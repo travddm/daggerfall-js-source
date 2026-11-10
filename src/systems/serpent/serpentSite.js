@@ -20,7 +20,7 @@
 // ones past it, the ones across its edge - one list in one order on every game that stands the land past the Bay, once
 // its picture and its fit stand: `whole`), the open law the world's lane water (`open`). A game without them (the land
 // past the Bay off, or its picture still coming) cannot roll the site: it takes the HUB'S word of where the accounts that
-// rolled it agree it lies (`told` - net/serpent/serpentLink.js toldAt, the relay's `at`: serpentHerald.js serpentAtWord),
+// rolled it agree it lies (`told` - net/serpent/serpentLink.js toldAt, the relay's `at`: net/serpent/serpent-site.ts serpentAtWord),
 // and names none till then (worldSerpentSite) - so every game online rises the one serpent at the one site.
 import { serpentLaneOf, serpentAlongOf, serpentRing, SERPENT_LANE_TRIES } from '../../net/serpent/serpentLaw.js';
 import { PIXEL_M } from '../../net/gate/gateLaw.js';

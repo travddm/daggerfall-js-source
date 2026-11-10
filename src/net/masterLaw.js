@@ -1,10 +1,12 @@
 // @ts-check
 // MASTER-ART: A MASTER'S WORK. A Master in a craft makes a
-// Legendary piece of its kinds: the crafter chooses its three lines, the service rolls their values in the Legendary
-// band (never past its top - POWER-CEILING), for catalysts from three pursuits besides the recipe's goods, one a
-// character a UTC day. No Legendary power, no enchantment: the build you want, not a higher number (a player: "Add more
-// horizontal progression please!"). Pure: the service decides by it (server-account/src/masterWork.js); the mint, the
-// item law, the judge and the stations read it. Not a DFU member - Port-Ledger A, MASTER-ART.
+// Rare piece of its kinds (crafted gear stays below Legendary, as the tamed loot tiers do): the crafter
+// chooses its three lines, the service rolls their values in the piece's tier's band (never past its top -
+// POWER-CEILING), for catalysts from three pursuits besides the recipe's goods, one a character a UTC day. No Legendary
+// power, no enchantment: the build you want, not a higher number (a player: "Add more horizontal progression please!").
+// The service's PROF_MASTER_LEGENDARY setting ("on") makes it Legendary, as it was before the cap (masterTierFor).
+// Pure: the service decides by it (server-account/src/masterWork.js); the mint, the item law, the judge and the stations
+// read it. Not a DFU member - Port-Ledger A, MASTER-ART.
 import { PROF_RANK_MAX, HEARTWOOD, PEARL, ARCANE_ESSENCE, trackOf } from './professionLaw.js';
 import { rollsQuality } from './recipeLaw.js';
 import { utcDay } from './marksLaw.js';
@@ -14,7 +16,7 @@ import { seededRng } from '../systems/wind/wind.js';
 
 /** The rank a Master's work asks of the recipe's craft: Master. */
 export const MASTER_RANK = PROF_RANK_MAX;
-/** The lines a Master's work carries: a Legendary's - 34 of the 39 records carry three (lootRarity.js allLegendaries). */
+/** The lines a Master's work carries: three, a Rare's least (lootRarity.js AFFIX_COUNTS) and a Legendary's usual count. */
 export const MASTER_LINES = 3;
 /** Lines that do something (LOOT4's procs) a Master's work may carry: one, as a loot door's last pass gives at most. */
 export const MASTER_PROCS_MAX = 1;
@@ -93,22 +95,31 @@ export function masterChoiceRefusal(r, keys) {
   return null;
 }
 
-/** A line's Legendary band, [lo, hi] - the top no Master's line passes. @param {string} id */
-export const masterBand = (id) => AFFIX_RANGES[id]?.legendary ?? null;
+/** The tier a Master's work is made at on a service - Rare, unless its PROF_MASTER_LEGENDARY setting says
+ *  "on". The record carries the tier it was made at (productRecord.js masterVersionOf), so a reader never asks this.
+ *  @param {any} env @returns {'rare' | 'legendary'} */
+export const masterTierFor = (env) => (String(env?.PROF_MASTER_LEGENDARY ?? 'off').trim().toLowerCase() === 'on' ? 'legendary' : 'rare');
+
+/** The tier a service's state read names (`master.tier`) - Rare unless it says Legendary. @param {any} state
+ *  @returns {'rare' | 'legendary'} */
+export const masterTierOfState = (state) => (state?.master?.tier === 'legendary' ? 'legendary' : 'rare');
+
+/** A line's band at a Master's work's tier, [lo, hi] - the top no Master's line passes. @param {string} id @param {string} [tier] */
+export const masterBand = (id, tier = 'rare') => AFFIX_RANGES[id]?.[tier] ?? null;
 
 /**
- * THE ROLL: each chosen line's value in the Legendary band, off the service's seed, in the order chosen - lo to hi, the
+ * THE ROLL: each chosen line's value in the tier's band (Rare unless the service says Legendary), off the service's seed, in the order chosen - lo to hi, the
  * ladder's own draw (lootRarity.js rangeInt), so no value passes the band's top. Null for a choice the law refuses.
  * The service's alone, once: the record signs what it rolled (masterRecordLines - AUDIT HORIZONTAL B1).
- * @param {any} r @param {unknown} keys @param {number} seed
+ * @param {any} r @param {unknown} keys @param {number} seed @param {'rare' | 'legendary'} [tier]
  * @returns {{ id: string, param?: any, value: number }[] | null}
  */
-export function rollMasterLines(r, keys, seed) {
+export function rollMasterLines(r, keys, seed, tier = 'rare') {
   if (masterChoiceRefusal(r, keys) || !Number.isSafeInteger(seed)) return null;
   const rolls = seededRng(seed >>> 0);
   return /** @type {string[]} */ (keys).map((k) => {
     const o = /** @type {MasterOption} */ (masterLineOf(r, k));
-    const [lo, hi] = /** @type {number[]} */ (masterBand(o.id));
+    const [lo, hi] = /** @type {number[]} */ (masterBand(o.id, tier));
     const value = lo + Math.floor(rolls() * (hi + 1 - lo));
     return o.param === undefined ? { id: o.id, value } : { id: o.id, param: o.param, value };
   });
@@ -140,7 +151,9 @@ export function masterLinesOfRecord(l) {
   return /** @type {any[][]} */ (l).map(([id, value, ...p]) => (p.length ? { id, param: p[0], value } : { id, value }));
 }
 
-/** Whether a piece is a Master's work: a Legendary of no record, made (its provenance the service's). @param {any} item */
-export const isMasterWork = (item) => item?.rarity === 'legendary' && !item.legendary && typeof item.provenance === 'string';
+/** Whether a piece is a Master's work, made (its provenance the service's): a Rare the mint marked (`master`), or a
+ *  Legendary of no record. An ordinary Masterwork is a Rare too, and carries no mark. @param {any} item */
+export const isMasterWork = (item) => typeof item?.provenance === 'string' && !item.legendary
+  && (item.rarity === 'legendary' || (item.rarity === 'rare' && item.master === true));
 /** A Master's work's lines as one string - the judge holds a piece's to its record's. @param {any[]} lines */
 export const masterSignature = (lines) => (Array.isArray(lines) ? lines.map((a) => `${a?.id}:${a?.param ?? ''}:${a?.value}`).join('|') : '');

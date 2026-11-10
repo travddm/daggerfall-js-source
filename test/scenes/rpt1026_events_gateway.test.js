@@ -19,7 +19,7 @@ import { portalPlace, portalStonePlace, PORTAL_TEXT } from '../../src/systems/po
 import { createHorseCartPool } from '../../src/scenes/horseCartPool.js';
 import { HCC_WIRE_KIND } from '../../src/systems/horse/horseCartWire.js';
 import { createStarfallHost } from '../../src/scenes/starfall/starfallHost.js';
-import { starNightAt, starTimes, STAR_LIFE_MS } from '../../src/net/starfall/starfallLaw.js';
+import { starNightAt, starTimes, starLifeMs } from '../../src/net/starfall/starfallLaw.js';
 import { STAR_COVENS, starCovenOf } from '../../src/systems/starfall/starfallCovens.js';
 import { FESTIVALS } from '../../src/net/festivalLaw.js';
 
@@ -167,7 +167,7 @@ test('RPT1026-EVENTS GATE-WAY A FALLEN STAR: the real starfall host says the hea
     assert.equal(eventGroundAt(h), 'star');
     assert.equal(eventGroundAt([h[0] + EVENT_GROUND_M - 1, 0, h[2]]), 'star', 'its ground');
     assert.equal(eventGroundAt([h[0] + EVENT_GROUND_M + 1, 0, h[2]]), null, 'past it');
-    t = starTimes(N, 0).fallAt + STAR_LIFE_MS + 1000; host.frame();
+    t = starTimes(N, 0).fallAt + starLifeMs() + 1000; host.frame();
     assert.equal(host.state().find((x) => x.key === S.key)?.phase ?? 'gone', 'after');
     assert.equal(eventGroundAt(h), null, 'its life over: no ground');
     t = starTimes(N, 0).fallAt - 3_600_000; host.frame();

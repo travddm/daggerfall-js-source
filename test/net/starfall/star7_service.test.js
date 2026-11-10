@@ -1,3 +1,4 @@
+import { playFileByRules } from '../../profileRules.mjs'; // a server profile's rule keys, for one test file
 // STAR7: THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM - a star's `j1`
 // receipt counted once a (star, account), nine a UTC day of its fall, paid in Renown to the character that fought it and
 // in silver under the day's combat cap, its spoils given once a device, a guest thanked and never counted, the cards'
@@ -7,13 +8,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService, T0 } from '../../accountDb.mjs';
 import { mintStarReceipt } from '../../../src/net/starfall/starReceipt.js';
-import { STAR_HOUR_MS, starTimes } from '../../../src/net/starfall/starfallLaw.js';
+import { starTimes } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter } from '../../../src/net/sky-days.ts';
 import { MARKS_FAUCETS, MARKS_COMBAT } from '../../../src/net/marksLaw.js';
 import { STAR_CLAIMS_DAY_MAX, starKeyOf, starDayOf } from '../../../server-account/src/stars.js';
 import { progressSpentOf } from '../../../server-account/src/progress.js';
 import { renownRaidXp, renownForXp } from '../../../src/net/renown.js';
 import { spoilsGrant } from '../../../server-account/src/budget.js';
 import { FESTIVALS } from '../../../src/net/festivalLaw.js';
+
+playFileByRules({ 'time.skyClock': true }); // these pins stand on the sky clock's hourly night (a sky day is an hour at its default TimeScale)
 const FESTIVAL_FROM_MS = FESTIVALS[0].fromMs;   // the Witches' Festival's first day, the Starfall's own (net/festivalLaw.js)
 
 const { subtle } = globalThis.crypto;
@@ -25,7 +29,7 @@ test.after(() => { Date.now = realNow; });
 clock(T0);
 
 /** A night inside the window, and the stars of the four nights from it - one UTC day's (05:00 to 08:00). */
-const N = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS) + 5;
+const N = skyDayAtOrAfter(FESTIVAL_FROM_MS) + 5;
 const STARS = Array.from({ length: 12 }, (_, i) => [N + Math.floor(i / 3), i % 3]);
 const CH = 'char-0001';
 const CID = '0123456789abcdef', CID2 = 'fedcba9876543210';

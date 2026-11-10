@@ -9,7 +9,6 @@ import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { weatherKeyForWeather } from '../../../src/systems/ambientText.js';
 import { WEATHER_TYPES, FOG_SETTINGS, fogForWeather, weatherSunlightScale, weatherFlags, precipitationForWeather, isDryFall, skyOffsetForWeather, weatherRng } from '../../../src/world/weather.js';
 import { WEATHER_ENUM } from '../../../src/systems/weather/weatherTable.js';
 import { WEATHER_TABLE } from '../../../src/systems/weather/weatherTable.js';
@@ -91,7 +90,6 @@ test('ASHFALL1 the word: the ninth, appended - DFU\'s seven and the sandstorm ke
   assert.equal(weatherSunlightScale('ashfall', false), 0.4); assert.equal(weatherSunlightScale('ashfall', true), 0.4);
   assert.ok(weatherSunlightScale('ashfall', false) < weatherSunlightScale('rain', false) && weatherSunlightScale('ashfall', false) > weatherSunlightScale('sandstorm', false));
   assert.deepEqual({ ...weatherFlags('ashfall') }, { raining: false, storming: false, snowing: false, overcast: true });
-  assert.equal(weatherKeyForWeather('ashfall'), 'Cloudy', 'Ambient Text hears an overcast, as for the sandstorm');
   assert.equal(precipitationForWeather('ashfall'), 'ash');
   assert.ok(isDryFall('ash') && isDryFall('sand')); for (const m of ['rain', 'storm', 'snow', null, undefined]) assert.equal(isDryFall(m), false, String(m));
   assert.equal(skyOffsetForWeather('ashfall', weatherRng(1)), 0, 'the classic panorama has no ash sky: the season\'s');

@@ -49,7 +49,9 @@ check on what it receives.
 
 A pose is a JSON object with short keys: position, `ts` (a stamp modulo `POSE_TS_MOD`, 2^24), movement and animation
 fields (`POSE_DEFAULTS`: `mv`, `wd`, `an`, `as`, `am`, `sr`, `cn`, `cr`, `ce`, `ar`, `fk`), hand flags, dead flag
-`dd`, riding mode. `validPose` and `slimPose` define the accepted shape. The client sends up to `POSE_HZ` (10/s,
+`dd`, riding mode, concealment `cv`, and the player's live Stealth `sk` and half-speed state `hv`, which a foe that
+another client runs reads for DFU's stealth check (`src/net/stealth-wire.ts`). `validPose` and `slimPose` define the
+accepted shape. The client sends up to `POSE_HZ` (10/s,
 fewer in a crowd, `POSE_CROWD`); the relay allows `POSE_HZ_MAX` (20/s) and batches fan-out every `POSE_BATCH_MS`.
 
 ### Limits worth knowing

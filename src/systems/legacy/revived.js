@@ -13,7 +13,7 @@
 // `died.at` of each death taken back, and every copy that meets the stamp - a merge on a device (store.js mergeFacts,
 // legacyHost.js mergeFamily), a write at the realm (legacy.js putLineage takes the stored copy's stamps into every copy
 // sent) - drops THAT death and what it laid: its remains row and the Succession it left waiting. Only that death: a
-// later one is another `at`, and stands. The operator's revival (tools/reviveRealmCharacter.mjs) writes the stamp.
+// later one is another `at`, and stands. An operator's revival writes the stamp.
 //
 // Pure, and the service's as much as the client's (server-account/src/legacy.js imports it): one law, two doors.
 //

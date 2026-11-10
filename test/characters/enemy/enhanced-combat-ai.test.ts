@@ -1,23 +1,38 @@
 // DFU's Enhanced Combat AI setting, the setting and the senses (EnemySenses.cs, EnemyAttack.MeleeAnimation): the field
 // of view, the lead on the target, the rate of approach and the runner-up target, each against the classic path.
-import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { srand } from '../../../src/formats/dfRandom.js';
-import {
-  ENHANCED_FIELD_OF_VIEW,
-  enhancedCombatAIEnabled,
-  trackRateOfApproach,
-  type ApproachTracker,
-  type EnhancedCombatAIFields,
-} from '../../../src/characters/enemy/enhanced-combat-ai.ts';
-import { tierOf } from '../../../src/systems/settings/settings.js';
-import { onlineForcedSetting } from '../../../src/systems/online/onlineLane.js';
 import { profileKeyOf } from '../../../src/net/profile/profileKeys.ts';
 
-// The motor, its attack and its targeting are loaded by a computed path, which tsconfig.node.json does not follow: their imports
-// reach src/player/motor.js and src/net, which name the DOM's crypto types (CryptoKey, SubtleCrypto), and the node
-// config has no DOM library.
+// The mods-off precondition, the setting's module, the settings, the online lane, the motor, its attack and its
+// targeting are loaded by a computed path, which tsconfig.node.json does not follow: their imports reach
+// src/player/motor.js and src/net (the setting reads the settings, whose online lane reads the server profile, which
+// hands the sky clock's rule to net/skyLaw.js), which name the DOM's crypto types (CryptoKey, SubtleCrypto), and the
+// node config has no DOM library. Every top-level await runs before the first test, so the mods are off for each.
+const MODS_OFF_PATH: string = '../../modsOff.js';
+const ECAI_PATH: string = '../../../src/characters/enemy/enhanced-combat-ai.ts';
+const SETTINGS_PATH: string = '../../../src/systems/settings/settings.js';
+const LANE_PATH: string = '../../../src/systems/online/onlineLane.js';
+await import(MODS_OFF_PATH);
+const { ENHANCED_FIELD_OF_VIEW, enhancedCombatAIEnabled, trackRateOfApproach } = await import(ECAI_PATH);
+const { tierOf } = await import(SETTINGS_PATH);
+const { onlineForcedSetting } = await import(LANE_PATH);
+
+// The shapes this test reads, as enhanced-combat-ai.ts declares them (ApproachTracker, EnhancedCombatAIFields): its
+// types cannot be imported without pulling the module into the node config.
+type ApproachTracker = {
+  readonly enhancedCombatAI: boolean;
+  targetRateOfApproach: number;
+  _lastDistanceToTarget: number;
+  _approachTarget: unknown;
+};
+type EnhancedCombatAIFields = ApproachTracker & {
+  _enhancedCombatAIOn: () => boolean;
+  fieldOfView: number;
+  secondaryTargetPos: number[] | null;
+  _inEarshot: boolean;
+};
 const MOTOR_PATH: string = '../../../src/characters/enemy/enemyMotor.js';
 const TARGETS_PATH: string = '../../../src/characters/enemy/enemyTargets.js';
 const ATTACK_PATH: string = '../../../src/characters/enemy/enemyAttack.js';

@@ -1,7 +1,7 @@
 // @ts-check
 // SCHOOLS - ARCANE SPECIALISATIONS: A MAGE IS THE SCHOOLS THEY MASTER.
 //
-// The Patreon chat, through Asked, the owner chose:
+// The players' chat, through Asked, the owner chose:
 // the pair CHOSEN ONCE among the schools mastered, permanent as a mastery is; each pair a signature spell, a passive, and
 // every school paying past 100 in its own way; nothing below 100 changed; all of it at once.
 //

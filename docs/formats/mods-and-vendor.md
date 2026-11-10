@@ -52,7 +52,6 @@ Mods (the folder README has the version, credits and permission):
 
 | Folder | What is vendored |
 | --- | --- |
-| `ambient-text` | Ambient Text: its text table |
 | `aquatic-sprites`, `detailed-ships`, `warm-ashes-ships`, `immersive-travel` | World-data patches (and quests, IL, drawings where the mod has them) |
 | `beautiful-villages`, `beautiful-cities` | One world-data pack each |
 | `better-ambience`, `immersive-footsteps`, `readied-spellcasting-hands`, `world-tooltips` | C# sources and clips |

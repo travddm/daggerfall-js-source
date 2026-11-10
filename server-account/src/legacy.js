@@ -145,8 +145,8 @@ export async function putLineage({ db, nowS }, playerId, { id, record: sent, bas
 }
 
 /**
- * REVIVE: THE DEATHS THE STORED COPY SAYS WERE TAKEN BACK (src/systems/legacy/revived.js - an operator's revival,
- * tools/reviveRealmCharacter.mjs, stamps the stored copy). A copy from a device that never heard of the revival carries
+ * REVIVE: THE DEATHS THE STORED COPY SAYS WERE TAKEN BACK (src/systems/legacy/revived.js - an operator's revival
+ * stamps the stored copy). A copy from a device that never heard of the revival carries
  * the death again, and stored, it would kill the member again (entombLineDead) - so the stored copy's stamps are taken
  * into the copy sent, and every death they take back is dropped with the remains row and the Succession it laid, before
  * anything is stored or entombed. The stamp so goes home in every copy stored after it, and each device's next merge

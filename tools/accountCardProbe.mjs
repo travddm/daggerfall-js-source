@@ -130,7 +130,7 @@ const measured = await page.evaluate(async (stages) => {
     const card = accountCard(document, flow);
     app.append(card.root);
     const cs = (el) => (el ? getComputedStyle(el) : null);
-    const label = card.root.querySelector('label.field .fieldlabel');   // ACC1e F1's subject, a FORM field's label - NAME-AS: a signed-in card's section labels (the wardrobe's Title, Aura, Glyphs, Patreon and the name-in-game toggle's) wear the card's own bone, never measured as one
+    const label = card.root.querySelector('label.field .fieldlabel');   // a FORM field's label - a signed-in card's section labels (the wardrobe's Title, Aura, Glyphs and the name-in-game toggle's) wear the card's own bone, never measured as one
     const code = card.root.querySelector('.acctcode code');
     const primary = card.root.querySelector('.act.primary');
     out.push({

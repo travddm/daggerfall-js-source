@@ -72,7 +72,7 @@ test('TV8 wire (world124): the leader\'s walk and a member\'s stop ride the part
   }
   assert.equal(validPartyPose({ ...base, ts: -1 }).ts, undefined);
   assert.equal(validPartyPose({ ...base, ts: 'x' }).ts, undefined);
-  assert.equal(RELAY_VERSION, 'world303');
+  assert.equal(RELAY_VERSION, 'world323');
 });
 
 test('TV8 host: the leader\'s walk begins with an Overworld journey (a gathered member, a hub that carries it) and runs on the law\'s own steps (AUDIT OW3: leaderWalkStep, halted through the panel); a member hears it with a grace, is asked only when free, walks the same journey on a yes, halts with the party through the panel, publishes only their own stops', () => {
@@ -781,6 +781,6 @@ test('AUDIT OW5b D3 (run on the host\'s own code): THE LEADER\'S SPAWN IS A DOOR
   assert.deepEqual(M.walks.at(-1).door, rect, 'as its door - never refused for the peaks, never a bare spot');
   const w8 = rd('src/scenes/world.js');
   assert.match(w8, /const there = summary \? null : tvLocationAt\(tw\.x, tw\.y\);/, 'the host asks what stands there');
-  assert.match(rd('src/scenes/spawnGroundHost.js'), /const tvLocationAt = \(x, y\) => locationIndex\.get\(`\$\{x\},\$\{y\}`\) \?\? \(params\.has\('online'\) && !inEtherLaw\(x, y\) && spawnsDungeon\(_spawnSalt, x, y\) \? tvSpawnAt\(x, y\) : null\);/, 'the index, else the spawn its roll would stand (online; side-effect free)');
+  assert.match(rd('src/scenes/spawnGroundHost.js'), /const tvLocationAt = \(x, y\) => locationIndex\.get\(`\$\{x\},\$\{y\}`\) \?\? \(spawnedDungeonsStand\(params, getPref\) && !inEtherLaw\(x, y\) && spawnsDungeon\(_spawnSalt, x, y\) \? tvSpawnAt\(x, y\) : null\);/, 'the index, else the spawn its roll would stand (online; side-effect free)');
 });
 
