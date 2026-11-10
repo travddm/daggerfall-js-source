@@ -11,7 +11,8 @@
 // every byte of it, so the sky lives here, outside the relay's import graph (test/systems/time1_sky.test.js holds it out); the
 // account service bundles it through nodeLaw.js, whose UTC days take their season from the sky. It imports wire.js and
 // the server profile's data (net/profile/), so neither graph grows past those leaves.
-import { sharedClassicMinutes, wallMsForClassicMinutes, onlineMinutesPerMs, onlineTimeScale, setOnlineTimeScale } from './wire.js';
+import { sharedClassicMinutes, wallMsForClassicMinutes, onlineMinutesPerMs } from './wire.js';
+import { SKY_SWITCH_MS, onlineTimeScale, setOnlineTimeScale, setSkyClock, skyClockOn, skyTimeScale } from './world-time-scale.ts';
 import { OFFICIAL_PROFILE } from './profile/officialProfile.ts';   // whether the sky has a clock of its own (time.skyClock)
 import { resolveRules } from './profile/profileKeys.ts';
 
@@ -31,7 +32,7 @@ import { resolveRules } from './profile/profileKeys.ts';
 export const SKY_SEGMENTS = Object.freeze([
   // TimeScale 24: a day every real hour, midnight on the hour (SKY-SLOW, 2026-10-02: 48's thirty-minute day zoomed by -
   // the row replaced before it went live).
-  Object.freeze({ fromMs: Date.UTC(2026, 9, 3, 17, 7, 30), minutesPerMs: 24 / 60 / 1000 }),
+  Object.freeze({ fromMs: SKY_SWITCH_MS, minutesPerMs: 24 / 60 / 1000 }),
 ]);
 
 /**
@@ -71,24 +72,19 @@ export function skyLawOf(segments) {
   return { minutesAt, wallMsAt, rateAt };
 }
 
-// THE RATES ARE THE SERVER PROFILE'S. The account service reads the official profile and the client the profile it installed
-// (systems/online/serverProfile.ts sets the rules); the relay never imports this file and reads the world's rate in
-// server/src/relayFacts.ts. The world clock's TimeScale (time.worldScale) is set on the wire from the official profile
-// when this module loads, so the account service, which imports this file and never installs a profile, plays by it.
+// THE RATES ARE THE SERVER PROFILE'S, held in world-time-scale.ts. The account service reads the official profile when
+// this module loads (it imports this file and never installs a profile); a client sets them when it installs the relay's
+// profile (systems/online/serverProfile.ts); the relay never imports this file and sets them in server/src/relayFacts.ts.
 const OFFICIAL_RULES = resolveRules(OFFICIAL_PROFILE.rules);
-setOnlineTimeScale(Number(OFFICIAL_RULES['time.worldScale']));
-let _skyScale = () => Number(OFFICIAL_RULES['time.skyScale']);
-/** Sets the rule that answers the sky clock's TimeScale (time.skyScale), read only while the sky has a clock of its own. */
-export function setSkyScaleRule(/** @type {() => number} */ fn) {
-  _skyScale = fn;
-}
+setOnlineTimeScale(OFFICIAL_RULES['time.worldScale']);
+setSkyClock(OFFICIAL_RULES['time.skyClock'], OFFICIAL_RULES['time.skyScale']);
 
 /** The sky's law at the profile's rates: SKY_SEGMENTS with the last row at `time.skyScale`, built on the world's rate
  *  (the first row starts at the event clock's minute at its switch), and rebuilt when either rate changes. */
 let _law = null;
 let _lawKey = '';
 const liveLaw = () => {
-  const scale = _skyScale();
+  const scale = skyTimeScale();
   const key = `${onlineTimeScale()}/${scale}`;
   if (_law === null || key !== _lawKey) {
     _law = skyLawOf(SKY_SEGMENTS.map((seg, i) => (i === SKY_SEGMENTS.length - 1 ? { ...seg, minutesPerMs: scale / 60 / 1000 } : seg)));
@@ -98,15 +94,9 @@ const liveLaw = () => {
 };
 
 // ONE CLOCK BY DEFAULT, AS IN DFU: the sky's own clock is the server profile's option (time.skyClock). Off, every read
-// below is the event clock's, so the sky, the date, the season and the moons are the world's. The account service reads
-// the official profile; the client reads the profile it installed (systems/online/serverProfile.ts sets the rule).
-let _skyOwnClock = () => resolveRules(OFFICIAL_PROFILE.rules)['time.skyClock'] === true;
-/** Sets the rule that answers whether the sky has a clock of its own. */
-export function setSkyClockRule(/** @type {() => boolean} */ fn) {
-  _skyOwnClock = fn;
-}
+// below is the event clock's, so the sky, the date, the season and the moons are the world's.
 /** Whether the sky runs on a clock of its own (time.skyClock). */
-export const skyHasOwnClock = () => _skyOwnClock() === true;
+export const skyHasOwnClock = () => skyClockOn();
 
 /** The sky's clock, classic minutes, for a relay-clock instant (ms) - the event clock's before the first switch,
  *  and always with one clock. */
