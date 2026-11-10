@@ -1,35 +1,52 @@
-// Classic distance shading. The original game darkened and fogged by distance through 64-step palette remap tables:
-// the far a surface, the further its colours were moved toward the table's fade colour. This pass gives the same 64
-// steps to the full-colour image: after the world is drawn, each pixel is moved toward the fade colour by its step.
+// Classic distance shading: up to two fades over the drawn world, before the present.
 //
-// Departures from the original game, recorded here and in the row's note:
+// To fog colour (the row). The original game darkened and fogged by distance through 64-step palette remap tables:
+// the far a surface, the further its colours were moved toward the table's fade colour. This fade gives the same 64
+// steps to the full-colour image, toward the scene's own fog colour, so a mod's coloured fog (Better Ambience gives
+// dungeons a brown one) tints the far view. Departures from the original game, recorded here and in the row's note:
 //   - The step is picked per pixel from the depth buffer. The original game picked one row per flat, or per surface
 //     from its centre point.
 //   - The colour moves by a linear blend, not through the palette tables, which would need a palettized picture.
-//   - The range is not measured on the original game yet (it needs a capture). Indoors it is 30 m: in the original
-//     game dungeons fall to dark after about that distance (Daggerfall Unity 0.13 Rendering Update, parts 2 and 3).
-//     Outdoors the steps follow the scene's own fog, so the land stays visible as far as it does today.
-//   - The fade colour is a choice, an agreed design. To black, the default, is the original game's look:
-//     dungeons and buildings go to black whatever their fog. To fog colour moves every place toward its own fog, so a
-//     mod's coloured fog (Better Ambience gives dungeons a brown one) tints the far view. The two differ only indoors
-//     under a fog that is not black.
+//   - The fade colour is the scene's fog colour: an agreed design, so a coloured fog stays coloured.
 //
-// The pass costs nothing while it is off: the renderer builds it on the first shaded frame, so no program, buffer or
-// framebuffer of it exists before. It is a leaf: it is handed the renderer's program builder and imports nothing of it.
+// Color Boost's dungeon falloff (Daggerfall Unity's Effects/ColorBoostDungeonFalloff, read by
+// systems/distance-shading-setting.ts). DFU's own arithmetic (ColorBoost.shader): in dungeons only, each pixel moves
+// toward black by min(eye depth / 90 m, 1) x falloff, smoothly, not in steps. It takes the place of a "to black" row:
+// a DFU settings file means the same here.
+//
+// The pass costs nothing while both are off: the renderer builds it on the first shaded frame, so no program, buffer
+// or framebuffer of it exists before. It is a leaf: it is handed the renderer's program builder and imports nothing of
+// it. The vertex stage is the retro pass's full-screen one.
+import SHADE_VERTEX from './retro-pass.vert?raw';
+import SHADE_FRAGMENT from './classic-distance-shading.frag?raw';
+
+export const SHADE_VS: string = SHADE_VERTEX;
+export const SHADE_FS: string = SHADE_FRAGMENT;
 
 /** The original game's remap tables have 64 rows. */
 export const CLASSIC_SHADE_STEPS = 64;
 
-/** Indoors, where the fade colour is black: the distance in metres at which the last step is reached. */
+/** Under a black fog (a dungeon under DFU's own fog, or a building): the distance in metres at which the last step is
+ *  reached. In the original game dungeons fall to dark after about that distance (Daggerfall Unity 0.13 Rendering
+ *  Update, parts 2 and 3); the range is not measured on the original game yet. */
 export const CLASSIC_DARK_RANGE_M = 30;
+
+/** DFU's Color Boost reaches its full dungeon falloff at this eye depth, in metres (ColorBoost.shader). */
+export const DUNGEON_FALLOFF_DEPTH_M = 90;
 
 /** An exponential fog leaves 5% of the colour at 3 / density. */
 const EXP_FOG_FULL = 3;
 
-/** Where the last step leads. */
-export type ShadeTarget = 'black' | 'fog';
+/** A building's fog: DFU's interior fog, exponential 0.001 and black (scenes/interior.js). A dungeon's never is. */
+const INTERIOR_FOG_DENSITY = 0.001;
 
-const BLACK: readonly number[] = Object.freeze([0, 0, 0]);
+/** What the setting source asks for this frame (systems/distance-shading-setting.ts); null while both are off. */
+export type ShadeChoice = {
+  /** The row's To fog colour. */
+  readonly fogColour: boolean;
+  /** ColorBoostDungeonFalloff, 0 to 8; 0 is off. */
+  readonly falloff: number;
+};
 
 /** The fog the renderer was given for the frame, as setFog stores it. */
 export type SceneFog = {
@@ -40,6 +57,8 @@ export type SceneFog = {
   readonly end: number;
   readonly color: ArrayLike<number>;
 };
+
+const isBlack = (color: ArrayLike<number>): boolean => color[0] === 0 && color[1] === 0 && color[2] === 0;
 
 /** How many steps a surface at `distance` metres is moved toward the fade colour: 0 (untouched, near the player) to
  *  63 (all the way). The original game's row 63 is its untouched row and row 0 its full fade; this counts the other way. */
@@ -53,18 +72,21 @@ export function shadeAmount(step: number): number {
   return step / (CLASSIC_SHADE_STEPS - 1);
 }
 
-/** The distance at which the last step is reached for a scene's fog, or null when the scene has no fog to fade to.
- *  A black fog is a dungeon's or a building's (Renderer.setFog from scenes/dungeon.js and scenes/interior.js). */
+/** The distance at which the last step is reached for a scene's fog, or null when the scene has no fog to fade to. */
 export function shadeRange(fog: SceneFog): number | null {
   if (fog.mode === 0) return null;
-  const black = fog.color[0] === 0 && fog.color[1] === 0 && fog.color[2] === 0;
-  if (black) return CLASSIC_DARK_RANGE_M;
+  if (isBlack(fog.color)) return CLASSIC_DARK_RANGE_M;
   if (fog.mode === 1) return fog.end > 0 ? fog.end : null;
   return fog.density > 0 ? EXP_FOG_FULL / fog.density : null;
 }
 
-/** The last step's colour and distance for a scene, or null when the scene has no fog to fade to. */
+/** The last step's colour and distance for the fog-colour fade, or null when the scene has no fog to fade to. */
 export type ShadeFade = { readonly range: number; readonly color: ArrayLike<number> };
+
+export function shadeFade(fog: SceneFog): ShadeFade | null {
+  const range = shadeRange(fog);
+  return range === null ? null : { range, color: fog.color };
+}
 
 /** Whether a frame is a dungeon's or a building's, by its clear colour: those clear to opaque black (INTERIOR_CLEAR,
  *  as DFU's CameraClearManager), the exterior to the sky, and the real windows' view out to transparent black. */
@@ -72,38 +94,18 @@ export function clearsIndoors(clear: ArrayLike<number>): boolean {
   return clear[0] === 0 && clear[1] === 0 && clear[2] === 0 && clear[3] === 1;
 }
 
-export function shadeFade(fog: SceneFog, indoors: boolean, target: ShadeTarget): ShadeFade | null {
-  const range = shadeRange(fog);
-  if (range === null) return null;
-  if (target === 'black' && indoors) return { range: CLASSIC_DARK_RANGE_M, color: BLACK };
-  return { range, color: fog.color };
+/** Whether a frame is a dungeon's: indoors, and not under a building's fog. The world host alone knows the mode, so the
+ *  pass reads it from the clear colour and the fog it was already given. */
+export function inDungeon(clear: ArrayLike<number>, fog: SceneFog): boolean {
+  const buildingFog = fog.mode === 2 && fog.density === INTERIOR_FOG_DENSITY && isBlack(fog.color);
+  return clearsIndoors(clear) && !buildingFog;
 }
 
-export const SHADE_VS = `#version 300 es
-layout(location = 0) in vec2 aPos;
-void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
-`;
-
-// The fragment's step must equal shadeStep's. Blending (SRC_ALPHA, ONE_MINUS_SRC_ALPHA) does the move:
-// colour * (1 - amount) + fade * amount. The sky, at the far plane, is left as it is.
-export const SHADE_FS = `#version 300 es
-precision highp float;
-uniform highp sampler2D uDepth;
-uniform vec2 uSize;     // the image, in pixels
-uniform vec4 uProj;     // |proj[0]|, proj[5], proj[10], proj[14] of the world's projection
-uniform float uRange;   // metres to the last step
-uniform vec3 uFade;
-out vec4 outColor;
-void main() {
-  float depth = texelFetch(uDepth, ivec2(gl_FragCoord.xy), 0).r;
-  if (depth >= 1.0) { outColor = vec4(0.0); return; }
-  vec2 ndc = gl_FragCoord.xy / uSize * 2.0 - 1.0;
-  float viewDepth = uProj.w / (depth * 2.0 - 1.0 + uProj.z);
-  float distance = viewDepth * length(vec3(ndc.x / uProj.x, ndc.y / uProj.y, 1.0));
-  float step = min(floor(distance / uRange * ${CLASSIC_SHADE_STEPS.toFixed(1)}), ${(CLASSIC_SHADE_STEPS - 1).toFixed(1)});
-  outColor = vec4(uFade, max(step, 0.0) / ${(CLASSIC_SHADE_STEPS - 1).toFixed(1)});
+/** DFU's falloff at an eye depth: the share of the way to black, 0 to 1. */
+export function dungeonFalloffAmount(depth: number, falloff: number): number {
+  if (!(depth > 0) || !(falloff > 0)) return 0;
+  return Math.min(1, 0.999 * Math.min(1, depth / DUNGEON_FALLOFF_DEPTH_M) * falloff);
 }
-`;
 
 type ProgramBuilder = (vs: string, fs: string) => WebGLProgram;
 
@@ -112,8 +114,10 @@ type ShadeProgram = {
   vao: WebGLVertexArrayObject;
   uSize: WebGLUniformLocation | null;
   uProj: WebGLUniformLocation | null;
+  uMode: WebGLUniformLocation | null;
   uRange: WebGLUniformLocation | null;
   uFade: WebGLUniformLocation | null;
+  uFalloff: WebGLUniformLocation | null;
 };
 
 /** One shaded frame: the image to shade in place and the frame's depth, both `width` x `height`. */
@@ -125,10 +129,22 @@ export type ShadeFrame = {
   /** The world's projection (column-major, as mat4.js perspective builds it). */
   readonly proj: ArrayLike<number>;
   readonly fog: SceneFog;
-  /** The frame's clear colour (Renderer.setClearColor), which tells a dungeon or a building from the outdoors. */
+  /** The frame's clear colour (Renderer.setClearColor), which tells an indoor frame from the outdoors. */
   readonly clear: ArrayLike<number>;
-  readonly target: ShadeTarget;
+  readonly target: ShadeChoice;
 };
+
+/** The two fades a frame gets, in order; empty when neither applies. */
+export function shadeDraws(
+  frame: Pick<ShadeFrame, 'fog' | 'clear' | 'target'>,
+): Array<{ mode: 0; fade: ShadeFade } | { mode: 1; falloff: number }> {
+  const draws: Array<{ mode: 0; fade: ShadeFade } | { mode: 1; falloff: number }> = [];
+  const fade = frame.target.fogColour ? shadeFade(frame.fog) : null;
+  if (fade) draws.push({ mode: 0, fade });
+  if (frame.target.falloff > 0 && inDungeon(frame.clear, frame.fog))
+    draws.push({ mode: 1, falloff: frame.target.falloff });
+  return draws;
+}
 
 export class DistanceShadePass {
   private readonly gl: WebGL2RenderingContext;
@@ -162,8 +178,10 @@ export class DistanceShadePass {
         vao,
         uSize: gl.getUniformLocation(program, 'uSize'),
         uProj: gl.getUniformLocation(program, 'uProj'),
+        uMode: gl.getUniformLocation(program, 'uMode'),
         uRange: gl.getUniformLocation(program, 'uRange'),
         uFade: gl.getUniformLocation(program, 'uFade'),
+        uFalloff: gl.getUniformLocation(program, 'uFalloff'),
       };
     } catch (error) {
       this.failed = true;
@@ -185,10 +203,10 @@ export class DistanceShadePass {
 
   /** Shades the image in place. Leaves the image's framebuffer bound, the depth unbound from unit 1 with TEXTURE0
    *  active, and the draw-state baseline (depth test, depth writes and culling on, blending off); the present that
-   *  follows binds its own. Returns false when the scene has no fog to fade to or the program would not build. */
+   *  follows binds its own. Returns false when no fade applies to the frame or the program would not build. */
   draw(frame: ShadeFrame): boolean {
-    const fade = shadeFade(frame.fog, clearsIndoors(frame.clear), frame.target);
-    if (fade === null || !(frame.width > 0) || !(frame.height > 0)) return false;
+    const draws = shadeDraws(frame);
+    if (draws.length === 0 || !(frame.width > 0) || !(frame.height > 0)) return false;
     const shade = this.program();
     if (!shade) return false;
     const gl = this.gl;
@@ -208,9 +226,16 @@ export class DistanceShadePass {
     const proj = frame.proj;
     gl.uniform2f(shade.uSize, frame.width, frame.height);
     gl.uniform4f(shade.uProj, Math.abs(proj[0]), proj[5], proj[10], proj[14]);
-    gl.uniform1f(shade.uRange, fade.range);
-    gl.uniform3f(shade.uFade, fade.color[0], fade.color[1], fade.color[2]);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    for (const draw of draws) {
+      gl.uniform1i(shade.uMode, draw.mode);
+      if (draw.mode === 0) {
+        gl.uniform1f(shade.uRange, draw.fade.range);
+        gl.uniform3f(shade.uFade, draw.fade.color[0], draw.fade.color[1], draw.fade.color[2]);
+      } else {
+        gl.uniform1f(shade.uFalloff, draw.falloff);
+      }
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
     gl.bindVertexArray(null);
     gl.bindTexture(gl.TEXTURE_2D, null);
     gl.activeTexture(gl.TEXTURE0);

@@ -82,13 +82,19 @@ world frame, so a change applies on the next frame.
   section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
   Off and land view distance 3 in one press. It keeps the values it replaced in the `classicRenderingSaved` preference,
   and Off puts back each one that still holds the preset's value.
-- **Classic distance shading** (`src/render/classic-distance-shading.ts`, preference `classicDistanceShading`:
-  `off` by default, `black` or `fog`). Before the present, one full-screen pass reads the image's depth and moves
-  each pixel in 64 steps toward a fade colour. Outdoors that is the fog colour, over the fog's own distance. Indoors
-  (the frame clears to black) `black` goes to black over 30 m, and `fog` goes to the frame's fog colour over its
-  distance, so a mod's coloured dungeon fog tints the far view. A black indoor fog gives 30 m either way. It needs the
-  world in an image, so with retro mode and render scale off it opens a full-size one (the cost of the option, on top
-  of the pass). Off, nothing of it is built; the renderer asks its source once per world frame.
+- **Classic distance shading** (`src/render/classic-distance-shading.ts`, source
+  `src/systems/distance-shading-setting.ts`). Before the present, a full-screen pass reads the image's depth and
+  draws up to two fades over it:
+  - the row's To fog colour (preference `classicDistanceShading`, `off` by default, or `fog`): each pixel moves in 64
+    steps toward the frame's fog colour over the fog's own distance, or over 30 m under a black fog;
+  - Daggerfall Unity's Color Boost dungeon falloff (`Effects/ColorBoostDungeonFalloff`, 0 to 8, read while
+    `Effects/ColorBoostEnable` is on, as in DFU): in dungeons only, each pixel moves toward black by
+    min(eye depth / 90 m, 1) x falloff. A dungeon is an indoor frame (opaque black clear) without DFU's interior fog
+    (exponential 0.001, black).
+
+  It needs the world in an image, so with retro mode and render scale off it opens a full-size one (the cost of the
+  option, on top of the pass). With both off, nothing of it is built; the renderer asks its source once per world
+  frame.
 - Leaving all three returns to drawing straight to the canvas, and the renderer frees the image and depth it used.
 
 ## GPU memory and context loss

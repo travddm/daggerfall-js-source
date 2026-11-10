@@ -92,8 +92,9 @@ const CLASSIC_COLOURS_ROW: SettingsRow = Object.freeze({
   control: Object.freeze({ store: 'settings', key: 'Video/PostProcessingInRetroMode' }),
 });
 
-/** Off by default, so the game looks as before until a player turns it on. Both choices blend in full colour and differ
- *  only in where the steps lead. Fading through the original palette tables would be a choice of its own. */
+/** Off by default, so the game looks as before until a player turns it on. The fade to black in dungeons is Daggerfall
+ *  Unity's own Color Boost falloff on the settings screen, so a DFU settings file means the same here; fading through
+ *  the original palette tables would be a choice of its own. */
 const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   id: 'classic-distance-shading',
   group: 'sight',
@@ -103,10 +104,10 @@ const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   get note() {
     return t(
       'features.classicDistanceShading.note',
-      'Darkens the world in 64 steps with distance, as the original game did. To black: dungeons and buildings go to ' +
-        'black, and the outdoors to the fog colour. To fog colour: every place goes to its own fog colour, so a mod ' +
-        'that colours the fog, as Better Ambience does in dungeons, tints the far view. Made for Classic picture, but ' +
-        'it works without it. The original game picked one step for each surface; this picks one for each pixel.',
+      'Moves far surfaces toward the fog colour in 64 steps, as the original game did. A mod that colours the fog, as ' +
+        'Better Ambience does in dungeons, tints the far view. To darken dungeons with distance, use Color Boost ' +
+        'Falloff in the Post effects settings. Made for Classic picture, but it works without it. The original game ' +
+        'picked one step for each surface; this picks one for each pixel.',
     );
   },
   get effect() {
@@ -120,7 +121,6 @@ const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
     online: 'player',
     tiers: Object.freeze([
       tier('off', () => localizedText('off', 'Off')),
-      tier('black', () => t('features.classicDistanceShading.black', 'To black')),
       tier('fog', () => t('features.classicDistanceShading.fog', 'To fog colour')),
     ]),
   }),

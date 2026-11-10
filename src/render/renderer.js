@@ -1719,7 +1719,7 @@ export class Renderer {
     this._retroOwed = false;    // a retro image is drawn and not yet presented
     this._retroMips = true;     // whether the world's textures read their mip chains (TextureReader's retro arm)
     this._shade = null;         // the DistanceShadePass, built on the first shaded frame
-    this._shadeSource = null;   // classic distance shading's target, null while off; main.js hands it in, as the retro source
+    this._shadeSource = null;   // classic distance shading's choice, null while off; main.js hands it in, as the retro source
     // PERF-SCALE: the render scale's source (systems/renderScale.js renderScaleSetting, handed over by main.js as the
     // retro source is) - a function answering the frame's scale, 1 the whole canvas. Null (every test's) is 1
     this._scaleSource = null;
@@ -3047,7 +3047,7 @@ export class Renderer {
   /** PERF-SCALE: where the renderer asks for each WORLD frame's render scale - systems/renderScale.js
    *  renderScaleSetting, handed over by main.js; null (the default, and every test's) is 1, today's frame. */
   setRenderScaleSource(fn) { this._scaleSource = typeof fn === 'function' ? fn : null; }
-  /** Where the renderer asks classic distance shading's target ('black' or 'fog', null and no source off) per world frame. */
+  /** Where the renderer asks what classic distance shading draws (null, or no source, is off), once per world frame. */
   setDistanceShadeSource(fn) { this._shadeSource = typeof fn === 'function' ? fn : null; }
   /** The frame's size for the FPS counter: the world image, the canvas, the devicePixelRatio, the render scale the
    *  last world frame took (1 under retro or at 100%) and the GPU. The counter asks once a second. */
