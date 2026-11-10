@@ -1,7 +1,6 @@
 // AUDIT 28 - NOTICE1's findings, each
 // pinned against the real Worker over node:sqlite (test/accountDb.mjs), the client's book, or the board's window on
-// the minimal DOM (test/chargenDom.mjs), and each failing on the code before the fix. bible/06-Systems/
-// Professions-Arc.md 10.7 (AUDIT 28).
+// the minimal DOM (test/chargenDom.mjs), and each failing on the code before the fix. docs/systems/professions.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

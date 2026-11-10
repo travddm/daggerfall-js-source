@@ -1,9 +1,8 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL6-STATUS - THE PANEL'S SERVER STATUS, ITS LIMITS AND
 // ITS HOME.
 //
-// ═══ SERVER STATUS (Admins only): ONE READ, ASKED EVERY 10 SECONDS ═══
+// SERVER STATUS (Admins only): ONE READ, ASKED EVERY 10 SECONDS
 //
 // Four tiles - players, service load, game activity, health - each grey while normal and amber or red only past a limit
 // an Admin set (staff_limits), and each saying where its numbers came from and when (`asOf`, `sources`): a source that
@@ -31,12 +30,12 @@
 // reads) - so a poll every ten seconds costs the session's read and, at most, the fast part's one batch. Only a part's
 // answer is kept, never a pending one: a Worker cannot hand one request's I/O to another.
 //
-// ═══ LIMITS (staff_limits) ═══
+// LIMITS (staff_limits)
 //
 // Per metric (STATUS_METRICS), an amber and a red line, either or both: a value AT OR PAST a line takes its colour. Every
 // staff member may read them; only an Admin sets one, written down in the audit log in the same batch, with what it was.
 //
-// ═══ HOME (design doc, "Home: only the top of everything"; mob, 03:23Z-03:24Z) ═══
+// HOME (design doc, "Home: only the top of everything"; mob, 03:23Z-03:24Z)
 //
 // One read: the top 3, 5 or 10 of every watch the caller may see, each item a level (high, medium, low), why, and who,
 // each watch with "N high of M", the watches ordered by their worst item. A watch is one plain entry in HOME_WATCHES - a

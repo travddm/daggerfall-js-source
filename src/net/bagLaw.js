@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // BAG1 — THE MATERIALS BAG AND WHAT A CHARACTER CARRIES:
-// the shapes and bounds BOTH ends read (bible/06-Systems/Materials-
-// Bag.md). The account service counts (server-account/src/
+// the shapes and bounds BOTH ends read. The account service counts (server-account/src/
 // professions.js); the client holds the items (systems/materialsBag.js).
 // Pure: no clock, no DOM, no network.
 //

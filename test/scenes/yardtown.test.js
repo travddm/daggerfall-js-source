@@ -1,6 +1,6 @@
 // YARD-TOWN - A TOWN'S YARDS STAND A FEW A FRAME. Over the real yards and their pools: a town of strangers' yards stands
 // YARD_STANDS_A_FRAME of them a frame, frame after frame until it is stood (never half a second apart), and the owner's
-// own yard never waits behind them. `06-Systems/Online-Arc.md` YARD-TOWN.
+// own yard never waits behind them. YARD-TOWN.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHomeYards, YARD_STANDS_A_FRAME, YARD_SYNC_S } from '../../src/scenes/homeYards.js';

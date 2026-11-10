@@ -3,7 +3,7 @@
 // next claimant when the first cannot pay), the Contested seats, the holder's defence and the Rights of Siege (one a guild
 // and one a seat, a new Charter in truce), the Legacy carried, a Charter relinquished, and a guild that holds one kept
 // from going - driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// 5.2, 16; `06-Systems/Online-Arc.md` SEAT1c.
+// 5.2, 16; SEAT1c.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0, d1, D1_MAX_BOUND } from '../accountDb.mjs';   // SEAT-CAP: the fake refuses what D1 refuses

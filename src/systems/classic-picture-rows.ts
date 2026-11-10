@@ -104,8 +104,8 @@ const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   get note() {
     return t(
       'features.classicDistanceShading.note',
-      'Moves far surfaces toward the fog colour in 64 steps, as the original game did. A mod that colours the fog, as ' +
-        'Better Ambience does in dungeons, tints the far view. To darken dungeons with distance, use Color Boost ' +
+      'Moves far surfaces toward the fog colour in 64 steps, as the original game did. A mod that colours the ' +
+        'fog in a dungeon tints its far view. To darken dungeons with distance, use Color Boost ' +
         'Falloff in the Post effects settings. Made for Classic picture, but it works without it. The original game ' +
         'picked one step for each surface; this picks one for each pixel.',
     );

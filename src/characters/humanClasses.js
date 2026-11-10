@@ -1,6 +1,5 @@
 import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 
-// ═══════════════════════════════════════════════════════════════════
 // THE HUMAN CLASS ENEMIES
 //
 // Mage, Sorcerer, Battlemage, Bard and Thief — mapChance 3, 3, 2, 2, 2,
@@ -23,7 +22,6 @@ import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 // the case that was clipping until the drape learned to clear what is
 // under it, so it is here partly as an enemy and partly as the thing
 // that proves that fix on a design built after it.
-// ═══════════════════════════════════════════════════════════════════
 
 /** ART_PAL spans, same convention as ORC_RAMPS and UNDEAD_RAMPS. */
 export const CLASS_RAMPS = Object.freeze({

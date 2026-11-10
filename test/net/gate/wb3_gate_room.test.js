@@ -42,7 +42,7 @@ function fightOf(lvs = [10]) {
 }
 const body = (sub, x, z, dead = false) => ({ sub, x, z, dead });
 
-// ═══ THE BRAIN ══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE BRAIN
 
 test('WB3 brain: the numbers a claim sets - the health a player brings and the bucket that bounds them grow together, so NO claim buys a faster kill: one player at the cap kills their own share in (BOSS_TTK_S - BUCKET_DEPTH_X) / BUCKET_RATE_X seconds at every level (mutants: the share off the claim; the bucket rate off the claim; the one-blow cap lifted)', () => {
   assert.equal(dpsRef(1), 6); assert.equal(dpsRef(20), 25); assert.equal(dpsRef(999), dpsRef(LV_MAX), 'a claim past the ceiling is the ceiling');
@@ -331,7 +331,7 @@ test('WB3 brain: the checkpoint - the fight is plain numbers and strings, so the
   assert.deepEqual(COURT_CENTRE, [25.6, 0, 25.6]);
 });
 
-// ═══ THE RECEIPT ═════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RECEIPT
 
 async function keypair() { return subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']); }
 const WHAT = { d: 200, b: 'ruhn', s: 'acct-peer-0001', c: 0xdeadbeef, x: 'dealt' };
@@ -390,7 +390,7 @@ test('WB3 receipt: the relay\'s key from its secret - PKCS8 in base64 (the accou
   for (const bad of [undefined, '', 'not base64!', Buffer.from('nope').toString('base64')]) assert.equal(await importReceiptKey(bad, { subtle }), null);
 });
 
-// ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('WB3 wire: the client says two things - `in` with a level claim, `hit` with a sequence, a damage and a kind - projected field by field, after a hello alone; the room says its closed list of kinds, each bounded (mutants: an extra field carried; a damage past the wire\'s bound; a refusal word invented)', () => {
   assert.deepEqual(GATE_KINDS, ['in', 'hit', 'spent', 'site', 'xhit', 'ahit', 'heal', 'vt']);
@@ -423,7 +423,7 @@ test('WB3 wire: the client says two things - `in` with a level claim, `hit` with
   assert.ok(GATE_HZ_MAX >= GATE_HIT_HZ_MAX + 2, 'the meter never refuses a blow the brain would take');
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 const DAY = 200;
 const TT = gateTimes(DAY);
@@ -631,7 +631,7 @@ test('WB3 relay: NO KEY - the fight and its receipts run the same, unsigned (the
   });
 });
 
-// ═══ THE SESSION ═════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
 function gateRig(room) {

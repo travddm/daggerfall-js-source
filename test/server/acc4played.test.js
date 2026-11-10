@@ -1,7 +1,7 @@
 // ACC4 — REGISTERED DATE AND TIME PLAYED ON THE PROFILE CARD.
 //
 //
-// ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
+// WHAT THESE PINS ARE FOR
 //
 // THE REGISTERED DATE IS A COLUMN THAT ALREADY EXISTED (`players.registered_at`); the only work was carrying it to the card, and the
 // pin is that a guest gets no date rather than 1970.

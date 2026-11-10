@@ -246,8 +246,7 @@ export function buyItemPrice(item, { quality = 0, priceAdjustment = 1000, holida
  *  #feature-feedback "Bring back loot price based on the condition!": "actively discourage players to repair an item in
  *  order to maximalize the sell price - like with repair kits at early levels, and enchants at higher"); wear after the
  *  find still lowers the sale. A piece with no mark - handed over whole (a craft, a reward, a new shelf's), or found
- *  before this - sells at its own condition, repaired or not. Offline, the mod's prices stand. Bible:
- *  06-Systems/Economy-Arc.md, MEND-THIRD. */
+ *  before this - sells at its own condition, repaired or not. Offline, the mod's prices stand. */
 export function saleConditionPercentage(item, { online = isOnlinePage() } = {}) {
   // WAGON-TIERS: a wagon's condition is its wear, and its wear prices it only where
   // the seller's wagon upkeep tier says so (Hard). On Boons - and Off - a counter buys it as DFU's plain wagon, which

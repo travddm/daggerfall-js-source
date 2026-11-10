@@ -1,3 +1,4 @@
+import { playFileByRules } from '../../profileRules.mjs'; // a server profile's rule keys, for one test file
 // STAR-CLEAR - World of Daggerfall's rock keeps off a
 // fallen star. A star's spot is the law's alone (net/starfall/starfallLaw.js starSpotLocal, on the gate's own pixels), and
 // the mod stands its rock fields there - of the festival's 1,366 stars, 381 had a piece's mesh box reach within
@@ -14,7 +15,8 @@ import {
   STAR_ROCK_M, GATE_CLEAR_M,
 } from '../../../src/world/gate/gateClearance.js';
 import { createStarfallHost } from '../../../src/scenes/starfall/starfallHost.js';
-import { starNightAt, starTimes, starSpotLocal, starInWindow, STAR_HOUR_MS, STAR_PER_NIGHT } from '../../../src/net/starfall/starfallLaw.js';
+import { starNightAt, starTimes, starSpotLocal, starInWindow, STAR_PER_NIGHT } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter, skyDayMs } from '../../../src/net/sky-days.ts';
 import { STAR_STAND_R, STAR_WARN_MS } from '../../../src/systems/starfall/starfallClient.js';
 import { STAR_BARE_R } from '../../../src/world/starfall/starModel.js';
 import { STAR_COVENS } from '../../../src/systems/starfall/starfallCovens.js';
@@ -31,6 +33,8 @@ import { transformedAabb } from '../../../src/render/frustum.js';
 import { WoodsFile } from '../../../src/formats/woodsFile.js';
 import { HAS_ARENA2, ARENA2, ROOT, loadMaps, classicModels } from '../../arena1Data.mjs';
 import { hostText } from '../../hostText.mjs';
+
+playFileByRules({ 'time.skyClock': true }); // these pins stand on the sky clock's hourly night (a sky day is an hour at its default TimeScale)
 
 const FESTIVAL = FESTIVALS[0];
 const N = starNightAt(FESTIVAL.fromMs) + 30;
@@ -101,7 +105,7 @@ test('STAR-CLEAR THE HOST\'S STARS: each star\'s clearing stands from STAR_WARN_
     const sites = sitesOf(N);
     assert.equal(sites.length, STAR_PER_NIGHT);
     const T0 = starTimes(N, 0);
-    t = FESTIVAL.fromMs - 10 * STAR_HOUR_MS;
+    t = FESTIVAL.fromMs - 10 * skyDayMs();
     assert.deepEqual(host.starClears(), [], 'before the festival: none');
     // the hour before night N's first star is named: the night before's stars are all gone
     t = T0.fallAt - STAR_WARN_MS - 5000;
@@ -137,7 +141,7 @@ test('STAR-CLEAR THE HOST\'S STARS: each star\'s clearing stands from STAR_WARN_
       t = T.fallAt - STAR_WARN_MS + 1500;
       assert.ok(host.starClears().some((c) => c.s === `${N}.${k}`), `star ${k} named`);
     }
-    t = FESTIVAL.toMs + 10 * STAR_HOUR_MS;
+    t = FESTIVAL.toMs + 10 * skyDayMs();
     assert.deepEqual(host.starClears(), [], 'the festival over and its last stars gone: none');
   } finally { Date.now = realNow; }
 });
@@ -240,7 +244,7 @@ test('STAR-CLEAR on the player\'s map: of the festival\'s real stars, the mod\'s
     return false;
   };
   let stars = 0, rocked = 0, wholeLeft = 0;
-  for (let n = Math.ceil(FESTIVAL.fromMs / STAR_HOUR_MS); n < Math.ceil(FESTIVAL.toMs / STAR_HOUR_MS); n++) {
+  for (let n = skyDayAtOrAfter(FESTIVAL.fromMs); n < skyDayAtOrAfter(FESTIVAL.toMs); n++) {
     for (const s of findStarSites(n, scan, { gateSiteOf: (d) => findGateSite(d, scan) })) {
       if (!starInWindow(s.n, s.k)) continue;
       stars++;

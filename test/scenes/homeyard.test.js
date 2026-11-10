@@ -4,7 +4,7 @@
 // house nor another building's ground, its edge marked); the service through the real Worker (a yard's pieces and a
 // room's counted apart, the room's list its own, the town's yards read together); the town's yards stood in their
 // pixels and stood again when the world recentres; the decorator outside - the owner's lot found under their feet, a
-// piece off it refused, the service asked with `yard`; the world host by source. `06-Systems/Online-Arc.md` HOME-YARD.
+// piece off it refused, the service asked with `yard`; the world host by source. HOME-YARD.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

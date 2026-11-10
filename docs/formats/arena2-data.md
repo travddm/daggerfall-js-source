@@ -16,7 +16,7 @@ reader parses bytes that the player supplies, in the player's own browser. The s
 
 1. a memory cache (`mem`, keyed by the normalized name);
 2. IndexedDB, database `project-dagger`, object store `arena2`;
-3. the network, `./arena2/<name>` (only the dev server answers this; the deployed site returns 404).
+3. the network, `./arena2/<name>` (only the dev server answers this; a release build returns 404).
 
 Names are normalized by `normalizeName`: the basename, upper-cased. Real ARENA2 files are upper-case; user folders vary.
 `forgetBytes(name)` drops a cached file, but only when it can be read again from IndexedDB or the network.
@@ -40,9 +40,11 @@ ARENA2 is about 517 MB; the game reads about 155 MB. `KEEP(name, lean)` decides 
   `WARRIOR.CEL`;
 - `SKYnn.DAT` sky sets (about 247 MB), but only when not `lean`.
 
-`lean` is true on a touch-primary browser without the desktop shell. On the lean diet the sky falls back to a gradient.
+`lean` is true on a touch-primary browser without the desktop shell. On the lean diet the sky falls back to a
+gradient, with no player choice today. It is decided that phone skies become a player option and that phones keep the
+gradient by default (decision 117 (22)).
 
-**Trap: a new reader needs its file in `KEEP`.** A file that the filter drops is absent on the deployed site and on
+**Trap: a new reader needs its file in `KEEP`.** A file that the filter drops is absent in a release build and on
 phones, but present in development (the dev server serves the whole folder). The failure is silent: callers warn and
 skip. When you add a reader for a file kind that `KEEP` drops, add the file to `KEEP` and bump `MANIFEST_V`. A stored set
 with an older manifest version is wiped and the player is asked to pick again. A test re-derives the list of ARENA2 names
@@ -51,7 +53,7 @@ the source fetches and fails when `KEEP` drops one of them.
 ### Other stores in the same database
 
 | Store | Holds | Cleared by an ARENA2 re-pick |
-|---|---|---|
+| --- | --- | --- |
 | `arena2` | the filtered ARENA2 files and a `__MANIFEST__` record | yes |
 | `music` | player-supplied replacement music | no |
 | `textures` | player-supplied loose replacement textures | no |

@@ -1,7 +1,7 @@
 // PUDDLE-DRY: a town's puddles are dry ground (world/puddleDry.js), served so through the block's one door
 // (formats/blocksFile.js getBlock). The fixtures are the producer's: a block's 256 ground bytes read by BlocksFile's own
-// ground reader, so every tile is the shape every reader of the ground is handed. The record: bible/07-Rendering/
-// Water-Arc.md PUDDLE-DRY.
+// ground reader, so every tile is the shape every reader of the ground is handed. The record:
+// docs/rendering/sky-weather-water.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

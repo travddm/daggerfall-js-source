@@ -20,7 +20,7 @@ import { NOT_ENOUGH_GOLD_ID } from '../../../src/systems/tavern.js';
 import { setPref, _resetForTests } from '../../../src/systems/uiPrefs.js';
 import { CLIMATES } from '../../../src/formats/mapsFile.js';   // MENU-CLIMATE (FIELD BUGS 2026-09-30
 
-// ═══ SURV5: WHAT THE PLAYER IS TOLD, AND THE TAVERN ═══
+// SURV5: WHAT THE PLAYER IS TOLD, AND THE TAVERN
 //
 // The HUD's needs strip and the status page's third box
 // (survival/status.js); the survival items' own info box; the mod's

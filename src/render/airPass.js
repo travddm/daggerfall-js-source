@@ -75,8 +75,8 @@
 // both encodes (the lane's, the resolve's) are DITHERED at the byte
 // (orderedDither.js's bayer4, zero-mean) - a lantern's falloff on a dark floor was bands.
 //
-// LA-POST: the chain audited, every finding measured first
-// (07-Rendering/Enhanced-Lighting-Arc.md, LA-POST). The bright pass reads its
+// LA-POST: the chain audited, every finding measured first.
+// The bright pass reads its
 // whole block (AIR_BRIGHT_TAPS); the glare's taps are soft, filtered and off
 // the flat's edge, its size held against the light's flicker (AIR_GLARE_TAPS,
 // heldGlareRange); the bloom and the shafts are half floats where the GL

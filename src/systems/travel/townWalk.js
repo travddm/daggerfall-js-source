@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // OW-TOWN-WALK: A JOURNEY THROUGH
 // A TOWN WALKS ITS STREETS, AT A TOWN'S PACE.
 //
@@ -31,7 +30,6 @@
 // (scenes/townWalkHost.js) finds the town the traveller stands in and turns cells into the world's natives.
 // Not a DFU member: DFU's fast travel never walks a town (it fades to black), and Travel Options' autopilot never
 // paths. Ledger A row (OW-TOWN-WALK).
-// ═══════════════════════════════════════════════════════════════════
 import { townPathSearch } from '../livingWorld/townPaths.js';
 import { stepsDone } from '../../world/puddleMask.js';   // IC-STUTTER: OW-HITCH's runner, the one export
 
@@ -40,8 +38,7 @@ import { stepsDone } from '../../world/puddleMask.js';   // IC-STUTTER: OW-HITCH
  *  motor and the collider meet a frame at a time. */
 export const TOWN_PACE_MAX = 5;
 /** IC-PACE:
- *  the fastest a journey runs in the Imperial City's streets - forty-nine pixels of them (5.7 km across: TS5, bible/03-World/
- *  Town-Shapes.md), which at five times a walk took a quarter of an hour of real time to cross. Its streets are still
+ *  the fastest a journey runs in the Imperial City's streets - forty-nine pixels of them (5.7 km across: TS5), which at five times a walk took a quarter of an hour of real time to cross. Its streets are still
  *  walked as a town's (the way, the gates, the steering); only the clock is let run. */
 export const IMPERIAL_PACE_MAX = 60;
 /** How far round a cell that is no street (a doorstep, a building's footprint the traveller stands at the edge of) the

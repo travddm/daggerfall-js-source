@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // BANTHA1 () - THE JUNGLE'S HAZE: how thick, how high, what
 // colour, and what it hides. PURE - the host (scenes/jungleHost.js) hands it the frame's eye, clock and weather and
 // hands its answer to the renderer (render/hazeGlsl.js is the shader's half: hazeTransmittance below is its CPU twin,
@@ -26,7 +25,6 @@
 //     drawn as nothing but haze colour - so it is not drawn (hazeHides: a bound, never a guess - the optical depth along
 //     any ray into the box is at least the depth to its nearest point at its top height). Inside the jungle the streamed
 //     world past a kilometre or so costs nothing: the haze PAYS for the jungle.
-// ═══════════════════════════════════════════════════════════════════
 import { ecoHash } from '../ecotone.js';
 import { fogFactor } from '../weather.js';
 

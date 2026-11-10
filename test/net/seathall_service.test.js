@@ -3,7 +3,7 @@
 // named, by an Officer of the guild holding the palace seat, at most a hundred pieces over the seat, DECOR's gold a
 // placement; cleared whenever the seat changes hands or lapses (7.2;
 // server-account/src/decor.js SEAT_STORE). Driven through the real Worker over node:sqlite with every migration applied
-// (test/accountDb.mjs). `06-Systems/Online-Arc.md` SEAT-HALL.
+// (test/accountDb.mjs). SEAT-HALL.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

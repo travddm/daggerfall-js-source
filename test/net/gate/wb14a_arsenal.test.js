@@ -54,7 +54,7 @@ const atkOf = (out) => out.find((o) => o.k === 'atk') ?? null;
 /** An atk word as the wire carries it, `a` an attack. */
 const word = (A, over = {}) => ({ i: 7, a: A.id, at: T0, x: 0, z: 0, yw: 0, tg: [], ...over });
 
-// ═══ THE TABLE ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE TABLE
 
 test('WB14a the arsenal: six attacks more, ids 11 to 16, each a cooldown of its own (none of the eleven before has one) - the Brand asks a court of two, the Torment (AUDIT WB14 PLAY-3) three; the Chains and the Gaze are the struck screen\'s alone (mutants: an id moved; a cooldown dropped; the Gaze counted by the relay; the Torment between two)', () => {
   assert.deepEqual(NEW.map((k) => ATTACKS[k].id), [11, 12, 13, 14, 15, 16]);
@@ -87,7 +87,7 @@ test('WB14a every new wind-up outruns its shape at the player\'s 7.6 m/s from it
   assert.deepEqual([GAZE_HALF_DEG, GAZE_RANGE_M, GAZE_BLIND_MS], [50, 60, 2000]);
 });
 
-// ═══ THE CHOICE ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE CHOICE
 
 test('WB14a his choice: without the fight\'s word attacksFor offers none of the six (every older pin\'s answer holds); with it, each once its cooldown has passed since its last use and a court of nMin stands - and the beat stamps its use (mutants: a cooldown never read; the court\'s count ignored; the use never stamped)', () => {
   assert.ok(!attacksFor(3, 5, 2).some((a) => NEW.includes(a.key)), 'no word, none');
@@ -117,7 +117,7 @@ test('WB14a his choice: without the fight\'s word attacksFor offers none of the 
   assert.ok(saw.t >= T0 + OPENING_MS + ATTACKS.chains.cd, 'never before its cooldown has run from his wake - he never opens on one');
 });
 
-// ═══ THE MARKED ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE MARKED
 
 test('WB14a the marked: the chained and the tormented his target, the branded brandCountFor of the living by the dice - each where they stood (`tg`) and by peer id (`pk`), on the wire too; a relay that cannot name them all names none (mutants: the ids dropped; the count off)', () => {
   assert.deepEqual([1, 2, 3, 5, 6, 8, 20].map(brandCountFor), [1, 1, 2, 2, 3, 3, 3]);
@@ -152,7 +152,7 @@ test('WB14a the wire: an atk word\'s `pk` - one valid peer id for each of its ta
   assert.equal(validGateOut({ ...base, a: 32 }), null);
 });
 
-// ═══ THE CHAINS ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE CHAINS
 
 test('WB14a the Chains: the relay reads the chained fighter as it lands - inside CHAIN_HOLD_M (and the pose\'s slack) a Ground Slam follows at his feet a recovery and a breath later; past it, nothing; my screen reels me to CHAIN_PULL_TO_M of him against the motor\'s own decay (mutants: the slam after a broken chain; the pull too short)', () => {
   const run = (z) => {
@@ -183,7 +183,7 @@ test('WB14a the Chains: the relay reads the chained fighter as it lands - inside
   assert.equal(chainPull(a, 0, 3, BLOW_PUSH_DECAY), null, 'already that near');
 });
 
-// ═══ THE BRAND AND THE TORMENT ═══════════════════════════════════════════════════════════════════════════════════════
+// THE BRAND AND THE TORMENT
 
 test('WB14a Dagon\'s Brand on my feet: branded, its own share; within its reach of ANOTHER branded fighter where my screen sees them, its burst - never my own ring; Shared Torment shared among everyone inside its ring as my screen sees them (mutants: the brand bursting on its own; the torment shared among the court)', () => {
   const places = new Map([['ann', [10, 0]], ['bran', [20, 0]]]);
@@ -206,7 +206,7 @@ test('WB14a Dagon\'s Brand on my feet: branded, its own share; within its reach 
   assert.equal(tormentShare(mine, 'me', 0, 0, placeOf, [[2, 0], [9, 0]]), 2, 'mine where I stand');
 });
 
-// ═══ THE WHEEL AND THE UNMAKING ══════════════════════════════════════════════════════════════════════════════════════
+// THE WHEEL AND THE UNMAKING
 
 test('WB14a the Wheel: two blades from where he stood, turning `spin` a second over its span, one way or the other by its number - it strikes as a blade passes, between the frame before and this one, a slow frame sweeping all it missed; ahead of a blade is safe until it comes (mutants: the blades still; a slow frame\'s sweep missed)', () => {
   const W = ATTACKS.wheel;
@@ -261,7 +261,7 @@ test('WB14a the Unmaking: every other one of eight wedges about his court\'s hea
   assert.ok(!f.queue.some((e) => e.a === 'unmake') && f.pending?.a !== 'unmake', 'and none after the second');
 });
 
-// ═══ THE GAZE ════════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE GAZE
 
 test('WB14a the Burning Gaze: on whoever\'s view holds him as it lands - within GAZE_HALF_DEG of the camera\'s heading and GAZE_RANGE_M of him; turned away, nothing; no camera, nothing (mutants: the angle off; the range ignored)', () => {
   // me at the origin facing +z (yaw 0); him ahead
@@ -276,7 +276,7 @@ test('WB14a the Burning Gaze: on whoever\'s view holds him as it lands - within 
   assert.deepEqual([markedVerdict(word(ATTACKS.gaze), T0 - 1), markedVerdict(word(ATTACKS.gaze), T0), markedVerdict(word(ATTACKS.gaze), T0 + ATTACKS.gaze.active + STRIKE_LATE_MS + 1)], ['wait', 'judge', 'miss']);
 });
 
-// ═══ THE RELAY'S JUDGE ═══════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY'S JUDGE
 
 test('WB14a the relay counts what its poses can show: the Wheel down its turn and the Unmaking\'s wedges, as plain blows; never the Chains (a pull), never the Gaze (a camera), never the Brand nor the Torment (his element, a count it does not hold) (mutants: the Gaze counted; the Wheel judged once at its landing)', () => {
   const f = fightOf(2, 3);
@@ -292,7 +292,7 @@ test('WB14a the relay counts what its poses can show: the Wheel down its turn an
   assert.equal(judge(word(ATTACKS.unmake, { tg: [heart] }), heart[0] + 10 * Math.sin(Math.PI / 4), heart[1] + 10 * Math.cos(Math.PI / 4), [T0 + 1000, T0 + 2000]).length, 0, 'a dark one');
 });
 
-// ═══ THE GROUND ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE GROUND
 
 test('WB14a the ground shows what lands: the chain a path from him to the chained where my screen sees them, his colour inside its hold and the safe edge past it; the brand\'s and the torment\'s rings where their fighters are seen (the torment in gold); the wheel the Spokes\' lanes, turning and lit through their turn; the Unmaking its own kind; the Gaze none (mutants: the ring left where they stood; the chain\'s colour fixed)', () => {
   const P = BASE_PROFILE;
@@ -333,7 +333,7 @@ test('WB14a the ground shows what lands: the chain a path from him to the chaine
   assert.match(TELEGRAPH_FS, /\} else if \(uKind == 8\) \{/);
 });
 
-// ═══ MY SCREEN ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// MY SCREEN
 
 test('WB14a my screen judges the marked blows on my feet once each: chained inside the hold - struck and reeled; branded - its own share, and the burst by another; the Torment\'s share by who stands in it; the Gaze while I look at him - struck and blinded; and none of it on a fallen body or after its late bound (mutants: judged twice; the pull never sent; the share unshared)', () => {
   const P = BASE_PROFILE;

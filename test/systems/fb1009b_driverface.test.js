@@ -7,7 +7,6 @@
 // (GetPortraitIndexFromStaticNPCBillboard, systems/npcSession.js) stood its starting record, 410: TFAC00I0's grey
 // "OOPS! Tell Mack NOW!". Every walled city has a WALLAA09 gate. The flat now wears the face FLATS.CFG gives classic's
 // own bearded man (182.3, 429), written as a mod writes FLATS.CFG's dictionary, while the mod is loaded.
-// `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

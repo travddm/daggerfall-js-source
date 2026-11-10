@@ -165,7 +165,6 @@ test('A54: the price list draws its GREEN/RED arrows, and the states are DFU\'s'
   }
 });
 
-// ═══════════════════════════════════════════════════════════════════
 // ROAD-G G5 - THE PRICE LIST'S SCROLL BAR (SetupScrollBar :303-314).
 //
 // AUDIT 58's windows lane drew the two arrows above and below it and
@@ -185,7 +184,6 @@ test('A54: the price list draws its GREEN/RED arrows, and the states are DFU\'s'
 // (10) `update(..., vy)` -> `vx`, the horizontal drag; (11)
 // `!!(e?.buttons & 1)` -> `true`, the ignored mouse button; (12) the
 // thumb drawn at `{ y: 0, h }`, pinned to the top of the rail.
-// ═══════════════════════════════════════════════════════════════════
 test('G5: SetupScrollBar - the rect is [106,39,7,48] with DisplayUnits = listDisplayUnits', () => {
   assert.deepEqual([...PURCHASE_RECTS.scrollBar], [106, 39, 7, 48], 'Position (106,39), Size (7,48) (:306-311)');
   const w = new BankPurchaseWindow({ houses: () => [], onClose: () => {} });

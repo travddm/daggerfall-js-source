@@ -3,8 +3,8 @@
 // at the day's turn), the fall and the stump and the logs, the War Axe in the hand, through the one gathering host; the
 // woods as items; Carpentry's pieces (a staff and a bow at their wood's material, arrows a quiver, furniture among the
 // home's things with its worth and its mark, the Basket's life); the Workbench on the Stores page; and the done-when,
-// driven through the real Worker: DECOR PLACES A CRAFTED TABLE. Then the hosts' wiring. bible/06-Systems/
-// Professions-Arc.md 25.
+// driven through the real Worker: DECOR PLACES A CRAFTED TABLE. Then the hosts' wiring.
+// docs/systems/professions.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

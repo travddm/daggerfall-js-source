@@ -3,7 +3,7 @@
 // LW3 - THE ROAD'S PEOPLE, SEEN.
 //
 // Each member of a party on the road (systems/livingWorld/trips.js) as a billboard: one walking ARMED (an adventurer, a
-// caravan's sellsword, a courier - LW0 decision 5) in their class's eight-way sprite, the enemy's own MobileUnit on the
+// caravan's sellsword, a courier) in their class's eight-way sprite, the enemy's own MobileUnit on the
 // class archive (the bands' body, world/bandSprites.js); the rest in their own townsperson's outfit, the walker's
 // billboard (characters/residentWalker.js - the street's records on the outfit's archive). Faded in by distance as the
 // bands are, and grown under the Overworld. Where each stands is the roads' (scenes/livingWorld/livingRoads.js); this draws, and

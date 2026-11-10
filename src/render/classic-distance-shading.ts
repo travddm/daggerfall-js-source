@@ -1,9 +1,9 @@
 // Classic distance shading: up to two fades over the drawn world, before the present.
 //
 // To fog colour (the row). The original game darkened and fogged by distance through 64-step palette remap tables:
-// the far a surface, the further its colours were moved toward the table's fade colour. This fade gives the same 64
-// steps to the full-colour image, toward the scene's own fog colour, so a mod's coloured fog (Better Ambience gives
-// dungeons a brown one) tints the far view. Departures from the original game, recorded here and in the row's note:
+// the farther a surface, the further its colours were moved toward the table's fade colour. This fade gives the same 64
+// steps to the full-colour image, toward the scene's own fog colour, so a mod that gives a dungeon
+// a coloured fog tints its far view. Departures from the original game, recorded here and in the row's note:
 //   - The step is picked per pixel from the depth buffer. The original game picked one row per flat, or per surface
 //     from its centre point.
 //   - The colour moves by a linear blend, not through the palette tables, which would need a palettized picture.
@@ -201,7 +201,7 @@ export class DistanceShadePass {
     return fbo;
   }
 
-  /** Shades the image in place. Leaves the image's framebuffer bound, the depth unbound from unit 1 with TEXTURE0
+  /** Shades the image in place. Leaves the image's framebuffer bound, the depth unbound from unit 1 with unit 0
    *  active, and the draw-state baseline (depth test, depth writes and culling on, blending off); the present that
    *  follows binds its own. Returns false when no fade applies to the frame or the program would not build. */
   draw(frame: ShadeFrame): boolean {

@@ -4,7 +4,7 @@
 // the old cell's record in the order the words were said; the pool keeping each cell's word apart and a kept team
 // under its own key, a live part standing it down only where it stands; the owner's park word off the save record;
 // the riders layer drawing a peer in the saddle as Eye Of The Beholder's mounted sprite off the SHOWN pose.
-// `06-Systems/Horse-Cart-And-Cargo.md` HCC-PARK and AUDIT BRANCH.
+// HCC-PARK and AUDIT BRANCH.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

@@ -4,7 +4,7 @@
 // steal (ui/native/nativeTrade.js driven, ui/enhanced/enhancedTrade.js by source), the save's deliveries (systems/save/save.js), the panel's
 // look view (ui/decorPanel.js), the tool setting furniture down as its look and taking it back (scenes/decor/decorTool.js),
 // and the host's wiring by source. The service's half is pinned with the service (decor1.test.js).
-// `06-Systems/Online-Arc.md` DECOR2.
+// DECOR2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

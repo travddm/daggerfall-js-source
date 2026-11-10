@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // PROF1 - A STORES MATERIAL AS DFU'S OWN
 // ITEM: its name, and the items a withdrawal mints into the pack
 // (7, 22; law 3 - the Stores are
@@ -27,7 +26,6 @@
 // part its own ingredient (Big Tooth, Spider's Venom...); its butchery
 // C&C's Raw Meat, and a Slaughterfish's Raw Fish as the Basket's fruit is
 // chosen - C&C's while it is on, else Foraging's Fish.
-// ═══════════════════════════════════════════════════════════════════
 import { material } from '../../net/nodeLaw.js';
 import { minedMaterial } from '../../net/professionLaw.js';
 import { setItemFields, mintCondition, templateByIndex } from '../item/itemTemplates.js';

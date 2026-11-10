@@ -1,8 +1,6 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // The Overworld's crossing's two asks of the planner (OWS2, "OWS - the sea"; moved out of
 // scenes/world.js by PLAN-SLICES, HOST-SPLIT - the world host imports them by the same names).
-// ═══════════════════════════════════════════════════════════════════
 
 /** AUDIT OW5 S3 (the audit before the merge): A MOORED BOAT IS TAKEN ONLY WHERE THE ROUTE PUTS TO SEA. A boat moored in
  *  reach starts the search afloat (`start: 'sea'`), so a trip with no water on the way was begun at its helm - boarded,

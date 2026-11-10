@@ -1,5 +1,5 @@
 // SEA VENTURES, reduced (open-world PvP removal): the sea's host keeps the day's vaults (SEA-VAULTS), the storm and the
-// treasure fleet (SEA-EVENTS) and the season boards (SEA-SEASON), and holds no wreck, bounty, gun or hub lock.
+// treasure fleet (SEA-EVENTS) and holds no wreck, bounty, gun or hub lock.
 // Driven over the real host with fake seams: the clock, the player's pixel, the social socket and the ether host.
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -72,14 +72,13 @@ test("SEA VENTURES vaults: the day's vaults stand while the sea stands, none whe
   assert.equal(r.host.vaultHere(), null, 'and none found');
 });
 
-test('SEA VENTURES chart: a vault is a place, a name and a band alone - no lock, no crows, no fights flag; the office holds the season only', () => {
+test('SEA VENTURES chart: a vault is a place, a name and a band alone - no lock, no crows, no fights flag', () => {
   const r = rig();
   const word = r.host.chartWord();
   assert.equal('pvp' in word, false, 'no fights flag');
   assert.ok(word.vaults.length > 0);
   for (const v of word.vaults) assert.deepEqual(Object.keys(v).sort(), ['band', 'key', 'name', 'ring', 'x', 'y']);
-  assert.deepEqual(Object.keys(r.host.office()), ['season'], 'no Wanted section');
-  for (const gone of ['crowLine', 'wref', 'guns']) assert.equal(gone in r.host, false, `${gone} is gone`);
+  for (const gone of ['office', 'crowLine', 'wref', 'guns']) assert.equal(gone in r.host, false, `${gone} is gone`);
 });
 
 test('SEA VENTURES fleet: a flagship sunk is told to the social room as a `sea` word once, and its purse is paid once', () => {

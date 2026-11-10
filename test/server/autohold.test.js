@@ -35,7 +35,7 @@ import { leavingKeys } from '../../server-account/src/ledger.js';
 import { accountRefusalText } from '../../src/net/accountClient.js';
 import { itemLongName } from '../../src/systems/item/itemInfo.js';
 import { applyInteriorLoot, applyInteriorShared, withoutCarried } from '../../src/world/interior/interiorShared.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { realmIo, createRealmSession, LEDGER_KEY_RE, REALM_LOCKED_PREFIX } from '../../src/systems/realmSaves.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { applyRarity } from '../../src/systems/loot/lootRarity.js';
@@ -333,7 +333,7 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
     const s = await standService();
     const who = await s.registered('told');
     const R = await seatRealm(s.env, who.secret, 'told');
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const at = R.at();
     const session = createRealmSession({ io: realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), s.env), storage }), id: at.id, lease: at.lease, seq: at.seq });

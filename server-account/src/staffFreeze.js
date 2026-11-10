@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL5-FREEZE - FREEZE PLAYER
 // AND THE STAFF CHAT, the account service's half.
 //
@@ -38,7 +37,6 @@
 // so it changes without a game update (mob, 03:22Z: https://discord.gg/QADbZYQ73j). Unset, the tab shows none.
 //
 // OFFLINE ONLY until mob tries it live.
-// ═══════════════════════════════════════════════════════════════════
 
 import { displayName, overRate } from './accounts.js';
 import { canModerate } from './titles.js';

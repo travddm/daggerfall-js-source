@@ -310,7 +310,7 @@ test('SCALE5b the client: a frame batch is read frame by frame as if each came a
   });
 });
 
-// ═══ PART THREE: THE RELAY'S HYGIENE ════════════════════════════════════════════════════════════════════════════════
+// PART THREE: THE RELAY'S HYGIENE
 
 /** A story of a room's sockets - hellos, a reconnect replacing its own id, closes said and unsaid, wakes, the clock past
  *  the index's trust - and after every step `check(room, sockets)`. */
@@ -567,31 +567,31 @@ test('SCALE5b the metrics point: a socket refused \'room full\' is counted - the
   assert.equal(got[2].doubles[14], 11, 'the peak is never under the sockets the room holds at the point');
 });
 
-// ═══ PART FOUR: THE RELAY'S SETTINGS, AT RUN TIME (net/relayCfg.js) ═════════════════════════════════════════════════
+// PART FOUR: THE RELAY'S SETTINGS, AT RUN TIME (net/relayCfg.js)
 
-test('SCALE5b relayCfg: a setting is one of twenty names and a string of at most RELAY_CFG_VALUE_MAX, or null (handed back to the var); the one in force is the hub\'s, else the var; a developer alone may set one; /relay\'s words (mutants: a name not a setting\'s; the bound unasked; null refused; the var over the hub\'s; a Dungeon Master let in)', async () => {
+test('SCALE5b relayCfg: a setting is one of ten names and a string of at most RELAY_CFG_VALUE_MAX, or null (handed back to the var); the one in force is the hub\'s, else the var; a developer alone may set one; /relay\'s words (mutants: a name not a setting\'s; the bound unasked; null refused; the var over the hub\'s; a Dungeon Master let in)', async () => {
   const C = await import('../../src/net/relayCfg.js');
-  assert.deepEqual(C.RELAY_CFG_KEYS, ['bossBody', 'gateRole', 'serpentRole', 'sdRole', 'gateThread', 'serpentThread', 'sdThread', 'groundGate', 'grantMode', 'grantRoll', 'grantStrip', 'grantDoor', 'cellSeed', 'leaseDoor', 'lootDoor', 'sdCollapse']);
-  assert.deepEqual(Object.values(C.RELAY_CFG_VARS), ['BOSS_BODY', 'GATE_DISCORD_ROLE', 'SERPENT_DISCORD_ROLE', 'SD_DISCORD_ROLE', 'GATE_DISCORD_THREAD', 'SERPENT_DISCORD_THREAD', 'SD_DISCORD_THREAD', 'GROUND_GATE', 'GRANT_MODE', 'GRANT_ROLL', 'GRANT_STRIP', 'GRANT_DOOR', 'CELL_SEED', 'LEASE_DOOR', 'LOOT_DOOR', 'SD_COLLAPSE']);
-  assert.deepEqual(C.validRelayCfgIn({ k: 'gateRole', v: '1555589839825670258' }), { k: 'gateRole', v: '1555589839825670258' });
+  assert.deepEqual(C.RELAY_CFG_KEYS, ['bossBody', 'groundGate', 'grantMode', 'grantRoll', 'grantStrip', 'grantDoor', 'cellSeed', 'leaseDoor', 'lootDoor', 'sdCollapse']);
+  assert.deepEqual(Object.values(C.RELAY_CFG_VARS), ['BOSS_BODY', 'GROUND_GATE', 'GRANT_MODE', 'GRANT_ROLL', 'GRANT_STRIP', 'GRANT_DOOR', 'CELL_SEED', 'LEASE_DOOR', 'LOOT_DOOR', 'SD_COLLAPSE']);
+  assert.deepEqual(C.validRelayCfgIn({ k: 'grantMode', v: 'enforce' }), { k: 'grantMode', v: 'enforce' });
   assert.deepEqual(C.validRelayCfgIn({ k: 'bossBody', v: null }), { k: 'bossBody', v: null });
   assert.deepEqual(C.validRelayCfgIn({ k: 'bossBody', v: 'x'.repeat(C.RELAY_CFG_VALUE_MAX) })?.v.length, C.RELAY_CFG_VALUE_MAX);
   for (const bad of [null, {}, { k: 'BOSS_BODY', v: '' }, { k: 'toString', v: '' }, { k: 'bossBody' }, { k: 'bossBody', v: 5 }, { k: 'bossBody', v: 'x'.repeat(C.RELAY_CFG_VALUE_MAX + 1) }]) assert.equal(C.validRelayCfgIn(bad), null, JSON.stringify(bad)?.slice(0, 60));
-  assert.deepEqual(C.validRelayCfgOut({ k: 'sdRole', v: '' }), { k: 'sdRole', v: '' });
-  assert.deepEqual(C.validRelayCfgOut({ k: 'sdRole', error: 'no' }), { k: 'sdRole', error: 'no' });
-  assert.equal(C.validRelayCfgOut({ k: 'sdRole' }), null);
-  const env = { BOSS_BODY: '{"enforce":true}', GATE_DISCORD_ROLE: '1' };
+  assert.deepEqual(C.validRelayCfgOut({ k: 'lootDoor', v: '' }), { k: 'lootDoor', v: '' });
+  assert.deepEqual(C.validRelayCfgOut({ k: 'lootDoor', error: 'no' }), { k: 'lootDoor', error: 'no' });
+  assert.equal(C.validRelayCfgOut({ k: 'lootDoor' }), null);
+  const env = { BOSS_BODY: '{"enforce":true}', GRANT_MODE: 'measure' };
   assert.equal(C.relayCfgValue({}, env, 'bossBody'), '{"enforce":true}', 'the var while the hub holds none');
   assert.equal(C.relayCfgValue({ bossBody: '' }, env, 'bossBody'), '', 'the hub\'s - an empty one too - over the var');
-  assert.equal(C.relayCfgValue(null, env, 'gateRole'), '1');
-  assert.equal(C.relayCfgValue([], {}, 'sdRole'), undefined);
+  assert.equal(C.relayCfgValue(null, env, 'grantMode'), 'measure');
+  assert.equal(C.relayCfgValue([], {}, 'lootDoor'), undefined);
   assert.equal(C.mayRelayCfg(['dev']), true);
   for (const g of [['dm'], ['herald'], ['mod'], [], null, 'dev']) assert.equal(C.mayRelayCfg(g), false, String(g));
   const { parseStaffCommand, STAFF_HELP_LINES } = await import('../../src/net/staffCommands.js');
   assert.deepEqual(parseStaffCommand('/relay'), { cmd: 'relay' });
   assert.deepEqual(parseStaffCommand('/relay bossbody {"enforce": true}'), { cmd: 'relay', k: 'bossBody', v: '{"enforce": true}' });
-  assert.deepEqual(parseStaffCommand('/relay gateRole -'), { cmd: 'relay', k: 'gateRole', v: null });
-  assert.ok('error' in parseStaffCommand('/relay gateRole'));
+  assert.deepEqual(parseStaffCommand('/relay grantMode -'), { cmd: 'relay', k: 'grantMode', v: null });
+  assert.ok('error' in parseStaffCommand('/relay grantMode'));
   assert.ok('error' in parseStaffCommand('/relay nothing 5'));
   assert.ok(STAFF_HELP_LINES.some((l) => l.startsWith('/relay')));
 });
@@ -605,15 +605,15 @@ test('SCALE5b the client: a session sends a relay setting only on the hub\'s lin
     s.join('chat:world');
     sockets[0].open();
     sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, now: 1_000_000 });
-    assert.equal(s.sendRelayCfg({ k: 'gateRole', v: '1' }), true);
+    assert.equal(s.sendRelayCfg({ k: 'lootDoor', v: 'on' }), true);
     assert.equal(s.sendRelayCfg({ k: 'nope', v: '1' }), false);
-    assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'cfg', k: 'gateRole', v: '1' });
-    sockets[0].receive({ t: 'cfg', k: 'gateRole', v: '1' });
-    assert.deepEqual(heard, [{ k: 'gateRole', v: '1' }]);
+    assert.deepEqual(JSON.parse(sockets[0].sent.at(-1)), { t: 'cfg', k: 'lootDoor', v: 'on' });
+    sockets[0].receive({ t: 'cfg', k: 'lootDoor', v: 'on' });
+    assert.deepEqual(heard, [{ k: 'lootDoor', v: 'on' }]);
   });
 });
 
-// ═══ PART FIVE: THE RELAY'S WORD OF ITS REFEREES, FOR A HALO ═════════════════════════════════════════════════════════
+// PART FIVE: THE RELAY'S WORD OF ITS REFEREES, FOR A HALO
 
 test('SCALE5b the relay\'s referee word: a cell that judges the poses reaching it - a duel, a serpent\'s fight - says so in its welcome (`rf`), and when that moves says it to the second wire\'s sockets, once (mutants: the welcome\'s word unsaid; the change unsaid; said every pose; said to the first wire)', async () => {
   await cell(async ({ R, w2, w2b, old, said, speak, rnd }) => {

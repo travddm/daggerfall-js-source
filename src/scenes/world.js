@@ -860,7 +860,7 @@ import { appStorage } from '../systems/appStorage.js';   // ACC1d: where that se
 import { createStaffMessages } from '../net/staffMessages.js';   // STAFF-PANEL5-MESSAGE: Message on screen, the game's half
 import { createStaffFreezeHost } from './staffFreezeHost.js';   // STAFF-PANEL5-FREEZE: the staff freeze's screen and the Staff tab
 import { skyClassicMinutes, wallMsForSkyMinutes, skyMinutesPerMsAt } from '../net/skyLaw.js';   // TIME1: the sky's own clock, installed beside the event clock
-import { POSE_STRIKES, isWorldRoom, isCellRoom, cellHaloFor, actFrameFits, sharedClassicMinutes, wallMsForClassicMinutes } from '../net/wire.js';   // WORLD6b-iii(b): the cell seam's halo   // MAC7 #1: the swing's kind on the wire; AUDIT WORLD4 A1: whether an act frame can be said at all
+import { POSE_STRIKES, isWorldRoom, isCellRoom, cellHaloFor, actFrameFits, sharedClassicMinutes, wallMsForClassicMinutes, onlineMinutesPerMs } from '../net/wire.js';   // WORLD6b-iii(b): the cell seam's halo   // MAC7 #1: the swing's kind on the wire; AUDIT WORLD4 A1: whether an act frame can be said at all
 import { POSE_RIDE } from '../net/wire.js';   // INT9 (AUDIT): a deposit's chunks, bounded by the wire's frame; COATS3D: POSE_RIDE - a peer on a horse rides the 3D one
 import { hasDaggerfallArrows } from '../combat/fpArm/fpArmParts.js';   // the arrow bit on the wire, read as weaponRig reads it
 import { drawText } from '../ui/text.js';   // ONLINE1: the session's status line
@@ -2720,7 +2720,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   }
   const timeScaleMult = params.has('timescale') && !sharedClockOn() ? Number(params.get('timescale')) / 12 : 1;
   const minuteNow = () => skyMinutes() % 1440;   // TIME1: THE SKY's hour - every isNight, hour and sky read below takes it
-  // LW2 (, LW0 decisions 2-3): THE LIVING WORLD'S CLOCK is the sky's minute, and its
+  // LW2: THE LIVING WORLD'S CLOCK is the sky's minute, and its
   // people walk at DFU's 1.3 m/s - so their pace in the sky's minutes is that over the clock's rate: the sky's own online
   // (twenty-four a real minute, every reader the same), the calendar's twelve offline. A journey speeds the calendar
   // and the people with it (`livingRate`); online it moves no shared clock.
@@ -8799,7 +8799,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // the Fleet page's yard (a ship laid up anywhere) is the shipwright's
     if (model.atQuay) model.office = () => {   // CAPT-BOARD: the harbourmaster's tab - ETHER-SEA: past the Veil a freeport's (etherHost.js office)
       const port = navalPortHere();
-      if (port?.ether) { const o = etherHost.office(port); return o ? { ...o, rumours: [...o.rumours, ...seaVentures.rumours(port)], ...seaVentures.office(), buyChart: () => { const r = etherHost.buyChart(port); captainSay(); return r; } } : null; }   // SEA-EVENTS: the treasure fleet's and the Aether Storm's talk
+      if (port?.ether) { const o = etherHost.office(port); return o ? { ...o, rumours: [...o.rumours, ...seaVentures.rumours(port)], buyChart: () => { const r = etherHost.buyChart(port); captainSay(); return r; } } : null; }   // SEA-EVENTS: the treasure fleet's and the Aether Storm's talk
       return harbourOffice.model({ uid: model.uid ?? null });
     };
     if (model.atQuay) model.exchange = () => harbourOffice.exchange(model);   // CAPT-TRADE: the exchange's tab, over the yard's model - AUDIT CAPTAIN'S SEA B11: her room; CREW-TRADE: her crew (`crewDeal`)
@@ -21024,7 +21024,6 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     state,
     link: socialLink,
     ether: etherHost,
-    session: realmSession,   // SEA-SEASON: the season boards need the realm character
   });
   // SEA-EVENTS: the treasure fleets' record is the social room's. The room's word comes to the sea ventures' host, and
   // the room is asked for it when a socket opens and every ten minutes after, so a client that missed a word hears it again.
@@ -21672,7 +21671,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
    *  above) - the site of the gate the clock is about (net/gate/gateLaw.js gateAt: from the last gate's collapse to this
    *  one's), the omen's own roll, so every client clears the same ground and the land is clear long before the omen
    *  names it. Nothing until the site's scan is done (it begins once the relay's clock is read); the day then read off
-   *  the relay's clock as the omen reads it, the last offset kept through a reconnect. DISCORD-GATES: the site kept
+   *  the relay's clock as the omen reads it, the last offset kept through a reconnect. The site kept
    *  beside it, for the hub's word below. */
   let _gateClearOf = { day: null, site: null, clear: null };
   const _gateClearSetOf = gateClearMemo();   // GATE-CLEAR: the set last made, made again only when what it is made of moves
@@ -21688,13 +21687,13 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // STAR-CLEAR: and every fallen star's, from its town's naming until it is gone (scenes/starfall/starfallHost.js starClears)
     return _gateClearSetOf(_gateClearOf.clear, starfall?.starClears() ?? null);
   };
-  /** DISCORD-GATES: THIS GAME'S WORD OF WHERE THE GATE STANDS, to the hub (net/online.js sendGateSite, once a socket and
+  /** THIS GAME'S WORD OF WHERE THE GATE STANDS, to the hub (net/online.js sendGateSite, once a socket and
    *  day): the clearing's own site - the gate the clock is about, from its scan's end on, ~85 real minutes before its
-   *  omen. The hub names the place in its Discord posts once two accounts agree (net/gate/gateHerald.js). */
+   *  omen. The broken rite stands by the site two accounts agree on (net/gate/gate-site.ts). */
   const reportGateSite = () => {
     const s = _gateClearNow() ? _gateClearOf.site : null;
     if (s) socialLink()?.sendGateSite?.(s.day, s.px, s.py, s.place);
-    // WW2: and each lane's past the Bay, from its omen on - the hub's herald posts such a gate only where accounts agree on it
+    // and each lane's past the Bay, from its omen on
     for (const { lane, c } of gateOmen?.currents() ?? []) if (lane && c.site) socialLink()?.sendGateSite?.(c.site.day, c.site.px, c.site.py, c.site.place);
   };
   /** AUDIT SD II (L5 F4): THE SPENT WORDS A POOL STILL OWES THE HUB (scenes/spoilsPool.js `resendSpent`) - said again
@@ -21724,7 +21723,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   const gateFrame = () => {
     try { gateOmen?.frame(); } catch (e) { console.warn('[gate] frame', e?.message ?? e); }
     gateClaims?.tick();   // WB5b: what the account service has not counted yet, offered again on its own clock
-    if (gateOmen) reportGateSite();   // DISCORD-GATES: where the gate stands, to the hub
+    if (gateOmen) reportGateSite();   // where the gate stands, to the hub
     resendSpentWords();   // AUDIT SD II (L5 F4): the spent words a pool still owes the hub
     raidClaims?.tick();   // RAID4: and the raids' receipts, on theirs
     if (profBook?.state.open === true) { try { motherlodeBook?.tick({ sense: profBook.track('mining').specs?.[100] === 'motherlode-sense' }); } catch (e) { console.warn('[motherlode] frame', e?.message ?? e); } }   // PROF2b: the day's Motherlodes read, warned of and stood
@@ -29636,7 +29635,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
       // clock its REAL minutes: 32 days on the map, hours lived, and a guild's 28 days, an infection's turn and every
       // need stood still behind it. Its minutes past the world's are raised on the character's own clock now, as a
       // rest's are (AUDIT LIVED1 For Mac 2, AUDIT LIVED1b For Mac 5); offline the scaled dt charges the one calendar.
-      const walkRaise = sharedClockOn() && travelScale > 1 ? dt * CLASSIC_MINUTES_PER_SECOND * (travelScale - 1) : 0;
+      const walkRaise = sharedClockOn() && travelScale > 1 ? dt * onlineMinutesPerMs() * 1000 * (travelScale - 1) : 0;
       if (!_overlayHeld) playerTicker.tick(dt * timeScaleMult * travelScale, {   // TO1: ...and the calendar keeps up with the miles
         running: player.isRunning && !player.standing && upkeep.riderPaysGallop(player.transportMode),   // AUDIT 23 (entity-2): PlayerEntity.cs:408; STEED1: a gallop is the horse's breath, not the rider's fatigue
         standing: !!player.standing,   // FATIGUE-IDLE: standing still on the ground pays no minute's band (worldTick.js)

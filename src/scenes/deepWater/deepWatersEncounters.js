@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DW-E3: ILIAC PUDDLE NO MORE'S ENCOUNTER PULSE AND ITS FISH
 // SPAWNER (jet082, 1.2.2) - UnderwaterEncounterPulse.cs and the host half
 // of UnderwaterPassiveFishSpawner.cs, over the port's pixels. The laws a
@@ -33,7 +32,6 @@
 // the floor's 2.5 m and the surface's 3, a foe for the column's depth and
 // its place there; one stands a frame; Max Live Enemies caps them, and a
 // foe that dies keeps its count until its pixel's group leaves.
-// ═══════════════════════════════════════════════════════════════════
 
 import { TransientObjectTracker } from '../../world/deepWater/deepWaterTransients.js';
 import {

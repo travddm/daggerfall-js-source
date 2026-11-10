@@ -1,4 +1,4 @@
-// RPT1026-ITEMS (bible/01-Overview/bugs/, the private reports of 2026-10-26): the item group's pins.
+// RPT1026-ITEMS (the private reports of 2026-10-26): the item group's pins.
 //
 // HELD-OUT - three private reports of gear lost around an Identify at the Mages Guild, one of them Legendaries identified
 // there and missing once the client had restarted for a new version. A trade counter stages the

@@ -6,7 +6,7 @@
 // after a hold, the holder's Standing and defence fifth struck and the challenger's bar lifted; after a Tourney, the
 // winner's Charter gone. A Chronicle row; Honours paid stand; a later receipt refused; idempotent. Driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), and the chat word parsed.
-// 18; `06-Systems/Online-Arc.md` SIEGE-VOID.
+// 18; SIEGE-VOID.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

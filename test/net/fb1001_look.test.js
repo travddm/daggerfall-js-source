@@ -1,6 +1,6 @@
 // FIELD BUGS 2026-10-01 (3): "Switching textures on houses doesnt stay and resets". HOME-LOOK, the owner painting their
-// online home's outside in the "Exterior" tab of the yard's decorator panel (ui/decorPanel.js; `06-Systems/Online-Arc.md`
-// HOME-LOOK). Three faults, each reproduced on the real modules first:
+// online home's outside in the "Exterior" tab of the yard's decorator panel (ui/decorPanel.js).
+// Three faults, each reproduced on the real modules first:
 //
 // LOOK-BUTTONS: the painter's three buttons - "The town's own", "Paint it", "Put back" - stood in a row classed as the
 // rent tab's (`dfdecor-rent-actions`), and the decorator's own sheet hides that class in every tab but "Rooms to rent"

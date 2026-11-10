@@ -5,6 +5,10 @@ comparison, retro mode and render scale, and GPU memory release.
 
 ## Rules that hold
 
+- **No graphics regressions** (decision 104). A change that could make a player's game look worse, or cost more to
+  draw, ships as an option, and the current look stays reachable. Measure the default path on the base commit and on
+  the change, on the same machine ([Measuring](#measuring)), and name in the pull request description the options that
+  hold the old look.
 - **No shader compile inside a frame.** A compile and link is a driver call that can stall for tens of milliseconds.
   - Every program is built with `buildProgram(gl, vs, fs, label)` in `src/render/glProgram.js`. A failure throws the
     driver's log.

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // MENU-ORDER — A PIECE'S PICTURE FOR A MENU'S ROW.
 //
 // The owner, of the stores and the crafting menus: "I just feel like text lists are too much". A material in the
@@ -13,7 +12,6 @@
 // The tabs that draw these rows read no game law of their own (the Notice Board's tabs and the Stores page take what
 // they show from their hosts), so the host hands them these two as `picture`: `(key|item, wake) => { src, w, h } | null`
 // - null while the picture is made, `wake` called when it lands; the tab draws it with ui/menu/menuGlyphs.js pictureNode.
-// ═══════════════════════════════════════════════════════════════════
 
 import { inventoryItemImage } from '../../systems/item/itemTemplates.js';
 import { mintMaterialItem } from '../../systems/professions/profItems.js';

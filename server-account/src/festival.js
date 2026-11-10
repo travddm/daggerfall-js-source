@@ -1,10 +1,9 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WITCH1: THE WITCHES' FESTIVAL, AS THE SERVICE KEEPS IT -
 // an account's Soul Cakes, the day's finds, the Wyrd Sister's sales, and the Hearth Offerings set out at homes' doors.
 // The numbers are src/net/festivalLaw.js, which the client reads too.
 //
-// ═══ THE SERVICE ROLLS, THE CLIENT PLAYS ═══════════════════════════
+// THE SERVICE ROLLS, THE CLIENT PLAYS
 //
 // No relay sees an ordinary kill, so a find is the account's word that it killed (or fished, or won) - and that word is
 // BOUNDED here, never believed: the service's own die decides each ask at its source's odds, and a UTC day takes at most
@@ -12,7 +11,7 @@
 // more than an honest one who played the whole day. Everything the cakes buy is the service's to sell: a sale is one
 // guarded UPDATE that takes the price only while the count covers it.
 //
-// ═══ ONE STATEMENT DECIDES ═════════════════════════════════════════
+// ONE STATEMENT DECIDES
 //
 // Every move is one `db.batch` whose first statement decides it against the rows as they stand, and whose others run only
 // where it did: a take moves a cake out of a bowl only while one is in it and the taker has not taken there today, and
@@ -30,7 +29,6 @@
 //
 // EVERY CLOCK IS AN ARGUMENT (accounts.js's law): `nowS` is the request's.
 // Not a DFU member. Ledger A (THE WITCHES' FESTIVAL).
-// ═══════════════════════════════════════════════════════════════════
 import { isDeveloper } from './titles.js';
 import { overAccountRate } from './accounts.js';
 import { CHAR_ID_RE } from './service.js';
@@ -187,7 +185,7 @@ async function saleAnswer(/** @type {any} */ db, /** @type {string} */ id, /** @
   return { ware, cakes: int(row?.fest_cakes), bowls: int(row?.fest_bowls), wares: festivalWaresHeld(row?.fest_wares) };
 }
 
-// ═══ THE HEARTH OFFERINGS ════════════════════════════════════════════════════════════════════════════════════════════
+// THE HEARTH OFFERINGS
 /** A home the named character of this account owns (never a guild's hall: its yard is its keepers', its door its
  *  guild's) - the offering's own test. */
 const OWNED_HOME = `EXISTS (SELECT 1 FROM homes h WHERE h.map_id = ?1 AND h.building_key = ?2 AND h.player = ?3 AND h.char_id = ?4 AND h.guild_id IS NULL)`;

@@ -6,7 +6,7 @@
 // fitted into it (turned into the wall, sized to the opening, stood on its floor, swung the other way). The catalogue's
 // doors (the town blocks' own door records), the room's pool handing a door to the host's action doors, the action
 // system taking one back out, and the decorator: every free doorway marked, the door fitted into the one looked at, the
-// bar saying where it goes, the rooms found again once it is in. `06-Systems/Online-Arc.md` HOME-DOORS.
+// bar saying where it goes, the rooms found again once it is in. HOME-DOORS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

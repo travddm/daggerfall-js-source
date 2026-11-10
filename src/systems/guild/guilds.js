@@ -601,7 +601,7 @@ export function activeMemberships(entity) {
   carryInvitationOnly(entity.guildMemberships, vamp);   // CURSE-CARRY: the two that cannot be asked ride the swap
   return membershipsFor(entity.guildMemberships, vamp);
 }
-/** CURSE-CARRY (`01-Overview/bugs/Field-Bugs-2026-10-17d.md`) - A DEPARTURE FROM GuildManager.Memberships
+/** CURSE-CARRY - A DEPARTURE FROM GuildManager.Memberships
  *  (:109-112): the two guilds nobody can ask to join follow the player across the swap. DFU's new vampire opens an
  *  empty book, and a member of either had no road back into it - INVITATION_ONLY refuses the walk-in, and the one
  *  invitation each guild ever sends parks its tally at InviteSent (crimeGuilds.js handleStartingCrimeGuildQuests,

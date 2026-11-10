@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-EVENT - THE PANEL'S EVENT DOORS. Admins only.
 //
 // /v1/staff/event { op } - 'start' stages one (`ev`: the place, the monsters, how many, the meter's kills, the mini boss

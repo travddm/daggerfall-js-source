@@ -37,14 +37,14 @@ door (`POST /__cron`, `server-account/src/cron-triggers.ts`).
 operator door secret. It keeps a value that is already there, so running it again changes nothing. workerd reads these
 from the environment:
 
-| Variable                                                                                           | Read by                | Unset                                  |
-| -------------------------------------------------------------------------------------------------- | ---------------------- | -------------------------------------- |
-| `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`                                                      | both                   | No sign-in token can be minted or read |
-| `GATE_SIGNING_KEY`, `GATE_PUBLIC_KEY`                                                              | relay, accounts        | Gate kills are not counted             |
-| `OPERATOR_SECRET`                                                                                  | accounts               | The operator door is off               |
-| `CRON_SECRET`                                                                                      | accounts, cron sidecar | The cron door is off                   |
-| `DISCORD_BOT_TOKEN`, `ANTHROPIC_API_KEY`, `PATREON_*`, `STAFF_ANALYTICS_*`, `GATE_DISCORD_WEBHOOK` | as on Cloudflare       | That feature is off                    |
-| `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`                | r2, with `--r2 s3`     | The bucket refuses every request       |
+| Variable                                                                            | Read by                | Unset                                  |
+| ----------------------------------------------------------------------------------- | ---------------------- | -------------------------------------- |
+| `IDENTITY_PRIVATE_KEY`, `IDENTITY_PUBLIC_KEY`                                       | both                   | No sign-in token can be minted or read |
+| `GATE_SIGNING_KEY`, `GATE_PUBLIC_KEY`                                               | relay, accounts        | Gate kills are not counted             |
+| `OPERATOR_SECRET`                                                                   | accounts               | The operator door is off               |
+| `CRON_SECRET`                                                                       | accounts, cron sidecar | The cron door is off                   |
+| `ANTHROPIC_API_KEY`, `STAFF_ANALYTICS_*`                                            | as on Cloudflare       | That feature is off                    |
+| `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | r2, with `--r2 s3`     | The bucket refuses every request       |
 
 The chat reviewer sends player chat to a third party. With `ANTHROPIC_API_KEY` set and `MOD_AI` turned from `off` to
 `shadow` or `on` in `server-account/wrangler.toml`, the account service sends reported lines, and the public chat lines
@@ -68,9 +68,10 @@ node selfhost/keys.ts
 DFO_RELAY_HOST=relay.example.org DFO_ACCOUNTS_HOST=accounts.example.org docker compose -f selfhost/docker-compose.yml up -d --build
 ```
 
-Caddy terminates TLS for both names and proxies to workerd. The game client takes the relay as `wss://<relay host>`
-and the account service as `https://<accounts host>`. `GENERATE_FLAGS="--metrics"` or `GENERATE_FLAGS="--r2 s3"` before
-`docker compose` passes generator options into the image.
+Caddy terminates TLS for both names and proxies to workerd. Players enter one address in the game, the relay's
+(`wss://<relay host>`, Settings, Online, Relay). The relay names its account service at `/profile` from
+`ACCOUNT_SERVICE_URL`, which the compose file sets to `https://<accounts host>`. `GENERATE_FLAGS="--metrics"` or
+`GENERATE_FLAGS="--r2 s3"` before `docker compose` passes generator options into the image.
 
 ## Run it without Docker
 
@@ -86,7 +87,9 @@ node selfhost/generate.ts
 node selfhost/keys.ts
 ```
 
-Then start workerd with `.env` in its environment, and the cron sidecar beside it:
+Then start workerd with `.env` in its environment, and the cron sidecar beside it. Put
+`ACCOUNT_SERVICE_URL=https://<accounts host>` in `.env`, or the relay names no account service and players cannot
+sign in:
 
 ```bash
 set -a && . selfhost/.env && set +a && selfhost/node_modules/.bin/workerd serve selfhost/build/dfo.capnp --experimental

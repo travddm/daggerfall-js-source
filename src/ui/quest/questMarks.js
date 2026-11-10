@@ -9,8 +9,7 @@
 // the place the player stands in. A named place not yet on the map gets
 // no mark; it gets the talk arc's answer instead, the tracker card's "Not
 // on your map yet. Ask around for directions." - which is what
-// Daggerfall's directions are for (06-Systems/Talk-Arc.md, THE COMPASS
-// MARK: a person who knows marks it). Nothing here is the quest
+// Daggerfall's directions are for (a person who knows marks it). Nothing here is the quest
 // debugger's knowledge; GUIDE8's Exact tier is that, off by default.
 //
 // THE MAP marks every active quest's place - the one the tracker follows

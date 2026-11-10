@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LEAN-WITNESS
 // - A WITNESSED KEY'S ANSWERS, READ AS FAR AS THEY CAN MATTER.
 //
@@ -26,7 +25,6 @@
 // What a late row still counts is its account - the audit lists' witnesses
 // and their "exactly three", which read every row (npcHalls.js listHalls,
 // townSeats.js a developer's listSeats).
-// ═══════════════════════════════════════════════════════════════════
 
 import { SEAT_WITNESS_UNMATCHED_MAX, SEAT_WITNESS_IGNORED_S } from '../../src/net/townSeatLaw.js';
 

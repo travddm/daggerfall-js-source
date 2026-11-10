@@ -27,7 +27,7 @@ Enhanced main menu (`src/ui/enhanced/enhancedMenu.js` `runEnhancedMenu`). The me
 
 | Query | Host | Module |
 | --- | --- | --- |
-| (none), `?world` | `bootWorld` | `src/scenes/world.js` |
+| (none), `?world` | `bootWorld` | `src/scenes/world.js`, after the profile door (below) |
 | `?exterior`, `?region=`, `?loc=` | `bootExterior` | `src/scenes/exterior.js` |
 | `?dungeon=<name>` | `bootDungeon` | `src/scenes/dungeon.js` |
 | `?interior=<block>:<record>` | `bootInterior` | `src/scenes/interior.js` |
@@ -35,12 +35,32 @@ Enhanced main menu (`src/ui/enhanced/enhancedMenu.js` `runEnhancedMenu`). The me
 
 Every host has the signature `(canvas, renderer, params, status)`. `status(text)` sets the document title.
 
+### The profile door
+
+An online world plays by the server's profile, the source of online rules (decisions 58 and 65). The world reads
+profile values while it boots (dungeon sizes, ground pins), so the profile must be in place before `world.js` runs.
+`main.js`'s `bootWorld` therefore first runs `openProfileDoor` (`src/systems/online/profileDoor.ts`), then imports
+`src/scenes/world.js`.
+
+`openProfileDoor(params, status)` does nothing unless `params` has `online`. On an online page it:
+
+1. Picks the relay the page will join (`relayServerOf`: the URL's `server`, the `onlineServer` preference, else
+   `DEFAULT_SERVER`) and fetches its `/profile`.
+2. Checks the answer's relay version `v` with `relayMatches` (`src/net/wire.js`).
+3. Checks the profile against this build (`profileErrors` in `src/systems/online/serverProfile.ts`).
+4. Computes the profile's hash (`profileHashOf`, `src/net/profile/profileHash.ts`) and requires it to equal the `ph`
+   the relay named.
+5. Installs the profile (`installProfile`). It is frozen for the life of the page.
+
+A failed step says the player's words on `status` and throws, so the boot stops with the reason and the world never
+boots on the wrong rules. [client-net.md](../multiplayer/client-net.md) covers how the installed profile is read.
+
 ### The hosts are dynamic imports
 
 `main.js` reaches each host through a dynamic `import()` at the moment of use (`const bootWorld = (...a) =>
-import('./scenes/world.js').then(...)`). A static import would pull the whole game graph into the entry chunk before
-the menu shows. `test/scenes/boot1.test.js` walks the entry's static import graph and fails if a host appears on it.
-Keep it that way: do not import a scene host, or a module that imports one, from `main.js` or from the menu.
+import(...).then(...)`). A static import would pull the whole game graph into the entry chunk before the menu shows.
+No test checks this. Keep it that way: do not import a scene host, or a module that imports one, from `main.js` or
+from the menu.
 
 Hosts must have no import-time side effects, so loading them later changes only when they evaluate.
 
@@ -53,8 +73,9 @@ offers a button that clears IndexedDB (`clearStoredData`) and reloads.
 
 ## The streaming world: `bootWorld`
 
-`bootWorld` (`src/scenes/world.js`) is the main game. It is one very large function: every piece of game state is a
-local variable in its scope, and the modules it wires read that state through closures. It sets up, in source order:
+`bootWorld` (`src/scenes/world.js`) is the main game. Today it is one very large function: most game state is a local
+variable in its scope, and the modules it wires read that state through closures. The planned simulation core
+(decisions 36, 64 and 66) replaces this design. It sets up, in source order:
 
 1. Realm session and save state (`createRealmSession`, `src/systems/realmSaves.js`), map data (`MapsFile`), the
    location index, the boot start (`createBootStart`, `src/scenes/bootStartHost.js`) and the sky
@@ -75,8 +96,8 @@ local variable in its scope, and the modules it wires read that state through cl
 until the player uses a static door. Then the mode machine swaps the whole frame pipeline (draws, lighting, fog,
 collider) to a built context, and swaps it back on exit.
 
-- **Modes:** `exterior`, `interior` and `dungeon`. Further modal arms (the gate arena, the arena floor, the Shattered
-  Hour realm and the abyss) enter through their own `enter*` functions.
+- **Modes:** `exterior`, `interior` and `dungeon`. A further modal arm enters through its own `enter*` function in
+  `worldModes.js` and uses the same swap.
 - **Contexts:** an interior is built by `src/scenes/interiorContext.js`; a dungeon by `buildDungeonContext`
   (`src/scenes/dungeonContext.js`), which builds against the host's caches.
 - **Switching:** `setMode(next)` changes the mode. Entries go through `gatedTransition` and `createTransitionGate`
@@ -110,7 +131,7 @@ earlier step wrote.
 | 5 | `cameraRecoiler.update` | |
 | 6 | `onlineFrame(now, dt)` | Only when online and the player has spawned: sends look and pose, then `online.tick()`. |
 | 7 | Loading and foes: `syncInteriorLoad`, `syncLoading`, `tickTactics` | |
-| 8 | `modes.frame(dt, now)` | Interior, dungeon and modal arms draw here and the host returns. |
+| 8 | `modes.frame(dt, now)` | Interior, dungeon and modal arms draw here. The host then ticks the modules that also run indoors (`gatherHost.tick` among them) and returns. |
 | 9 | Exterior simulation: travel view, `player.update`, host module ticks (`gatherHost.tick`), season, ambience, wind, spawners, city gates | |
 | 10 | Render setup: `setFog`, `setLighting`, `setClearColor`, `renderer.beginFrame(proj, view, sunDirection(minute), WORLD_FRAME)` | |
 | 11 | World draws: terrain and meshes, sky (`sky.draw`), billboards (`drawBillboards`), held items, particles | Pass order inside the renderer: [rendering/renderer.md](../rendering/renderer.md). |
@@ -126,6 +147,7 @@ Rules for code that runs in the frame:
   draws; game logic must not read their results.
 - Do not allocate per frame on hot paths. Reuse typed arrays and scratch objects as the surrounding code does.
 - A host module runs its per-frame work from the host's frame (its `tick(dt)` or `frame(dt)`), not from its own
-  `requestAnimationFrame`. A module that must stop while a modal mode runs is called only from the exterior branch.
+  `requestAnimationFrame`. A module that must stop while a modal mode runs is called only from the exterior branch; a
+  module that must run indoors too is also called from the modal branch (step 8).
 - Wrap a module's tick in `try`/`catch` when a failure in it must not stop the frame; the host already does this for
   `gatherHost.tick`.

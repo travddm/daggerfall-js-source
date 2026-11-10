@@ -12,7 +12,6 @@
 //                        drawn over the rest - over five minutes of a real crew's words seen from the helm
 //   A MATE'S NAME      - a bubble's foot (its tail under it) clear of a mate's bar and the name over it, by the sheet's
 //                        own numbers; and its box the sheet's - a content box, its padding and ring outside its words
-// `01-Overview/bugs/Field-Bugs-2026-10-02.md`.
 import '../../modsOff.js';
 import { byClass } from '../../chargenDom.mjs';
 import { test } from 'node:test';

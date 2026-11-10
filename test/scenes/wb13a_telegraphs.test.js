@@ -35,7 +35,7 @@ function frag(sh, p, extra = {}, fw = 0.04) {
 }
 const lum = (o) => (o ? o[0] + o[1] + o[2] : 0);
 
-// ═══ T1: EVERY LIVE POOL DRAWN ═══════════════════════════════════════════════════════════════════════════════════════
+// T1: EVERY LIVE POOL DRAWN
 
 test('WB13a T1: every live pool is drawn - a full group starts another (two phase-three Hellfires on five fighters left the newest ten unseen, and still biting); each group at most TELEGRAPH_POINTS_MAX, each court and radius its own (mutants: a full group dropping the rest)', () => {
   const pools = [];
@@ -49,7 +49,7 @@ test('WB13a T1: every live pool is drawn - a full group starts another (two phas
   assert.equal(shapes.filter((s) => s.r === 3).length, 1);
 });
 
-// ═══ T2: THE NOVA ESCAPED FROM EVERY POINT OF THE FLOOR ═══════════════════════════════════════════════════════════════
+// T2: THE NOVA ESCAPED FROM EVERY POINT OF THE FLOOR
 
 /** The longest way out of a ring (r0..r1 about B) for any point of court 0's floor inside it: inward to his feet (a
  *  straight line - the floor is round), or outward to r1 where that point is on the floor. */
@@ -83,7 +83,7 @@ test('WB13a T2: THE FLAME NOVA IS ESCAPED FROM EVERY POINT OF THE FLOOR - wherev
   for (const B of spots) for (const d of [3.9, 4.1, 15.9, 16.1]) assert.equal(inAttack(W('nova', { x: B[0], z: B[1] }), B[0] + d, B[1]), d >= 4 && d <= 16);
 });
 
-// ═══ T3: THE FILL MEETS THE RIM IT IS SEEN AT ═══════════════════════════════════════════════════════════════════════
+// T3: THE FILL MEETS THE RIM IT IS SEEN AT
 
 test('WB13a T3: the fill reaches the edge a fighter can see as it lands - the Nova\'s and the Spokes\' far edge is the floor\'s rim where they reach past it (the Spokes ran 30 m on a floor of 24; with him off the heart the near spoke filled at half its wind-up) (mutants: the spoke filled to its length)', () => {
   // the Nova off the heart: toward the near rim the fill ends at the rim, the far way at its own ring
@@ -100,7 +100,7 @@ test('WB13a T3: the fill reaches the edge a fighter can see as it lands - the No
   assert.ok(Math.abs(rimDist(12, 0, 1, 0, 0, 0) - 12) < 1e-9 && Math.abs(rimDist(0, 0, 0, 1, 0, 0) - COURT_R) < 1e-9);
 });
 
-// ═══ T4, T5: THE LINE, THE FILL, THE LANDING ═════════════════════════════════════════════════════════════════════════
+// T4, T5: THE LINE, THE FILL, THE LANDING
 
 test('WB13a T4/T5: the line stands whole from the first frame - the brightest thing in the shape - while the inside comes up behind it; the last moments brighten the line alone; the landing is white-hot at once and decays to a dark scorch (mutants: the line faded in; the last moment flooding the shape; the landing held flat)', () => {
   const slam = W('slam'), w = ATTACKS.slam.windup;
@@ -130,7 +130,7 @@ test('WB13a T5: the Charge\'s landing follows his head down the lane - lit ahead
   assert.ok(lum(ahead) > lum(behind) * 1.5, `ahead ${lum(ahead).toFixed(2)}, behind ${lum(behind).toFixed(2)}`);
 });
 
-// ═══ T8, T9: ONE DANGER EDGE; THE NOVA'S HEART COOL ═════════════════════════════════════════════════════════════════
+// T8, T9: ONE DANGER EDGE; THE NOVA'S HEART COOL
 
 test('WB13a T8: every pending outline wears ONE danger edge whatever it carries - Dagon\'s crimson for the Wrath and the Reckoning - and the element stays in the fill (the bar\'s callout colours untouched); his host\'s blows the same edge (mutants: the edge his aspect\'s)', () => {
   for (const md of [null, ['rime'], ['storm'], ['venom']]) {
@@ -163,7 +163,7 @@ test('WB13a T9: the Nova\'s safe heart has a cool edge, its danger field a hot o
   assert.ok(field && field[3] > 0.15, 'the field darkened at once');
 });
 
-// ═══ T11, T12: NO FLASHING; THE WAVE SIZED ════════════════════════════════════════════════════════════════════════
+// T11, T12: NO FLASHING; THE WAVE SIZED
 
 test('WB13a T11/T12: nothing flashes past three times a second - the throb on the line (AUDIT WB9 F3 counts it), Storm\'s crackle four times a second; the shockwave runs half its shape\'s size (1 to 3.5 m) and never into a safe heart (mutants: the crackle at twelve; the wave unsized)', () => {
   assert.equal(TELEGRAPH_THROB_MAX_HZ, 3);
@@ -180,7 +180,7 @@ test('WB13a T11/T12: nothing flashes past three times a second - the throb on th
   assert.ok(lum(frag(nova, [1.5, 0])) < 0.05, 'none into the Nova\'s heart');
 });
 
-// ═══ T6, T7: TERRAIN, PATHS, HIS MARK ═════════════════════════════════════════════════════════════════════════════
+// T6, T7: TERRAIN, PATHS, HIS MARK
 
 test('WB13a T6/T7: burning ground is terrain - the floor darkened under it, dim, its rim broken - never brighter than a blow still to come; a path or a tether is dashes flowing to him; his mark dashed and dim (mutants: the ground lit as a blow)', () => {
   const pool = poolShapes([{ x: 0, z: 0, r: 3.5, from: 0, until: 9000, pct: 0.1, base: 1, el: 'fire' }], 2000, [1, 0.45, 0.1])[0];
@@ -206,7 +206,7 @@ test('WB13a T6/T7: burning ground is terrain - the floor darkened under it, dim,
   assert.match(TELEGRAPH_FS, /float mark = 0\.4 \* ring \* dash \+ 0\.65 \* chev/);
 });
 
-// ═══ T10, T14: THE LINE'S WIDTH; A QUAD PER SHAPE ═══════════════════════════════════════════════════════════════════
+// T10, T14: THE LINE'S WIDTH; A QUAD PER SHAPE
 
 test('WB13a T10/T14: the line\'s width is read off the edge\'s own derivative (wider on a short screen, up to TELEGRAPH_LINE_W_MAX); a shape\'s quad covers its own ground and every point it holds - the Nova\'s, the Spokes\' and the whole floor\'s their court (mutants: a quad short of its shape)', () => {
   assert.match(TELEGRAPH_FS, /float aa = max\(fwidth\(edge\), 1e-4\) \* uLineW;/);
@@ -238,7 +238,7 @@ test('WB13a T10/T14: the line\'s width is read off the edge\'s own derivative (w
   assert.equal(pass.drawn, 1);
 });
 
-// ═══ T13: IN IT ══════════════════════════════════════════════════════════════════════════════════════════════════
+// T13: IN IT
 
 const STATE = (atk, extra = {}) => ({ day: 1, phase: 2, fell: null, wrath: null, atk, x: 0, z: 0, yaw: 0, shieldUntil: 0, lg: null, ...extra });
 

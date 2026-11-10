@@ -6,7 +6,7 @@
 // rigid one (mwSkin.js skinBatch, mwFirstPerson.js placeAtBone), packFpArm de-indexed the whole stream with a cross
 // product per face, and updateCharacterMesh re-uploaded all of it. PERF-RIG1 costed that at ~0.3 ms a body at
 // 3,000 vertices on the fixture rig, more on a clothed retail body, and paid per body; every page of
-// 07-Rendering/Performance-Rig.md since ends on the same open item - "the real answer is GPU skinning (bone
+// docs/rendering/performance.md since ends on the same open item - "the real answer is GPU skinning (bone
 // matrices as uniforms, the blend in the vertex shader, the static stream uploaded once)". This is that.
 //
 // THE SPLIT. What never changes for the life of a built body is laid out ONCE (skinLayout, packSkinStream): the

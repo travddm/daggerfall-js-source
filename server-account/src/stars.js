@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAR7 — THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM.
 //
 // The owner: "A lore accurate world encounter defense mission ...
@@ -15,7 +14,7 @@
 // rung (raids.js) - one transaction, the row first and stamped with the
 // claim's own nonce, every credit by that row alone.
 //
-// ═══ WHOSE WORD, AND WHAT BOUNDS IT ════════════════════════════════
+// WHOSE WORD, AND WHAT BOUNDS IT
 //
 // The receipt is the RELAY's word: it saw the master fall on its
 // encounter clock and the account stand at the star. What the relay
@@ -37,7 +36,6 @@
 // character - so the device finishes once (starClaims.js).
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═══════════════════════════════════════════════════════════════════
 
 import { verifyStarReceipt } from '../../src/net/starfall/starReceipt.js';
 import { starTimes } from '../../src/net/starfall/starfallLaw.js';

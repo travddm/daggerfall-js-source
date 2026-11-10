@@ -1,5 +1,5 @@
 // DECOR-MODS (FIELD BUGS 2026-10-05b,; asked which, the town mods' furnishings first). The catalogue read Daggerfall's own blocks alone (WD3), so
-// nothing Beautiful Villages, Beautiful Cities or Detailed Ships furnish - the coloured beds, the paintings, the
+// nothing Beautiful Villages or Beautiful Cities furnish - the coloured beds, the paintings, the
 // tapestries and banners, the set tables and stocked shelves - could be set in a house. Now the pieces the port stands in
 // for what the mods place join it, offered while the port stands them: a room's where the mods stand them inside, a
 // yard's where outside alone, counted as the mods place them, named as the port names them, numbered after every place
@@ -25,26 +25,21 @@ import { DET_MODELS, DET_TOWN_MODELS, DET_FLAT_STAND_INS, DET_FLAT_DRAWINGS, DET
 import { TOWN_PICTURE_ARCHIVE } from '../../../src/world/townPictures.js';
 import { customModelFor } from '../../../src/world/customModels.js';
 import { decorPrice } from '../../../src/net/decorLaw.js';
-import { installDetailedShipsArt, DETAILED_SHIPS_DERIVED, DETAILED_SHIPS_OWN_ART } from '../../../src/systems/detailedShips.js';
-import { setModSetting } from '../../../src/systems/modSettings.js';
 import { BLOCK_TYPES } from '../../../src/formats/blocksFile.js';
 import { openWorldDataPack } from '../../../src/formats/worldData/worldDataPack.js';
-import { rebuildWorldDataPatch } from '../../../src/formats/worldData/worldDataPatch.js';
 import { rmb, fakeBlocks, toolRig, settle, rows, all } from '../../decorFakes.mjs';
 import { HAS_ARENA2, loadBlocks, loadMaps, ROOT } from '../../arena1Data.mjs';
 
-// the port's stand-ins, on - as while a town mod stands (scenes/modWorldData.js), Detailed Ships' own switch off
+// the port's stand-ins, on - as while a town mod stands (scenes/modWorldData.js)
 let townsOn = true;
-setModSetting('detailed-ships', 'Enabled', false);
-installDetailedShipsArt({ fetchBytes: async () => new Uint8Array(0) });
 installTownStandIns(() => townsOn);
 
 const offered = (t) => [...Object.keys(t.models).map((id) => `m${id}`), ...Object.keys(t.flats).map((k) => `f${k.replace('_', '.')}`)];
 const ROOM_KEYS = offered(DECOR_MOD_ROOMS), STREET_KEYS = offered(DECOR_MOD_STREETS);
 
 test('DECOR-MODS the pieces: every one the port stands in for the mods - a room\'s where they stand it inside, a street\'s where outside alone - never the town\'s structure, a sown field or the sea\'s; a twin offered once, DET\'s old archive numbers its new ones (mutants: DECORMODS-structure-offered, DECORMODS-twin-offered)', () => {
-  assert.deepEqual([ROOM_KEYS.length, STREET_KEYS.length], [223, 74]);
-  assert.equal(new Set([...ROOM_KEYS, ...STREET_KEYS]).size, 297, 'no piece in both');
+  assert.deepEqual([ROOM_KEYS.length, STREET_KEYS.length], [198, 74]);
+  assert.equal(new Set([...ROOM_KEYS, ...STREET_KEYS]).size, 272, 'no piece in both');
   const models = [...Object.keys(DECOR_MOD_ROOMS.models), ...Object.keys(DECOR_MOD_STREETS.models)].map(Number);
   // every model offered is one the port stands in for the mods
   const standIns = new Set([...Array(TOWN_BED_COUNT).keys()].map((k) => TOWN_BED_FIRST + k).concat(
@@ -63,7 +58,6 @@ test('DECOR-MODS the pieces: every one the port stands in for the mods - a room\
   const known = new Set([
     ...[DET_FLAT_STAND_INS, DET_FLAT_DRAWINGS, DET_TOWN_FLATS].flatMap((t) => Object.entries(t).flatMap(([a, rs]) => Object.keys(rs).map((r) => `${a}_${r}`))),
     ...Object.keys(TOWN_CLUTTER).map((r) => `${TOWN_CLUTTER_ARCHIVE}_${r}`), ...Object.keys(TOWN_GARDEN).map((r) => `${TOWN_GARDEN_ARCHIVE}_${r}`),
-    ...[...Object.keys(DETAILED_SHIPS_DERIVED), ...DETAILED_SHIPS_OWN_ART].map((n) => n.replace(/-0$/, '')),
   ]);
   for (const k of flatKeys) {
     assert.ok(known.has(k), `${k} is a stand-in`);
@@ -76,16 +70,16 @@ test('DECOR-MODS the pieces: every one the port stands in for the mods - a room\
 
 test('DECOR-MODS the offer follows the port\'s own switch: every piece offered while its stand-in stands, none while the mods are off - AUDIT 05b A3: and every one catalogued whatever is on, so no name, kind or number moves with a switch; a key a place of Daggerfall\'s holds stays that place\'s (mutants: DECORMODS-unswitched, DECORMODS-offered-unswitched, DECORMODS-place-overwritten)', () => {
   const c = addDecorMods(new Map());
-  assert.equal(c.size, 297);
+  assert.equal(c.size, 272);
   assert.deepEqual([c.get('m42069').count, c.get('m42069').from, c.get('f10010.44').count, c.get('f10010.44').from], [347, 'mod', 1607, 'modstreet']);
   const cat = decorCatalogue(c);
   const yard = { kind: 'home', yard: true, natureBase: 504 };
-  assert.equal(decorModsLive(cat).size, 297, 'every one stands while the mods do');
-  assert.equal(decorRoomEntries(cat, yard, true, decorModsLive(cat)).length, 297, 'and is offered');
+  assert.equal(decorModsLive(cat).size, 272, 'every one stands while the mods do');
+  assert.equal(decorRoomEntries(cat, yard, true, decorModsLive(cat)).length, 272, 'and is offered');
   townsOn = false;
   try {
-    // DET's pieces and Cliffworms' answer Detailed Ships' switch too - off here as the towns'
-    assert.deepEqual([addDecorMods(new Map()).size, decorModsLive(cat).size], [297, 0], 'the mods off: every piece catalogued, none standing');
+    // DET's pieces answer the towns' switch
+    assert.deepEqual([addDecorMods(new Map()).size, decorModsLive(cat).size], [272, 0], 'the mods off: every piece catalogued, none standing');
     assert.deepEqual([decorRoomEntries(cat, yard, true, decorModsLive(cat)).length, decorRoomEntries(cat, yard, true).length], [0, 0], 'none offered - nor where the offer is told nothing stands');
     const named = (list) => list.map((e) => [e.key, e.kind, e.name]);
     assert.deepEqual(named(decorCatalogue(addDecorMods(new Map()))), named(cat), 'no name, kind or number moves with a switch');
@@ -103,7 +97,6 @@ test('DECOR-MODS the names and the filing: a bed by its colour, filed with the b
   assert.deepEqual(decorModNaming({ model: 69471 }).base, 'Rug 3');
   assert.deepEqual(decorModNaming({ flat: [10010, 44] }), { base: 'Dove', as: 10010 });
   assert.deepEqual(decorModNaming({ flat: [56790, 2] }), { base: null, as: TOWN_CLUTTER[2][0] });
-  assert.deepEqual(decorModNaming({ flat: [1210, 10] }), { base: 'Green bottle', as: 205 });
   assert.deepEqual(decorModFlatSource(1021, 13), [...DET_FLAT_STAND_INS[10021][13]], 'an old DET number is its new one');
   // a classic room: a bed, a box, a book and a chair, then the mods
   const classic = rmb([41000, 41001, 41120], [[205, 9], [209, 2]]);
@@ -112,7 +105,7 @@ test('DECOR-MODS the names and the filing: a bed by its colour, filed with the b
   const by = Object.fromEntries(cat.map((e) => [e.key, e]));
   for (const [k, name] of Object.entries(alone)) assert.equal(by[k].name, name, `${k} keeps "${name}"`);
   assert.deepEqual(['m42069', 'm42070', 'm42071'].map((k) => [by[k].kind, by[k].name]), [['bed', 'Blue bed 1'], ['bed', 'Blue bed 2'], ['bed', 'Blue bed 3']]);
-  assert.deepEqual([by['f56790.2'].kind, by['f1210.1'].kind], ['boxes', 'books'], 'filed as the classic flats they stand in as');
+  assert.equal(by['f56790.2'].kind, 'boxes', 'filed as the classic flat it stands in as');
   assert.ok(by['f56790.2'].name.startsWith('Box ') && Number(by['f56790.2'].name.slice(4)) > 1, 'numbered after the room\'s own box');
   assert.deepEqual([by['m45008'].kind, by['m45008'].name, by['m69420'].kind, by['m69420'].name], ['mods', 'Tapestry of Glenpoint', 'mods', 'Painting 1']);
   assert.deepEqual([by['m53038'].kind, by['m53038'].outside, by['f10010.44'].kind, by['f10010.44'].name], ['outdoor', true, 'outdoor', 'Dove 2']);
@@ -206,7 +199,7 @@ test('DECOR-MODS AUDIT 05b A8 the names, off the tables: every hanging and rug i
   for (const id of hung.filter((k) => `${k}` in DECOR_MOD_ROOMS.models)) assert.ok(on[every.findIndex((w) => w.model === id)].base, `${id} named`);
 });
 
-test('DECOR-MODS measured (ARENA2): every stand-in the mods place - both town packs and Detailed Ships\' two ships over the player\'s own blocks - is offered with the count and the place measured, a twin\'s count in its one, an old DET number\'s in its new one, or left out by why', { skip: !HAS_ARENA2 && 'ARENA2_PATH not set' }, () => {
+test('DECOR-MODS measured (ARENA2): every stand-in the mods place - both town packs over the player\'s own blocks - is offered with the count and the place measured, a twin\'s count in its one, an old DET number\'s in its new one, or left out by why', { skip: !HAS_ARENA2 && 'ARENA2_PATH not set' }, () => {
   const blocks = loadBlocks(), maps = loadMaps();
   const inside = new Map(), outside = new Map();
   const tally = (key, side) => { const m = side === 'Interior' ? inside : outside; m.set(key, (m.get(key) ?? 0) + 1); };
@@ -224,10 +217,6 @@ test('DECOR-MODS measured (ARENA2): every stand-in the mods place - both town pa
     const p = openWorldDataPack(JSON.parse(zlib.gunzipSync(readFileSync(join(ROOT, `vendor/${v}/WorldDataPack/${v}.pack.json.gz`))).toString('utf8')), { blocks });
     for (const name of p.names()) if (name.endsWith('.RMB.json')) walk(p.rebuild(name, maps).RmbBlock);
     p.release();
-  }
-  for (const f of ['SHIPAA00.RMB-390-building0.json', 'SHIPAA01.RMB-630-building0.json']) {
-    const json = rebuildWorldDataPatch(JSON.parse(readFileSync(join(ROOT, 'vendor/detailed-ships/WorldDataPatches', f), 'utf8')), blocks);
-    walk({ SubRecords: [json.RmbSubRecord] });
   }
   // fold the twins and the old numbers as the tables do, keep the stand-ins
   const fold = (key) => {

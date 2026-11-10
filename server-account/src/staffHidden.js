@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL5-HIDDEN - A STAFF MEMBER HIDDEN FROM EVERY PLAYER.
 //
 // NOT THE GAME'S INVISIBILITY. That one (INVIS-NET, INVIS-LOOK, src/net/remotePlayers.js) still sends the player's position
@@ -50,6 +49,7 @@ import { signingKey, gatePublicKey } from './signing.js';
 import { pushLaw } from './sanctions.js';
 import { staffRole, auditStatement, configKey, STAFF_IDLE_S } from './staff.js';
 import { followSubject } from './staffFollow.js';
+import { whenOption, NOT_READ } from './operator-options.ts';
 
 export const HIDDEN_ROUTES = Object.freeze(['/v1/staff/hide']);
 /** The name a hidden token carries - never the account's (wire.js sanitizeName keeps it as it is; a bare "Staff" it does not). */
@@ -104,7 +104,7 @@ const HIDDEN_SINCE_SQL = LAPSED_SQL.replace('SELECT 1 AS held FROM', () => `SELE
  * they sign in again (hidden again) or sign out or press Show myself (visible by their own word).
  * @param {any} ctx @param {any} env @param {any} player the mint's account row @param {CryptoKey} key the identity key
  */
-export async function hiddenToken(ctx, env, player, key) {
+async function mintHiddenToken(ctx, env, player, key) {
   const role = staffRole(player, env);
   if (!role) return null;   // every other account: nothing read, the bytes it always minted
   const { subtle, nowS } = ctx;
@@ -188,7 +188,7 @@ export async function staffHidden(ctx, env, path, body, who, audit) {
  * whose session minted the subject. `{ ok }` or `{ error }`.
  * @param {any} ctx @param {any} env @param {Uint8Array} bytes @param {unknown} sig
  */
-export async function takeHiddenSeen(ctx, env, bytes, sig) {
+async function keepHiddenSeen(ctx, env, bytes, sig) {
   const { subtle, nowS } = ctx;
   const db = ctx.primary ?? ctx.db;
   const opened = await openHiddenSeen(bytes, sig, await gatePublicKey(env, subtle), { subtle, nowMs: nowS * 1000 });
@@ -203,3 +203,16 @@ export async function takeHiddenSeen(ctx, env, bytes, sig) {
   await auditStatement(db, nowS, { actor, role: actor ? staffRole(actor, env) : null, act: 'hidden-home', detail: { sub: s, room: r }, keyId: actor?.s_key ?? null, onceIn: 60 }).run();
   return { ok: true };
 }
+
+/**
+ * A staff member's hidden token, minted only while the operator's option `hidden` is on; off, every account gets null,
+ * the bytes a player always gets, so no socket is ever hidden.
+ * @param {any} ctx @param {any} env @param {any} player @param {any} key
+ */
+export const hiddenToken = (ctx, env, player, key) => whenOption(env, 'hidden', () => mintHiddenToken(ctx, env, player, key), null);
+
+/**
+ * The relay's note of a hidden socket in a private home, kept only while the option `hidden` is on; off, dropped.
+ * @param {any} ctx @param {any} env @param {Uint8Array} bytes @param {string|null} sig
+ */
+export const takeHiddenSeen = (ctx, env, bytes, sig) => whenOption(env, 'hidden', () => keepHiddenSeen(ctx, env, bytes, sig), NOT_READ);

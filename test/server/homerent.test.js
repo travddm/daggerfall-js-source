@@ -4,7 +4,7 @@
 // home and collected by the owner, a sale and a delete wait for the tenants; the client's half (systems/homeRent.js,
 // systems/online/onlineHomes.js): the registry's tenancies and vacancies, the door's rows, a rent paid and given back, the
 // rent collected by the service's count; the owner's rooms view in the decorator; the host's wiring by source.
-// `06-Systems/Online-Arc.md` HOME-RENT.
+// HOME-RENT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

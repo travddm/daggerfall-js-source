@@ -155,7 +155,7 @@ test('SAFE7 THE CODE OF CONDUCT is versioned by its date and names what it forbi
   assert.ok(rules.some((r) => /not even as a joke/.test(r) && /asexuality/.test(r)));
 });
 
-/* ═══ AUDIT SAFE - THE CLIENT LANE ═══════════════════════════════════════════════════════════════════════
+/* AUDIT SAFE - THE CLIENT LANE
  * The law's half of the audit's client findings: a report's lines out of their day dropped rather than the report
  * refused, a ban's own sentence, a report's note and a ban's reason in the commands, a moderator's look at the reports,
  * and a ban said as a ban in every language. Each pin failed on the arc as it merged. */

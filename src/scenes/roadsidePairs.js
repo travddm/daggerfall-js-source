@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // JUNGLE-ROADSIDE (, The roadside pairs): A PIXEL'S ROADSIDE PAIRS STOOD - a module the
 // pixel's build wires (scenes/pixelBuild.js; HOST-SPLIT). The layout stood the pairs
 // beside the flats (world/terrain/jungleNature.js jungleLayout, world/jungle/jungleRoadside.js standPairs); here a pair
@@ -15,7 +14,6 @@
 //     species' measures; but the species' near set leaves it to its half.
 // A pair whose halves or trees' far pictures cannot all stand stands its two trees as the canopy stands its own (but
 // never Logging's).
-// ═══════════════════════════════════════════════════════════════════
 import { pairPicture } from '../world/naturePicture.js';   // THE ONE CONSTRUCTION SEAM: the one file that asks a door for a picture
 
 /**

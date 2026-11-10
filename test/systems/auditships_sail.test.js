@@ -42,7 +42,7 @@ function helmOn(hull, { handling = 'responsive', off = 90, len = 1.5, variant = 
   return { s, boat, run, way: () => Math.hypot(...s.rt.state.MoveVectorCurrent) };
 }
 
-// ═══ A2: THE JOURNEY KEEPS HER OFF LAND AT HER WAY ═════════════════════════════════════════════════════════════════
+// A2: THE JOURNEY KEEPS HER OFF LAND AT HER WAY
 
 test('AUDIT SHIPS A2 the journey\'s hand keeps her off land as far as her way needs (seaHelmReach: avoidM, or what her way runs in avoidS) and keeps the reach it saw land at until she is clear of it (seaHelmLook - slowed under the oars to turn off an islet, the islet fell out of a shrinking reach and she raised sail and ran back at it); her bow clear, she holds the heading that cleared it while the mark\'s own line runs onto land within reach (mutants: a fixed reach; the reach let go; turned straight back)', () => {
   assert.equal(seaHelmReach(0), SEA_HELM.avoidM);
@@ -208,7 +208,7 @@ test('AUDIT FERRY-CLEAR the hand on world.js\'s own lift, where FERRY-CLEAR\'s t
   }
 });
 
-// ═══ A3: HER WAY OFF BESIDE HER ════════════════════════════════════════════════════════════════════════════════════
+// A3: HER WAY OFF BESIDE HER
 
 test('AUDIT SHIPS A3 (BOARD-MAGNET, 2026-10-26: the heave-to retired with the ram) the grapples\' haul takes her way off by the way she was making (haulBrake: all of it over GRAPPLE_S, never past CSA_BRAKE_MAX) - on Come Sail Away\'s real runtime a galleon and a Carrack at SAIL-FREE\'s full way on her beam and her quarter come to rest within the haul, so the ship hauled meets her lying still (mutants: the haul\'s brake halved)', () => {
   near(haulBrake(8.2) * GRAPPLE_S, 8.2, 1e-12, 'all of her way over the haul');
@@ -231,7 +231,7 @@ test('AUDIT SHIPS A3 (BOARD-MAGNET, 2026-10-26: the heave-to retired with the ra
   assert.match(WORLD, /brake: \(\) => naval\?\.brake\(\) \?\? 0,/, 'the world hands the sea fight\'s brake to her');
 });
 
-// ═══ A4: HER SAILS OR A CREW'S OARS, THE RUNTIME'S OWN WORD ════════════════════════════════════════════════════════
+// A4: HER SAILS OR A CREW'S OARS, THE RUNTIME'S OWN WORD
 
 test('AUDIT SHIPS A4 the journey weighs a crew\'s oars against her sails by the runtime\'s own word - her way under sail as she lies (sailWayOf), set or not, is the way she then makes, and her oars\' (oarWayOf) the way they make; under SAIL-FREE a fog\'s breath fills her sails (seaWind\'s floor), so a galleon and a Carrack sail through a fog where they rowed at 1 m/s (the mod\'s formula of the raw wind, and its calm), and a Large Galley\'s crew still rows past her one square sail (mutants: the mod\'s formula; the calm under SAIL-FREE)', () => {
   for (const hull of [HULL.SmallShip, HULL.Carrack, HULL.LargeGalley]) {
@@ -254,7 +254,7 @@ test('AUDIT SHIPS A4 the journey weighs a crew\'s oars against her sails by the 
   assert.match(WORLD, /crewed: !!boat\.crewed, oarWay: csaRuntime\.oarWayOf\(boat\),\n\s+sailWay: csaRuntime\.sailWayOf\(boat\),/, 'the world asks the runtime');
 });
 
-// ═══ A5: EVERY RIG'S OWN GAIN ══════════════════════════════════════════════════════════════════════════════════════
+// A5: EVERY RIG'S OWN GAIN
 
 test('AUDIT SHIPS A5 every rig\'s own gain (SAIL_FREE_GAINS - the galleon\'s SAIL_FREE.gain hers): her SAIL-FREE drive on her beam in the rated wind over the mod\'s own, measured here on the real runtime for every hull and the Large Boat\'s seven rigs - so each gathers and loses her way as HELM-WAY tuned her; the galleon\'s 1.643 was every hull\'s, and a Large Boat gathered hers a third quicker, a Large Galley a third slower (mutants: one gain for all)', () => {
   const drive = (hull, variant, handling) => { const h = helmOn(hull, { variant, handling }); h.run(40); return h.s.rt.state.MoveVectorTarget[2]; };
@@ -287,7 +287,7 @@ test('AUDIT SHIPS A5 a coast takes her rig\'s gain only for a way her canvas mad
   assert.equal(ca.s.rt.properties.moveAccel(), oarRate, 'under the mod\'s own helm too (its autorun holds MoveForwards)');
 });
 
-// ═══ A6/D1: THE RESPONSIVE HELM TRIMS HER ITSELF ══════════════════════════════════════════════════════════════════
+// A6/D1: THE RESPONSIVE HELM TRIMS HER ITSELF
 
 test('AUDIT SHIPS A6/D1 under the responsive helm her trim is the helm\'s own - every sail draws at its crest, so with the mod\'s AutoTrimming off the panel and the pad offer no trim (helmPanelState `manualTrim`), the trim keys move nothing, and her booms are trimmed as the assist trims them, to show it; under the mod\'s own helm the trim is the player\'s as it was; the trim had stayed offered, and moved her booms and nothing else (mutants: the trim the player\'s under the responsive helm)', () => {
   const off = { 'SailingAssist.AutoTrimming': false };
@@ -316,7 +316,7 @@ test('AUDIT SHIPS A6/D1 under the responsive helm her trim is the helm\'s own - 
   assert.equal(c.s.rt.helmPanelState().manualTrim, true, 'the mod\'s own helm: the trim is the player\'s');
 });
 
-// ═══ A7: A PEER'S BOAT SNAPS BY HER WAY ════════════════════════════════════════════════════════════════════════════
+// A7: A PEER'S BOAT SNAPS BY HER WAY
 
 const fileFetch = async (url) => {
   const bytes = readFileSync(fileURLToPath(url));
@@ -371,9 +371,9 @@ test('AUDIT SHIPS A7 another player\'s boat snaps - and carries nobody - past wh
   assert.equal(hitch(0, 0.2, 100, false), true, 'a boat at rest moved 100 m: a teleport');
 });
 
-// ═══ D4: THE GALLEON'S HANDLING AT HER NEW WAY, AS THE RECORD SAYS IT ═════════════════════════════════════════════════
+// D4: THE GALLEON'S HANDLING AT HER NEW WAY, AS THE RECORD SAYS IT
 
-test('AUDIT SHIPS D4 the galleon\'s handling under SAIL-FREE, measured as AUDIT GALLEON T11 measured HELM-WAY\'s (1/60 s frames, a rated wind on her beam): her full way 14.38 m/s, 95% of it in 7.93 s, struck to 2.5 m/s in 12.05 s, head to wind with the helm over 40 deg off its eye in 4.83 s, her rudder 9.68 and 10.33 deg/s at 4.5 and 9 m/s - the figures `03-World/Come-Sail-Away.md` gives; it kept T11\'s HELM-WAY figures (10.42 s, 6.37 s, "the rudder as above") as hers, and no pin read them', () => {
+test('AUDIT SHIPS D4 the galleon\'s handling under SAIL-FREE, measured as AUDIT GALLEON T11 measured HELM-WAY\'s (1/60 s frames, a rated wind on her beam): her full way 14.38 m/s, 95% of it in 7.93 s, struck to 2.5 m/s in 12.05 s, head to wind with the helm over 40 deg off its eye in 4.83 s, her rudder 9.68 and 10.33 deg/s at 4.5 and 9 m/s; it kept T11\'s HELM-WAY figures (10.42 s, 6.37 s, "the rudder as above") as hers, and no pin read them', () => {
   const DT = 1 / 60;
   const helm = (wind) => {
     const s = scene();

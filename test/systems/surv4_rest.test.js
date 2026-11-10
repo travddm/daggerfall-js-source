@@ -15,7 +15,7 @@ import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import { setWorldMinutes } from '../../src/systems/worldTick.js';
 import { SKILLS } from '../../src/systems/skills.js';
 
-// ═══ SURV4: THE REST LAW ═══════════════════════════════
+// SURV4: THE REST LAW
 //
 // A bed or a fire sleeps
 // whole; the window alone is ROUGH - half the hour's recovery, the

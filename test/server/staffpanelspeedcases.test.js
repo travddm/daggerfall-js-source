@@ -70,7 +70,7 @@ async function stand() {
   const caseOn = (who, { reports = [['harassment', 1, nowS()]], ...cols } = {}) => {
     const id = (++n).toString(16).padStart(16, 'c');
     const t = nowS();
-    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: reports.length, credible: reports.filter((r) => r[1]).length, ai_state: 'off', discord_state: 'off', ...cols };
+    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: reports.length, credible: reports.filter((r) => r[1]).length, ai_state: 'off', ...cols };
     raw.prepare(`INSERT INTO mod_cases (${Object.keys(row).join(', ')}) VALUES (${Object.keys(row).map(() => '?').join(', ')})`).run(...Object.values(row));
     raw.prepare('INSERT INTO mod_case_lines (case_id, at, sub, name, tab, text) VALUES (?, ?, ?, ?, ?, ?)').run(id, t - 5, who.id, 'Troll', 'local', 'a line');
     reports.forEach(([reason, counted, at], i) => {

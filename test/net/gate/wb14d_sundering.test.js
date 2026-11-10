@@ -64,7 +64,7 @@ const kinds = (out, k) => out.filter((o) => o.k === k);
 const atkKeys = (out, b) => out.filter((o) => o.k === 'atk' && (b === HALF.flame ? o.b === HALF.flame : o.b === undefined)).map((o) => ATTACK_BY_ID[o.a].key);
 const hit = (run, sub, b, d = 500, r = HIT_KINDS.Spell) => { const p = run.where[sub]; return applyHit(run.f, sub, d, r, { x: p[0], z: p[1] }, run.t, null, b === HALF.flame ? { b: 1 } : {}); };
 
-// ═══ THE TABLES ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE TABLES
 
 test('WB14d the tables: the Sundering and the Rejoining, 17 and 18 - turns, never chosen, plain discs about his feet the relay counts; the halves\' kits split his arsenal between them, every key an attack (mutants: a kit naming no attack; the two discs elemental)', () => {
   assert.deepEqual([ATTACKS.sunder.id, ATTACKS.rejoin.id], [17, 18]);
@@ -99,7 +99,7 @@ test('WB14d the halves\' bodies: the Blade\'s profile is his marks\' at 0.85 of 
   assert.equal(halfProfile(Q, HALF.blade), halfProfile(Q, HALF.blade), 'made once a profile');
 });
 
-// ═══ THE TURN AND THE SPLIT ═══════════════════════════════════════════════════════════════════════════════════════
+// THE TURN AND THE SPLIT
 
 test('WB14d the turn: on a Sundering night the second phase leaps to his court\'s heart and calls the Sundering (a plain night bounds as WB9b); with four challengers he splits - the Blade to the second court over walkway 0, the Flame to the third over the Rift Way, never walkway 1 (mutants: the plain turn on a Sundering night; the Flame over walkway 1)', () => {
   const plain = toSplitPlain();
@@ -166,7 +166,7 @@ test('WB14d the kits and the courts: over a split fight the Blade casts its own 
   assert.equal(new Set(ids).size, ids.length, 'one count of attack numbers for both');
 });
 
-// ═══ THE BLOWS ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE BLOWS
 
 test('WB14d a blow names its half: `b` 1 the Flame\'s pool, else the Blade\'s; each from its own court, past its own ward, measured from its own smaller body, never past its pool, each half\'s threat its own (mutants: a Flame blow on the Blade\'s pool; the Flame struck from the Blade\'s court; the pool uncapped)', () => {
   const run = spread(toSplit(sunderFight(4))).step(140);
@@ -311,7 +311,7 @@ test('WB14d the relay\'s judge: the Flame\'s plain blows by its own body (its bo
   assert.deepEqual(judgeGate(f, stood, met.at + 400), [], 'its element\'s');
 });
 
-// ═══ THE WIRE ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('WB14d the wire: a hit names its half (`b` 1 kept, 0 dropped, anything else refused); the Flame\'s atk, mv and ph carry `b` 1 and nothing else; sdh, kn, kr and rj bounded; a state\'s halves whole or the state refused (mutants: a `b` of 2 kept; a pool past its whole kept)', () => {
   const H = { k: 'hit', q: 3, d: 40, r: 0 };
@@ -334,7 +334,7 @@ test('WB14d the wire: a hit names its half (`b` 1 kept, 0 dropped, anything else
   for (const bad of [{ h: [st.sd.m + 1, 0] }, { kn: [0] }, { two: 2 }, { lo: [0, 3] }, { fl: { ...st.sd.fl, ct: 9 } }]) assert.equal(validGateOut({ ...st, sd: { ...st.sd, ...bad } }), null, JSON.stringify(bad));
 });
 
-// ═══ THE SCREEN ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SCREEN
 
 /** A court's state folded from a fight's own words (the relay's), as the session would. */
 function folded(run) {

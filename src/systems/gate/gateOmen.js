@@ -43,7 +43,7 @@ export const insideGateRing = (mark, px, py, slack = 1) => !!mark && Math.hypot(
  *  south-west corner) plus the spot, [east, north] metres - spawned dungeons' own sum (scenes/world.js, the sight line). */
 export const gateSceneXZ = (standing, t) => [t[0] + standing.spot[0], t[2] + standing.spot[1]];
 /** WB12d: the faithful's rite, said right after the omen's line while it holds (scenes/riteHost.js stands its circle) -
- *  AUDIT WB12d (D3): the Discord post's own sentences (net/gate/gateRite.js RITE_OMEN_LINE). */
+ *  net/gate/gateRite.js RITE_OMEN_LINE. */
 export const riteOmenLine = () => RITE_OMEN_LINE;
 
 // ═══ WBX8: THE SKY BURNS ═════════════════════════════════════════════════════════════════════════════════════════

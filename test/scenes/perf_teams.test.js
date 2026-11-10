@@ -4,7 +4,7 @@
 // BY EXECUTION: past PEER_TEAM_DRAW_M a team keeps its word and its ease and draws nothing (with a hysteresis); my own
 // parked wagon a league off is the same; the travel view's grown world is never cut by the eye's distance; the host's
 // view verdict (world.js yardCull) drops a wagon off screen or casts it into the shadow maps alone; the window's view
-// out takes no team past the reach. `06-Systems/Horse-Cart-And-Cargo.md`.
+// out takes no team past the reach.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

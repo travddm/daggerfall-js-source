@@ -19,7 +19,7 @@
 //                        half a hull clear pushed her and refused her helm, and the push answers the SUM - two clear
 //                        astern and one clear ahead summed to her way, and she sailed onto the one ahead and through
 //                        it. Each sweep reaches her own end now (a departure)
-// Each pin is red on the record's own code (e2466e2bd). `01-Overview/bugs/Field-Bugs-2026-10-02b.md`.
+// Each pin is red on the record's own code (e2466e2bd).
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

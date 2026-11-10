@@ -125,7 +125,7 @@ test('VAMP-HOOD online: the door reads the shared clock, whose day is one real h
   } finally { setSharedClock(null); }
 });
 
-test('HOOD-SUN (2026-10-07, Mac: "The vampire cloak and hood doesn\'t work ingame for shielding against the sun"): the hood shields the stats too - bare-headed in the street\'s sun at noon the seven stats are 20 down (VAMP-DAY), the hood raised they are 0 (BAL6: shielded, not the night\'s +20), lowered 20 down again; a hood in the pack shields nothing (mutants: the stats ask no hood; the hood read backwards)', () => {   // PIN MOVED (HOOD-SUN): VAMP-HOOD left the -20 under a hood; PIN MOVED (BAL6, bible/05-Combat/Balance-Arc.md section 12): the hood raised is 0, not +20
+test('HOOD-SUN (2026-10-07, Mac: "The vampire cloak and hood doesn\'t work ingame for shielding against the sun"): the hood shields the stats too - bare-headed in the street\'s sun at noon the seven stats are 20 down (VAMP-DAY), the hood raised they are 0 (BAL6: shielded, not the night\'s +20), lowered 20 down again; a hood in the pack shields nothing (mutants: the stats ask no hood; the hood read backwards)', () => {   // PIN MOVED (HOOD-SUN): VAMP-HOOD left the -20 under a hood; PIN MOVED (BAL6): the hood raised is 0, not +20
   const v = vampire();
   const cloak = casualCloak();
   equipItem(v, cloak);

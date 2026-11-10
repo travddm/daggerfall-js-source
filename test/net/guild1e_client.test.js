@@ -1,7 +1,6 @@
 // GUILD1e: A GUILD'S OWN BOARD, AS THE CLIENT HOLDS IT - the notice book's guild
 // acts through the real Worker (test/accountDb.mjs), the Notice Board's Guilds tab and the hall's own board on the
 // minimal DOM (test/chargenDom.mjs), the catalogue's hall board, and the hosts by their source.
-// 8.2; `06-Systems/Online-Arc.md` GUILD1e.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

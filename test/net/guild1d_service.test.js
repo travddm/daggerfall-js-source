@@ -1,6 +1,5 @@
 // GUILD1d: THE GUILD HALL AND HERALDRY, AS THE SERVICE KEEPS THEM - driven through the
-// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). 8;
-// `06-Systems/Online-Arc.md` GUILD1d.
+// real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

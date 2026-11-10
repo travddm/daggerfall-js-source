@@ -6,7 +6,7 @@ import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
 import { profileKeyOf, profileRuleErrors, resolveRules, type ProfileValue } from '../../net/profile/profileKeys.ts';
 import { pageHas } from '../pageQuery.js';
 import { t } from '../textManager.js';
-import { setSkyClockRule } from '../../net/skyLaw.js';
+import { setOnlineTimeScale, setSkyClock } from '../../net/world-time-scale.ts';
 
 export type ProfilePins = {
   readonly prefs: Readonly<Record<string, boolean | string>>;
@@ -67,7 +67,8 @@ export function installProfile(profile: unknown, ph: string): void {
 /** The installed profile's hash, or null when nothing is installed. */
 export const installedProfileHash = (): string | null => installed?.ph ?? null;
 
-/** Does the hash a relay named (`ph` in its welcome) match this page's? A page with none installed matches none. */
+/** Does the hash a relay named (`ph` in its welcome) match this page's? A page with none installed matches only a
+ *  welcome that names no `ph`. */
 export const profileMatches = (ph: unknown): boolean => (typeof ph === 'string' ? ph : null) === installedProfileHash();
 
 /** The pins this page plays by: the installed profile's, else the official profile's. */
@@ -104,8 +105,12 @@ export function onlineRule(name: string): ProfileValue | undefined {
   return rule(name, '?online');
 }
 
-// The sky's own clock is this page's profile's to say (net/skyLaw.js time.skyClock), installed or the official one.
-setSkyClockRule(() => onlineRule('time.skyClock') === true);
+// The clocks' TimeScales and whether the sky has a clock of its own are this page's profile's to say (net/world-time-scale.ts):
+// the installed profile's, and the official profile's again after a reset.
+onProfileInstalled(() => {
+  setOnlineTimeScale(onlineRule('time.worldScale'));
+  setSkyClock(onlineRule('time.skyClock'), onlineRule('time.skyScale'));
+});
 
 /** Tests: nothing installed. */
 export function _resetProfileForTests(): void {

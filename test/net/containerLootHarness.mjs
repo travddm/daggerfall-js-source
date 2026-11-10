@@ -71,7 +71,7 @@ export const REAL_RANDOM = Math.random;
 export const lcg = (seed) => { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); };
 export const clone = (v) => JSON.parse(JSON.stringify(v));
 
-// ═══ THE HOST'S DOORS, sliced (test/systems/partyloot.test.js's method) ═══════════════════════════════════════════════
+// THE HOST'S DOORS, sliced (test/systems/partyloot.test.js's method)
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 function walk(n, fn) {
   if (!n || typeof n.type !== 'string') return;
@@ -216,7 +216,7 @@ function guarded(who, missing, fn) {
   };
 }
 
-// ═══ THE BUILDING: a relay of act frames, and the players in it ═════════════════════════════════════════════════════
+// THE BUILDING: a relay of act frames, and the players in it
 export const TODAY = 2026 * 1000 + 290;   // shopStock.js createStockedDate's shape: year * 1000 + the day of the year
 export const KEY = 'container:0';
 export const ROOM = 'interior:m1.7';   // interiorLocationKey(1, 7): the relay room of the building the mount builds
@@ -296,7 +296,7 @@ export function relay() {
   return net;
 }
 
-// ═══ ONE PLAYER: their own copy of the interior, the host's doors over it, their dice, their clock ═════════════════════
+// ONE PLAYER: their own copy of the interior, the host's doors over it, their dice, their clock
 const filterOf = (entity) => (list) => {   // AUTO-HOLD's rule as the realm session registers it (scenes/realmHoldHost.js): never a piece the reader carries
   const c = carriedPieces(entity);
   const keys = new Set(c.keys);
@@ -559,7 +559,7 @@ export const quiesce = (s, opts = {}) => elapse(s, 40_000, opts);
 /** The `l` records of an act frame as the frame says them. */
 export const recordsOf = (e) => (Array.isArray(e?.data?.l) ? e.data.l : []);
 
-// ═══ AN OLDER BUILD: the whole-list law of 02706035cf, frozen ════════════════════════════════════════════════════════
+// AN OLDER BUILD: the whole-list law of 02706035cf, frozen
 // A player on the build before this fix says WORLD6a's word - `{ k, r, d }`, the container's whole list and the day it was
 // stocked - and lands every word it hears over its own list, except on the container it has open. These are that build's
 // interiorShared.js applyInteriorLoot, interiorLootRecords and withoutCarried VERBATIM (the doors, the vocabulary and the cap
@@ -643,7 +643,7 @@ export function older(net, id, { list = null } = {}) {
   return o;
 }
 
-// ═══ PIECES a pin can hand a roll ═══════════════════════════════════════════════════════════════════════════════════════
+// PIECES a pin can hand a roll
 /** `n` DISTINCT light pieces (distinct templates, no two stack), each as a store mints it and the item law reads it: what a
  *  Take all of more than 32 rows needs to be every row a row of its own. */
 export function lightPieces(n) {

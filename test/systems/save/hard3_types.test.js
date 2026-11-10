@@ -2,7 +2,7 @@
 //
 // WHAT THIS SLICE IS, AND WHAT IT DELIBERATELY IS NOT.
 //
-// `01-Overview/Hardening.md` listed types THIRD, with the honest note
+// The program listed types THIRD, with the honest note
 // that walking AUDIT 66's twelve findings against a type checker catches
 // approximately none of them: ordering, omission, placement,
 // reachability and unit convention are not shapes. That has not changed,

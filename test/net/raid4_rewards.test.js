@@ -75,7 +75,7 @@ async function relayPair() {
 const raidFor = (s, key, priv, nowS = T0, y = 2) => mintRaidReceipt({ w: key, s, c: 777, y }, priv, { subtle, nowS });
 const CH = 'char-0001', CH2 = 'char-0002';
 
-// ═══ THE LAW ═════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('RAID4 the Renown a town pays: three quests\' worth at the top quest level, read no higher than the character\'s Renown allows - RENOWN-ACCOUNT\'s three quarters: 585 at Renown 1, 1,395 at 10, 2,925 from 27 (780, 1,860 and 3,900 at the full rate) (mutants: the ceiling unread; the count of quests off)', () => {
   assert.equal(RENOWN_RAID_QUESTS, 3);
@@ -87,7 +87,7 @@ test('RAID4 the Renown a town pays: three quests\' worth at the top quest level,
   assert.equal(renownRaidXp(10), RENOWN_RAID_QUESTS * renownQuestXp(RENOWN_QUEST_LEVEL_MAX, 10));
 });
 
-// ═══ THE SERVICE ═════════════════════════════════════════════════════════════════════════════════
+// THE SERVICE
 
 test('RAID4 the claim: a receipt the relay signed, naming the claiming account, is one row a (raid, account) - counted once whatever happens to it, and the character that fought it paid its Renown in the same breath, once; another raid adds one; another account\'s, an unsigned one, a gate\'s, a forged one and an expired one are refused; no public half is the service\'s gap; a guest is not counted until it registers (mutants: the row unkeyed; the credit outside the row\'s own claim; the guest counted)', async () => {
   const db = d1();
@@ -211,7 +211,7 @@ test('RAID4 the worker: /v1/raid/claim behind a session and never open - the ses
   assert.deepEqual(await bare.call('POST', '/v1/raid/claim', { receipt: r, character: G }, g.secret), { status: 503, body: { error: 'no-gate-key' } }, 'no public half: the service\'s gap');
 });
 
-// ═══ THE CLIENT ══════════════════════════════════════════════════════════════════════════════════
+// THE CLIENT
 
 test('RAID4 the client\'s call: the receipt, the character and its name to /v1/raid/claim under the stored session; none, no knock (mutants: the character unsent; a call with no session)', async () => {
   const calls = [];

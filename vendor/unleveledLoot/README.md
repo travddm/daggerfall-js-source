@@ -36,4 +36,4 @@ Loot.dll` (11,264 bytes); the repository carries `UnleveledLoot.cs` at
 naming what the decompiler numbered; where they differ (the armour
 drop's construction and its condition) the DLL stands. Neither is
 carried; the port is `src/systems/unleveledLoot.js`. The page is
-`bible/06-Systems/Unleveled-Loot.md`.
+`docs/formats/mods-and-vendor.md`.

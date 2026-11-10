@@ -82,7 +82,7 @@ const harvestBody = (who, p, id = rid('harv')) => ({
   climate: WOODS, region: ANTICLERE, act: { clean: false, bruised: false }, at: NOW - 2, rid: id,
 });
 
-// ═══ THE SERVICE: A HARVEST ══════════════════════════════════════════════════════════════════════════════════════════
+// THE SERVICE: A HARVEST
 
 test('GATHER-SPEED: a harvest is four round trips - its request asked before, the hour\'s acts with the ground and the track (asked together), and its decision with its row and every read of its answer in one batch; asked again, two - and the two answers say the same (mutants: the answer read one trip each; the ground and the track apart; the row read back alone; the repeat\'s reads one trip each)', async () => {
   const s = await stand();
@@ -140,7 +140,7 @@ test('GATHER-SPEED: the professions\' state is one round trip, and a pixels-and-
   assert.equal(none.c.trips, 0, 'nothing asked, nothing sent');
 });
 
-// ═══ THE SERVICE: THE SEATS' PLACES ══════════════════════════════════════════════════════════════════════════════════
+// THE SERVICE: THE SEATS' PLACES
 
 const SEAT = { key: 3021, name: 'Anticlere', region: ANTICLERE, tier: 'palace', pixel: [402, 151] };
 const seatRead = (sql) => sql === SEAT_ROWS_SQL || sql === SEAT_JUDGED_SQL;   // LEAN-WITNESS (
@@ -163,7 +163,7 @@ test('GATHER-SPEED / MARKET-SPEED: a Levy\'s seat, a Tithe\'s and a board\'s Mar
   assert.equal(c.n, 1, 'the asks within the minute: the rows read once');
 });
 
-// ═══ THE SERVICE: A MARKET READ ══════════════════════════════════════════════════════════════════════════════════════
+// THE SERVICE: A MARKET READ
 
 const DF = 17, WR = 23;
 const HUBS = { [DF]: [207, 212], [WR]: [590, 166] };
@@ -199,7 +199,7 @@ test('MARKET-SPEED: a market read is three round trips - the settle\'s reads wit
   assert.equal(back.c.trips, 5, 'the settle\'s reads, the expiry with its rows, the returns in one batch, the Stores said, the view');
 });
 
-// ═══ THE CLIENT: THE NODE GOES WITH ITS ACT ══════════════════════════════════════════════════════════════════════════
+// THE CLIENT: THE NODE GOES WITH ITS ACT
 
 const tick = () => new Promise((r) => setImmediate(r));
 const memStorage = () => { const m = new Map(); const st = { reads: 0, getItem: (k) => { st.reads++; return m.get(k) ?? null; }, setItem: (k, v) => m.set(k, String(v)) }; return st; };
@@ -347,7 +347,7 @@ test('GATHER-SPEED client: the frame\'s reads of the kept table are the last par
   assert.equal(PUMP_IDLE_MAX_MS, 1_000);
 });
 
-// ═══ THE CLIENT: THE MARKET'S MINUTE ═════════════════════════════════════════════════════════════════════════════════
+// THE CLIENT: THE MARKET'S MINUTE
 
 test('MARKET-SPEED client: the book says whether its minute\'s cache would answer a read (`fresh`), as `read` itself decides (mutants: fresh past the minute; fresh on another view)', async () => {
   let t = 1_000_000;
@@ -380,7 +380,7 @@ test('MARKET-SPEED client: a view the minute\'s cache answers is drawn once, wit
   assert.equal(draws, 2, 'forced: the wait, then the answer');
 });
 
-// ═══ AUDIT GATHER-SPEED ══════════════════════════════════════════════════════════════
+// AUDIT GATHER-SPEED
 
 test('AUDIT GATHER-SPEED G1: `gone` asked of every node near the player, every frame, reads the storage once - the set of nodes being counted kept until this book writes, the slot changes or PUMP_IDLE_MAX_MS (mutant: counting read off the storage each ask)', async () => {
   const storage = memStorage();

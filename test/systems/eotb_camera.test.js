@@ -10,7 +10,7 @@ import {
 import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
 import { PrefabNode } from '../../src/world/prefabNode.js';
 
-// ═══ EOTB2: THE CAMERA, READ OFF THE IL ═══════════════════════════
+// EOTB2: THE CAMERA, READ OFF THE IL
 //
 // and on why a
 // port that already has third person carries a second one: "This is
@@ -304,7 +304,7 @@ test('EOTB2: the offset rides the EYE’s basis, so looking up walks the camera 
   assert.deepEqual(bodyVector(v, Math.PI / 2).map(r6), [-2, 0, 0]);
 });
 
-// ═══ THE PINS THE FIRST CAMPAIGN EXPOSED ══════════════════════════
+// THE PINS THE FIRST CAMPAIGN EXPOSED
 //
 // Five mutants survived the pins above, and four were holes in the
 // pins rather than in the code. They are worth naming because each is
@@ -396,7 +396,7 @@ test('EOTB2: ToggleOffset itself zeroes the scroll - on the path that does not g
   assert.equal(c.scroll(), 0, 'and entering third person does');
 });
 
-// ═══ AUDIT-EOTB: WHAT THE CAMPAIGN NEVER ASKED ════════════════════
+// AUDIT-EOTB: WHAT THE CAMPAIGN NEVER ASKED
 //
 // The first campaign killed 17 of 18 and the arc shipped. The audit
 // then drove the camera through the path a HOST actually takes and
@@ -462,7 +462,7 @@ test('AUDIT-EOTB F5b: the SHIPPED offset puts the camera above the feet, not bel
   assert.equal(r4(r.eye[2]), -2, '...and at the base distance behind');
 });
 
-// ═══ EOTB-IL: THE CAMERA, AGAINST THE ASSEMBLY ═════════
+// EOTB-IL: THE CAMERA, AGAINST THE ASSEMBLY
 //
 // The shipped `.dfmod` is open (vendor/eye-of-the-beholder/il/). These
 // pin the places where EOTB2's reading of the camera was wrong or

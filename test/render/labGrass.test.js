@@ -202,7 +202,7 @@ test('GR5: a cell grows the same blades whoever is looking, and walking touches 
   assert.ok(pending > 0, 'the rest wait their turn');
 });
 
-// ═══ GRASS5: THE BLADE, PACKED ═════════════════════════
+// GRASS5: THE BLADE, PACKED
 // Twelve floats a blade was 48 bytes on the GPU, and the STORAGE - not
 // the frame - was what capped the range: 106 MB at 250 m, 169 at 320.
 // Sixteen bytes is three times the field for the same memory.

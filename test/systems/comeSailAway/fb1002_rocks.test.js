@@ -28,7 +28,6 @@
 // Moved by the record's audit: the sweep is the sphere's own (no spokes, so no `pass` for them), a ledge is no rock
 // by the KEEL LINE where the host had dropped an overlap "beneath" her, and each sweep reaches her own end (ROCK-REACH)
 // - so the rocks of these pins stand inside her own length, and the ledge under her keel.
-// `01-Overview/bugs/Field-Bugs-2026-10-02.md`.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

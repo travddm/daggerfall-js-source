@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // FAR-FIELD: THE FAR FIELD - the land past the far ring, out to 393 km.
 //
 // THE LAYERS BY DISTANCE, each the one inside it drawn over it, at the far plane, in one pass (render/farRing.js draw):
@@ -26,7 +25,6 @@
 // closed over the far field's (FAR_RIM_START..FAR_RIM_END) while the far field stands - the far ring no longer closes into
 // the sky at 28 km, the land runs on at the hold's 15% to the far field's rim. A range 2 km high 300 km off stands about
 // 0.4 degrees over the horizon (no curvature is drawn) - a few pixels of a 65-degree lens.
-// ═══════════════════════════════════════════════════════════════════
 
 import { TERRAIN_SIZE, SCALED_BEACH_ELEVATION, BASE_HEIGHT_SCALE as BYTE_SCALE } from '../world/terrain/terrainSampler.js';
 import { FAR_CELL, FAR_RADIUS, FAR_REBUILD_DRIFT, FAR_SAMPLES, farFieldSide } from '../world/terrain/midRingGrid.js';

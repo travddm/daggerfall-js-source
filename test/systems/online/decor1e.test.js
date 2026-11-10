@@ -3,7 +3,7 @@
 // (scenes/decor/decorTool.js) - offline into the room's pool, online through the account service first; the sale that takes
 // a room's pieces with it (the client's registry, the scene's record, the host's hooks); and the touch screen's
 // flight - the stick, the bar's Fly up and Fly down, no tap or swipe under it (the tool, worldModes.js, world.js). The
-// service's own sum is pinned with the service (decor1.test.js). `06-Systems/Online-Arc.md` DECOR1e.
+// service's own sum is pinned with the service (decor1.test.js). DECOR1e.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

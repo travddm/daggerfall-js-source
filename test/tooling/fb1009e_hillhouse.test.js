@@ -6,7 +6,7 @@
 // stands its House2 #6 (model 159) inside two of the author's hills - the one walled door of both packs (AUDIT FB1005
 // T3), carried as the pack's own until a quest seated its person there. The house is stood on the block's nearest clear
 // ground at the author's facing, its record kept (src/world/curatedPlacements.js; measured by
-// tools/curatedPlacements.mjs). `01-Overview/bugs/Field-Bugs-2026-10-09e.md`.
+// tools/curatedPlacements.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

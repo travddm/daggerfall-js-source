@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // PROF2 - THE GATHERING PROFESSIONS IN THE
-// STREAMING WORLD, one shell for every kind of node (bible/06-Systems/
-// Professions-Arc.md 5, 6, 8, 22, 23; FORAGE0 14). PROF1 built it as
+// STREAMING WORLD, one shell for every kind of node (docs/systems/professions.md).
+// PROF1 built it as
 // Herbalism's own host; every gathering profession needs the same shell,
 // so the shell is this, and each profession is a KIND in it - PROF1's
 // patches (scenes/herbHost.js herbKind), PROF2's veins and boulders

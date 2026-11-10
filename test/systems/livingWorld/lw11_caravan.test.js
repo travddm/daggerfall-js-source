@@ -473,7 +473,6 @@ test('LW11 the host\'s wiring: the road\'s trade window (its counter\'s discount
   assert.match(roads, /const trip = deps\.robbed\?\.\(p\.trip\.id\) != null \? \{ \.\.\.p\.trip, robbed: \{ t: /);
 });
 
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT LW-II: THE CARAVAN'S DOOR, AUDITED - each finding reproduced, fixed, and pinned below.
 
 test('AUDIT LW-II C1: at the game\'s epoch every place is a newcomer\'s - a witness and an escort\'s leader found by their place, the newcomer minted as the lives mint them; a murder carried in is charged, an escort kept and paid; a trip\'s trips waiting answer undefined (mutants: the newcomer, the place, the pending)', () => {

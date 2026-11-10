@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // FESTIVAL-STAGE - A
-// FESTIVAL'S MUSIC, BANNERS AND LANTERNS (bible/11-Multiplayer/
-// Seats-Arc.md 7.6: "Festival - music, banners, lanterns"). SEAT1d built
+// FESTIVAL'S MUSIC, BANNERS AND LANTERNS. SEAT1d built
 // its Festive buff (systems/seatEdicts.js); this is the town dressed for
 // it, while a Festival rules there - the holder's Edict as the seats'
 // list dresses the seat (net/townSeatLaw.js festivalRules). Nothing on

@@ -61,7 +61,7 @@ test('VC3: the light - the sun while it is up, else the brighter visible moon, d
   assert.ok(night.color[0] < 0.2 && night.day === 0, 'dim');
   const set = cloudLight({ sunDir: [0, -0.2, 0.98], sun: [0, 0, 0], masser: { ...masser, dir: [0.3, -0.1, 0.9] }, secunda: { ...secunda, vis: 0 } });
   assert.deepEqual(set.color, [0, 0, 0], 'no light: the sun down, Masser set, Secunda dark');
-  // ═══ VC6b: THE SUN SETS FOR THE CLOUD LAST ═════════════════════════
+  // VC6b: THE SUN SETS FOR THE CLOUD LAST
   // The weight used to fade from y = -0.02 to 0.06 - a window fitted by
   // eye, which put the cloud's light out while the sun was still two
   // and a half degrees UP, in the middle of Mac's golden hour. It is

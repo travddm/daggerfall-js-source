@@ -1,8 +1,8 @@
 // CROWN-HALL: A CROWN'S CASTLE AS ITS HOLDER'S HALL - the throne room found by its
 // ruler (the region's Province faction's first child, an Individual - MacroHelper.GetLordNameForFaction's law), its
 // pieces placed about them in the dungeon's own collider (src/systems/crownHall.js), and the hosts' seams
-// (src/scenes/worldModes.js crownHall, src/scenes/world.js seatHall.crown and drawDungeonBanners). bible/11-Multiplayer/
-// Seats-Arc.md 7.2; `06-Systems/Online-Arc.md` CROWN-HALL.
+// (src/scenes/worldModes.js crownHall, src/scenes/world.js seatHall.crown and drawDungeonBanners).
+// CROWN-HALL.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

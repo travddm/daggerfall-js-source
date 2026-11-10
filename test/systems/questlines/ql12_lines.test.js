@@ -103,7 +103,7 @@ test('QL13 the Covens\' Hoard\'s end: the key sold or sealed, the claim\'s two w
   assert.deepEqual(QL_SERVICE_LINES.burningDoors.witness, { 2: 'rite', 3: 'breach' });
 });
 
-// ═══ AUDIT QUESTLINES (LINES-4, -8, -9, -10, -23, -24, -26, -27, ACTS-7): THE SCRIPTS' WORDS AND PAY, HELD TO THE WORLD ═══
+// AUDIT QUESTLINES (LINES-4, -8, -9, -10, -23, -24, -26, -27, ACTS-7): THE SCRIPTS' WORDS AND PAY, HELD TO THE WORLD
 
 /** A step's script on the real bridge as the game drives it: the pack's own source, the player's pack (a quest item given
  *  is carried), the town and the sky's hour the host's (noon). The world's own part - an NPC stood at a place - is done by
@@ -456,7 +456,7 @@ test('QL1/QL12 an outcome settles at the end its script names: a failure clock\'
   assert.equal(won.offers.length, 1, 'the choice of three');
 });
 
-// ═══ AUDIT QUESTLINES (LINES, ACTS-2): the runner's gates, its stalls and its order ═══
+// AUDIT QUESTLINES (LINES, ACTS-2): the runner's gates, its stalls and its order
 
 test('AUDIT QUESTLINES ACTS-2, LINES-3, LINES-6: a step whose deed needs a switch that is off, or the Renown a revenant comes at, waits and says so - never started to fail every day; each need is one the runner can read (mutants: the needs unread; the line begun regardless; the Renown)', () => {
   assert.deepEqual(Object.keys(NEED_CHECKS).sort(), ['lootRarity', 'naval', 'renown', 'starfall']);

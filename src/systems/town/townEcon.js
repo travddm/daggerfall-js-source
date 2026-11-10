@@ -6,7 +6,7 @@
 // apply (townShopFactor, a seat's folded in), and its card for the Held
 // Map's and the Overworld's hover (townTipOf).
 //
-// Online only (TE0 decision 4): offline a counter prices as DFU's does and
+// Online only: offline a counter prices as DFU's does and
 // no town shows a card. What it reads comes from its host - the town's own
 // row (its pixel, region and type), the seat book's dressed seats, the
 // raids running, the relay's clock (AUDIT TOWN-ECON LAW-2) - and nothing here asks the service
@@ -14,7 +14,7 @@
 // id (net/townEconBook.js shareOf), 0 where none is read.
 // ═════════════════════════════════════════════════════════════════════
 import { isEconTown, townKeyOf, townProsperity, townShopFactor, townTipOf, townDayOf, townBandOf, townExchangeFactors, TOWN_SALE_MODES } from '../../net/townEconLaw.js';
-import { bailiwickOf, seatTipOf } from '../../net/townSeatLaw.js';   // TE0 decision 5: the area's seat (the Tithe's own rule); AUDIT TOWN-ECON CLI-3: a seat's own card where its place has no economy
+import { bailiwickOf, seatTipOf } from '../../net/townSeatLaw.js';   // the area's seat (the Tithe's own rule); AUDIT TOWN-ECON CLI-3: a seat's own card where its place has no economy
 
 /**
  * @param {{ online: () => boolean, townOf: (mapId: number) => ({ name: string, px: number, py: number, region: number, type: number }|null|undefined),
@@ -51,7 +51,7 @@ export function createTownEcon(host) {
     bandOf(mapId) { const r = readingOf(mapId); return r ? townBandOf(r.p) : null; },
     /** SEA-TRADE: a port town's exchange factors today (townEconLaw.js townExchangeFactors), or null. @param {unknown} mapId */
     exchangeOf(mapId) { const r = readingOf(mapId); return r ? townExchangeFactors(r.p) : null; },
-    /** A COUNTER'S FACTOR (TE0 decision 4): what the counter in building `b` (its town `b.townMapId`) applies for
+    /** A COUNTER'S FACTOR: what the counter in building `b` (its town `b.townMapId`) applies for
      *  `mode`, the seat's `seatFactor` folded in - where the town has no economy, or offline, the seat's alone (AUDIT
      *  TOWN-ECON CLI-3: SEAT1d's own law - it handed the seat's discount to a sale of magic), and what it pays never
      *  above what it asks this player (SEAT-LOOP: the seat's essentials round trip, closed where no town reads too). */
@@ -61,7 +61,7 @@ export function createTownEcon(host) {
       if (TOWN_SALE_MODES.includes(mode)) return Math.min(1, seatFactor);
       return mode === 'Buy' || mode === 'Repair' ? seatFactor : 1;
     },
-    /** A TOWN'S CARD (TE0 decision 6), or null - AUDIT TOWN-ECON CLI-3: a seat whose place has no economy (a Palace
+    /** A TOWN'S CARD, or null - AUDIT TOWN-ECON CLI-3: a seat whose place has no economy (a Palace
      *  outside MAPS' three town types) keeps SEAT-TIP's own card. @param {unknown} mapId */
     tipAt(mapId) {
       const r = readingOf(mapId);

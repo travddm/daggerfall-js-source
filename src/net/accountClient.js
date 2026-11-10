@@ -69,13 +69,12 @@ import { busyRead, busyAnswer, busyWaitMs, retryAfterMs, BUSY_HOLD_MS } from './
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the arena's refusals, in its own frozen table
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
 import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HOLD-SAID: the standing hold's own notice
-import { MINT_VERSION } from './productRecord.js';   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
+import { MINT_VERSION } from './productRecord.js';   // a craft asks its record be stamped with the version this build mints
+import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said
 
-/** WHERE THE SERVICE IS. Its own constant beside the relay's
- *  DEFAULT_SERVER (net/online.js), because they are two Workers and
- *  ACC0's whole argument is that they deploy apart - a player pointing
- *  at a test relay has not moved their account. */
-export const DEFAULT_ACCOUNT_SERVICE = 'https://daggerfall-accounts.mackcothran.workers.dev';
+/** There is no built-in account service: the relay a player enters names its own
+ *  (net/account-service-address.ts). Empty is no service. The deploy workflows read this line with grep. */
+export const DEFAULT_ACCOUNT_SERVICE = '';
 
 /** The bounds the SERVICE enforces, restated here for the field caps
  *  alone. `password.js` PASSWORD_MIN/MAX and `guestName.js` HANDLE_RE
@@ -93,7 +92,7 @@ export const HANDLE_MAX_LEN = 24;
  *  credentials at once, so the merge belongs there - and two different
  *  credentials under one key is how a player gets signed out of both. */
 export const SESSION_KEY = 'dagger.account.session';
-export const SERVICE_KEY = 'dagger.account.service';
+export { SERVICE_KEY } from './account-service-address.ts';
 
 /**
  * WHAT A REFUSAL MEANS, IN WORDS A PLAYER CAN ACT ON.
@@ -201,12 +200,6 @@ const REFUSAL_WORDS = {
   'ladder-needs-account': () => t('account.refusal.ladderNeedsAccount', 'The ladder online needs a username and a password. Give this account one and your climb is kept.'),   // AUDIT ARENA-LADDER 2: a guest climbs nothing online
   joined: () => t('account.refusal.joined', 'You already fight under a banner. Leave it at its recruiter first.'),
   season: () => t('account.refusal.season', 'You left that banner this season. You can rejoin it next season.'),
-  // PATREON-LINK, a patron's own Patreon (server-account/src/patreon.js). `signature` is the webhook's, met by Patreon
-  // and never a player; it has a sentence because every word the service says does.
-  'patreon-closed': () => t('account.refusal.patreonClosed', 'Patreon linking is not available yet.'),
-  'patreon-down': () => t('account.refusal.patreonDown', 'Patreon did not answer. Try linking again in a minute.'),
-  'patreon-needs-account': () => t('account.refusal.patreonNeedsAccount', 'Linking Patreon needs a username and a password. Give this account one first.'),
-  signature: () => t('account.refusal.signature', 'The account service could not check who sent that request.'),
   // MOD1, moderation. A moderator reads these in chat, beside the
   // command they just typed.
   'not-moderator': () => t('account.refusal.notModerator', 'Only moderators can do that.'),
@@ -1201,10 +1194,6 @@ export const buyInsignia = (io, item, rid = null) => call(io, '/v1/account/insig
 /** AUDIT FB1024 (BROKER-RID): a Broker sale whose answer was lost, asked after by its request id (`{ rid, nonce }`) -
  *  server-account/src/brokerSales.js settleBrokerSale. Signed out, nothing is asked. */
 export const settleBrokerSale = (io, body) => (io ? call(io, '/v1/broker/settle', body) : Promise.resolve({ ok: false, error: 'no-session' }));
-/** PATREON-LINK: take this account's Patreon off it - `{ ok, titles, title, glyphs, auras, aura, insignia, patreon }`,
- *  the wardrobe after it and the card's Patreon row. Linking has no call here: the account read carries the link, and
- *  the player follows it in a browser (server-account/src/patreon.js says why). */
-export const unlinkPatreon = (io) => call(io, '/v1/patreon/unlink', {});
 
 /** ACC4: ONE BEAT OF TIME PLAYED. It carries no number - the service
  *  credits the gap by its own clock (net/playClock.js says why), and
@@ -2256,13 +2245,6 @@ export function accountMarket({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) 
   };
 }
 
-/** SEA-SEASON: THE SEA'S SEASON BOARDS' DOOR (server-account/src/seaSeason.js) - the season's deepest voyages and legends
- *  ended, and the asking character's rank each way (`board`: `{ character }`). Its answer is `call`'s shape. */
-export function accountSeaSeason({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return { board: (req) => post('/v1/sea/season/board', req) };
-}
-
 /** CREW-SIGNED: A CREW HALL'S DOOR (server-account/src/crewSigns.js) - a town's hall on a day (`hall`: `{ town, day }` -
  *  the slots others hold and the asker's), a recruit held (`sign`: `{ id }`) and let go (`release`: `{ id }`). Every
  *  answer is `call`'s shape. */
@@ -2297,11 +2279,8 @@ export function accountWrits({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
   };
 }
 
-/** The service this device talks to. Overridable the same way the
- *  relay is, so a test deployment can be pointed at without a build. */
+/** The service this device talks to: a developer's override, then what the player's relay named
+ *  (net/account-service-address.ts accountServiceOf). */
 export function serviceBase(storage) {
-  try {
-    const v = storage?.getItem?.(SERVICE_KEY);
-    return (typeof v === 'string' && /^https:\/\/\S+$/.test(v)) ? v : DEFAULT_ACCOUNT_SERVICE;
-  } catch { return DEFAULT_ACCOUNT_SERVICE; }
+  return accountServiceOf(storage, DEFAULT_ACCOUNT_SERVICE);
 }

@@ -80,7 +80,7 @@ function argsOf(text, at) {
   return out;
 }
 
-// ═══ A. THE SCHEDULE ═════════════════════════════════════════════════════════════════════════════════════════════════
+// A. THE SCHEDULE
 
 test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Worker still exports `default` alone and its scheduled() fires the list its cron names - none for a cron the service does not keep, nothing while it is held for maintenance, and one metrics point a job (mutants: the hour\'s list for the minute, maintenance ignored, the point never written)', async () => {
   const toml = src('server-account/wrangler.toml');
@@ -119,7 +119,7 @@ test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Wo
   assert.ok(!JSON.stringify(points).includes(g.id));
 });
 
-// ═══ B. THE READS WRITE NOTHING THEY SWEPT ═══════════════════════════════════════════════════════════════════════════
+// B. THE READS WRITE NOTHING THEY SWEPT
 
 test('SCALE4b B: the Notice Board\'s read, a guild board\'s, the professions\' state and the market\'s History write nothing - and answer what they answered when they swept first; the expired rows wait for the hour, which takes them and leaves the live (mutants: each sweep back on its read, a sweep that takes the live)', async () => {
   const s = await standService(OPEN);
@@ -187,7 +187,7 @@ test('SCALE4b B: the Notice Board\'s read, a guild board\'s, the professions\' s
   assert.deepEqual((await s.call('/v1/guilds/board', { character: a.character }, a.secret)).body, gb.body);
 });
 
-// ═══ C. ASKED BEFORE IT IS WRITTEN ═══════════════════════════════════════════════════════════════════════════════════
+// C. ASKED BEFORE IT IS WRITTEN
 
 test('SCALE4b C: the market\'s read, the Work tab\'s and a guild\'s write nothing while nothing is due - and the moment something is, the same updates go: a listing past its hours expired, a commission past its days, a guild that lost its master crowned (mutants: each update left unasked, its guard inverted)', async () => {
   const s = await standService(OPEN);
@@ -235,7 +235,7 @@ test('SCALE4b C: the market\'s read, the Work tab\'s and a guild\'s write nothin
   assert.deepEqual(w.writes(), [], 'crowned: nothing to write again');
 });
 
-// ═══ D. THE MINUTE'S SETTLEMENTS ═════════════════════════════════════════════════════════════════════════════════════
+// D. THE MINUTE'S SETTLEMENTS
 
 test('SCALE4b D: every minute the clock settles what no read has asked for - an auction past its end closed, a guild\'s writ and contract past theirs expired and their escrow back, the seats\' Turning (only while the seats are everyone\'s) and the day\'s Motherlodes, picked once an isolate (mutants: a job dropped from the minute, the seats settled behind `dev`, the day picked every minute)', async () => {
   const s = await standService(OPEN);
@@ -287,7 +287,7 @@ test('SCALE4b D: every minute the clock settles what no read has asked for - an 
   assert.equal(keptAt(), T0 + 2 * ARENA_CHAMPION_CLOCK_S);
 });
 
-// ═══ E. RETENTION ════════════════════════════════════════════════════════════════════════════════════════════════════
+// E. RETENTION
 
 test('SCALE4b E: each hour the rows nothing reads any more go - a rate window a day past its start (the longest window any bucket counts is an hour), a session idle past its year (the bound resolveSession refuses it at; the table walked, AUDIT SCALE A6), an invitation past its week - and the live stay; a sweep past a page is taken in rounds, never more than ROUNDS_MAX pages a firing (mutants: the cutoffs moved, the rounds unbounded)', async () => {
   const s = await standService(OPEN);

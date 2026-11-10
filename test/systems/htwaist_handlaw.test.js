@@ -165,7 +165,7 @@ test('HT-WAIST: the throw\'s wind-up leaves the waist\'s lantern lit - switch of
   }
 });
 
-// ═══ the first-person hand ═══════════════════════════════════════════════
+// the first-person hand
 
 const loadSprite = async (record, frame) => (frame < 4 && record <= 1 ? { width: record ? 110 : 90, height: record ? 138 : 205, colors: null } : null);
 const fakeRenderer = () => { const r = { uploads: [], quads: [], uploadTexture: (a, k, img) => { const t = { a, k, img }; r.uploads.push(t); return t; }, drawScreenQuad: (tex, rect) => r.quads.push(rect) }; return r; };
@@ -191,7 +191,7 @@ test('HT-WAIST: the first-person hand never holds the waist\'s lantern - no lant
   assert.equal(t.h.draw(renderer, t.ctx.canvas), true, 'the torch is held and drawn');
 });
 
-// ═══ the light ═══════════════════════════════════════════════════════════
+// the light
 
 test('HT-WAIST: the light shines from the HIP - LANTERN_HIP in the yaw frame, over BOTH writers of the torch\'s override; a drawn body\'s point when one is handed in; a torch keeps TORCH_OFFSET; switch off, the lantern takes the override as before (mutant: the waist rule dropped or read after the override)', () => {
   _resetModSettings();

@@ -1,10 +1,8 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // CREW-TRADE - HER CREW AT THE EXCHANGE, the naval host's side:
 // the shipwright's window's model carries it (navalHost.js yardModel `crewDeal`) to the harbour office's exchange
 // (scenes/harbourOffice.js), which prices, pays and says. Out of createNavalHost (HOST-SPLIT): the host hands her state,
 // its roster's sync and its crew companions, and keeps no state of this module's.
-// ═══════════════════════════════════════════════════════════════════
 import { crewSpare, crewRoom, signOffOrder } from '../../systems/naval/crewTrade.js';
 import { playerCrewCount } from '../../systems/naval/crewLife.js';
 import { charterRecord } from '../../systems/naval/passage.js';   // AUDIT CREW-TRADE E1: a booked passage's boat

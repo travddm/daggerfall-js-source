@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // LW10: THE ROAD'S TEAMS, SEEN - the horses and the wagons of
 // the living world's parties (systems/livingWorld/wagons.js: where each stands), drawn with Horse Cart and Cargo's own
-// pieces (Living World II decision 4): the wagon classic model 41214 in its five parts with its cargo by tier (the pool's
+// pieces: the wagon classic model 41214 in its five parts with its cargo by tier (the pool's
 // `presentation.drawWagon` - ONE MEMBER, ONE EXPORT), the horse the mod's eight-way billboard off its own art (the pool's
 // `presentation.poseHorse`, its frames stepped by horseCartLaw.js stepHorseWalk at the team's pace). Neither needs the
 // mod switched on: the pool's pieces are built whatever its switch says.

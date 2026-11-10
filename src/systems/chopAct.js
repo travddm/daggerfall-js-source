@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // PROF4 - LOGGING'S ACT, the Wood-Axe at a
-// tree, as a machine the host feeds a frame at a time (bible/06-Systems/
-// Professions-Arc.md 5.2, 25; FORAGE0 14.4). Pure: the host hands in the
+// tree, as a machine the host feeds a frame at a time (docs/systems/professions.md).
+// Pure: the host hands in the
 // frame's time and whether attack was pressed this frame; the machine
 // answers where the act stands - the ring the meter draws - and, at its
 // end, the report the harvest carries.

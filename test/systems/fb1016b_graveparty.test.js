@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-16b GRAVE-PARTY (bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord's "A few things": "graveyard
+// FIELD BUGS 2026-10-16b GRAVE-PARTY (the Discord's "A few things": "graveyard
 // loot on headstones are able to be looted by others, objects in tombs are un lootable (have not tried dungeons yet)"; Mac's
 // SEARCH1-PARTY: "When one player in the party interacted with it no one else can again for 5 hours ... visible for
 // everyone in the party the same the looter sees"). A SEARCH IS ITS SEARCHER'S PARTY'S - above ground and below:

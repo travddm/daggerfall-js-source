@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL5-MESSAGE - A STAFF MEMBER'S MESSAGE TO ONE PLAYER, end to end.
 //
 // THE PANEL'S TWO DOORS (behind a staff session, staff.js): /v1/staff/message sends one - an Admin or a Moderator, to one
@@ -89,7 +88,7 @@ export async function staffMessage(ctx, env, path, body, who, audit) {
   }
   if (path !== '/v1/staff/message') return { error: 'not-found' };
 
-  // ═══ SEND: one player, by account id ═══
+  // SEND: one player, by account id
   if (typeof body.target !== 'string' || !ID_RE.test(body.target)) return { error: 'body' };
   const text = messageText(body.text);
   if (!text) return { error: 'body' };
@@ -115,7 +114,7 @@ export async function staffMessage(ctx, env, path, body, who, audit) {
   ]);
   if (!put.meta.changes) return { error: 'staff-message-rate' };
 
-  // ═══ THEN THE RELAY: the order of its own kind, and the hub's own count of what it handed ═══
+  // THEN THE RELAY: the order of its own kind, and the hub's own count of what it handed
   const key = await signingKey(env, subtle);
   const order = key ? await mintStaffMessageOrder({ s: row.id, mi: id }, key, { subtle, nowS }) : null;
   /** @type {any} */

@@ -24,7 +24,7 @@ import { E, stateGl, presents, retroCfg } from '../retroGl.mjs';
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const L = new Float32Array([0.3, 0.8, -0.2]);
 const BLACK = new Float32Array([0, 0, 0]);
-/** Better Ambience's FoggyDungeons fog: linear, 1.76 to 98.7 m, brown. */
+/** A mod's coloured dungeon fog: linear, 1.76 to 98.7 m, brown. */
 const BROWN = new Float32Array([0.208, 0.157, 0.005]);
 const DUNGEON_BROWN = { mode: 1, density: 0, end: 98.7, color: BROWN };
 /** DFU's own dungeon fog and its interior (building) fog. */
@@ -54,7 +54,7 @@ test("the fog-colour fade: 30 m under a black fog, the fog's own distance and co
     1000,
     'rain: 5% at 3 / density',
   );
-  assert.deepEqual(shadeFade(DUNGEON_BROWN), { range: 98.7, color: BROWN }, "Better Ambience's brown");
+  assert.deepEqual(shadeFade(DUNGEON_BROWN), { range: 98.7, color: BROWN }, 'a coloured fog');
   assert.equal(shadeFade({ mode: 0, density: 0, end: 0, color: BLACK }), null, 'fog off');
 });
 
@@ -63,7 +63,7 @@ test("indoors is the opaque black clear; a dungeon is indoors without a building
   assert.equal(clearsIndoors(SKY_CLEAR), false);
   assert.equal(clearsIndoors(VIEW_OUT_CLEAR), false, "the real windows' view out");
   assert.equal(inDungeon(INTERIOR_CLEAR, DUNGEON_DFU), true, "DFU's dungeon fog");
-  assert.equal(inDungeon(INTERIOR_CLEAR, DUNGEON_BROWN), true, "Better Ambience's dungeon fog");
+  assert.equal(inDungeon(INTERIOR_CLEAR, DUNGEON_BROWN), true, 'a coloured dungeon fog');
   assert.equal(inDungeon(INTERIOR_CLEAR, BUILDING), false, 'a building');
   assert.equal(inDungeon(SKY_CLEAR, DUNGEON_DFU), false, 'outdoors');
 });
@@ -244,7 +244,12 @@ test('with retro mode, the 320x200 image is shaded before the present palettizes
 
 test('the renderer draws the fog fade, then the falloff in a dungeon; a building and the outdoors get no falloff', () => {
   const cases = [
-    { clear: INTERIOR_CLEAR, fog: ['linear', 0, 1.76, 98.7, BROWN], want: [0, 1], what: 'a Better Ambience dungeon' },
+    {
+      clear: INTERIOR_CLEAR,
+      fog: ['linear', 0, 1.76, 98.7, BROWN],
+      want: [0, 1],
+      what: 'a dungeon with a coloured fog',
+    },
     { clear: INTERIOR_CLEAR, fog: ['exp', 0.001, 0, 0, BLACK], want: [0], what: 'a building' },
     { clear: SKY_CLEAR, fog: ['linear', 0, 0, 2400, new Float32Array([0.5, 0.6, 0.7])], want: [0], what: 'outdoors' },
   ];

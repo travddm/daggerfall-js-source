@@ -74,7 +74,7 @@ function bilinear(W, H, at) {
 const depth01 = (dist, pi) => ((pi[3] / dist - pi[2]) + 1) / 2;
 const viewDistJs = (d01, pi) => pi[3] / (d01 * 2 - 1 + pi[2]);
 
-// ═══ 1. THE BRIGHT PASS ══════════════════════════════════════════════════════════════════════════════════════════
+// 1. THE BRIGHT PASS
 test('LA-POST1: the bright pass reads its whole 4x4 block - four bilinear reads at the inner corners, every pixel once at a sixteenth (the old one read the middle four) - and thresholds each quarter before the average, so a 3x3 flame blooms the same at all sixteen places in a block where the old read bloomed it whole at four and not at all at twelve; the glow still blooms (mutants: one read at the centre; the threshold after the average; the taps half a pixel out; the glow dropped)', () => {
   // the footprint, in JS: a bloom texel's centre is the corner (2, 2) of its block; a bilinear read at a pixel corner
   // (cx, cy) weighs the four pixels about it a quarter each
@@ -131,7 +131,7 @@ test('LA-POST1: the bright pass reads its whole 4x4 block - four bilinear reads 
   assert.equal(run(fs0, () => [0, 0, 0, 1], () => [1, 1, 1, 1]), 0, 'the pass built without the glow reads none');
 });
 
-// ═══ 2. THE LANTERN GLARE ════════════════════════════════════════════════════════════════════════════════════════
+// 2. THE LANTERN GLARE
 /** The glare's scene on a 320 x 200 canvas: a flame flat at view distance D (x in [-hw, hw], y in [-1, 0] - the light
  *  at its top, a city light's), a wall 20 behind it, and `beam` (a surface one unit nearer, over x in [beam[0],
  *  beam[1]] and y in [-0.2, 0.2], or null) - the eye at (tx, ty, 0) looking down -z, the light at (lx, 0, -D). */
@@ -296,7 +296,7 @@ test('LA-POST2: the glare is sized by a range HELD per light - a lamp whose rang
   assert.equal(calls.filter((c) => c[0] === 'drawArrays').length, 0);
 });
 
-// ═══ 4. THE EYE IN SIXTEEN BITS ══════════════════════════════════════════════════════════════════════════════════
+// 4. THE EYE IN SIXTEEN BITS
 test('LA-POST4: the eye\'s state is sixteen bits (the high byte in R, the low in G) - the codec round-trips to 6e-5 of a stop and reads the bare [128, 128] images as it always did; at 144 Hz a dark frame that the byte eye never opened to is reached, and after a flash the eye comes back where the byte eye stayed closed; ADAPT_FS is packAdapt(adaptStep(unpackAdapt)) term for term, and LUM_FS holds each tap\'s log to the encoded range (mutants: one byte; the low byte dropped; a black tap scored at -29.9)', () => {
   const R = AIR_ADAPT_LOG_RANGE;
   assert.equal(AIR_ADAPT_STEPS, 65535);
@@ -358,7 +358,7 @@ test('LA-POST4: the eye\'s state is sixteen bits (the high byte in R, the low in
   assert.ok(want - oldMean > 4, `the base scored the same cell ${(want - oldMean).toFixed(1)} stops darker - four black taps outweighing twelve lit`);
 });
 
-// ═══ 5. THE AO BLUR'S WINDOW ═════════════════════════════════════════════════════════════════════════════════════
+// 5. THE AO BLUR'S WINDOW
 test('LA-POST5: the AO blur keeps the whole tile on far ground - its depth window is a share of the distance with the radius its floor - where the absolute radius dropped the ground\'s far and near rows past ~20 units (the rotation\'s stripes); the sky beside a wall is still no neighbour (mutants: the absolute window back; the share applied as a ceiling)', () => {
   assert.equal(AIR_AO_BLUR_SHARE, 0.15); assert.equal(AIR_AO_RADIUS, 0.8);
   // the ground from an eye 1.7 up looking level, at 1080p: an AO texel is two canvas rows
@@ -393,7 +393,7 @@ test('LA-POST5: the AO blur keeps the whole tile on far ground - its depth windo
   assert.equal(f.globals.outColor[0], 1, 'the sky\'s taps (occlusion 0 here) are no neighbours of the wall');
 });
 
-// ═══ 6. THE CONTACT MARCH ════════════════════════════════════════════════════════════════════════════════════════
+// 6. THE CONTACT MARCH
 /** The previous frame, ray-cast: the eye at (0, 1.7, 0) looking down -z on a 320 x 200 canvas, a floor at y = 0, a
  *  wall at z = -wallZ, a pillar (x 1..2, y 0..3, z -9.7..-9.2). Returns the contact block's bindings for it. */
 function prevFrame({ wallZ = 10, camPos = [0, 1.7, 0.5] } = {}) {
@@ -524,7 +524,7 @@ test('LA-POST6: the march\'s previous frame is a frame this one follows - the fl
   assert.ok(calls.length > 0);
 });
 
-// ═══ 7. THE GLOW'S GATE ══════════════════════════════════════════════════════════════════════════════════════════
+// 7. THE GLOW'S GATE
 test('LA-POST7: the renderer hands the lanterns\' glow to the air pass only where the glow\'s shader BUILT - a GL that refused it (`vol: null`) marches nothing, and the lane keeps its own analytic glow instead of zeroing it and leaving none (mutant: the build unasked)', () => {
   const { calls, canvas } = rendererGl();
   const r = new Renderer(canvas);
@@ -557,7 +557,7 @@ test('LA-POST7: the renderer hands the lanterns\' glow to the air pass only wher
   r.air.programs.vol = vol;
 });
 
-// ═══ 8. THE FRAME'S FRAMEBUFFERS, THE IMAGES NOTHING READS ═══════════════════════════════════════════════════════
+// 8. THE FRAME'S FRAMEBUFFERS, THE IMAGES NOTHING READS
 test('LA-POST8: the frame binds one of two framebuffers - each the colour image with one depth - and attaches nothing per frame; a night frame (no beams, no haze) leaves the shafts\' image alone because its resolve reads none; a menu\'s frame runs no bright pass and no gaussians (mutants: the depth re-attached; the framebuffers swapped; the shafts cleared; the bloom for a menu)', () => {
   const { calls, canvas } = rendererGl();
   const r = new Renderer(canvas);

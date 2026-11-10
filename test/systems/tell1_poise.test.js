@@ -11,6 +11,7 @@ import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { setPref } from '../../src/systems/uiPrefs.js';
+import { setValue } from '../../src/systems/settings/settings.js';
 import { Collider } from '../../src/player/collider.js';
 import { EnemyAI } from '../../src/characters/enemy/enemyMotor.js';
 import { EnemyAttack } from '../../src/characters/enemy/enemyAttack.js';
@@ -30,7 +31,8 @@ const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const DT = 1 / 60;
 let T = 0;
 setTacticsClock(() => T);
-beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', true); });
+// These pins are the classic motor's approach and windup: DFU's Enhanced Combat AI, on by default, lets a foe roll to back off and stay out of reach for seconds, so a foe may never wind up inside the test's frames.
+beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', true); setValue('Enhancements', 'EnhancedCombatAI', false); });
 
 // ── the law ─────────────────────────────────────────────────────────
 

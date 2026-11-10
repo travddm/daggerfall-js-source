@@ -3,7 +3,7 @@
 // frame carries them; a fighter's blow on one is the referee's, the sides kept, its fall said and credited; a guard's own
 // blow lands on the room's held vitality at its beat and its fall is said by it; a revolt's room raises its Captain and
 // rebels, and his fall ends it, the receipts carrying no Honours (7.5, 7.7;
-// server/src/index.js `_siegeNpcBlow`, `_siegeTick`; net/siege/siegeRef.js). `06-Systems/Online-Arc.md` SEAT2b part two (c).
+// server/src/index.js `_siegeNpcBlow`, `_siegeTick`; net/siege/siegeRef.js). SEAT2b part two (c).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { siegeRoomKey, SIEGE_UNITS_PER_M, siegeNpcAt } from '../../../src/net/siege/siegeRef.js';

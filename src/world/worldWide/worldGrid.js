@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WW1 - THE WORLD'S GRID: the one key, the theatres and the areas every
 // system reads once the world is more than the Iliac Bay.
 //
@@ -27,13 +26,12 @@
 //    the 62 regions are the wall the online game stands on (chat, banks, law, prices, seats - TESA3, and the owner's
 //    call on the provinces as regions of their own); an area is the systems' own grouping and never goes on the wire as
 //    a region.
-// ═══════════════════════════════════════════════════════════════════
 import { inBay, bayToPicture } from '../tamriel/tamrielFrame.js';
 import { provinceKeyAt, PROVINCE_OF_ID } from '../tamriel/tamrielLand.js';
 import { provinceByKey } from '../tamriel/tamrielGeography.js';
 import { REGION_NAMES, REGION_RACES, BAY_REGION_COUNT } from '../../formats/mapsTables.js';
 
-// ═══ THE KEY ═════════════════════════════════════════════════════════
+// THE KEY
 
 /** A map pixel the world holds lies within this of the Bay's corner, either way, on both axes (net/wire.js
  *  WORLD_PIXEL_BOUND - pinned equal by test/world/worldWide/ww1_grid.test.js). */
@@ -54,7 +52,7 @@ export const WORLD_PIXEL_KEYS = SIDE * SIDE;
 /** The pixel a key names: [px, py]. @param {number} key */
 export const worldPixelOfKey = (key) => [(key % SIDE) - WORLD_PIXEL_SPAN, Math.floor(key / SIDE) - WORLD_PIXEL_SPAN];
 
-// ═══ THE THEATRES ════════════════════════════════════════════════════
+// THE THEATRES
 
 /** The Iliac Bay's theatre: Daggerfall's own 1000 x 500. */
 export const BAY_THEATRE = 0;
@@ -79,7 +77,7 @@ export function theatreAt(px, py) {
   return key == null ? -1 : THEATRE_OF_PROVINCE.get(key) ?? -1;
 }
 
-// ═══ THE AREAS ═══════════════════════════════════════════════════════
+// THE AREAS
 
 /** The Bay's areas are its regions, 0..61 (MapsFile's REGION_NAMES). */
 export const BAY_AREA_COUNT = BAY_REGION_COUNT;   // WW-R: the Bay's 62 - REGION_NAMES holds the provinces' regions after them, never an area

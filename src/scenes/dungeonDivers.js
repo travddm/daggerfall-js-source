@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LW6: THE DIVERS MET - a party of the living world's adventurers inside
 // the dungeon the player is in..
 //
@@ -33,7 +32,6 @@
 //
 // EVERY ALLOCATION HAS AN OWNER: each body stood is this layer's until its company leaves (a foe cut down the pool's
 // own); `clear()` (the dungeon left, a sweep) forgets every one - the dungeon's pool goes with its context.
-// ═══════════════════════════════════════════════════════════════════
 import { membersAt } from '../systems/livingWorld/trips.js';
 import { firstNameOf } from '../systems/livingWorld/lines.js';
 import { pointAt, stopAt } from '../systems/livingWorld/deepRoute.js';   // LW14: where their route has them

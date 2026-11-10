@@ -433,7 +433,7 @@ test('LW9 the host: the roads\' trouble world reads the patrol\'s cover, the tow
   assert.equal(paceScale(CALENDAR_MPM), 1);
 });
 
-// ═══ AUDIT LW-II: LW9's findings, each pinned ═══
+// AUDIT LW-II: LW9's findings, each pinned
 
 /** The host's trouble as world.js composes it - troubleOf with the patrol's cover, a cover waiting on a round's way no
  *  answer (undefined: townTrips waits), each trip's trouble kept once known (world.js `_livingFates`). */

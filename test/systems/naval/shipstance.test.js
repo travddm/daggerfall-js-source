@@ -11,7 +11,7 @@
 //                 state line says the same after her stance
 // The host's own model (scenes/naval/navalHost.js tagsModel, targetCardOf) through real frames over Come Sail Away's pool
 // (test/navalSea.mjs), and the HUD's own text and DOM (ui/naval/navalHud.js). Each is red on the record's code (168bf2587).
-// `03-World/Naval-Combat.md` (NAV-F).
+// `docs/systems/naval.md`.
 import { byClass } from '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

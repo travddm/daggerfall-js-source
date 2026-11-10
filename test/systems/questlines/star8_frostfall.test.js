@@ -355,7 +355,7 @@ test('STAR8 WHAT THE THREAD IS WORTH, run on the machine: Morwen asks at the cov
   assert.equal(quest.ql.outcome, 'guild', 'sold to the Mages Guild');
 });
 
-// ═══ AUDIT STAR8: the line's defects fixed, and its ties to the Witches' Festival ═══
+// AUDIT STAR8: the line's defects fixed, and its ties to the Witches' Festival
 
 test('AUDIT STAR8 S1 THE COVEN GONE UNFOUGHT COMES AGAIN, NEVER BESIDE ITSELF: the Spinner culled while her sisters stand brings no second coven, even at a return; the whole coven gone - the Spinner unkilled, her sisters fallen (a body that fell stands for nobody) - calls it again at the Bluff; a load that did not bring it back calls it again (what stood is saved); the Spinner slain hands over the spindle, costs the Sisters of the Bluff their favour (FACTION.TXT 423, -10) and stops Morwen\'s clock - and nothing gone after her death calls a coven (mutants: `ql gone` on the first foe alone; the fallen standing; the beat unread; `seen` unsaved; the kill unread; the re-arm unscripted; the re-arm after the ambush; the spindle on her body; the repute; the clock run on)', async () => {
   const { questSource } = await import('../../qlSources.mjs');
