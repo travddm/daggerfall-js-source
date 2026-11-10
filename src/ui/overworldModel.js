@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // U61 — THE OVERWORLD MODEL: the whole Iliac Bay as one relief, from
 // data alone.
 //
@@ -34,7 +33,6 @@
 // PALETTE here is ours; the dot BUCKETS are not: which locations a
 // filter hides and which type gets which slot is getPixelColorIndex,
 // imported from the classic window - one home, both skins.
-// ═══════════════════════════════════════════════════════════════════
 
 import { CLIMATES, getPixelFromPixelID } from '../formats/mapsFile.js';
 import { SCALED_OCEAN_ELEVATION, BASE_HEIGHT_SCALE, STREAMING_TERRAIN_SCALE } from '../world/terrain/terrainSampler.js';   // AUDIT EV F-DOC7: one home for the byte*8 base term

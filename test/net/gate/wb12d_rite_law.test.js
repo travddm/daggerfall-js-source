@@ -118,7 +118,7 @@ test('WB12d the wire: a rite word is {d, px, py, s, f, c} and nothing more (BROK
   assert.equal(validRiteOut({ k: 'xx', d: 700, px: 1, py: 2, at: 5 }), null);
 });
 
-// ═══ THE ACCOUNT SERVICE: THE RITE'S EMBER ═══════════════════════════════════════════════════════
+// THE ACCOUNT SERVICE: THE RITE'S EMBER
 
 const MIGRATIONS = readdirSync(new URL('../../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
 function d1() {

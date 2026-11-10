@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // TOWN-ECON TE2 - THE PLAYERS' SHARE
 // OF A TOWN'S ECONOMY, as this service counts it.
 //
@@ -23,7 +22,6 @@
 //
 // Footsteps and raids are counted for an account a week registered alone (witnessOf), as its reports are; a sale
 // counts for its buyer so, and a patron's for its seller (who keeps a home and a trader in the town).
-// ═══════════════════════════════════════════════════════════════════
 import { accountKind, overRate } from './accounts.js';
 import { witnessOf } from './townSeats.js';
 import { witnessedFact, factConfirmed } from '../../src/net/nodeLaw.js';

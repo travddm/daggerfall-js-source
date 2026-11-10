@@ -3,7 +3,7 @@
 // service's pass (the hello's `sp`), keeps the sides, raises the fallen at their camp on the tier's wave, beats the battle
 // each second and fans its field, and at its end hands each fighter its own signed `s1` receipt. The slice's gate (Seats-Arc
 // 13): "A headless 10v10 siege runs to both endings". 6.2-6.8, 17;
-// `06-Systems/Online-Arc.md` SEAT2a (part two).
+// SEAT2a (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_WAVE_MS, SIEGE_OPENS_MS, SIEGE_FORFEIT_MS, SIEGE_LENGTH_MS, SIEGE_SPECTATORS_MAX } from '../../../src/net/siege/siegeRef.js';

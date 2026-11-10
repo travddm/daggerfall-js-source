@@ -123,7 +123,7 @@ test('SCALE2c a lone drop, a busy refusal, and a drop with the network gone are 
   assert.equal(off.opened(), 6, 'the browser offline when they dropped: all back at the old retry');
 });
 
-// ═══ A FULL FOES FRAME THAT SAYS NOTHING, SAID ONCE ════════════════════════════════════════════════════════════════════
+// A FULL FOES FRAME THAT SAYS NOTHING, SAID ONCE
 
 /** The frame an idle player's world host builds in a cell: the pool's own frame (nothing of mine), the camps' empty
  *  list, the horse's word for nothing standing, and the wagon's riders' none - each from its producer. */

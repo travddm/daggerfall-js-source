@@ -1,5 +1,5 @@
-// mergeMain - the mechanical half of merging main into a long branch (AUDIT RELEASE R3, bible/01-Overview/audits/
-// Audit-Release-R3.md "Merging main"). A branch that carries an unpublished relay row and account version meets main's
+// mergeMain - the mechanical half of merging main into a long branch (AUDIT RELEASE R3).
+// A branch that carries an unpublished relay row and account version meets main's
 // own at every merge: the version line, every pin that asserts it, and the plain-English history each pin keeps. The
 // rule is the one every merge of this repository has applied by hand (test/net/relayversion.test.js, "A version bump is
 // ..."): the branch's release takes the next number past main's newest, its own history clause first, main's whole

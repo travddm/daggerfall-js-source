@@ -1,7 +1,7 @@
 // HOME1: AN ONLINE HOME, ONE OWNER A BUILDING, SERVER-WIDE. The law
 // both ends read (net/homeLaw.js), the account service's registry driven through the real Worker over node:sqlite
 // with every migration applied (server-account/src/homes.js), the client's door to it, and the deploy's wiring.
-// `06-Systems/Online-Arc.md` HOME1.
+// HOME1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

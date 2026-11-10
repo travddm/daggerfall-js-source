@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // VIRT — A LONG LIST DRAWS THE ROWS ON SCREEN, NOT ALL OF THEM.
 //
 // The enhanced pack rebuilds its DOM on every repaint (ui/domRepaint.js says why that is the shape), and a list
@@ -30,7 +29,6 @@
 // THE ROWS ARE THE CALLER'S. `build(item)` makes a row exactly as the whole list made it; a row that leaves the window
 // is removed and one that enters is built then, from the state the pane holds at that moment. A row still in the window
 // is never moved or rebuilt by a scroll, so a hover, a press or a picture swapped into it keeps its node.
-// ═══════════════════════════════════════════════════════════════════
 
 /** A list shorter than this is drawn whole, every row, as it always was. */
 export const VIRTUAL_MIN = 120;

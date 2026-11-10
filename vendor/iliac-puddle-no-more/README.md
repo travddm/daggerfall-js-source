@@ -66,5 +66,3 @@ writes both from the shipped bundle.
   `src/render/renderer.js`, FAR-CLIP1 - until then the port had only left
   whole clipped quads out of the ground's index set); the compiled blobs
   are not carried.
-
-The page for the whole port is `bible/03-World/Deep-Waters.md`.

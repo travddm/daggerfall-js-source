@@ -22,7 +22,7 @@ const T = 2_000_000;
 const LINE = Object.freeze({ depth: 1, perS: 0.05 });
 const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg ?? ''} ${a} !~ ${b}`);
 
-// ═══ THE LINE ═══════════════════════════════════════════════════════════════════
+// THE LINE
 
 test('INT11 THE LINE: the relay\'s BOSS_BODY var read whole or not at all - empty, unreadable, a wrong type or a number past BODY_LINE_MAX is the DEFAULT, which ENFORCES NOTHING (measure first); a part left out is the default\'s; the default\'s hull line is the sea\'s own repairs under fire twice over, and a ship floats again where the sea says (mutants: a typo enforcing; a part dropped; the refloat the relay\'s own guess)', () => {
   assert.equal(BODY_DEFAULT.enforce, false, 'MEASURE FIRST: nothing enforced until staff say so');
@@ -39,7 +39,7 @@ test('INT11 THE LINE: the relay\'s BOSS_BODY var read whole or not at all - empt
   assert.equal(BODY_SAY_WHOLE, BODY_WORD_MAX, 'the client\'s word and the wire\'s bound, one whole');
 });
 
-// ═══ THE COUNT ══════════════════════════════════════════════════════════════════
+// THE COUNT
 
 test('INT11 THE COUNT: a blow the relay judged takes its share off the count; the blow that takes it to nothing is the count\'s FALL (one more, the first\'s stood time and damage kept for the receipt); a fallen count takes nothing more; nothing for no share (mutants: the fall never counted; the first fall\'s numbers overwritten; a fallen body struck again)', () => {
   const p = { stoodMs: 5000, dealt: 300 };
@@ -193,7 +193,7 @@ test('INT15 THE SAYING: the client\'s word at most every BODY_SAY_MS, at once wh
   assert.deepEqual(sent, [500, 600, 600, 700, BODY_SAY_WHOLE, 0]);
 });
 
-// ═══ THE JUDGE ══════════════════════════════════════════════════════════════════
+// THE JUDGE
 
 const W = T + 3_600_000;
 function gateFight(n = 3) {

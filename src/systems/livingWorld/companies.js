@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LW13: THE COMPANIES - a town's adventurers in parties of
 // their own, travelling and diving together.. Pure, like the
 // census they are dealt from (LW0 decision 2): a company is its PLACES (the roster's slots), as a caravan's contract is

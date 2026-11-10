@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DECOR-MODS (FIELD BUGS 2026-10-05b) — THE TOWN MODS' FURNISHINGS, IN
 // THE CATALOGUE WHILE THEY STAND.
 //
@@ -43,7 +42,6 @@
 // piece; numbered after every place read before them (systems/
 // decorCatalogue.js DECOR_FROM), so no name of Daggerfall's ever moves.
 // Read off tables alone, never a switch or a built model.
-// ═══════════════════════════════════════════════════════════════════
 
 import {
   townBedOf, TOWN_BED_COLOURS, TOWN_PAINTINGS, RMBRP_ROCKS, RMBRP_STALLS, RMBRP_HILLS, TOWN_CROP_FIELDS,

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // SEAT-HALL and CROWN-HALL, moved out of bootWorld (HOST-SPLIT, DOMAIN2 -
 // ): A SEAT'S HALLS AS THE MODES
 // HOST ASKS THEM (scenes/worldModes.js seatHallsFrame, crownHere) - a
@@ -17,7 +16,6 @@
 // (world.js, off the seats' book); guild() - this character's guild as its
 // book last read it (net/guild/guildBook.js `guild`: its id, rank and,
 // DOMAIN2, its castles).
-// ═══════════════════════════════════════════════════════════════════
 import { seatHallOf, seatBannerOf } from '../net/townSeatLaw.js';
 import { hallMay } from '../net/hallLaw.js';   // SEAT-HALL: a palace's keepers are a hall's
 

@@ -20,8 +20,7 @@
 //     take only its light; the far field still gives way to the tile's mean
 //     as the pixel style's does.
 //
-//   - IT IS CROSSED CARDS, NOT A BILLBOARD. Low Poly Trees (bible/07-
-//     Rendering/Low-Poly-Trees.md) stands its bushes as a star of vertical
+//   - IT IS CROSSED CARDS, NOT A BILLBOARD. Low Poly Trees stands its bushes as a star of vertical
 //     cards through the centre, every one showing the same side view
 //     (`504_27`: four, 45 degrees apart). A meadow tuft is MEADOW_CARDS such
 //     cards (MEADOW_CARDS_FAR past MEADOW_NEAR_AT of the range) at a yaw of

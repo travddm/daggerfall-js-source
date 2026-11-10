@@ -141,7 +141,7 @@ test('audio: A2 the action Play sound seam - soundIndex > 0 fires from the objec
   assert.deepEqual(played, [[12, [3, 4, 5]], [3, [7, 8, 9]]]);
 });
 
-// ═══ E6: the quest machine's own audio source ═══════════════════════
+// E6: the quest machine's own audio source
 
 test('E6: the quest DaggerfallAudioSource is BUSY until the clip it started ends', () => {
   // DaggerfallAudioSource.IsPlaying (:244-247) is `audioSource
@@ -166,7 +166,7 @@ test('E6: the quest DaggerfallAudioSource is BUSY until the clip it started ends
   assert.deepEqual(played, [386, 999]);
 });
 
-// ═══ AUDIT 58: THE ID DOOR ══════════════════════════════════════════
+// AUDIT 58: THE ID DOOR
 // SoundReader.GetSoundIndex (SoundReader.cs:152-158) is
 // `soundFile.GetRecordIndex(soundID)`. DaggerfallAudioSource carries
 // TWO overloads of every entry point for exactly that reason - one

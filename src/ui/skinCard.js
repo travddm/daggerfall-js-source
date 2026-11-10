@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DISC23-B2 — THE SKIN, ON THE PLAYER'S PROFILE.
 //
 //
@@ -49,7 +48,6 @@
 //
 // Not a DFU member: Daggerfall Unity has no profile and no skins. The
 // sprites are the vendored mod's (vendor/eye-of-the-beholder).
-// ═══════════════════════════════════════════════════════════════════
 
 import { MOD_SETTINGS, modSetting, setModSetting, storedModSetting } from '../systems/modSettings.js';
 import { spriteFor, eotbSpriteUrl } from '../player/eyeOfTheBeholder/eotbSprite.js';

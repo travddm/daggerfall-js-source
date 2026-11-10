@@ -1,7 +1,7 @@
 // SEAT2a: THE BATTLE'S LAW -
 // net/siege/siegeRef.js's battlefield (the banners, the Throne, the clock, the no-shows, Honours), the service's pass
 // (net/identityToken.js's `siege` order) and the relay's receipt (net/siege/siegeReceipt.js).
-// 6.2-6.8; `06-Systems/Online-Arc.md` SEAT2a (part two).
+// 6.2-6.8; SEAT2a (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

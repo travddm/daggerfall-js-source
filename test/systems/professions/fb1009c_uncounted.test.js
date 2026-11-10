@@ -7,7 +7,7 @@
 // what the service handed to this character; a looted unit, a shop's and a traded one are held and never counted. The
 // fault was the page's silence: the Stores page built its rows from the counted materials alone, so a pack full of
 // Troll's Blood showed nothing, and nothing said why. It names them now - "N unstorable" on the card, and the law in the
-// player's words on the picked bar - and Put in still moves only what is counted. `01-Overview/bugs/Field-Bugs-2026-10-09c.md`.
+// player's words on the picked bar - and Put in still moves only what is counted.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

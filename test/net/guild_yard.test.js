@@ -5,7 +5,7 @@
 // Worker over node:sqlite (test/accountDb.mjs): the look, the yard's pieces paid off the keeper's record, a piece's half
 // into the guild's treasury, the sale paying its yard's half as its rooms'; the client: whose outside the playing
 // character keeps (systems/online/onlineHomes.js homeOutsideKept), the yard's decorator on a hall's lot (scenes/homeYards.js),
-// the hall drawn out of the merge for its keeper's painter (scenes/world.js). `06-Systems/Online-Arc.md` GUILD-YARD.
+// the hall drawn out of the merge for its keeper's painter (scenes/world.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

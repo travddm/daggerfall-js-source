@@ -336,8 +336,7 @@ export const DET_PICTURES = Object.freeze({
   45192: PICTURE.rug(0), 45194: PICTURE.rug(1),
 });
 
-/** The DET models only the town mods place, by id, read off the catalogue's names and the placements
- *  (bible `03-World/Beautiful-Towns.md` keeps the table). */
+/** The DET models only the town mods place, by id, read off the catalogue's names and the placements. */
 export const DET_TOWN_MODELS = Object.freeze({
   // the regions' tapestries and banners (on house fronts and in halls)
   ...Object.fromEntries(REGIONS.flatMap(([_name, tapestry, flag]) => [

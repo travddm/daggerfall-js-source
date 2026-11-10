@@ -1,4 +1,4 @@
--- STAR8 (2026-10-20; bible/11-Multiplayer/Starfall.md section 7): THE THIRTEENTH OF FROSTFALL, step 4 of 4 - the
+-- STAR8 (2026-10-20): THE THIRTEENTH OF FROSTFALL, step 4 of 4 - the
 -- line's last, its way the line's outcome (the Starwarden is the three stars', its last witnessed step -
 -- net/questlineClaims.js `titleAt`). Morwen meets the player at the Glenmoril Coven's fire once, on arrival after her
 -- letter (the open-air coven has no quest marker - QLTF01 says why), and asks what the Bluff's spindle is worth (one

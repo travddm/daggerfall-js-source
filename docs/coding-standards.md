@@ -66,7 +66,8 @@ commit of its own and say so in the pull request.
 
 The rules are in [README.md](README.md#code-comments): a comment says why, in plain sentences, and carries no quotes of
 people, slice or audit tags, or dates with names. Write the prose of a comment as [technical writing](#documentation)
-asks. Do not duplicate those rules here.
+asks. Do not duplicate those rules here. What they leave open, such as comments that a test or tool reads, is in
+[.claude/rules/comments.md](../.claude/rules/comments.md).
 
 ## TypeScript
 

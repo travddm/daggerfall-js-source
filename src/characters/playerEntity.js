@@ -83,7 +83,7 @@ export const playerEntity = {
  *  (onlineLane.js ONLINE_REFUSED_FLAGS), so a page that is played never
  *  carries the one-line handle. It hides a handle; it is not a lock: what
  *  another player sees, takes or is ranked against is the Integrity arc's,
- *  decided where no client reaches (06-Systems/Integrity-Arc.md).
+ *  decided where no client reaches.
  *  AUDIT ANTICHEAT A1: the gate reads pageQuery's memo - this runs in the
  *  frame, and a URLSearchParams minted a call is PERF-URL's waste. */
 export function surfacePlayer() {

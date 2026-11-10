@@ -1220,7 +1220,7 @@ function paneOnline(body) {
   //
   // WHERE EACH PIECE WENT, because none of it was deleted for tidiness:
   //
-  //   the shared-world prose  -> 11-Multiplayer/Multiplayer.md, which
+  //   the shared-world prose  -> docs/multiplayer/README.md, which
   //       is where the law it describes is written down. A wall of text
   //       above a row of tiles is read once and skipped for ever; the
   //       promises in it are the RELAY's and are pinned there.

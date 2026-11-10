@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // ECOTONE1 -
 // THE ECOTONE: where two climates meet, one wandering, patchy border in
 // place of the map pixel's straight edge.
@@ -46,7 +45,6 @@
 // layout (world/terrain/terrainNature.js) and the grass read the climate that
 // owns a point (ecotoneOwner), so a tree, a blade and the ground under
 // them agree on which climate they are in.
-// ═══════════════════════════════════════════════════════════════════
 
 /** The ecotone's numbers, in one place. Lattice cells are in tiles (6.4 m) and divide a pixel's 128. */
 export const ECOTONE = Object.freeze({

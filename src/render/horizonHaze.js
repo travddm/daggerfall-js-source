@@ -67,7 +67,7 @@ float horizonHaze(float d, float fogStart, float fogEnd, float rimStart, float r
  *  running down to the sea crosses into the sea's haze without a line. */
 export const SEA_HAZE_BAND = 1.0;
 
-/** RED-MOUNTAIN (03-World/Red-Mountain.md): THE HAZE LIES UNDER THE SUMMITS. Ground over `from` metres (the land's old
+/** RED-MOUNTAIN: THE HAZE LIES UNDER THE SUMMITS. Ground over `from` metres (the land's old
  *  ceiling - Red Mountain's cone alone stands over it) is seen through thinner air: the far ring's haze hold eased down
  *  by `keep` of itself by `to`, so the summit stands clear on the horizon. The rim still closes it into the sky. AUDIT
  *  RED-MOUNTAIN F6: the thinner air comes in over `ease` metres past the streamed grid's edge, never at it - beside the

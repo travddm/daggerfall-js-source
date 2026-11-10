@@ -1,4 +1,4 @@
--- QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.1): THE COVENS' HOARD, step 3 of 3 - the line's end.
+-- QL12 (2026-10-19; docs/systems/quests.md): THE COVENS' HOARD, step 3 of 3 - the line's end.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner: Ysolde's letter,
 -- then her table, and one `ask`: sell the Weir Key to the Guild, or give it to the Order of the Hour to be sealed. The
 -- outcome ids are the claim's words (`keep` the sale, `seal`). Both paths pay the Guild's fee in gold; the sale the key's

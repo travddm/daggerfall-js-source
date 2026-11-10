@@ -4,34 +4,33 @@ Every file here is baked to Daggerfall’s own format - 11025 Hz unsigned 8-bit 
 (`src/formats/sndFile.js`) - by `tools/sndify.mjs`, unless its paragraph says otherwise.
 
 The `naval-*.wav` files are ours outright: the sea fight's guns, strikes,
-barrels, grapnels and gun carriages (bible/03-World/Naval-Combat.md), built by `tools/navalSfx.mjs`
+barrels, grapnels and gun carriages (docs/systems/naval.md), built by `tools/navalSfx.mjs`
 from the same kit (`tools/sfxSynth.mjs`) and the same bake. DAGGER.SND has the
 splashes, the bell and the fire the naval host also plays; it has no cannon.
 
 The `climb-*.wav` files are ours outright as well: the climb's hands on stone,
 boots on the wall, the haul over a sill, the rush of a leap and the grit coming
-away (bible/03-World/Parkour-Arc.md, CLIMB4), built by `tools/climbSfx.mjs` from
+away, built by `tools/climbSfx.mjs` from
 the same kit and the same bake. DAGGER.SND has a body falling and the stride; it
 has no hand on stone.
 
 The `gather-*.wav` files are ours outright as well: the gathering professions' axe in a trunk, the tree's groan and its
 fall, a pick on stone and on ore, a vein's rubble, hands among leaves, a herb pulled, the knife through hide, the net
-thrown, landing, tugged and hauled, and the chimes of a clean finish and a rank (bible/06-Systems/Professions-Arc.md
-section 44, GATHER-FEEL), built by `tools/gatherSfx.mjs` from the same kit and the same bake. DAGGER.SND has hits, a
+thrown, landing, tugged and hauled, and the chimes of a clean finish and a rank (docs/systems/professions.md), built by `tools/gatherSfx.mjs` from the same kit and the same bake. DAGGER.SND has hits, a
 parry, a splash and a lock's click, which the acts borrowed; it has no axe in wood, no pick on stone, no leaves and no
 tree coming down.
 
 The `lock-*.wav` files are ours outright as well: the lockpicking minigame's tumblers - a pin lifted, a free pin
-springing back, a pin set, a spool's false set, a slip and a pick snapping (bible/06-Systems/Lockpicking.md, LOCKPICK),
+springing back, a pin set, a spool's false set, a slip and a pick snapping,
 built by `tools/lockSfx.mjs` from the same kit and the same bake. DAGGER.SND has the picked lock's chime, which the world
 still plays as a lock opens; it has no tumblers.
 
 The `horse-*.wav` files are ours outright as well: the horse's snorts, blows, breaths and spook, and its hooves on grass,
-in snow and in water (bible/08-Audio/Audio.md HORSE-VOICE), built by `tools/horseSfx.mjs` from the same kit and the same
+in snow and in water (docs/systems/audio.md), built by `tools/horseSfx.mjs` from the same kit and the same
 bake. DAGGER.SND has one neigh, two clops on hard ground and the cart; it has no snort, no breath and no hoof on soft
 ground.
 
-The `sea-*`, `shore-*`, `wild-*` and `town-*` files are the soundscape's (SOUNDSCAPE, bible/08-Audio/Audio.md): the
+The `sea-*`, `shore-*`, `wild-*` and `town-*` files are the soundscape's (SOUNDSCAPE, docs/systems/audio.md): the
 gulls at sea, the surf on a shore, the wild's voices and a town's smithies. Two kinds. OURS: a wave breaking, the owls
 and the wolves, built by `tools/soundscapeSfx.mjs` from the same kit and the same bake - DAGGER.SND has splashes, a bell
 and a lap of water, and no surf, no owl and no wolf (the deck's own eleven - the hull's slaps, the timbers' and the

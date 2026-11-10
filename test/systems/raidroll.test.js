@@ -4,8 +4,7 @@
 //   - its region and town are the towns table's (the player's game files): a client hands the hub the table it asks
 //     for by the operator's pinned hash (RAID_TOWNS_SHA256), the hub keeps only a table that hashes to it, and every
 //     cell then reads a word against the day's whole roll (raidDayIds) - its key and pixel too, or nothing.
-// Driven through the real Room (fakeRoom.mjs), the real session and the real raid module. bible/03-World/
-// Raiding-Parties.md, "RAID-ROLL".
+// Driven through the real Room (fakeRoom.mjs), the real session and the real raid module.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

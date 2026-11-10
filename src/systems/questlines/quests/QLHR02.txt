@@ -1,4 +1,4 @@
--- QL14 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.2): THE HOUR THAT WAS NOT, step 2 of 2 - the line's
+-- QL14 (2026-10-19; docs/systems/quests.md): THE HOUR THAT WAS NOT, step 2 of 2 - the line's
 -- last, its branch the line's outcome. Witnessed (net/questlineClaims.js: `hour`, the h1 receipt): it waits on the
 -- Brass Remnant broken (`ql act hour-broken 1`). Six powers are two asks: the first's fourth choice opens the second.
 -- It says nothing of which ending comes, and ends no main quest. Lore: canon - the Numidium, Kagrenac, the Mantella, a

@@ -216,7 +216,7 @@ test('ROAD-LOOK both terrain programs blend right after their own tile - the lan
   assert.match(EL_TERRAIN_FS, /return elDecode\(textureGrad\(uTileArr, vec3\(ROT\[t\] \* l \+ TRANS\[t\], float\(d >> 2u\)\), ROT\[t\] \* dux, ROT\[t\] \* duy\)\.rgb\);/, 'the lane\'s neighbour in its own linear light');
   assert.equal(terrainClipFs(EL_TERRAIN_FS).split('\n').length, EL_TERRAIN_FS.split('\n').length + 1, 'the clip still one line');
   assert.ok(snowTerrainFs(EL_TERRAIN_FS).includes('vec3 roadEdge('), 'the snow variant still built from the program');
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.doesNotMatch(read(host), /renderer\.roadEdges|roadEdgesOn/, `${host}: no host's own line (bible/01-Overview/Host-Split.md)`);
+  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.doesNotMatch(read(host), /renderer\.roadEdges|roadEdgesOn/, `${host}: no host's own line (docs/architecture/hosts-and-modules.md)`);
   assert.deepEqual([roadEdgesOn('?skin=enhanced'), roadEdgesOn('?skin=enhanced&roadedges=off'), roadEdgesOn('?skin=classic'), roadEdgesOn('?skin=classic&roadedges=on')], [true, false, false, false], 'the enhanced skin\'s, the kill door its own');
 });
 

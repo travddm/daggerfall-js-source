@@ -1,4 +1,4 @@
--- STAR8 (2026-10-20; bible/11-Multiplayer/Starfall.md section 7): THE THIRTEENTH OF FROSTFALL, step 3 of 4.
+-- STAR8 (2026-10-20): THE THIRTEENTH OF FROSTFALL, step 3 of 4.
 -- Begun by the raven's letter while the Starfall runs (`needs: ['starfall']`). Witnessed (net/questlineClaims.js
 -- `stars3`, three j1 receipts newer than the first step's): three more fallen stars held (`ql act star-held 3`), and
 -- the raven brings Morwen's word and her purse where the player stands, so no journey ends in a walk to the coven.

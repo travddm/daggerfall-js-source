@@ -135,7 +135,7 @@ function rig(over = {}, deps = {}) {
   return { h, store, said, shots, loops, entity, keys, ctx, frame, twice, tap, spawned };
 }
 
-// ═══ the eleven ═════════════════════════════════════════════════════════
+// the eleven
 
 test('AUDIT 66 F1: the dropped light hangs over the billboard\'s HEAD - half the texture\'s own height, then half a unit - and a shorter light sits lower; the thrown one hangs over its quad\'s centre', async () => {
   setWorldMinutes(30000);
@@ -255,7 +255,7 @@ test('AUDIT 66 F9: DrawTrajectory is a law, not a frame - the arc integrates fro
   assert.equal(def.description, 'Has no effect here: the throw\u2019s arc isn\u2019t drawn in this game.', 'the pane says the arc is not drawn here');
 });
 
-// ═══ the pins HT1 wrote that a mutation would have survived ═════════════
+// the pins HT1 wrote that a mutation would have survived
 
 test('AUDIT 66 pins: the bow in the LEFT hand takes the right hand too - with a weapon in the right slot, so the bare-hand arm cannot stand in for it', () => {
   const r = rig();

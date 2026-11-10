@@ -11,7 +11,7 @@
 //   RENT-NUMBER  the owner's "Room 2" was offered as room 1 - the door named it otherwise to every tenant
 //   HOMES-FORCE  a forced town read asked while another was in flight was answered by it - the door stayed shut
 // Each test here is red on the code before its fix (the namespace imports keep one fault's missing export from failing
-// the others). `01-Overview/bugs/Field-Bugs-2026-10-01.md`.
+// the others).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

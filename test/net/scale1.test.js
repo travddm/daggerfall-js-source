@@ -28,7 +28,7 @@ const { subtle } = globalThis.crypto;
 const rand = (b) => globalThis.crypto.getRandomValues(b);
 const NOW = 1_790_000_000;
 
-// ═══ A. THE PER-REQUEST WRITES ═══════════════════════════════════════════════════════════════════════════════════════
+// A. THE PER-REQUEST WRITES
 
 /** D1 with its writes counted (UPDATE statements, alone or in a batch). */
 function writesCounted(db) {
@@ -70,7 +70,7 @@ test('SCALE1 A: a stale touch that fails never fails the request it rode in on (
   assert.equal(who?.player.id, made.id);
 });
 
-// ═══ B. EVERY REQUEST COUNTED ════════════════════════════════════════════════════════════════════════════════════════
+// B. EVERY REQUEST COUNTED
 
 test('SCALE1 B: every request writes ONE point - the route as a template, the method, the status, a refusal\'s word, wall ms and the D1 statements it ran - and nothing that names a player (mutants: the point never written; the route\'s ids kept; the statements uncounted)', async () => {
   const s = await standService();
@@ -122,7 +122,7 @@ test('SCALE1 B: a metric never costs a request - no binding serves as before, a 
   assert.match(src('server-account/wrangler.toml'), /^\[\[analytics_engine_datasets\]\]\nbinding = "METRICS"\ndataset = "daggerfall_accounts"$/m);
 });
 
-// ═══ C. THE STATEMENTS THAT READ A WHOLE TABLE ═══════════════════════════════════════════════════════════════════════
+// C. THE STATEMENTS THAT READ A WHOLE TABLE
 
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
 const planned = () => {
@@ -171,7 +171,7 @@ test('SCALE1 C: every statement the audit found reading a whole table finds its 
   }
 });
 
-// ═══ D. D1'S HUNDRED BOUND PARAMETERS ════════════════════════════════════════════════════════════════════════════════
+// D. D1'S HUNDRED BOUND PARAMETERS
 
 /** D1 as D1 refuses: past 100 bound parameters a statement is an error (node:sqlite takes 32766, so the pins never saw). */
 function d1Limited(db) {
@@ -199,7 +199,7 @@ test('SCALE1 D: the market\'s materials view asked for the whole catalogue binds
   assert.deepEqual(r.body.rows, []);
 });
 
-// ═══ E. THE DEPLOYS ══════════════════════════════════════════════════════════════════════════════════════════════════
+// E. THE DEPLOYS
 
 test('SCALE1 E: the account service deploys only after the suite passes; the relay runs the suite only when it would deploy, and deploys only when it passed; the bookmark is written before the migrations (mutants: each gate dropped)', () => {
   const acct = src('.github/workflows/account-deploy.yml');
@@ -214,7 +214,7 @@ test('SCALE1 E: the account service deploys only after the suite passes; the rel
   assert.match(relay, /if: \$\{\{ !cancelled\(\) && needs\.drift\.result == 'success' && \(needs\.verify\.result == 'success' \|\| needs\.verify\.result == 'skipped'\) \}\}/);
 });
 
-// ═══ F. HOW A TAB ASKS AGAIN ═════════════════════════════════════════════════════════════════════════════════════════
+// F. HOW A TAB ASKS AGAIN
 
 test('SCALE1 F: a wait is jittered to [half, one and a half) of itself; only the network and the service\'s own fault are asked again at once (mutants: no jitter; `rate` asked again)', () => {
   assert.equal(jittered(1000, () => 0), 500);

@@ -16,7 +16,7 @@
 //   sprites: the five small ones a classic record whole, each larger atlas 75-91% classic records copied texel for
 //   texel (turned or mirrored in places, cut down in others), the rest the author's top-down crowns and larger side
 //   views made from the same records (on the winter atlases capped with painted snow) plus a few hand-written record
-//   numbers. A render of game data IS game data (01-Overview/Port-Doctrine.md), so the spec names what to copy and the
+//   numbers. A render of game data IS game data (test/tooling/doctrine.test.js), so the spec names what to copy and the
 //   runtime paints the atlas from the player's own records (src/world/lowPolyTrees.js paintAtlas): BLITS - the record,
 //   its turn, where it lands, the rectangle it may paint and its ERASE spans (each the whole gap between this copy's
 //   own claims, so none traces a record's silhouette - AUDIT LPT D13) - in the greedy order the match found them, the

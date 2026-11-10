@@ -50,7 +50,7 @@ Editor writes it:
 - `WorldDataPack/beautiful-cities.pack.json.gz` - every world-data file of
   the mod as the author's EDIT of Daggerfall's own data
   (`src/formats/worldData/worldDataPack.js`, WD3;
-  `bible/02-Formats/World-Data-Patches.md`): a location as the edit of the
+  `docs/formats/world-data.md`): a location as the edit of the
   location MAPS.BSA holds, a classic-named block as the edit of the block,
   a composite as the edit of a parent, a new block as the edit of the
   classic block nearest it - every subrecord or building half the author
@@ -100,6 +100,6 @@ port orders them so (`scenes/modWorldData.js` `WORLD_DATA_PRIORITY`).
 
 A house bought, a room rented, a quest's building, an item at a smith and a
 Recall anchor set indoors keep the layout their city was in when they were
-made (`src/systems/layoutPins.js`; `bible/03-World/Beautiful-Towns.md`).
+made (`src/systems/layoutPins.js`; `docs/formats/mods-and-vendor.md`).
 Online the switch is the room's, and every online home keeps the layout
 its city was bought in, server-wide.

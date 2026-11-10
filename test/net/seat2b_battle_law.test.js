@@ -1,7 +1,7 @@
 // SEAT2b part two (b): THE WORKS IN BATTLE, THEIR LAW - the
 // Walls' quicker wave, the Gatehouse that bars the Throne, the Rams that batter it and the blows that break them
 // (6.2, 7.5; net/siege/siegeRef.js, its numbers pinned equal to net/fortLaw.js's); the
-// pass's works (net/identityToken.js `sx`) and the wire's words for them (net/wire.js). `06-Systems/Online-Arc.md`
+// pass's works (net/identityToken.js `sx`) and the wire's words for them (net/wire.js).
 // SEAT2b part two (b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -59,7 +59,7 @@ Editor writes it:
   names; the dependency list below).
 - `WorldDataPack/beautiful-villages.pack.json.gz` - **every world-data file
   of the mod as the author's EDIT of Daggerfall's own data**
-  (`src/formats/worldData/worldDataPack.js`, WD3; `bible/02-Formats/World-Data-Patches.md`).
+  (`src/formats/worldData/worldDataPack.js`, WD3; `docs/formats/world-data.md`).
   A location file is the edit of the location MAPS.BSA holds; a block that
   replaces a classic one is the edit of that block; a new block is the edit
   of the classic block it was made from, or carried whole where it is the
@@ -122,6 +122,6 @@ A house bought, a room rented, a quest's building, an item at a smith and a
 Recall anchor set indoors all name their building by its KEY, and a key
 names a building only in one layout of its town. A town holding such a
 record keeps the layout it was made in, whatever the switch says since
-(`src/systems/layoutPins.js`; `bible/03-World/Beautiful-Towns.md`).
+(`src/systems/layoutPins.js`; `docs/formats/mods-and-vendor.md`).
 Online the switch is the room's, and every online home keeps the layout
 its town was bought in, server-wide.

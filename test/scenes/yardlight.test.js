@@ -5,7 +5,7 @@
 // lantern at the flat's top, in the lanterns' hours, colour and flicker, ranked with the street's own. Pinned through the
 // real yard host (scenes/homeYards.js over scenes/decor/decorRoom.js), the room's own law beside it (decor1.test.js holds the
 // rest of it), and the world host's own night composition run out of its source over a real Renderer
-// (test/yardLightRig.mjs). AUDIT YARD-LIGHT's laws are test/world/audityardlight.test.js's. `06-Systems/Online-Arc.md`
+// (test/yardLightRig.mjs). AUDIT YARD-LIGHT's laws are test/world/audityardlight.test.js's.
 // YARD-LIGHT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

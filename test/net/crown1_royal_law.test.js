@@ -1,7 +1,6 @@
 // CROWN1 part two: THE ROYAL TOURNEY'S LAW - the room
 // (net/siege/siegeRef.js), the pass (net/identityToken.js's `siege` order with `sn` 'royal'), the wire's royal frames
 // (net/wire.js), the bout's `t1` receipt (net/siege/siegeReceipt.js) and the ladder's own rules, pure.
-// 7.6; `06-Systems/Online-Arc.md` CROWN1 (part two).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

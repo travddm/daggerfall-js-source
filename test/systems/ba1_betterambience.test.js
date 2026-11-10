@@ -83,7 +83,7 @@ function rig(over = {}, { rolls = [], weather = 'sunny', fetchOk = () => true } 
 }
 const armor = (material) => ({ group: 'Armor', templateIndex: 102, material });
 
-// ═══ the settings, the assets, the seams ═════════════════════════════════
+// the settings, the assets, the seams
 
 test('BA1: the Mods pane entry is the shipped modsettings.json - six sections, twenty keys, the kinds and ranges, the mod\'s own words - with ONE recorded departure: Better Footsteps ships off beside Immersive Footsteps; the manifest, the row, the curated keys, the credit, the README, the registry', () => {
   const m = MOD_SETTINGS[V];
@@ -174,7 +174,7 @@ test('BA1: TryImportAudioClips\' names - wood 4, stone 4, armour 11, crunchy-gra
   assert.equal(wav.subarray(0, 4).toString(), 'RIFF'); assert.equal(wav.readUInt32LE(24), 44100); assert.equal(wav.readUInt16LE(22), 2);
 });
 
-// ═══ the laws ═══════════════════════════════════════════════════════════════
+// the laws
 
 test('BA1: SoundList - the pitch is rolled inclusive, the clip exclusive, a classic index and a mod key both play, the empty list plays nothing; [verbatim] GetRandomClip indexes the mod clips by the unshifted roll', () => {
   const l = new SoundList();
@@ -473,7 +473,7 @@ test('AUDIT-BA F2 + F3: the floating origin\'s rebase is IsRepositioningPlayer -
   assert.ok(r.c.shaker.instances[0].currentFadeTime > 0, 'unpaused: it runs');
 });
 
-// ═══ the compatibility brief ═══════════════════════════════════════════════════
+// the compatibility brief
 
 test('BA1 + IF1: ModCompatibilityChecking reads Better Ambience\'s switch through the settings (GetModFromGUID answers the vendored mod), and ReportModCompatibilityIssues posts the four log lines and the box only when Immersive Footsteps is on, its warnings are on, and Better Footsteps is on - so the shipped defaults post nothing', () => {
   _resetModSettings();
@@ -498,5 +498,5 @@ test('BA1 + IF1: ModCompatibilityChecking reads Better Ambience\'s switch throug
   _resetModSettings();
 });
 
-// ═══ the hosts ══════════════════════════════════════════════════════════════════
+// the hosts
 

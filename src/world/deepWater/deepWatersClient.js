@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-A / DW-B — THE DEEP WATERS CLIENT. The host's one door to Iliac
 // Puddle No More's heavy work: the location rects read here (MAPS.BSA +
 // BLOCKS.BSA live on this thread), the bake built on the Deep Waters
@@ -17,7 +16,6 @@
 //    thread, sliced by buildGlobalSteps so a frame is never held for more
 //    than a slice, and a pixel is promoted here by the same function the
 //    worker runs; a job the dead worker still owed is answered here too.
-// ═══════════════════════════════════════════════════════════════════
 
 import { buildGlobalSteps, classifyPixel, PIXEL_MIXED, DeepWatersBake } from './deepWatersBake.js';
 import { bakeCacheKey, bakeStore, cachedBake, fnv1a, rectsFingerprint, rectsLookup } from './deepWatersBakeCache.js';

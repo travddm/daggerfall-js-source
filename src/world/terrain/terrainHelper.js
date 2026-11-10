@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT 58 F4 — TERRAINHELPER'S TWO RUNTIME DATA REPAIRS.
 // 1:1 translation of Daggerfall Unity's TerrainHelper.cs (MIT,
 // Daggerfall Workshop / Gavin Clayton), the half StreamingWorld runs
@@ -30,7 +29,6 @@
 //    is DFU's behaviour, not an accident of ours.
 //
 // CLASSIC-LANE LAW - no isEnhanced() gate on either.
-// ═══════════════════════════════════════════════════════════════════
 
 import { MAP_WIDTH, MAP_HEIGHT } from '../../formats/woodsFile.js';
 import { PAK_WIDTH } from '../../formats/pakFile.js';

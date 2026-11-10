@@ -16,6 +16,13 @@ written for a maintainer and for a server owner: there is no official live servi
   `npm run markdown` and `npm run spell` on what you changed.
 - **Comments and tests**: a comment says why, in plain sentences. A test imports the code and runs it
   (`docs/README.md`, "Code comments"; `docs/testing/writing-tests.md`).
+- **Comments**: `.claude/rules/comments.md`. The `comment-cleanup` agent rewrites a file's comments to it.
+- **Docs**: `.claude/rules/docs.md`.
+- **Code**: `.claude/rules/code.md`.
+- **Git and pull requests**: `.claude/rules/git-and-prs.md`.
+- **Verification and UI**: `.claude/rules/verification-and-ui.md`.
+- **Design rules**: `.claude/rules/design-rules.md`.
+- **For people**: `CONTRIBUTING.md` summarises setup, checks and the rules.
 - **ARENA2 is freeware**: `sh tools/fetch-data.sh <dir>` puts Daggerfall's own data at `<dir>/arena2` (~150 MB, never
   in the repo). Fetch it before work that reads the map, the game's files or the running game, and set `ARENA2_PATH`
   to it.

@@ -3,7 +3,7 @@
 // swatch (ui/heraldrySwatch.js over ui/heraldryArt.js shieldSvg), the index by tag the client builds from what it holds
 // (net/heraldryIndex.js heraldryByTag), the name tag's frame (ui/nameLayer.js), the siege HUD's two shields
 // (net/siege/siegeLink.js siegeHudModel's `arms`, fightArmed; ui/siegeHud.js), the Seat tab's Chronicle and the Hall of
-// Records' Roll of Arms (ui/seatTab.js, ui/hallOfRecords.js), and the host's wiring. `06-Systems/Online-Arc.md`
+// Records' Roll of Arms (ui/seatTab.js, ui/hallOfRecords.js), and the host's wiring.
 // HERALDRY-SHOWN.
 import '../chargenDom.mjs';
 import { test } from 'node:test';

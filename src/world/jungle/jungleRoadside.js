@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // JUNGLE-ROADSIDE - THE ROADSIDE PAIRS, READ., The
-// roadside pairs, is the design and the record; 01-Overview/audits/Audit-Jungle-Roadside.md its audit.
+// roadside pairs, is the design and the record.
 //
 // Each of the owner's three files is a PAIR: the mahogany and a second tree of the jungle's own (a kapok they leant over
 // the road, a fig, a kapok they sank 2 m), 33 m apart, and lianas strung between their crowns - ribbons cut from the fig

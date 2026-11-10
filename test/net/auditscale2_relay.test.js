@@ -63,7 +63,7 @@ function walkWorld(now) {
 }
 const said = async (res) => (res.status === 200 ? res.text() : `${res.status} ${await res.text()}`);
 
-// ═══ R1-1: THE REFEREE WORD, WHAT EVERY SOCKET WAS LAST TOLD ═══════════════════════════════════════════════════════════
+// R1-1: THE REFEREE WORD, WHAT EVERY SOCKET WAS LAST TOLD
 
 const BX = 13 * 16 + 8, BY = 13 * 16 + 8;
 const CELL = `world:${Math.floor(BX / 16)},${Math.floor(BY / 16)}`;
@@ -101,7 +101,7 @@ test('AUDIT SCALE II R1-1 a hello\'s welcome tells its own socket alone: a refer
   });
 });
 
-// ═══ R1-2: A BEAT NEVER AWAITS THE HUB ═══════════════════════════════════════════════════════════════════════════════
+// R1-2: A BEAT NEVER AWAITS THE HUB
 
 test('AUDIT SCALE II R1-2 a boss\'s beat asks the hub for the relay\'s settings and goes on: the gate\'s, a serpent\'s and a Remnant\'s beat each settle while the hub has not answered; the answer, when it lands, is in force; asked once a RELAY_CFG_TTL_MS (mutants: each of the three beats awaiting it)', async () => {
   await quiet(async () => {
@@ -136,7 +136,7 @@ test('AUDIT SCALE II R1-2 a boss\'s beat asks the hub for the relay\'s settings 
   });
 });
 
-// ═══ R1-3: A SLIM POSE KEEPS WHAT ITS ROUNDING CANNOT HOLD ═══════════════════════════════════════════════════════════
+// R1-3: A SLIM POSE KEEPS WHAT ITS ROUNDING CANNOT HOLD
 
 test('AUDIT SCALE II R1-3 slimPose keeps a value its rounding overflows: a pitch the relay admits past 1.8e304 rides the second wire as itself, and a reader of the second wire stands its sender where the first wire\'s reader does (mutant: the rounding\'s Infinity written as null)', async () => {
   for (const pitch of [1.8e304, -1e305, Number.MAX_VALUE]) {
@@ -171,7 +171,7 @@ test('AUDIT SCALE II R1-3 slimPose keeps a value its rounding overflows: a pitch
   });
 });
 
-// ═══ R1-4: A RELAY SETTING BY ITS CONSUMERS' LAW ═════════════════════════════════════════════════════════════════════
+// R1-4: A RELAY SETTING BY ITS CONSUMERS' LAW
 
 test('AUDIT SCALE II R1-4 the hub takes a relay setting only as its consumers read it - a switch one of its words, the line bodyConfig\'s whole with no key it would ignore - and refuses anything else in words /relay shows, keeping nothing (mutants: the refusal unsaid; a key unknown taken; a part unknown taken; a line bodyConfig reads as its default taken)', async () => {
   await onClock(1_800_000_000_000, async ({ tick }) => {
@@ -211,7 +211,7 @@ test('AUDIT SCALE II R1-4 the hub takes a relay setting only as its consumers re
   });
 });
 
-// ═══ R1-5 AND R3-3 (a): THE WORKER'S WALK ════════════════════════════════════════════════════════════════════════════
+// R1-5 AND R3-3 (a): THE WORKER'S WALK
 
 test('AUDIT SCALE II R1-5 double13 is the sockets refused `room full`: a full layer the walk passes counts nothing, the walk\'s last try counts its one refusal, and the page\'s own word of a last try is not believed (mutants: every full layer counted; the last try unmarked; the page\'s header passed on)', async () => {
   await withPair(() => onClock(1_800_000_000_000, async ({ now }) => {
@@ -268,7 +268,7 @@ test('AUDIT SCALE II R3-3 (a) an asked layer is a page\'s only while someone sta
   }));
 });
 
-// ═══ R3-3 (b): NO EVENT IN A LAYER ═══════════════════════════════════════════════════════════════════════════════════
+// R3-3 (b): NO EVENT IN A LAYER
 
 test('AUDIT SCALE II R3-3 (b) a layer of the serpent\'s cell stands no serpent: its `in` is the waters\' own refusal, nothing stood or kept, while the place\'s fight stands; a layer of a raided town keeps no raid ledger, while the place\'s does (mutants: a layer\'s serpent; its refusal unsaid; a layer\'s raid ledger)', async () => {
   // the serpent (the serpent1 pins' site: day 363 at map pixel 205,214)
@@ -314,7 +314,7 @@ test('AUDIT SCALE II R3-3 (b) a layer of the serpent\'s cell stands no serpent: 
   });
 });
 
-// ═══ R3-8: A PARKED TEAM'S LAYER ═════════════════════════════════════════════════════════════════════════════════════
+// R3-8: A PARKED TEAM'S LAYER
 
 test('AUDIT SCALE II R3-8 the park registry keeps the layer a team is kept in: parked in a layer, then elsewhere - another cell, or the place of its own - the layer drops it; a word naming a cell it does not hold leaves that cell\'s layer\'s record standing; a record from before it is the place (mutants: the layer unsaid; the layer unkept; the drop to the place; the same cell\'s layer never compared; a word with no layer read as the place)', async () => {
   await quiet(async () => {
@@ -365,7 +365,7 @@ test('AUDIT SCALE II R3-8 the park registry keeps the layer a team is kept in: p
   });
 });
 
-// ═══ R3-3 (c): EVERY EVENT IS THE PLACE'S ═══════════════════════════════════════════════════════════════════════════
+// R3-3 (c): EVERY EVENT IS THE PLACE'S
 
 test('AUDIT SCALE II R3-3 (c) a layer stands no circle and keeps no overworld ledger: a layer\'s rite word tells the hub nothing and keeps nothing, its ledger word writes and says nothing - nobody struck - while the place keeps both (mutants: a layer\'s circle told the hub; a layer\'s ledger)', async () => {
   // the rite (the wb12d pins' circle: day 200 at map pixel 300,200)
@@ -414,7 +414,7 @@ test('AUDIT SCALE II R3-3 (c) a layer stands no circle and keeps no overworld le
   });
 });
 
-// ═══ D-8: THE BATCHES' NUMBERS THE RECORD STATES ═════════════════════════════════════════════════════════════════════
+// D-8: THE BATCHES' NUMBERS THE RECORD STATES
 
 test('AUDIT SCALE II D-8 the second wire\'s batches are the record\'s: a room\'s poses twenty times a second (POSE_BATCH_MS 50), a channel\'s roster once a second (ROSTER_BATCH_MS 1000) (mutants: either doubled)', () => {
   assert.equal(POSE_BATCH_MS, 50);

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // VERGE1's BAND, ONE HOME FOR BOTH THREADS (JUNGLE-ROADSIDE, 2026-10-23; VERGE1): the band Basic
 // Roads paints a road or a track as - two tiles wide about the line from a map pixel's centre to the edge or corner its
 // compass bit names - and the room a point has beside it, measured as a disc to a segment. Moved here whole out of
@@ -7,7 +6,6 @@
 // pathsDataPoint - AUDIT JUNGLE-ROADSIDE DOC-2: no second reader), so the terrain worker, which reaches world/ and
 // formats/ alone (TAMRIEL2-WORKER), stands the jungle's roadside pairs off the very band VERGE1 keeps a flat off
 // (world/jungle/jungleRoadside.js).
-// ═══════════════════════════════════════════════════════════════════
 import { pathsDataPoint, MP_WORLD_UNITS, N, NE, E, SE, S, SW, W, NW } from './pathData.js';
 import { MAP_W, MAP_H } from './roadNetwork.js';
 import { PATH_HALF_WIDTH, UNITS_PER_METRE } from './roadClearance.js';

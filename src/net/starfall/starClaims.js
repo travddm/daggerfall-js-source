@@ -125,7 +125,7 @@ export function createStarClaims({ claim, store = null, nowS = () => Math.floor(
   /** B3: a kept entry's `lost` mark, laid or cleared on the entry as it is stored */
   const mark = (e, lost) => { e.lost = lost; keep(kept().map((k) => (k.r === e.r ? { ...k, lost } : k))); };
 
-  // ═══ THE ACTS (AUDIT STARFALL 7, T-A) ═══
+  // THE ACTS (AUDIT STARFALL 7, T-A)
   let owedMemory = [];
   /** The acts owed characters not standing (STAR_ACTS_KEY). */
   function owed() {

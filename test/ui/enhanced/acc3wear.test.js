@@ -7,7 +7,7 @@
 // names a player reads most - the chat roster - showed bare names
 // while the same names wore titles in the world.
 //
-// ═══ WHAT THESE PINS ARE ACTUALLY FOR ══════════════════════════════
+// WHAT THESE PINS ARE ACTUALLY FOR
 //
 // THE CLIENT MUST NOT DECIDE WHAT IS HELD. The grant is derived at the
 // service and can lapse between this card being drawn and the button

@@ -1,6 +1,5 @@
 // GUILD1e: A GUILD'S OWN BOARD, AS THE SERVICE KEEPS IT - driven through the
-// real Worker over node:sqlite with every migration applied (test/accountDb.mjs). 8.2
-// ("a private guild board (the board's Guilds tab, members only)"); `06-Systems/Online-Arc.md` GUILD1e.
+// real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

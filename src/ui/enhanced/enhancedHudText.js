@@ -52,7 +52,7 @@
 // element cites a DFU rect (THE NATIVE-WINDOW RULE), so the face
 // cannot change without the metrics changing with it. (FONT3, 2026-10-02: that list is history - five of the seven
 // now always open an enhanced DOM face and the other two are reached only from the classic map a player chose; the
-// prison countdown and Come Sail Away's map words were the gaps left, and are enhanced too. 10-UI/UI-Arc.md FONT3.)
+// prison countdown and Come Sail Away's map words were the gaps left, and are enhanced too. docs/systems/ui.md.)
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhancedStyle.js';
 import { nativeMetrics } from '../native/nativePanel.js';
 

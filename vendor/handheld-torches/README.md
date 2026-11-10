@@ -41,8 +41,8 @@ here - the earlier mod records carry theirs in this line.]**
 
 ## Why the textures ARE here
 
-The port's doctrine (`bible/01-Overview/Port-Doctrine.md`) keeps
-ARENA2 and every render of it out of the repository - Seasons of the
+The port's doctrine (`docs/getting-started.md`, "Rules that hold
+everywhere") keeps ARENA2 and every render of it out of the repository - Seasons of the
 Iliac Bay's and Weapon Widget's repaints are re-shaded classic sprites
 and stay with the player's copy of those mods. These are not that: no
 ARENA2 file shows a hand holding a torch or a torch lying on a floor;
@@ -57,8 +57,7 @@ exist at all.
 
 **The scripts.** The bundle carries `Handheld Torches.dll` (43,520
 bytes), a compiled assembly; the four `.cs` files its manifest names
-are not in the bundle. The port read the IL method by method - the
-record is `bible/06-Systems/Handheld-Torches.md`, a table of every
-method against where it lives in `src/systems/handheldTorches.js` and
+are not in the bundle. The port read the IL method by method; the
+ported code is in `src/systems/handheldTorches.js` and
 `src/scenes/droppedTorches.js`. The DLL itself is the author's compiled
 work and is not carried.

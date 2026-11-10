@@ -1,7 +1,7 @@
 // SEAT1a: THE SEATS AS EVERY CLIENT DERIVES AND SHOWS THEM - the derivation over a
 // fixture MAPS set (never hand-built rows: TEST THE SHAPE THE PRODUCER MINTS), the one law module, the seat book, the
 // map's rings, the banners' anchors and the hosts by their source. 3.1-3.4;
-// `06-Systems/Online-Arc.md` SEAT1a.
+// SEAT1a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

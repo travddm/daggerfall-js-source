@@ -1,4 +1,4 @@
-// AUDIT RELEASE R3 (2026-10-26, bible/01-Overview/audits/Audit-Release-R3.md "Merging main"): tools/mergeMain.mjs's pure
+// AUDIT RELEASE R3 (2026-10-26): tools/mergeMain.mjs's pure
 // half - the rules every merge of main into a long branch applies by hand, held so the redo of the merge takes minutes.
 // tools/mutants/mergemain.json.
 import test from 'node:test';

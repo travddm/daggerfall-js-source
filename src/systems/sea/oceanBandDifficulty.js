@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // OCEAN BAND DIFFICULTY: the deeper the sea, the harder its dungeons. A property of the ocean's bands (Shallows 1,
 // Reaches 2, Deep Aether 3, Abyss 4 - systems/sea/etherRings.js), with no player fighting in it. Pure: a ring in, the
 // factors out; the dungeon host (scenes/dungeonContext.js) applies them to the foes it builds and the loot it rolls.
@@ -12,7 +11,6 @@
 //   - plain RUIN isles: a smaller step, 1.1 to 1.4 times the health and 1.05 to 1.15 times the blows by ring.
 // Veilhaven's peace (ring 0) and any place that is not the sea's get no factors (`null`).
 // The factors are the same for every client (a pure function of the ring), so every client builds a room's foes alike.
-// ═══════════════════════════════════════════════════════════════════
 import { isGoldPieces } from '../inventory.js';
 
 /** @typedef {{ health: number, damage: number, loot: number, gold: number }} OceanBandFactors */

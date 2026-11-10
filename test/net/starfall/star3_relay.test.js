@@ -31,7 +31,7 @@ const FESTIVAL_FROM_MS = FESTIVALS[0].fromMs;   // the Witches' Festival's first
 const subtle = globalThis.crypto.subtle;
 const quiet = async (fn) => { const w = console.warn, i = console.info; console.warn = () => {}; console.info = () => {}; try { return await fn(); } finally { console.warn = w; console.info = i; } };
 
-// ═══ THE RIG ══════════════════════════════════════════════════════════════════════════════════════
+// THE RIG
 
 /** A night inside the window, its first star, and a pixel of the Bay. */
 const N = skyDayAtOrAfter(FESTIVAL_FROM_MS) + 5, K = 0;
@@ -77,7 +77,7 @@ async function defend({ say, step }, owner, others, { until = (st) => st.p === P
   return seen(owner);
 }
 
-// ═══ THE WIRE ═════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('STAR3 THE WIRE: a star word projected whole and bounded - the wave its deaths belong to among it; each word a cell or the hub says, projected - the speaker\'s own blows on its ledger, bounded, a receipt by its shape, the held list by its entries; the law\'s bounds written again and pinned equal; an older relay is said none; the Starfall rides the festival\'s days, no live event of its own (mutants: the star\'s index unbounded; the deaths\' wave unbounded; the light unbounded; my blows unbounded; a junk name hiding the held list\'s count; the relay floor off)', () => {
   assert.deepEqual(validStarIn({ ...word(), junk: 1 }), word(), 'projected: nothing the law does not read rides on');
@@ -165,7 +165,7 @@ test('STAR3 THE STORED LEDGER: a ledger is what the law made, read back - its st
   });
 });
 
-// ═══ THE CELL ═════════════════════════════════════════════════════════════════════════════════════
+// THE CELL
 
 test('STAR3 THE WORD: heard in the star\'s own cell alone (another cell\'s pixel is junk), never in a layer, and inside the star\'s life and the window; its ledger made only at the star, by a word from its pose, and only before its deadline - the grace hears its last words; a word from off the star is heard and counts nothing (mutants: the cell unchecked; a layer\'s ledger; the life unchecked; a ledger made from anywhere; a ledger made past the deadline; a word off the star counted)', async () => {
   await withStar(async ({ world, r, say, set, step }) => {
@@ -578,7 +578,7 @@ test('STAR3 MINTED ONCE: the master\'s fall mints its receipts once - the alarm\
   });
 });
 
-// ═══ THE HUB ══════════════════════════════════════════════════════════════════════════════════════
+// THE HUB
 
 test('STAR3 THE HUB: a hold told again is neither said nor kept twice; a receipt is kept only signed, for its own account and its own star; one told after its night keeps its receipts and says nothing; a night\'s held stars go once its last star is gone; the sweep lets a spent keep go; a hello hands the list and the account\'s receipts (mutants: told twice said twice; another account\'s receipt kept; an unsigned one kept; the night kept for ever; the sweep blind)', async () => {
   const { kp } = await signing();
@@ -626,7 +626,7 @@ test('STAR3 THE HUB: a hold told again is neither said nor kept twice; a receipt
   });
 });
 
-// ═══ THE SESSION ══════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
 test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - my own or a halo\'s - only once that socket is welcomed; a cell\'s ledger is heard from a cell, the night\'s held list from the hub, a hold and a receipt from either (mutants: the halo sent on the primary\'s word; the hub\'s list heard from a cell)', () => {
   const { FakeWS, sockets } = fakeSocketClass();

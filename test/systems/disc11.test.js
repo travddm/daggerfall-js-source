@@ -1,5 +1,5 @@
 // DISC11. What the ear hears is gain x the recording's own level; indoors must never outplay the
-// street. 01-Overview/bugs/Field-Bugs-2026-09-23.md. Pinned by execution with the real component and the real ambience.
+// street. Pinned by execution with the real component and the real ambience.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as W from '../../src/systems/weather/weatherSim.js';

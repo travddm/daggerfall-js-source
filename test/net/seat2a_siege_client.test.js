@@ -1,7 +1,7 @@
 // SEAT2a part three: THE LAW
 // THE SERVICE AND THE CLIENT SHARE OF A BATTLE'S END - the field settled from the fighters' games, the pass's door and
 // window, the winner, what the Turning remembers, Honours and the Spoils, the Chronicle's rows, the refusals in words, and
-// the book's two calls. 6.2, 6.5-6.8; `06-Systems/Online-Arc.md` SEAT2a (part three).
+// the book's two calls. 6.2, 6.5-6.8; SEAT2a (part three).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

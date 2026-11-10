@@ -1,10 +1,10 @@
--- QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.1): THE BURNING DOORS, step 5 of 5 - the line's end.
+-- QL12 (2026-10-19; docs/systems/quests.md): THE BURNING DOORS, step 5 of 5 - the line's end.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner: Ysolde's letter,
 -- then her table. She tells why Dagon's Faithful cage the Sigil Broker, and asks where the embers the player carried out
 -- of the breaches should go - one `ask`, three choices, the line's outcome (the sheet's `guild`, `order`, `broker`).
 -- Lore: canon - Dagon gave the Dark Seducers their wings; the Covenant of Akatosh and Alessia, kept by the Dragonfires;
 -- the Order of the Hour is Akatosh's. The port's own - the Broker, a Seducer who sells Dagon's sigils for embers to
--- the ones who close his doors, and the cage his faithful keep her in (bible/11-Multiplayer/World-Bosses.md, "The
+-- the ones who close his doors, and the cage his faithful keep her in ("The
 -- caged Broker"). AUDIT QUESTLINES LINES-23: the Covenant is Akatosh's with the Emperors' blood (portBooks.js "The
 -- Covenant") - the Order of the Hour is Akatosh's, never the Covenant's keeper (1032, 1041).
 Quest: QLBD05

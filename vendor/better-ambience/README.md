@@ -44,7 +44,7 @@ commit. The repository holds 0.1.3, so the 0.1.4 scripts, manifest and settings 
   `Better Footsteps.enable` ships OFF here (the mod ships it on) -
   Immersive Footsteps' author rules that the two strides must not both
   run, and the port ships the pair as he says a player should run
-  them; see modSettings.js and `bible/06-Systems/Better-Ambience.md`.
+  them; see modSettings.js and `docs/formats/mods-and-vendor.md`.
 - `Scripts/` - the sixteen `.cs` files, byte for byte as the bundle
   carries them (Unity packs a mod's sources into the `.dfmod` as
   TextAssets; the port's UnityFS reader took them out). Every function

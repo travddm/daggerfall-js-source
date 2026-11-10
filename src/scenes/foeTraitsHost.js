@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT WORLD-EVENTS: THE FOE POOLS' BOSS TRAITS, out of the hosts' bodies (HOST-SPLIT, bible/01-Overview/
-// Host-Split.md - scenes/dungeonContext.js wires each in one call, scenes/exteriorFoes.js the striker's door):
+// AUDIT WORLD-EVENTS: THE FOE POOLS' BOSS TRAITS, out of the hosts' bodies (HOST-SPLIT, docs/architecture/hosts-and-modules.md - scenes/dungeonContext.js wires each in one call, scenes/exteriorFoes.js the striker's door):
 //   - L2-13: my blow's floating number told again where a trait resisted it (the door decides after the formula reports);
 //   - L2-3: the room's record carries a copy's WRATH (`bw`) and its WARD's share (`bv`) to every joiner, and an own lane's
 //     elite its mark and its traits (`z`, `bt` - a searched grave's elite was a plain foe on every peer); a joiner's copy

@@ -35,9 +35,7 @@ const densityBody = () => {
   return CLOUD_FIELD_GLSL.slice(i, j);
 };
 
-// ═══════════════════════════════════════════════════════════════════════
 // VC6a - THE REPEAT
-// ═══════════════════════════════════════════════════════════════════════
 
 test('VC6a: the periods no longer walk in step - the variation is five times the shape volume, not one and a bit, and every period still divides the field\'s', () => {
   // THE BUG, in two numbers. The shape volume tiles every 12288 m; the
@@ -107,9 +105,7 @@ test('VC6a: the cloud TYPE varies across the sky, and collapses to one thing for
   assert.equal((CLOUD_FIELD_GLSL.match(/uniform float uVary;/g) || []).length, 1);
 });
 
-// ═══════════════════════════════════════════════════════════════════════
 // VC6b - THE GOLDEN HOUR
-// ═══════════════════════════════════════════════════════════════════════
 
 test('VC6b: the deck sees the sun past the ground\'s horizon, and the light it takes is that sun\'s colour', () => {
   // the geometry, by value - a degree and a half for this slab
@@ -137,7 +133,7 @@ test('VC6b: the deck sees the sun past the ground\'s horizon, and the light it t
 });
 
 test('VC6b: the march\'s three low-sun terms are weighted by how low the sun is, so noon is the picture it was', () => {
-  // ═══ THE WEIGHT IS THE SUN'S, AND IT IS NOT IN THE SHADER ═════════
+  // THE WEIGHT IS THE SUN'S, AND IT IS NOT IN THE SHADER
   // uLightDir is NOT always the sun: once the sun is down it is the
   // brighter visible MOON's (cloudLight). A smoothstep on it in the
   // march therefore read a moon near the horizon as "the sun is low" -
@@ -183,9 +179,7 @@ test('VC6b: the march\'s three low-sun terms are weighted by how low the sun is,
   assert.doesNotMatch(SHADOW_FS, /uSkyTint|duskTint|sideLit/);
 });
 
-// ═══════════════════════════════════════════════════════════════════════
 // VC6c - THE SHAFTS
-// ═══════════════════════════════════════════════════════════════════════
 
 test('VC6c: a sun behind a bank throws no shafts - the gate is the cloud shadow at the player\'s own feet', () => {
   const air = read('src/render/airPass.js');
@@ -200,7 +194,7 @@ test('VC6c: a sun behind a bank throws no shafts - the gate is the cloud shadow 
   assert.match(air, /gl\.uniform3fv\(S\.uEye, f\.eye\);/);   // VC7b: S is this.programs.shaft
   assert.match(air, /gl\.uniform4fv\(S\.uCloudShadowRect, deck\?\.rect \?\? this\._noDeck\);/);
   assert.match(air, /const S = this\.programs\.shaft;/, 'S is the shaft program');
-  // ═══ THE DECK IS READ AT THE RESOLVE, NEVER AT PREPARE ═════════════
+  // THE DECK IS READ AT THE RESOLVE, NEVER AT PREPARE
   // beginFrame CLEARS the deck (a deck is a frame's, so an interior never
   // inherits the last exterior's map) and `prepare` runs inside
   // beginFrame, a moment after that clear - while both exterior hosts set
@@ -230,9 +224,7 @@ test('VC6c: a sun behind a bank throws no shafts - the gate is the cloud shadow 
 
 });
 
-// ═══════════════════════════════════════════════════════════════════════
 // VC6d - THE FRAME
-// ═══════════════════════════════════════════════════════════════════════
 
 test('VC6d: no sample is taken outside the band, and the gate is the band\'s own ends - never the gradient, which the place can reopen', () => {
   const d = densityBody();

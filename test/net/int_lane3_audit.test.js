@@ -37,7 +37,7 @@ const ENFORCE = JSON.stringify({ enforce: true });
 const near = (a, b, m = '') => assert.ok(Math.abs(a - b) < 1e-9, `${m} ${a} vs ${b}`);
 const LINE = BODY_DEFAULT.body;
 
-// ═══ THE GATE'S HARNESS (test/net/int12_body_relay.test.js's) ═══════════════════════════
+// THE GATE'S HARNESS (test/net/int12_body_relay.test.js's)
 
 const DAY = 200;
 const TT = gateTimes(DAY);
@@ -58,7 +58,7 @@ async function withGate(fn, { env = {} } = {}) {
 }
 const lay = (f, now, a, inMs = 100) => { f.atk = { i: (f.seq = (f.seq ?? 0) + 1), a: a.id, at: now + inMs, x: 0, z: 0, yw: 0, tg: [], until: now + inMs + a.active + Math.max(a.recover, 1000) }; };
 
-// ═══ THE SERPENT'S HARNESS ═══════════════════════════════════════════════════════════
+// THE SERPENT'S HARNESS
 
 const SDAY = 363;
 const ST = serpentTimes(SDAY);
@@ -94,7 +94,7 @@ async function twoShips({ r, say, tick, now }) {
 const lash = (f, now) => { f.atk = { i: (f.seq = (f.seq ?? 0) + 77), a: SERPENT_ATTACK_TABLE.lash.id, at: now + 100, x: 100, z: 0, yw: Math.PI / 2, tg: [[100, 0]], until: now + 3000 }; };
 const LANDED = Math.ceil((100 + BODY_AFTER_MS) / SERPENT_TICK_MS) + 1;
 
-// ═══ THE BODY'S WORD, ON ITS OWN BUCKET ═══════════════════════════════════════════════
+// THE BODY'S WORD, ON ITS OWN BUCKET
 
 test('AUDIT INT15 THE BODY\'S WORD ON A BUCKET OF ITS OWN: BODY_WORD_HZ_MAX a second, bodySayer\'s own pace (pinned equal); the client\'s at it, the relay\'s with a burst - and at the relay a gate\'s sixteen frames and a serpent\'s ten all taken beside four body words in the same instant (mutants: the word back on the blows\' bucket at the relay; the relay\'s burst gone)', async () => {
   assert.equal(BODY_WORD_HZ_MAX, 1000 / BODY_SAY_MS, 'the word at bodySayer\'s pace');
@@ -180,7 +180,7 @@ test('AUDIT INT15 THE CLIENT\'S WORD: a body\'s `vt` leaves on its own bucket - 
   } finally { console.info = log; }
 });
 
-// ═══ THE TRAIL ═══════════════════════════════════════════════════════════════════
+// THE TRAIL
 
 test('AUDIT INT11 WHERE IT STOOD, NOT KNOWN: a trail whose every pose came after the landing (or an empty one - the relay\'s word that it does not know) says nothing of where the body stood at it, and the body is not struck; no trail is where it stands (mutants: the first pose after read as where it stood)', () => {
   const t1 = 10_000;
@@ -266,7 +266,7 @@ test('AUDIT INT11 A SECOND SOCKET IS NO DECOY: a ship\'s body is judged on the t
   });
 });
 
-// ═══ THE HULL ════════════════════════════════════════════════════════════════════
+// THE HULL
 
 test('AUDIT INT13 A SHIP BACK FROM HER YARD IS A NEW HULL: back at the fight after SERPENT_ABSENT_RETIRE_MS away, the count of the hull she left with is not hers - whole, her budget full, her measure kept; a ship that never left keeps her count (mutants: the count kept across her absence; any ship made new)', async () => {
   await withSea(async ({ r, say, tick, now }) => {
@@ -331,7 +331,7 @@ test('AUDIT INT13 A HULL\'S WORD WAKES NO SLEEPING FIGHT: heard before the fight
   });
 });
 
-// ═══ THE COUNT'S FALL, TOLD AGAIN ═════════════════════════════════════════════════
+// THE COUNT'S FALL, TOLD AGAIN
 
 test('AUDIT INT11 THE FALL TOLD AGAIN (bodyTellOwed): enforced, fallen by the count, no death seen since and BODY_TELL_MS on from the last telling - stamped as it answers; never unenforced, never to a body standing, never after its death (mutants: told every beat; told after its death; told unenforced)', () => {
   const T = 1_000_000;
@@ -370,7 +370,7 @@ test('AUDIT INT11 A FALL ITS GAME MISSED (a court, ENFORCED): its word lost on a
   }, { env: { BOSS_BODY: ENFORCE } });
 });
 
-// ═══ AN ALLY'S HEAL ══════════════════════════════════════════════════════════════
+// AN ALLY'S HEAL
 
 test('AUDIT INT11 AN ALLY\'S HEAL IS THE COUNT\'S (bodyHealed): after the body\'s word claimed it, the budget it paid given back and no longer the body\'s own believing; what was left unmet believed and no longer past the line; before the word, it stands the count up itself; fallen and enforced, nothing (mutants: the heal unheard; the budget not given back; past the line kept)', () => {
   const T = 1_000_000;
@@ -417,7 +417,7 @@ test('AUDIT INT11 AN ALLY\'S HEAL IN THE COURT: what the gate believed of a mate
   });
 });
 
-// ═══ THE BEAT ════════════════════════════════════════════════════════════════════
+// THE BEAT
 
 test('AUDIT INT11 THE BODIES READ ONCE A BEAT: the court\'s and the serpent\'s - the census run over them again for the brain, never built twice (mutants: the bodies built for each)', async () => {
   await withGate(async ({ r, say, tick }) => {
@@ -454,5 +454,5 @@ test('AUDIT INT14 THE RANKS ONE LAW (review.js ranked): the boss fights\' measur
   assert.ok(Array.isArray(wealth.bands) && wealth.bands.every((b) => b.quantiles.length === 4), 'the wealth\'s measure reads its ranks by the same');
 });
 
-// ═══ THE DOC ═════════════════════════════════════════════════════════════════════
+// THE DOC
 

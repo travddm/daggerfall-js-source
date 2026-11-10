@@ -2,7 +2,7 @@
 // pinned EQUAL to DFU's own (characters/weapons.js, combat/formulas.js, combat/playerWeapon.js - the leaf's law: the
 // relay bundles every byte it imports, so the tables are copied, never imported), 6.1's buckets against DFU's damage
 // ranges for every weapon and material, and every refusal of a blow, a cast and a step.
-// 6.1; `06-Systems/Online-Arc.md` PVP-REF.
+// 6.1; PVP-REF.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

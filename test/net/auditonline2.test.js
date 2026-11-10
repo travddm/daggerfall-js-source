@@ -27,7 +27,7 @@ const subtle = globalThis.crypto.subtle;
 const settle = async () => { for (let i = 0; i < 5; i++) await new Promise((res) => setImmediate(res)); };
 const memStore = () => { const m = new Map(); return { get: (k) => (m.has(k) ? JSON.parse(m.get(k)) : undefined), set: (k, v) => m.set(k, JSON.stringify(v)), remove: (k) => m.delete(k), m }; };
 
-// ═══ F2: THE RELAY'S CLOCK ═══════════════════════════════════════════════════════════════════════
+// F2: THE RELAY'S CLOCK
 
 test('AUDIT ONLINE2 F2: A RECEIPT\'S LIFE IS THE RELAY\'S CLOCK - the raid and gate carriers keep and offer a receipt whatever this device\'s clock says while no relay clock is heard (the service judges it), let go unasked only one the relay\'s clock says is past, and the world host hands both carriers the relay\'s clock (mutants: the device\'s clock back; "unheard" read as expired; the host\'s clock unwired)', async () => {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
@@ -60,7 +60,7 @@ test('AUDIT ONLINE2 F2: A RECEIPT\'S LIFE IS THE RELAY\'S CLOCK - the raid and g
   assert.equal(RAID_CLAIMS_KEY, 'raid4.raidClaims');
 });
 
-// ═══ F3: A LOAD IS A STAND-UP ════════════════════════════════════════════════════════════════════
+// F3: A LOAD IS A STAND-UP
 
 test('AUDIT ONLINE2 F3: A LOAD IN THE SESSION IS A STAND-UP - a town\'s thanks given, a save from before them loaded, then a save: the record is NOT cleared (the pool let go of what it held in the old pack), and the crash\'s door hands the pieces again; saved once more, it clears; both loads say so and the world host re-asks the door (mutants: the pool never lets go; the door never asked again; a load unsaid)', async () => {
   const st = memStore();
@@ -89,7 +89,7 @@ test('AUDIT ONLINE2 F3: A LOAD IN THE SESSION IS A STAND-UP - a town\'s thanks g
   assert.deepEqual(heard, ['char-A', null], 'told, a throwing listener kept from the rest, and unsubscribed');
 });
 
-// ═══ F5: A REFUSED TRADE SAYS WHOSE ══════════════════════════════════════════════════════════════
+// F5: A REFUSED TRADE SAYS WHOSE
 
 function makePack(ids, gold) {
   const st = { items: ids.map((id) => ({ id, stackCount: 1 })), gold };

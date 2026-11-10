@@ -90,7 +90,7 @@ export const SILHOUETTE_IOU = 0.6;
 export const SILHOUETTE_TRACED = 0.25;
 /** The archives the measure finds that are not the fourth exception's repaints, each with the owner's reason. */
 export const SILHOUETTE_ALLOWED = Object.freeze({
-  1603: "the Bat (mobile 260), the 1995 demo's: its outline is the retail bat's, TEXTURE.289, on 24 of its 45 pictures. The demo's art is the mod's own, not the retail ARENA2 the doctrine names (Mac, 2026-10-19: \"Mod art, ship it\"; bible/04-Characters/Enemy-Expansion.md section 2)",
+  1603: "the Bat (mobile 260), the 1995 demo's: its outline is the retail bat's, TEXTURE.289, on 24 of its 45 pictures. The demo's art is the mod's own, not the retail ARENA2 the doctrine names (Mac, 2026-10-19: \"Mod art, ship it\")",
 });
 
 /** A picture's outline - its alpha mask (a clear pixel is clear whatever colour Unity bled under it) - or null when it

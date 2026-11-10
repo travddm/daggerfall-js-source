@@ -41,7 +41,7 @@ const rd = (p) => hostText(p);
 const T = WEAPON_TYPES, S = STATE_INDEX;
 const near = (a, b, eps = 1e-6, msg) => assert.ok(Math.abs(a - b) <= eps, msg ?? `${a} ~ ${b}`);
 
-// ═══ the settings ═══════════════════════════════════════════════════════
+// the settings
 
 test('WW1: the Mods pane entry is the shipped modsettings.json - every key, its kind, its range or options, its default, and the mod\'s own words where it wrote any', () => {
   const m = MOD_SETTINGS[WEAPON_WIDGET_VENDOR];
@@ -132,7 +132,7 @@ test('WW1: LoadSettings - the fields carry the mod\'s own multipliers (Offset x1
   assert.equal(r.recoilChance, 0.35); assert.equal(r.textureScaleFactor, 1, 'a zero factor would divide by nothing; floored at 1');
 });
 
-// ═══ the arithmetic ═════════════════════════════════════════════════════
+// the arithmetic
 
 test('WW1: GetAnimTickTime - the bow\'s classic 0.0625, FormulaHelper\'s melee tick, and the Swings remap over [0, 0.398] into [0.046, 0.352] (the bow\'s too)', () => {
   assert.equal(widgetAnimTickTime(T.Bow, 50, false), CLASSIC_UPDATE_INTERVAL);
@@ -157,7 +157,7 @@ test('WW1: Unity\'s pieces - MoveTowards (scalar and Vector2), Mathf.Round half 
   assert.equal(snap(7, 0), 7, 'no interval: untouched');
 });
 
-// ═══ the component ══════════════════════════════════════════════════════
+// the component
 
 /** A store the widget reads: the shipped defaults with overrides. */
 function settingsOf(over = {}) {
@@ -570,7 +570,7 @@ test('WW1: the Morrowind arms take the frame\'s Position and Scale over their ow
   t.ctx.weaponType = T.LongBlade; t.frame(); assert.equal(t.draws.length, n + 1);
 });
 
-// ═══ the seams ══════════════════════════════════════════════════════════
+// the seams
 
 test('WW1: the bundle door - TryImportCifRci\'s spelling with the w_ prefix and the metal\'s name (none for bare hands), the pick\'s names filtered to the mod\'s bundle and its loose PNGs, nothing attached answering null without throwing, the DFMOD prefix with one home', async () => {
   assert.equal(widgetTextureName('WEAPON04.CIF', 0, 0, WEAPON_MATERIALS.Elven), 'w_WEAPON04.CIF_0-0_Elven');

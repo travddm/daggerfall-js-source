@@ -895,7 +895,7 @@ test('corpus: every real classic save parses - version, character, savevars tabl
   }
 });
 
-// ═══════════════════════════ SAV2: the import core ═══════════════════════════
+// SAV2: the import core
 
 import {
   classicPitchDegrees, classicYawDegrees, convertClassicClimateWeathers,
@@ -1504,7 +1504,7 @@ test('SAV2: MAPSAVE discovery lands in the envelope through the resolver seam', 
   });
 });
 
-// ═══════════════════════ SAV3: the window and the wiring ═══════════════════════
+// SAV3: the window and the wiring
 
 import {
   LoadClassicWindow, SAVE_IMAGE_RECTS, SAVE_TEXT_RECTS, OUTLINE_RECTS,

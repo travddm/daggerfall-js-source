@@ -1,6 +1,5 @@
 import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 
-// ═══════════════════════════════════════════════════════════════════
 // THE BEASTS
 //
 // Rat, Grizzly Bear and Sabertooth Tiger: the first enemies in this
@@ -24,7 +23,6 @@ import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 // bear is a mountain on short legs; a tiger is longer again on longer
 // ones. Those are NUMBERS, so the fourth quadruped costs a design rather
 // than a file — the same bet the class file made and won.
-// ═══════════════════════════════════════════════════════════════════
 
 /** ART_PAL spans, same convention as the other lines. */
 export const BEAST_RAMPS = Object.freeze({

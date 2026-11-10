@@ -198,7 +198,7 @@ test('CHAP2b the board\'s asks: each chapter\'s by its guild\'s row, a member\'s
 
 // ── THE BOARD AND THE WIRING ────────────────────────────────────────
 
-test('CHAP2b the asks on the board - GUILD3d (bible/11-Multiplayer/Guilds-Made-Plain.md): each chapter\'s Duties on its card, the gate held and the town defended, what each earns, a member\'s first of each today; never a card, which had no Take (mutants: the text, the state)', async () => {
+test('CHAP2b the asks on the board - GUILD3d: each chapter\'s Duties on its card, the gate held and the town defended, what each earns, a member\'s first of each today; never a card, which had no Take (mutants: the text, the state)', async () => {
   const tick = () => new Promise((r) => setImmediate(r));
   const receipts = [
     { faction: 41, kind: 'gate', member: true, done: true }, { faction: 41, kind: 'raid', member: true, done: false },

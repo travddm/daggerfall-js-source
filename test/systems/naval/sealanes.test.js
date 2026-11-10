@@ -18,7 +18,7 @@
 //                 map's own ports, water and climate, at the shared clock
 // The pure law (systems/naval/seaLanes.js) over a coast of its own; the real host (scenes/naval/navalHost.js liners) through
 // real frames over Come Sail Away's pool (test/navalSea.mjs); world.js's feed lifted from its source and run. Each is
-// red on the record's code (168bf2587). `03-World/Naval-Combat.md` (SEA-LANES).
+// red on the record's code (168bf2587). `docs/systems/naval.md`.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

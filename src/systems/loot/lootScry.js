@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LOOT19 — SCRYING.
 //
 // The Loot arc II (; Mac:
@@ -21,7 +20,6 @@
 // rows, each with its name and map pixel, and the player's pixel); the
 // window (ui/reforgeWindow.js 'scry') asks and draws. OFF IS DFU
 // EXACTLY: with the loot-rarity row off nothing is scried.
-// ═══════════════════════════════════════════════════════════════════
 
 import { lootRarityOn, DUNGEON_FAMILY, FAMILY_IDS } from './lootRarity.js';
 import { hasDiscoveredLocationId, discoverLocation } from '../discovery.js';
