@@ -49,10 +49,12 @@ installed (a test) plays the official profile.
 new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintToken, wave, wire2, ... })
 ```
 
-- **URL.** `relayUrl` (`wire.js`) accepts `wss://` to any host, and `ws://` only for `localhost` or `127.0.0.1`. The
-  default is `DEFAULT_SERVER` in `online.js`, which names the upstream author's Cloudflare relay. `onlineStart` takes
-  `?server=<url>`, then the `onlineServer` preference, then the default. The profile door picks the relay by the same
-  order (`relayServerOf`), so the page installs the profile of the relay it joins.
+- **URL.** `relayUrl` (`wire.js`) accepts `wss://` to any host, and `ws://` only for `localhost` or `127.0.0.1`.
+  There is no built-in relay (`DEFAULT_SERVER` in `online.js` is empty). `onlineStart` takes `?server=<url>`, then the
+  `onlineServer` preference; with neither, the profile door stops an online boot and tells the player to enter an
+  address.
+  The profile door picks the relay by the same order (`relayServerOf`), so the page installs the profile of the
+  relay it joins.
 - **Sessions per page.** One presence session (the player's body in the world) and separate chat channel sessions
   (`presence: false`, `wire2: true`, sharing `pageWave`). Instance, staff and caravan links create their
   own sessions.
@@ -106,10 +108,13 @@ In a world or dungeon room, one client is the **host**: the relay names it in th
 call(io, path, body)   // io = { fetch, base, secret }
 ```
 
-- **Base URL.** `serviceBase(storage)` returns a stored `https://` override (`SERVICE_KEY`) or
-  `DEFAULT_ACCOUNT_SERVICE` (the upstream author's Cloudflare service). Only `https` is accepted. The self-host kit
-  puts Caddy in front of both services for TLS (`selfhost/Caddyfile`); a local account service without it needs an
-  https tunnel or a code change.
+- **Base URL.** There is no built-in service (`DEFAULT_ACCOUNT_SERVICE` is empty). `serviceBase(storage)` returns,
+  in this order (`accountServiceOf`, `src/net/account-service-address.ts`): a stored `https://` developer override
+  (`SERVICE_KEY`), then the service the player's relay named in its `/profile` (`accounts`, kept by
+  `rememberAccountService`), else nothing. Only `https` is accepted, so a local account service needs the override
+  set to an https tunnel or a code change. The main menu's account card asks the saved relay for its service
+  before it offers a sign-in (`accountServiceWait`, `src/ui/enhanced/account-service-wait.ts`).
+  The self-host kit puts Caddy in front of both services for TLS (`selfhost/Caddyfile`).
 - **Session.** `keepSession`, `storedSession`, `forgetSession` keep `{ id, name, kind, sessionId, secret, glyphs, ... }`
   in the tab's storage (`tabStorage`, `src/systems/appStorage.js`). With no session, calls return
   `{ ok: false, error: 'no-session' }`.

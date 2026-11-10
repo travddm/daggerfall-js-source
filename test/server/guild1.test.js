@@ -16,7 +16,7 @@ import {
 } from '../../src/net/guild/guildLaw.js';
 import { renownXpFor } from '../../src/net/renown.js';
 import { HUB_GUILD_WHO_MAX } from '../../src/net/hubShards.js';
-import { accountGuilds, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountGuilds, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { r2, seatRealm } from '../realmSeat.mjs';   // AUDIT REALM2 S2: a founding is a realm character's, paid on its record
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
 
@@ -433,7 +433,7 @@ test('GUILD1 the wire: every guild route is the service\'s and behind a session;
   const routes = ['mine', 'invites', 'found', 'invite', 'answer', 'leave', 'remove', 'rank', 'ranks', 'deposit', 'withdraw', 'handover', 'disband'].map((r) => `/v1/guilds/${r}`);
   for (const r of routes) assert.ok(ROUTES.has(r), r);
   const sent = [];
-  const storage = new Map([[SESSION_KEY, JSON.stringify({ secret: 'sek' })]]);
+  const storage = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: 'sek' })]]);
   const fetch = async (url, init) => { sent.push([new URL(url).pathname, JSON.parse(init.body), init.headers.authorization]); return new Response(JSON.stringify({ ok: true }), { status: 200 }); };
   const door = accountGuilds({ fetch, storage: { getItem: (k) => storage.get(k) ?? null } });
   await door.mine('c1');

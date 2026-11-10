@@ -218,13 +218,13 @@ export { HEARTBEAT_MS, PING_MS };
 export const KNOWN_MAX = SOCKETS_MAX * 2;
 /** AUDIT CONTRIB A2: the fallen remembered at once (one death per life) - the oldest goes first past this. */
 export const FALLEN_MAX = 256;
-/** The relay this port hosts (server/wrangler.toml). */
 /** AUDIT DROPS B3: the most senders the inbound trade gate keeps a bucket for before it forgets them all - a room holds SOCKETS_MAX at most, so an honest map never reaches it. */
 const TRADE_IN_SENDERS_MAX = 64;
 /** AUDIT 68 S14-quest-inbound-ungated: the quest shares one room passes a second - an honest hub's worst case, every
  *  other seat of my party sharing at the hub's own per-socket cooldown (QUEST_HUB_MIN_MS), with all of them at once for its burst. */
 const QUEST_IN_ROOM_HZ = ((PARTY_MAX - 1) * 1000) / QUEST_HUB_MIN_MS;
-export const DEFAULT_SERVER = 'wss://daggerfall-online.mackcothran.workers.dev';
+/** No built-in relay: the player enters one in Settings, Online, Relay. Workflows grep this line. */
+export const DEFAULT_SERVER = '';
 /** A peer silent this long is HIDDEN (out of range, or its socket is
  *  gone and the leave is on its way); only the room's leave removes it. */
 // RELAY-H1: DERIVED from the heartbeat, never a literal beside it. The silence law hides a peer this long after its

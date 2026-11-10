@@ -84,7 +84,8 @@ characters, and `relayMatches` requires it to equal the client's own. The versio
 - the profile door, which refuses a relay of another version before an online world boots;
 - `.github/workflows/relay-deploy.yml`, which deploys when the source version differs from the live one;
 - `.github/workflows/account-deploy.yml`, which waits until the relay at the client's `DEFAULT_SERVER` serves this
-  version (or a later one) before deploying the service, so the service never signs what the live relay refuses;
+  version (or a later one) before deploying the service, so the service never signs what the live relay refuses (with
+  `DEFAULT_SERVER` empty it waits on nothing);
 - the client, which joins only a relay of its own version (below).
 
 ### One version, client and relay

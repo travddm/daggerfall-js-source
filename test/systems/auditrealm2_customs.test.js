@@ -8,7 +8,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { tradeableRecord, settleRealmTrade, BOAT_TEMPLATES } from '../../src/net/realm/realmTradeLaw.js';
 import { createTradePack, tradeRefusal } from '../../src/systems/tradePack.js';
 import { BOAT_PARTS_TEMPLATE, BOAT_DEED_TEMPLATE, mintBoatItem, boatItemName, boatItemMessage } from '../../src/systems/comeSailAway/comeSailAwayItems.js';
@@ -66,7 +66,7 @@ async function realm() {
   async function player() {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
     const storage = fakeStorage();
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     return { g, storage, io: realmIo({ fetch: (url, init) => worker.fetch(new Request(url, init), env), storage }) };
   }
   return { env, player };

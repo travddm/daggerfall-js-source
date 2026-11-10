@@ -12,7 +12,7 @@ function client(version) {
     close() {}
     receive(o) { this.onmessage?.({ data: JSON.stringify(o) }); }
   }
-  const s = new OnlineSession({ id: 'ann-0001', secret: 'secret-of-ann-0001', WebSocketImpl: FakeWS, now: () => 10000 });
+  const s = new OnlineSession({ url: 'wss://relay.invalid', id: 'ann-0001', secret: 'secret-of-ann-0001', WebSocketImpl: FakeWS, now: () => 10000 });
   s.join('world:3,12', { x: 1, y: 0, z: 1, yaw: 0, pitch: 0, mv: 0 });
   const ws = sockets[0]; ws.onopen?.();
   ws.receive({ t: 'welcome', id: 'ann-0001', peers: [], v: version });

@@ -68,9 +68,10 @@ node selfhost/keys.ts
 DFO_RELAY_HOST=relay.example.org DFO_ACCOUNTS_HOST=accounts.example.org docker compose -f selfhost/docker-compose.yml up -d --build
 ```
 
-Caddy terminates TLS for both names and proxies to workerd. The game client takes the relay as `wss://<relay host>`
-and the account service as `https://<accounts host>`. `GENERATE_FLAGS="--metrics"` or `GENERATE_FLAGS="--r2 s3"` before
-`docker compose` passes generator options into the image.
+Caddy terminates TLS for both names and proxies to workerd. Players enter one address in the game, the relay's
+(`wss://<relay host>`, Settings, Online, Relay). The relay names its account service at `/profile` from
+`ACCOUNT_SERVICE_URL`, which the compose file sets to `https://<accounts host>`. `GENERATE_FLAGS="--metrics"` or
+`GENERATE_FLAGS="--r2 s3"` before `docker compose` passes generator options into the image.
 
 ## Run it without Docker
 
@@ -86,7 +87,9 @@ node selfhost/generate.ts
 node selfhost/keys.ts
 ```
 
-Then start workerd with `.env` in its environment, and the cron sidecar beside it:
+Then start workerd with `.env` in its environment, and the cron sidecar beside it. Put
+`ACCOUNT_SERVICE_URL=https://<accounts host>` in `.env`, or the relay names no account service and players cannot
+sign in:
 
 ```bash
 set -a && . selfhost/.env && set +a && selfhost/node_modules/.bin/workerd serve selfhost/build/dfo.capnp --experimental

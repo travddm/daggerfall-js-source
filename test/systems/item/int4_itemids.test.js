@@ -26,7 +26,7 @@ import { letterOfCredit } from '../../../src/systems/inventory.js';
 import { templateByIndex } from '../../../src/systems/item/itemTemplates.js';
 import { seeded } from '../../honestItems.mjs';
 import { readFileSync } from 'node:fs';
-import { SESSION_KEY } from '../../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
 import { realmIo, createRealmSession } from '../../../src/systems/realmSaves.js';
 
 const rare = (seed = 11, t = 113) => applyRarity(createWeapon(t, 1, seeded(7)), 'rare', seeded(seed));
@@ -273,7 +273,7 @@ test('INT3/INT4 client: the realm\'s session hears the hold and the piece as its
     const s = await standService();
     const who = await s.registered('heard');
     const R = await seatRealm(s.env, who.secret, 'heard');
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const at = R.at();
     const session = createRealmSession({ io: realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), s.env), storage }), id: at.id, lease: at.lease, seq: at.seq });

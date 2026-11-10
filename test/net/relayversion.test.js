@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world325: 'c5b36d9274ac04b809a6b25116dea7e27968941686015cc284c5ccc9e511a0d3', // /profile names the relay's account service (relayFacts.ts accountServiceOfEnv)
   world324: 'ff37b9430b312d2948daf4db3f50c972fcbd75a5b86addb759d2522a830d9ed5', // the vendored ship mod leaves the server profile and the online lane
   world323: '0fe45d25f981857ecebaa8a0bbf89209d2a667f4fbe608c09c9eb1595f1cc11a', // the Starfall's nights are the sky's days (sky-days.ts), and the Hunters' Mark days and the sea season follow time.worldScale
   world322: '11ec596462562c4252a36188dcb1d4b68e3cf43e58333a85d063a11b93059c89', // the world clock's TimeScale is a server-profile key (`time.worldScale`): wire.js reads it through setOnlineTimeScale, relayFacts.ts sets it
