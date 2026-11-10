@@ -303,13 +303,13 @@ export function assignHeldSpell(record, entity, item, { ctx = null, nowMinutes =
   item.timeEffectsLastRerolled = nowMinutes;
 }
 
-/** EQUIP-BILL (decision #69): DFU bills a Cast-When-Held spell's whole casting cost in condition at EVERY equip
+/** EQUIP-BILL: DFU bills a Cast-When-Held spell's whole casting cost in condition at EVERY equip
  *  (CastWhenHeld.cs InstantiateSpellBundle), and a bill past what the piece has left breaks it. That is the default.
  *  Two options keep the port's earlier laws (systems/equipBill.js):
- *  - `gentleEquipBill` (HELD-REWEAR, FIELD BUGS 2026-10-09f: a piece swapped on and off was spent by the swapping):
+ *  - `gentleEquipBill` (HELD-REWEAR: a piece swapped on and off was spent by the swapping):
  *    (1) a piece re-worn within REROLL_MINIMUM_HOURS of its spell's last casting (`timeEffectsLastRerolled`) pays
  *    nothing, and (2) the bill stops at 1 condition, so wear while worn is what ends it.
- *  - `legendaryEquipFree` (LEGEND-HELD, FIELD BUGS 2026-10-11b: the Aegis of Dawn cost a leather buckler a third of
+ *  - `legendaryEquipFree` (LEGEND-HELD: the Aegis of Dawn cost a leather buckler a third of
  *    its life): (3) a Legendary's equip bills nothing. */
 /** (1) Whether a re-wear is still fresh. Pure: the caller asks it only with `gentleEquipBill` on. */
 export function heldEquipIsFree(item, nowMinutes) {

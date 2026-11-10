@@ -1,4 +1,4 @@
-// EQUIP-BILL (decision #69, trbcodex T10): by default a Cast-When-Held piece pays DFU's bill at every equip that is not a
+// EQUIP-BILL: by default a Cast-When-Held piece pays DFU's bill at every equip that is not a
 // recast - the held spell's whole classic casting cost in condition - and a bill past what it has left breaks it
 // (CastWhenHeld.cs InstantiateSpellBundle: `if (!recast) sourceItem.LowerCondition(amount, ...)`). A Legendary pays too,
 // and a re-wear inside six hours pays again. The port's earlier laws are two options, off here; their own behaviour is
