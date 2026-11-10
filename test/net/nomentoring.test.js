@@ -1,4 +1,4 @@
-// NO-MENTORING: the party leader can set the party to "no mentoring". The hub's `party.mentoring.off` and
+// The party leader can set the party to "no mentoring". The hub's `party.mentoring.off` and
 // `party.mentoring.on` acts are the leader's alone; the party view carries `nm: 1` while it stands; and the mentor host
 // (scenes/mentorHost.js) then mentors nobody, so the higher-level player fights at full strength and nobody gets the
 // pupil's training bonus. The server profile's `party.allowNoMentoring` rule lets a server keep every party mentored.
@@ -16,7 +16,7 @@ import { installProfile, _resetProfileForTests } from '../../src/systems/online/
 import { OFFICIAL_PROFILE } from '../../src/net/profile/officialProfile.ts';
 import { resolveRules } from '../../src/net/profile/profileKeys.ts';
 
-test('NO-MENTORING wire: the two acts name nothing; a party view keeps nm 1 and drops any other value', () => {
+test('No mentoring wire: the two acts name nothing; a party view keeps nm 1 and drops any other value', () => {
   assert.deepEqual([SOCIAL_ACTS['party.mentoring.off'], SOCIAL_ACTS['party.mentoring.on']], ['', '']);
   assert.deepEqual(validSocialAct({ k: 'party.mentoring.off' }), { k: 'party.mentoring.off' });
   assert.deepEqual(validSocialAct({ k: 'party.mentoring.on' }), { k: 'party.mentoring.on' });
@@ -55,7 +55,7 @@ async function withHub(fn) {
   }
 }
 
-test('NO-MENTORING hub: the leader sets no mentoring and back - stored, said to every member in the party view; a member and a player in no party are refused', () =>
+test('No mentoring hub: the leader sets no mentoring and back - stored, said to every member in the party view; a member and a player in no party are refused', () =>
   withHub(async ({ r, act, join, tick }) => {
     const a = await join('a'),
       b = await join('b'),
@@ -86,7 +86,7 @@ test('NO-MENTORING hub: the leader sets no mentoring and back - stored, said to 
     for (const ws of [a, b]) assert.equal('nm' in lastOf(ws, 'party').party, false, 'mentoring again');
   }));
 
-test('NO-MENTORING host: in a no-mentoring party the high-level member is themself at once and a low-level partner beside them never mentors them; mentoring again engages after the join wait', () => {
+test('No mentoring host: in a no-mentoring party the high-level member is themself at once and a low-level partner beside them never mentors them; mentoring again engages after the join wait', () => {
   const me = { name: 'Hero', isPlayer: true, level: 30, activeEffects: [], items: [], stats: {}, skills: 40 };
   const lines = [];
   const state = { nm: false };
@@ -133,7 +133,7 @@ function partyRoom(party) {
   return room;
 }
 
-test('NO-MENTORING profile rule, relay: with the rule off the leader is refused and nothing is stored; a stored nm leaves the view; the official profile allows it', async () => {
+test('No mentoring profile rule, relay: with the rule off the leader is refused and nothing is stored; a stored nm leaves the view; the official profile allows it', async () => {
   const off = resolveRules({ 'party.allowNoMentoring': false });
   const official = resolveRules(OFFICIAL_PROFILE.rules);
   assert.equal(noMentoringAllowed(official), true, 'the official profile allows the switch');
@@ -151,7 +151,7 @@ test('NO-MENTORING profile rule, relay: with the rule off the leader is refused 
   assert.deepEqual(noMentoringField(party, official), {});
 });
 
-test('NO-MENTORING profile rule, client: the leader gets no switch when the installed profile sets the rule off, and gets it back under the official profile', () => {
+test('No mentoring profile rule, client: the leader gets no switch when the installed profile sets the rule off, and gets it back under the official profile', () => {
   const btn = (label) => ({ label });
   const party = {};
   try {

@@ -1,5 +1,5 @@
 // @ts-check
-// NO-MENTORING: the Party tab's line and switch for the leader's "no mentoring" (the hub's party.mentoring.off and
+// The Party tab's line and switch for the leader's "no mentoring" (the hub's party.mentoring.off and
 // .on acts; the party view's `nm`). Every member reads the line while it stands; the leader alone gets the switch, and
 // only while the server profile's `party.allowNoMentoring` rule allows it. Its own file keeps ui/socialPanel.js from
 // growing.

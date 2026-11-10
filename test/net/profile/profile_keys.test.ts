@@ -40,7 +40,7 @@ test("P0 ON60, THE FIRST KEY: repair.allowMagic is DFU false, online true, the p
   assert.equal(profileKeyOf('toString'), null, 'a name the object inherits is no key');
 });
 
-test('NO-MENTORING: party.allowNoMentoring is a bool the client and the relay read, allowed online by default; a server may set it false', () => {
+test('party.allowNoMentoring is a bool the client and the relay read, allowed online by default; a server may set it false', () => {
   const key = profileKeyOf('party.allowNoMentoring');
   assert.deepEqual(
     [key?.type, key?.dfu, key?.online, key?.offline, key?.checkedBy],

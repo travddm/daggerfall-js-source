@@ -1176,7 +1176,7 @@ test('PARTY-READY: the Party tab the travel map took comes back when the map clo
   assert.equal(panel.isOpen(), false, 'the cover over another tab keeps it closed');
 });
 
-test('NO-MENTORING: the leader is offered No mentoring and, once set, Allow mentoring; every member reads the line while it stands; a member gets no switch', () => {
+test('The leader is offered No mentoring and, once set, Allow mentoring; every member reads the line while it stands; a member gets no switch', () => {
   const party = { id: 'q-1', leader: 'acct-me', members: [member('me', { acct: 'acct-me', name: 'Mac' }), member('Bob')] };
   const { social, panel, root, sent } = build({ frame: stateFrame({ party }) });
   panel.open();

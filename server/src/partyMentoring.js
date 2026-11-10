@@ -1,7 +1,7 @@
-// NO-MENTORING: the party leader sets the party to no mentoring (`on` false) or back. While it stands the party record
+// The party leader sets the party to no mentoring (`on` false) or back. While it stands the party record
 // and its view carry `nm: 1`, and the mentor host (src/scenes/mentorHost.js) mentors nobody: the higher-level member
 // fights at full strength and nobody gets the pupil's training bonus. The leader's alone, as a kick is; every member
-// hears the party as it stands. A Room method's body of its own (HOST-SPLIT): `room` is the hub.
+// hears the party as it stands. A Room method's body of its own: `room` is the hub.
 //
 // The server profile's `party.allowNoMentoring` rule lets a server owner keep every party mentored. With the rule off,
 // the act is refused and a stored `nm` is left out of the view, so a party set before the rule changed is mentored too.
