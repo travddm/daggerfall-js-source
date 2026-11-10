@@ -12,6 +12,9 @@ import {
 } from '../../src/systems/shopStock.js';
 import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 import { OIL_TEMPLATE } from '../../src/systems/inventory.js';   // AUDIT 58: the oil-bottle stack clause
+import { tradeCost, getTradePrice, markCounterBought } from '../../src/systems/tradeModes.js';
+import { createRestItem, REST_ITEM } from '../../src/systems/rest/restItems.js';
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 
 test('itemTemplates: the 288-row table + group enum mapping + material values', () => {
   assert.equal(ITEM_TEMPLATES.length, 288);
@@ -179,4 +182,75 @@ test('AUDIT 58: a shop shelves 5-20 OIL BOTTLES when torches come from items (Da
   assert.ok(rows > 100, 'the sweep really shelved oil');
   assert.equal(lo, 5, 'the low bound is REACHED');
   assert.equal(hi, 20, 'and so is 20 - Range(5, 20 + 1) is inclusive of 20');
+});
+
+// A shop's offer for a sale online (net/profile/profileKeys.ts trade.saleCap, trade.haggleRange): DFU's haggle by
+// default, the counter-half cap as the server profile's option.
+const ONLINE = { online: true };
+const OFFLINE = { online: false };
+const WEAK = { mercantile: 5, personality: 40 };
+const BEST = { mercantile: 100, personality: 100 };
+const sell = (q, skills, where) => calculateTradePrice(1000, q, skills, true, where);
+
+/** Runs `fn` with the page online, as the game's own reads of the lane see it. */
+const onlinePage = (fn) => {
+  const was = globalThis.location;
+  globalThis.location = /** @type {any} */ ({ search: '?online=1' });
+  try {
+    return fn();
+  } finally {
+    globalThis.location = was;
+  }
+};
+
+test("online a sale is DFU's haggle (FormulaHelper.CalculateTradePrice): the same offer as single player, every quality and skill in range", () => {
+  for (let q = 1; q <= 20; q++) {
+    for (const m of [0, 5, 40, 75, 100]) {
+      for (const p of [0, 40, 100]) {
+        const skills = { mercantile: m, personality: p };
+        assert.equal(sell(q, skills, ONLINE), sell(q, skills, OFFLINE), `q${q} M${m} P${p}`);
+      }
+    }
+  }
+  // DFU's offers for a 1000-gold piece at a quality-10 shop, for a weak seller and for the best one.
+  assert.equal(sell(10, WEAK, ONLINE), 371);
+  assert.equal(sell(10, BEST, ONLINE), 671);
+});
+
+test('online a poor shop pays more for goods than a rich one, and the skills move a sale at their full weight', () => {
+  assert.ok(sell(1, BEST, ONLINE) > sell(10, BEST, ONLINE));
+  assert.ok(sell(10, BEST, ONLINE) > sell(20, BEST, ONLINE));
+  // About 81 percent from the weakest seller to the best at quality 10, as in DFU.
+  assert.ok(sell(10, BEST, ONLINE) / sell(10, WEAK, ONLINE) > 1.75);
+});
+
+test('online the haggle still reads a skill inside 0 to 100 (trade.haggleRange), so an enchanted skill never drives a price under nothing', () => {
+  const lifted = { mercantile: 346, personality: 100 };
+  assert.equal(sell(10, lifted, ONLINE), sell(10, BEST, ONLINE));
+  assert.equal(calculateTradePrice(1000, 10, lifted, false, ONLINE), calculateTradePrice(1000, 10, BEST, false, ONLINE));
+  assert.ok(calculateTradePrice(1000, 10, lifted, false, OFFLINE) < 0, "single player reads DFU's unbounded skill");
+});
+
+test("with the server profile's cap, a sale is the old online rule: at most half the counter's least ask, skills at half weight", (t) => {
+  playByRules(t, { 'trade.saleCap': true });
+  assert.equal(sell(10, WEAK, ONLINE), 145);
+  assert.equal(sell(10, BEST, ONLINE), 187);
+  assert.ok(sell(20, BEST, ONLINE) > sell(1, BEST, ONLINE), 'the quality order the cap turns over');
+  assert.equal(sell(10, WEAK, OFFLINE), 371, 'single player keeps DFU');
+});
+
+test('without the cap, a piece bought at a counter still never sells back there for more than was paid (the counter-paid mark)', () => {
+  onlinePage(() => {
+    for (let q = 1; q <= 20; q++) {
+      for (const adj of [500, 1000, 2500]) {
+        const wood = createRestItem(REST_ITEM.Firewood, { stackCount: 5 });
+        const bought = tradeCost('Buy', [wood], { quality: q, priceAdjustment: adj });
+        const paid = getTradePrice('Buy', bought.cost, q, BEST, bought.pieces);
+        markCounterBought([wood], { price: paid });
+        const back = tradeCost('Sell', [wood], { quality: q, priceAdjustment: adj });
+        const offered = getTradePrice('Sell', back.cost, q, BEST, back.pieces, back.resale);
+        assert.ok(offered <= paid, `q${q} index ${adj}: paid ${paid}, offered ${offered}`);
+      }
+    }
+  });
 });

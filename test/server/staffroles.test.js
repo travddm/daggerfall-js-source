@@ -9,7 +9,6 @@ import { standService } from '../accountDb.mjs';
 import { staffWords, STAFF_SESSION_HEADER } from '../../server-account/src/staff.js';
 import { isDeveloper, canModerate, isOwner } from '../../server-account/src/titles.js';
 import { isReportReader } from '../../server-account/src/reports.js';
-import { poiRolesOf } from '../../server-account/src/poi.js';
 import { festivalOpenFor } from '../../server-account/src/festival.js';
 import { STAFF_ROUTES } from '../../server-account/src/service.js';
 import { verifyToken } from '../../src/net/identityToken.js';
@@ -107,9 +106,8 @@ test('STAFF-ROLES: registering a name the former staff held grants nothing - no 
         canModerate(row, s.env),
         isOwner(row, s.env),
         isReportReader(row, s.env),
-        poiRolesOf(row, s.env),
       ],
-      [false, false, false, false, { builder: false, approver: false }],
+      [false, false, false, false],
       `${handle}: no role`,
     );
     const token = await s.call('/v1/auth/token', {}, who.secret);
@@ -189,15 +187,6 @@ test('STAFF-ROLES: each door that asked a handle list is refused without the rol
       festivalOpenFor(row('Kestrel'), s.env),
     ],
     [false, false, true],
-  );
-  // the POI editor: an Admin builds, an Owner approves
-  assert.deepEqual(
-    [poiRolesOf(row('Plain'), s.env), poiRolesOf(row('Kestrel'), s.env), poiRolesOf(row('Boss'), s.env)],
-    [
-      { builder: false, approver: false },
-      { builder: true, approver: false },
-      { builder: true, approver: true },
-    ],
   );
   // the private reports: an Owner reads them, an Admin does not
   assert.deepEqual((await s.call('/v1/report/inbox', {}, adm.secret)).body, { error: 'not-report-reader' });

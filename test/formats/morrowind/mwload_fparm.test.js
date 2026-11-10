@@ -4,10 +4,8 @@ import { readFileSync } from 'node:fs';
 import { MwBsaFile } from '../../../src/formats/morrowind/mwBsaFile.js';
 import { MW_WEAPON_TYPE } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { warningImage } from '../../../src/formats/morrowind/mwTexture.js';
-import {
-  buildFpArm, createFpArm, fpSkeletonPath, FP_CLIP_PATH,
-  collectArmTextures, resolveWeaponParts, weaponPartPaths,
-} from '../../../src/combat/fpArm.js';
+import { buildFpArm, createFpArm, fpSkeletonPath, FP_CLIP_PATH, collectArmTextures } from '../../../src/combat/fpArm.js';
+import { resolveWeaponParts, weaponPartPaths } from '../../../src/combat/fpArm/fpArmParts.js';
 
 // MW-LOAD: THE ARM READS A LAZILY OPENED ARCHIVE.
 //

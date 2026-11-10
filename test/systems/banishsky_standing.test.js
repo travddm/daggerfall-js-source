@@ -5,6 +5,7 @@
 // clock's minutes and measured with the sky's own law (AUDIT WAITS B4: exact across a change of the sky's rate), its days
 // said in the sky's and its length in real time; the offline copy carries the days the player was told (AUDIT
 // WAITS B1); offline DFU's one clock, REP3's term whole.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -46,7 +47,8 @@ test('BANISH-SKY: offline the term is REP3\'s thirty days of the one clock; a sh
   assert.equal(banishmentEnd(5000), 5000 + 30 * 1440);
 });
 
-test('BANISH-SKY: online the term is thirty days of the sky - fifteen days of the event clock, thirty real hours; stamped on the event clock, and lifted as the thirtieth day of the calendar passes', () => {
+test('BANISH-SKY: online the term is thirty days of the sky - fifteen days of the event clock, thirty real hours; stamped on the event clock, and lifted as the thirtieth day of the calendar passes', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const { at, world } = online();
   const p = citizen();
   banish(p, 4, world());
@@ -64,7 +66,8 @@ test('BANISH-SKY: online the term is thirty days of the sky - fifteen days of th
   assert.equal(banishmentDaysLeft(p, 4, world()), 0, 'and none left');
 });
 
-test('BANISH-SKY (AUDIT WAITS B4): the term is measured across the sky\'s own law, not its rate at the stamp - a banishment begun an hour before the sky took its TimeScale 24 ends when the sky reads thirty days on, though the first hour ran at the old rate', () => {
+test('BANISH-SKY (AUDIT WAITS B4): the term is measured across the sky\'s own law, not its rate at the stamp - a banishment begun an hour before the sky took its TimeScale 24 ends when the sky reads thirty days on, though the first hour ran at the old rate', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const sw = SKY_SEGMENTS[0].fromMs;
   const { at, world } = online(sw - HOUR);
   const p = citizen();
@@ -79,7 +82,8 @@ test('BANISH-SKY (AUDIT WAITS B4): the term is measured across the sky\'s own la
   assert.equal(isBanished(p, 4, world()), false, 'and lifted with it');
 });
 
-test('BANISH-SKY: the days are rounded up and the real time never down - the last hour of a banishment is still a day and its last millisecond too, a minute and a fraction is two minutes (AUDIT WAITS B2)', () => {
+test('BANISH-SKY: the days are rounded up and the real time never down - the last hour of a banishment is still a day and its last millisecond too, a minute and a fraction is two minutes (AUDIT WAITS B2)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const { at, world } = online();
   const p = citizen();
   banish(p, 4, world());
@@ -103,7 +107,8 @@ test('BANISH-SKY: the days are rounded up and the real time never down - the las
   assert.equal(worldSpanRealWords(NaN), null);
 });
 
-test('BANISH-SKY: a term not known at the arrest (AUDIT REP F2: the relay unheard - no stamp) takes the same thirty sky days at its first trusted read', () => {
+test('BANISH-SKY: a term not known at the arrest (AUDIT REP F2: the relay unheard - no stamp) takes the same thirty sky days at its first trusted read', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const { world } = online();
   const p = citizen();
   banish(p, 4, NaN);
@@ -117,7 +122,8 @@ test('BANISH-SKY: a term not known at the arrest (AUDIT REP F2: the relay unhear
   assert.equal(q.regionConditions[4].banishedUntil, 500 + 30 * 1440, 'the clock gone, the one clock\'s thirty days again');
 });
 
-test('BANISH-SKY: the temple says the calendar\'s days and, online, what they are in real time; the Standing page the same; offline neither says real time', () => {
+test('BANISH-SKY: the temple says the calendar\'s days and, online, what they are in real time; the Standing page the same; offline neither says real time', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const { world } = online();
   const p = citizen();
   banish(p, 4, world());

@@ -3,6 +3,7 @@
 // Lockpick as the producers mint it (its row, the item law headless, the counter's endless stack, the kit and the gift, a
 // rogue's pockets), the host's one home (no pick, a snap, the last snap, an open, a dispose), the window's pure geometry
 // and its words, the ear, the picture, and every site that rolled the pick now playing it.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -226,7 +227,8 @@ test('LOCKPICK item: its row registered and known headless, a stack of steel and
   assert.equal(LOCKPICK_ART.archive, 38321);
 });
 
-test('LOCKPICK item: counted across stacks, spent one at a time; the counter\'s endless stack, refilled online as bought', () => {
+test('LOCKPICK item: counted across stacks, spent one at a time; the counter\'s endless stack, refilled online as bought', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const entity = { items: [lockpicks(2), { group: 'UselessItems2', templateIndex: 1, stackCount: 9 }, lockpicks(1)] };
   assert.equal(lockpickCount(entity.items), 3); assert.equal(lockpickCount(null), 0);
   assert.equal(spendLockpick(entity), true); assert.equal(lockpickCount(entity.items), 2);

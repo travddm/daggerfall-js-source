@@ -1116,7 +1116,7 @@ export async function pickTranslationPack(code, languageName = code) {
   return pickAssetFolder({
     title: `A translation for ${languageName}`,
     blurb: `<p>Pick a <b>Daggerfall Unity translation</b>: its folder, or the .zip it came in. Its text replaces
-      the machine translation wherever it can. Nothing is uploaded. It is stored in this browser.</p>
+      the game’s own text wherever it can. Nothing is uploaded. It is stored in this browser.</p>
       <p style="color:#999">As in Daggerfall Unity, the string tables, quests and books are read from <b>Text</b>,
       and the fonts from <b>Fonts</b>.</p>`,
     store: async (files) => {
@@ -1452,7 +1452,7 @@ export const incompleteArena2Text = (missing) =>
  *  decompressed, the skip-before-inflate readZip has always done.
  *  Answers `[{ name, data }]` in archive order, `data` an ArrayBuffer;
  *  directory entries and methods other than 0/8 are skipped.
- *  AUDIT POI P5: `limit(name, size)`, when a caller gives one, bounds
+ *  `limit(name, size)`, when a caller gives one, bounds
  *  what each picked entry may become - asked of every one, with the
  *  size the directory declares, BEFORE any is inflated (a declared size
  *  past its bound refuses the archive), and held while each inflates (an
@@ -1486,7 +1486,7 @@ export async function readZipEntries(file, { pick = (names) => names, onProgress
   }
   const wanted = new Set(pick(dirs.map((d) => d.name)));
   const picked = dirs.filter((d) => wanted.has(d.name));
-  // AUDIT POI P5: every bound asked before a byte is inflated (a stored entry is its own size: one longer lies)
+  // every bound asked before a byte is inflated (a stored entry is its own size: one longer lies)
   if (limit) for (const d of picked) if (!(d.size <= limit(d.name, d.size)) || (d.method === 0 && d.compSize > d.size)) throw zipTooLarge(d.name);
   const entries = [];
   let seen = 0;
@@ -1509,7 +1509,7 @@ export async function readZipEntries(file, { pick = (names) => names, onProgress
   return entries;
 }
 const zipTooLarge = (name) => Object.assign(new Error(`zip entry past its bound: ${name}`), { code: 'zip-too-large' });
-/** AUDIT POI P5: an inflating entry read to its end - and stopped, refused, the moment it passes `max` bytes. */
+/** An inflating entry read to its end - and stopped, refused, the moment it passes `max` bytes. */
 async function inflatedTo(stream, max, name) {
   const reader = stream.getReader();
   const chunks = [];

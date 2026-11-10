@@ -90,7 +90,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { statsHunt } from '../bounty/huntRank.js';   // HUNTERS-MARK (Bounty-Boards.md 12.3)
-import { fpArm, hasDaggerfallArrows } from '../../combat/fpArm.js';
+import { fpArm } from '../../combat/fpArm.js'; import { hasDaggerfallArrows } from '../../combat/fpArm/fpArmParts.js';
 import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1: the Standing page's Dress line
 import { questRail, shelvedRail, unloggedRail, journalLines, questTitleOf, QUEST_URGENT_SECONDS, remainWords } from '../quest/questRail.js';   // MAC-K2: the ONE quest walk, shared with the chronicle
 import { qlObjectivesBlock, qlOfferDetail, offerRowWords, qlLineDetail, lineStateWords, qlLadderDetail } from '../questlines/qlJournal.js';   // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
@@ -119,7 +119,7 @@ import {
 } from '../../systems/settings/settings.js';
 import { mostRecentRestorable, restorableSaves, firstRestorable, deleteSave, QUICK_SAVE_NAME, loadSlot, saveSlot } from '../../systems/save/saveSlots.js';
 import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E: Copy to offline changes lanes
-import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
+import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes, skyHasOwnClock } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
 import {
   realmIo, realmList, realmDelete, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
   sweepUnsent,
@@ -491,7 +491,7 @@ export function skyDayWords(nowMs = Date.now(), localTime = (ms) => new Date(ms)
   const at = (m) => { const v = ((m % 60) + 60) % 60; return `:${String(Math.floor(v)).padStart(2, '0')}${v % 1 ? ':30' : ''}`; };
   // L10N4: one sentence, one pattern - the midnight's two shapes are a select inside it, never a glued fragment
   const day = { onHour: m0 === 0 ? 'yes' : 'no', midnight: at(m0), dusk: at(m0 + 45) };
-  return nowMs >= turn
+  return !skyHasOwnClock() ? t('menu.online.oneClockDay', 'A day in the world is two hours of real time.') : nowMs >= turn   // one clock, as in DFU (time.skyClock)
     ? t('menu.online.skyDay', 'A day in the world is an hour of real time: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', day)
     : t('menu.online.skyDayUntil', 'A day in the world is two hours of real time until {turn}; from then on it is an hour: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', { ...day, turn: localTime(turn) });
 }
@@ -2204,9 +2204,8 @@ function helpCard(key) {
  * switch | enum | number | colour | text | blocked.
  *
  * A blocked row is DRAWN, greyed, with its reason one press away. That
- * is deliberate and it is the port's own standing rule: DFU ships
- * EnhancedCombatAI True and we run the classic path, so a working
- * toggle there would be a lying toggle.
+ * is deliberate and it is the port's own standing rule: a working
+ * toggle for a setting the port does not run would be a lying toggle.
  */
 // AUDIT F7: this read effectiveSettings() - a full merge of all 171
 // keys over the defaults - ONCE PER ROW, so the Game category rebuilt
@@ -2507,8 +2506,7 @@ function stepRow(key, name, note, { min, max, step: inc, fmt }) {
 
 /** L10N1b: THE LANGUAGE ROW. Every language the build holds text for, by its own name and its English one, switched
  *  at once - its tables fetched, the text core switched, the menu drawn again - and remembered (uiPrefs `language`).
- *  The front door's alone, as the skip-video row is: a running game keeps the language it booted in. A language whose
- *  strings are Claude's drafts says so. */
+ *  The front door's alone, as the skip-video row is: a running game keeps the language it booted in. */
 function languageRow() {
   const row = el('div', 'row');
   row.dataset.opt = 'language'; row.dataset.pref = 'language';   // ORG2: the map finds it by its key (settingsMap port:language)
@@ -2516,7 +2514,6 @@ function languageRow() {
   const cur = currentLocale();
   main.append(el('div', 'row-name', t('settings.language.name', 'Language')));
   main.append(el('div', 'row-note', t('settings.language.note', 'The language of the game\u2019s text. Takes effect at once.')));
-  if (localeInfo(cur)?.source === 'machine') main.append(el('div', 'row-note', t('settings.language.machine', 'Machine translated')));
   row.append(main);
   const ctl = el('div', 'ctl');
   const sel = el('select', 'act langsel');
@@ -2538,7 +2535,7 @@ function languageRow() {
 
 /** L10N3b: THE TRANSLATION PACK ROW, under the language's: a Daggerfall Unity translation of the chosen language,
  *  installed from the player's own files (scenes/dataSource.js pickTranslationPack) - never bundled, never uploaded -
- *  or replaced, or removed. Its text takes the place of the machine translation wherever it has some. English has
+ *  or replaced, or removed. Its text takes the place of the game's own translation wherever it has some. English has
  *  none: English is the game's own. */
 function translationPackRow() {
   const cur = currentLocale();
@@ -2549,7 +2546,7 @@ function translationPackRow() {
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', t('settings.pack.name', 'Translation pack')));
   main.append(el('div', 'row-note', pack
-    ? t('settings.pack.installed', '{name}: {tables, plural, one {# table} other {# tables}}, {quests, plural, one {# quest} other {# quests}}, {books, plural, one {# book} other {# books}}. Its text replaces the machine translation.', { name: pack.name, tables: pack.counts?.table ?? 0, quests: pack.counts?.quest ?? 0, books: pack.counts?.book ?? 0 })
+    ? t('settings.pack.installed', '{name}: {tables, plural, one {# table} other {# tables}}, {quests, plural, one {# quest} other {# quests}}, {books, plural, one {# book} other {# books}}. Its text replaces the game\u2019s own translation.', { name: pack.name, tables: pack.counts?.table ?? 0, quests: pack.counts?.quest ?? 0, books: pack.counts?.book ?? 0 })
     : t('settings.pack.none', 'Install a Daggerfall Unity translation into {language} from your own files. Nothing is uploaded.', { language: info.name })));
   row.append(main);
   const ctl = el('div', 'ctl');
@@ -2596,7 +2593,6 @@ function languageOffer() {
   const card = el('div', 'px-langoffer');
   card.lang = code;
   card.append(el('div', 'px-langoffer-q', tIn(code, 'lang.offer', 'Play in English?')));
-  if (localeInfo(code)?.source === 'machine') card.append(el('div', 'px-langoffer-note', tIn(code, 'lang.offer.machine', 'This translation is machine-made and still being checked.')));
   card.append(acts([
     { label: tIn(code, 'lang.offer.yes', 'Yes'), primary: true, onClick: () => { chooseLanguage(code); } },
     { label: tIn(code, 'lang.offer.no', 'No, keep English'), onClick: () => { setPref('languageOffered', true); render(); } },

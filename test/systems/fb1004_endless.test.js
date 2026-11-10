@@ -2,6 +2,7 @@
 // Materials Bag and its two to four Campfires sold out for the day - and online a shelf is the whole building's. Now a
 // bag or a Campfire bought is put back on the shelf it came from, fresh, by commitTrade's Buy arm; a row stolen from a
 // closed shop's shelf is not.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -29,7 +30,8 @@ function buy(shelf, staged) {
   return restockEndless(shelf, staged);
 }
 
-test('ENDLESS-STOCK: a Materials Bag bought is back on the shelf - bought five times over, the shelf still sells one, never the record the buyer took (mutants: the bag not endless; the restock unwired)', () => {
+test('ENDLESS-STOCK: a Materials Bag bought is back on the shelf - bought five times over, the shelf still sells one, never the record the buyer took (mutants: the bag not endless; the restock unwired)', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const shelf = onlineShelf();
   assert.equal(count(shelf, isBagItem), 1, 'the shelf, as stocked, holds one');
   const bought = [];
@@ -45,7 +47,8 @@ test('ENDLESS-STOCK: a Materials Bag bought is back on the shelf - bought five t
   assert.deepEqual([left.templateIndex, left.group, left.value > 0], [BAG_TEMPLATE, 'UselessItems2', true], 'minted as the shelf mints it');
 });
 
-test('ENDLESS-STOCK: Campfires bought are back on the shelf, one for each bought - three in one purchase give back three, each a full fresh Campfire (mutants: the Campfire not endless; the bag minted for a Campfire)', () => {
+test('ENDLESS-STOCK: Campfires bought are back on the shelf, one for each bought - three in one purchase give back three, each a full fresh Campfire (mutants: the Campfire not endless; the bag minted for a Campfire)', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const shelf = onlineShelf();
   const stocked = count(shelf, isCampfireKit);
   assert.ok(stocked >= 2 && stocked <= 4, `two to four, as REST2 stocks them (${stocked})`);
@@ -70,7 +73,8 @@ test('ENDLESS-STOCK: only the bag and the Campfire - the horse, the cart and the
   assert.equal(restockEndless(null, [shelf.find(isBagItem)]), 0);
 });
 
-test('AUDIT ENDLESS-STOCK F1/F2: online no shop buys back a bag or a Campfire - bought cheap and sold dear it was gold for nothing, and one sold made any shelf endless; offline a shop buys them as before (mutants: the buy-back open online; closed offline)', () => {
+test('AUDIT ENDLESS-STOCK F1/F2: online no shop buys back a bag or a Campfire - bought cheap and sold dear it was gold for nothing, and one sold made any shelf endless; offline a shop buys them as before (mutants: the buy-back open online; closed offline)', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const shelf = onlineShelf();
   const bag = shelf.find(isBagItem), fire = shelf.find(isCampfireKit), rope = shelf.find((it) => !isEndlessStock(it) && shopBuysItem(BUILDING_TYPES.GeneralStore, it));
   assert.ok(bag && fire && rope);
