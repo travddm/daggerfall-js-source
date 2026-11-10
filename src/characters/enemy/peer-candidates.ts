@@ -68,7 +68,12 @@ export type PeerCandidates = {
   nextFrame: () => number;
 };
 
-export function createPeerCandidates({ read, concealFlags, capsuleHeight, stance }: PeerCandidatesDeps): PeerCandidates {
+export function createPeerCandidates({
+  read,
+  concealFlags,
+  capsuleHeight,
+  stance,
+}: PeerCandidatesDeps): PeerCandidates {
   const cands = new Map<string, PeerCandidate>();
   let frame = 0;
   let readAt = -1;
