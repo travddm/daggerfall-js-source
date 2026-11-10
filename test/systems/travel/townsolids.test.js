@@ -5,11 +5,17 @@ import assert from 'node:assert/strict';
 import { solidCells, coverNav, townWayCells, clearLine, SOLID_BAND } from '../../../src/systems/travel/townWalk.js';
 import { createTownWalk } from '../../../src/scenes/townWalkHost.js';
 import { CityNavigation, NAV_CELL } from '../../../src/world/city/cityNavigation.js';
-import { mapPixelWorldOrigin } from '../../../src/systems/travel/travelPaths.js';
+import { mapPixelToWorldCoord } from '../../../src/formats/mapsFile.js';
 import { CITY_GATE_OPEN_MODEL_ID } from '../../../src/world/rmbLayout.js';
 import { SCENE_MAP_RATIO } from '../../../src/world/streamingWorld.js';
 
 const C = NAV_CELL;
+
+/** A map pixel's south-west corner in world units, as the town walk host reads its pixel. */
+function pixelOrigin(px, py) {
+  const o = mapPixelToWorldCoord(px, py);
+  return { x: o.x, z: o.y };
+}
 
 /** A grid `w` x `h` of road. */
 function road(w, h) {
@@ -122,7 +128,7 @@ test("the journey grid's way: a way across a fenced yard's closed side goes roun
 });
 
 test("the town walk host: the journey's way is asked of the town's grid with its solid models' faces covered, in the location frame; a town with none walks its grid as before", () => {
-  const o = mapPixelWorldOrigin(100, 200);
+  const o = pixelOrigin(100, 200);
   const R = SCENE_MAP_RATIO,
     t = [0, 0, 0],
     locOrigin = [o.x / R + 2, 3, o.z / R + 5];
@@ -159,7 +165,7 @@ test("the town walk host: the journey's way is asked of the town's grid with its
 });
 
 test("the town walk host: a traveller in a walled town's fields, bound past them, walks round the walls; bound for a street inside, through a gate (mutant: the fields walked on the gates' grid)", () => {
-  const o = mapPixelWorldOrigin(100, 200);
+  const o = pixelOrigin(100, 200);
   const R = SCENE_MAP_RATIO;
   const t = [0, 0, 0];
   const locOrigin = [o.x / R, 0, o.z / R];
@@ -171,8 +177,13 @@ test("the town walk host: a traveller in a walled town's fields, bound past them
   const nav = new CityNavigation(1, 1);
   const ring = (x, y) => (x === 10 || x === 53 || y === 10 || y === 53) && x >= 10 && x <= 53 && y >= 10 && y <= 53;
   for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) nav.grid[y * 64 + x] = (ring(x, y) ? 0 : 15) << 4;
-  const gateAt = (gx, gy) => ({ gate: { modelId: CITY_GATE_OPEN_MODEL_ID }, local: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, locOrigin[0] + (gx + 0.5) * C, 0, locOrigin[2] + (gy + 0.5) * C, 1] });
-  const built = new Map([['100,200', { population: { nav }, locOrigin, models: [], cityGates: [gateAt(32, 10), gateAt(32, 53)] }]]);
+  const gateAt = (gx, gy) => ({
+    gate: { modelId: CITY_GATE_OPEN_MODEL_ID },
+    local: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, locOrigin[0] + (gx + 0.5) * C, 0, locOrigin[2] + (gy + 0.5) * C, 1],
+  });
+  const built = new Map([
+    ['100,200', { population: { nav }, locOrigin, models: [], cityGates: [gateAt(32, 10), gateAt(32, 53)] }],
+  ]);
   const tw = createTownWalk({ built, state, cpuModels: new Map() });
   const cellAt = (gx, gy) => ({ x: (locOrigin[0] + (gx + 0.5) * C) * R, z: (locOrigin[2] + (gy + 0.5) * C) * R });
   const inside = (q) => {
@@ -183,7 +194,13 @@ test("the town walk host: a traveller in a walled town's fields, bound past them
   const crosses = (pts) => {
     for (let i = 1; i < pts.length; i++) {
       for (let s = 0; s <= 40; s++) {
-        if (inside({ x: pts[i - 1].x + ((pts[i].x - pts[i - 1].x) * s) / 40, z: pts[i - 1].z + ((pts[i].z - pts[i - 1].z) * s) / 40 })) return true;
+        if (
+          inside({
+            x: pts[i - 1].x + ((pts[i].x - pts[i - 1].x) * s) / 40,
+            z: pts[i - 1].z + ((pts[i].z - pts[i - 1].z) * s) / 40,
+          })
+        )
+          return true;
       }
     }
     return false;
@@ -192,8 +209,8 @@ test("the town walk host: a traveller in a walled town's fields, bound past them
   const round = tw.townWay(cellAt(32, 3), cellAt(32, 120));
   assert.ok(round.pts.length > 2, 'a way of turns');
   assert.ok(!crosses(round.pts), 'round the walls, never across the city');
-  assert.equal(round.pace, Infinity, 'at the journey\'s own rate, never a town\'s');
+  assert.equal(round.pace, Infinity, "at the journey's own rate, never a town's");
   const into = tw.townWay(cellAt(32, 3), cellAt(32, 32));
   assert.ok(into.pts.some(inside), 'a street inside is reached through the gate');
-  assert.ok(Number.isFinite(into.pace), 'and walked at the town\'s pace');
+  assert.ok(Number.isFinite(into.pace), "and walked at the town's pace");
 });

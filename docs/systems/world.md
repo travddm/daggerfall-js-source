@@ -207,7 +207,7 @@ Walked travel (autopilot) is the port's own: `travelRoute.js` `planRoute` (costs
 hands off to ships (see [naval.md](naval.md)). `src/systems/immersiveTravel.js` ports the Immersive Travel mod's
 carriage and sailor services.
 
-Travel Options' own journey (`beginTravel`) walks a straight line, as the mod does. With the mod pane's Avoid Obstacles
+The mod's own journey (`beginTravel`) walks a straight line, as the mod does. With the mod pane's Avoid Obstacles
 key on (the default; a port key, off is the mod's beeline), the steering (`travelSteer.js`) feels its way at two heights
 over the feet, so a rail fence's rails are seen, and the journey walks the streets of every town it starts in or crosses
 on the town's grid (`townWalk.js`, `src/scenes/townWalkHost.js`). That journey grid covers the faces of the town's solid

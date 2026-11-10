@@ -413,7 +413,7 @@ export function* townWayCellsSteps(nav, from, to, { maxExpansions = nav.width * 
   return null;
 }
 
-/** The mod's named journey as a route of no legs (systems/travel/travelOptions.js beginTravel, under Avoid Obstacles): it
+/** The mod's named journey as a route of no legs (its beginTravel, under Avoid Obstacles): it
  *  walks the streets of every town it starts in or crosses as the Overworld's routes do, and the mod's straight walk to
  *  the place between them. A straight line out of a town or across one meets its walls, houses and fenced yards, and the
  *  steering gave it up there as stuck or blocked. The route's last leg is the mod's own: the place's rect grown by the
@@ -429,7 +429,7 @@ export const STREET_REPLANS = 2;
  * A steering stop in a town's streets, answered by a way asked again (`restart`) rather than the end of the journey:
  * what stopped the body is on no grid the way was planned on (a cart, a fence no model holds), and a way from where the
  * body now stands goes round it. STREET_REPLANS times a town; then, or off a street, the stop stands.
- * @param {any} route - the journey's route (travelOptions.js `st.route`), or null
+ * @param {any} route - the journey's route (`st.route`), or null
  * @param {string | null} stop - the steering's answer: 'stuck', 'blocked' or null
  * @param {() => void} restart - begins the leg again: its town's way asked from where the body stands
  * @returns {string | null} the stop that stands, or null
