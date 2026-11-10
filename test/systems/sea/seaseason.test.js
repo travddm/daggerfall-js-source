@@ -38,13 +38,13 @@ test('SEA-SEASON the season\'s law: its numbers each their source\'s; a world da
   assert.equal(S.SEA_SEASON_VENDOR, CAPTAIN_SAVE_VENDOR);
   assert.equal(S.SEA_DEEPEST_MAX, Math.floor(etherDepthAt(ETHER_BOX.x0)), 'the sea\'s west edge');
   assert.deepEqual([S.SEA_LEGENDS, S.SEA_LEGEND_RISE_DAYS], [LEGENDS.length, LEGEND_RISE_DAYS]);
-  assert.equal(S.SEA_LEGEND_RISE_S, 60 * 3600, 'thirty of the world\'s days are sixty hours of wall time');
+  assert.equal(S.seaLegendRiseS(), 60 * 3600, 'thirty of the world\'s days are sixty hours of wall time');
   assert.deepEqual([S.SEA_SEASON_ROWS, S.SEA_SEASON_LAST_ROWS], [10, 3]);
   const turn = dayAt(ARENA_SEASON_EPOCH_S + ARENA_SEASON_S);
   assert.deepEqual([dayAt(T1), dayAt(T2), turn + 1, turn].map(S.seaSeasonOfDay), [1, 2, 2, 1], 'by the wall time a day begins at - the day the season turns in, the old one\'s');
   assert.deepEqual([1, 2, 3].map(S.seaSeasonStartS), [ARENA_SEASON_EPOCH_S, ARENA_SEASON_EPOCH_S + ARENA_SEASON_S, ARENA_SEASON_EPOCH_S + 2 * ARENA_SEASON_S]);
   const start = S.seaSeasonStartS(2);
-  assert.deepEqual([start, start + S.SEA_LEGEND_RISE_S - 1, start + S.SEA_LEGEND_RISE_S, start + 5 * S.SEA_LEGEND_RISE_S].map(S.seaLegendsPossible), [6, 6, 12, 36], 'each of the six once, and again at each rise');
+  assert.deepEqual([start, start + S.seaLegendRiseS() - 1, start + S.seaLegendRiseS(), start + 5 * S.seaLegendRiseS()].map(S.seaLegendsPossible), [6, 6, 12, 36], 'each of the six once, and again at each rise');
   const save = (season) => ({ modData: { Captain: { ether: { season } } } });
   assert.deepEqual(S.seaSeasonFigures(save({ n: 1, deepest: 400, legends: 3 }), T1), { n: 1, deepest: 400, legends: 3 });
   assert.deepEqual(S.seaSeasonFigures(save({ n: 1, deepest: S.SEA_DEEPEST_MAX, legends: S.seaLegendsPossible(T1) }), T1), { n: 1, deepest: S.SEA_DEEPEST_MAX, legends: 30 }, 'at the bounds');

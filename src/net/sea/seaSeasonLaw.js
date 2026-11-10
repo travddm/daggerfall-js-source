@@ -14,7 +14,7 @@
 // Pure: the numbers, the reading of a save's figures, and the board's shape.
 // ═══════════════════════════════════════════════════════════════════
 import { arenaSeasonOf, ARENA_SEASON_EPOCH_S, ARENA_SEASON_S } from '../arena/arenaLaw.js';
-import { wallMsForClassicMinutes, ONLINE_MINUTES_PER_MS } from '../wire.js';
+import { wallMsForClassicMinutes, onlineMinutesPerMs } from '../wire.js';
 
 /** The captain's ledger's record in a save's modData (systems/naval/captainLedger.js CAPTAIN_SAVE_VENDOR - pinned equal;
  *  the Worker bundles no ledger). */
@@ -26,8 +26,9 @@ export const SEA_DEEPEST_MAX = 1365;
 export const SEA_LEGENDS = 6;
 /** A legend ended rises again this many of the world's days on (etherShips.js LEGEND_RISE_DAYS - pinned equal)... */
 export const SEA_LEGEND_RISE_DAYS = 30;
-/** ...which online is this many seconds of wall time (the shared clock's twelve minutes a minute: two hours a day). */
-export const SEA_LEGEND_RISE_S = Math.round(SEA_LEGEND_RISE_DAYS * 1440 / ONLINE_MINUTES_PER_MS / 1000);
+/** ...which online is this many seconds of wall time: sixty hours at DFU's TimeScale 12 (two hours a day), fewer or more as
+ *  the server profile's time.worldScale says. */
+export const seaLegendRiseS = () => Math.round(SEA_LEGEND_RISE_DAYS * 1440 / onlineMinutesPerMs() / 1000);
 /** A board's rows each way, and the last season's shown. */
 export const SEA_SEASON_ROWS = 10;
 export const SEA_SEASON_LAST_ROWS = 3;
@@ -38,12 +39,12 @@ export const seaSeasonOfDay = (/** @type {number} */ day) => arenaSeasonOf(Math.
 export const seaSeasonStartS = (/** @type {number} */ season) => ARENA_SEASON_EPOCH_S + (Math.max(1, Math.floor(season)) - 1) * ARENA_SEASON_S;
 /** The most legends a captain can have ended by `nowS` in its season: each of the six once, and once more each time the
  *  aether has raised her since the season began. */
-export const seaLegendsPossible = (/** @type {number} */ nowS) => SEA_LEGENDS * (Math.floor(Math.max(0, nowS - seaSeasonStartS(arenaSeasonOf(nowS))) / SEA_LEGEND_RISE_S) + 1);
+export const seaLegendsPossible = (/** @type {number} */ nowS) => SEA_LEGENDS * (Math.floor(Math.max(0, nowS - seaSeasonStartS(arenaSeasonOf(nowS))) / seaLegendRiseS()) + 1);
 
 /** AUDIT SEA VENTURES B6: a world day on the shared clock, s - the ledger files a day's figures under the season its
  *  first minute fell in (the day the season turns in counts for the old one), so for this long past a turn a save may
  *  still carry the season before's. */
-export const SEA_WORLD_DAY_S = Math.round(1440 / ONLINE_MINUTES_PER_MS / 1000);
+export const seaWorldDayS = () => Math.round(1440 / onlineMinutesPerMs() / 1000);
 
 /**
  * THE SEASON'S FIGURES A SAVE CARRIES, as the service reads them at `nowS`: `{ n, deepest, legends }` - the ledger's
@@ -57,7 +58,7 @@ export function seaSeasonFigures(save, nowS) {
   if (!s || typeof s !== 'object') return null;
   const { n, deepest, legends } = s;
   const cur = arenaSeasonOf(nowS), turnS = seaSeasonStartS(cur);
-  const before = n === cur - 1 && nowS - turnS < SEA_WORLD_DAY_S;
+  const before = n === cur - 1 && nowS - turnS < seaWorldDayS();
   if (!Number.isSafeInteger(n) || (n !== cur && !before)) return null;
   if (!Number.isSafeInteger(deepest) || deepest < 0 || deepest > SEA_DEEPEST_MAX) return null;
   if (!Number.isSafeInteger(legends) || legends < 0 || legends > seaLegendsPossible(before ? turnS - 1 : nowS)) return null;
