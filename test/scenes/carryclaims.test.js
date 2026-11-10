@@ -1,4 +1,4 @@
-// CARRY-CLAIMS (decision #69, trbcodex T12): a take from a shared container online leaves the pack while the room's
+// CARRY-CLAIMS: a take from a shared container online leaves the pack while the room's
 // authority judges it (roomLootHost.js roomTake; claimLedger.js take), and the carry gate (itemTransfer.js planTake) read
 // the pack alone. Fast takes near the limit each passed, and the grants landed past it. DFU refuses a take past
 // MaxEncumbrance (DaggerfallInventoryWindow.cs CanCarryAmount), so the claims in flight now weigh at the gate. Driven
