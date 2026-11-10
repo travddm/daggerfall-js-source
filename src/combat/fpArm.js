@@ -51,15 +51,14 @@ import { CHAR_SPRITE_RT_SIZE } from '../render/renderer.js';
 import {
   sampleTrack, resetClip, advanceClip, getTextKeyTime, getStartTime,
 } from '../formats/morrowind/mwAnim.js';
-import { accumRootRef, buildSkeleton, GRAPH_ROOT } from '../formats/morrowind/mwSkin.js';
-import { nodeTransformOf } from '../formats/morrowind/mwCharacter.js';
+import { accumRootRef, GRAPH_ROOT } from '../formats/morrowind/mwSkin.js';
 import { parseNif } from '../formats/morrowind/mwNifFile.js';
 import { flattenNif } from '../formats/morrowind/mwNifMesh.js';
 import {
   assembleFirstPersonArm, poseAssembly, armPieceRows, clipReport, clipUnionBounds, clipSweepTimes, bindPartsInto,
   armReport, armMeshPaths, bodyParts,
-  weaponRecords, dfWeaponToMw, dfWeaponShape, pickWeaponRecord, weaponAttachBone, MW_WEAPON_TYPE,
-  ammoTypeFor, arrowAttachBone, ARROW_FALLBACK_NODE, reloadsItself, shootsRatherThanSwings,
+  weaponRecords, dfWeaponToMw, dfWeaponShape, pickWeaponRecord, MW_WEAPON_TYPE,
+  reloadsItself, shootsRatherThanSwings,
   headViewRef, composeStanceGroup, composeWeaponGroup, mwAttackType, attackKeys, MW_SHOOT_ATTACK, strikeReversed,
   weaponShortGroup, calculateWindUp, EQUIP_KEYS, UNEQUIP_KEYS, isRealWeapon,
   stepAimFocus, fpAnimSources, pickAnimSource, anySourceHasGroup, FP_BASE_MODEL, animSourceName,
@@ -96,7 +95,6 @@ import { createParticleSystem, packParticleQuads, particleDrawState, affineOfTra
 import { boneSourcesFor, resolveHolsterParts, holsterPartPaths, holsterHidden, HOLSTER_SLOTS } from '../systems/weaponSheathing.js';   // WS1
 import { fitCloakOver, fitStowedGear, followCloak, HIP_PITCH_LIMIT, CLOAK_PUSH_LIMIT, SLUNG_MOVE_LIMIT } from '../formats/morrowind/mwCloakFit.js';   // MW-CLOAK1: the cloak over what the body wears, stowed gear against it; AUDIT MW-CLOAK: and going with it
 import { isCloakSlot, ownCloakFor, isOutfitSlot } from '../characters/ownModels/ownClothingModels.js';   // MW-CLOAK1; AUDIT MW-CLOAK: and its picture; AUDIT MW-FOLK1: an outfit's add, by its label
-import { injectSkeletonNodes } from '../formats/morrowind/mwSkin.js';   // WS1: the dry injection the holster's bone probe runs
 // MAP3: THE HELD SHEET - the pose deltas over the idle, the paper piece
 // the hands hold, and where its corners land on the composite
 import { deltaTracks, heldSampler, paperPiece, refreshPaperSource, projectPaperCorners, normaliseHeldPose, HELD_POSE_DEFAULT } from './heldPose.js';
@@ -116,72 +114,18 @@ import {
   FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType, accurateAiming, clipCompletion,
   strideOppositeTime, blowRate, releaseSkip,
 } from './fpArm/fpAnimState.js';   // the animation-state helpers
+import { loadFromArchives, findLoaded, parseNifOnce, nifBytes, boneProbe, esmLoadOrder } from './fpArm/archiveBytes.js';   // the archive reads
+export { nifParseCount, esmLoadOrder, NIF_COPY_CAP, nifBytes } from './fpArm/archiveBytes.js';
+import {
+  weaponPartPaths, torchPartPaths, resolveTorchPart,
+  HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK, PLUMB, hipLanternPartPaths, resolveHipLanternPart, archiveHas,
+  resolveOffWeaponParts, resolveWeaponParts,
+} from './fpArm/fpArmParts.js';   // the carried parts
 export {
   WOLFSKIN, WOLFSKIN_1ST, fpSkeletonPath, tpSkeletonPath, FP_CLIP_PATH, FP_IDLE_BASE, FP_IDLE_SNEAK, TORCH_GROUP,
   carriedLeftVisible, idleBaseFor, FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType,
   accurateAiming, clipCompletion, strideOppositeTime, BLOW_RATE_MAX, BLOW_RATE_MIN, BLOW_LEFT_MIN, blowRate, releaseSkip,
 } from './fpArm/fpAnimState.js';
-
-// MW-LOAD: THE ARCHIVE IS OPENED, NOT READ, AND THIS FILE IS ITS
-// ONE READER.
-//
-// Every boot used to pull each stored .bsa out of IndexedDB as one whole
-// ArrayBuffer - 150-300 MB apiece, three of them on a retail set, one to
-// three seconds each measured - and hold them for the session, so that
-// this file could read a few dozen entries out of them. dataSource now
-// OPENS each archive off its stored Blob (MwBsaFile.open): the directory
-// arrives by range, and an ENTRY's bytes arrive by range when somebody
-// loads them.
-//
-// What that costs this file is one law. `get` is still synchronous and
-// still answers what is in hand - the contract every reader here already
-// speaks - but on a lazily opened archive it THROWS ("not loaded - await
-// load(path) first") for an entry nobody asked for. So every synchronous
-// read below is now preceded, IN THE SAME FUNCTION, by the load that
-// brings its bytes in, and the two helpers here are the whole mechanism.
-// There is no second copy of the `find` law in any preload: the archive
-// a path is loaded from is the archive it is read from, by construction.
-//
-// The resident archives - every test fixture's {has, get} duck, the
-// loose-file archive, a whole-buffer MwBsaFile - answer `loaded` true for
-// everything they carry and `load` out of memory, so one body of code
-// drives both and no fixture had to move.
-
-/** MW-LOAD: bring in every path the archives carry, through the SAME
- *  `find` law the synchronous read uses - the first archive whose `has`
- *  answers owns the path. Deduped and CONCURRENT: one lazy entry is a
- *  ranged read of about a millisecond, and forty of them in a row is
- *  forty round trips, which is the load time this whole change is about.
- *  Never throws - a path that will not load is reported by the read that
- *  follows, in that read's own words. An archive with no `load` door is
- *  already resident, which is the old two-door duck. */
-async function loadFromArchives(archives, paths) {
-  const seen = new Set();
-  const jobs = [];
-  for (const path of paths ?? []) {
-    if (!path || seen.has(path)) continue;
-    seen.add(path);
-    const arc = (archives ?? []).find((a) => a.has(path));
-    if (!arc || typeof arc.load !== 'function') continue;
-    if (typeof arc.loaded === 'function' && arc.loaded(path)) continue;
-    jobs.push(Promise.resolve(arc.load(path)).catch(() => null));
-  }
-  if (jobs.length) await Promise.all(jobs);
-}
-
-/** MW-LOAD: `find`, asserting the bytes are in hand. A path no archive
- *  carries answers null exactly as `find` does, and every caller already
- *  reports that as "not in your archives". A path an archive DOES carry
- *  and has not loaded is a missed preload - a defect in this file - and
- *  it is named here, with the path, rather than left to surface as a
- *  bare throw from inside MwBsaFile.get two frames down. */
-function findLoaded(archives, path) {
-  const arc = (archives ?? []).find((a) => a.has(path));
-  if (arc && typeof arc.loaded === 'function' && !arc.loaded(path)) {
-    throw new Error(`MW-LOAD: ${path} was read before it was loaded - the preload that covers this read missed it`);
-  }
-  return arc;
-}
 
 /** MW-LOAD: the texture bytes collectArmTextures reads synchronously.
  *  It walks rule 36's OWN ladder - correctTexturePath over the same
@@ -671,33 +615,6 @@ export function portraitWindow(ranges, model, bodyBox) {
  * Morrowind.bsa for the life of the tab. Copy what we need, release the
  * rest.
  */
-/** MW-D16: the weapon mesh is parsed twice - once by the assembly and
- *  once here, for getArrowBone's fallback - so it is cached per call
- *  rather than parsed twice for the same bytes. */
-function parseNifOnce(bytes, cache = parseNifOnce.cache) {
-  if (cache.has(bytes)) return cache.get(bytes);
-  const nif = parseNif(bytes);
-  cache.set(bytes, nif);
-  parseNifOnce.parses++;   // MWNPC3: the parses the memo could not answer - the pins' count of the one parse a mesh
-  return nif;
-}
-parseNifOnce.cache = new WeakMap();
-parseNifOnce.parses = 0;
-/** MWNPC3: how many meshes the builds have PARSED (a memo hit is not one) - the shared parse's pins read it. */
-export const nifParseCount = () => parseNifOnce.parses;
-
-/**
- * MWNPC3: ONE COPY OF A
- * MESH'S BYTES, FOR EVERY BODY. Every build copied each part's bytes out of its archive (`.slice()`) and parsed the
- * copy - a fresh copy a build, so parseNifOnce's memo (keyed by the bytes) never met the same mesh twice, and every
- * body re-parsed every mesh it wore: the player's on each equip, each peer's, and a crowd of NPCs wearing the same
- * dozen body parts. A mesh's bytes are copied ONCE per archive now and handed to every build that asks, so the memo
- * answers the second body from the first's parse (a parsed NIF is read, never written - mwFirstPerson.js
- * assembleFirstPersonArm's note). Keyed by the archive object and the path (a whole-buffer archive answers a fresh
- * view each `get`; a lazy one its cached bytes - both key the same), the copy is kept per archive while it lives, the
- * oldest let go past NIF_COPY_CAP, and its parse with it (the memo is weak). A path the archive cannot answer is
- * `undefined`, as `find(path)?.get(path)?.slice()` was.
- */
 /**
  * MWNPC3: ONE GL TEXTURE A PICTURE, FOR EVERY BODY. The decoded image was already shared (TEXTURE_CACHE, by data
  * generation and file) - but every mesh uploaded its own GL copy of every texture it
@@ -736,82 +653,6 @@ export function releaseCharacterTexture(renderer, tex) {
   return true;
 }
 
-/** The masters in their load order. */
-const ESM_MASTERS = Object.freeze(['morrowind.esm', 'tribunal.esm', 'bloodmoon.esm']);
-/**
- * AUDIT MW-NPC D6: THE MASTERS IN LOAD ORDER - Morrowind.esm, Tribunal.esm, Bloodmoon.esm, then any other (a mod, after
- * the masters it names), each run of them as stored. The store answers its keys alphabetically (Bloodmoon, Morrowind,
- * Tribunal), and both record walks below let the last record of an id win "as the engine's load order does" - so an
- * expansion's record lost to Morrowind's own. dataSource.js ranks the .bsa files by the same three names, the other way
- * round: there the first archive that has a path answers it.
- * @param {string[]} names
- */
-export function esmLoadOrder(names) {
-  // AUDIT MW-NPC II G2: the masters by their WHOLE names - by prefix, "Morrowind Patch.esm" ranked as Morrowind's own
-  // and, stored before it (' ' sorts before '.'), lost every record it patched to the master it patches
-  const rank = (n) => { const i = ESM_MASTERS.indexOf(String(n).split(/[\\/]/).pop().toLowerCase()); return i < 0 ? ESM_MASTERS.length : i; };
-  return names.map((n, i) => [n, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([n]) => n);
-}
-
-export const NIF_COPY_CAP = 384;
-const NIF_COPIES = new WeakMap();   // archive -> Map(path -> bytes), insertion-ordered: the oldest first
-export function nifBytes(arc, path) {
-  if (!arc) return undefined;
-  let m = NIF_COPIES.get(arc);
-  if (!m) NIF_COPIES.set(arc, (m = new Map()));
-  let b = m.get(path);
-  if (b) { m.delete(path); m.set(path, b); return b; }
-  const src = arc.get(path);
-  if (!src) return src;
-  b = src.slice();
-  m.set(path, b);
-  if (m.size > NIF_COPY_CAP) m.delete(m.keys().next().value);
-  return b;
-}
-
-/** getArrowBone's FIRST branch: does the ACTOR's own skeleton carry the
- *  ammo type's attach bone? */
-function skeletonHasBone(skeletonBytes, name) {
-  try {
-    const skel = buildSkeleton(parseNifOnce(skeletonBytes));
-    return skel.byName.has(String(name).toLowerCase());
-  } catch { return false; }
-}
-/** WS1: skeletonHasBone AFTER the bone addons - a dry injection over the
- *  same bytes, so the holster resolves against the skeleton the
- *  assembly will build. */
-function boneProbe(skeletonBytes, boneSources) {
-  let skel = null;
-  try {
-    skel = buildSkeleton(parseNifOnce(skeletonBytes));
-    for (const src of boneSources ?? []) { try { injectSkeletonNodes(skel, parseNifOnce(src.bytes)); } catch { /* the assembly notes it */ } }
-  } catch { skel = null; }
-  return (name) => !!skel && skel.byName.has(String(name).toLowerCase());
-}
-
-/**
- * MW-D9's WEAPON RESOLUTION, one home (extracted at MW-D19 so a live
- * equip change resolves through the same door as the build).
- *
- * A Morrowind weapon is a RIGID part at a bone - rule 12's rigid half,
- * the same path armcuff has proved since MW-D6 - so it rides in as one
- * more part with an explicit `bones` override instead of the PART_BONES
- * table. Rule 17 is that override: the generic "Weapon Bone" is
- * replaced by the equipped type's own attach bone when the actor has
- * that node, which is how a bow reaches "Weapon Bone Left" (rule 8).
- *
- * AND THE BOW COMES OUT MIRRORED, which is faithful and surprising
- * enough to write down before someone "fixes" it. Rule 13's mirror is
- * a SUBSTRING TEST on the attach bone's name (SceneUtil::attach,
- * components/sceneutil/attach.cpp:166-181), and that function is the
- * generic attach path for every part - weapons included, not body parts
- * only. "Weapon Bone Left" contains "Left", so the bow is drawn with X
- * negated by exactly the same rule that mirrors the left hand. Nothing
- * here special-cases it.
- *
- * @returns {{mwType:number, parts:object[], weaponInfo:object|null,
- *   arrowInfo:object|null, notes:string[]}}
- */
 /**
  * MW-D19: the identity a weapon swap compares. Everything that changes
  * WHICH mesh hangs on the bone is in it - the Morrowind type (two
@@ -1258,157 +1099,6 @@ export function weaponRestSide(arm, bone) {
   return x > 1e-4 ? 'right' : x < -1e-4 ? 'left' : 'centre';
 }
 
-/** Daggerfall's arrows in the pack. This test existed as THREE
- *  literals (the rig's out-of-arrows auto-sheathe, the card's build
- *  button, and the swap seam wanted a fourth) - one export now.
- *  AUDIT 68 S27-ammoCount-dup: and the COUNT under it is inventory.js's
- *  ammoCountFor, beside the spend law - this file carried a copy of it,
- *  and the copy was the one the rig read. */
-export const hasDaggerfallArrows = (items) => ammoCountFor(items, null) > 0;
-/** THE SAME QUESTION, ASKED OF THE WEAPON: a bow is out of ammunition
- *  when there are no Arrows, and every other weapon answers the same
- *  arrow test, so no caller has to know which it is holding. */
-export const hasAmmoFor = (items, weapon) => ammoCountFor(items, weapon) > 0;
-
-/**
- * MW-LOAD: THE ARCHIVE PATHS resolveWeaponParts WILL READ, before it
- * reads them - the picked weapon's model, and the ammunition's when the
- * type takes one and the player has it.
- *
- * It asks the SAME two record questions resolveWeaponParts asks, in the
- * same order, off the same records (dfWeaponToMw, then pickWeaponRecord
- * on the type; ammoTypeFor, then pickWeaponRecord on the ammo type), so
- * the preload cannot drift from the read. Everything else that function
- * decides - the attach bone, rule 13's mirror, getArrowBone's two
- * branches - is answered off skeleton bytes the caller already holds and
- * needs nothing from an archive.
- */
-export function weaponPartPaths({ weapon, hasAmmo = false, allWeapons, has = null }) {
-  const paths = [];
-  const mwType = dfWeaponToMw(weapon, WEAPONS);
-  if (mwType === MW_WEAPON_TYPE.None) return paths;
-  const rec = pickWeaponRecord(allWeapons, mwType, weapon ? materialName(weapon) : null, { has, shape: dfWeaponShape(weapon, WEAPONS) });   // MW-D50: a record the archives carry
-  if (rec) paths.push(`meshes/${rec.model}`);
-  const ammoType = ammoTypeFor(mwType);
-  if (ammoType !== MW_WEAPON_TYPE.None && hasAmmo) {
-    const ammoRec = pickWeaponRecord(allWeapons, ammoType, null, { has });
-    if (ammoRec) paths.push(`meshes/${ammoRec.model}`);
-  }
-  return paths;
-}
-
-/** MW-D51: THE HELD TORCH's mesh paths, for the build's one preload
- *  round - weaponPartPaths' twin. */
-export function torchPartPaths({ torch = false, allLights, has = null }) {
-  if (!torch) return [];
-  const rec = pickTorchRecord(allLights, { has });
-  return rec ? [`meshes/${rec.model}`] : [];
-}
-
-/** MW-D51: THE HELD TORCH, resolveWeaponParts' twin for Slot_CarriedLeft.
- *  Daggerfall's lit light is PlayerEntity.LightSource (the
- *  Torch item, lit by use - and Handheld Torches' hand law stows it
- *  when no hand is free); Morrowind's is the carried-left slot, whose
- *  LIGH record is instanced under "Shield Bone" exactly as a shield is
- *  (sPartList's PRT_Shield; npcanimation.cpp's updateParts reads
- *  Slot_CarriedLeft for a Light the same way). The rig without the
- *  bone is REPORTED, not silently swapped (`hasBone` is the same
- *  skeletonHasBone test the weapon's typed bone takes, injectable for
- *  a fixture without the bone). */
-export const TORCH_BONE = 'Shield Bone';
-/**
- * MWT1 - THE ATTITUDE A HELD LIGHT IS GIVEN, AND ONLY A LIGHT.
- *
- * The bone was right and the rotation was missing. `SceneUtil::attach`
- * puts ONE PositionAttitudeTransform between the actor's bone and the
- * attached model, and the only rotation it can carry is the caller's
- * `attitude` - which `ActorAnimation::attach` passes for `isLight` ALONE
- * (actoranimation.cpp:97-103) and never for a weapon (:104-105). It is an
- * extra -90 degrees about X, and this port's own reference notes wrote it
- * down at `02-Formats/Morrowind-Rules.md:3228` ("a held light (the torch
- * in the player's left hand) gets an extra -90 deg X rotation passed as
- * attitude") beside the two engine-injected transforms it DID port. The
- * torch hung at Shield Bone unrotated: the right bone, the wrong way up.
- *
- * Rx(-90) row-major, which is the shape `preTransform` already takes for
- * the arrow (`{ a: 3x3, t: 3 }`, applied to the positions before the
- * bone) - the same place in the chain the reference's PAT sits, and the
- * bone carries no "Left" so no mirror intervenes.
- */
-export const LIGHT_ATTITUDE = Object.freeze({
-  a: Object.freeze([1, 0, 0, 0, 0, 1, 0, -1, 0]),
-  t: Object.freeze([0, 0, 0]),
-});
-export function resolveTorchPart({ torch = false, allLights, find, skeletonBytes, has = null, hasBone = null }) {
-  const notes = [];
-  const parts = [];
-  let torchInfo = null;
-  if (!torch) return { parts, torchInfo, notes };
-  const rec = pickTorchRecord(allLights, { has });
-  if (!rec) { notes.push('torch: your archives carry no carriable Morrowind torch (a LIGH record named torch, with its mesh)'); return { parts, torchInfo, notes }; }
-  const path = `meshes/${rec.model}`;
-  const arc = find(path);
-  if (!arc) { notes.push(`torch: ${path} (${rec.id}) is not in your archives`); return { parts, torchInfo, notes }; }
-  const carries = hasBone ? hasBone(TORCH_BONE) : skeletonHasBone(skeletonBytes, TORCH_BONE);
-  if (!carries) { notes.push(`torch: this skeleton has no "${TORCH_BONE}" - nowhere to hold it`); return { parts, torchInfo, notes }; }
-  parts.push({ slot: 'torch', bones: [TORCH_BONE], bytes: nifBytes(arc, path), preTransform: LIGHT_ATTITUDE });   // MWT1
-  torchInfo = { id: rec.id, name: rec.name, model: rec.model, bone: TORCH_BONE, fire: !!rec.fire, attitude: true };
-  return { parts, torchInfo, notes };
-}
-
-/**
- * HT-WAIST: THE LANTERN AT THE WAIST, on the third-person body.
- *
- * Handheld Torches' port-own `Handling.LanternsAtWaist` hangs a lit lantern at the waist instead of the hand
- * (systems/playerTorch.js lanternAtWaist is the one question). Morrowind has no lantern on a belt either - its
- * carried lights ride Slot_CarriedLeft at the Shield Bone, which is MW-D51's torch - so every number here is the
- * port's own and says so:
- *
- *   the RECORD - pickLanternRecord, pickTorchRecord's own shape for a carriable light named lantern;
- *   the BONE   - `Bip01 Pelvis`, which the retail third-person skeleton carries (Weapon Sheathing's vendored
- *                xbase_anim_sh.nif copies its Bip01 chain: the pelvis at (0, 1.8, 76.4) in the actor's Z-up,
- *                +Y-forward, -X-left units - measured with this port's own buildSkeleton / poseSkeleton);
- *   the HOOK   - HIP_LANTERN_HOOK, off the pelvis in those same axes: the RIGHT hip, clear of the one-handed
- *                scabbard that hangs at the left (Bip01 LongBladeOneHand, (-10.8, 7.8, 86.5)) and of the thigh
- *                (Bip01 R Thigh at x 6.6), a little forward, at belt height (the scabbard's own 86.5);
- *   the HANG   - plumb from the hook, not the pelvis's rotation (mwFirstPerson.js hangAffine), times the swing
- *                law (systems/lanternSwing.js) stepped off the body's motion every frame it is drawn;
- *   the SIZE   - a belt lantern's (hipLanternSize, HT-WAIST-SIZE), whatever size the record's mesh was made at;
- *   the RIG    - the third-person body ALONE: the first-person arms have no hip to hang it on, and a lantern at
- *                the waist is exactly the light the arm does NOT hold.
- *
- * It is never hidden by the carried-left rule (a lantern at the waist is in no hand, so a two-hander, a bow or a
- * spell does not put it away) - only by not being lit.
- */
-export const HIP_LIGHT_BONE = 'Bip01 Pelvis';
-export const HIP_LIGHT_SLOT = 'hiplight';
-export const HIP_LANTERN_HOOK = Object.freeze([14, 5, 9.5]);
-/** The hang's rest attitude - and the portrait's: the figure stands still, so its lantern hangs straight down
- *  (the world frame writes the swing back into the hang before it next poses; the picture stays deterministic). */
-const PLUMB = Object.freeze([1, 0, 0, 0, 1, 0, 0, 0, 1]);
-export function hipLanternPartPaths({ hipLight = false, allLights, has = null }) {
-  if (!hipLight) return [];
-  const rec = pickLanternRecord(allLights, { has });
-  return rec ? [`meshes/${rec.model}`] : [];
-}
-export function resolveHipLanternPart({ hipLight = false, allLights, find, skeletonBytes, has = null, hasBone = null }) {
-  const notes = [];
-  const parts = [];
-  let hipInfo = null;
-  if (!hipLight) return { parts, hipInfo, notes };
-  const rec = pickLanternRecord(allLights, { has });
-  if (!rec) { notes.push('hiplight: your archives carry no carriable Morrowind lantern (a LIGH record named lantern, with its mesh)'); return { parts, hipInfo, notes }; }
-  const path = `meshes/${rec.model}`;
-  const arc = find(path);
-  if (!arc) { notes.push(`hiplight: ${path} (${rec.id}) is not in your archives`); return { parts, hipInfo, notes }; }
-  const carries = hasBone ? hasBone(HIP_LIGHT_BONE) : skeletonHasBone(skeletonBytes, HIP_LIGHT_BONE);
-  if (!carries) { notes.push(`hiplight: this skeleton has no "${HIP_LIGHT_BONE}" - nowhere to hang it`); return { parts, hipInfo, notes }; }
-  // The hang is the part's own: the swing writes `rot` each frame, the bind fills the hook and the anchor.
-  const hang = { rot: Float32Array.from(PLUMB), hookLocal: null, anchor: null };
-  parts.push({ slot: HIP_LIGHT_SLOT, bones: [HIP_LIGHT_BONE], bytes: nifBytes(arc, path), hang });
-  hipInfo = { id: rec.id, name: rec.name, model: rec.model, bone: HIP_LIGHT_BONE, fire: !!rec.fire };
-  return { parts, hipInfo, notes };
-}
 /**
  * HT-WAIST-SIZE:
  * THE SCALE A LANTERN'S MESH HANGS AT, from its own height (rig units, mwFirstPerson.js hangAnchor's) - a belt
@@ -1451,34 +1141,8 @@ export function fitThirdPersonCloak(arm, underSlots) {
   return { cloak, gear, follow, notes };
 }
 
-/** MW-D50: the archives' DIRECTORY - "is this path in any attached
- *  .bsa" - the one question pickWeaponRecord asks of them. Not
- *  findLoaded: that one throws for a path known but not yet read
- *  (MW-LOAD's guard), and a candidate's presence is asked BEFORE the
- *  preload that reads it. */
-export const archiveHas = (archives) => (p) => (archives ?? []).some((a) => a.has(p));
-
-/** MW-D50: said ONCE per reason, on the console, beside the card. A
- *  bow that resolves with ammunition in the pack and no arrow on it is
- *  a fault the player sees from the chair and could not name - the
- *  card's note is the same sentence, but the card is a menu away. */
-import { ammoCountFor } from '../systems/inventory.js';   // AUDIT 68 S27-ammoCount-dup: the ammunition count's one home, beside the spend law
 import { glowUnit } from '../render/weaponGlowGlsl.js';   // WEAPON-GLOW1: the glow's unit off the lens's rows - a leaf
 import { drawnPiece } from '../net/appearanceLaw.js';   // APPEARANCES: a worn piece's look - a leaf
-
-const saidArrow = new Set();
-function sayNoArrow(notes) {
-  const why = notes.filter((n) => n.startsWith('arrow')).join('; ') || 'no reason recorded';
-  if (saidArrow.has(why)) return;
-  saidArrow.add(why);
-  console.warn(`[mw] the bow carries no arrow - ${why}`);
-}
-
-/** TWO-HANDS: the node the LEFT hand's weapon hangs on - Morrowind's own, the bow's
- *  (WEAPON_ATTACH_BONE's MarksmanBow row). Rule 13 mirrors every part on a node whose name holds "Left" (attach.cpp's
- *  substring test - the bow is "the sword's own mesh with X negated", Morrowind-Rules.md section 8), so a sword hung
- *  here is the right hand's sword in the mirror, which is what a second hand holds. */
-export const OFF_WEAPON_BONE = weaponAttachBone(MW_WEAPON_TYPE.MarksmanBow);
 /**
  * TWO-HANDS AUDIT: THE PAIR'S GUARD ON THE BODY, sized as the sprite lane sizes it (handsLaw.js GUARD) - a share of the
  * arms' own picture, taken as the angle at the eye (FP_FIELD_OF_VIEW's height) and carried to the shoulder by the arm's
@@ -1645,122 +1309,7 @@ export function pairGuardDip(arm, cameraRef, mats = arm?.mats, drop = { L: GUARD
 }
 /** A weapon slot's note when the skeleton has no node to hang it on, and when a swap to it fails - the right hand's
  *  sentences, the left hand's too (TWO-HANDS: one sentence, two slots). */
-const noBoneNote = (slot, bone, what) => `${slot}: this skeleton has no "${bone}" bone to hang ${what} on`;
 const swapFailedNote = (slot, msg) => `${slot}: the swap to this weapon failed - ${msg}`;
-/**
- * TWO-HANDS: THE LEFT HAND'S WEAPON - the same record, the same mesh and the same door the right hand's takes
- * (resolveWeaponParts: the port's own models, Morrowind's records by type, material and shape), hung on the left hand's
- * node in a part of its own slot ('offweapon'). No arrow: a pair is two melee weapons (combat/twoHands/handsLaw.js DUAL_TYPES).
- * The node is asked of the skeleton AS ASSEMBLED (`hasBone`, as the holster asks - TWO-HANDS AUDIT): retail's carry no
- * Weapon Bone Left in their bytes, and the player's rigs are given one made by the mirror from their own Weapon Bone
- * (assembleFirstPersonArm's `offWeaponBone`, combat/twoHands/mirrorRig.js offWeaponBoneAddon). Without `hasBone` the bytes are
- * asked. A skeleton that has none even so draws no second weapon and says so - a sword hung anywhere else would hang
- * unmirrored, the wrong way round in the hand.
- */
-export function resolveOffWeaponParts({ weapon, allWeapons, find, skeletonBytes, has = null, hasBone = null }) {
-  if (!weapon) return { parts: [], info: null, notes: [] };
-  const r = resolveWeaponParts({ weapon, hasAmmo: false, allWeapons, find, skeletonBytes, has });
-  const main = r.parts.find((p) => p.slot === 'weapon');
-  const notes = r.notes.filter((n) => /^weapon[ :@]/.test(n)).map((n) => n.replace(/^weapon/, 'offweapon'));
-  if (!main) return { parts: [], info: null, notes };
-  const carries = hasBone ? hasBone(OFF_WEAPON_BONE) : skeletonHasBone(skeletonBytes, OFF_WEAPON_BONE);
-  if (!carries) {
-    return { parts: [], info: null, notes: [...notes, noBoneNote('offweapon', OFF_WEAPON_BONE, r.weaponInfo?.name ?? main.slot)] };
-  }
-  return { parts: [{ slot: 'offweapon', bones: [OFF_WEAPON_BONE], bytes: main.bytes }], info: { ...r.weaponInfo, bone: OFF_WEAPON_BONE }, notes };
-}
-
-export function resolveWeaponParts({ weapon, hasAmmo = false, allWeapons, find, skeletonBytes, has = null }) {
-  const notes = [];
-  const parts = [];
-  let weaponInfo = null;
-  let arrowInfo = null;
-  const mwType = dfWeaponToMw(weapon, WEAPONS);
-  if (mwType !== MW_WEAPON_TYPE.None) {
-    const rec = pickWeaponRecord(allWeapons, mwType, weapon ? materialName(weapon) : null, { has, shape: dfWeaponShape(weapon, WEAPONS) });   // MW-D38; MW-D50: a record the archives carry
-    if (!rec) {
-      notes.push(`weapon: your archives carry no unenchanted Morrowind weapon of type ${mwType}`);
-    } else {
-      const path = `meshes/${rec.model}`;
-      const arc = find(path);
-      if (!arc) notes.push(`weapon: ${path} (${rec.id}) is not in your archives`);
-      else {
-        // MW-D32: the TYPED bone only when the rig CARRIES it - the
-        // reference starts from sPartList's "Weapon Bone" and switches
-        // to the type's own mAttachBone only `if (found != nodeMap
-        // .end())` (npcanimation.cpp:787-795). A rig without "Weapon
-        // Bone Left" hangs the bow on "Weapon Bone" rather than
-        // dropping it.
-        const typed = weaponAttachBone(mwType);
-        const bone = typed === 'Weapon Bone' || skeletonHasBone(skeletonBytes, typed)
-          ? typed : 'Weapon Bone';
-        const weaponBytes = nifBytes(arc, path);
-        parts.push({ slot: 'weapon', bones: [bone], bytes: weaponBytes });
-        weaponInfo = { id: rec.id, name: rec.name, model: rec.model, type: mwType, bone,
-          // MW-D28: the record's own attack speed (character.cpp:1326).
-          speed: rec.speed || 1 };
-
-        // MW-D16 / RULE 24's ARROW. A drawn bow with no round on it is
-        // what the port has been drawing; the reference instances the
-        // AMMUNITION SLOT's model under getArrowBone() at the
-        // "shoot attach" key.
-        const ammoType = ammoTypeFor(mwType);
-        if (ammoType !== MW_WEAPON_TYPE.None && hasAmmo) {
-          const ammoRec = pickWeaponRecord(allWeapons, ammoType, null, { has });   // MW-D50
-          if (!ammoRec) {
-            notes.push(`arrow: your archives carry no unenchanted Morrowind ammunition of type ${ammoType}`);
-          } else {
-            const ammoPath = `meshes/${ammoRec.model}`;
-            const ammoArc = find(ammoPath);
-            if (!ammoArc) notes.push(`arrow: ${ammoPath} (${ammoRec.id}) is not in your archives`);
-            else {
-              // getArrowBone's two branches. The ACTOR's own bone
-              // first; failing that, a node named "ArrowBone" inside
-              // the WEAPON's mesh - which brings the weapon's whole
-              // transform chain, and its MIRROR, along with it.
-              const skelBone = arrowAttachBone(mwType);
-              const onActor = skelBone && skeletonHasBone(skeletonBytes, skelBone);
-              let pre = null;
-              let preClip = null;
-              let arrowBone = skelBone;
-              if (!onActor) {
-                const weaponNif = parseNifOnce(weaponBytes);
-                pre = nodeTransformOf(weaponNif, ARROW_FALLBACK_NODE);
-                arrowBone = pre ? bone : null;
-                // MW-BOW1: and the node MOVES - the bow's own clock carries the ArrowBone from the quiver to the
-                // string and back (formats/morrowind/mwPartClock.js). `pre` is its rest; the clock poses it each frame.
-                if (pre) preClip = { nif: weaponNif, node: ARROW_FALLBACK_NODE };
-              }
-              if (!arrowBone) {
-                notes.push(`arrow: neither this skeleton's "${skelBone}" bone nor an `
-                  + `"${ARROW_FALLBACK_NODE}" node in ${weaponInfo.model} - nowhere to put it`);
-              } else {
-                parts.push({
-                  // MW-D34: `ammo` marks the one part attachArrow
-                  // instances BARE - no BoneOffset of its own
-                  // (weaponanimation.cpp:87-93, getInstance direct).
-                  slot: 'arrow', bones: [arrowBone], bytes: nifBytes(ammoArc, ammoPath), preTransform: pre, preClip,
-                  ammo: true,
-                });
-                arrowInfo = {
-                  id: ammoRec.id, name: ammoRec.name, model: ammoRec.model, type: ammoType,
-                  bone: arrowBone, viaWeaponMesh: !onActor,
-                };
-              }
-            }
-          }
-        }
-      }
-    }
-  } else if (weapon) {
-    notes.push('weapon: Morrowind has no weapon type for what you are holding');
-  }
-  // MW-D50: ammunition in the pack, a weapon that takes it, and no
-  // arrow resolved - say so where the player can read it.
-  if (hasAmmo && weaponInfo && ammoTypeFor(mwType) !== MW_WEAPON_TYPE.None && !arrowInfo) sayNoArrow(notes);
-  return { mwType, parts, weaponInfo, arrowInfo, notes };
-}
-
 /** MW-BRIG2: THE BODY FILES A WORN MODEL SKINNED FROM THE BODY TAKES TO THE BINDER - the player's own third-person
  *  skin parts (`rows`, playerBodyRows) for the slots it is skinned from (`skinFrom`), SHADOWED OR NOT (the cuirass
  *  hides the very chest it copies; hidden is not drawn, and the skin is still the body's). Nothing for a retail add,
