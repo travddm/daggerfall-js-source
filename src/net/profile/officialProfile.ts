@@ -40,6 +40,8 @@ const PREFS = Object.freeze({
   repairPriceByDamage: false,
   cureKeepsInfection: false,
   clawMetal: false,
+  gentleEquipBill: false,
+  legendaryEquipFree: false,
   lockpickTumblers: false,
   dressForThePart: false,
   guildProbation: false,
