@@ -414,7 +414,7 @@ import {
   cloudIo, cloudList, pushSlot, pullSlot, removeCloudSlot, localSlot, cloudOnly,
   slotPath as clientSlotPath, slotKeyOf, CLOUD_REFUSALS, cloudRefusalText,
 } from '../../src/systems/cloudSaves.js';
-import { SESSION_KEY, REFUSALS } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY, REFUSALS } from '../../src/net/accountClient.js';
 import { SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX } from '../../src/systems/characterId.js';
 import { saveSlot, enumerateSaves, findSave, saveInfoOf } from '../../src/systems/save/saveSlots.js';
 import { cloudStateOf } from '../../src/ui/saveTile.js';
@@ -464,7 +464,7 @@ async function client() {
   const { env, call, linked } = await stand();
   const me = await linked('Nystul');
   const storage = fakeStorage();
-  storage.setItem(SESSION_KEY, JSON.stringify({ id: me.id, name: me.name, kind: 'linked', sessionId: me.sessionId, secret: me.secret }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ id: me.id, name: me.name, kind: 'linked', sessionId: me.sessionId, secret: me.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const io = cloudIo({ fetch: fetchOf(env), storage });
   return { env, call, me, storage, io };
 }
@@ -490,7 +490,7 @@ test('ACC2b: a whole slot goes up and comes back down, through the REAL service'
   // ...ONTO A DIFFERENT DEVICE, which is the case that matters: an
   // empty store, and the slot arrives whole.
   const other = fakeStorage();
-  other.setItem(SESSION_KEY, storage.getItem(SESSION_KEY));
+  other.setItem(SESSION_KEY, storage.getItem(SESSION_KEY)); other.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const down = await pullSlot(io, other, list.saves[0]);
   assert.equal(down.ok, true, down.error);
   assert.equal(other.getItem(SAVE_DATA_PREFIX + down.key), data, 'the save itself');
@@ -561,7 +561,7 @@ test('ACC2b: the card goes FIRST, the shot is optional, and the credential is on
   // A SLOT WITH NO SCREENSHOT IS STILL A BACKUP - the shot is skipped,
   // not faked, and the push still succeeds.
   const bare = fakeStorage();
-  bare.setItem(SESSION_KEY, storage.getItem(SESSION_KEY));
+  bare.setItem(SESSION_KEY, storage.getItem(SESSION_KEY)); bare.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(bare, 0, { saveName: 'no picture' });
   seen.length = 0;
   assert.equal((await pushSlot(cloudIo({ fetch: (u, i) => { seen.push({ url: u, init: i }); return fetchOf(env)(u, i); }, storage: bare }), bare, 0)).ok, true);
@@ -611,7 +611,7 @@ test('ACC2b: a guest, a dead credential and an offline service each fail the way
   const { env, guest } = await stand();
   const g = await guest();
   const gs = fakeStorage();
-  gs.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+  gs.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); gs.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(gs, 0);
   const gio = cloudIo({ fetch: fetchOf(env), storage: gs });
   const r = await pushSlot(gio, gs, 0);
@@ -622,7 +622,7 @@ test('ACC2b: a guest, a dead credential and an offline service each fail the way
   // A DEAD CREDENTIAL IS FORGOTTEN, and only that one: accountClient's
   // law, reached through this module.
   const dead = fakeStorage();
-  dead.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'not-a-session-secret-at-all' }));
+  dead.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'not-a-session-secret-at-all' })); dead.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(dead, 0);
   const dio = cloudIo({ fetch: fetchOf(env), storage: dead });
   assert.equal((await pushSlot(dio, dead, 0)).error, 'auth');
@@ -631,7 +631,7 @@ test('ACC2b: a guest, a dead credential and an offline service each fail the way
   // AND A NETWORK FAILURE IS A REFUSAL, NOT A THROW - ONCRASH1's law:
   // a throw out of a button handler ends more than the button.
   const off = fakeStorage();
-  off.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'y' }));
+  off.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'y' })); off.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(off, 0);
   const oio = cloudIo({ fetch: async () => { throw new Error('network down'); }, storage: off });
   assert.deepEqual(await cloudList(oio), { ok: false, error: 'offline' });
@@ -765,7 +765,7 @@ test('FIELD 2026-09-27: his round trip through the REAL service - PC backs up, t
 
   // 2. the Mac: an empty store, the backup is its own tile, Download
   const mac = fakeStorage();
-  mac.setItem(SESSION_KEY, pc.getItem(SESSION_KEY));
+  mac.setItem(SESSION_KEY, pc.getItem(SESSION_KEY)); mac.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const first = (await cloudList(io)).saves;
   assert.equal(cloudOnly(first, []).length, 1, 'a fresh install sees it as only in the backup');
   const onMac = await pullSlot(io, mac, first[0]);
@@ -872,7 +872,7 @@ test('FIELD 2026-09-27: what a restore never removes - the backup\'s own save, a
   const pc = fakeStorage();
   putLocal(pc, 0, { dateAndTime: { gameTime: 1000, realTime: 1 } });
   const tab = fakeStorage();
-  tab.setItem(SESSION_KEY, storage.getItem(SESSION_KEY));
+  tab.setItem(SESSION_KEY, storage.getItem(SESSION_KEY)); tab.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(tab, 0, { dateAndTime: { gameTime: 500, realTime: 7 } }, { data: blob(500) });
   assert.equal((await pushSlot(io, tab, 0)).ok, true);
   const stale = await pullSlot(io, pc, card, { replaces: stamp(0, 1000, 1) });

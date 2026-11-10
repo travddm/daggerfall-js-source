@@ -104,8 +104,8 @@ test('SEAT2b part two A CRAFT CARRIES ITS TOWN: the book keeps the town the stat
   await book.craft('longsword:mithril', { clean: true, seat: -4 }, () => {});
   assert.deepEqual(calls.map((a) => a[7]), [3021, null, null]);
   const posted = [];
-  const { accountProf } = await import('../../src/net/accountClient.js');
-  const prof = accountProf({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: () => JSON.stringify({ id: 'p1', secret: 's' }), setItem() {}, removeItem() {} } });
+  const { accountProf, SERVICE_KEY } = await import('../../src/net/accountClient.js');
+  const prof = accountProf({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : JSON.stringify({ id: 'p1', secret: 's' })), setItem() {}, removeItem() {} } });
   await prof.craft('c1', 'longsword:mithril', true, 'Hollin', 'rid-1', false, null, 3021);
   await prof.craft('c1', 'longsword:mithril', true, 'Hollin', 'rid-2');
   assert.deepEqual(posted.map(([p, b]) => [p, b.seat]), [['/v1/prof/craft', 3021], ['/v1/prof/craft', undefined]]);

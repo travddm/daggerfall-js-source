@@ -12,8 +12,7 @@ commit 2343305 (2026-09-14):
   `Internal_MagicItems.csv` (59), `Internal_Factions.csv` (366) - rows
   as DFU's StringTableCSVParser reads them, the BOM stripped.
 
-They are the English every translation is made from: the pipeline
-(`tools/translate.mjs`) drafts a language's table from them, and the
+They are the English every translation is made from, and the
 L10N3 pins hold the port's English constants to them key by key. The
 game itself never loads them - the English it shows is in the code.
 

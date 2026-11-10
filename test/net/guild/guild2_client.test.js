@@ -22,7 +22,7 @@ import {
   createSocialPanel, GUILD_RENAME_COST_TEXT, guildRenameSoonText, GUILD_VAULT_REACH_TEXT, GUILD_VAULT_EMPTY_TEXT, armsWhy, guildWordText, GUILD_LEDGER_WORDS,
 } from '../../../src/ui/socialPanel.js';
 import { SocialState } from '../../../src/net/social.js';
-import { REFUSALS, accountGuilds } from '../../../src/net/accountClient.js';
+import { REFUSALS, accountGuilds, SERVICE_KEY } from '../../../src/net/accountClient.js';
 
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const WOLF = { field: 'azure', border: 'gold', device: 'wolf' };
@@ -230,7 +230,7 @@ test('GUILD2 the client\'s door: the five routes and their bodies; every refusal
   const seen = [];
   const door = accountGuilds({
     fetch: async (u, i) => { seen.push([new URL(u).pathname, JSON.parse(i.body)]); return { ok: true, status: 200, json: async () => ({}) }; },
-    storage: { getItem: () => JSON.stringify({ id: 'a', secret: 's'.repeat(43) }), setItem() {}, removeItem() {} },
+    storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : JSON.stringify({ id: 'a', secret: 's'.repeat(43) })), setItem() {}, removeItem() {} },
   });
   await door.rename('rabc', 'The Open Hand', null);
   await door.vault('rabc');

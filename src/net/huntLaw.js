@@ -3,7 +3,7 @@
 // account service and kept in its ledger; the hunter's rank is read off a character's clears, and its rewards are
 // sideways - titles, a weekly named beast, a trophy, a little seat influence - never gear. Pure: no clock, no DOM.
 import { BOUNTY_TIERS, BOUNTY_FULL_PURSE, BOUNTY_LEVEL_MAX, bountyTierIndex, parseBountyId, bountyHash, MINUTES_PER_DAY } from '../systems/bounty/bountyBoard.js';
-import { sharedClassicMinutes, ONLINE_MINUTES_PER_MS, worldPixelOk } from './wire.js';   // SHIP AUDIT: a mark's town the world's pixel, as LAIR-WORLD's board notices
+import { sharedClassicMinutes, onlineMinutesPerMs, worldPixelOk } from './wire.js';   // SHIP AUDIT: a mark's town the world's pixel, as LAIR-WORLD's board notices
 import { seatWeekOf } from './townSeatLaw.js';
 import { PROFESSIONS } from './professionLaw.js';
 
@@ -29,14 +29,15 @@ export const huntMarksOpen = (clears) => huntRungOf(clears) >= HUNT_MARK_RUNG;
 
 // ─── WHAT THE SERVICE ACCEPTS ────────────────────────────────────────
 
-/** Game days the event clock turns in a UTC day - a day every two real hours (wire.js ONLINE_MINUTES_PER_MS). */
-export const GAME_DAYS_PER_UTC_DAY = Math.round((86_400_000 * ONLINE_MINUTES_PER_MS) / MINUTES_PER_DAY);
+/** Game days the event clock turns in a UTC day: twelve at DFU's TimeScale, a day every two real hours (the server
+ *  profile's time.worldScale sets it, wire.js onlineMinutesPerMs). */
+export const gameDaysPerUtcDay = () => Math.round((86_400_000 * onlineMinutesPerMs()) / MINUTES_PER_DAY);
 /** An account's clears a UTC day, every character's together. AUDIT HORIZONTAL F3: MEASURED, not four held a game day - a
  *  hunter clears, takes four more at the next of 410 boards, by horse or carriage. tools/huntPace.mjs walks the game's
  *  map at the fastest legal ride, no time fighting: its best of fourteen UTC days was 706, rounded up to the next fifty. */
 export const HUNT_CLEARS_DAY_MAX = 750;
 /** A clear reported later than this many game days after its notice was posted is refused (a real day's). */
-export const HUNT_CLEAR_LATE_DAYS = GAME_DAYS_PER_UTC_DAY;
+export const huntClearLateDays = () => gameDaysPerUtcDay();
 /** The event clock's game day at a wall instant - the day a board posts on online. */
 export const huntGameDayAt = (nowMs) => Math.floor(sharedClassicMinutes(nowMs) / MINUTES_PER_DAY);
 /** The week a named mark runs in: the seats' week, turned at the Turning. */
@@ -67,7 +68,7 @@ export function huntClearOf(id, nowMs) {
   const b = parseBountyId(id);
   if (b) {
     const today = huntGameDayAt(nowMs);
-    if (b.day < today - HUNT_CLEAR_LATE_DAYS) return { why: 'late' };
+    if (b.day < today - huntClearLateDays()) return { why: 'late' };
     if (b.day > today + 1) return { why: 'early' };
     return { kind: 'board', id: String(id), key: b.slotKey, level: b.level, tier: bountyTierIndex(b.level) };
   }

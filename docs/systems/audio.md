@@ -39,8 +39,8 @@ idempotent and memoises its boot promise.
   caches by index (`_buffer`). `registerSamples(key, samples, rate)` registers a buffer the game made itself under a
   string key; every play door then accepts that key as a clip.
 - **Doors.** `playOneShot(index, volume, pitch)` (flat, at the ear), `play3d` / `play3dVoice` (positional), `loop`,
-  `setLoop`, named beds (`setBed`, `setBed3d`, `fadeFar`), and `source()` (an `AudioSource`-shaped object for ported mod code).
-  `playOneShotId` resolves a Daggerfall sound id to an index first.
+  `setLoop`, named beds (`setBed`, `setBed3d`, `fadeFar`), and `source()` (an `AudioSource`-shaped object for ported
+  mod code). `playOneShotId` resolves a Daggerfall sound id to an index first.
 - **Handedness.** The scene uses Daggerfall Unity's left-handed frame; Web Audio is right-handed. `audioFrame` negates
   z once for the listener and every source. Callers always pass scene coordinates.
 - **Panning.** `PANNING_MODEL` is `'HRTF'`. `_panner` takes Unity-style `refDistance`, `maxDistance`,
@@ -97,8 +97,8 @@ bank behind `voiceSpec` / `percussionSpec`. Channel 9 is percussion.
 `src/systems/song/songManager.js` carries Daggerfall Unity's `SongManager` playlists verbatim, in the archive's
 spelling (`GDAY___D.HMI`), duplicates included because they change the odds. `SongManager.update(context)` picks a
 playlist from the environment (`musicEnvironment`, `MUSIC_ENV`): dungeon, wilderness or city by weather and night,
-temples by alignment, taverns, shops, guilds, palaces, castles. `selectSong` uses the game's seeded `DFRandom`; a dungeon seeds it with `dungeonKey` (from the dungeon block's
-`Unknown2` field and the region).
+temples by alignment, taverns, shops, guilds, palaces, castles. `selectSong` uses the game's seeded `DFRandom`; a
+dungeon seeds it with `dungeonKey` (from the dungeon block's `Unknown2` field and the region).
 
 Each host builds one director with `createMusicDirector()` (`src/scenes/shared.js`) and calls `update(base, overlay)`
 every frame. It reads `Audio/AlternateMusic` (the FM playlists) once at construction, as Daggerfall Unity does, so a
@@ -109,17 +109,18 @@ the sea's songs (`src/systems/soundscape/seaScore.js`), boss and arena scores. T
 The intro film and both main menus play Daggerfall Unity's title song, `5STRONG.HMI` (`song_5strong`, the setup
 wizard's `titleSongFile` in `DaggerfallUnitySetupGameWizard.cs`), with `03.HMI` as a stand-in for an archive without
 it (`src/systems/titleMusic.js` `TITLE_SONGS`). Daggerfall's own `MIDI.BSA` has no `5STRONG` record (Daggerfall
-Unity ships that song as a `.mid` file of its own), so with Daggerfall's data `03.HMI` plays. The front door does not ask for ARENA2, so on a first visit the intro
-plays silently. The film runs on the shared AudioContext's clock, not the song's: its cue sheet
-(`src/ui/intro/introCue.js`) has no beat in the title song to land on. The song plays at a lower level under the
-Enhanced menu (`MENU_MUSIC_LEVEL`) and fades out when a game is chosen. Daggerfall Unity plays it at one level.
+Unity ships that song as a `.mid` file of its own), so with Daggerfall's data `03.HMI` plays. The front door does not
+ask for ARENA2, so on a first visit the intro plays silently. The film runs on the shared AudioContext's clock, not
+the song's: its cue sheet (`src/ui/intro/introCue.js`) has no beat in the title song to land on. The song plays at a
+lower level under the Enhanced menu (`MENU_MUSIC_LEVEL`) and fades out when a game is chosen. Daggerfall Unity plays
+it at one level.
 
 ### The music service (`src/systems/music.js`)
 
 `music` (`MusicService`) owns one player on the engine's context. A switch fades: the old song fades out over
 `MUSIC_FADE_OUT_S` (1.5 s), then the next fades in over `MUSIC_FADE_IN_S` (1 s). Daggerfall Unity cuts instead; this
-is a deliberate departure. The latest request during a fade wins, and `playing` stays true through the fade so the
-director does not see a finished song.
+is a deliberate departure with no option yet. Under decision 49 DFU's cut must be selectable. The latest request
+during a fade wins, and `playing` stays true through the fade so the director does not see a finished song.
 
 - **Music packs.** `src/systems/musicReplacement.js` follows Daggerfall Unity's `SoundReplacement.TryImportSong`:
   when `Enhancements/AssetInjection` is on and the player has attached a folder, a file named after the song replaces
@@ -132,19 +133,21 @@ director does not see a finished song.
 
 - **Scene ambience** (`src/systems/ambientEffects.js`): Daggerfall Unity's `AmbientEffectsPlayer` presets. Dungeon
   one-shots around the player, rain loop, storm thunder, sunny-day birds, night crickets. The crickets play less often
-  than in Daggerfall Unity (a deliberate departure).
+  than in Daggerfall Unity (a deliberate departure). `nightCrickets` silences them but cannot restore DFU's loop;
+  under decision 49 DFU's behaviour must be selectable.
 - **Animal flats** (`src/systems/animalAmbience.js`): every archive-201 animal flat within range rolls each classic
   tick and barks, in dungeons and towns alike. Horses follow Horse Volume, the others Animal Volume.
 - **Better Ambience** (`src/systems/betterAmbience.js`): the mod by Joshua Steinhauer (joshcamas), MIT, sources and
   clips in `vendor/better-ambience/`. Ported: dungeon reverb, camera shake on damage, dungeon fog and light, the
-  indoor rain loop. Its footsteps ship off (see below).
+  indoor rain loop. Its footsteps ship off (see below). The port leaves core with the mod (decisions 77 and 99).
 - **Wind** (`src/systems/wind/windAudio.js`): one filtered-noise loop that follows wind strength, silent indoors.
 - **Soundscape** (`src/scenes/soundscapeHost.js` drives `src/systems/soundscape/`): over a ship's deck, swell, wash
   and rigging beds (`seaAir.js`) and the sea's songs at the helm (`seaScore.js`); on land, surf near a shore, the
   wild by climate and hour, and a town's murmur and taverns (`worldAir.js`). Beds are seeded noise made off the main
   thread (`soundJobs.js`, `soundWorker.js`, `soundBeds.js`, `townBeds.js`); recorded clips are `public/sfx/*.wav`,
   with provenance in `public/sfx/SOURCES.md` (`soundscapeSfx.js`, loaded by `clipInstall.js`). The host's `stop`
-  silences it indoors.
+  silences it indoors. The sea half (`seaAir.js`, `seaScore.js`) is naval content and leaves core with it (decision
+  102).
 
 ## Footsteps
 
@@ -154,7 +157,7 @@ director does not see a finished song.
 - `src/systems/immersiveFootsteps.js` ports Immersive Footsteps 1.01 by Kirk.O (MIT, `vendor/immersive-footsteps/`):
   terrain- and floor-aware steps plus armour sway, at a fixed 0.02 s step. While it is on and its clips have loaded,
   `ownsStride()` answers true and the hosts skip the classic stride. The hosts call its `onTransition*` handlers on
-  every scene change.
+  every scene change. The port leaves core with the mod (decisions 77 and 99).
 - Better Ambience's "Better Footsteps" ships **off**, as Immersive Footsteps' author asks. Turning both on shows the
   mod's warning (`reportModCompatibilityIssues`).
 
@@ -171,8 +174,8 @@ monster's own sounds, not a weapon's impact.
 `src/systems/enhancedSounds.js` `enhancedSoundsOn()` gates every sound Daggerfall does not have: the wind, the
 enhanced inventory's clicks, climbing, horse voices and hooves, gathering, and the soundscape. It is true only on the
 enhanced skin with uiPrefs `soundEnhancements` on (Features row `enhanced-sounds`). The classic skin plays exactly what
-Daggerfall Unity plays. The pref name avoids the `enhanced` prefix on purpose: online play forces every `enhanced*`
-pref on, and sound stays the player's choice.
+Daggerfall Unity plays. The row is `online: 'player'`: online, the server profile pins room prefs (`pins.prefs` in
+`src/net/profile/officialProfile.ts`), and this pref is not among them, so sound stays the player's choice.
 
 Loose sound replacement (`src/systems/soundReplacer.js`) lets a player attach a mod's `Sound` folder; listed clips
 (the crickets and the distant howl) are then replaced. uiPrefs `nightCrickets` and `distantHowl` silence each.

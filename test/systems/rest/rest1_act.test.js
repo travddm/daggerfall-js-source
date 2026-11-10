@@ -3,6 +3,7 @@
 // bag: the timed rest's own session, eight hours, run in one call, so every sub-tick system sees what an eight-hour rest
 // gave it. A second rest inside the night interval (two hours of the character's clock) is a short rest: it heals, and
 // nothing passes. Offline the window is DFU's, byte for byte.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -105,7 +106,8 @@ test('REST1 the night breaks as a rest breaks: a foe in reach at the third hour 
   assert.equal(rent.hours, 5);
 });
 
-test('REST1 createRestDeps composes the act online: the plan names the point and whether a night is due; a night moves the character\'s clock eight hours, stamps it and ends full; the next rest inside the interval is a short rest that heals and moves nothing; offline there is no act', async () => {
+test('REST1 createRestDeps composes the act online: the plan names the point and whether a night is due; a night moves the character\'s clock eight hours, stamps it and ends full; the next rest inside the interval is a short rest that heals and moves nothing; offline there is no act', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const { createRestDeps } = await import('../../../src/scenes/shared.js');
   setSharedClock(() => 5_000_000);
   setOwnMinutes(400_000);
@@ -254,4 +256,13 @@ test('REST1 the Next night tile: a buff while the night interval runs, its real 
   assert.equal(t.name, REST_ACT_TEXT.rested, 'the act\'s own word for it');
   assert.deepEqual(statusTiles({ rested: { minutes: 0 } }), []);
   assert.deepEqual(statusTiles({ rested: null }), []);
+});
+
+test("ONLINE REST, DFU's window by default (DaggerfallRestWindow.cs): with the shared clock on and no rest act in the server profile, the window opens on no act - hours or loiter wherever CanRest allows - and a lit candle still kneels", async () => {
+  const { createRestDeps } = await import('../../../src/scenes/shared.js');
+  setSharedClock(() => 5_000_000);
+  setOwnMinutes(400_000);
+  const e = { health: 5, maxHealth: 60, fatigue: 0, magicka: 0, maxMagicka: 30, stats: { endurance: 50, strength: 50, willpower: 50, agility: 50 }, skills: [], career: {}, activeEffects: [] };
+  const deps = createRestDeps(e, { restPoint: () => ({ kind: 'camp', where: 'fire' }), restKind: () => 'camp', advanceMinutes: (n) => advanceOwnMinutes(n), endLines: () => null });
+  assert.equal(deps.restAct(), null, 'no act, even at a fire: the window is DFU\'s');
 });

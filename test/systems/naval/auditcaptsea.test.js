@@ -452,6 +452,9 @@ test('AUDIT CAPTAIN\'S SEA G2/P7: THE SWITCH SPLIT - the sea stands in every gam
   const { setPref, _resetForTests } = await import('../../../src/systems/uiPrefs.js');
   _resetForTests();
   setPref('uiSkin', 'classic');
+  assert.equal(etherSeaOn('?skin=classic'), false, 'the Features row `eltheric-sea` is off by default: no sea offline');
+  assert.equal(etherSeaOn('?online=1'), true, '...and forced on online');
+  setPref('etherSea', true);
   assert.equal(etherSeaOn('?skin=classic'), true, 'the classic skin: the sea stands');
   assert.equal(etherCrossOutOn('?skin=classic'), false, '...and its captain is never asked out');
   assert.equal(etherSeaOn('?ether=off'), false); assert.equal(etherCrossOutOn('?ether=off&online=1'), false);

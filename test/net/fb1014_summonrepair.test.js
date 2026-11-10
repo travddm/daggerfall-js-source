@@ -14,7 +14,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
 import { seatRealm } from '../realmSeat.mjs';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { realmIo, createRealmSession, openRealmBoot } from '../../src/systems/realmSaves.js';
 import { realmLetterOfCredit } from '../../src/net/realm/realmGoldLaw.js';
 import { FACTION_FLAGS } from '../../src/formats/factionFile.js';
@@ -31,7 +31,7 @@ const stuck = () => ({
 
 /** A device's storage - the session (SESSION_KEY) and whatever the realm's rescue copy writes. */
 function deviceOf(who) {
-  const m = new Map([[SESSION_KEY, JSON.stringify({ secret: who.secret, id: who.id })]]);
+  const m = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: who.secret, id: who.id })]]);
   return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: (k) => { m.delete(k); }, _map: m };
 }
 

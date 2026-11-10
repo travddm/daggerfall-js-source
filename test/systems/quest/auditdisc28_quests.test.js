@@ -245,7 +245,7 @@ test('AUDIT DISC28 QS-2: the live-sync watch runs above the modal gate - one cal
   const modal = W.indexOf('    if (modes.frame(dt, now)) {', frameAt);
   const calls = [...W.matchAll(/^\s*questSyncTick\(\);/gm)].map((x) => x.index);
   assert.equal(calls.length, 1, 'one call');
-  assert.ok(calls[0] > W.indexOf('    tickAmbientText();', frameAt) && calls[0] < modal, 'above the modal return, beside the ambient text');
+  assert.ok(calls[0] > W.indexOf('    yards?.frame({ dt, cam', frameAt) && calls[0] < modal, 'above the modal return, after the yards');
   assert.ok(W.indexOf('    if (_mode() !== _torchesMode)', frameAt) < modal && W.indexOf('    if (_mode() !== _torchesMode)', frameAt) > calls[0], 'the torch sweep stays adjacent to the gate (AUDIT 66 F11)');
 });
 

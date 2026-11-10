@@ -37,6 +37,7 @@
 // (IsBlending -> an 8%-per-classic-update see-through roll).
 
 import { GLOBAL_SCALE } from '../../world/meshReader.js';
+import { playerHalfOfStealthCheck, peerHalfOfStealthCheck, meetPeer, stealthBandHolds } from './stealth-check.ts';   // StealthCheck's player half, for a peer too
 import { dice100 } from '../../combat/formulas.js';   // PT1: Dice100 has ONE home and this file had written it out twice
 import { CLASSIC_UPDATE_INTERVAL } from '../weaponStates.js';   // single source (GameManager.cs:42)
 import { CAPSULE_HEIGHT, CAPSULE_RADIUS, DF_WALK_BASE } from '../../player/motor.js';           // single source
@@ -774,9 +775,9 @@ export class EnemyAI {
    *  player-encounter edge or the pacification roll it feeds. */
   _encounterEdge() {
     // AUDIT WORLD3 C4: a PEER is not my first meeting either - justEncountered's one consumer resolves the whole
-    // language check with the LOCAL player (its skill, its sheathed hand, its HUD line, its tally) and can stand the
-    // foe down on the host's roll for a foe that has only ever seen the joiner.
-    if (this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || this._targetCandidate.isPeer === true)) return;
+    // language check with the LOCAL player. The peer's meeting is recorded for it (meetPeer), and the peer rolls its
+    // own check on its own client (peer-senses.ts).
+    if (this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || meetPeer(this, this._targetCandidate))) return;
     if (!this.hasEncounteredPlayer) { this.hasEncounteredPlayer = true; this.justEncountered = true; }
   }
 
@@ -892,7 +893,7 @@ export class EnemyAI {
    *  scene's senses context, like PlayerEntity.TimeOfLastStealthCheck). */
   _stealthCheck(senses) {
     if (senses.insideDungeonCastle && !this.isHostile) return false;   // :619-621, the FIRST statement
-    if (!this.wouldBeSpawned) return false;
+    if (!stealthBandHolds(this, wouldBeSpawnedInClassic)) return false;   // stealth-check.ts: the band of the player checked
     if (this._dist > STEALTH_MAX_DISTANCE) return false;
     const gameMinutes = senses.gameMinutes ?? 0;
     if (gameMinutes === this._lastStealthMinute) return this.detected;
@@ -902,20 +903,11 @@ export class EnemyAI {
     // foe target (armed pools) rolls on its own live Stealth below.
     // AUDIT WORLD3 C5: a PEER takes neither half of the LOCAL player's stealth - not the half-speed minute skip, not
     // the encountered auto-detect, and above all not the TALLY (a foe hunting the joiner advanced the host's Stealth)
-    // and not senses.playerStealth against a distance measured to the joiner. Its own skill is a later slice's wire
-    // field; until then the candidate answers 0, the same fallback the foe arm below already takes.
+    // and not senses.playerStealth against a distance measured to the joiner. A peer takes its own half off its pose,
+    // and its Stealth rides the pose (`sk`), answered through its candidate's stealthOf (peer-senses.ts).
     const foeTarget = this._armedTargeting && this._targetCandidate && (!this._targetCandidate.isPlayer || this._targetCandidate.isPeer === true);
-    if (!foeTarget) {
-      if (senses.movingLessThanHalfSpeed) {
-        if ((gameMinutes & 1) === 1) return this.detected;
-      } else if (this.hasEncounteredPlayer) {
-        return true;
-      }
-      if (senses.sharedStealth && senses.sharedStealth.minute !== gameMinutes) {
-        senses.tallyStealth?.();
-        senses.sharedStealth.minute = gameMinutes;
-      }
-    }
+    const half = !foeTarget ? playerHalfOfStealthCheck(this, senses, gameMinutes) : this._targetCandidate.isPeer === true ? peerHalfOfStealthCheck(this, this._targetCandidate, gameMinutes) : undefined;   // stealth-check.ts
+    if (half !== undefined) return half;
     this._lastStealthMinute = gameMinutes;
     // CalculateStealthChance(distanceToTarget, target) reads the
     // TARGET's live Stealth (:654): the foe entity's uniform skill
@@ -2238,7 +2230,7 @@ export class EnemyAI {
    *  (and held the encounter cap), `inSight` kept its melee deciding, either one or `wouldBeSpawned` refused the
    *  player's rest (areEnemiesNearby). The first step after the hold senses afresh. */
   holdFrame() {
-    this.inSight = false; this.detected = false; this.wouldBeSpawned = false;
+    this.inSight = false; this.detected = false; this.wouldBeSpawned = false; this.peerSpawned = null;
   }
 
   /** AUDIT 68 S20-offset-ai-memory: the floating-origin recenter moves every WORLD position the motor holds, not the

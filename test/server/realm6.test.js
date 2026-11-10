@@ -11,7 +11,7 @@ import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { decorGoldDelta } from '../../server-account/src/decor.js';
-import { SESSION_KEY, accountHomes, accountDecor } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY, accountHomes, accountDecor } from '../../src/net/accountClient.js';
 import { HOME_SALE_SHARE, homeSaleRefund, HOME_PRICE_MIN } from '../../src/net/homeLaw.js';
 import { DECOR_STATION_FEES, decorRescale, decorRefund } from '../../src/net/decorLaw.js';
 import { DEED_SELL_MULT } from '../../src/systems/banking.js';
@@ -75,7 +75,7 @@ async function stand() {
     }), env);
     assert.equal(reg.status, 200);
     const storage = fakeStorage();
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const door = { before: null };
     const fetch = async (url, init) => { if (door.before) await door.before(String(url)); return worker.fetch(new Request(url, init), env); };
     const io = realmIo({ fetch, storage });

@@ -20,7 +20,7 @@ import * as acorn from 'acorn';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { REALM_MAX_BYTES } from '../../server-account/src/realm.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   realmIo, realmCreate, realmPut, realmFetch, realmLeave, realmDelete, realmList, openRealmBoot, createRealmSession,
   readUnsent, keepUnsent, forgetUnsent, claimUnsent, sweepUnsent, realmSaveWithHeld, packUnsent, unpackUnsent,
@@ -81,7 +81,7 @@ async function account() {
   const env = { DB: d1(), SAVES: r2(), ACCOUNT_VERSION: 'test1' };
   const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
   const device = (storage = fakeStorage()) => {
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     let open = () => {};
     const gate = new Promise((r) => { open = r; });
     const door = { plan: [], puts: 0, open: () => open() };

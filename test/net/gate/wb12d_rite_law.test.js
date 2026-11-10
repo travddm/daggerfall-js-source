@@ -12,7 +12,6 @@ import {
 } from '../../../src/net/gate/gateRite.js';
 import { gateSpotLocal, gateYaw, gateTimes, PIXEL_M, isGateDay, GATE_COLLAPSE_MS } from '../../../src/net/gate/gateLaw.js';
 import { PIXEL_UNITS, mapPixelOfWire, validRiteIn, validRiteOut, parseClient, RITE_BY_MAX, sanitizeName } from '../../../src/net/wire.js';
-import { ritePost } from '../../../src/net/gate/gateHerald.js';
 import { RECEIPT_EARNED, receiptValid, mintReceipt, readReceipt, importReceiptKey } from '../../../src/net/gate/gateReceipt.js';
 import { importPublicKeyB64 } from '../../../src/net/identityToken.js';
 import { createGuest, claimGate, gateRecordOf, insigniaPurse, buyInsignia } from '../../../server-account/src/accounts.js';
@@ -211,7 +210,7 @@ test('AUDIT WB12d (lens T F7) the Broker\'s sale spends the purse the card shows
   assert.equal(sale.purse, 0);
 });
 
-test('AUDIT WB12d (lens T F14, F21, F22): the law\'s numbers are the bible\'s - a word believed from 60 m of the circle and no further, the faithful each their own career; the wire\'s edges - the map\'s last column and row a place, a day and an instant the hub\'s word must carry, its names made safe; the channel\'s names stripped of what Discord would read (mutants: the reach strict; the reach doubled; one career a day; the last column refused; the day unchecked; an instant of 0; the names raw; the post\'s names raw)', () => {
+test('AUDIT WB12d (lens T F14, F21, F22): the law\'s numbers are the bible\'s - a word believed from 60 m of the circle and no further, the faithful each their own career; the wire\'s edges - the map\'s last column and row a place, a day and an instant the hub\'s word must carry, its names made safe (mutants: the reach strict; the reach doubled; one career a day; the last column refused; the day unchecked; an instant of 0; the names raw)', () => {
   let edge = null;
   for (const d of DAYS) {
     const [x, z] = riteNativeOf(d, 300, 200);
@@ -232,6 +231,4 @@ test('AUDIT WB12d (lens T F14, F21, F22): the law\'s numbers are the bible\'s - 
   const raw = 'Ann\u0007\u00e9  ';
   assert.notEqual(sanitizeName(raw), raw);
   assert.deepEqual(validRiteOut({ ...out, by: [raw] }).by, [sanitizeName(raw)], 'its names made safe');
-  const post = ritePost({ place: 'Copperham', by: ['**Ann**', '<@&123>Bran'], n: 2 });
-  assert.equal(post.embeds[0].fields.find((f) => f.name === 'Broken by').value, 'Ann and 123Bran', 'no markdown, no mention');   // HERALD-CARDS: the card's field
 });

@@ -26,7 +26,7 @@
 import {
   starfallRuns, starInWindow, starNightAt, starTimes, starStreakBearing, starCircleSize, STAR_WORD_MS, STAR_ORPHAN_MS,
   STAR_CIRCLE_AT, STAR_LOW_LIGHT, STAR_LIGHT, starLostAt, P_WAVE, P_BREATH, P_MASTER, P_HELD, P_LOST, STAR_LOST_DARK,
-  STAR_LIFE_MS, STAR_AFTER_MS, STAR_WAVE_MAX, STAR_ACCOUNTS_MAX, STAR_BLOWS_WIRE_MAX, STAR_FOE_HEALTH,
+  starLifeMs, STAR_AFTER_MS, STAR_WAVE_MAX, STAR_ACCOUNTS_MAX, STAR_BLOWS_WIRE_MAX, STAR_FOE_HEALTH,
 } from '../../net/starfall/starfallLaw.js';
 import { worldRoom } from '../../net/wire.js';
 import { storedSession } from '../../net/accountClient.js';
@@ -120,7 +120,7 @@ export const STAR_LIVE_MAX = STAR_WAVE_MAX + 1 + STAR_CIRCLE_AT.length * starCir
  * star standing finds none (the night's sites keep only a star landed inside it). The client's alone - the relay never
  * asks it, so the relay's law (net/starfall/starfallLaw.js) and its bundle's bytes stay as they are. Pure.
  */
-export const starfallStands = (/** @type {number} */ nowMs) => starfallRuns(nowMs) || starfallRuns(nowMs - STAR_LIFE_MS - STAR_AFTER_MS);
+export const starfallStands = (/** @type {number} */ nowMs) => starfallRuns(nowMs) || starfallRuns(nowMs - starLifeMs() - STAR_AFTER_MS);
 
 const NONE = Object.freeze([]);
 const DOWN = [0, -1, 0];

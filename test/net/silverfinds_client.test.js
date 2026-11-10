@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 
 import { setSilverFinder, silverFinderSet, silverFindAt, SILVER_FINDS_KEPT, _resetSilverFindsForTests } from '../../src/systems/silverFinds.js';
 import { findChanceOf, MARKS_FAUCETS, MARKS_RID_RE } from '../../src/net/marksLaw.js';
-import { accountMarks, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountMarks, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { createMarksBook, MARKS_TEXT, MARKS_TRIES, FIND_WORDS, FINDS_OWED_MAX } from '../../src/net/marksBook.js';
 import { findHaul, harvestHauls, haulWords, FIND_SOURCE, FIND_BAR_TEXT, COMBAT_BAR_TEXT, claimHauls } from '../../src/ui/haulCards.js';
 import { openCorpseLoot, ARROW_TEMPLATE_INDEX } from '../../src/scenes/corpseMarker.js';
@@ -73,7 +73,7 @@ test('SILVER-FINDS the roll\'s memory: a key string is remembered beside an obje
 test('SILVER-FINDS the door: a find posts its kind and its request id to /v1/marks/find behind the session; `bad-find` has its sentence (mutants: the route; the body)', async () => {
   const sent = [];
   const fetch = async (url, init) => { sent.push([new URL(url).pathname, JSON.parse(init.body), init.headers.authorization]); return new Response(JSON.stringify({ ok: true }), { status: 200 }); };
-  const door = accountMarks({ fetch, storage: { getItem: (k) => (k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } });
+  const door = accountMarks({ fetch, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } });
   await door.find('corpse', 'r-00000001');
   assert.deepEqual(sent, [['/v1/marks/find', { kind: 'corpse', rid: 'r-00000001' }, 'Bearer sek']]);
   assert.equal(REFUSALS['bad-find'], 'That find could not be read.');

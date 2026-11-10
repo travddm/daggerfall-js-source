@@ -469,7 +469,7 @@ export class PlayerWeapon {
    * Balance-Arc.md section 12): BAL6 had the claws strike as silver; the
    * owner reverted it - the bare hand, ungated, DFU's. BAL6-GAUNTLETS: the
    * plate gauntlets the beast wears add their metal's damage to it, a port
-   * departure (combat/clawMetal.js, read by both cores).
+   * departure behind an option, off by default (combat/clawMetal.js).
    */
   get strikingWeapon() {
     if (!this.weapon?.werecreatureClaws) return this.weapon;

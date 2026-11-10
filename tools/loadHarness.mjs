@@ -165,7 +165,7 @@ export function parseArgs(argv) {
 // ═══ ONLY ITS OWN TWO ADDRESSES ════════════════════════════════════════════════════════════════════════════════════
 
 /** The account service's address as the bots' storage names it. The client accepts only an https base
- *  (accountClient.js serviceBase) and falls back to the PRODUCTION service for anything else - so the bots are given
+ *  (account-service-address.ts isServiceUrl) and knows no service for anything else - so the bots are given
  *  this one, which resolves nowhere, and `localFetch` maps it to the local Worker. */
 export const LOAD_SERVICE = 'https://accounts.load.invalid';
 

@@ -195,7 +195,8 @@ test('TELL4: the first blow on an overreached foe STAGGERS it - its weight\'s le
   assert.ok(overreachOpen(g.ai));
 });
 
-test('TELL4: an overreached foe takes 30% more from every blow - the registry the formulas\' tail and a spell\'s landing read (mutants: the fold unregistered)', () => {
+test('TELL4: an overreached foe takes 30% more from every blow - the registry the formulas\' tail and a spell\'s landing read (mutants: the fold unregistered)', (tc) => {
+  setPref('openingDamage', true); tc.after(() => setPref('openingDamage', false));   // the extra damage on an opening: the Features row, off by default
   assert.ok(blowTakenNames().includes('tell-overreach'));
   T = 4;
   assert.equal(blowTakenScale(null, { overreachUntil: 5 }), 1.3);

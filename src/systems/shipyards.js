@@ -22,7 +22,8 @@
 // counter's one law (shopStock.js calculateCost, tradeModes.js getTradePrice - Mercantile and Personality, live). A ship
 // SOLD BACK fetches the counter's sale price on her WORTH: what she was bought for (a claimed prize her papers' quarter -
 // SHIP-CLAIM), half what her refits cost in gold (REFIT_RESALE), and her hull's state (a wreck SALE_FLOOR of it). Online a
-// sale is capped at half the least ask, as at every counter (calculateTradePrice), so no buy and sell back pays.
+// sale fetches at most what the yard asks that seller for her (shipSalePrice), and with the server profile's sale cap at
+// most half the least ask, as at every counter (calculateTradePrice), so no buy and sell back pays.
 //
 // WHAT IT TAKES BACK (`saleRefusal`): a ship of the player's that is HERE - made fast or lying at this port, laid up (her
 // title in the book), or packed (her parts in the pack) - with nothing in her hold, nobody of hers ashore at the
@@ -40,6 +41,7 @@ import { mintDeed, mintParts, BOAT_PARTS_TEMPLATE, BOAT_DEED_TEMPLATE } from './
 import { YARD_QUALITY, YARD_PRICE_INDEX } from './merchantYards.js';
 import { calculateCost } from './shopStock.js';
 import { getTradePrice } from './tradeModes.js';
+import { isOnlinePage } from './online/onlineLane.js';
 import { upgradeCost, UPGRADE_LINES, UPGRADE_TIERS } from './fleet.js';
 import { hullBuild, batteriesOf } from './naval/navalShips.js';
 import { playerCrewCount } from './naval/crewLife.js';
@@ -112,11 +114,14 @@ export function shipBuyPrice(value, skills) {
   const pieces = 1;   // a ship is one piece (FB0929's floor: a gold a piece)
   return getTradePrice('Buy', calculateCost(Math.max(0, value), SHIPYARD_QUALITY, SHIPYARD_PRICE_INDEX), SHIPYARD_QUALITY, skills, pieces);
 }
-/** What the shipyard pays for a ship of `worth` (shipWorth's) - the counter's selling law (online, half the least ask
- *  at most). Pure. */
-export function shipSalePrice(worth, skills) {
+/** What the shipyard pays for a ship of `worth` (shipWorth's) - the counter's selling law. Online it is never more than
+ *  the yard asks the same seller for her: a ship's worth is her hull's value, not the gold paid, so the counter-paid
+ *  mark that holds every other piece to its price does not reach her, and DFU's haggle pays a skilled seller more
+ *  than it asks. Pure. */
+export function shipSalePrice(worth, skills, { online = isOnlinePage() } = {}) {
   const pieces = 1;
-  return Math.max(0, getTradePrice('Sell', calculateCost(Math.max(0, worth), SHIPYARD_QUALITY, SHIPYARD_PRICE_INDEX), SHIPYARD_QUALITY, skills, pieces));   // never a negative offer (AUDIT SHIPYARDS L1-2)
+  const sale = Math.max(0, getTradePrice('Sell', calculateCost(Math.max(0, worth), SHIPYARD_QUALITY, SHIPYARD_PRICE_INDEX), SHIPYARD_QUALITY, skills, pieces));   // never a negative offer (AUDIT SHIPYARDS L1-2)
+  return online ? Math.min(sale, shipBuyPrice(worth, skills)) : sale;
 }
 
 /**

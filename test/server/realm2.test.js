@@ -10,7 +10,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   realmIo, realmList, realmCreate, realmJoin, realmFetch, realmDelete, createRealmSession, REALM_LOST,
 } from '../../src/systems/realmSaves.js';
@@ -66,7 +66,7 @@ async function device() {
   const env = { DB: d1(), SAVES: r2(), ACCOUNT_VERSION: 'test1' };
   const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
   const storage = fakeStorage();
-  storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const door = { mode: 'ok', inits: [] };
   const fetch = async (url, init) => {
     door.inits.push(init);
@@ -169,7 +169,7 @@ test('REALM P1.2: another tab\'s join ends this session - said once, and no chec
 
 test('REALM P1.2: a secret the service no longer honours is forgotten - accountClient.js\'s one exception - and a session told `auth` ends', async () => {
   const { env, storage } = await device();
-  storage.setItem(SESSION_KEY, JSON.stringify({ id: 'nobody', secret: 'not-a-secret-the-service-holds' }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ id: 'nobody', secret: 'not-a-secret-the-service-holds' })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const io = realmIo({ fetch: (url, init) => worker.fetch(new Request(url, init), env), storage });
   const r = await realmList(io);
   assert.deepEqual([r.ok, r.error, r.status], [false, 'auth', 401]);

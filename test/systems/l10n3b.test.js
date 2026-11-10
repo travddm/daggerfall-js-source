@@ -1,7 +1,7 @@
 // L10N3b: A DFU TRANSLATION PACK, INSTALLED FROM THE PLAYER'S OWN FILES.
 // What a pack holds, by the folders DFU reads it from (systems/translationPacks.js); the store that keeps it in the
 // browser and nowhere else (scenes/translationStore.js, over an in-memory IndexedDB); and the language loader putting
-// it to use (scenes/localeData.js) - its tables patched over the machine drafts, so a person's translation outranks a
+// it to use (scenes/localeData.js) - its tables patched over the language's own tables, so a pack's text outranks a
 // machine's, its quests', books' and name banks' text kept for their readers, its fonts registered as DFU's are; a
 // removal that leaves the drafts standing; and the Settings row, by source.
 import { test, beforeEach } from 'node:test';
@@ -14,7 +14,7 @@ import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 
 import { memoryIdb } from '../memoryIdb.mjs';   // an IndexedDB in memory (L10N6 shares it)
 
-// A fixture machine draft for French: the subject is a pack laid over a draft, not a shipped language.
+// A fixture table for French: the subject is a pack laid over a language's own table, not a shipped language.
 const FR_DRAFT = 'Key,Value\nmenu.rail.new,"Nouvelle partie"\nmenu.rail.load,"Charger une partie"\n';
 
 beforeEach(() => {
@@ -87,7 +87,7 @@ test('L10N3b the store: only the files the game reads are kept, text decoded and
   assert.deepEqual(await store.packFiles('fr'), []);
 });
 
-test('L10N3b the pack at work: its tables over the machine drafts (a person\'s word outranks a machine\'s), its other text for the readers that ask, pt-BR reading pt\'s pack, the language told the pack is there; removed, the drafts stand again; no FontFace, no font - the language\'s own face stands', async () => {
+test('L10N3b the pack at work: its tables over the language\'s own tables, its other text for the readers that ask, pt-BR reading pt\'s pack, the language told the pack is there; removed, the drafts stand again; no FontFace, no font - the language\'s own face stands', async () => {
   const draft = tm.parseStringTableCsv(FR_DRAFT);
   const draftWord = new Map(draft).get('menu.rail.new');
   await data.initLocale(new URLSearchParams('lang=fr'), { languages: [] });
@@ -144,3 +144,14 @@ test('L10N3b the pack\'s font, where a browser can load it: registered for its l
   }
 });
 
+
+test('decision 123: a language with no translation in the build (Japanese) is offered once the player installs a pack for it, and speaks the pack', async () => {
+  data._useLocaleFilesForTests({});
+  assert.equal(data.hasLocaleText('ja'), false, 'no pack, no Japanese');
+  await data.installTranslationPack('ja', entries({ 'JA/Text/Internal_Strings.csv': 'Key,Value\nsaveGame,セーブ\n' }));
+  assert.equal(data.hasLocaleText('ja'), true, 'the pack offers it');
+  await data.switchLocale('ja');
+  assert.equal(tm.getLocalizedText('saveGame'), 'セーブ');
+  assert.equal(await data.removeTranslationPack('ja'), true);
+  assert.equal(data.hasLocaleText('ja'), false, 'removed, it is not offered');
+});

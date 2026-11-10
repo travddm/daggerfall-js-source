@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import worker from '../../server-account/src/index.js';
 import { prepareRealmRecord, REALM_MAX_BYTES } from '../../server-account/src/realm.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   REALM_TEXT_MAX_BYTES, isGzip, gzipSizeOf, gzipText, gunzipText, saveTextOf,
 } from '../../src/net/realm/realmSaveCodec.js';
@@ -60,7 +60,7 @@ async function realm() {
   async function player({ older = false } = {}) {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
     const storage = fakeStorage();
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const door = { urls: [], bodies: [] };
     const fetch = async (url, init) => {
       door.urls.push(`${init?.method ?? 'GET'} ${url}`);

@@ -436,9 +436,9 @@ export const MIN_PRICE_PER_PIECE = 1;
  *  beside a horse rounds into the horse's price like any piece of a lot;
  *  no price a counter quotes is under a gold a piece.
  *
- *  THE SALE IS NOT FLOORED. Online REALM P0.4 pays at most half the
- *  asking price (shopStock.js ONLINE_SALE_SHARE), and half a one-gold
- *  ask is nothing; offline that candle rode the horse for no gold, so a
+ *  THE SALE IS NOT FLOORED. With the server profile's sale cap
+ *  (trade.saleCap) online pays at most half the asking price, and half
+ *  a one-gold ask is nothing; offline that candle rode the horse for no gold, so a
  *  gold for selling it alone would be minted. The floor only raises an
  *  asking price, so no buy-and-sell-back gains by it. Identify keeps its
  *  cost - the Witches Festival's free one is DFU's design.

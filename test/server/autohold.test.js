@@ -13,6 +13,7 @@
 //   - (AUDIT) A KEY A RECORD HOLDS TWICE never leaves it, by a route or a trade - one of the two is a copy; a peer's word
 //     never hands its reader a piece it carries (systems/peerWord.js notCarried); a key on another piece holds while it is
 //     carried, names its piece, and is no strike.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -34,7 +35,7 @@ import { leavingKeys } from '../../server-account/src/ledger.js';
 import { accountRefusalText } from '../../src/net/accountClient.js';
 import { itemLongName } from '../../src/systems/item/itemInfo.js';
 import { applyInteriorLoot, applyInteriorShared, withoutCarried } from '../../src/world/interior/interiorShared.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { realmIo, createRealmSession, LEDGER_KEY_RE, REALM_LOCKED_PREFIX } from '../../src/systems/realmSaves.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { applyRarity } from '../../src/systems/loot/lootRarity.js';
@@ -332,7 +333,7 @@ test('AUTO-HOLD client: over the real Worker, the third strike heard timed with 
     const s = await standService();
     const who = await s.registered('told');
     const R = await seatRealm(s.env, who.secret, 'told');
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const at = R.at();
     const session = createRealmSession({ io: realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), s.env), storage }), id: at.id, lease: at.lease, seq: at.seq });
@@ -426,7 +427,8 @@ test('AUTO-HOLD client (AUDIT): A PIECE THE REALM LOCKED STAYS WITH ITS HOLDER -
 /** A template the game binds by its nature (the Sigil Stone's - systems/item/itemBound.js SS1). */
 const lawTemplateIndexBound = () => { for (let i = 0; i < 4096; i++) if (lawTemplate(i)?.bound === true) return i; return -1; };
 
-test('AUTO-HOLD shelf: the room\'s word never lands back a piece its reader carries, nor one piece twice - and (AUDIT) a SHOP\'S SHELF never one it stowed, while a container (a rented room\'s chest, its stowage) still lands its own; a shelf never opened here too; a piece the ledger does not follow lands as it always did; every landing hands it the pack\'s keys', () => {
+test('AUTO-HOLD shelf: the room\'s word never lands back a piece its reader carries, nor one piece twice - and (AUDIT) a SHOP\'S SHELF never one it stowed, while a container (a rented room\'s chest, its stowage) still lands its own; a shelf never opened here too; a piece the ledger does not follow lands as it always did; every landing hands it the pack\'s keys', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const k = '7a7a7a7a7a7a7a7a', away = '6c6c6c6c6c6c6c6c';
   const wire = (it) => JSON.parse(JSON.stringify(it));
   const plain = createWeapon(113, 1, seeded(7));   // no tier: a piece the ledger does not follow
