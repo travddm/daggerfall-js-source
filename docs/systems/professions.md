@@ -1,17 +1,25 @@
 # Professions and crafting
 
+> Leaves core: the professions mod, a private first-party mod (decisions 102 and 103).
+
 This page covers the gathering and crafting professions: the tracks and XP, the acts the player plays, the stations,
 the item templates, the sounds, the Materials Bag, and the Foraging mod port they build on.
 
 ## The shape
 
 - Daggerfall has no crafting skill. Its three makers (potion maker `src/systems/potions.js`, spellmaker, item maker
-  `src/systems/enchanting.js`) stay as Daggerfall Unity (DFU) has them and use no skill. Professions are the port's
-  own, a deliberate departure from DFU.
+  `src/systems/enchanting.js`) stay as Daggerfall Unity (DFU) has them and use no skill. Professions are the game's
+  own system, a departure from DFU.
+- **Where it is going.** Professions are a system of their own (new mechanics, tables, wire frames and service
+  handlers), so they leave core as a mod in their own private repository once the mod API gives them the hooks they
+  need (decisions 102 and 103). Until then the code stays in core behind its switches. Public releases will not
+  bundle the mod (decision 110).
 - **Professions are online only.** The account service credits every point of XP, rolls every yield, and keeps the
-  Stores. Offline, nothing earns profession XP; the stations show a "done online" line.
+  Stores. Offline, nothing earns profession XP; the stations show a "done online" line. There is no official server
+  (decision 95), so a player reaches professions only on a self-hosted server whose account service has them on.
 - The account service gates the whole system with `PROFESSIONS_OPEN` (`off`, `dev`, `on`) in
-  `server-account/wrangler.toml`, read by `profSwitchOf` and `profOpenFor` in `server-account/src/professions.js`.
+  `server-account/wrangler.toml`, read by `profSwitchOf` and `profOpenFor` in `server-account/src/professions.js`. The
+  server kit (`selfhost/`) reads the same file, where the switch is `on`.
 - The client plays the act and reports how well it went. The service trusts that report only within a bound: a clean
   act moves a craft's quality roll by at most one step, or adds XP and bonus chances within caps the service checks.
 - **Each track has a daily limit.** A character does a bounded number of acts on a track each UTC day: harvests on a
@@ -22,26 +30,30 @@ the item templates, the sounds, the Materials Bag, and the Foraging mod port the
   Superior piece instead, on the same roll. `PROF_MASTERWORK_GATE = "off"` lifts the gate.
 - **Tier prices follow DFU's ingredient scale** for ores, ingots, planks, leathers and Arcane Essence
   (`DFU_TIER_PRICE` in `profTemplates.js`). `PROF_DFU_PRICES = "off"` puts back the port's earlier scale; the service
-  reports the choice in the state read and the client sets the rows to it. The three switches move to the server profile
-  later.
+  reports the choice in the state read and the client sets the rows to it.
 - Shared law lives in `src/net/` and is pure (no clock, DOM or network). The client and the service import the same
   files.
 
 ## Where it lives
 
-| Layer           | Files                                                                                                                                                                                                                                                                                                                                                          |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shared law      | `src/net/professionLaw.js` (tracks, ranks, XP, tiers, specialisations, materials, Stores bounds), `src/net/recipeLaw.js` (recipes, quality, craft XP, act tuning), `src/net/nodeLaw.js` (nodes per pixel per day, herb tables, yields), `src/net/provinceNodes.js` (what each province outside the Bay is rich in), `src/net/bagLaw.js` (Materials Bag bounds) |
-| Account service | `server-account/src/professions.js` (tracks, Stores, harvests, crafts, withdrawals, Court writs), `alchemy.js`, `masterWork.js`, `craftWrits.js`, `writs.js`, `market.js`, `craftedPiece.js`                                                                                                                                                                   |
-| Client book     | `src/net/profBook.js` (this device's view of tracks and Stores; queues and retries requests)                                                                                                                                                                                                                                                                   |
-| Gathering hosts | `src/scenes/gatherHost.js` (one shell for every node kind), with kinds `herbHost.js`, `mineHost.js`, `treeHost.js`, `huntHost.js`, `fishHost.js` (all in `src/scenes/`)                                                                                                                                                                                        |
-| Act machines    | `src/systems/herbAct.js`, `mineAct.js`, `chopAct.js`, `traceAct.js`, `fishAct.js`, `heatAct.js`, `planeAct.js`, `stitchAct.js`, `chiselAct.js`, `facetAct.js`, `panAct.js`                                                                                                                                                                                     |
-| Products        | `src/systems/smithItems.js`, `cookItems.js`, `alchemyItems.js`, `fletching.js`, `src/systems/professions/profItems.js`                                                                                                                                                                                                                                         |
-| Templates       | `src/systems/professions/profTemplates.js`                                                                                                                                                                                                                                                                                                                     |
-| Feel            | `src/systems/professions/profSounds.js`, `src/systems/gatherSounds.js`, `src/systems/gatherBlow.js`, `src/systems/veinCrack.js`                                                                                                                                                                                                                                |
-| UI              | `src/ui/professions/profPages.js` (Professions, Stores and Crafting pages; station acts), `profHud.js` (toasts, rank banner), `profReticle.js` (the act drawn round the crosshair), `craftHall.js`, `masterBox.js`                                                                                                                                             |
-| Bag             | `src/systems/materialsBag.js`                                                                                                                                                                                                                                                                                                                                  |
-| Foraging        | `src/systems/foraging/` and `vendor/foraging/`                                                                                                                                                                                                                                                                                                                 |
+- **Shared law**: `src/net/professionLaw.js` (tracks, ranks, XP, tiers, specialisations, materials, Stores bounds),
+  `src/net/recipeLaw.js` (recipes, quality, craft XP, act tuning), `src/net/nodeLaw.js` (nodes per pixel per day, herb
+  tables, yields), `src/net/provinceNodes.js` (what each province outside the Bay is rich in), `src/net/bagLaw.js`
+  (Materials Bag bounds).
+- **Account service**: `server-account/src/professions.js` (tracks, Stores, harvests, crafts, withdrawals, Court
+  writs), `alchemy.js`, `masterWork.js`, `craftWrits.js`, `writs.js`, `market.js`, `craftedPiece.js`.
+- **Client book**: `src/net/profBook.js` (this device's view of tracks and Stores; queues and retries requests).
+- **Gathering hosts**: `src/scenes/gatherHost.js` (one shell for every node kind), with kinds `herbHost.js`,
+  `mineHost.js`, `treeHost.js`, `huntHost.js`, `fishHost.js` (all in `src/scenes/`).
+- **Act machines**: `src/systems/herbAct.js`, `mineAct.js`, `chopAct.js`, `traceAct.js`, `fishAct.js`, `heatAct.js`,
+  `planeAct.js`, `stitchAct.js`, `chiselAct.js`, `facetAct.js`, `panAct.js`.
+- **Products**: `src/systems/smithItems.js`, `cookItems.js`, `alchemyItems.js`, `fletching.js`,
+  `src/systems/professions/profItems.js`. **Templates**: `src/systems/professions/profTemplates.js`.
+- **Feel**: `src/systems/professions/profSounds.js`, `src/systems/gatherSounds.js`, `src/systems/gatherBlow.js`,
+  `src/systems/veinCrack.js`.
+- **UI**: `src/ui/professions/profPages.js` (Professions, Stores and Crafting pages; station acts), `profHud.js`
+  (toasts, rank banner), `profReticle.js` (the act drawn round the crosshair), `craftHall.js`, `masterBox.js`.
+- **Bag**: `src/systems/materialsBag.js`. **Foraging**: `src/systems/foraging/` and `vendor/foraging/`.
 
 The gathering host exists only on the streaming world host (`src/scenes/world.js` builds it with `createGatherHost`
 when a professions book exists).
@@ -76,7 +88,8 @@ All in `professionLaw.js` and `recipeLaw.js`.
 - Writ XP: `writXp` = 2 x its pay.
 - `CRAFTS_ABOVE_JOURNEYMAN` (2): only two crafting tracks may pass rank 50. Gathering is unlimited.
 - Specialisations: a choice at ranks 50 and 100 (`SPEC_RANKS`, `SPECIALISATIONS`, `specsAt`). Free to change for a day
-  (`SPEC_TRIAL_S`); after that a change costs `RESPEC` (1,000 Marks, then a 7-day lock).
+  (`SPEC_TRIAL_S`); after that a change costs `RESPEC` (1,000 Marks, the server-held currency described below, then
+  a 7-day lock).
 
 ## Gathering: nodes and acts
 
@@ -129,8 +142,10 @@ The station checks are the interior host's `forgeHere`, `workbenchHere`, `loomHe
 - **Quality.** `QUALITY_NAMES`: Crude, Standard, Fine, Superior, Masterwork. The service rolls it (`rollQuality`); a
   clean act and specialisations add steps (`craftQuality`). Kits, arrows, siege works and dishes take no quality
   (`takesQuality`).
-- **Rarity ceiling.** A craft reaches Rare (Masterwork) at most. A Master's work (`masterWork.js`, `masterBox.js`) can
-  reach Legendary. Aetheric, Artifact and Sigil pieces are never craftable.
+- **Rarity ceiling.** A craft reaches Rare (Masterwork) at most. A Master's work (`masterWork.js`, `masterBox.js`) is
+  Rare too, its three chosen lines rolled in the Rare band. `PROF_MASTER_LEGENDARY = "on"` makes it
+  Legendary again; the record's mint version carries the tier (`MINT_V_MASTER` Legendary, `MINT_V_MASTER_RARE` Rare).
+  Aetheric, Artifact and Sigil pieces are never craftable.
 - **Minting.** `smithItems.js` `mintPiece` makes DFU's own item first (`ItemBuilder.CreateWeapon` and friends), then
   lays the quality on it. It also owns tempering, reforging and repair kits. `cookItems.js` mints dishes and their
   effects (stamina, feasts shared with a party). `alchemyItems.js` mints brewed potions as DFU's own potion items.
@@ -164,9 +179,12 @@ The station checks are the interior host's `forgeHere`, `workbenchHere`, `loomHe
 
 ## Foraging (`src/systems/foraging/`)
 
+> Leaves core: the Foraging mod (decision 99).
+
 A port of Harbinger451's **Foraging 1.7** for Daggerfall Unity, carried with the author's permission and credited on
-the About screen. The mod ships as a compiled script with no source; the port's rules follow its IL, vendored at
-`vendor/foraging/il/`.
+the About screen. Professions use its tool templates and its act checks, so once both are mods the professions mod
+requires Foraging, and the mod manager refuses it without Foraging (decision 73 (4)). The mod ships as a compiled
+script with no source; the port's rules follow its IL, vendored at `vendor/foraging/il/`.
 
 - `foragingLaw.js`: the pure rules: the twelve templates 1600-1611 (`FORAGING_TEMPLATES`), the six tools, refusals,
   yields. `foragingCore.js` holds the parts the account service also reads (attribute bands, daylight, Basket blocks).

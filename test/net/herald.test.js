@@ -1,10 +1,10 @@
-// HERALD — THE PATREON TIER BETWEEN DISCIPLE AND HIEROPHANT.
+// HERALD — THE NAMED TITLE BETWEEN DISCIPLE AND HIEROPHANT.
 //
 // then "you'll need to develop the
 // herald title/glyph". No colour or shape was named, so it is the tiers' kind - TITLE-N's law: one flat colour, the
 // glyph a stroked shape in that colour - in AZURE, heraldry's own blue, with the herald's trumpet and its swallowtail
-// banner for the glyph (ui/playerBadge.js says what was tried beside it). It is held by its pledge (PATREON_TIERS maps
-// Mac's Herald tier to it) and by HERALD_HANDLES for a Herald Mac names.
+// banner for the glyph (ui/playerBadge.js says what was tried beside it). It is held by HERALD_HANDLES, for a Herald
+// the server names.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -19,7 +19,6 @@ import { GLYPH_LABEL } from '../../src/ui/enhanced/enhancedAccount.js';
 import { ENHANCED_CSS } from '../../src/ui/enhanced/enhancedStyle.js';
 import { isStaff } from '../../src/net/staffCommands.js';
 import { titlesHeld, glyphsOf, equipRefusal, titleWorn, TIER_LISTS, TIER_GLYPH } from '../../server-account/src/titles.js';
-import { PATREON_TITLES, patreonTierMap } from '../../server-account/src/patreon.js';
 import { readBadge, RELAY_VERSION } from '../../src/net/wire.js';
 import { createNameLayer } from '../../src/ui/nameLayer.js';
 import { RemotePlayers, PEER_HEIGHT } from '../../src/net/remotePlayers.js';
@@ -29,9 +28,8 @@ const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const { subtle } = webcrypto;
 const toml = rd('server-account/wrangler.toml');
 const v = (k) => new RegExp(`^${k} = "([^"]*)"$`, 'm').exec(toml)?.[1];
-/** The Worker's config as it reads it: every handle list, and the Patreon tiers. */
-const ENV = { ...Object.fromEntries([...toml.matchAll(/^([A-Z_]+_HANDLES) = "([^"]*)"$/gm)].map((m) => [m[1], m[2]])), PATREON_TIERS: v('PATREON_TIERS') };
-const HERALD_TIER = '29666234';   // Mac's Herald tier: its Join link's `rid`
+/** The Worker's config as it reads it: every handle list. */
+const ENV = Object.fromEntries([...toml.matchAll(/^([A-Z_]+_HANDLES) = "([^"]*)"$/gm)].map((m) => [m[1], m[2]]));
 const AFTER = 1_900_000_000;      // first played long after Founder's cutoff, so no row below holds Founder by accident
 const row = (handle, over = {}) => ({ handle, created_at: AFTER, registered_at: AFTER, ...over });
 const LATER = AFTER + 30 * 86_400;   // past the sprout's two weeks, so the only glyph is the grant's
@@ -149,23 +147,15 @@ const span = (a) => Math.max(...a) - Math.min(...a);
 
 // ── THE GRANT ───────────────────────────────────────────────────────
 
-test('HERALD grant: a Herald pledge holds the title and its glyph by PATREON_TIERS (Mac\'s Herald tier), and HERALD_HANDLES grants both by name - empty, nobody yet; a guest, a lapsed pledge and every other tier hold none; no staff command rides it (mutants: the glyph without the title; the Herald tier unmapped; the list crossed with Penitent\'s)', () => {
+test('HERALD grant: HERALD_HANDLES grants the title and its glyph by name - empty, nobody yet; a guest and every other name hold none; no staff command rides it (mutants: the glyph without the title; the list crossed with Penitent\'s)', () => {
   assert.equal(TIER_LISTS.herald, 'HERALD_HANDLES');
   assert.equal(TIER_GLYPH.herald, 'herald');
   assert.equal(v('HERALD_HANDLES'), '', 'nobody by name yet');
-  assert.ok(PATREON_TITLES.includes('herald'), 'a Patreon tier may grant it');
-  assert.equal(patreonTierMap(ENV).get(HERALD_TIER), 'herald', 'Mac\'s Herald tier grants it');
-  const pledged = row('Herold', { patreon_user: '777', patreon_tiers: HERALD_TIER, patreon_status: 'active_patron' });
-  assert.deepEqual(titlesHeld(pledged, ENV), ['herald'], 'a Herald patron holds Herald, and nothing else');
-  assert.deepEqual(glyphsOf(pledged, ENV, LATER), ['herald'], 'with its trumpet');
-  assert.equal(equipRefusal('herald', pledged, ENV), null, 'theirs to wear');
-  assert.equal(titleWorn({ ...pledged, title: 'herald' }, ENV), 'herald');
-  assert.equal(titleWorn({ ...pledged, title: 'herald', patreon_status: 'former_patron' }, ENV), undefined, 'a pledge that ended stops being worn');
-  assert.deepEqual(titlesHeld({ ...pledged, patreon_tiers: '29666211' }, ENV), ['disciple'], 'the Disciple tier is the Disciple\'s');
-  assert.deepEqual(titlesHeld({ ...pledged, patreon_tiers: '29701293' }, ENV), [], 'the Supporter tier holds none');
-  assert.deepEqual(titlesHeld({ ...pledged, patreon_tiers: '29666221' }, ENV), ['hierophant'], 'the Hierophant tier is the Hierophant\'s (HIEROPHANT-TIER), never a Herald');
-  assert.deepEqual(titlesHeld({ ...pledged, handle: null }, ENV), [], 'a guest holds none');
   const named = { ...ENV, HERALD_HANDLES: 'Crier' };
+  assert.equal(equipRefusal('herald', row('Crier'), named), null, 'theirs to wear');
+  assert.equal(titleWorn({ ...row('Crier'), title: 'herald' }, named), 'herald');
+  assert.equal(titleWorn({ ...row('Crier'), title: 'herald' }, ENV), undefined, 'a name taken off the list stops being worn');
+  assert.deepEqual(titlesHeld({ ...row('Crier'), handle: null }, named), [], 'a guest holds none');
   for (const h of ['Crier', 'crier', 'CRIER']) {
     assert.deepEqual(titlesHeld(row(h), named), ['herald'], `${h}: by name, case-folded`);
     assert.deepEqual(glyphsOf(row(h), named, LATER), ['herald']);

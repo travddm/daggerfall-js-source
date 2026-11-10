@@ -97,8 +97,10 @@ load or apply code into a host.
 - `ChargenFlow` states, in order: `race`, `gender`, `classMethod`, `classQuestions`, `class`, `customClass`,
   `bioMethod`, `biography`, `name`, `face`, `stats`, `skills`, `reflexes`, `summary`, `done`. Two wizard skins exist
   (classic and enhanced, chosen by `isEnhanced` in `src/systems/uiSkin.js`).
-- After the wizard: the levelling-system question (offline only), the Project Legacy model question when that mod is
-  on, and the start quest (`src/systems/starts/starts.js`): every character starts at Privateer's Hold, as in DFU.
+- After the wizard (`withChargenQuestions` in `src/systems/chargenSession.js`): the character mode question when the
+  `character-modes` mod is on ([character-modes.md](character-modes.md)), then the Project Legacy model question for
+  the Legacy mode only, and the start quest (`src/systems/starts/starts.js`): every character starts at Privateer's
+  Hold, as in DFU.
 - `finishChargen` applies the result: `applyCharacter`, starting spells (`assignStartingSpells`), starting equipment
   (`startingGear.js`), biography effects, faction reputation and region data.
 - `applyHeadlessChargen(entity, classIndex)` builds a character with no window (`?class=N`, tests).
@@ -151,6 +153,10 @@ minutes (`SKILL_RAISE_CHECK_INTERVAL`) a skill with enough uses rises one point.
   and current Endurance. It rides the online layer and is never saved.
 - `LEVEL_CAP` is 45 online and offline (`levelCap.js`), a departure: DFU has no cap. `releaseCapLatch` clears a level-up
   latched in an old save at the cap.
+- Online, mentor mode (`mentorMode.js`, run by `src/scenes/mentorHost.js`) scales a higher-level party member down
+  beside a lower-level partner. It has no DFU counterpart. The party leader can turn it off for the party (the hub's
+  `party.mentoring.off` act, `server/src/partyMentoring.js`). A server owner can take that switch away with the
+  server profile rule `party.allowNoMentoring` (`src/net/profile/profileKeys.ts`); the default allows it.
 
 ### Master Skills and the soft cap
 

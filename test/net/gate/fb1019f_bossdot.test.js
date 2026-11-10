@@ -17,7 +17,7 @@ import { HIT_KINDS, HOST } from '../../../src/net/gate/gateBrain.js';
 import { GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
 import { validGateIn } from '../../../src/net/wire.js';
 import { createStandInSpell, createStandInRounds, createSerpentSpell, countOnStandIn, carriedOnStandIn } from '../../../src/scenes/gate/standInSpell.js';
-import { createGateCourt, COURT_ROUND_MS } from '../../../src/scenes/gate/gateCourt.js';
+import { createGateCourt, courtRoundMs } from '../../../src/scenes/gate/gateCourt.js';
 import { courtToDungeon } from '../../../src/world/gate/gateArena.js';
 import { applySpell, tickActiveEffects } from '../../../src/systems/effects.js';
 import { duelSpellOf } from '../../../src/combat/duelCombat.js';
@@ -28,6 +28,7 @@ import { SERPENT_HIT_CAP_X, SERPENT_HAND_REF } from '../../../src/net/serpent/se
 import { destroyGateBossBar } from '../../../src/ui/gate/gateBossBar.js';
 import { destroyGateMarksCard } from '../../../src/ui/gate/gateMarksView.js';
 import { destroyGateGround } from '../../../src/ui/gate/gateGroundView.js';
+const COURT_ROUND_MS = courtRoundMs();   // five seconds at TimeScale 12
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const NOOP = () => {};

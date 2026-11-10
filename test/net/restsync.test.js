@@ -3,6 +3,7 @@
 // the room), streams it on the layout's own frame, and every joiner stands it as a puppet, strikes it through the
 // host and loots its body as the room's container; a joiner's own rest ASKS the host for its encounter. Mounted, not
 // matched: the statements are sliced out of the context's source (test/systems/audit68_dungeonctx.test.js's harness) and run.
+import { stealthCheckRecord } from '../../src/characters/enemy/peer-senses.ts';   // the dungeon record writer's stealth field
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -15,7 +16,7 @@ import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';   //
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
-const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };   // AUDIT WORLD-EVENTS
+const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS, stealthCheckRecord, _peerSenses: { read: () => false } };   // AUDIT WORLD-EVENTS
 
 const D = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
 const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
@@ -310,7 +311,7 @@ test('REST-SYNC: a joiner\'s blow at the room\'s encounter goes to the host by t
   const layout0 = foe(), pup = foe({ _encId: 7 });
   const j = {
     _authority: false, ARENA_PUPPET_OWNER, blowClassOf, foes: [layout0, pup], _layoutFoes: 1, lastPlayerFeet: [1, 0, 1], _ecvT: 0,
-    opts: { onFoeHit: (h) => sent.push(h) }, renownFoeStruck() {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck() {}, markConcealedHit() {},
+    opts: { onFoeHit: (h) => sent.push(h) }, renownFoeStruck() {}, takeWholeBlow: () => false, bossStrikeAt, bossTakeAt, stealthCheckRecord, _peerSenses: { read: () => false }, bossClockS, strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, markFoeStruck() {}, markConcealedHit() {},
   };
   const jd = mount(`${consts()}\n${declSrc('isRoomFoe')}\n${fnSrc('damageFoe')}\nreturn { damageFoe };`, j);
   jd.damageFoe(pup, 5, [2, 0, 3]);

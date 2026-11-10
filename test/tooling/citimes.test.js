@@ -110,7 +110,7 @@ test('CI-TIMES THE SHARD RECORDS: runTests hands a runner with a record the summ
   runTests(['test/a.test.js'], { root: ROOT, times: {}, cores: 2, spawn, summary: false });
   assert.deepEqual(calls[0].args.slice(0, 2 + summaryReporters(ROOT).length), ['--test', '--test-concurrency=2', ...summaryReporters(ROOT)]);
   assert.equal(calls[0].opts.env.TEST_TIMES_RECORD, join(process.cwd(), 'rel/times.json'), 'absolute - the runner runs in the root');
-  assert.equal(calls[1].opts.env, undefined, 'no record, the environment as it was');
+  assert.equal(calls[1].opts.env.TEST_TIMES_RECORD, process.env.TEST_TIMES_RECORD, 'no record, none added');
   assert.ok(!calls[1].args.some((a) => a.includes('failSummary')), 'and no summary asked');
 
   const all = testFiles(ROOT), rec = join(scratch(t), 'shard.json');

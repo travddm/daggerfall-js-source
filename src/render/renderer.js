@@ -21,7 +21,7 @@ import { COLUMN_GLSL } from './columnGlsl.js';   // DW-F: the water column's sha
 // this is already guaranteed - the lines stand where they read as the rule.
 import { buildProgram, startPrograms, parallelCompile } from './glProgram.js';   // AUDIT 68 S17-gl-program-dup: the one compile and link; SHADER-STALL: and a start that never waits
 import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM, GLASS_NONE, GLASS_EXTERIOR, GLASS_INTERIOR, winModeFor, roomLightFor, sphereNdcRect, cropProjection, viewTargetSize, viewSkyFrom, viewRays, VIEW_BG_VS, VIEW_BG_FS, VIEW_PANES_MAX, VIEW_PANE_UNIT, VIEW_PANE_VS, VIEW_PANE_FS } from './realWindows.js';   // RW1: the real windows - the rooms, the glass, the view out
-import { MESH_ALPHA_GLSL, samplerParams, samplerKey } from './meshAlpha.js';   // POI-2: a translucent mesh draw, and a texture's own wrap and filter
+import { MESH_ALPHA_GLSL, samplerParams, samplerKey } from './meshAlpha.js';   // a translucent mesh draw, and a texture's own wrap and filter
 import { frameTarget, setFrameTarget } from './renderTarget.js';   // RW1: the view out's pass hands the frame target back as it found it (EL4's restore)
 import { CLIP_SENTINEL } from '../world/terrain/terrainSurface.js';   // FAR-CLIP1: the byte the terrain's clip variant discards - the TileMap format's module, already in this file's closure (waterCorners.js)
 import { sharedIndexBuffer, ownIndexBuffer, createPixelTerrainSurface } from './terrainIndexBuffers.js';   // the terrain's index sets: shared, or a pixel's own with the slope cut
@@ -169,7 +169,7 @@ ${RW_MAIN_ROOM}
   // The emission (window style from getWindowColors32, or an auto-emissive
   // record's own albedo at Color.white) goes back on top of the lighting
   // its subtraction above paid for - o.Emission = emission.
-  outColor = vec4(dwWaterFog(mix(uFogColor, lit + emission, fogFactorAt(vWorldPos)), vWorldPos), meshAlphaOf(tex.a));   // DW-C: the sea's distance fog over the finished colour; POI-2: alpha 1 but in a translucent draw
+  outColor = vec4(dwWaterFog(mix(uFogColor, lit + emission, fogFactorAt(vWorldPos)), vWorldPos), meshAlphaOf(tex.a));   // the sea's distance fog over the finished colour; alpha 1 but in a translucent draw
   // A2: the Daggerfall/Automap shader's presentation, verbatim
   // (DaggerfallAutomap.shader:102-110): brightness falls with vertical
   // distance from the slice plane (floored at 40%), then the
@@ -2427,7 +2427,7 @@ export class Renderer {
     this.uIndirectColor = gl.getUniformLocation(this.program, 'uIndirectColor');
     this._solidFog = this._fogLocs(this.program);
     this.uDissolveCut = gl.getUniformLocation(this.program, 'uDissolveCut');   // SHIP-FADE: the installed mesh program's dissolve
-    this.uMeshAlpha = gl.getUniformLocation(this.program, 'uMeshAlpha');   // POI-2: the installed mesh program's translucency (render/meshAlpha.js)
+    this.uMeshAlpha = gl.getUniformLocation(this.program, 'uMeshAlpha');   // the installed mesh program's translucency (render/meshAlpha.js)
     this.rwLocs = {   // RW1: the real windows' uniforms on the installed mesh program - and what this program holds of them is not known yet
       mode: gl.getUniformLocation(this.program, 'uWinMode'), cut: gl.getUniformLocation(this.program, 'uCutout'),
       rect: gl.getUniformLocation(this.program, 'uGlassRect'), lamp: gl.getUniformLocation(this.program, 'uRoomLamp'),
@@ -5358,7 +5358,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // hand back the wrong sampling silently. Only the logo asks for smooth
     // today and its key is unique, so nothing was broken - but a cache
     // that quietly ignores an argument is a trap, not a cache.
-    const key = `${archive}_${record}${opts.smooth ? '#smooth' : ''}${opts.opaque ? '#opaque' : ''}${opts.mips === false ? (opts.variant ?? '#ui') : ''}${opts.alpha ? '#alpha' : ''}${opts.clamp && !opts.smooth ? '#clamp' : ''}${opts.sampler && !opts.smooth ? samplerKey(opts.sampler) : ''}`;   // POI-2: a sampler asked for keys apart too (render/meshAlpha.js samplerKey)   // INCIDENT 2026-09-04: DFU caches materials per alphaIndex; REVIEW 2026-09-05: the un-mipped UI variant of a world archive (item icons) keys apart too; AUDIT 61: `variant: ''` keeps the plain batch key for world art uploaded without a chain (a mod atlas built mipChain:false - SIB1)
+    const key = `${archive}_${record}${opts.smooth ? '#smooth' : ''}${opts.opaque ? '#opaque' : ''}${opts.mips === false ? (opts.variant ?? '#ui') : ''}${opts.alpha ? '#alpha' : ''}${opts.clamp && !opts.smooth ? '#clamp' : ''}${opts.sampler && !opts.smooth ? samplerKey(opts.sampler) : ''}`;   // a sampler asked for keys apart too (render/meshAlpha.js samplerKey)   // DFU caches materials per alphaIndex; the un-mipped UI variant of a world archive (item icons) keys apart too; `variant: ''` keeps the plain batch key for world art uploaded without a chain (a mod atlas built mipChain:false)
     this._uploadSink?.(false, key);   // FIELD BUGS 2026-10-04d PLACE-LRU: a hit is asked for too - the place asking holds it
     if (opts.cutout) this._markCutout(this.textures.get(key));   // RW1: a cutout ask cuts the picture the key already holds, too
     // AUDIT DEX B5: a picture on its way (systems/textureReplacement.js pendingPicture - a readOnly picture let go once on
@@ -5391,7 +5391,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       gl.RGBA, gl.UNSIGNED_BYTE, color32Bytes(color32, `uploadTexture(${archive}, ${record})`)   // WW3: the shape's own error, not a TypeError three frames down
     );
     const { wrap, filter } = textureParams(gl, opts);
-    // POI-2: a texture's own sampler (render/meshAlpha.js) - a wrap per axis and its filter, its mips world art's as ever
+    // a texture's own sampler (render/meshAlpha.js) - a wrap per axis and its filter, its mips world art's as ever
     const own = opts.sampler && !opts.smooth ? samplerParams(gl, opts.sampler, !opts.smooth && (opts.mips ?? (typeof archive === 'number'))) : null;
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
@@ -6832,7 +6832,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
    *  ALBEDO of an auto-emissive record, which wears no window tint
    *  (MaterialReader.cs:448-453, EmissionColor = Color.white). */
   uploadEmissionTexture(archive, record, color32, opts = {}) {
-    // POI-2: an emission map keys with its albedo's sampler (render/meshAlpha.js samplerKey) - the sub-mesh finds both
+    // an emission map keys with its albedo's sampler (render/meshAlpha.js samplerKey) - the sub-mesh finds both
     // under the one resolved key, and both are sampled alike (the shader subtracts one from the other)
     const key = `${archive}_${record}${opts.sampler ? samplerKey(opts.sampler) : ''}`;
     this._uploadSink?.(true, key);   // FIELD BUGS 2026-10-04d PLACE-LRU: hit or miss, as uploadTexture's
@@ -6849,7 +6849,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
       gl.RGBA, gl.UNSIGNED_BYTE, color32Bytes(color32, `uploadEmissionTexture(${archive}, ${record})`)   // AUDIT 19 F7: the view, not its buffer; WW3: named when the shape is wrong
     );
-    const own = opts.sampler ? samplerParams(gl, opts.sampler, true) : null;   // POI-2: its albedo's own sampling
+    const own = opts.sampler ? samplerParams(gl, opts.sampler, true) : null;   // its albedo's own sampling
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : gl.REPEAT);
     // REVIEW 2026-09-05: the emission map carries the same chain as the
@@ -8752,13 +8752,13 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   drawMesh(mesh, modelMatrix, texRemap = null, { noShadow = false, translucent = 0 } = {}) {
     this._close2D();   // PERF-2D: the baseline back, before anything that needs it
     if (this._rwOutside && this._rwSkips(mesh)) return;   // RW1: the view out leaves out what a context asked it to (outsideViewSkip)
-    // POI-2 (render/meshAlpha.js): A TRANSLUCENT DRAW - its texels' alpha times `translucent` over what is drawn, depth
+    // A TRANSLUCENT DRAW (render/meshAlpha.js) - its texels' alpha times `translucent` over what is drawn, depth
     // tested and never written, no shadow cast; the caller draws it after the opaque world, back to front
     if (translucent > 0) { this._drawTranslucent(mesh, modelMatrix, texRemap, Math.min(translucent, 1)); return; }
     this._drawMeshBundle(mesh, modelMatrix, texRemap, false, noShadow);
   }
 
-  /** POI-2: the translucent draw's state, set and put back around the one bundle - blending straight alpha over (the
+  /** The translucent draw's state, set and put back around the one bundle - blending straight alpha over (the
    *  destination's alpha kept at one: `ONE, ONE_MINUS_SRC_ALPHA` on alpha), the depth mask off, `uMeshAlpha` the share -
    *  so no draw after it inherits any of it. */
   _drawTranslucent(mesh, modelMatrix, texRemap, alpha) {

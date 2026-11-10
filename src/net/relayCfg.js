@@ -1,7 +1,6 @@
 // @ts-check
 // SCALE5b: THE RELAY'S SETTINGS, AT RUN TIME. The line the
-// boss fights' count runs by (BOSS_BODY, INT11-INT14) and the Discord roles the herald pings (GATE_DISCORD_ROLE,
-// SERPENT_DISCORD_ROLE, SD_DISCORD_ROLE - and, HERALD-CARDS, the threads it posts to) were the Worker's vars alone, and a var changed is a Worker redeployed: every
+// boss fights' count runs by (BOSS_BODY) and the relay's switches were the Worker's vars alone, and a var changed is a Worker redeployed: every
 // player online dropped, a reconnect wave and its mints, to move one number. A developer now sets each in the hub
 // (`/relay <setting> <value>`, a hub frame - only a token whose glyphs say `dev` may), the hub keeps it in its storage,
 // and every room reads it there: the hub its own, a boss's room by asking the hub at most every RELAY_CFG_TTL_MS. The
@@ -12,14 +11,6 @@
 /** A setting's name -> the Worker var it stands over. */
 export const RELAY_CFG_VARS = Object.freeze({
   bossBody: 'BOSS_BODY',
-  gateRole: 'GATE_DISCORD_ROLE',
-  serpentRole: 'SERPENT_DISCORD_ROLE',
-  sdRole: 'SD_DISCORD_ROLE',
-  // HERALD-CARDS (net/herald/heraldCard.js): the thread of the world events' channel each herald posts its cards to - its
-  // own when set, else the gate's, else the channel itself (a Discord id; a forum channel needs the gate's at least)
-  gateThread: 'GATE_DISCORD_THREAD',
-  serpentThread: 'SERPENT_DISCORD_THREAD',
-  sdThread: 'SD_DISCORD_THREAD',
   groundGate: 'GROUND_GATE',   // GROUND-GATE: 'on' refuses a ground room's hello from a build on an older ground (net/wire.js GROUND_LAW) - off until the site serves the build that says it, since the relay deploys first
   grantMode: 'GRANT_MODE',   // GRANT2: the spawn grants' law - 'measure' (and unset: net/grantLaw.js grantModeOf), 'enforce' (GRANT6), 'off'
   grantRoll: 'GRANT_ROLL',   // GRANT8 (Spawn-Grants.md section 16): 'on' - an encounter's grant rolls its species from its seed (`encr`); off unset

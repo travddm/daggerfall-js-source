@@ -22,13 +22,13 @@ import '../systems/grammar/frenchGrammar.js';   // L10N3g: the French pack's gra
 const IN_BROWSER = typeof window !== 'undefined';
 const FILES = IN_BROWSER ? import.meta.glob('../../locales/*/*.csv', { query: '?raw', import: 'default' }) : {};
 // L10N6: the packs the tree BUNDLES (locales/<tag>/pack/ - tools/l10nPack.mjs holds what one must carry), only where an
-// author's terms allow it. Their text is a lazy chunk like the drafts; a font is fetched by its URL; PACK.json (who made
+// author's terms allow it. Their text is a lazy chunk like a language's own tables; a font is fetched by its URL; PACK.json (who made
 // it, on what terms) is read at once, for the Language row and the About pane's credits.
 const BUNDLED_TEXT = IN_BROWSER ? import.meta.glob(['../../locales/*/pack/**/*.csv', '../../locales/*/pack/**/*.txt'], { query: '?raw', import: 'default' }) : {};
 const BUNDLED_FONTS = IN_BROWSER ? import.meta.glob(['../../locales/*/pack/**/*.ttf', '../../locales/*/pack/**/*.otf'], { query: '?url', import: 'default' }) : {};
 const BUNDLED_META = IN_BROWSER ? import.meta.glob('../../locales/*/pack/PACK.json', { eager: true, import: 'default' }) : {};
 // L10N6: the people who translated or checked a language (`locales/<tag>/translators.json`, a list of names) - the About
-// pane credits them beside the machine's drafts.
+// pane credits them.
 const TRANSLATORS = IN_BROWSER ? import.meta.glob('../../locales/*/translators.json', { eager: true, import: 'default' }) : {};
 
 /** A glob's locale files by tag - `locales/<tag>/<table>.csv` -> [{ table, load }] - English left out: it is the
@@ -83,9 +83,8 @@ let _translators = indexTranslators(TRANSLATORS);
 
 /** L10N3b: the installed packs, by tag - read from the store at boot and after every install or removal. */
 let _packs = new Map();
-/** Whether the game holds text for `code`: the build's (English and the pseudo-locale always), or an installed pack. A
- *  language still `drafting` (systems/localeCatalog.js) is not held by its part-drafts alone - only a pack offers it. */
-export const hasLocaleText = (code) => code === BASE_LOCALE || code === PSEUDO_LOCALE || (byCode.has(code) && !catalogLocale(code)?.drafting)
+/** Whether the game holds text for `code`: the build's (English and the pseudo-locale always), or an installed pack. */
+export const hasLocaleText = (code) => code === BASE_LOCALE || code === PSEUDO_LOCALE || byCode.has(code)
   || ((_packs.has(code) || _bundled.has(code)) && !!catalogLocale(code));
 
 /** What the text core is told of a language: the catalog's record, its installed pack's (`pack` - the language row

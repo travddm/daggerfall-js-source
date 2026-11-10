@@ -37,7 +37,7 @@ test('L10N1b catalog: every language once, by a well-formed tag, its own name an
   assert.equal(LOCALE_CATALOG[0].source, 'base');
   const middle = LOCALE_CATALOG.slice(1, -1);
   assert.deepEqual(middle.map((l) => l.englishName), [...middle.map((l) => l.englishName)].sort(), 'by English name');
-  assert.ok(middle.every((l) => l.source === 'machine'), 'every language is Claude\'s draft until a human one lands');
+  assert.ok(middle.every((l) => l.source === 'community'), 'every other language is a person\'s translation');
   const pseudo = LOCALE_CATALOG.at(-1);
   assert.equal(pseudo.code, tm.PSEUDO_LOCALE);
   assert.equal(pseudo.hidden, true);
@@ -97,10 +97,7 @@ test('L10N1b every language\'s file: DFU\'s format as the port writes it, the En
     const rows = tm.parseStringTableCsv(text);
     assert.equal(tm.formatStringTableCsv(rows), text, `${path} is in the port's own form (the writer's)`);
     const map = new Map(rows);
-    // a language still `drafting` holds part of the catalog and is not offered on it (test below); every other
-    // language holds the catalog exactly
-    if (catalogLocale(code).drafting) assert.deepEqual([...map.keys()].filter((k) => !en.has(k)), [], `${code}'s part-drafts name only catalog keys`);
-    else assert.deepEqual([...map.keys()].sort(), [...en.keys()].sort(), `${code} covers the catalog`);
+    assert.deepEqual([...map.keys()].sort(), [...en.keys()].sort(), `${code} covers the catalog`);
     for (const [k, v] of map) {
       assert.ok(v.trim(), `${code} ${k} is empty`);
       assert.doesNotThrow(() => tm.parseMessage(v), `${code} ${k} is not a readable pattern`);
@@ -109,22 +106,13 @@ test('L10N1b every language\'s file: DFU\'s format as the port writes it, the En
   }
 });
 
-test('L10N6 the first batch: a language still drafting is not offered on its part-drafts - not held, not in the picker\'s list, not offered to a browser that reads it - while a whole one is; a pack for it offers it', () => {
-  const drafting = LOCALE_CATALOG.filter((l) => l.drafting).map((l) => l.code);
-  const whole = LOCALE_CATALOG.filter((l) => l.source === 'machine' && !l.drafting).map((l) => l.code);
-  assert.deepEqual(whole, ['bg', 'cs', 'da', 'fr', 'de', 'id', 'it', 'ko', 'nb', 'pt-BR', 'ro', 'ru', 'es'], 'the thirteen drafted whole');
-  assert.equal(drafting.length + whole.length, 25, 'every language is whole or drafting');
-  assert.ok(drafting.includes('ja') && whole.includes('fr'));
-  data._useLocaleFilesForTests({
-    '../../locales/ja/Port_Strings.csv': async () => rd('locales/ja/Port_Strings.csv'),
-    '../../locales/fr/Port_Strings.csv': async () => rd('locales/fr/Port_Strings.csv'),
-  });
-  assert.deepEqual([data.hasLocaleText('ja'), data.hasLocaleText('fr')], [false, true], 'the part-drafts hold nothing a player is offered');
-  assert.equal(localeForBrowser(['ja-JP', 'en'], data.hasLocaleText), null, 'a Japanese browser is not offered Japanese yet');
+test('L10N6 a catalog language is offered by its own files or by a pack for it, and by neither it is not', () => {
+  data._useLocaleFilesForTests({ '../../locales/fr/Port_Strings.csv': async () => 'Key,Value\n' });
+  assert.deepEqual([data.hasLocaleText('fr'), data.hasLocaleText('it')], [true, false]);
+  assert.equal(localeForBrowser(['it-IT', 'en'], data.hasLocaleText), null, 'an Italian browser is not offered Italian');
   assert.equal(localeForBrowser(['fr-FR', 'en'], data.hasLocaleText), 'fr');
-  data._useLocaleFilesForTests({ '../../locales/ja/Port_Strings.csv': async () => rd('locales/ja/Port_Strings.csv') },
-    { meta: { '../../locales/ja/pack/PACK.json': { name: 'A pack', authors: ['Someone'], licence: 'MIT', source: 'https://example.org' } } });
-  assert.equal(data.hasLocaleText('ja'), true, 'a pack for it offers it');
+  data._useLocaleFilesForTests({}, { meta: { '../../locales/it/pack/PACK.json': { name: 'A pack', authors: ['Someone'], licence: 'MIT', source: 'https://example.org' } } });
+  assert.equal(data.hasLocaleText('it'), true, 'a pack for it offers it');
   data._useLocaleFilesForTests({});
 });
 
