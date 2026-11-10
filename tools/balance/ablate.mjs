@@ -17,7 +17,7 @@ export function ablationMarkdown(common, layers) {
     for (const [view, title] of VIEWS) {
       lines.push(`### ${title}`, '');
       lines.push(`| Layers | ${common.levels.join(' | ')} |`, `| --- | ${common.levels.map(() => '---:').join(' | ')} |`);
-      lines.push(`| target | ${common.levels.map((level) => times(targetRatio(level))).join(' | ')} |`);
+      lines.push(`| target | ${common.levels.map((level) => times(targetRatio(level, BUILDS[buildName]))).join(' | ')} |`);
       for (const [label, report] of results) {
         const cells = common.levels.map((level) => {
           const row = report.rows.find((r) => r.build === buildName && r.level === level && r.foeKind === 'average');

@@ -6,14 +6,20 @@ import { applyLayers, DEFAULT_LAYERS, LAYER_NAMES, MC_DEFAULT_SWINGS } from './o
 import { DEFAULT_GEAR_PERCENTILE, MATERIAL_NAMES } from './gear.mjs';
 
 export const DEFAULT_LEVELS = Object.freeze([1, 5, 10, 15, 20, 25, 30, 35, 40, 45]);
-export const TARGET_TOP_RATIO = 1.5;
+/** The power budget at level 45 as a multiple of a DFU character: about 1.6x for a maxed melee or archer build, about
+ *  1.75x for a build that casts. */
+export const TARGET_TOP_RATIO = Object.freeze({ melee: 1.6, caster: 1.75 });
 export const TOP_LEVEL = 45;
 /** The layers that act on the foe. Switched off, the character keeps its layers and meets DFU's own foe row. */
 export const FOE_LAYERS = Object.freeze(['stats', 'hero']);
 export const FOE_KINDS = Object.freeze(['weak', 'average', 'strong', 'elite', 'boss']);
 
-/** The owner's target: a maxed character is about 1.5x a DFU character; the path from 1.0 at level 1 is a straight line. */
-export const targetRatio = (level) => 1 + ((TARGET_TOP_RATIO - 1) * (Math.min(level, TOP_LEVEL) - 1)) / (TOP_LEVEL - 1);
+/** A build that casts (its `spell`) is held to the caster's budget, every other build to the melee one. */
+export const targetTopRatio = (build) => (build?.spell ? TARGET_TOP_RATIO.caster : TARGET_TOP_RATIO.melee);
+
+/** The target for a build at a level: 1.0 at level 1, rising in a straight line to its budget at TOP_LEVEL. */
+export const targetRatio = (level, build = null) =>
+  1 + ((targetTopRatio(build) - 1) * (Math.min(level, TOP_LEVEL) - 1)) / (TOP_LEVEL - 1);
 
 const ratio = (a, b) => (b > 0 && Number.isFinite(a) && Number.isFinite(b) ? a / b : null);
 
@@ -58,7 +64,7 @@ export function buildReport({
         rows.push({
           build: buildName, level, foeKind: kind, dfu: dfuValue, ours: oursValue, oursVsDfuFoe: characterValue,
           ratios: dfuValue ? ratiosOf(dfuValue, oursValue) : null,
-          characterRatios: dfuValue ? ratiosOf(dfuValue, characterValue) : null, target: targetRatio(level),
+          characterRatios: dfuValue ? ratiosOf(dfuValue, characterValue) : null, target: targetRatio(level, build),
         });
       }
     }

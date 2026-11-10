@@ -59,10 +59,9 @@ real foe builder, scaling seams, equip table and swing law. Each layer is a swit
 | `power` | Loot-ladder gear: a damage line on the weapon, an armour line on each piece, at the tier the level wears. |
 | `techniques` | The best weapon technique the gear tier can roll. |
 | `swing` | The swing law: DFU's Speed line with the weapon's heft and handling. |
-| `virtue` | 12 attribute points a level instead of 5 (`VIRTUE_POINTS_PER_LEVEL` in `progression.mjs`). It models the Oblivion-style levelling mod, which is no longer in the game. Off by default. |
 | `ceiling` | The maxed character: the blow takes the rest of its room up to `BLOW_MOST`, the hurt and the spell likewise (off by default; add it with `--layers +ceiling,-hero,-stats`). |
 
-The default set (`DEFAULT_LAYERS` in `ours.mjs`) is every layer but `virtue`, `ceiling` and `skyHealth`: the rules
+The default set (`DEFAULT_LAYERS` in `ours.mjs`) is every layer but `ceiling` and `skyHealth`: the rules
 online play turns on under the official profile, with a character of typical gear.
 
 ## The reference characters
@@ -86,10 +85,9 @@ Stated in `builds.mjs` and `progression.mjs`; none comes from a save.
 
 ## How to read it
 
-The report's target column (`targetRatio` in `report.mjs`) is 1.0 at level 1, rising in a straight line to
-`TARGET_TOP_RATIO` 1.5 at level 45. The owner's current budget is decision 41, which supersedes the strict 1.5x: at
-level 45 a maxed character is about 1.6x a DFU character in melee and about 1.75x for the casters, and typical gear
-stays at or under 1.5x. Two numbers are compared with the target:
+The report's target column (`targetRatio` in `report.mjs`) is 1.0 at level 1, rising in a straight line to decision
+41's budget at level 45 (`TARGET_TOP_RATIO`): about 1.6x a DFU character for a melee or archer build, and about 1.75x
+for a build that casts. Typical gear stays at or under 1.5x. Two numbers are compared with the target:
 
 - **Character power**: the geometric mean of dps ratio and dies-s ratio when this game's character meets **DFU's own foe
   row** (the foe layers `stats` and `hero` are switched off for it). It isolates the character.
