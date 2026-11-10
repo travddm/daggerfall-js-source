@@ -26,6 +26,7 @@
     "dressForThePart": false,
     "guildProbation": false,
     "soldGoodsOnShelf": false,
+    "absorptionLimits": false,
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,
