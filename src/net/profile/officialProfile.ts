@@ -48,6 +48,7 @@ const PREFS = Object.freeze({
   soldGoodsOnShelf: false,
   absorptionLimits: false,
   openingDamage: false,
+  eliteStacking: false,
   questlineRewards: true,
 });
 
