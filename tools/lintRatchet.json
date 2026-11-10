@@ -376,7 +376,7 @@
     "src/scenes/worldModes.js::Function 'tryExit'#0": 331,
     "src/scenes/worldModes.js::Function 'tryExitDungeon'#0": 159,
     "src/systems/betterAmbience.js::Function 'createBetterAmbience'#0": 154,
-    "src/systems/classicSave.js::Function 'classicSaveToSnapshot'#0": 248,
+    "src/systems/classicSave.js::Function 'classicSaveToSnapshot'#0": 245,
     "src/systems/comeSailAway/comeSailAway.js::Function 'createComeSailAwayRuntime'#0": 2769,
     "src/systems/comeSailAway/comeSailAwayWaves.js::Function 'buildWaveMesh'#0": 201,
     "src/systems/decor/decorGrants.js::Async function 'openSharedChest'#0": 212,
