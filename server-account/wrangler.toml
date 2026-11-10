@@ -142,13 +142,15 @@ MODES_OFFERED = ""
 # hub applies and hands to its target's own client. Empty: the order lands on the target's next connection instead.
 # AUDIT SAFE RELAY S1: the order goes through the RELAY service binding below, which this address only names the path
 # for - one Worker fetching another's workers.dev address on the same account may be refused (Cloudflare's error 1042).
-RELAY_LAW_URL = "https://daggerfall-online.mackcothran.workers.dev/v1/law"
+# The host is the reserved `relay.invalid`: the binding reads only the path. A deploy without the RELAY binding must set
+# its own relay host here; `.invalid` never resolves, so no order leaves for another server.
+RELAY_LAW_URL = "https://relay.invalid/v1/law"
 # MOD_AI - SAFE5: the reviewer (src/modAi.js) - "off"; "shadow", which reads the relay's feed of public lines and the
 # reported cases and says its verdict beside each case, marked as a shadow's, and does nothing on it; or "on", which
-# also mutes for half an hour on its severest, surest verdicts. Shipped "shadow" (INT5's law, Mac's "Measure 7 days,
-# then enforce"): read what it says for a fortnight, then turn it on. It reads nothing until the deploy has put
-# ANTHROPIC_API_KEY beside it - a secret, from the repository's own secrets, never here.
-MOD_AI = "shadow"
+# also mutes for half an hour on its severest, surest verdicts. Shipped "off": "shadow" and "on" send
+# public chat lines and reported lines to Anthropic's Messages API, so an operator turns the reviewer on on purpose. It
+# reads nothing until ANTHROPIC_API_KEY is set beside it, as a secret, never here.
+MOD_AI = "off"
 # MOD_AI_MODEL: the model, empty for the current Haiku (src/modAi.js MOD_AI_MODEL_DEFAULT). MOD_AI_DAILY_MAX: its calls
 # a UTC day, empty for 1,500.
 MOD_AI_MODEL = ""
