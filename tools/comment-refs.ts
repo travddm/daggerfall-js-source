@@ -29,7 +29,14 @@ export type DiffLines = { added: Map<string, number[]>; removed: Map<string, Map
 
 // Technical names that look like item tags: a letter run with a digit, or capitals with a hyphen.
 const TECHNICAL_NAME =
-  /^(?:UTF-?(?:8|16|32)(?:LE|BE)?|SHA-?\d+|MD5|AES-?\d+|[HR]S\d+|ES\d+|RGBA?\d*|DXT\d|BC\d+|MP[34]|H26[45]|WEBGL\d?|ARENA2|ASD-STE100|STE100|ISO-?\d+|RFC\d+|IEEE\d+|WGS84|CRC\d+|X11|PCM\d+|FSB\d|CP\d+|F\d{1,2}|HTTP\d|IPV[46]|TLS\d+|SSL\d|I18N|L10N|A11Y|E2E|W3C|V8|EC2|S3|R2|D1|UV\d|LOD\d|R\d+F|RG\d+F?|NPC-?\d+|CSS\d?|HTML\d|PNG\d+|GIF\d+|BMP\d+|OGG|JSON\d?)$/;
+  /^(?:UTF-?(?:8|16|32)(?:LE|BE)?|SHA-?\d+|MD5|AES-?\d+|[HR]S\d+|ES\d+|RGBA?\d*|DXT\d|BC\d+|MP[34]|H26[45]|WEBGL\d?|ARENA2|ASD-STE100|STE100|ISO-?\d+|RFC\d+|IEEE\d+|WGS84|CRC\d+|X11|PCM\d+|FSB\d|CP\d+|F\d{1,2}|HTTP\d|IPV[46]|TLS\d+|SSL\d|I18N|L10N|A11Y|E2E|W3C|V8|EC2|S3|R2|D1|UV\d|LOD\d|R\d+F|RG\d+F?|NPC-?\d+|D3D\d+|TES\d|CSS\d?|HTML\d|PNG\d+|GIF\d+|BMP\d+|OGG|JSON\d?)$/;
+
+// Daggerfall's own file and archive names, as a comment writes them without the extension. The shapes come from the
+// files under ARENA2: `ARCH3D.BSA`, images and text (`BODY00I0.IMG`, `FMAP0I00.IMG`, `BIOG00T0.TXT`), quest files
+// (`S0000001.QBN`), numbered configs and videos (`CLASS00.CFG`, `ANIM0000.VID`, `FONT0000.FNT`, `SKY00.DAT`,
+// `WEAPON00.CFG`), and the city and dungeon blocks (`N0B20Y25.RMB`, `R0C10Y16.RDB`, `O0B2XY08.RMB`).
+const DAGGERFALL_FILE_NAME =
+  /^(?:ARCH3D|[A-Z]{4}[0-9A-B]{1,2}[IT]\d{1,2}|S\d{7}|SKY\d{2}|CLASS\d{2}|ANIM\d{4}|WEAPON\d{2}|FONT\d{4}|[A-Z]0[BC][0-9X]{2}[YL]\d{2})$/;
 
 const DECISION = /\bdecisions?\s+\d+/gi;
 const PULL_REQUEST = /\b(?:PRs?|pull requests?)\s+#?\d+|\bissues?\s+#\d+|(?<![\w&/#-])#\d{1,5}(?![\w-])/gi;
@@ -46,7 +53,8 @@ export function tagsIn(text: string): Tag[] {
   add('pull-request', PULL_REQUEST);
   add('audit', AUDIT);
   for (const match of text.matchAll(ITEM)) {
-    if (!TECHNICAL_NAME.test(match[0])) found.push({ kind: 'item', tag: match[0] });
+    if (!TECHNICAL_NAME.test(match[0]) && !DAGGERFALL_FILE_NAME.test(match[0]))
+      found.push({ kind: 'item', tag: match[0] });
   }
   return found;
 }
