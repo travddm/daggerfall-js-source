@@ -5,6 +5,7 @@
 // diseased, when REST-WARN asks first (a DecisionBoxWindow), and the window opens on its Yes, after the flag is down.
 // The mode machine over a stub host (test/world/fb1007_hallfolk.test.js's rig: Warvale's house #1, GENRAS00 as
 // Beautiful Villages serves it), a bed pressed: the rest's place is read at the window's open (shared.js setResting).
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -126,7 +127,8 @@ test('AUDIT RPT1026 L3: a bed pressed in a building is a bed\'s rest - and stays
   }
 });
 
-test('AUDIT RPT1026 L3: the law, in the one door and the one bag - a window a bed\'s press opened rests in the bed and stands on it, offline and online; any other window keeps the host\'s word; the street\'s ship bed carries its press through the box too (mutants: auditl-bed-press-unmarked, auditl-bed-press-place-unread, auditl-bed-press-point-unread, auditl-bed-press-street-dropped, auditl-bed-press-kept)', () => {
+test('AUDIT RPT1026 L3: the law, in the one door and the one bag - a window a bed\'s press opened rests in the bed and stands on it, offline and online; any other window keeps the host\'s word; the street\'s ship bed carries its press through the box too (mutants: auditl-bed-press-unmarked, auditl-bed-press-place-unread, auditl-bed-press-point-unread, auditl-bed-press-street-dropped, auditl-bed-press-kept)', (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const sleeper = () => ({ health: 5, maxHealth: 60, fatigue: 0, magicka: 0, maxMagicka: 30, stats: { endurance: 50, strength: 50, willpower: 50, agility: 50 }, skills: [], career: {}, activeEffects: [] });
   const bagOf = (e) => createRestDeps(e, { restKind: () => 'rough', restPoint: () => ({ kind: 'rough', where: null }), endLines: () => null });
   // offline: the place the open reads

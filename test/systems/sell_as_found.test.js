@@ -6,6 +6,7 @@
 // Each roll now leaves the condition it set as `foundCondition`, and online the Sell arm reads a piece no higher.
 // A smith's repair still adds nothing; MEND-THIRD credits a third of what its owner's OWN
 // mends - a kit, Repairs Objects, the Varla Stone - put past the mark, which nothing here makes.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -59,7 +60,8 @@ test('SELL-AS-FOUND: each of Roleplay & Realism: Items\' rolls leaves the condit
   assert.equal(knight.items.find((it) => it.group === 'Currency')?.foundCondition, undefined, 'gold');
 });
 
-test('SELL-AS-FOUND: online, repairing a found piece to sell it never pays - the counter pays what it paid before, a smith\'s whole repair and a kit\'s 75% alike, for every haggler at every counter (mutants: the mark ignored; read past the mark; the rule offline-only)', () => {
+test('SELL-AS-FOUND: online, repairing a found piece to sell it never pays - the counter pays what it paid before, a smith\'s whole repair and a kit\'s 75% alike, for every haggler at every counter (mutants: the mark ignored; read past the mark; the rule offline-only)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the figures below are priced under the server profile's sale cap
   online(() => {
     let checked = 0;
     for (const quality of [1, 10, 20]) {

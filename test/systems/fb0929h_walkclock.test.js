@@ -25,7 +25,9 @@ function walkRaiseOf() {
   const m = /\n\s*const walkRaise = ([^\n]+);\n/.exec(W);
   assert.ok(m, 'the frame no longer names its walk raise');
   // eslint-disable-next-line no-new-func
-  return new Function('sharedClockOn', 'travelScale', 'dt', 'CLASSIC_MINUTES_PER_SECOND', `return ${m[1]};`);
+  const lifted = new Function('sharedClockOn', 'travelScale', 'dt', 'CLASSIC_MINUTES_PER_SECOND', 'onlineMinutesPerMs', `return ${m[1]};`);
+  // online the frame reads the wire's live rate; at DFU's TimeScale 12 it is the classic rate over a thousand
+  return (sharedClockOn, travelScale, dt, rate) => lifted(sharedClockOn, travelScale, dt, rate, () => rate / 1000);
 }
 const player = () => ({
   isPlayer: true, name: 'P', raceId: RACES.Breton, level: 5, health: 60, maxHealth: 60, magicka: 10, maxMagicka: 10, fatigue: 6000,

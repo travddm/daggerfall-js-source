@@ -23,7 +23,7 @@ const accountVars = varsOf('server-account/wrangler.toml');
 const relayVars = varsOf('server/wrangler.toml');
 
 // The relay's feed doors: each is posted through the ACCOUNTS binding, which reads only the path.
-const RELAY_FEEDS = ['MOD_FEED_URL', 'GRANT_FEED_URL', 'HIDDEN_SEEN_URL', 'STAFF_NET_FEED_URL', 'REACTION_FEED_URL'];
+const RELAY_FEEDS = ['MOD_FEED_URL', 'GRANT_FEED_URL', 'HIDDEN_SEEN_URL'];
 
 test('the shipped reviewer is off even when an operator adds an Anthropic key', () => {
   const env = { ...accountVars, ANTHROPIC_API_KEY: 'sk-test' };

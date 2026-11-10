@@ -54,7 +54,6 @@ import { armsIssuable } from '../../src/net/identityToken.js';   // INT7: the ar
 import { saveTextOf, REALM_TEXT_MAX_BYTES } from '../../src/net/realm/realmSaveCodec.js';   // REALM-GZIP: a save read packed or plain
 import { lineageBirthRefusal, houseOn, endUnionsOf } from './legacy.js';   // LEGACY7: a realm character born as a person of the account's own line
 import { wealthOf, ledgerPieces, classicCount, WEALTH_VERSION } from './judge.js';   // INT5: what the service's own writes move, witnessed; INT4: the pieces it moves
-import { seaSeasonSteps } from './seaSeason.js';   // SEA-SEASON: the sea's season figures, off a clean checkpoint
 import { piecesRefusal, ledgerMoves, releaseSteps, ledgerReads, leavingKeys } from './ledger.js';   // INT4: a piece the record may give, and the ledger moved with it; SAVE-BATCH: its reads in the checkpoint's first batch
 import { budgetKept, budgetRead, budgetFrom } from './budget.js';   // SAVE-BATCH: and the budget's config, where the isolate kept none
 import { verdictOn } from './verdict.js';   // INT2-INT5: the verdict on every checkpoint, in the checkpoint's own batch
@@ -376,7 +375,7 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
  * @param {any} ctx @param {string} playerId
  * @param {{ id: string, lease: unknown, seq: unknown, summary?: unknown }} at @param {ArrayBuffer} body @param {number} bytes
  */
-export async function checkpointRealm({ db, bucket, rand, nowS }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
+export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
   if (!bucket) return { error: 'no-storage' };
   if (!REALM_ID_RE.test(id) || typeof lease !== 'string' || !LEASE_RE.test(lease) || !Number.isSafeInteger(seq) || /** @type {number} */ (seq) < 1) return { error: 'body' };
   // SAVE-BATCH: the record's row, the ledger's two reads of the character's own rows and (where this isolate
@@ -436,7 +435,7 @@ export async function checkpointRealm({ db, bucket, rand, nowS }, playerId, { id
   // the stored record measured again under the new one
   const baseline = row.wealth == null || row.wealth_v !== WEALTH_VERSION ? await baselineOf(bucket, row) : null;
   const known = { mine: mineRes, dupes: dupesRes, config };
-  const v = await verdictOn({ db, nowS }, { player: playerId, char: id, seq: /** @type {number} */ (seq), key }, row, save, summaryNow, baseline, known);
+  const v = await verdictOn({ db, nowS, env }, { player: playerId, char: id, seq: /** @type {number} */ (seq), key }, row, save, summaryNow, baseline, known);
   await bucket.put(key, body);
   /** @type {any} the judge's columns as they stand after the batch - the verdict's, or (its rev moved) the row's */
   let stood = null;
@@ -446,8 +445,6 @@ export async function checkpointRealm({ db, bucket, rand, nowS }, playerId, { id
         .bind(seq, bytes, key, nowS, said, nowS, id, playerId, lease, /** @type {number} */ (seq) - 1),
       mustChange(db),
       ...v.steps,
-      // SEA-SEASON (seaSeason.js): a clean checkpoint's season figures - after the verdict's write, so a hold it lays counts
-      ...(v.clean ? seaSeasonSteps(db, { player: playerId, char: id }, save, nowS) : []),
     ]);
     if (res?.[2]?.meta?.changes === 1) stood = v.set;
   } catch {

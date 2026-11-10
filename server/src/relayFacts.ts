@@ -2,8 +2,16 @@
 // page before its world boots). Both name the profile's hash, as every welcome does.
 
 import { RELAY_VERSION } from '../../src/net/wire.js';
+import { DFU_TIME_SCALE, setOnlineTimeScale, setSkyClock } from '../../src/net/world-time-scale.ts';
 import { OFFICIAL_PROFILE } from '../../src/net/profile/officialProfile.ts';
 import { profileHashOf } from '../../src/net/profile/profileHash.ts';
+
+// The clocks' TimeScales are the profile's (time.worldScale, and time.skyClock with time.skyScale), so every raid,
+// exhibition and grant minute and every Starfall night the relay reads agrees with the clients'. The relay does not bundle
+// the key registry, so a profile that names none plays the defaults: DFU's 12, one clock.
+const officialRules = OFFICIAL_PROFILE.rules as Record<string, unknown>;
+setOnlineTimeScale(officialRules['time.worldScale'] ?? DFU_TIME_SCALE);
+setSkyClock(officialRules['time.skyClock'], officialRules['time.skyScale']);
 
 let held: Promise<string> | null = null;
 /** The profile's hash, computed on first use: a Worker may not run `crypto.subtle` in its global scope. */

@@ -14,7 +14,8 @@ import { mintReceipt } from '../../src/net/gate/gateReceipt.js';
 import { mintSdReceipt } from '../../src/net/superDungeon/sdReceipt.js';
 import { mintSerpentReceipt } from '../../src/net/serpent/serpentReceipt.js';
 import { mintStarReceipt } from '../../src/net/starfall/starReceipt.js';   // STAR8: the fallen stars' witness
-import { STAR_HOUR_MS } from '../../src/net/starfall/starfallLaw.js';
+import { } from '../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter } from '../../src/net/sky-days.ts';
 import { QL_SERVICE_LINES, QL_TITLES, QL_WITNESS_KINDS, qlTitleBit, qlStepClaimed } from '../../src/net/questlineClaims.js';
 import { claimQl, QL_WITNESS_SQL, QL_STATUS, qlTitleSteps, qlSwitchOf, questlinesOpenFor, qlStepsBefore, qlInOrderSql, QL_PURSES } from '../../server-account/src/questlines.js';
 import { titlesHeld } from '../../server-account/src/titles.js';
@@ -70,7 +71,7 @@ async function stood(t, extra = {}) {
   /** STAR8: a fallen star held - its receipt claimed (its `stars_held` row), each one a star of its own, a night's three
    *  and the next night's after them. */
   let held = 0;
-  const STAR_N = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS) + 5;
+  const STAR_N = skyDayAtOrAfter(FESTIVAL_FROM_MS) + 5;
   const star = async (who) => {
     const i = held++;
     const receipt = await mintStarReceipt({ n: STAR_N + Math.floor(i / 3), k: i % 3, s: who.id, c: 7, l: 14 }, S.gatePriv, { subtle, nowS: now() });

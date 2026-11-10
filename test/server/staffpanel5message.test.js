@@ -134,6 +134,10 @@ test('STAFF-PANEL5-MESSAGE: never by name, never empty, an account that exists, 
 
 test('STAFF-PANEL5-MESSAGE: one message every 5 seconds a staff member - a second inside it is refused 429 and audited failed, another member is not held by it, and 5 seconds on it goes (mutants: the gap unasked; the gap asked of everyone; the store\'s own ask dropped)', async () => {
   const s = await stand();
+  // The server reads whole seconds and the pin backdates by whole seconds: a second boundary between two steps would move the gap by one.
+  const realNow = Date.now;
+  const frozen = realNow();
+  Date.now = () => frozen;
   try {
     assert.equal((await s.send(s.asy, { target: s.troll.id, text: 'one' })).status, 200);
     assert.deepEqual(await s.send(s.asy, { target: s.sylvia.id, text: 'two' }), { status: 429, body: { error: 'staff-message-rate' } });
@@ -155,7 +159,7 @@ test('STAFF-PANEL5-MESSAGE: one message every 5 seconds a staff member - a secon
     try { assert.deepEqual(await s.send(s.tab, { target: s.troll.id, text: 'second' }), { status: 429, body: { error: 'staff-message-rate' } }); } finally { s.env.DB.prepare = realPrepare; }
     assert.ok(raced, 'the race was run');
     assert.equal(s.audits('message').at(-1).outcome, 'failed', 'and its audit row says it changed nothing');
-  } finally { s.restore(); }
+  } finally { Date.now = realNow; s.restore(); }
 });
 
 test('STAFF-PANEL5-MESSAGE: EACH MESSAGE\'S STATE - Delivered (the hub handed it), "old game, not shown", Not confirmed (no socket, the door refused, no relay), Sent (a door that gave no count), then "they pressed OK" from the player\'s own game (mutants: each state\'s rule)', async () => {

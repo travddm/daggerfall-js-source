@@ -1,15 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SAFE5 + SAFE8: THE
-// CHAT SAFETY'S CLOCK - what no request waits on. Every minute (cron.js MINUTE_JOBS 'safety'):
+// THE CHAT SAFETY'S CLOCK - what no request waits on. Every minute (cron.js MINUTE_JOBS 'safety'):
 //   1. the reviewer reads the cases reports opened or grew (TRIAGE_MAX), the most reporters who count first, and gives
 //      each its verdict on the reported account's lines - BEFORE the feed (AUDIT SAFE AI-3: the feed spent the day's
 //      calls first, and a report went unread);
 //   2. the reviewer reads the relay's waiting feed batches - as many as fit FEED_LINES_MAX lines in one call (AI-3: a
 //      batch of two lines cost a call of its own), FEED_READS_MAX calls - and opens a case for each speaker it finds
-//      breaking the code at FLAG_SEVERITY or worse: their flagged lines and the CONTEXT_BEFORE lines before each;
-//   3. every case whose verdict is in (or that has waited REVIEW_WAIT_S since it opened on a reviewer that does not
-//      answer) is posted to the moderators' channel, or its card redrawn (POSTS_MAX), the most reporters first.
+//      breaking the code at FLAG_SEVERITY or worse: their flagged lines and the CONTEXT_BEFORE lines before each.
+// Moderators read the cases in the staff panel and in the game (safety.js).
 //
 // A READ IS CLAIMED (AI-9): the statement that takes a batch or a case marks it `reading`, so two firings that overlap
 // never read one twice; a claim a firing never finished is free again after CLAIM_STALE_S. A batch is DONE only once
@@ -31,12 +29,10 @@
 // Every hour (HOUR_JOBS 'safety-sweep'), each a page asked again while full and the budget holds (AI-7: one page of
 // 500 an hour kept the feed's lines past the privacy policy's day): the feed's batches past FEED_KEEP_S; a case left
 // open past CASE_OPEN_MAX_S closed as expired; a resolved case's lines, its reports' notes and the reviewer's reason
-// past RESOLVED_LINES_KEEP_S - and its card in the moderators' channel redrawn without them (DOC-1: the copy in Discord
-// outlived the policy's ninety days); the reviewer's daily counts past AI_DAYS_KEEP.
+// past RESOLVED_LINES_KEEP_S (the privacy policy's ninety days); the reviewer's daily counts past AI_DAYS_KEEP.
 // ═══════════════════════════════════════════════════════════════════
 
 import { reviewLines, modAiOn, modAiModeOf, flagActs, FLAG_SEVERITY, AI_WAITS } from './modAi.js';
-import { discordOn, sendCard, cardOf } from './discord.js';
 import { openCaseFor, keepCaseLines } from './safety.js';
 import { autoMute, autoMutable, lawOrder, pushLaw } from './sanctions.js';
 import { FEED_LINES_MAX } from '../../src/net/safety/chatFeed.js';
@@ -49,12 +45,8 @@ export const FEED_COMBINE_ROWS = 20;
 export const FEED_SPEAKERS_MAX = 6;
 /** The cases the reviewer reads a minute. */
 export const TRIAGE_MAX = 3;
-/** The cards posted or redrawn a minute (Discord's own rate is five a channel in five seconds). */
-export const POSTS_MAX = 5;
 /** The feed's lines kept before each flagged line, for context. */
 export const CONTEXT_BEFORE = 3;
-/** How long a new case waits on a reviewer that does not answer before it is posted without a verdict, seconds. */
-export const REVIEW_WAIT_S = 600;
 /** How long a firing's claim on a batch or a case holds before another firing may take it, seconds. */
 export const CLAIM_STALE_S = 600;
 /** How long the feed's batches are kept (a batch seen twice inside it is read once), seconds. */
@@ -110,18 +102,18 @@ async function actOn(ctx, env, fetchFn, caseId, targetId, flag, lines) {
 
 /**
  * A verdict kept on its case - only ever raised (a worse severity, or the same at more confidence - AI-12), with the
- * line it flagged (AI-10) - and the card due again. A read of the case itself (`read`, the triage's) closes its claim;
+ * line it flagged. A read of the case itself (`read`, the triage's) closes its claim;
  * the feed's verdict on a case a report holds leaves that report's read due (AI-6).
  * @param {any} db @param {string} caseId @param {any} flag @param {{ at: number, sub: string }|null} line
  * @param {string} mode @param {number} nowS @param {{ read: boolean }} how
  */
 async function keepVerdict(db, caseId, flag, line, mode, nowS, { read }) {
   await db.prepare(`UPDATE mod_cases SET ai_category = ?2, ai_severity = ?3, ai_confidence = ?4, ai_reason = ?5, ai_mode = ?6, ai_at = ?7,
-      ai_line_at = ?8, ai_line_sub = ?9, updated_at = ?7, discord_state = CASE WHEN discord_state = 'off' THEN 'off' ELSE 'due' END
+      ai_line_at = ?8, ai_line_sub = ?9, updated_at = ?7
     WHERE id = ?1 AND (ai_severity IS NULL OR ai_severity < ?3 OR (ai_severity = ?3 AND COALESCE(ai_confidence, 0) <= ?4))`)
     .bind(caseId, flag?.category ?? null, flag?.severity ?? 0, flag?.confidence ?? null, flag?.reason ?? null, mode, nowS, line?.at ?? null, line?.sub ?? null).run();
   if (read) {
-    await db.prepare("UPDATE mod_cases SET ai_state = 'done', ai_mode = ?2, ai_at = ?3, discord_state = CASE WHEN discord_state = 'off' THEN 'off' ELSE 'due' END WHERE id = ?1 AND ai_state = 'reading'")
+    await db.prepare("UPDATE mod_cases SET ai_state = 'done', ai_mode = ?2, ai_at = ?3 WHERE id = ?1 AND ai_state = 'reading'")
       .bind(caseId, mode, nowS).run();
   }
 }
@@ -143,7 +135,7 @@ async function triageCases(ctx, env, fetchFn) {
     }
     n++;
     if (!('flags' in r)) {
-      await ctx.db.prepare("UPDATE mod_cases SET ai_state = 'failed', ai_at = ?2, discord_state = CASE WHEN discord_state = 'off' THEN 'off' ELSE 'due' END WHERE id = ?1 AND ai_state = 'reading'").bind(c.id, ctx.nowS).run();
+      await ctx.db.prepare("UPDATE mod_cases SET ai_state = 'failed', ai_at = ?2 WHERE id = ?1 AND ai_state = 'reading'").bind(c.id, ctx.nowS).run();
       continue;
     }
     const worst = worstOf(r.flags.filter((f) => lines[f.line]?.sub === c.target));
@@ -210,35 +202,10 @@ async function readFeed(ctx, env, fetchFn) {
       // ONE LINE THE REVIEWER WOULD NOT READ: the moderators read it - a case of its own, marked unread
       const caseId = await openCaseFor(ctx, env, lines[0].sub, 'review');
       await keepCaseLines(ctx.db, caseId, [{ ...lines[0], sg: null }], lines[0].sub);
-      await ctx.db.prepare("UPDATE mod_cases SET ai_state = 'failed', ai_at = ?2, updated_at = ?2, discord_state = CASE WHEN discord_state = 'off' THEN 'off' ELSE 'due' END WHERE id = ?1 AND ai_severity IS NULL")
+      await ctx.db.prepare("UPDATE mod_cases SET ai_state = 'failed', ai_at = ?2, updated_at = ?2 WHERE id = ?1 AND ai_severity IS NULL")
         .bind(caseId, ctx.nowS).run();
     }
     await markFeed(ctx.db, ids, 'done');
-  }
-  return n;
-}
-
-/** 3. THE CARDS: each case due (or open and never posted, the queue having been off - DISCORD-6), posted or redrawn
- *  once its verdict is in or it has waited REVIEW_WAIT_S since it opened (AI-11), the most reporters first. A card
- *  Discord refuses is marked and passed over (DISCORD-2: one refused card held the whole queue every minute); a card
- *  whose message is gone is posted again; only an unreachable Discord waits the minute out. A card drawn before a
- *  press or a report changed its case is drawn again (DISCORD-8). */
-async function postCards(ctx, env, fetchFn) {
-  const due = (await ctx.db.prepare(`SELECT id, discord_msg, updated_at, status FROM mod_cases
-      WHERE (discord_state = 'due' OR (discord_state = 'off' AND status = 'open'))
-        AND (status != 'open' OR ai_state NOT IN ('due', 'reading') OR opened_at < ?1)
-      ORDER BY credible DESC, reports DESC, updated_at LIMIT ?2`).bind(ctx.nowS - REVIEW_WAIT_S, POSTS_MAX).all())?.results ?? [];
-  let n = 0;
-  for (const c of due) {
-    const card = await cardOf(ctx.db, c.id, ctx.nowS);
-    if (!card) continue;
-    const sent = await sendCard(env, fetchFn, card, c.discord_msg ?? null, { nonce: c.id });
-    if ('down' in sent) break;
-    if ('gone' in sent) { await ctx.db.prepare('UPDATE mod_cases SET discord_msg = NULL WHERE id = ?1').bind(c.id).run(); continue; }
-    if ('refused' in sent) { await ctx.db.prepare("UPDATE mod_cases SET discord_state = 'failed' WHERE id = ?1").bind(c.id).run(); continue; }
-    await ctx.db.prepare("UPDATE mod_cases SET discord_msg = ?2, discord_state = CASE WHEN updated_at = ?3 AND status = ?4 THEN 'posted' ELSE 'due' END WHERE id = ?1")
-      .bind(c.id, sent.id, c.updated_at, c.status).run();
-    n++;
   }
   return n;
 }
@@ -251,7 +218,6 @@ async function postCards(ctx, env, fetchFn) {
 export async function safetyMinute(ctx, env, { fetchFn = (u, i) => globalThis.fetch(u, i) } = {}) {
   let n = 0;
   if (modAiOn(env)) n += (await triageCases(ctx, env, fetchFn)) + (await readFeed(ctx, env, fetchFn));
-  if (discordOn(env)) n += await postCards(ctx, env, fetchFn);
   return n;
 }
 
@@ -270,11 +236,10 @@ export async function safetySweep(ctx) {
   };
   let n = 0;
   n += await paged('DELETE FROM mod_feed WHERE id IN (SELECT id FROM mod_feed WHERE at < ?1 LIMIT ?2)', nowS - FEED_KEEP_S);
-  n += await paged(`UPDATE mod_cases SET status = 'dismissed', resolved_by = 'the clock', resolved_at = ?1, resolution = 'expired', updated_at = ?1, claimed_at = NULL,
-      ai_state = CASE WHEN ai_state IN ('due', 'reading') THEN 'off' ELSE ai_state END,
-      discord_state = CASE WHEN discord_msg IS NULL THEN 'off' ELSE 'due' END
+  n += await paged(`UPDATE mod_cases SET status = 'dismissed', resolved_by = 'the clock', resolved_at = ?1, resolution = 'expired', updated_at = ?1,
+      ai_state = CASE WHEN ai_state IN ('due', 'reading') THEN 'off' ELSE ai_state END
     WHERE id IN (SELECT id FROM mod_cases WHERE status = 'open' AND opened_at < ?2 LIMIT ?3)`, nowS, nowS - CASE_OPEN_MAX_S);
-  n += await paged(`UPDATE mod_cases SET lines_kept = 0, ai_reason = NULL, discord_state = CASE WHEN discord_msg IS NULL THEN discord_state ELSE 'due' END
+  n += await paged(`UPDATE mod_cases SET lines_kept = 0, ai_reason = NULL
     WHERE id IN (SELECT id FROM mod_cases WHERE lines_kept = 1 AND resolved_at IS NOT NULL AND resolved_at < ?1 AND status != 'open' LIMIT ?2)`, nowS - RESOLVED_LINES_KEEP_S);
   n += await paged(`DELETE FROM mod_case_lines WHERE rowid IN (SELECT l.rowid FROM mod_case_lines l JOIN mod_cases c ON c.id = l.case_id
     WHERE c.lines_kept = 0 LIMIT ?1)`);

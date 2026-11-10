@@ -10,7 +10,7 @@
 // DaggerfallUI.MessageBox lines to the HUD line instead; three
 // DOM-native windows (the tavern, the inventory, the held map) grew
 // their own notice cards; and the HUD-text kind - PopupText, the
-// top-of-screen lines that Climates & Calories, Ambient Text and the
+// top-of-screen lines that Climates & Calories and the
 // torches speak through - had a column of its own. Four faces, no
 // funnel.
 //

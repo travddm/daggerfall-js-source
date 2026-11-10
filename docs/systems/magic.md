@@ -146,10 +146,12 @@ the cast spent.
 4. The sources are checked in order: the Spell Absorption effect, the career flag (`careerAbsorbs`), then any
    registered chance (`registerAbsorptionChance`, used by arcane paths).
 
-Port changes: the Absorbs Spells item enchantment is a roll (`ABSORB_ENCHANT_CHANCE`), not always. The Spell
-Absorption effect's chance is capped (`SPELL_ABSORPTION_CHANCE_CAP`). Every absorb refunds half the points, floored
-(`ABSORB_REFUND_SCALE`, `absorbRefund`). A career with absorption Always (the Sorcerer) still absorbs every time.
-Decided, not built: DFU's absorption by default, the halved refund as an option (decision 117 (20)).
+By default absorption is Daggerfall Unity's: the Absorbs Spells item enchantment always absorbs, the Spell Absorption
+effect's chance has no cap, and an absorb refunds the whole of the points. The "Absorption limits" Features row
+(`absorption-limits.ts`, pinned off online) brings back the port's limits: the enchantment is a roll
+(`ABSORB_ENCHANT_CHANCE`), the effect's chance and the Spell Maker's are capped (`SPELL_ABSORPTION_CHANCE_CAP`), and every
+absorb refunds half the points, floored (`ABSORB_REFUND_SCALE`, `absorbRefund`). A career with absorption Always (the
+Sorcerer) absorbs every time either way.
 Tests: `test/systems/absorption.test.js`, `absorb_nerf.test.js`.
 
 ## Enchantments

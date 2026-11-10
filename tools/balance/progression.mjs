@@ -10,7 +10,7 @@
 //     then counts effective points, tops out at 800 and, with the online level law, reaches level 45 exactly at the top
 //     (levelClimb.js onlineLevelFor).
 //   - Attributes: 5 points a level (DFU bonus pool Range(4,6), mean 5; online fixed 5), split by the build's weights, each
-//     stat held at 100. `pointsPerLevel` 12 is the Oblivion-style levelling mod (audit A23).
+//     stat held at 100.
 //   - Hit points: 25 + h at level 1 (rollMaxHealthLevel1), then each level adds the class's mean roll plus the
 //     Endurance modifier at that level (CalculateHitPointsPerLevelUp), never under 1.
 import { ONLINE_LEVEL_CAP, onlineLevelFor } from '../../src/systems/levelClimb.js';
@@ -20,7 +20,6 @@ import { SKILL_START, MISC_SKILL_START, LEVEL_PER_SUM, LEVEL_HEAD_START, STAT_KE
 export const DFU_SKILL_CAP = 100;
 export const SKILL_COUNT = 35;
 export const DFU_POINTS_PER_LEVEL = 5;
-export const VIRTUE_POINTS_PER_LEVEL = 12;
 export const ATTRIBUTE_CAP = 100;
 
 /** Counted-sum gain a DFU level needs: the smallest gain G with floor((G + 28) / 15) = level. */

@@ -3,6 +3,7 @@
 // menupad, touchbuttons, guildshelf, decor1, auditsoc, own1); these are the ones whose seam is a pure law, or a host's
 // closure read by its source (world.js - the scene cannot be stood up here), recorded in
 // ## AUDIT.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -16,7 +17,8 @@ const W = src('src/scenes/world.js');
 
 // ─── SPELL-GIFT / PARTY-BUFFS (agent B) ────────────────────────────────────────────────────────────────────────────
 
-test('AUDIT SPELL-GIFT B4: the live Spell Absorption is the BEST of its entries - a gift never merges with my own (ALLY-CAST C2), and a stranger\'s 0% one, first in the list, made my own 100% read 0 for as long as it ran (mutants: the first entry\'s)', () => {
+test('AUDIT SPELL-GIFT B4: the live Spell Absorption is the BEST of its entries - a gift never merges with my own (ALLY-CAST C2), and a stranger\'s 0% one, first in the list, made my own 100% read 0 for as long as it ran (mutants: the first entry\'s)', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const entry = (chanceBase, over = {}) => ({ kind: 'spellAbsorption', chanceBase, chanceMod: 0, chancePerLevel: 1, ...over });
   // ABSORB-NERF: the chance caps at 50 (absorption.js SPELL_ABSORPTION_CHANCE_CAP) - the best is read under it
   assert.equal(spellAbsorptionChance({ level: 10, activeEffects: [entry(0), entry(40)] }), 40, 'the gift ahead of my own');

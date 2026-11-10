@@ -57,7 +57,7 @@ export const sourceName = (/** @type {string} */ id) => WARDROBE_SOURCES.find(([
  * (wardrobeAvail): 'seasonal' while one is open, 'offseason' while none is.
  *   open      play earns it now          chance    a roll on a deed, earned by trying
  *   ranked    held while on top of a board, and passed on
- *   seasonal  the Witches' Festival's     patron    a Patreon pledge's, held while it stands
+ *   seasonal  the Witches' Festival's
  *   dormant   in the vocabulary, given out by nothing yet
  *   staff     the game's own people
  *   auto      given by itself, never earned (AUDIT COLLECTIONS-II, lane 3: the sprout, a new account's two weeks)
@@ -65,9 +65,9 @@ export const sourceName = (/** @type {string} */ id) => WARDROBE_SOURCES.find(([
  *             a guest from before the cutoff earns it by registering, a character from before it brings it along)
  *   retired   given once and closed (a first company's name)
  */
-export const WARDROBE_AVAIL = Object.freeze(['open', 'chance', 'ranked', 'seasonal', 'offseason', 'patron', 'dormant', 'auto', 'staff', 'closed', 'retired']);
+export const WARDROBE_AVAIL = Object.freeze(['open', 'chance', 'ranked', 'seasonal', 'offseason', 'dormant', 'auto', 'staff', 'closed', 'retired']);
 /** The availabilities a player can act on now - the page's "Obtainable" filter. */
-export const AVAIL_NOW = Object.freeze(['open', 'chance', 'ranked', 'seasonal', 'patron']);
+export const AVAIL_NOW = Object.freeze(['open', 'chance', 'ranked', 'seasonal']);
 /** Each availability's tag (a chip on the row), as a player reads it. */
 export const AVAIL_TAG = Object.freeze({
   open: () => t('coll.avail.open', 'Obtainable'),
@@ -75,7 +75,6 @@ export const AVAIL_TAG = Object.freeze({
   ranked: () => t('coll.avail.ranked', 'Ranked'),
   seasonal: () => t('coll.avail.seasonal', 'Seasonal'),
   offseason: () => t('coll.avail.offseason', 'Out of season'),
-  patron: () => t('coll.avail.patron', 'Patron reward'),
   dormant: () => t('coll.avail.dormant', 'Not yet available'),
   auto: () => t('coll.avail.auto', 'Automatic'),
   staff: () => t('coll.avail.staff', 'Staff only'),
@@ -89,7 +88,6 @@ export const AVAIL_LINE = Object.freeze({
   ranked: () => t('coll.availLine.ranked', 'Held only while you stay on top.'),   // AUDIT COLLECTIONS-II (lane 1): a #1 short of a board's floor holds nothing, so it passes to no one
   seasonal: (/** @type {string} */ date) => t('coll.availLine.seasonal', 'Only during the Witches’ Festival - on now, until {date}.', { date }),
   offseason: () => t('coll.availLine.offseason', 'Only during the Witches’ Festival, which is not on now.'),
-  patron: () => t('coll.availLine.patron', 'Held while your pledge stands.'),
   dormant: () => t('coll.availLine.dormant', 'Not open to players yet.'),
   auto: () => t('coll.availLine.auto', 'Given to every new account by itself - it cannot be earned later.'),
   staff: () => t('coll.availLine.staff', 'Held by the game’s staff alone.'),
@@ -104,9 +102,8 @@ export const REMNANT_ODDS = Object.freeze({ hourbreaker: 4, turninghour: 8 });
 export const SERPENT_ODDS = Object.freeze({ coilbreaker: 20, maelstrom: 50 });
 
 // ── the words of how ──────────────────────────────────────────────────────────────────────────────────────────────────
-const patron = (/** @type {string} */ tier) => () => t('coll.how.patron', 'Support DFO Online on Patreon at the {tier} tier, then link Patreon from your profile - or be granted it by name.', { tier: TITLE_TEXT[/** @type {keyof typeof TITLE_TEXT} */ (tier)] });
-/** Apostle: a Patreon tier's title no pledge maps yet (server-account/wrangler.toml PATREON_TIERS), held by name alone. */
-const apostle = () => t('coll.how.apostle', 'A Patreon reward with no tier to pledge yet - for now it is granted by name.');
+/** The named titles (server-account/src/titles.js TIER_LISTS): a server's config grants each by name alone. */
+const named = () => t('coll.how.named', 'Granted by name in the server’s settings.');
 const developer = () => t('coll.how.developer', 'The game’s developers.');
 const dungeonMaster = () => t('coll.how.dungeonmaster', 'The game’s Dungeon Master, who may speak to chat in orange with /dm.');
 const broker = (/** @type {string} */ id) => () => t('coll.how.broker', 'Buy it from the Sigil Broker for {price} Deadlands Embers - won closing Dagon’s Breaches and slaying Sea Serpents.', { price: insigniaById(id)?.price ?? 0 });   // AUDIT COLLECTIONS-II (lane 1): every ember the purse counts (accounts.js EMBERS_EARNED_SQL)
@@ -159,11 +156,11 @@ export const WARDROBE = Object.freeze({
     founder: E('account', 'closed', () => t('coll.how.founder', 'Every registered account that first played by noon UTC on 25 September 2026, or is granted it by name. A guest from before then earns it by registering; a character from before then brought onto your account counts too.')),   // AUDIT COLLECTIONS-II (lane 1): server-account/src/titles.js FOUNDER_UNTIL, firstPlayed, FOUNDER_HANDLES; founderLink.js
     developer: E('staff', 'staff', developer, { with: ['aura:seraphwings', 'glyph:dev'] }),
     dungeonmaster: E('staff', 'staff', dungeonMaster, { with: ['glyph:dm'] }),
-    disciple: E('patrons', 'patron', patron('disciple'), { with: ['glyph:disciple'] }),
-    apostle: E('patrons', 'dormant', apostle, { with: ['glyph:apostle'] }),
-    hierophant: E('patrons', 'patron', patron('hierophant'), { with: ['glyph:hierophant'] }),
+    disciple: E('patrons', 'dormant', named, { with: ['glyph:disciple'] }),
+    apostle: E('patrons', 'dormant', named, { with: ['glyph:apostle'] }),
+    hierophant: E('patrons', 'dormant', named, { with: ['glyph:hierophant'] }),
     gatebreaker: E('broker', 'open', broker('title:gatebreaker')),
-    herald: E('patrons', 'patron', patron('herald'), { with: ['glyph:herald'] }),
+    herald: E('patrons', 'dormant', named, { with: ['glyph:herald'] }),
     // AUDIT COLLECTIONS-II (lane 1): a seat's title is worn on the guildmaster's character (the token's mint); the Tourney's champion when proclaimed
     warden: E('seats', 'open', () => t('coll.how.warden', 'Lead a guild that holds a town’s palace seat. Your guildmaster character wears it as “Warden of” the town.')),
     protector: E('seats', 'open', () => t('coll.how.protector', 'Lead a guild that holds a kingdom’s crown seat. Your guildmaster character wears it as “Protector of” the kingdom.')),
@@ -215,10 +212,10 @@ export const WARDROBE = Object.freeze({
     dev: E('staff', 'staff', developer, { with: ['title:developer', 'aura:seraphwings'] }),
     mod: E('staff', 'staff', () => t('coll.how.moderator', 'The game’s moderators.')),
     dm: E('staff', 'staff', dungeonMaster, { with: ['title:dungeonmaster'] }),
-    disciple: E('patrons', 'patron', patron('disciple'), { with: ['title:disciple'] }),
-    apostle: E('patrons', 'dormant', apostle, { with: ['title:apostle'] }),
-    hierophant: E('patrons', 'patron', patron('hierophant'), { with: ['title:hierophant'] }),
-    herald: E('patrons', 'patron', patron('herald'), { with: ['title:herald'] }),
+    disciple: E('patrons', 'dormant', named, { with: ['title:disciple'] }),
+    apostle: E('patrons', 'dormant', named, { with: ['title:apostle'] }),
+    hierophant: E('patrons', 'dormant', named, { with: ['title:hierophant'] }),
+    herald: E('patrons', 'dormant', named, { with: ['title:herald'] }),
     tower: E('seats', 'open', () => t('coll.how.tower', 'Belong to a guild that holds a town’s palace seat.'), PER_CHARACTER),
     crownDF: E('seats', 'open', crown, PER_CHARACTER),
     crownWR: E('seats', 'open', crown, PER_CHARACTER),

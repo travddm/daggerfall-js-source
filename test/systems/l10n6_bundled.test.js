@@ -1,6 +1,6 @@
 // L10N6: A PACK THE TREE BUNDLES, AT WORK. Where an author's terms allow
 // it, `locales/<tag>/pack/` holds their Daggerfall Unity pack as a player would install it (tools/l10nPack.mjs checks
-// what it must carry). The language loader (scenes/localeData.js) lays it over the machine drafts and beneath a pack the
+// what it must carry). The language loader (scenes/localeData.js) lays it over the language's own tables and beneath a pack the
 // player installs: drafts < bundled < installed, table by table and document by document - the player's own choice is
 // the last word, a person's translation outranks a machine's. A bundled pack alone offers its language; a folder with no
 // PACK.json is no pack (nothing credits it, so nothing loads it); English has none.
@@ -13,7 +13,7 @@ import * as data from '../../src/scenes/localeData.js';
 import { _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { memoryIdb } from '../memoryIdb.mjs';
 
-// A fixture machine draft for French: the subject is the drafts < bundled < installed order, not a shipped language.
+// A fixture table for French: the subject is the own < bundled < installed order, not a shipped language.
 const FR_DRAFT = 'Key,Value\nmenu.rail.new,"Nouvelle partie"\nmenu.rail.load,"Charger une partie"\nmenu.rail.about,"À propos"\n';
 const DRAFTS = { '../../locales/fr/Port_Strings.csv': async () => FR_DRAFT };
 const META = { name: 'Fichiers français', authors: ['A. Traducteur'], source: 'https://example.org/fr', license: 'CC-BY-4.0', terms: 'bundling allowed with credit (2026-10-01)' };
@@ -61,7 +61,7 @@ test('L10N6 what the tree bundles: a pack by its PACK.json, each file by the fol
   assert.equal(data.hasLocaleText('it'), false);
 });
 
-test('L10N6 drafts < bundled < installed: the bundled pack over the machine drafts, the player\'s pack over both, its documents too; the player\'s removed, the bundled pack stands again; a bundled language with no drafts loads its pack', async () => {
+test('L10N6 drafts < bundled < installed: the bundled pack over the language\'s own tables, the player\'s pack over both, its documents too; the player\'s removed, the bundled pack stands again; a bundled language with no drafts loads its pack', async () => {
   const draft = new Map(tm.parseStringTableCsv(FR_DRAFT));
   const fetched = [], wasFetch = globalThis.fetch;
   globalThis.fetch = async (url) => { fetched.push(url); return { arrayBuffer: async () => new ArrayBuffer(4) }; };

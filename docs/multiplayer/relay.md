@@ -6,17 +6,20 @@ to deploy and test it. Scaling, the chat hub and cost are in [relay-scaling-and-
 
 ## Where it lives
 
-| Path | What it holds |
-| --- | --- |
-| `server/wrangler.toml` | Worker config: `ROOMS` binding to class `Room` (SQLite-backed), `METRICS` Analytics Engine dataset `daggerfall_relay`, `ACCOUNTS` service binding to `daggerfall-accounts`, `[vars]` |
-| `server/src/index.js` | The Worker `fetch` handler and the `Room` class (about 12,800 lines) |
-| `server/src/relay.js` | One line: `export * from '../../src/net/wire.js'`. The relay's protocol rules are the client's own module |
-| `server/src/relayScale.js` | Scale constants, `askRoom`, `layerWalk`, `RoomMetrics`, `roomKindOf`, `ROOM_CALL_MS` |
-| `server/src/cell*.js` | Cell tree: `cellNodes.js` (Worker door), `cellMoves.js` (directory), `cellHandover.js` (row moves) |
-| `server/src/foesHold.js` | Holds oversized first `foes` frames and releases them one sender at a time |
-| `server/src/drainWindows.js` | `flushAtDrain(room)`: posts open feed windows and clears timers when the last socket leaves |
-| `server/src/sdCopy.js` | Super Dungeon copy rooms and per-account Super Dungeon state on the hub |
-| `server/src/staff*.js` | Staff features on the relay; see [staff-tools.md](staff-tools.md) |
+| Path                         | What it holds                                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `server/wrangler.toml`       | Worker config: `ROOMS` binding to class `Room` (SQLite-backed), `METRICS` Analytics Engine dataset `daggerfall_relay`, `ACCOUNTS` service binding to `daggerfall-accounts`, `[vars]` |
+| `server/src/index.js`        | The Worker `fetch` handler and the `Room` class (about 9,800 lines)                                                                                                                  |
+| `server/src/relay.js`        | One line: `export * from '../../src/net/wire.js'`. The relay's protocol rules are the client's own module                                                                            |
+| `server/src/relayFacts.ts`   | The answers to `/health` and `/profile`, and `relayProfileHash`, the hash (`ph`) of the profile the relay plays by                                                                   |
+| `server/src/helloDoor.ts`    | `helloDoorRefused`: the doors a hello must pass (profile hash, then the hello law numbers)                                                                                           |
+| `server/src/helloGate.js`    | `preTokenGate`, `placeGate`: each room's bucket of hellos a second, spent before or after the token                                                                                  |
+| `server/src/relayScale.js`   | Scale constants, `askRoom`, `layerWalk`, `RoomMetrics`, `roomKindOf`, `ROOM_CALL_MS`                                                                                                 |
+| `server/src/cell*.js`        | Cell tree: `cellNodes.js` (Worker door), `cellMoves.js` (directory), `cellHandover.js` (row moves)                                                                                   |
+| `server/src/foesHold.js`     | Holds oversized first `foes` frames and releases them one sender at a time                                                                                                           |
+| `server/src/drainWindows.js` | `flushAtDrain(room)`: posts open feed windows and clears timers when the last socket leaves                                                                                          |
+| `server/src/sdCopy.js`       | Super Dungeon copy rooms and per-account Super Dungeon state on the hub                                                                                                              |
+| `server/src/staff*.js`       | Staff features on the relay; see [staff-tools.md](staff-tools.md)                                                                                                                    |
 
 The relay imports a large part of `src/net/` (wire rules, receipts, boss brains, arena law). Wrangler
 bundles those relative imports. A change to any file in that import graph is a relay change; see
@@ -26,12 +29,16 @@ bundles those relative imports. A change to any file in that import graph is a r
 
 `export default { fetch }` in `server/src/index.js` matches in this order:
 
-| Path | Handler |
-| --- | --- |
-| `/health` | JSON `{ ok, service: 'daggerfall-online', version: RELAY_VERSION, t }` |
-| `SD_OPEN_PATH` | `sdOpenDoor` (Super Dungeon open check) |
-| `/v1/law` (`SAFE_LAW_PATH`) | `lawDoor`: signed orders from the account service (bans, mutes, staff orders) |
-| `/room/<key>` | A WebSocket to the Room named `<key>` |
+| Path                        | Handler                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `/health`                   | JSON `{ ok, service: 'daggerfall-online', version: RELAY_VERSION, ph, t }`              |
+| `/profile`                  | JSON `{ v: RELAY_VERSION, ph, profile }`: the server profile the relay plays by (below) |
+| `SD_OPEN_PATH`              | `sdOpenDoor` (Super Dungeon open check)                                                 |
+| `/v1/law` (`SAFE_LAW_PATH`) | `lawDoor`: signed orders from the account service (bans, mutes, staff orders)           |
+| `/room/<key>`               | A WebSocket to the Room named `<key>`                                                   |
+
+`relayFactsAnswer` (`server/src/relayFacts.ts`) answers both fact paths. Every answer allows any origin, because the
+game page is served from another host than the relay.
 
 `roomOf` (`src/net/wire.js`) accepts only `/room/<key>` with a key of `[A-Za-z0-9_.,:+-]{1,80}`. Before any object is
 created, the Worker refuses unknown or closed keys with 404 (`isChatRoom`, `isGateRoom`/`gateHolds`, `isSdRoom` plus
@@ -48,19 +55,19 @@ Dispatch after the guards:
 
 Clients build keys; the Worker only validates them. Key builders live in `src/net/`.
 
-| Kind | Key shape | Builder |
-| --- | --- | --- |
-| Exterior cell | `world:<x>,<y>` (16 map pixels a side) | `worldRoom` in `wire.js`; halo via `cellHaloFor` |
-| Cell node (split area) | `cell:<level>:<x>,<y>` | `src/net/cellTree.js` (never a client room) |
-| Dungeon / interior | `dungeon:m<id>...`, `interior:m<id>.<n>` | `roomKeyFor` in `src/net/online.js` |
-| Private instance | `dungeon:m<id>.i<owner16hex>.<epoch8hex>` | `instanceRoomOf` in `src/net/instanceRoom.js` |
-| Owned interior / boat | `owned:...` | `src/net/privateInterior.js` |
-| Chat hub and channels | `chat:world`, `chat:region.<n>`, `chat:lang.<code>`, `chat:trade`, `chat:lfg`, shard keys | `wire.js`, `src/net/hubShards.js` |
-| Gate courts | `gate:<day>[.<court>]`, copies `#<k>` | `src/net/gate/gateLaw.js` |
-| Siege / royal | `siege:<seat>:<week>`, `royal:<seat>:<week>` | `src/net/siege/siegeRef.js` |
-| Arena | `arena:hall`, `arena:b<16hex>`, `arena:p<code>`, `arena:x<hour>` | `src/net/arena/arenaLaw.js` |
-| Super Dungeon | `sd:<slot>.<owner>` | `src/net/superDungeon/sdLaw.js` |
-| Park registry | `parkreg:<owner>` | `parkRegistryRoom` in `wire.js` |
+| Kind                   | Key shape                                                                                 | Builder                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Exterior cell          | `world:<x>,<y>` (16 map pixels a side)                                                    | `worldRoom` in `wire.js`; halo via `cellHaloFor` |
+| Cell node (split area) | `cell:<level>:<x>,<y>`                                                                    | `src/net/cellTree.js` (never a client room)      |
+| Dungeon / interior     | `dungeon:m<id>...`, `interior:m<id>.<n>`                                                  | `roomKeyFor` in `src/net/online.js`              |
+| Private instance       | `dungeon:m<id>.i<owner16hex>.<epoch8hex>`                                                 | `instanceRoomOf` in `src/net/instanceRoom.js`    |
+| Owned interior / boat  | `owned:...`                                                                               | `src/net/privateInterior.js`                     |
+| Chat hub and channels  | `chat:world`, `chat:region.<n>`, `chat:lang.<code>`, `chat:trade`, `chat:lfg`, shard keys | `wire.js`, `src/net/hubShards.js`                |
+| Gate courts            | `gate:<day>[.<court>]`, copies `#<k>`                                                     | `src/net/gate/gateLaw.js`                        |
+| Siege / royal          | `siege:<seat>:<week>`, `royal:<seat>:<week>`                                              | `src/net/siege/siegeRef.js`                      |
+| Arena                  | `arena:hall`, `arena:b<16hex>`, `arena:p<code>`, `arena:x<hour>`                          | `src/net/arena/arenaLaw.js`                      |
+| Super Dungeon          | `sd:<slot>.<owner>`                                                                       | `src/net/superDungeon/sdLaw.js`                  |
+| Park registry          | `parkreg:<owner>`                                                                         | `parkRegistryRoom` in `wire.js`                  |
 
 `chat:world` is also the **hub**: the object that holds cross-room state (parties, guild outboxes, relay settings,
 event records, receipts).
@@ -83,34 +90,56 @@ event records, receipts).
 
 ### The hello
 
-The first frame is `{ t: 'hello', id, secret, name, look, pose, tok, ... }`.
+The first frame is `{ t: 'hello', id, secret, name, look, pose, tok, ph, ... }`. Nothing is written for a hello until
+it has passed every check below, in this order:
 
-1. The room imports `IDENTITY_PUBLIC_KEY` (a `[vars]` entry; a public key is not a secret). If the key is missing or
-   does not import, every hello is refused: the relay fails closed.
-2. `verifyToken` (`src/net/identityToken.js`) checks the Ed25519 identity token. The TTL ceiling is
+1. The room's hello gate (`preTokenGate`, `server/src/helloGate.js`) spends the room's bucket of hellos. Battle,
+   arena floor, Super Dungeon, instance, cell and world rooms spend it after the token instead (`placeGate`).
+2. The hello doors (`helloDoorRefused`, `server/src/helloDoor.ts`). The first door compares the hello's `ph` with the
+   relay's own profile hash and refuses another one with the reason `other rules`. The next doors check the law
+   numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the lease door, the cell-tree `of` field) and refuse an
+   older build with a reason such as `old ground` or `old cells`. Each refusal sends an `error` frame with the
+   player's words, then closes with `CLOSE_POLICY`.
+3. `_named` checks the identity token. It needs `IDENTITY_PUBLIC_KEY` (a `[vars]` entry; a public key is not a
+   secret): if the key is missing or does not import, every hello is refused, so the relay fails closed.
+   `verifyToken` (`src/net/identityToken.js`) checks the Ed25519 token. The TTL ceiling is
    `min(IDENTITY_MAX_TTL_S, MAX_TTL_S)`, 300 s.
-3. The hello's law numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the cell-tree `of` field) are checked.
-   An older build is refused with `CLOSE_POLICY` and a reason such as `old ground` or `old cells`.
-4. Ban and freeze checks run (`_bannedHello`, `frozenHello`).
-5. The room answers `{ t: 'welcome', id, peers, host, world, now, v }`. `v` is `RELAY_VERSION`.
+4. Ban, hidden-staff and freeze checks run (`_bannedHello`, `hiddenHello`, `frozenHello`), then the gate for rooms
+   that spend it after the token.
+5. The room answers `{ t: 'welcome', id, peers, host, world, now, v, ph }`. `v` is `RELAY_VERSION` and `ph` is the
+   profile hash.
 
-The hello carries no relay version. The client compares `v` from the welcome with its own `RELAY_VERSION` and refuses
-a relay of another version (see [wire-protocol.md](wire-protocol.md), One version, client and relay).
+The hello carries no relay version. The client compares `v` and `ph` from the welcome with its own and refuses a relay
+on another version or other rules (see [wire-protocol.md](wire-protocol.md), One version, client and relay).
+
+### The server profile
+
+The relay plays by one server profile: the data that holds the server's online rules (decisions 58 and 65). Today it
+is `OFFICIAL_PROFILE` (`src/net/profile/officialProfile.ts`), bundled into the relay at build time. `relayFacts.ts`
+computes its hash once (`relayProfileHash`, SHA-256 of the profile's canonical JSON, `src/net/profile/profileHash.ts`)
+and names it as `ph` in `/health`, `/profile` and every welcome. An online page fetches `/profile` before its world
+boots ([boot-and-frame.md](../architecture/boot-and-frame.md), The profile door) and sends the same `ph` in every
+hello.
+
+Because the profile is in the relay bundle, an edit to `officialProfile.ts` is a relay change and needs a new
+`RELAY_VERSION` ([wire-protocol.md](wire-protocol.md)). The self-host kit has no setting for another profile yet: a
+server on other rules needs a build with another profile. Decision 122 (3) moves the profile into a file the kit
+loads; that is not built yet.
 
 ## Durable storage
 
 Each Room has its own SQLite-backed storage (`state.storage`). Main keys:
 
-| Key | Meaning |
-| --- | --- |
-| `hub` | Marks the hub object; `alarm()` branches on it |
-| `relaycfg` | Relay settings set in game with `/relay` (`src/net/relayCfg.js`) |
-| `WORLD_META`, `worldChunkKey(i)` | The stored world snapshot of a room (published by a client host) |
-| `BANS_KEY`, `EVENT_KEY`, `HOME_WORDS_KEY`, `GUILD_OUTS_KEY` | Bans, live event, home notes, guild outbox |
-| `look:`, `acct:`, `party:`, `park:` | Per-peer looks, accounts, parties, parked caravans |
-| `*_RC_PREFIX` (`raid`, `sd`, `egrc:`, `star`, ...) | Reward receipts held for claim |
-| `sweep:<kind>` | Cursors for the paged sweeps in `_sweepHub` |
-| `reg` | Park registry record |
+| Key                                                         | Meaning                                                          |
+| ----------------------------------------------------------- | ---------------------------------------------------------------- |
+| `hub`                                                       | Marks the hub object; `alarm()` branches on it                   |
+| `relaycfg`                                                  | Relay settings set in game with `/relay` (`src/net/relayCfg.js`) |
+| `WORLD_META`, `worldChunkKey(i)`                            | The stored world snapshot of a room (published by a client host) |
+| `BANS_KEY`, `EVENT_KEY`, `HOME_WORDS_KEY`, `GUILD_OUTS_KEY` | Bans, live event, home notes, guild outbox                       |
+| `look:`, `acct:`, `party:`, `park:`                         | Per-peer looks, accounts, parties, parked caravans               |
+| `*_RC_PREFIX` (`raid`, `sd`, `egrc:`, `star`, ...)          | Reward receipts held for claim                                   |
+| `sweep:<kind>`                                              | Cursors for the paged sweeps in `_sweepHub`                      |
+| `reg`                                                       | Park registry record                                             |
 
 The cell tree moves stored rows between nodes when it splits or merges. `cellHandover.js` classifies every key
 (`KEY_CLASSES`: part, copy, drop, block). An unknown key class blocks the move, so a **new storage key needs a class
@@ -121,8 +150,8 @@ in `cellHandover.js`**.
 One alarm per object. `alarm()` runs, in order: the cell directory plan (`cellPlanAlarm`), the bus silence sweep, the
 shard's hub flush and poll (`_hubUpFlush`, `_hubPollEnsure`), sea work, then:
 
-- on the hub: `_sweepHub` (paged sweep of expired accounts, parties, looks, receipts) and the herald and event beats
-  (`_heraldBeat`, `_sdBeat`, ...);
+- on the hub: `_sweepHub` (paged sweep of expired accounts, parties, looks, receipts) and the Abyss Dungeon
+  director's beat (`_sdBeat`);
 - elsewhere: park-registry and caravan-decor expiry, and the per-mode ticks (`_gateTick`, `_siegeTick`, `_arenaTick`,
   `_serpentTick`), then `_reap`.
 
@@ -132,16 +161,15 @@ Every `setAlarm` re-arms the object. See [relay-scaling-and-cost.md](relay-scali
 
 `server/wrangler.toml` `[vars]`:
 
-| Var | Use |
-| --- | --- |
-| `IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S` | Identity token check |
-| `CELL_SPLIT_AT`, `CELL_SPLIT_DWELL_MS`, `CELL_MERGE_AT`, `CELL_MERGE_DWELL_MS`, `REGION_SHARDS` | Scaling; see the scaling page |
-| `MOD_FEED_URL`, `GRANT_FEED_URL`, `HIDDEN_SEEN_URL`, `STAFF_NET_FEED_URL`, `REACTION_FEED_URL` | Signed feeds posted to the account service |
-| `*_DISCORD_ROLE`, `*_DISCORD_THREAD` | Event announcements to Discord (webhook secret `GATE_DISCORD_WEBHOOK`) |
-| `RAID_TOWNS_SHA256`, `BOSS_BODY` | Raid town list check; boss body mode |
+| Var                                                                                             | Use                                        |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S`                                                     | Identity token check                       |
+| `CELL_SPLIT_AT`, `CELL_SPLIT_DWELL_MS`, `CELL_MERGE_AT`, `CELL_MERGE_DWELL_MS`, `REGION_SHARDS` | Scaling; see the scaling page              |
+| `MOD_FEED_URL`, `GRANT_FEED_URL`, `HIDDEN_SEEN_URL`, `STAFF_NET_FEED_URL`, `REACTION_FEED_URL`  | Signed feeds posted to the account service |
+| `RAID_TOWNS_SHA256`, `BOSS_BODY`                                                                | Raid town list check; boss body mode       |
 
 Secrets (set by the account deploy, never in the file): `GATE_SIGNING_KEY` (signs receipts, chat stamps, room
-leases, feeds) and `GATE_DISCORD_WEBHOOK`.
+leases, feeds).
 
 ## Deploy
 
