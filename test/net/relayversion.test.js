@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world319: '8e277658b5ae8d3eca9c7d9322053f1a311c7a9693cb1731786b5f82a519c736', // the locale catalog keeps every language for player-installed packs; a translation's source is `community`
   world318: 'cb13bad9c1b416a14858034860b93b087bb7474d667fccc04526306624f56086', // the Spawned dungeons switch is pinned off in the server profile (officialProfile.ts)
   world317: '4d9171291970064f95668f4d11ecbe8ab5f449009ed1ea6ec7d04f9a68ae750a', // the official profile pins the Elites stack row off (officialProfile.ts)
   world316: '87d95a0f47460b81c84519aafb0d25b9a5a6ad9967d21cd7380472a9a8e84712', // the official profile pins the Openings take extra damage row off (officialProfile.ts)

@@ -563,8 +563,8 @@ const listOf = (names) => {
 
 /** L10N6: THE TRANSLATIONS, credited as the works are - one row a language the game holds text for, English and the
  *  pseudo-locale aside (textManager availableLocales, as scenes/localeData.js registers them): its name in itself,
- *  whose words they are, and a bundled pack's terms and source. Mac's decisions (Localization-Arc.md): a machine draft
- *  says it is one; the people who translate or check a language are credited by name (`locales/<tag>/translators.json`);
+ *  whose words they are, and a bundled pack's terms and source. The people who translate or check a language are
+ *  credited by name (`locales/<tag>/translators.json`);
  *  a pack is bundled only on its authors' terms, and those travel with it. A pack the player installed is their own -
  *  the Language row says so, the credits do not. Read as the About pane draws it, so every sentence is the player's
  *  language's. */
@@ -573,21 +573,15 @@ export function translationCredits(infos = availableLocales()) {
     const people = i.translators ?? [];
     const pack = i.bundled ?? null;
     const lines = [];
-    if (i.source === 'machine') {
-      lines.push(people.length
-        ? t('credits.l10n.checked', 'Machine translation by Claude, checked and corrected by {names}.', { names: listOf(people) })
-        : t('credits.l10n.machine', 'Machine translation by Claude, still being checked. Corrections from native speakers are welcome.'));
-    } else {
-      lines.push(people.length
-        ? t('credits.l10n.people', 'Translated by {names}.', { names: listOf(people) })
-        : t('credits.l10n.community', 'Translated by the community.'));
-    }
+    lines.push(people.length
+      ? t('credits.l10n.people', 'Translated by {names}.', { names: listOf(people) })
+      : t('credits.l10n.community', 'Translated by the community.'));
     if (pack) lines.push(t('credits.l10n.bundled', 'Daggerfall\u2019s original text is {pack}, used with its authors\u2019 permission.', { pack: pack.name }));
     const authors = [...(pack?.authors ?? []), ...people];
     return Object.freeze({
       code: i.code,
       title: i.name,
-      author: authors.length ? listOf(authors) : 'Claude (Anthropic)',
+      author: authors.length ? listOf(authors) : t('credits.l10n.anyone', 'The community'),
       what: lines.join(' '),
       ...(pack ? { terms: t('credits.l10n.terms', '{license}: {terms}', { license: pack.license, terms: pack.terms }) } : {}),
       ...(pack && /^https?:\/\//.test(pack.source) ? { link: pack.source } : {}),
