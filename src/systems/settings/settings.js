@@ -41,7 +41,7 @@
 //                reads it, so there is nothing here to close.
 //   unavailable  meaningless here (resolution, controllers, mod
 //                paths) or the port implements ONE side of the branch
-//                (EnhancedCombatAI, AdvancedClimbing - see the Ledger)
+//                (AdvancedClimbing - see the Ledger)
 //   restart      FPS-VSYNC: read by the desktop shell at its next launch
 //                (SHELL_AT_LAUNCH names the reader) - in the app it
 //                changes play from the next start; in a browser the
@@ -177,6 +177,9 @@ export const LIVE = Object.freeze({
   'Controls/InstantRepairs': 'src/scenes/worldModes.js',      // R1: the repair flow's instant branch
   'Controls/AllowMagicRepairs': 'src/scenes/worldModes.js',   // R1: the repair entry gate + world.js's enchantCtx seam
   'Controls/MusicVolume': 'src/systems/song/songPlayer.js',
+  // DFU's Enhanced Combat AI (EnemySenses, EnemyMotor, EnemyAttack, DaggerfallMissile): the foe pools hand the reader
+  // to every EnemyAI. Pinned online by the server profile (combat.enhancedAI).
+  'Enhancements/EnhancedCombatAI': 'src/characters/enemy/enhanced-combat-ai.ts',
   'Controls/MouseLookSensitivity': 'src/ui/lookSettings.js',
   'Controls/InvertMouseVertical': 'src/ui/lookSettings.js',
   // AUDIT: this one was tiered `stored` while main.js read it as
@@ -302,7 +305,6 @@ export const LIVE = Object.freeze({
  *  player cannot find out about. */
 const NO_MOD_LOADER = 'there is no mod loader to set up';
 export const UNAVAILABLE = Object.freeze({
-  'Enhancements/EnhancedCombatAI': 'this game uses the classic enemy AI',
   'Enhancements/AdvancedClimbing': 'this game uses the classic climbing',
   'Enhancements/LypyL_ModSystem': NO_MOD_LOADER,
   'Enhancements/CompressModdedTextures': NO_MOD_LOADER,

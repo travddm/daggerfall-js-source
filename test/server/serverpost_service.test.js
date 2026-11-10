@@ -15,7 +15,7 @@ import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
-/** A piece, as the operator's statement writes one (tools/sendServerPost.mjs). */
+/** A piece, as an operator's statement writes one. */
 const send = (env, who, { batch = 'test-batch', subject = 'A gift', body = 'For you.', item = null, at = T0 } = {}) => {
   const id = `p${Math.random().toString(16).slice(2).padEnd(20, '0')}`.slice(0, 24);
   const r = env.DB._raw.prepare('INSERT OR IGNORE INTO server_post (id, to_id, batch, sender, subject, body, item, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')

@@ -39,6 +39,7 @@ const PREFS = Object.freeze({
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,
+  clawMetal: false,
   gentleEquipBill: false,
   legendaryEquipFree: false,
   lockpickTumblers: false,

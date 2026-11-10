@@ -46,6 +46,7 @@ export const SECRETS: Record<string, readonly string[]> = {
     'IDENTITY_PUBLIC_KEY',
     'GATE_PUBLIC_KEY',
     'CRON_SECRET',
+    'OPERATOR_SECRET',
     'ANTHROPIC_API_KEY',
     'DISCORD_BOT_TOKEN',
     'PATREON_CLIENT_SECRET',
