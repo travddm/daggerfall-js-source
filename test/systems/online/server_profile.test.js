@@ -35,7 +35,7 @@ afterEach(() => {
 
 test('P0 NO PLAY CHANGE: under the official profile the lane forces exactly what the base forced - every pref, every DFU setting, every mod key and every whole mod (mutants: a pin dropped in the move; a pin added; a whole mod freed)', () => {
   assert.deepEqual({ ...lane.ONLINE_FORCED_PREFS }, BASE.prefs);
-  // Decision 117 adds one setting to the base's: DFU's own Enhanced Combat AI, pinned at DFU's True (combat.enhancedAI).
+  // This port adds one setting to the base's: DFU's own Enhanced Combat AI, pinned at DFU's True (combat.enhancedAI).
   assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_FORCED_SETTINGS)), { ...BASE.settings, Enhancements: { EnhancedCombatAI: 'True' } });
   assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_ROOM_MOD_KEYS)), BASE.modKeys);
   assert.deepEqual(JSON.parse(JSON.stringify(lane.ONLINE_WHOLE_MODS)), BASE.wholeMods);
