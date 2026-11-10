@@ -50,7 +50,7 @@ import {
   playerOnPathAt, pathsDataPoint, roadsDataPoint, nextPathDirection,
 } from './travelPaths.js';
 import { TravelAutopilot, rectOf, rectMinMax, rectContains, rectCentre, ARRIVAL_BUFFER } from './travelAutopilot.js';
-import { TOWN_PACE_MAX } from './townWalk.js';   // OW-TOWN-WALK: a town's streets walked at a town's pace
+import { TOWN_PACE_MAX, classicTownRoute, streetReplan } from './townWalk.js';   // a town's streets walked at a town's pace
 import { TRAVEL_OPTIONS_TEXT as T, TRAVEL_NAV_TEXT, format, localize } from './travelOptionsText.js';
 import { hasPortFor } from './travelPorts.js';   // SEAT2b part two: HasPort, or a members' Harbour at a seat
 import { FATIGUE_MULTIPLIER } from '../statMods.js';
@@ -561,7 +561,7 @@ export function createTravelOptions(deps = {}) {
   function beginTravel(summary, speedCautious = false, estimateMinutes = null) {
     const name = deps.localizedLocationName?.(summary) ?? summary?.name ?? null;
     if (name == null) throw new Error('TravelOptions: destination not found!');   // :472
-    st.route = null;   // TV2: a journey of the mod's replaces the view's
+    st.route = st.settings.avoidObstacles ? classicTownRoute(summary) : null;   // a journey of the mod's replaces the view's; with Avoid Obstacles it walks the streets of the towns it crosses, off it is the mod's beeline exactly
     st.destinationName = name;
     ui?.setDestinationName(name);
     st.destinationSummary = summary;
@@ -1393,7 +1393,7 @@ export function createTravelOptions(deps = {}) {
       // resume prompt) and a message box says why. A host whose panel does
       // not interrupt is stopped outright (ROAD-CRASH's guard).
       if (st.autopilot && drive && !drive.arrived && st.settings.avoidObstacles && deps.steer && !deps.atSea?.()) {   // OWS2: afloat, the helm's own hand steers (systems/seaHelm.js), not the walk's
-        const stop = deps.steer(drive, p.x, p.z, st.autopilot);
+        const stop = streetReplan(st.route, deps.steer(drive, p.x, p.z, st.autopilot), () => { st.autopilot = null; startRouteLeg(); });   // in a town's streets, its way asked again from here before the journey stops
         st.steeredBy = drive.yaw !== st.autopilot.yaw ? st.autopilot : null;
         if (stop) {
           stopTravelWithMessage(stop === 'stuck' ? TRAVEL_NAV_TEXT.MsgStuck : TRAVEL_NAV_TEXT.MsgBlocked);
