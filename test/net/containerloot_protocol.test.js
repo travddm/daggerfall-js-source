@@ -37,6 +37,7 @@ import { templateByIndex } from '../../src/systems/item/itemTemplates.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { applyRarity } from '../../src/systems/loot/lootRarity.js';
 import { seeded } from '../honestItems.mjs';
+import { playByRules } from '../profileRules.mjs';
 import {
   REAL_RANDOM, TODAY, KEY, ROOM, LOOT_LIST_MAX, clock, items, names, mk, peekNames, packHas, have, windowOf, realWindowOf, bulk, frame, elapse, quiesce,
   rolled, firstOpen, pressYes, pressNo, joiner, older, lightPieces, wallNow, WALL0, clone, plaque, LEAVE_SITES, relay, player, cupboard, building,
@@ -857,7 +858,8 @@ test('T26 AC8 (guard - passes today): a BORN cupboard\'s `preview` frame lights 
 // cannot read it. The shut shop's stealing window has the cupboard's race (recorded, DESIGN-REVIEW F-1 - the next slice's: the
 // claim law with a refunding trade window); until then a shelf says its whole list, lands another's whole, and the last
 // writer wins.
-test('SHELF AC8 (guard - passes today; recorded: F-1): `shelf:` keeps WORLD6a\'s whole-list word - `{ k, r, d }` and nothing of a room word, landed whole over a shelf with no window open, never over the one a player has open, and a stale close still brings a taken piece back (F-1\'s recorded race)', () => {
+test('SHELF AC8 (guard - passes today; recorded: F-1): `shelf:` keeps WORLD6a\'s whole-list word - `{ k, r, d }` and nothing of a room word, landed whole over a shelf with no window open, never over the one a player has open, and a stale close still brings a taken piece back (F-1\'s recorded race)', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const stock = () => [mk('Dagger'), mk('Mace'), mk('Katana'), mk('Staff')];
   const s = building(3, { each: [0, 1, 2].map(() => ({ shelves: 1, building: SHOP, shelfRoll: stock })) });
   const wa = windowOf(s.A), wb = windowOf(s.B);

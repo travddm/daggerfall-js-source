@@ -100,6 +100,7 @@ import { isBattleRoom } from './siege/siegeRef.js';   // SEAT2a part four: a sie
 import { caravanKeyOf } from './privateInterior.js';   // WAGONS2-VISIT: a caravan's own room (NET-SMOOTH's owned interior is wire.js nativePoseRoom's now, SLIM-FRAME)
 import { validCaravanData } from './wire.js';   // WAGONS2-VISIT: what a caravan's owner placed, said to its room
 import { isArenaRoom, validArenaIn } from './arena/arenaLaw.js';   // ARENA4: the arena's hall and its bouts
+import { stealthPoseFields } from './stealth-wire.ts';   // the pose's stealth fields, drawn whole
 import { poseChanged, validSeaIn, validSeaOut, POSE_TS_MOD, poseTsDiff, SOCKETS_MAX, WORLD_CELL, RANGE_PIXELS, PIXEL_UNITS, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, CLOSE_SAME_ROOM, CLOSE_REPARTITION, HALO_OF_PARAM, HALO_OF_MAX, WORLD_FRAME_MAX, worldFrameMaxFor, isCellRoom, hitOwnerOf, validPose, validLook, sanitizeName, readBadge, readAura, readIcon, readRibbon, sanitizeChat, validChatItem, validChatItems, chatGate, redGate, dmGate, muteGate, subOf, mutedUntilOf, worldRoom, inRange, relayUrl, isWorldRoom, streamsFoes, isChatRoom, foesGate, FOES_FRAME_MAX, MAX_FRAME_BYTES, hitGate, actGate, actFrameFits, whoGate, WHO_RETRY_MS, HEARTBEAT_MS, PING_MS, FOES_FULL_MS, FOES_STALE_MS, relayMatches, chatInGate, CHAT_ROOM_HZ_MAX, socialGate, partyGate, validPartyPose, validSocialFrame, validPartyFrame, PARTY_SEND_MS, validSocialAct, socialInGate, noteInGate, partyInGate, SOCIAL_IN_HZ_MAX, NOTE_IN_HZ_MAX, INBOUND_FRAME_MAX, questInGate, validQuestFrame, QUEST_SEND_MS, QUEST_HUB_MIN_MS, PARTY_MAX, tokenGate, validTradeData, tradeGate, tradeInGate, validCastData, castGate, castInGate, CAST_FRAME_MAX, CAST_IN_HZ_MAX, TRADE_IN_HZ_MAX, TRADE_FRAME_MAX, parkGate, PARK_CELL_MAX, PARK_KEY_RE, PARK_TTL_MS, CHAT_LINE_CHANNELS, partyChatInGate, PARTY_CHAT_ROOM_HZ_MAX, rollGate, validRollSpec, validRoll, validCardData, cardGate, cardInGate, CARD_FRAME_MAX, CARD_IN_HZ_MAX, validPageData, pageGate, pageInGate, PAGE_FRAME_MAX, PAGE_IN_HZ_MAX, validDuelData, duelGate, duelInGate, DUEL_FRAME_MAX, DUEL_IN_HZ_MAX, bodyWordGate, validDuelRefOut, validWedData, wedGate, wedInGate, WED_FRAME_MAX, WED_IN_HZ_MAX, readRenown, renownGate, RENOWN_ORDER_KEEP_MS, RENOWN_RESEND_MS, lookGate, eventGate, validLiveEvent, LIVE_EVENTS, isSocialRoom, validGateIn, validGateOut, gateGate, gatePlaceWire, readGuildTag, readHouse, GUILD_ORDER_KEEP_MS, guildChatInGate, GUILD_CHAT_ROOM_HZ_MAX, validRaidIn, validRaidOut, raidGate, validRaidTownsIn, isRegionRoom, validTravellerMark, validTravellerFrame, validTravWords, travInGate, TRAV_SEND_MIN_MS, TRAV_WELCOME_MAX, TRAV_STALE_MS, validAmapFrame, amapBody, AMAP_SEND_MS, AMAP_HUB_MIN_MS, validSiegeIn, validSiegeOut, siegeGate, validRiteIn, validRiteOut, riteGate, validStarIn, validStarOut, starGate, arenaGate, readArenaOut, BUSY_TOKEN_UNREAD, WIRE2_BATCH_MAX, validParkYeet, HOME_ORDER_KEEP_MS, validHomeFrame, homeInGate } from './wire.js';   // SCALE5a: a busy close's word that the token went unread   // SOC2: the hub's law, at home; AUDIT SOC B3/B11/B20: the act's projection, the inbound gates, the inbound bound
 import { RAID_TOWNS_CHUNK } from './raid/raidLaw.js';   // RAID-ROLL: the towns table's pieces; WW6: a raid's lane
 import { dungeonRoomTag } from './wire.js';   // SD-ONLINE: a dungeon's room carries the size it was built at
@@ -373,7 +374,7 @@ export function lerpPose(from, to, t) {
     ...(to.lt ? { lt: to.lt } : {}),   // PEERLIGHT1: the torch's light - discrete, omitted while nothing burns
     ...(to.hl ? { hl: 1 } : {}),   // HT-WAIST-NET: the lantern at the waist - discrete, omitted without one as the wire omits it
     ...(to.st ? { st: to.st } : {}),   // CARDS2b: the seat - discrete, omitted standing as the wire omits it
-    ...(to.cv ? { cv: to.cv } : {}),   // INVIS-NET: the concealment - discrete, omitted when there is none as the wire omits it
+    ...(to.cv ? { cv: to.cv } : {}), ...stealthPoseFields(to.sk, to.hv),   // INVIS-NET: the concealment - discrete, omitted when there is none as the wire omits it; and the live Stealth and half-speed state a foe's senses read (net/stealth-wire.ts)
     ...(to.cl ? { cl: to.cl, ...(Number.isFinite(to.cw) ? { cw: to.cw } : {}), ...(to.ck ? { ck: to.ck, ...(Number.isFinite(to.cy) ? { cy: to.cy } : {}), ...(to.cd ? { cd: to.cd } : {}) } : {}) } : {}),   // CLIMB6: the move's kind, lip and time, whole   // CLIMB5: the climb and its facing - whole (the body eases its own yaw), omitted off the wall as the wire omits it
     ...(to.ga ? { ga: to.ga, ...(to.gm ? { gm: to.gm } : {}) } : {}), ...(to.gb ? { gb: to.gb } : {}),   // PEER-ACTS: the gathering act and the net's throw, and the beats on their own - discrete, omitted at none as the wire omits them
     ...(to.ab ? { ab: aboardAlong(from.ab, to.ab, k) } : {}),   // DECK-POSE: the place aboard, eased along its deck as the feet are - omitted ashore as the wire omits it
@@ -534,7 +535,6 @@ export const peerId = (storage = tabStorage()) => keptToken(storage, 'dagger.onl
 /** The id's secret (AUDIT ONLINE A3): minted beside it, kept beside it, sent only in the hello. */
 export const peerSecret = (storage = tabStorage()) => keptToken(storage, 'dagger.online.secret', /^[A-Za-z0-9_-]{8,64}$/,
   () => Array.from({ length: 4 }, () => Math.random().toString(36).slice(2, 10)).join(''));
-
 
 /**
  * One player's connection to the relay: one room at a time, the
@@ -742,7 +742,7 @@ export class OnlineSession {
     this._wedBucket = null;       // LEGACY7 part three: my own wed frames out - wedGate's law
     this._inWedBuckets = new Map();   // LEGACY7 part three: the gate on wed frames coming in, per sender (`_directedIn`)
     this.onSea = null;            // SEA-EVENTS: (word) => void - the social room's word on the treasure fleets (wire.js validSeaOut)
-    this._gateSiteSaid = null;    // DISCORD-GATES: the socket and day my `site` last went on - once a socket and day (WW2: and gate - `{ ws, said }`, the gates said on it)
+    this._gateSiteSaid = null;    // the socket and day my `site` last went on - once a socket, day and gate (`{ ws, said }`, the gates said on it)
     this.arenaHeard = false;      // FIELD BUGS 2026-10-16b ARENA-WAIT: a primary welcome has come (sticky) - before it the arena on the online lane waits (scenes/arena/arenaOnline.js waiting)
     this.onArena = null;          // ARENA4: (word, room) => void - the hall's or a bout's word, projected by the wire's readArenaOut
     this._arenaBucket = null;     // ARENA4: my own arena words out - arenaGate's law
@@ -1776,8 +1776,8 @@ export class OnlineSession {
     return true;
   }
   /** SERPENT2: where this game found the serpent the clock is about (systems/serpent/serpentSite.js - its day, its native point
-   *  to the whole unit and the port it lies off), said to the hub, whose Discord herald names the place and posts the
-   *  kill at the site the most accounts agree on (net/serpent/serpentHerald.js). ONCE A SOCKET AND DAY (the gate's `site` law);
+   *  to the whole unit and the port it lies off), said to the hub, which tells every game the site the most accounts agree
+   *  on (net/serpent/serpent-site.ts serpentAtWord). ONCE A SOCKET AND DAY (the gate's `site` law);
    *  on the hub's socket alone, under the serpent frames' own bucket; true once it went. */
   sendSerpentSite(day, sx, sz, place) {
     if (this._serpentSiteSaid && this._serpentSiteSaid.ws === this._ws && this._serpentSiteSaid.d === day) return true;
@@ -2008,9 +2008,9 @@ export class OnlineSession {
     return true;
   }
 
-  /** DISCORD-GATES: where this game found the gate the clock is about (systems/gate/gateSite.js - its day, its map pixel and
-   *  its place), said to the hub, which names the place in its Discord posts once two accounts agree (net/gate/gateHerald.js).
-   *  ONCE A SOCKET AND DAY - a reconnect says it again, to a hub a deploy may have given a herald since. On the hub's
+  /** Where this game found the gate the clock is about (systems/gate/gateSite.js - its day, its map pixel and its place),
+   *  said to the hub, whose broken rite stands by the site two accounts agree on (net/gate/gate-site.ts).
+   *  ONCE A SOCKET AND DAY - a reconnect says it again, to a hub that may have restarted since. On the hub's
    *  socket alone, under the gate frames' own bucket; true once it went. */
   sendGateSite(day, px, py, place) {
     // WW2: once a socket and GATE - each lane's gate of a day is its own number, and said once on the socket

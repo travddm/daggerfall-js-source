@@ -37,12 +37,12 @@ test('UXB1-E: a sync writes only what differs, each into its own store, keeps wh
   // SD-ONLINE (
   assert.deepEqual(before.filter((r) => !r.same).map((r) => r.id).sort(), [
     'mods:pcaao/Enabled', 'mods:project-legacy/Enabled', 'mods:roads-hazelnut/RiversAndStreams', 'mods:roleplay-realism/RefinedTraining.intensiveTraining',
-    'prefs:enhancedAI', 'prefs:enhancedClimbing', 'prefs:worldDungeonSizes',
+    'prefs:enhancedAI', 'prefs:enhancedClimbing', 'prefs:etherSea', 'prefs:worldDungeonSizes',
     'settings:Controls/AllowMagicRepairs', 'settings:Experimental/SmallerDungeons',
   ]);   // LANDFORM3: the room's rivers are on, past the mod's shipped off - so a fresh store differs there too
   const rec = applyOnlineSync(before, { now: 1234 });
   assert.equal(rec.at, 1234);
-  assert.equal(rec.rows.length, 9);   // (the merge of main's LANDFORMS: its rivers and SD-ONLINE's sizes, both)
+  assert.equal(rec.rows.length, 10);   // (the merge of main's LANDFORMS: its rivers and SD-ONLINE's sizes, both)
   assert.equal(getPref('enhancedAI'), true);
   assert.equal(getPref('enhancedClimbing'), true);
   assert.equal(getPref('worldDungeonSizes'), true, 'SD-ONLINE: offline play at the world\'s sizes');
@@ -60,7 +60,7 @@ test('UXB1-E: a sync writes only what differs, each into its own store, keeps wh
   assert.equal(applyOnlineSync(onlineSyncPlan({ search: '' })), null, 'a second sync with nothing to do writes nothing');
   assert.ok(lastOnlineSync(), '...and leaves the undo standing');
 
-  assert.equal(undoOnlineSync(), 9);   // (the merge of main's LANDFORMS: its rivers and SD-ONLINE's sizes, both)
+  assert.equal(undoOnlineSync(), 10);   // (the merge of main's LANDFORMS: its rivers and SD-ONLINE's sizes, both)
   assert.equal(getPref('enhancedAI'), false);
   assert.equal(getPref('enhancedClimbing'), false);
   assert.equal(getPref('worldDungeonSizes'), false);

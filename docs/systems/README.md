@@ -4,7 +4,8 @@ One page per major gameplay area: what it does, where it lives, its data and its
 
 - [characters.md](characters.md): races, classes, attributes and skills, character creation, advancement, the
   online firmament tree, bodies and the paperdoll.
-- [character-modes.md](character-modes.md): the five modes picked at creation, their rules, enforcement and storage.
+- [character-modes.md](character-modes.md): the five modes picked at creation, their storage and the creation picker.
+  Hardcore and Ironman are not enforced yet.
 - [combat.md](combat.md): how a swing or an arrow becomes damage, weapons, shields, techniques, enemy strength, the
   power ceiling, blood.
 - [magic.md](magic.md): the spell record, casting and cost, the effect library, enchanting, arcane paths, enemy
@@ -14,8 +15,10 @@ One page per major gameplay area: what it does, where it lives, its data and its
 - [quests.md](quests.md): the quest engine (Daggerfall Unity's quest scripts), how quests are offered, guidance,
   online rules, questlines, bounty boards.
 - [professions.md](professions.md): online gathering and crafting: tracks, XP, acts, stations, quality, materials.
-- [world.md](world.md): terrain, landforms, roads, towns, dungeons, places of interest, travel, and the map past the
-  Iliac Bay.
+- [world.md](world.md): the Iliac Bay's terrain, landforms, roads, towns and townsfolk, dungeons, wilderness camps,
+  discovery, travel.
+- [past-the-bay.md](past-the-bay.md): the map past the Iliac Bay: the Tamriel frame and data, towns, walls and
+  capitals made there.
 - [time-and-weather.md](time-and-weather.md): the calendar and clocks (offline and online), rest and waits, weather,
   the sky, snow, seasons and climates.
 - [naval.md](naval.md): boats and sailing, the sea fight, crews and captains, ports and shipyards, trade, online sync
@@ -24,6 +27,6 @@ One page per major gameplay area: what it does, where it lives, its data and its
   localization.
 - [audio.md](audio.md): the Web Audio engine, Daggerfall's sound and music formats, music selection, ambience,
   footsteps, combat voices, volumes.
-- [balance-harness.md](balance-harness.md): the tool that measures combat balance by level under DFU's rules and this
-  game's, with a switch for each rule layer.
+- [balance-harness.md](balance-harness.md): not a gameplay area but a tool (`tools/balance/`) that measures
+  combat balance by level under DFU's rules and this game's, with a switch for each rule layer.
 - [enhanced-ai.md](enhanced-ai.md): the optional layer over the classic foe AI: navmesh, tactics and cover, tells.

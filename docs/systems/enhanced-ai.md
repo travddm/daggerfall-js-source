@@ -1,5 +1,7 @@
 # Enhanced AI
 
+> Leaves core: an Enhanced AI mod (decision 117 (15)).
+
 This page covers the Enhanced AI: the optional layer over Daggerfall's classic foe behaviour that adds navmesh
 pathfinding, group tactics, cover, and telegraphed blows with poise and staggers.
 It also covers how the layer is switched on and how it falls back to the classic motor.
@@ -24,16 +26,53 @@ plain `EnemyAI`. The result is Daggerfall Unity's classic behaviour.
 DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies", `Enhancements/EnhancedCombatAI`, DFU's default on).
 The port runs it under the same name (decision 117): the foe pools hand each `EnemyAI` the setting's reader
 (`src/characters/enemy/enhanced-combat-ai.ts`), and online the server profile pins it at DFU's value
-(`combat.enhancedAI` in `src/net/profile/profileKeys.ts`). Its behaviours are ported in groups; the senses group is in
-(the 190-degree field of view, the lead on the target, the rate of approach in the melee reach, the runner-up target).
-The Enhanced AI here is a separate option on top of it that shares half a name.
+(`combat.enhancedAI` in `src/net/profile/profileKeys.ts`). Its behaviours are ported in groups. In so far:
+
+- The senses: the 190-degree field of view, the lead on the target, the rate of approach in the melee reach, the
+  runner-up target.
+- Movement and strafing (`src/characters/enemy/enhanced-movement.ts`): a foe stands off at 1.7, rolls to close in or
+  back off on the level difference, strafes round its target, backs away when too close, walks while it turns, waits a
+  short reflex between changes, and walks at half speed while it attacks. A flyer or swimmer does not strafe or back
+  away yet.
+
+The retreat roll reads the player's facing and weapon from `src/player/player-stance.ts`, which the camera look and the
+screen weapon write, and a peer's from its pose (facing, and the sheath; a peer's bow and paralysis are not on the
+wire, so a foe treats a peer as not paralysed and with a weapon out).
+
+The Enhanced AI here is a separate option on top of it that shares half a name. With both on, `tacticsStep` runs first
+in the classic tick; when it takes the step, DFU's enhanced movement waits for the next tick.
+
+### Online: players on other clients
+
+Online, each foe runs on one client, its owner's, and its senses read every player in the room. DFU has one player, so
+its stealth check and its first-meeting language roll read that player's skills. The port gives each player on another
+client (a peer) the same rules, with no setting, because nothing here departs from DFU:
+
+- The peer's live Stealth and half-speed state ride its pose. The owner's foe rolls DFU's stealth chance against that
+  Stealth, skips odd minutes while the peer moves under half speed, and detects a met peer that moves faster
+  (`src/characters/enemy/stealth-check.ts`). The foe's record names the minute of its last check at the peer, and the
+  peer's own client tallies its Stealth once a minute, as DFU tallies the player's.
+- The first record that names the peer as the foe's target is the peer's first meeting. The peer's client rolls DFU's
+  language check with the peer's own skills and sheathed hand, and a success goes to the owner, which stands the foe
+  down as a pacified foe (`src/characters/enemy/peer-senses.ts`). A pacified foe ignores every player until one strikes
+  it, as in DFU.
+- A failed language roll shows a line ("Orc ignores your words."), in single player and online. DFU shows nothing; the line
+  changes no outcome.
+
+The stealth check runs only while the peer is inside the foe's classic spawn band. DFU's `WouldBeSpawnedInClassic` gate
+measures that band to its one player, so the port measures it to the peer the check is about, with a latch for each
+peer. The foe's own band, which the rest gate and the target machine read, stays measured to its owner's player.
+
+Departure from Daggerfall Unity: DFU has its own "Enhanced Combat AI" setting ("Smarter Enemies"). This port does not
+implement it; the port runs DFU's classic path only. The Enhanced AI here is a separate design that shares half a name.
 
 ## The switch
 
 - Pref key `enhancedAI` in `src/systems/uiPrefs.js`, declared as the `enhanced-ai` row in `src/systems/features.js`
   (group `combat`).
-- `initial: true` (on by default offline). `online: true`: the online lane forces it on for every player
-  (`src/systems/online/onlineLane.js` derives this from the row).
+- `initial: true` (on by default offline). `online: 'room'`: online the server profile decides it for every player.
+  The official profile pins `enhancedAI: true` in `pins.prefs` (`src/net/profile/officialProfile.ts`), and
+  `src/systems/online/onlineLane.js` applies the installed profile's pins (`ONLINE_FORCED_PREFS`).
 - `PREF1_ADOPT_NEW_DEFAULT` in `uiPrefs.js` lists `enhancedAI`: a prefs shelf saved before the default changed adopts
   the new default once. A shelf with `featuresRestore` set and no `enhancedAI` key keeps it off.
 - The row has a sub-part `telegraphContrast` (default off, the player's own choice online): thicker telegraph lines, a
@@ -114,7 +153,7 @@ frozen `TACT` table.
   per `BACKOFF_COOLDOWN`.
 - **Fleeing**: only the cowardly human classes, `COWARD_CLASSES` (Mage, Sorcerer, Healer, Bard, Burglar, Acrobat,
   Thief), run below `FLEE_SHARE` health. Beasts, undead, daedra, constructs and guards never flee (`isCoward`). DFU has
-  no flee at all; this is the port's own, and F1 took it from the animals.
+  no flee at all; this is the port's own.
 - **Kiting**: a shooter with a token backs off a target inside `KITE_IN`, one burst (`KITE_MAX`) per `KITE_COOLDOWN`;
   cornered, it fights in melee.
 - Foes walk the way they face (turn first, `WALK_FACE_DEG`); nobody backpedals after a pressing target.
@@ -156,7 +195,7 @@ every `TELL` number), `src/render/foeTelegraph.js` and `src/render/telegraphStyl
 A blow is the foe's own swing, delayed and shaped. A foe winds up with the shape drawn on the ground; at the landing the
 brain forces the swing, and the host's hit resolution asks `blowConnects` (the shape's verdict in place of the reach
 test). The damage is the combat formulas' roll and nothing else: no shape, signature or aimed shot multiplies a foe's
-blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
+blow (DFU rolls the same damage whether or not the swing was telegraphed).
 
 - **Shapes** (`BLOW`): lunge, sweep, slam, ring, charge, leap, and aimed shot. `blowShapesOf` picks
   them by family (`BLOW_FAMILY`); `inBlow` tests a point.
@@ -165,20 +204,24 @@ blow (F1; DFU rolls the same damage whether or not the swing was telegraphed).
 - **Sparingly**: one wind-up near the player at a time (`BLOW_NEAR`, `windupNear`), a per-foe cooldown, and only from a
   melee token holder in reach (charge, leap and aimed shot from their own bands).
 - **Poise and stagger**: a winding-up foe takes no knockback; blow weight (`blowWeight`, weapon class `blowK`, back hits
-  `POISE_BACK`) fills its poise (`poiseOf`). Full, the wind-up breaks and the foe is staggered (`STAGGER_S`), taking
+  `POISE_BACK`) fills its poise (`poiseOf`). Full, the wind-up breaks and the foe is staggered (`STAGGER_S`). With the
+  "Openings take extra damage" row on (`ai/opening-damage.ts`, off by default, pinned off online) it takes
   `STAGGER_TAKEN` more. `windupStruck` in `tactics.js` runs the meter.
 - **Iron blows** (red, hatched) cannot be broken; they must be dodged.
-- **Punish window**: a missed blow leaves the foe overreached (`PUNISH_S`, takes `PUNISH_TAKEN` more). Leaving the shape
+- **Punish window**: a missed blow leaves the foe overreached (`PUNISH_S`; with the same row on it takes `PUNISH_TAKEN`
+  more). Leaving the shape
   in the last `TELL_LATE` s is a perfect dodge with a longer window.
 - **Patterns**: varied wind-up length, tracking lunges and charges, feints (`feints`; a feint never glints), chains.
 - **Landing effects**: `src/systems/blowEffects.js` (push, bleed, rattle, knock-down; `blowEffectOf`, `drainBlowEffects`).
 - **Damage modifiers**: staggered and overreached multipliers register through `registerBlowTakenMod` in
-  `src/systems/blowTaken.js`, a leaf the combat formulas read.
+  `src/systems/blowTaken.js`, a leaf the combat formulas read. These multiply the damage a foe takes
+  (`STAGGER_TAKEN` 1.25, `PUNISH_TAKEN` 1.3 in `tells.js`). Decision 117 (15) puts them under decision 13's rule on
+  damage multipliers: they are dropped or become an option. The code still applies them.
 - **Cues**: `tellCues` in `src/scenes/hostCombat.js` (glint, wind sound, release whoosh); `foeGlint` and `poiseTrack` in
   `tactics.js`.
 
-`blowShapes.js` imports nothing so the renderer can read the shapes without pulling the brain onto its boot graph
-(`test/render/boot2.test.js` checks this).
+`blowShapes.js` imports nothing so the renderer can read the shapes without pulling the brain onto its boot graph. No
+test checks this; keep the module free of imports by hand.
 
 ### Online
 

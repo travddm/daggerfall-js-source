@@ -221,6 +221,16 @@ export function toCharacterDocument(parsedData, stripLycanthropyType = LYCANTHRO
  *  skips the scale - same value, DFU's own shape). */
 export const classicPitchDegrees = (pitch) => (pitch !== 0 ? (pitch * 45) / 256 : 0);
 export const classicYawDegrees = (yaw) => (yaw !== 0 ? (yaw * 360) / 2048 : 0);
+const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+
+/** A save record's look as the camera holds it. DFU hands the degrees above to PlayerMouseLook.SetFacing; the camera
+ *  here, and the port's own saves, hold radians. */
+function classicFacing(root) {
+  return {
+    pitch: degreesToRadians(classicPitchDegrees(root.pitch)),
+    yaw: degreesToRadians(classicYawDegrees(root.yaw)),
+  };
+}
 
 /** The StartFromClassicSave weather loop (:633-643): the 0x80 fog flag
  *  is masked off (DFU's own TODO - fog-on-snow/rain is not built), and
@@ -888,10 +898,7 @@ export function classicSaveToSnapshot(saveGames, {
   // whatever the save's environment byte says.
   const positionRecord = saveTree.findRecord(RECORD_TYPES.CharacterPositionRecord);
   const root = positionRecord?.recordRoot ?? null;
-  if (root) {
-    snap.pose.pitch = classicPitchDegrees(root.pitch);
-    snap.pose.yaw = classicYawDegrees(root.yaw);
-  }
+  if (root) Object.assign(snap.pose, classicFacing(root));
 
   return {
     snap,

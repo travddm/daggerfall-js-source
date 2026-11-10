@@ -44,9 +44,9 @@ export const DECOR_ID_RE = /^[A-Za-z0-9_-]{1,24}$/;
 /** ARCH3D model ids run to six digits; TEXTURE records below 512, and archives below 512 - DECOR2c: or the port's own
  *  past them (Roleplay & Realism's weapons and armour, 513 to 526; Climates & Calories', 532 to 539), so a mounted
  *  weapon of theirs shows its own picture.
- *  DECOR-MODFLATS: or a MOD's, to five digits. The catalogue is read out of the world's own blocks, and the ships
- *  Detailed Ships lays in them carry its own flats (archives 1210 and 1230) and the DET flats the port stands in (10009
- *  to 10027) - "Decoration 49" onward, numbered after the classic ones. The bound refused every one: the piece being
+ *  DECOR-MODFLATS: or a MOD's, to five digits. The catalogue is read out of the world's own blocks, and the town mods
+ *  lay flats of archives past Daggerfall's in them (1210, and the DET flats the port stands in, 10009 to 10027) -
+ *  "Decoration 49" onward, numbered after the classic ones. The bound refused every one: the piece being
  *  placed was never a piece, so its picture never stood and Place did nothing. */
 export const DECOR_MODEL_MAX = 999_999;
 export const DECOR_ARCHIVE_MAX = 99_999;

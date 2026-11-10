@@ -1,6 +1,6 @@
 // WD3 - THE PIECES THE TWO TOWN MODS
 // BORROW, STOOD IN BY THE PORT (src/world/townStandIns.js, detStandIns.js, townPictures.js, standInSprites.js,
-// flatFields.js; systems/detailedShips.js's shared pictures). Beautiful Villages and Beautiful Cities place pieces of five
+// flatFields.js). Beautiful Villages and Beautiful Cities place pieces of five
 // peer mods the port does not carry and eighteen beds whose prefabs point at nothing; DFU without the peers draws
 // nothing there. Every stand-in is the port's own - a classic model under another blanket, a mesh built in code, a
 // picture drawn in code or rebuilt from the player's own records - made for the places the author put it.
@@ -13,8 +13,8 @@
 // the size it was measured; its city-wall piece, cut out of the player's 445, in test/world/fb1003c_citywall.test.js); the
 // drawn cloth (48 pictures, opaque) and sprites (a clear ground, binary alpha); the crop
 // fields (the climate's plant, a grid of 484, the same every visit, sown only where a block's nature is known); the
-// table clutter and the temple gardens (classic records); the install (once, every piece behind its switch, DET's and
-// Cliffworms' shared with Detailed Ships by either switch); the pipeline's hole (a record no picture is for draws
+// table clutter and the temple gardens (classic records); the install (once, every piece behind its switch, DET's
+// pieces with them); the pipeline's hole (a record no picture is for draws
 // nothing, said once). With ARENA2_PATH: every model and flat the two packs place is Daggerfall's own, stood in, or one
 // of a named few; every built-in flat a town's interior lays can be taken out of a house (BASE-HIDE's name); the solids
 // the port stands in a town against the author's own models and every exterior door's approach (FIELD BUGS 2026-10-15f
@@ -40,9 +40,7 @@ import { customModelFor, customAliasFor, aliasSubMeshes, classicModelIdOf, hasCu
 import { flatFieldFor, cropRecordsFor, sowField, CROP_ARCHIVE, _resetFlatFields } from '../../src/world/flatFields.js';
 import { collectBlockFlats } from '../../src/world/rmbFlats.js';
 import { addVendorTextures, clearVendorTextures, hasTextureReplacement, setTextureDeriveContext, preloadTextureArchive, decodedTexture } from '../../src/systems/textureReplacement.js';
-import { installDetailedShipsArt, _resetDetailedShipsArt, detailedShipsArtOn, DETAILED_SHIPS_VENDOR } from '../../src/systems/detailedShips.js';
-import { billboardXmlScale, unregisterBillboardXml } from '../../src/world/billboardXml.js';
-import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
+import { _resetModSettings } from '../../src/systems/modSettings.js';
 import { isBedModel } from '../../src/systems/roleplayRealism/rrRealism.js';
 import { DECOR_BASE_KEY_RE, decorBaseFlatKey, decorBaseModelKey } from '../../src/net/decorLaw.js';
 import { createDataPipeline, LAST_CLASSIC_TEXTURE_ARCHIVE } from '../../src/scenes/dataPipeline.js';
@@ -65,7 +63,7 @@ const U = 0.025;
 
 function resetAll() {
   _resetTownStandIns(); _resetDetStandIns(); _resetCustomModels(); _resetFlatFields(); clearVendorTextures();
-  _resetDetailedShipsArt(); unregisterBillboardXml(DETAILED_SHIPS_VENDOR); setTextureDeriveContext(null); _resetModSettings();
+  setTextureDeriveContext(null); _resetModSettings();
 }
 
 /** A built model: every array the size its vertices say, the submeshes tiling the index list, every index landing, every
@@ -332,15 +330,12 @@ test('WD3 stand-ins, a field sown in a block: rmbFlats lays a registered prefab\
 });
 
 // ---- the install ----------------------------------------------------------------------------------------------------------
-test('WD3 stand-ins, the install: once; every piece behind the town mods\' switch - beds, paintings, Rosy\'s, the pack\'s pieces, the fields, the bedclothes, the cloth, the clutter, the gardens - and DET\'s pieces and Cliffworms\' pictures shared with Detailed Ships, on while either is', async () => {
+test('WD3 stand-ins, the install: once; every piece behind the town mods\' switch - beds, paintings, Rosy\'s, the pack\'s pieces, the fields, the bedclothes, the cloth, the clutter, the gardens - and DET\'s pieces with them', async () => {
   resetAll();
-  setModSetting(DETAILED_SHIPS_VENDOR, 'Enabled', false);
   let towns = true;
-  assert.equal(installDetailedShipsArt({ fetchBytes: async () => new Uint8Array(0) }), 13);
-  assert.equal(detailedShipsArtOn(), false, 'Detailed Ships off, no town mod yet');
   const n = installTownStandIns(() => towns);
   assert.equal(installTownStandIns(() => true), 0, 'once');
-  assert.equal(n, 18 + 22 + 7, 'the bedclothes, the clutter and the gardens - DET\'s pictures were put on the door by Detailed Ships, and answer to both switches');
+  assert.equal(n, 233, 'the bedclothes, the clutter, the gardens and DET\'s pictures');
   for (const id of [...Object.keys(TOWN_PAINTINGS), ...Object.keys(ROSYS_PIECES), ...Object.keys(RMBRP_PIECES), ...Object.keys(DET_TOWN_MODELS)]) assert.equal(hasCustomModel(id), true, id);
   for (const id of Object.keys(TOWN_CROP_FIELDS)) assert.ok(flatFieldFor(id), id);
   const pictures = [
@@ -351,20 +346,14 @@ test('WD3 stand-ins, the install: once; every piece behind the town mods\' switc
     ...Object.entries(DET_TOWN_FLATS).flatMap(([a, rs]) => Object.keys(rs).map((r) => [Number(a), Number(r)])),
     ...Object.entries(DET_FLAT_STAND_INS).flatMap(([a, rs]) => Object.keys(rs).map((r) => [Number(a), Number(r)])),
     ...Object.keys(DET_OLD_ARCHIVES).flatMap((a) => Object.keys(DET_FLAT_STAND_INS[DET_OLD_ARCHIVES[a]] ?? {}).map((r) => [Number(a), Number(r)])),
-    [1210, 10], [1210, 11], [1210, 12], [1210, 17], [1210, 18], [1210, 19], [1210, 20],
   ];
   for (const [a, r] of pictures) assert.equal(hasTextureReplacement(a, r), true, `${a}_${r}`);
-  assert.equal(detStandInsOn(), true); assert.equal(detailedShipsArtOn(), true, 'Cliffworms\' pictures shared with the towns');
-  assert.deepEqual(billboardXmlScale(1210, 17), { x: 0.5, y: 0.5 }, 'and their scales');
+  assert.equal(detStandInsOn(), true);
   for (const [a, r] of Object.entries(TOWN_CLUTTER).concat(Object.entries(TOWN_GARDEN)).map(([, from]) => from)) assert.ok(a <= LAST_CLASSIC_TEXTURE_ARCHIVE && Number.isInteger(r), 'a classic record');
   towns = false;
   for (const [a, r] of pictures) assert.equal(hasTextureReplacement(a, r), false, `${a}_${r} off`);
   assert.equal(hasCustomModel(69424), false); assert.equal(flatFieldFor(53211), null); assert.equal(customAliasFor(42069), null);
-  assert.equal(detailedShipsArtOn(), false); assert.equal(billboardXmlScale(1210, 17), null);
-  setModSetting(DETAILED_SHIPS_VENDOR, 'Enabled', true);
-  assert.equal(hasTextureReplacement(1210, 10), true, 'Detailed Ships\' own switch');
-  assert.equal(hasCustomModel(45081), true, 'DET\'s timbers stand for its ships');
-  assert.equal(hasCustomModel(69424), false, 'the towns\' own pieces do not');
+  assert.equal(detStandInsOn(), false); assert.equal(hasCustomModel(45081), false, 'DET\'s timbers stand with the towns');
   resetAll();
 });
 
@@ -434,13 +423,11 @@ function loadArena2() {
 /** What neither the port nor Daggerfall stands, and why (, "Not stood in"). */
 const NOT_STOOD_IN = Object.freeze({
   models: [43756, 45179, 45181, 45198, 45205, 45206, 52991, 53129, 53130, 53132, 53134, 69465],
-  flats: ['10025_1', '1200_4', '1200_9', '1210_13', '1210_16', '1210_24', '1230_11', '1230_15', '1230_2', '1230_22', '1230_3', '1230_5', '1230_6', '1230_9'],
+  flats: ['10025_1', '1200_4', '1200_9', '1210_10', '1210_11', '1210_12', '1210_13', '1210_16', '1210_17', '1210_18', '1210_19', '1210_20', '1210_24', '1230_11', '1230_15', '1230_2', '1230_22', '1230_3', '1230_5', '1230_6', '1230_9'],
 });
 
 test('WD3 with ARENA2: every model and flat the two packs place is Daggerfall\'s own, stood in by the port, or one of the named few nothing stands (as DFU without the peers) - 2,014 models and 623 flats', { skip: HAVE_ARENA2 ? false : 'ARENA2_PATH not set' }, () => {
   resetAll();
-  setModSetting(DETAILED_SHIPS_VENDOR, 'Enabled', false);
-  installDetailedShipsArt({ fetchBytes: async () => new Uint8Array(0) });
   installTownStandIns(() => true);
   const { blocks, maps, arch, texture } = loadArena2();
   const models = new Map(), flats = new Map();
@@ -463,7 +450,7 @@ test('WD3 with ARENA2: every model and flat the two packs place is Daggerfall\'s
     else if (a <= LAST_CLASSIC_TEXTURE_ARCHIVE && texture(a) && r < texture(a).recordCount) fcount.classic++;
     else fmissing.push(k);
   }
-  assert.deepEqual([flats.size, fcount.classic, fcount.standIn], [623, 503, 106]);
+  assert.deepEqual([flats.size, fcount.classic, fcount.standIn], [623, 503, 99]);
   assert.deepEqual(fmissing.sort(), [...NOT_STOOD_IN.flats].sort());
   // ...and every stand-in drawn from a classic record names one the player's data has
   const sources = [

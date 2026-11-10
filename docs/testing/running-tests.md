@@ -6,7 +6,9 @@ recorded times and the game data that some tests need.
 ## The runner
 
 The suite uses Node's built-in runner, `node:test`, with `node:assert/strict`. There is no Jest, Mocha or Vitest.
-Every file named `*.test.js` anywhere under `test/` is a test file. Each file runs in its own process.
+Every file named `*.test.js` or `*.test.ts` anywhere under `test/` is a test file (`testFiles` in
+`tools/testShards.mjs`). Each file runs in its own process. A new test file is `<module>.test.ts`; existing files keep
+their names until the rename pass (decision 116 (9), [writing-tests.md](writing-tests.md)).
 
 Node must be `>=22.18.0` (`package.json` `engines`), the first 22 release that runs `.ts` files. CI uses Node 22.
 
@@ -32,14 +34,15 @@ processes that run one after another (`WIN32_ARGV_BUDGET`). Elsewhere it uses on
 | `node tools/testShards.mjs 3/8` | Shard 3 of 8, as CI runs it. |
 | `node tools/testShards.mjs 3/8 --list` | The files in shard 3 of 8, one a line. |
 | `node tools/testShards.mjs --plan 8` | File count and recorded seconds for each of 8 shards. |
-| `node --test test/ui/chatscroll.test.js` | One file, directly. |
+| `node --import ./tools/raw-import-hooks.ts --test test/ui/chatscroll.test.js` | One file, directly. The `--import` lets Node load a shader file imported with `?raw`; without it, a test that reaches such a module fails with `ERR_UNKNOWN_FILE_EXTENSION`. The tools above add it for you. |
 | `npm run lint` | ESLint over `src/`, `server/src/`, `server-account/src/`, `test/`, `tools/`, `scripts/`, `app/` and the root `*.config.js`. It keeps a content-keyed cache in `node_modules/.cache/eslint/`. |
 | `npm run types` | `tsc -p tsconfig.json`. `checkJs` is off: only `src/` files with `// @ts-check` on their first line are reported. `test/systems/save/hard3_types.test.js` decides which files must opt in. |
 | `npm run build` | `vite build` into `dist/`. |
 | `npm run check` | Lint, types, the whole suite and the build, in series. Slow; use it only when CI cannot run. |
 
 To run one area, list its files with a quoted glob: `node --test "test/net/**/*.test.js"`. Do not pass a bare
-directory such as `test/ui/`: a trailing directory path breaks file discovery on Node 22.
+directory such as `test/ui/`: a trailing directory path breaks file discovery on Node 22. A direct `node --test` needs
+the `?raw` hook, as the table shows or through `NODE_OPTIONS` ([getting-started.md](../getting-started.md#node-and-shader-files)).
 
 Runner flags pass through the tools. `npm test -- --test-name-pattern=foo` and
 `node tools/testChanged.mjs --test-only` hand every `--test-*` argument to each runner process (`runnerFlags`).
@@ -62,6 +65,11 @@ files. Options:
 
 - `--list` prints the chosen files and runs nothing.
 - `--base <rev>` compares against another commit.
+
+Pull requests on this fork target `feat/tamriel-review`, not `main`, so the default base picks too many files. Pass the
+merge base with the branch the pull request targets:
+`node tools/testChanged.mjs --base $(git merge-base HEAD origin/feat/tamriel-review)`. The tool's default is not fixed
+yet.
 
 When a change touches a module that most tests import (a scene host such as `src/scenes/world.js`), the tool picks
 most of the suite. In that case run the change's own test files and let CI run the rest.

@@ -24,7 +24,7 @@ import { markFoeStruck } from '../ui/hud/hudFoeTarget.js';   // PX30
 import { damageShieldPool, playerBlowCameToNothing } from '../characters/playerEntity.js';   // AUDIT 58: DecreaseHealth's shield hook is the BASE class's (DaggerfallEntity.cs:313-328)
 import { lycanthropeAttackVoice } from '../systems/lycanthropy.js';   // V4: the beast's attack voice
 import { copyEffectEntry } from '../systems/save/save.js';   // AUDIT 26 F216: the caster-stripping effect copy, one home
-import { EnemyAI, isBackFacing, withinYaw, MELEE_DISTANCE, foeFrameDt, enhancedCombatAIEnabled } from '../characters/enemy/enemyMotor.js';   // AUDIT WORLD6b-iii(a) B4: the puppet's cast is read against the owner's own bands
+import { EnemyAI, isBackFacing, withinYaw, MELEE_DISTANCE, foeFrameDt, enhancedCombatAIEnabled, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from '../characters/enemy/enemyMotor.js';   // AUDIT WORLD6b-iii(a) B4: the puppet's cast is read against the owner's own bands
 import { pilotFoe, pilotSteer } from '../systems/staffBossPilot.js';   // STAFF-PILOT: a staff member steering their event's mini boss
 import { EnhancedEnemyAI } from '../ai/enhancedMotor.js';   // FIELD BUGS 2026-10-16b INDOOR-WATCH: the routes, where the host hands a mesh (`nav`)
 import { getPref } from '../systems/uiPrefs.js';   // INDOOR-WATCH: the Enhanced AI switch, as the dungeon's construction sites read it
@@ -36,6 +36,8 @@ import { FALL_DAMAGE_THRESHOLD, FALL_HP_PER_METRE, CAPSULE_HEIGHT } from '../pla
 import { SOUND, hitSoundFor, ENEMY_HIT_VOLUME } from '../systems/soundClips.js';   // CH3: the FallDamage clip; WORLD6b: a peer's blow rung at the owner
 import { EnemyCaster, castEnemySpell, hasMagickaToCast, MIN_RANGED_DISTANCE, MAX_RANGED_DISTANCE } from '../characters/enemy/enemyCasting.js';   // X3: the shared decision + the ONE cast executor
 import { assignEnemySpells, SPELL_CAST_SOUND } from '../systems/enemySpells.js';   // X3
+import { createPeerCandidates } from '../characters/enemy/peer-candidates.ts';   // the room's other players as target candidates
+import { stealthCheckRecord, createPeerSensesLink, applyCalm } from '../characters/enemy/peer-senses.ts';   // DFU's stealth tally and language roll for a player on another client
 import { applySpell, isSoulTrapEffect, maxFatigue, entityIsParalyzed, applyEnemyMotorEffectFlags, concealmentFlags, concealFlagsOfBits } from '../systems/effects.js';   // X3: self-casts land through the effect spine   // A5: the enemy Levitate arm, the foe-target concealment closure + EntityConcealmentBehaviour's visual
 import { calculateCastCost } from '../systems/spellcost.js';   // X3: costs priced off the player (magic-15 note)
 import { silenceBlocksCast, attemptSoulTrap, SOUL_TRAP_TEXT, fillEmptyTrap, peerSoulTrapOf } from '../systems/mysticism.js';   // X3: the enemy silence gate; X5: the soul trap's kill intercept; STRIKE-SHARED: a peer's trap is its caster's
@@ -381,8 +383,8 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
   // alone here). A peer's hit on my foe carries the striker's feet and the blow's direction, so the foe turns on
   // the striker and the shove goes the way the blow went. Casts stay the owner's own: a foe whose target is a peer
   // does not cast (6b-iii).
-  const _peerCands = new Map();   // id -> { isPlayer, isPeer, id, feet, height, health }
-  let _peerFrame = 0, _peerRead = -1;
+  const _peers = createPeerCandidates({ read: () => _net?.peers?.() ?? null, concealFlags: concealFlagsOfBits, capsuleHeight: CAPSULE_HEIGHT, stance: { write: (id, yaw, sheathed) => { writePlayerYaw(id, yaw); writePlayerBowOrSheathed(id, sheathed); }, forget: forgetPlayerStance } });
+  let _peerFrame = 0;   // the frame a blow's divert was taken in
 
   const activeCount = () => foes.filter((f) => !f.dead && !f.puppet && !f.placed && f.companion == null).length;   // AUDIT CC-A7: a companion is the player's, never one of the place's encounter slots   // WORLD6b: a puppet is its owner's, not this cap's; WOD3: nor is a foe a mod PLACED
 
@@ -1156,26 +1158,15 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
   }
   /** WORLD6b-ii: the peers in my cell as target candidates (WORLD3) - read once a frame off the net, each a stable
    *  identity; a peer gone is dead to the machine (health 0, targetHealth's read) and dropped. */
-  function peerCandidates() {
-    if (_peerRead === _peerFrame) return [..._peerCands.values()];
-    _peerRead = _peerFrame;
-    const list = _net?.peers?.() ?? null;
-    if (!list) { for (const c of _peerCands.values()) c.health = 0; _peerCands.clear(); return []; }
-    const seen = new Set();
-    for (const q of list) {
-      if (!q || typeof q.id !== 'string' || !Array.isArray(q.feet) || q.feet.length !== 3 || !q.feet.every(Number.isFinite)) continue;
-      seen.add(q.id);
-      let c = _peerCands.get(q.id);
-      if (!c) { c = { isPlayer: true, isPeer: true, id: q.id, feet: [0, 0, 0], height: CAPSULE_HEIGHT, health: 1, cv: 0, concealment: () => concealFlagsOfBits(c.cv) }; _peerCands.set(q.id, c); }   // INVIS-NET: its concealment, off its pose - EnemySenses.BlockedByIllusionEffect reads a peer as it reads any target
-      c.feet[0] = q.feet[0]; c.feet[1] = q.feet[1]; c.feet[2] = q.feet[2];
-      c.height = Number.isFinite(q.height) && q.height > 0 ? q.height : CAPSULE_HEIGHT;
-      c.health = 1;
-      c.cv = q.cv | 0;
-    }
-    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); }
-    return [..._peerCands.values()];
-  }
-  const peerCandidate = (id) => { peerCandidates(); return (typeof id === 'string' && _peerCands.get(id)) || null; };
+  function peerCandidates() { return _peers.all(); }
+  const peerCandidate = _peers.byId;
+  const _peerSenses = createPeerSensesLink({   // DFU's stealth tally and language roll for my player at another's foe (peer-senses.ts)
+    playerEntity,
+    isMe: (f, at) => recipientIsMe(f, at),
+    minute: () => Math.floor(currentMinute()),
+    rollLanguage: (f, edge) => tryLanguagePacification(edge, f.entity, f.mobileType, playerEntity, { sheathed: playerWeaponSheathed(), enemyLanguageSkill, calculateEnemyPacification, say: say ?? (() => {}) }),
+    send: (f, word) => _net?.onPeerHit?.({ to: f.puppet, k: _owners.get(f.puppet)?.k ?? _net.room?.() ?? null, i: f.seq, ...word }),
+  });
   /** The feet the ATTACK and CAST components must aim at: DFU's
    *  components read senses.Target, not the player (EnemyAttack.cs:
    *  199-209). Unarmed, or with the player selected, this is the
@@ -1394,7 +1385,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     hitEffects?.bleed?.(dt, foes, foeBleedView);   // BLOOD2c: the wounded drip, the dead bleed out - every body this pool walks, puppets included
     corpsePrefabs.frame(foes, dt);   // DEX5: a prefab's body on the foes' clock
     tickCorpseMarkers(corpseBatches, dt);   // AUDIT DEX B3: a body of more than one frame animates (the Hell Hound's)
-    _peerFrame++;   // WORLD6b-ii: the peers are read once a frame
+    _peerFrame = _peers.nextFrame();   // WORLD6b-ii: the peers are read once a frame
     const _bossS = tickBossClock(performance.now(), !(dt > 0));   // AUDIT WORLD-EVENTS L2-5: the traits' clock - a pause holds it
     spaceFoes(foes, collider, foeFrameDt(dt));   // FOE-SPACING: two bodies in one spot are pushed apart (characters/foeSpacing.js)
     for (const f of foes) {
@@ -2363,12 +2354,13 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
         f._heir = items ? h : null;
         if (f._heir) { r.e = h; r.it = items; }
       }
+      Object.assign(r, stealthCheckRecord(f.ai));   // its last stealth check at a peer, so that peer tallies its Stealth (peer-senses.ts)
       if (!f.dead && f.ai._tac && !f.ai._tac.puppet) Object.assign(r, blowWire(f.ai, tacticsNow(), (p) => _net.toWire(p)));   // TELL8 (10.1): its wind-up, its stagger, its overreach - a foe with a brain
       // AUDIT MW-NPC II K2-K4: the look its owner stands it in - its seed, and a person's kit - on a full frame and when it
       // changed since it last went (a frame the trim below cut it from owes it again)
       const lk = foeWireLook(f);
       if (full || f._lkSent !== lk.key) { r.ls = lk.seed; if (lk.kit) Object.assign(r, lk.kit); f._lkPend = lk.key; }   // APPEARANCES-II: the kit (`lw`) and the looks its pieces wear (`la`) ride together
-      const key = `${lk.key}|${r.f[0]},${r.f[1]},${r.f[2]},${r.y},${r.h},${r.k},${r.d},${r.a},${r.b},${r.m},${r.g},${r.l},${wd ? wd.join('/') : '-'},${r.c},${r.s},${r.u},${r.o},${r.n},${r.bg ?? 0},${r.z ?? 0},${r.nm ?? ''},${r.yd ?? 0},${r.ex ?? 0},${r.sp ?? 0},${traitWireKey(r)}${r.wk !== undefined || r.ws !== undefined ? `,${blowWireKey(r)}` : ''}`;   // TELL8: and the wind-up's (never `wl`); AUDIT WORLD-EVENTS L5-10: and the boss's wrath and live ward (a blow the ward took moved no health, and was never sent)
+      const key = `${lk.key}|${r.sc},${r.f[0]},${r.f[1]},${r.f[2]},${r.y},${r.h},${r.k},${r.d},${r.a},${r.b},${r.m},${r.g},${r.l},${wd ? wd.join('/') : '-'},${r.c},${r.s},${r.u},${r.o},${r.n},${r.bg ?? 0},${r.z ?? 0},${r.nm ?? ''},${r.yd ?? 0},${r.ex ?? 0},${r.sp ?? 0},${traitWireKey(r)}${r.wk !== undefined || r.ws !== undefined ? `,${blowWireKey(r)}` : ''}`;   // TELL8: and the wind-up's (never `wl`); AUDIT WORLD-EVENTS L5-10: and the boss's wrath and live ward (a blow the ward took moved no health, and was never sent)
       const gkey = r.gr ? `${key}|${r.gr[0]}` : key;   // GRANT3: a grant carried into another cell is another number - said again
       const sent = gkey + body.keyFor(f);   // OUTDOOR-LOOT: and the body's takes digest, so a take re-sends the record
       if (!full && f._sentKey === sent) continue;
@@ -2673,6 +2665,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       else if (!cur || cur.templateIndex !== r.w[0] || (cur.material | 0) !== r.w[1]) f.entity.weapon = createWeapon(r.w[0], r.w[1], () => 0.5);
     }
     if (r.g !== undefined) p.target = r.g;   // WORLD6b-ii: whose blow this puppet's is
+    _peerSenses.read(f, r, p.target);   // my Stealth tally and my first-meeting language roll at another's foe
     if (r.d !== 1) f._fightN = r.n ?? 1;   // AUDIT PSCALE1: the owner's count of who fights it (a record without one: its owner alone). SIGIL1: a LIVE record's - a body's carries none, and the fight it died in was the last live count (its Renown bonus, its sigils)
     if (r.o !== undefined) { p.o = r.o; if (r.o > 0 && !(f._closedN != null && (_owners.get(f.puppet)?.n ?? 0) <= f._closedN)) f.corpseDisabled = false; }   // WORLD6b-iii(c): the body's pile, its owner's word - a refilled word re-opens it; AUDIT WORLD6b-iii(c) A7: not a word OLDER than the grant that closed it (a frame in flight at the splice)
     if (r.y !== undefined) p.yaw = r.y;
@@ -2809,6 +2802,12 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
    *  WORLD6b A7). */
   /** AUDIT WORLD6b-iii(e) A1: the Arrows a body holds (the shaft's item, BowDamage's) - the bound the hit's `ar` lands under. */
   function arrowsIn(items) { let n = 0; for (const it of items) if (it && it.templateIndex === 131 && it.name === 'Arrow') n += it.stackCount ?? 1; return n; }
+  function applyCalmWord(from, data) {   // a peer's language roll pacified my foe (peer-senses.ts), keyed to a cell I hold as its blows are
+    if (data.k != null && _net?.room && data.k !== _net.room() && !_net.inRoom?.(data.k)) return false;
+    const f = foes.find((x) => !x.puppet && x.seq === (data.i | 0)) ?? watchOf(data.i | 0);
+    if (_questLike(f) && !_peerMayHit(from, f)) return false;
+    return applyCalm(f?.ai, !f || f.dead);
+  }
   function applyHit(from, data) {
     if (!data || typeof data !== 'object') return false;
     if (data.k != null && _net?.room && data.k !== _net.room() && !_net.inRoom?.(data.k)) return false;   // AUDIT WORLD6b-iii(b) C1/B6: keyed to any cell I HOLD - the striker remembers my cell from my last frame, and for a foes interval after a crossing that was the cell I left (still held as a halo); a cell I do not hold is not the world
@@ -3146,7 +3145,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     fateFor, chooseFate, companionFx, portals,   // REVENANT-FATE: a kneeling revenant's choice; COMPANION-PORTAL: this pool's portals
     // SAILING-CABINS: withdraw exterior actors on the same sequence while the boat heartbeat continues.
     emptyFoesFrame: () => ({ n: ++_foesSeq, k: _net?.room?.() ?? null, full: 1, f: [] }),
-    setNet, foesFrame, applyFoes, applyHit, spellToOwner, pruneOwners, clearPuppets, handOverFrame, handOver, dropOwnLive,
+    setNet, foesFrame, applyFoes, applyHit: (from, data) => (data?.calm === 1 ? applyCalmWord(from, data) : applyHit(from, data)), spellToOwner, pruneOwners, clearPuppets, handOverFrame, handOver, dropOwnLive,
     deepPuppetsNear,   // DEEP-SHARE: the deep's foes others stand near a point
     setQuestShare,   // QUEST-PARTY
     setOnSites, removeSiteFoes, dropSiteFoes, reclaimSite,   // WOD7; AUDIT WB12d (C1): a site left behind, and one taken back

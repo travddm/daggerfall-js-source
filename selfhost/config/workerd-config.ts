@@ -40,16 +40,14 @@ export const ENV_OVERRIDES: Record<string, readonly string[]> = {
 
 /** Secrets each Worker reads that no toml names, read from the environment. Unset, a binding is null. */
 export const SECRETS: Record<string, readonly string[]> = {
-  relay: ['GATE_SIGNING_KEY', 'GATE_DISCORD_WEBHOOK'],
+  relay: ['GATE_SIGNING_KEY'],
   accounts: [
     'IDENTITY_PRIVATE_KEY',
     'IDENTITY_PUBLIC_KEY',
     'GATE_PUBLIC_KEY',
     'CRON_SECRET',
+    'OPERATOR_SECRET',
     'ANTHROPIC_API_KEY',
-    'DISCORD_BOT_TOKEN',
-    'PATREON_CLIENT_SECRET',
-    'PATREON_WEBHOOK_SECRET',
     'STAFF_ANALYTICS_ACCOUNT',
     'STAFF_ANALYTICS_TOKEN',
   ],

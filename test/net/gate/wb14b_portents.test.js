@@ -9,7 +9,7 @@
 //   the screen              world/gate/gateArena.js planOfDay, arrivalOf, the plan's model, collider, slabs, lights, arena;
 //                           the telegraph's whole-arena shape over the plan's floors alone
 //   the words               the chat (systems/gate/gateOmen.js), the map's card (gateTip), the marks card
-//                           (ui/gate/gateMarksView.js portentRowsOf), the Discord omen post (net/gate/gateHerald.js)
+//                           (ui/gate/gateMarksView.js portentRowsOf)
 //
 // Design: 2 and 6.
 import { test } from 'node:test';
@@ -34,9 +34,7 @@ import { TOWER_WINDOW, floorGap, deadlandsIslands, LAND_CLEAR_M } from '../../..
 import { SIGIL_TOWER } from '../../../src/render/deadlands.js';
 import { createGateOmen, gateTip } from '../../../src/systems/gate/gateOmen.js';
 import { marksCardModel, drawGateMarksCard, destroyGateMarksCard, PORTENT_CSS } from '../../../src/ui/gate/gateMarksView.js';
-import { omenPost } from '../../../src/net/gate/gateHerald.js';
 import { createGateCourt } from '../../../src/scenes/gate/gateCourt.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const T0 = 1_000_000;
@@ -289,7 +287,7 @@ test('WB14b the Deadlands keep clear of every floor of every night: no island wi
 
 // ═══ THE WORDS ═══════════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('WB14b the night\'s portents said before the gate, everywhere his marks are: the chat\'s line after his marks (the Dire Breach\'s own first), the map\'s card a line of their names, the marks card a row each after his trials, the Discord omen post after the marks; none of it on a plain night (mutants: the portents unsaid in the chat; the card\'s row missing; the post without them)', () => {
+test('WB14b the night\'s portents said before the gate, everywhere his marks are: the chat\'s line after his marks (the Dire Breach\'s own first), the map\'s card a line of their names, the marks card a row each after his trials; none of it on a plain night (mutants: the portents unsaid in the chat; the card\'s row missing)', () => {
   const plain = dayOf(null, 600), van = dayOf('vanguard', 600), dire = dayOf('vanguard+sunder', 600);
   const SITE = { place: 'Copperham, Wrothgarian Mountains', near: 'Copperham', px: 400, py: 200, spot: [409.6, 409.6], ring: { cx: 400.3, cy: 200.6, r: 2 } };
   const chat = (day) => { const said = []; const o = createGateOmen({ now: () => gateTimes(day).openAt + 1000, site: () => SITE, say: (s) => said.push(s), localTime: (m) => `L${m}` }); o.frame(); return said; };
@@ -321,11 +319,6 @@ test('WB14b the night\'s portents said before the gate, everywhere his marks are
   drawGateMarksCard(marksCardModel(gateModsOf(plain), { name: boss }, { mode: 'gate' }), { doc });
   assert.equal(shown().length, 3, 'the portents\' rows hidden on a plain night, never removed');
   destroyGateMarksCard();
-  const post = (day) => cardOf(omenPost({ day, place: 'Copperham' })).text;   // HERALD-CARDS: the card's text
-  assert.ok(post(van).endsWith(' tonight, ' + gateModsOf(van).slice(1).map((id) => GATE_TRIALS.find((t) => t.id === id).name).join(' and ') + '. His vanguard holds the approach.'), post(van));
-  assert.ok(post(dire).endsWith(`. ${gateDireLine()} His vanguard holds the approach. He tears in two at the second phase.`), post(dire));
-  assert.ok(post(plain).endsWith('tonight, ' + gateModsOf(plain).slice(1).map((id) => GATE_TRIALS.find((t) => t.id === id).name).join(' and ') + '.'), post(plain));
-  assert.ok(post(dire).length < 2000, 'a Discord message\'s bound');
 });
 
 test('WB14b a new night\'s fight is judged anew: the court\'s reset clears what it judged, heard and landed before it lays the night\'s arrival - a Slam numbered as the last night\'s lands again (mutants: the resets lost behind the arrival)', async () => {

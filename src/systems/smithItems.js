@@ -89,7 +89,7 @@ import { itemLongName } from './item/itemInfo.js';
 import './professions/profTemplates.js';   // the Repair Kit's row (692), registered with the ores and ingots
 import { applyRarity, rarityEligible, RARE_FLAVOURS, reforgeAffix, reforgeableLines, lastPass, rarityName, affixesWorth } from './loot/lootRarity.js';   // CRAFT4: and the Reforge with Essence's roll; CRAFT-PROCS: the last pass; MASTER-ART: a Master's work's name and worth
 import { pieceQuality, temperRefusal, temperStep, reforgeEssence } from '../net/temperLaw.js';   // CRAFT4: the temper
-import { readProductRecord, mintVersionOf, MINT_V_LAST_PASS, MINT_V_LINES, MINT_V_ARMOR_LEAN, MINT_V_JEWEL_KIN, MINT_V_MASTER, masterLinesOf } from '../net/productRecord.js';   // CRAFT4: a tempered piece's record, re-signed; CRAFT-PROCS: the mint's version; AFFIX-LINES: its lines' law; MASTER-ART: a Master's lines
+import { readProductRecord, mintVersionOf, MINT_V_LAST_PASS, MINT_V_LINES, MINT_V_ARMOR_LEAN, MINT_V_JEWEL_KIN, MINT_V_MASTER, masterLinesOf, masterTierOfVersion } from '../net/productRecord.js';   // CRAFT4: a tempered piece's record, re-signed; CRAFT-PROCS: the mint's version; AFFIX-LINES: its lines' law; MASTER-ART: a Master's lines
 import { masterLinesOfRecord } from '../net/masterLaw.js';   // MASTER-ART: a Master's work's lines, as its record signs them
 import { itemIsIdentified } from './tradeModes.js';   // CRAFT4: a line the Reforge sees, known
 import { isEquipped } from './equip.js';   // CRAFT4: and never on a worn piece
@@ -145,18 +145,20 @@ function setJewel(item, r, hand) {
 }
 
 /**
- * MASTER-ART (Professions-Arc 57): A MASTER'S WORK laid on its piece - Legendary, its lines at the values its record signs
+ * MASTER-ART (Professions-Arc 57): A MASTER'S WORK laid on its piece - at its record's tier (Rare from
+ * MINT_V_MASTER_RARE, Legendary before), marked `master`, its lines at the values its record signs
  * (AUDIT HORIZONTAL B1: net/masterLaw.js masterLinesOfRecord, never rolled again), its name its lines' (a mark's name over
  * it), its worth its lines'. No record, no enchantment and no power: a drop's Legendary keeps those. Answers whether the
  * lines were a record's.
- * @param {any} item @param {unknown} lines
+ * @param {any} item @param {unknown} lines @param {'rare' | 'legendary'} tier
  */
-function applyMasterWork(item, lines) {
+function applyMasterWork(item, lines, tier) {
   const affixes = masterLinesOfRecord(lines);
   if (!affixes) return false;
-  item.rarity = 'legendary';
+  item.rarity = tier;
+  item.master = true;
   item.affixes = affixes;
-  item.name = rarityName(item, 'legendary', affixes);
+  item.name = rarityName(item, tier, affixes);
   item.value = itemBaseValue(item) + affixesWorth(affixes, item);
   item.isIdentified = true;
   return true;
@@ -222,7 +224,7 @@ export function mintPiece({ recipe, quality, seed, maker = null, marked = false,
     // AUDIT PROF-541 J4: a jewel's Rare roll one its points hold (a Cloth Amulet's 660 never carries Tongues' 1,590)
     const fits = r.kind === 'jewel' ? ((f) => (enchantmentRowCost(f) ?? Infinity) <= jewelPoints(r, templateByIndex(r.templateIndex)?.enchantmentPoints ?? 0, hand)) : null;
     // MASTER-ART: a Master's work's record names its lines - laid on whatever the switch, as the last pass is below
-    const master = q === MASTERWORK && Number.isSafeInteger(version) && version >= MINT_V_MASTER && Array.isArray(lines) && applyMasterWork(item, lines);
+    const master = q === MASTERWORK && Number.isSafeInteger(version) && version >= MINT_V_MASTER && Array.isArray(lines) && applyMasterWork(item, lines, masterTierOfVersion(version));
     if (!master && eff.rarity && rarityEligible(item)) {
       const rolls = seededRng(seed >>> 0);
       // AFFIX-LINES: a record of MINT_V_LINES on draws its lines over the lines and names the piece by them; one made
@@ -264,7 +266,7 @@ export function asMinted(item) {
   if (item.honed !== undefined) return false;   // AUDIT LOOT II C1: nor a line honed past its roll (LOOT17) - the market's mint would hand back the roll, the shards and the gold gone
   if ((item.foodStage ?? 0) > 0) return false;   // PROF9: a dish spoiled since it was cooked - the record mints it fresh
   const e = item.enchantments ?? [];
-  if (item.rarity !== 'rare') return e.length === 0;
+  if (item.rarity !== 'rare' || item.master === true) return e.length === 0;   // a Rare Master's work rolls no flavour
   const roll = RARE_FLAVOURS[item.group] ?? RARE_FLAVOURS.Jewellery;
   return e.length === 1 && roll.some((f) => f.type === e[0]?.type && f.param === e[0]?.param);
 }

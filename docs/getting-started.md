@@ -46,6 +46,27 @@ sh tools/fetch-vendor.sh
 fetched. A plain `node --test <file>` does not run it. See
 [formats/mods-and-vendor.md](formats/mods-and-vendor.md#fetched-folders-toolsfetch-vendorsh).
 
+## Node and shader files
+
+Some modules import their shaders as files (`import fs from './retro-pass.frag?raw'`). Vite reads them; plain Node
+cannot, and a test or tool that reaches such a module fails with `ERR_UNKNOWN_FILE_EXTENSION ".vert"`. Load the hook
+`tools/raw-import-hooks.ts` in every shell you run Node from, at the repository root:
+
+```sh
+export NODE_OPTIONS="--import=./tools/raw-import-hooks.ts"    # Git Bash, Linux, macOS
+```
+
+```powershell
+$env:NODE_OPTIONS = "--import=./tools/raw-import-hooks.ts"    # PowerShell
+```
+
+The commands in these docs (`node --test <file>`, `node tools/<tool>.mjs`) assume it. `npm test`, `npm run
+test:changed` and the CI shards set it for you (`runnerEnv` in `tools/testShards.mjs`).
+
+The path is relative, so Node finds the hook only when it starts at the repository root. A command that runs Node from
+another folder (`wrangler` in `server-account/`, `npm --prefix server-account`) fails with `ERR_MODULE_NOT_FOUND`:
+clear `NODE_OPTIONS` for it, or give the hook as an absolute `file://` URL, as `.github/workflows/probes.yml` does.
+
 ## Fetch the game data (ARENA2)
 
 Daggerfall's data is freeware but not redistributable. It never enters the repository or the build. Fetch it once:
@@ -155,7 +176,7 @@ The labs are development aids. The player reaches only `index.html`, `play/index
 | --- | --- |
 | `src/` | The browser client: entry `src/main.js`, scenes, systems, UI, renderer, format readers. See [architecture/source-layout.md](architecture/source-layout.md). |
 | `server/` | The multiplayer relay: a Cloudflare Worker with one Durable Object `Room` per room (`server/src/index.js`). |
-| `server-account/` | The account service: a Cloudflare Worker with a D1 database (`migrations/`) and the Discord bot. |
+| `server-account/` | The account service: a Cloudflare Worker with a D1 database (`migrations/`). |
 | `app/` | The Electron desktop shell (`app/main.cjs`, preloads, launcher). Builds with `electron-builder`. |
 | `play/` | The game's HTML entry. |
 | `public/` | Static files copied to the build as they are: icons, fonts, sound effects, skins and approved art packs. |

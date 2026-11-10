@@ -3,10 +3,10 @@
 // service, both in local workerd, at the real client's own rates, measured (SCALE3).
 //
 //   npm run load                                    50 bots, three minutes standing play
-//   node tools/loadHarness.mjs --bots 200 --minutes 5
-//   node tools/loadHarness.mjs --scenario storm     the same, and halfway the relay is restarted under the fleet (a deploy)
-//   node tools/loadHarness.mjs --json out.json      every figure, for a machine
-//   node tools/loadHarness.mjs --help               every knob
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --bots 200 --minutes 5
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --scenario storm     the same, and halfway the relay is restarted under the fleet (a deploy)
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --json out.json      every figure, for a machine
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --help               every knob
 //
 // WRANGLER_BIN names a wrangler to run (`npm ci` in server/ installs one - server/node_modules/.bin/wrangler, which is
 // taken by default when it is there); without one, `npx --yes wrangler@4` (minutes a call on a cold cache). It runs on
@@ -1066,7 +1066,7 @@ if (isMainThread && isMain(import.meta.url)) {
   let o;
   try { o = parseArgs(process.argv.slice(2)); } catch (e) { console.error(String(e?.message ?? e)); process.exit(2); }
   if (o.help) {
-    console.log('node tools/loadHarness.mjs [--knob value]...\n');
+    console.log('node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs [--knob value]...\n');
     for (const [k, [v, what]] of Object.entries(KNOBS)) console.log(`  --${pad(k, 12)} ${pad(JSON.stringify(v), 10)} ${what}`);
     process.exit(0);
   }

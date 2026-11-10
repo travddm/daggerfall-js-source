@@ -1,7 +1,7 @@
 # The client's net layer
 
-This page covers the game client's side of online play: the relay session, remote players, the account client, and
-cloud saves. The frames themselves are in [wire-protocol.md](wire-protocol.md).
+This page covers the game client's side of online play: the server profile, the relay session, remote players, the
+account client, and cloud saves. The frames themselves are in [wire-protocol.md](wire-protocol.md).
 
 ## Files
 
@@ -16,6 +16,32 @@ cloud saves. The frames themselves are in [wire-protocol.md](wire-protocol.md).
 | `src/systems/cloudSaves.js` | Cloud save slots |
 | `src/net/updateNotice.js` | "New version" notice from the site build |
 | `src/scenes/world.js` | Creates the sessions (`onlineStart`) and wires them into the game |
+| `src/systems/online/profileDoor.ts` | `openProfileDoor`: fetches, checks and installs the relay's profile before an online world boots |
+| `src/systems/online/serverProfile.ts` | The installed profile: `installProfile`, `rule`, `activePins`, `profileMatches` |
+| `src/systems/online/onlineLane.js` | Applies the profile's pins to preferences, DFU settings and mod settings on an online page |
+| `src/net/profile/` | The official profile, the key registry and the profile hash, shared with the relay and the account service |
+
+## The server profile
+
+The server profile is the source of online rules (decisions 58 and 65): an online page plays by the profile of the
+relay it joins, not by rules built into the client.
+
+- **Install.** Before `world.js` boots on an online page, `openProfileDoor` fetches the relay's `/profile`, checks the
+  relay version, the profile and its hash, and calls `installProfile` (see
+  [boot-and-frame.md](../architecture/boot-and-frame.md), The profile door). The profile is frozen for the life of
+  the page. A page whose relay changes rules must reload.
+- **Rules.** `rule(name)` gives a key's value on this page: the installed profile's value online, or the key's offline
+  value in single player. A key is a row of the registry `PROFILE_KEYS` (`src/net/profile/profileKeys.ts`), which
+  holds DFU's value and the online default for each key. `rule` throws on a name the registry does not hold.
+- **Pins.** The profile's `pins` hold the switches the room forces: preferences (`prefs`), mod keys (`modKeys`) and
+  whole mods (`wholeMods`). `onlineLane.js` reads them through `activePins` and refreshes its tables
+  (`ONLINE_FORCED_PREFS`, `ONLINE_ROOM_MOD_KEYS`, `ONLINE_WHOLE_MODS`) on every install (`onProfileInstalled`).
+- **The hash.** `installedProfileHash()` is the `ph` this page sends in every hello. `profileMatches` checks the `ph`
+  in each welcome.
+
+Online rules that have not moved into the profile yet are still `isOnlinePage()` branches across `src/` and constants
+in `src/net/*Law.js`. Decision 58 moves each of them to a profile key with DFU's value selectable. Online with nothing
+installed (a test) plays the official profile.
 
 ## OnlineSession
 
@@ -23,10 +49,12 @@ cloud saves. The frames themselves are in [wire-protocol.md](wire-protocol.md).
 new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintToken, wave, wire2, ... })
 ```
 
-- **URL.** `relayUrl` (`wire.js`) accepts `wss://` to any host, and `ws://` only for `localhost` or `127.0.0.1`. The
+- **URL.** `relayUrl` (`wire.js`) accepts `wss://` to any host, and `ws://` only for `localhost` or `127.0.0.1`.
   There is no built-in relay (`DEFAULT_SERVER` in `online.js` is empty). `onlineStart` takes `?server=<url>`, then the
   `onlineServer` preference; with neither, the profile door stops an online boot and tells the player to enter an
   address.
+  The profile door picks the relay by the same order (`relayServerOf`), so the page installs the profile of the
+  relay it joins.
 - **Sessions per page.** One presence session (the player's body in the world) and separate chat channel sessions
   (`presence: false`, `wire2: true`, sharing `pageWave`). Instance, staff and caravan links create their
   own sessions.
@@ -35,21 +63,21 @@ new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintTo
   In the open country `setHalo(rooms)` keeps sockets to neighbouring cells; crossing into a held halo cell promotes
   that socket without a reconnect.
 - **Hello.** On socket open the session awaits `mintToken()` (raced against `TOKEN_WAIT_MS`, 8 s) and sends
-  `{ t: 'hello', id, secret, name, look, pose, tok, ... }`. `mintToken` is `mintIdentity` in `accountClient.js`
+  `{ t: 'hello', id, secret, name, look, pose, tok, ph, ... }`. `mintToken` is `mintIdentity` in `accountClient.js`
   (POST `/v1/auth/token`). Sockets that open together share one mint in flight, and a token is handed to other rooms
   asked within `TOKEN_REUSE_MS` (60 s) under the same session and character, so a reconnect wave does not flood the
   service. The relay refuses a hello without a token. The name shown to others comes from the token, not from the client.
-- **Welcome.** `_receive` handles `welcome`: it first checks `v` with `relayMatches`. A relay of another version, or
-  one that names none, is refused (`refuseVersion`, see Reconnect); otherwise the socket is welcomed and `onWelcomed`
-  is called.
+- **Welcome.** `_receive` handles `welcome`: it first checks `v` with `relayMatches` and `ph` with `profileMatches`. A
+  relay of another version or on other rules is refused (`refuseVersion`, see Reconnect); otherwise the socket is
+  welcomed and `onWelcomed` is called.
 - **Heartbeat.** The session resends its pose every `HEARTBEAT_MS` (20 s) even when still, and pings an idle socket
   every `PING_MS`. A peer silent for `PEER_TIMEOUT_MS` (4 heartbeats) is hidden, not removed. Only the room's leave
   removes a peer.
 - **Reconnect.** `_scheduleRetry` uses jittered exponential backoff between `BACKOFF_MIN_MS` (1 s) and
   `BACKOFF_MAX_MS` (8 s). `CLOSE_BUSY` starts at half the maximum. `CLOSE_REPARTITION` retries almost at once.
   `CLOSE_POLICY` with a retryable token reason waits for a fresh token. `bar()` latches every room shut after a ban.
-  `refuseVersion()` latches every room shut when a welcome names another `RELAY_VERSION`: no retry, rejoin or join
-  until the page is reloaded, and `statusLine` asks the player to reload.
+  `refuseVersion()` latches every room shut when a welcome names another `RELAY_VERSION` or another profile hash: no
+  retry, rejoin or join until the page is reloaded, and `statusLine` asks the player to reload.
 - **Deploy waves.** `reconnectWave` detects two or more drops within `WAVE_WINDOW_MS` (2 s) while the browser is
   online, and holds each socket's first retry to a shared random offset of up to `WAVE_SPREAD_MAX_MS` (40 s), scaled
   by the number of players online. This stops a relay deploy from causing a reconnect storm.
@@ -86,6 +114,7 @@ call(io, path, body)   // io = { fetch, base, secret }
   `rememberAccountService`), else nothing. Only `https` is accepted, so a local account service needs the override
   set to an https tunnel or a code change. The main menu's account card asks the saved relay for its service
   before it offers a sign-in (`accountServiceWait`, `src/ui/enhanced/account-service-wait.ts`).
+  The self-host kit puts Caddy in front of both services for TLS (`selfhost/Caddyfile`).
 - **Session.** `keepSession`, `storedSession`, `forgetSession` keep `{ id, name, kind, sessionId, secret, glyphs, ... }`
   in the tab's storage (`tabStorage`, `src/systems/appStorage.js`). With no session, calls return
   `{ ok: false, error: 'no-session' }`.
