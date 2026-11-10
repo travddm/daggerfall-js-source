@@ -36,7 +36,7 @@ export const conductRules = () => [
   t('net.conduct.banter', 'Trash talk about the game is fine. Attacking people is not.'),
 ];
 /** What follows a broken rule, and who reads a report. */
-export const conductConsequence = () => t('net.conduct.consequence', 'Breaking these rules leads to a mute, then longer mutes, then a ban. Moderators read every report, and an automated reviewer helps them sort what comes in. /block hides a player from you; /report sends their lines to the moderators.');
+export const conductConsequence = () => t('net.conduct.consequence', 'Breaking these rules leads to a mute, then longer mutes, then a ban. Moderators read every report. /block hides a player from you; /report sends their lines to the moderators.');
 /** The button that agrees. */
 export const conductAgreeLabel = () => t('net.conduct.agree', 'I agree');
 /** The button that puts it off - the line stays unsent. */

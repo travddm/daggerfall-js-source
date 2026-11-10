@@ -45,6 +45,15 @@ a value that is already there, so running it again changes nothing. workerd read
 | `DISCORD_BOT_TOKEN`, `ANTHROPIC_API_KEY`, `PATREON_*`, `STAFF_ANALYTICS_*`, `GATE_DISCORD_WEBHOOK` | as on Cloudflare       | That feature is off                                       |
 | `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`                | r2, with `--r2 s3`     | The bucket refuses every request                          |
 
+The chat reviewer sends player chat to a third party. With `ANTHROPIC_API_KEY` set and `MOD_AI` turned from `off` to
+`shadow` or `on` in `server-account/wrangler.toml`, the account service sends reported lines, and the public chat lines
+that the relay posts to `MOD_FEED_URL`, to Anthropic's Messages API (`api.anthropic.com`). Speakers go as `P1`, `P2`,
+but the text is whatever the players typed. The kit ships `MOD_AI = "off"`, so the key alone sends nothing.
+
+The feed and law URLs in both `wrangler.toml` files name the reserved hosts `accounts.invalid` and `relay.invalid`. The
+kit routes them through the service bindings, which use only the path. A deploy without those bindings must set its
+own hosts there.
+
 The relay's `IDENTITY_PUBLIC_KEY` and the account service's `OWNER_KEYS` come from the environment, not from the
 `wrangler.toml` files: those hold the Cloudflare deploy's values.
 
