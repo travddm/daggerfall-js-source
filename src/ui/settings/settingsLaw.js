@@ -125,7 +125,7 @@ export const COLOUR_KEYS = Object.freeze([
 const isBoolDefault = (v) => v === 'True' || v === 'False';
 const isHex8 = (v) => /^[0-9A-F]{8}$/i.test(String(v ?? ''));
 
-/** Total and decidable over all 171 keys - no implementer judgement.
+/** Total and decidable over all 173 keys - no implementer judgement.
  *  Returns one of: switch | enum | number | colour | text | blocked. */
 export function widgetFor(key) {
   if (tierOf(key) === 'unavailable') return 'blocked';

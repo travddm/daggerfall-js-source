@@ -40,6 +40,7 @@ export const SETTINGS_DEFAULTS = Object.freeze({
     "InteriorShadowDistance": "30.0",
     "ExteriorShadowDistance": "90.0",
     "EnableTextureArrays": "True",
+    "EnableObjectCulling": "True",
     "RandomDungeonTextures": "0",
   },
   "Effects": {
@@ -184,6 +185,7 @@ export const SETTINGS_DEFAULTS = Object.freeze({
     "SmallerDungeons": "False",
     "CustomBooksImport": "True",
     "AssetCacheThreshold": "25",
+    "DungeonsPoolSizeTarget": "3",
   },
   "Enhancements": {
     "LypyL_GameConsole": "True",
