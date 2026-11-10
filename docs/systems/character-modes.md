@@ -11,8 +11,8 @@ each mode is to enforce, is in `dfo-plans/future-work/character-modes/character-
 
 Online play does not enforce Hardcore or Ironman yet. Nothing reads the `permadeath` or `ironman` predicates: a
 Hardcore death online is not final, and an Ironman character can trade and join parties. The official profile still
-offers both modes online. Decision 116 (1) hides them online until their enforcement lands; open draft PR #142 does
-that. Offline, a mode is stored on the character and changes nothing.
+offers both modes online. Decision 116 (1) hides them online until their enforcement lands. Offline, a mode is stored on
+the character and changes nothing.
 
 ## What the code does
 
