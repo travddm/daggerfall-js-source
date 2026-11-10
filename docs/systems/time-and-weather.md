@@ -58,9 +58,9 @@ Offline all three are the same counter.
 | Key | Default | Range | Read by |
 | --- | --- | --- | --- |
 | `time.worldScale` | 12 (DFU's TimeScale) | whole numbers 1 to 100 | the relay, the account Worker, every client |
-| `time.skyScale` | 24 | whole numbers 1 to 100 | the account Worker and every client, only while `time.skyClock` is true |
+| `time.skyScale` | 24 | whole numbers 1 to 100 | the relay (the Starfall's nights), the account Worker and every client, only while `time.skyClock` is true |
 
-- The relay sets the world scale from the official profile when it starts (`server/src/relayFacts.ts`); the account Worker
+- The relay sets the scales from the official profile when it starts (`server/src/relayFacts.ts`); the account Worker
   does the same when `src/net/skyLaw.js` loads; a client sets it when it installs the relay's profile
   (`src/systems/online/serverProfile.ts`). Single player always plays at 12.
 - A profile names a scale in its `rules`; one that names none plays the defaults, so the profile's hash does not move.
@@ -68,12 +68,21 @@ Offline all three are the same counter.
   `time.worldScale` on a server with players moves the world's date at once, and with it every deadline kept in world
   minutes. Set the scale before play.
 - The sky's midnights fall on the hour UTC only at `time.skyScale` 24 (`tools/skyCutover.mjs` lists the aligned instants).
-- Figures written for 12 do not follow the key yet: the Hunters' Mark game days in a UTC day (`GAME_DAYS_PER_UTC_DAY`),
-  the sea season's day and rise (`SEA_WORLD_DAY_S`, `SEA_LEGEND_RISE_S`), the court's round (`COURT_ROUND_MS`), the
-  camp encounter window (`CAMP_WINDOW_MINUTES`) and the Starfall's hourly nights.
+- Five figures were written for 12 and now follow `time.worldScale`. At 12 each is the figure it was.
 
-With the sky clock off (the default), the Starfall still falls on its own hourly nights (`src/net/starfall/starfallLaw.js`,
-the relay's wall-clock law), which then do not match the sky's nights.
+| System | Figure | At 12 | At scale S |
+| --- | --- | --- | --- |
+| Hunters' Mark (`src/net/huntLaw.js`) | game days in a UTC day, and the late bound for a clear (`gameDaysPerUtcDay`, `huntClearLateDays`) | 12 | S |
+| Sea season (`src/net/sea/seaSeasonLaw.js`) | a world day and the legends' rise, in real seconds (`seaWorldDayS`, `seaLegendRiseS`) | 7,200 and 216,000 | 86,400 / S and 2,592,000 / S |
+| Gate court (`src/scenes/gate/gateCourt.js`) | a magic round, the real time of one game minute (`courtRoundMs`) | 5,000 ms | 60,000 / S ms |
+| Camp encounters (`src/systems/campEncounters.js`) | the window, in game minutes: 15 real minutes online (`campWindowMinutes`; offline it stays 180) | 180 | 15 x S |
+| Starfall (`src/net/starfall/starfallLaw.js`) | a night is a sky day (see below) | 2 real hours | 86,400,000 / S ms |
+
+The Starfall's nights are the sky's nights. A night is one sky day (`src/net/sky-days.ts`): the world's day by default,
+so a night every 2 real hours at 12, and the sky clock's own day when `time.skyClock` is true (an hour at its default
+`time.skyScale` 24). Its three stars fall at the sky's 18:00, 21:00 and midnight, and each stands for a quarter of a sky
+day. The omen and the streak stay real seconds. `sky-days.ts` is the same sky as `skyLaw.js` (`test/net/sky_days.test.js`
+holds them equal); it exists because the relay carries it and never carries `skyLaw.js`.
 
 - `setWorldMinutes` and `advanceWorldMinutes` do nothing online and return the shared time. A caller that expects the
   clock to move sees no error.

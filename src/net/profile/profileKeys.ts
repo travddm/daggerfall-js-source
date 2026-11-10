@@ -157,14 +157,14 @@ export const PROFILE_KEYS = Object.freeze({
     dfu: false,
     online: false,
     offline: false,
-    checkedBy: Object.freeze(['client', 'account'] as const),
+    checkedBy: Object.freeze(['client', 'relay', 'account'] as const),
     words: 'profile.time.skyClock',
   }),
   // How fast the world clock runs online, in DFU's TimeScale: game minutes per real minute (12 is a game minute every
   // five real seconds and a day every two real hours). DFU's setting is the same number. The online world's date is a
   // function of the relay's wall time from a fixed start (net/wire.js ONLINE_EPOCH_MS), so changing the value on a server
   // with players moves the world's date at once; set it before play. The relay, the account Worker and every client read
-  // it. Derived figures that were written for 12 (the Hunters' Mark days, the sea season, the court's round) do not follow.
+  // it. The Hunters' Mark days, the sea season, the court's round, the camp window and the Starfall's nights follow it.
   'time.worldScale': Object.freeze({
     census: Object.freeze(['ON31'] as const),
     feature: 'TIME1',
@@ -189,7 +189,7 @@ export const PROFILE_KEYS = Object.freeze({
     dfu: 12,
     online: 24,
     offline: 12,
-    checkedBy: Object.freeze(['client', 'account'] as const),
+    checkedBy: Object.freeze(['client', 'relay', 'account'] as const),
     words: 'profile.time.skyScale',
   }),
 } satisfies Record<string, ProfileKey>);
