@@ -141,7 +141,7 @@ export function weatherSunlightScale(weather, isWinter) {
 /** AT1: WeatherManager's FOUR PUBLIC FLAGS for a weather word.
  *
  *  IsRaining, IsStorming, IsSnowing and IsOvercast are what a mod asks
- *  the sky (Ambient Text's WeatherKey is the first here to), and they
+ *  the sky, and they
  *  are not a fifth enum - they are whatever SetWeather's switch
  *  (WeatherManager.cs:442-473) has left set, over ClearAllWeather's
  *  floor (:141-156). So the table is DERIVED from the calls each case

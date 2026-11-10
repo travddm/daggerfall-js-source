@@ -349,8 +349,7 @@ test('AUDIT FONT F1: two PopupText models, two sets of toasts in ONE stack - a d
     // The two that are alive at once on ?world inside a dungeon:
     // scenes/dungeonContext.js's (the skill lines, the loot tallies,
     // the door texts, every ctx.hudSay) and scenes/townTalk.js's (the
-    // street, and the Ambient Text mod's lines - which are said in a
-    // dungeon too, through townTalk.say).
+    // street).
     const dungeon = new HudText('dungeon');
     const town = new HudText('town');
     assert.notEqual(dungeon.key, town.key,

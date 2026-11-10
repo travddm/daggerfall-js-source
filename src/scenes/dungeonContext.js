@@ -114,7 +114,7 @@ import { setMidScreenText, midScreenText } from '../ui/midScreenText.js';   // A
 // their bytes; this one module is ~16 KB of source.
 import { EnhancedEnemyAI, makeNavWorld } from '../ai/enhancedMotor.js';
 import { navGoalOn } from './interiorNav.js';   // INDOOR-WATCH AUDIT: the motor's off-mesh goal over the dungeon's own bake
-import { foeFrameDt } from '../characters/enemy/enemyMotor.js';   // FOE-CATCHUP: the one cap every pool hands its foes
+import { foeFrameDt, enhancedCombatAIEnabled, writePlayerYaw, writePlayerBowOrSheathed, forgetPlayerStance } from '../characters/enemy/enemyMotor.js';   // FOE-CATCHUP: the one cap every pool hands its foes
 import { ownerFoes } from './ownerCatchUp.js';   // HOST-CLOCK: the foes' step through the page's one catch-up (OWNER-CLOCK's parity)
 import { spaceFoes, spacingSkips, clearDoorways, actionDoorSpots, freeLodgedFeet, clearPast } from '../characters/foeSpacing.js';   // FOE-SPACING: the pack keeps apart; AUDIT TACT C7: and the doorways clear; FIELD BUGS 2026-10-04d CRATE-FREE: and no foe stands in a crate
 import { isStaleChunk, STALE_CHUNK_IN_PLAY_TEXT, STALE_CHUNK_IN_PLAY_SECONDS } from '../systems/staleChunk.js';   // DISC19-D: a chunk gone mid-session is said, not swallowed
@@ -1533,7 +1533,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
         nav: () => enhancedNav.chf, navWorld: enhancedNav.world, navGoal: (f) => navGoalOn(enhancedNav.chf, f, { collider }), navSeed: (yawDeg * 1000) | 0,   // INDOOR-WATCH AUDIT: a player past the mesh's snap is walked in to, as in a building
         // AUDIT 39: a THUNK, not a snapshot - TakeAction re-reads
         // Stats.LiveSpeed every FixedUpdate (EnemyMotor.cs:432).
-        liveSpeed: () => liveStat(entity, 'speed'),
+        liveSpeed: () => liveStat(entity, 'speed'), enhancedCombatAI: enhancedCombatAIEnabled,
         // AUDIT 39: RDBLayout.AddEnemy :1519-1521 -> EnemyMotor.cs:122.
         // The marker's Passive action byte (99) was minted by
         // collectDungeonEnemies and dropped here, so a castle guard
@@ -1619,7 +1619,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       // block water surface (beached = frozen, verbatim).
       const ai = new (getPref('enhancedAI') ? D.EnhancedEnemyAI : D.EnemyAI)(collider, pos, yawDeg * Math.PI / 180, {   // ENHANCED AI 4: the switch chooses the motor; the bake is read per step
         nav: () => enhancedNav.chf, navWorld: enhancedNav.world, navGoal: (f) => navGoalOn(enhancedNav.chf, f, { collider }), navSeed: (yawDeg * 1000) | 0,   // INDOOR-WATCH AUDIT: a player past the mesh's snap is walked in to, as in a building
-        liveSpeed: () => liveStat(entity, 'speed'),   // AUDIT 39: EnemyMotor.cs:432 re-reads it per FixedUpdate
+        liveSpeed: () => liveStat(entity, 'speed'), enhancedCombatAI: enhancedCombatAIEnabled,   // AUDIT 39: EnemyMotor.cs:432 re-reads it per FixedUpdate
         isHostile: e.reaction !== 'passive',          // AUDIT 39: RDBLayout.AddEnemy :1519-1521 -> EnemyMotor.cs:122
         seesThroughInvisibility: basics.seesThroughInvisibility ?? false,
         behaviour, mobileId: e.mobileType, waterSurfaceY: waterSurfaceYAt,
@@ -5749,9 +5749,9 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       c.feet[0] = q.feet[0]; c.feet[1] = q.feet[1]; c.feet[2] = q.feet[2];
       c.height = Number.isFinite(q.height) && q.height > 0 ? q.height : CAPSULE_HEIGHT;
       c.health = 1;
-      c.cv = q.cv | 0;
+      c.cv = q.cv | 0; writePlayerYaw(q.id, q.yaw); writePlayerBowOrSheathed(q.id, q.wd === 0);   // the stance a foe's retreat roll reads: the pose's facing, and wd 0 is sheathed
     }
-    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); }
+    for (const [id, c] of _peerCands) if (!seen.has(id)) { c.health = 0; _peerCands.delete(id); forgetPlayerStance(id); }
     return [..._peerCands.values()];
   }
   const peerCandidate = (id) => { peerCandidates(); return (typeof id === 'string' && _peerCands.get(id)) || null; };
@@ -8586,7 +8586,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
      *  its body stands (characters/foeBodies.js drawBodiesUnderWindow) - the loot window no longer turns the body it was
      *  opened on into its classic corpse. drawFoes marks them anew. */
     drawWindowBodies: (canvas, { proj, view, eye }) => drawBodiesUnderWindow(_npcLane, foes, _npcStood, { idOf: foeId, corpseFlat: (f) => f.corpseBatch, renderer, canvas, proj, view, eye }),
-    hudSay: (t, delayInSeconds = undefined) => hudText.add(t, delayInSeconds),   // R1: the host's one-line channel (the F1-F4 mode line)   // AT2: AddHUDText's delay arg rides through, as townTalk.say's does - Ambient Text sets it per line (textDisplayTime)
+    hudSay: (t, delayInSeconds = undefined) => hudText.add(t, delayInSeconds),   // the host's one-line channel (the F1-F4 mode line)
     hudBox: (rows) => pushDungeonWindow(new ActionTextBox(rows)),   // AUDIT 63 F33: DaggerfallUI.MessageBox, for the enemy arm's success boxes
     randomText: (id) => textRsc?.randomTextById(id, Math.random) ?? '',   // AUDIT 63 F33: TextProvider.GetRandomText (:250-269) - the 8999 pool
     makeAreaHostile,   // AUDIT 63 F33: GameManager.MakeEnemiesHostile over this host's pool
