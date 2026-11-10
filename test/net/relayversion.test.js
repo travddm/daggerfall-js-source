@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world325: 'c5b36d9274ac04b809a6b25116dea7e27968941686015cc284c5ccc9e511a0d3', // /profile names the relay's account service (relayFacts.ts accountServiceOfEnv)
   world324: 'ff37b9430b312d2948daf4db3f50c972fcbd75a5b86addb759d2522a830d9ed5', // the vendored ship mod leaves the server profile and the online lane
   world323: '0fe45d25f981857ecebaa8a0bbf89209d2a667f4fbe608c09c9eb1595f1cc11a', // the Starfall's nights are the sky's days (sky-days.ts), and the Hunters' Mark days and the sea season follow time.worldScale
   world322: '11ec596462562c4252a36188dcb1d4b68e3cf43e58333a85d063a11b93059c89', // the world clock's TimeScale is a server-profile key (`time.worldScale`): wire.js reads it through setOnlineTimeScale, relayFacts.ts sets it
@@ -63,7 +64,6 @@ const LAW = {
   world287: '5fa98938d25fe3be574c04ebe52e8fa09adbb01e84b316e02fb213d8ce0a64ad',     // SD LANES: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone)
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
-  world309: '68c6c0d99c6ab7d86cb1f9b83004f79a354a861f6f20082e75ed5854a0cec200', // /profile names the relay's account service (relayFacts.ts accountServiceOfEnv)
   world303: '4fc754a8d0c8b5e6924f4020314737053d761a020a6033dbc4f0f916d9783c8e', // TOWN-SEATS ROW: the Town seats switch is pinned on in the server profile (officialProfile.ts)
   world308: 'd9a2d9f23d1ecabbd62032a0731ed9224a8d3b0d9c00556e84ae739ab195c35d', // a player's live Stealth and half-speed state on the pose, and a foe record's stealth-check minute (characters/enemy/peer-senses.ts)
   world307: 'b6541ec9bfade28b6df33c2ea9113e9683c7079da938cac72596158fb51b223b', // (re-hashed in place, unmerged - bytes cd691f30... before the profile rule) A party leader sets the party to no mentoring - the hub's party.mentoring.off and .on acts, the party view's nm; the server profile's party.allowNoMentoring rule can refuse the act
