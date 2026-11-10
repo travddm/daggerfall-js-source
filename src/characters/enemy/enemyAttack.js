@@ -14,7 +14,8 @@
 //     targetRateOfApproach is assigned a non-zero value ONLY inside
 //     `if (DaggerfallUnity.Settings.EnhancedCombatAI)`
 //     (EnemySenses.cs:354-363), so on the classic path the term is
-//     identically 0 and the reach is a flat 2.25 (AUDIT 18)
+//     identically 0 and the reach is a flat 2.25 (AUDIT 18); with the
+//     setting on, enhanced-combat-ai.ts keeps the rate
 //   - ResetMeleeTimer: Random.Range(1500, 3001) - an INT roll, one of
 //     1501 discrete values - then - 50*(playerLevel-10)
 //     + 450*(reflexes-2), floored at 0, / 980 (classicFrameUpdate)
@@ -70,6 +71,14 @@ export function attackRollPasses(liveSpeed, randFn = rand) {
 }
 
 /** Per-foe attack driver over the shared machine. */
+/** EnemyAttack.MeleeAnimation's reach (:157-164). Classic AI uses ClassicMeleeDistanceVsAI 1.5 against a foe target
+ *  and MeleeDistance 2.25 against the player; DFU's Enhanced Combat AI uses 2.25 against every target and adds the
+ *  target's rate of approach (0 on the classic path), so a foe swings at a target walking into its reach. */
+function meleeReach(ai) {
+  const vsAI = ai.enhancedCombatAI !== true && ai._armedTargeting && ai.target && !ai.target.isPlayer;
+  return (vsAI ? CLASSIC_MELEE_DISTANCE_VS_AI : MELEE_DISTANCE) + (ai.targetRateOfApproach ?? 0);
+}
+
 export class EnemyAttack {
   /** rangedAttack: set by the scene when the foe HAS A BOW ATTACK
    *  (hasBowAttack - mobile flags, not the equipped weapon). */
@@ -243,8 +252,7 @@ export class EnemyAttack {
       // "Classic uses separate melee distance for targeting player
       // and for targeting other AI" - 1.5 rather than 2.25. Unarmed
       // (and against the player) the reach is unchanged.
-      const vsAI = ai._armedTargeting && ai.target && !ai.target.isPlayer;
-      if (dist > (vsAI ? CLASSIC_MELEE_DISTANCE_VS_AI : MELEE_DISTANCE)) continue;
+      if (dist > meleeReach(ai)) continue;
       if (ai._tacStrike === false) continue;   // TACT2: no melee token - it holds the ring and waits its turn (unset with the switch off)
       // MeleeAnimation (:151-176) has now returned TRUE, so FixedUpdate
       // :85 calls ResetMeleeTimer UNCONDITIONALLY - even when the state
