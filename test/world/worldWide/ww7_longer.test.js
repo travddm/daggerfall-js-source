@@ -20,8 +20,8 @@ import { capitalPlaceId, capitalSpan, CAPITALS } from '../../../src/world/tamrie
 import { portIdOf } from '../../../src/world/worldWide/worldPorts.js';
 import { CROSS_LANE_PATH_PX, createWorldLanes, worldLaneWater, BEYOND_LANE_MAX_PX } from '../../../src/scenes/naval/worldLanes.js';
 import { validSerpentOut, SOCIAL_ROOM, POSE_BOUND } from '../../../src/net/wire.js';
-import { serpentAtWord, agreedSerpentSite } from '../../../src/net/serpent/serpentHerald.js';
-import { foldGateSite } from '../../../src/net/gate/gateHerald.js';
+import { serpentAtWord, agreedSerpentSite } from '../../../src/net/serpent/serpent-site.ts';
+import { foldGateSite } from '../../../src/net/gate/gate-site.ts';
 import { serpentTimes, serpentRing, SERPENT_EVERY_DAYS } from '../../../src/net/serpent/serpentLaw.js';
 import { createSerpentLink, SERPENT_STATE_EMPTY } from '../../../src/net/serpent/serpentLink.js';
 import { worldSerpentSite, siteOfWord, findSerpentSite, sitePixelOfNative } from '../../../src/systems/serpent/serpentSite.js';
@@ -294,7 +294,7 @@ test('WW7-11 A CAPITAL IS ONE TOWN: the Imperial City\'s 625 slices are places, 
 
 // ─── 4. THE SERPENT ON THE WORLD'S LANES (WW7-12) ──────────────────────────
 
-const DAY = 611;   // a serpent day (serpent2_herald.test.js's)
+const DAY = 611;   // a serpent day (serpent-site.test.js's)
 const T = serpentTimes(DAY);
 const SITE = { sx: 81_000, sz: -42_000, pl: 'Northpoint' };
 
@@ -321,10 +321,9 @@ test('WW7-12 THE HUB\'S WORD: `at` - the day, the site\'s native point to the wh
   assert.equal(serpentAtWord('junk', T.omenAt), null);
 });
 
-/** The hub with accounts and Date.now at the harness's clock (serpent2_herald.test.js's harness, Discord left out). */
+/** The hub with accounts and Date.now at the harness's clock (as in serpent-site.test.js). */
 async function withHub(fn) {
   const r = fakeRoom(SOCIAL_ROOM);
-  r.room._heraldBeat = async () => {}; r.room._heraldNextAt = () => null; r.room._serpentHeraldBeat = async () => {};
   const realNow = Date.now, warn = console.warn;
   let clock = T.omenAt - 10 * 60_000;
   Date.now = () => clock;

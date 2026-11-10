@@ -1,4 +1,4 @@
-// TITLE-N — THE DUNGEON MASTER AND THE PATREON TIERS.
+// THE DUNGEON MASTER AND THE NAMED TITLES.
 //
 //
 // Each grant is a handle list in the account service's config (the developers' law), each title carries its own
@@ -11,7 +11,7 @@ import { fakeRoom } from '../fakeRoom.mjs';
 import { TITLES, GLYPHS, claimsValid, mintToken, verifyToken, importPublicKeyB64 } from '../../src/net/identityToken.js';
 import { TITLE_TEXT, TITLE_RGBA, GLYPH_RGBA, GLYPH_MARK, GLYPH_PATH, GLYPH_STROKE, FONT_GLYPH_MIN, FONT_GLYPH_MAX, cssRgba, titleBadge, glyphBadges } from '../../src/ui/playerBadge.js';
 import { GLYPH_LABEL } from '../../src/ui/enhanced/enhancedAccount.js';
-import { titlesHeld, glyphsOf, equipRefusal, titleWorn, aurasHeld, auraWorn, canModerate, TIER_LISTS, TIER_GLYPH, FOUNDER_UNTIL } from '../../server-account/src/titles.js';
+import { titlesHeld, glyphsOf, equipRefusal, titleWorn, aurasHeld, auraWorn, canModerate, TIER_LISTS, TIER_GLYPH } from '../../server-account/src/titles.js';
 import { parseClient, dmGate, redGate, DM_HZ_MAX, RED_HZ_MAX, readBadge } from '../../src/net/wire.js';
 import { HOST_COMMANDS, parseChatLine } from '../../src/net/chatCommands.js';
 import { ChatLog } from '../../src/net/chat.js';
@@ -45,19 +45,6 @@ test('TITLE-N vocabulary: four titles and four glyphs join, each title with its 
 });
 
 // ── THE GRANTS ──────────────────────────────────────────────────────
-
-test('TITLE-R founder: no account registered after the cutoff can obtain Founder, and every account that holds it keeps it - held and worn (Mac: "Remove the founder title from being obtained. Current users keep their founder title") (mutants: the cutoff moved forward; the cutoff an open end)', () => {
-  // FOUNDER2: Mac granted it once more to every account then registered - the cutoff is the end of that
-  // day now (founder2.test.js), and the title is closed again past it
-  // FOUNDER5 (2026-10-07
-  assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000, 'the cutoff is the end of the day FOUNDER2 was asked, on the last clock to reach the next');
-  const later = Date.UTC(2026, 8, 26) / 1000;
-  assert.deepEqual(titlesHeld({ handle: 'New', registered_at: later }, {}), [], 'registered after it: no Founder');
-  assert.deepEqual(titlesHeld({ handle: 'New', registered_at: FOUNDER_UNTIL + 1 }, {}), [], 'a second past the cutoff: no Founder');
-  const old = { handle: 'Old', registered_at: FOUNDER_UNTIL - 86400, title: 'founder' };
-  assert.deepEqual(titlesHeld(old, {}), ['founder'], 'registered before: kept');
-  assert.equal(titleWorn(old, {}), 'founder', 'and still worn');
-});
 
 test('TITLE-N grants: the Dungeon Master is SquidKamer\'s alone and Disciple is Dutchess\'s, each from its handle list, case-folded; each held title brings its glyph; a guest and anyone else hold none, and cannot wear one (mutants: the lists crossed; a guest granted; the glyph without the title)', () => {
   const toml = rd('server-account/wrangler.toml');

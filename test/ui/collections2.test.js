@@ -25,8 +25,7 @@ import { QL_LINES } from '../../src/systems/questlines/qlLines.js';
 import { ARENA_CHAMPION_MIN_BOUTS, ARENA_CHAMPION_MIN_FOES } from '../../src/net/arena/arenaLaw.js';
 import { codexRows, codexSets, noteFind, _resetCodexForTests } from '../../src/systems/loot/lootCodex.js';
 import { GILDED_RECORDS, DRAGONFIRE_OATH, mintGilded } from '../../src/systems/gilded.js';
-import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, FOUNDER_UNTIL, wardrobeOf } from '../../server-account/src/titles.js';
-import { PATREON_TITLES } from '../../server-account/src/patreon.js';
+import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, wardrobeOf } from '../../server-account/src/titles.js';
 import { SD_TITLE_CHANCE, SD_AURA_CHANCE } from '../../server-account/src/sds.js';
 import { SERPENT_TITLE_CHANCE, SERPENT_AURA_CHANCE } from '../../server-account/src/serpents.js';
 import { EMBERS_EARNED_SQL } from '../../server-account/src/accounts.js';
@@ -85,13 +84,13 @@ function page({ flow = null, player = { items: [] }, now = DURING } = {}) {
   return box;
 }
 
-/** The row a registered founder from before the date minted, who bought the Broker's two pieces and the festival's Twin
+/** The row a registered account minted that once spoke with a lamp keeper, bought the Broker's two pieces and the festival's Twin
  *  Moons, broke a Remnant for both its grants, and hid the sprout - read through the service's own wardrobeOf. */
 function mintedWardrobe() {
   const nowS = Math.floor(DURING / 1000);
   const player = {
     handle: 'aelwyn', registered_at: 1_790_000_000, created_at: nowS - 3600, insignia: 'title:gatebreaker aura:dagonfire',
-    sd_honours: 3, fest_wares: 'icon:twinmoons', title: 'gatebreaker', aura: 'dagonfire', icon: 'twinmoons', glyphs_off: 'sprout',
+    sd_honours: 3, lamp_title: 1, fest_wares: 'icon:twinmoons', title: 'gatebreaker', aura: 'dagonfire', icon: 'twinmoons', glyphs_off: 'sprout',
   };
   return wardrobeOf(player, {}, nowS);
 }
@@ -106,8 +105,8 @@ const CATALOGUE = {
   'title:champion': 'seats open', 'title:chaptermaster': 'chapters dormant', 'title:chapterofficer': 'chapters dormant',
   'title:formermaster': 'chapters dormant', 'title:highmaster': 'chapters dormant', 'title:seasonmaster': 'chapters dormant', 'title:grandchampion': 'ranked open',
   'title:arenachampion': 'ranked ranked', 'title:ilovelamp': 'world open',
-  'title:founder': 'account closed', 'title:disciple': 'patrons patron', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons patron',
-  'title:herald': 'patrons patron', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff',
+  'title:founder': 'account closed', 'title:disciple': 'patrons dormant', 'title:apostle': 'patrons dormant', 'title:hierophant': 'patrons dormant',
+  'title:herald': 'patrons dormant', 'title:developer': 'staff staff', 'title:dungeonmaster': 'staff staff',
   /* HUNTERS-MARK, MARKS-OF-MASTERY ( */
   'title:bloodhound': 'hunt open', 'title:beastbane': 'hunt open', 'title:grandhuntsman': 'hunt open', 'title:huntlegend': 'hunt open',
   'title:mastermining': 'mastery open', 'title:masterlogging': 'mastery open', 'title:masterherbalism': 'mastery open', 'title:masterhunting': 'mastery open',
@@ -121,8 +120,8 @@ const CATALOGUE = {
   'glyph:crownSK': 'seats open character', 'glyph:crownMW': 'seats open character', 'glyph:crownSU': 'seats open character', 'glyph:crownVW': 'seats open character',
   'glyph:crownEW': 'seats open character', 'glyph:crownBM': 'seats open character', 'glyph:crownCY': 'seats open character',
   'glyph:laurel': 'ranked ranked',
-  'glyph:sprout': 'account auto', 'glyph:disciple': 'patrons patron', 'glyph:apostle': 'patrons dormant', 'glyph:hierophant': 'patrons patron',
-  'glyph:herald': 'patrons patron', 'glyph:dev': 'staff staff', 'glyph:mod': 'staff staff', 'glyph:dm': 'staff staff',
+  'glyph:sprout': 'account auto', 'glyph:disciple': 'patrons dormant', 'glyph:apostle': 'patrons dormant', 'glyph:hierophant': 'patrons dormant',
+  'glyph:herald': 'patrons dormant', 'glyph:dev': 'staff staff', 'glyph:mod': 'staff staff', 'glyph:dm': 'staff staff',
 };
 
 // ── THE CATALOGUE ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -156,19 +155,17 @@ test('COLLECTIONS-II WHAT COMES TOGETHER, ALL OF IT EACH WAY (AUDIT COLLECTIONS-
   assert.deepEqual(got, want);
 });
 
-test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (AUDIT COLLECTIONS-II lanes 1 and 5): the lists\' titles; each roll\'s own odds, each patron tier\'s own name, each board\'s own floor, each questline\'s own name, giver and level or the line it follows; the founders\' instant and the routes still open; Season 0 crowning no one; the cakes others take; a dealing claim\'s roll; the embers\' three purses; the prices; the chapters\' switch and the festival\'s, the questlines\' and the seats\' (mutants: the Hourbreaker saying the aura\'s odds; every patron the Disciple; a questline\'s level, its predecessor, another line; a board\'s floor; the founder retired; a switch off)', () => {
+test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (AUDIT COLLECTIONS-II lanes 1 and 5): the lists\' titles; each roll\'s own odds, each named title granted by name alone, each board\'s own floor, each questline\'s own name, giver and level or the line it follows; the founders\' instant and the routes still open; Season 0 crowning no one; the cakes others take; a dealing claim\'s roll; the embers\' three purses; the prices; the chapters\' switch and the festival\'s, the questlines\' and the seats\' (mutants: the Hourbreaker saying the aura\'s odds; a named title offered to players; a questline\'s level, its predecessor, another line; a board\'s floor; the founder retired; a switch off)', () => {
   const entry = (kind, key) => W.wardrobeEntry(kind, key);
   const how = (kind, key) => entry(kind, key).how();
   // the lists
-  const mapped = (configOf('PATREON_TIERS') ?? '').split(',').map((p) => p.split(':')[1]).filter(Boolean);
-  assert.ok(mapped.length >= 3, 'the config read');
   for (const t of Object.keys(TIER_LISTS)) {
     const e = entry('title', t);
-    if (PATREON_TITLES.includes(t)) {
-      assert.deepEqual([e.src, e.avail], ['patrons', mapped.includes(t) ? 'patron' : 'dormant'], `${t}: a pledge's, ${mapped.includes(t) ? 'mapped' : 'no tier yet'}`);
-      if (mapped.includes(t)) assert.match(e.how(), new RegExp(`at the ${t[0].toUpperCase()}${t.slice(1)} tier`), `${t}: its own tier named`);
-    } else if (t === 'dungeonmaster') assert.deepEqual([e.src, e.avail], ['staff', 'staff']);
-    else assert.fail(`${t}: every listed title is a pledge's or the Dungeon Master's`);
+    if (t === 'dungeonmaster') assert.deepEqual([e.src, e.avail], ['staff', 'staff']);
+    else {
+      assert.deepEqual([e.src, e.avail], ['patrons', 'dormant'], `${t}: granted by name alone`);
+      assert.match(e.how(), /^Granted by name/, `${t}: says how it is granted`);
+    }
     assert.equal(entry('glyph', TIER_GLYPH[t]).avail, e.avail, `${t}'s glyph is had as it is`);
     if (TIER_AURA[t]) assert.equal(entry('aura', TIER_AURA[t]).avail, e.avail, `${t}'s aura is had as it is`);
   }
@@ -195,7 +192,6 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   }
   assert.equal(entry('title', 'starwarden').avail, 'seasonal', 'the Thirteenth of Frostfall is the festival\'s');
   // the founders: the instant, the routes still open
-  assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000, 'noon UTC, 25 September 2026');
   assert.equal(entry('title', 'founder').avail, 'closed');
   assert.match(how('title', 'founder'), /by noon UTC on 25 September 2026, or is granted it by name\. A guest from before then earns it by registering; a character from before then brought onto your account counts too\./);
   assert.ok(!W.AVAIL_NOW.includes('closed') && !W.AVAIL_NOW.includes('retired'));
@@ -219,8 +215,8 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
 
 test('COLLECTIONS-II HELD, WORN AND COUNTED off the wardrobe the service mints (titles.js wardrobeOf): the founder, the bought, the rolled and the festival\'s held; the one title, aura and icon worn; a glyph taken off held and not shown, one held and on shown; High Master with Chapter Master, never worn or counted; a seat\'s glyph the character\'s, never the account\'s - the service\'s wardrobe has none, so the page says nothing of its holding and counts it nowhere (AUDIT COLLECTIONS-II lanes 1, 2: the Seats\' glyphs read "not held" for their every holder); a service too old to name a kind holds none of it (mutants: worn read off held; a hidden glyph shown; the via counted; a character\'s glyph counted)', () => {
   const w = mintedWardrobe();
-  assert.deepEqual(w.titles, ['founder', 'gatebreaker', 'hourbreaker'], 'the producer\'s own shape');
-  for (const [k, key] of [['title', 'founder'], ['title', 'gatebreaker'], ['title', 'hourbreaker'], ['aura', 'dagonfire'], ['aura', 'turninghour'], ['icon', 'twinmoons'], ['glyph', 'sprout']]) assert.equal(W.wardrobeHeld(k, key, w), true, `${k}:${key} held`);
+  assert.deepEqual(w.titles, ['gatebreaker', 'hourbreaker', 'ilovelamp'], 'the producer\'s own shape');
+  for (const [k, key] of [['title', 'ilovelamp'], ['title', 'gatebreaker'], ['title', 'hourbreaker'], ['aura', 'dagonfire'], ['aura', 'turninghour'], ['icon', 'twinmoons'], ['glyph', 'sprout']]) assert.equal(W.wardrobeHeld(k, key, w), true, `${k}:${key} held`);
   assert.equal(W.wardrobeHeld('title', 'developer', w), false);
   assert.deepEqual(['title', 'aura', 'icon'].map((k) => W.wardrobeEntries(k).filter((e) => W.wardrobeWorn(k, e.key, w)).map((e) => e.key)), [['gatebreaker'], ['dagonfire'], ['twinmoons']], 'one worn a kind');
   assert.equal(W.wardrobeWorn('glyph', 'sprout', w), false, 'the sprout taken off');
@@ -252,13 +248,13 @@ test('COLLECTIONS-II THE SEASONS AND THE FILTERS: a festival\'s piece seasonal w
   const w = mintedWardrobe();
   const titles = W.wardrobeEntries('title');
   const now = titles.filter((e) => wardrobeFilterPasses('now', e, w, DURING)).map((e) => e.key);
-  for (const k of ['founder', 'developer', 'chaptermaster', 'hoursfirst', 'apostle']) assert.ok(!now.includes(k), `${k} is not to be had now`);
+  for (const k of ['founder', 'developer', 'chaptermaster', 'hoursfirst', 'apostle', 'disciple']) assert.ok(!now.includes(k), `${k} is not to be had now`);
   assert.ok(!W.wardrobeEntries('glyph').filter((e) => wardrobeFilterPasses('now', e, w, DURING)).some((e) => e.key === 'sprout'), 'the sprout comes by itself, never had now');
-  for (const k of ['gatebreaker', 'covenbane', 'hourbreaker', 'arenachampion', 'witchwarden', 'disciple', 'ilovelamp']) assert.ok(now.includes(k), `${k} is`);
+  for (const k of ['gatebreaker', 'covenbane', 'hourbreaker', 'arenachampion', 'witchwarden', 'ilovelamp']) assert.ok(now.includes(k), `${k} is`);
   assert.ok(!titles.filter((e) => wardrobeFilterPasses('now', e, w, AFTER)).some((e) => e.key === 'witchwarden'), 'out of season, not now');
   const held = titles.filter((e) => wardrobeFilterPasses('held', e, w)).map((e) => e.key);
   const missing = titles.filter((e) => wardrobeFilterPasses('missing', e, w)).map((e) => e.key);
-  assert.deepEqual([...held].sort(), ['founder', 'gatebreaker', 'hourbreaker']);
+  assert.deepEqual([...held].sort(), ['gatebreaker', 'hourbreaker', 'ilovelamp']);
   assert.equal(held.length + missing.length, titles.length);
   const glyphs = W.wardrobeEntries('glyph');
   assert.ok(!glyphs.filter((e) => wardrobeFilterPasses('missing', e, w)).some((e) => e.key === 'tower'), 'a character\'s own is not missing from the account');
@@ -376,10 +372,11 @@ test('COLLECTIONS-II A KIND\'S PART: every one of the kind a row under its sourc
   const flow = fakeFlow(w);
   let p = page({ flow });
   assert.equal(cls(p.root, 'coll-row').length, TITLES.length);
-  for (const h of ['The Sigil Broker - 1/1', 'Your Account - 1/1', 'The Abyss Dungeons - 1/2', 'The Guild Chapters - 0/4']) assert.ok(heads(p.root).includes(h), `${h} in ${heads(p.root).join(' | ')}`);
+  for (const h of ['The Sigil Broker - 1/1', 'Around the Bay - 1/1', 'Your Account - 0/1', 'The Abyss Dungeons - 1/2', 'The Guild Chapters - 0/4']) assert.ok(heads(p.root).includes(h), `${h} in ${heads(p.root).join(' | ')}`);
   const gate = rowOf(p.root, 'title', 'gatebreaker');
   assert.deepEqual(tags(gate), ['Worn', 'Obtainable']);
-  assert.deepEqual(tags(rowOf(p.root, 'title', 'founder')), ['Held', 'Closed']);
+  assert.deepEqual(tags(rowOf(p.root, 'title', 'founder')), ['Closed'], 'not held: no state chip');
+  assert.deepEqual(tags(rowOf(p.root, 'title', 'ilovelamp')), ['Held', 'Obtainable']);
   assert.deepEqual(tags(rowOf(p.root, 'title', 'hourbreaker')), ['Held', 'By chance']);
   assert.deepEqual(tags(rowOf(p.root, 'title', 'developer')), ['Staff only'], 'not held: no state chip');
   assert.ok(gate.classList.contains('held') && !rowOf(p.root, 'title', 'developer').classList.contains('held'));
@@ -387,7 +384,7 @@ test('COLLECTIONS-II A KIND\'S PART: every one of the kind a row under its sourc
   assert.equal(cls(p.root, 'coll-season').length, 1, 'the festival is on');
   // the Held filter: the dividers keep their own counts
   focus(p.root, 'coll-filter-held').onclick();
-  assert.ok(heads(p.root).includes('The Abyss Dungeons - 1/2') && heads(p.root).includes('Your Account - 1/1'), heads(p.root).join(' | '));
+  assert.ok(heads(p.root).includes('The Abyss Dungeons - 1/2') && heads(p.root).includes('Around the Bay - 1/1'), heads(p.root).join(' | '));
   focus(p.root, 'coll-filter-all').onclick();
   // opened whole, and worn off
   gate.onclick();
@@ -475,7 +472,7 @@ test('COLLECTIONS-II THE FILTERS, THE PICTURES, THE RESET: a filter pressed narr
   resetCollectionsPage();
   const p = page({ flow: fakeFlow(mintedWardrobe()) });
   focus(p.root, 'coll-filter-held').onclick();
-  assert.deepEqual(cls(p.root, 'coll-row').map((r) => r.dataset.wardrobe).sort(), ['title:founder', 'title:gatebreaker', 'title:hourbreaker']);
+  assert.deepEqual(cls(p.root, 'coll-row').map((r) => r.dataset.wardrobe).sort(), ['title:gatebreaker', 'title:hourbreaker', 'title:ilovelamp']);
   assert.ok(focus(p.root, 'coll-filter-held').classList.contains('on') && focus(p.root, 'coll-filter-held').attrs['aria-pressed'] === 'true');
   setCollectionsPart('icons'); p.draw();
   assert.equal(cls(p.root, 'coll-row').length, 1, 'the one icon held');

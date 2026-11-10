@@ -8,8 +8,7 @@
 // read here, mapped onto the screen through the <img>'s own box, and every opaque pixel under the mark's box (the Plus
 // frame's outset included) is counted. The mark may stand on none at any size, measured twice: with its caption as a
 // new player sees it and with a caption at its bound (a long name and a long character line, ellipsised at the door's
-// 140px). SUPPORT1's two support icons stood top-left until they were removed with the upstream project's Patreon and
-// Ko-fi links.
+// 140px). Two support icons stood top-left until they were removed.
 //
 // DOOR-FIT: the door never cuts itself off. At every size the wordmark's top is on the screen and the LAST menu row,
 // once the stage is scrolled to its end, stands whole and takes a press; and where the door fits, it is centred -

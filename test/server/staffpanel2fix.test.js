@@ -1,13 +1,12 @@
 // STAFF-PANEL2-FIX - THE CASES' AND SANCTIONS' GAPS, closed in the code every door shares (server-account/src/
 // safety.js modAct), driven through the real Worker on the node:sqlite database every account pin stands on
-// (test/accountDb.mjs), from each door: the staff panel (/v1/staff/*), the game's moderators (/v1/mod/*) and Discord.
+// (test/accountDb.mjs), from each door: the staff panel (/v1/staff/*) and the game's moderators (/v1/mod/*).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
 import { staffWords, STAFF_SESSION_HEADER, STAFF_IDLE_S } from '../../server-account/src/staff.js';
 import { CLAIM_S, HIGH_IDLE_S } from '../../server-account/src/staffCases.js';
 import { openCaseFor, modAct, CASE_ACT_S } from '../../server-account/src/safety.js';
-import { discordInteraction } from '../../server-account/src/discord.js';
 import { mintStamp } from '../../src/net/safety/chatStamp.js';
 import { SAFE_LAW_PATH } from '../../src/net/wire.js';
 import { verifyOrder, verifyToken } from '../../src/net/identityToken.js';
@@ -61,10 +60,6 @@ async function stand() {
   const troll = await s.registered('Troll');
   const sylvia = await s.registered('Sylvia');
   const raw = s.env.DB._raw;
-  // the operator's link (docs/operations/staff-roles.md): a Discord user id bound to the moderator's ACCOUNT
-  for (const [discordId, handle] of [['111111111111111111', 'Asynian'], ['222222222222222222', 'Tabbyvish'], ['333333333333333333', 'SirMcMobdon']]) {
-    raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, (SELECT id FROM players WHERE handle_lc = ?), ?)').run(discordId, handle.toLowerCase(), nowS());
-  }
   raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(nowS() - SPROUT_S - 60, sylvia.id);   // old enough to count
   const mob = (await staff('/v1/staff/login', { handle: 'SirMcMobdon', password: PASSWORD, ...(await mobKey.proof('login', 'SirMcMobdon')) })).body;
   const enrol = async (handle) => {
@@ -81,7 +76,7 @@ async function stand() {
   const caseOn = (who, { reports = [['harassment', 1, nowS()]], ...cols } = {}) => {
     const id = (++n).toString(16).padStart(16, 'c');
     const t = nowS();
-    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: reports.length, credible: reports.filter((r) => r[1]).length, ai_state: 'off', discord_state: 'off', ...cols };
+    const row = { id, target: who.id, source: 'report', status: 'open', opened_at: t - 100 * n, updated_at: t, reports: reports.length, credible: reports.filter((r) => r[1]).length, ai_state: 'off', ...cols };
     raw.prepare(`INSERT INTO mod_cases (${Object.keys(row).join(', ')}) VALUES (${Object.keys(row).map(() => '?').join(', ')})`).run(...Object.values(row));
     reports.forEach(([reason, counted, at], i) => {
       const rep = `p_rep${n}x${i}`.padEnd(10, '0');
@@ -93,17 +88,13 @@ async function stand() {
   let m = 0;
   const player = async () => s.registered(`Target${++m}`);
   const ctx = () => ({ db: s.env.DB, nowS: nowS(), subtle, rand: (b8) => globalThis.crypto.getRandomValues(b8) });
-  /** A Discord button press, or a /mod command, by the Discord user `user`. */
-  const press = (user, customId, id = undefined) => discordInteraction(ctx(), s.env, { type: 3, ...(id ? { id } : {}), member: { user: { id: user } }, data: { custom_id: customId } });
-  const command = (user, sub, opts) => discordInteraction(ctx(), s.env, { type: 2, member: { user: { id: user } },
-    data: { name: 'mod', options: [{ name: sub, options: Object.entries(opts).map(([name, value]) => ({ name, value })) }] } });
   const row = (id) => raw.prepare('SELECT * FROM players WHERE id = ?').get(id);
   const caseRow = (id) => raw.prepare('SELECT * FROM mod_cases WHERE id = ?').get(id);
   const strikes = (id) => raw.prepare("SELECT COUNT(*) AS n FROM mod_actions WHERE target = ? AND kind IN ('mute', 'ban')").get(id).n;
-  return { ...s, raw, staff, game: s.call, g, mob, asy, tab, troll, sylvia, caseOn, player, ctx, press, command, row, caseRow, strikes, pushed, restore: () => { globalThis.fetch = real; } };
+  return { ...s, raw, staff, game: s.call, g, mob, asy, tab, troll, sylvia, caseOn, player, ctx, row, caseRow, strikes, pushed, restore: () => { globalThis.fetch = real; } };
 }
 
-test('STAFF-PANEL2-FIX 1: ONE CASE, ONE SANCTION from every door - a Mute or Ban carries its case and the press\'s one-time id; the same press sent again is the first, answered; a second act on the case is refused from the panel, the game and Discord; an act in flight holds the case; a refused act gives it back (mutants: the take\'s act_click check; the repeat look; the give-back; the click asked of a panel press)', async () => {
+test('STAFF-PANEL2-FIX 1: ONE CASE, ONE SANCTION from every door - a Mute or Ban carries its case and the press\'s one-time id; the same press sent again is the first, answered; a second act on the case is refused; an act in flight holds the case; a refused act gives it back (mutants: the take\'s act_click check; the repeat look; the give-back; the click asked of a panel press)', async () => {
   const s = await stand();
   try {
     const line = { tab: 'world', sub: s.troll.id, name: 'Troll', at: Date.now(), text: 'quit the game, nobody likes you' };
@@ -141,29 +132,16 @@ test('STAFF-PANEL2-FIX 1: ONE CASE, ONE SANCTION from every door - a Mute or Ban
     assert.equal(s.strikes(s.troll.id), 1);
     assert.equal(s.pushed.length, 1);
     assert.ok(s.raw.prepare("SELECT 1 FROM staff_audit WHERE act = 'mute' AND outcome = 'ok' AND detail LIKE '%\"repeat\":true%'").get(), 'the repeat written down');
-    // a second sanction on the case: the panel (another member, an Admin), and a Discord button - none lands
+    // a second sanction on the case: the panel (another member, an Admin) - none lands
     assert.deepEqual(await s.staff('/v1/staff/ban', { target: s.troll.id, case: id, days: 7, click: 'press-a004' }, s.tab.session).then((r) => [r.status, r.body]), [409, { error: 'case-closed' }]);
     assert.deepEqual((await s.staff('/v1/staff/dismiss', { target: s.troll.id, case: id }, s.mob.session)).body, { error: 'case-closed' });
-    const card = await s.press('222222222222222222', `safe:b30:${id}`, 'discord-0000000001');
-    assert.equal(card.type, 7, 'Discord shows the card as it stands');
     assert.equal(s.row(s.troll.id).banned_until, null);
     assert.equal(s.strikes(s.troll.id), 1);
     assert.deepEqual(s.raw.prepare("SELECT outcome FROM staff_audit WHERE act = 'ban'").all().map((r) => r.outcome), ['failed', 'failed'], 'each refusal written down');
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2-FIX 1: Discord\'s press id is its one-time id - a press Discord sends twice is one act (mutant: the interaction\'s id unread)', async () => {
-  const s = await stand();
-  try {
-    const t = await s.player();
-    const c = s.caseOn(t);
-    assert.equal((await s.press('222222222222222222', `safe:m30:${c}`, 'discord-0000000002')).type, 7);
-    assert.deepEqual({ ...s.raw.prepare('SELECT case_id, click FROM mod_actions WHERE target = ?').get(t.id) }, { case_id: c, click: 'discord-0000000002' });
-    assert.equal(s.caseRow(c).status, 'actioned');
-  } finally { s.restore(); }
-});
-
-test('STAFF-PANEL2-FIX 2: THE CLAIM IS ASKED IN THE SHARED ACT - a case another member holds in the panel refuses the game\'s /mute, /ban and dismiss and Discord\'s /mod as the panel does; its holder acts on it from the game (mutants: the claim dropped from the take; the holder refused)', async () => {
+test('STAFF-PANEL2-FIX 2: THE CLAIM IS ASKED IN THE SHARED ACT - a case another member holds in the panel refuses the game\'s /mute, /ban and dismiss as the panel does; its holder acts on it from the game (mutants: the claim dropped from the take; the holder refused)', async () => {
   const s = await stand();
   try {
     const a = await s.player();
@@ -173,8 +151,6 @@ test('STAFF-PANEL2-FIX 2: THE CLAIM IS ASKED IN THE SHARED ACT - a case another 
       const r = await s.game(path, body, s.g.Tabbyvish.secret);
       assert.deepEqual([r.status, r.body?.error], [409, 'staff-claimed'], path);
     }
-    assert.match((await s.command('222222222222222222', 'ban', { player: a.id, days: 1 })).data.content, /Another staff member has this case in the staff panel/);
-    assert.match((await s.command('333333333333333333', 'mute', { player: a.id, minutes: 30 })).data.content, /Another staff member has this case/, 'an Admin too - an Admin takes the claim first');
     assert.deepEqual([s.row(a.id).muted_until, s.row(a.id).banned_until], [null, null]);
     assert.deepEqual([s.caseRow(ca).status, s.caseRow(ca).act_click], ['open', null], 'and the case left as it was');
     // the holder acts from the game
@@ -185,7 +161,7 @@ test('STAFF-PANEL2-FIX 2: THE CLAIM IS ASKED IN THE SHARED ACT - a case another 
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2-FIX 3: CASES HAVE A KIND - a spawn case opens beside a chat case, one open a kind; a Moderator sees and acts on chat cases alone, an Admin on both, in the panel, the game and Discord (mutants: each kind gate)', async () => {
+test('STAFF-PANEL2-FIX 3: CASES HAVE A KIND - a spawn case opens beside a chat case, one open a kind; a Moderator sees and acts on chat cases alone, an Admin on both, in the panel and the game (mutants: each kind gate)', async () => {
   const s = await stand();
   try {
     const t = await s.player();
@@ -212,7 +188,6 @@ test('STAFF-PANEL2-FIX 3: CASES HAVE A KIND - a spawn case opens beside a chat c
     assert.equal((await s.game('/v1/mod/case', { target: u.id }, s.g.SirMcMobdon.secret)).body.case.id, lone);
     // one act: a Moderator's refused on a spawn case from every door
     assert.deepEqual(await s.staff('/v1/staff/mute', { target: t.id, case: spawn, minutes: 30, click: 'press-k001' }, s.asy.session).then((r) => [r.status, r.body]), [403, { error: 'not-developer' }]);
-    assert.match((await s.press('222222222222222222', `safe:dis:${spawn}`)).data.content, /Only an Admin can act on a spawn case/);
     assert.equal((await s.game('/v1/mod/dismiss', { target: u.id }, s.g.Tabbyvish.secret)).status, 404, 'the game\'s dismiss finds no chat case');
     assert.equal(s.caseRow(spawn).status, 'open');
     // a Moderator's mute of an account with a spawn case alone answers no case, and leaves it an Admin's
@@ -227,7 +202,7 @@ test('STAFF-PANEL2-FIX 3: CASES HAVE A KIND - a spawn case opens beside a chat c
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2-FIX 4: WHO SET EACH SANCTION is stored, and an Admin\'s is lifted or cut short by an Admin alone - from the panel, the game and Discord; a Moderator may lengthen it and it stays the Admin\'s (mutants: each admin guard; the setter unwritten)', async () => {
+test('STAFF-PANEL2-FIX 4: WHO SET EACH SANCTION is stored, and an Admin\'s is lifted or cut short by an Admin alone - from the panel and the game; a Moderator may lengthen it and it stays the Admin\'s (mutants: each admin guard; the setter unwritten)', async () => {
   const s = await stand();
   try {
     const troll = s.troll.id;
@@ -238,7 +213,6 @@ test('STAFF-PANEL2-FIX 4: WHO SET EACH SANCTION is stored, and an Admin\'s is li
     assert.deepEqual([s.row(troll).banned_by, s.row(troll).ban_admin], [mobId, 1]);
     assert.deepEqual(await s.staff('/v1/staff/unban', { target: troll }, s.asy.session).then((r) => [r.status, r.body]), [403, { error: 'admin-sanction' }]);
     assert.equal((await s.game('/v1/mod/unban', { target: troll }, s.g.Tabbyvish.secret)).status, 403);
-    assert.match((await s.command('222222222222222222', 'unban', { player: troll })).data.content, /An Admin set this/);
     assert.equal((await s.staff('/v1/staff/ban', { target: troll, days: 1, click: 'press-s002' }, s.asy.session)).body.error, 'admin-sanction', 'cut short');
     assert.equal((await s.staff('/v1/staff/ban', { target: troll, days: 30, click: 'press-s003' }, s.asy.session)).status, 200, 'lengthened');
     assert.deepEqual([s.row(troll).banned_by, s.row(troll).ban_admin], [asyId, 1], 'set by the Moderator now, and still the Admin\'s');
@@ -254,7 +228,6 @@ test('STAFF-PANEL2-FIX 4: WHO SET EACH SANCTION is stored, and an Admin\'s is li
     assert.deepEqual([s.row(syl).muted_by, s.row(syl).mute_admin], [mobId, 1]);
     assert.deepEqual(await s.game('/v1/mod/mute', { target: syl, minutes: 0 }, s.g.Tabbyvish.secret).then((r) => [r.status, r.body.error]), [403, 'admin-sanction']);
     assert.equal((await s.staff('/v1/staff/mute', { target: syl, minutes: 30, click: 'press-s005' }, s.asy.session)).body.error, 'admin-sanction', 'cut short');
-    assert.match((await s.command('222222222222222222', 'unmute', { player: syl })).data.content, /An Admin set this/);
     assert.equal((await s.game('/v1/mod/mute', { target: syl, minutes: 120 }, s.g.Tabbyvish.secret)).status, 200, 'lengthened');
     assert.deepEqual([s.row(syl).muted_by, s.row(syl).mute_admin], [s.g.Tabbyvish.id, 1]);
     assert.equal((await s.staff('/v1/staff/mute', { target: syl, minutes: 0, click: 'press-s006' }, s.mob.session)).status, 200, 'the Admin lifts it');
@@ -306,7 +279,7 @@ test('STAFF-PANEL2-FIX 6: A CLAIMED HIGH CASE LEFT IDLE returns to the top, and 
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2-FIX 8: CUTTING OFF A STAFF MEMBER holds at every door - the stored flag takes every role (the panel, the game\'s /v1/mod doors, Discord, a token\'s staff glyphs), the cut ends their game sessions, and the relay is ordered to close their sockets; an owner\'s invite brings them back (mutants: each suspended check; the sessions left; no order pushed)', async () => {
+test('STAFF-PANEL2-FIX 8: CUTTING OFF A STAFF MEMBER holds at every door - the stored flag takes every role (the panel, the game\'s /v1/mod doors, a token\'s staff glyphs), the cut ends their game sessions, and the relay is ordered to close their sockets; an owner\'s invite brings them back (mutants: each suspended check; the sessions left; no order pushed)', async () => {
   const s = await stand();
   try {
     const asyId = s.g.Asynian.id;
@@ -337,7 +310,6 @@ test('STAFF-PANEL2-FIX 8: CUTTING OFF A STAFF MEMBER holds at every door - the s
     assert.deepEqual(await s.game('/v1/mod/mute', { target: s.troll.id, minutes: 30 }, back.body.secret).then((x) => [x.status, x.body.error]), [403, 'not-moderator']);
     assert.equal((await s.game('/v1/mod/cases', {}, back.body.secret)).status, 403);
     assert.ok(!(await glyphs(back.body.secret)).includes('mod'), 'no staff glyph on the next token');
-    assert.match((await s.command('111111111111111111', 'lookup', { player: 'Troll' })).data.content, /Only the game's moderators/);
     assert.deepEqual((await s.staff('/v1/staff/login', { handle: 'Asynian', password: PASSWORD, ...(await s.asy.key.proof('login', 'Asynian')) })).body, { error: 'staff-login' });
     const team = (await s.staff('/v1/staff/team', {}, s.mob.session)).body.team.find((p) => p.handle === 'Asynian');
     assert.deepEqual([team.role, team.suspended], ['moderator', true]);
@@ -503,7 +475,7 @@ test('STAFF-PANEL2-FIX review 2: THE SAME PRESS SENT TWICE AT ONCE, with no case
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2-FIX review 3: EVERY DOOR\'S ACT IS IN THE AUDIT LOG, written once in the shared act - the game\'s, Discord\'s and the panel\'s, ok, denied or failed, the door named, and the owners read it; a knock by one who is no moderator writes nothing (mutants: the doors\' row unwritten; the door unnamed at each door; a denial written as failed; the panel\'s writer not handed in)', async () => {
+test('STAFF-PANEL2-FIX review 3: EVERY DOOR\'S ACT IS IN THE AUDIT LOG, written once in the shared act - the game\'s and the panel\'s, ok, denied or failed, the door named, and the owners read it; a knock by one who is no moderator writes nothing (mutants: the doors\' row unwritten; the door unnamed at each door; a denial written as failed; the panel\'s writer not handed in)', async () => {
   const s = await stand();
   try {
     const rows = (act, target) => s.raw.prepare('SELECT actor, role, outcome, detail, key_id FROM staff_audit WHERE act = ? AND target IS ? ORDER BY id').all(act, target)
@@ -518,26 +490,18 @@ test('STAFF-PANEL2-FIX review 3: EVERY DOOR\'S ACT IS IN THE AUDIT LOG, written 
     assert.deepEqual(rows('ban', a.id).map((r) => [r.role, r.outcome, r.detail]), [['admin', 'ok', { name: a.handle, door: 'in the game', days: 7, reason: 'slurs' }]]);
     assert.equal((await s.game('/v1/mod/unban', { target: a.id }, s.g.Tabbyvish.secret)).status, 403);
     assert.deepEqual(rows('unban', a.id).map((r) => [r.outcome, r.detail.door, r.detail.error]), [['denied', 'in the game', 'admin-sanction']]);
-    // Discord's: a press, and /mod refused on a case another member holds, then a ban and its unban
+    // the game's dismiss names its case; a mute refused on a case another member holds is a denial
     const b = await s.player();
     const cb = s.caseOn(b);
-    assert.equal((await s.press('222222222222222222', `safe:dis:${cb}`, 'discord-0000000009')).type, 7);
-    assert.deepEqual(rows('dismiss', b.id).map((r) => [r.actor, r.outcome, r.detail.door, r.detail.case]), [[tabId, 'ok', 'Discord', cb]]);
+    assert.equal((await s.game('/v1/mod/dismiss', { target: b.id }, s.g.Tabbyvish.secret)).status, 200);
+    assert.deepEqual(rows('dismiss', b.id).map((r) => [r.actor, r.outcome, r.detail.door, r.detail.case]), [[tabId, 'ok', 'in the game', cb]]);
     const c = await s.player();
     s.caseOn(c);
     assert.equal((await s.staff('/v1/staff/claim', { target: c.id }, s.asy.session)).status, 200);
-    assert.match((await s.command('222222222222222222', 'mute', { player: c.id, minutes: 30 })).data.content, /Another staff member/);
-    assert.deepEqual(rows('mute', c.id).map((r) => [r.outcome, r.detail.door, r.detail.error]), [['denied', 'Discord', 'staff-claimed']]);
+    assert.equal((await s.game('/v1/mod/mute', { target: c.id, minutes: 30 }, s.g.Tabbyvish.secret)).status, 409);
+    assert.deepEqual(rows('mute', c.id).map((r) => [r.outcome, r.detail.door, r.detail.error]), [['denied', 'in the game', 'staff-claimed']]);
     assert.equal((await s.game('/v1/mod/dismiss', { target: c.id }, s.g.Asynian.secret)).status, 200, 'the holder, from the game');
     assert.deepEqual(rows('dismiss', c.id).map((r) => [r.outcome, r.detail.door]), [['ok', 'in the game']]);
-    const f = await s.player();
-    const spawn = await openCaseFor(s.ctx(), s.env, f.id, 'review', 'spawn');
-    assert.match((await s.press('222222222222222222', `safe:dis:${spawn}`)).data.content, /Only an Admin/);
-    assert.deepEqual(rows('dismiss', f.id).map((r) => [r.outcome, r.detail.door, r.detail.error]), [['denied', 'Discord', 'not-developer']], 'a spawn case, a Moderator\'s press');
-    const d = await s.player();
-    assert.match((await s.command('222222222222222222', 'ban', { player: d.id, days: 1 })).data.content, /is banned/);
-    assert.match((await s.command('222222222222222222', 'unban', { player: d.id })).data.content, /is unbanned/);
-    assert.deepEqual([...rows('ban', d.id), ...rows('unban', d.id)].map((r) => [r.outcome, r.detail.door]), [['ok', 'Discord'], ['ok', 'Discord']]);
     // the panel's: one row an act, its own - its session's key beside it
     const e = await s.player();
     assert.equal((await s.staff('/v1/staff/mute', { target: e.id, minutes: 30, click: 'press-v001' }, s.asy.session)).status, 200);
@@ -545,13 +509,13 @@ test('STAFF-PANEL2-FIX review 3: EVERY DOOR\'S ACT IS IN THE AUDIT LOG, written 
     // one who is no moderator, knocking at the game's door, writes nothing
     assert.equal((await s.game('/v1/mod/mute', { target: e.id, minutes: 30 }, s.troll.secret)).status, 403);
     assert.equal(rows('mute', e.id).length, 1);
-    // the owners read the game's and Discord's acts in their log
+    // the owners read the game's acts in their log
     const log = (await s.staff('/v1/staff/audit', { target: b.id }, s.mob.session)).body.rows;
-    assert.deepEqual(log.map((r) => [r.act, r.actorName, r.detail.door]), [['dismiss', 'Tabbyvish', 'Discord']]);
+    assert.deepEqual(log.map((r) => [r.act, r.actorName, r.detail.door]), [['dismiss', 'Tabbyvish', 'in the game']]);
   } finally { s.restore(); }
 });
 
-test('STAFF-PANEL2-FIX review 4: THE ACT, ITS STRIKE AND ITS CASE\'S CLOSE ARE ONE BATCH - the close failing leaves neither the sanction nor its strike, for a mute, a button\'s mute that keeps a longer one, a ban and a dismiss; the case given back, and the next act strikes once (mutants: each written apart from its close)', async () => {
+test('STAFF-PANEL2-FIX review 4: THE ACT, ITS STRIKE AND ITS CASE\'S CLOSE ARE ONE BATCH - the close failing leaves neither the sanction nor its strike, for a mute, a ban and a dismiss; the case given back, and the next act strikes once (mutants: each written apart from its close)', async () => {
   const s = await stand();
   try {
     const tab = s.row(s.g.Tabbyvish.id);
@@ -574,14 +538,6 @@ test('STAFF-PANEL2-FIX review 4: THE ACT, ITS STRIKE AND ITS CASE\'S CLOSE ARE O
         assert.deepEqual([again.ok, again.repeat, again.case, s.caseRow(c).status !== 'open', acts(t.id)], [true, undefined, c, true, 1], `${ask.act}: the same press, acted once`);
       }
     }
-    // a button's mute while a longer one stands: its record and the close, one batch
-    const k = await s.player();
-    const ck = s.caseOn(k);
-    s.raw.prepare('UPDATE players SET muted_until = ?, muted_by = ? WHERE id = ?').run(nowS() + 86400, s.g.Asynian.id, k.id);
-    await assert.rejects(modAct(closeFails(), tab, s.env, { act: 'mute', target: k.id, minutes: 30, caseId: ck, keepLonger: true, from: 'Discord' }), /overloaded/);
-    assert.deepEqual([acts(k.id), s.caseRow(ck).status], [0, 'open']);
-    const kept = await modAct(s.ctx(), tab, s.env, { act: 'mute', target: k.id, minutes: 30, caseId: ck, keepLonger: true, from: 'Discord' });
-    assert.deepEqual([kept.kept, acts(k.id), s.caseRow(ck).status], [true, 1, 'actioned']);
   } finally { s.restore(); }
 });
 

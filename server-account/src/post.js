@@ -6,8 +6,7 @@
 // What a piece is - its bounds and its sender - is src/net/postLaw.js.
 // This file is the four things its reader does with their own: list the
 // box, open one, CLAIM its item, and throw one away. Nothing here writes
-// a piece: the operator's workflow does (.github/workflows/server-post.yml,
-// tools/sendServerPost.mjs), and no route a player can reach sends one of
+// a piece: the operator does, and no route a player can reach sends one of
 // a player's choosing.
 //
 // ═══ A READER'S POST IS THEIRS ALONE ═══════════════════════════════
