@@ -6,7 +6,8 @@ import { applyLayers, DEFAULT_LAYERS, LAYER_NAMES, MC_DEFAULT_SWINGS } from './o
 import { DEFAULT_GEAR_PERCENTILE, MATERIAL_NAMES } from './gear.mjs';
 
 export const DEFAULT_LEVELS = Object.freeze([1, 5, 10, 15, 20, 25, 30, 35, 40, 45]);
-/** Decision 41's budget at level 45: a maxed melee or archer character about 1.6x a DFU character, a caster about 1.75x. */
+/** The power budget at level 45 as a multiple of a DFU character: about 1.6x for a maxed melee or archer build, about
+ *  1.75x for a build that casts. */
 export const TARGET_TOP_RATIO = Object.freeze({ melee: 1.6, caster: 1.75 });
 export const TOP_LEVEL = 45;
 /** The layers that act on the foe. Switched off, the character keeps its layers and meets DFU's own foe row. */
