@@ -1,16 +1,15 @@
-// Classic distance shading, route A of the classic rendering study (dfo-plans, rendering/classic-rendering-options.md,
-// decision 111). The original game darkened and fogged by distance through 64-step palette remap tables: the far a
-// surface, the further its colours were moved toward the table's fade colour. This pass gives the same 64 steps to the
-// full-colour image: after the world is drawn, each pixel is moved toward the fade colour by its step.
+// Classic distance shading. The original game darkened and fogged by distance through 64-step palette remap tables:
+// the far a surface, the further its colours were moved toward the table's fade colour. This pass gives the same 64
+// steps to the full-colour image: after the world is drawn, each pixel is moved toward the fade colour by its step.
 //
 // Departures from the original game, recorded here and in the row's note:
 //   - The step is picked per pixel from the depth buffer. The original game picked one row per flat, or per surface
 //     from its centre point.
-//   - The colour moves by a linear blend, not through the palette tables (route B, which needs palettization).
+//   - The colour moves by a linear blend, not through the palette tables, which would need a palettized picture.
 //   - The range is not measured on the original game yet (it needs a capture). Indoors it is 30 m: in the original
 //     game dungeons fall to dark after about that distance (Daggerfall Unity 0.13 Rendering Update, parts 2 and 3).
 //     Outdoors the steps follow the scene's own fog, so the land stays visible as far as it does today.
-//   - The fade colour is a choice (decision 126, an agreed design). To black, the default, is the original game's look:
+//   - The fade colour is a choice, an agreed design. To black, the default, is the original game's look:
 //     dungeons and buildings go to black whatever their fog. To fog colour moves every place toward its own fog, so a
 //     mod's coloured fog (Better Ambience gives dungeons a brown one) tints the far view. The two differ only indoors
 //     under a fog that is not black.

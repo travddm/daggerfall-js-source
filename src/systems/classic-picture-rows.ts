@@ -92,8 +92,8 @@ const CLASSIC_COLOURS_ROW: SettingsRow = Object.freeze({
   control: Object.freeze({ store: 'settings', key: 'Video/PostProcessingInRetroMode' }),
 });
 
-/** Off by default (decision 104). Both choices are route A, and they differ only in where the steps lead (decision 126).
- *  Route B, the original palette tables, would be a choice of its own. */
+/** Off by default, so the game looks as before until a player turns it on. Both choices blend in full colour and differ
+ *  only in where the steps lead. Fading through the original palette tables would be a choice of its own. */
 const CLASSIC_DISTANCE_SHADING_ROW: PrefsRow = Object.freeze({
   id: 'classic-distance-shading',
   group: 'sight',
