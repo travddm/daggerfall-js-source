@@ -55,7 +55,7 @@ Mods (the folder README has the version, credits and permission):
 
 | Folder | What is vendored |
 | --- | --- |
-| `aquatic-sprites`, `detailed-ships`, `warm-ashes-ships`, `immersive-travel` | World-data patches (and quests, IL, drawings where the mod has them) |
+| `warm-ashes-ships`, `immersive-travel` | World-data patches (and quests, IL, drawings where the mod has them) |
 | `beautiful-villages`, `beautiful-cities` | One world-data pack each |
 | `better-ambience`, `immersive-footsteps`, `readied-spellcasting-hands`, `world-tooltips` | C# sources and clips |
 | `class-skins`, `layered-armor`, `sands-of-the-alikr` | Sprite and texture art (loose packs) |
@@ -102,8 +102,6 @@ These folders stay committed: no public download reproduces them. The folder REA
 
 | Folder | Author | Mod and version | Source | Permission or licence | Licence files in the folder |
 | --- | --- | --- | --- | --- | --- |
-| `aquatic-sprites` | Cliffworms | Aquatic Sprites 1.0 | Nexus Mods, Daggerfall Unity mod 276 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_AquaticSprites.txt` (the author's readme) |
-| `detailed-ships` | Cliffworms | Detailed Ships 1.0.0 | Nexus Mods, Daggerfall Unity mod 307 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_DetailedShips.txt` (the author's readme) |
 | `project-legacy` | Lattymoy, Ghð§† and Positronico | Project Legacy 0.4.1 | The shipped archive, from Lattymoy | The owner's own mod; the bundle states no licence. The co-authors' consent is not recorded | none |
 | `raum-book` | Mac (Lattymoy) | project-raum's book and paper code | `github.com/Lattymoy/project-raum` (not public) | The owner's own work | none |
 | `readied-spellcasting-hands` | jefetienne | Readied Spellcasting Hands 1.3 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
