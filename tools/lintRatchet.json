@@ -1122,7 +1122,7 @@
     "src/systems/quest/markerCuration.js": 4,
     "src/systems/quest/person.js": 33,
     "src/systems/quest/place.js": 53,
-    "src/systems/quest/quest.js": 8,
+    "src/systems/quest/quest.js": 6,
     "src/systems/quest/questGuidance.js": 31,
     "src/systems/quest/questMacros.js": 23,
     "src/systems/quest/questRepair.js": 55,

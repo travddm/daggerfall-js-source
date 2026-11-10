@@ -135,3 +135,8 @@ test("P12 THE GUILD KEYS: guild.promoteNow and guild.seatRanks are DFU's wait an
     assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool'], name);
   }
 });
+
+test("P13 THE QUEST KEY: quest.failureFree is DFU's -2 online by default", () => {
+  const key = profileKeyOf('quest.failureFree');
+  assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool']);
+});

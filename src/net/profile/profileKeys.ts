@@ -149,6 +149,19 @@ export const PROFILE_KEYS = Object.freeze({
     checkedBy: Object.freeze(['client'] as const),
     words: 'profile.guild.seatRanks',
   }),
+  // Whether a quest that ends unfinished online costs its faction nothing. DFU takes 2 reputation, spread through the
+  // faction's allies and enemies (Quest.cs EndQuest). The cost was waived when deadlines ran on the character's clock in
+  // travel and rest; a deadline now charges only the time lived.
+  'quest.failureFree': Object.freeze({
+    census: Object.freeze(['ON32'] as const),
+    feature: 'QFAIL-FREE',
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.quest.failureFree',
+  }),
 } satisfies Record<string, ProfileKey>);
 
 export type ProfileKeyName = keyof typeof PROFILE_KEYS;
