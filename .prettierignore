@@ -11,6 +11,7 @@ package-lock.json
 server/package-lock.json
 tools/testTimes.json
 tools/lintRatchet.json
+tools/vendored-mods.json
 src/buildTag.js
 *.html
 *.png
