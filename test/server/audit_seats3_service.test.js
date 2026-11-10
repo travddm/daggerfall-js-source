@@ -300,7 +300,7 @@ test('AUDIT SEATS-3 D2: THE MARKET\'S READ SAYS THE BOARD\'S LISTING CAP - `list
   assert.match(mk, /JSON\.stringify\(moved\), listingsMax,\n\s*vend\?\.map \?\? null, vend\?\.id \?\? null\),/);
 });
 
-test('AUDIT SEATS-3 E2: THE WARDROBE\'S OTHER DOORS KEEP A CHARTER\'S TITLES - an aura worn or taken off answers the wardrobe with the guildmaster\'s "warden" still held and worn, as the account read and the title\'s equip do; the insignia and the Patreon unlink are read the same way (mutants: the aura on the bare row; the insignia; the unlink)', async (t) => {
+test('AUDIT SEATS-3 E2: THE WARDROBE\'S OTHER DOORS KEEP A CHARTER\'S TITLES - an aura worn or taken off answers the wardrobe with the guildmaster\'s "warden" still held and worn, as the account read and the title\'s equip do; the insignia is read the same way (mutants: the aura on the bare row; the insignia)', async (t) => {
   t.mock.method(Date, 'now', () => T0 * 1000);
   const svc = await standService({ SEATS_OPEN: 'on', MARKS_OPEN: 'on' });
   const raw = svc.env.DB._raw;

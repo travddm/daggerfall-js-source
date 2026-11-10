@@ -96,13 +96,22 @@ export function shardsOf(files, n, times = {}) {
  * (verify.yml, test-times.yml).
  * @param {string[]} files
  */
+/** The environment every test runner gets: `NODE_OPTIONS` preloads tools/raw-import-hooks.ts, so a module that imports a
+ *  shader file with `?raw` loads under Node as it does under Vite. It rides the environment, not the runner's argv, so
+ *  a node process a test starts inherits it too. `extra` adds variables (a record's path). */
+export function runnerEnv(root = ROOT, extra = {}) {
+  const hook = `--import=${pathToFileURL(join(root, 'tools/raw-import-hooks.ts')).href}`;
+  const options = process.env.NODE_OPTIONS ? `${process.env.NODE_OPTIONS} ${hook}` : hook;
+  return { ...process.env, NODE_OPTIONS: options, ...extra };
+}
+
 export const WIN32_ARGV_BUDGET = 30000;
 export function runTests(files, { root = ROOT, times = readTimes(root), cores = availableParallelism(), spawn = spawnSync, extra = [],
   budget = process.platform === 'win32' ? WIN32_ARGV_BUDGET : Infinity, summary = true, record = '' } = {}) {
   if (!files.length) return 0;
   const ordered = shardsOf(files, 1, times)[0].files;
   const head = ['--test', `--test-concurrency=${Math.max(1, cores | 0)}`, ...(summary || record ? summaryReporters(root) : []), ...extra];
-  const env = record ? { ...process.env, TEST_TIMES_RECORD: resolve(record) } : undefined;
+  const env = runnerEnv(root, record ? { TEST_TIMES_RECORD: resolve(record) } : {});
   const base = process.execPath.length + head.reduce((n, a) => n + a.length + 3, 0);   // a space and two quotes an argument
   const runs = [];
   let run = [], used = base;
@@ -113,7 +122,7 @@ export function runTests(files, { root = ROOT, times = readTimes(root), cores = 
   runs.push(run);
   let status = 0;
   for (const list of runs) {
-    const r = spawn(process.execPath, [...head, ...list], { cwd: root, stdio: 'inherit', ...(env ? { env } : {}) });
+    const r = spawn(process.execPath, [...head, ...list], { cwd: root, stdio: 'inherit', env });
     if (r.error) console.error(`[tests] the test runner did not start: ${r.error.message ?? r.error}`);
     const s = r.status ?? 1;
     if (s !== 0 && status === 0) status = s;

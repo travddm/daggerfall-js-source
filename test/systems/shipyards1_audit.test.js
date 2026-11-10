@@ -2,6 +2,7 @@
 // every finding was checked by hand, and each one fixed is pinned here (, AUDIT SHIPYARDS).
 // The crew hall is driven over the REAL sea fight (test/navalSea.mjs - the producer, never a fake that mints another
 // shape: TEST THE SHAPE THE PRODUCER MINTS), the shipmaster's acts over the real Fleet ledger.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -230,7 +231,8 @@ test('AUDIT SHIPYARDS (L1-2): a shipmaster buys a ship laid up; a record\'s wort
   }
 });
 
-test('AUDIT SHIPYARDS NO LOOP ONLINE, OVER THE SHIPYARD\'S OWN PRICES (L6-4): with the page online, what the shipmaster pays for any ship of his never reaches what he asks for her new, at any Mercantile and Personality (the old pin priced the counter directly - the shipyard\'s own path never ran); a worth past a few million never turns his offer negative', () => {
+test('AUDIT SHIPYARDS NO LOOP ONLINE, OVER THE SHIPYARD\'S OWN PRICES (L6-4): with the page online, what the shipmaster pays for any ship of his never reaches what he asks for her new, at any Mercantile and Personality (the old pin priced the counter directly - the shipyard\'s own path never ran); a worth past a few million never turns his offer negative', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the half is the server profile's sale cap; without it shipyards1.test.js holds the sale to the ask
   const prev = globalThis.location;
   try {
     globalThis.location = { search: '?online' };

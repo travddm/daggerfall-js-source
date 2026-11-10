@@ -3,7 +3,7 @@
 // The door carries the profile mark top-right, over a stage whose wordmark can reach under it. Here: the corners' band -
 // the door's stage starting below the mark wherever the wordmark reaches under it - derived from the mark's own numbers
 // rather than restated, so a mark that grows without its band fails here; and DOOR-FIT, the door that never cuts itself
-// off. SUPPORT1 also stood two support icons top-left; they linked the upstream project's Patreon and Ko-fi and are
+// off. Two support icons also stood top-left; they asked for support and are
 // removed, with their tests. In a real browser: tools/doorCornersProbe.mjs (the logo's own pixels under the mark, a
 // caption at its bound among them; and DOOR-FIT's top, last row and centring, at 192 sizes on both skins).
 import { test } from 'node:test';

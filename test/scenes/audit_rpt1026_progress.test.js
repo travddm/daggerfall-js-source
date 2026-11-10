@@ -11,6 +11,7 @@
 //       batch's AS DESIGNED answer to the absorption report.
 //   F4  an artifact's summon restored from a save stood unmarked - its death's finds lay on its body (exteriorFoes.js
 //       snapshotWorld/restoreWorld, SUMMON-BARE's left item); and the end-to-end pin of the death's finds emptied.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -196,7 +197,8 @@ function blastAtFullPool(discount) {
   } finally { registerSpellCostMod('audit-rpt1026-f3', null); }
 }
 
-test('AUDIT RPT1026 F3 (absorbing my own blast after a rest): at a full pool the cast makes room for what it paid, and that is room enough - with a 30% discount the blast is absorbed, as it is without one; the gain never passes what it spent (mutants: the undiscounted price asked of the room; every caster\'s payment read)', () => {
+test('AUDIT RPT1026 F3 (absorbing my own blast after a rest): at a full pool the cast makes room for what it paid, and that is room enough - with a 30% discount the blast is absorbed, as it is without one; the gain never passes what it spent (mutants: the undiscounted price asked of the room; every caster\'s payment read)', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const plain = blastAtFullPool(false);
   assert.equal(plain.hurt, 0, 'undiscounted, the absorber drinks its own blast (DFU\'s TryAbsorption: the room is the price)');
   const cheap = blastAtFullPool(true);
@@ -205,7 +207,8 @@ test('AUDIT RPT1026 F3 (absorbing my own blast after a rest): at a full pool the
   assert.ok(cheap.magicka < cheap.max, 'and nothing is made of it: the refund is half of what was spent (ABSORB-NERF, the self-cast cap)');
 });
 
-test('AUDIT RPT1026 F3: drunk in the room it made, my own spell gives back less than it spent - a CasterOnly blast at a 60% discount, after a dearer cast (the cap DFU reads is the LAST cast\'s), leaves the pool lower than it found it (mutants: the whole price drunk)', () => {
+test('AUDIT RPT1026 F3: drunk in the room it made, my own spell gives back less than it spent - a CasterOnly blast at a 60% discount, after a dearer cast (the cap DFU reads is the LAST cast\'s), leaves the pool lower than it found it (mutants: the whole price drunk)', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const p = structuredClone(PLAYER);
   createCharacter(p, absorber, -1, { rolls: () => 0.5 });
   p.chargenDone = true; p.level = 20; p.skills[SKILLS.Destruction] = 80;
