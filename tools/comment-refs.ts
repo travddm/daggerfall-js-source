@@ -1,16 +1,21 @@
-// Fails a pull request that adds a code comment citing a decision, a pull request or an item tag. The rule is in
-// .claude/rules/comments.md and docs/README.md ("Code comments"): a comment says why, and a reference belongs in the
-// commit message and the pull request description.
+// Fails a pull request that adds a code comment, or an error or warning message, that carries a decision, a pull
+// request or an item tag. The rule is in .claude/rules/comments.md and docs/README.md ("Code comments"): a comment
+// says why, a message says what went wrong in words, and a reference belongs in the commit message and the pull
+// request description.
 //
 //   node tools/comment-refs.ts [--base <ref>]     # default: $BASE_REF, else origin/feat/tamriel-review
 //
-// Only the lines the change adds are checked. A tag passes once for each time the same change removes it, so an old tag
-// on a line you edit, or on a comment you move to another file, does not fail the check, and a change that adds a tag
-// more often than it removes it does. A comment without a tag on a new line never fails. Exit code 1 lists each added comment line and the tag it carries.
+// Two kinds of added line are checked:
+//   - a comment line: any decision, pull request, audit or item tag in it;
+//   - the first argument of `throw new SomeError(...)`, `console.warn(...)` or `console.error(...)`: only a tag it
+//     opens with, because a tag later in a message is read as a word.
+// A tag passes once for each time the same change removes it, so an old tag on a line you edit, or on a comment you
+// move to another file, does not fail the check, and a change that adds a tag more often than it removes it does.
+// Exit code 1 lists each added line and the tag it carries.
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
-import { parse, type Comment, type Options } from 'acorn';
+import { parse, type Comment, type Node, type Options } from 'acorn';
 import { isMain } from './lib/isMain.mjs';
 
 const DEFAULT_BASE = 'origin/feat/tamriel-review';
@@ -19,7 +24,7 @@ const TYPESCRIPT_EXTENSIONS = ['.ts', '.mts', '.cts'];
 const SKIPPED_PREFIXES = ['vendor/', 'node_modules/'];
 
 export type Tag = { kind: 'decision' | 'pull-request' | 'audit' | 'item'; tag: string };
-export type Hit = Tag & { file: string; line: number; text: string };
+export type Hit = Tag & { file: string; line: number; text: string; where: 'comment' | 'message' };
 export type DiffLines = { added: Map<string, number[]>; removed: Map<string, Map<string, number>> };
 
 // Technical names that look like item tags: a letter run with a digit, or capitals with a hyphen.
@@ -57,14 +62,19 @@ export function isCheckedFile(path: string): boolean {
   return SCRIPT_EXTENSIONS.includes(extensionOf(path)) && !SKIPPED_PREFIXES.some((prefix) => path.startsWith(prefix));
 }
 
-function parseComments(source: string): Comment[] {
+function parseSource(source: string): { tree: Node; comments: Comment[] } {
   let lastError: unknown;
   for (const sourceType of ['module', 'script'] as const) {
     const comments: Comment[] = [];
-    const options: Options = { ecmaVersion: 'latest', sourceType, onComment: comments, allowHashBang: true };
+    const options: Options = {
+      ecmaVersion: 'latest',
+      sourceType,
+      onComment: comments,
+      allowHashBang: true,
+      locations: true,
+    };
     try {
-      parse(source, options);
-      return comments;
+      return { tree: parse(source, options), comments };
     } catch (error) {
       lastError = error;
     }
@@ -72,8 +82,72 @@ function parseComments(source: string): Comment[] {
   throw lastError;
 }
 
-/** The comment text on each line of a file, by 1-based line number. A line with no comment is absent. */
-export function commentLines(path: string, text: string): Map<number, string> {
+/** The parts of an ESTree node that the message scan reads. Acorn's own `Node` type has none of them. */
+type Syntax = {
+  type: string;
+  loc?: { start: { line: number } };
+  value?: unknown;
+  operator?: string;
+  left?: Syntax;
+  quasis?: { value: { cooked?: string | null } }[];
+  callee?: Syntax;
+  computed?: boolean;
+  object?: Syntax;
+  property?: Syntax;
+  name?: string;
+  arguments?: Syntax[];
+};
+
+/** What `scanFile` finds in one file, each by 1-based line number. */
+export type FileText = { comments: Map<number, string>; messages: Map<number, string> };
+
+/** The leading text of a message's first argument: a string, a template's first part, or a concatenation's first part. */
+function leadingText(node: Syntax | undefined): string | undefined {
+  if (!node) return undefined;
+  if (node.type === 'Literal' && typeof node.value === 'string') return node.value;
+  if (node.type === 'TemplateLiteral') return node.quasis?.[0]?.value.cooked ?? undefined;
+  if (node.type === 'BinaryExpression' && node.operator === '+') return leadingText(node.left);
+  return undefined;
+}
+
+/** True for `new SomeError(...)`, `console.warn(...)` and `console.error(...)`: the calls whose text a user can read. */
+function isMessageCall(node: Syntax): boolean {
+  if (node.type === 'NewExpression') return node.callee?.type === 'Identifier' && /Error$/.test(node.callee.name ?? '');
+  if (node.type !== 'CallExpression') return false;
+  const callee = node.callee;
+  return (
+    callee?.type === 'MemberExpression' &&
+    !callee.computed &&
+    callee.object?.type === 'Identifier' &&
+    callee.object.name === 'console' &&
+    (callee.property?.name === 'warn' || callee.property?.name === 'error')
+  );
+}
+
+function collectMessages(node: Syntax, messages: Map<number, string>): void {
+  if (isMessageCall(node)) {
+    const argument = node.arguments?.[0];
+    const lead = leadingText(argument);
+    if (argument?.loc && lead !== undefined) messages.set(argument.loc.start.line, lead);
+  }
+  for (const child of Object.values(node)) {
+    const children: unknown[] = Array.isArray(child) ? child : [child];
+    for (const item of children) {
+      if (item && typeof item === 'object' && typeof (item as Syntax).type === 'string') {
+        collectMessages(item as Syntax, messages);
+      }
+    }
+  }
+}
+
+/** The tags a message opens with: its first word, up to a colon, a space or a closing bracket. */
+export function openingTags(message: string): Tag[] {
+  const word = /^\s*\[?([^\s:\]]+)/.exec(message)?.[1];
+  return word ? tagsIn(word) : [];
+}
+
+/** The comment text and the message starts on each line of a file. A line with none is absent. */
+export function scanFile(path: string, text: string): FileText {
   // Stripping replaces each type with spaces, so offsets in the stripped source are offsets in `text`.
   const source = TYPESCRIPT_EXTENSIONS.includes(extensionOf(path))
     ? stripTypeScriptTypes(text, { mode: 'strip' })
@@ -91,7 +165,10 @@ export function commentLines(path: string, text: string): Map<number, string> {
     }
     return low + 1;
   };
-  for (const comment of parseComments(source)) {
+  const { tree, comments } = parseSource(source);
+  const messages = new Map<number, string>();
+  collectMessages(tree as unknown as Syntax, messages);
+  for (const comment of comments) {
     // Acorn reads a hashbang as a comment; it names the interpreter, so it is code.
     if (comment.start === 0 && source.startsWith('#!')) continue;
     const first = lineOf(comment.start);
@@ -100,7 +177,12 @@ export function commentLines(path: string, text: string): Map<number, string> {
       lines.set(line, `${lines.get(line) ?? ''} ${part}`.trim());
     });
   }
-  return lines;
+  return { comments: lines, messages };
+}
+
+/** The comment text on each line of a file, by 1-based line number. A line with no comment is absent. */
+export function commentLines(path: string, text: string): Map<number, string> {
+  return scanFile(path, text).comments;
 }
 
 /**
@@ -133,7 +215,7 @@ export function parseDiff(diff: string): DiffLines {
 }
 
 /**
- * The added comment lines that carry a tag the change does not remove as often. A tag passes once for each time the
+ * The added comment lines and message starts that carry a tag the change does not remove as often. A tag passes once for each time the
  * change removes it, from the same file first, so a moved or reworded comment passes and a tag the change adds beyond
  * what it removes does not. `read` returns a file's new text.
  */
@@ -152,18 +234,25 @@ export function findHits(diff: string, read: (file: string) => string): Hit[] {
   const hits: Hit[] = [];
   for (const [file, lines] of added) {
     if (!isCheckedFile(file)) continue;
-    let comments: Map<number, string>;
+    let scanned: FileText;
     try {
-      comments = commentLines(file, read(file));
+      scanned = scanFile(file, read(file));
     } catch {
       // A file that does not parse cannot be told apart from its comments: leave it to review.
       continue;
     }
     for (const line of lines) {
-      const text = comments.get(line);
-      if (!text) continue;
-      for (const found of tagsIn(text)) {
-        if (!spend(file, found.tag)) hits.push({ ...found, file, line, text });
+      const comment = scanned.comments.get(line);
+      if (comment) {
+        for (const found of tagsIn(comment)) {
+          if (!spend(file, found.tag)) hits.push({ ...found, file, line, text: comment, where: 'comment' });
+        }
+      }
+      const message = scanned.messages.get(line);
+      if (message) {
+        for (const found of openingTags(message)) {
+          if (!spend(file, found.tag)) hits.push({ ...found, file, line, text: message, where: 'message' });
+        }
       }
     }
   }
@@ -190,7 +279,7 @@ function main(argv: string[]): number {
     return 0;
   }
   for (const hit of hits)
-    console.log(`${hit.file}:${hit.line}: ${hit.kind} "${hit.tag}" in: ${hit.text.slice(0, 100)}`);
+    console.log(`${hit.file}:${hit.line}: ${hit.kind} "${hit.tag}" in ${hit.where}: ${hit.text.slice(0, 100)}`);
   console.log(
     `\ncomment-refs: ${hits.length} added comment line(s) carry a reference. State the reason in words, or delete the\n` +
       'comment; the reference goes in the commit message and the pull request description (.claude/rules/comments.md).',

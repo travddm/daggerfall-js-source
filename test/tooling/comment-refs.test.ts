@@ -4,7 +4,15 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { checkAgainst, commentLines, findHits, parseDiff, tagsIn } from '../../tools/comment-refs.ts';
+import {
+  checkAgainst,
+  commentLines,
+  findHits,
+  openingTags,
+  parseDiff,
+  scanFile,
+  tagsIn,
+} from '../../tools/comment-refs.ts';
 
 const kinds = (text: string) => tagsIn(text).map((t) => `${t.kind}:${t.tag}`);
 
@@ -137,6 +145,70 @@ test('findHits ignores a tag in a string, in code or in a vendored or unparsable
   assert.deepEqual(
     findHits(broken, () => '// SAFE8 {\nconst = ;\n'),
     [],
+  );
+});
+
+test('openingTags reads only the tag a message opens with', () => {
+  assert.deepEqual(
+    openingTags('CHAR7: the skin failed').map((t) => t.tag),
+    ['CHAR7'],
+  );
+  assert.deepEqual(
+    openingTags('[FAR-CLIP1] no depth').map((t) => t.tag),
+    ['FAR-CLIP1'],
+  );
+  assert.deepEqual(
+    openingTags('  SNOWFALL1 pass lost').map((t) => t.tag),
+    ['SNOWFALL1'],
+  );
+  assert.deepEqual(openingTags('the pass SNOWFALL1 lost'), []);
+  assert.deepEqual(openingTags('UTF-8 text is required'), []);
+  assert.deepEqual(openingTags('HTTP 404: not found'), []);
+  assert.deepEqual(openingTags(''), []);
+});
+
+test('scanFile finds the first string of an Error, console.warn and console.error, and nothing else', () => {
+  const source = [
+    "throw new Error('CHAR7: one');",
+    'console.warn(`VOL1: two ${x}`);',
+    "console.error('WEAPON-GLOW1: ' + detail);",
+    'throw new TypeError("a plain message");',
+    "console.log('SAFE8: logs are not checked');",
+    "const label = 'HARD3: data is not checked';",
+    "run(new Error(message), 'LOOT-GATE: second argument');",
+  ].join('\n');
+  const { messages } = scanFile('x.js', source);
+  assert.deepEqual(
+    [...messages],
+    [
+      [1, 'CHAR7: one'],
+      [2, 'VOL1: two '],
+      [3, 'WEAPON-GLOW1: '],
+      [4, 'a plain message'],
+    ],
+  );
+});
+
+test('findHits fails an added message that opens with a tag and counts it against the removed ones', () => {
+  const text = [
+    "throw new Error('CHAR7: kept');",
+    "console.warn('CHAR7: copied');",
+    "console.warn('words only');",
+    '',
+  ].join('\n');
+  const diff = [
+    '--- a/a.js',
+    '+++ b/a.js',
+    '@@ -1,1 +1,3 @@',
+    "-throw new Error('CHAR7: old');",
+    "+throw new Error('CHAR7: kept');",
+    "+console.warn('CHAR7: copied');",
+    "+console.warn('words only');",
+  ].join('\n');
+  const hits = findHits(diff, () => text);
+  assert.deepEqual(
+    hits.map((h) => [h.line, h.tag, h.where]),
+    [[2, 'CHAR7', 'message']],
   );
 });
 

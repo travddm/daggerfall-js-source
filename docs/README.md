@@ -64,6 +64,8 @@ Until the mod manifests exist, a departure is a row in `src/systems/features.js`
 - Write plain sentences. Do not write ALL-CAPS headlines, quotes of people, dates with names, version histories,
   slice or audit tags, or notes about where code used to be. Git holds history.
 - Do not cite documents by line number. Name a file and a function.
+- The same holds outside comments. No audit, arc, decision or plan IDs in code, in data fields or in shipped strings:
+  a field or a message says what it means in words.
 - Rewrite a comment you touch if it breaks these rules. Do not reformat lines you do not otherwise change.
 
 ## Tests
