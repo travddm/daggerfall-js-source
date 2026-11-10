@@ -84,6 +84,30 @@ export function createTownWalk(host) {
     }
     return got;
   }
+  /** Whether `cell` (the traveller's, by default) lies in a walled town's fields: outside its walls, in the piece of the
+   *  residents' grid (its gates closed) that reaches the grid's edge - or past the grid. A city's start markers stand
+   *  there, outside its gates. */
+  function inFields(town, cell = town.cell) {
+    if (!town.b.cityGates?.length) return false;   // no walls: the grid is the town (and its pieces are never flooded for it)
+    const pieces = edgePieces(town.nav);
+    if (pieces.edge.size >= pieces.all) return false;   // walls that close nothing
+    if (!town.nav.inBounds(cell[0], cell[1])) return true;
+    const at = snapCell(town.nav, cell);   // a doorstep reads as its street
+    return !!at && pieces.edge.has(componentsOf(town.nav)[at[1] * town.nav.width + at[0]]);
+  }
+  /** The grid a traveller in a walled town's fields walks: its solid models covered and no gate carved, so the way goes
+   *  round the walls to the edge nearest its point. Through a gate it went back into the city and across it, on streets
+   *  that the town's own grid draws a cell wide where the gate stands. */
+  function fieldsGrid(town) {
+    const key = `${town.key}|fields`;
+    const kept = grids.get(key);
+    if (kept && kept.base === town.nav) return kept;
+    const made = { base: town.nav, sig: 'fields', nav: coverNav(town.nav, solidsOf(town)), shut: false };
+    grids.delete(key);
+    grids.set(key, made);
+    if (grids.size > JOURNEY_GRIDS_MAX) grids.delete(grids.keys().next().value);
+    return made;
+  }
   /** The town's journey grid: its own with each open gate's passage carved through (`allOpen`: every gate's, as by day)
    *  - and whether any gate is shut. */
   function journeyGrid(town, allOpen = false) {
@@ -116,18 +140,17 @@ export function createTownWalk(host) {
     townPace(n) {
       const town = townAt(n);
       if (!town?.inside) return null;
-      const pace = paceAt(town.px.x, town.px.y);
-      const pieces = edgePieces(town.nav);
-      if (!town.b.cityGates?.length || pieces.edge.size >= pieces.all) return pace;   // no walls (or none that close): the grid is the town
-      const at = snapCell(town.nav, town.cell);   // a doorstep reads as its street
-      return at && pieces.edge.has(componentsOf(town.nav)[at[1] * town.nav.width + at[0]]) ? null : pace;   // the fields' piece (the residents' grid, its gates closed) is no street of the town
+      return inFields(town) ? null : paceAt(town.px.x, town.px.y);   // the fields' piece (the residents' grid, its gates closed) is no street of the town
     },
     townWay(from, to) {
       const town = townAt(from);
       if (!town?.inside) return null;
       const t = state.localFromWorld(to.x, to.z);
       const toCell = town.nav.worldToNav(t[0] - town.o[0] - town.t[0], t[1] - town.o[2] - town.t[2]);
-      const grid = journeyGrid(town);
+      // outside the walls and bound outside them: round the walls, never through the city; a way to a street inside is
+      // still through a gate
+      const outside = inFields(town) && inFields(town, toCell);
+      const grid = outside ? fieldsGrid(town) : journeyGrid(town);
       // IC-STUTTER: searched WAY_STEPS_AN_ASK steps an ask, from where the traveller stood when it was first asked (the walk's
       // first run is checked from where the body stands - the pursuit takes it up from there); its own scratch (the grid's
       // record), so the residents' searches between its steps never begin it again
@@ -135,12 +158,12 @@ export function createTownWalk(host) {
       if (making?.k !== k) making = { k, steps: townWayCellsSteps(grid.nav, town.cell, toCell, { scratchKey: grid }) };
       let got = making.steps.next();
       for (let n = 1; !got.done && n < WAY_STEPS_AN_ASK; n++) got = making.steps.next();
-      if (!got.done) return { pending: true, pts: [], inside: true, shut: false, pace: paceAt(town.px.x, town.px.y) };
+      if (!got.done) return { pending: true, pts: [], inside: true, shut: false, pace: outside ? Infinity : paceAt(town.px.x, town.px.y) };
       making = null;
       const way = got.value;
       // short of its point: behind a shut gate - said, if the gates open by day would have let it through; else (a yard
       // the houses close in, its piece no street reaches) walked as far as it reaches, never blamed on the gates
-      const pace = paceAt(town.px.x, town.px.y);   // IC-PACE
+      const pace = outside ? Infinity : paceAt(town.px.x, town.px.y);   // a town's streets at its pace; its fields are open ground, at the journey's own rate
       if (!way?.reached && grid.shut && townWayCells(journeyGrid(town, true).nav, town.cell, toCell)?.reached) return { pts: [], inside: !!way?.inside, shut: true, pace };
       if (!way) return null;
       // AUDIT OW-REVISITED L1-2: the first cell kept - the walk's first run is checked from it (the pursuit takes it up

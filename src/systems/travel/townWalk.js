@@ -420,3 +420,30 @@ export function* townWayCellsSteps(nav, from, to, { maxExpansions = nav.width * 
  *  arrival buffer, at the mod's speed, its arrival box. */
 export const classicTownRoute = (summary) =>
   ({ legs: [], i: 0, summary, point: null, quiet: false, join: null, street: null, streetFor: null, townAt: null });
+
+/** How many times a journey asks a town for its way again, from where it stands, when the steering would stop it in
+ *  that town's streets. */
+export const STREET_REPLANS = 2;
+
+/**
+ * A steering stop in a town's streets, answered by a way asked again (`restart`) rather than the end of the journey:
+ * what stopped the body is on no grid the way was planned on (a cart, a fence no model holds), and a way from where the
+ * body now stands goes round it. STREET_REPLANS times a town; then, or off a street, the stop stands.
+ * @param {any} route - the journey's route (travelOptions.js `st.route`), or null
+ * @param {string | null} stop - the steering's answer: 'stuck', 'blocked' or null
+ * @param {() => void} restart - begins the leg again: its town's way asked from where the body stands
+ * @returns {string | null} the stop that stands, or null
+ */
+export function streetReplan(route, stop, restart) {
+  if (!stop || !route?.street) return stop;
+  if (route.replanTown !== route.townAt) {
+    route.replanTown = route.townAt;
+    route.replans = 0;
+  }
+  if (route.replans >= STREET_REPLANS) return stop;
+  route.replans++;
+  route.street = null;
+  route.streetFor = null;
+  restart();
+  return null;
+}
