@@ -139,28 +139,6 @@ const REFUSAL_WORDS = {
   'bad-login': () => t('account.refusal.badLogin', 'That username and password do not match.'),
   'bad-code': () => t('account.refusal.badCode', 'That username and recovery code do not match.'),
   'codes-moved': () => t('account.refusal.codesMoved', 'Your recovery codes changed in the meantime. Try again.'),   // RECOVERY-SET: two presses raced (accounts.js newRecoveryCodes)
-  // POI-1: the POI store's refusals (server-account/src/poi.js) - the editor's, said to a builder or an approver
-  'poi-not-builder': () => t('account.refusal.poiNotBuilder', 'Only builders can do that. Ask a developer to add your username to the builders.'),
-  'poi-not-approver': () => t('account.refusal.poiNotApprover', 'Only an approver can decide what goes into the world.'),
-  'poi-not-author': () => t('account.refusal.poiNotAuthor', 'Only the builder who made that draft can do that.'),
-  'poi-sha': () => t('account.refusal.poiSha', 'That upload had the wrong file name. Reload the editor and try again.'),
-  'poi-sha-mismatch': () => t('account.refusal.poiShaMismatch', 'That upload arrived damaged. Try again.'),
-  'poi-kind': () => t('account.refusal.poiKind', 'That file is not the type it was sent as. Upload it again.'),
-  'poi-bad-mesh': () => t('account.refusal.poiBadMesh', 'That model could not be read. Import it again.'),
-  'poi-bad-texture': () => t('account.refusal.poiBadTexture', 'A texture must be a PNG, JPEG or WebP image no larger than 4096 pixels on a side.'),
-  'poi-quota': () => t('account.refusal.poiQuota', 'You have uploaded all you can today. Try again tomorrow.'),
-  'poi-doc': () => t('account.refusal.poiDoc', 'This place has problems to fix first. The editor lists them.'),
-  'poi-state': () => t('account.refusal.poiState', 'That revision has changed since you opened it. Refresh and try again.'),
-  'poi-not-live': () => t('account.refusal.poiNotLive', 'That POI is not in the world, so it cannot be retired.'),
-  'poi-pending': () => t('account.refusal.poiPending', 'A retirement of that POI is already waiting for approval.'),
-  // AUDIT POI: the store's newer words - a submission changed under the approver's look (S1), a builder's holdings full
-  // (S10: a full shelf had been told a full day's uploads), and an entry taken off the shelf (U13: it had been told the
-  // service does not know the request)
-  'poi-changed': () => t('account.refusal.poiChanged', 'That submission has changed since you looked at it. Look at it again before you decide.'),
-  'poi-drafts-full': () => t('account.refusal.poiDraftsFull', 'You have the most drafts and submissions a builder can have open. Send a draft, or wait for an approver to decide on one, before you start another.'),
-  'poi-shelf-full': () => t('account.refusal.poiShelfFull', 'Your library shelf is full. Remove entries you no longer need to make room.'),
-  'poi-shelf-spent': () => t('account.refusal.poiShelfSpent', 'You have added the most library entries a builder can, counting ones you removed. Ask a developer to make room.'),
-  'poi-gone': () => t('account.refusal.poiGone', 'That library entry has been removed.'),
   email: () => t('account.refusal.email', 'That does not look like an email address.'),
   rate: () => t('account.refusal.rate', 'Too many attempts. Wait a few minutes and try again.'),
   auth: () => t('account.refusal.auth', 'You have been signed out. Sign in again.'),
@@ -223,12 +201,6 @@ const REFUSAL_WORDS = {
   'ladder-needs-account': () => t('account.refusal.ladderNeedsAccount', 'The ladder online needs a username and a password. Give this account one and your climb is kept.'),   // AUDIT ARENA-LADDER 2: a guest climbs nothing online
   joined: () => t('account.refusal.joined', 'You already fight under a banner. Leave it at its recruiter first.'),
   season: () => t('account.refusal.season', 'You left that banner this season. You can rejoin it next season.'),
-  // PATREON-LINK, a patron's own Patreon (server-account/src/patreon.js). `signature` is the webhook's, met by Patreon
-  // and never a player; it has a sentence because every word the service says does.
-  'patreon-closed': () => t('account.refusal.patreonClosed', 'Patreon linking is not available yet.'),
-  'patreon-down': () => t('account.refusal.patreonDown', 'Patreon did not answer. Try linking again in a minute.'),
-  'patreon-needs-account': () => t('account.refusal.patreonNeedsAccount', 'Linking Patreon needs a username and a password. Give this account one first.'),
-  signature: () => t('account.refusal.signature', 'The account service could not check who sent that request.'),
   // MOD1, moderation. A moderator reads these in chat, beside the
   // command they just typed.
   'not-moderator': () => t('account.refusal.notModerator', 'Only moderators can do that.'),
@@ -1223,10 +1195,6 @@ export const buyInsignia = (io, item, rid = null) => call(io, '/v1/account/insig
 /** AUDIT FB1024 (BROKER-RID): a Broker sale whose answer was lost, asked after by its request id (`{ rid, nonce }`) -
  *  server-account/src/brokerSales.js settleBrokerSale. Signed out, nothing is asked. */
 export const settleBrokerSale = (io, body) => (io ? call(io, '/v1/broker/settle', body) : Promise.resolve({ ok: false, error: 'no-session' }));
-/** PATREON-LINK: take this account's Patreon off it - `{ ok, titles, title, glyphs, auras, aura, insignia, patreon }`,
- *  the wardrobe after it and the card's Patreon row. Linking has no call here: the account read carries the link, and
- *  the player follows it in a browser (server-account/src/patreon.js says why). */
-export const unlinkPatreon = (io) => call(io, '/v1/patreon/unlink', {});
 
 /** ACC4: ONE BEAT OF TIME PLAYED. It carries no number - the service
  *  credits the gap by its own clock (net/playClock.js says why), and
@@ -1609,11 +1577,7 @@ export function accountTokenMinter({ fetch, storage, onIssued = null, character 
     },
     /** AUDIT SAFE CLIENT-2: THE HELD TOKEN LET GO - the relay said this account is banned
      *  (scenes/chatSafetyHost.js), and a token minted a moment before the ban opened every room a rejoin asked within
-     *  TOKEN_REUSE_MS. The next room mints, and the service refuses it.
-     *  STAFF-HIDE-TOGGLE: and Hide me or Show myself pressed
-     *  (scenes/staffFollowHost.js relinkGame) - a token signed before the press would open a room as the game was, so it
-     *  goes, and so does any mint still on its way (`forgets`): the next room asks the service, which reads the switch as
-     *  it stands now. */
+     *  TOKEN_REUSE_MS. The next room mints, and the service refuses it. A mint still on its way goes too (`forgets`). */
     forget: () => { held = null; forgets++; },
     /** DOOR-TOKEN: does this minter hold a token `room` would be handed now, nothing on the wire (the reuse law) - a
      *  session whose hello went without one asks again the moment it does (net/online.js). */
@@ -2280,13 +2244,6 @@ export function accountMarket({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) 
     // GOLD-MARKET: a realm character's gold its sales hold, collected into its record (`{ character, realm, region }`)
     gold: (req) => post('/v1/market/gold', req),
   };
-}
-
-/** SEA-SEASON: THE SEA'S SEASON BOARDS' DOOR (server-account/src/seaSeason.js) - the season's deepest voyages and legends
- *  ended, and the asking character's rank each way (`board`: `{ character }`). Its answer is `call`'s shape. */
-export function accountSeaSeason({ fetch, storage, waitMs = ACCOUNT_ACT_WAIT_MS }) {
-  const post = waitedPost({ fetch, storage }, waitMs);
-  return { board: (req) => post('/v1/sea/season/board', req) };
 }
 
 /** CREW-SIGNED: A CREW HALL'S DOOR (server-account/src/crewSigns.js) - a town's hall on a day (`hall`: `{ town, day }` -

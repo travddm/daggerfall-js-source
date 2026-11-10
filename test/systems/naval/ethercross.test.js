@@ -77,7 +77,7 @@ test('ETHER-CROSSING by source: asked at a helm in the exterior with no window u
 });
 
 test('ETHER-SEA the ledger\'s record: isles charted once each (the log\'s islands), a legend\'s day, a strand\'s day (the newest kept), the way out, the crossings, the legends heard - kept whole by the save and cleaned field by field (mutants: each field, the bounds)', () => {
-  assert.deepEqual(newEther(), { charted: [], legends: {}, harvested: {}, from: null, crossings: 0, heard: [], season: null, fleets: [], wrack: [] });
+  assert.deepEqual(newEther(), { charted: [], legends: {}, harvested: {}, from: null, crossings: 0, heard: [], fleets: [], wrack: [] });
   assert.equal(ETHER_CHARTED_MAX, 4096); assert.equal(ETHER_HARVEST_KEEP, 128);
   const a = createCaptainLedger();
   assert.equal(a.chartIsle('800,249'), true); assert.equal(a.chartIsle('800,249'), false); assert.equal(a.chartIsle(5), false);
@@ -101,7 +101,7 @@ test('ETHER-SEA the ledger\'s record: isles charted once each (the log\'s island
   const c = createCaptainLedger();
   c.restoreSaveData({ ether: { charted: ['1,2', '1,2', 'x', 5, '-3,4'], legends: { wake: 4, junk: 'q' }, harvested: { '1,1': 3, n: null }, from: { px: 'no' }, crossings: -4, heard: ['wake', 9, 'wake'] } });
   const e = c.getSaveData().ether;
-  assert.deepEqual(e, { charted: ['1,2'], legends: { wake: 4 }, harvested: { '1,1': 3 }, from: null, crossings: 0, heard: ['wake'], season: null, fleets: [], wrack: [] });
+  assert.deepEqual(e, { charted: ['1,2'], legends: { wake: 4 }, harvested: { '1,1': 3 }, from: null, crossings: 0, heard: ['wake'], fleets: [], wrack: [] });
   for (let i = 0; i < ETHER_CHARTED_MAX + 3; i++) c.chartIsle(`${i % 4000},${Math.floor(i / 4000)}`);
   assert.equal(c.charted().length, ETHER_CHARTED_MAX, 'no more than the charts hold');
   const lines = Object.fromEntries(logLines({ ...newLog(), islands: 3, deepest: 12, legends: ['The Drowned Queen'] }));

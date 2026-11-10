@@ -165,7 +165,6 @@ function exteriorFrame({ lane, night, town, boats, eye }) {
     naval: null,   // NAV-B: the broadsides' flashes and the burning decks join the hand lights - no sea in this pin
     festivalStage: null,   // FESTIVAL-STAGE: no Festival in this pin
     quays: null,
-    poiHost: null,
     yards: null,
     portHost: null,
     CITY_LIGHT_COLOR_F32: lanternColor(lane, new Float32Array(CITY_LIGHT_COLOR)),

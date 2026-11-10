@@ -4,6 +4,9 @@ Status: decided, 2026-11-03 (owner decision 23g and its follow-up answers). Not 
 lists the order. Companion to the simulation-core note: the relay checks or decides on messages and never simulates a
 room per frame. Paths are relative to the repository root.
 
+Online play does not enforce Hardcore or Ironman yet, so an online page does not offer them and the account service
+refuses them (`src/systems/unenforced-online-modes.ts`, decision 116 (1)). Offline the picker offers all five.
+
 ## Summary
 
 - The player picks one of five modes when creating a character: Classic (default), Hardcore, Legacy, Ironman,
@@ -162,8 +165,7 @@ Hardcore characters out of all PvP and would need a second health model on the r
 - The row stays, with `dead_at` and `dead_why = 'fell'`, and appears in a Hall of the Fallen (name, class, level,
   place, time, killer when known). The slot is freed.
 - The existing party Resurrect window applies (150 s).
-- Staff may take a death back through the existing operator revival (`realm-revive.yml`, D1 Time Travel;
-  `docs/multiplayer/account-service.md:148`; `revived.js` `takeBack`) for a verified bug only. Section 4.4.
+- Staff may take a death back for a verified bug only (`revived.js` `stampRevived` stamps it). Section 4.4.
 
 ### 2.4 Ironman details
 

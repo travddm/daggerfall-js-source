@@ -1,4 +1,4 @@
-// SCHOOLS - ARCANE SPECIALISATIONS. The Patreon chat, through the
+// SCHOOLS - ARCANE SPECIALISATIONS. The players' chat, through the
 // owner: "making mage characters recently ... they all kind of end up the same ... specialisation based on the two master
 // skills you pick ... Restoration and Mysticism could be the requirements for a Necromancer sub-class". Asked, the owner
 // chose: the pair chosen once among the mastered schools, permanent; a signature spell, a passive and every school paying

@@ -310,8 +310,8 @@ export const saveKey = (playerId, characterId, saveName, part) =>
  *  bound somebody raises by accident. */
 export const SAVE_MAX_BYTES = 4 * 1024 * 1024;
 
-/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only its own
- *  deploy sets (.github/workflows/realm-revive.yml); every call but /v1/health and /v1/pubkey is then refused 503. */
+/** The switch a history repair throws for its minute - MAINTENANCE = "1", a var only an
+ *  operator's deploy sets; every call but /v1/health and /v1/pubkey is then refused 503. */
 export const maintaining = (/** @type {any} */ env) => env?.MAINTENANCE === '1';
 export const SHOT_MAX_BYTES = 256 * 1024;
 /** Slots per ACCOUNT. An account at this bound is refused; its oldest
@@ -501,10 +501,10 @@ export const ROUTES = new Set([
   '/v1/board/read', '/v1/board/pin', '/v1/board/take-down', '/v1/board/report', '/v1/board/mod/remove', '/v1/board/mod/restore',
   '/v1/board/notice', '/v1/board/notice/remove',
   // SAFE1-SAFE8: a player's block list, a report, the code of conduct agreed;
-  // a moderator's ban, unban and look; and the two doors a stranger reaches that prove themselves (SAFE_OPEN_ROUTES);
+  // a moderator's ban, unban and look; and the door a stranger reaches that proves itself (SAFE_OPEN_ROUTES);
   // AUDIT SAFE DOC-4: the moderators' read of the cases in the game - the open ones, one, and its dismissal
   '/v1/safety/blocks', '/v1/safety/block', '/v1/safety/unblock', '/v1/safety/report', '/v1/safety/conduct',
-  '/v1/mod/ban', '/v1/mod/unban', '/v1/mod/strikes', '/v1/mod/feed', '/v1/discord/interactions',
+  '/v1/mod/ban', '/v1/mod/unban', '/v1/mod/strikes', '/v1/mod/feed',
   '/v1/mod/cases', '/v1/mod/case', '/v1/mod/dismiss',
   // STAFF-PANEL1: the staff panel's doors (staff.js) - its own sign-in and session, never a game session (STAFF_ROUTES)
   '/v1/staff/login', '/v1/staff/enroll', '/v1/staff/me', '/v1/staff/logout', '/v1/staff/keys', '/v1/staff/key/forget',
@@ -584,7 +584,6 @@ export const ROUTES = new Set([
   '/v1/market/read', '/v1/market/list', '/v1/market/buy', '/v1/market/cancel', '/v1/market/order', '/v1/market/fill',
   '/v1/market/unorder', '/v1/market/collect', '/v1/market/report', '/v1/market/remove', '/v1/market/auction', '/v1/market/bid',
   '/v1/market/gold',
-  '/v1/sea/season/board',   // SEA-SEASON: the sea's season boards
   '/v1/crew/hall', '/v1/crew/sign', '/v1/crew/release',   // CREW-SIGNED: a crew hall's recruit signed once online (crewSigns.js)
   // HOME-VENDOR: a home's trader's stock, and the region's traders
   '/v1/market/vendor', '/v1/market/vendors', '/v1/market/myvendors',
@@ -601,9 +600,6 @@ export const ROUTES = new Set([
   '/v1/realm/raise',
   // LEGACY7 part three: a half of one wedding between two players' characters, and the account's unions
   '/v1/realm/wed', '/v1/realm/unions',
-  // PATREON-LINK: a patron's own Patreon, linked (patreon.js) - Patreon sends the player back to the callback, the
-  // confirm is their yes, the webhook is Patreon's word on a member; the unlink is the account's, behind a session.
-  '/v1/patreon/callback', '/v1/patreon/confirm', '/v1/patreon/webhook', '/v1/patreon/unlink',
   // ARENA4: the arena (arena.js) - a bout's receipt the relay signed, carried here by an account it names; the boards,
   // counted from the rows; a banner joined or quit. Every one behind a session; a guest reads the boards and keeps nothing.
   '/v1/arena/claim', '/v1/arena/board', '/v1/arena/team',
@@ -618,42 +614,14 @@ export function realmPathOf(path) {
   return m ? { id: m[1] } : null;
 }
 
-/**
- * POI-1: THE POI STORE'S PATHS - `{ route, sha?, id? }`, or null for a path that
- * is not one. Matched as a save slot is, so the 404 knows them: `live` and an asset's GET are read without a session (a
- * live asset; a draft's needs a builder's), the rest behind one.
- *   GET /v1/poi/live | GET /v1/poi/asset/<sha> | PUT /v1/poi/asset/<sha>?kind=mesh|texture
- *   GET /v1/poi/me | /v1/poi/list | /v1/poi/queue | /v1/poi/doc/<id>
- *   PUT /v1/poi/draft { doc, base } | POST /v1/poi/{submit,withdraw,retire,review,rollback}
- * @param {string} path
- */
-export function poiPathOf(path) {
-  if (typeof path !== 'string' || !path.startsWith('/v1/poi/')) return null;
-  const rest = path.slice('/v1/poi/'.length);
-  if (['live', 'me', 'list', 'queue', 'draft', 'submit', 'withdraw', 'retire', 'review', 'rollback', 'shelf', 'unshelve'].includes(rest)) return { route: rest };
-  let m = /^asset\/([0-9a-f]{64})$/.exec(rest);
-  if (m) return { route: 'asset', sha: m[1] };
-  m = /^doc\/(poi-[0-9a-f]{12})$/.exec(rest);
-  if (m) return { route: 'doc', id: m[1] };
-  m = /^shelf\/(lib-[0-9a-f]{12})$/.exec(rest);   // POI-4b: one library entry
-  if (m) return { route: 'shelf', id: m[1] };
-  return null;
-}
-
 /** The routes a caller reaches WITHOUT a credential. Everything else
  *  resolves a session first. Named rather than special-cased inside the
  *  ladder, so "what can a stranger reach?" has one answer. */
 export const OPEN_ROUTES = new Set(['/v1/health', '/v1/auth/guest', '/v1/auth/login', '/v1/auth/recover']);
 
-/** PATREON-LINK: the three a stranger reaches that are NOT the JSON ladder's - a browser carrying Patreon's code back
- *  (a GET, answered with a page), the page's yes (a form), and Patreon's own webhook. Each proves itself with what it
- *  carries - a state or a ticket this service signed, a signature under the webhook's secret - never a session. */
-export const PATREON_OPEN_ROUTES = new Set(['/v1/patreon/callback', '/v1/patreon/confirm', '/v1/patreon/webhook']);
-
-/** SAFE5 + SAFE8: the chat safety's two doors a stranger reaches, NOT the JSON ladder's - the relay's feed of public
- *  lines and Discord's presses and commands. Each proves itself by a signature over its exact bytes (the relay's receipt
- *  key, the Discord application's key), never a session. */
-export const SAFE_OPEN_ROUTES = new Set(['/v1/mod/feed', '/v1/discord/interactions']);
+/** The chat safety's door a stranger reaches, NOT the JSON ladder's - the relay's feed of public lines. It proves
+ *  itself by a signature over its exact bytes (the relay's receipt key), never a session. */
+export const SAFE_OPEN_ROUTES = new Set(['/v1/mod/feed']);
 
 /** STAFF-PANEL1: the staff panel's doors (staff.js), NOT the JSON ladder's - none takes a game session. Two prove themselves by
  *  a password and an extension's signature (login, enroll); the rest by a staff session in `x-staff-session`. */

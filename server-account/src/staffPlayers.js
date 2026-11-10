@@ -84,8 +84,6 @@ export const NAME_COPIES = Object.freeze([
   // account's own line naming a material spelled as its old handle is renamed too; name the kinds if that ever matters
   ['marks_ledger', 'who', 'actor = ?3'],
   ['town_seat_pledges', 'set_by'], ['town_seat_windows', 'set_by'], ['town_seat_hires', 'by_name'], ['town_seat_edicts', 'set_by'],
-  ['poi_revs', 'author_name', 'author = ?3'], ['poi_revs', 'reviewer_name', 'reviewer = ?3'], ['poi_shelf', 'by_name', 'by = ?3'], ['poi_shelf', 'updated_by'],
-  ['poi_shelf', 'gone_by'],
 ]);
 /** A character list read at most this many (D1 binds 100 a statement). */
 const CHARS_READ_MAX = 90;

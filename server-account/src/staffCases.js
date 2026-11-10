@@ -19,8 +19,8 @@
 // A CLAIM (, "mods can only take one"): a Moderator holds one open case at a
 // time, checked in the statement that takes it; an Admin takes any, one a Moderator holds too, and the Moderator is told
 // (`claim_from`, answered as `lost`). A claim lets go CLAIM_S after its holder's last look or act on it. While another
-// member holds a case, the panel's acts on its account are refused (`staff-claimed`), and so is a Discord press on it
-// (discord.js onPress).
+// member holds a case, the panel's acts on its account are refused (`staff-claimed`), and so is the game's (safety.js
+// modAct).
 //
 // EVERY LIST PAGES: `from` the offset of the next page,
 // answered as `next` while more stand.
@@ -97,7 +97,6 @@ export function caseUrgency(c, { reports, strikes, nowS }) {
   else if (n >= 2 && counted.length) raise(1, '');   // reporters who are all guests or new accounts are low
   if (strikes >= LADDER_BAN_AT) raise(2, `${strikes} strikes: next is a ban`);
   else if (strikes > 0) raise(1, `${strikes} strike${strikes === 1 ? '' : 's'}`);
-  if (c.discord_state === 'failed') raise(1, 'Discord card failed');
   if (reports.length && !counted.length) why.push('reporters all guests or new');
   if (nowS - Number(c.updated_at) >= STALE_S && rank < 2) { rank++; why.push('untouched for a day'); }
   return { level: /** @type {'high'|'medium'|'low'} */ (LEVELS[rank]), why: why.filter(Boolean) };

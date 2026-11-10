@@ -13,7 +13,7 @@
 // vampireStatMod) on the sun's own seam.
 
 import '../modsOff.js';
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createLycanthropyCurse, lycanthropyMagicRound, morphSelf, liveLycanthropy, morphHeals, lycanthropeAdvantages,
@@ -26,7 +26,7 @@ import { skillValue, SKILLS } from '../../src/systems/skills.js';
 import { WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 import { pcaaoModules, pcaaoAttackDamage, pcaaoHandToHandAttackDamage } from '../../src/combat/pcaao.js';
 import { calculateAttackDamage, handToHandAttackDamage } from '../../src/combat/formulas.js';
-import { clawMetalDamage } from '../../src/combat/clawMetal.js';
+import { clawMetalDamage, CLAW_METAL_PREF } from '../../src/combat/clawMetal.js';
 import { computeCombatStats } from '../../src/combat/combatStats.js';
 import { equipItem, equipTableOf, EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { armorOfMaterial } from '../../src/combat/enemyEquipment.js';
@@ -36,6 +36,11 @@ import { makeEnemyEntity } from '../../src/characters/enemy/enemyEntity.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { vampireStatMod, VAMPIRE_STAT_MOD } from '../../src/systems/vampirism.js';
 import { setPassiveSpecialsHost } from '../../src/systems/passiveSpecials.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Claws take gauntlet metal on. DFU's default (off) is test/combat/clawmetal_option.test.js.
+before(() => setPref(CLAW_METAL_PREF, true));
+after(() => setPref(CLAW_METAL_PREF, false));
 
 const QUIET = (() => {
   let m = CLASSIC_GAME_START_TIME;

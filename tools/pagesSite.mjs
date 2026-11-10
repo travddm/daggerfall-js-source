@@ -4,8 +4,6 @@
 //
 //   npm run pages:build              production build into scratch/pages-site (the same steps as the workflow:
 //                                    tools/fetch-vendor.sh, then `npm run build`, then dist/ copied to the site root)
-//   npm run pages:build -- --atlas   also builds the chatgpt/exact-face-atlas branch and mounts it at
-//                                    preview/exact-face-atlas, as the workflow does (needs network and `git fetch`)
 //   npm run pages:preview            serves scratch/pages-site on http://localhost:4173/
 //
 // Keep the steps in step with the `site` job in .github/workflows/deploy.yml.
@@ -16,8 +14,6 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = join(ROOT, 'scratch', 'pages-site');
-const ATLAS_BRANCH = 'chatgpt/exact-face-atlas';
-const ATLAS_DIR = join(ROOT, 'scratch', 'pages-atlas');
 
 function run(command, args, cwd = ROOT) {
   console.log(`\n> ${command} ${args.join(' ')}   (${cwd})`);
@@ -46,23 +42,8 @@ function buildSite() {
   }
 }
 
-function buildAtlas() {
-  rmSync(ATLAS_DIR, { recursive: true, force: true });
-  run('git', ['fetch', 'origin', ATLAS_BRANCH]);
-  run('git', ['worktree', 'prune']);
-  run('git', ['worktree', 'add', '--detach', ATLAS_DIR, 'FETCH_HEAD']);
-  run('npm', ['ci'], ATLAS_DIR);
-  run('npm', ['run', 'build'], ATLAS_DIR);
-  const mount = join(SITE, 'preview', 'exact-face-atlas');
-  mkdirSync(mount, { recursive: true });
-  cpSync(join(ATLAS_DIR, 'dist'), mount, { recursive: true });
-  // npm ci inside a worktree leaves node_modules behind; the worktree goes, the built copy stays in the site.
-  rmSync(join(ATLAS_DIR, 'node_modules'), { recursive: true, force: true });
-  run('git', ['worktree', 'remove', '--force', ATLAS_DIR]);
-}
-
-if (process.argv.includes('--atlas') === false && process.argv.slice(2).some((arg) => arg.startsWith('-'))) {
-  console.error('usage: node tools/pagesSite.mjs [--atlas]');
+if (process.argv.slice(2).length > 0) {
+  console.error('usage: node tools/pagesSite.mjs');
   process.exit(2);
 }
 
@@ -71,5 +52,4 @@ buildSite();
 rmSync(SITE, { recursive: true, force: true });
 mkdirSync(SITE, { recursive: true });
 cpSync(join(ROOT, 'dist'), SITE, { recursive: true });
-if (process.argv.includes('--atlas')) buildAtlas();
 console.log(`\nSite ready in ${SITE}. View it with: npm run pages:preview`);

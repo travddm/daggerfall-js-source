@@ -71,9 +71,11 @@ test('MENU T4: the widget law is total, and a blocked row never shows a stored v
       assert.ok(INSTEAD[k], `${k} has no "instead" sentence`);
     }
   }
-  // THE HONESTY CASE: EnhancedCombatAI stores DFU's True while this
-  // port runs the classic path. Printing "On" would be a lie.
-  assert.equal(formatValue('Enhancements/EnhancedCombatAI', 'True'), 'classic');
+  // THE HONESTY CASE: a blocked row never prints its stored value. AdvancedClimbing can store True while the port runs
+  // the classic climbing, so "On" would be a lie.
+  assert.equal(formatValue('Enhancements/AdvancedClimbing', 'True'), 'classic');
+  // EnhancedCombatAI is live: it prints the value the foes run by
+  assert.equal(formatValue('Enhancements/EnhancedCombatAI', 'True'), 'On');
   // enums are DFU's names in DFU's order
   for (const [k, law] of Object.entries(ENUM_LAW)) {
     assert.ok(law.values.length >= 2 && law.cite, `${k}: enum needs values and a citation`);

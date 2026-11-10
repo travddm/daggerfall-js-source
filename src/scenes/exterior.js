@@ -76,7 +76,6 @@ import { PITCH_LIMIT } from '../player/mwCamera.js';   // MW-D30: camera.cpp:323
 import { getStaticDoors } from '../world/staticDoors.js';
 import { createDataPipeline } from './dataPipeline.js';
 import { createWorldModes } from './worldModes.js';
-import { setAmbientTextHost, tickAmbientText } from '../systems/ambientText.js';   // AT2: Ambient Text's one component - this host claims it and feeds it the frame
 import { setDefaultEnchantCtx } from '../systems/enchantments.js';   // AUDIT 58 (f2/hosts): the session's ONE enchant ctx - this host mounted none
 import { createEnchantCtx, standLooseFoe, LOOSE_FOE_PLACE_ATTEMPTS } from './hostEnchant.js';   // FS1 (wave D): the ONE ctx body + SD1's loose-foe placement
 import { windowEmissionRGB } from '../render/windowEmission.js';
@@ -4650,30 +4649,6 @@ export async function bootExterior(canvas, renderer, params, status) {
       return !!quest;
     },
   });
-  // AT2: AMBIENT TEXT CLAIMS ITS HOST - THE FOUR HOSTS RULE, and this
-  // is the second of the two that own an exterior motor. The same one
-  // component as in scenes/world.js (systems/ambientText.js holds it);
-  // only one of these two scenes exists on a page, so only one claim
-  // stands. `_musicInLocationRect` is this host's F061 widened town
-  // rect, which is `true` by construction - the probe scene IS a town -
-  // so the key's family here is always the location's, never `None`.
-  setAmbientTextHost({
-    paused: () => gamePaused(),
-    say: (text, seconds) => townTalk.say(text, seconds),   // DaggerfallUI.AddHUDText(text, delay)
-    insideBuilding: () => _mode() === 'interior',   // AUDIT AT F5: the one flag Update reads every frame - see the note in world.js
-    where: () => {
-      const inside = modes?.insideContext?.() ?? { insideDungeon: false, dungeonType: 255 };
-      return {
-        insideDungeon: inside.insideDungeon,
-        dungeonType: inside.dungeonType,
-        inLocationRect: _musicInLocationRect(),
-        locationType: _musicLocationType(),
-        isDay: !isNight(minuteNow()),        // WorldTime.Now.IsDay
-        climateIndex: locClimateIndex,       // PlayerGPS.CurrentClimateIndex - this host stands on one pixel
-        weather: currentWeather(),
-      };
-    },
-  });
   /** SD1: SoulBound's break release and the Sanguine Rose's
    *  Daedroth, through DFU's own placement - in whichever world the
    *  player is actually standing in. ROAD-G G2 GAVE THE EXTERIOR ARM
@@ -5197,9 +5172,6 @@ export async function bootExterior(canvas, renderer, params, status) {
       },
     });
 
-    // AT2: AmbientTextMod.Update, above the modal gate - see the note
-    // at the same line in scenes/world.js.
-    tickAmbientText();
     {   // STEED-UI: the saddle panel (world.js saddleDrawPanel's twin) - above the modal gate, every mode, so a door takes it down
       const show = isEnhancedPlus() && typeof document !== 'undefined' && walkMode && modeNow() === 'exterior' && !(townTalk.overlay instanceof DeathScreen);
       saddleHost.frame({

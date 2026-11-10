@@ -29,11 +29,12 @@ function grid(w, h, wall = () => false) {
 }
 /** The real Travel Options over a stub world: `rect` the place's rect law, `town`/`way` the town walk's, `words` every
  *  word the mod says or boxes. */
-function rig({ rect = null, town = () => null, way = () => null, atSea = () => false } = {}) {
+function rig({ rect = null, town = () => null, way = () => null, atSea = () => false, avoidObstacles = true, steer = undefined } = {}) {
   const state = { pos: mid(500, 250), pixel: { x: 500, y: 250 } };
   const words = [], asked = [];
   const ui = new TravelControlUI({ defaultStartingAccel: 10, accelerationLimit: 60 });
-  const settings = readTravelOptionsSettings((vendor, key) => (vendor === 'roads-hazelnut' ? key === 'Enabled' : modSetting(vendor, key)));
+  const settings = readTravelOptionsSettings((vendor, key) => (vendor === 'roads-hazelnut' ? key === 'Enabled'
+    : key === 'GeneralOptions.AvoidObstacles' ? avoidObstacles : modSetting(vendor, key)));
   const to = createTravelOptions({
     settings, ui,
     roads: () => ({ roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500), source: 'basic-roads' }),
@@ -44,7 +45,7 @@ function rig({ rect = null, town = () => null, way = () => null, atSea = () => f
     setTimeScale: () => {}, now: () => 0, worldTimeNow: () => 0, roll100: () => 100,
     locationWorldRect: rect ?? ((s) => { const o = mapPixelWorldOrigin(s.pixel.x, s.pixel.y); return rectOf(o.x + 16000, o.z + 16000, 768, 768); }),
     locationTileRect: () => null, pushWindow: (w) => { w.show(); },
-    townKey: (n) => town(n), townWay: (a, b) => { asked.push([a, b]); return way(a, b); }, atSea,
+    townKey: (n) => town(n), townWay: (a, b) => { asked.push([a, b]); return way(a, b); }, atSea, steer,
   });
   const go = (at, px, py) => { const p = px == null ? worldCoordToMapPixel(at.x, at.z) : { x: px, y: py }; state.pixel = p; state.pos = at; return to.update({ topWindowIsTravelUI: true, isPlayerOnHUD: false }); };
   return { to, state, words, asked, go };
@@ -321,4 +322,61 @@ test('AUDIT OW-REVISITED L1-9: a line of runs is arrived at its end\'s square on
   assert.equal(ap.update({ worldX: 160, worldZ: 50, mapPixelX: 0, mapPixelY: 0 }).arrived, false, 'in the end\'s square from the first run\'s side: walked on');
   const lane = new TravelAutopilot({ x: 0, y: 0 }, rectOf(150, 0, 100, 100), 1, { path: [[0, 0], [200, 40]] });
   assert.equal(lane.update({ worldX: 160, worldZ: 50, mapPixelX: 0, mapPixelY: 0 }).arrived, true, 'a lane\'s end square: arrived');
+});
+
+test('the mod\'s named journey walks the streets of the town it starts in and of every town it crosses, under Avoid Obstacles; off, it is the mod\'s beeline and asks no town', () => {
+  const start = mid(500, 250), exit = { x: start.x - 6000, z: start.z }, other = mid(499, 250);
+  const town = (n) => (Math.abs(n.x - start.x) < 8000 ? '500,250' : Math.abs(n.x - other.x) < 8000 ? '499,250' : null);
+  const r = rig({ town, way: () => ({ pts: [exit], pace: 5 }) });
+  r.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(r.asked.length, 1, 'the town the traveller stands in is asked for its way');
+  assert.equal(r.to.state.route.street.pts.length, 1, 'and its way is the journey\'s first run');
+  assert.deepEqual(r.to.state.autopilot.path.at(-1), [exit.x, exit.z], 'walked to where the way ends');
+  r.go(exit);
+  assert.equal(r.to.state.route.street, null, 'the way walked, the straight walk on');
+  // a town met on the way is walked through on its streets too
+  r.go(other);
+  assert.equal(r.asked.length, 2, 'the second town is asked for its way');
+  assert.equal(r.to.state.route.townAt, '499,250');
+  // begun in the open: the straight walk, a town asked only where one is entered
+  const open = rig({ town: (n) => (Math.abs(n.x - other.x) < 8000 ? '499,250' : null), way: () => ({ pts: [exit] }) });
+  open.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.ok(open.to.state.route, 'a route of no legs');
+  assert.equal(open.asked.length, 0, 'no town where it starts: none asked');
+  open.go(other);
+  assert.equal(open.asked.length, 1, 'the town it crosses is asked');
+  // Avoid Obstacles off: the mod's beeline exactly - no route, and no town asked, begun in one or crossing one
+  const plain = rig({ town, way: () => ({ pts: [exit] }), avoidObstacles: false });
+  plain.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(plain.to.state.route, null, 'no route');
+  plain.go(other);
+  assert.equal(plain.asked.length, 0, 'no town asked');
+});
+
+test('a steering stop in a town\'s streets asks the town for its way again from where the body stands, twice a town, and only then stops the journey; in the open the stop stands at once', () => {
+  const start = mid(500, 250), exit = { x: start.x - 6000, z: start.z };
+  let block = 0;
+  const steer = () => (block > 0 ? (block--, 'blocked') : null);
+  const r = rig({ town: (n) => (Math.abs(n.x - start.x) < 8000 ? '500,250' : null), way: () => ({ pts: [exit], pace: 5 }), steer });
+  r.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(r.asked.length, 1, 'the town\'s way, asked at the start');
+  const step = (dx) => r.go({ x: start.x - dx, z: start.z });
+  step(100);
+  assert.equal(r.words.length, 0, 'an open street: walked on');
+  block = 1; step(200);
+  assert.equal(r.asked.length, 2, 'stopped in the streets: the way asked again');
+  assert.ok(r.to.state.route.street, 'and walked');
+  assert.equal(r.words.length, 0, 'the journey goes on');
+  block = 1; step(300);
+  assert.equal(r.asked.length, 3, 'a second time');
+  assert.equal(r.words.length, 0);
+  block = 1; step(400);
+  assert.equal(r.asked.length, 3, 'the third stop asks no more');
+  assert.ok(r.words.includes(TRAVEL_NAV_TEXT.MsgBlocked), 'and stops the journey with the steering\'s own words');
+  // in the open, no street: a stop is a stop
+  const open = rig({ town: () => null, steer: () => 'stuck' });
+  open.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  open.go({ x: start.x - 100, z: start.z });
+  assert.ok(open.words.includes(TRAVEL_NAV_TEXT.MsgStuck), 'stopped at once');
+  assert.equal(open.asked.length, 0);
 });
