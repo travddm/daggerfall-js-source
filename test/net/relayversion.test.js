@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world319: '8e277658b5ae8d3eca9c7d9322053f1a311c7a9693cb1731786b5f82a519c736', // the locale catalog keeps every language for player-installed packs; a translation's source is `community`
   world318: 'cb13bad9c1b416a14858034860b93b087bb7474d667fccc04526306624f56086', // the Spawned dungeons switch is pinned off in the server profile (officialProfile.ts)
   world317: '4d9171291970064f95668f4d11ecbe8ab5f449009ed1ea6ec7d04f9a68ae750a', // the official profile pins the Elites stack row off (officialProfile.ts)
   world316: '87d95a0f47460b81c84519aafb0d25b9a5a6ad9967d21cd7380472a9a8e84712', // the official profile pins the Openings take extra damage row off (officialProfile.ts)
@@ -57,7 +58,6 @@ const LAW = {
   world287: '5fa98938d25fe3be574c04ebe52e8fa09adbb01e84b316e02fb213d8ce0a64ad',     // SD LANES: a province's Hollow keeps the hub's one life and one win an account on its own lane (sdAcctInternal read the Bay's keys alone)
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
-  world311: '2cc36303bf16b34595c6e0a07dae3d3fdd8c95798e6a6e56dee8218691ff36bc', // the locale catalog keeps every language for player-installed packs; a translation's source is `community`
   world303: '4fc754a8d0c8b5e6924f4020314737053d761a020a6033dbc4f0f916d9783c8e', // TOWN-SEATS ROW: the Town seats switch is pinned on in the server profile (officialProfile.ts)
   world308: 'd9a2d9f23d1ecabbd62032a0731ed9224a8d3b0d9c00556e84ae739ab195c35d', // a player's live Stealth and half-speed state on the pose, and a foe record's stealth-check minute (characters/enemy/peer-senses.ts)
   world307: 'b6541ec9bfade28b6df33c2ea9113e9683c7079da938cac72596158fb51b223b', // (re-hashed in place, unmerged - bytes cd691f30... before the profile rule) A party leader sets the party to no mentoring - the hub's party.mentoring.off and .on acts, the party view's nm; the server profile's party.allowNoMentoring rule can refuse the act
