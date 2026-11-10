@@ -39,7 +39,7 @@
 // looks level because ITS pitch is an animation channel, where this one
 // takes the player's pitch through the neck the reference rotates.
 
-import { lookAt, multiply, ortho, perspective, transformPoint, trs, wrapAngle } from '../world/mat4.js';
+import { lookAt, multiply, ortho, perspective, transformPoint, trs } from '../world/mat4.js';
 import { ClimbPose, POSE } from '../player/climb/climbPose.js';   // CLIMB6: the climb's limbs, in the world; TWO-HANDS: its limb law (LIMB_TAU) eases the mirror's compositions
 import { runWeightStep, runPhaseFollow, pumpTarget3D, RUN_3D, mirrorStrike, guardStep, GUARD, pairSpreadAngle, PAIR_SPREAD, easeTo, blowWeaponOf } from './twoHands/handsLaw.js';   // TWO-HANDS: the run's pump, the sprite lane's stroke on the 3D body; a mirrored blow's way across the screen; the guard's weight; TWO-HANDS SPREAD: the pair's arms turned out
 import { strikingSide, mirrorPlan, counterpartName } from './twoHands/mirrorRig.js';   // TWO-HANDS: which fist a hand-to-hand clip throws; the wrists, for the pins; a blade's own bone across
@@ -60,16 +60,14 @@ import {
   weaponRecords, dfWeaponToMw, dfWeaponShape, pickWeaponRecord, MW_WEAPON_TYPE,
   reloadsItself, shootsRatherThanSwings,
   headViewRef, composeStanceGroup, composeWeaponGroup, mwAttackType, attackKeys, MW_SHOOT_ATTACK, strikeReversed,
-  weaponShortGroup, calculateWindUp, EQUIP_KEYS, UNEQUIP_KEYS, isRealWeapon,
+  calculateWindUp, EQUIP_KEYS, UNEQUIP_KEYS, isRealWeapon,
   stepAimFocus, fpAnimSources, pickAnimSource, anySourceHasGroup, FP_BASE_MODEL, animSourceName,
   gmstValue, GMST_SNEAK_DELTA, sneakOffset,
   lightRecords, pickTorchRecord, blendMaskBones, overlayTracks, overlaySampler,   // MW-D51: the held torch
   pickLanternRecord, hangAnchor, hookOnBone, hangAffine,   // HT-WAIST: the lantern at the waist, and the part that hangs
   tpAnimSources, TP_BASE_MODEL, playerBodyRows, werewolfHeadRows, MW_UNITS_PER_METER, resolveBodyParts, ARM_PARTS, raceRecords, armorRecords, clothingRecords,
   facePools, meshBounds, curatedAnswersFace,   // AUDIT MW-HEADS1: the match stands down where the curated table answers
-  movementAnimState, composeMovementGroup, MOVEMENT_FALLBACK_SPEED, MOVEMENT_SPEED_CAP, turnAnimSpeed,
-  jumpAnimState,
-  sourcesKeyTime, sourceVelocityOf,
+  sourcesKeyTime,
   magicEffectRecords, vfxStaticRecords,   // MW-SPELLFX1: the magic effects and the statics their visuals are
   assembleCreature, creatureAnimSources, creatureRecords, CREA_FLAG,   // MWNPC9: a creature's body
   posePartClocks, WEAPON_CLASS, MW_WEAPON_CLASS,   // MW-BOW1: the weapon's own clock
@@ -110,8 +108,8 @@ import { skinLayout, skinSamePieces, packSkinStream, writeSkinPalette, restreamM
 import { pageParam } from '../systems/pageQuery.js';   // MWNPC1: the GPU skin's bisect door
 import { t } from '../systems/textManager.js';   // L10N4: AUDIT MW-FOLK1's note in the player's language
 import {
-  fpSkeletonPath, tpSkeletonPath, FP_IDLE_BASE, FP_IDLE_SNEAK, TORCH_GROUP, carriedLeftVisible, idleBaseFor,
-  FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType, accurateAiming, clipCompletion,
+  fpSkeletonPath, tpSkeletonPath, FP_IDLE_BASE, TORCH_GROUP, carriedLeftVisible,
+  animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType, accurateAiming, clipCompletion,
   strideOppositeTime, blowRate, releaseSkip,
 } from './fpArm/fpAnimState.js';   // the animation-state helpers
 import { loadFromArchives, findLoaded, parseNifOnce, nifBytes, boneProbe, esmLoadOrder } from './fpArm/archiveBytes.js';   // the archive reads
@@ -122,6 +120,7 @@ import {
   resolveOffWeaponParts, resolveWeaponParts,
 } from './fpArm/fpArmParts.js';   // the carried parts
 import { raceScaleOf, stickyAccumRoot } from './fpArm/buildRules.js';   // the race scale and the shared accum root
+import { createAnimSlots } from './fpArm/animSlots.js';   // the slots below the upper body
 export {
   WOLFSKIN, WOLFSKIN_1ST, fpSkeletonPath, tpSkeletonPath, FP_CLIP_PATH, FP_IDLE_BASE, FP_IDLE_SNEAK, TORCH_GROUP,
   carriedLeftVisible, idleBaseFor, FP_IDLE_LOOPS, animWeaponType, UPPER_BODY, UPPER_BODY_NAME, spellAttackType,
@@ -2814,54 +2813,15 @@ export function createFpArm() {
   let wornEquipKey = null;
   let lastBuildOpts = null;
 
-  // MW-D12: TWO CLIP SLOTS, because Morrowind's first-person arm plays
-  // TWO animations and the port had one.
-  //
-  // The reference keeps mCurrentIdle and mCurrentWeapon as separate
-  // AnimStates on separate priorities and lets rule 26 resolve them per
-  // bone group. In first person the weapon group is played on
-  // BlendMask_All at priorityWeapon, and the idle at a lower priority on
-  // the same mask, so the resolution is not a blend at all: WHILE A
-  // WEAPON ANIMATION IS PLAYING IT WINS EVERY BONE. That is why this can
-  // be two slots and a winner rather than the whole priority vector -
-  // and it is stated here so that when a third animation arrives
-  // (hit recoil, sneak) somebody ports rule 26 instead of adding a third
-  // `if`.
-  let idleState = null;
+  // THE CLIP SLOTS. The arm plays several clips at once, each in a slot of its own: the weapon action here, and the
+  // idle, movement, jump, hit recoil and death in fpArm/animSlots.js (`slots`). Every one of them moves every bone,
+  // so posing takes the highest slot that plays rather than blending: death, then the weapon action, then the
+  // recoil, the movement, the jump, and the idle last. The jump ranks under the movement but still shows in the air,
+  // because the movement slot empties there. On landing the movement takes over again, so a player who lands
+  // walking walks over the landing tail. A blend per bone group (a swing on the torso over a walk on the legs) is
+  // not done here.
   let actionState = null;
-  let idleGroup = null;
   let weaponGroup = null;
-  // MW-D26: THE THIRD SLOT - MOVEMENT. The reference plays movement at
-  // Priority_Movement, above the idle and below the weapon action, and
-  // in first person everything rides BlendMask_All - so the two-slot
-  // winner grows to three: action beats movement beats idle. The
-  // per-bone-group blend (a swing on the torso OVER a walk on the legs,
-  // rule 26's real vector) is NOT this - recorded in the bible as the
-  // known gap, so nobody mistakes the ladder for the vector.
-  let movementState = null;
-  let movementGroup = null;
-  let movementSource = null;
-  let movementBase = null;
-  let movementStance = null;
-  let movementRate = 1;
-  // MW-D39: THE FOURTH SLOT - JUMP. Priority_Jump sits BELOW
-  // Priority_Movement in the reference's enum (character.hpp:34-35),
-  // so the winner ladder reads action > movement > JUMP > idle - and
-  // the jump still SHOWS in the air because the movestate ladder only
-  // runs inside `if (!mInJump)` (character.cpp:2296): airborne, the
-  // movement slot empties and the jump is the highest thing playing.
-  // On the landing frame movement selects again, so a player who lands
-  // holding W walks over the landing tail - the reference's own look.
-  let jumpState = null;
-  let jumpGroup = null;
-  let jumpSource = null;
-  let jumpStance = null;
-  let jumpKind = null;          // mJumpState: null | 'inair' | 'landing'
-  // character.cpp:2355-2366 - the turn animation HOLDS 0.05s past the
-  // last actual rotation, so mouse jitter does not flicker it.
-  let lastYaw = null;
-  let turnHold = 0;
-  let turnDir = 0;
   let upper = UPPER_BODY.Rest;
   let spellReady = false;        // MW-D39: a spell is readied (the stance)
   let spellHand = false, spellInHand = false;   // SPELL-HAND: the spell goes in the free hand beside the weapon (the rig's word), and one is readied there
@@ -2877,19 +2837,10 @@ export function createFpArm() {
   // BlendMask_All: Priority_Torch on the LEFT ARM (character.cpp's
   // `mAnimation->play("torch", Priority_Torch, BlendMask_LeftArm, ...)`),
   // so the right arm keeps swinging while the left holds the light up.
-  // MWNPC4: THE REACTIONS - the hit recoil and the death
-  // (character.cpp refreshHitRecoilAnims, playRandomDeath/playDeath). Both play on BlendMask_All
-  // (`playBlendedAnimation(mCurrentHit, priority, MWRender::BlendMask_All, ...)`, and playDeath's own), so they join the
-  // winner ladder EXACTLY - the "third animation" the two-slot note above foresaw needs no per-bone vector, because
-  // neither has a mask of its own: Priority_Death over everything, Priority_Hit between the weapon and the movement
-  // (character.hpp's enum - Movement < Hit < Weapon < Block < Knockdown < Torch < Storm < Death). An NPC's body takes
-  // them (net/peer/peerBodies.js `_arm`, the pose's `ht` and `dd`); the player's own never does.
-  let hitState = null;
-  let hitSource = null;
-  let deathState = null;
-  let deathSource = null;
+  // The hit recoil and the death are slots too (animSlots.js). An NPC's body takes them (net/peer/peerBodies.js
+  // `_arm`, the pose's `ht` and `dd`); the player's own never does.
   let posedGroup = null;        // MWNPC4: the frame's winner, by name - on the card
-  let dead = false;              // MWNPC4: died - the reference stops refreshing a dead actor's states (character.cpp:"For dead actors, refreshCurrentAnims is no longer called")
+  let dead = false;              // died: a dead body's slots are no longer refreshed
   let torchLit = false;
   // WEAPON-GLOW1: the held weapon's glow - `{ look, code, level, ramp }`
   // (systems/weaponGlow.js meshGlow, or glowFromWord for a peer's body) - laid on the mesh each draw; the renderer lights
@@ -3068,7 +3019,6 @@ export function createFpArm() {
   let sneaking = false;
   // The source each slot won, kept beside the clip because a clip and
   // the tracks that pose it come from the SAME file.
-  let idleSource = null;
   let actionSource = null;
   const notes = [];
 
@@ -3104,12 +3054,12 @@ export function createFpArm() {
     return nonBiped() && !isRealWeapon(t) ? MW_WEAPON_TYPE.None : t;
   };
 
-  const active = () => !standIn && !!(built && built.ok && mesh && renderer && camera && (actionState || movementState || jumpState || idleState)
+  const active = () => !standIn && !!(built && built.ok && mesh && renderer && camera && (actionState || slots.movementState || slots.jumpState || slots.idleState)
     && viewMode === 'first');
   // MWNPC4 (AUDIT, 2026-10-09): a body in its recoil or its death stands too - die() resets every other state, so a
   // dying body answered false here, its lane let it go (PeerBodies._standing) and its corpse flat drew instead
   const thirdActive = () => !standIn && !!(built && built.ok && thirdBuilt && thirdBuilt.ok && thirdMesh
-    && renderer && (actionState || movementState || jumpState || idleState || hitState || deathState) && viewMode === 'third');
+    && renderer && (actionState || slots.movementState || slots.jumpState || slots.idleState || slots.hitState || slots.deathState) && viewMode === 'third');
 
   /**
    * MW-D9f: THE UPDATE PREDICATE, WHICH IS NOT THE DRAW PREDICATE.
@@ -3129,7 +3079,7 @@ export function createFpArm() {
    * These are exactly update()'s own requirements: a camera is a DRAW
    * term, and posing without one is harmless work, not a wrong picture.
    */
-  const ready = () => !!(built && built.ok && (actionState || movementState || jumpState || idleState || hitState || deathState) && renderer);
+  const ready = () => !!(built && built.ok && (actionState || slots.movementState || slots.jumpState || slots.idleState || slots.hitState || slots.deathState) && renderer);
 
   function releaseGpu(m) {
     releaseCastFx((c) => c.mesh === m);   // MW-SPELLFX1: the glow on this mesh lets go of its own textures first
@@ -3429,6 +3379,11 @@ export function createFpArm() {
   // hasAnimation: ANY source names the group (animation.cpp). WHICH
   // source plays it is a separate question, answered in reverse below.
   const hasGroup = (n) => { const r = rig(); return !!r && !!r.sources && anySourceHasGroup(r.sources, n); };
+  const slots = createAnimSlots({   // the idle, movement, jump, hit and death slots
+    built: () => built, dead: () => dead, upper: () => upper, sneaking: () => sneaking, viewMode: () => viewMode,
+    notes: () => notes, rig: () => rig(), stanceOf: () => stanceOf(), nonBiped: () => nonBiped(), hasGroup,
+  });
+  const clockOf = (state) => (state ? state.time : null);   // a slot's clock on the card
 
   /** MF1: the third body's OWN idle for the drawn stance - the same
    *  ladder refreshIdle climbs (composeStanceGroup: asked group, short
@@ -3447,19 +3402,6 @@ export function createFpArm() {
     return memo.get(composed.group);
   }
 
-  /** MWNPC4: chooseRandomGroup (character.cpp): the groups `<prefix>1`, `<prefix>2`, ... counted while the body's
-   *  sources carry each, one of them picked - by `roll`, where the reference rolls its world PRNG (a roll the caller
-   *  keeps, so the same blow plays the same recoil on every machine, and no random stream of the port's is drawn).
-   *  Null when the body carries none - the reference's roll then names a group that is not there,
-   *  and plays nothing. */
-  function chooseRandomGroup(prefix, roll) {
-    const r = rig();
-    if (!r || !r.sources) return null;
-    let n = 0;
-    while (anySourceHasGroup(r.sources, `${prefix}${n + 1}`)) n++;
-    if (!n) return null;
-    return `${prefix}${1 + ((((roll | 0) % n) + n) % n)}`;
-  }
 
   /** The source currently posing the arm - the one that won the clip
    *  being drawn, because its tracks are the ones the pose reads. */
@@ -3491,59 +3433,7 @@ export function createFpArm() {
     return true;
   }
 
-  /**
-   * REFRESHIDLEANIMS, the first-person half (character.cpp:773-830).
-   *
-   * Called EVERY FRAME, exactly as the reference calls it, and its early
-   * return is what keeps that cheap: the same group still playing is left
-   * alone. What it is NOT is a one-shot at build time - the group depends
-   * on the drawn weapon, so sheathing has to be able to change it without
-   * anything else being torn down.
-   */
-  function refreshIdle(force = false) {
-    if (!built || !built.ok || dead) return;   // MWNPC4: a dead actor's states are no longer refreshed
-    // MWNPC9: refreshIdleAnims' non-biped arm (character.cpp:680-685) - a creature lets its idle go while an upper-body
-    // action, a movement or a recoil plays, and takes it up again from its start once none does
-    if (nonBiped() && ((upper !== UPPER_BODY.Rest && upper !== UPPER_BODY.Ready) || movementState || hitState)) {
-      idleState = null; idleGroup = null; idleSource = null;
-      return;
-    }
-    const type = stanceOf();   // MWNPC9: a non-biped's bare stance
-    // MW-D52: the idle STATE picks the base - "idlesneak" while sneaking
-    // on the ground where a source carries it, else the plain idle with
-    // its weapon suffix. The sneak idle takes no suffix and no loop dice.
-    const base = idleBaseFor({ sneaking, inJump: !!jumpState, hasGroup });
-    const compose = () => (base === FP_IDLE_SNEAK ? { group: base } : composeStanceGroup(base, type, hasGroup));
-    if (!force && idleState && idleState.playing) {
-      // Only the GROUP can have gone stale; a playing idle of the right
-      // group is left exactly where it is.
-      const composed = compose();
-      if (composed.group === idleGroup) return;
-    }
-    const composed = compose();
-    if (!composed.group) { idleState = null; idleGroup = null; return; }
-    // Rule 10's condition: the dice roll happens only when the stance HAS
-    // a short group. Bare hands away idle forever.
-    const short = base === FP_IDLE_SNEAK ? null : weaponShortGroup(type);
-    const loopCount = short ? FP_IDLE_LOOPS() : Infinity;
-    // :822-825 - a restart of the SAME group resumes from where it was.
-    const startPoint = idleGroup === composed.group ? clipCompletion(idleState) : 0;
-    const pick = pickAnimSource(rig().sources, composed.group, resetClip,
-      { loopFallback: true, loopCount, startPoint });
-    if (!pick) {
-      idleState = null; idleGroup = null;
-      notes.push(`idle: no source gives "${composed.group}" a start and a stop key`);
-      return;
-    }
-    idleGroup = composed.group;
-    idleState = pick.state;
-    idleSource = pick.source;
-  }
 
-  /** resetCurrentIdleState (:1850-1853 via mResetIdleOnAttackEnd): drop
-   *  the idle so the next refresh replays it from its start with a fresh
-   *  loop count, rather than resuming mid-swing-shaped. */
-  function resetIdle() { idleState = null; idleGroup = null; refreshIdle(true); }
   /** SPELL-HAND: a spell readied in the free hand beside the weapon (readySpell's door while the spell hand is up): the arm
    *  keeps the weapon's stance - its left arm the Spell idle's (spellHandArm) - and a cast's latched Spell stance (castSpell)
    *  lets go as its cast ends (stepUpper's unreadyAfterCast), back to the weapon's. */
@@ -3552,7 +3442,7 @@ export function createFpArm() {
     const step = spellHandStanceStep({ upper, spellReady }, UPPER_BODY);   // AUDIT SPELL-HAND L3-11: the law is spellHandArm.js's
     if (step === 'afterCast') unreadyAfterCast = true;
     if (step !== 'drop') return false;
-    spellReady = false; refreshWeaponGroup(); resetIdle(); resetMovement();
+    spellReady = false; refreshWeaponGroup(); slots.resetIdle(); slots.resetMovement();
     return true;
   }
 
@@ -3636,15 +3526,15 @@ export function createFpArm() {
     spellIdle: spellInHand && upper !== UPPER_BODY.Casting ? heldClips.clip(r, stanceIdle(r, r.mwType ?? built.mwType, true), dt) : null,
   }) : null);
   /** The idle clip as it stands - the hand at rest under the other's blow. Null with no idle playing. */
-  const idleClip = () => (idleState && idleSource ? { tracks: idleSource.trackMap, sampleTrack, time: poseTime(idleState) } : null);
+  const idleClip = () => (slots.idleState && slots.idleSource ? { tracks: slots.idleSource.trackMap, sampleTrack, time: poseTime(slots.idleState) } : null);
   /**
    * TWO-HANDS FIELD: THE STRIDE'S OTHER HALF - the movement clip that poses the body this frame (no blow, recoil or death
    * over it), at its time half a loop on (strideOppositeTime). Null standing, or under anything else.
    */
   const strideOpposite = () => {
-    if (deathState || actionState || hitState || !movementState || !movementSource) return null;
-    const time = strideOppositeTime(movementState, poseTime(movementState), movementSource.keys);
-    return time == null ? null : { tracks: movementSource.trackMap, sampleTrack, time };
+    if (slots.deathState || actionState || slots.hitState || !slots.movementState || !slots.movementSource) return null;
+    const time = strideOppositeTime(slots.movementState, poseTime(slots.movementState), slots.movementSource.keys);
+    return time == null ? null : { tracks: slots.movementSource.trackMap, sampleTrack, time };
   };
   /**
    * Which fist attack `type`'s clip throws on rig `r` - measured, not assumed (Morrowind's hand-to-hand groups throw with
@@ -3873,227 +3763,10 @@ export function createFpArm() {
     torchGroup = TORCH_GROUP; torchState = pick.state; torchSource = pick.source;
   }
 
-  function resetMovement() {
-    movementState = null; movementGroup = null; movementSource = null; movementBase = null;
-    movementStance = null;
-  }
 
-  /** resetCurrentJumpState (character.cpp:350-354). */
-  function resetJump() {
-    jumpState = null; jumpGroup = null; jumpSource = null; jumpStance = null;
-    jumpKind = null;
-  }
 
-  /** The velocity the clip itself travels at, so the played speed can
-   *  scale to the actor's real speed (character.cpp:743-752): the
-   *  accum root's horizontal displacement over the clip, falling back
-   *  to the reference's own constants when a clip carries none. */
-  let movementAnimSpeed = MOVEMENT_FALLBACK_SPEED.walk;
 
-  /**
-   * MW-D26: REFRESHMOVEMENTANIMS + the movestate selection, per frame
-   * (character.cpp:639-759, :2297-2330). The state derives from the
-   * frame's movement INPUT (the reference's movement-settings vector)
-   * carried on the camera dep; the group composes the weapon's short
-   * suffix through the same one ladder the idle rides, plus movement's
-   * own run->walk swap; a same-group refresh resumes from where it was
-   * (:711-713); and a group nothing serves RESETS the slot rather than
-   * substituting a wrong clip (:701-707).
-   *
-   * TURNING (character.cpp:2321-2329, 2355-2366): third person only,
-   * never sneaking; the state holds 0.05s past the last rotation so
-   * per-frame mouse deltas do not flicker it. The reference's
-   * isTurning() reads the movement-settings rotation channel; this
-   * port's yaw is mouse-driven per frame, so the hold IS the port of
-   * the threshold, stated rather than smuggled.
-   */
-  /**
-   * MW-D39: REFRESHJUMPANIMS (character.cpp:494-532), fed by the
-   * frame's derived JumpState (jumpAnimState above the fold in
-   * mwFirstPerson.js - update()'s :2195-2296, animation half).
-   *
-   * The reference's laws, kept in its own order:
-   *   - the early-out is `jump == mJumpState` unless forced (:496);
-   *     the force here is the weapon-stance transition, MW-D29's law
-   *     carried over from movement - a sword drawn mid-air recomposes
-   *     jump -> jump1h THAT frame;
-   *   - None resets the jump slot AND the idle (:499-505 - the idle
-   *     replays from its start when a jump ends over it);
-   *   - the group is "jump" + the weapon short suffix through
-   *     fallbackShortWeaponGroup's ladder (:508-513), which
-   *     composeStanceGroup already IS (MW-D26's one-home law); a name
-   *     nothing serves resets both, exactly as None does (:515-520);
-   *   - startAtLoop (:522): a forced re-pick in the SAME state starts
-   *     at "loop start" (resetClip carries Animation::reset's own
-   *     ": start" fallback for it, :986-991), so a mid-air stance
-   *     change does not replay the takeoff;
-   *   - InAir plays start -> stop with unbounded loops and NO
-   *     loopfallback (:528-529 - a group with real loop keys loops
-   *     forever, one without plays once and HOLDS its last pose, which
-   *     is the reference's autodisable=false falling pose);
-   *   - Landing plays ONCE from "loop stop" to "stop" (:531). A group
-   *     with no "jump: loop stop" key fails the pick - which is
-   *     Animation::reset:992 returning false and the reference's play
-   *     silently doing nothing: no landing animation is the correct
-   *     outcome for data that carries none.
-   *
-   * Returns the frame's inJump, which gates the movestate ladder
-   * (character.cpp:2296 - it runs only inside `if (!mInJump)`).
-   */
-  function refreshJump(mv) {
-    if (!built || !built.ok || dead) return false;   // MWNPC4: nor its jump
-    const derived = jumpAnimState({
-      grounded: mv ? mv.grounded !== false : true,
-      swimming: !!(mv && mv.swimming),
-      levitating: !!(mv && mv.levitating),
-      jumpQueued: !!(mv && mv.jumping),
-      priorInAir: jumpKind === 'inair',
-      jumpPlaying: !!(jumpState && jumpState.playing),
-    });
-    const stance = stanceOf();   // MWNPC9
-    const force = !!jumpState && jumpStance !== stance;
-    if (!force && derived.jump === jumpKind) return derived.inJump;   // :496
-    if (!derived.jump) {
-      if (jumpState) { resetJump(); resetIdle(); }   // :499-505
-      else resetJump();
-      return derived.inJump;
-    }
-    const composed = composeStanceGroup('jump', stance, hasGroup);   // :508-513
-    if (!composed.group) {
-      if (jumpState) { resetJump(); resetIdle(); }   // :515-520
-      else resetJump();
-      return derived.inJump;
-    }
-    const startAtLoop = derived.jump === jumpKind;   // :522
-    const pick = derived.jump === 'inair'
-      ? pickAnimSource(rig().sources, composed.group, resetClip,
-        { start: startAtLoop ? 'loop start' : 'start', stop: 'stop', loopCount: Infinity })
-      : pickAnimSource(rig().sources, composed.group, resetClip,
-        { start: 'loop stop', stop: 'stop', loopCount: 0 });
-    if (!pick) {
-      // The Landing arm lands here on loop-key-less data; the InAir arm
-      // on a group hasGroup approved whose keys resetClip refuses.
-      // Either way the reference's outcome is a jump slot with nothing
-      // playing (:515-520 / Animation::reset:992).
-      if (jumpState) { resetJump(); resetIdle(); }
-      else resetJump();
-      return derived.inJump;
-    }
-    jumpState = pick.state;
-    jumpSource = pick.source;
-    jumpGroup = composed.group;
-    jumpStance = stance;
-    jumpKind = derived.jump;
-    return derived.inJump;
-  }
 
-  function refreshMovement(cam, dt, inJump = false) {
-    if (!built || !built.ok || dead) return;   // MWNPC4: nor its movement
-    const yaw = cam ? (cam.yaw || 0) : 0;
-    let yawRate = 0;
-    if (lastYaw != null && dt > 0) {
-      // ONCRASH1: one step, not a loop. A PEER's rig reads this camera
-      // (net/peer/peerBodies.js peerCamera), so `yaw` is the wire's there.
-      const d = wrapAngle(yaw - lastYaw);
-      yawRate = d / dt;
-      if (d !== 0) { turnDir = Math.sign(d); turnHold = 0.05; }
-      else { turnHold -= dt; if (turnHold <= 0) turnDir = 0; }
-    }
-    lastYaw = yaw;
-    const mv = (cam && cam.move) || null;
-    // MW-D39: the movestate ladder runs only inside `if (!mInJump)`
-    // (character.cpp:2296) - airborne, the movement slot EMPTIES and
-    // the jump slot beneath it is what shows. The null flows into the
-    // existing empty-movement branch, which already carries the
-    // reset-both law (:646-651).
-    const base = inJump ? null : movementAnimState({
-      forward: mv ? mv.forward : 0,
-      strafe: mv ? mv.strafe : 0,
-      running: !!(mv && mv.running),
-      sneaking,
-      turning: turnDir,
-      thirdPerson: viewMode === 'third' && !nonBiped(),   // MWNPC9: turning animations are a biped's (character.cpp:2178)
-    });
-    if (!base) {
-      // MW-D29: the frame the movement EMPTIES while one was playing,
-      // the idle resets with it (character.cpp:646-651) - so it replays
-      // from its start with freshly rolled loop dice (:824, :811)
-      // instead of resuming mid-clip on a stale counter.
-      if (movementState) { resetMovement(); resetIdle(); }
-      return;
-    }
-    const isTurn = base.startsWith('turn');
-    // MW-D29: the STANCE is part of the early-out key. The reference
-    // forces refreshMovementAnims on every weapon-type transition
-    // (forcestateupdate at character.cpp:1361/:1372/:1431 flows into
-    // refreshCurrentAnims -> refreshMovementAnims(force)), so drawing a
-    // sword mid-walk re-composes walkforward -> walkforward1h THAT
-    // frame - the port's old gate keyed on the movestate name alone and
-    // kept the bare-handed walk playing with the sword out.
-    const stance = stanceOf();   // MWNPC9: a non-biped's bare walk
-    const fresh = !(movementState && movementState.playing
-      && movementBase === base && movementStance === stance);
-    if (fresh) {
-      const composed = composeMovementGroup(base, stance, hasGroup);
-      if (!composed.group) {
-        if (movementState) { resetMovement(); resetIdle(); }   // :701-707 resets BOTH
-        movementBase = base; movementStance = stance;
-        return;
-      }
-      if (!(movementState && movementState.playing && movementGroup === composed.group)) {
-        const startPoint = movementGroup === composed.group ? clipCompletion(movementState) : 0;
-        const pick = pickAnimSource(rig().sources, composed.group, resetClip,
-          { loopFallback: true, loopCount: Infinity, startPoint });
-        if (!pick) {
-          resetMovement();
-          notes.push(`movement: no source gives "${composed.group}" a start and a stop key`);
-          movementBase = base; movementStance = stance;   // AUDIT MWBODY A14: remembered, or the note is pushed again every frame
-          return;
-        }
-        movementGroup = composed.group;
-        movementState = pick.state;
-        movementSource = pick.source;
-      }
-      movementBase = base; movementStance = stance;
-      // MW-D29: the clip speed refreshes on EVERY state change, not only
-      // a re-pick - the reference assigns mMovementAnimSpeed whenever
-      // refreshMovementAnims runs (character.cpp:743-752), and the
-      // fallback constant reads the FRESH state's run/sneak, which is
-      // exactly the run->walk-swap case where the clip stays put and
-      // the state does not. That half stands.
-      //
-      // PX29 - REVERTED AT MAC'S DIRECTION, and recorded as the
-      // DECLARED DIVERGENCE it is. MW-D29 also changed WHICH source
-      // answers for the velocity: from the one source that won the
-      // group pick to getVelocity's multi-source walk
-      // (animation.cpp:1267-1338). In first person that is invisible -
-      // the .1st clips carry no accumulation-root movement, every
-      // source answers 0, and the fallback constants decide. In THIRD
-      // person the body's clips carry real movement, so the walk can
-      // answer with a DIFFERENT source's velocity than the clip
-      // actually playing, and the divisor changes under a sprint that
-      // did not change: Mac watched the third-person sprint alter and
-      // asked for it back. The picked source's own velocity is the
-      // number that matches the clip on screen, which is the property
-      // that matters more here than the citation. If a future 1:1
-      // sweep wants the multi-source walk again it must come with
-      // Mac's eye on the sprint, not a line number.
-      const vel = movementSource ? sourceVelocityOf(movementSource, movementGroup) : 0;
-      movementAnimSpeed = vel > 1 ? vel
-        : sneaking ? MOVEMENT_FALLBACK_SPEED.sneak
-          : (mv && mv.running) ? MOVEMENT_FALLBACK_SPEED.run : MOVEMENT_FALLBACK_SPEED.walk;
-    }
-    // The rate follows the LIVE speed every frame (character.cpp:2392-2408),
-    // AFTER the pick so a fresh clip's own velocity is what divides: a
-    // turn plays at min(1.5, |rot|/dt/pi); everything else at actual
-    // speed / clip speed, capped at 10 - the port's meters crossing to
-    // MW units through the one bridge, because the clip's velocity is
-    // in MW units.
-    movementRate = isTurn
-      ? turnAnimSpeed(yawRate)
-      : Math.min(MOVEMENT_SPEED_CAP,
-        ((mv && mv.speed ? mv.speed : 0) * MW_UNITS_PER_METER) / movementAnimSpeed);
-  }
 
   /** Rule 9's long group for the CURRENT stance, and the equip/unequip
    *  and attack sections all live in it. */
@@ -4183,7 +3856,7 @@ export function createFpArm() {
     attackType = null;
     attackHand = null;   // TWO-HANDS
     blowPlan = null;
-    if (resetIdleOnAttackEnd) { resetIdleOnAttackEnd = false; resetIdle(); }
+    if (resetIdleOnAttackEnd) { resetIdleOnAttackEnd = false; slots.resetIdle(); }
   }
 
   /**
@@ -4198,7 +3871,7 @@ export function createFpArm() {
     if (dead) return null;
     if (upper === UPPER_BODY.Recovering) endAttack();
     if (upper !== UPPER_BODY.Ready) return null;
-    const g = chooseRandomGroup('attack', roll);
+    const g = slots.chooseRandomGroup('attack', roll);
     const pick = g ? pickAnimSource(rig().sources, g, resetClip, { start: 'start', stop: 'stop', loopCount: 0 }) : null;
     if (!pick) return null;
     actionState = pick.state; actionSource = pick.source;
@@ -4212,7 +3885,7 @@ export function createFpArm() {
       const rate = hit > st.startTime ? blowRate(hit - st.startTime, blow.hitAt) : blowRate(st.stopTime - st.startTime, blow.seconds);
       blowPlan = { seconds: blow.seconds, hitAt: blow.hitAt, clock: 0, rate };
     }
-    refreshIdle();   // a non-biped lets its idle go
+    slots.refreshIdle();   // a non-biped lets its idle go
     return g;
   }
   let creatureCasts = 0;   // MWNPC9: the roll a non-biped's casts pick their attack by
@@ -4253,7 +3926,7 @@ export function createFpArm() {
         // empty until the first shot's follow-through.
         reloadCrossbow();
         upper = UPPER_BODY.Ready;
-        if (resetIdleOnAttackEnd) { resetIdleOnAttackEnd = false; resetIdle(); }
+        if (resetIdleOnAttackEnd) { resetIdleOnAttackEnd = false; slots.resetIdle(); }
         break;
       case UPPER_BODY.Stowing:
         // :1857-1859 - THIS is where the weapon type becomes None, and
@@ -4263,7 +3936,7 @@ export function createFpArm() {
         upper = UPPER_BODY.Rest;
         sheathed = true;
         refreshWeaponGroup();
-        refreshIdle(true);
+        slots.refreshIdle(true);
         break;
       case UPPER_BODY.Winding:
         // THE BOW HOLDS HERE and nothing else does. The reference leaves
@@ -4288,9 +3961,9 @@ export function createFpArm() {
         actionSource = null;
         upper = sheathed ? UPPER_BODY.Rest : UPPER_BODY.Ready;
         attackType = null;
-        if (resetIdleOnAttackEnd) { resetIdleOnAttackEnd = false; resetIdle(); }
+        if (resetIdleOnAttackEnd) { resetIdleOnAttackEnd = false; slots.resetIdle(); }
         // MW-CAST1: the spell went while the hands still cast - the stance it left drops now, not mid-motion
-        if (unreadyAfterCast) { unreadyAfterCast = false; spellReady = false; refreshWeaponGroup(); resetIdle(); resetMovement(); }
+        if (unreadyAfterCast) { unreadyAfterCast = false; spellReady = false; refreshWeaponGroup(); slots.resetIdle(); slots.resetMovement(); }
         break;
       default:
         if (actionState) actionState = null;
@@ -4406,14 +4079,14 @@ export function createFpArm() {
         wornEquipKey = wornEquipKeyOf(opts && opts.armor);
         lastBuildOpts = opts ? { ...opts } : null;
         buildDeps = (opts && opts.deps) || null;
-        idleState = null; actionState = null; idleGroup = null; weaponGroup = null; weaponClock = { group: null, value: 0 };   // MW-BOW1: no group, no state
-        movementState = null; movementGroup = null; movementSource = null; movementBase = null;
-        jumpState = null; jumpGroup = null; jumpSource = null; jumpStance = null; jumpKind = null;   // MW-D39
-        lastYaw = null; turnDir = 0; turnHold = 0;
+        slots.idleState = null; actionState = null; slots.idleGroup = null; weaponGroup = null; weaponClock = { group: null, value: 0 };   // no weapon group, so no clip state
+        slots.movementState = null; slots.movementGroup = null; slots.movementSource = null; slots.movementBase = null;
+        slots.jumpState = null; slots.jumpGroup = null; slots.jumpSource = null; slots.jumpStance = null; slots.jumpKind = null;
+        slots.lastYaw = null; slots.turnDir = 0; slots.turnHold = 0;
         upper = UPPER_BODY.Rest; attackType = null; holdWindUp = false;
         attackHand = null;   // AUDIT MIXED-PAIR L3-7: a blow a rebuild cuts takes its hand with it
         weaponShown = false; arrowShown = false; notes.length = 0; aimFactor = 0; sneaking = false;
-        idleSource = null; actionSource = null; poseSource = null;
+        slots.idleSource = null; actionSource = null; poseSource = null;
         // A REBUILT ARM STARTS SHEATHED, whatever the last one was doing.
         // The build is triggered by a button, and the player is not
         // mid-swing when they press it; carrying a stale AttackRelease
@@ -4430,9 +4103,9 @@ export function createFpArm() {
         hipLantern.reset();
         if (!res.ok) { reason = `${res.stage}: ${res.error}`; built = res; return res; }
         refreshWeaponGroup();
-        refreshIdle(true);
+        slots.refreshIdle(true);
         refreshTorch(true);
-        if (!idleState) {
+        if (!slots.idleState) {
           built = null;
           reason = 'clip: no idle group this stance can reach';
           return { ok: false, stage: 'clip', error: reason };
@@ -4466,15 +4139,15 @@ export function createFpArm() {
       offKey = null; pendingOff = undefined; strikeSides.clear(); mirrorCarry.first = {}; mirrorCarry.third = {};   // TWO-HANDS
       held = null; heldMemo = null; lastFrame = null; drewLast = false;   // MAP3: the sheet goes with the rig
       releaseThirdMesh(); thirdBuilt = null; thirdPacked = null; viewMode = 'first';
-      movementState = null; movementGroup = null; movementSource = null; movementBase = null;
-      jumpState = null; jumpGroup = null; jumpSource = null; jumpStance = null; jumpKind = null;   // MW-D39
-      lastYaw = null; turnDir = 0; turnHold = 0;
-      idleState = null; actionState = null; idleGroup = null; weaponGroup = null; weaponClock = { group: null, value: 0 };   // MW-BOW1: no group, no state
+      slots.movementState = null; slots.movementGroup = null; slots.movementSource = null; slots.movementBase = null;
+      slots.jumpState = null; slots.jumpGroup = null; slots.jumpSource = null; slots.jumpStance = null; slots.jumpKind = null;
+      slots.lastYaw = null; slots.turnDir = 0; slots.turnHold = 0;
+      slots.idleState = null; actionState = null; slots.idleGroup = null; weaponGroup = null; weaponClock = { group: null, value: 0 };   // no weapon group, so no clip state
       upper = UPPER_BODY.Rest; attackType = null; holdWindUp = false;
       attackHand = null;   // AUDIT MIXED-PAIR L3-7
       weaponShown = false; arrowShown = false;
       notes.length = 0; aimFactor = 0; sneaking = false;
-      idleSource = null; actionSource = null; poseSource = null;
+      slots.idleSource = null; actionSource = null; poseSource = null;
       torchLit = false; torchState = null; torchSource = null; torchGroup = null; torchMissRig = null;   // MW-D51
       hipLit = false; pendingHipLight = null; hipLantern.reset();   // HT-WAIST
       pendingWerewolf = null;   // WEREWOLF1
@@ -4523,7 +4196,7 @@ export function createFpArm() {
         if (upper === UPPER_BODY.Striking || upper === UPPER_BODY.Recovering) return false;
         if (upper === UPPER_BODY.Rest || !weaponGroup) {
           sheathed = true; weaponShown = false; arrowShown = false;
-          refreshWeaponGroup(); refreshIdle(true);
+          refreshWeaponGroup(); slots.refreshIdle(true);
           return true;
         }
         upper = UPPER_BODY.Stowing;
@@ -4532,7 +4205,7 @@ export function createFpArm() {
         const detach = keyTime(UNEQUIP_KEYS.detach);
         if (!playAction(UNEQUIP_KEYS.start, UNEQUIP_KEYS.stop, 0)) {
           upper = UPPER_BODY.Rest; sheathed = true; weaponShown = false; arrowShown = false;
-          refreshWeaponGroup(); refreshIdle(true);
+          refreshWeaponGroup(); slots.refreshIdle(true);
           return true;
         }
         if (detach < 0) weaponShown = false;
@@ -4552,7 +4225,7 @@ export function createFpArm() {
       if (!playAction(EQUIP_KEYS.start, EQUIP_KEYS.stop, 0)) { upper = UPPER_BODY.Ready; weaponShown = true; }
       // :1468-1472 - no "equip attach" key means show the weapon now.
       if (attach < 0) weaponShown = true;
-      refreshIdle(true);
+      slots.refreshIdle(true);
       return true;
     },
 
@@ -4793,13 +4466,13 @@ export function createFpArm() {
             arrowShown = false;    // a fresh round attaches at its own shoot keys (MW-D16)
             upper = UPPER_BODY.Ready;
             refreshWeaponGroup();
-            resetIdle();           // forcestateupdate (:1372) - the new stance's idle
+            slots.resetIdle();           // forcestateupdate (:1372) - the new stance's idle
           } else {
             weaponShown = false; arrowShown = false;
             sheathed = true;
             upper = UPPER_BODY.Rest;
             refreshWeaponGroup();
-            refreshIdle(true);
+            slots.refreshIdle(true);
             // A drawn hand equips the NEW weapon - the same section the
             // reference plays when the equip slot changes mid-draw
             // (real-weapon-to-real-weapon never reaches here any more).
@@ -5287,48 +4960,32 @@ export function createFpArm() {
       if (!want && upper === UPPER_BODY.Casting) { unreadyAfterCast = true; return false; }
       spellReady = want;
       refreshWeaponGroup();
-      resetIdle();
-      resetMovement();
+      slots.resetIdle();
+      slots.resetMovement();
       return true;
     },
 
-    /** MWNPC4: A HIT RECOIL (character.cpp refreshHitRecoilAnims, the `recovery` arm): "hit" + one of the body's hitN
-     *  (chooseRandomGroup, by `roll`), played start to stop, once, at Priority_Hit - under a weapon action, over the
-     *  movement and the idle. A body that carries none plays none (mCurrentHit cleared); the dead recoil from nothing;
-     *  and a recoil still playing takes no other (refreshHitRecoilAnims returns while `isPlaying(mCurrentHit)`). */
+    /** A hit recoil, picked by `roll` (animSlots.js hurt): under a weapon action, over the movement and the idle. */
     hurt(roll = 0) {
-      if (!built || !built.ok || dead || hitState) return false;
-      const g = chooseRandomGroup('hit', roll);
-      const pick = g ? pickAnimSource(rig().sources, g, resetClip, {}) : null;
-      if (!pick) return false;
-      hitState = pick.state; hitSource = pick.source;
-      return true;
+      return slots.hurt(roll);
     },
 
-    /** MWNPC4: THE DEATH (playRandomDeath, playDeath): one of the body's deathN by `roll`, played once at
-     *  Priority_Death and held at its last frame; every other state reset (movement, weapon, hit, idle, jump) and no
-     *  longer refreshed. `startPoint` 1 stands a body already dead in its last frame - the reference's own startpoint,
-     *  which a loaded game hands a corpse. A body that carries no death stops where it stood. */
+    /** The death, picked by `roll` (animSlots.js die), held at its last frame over everything. The weapon action ends
+     *  and the upper body stands at rest or ready. `startPoint` 1 stands a body that a loaded game hands over already
+     *  dead in its last frame. A body whose clips carry no death stops where it stood. */
     die(roll = 0, { startPoint = 0 } = {}) {
       if (!built || !built.ok) return false;
-      const g = chooseRandomGroup('death', roll);
-      const pick = g ? pickAnimSource(rig().sources, g, resetClip, { startPoint, loopCount: 0 }) : null;   // playDeath's loops: 0
       dead = true;
       actionState = null; actionSource = null; holdWindUp = false; attackType = null; blowPlan = null;
       upper = sheathed ? UPPER_BODY.Rest : UPPER_BODY.Ready;
-      movementState = null; movementSource = null; movementGroup = null;
-      jumpState = null; jumpSource = null; jumpKind = null;
-      hitState = null; hitSource = null;
-      idleState = null; idleSource = null; idleGroup = null;
-      deathState = pick ? pick.state : null; deathSource = pick ? pick.source : null;
-      return !!pick;
+      return slots.die(roll, startPoint);
     },
 
-    /** MWNPC4: back from the dead - a body handed to a living actor (a spare, a pooled walker re-rolled in place). */
+    /** Back from the dead: a body handed to a living actor (a spare, a pooled walker re-rolled in place). */
     revive() {
-      if (!dead && !deathState) return;
-      dead = false; deathState = null; deathSource = null; hitState = null; hitSource = null;
-      refreshIdle(true);
+      if (!dead && !slots.deathState) return;
+      dead = false;
+      slots.revive();
     },
 
     /** MWNPC4: has this body died? */
@@ -5381,7 +5038,7 @@ export function createFpArm() {
       // self-cast - the healing and buff spells a player casts most -
       // was silent. The cast is proof enough that a spell is going, so
       // it latches the stance and composes the group before it plays.
-      if (!spellReady) { spellReady = true; refreshWeaponGroup(); resetIdle(); resetMovement(); }
+      if (!spellReady) { spellReady = true; refreshWeaponGroup(); slots.resetIdle(); slots.resetMovement(); }
       const type = spellAttackType(rangeType);
       attackType = type;
       castReleased = false;   // MW-CAST1: this cast's own release, not a stale one
@@ -5525,20 +5182,20 @@ export function createFpArm() {
       }
       // MWNPC4: the recoil plays once and lets go (refreshHitRecoilAnims - the first of refreshCurrentAnims' refreshes:
       // `!isPlaying(mCurrentHit)` clears the hit state); the death plays once and HOLDS its last frame - playDeath's autodisable is false
-      if (hitState) { advanceClip(hitState, (hitSource || rig()).keys, dt, null); if (!hitState.playing) { hitState = null; hitSource = null; } }
-      if (deathState) advanceClip(deathState, (deathSource || rig()).keys, dt, null);
+      if (slots.hitState) { advanceClip(slots.hitState, (slots.hitSource || rig()).keys, dt, null); if (!slots.hitState.playing) { slots.hitState = null; slots.hitSource = null; } }
+      if (slots.deathState) advanceClip(slots.deathState, (slots.deathSource || rig()).keys, dt, null);
       // MW-D39: jump refreshes BEFORE movement, the reference's own
       // order (refreshCurrentAnims, character.cpp:841-844: hit recoil,
       // jump, movement, idle last), and its inJump is what gates the
       // movestate ladder this frame.
-      const inJump = refreshJump((cam && cam.move) || null);
-      refreshMovement(cam, dt, inJump);
-      if (movementState) advanceClip(movementState, (movementSource || rig()).keys, dt * movementRate, null);
+      const inJump = slots.refreshJump((cam && cam.move) || null);
+      slots.refreshMovement(cam, dt, inJump);
+      if (slots.movementState) advanceClip(slots.movementState, (slots.movementSource || rig()).keys, dt * slots.movementRate, null);
       // The jump plays at speedmult 1.0 (character.cpp:528-531 pass
       // 1.0f) - no rate scaling, unlike movement.
-      if (jumpState) advanceClip(jumpState, (jumpSource || rig()).keys, dt, null);
-      if (idleState) advanceClip(idleState, (idleSource || rig()).keys, dt, null);
-      refreshIdle();
+      if (slots.jumpState) advanceClip(slots.jumpState, (slots.jumpSource || rig()).keys, dt, null);
+      if (slots.idleState) advanceClip(slots.idleState, (slots.idleSource || rig()).keys, dt, null);
+      slots.refreshIdle();
       // MW-D51: the torch's own clock, on its own keys - it is not the
       // frame's winner, it is the LEFT ARM's, and it plays through
       // whatever the four-slot winner does with the rest of the body.
@@ -5548,11 +5205,11 @@ export function createFpArm() {
       // BODY-MOTION: its clocks, after the clips so a blow reads this frame's section (a frame that does not pose still walks)
       // the word the layer reads, a line for each of what it says: the body, its blow, its hands (AUDIT BODY-MOTION RIG-10)
       motion.step(dt, motionWord({
-        cam, third: viewMode === 'third', rig: thirdBuilt, built, dead, hit: !!hitState && !actionState, climb: climbWorld.w, upper: UPPER_BODY_NAME[upper],
+        cam, third: viewMode === 'third', rig: thirdBuilt, built, dead, hit: !!slots.hitState && !actionState, climb: climbWorld.w, upper: UPPER_BODY_NAME[upper],
         attackType, reversed: attackReversed, hand: attackHand, progress: actionState ? clipCompletion(actionState) : 0, strength: attackStrength,
         shown: weaponInHand(), hands: handsMode, torch: torchVisible(), spell: spellStance(), spellHand: spellHand && spellInHand, guard: pairDip(),
       }));
-      if (!actionState && !movementState && !jumpState && !idleState && !hitState && !deathState) return;
+      if (!actionState && !slots.movementState && !slots.jumpState && !slots.idleState && !slots.hitState && !slots.deathState) return;
       // THE WINNER, not a blend. See the two-slot note above: in first
       // person both animations are played on BlendMask_All, so the higher
       // priority takes every bone for as long as it is playing.
@@ -5562,13 +5219,13 @@ export function createFpArm() {
       // BlendMask_All everywhere. The jump wins the air because the
       // movement slot empties there, not by outranking it. The
       // per-bone-group vector is the recorded gap.
-      const state = deathState || actionState || hitState || movementState || jumpState || idleState;   // MWNPC4: death over all, the recoil under the weapon
+      const state = slots.deathState || actionState || slots.hitState || slots.movementState || slots.jumpState || slots.idleState;   // death over all, the recoil under the weapon
       posedGroup = state.group;
       // MW-D14: and the TRACKS come from the same file as the clip. A
       // female actor can win her idle from xbase_anim_female.1st.kf and
       // her swing from the base xbase_anim.1st.kf, and posing one with
       // the other's tracks is a bind pose with no error.
-      poseSource = deathState ? deathSource : actionState ? actionSource : hitState ? hitSource : (movementState ? movementSource : (jumpState ? jumpSource : idleSource));
+      poseSource = slots.deathState ? slots.deathSource : actionState ? actionSource : slots.hitState ? slots.hitSource : (slots.movementState ? slots.movementSource : (slots.jumpState ? slots.jumpSource : slots.idleSource));
       // Rule 54's neck: the camera node hangs off "bip01 neck", so the
       // pitch has to be in the pose before any matrix is composed - the
       // eye MOVES with the look, it is not a lens tilt.
@@ -5584,11 +5241,11 @@ export function createFpArm() {
         if (!t || !t.ok) return;
         // MW-D51: the torch overlay on the body's own LeftArm mask.
         const tBase = poseSource ? poseSource.trackMap : t.tracks;
-        const tOverlay = torchState && torchSource && !deathState && t.leftArm && t.leftArm.size;   // MWNPC4: the death takes the left arm too (Priority_Death over Priority_Torch)
+        const tOverlay = torchState && torchSource && !slots.deathState && t.leftArm && t.leftArm.size;   // the death takes the left arm too: it outranks the torch
         if (tOverlay) overlayClock = torchState.time;
         // HT-WAIST: the lantern at the waist swings on the frame's motion before the body is posed around it - on the
         // body motion's stride while it walks the legs (BODY-MOTION), else on the walk clip's
-        if (hipVisible() && thirdBuilt.hipHang) hipLantern.step(cam, dt, motion.stride().move > 0.5 ? motion.stride().phase : movementState ? clipCompletion(movementState) % 1 : null, thirdBuilt.hipHang.rot, motion.stride().hipYaw);
+        if (hipVisible() && thirdBuilt.hipHang) hipLantern.step(cam, dt, motion.stride().move > 0.5 ? motion.stride().phase : slots.movementState ? clipCompletion(slots.movementState) % 1 : null, thirdBuilt.hipHang.rot, motion.stride().hipYaw);
         // PEER-CADENCE: a frame that does not pose keeps last frame's
         // skin, upload and bounds; the clips above advanced all the
         // same, so the next posing frame lands where the clock is.
@@ -5634,7 +5291,7 @@ export function createFpArm() {
       // clock. The arm's LeftArm set is rule 25's walk on THIS
       // skeleton; a rig without "Bip01 L Clavicle" overlays nothing.
       const fBase = poseSource ? poseSource.trackMap : built.tracks;
-      const fOverlay = torchState && torchSource && !deathState && built.leftArm && built.leftArm.size;   // MWNPC4: and here
+      const fOverlay = torchState && torchSource && !slots.deathState && built.leftArm && built.leftArm.size;   // the death takes the left arm here too
       if (fOverlay) overlayClock = torchState.time;
       let fTracks = fOverlay ? overlayFor(fBase, built.leftArm) : fBase;
       let fSampler = fOverlay ? overlaySample : sampleTrack;
@@ -5908,13 +5565,13 @@ export function createFpArm() {
       // nothing on the screen for a composition change to carry from (a carry kept across the switch eased the arms in
       // from where they stood when the player LEFT this view); a fresh carry takes its first composition as it stands
       mirrorCarry.first = {}; mirrorCarry.third = {};
-      resetMovement();
-      resetJump();   // MW-D39: the clip state came from the OTHER rig's sources; the next frame re-derives
+      slots.resetMovement();
+      slots.resetJump();   // the clip state came from the OTHER rig's sources; the next frame re-derives
       if (upper !== UPPER_BODY.Rest && upper !== UPPER_BODY.Ready) {
         upper = weaponShown ? UPPER_BODY.Ready : UPPER_BODY.Rest;
       }
       refreshWeaponGroup();
-      resetIdle();
+      slots.resetIdle();
       refreshTorch(true);   // MW-D51: the torch clip came from the OTHER rig's sources too
       return true;
     },
@@ -6331,11 +5988,11 @@ export function createFpArm() {
         // MW-D12: the card reports the ANIMATION state, because "built"
         // stopped being the whole question the moment there were two
         // clips and a machine between them. A frozen arm now has a name.
-        idleGroup,
+        idleGroup: slots.idleGroup,
         weaponGroup,
         // MWNPC4: the reactions - the recoil playing, the death (held at its stop), and the frame's winner
-        hit: hitState ? { group: hitState.group, time: hitState.time } : null,
-        death: deathState ? { group: deathState.group, time: deathState.time, stop: deathState.stopTime } : null,
+        hit: slots.hitState ? { group: slots.hitState.group, time: slots.hitState.time } : null,
+        death: slots.deathState ? { group: slots.deathState.group, time: slots.deathState.time, stop: slots.deathState.stopTime } : null,
         dead,
         posedGroup,
         upper,
@@ -6363,22 +6020,26 @@ export function createFpArm() {
         hipShown: hipVisible(),
         hipSwing: { fore: hipLantern.swing.fore, side: hipLantern.swing.side },
         motion: motion.status(),   // BODY-MOTION
-        loopsLeft: idleState && Number.isFinite(idleState.loopCount) ? idleState.loopCount : null,
+        loopsLeft: slots.idleState && Number.isFinite(slots.idleState.loopCount) ? slots.idleState.loopCount : null,
         groups: built && built.ok ? built.groups : null,
         sources: built && built.ok ? built.sourcePaths : null,
-        idleSource: idleSource && idleSource.name,
+        idleSource: slots.idleSource && slots.idleSource.name,
         actionSource: actionSource && actionSource.name,
         // MW-D26: the movement slot, on the card like the others.
-        movementGroup,
-        movementRate: movementState ? +movementRate.toFixed(3) : null,
-        movementSource: movementSource && movementSource.name,
+        movementGroup: slots.movementGroup,
+        movementRate: slots.movementState ? +slots.movementRate.toFixed(3) : null,
+        // The slots' own clocks, for the parity recording and the card.
+        idleTime: clockOf(slots.idleState),
+        movementTime: clockOf(slots.movementState),
+        jumpTime: clockOf(slots.jumpState),
+        movementSource: slots.movementSource && slots.movementSource.name,
         // MW-D39: the jump slot, on the card like the others.
-        jumpGroup,
-        jumpKind,
-        jumpSource: jumpSource && jumpSource.name,
+        jumpGroup: slots.jumpGroup,
+        jumpKind: slots.jumpKind,
+        jumpSource: slots.jumpSource && slots.jumpSource.name,
         clipNotes: notes.slice(-6),
-        time: actionState ? actionState.time : (idleState ? idleState.time : null),
-        poseTime: actionState ? poseTime(actionState) : (idleState ? idleState.time : null),   // MS1: what the pose sampled
+        time: actionState ? actionState.time : (slots.idleState ? slots.idleState.time : null),
+        poseTime: actionState ? poseTime(actionState) : (slots.idleState ? slots.idleState.time : null),   // what the pose sampled
         frames,
         // MW-D24: which rig the machine is driving, and the body's own
         // build verdict - a refusal is a sentence on the card, exactly
@@ -6410,7 +6071,7 @@ export function createFpArm() {
     built: () => built,
     trace({ dt = 0.2, steps = 40, loopCount = 2, group = null } = {}) {
       if (!built || !built.ok) return null;
-      const s2 = resetClip(built.keys, group || idleGroup, { loopCount, loopFallback: true });
+      const s2 = resetClip(built.keys, group || slots.idleGroup, { loopCount, loopFallback: true });
       if (!s2.ok) return null;
       const out = [];
       for (let i = 0; i < steps && s2.playing; i++) {
