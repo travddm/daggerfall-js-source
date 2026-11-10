@@ -434,7 +434,7 @@ test('TV2 journey: the mod\'s stops still stop it (a foe near: boxed); interrupt
   const o = mapPixelWorldOrigin(503, 250);
   assert.equal(r.to.state.autopilot.destinationWorldRect.xMin, o.x + MID_LO);
   r.to.beginTravel({ pixel: { x: 520, y: 250 }, name: 'Daggerfall', mapId: 7 });
-  assert.equal(r.to.route, null, 'the mod\'s journey replaces the view\'s');
+  assert.deepEqual([r.to.route?.legs, r.to.route?.summary?.name], [[], 'Daggerfall'], 'the mod\'s journey replaces the view\'s: no road legs, bound for its own place');
   r.to.clearTravelDestination();
   assert.equal(r.to.beginTravelAlongRoute({ legs: [] }), false, 'no end, no journey');
 });

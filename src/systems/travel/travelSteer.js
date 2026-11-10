@@ -581,7 +581,7 @@ export function steerDrive(steer, drive, worldX, worldZ, autopilot, frame, probe
 /** How high above the feet a feeler runs: over anything the motor steps
  *  up (STEP_OFFSET), under everything it cannot. */
 export const FEELER_HEIGHT = STEP_OFFSET + 0.1;
-/** A feeler's second ray, above the first. A rail fence (ARCH3D 41206 and 41207, which Beautiful Villages stands round
+/** A feeler's second ray, above the first. A rail fence (ARCH3D 41206 and 41207, which a town mod stands round
  *  its yards) is posts with a low rail 0.38-0.65 m and an upper rail 1.30-1.50 m over its foot. On ground a few
  *  centimetres lower than the body's, the ray at FEELER_HEIGHT passes over the low rail and between the posts, so the
  *  steering saw a fence as open ground and the body ground against it. This height meets the upper rail wherever the

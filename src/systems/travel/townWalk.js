@@ -268,7 +268,7 @@ export function carveNav(nav, passages) {
 
 // THE JOURNEY'S GRID KNOWS WHAT A BODY CANNOT WALK THROUGH. The town's grid is DFU's CityNavigation: its buildings'
 // automap footprints and its ground. A town's fences, walls, wells and signposts, and the pieces a town mod stands
-// (Beautiful Villages fences its yards), are on no automap, so a journey's way ran through a fenced yard and the body
+// (a town mod fences its yards with them), are on no automap, so a journey's way ran through a fenced yard and the body
 // stopped at the fence. The journey's grid has those cells covered: every near-vertical face of the town's solid models
 // between a step's height and the head, laid on the cells it crosses. The residents' grid is not written: DFU's
 // townsfolk walk as DFU walks them.
