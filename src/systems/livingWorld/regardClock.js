@@ -12,8 +12,8 @@
 // sky") - LIVED1 puts a character's standing on their own clock, and the courtship beside the regard was already there
 // (legacyHost.js ownDay). Offline the sky, the world's clock and the character's are one clock: nothing changes there.
 //
-// The Living World's people, plans, roads and tales stay on the sky (LW0 decision 2: the world is shared); how it regards
-// the character is theirs (decision 6), so its day is theirs. Every caller still hands the relations the living day it
+// The Living World's people, plans, roads and tales stay on the sky (the world is shared); how it regards
+// the character is theirs, so its day is theirs. Every caller still hands the relations the living day it
 // has (twenty-odd sites across the towns, roads, dives and caravans); this seam is the one place the relations are made
 // (THE ONE CONSTRUCTION SEAM), and it counts every regard in the character's own day instead.
 import { createRelations, regardStanding, EASE_PER_DAY } from './relations.js';

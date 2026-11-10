@@ -1040,7 +1040,7 @@ const service = {
       const auth = request.headers.get('authorization') ?? '';
       const bearer = /^Bearer (.+)$/.exec(auth)?.[1];
       const secret = bearer ?? (request.method === 'POST' ? body.secret : null);
-      // SESSION-SIGN (sessionPass.js; THE PLAN PAST 1,000, decision 4): A HOT ROUTE
+      // SESSION-SIGN (sessionPass.js): A HOT ROUTE
       // BELIEVES ITS PASS - who the lookup found, signed for five minutes and bound to this secret - and asks the lookup
       // only for one it cannot believe, minting the next beside its answer
       const hot = passRoute(path, request.method) ? await passKey(env, subtle) : null;

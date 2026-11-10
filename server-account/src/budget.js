@@ -127,7 +127,7 @@ export function spoilsGrantStatement(db, playerId, guard = null, ...binds) {
 
 /** LW15 ("LW15"): THE SERVICE'S OWN FAUCETS - gold it pays that no player paid (a
  *  patron's purchase: market.js reckonPatrons) - kept by the hour and kind (realm_faucets) beside the wealth's hours, so
- *  staff read what the living world mints before the budget is enforced (Living World II decision 7). SUMMON-REPAIR: and
+ *  staff read what the living world mints before the budget is enforced. SUMMON-REPAIR: and
  *  staff's own refunds (review.js `repair`) - gold no player paid, named as its own kind. */
 export const FAUCET_KINDS = Object.freeze(['patron', 'repair']);
 /** One faucet's gold written to its hour. @param {any} db @param {string} kind @param {number} hour @param {number} gold */

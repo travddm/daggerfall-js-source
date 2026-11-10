@@ -2738,7 +2738,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   }
   const timeScaleMult = params.has('timescale') && !sharedClockOn() ? Number(params.get('timescale')) / 12 : 1;
   const minuteNow = () => skyMinutes() % 1440;   // TIME1: THE SKY's hour - every isNight, hour and sky read below takes it
-  // LW2 (, LW0 decisions 2-3): THE LIVING WORLD'S CLOCK is the sky's minute, and its
+  // LW2: THE LIVING WORLD'S CLOCK is the sky's minute, and its
   // people walk at DFU's 1.3 m/s - so their pace in the sky's minutes is that over the clock's rate: the sky's own online
   // (twenty-four a real minute, every reader the same), the calendar's twelve offline. A journey speeds the calendar
   // and the people with it (`livingRate`); online it moves no shared clock.

@@ -302,7 +302,7 @@ export class LivingTown {
    *   when, who of elsewhere stays here; LW-TALK `places` the towns its roads and news name, its talk's {place}), undefined while its ways are still being asked; `armOf(res)` a resident's
    *   class sprite once its art is loaded, else null (LW-LOOKS: `res.cls` the class asked - their town's), `flatOf(flat)` a
    *   still picture's art and its frames once loaded, else null - `clock` the sky's minute (worldTick.js skyMinutes); `rate` the clock's minutes a real second now (a
-   *   journey's scale in it); `mpm` the walking pace in the clock's metres a minute (LW0 decision 3). LW5: `ashore(res)`
+   *   journey's scale in it); `mpm` the walking pace in the clock's metres a minute. LW5: `ashore(res)`
    *   where one of its sailors is by their packet's clock (portCrews.js - at sea or abroad, in no street of this town);
    *   `crews()` the hands of the packets lying here from elsewhere, each ashore from `inT` to `outT` (the clock's
    *   minutes); `harbour()` the harbour's berth in the location's frame (the dock of a port with no Ship building).

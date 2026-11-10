@@ -1,7 +1,7 @@
 // @ts-check
 // LW1: THE MEETINGS - who talks with whom where the town gathers, and
 // the line being said this moment, so every reader of a minute sees the same two heads together and the same words over
-// them (LW0 decision 2).
+// them.
 //
 // ROUNDS. Time at a spot runs in rounds of ROUND_S of the reader's real seconds, laid on the clock (`roundMin`, the
 // clock's minutes in a round - the host's conversion); the residents standing at the spot for the WHOLE of a round

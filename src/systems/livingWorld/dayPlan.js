@@ -5,7 +5,7 @@
 // THE DAY TURNS AT 04:00 (DAY_START_MIN): the one hour everyone is abed - the larks rise at five, the night owls are in
 // by two - so no night is cut in half by the turn. Each day is a run of ENTRIES covering every minute of it once:
 // a stay at a place (a building, through its door; a spot in the street) or a WALK from one place to the next. The
-// walk's minutes are the walk itself at the resident's pace (`mpm`, metres a minute of the clock: LW0 decision 3) over
+// walk's minutes are the walk itself at the resident's pace (`mpm`, metres a minute of the clock) over
 // the grid's own distance and a detour; the host walks the real path (townPaths.js) and the resident arrives when the
 // path says (`realised`).
 //
@@ -23,7 +23,7 @@
 //
 // AWAY: a window the roads hold the resident (trips.js) is handed in and the day bends round it - geared at home (an
 // armed traveller), walked out to the exit facing the road, away, walked home after; every walk to or from an away
-// window ARMED (LW0 decision 5 - the host draws the class sprite).
+// window ARMED (the host draws the class sprite).
 import { NAV_CELL } from '../../world/city/cityNavigation.js';
 import { BUILDING_TYPES } from '../../world/buildingNames.js';
 import { lwRng, lwSeed, rollInt, pickOf } from './seed.js';

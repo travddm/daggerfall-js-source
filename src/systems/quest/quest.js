@@ -169,7 +169,7 @@ export class Quest {
     this.shelvedSites = null;
     this.shelvedItems = null;   // QUEST-SHELF-DROP: its items the pack held as it was set aside, by symbol
     this.instanceEpoch = null;   // INSTANCES: its instance's epoch, minted when one first opens (systems/instancePlaces.js questInstanceEpoch)
-    // QL1 (decision 1): the questlines' stamp and state - null, DFU's quest; set once,
+    // QL1: the questlines' stamp and state - null, DFU's quest; set once,
     // at its start (machine.js startQuestImmediate), and kept for life. The machine never reads it; the layer does.
     this.ql = null;
   }
