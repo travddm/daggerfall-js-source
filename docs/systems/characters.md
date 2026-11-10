@@ -153,6 +153,10 @@ minutes (`SKILL_RAISE_CHECK_INTERVAL`) a skill with enough uses rises one point.
   and current Endurance. It rides the online layer and is never saved.
 - `LEVEL_CAP` is 45 online and offline (`levelCap.js`), a departure: DFU has no cap. `releaseCapLatch` clears a level-up
   latched in an old save at the cap.
+- Online, mentor mode (`mentorMode.js`, run by `src/scenes/mentorHost.js`) scales a higher-level party member down
+  beside a lower-level partner. It has no DFU counterpart. The party leader can turn it off for the party (the hub's
+  `party.mentoring.off` act, `server/src/partyMentoring.js`). A server owner can take that switch away with the
+  server profile rule `party.allowNoMentoring` (`src/net/profile/profileKeys.ts`); the default allows it.
 
 ### Master Skills and the soft cap
 

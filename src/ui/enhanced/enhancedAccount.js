@@ -61,7 +61,7 @@ export const GLYPH_LABEL = localizedTable({   // L10N4: each word a getter, read
   dev: () => t('account.glyph.dev', 'Developer'),
   mod: () => t('account.glyph.mod', 'Moderator'),
   dm: () => t('account.glyph.dm', 'Dungeon Master'),   // TITLE-N: the die beside the Dungeon Master's name
-  disciple: () => t('account.glyph.disciple', 'Disciple'),   // TITLE-N: the Patreon tiers' marks, each its title's word
+  disciple: () => t('account.glyph.disciple', 'Disciple'),   // the named titles' marks, each its title's word
   apostle: () => t('account.glyph.apostle', 'Apostle'),
   hierophant: () => t('account.glyph.hierophant', 'Hierophant'),
   herald: () => t('account.glyph.herald', 'Herald'),   // HERALD: the herald's trumpet and its banner
@@ -495,36 +495,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
   }
 
   /**
-   * PATREON-LINK — THE PATRON'S OWN LINK. A registered account, on a service with linking on, gets one row: Link Patreon, or Linked with what the
-   * pledge holds, a Refresh (the same link - Patreon asked again) and an Unlink.
-   *
-   * THE LINK IS A LINK, not a button that asks for one: the service put it in the account read, so the press opens it
-   * at once - a new tab on the web, the system browser from the desktop app (app/main.cjs hands http(s) there), exactly
-   * as TERMS1's document links do. A window opened after an await is a popup a phone's browser blocks.
-   */
-  function patreonRow() {
-    const p = flow.patreon;
-    if (!p?.on || !flow.account?.handle) return;
-    const titles = Array.isArray(p.titles) ? p.titles : [];
-    const box = el('div', 'acctwear acctpatreon');
-    box.append(el('span', 'fieldlabel', 'Patreon'));
-    const row = el('div', 'acctwearrow');
-    if (p.linked) row.append(el('span', 'acctpatreonstate', titles.length ? t('account.patreon.linked', 'Linked - {titles}', { titles: titles.map((k) => TITLE_TEXT[k] ?? k).join(', ') }) : t('account.patreon.noTier', 'Linked. No rank yet')));
-    if (typeof p.link === 'string' && p.link.startsWith('https://')) {
-      const a = keyedAs(el('a', 'act', p.linked ? t('account.patreon.refresh', 'Refresh') : t('account.patreon.link', 'Link Patreon')), 'patreon:link');
-      a.href = p.link;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.onclick = () => flow.patreonOpened();
-      row.append(a);
-    }
-    if (p.linked) row.append(act(t('account.patreon.unlink', 'Unlink'), () => flow.unlinkPatreon(), { disabled: !!flow.busy, key: 'patreon:unlink' }));
-    box.append(row);
-    host.append(box);
-  }
-
-  /**
-   * RECOVERY-SET - THE CODES' ROW, in the Account section as the Patreon row is: how many recovery codes still open the
+   * THE CODES' ROW, in the Account section: how many recovery codes still open the
    * account (a count, never a code - the service keeps only hashes), and the press that makes a new set. AUDIT
    * RECOVERY-SET B3: in the section, not the window's foot - a fifth press there took the sticky foot to three rows (225px
    * of a 667px phone, 193px of a landscape one's 390). None for a guest, nor where the service counts no codes (a
@@ -541,18 +512,9 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     host.append(box);
   }
 
-  /** PATREON-LINK: BACK FROM THE BROWSER, the account is read again - a link that landed, or a pledge that moved, is on
-   *  the card the player comes back to. One listener a card, gone on the first focus after the card is. */
-  const win = doc.defaultView;
-  let off = () => {};   // MEM-AUDIT: the card's owner lets it go when it draws the next - a repaint makes a card a render
-  if (win && typeof win.addEventListener === 'function') {
-    const onFocus = () => {
-      if (!root.isConnected) { win.removeEventListener('focus', onFocus); return; }
-      if (flow.stage === 'in' && flow.patreon?.on && typeof flow.refresh === 'function') Promise.resolve(flow.refresh()).catch(() => {});
-    };
-    win.addEventListener('focus', onFocus);
-    off = () => win.removeEventListener('focus', onFocus);
-  }
+  /** The card's owner lets it go when it draws the next. The card holds no listener of its own now, so there
+   *  is nothing to let go; the owner's call stays. */
+  const off = () => {};
 
   function build(stage) {
     const copy = STAGE_COPY[stage];
@@ -563,7 +525,7 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
     // it reads in the order a player looks: WHO (the plate - the portrait the corner mark wears, the name with its
     // Renown, the title and glyphs worn, the character), then WHAT THEY HAVE DONE (the record, a tile a deed; each
     // character's Renown with how far into it they are, drawn), then WHAT THEY WEAR (the wardrobe), then THE ACCOUNT
-    // (its facts and the Patreon link). Each in a section of its own under its own head; side by side where the window
+    // (its facts). Each in a section of its own under its own head; side by side where the window
     // is wide (enhancedStyle.js .acctgrid), one column on a phone. Every fact is the one the card already said - none is
     // new, and none is said twice.
     const signedIn = stage === 'in' && !!flow.account;
@@ -685,14 +647,14 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       }
       keep(deeds, chars);
 
-      // THE WARDROBE (ACC3c) and THE PATRON'S LINK (PATREON-LINK), each under its head, where there is one to draw
+      // THE WARDROBE, under its head, where there is one to draw
       host = el('section', 'acctsec');
       host.append(el('h4', 'acctsechead', 'Wardrobe'));
       wardrobe();
       if (host.children.length > 1) kept.append(host);
 
       // THE ACCOUNT - what it is: the name it goes by, its kind, when it was made and the time played on it - NAME-AS: and
-      // which name the room reads - and its Patreon link, which is the account's too.
+      // which name the room reads.
       const account = section('Account');
       // A GUEST IS NOT A LESSER ACCOUNT, and the card says so rather
       // than showing an empty username and a nag. It is an account
@@ -711,7 +673,6 @@ export function accountCard(doc, flow, { onClose = null, face = null, character 
       kept.append(account);
       host = account;
       nameAsRow();   // NAME-AS: the name the room reads - the account's own section, beside the name it goes by
-      patreonRow();   // PATREON-LINK
       recoveryRow();   // RECOVERY-SET
       if (!flow.account.handle) {
         account.append(el('p', 'meta', t('account.card.guestNote', 'Adding a username keeps everything this account already has.')));

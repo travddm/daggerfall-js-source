@@ -19,7 +19,7 @@ import {
 import { traitWire, readTraitWire, traitsAuthority, hostLordTraits } from '../../src/scenes/foeTraitsHost.js';
 import { createStandInSpell } from '../../src/scenes/gate/standInSpell.js';
 import { bossStandIn } from '../../src/world/gate/gateBoss.js';
-import { COURT_ROUND_MS } from '../../src/scenes/gate/gateCourt.js';
+import { courtRoundMs } from '../../src/scenes/gate/gateCourt.js';
 import { applySpell } from '../../src/systems/effects.js';
 import { hitSpellFields } from '../../src/net/wire.js';
 import { foeTitle } from '../../src/systems/foeTitle.js';
@@ -28,6 +28,7 @@ import { mountHitNumbers, unmountHitNumbers } from '../../src/ui/hitNumbers.js';
 import { reportPlayerAttack } from '../../src/combat/formulas.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { WEAPONS } from '../../src/characters/weapons.js';
+const COURT_ROUND_MS = courtRoundMs();   // five seconds at TimeScale 12
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 // the raid guards' rig (test/scenes/bosstraits_hosts.test.js)

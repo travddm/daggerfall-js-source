@@ -9,6 +9,7 @@
 // ask (100 in each - since MERC-CAP, Field-Bugs-2026-09-29f, the top of the range the haggle reads online). That is
 // still at most half of what the counter asks anyone, so the buy-back loop P0.4 shut stays shut, and it is a number of
 // the counter and the piece - no skill lowers a sale. Offline, Daggerfall's haggle is untouched.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateTradePrice, ONLINE_SALE_SHARE, ONLINE_HAGGLE_MAX } from '../../src/systems/shopStock.js';
@@ -17,7 +18,8 @@ import { getTradePrice } from '../../src/systems/tradeModes.js';
 const sale = (cost, q, m, p, online = true) => calculateTradePrice(cost, q, { mercantile: m, personality: p }, true, { online });
 const ask = (cost, q, m, p) => calculateTradePrice(cost, q, { mercantile: m, personality: p }, false, { online: false });
 
-test('MERC-RISE: the field\'s counter - a higher Mercantile never sells for less (P0.4 paid 3499 at 60 and 2888 at 90)', () => {
+test('MERC-RISE: the field\'s counter - a higher Mercantile never sells for less (P0.4 paid 3499 at 60 and 2888 at 90)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   const [Q, COST] = [5, 17397];
   // the report's two offers were half of each seller's own ask - the old law, to the gold
   assert.deepEqual([Math.floor(ask(COST, Q, 60, 100) / 2), Math.floor(ask(COST, Q, 90, 100) / 2)], [3499, 2888]);
@@ -70,7 +72,8 @@ test('MERC-RISE: online, a sale never falls as Mercantile or Personality rises -
 // that seller ONLINE, which reads 100 past 100 - it held them to half of Daggerfall's own ask there, and that ask runs
 // under nothing by 234, so the half was a price the seller paid
 const askOnline = (cost, q, m, p) => calculateTradePrice(cost, q, { mercantile: m, personality: p }, false, { online: true });
-test('MERC-RISE: P0.4\'s law stands for every seller - online a counter pays at most half of what it asks that seller, a spell\'s lift past 100 included', () => {
+test('MERC-RISE: P0.4\'s law stands for every seller - online a counter pays at most half of what it asks that seller, a spell\'s lift past 100 included', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   assert.equal(ONLINE_SALE_SHARE, 0.5);
   assert.equal(ONLINE_HAGGLE_MAX, 100, 'DFU\'s maximum skill and stat');
   for (let q = 1; q <= 20; q += 1) {

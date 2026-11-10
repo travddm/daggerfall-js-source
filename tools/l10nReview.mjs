@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-// L10N6: THE REVIEW FILE - how a person who reads a language fixes its machine draft without a code editor.
+// L10N6: THE REVIEW FILE - how a person who reads a language fixes its translation without a code editor.
 //
-// A pull request that edits `locales/<tag>/Port_Strings.csv` is one door (the pipeline already sees
-// the edit and keeps the row the person's). This is the other: a language's rows exported as a spreadsheet - the key,
+// A pull request that edits `locales/<tag>/Port_Strings.csv` is one door. This is the other: a language's rows exported as a spreadsheet - the key,
 // the English, the current translation, whose it is, and an empty `fix` column - and the filled sheet imported back.
-// Each fix is held to the pipeline's own placeholder law (tools/translate.mjs checkDraft: every `{argument}` the
+// Each fix is held to the placeholder law (tools/lib/translation-rows.mjs checkDraft: every `{argument}` the
 // English names, a language's own plural categories) and recorded in `Port_Strings.meta.json` as a person's
-// (`by: "human"`), so neither a session's drafts nor the pipeline ever writes over it. A row whose English moved since
+// (`by: "human"`). A row whose English moved since
 // the sheet was exported is refused as stale: the fix was for other words.
 //
 //   node tools/l10nReview.mjs --export fr > fr-review.csv            every row (add --machine for the machine's alone)
@@ -16,7 +15,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseStringTableCsv, formatStringTableCsv } from '../src/systems/textManager.js';
 import { catalogLocale } from '../src/systems/localeCatalog.js';
-import { checkDraft, hash, planRun } from './translate.mjs';
+import { checkDraft, hash, planRun } from './lib/translation-rows.mjs';
 import { isMain } from './lib/isMain.mjs';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');

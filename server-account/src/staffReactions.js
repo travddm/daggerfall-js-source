@@ -23,6 +23,7 @@
 // and a reaction time always carries network delay (Weak spots): it can flag a player, never prove botting.
 import { openStaffFeed, REACT_FEED_V } from '../../server/src/staffFeedLaw.js';
 import { gatePublicKey } from './signing.js';
+import { whenOption, NOT_READ } from './operator-options.ts';
 import { findAccount } from './sanctions.js';
 import { displayName } from './accounts.js';
 
@@ -68,7 +69,7 @@ export function episodeRow(r) {
  * (`read` false for one already kept), or `{ error }` (feed-closed, feed-shape, feed-signature, feed-stale).
  * @param {{ db: any, nowS: number, subtle: SubtleCrypto }} ctx @param {any} env @param {Uint8Array} bytes @param {unknown} sig
  */
-export async function takeReactionFeed({ db, nowS, subtle }, env, bytes, sig) {
+async function keepReactionFeed({ db, nowS, subtle }, env, bytes, sig) {
   const opened = await openStaffFeed(REACT_FEED_V, bytes, sig, await gatePublicKey(env, subtle), { subtle, nowMs: nowS * 1000 });
   if ('error' in opened) return opened;
   const b = opened.batch;
@@ -179,3 +180,10 @@ export async function staffReactions(ctx, env, path, body, who, audit) {
     episodes, next: (page?.results?.length ?? 0) > REACT_PAGE ? episodes[episodes.length - 1].id : null,
   };
 }
+
+/**
+ * The bot check's episodes in, kept only while the operator's option `botcheck` is on; off, a batch is answered as
+ * taken and dropped, so the relay neither retries it nor logs a refusal.
+ * @param {any} ctx @param {any} env @param {Uint8Array} bytes @param {string|null} sig
+ */
+export const takeReactionFeed = (ctx, env, bytes, sig) => whenOption(env, 'botcheck', () => keepReactionFeed(ctx, env, bytes, sig), NOT_READ);

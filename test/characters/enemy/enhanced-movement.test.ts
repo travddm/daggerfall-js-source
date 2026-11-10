@@ -1,6 +1,5 @@
 // DFU's Enhanced Combat AI, movement and strafing (EnemyMotor.cs): the stop distance, the retreat roll, the strafe,
 // the action ladder and the attack's half speed, each against the classic path; then the motor end to end.
-import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -21,9 +20,12 @@ import {
   writePlayerYaw,
 } from '../../../src/player/player-stance.ts';
 
-// The motor and the collider are loaded by a computed path, which tsconfig.node.json does not follow: their imports
-// reach src/player/motor.js and src/net, which name the DOM's crypto types (CryptoKey, SubtleCrypto), and the node
-// config has no DOM library.
+// The mods-off precondition, the motor and the collider are loaded by a computed path, which tsconfig.node.json does not
+// follow: their imports reach src/player/motor.js and src/net (the server profile hands the sky clock's rule to
+// net/skyLaw.js), which name the DOM's crypto types (CryptoKey, SubtleCrypto), and the node config has no DOM library.
+// Every top-level await runs before the first test, so the mods are off for each.
+const MODS_OFF_PATH: string = '../../modsOff.js';
+await import(MODS_OFF_PATH);
 const MOTOR_PATH: string = '../../../src/characters/enemy/enemyMotor.js';
 const COLLIDER_PATH: string = '../../../src/player/collider.js';
 const { EnemyAI } = await import(MOTOR_PATH);

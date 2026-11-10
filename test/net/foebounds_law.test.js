@@ -84,8 +84,9 @@ test('FOE-BOUNDS THE STREET\'S BOUND IS ITS BUILDERS\' WORST, EXACTLY: every mon
   assert.ok(foeHealthBound({ t: KNIGHT_CITY_WATCH, l: 40 }, { camp: false }) >= w.maxHealth);
 });
 
-test("FOE-BOUNDS THE DUNGEON'S BOUND IS ITS BUILDERS' WORST, EXACTLY: a layout foe - a Super dungeon's x4 then the hero at his worst or a Stalwart champion, or a Super dungeon's elite - the record carrying no marks there; a revenant's lair stand (the hero's threat, then the revenant's stages) stands under it (mutants: the Super dungeon's x4 left out; the elite's x9)", () => {
+test("FOE-BOUNDS THE DUNGEON'S BOUND IS ITS BUILDERS' WORST, EXACTLY: a layout foe - a Super dungeon's x4 then the hero at his worst or a Stalwart champion, or a Super dungeon's elite - the record carrying no marks there; a revenant's lair stand (the hero's threat, then the revenant's stages) stands under it (mutants: the Super dungeon's x4 left out; the elite's x9)", (tc) => {
   ladder();
+  setPref('eliteStacking', true); tc.after(() => setPref('eliteStacking', false));   // elites stack with the dungeon: the Features row, off by default
   const stalwart = FOE_BOUND.championTraits.indexOf(Math.max(...FOE_BOUND.championTraits));
   for (const [t, l] of [...MONSTERS.map((x) => [x, null]), [131, 20]]) {
     const a = entityOf(t, l); scaleSuperFoe(a); hero(a);
