@@ -24,7 +24,7 @@ import { GUILD_FOUND_RENOWN, GUILD_RANK_NAMES } from '../../src/net/guild/guildL
 import { renownXpFor } from '../../src/net/renown.js';
 import { mintToken, verifyOrder, mintGuildOrder, mintGuildOutOrder, MAX_TTL_S } from '../../src/net/identityToken.js';
 import { SOCIAL_ROOM } from '../../src/net/wire.js';
-import { accountGuilds, accountHomes, accountRefusalText, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountGuilds, accountHomes, accountRefusalText, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { GuildBook, GUILD_FRESH_MS, guildRefused } from '../../src/net/guild/guildBook.js';
 import {
   createOnlineHomes, buyOnlineHome, HOME_BUY_BUSY, HOME_BOUGHT_LINE, homeShortLine, homeSceneName, homeBuyRows, homeOwnerRows,
@@ -129,7 +129,7 @@ async function stand({ kp = null, db = d1() } = {}) {
       env.DB._raw.prepare('INSERT OR REPLACE INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)')
         .run(id, character, handle, renownXpFor(renown), 1, 1);
     }
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ secret, id })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret, id })]]);
     const storage = { getItem: (k) => kept.get(k) ?? null, setItem: (k, v) => kept.set(k, v), removeItem: (k) => kept.delete(k) };
     return { secret, id, character, handle, storage, at };
   };

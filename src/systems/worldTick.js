@@ -134,7 +134,7 @@ import { findFactionByTypeAndRegion } from './talk/talk.js';   // AUDIT ALL E8: 
 import { FACTION_TYPES } from '../formats/factionFile.js';
 import { MERCHANTS_FACTION_ID } from './guild/guilds.js';   // AUDIT ALL E8: no Merchants, no walk, no flags (DFU's own gate)            // FormulaHelper.UpdateRegionalPrices (:2053); ECON1: the world's price seam and the walk's one-home pieces
 import { REGION_COUNT } from './region/regionConditions.js';   // ECON1: the world's walk is region-major, as DFU's
-import { ONLINE_EPOCH_MINUTES, ONLINE_MINUTES_PER_MS } from '../net/wire.js';   // ECON1: the world's economy begins the day the online world stood at the classic start
+import { ONLINE_EPOCH_MINUTES, onlineMinutesPerMs } from '../net/wire.js';   // ECON1: the world's economy begins the day the online world stood at the classic start
 import { rollClimateWeathersForDay, evolveClimateWeathers } from './weather/weatherSim.js';
 import { setSkyCalendar } from './skyCalendar.js';   // TIME1: the weather's season and hour are the sky's, switched on with the sky      // WeatherManager.SetClimateWeathers (:419); CLK2: the enhanced lane's hourly evolution
 import { seededRng } from './wind/wind.js';   // WORLD6b: the shared day's own generator for the region's walk
@@ -1325,13 +1325,13 @@ export const sharedWallMs = (classicMinutes) => (_sharedWall && Number.isFinite(
  *  minutes"), rounded up as the nightfall words round; null offline, where the days are DFU's own words. */
 export function worldSpanRealWords(eventMinutes) {
   if (!_sharedClock || !Number.isFinite(eventMinutes) || eventMinutes <= 0) return null;
-  const real = Math.max(1, Math.ceil(eventMinutes / ONLINE_MINUTES_PER_MS / 60000));
+  const real = Math.max(1, Math.ceil(eventMinutes / onlineMinutesPerMs() / 60000));
   return real >= 120 ? `about ${Math.ceil(real / 60)} real hours` : `about ${real} real minute${real === 1 ? '' : 's'}`;
 }
 /** LIVED1: THE SUN IS EVERYONE'S. A single player waits out the day with a rest; online a rest moves their own clock
  *  and not the sky, so a refusal that waits on the night (the vampire's CheckFastTravel, a sun-damaged career's box)
  *  says when the world's night falls, in real minutes. Null offline, or when it is night. TIME1: the SKY's night, timed
- *  through the sky's own inverse - at the sky's rate, which the event clock's ONLINE_MINUTES_PER_MS no longer is (it
+ *  through the sky's own inverse - at the sky's rate, which the event clock's is not (it
  *  would have said four times too long); a sky with no inverse installed is timed at the wire's one rate. */
 export function worldNightfallText() {
   if (!_sharedClock) return null;
@@ -1339,7 +1339,7 @@ export function worldNightfallText() {
   const now = Math.floor(sky);
   if (!isDayFromMinutes(now)) return null;
   const dusk = Math.floor(now / MINUTES_PER_DAY) * MINUTES_PER_DAY + DUSK_HOUR * 60;
-  const ms = _skyWall ? _skyWall(dusk) - _skyWall(sky) : (dusk - sky) / ONLINE_MINUTES_PER_MS;
+  const ms = _skyWall ? _skyWall(dusk) - _skyWall(sky) : (dusk - sky) / onlineMinutesPerMs();
   const real = Math.max(1, Math.ceil(ms / 60000));
   return `Online, resting does not move the sun. Night falls in about ${real} minute${real === 1 ? '' : 's'}.`;
 }
@@ -1355,7 +1355,7 @@ export function ownTimeLeftText(untilMinutes) {
   const n = (v, unit) => `${v} ${unit}${v === 1 ? '' : 's'}`;
   const days = Math.floor(left / MINUTES_PER_DAY), hours = Math.floor((left % MINUTES_PER_DAY) / 60);
   const own = days > 0 ? n(days, 'day') + (hours > 0 ? ` ${n(hours, 'hour')}` : '') : hours > 0 ? n(hours, 'hour') : n(left % 60, 'minute');
-  const playMinutes = Math.ceil(left / ONLINE_MINUTES_PER_MS / 60000);
+  const playMinutes = Math.ceil(left / onlineMinutesPerMs() / 60000);
   // AUDIT LIVED1b U5: "the most it can take" is never rounded DOWN - from two days of play the hours went to the
   // nearest, and "(48 hours of play)" stood for up to 48h 29m
   const play = playMinutes >= 2880 ? `${Math.ceil(playMinutes / 60)} hours`

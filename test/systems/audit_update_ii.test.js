@@ -16,7 +16,6 @@ import { counterValueOf } from '../../src/systems/tradeModes.js';
 import { eliteLoot } from '../../src/systems/eliteFoes.js';
 import { revenantLoot } from '../../src/systems/revenant/revenant.js';
 import { parseStringTableCsv } from '../../src/systems/textManager.js';
-import { hash } from '../../tools/translate.mjs';
 import { setPref } from '../../src/systems/uiPrefs.js';
 
 setPref(LOOT_RARITY_KEY, true);
@@ -86,17 +85,3 @@ test('AUDIT UPDATE II A9: the scope refuses an async body, and a throw after the
   assert.equal(p.goldPieces, 10_000_000, 'nothing paid');
 });
 
-test('AUDIT UPDATE II A4: no machine row of any language stands on an English that has moved - the pipeline\'s hash of the English it was drafted from is the English\'s now (a person\'s row is theirs to review: l10nCoverage.mjs counts it stale) (mutants: a moved English\'s rows left)', () => {
-  const english = new Map(parseStringTableCsv(readFileSync('locales/en/Port_Strings.csv', 'utf8')));
-  const stale = [];
-  for (const tag of readdirSync('locales')) {
-    const metaPath = `locales/${tag}/Port_Strings.meta.json`;
-    if (tag === 'en' || !existsSync(metaPath)) continue;
-    const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
-    for (const [key, rec] of Object.entries(meta)) {
-      if (rec?.by === 'human' || !english.has(key)) continue;
-      if (rec?.en !== hash(english.get(key))) stale.push(`${tag}: ${key}`);
-    }
-  }
-  assert.deepEqual(stale, [], 'redraft them in session (tools/l10nInSession.mjs) when their English moves');
-});

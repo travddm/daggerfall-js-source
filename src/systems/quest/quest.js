@@ -27,6 +27,7 @@
 // season are read on, and `worldSeconds`, the event clock the journal's
 // dates are stamped on. Offline all three are DFU's one clock.
 
+import { questFailureFree } from './quest-failure-rule.ts';   // QFAIL-FREE, the server profile's option
 import { travelTimeSeconds } from './clock.js';
 import { Message, Formatting } from './message.js';
 import { localizedQuestMessage } from './localizedQuest.js';   // L10N3c: GetMessage's Internal_Quests lookup
@@ -393,12 +394,12 @@ export class Quest {
     // tombstone later scrubs the "rumor mill" rumors and info topics.
     this.hooks?.removeProgressRumors?.(this.uid);
     this.hooks?.removeQuestorPostMessage?.(this.uid);
-    // QFAIL-FREE: online a quest
+    // The server profile's option (quest.failureFree; off: DFU's -2 online too): online a quest
     // that ends unfinished costs the faction nothing. TIME3 put the
-    // countdowns on the character's clock, so a journey or a rest spends
+    // countdowns on the character's clock, so a journey or a rest spent
     // them, and DFU's -2 (propagated through the tree) bled every
-    // standing a player held. Offline DFU's -2 stands. Port-Ledger A.
-    const failureFree = !this.questSuccess && !!this.hooks?.sharedClock?.();
+    // standing a player held; a deadline now charges only lived time.
+    const failureFree = questFailureFree(this.questSuccess, this.hooks);
     if (this.factionId > 0 && !failureFree) {
       const repChange = this.questSuccess ? QUEST_SUCCESS_REP : QUEST_FAILURE_REP;
       // Quest.cs:385 passes propagate=TRUE - the ally/enemy/tree

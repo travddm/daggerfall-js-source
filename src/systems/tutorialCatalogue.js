@@ -18,6 +18,7 @@
 
 import { t } from './textManager.js';   // KG3: a page's words read through the text core when shown
 import { isEnhanced } from './uiSkin.js';   // AUDIT SUGGESTIONS-1019 L6-4: a line only the enhanced skin's Stats page bears out
+import { seatsHoldTopRanks } from './guild/guild-rank-rule.ts';   // whether the chairs hold ranks 8 and 9 online (guild.seatRanks)
 import { ROLL_GAIN_DAY_MAX, ROLL_BOOK_RANK_MAX, SEAT_RANK } from '../net/npcChapterLaw.js';   // SEAT-WORDS: the Chapters page's numbers, the law's own
 
 /** @typedef {{ id: string, group: string, title: string, trigger: string, body: ReadonlyArray<string>, points?: ReadonlyArray<string> }} Tutorial */
@@ -329,7 +330,7 @@ export const TUTORIALS = Object.freeze([
     },
     // SEAT-WORDS (Field-Bugs-2026-10-15g): online a review stops at 7 - the page said "to rank up, keep working for it";
     // AUDIT GUILD-WORDS II C-2: ranks 8 and 9 are chairs - a seat is a town's (GUILD3, ONE WORD ONE THING)
-    get points() { return [t('tutorials.guilds.online', 'Online, reviews promote you no further than rank {cap}. Ranks {officer} and {master} are chapter chairs; see Guild Chapters.', { cap: ROLL_BOOK_RANK_MAX, officer: SEAT_RANK.officer, master: SEAT_RANK.master })]; },
+    get points() { return [seatsHoldTopRanks() ? t('tutorials.guilds.online', 'Online, reviews promote you no further than rank {cap}. Ranks {officer} and {master} are chapter chairs; see Guild Chapters.', { cap: ROLL_BOOK_RANK_MAX, officer: SEAT_RANK.officer, master: SEAT_RANK.master }) : t('tutorials.guilds.onlineRanks', 'Online, reviews promote you as in single player. A chapter chair is an honour, not a rank; see Guild Chapters.')]; },
   }),
   page({
     id: 'tavern', group: 'towns', title: 'Taverns', trigger: 'When you first visit a tavern.',
@@ -600,7 +601,7 @@ export const TUTORIALS = Object.freeze([
         // so), the real day it counts by - II C-8: a UTC day, said; II C-3: no quest is free of its own guild's losses
         // (REPUTE-GATE gates the two that cost the most instead), so the page no longer says one is; II C-2: chairs
         t('tutorials.chapters.body1', 'Online, quests raise your standing with each guild by at most {max} a real day (days start at midnight UTC). Any more is added on later days.', { max: ROLL_GAIN_DAY_MAX }),
-        t('tutorials.chapters.body2', 'Reviews promote you up to rank {cap}. Ranks {officer} and {master} are chapter chairs, won by Merit at each Sunday\'s Turning. A notice board explains chapters.', { cap: ROLL_BOOK_RANK_MAX, officer: SEAT_RANK.officer, master: SEAT_RANK.master }),
+        seatsHoldTopRanks() ? t('tutorials.chapters.body2', 'Reviews promote you up to rank {cap}. Ranks {officer} and {master} are chapter chairs, won by Merit at each Sunday\'s Turning. A notice board explains chapters.', { cap: ROLL_BOOK_RANK_MAX, officer: SEAT_RANK.officer, master: SEAT_RANK.master }) : t('tutorials.chapters.body2Ranks', 'Reviews promote you up to rank {master}, as in single player. A chapter chair is an honour won by Merit at each Sunday\'s Turning, and gives no rank. A notice board explains chapters.', { master: SEAT_RANK.master }),
       ];
     },
   }),

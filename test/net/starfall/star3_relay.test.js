@@ -8,11 +8,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  STAR_HOUR_MS, STAR_PER_NIGHT, STAR_WAVES, STAR_LEVEL_MAX, STAR_KILLS_WIRE_MAX, STAR_BLOWS_WIRE_MAX,
+  STAR_PER_NIGHT, STAR_WAVES, STAR_LEVEL_MAX, STAR_KILLS_WIRE_MAX, STAR_BLOWS_WIRE_MAX,
   STAR_TOP_MAX, STAR_ACCOUNTS_MAX, STAR_LIGHT, STAR_PHASES, STAR_WORD_MS, STAR_GRACE_MS, STAR_REACH_M, STAR_UNITS_PER_M,
   STAR_ORPHAN_MS, STAR_LOST_DAWN, STAR_LOST_DARK, P_GATHER, P_WAVE, P_BREATH, P_MASTER, P_HELD, P_LOST, starTimes, starNativeOf, starLedgerId,
-  starWaveSize, starNightGoneAt, STAR_WAVE_MAX, newStarLedger, starLedgerSane, starHeldWord, STAR_LIFE_MS, STAR_AFTER_MS, starLedgerState,
+  starWaveSize, starNightGoneAt, STAR_WAVE_MAX, newStarLedger, starLedgerSane, starHeldWord, starLifeMs, STAR_AFTER_MS, starLedgerState,
 } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter, skyDayStartMs } from '../../../src/net/sky-days.ts';
 import { readStarReceipt, verifyStarReceipt, mintStarReceipt, STAR_RECEIPT_MAX, STAR_RECEIPT_V } from '../../../src/net/starfall/starReceipt.js';
 import {
   parseClient, validStarIn, validStarOut, STAR_STARS_MAX, STAR_WAVES_MAX, STAR_LEVEL_WIRE_MAX,
@@ -33,7 +34,7 @@ const quiet = async (fn) => { const w = console.warn, i = console.info; console.
 // THE RIG
 
 /** A night inside the window, its first star, and a pixel of the Bay. */
-const N = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS) + 5, K = 0;
+const N = skyDayAtOrAfter(FESTIVAL_FROM_MS) + 5, K = 0;
 const PX = 100, PY = 200, CELL = worldRoom(PX, PY);
 const T = starTimes(N, K);
 /** A pose at the star the law places in (px, py) - `east` metres east of it. */
@@ -149,7 +150,7 @@ test('STAR3 THE STORED LEDGER: a ledger is what the law made, read back - its st
   }
   const held = { ...led, p: P_HELD, hd: T.fallAt + 9, top: ['Ann'], hn: 3 };
   assert.deepEqual(validStarOut(starHeldWord(held)), { k: 'hd', n: N, s: K, px: PX, py: PY, at: T.fallAt + 9, top: ['Ann'], c: 3 }, 'the wire\'s own word');
-  assert.equal(starNightGoneAt(N), N * STAR_HOUR_MS + STAR_LIFE_MS + STAR_AFTER_MS, 'the night\'s last star falls at its midnight');
+  assert.equal(starNightGoneAt(N), skyDayStartMs(N) + starLifeMs() + STAR_AFTER_MS, 'the night\'s last star falls at its midnight');
   await withStar(async ({ r, say, step }) => {
     const a = r.connect(); await r.hello(a, 'peer-0001', ON);
     r.store.set(LED(), { junk: 1 });
@@ -179,7 +180,7 @@ test('STAR3 THE WORD: heard in the star\'s own cell alone (another cell\'s pixel
     step(1000); set(T.endAt + STAR_GRACE_MS); await say(a);
     assert.deepEqual(ledgers(r), [], 'nothing read, kept or said before its landing or past its grace');
     // a night outside the window
-    const early = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS) - 3;
+    const early = skyDayAtOrAfter(FESTIVAL_FROM_MS) - 3;
     set(starTimes(early, K).fallAt + 1000); await say(a, { n: early });
     assert.deepEqual(ledgers(r), [], 'a night before the window');
     assert.equal(r.room._meterOf(a).junk, 1, 'and nobody struck for them');

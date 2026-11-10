@@ -19,6 +19,7 @@ const PREFS = Object.freeze({
   crimeRecovery: 'x4',
   dungeonFires: true,
   weatherEvents: true,
+  etherSea: true,
   realForests: true,
   banthaJungle: true,
   tamrielLands: true,
@@ -28,6 +29,7 @@ const PREFS = Object.freeze({
   climateBlend: true,
   questlines: true,
   wildernessCamps: true,
+  spawnedDungeons: false,
   naval: false,
   revenants: true,
   revenantWho: 'elite',
@@ -39,9 +41,16 @@ const PREFS = Object.freeze({
   humanoidLoot: 'dfu',
   repairPriceByDamage: false,
   cureKeepsInfection: false,
+  clawMetal: false,
+  gentleEquipBill: false,
+  legendaryEquipFree: false,
   lockpickTumblers: false,
   dressForThePart: false,
   guildProbation: false,
+  soldGoodsOnShelf: false,
+  absorptionLimits: false,
+  openingDamage: false,
+  eliteStacking: false,
   questlineRewards: true,
 });
 
@@ -66,8 +75,6 @@ const MOD_KEYS = Object.freeze({
   }),
   // Levels the ground under its camps and stands collidable rock; its peaks do the same.
   'world-of-daggerfall': Object.freeze({ Enabled: true, Mountains: false }),
-  // Every owner's ship stands at the same map pixel, so its collidable deck props are shared ground.
-  'detailed-ships': Object.freeze({ Enabled: true }),
   // Lays the towns out again: players who disagree walk different streets, and a building key names different buildings.
   'beautiful-villages': Object.freeze({ Enabled: true }),
   'beautiful-cities': Object.freeze({ Enabled: true }),

@@ -33,7 +33,7 @@ import {
 import { inAttack, spokeLanes, landingPools, poolUnder, strikeDamage, blowOf, strikeVerdict } from '../../../src/net/gate/gateStrike.js';
 import { telegraphShape, telegraphField, markShape, poolShapes, TELEGRAPH_KIND, TELEGRAPH_FS, BOSS_MARK_R, BOSS_MARK_CHEVRON_LEN, BOSS_MARK_CHEVRON_HALF_W } from '../../../src/render/gate/gateTelegraph.js';
 import { bossPlace, bossHop, bossAct, bossStandIn, bossLookOf, LEAP_AIR_MS, LEAP_HEIGHT, ATTACK_COLORS, POOL_COLOR, WARD_COLOR, BOSS_CUES, QUAKE_ON } from '../../../src/world/gate/gateBoss.js';
-import { createGateCourt, courtPhaseCard, COURT_STRIKE_TEXT, MARK_COLOR, COURT_ROUND_MS } from '../../../src/scenes/gate/gateCourt.js';
+import { createGateCourt, courtPhaseCard, COURT_STRIKE_TEXT, MARK_COLOR, courtRoundMs } from '../../../src/scenes/gate/gateCourt.js';
 import { GATE_STATE_EMPTY } from '../../../src/net/gate/gateLink.js';
 import { bossBarModel, BOSS_BAR_TEXT } from '../../../src/ui/gate/gateBossBar.js';
 import { createSpoilsPool, iconSize, SPOILS_ICON_ARCHIVE, SPOILS_ICON_MAX_M, SPOILS_ICON_M_PER_PX } from '../../../src/scenes/spoilsPool.js';
@@ -47,6 +47,7 @@ import { damageEquipment } from '../../../src/combat/formulas.js';
 import { RELAY_VERSION } from '../../../src/net/wire.js';
 import { relayVersionAtLeast } from '../../relayVersion.mjs';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+const COURT_ROUND_MS = courtRoundMs();   // five seconds at TimeScale 12
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const W = (key, over = {}) => ({ i: 1, a: ATTACKS[key].id, at: 10000, x: 0, z: 0, yw: 0, tg: [], ...over });

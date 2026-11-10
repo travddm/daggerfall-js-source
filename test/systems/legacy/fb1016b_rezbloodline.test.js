@@ -27,7 +27,7 @@ import { REZ_SETTLE_MAX, settleHolds } from '../../../server-account/src/legacy.
 import { MINUTE_JOBS, CRON_MINUTE } from '../../../server-account/src/cron.js';
 import { d1, standService } from '../../accountDb.mjs';
 import { seatRealm, freshSave } from '../../realmSeat.mjs';
-import { SESSION_KEY } from '../../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
 import { realmIo, createRealmSession, whenPageGoes } from '../../../src/systems/realmSaves.js';
 import { createRealmLine } from '../../../src/systems/legacy/realmLine.js';
 import { createLegacyHost, LEGACY_TEXT, REZ_HOLD_MS } from '../../../src/scenes/legacyHost.js';
@@ -139,7 +139,7 @@ async function party({ model = MODELS.bloodline, online = true, ear = true } = {
     const g = await svc.guest();   // an account of her own, each party
     r.svc = svc; r.g = g; r.raw = svc.env.DB._raw;
     const store = mem();
-    store.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    store.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); store.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const fetch = async (url, init) => {
       const hold = init?.body && JSON.parse(init.body)?.hold === true;
       r.door.push(`${init?.method ?? 'GET'} ${new URL(url).pathname}${hold ? ' hold' : ''}${init?.keepalive ? ' keepalive' : ''}`);

@@ -13,7 +13,7 @@ import {
   gateNumber, gateLaneOf, gateTimes, gateAdmits, gateHolds, gateRoomKey, GATE_LANES_OPEN, gateLaneOpen, GATE_COLLAPSE_MS, gameDayAt,
 } from '../../../src/net/gate/gateLaw.js';
 import { gateNumberOk, gatePixelOk, gateLaneKey, gateReceiptKey, validGateIn, validRiteIn, SOCIAL_ROOM } from '../../../src/net/wire.js';
-import { agreedGateSite, omenPost } from '../../../src/net/gate/gateHerald.js';
+import { agreedGateSite } from '../../../src/net/gate/gate-site.ts';
 import { gateRegionOk, seatReportText, seatWeekOf } from '../../../src/net/townSeatLaw.js';
 import { regionOfTheatre, REGION_NAMES } from '../../../src/formats/mapsTables.js';
 import { gateSeatRegion, gateClaimWaits } from '../../../src/scenes/gate/gateSeat.js';
@@ -109,7 +109,7 @@ test('WW-GATES-EVERYWHERE A2b THE SERVICE: a Skyrim gate\'s kill, its region Sky
 
 // ─── the relay: a gate past the Bay stands, is entered and falls ────────────────────────────────
 
-test('WW-GATES-EVERYWHERE THE RELAY: a Skyrim gate\'s court is minted at its opening and admits its fighters; its Warden falls, a receipt names the gate\'s number; the night\'s fall is kept on Skyrim\'s lane and handed at a hello; its site agreed by two accounts and its omen posted with its place; the open zone\'s court never minted (mutants: a province\'s lane shut)', async () => {
+test('WW-GATES-EVERYWHERE THE RELAY: a Skyrim gate\'s court is minted at its opening and admits its fighters; its Warden falls, a receipt names the gate\'s number; the night\'s fall is kept on Skyrim\'s lane and handed at a hello; its site agreed by two accounts; the open zone\'s court never minted (mutants: a province\'s lane shut)', async () => {
   const lane = THEATRE_KEYS.indexOf('Skyrim'), DAY = 538, n = gateNumber(DAY, lane), TT = gateTimes(n);
   const realNow = Date.now;
   try {
@@ -153,16 +153,10 @@ test('WW-GATES-EVERYWHERE THE RELAY: a Skyrim gate\'s court is minted at its ope
     assert.deepEqual(late.sent.filter((m) => m.t === 'gate' && m.k === 'fell').map((m) => m.d), [n], 'a hello hears it');
     assert.equal(hub.store.has(gateReceiptKey('acct-peer-0001', lane)), true, 'the earner\'s receipt kept on its lane');
   } finally { Date.now = realNow; }
-  // THE HERALD: the site two accounts agree on, the omen posted with its place
-  const HOOK = 'https://discord.com/api/webhooks/123456789012345678/abc_DEF-123';
+  // THE SITE: the place two accounts agree on, kept on Skyrim's lane
   const hr = fakeRoom(SOCIAL_ROOM);
-  Object.assign(hr.env, { GATE_DISCORD_WEBHOOK: HOOK });
-  for (const k of ['_serpentHeraldBeat', '_serpentHeraldArm', '_sdBeat', '_sdHeraldArm', '_ktHeraldArm', '_ktHeraldBeat', '_egHeraldBeat']) if (typeof hr.room[k] === 'function') hr.room[k] = async () => {};
-  const realFetch = globalThis.fetch;
   let clock = TT.omenAt - 10 * 60_000;
-  const posts = [];
   Date.now = () => clock;
-  globalThis.fetch = async (url, init) => { posts.push(JSON.parse(init.body)); return { ok: true, status: 204 }; };
   try {
     await quiet(async () => {
       const join = async (k) => { const ws = hr.connect(); await hr.hello(ws, `peer-${k}`, null, { name: k, acct: `acct-${k}`, asecret: `secret-of-acct-${k}` }); clock += 10; return ws; };
@@ -170,11 +164,8 @@ test('WW-GATES-EVERYWHERE THE RELAY: a Skyrim gate\'s court is minted at its ope
       const site = (ws) => hr.raw(ws, JSON.stringify({ t: 'gate', k: 'site', d: n, px: 1700, py: -20, pl: 'Morthal, Skyrim' }));
       await site(x); await site(y);
       assert.deepEqual(agreedGateSite(hr.store.get(gateLaneKey('gatesite', lane)), n), { px: 1700, py: -20, pl: 'Morthal, Skyrim' }, 'two accounts agree where Skyrim\'s gate stands');
-      clock = TT.omenAt; await hr.fire();
-      assert.deepEqual(posts.filter((p) => JSON.stringify(p).includes('Morthal')), [omenPost({ day: n, place: 'Morthal, Skyrim', role: null })], 'its omen posted, named');
-      assert.equal(hr.store.get(gateLaneKey('herald', lane))?.omen, n);
     });
-  } finally { Date.now = realNow; globalThis.fetch = realFetch; }
+  } finally { Date.now = realNow; }
 });
 
 // ─── the court past the Bay ─────────────────────────────────────────────────────────────────────

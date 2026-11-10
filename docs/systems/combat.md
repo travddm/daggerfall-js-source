@@ -8,7 +8,9 @@ telegraphed blows, cover) are on [enhanced-ai.md](enhanced-ai.md). Attributes, s
 
 The core is Daggerfall Unity's (DFU, MIT, Daggerfall Workshop) `FormulaHelper`, `WeaponManager` and `EnemyAttack`,
 ported verbatim, with classic bugs kept where DFU keeps them. Vendored DFU mods change it through registered
-overrides. Every departure the game makes is named below.
+overrides. Those mods (PCAAO, Roleplay Realism Items, Shield Widget, Weapon Widget, Diverse Weapons, Daggerfall Enemy
+Expansion and MUDEX) leave core as mods of their own (decisions 77 and 99). Every departure the game makes is named
+below.
 
 ## Where it lives
 
@@ -150,7 +152,8 @@ A weapon with a technique, and gauntlets for bare hands, can use it with the Wea
 Lunge (short blade), Cleave and Headsman's Chop (axe), Ground Slam and Skull Crack (blunt), Flying Kick and Haymaker
 (hand to hand). With Loot rarity off, every weapon uses its family's first one at its `base` power; with it on, a
 weapon with no line has none. Each technique has a mechanic, aim, fatigue, cooldown and a `base` multiplier on the
-normal `calculateAttackDamage` result (a miss stays a miss).
+normal `calculateAttackDamage` result (a miss stays a miss). Each melee technique also adds its own to-hit term
+(`toHit`, 5 to 10); the two archery techniques add none.
 `techniques.js` runs them, `techniqueBlow.js` shapes the blow (reach, arc; never against a player), `techniqueFx.js`
 adds the feel. The Weapon techniques row (`techniquesOn.js`) is their only switch. DFU has no techniques.
 
@@ -168,19 +171,25 @@ paths (one per pair of weapon skills). A path adds passives, riders and a signat
 
 - **Base stats:** `enemyEntity.js` (see [characters.md](characters.md)). Equipment: `assignEnemyStartingEquipment`;
   Roleplay Realism Items' realistic equipment (`rriEnemyEquipment.js`) replaces it while its switch is on (default
-  on). With Daggerfall Enemy Expansion loaded, MUDEX also loads and rewrites about 30 classic monsters.
+  on). With Daggerfall Enemy Expansion loaded, MUDEX (Meaner Unleveled Daggerfall Enemy
+  Expansion) also loads and rewrites about 30 classic monsters.
   `systems/enemyExpansion/classic-stat-pass.ts` holds the numbers those monsters stand at: every field within 30% of
   Daggerfall Unity's row (armor within 30% or 2 points).
 - **Hero's threat** (`heroThreat.js`): the only scaling of an ordinary foe. Each level past 30, up to 45, multiplies
-  its blows by 1.036 and its health by 1.018 (about 1.7 and 1.3 at level 45). A promoted foe, an ally, the watch and
+  its blows by 1.036 and its health by 1.018 (about 1.7 and 1.3 at level 45, which is about 1.5 times a DFU foe in the
+  balance harness's fight power). A promoted foe, an ally, the watch and
   a tuned stage take none. `enemyEntity.js` `applyHeroThreat` is the one writer.
 - **Promoted foes** (`foe-promotion.ts`): one hash roll for each foe lands on an elite (1%), a champion (2%) or neither;
   the same hash marks the same records on every client. A promoted foe takes no hero's threat. Never under level 3,
   never the watch, an ally or a quest foe. Online always; offline only while the loot ladder is on.
 - **Elites** (`eliteFoes.js`): x2 health, x1.3 damage, 1.25x size, a glow, better loot, one boss trait. An Elite
-  Dungeon holds three or four, at x7 health and x2.6 damage; the super dungeon's are x9 and x3.
+  Dungeon holds three or four. There an elite takes the larger of the elite tier and the dungeon's own layer, stat by
+  stat: x2 and x2 in an Elite Dungeon, x4 and x2.5 in a super dungeon (`elite-stacking.ts`). The "Elites and champions
+  stack with dungeon difficulty" row (pinned off online) multiplies them instead: x7 health and x2.6 damage, x9 and x3,
+  and a champion's step on the layer.
 - **Champions** (`champions.js`): x1.4 health, x1.15 damage, and one trait from `CHAMPION_TRAITS` (Mighty, Stalwart,
-  Swift, Vampiric, Thorned).
+  Swift, Vampiric, Thorned). In a dungeon with a layer of its own (an Elite or super dungeon, an ocean band) a champion
+  takes the larger of its step and the layer, stat by stat (`elite-stacking.ts` `stepOnLayer`).
 - **Boss traits** (`bossTraits.js`): `warded` (a ward of 30% health that regrows), five element proofs (a spell of
   that element lands 25%), `bladeturning` (blades and arrows land 50%), `stoneskin` (blunt and fists land 50%),
   `curbing` (no blow over 5% of health), `wrathful` (x1.6 damage 75 s into a fight), `thorned` (20% of weapon damage

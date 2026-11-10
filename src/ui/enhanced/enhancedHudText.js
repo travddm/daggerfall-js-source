@@ -21,8 +21,8 @@
 // them, F2 scaled them, F7 stepped them out of the chat's peek, F8 let
 // them wrap). That column was a SECOND enhanced face beside the notice
 // panel ENH-NOTICE1 gave the message box - and the rows it carried
-// (Climates & Calories' hunger, thirst and cold, the Ambient Text mod's
-// street lines, the torches' burn-out, every skill-up and loot tally)
+// (Climates & Calories' hunger, thirst and cold, the
+// torches' burn-out, every skill-up and loot tally)
 // were exactly the lines the player expected in the panel. So each
 // PopupText row is a TOAST in the notice stack now (ui/enhancedNotice
 // .js drawEnhancedToasts, handed HudText.frame each draw as this module

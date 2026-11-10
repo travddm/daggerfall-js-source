@@ -1,3 +1,4 @@
+import { playFileByRules } from '../../profileRules.mjs'; // a server profile's rule keys, for one test file
 // STAR5/STAR6 (4, 5 and 8): THE STARFALL'S HOST, END TO END on the world's
 // bindings by name - a night's stars found over a scan, their moments said where they should be heard, the defense
 // stood by the ledger the cell says (each wave, the master, its circle at its calls, the ward), the star a body its own
@@ -14,7 +15,7 @@ import {
   createStarfallHost, starfallStands, STAR_BLOWS_STORE, STAR_LIVE_MAX, STAR_RESTAND_MS, STAR_COARSE_EVERY, STAR_FLOOR_OFFSET, STAR_BUILD_M, STAR_GROUND_EVERY,
 } from '../../../src/scenes/starfall/starfallHost.js';
 import {
-  starNightAt, starTimes, starCircleSize, starLostAt, STAR_ORPHAN_MS, STAR_CIRCLE_AT, STAR_LOST_DARK, STAR_LIFE_MS, STAR_AFTER_MS, STAR_GRACE_MS,
+  starNightAt, starTimes, starCircleSize, starLostAt, STAR_ORPHAN_MS, STAR_CIRCLE_AT, STAR_LOST_DARK, starLifeMs, STAR_AFTER_MS, STAR_GRACE_MS,
   P_GATHER, P_WAVE, P_BREATH, P_MASTER, P_HELD, P_LOST, STAR_FOE_HEALTH,
 } from '../../../src/net/starfall/starfallLaw.js';
 import { starCovenOf, covenWitches, STAR_COVENS } from '../../../src/systems/starfall/starfallCovens.js';
@@ -36,6 +37,8 @@ import { characterIdOf } from '../../../src/systems/characterId.js';
 import { midScreenText } from '../../../src/ui/midScreenText.js';
 import { renownFoeStruck } from '../../../src/net/renownTracker.js';
 import { FESTIVALS } from '../../../src/net/festivalLaw.js';
+
+playFileByRules({ 'time.skyClock': true }); // these pins stand on the sky clock's hourly night (a sky day is an hour at its default TimeScale)
 const FESTIVAL_FROM_MS = FESTIVALS[0].fromMs;   // the Witches' Festival's first day, the Starfall's own (net/festivalLaw.js)
 
 const N = starNightAt(FESTIVAL_FROM_MS) + 30;
@@ -132,7 +135,7 @@ test('STAR5 THE NIGHT\'S STARS: three in the coven\'s region, each from its omen
   const w = world();
   clockOf(w);
   assert.equal(sitesOf(N).length, 3);
-  w.t = FESTIVALS[0].toMs + STAR_LIFE_MS + STAR_AFTER_MS;
+  w.t = FESTIVALS[0].toMs + starLifeMs() + STAR_AFTER_MS;
   assert.equal(w.frame(), null);
   assert.deepEqual(w.host.state(), [], 'the festival over and its last star gone, no stars');
   w.t = starTimes(N, 0).omenAt;
@@ -430,7 +433,7 @@ test('STAR6 THE READINGS: the Timers\' rows (the standing star and the next fall
   w.host.destroyAll();
   assert.equal(w.host.active(), false);
   assert.deepEqual(w.host.state(), []);
-  w.t = FESTIVALS[0].toMs + STAR_LIFE_MS + STAR_AFTER_MS;   // the festival over and its last star gone: no rows, no marks
+  w.t = FESTIVALS[0].toMs + starLifeMs() + STAR_AFTER_MS;   // the festival over and its last star gone: no rows, no marks
   assert.deepEqual(w.host.timerRows(), []);
   assert.deepEqual(w.host.mapMarks(), []);
   Date.now = realNow;
@@ -557,7 +560,7 @@ test('AUDIT STARFALL C5 THE FESTIVAL\'S LAST STARS STAND TO THEIR END: a star th
   assert.equal(w.host.mapMarks().length, 2);
   w.t = starTimes(n, 1).goneAt; w.frame();
   assert.deepEqual(w.host.state(), [], 'gone at its end');
-  assert.equal(starfallStands(end + STAR_LIFE_MS + STAR_AFTER_MS), false);
+  assert.equal(starfallStands(end + starLifeMs() + STAR_AFTER_MS), false);
   assert.equal(starfallStands(FESTIVALS[0].fromMs - 1), false, 'nothing before it opens');
   Date.now = realNow;
 });

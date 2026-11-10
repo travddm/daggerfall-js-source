@@ -294,7 +294,7 @@ test('POWER-CEILING THE SOURCE: every blow modifier the tree registers asks blow
     for (let j = i; j < src.length; j++) { if (src[j] === '{') depth++; else if (src[j] === '}' && --depth === 0) return src.slice(i, j + 1); }
     return null;
   };
-  const VETOES = Object.freeze(['poi-editor']);   // an editor's body: no blow lands at all
+  const VETOES = Object.freeze([]);   // the ids of inline vetoes, which land no blow at all; none is registered now
   /** A veto lands nothing or the blow whole: `(e, d) => (<cond> ? 0 : d)` - a share in it would step round the product. */
   const veto = (fn) => /^\(\s*[\w$]+\s*,\s*([\w$]+)\s*\)\s*=>\s*\(?.+\?\s*0\s*:\s*([\w$]+)\s*\)?$/.exec(fn);
   const seen = { blow: [], guard: [] };
@@ -323,7 +323,7 @@ test('POWER-CEILING THE SOURCE: every blow modifier the tree registers asks blow
     }
   }
   assert.deepEqual(seen.blow.sort(), ['firmamentBlow', 'lootBlow', 'martialBlow', 'setBlow', 'sigilBlow', 'weaponMasteryBlow']);
-  assert.deepEqual(seen.guard.sort(), ['firmamentDamage', 'lootDamageMod', 'martialDamageMod', 'pathDamageMod', 'poi-editor', 'setDamageMod']);
+  assert.deepEqual(seen.guard.sort(), ['firmamentDamage', 'lootDamageMod', 'martialDamageMod', 'pathDamageMod', 'setDamageMod']);
   // AUDIT HORIZONTAL D4: every room asked names its registry, a registry the tops know - one asked unnamed is held by the
   // product alone, and cuts whoever asks after it
   const named = { blowRoom: new Set(), guardRoom: new Set() };

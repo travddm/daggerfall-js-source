@@ -257,7 +257,7 @@ export const sdOwnerOfRoom = (key) => SD_ROOM.exec(String(key ?? ''))?.[2] ?? nu
 // to nobody: it is a find.
 /** AUDIT SD III (T19): WHERE AN ABYSS DUNGEON STANDS, in a line: near its city, else in its region (*in the Alik'r
  *  Desert region* - it read *near Alik'r Desert*), else near the Bay. Pure. */
-/** The Bay's own name in a line, its one home (sdWhere's, and the herald's rise - net/superDungeon/sdHerald.js). */
+/** The Bay's own name in a line, its one home (sdWhere's). */
 export const SD_BAY_NAME = 'the Iliac Bay';
 export const sdWhere = (near, region = '', province = '') => (near ? `near ${near}` : region ? `in the ${region} region` : province ? 'in ' + province : 'near ' + SD_BAY_NAME);   // WW5: a province's Hollow is in its province (`province` - its name)
 export const sdFoundLine = ({ who, near, region, province = '' }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region, province)}!`;   // ABYSS-NAME: the player's word; the code's stays `super`

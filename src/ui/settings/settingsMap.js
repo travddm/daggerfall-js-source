@@ -73,13 +73,13 @@ export const CATEGORIES = Object.freeze([
       "GUI/QuestRumorWeight", "GUI/EnableQuestDebugger"]),
     sec("dungeons", "Dungeons", [
       "feat:smaller-dungeons", "Experimental/SmallerDungeons", "feat:medium-dungeons", "feat:world-dungeon-sizes", "feat:varied-dungeon-monsters",
-      "Enhancements/AlternateRandomEnemySelection", "feat:mod-aquatic-sprites"]),
+      "Enhancements/AlternateRandomEnemySelection"]),
     sec("loot", "Loot & items", [
       "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:gate-portent-loot", "feat:town-seats", "feat:humanoid-loot", "feat:revenants", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
     sec("light", "Your light", [
       "feat:torches-from-items", "Enhancements/PlayerTorchFromItems", "feat:mod-handheld-torches"]),
     sec("character", "Character & survival", [
-      "feat:mod-character-modes", "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection", "feat:lockpick-tumblers"]),
+      "feat:mod-character-modes", "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection", "feat:claw-metal", "feat:gentle-equip-bill", "feat:legendary-equip-free", "feat:lockpick-tumblers"]),
     sec("moving", "Climbing & gathering", [
       "feat:enhanced-climbing", "Enhancements/AdvancedClimbing", "feat:resource-highlights", "feat:mod-foraging"]),
     sec("start", "Starting a new game", [
@@ -103,7 +103,7 @@ export const CATEGORIES = Object.freeze([
     sec("aftermath", "Seeing & bleeding", [
       "feat:enhanced-combat-visuals", "feat:blood"]),
     sec("sea", "At sea", [
-      "feat:naval-combat"]),
+      "feat:naval-combat", "feat:eltheric-sea"]),
   ]),
   tab("world", "World", [
     sec("land", "Land", [
@@ -111,13 +111,13 @@ export const CATEGORIES = Object.freeze([
     sec("weather", "Weather & ambience", [
       "feat:weather-events", "feat:mod-better-ambience"]),
     sec("towns", "Towns & people", [
-      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:town-watch", "feat:crime-recovery", "feat:guild-probation", "feat:dress-for-the-part"]),
+      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:town-watch", "feat:crime-recovery", "feat:guild-probation", "feat:sold-goods-on-shelf", "feat:absorption-limits", "feat:opening-damage", "feat:elite-stacking", "feat:dress-for-the-part"]),
     sec("encounters", "Wilderness & encounters", [
-      "feat:mod-world-of-daggerfall", "feat:wilderness-camps", "feat:road-encounters", "feat:mod-world-events-raiding-parties"]),
+      "feat:mod-world-of-daggerfall", "feat:spawned-dungeons", "feat:wilderness-camps", "feat:road-encounters", "feat:mod-world-events-raiding-parties"]),
     sec("travel", "Travel", [
       "feat:mod-travel-options", "feat:mod-immersive-travel", "feat:mod-horse-cart-and-cargo", "feat:horse-care", "feat:horse-walks", "feat:wagon-upkeep"]),
     sec("sea", "The sea & ships", [
-      "feat:mod-come-sail-away", "feat:mod-detailed-ships", "feat:mod-warm-ashes-ships", "feat:mod-iliac-puddle-no-more", "feat:mod-ocean-holes"]),
+      "feat:mod-come-sail-away", "feat:mod-warm-ashes-ships", "feat:mod-iliac-puddle-no-more", "feat:mod-ocean-holes"]),
   ]),
   tab("interface", "Interface", [
     // L10N1b: the language the game's words are shown in, and under it a Daggerfall Unity translation pack (L10N3b)
@@ -127,7 +127,7 @@ export const CATEGORIES = Object.freeze([
       "GUI/EnableVitalsIndicators", "GUI/InteractionModeIcon", "GUI/EnableArrowCounter", "GUI/IconsPositioningScheme", "feat:near-death-warning",
       "Enhancements/NearDeathWarning"]),
     sec("messages", "Messages & prompts", [
-      "feat:event-board", "feat:mod-world-tooltips", "feat:mod-ambient-text", "GUI/ShowQuestJournalClocksAsCountdown", "GUI/DungeonExitWagonPrompt",
+      "feat:event-board", "feat:mod-world-tooltips", "GUI/ShowQuestJournalClocksAsCountdown", "GUI/DungeonExitWagonPrompt",
       "GUI/IllegalRestWarning", "GUI/DisableEnemyDeathAlert"]),
     sec("quests", "Quest help", [
       "feat:quest-herald", "feat:quest-tracker", "feat:quest-marks", "feat:quest-guidance"]),
