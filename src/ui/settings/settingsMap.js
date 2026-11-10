@@ -127,7 +127,7 @@ export const CATEGORIES = Object.freeze([
       "GUI/EnableVitalsIndicators", "GUI/InteractionModeIcon", "GUI/EnableArrowCounter", "GUI/IconsPositioningScheme", "feat:near-death-warning",
       "Enhancements/NearDeathWarning"]),
     sec("messages", "Messages & prompts", [
-      "feat:event-board", "feat:mod-world-tooltips", "feat:mod-ambient-text", "GUI/ShowQuestJournalClocksAsCountdown", "GUI/DungeonExitWagonPrompt",
+      "feat:event-board", "feat:mod-world-tooltips", "GUI/ShowQuestJournalClocksAsCountdown", "GUI/DungeonExitWagonPrompt",
       "GUI/IllegalRestWarning", "GUI/DisableEnemyDeathAlert"]),
     sec("quests", "Quest help", [
       "feat:quest-herald", "feat:quest-tracker", "feat:quest-marks", "feat:quest-guidance"]),

@@ -34,7 +34,8 @@ const IMPORT_RE = /(?:^|[\s;])(?:import|export)\s[^'"`;]*?from\s*['"]([^'"]+)['"
 export function importsOf(file, text, root = ROOT) {
   const out = [];
   for (const m of text.matchAll(IMPORT_RE)) {
-    const spec = m[1] ?? m[2] ?? m[3];
+    // A query (`./x.frag?raw`) is Vite's, not part of the file name: the shader file is the edge.
+    const spec = (m[1] ?? m[2] ?? m[3])?.replace(/\?.*$/, '');
     if (!spec || !spec.startsWith('.')) continue;
     const base = normalize(join(dirname(file), spec));
     for (const cand of [base, `${base}.js`, `${base}.mjs`, `${base}.ts`, join(base, 'index.js'), join(base, 'index.ts')]) {
