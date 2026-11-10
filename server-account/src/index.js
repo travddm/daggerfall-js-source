@@ -332,7 +332,7 @@ import { isGzip, gzipSizeOf, gunzipText, REALM_TEXT_MAX_BYTES } from '../../src/
 import { tradeRealm, REALM_TRADE_BODY_MAX } from './realmTrade.js';   // REALM P2.1: a trade, settled here
 import { listLineages, putLineage, realmDie, realmRaise, realmWed, listUnions, LINEAGE_BODY_MAX } from './legacy.js';   // LEGACY7: Project Legacy's lines and the tombstone; REZ-BLOODLINE AUDIT R1: a Resurrect inside its hold
 import { measured, heartbeatPartsOf } from './metrics.js';   // SCALE1: every request counted (Workers Analytics Engine); AUDIT SCALE II A-3: a heartbeat's parts, of the body the route read
-import { scheduled, isCronDoor, cronDoor } from './cron-triggers.ts';   // SCALE4b: the service's own clock, and its door where there are no cron triggers
+import { scheduled, localDoor } from './worker-doors.ts';   // SCALE4b: the service's own clock, its door where there are no cron triggers, and the operator's door
 import { blocksOf, blockAccount, unblockAccount, fileReport, agreeConduct, conductAgreed, takeFeed, bannedAnswer, modCases, modCase, modDismiss, modAct, REPORT_BODY_MAX } from './safety.js';   // SAFE1-SAFE7: the chat's safety
 import { strikesLook, isBanned } from './sanctions.js';   // SAFE4: the record, the ladder and the ban
 import { freezeRefusal, frozenAnswer, playerStaffChat, isFrozen, STAFF_CHAT_ROUTES, STAFF_CHAT_STATUS } from './staffFreeze.js';   // STAFF-PANEL5-FREEZE: the freeze gate and the player's staff chat
@@ -1112,7 +1112,7 @@ const service = {
 
       // ARENA4: THE ARENA'S HONOURS ON THE ROW, where a badge is minted or a wardrobe read - the Grand Champion's row, the
       // season's #1 (server-account/src/arena.js arenaHonoursOf) - so titles.js derives `grandchampion`, `arenachampion`
-      // and the laurel from the arena's rows as it derives the founder from a date. Only on the doors that read a badge.
+      // and the laurel from the arena's rows. Only on the doors that read a badge.
       // AUDIT SCALE4d A1: ON THE BINDING, never the mint's replica session - a #1 found stale is COUNTED AGAIN AND WRITTEN
       // (arena.js championNow -> storeArenaChampion): counted off a replica as new as the session lookup,
       // the write put back a #1 a rated bout had just moved past, and the clock only re-stamps a kept #1
@@ -2514,7 +2514,7 @@ const service = {
 };
 
 export default {
-  fetch: (request, env, exec) => (isCronDoor(request, env) ? cronDoor(request, env) : measured(request, env, service.fetch, exec)),   // AUDIT SAFE DISCORD-4: the ExecutionContext, for waitUntil
+  fetch: (request, env, exec) => localDoor(request, env) ?? measured(request, env, service.fetch, exec),   // the ExecutionContext, for waitUntil
   // SCALE4b: THE SERVICE'S OWN CLOCK - wrangler.toml's [triggers] crons, each firing its list (cron.js), the sweeps no
   // read runs any more and the settlements every read now nearly always finds done
   scheduled,
