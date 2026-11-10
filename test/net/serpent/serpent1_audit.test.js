@@ -48,7 +48,7 @@ function clientOf(f, now) {
   return { L, fold };
 }
 
-// ═══ ONE TIMELINE (S2) ═══════════════════════════════════════════════════════════════════════════════════
+// ONE TIMELINE (S2)
 
 test('AUDIT SERPENT S2: a word said now supersedes every leg or mode still to come - on the relay as it pushes and on every client as it folds - so the body a client draws is the body the relay judges, beat by beat, through fights, wakes and turns (mutants: the rule dropped on either side; a turn unsaying an attack in flight)', () => {
   assert.deepEqual(supersede([{ at: 1 }, { at: 5 }, { at: 3 }, { at: 9 }], 4), [{ at: 1 }, { at: 3 }]);
@@ -160,7 +160,7 @@ test('AUDIT SERPENT S2: a phase crossed mid-attack lets the attack land as it wa
   assert.equal(later.find((w) => w.k === 'atk')?.a, SERPENT_ATTACK_TABLE.cry.id, 'the Call comes after it');
 });
 
-// ═══ THE COIL'S WORDS (S3, S4, M2, S10) ════════════════════════════════════════════════════════════════
+// THE COIL'S WORDS (S3, S4, M2, S10)
 
 function coilBegun(seed = 2) {
   const f = surfaced(fightOf([HULL.Carrack, HULL.Carrack]));
@@ -236,7 +236,7 @@ test('AUDIT SERPENT S6: an attack\'s word carries its bearing wrapped - a head o
   assert.ok(validSerpentOut({ k: 'atk', ...w }), 'the wire takes it');
 });
 
-// ═══ BEING AT THE FIGHT (S8, E1, E2, T2, B7) ═══════════════════════════════════════════════════════════
+// BEING AT THE FIGHT (S8, E1, E2, T2, B7)
 
 test('AUDIT SERPENT S8/E2/T2: a share stays in its health only while its ship is AT the fight, afloat and firing - an `in` said from past ENGAGE_R keeps none, a wreck\'s goes and stays gone, a silent ship\'s goes and comes back with her next blow (mutants: the far `in` restoring; the wreck restored; the silent share kept; a blow not restoring it)', () => {
   const f = surfaced(fightOf([HULL.Carrack, HULL.Carrack]));

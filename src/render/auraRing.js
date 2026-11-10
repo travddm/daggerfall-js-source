@@ -1,8 +1,8 @@
 // @ts-check
 // WB9g: DAGON'S FIRE, DRAWN - the Sigil Broker's aura,
 // burning on the ground about the feet of whoever wears it: a ring of fire that chases itself round, tongues of flame
-// licking up out of it, embers circling in it and a glow in the stone inside it. Design: bible/11-Multiplayer/
-// World-Bosses.md section 14 (WB9g); the aura's law (who wears one, signed into the token) is net/insignia.js.
+// licking up out of it, embers circling in it and a glow in the stone inside it.
+// The aura's law (who wears one, signed into the token) is net/insignia.js.
 //
 // TWO DRAWS A WEARER, one pass:
 //   - THE GROUND: one quad flat under the feet, the ring, its fire, its embers and the glow inside it answered per pixel

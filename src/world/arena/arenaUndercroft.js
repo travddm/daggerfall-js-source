@@ -1,8 +1,7 @@
 // @ts-check
 // ARENA-FIX 4: THE ARENA UNDERCROFT - THE FIGHTERS' HALL. Kamer's 32 blocks under the colosseum
 // (world/arena/arenaCity.js undercroftLocation) were laid as any keep is: a HumanStronghold's encounter table over its 343
-// random markers, so the stair down from the sand opened on a dungeon full of bandits. The design (bible/11-Multiplayer/
-// Arena.md "1. The building", the undercroft) is a HALL: "Its people are fighters at rest, the arena's keepers and the
+// random markers, so the stair down from the sand opened on a dungeon full of bandits. The design is a HALL: "Its people are fighters at rest, the arena's keepers and the
 // caged beasts of the beast tiers; it holds the ladder's training pit (an unranked bout against a dummy-fighter) and
 // the Hall of Champions - a plaque wall naming every Grand Champion this save".
 //

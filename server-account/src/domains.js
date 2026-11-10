@@ -1,8 +1,7 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
 // DOMAIN3 - THE REGION'S
-// CHARTER, as the service learns and reads it (bible/11-Multiplayer/
-// Domains.md section 7).
+// CHARTER, as the service learns and reads it.
 //
 // ONE REGION, ONE CHARTER (Domains law 1): from the seat week the config's
 // DOMAINS_WEEK names, a guild holds a region - its Charter its SEAT OF

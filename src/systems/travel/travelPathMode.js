@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // OW-PATH - HOW THE OVERWORLD'S CLICKS TRAVEL.
 //
 // The player's ask: "it also needs a prefer streets and freewalk button. also when moving near cities it
@@ -16,7 +15,6 @@
 // own neighbourhood, and never with the fine-move modifier (Shift or Alt) held. A plate's click is always the town's.
 //
 // The choice is the device's, as "Show me to travellers" is: kept through the one storage seam (appStorage).
-// ═══════════════════════════════════════════════════════════════════
 import { appStorage } from '../appStorage.js';
 
 export const TRAVEL_PATH_MODES = Object.freeze(['roads', 'free']);

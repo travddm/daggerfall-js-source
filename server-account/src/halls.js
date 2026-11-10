@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // GUILD1d - A GUILD'S HALL AND ITS
-// HERALDRY, AS THE SERVICE KEEPS THEM (bible/11-Multiplayer/
-// Seats-Arc.md 8; the law both ends read is src/net/hallLaw.js and
+// HERALDRY, AS THE SERVICE KEEPS THEM (the law both ends read is src/net/hallLaw.js and
 // src/net/heraldryLaw.js).
 //
 // ═══ A HALL IS A HOME THE GUILD OWNS ═══════════════════════════════

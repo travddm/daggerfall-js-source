@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // GUARD-ONLINE.
 //
 // N0B10Y03 "Guard the Guild" watches the hall `daily from 00:00 to
@@ -18,7 +17,6 @@
 // missed is not a quest lost - but one who stays (the thieves dead, the
 // questor to be paid) does not: the payment waits on the window being
 // shut. A DEPARTURE, recorded (Port-Ledger section A, GUARD-ONLINE).
-// ═══════════════════════════════════════════════════════════════════
 
 /** questName -> the place the watch is kept at (the script's own Place symbol, without its underscores) and the
  *  window, in seconds of the quest's clock - TIME3: the character's own (6.3a),

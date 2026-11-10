@@ -4,8 +4,8 @@
 // asked Daggerfall's price - the model's bounding RADIUS x 1280 - which ran from a few thousand to over 800,000 (a
 // hall's door asked 1,274,880 - FIELD BUGS 2026-10-03 HALL-GOLD), and any number the client named was taken by the
 // service up to ten million. The law (net/homeLaw.js homeOnlinePrice), the service's range and its `refund`, the
-// client's registry, the door's host and the words. `06-Systems/Economy-Arc.md` HOME-PRICE.
-// AUDIT HOME-PRICE (`01-Overview/audits/Audit-HomePrice.md`): the hundreds the service holds (L2), the sale's sum told only to
+// client's registry, the door's host and the words. HOME-PRICE.
+// AUDIT HOME-PRICE: the hundreds the service holds (L2), the sale's sum told only to
 // the character whose door can sell it (L3), the claim's answer saying it (C2), the rent held on it (C3), the door's chain
 // run over a model rather than read (D5), a knightly order's deed bought back online at the online price (C1), and the
 // rent's words beside the home's (E4) - with the pins the audit's own mutants survived (D1-D4, D6).

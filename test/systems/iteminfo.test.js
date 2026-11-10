@@ -322,7 +322,7 @@ test('ROAD-U (was AUDIT 22 F11): artifact IDENTITY is the enchantment record, no
   assert.equal(armorShouldShowMaterial(armor), false, 'an artifact never shows material');
 });
 
-// ═══ MAC-M1: THE CLASSIC SIDE'S TWO NUMBERS, PINNED AT LAST ═══════
+// MAC-M1: THE CLASSIC SIDE'S TWO NUMBERS, PINNED AT LAST
 //
 //
 // The ENHANCED card was the one at fault and is fixed in

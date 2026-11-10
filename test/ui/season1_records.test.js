@@ -1,5 +1,4 @@
-// SEASON1 part three: THE HALL OF RECORDS (bible/
-// 11-Multiplayer/Seats-Arc.md 9.2: "A Hall of Records book in every seat's palace ... read it as prose, from templates in
+// SEASON1 part three: THE HALL OF RECORDS ("A Hall of Records book in every seat's palace ... read it as prose, from templates in
 // the law module ... The book is read through the enhanced book window the port already has") - the law (a row's week in
 // its Season's words, the book's chapters), the book (its tokens through the reader's one door), the service's read
 // (through the real Worker: oldest first, its bound, the week Season 0 began), the client's door and book, and the
@@ -119,8 +118,8 @@ test('SEASON1 THE HALL OF RECORDS ON THE PAGE: the book asks its door for a seat
   assert.equal(book.open, false, 'a shut answer closes the seats');
   assert.equal(SEAT_RECORDS_CACHE_MS, 5 * 60_000);
   const posted = [];
-  const { accountSeats } = await import('../../src/net/accountClient.js');
-  const seats = accountSeats({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: () => JSON.stringify({ id: 'p1', secret: 's' }), setItem() {}, removeItem() {} } });
+  const { accountSeats, SERVICE_KEY } = await import('../../src/net/accountClient.js');
+  const seats = accountSeats({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : JSON.stringify({ id: 'p1', secret: 's' })), setItem() {}, removeItem() {} } });
   await seats.records(3021);
   assert.deepEqual(posted, [['/v1/seats/records', { key: 3021 }]]);
   assert.deepEqual([HALL_OF_RECORDS_TEXT, HALL_OF_RECORDS_SHUT], ['Hall of Records', 'The Hall of Records cannot be read now.']);

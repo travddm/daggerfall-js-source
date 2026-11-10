@@ -2,7 +2,7 @@
 // SOME WEAPONS WON ONLINE CARRY A SIGIL, AND IT GROWS (systems/sigil/sigil.js). The law's numbers; the blow, online and at
 // a foe alone; the stamp over a won list; the drink and its words; the item field on the wire; the outdoor pool's
 // kill door and its reader, driven; the hosts' other doors mounted from comment-stripped source or matched there.
-// `06-Systems/Online-Arc.md` SIGIL1.
+// SIGIL1.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

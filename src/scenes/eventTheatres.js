@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WW5: THE THEATRES A STAR NIGHT AND A HOLLOW STAND IN - the ground past the
 // Bay each of WW5's lanes reads (net/wire.js SITE_EVENT_LANES: the eight provinces; Cyrodiil's open zone none), off the
 // gate's own theatre scans (scenes/gate/gateLanes.js keptTheatreScans - one walk of a theatre's rings a registry
@@ -13,7 +12,6 @@
 // is whole and waits on it - the walk is the gate's slices', never one idle moment's here.
 // Kept by the scans object, the registry's generation and the picture (`land()` - world/tamriel/tamrielLand.js
 // tamrielLandVersion): a new one of any is a new scan to warm. Not a DFU member. Ledger A (WW5).
-// ═══════════════════════════════════════════════════════════════════
 import { SITE_EVENT_LANES } from '../net/wire.js';
 
 /** WW5: the lanes past the Bay a site-bound world event stands on - SITE_EVENT_LANES less the Bay's. */

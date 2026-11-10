@@ -13,7 +13,7 @@ import {
   mirrorFlips, MIRROR_TABLES, mirrorRevertTime, autoToggleRows, DELAYED_FRAMES, ORIENTATION_TIME,
 } from '../../../src/player/eyeOfTheBeholder/eotbBillboard.js';
 
-// ═══ EOTB3: THE PLAYER BILLBOARD ══════════════════════════════════
+// EOTB3: THE PLAYER BILLBOARD
 //
 // The body you see in third person when you have no Morrowind data
 // EOTB-IL: every law below is read off the assembly, and

@@ -1,5 +1,8 @@
 # Mods, `vendor/`, and Daggerfall Unity as the baseline
 
+> The `vendor/` mod folders are transitional: every vendored mod leaves this repository for its own repository
+> (decisions 77, 91 and 99). The folder tables below shrink as the folders leave.
+
 This page covers how the game carries Daggerfall Unity (DFU) mods: what `vendor/` holds, how a vendored mod's switches
 work (`src/systems/modSettings.js`), how a player's own `.dfmod` bundle is read, and how DFU's source is used as the
 baseline.
@@ -52,7 +55,7 @@ Mods (the folder README has the version, credits and permission):
 
 | Folder | What is vendored |
 | --- | --- |
-| `aquatic-sprites`, `detailed-ships`, `warm-ashes-ships`, `immersive-travel` | World-data patches (and quests, IL, drawings where the mod has them) |
+| `warm-ashes-ships`, `immersive-travel` | World-data patches (and quests, IL, drawings where the mod has them) |
 | `beautiful-villages`, `beautiful-cities` | One world-data pack each |
 | `better-ambience`, `immersive-footsteps`, `readied-spellcasting-hands`, `world-tooltips` | C# sources and clips |
 | `class-skins`, `layered-armor`, `sands-of-the-alikr` | Sprite and texture art (loose packs) |
@@ -63,6 +66,7 @@ Mods (the folder README has the version, credits and permission):
 | `diverse-weapons`, `seasons-iliac-bay`, `vanilla-enhanced` | Manifests and settings; the textures come from a bundle (the player's, or for Vanilla Enhanced a pack the port ships) |
 | `dynamic-skies`, `handheld-torches`, `shield-widget`, `weapon-widget` | Settings, textures, shaders |
 | `grimoire-ui` | UI art listing (`systems/uiPack.js`) |
+| `world-of-daggerfall` | The author's C# source (shipped in the bundle), location prefabs (`LocationPrefab/`) and placements (`Locations/`, `locations.json`), ported in `src/world/worldOfDaggerfall/` |
 | `weapon-sheathing` | An OpenMW mod's scabbard meshes and bone add-ons (`systems/weaponSheathingAssets.js`) |
 | `raum-book` | The animated journal's book and paper code |
 | `pixelify-glyphs`, `silkscreen-five` | Single glyphs for the enhanced skin's fonts |
@@ -71,7 +75,7 @@ Mods (the folder README has the version, credits and permission):
 
 ## Fetched folders (`tools/fetch-vendor.sh`)
 
-Four mods are published on GitHub under the MIT licence. Their published files are not committed:
+Three mods are published on GitHub under the MIT licence. Their published files are not committed:
 `sh tools/fetch-vendor.sh` downloads each repository at a pinned commit and copies the files the game and the tests
 read into `vendor/<folder>/`. `.gitignore` lists the fetched paths. Each folder's `README.md`, and every file that
 differs from the published repository or is missing from it, stay committed.
@@ -98,12 +102,11 @@ These folders stay committed: no public download reproduces them. The folder REA
 
 | Folder | Author | Mod and version | Source | Permission or licence | Licence files in the folder |
 | --- | --- | --- | --- | --- | --- |
-| `aquatic-sprites` | Cliffworms | Aquatic Sprites 1.0 | Nexus Mods, Daggerfall Unity mod 276 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_AquaticSprites.txt` (the author's readme) |
-| `detailed-ships` | Cliffworms | Detailed Ships 1.0.0 | Nexus Mods, Daggerfall Unity mod 307 | The author's readme: "may be distributed/translated without my authorization as long as I am credited" | `Readme_DetailedShips.txt` (the author's readme) |
 | `project-legacy` | Lattymoy, Ghð§† and Positronico | Project Legacy 0.4.1 | The shipped archive, from Lattymoy | The owner's own mod; the bundle states no licence. The co-authors' consent is not recorded | none |
 | `raum-book` | Mac (Lattymoy) | project-raum's book and paper code | `github.com/Lattymoy/project-raum` (not public) | The owner's own work | none |
 | `readied-spellcasting-hands` | jefetienne | Readied Spellcasting Hands 1.3 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
 | `vorbis-fsb-setups` | vgmstream; the Xiph.org Foundation | Two Vorbis setup headers | vgmstream's `vorbis_codebooks_fsb.h`; libvorbis | vgmstream's licence; BSD-3-Clause for libvorbis | `COPYING.vgmstream`, `COPYING.libvorbis` |
+| `world-of-daggerfall` | Kamer | World of Daggerfall 2.0 | Nexus Mods, Daggerfall Unity mod 181; the shipped archive, from Lattymoy | The archive states no licence. Permission granted by the author (the grant that covers Windmills of Daggerfall), confirmed by Mac on 2026-09-23 and recorded in the folder's `README.md` (decision 122) | none |
 | `world-tooltips` | jefetienne | World Tooltips 1.1 | The author's `forums.dfworkshop.net` profile; no public repository found | MIT | `LICENSE` |
 
 The other vendored mod folders (all but DFU's own `dfu-*` data and the fetched folders above) await a record of their
@@ -124,9 +127,12 @@ does not claim a permission that is not recorded.
   loaded). `modSettingsOf(vendor)` returns every key resolved.
 - Values are stored in one record, `dfjs-mod-settings`, through `systems/appStorage.js` (in memory where there is no
   storage). `modSettingsGeneration()` changes on every write; a reader that caches a resolved copy keys on it.
-- **Online, the room decides some keys.** `onlineModSetting` (via `systems/online/onlineLane.js`) forces keys the shared
-  ground depends on (`ONLINE_ROOM_MOD_KEYS`) and reads whole balance mods at their shipped defaults
-  (`ONLINE_WHOLE_MODS`). While a room's shared loot base rolls, every key reads its shipped default (`asTheRoom`).
+- **Online, the server profile decides some keys.** The installed server profile's pins
+  (`activePins()` in `src/systems/online/serverProfile.ts`; the official profile is `src/net/profile/officialProfile.ts`)
+  name the mod keys the room owns (`pins.modKeys`) and the balance mods it reads whole at their shipped defaults
+  (`pins.wholeMods`). `onlineModSetting` applies them through `systems/online/onlineLane.js`, whose
+  `ONLINE_ROOM_MOD_KEYS` and `ONLINE_WHOLE_MODS` are live copies of those pins. While a room's shared loot base rolls,
+  every key reads its shipped default (`asTheRoom`).
 - **Load-time mods latch.** A mod that takes effect on the next game load is read once by the host that builds it
   (`latchModLoaded`); its other code asks `modLatchedOn` so a mid-game switch reaches nothing until the next load.
 - `flattenModPreset` turns a DFU preset (`{ Values: { Section: { Key: "True" } } }`) into store keys.

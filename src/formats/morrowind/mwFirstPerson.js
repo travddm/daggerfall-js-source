@@ -5,8 +5,8 @@
 // guessed, verified against a fixture built from the same guess, and
 // reported working. The reverted rig hardcoded `meshes\base_anim.1st.nif`
 // - a name that appears NOWHERE in OpenMW's skeleton table, because
-// base_anim.nif is the THIRD-person skeleton (bible/02-Formats/
-// Morrowind-Rules.md, rule 6). Nothing ever said so out loud; the layer
+// base_anim.nif is the THIRD-person skeleton (docs/formats/morrowind.md).
+// Nothing ever said so out loud; the layer
 // just fell back to the sprite for ever.
 //
 // So this module is the thing that should have existed first. It opens the

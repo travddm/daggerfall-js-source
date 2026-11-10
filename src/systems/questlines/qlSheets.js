@@ -8,7 +8,7 @@
 // rewards do not know). The game reads sheets the pins (test/systems/questlines/ql1_sheets.test.js) have already held to
 // their scripts, so it never runs the check - and its words, a writer's and never a player's, stay out of the game.
 //
-// The sheets are quest text (decision 3: Daggerfall's words stay, the port's are added): their lines are English and
+// The sheets are quest text (Daggerfall's words stay, the port's are added): their lines are English and
 // read in a translation's words where a pack carries them (qlText's table, Internal_Questlines), as DFU's own quest
 // messages read their -LOC files - not the Port_Strings catalog, which is the port's interface.
 import { QL_FAMILY_NAMES } from './qlFamilies.js';

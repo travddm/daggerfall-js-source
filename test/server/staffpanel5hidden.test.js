@@ -280,7 +280,7 @@ test('STAFF-PANEL5-HIDDEN: A PRIVATE HOME ENTERED - the relay\'s signed note is 
   } finally { s.restore(); }
 });
 
-// ═══ STAFF-PANEL5-HIDDEN-FIX (the relay flaw review, findings 4/15 and 14) ═══
+// STAFF-PANEL5-HIDDEN-FIX (the relay flaw review, findings 4/15 and 14)
 
 test('STAFF-PANEL5-HIDDEN-FIX: A HIDDEN SESSION THAT LAPSES SHOWS NOBODY - the game it hid, its session gone idle, past its 8 hours or deleted by the panel\'s own poll, is minted no token at all (409 staff-session-lapsed, a `hidden-lapsed` row a minute) and never a visible one; signed in again it is hidden again; only the staff member\'s own word shows it - a sign-out by that key, a sign-out of every session, or Show myself (mutants: the lapse unread; the refusal unwritten; the refusal a 200; any key\'s sign-out ends it; a sign-out of all unread; the own key\'s unread; Show myself unread; the oldest row read)', async () => {
   const s = await stand();
@@ -352,8 +352,8 @@ test('STAFF-PANEL5-HIDDEN-FIX: A FOLLOW EYE IN A PRIVATE HOME is the staff membe
   } finally { s.restore(); }
 });
 
-// ═══ STAFF-PANEL5-HIDDEN-R2 (the relay fixes' second round: finding 14's regression and gap, finding 28's second half,
-// the cut's follow eyes) ═══
+// STAFF-PANEL5-HIDDEN-R2 (the relay fixes' second round: finding 14's regression and gap, finding 28's second half,
+// the cut's follow eyes)
 
 test('STAFF-PANEL5-HIDDEN-R2: THE STAFF MEMBER\'S OWN WORD ENDS A HIDING, SESSION BY SESSION - the key that hid the game forgotten, from its own session, brings the game back as a normal player (never refused for good); another key forgotten ends nothing; of two sessions on one key, the older signing out ends nothing of the newer\'s, which lapsed is refused (mutants: the forget unread; any key\'s forget; a sign-out read by its key)', async () => {
   const s = await stand();
@@ -442,9 +442,9 @@ test('STAFF-PANEL5-HIDDEN-R2: A MODERATOR REMOVED AND A STAFF MEMBER CUT ARE ORD
   } finally { s.restore(); }
 });
 
-// ═══ STAFF-HIDE-TOGGLE - Hide me off by default for every staff member, and a
+// STAFF-HIDE-TOGGLE - Hide me off by default for every staff member, and a
 // press that takes effect at the very next mint (the game remakes its links at once: test/net/staffpanel5hook.test.js).
-// tools/mutants/staff-hide-toggle.json ═══
+// tools/mutants/staff-hide-toggle.json
 
 test('STAFF-HIDE-TOGGLE: HIDE ME, OFF BY DEFAULT - an Admin and a Moderator who never pressed it are shown, though the older `staff_hide` column still says 1 on their rows; Hide me hides the very next mint and pushes nothing; Show myself orders the hidden subject closed and shows the next mint, as before (mutants: the default on; `staff_hide` read; the switch read as `staff_hide` was read; the press written to `staff_hide`)', async () => {
   const s = await stand({ hide: false });

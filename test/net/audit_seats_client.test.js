@@ -4,8 +4,6 @@
 // settling answer on the card (C7), the Seat tab's words, reloads and relinquish (C8, C9, C13), the Watch kept through a
 // session run out (C10), the Hall of Records read once at a time (C11), the frame's allocations (C12); the battles
 // announced in the server's voice (G1) and fought with shafts, spells and wards (G5).
-// 6.1, 6.3, 6.6, 7.6, 7.9, 9.2, 19; `06-Systems/Online-Arc.md` SEAT2a part four,
-// CROWN1 part two, SEASON1.
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

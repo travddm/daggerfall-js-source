@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // LAMP-KEEPER II: THE LAMP'S
 // TITLE, KEPT ON THE ROW.
 //
@@ -11,7 +10,6 @@
 // word, as a novelty title's may be (it buys nothing and opens nothing). Rate-limited with every act (index.js).
 //
 // Not a DFU member. Ledger A (LAMP-KEEPER).
-// ═══════════════════════════════════════════════════════════════════
 
 /** The title's word, in the vocabulary's spelling (src/net/identityToken.js TITLES). */
 export const LAMP_TITLE = 'ilovelamp';

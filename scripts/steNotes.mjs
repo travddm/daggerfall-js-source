@@ -246,7 +246,7 @@ function main(args) {
     console.log('the patch notes keep the STE rules this check reads (STE-NOTES) - the dictionary is the writer\'s and the reviewer\'s');
     return 0;
   }
-  console.log(`the patch notes break STE in ${findings.length} place${findings.length === 1 ? '' : 's'} (STE-NOTES, bible/01-Overview/Desktop-App.md):`);
+  console.log(`the patch notes break STE in ${findings.length} place${findings.length === 1 ? '' : 's'} (STE-NOTES, docs/operations/desktop-release.md):`);
   for (const f of findings) console.log(`- ${f.message}`);
   return 1;
 }

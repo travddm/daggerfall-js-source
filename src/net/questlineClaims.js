@@ -4,7 +4,7 @@
 // (systems/questlines/qlLines.js) names its witnessed steps here, and the service's claim (server-account/src/
 // questlines.js) pays by it. PURE: no clock, no store.
 //
-// THE LAW (decision 8): the service pays only what it witnessed. A step done in an endgame place is witnessed by that
+// THE LAW: the service pays only what it witnessed. A step done in an endgame place is witnessed by that
 // place's receipt, already on the service's own rows - a Dagon's Breach's (`gate_kills`, r1), an Hour's (`sd_kills`, h1), the Sea Serpent's (`serpent_kills`, l1), a fallen star's (`stars_held`,
 // j1 - STAR8) - and only one written after
 // the LINE was first opened on the service (its first `ql_steps.opened_at`), and IN THE LINE'S ORDER: newer than the

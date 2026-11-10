@@ -60,7 +60,3 @@ the tracks by shading out to 320 m.
 
 Every file here but this note is made by
 `node tools/environmentModsExtract.mjs` and the two Python tools.
-
-## The port
-
-`bible/03-World/Snowfall.md` is the record.

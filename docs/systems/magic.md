@@ -72,7 +72,8 @@ from `EFFECT_COST_TABLE`, spell points as `gold * (110 - skill) / 400` in the ef
 
 Port additions:
 
-- Online, a school past 100 still lowers the price, but never to zero.
+- Online, a school past 100 still lowers the price, but never to zero. It branches on `isOnlinePage()`; decision 58
+  moves such rules to server profile keys.
 - `registerSpellCostMod` and `registerSpellFreeCast` let loot, set bonuses and arcane paths change the price.
 - `castSchool` prices a signature spell in its path's schools (see below).
 
@@ -83,7 +84,7 @@ Port additions:
 
 - `schoolPotency`: online, each effective point of a school's climb past 100 adds 1% to what that school does, up to
   x1.4. Destruction raises damage, Restoration raises healing, Alteration raises Shield, Illusion raises concealment
-  duration, Mysticism and Thaumaturgy raise their chances. Offline, DFU's numbers stand.
+  duration, Mysticism and Thaumaturgy raise their chances. Offline, DFU's numbers stand. It too reads `isOnlinePage()`.
 - `registerSpellPowerMod` and `spellPowerMult` sum percent bonuses onto a player's damage spell at a foe.
 - `registerSpellPierceMod` lowers a foe's saving throw.
 - `registerSpellLandedListener` tells listeners when the player's spell lands. The cast engine calls `tellSpellLanded`.
@@ -93,7 +94,8 @@ Port additions:
 
 `castSpeed.js` `castRate(entity)` sets the speed of both hand lanes, the classic sprites and the Morrowind arm. Speed
 50 is rate 1. Registered modifiers (loot, arcane paths) add percents. The result is clamped to `CAST_RATE_MIN` and
-`CAST_RATE_MAX`. `weaponRig.js` reads it once per cast. DFU uses a fixed animation clock; this is a port departure.
+`CAST_RATE_MAX`. `weaponRig.js` reads it once per cast. DFU uses a fixed animation clock; this is a port departure
+with no option yet (decision 49 wants DFU's rate selectable).
 
 ### Casts on a party mate
 
@@ -191,7 +193,7 @@ rider.
   `SPEC_RESET_GOLD`.
 - `arcanePowers.js` registers each path's effects at import through the existing hooks: spell power, pierce, cost,
   cast speed, the entity fold, the player's damage and hurt listeners, blow evasion, kills, the magic round and
-  absorption. Every power is off in a refereed fight (`sigil.js` `sigilDueling`).
+  absorption. Every power is off in a refereed fight (`src/systems/sigil/sigil.js` `sigilDueling`).
 - `signatureSpells.js` builds each signature spell's record with the spell maker's builder. Records use their own
   index band from `SIGNATURE_INDEX_BASE`. Only the Mages Guild (or temple) shelf sells it, and only to the path's
   holder. Without its holder, the spell is the plain classic bundle with no rider.
@@ -202,6 +204,8 @@ rider.
 Tests: `test/systems/schools_arcane.test.js`, `audit_schools.test.js`.
 
 ## Readied spellcasting hands
+
+> Leaves core: the Readied Spellcasting Hands mod (decision 99).
 
 A port of the Readied Spellcasting Hands mod (jefetienne, MIT, vendored in `vendor/readied-spellcasting-hands/`,
 credited in `src/ui/credits.js`). A readied spell that is not CasterOnly shows frame 0 of its element's cast art until

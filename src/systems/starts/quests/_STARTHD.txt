@@ -1,4 +1,4 @@
--- START2 (2026-10-24; bible/06-Systems/Alternate-Starts-Arc.md section 9): THE EMPEROR'S COMMISSION, IN HAND - the
+-- START2 (2026-10-24): THE EMPEROR'S COMMISSION, IN HAND - the
 -- start of a character born at no start (a family's heir at its seat, LEGACY1; the fixed city's bench): the commission
 -- is in their pack from the first moment (`get item`, GetItem.cs: no reward's window, no wait for the town). Under the
 -- contract every start keeps: it is opened when the player chooses, and _BRISIEN begins in the city of Daggerfall.

@@ -98,7 +98,7 @@ test('TAMRIEL2 ground: a pixel past the Bay answers the law at its centre, cache
   assert.equal(groundCacheSize(), 1);
   assert.equal(tamrielHeightByte(-2000, 100), 0, 'the Eltheric, past the Bay\'s mouth');
   assert.ok(GROUND_CACHE_MAX >= 65536);
-  assert.equal(tamrielClimateAt(2200, -300), CLIMATES.MountainWoods, 'Skyrim\'s tundra plains');   // PIN MOVED (TESA-BIOME, bible/03-World/Tamriel-Biomes.md): a province's zone's climate, Whiterun's MountainWoods where all Skyrim was Mountain
+  assert.equal(tamrielClimateAt(2200, -300), CLIMATES.MountainWoods, 'Skyrim\'s tundra plains');   // PIN MOVED (TESA-BIOME): a province's zone's climate, Whiterun's MountainWoods where all Skyrim was Mountain
   assert.equal(tamrielClimateAt(-2000, 100), CLIMATES.Ocean);
   assert.equal(tamrielClimateAt(1350, 1837), CLIMATES.Rainforest, 'Falinesti\'s ground: Valenwood\'s');
   assert.equal(provinceByKey('Valenwood').climate, CLIMATES.Rainforest);

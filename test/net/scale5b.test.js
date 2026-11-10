@@ -310,7 +310,7 @@ test('SCALE5b the client: a frame batch is read frame by frame as if each came a
   });
 });
 
-// ═══ PART THREE: THE RELAY'S HYGIENE ════════════════════════════════════════════════════════════════════════════════
+// PART THREE: THE RELAY'S HYGIENE
 
 /** A story of a room's sockets - hellos, a reconnect replacing its own id, closes said and unsaid, wakes, the clock past
  *  the index's trust - and after every step `check(room, sockets)`. */
@@ -567,7 +567,7 @@ test('SCALE5b the metrics point: a socket refused \'room full\' is counted - the
   assert.equal(got[2].doubles[14], 11, 'the peak is never under the sockets the room holds at the point');
 });
 
-// ═══ PART FOUR: THE RELAY'S SETTINGS, AT RUN TIME (net/relayCfg.js) ═════════════════════════════════════════════════
+// PART FOUR: THE RELAY'S SETTINGS, AT RUN TIME (net/relayCfg.js)
 
 test('SCALE5b relayCfg: a setting is one of ten names and a string of at most RELAY_CFG_VALUE_MAX, or null (handed back to the var); the one in force is the hub\'s, else the var; a developer alone may set one; /relay\'s words (mutants: a name not a setting\'s; the bound unasked; null refused; the var over the hub\'s; a Dungeon Master let in)', async () => {
   const C = await import('../../src/net/relayCfg.js');
@@ -613,7 +613,7 @@ test('SCALE5b the client: a session sends a relay setting only on the hub\'s lin
   });
 });
 
-// ═══ PART FIVE: THE RELAY'S WORD OF ITS REFEREES, FOR A HALO ═════════════════════════════════════════════════════════
+// PART FIVE: THE RELAY'S WORD OF ITS REFEREES, FOR A HALO
 
 test('SCALE5b the relay\'s referee word: a cell that judges the poses reaching it - a duel, a serpent\'s fight - says so in its welcome (`rf`), and when that moves says it to the second wire\'s sockets, once (mutants: the welcome\'s word unsaid; the change unsaid; said every pose; said to the first wire)', async () => {
   await cell(async ({ R, w2, w2b, old, said, speak, rnd }) => {

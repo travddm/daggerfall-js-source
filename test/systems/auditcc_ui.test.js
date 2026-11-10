@@ -37,7 +37,7 @@ import { TUTORIALS } from '../../src/systems/tutorialCatalogue.js';
 import { rulesOf } from '../sheetRules.mjs';
 import { withDom } from '../invdrag.mjs';
 
-// ═══ AUDIT C&C - THE SURFACES ═══════════════════════════════
+// AUDIT C&C - THE SURFACES
 //
 // Lens S (what the player sees) and lens R (the records and the pins) of AUDIT C&C, the comprehensive audit of the
 // Climates & Calories arc, each finding reproduced in Chromium or through the real producers before it was fixed: the
@@ -181,7 +181,7 @@ const contrast = (a, b) => {
   return (x + 0.05) / (y + 0.05);
 };
 
-// ═══ S1 - THE PACK'S PLAQUES ════════════════════════════════════════════
+// S1 - THE PACK'S PLAQUES
 
 test('AUDIT C&C S1: THE PACK\'S TWO PLAQUES STAND IN ONE ROW ON THE FIGURE\'S FIRST CELL NAMED WHOLE - row 1 to 2, column 2 to 3 (each stood alone on \'1 / 2\', where an absolutely placed grid child\'s unnamed end lines run to the map\'s edge: the Felt plaque stood on the R-Weapon panel at every screen in both dresses); the row is the sheets\', the Armour plaque at its left and the Felt one at its right, wrapping under the Armour one where the figure is narrow', () => {
   const e = realPlayer('casual');
@@ -215,7 +215,7 @@ test('AUDIT C&C S1: THE PACK\'S TWO PLAQUES STAND IN ONE ROW ON THE FIGURE\'S FI
   }
 });
 
-// ═══ S3, S10, S12 - THE HUD'S PLATE ═════════════════════════════════════
+// S3, S10, S12 - THE HUD'S PLATE
 
 test('AUDIT C&C S3: THE PLATE IS A HUD PIECE OF ITS OWN, INSIDE ANOTHER (UI-CALM: the quick block, the corner\'s caption) - the outer piece\'s X turns it off and leaves the plate (it took the plate with it while the plate\'s own part stood on), the plate\'s own X turns it off, the compass\'s move is undone on it and the plate moves on its own - HUD-MOVE\'s real sweep over the real HUD', async () => {
   assert.deepEqual({ ...HUD_PIECES.find((p) => p.id === 'temp') }, { id: 'temp', sel: '.hud .hud-temp', name: 'Temperature', inside: 'quick' });
@@ -243,7 +243,7 @@ test('AUDIT C&C S3: THE PLATE IS A HUD PIECE OF ITS OWN, INSIDE ANOTHER (UI-CALM
   assert.ok(HUD_LAYOUT_CSS.includes('\n.hud-quick[data-hm-off]:not([data-hm-edit]) .hud-temp[data-hm]:not([data-hm-off]) { visibility: visible !important; }'));
 });
 
-// ═══ S4 - THE GRIMOIRE DRESS ════════════════════════════════════════════
+// S4 - THE GRIMOIRE DRESS
 
 test('AUDIT C&C S4: THE GRIMOIRE DRESS KEEPS THE COST\'S SIGNAL - the HUD plate\'s level frames over the chip\'s wood (the wood\'s rule outweighed the plate\'s levels, three classes to two, and the plate wore one frame felt, costing or comfortable), and the pack\'s Felt plaque out of the Armour plaque\'s red ink - its number in its side\'s ink and its frame in its level\'s, deepened to read on the page', () => {
   const G = ':root[data-plus-dress="grimoire"]';
@@ -273,7 +273,7 @@ test('AUDIT C&C S4: THE GRIMOIRE DRESS KEEPS THE COST\'S SIGNAL - the HUD plate\
   assert.ok(contrast(TEMP_INK.warn, page) >= 3 && contrast(GRIM_TONES.red, page) >= 3);
 });
 
-// ═══ S5 - RED MEANS IT COSTS, IN THE LIVE TIER ═════════════════════════
+// S5 - RED MEANS IT COSTS, IN THE LIVE TIER
 
 test('AUDIT C&C S5 (decisions D1, D2): A NEED\'S CHIP IS RED EXACTLY WHERE THE LIVE TIER\'S MINUTE CHARGES FOR ITS STAGE - every stage of every need, in Hard, Casual and Boons, through the real minute law: Hard red from Tired (it takes the attributes) and on the stiff morning (they were amber), Casual the red words, Boons nothing; Drenched amber in every tier (it was red, and costs only through the temperature, whose chip says so)', () => {
   const STAGES = [
@@ -361,7 +361,7 @@ test('AUDIT C&C S5: THE TEMPERATURE\'S RED IS THE LIVE TIER\'S BAND - over the w
   assert.deepEqual([level(-35, CASUAL, { byFire: true }), level(-35, CASUAL, { byFire: false }), level(-35, HARD, { byFire: true }), level(55, CASUAL, { byFire: true })], ['warn', 'danger', 'danger', 'danger']);
 });
 
-// ═══ S6 - AS ITS CARD KNOWS IT ══════════════════════════════════════════
+// S6 - AS ITS CARD KNOWS IT
 
 test('AUDIT C&C S6 (decision D4): AN UNIDENTIFIED PIECE\'S COMPARISON IS AS ITS CARD KNOWS IT - no lines and no power: the Wrothgar Pass Mantle unknown reads as the formal cloak it shows (-85 to -73 on a mountain night; its hidden Mountain-Born had it at -53), and known its lining and its power too (-43)', () => {
   setPref(LOOT_RARITY_KEY, true);
@@ -384,7 +384,7 @@ test('AUDIT C&C S6 (decision D4): AN UNIDENTIFIED PIECE\'S COMPARISON IS AS ITS 
   assert.equal(wearComparison(e, hidden).worn[wearComparison(e, hidden).slot].legendary, null, 'the comparison wears the view');
 });
 
-// ═══ S8, S13 - THE WORDS ════════════════════════════════════════════════
+// S8, S13 - THE WORDS
 
 test('AUDIT C&C S8, S13: THE WORDS SAY WHAT IS SO - the credits and the Features comment say Boons\' neglect costs nothing (the drink still swings the attributes in Boons: "nothing taken" was false); the first-need page opens on the first need of any kind and says where the tiles stand (the left edge, not beside the bars), in TUT1\'s sixty words', () => {
   const cc = Object.values(CREDITS).flat().find((c) => c?.title === 'Climates & Calories');
@@ -396,7 +396,7 @@ test('AUDIT C&C S8, S13: THE WORDS SAY WHAT IS SO - the credits and the Features
   assert.equal(page.body.join(' ').split(/\s+/).length, 60, 'TUT1\'s count: two paragraphs, no more than sixty');   // VOICE1 (PIN MOVED)
 });
 
-// ═══ S9 - ONE READING ON THE HUD ════════════════════════════════════════
+// S9 - ONE READING ON THE HUD
 
 test('AUDIT C&C S9 (decision D3): ONE TEMPERATURE READING ON THE HUD - a CLOTHED body in the rain, whose wet eats its clothes\' warmth a minute at a time: the strip\'s tile and the plate say the live reading\'s word and level every frame (the tile read the record: Freezing beside the plate\'s -51 Deadly cold), and a step to a fire is amber on both before the minute turns; the fire\'s law is one helper the minute law writes with', async () => {
   assert.deepEqual([[CASUAL, true, -1], [CASUAL, true, 0], [CASUAL, false, -40], [HARD, true, -40], [BOONS, true, -40], [null, true, -40]].map(([r, byFire, felt]) => warmedByFire(r, { byFire }, felt)),
@@ -431,7 +431,7 @@ test('AUDIT C&C S9 (decision D3): ONE TEMPERATURE READING ON THE HUD - a CLOTHED
   });
 });
 
-// ═══ S11 - THE PAGE READS THE LIVE TIER ═════════════════════════════════
+// S11 - THE PAGE READS THE LIVE TIER
 
 test('AUDIT C&C S11: THE STATUS PAGE READS THE LIVE TIER - turned from Boons to Casual under the pause, before a minute runs, it says Casual\'s words at once (it still said "You are not tired." and the boons until a minute ran): the row builder reads the tier once, for all four hosts', () => {
   const e = realPlayer('boons');
@@ -443,7 +443,7 @@ test('AUDIT C&C S11: THE STATUS PAGE READS THE LIVE TIER - turned from Boons to 
   assert.ok(Array.isArray(e.survival.boons), 'the record still Boons\' - no minute ran');
 });
 
-// ═══ S14 - A COST SAID WITHOUT ITS COLOUR ═══════════════════════════════
+// S14 - A COST SAID WITHOUT ITS COLOUR
 
 test('AUDIT C&C S14: A COST IS SAID WITHOUT ITS COLOUR - a need\'s tile and the HUD\'s plate say their level in words on their title and label and a costing one carries a mark (the sheets\' "!"), the pack\'s plaque says it too; the colour alone had told a costing reading from a felt one', async () => {
   assert.deepEqual({ ...LEVEL_WORDS }, { danger: 'it costs you', warn: 'no cost to you yet' });
@@ -486,7 +486,7 @@ test('AUDIT C&C S14: A COST IS SAID WITHOUT ITS COLOUR - a need\'s tile and the 
   assert.deepEqual([plaque.content, plaque.position], ['\'!\'', 'absolute']);
 });
 
-// ═══ D6, R11 - THE GLYPHS ═══════════════════════════════════════════════
+// D6, R11 - THE GLYPHS
 
 test('AUDIT C&C D6, R11: THE COMFORTABLE THERMOMETER IS NEUTRAL - its column the plate\'s bone, not the red that says a reading costs; and the code says the hearth wears a flame of its own (it said "the campfire", REST1\'s Rested\'s)', () => {
   assert.deepEqual({ ...STATUS_GLYPHS.thermo.pal }, { g: '#cfd4dc', w: '#eef2f6', r: '#b8ab8c', h: '#efe6cf', t: '#a8b0bc' });
@@ -497,7 +497,7 @@ test('AUDIT C&C D6, R11: THE COMFORTABLE THERMOMETER IS NEUTRAL - its column the
   for (const f of ['src/systems/survival/status.js', 'src/ui/hud/hudStatus.js']) assert.doesNotMatch(read(f), /the campfire for the hearth/, f);
 });
 
-// ═══ R5, R6, R7 - THE PINS THAT DID NOT FAIL ════════════════════════════
+// R5, R6, R7 - THE PINS THAT DID NOT FAIL
 
 test('AUDIT C&C R7 (TEMP-UI): A WEAR\'S READING TAKES THE WEAR\'S WARDROBE - a lined formal cloak (a Magic warmth line of 4, the ladder\'s own roll) says +16 on its card, the cloak\'s 12 and its lining\'s 4 (read without the wear\'s wardrobe, it said +12)', () => {
   setPref(LOOT_RARITY_KEY, true);

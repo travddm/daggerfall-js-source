@@ -95,7 +95,7 @@ function skyrim() {
   return places;
 }
 
-// ═══ THE LAW ════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('WW6 the law: a raid\'s key names every region of the world - a Bay region with its MAPS.BSA location as it always was, a province\'s past the Bay with its town\'s own index, negative - its tuple the world\'s pixel, its lane its theatre, the open zone\'s shut, and a word on the wrong side of the Bay\'s edge no honest machine\'s (mutants: the region bound left at 99; a province\'s key with a Bay location; a Bay key with a negative one; the signature\'s Bay pixel; a lane off by one; the zone open; the side unread)', () => {
   for (const ok of ['3:7:600', '0:0:0', '61:9999:9999999', '10:100:1', '59:1:1', '60:2:2']) assert.ok(RAID_KEY_RE.test(ok), ok);
@@ -131,7 +131,7 @@ test('WW6 the law: a raid\'s key names every region of the world - a Bay region 
   assert.deepEqual([raidWordSane(sane), raidWordSane({ ...sane, px: 400 }), raidWordSane({ ...sane, key: `70:-41000000:${D}` }), raidWordSane({ ...sane, key: `3:7:${D}` })], [true, false, true, false]);
 });
 
-// ═══ THE BAY'S LANE, TO THE BYTE ═════════════════════════════════════════════════════════════════
+// THE BAY'S LANE, TO THE BYTE
 
 /** The law before WW6, written out: the day's generator, SelectRaids' roll and the relay's slots as RAID-ROLL had them. */
 const OLD = {
@@ -176,7 +176,7 @@ test('WW6 THE BAY\'S LANE IS THE LAW BEFORE IT, to the byte: its generator world
   assert.deepEqual(raids.map((r) => raidHome(r)), raids.map((r) => r.regionIndex), 'a Bay raid is told of in its region');
 });
 
-// ═══ THE LANES ═══════════════════════════════════════════════════════════════════════════════════
+// THE LANES
 
 test('WW6 a lane\'s parties are its province\'s OWN FAUNA\'s - the mod\'s three whose kinds TESA-BIOME\'s rosters (by day, by night, its towns\') name there: no orc war band raids Black Marsh (its Recorded choice 4), Orsinium\'s High Rock and Malabal Tor\'s Valenwood stand orcs, the open zone none; the Bay\'s three as ever (mutants: a party a province\'s fauna never stands; the Bay\'s narrowed)', () => {
   const kinds = { 0: [M.Knight], 1: [M.Rogue, M.Thief, M.Burglar], 2: [M.Orc, M.OrcSergeant, M.OrcWarlord, M.OrcShaman] };
@@ -249,7 +249,7 @@ test('WW6 a lane\'s towns off the world\'s registry: its theatre\'s LISTED towns
   assert.equal(raidLaneGroups(places, 3).flatMap((x) => x.towns).length, 6, 'no street law handed: the street a town of its own');
 });
 
-// ═══ THE CLIENT'S DAY ════════════════════════════════════════════════════════════════════════════
+// THE CLIENT'S DAY
 
 const DAY_AT = (min) => D * MINUTES_PER_DAY + min;
 const bayRaid = (o = {}) => ({ regionIndex: 3, locationIndex: 7, startDay: D, locationName: 'Gothway Garden', type: 2, startMinute: DAY_AT(600), endMinute: DAY_AT(720), killed: 0, attackAmount: 15, cleansed: false, announced: false, struck: false, px: 200, py: 100, ...o });
@@ -377,7 +377,7 @@ test('WW6 the client\'s raid past the Bay: told in its AREA (a player in its dis
   assert.ok(validRaidIn(word.w) && raidWordSane(word.w) && raidOnSlot(word.w, raidDaySlots(D, 3)), 'a word the relay takes');
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 async function onTheRelay(fn, raid) {
   const realNow = Date.now; let clock = wallMsForClassicMinutes(raid.startMinute + 10); Date.now = () => clock;
@@ -452,7 +452,7 @@ test('WW6 the session: a raid past the Bay goes to the relay as a Bay raid does'
   assert.equal(now.sendRaid(past, worldRoom(past.px, past.py)), true, 'past the Bay');
 });
 
-// ═══ A STAFF TOWN EVENT PAST THE BAY ═════════════════════════════════════════════════════════════
+// A STAFF TOWN EVENT PAST THE BAY
 
 test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by its own index at its own pixel in a province\'s region (a city\'s word kept), refuses either side\'s location at the other\'s pixel by name (`town`); an area is -1 alone; the account door stages it, the hub\'s book holds it, and the game stands it in its town by its index (mutants: the side unread; an area any negative; a province\'s region unasked)', () => {
   const sol = at('Solitude');
@@ -480,7 +480,7 @@ test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by 
   staffEventBook([]);
 });
 
-// ═══ THE MAP AND THE HOST ════════════════════════════════════════════════════════════════════════
+// THE MAP AND THE HOST
 
 test('WW6 the held map stands a raid past the Bay on the continent\'s sheet (the bounties\' law), the Bay\'s sheet the Bay\'s; the host\'s seams: the raids\' host hands the registry and the capital\'s street, the host constructs it (mutants: the sheet unread; the registry unhanded)', () => {
   // marks by the box itself - so the sheet is asked of a mark north of the Bay (Solitude's pixel, kept) and one past the
@@ -493,7 +493,7 @@ test('WW6 the held map stands a raid past the Bay on the continent\'s sheet (the
   assert.deepEqual(readRaidMarksIn(() => { throw new Error('x'); }, { x0: 0, y0: 0, w: 1000, h: 500 }), []);
 });
 
-// ═══ WITH ARENA2: THE FREEWARE'S REGISTRY WITH TESA'S PLACES ═════════════════════════════════════
+// WITH ARENA2: THE FREEWARE'S REGISTRY WITH TESA'S PLACES
 
 test('WW6 with ARENA2: every province\'s lane over the freeware\'s registry with TESA\'s places (the game\'s own templates) - its towns, its areas and its day\'s raids, the open zone none; the Bay\'s roll the old law\'s on the real table; a raid rolled on a Skyrim town, its word through the wire\'s parse and the relay\'s law and its cell; a staff event at Solitude', { skip: HAVE ? false : 'ARENA2_PATH not set' }, async () => {
   const bytes = (n) => new Uint8Array(readFileSync(join(ARENA2, n)));

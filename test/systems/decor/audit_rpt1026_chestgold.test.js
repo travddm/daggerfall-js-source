@@ -14,7 +14,7 @@ import { ACCEPTED } from '../../../src/net/legalLaw.js';
 import { r2, seatRealm, recordOf, realmAt } from '../../realmSeat.mjs';
 import { bindDecorHouseFrom, noteDecorBin, openSharedChest } from '../../../src/systems/decor/decorGrants.js';
 import { realmGoldAct, realmIo, createRealmSession } from '../../../src/systems/realmSaves.js';
-import { accountRefusalText, SESSION_KEY } from '../../../src/net/accountClient.js';
+import { accountRefusalText, SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
 import { createPotion, validLootList, MAP_TEMPLATE_INDEX } from '../../../src/systems/loot/loot.js';
 import { NativeInventoryWindow } from '../../../src/ui/native/nativeInventory.js';
 import { mountEnhancedInventory } from '../../../src/ui/enhanced/enhancedInventory.js';
@@ -111,7 +111,7 @@ function gameOf(t, secret, id, { drop = false } = {}) {
   const { env, call } = t;
   const rec = recordOf(env, id);
   const entity = { name: rec.name, goldPieces: rec.goldPieces, items: [...(rec.items ?? [])], stats: { ...rec.stats }, activeEffects: [] };
-  const kept = new Map([[SESSION_KEY, JSON.stringify({ id: t.ids.get(secret), secret })]]);
+  const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: t.ids.get(secret), secret })]]);
   const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
   const at = realmAt(env, id);
   const session = createRealmSession({ io: realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), env), storage }), id: at.id, lease: at.lease, seq: at.seq });

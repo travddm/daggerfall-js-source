@@ -11,7 +11,7 @@ import { ControlsWindow } from '../../src/ui/controlsWindow.js';
 import { currentDict } from '../../src/systems/controlsConfig.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// ═══ MAC-K: THREE THINGS MAC FOUND IN PLAY ════════════════════════
+// MAC-K: THREE THINGS MAC FOUND IN PLAY
 //
 // 2026-09-15, verbatim:
 //   1. Mouse keybindings not working properly
@@ -206,7 +206,7 @@ test('MAC-K3: a frame while dismounted draws nothing, and cannot reach a canvas 
   assert.equal(drew, 0, 'on foot, nothing is drawn');
 });
 
-// ═══ AUDIT-MACK F1: THE DOOR IS NOT THE KEY ═══════════════════════
+// AUDIT-MACK F1: THE DOOR IS NOT THE KEY
 
 test('AUDIT-MACK F1b: the fall-through is DRIVEN, and it declines what is not there', () => {
   // The arm itself, run: `routeAction` opens a door that exists,
@@ -274,7 +274,7 @@ test('AUDIT-MACK F3: a rig a host builds unconditionally is never optional-chain
   }
 });
 
-// ═══ MAC-L1: THE PAUSE DOOR THREW THE SESSION AWAY ════════════════
+// MAC-L1: THE PAUSE DOOR THREW THE SESSION AWAY
 //
 // 2026-09-16, dycaite, on the live site:
 //
@@ -363,7 +363,7 @@ test('MAC-L1: the routeAction fall-through is the LAST arm of every ladder it is
   }
 });
 
-// ═══ MAC-L3: RIGHT CLICK ESCAPED THE GAME ═════════════════════════
+// MAC-L3: RIGHT CLICK ESCAPED THE GAME
 //
 // 2026-09-16, Orion: "right click in general seems to cause either a
 // new window to open, or for the page to refresh to the menu, causing
@@ -460,7 +460,7 @@ test('MAC-L3: a running game guards the way out, and a door the GAME opened does
   g.resetUnloadGuard();
 });
 
-// ═══ MAC-L4: SPELLS DISAPPEARED FROM THE SPELLBOOK ════════════════
+// MAC-L4: SPELLS DISAPPEARED FROM THE SPELLBOOK
 //
 // 2026-09-16, bigdaddywetwet: "also it appears that something causes
 // spells to disappear from the spellbook".
@@ -512,7 +512,7 @@ test('MAC-L4: a restore HOLDS a spell it cannot resolve - it never drops it', as
   assert.deepEqual(orphan.spellsPending, [4242], 'an unknown index is still the player’s data');
 });
 
-// ═══ AUDIT-MACL: THE AUDIT OF THE FIX ═════════════════════════════
+// AUDIT-MACL: THE AUDIT OF THE FIX
 //
 // Three findings against MAC-L itself, all in the half that was
 // WIRING rather than law. Two of them are classes this port had

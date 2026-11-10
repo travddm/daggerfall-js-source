@@ -15,6 +15,9 @@ the world next loads.
 | Enhanced lighting | `EL_LANE` from `enhancedLighting.js` | Linear light: sRGB decode, windowed inverse-square lanterns, specular highlight, exposure (`EL_EXPOSURE`) and an extended Reinhard tone map, then sRGB encode. At most `EL_MAX_LIGHTS` (48) point lights. Shadows and the air pass. |
 | Classic with shadows | `syncClassicShadowLane` (`src/render/classicShadowLane.js`) | The enhanced programs with the classic look put back (`classicLook` swaps the GLSL functions) plus shadow maps. Used by the Improved Interior Lighting mod (`src/systems/improvedInteriorLighting.js`). |
 
+The Classic with shadows lane exists for Improved Interior Lighting, an outside author's mod ported from its scripts.
+That port leaves core (decisions 77 and 99); under decision 104 its look stays reachable by loading the mod.
+
 `enhancedLightingOn()` decides the lane: the enhanced skin, the `enhancedLighting` preference, and not
 `?lighting=classic`. A lane object declares its fragment shaders (`meshFs`, `bbFs`, `terrainFs`, `charFs`,
 `decalFs`, `farRingFs`), whether it wants shadows (`shadows`) and the air pass (`air`), and its light cap.
@@ -26,7 +29,7 @@ Host colours (ambient, sun, light colours) are always given in display space. Ea
 ### What the host sets each frame
 
 - `setLighting(ambient, sunScale, sunColor, trilight)` and `setAmbientTrilight` (sky, equator and ground ambient from
-  the Better Ambience mod).
+  the Better Ambience mod, `src/systems/betterAmbience.js`, which leaves core with that mod, decisions 77 and 99).
 - `setLightDir`, `setMoonlight`, `setThirdLight`.
 - `setPointLights(data, color, colors)`: up to the lane's cap, four floats each (position and radius). Light identity
   (`src/render/lightId.js`) lets the shadow pass keep a light's map when the list is reordered.

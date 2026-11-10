@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { undergroundWakeSpot, undergroundWakeText, nearestSafeLocation } from '../../src/systems/deathRespawn.js';
 import { LOCATION_TYPES, DUNGEON_TYPES } from '../../src/formats/mapsFile.js';
 
-// ═══ ONLINE-UNDERGROUND-LOAD1 ═══════════════════════════════════════
+// ONLINE-UNDERGROUND-LOAD1
 //
 // Lost, 2026-09-19: online, the game saves when the page closes; a character saved underground must not wake
 // inside the dungeon on the next online load - it wakes near a city, graveyard or temple.

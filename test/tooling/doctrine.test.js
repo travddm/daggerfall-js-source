@@ -70,7 +70,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // MAP0: THE HELD MAP'S SPRITE. Mac's own painting - two
   // gauntleted hands holding a blank parchment, 1448x1086 - and the
   // only picture the enhanced map will ship; the map itself is drawn
-  // onto the paper at runtime from MAPS and WOODS data (10-UI/Held-Map-Arc.md).
+  // onto the paper at runtime from MAPS and WOODS data.
   ['public/art/climb-grip.png', "OURS - Mac's own painting of the climbing fist, drawn for the right hand and mirrored for the left (CLIMB-HANDS, 2026-10-02); no ARENA2 pixel in it"],
   ['public/art/climb-reach.png', "OURS - Mac's own painting of the arm reaching for a hold, mirrored for the left (CLIMB-HANDS, 2026-10-02); no ARENA2 pixel in it"],
   ['public/art/held-map.png', "OURS - Mac's own painting of the held parchment (MAP0, 2026-09-18; the fourth painting, MAP-FIELD8, 2026-09-22); no ARENA2 pixel in it"],
@@ -442,15 +442,6 @@ const PUBLIC_ALLOWLIST = new Map([
   ['vendor/climates-calories/Textures/539_0-0.png', "THIRD-PARTY - Climates & Calories 1.7.1 (Ralzar), carried on the author's permission (relayed by Mac); the mod's own pixel art - the waterskin"],
   ['vendor/climates-calories/Textures/50_7-0.png', "THIRD-PARTY - Climates & Calories 1.7.1 (Ralzar), carried on the author's permission (relayed by Mac); the mod's own pixel art - the tent's canvas (SURV-TENT)"],
   ['vendor/climates-calories/Textures/67_10-0.png', "THIRD-PARTY - Climates & Calories 1.7.1 (Ralzar), carried on the author's permission (relayed by Mac); the mod's own pixel art - the tent's pole (SURV-TENT)"],
-  // DS1: DETAILED SHIPS 1.0.0 (Cliffworms) - the four of its
-  // thirteen pictures that NO classic record is, measured against every
-  // record of every TEXTURE file at every offset (tools/detailedShipsAssets.mjs);
-  // the nine that are classic records ship as specs over the player's
-  // own (Textures/derived.json), never as pixels.
-  ['vendor/detailed-ships/Textures/1210_10-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme ('may be distributed ... as long as I am credited'); the author's own 7x15 drawing - a green bottle"],
-  ['vendor/detailed-ships/Textures/1210_11-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme ('may be distributed ... as long as I am credited'); the author's own 7x15 drawing - a blue bottle"],
-  ['vendor/detailed-ships/Textures/1210_12-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme ('may be distributed ... as long as I am credited'); the author's own 7x15 drawing - an amber bottle"],
-  ['vendor/detailed-ships/Textures/1230_30-0.png', "THIRD-PARTY - Detailed Ships 1.0.0 (Cliffworms), carried under the author's readme; the Kynareth statue the readme credits to King of Worms and Zoran ('for the deity statues'), credited beside him"],
   // FOEBAR1: THE TARGET BAR'S BLADE FACE. Two pictures a
   // friend of Mac's drew for this port and sent through him to be its
   // alternate enemy health bar - a twin-bladed shape with a skull hub,
@@ -708,7 +699,7 @@ const PUBLIC_ALLOWLIST = new Map([
   // MEADOW'S FIVE SPRITES, supplied by Mac as indexed PNGs and committed as he supplied them. Nothing ships them:
   // tools/bakeMeadow.mjs bakes them into render/meadowArt.js, and test/render/grassmeadow.test.js holds that module to
   // them texel for texel. Their colours are not looked up in any palette at runtime - the sprites carry their own.
-  ['src/assets/tamriel/source/tamriel-heightmap.png', "SUPPLIED - the owner's heightmap of the whole continent (TAMRIEL-RELIEF, 2026-10-24: 'Heres the entire tamriel height map btw', then 'This is the heightmap. Use it'), as he sent it - a phone's screenshot, its map cropped to 930x705 and saved as PNG; its own source not stated - its licence the owner's permission (AUDIT TESA II G9, the owner 2026-10-25: 'We have permission'; bible/03-World/Tamriel.md TAMRIEL-RELIEF). Greys only, no ARENA2 pixel in it; the PNG ships nowhere, and its derivative does: tools/bakeTamrielRelief.mjs lays it on the trace into src/world/tamriel/tamrielReliefData.js, a chunk of the build - a height every cell, the sea's too, so nothing of the trace ships in it (AUDIT TESA II G1)"],
+  ['src/assets/tamriel/source/tamriel-heightmap.png', "SUPPLIED - the owner's heightmap of the whole continent (TAMRIEL-RELIEF, 2026-10-24: 'Heres the entire tamriel height map btw', then 'This is the heightmap. Use it'), as he sent it - a phone's screenshot, its map cropped to 930x705 and saved as PNG; its own source not stated - its licence the owner's permission (AUDIT TESA II G9, the owner 2026-10-25: 'We have permission'). Greys only, no ARENA2 pixel in it; the PNG ships nowhere, and its derivative does: tools/bakeTamrielRelief.mjs lays it on the trace into src/world/tamriel/tamrielReliefData.js, a chunk of the build - a height every cell, the sea's too, so nothing of the trace ships in it (AUDIT TESA II G1)"],
   ['src/assets/grass/source/tuft-tall.png', "SUPPLIED - Mac's tall grass tuft for the meadow grass (MEADOW1, 2026-10-06), 32x32 indexed, his own PNG bytes - his own pixel art, no ARENA2 pixel in it (his word, AUDIT MEADOW1 2026-10-06)"],
   ['src/assets/grass/source/tuft-short.png', "SUPPLIED - Mac's short grass tuft for the meadow grass (MEADOW1, 2026-10-06), 32x32 indexed, his own PNG bytes - his own pixel art, no ARENA2 pixel in it (his word, AUDIT MEADOW1 2026-10-06)"],
   ['src/assets/grass/source/flowers.png', "SUPPLIED - Mac's flower tuft for the meadow grass (MEADOW1, 2026-10-06), 32x32 indexed, his own PNG bytes - his own pixel art, no ARENA2 pixel in it (his word, AUDIT MEADOW1 2026-10-06)"],

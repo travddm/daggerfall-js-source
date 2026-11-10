@@ -16,7 +16,7 @@
 // boat posed off her owner's word (scenes/comeSailAway/comeSailAwayPeers.js), the aboard machine (scenes/comeSailAway/comeSailAwayAboard.js),
 // the world's collider (player/collider.js) and the player's motor (player/motor.js) - with world.js's own
 // csaSyncColliders, csaSphereCastAll and csaPeersFrame lifted from its source and run in the frame's order (the motor,
-// the mod's step's sync, the peers posed and the deck's carry). `01-Overview/bugs/Field-Bugs-2026-10-01b.md`.
+// the mod's step's sync, the peers posed and the deck's carry).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

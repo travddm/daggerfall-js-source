@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-04b ((COMPANION-TRAIL); "Reduce companion noises, they are way too persistant"
-// (QUIET-COMPANIONS); "Reduce Lysandus VENGENANCE audio" (QUIET-VENGEANCE). `01-Overview/bugs/Field-Bugs-2026-10-04.md`.
+// (QUIET-COMPANIONS); "Reduce Lysandus VENGENANCE audio" (QUIET-VENGEANCE).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

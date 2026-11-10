@@ -29,8 +29,9 @@ Kokey's word is not recorded either. The repository states no licence.]**
 Vanilla Enhanced repaints Daggerfall's own textures, so Port-Doctrine's
 **A RENDER OF GAME DATA IS GAME DATA** rule covers it. Under that rule, VE3
 had the player attach their own copy. Mac approved carrying it instead.
-`bible/01-Overview/Port-Doctrine.md` records the exception and limits it to
-`public/art/vanilla-enhanced/`. `test/tooling/doctrine.test.js` marks these rows
+`docs/getting-started.md` ("Rules that hold everywhere") names
+`public/art/vanilla-enhanced/` as an exception in its own directory.
+`test/tooling/doctrine.test.js` limits it to that directory: it marks these rows
 `derived` and fails if any other row carries that mark.
 
 ## What is here
@@ -117,4 +118,4 @@ port's own file, fetched when it is first drawn.
 - A copy the player attaches under the same name (a newer version from Nexus)
   shadows the shipped one.
 
-See `bible/07-Rendering/Vanilla-Enhanced.md`.
+See `docs/formats/mods-and-vendor.md`.

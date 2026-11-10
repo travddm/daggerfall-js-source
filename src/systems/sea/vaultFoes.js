@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // SEA-VAULTS: THE VAULT HALLS' FOES.
 //
 // A vault hall's layout draws its foes from its template's own tables (characters/dungeonEnemies.js), which are rats and
@@ -7,7 +6,6 @@
 // vault's id and the foe's index, so every client builds the same hall. A water marker keeps a water foe (the Dreugh, the
 // Lamia). The human classes (Mage .. Knight, 128+) are kept: they are drawn at the player's own level, never a low tier.
 // (Moved from the open zone's hall file when the zone was removed; the picks are unchanged.)
-// ═══════════════════════════════════════════════════════════════════
 import { WATER_SPECIES } from '../../characters/dungeonEnemies.js'; // RDBLayout's water species, one home
 import { isClassEnemyId } from '../../characters/enemy/enemyBasics.js'; // DFU's class test (DaggerfallEntity.IsClassEnemyId): a mod's monster past 255 is no class
 

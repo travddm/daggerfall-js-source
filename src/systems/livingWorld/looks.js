@@ -1,7 +1,7 @@
 // @ts-check
 // LW-LOOKS: WHAT A RESIDENT LOOKS LIKE.
 //
-// THE CLASS THEY WALK THE TOWN IN (`townClassOf`). LW0 decision 5 put a class's eight-way sprite on one going out to
+// THE CLASS THEY WALK THE TOWN IN (`townClassOf`). A class's eight-way sprite was put on one going out to
 // fight (LW3's armed walk) and every one else in a townsperson's outfit; now those whose calling is a class's walk the
 // town in it too: one with a class of their own (an adventurer, a sellsword, a courier), a guild hall's own members (the
 // Mages Guild's one of the mage's classes, the Fighters Guild's one of the warrior's - their seed's - a knightly order's

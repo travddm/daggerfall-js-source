@@ -3,7 +3,7 @@
 // ... In Daggerfall, it's actually the one-handed axes that're called battle-axes, & the two-handed ones that're called
 // waraxes". Daggerfall's hands are right (DFU's ItemTemplates: Battle Axe 'Either', War Axe 'Both'); the Morrowind art
 // was crossed - DF_TO_MW_WEAPON matched the names, so a War Axe drew Morrowind's one-handed war axe with its clips and a
-// Battle Axe the two-handed battle axe. `01-Overview/bugs/Field-Bugs-2026-10-15c.md`.
+// Battle Axe the two-handed battle axe.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

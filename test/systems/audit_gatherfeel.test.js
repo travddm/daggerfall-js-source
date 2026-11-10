@@ -97,7 +97,7 @@ async function underground(t, r) {
   return { state, stood, wall, vein: () => standDungeonVeins({ dungeon: DEEP_DUNGEON, day: utcDayOfMs(NOON * 1000), climate: WOODS, confirmed: false, wall })[0] };
 }
 
-// ═══ LANDING ═════════════════════════════════════════════════════════════════════════════════════════════════════════
+// LANDING
 
 test('AUDIT GATHER-FEEL F1: a new act begun while the last blow is still in the air - that blow lands all the same, on its own frame: its clack, its kick, its node going (its rubble) and its breaking burst of seven; its vein stands apart, cracked, until then; the hand is the new act\'s (mutants: the swing dropped at a new act, the cracked vein stood back into its twin\'s batch)', async () => {
   try {
@@ -340,7 +340,7 @@ test('AUDIT GATHER-FEEL R12: a harvest another took (node-taken) answered before
   } finally { setForagingHost(null); }
 });
 
-// ═══ THE CRACKS AND THE CHUNKS ═══════════════════════════════════════════════════════════════════════════════════════
+// THE CRACKS AND THE CHUNKS
 
 test('AUDIT GATHER-FEEL R3: a worked vein\'s cracks close at every end the record names - walked off, the professions shut, the dungeon left (re-entered, it stands whole) - as at Escape and a refusal (mutants: each end\'s unwork dropped)', async () => {
   try {
@@ -425,7 +425,7 @@ test('AUDIT GATHER-FEEL R3: a burst\'s batch - its box holds every chunk\'s whol
   } finally { Math.random = realRandom; setForagingHost(null); }
 });
 
-// ═══ THE PEERS AND THE RECENTRE ══════════════════════════════════════════════════════════════════════════════════════
+// THE PEERS AND THE RECENTRE
 
 test('AUDIT GATHER-FEEL W1: a fishing peer\'s water is heard at the net however its landing was missed - first seen while it waits, its landing out of earshot - and the recentre carries the net with the land (mutants: the net a cue\'s alone, the first sight netless, the rebase dropping it)', () => {
   const FEET = [10, 0, 20], NET = [10, 0, 27];
@@ -539,7 +539,7 @@ test('AUDIT GATHER-FEEL RECENTRE: the gatherer\'s own ear - the net\'s place and
   } finally { setForagingHost(null); }
 });
 
-// ═══ THE FEEL ════════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE FEEL
 
 test('AUDIT GATHER-FEEL R2: BLOW-SHAKE through its own doors as they ship - the skin read (classic: none), the system\'s reduced motion read (none), the player\'s technique motion read (Off none, half half) - the springs\' own numbers, no door handed in (mutants: each default door a constant)', () => {
   const realMatch = globalThis.matchMedia;
@@ -590,7 +590,7 @@ test('AUDIT GATHER-FEEL R16: the springs are the view\'s, never the look the gli
   resetTechniqueFx();
 });
 
-// ═══ THE NUMBERS ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE NUMBERS
 
 test('AUDIT GATHER-FEEL R5/R7/F4: the tables the record states, by their numbers - the crack\'s shade and order, the chunks\', the ear\'s (the slipping catch LOUDER, a plip every 2.2-5.5 s, a pitch moved up to 5%); a peer\'s floor one pose at the pose\'s top rate; the dungeon\'s veins keep their typed doc (mutants: each number moved)', () => {
   assert.deepEqual([VEIN_CRACK_CELL, VEIN_CRACK_SHADE, { ...VEIN_CRACK_ORDER }], [7, 0.3, { own: 0.35, heart: 0.75 }]);
@@ -604,7 +604,7 @@ test('AUDIT GATHER-FEEL R5/R7/F4: the tables the record states, by their numbers
   assert.equal(PEER_GATHER_CUE_MS, 0.75 * 1000 / POSE_HZ, 'three quarters of a pose at the top rate - no floor of the climb\'s; PIN MOVED (AUDIT GATHER F8): a whole pose dropped honest beats measured a frame early');
 });
 
-// ═══ THE VEIN, ITS CHUNKS AND ITS CRACKS (lane V) ════════════════════════════════════════════════════════════════════
+// THE VEIN, ITS CHUNKS AND ITS CRACKS (lane V)
 
 const flatsDrawn = (t) => t.entry.batches.filter((b) => !b.dynamic && !b.destroyed).reduce((n, b) => n + b.centers.length, 0);
 

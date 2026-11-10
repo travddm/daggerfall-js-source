@@ -2,8 +2,7 @@
 // signed by the receipt's own account (C1), a palace's Charter Room never cached as the save's when its hall lapses
 // mid-visit (C2), a battle's sweeps reading the room's bodies once (C3), the frame's banner and tower lists kept (C4), a
 // failed first seats read asked again (C5), the Tithe's cap words (C6), a board's own listings cap (D2), the Tithe named
-// in the listing's words (D3), a crown's Saturday slot in place of the window lever (D6). `06-Systems/Online-Arc.md`
-// AUDIT SEATS-3.
+// in the listing's words (D3), a crown's Saturday slot in place of the window lever (D6).
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

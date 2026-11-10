@@ -1,6 +1,6 @@
 // FIELD BUGS 2026-10-07b TOWER-FLOORS (Jacob on Discord, #bug-reports: "The two Daggerfall Castle courtyard tower
 // interiors are very bugged. Everything inside them seems to be shifted up several meters including stairs, and there
-// is open void in some spots"). `01-Overview/bugs/Field-Bugs-2026-10-07b.md`.
+// is open void in some spots").
 //
 // The towers are CUSTAA05 #0 and #1, five storeys of room shells. Classic writes those shells as ObjectType 5, the
 // type it writes floor planes as, at the height of the storey each stands on - where the same shells, written as

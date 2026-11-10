@@ -2,7 +2,7 @@
 // SIEGE - the room's words projected (net/wire.js validSiegeOut) and folded (net/siege/siegeLink.js), the HUD's words and its
 // readout (ui/siegeHud.js), the receipts carried (net/siege/siegeClaims.js), the field the town's records give
 // (systems/siegeField.js), the socket's pass on every hello (net/online.js), and the session that ties them
-// (net/siege/siegeSession.js). 6.2, 6.8, 19; `06-Systems/Online-Arc.md` SEAT2a (part four).
+// (net/siege/siegeSession.js). 6.2, 6.8, 19; SEAT2a (part four).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../../chargenDom.mjs';

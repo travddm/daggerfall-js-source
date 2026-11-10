@@ -241,7 +241,7 @@ export function raidRegions(maps, pickerData) {
  * every client standing the land the same) of the types SelectRaids takes (RAID_TOWN_TYPES), a capital one town (its
  * centre: `street` WW7-11's law, scenes/livingWorld/livingIndex.js capitalStreet), each keyed by its OWN location index
  * (the registry's `location` - a place past the Bay's, negative: no MAPS.BSA row holds it) - grouped by AREA, the
- * province's districts (world/worldWide/worldGrid.js - what a region is to the Bay's draw, World-Wide decision 4), the areas
+ * province's districts (world/worldWide/worldGrid.js - what a region is to the Bay's draw), the areas
  * ascending, each its towns by map id, each beside its province's region. None for the Bay's lane (raidRegions is its own)
  * nor for a lane that stands no raid.
  * @param {{ inTheatre: (t: number) => ReadonlyArray<any> }|null|undefined} places @param {number} lane

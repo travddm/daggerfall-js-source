@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // INT5: THE WEALTH BUDGET. Realm-Arc section 4's
 // "budgets per hour of online play the service measured itself", built.
 //
@@ -18,7 +17,6 @@
 // have held - and nothing is held. Staff read the hours (/v1/mod/realm-budget, tools/realmReview.mjs), set the line
 // from them and turn `enforce` on; from then a gain past the bucket holds the character's trade ('budget') until play
 // refills it. The numbers below are the first setting, a guess the measure exists to replace.
-// ═══════════════════════════════════════════════════════════════════
 
 import { DB_ROOT } from './service.js';   // SCALE4d: the binding a request's counted Proxy wraps - what the config is kept by
 
@@ -129,7 +127,7 @@ export function spoilsGrantStatement(db, playerId, guard = null, ...binds) {
 
 /** LW15 ("LW15"): THE SERVICE'S OWN FAUCETS - gold it pays that no player paid (a
  *  patron's purchase: market.js reckonPatrons) - kept by the hour and kind (realm_faucets) beside the wealth's hours, so
- *  staff read what the living world mints before the budget is enforced (Living World II decision 7). SUMMON-REPAIR: and
+ *  staff read what the living world mints before the budget is enforced. SUMMON-REPAIR: and
  *  staff's own refunds (review.js `repair`) - gold no player paid, named as its own kind. */
 export const FAUCET_KINDS = Object.freeze(['patron', 'repair']);
 /** One faucet's gold written to its hour. @param {any} db @param {string} kind @param {number} hour @param {number} gold */

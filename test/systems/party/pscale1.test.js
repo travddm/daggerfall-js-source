@@ -2,7 +2,7 @@
 // A FIGHT WEIGHS WHAT ITS FIGHTERS WEIGH (systems/party/partyScale.js). The law's numbers; the outdoor pool driven - a
 // shared foe's toughness at its owner's damage door by the players striking it, the remainder carried, the foes
 // nobody else can help with left alone, a shared foe's hit on me harder; and the hosts by source. The audit's own
-// pins, mounted and driven, are test/systems/auditpscale1.test.js. `06-Systems/Online-Arc.md` PSCALE1, AUDIT PSCALE1.
+// pins, mounted and driven, are test/systems/auditpscale1.test.js. PSCALE1, AUDIT PSCALE1.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

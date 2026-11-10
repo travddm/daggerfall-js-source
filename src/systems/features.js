@@ -1031,7 +1031,7 @@ export const FEATURES = Object.freeze([
     group: 'world',
     title: 'Living world',
     note: 'Townsfolk have names, homes, trades and daily routines. They open their shops, meet and talk at the square '
-      + 'and the tavern, sleep at night and remember how you treated them. Everyone online sees the same people. '
+      + 'and the tavern, sleep at night and remember how you treated them. Online, each player chooses for themselves. '
       + 'Off fills the streets with the classic wandering strangers, who vanish at dusk.',
     effect: 'Takes effect when a town next loads.',
     kinds: Object.freeze(['enhanced']),
@@ -1087,13 +1087,6 @@ export const FEATURES = Object.freeze([
   // wilderness itself. Read at the world's mount, like the roads it
   // consults: the loader's list is built once per world.
   modFeature('world-of-daggerfall', () => t('features.effect.worldLoads', 'Takes effect when the world next loads.'), 'world'),
-  // AS1: AQUATIC SPRITES - `world`, three flooded dungeon
-  // blocks. The door caches a block once it is served, so a switch flipped
-  // mid-session reaches the next load, not the dungeon you stand in.
-  modFeature('aquatic-sprites', () => t('features.effect.gameLoads', 'Takes effect when the game next loads.'), 'world'),
-  // DS1: DETAILED SHIPS - `world`, the two ships you can own.
-  // Their building records are read through the door once per load.
-  modFeature('detailed-ships', () => t('features.effect.gameLoads', 'Takes effect when the game next loads.'), 'world'),
   // WD3: BEAUTIFUL VILLAGES and BEAUTIFUL CITIES - `world`, the towns themselves. The world-data
   // loader reads each switch once, when the game loads (scenes/modWorldData.js latches it), so a town never moves
   // under the player; online the room owns both.

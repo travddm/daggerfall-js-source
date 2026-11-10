@@ -1,5 +1,4 @@
-// PERF-INST: A MESH'S PLACEMENTS ARE FILED BY PLACE (render/shadowPass.js SHADOW_INSTANCE_LINEAR; bible/07-Rendering/
-// Performance-Priority.md PERF-INST).
+// PERF-INST: A MESH'S PLACEMENTS ARE FILED BY PLACE (render/shadowPass.js SHADOW_INSTANCE_LINEAR; docs/rendering/performance.md).
 //
 // The shadow pass remembers every placement of a mesh (AUDIT SC1, AUDIT REACH) to tell a still copy from a moved one.
 // Each draw scanned every placement its mesh had - N copies of one model, N x N distances a frame - and past 128 every

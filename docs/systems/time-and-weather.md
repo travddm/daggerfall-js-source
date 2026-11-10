@@ -1,7 +1,7 @@
 # Time and Weather
 
 This page covers the game clock (calendar, day and night, online and offline time, waits and rest), weather, the sky,
-and seasons and climates. Terrain and the map are in [world.md](world.md).
+seasons and climates, and the survival arc that reads them. Terrain and the map are in [world.md](world.md).
 
 ## Calendar
 
@@ -26,8 +26,8 @@ Daggerfall Unity's `DaggerfallDateTime`.
 
 - `createPlayerTicker` (`src/scenes/shared.js`) wraps `tickPlayerMinutes`. `ticker.advance(minutes)` is Daggerfall
   Unity's `RaiseTime`.
-- `tickPlayerMinutes` runs the magic round, the per-minute loop, survival needs
-  (`src/systems/survival/needs.js` `survivalMinute`) and the calendar hooks (`runDayChange`, `runCalendarArms`).
+- `tickPlayerMinutes` runs the magic round, the per-minute loop, the calendar hooks (`runDayChange`,
+  `runCalendarArms`) and, when the host passes a `survival` argument, the survival needs (see Survival arc below).
   Catch-up is capped at `MAX_CATCHUP_ROUNDS` (2880), Daggerfall Unity's `maxCatchupDays` figure.
 - `src/systems/timeScale.js` scales game time for travel (`setTimeScale`, clamped to 0.01 to 100; `travelRateOf`).
   `src/scenes/world.js` calls `resetTimeScale` when a journey ends.
@@ -43,7 +43,7 @@ Online, nobody stores or moves the world clock. World time is a pure function of
   `setSharedClock` in `worldTick.js` installs it as the source.
 - Every client computes the same time; nothing about the clock is sent after the welcome.
 
-There are three clocks online:
+Daggerfall Unity has one clock. Online, the code runs three:
 
 | Clock | Function | Behaviour |
 | --- | --- | --- |
@@ -92,7 +92,7 @@ holds them equal); it exists because the relay carries it and never carries `sky
   Weather and seasons read the sky date online.
 - The fast-travel arrival clamp (`arrivalClampMinutes`) runs offline only.
 - `SKY_SEGMENTS` rows start at aligned instants (`tools/skyCutover.mjs` lists them) so a rate change does not make the
-  sky jump. A new row must start after the build that carries it is live.
+  sky jump.
 
 ## Rest and waits
 
@@ -123,7 +123,8 @@ Other rest files:
 `src/systems/holidays.js` `getHolidayId(gameMinutes, regionIndex)` is a port of `GetHolidayId`; it also lists the
 holidays that give free or half-price cures. Days 356 to 360 are never holidays.
 
-`src/systems/seasonBook.js` is not the calendar. It tracks online realm and seat seasons.
+`src/systems/seasonBook.js` is not the calendar. It builds the pause screen's season window from the clock, the town
+seats and the season boards. The season boards are cut (decision 46) and the seats become a mod (decision 102).
 
 ## Weather
 
@@ -144,6 +145,14 @@ two. The same file holds fog settings (`fogForWeather`), sky offsets and `isSnow
 
 ### Enhanced lane
 
+> Leaves core: a mod of the weather map and Enhanced Environments, with `airTemperature.js` and `snowpack.js`
+> (decision 122 (5)).
+
+A departure from Daggerfall Unity, on two Features rows: `weather-events` (`weatherEvents`) and
+`enhanced-environments` (`enhancedEnvironments`), both on by default and both held by the room online. The parts
+gated on the enhanced skin fall under decision 117 (16): they are made to work in every skin where that is cheap, or
+move into the skin mod ([ui.md](ui.md)).
+
 The weather map, the field and the forecast run on the `weatherEvents` preference alone, in every skin, on DFU's own
 weather words. Enhanced Environments adds to them (the clouds' cells, the air's snow-or-rain law, the hourly
 evolution) and is not required. The rest of this section is behind the enhanced skin and the Enhanced Environments
@@ -157,6 +166,10 @@ preference:
 - `weatherFront.js` `createWeatherFront` eases sky, sound and precipitation through a three-hour front.
 - `src/systems/wind/wind.js` `createWindModel`: daily calm and front strength, seeded (`?wseed` overrides the seed).
 - `owForecast.js`: the forecast. `nightFog.js`: fog colour from the lit air, so fog darkens at night.
+- `src/systems/weather/airTemperature.js`: an air model in Celsius (lapse rate with altitude). It decides the snow
+  share of precipitation (`snowShareOf`) and feeds the snowpack. It does not feed the survival arc's felt temperature.
+- `src/systems/weather/snowpack.js` integrates snow water over the weather map's history with the air model, and gives
+  snowlines that `src/render/snowCoverGlsl.js` reads.
 
 Lane gates in `weatherSim.js` (`weatherFieldOn`, `weatherMapOn`, `snowGroundLawOn`, `precipLawOn`,
 `weatherEvolutionOn`) are read per call. Each has a URL switch: `?wxfield=off`, `?wxmap=off`, `?snowground=off`,
@@ -167,7 +180,8 @@ Lane gates in `weatherSim.js` (`weatherFieldOn`, `weatherMapOn`, `snowGroundLawO
 The relay has no weather code. Online, `src/scenes/world.js` calls `setSharedWeather(true)`: the day roll is seeded by
 the event-clock day (`rollsFor`), and the season comes from the sky date, so every client rolls the same six words.
 The weather map, distant storms, snowpack and forecast are pure in place and minute, so clients agree without
-messages. The weather-events preference is forced on online.
+messages. Online the room holds the weather-events preference on (`weatherEvents: true` in
+`src/net/profile/officialProfile.ts`, the server kit's default profile).
 
 ### Rendering
 
@@ -183,40 +197,64 @@ messages. The weather-events preference is forced on online.
 - Classic sky: `src/render/skyRenderer.js`.
 - Enhanced sky: `src/render/enhancedSky.js` draws the sun, the two moons Masser and Secunda (phases from the
   calendar), stars and cloud layers.
-- Dynamic Skies: `src/systems/dynamicSkies/dynamicSkies.js` ports the Dynamic Skies mod's logic (presets, light curve,
-  moon orbits, fog presets that replace the weather manager's). `dynamicSkiesRuntime.js` holds the instance,
-  `src/render/dynamicSkiesRenderer.js` draws it. It runs on the enhanced lane when the mod setting is on;
-  `createSkyController` in `src/scenes/shared.js` decides.
 - `src/world/dreadSky.js` is an event sky with red strikes.
+
+### Dynamic Skies
+
+> Leaves core: the Dynamic Skies mod (decision 99).
+
+`src/systems/dynamicSkies/dynamicSkies.js` ports the logic of the Dynamic Skies mod
+(`vendor/dynamic-skies/`): presets, light curve, moon orbits, and fog presets that replace the weather manager's.
+`dynamicSkiesRuntime.js` holds the instance, `src/render/dynamicSkiesRenderer.js` draws it. It runs on the enhanced
+lane when the mod setting is on; `createSkyController` in `src/scenes/shared.js` decides.
 
 The firmament (`src/systems/firmamentLive.js`, `firmamentPowers.js`) is not a sky. It is the online passive skill
 tree; see [characters.md](characters.md).
 
 ## Snow
 
-Two independent systems:
-
-- `src/systems/snowfall.js` and `snowfallRuntime.js` port the Dynamic Snow mod: depth grows 0.1 m per 3 hours of
-  snowfall and melts 0.1 m per 72 clear hours, with footprint tracks (`PersistentTrackField`, saved). The host is
-  `src/scenes/snowfallHost.js`; the shader is `src/render/snowfallSurface.js`.
-- `src/systems/weather/snowpack.js` integrates snow water over the weather map's history with
-  `src/systems/weather/airTemperature.js`, and gives snowlines that `src/render/snowCoverGlsl.js` reads.
-
 Classic winter ground is calendar-only: `src/world/climateSwaps.js` `getTerrainGroundArchive` swaps to the winter
-archive, as Daggerfall Unity's `ClimateSwaps`.
+archive, as Daggerfall Unity's `ClimateSwaps`. This stays in core. Two snow systems sit on top of it: the snowpack of
+the enhanced weather lane (above), and Snowfall (below).
+
+### Snowfall
+
+> Leaves core: the Snowfall mod (decision 99).
+
+`src/systems/snowfall.js` and `snowfallRuntime.js` port demifiend000's Snowfall 1.0.5 (`vendor/snowfall/`): depth
+grows 0.1 m per 3 hours of snowfall and melts 0.1 m per 72 clear hours, with footprint tracks (`PersistentTrackField`,
+saved). The host is `src/scenes/snowfallHost.js`; the shader is `src/render/snowfallSurface.js`.
 
 ## Seasons and climates
 
 - `src/world/climateSwaps.js` ports `ClimateSwaps.ApplyClimate`. It has its own `SEASON` enum (Summer 0, Winter 1,
   Rain 2), not `gameDate.js`'s. Interiors always use summer.
-- `src/systems/seasonsIliacBay.js` ports the Seasons of the Iliac Bay mod: seasonal texture atlases swapped in at each
-  new month, load and fast travel.
 - `src/world/seasonReskin.js` `createSeasonReskin` re-skins or rebuilds streamed pixels when the season changes.
-- `src/systems/survival/temperature.js` gives the felt temperature in abstract degrees (`CLIMATE_TEMP`, `MONTH_TEMP`,
-  `NIGHT_MULT`, `WEATHER_TEMP`, `feltTemperature`), which drives survival.
-- `src/systems/weather/airTemperature.js` is a separate air model in Celsius (lapse rate with altitude). It decides the
-  snow share of precipitation (`snowShareOf`) and feeds the snowpack. The two temperature models do not feed each
-  other.
+- The air temperature model is part of the enhanced weather lane (above).
+
+### Seasons of the Iliac Bay
+
+> Leaves core: the Seasons of the Iliac Bay mod (decision 99).
+
+`src/systems/seasonsIliacBay.js` ports RosyTheRascal's Seasons of the Iliac Bay 1.1 (`vendor/seasons-iliac-bay/`):
+seasonal texture atlases swapped in at each new month, load and fast travel.
+
+## Survival arc
+
+> Leaves core: Climates & Calories, whole, with the arc built on it (decisions 77 and 93).
+
+The game's own design after Ralzar's Climates & Calories (`vendor/climates-calories/`). One Features row,
+`mod-climates-calories` (key `survival`), picks a tier: Off (Daggerfall Unity's game), Boons (the default), Casual or
+Hard. Each player picks their own online. `src/systems/survival/switch.js` (`survivalTier`, `survivalOn`,
+`survivalRules`) is the one switch every part reads. When the arc leaves, core falls back to Daggerfall Unity's
+starting gear, shops and rest.
+
+- `src/systems/survival/needs.js` `survivalMinute`: hunger, thirst, sleep, wetness and exposure, one law per world
+  minute, run from `tickPlayerMinutes`.
+- `src/systems/survival/temperature.js`: the felt temperature in abstract degrees (`CLIMATE_TEMP`, `MONTH_TEMP`,
+  `NIGHT_MULT`, `WEATHER_TEMP`, `feltTemperature`).
+- `src/systems/survival/` also holds food, camps (`camp.js`, stood by `src/scenes/camps.js`), hearths and the tier
+  table (`difficulty.js`). The rest supplies (`src/systems/rest/restItems.js`, `restItemRows.js`) leave with the arc too.
 
 ## Tests
 
@@ -233,6 +271,9 @@ archive, as Daggerfall Unity's `ClimateSwaps`.
 ## Traps
 
 - Two season enums, two temperature models and two snow systems exist side by side. Check which one a caller reads.
+  `gameDate.js`'s `SEASONS` and `climateSwaps.js`'s `SEASON` are Daggerfall Unity ports and stay in core. The felt
+  temperature leaves with the survival arc, the air model and the snowpack with the enhanced weather lane, and
+  Snowfall as its own mod.
 - Online, a write to the world clock silently does nothing. Move the character's own clock instead.
 - `bandNight` in `src/scenes/world.js` repeats the dawn and dusk hours as literal minutes (360 and 1080).
 - Weather must stay a pure function of place, minute and the shared seed, or online clients disagree.

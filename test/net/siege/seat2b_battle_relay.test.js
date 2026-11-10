@@ -3,7 +3,7 @@
 // its Rams and its Walls; an attacker's blow batters the Gatehouse, a defender's the Ram, each at its share; the Ram's
 // crew strikes every ten seconds; a destroyed Ram's successor comes at the attackers' wave; the breach unbars the
 // Throne; a defender rises on the Walls' quicker wave (6.2, 7.5; server/src/index.js
-// `_siegeWorkBlow`, net/siege/siegeRef.js). `06-Systems/Online-Arc.md` SEAT2b part two (b).
+// `_siegeWorkBlow`, net/siege/siegeRef.js). SEAT2b part two (b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_WAVE_MS, siegeNextWave } from '../../../src/net/siege/siegeRef.js';

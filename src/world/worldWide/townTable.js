@@ -1,11 +1,9 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WW7 - THE TOWNS BY MAP ID: a trader's town, a resident's, a vendor's waypoint, the town
 // economy's - named and found. The host's own table holds the Bay's (MAPS.BSA's rows, walked once at the boot:
 // HOME-VENDOR, TOWN-ECON); a map id it does not hold is asked of the world's registry (world/worldWide/worldPlaces.js -
 // TESA's places past the Bay, WW7), so a vendor of Solitude or a resident of an Arena town is named as a Bay one is.
 // The registry's place answers in the table's own shape ({ name, px, py, region, type }; no MAPS `location` index).
-// ═══════════════════════════════════════════════════════════════════
 
 /**
  * @typedef {{ name: string, px: number, py: number, region: number, type: number, location?: number }} TownRow

@@ -3,7 +3,7 @@
 // schedule (key order, the clash, the two-hour move, the unplaced), the sides' caps and the rosters' close, the board's
 // words; the Seat tab's battle panel (the announcement, each side, the reader's sign and unsign, a Guildmaster's
 // Sellswords) and the holder's window lever; the seat book's calls. 6.3-6.5;
-// `06-Systems/Online-Arc.md` SEAT2a.
+// SEAT2a.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';

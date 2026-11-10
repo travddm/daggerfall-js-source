@@ -3,7 +3,7 @@
 // her wake and her colours with her at full - only her hull and her flats faded - and the aside card's state line ran to
 // a second. The real renderer and shadow pass over a recording GL (test/render/el2_shadows.test.js's), Come Sail Away's real
 // pool, the real host (test/navalSea.mjs), and world.js's particle lists lifted from its source. Each pin is red on the
-// record's code (ea3a7361e). `01-Overview/audits/Audit-Ships-of-the-Bay.md`.
+// record's code (ea3a7361e).
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

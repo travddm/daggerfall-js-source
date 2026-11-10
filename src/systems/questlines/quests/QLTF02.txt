@@ -1,4 +1,4 @@
--- STAR8 (2026-10-20; bible/11-Multiplayer/Starfall.md section 7): THE THIRTEENTH OF FROSTFALL, step 2 of 4.
+-- STAR8 (2026-10-20): THE THIRTEENTH OF FROSTFALL, step 2 of 4.
 -- Begun by the raven's letter (the line's runner starts it an hour after the first). The Sisters of the Bluff spin the
 -- black thread at their coven nearest the capital (`permanent BluffCoven`, the region of Daggerfall). A coven is an
 -- open-air place with no quest marker (WITCAA04.RMB - QLTF01 says why), so its people come out of the dark when the

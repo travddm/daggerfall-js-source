@@ -2,7 +2,7 @@
 // LW4: THE LIVES - who holds a traveller's place in their town, cycle by
 // cycle. The road kills (trouble.js); a traveller slain is slain for good, their place stands empty while the town
 // mourns, and a newcomer takes it - a new name, a new face, a new trade's record - and the town's talk remembers the one
-// who went. Pure, like the rest of the living world (LW0 decision 2): no save holds who died, so every reader's world
+// who went. Pure, like the rest of the living world: no save holds who died, so every reader's world
 // holds the same dead and the same newcomers, and a slot's whole history is a short read of its own seeded dice.
 //
 // THE FATE. Each traveller slot rolls its fate once a cycle - its own cycle (trips.js cycleOf), a sellsword's its
@@ -14,7 +14,7 @@
 // The death plays out where it falls: on that cycle's trip (trouble.js - a fated death is always ON the road: ownTrip
 // sets out whatever the cycle's chance said), or, a cycle with no trip to make, abroad and unseen.
 //
-// A CHARACTER'S OWN TURNS (LW0 decision 6). A player who fights beside a party can turn a fate: a member the road
+// A CHARACTER'S OWN TURNS. A player who fights beside a party can turn a fate: a member the road
 // would have taken, alive when the fight is won, was SPARED; one cut down beside them FELL. Both are the character's
 // (the LivingWorld record), keyed by the PLACE and the cycle (`<place>@<cycle>` - the census's id, which holder held it
 // that cycle being the dice's own answer), and read here over the dice - the world is shared, what one player changed

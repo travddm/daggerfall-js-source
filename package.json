@@ -28,6 +28,7 @@
     "format:fix": "node tools/check-changed.mjs format-fix",
     "markdown": "node tools/check-changed.mjs markdown",
     "spell": "node tools/check-changed.mjs spell",
+    "comment-refs": "node tools/comment-refs.ts",
     "check": "npm run lint && npm run types && npm test && npm run build",
     "prebuild": "sh tools/fetch-vendor.sh && node scripts/buildTag.mjs",
     "postbuild": "git checkout -- src/buildTag.js",

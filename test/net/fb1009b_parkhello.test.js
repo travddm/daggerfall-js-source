@@ -9,7 +9,7 @@
 // seconds old), the park arrived while it waited, the relay closed the socket as policy ('park before hello'), and the
 // Rift cast its player out at the Hollow's door - "The way to the Shattered Hour is lost." Within ten seconds of
 // another player's hello the realm needed no fetch, which is the eighth Recall that let them in. Driven here over the
-// real session and the relay's own parse. `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
+// real session and the relay's own parse.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { OnlineSession } from '../../src/net/online.js';

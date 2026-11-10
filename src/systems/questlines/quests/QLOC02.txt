@@ -1,8 +1,8 @@
--- QL16 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.3): THE OLD COIL, step 2 of 3.
+-- QL16 (2026-10-19; docs/systems/quests.md): THE OLD COIL, step 2 of 3.
 -- Begun with the giver's word in the journal at once (the line's runner starts it an hour after the tale). The act:
 -- two ports reached under sail (`ql act port-reached 2` - systems/questlines/qlActs.js, the harbour office's berth);
 -- Hamid's packet meets the player's at the second port and pays there, so no voyage ends in a walk inland. Lore: the
--- port's own - the packet lanes, the harbour bells that ring for the Old Coil (bible/03-World/Sea-Serpent.md).
+-- port's own - the packet lanes, the harbour bells that ring for the Old Coil.
 Quest: QLOC02
 DisplayName: The Packet Lanes
 -- Message panels

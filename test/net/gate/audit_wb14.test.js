@@ -61,7 +61,7 @@ function drain(run, sub, b, left = 0) {
   for (let g = 0; H.h > left + 1e-9 && !H.kn && g < 9000; g++) { run.hit(sub, Math.min(700, (H.h - left) * f.max + (left ? 0 : 1)), b); run.t += 1; }
 }
 
-// ═══ LAW ══════════════════════════════════════════════════════════════════════════════════════════════════════════
+// LAW
 
 test('AUDIT WB14 LAW-1 the Reckoning\'s stun weights a blow on him whole - a Blade kneeling (its stun its own) makes the Flame take no more (mutants: the stun read sundered)', () => {
   const run = sundered(), { f } = run;
@@ -237,7 +237,7 @@ test('AUDIT WB14 LAW-9 / LAW-10 / LAW-11 the fight is built on the portents it k
   assert.equal(f.used.unmake, um[0]._t, 'from the first');
 });
 
-// ═══ WIRE ═════════════════════════════════════════════════════════════════════════════════════════════════════════
+// WIRE
 
 test('AUDIT WB14 WIRE-3 / WIRE-5 the Rejoining is said with the state in its beat - each half\'s ward in it - and a half\'s mending begun or ended is said at once (mutants: the ward left to the next state; the mending unsaid)', () => {
   const run = sundered(), { f } = run;
@@ -298,7 +298,7 @@ test('AUDIT WB14 WIRE-2 the relay: a Tithe-Imp caught pays at its catch, the fig
   } finally { Date.now = realNow; console.warn = quiet; }
 });
 
-// ═══ RECORD: laws a lane found unpinned ════════════════════════════════════════════════════════════════════════════
+// RECORD: laws a lane found unpinned
 
 test('AUDIT WB14 RECORD-2 the pair law\'s window is SUNDER_PAIR_MS to the beat: a half kneeling rises no sooner, and once (mutants: the window halved)', () => {
   const run = sundered(), { f } = run;
@@ -428,7 +428,7 @@ test('AUDIT WB14 WIRE-6 (PORTENT-FOLD) the account: a portent night\'s receipt f
   assert.ok(guarded[0][0].endsWith(' AND (x = ?4 AND y = ?5)'));
 });
 
-// ═══ PLAY: the balance by simulation ══════════════════════════════════════════════════════════════════════════════
+// PLAY: the balance by simulation
 
 test('AUDIT WB14 PLAY-1 a half knelt past the pair law rises level with the other - SUNDER_RISE of its pool at most, SUNDER_RISE_MIN at least - so two sides out of step even out instead of kneeling and rising for ever (mutants: risen at SUNDER_RISE whatever the other holds)', () => {
   for (const [left, want] of [[0.1, 0.1], [0.01, SUNDER_RISE_MIN], [0.45, SUNDER_RISE]]) {

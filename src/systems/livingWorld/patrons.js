@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LW15: THE PATRONS, DRAWN - the client's half of the sale the
 // service decides (net/patronLaw.js). The service names a SEED and a MINUTE, never a person; here the seed is DEALT to
 // one of the town's own residents (`patronOf` - its households, never the watch or a visitor: every reader deals the

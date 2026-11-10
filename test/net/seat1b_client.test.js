@@ -2,7 +2,7 @@
 // its rhythm, the relay's tick in a cell room (driven through the real Room over test/fakeRoom.mjs), the caps' arithmetic,
 // the Seat tab's words, the seats' book (the standings, a pledge, Tribute's one request id, the Watch's receipts kept and
 // claimed), the Renown report's region, and the hosts by source. 4.1-4.2, 7.9;
-// `06-Systems/Online-Arc.md` SEAT1b.
+// SEAT1b.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

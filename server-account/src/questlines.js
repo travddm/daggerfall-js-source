@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// QL12 (2026-10-19,; (decision 8) and 5.3): THE QUESTLINES'
+// QL12 (2026-10-19): THE QUESTLINES'
 // CLAIM - what the account service pays a questline, and only against what it witnessed.
 //
 // `POST /v1/ql/claim { line, step, phase, choice? }`, behind a session. Its pay for a registered account (a guest holds no title, titles.js titlesHeld;

@@ -171,14 +171,12 @@ test('AUDIT 26 F019: the exterior activation ray clicks them (PlayerActivate.cs:
     'the click always derives a BUILDING record - the exterior overload stamps Context.Custom');
 });
 
-// ═══════════════════════════════════════════════════════════════════
 // ROAD-E E3: RMBLayout's THIRD act on an exterior StaticNPC
 // (RMBLayout.cs:377 / :453) - the one the AUDIT 26 wiring left flagged.
 // The law is `QuestMachine.Instance.SetupIndividualStaticNPC(go,
 // obj.FactionID)` at LAYOUT, per NPC, and its two observable halves:
 // the away arm's SetActive(false) (out of the draw AND out of the ray)
 // and the bootstrap QuestResourceBehaviour every other individual gets.
-// ═══════════════════════════════════════════════════════════════════
 
 /** A machine whose one site link places the individual 305 AWAY from
  *  home (or at home), without parsing a quest: the walk reads
@@ -280,7 +278,6 @@ test('E3: the wiring - world.js runs the pass at layout and stands only the ACTI
     'the start pixel would carry no bootstrap behaviours at all');
 });
 
-// ═══════════════════════════════════════════════════════════════════
 // ROAD-F GS1: the OTHER gap AUDIT 26 flagged at this seam - the GUILD
 // SERVICE popup above ground.
 //
@@ -292,7 +289,6 @@ test('E3: the wiring - world.js runs the pass at layout and stands only the ACTI
 // into DFU's ONE UserInterfaceManager stack. The port has three slots,
 // one per mode, and this whole chain wrote the interior one - which
 // only the interior and dungeon frames draw, tick, key and click.
-// ═══════════════════════════════════════════════════════════════════
 
 /** Lift `mountServiceWindow` out of the shipped host and run it.
  *  Nothing is retyped: the arms that execute here are the ones in

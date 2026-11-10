@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // CRAFT-WRITS: THE GUILDS' ASKS OF A CRAFTER, as the service keeps them.
 // The law - what is asked, of whom, for what - is src/net/craftWritLaw.js; the record
 // section 49.
@@ -16,7 +15,6 @@
 //                    statements, CHAP2a) while the Chapters are the account's
 //   sweepCraftWrits  the hour's clock (cron.js): an unfilled writ the day after its own - a filled one stays, the brews it
 //                    took counted by it
-// ═══════════════════════════════════════════════════════════════════
 
 import { mintId, overRate } from './accounts.js';
 import { asks, shut, trackView, trackRow, craftCapSql, renownAnswer } from './professions.js';

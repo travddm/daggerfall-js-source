@@ -1,5 +1,5 @@
-// TESA7 (2026-10-12, the owner: "Populating the world with unique and smaller towns, farms, etc"; bible/03-World/
-// Arena-Provinces.md TESA7) - THE COUNTRYSIDE PAST THE BAY, pinned. Each climate stands what the Bay stands on its land of
+// TESA7 (2026-10-12, the owner: "Populating the world with unique and smaller towns, farms, etc") - THE
+// COUNTRYSIDE PAST THE BAY, pinned. Each climate stands what the Bay stands on its land of
 // that climate (world/tamrielCountry.js: the game's rows over the Bay's land), a pixel's own hash rolls it, the clone is
 // one of the game's own places of its kind under the province's names, its own id, its own index; the world host asks it
 // of every pixel past the Bay that Arena's places leave free, never on water, an Arena road or the sea's edge.
@@ -240,11 +240,11 @@ test('TESA7 the host: the templates and the count off the game\'s rows before th
   assert.match(W, /const bayLandNow = \(\) => \(_pastBay\.bayLand \?\?= bayLand\(\(x, y\) => maps\.getClimateIndex\(x, y\), \(x, y, c\) => isWaterPixel\(c, host\.woods\.getHeightMapValue\(x, y\)\)\)\);\n\s+const countryRatesNow = \(\) => \(_pastBay\.countryRates \?\?= countryRates\(_countryCounts, bayLandNow\(\)\)\);/);   // PIN MOVED (TESA8): the Bay's land read once for the lairs' rates too
   assert.match(W, /const _countryGround = _countryTemplates \? createCountryGround\(host\.woods\) : null;/);
   // PIN MOVED (AUDIT TESA II P1): online the open zone's hall of the day first - Cyrodiil's lie past the Bay
-  assert.match(W, /if \(\(_arenaTemplates \|\| _countryTemplates \|\| _capitalBase\) && !onTheBay\(px, py\)\) return \(locationIndex\.get\(`\$\{px\},\$\{py\}`\)\?\.superTier \? locationIndex\.get\(`\$\{px\},\$\{py\}`\) : null\) \|\| host\.capitalLocationAt\(px, py\) \|\| \(_arenaTemplates && host\.arenaLocationAt\(px, py\)\) \|\| host\.countryLocationAt\(px, py\) \|\| host\.lairLocationAt\(px, py\) \|\| spawnPastBayAt\(px, py\);/);   // PIN MOVED (TESA8): then the lair's (tesa8_lairs); PIN MOVED (TESA10): a capital first (tesa10_capitals)   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): _locationToBuild is scenes/spawnStandHost.js's, the places' rolls through `host`   // PIN MOVED (SPAWN-WORLD 2026-10-26): online, the spawner's last - never on a place   // PIN MOVED (WW5, bible/03-World/World-Wide.md WW5): a province's Hollow first, as its lane stands it in the index (scenes/superDungeon/sdLanes.js) - carried into scenes/spawnStandHost.js at the packages' merge (AUDIT BAY-LEFT)
+  assert.match(W, /if \(\(_arenaTemplates \|\| _countryTemplates \|\| _capitalBase\) && !onTheBay\(px, py\)\) return \(locationIndex\.get\(`\$\{px\},\$\{py\}`\)\?\.superTier \? locationIndex\.get\(`\$\{px\},\$\{py\}`\) : null\) \|\| host\.capitalLocationAt\(px, py\) \|\| \(_arenaTemplates && host\.arenaLocationAt\(px, py\)\) \|\| host\.countryLocationAt\(px, py\) \|\| host\.lairLocationAt\(px, py\) \|\| spawnPastBayAt\(px, py\);/);   // PIN MOVED (TESA8): then the lair's (tesa8_lairs); PIN MOVED (TESA10): a capital first (tesa10_capitals)   // PIN MOVED (HOST-SPLIT, SPAWN-WORLD 2026-10-26): _locationToBuild is scenes/spawnStandHost.js's, the places' rolls through `host`   // PIN MOVED (SPAWN-WORLD 2026-10-26): online, the spawner's last - never on a place   // PIN MOVED (WW5): a province's Hollow first, as its lane stands it in the index (scenes/superDungeon/sdLanes.js) - carried into scenes/spawnStandHost.js at the packages' merge (AUDIT BAY-LEFT)
   const tp = W.slice(W.indexOf('    window.__tesaPlace = (x, y) => {'), W.indexOf('    window.__arena = () => {'));
   assert.match(tp, /country: loc\?\.country \?\? null, type: loc\?\.mapTableData\?\.locationType \?\? null \};/, 'the probe reads it');
   const M = read('src/scenes/worldModes.js');
-  // PIN MOVED (BAY-LEFT-B, bible/03-World/Arena-Provinces.md): a country place sells its houses and reads its deed - its
+  // PIN MOVED (BAY-LEFT-B): a country place sells its houses and reads its deed - its
   // province's region's, held to its own map id (banking.js deedHeldIn; test/systems/bayleftb_houses.test.js)
   assert.match(M, /if \(isEtherPlaceId\(dir\.mapId\)\) return \[\];/, 'a house sold in one');
   assert.match(M, /const houseOwnedAt = \(b, key\) => !isEtherPlaceId\(homeTownOf\(b\)\) && isHouseOwned\(/, 'and its deed read there');

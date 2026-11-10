@@ -105,8 +105,7 @@ export function createExteriorAutomapToggle(host) {
       // racial fast-travel block - four checks that happen at open
       // time. Handing the bay over on the town key would walk straight
       // past all four, and moving them to commit time is a behaviour
-      // change to a ported, audited system. Mac's call, recorded in
-      // 10-UI/Enhanced-Maps-Arc.md; until he takes it, the travel key
+      // change to a ported, audited system. Mac's call; until he takes it, the travel key
       // is the way to the bay and it keeps its ladder.
       // FB1020c STREETS-TAB: the other way round needs none of them - the
       // travel key's window holds these streets too (travelTown, below),

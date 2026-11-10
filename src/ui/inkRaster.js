@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // MAP-WHOLE: THE CONTINENT'S DOTS RASTERISED BY HAND.
 //
 // Out on the continent the held map draws each road's and track's pixel past the Bay as a dot of the far pen's width
@@ -12,7 +11,6 @@
 // colour solid under it: the union the canvas's non-zero fill makes, to the sample (the same 300,000 dots in 28 ms, the
 // alpha within 4.4 of 255 of the canvas's on the inked pixels, mean). Pure (no canvas), pinned in node. The far band's
 // runs stay the canvas's strokes: a capsule a sample at a time measured three times slower than its stroke.
-// ═══════════════════════════════════════════════════════════════════
 
 /** Samples a device pixel's side - 4: sixteen levels of coverage, a canvas's own anti-aliasing's grain. */
 export const RASTER_SS = 4;

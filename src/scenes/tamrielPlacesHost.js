@@ -71,8 +71,7 @@ export function createTamrielPlaces(host) {
   const lairRatesNow = () => (_pastBay.lairRates ??= countryRates(_lairCounts, bayLandNow(), LAIR_TYPES));   // TESA8: the lairs' over the same land
   const _countryGround = _countryTemplates ? createCountryGround(host.woods) : null;
   /** TESA14: the world the roll reads past the Bay - the climate, the ground's bytes and its dry plateau - and the two
-   *  rolls' own rates and templates, made at the first ask (the rates read the Bay's land once). WW7-7 (bible/03-World/
-   *  World-Wide.md): a pixel the roads past the Bay rolled a place on (world/pastBayPlaces.js - their workers' roll, the one
+   *  rolls' own rates and templates, made at the first ask (the rates read the Bay's land once). WW7-7: a pixel the roads past the Bay rolled a place on (world/pastBayPlaces.js - their workers' roll, the one
    *  roll, its plateau read there) is dry: its plateau is not summed again (the dear part - a 129 x 129 kernel, ~1 ms a
    *  place; the living world's squares past the Bay ask sixty places at a time). The same answer, read once. */
   const _pastBayAt = { climateAt: (x, y) => maps.getClimateIndex(x, y), heightAt: (x, y) => host.woods.getHeightMapValue(x, y), ground: (x, y) => pastBayPlacesIn(x, y, x + 1, y + 1).length > 0 || _countryGround(x, y) };

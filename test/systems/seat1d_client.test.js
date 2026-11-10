@@ -2,7 +2,7 @@
 // scale, the Tithe and its bailiwick, the members' discount, every row of Standing, Unrest, the Edicts, the Levy's share,
 // a camp's pixel), the Turning's plan over them, the client's own (systems/seatEdicts.js: the shops, the arrival's news,
 // the Festive buff, Curfew, the Bounty's camps), the Seat tab's levers, the hosts by source, and the economy model.
-// 7.1-7.3, 7.6, Appendix C; `06-Systems/Online-Arc.md` SEAT1d.
+// 7.1-7.3, 7.6, Appendix C; SEAT1d.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

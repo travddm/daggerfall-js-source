@@ -3,8 +3,7 @@
 // (AUDIT 29 B2's FLAGGED) - so an online classic player could neither read a rank nor withdraw a gathered good, and a
 // home's Forge, Workbench or Loom was not offered them. A door pressed for a professions page - THE PROFESSIONS KEY (the
 // down arrow, appended), a shop's or a home's station - now opens the enhanced pause on that page on either skin, as DISC22-B's
-// Controls button opens its Settings; with no pages to show it says why and opens nothing. bible/06-Systems/
-// Professions-Arc.md 22.
+// Controls button opens its Settings; with no pages to show it says why and opens nothing. docs/systems/professions.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

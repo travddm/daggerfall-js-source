@@ -1,6 +1,6 @@
-// PROF1 - THE PROFESSIONS' LAWS, pinned against the record (bible/06-Systems/
-// Professions-Arc.md, PROF0 3, 4.3, 6, 11, 22 and Appendix B) and against DFU's own tables: src/net/professionLaw.js,
-// src/net/nodeLaw.js, and the two pure modules both ends read (src/formats/mapsTables.js, src/systems/foraging/foragingCore.js).
+// PROF1 - THE PROFESSIONS' LAWS, pinned against docs/systems/professions.md and against DFU's own tables:
+// src/net/professionLaw.js, src/net/nodeLaw.js, and the two pure modules both ends read (src/formats/mapsTables.js,
+// src/systems/foraging/foragingCore.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

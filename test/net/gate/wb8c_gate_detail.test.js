@@ -47,7 +47,7 @@ function court({ feet = [0, 0, 0], health = 100, maxHealth = 100, save = 100 } =
 }
 const tick = async (h, t, st) => { if (st) h.link.st = st; h.clock.t = t; h.c.frame(); await new Promise((r) => setImmediate(r)); };
 
-// ═══ THE STRIKE, UNDER HIS MARKS ══════════════════════════════════════════════════════════════════════════════════
+// THE STRIKE, UNDER HIS MARKS
 
 test('WB8c the strike law under a profile: Colossal\'s slam reaches 8.5 and his cone and his charge hold his larger body; each blow\'s element and name are his aspect\'s, any element\'s saving throw answers it, Vengeful\'s weight in its share and base; the Wrath answered by nothing (mutants: the old reach; the element unread; the throw fire\'s alone)', () => {
   const C = P('burning', 'colossal');
@@ -82,7 +82,7 @@ test('WB8c the ground under his marks: his aspect\'s element on every pool; Scar
   assert.equal(landingPools(W('hellfire', { tg: [[1, 1]] }), P('burning', 'vengeful'))[0].pct, POOLS.hellfire.pct * 1.25);
 });
 
-// ═══ THE COURT, UNDER HIS MARKS ══════════════════════════════════════════════════════════════════════════════════
+// THE COURT, UNDER HIS MARKS
 
 test('WB8c the court\'s strikes: his frost through MY frost throw - the host asked for the element - and a full resist said in its own word; his rime underfoot bites through the same throw; the strike door told the element (mutants: the throw asked for fire; the word fire\'s)', async () => {
   destroyGateBossBar();
@@ -179,7 +179,7 @@ test('WB8c the court\'s body under his marks: Colossal\'s larger body for my blo
   destroyGateBossBar();
 });
 
-// ═══ THE LOOK ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LOOK
 
 test('WB8c the look and the voice: his elemental blows, his ground and his ember in his aspect\'s colours - his weight\'s own and Dagon\'s Wrath untouched; his glow at his own chest; his elemental cues in his element\'s cast and, landing, the storm\'s thunder - the burning cues as they were (mutants: a blade turned blue; the Wrath recoloured; the voice unchanged under the rime)', () => {
   for (const id of ['rime', 'storm', 'venom']) {
@@ -235,7 +235,7 @@ test('WB8c the ground drawn and the bar: the telegraph shows Colossal\'s slam at
   destroyGateBossBar();
 });
 
-// ═══ THE WORD BEFORE THE GATE ════════════════════════════════════════════════════════════════════════════════════
+// THE WORD BEFORE THE GATE
 
 test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\'s omen, each trial by name and in words), the map\'s card while he stands (his epithet and his trials) (mutants: the card without them; a trial unsaid)', () => {
   const day = 112;   // WB11a: the nine-trial rotation moved the Rime-Wrought, Colossal and Unyielding from day 3 to day 112
@@ -249,7 +249,7 @@ test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\
   assert.ok(gateTimes(day).omenAt < gateTimes(day).openAt);
 });
 
-// ═══ THE FOLD AND THE SEAMS ══════════════════════════════════════════════════════════════════════════════════════
+// THE FOLD AND THE SEAMS
 
 test('WB8c the fold: a state says his marks; a feeding moves his health and names the fed; a state of the same fight keeps the feeding heard, another fight\'s forgets it (mutants: the marks dropped; the feeding lost at the next state)', () => {
   const st = { k: 'st', d: 9, b: 'ruhn', ph: 1, h: 50, m: 100, x: 0, z: 0, yw: 0, mv: null, atk: null, sh: 0, wr: 5, n: 1, fell: null, wrath: null, md: ['venom', 'soulhungry'] };

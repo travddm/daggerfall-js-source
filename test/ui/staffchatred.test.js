@@ -169,7 +169,7 @@ test('STAFF-CHAT-RED THE MINT\'S WORD: the service\'s `hidden: 1` reaches the vo
   assert.equal(host.voice.hidden(), false, 'a visible mint says nothing, and is heard as visible');
 });
 
-/* ═══ THE PANEL ═══════════════════════════════════════════════════════════════════════════════════════════════════ */
+/* THE PANEL */
 
 function fakeNode(tag, doc) {
   const n = {

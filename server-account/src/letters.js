@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // MAIL1 - THE SERVICE'S LETTERS.
 //
 // Addison Knox: "An in-game mail system where players can send messages
@@ -10,7 +9,7 @@
 // who may send one, to whom, and how often; and the three things a
 // reader does with their own: list, open, delete.
 //
-// ═══ REGISTERED, BOTH ENDS ═════════════════════════════════════════
+// REGISTERED, BOTH ENDS
 //
 // A guest is a DEVICE - an account that a cleared browser loses - so a
 // guest can neither be written to (there is no name that stays theirs:
@@ -21,7 +20,7 @@
 // asks again, because a function that trusts its caller's wall is a
 // function one refactor away from having none.
 //
-// ═══ THE THREE WALLS AGAINST A FLOOD ═══════════════════════════════
+// THE THREE WALLS AGAINST A FLOOD
 //
 // Registered-only is the first: a sender has a handle a moderator can
 // mute, and a mute stops their letters (`muted`) exactly as it stops
@@ -31,13 +30,12 @@
 // bound is the third, and it refuses the SENDER: a reader's oldest
 // letter is never deleted to make room for a stranger's newest.
 //
-// ═══ A READER'S LETTERS ARE THEIRS ALONE ═══════════════════════════
+// A READER'S LETTERS ARE THEIRS ALONE
 //
 // Every read, mark and delete names the letter AND its reader in the
 // one statement (`WHERE id = ? AND to_id = ?`), so a letter id that is
 // somebody else's is exactly as absent as one that never existed - the
 // same word (`no-letter`) for both, and nothing to learn from which.
-// ═══════════════════════════════════════════════════════════════════
 import { mintId, accountKind, displayName, isMuted, overRate } from './accounts.js';
 import { ID_RE } from '../../src/net/identityToken.js';   // NAME-AS: a friend's letter, addressed by account
 import { titleWorn, glyphsShown } from './titles.js';

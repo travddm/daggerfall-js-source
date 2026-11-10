@@ -66,7 +66,7 @@ function clientOf({ maxHealth = 100, feet = [60, 1, 0], boat = null } = {}) {
   return { host, link, hear, fx, bites, at: () => now, set: (t) => { now = t; } };
 }
 
-// ═══ XC4: THE VENOM'S SHARE, CARRIED ══════════════════════════════════════════════════════════════════════════════
+// XC4: THE VENOM'S SHARE, CARRIED
 
 test('AUDIT SHIPS 2 XC4 the venom\'s bite at a pair\'s share is two thirds of the whole over a pool - its whole bite on my body (venomBite: pct of my health and base, never under 1) shared and carried bite to bite as every blow is (venomHurt); handed on as pct x k and base x k and rounded a bite at a time, a pair at 20 health took every 1-point bite whole and at 40 half of each 2 (mutants: the share rounded alone; the carry dropped)', () => {
   const P = SERPENT_ATTACK_TABLE.spit.pool;
@@ -93,7 +93,7 @@ test('AUDIT SHIPS 2 XC4 the venom\'s bite at a pair\'s share is two thirds of th
   assert.ok(Math.abs(R.bites.length - ticks * 2 / 3) <= 1, `two thirds of the pool's bites land (${R.bites.length})`);
 });
 
-// ═══ XC6: THE WAKE TO ITS TURN ═════════════════════════════════════════════════════════════════════════════════════
+// XC6: THE WAKE TO ITS TURN
 
 test('AUDIT SHIPS 2 XC6 a dash cut by the kill or the sounding keeps its bow wave until its own turn - the end is said SERPENT_SAY_AHEAD_MS on (AUDIT SHIPS B5) and the head dashes on under the sea till then; the wave stopped at the word, and 15-18 m of a 34 m/s dash went by with none over it; past its turn (the throes, the dive) none (mutants: the wave stopped at the word)', () => {
   for (const [how, pend, endBeat] of [['sounded mid-ram', 'ram', T0 + 6000], ['slain mid-Maw-dash', 'breach', T0 + 14_000]]) {
@@ -131,13 +131,13 @@ test('AUDIT SHIPS 2 XC6 a dash cut by the kill or the sounding keeps its bow wav
   }
 });
 
-// ═══ XC8: THE BAR'S COUNT ══════════════════════════════════════════════════════════════════════════════════════════
+// XC8: THE BAR'S COUNT
 
 test('AUDIT SHIPS 2 XC8 the bar\'s count says what it counts - the ships FIGHTING it (AUDIT SHIPS C1: the shares in its health), where it said "in its waters" over a count that left a rowboat and an idle ship in its waters out (mutants: the old words)', () => {
   assert.deepEqual([1, 2, 3].map(SERPENT_BAR_TEXT.ships), ['1 ship fighting it', '2 ships fighting it', '3 ships fighting it']);
 });
 
-// ═══ XB1: THE CLOSING SURGE, SWUM AS THE DASHES ARE ═════════════════════════════════════════════════════════════════
+// XB1: THE CLOSING SURGE, SWUM AS THE DASHES ARE
 
 /** Closing on a ship 450 m off sailing a `course` ('line' across its bow, or a 300 m 'round') at `v` m/s for 8 s - its
  *  way read off her poses first: every beat's words. */
@@ -178,7 +178,7 @@ test('AUDIT SHIPS 2 XB1 the closing surge is swum as its dashes are - a turn of 
   assert.ok(reversals <= 6, `${reversals} reversals over six closings`);
 });
 
-// ═══ XB2: THE KILL BETWEEN BEATS ═══════════════════════════════════════════════════════════════════════════════════
+// XB2: THE KILL BETWEEN BEATS
 
 test('AUDIT SHIPS 2 XB2 a kill between beats (a blow is judged the moment it comes) lays its throes SERPENT_SAY_AHEAD_MS on and unsays nothing said before then: a Rising Maw and a ram begun at a beat, their swims said to begin SERPENT_SAY_AHEAD_MS on, slain 250, 400 and 450 ms after it - a client 100, 150 and 250 ms late draws the relay\'s head every moment; held from the blow\'s moment (AUDIT SHIPS B5\'s holdNow), the dash a lagging screen had begun to draw was unsaid - 0.7, 1.6 and 3.2 m (mutants: the swim held from the blow)', () => {
   let worst = 0;
@@ -206,7 +206,7 @@ test('AUDIT SHIPS 2 XB2 a kill between beats (a blow is judged the moment it com
   assert.ok(worst <= 0.001, `every lagging screen draws the relay's head (${worst.toFixed(4)} m apart at worst)`);
 });
 
-// ═══ XC3 / XB5: ONE CENTRE ═════════════════════════════════════════════════════════════════════════════════════════
+// XC3 / XB5: ONE CENTRE
 
 /** Steps `f` from `from` to `to` over `bodies`; the head's widest step in a 50 ms look, and its bearing about the coil
  *  against the coil drawn (worst, radians) and its distance off the ring from `round` on while the coil holds. */
@@ -279,7 +279,7 @@ test('AUDIT SHIPS 2 XB5 a coil holding a ship across the relay\'s deploy (a figh
   near(gapAtLetGo(f), COIL_R * (1 - COIL_HEAD_IN), 0.2, 'as it lets go its head lies where this law\'s own coil\'s does');
 });
 
-// ═══ THE RELAY: XB4 A GAME TOLD TO RELOAD; XB6 KEPT BEFORE IT IS SAID ═══════════════════════════════════════════════
+// THE RELAY: XB4 A GAME TOLD TO RELOAD; XB6 KEPT BEFORE IT IS SAID
 
 const DAY = 363, TT = serpentTimes(DAY), PX = 205, PY = 214;
 const SX = (PX + 0.5) * PIXEL_UNITS, SZ = (499 - PY + 0.5) * PIXEL_UNITS, CELL = cellRoomOfWire(SX, SZ);
@@ -368,7 +368,7 @@ test('AUDIT SHIPS 2 XB6 a relay restarted mid-fight wakes it where its screens h
   assert.ok(worst <= 0.05, `no word moves a screen's head (${worst.toFixed(2)} m at worst)`);
 });
 
-// ═══ HER WAY: XB8 HER CLOCK HELD TO THE RELAY'S; XB11 NO POSE, NO WAY ═══════════════════════════════════════════════
+// HER WAY: XB8 HER CLOCK HELD TO THE RELAY'S; XB11 NO POSE, NO WAY
 
 /** A ship sailing east at 5 m/s, her poses true, sent every 100 ms and stamped by her clock run at `rate` of the
  *  relay's (`jitter` ms of it each way): the relay hands the brain her latest each beat for `ms`. Her way, read. */
@@ -401,7 +401,7 @@ test('AUDIT SHIPS 2 XB11 no new pose of hers past SERPENT_WAY_STALE_MS of the re
   assert.equal(Math.hypot(p.vx, p.vz), 0, 'none past SERPENT_WAY_STALE_MS: at rest');
 });
 
-// ═══ THE SHIPS FIGHTING IT: XB9, XB10, XC1, XC5 ═════════════════════════════════════════════════════════════════════
+// THE SHIPS FIGHTING IT: XB9, XB10, XC1, XC5
 
 test('AUDIT SHIPS 2 XB9 a captain on a smaller warship of her own is a ship of the fight: her share taken down to hers at the fraction it stands at, a true pair two ships and its share a pair\'s; never shrunk (AUDIT SERPENT H2), she was no ship at all - her share out of its health, and the pair read as one, its blows whole (mutants: the smaller ship no ship)', () => {
   const f = surfaced(fightOf([HULL.Carrack, HULL.Carrack]));

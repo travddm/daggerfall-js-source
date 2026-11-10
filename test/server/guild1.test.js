@@ -1,6 +1,6 @@
 // GUILD1: THE GUILDS. The law both ends read (net/guild/guildLaw.js), the account service's guilds
 // driven through the real Worker over node:sqlite with every migration applied (server-account/src/guilds.js), and the
-// client's door (net/accountClient.js accountGuilds). `06-Systems/Online-Arc.md` GUILD1.
+// client's door (net/accountClient.js accountGuilds). GUILD1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -16,7 +16,7 @@ import {
 } from '../../src/net/guild/guildLaw.js';
 import { renownXpFor } from '../../src/net/renown.js';
 import { HUB_GUILD_WHO_MAX } from '../../src/net/hubShards.js';
-import { accountGuilds, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountGuilds, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { r2, seatRealm } from '../realmSeat.mjs';   // AUDIT REALM2 S2: a founding is a realm character's, paid on its record
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
 
@@ -433,7 +433,7 @@ test('GUILD1 the wire: every guild route is the service\'s and behind a session;
   const routes = ['mine', 'invites', 'found', 'invite', 'answer', 'leave', 'remove', 'rank', 'ranks', 'deposit', 'withdraw', 'handover', 'disband'].map((r) => `/v1/guilds/${r}`);
   for (const r of routes) assert.ok(ROUTES.has(r), r);
   const sent = [];
-  const storage = new Map([[SESSION_KEY, JSON.stringify({ secret: 'sek' })]]);
+  const storage = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: 'sek' })]]);
   const fetch = async (url, init) => { sent.push([new URL(url).pathname, JSON.parse(init.body), init.headers.authorization]); return new Response(JSON.stringify({ ok: true }), { status: 200 }); };
   const door = accountGuilds({ fetch, storage: { getItem: (k) => storage.get(k) ?? null } });
   await door.mine('c1');

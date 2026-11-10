@@ -1,7 +1,7 @@
 // @ts-check
 // SD-ONELIFE, AUDIT SD III (H1) - THE HOLLOWS' SLOTS KEPT ON THE DEVICE: the Hours I went through (the Rift admits me again
-// during their collapse) and the Hours I died in (it never does), by the signed-in account (bible/11-Multiplayer/
-// Super-Dungeons.md). Out of scenes/world.js bootWorld whole (WITCH1, 2026-10-20 - the host's room for the Witches'
+// during their collapse) and the Hours I died in (it never does), by the signed-in account (docs/multiplayer/group-instances.md).
+// Out of scenes/world.js bootWorld whole (WITCH1, 2026-10-20 - the host's room for the Witches'
 // Festival's wiring, HOST-SPLIT); the world host keeps the two memories it makes of it.
 import { appStorage } from '../appStorage.js';
 import { SD_ENTERED_MAX } from '../../world/superDungeon/sdDungeon.js';

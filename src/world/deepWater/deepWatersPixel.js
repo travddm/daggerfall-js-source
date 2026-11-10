@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-B: ONE STREAMED PIXEL'S DEEP WATERS, WHOLE. What
 // Iliac Puddle No More 1.2.2 (jet082) does when DFU promotes a terrain,
 // in its own order and as data:
@@ -20,7 +19,6 @@
 // they are streamed (DeepWaterTerrainLookup's answer to the floor's
 // shore fit a meter past the edge), and the two settings the geometry
 // reads (Water Depth, Spawn Water Surfaces).
-// ═══════════════════════════════════════════════════════════════════
 
 import { SCALED_OCEAN_ELEVATION, MAX_TERRAIN_HEIGHT, HEIGHTMAP_DIMENSION, STREAMING_TERRAIN_SCALE } from '../terrain/terrainSampler.js';
 import { DeepWaterTileData } from './deepWaterTileData.js';

@@ -1,6 +1,6 @@
 // SCALE2b: the scale arc's relay
-// slice and its second half of NET-SMOOTH, in the one relay deploy SCALE's policy asks for (bible/11-Multiplayer/
-// Scale-Arc.md SCALE2b). The relay: the socket index kept rather than re-walked, the hello's storage moved to memory, a
+// slice and its second half of NET-SMOOTH, in the one relay deploy SCALE's policy asks for (docs/multiplayer/relay-scaling-and-cost.md).
+// The relay: the socket index kept rather than re-walked, the hello's storage moved to memory, a
 // pose's attachment written lazily, the fan selected rather than sorted, the caches bounded without thrashing, every
 // call to another room under a deadline, the room's counts written to Analytics Engine. The wire: a pose's SEND TIME
 // (`ts`). The client: ordered and spaced by it, and quiet where nobody hears - the foes streams, an unchanged memory,

@@ -16,7 +16,7 @@ import { FRAME_PROBE_EDITS, editsPlugin, probeTransforms } from '../../tools/fra
 import { ONLINE_PROBE_EDITS, probePlugins, crowdsOf } from '../../tools/onlineFrameProbe.mjs';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const NEEDLE_FILES = ['src/systems/buildBreather.js', 'src/render/labGrass.js', 'src/net/accountClient.js', 'src/systems/online/onlineLane.js', 'src/scenes/world.js'];
+const NEEDLE_FILES = ['src/systems/buildBreather.js', 'src/render/labGrass.js', 'src/net/account-service-address.ts', 'src/systems/online/onlineLane.js', 'src/scenes/world.js'];
 /** A file as the online probe's page server serves it: every transform its server is built with, in order. */
 const served = (file) => probePlugins().reduce((code, pl) => pl.transform(code, `/repo/${file}?v=1`) ?? code, src(file));
 

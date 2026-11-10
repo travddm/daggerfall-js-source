@@ -1,6 +1,5 @@
 import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 
-// ═══════════════════════════════════════════════════════════════════
 // THE DAEDRA
 //
 // Frost, Fire, Daedroth, Lord and Seducer. Every one of them is
@@ -19,7 +18,6 @@ import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 // the twentieth enemy costs a file and the forty-sixth costs a line. The
 // beasts needed a builder because a spider does not fit a spine; these
 // need nothing because a daedra IS a man, however unpleasantly.
-// ═══════════════════════════════════════════════════════════════════
 
 /** ART_PAL spans, same convention as every other line. */
 export const DAEDRA_RAMPS = Object.freeze({

@@ -1,6 +1,5 @@
 // @ts-check
-// TECH-CARD: THE TECHNIQUE, DRAWN - bible/05-Combat/
-// Weapon-Techniques.md "The card's block".
+// TECH-CARD: THE TECHNIQUE, DRAWN.
 //
 // TECH1 told a technique in words - its line and what a press does, two more lines in the card's tier list in the
 // affixes' own colour, so an active move on its own key read like one more "+17 Dodging", and its second line broke

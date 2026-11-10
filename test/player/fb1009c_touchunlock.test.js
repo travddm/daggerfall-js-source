@@ -6,7 +6,7 @@
 // dispatch. ESC-LOCK reads a lock the page did not release, lost with nothing up, as the Escape the browser swallowed -
 // so every tap opened the pause, and the pause's close relocked for the next tap to end. Blink never ends a lock on a
 // touch. A loss within TOUCH_UNLOCK_MS of a touch event is the finger's now (player/pointerLock.js bindCursorToggle),
-// and a loss with no touch near is still the player's Escape. `01-Overview/bugs/Field-Bugs-2026-10-09c.md`.
+// and a loss with no touch near is still the player's Escape.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { bindCursorToggle, ESCAPE_DELIVERY_MS, TOUCH_UNLOCK_MS } from '../../src/player/pointerLock.js';

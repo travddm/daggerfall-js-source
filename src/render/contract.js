@@ -1,7 +1,7 @@
 // @ts-check
 // HARD3 - THE RENDERER'S CONTRACT, WRITTEN DOWN.
 //
-// The third slice of `01-Overview/Hardening.md`, and the boundary it
+// The third slice of the hardening plan, and the boundary it
 // names first. The Weapon Widget crash was a SHAPE mismatch here, and
 // this is the one boundary in the port where a wrong shape THROWS rather
 // than misbehaves: the caller builds an object, the renderer hands its

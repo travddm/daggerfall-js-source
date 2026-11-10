@@ -4,8 +4,7 @@
 // moved - and Mithril Ore bought the same way reaching the buyer's Stores after its courier's time); the book (a piece
 // listed taken out of the save and kept until answered, put back on a refusal; a bought piece minted once however many
 // tabs settle it; the minute's cache and the stale read; the shut words; the balance told to the Marks book); the tab's
-// five views drawn; the window's Market tab and its region; the host's wiring; the plane dressed (FOUND). bible/06-Systems/
-// Professions-Arc.md 26.
+// five views drawn; the window's Market tab and its region; the host's wiring; the plane dressed (FOUND). docs/systems/professions.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

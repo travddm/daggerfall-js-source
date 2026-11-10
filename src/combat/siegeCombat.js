@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT-SEATS G5: A SIEGE FOUGHT WITH MORE THAN THE SWING (bible/11-Multiplayer/
-// Seats-Arc.md 6.1: "The blow - a claim {target, weapon kind, material, spell?} ... bows 60 m"; "Spells - at most 3
+// AUDIT-SEATS G5: A SIEGE FOUGHT WITH MORE THAN THE SWING ("The blow - a claim {target, weapon kind, material, spell?} ... bows 60 m"; "Spells - at most 3
 // damaging casts in 5 seconds, each clamped to 60; Teleport, Recall and Levitate do nothing in a siege room; healing a
 // side-mate is allowed (ALLY-CAST's frame), clamped to 40 a cast"; "Horses are dismounted on entry"). SEAT2a part four
 // sent the melee swing alone (its `r` always a swing's); PVP-REF's referee (net/siege/siegeRef.js refereeBlow, refereeCast)

@@ -130,7 +130,7 @@ test('TIMERS2 the sheet: the gate\'s red and the rings\' colours, the bar and th
   assert.match(ENHANCED_CSS, /:root\[data-plus-theme="stone"\] \.px-timerswin \.tm-badge, :root\[data-plus-theme="stone"\] \.px-timerswin \.tm-section-live \{ color: #c8ffd6; \}/, 'TIMERS1\'s live green on Stone (7.1:1 over its panel, as timers1.test.js measures it)');
 });
 
-// ═══ AUDIT TIMERS2 ═══════════════════════════════════════════════════════════════════════════════════════════════
+// AUDIT TIMERS2
 
 test('AUDIT TIMERS2 M3: the bar\'s buttons are written in place - the same buttons while the groups are the same, their counts, marks and names moved with the world; a group going rebuilds the bar and the focus that stood on its button goes to All (mutants: the counts left stale; the bar rebuilt every change; the focus dropped)', () => {
   let now = NOW;

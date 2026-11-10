@@ -2,7 +2,7 @@
 // items hang, the frame a mount's turn names, the archive bound for the port's own pictures), what of the pack hangs and
 // as what (systems/decor/decorItems.js), the placer setting one on a surface (systems/decor/decorPlacer.js), the room hanging it on
 // the decal pass (scenes/decor/decorRoom.js), the tool's flight and its ghost (scenes/decor/decorTool.js), the panel's line, and the
-// host's wiring by source. The service's half is pinned with the service (decor1.test.js). `06-Systems/Online-Arc.md`
+// host's wiring by source. The service's half is pinned with the service (decor1.test.js).
 // DECOR2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
