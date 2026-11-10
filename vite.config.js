@@ -170,7 +170,7 @@ export default defineConfig({
     // At Vite's 500 kB it fired on every build - the world chunk, world.js
     // and all it imports statically, was 2,662 kB when this was set - so it
     // said nothing. Set just over the largest chunk then, it speaks when a
-    // chunk grows past the world. (HOST-SPLIT does not shrink it: a module the host imports
+    // chunk grows past the world. (Splitting the host does not shrink it: a module the host imports
     // statically joins the host's chunk - pixelBuild.js is in it. Only a
     // dynamic import takes code out; lower this when one does.)
     chunkSizeWarningLimit: 2_750,

@@ -154,7 +154,7 @@ test('EV6: the skies neither query CURRENT_PROGRAM nor restore - the hosts mark 
     // WINDFALL1: and Windfall's leaves and snow flurries, one more in both hosts (before the haze, which bends them)
     // SD2c: and a Super dungeon's omen, one more in the world host (after the rite's smoke
     // STAR4: and the Starfall in the sky - an omen, a fall, a landing, a beacon - one more in the world host (after the Hollow's omen
-    const want = host === 'src/scenes/world.js' ? 30 : 8;   // NPC-MARKS (AUDIT NPC-MARKS R1): the marks over the people, one seam on each exterior host (render/npcMarkPass.js
+    const want = host === 'src/scenes/world.js' ? 30 : 8;   // the marks over the people, one seam on each exterior host (render/npcMarkPass.js
     assert.equal((s.match(/renderer\.markForeignPass\(\);/g) || []).length, want,
       `${host} marks its foreign seams (the sky, the rain, the sand, the wisps, the bolts${want === 6 ? ', and the grass' : ''})`);
   }

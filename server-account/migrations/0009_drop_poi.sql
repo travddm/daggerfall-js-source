@@ -1,4 +1,4 @@
--- The POI store is gone (decision 118 A4): builders' points of interest, their revisions and the assets they name, the
+-- The POI store is gone: builders' points of interest, their revisions and the assets they name, the
 -- live feed's version, the library shelf and the daily upload counts. Dropping a table drops its indexes with it.
 -- poi_revs references poi_docs, so the children are dropped first. The asset bytes in the SAVES bucket under `poi/a/`
 -- are left orphaned: no code deletes them.

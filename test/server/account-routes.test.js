@@ -1,5 +1,5 @@
 // The account Worker's routes, driven through the real Worker on the node:sqlite database (test/accountDb.mjs).
-// The POI store was removed (decision 118 A4): its paths under /v1/poi/ are unknown routes now, with or without a
+// The POI store was removed: its paths under /v1/poi/ are unknown routes now, with or without a
 // session, and no table of it is left after the migrations.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

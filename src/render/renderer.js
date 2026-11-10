@@ -169,7 +169,7 @@ ${RW_MAIN_ROOM}
   // The emission (window style from getWindowColors32, or an auto-emissive
   // record's own albedo at Color.white) goes back on top of the lighting
   // its subtraction above paid for - o.Emission = emission.
-  outColor = vec4(dwWaterFog(mix(uFogColor, lit + emission, fogFactorAt(vWorldPos)), vWorldPos), meshAlphaOf(tex.a));   // DW-C: the sea's distance fog over the finished colour; alpha 1 but in a translucent draw
+  outColor = vec4(dwWaterFog(mix(uFogColor, lit + emission, fogFactorAt(vWorldPos)), vWorldPos), meshAlphaOf(tex.a));   // the sea's distance fog over the finished colour; alpha 1 but in a translucent draw
   // A2: the Daggerfall/Automap shader's presentation, verbatim
   // (DaggerfallAutomap.shader:102-110): brightness falls with vertical
   // distance from the slice plane (floored at 40%), then the
@@ -5358,7 +5358,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // hand back the wrong sampling silently. Only the logo asks for smooth
     // today and its key is unique, so nothing was broken - but a cache
     // that quietly ignores an argument is a trap, not a cache.
-    const key = `${archive}_${record}${opts.smooth ? '#smooth' : ''}${opts.opaque ? '#opaque' : ''}${opts.mips === false ? (opts.variant ?? '#ui') : ''}${opts.alpha ? '#alpha' : ''}${opts.clamp && !opts.smooth ? '#clamp' : ''}${opts.sampler && !opts.smooth ? samplerKey(opts.sampler) : ''}`;   // a sampler asked for keys apart too (render/meshAlpha.js samplerKey)   // INCIDENT 2026-09-04: DFU caches materials per alphaIndex; REVIEW 2026-09-05: the un-mipped UI variant of a world archive (item icons) keys apart too; AUDIT 61: `variant: ''` keeps the plain batch key for world art uploaded without a chain (a mod atlas built mipChain:false - SIB1)
+    const key = `${archive}_${record}${opts.smooth ? '#smooth' : ''}${opts.opaque ? '#opaque' : ''}${opts.mips === false ? (opts.variant ?? '#ui') : ''}${opts.alpha ? '#alpha' : ''}${opts.clamp && !opts.smooth ? '#clamp' : ''}${opts.sampler && !opts.smooth ? samplerKey(opts.sampler) : ''}`;   // a sampler asked for keys apart too (render/meshAlpha.js samplerKey)   // DFU caches materials per alphaIndex; the un-mipped UI variant of a world archive (item icons) keys apart too; `variant: ''` keeps the plain batch key for world art uploaded without a chain (a mod atlas built mipChain:false)
     this._uploadSink?.(false, key);   // FIELD BUGS 2026-10-04d PLACE-LRU: a hit is asked for too - the place asking holds it
     if (opts.cutout) this._markCutout(this.textures.get(key));   // RW1: a cutout ask cuts the picture the key already holds, too
     // AUDIT DEX B5: a picture on its way (systems/textureReplacement.js pendingPicture - a readOnly picture let go once on

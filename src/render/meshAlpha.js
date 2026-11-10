@@ -12,8 +12,8 @@
 //   - drawMesh(..., { translucent }) (renderer.js): blending on (straight alpha over, the destination's own alpha kept at
 //     one), depth tested and never written, no shadow cast - a pane of glass is not a wall - drawn by its owner after the
 //     opaque world, back to front.
-//   - samplerParams / samplerKey: a texture's wrap per axis and its filter, its mips as world art's, keyed apart (AUDIT
-//     19 F10's law: the sampling is part of the key) - a material asks for the key through its texRemap.
+//   - samplerParams / samplerKey: a texture's wrap per axis and its filter, its mips as world art's, keyed apart (the
+//     sampling is part of the key) - a material asks for the key through its texRemap.
 // ═══════════════════════════════════════════════════════════════════
 
 export const MESH_ALPHA_GLSL = `uniform float uMeshAlpha;   // 0 the opaque world (alpha 1, INCIDENT 2026-09-04's law); above 0 a translucent draw (render/meshAlpha.js)
