@@ -1,7 +1,8 @@
 # DFO Online documentation
 
 DFO Online is a browser RPG based on The Elder Scrolls II: Daggerfall, with an online world. These pages are for
-the people who maintain it. The code is the authority: when a page and the code disagree, fix the page.
+the people who maintain it and for server owners, who run the relay and the account service from `selfhost/`. There
+is no official live service (decision 95). The code is the authority: when a page and the code disagree, fix the page.
 
 Start with [getting-started.md](getting-started.md), then [architecture/](architecture/README.md). The rules for new and
 touched code are in [coding-standards.md](coding-standards.md).
@@ -23,35 +24,37 @@ touched code are in [coding-standards.md](coding-standards.md).
   traps. Leave out history: git holds it.
 - Name files by path and functions by name. Do not cite line numbers.
 - Keep a page under about 250 lines. Add a page to its folder's `README.md` when you add it.
+- A section about a vendored port or a first-party departure that leaves core carries one line under its heading:
+  `> Leaves core: <the mod it becomes> (decision N).` Add it when you touch the section, and remove it
+  when the code leaves.
 
 ## Scope
 
-Daggerfall Unity (DFU) is the baseline: its rules, numbers, data formats and feel are what the game does unless a
-reason says otherwise. A departure from DFU is allowed in two cases only:
-
-- **Online**: online play needs it (shared state, trading, anti-cheat, many players in one place).
-- **Better design**: it is a written, agreed design that is better for play.
-
-Name each departure where you make it (in the code comment or the page that covers it) and say which of the two cases
-it is. A departure that makes play or progression feel worse than DFU is a defect, and the fix is to revert it. Read
-the DFU source for the behaviour first; its MIT-licensed code is the reference ([mods-and-vendor.md](formats/mods-and-vendor.md)).
+Daggerfall Unity (DFU) is the core: its rules, numbers, data formats and feel are what the game does. Every departure
+from DFU is an agreed mod or option (decisions 49, 102 and 103), and online rules live in the server profile. Name the
+mod or option where you make a departure (in the code comment or the page that covers it). A departure that makes
+play or progression feel worse than DFU is a defect, and the fix is to revert it. Read the DFU source for the
+behaviour first; its MIT-licensed code is the reference ([mods-and-vendor.md](formats/mods-and-vendor.md)).
 
 ### Every departure is a mod
 
-The core game is DFU's rules. Every departure ships as a mod, with no exceptions:
+The core game is DFU's rules and the engine. Every departure ships as a mod or an option, with no exceptions:
 
-- **Mods**: every piece of content or behaviour that differs from DFU belongs to a mod: our own departures as
-  first-party mods, other people's as third-party mods. The mod API gives each one a clean interface.
+- **Mods**: a system of its own that differs from DFU (new mechanics, content, UI, wire frames, tables or relay
+  handlers) leaves core as a first-party mod in its own repository, once the mod API gives it the hooks it needs.
+  Until then it stays in core behind its option. Other people's departures are third-party mods.
 - **Options**: every tuning value that differs from DFU is a player setting, so a single-player game can be set back to
-  DFU's value or anywhere between. New single-player games start with the official curated mod list and its settings.
-  A "Daggerfall Unity classic" preset turns every mod and setting back to DFU.
-- **Servers**: a server runs a curated mod list with its own settings, and every player on it uses exactly that list
-  and those settings. Only mods and settings that are purely cosmetic, and change nothing in play, are left to each
-  player.
+  DFU's value or anywhere between. Plain options that are cheap to support stay in core: rendering options above all,
+  and small tuning values over DFU's own systems. A "Daggerfall Unity classic" preset turns every mod and setting back
+  to DFU.
+- **Servers**: a server pins its mods and settings in its server profile (`src/systems/online/serverProfile.ts`,
+  `src/net/profile/`), and every player on it uses exactly those. Only mods and settings that are purely cosmetic,
+  and change nothing in play, are left to each player.
 
 Until the mod manifests exist, a departure is a row in `src/systems/features.js` with its values in
-`src/systems/modSettings.js`, and a setting that changes play is forced online through
-`src/systems/online/onlineLane.js`. Name the mod a change belongs to in its pull request.
+`src/systems/modSettings.js`. A setting that changes play online is a server profile key; do not add new
+`isOnlinePage()` branches or `src/systems/online/onlineLane.js` tables. Name the mod a change belongs to in its pull
+request.
 
 ## Code comments
 

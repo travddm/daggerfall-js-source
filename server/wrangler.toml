@@ -149,7 +149,13 @@ SD_DISCORD_THREAD = ""
 # retried: a batch the service does not take is dropped. EMPTY IS A
 # LEGAL STATE: nothing is kept and nothing is posted. The service drops
 # what it is fed while its reviewer is off (MOD_AI, or no key).
-MOD_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/feed"
+#
+# The feed URLs in this file name the account service's paths on the
+# reserved host `accounts.invalid`. Every post goes through the ACCOUNTS
+# binding below, which reads only the path, so the host is never looked
+# up. A deploy without that binding must set its own account host here:
+# `.invalid` never resolves, so nothing leaves for another server.
+MOD_FEED_URL = "https://accounts.invalid/v1/mod/feed"
 # ═══ GRANT2: THE SPAWN GRANTS' MEASURE ═══════════════════════════════
 #
 # Where each cell posts its window of spawn grant asks for the account
@@ -175,7 +181,7 @@ MOD_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/feed"
 # reason; once it does, set it here as well as at the hub, so a room just
 # woken (or one whose hub did not answer) never reads it off. Leases are
 # signed with a key derived from GATE_SIGNING_KEY; no new secret.
-GRANT_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/grant-feed"
+GRANT_FEED_URL = "https://accounts.invalid/v1/mod/grant-feed"
 # COST-2 part two (bible/11-Multiplayer/Scale-Arc.md): THE CELL TREE MOVES.
 # The setting `cellSeed` (CELL_SEED, off unset) is the level the cell
 # directory seeds its tree at - 2 is 64-pixel cells. It stays off until the
@@ -201,7 +207,7 @@ CELL_MERGE_DWELL_MS = "600000"
 # EMPTY (or no GATE_SIGNING_KEY) CLOSES EVERY PRIVATE HOME TO A HIDDEN
 # SOCKET (server/src/staffHidden.js hiddenSeenOn): an entry the log
 # would not hold is never made.
-HIDDEN_SEEN_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/hidden-seen"
+HIDDEN_SEEN_URL = "https://accounts.invalid/v1/mod/hidden-seen"
 # ═══ STAFF-PANEL5-FEEDS: THE STAFF PANEL'S NET AND BOT-CHECK FEEDS ═════
 #
 # mob, 2026-10-23 08:29Z: "get them set to merge right after speed". Where
@@ -219,8 +225,8 @@ HIDDEN_SEEN_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/hi
 # Only these vars change, so RELAY_VERSION does not move: the relay deploy
 # is a manual run of the relay's deploy with `redeploy` ticked (a plain
 # dispatch deploys only on drift), which drops every connected player once.
-STAFF_NET_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/staff/net-feed"
-REACTION_FEED_URL = "https://daggerfall-accounts.mackcothran.workers.dev/v1/mod/reaction-feed"
+STAFF_NET_FEED_URL = "https://accounts.invalid/v1/staff/net-feed"
+REACTION_FEED_URL = "https://accounts.invalid/v1/mod/reaction-feed"
 # ═══ INT11-INT14: THE LINE THE BOSS FIGHTS' COUNT RUNS BY ════════════
 #
 # The relay counts each fighter's body in a gate, an Abyss Dungeon and
