@@ -772,7 +772,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }),   // on by default: the ladder is the port's own game, not an opt-in
   }),
-  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, GATE_PORTENT_LOOT_ROW, TOWN_SEATS_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, CLAW_METAL_ROW, GENTLE_EQUIP_BILL_ROW, LEGENDARY_EQUIP_FREE_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, SOLD_GOODS_ON_SHELF_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW, TERRAIN_SLOPE_CUT_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
+  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, GATE_PORTENT_LOOT_ROW, TOWN_SEATS_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, CLAW_METAL_ROW, GENTLE_EQUIP_BILL_ROW, LEGENDARY_EQUIP_FREE_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, SOLD_GOODS_ON_SHELF_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW, TERRAIN_SLOPE_CUT_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
