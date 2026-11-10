@@ -6,6 +6,7 @@ import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
 import { profileKeyOf, profileRuleErrors, resolveRules, type ProfileValue } from '../../net/profile/profileKeys.ts';
 import { pageHas } from '../pageQuery.js';
 import { t } from '../textManager.js';
+import { setOnlineTimeScale, setSkyClock } from '../../net/world-time-scale.ts';
 
 export type ProfilePins = {
   readonly prefs: Readonly<Record<string, boolean | string>>;
@@ -102,6 +103,13 @@ export function rule(name: string, search?: string): ProfileValue | undefined {
 export function onlineRule(name: string): ProfileValue | undefined {
   return rule(name, '?online');
 }
+
+// The clocks' TimeScales and whether the sky has a clock of its own are this page's profile's to say (net/world-time-scale.ts):
+// the installed profile's, and the official profile's again after a reset.
+onProfileInstalled(() => {
+  setOnlineTimeScale(onlineRule('time.worldScale'));
+  setSkyClock(onlineRule('time.skyClock'), onlineRule('time.skyScale'));
+});
 
 /** Tests: nothing installed. */
 export function _resetProfileForTests(): void {

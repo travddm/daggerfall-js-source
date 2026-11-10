@@ -292,8 +292,8 @@ test('STAFF-PANEL3-PLAYERS: A PROFILE - the card, the badges from the judge\'s s
 test('STAFF-PANEL3-PLAYERS FIX: A PROFILE SHOWS EVERY OPEN CASE - a chat case and a spawn case at once, both on Overview by kind, and both in its badge (mutants: the first case only; the order; the badge a boolean)', async () => {
   const s = await stand();
   const t = nowS();
-  const kase = (id, kind, source) => s.raw.prepare(`INSERT INTO mod_cases (id, target, source, status, opened_at, updated_at, reports, credible, ai_state, discord_state, kind)
-    VALUES (?, ?, ?, 'open', ?, ?, ?, 0, 'off', 'off', ?)`).run(id, s.brisk.id, source, t - 60, t - 60, source === 'report' ? 1 : 0, kind);
+  const kase = (id, kind, source) => s.raw.prepare(`INSERT INTO mod_cases (id, target, source, status, opened_at, updated_at, reports, credible, ai_state, kind)
+    VALUES (?, ?, ?, 'open', ?, ?, ?, 0, 'off', ?)`).run(id, s.brisk.id, source, t - 60, t - 60, source === 'report' ? 1 : 0, kind);
   kase('case-spawn-000001', 'spawn', 'review');
   kase('case-chat-0000001', 'chat', 'report');
   const open = await s.staff('/v1/staff/player', { target: s.brisk.id }, s.mob.session);

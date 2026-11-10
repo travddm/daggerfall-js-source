@@ -2,8 +2,7 @@
 // THE RELAY'S OWN COUNT OPENS A CASE (server-account/src/grants.js) - a record the relay itself stripped because no
 // builder could give it opens the case on its sender alone, its evidence on the line; an account's own asks far past its
 // budget in one cell's window do too; one batch's findings on one account are ONE line (a case line is keyed by its
-// second and account); the count opens no more than GRANT_OWN_CASES_HOUR cases an hour; and the Discord card says the
-// spawn grants opened it, never that the chat reviewer "found nothing".
+// second and account); and the count opens no more than GRANT_OWN_CASES_HOUR cases an hour.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
@@ -11,7 +10,6 @@ import { newGrantMeasure, foldGrantAsk, foldGrantTally, grantMeasureBatch, sealG
 import { GRANT_KINDS } from '../../src/net/grantLaw.js';
 import { GRANT_FEED_PATH, GRANT_CASE_TAB, GRANT_ASK_CASE_TIMES, GRANT_ASK_CASE_OVER_MIN, GRANT_OWN_CASES_HOUR, GRANT_RATE_SPAN_MIN_S, grantAskText } from '../../server-account/src/grants.js';
 import { overRate } from '../../server-account/src/accounts.js';
-import { caseCard } from '../../server-account/src/discord.js';
 
 const { subtle } = globalThis.crypto;
 const URL_ = `https://accounts.invalid${GRANT_FEED_PATH}`;
@@ -80,16 +78,4 @@ test('FOE-BOUNDS ONE BATCH\'S FINDINGS ON ONE ACCOUNT ARE ONE LINE, AND THE COUN
   R.raw.prepare('UPDATE mod_case_lines SET at = at - 700').run();   // the window on
   await R.post([[GRANT_RELAY_READER, bad, 'stats', 1, { t: 0, k: 50_000, mx: 91 }]]);
   assert.equal(R.lines(bad).length, 2, 'an open case still takes its line');
-});
-
-test('FOE-BOUNDS THE CARD SAYS THE SPAWN GRANTS OPENED IT: a case whose lines are the spawn grants\' and that no reviewer judged is titled so, its reports "none - the spawn grants\' count opened it", and never "found nothing against the code"; a chat reviewer\'s case reads as it did (mutants: every review case renamed; the old words kept)', () => {
-  const c = { id: 'c1', target: 'acct-bad', source: 'review', status: 'open', reports: 0, credible: 0, ai_state: 'done', ai_category: null };
-  const spawn = caseCard({ c, name: 'Badger', lines: [{ at: 1, sub: 'acct-bad', name: 'Badger', tab: GRANT_CASE_TAB, text: 'the relay itself dropped 1' }], reasons: [], strikes: 0 }).embeds[0];
-  assert.equal(spawn.title, 'Case c1 (opened by the spawn grants)');
-  assert.equal(spawn.fields.find((f) => f.name === 'Reports').value, 'none - the spawn grants\' count opened it');
-  assert.ok(spawn.fields.some((f) => f.name === 'Spawn grants'));
-  assert.ok(!spawn.fields.some((f) => /found nothing against the code/.test(f.value)));
-  const chat = caseCard({ c, name: 'Badger', lines: [{ at: 1, sub: 'acct-bad', name: 'Badger', tab: 'chat', text: 'hi' }], reasons: [], strikes: 0 }).embeds[0];
-  assert.equal(chat.title, 'Case c1 (opened by the reviewer)');
-  assert.ok(chat.fields.some((f) => f.value === 'found nothing against the code.'));
 });

@@ -34,7 +34,7 @@ function seed(store) {
   store.set(OW_LEDGER_KEY, owLedgerOf(led));
   store.set('look:peer-x', { race: 'Nord' });
   store.set('secret:peer-x', 's');
-  store.set('relaycfg', { gateThread: '1' });
+  store.set('relaycfg', { lootDoor: 'on' });
   return { parks, led: owLedgerOf(led) };
 }
 const take = (W) => async (target, payload) => (await W.room(target).room.fetch(new Request(`https://relay.internal${CELL_INTERNAL_TAKE}`, { method: 'POST', body: JSON.stringify(payload) }))).ok;
@@ -80,7 +80,7 @@ test('COST-2 A SPLIT HANDS EACH CHILD ITS OWN ROWS, AND A MERGE GIVES THEM BACK 
   assert.ok(owIdPixel('b192.186.7').y < 128, 'the fixture holds a band whose cell origin is past the node\'s edge');
   for (const r of Object.values(led.dg)) for (const c of KIDS) assert.equal(!!ledOf(W, c).dg[`${r[0]},${r[1]}`], nodeHolds(c, r[0], r[1]));
   assert.ok(ledOf(W, 'world:25,8').gr['401,129|0|acct-g'], 'the grave with its stone');
-  for (const c of KIDS) assert.deepEqual(W.room(c).store.get('relaycfg'), { gateThread: '1' }, `${c}: the settings copied`);
+  for (const c of KIDS) assert.deepEqual(W.room(c).store.get('relaycfg'), { lootDoor: 'on' }, `${c}: the settings copied`);
   for (const c of KIDS) assert.equal(W.room(c).store.has('look:peer-x'), false, 'a look is no row to hand over');
   // the departing node let go of what it handed
   const left = W.room(NODE).store;

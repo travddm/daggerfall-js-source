@@ -42,7 +42,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import {
-  openGuest, register, login, recover, readAccount, changePassword, logout, equipTitle, equipAura, equipIcon, equipGlyph, adoptIdentity, unlinkPatreon,
+  openGuest, register, login, recover, readAccount, changePassword, logout, equipTitle, equipAura, equipIcon, equipGlyph, adoptIdentity,
   newRecoveryCodes,   // RECOVERY-SET: a new set of recovery codes, from the profile
   chooseNameAs,   // NAME-AS: which name the room reads
   storedSession, keepSession, forgetSession, accountRefusalText, handleShapeOk,
@@ -176,11 +176,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
      *  the card reads as "draw no picker" rather than "draw an empty
      *  one". */
     wardrobe: /** @type {any} */ (null),
-    /** PATREON-LINK: the card's Patreon row as the service answers it - `{ on, linked, titles, link }` - or null (nobody
-     *  signed in, or a service from before acct45), which draws no row. */
-    patreon: /** @type {any} */ (null),
-    /** PATREON-LINK: the link was followed and the player has not come back to a linked account yet */
-    patreonWaiting: false,
     /** a sentence for the player, never a machine word */
     error: '',
     /** a sentence that is NOT a failure - "your password was changed" */
@@ -237,7 +232,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     forgetSession(storage);
     self.account = null;
     self.wardrobe = null;   // ACC3c: a wardrobe outliving its account is a title drawn for nobody
-    self.patreon = null; self.patreonWaiting = false;   // PATREON-LINK: and a link for nobody
     self.busy = false;
     go('out', { error: message });
     return false;
@@ -308,69 +302,7 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
     // clock. A service too old to answer one leaves it null, and the
     // card then draws no picker at all rather than an empty one.
     self.wardrobe = r.data.wardrobe ?? null;
-    self.patreon = r.data.patreon ?? null;   // PATREON-LINK: the card's Patreon row, or none from a service before it
     go('in');
-  };
-
-  /**
-   * PATREON-LINK - THE PLAYER FOLLOWED THE LINK. Linking happens in a browser (a new tab, or the system browser from the
-   * desktop app) and ends on a page of the service's, so all the card can do is say where the player is and read the
-   * account again when they come back (`refresh`, which the card calls when the window has the focus again).
-   */
-  self.patreonOpened = () => {
-    if (self.stage !== 'in') return;
-    self.patreonWaiting = true;
-    self.error = '';
-    self.note = t('account.flow.patreonFinish', 'Finish on Patreon, then come back here.');
-    changed();
-  };
-
-  /**
-   * PATREON-LINK - THE ACCOUNT READ AGAIN, ON THE CARD THAT IS UP. `start` without its `loading` stage: the card stays
-   * drawn while the service is asked, and a blip leaves it as it was (`start`'s own rule - a failed read says nothing
-   * about the session). A link that landed, or a pledge that moved, comes back in the wardrobe and the Patreon row.
-   */
-  self.refresh = async () => {
-    if (self.busy || self.stage !== 'in') return false;
-    const asked = secret();
-    if (!asked) return false;
-    const r = await ask(() => readAccount(door()));
-    if (!r || !r.ok || self.stage !== 'in' || secret() !== asked) return false;   // signed out, a blip, or another account since
-    const was = self.patreon;
-    const d = r.data;
-    self.account = d.account;
-    adoptIdentity(storage, { name: d.account?.name, kind: d.account?.kind, glyphs: d.wardrobe?.glyphs, glyphsOff: d.wardrobe?.glyphsOff, aura: auraStated(d.wardrobe), icon: iconStated(d.wardrobe), secret: asked });   // `start`'s word, adopted as it adopts it
-    self.wardrobe = d.wardrobe ?? null;
-    self.patreon = d.patreon ?? null;
-    if (self.patreonWaiting && self.patreon?.linked && (!was?.linked || String(was.titles) !== String(self.patreon.titles))) {
-      self.patreonWaiting = false;
-      self.note = self.patreon.titles?.length ? t('account.flow.patreonLinkedTitle', 'Patreon linked. Wear your title under Title.') : t('account.flow.patreonLinked', 'Patreon linked. Your title arrives when your pledge holds one.');
-    }
-    changed();
-    return true;
-  };
-
-  /** PATREON-LINK - UNLINK: the account's Patreon off it. The answer is the wardrobe after it, as an equip's is - a title
-   *  the pledge held is held no more, nor worn - and the card's row. */
-  self.unlinkPatreon = async () => {
-    if (self.busy || self.stage !== 'in') return false;
-    const asked = secret();
-    self.busy = true; self.error = ''; self.note = ''; changed();
-    try {
-      const r = await ask(() => unlinkPatreon(door()));
-      if (!r) return false;
-      if (!r.ok) return refuse(accountRefusalText(r.error));
-      self.wardrobe = { ...(self.wardrobe ?? {}), titles: r.data.titles, title: r.data.title, glyphs: r.data.glyphs, ...glyphHalf(r.data), ...auraHalf(r.data) };   // the service's word whole: a tier's title gone with the link
-      self.patreon = r.data.patreon ?? null;
-      self.patreonWaiting = false;
-      self.busy = false;
-      self.note = t('account.flow.patreonUnlinked', 'Patreon unlinked.');
-      adoptIdentity(storage, { glyphs: r.data.glyphs, glyphsOff: r.data.glyphsOff, aura: auraStated(r.data), icon: iconStated(r.data), secret: asked });   // a lapsed tier's glyph off my own screen at once
-      changed();
-      return true;
-    } catch {
-      return refuse(accountRefusalText('offline'));
-    }
   };
 
   /**
@@ -741,7 +673,6 @@ export function AccountFlow({ io, storage, onChange = () => {}, now = () => Date
       forgetSession(storage);
       self.account = null;
       self.wardrobe = null;
-      self.patreon = null; self.patreonWaiting = false;   // PATREON-LINK
       self.busy = false;
       go('out', { note: all ? t('account.flow.signedOutAll', 'Signed out everywhere.') : t('account.flow.signedOut', 'Signed out.') });
     }

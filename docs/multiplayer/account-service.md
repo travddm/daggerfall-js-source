@@ -35,7 +35,7 @@ Placement is pinned to one region (`[placement] region`). Crons: `* * * * *` and
 | `server-account/src/cron.js` | `MINUTE_JOBS`, `HOUR_JOBS`, `runCron` |
 | `server-account/src/saves.js`, `realm.js` | Cloud saves; realm characters |
 | `server-account/src/market.js`, `homes.js`, `decor*.js`, `guilds.js`, `professions.js`, `writs.js`, `townSeats.js`, ... | One module per feature area |
-| `server-account/src/safety.js`, `sanctions.js`, `modAi.js`, `discord.js`, `staff*.js` | Moderation and staff; see [chat-safety.md](chat-safety.md) and [staff-tools.md](staff-tools.md) |
+| `server-account/src/safety.js`, `sanctions.js`, `modAi.js`, `staff*.js` | Moderation and staff; see [chat-safety.md](chat-safety.md) and [staff-tools.md](staff-tools.md) |
 
 The service imports shared law from `src/net/` (for example `identityToken.js`, `marketLaw.js`, `decorLaw.js`,
 `homeLaw.js`, `nameFilter.js`, `cellTree.js`), so client and server check the same rules.
@@ -47,12 +47,11 @@ The service imports shared law from `src/net/` (for example `identityToken.js`, 
 1. `OPTIONS` (CORS). `Access-Control-Allow-Origin` is `ALLOWED_ORIGIN` (`*`). Allowed headers include
    `authorization`, `x-session-pass`, `x-d1-bookmark`, `x-realm-lease`, `x-realm-seq`, `x-staff-session`.
 2. `/v1/health` and `/v1/pubkey` inline.
-3. `SAFE_OPEN_ROUTES`: `/v1/mod/feed` (relay feed, signature over the exact bytes) and `/v1/discord/interactions`
-   (Discord signature). No session.
+3. `SAFE_OPEN_ROUTES`: `/v1/mod/feed` (relay feed, signature over the exact bytes). No session.
 4. Signed relay feeds: `/v1/mod/grant-feed`, `/v1/mod/reaction-feed`, `/v1/mod/hidden-seen`, `/v1/staff/net-feed`,
    each checked by a signature header.
 5. `STAFF_ROUTES` (`/v1/staff/*`): POST, staff session in `x-staff-session`. Game sessions are refused.
-6. `OPEN_ROUTES` (`/v1/auth/guest`, `/login`, `/recover`) and Patreon callbacks: no session, rate-limited.
+6. `OPEN_ROUTES` (`/v1/auth/guest`, `/login`, `/recover`): no session, rate-limited.
 7. Everything else needs a session: `Authorization: Bearer <secret>` (or a body `secret` on POST), resolved by
    `resolveSession`. Unknown paths return 404 from the one `ROUTES` set.
 
@@ -123,7 +122,7 @@ Feature areas have a var with `off`, `dev` (developers only) or `on`: `MARKS_OPE
 `scheduled` calls `runCron(env, { cron })` (`server-account/src/cron.js`), which runs `jobsFor(cron)`:
 
 - **Every minute** (`MINUTE_JOBS`): `auctions`, `guild-writs`, `contracts`, `seats`, `seat-facts`, `town-shares`,
-  `yard-snap`, `arena-champion`, `rez-holds`, `safety` (the chat reviewer, Discord cards and freeze-push retries),
+  `yard-snap`, `arena-champion`, `rez-holds`, `safety` (the chat reviewer and freeze-push retries),
   `motherlodes`.
 - **Hourly at :41** (`HOUR_JOBS`): `board`, `guild-board`, `harvests`, `craft-writs`, `market-history`, `town-econ`,
   `rate-limits`, `sessions`, `guild-invites`, `realm-findings`, `realm-wealth-hours`, `progress-hours`,
@@ -145,10 +144,9 @@ player requests for D1.
 - `.github/workflows/account-deploy.yml` deploys the service. It resolves the D1 database id (creating the database
   if absent) in place of the `database_id` placeholder, records a D1 Time Travel bookmark, applies migrations
   (`wrangler d1 migrations apply --remote`, retried only on "overloaded"), puts secrets (`IDENTITY_PRIVATE_KEY`,
-  `IDENTITY_PUBLIC_KEY`, the relay's `GATE_SIGNING_KEY`/`GATE_PUBLIC_KEY`, `ANTHROPIC_API_KEY`,
-  `DISCORD_BOT_TOKEN`), waits until the live relay serves the source's `RELAY_VERSION` or later (so the service
-  never signs what the relay refuses; it gives up without deploying after about five and a half hours), deploys, and
-  points Discord at the service.
+  `IDENTITY_PUBLIC_KEY`, the relay's `GATE_SIGNING_KEY`/`GATE_PUBLIC_KEY`, `ANTHROPIC_API_KEY`),
+  waits until the live relay serves the source's `RELAY_VERSION` or later (so the service
+  never signs what the relay refuses; it gives up without deploying after about five and a half hours), and deploys.
 - **A service deploy drops nobody.** Sockets live on the relay, and requests are stateless.
 
 ## Running and testing

@@ -2,18 +2,20 @@
 // sky's own dark, the spot, the waves, the light, the owner, the encounter clock, the ledger's machine and the receipt.
 // Every number below is the law's own; each pin is held to fail under a one-character change of the law it names
 // (tools/mutants/star1.json).
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { webcrypto } from 'node:crypto';
 import {
   starfallRuns,
-  STAR_HOUR_MS, STAR_FALLS_MS, STAR_PER_NIGHT, STAR_OMEN_MS, STAR_STREAK_MS, STAR_LIFE_MS, STAR_GRACE_MS, STAR_AFTER_MS,
+  STAR_FALL_DAYS, starFallOffsetMs, STAR_PER_NIGHT, STAR_OMEN_MS, STAR_STREAK_MS, starLifeMs, STAR_GRACE_MS, STAR_AFTER_MS,
   starNightAt, starOk, starTimes, starInWindow, starHeard, starSpotLocal, starNativeOf, starNear, STAR_REACH_M, STAR_UNITS_PER_M,
   STAR_WAVES, STAR_GATHER_MS, STAR_WAVE_MAX_MS, STAR_KILL_MIN_MS, STAR_BREATH_MS, STAR_MASTER_MIN_MS, starWaveSize, starCircleSize, STAR_WAVE_MIN, STAR_WAVE_MAX, STAR_FOE_HEALTH,
   STAR_LIGHT, STAR_BLOW_LIGHT, STAR_BREATH_LIGHT, STAR_BLOWS_HZ, STAR_BLOWS_BURST, starBandOf, STAR_PRESENT_MS, STAR_ORPHAN_MS,
   newStarLedger, stepStar, foldStarWord, starClearFloorMs, starEarned, starTop, starLedgerState, starPhaseLeft, starOwner, starMayMake, starLostAt,
   P_FALLEN, P_GATHER, P_WAVE, P_BREATH, P_MASTER, P_HELD, P_LOST, STAR_LOST_DARK, STAR_LOST_DAWN, STAR_ACCOUNTS_MAX,
 } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter, skyDayStartMs, skyDayMs } from '../../../src/net/sky-days.ts';
 import { mintStarReceipt, readStarReceipt, verifyStarReceipt, starReceiptValid, STAR_RECEIPT_TTL_S } from '../../../src/net/starfall/starReceipt.js';
 import { skyClassicMinutes } from '../../../src/net/skyLaw.js';
 import { PIXEL_UNITS, LIVE_EVENTS } from '../../../src/net/wire.js';
@@ -23,22 +25,67 @@ import { PIXEL_M, GATE_SPOT_SPREAD_M } from '../../../src/net/gate/gateLaw.js';
 const SKY_HOUR = (ms) => (Math.floor(skyClassicMinutes(ms)) % 1440) / 60;
 /** The Witches' Festival's days (net/festivalLaw.js FESTIVALS - the Starfall's own), and a night inside them. */
 const { fromMs: FROM_MS, toMs: TO_MS } = FESTIVALS[0];
-const N0 = Math.ceil(FROM_MS / STAR_HOUR_MS) + 3;
+const N0 = skyDayAtOrAfter(FROM_MS) + 3;
 const word = (o = {}) => ({ lv: 10, s: 0, o: 0, kw: 0, kn: 0, wc: 0, hb: 0, mf: 0, ...o });
 
-test('STAR1 THE NIGHT: three stars a night, the sky\'s 18:00, 21:00 and midnight, each standing fifteen minutes - the last to dawn (mutants: a fall moved; the life lengthened; the omen shortened)', () => {
-  assert.deepEqual(STAR_FALLS_MS, [-900_000, -450_000, 0]);
+test('STAR1 THE NIGHT, sky clock on at 24: three stars a night, the sky\'s 18:00, 21:00 and midnight, each standing fifteen minutes - the last to dawn (mutants: a fall moved; the life lengthened; the omen shortened)', (t) => {
+  playByRules(t, { 'time.skyClock': true }); // the sky's own clock: a sky day is an hour
+  assert.deepEqual(STAR_FALL_DAYS, [-1 / 4, -1 / 8, 0]);
+  assert.deepEqual([0, 1, 2].map(starFallOffsetMs), [-900_000, -450_000, 0]);
   assert.equal(STAR_PER_NIGHT, 3);
-  assert.equal(STAR_HOUR_MS, 3_600_000);
+  assert.equal(skyDayMs(), 3_600_000);
   assert.equal(STAR_OMEN_MS, 90_000);
   assert.equal(STAR_STREAK_MS, 8_000);
-  assert.equal(STAR_LIFE_MS, 900_000);
-  const t = starTimes(N0, 2);
-  assert.deepEqual(t, { omenAt: N0 * STAR_HOUR_MS - 90_000, streakAt: N0 * STAR_HOUR_MS - 8_000, fallAt: N0 * STAR_HOUR_MS, endAt: N0 * STAR_HOUR_MS + 900_000, goneAt: N0 * STAR_HOUR_MS + 900_000 + STAR_AFTER_MS });
+  assert.equal(starLifeMs(), 900_000);
+  const n = skyDayAtOrAfter(FROM_MS) + 3;
+  assert.deepEqual(starTimes(n, 2), {
+    omenAt: skyDayStartMs(n) - 90_000,
+    streakAt: skyDayStartMs(n) - 8_000,
+    fallAt: skyDayStartMs(n),
+    endAt: skyDayStartMs(n) + 900_000,
+    goneAt: skyDayStartMs(n) + 900_000 + STAR_AFTER_MS,
+  });
+  assert.equal(skyDayStartMs(n) % 3_600_000, 0, "the sky's midnight falls on the hour UTC at 24");
 });
 
-test('STAR1 THE SKY\'S DARK: over a year of nights inside and around the window, every star lands in the sky\'s night and its deadline is no later than the sky\'s dawn - read off net/skyLaw.js itself, which the relay never imports (mutants: a fall at the sky\'s noon)', () => {
-  const first = Math.ceil(Date.UTC(2026, 9, 4) / STAR_HOUR_MS);
+test("STAR1 THE NIGHT, one clock by default: the sky is the world's, a day is two real hours, and the stars fall at the world's 18:00, 21:00 and midnight, each standing thirty minutes", () => {
+  assert.equal(skyDayMs(), 7_200_000);
+  assert.deepEqual([0, 1, 2].map(starFallOffsetMs), [-1_800_000, -900_000, 0]);
+  assert.equal(starLifeMs(), 1_800_000);
+  const n = N0;
+  assert.deepEqual([0, 1, 2].map((k) => SKY_HOUR(starTimes(n, k).fallAt)), [18, 21, 0]);
+  assert.equal(skyDayStartMs(n + 1) - skyDayStartMs(n), 7_200_000, 'a night every two real hours');
+  assert.equal(starTimes(n, 0).omenAt, starTimes(n, 0).fallAt - STAR_OMEN_MS, 'the omen and the streak stay real seconds');
+  for (let k = 0; k < STAR_PER_NIGHT; k++) {
+    const x = starTimes(n, k);
+    const fall = SKY_HOUR(x.fallAt);
+    const end = SKY_HOUR(x.endAt - 1);
+    assert.ok(fall >= 18 || fall < 6, `star ${k} lands at the sky's ${fall}`);
+    assert.ok(end >= 18 || end < 6, `star ${k} stands past the sky's dawn (${end})`);
+  }
+  assert.equal(starNightAt(starTimes(n, 2).fallAt), n, 'the night an instant stands in follows the sky day');
+  assert.equal(starNightAt(starTimes(n, 2).endAt), n, 'its last star stands to its deadline');
+  assert.equal(starNightAt(starTimes(n, 2).endAt + 1), n + 1, "and the next night is the sky's next day");
+});
+
+test("STAR1 THE NIGHT, at other scales: the stars keep the sky's hours whatever the world and sky scales are, and nights are a sky day apart (mutants: a night length fixed at an hour or two)", (t) => {
+  for (const [world, sky] of [[24, 48], [6, 12], [100, 60]]) {
+    playByRules(t, { 'time.skyClock': true, 'time.worldScale': world, 'time.skyScale': sky });
+    const n = skyDayAtOrAfter(FROM_MS) + 3;
+    assert.equal(skyDayMs(), 86_400_000 / sky, `a sky day at scale ${sky}`);
+    assert.deepEqual([0, 1, 2].map((k) => SKY_HOUR(starTimes(n, k).fallAt)), [18, 21, 0], `world ${world}, sky ${sky}`);
+    assert.ok(Math.abs(skyDayStartMs(n + 1) - skyDayStartMs(n) - 86_400_000 / sky) <= 1, 'a night a sky day after the last');
+    assert.equal(starLifeMs(), Math.round(86_400_000 / sky / 4));
+  }
+  playByRules(t, { 'time.worldScale': 24 });
+  assert.equal(skyDayMs(), 3_600_000, "one clock at world scale 24: the sky's day follows the world's");
+  const n = skyDayAtOrAfter(FROM_MS) + 3;
+  assert.deepEqual([0, 1, 2].map((k) => SKY_HOUR(starTimes(n, k).fallAt)), [18, 21, 0]);
+});
+
+test('STAR1 THE SKY\'S DARK: over a year of nights inside and around the window, every star lands in the sky\'s night and its deadline is no later than the sky\'s dawn - read off net/skyLaw.js itself, which the relay never imports (mutants: a fall at the sky\'s noon)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
+  const first = skyDayAtOrAfter(Date.UTC(2026, 9, 4));
   for (let n = first; n < first + 24 * 365; n += 7) {
     for (let k = 0; k < STAR_PER_NIGHT; k++) {
       const t = starTimes(n, k);
@@ -66,8 +113,8 @@ test('STAR1 THE WINDOW: stars fall on the Witches\' Festival\'s own days - its f
   assert.ok(!starfallRuns(NaN));
   assert.ok(!LIVE_EVENTS.includes('witchfest'), 'no live event to stage: the calendar is the festival\'s');
   assert.ok(starInWindow(N0, 1));
-  assert.ok(!starInWindow(Math.ceil(TO_MS / STAR_HOUR_MS) + 2, 1));
-  assert.ok(!starInWindow(Math.floor(FROM_MS / STAR_HOUR_MS) - 2, 1), 'a star that fell before the festival opened');
+  assert.ok(!starInWindow(skyDayAtOrAfter(TO_MS) + 2, 1));
+  assert.ok(!starInWindow((skyDayAtOrAfter(FROM_MS) - 1) - 2, 1), 'a star that fell before the festival opened');
   // lane 9 (Cyrodiil) stands like the provinces; past the theatres none
   assert.ok(starOk(N0, 27) && starOk(N0, 29) && !starOk(N0, 30) && !starOk(N0, -1) && !starOk(0, 0) && starOk(N0, 0) && starOk(N0, 3) && starOk(N0, 26));
   const t = starTimes(N0, 1);

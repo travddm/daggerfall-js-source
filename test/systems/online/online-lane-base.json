@@ -27,9 +27,12 @@
     "guildProbation": false,
     "soldGoodsOnShelf": false,
     "absorptionLimits": false,
+    "openingDamage": false,
+    "eliteStacking": false,
     "crimeRecovery": "x4",
     "dungeonFires": true,
     "weatherEvents": true,
+    "etherSea": true,
     "realForests": true,
     "banthaJungle": true,
     "tamrielLands": true,
@@ -40,6 +43,7 @@
     "questlines": true,
     "questlineRewards": true,
     "wildernessCamps": true,
+    "spawnedDungeons": false,
     "naval": false
   },
   "settings": {

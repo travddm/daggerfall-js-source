@@ -19,6 +19,7 @@ const PREFS = Object.freeze({
   crimeRecovery: 'x4',
   dungeonFires: true,
   weatherEvents: true,
+  etherSea: true,
   realForests: true,
   banthaJungle: true,
   tamrielLands: true,
@@ -28,6 +29,7 @@ const PREFS = Object.freeze({
   climateBlend: true,
   questlines: true,
   wildernessCamps: true,
+  spawnedDungeons: false,
   naval: false,
   revenants: true,
   revenantWho: 'elite',
@@ -47,6 +49,8 @@ const PREFS = Object.freeze({
   guildProbation: false,
   soldGoodsOnShelf: false,
   absorptionLimits: false,
+  openingDamage: false,
+  eliteStacking: false,
   questlineRewards: true,
 });
 

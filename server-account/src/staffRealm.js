@@ -47,6 +47,7 @@ import { progressConfig } from './progress.js';
 import { DB_ROOT } from './service.js';
 import { itemWorth } from '../../src/systems/item/itemLaw.js';
 import { giveCatalogue, mintGift, giftWorth, GIVE_REASONS } from './staffGive.js';
+import { whenOption } from './operator-options.ts';   // the operator's option `give`
 
 /** Rows one page answers. */
 export const REALM_PAGE = 25;
@@ -517,7 +518,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
   }
 
   // STAFF-GIVE: the item list Add an item picks from (staffGive.js) - the game's own tables, no character
-  if (path === '/v1/staff/item/catalogue') return giveCatalogue();
+  if (path === '/v1/staff/item/catalogue') return whenOption(env, 'give', () => giveCatalogue());
 
   // ═══ ONE CHARACTER'S DOORS, by its id ═══
   const row = await charRow(db, body.id);
@@ -617,7 +618,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
 
   if (path === '/v1/staff/item/purge-dupes') return purgeDupes();
   if (path === '/v1/staff/item/take') return takeAct();
-  if (path === '/v1/staff/item/give') return giveAct();
+  if (path === '/v1/staff/item/give') return whenOption(env, 'give', () => giveAct());
   return { error: 'not-found' };
 
   /**

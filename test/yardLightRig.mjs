@@ -66,7 +66,6 @@ export function exteriorFrame({ lane, night, town, lamps, eye, ranges, tick = ()
     magic: null, _dwFogP: null, playerTorchLight: () => null, playerEntity: {}, player: { feetAt: () => [0, 0, 0] },
     peerTorchLights: () => [], gatePool: null, riteHost: null, camps: { lights: () => [] }, droppedTorches: { lights: () => [] },
     naval: null, festivalStage: null, quays: null,
-    poiHost: null,
     starfall: null,
     portHost: ports ? { lights: () => ports } : null,   // SHIPYARDS: the lighthouses' lamps and the shipyards' lanterns, beside the quays'
     yards: { lamps: () => lamps }, yardLampRows,

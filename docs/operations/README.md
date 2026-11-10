@@ -13,4 +13,4 @@ and their configuration, the desktop app release, and the manual workflows that 
 - [operator-commands.md](operator-commands.md) - a self-hosted server's operator acts: staff roles, recovery codes,
   server posts and realm rollbacks.
 - [staff-roles.md](staff-roles.md) - Admin, Moderator and Owner are account roles: who sets them, and how the
-  operator sets the first Owner and links Discord moderators.
+  operator sets the first Owner.

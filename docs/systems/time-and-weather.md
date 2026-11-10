@@ -38,19 +38,50 @@ Online, nobody stores or moves the world clock. World time is a pure function of
 
 - The relay (`server/src/index.js`) puts its `now` in the welcome message. `src/net/online.js` turns it into
   `clockOffsetMs` (accepted only within 366 days of the local clock) and fires `onClock`.
-- `src/net/wire.js` `sharedClassicMinutes(nowMs)` maps wall time to classic minutes at `ONLINE_MINUTES_PER_MS` (the
-  same 12 game minutes per real minute). `setSharedClock` in `worldTick.js` installs it as the source.
+- `src/net/wire.js` `sharedClassicMinutes(nowMs)` maps wall time to classic minutes at `onlineMinutesPerMs()`: the server
+  profile's `time.worldScale` game minutes per real minute, 12 by default as in Daggerfall Unity's `TimeScale`.
+  `setSharedClock` in `worldTick.js` installs it as the source.
 - Every client computes the same time; nothing about the clock is sent after the welcome.
 
 There are three clocks online:
 
 | Clock | Function | Behaviour |
 | --- | --- | --- |
-| Event (world) clock | `worldMinutes()` | Wall-time function at 12x. Nobody can move it. |
-| Sky clock | `skyMinutes()` | Faster rate from `SKY_SEGMENTS` in `src/net/skyLaw.js` (24x: a day every real hour). |
+| Event (world) clock | `worldMinutes()` | Wall-time function at `time.worldScale` (12 by default). Nobody can move it. |
+| Sky clock | `skyMinutes()` | The event clock, as Daggerfall Unity has one clock. A server profile can give the sky its own faster rate (`time.skyClock`: `SKY_SEGMENTS` in `src/net/skyLaw.js`, at `time.skyScale`, 24 by default, a day every real hour). |
 | Own clock | `ownMinutes()` | Per character, saved. Runs with the world in play, runs ahead on rests and raises, stands while away or dead. |
 
 Offline all three are the same counter.
+
+### The scales are server-profile keys
+
+| Key | Default | Range | Read by |
+| --- | --- | --- | --- |
+| `time.worldScale` | 12 (DFU's TimeScale) | whole numbers 1 to 100 | the relay, the account Worker, every client |
+| `time.skyScale` | 24 | whole numbers 1 to 100 | the relay (the Starfall's nights), the account Worker and every client, only while `time.skyClock` is true |
+
+- The relay sets the scales from the official profile when it starts (`server/src/relayFacts.ts`); the account Worker
+  does the same when `src/net/skyLaw.js` loads; a client sets it when it installs the relay's profile
+  (`src/systems/online/serverProfile.ts`). Single player always plays at 12.
+- A profile names a scale in its `rules`; one that names none plays the defaults, so the profile's hash does not move.
+- The world's date is a function of the relay's wall time from a fixed start (`ONLINE_EPOCH_MS`). Changing
+  `time.worldScale` on a server with players moves the world's date at once, and with it every deadline kept in world
+  minutes. Set the scale before play.
+- The sky's midnights fall on the hour UTC only at `time.skyScale` 24 (`tools/skyCutover.mjs` lists the aligned instants).
+- Five figures were written for 12 and now follow `time.worldScale`. At 12 each is the figure it was.
+
+| System | Figure | At 12 | At scale S |
+| --- | --- | --- | --- |
+| Hunters' Mark (`src/net/huntLaw.js`) | game days in a UTC day, and the late bound for a clear (`gameDaysPerUtcDay`, `huntClearLateDays`) | 12 | S |
+| Gate court (`src/scenes/gate/gateCourt.js`) | a magic round, the real time of one game minute (`courtRoundMs`) | 5,000 ms | 60,000 / S ms |
+| Camp encounters (`src/systems/campEncounters.js`) | the window, in game minutes: 15 real minutes online (`campWindowMinutes`; offline it stays 180) | 180 | 15 x S |
+| Starfall (`src/net/starfall/starfallLaw.js`) | a night is a sky day (see below) | 2 real hours | 86,400,000 / S ms |
+
+The Starfall's nights are the sky's nights. A night is one sky day (`src/net/sky-days.ts`): the world's day by default,
+so a night every 2 real hours at 12, and the sky clock's own day when `time.skyClock` is true (an hour at its default
+`time.skyScale` 24). Its three stars fall at the sky's 18:00, 21:00 and midnight, and each stands for a quarter of a sky
+day. The omen and the streak stay real seconds. `sky-days.ts` is the same sky as `skyLaw.js` (`test/net/sky_days.test.js`
+holds them equal); it exists because the relay carries it and never carries `skyLaw.js`.
 
 - `setWorldMinutes` and `advanceWorldMinutes` do nothing online and return the shared time. A caller that expects the
   clock to move sees no error.

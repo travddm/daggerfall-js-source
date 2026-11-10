@@ -43,7 +43,7 @@ the code in this repository. For example:
 - a secret, key or token exposed in the code, a build or a response.
 
 Ordinary bugs are welcome too: in the game with `/bug`, or as a GitHub issue if nothing in them could be abused.
-Problems in third-party services (Cloudflare, Patreon, Discord, GitHub) go to those services. Daggerfall's own game
+Problems in third-party services (Cloudflare, Discord, GitHub) go to those services. Daggerfall's own game
 data is not part of this project.
 
 ## Acting in good faith
