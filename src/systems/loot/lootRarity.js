@@ -2110,7 +2110,7 @@ function reforgePool(item, index) {
  *  technique's, an armour's thorns - no other kind could be put there). Indices into `affixes`; none for anything else,
  *  and none that is not a valid line. */
 export function reforgeableLines(item) {
-  const list = Array.isArray(item?.affixes) ? item.affixes : [];
+  const list = Array.isArray(item?.affixes) && item.master !== true ? item.affixes : [];   // none of a Master's work - its lines are its record's
   let lines = [];
   if (item?.rarity === 'magic' || item?.rarity === 'rare') lines = list.map((_, i) => i);
   else if (item?.rarity === 'legendary' && item.exalted === true && list.length) lines = [list.filter((a) => a?.gem == null).length - 1];   // LOOT20, GEM1: the gems' lines are last - the Exalted's own is the one before them
@@ -2158,7 +2158,7 @@ export function reforgeAffix(item, index, rolls = Math.random) {
  *  Reforge takes (a Magic or Rare piece, an Exalted Legendary), every line a roll made (`affixBand`: a Legendary's record
  *  lines are its signature, fixed) that stands under its band's top. Indices into `affixes`; none for anything else. */
 export function honeableLines(item) {
-  const takes = item?.rarity === 'magic' || item?.rarity === 'rare' || (item?.rarity === 'legendary' && item.exalted === true);
+  const takes = item?.master !== true && (item?.rarity === 'magic' || item?.rarity === 'rare' || (item?.rarity === 'legendary' && item.exalted === true));   // never a Master's work: its lines are its record's
   if (!takes || !Array.isArray(item.affixes)) return [];
   return item.affixes.map((_, i) => i).filter((i) => { const b = affixBand(item, i); return !!b && item.affixes[i].value < b[1]; });
 }

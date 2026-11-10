@@ -9,8 +9,6 @@ and their configuration, the desktop app release, and the manual workflows that 
   `wrangler.toml` configuration, secrets and keys.
 - [desktop-release.md](desktop-release.md) - the Electron app, the release workflow, version numbers, how the app
   updates, and patch notes.
-- [admin-workflows.md](admin-workflows.md) - restore, revive, rollback, guild grants, recovery codes, server post,
-  and the load readings.
 - [tools-index.md](tools-index.md) - hand-run tools in `tools/` that no script, workflow or other page names.
 - [operator-commands.md](operator-commands.md) - a self-hosted server's operator acts: staff roles, recovery codes,
   server posts and realm rollbacks.
