@@ -845,46 +845,6 @@ jobs:
             echo "A receipt signed by any earlier relay key is refused at the signature and expires with its week."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # ── 4c. PATREON-LINK'S TWO SECRETS, WHERE THE REPOSITORY HAS THEM ──
-      #
-      # PATREON-LINK (2026-10-01, Mac: "having to manually hand out titles
-      # ... its really hard to keep up with it"): a patron links their own
-      # Patreon, and the service needs the two things only Patreon and Mac
-      # hold - the API client's secret (to spend the code a player comes
-      # back with) and the webhook's (to believe Patreon's word on a
-      # member). Each is a REPOSITORY secret, PATREON_CLIENT_SECRET and
-      # PATREON_WEBHOOK_SECRET, put on the Worker here on EVERY deploy - so
-      # a secret changed in the repository reaches the service on the next
-      # push. An unset one is not an error: linking stays off (patreon.js
-      # patreonLinkOn) and the webhook answers `patreon-closed`.
-      #
-      # ONE PUT FOR BOTH (`secret bulk`, one redeploy), fed through a pipe:
-      # jq builds the JSON from the environment, so neither value is ever
-      # echoed, written to a file, or an argument. The summary names the two
-      # addresses the Patreon client and its webhook are registered with,
-      # read off this deploy - never typed (AUDIT-ACC F16).
-      - name: Put the Patreon secrets, where the repository has them
-        working-directory: server-account
-        env:
-          PATREON_CLIENT_SECRET: ${{ secrets.PATREON_CLIENT_SECRET }}
-          PATREON_WEBHOOK_SECRET: ${{ secrets.PATREON_WEBHOOK_SECRET }}
-        run: |
-          set -euo pipefail
-          base="${{ steps.deploy.outputs.base }}"
-          if [ -z "${PATREON_CLIENT_SECRET}" ] && [ -z "${PATREON_WEBHOOK_SECRET}" ]; then
-            echo "neither PATREON_CLIENT_SECRET nor PATREON_WEBHOOK_SECRET is set for this repository - Patreon linking stays off"
-          else
-            jq -n 'env | {PATREON_CLIENT_SECRET, PATREON_WEBHOOK_SECRET} | with_entries(select(.value != null and .value != ""))' | $WRANGLER secret bulk
-          fi
-          {
-            echo "### Patreon linking"
-            echo ""
-            echo "- client secret: $([ -n "${PATREON_CLIENT_SECRET}" ] && echo put || echo 'not set - linking is off')"
-            echo "- webhook secret: $([ -n "${PATREON_WEBHOOK_SECRET}" ] && echo put || echo 'not set - pledges are not followed')"
-            echo "- the Patreon client's redirect URI: \`$base/v1/patreon/callback\`"
-            echo "- the Patreon webhook's URL: \`$base/v1/patreon/webhook\`"
-          } >> "$GITHUB_STEP_SUMMARY"
-
       # THE CHAT'S SAFETY HAS ONE SECRET (docs/multiplayer/chat-safety.md): the reviewer's ANTHROPIC_API_KEY
       # (server-account/src/modAi.js), put on the Worker here on EVERY deploy from the repository's own secrets, so a key
       # changed there reaches the service on the next push. An unset one is not an error: the reviewer reads nothing

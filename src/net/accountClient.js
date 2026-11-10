@@ -201,12 +201,6 @@ const REFUSAL_WORDS = {
   'ladder-needs-account': () => t('account.refusal.ladderNeedsAccount', 'The ladder online needs a username and a password. Give this account one and your climb is kept.'),   // AUDIT ARENA-LADDER 2: a guest climbs nothing online
   joined: () => t('account.refusal.joined', 'You already fight under a banner. Leave it at its recruiter first.'),
   season: () => t('account.refusal.season', 'You left that banner this season. You can rejoin it next season.'),
-  // PATREON-LINK, a patron's own Patreon (server-account/src/patreon.js). `signature` is the webhook's, met by Patreon
-  // and never a player; it has a sentence because every word the service says does.
-  'patreon-closed': () => t('account.refusal.patreonClosed', 'Patreon linking is not available yet.'),
-  'patreon-down': () => t('account.refusal.patreonDown', 'Patreon did not answer. Try linking again in a minute.'),
-  'patreon-needs-account': () => t('account.refusal.patreonNeedsAccount', 'Linking Patreon needs a username and a password. Give this account one first.'),
-  signature: () => t('account.refusal.signature', 'The account service could not check who sent that request.'),
   // MOD1, moderation. A moderator reads these in chat, beside the
   // command they just typed.
   'not-moderator': () => t('account.refusal.notModerator', 'Only moderators can do that.'),
@@ -1201,10 +1195,6 @@ export const buyInsignia = (io, item, rid = null) => call(io, '/v1/account/insig
 /** AUDIT FB1024 (BROKER-RID): a Broker sale whose answer was lost, asked after by its request id (`{ rid, nonce }`) -
  *  server-account/src/brokerSales.js settleBrokerSale. Signed out, nothing is asked. */
 export const settleBrokerSale = (io, body) => (io ? call(io, '/v1/broker/settle', body) : Promise.resolve({ ok: false, error: 'no-session' }));
-/** PATREON-LINK: take this account's Patreon off it - `{ ok, titles, title, glyphs, auras, aura, insignia, patreon }`,
- *  the wardrobe after it and the card's Patreon row. Linking has no call here: the account read carries the link, and
- *  the player follows it in a browser (server-account/src/patreon.js says why). */
-export const unlinkPatreon = (io) => call(io, '/v1/patreon/unlink', {});
 
 /** ACC4: ONE BEAT OF TIME PLAYED. It carries no number - the service
  *  credits the gap by its own clock (net/playClock.js says why), and

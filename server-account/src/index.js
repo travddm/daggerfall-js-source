@@ -173,12 +173,6 @@
 // HOME-VOTE, a registered account's word on another's home (homeVotes.js; /v1/homes/town's homes carry `score` and the
 // caller's `vote`):
 //   POST /v1/homes/vote { mapId, buildingKey, vote: 1 | -1 | 0 } -> { ok, mapId, buildingKey, vote, score }
-// PATREON-LINK, a patron's own Patreon (patreon.js) - /v1/account's answer carries `patreon: { on, linked, titles,
-// link }`, `link` the authorize URL with a state sealed for the account; the next three answer a browser and Patreon:
-//   GET  /v1/patreon/callback ?code&state  -> a page asking which game account, with the yes's ticket
-//   POST /v1/patreon/confirm  ticket=...   -> a page: linked, with what Patreon says NOW (a form, not JSON - the page posts it)
-//   POST /v1/patreon/webhook  <member>     -> { ok, applied }   (X-Patreon-Signature: HMAC-MD5 under the webhook secret)
-//   POST /v1/patreon/unlink   {}           -> { ok, titles, title, glyphs, auras, aura, insignia, patreon }   (an equip's shape)
 //
 // ACC2, and every one of them needs a REGISTERED account (the wall):
 //   GET    /v1/saves                                   -> { saves[] }
@@ -226,7 +220,7 @@ import {
   ACCOUNT_MAX, ACCOUNT_WINDOW_S,
 } from './accounts.js';
 import { mintToken, mintRenownOrder, mintGuildOrder, mintGuildOutOrder, mintHomeOrder, MAX_TTL_S, TOKEN_V, ID_RE, SEAT_TITLES, CHAPTER_TITLES, TOKEN_MAX_CHARS, TOKEN_BODY_MAX, tokenBodyOf } from '../../src/net/identityToken.js';
-import { ACCOUNT_VERSION, MAX_BODY_BYTES, ROUTES, OPEN_ROUTES, PATREON_OPEN_ROUTES, SAFE_OPEN_ROUTES, STAFF_ROUTES, savePathOf, realmPathOf, SAVE_MAX_BYTES, SHOT_MAX_BYTES, maintaining, routeDb, d1BookmarkOf, D1_BOOKMARK_RE, d1Overloaded, noteOverload, shedding } from './service.js';   // SCALE4d: the routes a read replica may serve, and the session they are served on
+import { ACCOUNT_VERSION, MAX_BODY_BYTES, ROUTES, OPEN_ROUTES, SAFE_OPEN_ROUTES, STAFF_ROUTES, savePathOf, realmPathOf, SAVE_MAX_BYTES, SHOT_MAX_BYTES, maintaining, routeDb, d1BookmarkOf, D1_BOOKMARK_RE, d1Overloaded, noteOverload, shedding } from './service.js';   // SCALE4d: the routes a read replica may serve, and the session they are served on
 import { listSaves, putCard, putBlob, getBlob, deleteSave, saveCardOf } from './saves.js';
 import { signingKey, gatePublicKey } from './signing.js';
 import { takeGrantMeasure, GRANT_FEED_PATH } from './grants.js';   // GRANT2: the spawn grants' measure, the relay's door in
@@ -341,11 +335,6 @@ import { FEED_MAX_BYTES, FEED_SIG_HEADER } from '../../src/net/safety/chatFeed.j
 import { heartbeat } from './heartbeat.js';   // SCALE4c: one request for a tab's three clocks
 import { ADMIT_ROUTES, admitWait } from './admit.js';   // ADMIT-LINE: the sign-in line
 export { AdmitGate } from './admit.js';   // ADMIT-LINE: the line's Durable Object (wrangler.toml binds it from this module)
-import {
-  patreonLinkOn, openPatreon, sealPatreon, patreonExchange, patreonIdentity, linkPatreon, unlinkPatreon, patreonWebhook,
-  patreonCardOf, pledgeTitles, patreonHtml, patreonPage, patreonConfirmPage, patreonLinkedPage,
-  PATREON_PAGES, PATREON_TICKET_S, PATREON_HOOK_MAX_BYTES, PATREON_CALLBACK_PATH,
-} from './patreon.js';   // PATREON-LINK: a patron's own Patreon, linked
 
 // THIS MODULE EXPORTS `default` AND NOTHING ELSE, and that is a
 // runtime requirement rather than a preference: in a module Worker
@@ -804,58 +793,6 @@ const service = {
     if (shedding(path, request.method, Date.now())) return overloaded(origin);
 
     try {
-      // PATREON-LINK: THE THREE DOORS A BROWSER AND PATREON KNOCK AT. No session: each is proven by what it carries
-      // (patreon.js says what, and why the link asks before it writes). Answered before the JSON ladder below, because
-      // none of them is JSON going in - a callback is a GET a person reads, the confirm a form, and the webhook a body
-      // whose signature covers its exact bytes.
-      if (PATREON_OPEN_ROUTES.has(path)) {
-        if (path === '/v1/patreon/webhook') {
-          if (request.method !== 'POST') return no('method', 405, origin);
-          const bytes = await readCapped(request, PATREON_HOOK_MAX_BYTES);
-          if (!bytes) return no('too-large', 413, origin);
-          const r = await patreonWebhook(ctx, env, new Uint8Array(bytes), request.headers.get('x-patreon-signature'), request.headers.get('x-patreon-event'));
-          return 'error' in r ? no(r.error, r.error === 'patreon-closed' ? 503 : r.error === 'signature' ? 401 : 400, origin) : json(r, 200, origin);
-        }
-        const page = (/** @type {any} */ p, /** @type {number} */ status) => patreonHtml(patreonPage(p), status);
-        if (!patreonLinkOn(env)) return page(PATREON_PAGES.off, 503);
-        // The open routes' own bucket (one address, sixty a minute): a callback spends a code at Patreon and a confirm
-        // writes, and neither is a thing one address gets to do without limit.
-        if (await overRate(ctx, `ip:${request.headers.get('cf-connecting-ip') || 'unknown'}`, 60)) return page(PATREON_PAGES.rate, 429);
-        const outbound = (/** @type {string} */ u, /** @type {any} */ init) => globalThis.fetch(u, init);
-        if (path === PATREON_CALLBACK_PATH) {
-          if (request.method !== 'GET') return no('method', 405, origin);
-          const state = await openPatreon('state', url.searchParams.get('state'), env, { subtle, nowS });
-          if (!state) return page(PATREON_PAGES.expired, 400);
-          const code = url.searchParams.get('code');
-          if (!code || url.searchParams.has('error')) return page(PATREON_PAGES.declined, 200);   // the player said no on Patreon
-          const player = await db.prepare('SELECT id, handle FROM players WHERE id = ?1').bind(state.p).first();
-          if (!player?.handle) return page(PATREON_PAGES.account, 403);
-          const token = await patreonExchange(outbound, env, code, `${url.origin}${PATREON_CALLBACK_PATH}`);
-          if ('error' in token) return page(PATREON_PAGES.down, 502);
-          const who = await patreonIdentity(outbound, token.token);
-          if ('error' in who) return page(PATREON_PAGES.down, 502);
-          // NOTHING IS WRITTEN HERE. The page names the game account the state did, and the yes carries a sealed ticket -
-          // so a link somebody else started is read by the patron before it can be finished.
-          const from = await db.prepare('SELECT handle FROM players WHERE patreon_user = ?1 AND id <> ?2').bind(who.user, player.id).first();
-          const ticket = await sealPatreon('ticket', { p: player.id, u: who.user, k: token.token, x: nowS + PATREON_TICKET_S }, env, { subtle, rand });
-          return patreonHtml(patreonConfirmPage({ handle: player.handle, name: who.name, titles: pledgeTitles(who.tiers, who.status, env), ticket, from: from?.handle ?? null }));
-        }
-        // /v1/patreon/confirm - the page's own form
-        if (request.method !== 'POST') return no('method', 405, origin);
-        const bytes = await readCapped(request, MAX_BODY_BYTES);
-        const ticket = await openPatreon('ticket', new URLSearchParams(bytes ? new TextDecoder().decode(bytes) : '').get('ticket'), env, { subtle, nowS });
-        if (!ticket || typeof ticket.k !== 'string') return page(PATREON_PAGES.expired, 400);
-        // THE YES WRITES WHAT PATREON SAYS NOW - asked again with the patron's own token, not what the page showed: a
-        // pledge cancelled between the page and the press holds nothing, and a yes pressed twice is Patreon asked twice.
-        const who = await patreonIdentity(outbound, ticket.k);
-        if ('error' in who) return page(PATREON_PAGES.down, 502);
-        if (who.user !== ticket.u) return page(PATREON_PAGES.expired, 400);   // the token answers for another Patreon account now
-        const r = await linkPatreon(ctx, { p: ticket.p, u: who.user, t: who.tiers.join(','), s: who.status });
-        if ('error' in r) return page(PATREON_PAGES.account, 403);
-        const row = await db.prepare('SELECT handle FROM players WHERE id = ?1').bind(ticket.p).first();
-        return patreonHtml(patreonLinkedPage({ handle: row?.handle ?? '', titles: pledgeTitles(who.tiers, who.status, env) }));
-      }
-
       // GRANT2: THE SPAWN GRANTS' MEASURE - a cell's window of asks,
       // posted by the relay and proven by its signature over the exact bytes (the chat feed's kind of door, grants.js)
       if (path === GRANT_FEED_PATH) {
@@ -1234,18 +1171,7 @@ const service = {
           account: { ...accountView(who.player, nowS), duels: await duelRecordOf(ctx, who.player.id), gates: await gateRecordOf(ctx, who.player.id), raids: await raidRecordOf(ctx, who.player.id), serpents: await serpentRecordOf(ctx, who.player.id), sds: await sdRecordOf(ctx, who.player.id), stars: await starRecordOf(ctx, who.player.id), renown: await renownTracksOf(ctx, who.player.id), marks: await marksCardOf(ctx, who.player, env) },
           wardrobe: { ...accountWardrobe(await withSeatTitles(ctx, who.player, env), env, nowS), purse: await insigniaPurse(ctx, who.player) },   // SEAT1c: and a Charter's titles   // WB9g: and what the account's closed gates could still pay the Broker's insignia
           devices: await devicesOf(ctx, who.player.id),
-          // PATREON-LINK: the card's Patreon row - whether linking is on, whether this account is linked, the titles its
-          // pledge holds, and the link to follow (a state sealed for this account, under the origin that served this)
-          patreon: await patreonCardOf(who.player, env, { subtle, rand, nowS, origin: url.origin }),
         }, 200, origin);
-      }
-
-      if (path === '/v1/patreon/unlink' && request.method === 'POST') {
-        // PATREON-LINK: the account's Patreon taken off it, and nothing about the pledge kept. The answer is the wardrobe
-        // after it (an equip's shape - a title the pledge held is no longer held, nor worn) and the card's row.
-        await unlinkPatreon(ctx, who.player.id);
-        const after = { ...(await withSeatTitles(ctx, who.player, env)), patreon_user: null, patreon_tiers: null, patreon_status: null, patreon_at: null };   // AUDIT SEATS-3 E2: a Charter's titles still held
-        return json({ ok: true, ...accountWardrobe(after, env, nowS), patreon: await patreonCardOf(after, env, { subtle, rand, nowS, origin: url.origin }) }, 200, origin);
       }
 
       if (path === '/v1/duel/loss' && request.method === 'POST') {

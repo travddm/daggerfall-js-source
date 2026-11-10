@@ -16,12 +16,8 @@
 //   DEV       the same role as the Developer title.
 //   DUNGEON MASTER, DISCIPLE, APOSTLE, HIEROPHANT (TITLE-N, 2026-09-24)
 //             your handle is in that title's own list in the config;
-//             each list grants the title AND its glyph. PATREON-LINK
-//             or, for the three Patreon tiers, the Patreon
-//             account you linked is an active patron entitled to that
-//             tier now (patreon.js) - Patreon's word, stored as WB9g's
-//             sale is, and read against the config at every ask.
-//   HERALD (HERALD, 2026-10-01) the same, and the Patreon tier's.
+//             each list grants the title AND its glyph.
+//   HERALD (HERALD, 2026-10-01) the same.
 //   GRAND CHAMPION, ARENA CHAMPION and THE LAUREL (ARENA4, 2026-10-02)
 //             the arena's rows (server-account/src/arena.js): a Grand
 //             Champion row the relay signed; the season's #1 of the
@@ -68,7 +64,6 @@
 
 import { TITLES, GLYPHS, AURAS, ICONS, SEAT_TITLES, CHAPTER_TITLES } from '../../src/net/identityToken.js';
 import { insigniaHeld, insigniaKeys } from '../../src/net/insignia.js';   // WB9g: the Broker's insignia - a title and an aura bought
-import { patreonTitlesOf } from './patreon.js';   // PATREON-LINK: a Patreon tier's title, held by the pledge
 import { SD_HONOUR_TITLE, SD_HONOUR_AURA } from './sds.js';   // SD9b: the Hour's grants on the row
 import { SERPENT_HONOUR_TITLE, SERPENT_HONOUR_AURA } from './serpents.js';   // SERPENT5: the Old Coil's grants on the row
 import { LAMP_TITLE } from './lamp.js';   // LAMP-KEEPER II: I Love Lamp on the row
@@ -108,14 +103,12 @@ export function handleList(raw) {
  * "Dungeon Master is an orange title with its own glyph. This title
  * allows the user to use the /dm to message chat with orange text
  * (similar to /red). This goes strictly to the account SquidKamer" -
- * and "Disciple, Apostle, Hierophant are new patreon titles. These also
- * recieve their own unique glyphs. The account Dutchess will recieve
- * the Disciple title/glyph".
+ * and Disciple, Apostle and Hierophant, each with a glyph of its own.
  *
  * Each is a HANDLE LIST IN CONFIG, the developers' own law and for the
  * developers' reason: granting one is a reviewed, deployed edit, never
- * a reach into the live database - and a Patreon tier that lapses is a
- * handle taken off a list, gone from that player's next token. The
+ * a reach into the live database - and a handle taken off a list is
+ * gone from that player's next token. The
  * title is HELD and may be worn; the glyph beside it is TRUE, and so
  * is the Dungeon Master's /dm: the relay reads that right off the `dm`
  * glyph in the signed token, as /red reads `dev`.
@@ -125,8 +118,7 @@ export const TIER_LISTS = Object.freeze({
   disciple: 'DISCIPLE_HANDLES',
   apostle: 'APOSTLE_HANDLES',
   hierophant: 'HIEROPHANT_HANDLES',
-  // The Patreon tier between Disciple and Hierophant. Held by its pledge (PATREON_TIERS) like the tiers before it, and
-  // by this list for a handle the owners name.
+  // Between Disciple and Hierophant, held by this list for a handle the owners name.
   herald: 'HERALD_HANDLES',
 });
 /** The glyph each of those titles carries, in the vocabulary's words. */
@@ -143,13 +135,11 @@ export const TIER_AURA = Object.freeze({});
  *  next token's glyphs all read it at once. @param {any} player */
 export const staffSuspended = (player) => player?.staff_suspended === 1;
 
-/** Does this player hold that list's title? A guest holds none, for the developer's reason. PATREON-LINK: AND a Patreon tier's title is held
- *  by the pledge too - the account's linked Patreon membership, read against PATREON_TIERS (patreon.js) - so a patron
- *  needs no line here, and the lists stay for the titles Mac grants by name. */
+/** Does this player hold that list's title? A guest holds none, for the developer's reason. */
 export const holdsTier = (title, player, env) =>
   typeof player?.handle === 'string' && !!player.handle && Object.hasOwn(TIER_LISTS, title)
   && !(staffSuspended(player) && STAFF_GLYPHS.includes(TIER_GLYPH[/** @type {keyof typeof TIER_GLYPH} */ (title)]))
-  && (handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase()) || patreonTitlesOf(player, env).includes(title));
+  && handleList(env?.[TIER_LISTS[title]]).has(player.handle.toLowerCase());
 
 /** STAFF-ROLES-BY-ACCOUNT: is this player an Admin (a developer)? The ROLE IS THE ACCOUNT'S (`staff_admin`, migration 0002),
  *  never a name's: a handle that a former staff member held grants nothing to whoever registers it. Read off the row at every

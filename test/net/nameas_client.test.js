@@ -157,7 +157,7 @@ function cardDoc() {
 test('NAME-AS the card: the Account section draws the name-in-game toggle - both choices, the chosen one pressed and worn, a press asking the flow - and one line saying what others see, the account\'s name by name; busy, neither presses; a service from before NAME-AS draws none (mutants: the toggle unwired; the pressed state inverted; drawn for an old service)', () => {
   const draw = (account, busy = false) => {
     const asked = [];
-    const flow = { stage: 'in', account, wardrobe: null, patreon: null, busy, error: '', note: '', values: {}, agreed: {}, chooseName: (as) => { asked.push(as); return Promise.resolve(true); } };
+    const flow = { stage: 'in', account, wardrobe: null, busy, error: '', note: '', values: {}, agreed: {}, chooseName: (as) => { asked.push(as); return Promise.resolve(true); } };
     const card = accountCard(cardDoc(), /** @type {any} */ (flow));
     card.paint();
     const box = card.root.all.find((n) => String(n.className).split(/\s+/).includes('acctnameas'));

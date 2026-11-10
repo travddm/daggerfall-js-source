@@ -1476,7 +1476,6 @@
  "test/scenes/partyrest1.test.js": 602,
  "test/systems/party/partytravel.test.js": 1121,
  "test/systems/passivespecials.test.js": 864,
- "test/server/patreon_link.test.js": 3568,
  "test/systems/pausewindow.test.js": 1014,
  "test/systems/pcaao.test.js": 926,
  "test/net/pcorpse1.test.js": 864,

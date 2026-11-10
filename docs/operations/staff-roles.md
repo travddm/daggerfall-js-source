@@ -50,6 +50,7 @@ held the sign-in key is removed (decision 122), and no Owner key is configured. 
 
 - A role taken off applies on the account's next request and the next token. A banned or cut account holds no role
   while the ban or cut stands.
-- The remaining `*_HANDLES` vars (`HOURS_FIRST_HANDLES`, `DUNGEON_MASTER_HANDLES`, the Patreon tier
-  lists) grant honorary **titles** and glyphs, not staff rights.
+- The remaining `*_HANDLES` vars (`HOURS_FIRST_HANDLES`, `DUNGEON_MASTER_HANDLES`, and the
+  `DISCIPLE_HANDLES`, `APOSTLE_HANDLES`, `HERALD_HANDLES` and `HIEROPHANT_HANDLES` lists) grant honorary **titles**
+  and glyphs, not staff rights.
 - The staff audit log (`staff_audit`) records `admin-add`, `admin-remove`, `mod-add` and `mod-remove`.

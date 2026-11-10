@@ -175,13 +175,9 @@ HOURS_FIRST_HANDLES = "aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDee
 # off the `dm` glyph in the signed token, as /red reads `dev`). "This
 # goes strictly to the account SquidKamer."
 DUNGEON_MASTER_HANDLES = "SquidKamer"
-# TITLE-N: the three Patreon tiers, lowest first - each list grants its
-# title and its glyph. Dutchess and Satranath are the first Disciples (Mac); a tier that
-# lapses is a handle taken off, gone from that player's next token.
-# PATREON-LINK (2026-10-01): a patron no longer needs a line here - they
-# link their own Patreon from the account card, and PATREON_TIERS below
-# grants the tier their pledge pays for. These lists stay for the titles
-# Mac grants by name (a comp, a patron who will not link).
+# Disciple, Apostle and Hierophant, lowest first - each list grants its
+# title and its glyph. Dutchess and Satranath are the first Disciples (Mac); a handle
+# taken off is gone from that player's next token.
 # 2026-09-26, Mac: "Grant Flylighter the disciple title/glyph".
 # 2026-09-29, Mac: "Add valenvalarys as a disciple ingame".
 DISCIPLE_HANDLES = "Dutchess,Satranath,Skibbster,Flylighter,valenvalarys"
@@ -265,40 +261,10 @@ SEASON_ZERO_WEEK = "2"
 DOMAINS_WEEK = "6"
 # HERALD (2026-10-01, Mac: "Herald doesnt exist ingame yet" - "you'll need
 # to develop the herald title/glyph"): Herald - the azure title and the
-# herald's trumpet with its banner beside the name, the Patreon tier
-# between Disciple and Hierophant. Its patrons hold it by their pledge
-# (PATREON_TIERS below); a handle here grants the title and the glyph by
-# name, as every list above does. Empty: nobody by name yet.
+# herald's trumpet with its banner beside the name, between Disciple and
+# Hierophant. A handle here grants the title and the glyph by name, as
+# every list above does. Empty: nobody by name yet.
 HERALD_HANDLES = ""
-# PATREON-LINK (2026-10-01, Mac: "With patron and having to manually hand
-# out titles. Im running into a workflow where its really hard to keep up
-# with it"; asked, "Patreon auto-link"): A PATRON'S TITLE FOLLOWS THEIR
-# PLEDGE. A registered player presses Link Patreon on the account card,
-# and the tier their pledge pays for is a title they hold - upgraded,
-# downgraded and lapsed by Patreon's webhook (server-account/src/patreon.js).
-#
-# PATREON_CLIENT_ID is the Patreon API client's id - not a secret (it is in
-# every authorize URL). Mac's client (2026-10-01). The card offers no link
-# until the deploy has put the client's secret beside it - empty here is
-# off too. The two secrets are NOT here and must never be: the deploy puts
-# PATREON_CLIENT_SECRET and PATREON_WEBHOOK_SECRET from the repository's
-# own secrets (.github/workflows/account-deploy.yml), as it puts the keys.
-PATREON_CLIENT_ID = "xyF8_xJg78YwVgT0xRhs6uhPVeAdOzJu7_dcpaGqvqH-5DNdbLp-gugahtfgH-Ui"
-# Which Patreon tier grants which title: "<tier id>:<title>", comma-
-# separated, the titles disciple, apostle, herald and hierophant. A tier's id is
-# the number in its Join link on the Patreon page (`rid=`). A tier not
-# listed grants nothing; changing a line here moves every patron of that
-# tier on their next token, with nothing walked.
-# Mac's tiers (2026-10-01: "some titles dont have titles/glyphs ingame.
-# Heriophant is custom and Herald doesnt exist ingame yet. Supporter doesnt
-# recieve a title/glyph"): Disciple (29666211) is mapped, and Herald
-# (29666234) since HERALD gave it its title in the game. Supporter
-# (29701293) holds none.
-# HIEROPHANT-TIER (2026-10-17, Mac: "The $50 patreon tier doesnt have a
-# title/glyph ingame. The Heirophant"): Hierophant (29666221) is mapped
-# too - its pledge holds TITLE-N's Hierophant, the rose title and the
-# crown. A title made for one patron is still granted by name, beside it.
-PATREON_TIERS = "29666211:disciple,29666234:herald,29666221:hierophant"
 
 [[d1_databases]]
 binding = "DB"
