@@ -47,10 +47,13 @@ There are three clocks online:
 | Clock | Function | Behaviour |
 | --- | --- | --- |
 | Event (world) clock | `worldMinutes()` | Wall-time function at 12x. Nobody can move it. |
-| Sky clock | `skyMinutes()` | Faster rate from `SKY_SEGMENTS` in `src/net/skyLaw.js` (24x: a day every real hour). |
+| Sky clock | `skyMinutes()` | The event clock, as Daggerfall Unity has one clock. A server profile can give the sky its own faster rate (`time.skyClock`: `SKY_SEGMENTS` in `src/net/skyLaw.js`, 24x, a day every real hour). |
 | Own clock | `ownMinutes()` | Per character, saved. Runs with the world in play, runs ahead on rests and raises, stands while away or dead. |
 
 Offline all three are the same counter.
+
+With the sky clock off (the default), the Starfall still falls on its own hourly nights (`src/net/starfall/starfallLaw.js`,
+the relay's wall-clock law), which then do not match the sky's nights.
 
 - `setWorldMinutes` and `advanceWorldMinutes` do nothing online and return the shared time. A caller that expects the
   clock to move sees no error.

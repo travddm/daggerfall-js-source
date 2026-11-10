@@ -118,7 +118,7 @@ import {
 } from '../../systems/settings/settings.js';
 import { mostRecentRestorable, restorableSaves, firstRestorable, deleteSave, QUICK_SAVE_NAME, loadSlot, saveSlot } from '../../systems/save/saveSlots.js';
 import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E: Copy to offline changes lanes
-import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
+import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes, skyHasOwnClock } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
 import {
   realmIo, realmList, realmDelete, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
   sweepUnsent,
@@ -490,7 +490,7 @@ export function skyDayWords(nowMs = Date.now(), localTime = (ms) => new Date(ms)
   const at = (m) => { const v = ((m % 60) + 60) % 60; return `:${String(Math.floor(v)).padStart(2, '0')}${v % 1 ? ':30' : ''}`; };
   // L10N4: one sentence, one pattern - the midnight's two shapes are a select inside it, never a glued fragment
   const day = { onHour: m0 === 0 ? 'yes' : 'no', midnight: at(m0), dusk: at(m0 + 45) };
-  return nowMs >= turn
+  return !skyHasOwnClock() ? t('menu.online.oneClockDay', 'A day in the world is two hours of real time.') : nowMs >= turn   // one clock, as in DFU (time.skyClock)
     ? t('menu.online.skyDay', 'A day in the world is an hour of real time: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', day)
     : t('menu.online.skyDayUntil', 'A day in the world is two hours of real time until {turn}; from then on it is an hour: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', { ...day, turn: localTime(turn) });
 }

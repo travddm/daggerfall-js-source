@@ -2,6 +2,7 @@
 // sky's own dark, the spot, the waves, the light, the owner, the encounter clock, the ledger's machine and the receipt.
 // Every number below is the law's own; each pin is held to fail under a one-character change of the law it names
 // (tools/mutants/star1.json).
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { webcrypto } from 'node:crypto';
@@ -37,7 +38,8 @@ test('STAR1 THE NIGHT: three stars a night, the sky\'s 18:00, 21:00 and midnight
   assert.deepEqual(t, { omenAt: N0 * STAR_HOUR_MS - 90_000, streakAt: N0 * STAR_HOUR_MS - 8_000, fallAt: N0 * STAR_HOUR_MS, endAt: N0 * STAR_HOUR_MS + 900_000, goneAt: N0 * STAR_HOUR_MS + 900_000 + STAR_AFTER_MS });
 });
 
-test('STAR1 THE SKY\'S DARK: over a year of nights inside and around the window, every star lands in the sky\'s night and its deadline is no later than the sky\'s dawn - read off net/skyLaw.js itself, which the relay never imports (mutants: a fall at the sky\'s noon)', () => {
+test('STAR1 THE SKY\'S DARK: over a year of nights inside and around the window, every star lands in the sky\'s night and its deadline is no later than the sky\'s dawn - read off net/skyLaw.js itself, which the relay never imports (mutants: a fall at the sky\'s noon)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const first = Math.ceil(Date.UTC(2026, 9, 4) / STAR_HOUR_MS);
   for (let n = first; n < first + 24 * 365; n += 7) {
     for (let k = 0; k < STAR_PER_NIGHT; k++) {
