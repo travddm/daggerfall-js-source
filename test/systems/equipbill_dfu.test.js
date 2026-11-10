@@ -1,8 +1,8 @@
-// EQUIP-BILL: by default a Cast-When-Held piece pays DFU's bill at every equip that is not a
+// By default a Cast-When-Held piece pays DFU's bill at every equip that is not a
 // recast - the held spell's whole classic casting cost in condition - and a bill past what it has left breaks it
 // (CastWhenHeld.cs InstantiateSpellBundle: `if (!recast) sourceItem.LowerCondition(amount, ...)`). A Legendary pays too,
 // and a re-wear inside six hours pays again. The port's earlier laws are two options, off here; their own behaviour is
-// held by fb1009f.test.js (HELD-REWEAR) and fb1011b_legendheld.test.js (LEGEND-HELD).
+// held by fb1009f.test.js (the gentleEquipBill option) and fb1011b_legendheld.test.js (the legendaryEquipFree option).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ENCHANTMENT_TYPES as T, setDefaultEnchantCtx, REROLL_MINIMUM_HOURS } from '../../src/systems/enchantments.js';
@@ -72,7 +72,7 @@ function withClock(fn) {
   }
 }
 
-test('EQUIP-BILL: by default every equip pays the whole casting cost - a re-wear inside the six hours pays again', () =>
+test('By default every equip pays the whole casting cost - a re-wear inside the six hours pays again', () =>
   withClock((clock) => {
     assert.deepEqual(
       [getPref(GENTLE_EQUIP_BILL_PREF), getPref(LEGENDARY_EQUIP_FREE_PREF)],
@@ -90,7 +90,7 @@ test('EQUIP-BILL: by default every equip pays the whole casting cost - a re-wear
     assert.equal(a.currentCondition, 800 - 2 * COST, 'DFU has no fresh-wear exemption');
   }));
 
-test('EQUIP-BILL: by default a bill past what is left breaks the piece on the way on - it says so, comes off and is lost', () =>
+test('By default a bill past what is left breaks the piece on the way on - it says so, comes off and is lost', () =>
   withClock((_clock, said) => {
     const a = amulet(COST - 1);
     const w = wearer([a]);
@@ -104,14 +104,14 @@ test('EQUIP-BILL: by default a bill past what is left breaks the piece on the wa
     );
   }));
 
-test('EQUIP-BILL: by default a Legendary pays like any other piece', () =>
+test('By default a Legendary pays like any other piece', () =>
   withClock(() => {
     const a = amulet(800, { rarity: 'legendary' });
     equipItem(wearer([a]), a);
     assert.equal(a.currentCondition, 800 - COST);
   }));
 
-test("EQUIP-BILL: both rows are off by default and the room's, and the official profile pins both off", () => {
+test("Both rows are off by default and the room's, and the official profile pins both off", () => {
   for (const [id, key] of [
     ['gentle-equip-bill', GENTLE_EQUIP_BILL_PREF],
     ['legendary-equip-free', LEGENDARY_EQUIP_FREE_PREF],

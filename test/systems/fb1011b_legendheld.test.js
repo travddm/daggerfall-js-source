@@ -26,7 +26,7 @@ const wearer = (items) => ({ name: 'W', isPlayer: true, health: 20, maxHealth: 3
 const AEGIS = LEGENDARIES.find((r) => r.id === 'aegis-of-dawn');
 /** The ladder's Aegis of Dawn on a leather Buckler, as a drop mints it. */
 const aegis = () => applyRarity(mintCondition(setItemFields({ group: 'Armor', templateIndex: BUCKLER, material: 0 })), 'legendary', seededRng(7), [AEGIS]);
-// LEGEND-HELD and HELD-REWEAR are options (EQUIP-BILL), both on here; DFU's default is test/systems/equipbill_dfu.test.js.
+// legendaryEquipFree and gentleEquipBill are options, both on here; DFU's default is test/systems/equipbill_dfu.test.js.
 function withClock(fn) {
   const clock = { now: 100_000 };
   setDefaultEnchantCtx({ spellsByIndex: () => new Map([[AEGIS.enchantment.param, spell(AEGIS.enchantment.param)], [4, spell(4)]]), now: () => clock.now });

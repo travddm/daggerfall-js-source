@@ -18,7 +18,7 @@ import { GENTLE_EQUIP_BILL_PREF } from '../../src/systems/equipBill.js';
 const rec = { index: 4, name: 'Fortify', rangeType: 0, effects: [{ type: 9, subType: 0, durationBase: 3, durationMod: 0, durationPerLevel: 1, chanceBase: 0, chanceMod: 0, chancePerLevel: 1, magnitudeBaseLow: 5, magnitudeBaseHigh: 5, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1 }, { type: -1 }, { type: -1 }] };
 const amulet = (cond) => ({ name: 'Amulet', templateIndex: 133, group: ITEM_GROUPS.Jewellery, currentCondition: cond, maxCondition: 800, enchantments: [{ type: T.CastWhenHeld, param: 4 }] });
 const wearer = (items) => ({ name: 'W', isPlayer: true, health: 20, maxHealth: 30, items, level: 5, stats: {}, skills: 40, career: {} });
-// HELD-REWEAR is the gentleEquipBill option (EQUIP-BILL); DFU's default bill is test/systems/equipbill_dfu.test.js.
+// The gentleEquipBill option keeps the port's re-wear rule; DFU's default bill is test/systems/equipbill_dfu.test.js.
 function withClock(fn) {
   const clock = { now: 100_000 };
   setDefaultEnchantCtx({ spellsByIndex: () => new Map([[4, rec]]), now: () => clock.now });

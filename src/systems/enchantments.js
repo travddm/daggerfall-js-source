@@ -67,7 +67,7 @@ import { ITEM_TEMPLATES, templateByIndex, mendOrder, mintCondition, TRANSPORT_HO
 import { WEAPONS } from '../characters/weapons.js';   // MEND-WORN / MEND-ARMOUR: a tick is the classic Dagger's share
 import { repoolWeapon } from './conditionRepair.js';   // MEND-WORN: a weapon on its row's pool moves before a mend on the pool, as before a wear
 import { creditOwnMend } from './item/foundMark.js';   // MEND-THIRD: the ring's mend credited past a found piece's mark
-import { legendaryEquipFree, gentleEquipBill } from './equipBill.js';   // EQUIP-BILL: DFU's bill by default, the port's two laws as options
+import { legendaryEquipFree, gentleEquipBill } from './equipBill.js';   // DFU's bill by default, the port's two laws as options
 import { stampedTier } from './rarityTier.js';   // RPT1026-ITEMS RARE-KEPT: a laddered piece breaks and stays (RARE-BREAK1's law), a leaf
 export { ENCHANTMENT_TYPES };
 
@@ -303,13 +303,13 @@ export function assignHeldSpell(record, entity, item, { ctx = null, nowMinutes =
   item.timeEffectsLastRerolled = nowMinutes;
 }
 
-/** EQUIP-BILL: DFU bills a Cast-When-Held spell's whole casting cost in condition at EVERY equip
+/** DFU bills a Cast-When-Held spell's whole casting cost in condition at EVERY equip
  *  (CastWhenHeld.cs InstantiateSpellBundle), and a bill past what the piece has left breaks it. That is the default.
  *  Two options keep the port's earlier laws (systems/equipBill.js):
- *  - `gentleEquipBill` (HELD-REWEAR: a piece swapped on and off was spent by the swapping):
+ *  - `gentleEquipBill` (a piece swapped on and off was spent by the swapping):
  *    (1) a piece re-worn within REROLL_MINIMUM_HOURS of its spell's last casting (`timeEffectsLastRerolled`) pays
  *    nothing, and (2) the bill stops at 1 condition, so wear while worn is what ends it.
- *  - `legendaryEquipFree` (LEGEND-HELD: the Aegis of Dawn cost a leather buckler a third of
+ *  - `legendaryEquipFree` (the Aegis of Dawn cost a leather buckler a third of
  *    its life): (3) a Legendary's equip bills nothing. */
 /** (1) Whether a re-wear is still fresh. Pure: the caller asks it only with `gentleEquipBill` on. */
 export function heldEquipIsFree(item, nowMinutes) {
@@ -323,7 +323,7 @@ export function heldEquipIsFree(item, nowMinutes) {
 export function heldEquipBill(item, cost, { legendaryFree = legendaryEquipFree(), neverBreaks = gentleEquipBill() } = {}) {
   // the condition lowerCondition will lower: minted, and a weapon on its row's pool moved to the one pool first
   if (item && Object.isExtensible(item)) { mintCondition(item); repoolWeapon(item); }
-  if (legendaryFree && item?.rarity === 'legendary') return 0;   // LEGEND-HELD
+  if (legendaryFree && item?.rarity === 'legendary') return 0;
   if (!neverBreaks) return Math.max(0, cost);
   const left = Number.isFinite(item?.currentCondition) ? item.currentCondition : Infinity;
   return Math.max(0, Math.min(cost, left - 1));
@@ -1123,7 +1123,7 @@ setEnchantmentHooks({
   onItemEquipped: (entity, item) => {
     if (!isEnchantedItem(item)) return;
     const nowMinutes = mergeCtx(null)?.now?.() ?? 0;
-    // HELD-REWEAR (the gentleEquipBill option): decided ONCE for the piece, before its first held power restamps the
+    // The gentleEquipBill option: decided ONCE for the piece, before its first held power restamps the
     // clock - an item with two Cast-When-Held powers is billed for both or for neither
     const ctx = gentleEquipBill() && heldEquipIsFree(item, nowMinutes) ? { heldEquipFree: true } : null;
     doItemEnchantmentPayloads(PAYLOAD.Equipped | PAYLOAD.Held, item, { entity, nowMinutes, ctx });

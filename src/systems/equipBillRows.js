@@ -1,5 +1,5 @@
 // @ts-check
-// EQUIP-BILL: the two Features rows over what putting on a Cast-When-Held piece costs (systems/equipBill.js reads their
+// The two Features rows over what putting on a Cast-When-Held piece costs (systems/equipBill.js reads their
 // prefs). Off is DFU's: the held spell's whole casting cost in condition at every equip, and it can break the piece.
 // Online the room's answers are the server profile's. Their own file keeps systems/features.js from growing.
 import { t } from './textManager.js';
