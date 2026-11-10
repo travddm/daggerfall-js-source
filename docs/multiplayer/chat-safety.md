@@ -104,5 +104,3 @@ retried: the database row is the truth, and the next token the player mints carr
 - Daily call cap `MOD_AI_DAILY_MAX`, with a share kept for reports.
 
 The account deploy writes `ANTHROPIC_API_KEY` from the repository secrets to the Worker.
-
-
