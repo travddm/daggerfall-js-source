@@ -5,7 +5,7 @@
 // A shop's keeper stands as a lamp now and then (src/systems/lampKeeper.js - the room's own pick, every client's), and
 // the account that speaks to one is granted I Love Lamp: `players.lamp_title`, laid once and held for
 // good, read off the row by titles.js titlesHeld as Hourbreaker is read off `sd_honours`. A guest - no handle - holds
-// no title (FOUNDER's law), so its word is answered `guest` and nothing is written.
+// no title (titles.js titlesHeld), so its word is answered `guest` and nothing is written.
 //
 // TRUSTED AS SPOKEN: no relay sees an interior's people, so nothing signs the meeting - the claim is the account's own
 // word, as a novelty title's may be (it buys nothing and opens nothing). Rate-limited with every act (index.js).

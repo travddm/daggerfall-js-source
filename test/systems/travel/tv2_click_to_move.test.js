@@ -434,7 +434,7 @@ test('TV2 journey: the mod\'s stops still stop it (a foe near: boxed); interrupt
   const o = mapPixelWorldOrigin(503, 250);
   assert.equal(r.to.state.autopilot.destinationWorldRect.xMin, o.x + MID_LO);
   r.to.beginTravel({ pixel: { x: 520, y: 250 }, name: 'Daggerfall', mapId: 7 });
-  assert.equal(r.to.route, null, 'the mod\'s journey replaces the view\'s');
+  assert.deepEqual([r.to.route?.legs, r.to.route?.summary?.name], [[], 'Daggerfall'], 'the mod\'s journey replaces the view\'s: no road legs, bound for its own place');
   r.to.clearTravelDestination();
   assert.equal(r.to.beginTravelAlongRoute({ legs: [] }), false, 'no end, no journey');
 });
@@ -545,7 +545,7 @@ test('TV2 host wiring: the click is a ray from the VIEW\'s eye through this fram
   // AUDIT TV A5: a town's grown rect asked across the 3x3 about the hit
   assert.match(w, /for \(let dy = -1; dy <= 1; dy\+\+\) \{\n\s*for \(let dx = -1; dx <= 1; dx\+\+\) \{\n\s*const summary = tvPlaceSummary\(pix\.x \+ dx, pix\.y \+ dy\);/);
   assert.match(w, /let legs = tvJoinedLegs\(from, plan, roads, door \|\| water \? null : n\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(!legs\.length && seaAsk\?\.goal === 'sea'\) \{ legs = \[\{ x: pix\.x, y: pix\.y, kind: 'sea' \}\]; plan = \{ \.\.\.plan, kinds: \['sea'\] \}; \}\n(\s*if \(door\) n = [^\n]*\n)?\s*const ok = travelOptions\.beginTravelAlongRoute\(\{ legs, point: \{ pixel: pix, x: n\.x, z: n\.z, door \}, name: TRAVEL_VIEW_TEXT\.spot \}, tvCautious\(\), \{ quiet: tvQuiet \}\)/);
-  for (const dep of [/onPick: \(x, y, e\) => onTravelViewPick\(x, y, e\),/, /onMark: \(key, e\) => staffView\.mark\(key\) \|\| onTravelViewMark\(key, e\),/, /marks: \(\) => staffView\.marks\(travelViewMarks\(\)\),/, /route: travelViewRoute,/, /trip: \(\) => \(tvWalking \? TRAVEL_VIEW_TEXT\.travelling\(tvWalking, tvHeld\) : tvTripLive\(\) \? tvTrip\.line : ''\),/]) assert.match(w, dep);
+  for (const dep of [/onPick: \(x, y, e\) => onTravelViewPick\(x, y, e\),/, /onMark: \(key, e\) => onTravelViewMark\(key, e\),/, /marks: \(\) => travelViewMarks\(\),/, /route: travelViewRoute,/, /trip: \(\) => \(tvWalking \? TRAVEL_VIEW_TEXT\.travelling\(tvWalking, tvHeld\) : tvTripLive\(\) \? tvTrip\.line : ''\),/]) assert.match(w, dep);
 });
 
 test('TV2 host wiring: THE CAP - governed before the frame reads the travel scale, only while the view is up over a running journey, over the pixels the view can reach; handed back whole when either ends; the panel told', () => {
