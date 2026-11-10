@@ -23,6 +23,8 @@ touched code are in [coding-standards.md](coding-standards.md).
   traps. Leave out history: git holds it.
 - Name files by path and functions by name. Do not cite line numbers.
 - Keep a page under about 250 lines. Add a page to its folder's `README.md` when you add it.
+- [contributing-docs.md](contributing-docs.md) says which kind of statement goes where and when a change must update a
+  page.
 
 ## Scope
 
@@ -55,7 +57,10 @@ Until the mod manifests exist, a departure is a row in `src/systems/features.js`
 
 ## Code comments
 
+- Comments are the exception. Prefer names and small functions that say what the code does.
 - A comment says why: the reason, an invariant, a workaround, a constraint the code cannot show. The code says what.
+- A comment stays true when the implementation changes and the intent does not. If a refactor would make it false, it
+  describes the how, and the how belongs in the code.
 - Write plain sentences. Do not write ALL-CAPS headlines, quotes of people, dates with names, version histories,
   slice or audit tags, or notes about where code used to be. Git holds history.
 - Do not cite documents by line number. Name a file and a function.

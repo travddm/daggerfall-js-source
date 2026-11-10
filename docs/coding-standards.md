@@ -20,6 +20,11 @@ later mechanical pass renames and reformats them. Do not rename or reformat a fi
 (`tools/check-changed.mjs`). They never touch a file you did not change. CI runs the same three checks on a pull
 request's changed files (the `standards` job in `.github/workflows/check.yml`).
 
+`npm run comment-refs` (`tools/comment-refs.ts`) checks the comments that your branch adds. It fails an added comment
+line that cites a decision (`decision 104`), a pull request (`PR 130`, `#64`), an `AUDIT` tag or an upper-case item tag
+(`SAFE8`, `LOOT-GATE`, `P2.2b`), unless the same change removes a line that carries that tag. Old tags on lines you edit
+or move pass; the fix for a failure is the reason in words, or no comment. Vendored code is skipped.
+
 The lint size ratchet (limits on file size, complexity and unused code that may only go down) is described in the
 lint-ratchet page of [testing/](testing/README.md) once that page has merged.
 
@@ -65,7 +70,7 @@ commit of its own and say so in the pull request.
 ## Comments
 
 The rules are in [README.md](README.md#code-comments): a comment says why, in plain sentences, and carries no quotes of
-people, slice or audit tags, or dates with names. Write the prose of a comment as [technical writing](#documentation)
+people, decision, pull request, slice or audit tags, or dates with names. Write the prose of a comment as [technical writing](#documentation)
 asks. Do not duplicate those rules here. What they leave open, such as comments that a test or tool reads, is in
 [.claude/rules/comments.md](../.claude/rules/comments.md).
 
