@@ -6,6 +6,7 @@ import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
 import { profileKeyOf, profileRuleErrors, resolveRules, type ProfileValue } from '../../net/profile/profileKeys.ts';
 import { pageHas } from '../pageQuery.js';
 import { t } from '../textManager.js';
+import { setSkyClockRule } from '../../net/skyLaw.js';
 
 export type ProfilePins = {
   readonly prefs: Readonly<Record<string, boolean | string>>;
@@ -94,6 +95,17 @@ export function rule(name: string, search?: string): ProfileValue | undefined {
   if (pageHas('online', search ?? globalThis.location?.search ?? '')) return OFFICIAL_RULES[name];
   return typeof key.offline === 'object' ? undefined : key.offline;
 }
+
+/**
+ * A rule's online value whatever this page's own query: the installed profile's, else the official profile's. For a law
+ * that is handed `online` itself, as the trade prices are (systems/shopStock.js calculateTradePrice).
+ */
+export function onlineRule(name: string): ProfileValue | undefined {
+  return rule(name, '?online');
+}
+
+// The sky's own clock is this page's profile's to say (net/skyLaw.js time.skyClock), installed or the official one.
+setSkyClockRule(() => onlineRule('time.skyClock') === true);
 
 /** Tests: nothing installed. */
 export function _resetProfileForTests(): void {

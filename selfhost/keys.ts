@@ -1,5 +1,5 @@
 // Writes the self-host's secrets into `selfhost/.env` (git-ignored): an identity signing pair, a gate receipt pair
-// (both from the tools the account deploy mints with), and a cron door secret. A value already in the file is kept, so
+// (both from the tools the account deploy mints with), a cron door secret and an operator door secret. A value already in the file is kept, so
 // running it again never invalidates a token or a receipt in flight. No value is printed.
 //
 //   node selfhost/keys.ts [--env selfhost/.env]
@@ -43,6 +43,9 @@ if (!have.has('GATE_SIGNING_KEY')) {
 }
 if (!have.has('CRON_SECRET')) {
   add('CRON_SECRET', Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url'));
+}
+if (!have.has('OPERATOR_SECRET')) {
+  add('OPERATOR_SECRET', Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url'));
 }
 writeFileSync(values.env, `${lines.filter((l) => l !== '').join('\n')}\n`, { mode: 0o600 });
 console.log(added.length > 0 ? `added ${added.join(', ')} to ${values.env}` : `${values.env} already holds every key`);

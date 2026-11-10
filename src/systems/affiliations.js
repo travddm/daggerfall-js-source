@@ -13,6 +13,7 @@
 
 import { activeMemberships, GUILDS, getTitle } from './guild/guilds.js';
 import { reviewWarnings } from './guild/guildServiceFlow.js';   // AUDIT GUILD-WORDS L1-2: the review's warnings, as the hall says them
+import { promotesWithoutWait } from './guild/guild-rank-rule.ts';   // a probation ends sooner online only where a review skips the 28 days
 import { standingOwedOf } from './standingOwed.js';   // STANDING-WORDS: what the Roll still owes, online
 import { templeOf, orderOf } from './guild/guildVariants.js';
 import { getReputation } from './faction/factionRep.js';
@@ -62,7 +63,7 @@ export function affiliations(entity, { now = null, online = false } = {}) {
       factionId: guild.factionId,
       probation: !!membership.probation,   // REP6: on probation - the next review below -10 expels
       owed: standingOwedOf(guild.factionId),   // STANDING-WORDS
-      warnings: entity?.factionRep ? reviewWarnings(entity, guild, activeMemberships(entity), entity.factionRep, { now, online }) : [],
+      warnings: entity?.factionRep ? reviewWarnings(entity, guild, activeMemberships(entity), entity.factionRep, { now, online: online && promotesWithoutWait() }) : [],
     });
   }
   return out;

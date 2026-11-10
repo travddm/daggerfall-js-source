@@ -13,6 +13,7 @@
 //   - (AUDIT) A KEY A RECORD HOLDS TWICE never leaves it, by a route or a trade - one of the two is a copy; a peer's word
 //     never hands its reader a piece it carries (systems/peerWord.js notCarried); a key on another piece holds while it is
 //     carried, names its piece, and is no strike.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -426,7 +427,8 @@ test('AUTO-HOLD client (AUDIT): A PIECE THE REALM LOCKED STAYS WITH ITS HOLDER -
 /** A template the game binds by its nature (the Sigil Stone's - systems/item/itemBound.js SS1). */
 const lawTemplateIndexBound = () => { for (let i = 0; i < 4096; i++) if (lawTemplate(i)?.bound === true) return i; return -1; };
 
-test('AUTO-HOLD shelf: the room\'s word never lands back a piece its reader carries, nor one piece twice - and (AUDIT) a SHOP\'S SHELF never one it stowed, while a container (a rented room\'s chest, its stowage) still lands its own; a shelf never opened here too; a piece the ledger does not follow lands as it always did; every landing hands it the pack\'s keys', () => {
+test('AUTO-HOLD shelf: the room\'s word never lands back a piece its reader carries, nor one piece twice - and (AUDIT) a SHOP\'S SHELF never one it stowed, while a container (a rented room\'s chest, its stowage) still lands its own; a shelf never opened here too; a piece the ledger does not follow lands as it always did; every landing hands it the pack\'s keys', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const k = '7a7a7a7a7a7a7a7a', away = '6c6c6c6c6c6c6c6c';
   const wire = (it) => JSON.parse(JSON.stringify(it));
   const plain = createWeapon(113, 1, seeded(7));   // no tier: a piece the ledger does not follow

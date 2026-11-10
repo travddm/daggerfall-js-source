@@ -6,7 +6,7 @@
 //     way in, the sounding's cost - and twelve the day has inside, stood and left astir ten real minutes: the biggest
 //     crowd (people within CROWD_M of one another, chained), the nearest other, the distance from the way in.
 //
-// Usage: node tools/livingRoomProbe.mjs
+// Usage: node --import ./tools/raw-import-hooks.ts tools/livingRoomProbe.mjs
 import { synthTown, walledTown } from '../test/lwTown.mjs';
 import { tavernHall } from '../test/lwRoom.mjs';
 import { LivingTown } from '../src/systems/livingWorld/livingTown.js';
