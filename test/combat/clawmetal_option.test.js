@@ -1,4 +1,4 @@
-// CLAW-METAL: by default a werewolf's claws are DFU's bare hand. FormulaHelper.cs
+// By default a werewolf's claws are DFU's bare hand. FormulaHelper.cs
 // CalculateHandToHandAttackDamage reads no item, so Daedric gauntlets on the beast add nothing to a claw hit, in either
 // core, on the stats card or on a refereed lane's sheet. The port's gauntlet metal is the `clawMetal` option, pinned off
 // in the server profile. The option's own behaviour is held by test/systems/bal6_curses.test.js and auditclaws.test.js.
@@ -80,7 +80,7 @@ const withClawMetal = (on, fn) => {
   }
 };
 
-test("CLAW-METAL: by default the beast in Daedric gauntlets strikes with DFU's bare claws - both cores, the stats card and a refereed sheet add nothing", () => {
+test("By default the beast in Daedric gauntlets strikes with DFU's bare claws - both cores, the stats card and a refereed sheet add nothing", () => {
   assert.equal(getPref(CLAW_METAL_PREF), false, 'the option starts off');
   const daedric = beast(ARMOR_MATERIAL.Daedric),
     bare = beast();
@@ -91,7 +91,7 @@ test("CLAW-METAL: by default the beast in Daedric gauntlets strikes with DFU's b
   assert.equal(duelAttackerOf(daedric).cm, 0, 'a duel or siege sheet carries no metal');
 });
 
-test('CLAW-METAL: the option on gives the old +6 for Daedric, and off zeroes a stand-in that still carries a word', () => {
+test('The option on gives the old +6 for Daedric, and off zeroes a stand-in that still carries a word', () => {
   const daedric = beast(ARMOR_MATERIAL.Daedric),
     bare = beast();
   const [on, sheet] = withClawMetal(true, () => [blows(daedric), duelAttackerOf(daedric)]);
@@ -107,7 +107,7 @@ test('CLAW-METAL: the option on gives the old +6 for Daedric, and off zeroes a s
   assert.equal(clawMetalDamage(stub), 0, "off, the room's pin answers the stand-in too");
 });
 
-test("CLAW-METAL: the Features row is off by default and the room's, and the official profile pins it off", () => {
+test("The Features row is off by default and the room's, and the official profile pins it off", () => {
   const row = FEATURES.find((f) => f.id === 'claw-metal');
   assert.deepEqual([row.control.key, row.control.initial, row.control.online], [CLAW_METAL_PREF, false, 'room']);
   assert.equal(OFFICIAL_PROFILE.pins.prefs[CLAW_METAL_PREF], false);

@@ -1,5 +1,5 @@
 // @ts-check
-// CLAW-METAL: the Features row for whether a werewolf's claws take the metal of its gauntlets (combat/clawMetal.js reads
+// The Features row for whether a werewolf's claws take the metal of its gauntlets (combat/clawMetal.js reads
 // its pref). Off is DFU's: the beast's claws are the bare hand (FormulaHelper.cs CalculateHandToHandAttackDamage reads no
 // item). Online the room's answer is the server profile's. Its own file keeps systems/features.js from growing.
 import { t } from '../systems/textManager.js';

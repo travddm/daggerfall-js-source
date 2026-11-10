@@ -468,7 +468,7 @@ export function pcaaoBonusOrPenaltyByEnemyType(attacker, target, rolls) {
 
 /** CalculateHandToHandAttackDamage: the player rolls DFU's own
  *  min..max, adds the modifier and the mod's STRENGTH term; a monster's
- *  `damageModifier` IS its summed attack damage. BAL6-GAUNTLETS: with its
+ *  `damageModifier` IS its summed attack damage. Claw metal: with its
  *  option on, the beast's claws add its gauntlets' metal where a weapon's material
  *  modifier stands (after Strength, before the floor - combat/clawMetal.js).
  *  BAL10: AND THE PORT'S BLOW MODIFIERS for a player's fists - where the

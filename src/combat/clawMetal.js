@@ -1,4 +1,4 @@
-// BAL6-GAUNTLETS, CLAW-METAL: AN OPTION, OFF BY DEFAULT - THE BEAST'S CLAWS TAKE THE METAL ON ITS HANDS.
+// The werewolf's claws take the metal of its gauntlets only as an option, off by default.
 //
 // DFU's claws are the bare hand: CalculateHandToHandAttackDamage rolls the skill's span and adds the swing and Strength,
 // and reads no item. That is the default. The `clawMetal` pref (combat/clawMetalRow.js; online the server profile's pin)
