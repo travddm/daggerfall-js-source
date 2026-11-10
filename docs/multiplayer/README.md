@@ -16,7 +16,7 @@ The online game: the relay (`server/`), the wire protocol, the client's net laye
 - [account-data.md](account-data.md) - D1 migrations and tables, saves and realm characters, the Marks ledger,
   market, homes and decor, integrity checks.
 - [chat-safety.md](chat-safety.md) - a chat line's path, reports, sanctions, the AI reviewer, the Discord bot.
-- [staff-tools.md](staff-tools.md) - roles, the staff panel's service side, in-game commands, follow, freeze, hidden
+- [staff-tools.md](staff-tools.md) - roles, the staff service routes, in-game commands, follow, freeze, hidden
   mode, staff events, monitoring feeds.
 - [group-instances.md](group-instances.md) - how instances, Super Dungeons, and the arena run on the
   relay: hosts, leases, receipts and claims.
