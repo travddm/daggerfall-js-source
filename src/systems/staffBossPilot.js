@@ -4,8 +4,7 @@
 // every game hands me the raid's run. The boss takes my feet and facing; its own swings and casts are held, a left
 // click swings at the player nearest my facing and a right click opens its cast. My body draws as concealment 7 and
 // no foe senses it. It ends when the boss falls, the event ends, or at Leave boss. No relay, no account change.
-// Nothing in the game starts it: Play as boss was the staff panel extension's message, removed with the game's hook
-// (decision 122).
+// Nothing in the game starts it: Play as boss was the staff panel extension's message, removed with the game's hook.
 
 /** The oldest claim my word on the event says - the wire's bound (world/raidShared.js RAID_CLAIM_AGE_MAX). */
 export const PILOT_CLAIM_AGE = 7_200_000;

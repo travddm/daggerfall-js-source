@@ -113,7 +113,7 @@ test('STAFF-CHAT-RED HIDDEN: Red still speaks; Me asks first and a second press 
   await settle();
   assert.deepEqual(old.said.at(-1), ['world', voiceCannotShowText()], 'refused');
   assert.equal(voiceCannotShowText(), 'Hide cannot be turned off from the game.');
-  // decision 122: no extension answers, so the voice's own showMe says no
+  // no extension answers, so the voice's own showMe says no
   const said = [];
   const bare = createChatVoice({ glyphs: () => ['dev'], say: (tab, text) => said.push([tab, text]) });
   bare.adopt({ hidden: true });

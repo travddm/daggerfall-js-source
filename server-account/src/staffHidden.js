@@ -16,7 +16,7 @@
 // pressed, for every member (`staff_hide_on` is the switch, default 0, keeping a Hide me pressed under the old default -
 // the audit log's newest `hide` row). The press takes effect at the game's next mint: this file's mint (hiddenToken)
 // reads the switch on the primary - hidden from that hello on, or shown. The game has no door that remakes its links at
-// the press: the staff panel extension's hook that did it is removed (decision 122). Show myself still pushes its hide
+// the press: the staff panel extension's hook that did it is removed. Show myself still pushes its hide
 // orders (hiddenEnd), so the hidden sockets close at once. What chat a hidden staff member may say is not
 // decided yet (mob's call): the relay's half is server/src/staffHidden.js HIDDEN_CHAT and hiddenMay, the game's the mint's
 // `hidden` answer (src/net/accountClient.js mintFresh, which drops it today) and the chat's send (scenes/world.js chatSend).
@@ -179,7 +179,7 @@ export async function staffHidden(ctx, env, path, body, who, audit) {
     audit('hide', null, { on: body.on }),
   ]);
   if (!on) await hiddenEnd(ctx, env, me.id);   // Show myself: the hidden sockets closed now, never shown
-  // STAFF-HIDE-TOGGLE: Hide me pushes nothing - each new socket's mint reads the switch just written
+  // Hide me pushes nothing - each new socket's mint reads the switch just written
   return { hidden: body.on };
 }
 

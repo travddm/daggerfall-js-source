@@ -1,7 +1,7 @@
 // @ts-check
 // THE WORLD'S REGISTRY OF PLACES, kept as the boot makes it (scenes/world.js), so the raids, Starfall and the Hollows'
 // lanes read it with no wiring of their own. The file once also held the staff panel's place picker; the panel is
-// removed (decision 122) and only the registry holder stays.
+// removed and only the registry holder stays.
 
 let _places = /** @type {any} */ (null);
 /** AUDIT RELEASE R2-7: the world's registry of places (world/worldWide/worldPlaces.js), kept as the boot makes it - a

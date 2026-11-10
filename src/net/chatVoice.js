@@ -14,7 +14,7 @@
 //   mint says so, accountClient.js mintFresh `hidden`): Me would show the member to players, so pressing Me while hidden
 //   ASKS first, in the chat, and a second press inside VOICE_ASK_MS says yes (ui/socialPanel.js Remove's law: one click
 //   arms, the second sends - no window.confirm); yes calls `showMe`. The staff panel extension that answered it is
-//   removed (decision 122), so the game has no way to turn Hide off and the default `showMe` says no. A line typed in Me
+//   removed, so the game has no way to turn Hide off and the default `showMe` says no. A line typed in Me
 //   while hidden is not sent, and says so, staying in the field - the relay would drop it without a word.
 //
 // Not a DFU member: Daggerfall Unity has no chat. Ledger A row (ONLINE).
@@ -39,7 +39,7 @@ export const voiceHiddenText = () => t('net.chat.voiceHidden', 'Not sent: you ar
 /**
  * The voice, made once by the chat safety host (scenes/chatSafetyHost.js `voice`). `glyphs()` my glyphs as issued;
  * `say(tabId, text)` a system line in the chat; `showMe()` turns Hide off, resolving whether it went (none by default:
- * decision 122 removed the extension that did it).
+ * the extension that did it is removed).
  * @param {{ glyphs?: () => unknown, say?: (tabId: string, text: string) => void, showMe?: () => Promise<boolean>, now?: () => number }} [deps]
  */
 export function createChatVoice({ glyphs = () => [], say = () => {}, showMe = () => Promise.resolve(false), now = () => Date.now() } = {}) {
