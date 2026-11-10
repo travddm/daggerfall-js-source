@@ -1,5 +1,4 @@
-// AUDIT MIXED-PAIR L4-3 / AUDIT SPELL-HAND L4-2 (; bible/05-Combat/
-// Two-Hands.md, "Peers on the wire"): THE OTHERS SEE THE HANDS. A peer's body held the lead hand's one weapon - a
+// AUDIT MIXED-PAIR L4-3 / AUDIT SPELL-HAND L4-2: THE OTHERS SEE THE HANDS. A peer's body held the lead hand's one weapon - a
 // pair's left blade's blow played with the right hand's weapon - and a spell beside a weapon stood the body
 // in the Spell stance with the weapon out of the hand and played none of its blows. The look carries both hands; the pose
 // carries `ah` (world251), the hand a pair's last strike was; the peer reads both by the local rig's own laws

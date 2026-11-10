@@ -42,7 +42,7 @@ function fightOf(n = 3, lv = 10) {
   return f;
 }
 
-// ═══ THE BRAIN ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE BRAIN
 
 test('GATE-HEAL the brain: a heal is credited to its CASTER - another fighter, never the one healed (a heal on oneself is no one\'s) - believed within the receiver\'s heal bucket (HEAL_DEPTH_X references deep, a reference refilled over HEAL_REFILL_S), and never a part in the fight (mutants: credited to the receiver; one\'s own heal credited; the bucket uncapped; never refilled)', () => {
   assert.equal(healRef(10), HEAL_REF_BASE + HEAL_REF_LV * 10);
@@ -96,7 +96,7 @@ test('GATE-HEAL the chart: each healer\'s row carries `hl` (whole), none for one
   assert.ok(applyHeal(old, 's2', 's1', 10, ON, T0 + 1000) === 10, 'a bucket from before it starts full');
 });
 
-// ═══ THE WIRE ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('GATE-HEAL the wire: `heal` - one to GATE_HEAL_ROWS_MAX rows, each a caster\'s peer id once (no row of my own: a heal on myself is no one\'s), whole points to GATE_HEAL_WIRE_MAX, projected row by row; a chart row\'s `hl` whole and bounded (a bad one is no chart, never a refused kill) (mutants: a caster twice; a fraction; a row of my own)', () => {
   assert.ok(GATE_KINDS.includes('heal'));
@@ -118,7 +118,7 @@ test('GATE-HEAL the wire: `heal` - one to GATE_HEAL_ROWS_MAX rows, each a caster
   }
 });
 
-// ═══ THE RELAY ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 test('GATE-HEAL the relay: a fighter\'s `heal` credits the caster its socket\'s peer id names - never the one healed (its own peer id credits nobody); a peer id of no fighter credits nobody; a word from a socket not in the fight is junk; a fallen fighter\'s word counts (said after the fall) (mutants: credited to the receiver; the peer id never read; the fallen word refused)', async () => {
   const DAY = 202, TT = gateTimes(DAY);
@@ -145,7 +145,7 @@ test('GATE-HEAL the relay: a fighter\'s `heal` credits the caster its socket\'s 
   } finally { Date.now = realNow; }
 });
 
-// ═══ THE SESSION ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
 function gateRig() {
   const { FakeWS, sockets } = fakeSocketClass();
@@ -159,7 +159,7 @@ test('GATE-HEAL the session: a `heal` goes to the relay as the wire\'s word (mut
   assert.deepEqual(JSON.parse(now.ws.sent.at(-1)), { t: 'gate', k: 'heal', h: [['peer-0009', 5]] });
 });
 
-// ═══ THE COURT ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE COURT
 
 function court() {
   destroyGateBossBar(); destroyGateMarksCard(); destroyGateGround();
@@ -226,7 +226,7 @@ test('GATE-HEAL the court: out as one word at most every HEAL_SEND_MS - each cas
   for (const m of h.sent) assert.ok(validGateIn({ k: 'heal', h: m.h }), `the wire takes ${JSON.stringify(m.h).slice(0, 60)}`);
 });
 
-// ═══ THE CHART ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE CHART
 
 test('GATE-HEAL the round-up: a Healed column, last, whenever anyone healed another - every row its figure (0 for none) - and none in a court nobody did; after the host\'s on a Legion-Lord night; on a narrow screen in the share\'s place; drawn into its own cell (mutants: the column always; never; the narrow fold; the cell unwritten)', () => {
   const at = { since: 0, now: DAMAGE_CHART_DELAY_MS + 100 };
@@ -271,5 +271,5 @@ function fakeDoc() {
   return { body, head, createElement: el, getElementById: () => null };
 }
 
-// ═══ THE PLUMBING ══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE PLUMBING
 

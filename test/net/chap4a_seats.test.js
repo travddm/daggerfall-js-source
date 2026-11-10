@@ -1,6 +1,5 @@
 // CHAP4a - THE SEATS: ranks 8 and 9, each chapter's one Master and
-// three officers, placed at its Turning by its Eligible members' Merit over four weeks (bible/11-Multiplayer/
-// Chapters-Arc.md sections 3.5 and 6). The law against literals; the Turning through the real service over the real
+// three officers, placed at its Turning by its Eligible members' Merit over four weeks. The law against literals; the Turning through the real service over the real
 // migrations; the Roll's answer and its recorded rank; a deleted character's seats.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

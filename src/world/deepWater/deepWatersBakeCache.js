@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-A: THE COASTLINE IS BUILT ONCE PER ARCHIVE, NOT ONCE PER BOOT.
 // deepWatersBake.js's global half - the bound over half a million
 // pixels, the coastal pixels sampled, the flood - is seconds of work
@@ -17,7 +16,6 @@
 //     BLOCKS.BSA as far as the coastline is concerned.
 //
 // A store that cannot open is a miss, never an error; node has none.
-// ═══════════════════════════════════════════════════════════════════
 
 import { idbStore } from '../roadsCache.js';
 

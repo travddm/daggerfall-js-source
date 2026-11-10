@@ -183,39 +183,6 @@ export const MOD_SETTINGS = Object.freeze({
       }),
     }),
   }),
-  // AS1: AQUATIC SPRITES 1.0 (Cliffworms). No modsettings of
-  // its own - three world-data blocks, so one switch: the port's Enabled,
-  // the gate DFU's mod list is (a mod that is off is a mod DFU never
-  // loaded; scenes/modWorldData.js reads it at the door).
-  'aquatic-sprites': Object.freeze({
-    title: 'Aquatic Sprites',
-    author: 'Cliffworms',
-    keys: Object.freeze({
-      Enabled: Object.freeze({
-        default: true,
-        get description() {
-          return t('mods.aquaticSprites.Enabled.description', 'Seaweed, coral and shells in 3 flooded dungeon areas. The original game has these sprites but '
-            + 'never uses them.');
-        },
-      }),
-    }),
-  }),
-  // DS1: DETAILED SHIPS 1.0.0 (Cliffworms). No modsettings of
-  // its own - two building records and thirteen pictures - so one switch.
-  'detailed-ships': Object.freeze({
-    title: 'Detailed Ships',
-    author: 'Cliffworms',
-    keys: Object.freeze({
-      Enabled: Object.freeze({
-        default: true,
-        get description() {
-          return t('mods.detailedShips.Enabled.description', 'Your ship, rebuilt inside and out. Outside: rigging, crates and barrels, a small boat, a rudder and '
-            + 'railings. Below deck: quarters for you and the crew, a kitchen, a cargo hold, an armory, a shrine to '
-            + 'Kynareth, and sailors to talk to.');
-        },
-      }),
-    }),
-  }),
   // WD3: BEAUTIFUL VILLAGES OF DAGGERFALL 1.4.2 and BEAUTIFUL
   // CITIES OF DAGGERFALL 0.5.0 (carademono). No modsettings of their own -
   // 7,317 and 410 places laid out again, their blocks with them - so one
@@ -876,32 +843,6 @@ export const MOD_SETTINGS = Object.freeze({
       'Step.Length': Object.freeze({ default: 1, min: 1, max: 10, get description() { return t('mods.handheldTorches.Step.Length.description', 'Size of each step. Higher moves in bigger jumps.'); } }),
       'Step.Condition': Object.freeze({ default: 0, options: lazyWords(() => t('mods.handheldTorches.option.sheatheAttackOnly', 'Sheathe/Attack Only'), () => t('mods.handheldTorches.option.allTransforms', 'All Transforms')), get description() { return t('mods.handheldTorches.Step.Condition.description', 'Whether the snapping only affects Sheathing or also other options like Bob, Inertia and Recoil'); } }),
       'Compatibility.TextureScaleFactor': Object.freeze({ default: 1, min: 0, max: 8, get description() { return t('mods.handheldTorches.Compatibility.TextureScaleFactor.description', 'Divides a custom texture’s size. Raise it if a texture pack draws the hand too large.'); } }),
-    }),
-  }),
-  // AT0: AMBIENT TEXT 1.8 (Regnier). Its one section, `AmbientText`,
-  // and its four SliderIntKeys, names, bounds and defaults exactly as
-  // modsettings.json ships them, plus the port's own `Enabled`.
-  // `interval` keeps the mod's own name and not the field's
-  // (`stdInterval`) - the pane shows the player what the author called
-  // it. All four are REAL-TIME SECONDS, not game time: the mod ticks on
-  // Unity's `Time.unscaledTime`, so its pace is the same whether you
-  // are standing still or riding a horse at 14x.
-  'ambient-text': Object.freeze({
-    title: 'Ambient Text',
-    author: 'Regnier',
-    keys: Object.freeze({
-      Enabled: Object.freeze({
-        default: true,
-        get description() {
-          return t('mods.ambientText.Enabled.description', 'Now and then, a short line in the corner about where you are: what a crypt smells like, what a '
-            + 'village sounds like at night, how the desert light looks. It depends on the place, the time and the '
-            + 'weather, and stays quiet indoors.');
-        },
-      }),
-      textChance: Object.freeze({ default: 33, min: 0, max: 100, get description() { return t('mods.ambientText.textChance.description', 'Chance, in percent, of a line at each check'); } }),
-      interval: Object.freeze({ default: 200, min: 60, max: 600, get description() { return t('mods.ambientText.interval.description', 'Real-time seconds between checks for a line'); } }),
-      postTextInterval: Object.freeze({ default: 500, min: 60, max: 600, get description() { return t('mods.ambientText.postTextInterval.description', 'Real-time seconds to wait after a line is shown'); } }),
-      textDisplayTime: Object.freeze({ default: 3, min: 1, max: 10, get description() { return t('mods.ambientText.textDisplayTime.description', 'Seconds a line stays on screen'); } }),
     }),
   }),
   // ── EYE OF THE BEHOLDER 2.1 (EOTB) ──────────────────────────────

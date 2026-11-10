@@ -22,7 +22,7 @@ import { isPeerTarget } from '../../../src/characters/enemy/enemyTargets.js';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const rd = (p) => readFileSync(join(ROOT, p), 'utf8');
 
-// ═══ the quests ══════════════════════════════════════════════════════════
+// the quests
 const V = join(ROOT, 'vendor/dfu-quests/Tables');
 const tables = {};
 for (const f of readdirSync(V)) if (f.endsWith('.txt')) tables[f.replace('.txt', '')] = readFileSync(join(V, f), 'utf8').replace(/^\uFEFF/, '');

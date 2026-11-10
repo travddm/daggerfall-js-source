@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // HEAL CURSE
 //
 // The temple's Cure Disease priest offers a second row: the CURSE lifted. What a curse is here:
@@ -15,7 +14,6 @@
 //
 // THE PRICE: a temple's rite, not a potion - HEAL_CURSE_BASE gold, through the region's price adjustment as Cure Disease
 // is (guildServiceActions.js), and the temple's quality a tenth either way. Pure but for the entity it is handed.
-// ═══════════════════════════════════════════════════════════════════
 import { liveVampirism, cureVampirism } from './vampirism.js';
 import { liveLycanthropy, cureLycanthropy } from './lycanthropy.js';
 import { liveInfections } from './infection.js';

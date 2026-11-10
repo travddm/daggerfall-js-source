@@ -1,10 +1,9 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // PROF2b - THE
 // MOTHERLODES, AS THE SERVICE KEEPS THEM (
 // 6 and 38; the law both ends read is src/net/motherlodeLaw.js).
 //
-// ═══ THE DAY'S THREE, PICKED ONCE ════════════════════════════════════
+// THE DAY'S THREE, PICKED ONCE
 //
 // The first read of a UTC day picks its Motherlodes from the pixels the
 // witnesses had confirmed before it began (motherlodeLaw motherlodeSites)
@@ -13,7 +12,7 @@
 // the same three). A realm nobody has walked has none that day; the next
 // read asks again.
 //
-// ═══ A STRIKE ═══════════════════════════════════════════════════════
+// A STRIKE
 //
 // A Motherlode is struck as a vein is (the Pick-Axe's act, its report
 // bounded by tier 6's glints) and asked through the harvest's own route,
@@ -32,7 +31,6 @@
 // strike it made.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═══════════════════════════════════════════════════════════════════
 import { mintId, overRate } from './accounts.js';
 import { marksOpenFor, balanceOf } from './marks.js';
 import { gatePublicKey } from './signing.js';

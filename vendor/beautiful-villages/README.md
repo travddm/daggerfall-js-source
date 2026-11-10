@@ -59,7 +59,7 @@ Editor writes it:
   names; the dependency list below).
 - `WorldDataPack/beautiful-villages.pack.json.gz` - **every world-data file
   of the mod as the author's EDIT of Daggerfall's own data**
-  (`src/formats/worldData/worldDataPack.js`, WD3; `bible/02-Formats/World-Data-Patches.md`).
+  (`src/formats/worldData/worldDataPack.js`, WD3; `docs/formats/world-data.md`).
   A location file is the edit of the location MAPS.BSA holds; a block that
   replaces a classic one is the edit of that block; a new block is the edit
   of the classic block it was made from, or carried whole where it is the
@@ -101,7 +101,7 @@ asks the same ("For anything missing I need you to curate").
 | dependency | manifest | in the port |
 |---|---|---|
 | Windmills of Daggerfall (Kamer) | peer | vendored already (`vendor/windmills-kamer`): the six farms of this mod that place Kamer's mill (model `41600`: FARMAA04, 05, 07, FARMBA05, 08, 09) stand the port's mill where they place it, when Windmills of Daggerfall is on |
-| RMB Resource Pack 0.1.10 | peer | not carried - the port's own stand-ins for the hills, rocks, market stalls, docks, temple platforms, foundations and domes, and crop fields the blocks place (the docks measured off the pack's meshes, their ramps and steps landing where the author's do); Cliffworms' Items, archive 1210, are Detailed Ships' pictures of them (the same author's, carried with his leave). Not stood in: its wooden bridges (their rails are in the pack's published files, their decks are not, so neither shape nor size can be read), its stone bridges (`53132`, `53134`: two meshes each under transforms the published files do not settle) and its winter-smoke markers - the streams stand bridgeless and the chimneys smokeless, as in DFU without the pack |
+| RMB Resource Pack 0.1.10 | peer | not carried - the port's own stand-ins for the hills, rocks, market stalls, docks, temple platforms, foundations and domes, and crop fields the blocks place (the docks measured off the pack's meshes, their ramps and steps landing where the author's do); Cliffworms' Items, archive 1210, are not stood in: their bottles and shelf pieces stand invisible, as in DFU without them. Not stood in: its wooden bridges (their rails are in the pack's published files, their decks are not, so neither shape nor size can be read), its stone bridges (`53132`, `53134`: two meshes each under transforms the published files do not settle) and its winter-smoke markers - the streams stand bridgeless and the chimneys smokeless, as in DFU without the pack |
 | Daggerfall Expanded Textures 0.6.3 (Ninelan) | peer | not carried - the port's own stand-ins (DS1's `detStandIns.js`, grown for the towns: chimneys, pillars and beams, tapestries and banners, vanes, pots, stumps, rugs; its food, animals and tools drawn in code); not its chimney smoke, nor the few pieces no catalogue names |
 | DET Harvestable Crops | peer | not carried - the temple gardens' rows (archive 10035, in no catalogue) stand as Daggerfall's own garden plants |
 | Diep - Rosy's Resources | peer | not carried - its paintings as Daggerfall's own framed paintings, its small hangings and rugs drawn in code; not its fireplace dressing (`69465`), whose classic hearth stands |
@@ -122,6 +122,6 @@ A house bought, a room rented, a quest's building, an item at a smith and a
 Recall anchor set indoors all name their building by its KEY, and a key
 names a building only in one layout of its town. A town holding such a
 record keeps the layout it was made in, whatever the switch says since
-(`src/systems/layoutPins.js`; `bible/03-World/Beautiful-Towns.md`).
+(`src/systems/layoutPins.js`; `docs/formats/mods-and-vendor.md`).
 Online the switch is the room's, and every online home keeps the layout
 its town was bought in, server-wide.

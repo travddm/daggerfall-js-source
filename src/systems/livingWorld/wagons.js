@@ -1,8 +1,7 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LW10: THE WAGON TRAIN - the horses and wagons the road's
 // parties travel with, and where each stands at any minute.. Pure,
-// like the trips they ride on (LW0 decision 2): the team is the trip's, its place the party's place on its way - every
+// like the trips they ride on: the team is the trip's, its place the party's place on its way - every
 // reader's caravan has the same wagon at the same bend, its wheels at the same spoke.
 //
 // WHO HAS WHAT (`teamOf`). A merchant's caravan draws one wagon - two when its town is a great house's (GREAT_HOUSE_BLOCKS);

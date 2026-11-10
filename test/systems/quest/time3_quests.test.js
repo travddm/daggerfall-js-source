@@ -9,6 +9,7 @@
 // QCLOCK-WORLD: online the time RAISED is charged NOTHING - a rest, a loiter, a journey spend no quest days - and only the
 // time lived with the world is, one played step at most: played time on the world's clock, WORLD7's law. Offline DFU's
 // own. The tests below that drove a clock with a rest drive it with lived play now, and say what a rest no longer does.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -261,7 +262,8 @@ test('TIME3 AUDIT: GUARD-ONLINE\'s watch is a countdown on the CHARACTER\'s cloc
   assert.equal(watch.checkTrigger(), true, 'ten minutes of their own time: open');
 });
 
-test('TIME3 the journal\'s date: a step stamped on the event clock is read on the sky\'s calendar - the date the player saw when it was logged; offline the stamp\'s own', () => {
+test('TIME3 the journal\'s date: a step stamped on the event clock is read on the sky\'s calendar - the date the player saw when it was logged; offline the stamp\'s own', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const T = SKY_SEGMENTS[0].fromMs + 3 * DAY_S * 1000 + 12_345;
   const eventS = Math.floor(sharedClassicMinutes(T) * 60);
   const quest = new Quest({ nowSeconds: () => 1, worldSeconds: () => eventS });

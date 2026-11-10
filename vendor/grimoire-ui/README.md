@@ -35,4 +35,4 @@ fonts draw through DFU's SDF arm (src/ui/text.js) when GUI/SDFFontRendering is o
 
 DFO Grimoire (GRIM1, 2026-10-09) is the pack's second use: the ENHANCED skin dressed in these same pictures, cut at run
 time by src/ui/grimoireArt.js (nothing derived is committed) and painted by src/ui/grimoireDress.js - the UI panel's
-fourth look. See bible/10-UI/Overhauls.md, GRIM1.
+fourth look.

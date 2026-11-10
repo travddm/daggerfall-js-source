@@ -27,6 +27,8 @@ touched code are in [coding-standards.md](coding-standards.md).
 - A section about a vendored port or a first-party departure that leaves core carries one line under its heading:
   `> Leaves core: <the mod it becomes> (decision N).` Add it when you touch the section, and remove it
   when the code leaves.
+- [contributing-docs.md](contributing-docs.md) says which kind of statement goes where and when a change must update a
+  page.
 
 ## Scope
 
@@ -58,10 +60,15 @@ request.
 
 ## Code comments
 
+- Comments are the exception. Prefer names and small functions that say what the code does.
 - A comment says why: the reason, an invariant, a workaround, a constraint the code cannot show. The code says what.
+- A comment stays true when the implementation changes and the intent does not. If a refactor would make it false, it
+  describes the how, and the how belongs in the code.
 - Write plain sentences. Do not write ALL-CAPS headlines, quotes of people, dates with names, version histories,
   slice or audit tags, or notes about where code used to be. Git holds history.
 - Do not cite documents by line number. Name a file and a function.
+- The same holds outside comments. No audit, arc, decision or plan IDs in code, in data fields or in shipped strings:
+  a field or a message says what it means in words.
 - Rewrite a comment you touch if it breaks these rules. Do not reformat lines you do not otherwise change.
 
 ## Tests

@@ -16,6 +16,13 @@ written for a maintainer and for a server owner: there is no official live servi
   `npm run markdown` and `npm run spell` on what you changed.
 - **Comments and tests**: a comment says why, in plain sentences. A test imports the code and runs it
   (`docs/README.md`, "Code comments"; `docs/testing/writing-tests.md`).
+- **Comments**: `.claude/rules/comments.md`. The `comment-cleanup` agent rewrites a file's comments to it.
+- **Docs**: `.claude/rules/docs.md`.
+- **Code**: `.claude/rules/code.md`.
+- **Git and pull requests**: `.claude/rules/git-and-prs.md`.
+- **Verification and UI**: `.claude/rules/verification-and-ui.md`.
+- **Design rules**: `.claude/rules/design-rules.md`.
+- **For people**: `CONTRIBUTING.md` summarises setup, checks and the rules.
 - **ARENA2 is freeware**: `sh tools/fetch-data.sh <dir>` puts Daggerfall's own data at `<dir>/arena2` (~150 MB, never
   in the repo). Fetch it before work that reads the map, the game's files or the running game, and set `ARENA2_PATH`
   to it.
@@ -35,10 +42,6 @@ written for a maintainer and for a server owner: there is no official live servi
 - **Patch notes are written in ASD-STE100 Simplified Technical English** (`docs/operations/desktop-release.md`). The
   `ste-notes` check reads the description each time it changes: write it to a file and run
   `node scripts/steNotes.mjs <file>` before you post it.
-- **Discord is code**: the bot's commands are in `server-account/src/discordCommands.js`, its cards and answers in
-  `server-account/src/discord.js`, its channel and moderators in `server-account/wrangler.toml`. The account deploy
-  (`account-deploy.yml`) writes them to Discord. Change Discord by changing those files. A person still invites the
-  bot, grants its roles and rotates its token (the `DISCORD_BOT_TOKEN` secret).
 - **The hosts do not grow** (`docs/architecture/hosts-and-modules.md`): new behaviour goes into a module the host
   wires (`src/scenes/merchantYardsHost.js` is the shape), never into the scene hosts themselves (`bootWorld`,
   `createWorldModes`, `buildDungeonContext`, `bootExterior`, `createNavalHost`, `createComeSailAwayRuntime`), and on the

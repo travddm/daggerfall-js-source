@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-GIVE - ADD AN ITEM TO A PLAYER, the Remove from a player's twin. Admins alone (staffRealm.js asks the role before
 // any door); OFFLINE ONLY until mob tries it live.
 //

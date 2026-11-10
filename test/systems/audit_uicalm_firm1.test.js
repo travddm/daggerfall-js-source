@@ -16,7 +16,7 @@ import {
 } from '../../src/net/firmament/firmamentLaw.js';
 import { FIRM_NODES, FIRM_EDGES } from '../../src/net/firmament/firmamentTree.js';
 import { createFirmamentBook, FIRM_KEPT_KEY } from '../../src/net/firmament/firmamentBook.js';
-import { accountFirmament, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountFirmament, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   setFirmamentTree, setFirmamentOnline, setFirmamentMentorScale, firmamentMentorScale, firmamentStatsAt, onFirmamentChange, firmActMult, firmStat, _resetFirmamentLiveForTests,
 } from '../../src/systems/firmamentLive.js';
@@ -89,7 +89,7 @@ async function stand(env = { FIRMAMENT_OPEN: 'on' }) {
 function device(s, who) {
   const m = new Map();
   const storage = { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
-  storage.setItem(SESSION_KEY, JSON.stringify({ secret: who.secret, id: who.id }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ secret: who.secret, id: who.id })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const net = { drop: 0, sets: /** @type {any[]} */ ([]) };
   const fetch = async (url, init) => {
     const u = new URL(url);

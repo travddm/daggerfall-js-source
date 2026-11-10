@@ -4,8 +4,8 @@
 // his blows at their marked reach and takes them through the saving throw of his aspect's element; the ground his
 // landings leave is his aspect's and Scarring's; he stands as large as Colossal makes him, glows and sounds in his
 // aspect's colours and voice; his bar says his epithet and his trials, each attack by his aspect's name. The court says
-// his marks as a fighter steps through, his feeding on the fallen, each phase's turn in his aspect's words; the omen,
-// the map's card and the Discord herald name tonight's marks before the gate opens.
+// his marks as a fighter steps through, his feeding on the fallen, each phase's turn in his aspect's words; the omen
+// and the map's card name tonight's marks before the gate opens.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -24,8 +24,6 @@ import { aspectCss } from '../../../src/ui/gate/gateMarksView.js';   // WB13c: h
 import { createGateCourt, COURT_STRIKE_TEXT, COURT_MARKS_TEXT, courtPhaseCard, MARK_COLOR, FED_LATE_MS } from '../../../src/scenes/gate/gateCourt.js';
 import { courtToDungeon } from '../../../src/world/gate/gateArena.js';
 import { gateTip } from '../../../src/systems/gate/gateOmen.js';
-import { omenPost } from '../../../src/net/gate/gateHerald.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const W = (key, over = {}) => ({ i: 1, a: ATTACKS[key].id, at: 10000, x: 0, z: 0, yw: 0, tg: [], ...over });
@@ -49,7 +47,7 @@ function court({ feet = [0, 0, 0], health = 100, maxHealth = 100, save = 100 } =
 }
 const tick = async (h, t, st) => { if (st) h.link.st = st; h.clock.t = t; h.c.frame(); await new Promise((r) => setImmediate(r)); };
 
-// ═══ THE STRIKE, UNDER HIS MARKS ══════════════════════════════════════════════════════════════════════════════════
+// THE STRIKE, UNDER HIS MARKS
 
 test('WB8c the strike law under a profile: Colossal\'s slam reaches 8.5 and his cone and his charge hold his larger body; each blow\'s element and name are his aspect\'s, any element\'s saving throw answers it, Vengeful\'s weight in its share and base; the Wrath answered by nothing (mutants: the old reach; the element unread; the throw fire\'s alone)', () => {
   const C = P('burning', 'colossal');
@@ -84,7 +82,7 @@ test('WB8c the ground under his marks: his aspect\'s element on every pool; Scar
   assert.equal(landingPools(W('hellfire', { tg: [[1, 1]] }), P('burning', 'vengeful'))[0].pct, POOLS.hellfire.pct * 1.25);
 });
 
-// ═══ THE COURT, UNDER HIS MARKS ══════════════════════════════════════════════════════════════════════════════════
+// THE COURT, UNDER HIS MARKS
 
 test('WB8c the court\'s strikes: his frost through MY frost throw - the host asked for the element - and a full resist said in its own word; his rime underfoot bites through the same throw; the strike door told the element (mutants: the throw asked for fire; the word fire\'s)', async () => {
   destroyGateBossBar();
@@ -181,7 +179,7 @@ test('WB8c the court\'s body under his marks: Colossal\'s larger body for my blo
   destroyGateBossBar();
 });
 
-// ═══ THE LOOK ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LOOK
 
 test('WB8c the look and the voice: his elemental blows, his ground and his ember in his aspect\'s colours - his weight\'s own and Dagon\'s Wrath untouched; his glow at his own chest; his elemental cues in his element\'s cast and, landing, the storm\'s thunder - the burning cues as they were (mutants: a blade turned blue; the Wrath recoloured; the voice unchanged under the rime)', () => {
   for (const id of ['rime', 'storm', 'venom']) {
@@ -237,9 +235,9 @@ test('WB8c the ground drawn and the bar: the telegraph shows Colossal\'s slam at
   destroyGateBossBar();
 });
 
-// ═══ THE WORD BEFORE THE GATE ════════════════════════════════════════════════════════════════════════════════════
+// THE WORD BEFORE THE GATE
 
-test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\'s omen, each trial by name and in words), the map\'s card while he stands (his epithet and his trials), the Discord omen in the tables\' words alone (mutants: the card without them; a trial unsaid)', () => {
+test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\'s omen, each trial by name and in words), the map\'s card while he stands (his epithet and his trials) (mutants: the card without them; a trial unsaid)', () => {
   const day = 112;   // WB11a: the nine-trial rotation moved the Rime-Wrought, Colossal and Unyielding from day 3 to day 112
   assert.deepEqual(gateModsOf(day), ['rime', 'colossal', 'unyielding']);
   assert.equal(marksLine({ boss: 'Valkynaz Ruhn', md: gateModsOf(day) }), 'Valkynaz Ruhn comes the Rime-Wrought tonight, Colossal and Unyielding.', 'WB13b: by name - the card says what each does');
@@ -248,13 +246,10 @@ test('WB8c tonight\'s marks before the gate opens: the chat\'s line (his aspect\
   const c = { site: { place: 'Copperham, Wrothgarian Mountains' }, phase: 'open', t: { day } };
   assert.deepEqual(gateTip(c, { to: 'seal', ms: 60_000 }), { title: 'Dagon\'s Breach', lines: ['Near Copperham, Wrothgarian Mountains', 'Open. Seals in 1:00', 'Valkynaz Ruhn, Warden of the Burning Gate', 'The Rime-Wrought - Colossal, Unyielding'] });   // PIN MOVED (VOICE2): the countdown a sentence of its own (Voice.md rule 5)
   assert.deepEqual(gateTip(c, null, 123).lines.at(-1), 'Valkynaz Ruhn has fallen', 'no marks once he has fallen');
-  const post = cardOf(omenPost({ day })).text;   // HERALD-CARDS: the card's text
-  assert.equal(post, 'The faithful work their rite nearby. Kill their Summoner before the breach opens. Valkynaz Ruhn comes **the Rime-Wrought** tonight, Colossal and Unyielding.', post);   // WB12d: the rite, a line
-  assert.ok(post.length < 2000);
   assert.ok(gateTimes(day).omenAt < gateTimes(day).openAt);
 });
 
-// ═══ THE FOLD AND THE SEAMS ══════════════════════════════════════════════════════════════════════════════════════
+// THE FOLD AND THE SEAMS
 
 test('WB8c the fold: a state says his marks; a feeding moves his health and names the fed; a state of the same fight keeps the feeding heard, another fight\'s forgets it (mutants: the marks dropped; the feeding lost at the next state)', () => {
   const st = { k: 'st', d: 9, b: 'ruhn', ph: 1, h: 50, m: 100, x: 0, z: 0, yw: 0, mv: null, atk: null, sh: 0, wr: 5, n: 1, fell: null, wrath: null, md: ['venom', 'soulhungry'] };

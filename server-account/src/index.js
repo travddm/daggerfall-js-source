@@ -65,7 +65,6 @@
 //   POST /v1/mod/strikes { target?, name? }          -> { ok, target, name, strikes, next, mutedUntil, bannedUntil, banReason, history }
 //   POST /v1/mod/feed  <batch>                       -> { ok, read }   (SAFE5: the relay's public lines, signed - x-relay-feed-sig)
 //   POST /v1/mod/grant-feed  <batch>                 -> { ok, read }   (GRANT2: a cell's window of spawn grant asks, signed - x-relay-grant-sig)
-//   POST /v1/discord/interactions <interaction>      -> Discord's answer   (SAFE8: signed - x-signature-ed25519, x-signature-timestamp)
 // A BANNED ACCOUNT is answered 403 { error: 'banned', until, reason } on every door behind a session but signing out.
 // PRIVATE-REPORT, a registered player's private report to the Owner accounts (reports.js):
 //   POST /v1/report/send { kind, subject, body, context?, rid } -> { ok, id, sentAt } | { ok, repeat, id, sentAt }
@@ -174,12 +173,6 @@
 // HOME-VOTE, a registered account's word on another's home (homeVotes.js; /v1/homes/town's homes carry `score` and the
 // caller's `vote`):
 //   POST /v1/homes/vote { mapId, buildingKey, vote: 1 | -1 | 0 } -> { ok, mapId, buildingKey, vote, score }
-// PATREON-LINK, a patron's own Patreon (patreon.js) - /v1/account's answer carries `patreon: { on, linked, titles,
-// link }`, `link` the authorize URL with a state sealed for the account; the next three answer a browser and Patreon:
-//   GET  /v1/patreon/callback ?code&state  -> a page asking which game account, with the yes's ticket
-//   POST /v1/patreon/confirm  ticket=...   -> a page: linked, with what Patreon says NOW (a form, not JSON - the page posts it)
-//   POST /v1/patreon/webhook  <member>     -> { ok, applied }   (X-Patreon-Signature: HMAC-MD5 under the webhook secret)
-//   POST /v1/patreon/unlink   {}           -> { ok, titles, title, glyphs, auras, aura, insignia, patreon }   (an equip's shape)
 //
 // ACC2, and every one of them needs a REGISTERED account (the wall):
 //   GET    /v1/saves                                   -> { saves[] }
@@ -227,8 +220,7 @@ import {
   ACCOUNT_MAX, ACCOUNT_WINDOW_S,
 } from './accounts.js';
 import { mintToken, mintRenownOrder, mintGuildOrder, mintGuildOutOrder, mintHomeOrder, MAX_TTL_S, TOKEN_V, ID_RE, SEAT_TITLES, CHAPTER_TITLES, TOKEN_MAX_CHARS, TOKEN_BODY_MAX, tokenBodyOf } from '../../src/net/identityToken.js';
-import { ACCOUNT_VERSION, MAX_BODY_BYTES, ROUTES, OPEN_ROUTES, PATREON_OPEN_ROUTES, SAFE_OPEN_ROUTES, STAFF_ROUTES, savePathOf, realmPathOf, poiPathOf, SAVE_MAX_BYTES, SHOT_MAX_BYTES, maintaining, routeDb, d1BookmarkOf, D1_BOOKMARK_RE, d1Overloaded, noteOverload, shedding } from './service.js';   // SCALE4d: the routes a read replica may serve, and the session they are served on
-import { poiRolesOf, putPoiAsset, getPoiAsset, savePoiDraft, submitPoi, withdrawPoi, requestRetire, reviewPoi, rollbackPoi, listPoi, poiHistory, poiQueue, poiLiveFeed, poiHeldVersion, poiFeedTag, listShelf, shelfEntry, shelve, unshelve, POI_ASSET_MAX, POI_DRAFT_BODY_MAX, POI_LIVE_ASSET_MAX_AGE_S } from './poi.js';   // POI-1: the POI store - builders draft, an approver decides, the feed is what is live; POI-4b: the library's shelf
+import { ACCOUNT_VERSION, MAX_BODY_BYTES, ROUTES, OPEN_ROUTES, SAFE_OPEN_ROUTES, STAFF_ROUTES, savePathOf, realmPathOf, SAVE_MAX_BYTES, SHOT_MAX_BYTES, maintaining, routeDb, d1BookmarkOf, D1_BOOKMARK_RE, d1Overloaded, noteOverload, shedding } from './service.js';   // SCALE4d: the routes a read replica may serve, and the session they are served on
 import { listSaves, putCard, putBlob, getBlob, deleteSave, saveCardOf } from './saves.js';
 import { signingKey, gatePublicKey } from './signing.js';
 import { takeGrantMeasure, GRANT_FEED_PATH } from './grants.js';   // GRANT2: the spawn grants' measure, the relay's door in
@@ -237,7 +229,6 @@ import { takeNetFeed, NET_FEED_PATH } from './staffNet.js';   // STAFF-PANEL5-FE
 import { takeReactionFeed, REACTION_FEED_PATH } from './staffReactions.js';   // STAFF-PANEL5-FEEDS: the bot check's episodes, their door in
 import { STAFF_FEED_SIG_HEADER, STAFF_FEED_MAX_BYTES } from '../../server/src/staffFeedLaw.js';
 import { crewHall, crewSign, crewRelease, CREW_STATUS } from './crewSigns.js';   // CREW-SIGNED: a crew hall's recruit signed once online
-import { seaSeasonBoard } from './seaSeason.js';   // SEA-SEASON: the sea's season boards
 import { titleWorn, glyphsOf, glyphsHidden, auraWorn, iconWorn } from './titles.js';
 import { withHonours } from './honours.js';   // SIGN-BATCH: the three games' honours on a badge's row, in one batch
 import { claimArena, arenaAttempt, arenaBoardOf, arenaTeam, arenaRatingOf, ARENA_HONOUR_PATHS, ARENA_RENOWN_REGION } from './arena.js';   // ARENA4: the arena's records, its board, its banners, and the honours the mint reads
@@ -340,16 +331,10 @@ import { staffRoute, STAFF_STATUS, STAFF_SESSION_HEADER, auditStatement } from '
 import { staffMessagesFor, staffMessageOk } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: the game's two doors
 import { hiddenToken, takeHiddenSeen } from './staffHidden.js';   // STAFF-PANEL5-HIDDEN: a hidden staff member's token, and a private home it entered
 import { HIDDEN_SEEN_PATH, HIDDEN_SEEN_MAX_BYTES, HIDDEN_SEEN_SIG_HEADER } from '../../src/net/hiddenSeen.js';
-import { discordSigned, discordInteraction, DISCORD_BODY_MAX } from './discord.js';   // SAFE8: the moderators' queue in Discord
 import { FEED_MAX_BYTES, FEED_SIG_HEADER } from '../../src/net/safety/chatFeed.js';   // SAFE5: the relay's feed of public lines
 import { heartbeat } from './heartbeat.js';   // SCALE4c: one request for a tab's three clocks
 import { ADMIT_ROUTES, admitWait } from './admit.js';   // ADMIT-LINE: the sign-in line
 export { AdmitGate } from './admit.js';   // ADMIT-LINE: the line's Durable Object (wrangler.toml binds it from this module)
-import {
-  patreonLinkOn, openPatreon, sealPatreon, patreonExchange, patreonIdentity, linkPatreon, unlinkPatreon, patreonWebhook,
-  patreonCardOf, pledgeTitles, patreonHtml, patreonPage, patreonConfirmPage, patreonLinkedPage,
-  PATREON_PAGES, PATREON_TICKET_S, PATREON_HOOK_MAX_BYTES, PATREON_CALLBACK_PATH,
-} from './patreon.js';   // PATREON-LINK: a patron's own Patreon, linked
 
 // THIS MODULE EXPORTS `default` AND NOTHING ELSE, and that is a
 // runtime requirement rather than a preference: in a module Worker
@@ -372,26 +357,6 @@ const json = (body, status = 200, origin = '*') => new Response(JSON.stringify(b
 /** Every refusal is one word and the same shape. A client learns that
  *  it failed and not why somebody else's secret is wrong. */
 const no = (why, status, origin) => json({ error: why }, status, origin);
-/** POI-1: a POI store refusal's status - a role refused 403, a thing not there 404 (taken off the shelf, 410), a state
- *  moved or a builder's holdings full 409, a full day 429. AUDIT POI: `poi-changed` (S1), `poi-drafts-full` (S10),
- *  `poi-shelf-full` and `poi-shelf-spent` (S10), `poi-gone` (U13). */
-const POI_STATUS = {
-  'poi-not-builder': 403, 'poi-not-approver': 403, 'poi-not-author': 403, 'not-found': 404, 'poi-gone': 410, 'poi-state': 409, 'poi-changed': 409, 'poi-pending': 409, 'poi-not-live': 409,
-  'poi-drafts-full': 409, 'poi-shelf-full': 409, 'poi-shelf-spent': 409, 'poi-quota': 429, 'no-storage': 503,
-};
-/** POI-1: what one address may ask of the POI store's open reads in a window - a game streaming a town's models at once. */
-const POI_OPEN_MAX = 600;
-/** POI-1: AN ASSET'S BYTES, as stored - a live one cached a day (AUDIT POI S4: its name is its hash, so its bytes never
- *  change, but it can stop being public - "immutable for a year" had made that impossible to take back), a draft's never
- *  cached (a builder's business, and it may never go live). */
-const poiAssetResponse = (/** @type {any} */ r, /** @type {string} */ origin) => new Response(r.object.body, {
-  status: 200,
-  headers: {
-    'content-type': r.type,
-    'access-control-allow-origin': origin,
-    'cache-control': r.live ? `public, max-age=${POI_LIVE_ASSET_MAX_AGE_S}` : 'private, no-store',
-  },
-});
 /** AUDIT ONLINE A17's law, the service's one answer to a throw: LOGGED, not lost, and a player told nothing about it -
  *  an overloaded D1 a 503 (SCALE4f: counted apart from a bug), any other a 500. HOMES-SHED: the try's catch below, and the one route above it that asks the database (the siege
  *  blackout's question), whose throw had left the Worker as a bare 500 - no body, no log line, no metrics point. */
@@ -739,7 +704,7 @@ const service = {
         headers: {
           'access-control-allow-origin': origin,
           'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'access-control-allow-headers': 'content-type, authorization, x-realm-lease, x-realm-seq, x-realm-summary, x-d1-bookmark, if-none-match, x-session-pass, x-staff-session',   // REALM P1: a checkpoint's lease, sequence and tile; SCALE4g: the tab's D1 bookmark; POI-1: the feed version a game holds; SESSION-SIGN: the session's pass
+          'access-control-allow-headers': 'content-type, authorization, x-realm-lease, x-realm-seq, x-realm-summary, x-d1-bookmark, x-session-pass, x-staff-session',   // a checkpoint's lease, sequence and tile, the tab's D1 bookmark, the session's pass
           'access-control-max-age': '86400',
         },
       });
@@ -801,8 +766,7 @@ const service = {
     // there is still exactly one place that decides a path is a 404.
     const slot = savePathOf(path);
     const realmSlot = realmPathOf(path);   // REALM P1: a realm character's save, matched as a save slot is
-    const poiPath = poiPathOf(path);   // POI-1: the POI store's paths, matched the same way
-    if (!ROUTES.has(path) && !slot && !realmSlot && !poiPath) return no('not-found', 404, origin);
+    if (!ROUTES.has(path) && !slot && !realmSlot) return no('not-found', 404, origin);
 
     if (!env.DB) return no('no-database', 503, origin);
     // ADMIT-LINE (admit.js): A SIGN-IN TAKES ITS PLACE IN THE LINE before it costs the database a statement - the open
@@ -829,58 +793,6 @@ const service = {
     if (shedding(path, request.method, Date.now())) return overloaded(origin);
 
     try {
-      // PATREON-LINK: THE THREE DOORS A BROWSER AND PATREON KNOCK AT. No session: each is proven by what it carries
-      // (patreon.js says what, and why the link asks before it writes). Answered before the JSON ladder below, because
-      // none of them is JSON going in - a callback is a GET a person reads, the confirm a form, and the webhook a body
-      // whose signature covers its exact bytes.
-      if (PATREON_OPEN_ROUTES.has(path)) {
-        if (path === '/v1/patreon/webhook') {
-          if (request.method !== 'POST') return no('method', 405, origin);
-          const bytes = await readCapped(request, PATREON_HOOK_MAX_BYTES);
-          if (!bytes) return no('too-large', 413, origin);
-          const r = await patreonWebhook(ctx, env, new Uint8Array(bytes), request.headers.get('x-patreon-signature'), request.headers.get('x-patreon-event'));
-          return 'error' in r ? no(r.error, r.error === 'patreon-closed' ? 503 : r.error === 'signature' ? 401 : 400, origin) : json(r, 200, origin);
-        }
-        const page = (/** @type {any} */ p, /** @type {number} */ status) => patreonHtml(patreonPage(p), status);
-        if (!patreonLinkOn(env)) return page(PATREON_PAGES.off, 503);
-        // The open routes' own bucket (one address, sixty a minute): a callback spends a code at Patreon and a confirm
-        // writes, and neither is a thing one address gets to do without limit.
-        if (await overRate(ctx, `ip:${request.headers.get('cf-connecting-ip') || 'unknown'}`, 60)) return page(PATREON_PAGES.rate, 429);
-        const outbound = (/** @type {string} */ u, /** @type {any} */ init) => globalThis.fetch(u, init);
-        if (path === PATREON_CALLBACK_PATH) {
-          if (request.method !== 'GET') return no('method', 405, origin);
-          const state = await openPatreon('state', url.searchParams.get('state'), env, { subtle, nowS });
-          if (!state) return page(PATREON_PAGES.expired, 400);
-          const code = url.searchParams.get('code');
-          if (!code || url.searchParams.has('error')) return page(PATREON_PAGES.declined, 200);   // the player said no on Patreon
-          const player = await db.prepare('SELECT id, handle FROM players WHERE id = ?1').bind(state.p).first();
-          if (!player?.handle) return page(PATREON_PAGES.account, 403);
-          const token = await patreonExchange(outbound, env, code, `${url.origin}${PATREON_CALLBACK_PATH}`);
-          if ('error' in token) return page(PATREON_PAGES.down, 502);
-          const who = await patreonIdentity(outbound, token.token);
-          if ('error' in who) return page(PATREON_PAGES.down, 502);
-          // NOTHING IS WRITTEN HERE. The page names the game account the state did, and the yes carries a sealed ticket -
-          // so a link somebody else started is read by the patron before it can be finished.
-          const from = await db.prepare('SELECT handle FROM players WHERE patreon_user = ?1 AND id <> ?2').bind(who.user, player.id).first();
-          const ticket = await sealPatreon('ticket', { p: player.id, u: who.user, k: token.token, x: nowS + PATREON_TICKET_S }, env, { subtle, rand });
-          return patreonHtml(patreonConfirmPage({ handle: player.handle, name: who.name, titles: pledgeTitles(who.tiers, who.status, env), ticket, from: from?.handle ?? null }));
-        }
-        // /v1/patreon/confirm - the page's own form
-        if (request.method !== 'POST') return no('method', 405, origin);
-        const bytes = await readCapped(request, MAX_BODY_BYTES);
-        const ticket = await openPatreon('ticket', new URLSearchParams(bytes ? new TextDecoder().decode(bytes) : '').get('ticket'), env, { subtle, nowS });
-        if (!ticket || typeof ticket.k !== 'string') return page(PATREON_PAGES.expired, 400);
-        // THE YES WRITES WHAT PATREON SAYS NOW - asked again with the patron's own token, not what the page showed: a
-        // pledge cancelled between the page and the press holds nothing, and a yes pressed twice is Patreon asked twice.
-        const who = await patreonIdentity(outbound, ticket.k);
-        if ('error' in who) return page(PATREON_PAGES.down, 502);
-        if (who.user !== ticket.u) return page(PATREON_PAGES.expired, 400);   // the token answers for another Patreon account now
-        const r = await linkPatreon(ctx, { p: ticket.p, u: who.user, t: who.tiers.join(','), s: who.status });
-        if ('error' in r) return page(PATREON_PAGES.account, 403);
-        const row = await db.prepare('SELECT handle FROM players WHERE id = ?1').bind(ticket.p).first();
-        return patreonHtml(patreonLinkedPage({ handle: row?.handle ?? '', titles: pledgeTitles(who.tiers, who.status, env) }));
-      }
-
       // GRANT2: THE SPAWN GRANTS' MEASURE - a cell's window of asks,
       // posted by the relay and proven by its signature over the exact bytes (the chat feed's kind of door, grants.js)
       if (path === GRANT_FEED_PATH) {
@@ -910,24 +822,14 @@ const service = {
         return 'error' in r ? no(r.error, r.error === 'seen-signature' ? 401 : 400, origin) : json(r, 202, origin);
       }
 
-      // SAFE5 + SAFE8: THE TWO DOORS THE CHAT'S SAFETY OPENS TO A STRANGER - the relay's feed and Discord's interactions.
-      // Neither is JSON a session carries; each is proven by a signature over its exact bytes, checked before a byte is read.
+      // THE DOOR THE CHAT'S SAFETY OPENS TO A STRANGER - the relay's feed. It is not JSON a session carries; it is
+      // proven by a signature over its exact bytes, checked before a byte is read.
       if (SAFE_OPEN_ROUTES.has(path)) {
         if (request.method !== 'POST') return no('method', 405, origin);
-        const bytes = await readCapped(request, path === '/v1/mod/feed' ? FEED_MAX_BYTES : DISCORD_BODY_MAX);
+        const bytes = await readCapped(request, FEED_MAX_BYTES);
         if (!bytes) return no('too-large', 413, origin);
-        if (path === '/v1/mod/feed') {
-          const r = await takeFeed(ctx, env, new Uint8Array(bytes), request.headers.get(FEED_SIG_HEADER));
-          return 'error' in r ? no(r.error, r.error === 'feed-signature' ? 401 : 400, origin) : json(r, 202, origin);
-        }
-        if (!(await discordSigned(env, new Uint8Array(bytes), request.headers.get('x-signature-ed25519'), request.headers.get('x-signature-timestamp'), { subtle, nowS }))) return no('signature', 401, origin);
-        let interaction = null;
-        try { interaction = JSON.parse(new TextDecoder().decode(bytes)); } catch { interaction = null; }
-        if (!interaction || typeof interaction !== 'object') return no('body', 400, origin);
-        // AUDIT SAFE DISCORD-4: what may follow the answer (the order to the relay's door) waits on the Worker's waitUntil,
-        // never on Discord's three seconds
-        const exec = /** @type {any} */ (held).exec;
-        return json(await discordInteraction(ctx, env, interaction, typeof exec?.waitUntil === 'function' ? { later: (p) => exec.waitUntil(p) } : {}), 200, origin);
+        const r = await takeFeed(ctx, env, new Uint8Array(bytes), request.headers.get(FEED_SIG_HEADER));
+        return 'error' in r ? no(r.error, r.error === 'feed-signature' ? 401 : 400, origin) : json(r, 202, origin);
       }
 
       // STAFF-PANEL1 (staff.js): THE STAFF PANEL'S DOORS. None takes a game session - a game secret opens no staff door and a
@@ -1001,27 +903,6 @@ const service = {
         const r = await yardsKept(ctx, body.mapId, nowS);
         return 'error' in r ? no(r.error, 400, origin) : json(r, 200, origin);
       }
-      // POI-1: THE LIVE FEED AND A LIVE ASSET NEED NO SESSION - what every approved POI is, and the bytes it names, are
-      // every player's to read, the game's included (poi.js). Bounded per address in this isolate's memory, as the yards
-      // are; the feed kept in the isolate and answered 304 to a game that already holds its version; an asset by its
-      // hash, cached a day (AUDIT POI S4: it can stop being public). An asset no live POI names falls through to a builder's session below.
-      if (poiPath && request.method === 'GET' && (poiPath.route === 'live' || poiPath.route === 'asset')) {
-        const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-        if (overAccountRate(`poi:${ip}`, nowS, POI_OPEN_MAX, ACCOUNT_WINDOW_S)) return no('rate', 429, origin);
-        // AUDIT POI S11: the version the game holds, read strong or weak - newer than this isolate's kept feed, the version is asked now
-        const held = poiPath.route === 'live' ? poiHeldVersion(request.headers.get('if-none-match')) : -1;
-        const feed = await poiLiveFeed(env.DB, Date.now(), held);
-        if (poiPath.route === 'live') {
-          const etag = poiFeedTag(feed.v);
-          const headers = { 'access-control-allow-origin': origin, 'access-control-expose-headers': 'etag', etag, 'cache-control': 'public, max-age=30' };
-          if (held === feed.v) return new Response(null, { status: 304, headers });
-          return new Response(feed.body, { status: 200, headers: { ...headers, 'content-type': 'application/json; charset=utf-8' } });
-        }
-        if (feed.live.has(poiPath.sha) || !request.headers.get('authorization')) {
-          const r = await getPoiAsset({ ...ctx, db: env.DB, bucket: env.SAVES }, poiPath.sha, { builder: false });
-          return 'error' in r ? no(r.error, r.error === 'no-storage' ? 503 : 404, origin) : poiAssetResponse(r, origin);
-        }
-      }
       // ═══ AUDIT-ACC F13: A CREDENTIAL DOES NOT GO IN A URL ══════
       //
       // This read `?secret=` on a GET, and the comment above defended
@@ -1040,7 +921,7 @@ const service = {
       const auth = request.headers.get('authorization') ?? '';
       const bearer = /^Bearer (.+)$/.exec(auth)?.[1];
       const secret = bearer ?? (request.method === 'POST' ? body.secret : null);
-      // SESSION-SIGN (sessionPass.js; THE PLAN PAST 1,000, decision 4): A HOT ROUTE
+      // SESSION-SIGN (sessionPass.js): A HOT ROUTE
       // BELIEVES ITS PASS - who the lookup found, signed for five minutes and bound to this secret - and asks the lookup
       // only for one it cannot believe, minting the next beside its answer
       const hot = passRoute(path, request.method) ? await passKey(env, subtle) : null;
@@ -1290,18 +1171,7 @@ const service = {
           account: { ...accountView(who.player, nowS), duels: await duelRecordOf(ctx, who.player.id), gates: await gateRecordOf(ctx, who.player.id), raids: await raidRecordOf(ctx, who.player.id), serpents: await serpentRecordOf(ctx, who.player.id), sds: await sdRecordOf(ctx, who.player.id), stars: await starRecordOf(ctx, who.player.id), renown: await renownTracksOf(ctx, who.player.id), marks: await marksCardOf(ctx, who.player, env) },
           wardrobe: { ...accountWardrobe(await withSeatTitles(ctx, who.player, env), env, nowS), purse: await insigniaPurse(ctx, who.player) },   // SEAT1c: and a Charter's titles   // WB9g: and what the account's closed gates could still pay the Broker's insignia
           devices: await devicesOf(ctx, who.player.id),
-          // PATREON-LINK: the card's Patreon row - whether linking is on, whether this account is linked, the titles its
-          // pledge holds, and the link to follow (a state sealed for this account, under the origin that served this)
-          patreon: await patreonCardOf(who.player, env, { subtle, rand, nowS, origin: url.origin }),
         }, 200, origin);
-      }
-
-      if (path === '/v1/patreon/unlink' && request.method === 'POST') {
-        // PATREON-LINK: the account's Patreon taken off it, and nothing about the pledge kept. The answer is the wardrobe
-        // after it (an equip's shape - a title the pledge held is no longer held, nor worn) and the card's row.
-        await unlinkPatreon(ctx, who.player.id);
-        const after = { ...(await withSeatTitles(ctx, who.player, env)), patreon_user: null, patreon_tiers: null, patreon_status: null, patreon_at: null };   // AUDIT SEATS-3 E2: a Charter's titles still held
-        return json({ ok: true, ...accountWardrobe(after, env, nowS), patreon: await patreonCardOf(after, env, { subtle, rand, nowS, origin: url.origin }) }, 200, origin);
       }
 
       if (path === '/v1/duel/loss' && request.method === 'POST') {
@@ -1968,13 +1838,6 @@ const service = {
         return json(r, 200, origin);
       }
 
-      // SEA-SEASON: the season's deepest voyages and legends
-      // ended - read here; the figures come with each clean checkpoint (seaSeason.js, realm.js checkpointRealm)
-      if (path === '/v1/sea/season/board') {
-        if (request.method !== 'POST') return no('method', 405, origin);
-        return json(await seaSeasonBoard(ctx, who.player, body), 200, origin);
-      }
-
       // ═══ PROF5: THE MARKET ══════════════════════════════════════════
       //
       // A registered account's, and the board's, the professions' and the Marks' switches together (market.js asks
@@ -2289,60 +2152,6 @@ const service = {
       // would tell a player at the backup button to sign in again,
       // which is not what they need to do. 403 rather than 401 because
       // the credential is GOOD; there is nothing to sign in again with.
-      // ═══ POI-1: THE POI STORE (poi.js) ═════════════════════════
-      //
-      // A builder's uploads, drafts and submissions; an approver's queue and word; the list and a POI's history. Every
-      // door asks the role itself (poi.js poiRolesOf), so a route here is never more than the roles say.
-      if (poiPath) {
-        const pctx = { ...ctx, bucket: env.SAVES };
-        const me = who.player;
-        const answer = (r) => ('error' in r ? json(r, POI_STATUS[r.error] ?? 400, origin) : json(r, 200, origin));
-        const { route } = poiPath;
-        if (route === 'me' && request.method === 'GET') return json({ handle: me.handle ?? null, ...poiRolesOf(me, env) }, 200, origin);
-        if (route === 'list' && request.method === 'GET') return answer(await listPoi(pctx, me, env));
-        if (route === 'queue' && request.method === 'GET') return answer(await poiQueue(pctx, me, env));
-        if (route === 'doc' && request.method === 'GET') return answer(await poiHistory(pctx, me, env, poiPath.id));
-        if (route === 'shelf' && request.method === 'GET') return answer(poiPath.id ? await shelfEntry(pctx, me, env, poiPath.id) : await listShelf(pctx, me, env));
-        if (route === 'shelf' && request.method === 'PUT' && !poiPath.id) {
-          // POI-4b: an entry on the library's shelf, read to a draft's own bound (an entry is a POI without its place)
-          if (!poiRolesOf(me, env).builder) return no('poi-not-builder', 403, origin);
-          const put = await readBody(request, POI_DRAFT_BODY_MAX);
-          if (put === undefined) return no('too-large', 413, origin);
-          if (!put) return no('body', 400, origin);
-          return answer(await shelve(pctx, me, env, { item: put.item }));
-        }
-        if (route === 'asset' && request.method === 'GET') {
-          const r = await getPoiAsset(pctx, poiPath.sha, poiRolesOf(me, env));
-          return 'error' in r ? no(r.error, r.error === 'no-storage' ? 503 : 404, origin) : poiAssetResponse(r, origin);
-        }
-        if (route === 'asset' && request.method === 'PUT') {
-          // A RAW BODY, against its kind's own bound (as a save's is), read only for a builder
-          if (!poiRolesOf(me, env).builder) return no('poi-not-builder', 403, origin);
-          const kind = url.searchParams.get('kind');
-          if (kind !== 'mesh' && kind !== 'texture') return no('poi-kind', 400, origin);
-          const raw = await readCapped(request, POI_ASSET_MAX[kind]);
-          if (!raw) return no('too-large', 413, origin);
-          if (!raw.byteLength) return no('body', 400, origin);
-          return answer(await putPoiAsset(pctx, me, env, { sha: poiPath.sha, kind, bytes: raw }));
-        }
-        if (route === 'draft' && request.method === 'PUT') {
-          if (!poiRolesOf(me, env).builder) return no('poi-not-builder', 403, origin);
-          const draft = await readBody(request, POI_DRAFT_BODY_MAX);
-          if (draft === undefined) return no('too-large', 413, origin);
-          if (!draft) return no('body', 400, origin);
-          return answer(await savePoiDraft(pctx, me, env, { doc: draft.doc, base: draft.base ?? null }));
-        }
-        if (request.method === 'POST') {
-          if (route === 'submit') return answer(await submitPoi(pctx, me, env, { id: body.id, rev: body.rev }));
-          if (route === 'withdraw') return answer(await withdrawPoi(pctx, me, env, { id: body.id, rev: body.rev }));
-          if (route === 'retire') return answer(await requestRetire(pctx, me, env, { id: body.id }));
-          if (route === 'review') return answer(await reviewPoi(pctx, me, env, { id: body.id, rev: body.rev, verdict: body.verdict, note: body.note ?? null, docSha: body.docSha ?? null }));   // AUDIT POI S1: what the approver saw
-          if (route === 'rollback') return answer(await rollbackPoi(pctx, me, env, { id: body.id, rev: body.rev }));
-          if (route === 'unshelve') return answer(await unshelve(pctx, me, env, { id: body.id }));
-        }
-        return no('method', 405, origin);
-      }
-
       if (path === '/v1/saves' || slot) {
         if (accountKind(who.player) !== 'linked') return no('saves-need-account', 403, origin);
         const me = who.player.id;
@@ -2416,7 +2225,7 @@ const service = {
       // account's as its Renown is.
       if (path.startsWith('/v1/realm')) {
         const me = who.player.id;
-        const rctx = { ...ctx, bucket: env.SAVES };
+        const rctx = { ...ctx, bucket: env.SAVES, env };   // env: the operator's options a checkpoint reads (verdict.js)
         const answer = (r, ok = 200) => (r.error ? no(r.error, REALM_STATUS[r.error] ?? 400, origin) : json(r, ok, origin));
         if (path === '/v1/realm') {
           if (request.method !== 'GET') return no('method', 405, origin);

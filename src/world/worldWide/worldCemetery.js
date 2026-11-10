@@ -1,12 +1,11 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // AUDIT RELEASE R2-6 - A CEMETERY PAST THE BAY.
 //
 // DFU's GetRandomCemetery (PlayerGPS.CurrentRegionIndex's map table, its DungeonType.Cemetery rows, one drawn by
 // UnityEngine.Random - VampirismInfection's transfer to a crypt when the turn completes) reads MAPS.BSA, which holds no
 // row past the Bay: a vampire turned in a province was never carried to a crypt. The same rule on the province's own
 // ground:
-//   - THE REGION IS THE AREA. WW1 (03-World/World-Wide.md decision 4) made a province's DISTRICT (DISTRICT_PX, about a
+//   - THE REGION IS THE AREA. WW1 made a province's DISTRICT (DISTRICT_PX, about a
 //     Bay region's size) what a region was to every system that grouped by it; a cemetery is drawn from the player's
 //     area's own - its lairs of DUNGEON_TYPES.Cemetery (world/tamrielDungeons.js LAIR_TYPES' graveyards) - by DFU's draw.
 //   - NONE IN IT: the nearest cemetery of the eight districts about it, the province's own (the theatre's), a map
@@ -15,7 +14,6 @@
 //     (`nearestBayCemetery`) - the transfer is never skipped past the Bay.
 // Pure over the world's registry (world/worldWide/worldPlaces.js inArea - a district walked once a generation) and the
 // game's MapsFile; the same answer on every client for one roll.
-// ═══════════════════════════════════════════════════════════════════
 import { DUNGEON_TYPES, longitudeLatitudeToMapPixel } from '../../formats/mapsFile.js';
 import { theatreAt, districtOf, areaOfDistrict, BAY_THEATRE } from './worldGrid.js';
 

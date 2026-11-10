@@ -42,7 +42,7 @@ import { TextureFile } from '../../src/formats/textureFile.js';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (p) => hostText(p);
 
-// ═══ the script's tables ════════════════════════════════════════════════
+// the script's tables
 
 test('SIB1: GetManagedArchivesForSeason - the four woodland sets below Summer, the three snow sets in Winter, nothing in Summer', () => {
   assert.deepEqual(managedArchivesForSeason(SEASONS.Fall), [504, 506, 508, 510]);
@@ -101,7 +101,7 @@ test('SIB1: ParseRecordFromFilename - prefix (case-blind) then an Int32, or -1',
   assert.deepEqual(filesForPrefix(['a/K1.png', 'b/J1.png', 'c/k2.PNG', 'SeasonHelper.cs'], 'K'), ['a/K1.png', 'c/k2.PNG']);
 });
 
-// ═══ TryBuildSeasonalAtlas's checks and the size law ═════════════════════
+// TryBuildSeasonalAtlas's checks and the size law
 
 const tex = (name, w = 8, h = 8) => ({ name, width: w, height: h, image: { width: w, height: h, data: new Uint8Array(w * h * 4) } });
 const fullSet = (prefix, n, from = 0) => Array.from({ length: n - from }, (_, i) => tex(`${prefix}${i + from}.png`, 10 + i, 20 + i));
@@ -149,7 +149,7 @@ test('SIB1: the size law - (w, h) * 3.1f with a zero scale through GetScaledBill
   assert.ok(Math.abs(s.w / classic.w - 3.1) < 1e-6);
 });
 
-// ═══ SeasonHelper's state machine ═══════════════════════════════════════
+// SeasonHelper's state machine
 
 function makeHelper({ season = SEASONS.Winter, counts = {}, sets = {} } = {}) {
   const log = { warns: [], refreshes: 0, loads: [], counts: [] };
@@ -307,7 +307,7 @@ test('SIB1 (AUDIT 62 F4): RefreshLoadedNatureBatches filters by ARCHIVE - a grid
   assert.deepEqual(reskin.take(built), ['1,0'], 'the pixel on 504 stands on an older install and IS re-applied - and it alone');
 });
 
-// ═══ the door: LZ4 blocks ═══════════════════════════════════════════════
+// the door: LZ4 blocks
 
 test('SIB1: LZ4 block - literals, matches, overlapping matches, long lengths, and refusals', () => {
   const dec = (arr, n) => Buffer.from(lz4BlockDecompress(new Uint8Array(arr), n)).toString('latin1');
@@ -329,7 +329,7 @@ test('SIB1: LZ4 block - literals, matches, overlapping matches, long lengths, an
   assert.throws(() => lz4BlockDecompress(new Uint8Array([0x10, 0x61]), 5), /filled 1 of 5/);
 });
 
-// ═══ the door: DXT blocks ═══════════════════════════════════════════════
+// the door: DXT blocks
 
 test('SIB1: DXT1 and DXT5 blocks decode to the documented palettes', () => {
   // DXT1: c0 = pure red (0xF800), c1 = pure blue (0x001F); c0 > c1 so
@@ -426,7 +426,7 @@ test('SIB1: the UnityFS reader - header, stored and LZ4 blocks, the type tree wi
   assert.equal(usesNewArchiveFlags([2023, 1, 0]), true);
 });
 
-// ═══ the registry over the pick ═════════════════════════════════════════
+// the registry over the pick
 
 test('SIB1: seasonsAssetKey - the .dfmod whole, the eleven folders\' PNGs by folder, nothing else', () => {
   assert.equal(seasonsAssetKey('Seasons of the Iliac Bay/seasons of the iliac bay.dfmod'), `${DFMOD_KEY_PREFIX}seasons of the iliac bay.dfmod`);
@@ -577,7 +577,7 @@ test('SIB1 (AUDIT 62 F26): a seasonal flat reaches texImage2D in getColor32 orde
   clearSeasonsSources();
 });
 
-// ═══ the hosts, the pick, the settings, the credits, the vendor tree ═════
+// the hosts, the pick, the settings, the credits, the vendor tree
 
 test('SIB1: both climate hosts take the cache\'s answer for a flat, and the streaming host hears every event the script subscribes', () => {
   const world = hostText('src/scenes/world.js');

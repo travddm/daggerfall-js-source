@@ -12,7 +12,7 @@ import { createRestItem, REST_ITEM, REST_ITEM_TEXT } from '../../../src/systems/
 import { setWorldMinutes, setSharedClock } from '../../../src/systems/worldTick.js';
 import { _resetForTests } from '../../../src/systems/uiPrefs.js';
 
-// ═══ FIELD BUGS 2026-10-04d CAMP-CAP: THE CAP STRIKES THE OLDEST ══════
+// FIELD BUGS 2026-10-04d CAMP-CAP: THE CAP STRIKES THE OLDEST
 //
 // Discord, 2026-10-04, several players: "Placing 5 or so tents around the
 // world and leaving them behind means I can no longer place any new tents

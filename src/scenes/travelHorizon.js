@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // OW-HORIZON: AS FAR AS
 // THE EYE CAN SEE, FROM THE AIR.
 //
@@ -27,7 +26,6 @@
 //
 // THE COST. None of it draws anything new: the haze and the lens are numbers the frame already sends. The far
 // ring's pass (one draw) was drawn under the view before; past the grid it is what the eye now sees.
-// ═══════════════════════════════════════════════════════════════════
 
 import { RING_RIM_END } from '../render/farRing.js';
 import { perspective, mirrorProjectionX } from '../world/mat4.js';

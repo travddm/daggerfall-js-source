@@ -45,7 +45,7 @@ const subtle = globalThis.crypto.subtle;
 const keypair = () => subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
 const quiet = (fn) => { const info = console.info, warn = console.warn; console.info = () => {}; console.warn = () => {}; try { return fn(); } finally { console.info = info; console.warn = warn; } };
 
-// ═══ THE LAW ═════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 const D = 600;                      // the raid's day
 /** RAID-ROLL: the relay hears only a raid the day drew - these raids are day D's own slots (net/raid/raidLaw.js
@@ -137,7 +137,7 @@ test('RAID3 law: WHO EARNED IT - struck a raider (said), and said so from the to
   assert.equal(RAID_TOP_MAX, 3);
 });
 
-// ═══ THE RECEIPT ═════════════════════════════════════════════════════════════════════════════════
+// THE RECEIPT
 
 test('RAID3 receipt: minted by the relay\'s one key and verified by its public half; unsigned is a real answer; never a gate\'s receipt nor an identity, whichever verifier is asked; refused, never repaired (mutants: the version not read first; a foreign claim let through; the expiry or the future ignored)', async () => {
   const kp = await keypair();
@@ -177,7 +177,7 @@ test('RAID3 receipt: minted by the relay\'s one key and verified by its public h
   await assert.rejects(() => mintRaidReceipt({ w: 'junk', s: 'acct-peer-0001', c: 1, y: 0 }, null, { subtle, nowS }), /refused a claim set/);
 });
 
-// ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a frame of the room\'s is projected for the client by its kind (mutant: a bound off by one)', async () => {
   assert.deepEqual(RAID_KINDS, ['w']);
@@ -222,7 +222,7 @@ test('RAID3 wire: a word is projected - its fields, bounded, nothing else; a fra
   assert.equal(pass, RAID_HZ_MAX, 'RAID_HZ_MAX at once');
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 const T0 = wallMsForClassicMinutes(ST + 10);   // ten game minutes into the raid
 const ON = { x: PX * PIXEL_UNITS + 16384, y: 0, z: (499 - PY) * PIXEL_UNITS + 16384, yaw: 0, pitch: 0 };
@@ -476,7 +476,7 @@ test('RAID3 relay: THE END - the cell\'s alarm forgets a ledger past its end; a 
   });
 });
 
-// ═══ THE SESSION ═════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
 function sessionRig(room) {
   const { FakeWS, sockets } = fakeSocketClass();
@@ -513,7 +513,7 @@ test('RAID3 session: a word goes only down the town cell\'s own socket, through 
   assert.deepEqual(hub.got.map((g) => g.f.k), ['cl', 'cls', 'rc'], 'the hub says cleanses, and hands an earner\'s receipt (AUDIT RAID R2); a ledger is a cell\'s');
 });
 
-// ═══ THE RAID, ON THE CLIENT ═════════════════════════════════════════════════════════════════════
+// THE RAID, ON THE CLIENT
 
 const CDAY = 400;
 const CAT = (min) => CDAY * MINUTES_PER_DAY + min;

@@ -14,12 +14,11 @@ manual testing use.
 | `src/characters/` | People and creatures: bodies, rigs, animation, equipment rules, paperdoll, name generation, encounter tables. |
 | `src/combat/` | Combat rules: formulas, weapons, first-person arms, blood, techniques, spell casting in first person. |
 | `src/formats/` | Readers for Daggerfall's file formats (BSA, TEXTURE, IMG/CIF, ARCH3D, BLOCKS, MAPS, SKY, sound, video, saves) and for Morrowind and Unity data (`morrowind/`, `unity/`, `save/`, `worldData/`). |
-| `src/net/` | The online client (`online.js`, `accountClient.js`, chat) and the rules both the client and the relay run (`*Law.js`). Feature folders per online feature. |
+| `src/net/` | The online client (`online.js`, `accountClient.js`, chat) and the rules both the client and the relay run (`*Law.js`). Feature folders per online feature. `profile/` holds the server profile's data and pure functions, which the relay and the account service also read: the official profile (`officialProfile.ts`), the key registry (`profileKeys.ts`) and the profile hash (`profileHash.ts`). |
 | `src/player/` | The player in the world: motor, collision, camera, pointer lock, first-person views, seats, climbing. |
-| `src/poi/` | The points-of-interest editor and feed. |
 | `src/render/` | The WebGL2 renderer, its shaders and passes ([rendering/](../rendering/README.md)). |
 | `src/scenes/` | The scene hosts (`world.js`, `worldModes.js`, `dungeonContext.js`, `exterior.js`, `interior.js`, `dungeon.js`), the host modules they wire (`*Host.js` and others), and shared scene code (`shared.js`, `dataSource.js`, `dataPipeline.js`). |
-| `src/systems/` | Game rules that are neither combat nor online: items, quests, guilds, travel, time, weather, saving, sound, settings, preferences. About 60 feature folders. |
+| `src/systems/` | Game rules that are neither combat nor online: items, quests, guilds, travel, time, weather, saving, sound, settings, preferences. About 60 feature folders. `online/` is the client's online lane: `profileDoor.ts` fetches and installs the server profile before an online world boots, `serverProfile.ts` holds the installed profile, and `onlineLane.js` applies its pins to settings and mods. |
 | `src/tools/` | Code for the lab pages (`labs/sky.html`, `labs/water.html`, `labs/studio.html` and others). Not loaded by the game. |
 | `src/ui/` | Every window, menu and HUD element, classic and Enhanced; input (`input.js`), touch (`touch/`), the intro. |
 | `src/world/` | World assembly: terrain, blocks, locations, dungeons, buildings, water, roads, the map of Tamriel (`tamriel/`), the registry of places (`worldWide/`). |
@@ -44,9 +43,10 @@ There is no global store. State lives in:
 - **Host scope.** Most live game state is local to `bootWorld` (and to the other host functions) and reaches modules
   through getters ([hosts-and-modules.md](hosts-and-modules.md)).
 - **Module scope.** Some modules keep a single instance at module level, for example the frame generation in
-  `src/scenes/shared.js` (`claimFrame`, `frameAlive`), the notification queue in `src/systems/notify.js`, and the
-  ARENA2 cache in `src/scenes/dataSource.js`. These modules export a reset function for tests where needed (for
-  example `_resetNotifyForTests`).
+  `src/scenes/shared.js` (`claimFrame`, `frameAlive`), the notification queue in `src/systems/notify.js`, the
+  ARENA2 cache in `src/scenes/dataSource.js`, and the installed server profile in
+  `src/systems/online/serverProfile.ts` (set once by the profile door and frozen for the page's life). These modules
+  export a reset function for tests where needed (for example `_resetNotifyForTests`, `_resetProfileForTests`).
 - **Storage.** Preferences and settings persist in `localStorage` through their modules. ARENA2 files, user music and
   local saves persist in IndexedDB. Always go through the owning module; storage can throw in private browsing, and
   the modules handle that.

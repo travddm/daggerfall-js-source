@@ -11,7 +11,7 @@ import {
   GATE_OMEN_MINUTE, GATE_RISE_MINUTE, GATE_OPEN_MINUTE, GATE_SEAL_MINUTE, GATE_WRATH_MINUTE, GATE_COLLAPSE_MS, GATE_EVERY_DAYS,
   gateAdmits, gateHolds, GATE_LANES_OPEN, gateLaneOpen,
 } from '../../../src/net/gate/gateLaw.js';
-import { heraldOmenDue, gateSiteDayOk } from '../../../src/net/gate/gateHerald.js';
+import { gateSiteDayOk } from '../../../src/net/gate/gate-site.ts';
 import {
   sharedClassicMinutes, wallMsForClassicMinutes, gateReceiptKey, gateLaneKey, gatePixelOk, gateLaneWire,
   validGateIn, validRiteIn, validRiteOut, GATE_LANES_WIRE, GATE_LANE_SPAN_WIRE, WORLD_PIXEL_BOUND,
@@ -37,7 +37,7 @@ const src = (p) => codeOnly(readFileSync(new URL('../../../' + p, import.meta.ur
 const NOW = Date.UTC(2026, 9, 24, 12, 0, 0);
 const CLASSIC_MIN_MS = 5000;
 
-// ─── the Bay's lane as it was before WW2, word for word (net/gate/gateLaw.js and net/gate/gateHerald.js at b268ad5b0d) ───
+// ─── the Bay's lane as it was before the lanes past the Bay, word for word (net/gate/gateLaw.js at b268ad5b0d) ───
 const oldIsGateDay = (day) => Number.isSafeInteger(day) && day >= 0 && day % GATE_EVERY_DAYS === 0;
 const oldGameDayAt = (nowMs) => Math.floor(sharedClassicMinutes(nowMs) / GATE_DAY_MINUTES);
 function oldGateTimes(day) {
@@ -50,17 +50,6 @@ function oldGateAt(nowMs) {
   if (oldIsGateDay(day - 1) && nowMs < oldGateTimes(day - 1).wrathAt + GATE_COLLAPSE_MS) return oldGateTimes(day - 1);
   while (!oldIsGateDay(day)) day++;
   return oldGateTimes(day);
-}
-function oldOmenDue(nowMs, postedDay = -1) {
-  const today = oldGameDayAt(nowMs);
-  const posted = Number.isSafeInteger(postedDay) && postedDay <= today ? postedDay : -1;
-  for (let d = Math.max(0, today); d <= today + GATE_EVERY_DAYS; d++) {
-    if (!oldIsGateDay(d) || d <= posted) continue;
-    const t = oldGateTimes(d);
-    if (t.openAt <= nowMs) continue;
-    return { day: d, at: Math.max(nowMs, t.omenAt) };
-  }
-  return null;
 }
 
 test('WW2 the lanes: a lane a theatre, a gate\'s NUMBER its day on the Bay\'s lane and its day plus its lane\'s span beyond it, both ends\' copies of the law equal; a number of no lane the world has is no gate (mutants: the lane\'s span, the lane read, a lane past the last)', () => {
@@ -84,7 +73,7 @@ test('WW2 the lanes: a lane a theatre, a gate\'s NUMBER its day on the Bay\'s la
   assert.equal(isGateDay(1.5), false);
 });
 
-test('WW2 the Bay\'s lane is the gate it always was: its instants, the gate the clock is about, the herald\'s omen owed and the game day, to the millisecond over three days and every edge (mutants: the stagger on the Bay\'s lane, the day read off the gate)', () => {
+test('WW2 the Bay\'s lane is the gate it always was: its instants, the gate the clock is about and the game day, to the millisecond over three days and every edge (mutants: the stagger on the Bay\'s lane, the day read off the gate)', () => {
   const t0 = oldGateTimes(oldGameDayAt(NOW)).omenAt;
   const instants = [];
   for (let ms = NOW - 86_400_000; ms < NOW + 2 * 86_400_000; ms += 37_000) instants.push(ms);
@@ -98,18 +87,13 @@ test('WW2 the Bay\'s lane is the gate it always was: its instants, the gate the 
     assert.equal(gameDayAt(ms, 0), oldGameDayAt(ms));
     assert.deepEqual({ ...gateAt(ms) }, oldGateAt(ms), `the gate at ${ms - t0}`);
     assert.deepEqual({ ...gateAt(ms, 0) }, oldGateAt(ms));
-    const today = oldGameDayAt(ms);
-    for (const posted of [-1, today - 2, today - 1, today, today + 1, gateNumber(today, 1)]) {
-      assert.deepEqual(heraldOmenDue(ms, posted), oldOmenDue(ms, posted), `the omen owed at ${ms - t0}, ${posted} posted`);
-      assert.deepEqual(heraldOmenDue(ms, posted, 0), oldOmenDue(ms, posted));
-    }
     checked++;
   }
   assert.ok(checked > 7000, `${checked} instants`);
   for (let d = 0; d < 400; d++) assert.equal(gateIndex(d), Math.floor(d / GATE_EVERY_DAYS), 'the Bay\'s place in the cycles');
 });
 
-test('WW2 THE STAGGER: lane t\'s gate runs GATE_LANE_STAGGER classic minutes (twelve real) behind lane t - 1\'s, so a game day\'s ten gates open across 108 of its 120 real minutes, two or three standing at once; each lane its own today, its own gate the clock is about and its own omen owed, on its own numbers (mutants: no stagger, the lane\'s today the Bay\'s, the herald\'s lane)', () => {
+test('WW2 THE STAGGER: lane t\'s gate runs GATE_LANE_STAGGER classic minutes (twelve real) behind lane t - 1\'s, so a game day\'s ten gates open across 108 of its 120 real minutes, two or three standing at once; each lane its own today, and its own gate the clock is about, on its own numbers (mutants: no stagger, the lane\'s today the Bay\'s)', () => {
   assert.equal(GATE_LANE_STAGGER * CLASSIC_MIN_MS, 12 * 60_000);
   assert.ok((GATE_LANES - 1) * GATE_LANE_STAGGER < GATE_DAY_MINUTES, 'the last lane opens inside its day');
   const day = oldGameDayAt(NOW);
@@ -125,14 +109,8 @@ test('WW2 THE STAGGER: lane t\'s gate runs GATE_LANE_STAGGER classic minutes (tw
       assert.equal(gateLaneOf(g.day), lane);
       assert.equal(gateDayOf(g.day), gateAt(ms - shift).day, `lane ${lane} at ${ms - NOW}`);
       assert.equal(gameDayAt(ms, lane), gameDayAt(ms - shift));
-      const due = heraldOmenDue(ms, -1, lane), bay = heraldOmenDue(ms - shift, -1);
-      assert.deepEqual(due && { day: gateDayOf(due.day), lane: gateLaneOf(due.day), at: due.at - shift }, bay && { day: bay.day, lane, at: Math.max(bay.at, ms - shift) }, `the omen owed on lane ${lane}`);
     }
   }
-  // a lane's own post stands for it, and only for it
-  const n1 = heraldOmenDue(NOW, -1, 1).day;
-  assert.notDeepEqual(heraldOmenDue(NOW, n1, 1)?.day, n1, 'lane 1\'s post spends lane 1\'s omen');
-  assert.deepEqual(heraldOmenDue(NOW, n1, 2), heraldOmenDue(NOW, -1, 2), 'and never lane 2\'s');
   // the count at once: the gates standing (omen to wrath) at each instant of a day
   let most = 0;
   for (let ms = NOW; ms < NOW + 86_400_000; ms += 60_000) {
@@ -167,7 +145,7 @@ test('WW2 the hub\'s records a lane: the Bay\'s keys the ones they always were, 
   assert.equal(gateReceiptKey('acct-1', 0), 'gaterc:acct-1');
   assert.equal(gateReceiptKey('acct-1', 3), 'gaterc:acct-1.3');
   assert.equal(new Set(Array.from({ length: GATE_LANES }, (_, l) => gateReceiptKey('acct-1', l))).size, GATE_LANES);
-  for (const k of ['gatefell', 'gatesite', 'herald', 'rite']) {
+  for (const k of ['gatefell', 'gatesite', 'rite']) {
     assert.equal(gateLaneKey(k), k);
     assert.equal(gateLaneKey(k, 0), k);
     assert.equal(gateLaneKey(k, 7), `${k}:7`);

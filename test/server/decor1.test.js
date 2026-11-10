@@ -2,7 +2,7 @@
 // service's store of an online home's pieces driven through the real Worker over node:sqlite with every migration
 // applied (server-account/src/decor.js), the client's door to it, and the deploy's wiring; DECOR1c: the pieces standing
 // in a room (scenes/decor/decorRoom.js), the scene that keeps them, and the host that stands them (worldModes.js).
-// `06-Systems/Online-Arc.md` DECOR1.
+// DECOR1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -15,7 +15,7 @@ import {
   DECOR_CAP, DECOR_POS_MAX, DECOR_SCALE_MIN, DECOR_SCALE_MAX, DECOR_PRICE_MIN, DECOR_PRICE_MAX, DECOR_OPS_MAX,
   decorWhatOf, decorLightOf, decorPlaceOf, decorPieceOf, decorPrice, decorRefund, decorRescale, mintDecorId, decorSaleBack,
 } from '../../src/net/decorLaw.js';
-import { accountDecor, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountDecor, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { collectDecor, decorCatalogue, filterDecor, decorSize, decorKey, modelKind, flatKind, DECOR_KINDS } from '../../src/systems/decor/decorCatalogue.js';
 import { createDecorRoom, decorMatrix, decorKeyOf, decorIdOfKey, decorLightLift, DECOR_REACH } from '../../src/scenes/decor/decorRoom.js';
 import { trs } from '../../src/world/mat4.js';
@@ -299,7 +299,7 @@ test('DECOR2c a mount in an online home: the service keeps a weapon or shield hu
   assert.deepEqual((await call('POST', '/v1/homes/decor', HOME, mara)).body.pieces, [axe], 'every visitor reads it hung');
   const past = piece({ id: 'w2', model: null, flat: [100_000, 0], item: { t: 120, g: 3, m: null, v: null, a: null, p: null }, paid: 0 });   // DECOR-MODFLATS: past a mod's five digits
   assert.equal((await call('POST', '/v1/homes/decor/place', at({ piece: past }), aldric)).body.error, 'bad-decor');
-  // DECOR-MODFLATS: a mod's flat - Detailed Ships' own, "Decoration 49" onward - is a piece to the service too
+  // DECOR-MODFLATS: a mod's flat - archive 1210, "Decoration 49" onward - is a piece to the service too
   const ship = piece({ id: 'w3', model: null, flat: [1210, 1], paid: 20 });
   const shipped = (await call('POST', '/v1/homes/decor/place', at({ piece: ship }), aldric)).body;
   assert.deepEqual([shipped.ok, shipped.piece, shipped.gold], [true, ship, -20]);
@@ -327,7 +327,7 @@ test('AUDIT HOME-STATIONS (the batch\'s cross-cutting audit, F8) the service: a 
 test('DECOR1 the client\'s door: every call rides the one session as a Bearer header to its route, and no session is a word, not a throw; every refusal the service can say has a sentence; the deploy bundles the law and its smoke reads a room and refuses a guest (mutants: a route misspelt, the secret in the body)', async () => {
   const seen = [];
   const fetch = async (url, init) => { seen.push({ url, init }); return { ok: true, status: 200, json: async () => ({ ok: true }) }; };
-  const storage = new Map([[SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
+  const storage = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
   const store = { getItem: (k) => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v), removeItem: (k) => storage.delete(k) };
   const api = accountDecor({ fetch, storage: store });
   await api.list(7, 9);

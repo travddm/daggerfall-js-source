@@ -11,6 +11,7 @@
 // (`count`); a line holding a snippet inside a longer one of its own is named by the LONGEST. Comment lines are not
 // readers. The table is a table and not a note on each line because the mutant campaigns (tools/mutants/) pin these
 // lines' text: an event reader that does not move should not change a byte.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -54,7 +55,8 @@ test('TIME1 census: the table is well formed - every row a file, a snippet, a kn
   }
 });
 
-test('TIME1 census: every line in src/ that reads a shared clock is named, every row names its lines, and no row says a clock its line does not read', () => {
+test('TIME1 census: every line in src/ that reads a shared clock is named, every row names its lines, and no row says a clock its line does not read', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const unnamed = [];
   const counts = new Map();
   const files = walk(join(ROOT, 'src'));
@@ -69,7 +71,7 @@ test('TIME1 census: every line in src/ that reads a shared clock is named, every
       if (best.clock === 'event') assert.doesNotMatch(line, SKY_RE, `${file}: "${best.has}" is an event row and its line reads the sky: ${line.slice(0, 160)}`);
     }
   }
-  assert.deepEqual(unnamed, [], `a line reads a shared clock and the census does not say which it means - add a row to test/fixtures/time1_census.json (bible/06-Systems/Online-Time-Arc.md section 5 says which):\n${unnamed.join('\n')}`);
+  assert.deepEqual(unnamed, [], `a line reads a shared clock and the census does not say which it means - add a row to test/fixtures/time1_census.json (docs/systems/time-and-weather.md says which):\n${unnamed.join('\n')}`);
   const wrong = CENSUS.rows.filter((r) => (counts.get(r) ?? 0) !== (r.count ?? 1))
     .map((r) => `${r.file}: "${r.has}" names ${counts.get(r) ?? 0} line(s), the row says ${r.count ?? 1}`);
   assert.deepEqual(wrong, [], `a row names lines that are gone, or more than it says:\n${wrong.join('\n')}`);

@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL3-ECON (2026-10-22; design doc "DFO Staff Panel: design", build step 3: "Market and trades, Node activity,
 // Economy (all read existing data)") - THE PANEL'S ECONOMY SCREENS, an Admin's alone (mob, 03:03Z: Moderators get the
 // chat reports, Mute and Ban; "Admin sees and does everything"). Every answer is a read of what the service already
@@ -15,7 +14,7 @@
 //                            and go, a day at a time over `days`, and the twenty richest characters and guilds
 //   /v1/staff/econ/guilds    PER GUILD: gold (realm and unverified legacy), Marks and vault contents, sortable, paged
 //
-// ═══ THE FLAGS ON A ROW (design doc, "Market and trades"; weak spot "The market 5x flag compares to the wrong prices") ═══
+// THE FLAGS ON A ROW (design doc, "Market and trades"; weak spot "The market 5x flag compares to the wrong prices")
 //
 // price     a material sold 5x above or below its usual price. The usual price is the median over MARKET_MEDIAN_DAYS of
 //           that material's sales IN THE ROW'S OWN CURRENCY (gold's sales never set a Drakes price, nor the other way),
@@ -29,8 +28,8 @@
 // The "linked account" flag is dropped (the weak spot: nothing the service keeps links two accounts).
 // Every number is in ECON_LIMITS, one place: starting numbers for Admins to tune, not measured ones.
 //
-// ═══ SERVER LOAD (design doc, "Server load": the existing economy reads cost 37, 56 and 96 serial trips an open, and an
-// unindexed read has reset the live database once) ═══
+// SERVER LOAD (design doc, "Server load": the existing economy reads cost 37, 56 and 96 serial trips an open, and an
+// unindexed read has reset the live database once)
 //
 // Each read is ONE batch (one trip, service.js readAll) or two where the second needs the first's answer. The stream's
 // span is STREAM_SPAN_DAYS at most and pages STREAM_PAGE rows; the economy reads ECON_DAYS_MAX days at most; node
@@ -39,7 +38,7 @@
 // says when it was read (`asOf`): the panel never polls them. Every statement stands on an index the schema holds or
 // one already there (test/server/staffpanel3econ.test.js asks EXPLAIN QUERY PLAN).
 //
-// ═══ WHAT THE SERVICE CANNOT SEE ═══
+// WHAT THE SERVICE CANNOT SEE
 //
 // A character's purse, bank and letters of credit live inside its save (realm.js, R2); no table holds them. The
 // economy names the places the service holds gold itself, and ranks characters by the judge's wealth at their last

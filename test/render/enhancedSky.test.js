@@ -269,7 +269,7 @@ test('ES1d shadow: the sun dims under the cloud the SHADER draws, and the two ca
 // ── ES1e / ES1f / ES1g: THE RETRO PASS - REMOVED (FT3, 2026-09-14, Mac:
 // "Remove our version of pixelated sky"). The pins went with the pass.
 
-// ═══ EE2: the sky's four fixes, from the Enhanced Environments lab ═══
+// EE2: the sky's four fixes, from the Enhanced Environments lab
 test('EE2: the deck reaches the horizon, the stars are not rows, the sunset has its band', async () => {
   const { paletteAt, SKY_KEYS } = await import('../../src/render/enhancedSky.js');
   // F3: the band is four keys wide where it was two

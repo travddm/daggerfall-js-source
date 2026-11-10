@@ -1,6 +1,6 @@
 // SD1: THE SUPER DUNGEON'S
-// LAW (net/superDungeon/sdLaw.js) - its slot, its record's life, where it rises, its name, its room. bible/11-Multiplayer/
-// Super-Dungeons.md sections 2-4. Pure, and the relay's: the hub stores one record (`sdev`) and moves it on with one
+// LAW (net/superDungeon/sdLaw.js) - its slot, its record's life, where it rises, its name, its room. docs/multiplayer/group-instances.md.
+// Pure, and the relay's: the hub stores one record (`sdev`) and moves it on with one
 // function per move, each refusing a move its phase does not allow; every phase is derived from the record's own
 // instants, so the hub and every client read the same life from the same record.
 import { test } from 'node:test';

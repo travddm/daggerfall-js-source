@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // ROAD-G G5 - THE INVENTORY'S DROP ICONS.
 //
 // AUDIT 58's windows lane drew the two 55x34 target-icon panels and
@@ -12,7 +11,6 @@
 //
 // Every test below was run RED under a named mutant before it was
 // kept; the mutant is written beside the assertion it kills.
-// ═══════════════════════════════════════════════════════════════════
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

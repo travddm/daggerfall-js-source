@@ -17,9 +17,7 @@
 //     on a frame hung where each id hangs;
 //   - the RMB Resource Pack's CITY-WALL PIECE (53210): the middle of Daggerfall's own wall segment out of the player's
 //     ARCH3D, closing the gap the author left it at every corner of Beautiful Cities' walls;
-//   - DET's pieces, shared with Detailed Ships: world/detStandIns.js;
-//   - Cliffworms' Items (archive 1210 - his bottles, and the classic pieces he moved there): Detailed Ships' pictures of
-//     them, by the same author and carried with his leave, shared (systems/detailedShips.js);
+//   - DET's pieces: world/detStandIns.js;
 //   - the cloth and the drawn sprites: world/townPictures.js, world/standInSprites.js.
 //
 // All of it stands behind the town mods' own load (scenes/modWorldData.js installs it when a town pack is opened -
@@ -34,7 +32,6 @@ import { registerFlatField } from './flatFields.js';
 import { RMBRP_HILL_SHAPES, SHAPE_BEARINGS, SHAPE_RINGS } from './rmbrpHillShapes.js';   // FIELD BUGS 2026-10-05 HILL-SHAPES: the pack's hills, measured
 import { wrapAngle } from './mat4.js';   // FIELD BUGS 2026-10-13e HILL-SEAT: a pad corner's turn, in one step
 import { DOOR_APPROACH_M } from './curatedPlacements.js';   // FIELD BUGS 2026-10-15f TEMPLE-STEPS: a door's approach, HILL-HOUSE's rule
-import { shareDetailedShipsArt } from '../systems/detailedShips.js';   // Cliffworms' Items (archive 1210): his pictures, the towns' too
 
 const U = 0.025;   // MeshReader.GlobalScale: one classic unit in metres
 
@@ -1017,13 +1014,12 @@ export const TOWN_GARDEN_ARCHIVE = 10035;
 
 // ---- install --------------------------------------------------------------------------------------------------------
 let _installed = false;
-/** Once: everything above on the model and texture doors behind `isOn`, and DET's pieces (shared with Detailed Ships)
- *  with `isOn` among their switches. Answers the pictures registered. */
+/** Once: everything above on the model and texture doors behind `isOn`, and DET's pieces with `isOn` among their
+ *  switches. Answers the pictures registered. */
 export function installTownStandIns(isOn = () => true) {
   if (_installed) return 0;
   _installed = true;
   let n = installDetStandIns(isOn);
-  shareDetailedShipsArt(isOn);   // the bottles and moved classic pieces of archive 1210 the towns' shelves hold - Detailed Ships' pictures of them
   for (let k = 0; k < TOWN_BED_COUNT; k++) {
     const { model, colour } = townBedOf(TOWN_BED_FIRST + k);
     registerModelAlias(TOWN_BED_FIRST + k, { model, remap: bedRemap(colour) }, isOn);

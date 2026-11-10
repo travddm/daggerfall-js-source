@@ -1,5 +1,4 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
 // CROWN2 -
 // CROWN POLITICS: Pacts (7.8). The law is townSeatLaw.js's (pactUntil, pledgeBarred).
 //
@@ -12,7 +11,6 @@
 // while one is pledged against the other's seat this week.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { accountKind, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { seatsOpenFor } from './townSeats.js';

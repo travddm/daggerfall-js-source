@@ -4,8 +4,9 @@ This page covers the outdoor passes: the three skies, volumetric clouds, precipi
 water, snow, and the horizon rings past the streamed world. Most of them are foreign passes: modules outside
 `renderer.js` that draw with the shared context and follow the rules in [renderer.md](renderer.md#foreign-passes).
 
-Weather and time are game state in `src/systems/` (for example `src/world/weather.js`, `src/systems/weather/`,
-`src/systems/wind/`, `src/systems/lightning.js`). The passes only draw that state; they do not decide it.
+Weather and time are game state in `src/systems/` and `src/world/` (for example `src/world/weather.js`,
+`src/systems/weather/`, `src/systems/wind/`, `src/systems/lightning.js`). The passes only draw that state; they do not
+decide it.
 
 ## The sky controller
 
@@ -16,6 +17,14 @@ Weather and time are game state in `src/systems/` (for example `src/world/weathe
 | Classic painted sky | `SkyRenderer`, `src/render/skyRenderer.js` | Always built. Daggerfall's 64 painted day frames (`SKY??.DAT`) and the painted night (`NITE??I0.IMG`), selected as `DaggerfallSky.cs` does. A rainy or snowy night shows the day branch, not stars (`skyFrameForWeatherTime`). |
 | Enhanced sky | `EnhancedSkyRenderer`, `src/render/enhancedSky.js` | The enhanced lane (enhanced skin, the `enhancedEnvironments` preference, not `?sky=classic`) with the Dynamic Skies mod off. One fullscreen procedural pass, no textures: sun, two moons with phases, stars, weather tint. |
 | Dynamic Skies | `DynamicSkiesRenderer`, `src/render/dynamicSkiesRenderer.js` | The enhanced lane with the Dynamic Skies mod enabled, or `?sky=dynamic`. A line-for-line translation of the mod's procedural skybox shader (`vendor/dynamic-skies/`); its uniform names are the shader's property names. `src/render/dynamicSkiesBridge.js` feeds its moon and cloud state to the rest of the world. |
+
+On the lean diet (a touch-primary browser without the desktop shell) the `SKY??.DAT` sets are not stored, and
+`SkyRenderer` draws a gradient panorama instead of the painted day frames ([arena2-data.md](../formats/arena2-data.md)).
+There is no player choice today. It is decided that phone skies become a player option and that phones keep the
+gradient by default (decision 117 (22)).
+
+The Dynamic Skies pass is a port of an outside author's mod. It leaves core with that mod (decisions 77 and 99), and
+under decision 104 its look stays reachable by loading the mod.
 
 `enhancedSky.js` also exports the sky maths the world uses: `sunSkyDirection`, `moonSkyDirection`,
 `moonlightTerm`, `withMoonAmbient` and `skyState`.
@@ -45,6 +54,9 @@ enhanced lane unless `?clouds=off`. Quality follows the `cloudQuality` preferenc
 | Heat haze | `src/render/heatHaze.js` | Translation of the Heat Haze mod's shader: copies the world's viewport, then draws a ring that refracts what lies beyond it. |
 | Weather curtains in the travel view | `src/render/rainCurtains.js` | Rain columns seen from above in the travel view. |
 
+The heat haze pass is a port of the Heat Haze mod (`vendor/heat-haze/`). It leaves core with that mod (decisions 77
+and 99); under decision 104 its look stays reachable by loading the mod.
+
 ## Fog and haze
 
 All world programs fog by `FOG_GLSL` (`src/render/fogGlsl.js`). Extra terms layer on top: the jungle haze
@@ -62,7 +74,8 @@ On the enhanced lane, with the `enhancedWater` preference and not `?water=off` (
 absorption with depth, Fresnel reflection of the sky, swell, shore foam and ripples. It is drawn after the opaque
 passes of a map pixel and before the flats. With shadows on, the surface receives the sun's shadow through its own
 program. Deep-water and ocean-hole features have their own passes (`src/render/deepWatersRender.js`,
-`src/render/oceanHolesRender.js`).
+`src/render/oceanHolesRender.js`). The ocean-holes pass ports the Ocean Holes mod (`vendor/ocean-holes/`), which
+leaves core (decisions 77 and 99); its look stays reachable by loading the mod (decision 104).
 
 The lab page `labs/water.html` (`src/tools/waterLab.js`) draws the water pass alone for tuning.
 
@@ -74,8 +87,13 @@ The lab page `labs/water.html` (`src/tools/waterLab.js`) draws the water pass al
   (`snowCoverAt`) for grass and footsteps; keep the two in step.
 - **Snowfall surface.** The Snowfall mod's dynamic snow (`src/render/snowfallGlsl.js`, `src/render/snowfallSurface.js`)
   is drawn through `renderer.drawSnow` with the mod's albedo and masks. It is owned by `src/scenes/snowfallHost.js`.
+  It leaves core with the Snowfall mod (decisions 77 and 99); its look stays reachable by loading the mod (decision
+  104).
 
 ## The horizon past the streamed world
+
+This section describes the current design. The adopted terrain pipeline (decision 38: a baked tile pyramid drawn with
+continuous distance-dependent level of detail) replaces it when that work lands.
 
 The streamed grid of map pixels ends a few kilometres out. Three coarser layers continue the land to the horizon. All
 are drawn in one pass by `src/render/farRing.js`, at the far plane, each inner layer over the outer one:

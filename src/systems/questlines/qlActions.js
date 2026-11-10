@@ -63,7 +63,7 @@ const UP = -1;
 const heldOf = (quest) => { let m = held.get(quest); if (!m) held.set(quest, (m = new Map())); return m; };
 
 /** AUDIT QUESTLINES BRANCH-1: A RECEIVED COPY KEPT IN STEP WITH A PARTY ASKS NOTHING - the sharer chooses, and the copies
- *  take the choice on the resync (decision 7, record 10.2). Every copy asked: the resync carried the sharer's click, so
+ *  take the choice on the resync. Every copy asked: the resync carried the sharer's click, so
  *  the member was asked the sharer's question; the member's answer synced back and decided the sharer's copy under the
  *  sharer's own box, whose answer then started the other choice's task - the kept gold AND the standing for giving it up
  *  (R0C11Y26). A received copy with no party to resync it (machine.js rewardShares: the party gone; or after a load - the

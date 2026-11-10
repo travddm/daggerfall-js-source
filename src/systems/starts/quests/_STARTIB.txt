@@ -1,4 +1,4 @@
--- START1 (2026-10-24; bible/06-Systems/Alternate-Starts-Arc.md section 3): THE EMPEROR'S COMMISSION, the Iliac Bay's
+-- START1 (2026-10-24): THE EMPEROR'S COMMISSION, the Iliac Bay's
 -- start. The port's own script on DFU's machine (systems/starts/starts.js), started on a new character in _BRISIEN's
 -- place (scenes/quest/questBridge.js GAME_START_QUESTS). The wake is DFU's own (_BRISIEN's 1025, its last sentence
 -- left out); the oilskin case, its commission and the order to Daggerfall are the port's. The commission is opened when

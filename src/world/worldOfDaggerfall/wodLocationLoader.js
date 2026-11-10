@@ -259,7 +259,7 @@ export function pickLocationsScan(tile, session, getPrefab, pathsPoint = null, s
 /**
  * The loop's state for one tile (FLOW2: the scan's and the walk's).
  *
- * FIELD BUGS 2026-10-18f WOD-SEA-TEST (; `01-Overview/Port-Ledger.md` section A): THE SEA ARM ASKS
+ * FIELD BUGS 2026-10-18f WOD-SEA-TEST: THE SEA ARM ASKS
  * THE PIXEL'S OWN REGION. The mod reads `mapRegionIndex` (:117), which GetMapPixelData fills from the pixel's LOCATION
  * alone - and a pixel with one has already left at :103 - so in DFU the arm never fired, and every site its lists name
  * on the sea stood there: rocks off Tlactrn Manor in open water (æther), the rocks ships met (FIELD BUGS 2026-10-02). The

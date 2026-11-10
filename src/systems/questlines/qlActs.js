@@ -7,7 +7,7 @@
 // A LEAF: the features import this and nothing of the layer. The quest bridge registers the layer as the sink, once
 // (scenes/quest/questBridge.js - THE ONE CONSTRUCTION SEAM, as questMacros.js setMacroWorld is), and a page with no quests
 // hears nothing. An act is the player's own client's word - it moves a quest's objective, never an account's currency
-// (decision 8: the service pays only what it witnessed - server-account/src/questlines.js).
+// (the service pays only what it witnessed - server-account/src/questlines.js).
 //
 // test/systems/questlines/ql11_acts.test.js sweeps src/ both ways: every kind here has a producer, and every producer
 // names a kind here.

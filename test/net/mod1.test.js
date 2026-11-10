@@ -3,7 +3,7 @@
 // and when asked which commands and which glyph: /mute and /unmute, and
 // the blue shield.
 //
-// ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
+// WHAT THESE PINS ARE FOR
 //
 // A MUTE IS AN AUTHORITY, and the build that passes a naive test is the
 // one where a client says "I am a moderator, mute Bob" and something

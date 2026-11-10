@@ -6,7 +6,7 @@
 // combat" - read a leader a hair below it as a descent and turned it up: it climbed till its feet were a metre off the
 // floor or its body met the ceiling, its 2.6 m into the roof. Its bar stood 0.3 m over its top - over the ceiling - and
 // the sight test hid it. The lift is combat's alone now (never while following), and the bar stands under the ceiling
-// over the body (ui/naval/navalHud.js crewBarPoint). `01-Overview/bugs/Field-Bugs-2026-10-09c.md`.
+// over the body (ui/naval/navalHud.js crewBarPoint).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

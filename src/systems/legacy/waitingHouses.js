@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // HOUSE-WAITS (FIELD BUGS 2026-10-09f, Sahh: "Blocked out of continuing as another bloodline character" - "My bloodline
 // permadeath character with two siblings died, and I was for a brief second shown the prompt to continue playing as one
 // of the two remaining siblings. The game however loaded me back into main menu right after and now despite the
@@ -17,7 +16,6 @@
 // says it), the record stored and written to the realm, the birth left for the boot - which is the world host's own
 // birth door (`?online&realmnew&legacyborn=`), so the birth, its first save and the fall's settling are the law that
 // already ran. Pure where it can be: storage, the tab and the realm line come in.
-// ═══════════════════════════════════════════════════════════════════
 import { MODELS, isAlive, personOf, fullNameOf, setCurrent, touch, newbornAllowed, addChild, rollSiblings } from './family.js';
 import { loadFamily, storeFamily, leaveBirth } from './store.js';
 import { t } from '../textManager.js';   // RPT1026-MISC HEIR-WAITS: the newborn's door, in the player's language

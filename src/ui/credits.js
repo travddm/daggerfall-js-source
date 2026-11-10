@@ -301,15 +301,6 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['seasons-iliac-bay']),
     }),
     Object.freeze({
-      title: 'Ambient Text',
-      version: '1.8',
-      author: 'Regnier',
-      get what() { return t('credits.ambientText.what', 'Now and then, a short line about your surroundings: 918 written by the author, chosen by the kind of place or dungeon you are in, the hour and the weather. It stays quiet indoors and waits longer after each line.'); },
-      get terms() { return t('credits.ambientText.terms', 'Used with the author\u2019s permission, with the author\u2019s own lines.'); },
-      contact: 'forums.dfworkshop.net',
-      vendor: Object.freeze(['ambient-text']),
-    }),
-    Object.freeze({
       title: 'Eye Of The Beholder',
       version: '2.1',
       author: 'RedRoryOTheGlen',
@@ -353,26 +344,6 @@ export const CREDITS = Object.freeze({
       what: 'Your family and its tree. When you fall, an heir carries on your line: a sibling, a child or a newborn, with traits from their blood and upbringing. Switch between siblings, in a Bloodline house where death is final or an Enduring house where it costs years. Recover the remains and heirloom of the fallen and lay them to rest. Family members you are not playing live at the family home, where you can meet them and play them. Find it on the pause menu\u2019s Family tab.',
       terms: 'Used with permission: Mac is Lattymoy, the mod\u2019s first-named author. Rebuilt from the released mod with its bugs fixed.',
       vendor: Object.freeze(['project-legacy']),
-    }),
-    Object.freeze({
-      title: 'Aquatic Sprites',
-      version: '1.0',
-      author: 'Cliffworms',
-      get what() { return t('credits.aquaticSprites.what', 'Weed, coral and shells: underwater sprites that come with Daggerfall but were never used. 119 of them are placed in 3 flooded dungeon areas, exactly where the author put them.'); },
-      get terms() { return t('credits.aquaticSprites.terms', 'Used with the author’s permission, under terms that ask only for credit: “The mod may be distributed/translated without my authorization as long as I am credited as the author.” The dungeon areas are rebuilt from your own game files.'); },
-      get contact() { return t('credits.contact.nexus', '{author}, through the Nexus page ({page})', { author: 'Cliffworms', page: 'daggerfallunity mod 276' }); },
-      vendor: Object.freeze(['aquatic-sprites']),
-      link: 'https://www.nexusmods.com/daggerfallunity/mods/276',
-    }),
-    Object.freeze({
-      title: 'Detailed Ships',
-      version: '1.0.0',
-      author: 'Cliffworms',
-      get what() { return t('credits.detailedShips.what', 'The 2 ships you can own, rebuilt inside and out. On deck: rigging, crates and barrels, tenders, rudders and railings. Below: your quarters, the crew’s, a kitchen, a cargo hold, an armory and a shrine to Kynareth, with sailors to talk to. The Kynareth statue is by King of Worms and Zoran, as the author’s readme credits it. Pieces the mod borrows from Ninelan’s Daggerfall Expanded Textures are replaced with stand-ins made for this game.'); },
-      get terms() { return t('credits.detailedShips.terms', 'Used with the author’s permission, under terms that ask only for credit: “The mod may be distributed/translated without my authorization as long as I am credited as the author.” The ships and the original pictures are rebuilt from your own game files.'); },
-      get contact() { return t('credits.contact.nexus', '{author}, through the Nexus page ({page})', { author: 'Cliffworms', page: 'daggerfallunity mod 1080' }); },
-      vendor: Object.freeze(['detailed-ships']),
-      link: 'https://www.nexusmods.com/daggerfallunity/mods/1080',
     }),
     // WD3: carademono's two town mods, one entry each (two vendors, two pages).
     Object.freeze({
@@ -572,8 +543,8 @@ const listOf = (names) => {
 
 /** L10N6: THE TRANSLATIONS, credited as the works are - one row a language the game holds text for, English and the
  *  pseudo-locale aside (textManager availableLocales, as scenes/localeData.js registers them): its name in itself,
- *  whose words they are, and a bundled pack's terms and source. Mac's decisions (Localization-Arc.md): a machine draft
- *  says it is one; the people who translate or check a language are credited by name (`locales/<tag>/translators.json`);
+ *  whose words they are, and a bundled pack's terms and source. The people who translate or check a language are
+ *  credited by name (`locales/<tag>/translators.json`);
  *  a pack is bundled only on its authors' terms, and those travel with it. A pack the player installed is their own -
  *  the Language row says so, the credits do not. Read as the About pane draws it, so every sentence is the player's
  *  language's. */
@@ -582,21 +553,15 @@ export function translationCredits(infos = availableLocales()) {
     const people = i.translators ?? [];
     const pack = i.bundled ?? null;
     const lines = [];
-    if (i.source === 'machine') {
-      lines.push(people.length
-        ? t('credits.l10n.checked', 'Machine translation by Claude, checked and corrected by {names}.', { names: listOf(people) })
-        : t('credits.l10n.machine', 'Machine translation by Claude, still being checked. Corrections from native speakers are welcome.'));
-    } else {
-      lines.push(people.length
-        ? t('credits.l10n.people', 'Translated by {names}.', { names: listOf(people) })
-        : t('credits.l10n.community', 'Translated by the community.'));
-    }
+    lines.push(people.length
+      ? t('credits.l10n.people', 'Translated by {names}.', { names: listOf(people) })
+      : t('credits.l10n.community', 'Translated by the community.'));
     if (pack) lines.push(t('credits.l10n.bundled', 'Daggerfall\u2019s original text is {pack}, used with its authors\u2019 permission.', { pack: pack.name }));
     const authors = [...(pack?.authors ?? []), ...people];
     return Object.freeze({
       code: i.code,
       title: i.name,
-      author: authors.length ? listOf(authors) : 'Claude (Anthropic)',
+      author: authors.length ? listOf(authors) : t('credits.l10n.anyone', 'The community'),
       what: lines.join(' '),
       ...(pack ? { terms: t('credits.l10n.terms', '{license}: {terms}', { license: pack.license, terms: pack.terms }) } : {}),
       ...(pack && /^https?:\/\//.test(pack.source) ? { link: pack.source } : {}),

@@ -31,7 +31,7 @@ import {
 } from '../../tools/powerCeiling.mjs';
 
 /** Every failure names the rule it breaks. */
-const RULE = 'THE CEILING HOLDS (bible/05-Combat/Power-Ceiling.md): a higher number or a new rung needs the owner\'s word, quoted there';
+const RULE = 'THE CEILING HOLDS: a higher number or a new rung needs the owner\'s word, quoted there';
 const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };
 const past = (where, item) => { const p = linesPastCeiling(item); assert.deepEqual(p, [], `${where}: ${p.join(', ')} - ${RULE}`); };
 

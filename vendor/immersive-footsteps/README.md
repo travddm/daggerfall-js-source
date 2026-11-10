@@ -62,8 +62,8 @@ pinned commit. The repository names the manifest `ImmersiveFootsteps.dfmod.json`
 
 ## Why the clips ARE here
 
-The port's doctrine (`bible/01-Overview/Port-Doctrine.md`) keeps ARENA2
-and every render of it out of the repository. These are not that: no
+The port's doctrine (`docs/getting-started.md`, "Rules that hold
+everywhere") keeps ARENA2 and every render of it out of the repository. These are not that: no
 DAGGER.SND record is a boot on gravel or a chain shirt swaying. They
 are the author's own recordings, the mod's data the way Handheld
 Torches' hand sprites and Eye Of The Beholder's body sprites are those

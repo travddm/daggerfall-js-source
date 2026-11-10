@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // LANDING TILES (VIRT, 2026-10-16; one home since TRADE-VIRT, 2026-10-20) — A PICTURE INTO ITS TILE, NOT A REPAINT.
 //
 // The enhanced screens rebuild their DOM on every state change (ui/domRepaint.js says why that is the shape), and a cold
@@ -12,7 +11,6 @@
 // The pictures that land together are one pass; a tile still waiting stays waiting; a tile a repaint threw away (no
 // longer in the document), or every tile once the screen is gone (`alive`), is dropped, never drawn into. The pack's,
 // the shop counter's and the trade between players' windows each keep one.
-// ═══════════════════════════════════════════════════════════════════
 
 const nextFrame = (f) => (globalThis.requestAnimationFrame ?? ((g) => setTimeout(g, 16)))(f);
 

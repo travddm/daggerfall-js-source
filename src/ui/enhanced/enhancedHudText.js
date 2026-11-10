@@ -21,8 +21,8 @@
 // them, F2 scaled them, F7 stepped them out of the chat's peek, F8 let
 // them wrap). That column was a SECOND enhanced face beside the notice
 // panel ENH-NOTICE1 gave the message box - and the rows it carried
-// (Climates & Calories' hunger, thirst and cold, the Ambient Text mod's
-// street lines, the torches' burn-out, every skill-up and loot tally)
+// (Climates & Calories' hunger, thirst and cold, the
+// torches' burn-out, every skill-up and loot tally)
 // were exactly the lines the player expected in the panel. So each
 // PopupText row is a TOAST in the notice stack now (ui/enhancedNotice
 // .js drawEnhancedToasts, handed HudText.frame each draw as this module
@@ -52,7 +52,7 @@
 // element cites a DFU rect (THE NATIVE-WINDOW RULE), so the face
 // cannot change without the metrics changing with it. (FONT3, 2026-10-02: that list is history - five of the seven
 // now always open an enhanced DOM face and the other two are reached only from the classic map a player chose; the
-// prison countdown and Come Sail Away's map words were the gaps left, and are enhanced too. 10-UI/UI-Arc.md FONT3.)
+// prison countdown and Come Sail Away's map words were the gaps left, and are enhanced too. docs/systems/ui.md.)
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhancedStyle.js';
 import { nativeMetrics } from '../native/nativePanel.js';
 

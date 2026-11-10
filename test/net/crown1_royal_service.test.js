@@ -3,7 +3,7 @@
 // contenders' games agree; each bout a winner's `t1` receipt brings, counted once and the same two three times a UTC
 // day; the ladder on the Seat tab; and at the Turning that ends its week the champion named, paid and titled for good
 // (worn with its crown and Season), or the prize home. Driven through the real Worker over node:sqlite with every
-// migration applied (test/accountDb.mjs). 7.6; `06-Systems/Online-Arc.md` CROWN1.
+// migration applied (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

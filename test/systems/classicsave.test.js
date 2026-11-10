@@ -72,10 +72,10 @@ const concat = (...parts) => {
 
 // A 71-byte record root. Byte 0 is the record type (PeekRecordType's
 // read); the field offsets are ReadRecordRoot's.
-function buildRecordRoot({ type, recordId, parentRecordId = 0, spriteIndex = 0, questId = 0, time = 0 }) {
+function buildRecordRoot({ type, recordId, parentRecordId = 0, spriteIndex = 0, questId = 0, time = 0, pitch = -100, yaw = 200 }) {
   const w = new Writer(RECORD_ROOT_LENGTH);
   w.u8(0, type);
-  w.i16(1, -100); w.i16(3, 200); w.i16(5, -300);        // pitch/yaw/roll
+  w.i16(1, pitch); w.i16(3, yaw); w.i16(5, -300);        // pitch/yaw/roll
   w.i32(7, 111); w.i32(11, -222); w.i32(15, 333);        // position
   w.u16(27, spriteIndex);
   w.u16(29, 0x5678);                                     // picture2
@@ -895,7 +895,7 @@ test('corpus: every real classic save parses - version, character, savevars tabl
   }
 });
 
-// ═══════════════════════════ SAV2: the import core ═══════════════════════════
+// SAV2: the import core
 
 import {
   classicPitchDegrees, classicYawDegrees, convertClassicClimateWeathers,
@@ -938,7 +938,7 @@ function recordElement(type, recordId, parentRecordId, data = new Uint8Array(0),
 // conjured item, a filled soul gem, guild + old-guild rows, an
 // OldClass record, a bank record and the position record.
 function buildImportTree({ charOpts = {}, diseaseId = null, guildTime = 1440 * 10,
-  bankDataLength = 40, oldClassFlags = null, charName = null, templeFactionId = null } = {}) {
+  bankDataLength = 40, oldClassFlags = null, charName = null, templeFactionId = null, look = {} } = {}) {
   const header = new Writer(SAVE_TREE_HEADER_LENGTH);
   header.i32(0, SAVE_TREE_VERSION);
   header.i32(4, 0); header.i32(8, 0); header.i32(12, 0);
@@ -1002,7 +1002,7 @@ function buildImportTree({ charOpts = {}, diseaseId = null, guildTime = 1440 * 1
     recordElement(RECORD_TYPES.OldGuild, 41, 2, oldGuildRow.bytes),
     recordElement(RECORD_TYPES.OldClass, 43, 2, oldClass),
     recordElement(RECORD_TYPES.BankAccount, 44, 0, bank.bytes),
-    recordElement(RECORD_TYPES.CharacterPositionRecord, 45, 0, new Uint8Array(0), {}),
+    recordElement(RECORD_TYPES.CharacterPositionRecord, 45, 0, new Uint8Array(0), look),
   ];
   if (templeFactionId != null) {
     parts.push(recordElement(RECORD_TYPES.GuildMembership, 42, 2, templeRow.bytes));
@@ -1401,10 +1401,10 @@ test('SAV2: classicSaveToSnapshot - the whole envelope, at SAVE_VERSION', () => 
   // store's own rep (the Merge law end to end).
   assert.deepEqual(snap.factionRep.rep, [-3, 5]);
 
-  // The pose: converted look, classic weaponDrawn.
+  // The pose: converted look in radians (the camera's unit), classic weaponDrawn.
   assert.equal(snap.pose.weaponDrawn, true);
-  assert.equal(snap.pose.pitch, classicPitchDegrees(-100));
-  assert.equal(snap.pose.yaw, classicYawDegrees(200));
+  assert.equal(snap.pose.pitch, (classicPitchDegrees(-100) * Math.PI) / 180);
+  assert.equal(snap.pose.yaw, (classicYawDegrees(200) * Math.PI) / 180);
   assert.equal(snap.pose.crouching, false);
 
   // The bundle's host-frame half.
@@ -1414,6 +1414,18 @@ test('SAV2: classicSaveToSnapshot - the whole envelope, at SAVE_VERSION', () => 
   assert.equal(bundle.globalVars.length, 64);
   assert.equal(bundle.saveName, 'My Save');
   assert.equal(bundle.classicTransformedRace, TRANSFORMED_RACES.None);
+});
+
+// A UESP community save ("Shadow", outside The Silver Wolf Tavern) faces yaw 1828 with the view level; DOS draws that
+// view toward the north-west. The camera turns by sin/cos of its yaw in radians, x east and z north.
+test('SAV2: a classic save faces where DOS faced it - yaw 1828 lands north-west, in radians', () => {
+  const games = importSaveGames({ look: { yaw: 1828, pitch: 0 } });
+  const { snap } = classicSaveToSnapshot(games, { spellsByIndex: new Map(), factionStore: { dict: FAKE_FACTIONS } });
+  assert.ok(Math.abs(snap.pose.yaw - (1828 / 2048) * 2 * Math.PI) < 1e-9, `yaw ${snap.pose.yaw}`);
+  assert.equal(snap.pose.pitch, 0);
+  const east = Math.sin(snap.pose.yaw);
+  const north = Math.cos(snap.pose.yaw);
+  assert.ok(east < -0.6 && north > 0.7, `facing east ${east}, north ${north}`);
 });
 
 // The advancement law re-derived locally so a drifted import breaks
@@ -1492,14 +1504,14 @@ test('SAV2: MAPSAVE discovery lands in the envelope through the resolver seam', 
   });
 });
 
-// ═══════════════════════ SAV3: the window and the wiring ═══════════════════════
+// SAV3: the window and the wiring
 
 import {
   LoadClassicWindow, SAVE_IMAGE_RECTS, SAVE_TEXT_RECTS, OUTLINE_RECTS,
   LOAD_BUTTON_RECT, EXIT_BUTTON_RECT, LOAD_CLASSIC_IMG,
 } from '../../src/ui/loadClassicWindow.js';
 import {
-  importClimateWeathers, resetWeatherSim, tickWeather, currentWeatherEnum, WEATHER_ENUM, setSnowGroundLaw, currentWeatherRaw, setWeatherMapLaw,
+  importClimateWeathers, resetWeatherSim, tickWeather, currentWeatherEnum, WEATHER_ENUM, setSnowGroundLaw, currentWeatherRaw, setWeatherMapLaw, setWeatherFieldLaw,
 } from '../../src/systems/weather/weatherSim.js';
 import { bitmapToColor32 } from '../../src/formats/color32Order.js';
 import {
@@ -1568,6 +1580,17 @@ test('SAV3: importClimateWeathers - the imported array wears on the next tick, n
   assert.equal(currentWeatherEnum(), WEATHER_ENUM.rain ?? 4);
   assert.equal(currentWeatherRaw(), 'rain', 'the table\'s own word, kept beside the worn one');
   resetWeatherSim(); setWeatherMapLaw(false);
+});
+
+// With the Weather events row off (no weather field, no weather map) the classic lane is DFU's: the save's own array is
+// the sky. With the row on, the weather map is the sky everywhere, the same for every player, so no save's weather shows.
+test('SAV3: the Shadow save\'s weather bytes reach the sky with Weather events off - Woodlands reads slot 5', () => {
+  resetWeatherSim(); setWeatherFieldLaw(false); setWeatherMapLaw(false); setSnowGroundLaw(false);
+  // SAVEVARS 0x17A2 in that save: [0, 2, 0x84, 5, 2, 6]; Daggerfall's region is Woodlands (231), the sixth slot.
+  assert.equal(importClimateWeathers(convertClassicClimateWeathers(Uint8Array.of(0, 2, 0x84, 5, 2, 6))), true);
+  tickWeather(0, 231, () => { throw new Error('a re-roll clobbered the imported array'); });
+  assert.equal(currentWeatherEnum(), WEATHER_ENUM.thunder, 'classic 6 is DFU\'s Thunder after the 5<->6 swap');
+  resetWeatherSim(); setWeatherFieldLaw(null); setWeatherMapLaw(false);
 });
 
 test('SAV3: bitmapToColor32 grows the GetColor32 alphaIndex - -1 draws index 0 opaque', () => {

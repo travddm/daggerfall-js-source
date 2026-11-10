@@ -1,4 +1,4 @@
-// BEAST-BOOTS (`02-Formats/Morrowind-Rules.md` BEAST-BOOTS): what a Khajiit or an Argonian wears on its feet and its
+// BEAST-BOOTS (`docs/formats/morrowind.md`): what a Khajiit or an Argonian wears on its feet and its
 // head on the Morrowind figure, by the viewer's two switches (systems/features.js, Beast Footwear and Beast Helmets),
 // As worn by default. Armor::canBeEquipped and Clothing::canBeEquipped refuse a Beast race any item whose part
 // references name PRT_Head, PRT_LFoot or PRT_RFoot; Daggerfall equips the piece anyway, so the switches choose what the

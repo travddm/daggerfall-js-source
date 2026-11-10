@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // NOTICE1 — THIS DEVICE'S NOTICE BOARDS: each town's board as the account service last said it, read
 // through a minute's cache (PROF0 19: "a slow service shows the last good board"), what this device has already read
 // of it (the count over the board is what it has not), and a note pinned, taken down or reported. The service keeps
@@ -13,7 +12,6 @@
 // a lost answer that finds the note gone was the first try's, and says so.
 //
 // Pure - the door, the storage and the clock are handed in - so the pins drive it without a network.
-// ═══════════════════════════════════════════════════════════════════
 import { BOARD_CACHE_MS, boardKeyOk, unseenCount, NOTE_ID_RE, NOTE_DAYS, noteReplySubject, GUILD_NOTES_LIVE_MAX } from './boardLaw.js';
 import { accountRefusalText } from './accountClient.js';
 

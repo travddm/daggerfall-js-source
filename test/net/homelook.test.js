@@ -3,7 +3,7 @@
 // families, through ApplyClimate so winter still snows on it); a painted house's own table (the pixel's climate swaps
 // and the look over them, a record the archive lacks left to the town's); the service's write and the town's answer
 // through the real Worker; the client's registry; the painter in the yard's panel; the world host by source.
-// `06-Systems/Online-Arc.md` HOME-LOOK.
+// HOME-LOOK.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

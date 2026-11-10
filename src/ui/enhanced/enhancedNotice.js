@@ -37,7 +37,7 @@
 //
 // ENH-NOTICE3: THE
 // SAME STACK CARRIES THE HUD LINE. DaggerfallUI.AddHUDText - the
-// PopupText rows Climates & Calories, Ambient Text, the torches, the
+// PopupText rows Climates & Calories, the torches, the
 // skill-ups and the loot tallies speak through - is not a box: it is
 // timed, it is not modal, and nothing dismisses it. FONT1 gave it a
 // DOM column of its own at the top of the screen, which was a second

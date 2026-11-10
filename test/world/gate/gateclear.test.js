@@ -2,8 +2,8 @@
 // The gate's spot is the clock's and the map files' alone (every client rolls it alike), and the mod stands a site on
 // 114,087 of the pixels the gate may take; nothing kept the two apart. world/gate/gateClearance.js is the law, ROADS-CLEAR's
 // shape: a whole site reaching the clearing stands none of its objects, any other piece reaching it is not stood, and the
-// streamer's sweep builds a pixel again when the gate the clock is about turns. GATE-AGREE (bible/01-Overview/bugs/
-// Field-Bugs-2026-10-24b.md): the clearing never decides a pick - a pick levels the ground, and the clearings are each
+// streamer's sweep builds a pixel again when the gate the clock is about turns. GATE-AGREE:
+// the clearing never decides a pick - a pick levels the ground, and the clearings are each
 // client's own word (the arches it believes), so a held site keeps its pick and its level ground.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

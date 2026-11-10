@@ -16,9 +16,11 @@ import { forgetChapters } from '../server-account/src/npcHalls.js';   // AUDIT C
 import { _resetTownEconForTests } from '../server-account/src/townEcon.js';   // TOWN-ECON TE2: nor the towns' shares
 import { renownXpFor } from '../src/net/renown.js';
 import { mintReceipt, importReceiptKey } from '../src/net/gate/gateReceipt.js';
+import { SERVICE_KEY } from '../src/net/account-service-address.ts';
 import { ACCEPTED } from '../src/net/legalLaw.js';   // MERGE 2: TERMS1 - a request that makes an account carries the versions ticked
 import { r2, seatRealm } from './realmSeat.mjs';   // MERGE 2: a founding is a realm character's (AUDIT REALM2 S2)
 import { GUILD_FOUND_GOLD } from '../src/net/guild/guildLaw.js';
+import { OPERATOR_OPTIONS } from '../server-account/src/operator-options.ts';
 import { ROLL_FACTIONS } from '../src/net/npcChapterLaw.js';   // AUDIT CHAP4 E3: a scene's chapters confirmed
 
 const src = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
@@ -111,7 +113,9 @@ export async function standService({ SEAT_ADMINS, SEAT_MODERATORS, SEAT_OWNERS, 
   const gk = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const gatePriv = await importReceiptKey(Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', gk.privateKey))).toString('base64'), { subtle });
   const gatePub = Buffer.from(new Uint8Array(await subtle.exportKey('raw', gk.publicKey))).toString('base64url');
-  const env = { DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*', GATE_PUBLIC_KEY: gatePub, ...extra };   // MERGE 2: SAVES, the realm's records (R2)
+  // Every operator option on (operator-options.ts), so the tests that drive those tools stand them as an operator would;
+  // a test of the shipped default passes its own OPERATOR_OPTIONS.
+  const env = { DB: d1(), SAVES: r2(), IDENTITY_PRIVATE_KEY: pkcs8, ACCOUNT_VERSION: 'test1', ALLOWED_ORIGIN: '*', GATE_PUBLIC_KEY: gatePub, OPERATOR_OPTIONS: OPERATOR_OPTIONS.join(','), ...extra };   // MERGE 2: SAVES, the realm's records (R2)
   const seatRoles = (/** @type {string} */ handle) => {
     const lc = handle.toLowerCase();
     const owner = seats.owner.has(lc);
@@ -186,8 +190,14 @@ export async function standService({ SEAT_ADMINS, SEAT_MODERATORS, SEAT_OWNERS, 
   return { env, call, setStaff, guest, registered, seated, claim, seedMarks, fetch, found, seatHome, identityPublic: kp.publicKey, gateKey: gatePriv, gatePriv };   // ARENA4: the relay's signing half, so a bout's receipt is signed as the relay signs it   // PROF3: the identity key's public half, a product record's verifier; SEAT1b: the relay's private half, a watch receipt's signer
 }
 
-/** A device's storage holding `who`'s session (net/accountClient.js SESSION_KEY). */
-export const sessionStorageOf = (sessionKey, who) => ({ getItem: (k) => (k === sessionKey ? JSON.stringify({ secret: who.secret, id: who.id }) : null) });
+/** The account service a test device names. No service is built in; this one resolves nowhere,
+ *  and the test's fetch takes any URL to the Worker. */
+export const TEST_ACCOUNT_SERVICE = 'https://accounts.invalid';
+
+/** A device's storage holding `who`'s session (net/accountClient.js SESSION_KEY) and naming TEST_ACCOUNT_SERVICE. */
+export const sessionStorageOf = (sessionKey, who) => ({
+  getItem: (k) => (k === sessionKey ? JSON.stringify({ secret: who.secret, id: who.id }) : k === SERVICE_KEY ? TEST_ACCOUNT_SERVICE : null),
+});
 
 /** AUDIT CHAP4 E3: A SCENE'S CHAPTERS CONFIRMED - each region's kept row (npcHalls.js npc_hall_regions, AUDIT CHAP3 S3)
  *  naming `factions` (every guild of the Roll by default), as its witnessed towns' reports would leave it: the seats are

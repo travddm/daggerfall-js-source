@@ -34,7 +34,7 @@
     ],
     "counts": {
       "paths": 0,
-      "lines": 3184
+      "lines": 3132
     }
   },
   "mods": [
@@ -63,8 +63,8 @@
         "daggerfallunity/mods/303\\b"
       ],
       "counts": {
-        "paths": 5,
-        "lines": 110
+        "paths": 0,
+        "lines": 0
       }
     },
     {
@@ -91,8 +91,8 @@
         "daggerfallunity/mods/276\\b"
       ],
       "counts": {
-        "paths": 6,
-        "lines": 27
+        "paths": 0,
+        "lines": 0
       }
     },
     {
@@ -120,7 +120,7 @@
       ],
       "counts": {
         "paths": 3,
-        "lines": 275
+        "lines": 273
       }
     },
     {
@@ -148,7 +148,7 @@
       ],
       "counts": {
         "paths": 3,
-        "lines": 302
+        "lines": 301
       }
     },
     {
@@ -257,7 +257,7 @@
       ],
       "counts": {
         "paths": 34,
-        "lines": 936
+        "lines": 943
       }
     },
     {
@@ -336,7 +336,7 @@
       ],
       "counts": {
         "paths": 72,
-        "lines": 3727
+        "lines": 3725
       }
     },
     {
@@ -442,7 +442,7 @@
       ],
       "counts": {
         "paths": 5543,
-        "lines": 860
+        "lines": 857
       }
     },
     {
@@ -488,21 +488,19 @@
       "paths": [
         "vendor/detailed-ships/",
         "src/systems/detailedShips.js",
-        "src/world/detStandIns.js",
         "tools/detailedShipsAssets.mjs"
       ],
       "terms": [
         "detailed-ships",
         "detailedShips",
-        "Detailed Ships",
-        "detStandIns"
+        "Detailed Ships"
       ],
       "patterns": [
         "daggerfallunity/mods/1080\\b"
       ],
       "counts": {
-        "paths": 19,
-        "lines": 176
+        "paths": 0,
+        "lines": 0
       }
     },
     {
@@ -539,7 +537,7 @@
       ],
       "counts": {
         "paths": 12635,
-        "lines": 258
+        "lines": 259
       }
     },
     {
@@ -576,7 +574,7 @@
       "patterns": [],
       "counts": {
         "paths": 43,
-        "lines": 284
+        "lines": 285
       }
     },
     {
@@ -619,7 +617,7 @@
       ],
       "counts": {
         "paths": 3050,
-        "lines": 1368
+        "lines": 1367
       }
     },
     {
@@ -689,7 +687,7 @@
       ],
       "counts": {
         "paths": 144,
-        "lines": 101
+        "lines": 104
       }
     },
     {
@@ -750,7 +748,7 @@
       ],
       "counts": {
         "paths": 8,
-        "lines": 89
+        "lines": 90
       }
     },
     {
@@ -799,7 +797,7 @@
       ],
       "counts": {
         "paths": 62,
-        "lines": 1693
+        "lines": 1691
       }
     },
     {
@@ -891,7 +889,7 @@
       ],
       "counts": {
         "paths": 43,
-        "lines": 912
+        "lines": 914
       }
     },
     {
@@ -957,7 +955,7 @@
       ],
       "counts": {
         "paths": 13,
-        "lines": 157
+        "lines": 159
       }
     },
     {
@@ -983,7 +981,7 @@
       "patterns": [],
       "counts": {
         "paths": 2,
-        "lines": 59
+        "lines": 60
       }
     },
     {
@@ -1024,7 +1022,7 @@
       ],
       "counts": {
         "paths": 12,
-        "lines": 704
+        "lines": 703
       }
     },
     {
@@ -1097,7 +1095,7 @@
       "patterns": [],
       "counts": {
         "paths": 5,
-        "lines": 503
+        "lines": 504
       }
     },
     {
@@ -1187,7 +1185,7 @@
       ],
       "counts": {
         "paths": 7,
-        "lines": 167
+        "lines": 168
       }
     },
     {
@@ -1219,7 +1217,7 @@
       ],
       "counts": {
         "paths": 5,
-        "lines": 361
+        "lines": 363
       }
     },
     {
@@ -1259,7 +1257,7 @@
       ],
       "counts": {
         "paths": 56,
-        "lines": 474
+        "lines": 473
       }
     },
     {
@@ -1363,7 +1361,7 @@
       ],
       "counts": {
         "paths": 4,
-        "lines": 114
+        "lines": 116
       }
     },
     {
@@ -1394,7 +1392,7 @@
       ],
       "counts": {
         "paths": 606,
-        "lines": 213
+        "lines": 214
       }
     },
     {
@@ -1515,7 +1513,7 @@
       "patterns": [],
       "counts": {
         "paths": 3,
-        "lines": 175
+        "lines": 176
       }
     },
     {
@@ -1876,7 +1874,7 @@
       "patterns": [],
       "counts": {
         "paths": 22,
-        "lines": 251
+        "lines": 237
       }
     },
     {

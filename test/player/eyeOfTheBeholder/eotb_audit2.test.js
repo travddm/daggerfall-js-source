@@ -1,4 +1,4 @@
-// ═══ AUDIT-EOTB2 → EOTB-IL: THE INTEGRATION ═══
+// AUDIT-EOTB2 → EOTB-IL: THE INTEGRATION
 //
 // Then, with the shipped archive in hand: "it
 // needs to be 1:1 with the uploaded file. No exceptions."

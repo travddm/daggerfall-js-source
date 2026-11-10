@@ -1,5 +1,4 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
 // GUILD1e - A GUILD'S OWN BOARD:
 // its notes, its members' alone.
 //
@@ -9,7 +8,7 @@
 // words, its days - is src/net/boardLaw.js (noteWords, no button), which
 // the client's window reads too; this file is who may do what with one.
 //
-// ═══ A MEMBER READS; A MEMBER PINS; A KEEPER TAKES DOWN ═════════════
+// A MEMBER READS; A MEMBER PINS; A KEEPER TAKES DOWN
 //
 // Every act names the character it is done as (guilds.js guildActorOf -
 // a guild is a character's), and that character's guild is the board's.
@@ -18,7 +17,7 @@
 // The Notice Board's switch (BOARD_OPEN) and its mute stand here as on a
 // town's board: this is a tab of that board.
 //
-// ═══ ONE STATEMENT DECIDES ═══════════════════════════════════════════
+// ONE STATEMENT DECIDES
 //
 // A member's live notes on the guild's board are bounded
 // (GUILD_NOTES_LIVE_MAX) inside the INSERT that writes one, and that
@@ -27,7 +26,6 @@
 // rid) makes a pin asked twice one note.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { mintId, isMuted, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { boardOpenFor } from './board.js';

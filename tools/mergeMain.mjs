@@ -1,5 +1,5 @@
-// mergeMain - the mechanical half of merging main into a long branch (AUDIT RELEASE R3, bible/01-Overview/audits/
-// Audit-Release-R3.md "Merging main"). A branch that carries an unpublished relay row and account version meets main's
+// mergeMain - the mechanical half of merging main into a long branch (AUDIT RELEASE R3).
+// A branch that carries an unpublished relay row and account version meets main's
 // own at every merge: the version line, every pin that asserts it, and the plain-English history each pin keeps. The
 // rule is the one every merge of this repository has applied by hand (test/net/relayversion.test.js, "A version bump is
 // ..."): the branch's release takes the next number past main's newest, its own history clause first, main's whole
@@ -219,7 +219,7 @@ export function mergeTable(base, ours, theirs) {
 
 /** THE LANGUAGES (`--locales`): the English catalog read again off the merged source (tools/l10nExtract.mjs), then each
  *  other language's rows and meta merged three ways from the index's stages, in the catalog's order, keys it no longer
- *  holds dropped - what tools/l10nInSession.mjs writes. Run after every source conflict is resolved. */
+ *  holds dropped. Run after every source conflict is resolved. */
 async function mergeLocales(apply) {
   const { parseStringTableCsv, formatStringTableCsv } = await import('../src/systems/textManager.js');
   const stage = (n, p) => { try { return git('show', `:${n}:${p}`); } catch { return null; } };

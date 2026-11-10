@@ -122,7 +122,7 @@ test('LR1: one ladder - a rolled tier is the item\'s own, an enchanted item deri
   assert.ok(!LR.rarityEligible({ ...sword(), questItem: true }));
   assert.ok(!LR.rarityEligible({ ...sword(), artifact: true }));
   assert.ok(!LR.rarityEligible({ ...sword(), magic: true, enchantments: [{ type: 0, param: 5 }] }), 'DFU\'s magic item keeps DFU\'s name');
-  assert.ok(LR.rarityEligible({ group: 'MensClothing', templateIndex: 163 }), 'LOOT14 (bible/06-Systems/Loot-II-Arc.md section 6): a garment rolls, on the wardrobe\'s own pool');
+  assert.ok(LR.rarityEligible({ group: 'MensClothing', templateIndex: 163 }), 'LOOT14 (docs/systems/items-and-loot.md): a garment rolls, on the wardrobe\'s own pool');
   assert.ok(!LR.rarityEligible({ ...sword(), equipSlot: 5 }), 'a worn item');
   assert.ok(!LR.rarityEligible({ ...sword(), rarity: 'magic', affixes: [{ id: 'damage', value: 5 }] }), 'LR4: one roll per item, ever - a Magic never rolls again');
 });
@@ -498,7 +498,7 @@ test('LR3: the Test Room\'s loot ladder - one door, thirty items (a Magic and a 
   _resetForTests();
 });
 
-// ═══ LR6: THE SHOWCASE SHOWS ══════════════════════════════════════
+// LR6: THE SHOWCASE SHOWS
 //
 //
 // It was all there - and two thirds of it was INVISIBLE, by DFU's own
@@ -592,7 +592,7 @@ test('LR4: the audit - the corpse door rolls the loot and never the worn kit, a 
   _resetForTests();
 });
 
-// ═══ AUDIT-LR: THE LADDER OVER THE WIRE, both online doors ═══════════
+// AUDIT-LR: THE LADDER OVER THE WIRE, both online doors
 //
 // The audit's one finding was a PIN gap, not a defect: the switch is
 // forced on for everyone online (OL1), so every rolled item a room

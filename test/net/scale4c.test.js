@@ -39,7 +39,7 @@ const get = async (s, path, secret) => {
   return { status: r.status, body: await r.json() };
 };
 
-// ═══ A. THE SERVICE ══════════════════════════════════════════════════════════════════════════════════════════════════
+// A. THE SERVICE
 
 test('SCALE4c A: /v1/heartbeat is a session\'s route, and each part it carries is answered EXACTLY as its own route answers it - the box as /v1/mail/inbox, a town\'s board as /v1/board/read, the knock as /v1/account/played - under one session, a guest\'s box refused in that route\'s word and its board and beat answered all the same (mutants: a part dropped, the guest\'s box opened, the board read for another town)', async () => {
   assert.ok(ROUTES.has('/v1/heartbeat'));
@@ -95,7 +95,7 @@ test('SCALE4c A: /v1/heartbeat is a session\'s route, and each part it carries i
   assert.equal((await get(s, '/v1/heartbeat', ann.secret)).status, 405);
 });
 
-// ═══ B. THE CLIENT'S HEARTBEAT ═══════════════════════════════════════════════════════════════════════════════════════
+// B. THE CLIENT'S HEARTBEAT
 
 /** A heartbeat over a fake service and a fake clock: each request's body kept, each answered as `answer` says. */
 function rig({ answer = (body) => ({ status: 200, json: body }), signedIn = true } = {}) {
@@ -303,7 +303,7 @@ test('SCALE4c B: a lost answer is asked again (NOTICE_TRIES in all) and then eac
   assert.equal(gated.due(1e9), true);
 });
 
-// ═══ C. THE BOOKS' PARTS ═════════════════════════════════════════════════════════════════════════════════════════════
+// C. THE BOOKS' PARTS
 
 test('SCALE4c C: the letterbox as a part - due when a look is, stamped as it sets out (never two looks at once), its answer taken as a look takes one: new letters said once, a guest\'s box a guest\'s, signed out nothing sent (mutants: the part never due, a look twice in flight, the answer untaken)', async () => {
   let t = 5_000_000;   // a clock past nought: the box's `at` 0 is its never-looked mark
@@ -381,5 +381,5 @@ test('SCALE4c C: the town\'s board as a part - due when the town the host stands
   assert.equal(part.body(), undefined);
 });
 
-// ═══ D. THE WORLD HOST ═══════════════════════════════════════════════════════════════════════════════════════════════
+// D. THE WORLD HOST
 

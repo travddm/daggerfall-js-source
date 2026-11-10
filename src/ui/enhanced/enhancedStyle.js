@@ -44,7 +44,6 @@ import { paceControlsCss } from '../travel/travelPaceControls.js';   // PACE-DIA
 import { SERPENT_RING_MAP_CSS } from '../serpentMapMark.js';   // SERPENT-TIMERS: the sea serpent's row marked in its waters' own colour
 import { SD_RING_MAP_CSS } from '../superDungeon/sdMapMark.js';   // SD2c: the Super dungeon's row in its omen's brass
 import { STAR_VIOLET_CSS } from '../starfall/starMapMark.js';   // STAR6: a fallen star's row in its violet
-import { heraldCss } from '../../net/herald/heraldCard.js';   // TIMERS2 / HERALD-CARDS: the gate's red, the one its Discord card wears
 import { TIER_MARKS, tierMarkCss } from '../lootTierMarks.js';   // LOOT-MARKS: the quick loot's tier gem and wash
 
 /**
@@ -1196,12 +1195,6 @@ img.fit { image-rendering: pixelated; }   /* AUDIT UI A1: a fitted picture drawn
 .card button.acctglyph.worn { opacity: 1; }
 .card button.acctglyph:hover:not(:disabled) { border-color: rgba(255, 255, 255, 0.18); }
 .card button.acctglyph:disabled { cursor: default; }
-/* PATREON-LINK - THE PATRON'S ROW. Link Patreon is a LINK (the account read carries it, so the press opens it at once,
-   as TERMS1's document links do), worn as an .act so it reads as the button it is; what the pledge holds is a fact
-   beside it, drawn as the glyphs' facts are - quiet, not pressable. */
-.card a.act { display: inline-flex; align-items: center; text-decoration: none; }
-.card .acctpatreon .acctwearrow { align-items: center; }
-.card .acctpatreonstate { display: inline-flex; align-items: center; font-size: 12.5px; color: var(--dim); }
 /* NAME-AS - THE NAME THE ROOM READS: two of the wardrobe's own buttons in the card's own colour (the chosen one at full
    strength behind the doubled edge, the other dimmed, as a title worn and held), and one quiet line under them saying
    what the other players see - tight under its buttons, where .meta's own foot would part them. */
@@ -1360,7 +1353,7 @@ ${badgeCss()}
   .card .acctcode li code { white-space: nowrap; letter-spacing: 0.06em; font-size: min(21px, 4.2vw); }
 }
 /* RECOVERY-SET: the codes' row in the Account section - the count beside
-   its press, as the Patreon row's state sits beside its. */
+   its press. */
 .card .acctrecovery .acctwearrow { align-items: center; }
 .card .acctrecoverystate { display: inline-flex; align-items: center; font-size: 12.5px; color: var(--dim); }
 .goldfield .meta { flex: 1 0 100%; color: var(--dim); font-size: 11.5px; margin: 0; }
@@ -2489,7 +2482,7 @@ ${badgeCss()}
 .px-profile:focus-visible { outline: none; }
 /* L10N1b: THE FIRST-RUN LANGUAGE OFFER - the top-left corner, the About box's plate, the question in the language it
    offers. Gone for good once answered. It stands 76px down, where it stood under SUPPORT1's corner asks before they
-   were removed with the upstream project's Patreon and Ko-fi links. */
+   were removed. */
 .px-langoffer {
   position: absolute; top: 76px; left: 18px; z-index: 5; max-width: min(360px, calc(100vw - 36px));
   padding: 12px 14px; background: rgba(10,12,17,0.95); border: 2px solid var(--brass);
@@ -2762,7 +2755,7 @@ ${badgeCss()}
    10px above the title of a live row (its clock three lines tall with the "Now") and 11px above a one-line row's */
 .px-timerswin .tm-name::before { content: '\\25c6'; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); font-size: 9px;
   line-height: 1; color: var(--tm-kind, #9c937d); }
-.px-timerswin .tm-gate { --tm-kind: ${heraldCss('gate')}; } .px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; } .px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; } .px-timerswin .tm-star { --tm-kind: ${STAR_VIOLET_CSS}; } .px-timerswin .tm-raid { --tm-kind: #f2c46b; } .px-timerswin .tm-battle { --tm-kind: #d98074; }
+.px-timerswin .tm-gate { --tm-kind: #e2554c; } .px-timerswin .tm-serpent { --tm-kind: ${SERPENT_RING_MAP_CSS}; } .px-timerswin .tm-super { --tm-kind: ${SD_RING_MAP_CSS}; } .px-timerswin .tm-star { --tm-kind: ${STAR_VIOLET_CSS}; } .px-timerswin .tm-raid { --tm-kind: #f2c46b; } .px-timerswin .tm-battle { --tm-kind: #d98074; }
 .px-timerswin .tm-seat { --tm-kind: #c08a3e; } .px-timerswin .tm-reset { --tm-kind: #85a8a1; }
 .px-timerswin .tm-row.live { background: rgba(192,138,62,0.08); }
 .px-timerswin .tm-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }

@@ -3,7 +3,7 @@
 // (`yard-town-full`), whichever way it is paid; another town's pieces never count, a room's piece is never refused for
 // it, and one taken away makes room again. Over the real build: a town at the bound, every row as wide as Daggerfall's
 // widest, is kept in its built row (keptBoard.js KEPT_BOARD_MAX_BYTES), so the bound is never one the read walks.
-// `06-Systems/Online-Arc.md` YARD-TOWN.
+// YARD-TOWN.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

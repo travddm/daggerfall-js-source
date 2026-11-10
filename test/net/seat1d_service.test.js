@@ -4,7 +4,7 @@
 // Tithe set once a week and taken across its bailiwick from a sale and a courier's share; the Edicts proclaimed for the
 // coming week and made law (or let fall) at the Turning - Open Gates' homes, the Levy's stockpile, the Bounty's camps.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// 7.1-7.3, 7.6; `06-Systems/Online-Arc.md` SEAT1d.
+// 7.1-7.3, 7.6; SEAT1d.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

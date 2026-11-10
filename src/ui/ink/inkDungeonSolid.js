@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // EM3-3D — THE DUNGEON IN THE ROUND: the automap sheet's plan, lifted
 // back into three dimensions and drawn by the same hand.
 //
@@ -44,7 +43,6 @@
 //
 // Pure except for the painters, which take a context and are guarded on a
 // real 2D one, as every painter in this lane is.
-// ═══════════════════════════════════════════════════════════════════
 
 import { INK_RGB, PARCHMENT_RGB, rgba, PEN, HALO_PEN, NAME_FACE } from './inkMap.js';
 import { STAIR_RISE, STOREY_NEAR } from '../../systems/automap/automapFloors.js';

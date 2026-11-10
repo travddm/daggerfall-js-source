@@ -1,4 +1,4 @@
--- QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.1): THE BURNING DOORS, step 1 of 5.
+-- QL12 (2026-10-19; docs/systems/quests.md): THE BURNING DOORS, step 1 of 5.
 -- QL-OFFERED (2026-10-25; Questlines-Arc.md section 4, THE RUNNER): a questline is TAKEN, never sent. This letter
 -- (1011) is read where its line is offered - a notice board, a giver's door, the Quests tab - and taken, it is in
 -- hand from the start-up (`start task`, `get item`): no courier's clock, and no courier's words.

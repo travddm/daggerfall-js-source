@@ -70,7 +70,7 @@ test('PARTY-LEAD client: the act leaves through the hub, as every other act does
       close() {}
       receive(o) { this.onmessage?.({ data: JSON.stringify(o) }); }
     }
-    const s = new OnlineSession({ id: 'ann-0001', secret: 'secret-of-ann-0001', WebSocketImpl: FakeWS, now: () => 10000, acct: 'acct-ann', asecret: 'secret-of-acct-ann', name: 'Ann' });
+    const s = new OnlineSession({ url: 'wss://relay.invalid', id: 'ann-0001', secret: 'secret-of-ann-0001', WebSocketImpl: FakeWS, now: () => 10000, acct: 'acct-ann', asecret: 'secret-of-acct-ann', name: 'Ann' });
     s.join(SOCIAL_ROOM, { x: 1, y: 0, z: 1, yaw: 0, pitch: 0, mv: 0 });
     const ws = sockets[0]; ws.onopen?.();
     ws.receive({ t: 'welcome', id: 'ann-0001', peers: [], v: RELAY_VERSION });

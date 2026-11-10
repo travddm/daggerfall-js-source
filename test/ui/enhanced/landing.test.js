@@ -327,8 +327,7 @@ test('U63: the night is the MENU\'s night - pixelGround\'s ramp, seed and star l
 // (U63's pictures test retired with the pictures themselves - the DA
 // site cleanup; the no-raster law above is its successor.)
 
-// (U64's, PATREON1's and SUPPORT1's corner asks retired with the asks themselves: they linked the upstream project's
-// Patreon and Ko-fi. The door keeps the 84px top they stood in.)
+// (The corner asks retired with the asks themselves. The door keeps the 84px top they stood in.)
 
 test('DISC1: the Discord is front and centre - a plaque in the door\u2019s own row, one home, no new shape', () => {
   // The plaque is what you PRESS, so the invite joins the plaque row

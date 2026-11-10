@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { nearestSafeLocation, respawnFlavorText, respawnHealth, RESPAWN_HEALTH_FRACTION } from '../../src/systems/deathRespawn.js';
 import { LOCATION_TYPES, DUNGEON_TYPES, longitudeLatitudeToMapPixel } from '../../src/formats/mapsFile.js';
 
-// ═══ D-ONLINE1: ONLINE, A DEATH RESPAWNS INSTEAD OF ENDING THE RUN ══
+// D-ONLINE1: ONLINE, A DEATH RESPAWNS INSTEAD OF ENDING THE RUN
 //
 // Mac, 2026-09-17 ("daggerfalljsWildlifeSpawnsRespawn"; players: "when
 // i die i just end up at the title menu", "still see you have died

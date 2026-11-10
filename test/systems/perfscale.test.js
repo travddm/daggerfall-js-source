@@ -35,6 +35,8 @@ import * as RendererModule from '../../src/render/renderer.js';
 import { EL_LANE } from '../../src/render/enhancedLighting.js';
 import { frameTarget, setFrameTarget } from '../../src/render/renderTarget.js';
 import { E, stateGl, presents, retroCfg } from '../retroGl.mjs';
+import { glslFunctions } from '../glsl.mjs';
+import { RETRO_FS } from '../../src/render/retroPass.js';
 import { FEATURES, FEATURE_PREF_DEFAULTS } from '../../src/systems/features.js';
 import { onlineForcedPref, ONLINE_PLAYERS_OWN_PREFS } from '../../src/systems/online/onlineLane.js';
 import { getPref, setPref, loadPrefs, PREF_DEFAULTS, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
@@ -166,9 +168,15 @@ test('PERF-SCALE S2: at 75% the classic world draws into round(canvas x 0.75) an
     assert.equal(presents(s).length, 1, 'presented once');
   } finally { setFrameTarget(null); }
   // the shader: the smooth arm samples at the pixel's own spot and returns before the snap and the effect
-  const fs = src('render/retroPass.js');
-  assert.match(fs, /uniform int uSmooth;/);
-  assert.match(fs, /void main\(\) \{\n {2}if \(uSmooth == 1\) \{ outColor = texture\(uColor, \(gl_FragCoord\.xy - uRect\.xy\) \/ uRect\.zw\); return; \}\n/);
+  // (run on the shader itself: the palettize kind is set, and the LUT must not be read)
+  const shade = glslFunctions(RETRO_FS, {
+    uSmooth: 1, uKind: 2, uNoSky: 0, uLutSize: 32, uRect: [10, 20, 200, 100], uPresent: [640, 400],
+    gl_FragCoord: [60.5, 70.5, 0.5, 1],
+    texture: (name, uv) => (name === 'uColor' ? [uv[0], uv[1], 0.25, 1] : [1, 1, 1, 1]),
+    texelFetch: () => { throw new Error('the smooth arm reads no LUT'); },
+  });
+  shade.main();
+  assert.deepEqual(shade.globals.outColor, [(60.5 - 10) / 200, (70.5 - 20) / 100, 0.25, 1]);
 });
 
 test('PERF-SCALE S2: a docked strip - the image is the STRIP x the scale, presented to the strip over a black canvas; under the lane its frame is the image\'s size and resolves into it; the program-less fallback blits LINEAR', () => {

@@ -62,8 +62,7 @@ export function liftCurse(item, player) {
   const c = item.cursed;
   const list = Array.isArray(item.enchantments) ? item.enchantments : [];
   let at = -1;
-  // the curse's own: the last of its kind that no item maker laid. AUDIT MAKER-RARE A1 (bible/01-Overview/bugs/
-  // Field-Bugs-2026-10-26.md): a cursed Rare the maker took may carry a bound soul's forced row of the drawback's very
+  // the curse's own: the last of its kind that no item maker laid. AUDIT MAKER-RARE A1: a cursed Rare the maker took may carry a bound soul's forced row of the drawback's very
   // kind after it (a Wraith's Item Deteriorates in holy places) - the last of its kind alone took the soul's row, left the
   // curse biting, and the item law held the piece's owner's trade
   for (let i = list.length - 1; i >= 0 && at < 0; i--) if (!makerLaid(list[i]) && list[i]?.type === c.type && list[i]?.param === c.param) at = i;

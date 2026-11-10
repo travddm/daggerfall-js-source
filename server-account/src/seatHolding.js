@@ -1,5 +1,4 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
 // SEAT1d - HOLDING A
 // SEAT: the holder's levers on its board (the Tithe, the Edict), what a
 // Charter pays (the Tithe across its bailiwick, beside every sale that
@@ -17,7 +16,6 @@
 // that write landed.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { accountKind, displayName, mintId, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { titheCapAt } from './seatForts.js';   // SEAT2b: the Market Hall's Tithe cap

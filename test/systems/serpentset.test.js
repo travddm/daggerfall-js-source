@@ -208,7 +208,7 @@ test('SERPENT-SET the hoard: every hoard - a ship that dealt and one that stood 
     ["Warrior's Flail of Skill", 'rare'], ['Torc of Warding', 'magic'],
   ]]);
   // gem arc's - this seed's broadsword rolls Leap Strike there, its line after the last pass's
-  assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 2 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (B4 rescale: potency's Legendary band is 2-3 now, the same draw lands on 2; earlier BAL9c, bible/05-Combat/Balance-Arc.md section 15): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
+  assert.deepEqual(h.pieces[0].item.affixes.filter((a) => !isTechniqueAffix(a)).at(-1), { id: 'potency', value: 2 }, 'the last pass\'s line, the kind that moved the roll');   // PIN MOVED (B4 rescale: potency's Legendary band is 2-3 now, the same draw lands on 2; earlier BAL9c): the same draw lands on potency in a blade's pool of five, castSpeed's band its own
   assert.deepEqual(h.pieces[0].item.affixes.at(-1), { id: 'technique', param: 'slam', value: 12 }, 'TECH1: and the technique\'s, last');
   assert.deepEqual(rollSerpentSpoils(6, 12, 'dealt'), h, 'the same seed, the same hoard');
   const grip = rollSerpentSpoils(12345, 20, 'dealt').pieces[2];

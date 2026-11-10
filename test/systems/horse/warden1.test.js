@@ -4,7 +4,7 @@
 // away told when they re-say the spot, a moved word clearing the mark, a word with no landing never thrown, the alarm
 // left to its own duties; the client's law (the stamp, the road share, the landing, the offline clock, the record and the
 // save moved); the pool holding a carried team and drawing a thrown one where it landed; the runtime's adoption; the
-// show's clock and its allocations; the host's three throws. `06-Systems/Wagon-Warden.md`.
+// show's clock and its allocations; the host's three throws.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

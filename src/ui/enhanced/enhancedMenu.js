@@ -6,7 +6,7 @@
 // settings, mods, about.
 //
 // ONE IMPLEMENTATION, THREE HOSTS. This module is mounted by the game
-// at boot (src/main.js), by the prototype page (/menu.html, via
+// at boot (src/main.js), by the prototype page (/labs/menu.html, via
 // src/tools/enhanced/enhancedMenu.js), and by the PAUSE DOOR once the game is
 // running (ui/pauseDoor.js) - and there is no second copy of any of
 // it. The prototype exists to be argued with and must therefore be the
@@ -118,7 +118,7 @@ import {
 } from '../../systems/settings/settings.js';
 import { mostRecentRestorable, restorableSaves, firstRestorable, deleteSave, QUICK_SAVE_NAME, loadSlot, saveSlot } from '../../systems/save/saveSlots.js';
 import { offlineCopyOf, REALM_COPY_SAVE_NAME } from '../../systems/offlineCopy.js';   // AUDIT LIVED1 E: Copy to offline changes lanes
-import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
+import { SKY_SEGMENTS, skyClassicMinutes, wallMsForSkyMinutes, skyHasOwnClock } from '../../net/skyLaw.js';   // TIME4: the sky's day, said at the door
 import {
   realmIo, realmList, realmDelete, realmFetch, realmRowAsSave, realmSummaryOf, realmRefusalText, takeRealmNotice,
   sweepUnsent,
@@ -243,7 +243,7 @@ import { profileBadge, portraitSave, liveCharacter, characterLine } from '../pro
 import { profileIconNode } from '../profileIcons.js';   // WITCH1: a profile icon worn, in the mark's portrait
 import { ownIcon } from '../../systems/ownGlyphs.js';   // WITCH1: the icon the stored session says this device's player wears
 import { cloudIo, cloudList, pushSlot, pullSlot, removeCloudSlot, cloudOnly, slotKeyOf, cloudRefusalText } from '../../systems/cloudSaves.js';   // ACC2: the backup a tile can offer, AUDIT-312 F1's delete, and ACC2c's download of a save that is only up there
-import { serviceBase, storedSession } from '../../net/accountClient.js';
+import { serviceBase, storedSession } from '../../net/accountClient.js'; import { accountServiceWait, accountWaitNote } from './account-service-wait.ts';   // the card waits for the relay to name its account service
 import { isBountyQuestId, abandonBountyQuest, shareBountyQuest, bountyQuestShareable } from '../../systems/bounty/bountyJournal.js';   // BOUNTY1: a bounty in the journal - its Abandon and its Share
 import { liveBundles, canEndBundle, endBundle } from '../../systems/mysticism.js';   // BUFF-END: the Stats page's Effects - the ONE bundle walk, and which the player may end
 import { maxRoundsRemaining } from '../hud/hudActiveSpells.js';   // BUFF-END: a bundle's rounds, as the HUD reads them
@@ -490,7 +490,7 @@ export function skyDayWords(nowMs = Date.now(), localTime = (ms) => new Date(ms)
   const at = (m) => { const v = ((m % 60) + 60) % 60; return `:${String(Math.floor(v)).padStart(2, '0')}${v % 1 ? ':30' : ''}`; };
   // L10N4: one sentence, one pattern - the midnight's two shapes are a select inside it, never a glued fragment
   const day = { onHour: m0 === 0 ? 'yes' : 'no', midnight: at(m0), dusk: at(m0 + 45) };
-  return nowMs >= turn
+  return !skyHasOwnClock() ? t('menu.online.oneClockDay', 'A day in the world is two hours of real time.') : nowMs >= turn   // one clock, as in DFU (time.skyClock)
     ? t('menu.online.skyDay', 'A day in the world is an hour of real time: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', day)
     : t('menu.online.skyDayUntil', 'A day in the world is two hours of real time until {turn}; from then on it is an hour: {onHour, select, yes {midnight falls on the hour} other {midnight falls at {midnight}}}, and dusk at {dusk}.', { ...day, turn: localTime(turn) });
 }
@@ -1135,7 +1135,7 @@ function closeAccount() {
  *  and the Collections page's that reads the wardrobe and wears from it (ui/collections/wardrobePart.js). */
 const newAccountFlow = (onChange) => AccountFlow({ io: { fetch: (...a) => globalThis.fetch(...a), base: serviceBase(appStorage()) }, storage: appStorage(), onChange });
 function accountBody() {
-  const host = el('div', 'acctmount');
+  const host = el('div', 'acctmount'); const waiting = acctFlow ? null : accountServiceWait(String(getPref('onlineServer') || ''), appStorage(), render); if (waiting) return accountWaitNote(host, waiting);
   const fresh = !acctFlow;
   if (fresh) acctFlow = newAccountFlow(() => acctPaint?.());
   // PROFILE-MENU: the card's plate wears the corner mark's portrait and says whose face it is - the same character
@@ -1220,7 +1220,7 @@ function paneOnline(body) {
   //
   // WHERE EACH PIECE WENT, because none of it was deleted for tidiness:
   //
-  //   the shared-world prose  -> 11-Multiplayer/Multiplayer.md, which
+  //   the shared-world prose  -> docs/multiplayer/README.md, which
   //       is where the law it describes is written down. A wall of text
   //       above a row of tiles is read once and skipped for ever; the
   //       promises in it are the RELAY's and are pinned there.
@@ -2353,11 +2353,11 @@ const ONLINE_LOCK_NOTE = 'Always on online: the shared world uses every enhancem
 /** MODS-ONLINE-2: the Mods pane's own line. The lane's note (above)
  *  is about the PORT's switches and was wrong over the tiles the
  *  moment a mod stopped being forced. */
-const ONLINE_MODS_NOTE = 'Most mods are your choice online. A few are set for everyone, so all players share the same ground and rules. Ground: Basic Roads, World of Daggerfall, Detailed Ships, Iliac Puddle No More\u2019s sea and depth, and There\u2019s a Hole in the Bottom of the Ocean. Rules: every setting of Meaner Monsters, the Combat and Armor Overhaul, Unleveled Loot, Roleplay & Realism and Roleplay & Realism: Items, except who stands behind shop counters. Travel Options is on for everyone, so every trip over land is traveled and ships sail only from ports. Immersive Travel is on for everyone too: carriages wait at every city gate, a driver\u2019s fare is your fast travel over land, and fares are the same for everyone. Its map style stays your choice.';   // AUDIT IT1 W5: a port's ship passage is fast travel online too
-const ONLINE_GROUND_NOTE = 'Set for everyone online, because everyone has to stand on the same ground: roads, rivers, camp sites, ship decks and the seafloor. Offline, your own choice applies.';   // AUDIT LANDFORMS C4: the rivers' row is one of the ground's since LANDFORM3 cut their channels
+const ONLINE_MODS_NOTE = 'Most mods are your choice online. A few are set for everyone, so all players share the same ground and rules. Ground: Basic Roads, World of Daggerfall, Iliac Puddle No More\u2019s sea and depth, and There\u2019s a Hole in the Bottom of the Ocean. Rules: every setting of Meaner Monsters, the Combat and Armor Overhaul, Unleveled Loot, Roleplay & Realism and Roleplay & Realism: Items, except who stands behind shop counters. Travel Options is on for everyone, so every trip over land is traveled and ships sail only from ports. Immersive Travel is on for everyone too: carriages wait at every city gate, a driver\u2019s fare is your fast travel over land, and fares are the same for everyone. Its map style stays your choice.';   // AUDIT IT1 W5: a port's ship passage is fast travel online too
+const ONLINE_GROUND_NOTE = 'Set for everyone online, because everyone has to stand on the same ground: roads, rivers, camp sites and the seafloor. Offline, your own choice applies.';   // AUDIT LANDFORMS C4: the rivers' row is one of the ground's since LANDFORM3 cut their channels
 /** WOD1: the vendors whose room-owned switch is the GROUND's - the two
  *  that write terrain heights (roads' beds, World of Daggerfall's sites). */
-const ONLINE_GROUND_VENDORS = Object.freeze(['roads-hazelnut', 'world-of-daggerfall', 'detailed-ships', 'ocean-holes']);   // DS1: the ships' shared deck   // OH-A: the pits cut into the seafloor
+const ONLINE_GROUND_VENDORS = Object.freeze(['roads-hazelnut', 'world-of-daggerfall', 'ocean-holes']);   // OH-A: the pits cut into the seafloor
 /** DW-D: a vendor whose room-owned switches are the ground's AND other reasons names its ground keys - the carved
  *  sea's switch and its depth. */
 const ONLINE_GROUND_KEYS = Object.freeze({ 'iliac-puddle-no-more': Object.freeze(['Enabled', 'General.WaterDepth']) });
@@ -2506,8 +2506,7 @@ function stepRow(key, name, note, { min, max, step: inc, fmt }) {
 
 /** L10N1b: THE LANGUAGE ROW. Every language the build holds text for, by its own name and its English one, switched
  *  at once - its tables fetched, the text core switched, the menu drawn again - and remembered (uiPrefs `language`).
- *  The front door's alone, as the skip-video row is: a running game keeps the language it booted in. A language whose
- *  strings are Claude's drafts says so. */
+ *  The front door's alone, as the skip-video row is: a running game keeps the language it booted in. */
 function languageRow() {
   const row = el('div', 'row');
   row.dataset.opt = 'language'; row.dataset.pref = 'language';   // ORG2: the map finds it by its key (settingsMap port:language)
@@ -2515,7 +2514,6 @@ function languageRow() {
   const cur = currentLocale();
   main.append(el('div', 'row-name', t('settings.language.name', 'Language')));
   main.append(el('div', 'row-note', t('settings.language.note', 'The language of the game\u2019s text. Takes effect at once.')));
-  if (localeInfo(cur)?.source === 'machine') main.append(el('div', 'row-note', t('settings.language.machine', 'Machine translated')));
   row.append(main);
   const ctl = el('div', 'ctl');
   const sel = el('select', 'act langsel');
@@ -2537,7 +2535,7 @@ function languageRow() {
 
 /** L10N3b: THE TRANSLATION PACK ROW, under the language's: a Daggerfall Unity translation of the chosen language,
  *  installed from the player's own files (scenes/dataSource.js pickTranslationPack) - never bundled, never uploaded -
- *  or replaced, or removed. Its text takes the place of the machine translation wherever it has some. English has
+ *  or replaced, or removed. Its text takes the place of the game's own translation wherever it has some. English has
  *  none: English is the game's own. */
 function translationPackRow() {
   const cur = currentLocale();
@@ -2548,7 +2546,7 @@ function translationPackRow() {
   const main = el('div', 'row-main');
   main.append(el('div', 'row-name', t('settings.pack.name', 'Translation pack')));
   main.append(el('div', 'row-note', pack
-    ? t('settings.pack.installed', '{name}: {tables, plural, one {# table} other {# tables}}, {quests, plural, one {# quest} other {# quests}}, {books, plural, one {# book} other {# books}}. Its text replaces the machine translation.', { name: pack.name, tables: pack.counts?.table ?? 0, quests: pack.counts?.quest ?? 0, books: pack.counts?.book ?? 0 })
+    ? t('settings.pack.installed', '{name}: {tables, plural, one {# table} other {# tables}}, {quests, plural, one {# quest} other {# quests}}, {books, plural, one {# book} other {# books}}. Its text replaces the game\u2019s own translation.', { name: pack.name, tables: pack.counts?.table ?? 0, quests: pack.counts?.quest ?? 0, books: pack.counts?.book ?? 0 })
     : t('settings.pack.none', 'Install a Daggerfall Unity translation into {language} from your own files. Nothing is uploaded.', { language: info.name })));
   row.append(main);
   const ctl = el('div', 'ctl');
@@ -2595,7 +2593,6 @@ function languageOffer() {
   const card = el('div', 'px-langoffer');
   card.lang = code;
   card.append(el('div', 'px-langoffer-q', tIn(code, 'lang.offer', 'Play in English?')));
-  if (localeInfo(code)?.source === 'machine') card.append(el('div', 'px-langoffer-note', tIn(code, 'lang.offer.machine', 'This translation is machine-made and still being checked.')));
   card.append(acts([
     { label: tIn(code, 'lang.offer.yes', 'Yes'), primary: true, onClick: () => { chooseLanguage(code); } },
     { label: tIn(code, 'lang.offer.no', 'No, keep English'), onClick: () => { setPref('languageOffered', true); render(); } },

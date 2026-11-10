@@ -1,6 +1,6 @@
 // CSA-A: IS A LARGE PICTURE BUILT OUT OF CLASSIC TEXTURES?
 //
-// Detailed Ships' search (tools/detailedShipsAssets.mjs findClassicSource)
+// The classic-record search (tools/lib/classic-source.ts findClassicSource)
 // asks whether ONE classic record covers a picture of about its own size. A
 // mod's 640x640 animation frame is no record's size, so that search passes
 // it without looking. This one looks: the picture is cut into aligned blocks
@@ -24,7 +24,7 @@
 // 32x32 block against TEXTURE.000 record 119 that way. A record one colour
 // covers FLAT_SHARE of is a swatch, and the search says which it skipped.
 
-import { DERIVED_SHARE } from '../detailedShipsAssets.mjs';
+import { DERIVED_SHARE } from './classic-source.ts';
 
 const rgbAt = (d, i) => (d[i] << 16) | (d[i + 1] << 8) | d[i + 2];
 

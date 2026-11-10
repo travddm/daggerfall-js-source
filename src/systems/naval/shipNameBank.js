@@ -1,12 +1,10 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // WW3: THE WATERS' PEOPLE - the name bank a ship's captain and hands are
 // named from: past the Bay the waters' area's province's (characters/areaNameBank.js nameBankOfArea - a Nord's in
 // Skyrim's waters), on the Bay her region's as always (17, Daggerfall's, for none). The naming laws
 // (systems/naval/navalShips.js shipNames, shipCrew.js handName) take the bank this answers: they are the account
 // Worker's too (its item law reaches them through the harbour board), and the continent's geography an area's people are
 // read off is never its. The client's own; not a DFU member. Ledger A (WW3).
-// ═══════════════════════════════════════════════════════════════════
 import { nameBankOfArea } from '../../characters/areaNameBank.js';
 import { getNameBankOfRegion } from '../../characters/nameHelper.js';
 import { BAY_AREA_COUNT } from '../../world/worldWide/worldGrid.js';

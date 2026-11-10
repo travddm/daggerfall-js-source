@@ -38,7 +38,7 @@ function seeded(seed = 1) {
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-// ═══ THE SCHEDULE ════════════════════════════════════════════════════════════════════════════════
+// THE SCHEDULE
 
 test('SERPENT1 schedule: the dawn watch of every odd game day - sighted 02:00, risen 05:00, the storm closing its waters 08:00, sounding 10:00 (day 363: 23:02:30, 23:17:30, 23:32:30 and 23:42:30 UTC) (mutants: a minute moved; the day phase flipped)', () => {
   assert.equal(SERPENT_DAY_MINUTES, MINUTES_PER_DAY);
@@ -143,7 +143,7 @@ test('SERPENT1 words: the boss table, and each line the event, where and when (m
   assert.equal(slainLine({ ...w, near: null, top: [] }), 'Sethrakul is slain. Its hoard goes to the ships that fought it.');
 });
 
-// ═══ THE BODY ════════════════════════════════════════════════════════════════════════════════════
+// THE BODY
 
 test('SERPENT1 body: a leg is a closed form - a straight run at its speed, an arc turning about a centre to its side, a new leg begun where the head is and as it heads (no jump, no kink) (mutants: the arc\'s centre on the wrong side; the turn\'s rate off the radius)', () => {
   const T = 1_000_000;
@@ -243,7 +243,7 @@ test('SERPENT1 body: WHAT A BALL MAY STRIKE - a segment above the sea, its box t
   assert.deepEqual(Object.keys(box).sort(), Object.keys(ship).sort());
 });
 
-// ═══ THE BRAIN ═══════════════════════════════════════════════════════════════════════════════════
+// THE BRAIN
 
 const T0 = 10_000_000;
 const SOUND = T0 + 25 * 60_000;

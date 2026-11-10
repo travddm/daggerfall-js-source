@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // RPT1026-ITEMS HELD-OUT:
 // THE PLAYER'S GOODS A WINDOW HOLDS OUT OF THE PACK ARE STILL THE PLAYER'S, AND EVERY SAVE SAYS SO.
 //
@@ -17,7 +16,6 @@
 // its own, `otherItems`): neither is held here.
 //
 // A leaf: no import. Not a DFU member - DFU saves no window's selection because it saves under none.
-// ═══════════════════════════════════════════════════════════════════
 
 /** @type {Set<{ entity: any, items: () => any }>} */
 const _held = new Set();

@@ -31,7 +31,7 @@ import { setTutorialHandler, _resetTutorialTriggerForTests } from '../../../src/
 import { createEquipTable } from '../../../src/characters/equipTable.js';
 import { fakeDom } from '../../invdrag.mjs';
 
-// ═══ SURV-BOONS: THE FOURTH TIER ═════════════════════════
+// SURV-BOONS: THE FOURTH TIER
 //
 // The owner: "I want to force a new version of Climates and Calories, but a
 // completely different version. Instead of punishing players for not

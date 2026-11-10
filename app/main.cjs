@@ -70,8 +70,7 @@ for (const s of FRAME_SWITCHES) app.commandLine.appendSwitch(s);
 app.commandLine.appendSwitch('force_high_performance_gpu');
 
 // PERF-GC1: THE YOUNG
-// GENERATION'S ROOM. A crowd's frame leaves about a megabyte of short-lived garbage (bible/07-Rendering/
-// Performance-Crowd.md), and V8's default 16 MB semi-space fills - and is swept - several times a second. 32 MB halves
+// GENERATION'S ROOM. A crowd's frame leaves about a megabyte of short-lived garbage (docs/rendering/performance.md), and V8's default 16 MB semi-space fills - and is swept - several times a second. 32 MB halves
 // the sweeps; a sweep's cost is what survives it, not the room. The peer lab, forty peers, steady frames: the layers'
 // mean 2.2-2.6 ms -> 2.0 (64 MB: 1.8, kept smaller for the low-memory machines). The picture is untouched; the browser
 // build keeps the browser's own. Before the app is ready, as every switch.

@@ -87,6 +87,18 @@
    "why": "the sky's own law"
   },
   {
+   "file": "src/net/skyLaw.js",
+   "has": ": sharedClassicMinutes(nowMs));",
+   "clock": "law",
+   "why": "one clock, as in DFU: without the sky's own clock (time.skyClock) the sky is the event clock"
+  },
+  {
+   "file": "src/net/skyLaw.js",
+   "has": ": wallMsForClassicMinutes(classicMinutes));",
+   "clock": "law",
+   "why": "one clock, as in DFU: without the sky's own clock (time.skyClock) the sky is the event clock"
+  },
+  {
    "file": "src/scenes/arrestFlow.js",
    "has": "banish(playerEntity, region(), trustedWorldMinutes());",
    "clock": "event",
@@ -1226,12 +1238,6 @@
    "has": "night: () => deadWalk(dayOfYearFromMinutes(Math.floor(skyMinutes())), nowMs()),",
    "clock": "sky",
    "why": "WITCH1: the Wyrd Sister's window says the night the dead walk"
-  },
-  {
-   "file": "src/net/sea/seaSeasonLaw.js",
-   "has": "arenaSeasonOf(Math.floor(wallMsForClassicMinutes(",
-   "clock": "event",
-   "why": "a voyage's game day as the realm's wall time - the season of the realm's eight weeks it falls in (SEA-SEASON, the arena's)"
   },
   {
    "file": "src/scenes/world.js",

@@ -1,7 +1,7 @@
 // AUDIT SEATS-2 - THE RELAY'S LANE: the relay's
 // own fighters answer whoever strikes them and are struck from nowhere they could never answer (R1); a work blow's field
 // frame says them where they stand (R2); the Throne's seconds never outrun the wire's bound (R3). Over the real Room and
-// its fake sockets (test/fakeRoom.mjs). `06-Systems/Online-Arc.md` AUDIT SEATS-2.
+// its fake sockets (test/fakeRoom.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

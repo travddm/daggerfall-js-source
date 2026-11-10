@@ -5,7 +5,7 @@
 //
 // The Standing page listed the player's memberships alone (systems/affiliations.js). With the Interface tab's Character
 // sheet row on (prefs `standingAll`, on by default - STANDING-ON), it lists every organization's reputation from the live faction
-// store (systems/faction/factionStanding.js). `01-Overview/bugs/Field-Bugs-2026-10-09e.md`.
+// store (systems/faction/factionStanding.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

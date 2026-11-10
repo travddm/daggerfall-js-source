@@ -148,7 +148,7 @@ test('AUDIT-D brain: a level is bounded at the join and kept from the first clai
   assert.ok(serpentEarned(f, 's') && serpentEarnedBy(f, 's') === 'dealt');
 });
 
-// ═══ the relay: the hub failing, the object waking, the keeping ═══
+// the relay: the hub failing, the object waking, the keeping
 const TT = serpentTimes(DAY);
 const PX = 205, PY = 214;
 const SX = (PX + 0.5) * PIXEL_UNITS, SZ = (499 - PY + 0.5) * PIXEL_UNITS;

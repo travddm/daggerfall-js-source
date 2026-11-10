@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // THE XML BILLBOARD SCALE (MM1, 2026-09-12) -
 // TextureReplacement.SetBillboardScale (TextureReplacement.cs:661-673)
 // and the scale arm of GetStaticBillboardMaterial (:508-519).
@@ -18,7 +17,6 @@
 // billboardSize applies whatever answers. A later registration for
 // the same record wins, as a later-loaded mod's file does in DFU.
 // A LEAF: no imports.
-// ═══════════════════════════════════════════════════════════════════
 
 const _registry = [];   // [{ vendor, table: { [archive]: { [record]: [x, y] } }, isOn: () => bool }]
 let _gen = 0;   // AUDIT DEX B7: bumps with every registration and every one let go

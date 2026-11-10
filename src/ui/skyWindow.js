@@ -1,7 +1,6 @@
 // @ts-check
 // RVN-STARS - A SKY OF STARS, DRAWN: the one window every sky the
-// port grows past the Firmament is drawn in - CAPTAIN-TREE's captain's stars (ui/captainTreeWindow.js, bible/03-World/
-// Naval-Refit.md). Taken out of the captain's window whole (one home, never copies that drift): the Firmament's own sky (ui/firmamentWindow.js - its sheet,
+// port grows past the Firmament is drawn in - CAPTAIN-TREE's captain's stars (ui/captainTreeWindow.js, docs/systems/naval.md). Taken out of the captain's window whole (one home, never copies that drift): the Firmament's own sky (ui/firmamentWindow.js - its sheet,
 // its two palettes, its stars' sizes) over the whole screen.
 //
 // WHAT A PLAYER DOES HERE - the Firmament's ways, kept:

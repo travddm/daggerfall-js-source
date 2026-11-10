@@ -1,6 +1,6 @@
 // SEAT2b: THE WORKS ON THE SEAT TAB - each work the seat may raise, its tier and what it does, the Marks of its next tier,
 // and the holder's lever a work (7.5, 7.9;
-// src/ui/seatWorks.js, src/net/fortLaw.js fortWorkLine). `06-Systems/Online-Arc.md` SEAT2b.
+// src/ui/seatWorks.js, src/net/fortLaw.js fortWorkLine). SEAT2b.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';

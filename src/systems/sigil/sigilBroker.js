@@ -2,9 +2,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // SET7 — THE SIGIL BROKER: SIGIL STONES BUY THE DAY'S STOCK.
 //
-// Design, and the record of every slice: bible/11-Multiplayer/
-// Sigil-Sets.md section 7.
-//
 // ═══ THIS FILE IS THE LAW ══════════════════════════════════════════
 //
 // Pure: the day's stock, minted from the DAY ALONE, and what buying

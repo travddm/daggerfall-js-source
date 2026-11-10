@@ -275,7 +275,7 @@ export function parseChatLine(text, extra = []) {
   if (name === 'rp') return rest.replace(/\*/g, '').trim() ? { kind: 'rp', text: rpText(rest) } : { kind: 'empty', name };   // CHAT-RP
   if (name === 'join' || name === 'leave') { const chan = rest.toLowerCase().replace(/^#/, ''); return { kind: name, chan: JOIN_CHANNELS.includes(chan) ? chan : '' }; }   // CHAT-TRADE
   if (name === 'emotes') return { kind: 'emotes' };
-  if (name === 'find' || name === 'who') return rest ? { kind: 'find', q: rest } : { kind: 'empty', name };   // SCALE5c (Mac's decision 2)
+  if (name === 'find' || name === 'who') return rest ? { kind: 'find', q: rest } : { kind: 'empty', name };   // SCALE5c
   if (Object.hasOwn(EMOTES, name)) return { kind: 'emote', text: emoteText(name, rest) };
   const chan = CHANNEL_COMMANDS.find((c) => c.names.includes(name));
   if (chan) return rest ? { kind: 'channel', tab: chan.tab, text: rest, wrap: chan.wrap } : { kind: 'empty', name };

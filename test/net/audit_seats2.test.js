@@ -1,7 +1,6 @@
 // AUDIT SEATS-2: THE SEATS ARC AUDITED AGAIN,
 // after SEAT2b part two, SEAT-HALL and CROWN-HALL - five lanes (the service, the relay, the shared law against the spec,
-// the client, the design's coverage), every finding verified, fixed and pinned here. `06-Systems/Online-Arc.md` AUDIT
-// SEATS-2.
+// the client, the design's coverage), every finding verified, fixed and pinned here.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

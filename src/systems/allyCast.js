@@ -163,7 +163,7 @@ export function allyReachFor(rangeType) {
  *  frame every door refuses - the caster's own (online.js sendCast), the relay's (which closes the socket) and the
  *  target's - so their gift never left and a CasterOnly heal fell back onto the caster. The port caps no level
  *  (FormulaHelper.CalculateCasterLevel is `caster.Level`, EntityEffect.cs:742-929 scale by it), so a caster past 30
- *  casts on a mate AT 30 (06-Systems/Online-Arc.md PEER-CAST - DFU has no cast on another player to be 1:1 with). */
+ *  casts on a mate AT 30 (PEER-CAST - DFU has no cast on another player to be 1:1 with). */
 export function allyCastFrame(spell, level, to) {
   return {
     to,

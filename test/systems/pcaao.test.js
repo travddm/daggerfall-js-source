@@ -503,7 +503,7 @@ test('PCO1: the seams - the Mods pane entry, the credit, the vendor folder, worl
   assert.ok(SKILLS.CriticalStrike === 34 && SKILLS.Dodging === 20, 'the skill ids the C# numbers');
 });
 
-// ═══ AUDIT PCO1 - the 1:1 audit, method for method against
+// AUDIT PCO1 - the 1:1 audit, method for method against
 // the decompiled 1.44. Two findings, both pinned here.
 test('AUDIT PCO1: the archery arm registers on the STOCK path too - InitMod registers AdjustWeaponHitChanceMod/AdjustWeaponAttackDamage whatever the armour module says (mutant: the hooks missing from formulas.js, or gated on armorHitFormulaRedone)', () => {
   uninstallPcaao();
