@@ -165,8 +165,7 @@ Hardcore characters out of all PvP and would need a second health model on the r
 - The row stays, with `dead_at` and `dead_why = 'fell'`, and appears in a Hall of the Fallen (name, class, level,
   place, time, killer when known). The slot is freed.
 - The existing party Resurrect window applies (150 s).
-- Staff may take a death back through the existing operator revival (`realm-revive.yml`, D1 Time Travel;
-  `docs/multiplayer/account-service.md:148`; `revived.js` `takeBack`) for a verified bug only. Section 4.4.
+- Staff may take a death back for a verified bug only (`revived.js` `stampRevived` stamps it). Section 4.4.
 
 ### 2.4 Ironman details
 

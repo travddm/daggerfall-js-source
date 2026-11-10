@@ -172,8 +172,7 @@ DISCORD_INVITE_URL = "https://discord.gg/QADbZYQ73j"
 # HOURS-FIRST (2026-10-08, Mac: "for all the accounts here I want to grant
 # them a unique different version of the aura, a title named Hour's First,
 # and each the gilded gun"): THE FIRST GROUP TO BREAK AN ABYSS DUNGEON - the
-# thirteen accounts the first clear's claims name (slot 1, read by
-# .github/workflows/sd-clears.yml). The title Hour's First and its aura, The
+# thirteen accounts the first clear's claims name (slot 1). The title Hour's First and its aura, The
 # First Hour (titles.js isHoursFirst). Comma-separated handles,
 # case-insensitive, the same as the lines above; held while listed.
 HOURS_FIRST_HANDLES = "aether,ArtemisGodfrey,CycleD0se,Duck,Kobakk,MackyWackyDeeJew,mayaamano,Nirnroot,ofrizz,rosalina,ShikiX3,Temegast,Terra"
