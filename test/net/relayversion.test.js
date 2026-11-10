@@ -35,6 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
+  world314: 'f7baf3674ce008f3ba2f92be435814e37c37f4903a2f79a5f721856ba90faf7e', // the official profile pins the Absorption limits row off (officialProfile.ts)
   world313: '84b59a258ff5325e9b747c2638941aedf616ce37089315177ad147a0d74ec75e', // the official profile pins the Sold goods stay on the shelf row off (officialProfile.ts)
   world312: 'b50e191194a38a9a6dccb5009224dae3506046703dfc5c74a0b1129d4971513c', // a failed quest costs DFU's reputation online, a server profile rule in the relay's graph
   world311: 'd727d6099fabd9f641ed904a4e7e320fb6d543b7cbca4fb0d03439acc9aecab6', // a guild rank follows DFU's 28-day rule online, a server profile rule in the relay's graph
@@ -53,8 +54,6 @@ const LAW = {
   world288: 'd908c3f2039b4650e4ae65a246e1cb40ae09c877497f21a7e4b5a8d26a298f56',     // GROUND LAW 3: the Bay's own locations stand on DFU's town ground again; the relay's bytes change only in the version.
   world289: 'eea27d09f7168bf2aedf55f8c9a01d751637f52eeed356cae2f5689e7f87713d',     // ENDGAME RETUNE (B6): the gate's reference damage dpsRef steepens past level 30, so a gate's and the Abyss Remnant's health keeps its length against the tamed power budget
   world303: '4fc754a8d0c8b5e6924f4020314737053d761a020a6033dbc4f0f916d9783c8e', // TOWN-SEATS ROW: the Town seats switch is pinned on in the server profile (officialProfile.ts)
-  world309: 'd064bb785c4c4928a2802a44d50eb2e0dee8a89a337c4ba3c45e77bdd6ec4f12', // the official profile pins the Sold goods stay on the shelf row off (officialProfile.ts)
-  world310: '8d646b68af0cc70da6101493ace2ced94b1b5b6ec24df80f5dd751ff63b2cd50', // the official profile pins the Absorption limits row off (officialProfile.ts)
   world308: 'd9a2d9f23d1ecabbd62032a0731ed9224a8d3b0d9c00556e84ae739ab195c35d', // a player's live Stealth and half-speed state on the pose, and a foe record's stealth-check minute (characters/enemy/peer-senses.ts)
   world307: 'b6541ec9bfade28b6df33c2ea9113e9683c7079da938cac72596158fb51b223b', // (re-hashed in place, unmerged - bytes cd691f30... before the profile rule) A party leader sets the party to no mentoring - the hub's party.mentoring.off and .on acts, the party view's nm; the server profile's party.allowNoMentoring rule can refuse the act
   world306: '920949d00b03e026c7f9ef3f7220cdc88d25958c65156afec8693bf9470795d9', // A Cast-When-Held equip pays DFU's bill by default; Legendary items equip free and equipping never breaks items are options, pinned off in the server profile (officialProfile.ts)
