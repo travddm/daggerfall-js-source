@@ -225,8 +225,11 @@ HIDDEN_SEEN_URL = "https://accounts.invalid/v1/mod/hidden-seen"
 # Only these vars change, so RELAY_VERSION does not move: the relay deploy
 # is a manual run of the relay's deploy with `redeploy` ticked (a plain
 # dispatch deploys only on drift), which drops every connected player once.
-STAFF_NET_FEED_URL = "https://accounts.invalid/v1/staff/net-feed"
-REACTION_FEED_URL = "https://accounts.invalid/v1/mod/reaction-feed"
+# Shipped empty: the feeds are the operator's options "feeds" and "botcheck" (OPERATOR_OPTIONS in
+# server-account/wrangler.toml). To turn one on, name it there and set its URL here, as
+# https://accounts.invalid/v1/staff/net-feed and https://accounts.invalid/v1/mod/reaction-feed.
+STAFF_NET_FEED_URL = ""
+REACTION_FEED_URL = ""
 # ═══ INT11-INT14: THE LINE THE BOSS FIGHTS' COUNT RUNS BY ════════════
 #
 # The relay counts each fighter's body in a gate, an Abyss Dungeon and

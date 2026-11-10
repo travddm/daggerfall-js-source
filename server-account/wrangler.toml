@@ -151,6 +151,10 @@ RELAY_LAW_URL = "https://relay.invalid/v1/law"
 # public chat lines and reported lines to Anthropic's Messages API, so an operator turns the reviewer on on purpose. It
 # reads nothing until ANTHROPIC_API_KEY is set beside it, as a secret, never here.
 MOD_AI = "off"
+# OPERATOR_OPTIONS (src/operator-options.ts): the operator's tools that core play does not need, each
+# off unless named here, comma-separated: census, economy, desk, status, follow, hidden, give, feeds, botcheck. "feeds"
+# and "botcheck" also need the relay's STAFF_NET_FEED_URL and REACTION_FEED_URL (server/wrangler.toml) set.
+OPERATOR_OPTIONS = ""
 # MOD_AI_MODEL: the model, empty for the current Haiku (src/modAi.js MOD_AI_MODEL_DEFAULT). MOD_AI_DAILY_MAX: its calls
 # a UTC day, empty for 1,500.
 MOD_AI_MODEL = ""
