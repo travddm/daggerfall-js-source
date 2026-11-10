@@ -50,7 +50,7 @@ import { levelWealthCeiling } from '../../src/net/realm/realmGoldLaw.js';
 import { censusStep } from './staffCensus.js';
 import { whenOption } from './operator-options.ts';   // the census's tally only while the operator's option is on
 /** No census this checkpoint: no step, and the hour's row keeps its tally. */
-const NO_CENSUS = Object.freeze({ steps: [], tally: null });   // STAFF-PANEL4-CENSUS: the census's tally, on the hour's row and the character's latest
+const NO_CENSUS = Object.freeze({ steps: [], tally: null });   // the census's tally, on the hour's row and the character's latest
 
 /** INT2's cutover: a character whose first judged wealth stands past this many
  *  of its level's wealth ceiling (realmGoldLaw.js levelWealthCeiling) is flagged for staff - flagged, never held. */

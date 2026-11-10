@@ -75,7 +75,7 @@ import { TOWN_ECON_SWEEPS, TOWN_ECON_SEEN_SWEEP, townEconKeptFrom, townEconSeenF
 import { settleStaleYards } from './decor.js';   // YARD-SNAP: a town's yards built again where a write left them stale
 import { STAFF_AUDIT_KEEP_S } from './staff.js';   // STAFF-PANEL1: the audit log's month
 import { censusDay, censusBackfill } from './staffCensus.js';
-import { whenOption } from './operator-options.ts';   // the census runs only while the operator's option is on   // STAFF-PANEL4-CENSUS: the census's day and its one backfill, off peak
+import { whenOption } from './operator-options.ts';   // the census's day and its one backfill, off peak, run only while the operator's option is on
 import { STAFF_MESSAGE_KEEP_S } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: a staff message's month
 import { STAFF_EVENT_KEEP_S } from './staffEvents.js';   // STAFF-EVENT: a staff event's month
 import { STAFF_FEED_KEEP_S } from './staffNet.js';   // STAFF-PANEL5-FEEDS: the relay's net feed's day

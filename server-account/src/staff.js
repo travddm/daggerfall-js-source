@@ -497,13 +497,13 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
 
   // ═══ STAFF-PANEL2: THE REPORTS, Mute, Ban and the claims - Admins and Moderators both (staffCases.js) ═══
   if (CASE_ROUTES.includes(path)) return staffCases(ctx, env, path, body, who, audit);
-  if (DESK_ROUTES.includes(path)) return whenOption(env, 'desk', () => staffDesk(ctx, env, path, body, who, audit));   // STAFF-PANEL3-DESK (staffDesk.js): each door checks its role
+  if (DESK_ROUTES.includes(path)) return whenOption(env, 'desk', () => staffDesk(ctx, env, path, body, who, audit));   // staffDesk.js: each door checks its role
   if (PLAYER_ROUTES.includes(path)) return staffPlayers(ctx, env, path, body, who, audit);   // STAFF-PANEL3-PLAYERS: search, profile, devices, rename - Admins'
-  if (STATUS_ROUTES.includes(path)) return whenOption(env, 'status', () => staffStatus(ctx, env, path, body, who, audit));   // STAFF-PANEL6-STATUS (staffStatus.js)
+  if (STATUS_ROUTES.includes(path)) return whenOption(env, 'status', () => staffStatus(ctx, env, path, body, who, audit));   // staffStatus.js
   if (REALM_ROUTES.includes(path)) return staffRealm(ctx, env, path, body, who, audit);   // STAFF-PANEL3-REALM: trade holds, rollbacks, fixes, gains, removals - Admins'
-  if (CENSUS_ROUTES.includes(path)) return whenOption(env, 'census', () => staffCensus(ctx, env, path, body, who, audit));   // STAFF-PANEL4-CENSUS: Admin only
-  if (ECON_ROUTES.includes(path)) return whenOption(env, 'economy', () => staffEconomy(ctx, env, path, body, who, audit));   // STAFF-PANEL3-ECON: an Admin's alone
-  if (FOLLOW_ROUTES.includes(path)) return whenOption(env, 'follow', () => staffFollow(ctx, env, path, body, who, audit));   // STAFF-PANEL5-FOLLOW: Admins and Moderators
+  if (CENSUS_ROUTES.includes(path)) return whenOption(env, 'census', () => staffCensus(ctx, env, path, body, who, audit));   // Admin only
+  if (ECON_ROUTES.includes(path)) return whenOption(env, 'economy', () => staffEconomy(ctx, env, path, body, who, audit));   // an Admin's alone
+  if (FOLLOW_ROUTES.includes(path)) return whenOption(env, 'follow', () => staffFollow(ctx, env, path, body, who, audit));   // Admins and Moderators
   // ═══ STAFF-PANEL5-MESSAGE: Message on screen, and each message's state - Admins and Moderators both (staffMessage.js) ═══
   if (MESSAGE_ROUTES.includes(path)) return staffMessage(ctx, env, path, body, who, audit);
   // ═══ STAFF-EVENT: an event staged, ended or its mini boss called, and the events with their meters - Admins (staffEvents.js) ═══
@@ -511,7 +511,7 @@ export async function staffRoute(ctx, env, path, body, { ip, token }) {
   if (NET_ROUTES.includes(path)) return whenOption(env, 'feeds', () => staffNet(ctx, env, path, body, who, audit));
   if (MONSTER_ROUTES.includes(path)) return whenOption(env, 'feeds', () => staffMonsters(ctx, env, path, body, who, audit));
   if (REACTION_ROUTES.includes(path)) return whenOption(env, 'botcheck', () => staffReactions(ctx, env, path, body, who, audit));
-  if (HIDDEN_ROUTES.includes(path)) return whenOption(env, 'hidden', () => staffHidden(ctx, env, path, body, who, audit));   // STAFF-PANEL5-HIDDEN: Hide me and Show myself (staffHidden.js)
+  if (HIDDEN_ROUTES.includes(path)) return whenOption(env, 'hidden', () => staffHidden(ctx, env, path, body, who, audit));   // Hide me and Show myself (staffHidden.js)
   if (FREEZE_ROUTES.includes(path)) return staffFreeze(ctx, env, path, body, who, audit);   // STAFF-PANEL5-FREEZE: freeze (Admins) and the staff chat (both)
 
   if (path === '/v1/staff/mods' || path === '/v1/staff/mod/add' || path === '/v1/staff/mod/remove') return staffMods(ctx, env, path, body, who, audit);   // the Admins' doors: the panel's Moderators
