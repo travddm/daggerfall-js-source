@@ -8,6 +8,8 @@ import { hasDiscoveredLocationId } from '../systems/discovery.js';
 import { inEther } from '../world/ethericSea.js';
 import { locationWorldRect } from '../world/streamingWorld.js';
 import { spawnedMapId, spawnsDungeon } from '../world/spawnedDungeons.js';
+import { spawnedDungeonsStand } from '../systems/dungeon/spawned-dungeons-row.js';
+import { getPref } from '../systems/uiPrefs.js';
 import { TV_FAR_RANGE } from '../systems/travel/travelFarPlaces.js';
 import { createTravelLairs } from '../systems/travel/travelLairs.js';   // TVD-WORLD: the lairs past the Bay, a few cells a call
 import { inBay as onTheBay } from '../world/tamriel/tamrielFrame.js';
@@ -54,7 +56,7 @@ export function createTravelViewDungeons(host) {
   const tvSpawnKnown = (s) => tvSpawnFound(s) || _announcedSpawnPixels.has(`${s.x},${s.y}`);
   /** AUDIT OW4 D4: the found spawns within the far range that the index does not hold (filedSpawns) - online alone, as
    *  the spawns are (spawnedDungeonAt's own gate). The store files a spawn under its pixel's id (spawnedMapId). */
-  const tvFiledSpawns = (at) => (params.has('online') ? filedSpawns({ at, rolls: (x, y) => spawnsDungeon(_spawnSalt, x, y),
+  const tvFiledSpawns = (at) => (spawnedDungeonsStand(params, getPref) ? filedSpawns({ at, rolls: (x, y) => spawnsDungeon(_spawnSalt, x, y),
     filed: (x, y) => hasDiscoveredLocationId(spawnedMapId(_spawnSalt, x, y)), indexed: (x, y) => locationIndex.has(`${x},${y}`), stand: tvSpawnAt }) : []);
   function travelViewDungeons() {
     if (typeof host._tvListsReady !== 'undefined' && !host._tvListsReady) return [];   // BOOT-TDZ II (typeof: a slice lifted without the flag reads as standing)

@@ -3,6 +3,7 @@
 // takes no blow, the exhaustion guard is the box, a rebuilt record takes its body with it, a Destroy()ed foe is no
 // container, a load and the teardown end this context's own flights, a magic round is nobody's blow unless its tick
 // says so, the rest decays the alert on the session's minute, and a bow shot's hit frame skips no draw.
+import { stealthCheckRecord } from '../../src/characters/enemy/peer-senses.ts';   // the dungeon record writer's stealth field
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -38,7 +39,7 @@ import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enem
 import { appliedOwnerTm } from '../../src/net/ownerClock.js';
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
-const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };   // AUDIT WORLD-EVENTS
+const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS, stealthCheckRecord, _peerSenses: { read: () => false } };   // AUDIT WORLD-EVENTS
 
 const D = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
 const AST = acorn.parse(D, { ecmaVersion: 'latest', sourceType: 'module' });

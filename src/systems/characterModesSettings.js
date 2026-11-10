@@ -12,14 +12,14 @@ export const CHARACTER_MODES_SETTINGS = Object.freeze({
       description:
         'Choose a mode when you create a character: Classic, Hardcore, Legacy, Ironman or Hardcore Ironman. Off is Daggerfall Unity: every character plays Classic.',
     }),
-    'Modes.Hardcore': Object.freeze({ default: true, description: 'Offer Hardcore: online, a death is final.' }),
+    'Modes.Hardcore': Object.freeze({ default: true, description: 'Offer Hardcore: online, a death is final. Online play does not enforce it yet, so it is offered offline only.' }),
     'Modes.Ironman': Object.freeze({
       default: true,
-      description: 'Offer Ironman: no trading with players, no parties, no shared dungeons.',
+      description: 'Offer Ironman: no trading with players, no parties, no shared dungeons. Online play does not enforce it yet, so it is offered offline only.',
     }),
     'Modes.HardcoreIronman': Object.freeze({
       default: true,
-      description: 'Offer Hardcore Ironman: Hardcore and Ironman together.',
+      description: 'Offer Hardcore Ironman: Hardcore and Ironman together. Online play does not enforce it yet, so it is offered offline only.',
     }),
   }),
 });

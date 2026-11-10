@@ -130,7 +130,7 @@ test('SCALE3: a checkpoint\'s save is the size asked, a fresh character\'s shape
   assert.notEqual(a, b, 'two checkpoints two saves');
   assert.notDeepEqual(sa.place, sb.place);
   assert.equal(sb.at, 1_120_000);
-  assert.match(JSON.parse(src('package.json')).scripts.load, /^node tools\/loadHarness\.mjs$/);
+  assert.match(JSON.parse(src('package.json')).scripts.load, /^node --import \.\/tools\/raw-import-hooks\.ts tools\/loadHarness\.mjs$/);
   // the clock the harness fires is the service's own two schedules (SCALE4b), written out so a tree before it loads
   assert.deepEqual([FIRE_MINUTE, FIRE_HOUR], [CRON_MINUTE, CRON_HOUR]);
   assert.equal(percentile([], 0.5), null);

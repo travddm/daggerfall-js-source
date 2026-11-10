@@ -34,9 +34,7 @@ ones, or let the next push to `main` retry them. Every deploy is idempotent.
 2. Runs `verify.yml` on it (without its own build) in parallel with the site build.
 3. Builds the site: `npm ci`, `npm run build` (Vite, `vite.config.js`, `base: './'`). The build writes the commit
    into `src/buildTag.js` (`prebuild`: `scripts/buildTag.mjs`) and restores the file after (`postbuild`).
-4. Adds a preview under `site/preview/`: a build of the branch `chatgpt/exact-face-atlas`. **A missing
-   `chatgpt/exact-face-atlas` branch fails the site deploy.** Remove the step when that preview is no longer wanted.
-5. Waits for the account service's version (above), then publishes with `actions/deploy-pages`.
+4. Waits for the account service's version (above), then publishes with `actions/deploy-pages`.
 
 Only one site deploy runs at a time; a newer push cancels an older run (`concurrency: pages`).
 
@@ -142,7 +140,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | --- | --- |
 | `[[durable_objects.bindings]] ROOMS` -> class `Room` | Every room (map cells, the hub, region channels, instances). SQLite-backed (`[[migrations]] v1`). |
 | `[[services]] ACCOUNTS` | Service binding to the account Worker. |
-| `[[analytics_engine_datasets]] METRICS` | Room metrics (`server/src/relayScale.js`), read by `relay-load.yml`. |
+| `[[analytics_engine_datasets]] METRICS` | Room metrics (`server/src/relayScale.js`). |
 | `[vars] IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S` | Verifies identity tokens. Must match the account service's key. |
 | `[vars] CELL_SPLIT_AT`, `CELL_MERGE_AT`, `*_DWELL_MS`, `REGION_SHARDS` | Crowd thresholds for splitting and merging cells. |
 | `[vars] *_FEED_URL`, `HIDDEN_SEEN_URL` | Account service endpoints the relay calls for moderation and staff feeds. |
@@ -156,11 +154,11 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[[r2_buckets]] SAVES` | Cloud saves. |
 | `[[durable_objects.bindings]] ADMIT` -> class `AdmitGate` | The sign-in line: queues the burst of sign-ins after a relay deploy (`server-account/src/admit.js`). |
 | `[[services]] RELAY` | Service binding to the relay. |
-| `[[analytics_engine_datasets]] METRICS` | Service metrics (`server-account/src/metrics.js`), read by `d1-load.yml`. |
+| `[[analytics_engine_datasets]] METRICS` | Service metrics (`server-account/src/metrics.js`). |
 | `[placement] region` | Runs the Worker near the D1 primary. |
 | `[triggers] crons` | The service's own clock (`server-account/src/cron.js` `runCron`): sweeps and retention. |
 | `[vars] ACCOUNT_VERSION` | Must equal `ACCOUNT_VERSION` in `server-account/src/service.js`. |
-| `[vars] *_HANDLES`, `OWNER_KEYS` | `*_HANDLES`: comma-separated account handles for honorary titles only. `OWNER_KEYS`: the public key an Owner account signs in with first. Staff roles are not vars: see [Staff roles](staff-roles.md). |
+| `[vars] *_HANDLES` | Comma-separated account handles for honorary titles only. Staff roles are not vars: see [Staff roles](staff-roles.md). |
 | `[vars] *_OPEN`, `SEASON_ZERO_WEEK`, `DOMAINS_WEEK` | Feature switches and season schedule. |
 | `[vars] MOD_AI`, `MOD_AI_MODEL`, `MOD_AI_DAILY_MAX` | The chat-safety reviewer's mode and limits. |
 | `[vars] OPERATOR_OPTIONS` | The operator's tools that are off unless named ([staff tools](../multiplayer/staff-tools.md#operator-options)). |
@@ -176,7 +174,7 @@ Repository secrets (Settings > Secrets and variables > Actions):
 
 | Secret | Used by | Effect when absent |
 | --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Every deploy and operator workflow | Nothing deploys. Needs Workers, D1 (edit), R2 and Durable Objects permissions. |
+| `CLOUDFLARE_API_TOKEN` | `relay-deploy.yml`, `account-deploy.yml` | Nothing deploys. Needs Workers, D1 (edit), R2 and Durable Objects permissions. |
 | `ANTHROPIC_API_KEY` | `account-deploy.yml` -> Worker secret | The chat-safety reviewer (`server-account/src/modAi.js`) is off. |
 | `DISCORD_BOT_TOKEN` | `account-deploy.yml` -> Worker secret and command registration | The Discord bot is off. |
 | `PATREON_CLIENT_SECRET`, `PATREON_WEBHOOK_SECRET` | `account-deploy.yml` -> Worker secrets | Patreon linking or pledge tracking is off. |

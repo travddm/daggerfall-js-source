@@ -7,6 +7,7 @@
 // bundles (the relay never reaches the sky), the clock module online and offline, the nightfall words at the sky's
 // rate, the weather's season, the rounds' moon through the tick, the raid's local time, the dome's two minutes, the
 // professions' season - and the four hosts by source.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -46,7 +47,8 @@ const installAt = (at) => setSharedClock(() => sharedClassicMinutes(at.t), (m) =
 
 afterEach(() => { setSharedClock(null); resetWeatherSim(); setSharedWeather(false); setWorldMinutes(0); });
 
-test('TIME1 the law: the sky IS the event clock before its first switch, the switch is seamless, and after it the sky runs at TimeScale 24 - a day every real hour', () => {
+test('TIME1 the law: the sky IS the event clock before its first switch, the switch is seamless, and after it the sky runs at TimeScale 24 - a day every real hour', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   assert.equal(SKY_SEGMENTS.length >= 1, true);
   assert.equal(RATE, 24 / 60 / 1000, "SKY-SLOW: TimeScale 24");
   for (let t = SWITCH.fromMs - 7 * 86_400_000; t < SWITCH.fromMs; t += 3_600_007) assert.equal(skyClassicMinutes(t), sharedClassicMinutes(t), 'before the switch the sky is the event clock, to the bit');
@@ -70,7 +72,8 @@ test('TIME1 the inverse round-trips on both sides of the switch', () => {
   assert.ok(near(skyClassicMinutes(wallMsForSkyMinutes(m)), m, 1e-6));
 });
 
-test('TIME1 a second switch is as seamless as the first: each segment starts where the one before it stood', () => {
+test('TIME1 a second switch is as seamless as the first: each segment starts where the one before it stood', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const second = { fromMs: SWITCH.fromMs + 3 * 86_400_000 + 7 * 60_000, minutesPerMs: 60 / 60 / 1000 };
   const law = skyLawOf([SWITCH, second]);
   const reached = skyClassicMinutes(second.fromMs);   // the first segment, read at the second switch
@@ -82,7 +85,8 @@ test('TIME1 a second switch is as seamless as the first: each segment starts whe
   assert.equal(skyLawOf([]).minutesAt(SWITCH.fromMs + 1), sharedClassicMinutes(SWITCH.fromMs + 1), 'no segment: the event clock');
 });
 
-test('TIME1 aligned: the switch stands at an aligned instant - the sky\'s hour there is the old sky\'s - and after it every midnight falls on the hour UTC, dawn at :15, noon at :30, dusk at :45', () => {
+test('TIME1 aligned: the switch stands at an aligned instant - the sky\'s hour there is the old sky\'s - and after it every midnight falls on the hour UTC, dawn at :15, noon at :30, dusk at :45', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   assert.deepEqual(alignedSkySwitches(RATE, SWITCH.fromMs - 1, { count: 1, withinMs: 2000 }), [SWITCH.fromMs], 'the switch is one of the instants the tool lists');
   assert.equal(minuteOfDay(skyClassicMinutes(SWITCH.fromMs)), minuteOfDay(sharedClassicMinutes(SWITCH.fromMs)));
   assert.equal(SWITCH.fromMs % 1000, 0, 'a whole second');
@@ -98,7 +102,8 @@ test('TIME1 aligned: the switch stands at an aligned instant - the sky\'s hour t
   assert.deepEqual(alignedSkySwitches(RATE, day, { count: 3, withinMs: 6 * 3600 * 1000 }).map((x) => new Date(x).toISOString().slice(11, 19)), ['01:07:30', '03:07:30', '05:07:30']);
 });
 
-test('TIME1 the tool: tools/skyCutover.mjs lists the aligned instants, and says when the sky already runs at the rate asked', () => {
+test('TIME1 the tool: tools/skyCutover.mjs lists the aligned instants, and says when the sky already runs at the rate asked', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const before = cutoverLines(['--after', new Date(SWITCH.fromMs - 3_600_000).toISOString()]);
   assert.match(before[0], /^TimeScale 24 \(a sky day every 60 real minutes\)/);
   assert.ok(before.some((l) => l.includes(new Date(SWITCH.fromMs).toISOString())), before.join('\n'));
@@ -154,7 +159,8 @@ test('TIME1 the clock module: offline the sky IS the one clock; online it reads 
   assert.ok(near(skyMinuteOfEvent(m), skyMinutes(), 1e-6));
 });
 
-test('TIME1 the nightfall words time the SKY\'s dusk at the sky\'s rate - fifteen real minutes from a sky noon, not the event clock\'s thirty - and say nothing at night or offline', () => {
+test('TIME1 the nightfall words time the SKY\'s dusk at the sky\'s rate - fifteen real minutes from a sky noon, not the event clock\'s thirty - and say nothing at night or offline', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const noon = nextHour(SWITCH.fromMs) + HALF_HOUR;   // a sky noon: half an hour past a midnight
   const at = { t: noon };
   installAt(at);
@@ -172,7 +178,8 @@ test('TIME1 the nightfall words time the SKY\'s dusk at the sky\'s rate - fiftee
   assert.equal(worldNightfallText(), null, 'offline the player rests to dusk');
 });
 
-test('TIME1 the weather keeps the event clock\'s pace and wears the sky\'s season: the day\'s roll at an event minute draws the sky\'s season\'s table there', () => {
+test('TIME1 the weather keeps the event clock\'s pace and wears the sky\'s season: the day\'s roll at an event minute draws the sky\'s season\'s table there', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   // an instant whose sky season is not the event clock's (within thirty real days of the switch)
   const seasonOf = (m) => seasonValue(dateFromClassicMinutes(m));
   const t = firstWhere(SWITCH.fromMs + 3_600_000, 600_000, 30 * 144, (u) => seasonOf(skyClassicMinutes(u)) !== seasonOf(sharedClassicMinutes(u)), 'instant whose sky season is not the event clock\'s');
@@ -192,7 +199,8 @@ test('TIME1 the weather keeps the event clock\'s pace and wears the sky\'s seaso
   assert.ok(differed, 'and some roll tells the two seasons apart - the table is the sky\'s, not the event clock\'s');
 });
 
-test('TIME1 the weather map\'s systems live on the event clock and are born to the sky\'s season and hour: a node drawn with the sky up draws to the sky\'s calendar, and a node drawn on one calendar is never served on the other', () => {
+test('TIME1 the weather map\'s systems live on the event clock and are born to the sky\'s season and hour: a node drawn with the sky up draws to the sky\'s calendar, and a node drawn on one calendar is never served on the other', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   try {
     let found = 0;
     for (const climate of [CLIMATES.Mountain, CLIMATES.Woodlands, CLIMATES.MountainWoods]) {
@@ -217,7 +225,8 @@ test('TIME1 the weather map\'s systems live on the event clock and are born to t
   } finally { setSkyCalendar(false); }
 });
 
-test('TIME1 the rounds read the SKY\'s moon through the tick: a werewolf under a full moon in the sky is changed, whatever the event clock\'s date - and a bare source (the event clock\'s date) leaves them be', () => {
+test('TIME1 the rounds read the SKY\'s moon through the tick: a werewolf under a full moon in the sky is changed, whatever the event clock\'s date - and a bare source (the event clock\'s date) leaves them be', (tc) => {
+  playByRules(tc, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   // an instant whose sky shows a full moon UP (TIME2: online the moon forces its night) and whose event clock's date
   // has none, now or a minute on
   const t = firstWhere(SWITCH.fromMs + 60_000, 60_000, 14 * 1440, (u) => isFullMoonNightFromMinutes(skyClassicMinutes(u)) && isFullMoonNightFromMinutes(skyClassicMinutes(u + 15_000))
@@ -275,3 +284,18 @@ test('TIME1 the professions\' day reads the sky\'s season - one law at both ends
   assert.deepEqual(dayDate(before), dateFromClassicMinutes(Math.floor(sharedClassicMinutes(before * 86_400_000))), 'before the switch the sky is the event clock');
 });
 
+
+// One clock by default, as in DFU (net/profile/profileKeys.ts time.skyClock): the sky's own clock is the server profile's.
+test("ONE CLOCK: with no sky clock in the server profile, the sky reads the event clock - its minutes, its inverse and its rate", () => {
+  const at = SKY_SEGMENTS.at(-1).fromMs + 5 * 3_600_000;
+  assert.equal(skyClassicMinutes(at), sharedClassicMinutes(at));
+  assert.equal(wallMsForSkyMinutes(sharedClassicMinutes(at)), wallMsForClassicMinutes(sharedClassicMinutes(at)));
+  assert.equal(skyMinutesPerMsAt(at), ONLINE_MINUTES_PER_MS);
+});
+
+test("ONE CLOCK: with the server profile's sky clock the sky runs at its own rate again", (tc) => {
+  playByRules(tc, { 'time.skyClock': true });
+  const at = SKY_SEGMENTS.at(-1).fromMs + 5 * 3_600_000;
+  assert.notEqual(skyClassicMinutes(at), sharedClassicMinutes(at));
+  assert.equal(skyMinutesPerMsAt(at), SKY_SEGMENTS.at(-1).minutesPerMs);
+});

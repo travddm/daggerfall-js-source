@@ -8,6 +8,8 @@ import { inEtherLaw } from '../world/ethericSea.js';
 import { inBay as onTheBay } from '../world/tamriel/tamrielFrame.js';   // BAY-LEFT-GROUND (D5): the lift's Bay
 import { isEliteSpawn, pickTemplate, spawnsDungeon, spawnTemplates, synthesizeDungeonLocation } from '../world/spawnedDungeons.js';
 import { isMainStoryDungeon } from '../world/dungeon/dungeonTextures.js';
+import { spawnedDungeonsStand } from '../systems/dungeon/spawned-dungeons-row.js';
+import { getPref } from '../systems/uiPrefs.js';
 
 /** @param {any} host */
 export function createSpawnGroundHost(host) {
@@ -41,7 +43,7 @@ export function createSpawnGroundHost(host) {
   /** GROUND-AGREE: the spawn law the Overworld and the ground share (world/spawnGroundPlace.js) - the gates it reads, handed in. */
   const spawnGroundPlace = createSpawnGroundPlace({
     maps,
-    online: params.has('online'),
+    online: spawnedDungeonsStand(params, getPref),   // online, and only where the room has the Spawned dungeons row on
     etherSea,
     plateauDry: _spawnGround,
     terrainGen,
@@ -56,7 +58,7 @@ export function createSpawnGroundHost(host) {
   /** AUDIT OW5b D3: WHAT STANDS ON A PIXEL, built or not - the index's place, else the spawn its roll would stand (online,
    *  side-effect free: tvSpawnAt). A member walking to the leader's spawn read the index alone, and a far spawn their own
    *  pixels had never built was a bare spot to them. */
-  const tvLocationAt = (x, y) => locationIndex.get(`${x},${y}`) ?? (params.has('online') && !inEtherLaw(x, y) && spawnsDungeon(_spawnSalt, x, y) ? tvSpawnAt(x, y) : null);   // ETHER-PLACES: no spawn past the Veil - the isles stand their own
+  const tvLocationAt = (x, y) => locationIndex.get(`${x},${y}`) ?? (spawnedDungeonsStand(params, getPref) && !inEtherLaw(x, y) && spawnsDungeon(_spawnSalt, x, y) ? tvSpawnAt(x, y) : null);   // no spawn past the Veil - the isles stand their own
   /** AUDIT LANDFORMS B1: landformLiftAt's pixels not built yet - what the build will stand there: the index's place, else
    *  online the spawn its roll stands (GROUND-AGREE: alive or dead - its ground is the roll's), read here without taking
    *  anything out of the index. AUDIT LANDFORMS II F1: declared here, beside the build's own answer, so it is the

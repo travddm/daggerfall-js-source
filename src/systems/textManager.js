@@ -77,7 +77,7 @@ const _listeners = new Set();
 let _locale = BASE_LOCALE;
 
 /** A locale's description: `code` (a BCP 47 tag), `name` (in its own language), `englishName`, `dir` ('ltr' or
- *  'rtl'), `source` ('base', 'community', 'machine', 'mixed' or 'pseudo') and whatever a host adds (credits, fonts). */
+ *  'rtl'), `source` ('base', 'community' or 'pseudo') and whatever a host adds (credits, fonts). */
 export function registerLocale(info) {
   if (!info?.code || typeof info.code !== 'string') throw new Error('a locale needs a code');
   const prev = _infos.get(info.code) ?? {};
