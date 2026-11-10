@@ -34,7 +34,7 @@
     ],
     "counts": {
       "paths": 0,
-      "lines": 3185
+      "lines": 3177
     }
   },
   "mods": [
@@ -63,8 +63,8 @@
         "daggerfallunity/mods/303\\b"
       ],
       "counts": {
-        "paths": 5,
-        "lines": 110
+        "paths": 0,
+        "lines": 0
       }
     },
     {
@@ -720,7 +720,7 @@
       ],
       "counts": {
         "paths": 44,
-        "lines": 539
+        "lines": 538
       }
     },
     {
@@ -1097,7 +1097,7 @@
       "patterns": [],
       "counts": {
         "paths": 5,
-        "lines": 503
+        "lines": 505
       }
     },
     {
@@ -1187,7 +1187,7 @@
       ],
       "counts": {
         "paths": 7,
-        "lines": 168
+        "lines": 167
       }
     },
     {
@@ -1611,7 +1611,7 @@
       ],
       "counts": {
         "paths": 78,
-        "lines": 91
+        "lines": 90
       }
     },
     {
@@ -1876,7 +1876,7 @@
       "patterns": [],
       "counts": {
         "paths": 22,
-        "lines": 250
+        "lines": 251
       }
     },
     {

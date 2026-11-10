@@ -30,7 +30,8 @@ import { buildSkeleton, poseSkeleton, skeletonSpaceMatrices, injectSkeletonNodes
 import { mat33Mul } from '../../src/formats/morrowind/mwNifMesh.js';
 import { applyMirrorRig, mirrorPlan, counterpartName, strikingSide, limbSkeleton, offWeaponBoneAddon, WEAPON_BONE_LEFT_SOURCE, mirrorBindSources } from '../../src/combat/twoHands/mirrorRig.js';
 import { rotAxisAngle } from '../../src/combat/climbRig.js';
-import { createFpArm, fpSkeletonPath, tpSkeletonPath, strideOppositeTime, FP_CLIP_PATH, resolveOffWeaponParts, resolveWeaponParts, OFF_WEAPON_BONE, fpWeaponKey, GUARD_LENS_DROP, bladePictureHeight, bladeInnerEdge, FP_FIELD_OF_VIEW } from '../../src/combat/fpArm.js';
+import { createFpArm, fpSkeletonPath, tpSkeletonPath, strideOppositeTime, FP_CLIP_PATH, fpWeaponKey, GUARD_LENS_DROP, bladePictureHeight, bladeInnerEdge, FP_FIELD_OF_VIEW } from '../../src/combat/fpArm.js';
+import { resolveOffWeaponParts, resolveWeaponParts, OFF_WEAPON_BONE } from '../../src/combat/fpArm/fpArmParts.js';
 import { GUARD, RUN_PUMP, RUN_STEP_M, runPhaseOfBob, runPhaseFollow, runPhaseStep, PAIR_SPREAD, pairSpreadAngle, RUN_3D } from '../../src/combat/twoHands/handsLaw.js';
 import { HeadBobber } from '../../src/player/headBobber.js';
 import { MW_WEAPON_TYPE, MW_UNITS_PER_METER, assembleFirstPersonArm, poseAssembly } from '../../src/formats/morrowind/mwFirstPerson.js';

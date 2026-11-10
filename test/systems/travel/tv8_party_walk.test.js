@@ -72,7 +72,7 @@ test('TV8 wire (world124): the leader\'s walk and a member\'s stop ride the part
   }
   assert.equal(validPartyPose({ ...base, ts: -1 }).ts, undefined);
   assert.equal(validPartyPose({ ...base, ts: 'x' }).ts, undefined);
-  assert.equal(RELAY_VERSION, 'world303');
+  assert.equal(RELAY_VERSION, 'world310');
 });
 
 test('TV8 host: the leader\'s walk begins with an Overworld journey (a gathered member, a hub that carries it) and runs on the law\'s own steps (AUDIT OW3: leaderWalkStep, halted through the panel); a member hears it with a grace, is asked only when free, walks the same journey on a yes, halts with the party through the panel, publishes only their own stops', () => {
@@ -730,7 +730,7 @@ test('AUDIT OW4 P6 (run on the host\'s own code): a member\'s own journey taken 
   assert.deepEqual([L.lead.h, M.journeying(), N.journeying()], [1700, false, false], 'halted with the party');
   M.to.resumeTravel();   // M's own Resume, from the map
   N.to.beginTravel(RIPWYCH);   // N's own journey by the mod's own map (walkDestLive's third branch: the mod's named journey)
-  assert.deepEqual([N.to.route, N.to.destinationName], [null, 'Ripwych']);
+  assert.deepEqual([N.to.route?.legs, N.to.destinationName], [[], 'Ripwych']);   // the mod's journey: no road legs
   w.tick(2000); w.tick(2300);
   assert.deepEqual([M.journeying(), N.journeying()], [true, true], 'walking on');
   assert.deepEqual([M.mine.yes, N.mine.yes], [false, false], 'left the walk');

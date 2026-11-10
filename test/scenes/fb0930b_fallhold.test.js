@@ -32,12 +32,16 @@ import { areEnemiesNearby } from '../../src/systems/encounters.js';
 import { TERRAIN_SIZE } from '../../src/world/terrain/terrainSampler.js';
 import { setPref } from '../../src/systems/uiPrefs.js';   // BAL4: the switch this file's pins assumed
 import { tickTactics, resetTactics } from '../../src/ai/tactics.js';   // AUDIT BAL: the brain's clock, ticked as the hosts tick it
+import { setValue } from '../../src/systems/settings/settings.js';   // DFU's Enhanced Combat AI, which the pools read
 
 // BAL4: the Enhanced AI ships On now; this file's pins are the classic motor's
 // hold and swing, so it says Off outright where it used to read the default (LR5's trap: a pin that leaned on a default
 // moves with it) - and AUDIT BAL's last pin runs the mid-fight hold again with the brain ON, its clock (ai/tacticsClock.js,
 // the foes' own time) ticked with the foes' step as every host ticks it
 setPref('enhancedAI', false);
+// DFU's Enhanced Combat AI is on by default as in DFU, and with it a foe may roll to back off and stay out of reach for
+// seconds (enhanced-movement.ts). These pins are the classic motor's, so it is Off here too.
+setValue('Enhancements', 'EnhancedCombatAI', false);
 
 const rd = (p) => readFileSync(join(import.meta.dirname, '..', '..', p), 'utf8');
 const settle = async () => { for (let i = 0; i < 4; i++) await new Promise((r) => setTimeout(r, 0)); };

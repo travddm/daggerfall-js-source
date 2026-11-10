@@ -238,7 +238,8 @@ Tests: `test/systems/banking.test.js`, `bankwindow.test.js`, `empirebank.test.js
 
 ## Testing
 
-Run a file with `node --test <file>`. Start with `test/systems/inventory.test.js`, `itemTransfer.test.js`,
+Run a file with `node --test <file>`, with `NODE_OPTIONS` set as
+[getting-started.md](../getting-started.md#node-and-shader-files) shows. Start with `test/systems/inventory.test.js`, `itemTransfer.test.js`,
 `inventorySession.test.js`, `equiprestrictions.test.js`, `useitem.test.js`, `lr1_lootrarity.test.js`,
 `unleveledLoot.test.js`, `partyloot.test.js`, `quickloot.test.js`, and the folders `test/systems/loot/` and
 `test/systems/item/`. The `loot1`-`loot21` tests cover the ladder's features one by one.
