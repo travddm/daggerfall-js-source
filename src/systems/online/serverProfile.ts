@@ -6,7 +6,8 @@ import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
 import { profileKeyOf, profileRuleErrors, resolveRules, type ProfileValue } from '../../net/profile/profileKeys.ts';
 import { pageHas } from '../pageQuery.js';
 import { t } from '../textManager.js';
-import { setSkyClockRule } from '../../net/skyLaw.js';
+import { setSkyClockRule, setSkyScaleRule } from '../../net/skyLaw.js';
+import { setOnlineTimeScale } from '../../net/wire.js';
 
 export type ProfilePins = {
   readonly prefs: Readonly<Record<string, boolean | string>>;
@@ -106,6 +107,10 @@ export function onlineRule(name: string): ProfileValue | undefined {
 
 // The sky's own clock is this page's profile's to say (net/skyLaw.js time.skyClock), installed or the official one.
 setSkyClockRule(() => onlineRule('time.skyClock') === true);
+setSkyScaleRule(() => Number(onlineRule('time.skyScale')));
+
+// The world clock's TimeScale follows the installed profile (net/wire.js), and the official one again after a reset.
+onProfileInstalled(() => setOnlineTimeScale(Number(onlineRule('time.worldScale'))));
 
 /** Tests: nothing installed. */
 export function _resetProfileForTests(): void {
