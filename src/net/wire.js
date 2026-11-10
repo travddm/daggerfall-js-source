@@ -879,7 +879,7 @@ export const MAP_PIXELS_Y = 500;
 export const SOCIAL_ACTS = Object.freeze({
   'friend.request': 'target', 'friend.accept': 'acct', 'friend.decline': 'acct', 'friend.cancel': 'acct', 'friend.remove': 'acct',
   'party.invite': 'target', 'party.accept': 'party', 'party.decline': 'party', 'party.leave': '', 'party.kick': 'acct',
-  'party.lead': 'acct', 'party.mentoring.off': '', 'party.mentoring.on': '',   // the leader hands the lead to a member, or sets the party to no mentoring
+  'party.lead': 'acct', 'party.mentoring.off': '', 'party.mentoring.on': '',   // PARTY-LEAD (world162): the leader hands the lead to a member; the leader's no-mentoring switch
 });
 /** Every note the hub says, as a code the CLIENT puts words to (net/social.js noteText) - the relay writes no chat line. */
 export const NOTE_CODES = Object.freeze(['friend.requested', 'friend.accepted', 'party.invited', 'party.declined', 'party.joined', 'party.left', 'party.kicked', 'party.leader', 'party.lapsed']);
