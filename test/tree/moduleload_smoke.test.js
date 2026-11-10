@@ -66,12 +66,12 @@ test('every module under src/ loads - its body RUNS, not just parses', async () 
   assert.deepEqual(unexpectedlyFine, [], `these import fine now - remove them from NOT_IMPORTABLE:\n  ${unexpectedlyFine.join('\n  ')}`);
 });
 
-test('the blind spot is exactly fourteen modules, each with a reason', () => {
+test('the blind spot is exactly twelve modules, each with a reason', () => {
   const files = walk(join(root, 'src')).map((f) => relative(root, f).split('\\').join('/'));
   for (const f of Object.keys(NOT_IMPORTABLE)) {
     assert.ok(files.includes(f), `${f} is on the exclusion list and no longer exists`);
   }
-  assert.equal(Object.keys(NOT_IMPORTABLE).length, 14);   // Elite Gates removed: the Spire's lab gone (
+  assert.equal(Object.keys(NOT_IMPORTABLE).length, 12);   // Elite Gates removed: the Spire's lab gone (
   // The three that matter are the hosts: they carry the most edits and
   // the least coverage, which is exactly the combination that produced
   // the boot failure. Recorded here so the next reader sees the cost.
