@@ -3,7 +3,7 @@
 // QL12 (2026-10-19): THE QUESTLINES'
 // CLAIM - what the account service pays a questline, and only against what it witnessed.
 //
-// `POST /v1/ql/claim { line, step, phase, choice? }`, behind a session. Its pay for a registered account (FOUNDER's law,
+// `POST /v1/ql/claim { line, step, phase, choice? }`, behind a session. Its pay for a registered account (a guest holds no title, titles.js titlesHeld;
 // as lamp.js: a guest's end is answered `guest` and nothing is paid - its opening is written, AUDIT QUESTLINES SERVICE-1). The law both ends share is src/net/questlineClaims.js -
 // QL_SERVICE_LINES names the steps the service pays, each step's witness and the title a line pays and on which step. A
 // step the service pays nothing is answered `unpaid` (qlStepClaimed).

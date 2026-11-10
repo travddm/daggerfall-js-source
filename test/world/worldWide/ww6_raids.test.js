@@ -51,7 +51,6 @@ import { _resetModSettings } from '../../../src/systems/modSettings.js';
 import { setSharedClock } from '../../../src/systems/worldTick.js';
 import { MINUTES_PER_DAY } from '../../../src/systems/gameDate.js';
 import { validStaffEvent, staffEventFault, staffTownPixelOk, isAreaEvent, STAFF_EVENT_AREA, STAFF_PROVINCE_REGIONS, STAFF_TOWN_INDEX_MIN } from '../../../src/net/staffEvent/staffEventLaw.js';
-import { staffPlaces, staffHere, gamePlaces } from '../../../src/net/staffPlaces.js';
 import { staffEventBook, staffRaidHere } from '../../../src/systems/staffEvents.js';
 import { stagedEvent } from '../../../server-account/src/staffEvents.js';
 import { readRaidMarksIn, readRaidMarks } from '../../../src/ui/eventMapMarks.js';
@@ -455,7 +454,7 @@ test('WW6 the session: a raid past the Bay goes to the relay as a Bay raid does'
 
 // A STAFF TOWN EVENT PAST THE BAY
 
-test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by its own index at its own pixel in a province\'s region (a city\'s word kept), refuses either side\'s location at the other\'s pixel by name (`town`); an area is -1 alone; the picker offers a province\'s town as itself; the account door stages it, the hub\'s book holds it, and the game stands it in its town by its index (mutants: the side unread; an area any negative; a town past the Bay offered as an area; a province\'s region unasked)', () => {
+test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by its own index at its own pixel in a province\'s region (a city\'s word kept), refuses either side\'s location at the other\'s pixel by name (`town`); an area is -1 alone; the account door stages it, the hub\'s book holds it, and the game stands it in its town by its index (mutants: the side unread; an area any negative; a province\'s region unasked)', () => {
   const sol = at('Solitude');
   const EV = { id: 'ab12cd34ef', rg: 64, loc: capitalLocationIndex(1, 0), px: sol.x, py: sol.y, nm: 'Solitude', ct: 1, mt: [7, 12], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'Mob' };
   assert.equal(staffEventFault(EV), null, 'Solitude, by its own index');
@@ -474,16 +473,6 @@ test('WW6 a staff TOWN event past the Bay: the law takes a town past the Bay by 
   assert.deepEqual([staffTownPixelOk(999, 499), staffTownPixelOk(1000, 0), staffTownPixelOk(sol.x, sol.y, -5, 64), staffTownPixelOk(sol.x, sol.y, -5, 61), staffTownPixelOk(5, 5, -5, 64)], [true, false, true, false, false]);
   assert.deepEqual(STAFF_PROVINCE_REGIONS, [regionOfTheatre(1), regionOfTheatre(9)]);
   assert.ok(stagedEvent({ ...EV, mins: 60 }, 'ab12cd34ef', 1_700_000_000, 'Mob'), 'the account door stages it');
-  // the picker offers it as itself
-  const places = skyrim();
-  const maps = { getRegion: () => null, getRegionName: (r) => REGION_NAMES[r] ?? '', getRegionIndexAt: () => 64 };
-  const list = staffPlaces(maps, 64, places).list;
-  assert.deepEqual(list.find((x) => x.name === 'Solitude'), { loc: capitalLocationIndex(1, 0), name: 'Solitude', kind: 'town', px: sol.x, py: sol.y });
-  assert.equal(list.find((x) => x.name === 'Unindexed').loc, -1, 'a place with no index of its own an area');
-  for (const x of list) assert.equal(staffEventFault({ ...EV, loc: x.loc, px: x.px, py: x.py, nm: x.name }), null, `${x.name}: what the picker offers runs`);
-  gamePlaces(places);
-  assert.equal(staffHere(maps, sol).loc, capitalLocationIndex(1, 0), 'where I stand: the town');
-  gamePlaces(null);
   // the hub's book, and the game stands it in its town
   assert.equal(staffEventBook([EV]), 1);
   assert.equal(staffRaidHere({ regionIndex: 0, locationIndex: EV.loc }, null, true)?.staff.id, EV.id, 'in its town, by its own index');
@@ -554,9 +543,9 @@ test('WW6 with ARENA2: every province\'s lane over the freeware\'s registry with
       await quiet(() => cell.raw(a, JSON.stringify({ t: 'raid', ...wordOf(r, { s: 1 }) })));
       assert.deepEqual(a.sent.filter((m) => m.t === 'raid').at(-1), { t: 'raid', k: 'st', key: raidKey(r), n: 0, tg: r.attackAmount, st: r.startMinute, c: 0, g: raidSig(word) }, 'the relay keeps Torbarke\'s raid');
     }, r);
-    // a staff event at Solitude, as the picker offers it
-    const sol = staffPlaces({ getRegion: () => null, getRegionName: (x) => REGION_NAMES[x] ?? '' }, 64, places).list.find((x) => x.name === 'Solitude');
-    assert.deepEqual([sol.loc, sol.kind], [capitalLocationIndex(1, 0), 'town']);
-    assert.equal(staffEventFault({ id: 'ab12cd34ef', rg: 64, loc: sol.loc, px: sol.px, py: sol.py, nm: sol.name, ct: 1, mt: [7], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'Mob' }), null);
+    // a staff event at Solitude, by the registry's own index for it
+    const sol = places.inTheatre(theatreOfRegion(64)).find((x) => x.name === 'Solitude');
+    assert.equal(sol.location, capitalLocationIndex(1, 0));
+    assert.equal(staffEventFault({ id: 'ab12cd34ef', rg: 64, loc: sol.location, px: sol.px, py: sol.py, nm: sol.name, ct: 1, mt: [7], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'Mob' }), null);
   } finally { setTamrielTrace(null); setTamrielFit(null); dropGroundCache(); }
 });

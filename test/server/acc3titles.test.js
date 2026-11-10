@@ -9,11 +9,10 @@
 // THE GRANTS ARE DERIVED AND NOT A COLUMN, and that is the claim worth
 // pinning, because it is the one a later slice will be tempted to
 // undo. A `grants` table would pass a test that only asked "does a
-// founder get the founder title?" - so these pins drive the things a
+// developer get the developer title?" - so these pins drive the things a
 // stored grant CANNOT do: a sprout that expires because time passed
 // with nothing running, a developer who stops being one the moment the
-// config drops them, a founder granted to a row inserted long after the
-// migration ran.
+// role is taken off the row.
 //
 // AND THE BADGE IS SIGNED, NEVER ASSERTED. ACC1g shut this hole on the
 // name one slice ago; a title is the stronger claim of the two, so the
@@ -29,7 +28,7 @@ import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { register } from '../../server-account/src/accounts.js';
 import {
-  FOUNDER_UNTIL, SPROUT_S, isDeveloper,
+  SPROUT_S, isDeveloper,
   titlesHeld, glyphsOf, titleWorn, equipRefusal, wardrobeOf,
 } from '../../server-account/src/titles.js';
 import {
@@ -43,9 +42,10 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
 const rand = (b) => globalThis.crypto.getRandomValues(b);
 
-// A moment AFTER the founder cutoff, so "registered before it" and
-// "registered after it" are both reachable from one clock.
-const NOW = FOUNDER_UNTIL + 90 * 24 * 60 * 60;
+// One fixed clock for the glyph reads, long after the test rows were made.
+const NOW = Date.UTC(2026, 11, 24, 12) / 1000;
+// A registration time for the test rows, before NOW.
+const REGISTERED = Date.UTC(2026, 9, 1) / 1000;
 
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url))
   .filter((f) => f.endsWith('.sql')).sort();
@@ -79,31 +79,14 @@ function d1() {
 
 // ── THE GRANTS, derived ─────────────────────────────────────────────
 
-test('ACC3: the founder title is a CUTOFF, so a row inserted long after any migration ran still answers correctly (mutant: a `granted` column, written once by a walk over the table)', () => {
-  // Mac asked that "all current players should be granted the founder
-  // title". The obvious migration walks every row and writes one - and
-  // a walk is a fact recorded at a moment nobody can re-derive. THIS is
-  // the difference, and it is the whole design: a row that did not
-  // exist when anybody ran anything is still judged correctly.
-  const early = { registered_at: FOUNDER_UNTIL - 1, created_at: 1 };
-  const onTheDot = { registered_at: FOUNDER_UNTIL, created_at: FOUNDER_UNTIL };   // FOUNDER3: first played in the cutoff's second
-  const late = { registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1 };   // FOUNDER3: first played after it (a row first seen before it and registered after is a founder)
-  assert.deepEqual(titlesHeld(early, {}), ['founder']);
-  assert.deepEqual(titlesHeld(onTheDot, {}), ['founder'], 'the cutoff is inclusive - the day Mac asked counts');
-  assert.deepEqual(titlesHeld(late, {}), []);
-
-  // AND A GUEST HOLDS NOTHING, which is Mac's own call when asked
-  // whether guests count ("Registered accounts only"). A guest row has
-  // no `registered_at` at all, so there is nothing to compare - and
-  // that is the right refusal rather than a coincidence: a founding
-  // title on a row one storage clear from gone was never anybody's.
+test('ACC3: Founder is no longer granted: no row holds it or may wear it, whenever it first played (server feature audit PR 3)', () => {
+  const early = { handle: 'Early', registered_at: 1, created_at: 1, first_played_at: 1, title: 'founder' };
+  assert.deepEqual(titlesHeld(early, {}), []);
+  assert.equal(titleWorn(early, {}), undefined, 'a row that still says founder wears nothing');
+  assert.equal(equipRefusal('founder', early, {}), 'not-held');
+  assert.deepEqual(titlesHeld(early, { FOUNDER_HANDLES: 'early' }), [], 'the old config list grants nothing');
+  // A GUEST HOLDS NOTHING: a guest row has no handle and no role.
   assert.deepEqual(titlesHeld({ created_at: 1, registered_at: null }, {}), []);
-  assert.deepEqual(titlesHeld({ created_at: 1 }, {}), []);
-
-  // The cutoff is a real date and not a number somebody typed: the end
-  // of the day Mac asked for this - asked again (FOUNDER2), so the later day;
-  // FOUNDER5 (
-  assert.equal(new Date(FOUNDER_UNTIL * 1000).toISOString(), '2026-09-25T12:00:00.000Z');
 });
 
 test('ACC3: the sprout EXPIRES because time passed - nothing runs, nothing is cleared (mutant: a stored glyph and a cron to remove it)', () => {
@@ -121,7 +104,7 @@ test('ACC3: the sprout EXPIRES because time passed - nothing runs, nothing is cl
 
 test('ACC3: a developer is a role on the ACCOUNT (staff_admin), so taking the role off takes the title and the glyph with it', () => {
   const env = {};
-  const dev = { handle: 'MacK', registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1, staff_admin: 1 };   // FOUNDER3: first played after the cutoff, so no Founder beside the Developer
+  const dev = { handle: 'MacK', registered_at: REGISTERED, created_at: REGISTERED, staff_admin: 1 };
   assert.ok(isDeveloper(dev, env));
   assert.deepEqual(titlesHeld(dev, env), ['developer']);
   assert.deepEqual(glyphsOf(dev, env, NOW), ['dev'], 'the glyph rides the same role as the title - one grant, two faces');
@@ -131,7 +114,7 @@ test('ACC3: a developer is a role on the ACCOUNT (staff_admin), so taking the ro
   assert.deepEqual(titlesHeld({ ...dev, staff_admin: 0 }, env), []);
   assert.deepEqual(glyphsOf({ ...dev, staff_admin: 0 }, env, NOW), []);
   assert.equal(titlesHeld(dev, { DEVELOPER_HANDLES: '' }).length, 1, 'the role is on the row: a list in the env neither adds nor removes it');
-  assert.deepEqual(titlesHeld({ handle: 'MacK', registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1 }, { DEVELOPER_HANDLES: 'mack' }), [], 'a handle on an env list, with no role on the row, is nobody');
+  assert.deepEqual(titlesHeld({ handle: 'MacK', registered_at: REGISTERED, created_at: REGISTERED }, { DEVELOPER_HANDLES: 'mack' }), [], 'a handle on an env list, with no role on the row, is nobody');
 
   // A GUEST HAS NO HANDLE and no role: a guest row is a device.
   assert.equal(isDeveloper({ handle: null, staff_admin: 0 }, env), false);
@@ -140,8 +123,8 @@ test('ACC3: a developer is a role on the ACCOUNT (staff_admin), so taking the ro
 
 test('ACC3: HOLDING IS NOT WEARING - a stored title stops being worn the moment the grant behind it lapses', () => {
   const env = {};
-  const dev = { handle: 'mack', registered_at: FOUNDER_UNTIL - 1, created_at: 0, title: 'developer', staff_admin: 1 };
-  assert.deepEqual(titlesHeld(dev, env), ['founder', 'developer'], 'both, in the order they are offered');
+  const dev = { handle: 'mack', registered_at: REGISTERED, created_at: 0, title: 'developer', staff_admin: 1 };
+  assert.deepEqual(titlesHeld(dev, env), ['developer']);
   assert.equal(titleWorn(dev, env), 'developer');
 
   // THE ROLE TAKEN OFF, AND THE COLUMN STILL SAYS `developer`. Nothing
@@ -155,16 +138,16 @@ test('ACC3: HOLDING IS NOT WEARING - a stored title stops being worn the moment 
 
 test('ACC3: equip refuses what is not held and what is not a title, and taking it off is always allowed', () => {
   const env = {};
-  const founder = { handle: 'notmack', registered_at: FOUNDER_UNTIL - 1, created_at: 0 };
-  assert.equal(equipRefusal('founder', founder, env), null);
-  assert.equal(equipRefusal('developer', founder, env), 'not-held');
-  assert.equal(equipRefusal('emperor', founder, env), 'no-title');
-  assert.equal(equipRefusal('', founder, env), 'no-title');
-  assert.equal(equipRefusal(null, founder, env), null, 'a player may always wear nothing');
+  const dev = { handle: 'notmack', registered_at: REGISTERED, created_at: 0, staff_admin: 1 };
+  assert.equal(equipRefusal('developer', dev, env), null);
+  assert.equal(equipRefusal('dungeonmaster', dev, env), 'not-held');
+  assert.equal(equipRefusal('emperor', dev, env), 'no-title');
+  assert.equal(equipRefusal('', dev, env), 'no-title');
+  assert.equal(equipRefusal(null, dev, env), null, 'a player may always wear nothing');
   // THE TWO REFUSALS ARE DIFFERENT WORDS because they are different
   // situations: one is "no such title exists" and the other is "it
   // exists and it is not yours", and the Worker answers 400 and 403.
-  assert.notEqual(equipRefusal('emperor', founder, env), equipRefusal('developer', founder, env));
+  assert.notEqual(equipRefusal('emperor', dev, env), equipRefusal('dungeonmaster', dev, env));
 });
 
 // ── THE TOKEN ───────────────────────────────────────────────────────
@@ -227,11 +210,9 @@ async function stand({ admins = [], ...vars } = {}) {
     }), env);
     return { status: res.status, body: await res.json().catch(() => null) };
   };
-  /** A REGISTERED account, because Founder is for registered accounts
-   *  (Mac's call) - a guest is one storage clear from gone. `register`
-   *  stamps `registered_at` off the ctx clock, so the clock chooses
-   *  which side of the cutoff the account lands on. */
-  const account = async (handle, { registeredAt = FOUNDER_UNTIL - 1, createdAt = null } = {}) => {
+  /** A REGISTERED account: a role is held by a registered account alone. `register` stamps `registered_at` off the
+   *  ctx clock. */
+  const account = async (handle, { registeredAt = REGISTERED, createdAt = null } = {}) => {
     const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
     await register({ db: env.DB, subtle, rand, nowS: registeredAt }, guest.id, { handle, password: 'a-long-enough-password' });
     if (admins.includes(handle)) await env.DB.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').bind(guest.id).run();   // STAFF-ROLES-BY-ACCOUNT
@@ -246,7 +227,7 @@ test('ACC3: /v1/account carries the wardrobe, and /v1/account/title equips one o
   const me = await account('mack');
 
   const seen = (await call('GET', '/v1/account', undefined, me.secret)).body;
-  assert.deepEqual(seen.wardrobe.titles, ['founder', 'developer']);
+  assert.deepEqual(seen.wardrobe.titles, ['developer']);
   assert.equal(seen.wardrobe.title, null, 'nothing is worn until it is equipped - null is a perfectly good answer and is what every existing row gets');
   assert.ok(seen.wardrobe.glyphs.includes('dev'));
   assert.equal('title' in seen.account, false, 'the wardrobe is its own field: an account view is the ROW, a wardrobe is the row read against the roles and a clock');
@@ -254,7 +235,7 @@ test('ACC3: /v1/account carries the wardrobe, and /v1/account/title equips one o
   const on = await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
   assert.equal(on.status, 200);
   assert.equal(on.body.title, 'developer');
-  assert.deepEqual(on.body.titles, ['founder', 'developer'], 'the answer describes the row AFTER the write, so nothing has to re-read');
+  assert.deepEqual(on.body.titles, ['developer'], 'the answer describes the row AFTER the write, so nothing has to re-read');
 
   const again = (await call('GET', '/v1/account', undefined, me.secret)).body;
   assert.equal(again.wardrobe.title, 'developer', 'and it stuck - the WORN title is the one thing that is stored, because it is the only thing that is a choice');
@@ -288,22 +269,21 @@ test('ACC3: the minted token carries what the service DERIVED, not what the call
   // OLD ENOUGH TO HAVE LOST THE SPROUT, so the only glyph in play
   // here is the developer's and the assertion below means what it says.
   const me = await account('mack', { createdAt: 1 });
-  await call('POST', '/v1/account/title', { title: 'founder' }, me.secret);
+  await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
 
   const pub = await importPublicKeyB64(pubB64, { subtle });
-  const got = await call('POST', '/v1/auth/token', { secret: me.secret, title: 'developer', glyphs: ['dev'] });
+  const got = await call('POST', '/v1/auth/token', { secret: me.secret, title: 'founder', glyphs: ['sprout'] });
   assert.equal(got.status, 200);
-  assert.equal(got.body.title, 'founder', 'the token route reads the WORN title off the row - a `title` in the body is not a request anybody answers');
+  assert.equal(got.body.title, 'developer', 'the token route reads the WORN title off the row - a `title` in the body is not a request anybody answers');
   const r = await verifyToken(got.body.token, pub, { subtle, nowS: Math.floor(Date.now() / 1000) });
   assert.ok(r.ok, r.why);
-  assert.equal(r.claims.t, 'founder');
+  assert.equal(r.claims.t, 'developer');
   assert.ok(r.claims.g.includes('dev'));
 
   // THE BADGE LAPSES ON THE NEXT TOKEN, with no cron and no column to
   // clear: take the role off the account and both halves of the
   // developer grant are gone from what gets signed. The worn title
   // survives in the column and simply stops being worn.
-  await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
   await env.DB.prepare('UPDATE players SET staff_admin = 0 WHERE id = ?').bind(me.id).run();
   const after = await call('POST', '/v1/auth/token', { secret: me.secret });
   assert.equal(after.body.title, null);
@@ -317,7 +297,7 @@ test('ACC3: a guest gets a token and no badge - the wall for a title is the same
   const { call } = await stand({ admins: ['mack'] });
   const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
   const seen = (await call('GET', '/v1/account', undefined, guest.secret)).body;
-  assert.deepEqual(seen.wardrobe.titles, [], 'Founder is for registered accounts (Mac)');
+  assert.deepEqual(seen.wardrobe.titles, [], 'a guest holds no title');
   // ...BUT THE SPROUT IS NOT A TITLE. It is true of a new account, and
   // a guest account is as new as any other, so it is there.
   assert.deepEqual(seen.wardrobe.glyphs, ['sprout']);

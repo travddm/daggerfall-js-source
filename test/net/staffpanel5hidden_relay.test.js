@@ -561,13 +561,13 @@ test('STAFF-PANEL5-HIDDEN-FIX an asked layer holding only hidden sockets is empt
   } finally { globalThis.WebSocketPair = had; }
 });
 
-test('STAFF-HIDE-TOGGLE (2026-10-23, mob: "need hide to be a toggle") the relink\'s order at the relay, with no relay change: Hide me pressed, the game closes its shown socket and says hello hidden on the same id - welcomed, never `id taken`, its leave said once and its hidden join never; Show myself the other way, as ever (scenes/staffFollowHost.js relinkGame)', async () => {
+test('STAFF-HIDE-TOGGLE (2026-10-23, mob: "need hide to be a toggle") the relink\'s order at the relay, with no relay change: Hide me pressed, the game closes its shown socket and says hello hidden on the same id - welcomed, never `id taken`, its leave said once and its hidden join never; Show myself the other way, as ever (a relink: the link left, then opened again on a fresh token)', async () => {
   await quiet(async () => {
     for (const key of ['world:3,12', SOCIAL_ROOM]) {
       const r = fakeRoom(key);
       const raw = r.connect(); await r.hello(raw, 'rawl-0002', P);
       const shown = r.connect(); await r.hello(shown, 'mobb-0001', P, { name: 'SirMcMobdon' });
-      await r.drop(shown);   // relinkGame: leave() first - the shown socket's close reaches the room before the new socket's hello
+      await r.drop(shown);   // the relink: leave() first - the shown socket's close reaches the room before the new socket's hello
       const hid = r.connect(); await r.hello(hid, 'mobb-0001', P, { ...HIDE, secret: 'secret-of-mobb-0001' });
       assert.equal(hid.sent.find((f) => f.t === 'error'), undefined, `${key}: no refusal`);
       assert.ok(welcomeOf(hid), `${key}: welcomed hidden`);

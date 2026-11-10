@@ -24,10 +24,8 @@ import { fileURLToPath } from 'node:url';
 import {
   pickTorchRecord, blendMaskBones, overlayTracks, overlaySampler, MW_LIGHT_CARRY, MW_LIGHT_FIRE,
 } from '../../src/formats/morrowind/mwFirstPerson.js';
-import {
-  resolveTorchPart, torchPartPaths, TORCH_BONE, TORCH_GROUP, LIGHT_ATTITUDE, idleBaseFor, FP_IDLE_SNEAK, FP_IDLE_BASE,
-  carriedLeftVisible, createFpArm, fpSkeletonPath, FP_CLIP_PATH,
-} from '../../src/combat/fpArm.js';
+import { TORCH_GROUP, idleBaseFor, FP_IDLE_SNEAK, FP_IDLE_BASE, carriedLeftVisible, createFpArm, fpSkeletonPath, FP_CLIP_PATH } from '../../src/combat/fpArm.js';
+import { resolveTorchPart, torchPartPaths, TORCH_BONE, LIGHT_ATTITUDE } from '../../src/combat/fpArm/fpArmParts.js';
 import { MW_WEAPON_TYPE, weaponFlags, MW_TWO_HANDED } from '../../src/formats/morrowind/mwFirstPerson.js';
 import { armBuildOptsOf, isLitTorch } from '../../src/combat/weapon/weaponRig.js';
 import { TEMPLATES } from '../../src/systems/useItem.js';
@@ -300,18 +298,19 @@ test('MW-D51/52 pins: the rig hands the lit light over per frame and at the buil
   const opts = armBuildOptsOf({ race: 'Argonian', gender: 'male', faceIndex: 0, items: [], lightSource: { templateIndex: TEMPLATES.Torch } });
   assert.equal(opts.torch, true);
   const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, sheathed, spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
+  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, ub\.sheathed, ub\.spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
   assert.equal((arm.match(/else if \(r\.slot === 'torch'\) r\.hidden = !torchVisible\(\);/g) ?? []).length, 2, 'both world meshes hide on the rule');
   assert.match(arm, /else if \(r\.slot === 'torch'\) r\.hidden = !torchLit;/, 'the portrait shows the lit light whatever the hand holds');
   assert.equal((arm.match(/overlayFor\((?:tBase|fBase), (?:t|built)\.leftArm\)/g) ?? []).length, 2, 'the overlay on both rigs’ own LeftArm sets, through the memo');
   assert.equal((arm.match(/if \((?:t|f)Overlay\) overlayClock = torchState\.time;/g) ?? []).length, 2, 'F4: the torch’s clock through a variable, both rigs - no sampler allocated per frame');
   assert.match(arm, /const overlaySample = overlaySampler\(sampleTrack, \(\) => overlayClock\);/, 'F4: one sampler for the life of the rig');
   assert.match(arm, /if \(pendingBuild\) \{[\s\S]*?api\.build\(o\);\n\s+return;\n\s+\}/, 'F6: a queued build drains first and supersedes the rest');
-  assert.match(arm, /resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
+  assert.match(arm, /slots\.resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
   assert.match(arm, /refreshTorch\(\);\n\s+if \(torchState\) advanceClip\(torchState, \(torchSource \|\| rig\(\)\)\.keys, dt, null\);/, 'the torch’s own clock, on its own keys');
   assert.match(arm, /pickAnimSource\(r\.sources, TORCH_GROUP, resetClip, \{ loopFallback: true \}\)/, '"torch", start to stop, looping');
-  assert.match(arm, /const base = idleBaseFor\(\{ sneaking, inJump: !!jumpState, hasGroup \}\);/, 'MW-D52: refreshIdle takes the state');
-  assert.match(arm, /const short = base === FP_IDLE_SNEAK \? null : weaponShortGroup\(type\);/, 'the sneak idle rolls no loop dice');
+  const slots = rd('src/combat/fpArm/animSlots.js');
+  assert.match(slots, /idleBaseFor\(\{ sneaking: ctx\.sneaking\(\), inJump: !!slots\.jumpState, hasGroup: ctx\.hasGroup \}\)/, 'MW-D52: the idle takes the state');
+  assert.match(slots, /if \(base === FP_IDLE_SNEAK\) return \{ group: base, dice: false \};/, 'the sneak idle rolls no loop dice');
   assert.match(arm, /if \(pendingTorch !== null\) \{ const l = pendingTorch; pendingTorch = null; api\.setTorch\(l\); \}/, 'a light that arrived mid-build is not dropped (MAC-S1’s law)');
   const menu = rd('src/ui/enhanced/enhancedMenu.js');
   assert.doesNotMatch(menu, /\['Torch', armState\.torch/, 'MWA4: the carried light left the card with the per-piece readout - status() still carries it');

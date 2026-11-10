@@ -1,30 +1,15 @@
 // @ts-check
-// STAFF-EVENT - THE STAFF PANEL'S PLACE PICKER, the game's half. The places
-// are the player's own game data (MAPS.BSA), never in the panel nor in this repository, so the panel over the game asks
-// the game: a region's named places (each its location index, name, kind and map pixel), and where the staff member
-// stands now (region, the location they stand in or -1, the map pixel). Read off the maps the game loaded, nothing new.
-//
-// The door's words (net/staffHook.js staffHookDoor):
-//   { dfoStaff: 'places?', region } -> { dfoStaff: 'places', region, name, list: [{ loc, name, kind, px, py }] }
-//   { dfoStaff: 'here?' }           -> { dfoStaff: 'here', region, name, loc, place, px, py } (region null: no map yet)
-import { LOCATION_TYPES, longitudeLatitudeToMapPixel } from '../formats/mapsFile.js';
-import { CHAT_REGION_COUNT } from './wire.js';
-import { isProvinceRegion, theatreOfRegion } from '../formats/mapsTables.js';   // AUDIT RELEASE R2-7: a province's region past the Bay (WW-R)
+// THE WORLD'S REGISTRY OF PLACES, kept as the boot makes it (scenes/world.js), so the raids, Starfall and the Hollows'
+// lanes read it with no wiring of their own. The file once also held the staff panel's place picker; the panel is
+// removed and only the registry holder stays.
 
-/** A region index the politic map has, or null (staffMap.js regionOf's, kept here: staffMap.js imports the hook). @param {unknown} r */
-const regionOf = (r) => (Number.isInteger(r) && /** @type {number} */ (r) >= 0 && /** @type {number} */ (r) < CHAT_REGION_COUNT ? /** @type {number} */ (r) : null);
-
-let _maps = /** @type {any} */ (null);
-/** The game's maps, kept as the boot makes them (scenes/world.js) - so the door reads them with no wiring of its own. @template T @param {T} m @returns {T} */
-export const gameMaps = (m) => { _maps = m; return m; };
-/** The maps kept, or null (a page with no game). */
-export const keptMaps = () => _maps;
 let _places = /** @type {any} */ (null);
 /** AUDIT RELEASE R2-7: the world's registry of places (world/worldWide/worldPlaces.js), kept as the boot makes it - a
  *  province's places are the registry's, no MAPS.BSA table holds them. @template T @param {T} p @returns {T} */
 export const gamePlaces = (p) => { _places = p; return p; };
 /** The registry kept, or null. */
 export const keptPlaces = () => _places;
+<<<<<<< HEAD
 
 /** The most places one answer carries (the largest region has fewer). */
 export const STAFF_PLACES_MAX = 2000;
@@ -94,3 +79,5 @@ export function staffHere(maps, px) {
   const at = staffPlaces(maps, region).list.find((p) => p.px === px.x && p.py === px.y) ?? null;
   return { dfoStaff: 'here', region, name: String(maps.getRegionName?.(region) ?? '').slice(0, 64) || null, loc: at ? at.loc : -1, place: at?.name ?? null, kind: at?.kind ?? null, px: px.x, py: px.y };
 }
+=======
+>>>>>>> origin/feat/tamriel-review
