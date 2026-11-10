@@ -1,4 +1,4 @@
-// CLAW-METAL (decision #69, trbcodex T11): by default a werewolf's claws are DFU's bare hand. FormulaHelper.cs
+// CLAW-METAL: by default a werewolf's claws are DFU's bare hand. FormulaHelper.cs
 // CalculateHandToHandAttackDamage reads no item, so Daedric gauntlets on the beast add nothing to a claw hit, in either
 // core, on the stats card or on a refereed lane's sheet. The port's gauntlet metal is the `clawMetal` option, pinned off
 // in the server profile. The option's own behaviour is held by test/systems/bal6_curses.test.js and auditclaws.test.js.
