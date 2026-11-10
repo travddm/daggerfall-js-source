@@ -23,6 +23,7 @@ import { ENCHANTMENT_TYPES as T } from '../../src/formats/magicDef.js';
 import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
 import { killIfAnyLiveStatZero } from '../../src/systems/statMods.js';
 import { isPrivateQuestFoe } from '../../src/scenes/quest/questFoeHost.js';
+import { stealthOfShown } from '../../src/characters/enemy/peer-senses.ts';   // peersNear's stealth fields
 import { promoteStaffBoss } from '../../src/systems/eliteFoes.js';   // BOSS-EXACT: a staff event's mini boss   // CURSE-SYNC: the handover's word for a quest's foe
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -426,7 +427,7 @@ test('AUDIT PSCALE1 DOORS-1 at the sources and NET-2/NET-3 in the host: a Disint
   const peersNear = mount(W.slice(pn, W.indexOf('=> {', pn) + 3) + balanced(W, W.indexOf('=> {', pn) + 3, '{', '}'), {
     modes: {}, csaPeers: { isBelowDeck: () => false },
     online: { room: 'world:3,12', status: 'open', peers: new Map([['bob-0002', { id: 'bob-0002', shown: { x: 1, y: 0, z: 1 } }]]), visible: (p, now) => { seen.push(now); return true; } },
-    peerBodies: null, _peerHeights: new Map(), onlineToScene: (p) => [p.x, p.y, p.z],
+    peerBodies: null, _peerHeights: new Map(), onlineToScene: (p) => [p.x, p.y, p.z], stealthOfShown,
   }, 'return peersNear;');
   assert.equal(peersNear().length, 1);
   assert.deepEqual(seen, [undefined], 'visible() on its own clock - performance.now() against Date.now() stamps never timed a peer out');

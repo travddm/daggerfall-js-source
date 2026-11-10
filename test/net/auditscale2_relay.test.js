@@ -173,12 +173,10 @@ test('AUDIT SCALE II R1-3 slimPose keeps a value its rounding overflows: a pitch
 
 // ═══ R1-4: A RELAY SETTING BY ITS CONSUMERS' LAW ═════════════════════════════════════════════════════════════════════
 
-test('AUDIT SCALE II R1-4 the hub takes a relay setting only as its consumers read it - a role is a Discord id (heraldRole), the line bodyConfig\'s whole with no key it would ignore - and refuses anything else in words /relay shows, keeping nothing (mutants: the refusal unsaid; a role unread; a key unknown taken; a part unknown taken; a line bodyConfig reads as its default taken)', async () => {
+test('AUDIT SCALE II R1-4 the hub takes a relay setting only as its consumers read it - a switch one of its words, the line bodyConfig\'s whole with no key it would ignore - and refuses anything else in words /relay shows, keeping nothing (mutants: the refusal unsaid; a key unknown taken; a part unknown taken; a line bodyConfig reads as its default taken)', async () => {
   await onClock(1_800_000_000_000, async ({ tick }) => {
     const W = fakeRooms();
     const H = W.room(SOCIAL_ROOM);
-    H.env.GATE_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/123456789/abcDEF_-x';
-    H.env.GATE_DISCORD_ROLE = '111111111111111111';
     const dev = H.connect(); tick(300); await H.hello(dev, 'dev-0001', null, { glyphs: ['dev'] });
     assert.equal(dev.closed, null);
     const say = async (k, v) => { tick(5000); await H.raw(dev, JSON.stringify({ t: 'cfg', k, v })); return dev.sent.filter((f) => f.t === 'cfg').at(-1); };
@@ -191,14 +189,9 @@ test('AUDIT SCALE II R1-4 the hub takes a relay setting only as its consumers re
       assert.equal(JSON.stringify(await H.state.storage.get('relaycfg')), before, 'nothing kept');
       return a.error;
     };
-    for (const k of ['gateRole', 'serpentRole', 'sdRole']) {
-      assert.match(await refused(k, '<@&111111111111111111>'), /Discord role's id/, 'a role pasted as its mention');
-      await refused(k, 'Gate Watchers');
-      await refused(k, '12345');
-    }
-    assert.equal(H.room._heraldOf().role, '111111111111111111', 'the herald pings the role it pinged');
-    assert.deepEqual(await say('gateRole', '222222222222222222'), { t: 'cfg', k: 'gateRole', v: '222222222222222222' }, 'an id is taken');
-    assert.equal(H.room._heraldOf().role, '222222222222222222');
+    assert.match(await refused('lootDoor', 'yes'), /lootDoor is on/, 'a switch is on or off');
+    assert.match(await refused('grantMode', 'maybe'), /grantMode is/);
+    assert.deepEqual(await say('lootDoor', 'on'), { t: 'cfg', k: 'lootDoor', v: 'on' }, 'a switch\'s word is taken');
     for (const v of [
       '{"enforce": true, "body": {"depth": 1.5}}',                      // a part without its perS: bodyConfig's default whole
       '{"enfroce": true}',                                              // a key bodyConfig would ignore

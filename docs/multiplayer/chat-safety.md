@@ -1,10 +1,10 @@
-# Chat safety, moderation and the Discord bot
+# Chat safety and moderation
 
-This page covers what a chat line passes through, how players report and moderators act, the AI reviewer, and the
-Discord moderation bot. Staff tools beyond moderation are in [staff-tools.md](staff-tools.md).
+This page covers what a chat line passes through, how players report and moderators act, and the AI reviewer. Staff
+tools beyond moderation are in [staff-tools.md](staff-tools.md).
 
 Responsibility is split three ways: the **client** filters and shows, the **relay** rate-limits, mutes, bans and
-signs lines, and the **account service** owns reports, cases, sanctions, the reviewer and Discord.
+signs lines, and the **account service** owns reports, cases, sanctions and the reviewer.
 
 ## A chat line's path
 
@@ -72,8 +72,8 @@ lists, with normalisation and an allow-list for innocent words. The service runs
   `server-account/src/sanctions.js`).
 - Session doors answer a banned account with `{ error: 'banned', until, reason }`.
 - There is no moderation kick. Freeze and hide are staff tools.
-- In-game moderator routes: `/v1/mod/{mute,ban,unban,strikes,cases,case,dismiss}`. In game and Discord both call
-  `modAct` (`safety.js`): claim the case, act, resolve, push the order.
+- In-game moderator routes: `/v1/mod/{mute,ban,unban,strikes,cases,case,dismiss}`. The game and the staff panel both
+  call `modAct` (`safety.js`): claim the case, act, resolve, push the order.
 
 ### Who may moderate
 
@@ -98,42 +98,9 @@ retried: the database row is the truth, and the next token the player mints carr
 - Every minute (`safety` cron job) `safetyMinute` reads the feed, triages open cases, and sends lines to the
   Anthropic Messages API (`reviewLines`; model `MOD_AI_MODEL`, with a built-in default). The key is the
   `ANTHROPIC_API_KEY` secret.
-- **shadow**: verdicts are recorded and shown on Discord cards; nothing is acted on.
+- **shadow**: verdicts are recorded on the case, where the staff panel shows them; nothing is acted on.
 - **on**: a verdict of the highest severity, confidence at least 0.9, in harassment, hate, sexual or threat, mutes for
   30 minutes (`auto:review`), only after a second read of the account's own lines agrees. The reviewer never bans.
 - Daily call cap `MOD_AI_DAILY_MAX`, with a share kept for reports.
 
-## The Discord bot
-
-The bot is an **interactions endpoint** on the account service, not a gateway bot.
-
-- Route `POST /v1/discord/interactions` (`server-account/src/discord.js`, `discordInteraction`). `discordSigned`
-  verifies the Ed25519 signature (`x-signature-ed25519`, `x-signature-timestamp`, 300 s skew) with
-  `DISCORD_PUBLIC_KEY`.
-- Commands are declared in `server-account/src/discordCommands.js` (`DISCORD_COMMANDS`): `/mod lookup`, `/mod mute`,
-  `/mod unmute`, `/mod ban`, `/mod unban`. Guild-only and hidden from members without Manage Messages.
-- `actorOf` maps the Discord user to a game account through the `staff_discord` table (Discord user id to account id,
-  set by the operator with `tools/staffRole.mjs discord`). The account must pass `canModerate`. A Discord role grants
-  nothing by itself.
-- **Case cards.** `postCards` (minute cron) posts one card per case to `DISCORD_MOD_CHANNEL` (`caseCard`): the
-  reported lines, reasons, reviewer verdict, strikes and next ladder step. Buttons (`safe:<act>:<caseId>`): mute 30
-  minutes, 1 day, 7 days, ban 30 days, dismiss. A press claims the case for 60 s, acts through `modAct`, and redraws
-  the card. Player text goes inside code blocks.
-
-### What the deploy does, and what a person does
-
-The account deploy's step "Point Discord at the service" runs `node tools/discordModCommands.mjs --setup` when
-`DISCORD_BOT_TOKEN`, `DISCORD_MOD_CHANNEL` and `DISCORD_PUBLIC_KEY` are all set. It checks that the public key is the
-application's, sets the Interactions Endpoint URL, overwrites the whole command list, and reports any missing channel
-permission (View Channel, Send Messages, Embed Links). It writes `DISCORD_BOT_TOKEN` and `ANTHROPIC_API_KEY` from
-repository secrets to the Worker.
-
-To change the bot, change `discordCommands.js`, `discord.js` or `wrangler.toml` and merge. A person must still invite
-the bot, grant its channel permissions and roles, and rotate `DISCORD_BOT_TOKEN` in the repository secrets.
-
-### Relay announcements
-
-Separate from moderation, the relay posts event announcements (Oblivion gates, Super Dungeons, serpent) through a
-webhook (`GATE_DISCORD_WEBHOOK` secret; `heraldWebhook` in `server/src/index.js`, cards in
-`src/net/herald/heraldCard.js`). Ping roles and threads come from the `*_DISCORD_ROLE` and `*_DISCORD_THREAD` vars and
-can be changed in game with `/relay` (`src/net/relayCfg.js`).
+The account deploy writes `ANTHROPIC_API_KEY` from the repository secrets to the Worker.

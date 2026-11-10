@@ -80,7 +80,7 @@ import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js';   // WATER-NEXT
 import { RING_SEA_GLSL, FLORA_GLSL } from './horizonHaze.js';   // FAR-SEA1: the ring's sea and the horizon's haze, the classic ring's own text; FAR-FLORA: the canopy's grain
 import { RING_HAZE_GLSL } from './hazeGlsl.js';   // BANTHA1: and the jungle's haze over it, the classic ring's own text
 import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM } from './realWindows.js';   // RW1: the real windows, the classic FS's own block on the lane's codec
-import { MESH_ALPHA_GLSL } from './meshAlpha.js';   // POI-2: the lane's mesh FS ends on the same translucency as the classic one
+import { MESH_ALPHA_GLSL } from './meshAlpha.js';   // the lane's mesh FS ends on the same translucency as the classic one
 
 /** The lane's light cap - the classic lane's sixteen, tripled. Forty-eight
  *  vec4 + forty-eight vec3 are 96 uniform vectors; ES 3.0 guarantees 224
@@ -614,7 +614,7 @@ ${RW_MAIN_GLASS}
   vec3 lit = albedo * (ambient + uSunColor * (uSunScale * diff) + uMoonColor * (uMoonScale * mdiff)
     + uLight3Color * (uLight3Scale * l3diff) + elPointLit(vWorldPos, n) + elIndirectLit(vWorldPos, n));
 ${RW_MAIN_ROOM}
-  outColor = vec4(elFinish(lit + emission, vWorldPos), meshAlphaOf(tex.a));   // POI-2: alpha 1 but in a translucent draw (render/meshAlpha.js)
+  outColor = vec4(elFinish(lit + emission, vWorldPos), meshAlphaOf(tex.a));   // alpha 1 but in a translucent draw (render/meshAlpha.js)
   if (amMode > 0) {
     if (vWorldPos.y <= uAutomapWaterLevel) {
       outColor.rgb = mix(outColor.rgb, uAutomapWaterColor.rgb, uAutomapWaterColor.a);

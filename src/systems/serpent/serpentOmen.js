@@ -13,7 +13,7 @@
 // slain says no sounding.
 //
 // THE SITE IS ASKED LAZILY: the lanes' walk (systems/serpent/serpentSite.js) runs the first time a serpent is in its omen or
-// later - SERPENT2: or online, from its quiet on (`ahead`, the site said to the hub for its Discord herald) - and a
+// later - or online, from its quiet on (`ahead`, the site said to the hub) - and a
 // host with no map data hands `site` a null and the omen stays silent rather than naming nowhere - asking again every
 // SITE_RETRY_MS (a site that throws is none), so a map loaded late still names it that day.
 //
@@ -85,7 +85,7 @@ export function createSerpentOmen({ now, site, say, localTime = () => null, fell
     },
     current: () => current,
     /** SERPENT2: the serpent the clock is about and its site, found AHEAD of its bells (from its quiet on, once the omen is
-     *  ready) - what this game says to the hub, so the Discord herald's bells can name the place (net/serpent/serpentHerald.js).
+     *  ready) - what this game says to the hub, so the accounts can agree on the site (net/serpent/serpent-site.ts).
      *  Null until then, or while no site is found. */
     ahead() {
       if (!settled) return null;

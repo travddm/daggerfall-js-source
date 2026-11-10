@@ -65,7 +65,7 @@ async function stand() {
   /** A chat case on `who` with one report `ago` seconds back, or a reviewer's case. */
   const caseOn = (who, { ago = 10, reason = 'harassment', source = 'report', ...cols } = {}) => {
     const id = `case${(++n).toString(16).padStart(12, '0')}`;
-    insert('mod_cases', { id, target: who.id, source, status: 'open', opened_at: nowS() - ago, updated_at: nowS() - ago, reports: source === 'report' ? 1 : 0, credible: 0, ai_state: 'off', discord_state: 'off', ...cols });
+    insert('mod_cases', { id, target: who.id, source, status: 'open', opened_at: nowS() - ago, updated_at: nowS() - ago, reports: source === 'report' ? 1 : 0, credible: 0, ai_state: 'off', ...cols });
     if (source === 'report') insert('mod_reports', { case_id: id, reporter: s.sylviaId ?? sylvia.id, reason, at: nowS() - ago, counted: 1 });
     return id;
   };
@@ -286,7 +286,7 @@ test('STAFF-PANEL3-DESK: THE AI CHECK\'S SCORECARD - the cases staff decided tha
   const t = nowS();
   let k = 0;
   const decided = (status, cat, sev, { mode = 'shadow', ago = 3600, by = 'Asynian', state = 'done' } = {}) => s.insert('mod_cases', {
-    id: `sc${(++k).toString(16).padStart(14, '0')}`, target: s.troll.id, source: 'report', status, opened_at: t - ago - 10, updated_at: t - ago, ai_state: state, discord_state: 'off',
+    id: `sc${(++k).toString(16).padStart(14, '0')}`, target: s.troll.id, source: 'report', status, opened_at: t - ago - 10, updated_at: t - ago, ai_state: state,
     ai_category: cat, ai_severity: sev, ai_mode: mode, resolved_at: t - ago, resolved_by: by,
   });
   decided('actioned', 'hate', 3);        // said, acted: agreed

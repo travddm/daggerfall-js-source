@@ -127,14 +127,6 @@ export const BOUNTY_RECORD_VENDOR = 'bountyBoard';
 /** AUDIT CAPTAIN'S SEA L4: the captain's ledger's record (captainLedger.js CAPTAIN_SAVE_VENDOR - pinned equal,
  *  test/systems/naval/auditcaptsea.test.js; this module stays off the ledger's graph as it does off the board's). */
 export const CAPTAIN_RECORD_VENDOR = 'Captain';
-/** SEA-SEASON (SEA-SEASON): THE SEA'S SEASON FIGURES ARE THE REALM'S ALONE - the
- *  captain's ledger's `ether.season` (the deepest voyage and the legends ended this season, the service's season boards
- *  read them off a judged checkpoint). The copy does not carry them: an offline game's voyages are on its own clock. */
-function dropSeason(copy) {
-  const e = copy.modData?.[CAPTAIN_RECORD_VENDOR]?.ether;
-  if (e && typeof e === 'object') e.season = null;
-}
-
 /** The save name Copy to offline gives the slot it writes (ui/enhanced/enhancedMenu.js copyToOffline). */
 export const REALM_COPY_SAVE_NAME = 'Copied from the realm';
 
@@ -143,7 +135,6 @@ export function offlineCopyOf(snap) {
   const copy = JSON.parse(JSON.stringify(snap ?? null));
   if (!copy || typeof copy !== 'object') return copy;
   dropLineage(copy);
-  dropSeason(copy);
   const own = saneSaveClock(copy.classicMinutes), world = saneSaveClock(copy.worldMinutes);
   delete copy.worldMinutes;
   delete copy.realmHeld;   // AUDIT RESCUE-SAVE A1: the realm's spoils records (systems/realmSaves.js REALM_HELD_FIELD) - a new character holds none

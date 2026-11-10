@@ -101,6 +101,10 @@ container, a shop. It also decides what closing the window owes the world (`clos
 
 `containers.js` identifies private house containers from furniture model ids, as DFU's `DaggerfallInterior` does.
 `containerLoot.js` raises DFU's `OnLootSpawned` event after a shelf or a house container is stocked.
+A shop shelf is the player's own, online too, as in DFU: rolled for the player when the day turns and sold out as it
+is bought. A server profile can make it the building's shared shelf instead (`shop.sharedShelf`,
+`shop-shelf-rule.ts`). A sold piece is gone, as DFU clears the merchant's basket; the "Sold goods stay on the shelf"
+Features row shelves it until the next restock, and online that row is pinned off.
 
 **Shared room loot.** Online, a dungeon's or building's container is one list for every player in the room
 (`roomLoot.js`):
@@ -159,6 +163,8 @@ bosses and named foes stay off the plain ladder. `kill-gold.ts` sets a killed fo
 `1 + 1.5 ln(level)`, so gold grows early and flattens late (DFU multiplies by the level; Unleveled Loot made it flat).
 It applies where Unleveled Loot's death handler runs. `renownLoot.js` scales the loot bonus with the roller's Renown
 online.
+A dungeon treasure pile's gold is the player's level times the table's roll, as in DFU, online too. A server profile
+can divide it back to level 1's gold online instead (`loot.pileGold` `flat`, `loot.js` `unlevelPileGold`).
 
 The hosts apply rarity where they mint loot: `scenes/hostCombat.js` for bodies (`rollCorpseLoot`), and
 `scenes/dungeonContext.js`, `scenes/interiorContext.js`, `scenes/world.js` and `src/systems/searchables.js` for piles

@@ -45,9 +45,7 @@ on:
     # realm checkpoint through src/systems/item/itemLaw.js - the loot's own
     # records, spoils and Broker, one law at both ends - so that graph
     # is listed too (the block after src/systems/wind/wind.js).
-    # DISCORD-CODE: and the deploy's last step runs tools/discordModCommands.mjs, so its own graph is listed (after this
-    # workflow's own line) - test/server/discord_setup.test.js holds it, and the commands it writes live under
-    # server-account/. No comment inside the list: the pins read it as one run of lines.
+    # No comment inside the list: the pins read it as one run of lines.
     paths:
       - "server-account/**"
       - "src/net/identityToken.js"
@@ -153,7 +151,6 @@ on:
       - "src/net/pvp/pvpCaps.js"
       - "src/net/siege/siegeReceipt.js"
       - "src/net/duel/duelReceipt.js"
-      - "src/net/sea/seaSeasonLaw.js"
       - "src/net/crewSignLaw.js"
       - "src/systems/item/itemKinds.js"
       - "src/net/gate/gateMods.js"
@@ -371,12 +368,8 @@ on:
       - "vendor/foraging/ItemTemplates.json"
       - "vendor/iliac-puddle-no-more/ItemTemplates.json"
       - ".github/workflows/account-deploy.yml"
-      - "tools/discordModCommands.mjs"
       - "tools/lib/isMain.mjs"
       - "src/systems/legacy/revived.js"
-      - "src/poi/poiLaw.js"
-      - "src/poi/poiMesh.js"
-      - "src/poi/poiImage.js"
       - "server/src/staffFeedLaw.js"
       - "src/ui/touch/touchDevice.js"
   workflow_dispatch:
@@ -852,72 +845,26 @@ jobs:
             echo "A receipt signed by any earlier relay key is refused at the signature and expires with its week."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # ── 4c. PATREON-LINK'S TWO SECRETS, WHERE THE REPOSITORY HAS THEM ──
-      #
-      # PATREON-LINK (2026-10-01, Mac: "having to manually hand out titles
-      # ... its really hard to keep up with it"): a patron links their own
-      # Patreon, and the service needs the two things only Patreon and Mac
-      # hold - the API client's secret (to spend the code a player comes
-      # back with) and the webhook's (to believe Patreon's word on a
-      # member). Each is a REPOSITORY secret, PATREON_CLIENT_SECRET and
-      # PATREON_WEBHOOK_SECRET, put on the Worker here on EVERY deploy - so
-      # a secret changed in the repository reaches the service on the next
-      # push. An unset one is not an error: linking stays off (patreon.js
-      # patreonLinkOn) and the webhook answers `patreon-closed`.
-      #
-      # ONE PUT FOR BOTH (`secret bulk`, one redeploy), fed through a pipe:
-      # jq builds the JSON from the environment, so neither value is ever
-      # echoed, written to a file, or an argument. The summary names the two
-      # addresses the Patreon client and its webhook are registered with,
-      # read off this deploy - never typed (AUDIT-ACC F16).
-      - name: Put the Patreon secrets, where the repository has them
-        working-directory: server-account
-        env:
-          PATREON_CLIENT_SECRET: ${{ secrets.PATREON_CLIENT_SECRET }}
-          PATREON_WEBHOOK_SECRET: ${{ secrets.PATREON_WEBHOOK_SECRET }}
-        run: |
-          set -euo pipefail
-          base="${{ steps.deploy.outputs.base }}"
-          if [ -z "${PATREON_CLIENT_SECRET}" ] && [ -z "${PATREON_WEBHOOK_SECRET}" ]; then
-            echo "neither PATREON_CLIENT_SECRET nor PATREON_WEBHOOK_SECRET is set for this repository - Patreon linking stays off"
-          else
-            jq -n 'env | {PATREON_CLIENT_SECRET, PATREON_WEBHOOK_SECRET} | with_entries(select(.value != null and .value != ""))' | $WRANGLER secret bulk
-          fi
-          {
-            echo "### Patreon linking"
-            echo ""
-            echo "- client secret: $([ -n "${PATREON_CLIENT_SECRET}" ] && echo put || echo 'not set - linking is off')"
-            echo "- webhook secret: $([ -n "${PATREON_WEBHOOK_SECRET}" ] && echo put || echo 'not set - pledges are not followed')"
-            echo "- the Patreon client's redirect URI: \`$base/v1/patreon/callback\`"
-            echo "- the Patreon webhook's URL: \`$base/v1/patreon/webhook\`"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      # SAFE5 + SAFE8 (bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY HAS TWO SECRETS - the reviewer's
-      # ANTHROPIC_API_KEY (server-account/src/modAi.js) and the Discord bot's DISCORD_BOT_TOKEN (discord.js), each put
-      # on the Worker here on EVERY deploy from the repository's own secrets, so a key changed there reaches the service
-      # on the next push. An unset one is not an error: the reviewer reads nothing (MOD_AI is a switch over a key), and
-      # no card is posted - the cases still gather. One put for both, fed through jq as the Patreon pair is: neither
-      # value is ever echoed, written to a file, or an argument. The summary names the door Discord's application is
-      # given (its Interactions Endpoint URL), read off this deploy - never typed.
+      # THE CHAT'S SAFETY HAS ONE SECRET (docs/multiplayer/chat-safety.md): the reviewer's ANTHROPIC_API_KEY
+      # (server-account/src/modAi.js), put on the Worker here on EVERY deploy from the repository's own secrets, so a key
+      # changed there reaches the service on the next push. An unset one is not an error: the reviewer reads nothing
+      # (MOD_AI is a switch over a key) - the cases still gather. Fed through jq: the value is never echoed, written to a
+      # file, or an argument.
       - name: Put the chat safety's secrets, where the repository has them
         working-directory: server-account
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
           set -euo pipefail
-          base="${{ steps.deploy.outputs.base }}"
-          if [ -z "${ANTHROPIC_API_KEY}" ] && [ -z "${DISCORD_BOT_TOKEN}" ]; then
-            echo "neither ANTHROPIC_API_KEY nor DISCORD_BOT_TOKEN is set for this repository - the reviewer and the Discord queue stay off"
+          if [ -z "${ANTHROPIC_API_KEY}" ]; then
+            echo "ANTHROPIC_API_KEY is not set for this repository - the reviewer stays off"
           else
-            jq -n 'env | {ANTHROPIC_API_KEY, DISCORD_BOT_TOKEN} | with_entries(select(.value != null and .value != ""))' | $WRANGLER secret bulk
+            jq -n 'env | {ANTHROPIC_API_KEY} | with_entries(select(.value != null and .value != ""))' | $WRANGLER secret bulk
           fi
           {
             echo "### Chat safety"
             echo ""
             echo "- the reviewer's key: $([ -n "${ANTHROPIC_API_KEY}" ] && echo put || echo 'not among the repository secrets - the Worker keeps any key put before (AUDIT SAFE DISCORD-12)')"
-            echo "- the Discord bot's token: $([ -n "${DISCORD_BOT_TOKEN}" ] && echo put || echo 'not among the repository secrets - the Worker keeps any token put before')"
-            echo "- the Discord application's Interactions Endpoint URL: \`$base/v1/discord/interactions\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # ...AND PROVE IT LANDED, BY CONTENT. The client's deploy has been
@@ -1235,7 +1182,7 @@ jobs:
           # AUDIT LEAN-READS 2 D5: A DISPLAY READ SHED AS BUSY IS NO BROKEN DEPLOY. SLOW-SHED opens the shed on a slow
           # D1 alone, and the shed answers every BUSY read (busyLaw.js) 503 with its Retry-After, asking no statement;
           # `ask` waits seven tries through a short one, and a slow evening outlasts them - a deploy whose Worker had
-          # taken failed after it went live, its public key's check and Discord's step unrun. So a BUSY read's 503 after
+          # taken failed after it went live, its public key's check unrun. So a BUSY read's 503 after
           # every try is said and passed; a route that did not deploy (404), a migration that did not apply (500) or a
           # wrong answer still fails.
           shed() { [ "$1" = "503" ] && echo "::warning::$2 was shed as busy through every try (a slow or overloaded D1: SLOW-SHED, BUSY-GATE) - the Worker answers; its answer was not read"; }
@@ -1396,37 +1343,3 @@ jobs:
             exit 1
           fi
           echo "and the relay's configured copy matches it"
-
-      # DISCORD-SETUP (bible/11-Multiplayer/Chat-Safety-Arc.md section 9): THE DISCORD END, SET BY THE DEPLOY - the
-      # application's Interactions Endpoint URL pointed at this deploy's door, and /mod registered in the server the
-      # moderators' channel is in, from the bot's token alone (tools/discordModCommands.mjs --setup: the application's id
-      # and public key are Discord's answer, the server the channel's). Every deploy, because both are idempotent and a
-      # changed /mod or a moved Worker then reaches Discord on the next push. LAST, so a refusal hides no check above it;
-      # and red when Discord refuses, because a service that deployed but cannot be pressed is the failure the setup
-      # exists for. Skipped, said, when the token, the channel or the public key is not set. The token is an env var
-      # here and in the tool, never an argument and never echoed.
-      - name: Point Discord at the service, where the repository has the bot's token
-        env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: |
-          set -euo pipefail
-          toml=server-account/wrangler.toml
-          channel=$(grep -oP '^DISCORD_MOD_CHANNEL\s*=\s*"\K[^"]*' "$toml" || true)
-          key=$(grep -oP '^DISCORD_PUBLIC_KEY\s*=\s*"\K[^"]*' "$toml" || true)
-          if [ -z "${DISCORD_BOT_TOKEN}" ] || [ -z "$channel" ] || [ -z "$key" ]; then
-            echo "the bot's token, DISCORD_MOD_CHANNEL or DISCORD_PUBLIC_KEY is not set - Discord is left as it is"
-            exit 0
-          fi
-          # DISCORD-CODE: what was done is said either way; what stopped it (Discord's refusal, or the permissions the bot
-          # lacks in the moderators' channel) goes to the summary too - the tool's stderr, which never holds the token
-          err="$RUNNER_TEMP/discord-setup.err"
-          if out=$(DISCORD_MOD_CHANNEL="$channel" DISCORD_PUBLIC_KEY="$key" DISCORD_INTERACTIONS_URL="${{ steps.deploy.outputs.base }}/v1/discord/interactions" node tools/discordModCommands.mjs --setup 2> "$err"); then
-            echo "$out"
-            { echo ""; echo "### Discord"; echo ""; echo "$out"; } >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "$out"
-            cat "$err"
-            { echo ""; echo "### Discord"; echo ""; echo "$out"; echo ""; echo "**Not finished:** $(cat "$err")"; } >> "$GITHUB_STEP_SUMMARY"
-            echo "::error::Discord's setup did not finish - $(head -c 300 "$err")"
-            exit 1
-          fi
