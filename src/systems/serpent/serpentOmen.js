@@ -13,7 +13,7 @@
 // slain says no sounding.
 //
 // THE SITE IS ASKED LAZILY: the lanes' walk (systems/serpent/serpentSite.js) runs the first time a serpent is in its omen or
-// later - SERPENT2: or online, from its quiet on (`ahead`, the site said to the hub) - and a
+// later - or online, from its quiet on (`ahead`, the site said to the hub) - and a
 // host with no map data hands `site` a null and the omen stays silent rather than naming nowhere - asking again every
 // SITE_RETRY_MS (a site that throws is none), so a map loaded late still names it that day.
 //

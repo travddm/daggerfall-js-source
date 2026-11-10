@@ -37,7 +37,7 @@ const src = (p) => codeOnly(readFileSync(new URL('../../../' + p, import.meta.ur
 const NOW = Date.UTC(2026, 9, 24, 12, 0, 0);
 const CLASSIC_MIN_MS = 5000;
 
-// ─── the Bay's lane as it was before WW2, word for word (net/gate/gateLaw.js at b268ad5b0d) ───
+// ─── the Bay's lane as it was before the lanes past the Bay, word for word (net/gate/gateLaw.js at b268ad5b0d) ───
 const oldIsGateDay = (day) => Number.isSafeInteger(day) && day >= 0 && day % GATE_EVERY_DAYS === 0;
 const oldGameDayAt = (nowMs) => Math.floor(sharedClassicMinutes(nowMs) / GATE_DAY_MINUTES);
 function oldGateTimes(day) {

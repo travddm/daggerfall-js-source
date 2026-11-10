@@ -742,7 +742,7 @@ export class OnlineSession {
     this._wedBucket = null;       // LEGACY7 part three: my own wed frames out - wedGate's law
     this._inWedBuckets = new Map();   // LEGACY7 part three: the gate on wed frames coming in, per sender (`_directedIn`)
     this.onSea = null;            // SEA-EVENTS: (word) => void - the social room's word on the treasure fleets (wire.js validSeaOut)
-    this._gateSiteSaid = null;    // the socket and day my `site` last went on - once a socket and day (WW2: and gate - `{ ws, said }`, the gates said on it)
+    this._gateSiteSaid = null;    // the socket and day my `site` last went on - once a socket, day and gate (`{ ws, said }`, the gates said on it)
     this.arenaHeard = false;      // FIELD BUGS 2026-10-16b ARENA-WAIT: a primary welcome has come (sticky) - before it the arena on the online lane waits (scenes/arena/arenaOnline.js waiting)
     this.onArena = null;          // ARENA4: (word, room) => void - the hall's or a bout's word, projected by the wire's readArenaOut
     this._arenaBucket = null;     // ARENA4: my own arena words out - arenaGate's law

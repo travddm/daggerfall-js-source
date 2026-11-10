@@ -359,7 +359,7 @@ const cageSaid = (d, c) => ({ k: 'cl', d, px: c.px, py: c.py, at: c.clAt });
 /** WB12d: a cell's circle the hub has not heard all of - its break and who struck since; BROKER-CAGE: or its faithful
  *  every one fallen. */
 const riteOwed = (c) => (!!c.f && c.told < Object.keys(c.h).length) || (!!c.cl && !c.clTold);
-/** AUDIT WB12d (R1): the circles a day's record stands by - those at the gate's agreed site (net/gate/gate-site.ts
+/** The circles a day's record stands by - those at the gate's agreed site (net/gate/gate-site.ts
  *  agreedGateSite: two accounts said where it stands) when there is one, else every circle told, the most struck first
  *  (the first told on a tie). A lie at a pixel no breach stands in is a circle the agreed site never names. */
 const riteCirclesBy = (r, d, site) => {
@@ -855,7 +855,7 @@ export class Room {
     this._grants = null;            // GRANT2 (Spawn-Grants.md section 12): a cell's spawn grants (_grantState) - made at its first ask; AUDIT TESA III E2-1: its gate kept in storage (_grantGateKeep)
     this._grantGateRead = null;     // AUDIT TESA III E2-1: the cell's kept grant gate, read once an instance life (_grantGateLoad) - its promise
     this._gateFells = new Map();    // WB3: the hub's last word of a kill, said to a hello while its gate still holds - WW2: a lane's (lane -> the word, null for none; absent: not read yet)
-    this._serpentSiteRec = undefined; // SERPENT2: the hub's record of where the serpent lies, as accounts said it (net/gate/gate-site.ts foldGateSite) - undefined: not read yet
+    this._serpentSiteRec = undefined; // the hub's record of where the serpent lies, as accounts said it (net/gate/gate-site.ts foldGateSite) - undefined: not read yet
     this._serpentFells = undefined; // SERPENT1: the hub's kills of the latest serpent day, one a site (SERPENT_FELLS_KEY), said to a hello while that day holds
     this._event = undefined;        // EVENT1: the hub's live event, read once (_liveEvent) - undefined: not read yet
     this._raids = new Bounded(RAID_CACHE_MAX);        // RAID3: a cell's raid ledgers read so far (net/raid/raidLaw.js) - AUDIT RAID R1: its identity (key and signature) -> ledger|null; storage is the truth; R6: at most RAID_CACHE_MAX
@@ -878,7 +878,7 @@ export class Room {
     this._instanceGuildRefused = new WeakSet();   // DOMAIN2: the castle guests already refused out (_instanceGuildOut)
     this._owLoad = null;            // OW6L: a cell's overworld ledger (net/overworldLaw.js) - the one storage read an instance life, its promise shared by every word and hello that lands while it runs; storage is the truth, written at every change
     this._roomOw = null;            // OW6L: a cell's budget for fanning its ledger's changes (OW_ROOM_HZ_MAX) - on the instance, as the chat's is
-    this._gateSiteRecs = new Map(); // the hub's record of where the gate stands, as accounts said it (net/gate/gate-site.ts foldGateSite) - WW2: a lane's (absent: not read yet)
+    this._gateSiteRecs = new Map(); // the hub's record of where the gate stands, as accounts said it (net/gate/gate-site.ts foldGateSite) - a lane's (absent: not read yet)
     this._serpents = undefined;     // SERPENT1: the serpents' fights a cell holds, by id (storage's SERPENT_FIGHTS_KEY after a wake) - undefined: not read yet
     this._serpentSavedAt = new Map(); // SERPENT1: when each was last checkpointed
     this._serpentFalling = new Map(); // SERPENT1: the kills being said (one fall at a time a fight - AUDIT WB12d R2's law)
@@ -2988,7 +2988,7 @@ export class Room {
     // SCALE5d part two: a court's copy syncs as a shard does. AUDIT SCALE II R2-4: its name read back from its storage when
     // its sockets say none, and the alarm kept while anything is still owed the bus (a last leave on a woken instance)
     if (await this._hubKeyOf()) { this._hubSyncAt = 0; await this._hubUpFlush(); this._hubPollEnsure(); if (this.state.getWebSockets().length || this._up.length || this._upRetry) await this.state.storage.setAlarm(Date.now() + HUB_SYNC_MS); return; }
-    if (await this.state.storage.get('hub')) { await this._relayCfgOf(); await this._sweepHub(Date.now()); await this._sdBeat(Date.now()); return; }   // AUDIT SOC A3: the hub's alarm is its sweep, whoever is in the room; SD3: and the Super dungeon's director
+    if (await this.state.storage.get('hub')) { await this._relayCfgOf(); await this._sweepHub(Date.now()); await this._sdBeat(Date.now()); return; }   // the hub's alarm is its sweep, whoever is in the room, and the Super dungeon's director
     // AUDIT 68 X8-park-registry-unbounded: an owner's registry (HCC-PARK) is one object per account and character a
     // client names - its word goes PARK_TTL_MS after it was said, as the cell's record it points at does
     const reg = await this.state.storage.get('reg');
@@ -6635,7 +6635,7 @@ export class Room {
   }
   /** THE NIGHT, SAID ONCE: when the book says it done, a receipt of the rite alone minted for each who broke the faithful's
    *  rite and holds no court's (WB12d, gateCourts.js riteOnly) - kept with the night's moment before anything is said
-   *  (AUDIT WB A10's law) - and the hub told the night (its `fell`: every screen's gate collapses)
+   *  - and the hub told the night (its `fell`: every screen's gate collapses)
    *  until it answers. A hub that does not say the rite's helpers leaves the night unsaid until it does. */
   async _gateBookBeat(now) {
     const book = await this._gateBookOf();
@@ -6792,7 +6792,7 @@ export class Room {
       : validGateOut({ k: 'fell', d: body?.d, at: body?.at, top: body?.top, n: body?.n, ...(body?.night ? { w: body?.w, cs: body?.cs } : {}) });
     if (!fell || fell.d === undefined) return json({ ok: false }, 400);
     const lane = gateLaneOf(fell.d);   // WW2: its lane's record, and its fighters' receipts under its lane's keys
-    if (!court) { this._gateFells.set(lane, fell); await this.state.storage.put(gateLaneKey('gatefell', lane), fell); }   // GATE-COURTS: a court's kill is not kept - its gate stands for the night's other courts
+    if (!court) { this._gateFells.set(lane, fell); await this.state.storage.put(gateLaneKey('gatefell', lane), fell); }   // a court's kill is not kept - its gate stands for the night's other courts
     const said = JSON.stringify({ t: 'gate', ...fell });
     const rc = new Map();
     for (const e of Array.isArray(body.rc) ? body.rc : []) {
@@ -7277,9 +7277,9 @@ export class Room {
     return this._gateSiteRecs.get(lane) ?? null;
   }
   /** An account's word of where the gate the clock is about stands, folded into the record (one word an account a day -
-   *  net/gate/gate-site.ts foldGateSite) and kept when it moved it. WW2: into its lane's record. */
+   *  net/gate/gate-site.ts foldGateSite) and kept when it moved it, into its lane's record. */
   async _gateSite(sub, m, now) {
-    if (!gateSiteDayOk(m.d, now)) return;   // AUDIT WB12d (R1): the rite stands by the agreed site
+    if (!gateSiteDayOk(m.d, now)) return;   // the rite stands by the agreed site
     const lane = gateLaneOf(m.d);
     const had = await this._gateSiteOf(lane);
     const rec = foldGateSite(had, m.d, sub, m.px, m.py, m.pl);
