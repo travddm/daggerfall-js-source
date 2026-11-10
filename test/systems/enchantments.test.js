@@ -3,6 +3,7 @@
 // Daggerfall Workshop). The port's magic items have carried their
 // MAGIC.DEF pairs since S1 and nothing ever read them.
 
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -151,7 +152,8 @@ test('E1 pump: VampiricEffect AtRange drains every foe inside 2.25 through the p
   assert.equal(w.health, 12);
 });
 
-test('E1 fold: the channels reach their formulas - armour, chance-to-hit, skills, absorption, max magicka', () => {
+test('E1 fold: the channels reach their formulas - armour, chance-to-hit, skills, absorption, max magicka', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const w = wearer([item(T.StrengthensArmor, -1), item(T.EnhancesSkill, 2)], { isPlayer: true });
   computeEnchantmentMods(w);
   assert.equal(enchantArmorMod(w), -5);

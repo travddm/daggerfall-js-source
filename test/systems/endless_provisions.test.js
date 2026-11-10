@@ -5,6 +5,7 @@
 // (ENDLESS-STOCK F4). An Off meal is eaten, never refused for hunger, and
 // gives stamina back (eatFood's offMeal; useItem.js passes it with the arc Off). A camp is every tier's (camps.js:
 // auditsurv, survtiers and survtiers3 pin it).
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -50,7 +51,8 @@ test('ENDLESS PROVISIONS: a General Store\'s and a Pawn Shop\'s counter shelf ha
   assert.ok(!back.some((i) => i.templateIndex === TEMPLATE.Rations), 'a back shelf is its own container, stocked whole - not the counter\'s');
 });
 
-test('ENDLESS PROVISIONS: online, Rations are endless stock - a stack bought whole or in part is filled back to 99, a kit stands again; and no shop buys them back (mutants: Rations not endless, the stack not refilled, a bought-out stack not stood again)', () => {
+test('ENDLESS PROVISIONS: online, Rations are endless stock - a stack bought whole or in part is filled back to 99, a kit stands again; and no shop buys them back (mutants: Rations not endless, the stack not refilled, a bought-out stack not stood again)', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const shelf = shelfOf(BUILDING_TYPES.GeneralStore, { online: true, tier: false });
   const stack = rations(shelf);
   assert.equal(isEndlessStock(stack), true);

@@ -20,7 +20,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  createTravelSteer, steerDrive, travelFrameReach, createColliderProbe, TRAVEL_STEER, FEELER_HEIGHT, WALKABLE_NY,
+  createTravelSteer, steerDrive, travelFrameReach, createColliderProbe, TRAVEL_STEER, FEELER_HEIGHT, FEELER_HEIGHT_HIGH, WALKABLE_NY,
 } from '../../../src/systems/travel/travelSteer.js';
 import * as STEER from '../../../src/systems/travel/travelSteer.js';   // TRAVEL-NAV2: read by name, so a pin on a constant the base lacks fails as an assertion
 import { TravelAutopilot, calculateYaw, rectDistance, ARRIVAL_BUFFER } from '../../../src/systems/travel/travelAutopilot.js';
@@ -1034,6 +1034,30 @@ test('TRAVEL-NAV1 THE FEELERS ARE THE COLLIDER\'S: a wall is met at its distance
   assert.equal(seen.o.size, 1); assert.equal(seen.d.size, 1); assert.equal(seen.out.size, 1);
 });
 
+/** A rail fence across +z at `z`, its foot at `foot`, shaped as ARCH3D 41206/41207: posts 0.2 m square every 1.6 m
+ *  (none at x = 0), a low rail 0.38-0.65 m and an upper rail 1.30-1.50 m over the foot. */
+function railFence(z, foot) {
+  const c = new Collider(() => 0);
+  const add = (name, m) => c.addMesh(name, m.p, m.i, IDENTITY);
+  for (let k = 0; k < 13; k++) { const x = -10 + k * 1.6; add(`post${k}`, boxMesh(x - 0.1, foot, z - 0.1, x + 0.1, foot + 1.75, z + 0.1)); }
+  add('low', boxMesh(-10, foot + 0.38, z - 0.05, 10, foot + 0.65, z + 0.05));
+  add('high', boxMesh(-10, foot + 1.3, z - 0.05, 10, foot + 1.5, z + 0.05));
+  return c;
+}
+
+test('the feelers meet a rail fence on ground a little lower than the body between its posts - its upper rail by the second ray where the first passes over the low rail', () => {
+  const feet = [0, 0, 0];
+  const lower = railFence(5, -0.1);
+  assert.equal(createColliderProbe({ collider: lower, feet: () => feet, heights: [FEELER_HEIGHT] })(0, 1, 0, 24), Infinity, 'one ray at FEELER_HEIGHT passes over the low rail: the fence read as open ground');
+  const met = createColliderProbe({ collider: lower, feet: () => feet })(0, 1, 0, 24);
+  assert.ok(Math.abs(met - 4.95) < 1e-3, `the feeler meets the fence's face (${met})`);
+  for (const foot of [-0.2, -0.1, -0.05, 0, 0.1, 0.2]) {
+    const d = createColliderProbe({ collider: railFence(5, foot), feet: () => feet })(0, 1, 0, 24);
+    assert.ok(Math.abs(d - 4.95) < 1e-3, `a fence whose foot stands ${foot} m from the feet is met (${d})`);
+  }
+  assert.ok(FEELER_HEIGHT_HIGH < 1.65, 'under the boards a shop sign hangs (world/signSolid.js)');
+});
+
 test('TRAVEL-NAV2 A FACE THAT IS WALKED ON HIDES NOTHING: a wall at a ramp\'s head, a deck\'s rail and a wall behind a face met from beneath are all seen - a deck the ramp leads onto is not read as a wall from inside it - and the ride is bounded and follows the ground again after', () => {
   const feet = [0, 0, 0];
   const probeOver = (c) => createColliderProbe({ collider: c, feet: () => feet });
@@ -1083,12 +1107,12 @@ test('TRAVEL-NAV2 A FACE THAT IS WALKED ON HIDES NOTHING: a wall at a ramp\'s he
   m1.addMesh('fence', fence.p, fence.i, IDENTITY);
   assert.ok(Math.abs(probeOver(m1)(0, 1, 0, 24) - 15) < 1e-4, `the fence past the mound (${probeOver(m1)(0, 1, 0, 24)})`);
   // BOUNDED: a collider that answers a walkable face at every cast is
-  // asked at most FEELER_RIDES + 1 times a leg
+  // asked at most FEELER_RIDES + 1 times a leg, at each of the feeler's two heights
   assert.equal(STEER.FEELER_RIDES, 4, 'four faces a leg');
   let calls = 0;
   const floors = { heightAt: () => 0, raycastHit(o, dd, max, filter, out) { calls++; out.dist = Math.min(0.5, max); out.key = 'f'; out.normal[0] = 0; out.normal[1] = 1; out.normal[2] = 0; return out; } };
   assert.equal(probeOver(floors)(0, 1, 0, 16), Infinity, 'faces to walk on, all the way');
-  assert.ok(calls <= 2 * (STEER.FEELER_RIDES + 1), `two legs, ${calls} casts`);
+  assert.ok(calls <= 2 * 2 * (STEER.FEELER_RIDES + 1), `two heights, two legs, ${calls} casts`);
 });
 
 test('TRAVEL-NAV1 raycastHit\'s `out`: the caller\'s own result, written and returned in place - the normal into the caller\'s array - and without it the answer it always was', () => {

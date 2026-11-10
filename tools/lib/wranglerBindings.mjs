@@ -1,8 +1,8 @@
 // PURSE-BACK: THE ACCOUNT SERVICE'S OWN BINDINGS, OVER WRANGLER - D1's and R2's surface as the service's
 // Worker uses them (env.DB: prepare / bind / first / all / run; env.SAVES: get / delete), answered by `wrangler d1
-// execute` and `wrangler r2 object` with the repository's CLOUDFLARE_API_TOKEN. An operator's run in Actions can then
+// execute` and `wrangler r2 object` with the repository's CLOUDFLARE_API_TOKEN. An operator's tool (tools/staffRole.mjs) can then
 // call the service's own functions - server-account/src/review.js reviewAct, its law whole - where the service itself
-// asks for a developer signed in (tools/realmRollback.mjs).
+// asks for a developer signed in.
 //
 // WRANGLER TAKES NO PARAMETERS, so a statement's binds are written into it as literals (literalSql, through lit) - the
 // placeholders outside quotes alone. WRANGLER SAYS NOTHING OF A WRITE'S ROWS (its JSON's meta is `{ duration }` on the

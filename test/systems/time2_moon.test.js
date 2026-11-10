@@ -4,6 +4,7 @@
 // the full moon is UP - from the dusk of a full-moon date to the next dawn, thirty real minutes on TIME1's sky - and at
 // dawn the lock ends. Offline DFU's whole day stands. THE LAW EXECUTES: the night's date, the full moon up, the round
 // online and offline, the round runner's lane, the morning after, and the Hircine ring.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -127,7 +128,8 @@ test('TIME2 the Hircine ring still holds the change off, the night of the full m
   }
 });
 
-test('TIME2 on the sky: a full moon\'s night is thirty real minutes, and a werewolf meets the two moons\' nights four real hours apart, then none for twenty-eight', () => {
+test('TIME2 on the sky: a full moon\'s night is thirty real minutes, and a werewolf meets the two moons\' nights four real hours apart, then none for twenty-eight', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const from = SKY_SEGMENTS[0].fromMs + 3_600_000;
   const nights = [];
   let inNight = false, start = 0;

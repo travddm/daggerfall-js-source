@@ -74,7 +74,6 @@ export const PSEUDO_ARCHIVES = Object.freeze([
   N(112380, 'player/eyeOfTheBeholder/eotbBillboard.js', 'ARCHIVE_LYCAN', 'mod', 'Eye Of The Beholder: the werewolf and the wereboar', 112381),
   N(112382, 'player/eyeOfTheBeholder/eotbBillboard.js', 'ARCHIVE_HORSE', 'mod', 'Eye Of The Beholder: mounted, five', 112386),
   N(112395, 'systems/comeSailAway/comeSailAwayWaves.js', 'WAVE_ARCHIVE', 'mod', "Come Sail Away's waves"),
-  N(600000, 'poi/poiRuntime.js', 'POI_TEXTURE_ARCHIVE', 'port', "the POIs' textures, a record each look - poi/poiRuntime.js createTextureBook (POI-1, the merge of main)"),
   N(900000, 'net/remotePlayers.js', 'PEER_ARCHIVE', 'synthetic', "the peers' dolls"),
 ]);
 

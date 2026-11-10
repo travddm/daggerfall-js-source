@@ -40,6 +40,19 @@ test("P0 ON60, THE FIRST KEY: repair.allowMagic is DFU false, online true, the p
   assert.equal(profileKeyOf('toString'), null, 'a name the object inherits is no key');
 });
 
+test('party.allowNoMentoring is a bool the client and the relay read, allowed online by default; a server may set it false', () => {
+  const key = profileKeyOf('party.allowNoMentoring');
+  assert.deepEqual(
+    [key?.type, key?.dfu, key?.online, key?.offline, key?.checkedBy],
+    ['bool', false, true, false, ['client', 'relay']],
+  );
+  assert.equal(resolveRules({})['party.allowNoMentoring'], true);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'party.allowNoMentoring': false } }), []);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'party.allowNoMentoring': 0 } }), [
+    'bad value for party.allowNoMentoring',
+  ]);
+});
+
 test('P0 A PROFILE READ AGAINST THE REGISTRY: another schema, an unknown key and a bad value are refused by name; the official profile is clean (mutants: unknown keys let through; values unchecked)', () => {
   assert.deepEqual(profileRuleErrors(OFFICIAL_PROFILE), []);
   assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'repair.allowMagic': false } }), []);
@@ -89,4 +102,41 @@ test('P0 TYPES AND BOUNDS: an int, a number, an enum and a string are each held 
     ['', 1].map((v) => validProfileValue(str, v)),
     [true, false],
   );
+});
+
+test("P9 THE TRADE KEYS: trade.saleCap is DFU's no cap online by default; trade.haggleRange keeps the skills inside 0 to 100 online", () => {
+  const cap = profileKeyOf('trade.saleCap');
+  assert.deepEqual([cap?.dfu, cap?.online, cap?.offline, cap?.type], [false, false, false, 'bool']);
+  const range = profileKeyOf('trade.haggleRange');
+  assert.deepEqual([range?.dfu, range?.online, range?.offline, range?.type], [false, true, false, 'bool']);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'trade.saleCap': true } }), []);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'trade.saleCap': 0.5 } }), [
+    'bad value for trade.saleCap',
+  ]);
+});
+
+test("P10 THE PILE GOLD KEY: loot.pileGold is DFU's level multiple online by default, 'flat' the old online rule", () => {
+  const key = profileKeyOf('loot.pileGold');
+  assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.values], ['dfu', 'dfu', 'dfu', ['dfu', 'flat']]);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'loot.pileGold': 'flat' } }), []);
+  assert.deepEqual(profileRuleErrors({ schema: PROFILE_SCHEMA, rules: { 'loot.pileGold': 'half' } }), [
+    'bad value for loot.pileGold',
+  ]);
+});
+
+test("P11 THE REST KEY: rest.fireOnly is DFU's rest window online by default; true is the rest act", () => {
+  const key = profileKeyOf('rest.fireOnly');
+  assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool']);
+});
+
+test("P12 THE GUILD KEYS: guild.promoteNow and guild.seatRanks are DFU's wait and DFU's ranks online by default", () => {
+  for (const name of ['guild.promoteNow', 'guild.seatRanks']) {
+    const key = profileKeyOf(name);
+    assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool'], name);
+  }
+});
+
+test("P13 THE QUEST KEY: quest.failureFree is DFU's -2 online by default", () => {
+  const key = profileKeyOf('quest.failureFree');
+  assert.deepEqual([key?.dfu, key?.online, key?.offline, key?.type], [false, false, false, 'bool']);
 });

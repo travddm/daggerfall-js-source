@@ -189,7 +189,7 @@ export function formatValue(key, raw) {
     const eff = Math.min(law.max, Math.max(law.min, n));
     return Number.isFinite(n) ? fmtNumber(eff, law) : String(raw ?? '');
   }
-  if (w === 'blocked') return READOUT[key] ?? 'not here';   // never the stored value: EnhancedCombatAI holds True while the port runs the classic path
+  if (w === 'blocked') return READOUT[key] ?? 'not here';   // never the stored value: a blocked key's store says nothing about what the port runs
   if (w === 'colour') return String(raw ?? '').toUpperCase();
   const s = String(raw ?? '');
   return s === '' ? 'default' : s;   // DFU's own substitution for an empty SoundFont (:264-267)

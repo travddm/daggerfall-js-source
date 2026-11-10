@@ -66,7 +66,7 @@ export function publishBootParams(params, { history = globalThis.history, locati
  *  - `?tod`, `?timescale`, `?weather`, `?wseed` and `?season` stand against the shared clock and sky.
  *  An online boot drops every one of them before anything reads them (scenes/world.js, beside the Test Room's refusal),
  *  and publishes the drop so every later reader of the URL agrees. Offline, F304 stands. */
-export const ONLINE_REFUSED_FLAGS = Object.freeze(['shot', 'fly', 'nofoes', 'tp', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'timescale', 'weather', 'wseed', 'season', 'editor']);   // POI-3: the POI editor's free eye and its map jump are powers too - a builder edits offline
+export const ONLINE_REFUSED_FLAGS = Object.freeze(['shot', 'fly', 'nofoes', 'tp', 'class', 'spell', 'weapon', 'spawn', 'region', 'loc', 'tod', 'timescale', 'weather', 'wseed', 'season']);
 /** Drops the refused flags from an online boot's params, in place. Answers the flags it dropped (none offline). */
 export function refuseOnlinePowerFlags(params) {
   if (!params?.has?.('online')) return [];
@@ -177,7 +177,6 @@ export const ONLINE_PLAYERS_OWN_MODS = [
   'weapon-widget',         // the first-person weapon's own motion; no damage, no timing, no attack state
   'eye-of-the-beholder',   // third person and your own billboard; peers are drawn by remotePlayers either way
   'readied-spellcasting-hands',   // RSH1: your own first-person hands on your own screen; the cast itself is unchanged
-  'ambient-text',          // flavour lines on your own screen
   'immersive-footsteps',   // your own footstep audio
   'better-ambience',       // ambient audio and the dungeon's darkness, both drawn locally
   // MODS-ONLINE-2: what the port already resolves at the

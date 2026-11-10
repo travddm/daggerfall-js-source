@@ -38,9 +38,9 @@
 import { ALL_KEYS } from './settings/settings.js';
 import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
-import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW, TERRAIN_SLOPE_CUT_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
+import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW, TERRAIN_SLOPE_CUT_ROW, CLAW_METAL_ROW, LEGENDARY_EQUIP_FREE_ROW, GENTLE_EQUIP_BILL_ROW, SOLD_GOODS_ON_SHELF_ROW, ABSORPTION_LIMITS_ROW, OPENING_DAMAGE_ROW, ELITE_STACKING_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
 import { CLASSIC_PICTURE_ROWS } from './classic-picture-rows.ts';
-import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js';
+import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js'; import { SPAWNED_DUNGEONS_ROW } from './dungeon/spawned-dungeons-row.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
 /** The three kinds, in label order. `label` is what the row wears and
@@ -277,7 +277,6 @@ export const MOD_CURATED = Object.freeze({
     'GeneralOptions.AvoidObstacles', 'GeneralOptions.FirstPersonTravel',
     'GeneralOptions.FirstPersonTravelFollowsRoads',
   ]),
-  'ambient-text': Object.freeze(['textChance', 'interval', 'postTextInterval', 'textDisplayTime']),   // AT0: all four it ships - the mod is small enough that curation would only hide something
   // EOTB0: the mod ships FIFTY-FOUR keys across nine sections, so this
   // one IS curated, and the four are the ones a player reaches for
   // first: how far back the camera sits, which shoulder it sits over,
@@ -475,8 +474,8 @@ export const FEATURES = Object.freeze([
   // one choice away and All off's. The words are AUDIT 59 F3's, kept
   // true by test/systems/ft5_enhancedai.test.js against the arc's own list of
   // what is still ahead. NOT a merge with DFU's Enhancements/
-  // EnhancedCombatAI ("Smarter Enemies", UNAVAILABLE in settings.js: the port runs the
-  // classic path only) - a different thing that shares half a name,
+  // EnhancedCombatAI ("Smarter Enemies", DFU's own setting, which this layer sits on top
+  // of) - a different thing that shares half a name,
   // which the note says outright so the two cannot be read as one.
   Object.freeze({
     id: 'enhanced-ai',
@@ -771,7 +770,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'lootRarity', initial: true, online: 'room' }),   // on by default: the ladder is the port's own game, not an opt-in
   }),
-  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, GATE_PORTENT_LOOT_ROW, TOWN_SEATS_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW, TERRAIN_SLOPE_CUT_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
+  REVENANTS_ROW, WEAPON_TECHNIQUES_ROW, GATE_PORTENT_LOOT_ROW, TOWN_SEATS_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, CLAW_METAL_ROW, GENTLE_EQUIP_BILL_ROW, LEGENDARY_EQUIP_FREE_ROW, LOCKPICK_TUMBLERS_ROW, DRESS_FOR_THE_PART_ROW, GUILD_PROBATION_ROW, SOLD_GOODS_ON_SHELF_ROW, ABSORPTION_LIMITS_ROW, OPENING_DAMAGE_ROW, ELITE_STACKING_ROW, HORSE_WALKS_ROW, CRIME_RECOVERY_ROW, DUNGEON_FIRES_ROW, TERRAIN_SLOPE_CUT_ROW,   // DUNGEON-FIRE-ONE: the dungeon's campfire; WEAPON-TECHNIQUES-SETTING: its own switch, beside Loot rarity; F3a: and the bad name's pace
   // WIND3: THE WIND SEEN AND HEARD - three rows over the
   // one wind (systems/wind/windDrive.js), each the player's own online (a
   // look and a sound, nothing the room shares), each read every frame
@@ -1019,7 +1018,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: 'room' }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
   }),
-  QUEST_REWARDS_ROW,   // QUESTLINE-REWARDS: the reward scale, DFU's selectable
+  QUEST_REWARDS_ROW, SPAWNED_DUNGEONS_ROW,   // the quest reward scale, with DFU's selectable; spawned dungeons, off by default as DFU has none
   // LW2: THE LIVING WORLD
   //  - a town's people are its residents, each with a name, a home, a trade and a
   // day (systems/livingWorld/livingTown.js stands them where DFU's wandering pool stood). The player's own online: every
@@ -1138,12 +1137,6 @@ export const FEATURES = Object.freeze([
   modFeature('roleplay-realism-items', () => t('features.effect.gameLoads', 'Takes effect when the game next loads.'), 'loot'),   // RRI1: the template patches are merged at load (ItemHelper.LoadItemTemplates); the classes read their switches live; RRI2: the nine modules read theirs at each roll (a corpse, a shelf, a price), the starting kit and spellbook at the next character   // DW1: the atlas name is chosen at the weapon's load (FPSWeapon.cs:637-644), and the rig's cache key carries it
   modFeature('roleplay-realism', () => t('features.effect.gameLoads', 'Takes effect when the game next loads.'), 'loot'),   // RR1: the class enemies' appearance is written into the basics at load (RoleplayRealism.cs:186-189); every other arm reads its switch at the roll
   modFeature('handheld-torches', () => t('features.effect.atOnce', 'Takes effect at once.'), 'loot'),   // HT1: the component reads its switches every frame
-  // AT0: AMBIENT TEXT - `world`, because what it talks
-  // about is where you are. Its effect line is the mod's own pacing:
-  // off falls silent at once, and on hands the mod back a clock that
-  // has been running the whole time (AT1 - the interval keeps running
-  // while the mod is quiet, exactly as it does while you are indoors).
-  modFeature('ambient-text', () => t('features.effect.atOnce', 'Takes effect at once.'), 'interface'),   // FT18: was world
   // EOTB0: EYE OF THE BEHOLDER - third person for a
   // player with no Morrowind data. Filed under `world` rather than
   // `combat`: it changes where you see the whole game from, not how a

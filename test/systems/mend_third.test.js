@@ -7,6 +7,7 @@
 // & Realism: Items' own roll (randomConditionLootItems), mended by the real kit (repairKitUse), the real ring's rounds
 // (runMagicRoundsFor) and the real stone (useVarlaStone), priced through the trade window's own walk.
 // MEND-THIRD;.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -119,7 +120,8 @@ test('MEND-THIRD: online a smith\'s whole repair of a found piece adds nothing t
   });
 });
 
-test('MEND-THIRD: the thread\'s ways sell again - a field kit on a found Daedric cuirass, a ring of Repairs Objects through an eight-hour rest over six, and the Varla Stone each lift the online sale by a third of what they mended (mutants: nothing credited; the ring\'s or the stone\'s mend uncredited)', () => {
+test('MEND-THIRD: the thread\'s ways sell again - a field kit on a found Daedric cuirass, a ring of Repairs Objects through an eight-hour rest over six, and the Varla Stone each lift the online sale by a third of what they mended (mutants: nothing credited; the ring\'s or the stone\'s mend uncredited)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the figures below are priced under the server profile's sale cap
   // the kit: a Daedric cuirass found at 47% (Mercantile 30, Personality 40, a quality-10 counter) - +2,377 (B4 took the
   // Daedric sale rule off, so a counter pays Daedric whole again)
   const plate = found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0.5);

@@ -10,6 +10,7 @@
 // a lot costing 17397) a seller at 346 was offered -2311 gold, and the sale's addGold took it from the purse. Every
 // purchase fell with it - the counter's gold a piece, a room and a cure free and then paying the buyer. Online the
 // haggle reads its own range now, 0 to 100; offline, DFU's reads stand.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateTradePrice, calculateCost, ONLINE_SALE_SHARE, ONLINE_HAGGLE_MAX, essentialPrice } from '../../src/systems/shopStock.js';
@@ -35,7 +36,8 @@ function onlinePage(fn) {
 }
 const [Q, COST] = [5, 17397];   // the field's counter and lot (MERC-RISE, Field-Bugs-2026-09-29d)
 
-test('MERC-CAP: the field\'s seller at 346 Mercantile - offered -2311 gold for the lot, now what the best haggler is paid', () => {
+test('MERC-CAP: the field\'s seller at 346 Mercantile - offered -2311 gold for the lot, now what the best haggler is paid', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   // the root, in DFU's own numbers (offline, where they stand): past 100 the ask keeps falling, and at 346 it is under nothing
   assert.equal(ask(COST, Q, 100, 100, false), 5436);
   assert.equal(ask(COST, Q, 346, 100, false), -4622);
@@ -50,7 +52,8 @@ test('MERC-CAP: the field\'s seller at 346 Mercantile - offered -2311 gold for t
   });
 });
 
-test('MERC-CAP: online the haggle reads 0..100 - a sale never falls with a skill or goes under nothing, no price is under the best haggler\'s, P0.4 holds for every seller, and inside the range nothing moves', () => {
+test('MERC-CAP: online the haggle reads 0..100 - a sale never falls with a skill or goes under nothing, no price is under the best haggler\'s, P0.4 holds for every seller, and inside the range nothing moves', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   assert.equal(ONLINE_HAGGLE_MAX, 100, 'DFU\'s maximum skill and stat');
   let checked = 0;
   for (let q = 0; q <= 20; q++) {
