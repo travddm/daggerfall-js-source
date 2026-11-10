@@ -1021,7 +1021,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'questlines', initial: true, online: 'room' }),   // systems/questlines/qlLaw.js QUESTLINES_PREF
   }),
-  QUEST_REWARDS_ROW, SPAWNED_DUNGEONS_ROW,   // QUESTLINE-REWARDS: the reward scale, DFU's selectable; spawned dungeons, off by default as DFU has none
+  QUEST_REWARDS_ROW, SPAWNED_DUNGEONS_ROW,   // the quest reward scale, with DFU's selectable; spawned dungeons, off by default as DFU has none
   // LW2: THE LIVING WORLD
   //  - a town's people are its residents, each with a name, a home, a trade and a
   // day (systems/livingWorld/livingTown.js stands them where DFU's wandering pool stood). The player's own online: every
