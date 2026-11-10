@@ -3,7 +3,7 @@
 // The client says what it asks - the recipe, its three lines, the dye; the service decides the rest in one batch, as
 // craftAtAnvil does: the character's Master rank, the day's one work, the recipe's goods (a station's, loose too) and
 // the catalysts it counted (own or bought, never loose - src/net/masterLaw.js MASTER_CATALYSTS), the roll's seed and
-// the signed record (net/productRecord.js MINT_V_MASTER). EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
+// the signed record (net/productRecord.js masterVersionOf: the tier it is made at). EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
 import { mintId, overRate } from './accounts.js';
 import { dice } from './unitRoll.js';
 import { signingKey } from './signing.js';
@@ -13,8 +13,8 @@ import {
 } from './professions.js';
 import { rankOfXp, PROF_OPS_MAX, PROF_OPS_WINDOW_S } from '../../src/net/professionLaw.js';
 import { recipeById, recipeOpen, makerMark, dyeOk, MASTERWORK, JUDGED_CLOTH } from '../../src/net/recipeLaw.js';
-import { mintProductRecord, MINT_V_MASTER } from '../../src/net/productRecord.js';
-import { MASTER_RANK, MASTER_CATALYSTS, masterChoiceRefusal, masterTrackOf, masterDayOf, rollMasterLines, masterRecordLines, masterLinesOfRecord, masterKeyOf } from '../../src/net/masterLaw.js';
+import { mintProductRecord, masterVersionOf } from '../../src/net/productRecord.js';
+import { MASTER_RANK, MASTER_CATALYSTS, masterChoiceRefusal, masterTrackOf, masterDayOf, rollMasterLines, masterRecordLines, masterLinesOfRecord, masterKeyOf, masterTierFor } from '../../src/net/masterLaw.js';
 import { LOOSE_ORIGIN } from '../../src/net/bagLaw.js';
 
 /** Every key a Master's work of `r` spends, and how many of each: `{ key, in, cat }` - the recipe's goods (`in`) and the
@@ -51,8 +51,8 @@ async function masterAnswer(db, player, row, nowS, extra = {}) {
 }
 
 /**
- * A MASTER'S WORK: `{ character, recipe, lines, name, dye, rid }` - a Legendary piece of `recipe` with the three `lines`
- * chosen (masterLaw.js: `kind` or `kind:param`), its values the service's roll in the Legendary band, a Masterwork with
+ * A MASTER'S WORK: `{ character, recipe, lines, name, dye, rid }` - a Rare piece (Legendary where PROF_MASTER_LEGENDARY is on) of `recipe` with the three `lines`
+ * chosen (masterLaw.js: `kind` or `kind:param`), its values the service's roll in that tier's band, a Masterwork with
  * the maker's mark. Refused: a recipe whose piece takes no tier (`prof-master`), lines the piece may not carry
  * (`prof-master-lines`), a dye on anything but a garment (`prof-dye`), a craft not at Master (`prof-rank`), the day's
  * work made (`prof-master-day`), goods or catalysts short (`stores-short`, `stores-gold`, with the `material`). No XP: a
@@ -82,11 +82,12 @@ export async function masterWork(ctx, player, env, { character, recipe: id, line
   const seed = Math.floor(dice(rand) * 4294967296);
   const provenance = provenanceId(rand);
   // AUDIT HORIZONTAL B1: THE ROLL, ONCE - the record and the row keep its values, so no reader rolls today's bands again
-  const rolled = rollMasterLines(r, lines, seed);
+  const tier = masterTierFor(env);   // Rare, so crafted gear stays below Legendary, unless PROF_MASTER_LEGENDARY is on
+  const rolled = rollMasterLines(r, lines, seed, tier);
   if (!rolled) return { error: 'prof-master-lines' };
   const signed = masterRecordLines(rolled);
   const record = await mintProductRecord({ p: provenance, s: player.id, h: character, r: r.id, q: MASTERWORK, m: maker, c: seed, a: maker !== null,
-    u: dye ?? null, v: MINT_V_MASTER, l: signed }, await signingKey(env, subtle), { subtle, nowS });
+    u: dye ?? null, v: masterVersionOf(tier), l: signed }, await signingKey(env, subtle), { subtle, nowS });
   const nonce = mintId(rand);
   const spends = masterSpends(r);
   const decided = 'EXISTS (SELECT 1 FROM prof_masters WHERE player = ?1 AND rid = ?5 AND n = ?6)';

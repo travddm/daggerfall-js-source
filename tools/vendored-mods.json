@@ -1,0 +1,1906 @@
+{
+  "shared": {
+    "terms": [
+      "ajrb/dfunity-mods",
+      "Hazelnut",
+      "Ralzar",
+      "carademono",
+      "Kamer",
+      "RedRoryOTheGlen",
+      "RedRory",
+      "demifiend000",
+      "jet082",
+      "jefetienne",
+      "Kirk.O",
+      "magicono43",
+      "Cliffworms",
+      "Regnier",
+      "joshcamas",
+      "Steinhauer",
+      "BadLuckBurt",
+      "Harbinger451",
+      "LordSquacquerone",
+      "kkgobkk",
+      "ShortBeard",
+      "Jagget",
+      "RosyTheRascal",
+      "RealAKP",
+      "Kokey",
+      "Greatness7",
+      "Positronico"
+    ],
+    "patterns": [
+      "\\bKab\\b"
+    ],
+    "counts": {
+      "paths": 0,
+      "lines": 3177
+    }
+  },
+  "mods": [
+    {
+      "folder": "ambient-text",
+      "title": "Ambient Text",
+      "authors": [
+        "Regnier"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/303"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/ambient-text/",
+        "src/systems/ambientText.js"
+      ],
+      "terms": [
+        "ambient-text",
+        "ambientText",
+        "Ambient Text"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/303\\b"
+      ],
+      "counts": {
+        "paths": 0,
+        "lines": 0
+      }
+    },
+    {
+      "folder": "aquatic-sprites",
+      "title": "Aquatic Sprites",
+      "authors": [
+        "Cliffworms"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/276"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/aquatic-sprites/"
+      ],
+      "terms": [
+        "aquatic-sprites",
+        "aquaticSprites",
+        "Aquatic Sprites"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/276\\b"
+      ],
+      "counts": {
+        "paths": 6,
+        "lines": 27
+      }
+    },
+    {
+      "folder": "beautiful-cities",
+      "title": "Beautiful Cities",
+      "authors": [
+        "carademono"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/720"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/beautiful-cities/"
+      ],
+      "terms": [
+        "beautiful-cities",
+        "beautifulCities",
+        "Beautiful Cities"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/720\\b"
+      ],
+      "counts": {
+        "paths": 3,
+        "lines": 275
+      }
+    },
+    {
+      "folder": "beautiful-villages",
+      "title": "Beautiful Villages",
+      "authors": [
+        "carademono"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/566"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/beautiful-villages/"
+      ],
+      "terms": [
+        "beautiful-villages",
+        "beautifulVillages",
+        "Beautiful Villages"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/566\\b"
+      ],
+      "counts": {
+        "paths": 3,
+        "lines": 302
+      }
+    },
+    {
+      "folder": "better-ambience",
+      "title": "Better Ambience",
+      "authors": [
+        "joshcamas"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/joshcamas/daggerfall-unity-mods"
+        ]
+      },
+      "paths": [
+        "vendor/better-ambience/",
+        "src/systems/betterAmbience.js"
+      ],
+      "terms": [
+        "better-ambience",
+        "betterAmbience",
+        "Better Ambience",
+        "joshcamas/daggerfall-unity-mods"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 21,
+        "lines": 264
+      }
+    },
+    {
+      "folder": "class-skins",
+      "title": "Class Skins",
+      "authors": [
+        "Kamer"
+      ],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "vendor/class-skins/",
+        "src/player/classSkins.js",
+        "tools/classSkinsListing.mjs"
+      ],
+      "terms": [
+        "class-skins",
+        "classSkins",
+        "Class Skins"
+      ],
+      "patterns": [
+        "ExistingClasses(?!/)"
+      ],
+      "counts": {
+        "paths": 1688,
+        "lines": 45
+      }
+    },
+    {
+      "folder": "climates-calories",
+      "title": "Climates & Calories",
+      "authors": [
+        "Ralzar"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/49"
+        ],
+        "github": [
+          "https://github.com/Ralzar81/Climates-Calories"
+        ]
+      },
+      "paths": [
+        "vendor/climates-calories/",
+        "src/systems/survival/camp.js",
+        "src/systems/survival/difficulty.js",
+        "src/systems/survival/env.js",
+        "src/systems/survival/food.js",
+        "src/systems/survival/hearth.js",
+        "src/systems/survival/items.js",
+        "src/systems/survival/loot.js",
+        "src/systems/survival/needs.js",
+        "src/systems/survival/rest.js",
+        "src/systems/survival/status.js",
+        "src/systems/survival/switch.js",
+        "src/systems/survival/tavernMenu.js",
+        "src/systems/survival/temperature.js"
+      ],
+      "terms": [
+        "climates-calories",
+        "climatesCalories",
+        "Climates & Calories",
+        "tavernMenu",
+        "Climates and Calories",
+        "systems/survival/",
+        "test/systems/survival/",
+        "'./survival/",
+        "'../survival/",
+        "survivalOn",
+        "survivalRules",
+        "Ralzar81/Climates-Calories"
+      ],
+      "patterns": [
+        "\\bSURV\\d+",
+        "daggerfallunity/mods/49\\b"
+      ],
+      "counts": {
+        "paths": 34,
+        "lines": 936
+      }
+    },
+    {
+      "folder": "come-sail-away",
+      "title": "Come Sail Away",
+      "authors": [
+        "RedRoryOTheGlen"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1131"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/come-sail-away/",
+        "src/render/comeSailAwayRender.js",
+        "src/scenes/comeSailAway/comeSailAwayAboard.js",
+        "src/scenes/comeSailAway/comeSailAwayPeers.js",
+        "src/scenes/comeSailAway/comeSailAwayPool.js",
+        "src/scenes/comeSailAway/deckFittingsHost.js",
+        "src/scenes/comeSailAway/farLife.js",
+        "src/scenes/comeSailAway/peerHulls.js",
+        "src/scenes/comeSailAway/shipLiveryPaint.js",
+        "src/scenes/comeSailAway/shipPlaque.js",
+        "src/scenes/csaAudio.js",
+        "src/scenes/csaMapHost.js",
+        "src/systems/comeSailAway/comeSailAway.js",
+        "src/systems/comeSailAway/comeSailAwayActions.js",
+        "src/systems/comeSailAway/comeSailAwayBoat.js",
+        "src/systems/comeSailAway/comeSailAwayHulls.js",
+        "src/systems/comeSailAway/comeSailAwayItems.js",
+        "src/systems/comeSailAway/comeSailAwayMap.js",
+        "src/systems/comeSailAway/comeSailAwayModels.js",
+        "src/systems/comeSailAway/comeSailAwayWaves.js",
+        "src/systems/comeSailAway/comeSailAwayWire.js",
+        "src/systems/comeSailAway/csaBoatMenu.js",
+        "src/systems/comeSailAway/csaLoadWind.js",
+        "src/systems/comeSailAway/peaceWay.js",
+        "src/ui/enhanced/enhancedHelm.js",
+        "tools/comeSailAwayExtract.mjs",
+        "tools/csaBench.mjs"
+      ],
+      "terms": [
+        "come-sail-away",
+        "comeSailAway",
+        "Come Sail Away",
+        "comeSailAwayRender",
+        "comeSailAwayAboard",
+        "comeSailAwayPeers",
+        "comeSailAwayPool",
+        "deckFittingsHost",
+        "peerHulls",
+        "shipLiveryPaint",
+        "shipPlaque",
+        "csaAudio",
+        "csaMapHost",
+        "comeSailAwayActions",
+        "comeSailAwayBoat",
+        "comeSailAwayHulls",
+        "comeSailAwayItems",
+        "comeSailAwayMap",
+        "comeSailAwayModels",
+        "comeSailAwayWaves",
+        "comeSailAwayWire",
+        "csaBoatMenu",
+        "csaLoadWind",
+        "peaceWay",
+        "enhancedHelm"
+      ],
+      "patterns": [
+        "\\bcsa[A-Z]\\w*",
+        "\\bCSA_\\w+",
+        "\\bCSA\\d*\\b",
+        "daggerfallunity/mods/1131\\b"
+      ],
+      "counts": {
+        "paths": 72,
+        "lines": 3725
+      }
+    },
+    {
+      "folder": "daggerfall-arena",
+      "title": "Daggerfall Arena",
+      "authors": [
+        "Kamer"
+      ],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "vendor/daggerfall-arena/",
+        "src/world/arena/arenaCity.js",
+        "src/world/arena/arenaFloor.js",
+        "src/world/arena/arenaModel.js",
+        "src/world/arena/arenaPlaques.js",
+        "src/world/arena/arenaUndercroft.js",
+        "tools/daggerfallArenaExtract.mjs"
+      ],
+      "terms": [
+        "daggerfall-arena",
+        "daggerfallArena",
+        "Daggerfall Arena",
+        "arenaCity",
+        "arenaFloor",
+        "arenaModel",
+        "arenaPlaques",
+        "arenaUndercroft",
+        "world/arena/",
+        "daggerfall_arena"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 13,
+        "lines": 380
+      }
+    },
+    {
+      "folder": "daggerfall-enemy-expansion",
+      "title": "Daggerfall Enemy Expansion",
+      "authors": [
+        "Kamer",
+        "Kab"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/372"
+        ],
+        "github": [
+          "https://github.com/SquidKamer/DaggerfallBestiaryProject"
+        ]
+      },
+      "paths": [
+        "vendor/daggerfall-enemy-expansion/",
+        "public/art/daggerfall-enemy-expansion/",
+        "public/art/daggerfall-enemy-expansion-repainted/",
+        "src/systems/enemyExpansion/classic-stat-pass.ts",
+        "src/systems/enemyExpansion/dexArt.js",
+        "src/systems/enemyExpansion/dexBodies.js",
+        "src/systems/enemyExpansion/dexCombat.js",
+        "src/systems/enemyExpansion/dexCsv.js",
+        "src/systems/enemyExpansion/dexEncounters.js",
+        "src/systems/enemyExpansion/dexEquipment.js",
+        "src/systems/enemyExpansion/dexIds.js",
+        "src/systems/enemyExpansion/dexInstall.js",
+        "src/systems/enemyExpansion/dexNames.js",
+        "src/systems/enemyExpansion/dexSpells.js",
+        "src/systems/enemyExpansion/dexSprites.js",
+        "src/systems/enemyExpansion/dexSwitches.js",
+        "src/systems/enemyExpansion/dexTables.js",
+        "src/systems/enemyExpansion/dexTableText.js",
+        "src/systems/enemyExpansion/dexTroll.js",
+        "tools/dexExtract.mjs"
+      ],
+      "terms": [
+        "daggerfall-enemy-expansion",
+        "daggerfallEnemyExpansion",
+        "Daggerfall Enemy Expansion",
+        "classic-stat-pass",
+        "dexBodies",
+        "dexCombat",
+        "dexEncounters",
+        "dexEquipment",
+        "dexInstall",
+        "dexNames",
+        "dexSpells",
+        "dexSprites",
+        "dexSwitches",
+        "dexTables",
+        "dexTroll",
+        "enemyExpansion/",
+        "BestiaryProject",
+        "Enemy Expansion",
+        "SquidKamer/DaggerfallBestiaryProject"
+      ],
+      "patterns": [
+        "\\bdex[A-Z]\\w*",
+        "\\bDEX_\\w+",
+        "\\bDEX\\d*\\b",
+        "daggerfallunity/mods/372\\b"
+      ],
+      "counts": {
+        "paths": 5543,
+        "lines": 860
+      }
+    },
+    {
+      "folder": "mudex",
+      "title": "MUDEX",
+      "authors": [
+        "Ralzar"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/Ralzar81/MUDEX"
+        ]
+      },
+      "paths": [
+        "vendor/mudex/",
+        "src/systems/enemyExpansion/mudexTableText.js",
+        "tools/mudexText.mjs"
+      ],
+      "terms": [
+        "mudex",
+        "mudexTableText",
+        "Ralzar81/MUDEX"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 6,
+        "lines": 132
+      }
+    },
+    {
+      "folder": "detailed-ships",
+      "title": "Detailed Ships",
+      "authors": [
+        "Cliffworms"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1080"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/detailed-ships/",
+        "src/systems/detailedShips.js",
+        "src/world/detStandIns.js",
+        "tools/detailedShipsAssets.mjs"
+      ],
+      "terms": [
+        "detailed-ships",
+        "detailedShips",
+        "Detailed Ships",
+        "detStandIns"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1080\\b"
+      ],
+      "counts": {
+        "paths": 19,
+        "lines": 176
+      }
+    },
+    {
+      "folder": "diverse-weapons",
+      "title": "Diverse Weapons",
+      "authors": [
+        "RealAKP"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/242"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/diverse-weapons/",
+        "public/art/diverse-weapons/",
+        "src/combat/diverseWeapons/diverseWeapons.js",
+        "src/combat/diverseWeapons/diverseWeaponsAssets.js",
+        "src/combat/diverseWeapons/diverseWeaponsIcons.js",
+        "src/combat/diverseWeapons/diverseWeaponsIndex.js",
+        "tools/diverseWeaponsExtract.mjs",
+        "tools/diverseWeaponsIndex.mjs"
+      ],
+      "terms": [
+        "diverse-weapons",
+        "diverseWeapons",
+        "Diverse Weapons",
+        "diverseWeaponsAssets",
+        "diverseWeaponsIcons"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/242\\b"
+      ],
+      "counts": {
+        "paths": 12635,
+        "lines": 258
+      }
+    },
+    {
+      "folder": "dynamic-skies",
+      "title": "Dynamic Skies",
+      "authors": [
+        "BadLuckBurt",
+        "carademono"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/drcarademono/dynamic-skies"
+        ]
+      },
+      "paths": [
+        "vendor/dynamic-skies/",
+        "src/render/dynamicSkiesBridge.js",
+        "src/render/dynamicSkiesRenderer.js",
+        "src/systems/dynamicSkies/dynamicSkies.js",
+        "src/systems/dynamicSkies/dynamicSkiesAssets.js",
+        "src/systems/dynamicSkies/dynamicSkiesRuntime.js"
+      ],
+      "terms": [
+        "dynamic-skies",
+        "dynamicSkies",
+        "Dynamic Skies",
+        "dynamicSkiesBridge",
+        "dynamicSkiesRenderer",
+        "dynamicSkiesAssets",
+        "dynamicSkiesRuntime",
+        "drcarademono/dynamic-skies"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 43,
+        "lines": 282
+      }
+    },
+    {
+      "folder": "eye-of-the-beholder",
+      "title": "Eye Of The Beholder",
+      "authors": [
+        "RedRoryOTheGlen"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/762"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/eye-of-the-beholder/",
+        "src/player/eyeOfTheBeholder/eotbBillboard.js",
+        "src/player/eyeOfTheBeholder/eotbBody.js",
+        "src/player/eyeOfTheBeholder/eotbCamera.js",
+        "src/player/eyeOfTheBeholder/eotbLantern.js",
+        "src/player/eyeOfTheBeholder/eotbSprite.js",
+        "src/player/eyeOfTheBeholder/eotbWagon.js",
+        "tools/eotbIl.mjs"
+      ],
+      "terms": [
+        "eye-of-the-beholder",
+        "eyeOfTheBeholder",
+        "Eye Of The Beholder",
+        "eotbBillboard",
+        "eotbBody",
+        "eotbCamera",
+        "eotbLantern",
+        "eotbSprite",
+        "eotbWagon"
+      ],
+      "patterns": [
+        "\\beotb[A-Z]\\w*",
+        "\\bEOTB\\w*",
+        "daggerfallunity/mods/762\\b"
+      ],
+      "counts": {
+        "paths": 3050,
+        "lines": 1368
+      }
+    },
+    {
+      "folder": "foraging",
+      "title": "Foraging",
+      "authors": [
+        "Harbinger451"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1260"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/foraging/",
+        "src/scenes/foragingWait.js",
+        "src/systems/foraging/foragingCore.js",
+        "src/systems/foraging/foragingInstall.js",
+        "src/systems/foraging/foragingLaw.js"
+      ],
+      "terms": [
+        "vendor/foraging",
+        "art/foraging",
+        "'foraging'",
+        "\"foraging\"",
+        "mods.foraging.",
+        "foragingWait",
+        "foragingCore",
+        "foragingInstall",
+        "foragingLaw",
+        "systems/foraging/"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1260\\b"
+      ],
+      "counts": {
+        "paths": 40,
+        "lines": 267
+      }
+    },
+    {
+      "folder": "grimoire-ui",
+      "title": "GrimoireUI",
+      "authors": [
+        "LordSquacquerone"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1222"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/grimoire-ui/",
+        "public/art/grimoire-ui/",
+        "src/ui/grimoireArt.js"
+      ],
+      "terms": [
+        "grimoire-ui",
+        "grimoireUi",
+        "GrimoireUI",
+        "grimoireArt"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1222\\b"
+      ],
+      "counts": {
+        "paths": 144,
+        "lines": 101
+      }
+    },
+    {
+      "folder": "handheld-torches",
+      "title": "Handheld Torches",
+      "authors": [
+        "RedRoryOTheGlen"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/780"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/handheld-torches/",
+        "src/scenes/droppedTorches.js",
+        "src/systems/handheldTorches.js"
+      ],
+      "terms": [
+        "handheld-torches",
+        "handheldTorches",
+        "Handheld Torches",
+        "droppedTorches"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/780\\b"
+      ],
+      "counts": {
+        "paths": 44,
+        "lines": 538
+      }
+    },
+    {
+      "folder": "heat-haze",
+      "title": "Heat Haze",
+      "authors": [
+        "demifiend000"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1397"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/heat-haze/",
+        "src/render/heatHaze.js",
+        "src/systems/heatHaze.js"
+      ],
+      "terms": [
+        "heat-haze",
+        "heatHaze",
+        "Heat Haze"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1397\\b"
+      ],
+      "counts": {
+        "paths": 8,
+        "lines": 89
+      }
+    },
+    {
+      "folder": "horse-cart-and-cargo",
+      "title": "Horse Cart and Cargo",
+      "authors": [
+        "demifiend000"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1374"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/horse-cart-and-cargo/",
+        "src/scenes/horseCartPool.js",
+        "src/systems/horse/horseCart.js",
+        "src/systems/horse/horseCartLaw.js",
+        "src/systems/horse/horseCartWire.js",
+        "src/systems/horse/horseFollow.js",
+        "src/systems/horse/trailingPoseCache.js",
+        "src/systems/wagon/wagon41214.js",
+        "src/ui/horseNameTooltip.js",
+        "tools/hccAssets.mjs"
+      ],
+      "terms": [
+        "horse-cart-and-cargo",
+        "horseCartAndCargo",
+        "Horse Cart and Cargo",
+        "horseCartPool",
+        "horseCart",
+        "horseCartLaw",
+        "horseCartWire",
+        "horseFollow",
+        "trailingPoseCache",
+        "horseNameTooltip",
+        "wagon41214",
+        "validHccRecord",
+        "HCC-PARK"
+      ],
+      "patterns": [
+        "\\bhcc[A-Z]\\w*",
+        "\\bHCC\\d*\\b",
+        "daggerfallunity/mods/1374\\b"
+      ],
+      "counts": {
+        "paths": 62,
+        "lines": 1693
+      }
+    },
+    {
+      "folder": "iliac-puddle-no-more",
+      "title": "Iliac Puddle No More",
+      "authors": [
+        "jet082"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1304"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/iliac-puddle-no-more/",
+        "src/render/deepWatersRender.js",
+        "src/scenes/deepWater/deepWatersDecor.js",
+        "src/scenes/deepWater/deepWatersEncounters.js",
+        "src/scenes/deepWater/deepWatersFish.js",
+        "src/scenes/deepWater/deepWatersHost.js",
+        "src/scenes/deepWater/deepWatersLoot.js",
+        "src/scenes/deepWater/deepWatersPlayer.js",
+        "src/scenes/deepWater/deepWatersSwimMove.js",
+        "src/systems/deepWater/deepWaterPlayer.js",
+        "src/systems/deepWater/deepWatersFishItems.js",
+        "src/systems/deepWater/deepWatersFishRows.js",
+        "src/world/deepWater/deepBathymetry.js",
+        "src/world/deepWater/deepWaterCap.js",
+        "src/world/deepWater/deepWaterClassification.js",
+        "src/world/deepWater/deepWaterFloor.js",
+        "src/world/deepWater/deepWaterLook.js",
+        "src/world/deepWater/deepWaterRuntime.js",
+        "src/world/deepWater/deepWatersBake.js",
+        "src/world/deepWater/deepWatersBakeCache.js",
+        "src/world/deepWater/deepWatersClient.js",
+        "src/world/deepWater/deepWatersPixel.js",
+        "src/world/deepWater/deepWaterSurface.js",
+        "src/world/deepWater/deepWaterSwim.js",
+        "src/world/deepWater/deepWatersWorker.js",
+        "src/world/deepWater/deepWaterTileData.js",
+        "src/world/deepWater/deepWaterTransients.js",
+        "src/world/passiveFish.js",
+        "src/world/underwater/underwaterDecorations.js",
+        "src/world/underwater/underwaterEnemies.js",
+        "src/world/underwater/underwaterLoot.js",
+        "tools/iliacPuddleAssets.mjs"
+      ],
+      "terms": [
+        "iliac-puddle-no-more",
+        "iliacPuddleNoMore",
+        "Iliac Puddle No More",
+        "deepWatersRender",
+        "deepWatersDecor",
+        "deepWatersEncounters",
+        "deepWatersFish",
+        "deepWatersHost",
+        "deepWatersLoot",
+        "deepWatersPlayer",
+        "deepWatersSwimMove",
+        "deepWaterPlayer",
+        "deepWatersFishItems",
+        "deepWatersFishRows",
+        "deepBathymetry",
+        "deepWaterCap",
+        "deepWaterClassification",
+        "deepWaterFloor",
+        "deepWaterLook",
+        "deepWaterRuntime",
+        "deepWatersBake",
+        "deepWatersBakeCache",
+        "deepWatersClient",
+        "deepWatersPixel",
+        "deepWaterSurface",
+        "deepWaterSwim",
+        "deepWatersWorker",
+        "deepWaterTileData",
+        "deepWaterTransients",
+        "passiveFish",
+        "underwaterDecorations",
+        "underwaterEnemies",
+        "underwaterLoot",
+        "deepWater/",
+        "deepWaters",
+        "Iliac Puddle"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1304\\b"
+      ],
+      "counts": {
+        "paths": 43,
+        "lines": 912
+      }
+    },
+    {
+      "folder": "immersive-footsteps",
+      "title": "Immersive Footsteps",
+      "authors": [
+        "Kirk.O",
+        "magicono43"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/magicono43/DFU-Mod_Immersive-Footsteps"
+        ]
+      },
+      "paths": [
+        "vendor/immersive-footsteps/",
+        "src/systems/immersiveFootsteps.js"
+      ],
+      "terms": [
+        "immersive-footsteps",
+        "immersiveFootsteps",
+        "Immersive Footsteps",
+        "magicono43/DFU-Mod_Immersive-Footsteps"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 2,
+        "lines": 189
+      }
+    },
+    {
+      "folder": "immersive-travel",
+      "title": "Immersive Travel",
+      "authors": [
+        "kkgobkk"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/986"
+        ],
+        "github": [
+          "https://github.com/kkgobkk/immersive-travel"
+        ]
+      },
+      "paths": [
+        "vendor/immersive-travel/",
+        "src/systems/immersiveTravel.js",
+        "src/systems/immersiveTravelTables.js",
+        "src/world/immersiveTravelGates.js",
+        "tools/immersiveTravelPatches.mjs"
+      ],
+      "terms": [
+        "immersive-travel",
+        "immersiveTravel",
+        "Immersive Travel",
+        "immersiveTravelTables",
+        "immersiveTravelGates",
+        "kkgobkk/immersive-travel"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/986\\b"
+      ],
+      "counts": {
+        "paths": 13,
+        "lines": 157
+      }
+    },
+    {
+      "folder": "improved-interior-lighting",
+      "title": "Improved Interior Lighting",
+      "authors": [
+        "ShortBeard"
+      ],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "src/render/classicShadowLane.js",
+        "src/systems/improvedInteriorLighting.js"
+      ],
+      "terms": [
+        "improved-interior-lighting",
+        "improvedInteriorLighting",
+        "Improved Interior Lighting",
+        "classicShadowLane"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 2,
+        "lines": 59
+      }
+    },
+    {
+      "folder": "low-poly-trees",
+      "title": "Low Poly Trees",
+      "authors": [
+        "SquidKamer"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/380"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/low-poly-trees/",
+        "src/render/lowPolyTreesGlsl.js",
+        "src/render/lowPolyTreesRender.js",
+        "src/systems/lowPolyTreesAssets.js",
+        "src/world/lowPolyTrees.js",
+        "src/world/lptCrowns.js",
+        "tools/bakeLptCrowns.mjs",
+        "tools/lowPolyTreesExtract.mjs"
+      ],
+      "terms": [
+        "low-poly-trees",
+        "lowPolyTrees",
+        "Low Poly Trees",
+        "lowPolyTreesGlsl",
+        "lowPolyTreesRender",
+        "lowPolyTreesAssets",
+        "lptCrowns"
+      ],
+      "patterns": [
+        "\\blpt[A-Z]\\w*",
+        "\\bLPT\\w*",
+        "daggerfallunity/mods/380\\b"
+      ],
+      "counts": {
+        "paths": 12,
+        "lines": 704
+      }
+    },
+    {
+      "folder": "ocean-holes",
+      "title": "There's a Hole in the Bottom of the Ocean",
+      "authors": [
+        "jet082"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1313"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/ocean-holes/",
+        "src/render/oceanHolesRender.js",
+        "src/scenes/oceanHolesAbyss.js",
+        "src/scenes/oceanHolesHost.js",
+        "src/scenes/oceanHolesPits.js",
+        "src/scenes/ohLootHost.js",
+        "src/world/oceanHoles.js",
+        "src/world/oceanHolesMiasma.js"
+      ],
+      "terms": [
+        "ocean-holes",
+        "oceanHoles",
+        "There's a Hole in the Bottom of the Ocean",
+        "oceanHolesRender",
+        "oceanHolesAbyss",
+        "oceanHolesHost",
+        "oceanHolesPits",
+        "ohLootHost",
+        "oceanHolesMiasma",
+        "Ocean Holes",
+        "Hole in the Bottom"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1313\\b"
+      ],
+      "counts": {
+        "paths": 11,
+        "lines": 207
+      }
+    },
+    {
+      "folder": "pcaao",
+      "title": "Physical Combat And Armor Overhaul",
+      "authors": [
+        "Kirk.O",
+        "magicono43"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/magicono43/DFU-Mod_Physical-Combat-And-Armor-Overhaul"
+        ]
+      },
+      "paths": [
+        "vendor/pcaao/",
+        "src/combat/pcaao-critical.ts",
+        "src/combat/pcaao.js"
+      ],
+      "terms": [
+        "pcaao",
+        "Physical Combat And Armor Overhaul",
+        "pcaao-critical",
+        "magicono43/DFU-Mod_Physical-Combat-And-Armor-Overhaul"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 5,
+        "lines": 505
+      }
+    },
+    {
+      "folder": "physical-items",
+      "title": "Physical Items",
+      "authors": [
+        "demifiend000"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1411"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/physical-items/",
+        "src/scenes/physicalItemsLayer.js",
+        "src/systems/physicalItems.js"
+      ],
+      "terms": [
+        "physical-items",
+        "physicalItems",
+        "Physical Items",
+        "physicalItemsLayer"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1411\\b"
+      ],
+      "counts": {
+        "paths": 7,
+        "lines": 111
+      }
+    },
+    {
+      "folder": "quest-actions-extension",
+      "title": "Quest Actions Extension",
+      "authors": [
+        "Jagget"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/Jagget/QuestActionsExtension"
+        ]
+      },
+      "paths": [
+        "src/systems/quest/questActionsExtension.js"
+      ],
+      "terms": [
+        "quest-actions-extension",
+        "questActionsExtension",
+        "Quest Actions Extension",
+        "QuestActionsExtension",
+        "Jagget/QuestActionsExtension"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 1,
+        "lines": 35
+      }
+    },
+    {
+      "folder": "readied-spellcasting-hands",
+      "title": "Readied Spellcasting Hands",
+      "authors": [
+        "jefetienne"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/91"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/readied-spellcasting-hands/",
+        "src/combat/fpsSpellCasting.js",
+        "tools/readiedHandsAssets.mjs"
+      ],
+      "terms": [
+        "readied-spellcasting-hands",
+        "readiedSpellcastingHands",
+        "Readied Spellcasting Hands",
+        "fpsSpellCasting"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/91\\b"
+      ],
+      "counts": {
+        "paths": 7,
+        "lines": 167
+      }
+    },
+    {
+      "folder": "roads-hazelnut",
+      "title": "Basic Roads",
+      "authors": [
+        "Hazelnut"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/134"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/roads-hazelnut/"
+      ],
+      "terms": [
+        "roads-hazelnut",
+        "roadsHazelnut",
+        "Basic Roads",
+        "loadModRoads",
+        "MOD_ROADS",
+        "retryModRoads",
+        "basicRoadsOn"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/134\\b"
+      ],
+      "counts": {
+        "paths": 5,
+        "lines": 361
+      }
+    },
+    {
+      "folder": "roleplay-realism",
+      "title": "Roleplay & Realism",
+      "authors": [
+        "Hazelnut"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/16"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/roleplay-realism/",
+        "public/art/roleplay-realism/",
+        "src/systems/roleplayRealism/rrInstall.js",
+        "src/systems/roleplayRealism/rrQuestLine.js",
+        "src/systems/roleplayRealism/rrRealism.js",
+        "src/systems/roleplayRealism/rrRidingHost.js",
+        "src/systems/roleplayRealism/rrVariants.js"
+      ],
+      "terms": [
+        "rrInstall",
+        "rrQuestLine",
+        "rrRealism",
+        "rrRidingHost",
+        "rrVariants",
+        "roleplayRealism/"
+      ],
+      "patterns": [
+        "[Rr]oleplay-realism(?!-items)",
+        "[Rr]oleplayRealism(?!Items)",
+        "Roleplay & Realism(?!: Items)",
+        "daggerfallunity/mods/16\\b"
+      ],
+      "counts": {
+        "paths": 56,
+        "lines": 474
+      }
+    },
+    {
+      "folder": "roleplay-realism-items",
+      "title": "Roleplay & Realism: Items",
+      "authors": [
+        "Hazelnut",
+        "Ralzar"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/61"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/roleplay-realism-items/",
+        "public/art/roleplay-realism-items/",
+        "src/combat/rriEnemyEquipment.js",
+        "src/systems/roleplayRealismItems/rriIndex.js",
+        "src/systems/roleplayRealismItems/rriInstall.js",
+        "src/systems/roleplayRealismItems/rriItems.js",
+        "src/systems/roleplayRealismItems/rriKits.js",
+        "src/systems/roleplayRealismItems/rriRealism.js",
+        "tools/rriExtract.mjs"
+      ],
+      "terms": [
+        "roleplay-realism-items",
+        "roleplayRealismItems",
+        "Roleplay & Realism: Items",
+        "rriEnemyEquipment",
+        "rriIndex",
+        "rriInstall",
+        "rriItems",
+        "rriRealism",
+        "customItemClass"
+      ],
+      "patterns": [
+        "\\brri[A-Z]\\w*",
+        "\\bRRI_\\w+",
+        "\\bRRI\\d*\\b",
+        "daggerfallunity/mods/61\\b"
+      ],
+      "counts": {
+        "paths": 307,
+        "lines": 692
+      }
+    },
+    {
+      "folder": "sands-of-the-alikr",
+      "title": "Sands of the Alik'r",
+      "authors": [],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1390"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/sands-of-the-alikr/",
+        "public/art/sands-of-the-alikr/"
+      ],
+      "terms": [
+        "sands-of-the-alikr",
+        "sandsOfTheAlikr",
+        "Sands of the Alik'r"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1390\\b"
+      ],
+      "counts": {
+        "paths": 50,
+        "lines": 39
+      }
+    },
+    {
+      "folder": "seasons-iliac-bay",
+      "title": "Seasons of the Iliac Bay",
+      "authors": [
+        "RosyTheRascal"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1377"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/seasons-iliac-bay/",
+        "src/systems/seasonsIliacBay.js",
+        "src/systems/seasonsIliacBayAssets.js"
+      ],
+      "terms": [
+        "seasons-iliac-bay",
+        "seasonsIliacBay",
+        "Seasons of the Iliac Bay",
+        "seasonsIliacBayAssets"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1377\\b"
+      ],
+      "counts": {
+        "paths": 4,
+        "lines": 114
+      }
+    },
+    {
+      "folder": "shield-widget",
+      "title": "Shield Widget",
+      "authors": [
+        "RedRoryOTheGlen"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/733"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/shield-widget/",
+        "src/combat/shieldWidget.js",
+        "src/combat/shieldWidgetAssets.js"
+      ],
+      "terms": [
+        "shield-widget",
+        "shieldWidget",
+        "Shield Widget",
+        "shieldWidgetAssets"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/733\\b"
+      ],
+      "counts": {
+        "paths": 606,
+        "lines": 213
+      }
+    },
+    {
+      "folder": "snowfall",
+      "title": "Snowfall",
+      "authors": [
+        "demifiend000"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1401"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/snowfall/",
+        "public/art/snowfall/",
+        "src/render/snowfallGlsl.js",
+        "src/render/snowfallSurface.js",
+        "src/scenes/snowfallHost.js",
+        "src/systems/snowfall.js",
+        "src/systems/snowfallRuntime.js"
+      ],
+      "terms": [
+        "vendor/snowfall",
+        "art/snowfall",
+        "'snowfall'",
+        "\"snowfall\"",
+        "mods.snowfall.",
+        "snowfallGlsl",
+        "snowfallSurface",
+        "snowfallHost",
+        "snowfallRuntime",
+        "systems/snowfall.js",
+        "'./snowfall.js'",
+        "dynamic-snow"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1401\\b"
+      ],
+      "counts": {
+        "paths": 186,
+        "lines": 172
+      }
+    },
+    {
+      "folder": "travel-options",
+      "title": "Travel Options",
+      "authors": [
+        "Hazelnut"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/122"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/travel-options/",
+        "src/systems/travel/travelAutopilot.js",
+        "src/systems/travel/travelOptions.js",
+        "src/systems/travel/travelOptionsText.js",
+        "src/systems/travel/travelPaths.js",
+        "src/systems/travel/travelPorts.js",
+        "src/ui/enhanced/enhancedTravelControl.js",
+        "src/ui/travel/travelControlUI.js",
+        "src/ui/travel/travelJunctionMap.js",
+        "src/ui/travel/travelMapOptions.js",
+        "src/ui/travel/travelPathsOverlay.js",
+        "src/world/road/pathData.js",
+        "tools/travelOptionsAssets.mjs"
+      ],
+      "terms": [
+        "travel-options",
+        "travelOptions",
+        "Travel Options",
+        "travelAutopilot",
+        "travelOptionsText",
+        "travelPaths",
+        "travelPorts",
+        "enhancedTravelControl",
+        "travelControlUI",
+        "travelJunctionMap",
+        "travelMapOptions",
+        "travelPathsOverlay",
+        "road/pathData"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/122\\b"
+      ],
+      "counts": {
+        "paths": 21,
+        "lines": 1353
+      }
+    },
+    {
+      "folder": "unleveledLoot",
+      "title": "Unleveled Loot",
+      "authors": [
+        "Ralzar"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/Ralzar81/Unleveled-Loot"
+        ]
+      },
+      "paths": [
+        "vendor/unleveledLoot/",
+        "src/systems/unleveledLoot.js"
+      ],
+      "terms": [
+        "unleveledLoot",
+        "Unleveled Loot",
+        "unleveled-loot",
+        "Ralzar81/Unleveled-Loot"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 3,
+        "lines": 175
+      }
+    },
+    {
+      "folder": "vanilla-enhanced",
+      "title": "Vanilla Enhanced",
+      "authors": [
+        "carademono",
+        "Kokey"
+      ],
+      "links": {
+        "nexus": [],
+        "github": [
+          "https://github.com/drcarademono/vanilla-enhanced"
+        ]
+      },
+      "paths": [
+        "vendor/vanilla-enhanced/",
+        "public/art/vanilla-enhanced/",
+        "src/systems/vanillaEnhanced/vanillaEnhanced.js",
+        "src/systems/vanillaEnhanced/vanillaEnhancedDecodeWorker.js",
+        "src/systems/vanillaEnhanced/vanillaEnhancedPack.js",
+        "tools/vanillaEnhancedVendor.mjs"
+      ],
+      "terms": [
+        "vanilla-enhanced",
+        "vanillaEnhanced",
+        "Vanilla Enhanced",
+        "vanillaEnhancedDecodeWorker",
+        "vanillaEnhancedPack",
+        "drcarademono/vanilla-enhanced"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 1448,
+        "lines": 192
+      }
+    },
+    {
+      "folder": "warm-ashes-ships",
+      "title": "Warm Ashes - Ships",
+      "authors": [
+        "Kamer"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/985"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/warm-ashes-ships/",
+        "src/systems/warmAshesShips.js"
+      ],
+      "terms": [
+        "warm-ashes-ships",
+        "warmAshesShips",
+        "Warm Ashes - Ships",
+        "Warm Ashes"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/985\\b"
+      ],
+      "counts": {
+        "paths": 16,
+        "lines": 192
+      }
+    },
+    {
+      "folder": "weapon-sheathing",
+      "title": "Weapon Sheathing",
+      "authors": [
+        "Greatness7"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/morrowind/mods/46069"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/weapon-sheathing/",
+        "src/systems/weaponSheathing.js",
+        "src/systems/weaponSheathingAssets.js"
+      ],
+      "terms": [
+        "weapon-sheathing",
+        "weaponSheathing",
+        "Weapon Sheathing",
+        "weaponSheathingAssets"
+      ],
+      "patterns": [
+        "morrowind/mods/46069\\b"
+      ],
+      "counts": {
+        "paths": 78,
+        "lines": 90
+      }
+    },
+    {
+      "folder": "weapon-widget",
+      "title": "Weapon Widget",
+      "authors": [
+        "RedRoryOTheGlen"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/860"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/weapon-widget/",
+        "src/combat/weapon/weaponWidget.js",
+        "src/combat/weapon/weaponWidgetAssets.js",
+        "src/combat/weapon/weaponWidgetMotion.js"
+      ],
+      "terms": [
+        "weapon-widget",
+        "weaponWidget",
+        "Weapon Widget",
+        "weaponWidgetAssets",
+        "weaponWidgetMotion"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/860\\b"
+      ],
+      "counts": {
+        "paths": 6,
+        "lines": 381
+      }
+    },
+    {
+      "folder": "windfall",
+      "title": "Windfall",
+      "authors": [
+        "demifiend000"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/1396"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/windfall/",
+        "src/render/windfallParticles.js",
+        "src/render/windfallSway.js",
+        "src/scenes/windfallHost.js",
+        "src/systems/windfall.js",
+        "src/systems/windfallEffects.js"
+      ],
+      "terms": [
+        "vendor/windfall",
+        "art/windfall",
+        "'windfall'",
+        "\"windfall\"",
+        "mods.windfall.",
+        "windfallParticles",
+        "windfallSway",
+        "windfallHost",
+        "windfallEffects",
+        "systems/windfall.js",
+        "'./windfall.js'"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/1396\\b"
+      ],
+      "counts": {
+        "paths": 45,
+        "lines": 119
+      }
+    },
+    {
+      "folder": "windmills-kamer",
+      "title": "Windmills of Daggerfall",
+      "authors": [
+        "Kamer"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/33"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/windmills-kamer/",
+        "src/world/windmillInterior.js",
+        "src/world/windmillMesh.js",
+        "src/world/windmills.js",
+        "scripts/bakeWindmill.mjs",
+        "scripts/bakeWindmillInterior.mjs"
+      ],
+      "terms": [
+        "windmills-kamer",
+        "windmillsKamer",
+        "Windmills of Daggerfall",
+        "windmillInterior",
+        "windmillMesh",
+        "bakeWindmill",
+        "bakeWindmillInterior",
+        "world/windmills"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/33\\b"
+      ],
+      "counts": {
+        "paths": 15,
+        "lines": 114
+      }
+    },
+    {
+      "folder": "world-events-raiding-parties",
+      "title": "World Events - Raiding Parties",
+      "authors": [
+        "Kamer"
+      ],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "vendor/world-events-raiding-parties/",
+        "src/systems/raidingParties.js"
+      ],
+      "terms": [
+        "world-events-raiding-parties",
+        "worldEventsRaidingParties",
+        "World Events - Raiding Parties",
+        "raidingParties",
+        "Raiding Parties"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 5,
+        "lines": 238
+      }
+    },
+    {
+      "folder": "world-of-daggerfall",
+      "title": "World of Daggerfall",
+      "authors": [
+        "Kamer"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/181"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/world-of-daggerfall/",
+        "src/world/worldOfDaggerfall/wodLocationData.js",
+        "src/world/worldOfDaggerfall/wodLocationLoader.js",
+        "src/world/worldOfDaggerfall/wodLocationObjects.js",
+        "src/world/worldOfDaggerfall/wodLocationPack.js",
+        "src/world/worldOfDaggerfall/wodPrivateersHold.js",
+        "src/world/worldOfDaggerfall/wodRockUv.js",
+        "src/world/worldOfDaggerfall/wodShared.js",
+        "src/world/worldOfDaggerfall/wodSpawner.js",
+        "src/world/worldOfDaggerfall/worldOfDaggerfall.js",
+        "tools/worldOfDaggerfallAssets.mjs"
+      ],
+      "terms": [
+        "world-of-daggerfall",
+        "worldOfDaggerfall",
+        "World of Daggerfall",
+        "wodLocationData",
+        "wodLocationLoader",
+        "wodLocationObjects",
+        "wodLocationPack",
+        "wodPrivateersHold",
+        "wodRockUv",
+        "wodShared",
+        "wodSpawner"
+      ],
+      "patterns": [
+        "\\bwod[A-Z]\\w*",
+        "\\bWOD\\w*",
+        "daggerfallunity/mods/181\\b"
+      ],
+      "counts": {
+        "paths": 130,
+        "lines": 1136
+      }
+    },
+    {
+      "folder": "world-tooltips",
+      "title": "World Tooltips",
+      "authors": [
+        "jefetienne"
+      ],
+      "links": {
+        "nexus": [
+          "https://www.nexusmods.com/daggerfallunity/mods/158"
+        ],
+        "github": []
+      },
+      "paths": [
+        "vendor/world-tooltips/",
+        "src/systems/worldTooltips.js",
+        "tools/worldTooltipsAssets.mjs"
+      ],
+      "terms": [
+        "world-tooltips",
+        "worldTooltips",
+        "World Tooltips"
+      ],
+      "patterns": [
+        "daggerfallunity/mods/158\\b"
+      ],
+      "counts": {
+        "paths": 7,
+        "lines": 169
+      }
+    },
+    {
+      "folder": "layered-armor",
+      "title": "Layered Armor",
+      "authors": [],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "vendor/layered-armor/",
+        "src/player/eyeOfTheBeholder/layeredArmor.js"
+      ],
+      "terms": [
+        "layered-armor",
+        "layeredArmor",
+        "Layered Armor"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 7653,
+        "lines": 66
+      }
+    },
+    {
+      "folder": "project-legacy",
+      "title": "Project Legacy",
+      "authors": [
+        "Positronico"
+      ],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "vendor/project-legacy/",
+        "src/systems/legacy/"
+      ],
+      "terms": [
+        "project-legacy",
+        "projectLegacy",
+        "Project Legacy"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 22,
+        "lines": 251
+      }
+    },
+    {
+      "folder": "raum-book",
+      "title": "Raum Book",
+      "authors": [],
+      "links": {
+        "nexus": [],
+        "github": []
+      },
+      "paths": [
+        "vendor/raum-book/"
+      ],
+      "terms": [
+        "raum-book",
+        "raumBook",
+        "Raum Book",
+        "project-raum"
+      ],
+      "patterns": [],
+      "counts": {
+        "paths": 4,
+        "lines": 23
+      }
+    }
+  ]
+}

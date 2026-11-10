@@ -91,7 +91,8 @@ retried: the database row is the truth, and the next token the player mints carr
 
 ## The AI reviewer
 
-`server-account/src/modAi.js`, `safetyClock.js`; switch `MOD_AI` (`off`, `shadow`, `on`).
+`server-account/src/modAi.js`, `safetyClock.js`; switch `MOD_AI` (`off`, `shadow`, `on`). The shipped value is
+`off`: `shadow` and `on` send chat lines to Anthropic, so an operator turns the reviewer on on purpose.
 
 - The relay's public-line feed is kept only while `MOD_AI` is not `off` (`takeFeed`).
 - Every minute (`safety` cron job) `safetyMinute` reads the feed, triages open cases, and sends lines to the

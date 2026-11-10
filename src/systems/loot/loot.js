@@ -43,6 +43,7 @@ import { themedIngredientPool } from './lootThemes.js';   // MOD: a monster's Cr
 import { pathOfSignatureIndex } from '../arcanePaths.js';   // AUDIT SCHOOLS: a signature spell's name, by its index band
 import { getLocalizedSpellName } from '../textManager.js';   // L10N3e: a stock spell's name, by its SPELLS.STD index (shownSpellName)
 import { isOnlinePage } from '../online/onlineLane.js';   // REALM P0.4: online, a pile's gold is not the level's
+import { onlineRule } from '../online/serverProfile.ts';   // the server profile's loot.pileGold
 import { rriLootMatrix, rriEnemyLootTableKey, conditionBasedPricesOn, randomConditionLootItems } from '../roleplayRealismItems/rriRealism.js';   // RRI2: LootRealismTables over DefaultLootTables, MobLootKeys over the basics' key, the condition roll on tabled loot
 import { RRI_VENDOR } from '../roleplayRealismItems/rriItems.js';   // FORAGE3: the pile event's first subscriber, named by its mod
 import { RECEIVER_MARKS, VALUE_IS_IDENTITY_TEMPLATES, BOAT_TEMPLATES } from '../../net/realm/realmTradeLaw.js';   // MARK-WIRE: the receiver's marks, one list with the realm's trade law; HACKED-GOLD: the records whose `value` is no price
@@ -886,11 +887,11 @@ export function addEnemyLootExtras(items, basics, rolls = Math.random, { quarter
 const _enemyLootExtras = new Map();
 export function registerEnemyLootExtra(name, fn) { if (typeof fn === 'function') _enemyLootExtras.set(name, fn); else _enemyLootExtras.delete(name); }
 
-/** REALM P0.4: ONLINE A PILE'S GOLD IS NOT
- *  THE LEVEL'S. GenerateRandomLoot rolls a pile's gold times the player's level, so a level-30 character found thirty
+/** The server profile's option (loot.pileGold 'flat'; DFU's level multiple by default): A PILE'S GOLD IS
+ *  NOT THE LEVEL'S. GenerateRandomLoot rolls a pile's gold times the player's level, so a level-30 character found thirty
  *  times a level-1 one's in the same pile, and the hour's respawn (WORLD8) paid it again. Unleveled Loot's own arm
- *  divides it back (unleveledLoot.js unleveledGoldLootPiles), and DFU never calls it; online the division runs for
- *  every pile, the mod on or off, never under one piece. Answers the items. */
+ *  divides it back (unleveledLoot.js unleveledGoldLootPiles); with the option the division runs online for every pile,
+ *  the mod on or off, never under one piece. Answers the items. */
 export function unlevelPileGold(items, level) {
   const by = Math.max(1, Math.trunc(level) || 1);
   for (const it of items) if (it?.group === 'Currency') it.stackCount = Math.max(1, Math.trunc((it.stackCount ?? 0) / by));
@@ -905,7 +906,7 @@ export const PILE_MAP_CHANCES = Object.freeze([2, 1, 1, 2, 2, 15]);   // J, K, L
 
 export function addPileLootExtras(items, lootTableKey, rolls = Math.random, { locationIndex = null, luck = 50, level = 1, online = isOnlinePage(), where = null, quarters = undefined } = {}) {   // PARTY-LOOT: `quarters` the roll's RENOWN-LOOT share for the subscribers (undefined: the roller's own)
   if (!items || !lootTableKey) return items;
-  if (online) unlevelPileGold(items, level);   // REALM P0.4: every pile, whatever its key
+  if (online && onlineRule('loot.pileGold') === 'flat') unlevelPileGold(items, level);   // REALM P0.4: every pile, whatever its key
   // `int alphabetIndex = key - 64` on the FIRST character: 'A' is 1,
   // so J is 10 and O is 15.
   const alphabetIndex = lootTableKey.charCodeAt(0) - 64;

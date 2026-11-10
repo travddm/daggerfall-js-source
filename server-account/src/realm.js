@@ -45,6 +45,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { isMode, tokenCodeOf, modeOfRequest, creatableModes, offeredFromList, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
+import { withoutUnenforcedModes } from '../../src/systems/unenforced-online-modes.ts';
 import { SAVE_MAX_BYTES } from './service.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
 import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
@@ -254,7 +255,8 @@ export async function createRealm({ db, rand, nowS }, playerId, { name, summary 
 function createRefusal(/** @type {string} */ playerId, /** @type {string | null} */ n, /** @type {boolean} */ born, /** @type {unknown} */ chosen, /** @type {unknown} */ profile) {
   if (!playerId || !n) return { error: 'body' };
   if (!isMode(chosen) || born !== legacyMode(chosen)) return { error: 'mode' };
-  return creatableModes(offeredFromList(profile)).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
+  // Every realm character is online, so the modes online play does not enforce yet are refused.
+  return creatableModes(withoutUnenforcedModes(offeredFromList(profile))).includes(chosen) ? null : { error: 'mode-off' };   // and the server's profile (MODES_OFFERED, modeLaw.js offeredFromList)
 }
 
 /**
@@ -374,7 +376,7 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
  * @param {any} ctx @param {string} playerId
  * @param {{ id: string, lease: unknown, seq: unknown, summary?: unknown }} at @param {ArrayBuffer} body @param {number} bytes
  */
-export async function checkpointRealm({ db, bucket, rand, nowS }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
+export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
   if (!bucket) return { error: 'no-storage' };
   if (!REALM_ID_RE.test(id) || typeof lease !== 'string' || !LEASE_RE.test(lease) || !Number.isSafeInteger(seq) || /** @type {number} */ (seq) < 1) return { error: 'body' };
   // SAVE-BATCH: the record's row, the ledger's two reads of the character's own rows and (where this isolate
@@ -434,7 +436,7 @@ export async function checkpointRealm({ db, bucket, rand, nowS }, playerId, { id
   // the stored record measured again under the new one
   const baseline = row.wealth == null || row.wealth_v !== WEALTH_VERSION ? await baselineOf(bucket, row) : null;
   const known = { mine: mineRes, dupes: dupesRes, config };
-  const v = await verdictOn({ db, nowS }, { player: playerId, char: id, seq: /** @type {number} */ (seq), key }, row, save, summaryNow, baseline, known);
+  const v = await verdictOn({ db, nowS, env }, { player: playerId, char: id, seq: /** @type {number} */ (seq), key }, row, save, summaryNow, baseline, known);
   await bucket.put(key, body);
   /** @type {any} the judge's columns as they stand after the batch - the verdict's, or (its rev moved) the row's */
   let stood = null;

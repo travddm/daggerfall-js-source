@@ -1,18 +1,17 @@
 # Staff tools
 
-This page covers the tools staff use on the live game: roles, the staff panel's service side, in-game staff
-commands, follow, freeze, hidden mode, on-screen messages, staff events and the monitoring feeds. Chat moderation is
+This page covers the tools staff use on the live game: roles, the staff service routes, in-game staff commands,
+follow, freeze, hidden mode, on-screen messages, staff events and the monitoring feeds. Chat moderation is
 in [chat-safety.md](chat-safety.md).
 
 ## Roles
 
-| Role                        | Source                            | Checked by                                     |
-| --------------------------- | --------------------------------- | ---------------------------------------------- |
-| Admin                       | `players.staff_admin`             | `isDeveloper`; `staffRole` returns `admin`     |
-| Moderator                   | `players.staff_mod`               | `canModerate`; `staffRole` returns `moderator` |
-| Owner                       | `players.staff_owner` (and Admin) | `isOwner`                                      |
-| Report reader, POI approver | an Owner                          | `isReportReader`, `poiRolesOf`                 |
-| POI builder                 | an Admin                          | `poiRolesOf`                                   |
+| Role          | Source                            | Checked by                                     |
+| ------------- | --------------------------------- | ---------------------------------------------- |
+| Admin         | `players.staff_admin`             | `isDeveloper`; `staffRole` returns `admin`     |
+| Moderator     | `players.staff_mod`               | `canModerate`; `staffRole` returns `moderator` |
+| Owner         | `players.staff_owner` (and Admin) | `isOwner`                                      |
+| Report reader | an Owner                          | `isReportReader`                               |
 
 A role belongs to the account, never to a handle: registering a name grants nothing. The columns are read fresh on every
 request. An Owner is set only by the operator (`tools/staffRole.mjs`); an Owner adds and removes Admins
@@ -23,20 +22,24 @@ In game, the relay sees roles only as **glyphs** in the identity token (`glyphsO
 (`src/net/staffCommands.js`) accepts `STAFF_GLYPHS` (`dev`, `dm`). The `mod` glyph is not in that list;
 hidden mode (`HIDDEN_GLYPHS`) does include it.
 
-## The staff panel
+## The staff routes
 
-The panel is a browser extension kept outside this repository. This repository holds its service side and the
-game's hook.
+The staff panel was a browser extension, kept outside this repository, that signed staff in to these routes and drove
+the running game through a hook. Decision 122 removed the extension and the game's hook. Moderation is by in-game
+chat commands: the staff commands below and the moderation commands in [chat-safety.md](chat-safety.md) (`/mute`,
+`/unmute`, `/ban`, `/unban`, `/strikes`, `/cases`, `/case`, `/dismiss`, `/modhelp`).
+
+The service routes and their sign-in stay until in-game commands cover freeze, rename, staff messages, staff events
+and the realm screens.
 
 - Routes `/v1/staff/*` (`STAFF_ROUTES` in `server-account/src/service.js`; `server-account/src/staff.js`,
   `staffPlayers.js`, `staffRealm.js`, `staffEconomy.js`, `staffCensus.js`, ...). POST only, session in the
   `x-staff-session` header. Game sessions are refused.
-- **Sign-in has three locks** (`staffLogin`, `staffEnroll`): the account password, an Ed25519 key held by the panel
-  (signature over `dfo-staff:v1:<what>:<handle>:<ts>`, 300 s, one use), and the role lists. An owner's first key is
-  in `OWNER_KEYS`. Sessions idle out after 30 minutes and end after 8 hours.
+- **Sign-in has three locks** (`staffLogin`, `staffEnroll`): the account password, an Ed25519 key (signature over
+  `dfo-staff:v1:<what>:<handle>:<ts>`, 300 s, one use), and the role lists. An Owner's first key came from the
+  `OWNER_KEYS` variable, which the configuration no longer sets: with it unset, no Owner can enrol, and so nobody can
+  sign in. Sessions idle out after 30 minutes and end after 8 hours.
 - Every staff action writes `staff_audit`.
-- The game exposes `src/net/staffHook.js`: the one door the panel uses to ask the running game for places, the
-  player's position, and to follow or teleport.
 
 ## In-game commands
 
@@ -52,12 +55,11 @@ game's hook.
 ## Follow, hidden mode and the map
 
 - **Follow** (`server-account/src/staffFollow.js`, `server/src/staffFollow.js`, `src/net/staffFollow.js`): the
-  service mints a hidden spectator token; the relay lets that socket watch a player without appearing.
+  service mints a hidden spectator token; the relay lets that socket watch a player without appearing. The game no
+  longer opens such a socket: the client half went with the extension.
 - **Hidden mode** (`/v1/staff/hide`; `server-account/src/staffHidden.js`, `server/src/staffHidden.js`): a hidden
   token keeps the socket out of rosters, counts and fan-out (`hiddenHello`, `hiddenPose`). The relay reports who saw
   a hidden socket to `HIDDEN_SEEN_URL` (`src/net/hiddenSeen.js`).
-- **Map and places** (`src/net/staffMap.js`, `src/net/staffPlaces.js`, `src/scenes/staffFlatMapHost.js`): travellers
-  by region through a hidden link, and the game's own place lists.
 
 ## Freeze and staff chat
 
@@ -88,12 +90,36 @@ Admins can start a live event: a pack of creatures and an optional boss at a pla
 - Relay: `server/src/staffEvents.js` (`takeStaffEventLaw`, `payReward`) keeps the event book on the hub and pays
   receipts (`src/net/staffEvent/staffEventReceipt.js`).
 - Game: the event runs as a raid (`src/systems/staffEvents.js`, `src/systems/raidingParties.js`); the boss is
-  promoted by `promoteStaffBoss` (`src/systems/eliteFoes.js`) and can be piloted (`src/systems/staffBossPilot.js`).
+  promoted by `promoteStaffBoss` (`src/systems/eliteFoes.js`). `src/systems/staffBossPilot.js` holds the steering
+  of a boss by staff; nothing in the game starts it since the extension's `pilot` message went with the hook.
+
+## Operator options
+
+Tools that core play does not need are off unless the operator names them in `OPERATOR_OPTIONS`
+(`server-account/wrangler.toml`, a comma-separated list; `server-account/src/operator-options.ts`). An option that is
+off answers `option-off` (404) on its staff routes, drops its feed as taken (`{ ok: true, read: false }`), and runs no
+job.
+
+| Option     | What it turns on                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `census`   | The item and gold census: the tally on each realm checkpoint, the daily row and backfill, the census routes |
+| `economy`  | The market, trade, node and economy routes                                                                  |
+| `desk`     | Staff notes and watchlists                                                                                  |
+| `status`   | The server status routes                                                                                    |
+| `follow`   | Follow tokens                                                                                               |
+| `hidden`   | Hide me, the hidden token, and the relay's report of a private home entered                                 |
+| `give`     | An Admin's item mint (`/v1/staff/item/catalogue`, `/v1/staff/item/give`)                                    |
+| `feeds`    | The network and monster feeds and their routes; also set the relay's `STAFF_NET_FEED_URL`                   |
+| `botcheck` | The encounter reaction feed and its route; also set the relay's `REACTION_FEED_URL`                         |
+
+Moderation (cases, mute, ban, freeze, staff messages) and the realm review are core and have no switch. Metrics have
+their own switch: the `METRICS` binding (on the self-host kit, `--metrics`).
 
 ## Monitoring feeds
 
 The relay posts signed batches to the account service (signature header `x-relay-staff-sig`,
-`server/src/staffFeedLaw.js`):
+`server/src/staffFeedLaw.js`). The network and reaction feeds ship off: their relay URLs are empty and their options
+are off (above).
 
 | Feed                       | Relay                                                                          | Service route           | Tables                                                  |
 | -------------------------- | ------------------------------------------------------------------------------ | ----------------------- | ------------------------------------------------------- |

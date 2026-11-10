@@ -12,7 +12,7 @@
 //
 // PACK.json: { "name", "authors": [..], "source": "<where it is published>", "license": "<SPDX id or 'permission'>",
 //              "terms": "<what the authors allowed, and when>", "version"?, "licenseFile"? }
-// The build loads a bundled pack over the machine drafts and beneath any pack the player installs (scenes/localeData.js),
+// The build loads a bundled pack over the language's own tables and beneath any pack the player installs (scenes/localeData.js),
 // and the About pane credits it (ui/credits.js translationCredits). A pack's textures and subtitled videos are edits of
 // Bethesda's assets and fall under the no-ARENA2 rule whatever its terms say: anything here that is not text the game
 // reads, a font, the licence or a README is refused.

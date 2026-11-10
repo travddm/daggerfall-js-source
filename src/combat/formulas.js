@@ -427,7 +427,7 @@ export function handToHandAttackDamage(attacker, target, damageMod, isPlayer, ro
   // a strength drain (diseases.js writes signed statMods) moved a
   // player's weapon damage and left their fists untouched.
   if (isPlayer) damage += damageModifier(liveStat(attacker, 'strength'));   // "not applied in classic" for AI - DFU preserves that
-  // BAL6-GAUNTLETS (combat/clawMetal.js): A DEPARTURE - the beast's claws add its gauntlets' metal where the weapon
+  // Claw metal (combat/clawMetal.js): an option, off by default (DFU's bare claws) - the beast's claws add its gauntlets' metal where the weapon
   // path's material modifier stands, after Strength and before the enemy-type term
   if (isPlayer) damage += clawMetalDamage(attacker);
   damage += bonusOrPenaltyByEnemyType(attacker, target);

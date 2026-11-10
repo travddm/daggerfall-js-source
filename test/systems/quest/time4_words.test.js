@@ -2,6 +2,7 @@
 // section 7. What the player is told about online time is the law's own numbers: the Online pane's sentence (true when
 // it opens, before the sky's switch and after), the patch notes' figures, and the bible's switch instant - each held
 // here to the law it states, so a dial turned in net/skyLaw.js without its words fails.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -16,7 +17,8 @@ const SWITCH = SKY_SEGMENTS[SKY_SEGMENTS.length - 1];
 const REAL_MIN_PER_SKY_DAY = 1440 / SWITCH.minutesPerMs / 60_000;
 const minuteOfDay = (m) => ((m % 1440) + 1440) % 1440;
 
-test('TIME4 the Online pane says the sky\'s day as it is when the pane opens: two hours until the switch (and when, in this machine\'s time), an hour from it - midnight on the hour, dusk at :45, in this machine\'s own minutes', () => {
+test('TIME4 the Online pane says the sky\'s day as it is when the pane opens: two hours until the switch (and when, in this machine\'s time), an hour from it - midnight on the hour, dusk at :45, in this machine\'s own minutes', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const utc = (ms) => new Date(ms).getUTCMinutes() + new Date(ms).getUTCSeconds() / 60;
   const before = skyDayWords(SWITCH.fromMs - 1, (ms) => `<${ms}>`, utc);
   assert.equal(before, `A day in the world is two hours of real time until <${SWITCH.fromMs}>; from then on it is an hour: midnight falls on the hour, and dusk at :45.`);
@@ -52,3 +54,7 @@ test('TIME4 the figures the patch notes stated are the law\'s own: a day of 60 m
   assert.equal(PLAYED_STEP_MAX_SECONDS, 30 * 60);
 });
 
+
+test("TIME4 with one clock (no sky clock in the server profile): the door says a day is two hours of real time", () => {
+  assert.equal(skyDayWords(SKY_SEGMENTS.at(-1).fromMs, String, () => 0), 'A day in the world is two hours of real time.');
+});

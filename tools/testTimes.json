@@ -25,7 +25,6 @@
  "test/scenes/aiwater.test.js": 371,
  "test/systems/allycast.test.js": 1425,
  "test/systems/ambient.test.js": 413,
- "test/systems/ambienttext.test.js": 1559,
  "test/systems/animalambience.test.js": 238,
  "test/characters/anims.test.js": 514,
  "test/systems/answerpipeline.test.js": 1062,
