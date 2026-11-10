@@ -69,8 +69,8 @@ import { busyRead, busyAnswer, busyWaitMs, retryAfterMs, BUSY_HOLD_MS } from './
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the arena's refusals, in its own frozen table
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
 import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HOLD-SAID: the standing hold's own notice
-import { MINT_VERSION } from './productRecord.js';
-import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said   // AUDIT FB1026d C3: a craft asks its record be stamped with the version this build mints
+import { MINT_VERSION } from './productRecord.js';   // a craft asks its record be stamped with the version this build mints
+import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said
 
 /** There is no built-in account service: the relay a player enters names its own
  *  (net/account-service-address.ts). Empty is no service. The deploy workflows read this line with grep. */

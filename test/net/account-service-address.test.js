@@ -47,6 +47,14 @@ test('the lookup: a developer override, then what the relay said, then nothing; 
   assert.equal(serviceBase(store), 'https://dev.example', 'the override wins');
 });
 
+test('a relay that names no service clears the one an earlier relay named', () => {
+  const store = memoryStore();
+  rememberAccountService(store, RELAY, SERVICE);
+  assert.equal(rememberAccountService(store, 'wss://other.example', null), false);
+  assert.equal(learnedAccountService(store), null);
+  assert.equal(serviceBase(store), '', "the earlier relay's service does not serve the new one");
+});
+
 test('the menu asks a relay only when nothing was learned from it, and remembers its answer', async () => {
   const store = memoryStore();
   assert.equal(needsAccountService(store, RELAY), true);

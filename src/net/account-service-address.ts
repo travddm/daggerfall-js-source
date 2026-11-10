@@ -37,12 +37,13 @@ export function learnedAccountService(storage: Store): { relay: string; accounts
   }
 }
 
-/** Stores what `relay` said its account service is. An answer that is no https address is not stored. */
+/** Stores what `relay` said its account service is. An answer that is no https address clears the record instead, so
+ *  the service an earlier relay named does not serve this one. */
 export function rememberAccountService(storage: Store, relay: string, accounts: unknown): boolean {
-  if (!isServiceUrl(accounts)) return false;
+  const named = isServiceUrl(accounts);
   try {
-    storage?.setItem?.(LEARNED_SERVICE_KEY, JSON.stringify({ relay, accounts }));
-    return true;
+    storage?.setItem?.(LEARNED_SERVICE_KEY, named ? JSON.stringify({ relay, accounts }) : '');
+    return named;
   } catch {
     return false;
   }
