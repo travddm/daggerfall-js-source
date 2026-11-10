@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // FAR-FIELD: A FAR CELL'S CLIMATE, READ ON THE
 // TERRAIN WORKER where the worker reads it as the main thread's reader does - past the Bay, the continent's
 // (world/tamriel/tamrielGround.js groundClimateIndex: its trace installed on the worker by 'tamriel'), outside the
@@ -8,7 +7,6 @@
 // ground: the continent's first climate read works its biomes out in some 150 ms, and a cold centre some 16
 // microseconds after - the far field's 14,641 centres asked on the main thread ran a step of its build to 196 ms.
 // WORKER-SAFE: pure modules only (test/world/terrain/terrainworker.test.js EV7).
-// ═══════════════════════════════════════════════════════════════════
 
 import { tamrielClimateAt } from '../tamriel/tamrielGround.js';
 import { tamrielTrace } from '../tamriel/tamrielLand.js';

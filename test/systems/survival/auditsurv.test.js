@@ -32,7 +32,7 @@ import { MOBILE_TYPES } from '../../../src/characters/mobile/mobileTypes.js';
 import { assignStartingGear } from '../../../src/systems/startingGear.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
-// ═══ AUDIT SURV: five lenses over SURV1-SURV7 ════════
+// AUDIT SURV: five lenses over SURV1-SURV7
 //
 // . Five opus agents read the arc
 // - the pure laws, the wiring walk, the player-facing surfaces, the

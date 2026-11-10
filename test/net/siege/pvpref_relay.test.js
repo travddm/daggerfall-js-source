@@ -2,7 +2,7 @@
 // RELAY, pinned over the real Room and its fake sockets (test/fakeRoom.mjs) - a siege's room admits the developers alone
 // until SEAT2a opens it, makes an account a fighter at its token's Renown, judges every blow on the striker's look and
 // both last good poses, clips it, says the vitality left to the whole room, fells, raises at the wave, pulls a step too
-// fast back, and keeps one fighter an account. 6.1; `06-Systems/Online-Arc.md` PVP-REF.
+// fast back, and keeps one fighter an account. 6.1; PVP-REF.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { siegeRoomKey, SIEGE_UNITS_PER_M, SIEGE_WAVE_MS, SIEGE_PROTECT_MS, SIEGE_FIGHTERS_MAX, siegeBlowMax } from '../../../src/net/siege/siegeRef.js';

@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-13d (Discord #bug-reports, TheHalfinStream: "[ANGRY] Died of fatigue in wayrest palace, character
-// aged past limit and remains did not appear"; `01-Overview/bugs/Field-Bugs-2026-10-13d.md`).
+// aged past limit and remains did not appear").
 //
 // REMAINS-STAND. AUDIT LEGACY H1 made the remains a list the record owns, and nothing stood where the fallen fell: the
 // list opened by itself within six paces of the very spot underground, with nothing in the world to say where that spot

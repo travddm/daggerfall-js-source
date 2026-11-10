@@ -121,8 +121,7 @@ function drawHelm(ctx, x, y, r, rim, line) {
 
 /**
  * Mount the captain's stars over `host`. `ledger` the captain's (systems/naval/captainLedger.js: `captain()`, `tree()`,
- * `setTree(ids)`); `changed` once a sky is accepted (the save's word); `onExit` when it closes. GROWTH3 (bible/10-UI/
- * Growth.md section 6): `embed` draws it in the pause window's Growth tab (skyWindow.js's embedding).
+ * `setTree(ids)`); `changed` once a sky is accepted (the save's word); `onExit` when it closes. GROWTH3: `embed` draws it in the pause window's Growth tab (skyWindow.js's embedding).
  * @param {HTMLElement} host
  * @param {{ ledger: { captain: () => { xp: number, level: number, points: number, next: number|null }, tree: () => string[], setTree: (ids: string[]) => string[] },
  *   changed?: () => void, onExit?: (reason?: string) => void, doc?: Document, embed?: boolean }} deps

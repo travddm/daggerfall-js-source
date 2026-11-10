@@ -125,7 +125,7 @@ const bowDeps = (archive) => ({
   loadMorrowindFile: async (n) => (n === 'weap.esm' ? WEAP_ESM : f('armfp.esm')),
 });
 
-// ═══ S08: the overhaul's archery arm, the bow's draw ═══════════════════
+// S08: the overhaul's archery arm, the bow's draw
 
 test('AUDIT 68 S08-pcaao-rr-archery-dead-vendor-key: the overhaul reads Roleplay & Realism under its vendored id - on by default, off with the mod or its switch', () => {
   _resetModSettings();
@@ -166,7 +166,7 @@ test('AUDIT 68 S08-bow-draw-time-wallclock: the draw is the machine\'s held tick
   assert.equal(pw.lastDrawMs, 0, 'the tap wrote its own draw time instead of inheriting the last shot\'s');
 });
 
-// ═══ S08 / X7: the Morrowind rig ═════════════════════════════════════
+// S08 / X7: the Morrowind rig
 
 test('AUDIT 68 S08-fparm-busy-queue-drops-latest: mid-build, the LATEST request wins on every channel - worn X->Y->X, a weapon swap and back, a light lit and doused', async () => {
   // worn: X starts a rebuild, Y queues, X again must replace the queued Y
@@ -288,7 +288,7 @@ test('AUDIT 68 X7-fparm-swap-rejection-unhandled: a swap whose mesh will not loa
   assert.ok(st.notes.some((n) => /^weapon: the swap to this weapon failed/.test(n)), 'and the card says why');
 });
 
-// ═══ S11: the format readers ═════════════════════════════════════════
+// S11: the format readers
 
 test('AUDIT 68 S11-faceid-case: a mixed-case head id the matcher or the table names is the head the body wears', () => {
   const parts = bodyParts(concat(

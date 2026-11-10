@@ -1,5 +1,5 @@
-// CAPT-WATERS - THE RICH WATERS (bible/03-World/
-// Captains-Sea.md): SEA-EASE's safe coasts kept, and the DEEP waters - DEEP_PX map pixels and more from every port - the
+// CAPT-WATERS - THE RICH WATERS (docs/systems/naval.md):
+// SEA-EASE's safe coasts kept, and the DEEP waters - DEEP_PX map pixels and more from every port - the
 // captain's chosen risk: pirates DEEP_PIRATE_K as likely and the trade's ships fewer, classes drawn DEEP_LEVEL levels up,
 // pirates bold DEEP_BOLD of the time on the same draw that makes a coast's pirate bold, and every hold and cask rolled
 // DEEP_TIER rarity tiers richer. The plate says the deep. tools/mutants/captwaters.json.

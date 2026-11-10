@@ -1,12 +1,10 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DW-E1: TransientObjectTracker.cs (Iliac Puddle No More
 // 1.2.2, jet082) - the list a spawner keeps of what it stood in the world
 // (the fish, the foes, the sunken loot), and the four things it does with
 // it. An object is anything with `destroyed()` (Unity's `== null`: killed,
 // picked up, destroyed from outside), `position()` (its world [x, y, z])
 // and `destroy()`.
-// ═══════════════════════════════════════════════════════════════════
 
 /** @typedef {{ destroyed(): boolean, position(): number[], destroy(): void }} Transient */
 

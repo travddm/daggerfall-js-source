@@ -1,8 +1,8 @@
--- QL16 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.3): THE OLD COIL, step 3 of 3 - the line's last,
+-- QL16 (2026-10-19; docs/systems/quests.md): THE OLD COIL, step 3 of 3 - the line's last,
 -- its branch the line's outcome. Witnessed (net/questlineClaims.js: `serpent`, the l1 receipt): it waits on the Sea
 -- Serpent slain (`ql act serpent-slain 1`). Then Hamid's question: the serpent's blood poured back to Satakal (the
 -- sailors' offering) or its scale kept. Lore: canon - Satakal, the World-Skin. The port's own: Sethrakul, the Old Coil,
--- the harbour bells (bible/03-World/Sea-Serpent.md), the offering, Hamid al-Rasheen.
+-- the harbour bells, the offering, Hamid al-Rasheen.
 Quest: QLOC03
 DisplayName: The Shed Skin
 -- Message panels

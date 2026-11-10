@@ -536,7 +536,7 @@ export function createQuestBridge(ctx, { label = 'host' } = {}) {
     sharedClock: () => !!ctx.sharedClock?.(),   // REPUTE-GATE: online, two Mages Guild quests wait for their headers' standing
   });
 
-  // QL1 (decision 2): THE QUESTLINES' LAYER, made here once over this machine and its
+  // QL1: THE QUESTLINES' LAYER, made here once over this machine and its
   // lists (THE ONE CONSTRUCTION SEAM - every host with quests holds this bridge). It never runs a quest; it reads them.
   // Its host doors are closures over ctx, so this file stays the one place the bridge's contract is read from.
   // QL12: the account service's door for the endgame lines (questlineHost.js) - a host's own (a test's fake, or null

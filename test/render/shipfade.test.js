@@ -7,7 +7,7 @@
 // ship sunk, taken or yielded into a peer's copy goes as she always went. The real host (scenes/naval/navalHost.js) through
 // real frames over Come Sail Away's pool (test/navalSea.mjs, test/navalRoom.mjs), the pool's own draw and flats
 // (scenes/comeSailAway/comeSailAwayPool.js), the renderer's own setDissolve and shader (render/renderer.js). Each is red on the
-// record's code (168bf2587). `03-World/Naval-Combat.md` (SHIP-FADE).
+// record's code (168bf2587) (SHIP-FADE).
 import '../modsOff.js';
 import { byClass } from '../chargenDom.mjs';
 import { test } from 'node:test';

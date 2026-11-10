@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // MW-D35: THE FACE IS MATCHED, NOT WALKED.
 //
 // Mac's call: pair the classic portraits to Morrowind heads and hairs
@@ -25,7 +24,6 @@
 //     cheeks - Morrowind bakes beards into the head texture).
 //   hair:     colour (alpha-weighted texture mean), length (the mesh's
 //     vertical extent, rank-normalised within the pool).
-// ═══════════════════════════════════════════════════════════════════
 
 const dist3 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const lum = (c) => 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2];

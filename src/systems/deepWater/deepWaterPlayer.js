@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-D: ILIAC PUDDLE NO MORE'S PLAYER API (DeepWaterPlayer.cs,
 // jet082, 1.2.2) - the one public door the mod opens to other mods:
 //
@@ -14,7 +13,6 @@
 //
 // A leaf, so a mod port that listens (There's a Hole in the Bottom of the
 // Ocean, Come Sail Away) imports it without the world host.
-// ═══════════════════════════════════════════════════════════════════
 
 const state = { inWater: false, swimming: false, headSubmerged: false, underwater: false };
 let pending = false;

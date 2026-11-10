@@ -33,9 +33,9 @@ export const BUNDLES = {
 const S3_NETWORK = 's3-network';
 
 /** Values a self-host must supply itself, read from the environment in place of the toml's text: the relay's copy of
- *  the identity public key (the toml holds Cloudflare's). */
+ *  the identity public key (the toml holds Cloudflare's) and the relay's account service address. */
 export const ENV_OVERRIDES: Record<string, readonly string[]> = {
-  relay: ['IDENTITY_PUBLIC_KEY'],
+  relay: ['IDENTITY_PUBLIC_KEY', 'ACCOUNT_SERVICE_URL'],
 };
 
 /** Secrets each Worker reads that no toml names, read from the environment. Unset, a binding is null. */

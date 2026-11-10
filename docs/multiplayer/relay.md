@@ -9,8 +9,11 @@ to deploy and test it. Scaling, the chat hub and cost are in [relay-scaling-and-
 | Path                         | What it holds                                                                                                                                                                        |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `server/wrangler.toml`       | Worker config: `ROOMS` binding to class `Room` (SQLite-backed), `METRICS` Analytics Engine dataset `daggerfall_relay`, `ACCOUNTS` service binding to `daggerfall-accounts`, `[vars]` |
-| `server/src/index.js`        | The Worker `fetch` handler and the `Room` class (about 12,800 lines)                                                                                                                 |
+| `server/src/index.js`        | The Worker `fetch` handler and the `Room` class (about 9,800 lines)                                                                                                                  |
 | `server/src/relay.js`        | One line: `export * from '../../src/net/wire.js'`. The relay's protocol rules are the client's own module                                                                            |
+| `server/src/relayFacts.ts`   | The answers to `/health` and `/profile`, and `relayProfileHash`, the hash (`ph`) of the profile the relay plays by                                                                   |
+| `server/src/helloDoor.ts`    | `helloDoorRefused`: the doors a hello must pass (profile hash, then the hello law numbers)                                                                                           |
+| `server/src/helloGate.js`    | `preTokenGate`, `placeGate`: each room's bucket of hellos a second, spent before or after the token                                                                                  |
 | `server/src/relayScale.js`   | Scale constants, `askRoom`, `layerWalk`, `RoomMetrics`, `roomKindOf`, `ROOM_CALL_MS`                                                                                                 |
 | `server/src/cell*.js`        | Cell tree: `cellNodes.js` (Worker door), `cellMoves.js` (directory), `cellHandover.js` (row moves)                                                                                   |
 | `server/src/foesHold.js`     | Holds oversized first `foes` frames and releases them one sender at a time                                                                                                           |
@@ -26,12 +29,16 @@ bundles those relative imports. A change to any file in that import graph is a r
 
 `export default { fetch }` in `server/src/index.js` matches in this order:
 
-| Path                        | Handler                                                                       |
-| --------------------------- | ----------------------------------------------------------------------------- |
-| `/health`                   | JSON `{ ok, service: 'daggerfall-online', version: RELAY_VERSION, t }`        |
-| `SD_OPEN_PATH`              | `sdOpenDoor` (Super Dungeon open check)                                       |
-| `/v1/law` (`SAFE_LAW_PATH`) | `lawDoor`: signed orders from the account service (bans, mutes, staff orders) |
-| `/room/<key>`               | A WebSocket to the Room named `<key>`                                         |
+| Path                        | Handler                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `/health`                   | JSON `{ ok, service: 'daggerfall-online', version: RELAY_VERSION, ph, t }`              |
+| `/profile`                  | JSON `{ v: RELAY_VERSION, ph, profile }`: the server profile the relay plays by (below) |
+| `SD_OPEN_PATH`              | `sdOpenDoor` (Super Dungeon open check)                                                 |
+| `/v1/law` (`SAFE_LAW_PATH`) | `lawDoor`: signed orders from the account service (bans, mutes, staff orders)           |
+| `/room/<key>`               | A WebSocket to the Room named `<key>`                                                   |
+
+`relayFactsAnswer` (`server/src/relayFacts.ts`) answers both fact paths. Every answer allows any origin, because the
+game page is served from another host than the relay.
 
 `roomOf` (`src/net/wire.js`) accepts only `/room/<key>` with a key of `[A-Za-z0-9_.,:+-]{1,80}`. Before any object is
 created, the Worker refuses unknown or closed keys with 404 (`isChatRoom`, `isGateRoom`/`gateHolds`, `isSdRoom` plus
@@ -83,19 +90,41 @@ event records, receipts).
 
 ### The hello
 
-The first frame is `{ t: 'hello', id, secret, name, look, pose, tok, ... }`.
+The first frame is `{ t: 'hello', id, secret, name, look, pose, tok, ph, ... }`. Nothing is written for a hello until
+it has passed every check below, in this order:
 
-1. The room imports `IDENTITY_PUBLIC_KEY` (a `[vars]` entry; a public key is not a secret). If the key is missing or
-   does not import, every hello is refused: the relay fails closed.
-2. `verifyToken` (`src/net/identityToken.js`) checks the Ed25519 identity token. The TTL ceiling is
+1. The room's hello gate (`preTokenGate`, `server/src/helloGate.js`) spends the room's bucket of hellos. Battle,
+   arena floor, Super Dungeon, instance, cell and world rooms spend it after the token instead (`placeGate`).
+2. The hello doors (`helloDoorRefused`, `server/src/helloDoor.ts`). The first door compares the hello's `ph` with the
+   relay's own profile hash and refuses another one with the reason `other rules`. The next doors check the law
+   numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the lease door, the cell-tree `of` field) and refuse an
+   older build with a reason such as `old ground` or `old cells`. Each refusal sends an `error` frame with the
+   player's words, then closes with `CLOSE_POLICY`.
+3. `_named` checks the identity token. It needs `IDENTITY_PUBLIC_KEY` (a `[vars]` entry; a public key is not a
+   secret): if the key is missing or does not import, every hello is refused, so the relay fails closed.
+   `verifyToken` (`src/net/identityToken.js`) checks the Ed25519 token. The TTL ceiling is
    `min(IDENTITY_MAX_TTL_S, MAX_TTL_S)`, 300 s.
-3. The hello's law numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the cell-tree `of` field) are checked.
-   An older build is refused with `CLOSE_POLICY` and a reason such as `old ground` or `old cells`.
-4. Ban and freeze checks run (`_bannedHello`, `frozenHello`).
-5. The room answers `{ t: 'welcome', id, peers, host, world, now, v }`. `v` is `RELAY_VERSION`.
+4. Ban, hidden-staff and freeze checks run (`_bannedHello`, `hiddenHello`, `frozenHello`), then the gate for rooms
+   that spend it after the token.
+5. The room answers `{ t: 'welcome', id, peers, host, world, now, v, ph }`. `v` is `RELAY_VERSION` and `ph` is the
+   profile hash.
 
-The hello carries no relay version. The client compares `v` from the welcome with its own `RELAY_VERSION` and refuses
-a relay of another version (see [wire-protocol.md](wire-protocol.md), One version, client and relay).
+The hello carries no relay version. The client compares `v` and `ph` from the welcome with its own and refuses a relay
+on another version or other rules (see [wire-protocol.md](wire-protocol.md), One version, client and relay).
+
+### The server profile
+
+The relay plays by one server profile: the data that holds the server's online rules (decisions 58 and 65). Today it
+is `OFFICIAL_PROFILE` (`src/net/profile/officialProfile.ts`), bundled into the relay at build time. `relayFacts.ts`
+computes its hash once (`relayProfileHash`, SHA-256 of the profile's canonical JSON, `src/net/profile/profileHash.ts`)
+and names it as `ph` in `/health`, `/profile` and every welcome. An online page fetches `/profile` before its world
+boots ([boot-and-frame.md](../architecture/boot-and-frame.md), The profile door) and sends the same `ph` in every
+hello.
+
+Because the profile is in the relay bundle, an edit to `officialProfile.ts` is a relay change and needs a new
+`RELAY_VERSION` ([wire-protocol.md](wire-protocol.md)). The self-host kit has no setting for another profile yet: a
+server on other rules needs a build with another profile. Decision 122 (3) moves the profile into a file the kit
+loads; that is not built yet.
 
 ## Durable storage
 

@@ -17,7 +17,7 @@
 //    only the fated die (the lives' law) - its DEEP_FIGHT_MIN that stop's own.
 //  - WHERE THEY ARE (`stopAt`): at a stop (fighting at a foe's), between two, on the way out, or gone.
 //  - WHAT THEY LEAVE (`clearedOf`): the stops a dive left within DIVE_CLEAR_MIN before a minute - its foes built dead
-//    and emptied, its treasure built empty (decision 3).
+//    and emptied, its treasure built empty.
 import { lwSeed, lwRng, textSeed, rollInt } from './seed.js';
 import { DAY_MIN } from './dayPlan.js';
 import { RANDOM_RECORD } from '../../characters/dungeonEnemies.js';   // AUDIT LW-II-2 D11: the random foe marker's one home

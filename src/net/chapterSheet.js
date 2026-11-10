@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // CHAP3c — THE CHAPTER SHEET, HELD BY THE PLAYING TAB: the service's
 // `/v1/chapters/list` (every chapter's Strength and band, CHAP3b) read
 // once a while, and the hall the player stands in priced by its chapter's
@@ -22,7 +21,6 @@
 // CHAP7b: and each chapter's patron this Season - `{ id, name, tag,
 // heraldry }`, each checked (npcChapterLaw.js chapterPatronOf, heraldryLaw.js heraldryOf) - for its halls' banners and its
 // members' prices.
-// ═══════════════════════════════════════════════════════════════════
 
 import { chapterRollSeatsOf, chapterSeasonOf, chapterPatronOf, hallHidden } from './npcChapterLaw.js';   // CHAP5a: the seats as the roll reads them; CHAP6c: the Season's event; CHAP7b: its patron
 import { heraldryOf } from './heraldryLaw.js';   // CHAP7b: a patron's arms, as every face draws them

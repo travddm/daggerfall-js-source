@@ -231,7 +231,7 @@ test('WX2 the wind model\u2019s arrival: 0 at the cut, 1 when the front lands, a
   assert.equal(m.arrival(), 1, 'and after the front is forgotten');
 });
 
-// ═══ WX2a - AUDIT 57: the front audited ═══════════════════════════════
+// WX2a - AUDIT 57: the front audited
 
 test('AUDIT 57 F3 (sim): a change the player was not present for stamps a JUMP - a load, a travel landing, a respawn roll, a stale drain - and a live day roll does not', () => {
   resetWeatherSim(); setWeatherMapLaw(false);   // WEATHER3b: the day-roll machine's pin - on the map's lane the map is the sky and this machine stands down (weather3b pins that)

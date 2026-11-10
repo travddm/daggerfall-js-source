@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL5-FEEDS - THE BOT CHECK'S REACTIONS, KEPT
 // AND READ, Admins alone.
 //

@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-B: DeepWaterWaterClassification.cs (Iliac Puddle No
 // More 1.2.2, jet082) - which part of a streamed pixel is water, asked
 // of the pixel's own MapPixelData. Member for member, float for float.
@@ -25,7 +24,6 @@
 // (terrainGen's, after the location blend, the roads and World of
 // Daggerfall) and its RAW 128 x 128 tilemap (y * 128 + x) - what DFU's
 // MapPixelData holds when DaggerfallTerrain.OnPromoteTerrainData fires.
-// ═══════════════════════════════════════════════════════════════════
 
 import { SCALED_OCEAN_ELEVATION, SCALED_BEACH_ELEVATION, MAX_TERRAIN_HEIGHT, HEIGHTMAP_DIMENSION } from '../terrain/terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from '../terrain/terrainTiles.js';

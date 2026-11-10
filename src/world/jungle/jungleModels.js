@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 - THE JUNGLE'S TREES, READ. bible/03-World/
-// Bantha-Jungle.md is the design and the record.
+// BANTHA1 - THE JUNGLE'S TREES, READ.
 //
 // The owner's five trees (src/assets/jungle/source/, their Blender 5.2 exports as they handed them over: an OBJ, its MTL and
 // one 252x164 picture each, cut out by its alpha) read into the shape Low Poly Trees' pipeline already draws

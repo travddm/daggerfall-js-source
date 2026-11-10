@@ -1,8 +1,8 @@
 // WB13c: THE HUD - his bar
 // honed (the trailing segment, the ward a state, callouts that come and go with a line to the landing, Dagon's plate and
 // MOVE, the phase marks spent, his name and his epithet on lines of their own, the foot's chips, FELLED and the fade),
-// the phone layouts, the party's frames kept clear, the classic face loaded by the gate's own screens (bible/11-Multiplayer/
-// World-Bosses.md section 20, WB13c). The map's tap for a finger is pinned with the map's card (test/ui/eventtip.test.js).
+// the phone layouts, the party's frames kept clear, the classic face loaded by the gate's own screens (WB13c).
+// The map's tap for a finger is pinned with the map's card (test/ui/eventtip.test.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

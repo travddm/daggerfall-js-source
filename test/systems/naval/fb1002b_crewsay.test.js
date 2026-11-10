@@ -10,7 +10,7 @@
 //                       held where it stands while its way down is barred - never over another
 //   THE SCREEN'S TOP  - a stack of six at scale 2 on a 540-line screen stood off its top; a lifted bubble that would
 //                       stand over it is not drawn
-// Each pin is red on the record's own code (e2466e2bd). `01-Overview/bugs/Field-Bugs-2026-10-02b.md`.
+// Each pin is red on the record's own code (e2466e2bd).
 import '../../modsOff.js';
 import { byClass } from '../../chargenDom.mjs';
 import { test } from 'node:test';

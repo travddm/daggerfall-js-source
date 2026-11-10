@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STANDING-WORDS and SEAT-WORDS - WHAT THE
 // ROLL'S TRACKER SAYS, as the streaming host wires it (scenes/world.js; the shape is fishHost.js's: the host hands its
 // doors in and spreads what comes back into createRollTracker).
@@ -18,7 +17,6 @@
 // THE FOUR HOSTS: the Roll's tracker is world.js's alone (built only online, for a realm character) - WIRED here;
 // worldModes.js and dungeonContext.js are entered from it and read the same tracker through the host's doors;
 // exterior.js, the offline fixed city, keeps no Roll (offline the standing is DFU's, unsaid as DFU's - nothing to wire).
-// ═══════════════════════════════════════════════════════════════════
 import { bookCappedLine, ROLL_FACTIONS, rollFactionOfGuild } from '../net/npcChapterLaw.js';
 import { t, intlLocale } from '../systems/textManager.js';
 import { noteFirstUse } from '../systems/tutorials.js';

@@ -120,7 +120,7 @@ test('SCALE4f the mint\'s four reads of one row, in one - exactly what the four 
   for (const bad of [null, 7, '', 'r123', 'R'.padEnd(21, 'f'), `${housed.id}x`]) assert.deepEqual(await realmMintFacts(ctx, g.id, bad), { rc: 0, cl: null, wa: null, house: null, name: null, md: null }, String(bad));
 });
 
-// ═══ HOW BUSY THE PRIMARY IS ═══════════════════════════════════════════════════════════════════════════════════════
+// HOW BUSY THE PRIMARY IS
 
 /** A D1 shaped as workerd's: statements a class with private fields, whose methods throw on any `this` but their own,
  *  and a batch that refuses anything but its own statements (AUDIT SCALE4d D8's law, one level down). Each run moves the

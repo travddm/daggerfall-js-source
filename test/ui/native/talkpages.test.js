@@ -65,7 +65,7 @@ test('B5: Tell me about opens the flat engine list and a pick asks through the s
   assert.equal(w.conversation[2].text, 'Any news?: an answer');
 });
 
-// ═══ AUDIT 58 (seams): SetListboxTopics REPAIRS every row it adds ═══
+// AUDIT 58 (seams): SetListboxTopics REPAIRS every row it adds
 //
 // DaggerfallTalkWindow.cs:863-872 runs, for EVERY row, before AddItem:
 // a null caption falls back to the row's KEY, and an empty caption -

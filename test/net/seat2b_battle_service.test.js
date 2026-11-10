@@ -3,7 +3,7 @@
 // none, the camp's Rams where a gate stands; every later pass carries the same
 // though a work stands between them (6.2, 7.5; server-account/src/seatSiege.js
 // siegePass). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs), on
-// SEAT2a part three's battle week (test/net/seat2a_siege_service.test.js's harness, copied). `06-Systems/Online-Arc.md`
+// SEAT2a part three's battle week (test/net/seat2a_siege_service.test.js's harness, copied).
 // SEAT2b part two (b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -97,7 +97,7 @@ function watchman({ hostile = true, team = 'CityWatch' } = {}) {
   };
 }
 
-// ═══ (a) the struck PASSIVE watchman turns the whole area ═══
+// (a) the struck PASSIVE watchman turns the whole area
 test('ROAD-G G1(a): a struck PASSIVE watchman walks the area; a hostile one does not', () => {
   // DaggerfallEntityBehaviour.cs:255-258 verbatim - the walk is
   // conditional on `!enemyMotor.IsHostile`, and nothing else in the
@@ -239,7 +239,7 @@ test('ROAD-G G1(a): a struck former ALLY reverts to the static row\'s team', () 
   assert.equal(w.entity.team, 'CityWatch', 'Knight_CityWatch\'s row team, not PlayerAlly');
 });
 
-// ═══ (b) the Wabbajack transforms the watch ═══
+// (b) the Wabbajack transforms the watch
 test('ROAD-G G1(b): removeGuard is WabbajackEffect\'s SetActive(false), not a death', () => {
   const { g, freed } = pool();
   const w = watchman();

@@ -25,7 +25,7 @@
 // levels of each other on all four, because the last triangle to
 // rasterise a texel won and which one that was is arbitrary.
 //
-// ═══ SO THE UNWRAP IS COMPUTED ════════════════════════════════════
+// SO THE UNWRAP IS COMPUTED
 //
 // Not painted around, not worked with - replaced. Four steps, each one
 // the standard answer to its own question:
@@ -103,7 +103,7 @@ export function unwrapQuality(mesh) {
  * Group the triangles into islands: shared edge, and a normal no
  * further than `angleDeg` from THE ISLAND'S OWN RUNNING AVERAGE.
  *
- * ═══ THE AVERAGE, NOT THE NEIGHBOUR ═══════════════════════════════
+ * THE AVERAGE, NOT THE NEIGHBOUR
  *
  * The first version of this compared each face to the NEIGHBOUR it was
  * joining across, with union-find, and that is a different rule than it

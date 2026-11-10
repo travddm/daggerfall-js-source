@@ -36,7 +36,7 @@ import { EQUIP_SLOTS } from '../../../src/characters/paperdoll/paperdoll.js';
 import { RACES } from '../../../src/systems/races.js';
 import { withDom } from '../../invdrag.mjs';
 
-// ═══ SURV-TIERS: OFF, CASUAL, HARD ══════════════════════
+// SURV-TIERS: OFF, CASUAL, HARD
 //
 // then "Off, Casual, Hard" and
 // "I want this to be a smart and thorough difficulty design. No band
@@ -647,7 +647,7 @@ test('SURV-TIERS: composed - the feed hands the live tier\'s rules, and a Casual
   _resetForTests(); setWorldMinutes(0);
 });
 
-// ═══ AUDIT SURV-TIERS: THE LAWS HARD SHARES ══════════════════════════
+// AUDIT SURV-TIERS: THE LAWS HARD SHARES
 // Four findings of the audit were never the tiers' - they were the arc's,
 // and Hard had carried them since SURV1-7. Fixed where they live, pinned
 // here beside the slice that found them.
@@ -920,7 +920,7 @@ test('AUDIT SURV-TIERS (the second pass): before six the enhanced tavern says th
   } finally { if (hadLoc) globalThis.location = loc; else delete globalThis.location; }
 });
 
-// ═══ SURV-OFFSIGHT: OFF SEES OTHER PEOPLE'S CAMPFIRES ═══
+// SURV-OFFSIGHT: OFF SEES OTHER PEOPLE'S CAMPFIRES
 //
 // . Off kept every
 // camp and hid all of them from this player (AUDIT SURV-TIERS); its eyes

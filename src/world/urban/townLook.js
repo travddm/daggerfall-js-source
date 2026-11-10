@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // URBANIZER U1 - A PROVINCE'S TOWNS IN THEIR OWN STONE.
 //
 // Daggerfall dresses a town's buildings in its location's climate (DaggerfallLocation's ClimateUse.UseLocation:
@@ -32,7 +31,6 @@
 // is its own district work (not this module's - TESA11, world/imperialCity.js).
 //
 // Pure but for `townClimateAt`'s reading of the land (the province and the zone under a pixel, the trace's).
-// ═══════════════════════════════════════════════════════════════════
 import { CLIMATE_BASE_TYPES } from '../../formats/mapsFile.js';
 import { provinceKeyBeyondBay } from '../tamriel/tamrielLand.js';
 import { tamrielBiomeAt } from '../tamriel/tamrielBiomes.js';

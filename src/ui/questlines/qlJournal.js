@@ -1,11 +1,11 @@
 // @ts-check
-// QL2 (decision 10): THE QUESTS TAB'S QUESTLINE PARTS - one home for the
+// QL2: THE QUESTS TAB'S QUESTLINE PARTS - one home for the
 // two faces that draw quests (the pause window's Quests tab, ui/enhanced/enhancedMenu.js pauseQuests; the chronicle
 // the L key opens, ui/enhanced/enhancedChronicle.js), so they cannot disagree:
 //
 //   - WHAT TO DO: a stamped quest's objectives (the bridge's questLog row's `ql` - systems/questlines/qlLayer.js rowOf),
 //     each as the machine's state has opened it - done struck, failed crossed, an optional one marked, alternatives
-//     joined by "or" - never one the journal has not opened (decision 6);
+//     joined by "or" - never one the journal has not opened;
 //   - YOUR CHOICES: the branches taken, in the quest's own words;
 //   - HOW IT ENDED: the outcome, once there is one;
 //   - YOUR REWARD: what finishing pays - a choice of three pieces fitted to the player, at its tier's floor;

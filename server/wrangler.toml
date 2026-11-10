@@ -46,6 +46,9 @@ workers_dev = true
 # admits everybody, which is what it did before this slice; it does not
 # refuse the room and it does not pretend it checked.
 [vars]
+# The account service this relay's players sign in to, served at /profile (`accounts`); the client has no built-in
+# one. Empty is none: the relay plays without accounts. The self-host kit sets it.
+ACCOUNT_SERVICE_URL = ""
 IDENTITY_PUBLIC_KEY = "2ZbUhjpY80Hne60_ucjzCZMF0i5DsarfaWW9SDU5ei4"
 # The lifetime ceiling this relay will honour, beside the key it
 # belongs with (AUDIT-ACC F8, bible ACC1d D3). `MAX_TTL_S` in

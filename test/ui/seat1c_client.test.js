@@ -2,7 +2,7 @@
 // threshold and fee, Contested within 10%, the defence and Standing's modifier, one Right a guild and a seat, the truce,
 // the unchallenged Standing, the Legacy), the Chronicle's words, a held seat's marks and banner, the book dressing a seat
 // in its holder, the Seat tab's holder, battle, claim line, Chronicle and relinquish, and the hosts by source.
-// 3.3-3.4, 5.2, 7.9, 9.2; `06-Systems/Online-Arc.md` SEAT1c.
+// 3.3-3.4, 5.2, 7.9, 9.2; SEAT1c.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

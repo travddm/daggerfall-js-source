@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LOCKPICK - A LOCK PICKED, ONE HOME. The module a host wires (HOST-SPLIT: fishHost.js's shape):
 // a host hands it its player, the slot its windows go into and its ear, and calls `begin` where DFU rolled the pick -
 //
@@ -22,7 +21,6 @@
 // LOCKPICK-MODE: the window is the `lockpickTumblers` option, off by default. Off, `frontDoor` and `inside` are DFU's one
 // roll with no item (PlayerActivate.cs:543-566, DaggerfallActionDoor.AttemptLockpicking), a front door reads DFU's
 // LastLockpickAttempt gate again, and a dungeon door's roll stays the action graph's own (`inside` declines it with `door`).
-// ═══════════════════════════════════════════════════════════════════
 import { createLockpickAct } from '../systems/lockpick/lockpickAct.js';
 import { lockSeed, lockBand } from '../systems/lockpick/lockpickLaw.js';
 import { lockpickCount, spendLockpick } from '../systems/lockpick/lockpickItem.js';

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { bladeInset } from '../../../src/ui/enhanced/enhancedHud.js';
 import { PREF_DEFAULTS } from '../../../src/systems/uiPrefs.js';
 
-// ═══ FOEBAR1: THE BLADE FACE OF THE TARGET BAR ═════════
+// FOEBAR1: THE BLADE FACE OF THE TARGET BAR
 //
 // . A twin-bladed
 // shape with a skull hub - the dark one the empty bar, the red one the

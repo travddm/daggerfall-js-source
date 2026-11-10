@@ -3,7 +3,7 @@
 // and in a room (test/navalRoom.mjs) - a packet's course, her end, her berth, her names, her tag, her next voyage, her
 // spending, and a packet, a raider and a harbour's own handed from one player to another - the lanes' pure law
 // (systems/naval/seaLanes.js pursue, the lineage) and the world's feed lifted from world.js. Each pin is red on the
-// record's code (ea3a7361e) unless it says otherwise. `01-Overview/audits/Audit-Ships-of-the-Bay.md`.
+// record's code (ea3a7361e) unless it says otherwise.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

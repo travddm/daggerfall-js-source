@@ -7,12 +7,12 @@
 // (`householdCensus`) are minted from its buildings, read only for the town the player stands in. `townCensus` is the
 // whole town: both, every traveller given a home among the households' houses.
 //
-// A RESIDENT IS A DFU TOWNSPERSON WHO KEEPS THEIR IDENTITY FOR LIFE (LW0 decision 4): RandomiseNPC's own parts -
+// A RESIDENT IS A DFU TOWNSPERSON WHO KEEPS THEIR IDENTITY FOR LIFE: RandomiseNPC's own parts -
 // the climate's people for the billboard - a Redguard region's Redguards (REGIONAL-FOLK, characters/mobile/mobilePerson.js walkerRace;
 // FIELD BUGS 2026-10-10) - (PERSON_TEXTURES, one of four outfits a sex), the talk portrait's record law
 // (PERSON_FACE_RECORDS + one of 24), the region's name bank (MobilePersonNPC.cs:214) - drawn ONCE from the resident's
 // seed instead of at every spawn. The watch rides GUARD_TEXTURE, male, outfit 0 (RandomiseNPC's guard arm). The armed -
-// adventurers, sellswords, couriers - carry a CLASS too (LW0 decision 5): the sprite they wear beyond the walls.
+// adventurers, sellswords, couriers - carry a CLASS too: the sprite they wear beyond the walls.
 //
 // Slot ids are the town's and the slot's: `L<mapId>.<slot>` for a household, `L<mapId>.t<slot>` for a traveller,
 // `L<mapId>.w<slot>` for the watch - the same person for every reader, the key a relation is saved under (relations.js).
@@ -45,8 +45,8 @@ export const JOBS = Object.freeze({
 /** The jobs that travel (trips.js): the traveller roster's own. */
 export const TRAVELLER_JOBS = Object.freeze(['merchant', 'mercenary', 'adventurer', 'sailor', 'pilgrim', 'courier', 'pedlar']);
 /** LW9: THE ROAD'S NEW TRAFFIC, APPENDED - a traveller's id is `L<mapId>.t<slot>`, dealt in the jobs' order, so a job
- *  anywhere but after every one before it would re-key the regard and the turns of every traveller after it (Living
- *  World II decision 9): these are dealt after TRAVELLER_JOBS' own, in this order. A farm's or a village's CARTER takes
+ *  anywhere but after every one before it would re-key the regard and the turns of every traveller after it:
+ *  these are dealt after TRAVELLER_JOBS' own, in this order. A farm's or a village's CARTER takes
  *  its produce to market; a HUNTER goes into the wild; a city's PATROL keeps the region's roads; its NOBLE goes in
  *  procession with their RETAINERS; its MINSTREL plays the taverns of the towns about. */
 export const ROAD_JOBS = Object.freeze(['carter', 'hunter', 'patrol', 'noble', 'retainer', 'minstrel']);

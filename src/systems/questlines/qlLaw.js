@@ -1,14 +1,14 @@
 // @ts-check
 // QL1: THE
 // QUESTLINES' LAW - the switch, the stamp a quest carries for life, and the reading of a quest's objective sheet over
-// the state its machine holds. Design: (decisions 1, 2, 6, 7; section 2).
+// the state its machine holds.
 //
-// ONE MACHINE, A LAYER OVER IT (decision 2). Nothing here runs a quest: the machine is DFU's (systems/quest/machine.js)
+// ONE MACHINE, A LAYER OVER IT. Nothing here runs a quest: the machine is DFU's (systems/quest/machine.js)
 // and never learns of this file. A sheet NAMES state the machine already keeps - a task set, an item carried, a clock
-// running, a journal step written, a foe's kills - and an objective shows only once that state opens it (decision 6:
-// an objective tells the truth; the Quest Guide's PX4 law kept in its reason, changed in its letter - Port-Ledger A).
+// running, a journal step written, a foe's kills - and an objective shows only once that state opens it (an
+// objective tells the truth; the Quest Guide's PX4 law kept in its reason, changed in its letter - Port-Ledger A).
 //
-// THE STAMP (decision 1). A quest is stamped when it STARTS (machine.js startQuestImmediate asks deps.questlinesStamp)
+// THE STAMP. A quest is stamped when it STARTS (machine.js startQuestImmediate asks deps.questlinesStamp)
 // and keeps the stamp for life in its own save (quest.js `ql`): a quest begun with the switch off is DFU's to its end,
 // one begun with it on is the layer's to its end, whatever the switch says later - decided
 // at birth and never on load. Online the lane forces the switch on (features.js row `questlines`, online: true).

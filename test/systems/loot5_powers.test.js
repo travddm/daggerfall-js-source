@@ -183,7 +183,7 @@ test('LOOT5: the landed strike - chain, quake, echo, open hand, conduit', () => 
   wear(me4, legendary('gauntlets-of-the-rose'));
   const d5 = door([rec('struck', struck, 0)], me4);
   LP.lootStrike(me4, struck, 7, null);
-  assert.deepEqual(d5.hurts, [['struck', 4]], 'a bare-handed blow lands again - PIN MOVED (BAL7, bible/05-Combat/Balance-Arc.md section 13): for half (3.5, a whole 4)');
+  assert.deepEqual(d5.hurts, [['struck', 4]], 'a bare-handed blow lands again - PIN MOVED (BAL7): for half (3.5, a whole 4)');
   LP.lootStrike(me4, struck, 7, createWeapon(120, 0, () => 0.5));
   assert.equal(d5.hurts.length, 1, 'a weapon\'s does not');
   fresh();

@@ -67,7 +67,7 @@ a carriage (model 41214) and its team or a cart (41207, 41209, 41109), the horse
   BuildingDataList written at its count where the classic block reads 32 slots (28
   removed), and a scale of 1 on the two classic models, whose records carry none (6 set).
   What that still cannot carry is any other round-trip change to a classic record
-  (`bible/02-Formats/World-Data-Patches.md` names two: an automap ground-flat byte zeroed,
+  (`docs/formats/world-data.md` names two: an automap ground-flat byte zeroed,
   a rotation written as its equivalent).
   The loader checks every rebuild against the recorded sha256 and says when it differs;
   `test/formats/worldData/it1_worlddata.test.js` checks all four with `ARENA2_PATH` set. Run the tool again
@@ -90,4 +90,4 @@ a recorded departure). The two map skins carry its maps and popups:
 (`openImmersiveMap`) and travels it; online it is the one fast travel the room keeps
 (`src/systems/online/onlineLane.js`).
 
-See `bible/06-Systems/Immersive-Travel.md`. Thank you, kkgobkk.
+See `docs/formats/mods-and-vendor.md`. Thank you, kkgobkk.

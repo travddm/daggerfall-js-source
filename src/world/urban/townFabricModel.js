@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // URBANIZER U3 - A TOWN'S FABRIC MADE: one model of the town's own over its
 // blocks (world/urban/townFabric.js plans it), in the location's metres (x east, z north, its ground y 0):
 //   - its MAIN STREETS laid in the style's setts (URBAN_KINDS.setts) between kerbs, its PAVEMENTS of flags FABRIC_PAVE_Y
@@ -14,7 +13,6 @@
 // every 1.6 m) and Daggerfall's keep their own pictures, swapped to the town's climate as any block's model is. One
 // submesh a picture (world/arena/arenaModel.js composeArenaModel), so the town's fabric is a handful of draws in the
 // pixel's static batch. Pure: the plan and Daggerfall's pieces in, the model out.
-// ═══════════════════════════════════════════════════════════════════
 import { MeshBuilder } from '../detStandIns.js';
 import { composeArenaModel } from '../arena/arenaModel.js';
 import { vanillaTexels } from '../capitalModels.js';

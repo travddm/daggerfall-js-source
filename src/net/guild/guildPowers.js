@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // GUILD3c - WHAT EACH RANK OF A PLAYER'S GUILD MAY DO, IN WORDS.
 //
 // The powers live in four tables, each beside the law that asks it - guildLaw.js GUILD_POWERS (guildMay), hallLaw.js
@@ -17,7 +16,6 @@
 // never with an article guessed for it.
 //
 // Pure: no DOM, no clock, no network.
-// ═══════════════════════════════════════════════════════════════════
 
 import { GUILD_POWERS, GUILD_RANK_MASTER, GUILD_RANK_OFFICER, GUILD_RANK_MEMBER, GUILD_RANK_RECRUIT, GUILD_RANK_NAMES } from './guildLaw.js';
 import { HALL_POWERS } from '../hallLaw.js';

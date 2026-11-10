@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // WD1: A MOD'S WORLD-DATA FILE, AS A DIFF OF THE CLASSIC BLOCK.
 //
-// Aquatic Sprites, Detailed Ships and Warm Ashes - Ships ship whole
+// Mods such as Warm Ashes - Ships ship whole
 // blocks and whole building records as DFU's World Data Editor writes
 // them - the classic block with the author's edits in it. This tool
 // takes each file against the player's own BLOCKS.BSA (the block the

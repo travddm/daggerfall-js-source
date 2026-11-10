@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // SIT1: A CHAIR, AND THE SEAT ON IT - which of a room's models are sat on, and where on
 // one the sitter's body goes. Pure: the room's own probe is handed in (scenes/worldModes.js, the room's collider).
 //
@@ -24,7 +23,6 @@
 //   eye over its feet.
 //
 // Not a DFU member. Ledger A (SIT1).
-// ═══════════════════════════════════════════════════════════════════
 
 import { SEATED_EYE_HEIGHT, SEATED_HIP_HEIGHT, SEAT_ANKLE } from '../player/seatPose.js';
 

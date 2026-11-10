@@ -8,7 +8,7 @@
 // batches alone. Beside it, the local body asked for its sprites with the mod's SETTINGS, which never carry the form -
 // so a wereboar saw the werewolf on themselves. BY EXECUTION: the real validPose and lerpPose, the real createPeerRiders,
 // RemotePlayers and createEotbBody, driven in world.js's order with a fake renderer and decode.
-// 01-Overview/bugs/Field-Bugs-2026-09-24.md PR-WW1.
+// PR-WW1.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

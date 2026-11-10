@@ -1,4 +1,4 @@
-// BARE-BOOTS (FIELD BUGS 2026-10-15c, `01-Overview/bugs/Field-Bugs-2026-10-15c.md`; Discord "No boots model on legendary boots": the Morrowind figure in the pack
+// BARE-BOOTS (FIELD BUGS 2026-10-15c; Discord "No boots model on legendary boots": the Morrowind figure in the pack
 // stood bare-shinned and barefoot under The Wayrest Courier's Treads). The Legendary is innocent - applyRarity writes
 // the name, the lines and the enchantment and never the template, group or material - but a Legendary lands on
 // whatever base the loot made, and DFU's RandomArmorMaterial makes one boot in five CHAIN. Imperial chain is a cuirass,

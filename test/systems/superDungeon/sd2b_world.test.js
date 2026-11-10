@@ -1,7 +1,7 @@
 // SD2b: THE HOLLOW IN THE WORLD (scenes/superDungeon/sdHost.js) - the hub's record in, the Hollow it
 // names found over this client's own map files and stood at its pixel while its phase stands, the find said at its door
-// until the hub's word moves it, and the chat's lines for the moves everyone online hears. bible/11-Multiplayer/
-// Super-Dungeons.md sections 2-4.
+// until the hub's word moves it, and the chat's lines for the moves everyone online hears.
+// docs/multiplayer/group-instances.md.
 import { sdMarksLine } from '../../../src/systems/superDungeon/sdOmen.js';   // SD19 (
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

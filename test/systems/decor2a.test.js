@@ -3,7 +3,7 @@
 // nothing), what of the pack can stand and as what (systems/decor/decorItems.js), the room and the scene keeping the thing
 // itself (scenes/decor/decorRoom.js, systems/sceneCache.js), the panel's "Your things" (ui/decorPanel.js), the tool setting
 // one down and taking it back, offline and online (scenes/decor/decorTool.js), and the host's wiring by source. The
-// service's half is pinned with the service (decor1.test.js). `06-Systems/Online-Arc.md` DECOR2.
+// service's half is pinned with the service (decor1.test.js). DECOR2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

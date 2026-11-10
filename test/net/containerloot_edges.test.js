@@ -193,7 +193,7 @@ test('a birth no seat ever answers (an older build holds the seat, or its socket
   assert.deepEqual(names(items(s.B)), ['Dagger', 'Mace'], 'and B\'s own window shows its roll');
 });
 
-// ═══ AUDIT OUTDOOR-LOOT - WHAT A LOST TIE-BREAK AND A LEAVE MAY TOUCH ════════════════════════════
+// AUDIT OUTDOOR-LOOT - WHAT A LOST TIE-BREAK AND A LEAVE MAY TOUCH
 // C1: a lost tie-break lifted back out of the seat's pack every piece it had taken from the cupboard that visit - and a same-day birth
 // with an earlier `tm` is a lost tie-break whenever it comes, so one forged word, minutes later, took a seat's Katana (and, after a
 // take put back, the seat's own honest arrows that stack with it). What a lost roll gives back is bounded to the window an honest

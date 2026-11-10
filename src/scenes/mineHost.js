@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
 // PROF2 - MINING AND QUARRYING IN THE STREAMING
-// WORLD, a kind in the gathering host (scenes/gatherHost.js; bible/
-// 06-Systems/Professions-Arc.md 5.2, 6, 23; FORAGE0 14):
+// WORLD, a kind in the gathering host (scenes/gatherHost.js; docs/systems/professions.md):
 //
 //   WHERE A NODE STANDS (PROF0 6's "nearest suitable anchor", decided in
 //   23). World of Daggerfall is forced on for the online lane, so every

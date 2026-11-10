@@ -33,7 +33,7 @@ import { playerDamageMods, registerPlayerDamageMod } from '../../src/characters/
 import { liveStat } from '../../src/systems/statMods.js';
 import { mintKit, wearKit } from './gear.mjs';
 import { WEAPON_TEMPLATES } from './builds.mjs';
-import { progressionOf, VIRTUE_POINTS_PER_LEVEL } from './progression.mjs';
+import { progressionOf } from './progression.mjs';
 
 /** The rule layers, each with the game switch it flips. `default` is the game as an online room runs it. */
 export const LAYERS = Object.freeze({
@@ -48,12 +48,11 @@ export const LAYERS = Object.freeze({
   techniques: 'Weapon techniques: a burst of 1.2 to 1.8 times a blow every cooldown, on a gear tier that rolls one (combat/technique/techniqueRoster.js)',
   swing: "Swing law: DFU's Speed line with the weapon's heft and handling, and Items' weaponBalance as the game ships it (characters/weaponStates.js swingFrameSeconds, modHeft)",
   ceiling: 'Every stacking source at its cap: the blow takes the room up to the net (BLOW_MOST) and the hurt down to GUARD_LEAST (systems/powerCeiling.js). The maxed character; not in the default set',
-  virtue: 'Oblivion-style levelling: 12 attribute points a level instead of 5 (mod oblivion-remaster-leveling)',
 });
 export const LAYER_NAMES = Object.freeze(Object.keys(LAYERS));
-/** `virtue` is a per-character choice offline and is off in the room; `ceiling` and `skyHealth` are the maxed character, a scenario and
- *  not the room as played (Renown and a full Firmament tree are a long climb). The default set leaves all three out. */
-const OUT_OF_DEFAULT = new Set(['virtue', 'ceiling', 'skyHealth']);
+/** `ceiling` and `skyHealth` are the maxed character, a scenario and not the room as played (Renown and a full Firmament
+ *  tree are a long climb). The default set leaves both out. */
+const OUT_OF_DEFAULT = new Set(['ceiling', 'skyHealth']);
 export const DEFAULT_LAYERS = Object.freeze(LAYER_NAMES.filter((name) => !OUT_OF_DEFAULT.has(name)));
 
 const DEFAULT_CAREER = Object.freeze({
@@ -135,7 +134,6 @@ export function seedOf(...parts) {
 export function oursCharacter(build, level, layers, { gearPercentile, override = {} } = {}) {
   const progression = progressionOf(build, level, {
     masterSkills: layers.has('master'), onlineLevel: layers.has('online'),
-    pointsPerLevel: layers.has('virtue') ? VIRTUE_POINTS_PER_LEVEL : undefined,
   });
   if (override.stats) progression.stats = { ...progression.stats, ...override.stats };
   for (const [id, value] of Object.entries(override.skills ?? {})) progression.skills[id] = value;

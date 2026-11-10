@@ -1,4 +1,4 @@
--- QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.1): THE BURNING DOORS, step 3 of 5.
+-- QL12 (2026-10-19; docs/systems/quests.md): THE BURNING DOORS, step 3 of 5.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner: Ysolde's words
 -- are in the journal at once (the last step ended at her table). WITNESSED (net/questlineClaims.js, `rite`): the step
 -- waits on the act its receipt is - the faithful's rite broken at a Dagon's Breach (`ql act rite-broken 1`, said by

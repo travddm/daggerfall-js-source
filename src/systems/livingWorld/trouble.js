@@ -1,7 +1,6 @@
 // @ts-check
 // LW4: TROUBLE ON THE ROAD - what a party meets between two towns, and
-// what comes of it. Mac: NPCs "can encounter enemies in the overworld". Pure, like the trips it falls on (LW0 decision
-// 2): a trip's trouble is a function of the trip, its party and the world's own data - every reader sees the same
+// what comes of it. Mac: NPCs "can encounter enemies in the overworld". Pure, like the trips it falls on: a trip's trouble is a function of the trip, its party and the world's own data - every reader sees the same
 // caravan beset at the same bend of the same road, by the same foes, with the same end.
 //
 // AT MOST ONE ENCOUNTER A TRIP. Its chance is the walk's: RISK_PER_DAY a day of walking, out and home, weighed by the

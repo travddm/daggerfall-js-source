@@ -43,7 +43,7 @@ import {
   SET_TIER_BLOW, SET_TIER_GUARD, SET_TIER_OTHER, POWER_BLOW, POWER_GUARD, POWER_OTHER,
 } from '../../tools/powerCeiling.mjs';
 
-const RULE = 'THE CEILING HOLDS (bible/05-Combat/Power-Ceiling.md): a stronger kit needs the owner\'s word, quoted there';
+const RULE = 'THE CEILING HOLDS: a stronger kit needs the owner\'s word, quoted there';
 const close = (a, b, what) => assert.ok(Math.abs(a - b) < 1e-9, `${what}: ${a} is not ${b}`);
 let T = 0;
 LP._setLootPowersClockForTests(() => T);

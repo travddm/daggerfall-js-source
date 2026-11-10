@@ -14,7 +14,7 @@
 //   - so the three objects are three heads and three hairs: nine faces.
 //
 //   EACH PART IN THE HEAD'S OWN FRAME. A retail head or hair is a RIGID part hung under the skeleton's "Head" node
-//   (02-Formats/Morrowind-Rules.md rules 5, 12 and 13), its geometry in that node's frame. The three faces carry one
+//   (docs/formats/morrowind.md), its geometry in that node's frame. The three faces carry one
 //   such frame between them, not a recentring of each: every one has the same crown (z 7.66), the same sides
 //   (x +-4.78) and the same back, though one is a different mesh with a sculpted beard - so the frame is the source
 //   head's (`b_n_breton_m_head_05`, the names say), and each part is baked in it: the object's scene placement taken

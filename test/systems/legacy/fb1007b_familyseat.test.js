@@ -2,7 +2,7 @@
 // your family to be situated in a specific town, especially if your fresh from Privateer's Hold, you have to really
 // rough it. ... Fast travel will also kind of just steer you into towns so you have to manually be conscious of that
 // too. It would be nice if maybe either you had the option in the enhanced ui to reset your family seat to a town your
-// currently in, from one that it was in prior"). `01-Overview/bugs/Field-Bugs-2026-10-07b.md`.
+// currently in, from one that it was in prior").
 //
 // The seat is the first town the house stands in (legacyHost.js tick: the first second on a town's map pixel - a road
 // past one, a journey's crossing), and nothing moved it. The House page moves it now, to the town the one played stands

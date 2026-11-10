@@ -32,7 +32,7 @@ function seeded(seed = 1) {
 }
 const body = (sub, x, z, dead = false) => ({ sub, x, z, dead });
 
-// ═══ R: THE RELAY'S FIGHT ════════════════════════════════════════════════════════════════════════════════════════════
+// R: THE RELAY'S FIGHT
 
 test('AUDIT WBX R1 a share leaves with its fighter: one gone ABSENT_RETIRE_MS takes its share out of his health at the fraction he stands at, and brings it back when it returns - its seat, its blows and its claim kept; twenty accounts that said `in` and left no longer make him unkillable (mutants: the share left in him; the return healing him)', () => {
   const f = newFight(7, 0, 10_000_000, 'ruhn');
@@ -79,7 +79,7 @@ test('AUDIT WBX R5/R6 the bar through the Wrath\'s wind-up, and midnight is his:
   assert.equal(applyHit(g, 'p', 20, HIT_KINDS.Spell, { x: 0, z: 3 }, 60_000), 0, 'after midnight, with no beat to have said the Wrath');
 });
 
-// ═══ S: THE SPOILS ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// S: THE SPOILS
 
 test('AUDIT WBX S1 a spent receipt is said to the hub, which forgets its kept copy (that day\'s alone): the next hello of any device is handed nothing; the court\'s fighters are not handed it by the hub at the kill, and any other account on its newest tab alone (mutants: the hub keeping it; every tab handed it)', async () => {
   const DAY = 200, TT = gateTimes(DAY);
@@ -168,7 +168,7 @@ test('AUDIT WBX S2 the receipt says the level the fight admitted its account at,
   assert.equal(spoilsLevel(0, undefined), 1);
 });
 
-// ═══ F: THE COURT ════════════════════════════════════════════════════════════════════════════════════════════════════
+// F: THE COURT
 
 test('AUDIT WBX F1/F2 no weapon is worn or destroyed on him: the Razor\'s whole-health blow passes his stand-in by, and no Strikes payload bills its weapon for a blow on him - every other foe as DFU has it (mutants: the Razor on the stand-in; the payload\'s bill on him)', () => {
   const razor = SPECIAL_ARTIFACT_HANDLERS.get(ARTIFACTS.MehrunesRazor);
@@ -248,7 +248,7 @@ test('AUDIT WBX F6/F9 the court: my trap on him is said while it runs (a recast 
   for (let t = 9000; t <= 10_000; t += 16) { g.clock.t = t; g.c.frame(); }
 });
 
-// ═══ W: THE GATE IN THE WORLD, AND ITS MUSIC ═════════════════════════════════════════════════════════════════════════
+// W: THE GATE IN THE WORLD, AND ITS MUSIC
 
 test('AUDIT WBX W1/W6 a player standing in the stone the moment it comes up whole is set down before the gate, not sealed in it - GATE-FBX: in a foot, under its overhang, high in a pillar or in the lintel; the threshold, its free edge, the ground before a foot and about the gate, and the opening over a head are left alone; the fire\'s box is made when the gate\'s place moves, not every frame the hover asks (mutants: the roots\' check removed; the box made every frame; the box left where the gate stood)', async () => {
   const { createGatePool, inGateRoot } = await import('../../../src/scenes/gate/gatePool.js');

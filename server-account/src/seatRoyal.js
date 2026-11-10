@@ -1,5 +1,4 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
 // CROWN1 part two - THE ROYAL TOURNEY, AS THE SERVICE KEEPS IT: who may enter
 // (the pass, over the ring the contenders' games agree), the bouts the
 // winners' receipts bring (counted by the room's own ladder rule), the
@@ -18,7 +17,6 @@
 // third are the uncounted alone) is asked inside its own INSERT.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { accountKind, overRate } from './accounts.js';
 import { seatsOpenFor, confirmedSeats } from './townSeats.js';
 import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';

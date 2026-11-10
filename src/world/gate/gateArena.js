@@ -2,7 +2,7 @@
 // WB3b: THE BURNING COURT - the place
 // the gate opens onto. Design:
 //
-// NOT A FIFTH HOST. The four-hosts law (11-Multiplayer/Multiplayer.md "Constraints") exists because every host has
+// NOT A FIFTH HOST. The four-hosts law (docs/architecture/hosts-and-modules.md) exists because every host has
 // been missed at least once, and an arena that needs combat, spells, the HUD, the inventory, other players, a death and
 // a way out is a host's whole job. So the court is a DUNGEON - the dungeon host with a level made here:
 //

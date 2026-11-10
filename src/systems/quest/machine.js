@@ -294,7 +294,7 @@ import { Parser } from './parser.js';
 import { globalVarsTable } from './tables.js';   // STORY-AGAIN (AUDIT QA3): a step's globals, by name
 import { spineOwed, spineRecord, SPINE, SPINE_OPENER, SPINE_CHECK_TICKS } from './mainSpine.js';   // MAIN-SPINE: the main quest's backbone kept
 import { defaultActionTemplates, heldPromptPlaces } from './actions.js';   // AUDIT QA3 A1: a box up here, asked in the envelope
-import { receivedState, mergeSharedState, freshState, QL_STAMP } from '../questlines/qlState.js';   // QL1: a shared copy's questline state (decision 7); AUDIT QUESTLINES BRANCH-14: a restart's stamp
+import { receivedState, mergeSharedState, freshState, QL_STAMP } from '../questlines/qlState.js';   // QL1: a shared copy's questline state; AUDIT QUESTLINES BRANCH-14: a restart's stamp
 import { QuestResourceBehaviour } from './resourceBehaviour.js';
 import { FACTION_TYPES } from '../../formats/factionFile.js';
 import { SECONDS_PER_WEEK } from '../gameDate.js';
@@ -805,7 +805,7 @@ export class QuestMachine {
     quest.start();
     adoptLinkedDungeonSize(quest, this);   // AUDIT DELVE E5: where the medium size is either side, the size its markers know
     this.deps.addQuestTopics?.(quest);
-    // QL1 (decision 1): THE STAMP, at the one door every new quest starts through - a
+    // QL1: THE STAMP, at the one door every new quest starts through - a
     // scheduled one, a list's, a start's, a restart's. A quest that already carries one (none does here: a shared copy
     // and a load restore theirs, and never pass this door) keeps it. The layer answers (scenes/quest/questBridge.js).
     if (quest.ql == null) quest.ql = this.deps.questlinesStamp?.(quest) ?? null;
@@ -1650,7 +1650,7 @@ export class QuestMachine {
     for (const r of quest.resources.values()) if (r.isPlace && r.siteDetails) sitesBefore.set(r.symbol?.name, structuredClone(r.siteDetails));
     const qlBefore = quest.ql;   // QL1: this copy's questline state, merged with the partner's below
     quest.restoreSaveData({ ...questData, uid, instanceEpoch: quest.instanceEpoch ?? null }, this._saveResolvers());   // INSTANCES: and its instance - this copy's own (NO_INSTANCE)
-    quest.ql = mergeSharedState(qlBefore, questData.ql);   // QL1 (decision 7): the party's progress monotonic, the holder's reward its own
+    quest.ql = mergeSharedState(qlBefore, questData.ql);   // QL1: the party's progress monotonic, the holder's reward its own
     for (const r of quest.resources.values()) if (r.isPlace && sitesBefore.has(r.symbol?.name)) r.keepOwnSite?.(sitesBefore.get(r.symbol?.name));
     for (const r of quest.resources.values()) {
       if (r.isClock && !r.clockFinished && finishedBefore.has(r.symbol?.name)) {
@@ -1985,7 +1985,7 @@ export class QuestMachine {
     const why = this.restartRefusal(uid, { refuse });
     if (why) return { ok: false, reason: why };
     const old = this.quests.get(Number(uid));
-    // AUDIT QUESTLINES BRANCH-14: THE STAMP IS FOR LIFE, A RESTART'S TOO (decision 1). A stamped quest restarted with the
+    // AUDIT QUESTLINES BRANCH-14: THE STAMP IS FOR LIFE, A RESTART'S TOO. A stamped quest restarted with the
     // switch off (offline, the player's) was read and started as DFU's: a questline's own step unstamped, its `ql act`
     // deaf for good (qlActions.js QlAct). A stamped quest is read with its branch and starts stamped whatever the switch
     // says now (its tier the holder's, as a start reads it); an unstamped one restarts as any start does, by the switch now.

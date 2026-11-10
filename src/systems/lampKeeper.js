@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // LAMP-KEEPER II: THE LAMP KEEPER, ITS LAW.
 //
 // THE BUG IT WAS (LAMP-KEEPER, FIELD BUGS 2026-09-26 report 15): Roleplay &
@@ -25,7 +24,6 @@
 //
 // Pure but for the text core - the claim, the line and the banner are handed in. Not a DFU member. Ledger A
 // (LAMP-KEEPER).
-// ═══════════════════════════════════════════════════════════════════
 
 import { t } from './textManager.js';
 import { isShop } from './shopStock.js';

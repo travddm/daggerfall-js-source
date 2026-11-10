@@ -46,7 +46,7 @@ function dayOf(want, from = 0) {
 }
 const at = (k, dx = 0, dz = 0) => [COURTS[k][0] + dx, COURTS[k][1] + dz];
 
-// ═══ THE TABLE ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE TABLE
 
 test('WB14b the portents: three, each its name, its one line, its tip and its receipt bit (1, 2, 4); the Dire Breach is no row - the Vanguard and the Sundering, its own line before theirs; a night\'s portents on the wire are one, or the Dire Breach\'s pair, in the table\'s order, known words alone (mutants: a pair the table never makes; an unknown word let through)', () => {
   assert.deepEqual(GATE_PORTENTS.map((p) => p.id), ['vanguard', 'sunder', 'captive']);
@@ -70,7 +70,7 @@ test('WB14b the portents: three, each its name, its one line, its tip and its re
   assert.equal(portentsLine(null), '');
 });
 
-// ═══ THE BAG ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE BAG
 
 test('WB14b the bag: a night\'s portents from its day alone, the same every time; none on a Legion-Lord night; every other night that can carry one carries one - so no two gates running share a portent; each round of six brings the Vanguard twice, the Sundering twice, the Captive once and the Dire Breach once (mutants: the bag ignoring the Legion-Lord; two carriers running; a round short of its six)', () => {
   assert.deepEqual(PORTENT_BAG, ['vanguard', 'vanguard', 'sunder', 'sunder', 'captive', 'dire']);
@@ -114,7 +114,7 @@ test('WB14b the Tithe-Imp and the captive by the day: one night in TITHE_ONE_IN 
   assert.equal(gateTitheOf(-1), null);
 });
 
-// ═══ THE PLAN ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE PLAN
 
 test('WB14b the floors: the three courts first, then the Muster and the Bridgehead south of the first and the Pen east of it, all of COURT_R, never meeting; every walkway joins two of them, a walkway\'s length of fire between their rims (the Rift Way the long one past the second court\'s rim); every floor and walkway inside the wire\'s bound and out of the great tower\'s window; the Vanguard\'s walkway meets the first court clear of its bridge (mutants: a platform moved onto a court)', () => {
   assert.equal(COURTS.length, 6); assert.equal(COURTS_HIS, 3);
@@ -230,7 +230,7 @@ test('WB14b a bound lays its walkway on every screen: over a walkway of the nigh
   assert.deepEqual(crossLaid({ ...GATE_STATE_EMPTY, day: 1, xa: [] }, word).xa, [T0 + 20_000 - ATTACKS.cross.windup, T0 + 20_000 - ATTACKS.cross.windup], 'a plain night\'s (an old checkpoint\'s) bound to the third lays both');
 });
 
-// ═══ THE SCREEN ══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SCREEN
 
 test('WB14b the night\'s court on the screen: its plan by its day (the relay\'s draw, the same law); its fighters arrive on its root floor and its way in burns there; the model, the collider, the slabs and the braziers are the plan\'s - a plain night\'s WB9b\'s - and a portent\'s platform keeps no rune ring; the motor holds a body to the night\'s floor (mutants: the platforms on every night; the arrival in the first court on the Vanguard\'s)', () => {
   const vd = dayOf('vanguard'), pd = dayOf(null), cd = dayOf('captive');
@@ -285,7 +285,7 @@ test('WB14b the Deadlands keep clear of every floor of every night: no island wi
   assert.ok(floorGap(r.ax + r.ux * r.len / 2, r.az + r.uz * r.len / 2) < 0, 'the Rift Way counted');
 });
 
-// ═══ THE WORDS ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WORDS
 
 test('WB14b the night\'s portents said before the gate, everywhere his marks are: the chat\'s line after his marks (the Dire Breach\'s own first), the map\'s card a line of their names, the marks card a row each after his trials; none of it on a plain night (mutants: the portents unsaid in the chat; the card\'s row missing)', () => {
   const plain = dayOf(null, 600), van = dayOf('vanguard', 600), dire = dayOf('vanguard+sunder', 600);

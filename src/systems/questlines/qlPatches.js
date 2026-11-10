@@ -1,11 +1,11 @@
 // @ts-check
-// QL4/QL5-QL10 (decision 3, section 2.3): THE FLAGSHIP QUESTS' BRANCHES, AS PATCHES.
+// QL4/QL5-QL10: THE FLAGSHIP QUESTS' BRANCHES, AS PATCHES.
 // A flagship quest (section 3) that has no branch of its own is given one as SHAM-TRAIL gives its entry
 // (systems/quest/questPatches.js applyTextPatches): an exact old text, how many times it must occur, the new - applied as
 // the script is READ, never an edit of the vendored file, and a patch that no longer finds its text throws (here) or
 // loads the quest as shipped (the pack's reader), so a changed file is never patched silently wrong.
 //
-// ONLY WHILE THE SWITCH IS ON. A quest begun with the switch off is DFU's to its end (decision 1), so its script is read
+// ONLY WHILE THE SWITCH IS ON. A quest begun with the switch off is DFU's to its end, so its script is read
 // as DFU's: the branch is patched in only when the layer is on as the script is read, and the stamp is decided at the
 // start that follows the read (machine.js startQuestImmediate) - the two agree. A quest already running keeps the tasks it
 // was parsed with whatever the switch says later (a load restores them, a share carries them).

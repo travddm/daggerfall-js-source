@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // DISC25-F - THE HOW-MANY FIELD: DFU's split popup, on an enhanced card.
 //
 // Satranath, crediting Starempire42, on Discord: "It doesn't appear
@@ -15,7 +14,6 @@
 // whole. Both write the question as a field on the item's own card now,
 // beside the button that moves it - ONE constructor for both (AUDIT
 // 17i), the law (the words, the cap, the parse) in systems/item/itemTransfer.js.
-// ═══════════════════════════════════════════════════════════════════
 
 import { HOW_MANY_ITEMS, SPLIT_INPUT_MAX } from '../systems/item/itemTransfer.js';
 

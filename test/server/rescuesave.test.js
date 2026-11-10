@@ -20,7 +20,7 @@ import * as acorn from 'acorn';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { REALM_MAX_BYTES } from '../../server-account/src/realm.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   realmIo, realmCreate, realmPut, realmFetch, realmLeave, realmDelete, realmList, openRealmBoot, createRealmSession,
   readUnsent, keepUnsent, forgetUnsent, claimUnsent, sweepUnsent, realmSaveWithHeld, packUnsent, unpackUnsent,
@@ -81,7 +81,7 @@ async function account() {
   const env = { DB: d1(), SAVES: r2(), ACCOUNT_VERSION: 'test1' };
   const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
   const device = (storage = fakeStorage()) => {
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     let open = () => {};
     const gate = new Promise((r) => { open = r; });
     const door = { plan: [], puts: 0, open: () => open() };
@@ -132,7 +132,7 @@ const settle = async () => { for (let i = 0; i < 30; i++) await new Promise((r) 
 /** Until `ok()` holds - a put packed (REALM-GZIP) reaches the door a turn or more after it is asked. */
 const until = async (ok) => { for (let i = 0; i < 500 && !ok(); i++) await new Promise((r) => setTimeout(r, 1)); assert.ok(ok(), 'waited too long'); };
 
-// ═══ RESCUE-SAVE ═════════════════════════════════════════════════════════════════════════════════════════════════════
+// RESCUE-SAVE
 
 test('RESCUE-SAVE: THE OUTAGE - a save the service never took is kept on the device, and the next join plays it, says so and gives it to the service', async () => {
   const acct = await account();
@@ -299,7 +299,7 @@ test('RESCUE-SAVE: the world host says it once the world stands - only for a cop
   assert.match(REALM_RESTORED_TEXT, /this device kept it/i);
 });
 
-// ═══ AUDIT RESCUE-SAVE ═══════════════════════════════════════════════════════════════
+// AUDIT RESCUE-SAVE
 
 /** world.js's own statements, sliced (test/systems/auditrealm2_client.test.js's harness). */
 function sliced(rel) {
@@ -581,7 +581,7 @@ test('AUDIT RESCUE-SAVE A7: the Online door drops a copy of the account\'s own c
   assert.equal(keepUnsent(dev.storage, stranger, 4, '{"v":2}', { lease: 'b'.repeat(32) }), false, 'A4 by the letter: another lease writes nothing');
 });
 
-// ═══ AUDIT RESCUE-SAVE 2 ════════════════════════
+// AUDIT RESCUE-SAVE 2
 
 test('AUDIT RESCUE-SAVE 2 B1: a tab the character was taken from never drops or marks the newer tab\'s copy - not by a refusal the route answers before the lease (too-large), not by its own lease refused', async () => {
   const acct = await account();
@@ -736,7 +736,7 @@ test('AUDIT RESCUE-SAVE 2 (REALM-GZIP): a save past the request\'s bound rides p
   assert.equal((await c.served()).level, 40);
 });
 
-// ═══ RESCUE-PACK ══════════════════════════════════════════════════════════════════════════
+// RESCUE-PACK
 // A long life's copy rides packed: a save past REALM_UNSENT_PACK_OVER characters is kept gzipped (REALM-GZIP's codec)
 // as base64 - a browser's storage takes what the plain text would not.
 
@@ -838,8 +838,8 @@ test('RESCUE-PACK: a packed copy that will not open is dropped at the join, and 
   assert.equal(readUnsent(dev.storage, c.id), null);
 });
 
-// ═══ STRANDED (FIELD BUGS 2026-10-25: "Guild standing dropped from 100 brotherhood and mages 98 because i logged into ═
-// the browser not exe"; "all quests are gone and standings reset") SAVES-SAID ═════════
+// STRANDED (FIELD BUGS 2026-10-25: "Guild standing dropped from 100 brotherhood and mages 98 because i logged into
+// the browser not exe"; "all quests are gone and standings reset") SAVES-SAID
 
 test('STRANDED: a copy whose put LANDED with its answer lost is the realm\'s save - dropped at the join, never set aside', async () => {
   const acct = await account();

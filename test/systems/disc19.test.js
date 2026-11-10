@@ -53,7 +53,7 @@ import { isStaleChunk, STALE_CHUNK_IN_PLAY_TEXT } from '../../src/systems/staleC
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 
-// ═══ A: the curse through a load ═════════════════════════════════════════════════════════════════════════════════
+// A: the curse through a load
 const T0 = 523530 + 10 * MINUTES_PER_DAY;
 const mortal = () => ({
   isPlayer: true, name: 'Mac', race: 'Nord', gender: 'male', level: 10, reflexes: 2,
@@ -122,7 +122,7 @@ test('DISC19-A: in the session itself the round clock never touches a curse or a
   resetMagicRoundMarker(null);
 });
 
-// ═══ C: the death loop ═══════════════════════════════════════════════════════════════════════════════════════════
+// C: the death loop
 const withSearch = (search, fn) => {
   const had = Object.getOwnPropertyDescriptor(globalThis, 'location');
   Object.defineProperty(globalThis, 'location', { value: { search, pathname: '/' }, configurable: true, writable: true });
@@ -182,7 +182,7 @@ test('DISC19-C: an online page\'s death screen counts its respawn in the hint\'s
   });
 });
 
-// ═══ F: the watch and the town ════════════════════════════════════════════════════════════════════════════════════
+// F: the watch and the town
 const TOWN = { enabled: true, playerInTown: true, crime: false, threats: 1, defenders: 0, locationKey: '3,12' };
 
 test('DISC19-F: the watch comes to a monster hunting the player in town after the witnessed-crime countdown, not for a wanted player, not after the player left - and walks away when the town is quiet', () => {
@@ -312,7 +312,7 @@ test('DISC19-F: the player\'s swing spares a defender while the monsters\' pool 
   assert.equal(d.defender, true);
 });
 
-// ═══ E: the King of Worms' door ═══════════════════════════════════════════════════════════════════════════════════
+// E: the King of Worms' door
 /** An axis-aligned box as twelve triangles. */
 function boxMesh(min, max) {
   const [x0, y0, z0] = min, [x1, y1, z1] = max;
@@ -363,7 +363,7 @@ test('DISC19-E: the corridor piece still owns what its own geometry meets - a ra
   assert.equal(hit?.key, relay.key, 'the static bucket names nobody - the box decides, as it always did');
 });
 
-// ═══ D: the enemies no blow could reach ═══════════════════════════════════════════════════════════════════════════
+// D: the enemies no blow could reach
 const SRC_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '../src');
 /** The STATIC closure of a host module - every module on the page once that host has loaded (AUDIT DISC19: the first cut
  *  took "some file under src/ imports it", which is not "the page holds it" - the standalone ?dungeon host still loads

@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-A / DW-B — THE DEEP WATERS WORKER. Iliac Puddle No More's two heavy
 // halves, off the main thread: the bake's global half (deepWatersBake.js
 // - seconds of work on a first boot, then an IndexedDB hit) and every
@@ -32,7 +31,6 @@
 //     {t: 'pixel', id, error}.
 //
 // Pure modules only (no ui/, scenes/, render/) - a worker has no DOM.
-// ═══════════════════════════════════════════════════════════════════
 
 import { WoodsFile } from '../../formats/woodsFile.js';
 import { buildGlobal, DeepWatersBake, PLANE_KEEP_RADIUS } from './deepWatersBake.js';   // AUDIT ETHER-OW C1-2: the planes' keep, one home

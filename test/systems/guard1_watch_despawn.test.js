@@ -80,7 +80,7 @@ const werewolf = () => ({
   activeEffects: [{ kind: 'racialOverride', racial: 'lycanthropy', isTransformed: true }],
 });
 
-// ═══ (a) the three clauses that were there ════════════════════════
+// (a) the three clauses that were there
 test('GUARD1: an ACTIVE crime keeps the watch, and clearing it walks them away', () => {
   const pe = { level: 1, reflexes: 2, crimeCommitted: CRIMES.Murder };
   const { g, freed } = pool(pe);
@@ -97,7 +97,7 @@ test('GUARD1: an ACTIVE crime keeps the watch, and clearing it walks them away',
   assert.equal(freed.n, 3, 'every walk-away frees its billboard batch');
 });
 
-// ═══ (b) THE DROPPED CLAUSE ═══════════════════════════════════════
+// (b) THE DROPPED CLAUSE
 test('GUARD1: a TRANSFORMED lycanthrope does NOT despawn the watch, though the crime reads None', () => {
   // This is the whole finding. SuppressCrime holds crimeCommitted at
   // None for the entire transformation, so the first three clauses are
@@ -128,7 +128,7 @@ test('GUARD1: an ordinary mortal is untouched by the new term', () => {
   assert.equal(g.activeCount(), 0, 'no lycanthropy, no exemption');
 });
 
-// ═══ (c) the spawn gate still answers after a walk-away ═══════════
+// (c) the spawn gate still answers after a walk-away
 test('GUARD1: a fresh crime after a walk-away reaches the spawn chain', async () => {
   // The other half of the report - "then i was free to go on a killing
   // spree" - would also follow from a pool that refused to spawn again
@@ -158,7 +158,7 @@ test('GUARD1: the cap is DFU\'s `<= maxActiveGuardSpawns`, on both sides of the 
   }
 });
 
-// ═══ (d) crimeCommitted is a NUMBER, from one enum ════════════════
+// (d) crimeCommitted is a NUMBER, from one enum
 test('GUARD1: the pickpocket crime is the enum id, not a string', () => {
   // PlayerActivate.cs:1657 - `player.CrimeCommitted = Crimes.Pickpocketing`.
   const player = {

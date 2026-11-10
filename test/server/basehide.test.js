@@ -14,7 +14,7 @@ import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { DECOR_BASE_KEY_RE, DECOR_HIDDEN_CAP, decorBaseModelKey, decorBaseFlatKey, decorBaseWhat, decorHiddenOf } from '../../src/net/decorLaw.js';
 import { createBaseRoom, baseBucketOf } from '../../src/scenes/decor/decorBase.js';
 import { createSceneCache, cacheScene, restoreCachedScene, clearSceneHidden, interiorSceneName } from '../../src/systems/sceneCache.js';
-import { accountDecor, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountDecor, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { createDecorPanel, decorBaseSub, DECOR_HOLDS_LINE, DECOR_BASE_EMPTY } from '../../src/ui/decorPanel.js';
 import { toolRig, settle, all, one, fakeDoc, fakeWin } from '../decorFakes.mjs';
 import { ACCEPTED } from '../../src/net/legalLaw.js';   // TERMS1: a request that makes an account carries the versions ticked
@@ -181,7 +181,7 @@ test('BASE-HIDE the service: a home\'s list of what is out is read with its piec
   assert.deepEqual((await call('/v1/homes/decor', HOME, mara)).body.hidden, [], 'the next owner walks into the room as Daggerfall furnished it');
   // the client's door: the whole list, the owner's character
   const posts = [];
-  const session = new Map([[SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
+  const session = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: 'sek', id: 'p' })]]);
   const door = accountDecor({ fetch: async (u, i) => { posts.push([u, i]); return { ok: true, status: 200, json: async () => ({ ok: true }) }; }, storage: { getItem: (k) => session.get(k) ?? null } });
   await door.hidden({ ...HOME, character: 'char-me', keys: ['m1:2'], extra: 'dropped' });
   assert.equal(new URL(posts[0][0]).pathname, '/v1/homes/decor/hidden');

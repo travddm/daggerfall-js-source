@@ -11,7 +11,7 @@
 // card and on Take's title, what is held and walled and why (profBook.js walled, workTab.js writWalledText); a guild
 // writ's card the same; the service's gold refusal no longer sends the reader to withdraw what withdrawn is walled still.
 // Driven through the real Worker over node:sqlite (test/accountDb.mjs), the real books and the real board.
-// `01-Overview/bugs/Field-Bugs-2026-10-13e.md` WRIT-WALL; `06-Systems/Materials-Bag.md` section 4.
+// WRIT-WALL.
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

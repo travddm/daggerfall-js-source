@@ -3,8 +3,7 @@
 // NOTICE1 - THE NOTICE BOARD'S SERVICE: a town's notes, who
 // may pin one, and the server's notices.
 //
-// (bible/06-Systems/
-// Professions-Arc.md 10, PROF0). What a note is - its words, its days,
+// (docs/systems/professions.md). What a note is - its words, its days,
 // its button, every bound - is src/net/boardLaw.js, which the client's
 // window reads too; this file is who may do what with one.
 //

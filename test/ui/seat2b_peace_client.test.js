@@ -1,9 +1,9 @@
 // SEAT2b part two: THE WORKS AT PEACE ON THE CLIENT - the
 // Watchtowers' word asked ten minutes apart and said once a challenger, a week and a share, kept on the device; the
 // seats dressed in their works; the Seat tab's towers lines; a craft carrying the town its station stands in; the host's
-// seams - a members' Harbour a Travel Options port, a coast the sea beside the town (bible/
-// 11-Multiplayer/Seats-Arc.md 7.5; src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
-// src/scenes/world.js). `06-Systems/Online-Arc.md` SEAT2b part two.
+// seams - a members' Harbour a Travel Options port, a coast the sea beside the town
+// (src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
+// src/scenes/world.js). SEAT2b part two.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -104,8 +104,8 @@ test('SEAT2b part two A CRAFT CARRIES ITS TOWN: the book keeps the town the stat
   await book.craft('longsword:mithril', { clean: true, seat: -4 }, () => {});
   assert.deepEqual(calls.map((a) => a[7]), [3021, null, null]);
   const posted = [];
-  const { accountProf } = await import('../../src/net/accountClient.js');
-  const prof = accountProf({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: () => JSON.stringify({ id: 'p1', secret: 's' }), setItem() {}, removeItem() {} } });
+  const { accountProf, SERVICE_KEY } = await import('../../src/net/accountClient.js');
+  const prof = accountProf({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : JSON.stringify({ id: 'p1', secret: 's' })), setItem() {}, removeItem() {} } });
   await prof.craft('c1', 'longsword:mithril', true, 'Hollin', 'rid-1', false, null, 3021);
   await prof.craft('c1', 'longsword:mithril', true, 'Hollin', 'rid-2');
   assert.deepEqual(posted.map(([p, b]) => [p, b.seat]), [['/v1/prof/craft', 3021], ['/v1/prof/craft', undefined]]);

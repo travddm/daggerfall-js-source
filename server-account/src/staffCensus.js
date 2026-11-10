@@ -1,9 +1,8 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL4-CENSUS - THE ITEM AND GOLD CENSUS, AND THE CONTESTED PIECES. Admin only (mob, 03:03Z: a Moderator gets the chat
 // reports, Mute and Ban, and the few things named for them - not this).
 //
-// ═══ THE TALLY RIDES THE JUDGE, NEVER A SAVE OF ITS OWN ═════════════
+// THE TALLY RIDES THE JUDGE, NEVER A SAVE OF ITS OWN
 //
 // Every online character's checkpoint is already read by the judge (verdict.js verdictOn). The census takes its tally
 // there - gold (purse and banks) and how many of each item template the character holds (judge.js possessedItemLists:
@@ -23,7 +22,7 @@
 // What it measures is what the games claim (design doc, "Limits no fix removes"): a save's own word, as last saved by
 // the player's game. A character a service move changed while offline (a sale, a vault) counts as its last checkpoint.
 //
-// ═══ CONTESTED PIECES (the weak spot: "Copies found ... can blame an innocent player") ═══
+// CONTESTED PIECES (the weak spot: "Copies found ... can blame an innocent player")
 //
 // The ledger cannot tell a copier from someone who took the piece first (ledger.js THE FIRST HOLDER KEEPS IT), so a copy
 // found is a CONTESTED PIECE: which piece (its print), the first holder and the claimant with their times, how it was
@@ -31,7 +30,6 @@
 // the Remove itself is the realm builder's. Copies and census jumps are how dupes are hunted; neither proves one.
 //
 // EVERY LIST PAGES: `from`, answered as `next`.
-// ═══════════════════════════════════════════════════════════════════
 
 import { displayName } from './accounts.js';
 import { possessedItemLists, goldOf } from './judge.js';
@@ -59,8 +57,8 @@ export const CENSUS_DAYS_KEEP = 180;
 export const CENSUS_JUMP_HOURS = 24;
 export const CENSUS_JUMP_HOURS_MAX = 72;
 export const CENSUS_JUMPS_MAX = 50;
-/** THE QUIET HOURS (UTC) the census's own jobs run in - the evening peak is 14:00-00:00 UTC (bible/11-Multiplayer/
- *  Scale-Arc.md, PRIMARY-TRIPS). A guess at the quietest: nobody has measured the night. The day's totals at the first. */
+/** THE QUIET HOURS (UTC) the census's own jobs run in - the evening peak is 14:00-00:00 UTC (docs/multiplayer/relay-scaling-and-cost.md).
+ *  A guess at the quietest: nobody has measured the night. The day's totals at the first. */
 export const CENSUS_QUIET_HOURS = Object.freeze([7, 8, 9, 10]);
 export const CENSUS_DAY_HOUR = CENSUS_QUIET_HOURS[0];
 /** The backfill's page of characters, and the most it fills in one firing (each one an R2 read and a parse). */
@@ -80,7 +78,7 @@ const TEMPLATE_SCAN = 4096;
 export const CENSUS_ROUTES = Object.freeze(['/v1/staff/census/find', '/v1/staff/census', '/v1/staff/census/jumps',
   '/v1/staff/contested', '/v1/staff/contested/piece', '/v1/staff/contested/trail']);
 
-// ═══ THE TALLY ═══════════════════════════════════════════════════════
+// THE TALLY
 
 /**
  * ONE CHARACTER'S TALLY, pure: `{"g": gold, "b": banks, "t<index>": count, ...}` - gold the purse and the banks (judge.js goldOf,
@@ -149,7 +147,7 @@ export function censusStep(db, { player, char, seq, nowS }, save, was) {
   }
 }
 
-// ═══ KINDS: what staff type ═══════════════════════════════════════════
+// KINDS: what staff type
 
 /** A kind as the routes take it - 'gold', 'marks', or an item template ('t113', or 113) - or null. */
 export function kindOf(/** @type {unknown} */ v) {
@@ -199,7 +197,7 @@ export function storeTemplateOf(/** @type {string} */ key) {
   return Number.isSafeInteger(t) ? /** @type {number} */ (t) : null;
 }
 
-// ═══ THE READS ═══════════════════════════════════════════════════════
+// THE READS
 
 /** @type {Map<string, { at: number, data: any }>} the census reads this isolate kept */
 const kept = new Map();
@@ -324,7 +322,7 @@ async function jumpsOf(db, kind, nowS, hours) {
   }));
 }
 
-// ═══ CONTESTED PIECES ════════════════════════════════════════════════
+// CONTESTED PIECES
 
 /** What a piece is, off its print (judge.js ledgerPrintOf: `template:material`). */
 const pieceOf = (/** @type {unknown} */ fp) => {
@@ -441,7 +439,7 @@ async function pieceTrail(db, uid) {
   };
 }
 
-// ═══ THE PANEL'S DOORS ═══════════════════════════════════════════════
+// THE PANEL'S DOORS
 
 const offsetOf = (/** @type {unknown} */ v) => (Number.isSafeInteger(v) && /** @type {number} */ (v) > 0 ? /** @type {number} */ (v) : 0);
 const within = (/** @type {unknown} */ v, /** @type {number} */ dflt, /** @type {number} */ max) => (Number.isSafeInteger(v) && /** @type {number} */ (v) >= 1 ? Math.min(/** @type {number} */ (v), max) : dflt);
@@ -547,7 +545,7 @@ export const HOME_WATCH = Object.freeze({
   },
 });
 
-// ═══ THE CLOCK'S JOBS (cron.js HOUR_JOBS) - off peak only ═══════════════
+// THE CLOCK'S JOBS (cron.js HOUR_JOBS) - off peak only
 
 const utcHourOf = (/** @type {number} */ nowS) => new Date(nowS * 1000).getUTCHours();
 

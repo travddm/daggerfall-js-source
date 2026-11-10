@@ -196,8 +196,7 @@ export const dayMonth = (day) => dayDate(day).month;
 
 /** Whether (x, y) is a pixel of the world's ground: the Bay's map, ETHER-NODES the Eltheric Ocean's box (world/ethericSea.js inEther) - its isles
  *  stood the day's nodes and its open water the schools, and the law knew the Bay's 1000 x 500 alone: every id there
- *  was refused (`bad-node`), and every ask after its pixels' witnesses (`bad-pixels`) - and WW-C1 (bible/03-World/
- *  World-Wide.md WW-C) the provinces past the Bay: the world's whole grid (net/wire.js worldPixelOk, the Bay's map and the
+ *  was refused (`bad-node`), and every ask after its pixels' witnesses (`bad-pixels`) - and WW-C1 the provinces past the Bay: the world's whole grid (net/wire.js worldPixelOk, the Bay's map and the
  *  sea's box inside it), so a province's ground stands its nodes and is witnessed as the Bay's is. */
 export const pixelOk = (x, y) => Number.isSafeInteger(x) && Number.isSafeInteger(y) && worldPixelOk(x) && worldPixelOk(y);
 /** WW-C1: whether a pixel may be claimed for `region` - never a province's on the Bay's own map (the cheapest lie a

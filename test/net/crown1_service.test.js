@@ -2,7 +2,7 @@
 // a crown's reach in the standings and at the Turning, the Marches' share, the Free Lands' Watch; the Conscription Edict
 // proclaimed at a crown alone, made law at the Turning and paid at the next out of the kingdom's palace holders' Tithe,
 // each paying seat's Standing -5. Driven through the real Worker over node:sqlite with every migration applied
-// (test/accountDb.mjs). 4.3, 7.6; `06-Systems/Online-Arc.md` CROWN1.
+// (test/accountDb.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

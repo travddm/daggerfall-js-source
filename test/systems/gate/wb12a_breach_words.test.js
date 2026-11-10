@@ -2,8 +2,7 @@
 // The game is 3E 417: the Covenant bars a Prince's door forced from without, never one opened from within, so the gates
 // are Dagon's Breaches - torn open by his mortal faithful, sealed and torn shut by the Covenant. Every player-facing
 // line that named an Oblivion Gate says so; the Sigil Stone is the Deadlands Ember, its NAME alone moved, and every
-// stone a save, a crash record or a stack kept under the old name takes the new one. bible/11-Multiplayer/
-// World-Bosses.md section 19 A.
+// stone a save, a crash record or a stack kept under the old name takes the new one.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

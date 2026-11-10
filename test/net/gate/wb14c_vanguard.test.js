@@ -48,7 +48,7 @@ function beats(f, t0, t1, bodies, rng = seeded(5)) {
 }
 const words = (out, e) => out.filter((o) => o.k === 'vgw' && (e === undefined || o.e === e));
 
-// ═══ THE TABLES ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE TABLES
 
 test('WB14c the kinds and their blows: the Brute (a Daedroth), the Caster (a Daedra of his aspect) and the Markynaz (a Daedra Lord) beside the Imp, none outrunning a runner, each blow a disc a runner leaves in under half its wind-up; the Bolt his element\'s (mutants: a kind faster than a run; a blow past escape)', () => {
   assert.deepEqual(HOST_KINDS.slice(3, 6).map((k) => [k.id, k.key]), [[3, 'brute'], [4, 'caster'], [5, 'markynaz']]);
@@ -81,7 +81,7 @@ test('WB14c the stages: the Bridgehead then the Muster, each three waves and the
   assert.deepEqual(newVanguard(), { s: 0, w: 0, due: 0, rose: 0, last: 0, first: 0, pat: 0, said: false, lord: 0, call: 0, opened: false });   // AUDIT WB14 (RECORD-9): and its patience's word, said once
 });
 
-// ═══ THE FIGHT ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE FIGHT
 
 test('WB14c a Vanguard night\'s fight: its record from its birth and no opening said while it holds; a plain night\'s none, and its opening its birth\'s, as ever (mutants: the Vanguard on every night; his wake said while it holds)', () => {
   const f = vanguardFight();
@@ -254,7 +254,7 @@ test('WB14c the bodies: an Imp at the fighter farthest from him, a Brute and the
   assert.ok(smash && Math.hypot(smash[2] - f.lg.ads[0].x, smash[3] - f.lg.ads[0].z) < 0.01);
 });
 
-// ═══ THE RELAY ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 test('WB14c the relay takes a blow on one of the Vanguard from the platform its body stands on, never from another floor; and counts its Smash and Rend as plain blows, never its Bolt (mutants: blows from his court alone; the Bolt counted)', () => {
   const f = vanguardFight(2);
@@ -269,7 +269,7 @@ test('WB14c the relay takes a blow on one of the Vanguard from the platform its 
   assert.equal(judgeGate(f, live, T0 + 9500).length, 0, 'a Bolt is his element\'s: never counted');
 });
 
-// ═══ THE WIRE AND THE SCREEN ═════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE AND THE SCREEN
 
 test('WB14c the wire: the state\'s `vg` a pair (its stage to 2, its waves to 3), the `vgw` word its word, stage and waves and the walkway a clearing lays; folded, a clearing lays its walkway at its own moment and the stage moves on, and the word is kept for the court to say (mutants: the walkway left to the next state; a word past the table taken)', () => {
   assert.equal(GATE_VG_WORDS, Object.keys(VG_WORD).length);

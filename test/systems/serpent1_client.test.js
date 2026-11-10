@@ -36,7 +36,7 @@ let DAY = 360;
 while (!isSerpentDay(DAY)) DAY++;
 const TT = serpentTimes(DAY);
 
-// ═══ WHERE IT RISES ═══════════════════════════════════════════════════════════════════════════════
+// WHERE IT RISES
 
 /** A made sea: ports on map pixels, a straight way between each pair in native units (seaLanes.js's own shape). */
 const nativeOf = (px, py) => ({ x: (px + 0.5) * PIXEL_UNITS, z: (499 - py + 0.5) * PIXEL_UNITS });
@@ -83,7 +83,7 @@ test('SERPENT1 site: on a packet lane, in its middle stretch, in open sea every 
   assert.deepEqual(pointAlong(w, 2), { x: 10, z: 10 });
 });
 
-// ═══ THE CELL'S WORDS, FOLDED ═══════════════════════════════════════════════════════════════════════
+// THE CELL'S WORDS, FOLDED
 
 const SX = (205 + 0.5) * PIXEL_UNITS, SZ = (499 - 214 + 0.5) * PIXEL_UNITS;
 const CELL = cellRoomOfWire(SX, SZ);
@@ -147,7 +147,7 @@ test('SERPENT1 link: a refusal said once until the fight is left; a receipt kept
   assert.equal(fells.length, 1, 'unsaid');
 });
 
-// ═══ ITS BLOWS ON MY SHIP ════════════════════════════════════════════════════════════════════════════
+// ITS BLOWS ON MY SHIP
 
 const CARRACK = { x: 0, z: 0, yw: 0, hl: 25, hw: 7, maxHull: 1200, maxSail: 600 };
 const ROWBOAT = { x: 0, z: 0, yw: 0, hl: 3, hw: 1, maxHull: 120, maxSail: 0 };
@@ -215,7 +215,7 @@ test('SERPENT1 strike: the grip and the eye grind by the second with their fract
   assert.equal(poolBites(pool, 0, 100, pool.until), false, 'dried');
 });
 
-// ═══ THE SIGHTING ═══════════════════════════════════════════════════════════════════════════════════
+// THE SIGHTING
 
 const SITE = Object.freeze({ day: DAY, px: 205, py: 214, sx: SX, sz: SZ, near: 'Sentinel', place: 'Sentinel, Sentinel', between: ['Sentinel', 'Wayrest'], ring: { cx: 205.5, cy: 214.5, r: SERPENT_RING_PIXELS } });
 
@@ -295,7 +295,7 @@ test('SERPENT1 omen: nothing said before its host is ready and settled; each of 
   assert.equal(O.mapMark(), null, 'gone');
 });
 
-// ═══ THE HOST, END TO END AGAINST THE BRAIN ═══════════════════════════════════════════════════════════
+// THE HOST, END TO END AGAINST THE BRAIN
 
 /** The scene's frame is the site's moved (1000, 2000) - a floating origin. */
 const OFF = [1000, 2000];
@@ -508,7 +508,7 @@ test('SERPENT1 host: the whirl pulls my ship toward its heart and round; the ven
   assert.equal(marksMesh({ ...f2, tele: [], mael: null, venom: [], glob: null, coil: null }, flat) < m, true, 'the telegraph drew');
 });
 
-// ═══ THE BAR, ITS VOICE, ITS HOARD, ITS RING ════════════════════════════════════════════════════════
+// THE BAR, ITS VOICE, ITS HOARD, ITS RING
 
 test('SERPENT1 bar: the gate\'s bar in the sea\'s colours - its health, the attack named in its colour (MOVE when on my ship), the stun before it, the coil\'s health, the ships, the sounding\'s countdown inside SOUND_WARN_MS alone; its fall holds then fades (mutants: the stun under the attack; the countdown always; no fade)', () => {
   const b = { name: 'Sethrakul', title: 'the Shed-Skin of Satakal', hp: 300, max: 1200, phase: 2, phaseName: 'The Coil', fighters: 3, warded: false, stunned: false, stunLeft: 0, coil: { h: 20, m: 60, mine: true }, countdown: null, soundIn: SOUND_WARN_MS + 1, fell: null, gone: null, opening: false, atk: { key: 'ram', name: 'Breaching Ram', t: 0.5, aimed: true }, now: 5000 };
@@ -589,5 +589,5 @@ test('SERPENT1 ring: the held map reads its mark by the gate\'s reader and paint
   assert.ok(!ops.some(([, f, s]) => f === SERPENT_RING_MAP_CSS || s === SERPENT_RING_MAP_CSS));
 });
 
-// ═══ THE FOUR HOSTS ═════════════════════════════════════════════════════════════════════════════════
+// THE FOUR HOSTS
 

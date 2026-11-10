@@ -7,7 +7,6 @@
 // and past every look (gatherHost.js findTarget's ray is the rock's). The gathering host now hands every kind the
 // pieces its eight built neighbours stand that reach in (nearRocks, in the pixel's own frame), and a neighbour built
 // after stands its reached pixels again. The Motherlode's heart, stood unasked before standAnywhere, is asked too.
-// `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { groundAt, insideRocks } from '../../../src/world/terrain/terrainNature.js';

@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import worker from '../../server-account/src/index.js';
 import { prepareRealmRecord, REALM_MAX_BYTES } from '../../server-account/src/realm.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   REALM_TEXT_MAX_BYTES, isGzip, gzipSizeOf, gzipText, gunzipText, saveTextOf,
 } from '../../src/net/realm/realmSaveCodec.js';
@@ -60,7 +60,7 @@ async function realm() {
   async function player({ older = false } = {}) {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
     const storage = fakeStorage();
-    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const door = { urls: [], bodies: [] };
     const fetch = async (url, init) => {
       door.urls.push(`${init?.method ?? 'GET'} ${url}`);
@@ -108,7 +108,7 @@ async function lyingGzip(text) {
   return both;
 }
 
-// ═══ THE LAW ══════════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('REALM-GZIP law: a save packs and opens byte for byte (past ASCII too); its first bytes say which it is - no JSON text begins as gzip does; the trailer says its size; every opening is bounded, and a gzip cut short or bent opens to nothing (mutants: the bound never kept; plain text read past its bound)', async () => {
   const text = JSON.stringify(longLife(2 * MiB, { race: 'Łowca ✓ Маг' }));
@@ -131,7 +131,7 @@ test('REALM-GZIP law: a save packs and opens byte for byte (past ASCII too); its
   assert.equal(REALM_MAX_BYTES, 4 * MiB, 'the request\'s bound stands');
 });
 
-// ═══ THE SERVICE AND THE TAB ══════════════════════════════════════════════════════════════════════════════════════════
+// THE SERVICE AND THE TAB
 
 test('REALM-GZIP: Thoryn\'s save - past the request\'s 4 MiB of text - lands packed and reads back byte for byte; the service keeps it as sent; the same text sent plain is refused as before (mutants: the tab never packs; the join never says gzip; the read never opened)', { timeout: 120_000 }, async () => {
   const r = await realm();
@@ -268,5 +268,5 @@ test('REALM-GZIP: both ends older than the other - a service whose answers never
   assert.match(Q.door.urls.at(-1), /\?enc=gzip$/, 'the read asks for the save as stored');
 });
 
-// ═══ THE HOSTS ════════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE HOSTS
 

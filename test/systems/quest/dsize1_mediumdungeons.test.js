@@ -141,7 +141,7 @@ test('DSIZE1: the quest\'s stamp, the save\'s stamp and the warp - three layouts
   assert.equal(smallerDungeonsStateNow(true, true, false), SMALLER_DUNGEONS_STATE.Enabled);
   assert.equal(smallerDungeonsStateNow(false, true, false), MEDIUM_DUNGEONS_STATE);
   assert.equal(smallerDungeonsStateNow(false, false, false), SMALLER_DUNGEONS_STATE.Disabled);
-  assert.equal(smallerDungeonsStateNow(true, false, true), SMALLER_DUNGEONS_STATE.Disabled, 'E4: online, whatever the setting says - PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md section 5): the dungeon whole, the layout a quest\'s instance builds and its markers are chosen on (it was the world\'s sizes, SD-ONLINE)');
+  assert.equal(smallerDungeonsStateNow(true, false, true), SMALLER_DUNGEONS_STATE.Disabled, 'E4: online, whatever the setting says - PIN MOVED (INSTANCES, docs/multiplayer/group-instances.md): the dungeon whole, the layout a quest\'s instance builds and its markers are chosen on (it was the world\'s sizes, SD-ONLINE)');
   assert.equal(smallerDungeonsStateNow(false, false, true), SMALLER_DUNGEONS_STATE.Disabled);
   assert.equal(smallerDungeonsStateNow(true, true), SMALLER_DUNGEONS_STATE.Enabled, 'off the online page, the settings');
   const full = loc(20), med = generateMediumDungeon(loc(20)), sml = generateSmallerDungeon(loc(20));

@@ -28,7 +28,7 @@ test('the prototype page carries no design of its own', () => {
   assert.match(html, /src\/tools\/enhanced\/enhancedMenu\.js/);
 });
 
-// ═══ EE1: Enhanced Environments replaces the procedural sky switch ═══
+// EE1: Enhanced Environments replaces the procedural sky switch
 test('EE1: one switch for the whole outdoors, migrated once from the old sky answer', async () => {
   assert.equal(PREF_DEFAULTS.enhancedEnvironments, true, 'the new key defaults ON');
   // AUDIT FT15 (drift): the claim is that the row names the sky the tree

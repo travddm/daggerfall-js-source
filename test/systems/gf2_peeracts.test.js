@@ -49,7 +49,7 @@ const beat = (n, kind) => n * 16 + GATHER_POSE_BEATS.indexOf(kind);
 const toScene = (p) => [p.x, p.y, p.z];
 const onGlint = (m) => ({ yaw: MINE_POINTS[m.state.glint][0], pitch: MINE_POINTS[m.state.glint][1] });
 
-// ═══ THE WIRE ════════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('PEER-ACTS P1 the wire: `ga` an act the client\'s table names and `gm` the net\'s throw with it, `gb` the beats on their own (a beat that ended its act rides the pose that ended it) - each bounded, OMITTED at none, kept by the relay\'s door, sent at once and carried whole by the lerp (mutants: an act past the table kept; a beat of no count kept; the beat only with an act; a throw with no act; each edge not sent; the lerp dropping a beat without its act)', () => {
   const base = validPose(P);
@@ -143,7 +143,7 @@ test('PEER-ACTS P2 end to end: my act, its beats and the net\'s throw leave my s
   assert.deepEqual([drawn().ga, drawn().gm], [code('wait'), 7], 'the net out, its throw named');
 });
 
-// ═══ THE SENDER ══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SENDER
 
 test('PEER-ACTS P3 the sender: the act machines\' own beats (the ear\'s law), each one the pose names counted once with its kind - a blow and a clean one, the herb pulled, the knife going in, each stroke, the tear and the pelt off, the net in; `ga` each machine\'s act, a net by its phase, `gm` its throw once thrown; the count round past 255 and never 0 (mutants: a beat counted twice; the kind crossed; the count unwrapped; a cancelled act still named; the throw while winding)', () => {
   const st = (o) => ({ cancelled: false, done: false, ...o });
@@ -258,7 +258,7 @@ test('PEER-ACTS P4 the host: the pose names the act the hand is on - from a vein
   } finally { setForagingHost(null); }
 });
 
-// ═══ THE RECEIVER'S EAR ══════════════════════════════════════════════════════════════════════════════════════════════
+// THE RECEIVER'S EAR
 
 /** A peer's ear over a bus that keeps its shots, on its own clock (ms), the variety's dice in the middle. */
 function ear({ on = true } = {}) {
@@ -411,7 +411,7 @@ test('PEER-ACTS P7 the receiver\'s ear: the classic skin says the DFU cue the ga
   assert.deepEqual(shots.at(-1).at.map((v) => +v.toFixed(6)), peerActAt(moved, 0).map((v) => +v.toFixed(6)), '...where it was struck, in the new frame');
 });
 
-// ═══ THE LANES ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE LANES
 
 test('PEER-ACTS P8 the peers\' sync hears every peer gathering - a body peer\'s, a hidden one\'s - behind the swings\' switch and within earshot; a peer gone is forgotten and the recentre carries what was held with the land (mutants: the sound unwired; the switch, the earshot ignored; the sweep; the rebase)', async () => {
   const { getPref, setPref } = await import('../../src/systems/uiPrefs.js');
@@ -553,7 +553,7 @@ test('PEER-ACTS P11 Eye Of The Beholder\'s walker: ready while an act holds a to
   assert.notDeepEqual(melee.frames(WALK_GATHER_STROKES.throw), melee.frames(WALK_GATHER_STROKES.blow));
 });
 
-// ═══ ONE LAW ═════════════════════════════════════════════════════════════════════════════════════════════════════════
+// ONE LAW
 
 test('PEER-ACTS P12 one law, pinned: the stand-in tools are the classic hand\'s own (the hosts\' AXE_HAND, PICK_HAND, SICKLE_HAND, KNIFE_HAND), the strikes the ones the hand draws (axeHandFrame, pickHandFrame), a peer\'s blow\'s delay the machines\' own landsIn at the press; and the hosts send and hear it - the online frame\'s arm spreads the gathering host\'s poseAct, the peers\' sync hears every peer (mutants: a stand-in drifted; the arm unspread; the sync unwired)', () => {
   assert.deepEqual({ ...GATHER_POSE_TOOLS.chop }, { ...AXE_HAND });

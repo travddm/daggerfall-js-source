@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL5-FOLLOW - THE FOLLOW TOKEN. One door, /v1/staff/follow { sub, room? }: a relay token for a hidden staff spectator
 // (`hd` 1, the hidden builder's mark) that names the account it follows (`fo`), minted on a live staff session and
 // written to the audit log as it is minted.
@@ -16,7 +15,6 @@
 // (`room`). A private one - a home, a caravan, a boat's cabin - is written down by name (`follow-home`); every other is
 // one `follow` row a member, a target and a minute (onceIn). The owners are not alerted: that waits for mob (the design
 // doc's privacy policy line, "staff may watch play").
-// ═══════════════════════════════════════════════════════════════════
 import { mintToken, ID_RE, MAX_TTL_S } from '../../src/net/identityToken.js';
 import { privateInteriorOf } from '../../src/net/privateInterior.js';
 import { signingKey } from './signing.js';

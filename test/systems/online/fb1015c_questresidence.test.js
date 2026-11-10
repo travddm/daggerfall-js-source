@@ -3,7 +3,7 @@
 // picked before QUEST-HOME (main, 2026-10-15) the site could be another player's online home in a town the page had never
 // asked (`homeAt` knew no remote town), and a home's door says its owner's name over the building's - so no door in
 // Tambeth said "The Hawkley Residence". QUEST-HOME's re-pick moves such a site on the next online boot; a site it cannot
-// move (no other house, or one the player has stood in) now says the quest's name at the door. `01-Overview/bugs/Field-Bugs-2026-10-15c.md`.
+// move (no other house, or one the player has stood in) now says the quest's name at the door.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

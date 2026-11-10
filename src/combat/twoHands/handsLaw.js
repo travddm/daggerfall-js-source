@@ -126,8 +126,7 @@ export const handOnLeft = (hand, leftHanded) => (hand === 'L') !== !!leftHanded;
  * it unflipped: 'R' the arm that comes in from the right of the view, 'L' from the left. Classic Daggerfall threw its
  * hand-to-hand with BOTH fists, by direction - its idle (record 0) and its StrikeDownLeft, StrikeRight and StrikeDownRight
  * records paint the right arm (the light glove, the grey sleeve); its StrikeDown, StrikeLeft and StrikeUp records the left
- * (the dark glove, the brown sleeve with the stitched cuff). Read off the shipped file's frames, record by record (bible/
- * 05-Combat/Two-Hands.md, "The painted arm"); WeaponBasics carries nothing of it (every melee strike aligns Center).
+ * (the dark glove, the brown sleeve with the stitched cuff). Read off the shipped file's frames, record by record; WeaponBasics carries nothing of it (every melee strike aligns Center).
  * Every weapon file paints the right arm alone. Indexed by record.
  */
 export const MELEE_PAINTED_ARM = Object.freeze(['R', 'L', 'R', 'L', 'R', 'R', 'L']);
