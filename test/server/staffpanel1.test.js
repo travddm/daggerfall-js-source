@@ -11,7 +11,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { standService } from '../accountDb.mjs';
-import { staffRole, isOwner, ownerKeys, staffWords, STAFF_SESSION_HEADER, STAFF_IDLE_S, STAFF_TRY_MAX, STAFF_KEYS_MAX, STAFF_SIG_S, STAFF_READ_ROW_S, STAFF_AUDIT_KEEP_S } from '../../server-account/src/staff.js';
+import { staffRole, isOwner, staffWords, STAFF_SESSION_HEADER, STAFF_IDLE_S, STAFF_TRY_MAX, STAFF_KEYS_MAX, STAFF_SIG_S, STAFF_READ_ROW_S, STAFF_AUDIT_KEEP_S } from '../../server-account/src/staff.js';
 import { runCron, CRON_HOUR, HOUR_JOBS } from '../../server-account/src/cron.js';
 import { STAFF_ROUTES, ROUTES } from '../../server-account/src/service.js';
 import worker from '../../server-account/src/index.js';
@@ -113,14 +113,18 @@ test('STAFF-PANEL1: every door is listed once, beside the game\'s, and none is b
     // STAFF-PANEL5-FREEZE: freeze and the staff chat (staffFreeze.js)
     '/v1/staff/freeze', '/v1/staff/unfreeze', '/v1/staff/freezes', '/v1/staff/freeze-push', '/v1/staff/talk', '/v1/staff/chat', '/v1/staff/chat-send',
     '/v1/staff/chat-close', '/v1/staff/chats'].sort());
-  // no secret to set anywhere: the config holds an owner's public key, and no list of who holds a role
+  // no secret to set anywhere, and no list of who holds a role
   const toml = src('server-account/wrangler.toml');
   for (const list of ['DEVELOPER_HANDLES', 'MODERATOR_HANDLES', 'OWNER_HANDLES', 'DISCORD_MODERATORS']) assert.doesNotMatch(toml, new RegExp(`^${list} =`, 'm'), `${list} is gone: a role is a column of the account`);
-  // mob pasted the key his panel showed: that pair alone, and every key named a raw 32-byte Ed25519 public key
-  assert.match(toml, /^OWNER_KEYS = "SirMcMobdon:1c9fniJJmmIwXevvrTVajM6SeIFagO8KEzYiAM08mYM"$/m);
-  for (const k of ownerKeys({ OWNER_KEYS: toml.match(/^OWNER_KEYS = "([^"]*)"$/m)?.[1] }).values()) {
-    await crypto.subtle.importKey('raw', Buffer.from(k, 'base64url'), { name: 'Ed25519' }, false, ['verify']);
-  }
+});
+
+test('decision 122: the shipped config names no owner key, so an Owner\'s key is refused at sign-in', async () => {
+  const shipped = /^\s*OWNER_KEYS\s*=\s*"([^"]*)"/m.exec(src('server-account/wrangler.toml'))?.[1];
+  assert.equal(shipped, undefined, 'the staff panel extension\'s key enrolment is removed');
+  const s = await stand({ OWNER_KEYS: shipped });
+  await s.registered('SirMcMobdon');
+  const r = await s.login('SirMcMobdon', s.mobKey);
+  assert.deepEqual([r.status, r.body], [401, { error: 'staff-login' }]);
 });
 
 test('STAFF-PANEL1: unconfigured is shut - with no owner key named, nobody can sign in', async () => {
