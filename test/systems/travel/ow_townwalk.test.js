@@ -226,7 +226,7 @@ test('OW-TOWN-WALK the steering keeps the walk\'s own line: a leg that walks a l
 
 test('OW-TOWN-WALK the host\'s wiring: Travel Options handed the town and its way; under the view the clock held to a town\'s pace in a town - the keys\' travel too - and the panel says why; the route line drawn down the streets still ahead (mutants: the cap unread; the reason not the town\'s; the streets undrawn)', () => {
   const w = hostText('src/scenes/world.js');
-  assert.match(w, /const townWalk = createTownWalk\(\{ built, state \}\);[^\n]*\n(?:[^\n]*\n)?\s+travelOptions = travelOptionsOn \? createTravelOptions\(\{[^\n]*\n\s+townKey: townWalk\.townKey, townWay: townWalk\.townWay,/);
+  assert.match(w, /const townWalk = createTownWalk\(\{ built, state, cpuModels \}\);[^\n]*\n(?:[^\n]*\n)?\s+travelOptions = travelOptionsOn \? createTravelOptions\(\{[^\n]*\n\s+townKey: townWalk\.townKey, townWay: townWalk\.townWay,/);
   assert.match(w, /const tvTownPace = \(\) => townWalk\.townPace\(state\.worldCoords\(player\.pos\)\);/);
   assert.match(w, /const town = tvTownPace\(\) \?\? Infinity;[^\n]*\n\s+const rate = Math\.min\(load, foeCap, town\);/);
   assert.match(w, /tvHeldWhy = tvHeld == null \? null : town < Math\.min\(load, foeCap\) \? 'town' : foeCap < load \? 'foes' : 'load';/);

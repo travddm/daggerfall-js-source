@@ -147,7 +147,7 @@ export const POSE_CROWD = 24;
 export const TOKEN_WAIT_MS = 8000;
 
 /** Whether an identity token names a hidden staff socket (`hd: 1`) - read off its body alone; the relay verifies it.
- *  HIDDEN-UNCOUNTED: here, so the session notes its own mark at its hello (`hidden`); net/staffMap.js hands it on.
+ *  Here, so the session notes its own mark at its hello (`hidden`).
  *  @param {unknown} tok */
 export function tokenHidden(tok) {
   if (typeof tok !== 'string' || tok.length > TOKEN_MAX_CHARS) return false;

@@ -217,7 +217,7 @@ test('TO-ROADS REPRODUCED, then fixed (the host\'s own code over the real planne
   const off = host({ firstPerson: true });
   assert.deepEqual([off.tvOwnsJourneys(), off.tvRoutesJourneys()], [false, false]);
   off.onTravel(pick(510, 250), WALKED, { minutes: 90 });
-  assert.equal(off.to.route, null, 'no route: Travel Options\' own journey');
+  assert.deepEqual(off.to.route?.legs, [], 'no road legs: Travel Options\' own journey (a town on its way walked on its streets)');
   assert.equal(off.to.destinationName, 'Ripwych');
   assert.deepEqual(off.walk(), [{ x: 510, y: 250 }], 'REPRODUCED - the autopilot aimed at the place itself, the straightest shot, through the forest');
   assert.deepEqual([off.party, off.fast, off.said], [[], [], []], 'asked nobody (OW-TOGGLE\'s group travel), no teleport, nothing said');
@@ -347,7 +347,7 @@ test('TO-ROADS, both switches both ways (the host\'s own doors over the real set
   const cl = host({ firstPerson: true, roads: true, enhanced: false });
   assert.deepEqual([cl.tvOwnsJourneys(), cl.tvRoutesJourneys()], [false, false], 'the classic skin keeps Travel Options exactly');
   cl.onTravel(pick(510, 250), WALKED, { minutes: 90 });
-  assert.deepEqual([cl.to.route, cl.walk(), cl.said], [null, [{ x: 510, y: 250 }], []], 'the mod\'s own journey, at the place');
+  assert.deepEqual([cl.to.route?.legs, cl.walk(), cl.said], [[], [{ x: 510, y: 250 }], []], 'the mod\'s own journey, at the place');
   // read live: flipped mid-game, the next pick answers the new way (AUDIT OW5 T1's law for its switch)
   const h = host({ firstPerson: true });
   assert.equal(h.tvRoutesJourneys(), false);
