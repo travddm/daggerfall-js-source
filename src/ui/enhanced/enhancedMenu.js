@@ -90,7 +90,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { statsHunt } from '../bounty/huntRank.js';   // HUNTERS-MARK (Bounty-Boards.md 12.3)
-import { fpArm, hasDaggerfallArrows } from '../../combat/fpArm.js';
+import { fpArm } from '../../combat/fpArm.js'; import { hasDaggerfallArrows } from '../../combat/fpArm/fpArmParts.js';
 import { dressStanding } from '../../systems/clothingStanding.js';   // DRESS1: the Standing page's Dress line
 import { questRail, shelvedRail, unloggedRail, journalLines, questTitleOf, QUEST_URGENT_SECONDS, remainWords } from '../quest/questRail.js';   // MAC-K2: the ONE quest walk, shared with the chronicle
 import { qlObjectivesBlock, qlOfferDetail, offerRowWords, qlLineDetail, lineStateWords, qlLadderDetail } from '../questlines/qlJournal.js';   // QL2: a stamped quest's objectives, choices and outcome; the rewards waiting
@@ -2204,9 +2204,8 @@ function helpCard(key) {
  * switch | enum | number | colour | text | blocked.
  *
  * A blocked row is DRAWN, greyed, with its reason one press away. That
- * is deliberate and it is the port's own standing rule: DFU ships
- * EnhancedCombatAI True and we run the classic path, so a working
- * toggle there would be a lying toggle.
+ * is deliberate and it is the port's own standing rule: a working
+ * toggle for a setting the port does not run would be a lying toggle.
  */
 // AUDIT F7: this read effectiveSettings() - a full merge of all 171
 // keys over the defaults - ONCE PER ROW, so the Game category rebuilt

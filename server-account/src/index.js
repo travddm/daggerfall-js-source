@@ -332,7 +332,7 @@ import { isGzip, gzipSizeOf, gunzipText, REALM_TEXT_MAX_BYTES } from '../../src/
 import { tradeRealm, REALM_TRADE_BODY_MAX } from './realmTrade.js';   // REALM P2.1: a trade, settled here
 import { listLineages, putLineage, realmDie, realmRaise, realmWed, listUnions, LINEAGE_BODY_MAX } from './legacy.js';   // LEGACY7: Project Legacy's lines and the tombstone; REZ-BLOODLINE AUDIT R1: a Resurrect inside its hold
 import { measured, heartbeatPartsOf } from './metrics.js';   // SCALE1: every request counted (Workers Analytics Engine); AUDIT SCALE II A-3: a heartbeat's parts, of the body the route read
-import { scheduled, isCronDoor, cronDoor } from './cron-triggers.ts';   // SCALE4b: the service's own clock, and its door where there are no cron triggers
+import { scheduled, localDoor } from './worker-doors.ts';   // SCALE4b: the service's own clock, its door where there are no cron triggers, and the operator's door
 import { blocksOf, blockAccount, unblockAccount, fileReport, agreeConduct, conductAgreed, takeFeed, bannedAnswer, modCases, modCase, modDismiss, modAct, REPORT_BODY_MAX } from './safety.js';   // SAFE1-SAFE7: the chat's safety
 import { strikesLook, isBanned } from './sanctions.js';   // SAFE4: the record, the ladder and the ban
 import { freezeRefusal, frozenAnswer, playerStaffChat, isFrozen, STAFF_CHAT_ROUTES, STAFF_CHAT_STATUS } from './staffFreeze.js';   // STAFF-PANEL5-FREEZE: the freeze gate and the player's staff chat
@@ -782,11 +782,11 @@ const service = {
     }
 
     // HELD FOR MAINTENANCE. A history repair
-    // (.github/workflows/realm-revive.yml) rewinds the database for a minute to read what was lost, and puts it back;
-    // anything written in between would vanish with the rewind. So the job deploys this Worker with MAINTENANCE = "1"
+    // rewinds the database for a minute to read what was lost, and puts it back;
+    // anything written in between would vanish with the rewind. So a restore deploys this Worker with MAINTENANCE = "1"
     // first, and every call but the two above is refused for that minute - 503, which a playing tab's checkpoint waits
-    // out and sends again (systems/realmSaves.js), never a write that is silently lost. The job's own last step deploys
-    // it again without the switch; any deploy does.
+    // out and sends again (systems/realmSaves.js), never a write that is silently lost. Any deploy without the switch
+    // lifts it.
     if (maintaining(env)) return no('maintenance', 503, origin);
 
     // A PATH NOBODY SERVES IS A 404, and it is answered HERE - before
@@ -2235,7 +2235,7 @@ const service = {
 
       // SERVER-POST: THE SERVER'S POST - the developers' pieces to one account,
       // a registered one's alone (the letters' wall, its own word), each perhaps holding an item its reader claims into the
-      // online character being played (post.js). Read, claimed and thrown away here; written only by the operator's workflow.
+      // online character being played (post.js). Read, claimed and thrown away here; written only by the operator.
       if (path.startsWith('/v1/post/')) {
         if (accountKind(who.player) !== 'linked') return no('post-needs-account', 403, origin);
         if (path === '/v1/post/box') {
@@ -2514,7 +2514,7 @@ const service = {
 };
 
 export default {
-  fetch: (request, env, exec) => (isCronDoor(request, env) ? cronDoor(request, env) : measured(request, env, service.fetch, exec)),   // AUDIT SAFE DISCORD-4: the ExecutionContext, for waitUntil
+  fetch: (request, env, exec) => localDoor(request, env) ?? measured(request, env, service.fetch, exec),   // the ExecutionContext, for waitUntil
   // SCALE4b: THE SERVICE'S OWN CLOCK - wrangler.toml's [triggers] crons, each firing its list (cron.js), the sweeps no
   // read runs any more and the settlements every read now nearly always finds done
   scheduled,
