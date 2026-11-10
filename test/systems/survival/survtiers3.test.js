@@ -1,4 +1,5 @@
 import { test, afterEach } from 'node:test';
+import { stealthCheckRecord } from '../../../src/characters/enemy/peer-senses.ts';   // the dungeon record writer's stealth field
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -34,7 +35,7 @@ import { ROOM_LOOT_OFF } from '../../roomLootOff.mjs';
 import { appliedOwnerTm } from '../../../src/net/ownerClock.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the mounted scope
 import { bossClockS } from '../../../src/systems/bossTraits.js';
-const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS };
+const TRAIT_DOORS = { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame, bossClockS, stealthCheckRecord, _peerSenses: { read: () => false } };
 
 // ═══ AUDIT SURV-TIERS, THE THIRD PASS ═══════════════════
 //

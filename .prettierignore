@@ -23,3 +23,7 @@ test/fixtures/mw/mwAnimSourcesParity.json
 test/fixtures/mw/mwHeadViewParity.json
 test/fixtures/umRandomParity.json
 test/fixtures/mw/fpAnimStateParity.json
+test/fixtures/mw/fpArmPartsParity.json
+test/fixtures/mw/buildRulesParity.json
+test/fixtures/mw/animSlotsParity.json
+test/fixtures/mw/upperBodyParity.json

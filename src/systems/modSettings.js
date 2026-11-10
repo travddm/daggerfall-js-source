@@ -878,32 +878,6 @@ export const MOD_SETTINGS = Object.freeze({
       'Compatibility.TextureScaleFactor': Object.freeze({ default: 1, min: 0, max: 8, get description() { return t('mods.handheldTorches.Compatibility.TextureScaleFactor.description', 'Divides a custom texture’s size. Raise it if a texture pack draws the hand too large.'); } }),
     }),
   }),
-  // AT0: AMBIENT TEXT 1.8 (Regnier). Its one section, `AmbientText`,
-  // and its four SliderIntKeys, names, bounds and defaults exactly as
-  // modsettings.json ships them, plus the port's own `Enabled`.
-  // `interval` keeps the mod's own name and not the field's
-  // (`stdInterval`) - the pane shows the player what the author called
-  // it. All four are REAL-TIME SECONDS, not game time: the mod ticks on
-  // Unity's `Time.unscaledTime`, so its pace is the same whether you
-  // are standing still or riding a horse at 14x.
-  'ambient-text': Object.freeze({
-    title: 'Ambient Text',
-    author: 'Regnier',
-    keys: Object.freeze({
-      Enabled: Object.freeze({
-        default: true,
-        get description() {
-          return t('mods.ambientText.Enabled.description', 'Now and then, a short line in the corner about where you are: what a crypt smells like, what a '
-            + 'village sounds like at night, how the desert light looks. It depends on the place, the time and the '
-            + 'weather, and stays quiet indoors.');
-        },
-      }),
-      textChance: Object.freeze({ default: 33, min: 0, max: 100, get description() { return t('mods.ambientText.textChance.description', 'Chance, in percent, of a line at each check'); } }),
-      interval: Object.freeze({ default: 200, min: 60, max: 600, get description() { return t('mods.ambientText.interval.description', 'Real-time seconds between checks for a line'); } }),
-      postTextInterval: Object.freeze({ default: 500, min: 60, max: 600, get description() { return t('mods.ambientText.postTextInterval.description', 'Real-time seconds to wait after a line is shown'); } }),
-      textDisplayTime: Object.freeze({ default: 3, min: 1, max: 10, get description() { return t('mods.ambientText.textDisplayTime.description', 'Seconds a line stays on screen'); } }),
-    }),
-  }),
   // ── EYE OF THE BEHOLDER 2.1 (EOTB) ──────────────────────────────
   // RedRoryOTheGlen's third-person camera and player sprite, every key
   // the bundle's modsettings.json ships, under its own section name, as

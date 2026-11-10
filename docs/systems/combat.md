@@ -206,7 +206,8 @@ paths); `GUARD_TOPS` gives each guard registry its share. `weaponBlowMods` and `
 blow and per hurt (`openBlowCeiling`, `openGuardCeiling`); each registry asks `blowRoom` / `guardRoom` under its own
 name and is cut at its own top. The rule for new content: add sideways (new builds, new mechanics), not higher numbers.
 `test/combat/powerceiling_walk.test.js` checks every fixed record against the item tops;
-`node tools/powerCeiling.mjs` prints the measured tables.
+`node tools/powerCeiling.mjs` prints the measured tables (with `NODE_OPTIONS` set as
+[getting-started.md](../getting-started.md#node-and-shader-files) shows).
 
 ## Blood
 
