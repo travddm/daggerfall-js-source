@@ -291,42 +291,19 @@ test("STAFF-ROLES: no HTTP route makes an Owner, and a player's own routes set n
   void sneak;
 });
 
-test('STAFF-ROLES: Discord presses resolve through an account link, never a name', async () => {
-  const s = await stand();
-  const mod = await s.registered('DiscordMod');
-  const decoy = await s.registered('Lattymoy');
-  s.setStaff('DiscordMod', 'moderator');
-  const ID = '128705730965536768';
-  const press = async () => s.call('/v1/discord/interactions', {}); // not reachable without Discord's signature: the actor resolution is the unit below
-  void press;
-  const { discordInteraction } = await import('../../server-account/src/discord.js');
-  const ctx = { db: s.env.DB, nowS: nowS(), subtle, rand: (b) => crypto.getRandomValues(b) };
-  const ask = async () =>
-    (await discordInteraction(ctx, s.env, { type: 2, data: { name: 'mod' }, member: { user: { id: ID } } })).data
-      .content;
-  const refusal = /Only the game's moderators/;
-  assert.match(await ask(), refusal, 'a Discord id nobody linked is refused');
-  s.raw.prepare('INSERT INTO staff_discord (discord_id, player_id, created_at) VALUES (?, ?, ?)').run(ID, decoy.id, 1);
-  assert.match(await ask(), refusal, 'linked to an account with no role: refused, whatever its name');
-  s.raw.prepare('UPDATE staff_discord SET player_id = ? WHERE discord_id = ?').run(mod.id, ID);
-  assert.doesNotMatch(await ask(), refusal, 'linked to a Moderator: let in');
-  s.setStaff('DiscordMod', 'none');
-  assert.match(await ask(), refusal, 'the role taken off takes the presses with it');
-});
-
-test("STAFF-ROLES: the operator's tool writes the role columns, the Discord link, and nothing else", () => {
+test("STAFF-ROLES: the operator's tool writes the role columns and nothing else", () => {
   assert.deepEqual(ROLE_COLUMNS.owner, { staff_owner: 1, staff_admin: 1, staff_mod: 0 });
   assert.deepEqual(
-    statementsFor(['set', 'abc12345', 'owner'], 0).sql[0],
+    statementsFor(['set', 'abc12345', 'owner']).sql[0],
     "UPDATE players SET staff_owner = 1, staff_admin = 1, staff_mod = 0 WHERE id = 'abc12345' AND handle IS NOT NULL",
   );
   assert.ok(
-    'error' in statementsFor(['set', "x'; DROP TABLE players; --", 'owner'], 0),
+    'error' in statementsFor(['set', "x'; DROP TABLE players; --", 'owner']),
     'an id with a quote is refused',
   );
-  assert.ok('error' in statementsFor(['set', 'abc12345', 'god'], 0), 'an unknown role is refused');
-  assert.ok('error' in statementsFor(['find', "a'b"], 0), 'a handle with a quote is refused');
-  assert.ok('error' in statementsFor(['discord', 'abc12345', "1'"], 0));
+  assert.ok('error' in statementsFor(['set', 'abc12345', 'god']), 'an unknown role is refused');
+  assert.ok('error' in statementsFor(['find', "a'b"]), 'a handle with a quote is refused');
+  assert.ok('error' in statementsFor(['discord', 'abc12345', '128705730965536768']), 'no Discord link: the command is unknown');
   const toml = src('server-account/wrangler.toml');
   assert.doesNotMatch(
     toml,

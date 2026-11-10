@@ -43,7 +43,7 @@ from the environment:
 | `GATE_SIGNING_KEY`, `GATE_PUBLIC_KEY`                                               | relay, accounts        | Gate kills are not counted             |
 | `OPERATOR_SECRET`                                                                   | accounts               | The operator door is off               |
 | `CRON_SECRET`                                                                       | accounts, cron sidecar | The cron door is off                   |
-| `DISCORD_BOT_TOKEN`, `ANTHROPIC_API_KEY`, `PATREON_*`, `STAFF_ANALYTICS_*`          | as on Cloudflare       | That feature is off                    |
+| `ANTHROPIC_API_KEY`, `PATREON_*`, `STAFF_ANALYTICS_*`                               | as on Cloudflare       | That feature is off                    |
 | `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | r2, with `--r2 s3`     | The bucket refuses every request       |
 
 The chat reviewer sends player chat to a third party. With `ANTHROPIC_API_KEY` set and `MOD_AI` turned from `off` to

@@ -65,7 +65,6 @@
 //   POST /v1/mod/strikes { target?, name? }          -> { ok, target, name, strikes, next, mutedUntil, bannedUntil, banReason, history }
 //   POST /v1/mod/feed  <batch>                       -> { ok, read }   (SAFE5: the relay's public lines, signed - x-relay-feed-sig)
 //   POST /v1/mod/grant-feed  <batch>                 -> { ok, read }   (GRANT2: a cell's window of spawn grant asks, signed - x-relay-grant-sig)
-//   POST /v1/discord/interactions <interaction>      -> Discord's answer   (SAFE8: signed - x-signature-ed25519, x-signature-timestamp)
 // A BANNED ACCOUNT is answered 403 { error: 'banned', until, reason } on every door behind a session but signing out.
 // PRIVATE-REPORT, a registered player's private report to the Owner accounts (reports.js):
 //   POST /v1/report/send { kind, subject, body, context?, rid } -> { ok, id, sentAt } | { ok, repeat, id, sentAt }
@@ -338,7 +337,6 @@ import { staffRoute, STAFF_STATUS, STAFF_SESSION_HEADER, auditStatement } from '
 import { staffMessagesFor, staffMessageOk } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: the game's two doors
 import { hiddenToken, takeHiddenSeen } from './staffHidden.js';   // STAFF-PANEL5-HIDDEN: a hidden staff member's token, and a private home it entered
 import { HIDDEN_SEEN_PATH, HIDDEN_SEEN_MAX_BYTES, HIDDEN_SEEN_SIG_HEADER } from '../../src/net/hiddenSeen.js';
-import { discordSigned, discordInteraction, DISCORD_BODY_MAX } from './discord.js';   // SAFE8: the moderators' queue in Discord
 import { FEED_MAX_BYTES, FEED_SIG_HEADER } from '../../src/net/safety/chatFeed.js';   // SAFE5: the relay's feed of public lines
 import { heartbeat } from './heartbeat.js';   // SCALE4c: one request for a tab's three clocks
 import { ADMIT_ROUTES, admitWait } from './admit.js';   // ADMIT-LINE: the sign-in line
@@ -887,24 +885,14 @@ const service = {
         return 'error' in r ? no(r.error, r.error === 'seen-signature' ? 401 : 400, origin) : json(r, 202, origin);
       }
 
-      // SAFE5 + SAFE8: THE TWO DOORS THE CHAT'S SAFETY OPENS TO A STRANGER - the relay's feed and Discord's interactions.
-      // Neither is JSON a session carries; each is proven by a signature over its exact bytes, checked before a byte is read.
+      // THE DOOR THE CHAT'S SAFETY OPENS TO A STRANGER - the relay's feed. It is not JSON a session carries; it is
+      // proven by a signature over its exact bytes, checked before a byte is read.
       if (SAFE_OPEN_ROUTES.has(path)) {
         if (request.method !== 'POST') return no('method', 405, origin);
-        const bytes = await readCapped(request, path === '/v1/mod/feed' ? FEED_MAX_BYTES : DISCORD_BODY_MAX);
+        const bytes = await readCapped(request, FEED_MAX_BYTES);
         if (!bytes) return no('too-large', 413, origin);
-        if (path === '/v1/mod/feed') {
-          const r = await takeFeed(ctx, env, new Uint8Array(bytes), request.headers.get(FEED_SIG_HEADER));
-          return 'error' in r ? no(r.error, r.error === 'feed-signature' ? 401 : 400, origin) : json(r, 202, origin);
-        }
-        if (!(await discordSigned(env, new Uint8Array(bytes), request.headers.get('x-signature-ed25519'), request.headers.get('x-signature-timestamp'), { subtle, nowS }))) return no('signature', 401, origin);
-        let interaction = null;
-        try { interaction = JSON.parse(new TextDecoder().decode(bytes)); } catch { interaction = null; }
-        if (!interaction || typeof interaction !== 'object') return no('body', 400, origin);
-        // AUDIT SAFE DISCORD-4: what may follow the answer (the order to the relay's door) waits on the Worker's waitUntil,
-        // never on Discord's three seconds
-        const exec = /** @type {any} */ (held).exec;
-        return json(await discordInteraction(ctx, env, interaction, typeof exec?.waitUntil === 'function' ? { later: (p) => exec.waitUntil(p) } : {}), 200, origin);
+        const r = await takeFeed(ctx, env, new Uint8Array(bytes), request.headers.get(FEED_SIG_HEADER));
+        return 'error' in r ? no(r.error, r.error === 'feed-signature' ? 401 : 400, origin) : json(r, 202, origin);
       }
 
       // STAFF-PANEL1 (staff.js): THE STAFF PANEL'S DOORS. None takes a game session - a game secret opens no staff door and a

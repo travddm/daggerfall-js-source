@@ -37,7 +37,7 @@ const TABLES = [
   'rate_limits', 'reaction_batches', 'realm_characters', 'realm_config', 'realm_faucets', 'realm_findings',
   'realm_repairs', 'realm_trades', 'realm_tx_guard', 'realm_unions', 'realm_wealth_hours', 'realm_wed_halves',
   'renown_accounts', 'renown_tracks', 'saves', 'sd_kills', 'seat_facts_kept', 'seat_hall_decor', 'serpent_kills', 'serpent_spoils',
-  'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_discord', 'staff_events', 'staff_evidence',
+  'server_post', 'sessions', 'staff_audit', 'staff_chat_lines', 'staff_chat_threads', 'staff_events', 'staff_evidence',
   'staff_foe_rows', 'staff_invites', 'staff_keys', 'staff_limits', 'staff_messages', 'staff_net_batches',
   'staff_net_rows', 'staff_notes', 'staff_sessions', 'staff_settings', 'staff_watch', 'star_spoils', 'stars_held',
   'town_domain_witness', 'town_econ_acts', 'town_econ_days', 'town_econ_kept', 'town_econ_seen', 'town_econ_struck',

@@ -53,7 +53,7 @@ import { settleDueOnce } from './seatTurning.js';
 import { keepSeatFacts } from './townSeats.js';   // SEAT-FACTS: the seats' facts, kept once for the service
 import { motherlodesOf } from './motherlodes.js';
 import { sweepBoard } from './board.js';
-import { safetyMinute, safetySweep } from './safetyClock.js';   // SAFE5 + SAFE8: the reviewer's reads and the moderators' cards; the hour's sweep
+import { safetyMinute, safetySweep } from './safetyClock.js';   // the reviewer's reads; the hour's sweep
 import { sweepGuildNotes } from './guildBoard.js';
 import { sweepHarvests } from './professions.js';
 import { sweepCraftWrits } from './craftWrits.js';   // CRAFT-WRITS: an unfilled crafting writ the day after its own
@@ -170,8 +170,7 @@ export const MINUTE_JOBS = Object.freeze([
   // with no tab to close it - a page killed under its death screen - takes what a tombstone takes with it (its union, its
   // guild seat, its pieces). The window is the realm's own (REZ_HOLD_S), so the minute is the read that catches it
   ['rez-holds', (ctx) => rounds(() => settleHolds(ctx), REZ_SETTLE_MAX, ctx.budget)],
-  // SAFE5 + SAFE8: the reviewer reads the relay's feed and the reported cases,
-  // and each case's card goes to the moderators' channel - nothing a request waits on (safetyClock.js)
+  // the chat safety: the reviewer reads the relay's feed and the reported cases - nothing a request waits on (safetyClock.js)
   // STAFF-PANEL5-FREEZE (staffFreeze.js; design doc Weak spots: "A failed push leaves a freeze or unfreeze unapplied"): and a
   // freeze or unfreeze the relay's door did not take, pushed again with a fresh order - the sanctions' own minute, so no
   // job's share of the firing shrinks (AUDIT SCALE A2); nothing asked while no door is set
