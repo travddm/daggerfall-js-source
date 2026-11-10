@@ -197,7 +197,7 @@ export function titlesHeld(player, env) {
   // derived from the account's characters' seats (npcChapters.js chapterTitlesOfAccount), laid on the row as
   // `chapterTitles` for this request alone, while CHAPTER_TITLES is on
   if (Array.isArray(player?.chapterTitles)) for (const t of player.chapterTitles) if (CHAPTER_TITLES.includes(t) && !held.includes(t)) held.push(t);
-  // ARENA4: THE ARENA'S TWO, derived from the arena's rows -
+  // The arena's two titles, derived from the arena's rows -
   // read onto the row (`arena`, server-account/src/arena.js arenaHonoursOf) where a token is minted or a wardrobe shown.
   // The Grand Champion holds for good (a row only a relay-signed climb writes); the Arena Champion while the account is
   // the season's #1, so it passes to whoever takes the top and lapses by itself. A row read without them holds neither.
