@@ -73,7 +73,6 @@ Offline all three are the same counter.
 | System | Figure | At 12 | At scale S |
 | --- | --- | --- | --- |
 | Hunters' Mark (`src/net/huntLaw.js`) | game days in a UTC day, and the late bound for a clear (`gameDaysPerUtcDay`, `huntClearLateDays`) | 12 | S |
-| Sea season (`src/net/sea/seaSeasonLaw.js`) | a world day and the legends' rise, in real seconds (`seaWorldDayS`, `seaLegendRiseS`) | 7,200 and 216,000 | 86,400 / S and 2,592,000 / S |
 | Gate court (`src/scenes/gate/gateCourt.js`) | a magic round, the real time of one game minute (`courtRoundMs`) | 5,000 ms | 60,000 / S ms |
 | Camp encounters (`src/systems/campEncounters.js`) | the window, in game minutes: 15 real minutes online (`campWindowMinutes`; offline it stays 180) | 180 | 15 x S |
 | Starfall (`src/net/starfall/starfallLaw.js`) | a night is a sky day (see below) | 2 real hours | 86,400,000 / S ms |
