@@ -9,6 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { calculateEnemyPacification, enemyLanguageSkill } from '../../src/combat/formulas.js';
 import { SKILLS } from '../../src/systems/skills.js';
+import { tryLanguagePacification, languageIgnoredText } from '../../src/scenes/hostCombat.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const player = (skillVal, personality) => {
@@ -74,4 +75,20 @@ test('pacification: the motor edge fires once and non-hostile foes stop moving',
   assert.equal(ai.moving, false, 'a pacified foe does not pursue');
   assert.deepEqual(ai.feet, before, '...its feet stay planted');
   assert.equal(ai.yaw, yaw0, '...and it does not even TURN - the decision tick itself is gated (DFU TakeAction)');
+});
+
+test("pacification: a failed roll says the foe ignores the player's words; a success says it is pacified", () => {
+  const said = [];
+  const orc = { isClass: false, careerIndex: 7 };
+  const deps = { sheathed: true, enemyLanguageSkill: () => SKILLS.Orcish, say: (l) => said.push(l) };
+  const failed = tryLanguagePacification({ justEncountered: true, isHostile: true }, orc, 7, player(0, 50), { ...deps, calculateEnemyPacification: () => false });
+  assert.equal(failed.pacified, false);
+  assert.equal(said.length, 1);
+  assert.match(said[0], / ignores your words\.$/);
+  assert.equal(said[0], languageIgnoredText(said[0].slice(0, -' ignores your words.'.length)));
+  const ai = { justEncountered: true, isHostile: true };
+  tryLanguagePacification(ai, orc, 7, player(0, 50), { ...deps, calculateEnemyPacification: () => true });
+  assert.equal(ai.isHostile, false);
+  assert.match(said[1], /is pacified by your/);
+  assert.equal(said.length, 2, 'one line a roll');
 });

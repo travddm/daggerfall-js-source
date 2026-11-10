@@ -4,6 +4,9 @@
 	reverse_proxy workerd:8787
 }
 
+# The operator's door is answered only inside the host (selfhost/operator.ts), never from the public name: it mints
+# recovery codes and staff roles, so a leaked secret alone must not reach it from outside.
 {$DFO_ACCOUNTS_HOST} {
+	respond /__operator 404
 	reverse_proxy workerd:8788
 }
