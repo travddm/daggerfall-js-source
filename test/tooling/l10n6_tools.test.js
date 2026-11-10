@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { languageCoverage, coverageMarkdown } from '../../tools/l10nCoverage.mjs';
 import { exportReview, importReview, parseCsv, REVIEW_COLUMNS } from '../../tools/l10nReview.mjs';
 import { readBundledPack, packMetaProblems } from '../../tools/l10nPack.mjs';
-import { hash } from '../../tools/translate.mjs';
+import { hash } from '../../tools/lib/translation-rows.mjs';
 import { formatStringTableCsv } from '../../src/systems/textManager.js';
 
 const EN = [['a.hello', 'Hello'], ['a.gold', '{n, plural, one {# gold piece} other {# gold pieces}}'], ['a.name', 'Hello, {name}.'], ['a.new', 'Brand new']];

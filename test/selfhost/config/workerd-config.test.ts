@@ -31,7 +31,7 @@ const accounts = (): Toml => ({
   compatibility_date: '2026-09-01',
   placement: { region: 'aws:us-west-1' },
   triggers: { crons: ['* * * * *', '41 * * * *'] },
-  vars: { OWNER_KEYS: 'someone:key', ALLOWED_ORIGIN: '*', NOTE: 'Ærø' },
+  vars: { ALLOWED_ORIGIN: '*', NOTE: 'Ærø' },
   d1_databases: [
     { binding: 'DB', database_name: 'daggerfall-accounts', database_id: 'x', migrations_dir: 'migrations' },
   ],
@@ -60,8 +60,7 @@ test('vars become text, with the keys a self-host mints read from the environmen
   const config = workerdConfig(relay(), accounts(), OPTIONS);
   assert.match(String(bindingText(config, 'IDENTITY_MAX_TTL_S')), /text = "300"/);
   assert.doesNotMatch(config, /cloudflares-key/);
-  assert.doesNotMatch(config, /someone:key/);
-  for (const name of ['IDENTITY_PUBLIC_KEY', 'OWNER_KEYS', 'GATE_SIGNING_KEY', 'IDENTITY_PRIVATE_KEY', 'CRON_SECRET']) {
+  for (const name of ['IDENTITY_PUBLIC_KEY', 'GATE_SIGNING_KEY', 'IDENTITY_PRIVATE_KEY', 'CRON_SECRET']) {
     assert.match(config, new RegExp(`fromEnvironment = "${name}"`), name);
   }
   assert.match(config, /text = "\\xc3\\x86r\\xc3\\xb8"/);

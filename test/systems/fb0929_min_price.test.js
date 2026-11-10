@@ -6,6 +6,7 @@
 // Climates & Calories apple - went for NOTHING wherever the haggle fell under 128/256: a poor counter, a province
 // under the 1000 pivot, a practised haggler. Mac's call: a purchase asks a gold a piece at least (Port-Ledger A).
 // The sale is left Daggerfall's offline and REALM P0.4's online, and the pins below say why that side must not move.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../modsOff.js';   // MO1: Daggerfall's own shelves and haggle - the one mod a case needs is switched on in it
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -226,7 +227,8 @@ function callsOf(text, name) {
   return out;
 }
 
-test('FB0929: the sale is not floored - Daggerfall\'s offline, at most half the floored asking price online; the floor only raises an ask, so the loop that bought a bandage for nothing and sold it back for a gold nets nothing', () => {
+test('FB0929: the sale is not floored - Daggerfall\'s offline, at most half the floored asking price online; the floor only raises an ask, so the loop that bought a bandage for nothing and sold it back for a gold nets nothing', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   const bandage = bandageOf(shelfOf(BUILDING_TYPES.GeneralStore, 10));
   const ctx = { quality: 1, priceAdjustment: 750, skills: SKILLS };
   const ask = tradeCost('Buy', [bandage], ctx);

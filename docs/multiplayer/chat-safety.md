@@ -60,11 +60,11 @@ lists, with normalisation and an allow-list for innocent words. The service runs
 
 ## Sanctions
 
-| Action | Stored in | Effect on the relay |
-| --- | --- | --- |
-| Mute | `players.muted_until`, `muted_by` | Mute order sets the socket's `mu`; new tokens carry `mu` |
-| Ban | `players.banned_until`, `ban_reason`, `banned_by` | `_banClose` closes the sockets; `_bannedHello` refuses tokens older than the ban; bans stored in room storage |
-| Dismiss | Case closed; `voidAutoMutes` lifts its automatic mutes | Unmute order |
+| Action  | Stored in                                              | Effect on the relay                                                                                           |
+| ------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Mute    | `players.muted_until`, `muted_by`                      | Mute order sets the socket's `mu`; new tokens carry `mu`                                                      |
+| Ban     | `players.banned_until`, `ban_reason`, `banned_by`      | `_banClose` closes the sockets; `_bannedHello` refuses tokens older than the ban; bans stored in room storage |
+| Dismiss | Case closed; `voidAutoMutes` lifts its automatic mutes | Unmute order                                                                                                  |
 
 - Every act is a `mod_actions` row, never deleted. The ladder (`src/net/safety/safetyLaw.js`, `LADDER_MIN`) is 30
   minutes, 1 day,
@@ -91,7 +91,8 @@ retried: the database row is the truth, and the next token the player mints carr
 
 ## The AI reviewer
 
-`server-account/src/modAi.js`, `safetyClock.js`; switch `MOD_AI` (`off`, `shadow`, `on`).
+`server-account/src/modAi.js`, `safetyClock.js`; switch `MOD_AI` (`off`, `shadow`, `on`). The shipped value is
+`off`: `shadow` and `on` send chat lines to Anthropic, so an operator turns the reviewer on on purpose.
 
 - The relay's public-line feed is kept only while `MOD_AI` is not `off` (`takeFeed`).
 - Every minute (`safety` cron job) `safetyMinute` reads the feed, triages open cases, and sends lines to the
@@ -104,9 +105,4 @@ retried: the database row is the truth, and the next token the player mints carr
 
 The account deploy writes `ANTHROPIC_API_KEY` from the repository secrets to the Worker.
 
-## Relay announcements
 
-Separate from moderation, the relay posts event announcements (Oblivion gates, Super Dungeons, serpent) through a
-webhook (`GATE_DISCORD_WEBHOOK` secret; `heraldWebhook` in `server/src/index.js`, cards in
-`src/net/herald/heraldCard.js`). Ping roles and threads come from the `*_DISCORD_ROLE` and `*_DISCORD_THREAD` vars and
-can be changed in game with `/relay` (`src/net/relayCfg.js`).

@@ -25,7 +25,7 @@ import { QL_LINES } from '../../src/systems/questlines/qlLines.js';
 import { ARENA_CHAMPION_MIN_BOUTS, ARENA_CHAMPION_MIN_FOES } from '../../src/net/arena/arenaLaw.js';
 import { codexRows, codexSets, noteFind, _resetCodexForTests } from '../../src/systems/loot/lootCodex.js';
 import { GILDED_RECORDS, DRAGONFIRE_OATH, mintGilded } from '../../src/systems/gilded.js';
-import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, FOUNDER_UNTIL, wardrobeOf } from '../../server-account/src/titles.js';
+import { TIER_LISTS, TIER_GLYPH, TIER_AURA, DEVELOPER_AURA, HOURS_FIRST_AURA, wardrobeOf } from '../../server-account/src/titles.js';
 import { SD_TITLE_CHANCE, SD_AURA_CHANCE } from '../../server-account/src/sds.js';
 import { SERPENT_TITLE_CHANCE, SERPENT_AURA_CHANCE } from '../../server-account/src/serpents.js';
 import { EMBERS_EARNED_SQL } from '../../server-account/src/accounts.js';
@@ -84,13 +84,13 @@ function page({ flow = null, player = { items: [] }, now = DURING } = {}) {
   return box;
 }
 
-/** The row a registered founder from before the date minted, who bought the Broker's two pieces and the festival's Twin
+/** The row a registered account minted that once spoke with a lamp keeper, bought the Broker's two pieces and the festival's Twin
  *  Moons, broke a Remnant for both its grants, and hid the sprout - read through the service's own wardrobeOf. */
 function mintedWardrobe() {
   const nowS = Math.floor(DURING / 1000);
   const player = {
     handle: 'aelwyn', registered_at: 1_790_000_000, created_at: nowS - 3600, insignia: 'title:gatebreaker aura:dagonfire',
-    sd_honours: 3, fest_wares: 'icon:twinmoons', title: 'gatebreaker', aura: 'dagonfire', icon: 'twinmoons', glyphs_off: 'sprout',
+    sd_honours: 3, lamp_title: 1, fest_wares: 'icon:twinmoons', title: 'gatebreaker', aura: 'dagonfire', icon: 'twinmoons', glyphs_off: 'sprout',
   };
   return wardrobeOf(player, {}, nowS);
 }
@@ -192,7 +192,6 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
   }
   assert.equal(entry('title', 'starwarden').avail, 'seasonal', 'the Thirteenth of Frostfall is the festival\'s');
   // the founders: the instant, the routes still open
-  assert.equal(FOUNDER_UNTIL, Date.UTC(2026, 8, 25, 12) / 1000, 'noon UTC, 25 September 2026');
   assert.equal(entry('title', 'founder').avail, 'closed');
   assert.match(how('title', 'founder'), /by noon UTC on 25 September 2026, or is granted it by name\. A guest from before then earns it by registering; a character from before then brought onto your account counts too\./);
   assert.ok(!W.AVAIL_NOW.includes('closed') && !W.AVAIL_NOW.includes('retired'));
@@ -216,8 +215,8 @@ test('COLLECTIONS-II THE CATALOGUE IS THE SERVICE\'S LAW SAID, ENTRY BY ENTRY (A
 
 test('COLLECTIONS-II HELD, WORN AND COUNTED off the wardrobe the service mints (titles.js wardrobeOf): the founder, the bought, the rolled and the festival\'s held; the one title, aura and icon worn; a glyph taken off held and not shown, one held and on shown; High Master with Chapter Master, never worn or counted; a seat\'s glyph the character\'s, never the account\'s - the service\'s wardrobe has none, so the page says nothing of its holding and counts it nowhere (AUDIT COLLECTIONS-II lanes 1, 2: the Seats\' glyphs read "not held" for their every holder); a service too old to name a kind holds none of it (mutants: worn read off held; a hidden glyph shown; the via counted; a character\'s glyph counted)', () => {
   const w = mintedWardrobe();
-  assert.deepEqual(w.titles, ['founder', 'gatebreaker', 'hourbreaker'], 'the producer\'s own shape');
-  for (const [k, key] of [['title', 'founder'], ['title', 'gatebreaker'], ['title', 'hourbreaker'], ['aura', 'dagonfire'], ['aura', 'turninghour'], ['icon', 'twinmoons'], ['glyph', 'sprout']]) assert.equal(W.wardrobeHeld(k, key, w), true, `${k}:${key} held`);
+  assert.deepEqual(w.titles, ['gatebreaker', 'hourbreaker', 'ilovelamp'], 'the producer\'s own shape');
+  for (const [k, key] of [['title', 'ilovelamp'], ['title', 'gatebreaker'], ['title', 'hourbreaker'], ['aura', 'dagonfire'], ['aura', 'turninghour'], ['icon', 'twinmoons'], ['glyph', 'sprout']]) assert.equal(W.wardrobeHeld(k, key, w), true, `${k}:${key} held`);
   assert.equal(W.wardrobeHeld('title', 'developer', w), false);
   assert.deepEqual(['title', 'aura', 'icon'].map((k) => W.wardrobeEntries(k).filter((e) => W.wardrobeWorn(k, e.key, w)).map((e) => e.key)), [['gatebreaker'], ['dagonfire'], ['twinmoons']], 'one worn a kind');
   assert.equal(W.wardrobeWorn('glyph', 'sprout', w), false, 'the sprout taken off');
@@ -255,7 +254,7 @@ test('COLLECTIONS-II THE SEASONS AND THE FILTERS: a festival\'s piece seasonal w
   assert.ok(!titles.filter((e) => wardrobeFilterPasses('now', e, w, AFTER)).some((e) => e.key === 'witchwarden'), 'out of season, not now');
   const held = titles.filter((e) => wardrobeFilterPasses('held', e, w)).map((e) => e.key);
   const missing = titles.filter((e) => wardrobeFilterPasses('missing', e, w)).map((e) => e.key);
-  assert.deepEqual([...held].sort(), ['founder', 'gatebreaker', 'hourbreaker']);
+  assert.deepEqual([...held].sort(), ['gatebreaker', 'hourbreaker', 'ilovelamp']);
   assert.equal(held.length + missing.length, titles.length);
   const glyphs = W.wardrobeEntries('glyph');
   assert.ok(!glyphs.filter((e) => wardrobeFilterPasses('missing', e, w)).some((e) => e.key === 'tower'), 'a character\'s own is not missing from the account');
@@ -373,10 +372,11 @@ test('COLLECTIONS-II A KIND\'S PART: every one of the kind a row under its sourc
   const flow = fakeFlow(w);
   let p = page({ flow });
   assert.equal(cls(p.root, 'coll-row').length, TITLES.length);
-  for (const h of ['The Sigil Broker - 1/1', 'Your Account - 1/1', 'The Abyss Dungeons - 1/2', 'The Guild Chapters - 0/4']) assert.ok(heads(p.root).includes(h), `${h} in ${heads(p.root).join(' | ')}`);
+  for (const h of ['The Sigil Broker - 1/1', 'Around the Bay - 1/1', 'Your Account - 0/1', 'The Abyss Dungeons - 1/2', 'The Guild Chapters - 0/4']) assert.ok(heads(p.root).includes(h), `${h} in ${heads(p.root).join(' | ')}`);
   const gate = rowOf(p.root, 'title', 'gatebreaker');
   assert.deepEqual(tags(gate), ['Worn', 'Obtainable']);
-  assert.deepEqual(tags(rowOf(p.root, 'title', 'founder')), ['Held', 'Closed']);
+  assert.deepEqual(tags(rowOf(p.root, 'title', 'founder')), ['Closed'], 'not held: no state chip');
+  assert.deepEqual(tags(rowOf(p.root, 'title', 'ilovelamp')), ['Held', 'Obtainable']);
   assert.deepEqual(tags(rowOf(p.root, 'title', 'hourbreaker')), ['Held', 'By chance']);
   assert.deepEqual(tags(rowOf(p.root, 'title', 'developer')), ['Staff only'], 'not held: no state chip');
   assert.ok(gate.classList.contains('held') && !rowOf(p.root, 'title', 'developer').classList.contains('held'));
@@ -384,7 +384,7 @@ test('COLLECTIONS-II A KIND\'S PART: every one of the kind a row under its sourc
   assert.equal(cls(p.root, 'coll-season').length, 1, 'the festival is on');
   // the Held filter: the dividers keep their own counts
   focus(p.root, 'coll-filter-held').onclick();
-  assert.ok(heads(p.root).includes('The Abyss Dungeons - 1/2') && heads(p.root).includes('Your Account - 1/1'), heads(p.root).join(' | '));
+  assert.ok(heads(p.root).includes('The Abyss Dungeons - 1/2') && heads(p.root).includes('Around the Bay - 1/1'), heads(p.root).join(' | '));
   focus(p.root, 'coll-filter-all').onclick();
   // opened whole, and worn off
   gate.onclick();
@@ -472,7 +472,7 @@ test('COLLECTIONS-II THE FILTERS, THE PICTURES, THE RESET: a filter pressed narr
   resetCollectionsPage();
   const p = page({ flow: fakeFlow(mintedWardrobe()) });
   focus(p.root, 'coll-filter-held').onclick();
-  assert.deepEqual(cls(p.root, 'coll-row').map((r) => r.dataset.wardrobe).sort(), ['title:founder', 'title:gatebreaker', 'title:hourbreaker']);
+  assert.deepEqual(cls(p.root, 'coll-row').map((r) => r.dataset.wardrobe).sort(), ['title:gatebreaker', 'title:hourbreaker', 'title:ilovelamp']);
   assert.ok(focus(p.root, 'coll-filter-held').classList.contains('on') && focus(p.root, 'coll-filter-held').attrs['aria-pressed'] === 'true');
   setCollectionsPart('icons'); p.draw();
   assert.equal(cls(p.root, 'coll-row').length, 1, 'the one icon held');

@@ -66,7 +66,6 @@ makes a fresh copy. Only the owner's party is admitted. Entry from the world goe
   account's deaths and wins across copies (`sdac:<sub>`, `/internal/sd/acct`). The Worker refuses a copy key once the
   dungeon has closed (`sdLiveAsk`).
 - Account side: `server-account/src/sds.js`, table `sd_kills` (one row per slot, account and nonce).
-  `.github/workflows/sd-clears.yml` is a manual read-only listing of who cleared each slot.
 
 ## Arena
 

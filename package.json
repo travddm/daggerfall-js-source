@@ -43,7 +43,7 @@
     "levelup": "node tools/levelUpProbe.mjs",
     "blood": "node tools/bloodProbe.mjs",
     "account": "node tools/accountProbe.mjs",
-    "load": "node tools/loadHarness.mjs",
+    "load": "node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs",
     "acctcard": "node tools/accountCardProbe.mjs",
     "savetile": "node tools/saveTileProbe.mjs",
     "chargenphone": "node tools/chargenPhoneProbe.mjs",
@@ -64,6 +64,7 @@
     "pngjs": "^7.0.0",
     "prettier": "^3.9.10",
     "rollup": "^4.62.2",
+    "smol-toml": "^1.9.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.4"
   }

@@ -1,7 +1,6 @@
-// L10N6: THE TRANSLATIONS IN THE CREDITS. Mac's decisions (Localization-Arc.md): the game says which
-// languages are machine-translated, a person's translation outranks a draft, and a pack is bundled only on its authors'
+// L10N6: THE TRANSLATIONS IN THE CREDITS. Only people's translations ship, and a pack is bundled only on its authors'
 // terms. The About pane credits them as it credits the works (ui/credits.js translationCredits): one row a language the
-// game holds text for - its own name; Claude's drafts said to be drafts, "checked and corrected by" the people who did
+// game holds text for - its own name; the people who translated it
 // (`locales/<tag>/translators.json`, read by scenes/localeData.js into the language's record); a bundled pack's name,
 // authors, licence, terms and source. English and the pseudo-locale are the game's own and have no row.
 import { test, beforeEach } from 'node:test';
@@ -24,25 +23,25 @@ beforeEach(() => {
   globalThis.indexedDB = memoryIdb();
 });
 
-test('L10N6 a language\'s row: Claude\'s drafts said to be drafts, the people who checked them by name, a bundled pack\'s authors, licence, terms and source; English, the pseudo-locale and a hidden language have none', () => {
+test('L10N6 a language\'s row: the people who translated it by name, or the community, a bundled pack\'s authors, licence, terms and source; English, the pseudo-locale and a hidden language have none', () => {
   const rows = translationCredits([
-    { code: 'en', name: 'English', source: 'machine' },
-    { code: 'qps-ploc', name: 'Pseudo', source: 'machine' },
-    { code: 'xx', name: 'Hidden', source: 'machine', hidden: true },
-    { code: 'fr', name: 'Français', source: 'machine', translators: [], bundled: null },
-    { code: 'de', name: 'Deutsch', source: 'machine', translators: ['Anna', 'Bernd'] },
+    { code: 'en', name: 'English', source: 'base' },
+    { code: 'qps-ploc', name: 'Pseudo', source: 'pseudo' },
+    { code: 'xx', name: 'Hidden', source: 'community', hidden: true },
+    { code: 'fr', name: 'Français', source: 'community', translators: [], bundled: null },
+    { code: 'de', name: 'Deutsch', source: 'community', translators: ['Anna', 'Bernd'] },
     { code: 'it', name: 'Italiano', source: 'community', translators: ['Carla'], bundled: { ...PACK, name: 'Pacchetto', source: 'a forum post' } },
     { code: 'es', name: 'Español', source: 'community' },
   ]);
   assert.deepEqual(rows.map((r) => r.code), ['fr', 'de', 'it', 'es']);
   const [fr, de, it, es] = rows;
   assert.equal(fr.title, 'Français', 'the language by its own name');
-  assert.equal(fr.author, 'Claude (Anthropic)');
-  assert.match(fr.what, /Machine translation by Claude, still being checked/);
+  assert.equal(fr.author, 'The community');
+  assert.match(fr.what, /^Translated by the community\.$/);
   assert.equal(fr.terms, undefined);
   assert.equal(fr.link, undefined);
-  assert.equal(de.author, 'Anna and Bernd', 'the people who checked it, as the language lists names');
-  assert.match(de.what, /Machine translation by Claude, checked and corrected by Anna and Bernd\./);
+  assert.equal(de.author, 'Anna and Bernd', 'the people who translated it, as the language lists names');
+  assert.match(de.what, /^Translated by Anna and Bernd\.$/);
   assert.equal(it.author, 'A. Traducteur, B. Relecteur, and Carla', 'the pack\'s authors, then the translators');
   assert.match(it.what, /^Translated by Carla\. Daggerfall’s original text is Pacchetto, used with its authors’ permission\.$/);
   assert.equal(it.terms, 'CC-BY-4.0: bundling allowed with credit (2026-10-01)');
@@ -79,7 +78,7 @@ test('L10N6 the translators reach the language\'s record: `locales/<tag>/transla
   assert.equal(fr.terms, 'CC-BY-4.0\u00a0: bundling allowed with credit (2026-10-01)', 'the pattern in French - its space before the colon');
 });
 
-test('L10N6 the tree: every `locales/<tag>/translators.json` is a list of names, in a language folder the catalog drafts', () => {
+test('L10N6 the tree: every `locales/<tag>/translators.json` is a list of names, in a language folder the catalog holds', () => {
   for (const code of readdirSync(new URL('../../locales/', import.meta.url))) {
     const p = `locales/${code}/translators.json`;
     if (!existsSync(new URL('../../' + p, import.meta.url))) continue;

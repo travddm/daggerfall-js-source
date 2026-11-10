@@ -100,6 +100,7 @@ import '../systems/gate/gateSpoils.js'; import '../systems/portalStone.js'; impo
    // WB5: the Sigil Stone's own template (570) registers in every host, so a save carrying one loads it in any of the four; PORTAL1: and the Portal Stone's Use (572)
 import '../systems/sigil/sigilBroker.js';   // SET7: the Broker's record (what this character bought today) registers its save slot in every host, so a save made anywhere carries it
 import { installImmersiveTravel } from '../systems/immersiveTravel.js';   // IT1: Immersive Travel's Init - the drivers' and sailors' factions, their Fast Travel services
+import { onlineRule } from '../systems/online/serverProfile.ts';   // the server profile's rest.fireOnly
 import { installRoleplayRealism } from '../systems/roleplayRealism/rrInstall.js';   // RR1: Roleplay & Realism's InitMod - after Items', as DFU loads them (Items is the one it looks up)   // RRI1: the templates, the patches, the art - the same seam, the same reason   // DW3: its icons, on the replacement door - here and not at worldTick's module scope, where the mod's law sits in an import cycle (a TDZ)
 import { installEnemyExpansion } from '../systems/enemyExpansion/dexInstall.js';   // DEX1: Daggerfall Enemy Expansion's fifty enemies, their careers and the classic edits, once at boot
 import { getBool, getInt, getFloat } from '../systems/settings/settings.js';   // M-FM: Audio/AlternateMusic, read once for all three hosts; MAC-O4: Controls/WeaponSwingMode, the drag route's own missing term; NIGHT-FOG: Enhancements/NightAmbientLightScale, the night air's
@@ -109,7 +110,6 @@ import { audio } from '../systems/audio.js';
 import { messageBox } from '../systems/notify.js';   // ENH-NOTICE3: the one door every DaggerfallUI.MessageBox goes through - the infection's popup names the KIND, never the host's window
 
 import { getBytes, forgetBytes, storedMusicNames, loadMusicFile, registerTextureStore, registerMorrowindData } from './dataSource.js';   // M-EXT/M-TEX: the player's own packs
-
 
 /** The data seam every scene uses - delegates to the ARENA2 data
  *  source (memory -> IndexedDB -> network); signature unchanged. */
@@ -920,13 +920,13 @@ export function tamrielLandOn(search) {
 export { tamrielLandsOn } from '../systems/landsSwitch.js';
 
 /** ETHER-SEA: THE ELTHERIC OCEAN STANDS - its ground streamed in the world's far box
- *  (world/ethericSea.js), its places, its ships and its way home through the Veil - in every game. AUDIT CAPTAIN'S SEA
- *  G2: a save made past the Veil threw on its load under the classic skin, where the sea did not stand; it stands there
- *  now, and its captain sails home. `?ether=off` the kill door (a save past the Veil then lands at the way home). No
- *  Features row: the crossing is the player's own choice each time it is offered. The world host reads it once, at its
+ *  (world/ethericSea.js), its places, its ships and its way home through the Veil - when the Features row `eltheric-sea`
+ *  is on (forced on online), under any skin. AUDIT CAPTAIN'S SEA G2: a save made past the Veil threw on its load under
+ *  the classic skin, where the sea did not stand; it stands there now when the row is on, and its captain sails home.
+ *  `?ether=off` the kill door (a save past the Veil then lands at the way home). The world host reads it once, at its
  *  mount. */
 export function etherSeaOn(search) {
-  return pageParam('ether', search) !== 'off';
+  return pageParam('ether', search) !== 'off' && !!(onlineForcedPref('etherSea', search) ?? getPref('etherSea'));
 }
 /** ETHER-CROSSING: THE CROSSING OUT, offered on the open Abecean - on the enhanced skin and online; the classic skin keeps
  *  DFU's own sea (no captain of it is asked out, and one already past the Veil sails home through it). */
@@ -1887,7 +1887,7 @@ export function sensesContext(entity, gameMinutes, { movingLessThanHalfSpeed = t
     playerBlending: isBlending(entity),
     playerInvisible: isInvisible(entity),
     playerShade: isAShade(entity),
-    playerUnseen: entity.staffHidden === true,   // STAFF-UNSEEN: a hidden staff member (scenes/staffFollowHost.js staffFollowOnPage) - no foe senses them
+    playerUnseen: entity.staffHidden === true,   // a hidden staff member - no foe senses them. Nothing sets the flag since the staff panel extension's hook was removed
     sharedStealth: entity.stealthCheckBox,
     tallyStealth: () => tallySkill(entity, SKILLS.Stealth),
     // MT-ii: the target-machine seam. A host that owns a pool passes
@@ -2604,9 +2604,9 @@ export function createRestDeps(entity, opts = {}) {
     // the last stage of the walk. Flatten here, once, for every host.
     endLines: (id) => plainLines(rest.endLines?.(id)),
   };
-  // REST1: THE ACT ONLINE, composed here beside the window's deps so the four hosts
-  // share one law (systems/rest/restAct.js). `restAct` answers the plan the window opens on - null offline, where the
-  // window is DFU's own; `restNight` runs the night through THIS bag (the timed rest's own session, its sub-ticks,
+  // The rest act online, the server profile's option (rest.fireOnly), composed here beside the window's deps so the four
+  // hosts share one law (systems/rest/restAct.js). `restAct` answers the plan the window opens on - null offline and
+  // online by default, where the window is DFU's own on the character's own clock; `restNight` runs the night through THIS bag (the timed rest's own session, its sub-ticks,
   // quest ticks, hourly checks and vitals, in one call), stamps it, tops the yield up and spends a rented room's
   // night; `restShort` is the rest inside the night interval - the yield's healing and the sleep need paid as a night
   // of its kind pays it (REST-SLEEP1), and nothing else.
@@ -2614,7 +2614,7 @@ export function createRestDeps(entity, opts = {}) {
   // its own longer channel.
   out.restAct = () => {
     if (litCandle(entity)) return { point: { kind: 'candle', where: 'candle' }, night: false, meditate: true, channelSeconds: REST_CHANNEL_SECONDS };
-    if (!sharedClockOn()) return null;
+    if (!sharedClockOn() || onlineRule('rest.fireOnly') !== true) return null;   // the act is the server profile's option; DFU's window by default
     const point = out.bedPressed ? { kind: REST_KIND.Bed, where: null } : (restPoint?.() ?? null);   // AUDIT RPT1026 L3: and its point is that bed
     return { point, night: nightDue(entity, ownMinutes()), channelSeconds: point?.channelSeconds ?? REST_CHANNEL_SECONDS };
   };

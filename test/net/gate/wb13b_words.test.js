@@ -18,14 +18,12 @@ import { GATE_TEXT } from '../../../src/scenes/gate/gatePool.js';
 import { GATE_NO_TEXT } from '../../../src/net/gate/gateLink.js';
 import { GATE_CLAIM_TEXT } from '../../../src/net/gate/gateClaims.js';
 import { MARKS_TEXT } from '../../../src/net/marksBook.js';
-import { omenPost, fellPost, ritePost } from '../../../src/net/gate/gateHerald.js';
 import { fellLine, riteOmenLine, omenTimeLine, openTimeLine, sealTimeLine } from '../../../src/systems/gate/gateOmen.js';   // TIME1, at the merge: the three that name a time
 import { RITE_TEXT } from '../../../src/scenes/riteHost.js';
 import { SPOILS_TEXT } from '../../../src/scenes/spoilsPool.js';
 import { INSIGNIA_SUB, INSIGNIA_LINE, INSIGNIA_CARD } from '../../../src/ui/brokerWindow.js';
 import { dismantleAsk } from '../../../src/systems/sigil/sigilBroker.js';
 import { accountRefusalText } from '../../../src/net/accountClient.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const P = { boss: 'Valkynaz Ruhn' };
@@ -72,7 +70,6 @@ function lines() {
   // AUDIT WB12d (D18): the faithful's rite, every line it says
   add('rite.omen', riteOmenLine());
   for (const [k, v] of Object.entries(RITE_TEXT)) add(`rite.${k}`, typeof v === 'function' ? (k === 'broken' ? v({ near: 'Copperham', by: ['Ann', 'Bran'], n: 5 }) : v(7)) : v);
-  add('rite.post', cardOf(ritePost({ place: 'Copperham, Wrothgarian Mountains', by: ['Ann', 'Bran'], n: 5 })).title);   // HERALD-CARDS: the card's one line
   add('claim.rite', GATE_CLAIM_TEXT.rite); add('claim.guestRite', GATE_CLAIM_TEXT.guestRite);
   add('spoils.rite', SPOILS_TEXT.rite); add('strike.spilledRite', COURT_STRIKE_TEXT.spilledRite());
   return out;
@@ -98,16 +95,12 @@ test('WB13b THE STYLE, a law over every table: no "X, not Y"; no dash aside in a
   for (const p of GATE_PORTENTS) assert.ok(p.tip.length <= 60 && p.tip.endsWith('.') && !p.tip.includes(';'), `${p.id}: ${p.tip.length}`);
 });
 
-test('WB13b the chat names the marks - the card and the bar say what each does; Discord says the same sentence (mutants: the marks\' effects back in the chat; the herald\'s own sentence)', () => {
+test('WB13b the chat names the marks - the card and the bar say what each does; his fall said once, the collapse with it (mutants: the marks\' effects back in the chat; the old sentence)', () => {
   assert.equal(marksLine({ boss: P.boss, md: ['rime', 'colossal', 'unyielding'] }), 'Valkynaz Ruhn comes the Rime-Wrought tonight, Colossal and Unyielding.');
   assert.equal(marksLine({ boss: P.boss, md: ['burning'] }), 'Valkynaz Ruhn comes the Burning tonight.');
   for (const t of GATE_TRIALS) assert.ok(!marksLine({ boss: P.boss, md: ['burning', t.id] }).includes(t.text), `${t.id}: named, never explained`);
-  const post = cardOf(omenPost({ day: 112, place: 'Copperham' })).text;   // HERALD-CARDS: the card's text
-  assert.equal(post, 'The faithful work their rite nearby. Kill their Summoner before the breach opens. Valkynaz Ruhn comes **the Rime-Wrought** tonight, Colossal and Unyielding.', post);   // WB12d: the rite, a line
-  assert.ok(!/holds it|Tonight he comes/.test(post));
-  const fell = cardOf(fellPost({ day: 112, top: [], n: 0 }));
-  assert.deepEqual([fell.author, fell.title, fell.fields.Where, fell.text], ['Dagon\'s Breach', 'Valkynaz Ruhn has fallen', 'In the wilds', 'The breach collapses.']);
-  assert.equal(fellLine({ near: null, boss: P.boss, top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'the chat says what Discord\'s card says - its title, its family, where and the collapse');
+  assert.ok(!/holds it|Tonight he comes/.test(marksLine({ boss: P.boss, md: ['rime', 'colossal', 'unyielding'] })));
+  assert.equal(fellLine({ near: null, boss: P.boss, top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'his title, the breach, where and the collapse');
 });
 
 test('WB13b nothing said on stepping into the court - the marks\' card stands at that moment, with the same subtitle as by the gate (mutants: the arrival line said again; two subtitles)', () => {

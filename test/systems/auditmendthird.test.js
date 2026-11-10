@@ -5,6 +5,7 @@
 // handed it over whole. L3-4: There's a Hole in the Bottom of the Ocean's re-mint left a stale mark. L1-6 / L2-6 / L3-5:
 // a temper moved the maximum and left the mark. L3-6: a new character's worn kit, and the questions' dagger, unmarked.
 // L1-4: a patron read no condition at all. Every piece from its producer.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -47,7 +48,8 @@ const quote = (mode, item, { quality = 10, priceAdjustment = 1000, skills = { me
 const found = (piece, r) => randomConditionLootItems([piece], at(r))[0];
 const worn = (it) => it && (it.group === 'Weapons' || it.group === 'Armor' || it.group === 'Books') && it.name !== 'Arrow' && (it.maxCondition ?? 0) > 0 && (it.currentCondition ?? 0) < it.maxCondition;
 
-test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted at the item maker for one side effect at no gold, a Daedric cuirass found at 47% fenced, unmended, at its whole 47,553 where it sold for 22,350 (23,776 and 11,175 since DAEDRIC-SALE); offline, and an unmarked piece, fence as DFU\'s (mutants: the fence reads no mark; reads it offline)', () => {
+test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted at the item maker for one side effect at no gold, a Daedric cuirass found at 47% fenced, unmended, at its whole 47,553 where it sold for 22,350 (23,776 and 11,175 since DAEDRIC-SALE); offline, and an unmarked piece, fence as DFU\'s (mutants: the fence reads no mark; reads it offline)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the figures below are priced under the server profile's sale cap
   const plate = found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0.5);
   const side = sideEffectTypes().flatMap((t) => enchantmentParamValues(t).map((p) => enchantmentSettings(t, p))).filter(Boolean)
     .find((se) => { const d = enchantDecision(structuredClone(plate), [], [se], { gold: 0 }); return d.kind === 'enchant' && d.goldCost === 0; });

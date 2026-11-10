@@ -19,7 +19,7 @@
 // `loUnread` false, the pins' oracles: a light that moved through its static cache, and a lo map for every light that may
 // cast) - and `now`. test/render/lightid.test.js pins the counts (`courtShadowCounts`).
 //
-// Usage: node tools/courtShadowProbe.mjs [bodies=8]
+// Usage: node --import ./tools/raw-import-hooks.ts tools/courtShadowProbe.mjs [bodies=8]
 import { Renderer, WORLD_FRAME } from '../src/render/renderer.js';
 import { EL_LANE } from '../src/render/enhancedLighting.js';
 import { SHADOW_TUNING } from '../src/render/shadowPass.js';

@@ -669,7 +669,7 @@ test('TV1 host wiring: the frame draws from the view\'s eye risen out of the bod
   assert.match(w, /travelView\?\.drawHud\(\);/);
   assert.match(w, /audio\.setListener\(cam\.pos, tvf \? \[viewFwd\[0\], 0, viewFwd\[2\]\] : fwd\);/);
   // the cursor toggle cannot take the view's free cursor back, and the loop's death takes the view with it
-  assert.match(w, /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\) \|\| !!travelView\?\.active \|\| !!poiEditor\?\.active\(\),/);
+  assert.match(w, /bindCursorToggle\(canvas, \(\) => gamePaused\(\) \|\| \(modes\?\.modalWindowUp\?\.\(\) \?\? false\) \|\| !!travelView\?\.active,/);
   // P0's guard stays the plaque's one line (four pins hold it); the view goes on its own heartbeat, asking the same token
   assert.match(w, /if \(!frameAlive\(_frameToken\)\) \{ destroyWorldPlaque\(\); return; \}/);
   assert.match(w, /alive: \(\) => frameAlive\(_frameToken\),/);

@@ -24,6 +24,7 @@
 // EntityBehaviours yields the player after the enemies (:748).
 
 import { canSeeTarget, SYSTEM_TIMER_UPDATES_DIVISOR, SENSES_INTERVAL_UNITS } from './enemyMotor.js';
+import { trackRateOfApproach } from './enhanced-combat-ai.ts';   // EnemySenses' rate of approach, DFU's Enhanced Combat AI
 import { CAPSULE_HEIGHT } from '../../player/motor.js';   // REVIEW 2026-09-05: the player's transform above its feet
 import { getBool } from '../../systems/settings/settings.js';
 import { ENEMY_BASICS } from './enemyBasics.js';   // the STATIC table the ally revert reads
@@ -212,6 +213,7 @@ export function getTargets(self, candidates, playerFeet, {
   const selfTeam = self.entity?.team ?? 'PlayerEnemy';
   const selfMobileTeam = mobileTeamOf(self.entity);
   let highestPriorityTarget = null;
+  let secondHighestPriorityTarget = null;
   let highestPriority = -1;
   let secondHighestPriority = -1;
   let sawSelectedTarget = false;
@@ -298,7 +300,7 @@ export function getTargets(self, candidates, playerFeet, {
     const sOff = ai.centreOffset ?? (ai.height ?? CAPSULE_HEIGHT) / 2;
     const dx = tFeet[0] - ai.feet[0], dy = (tFeet[1] + tOff) - (ai.feet[1] + sOff), dz = tFeet[2] - ai.feet[2];
     const distance = Math.hypot(dx, dy, dz);
-    const see = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, tFeet, tHeight, null, distance, ai.sightRadius);   // CAMP-SIGHT
+    const see = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, tFeet, tHeight, null, distance, ai.sightRadius, ai.fieldOfView);   // CAMP-SIGHT; the enhanced AI's 190 (EnemySenses.Start)
     // Neither visible nor in the area around the player (:824-825) -
     // foe candidates only; the player has no senses.
     if (targetAi && !targetAi.wouldBeSpawned && !see) continue;
@@ -313,10 +315,12 @@ export function getTargets(self, candidates, playerFeet, {
       sawSecondaryTarget = sawSelectedTarget;   // :848
       sawSelectedTarget = see;
       selectedDistance = distance;
+      secondHighestPriorityTarget = highestPriorityTarget;
       highestPriorityTarget = c;
     } else if (priority > secondHighestPriority) {
       sawSecondaryTarget = see;                 // :855
       secondHighestPriority = priority;
+      secondHighestPriorityTarget = c;
     }
   }
   // THE HOLDER (:758-759, :862-863) is deliberately not carried: C#
@@ -329,6 +333,7 @@ export function getTargets(self, candidates, playerFeet, {
   return {
     target: highestPriorityTarget, targetInSight: sawSelectedTarget,
     distanceToTarget: selectedDistance, sawSecondaryTarget,
+    secondaryTarget: enhancedRunnerUp(ai, secondHighestPriorityTarget),
   };
 }
 
@@ -478,6 +483,24 @@ export function arrowAimDirection(casterTransform, aimPoint, { targetIsPlayer = 
 const targetHealth = (c, playerEntity) =>
   (isPlayerTarget(c) ? (c.health ?? playerEntity?.health ?? 1) : (c.entity?.health ?? 0));   // WORLD3: a peer's is its own
 
+/** GetTargets :868-872: only DFU's Enhanced Combat AI keeps the runner-up as the secondary target. */
+const enhancedRunnerUp = (ai, runnerUp) => (ai.enhancedCombatAI === true ? runnerUp : null);
+
+/** GetTargets :868-872, the write: the runner-up becomes the secondary target, and its position is kept when it was
+ *  seen (secondaryTarget.transform.position; feet here, as lastKnownTargetPos is). */
+function keepRunnerUp(ai, got, playerFeet) {
+  const t = got.secondaryTarget;
+  if (!t) return;
+  ai.secondaryTarget = t;
+  if (!got.sawSecondaryTarget) return;
+  const at = isPlayerTarget(t) ? (t.feet ?? playerFeet) : t.ai?.feet;
+  if (at) ai.secondaryTargetPos = [at[0], at[1], at[2]];
+}
+
+/** The position the secondary switch (:347-349) starts the pursuit from: the one GetTargets kept with DFU's Enhanced
+ *  Combat AI, else DFU's never-written Vector3.zero (the classic quirk recorded at the switch). */
+const secondaryTargetPosOf = (ai) => (ai.secondaryTargetPos ? [...ai.secondaryTargetPos] : [0, 0, 0]);
+
 /**
  * The classic target machine - EnemySenses.Update:312-414's
  * ClassicUpdate block, run once per classic tick by EnemyAI._step
@@ -536,20 +559,22 @@ export function runTargetMachine(self, candidates, playerFeet, classicDt, {
       // because the alternative is inventing a position DFU does not
       // have; the port's origin travels with the streamer, exactly as
       // DFU's does under StreamingWorld.
-      if (ai.sawSecondaryTarget) ai.lastKnownTargetPos = [0, 0, 0];
+      if (ai.sawSecondaryTarget) ai.lastKnownTargetPos = secondaryTargetPosOf(ai);
       ai.awareOfTargetForLastPrediction = false;
     }
   }
+  // :353-370: the rate of approach, after the null-target block and before GetTargets
+  trackRateOfApproach(ai, ai.target, ai._dist);
   // :377-383 - out of the classic area, still check direct LOS to the
   // player so enemies who see the player will try to attack.
   let playerInSight = false;
   if (!ai.wouldBeSpawned && playerFeet) {
-    playerInSight = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, playerFeet, playerHeight, null, null, ai.sightRadius);   // CAMP-SIGHT
+    playerInSight = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, playerFeet, playerHeight, null, null, ai.sightRadius, ai.fieldOfView);   // CAMP-SIGHT
     // WORLD3: a PEER in sight is a player in sight - the area DFU draws around the one player is drawn around
     // every player in the room, so a foe far from the host and beside a joiner still takes its targets
     if (!playerInSight) for (const c of candidates ?? []) {
       if (!isPeerTarget(c) || !c.feet) continue;
-      if (canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, c.feet, c.height ?? playerHeight, null, null, ai.sightRadius)) { playerInSight = true; break; }
+      if (canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, c.feet, c.height ?? playerHeight, null, null, ai.sightRadius, ai.fieldOfView)) { playerInSight = true; break; }
     }
   }
   if (ai.classicTargetUpdateTimer > SENSES_INTERVAL_UNITS) {
@@ -559,6 +584,7 @@ export function runTargetMachine(self, candidates, playerFeet, classicDt, {
       const got = getTargets(self, candidates, playerFeet, { noTargetMode, dropLocal, infighting, playerHeight, playerBout });
       ai.target = got.target;
       ai.sawSecondaryTarget = got.sawSecondaryTarget;
+      keepRunnerUp(ai, got, playerFeet);
       // `targetSenses = target.GetComponent<EnemySenses>()` (:397-400)
       // - the port's equivalent is the target CANDIDATE itself, since
       // its `ai` IS the senses. Null for the player, as C# nulls it.

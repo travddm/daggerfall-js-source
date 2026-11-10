@@ -9,6 +9,8 @@
 // ui/enhanced/enhancedInventory.js), the save, the wire and a realm trade's record, and the real arrest flow and court
 // (scenes/arrestFlow.js over systems/court.js) from the surrender to the release. The host's two sale arms and two theft
 // targets (scenes/worldModes.js, which no test can stand up whole) are read by source.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -354,7 +356,8 @@ test('STOLEN-GOODS the court: every guilty exit takes them - a fine paid with no
   assert.deepEqual(r.said, []);
 });
 
-test('STOLEN-GOODS wired (worldModes.js, by source): both sale arms land a piece through landSold - the counter\'s commitTrade and the keyed doSell - and neither pushes onto the shelf; the shut shop\'s shelf and a stranger\'s cupboard are loot targets marked stolen, a cupboard of one\'s own is not; the enhanced card says what the mark means (mutants: either arm shelving, either target unmarked)', () => {
+test('STOLEN-GOODS wired (worldModes.js, by source): both sale arms land a piece through landSold - the counter\'s commitTrade and the keyed doSell - and neither pushes onto the shelf; the shut shop\'s shelf and a stranger\'s cupboard are loot targets marked stolen, a cupboard of one\'s own is not; the enhanced card says what the mark means (mutants: either arm shelving, either target unmarked)', (tc) => {
+  setPref('soldGoodsOnShelf', true); tc.after(() => setPref('soldGoodsOnShelf', false));   // sold goods stay on the shelf: the Features row, off by default
   const wm = src('src/scenes/worldModes.js');
   const sellArm = wm.slice(wm.indexOf("} else if (mode === 'Sell' || mode === 'SellMagic') {"), wm.indexOf("} else if (mode === 'Repair') {"));
   assert.match(sellArm, /for \(const it of staged\) \{\n\s+const i = playerEntity\.items\.indexOf\(it\);\n\s+if \(i >= 0\) playerEntity\.items\.splice\(i, 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the counter');
@@ -362,7 +365,7 @@ test('STOLEN-GOODS wired (worldModes.js, by source): both sale arms land a piece
   assert.match(doSell, /playerEntity\.items\.splice\(playerEntity\.items\.indexOf\(it\), 1\);\n\s+landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/, 'the keyed list');
   for (const [name, body] of [['the counter', sellArm], ['the keyed list', doSell]]) assert.doesNotMatch(body, /shelf\.items\.push\(/, `${name} pushes nothing onto the shelf`);
   assert.match(wm, /landSoldAt \} from '\.\.\/systems\/shopStock\.js';/);
-  assert.match(readFileSync(new URL('../../src/systems/shopStock.js', import.meta.url), 'utf8'), /import \{ landSold \} from '\.\/stolenGoods\.js';[^\n]*\n[\s\S]*export function landSoldAt\(shelfItems, item, buildingType = null\) \{\n  if \(endlessArrowsAt\(buildingType\) && isShelfArrow\(item\)\) return false;\n  return landSold\(shelfItems, item\);\n\}/);
+  assert.match(readFileSync(new URL('../../src/systems/shopStock.js', import.meta.url), 'utf8'), /import \{ landSold \} from '\.\/stolenGoods\.js';[^\n]*\n[\s\S]*export function landSoldAt\(shelfItems, item, buildingType = null\) \{\n  if \(!soldGoodsStayOnShelf\(\) \|\| \(endlessArrowsAt\(buildingType\) && isShelfArrow\(item\)\)\) return false;\n  return landSold\(shelfItems, item\);\n\}/);
   const shelfArm = wm.slice(wm.indexOf('function openShelf'), wm.indexOf('function openMerchantSell'));
   // the theft's own law (the shelf's tally, the cupboard's basket) read
   assert.match(shelfArm, /if \(b\.insideOpenShop === false\) \{[\s\S]*const shelfBefore = new Set\(shelf\.items\);[^\n]*\n\s*const win = interiorInventory\(\{\n\s*loot: \{ items: \(\) => shelf\.items, stolenFrom: shelfBefore \},[\s\S]{0,300}if \(shopShelfTheft\(shelfBefore, shelf\.items\)\)/, 'a shut shop\'s shelf');
@@ -509,7 +512,9 @@ test('STOLEN-GOODS AUDIT S2: a stolen Materials Bag taken at a verdict leaves it
   } finally { globalThis.location = where; }
 });
 
-test('STOLEN-GOODS AUDIT S3: no shelf piece is stolen - the room\'s word for a shelf or a cupboard lands clean (an older build\'s sale, a hostile client) and this build says none, and a piece bought at the counter is the buyer\'s, honestly, on either lane (mutants: the word kept, the word said, the Buy kept)', () => {
+test('STOLEN-GOODS AUDIT S3: no shelf piece is stolen - the room\'s word for a shelf or a cupboard lands clean (an older build\'s sale, a hostile client) and this build says none, and a piece bought at the counter is the buyer\'s, honestly, on either lane (mutants: the word kept, the word said, the Buy kept)', (tc) => {
+  setPref('soldGoodsOnShelf', true); tc.after(() => setPref('soldGoodsOnShelf', false));   // sold goods stay on the shelf: the Features row, off by default
+  playByRules(tc, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const word = { ...createWeapon(DAGGER, 0, () => 0.5), stolen: true };
   const theirs = { ...createWeapon(ARROW_TEMPLATE, 0, () => 0.5), stolen: true };
   const shelf = { items: [], stockedDate: 5 };
