@@ -8,7 +8,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { questBoxHoldsFoes } from '../../src/scenes/quest/questFoeHost.js';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
+import { setValue } from '../../src/systems/settings/settings.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
+
+// The executed pin is the classic motor's hunt: DFU's Enhanced Combat AI, on by default, lets the rat roll to back off, so it may not close 1 m in the test's three seconds.
+setValue('Enhancements', 'EnhancedCombatAI', false);
 
 const rd = (p) => hostText(p);
 
