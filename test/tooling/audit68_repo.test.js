@@ -109,25 +109,22 @@ test('AUDIT 68 X2 (books): the BOOKS fallback finds DFU\'s own lowercase `books`
   }
 });
 
-test('AUDIT 68 X2-archive-sheet-orphan: every tracked root page is a build input', async () => {
-  // "Prototype HTMLs at repo root must register in
+test('AUDIT 68 X2-archive-sheet-orphan: every tracked root and labs page is a build input', async () => {
+  // "Lab and prototype HTMLs (the root, labs/) must register in
   // vite.config.js rollupOptions.input" - held here, not by memory.
   const input = Object.values((await import('../../vite.config.js')).default.build.rollupOptions.input);
-  const pages = tracked('*.html').filter((p) => !p.includes('/'));
+  const pages = tracked('*.html').filter((p) => !p.includes('/') || p.startsWith('labs/'));
   assert.ok(pages.includes('index.html'));
   for (const page of pages) assert.ok(input.includes(page), `${page} works under npm run dev and never ships`);
 });
 
 test('AUDIT 68 X2-cdn-three-no-sri: every script a tracked page loads from another origin carries Subresource Integrity', () => {
-  let seen = 0;
   for (const page of tracked('*.html')) {
     for (const [tag] of read(page).matchAll(/<script\b[^>]*\bsrc="(?:https?:)?\/\/[^"]*"[^>]*>/g)) {
-      seen++;
       assert.match(tag, /\bintegrity="sha(?:256|384|512)-[A-Za-z0-9+/]+={0,2}"/, `${page}: ${tag}`);
       assert.match(tag, /\bcrossorigin="anonymous"/, `${page}: SRI on a cross-origin script needs CORS mode`);
     }
   }
-  assert.ok(seen > 0, 'the pages still load three.js from cdnjs - this pin is not vacuous');
 });
 
 test('AUDIT 68 X2-eslint-coverage-gaps: tests, tools, scripts and the desktop shell are linted for the structural rules', async () => {

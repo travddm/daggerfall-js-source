@@ -79,8 +79,27 @@ world frame, so a change applies on the next frame.
 - **Retro mode** (`src/systems/retroMode.js`, Daggerfall Unity's settings `Video.RetroRenderingMode`,
   `PostProcessingInRetroMode`, `UseMipMapsInRetroMode`, `RetroModeAspectCorrection`, `PalettizationLUTShift`). The
   world draws into 320x200 or 640x400 (320x154 or 640x308 with the docked large HUD) and is point-sampled up, with
-  optional posterize or palettize post-processing. Retro mode wins over render scale.
-- Leaving both returns to drawing straight to the canvas, and the renderer frees the image and depth it used.
+  optional posterize or palettize post-processing. Retro mode wins over render scale. The settings screen shows the
+  first three keys as the Classic picture, Classic aspect and Classic colours rows (`src/systems/features.js`); the rows
+  write the keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)",
+  not classic: no source shows the original game drew at that size. The Classic rendering preset in the Quality
+  section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
+  Off and land view distance 3 in one press. It keeps the values it replaced in the `classicRenderingSaved` preference,
+  and Off puts back each one that still holds the preset's value.
+- **Classic distance shading** (`src/render/classic-distance-shading.ts`, source
+  `src/systems/distance-shading-setting.ts`). Before the present, a full-screen pass reads the image's depth and
+  draws up to two fades over it:
+  - the row's To fog colour (preference `classicDistanceShading`, `off` by default, or `fog`): each pixel moves in 64
+    steps toward the frame's fog colour over the fog's own distance, or over 30 m under a black fog;
+  - Daggerfall Unity's Color Boost dungeon falloff (`Effects/ColorBoostDungeonFalloff`, 0 to 8, read while
+    `Effects/ColorBoostEnable` is on, as in DFU): in dungeons only, each pixel moves toward black by
+    min(eye depth / 90 m, 1) x falloff. A dungeon is an indoor frame (opaque black clear) without DFU's interior fog
+    (exponential 0.001, black).
+
+  It needs the world in an image, so with retro mode and render scale off it opens a full-size one (the cost of the
+  option, on top of the pass). With both off, nothing of it is built; the renderer asks its source once per world
+  frame.
+- Leaving all three returns to drawing straight to the canvas, and the renderer frees the image and depth it used.
 
 ## GPU memory and context loss
 

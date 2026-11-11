@@ -53,7 +53,7 @@ function withRows(fn) {
   try { return fn(); } finally { delete globalThis.document; delete globalThis.window; }
 }
 
-const SPECIAL = ['preset:graphics', 'link:overhauls', 'bindings', 'mods-index'];
+const SPECIAL = ['preset:graphics', 'preset:classic', 'link:overhauls', 'bindings', 'mods-index'];
 const CARDS = ['card:morrowind', 'card:packs', 'card:peerSprites', 'card:nightSounds'];
 
 test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s keys, each Features row and each of the port\'s own rows stands in exactly one section of one tab (mutant: a row dropped, or placed twice)', () => {
@@ -90,7 +90,7 @@ test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s key
 test('ORG2: Graphics leads, with the preset at its head, and the tabs a player looks for in the order they look (mutant: the preset or a tab moved)', () => {
   assert.deepEqual(CATEGORY_IDS, ['graphics', 'gameplay', 'combat', 'world', 'interface', 'audio', 'controls', 'accessibility', 'mods']);
   const g = CATEGORIES[0];
-  assert.deepEqual(g.sections[0].items, ['preset:graphics'], 'Quality first, the preset alone in it');
+  assert.deepEqual(g.sections[0].items, ['preset:graphics', 'preset:classic'], 'Quality first, the two presets alone in it');
   for (const id of PRESET_ROWS) assert.equal(whereIs(`feat:${id}`)?.tab.id, 'graphics', `${id}, a row the preset sets, is on the same tab`);
   assert.equal(whereIs('feat:render-scale')?.section.id, 'display', 'the picture\'s resolution is a choice of its own, under Display');
   for (const k of ['Video/FieldOfView', 'Video/TargetFrameRate', 'Video/VSync']) assert.equal(whereIs(k)?.section.id, 'display', k);

@@ -18,7 +18,7 @@
 //   "feat:<id>"     a row of the Features registry (systems/features.js)
 //   "port:<id>"     one of the port's own rows (ui/enhanced/enhancedMenu.js: the HUD's, the touch knobs, the quest repair...)
 //   "card:<id>"     a card (the Morrowind files, the packs, other players, the night's sounds)
-//   "preset:graphics", "bindings", "link:overhauls", "mods-index" - the screen's own pieces
+//   "preset:graphics", "preset:classic", "bindings", "link:overhauls", "mods-index" - the screen's own pieces
 //
 // THE MAP IS TOTAL AND DISJOINT: every one of DFU's keys, every Features row and every port row stands in exactly one
 // section, and test/systems/org2_options.test.js pins all three both ways. A DFU re-bake that adds a key, a registry row added
@@ -31,7 +31,7 @@
 export const CATEGORIES = Object.freeze([
   tab("graphics", "Graphics", [
     sec("quality", "Quality", [
-      "preset:graphics"]),
+      "preset:graphics", "preset:classic"]),
     sec("display", "Display", [
       "Video/FieldOfView", "feat:render-scale", "Video/TargetFrameRate", "Video/VSync", "port:showFps", "Video/Fullscreen",
       "Video/ExclusiveFullscreen", "Video/ResolutionWidth", "Video/ResolutionHeight", "Video/QualityLevel", "Video/RunInBackground"]),
@@ -50,6 +50,7 @@ export const CATEGORIES = Object.freeze([
       "link:overhauls", "feat:dungeon-wall-style", "Video/RandomDungeonTextures", "Video/MainFilterMode", "GUI/GUIFilterMode", "GUI/VideoFilterMode",
       "Video/EnableTextureArrays", "GUI/AccelerateUICopyTexture"]),
     sec("retro", "Retro look", [
+      "feat:classic-picture", "feat:classic-aspect", "feat:classic-colours", "feat:classic-distance-shading",
       "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "Video/RetroModeAspectCorrection",
       "Video/PalettizationLUTShift"]),
     sec("shadows", "Daggerfall Unity's shadows", [

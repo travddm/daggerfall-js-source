@@ -477,7 +477,6 @@
  "test/ui/bankpreview.test.js": 943,
  "test/systems/bankwindow.test.js": 848,
  "test/server/basehide.test.js": 1540,
- "test/characters/beastattack.test.js": 219,
  "test/systems/beastform.test.js": 964,
  "test/net/beastpeer.test.js": 968,
  "test/characters/pieces/beasts.test.js": 289,
@@ -577,7 +576,6 @@
  "test/world/clock.test.js": 248,
  "test/render/clockArc.test.js": 934,
  "test/systems/clockrefusal.test.js": 1119,
- "test/characters/clothSim.test.js": 11083,
  "test/render/cloudNoise.test.js": 337,
  "test/server/cloudsaves.test.js": 6628,
  "test/ui/native/cm5_ctrlsplit.test.js": 820,
@@ -1370,7 +1368,6 @@
  "test/formats/morrowind/mwesm.test.js": 253,
  "test/combat/mwhand.test.js": 834,
  "test/world/mwhead1_window.test.js": 359,
- "test/formats/morrowind/mwinspect.test.js": 396,
  "test/formats/morrowind/mwload_fparm.test.js": 1017,
  "test/formats/morrowind/mwload_records.test.js": 966,
  "test/ui/town/mwmap1.test.js": 1101,
@@ -2212,5 +2209,6 @@
  "test/combat/weapon/ww3_widgettexture.test.js": 998,
  "test/scenes/x11.test.js": 1048,
  "test/systems/x11b.test.js": 1116,
- "test/characters/enemy/x3casting.test.js": 638
+ "test/characters/enemy/x3casting.test.js": 638,
+ "test/formats/morrowind/mwfirstperson_readers.test.js": 396
 }

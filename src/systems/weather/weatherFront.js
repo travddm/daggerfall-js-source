@@ -12,7 +12,7 @@
 // holds the particles off "until the front is mostly in - the rain
 // starts when the sky already looks like rain, not with it", scaling the
 // DRAWN COUNT by the front (`Math.round(wx.n * wsky.fall)`,
-// grass-proto.html's frame()). This module is that law on the game's own
+// the original grass lab page's frame()). This module is that law on the game's own
 // front rather than the lab's slider:
 //
 //   THE ARRIVAL is WIND1's front (systems/wind/wind.js `arrival()`): 0 at the

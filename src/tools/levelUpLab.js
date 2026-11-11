@@ -4,7 +4,7 @@
 // WHY A LAB AND NOT A PROBE OF THE GAME: /play/ cannot boot without a
 // player's own ARENA2, and a level-up is four hundred in-game hours
 // behind the title screen. A look has to be judged on a real screen at
-// real sizes (the argument grass-proto.html and enhanced.html are both
+// real sizes (the argument the old grass and UI prototype pages were
 // deployed for), and a window has to be DRIVEN to be believed - so
 // this page hands the real module a real rollout screen over a fake
 // entity, and tools/levelUpProbe.mjs drives exactly this.
@@ -34,7 +34,7 @@ import { createCharSheetWindow } from '../ui/charSheetDoor.js';
 //
 // A NAMED STATIC IMPORT TAKES NO NAMESPACE - it binds the one export
 // and reads it when it is used. This file is only ever loaded by
-// `levelup.html`, so nothing is added to the player's bundle by moving
+// `labs/levelup.html`, so nothing is added to the player's bundle by moving
 // it up here. The cycle underneath is older than this arc and is not
 // what changed; what changed is that something asked for a namespace
 // over one end of it.

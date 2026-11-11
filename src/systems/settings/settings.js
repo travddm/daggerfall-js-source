@@ -78,6 +78,9 @@ export const LIVE = Object.freeze({
   'Controls/JoystickMovementThreshold': 'src/systems/gamepad.js',
   'Controls/JoystickDeadzone': 'src/systems/gamepad.js',
   'Enhancements/CombatVoices': 'src/combat/combatVoices.js',
+  // Color Boost's dungeon falloff, gated by Color Boost as DFU's is (the rest of Color Boost is not built yet)
+  'Effects/ColorBoostEnable': 'src/systems/distance-shading-setting.ts',
+  'Effects/ColorBoostDungeonFalloff': 'src/systems/distance-shading-setting.ts',
   // MT-i: EnemyInfighting. OFF sends GetTargets down its else-arm
   // (:801-803), where a non-PlayerAlly foe skips every enemy
   // candidate and the whole scene is player-only again - which is

@@ -10,7 +10,7 @@
 //     npx vite --port 5199 &
 //     node tools/levelUpProbe.mjs
 //
-// It drives levelup.html (src/tools/levelUpLab.js), which mounts the
+// It drives labs/levelup.html (src/tools/levelUpLab.js), which mounts the
 // SHIPPING window over a made-up character. The window and both
 // rollout laws under it are the game's own modules; only the entity is
 // the lab's.
@@ -40,7 +40,7 @@ async function open(lane, viewport) {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(`${BASE}/levelup.html?lane=${lane}`, { waitUntil: 'load' });
+  await page.goto(`${BASE}/labs/levelup.html?lane=${lane}`, { waitUntil: 'load' });
   await page.waitForSelector('.lv-star', { timeout: 20000 });
   await page.waitForTimeout(250);
   return { ctx, page, errors };
@@ -280,7 +280,7 @@ for (const [label, viewport] of [
     await new Promise((r) => setTimeout(r, 900));
     await route.continue();
   });
-  await page.goto(`${BASE}/levelup.html?lane=door`, { waitUntil: 'commit' });
+  await page.goto(`${BASE}/labs/levelup.html?lane=door`, { waitUntil: 'commit' });
   const waited = await page.waitForSelector('#levelup-wait', { timeout: 5000 }).then(() => true, () => false);
   check('door: a paused game is never blank - the wait is drawn while the chunk is in flight', waited);
   if (waited) {
@@ -346,7 +346,7 @@ for (const [label, viewport, hudScale] of [
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(`${BASE}/levelup.html?lane=notice`, { waitUntil: 'load' });
+  await page.goto(`${BASE}/labs/levelup.html?lane=notice`, { waitUntil: 'load' });
   await page.waitForSelector('#enhanced-levelnotice .lv-note', { timeout: 20000 });
   // A LIVE BOTTOM BLOCK: the breath bar up - the row a player levelling
   // in a dungeon has over the vitals (UI3: the effects and the needs are

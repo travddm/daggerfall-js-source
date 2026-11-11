@@ -41,7 +41,7 @@ import { getPref } from '../uiPrefs.js';
 import { TALL_FLAT_HEIGHT } from '../../world/flatDistance.js';
 import { pageParam } from '../pageQuery.js';   // AUDIT PERF-URL A4: the ?sway=off door reads the page's one parse
 
-/** The lab's metres a second per slider unit (grass-proto.html frame()). */
+/** The lab's metres a second per slider unit (the original grass lab page frame()). */
 export const LAB_WIND_RATE = 0.16;
 /** The lab's slider top - labWindSlider clamps here. */
 export const WIND_SLIDER_MAX = 200;
