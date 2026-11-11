@@ -186,14 +186,15 @@ for (const startHidden of [false, true]) test(`HIDDEN-UNCOUNTED (AUDIT L3): a ha
     const pose = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0 };
     const staff = new Session({ url: 'wss://relay.test', name: 'Mob', id: 'stf-0003', secret: 'secret-of-stf-0003', presence: true, wire2: true, WebSocketImpl: BridgeWS, mintToken: async () => signer.token('stf-0003', claims()) });
     const peer = new Session({ url: 'wss://relay.test', name: 'Beta', id: 'plb-0002', secret: 'secret-of-plb-0002', presence: true, wire2: true, WebSocketImpl: BridgeWS, mintToken: async () => signer.token('plb-0002', { s: 'acct-b-0002', n: 'Beta', k: 'linked' }) });
+    // k is a ceiling, not a count: the loop ends when ok() holds. The mint signs with real async crypto, so under load it needs more turns than a fixed 40 gave it.
     const run = async (k, ok = () => false) => { for (let i = 0; i < k && !ok(); i++) { await settle(); tick(100); staff.tick(); peer.tick(); } };
     staff.join('world:3,12', pose); peer.join('world:2,12', pose);
-    await run(40, () => staff.welcomed && peer.welcomed);
+    await run(400, () => staff.welcomed && peer.welcomed);
     assert.equal(staff.hidden, startHidden, 'the primary\'s hello');
     hideOn = !startHidden;   // the switch flips; the halo's mint reads it, and no relink follows (a game the panel cannot reach)
     const halo = () => staff._halo.get('world:2,12');
     staff.setHalo(['world:2,12']);
-    await run(40, () => { staff.setHalo(['world:2,12']); return halo()?.status === 'open' && staff._welcomed.has(halo()?.ws); });
+    await run(400, () => { staff.setHalo(['world:2,12']); return halo()?.status === 'open' && staff._welcomed.has(halo()?.ws); });
     staff.join('world:2,12', pose);   // the crossing: the halo promoted
     await run(6);
     const att = [...W.made.get('world:2,12').sockets].map((ws) => ws.deserializeAttachment?.() ?? {}).find((x) => x.id === 'stf-0003');
