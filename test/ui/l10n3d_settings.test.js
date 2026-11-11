@@ -62,12 +62,16 @@ const WORDED = [
 /** A pack's word for value `i` of a worded row. */
 const frWord = (keys, i) => (Array.isArray(keys) ? `fr:${keys[i]}` : `fr:${keys}:${i}`);
 const shown = (key) => ENUM_LAW[key].values.map((_, i) => formatValue(key, String(i)));
+/** The words a worded row shows for DFU's words: DFU's own, except the 640x400 retro choice, which is marked as the
+ *  sharper one in the player's language (settingsLaw.js retroSharperWord). */
+const SHARPER_INDEX = { 'Video/RetroRenderingMode': 2 };
+const asShown = (key, words) => words.map((w, i) => (SHARPER_INDEX[key] === i ? tm.t('settings.retroMode640x400Sharper', '{size} (sharper)', { size: w }) : w));
 
 test('L10N3d settings: an enum row DFU words through its tables shows a translation\'s word, read by DFU\'s key when it is drawn - and English is its law\'s words, byte for byte, before and after', () => {
   const english = Object.fromEntries(WORDED.map(([key]) => [key, shown(key)]));
   for (const [key] of WORDED) {
-    assert.deepEqual(english[key], [...ENUM_LAW[key].values], `${key}: English shows the law's words`);
-    assert.deepEqual([...enumWords(key)], [...ENUM_LAW[key].values], `${key}: its words' English is its law's`);
+    assert.deepEqual(english[key], asShown(key, [...ENUM_LAW[key].values]), `${key}: English shows the law's words`);
+    assert.deepEqual([...enumWords(key)], asShown(key, [...ENUM_LAW[key].values]), `${key}: its words' English is its law's`);
   }
   for (const [key, table, keys] of WORDED) {
     tm.patchLocaleTable('fr', table, Array.isArray(keys) ? keys.map((k, i) => [k, frWord(keys, i)])
@@ -76,7 +80,7 @@ test('L10N3d settings: an enum row DFU words through its tables shows a translat
   for (const [key] of WORDED) assert.deepEqual(shown(key), english[key], `${key}: English stands until French is chosen`);
   tm.setLocale('fr');
   for (const [key, , keys] of WORDED) {
-    assert.deepEqual(shown(key), ENUM_LAW[key].values.map((_, i) => frWord(keys, i)), `${key} reads the pack's words`);
+    assert.deepEqual(shown(key), asShown(key, ENUM_LAW[key].values.map((_, i) => frWord(keys, i))), `${key} reads the pack's words`);
     assert.equal(stepValue(key, '0', 1), '1', `${key}: the store still holds an index`);
   }
   assert.deepEqual(ENUM_LAW['Video/QualityLevel'].values, ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], 'the law is not the words');

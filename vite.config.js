@@ -176,11 +176,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 2_750,
     // The bundled npm packages' licences, beside the LICENSE.txt that buildLicense() writes (scripts/buildLicense.mjs).
     license: { fileName: THIRD_PARTY_FILE },
-    // EVERY ROOT PAGE: the game, the voxel editor (viewer.html), the labs
-    // and the prototypes. None carries game data - a page that draws the
-    // game's art asks for the user's own ARENA2. AUDIT 68: a root page
+    // EVERY HTML PAGE: the site, the game, the legal pages and the labs in labs/. A page
     // missing here works under `npm run dev` and silently never ships;
-    // test/tooling/audit68_repo.test.js holds every tracked root *.html to a key.
+    // test/tooling/audit68_repo.test.js holds every tracked *.html at the root and in labs/ to a key.
     rollupOptions: {
       // BUILD-LEFTOVERS: one warning is the design, not a fault. hudLayout.js
       // loads revenantCard.js dynamically (the HUD preview's ghost) because
@@ -215,63 +213,29 @@ export default defineConfig({
         // links to (src/net/legalLaw.js TERMS_URL and PRIVACY_URL).
         terms: 'terms/index.html',
         privacy: 'privacy/index.html',
-        viewer: 'viewer.html',
-        sky: 'sky.html',   // ES1: the enhanced sky lab
-        water: 'water.html', // WATER1: the enhanced water lab (src/tools/waterLab.js)
-        abyss: 'abyss.html', // SD-LAB: the Shattered Hour and the Rift, made in code, drawn by the game's renderer (src/tools/abyssLab.js)
-        // MW-D: the Morrowind data inspector. Reads a player's own
-        // archives and reports what is IN them; it draws nothing, stores
-        // nothing and is wired to nothing the game runs. It exists
-        // because the reverted first-person arc asked for a skeleton
-        // file that is not in Morrowind.bsa and never said so.
-        mwInspect: 'mw-inspect.html',
-        // MW-IMPORT SLICE 2: the Morrowind mesh viewer - user-supplied
-        // Morrowind.bsa / loose NIFs through a picker, nothing baked in.
-        // Doubles as the record-coverage scout for the strict NIF reader,
-        // and as the visual proving ground the first-person rig has to
-        // pass before it goes anywhere near the game.
-        mwViewer: 'mw-viewer.html',
-        // A PROTOTYPE, and deployed on purpose: a design that claims to
-        // adapt to a phone has to be opened on one.
-        enhanced: 'enhanced.html',
-        // The same, for the FRONT DOOR - the four boot screens
-        // (title, launcher, splash, PICK03I0) as one menu.
-        menu: 'menu.html',
-        // And for the wizard behind it, one stage at a time.
-        chargen: 'chargen.html',
-        // THE MODERN DIRECTION (Mac, 2026-08-27): the Skyrim-esque
-        // main-menu redesign, self-contained, deployed for phone eyes.
-        menuRedesign: 'menu-redesign.html',
-        // The same direction cut in Daggerfall's own pixel idiom.
-        menuPixel: 'menu-pixel.html',
-        // THE GROUND PROTOTYPE (Mac, 2026-08-31: prototype the new
-        // ground textures and the 3D grass before any code change).
-        // Deployed on purpose - a look has to be judged on a real
-        // screen, and this one runs on the phone too. It touches
-        // nothing the game runs: its own page, its own shaders, and
-        // the tileset tools/groundProto.mjs writes into
-        // public/prototype/ground/.
-        grassProto: 'grass-proto.html',
+        // The lab pages live in labs/. They carry no game data: a page that draws the game's art asks for the user's own
+        // ARENA2, or runs on made-up data. They ship so a phone can open them.
+        sky: 'labs/sky.html',   // ES1: the enhanced sky lab
+        water: 'labs/water.html', // WATER1: the enhanced water lab (src/tools/waterLab.js)
+        abyss: 'labs/abyss.html', // SD-LAB: the Shattered Hour and the Rift, made in code, drawn by the game's renderer (src/tools/abyssLab.js)
+        // The front door - the four boot screens (title, launcher, splash, PICK03I0) as one menu.
+        menu: 'labs/menu.html',
+        // And the wizard behind it, one stage at a time.
+        chargen: 'labs/chargen.html',
         // LV1: THE ASCENSION LAB - the enhanced level-up window over a
         // made-up character, so the screen a player sees once a level
         // can be opened on demand, at any size, with no ARENA2 on disk.
         // tools/levelUpProbe.mjs drives this page.
-        levelUp: 'levelup.html',
+        levelUp: 'labs/levelup.html',
         // FIRM1: THE FIRMAMENT LAB - the passive tree's window over made-up purses, no service and no ARENA2, in either
         // dress (`?dress=grimoire`), so the sky can be judged and driven by hand
-        firmament: 'firmament.html',
+        firmament: 'labs/firmament.html',
         // GROWTH: THE GROWTH TAB'S LAB - the pause window on its Growth tab over a made-up character, Firmament book and
-        // captain, no ARENA2 and no service, so the guide and the skies drawn in the pane can be driven by hand;
-        // tools/growthProbe.mjs drives this page.
-        growth: 'growth.html',
-        // The texture-archive contact sheet: every record of one
-        // TEXTURE.nnn laid out and numbered, to read off which record
-        // an item template points at. The player's own ARENA2 through
-        // a picker, like mw-inspect - nothing baked in.
-        archiveSheet: 'archive-sheet.html',
+        // captain, no ARENA2 and no service, so the guide and the skies drawn in the pane can be driven by hand.
+        growth: 'labs/growth.html',
         // STUDIO1: THE STUDIO - every picture the port paints itself, as worn, each with its template to download, and the
         // artists' own pictures beside them (src/tools/studioLab.js; public/art/studio/README.md). No game data.
-        studio: 'studio.html',
+        studio: 'labs/studio.html',
       },
     },
   },

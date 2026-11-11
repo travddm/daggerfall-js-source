@@ -29,19 +29,14 @@
 // when the sun sets - and had no moon at all. So at midnight the ground
 // went dark and the grass stayed lit by a sun that was not there.
 //
-// The grass shader is byte-identical to `grass-proto.html` by GR1's
-// law, so the lab carries the same change and hands the new uniforms
-// its own way (no night in the lab: scale one, moon off).
+// The grass shader text is held to a fingerprint (test/render/labGrass.test.js).
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { WISP_MAX, WISP_FLOOR, WISP_BOX, WISP_LOOK, SAND_LOOK, wispCount } from '../../src/render/windWisps.js';
 import { WORLD_PER_DRIFT, wrapField } from '../../src/render/volumetricClouds.js';
-import { LAB_GRASS_FS, LAB_GRASS_VS, GRASS2_VS_EDITS } from '../../src/render/labGrass.js';
-
-const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+import { LAB_GRASS_FS, LAB_GRASS_VS } from '../../src/render/labGrass.js';
 
 test('WIND4 (1) the wisps thinned, executed - and WIND5 thinned them again (240, Mac: "reduce the amount of wind streaks"), and DISC17-A again (120, "reduce the amount of wind wisps"): a gale in the 90 m box, a calm ten', () => {
   assert.equal(WISP_MAX, 120, 'WIND4 took 2400 to 650; WIND5 to 240, each wisp then a flourish; DISC17-A to 120, kept by WISPS-RETURN with the streak back');
@@ -87,20 +82,5 @@ test('WIND4 (3) the grass darkens: the sward takes the sun\'s SCALE and the moon
   assert.ok(!/uSunCol \* 1\.15 \* vLam/.test(LAB_GRASS_FS), 'the unscaled sun is gone');
   assert.match(LAB_GRASS_VS, /uniform vec3 uEye, uSunDir, uMoonDir;/);
   assert.match(LAB_GRASS_VS, /vMoonLam = max\(dot\(nrm, normalize\(uMoonDir\)\), 0\.0\);/);
-  // GR1's law: the lab is the same text, and sets the new uniforms itself
-  const lab = read('grass-proto.html');
-  // The port's comments are edited on their own and the lab's are not, so the code is compared with `//` comments dropped.
-  const glslCode = (t) => t.replace(/[ \t]*\/\/[^\n]*/g, '');
-  assert.ok(glslCode(lab).includes(glslCode(LAB_GRASS_FS)), 'the lab carries this fragment stage’s code verbatim - GRASS2 changed no fragment law');
-  // GRASS2: the VERTEX stage is the lab's text plus its declared edits (four since GRASS6)
-  // now, so it is no longer a substring of the lab. The whole-text law
-  // lives in labGrass.test.js, which applies the edits and compares; what
-  // is checked here is that the lab still carries the lines those edits
-  // replace - if the lab moved under them, that pin's `from` would stop
-  // matching and the departure would silently become a rewrite.
-  for (const e of GRASS2_VS_EDITS) assert.ok(lab.includes(e.from), `the lab still carries the line this edit replaces: ${e.why}`);
-  assert.ok(!lab.includes(LAB_GRASS_VS), 'and the port\'s vertex stage is NOT the lab\'s any more - the departure is real and says so here too');
-  assert.match(lab, /gl\.uniform1f\(gl\.getUniformLocation\(grassProg, 'uSunScale'\), 1\);/, 'the lab has no night: scale one');
-  assert.match(lab, /gl\.uniform1f\(gl\.getUniformLocation\(grassProg, 'uMoonScale'\), 0\);/);
 });
 

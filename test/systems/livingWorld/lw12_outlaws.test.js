@@ -289,6 +289,7 @@ function hostOver({ band = null, here = null, t = 12 * 60, owner = true, looted 
     sceneOf: (nx, nz) => [nx / NATIVE_PER_M, 0, nz / NATIVE_PER_M],
     spawn: (type, feet, o) => { const rec = { type, feet, o, dead: false, entity: {} }; log.spawned.push(rec); return Promise.resolve(rec); },
     remove: (rec) => log.removed.push(rec), inPool: (rec) => log.spawned.includes(rec) && !log.removed.includes(rec),
+    now: () => 0,   // the chest is worked in a 3 ms slice of the real clock; a stall in that slice left the pile unlaid
     relations: () => rel, say: (s) => log.said.push(s),
     chest: function* () { return { items: items(), robbed }; },
     dropPile: (items) => { const pile = { items: [...items] }; log.piles.push(pile); return pile; },

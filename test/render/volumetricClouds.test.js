@@ -217,7 +217,7 @@ test('VC3: the seam - the clouds ride the dome only, behind the one switch, on t
   assert.match(lab, /\$\('clouds'\)\.value = cloudsDoor === 'off' \|\| Object\.hasOwn\(CLOUD_QUALITY, cloudsDoor\) \? cloudsDoor : 'default';/);
   assert.match(lab, /\$\('shadowmap'\)\.checked = params\.has\('shadowmap'\);/);
   assert.match(lab, /if \(\$\('clouds'\)\.value === 'default'\) p\.delete\('clouds'\); else p\.set\('clouds', \$\('clouds'\)\.value\);/, 'default is no door');
-  const html = read('sky.html');
+  const html = read('labs/sky.html');
   assert.match(html, /<select id="clouds"><option>off<\/option><option>lo<\/option><option>default<\/option><option>hi<\/option><\/select>/, 'the four doors');
   assert.match(html, /<input id="shadowmap" type="checkbox" \/>/);
 });

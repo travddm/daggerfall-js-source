@@ -14,6 +14,7 @@
 import { crashText } from './ui/crashText.js';   // the crash line, pinned in its own module
 import { Renderer } from './render/renderer.js';
 import { retroFrameConfig } from './systems/retroMode.js';   // RETRO1: the renderer's retro source - the settings are read here, not in render/
+import { classicDistanceShading } from './systems/distance-shading-setting.ts';
 import { renderScaleSetting } from './systems/renderScale.js';   // PERF-SCALE: the renderer's render-scale source, read the same way
 import { windowEmissionRGB } from './render/windowEmission.js';
 // BOOT1: THE GAME
@@ -57,8 +58,7 @@ async function boot() {
   installFramePacer();   // FPS-VSYNC: first, before any loop asks for a frame - a no-op but in the app with the wait lifted
   installCursor();   // CLASSIC-CURSOR: DFU's own arrow on the classic skin, from the first frame - it needs no game data
   const canvas = document.getElementById('c');
-  // GPU-TRAIL (render/gpuTrail.js): the desktop shell keeps the GPU's last samples with a crash, so the canvas is counted
-  // before the renderer makes its first object. Behind a door, as the shell's update notice is: a tab has no shell.
+  // The desktop shell keeps the GPU's last samples with a crash (render/gpuTrail.js), so the canvas is counted first.
   const gpuTrail = typeof globalThis.daggerShell?.gpuTrail === 'function'
     ? await import('./render/gpuTrail.js').then((m) => m.gpuTrailOn(canvas, globalThis.daggerShell.gpuTrail)).catch(() => null) : null;
   const renderer = new Renderer(canvas);
@@ -66,6 +66,7 @@ async function boot() {
   import('./render/portraitRenderer.js').then(({ setPortraitRenderer }) => setPortraitRenderer(renderer)).catch(() => {});   // PORTRAIT3D: the faces' renderer, for the menu's wells that hold none (behind a door: BOOT2's ceiling)
   renderer.setRetroSource(retroFrameConfig);   // RETRO1: DFU's retro mode - asked once per world frame, so the settings screen's change lands on the next
   renderer.setRenderScaleSource(renderScaleSetting);   // PERF-SCALE: the world's share of the window's pixels - asked once per world frame, and retro wins
+  renderer.setDistanceShadeSource(classicDistanceShading);
   const params = new URLSearchParams(location.search);
   // L10N1b: THE LANGUAGE FIRST. Every door below - the cinematic, the front door, the classic start, a probe's scene -
   // draws text, so the chosen language's tables are patched in before any of them runs (?lang= for one visit, else

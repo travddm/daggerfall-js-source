@@ -9,7 +9,7 @@
 // `pageHas('shot')`), or inside one of the two installers whose every call does, or is named below as ALWAYS ON with
 // its reason. Counted both ways: a new ungated seam fails, and so does a name left here after its seam was gated.
 //
-// src/tools/ is the lab pages' (mw-viewer, the paperdoll viewer, the card and sky labs), and is swept only for the
+// src/tools/ is the lab pages' (the card and sky labs), and is swept only for the
 // premise that lets it go: no module outside it imports one inside it, so no played page carries a lab's seams.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -11,7 +11,7 @@
 // WHAT IS VERBATIM
 //   - the sections, keys and DEFAULT VALUES: parsed from the VENDORED
 //     defaults.ini.txt (vendor/dfu-settings), not hand-transcribed -
-//     171 defaults across 13 sections is exactly the lossy-copy shape
+//     173 defaults across 13 sections is exactly the lossy-copy shape
 //     AUDIT 17e F9 caught in the item templates.
 //   - the TYPED GETTERS, including their failure modes, which are
 //     quirks and not accidents (SettingsManager.cs:911-1000):
@@ -51,6 +51,7 @@
 
 import { SETTINGS_DEFAULTS } from './settingsDefaults.js';
 import { appStorage } from '../appStorage.js';   // DA1: the storage seam
+import { t } from '../textManager.js';
 import { onlineForcedSetting, ONLINE_FORCED_SETTINGS } from '../online/onlineLane.js';   // DISC22-A: the room's settings, read first online
 
 const STORAGE_KEY = 'dagger.settings.v1';
@@ -77,6 +78,9 @@ export const LIVE = Object.freeze({
   'Controls/JoystickMovementThreshold': 'src/systems/gamepad.js',
   'Controls/JoystickDeadzone': 'src/systems/gamepad.js',
   'Enhancements/CombatVoices': 'src/combat/combatVoices.js',
+  // Color Boost's dungeon falloff, gated by Color Boost as DFU's is (the rest of Color Boost is not built yet)
+  'Effects/ColorBoostEnable': 'src/systems/distance-shading-setting.ts',
+  'Effects/ColorBoostDungeonFalloff': 'src/systems/distance-shading-setting.ts',
   // MT-i: EnemyInfighting. OFF sends GetTargets down its else-arm
   // (:801-803), where a non-PlayerAlly foe skips every enemy
   // candidate and the whole scene is player-only again - which is
@@ -316,6 +320,14 @@ export const UNAVAILABLE = Object.freeze({
   'Video/ResolutionHeight': 'the game fills your browser window',
   'Video/Fullscreen': 'your browser controls fullscreen',
   'Video/ExclusiveFullscreen': 'your browser controls fullscreen',
+  // Settings for Unity's own machinery, which this game does not have. Each states what stands in its place. Getters,
+  // so each reason is read in the player's language when it is shown, not when this module loads.
+  get 'Video/EnableObjectCulling'() { return t('settings.unavailable.objectCulling', 'the world is drawn in batches and skips what is out of view; a distance cut would only add pop-in'); },
+  get 'Video/EnableTextureArrays'() { return t('settings.unavailable.textureArrays', 'the ground always draws from texture arrays'); },
+  get 'Video/RunInBackground'() { return t('settings.unavailable.runInBackground', 'your browser decides whether a hidden game keeps running'); },
+  get 'GUI/AccelerateUICopyTexture'() { return t('settings.unavailable.uiCopyTexture', 'menu pictures go to the graphics card once as they load, with no copy to speed up'); },
+  get 'Experimental/TerrainHeightmapPixelError'() { return t('settings.unavailable.heightmapError', "the land is drawn by this game's own terrain, which sets its own detail"); },
+  get 'Experimental/AssetCacheThreshold'() { return t('settings.unavailable.assetCache', 'this game manages the memory its files use by itself'); },
   // FPS-CAP1: a page's frames always wait for the screen - there is no other mode to switch to. The Frame Rate Cap
   // holds under it (systems/frameCap.js: DFU's cap does nothing under VSync, which here would be never).
   // FPS-VSYNC: in the BROWSER. The desktop app answers it at launch (SHELL_AT_LAUNCH, below).
