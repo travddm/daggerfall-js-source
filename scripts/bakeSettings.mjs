@@ -1,6 +1,6 @@
 // Bake vendor/dfu-settings/defaults.ini.txt (DFU's shipped settings
 // defaults, MIT - see the vendor README) into
-// src/systems/settings/settingsDefaults.js. Hand-transcribing 171 defaults
+// src/systems/settings/settingsDefaults.js. Hand-transcribing 173 defaults
 // across 13 sections is the lossy-second-copy shape AUDIT 17e F9
 // caught in the item templates, so the bake reads the real bytes.
 // Run:  node scripts/bakeSettings.mjs

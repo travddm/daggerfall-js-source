@@ -219,6 +219,8 @@ export const PREF_DEFAULTS = Object.freeze({
   // FT18: what the Features home's All off moved, tile id ->
   // the segment it had, so Restore can put it back - across launches. null is nothing to restore.
   featuresRestore: null,
+  // What the Classic rendering preset replaced, so switching it off puts it back (systems/classic-rendering-preset.ts).
+  classicRenderingSaved: null,
   proceduralSky: true,   // LEGACY: read only by the migration in loadPrefs
   // RF4: THE PORT'S OWN
   // FEATURE SWITCHES ARE DECLARED ONCE, ON THEIR ROWS. The Features

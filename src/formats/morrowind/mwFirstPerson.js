@@ -1663,8 +1663,8 @@ export function bindPartsInto(assembly, parts) {
         if (geomFilter && !shapeMatchesBone(batch.name, geomFilter)) continue;
         // MW-D7: the piece KEEPS its batch, and `positions` is its own
         // buffer - never an alias of batch.positions, which poseAssembly
-        // reads every frame. Aliasing them is the runaway the viewer
-        // documents at mwViewer.js:"Skinned batches are".
+        // reads every frame. Aliasing them makes each frame skin the previous
+        // frame's output, and the pose runs away.
         pieces.push({ slot: part.slot, bone, kind: 'skinned', mirrored: false,
           batch, source: null, attachRef: null,
           // MW-D11: the UVs and the material ride WITH the piece. They

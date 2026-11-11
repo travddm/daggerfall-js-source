@@ -5,11 +5,8 @@
 // files: the palette, the body sprite the skin and boot ramps are read
 // out of, and the face.
 //
-// IT LIVES HERE BECAUSE IT HAS TWO CALLERS. tools/neutral/build-viewer.mjs
-// reads those three off disk and bakes the result into a standalone
-// file; the deployed editor gets the same three through dataSource at
-// RUNTIME and calls this with them. One source, so the local tool and
-// the published page cannot drift into building different figures.
+// The viewer page and the baked viewer tool that called this are gone; the character-design tests
+// build the figures through it, so every design is still built by one function.
 //
 // AND BECAUSE OF THE DOCTRINE. "A RENDER OF GAME DATA IS GAME DATA" —
 // the ramps come out of BODY00I0.IMG and the face out of FACE00I0.CIF,

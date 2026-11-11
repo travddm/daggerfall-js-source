@@ -30,12 +30,12 @@ test('MENU T1: the category map is TOTAL and DISJOINT over the store', () => {
     }
   }
   for (const k of ALL_KEYS) assert.ok(seen.has(k), `${k} has no category - it would vanish from the screen`);
-  assert.equal(seen.size, 171);
+  assert.equal(seen.size, 173);
   // the shape the design settled on, so a re-bake that renames a key
   // fails the build rather than quietly dropping a row
   // SO1 gave ENHANCED a category with no store key; FT12 took it off the rail. ORG2: one screen for every option - nine
-  // TABS by subject over the 171 and the Features rows; World holds none of DFU's keys, only the port's and the mods'
-  assert.deepEqual(CATEGORY_IDS.map((c) => keysOf(c).length), [67, 16, 5, 0, 37, 5, 15, 19, 7]);
+  // TABS by subject over the 173 and the Features rows; World holds none of DFU's keys, only the port's and the mods'
+  assert.deepEqual(CATEGORY_IDS.map((c) => keysOf(c).length), [68, 17, 5, 0, 37, 5, 15, 19, 7]);
   assert.deepEqual(CATEGORY_IDS, ['graphics', 'gameplay', 'combat', 'world', 'interface', 'audio', 'controls', 'accessibility', 'mods']);
 });
 

@@ -1,6 +1,6 @@
 // THE ENHANCED SKIN'S STYLE, in one place and injected once.
 //
-// It lived in menu.html's <style> while the menu was only a prototype
+// It lived in labs/menu.html's <style> while the menu was only a prototype
 // page. It cannot stay there now that the game mounts the same screen:
 // two copies of a design language is how the front door and the rooms
 // behind it drift apart, and this project has caught that shape often
@@ -12,7 +12,7 @@
 // pay for their CSS only when one of them is actually mounted. A
 // player who chose classic never loads a byte of this.
 //
-// The tokens are the ones enhanced.html established. Brass and
+// The tokens are the ones the old UI prototype page established. Brass and
 // verdigris are Daggerfall's own - its chrome is carved stone with
 // brass fittings, and verdigris is what brass becomes - and the ground
 // is a blue-black rather than a true black, because Skyrim's void is
@@ -20,7 +20,7 @@
 // place with weather in it.
 
 /* ── TOKENS ────────────────────────────────────────────────
-   Identical to enhanced.html on purpose. The menu and the in-game
+   Identical to the old UI prototype page on purpose. The menu and the in-game
    screens are ONE interface seen at two moments, and the moment a
    front door owns its own palette it stops being the same
    product as the rooms behind it.
@@ -102,7 +102,7 @@ export const FONT_BRAND = 'Grenze+Gotisch:wght@300;400;500';
    pixel art now - Jacquard 12 is a 12px-grid pixel BLACKLETTER (the
    wordmark; the same family Grenze Gotisch was chosen to evoke, on an
    actual pixel grid), Pixelify Sans the list face beside it. Chosen in
-   menu-pixel.html, the prototype of record. */
+   the old pixel-menu prototype, the prototype of record. */
 export const FONT_PIXEL_BRAND = 'Jacquard+12';
 export const FONT_PIXEL_DATA = 'Pixelify+Sans:wght@400;500';
 export const fontsUrl = (families) =>
@@ -1076,7 +1076,7 @@ img.fit { image-rendering: pixelated; }   /* AUDIT UI A1: a fitted picture drawn
 /* ONLINE1: the Online card's two fields */
 .card label.field { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
 /* ACC1e F1: THIS SAID var(--ash) AND NOTHING HAS EVER DEFINED --ash.
-   Not here, not in enhanced.html, not in the landing page's injected
+   Not here, not in the old UI prototype page, not in the landing page's injected
    block - the whole tree has one USE of it and no declaration, so the
    property was invalid at computed-value time and every field label in
    the enhanced skin inherited --bone instead. ONLINE1's two fields, the
@@ -1885,7 +1885,7 @@ ${badgeCss()}
 
 /* ── PX1: THE PIXEL HOME (Mac, 2026-08-27) ──────────────────
    The boot menu's front face in Daggerfall's own idiom, adopted from
-   menu-pixel.html: no boxes - the list floats over the dithered night
+   the old pixel-menu prototype: no boxes - the list floats over the dithered night
    (src/ui/pixelGround.js), the wordmark is pixel blackletter, and the
    focused row wears THE CLASSIC SHADOWED-LABEL PAIR - yellow
    243,239,44 over its 93,77,12 shadow at +1,+1 (scaled x2 for the

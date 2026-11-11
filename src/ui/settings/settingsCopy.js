@@ -2,13 +2,13 @@
 //
 // Two sources, in order:
 //   1. LABELS below - a short Title Case name for every one of the
-//      171 keys, so a raw ini identifier can never reach the screen.
+//      173 keys, so a raw ini identifier can never reach the screen.
 //      "LypyL_GameConsole" reads as "Developer Console". The five that
 //      are DFU's own words read through the text core (DFU_LABELS).
 //   2. DFU's OWN tooltip for the explanation (systemsText's
 //      SETTINGS_INFO, vendored from GameSettings.txt). Where DFU wrote
 //      a sentence we use DFU's sentence - porting the words is porting
-//      a law, and it is the reason this screen explains 78 settings
+//      a law, and it is the reason this screen explains 79 settings
 //      without anyone here inventing an explanation.
 //
 // DFU keys its text table by the name of the UI CONTROL, not by the
@@ -102,6 +102,7 @@ export const LABELS = Object.freeze({
   "Enhancements/PlayerTorchLightScale": "Torch Brightness",
   "Experimental/AssetCacheThreshold": "Asset Cache Size",
   "Experimental/CustomBooksImport": "Add Your Own Books",
+  get 'Experimental/DungeonsPoolSizeTarget'() { return t('menu.settings.label.dungeonsPool', 'Quest Dungeon Choices'); },
   "Experimental/SmallerDungeons": "Smaller Dungeons",
   "Experimental/TerrainDistance": "Land View Distance",
   "Experimental/TerrainHeightmapPixelError": "Land Detail Error",
@@ -166,6 +167,7 @@ export const LABELS = Object.freeze({
   "Video/AmbientLitInteriors": "Lit Interiors",
   "Video/DungeonLightShadows": "Dungeon Light Shadows",
   "Video/DungeonShadowDistance": "Dungeon Shadow Range",
+  get 'Video/EnableObjectCulling'() { return t('menu.settings.label.objectCulling', 'Object Culling'); },
   "Video/EnableTextureArrays": "Texture Arrays",
   "Video/ExclusiveFullscreen": "Exclusive Fullscreen",
   "Video/ExteriorLightShadows": "Outdoor Light Shadows",
@@ -296,6 +298,12 @@ export const READOUT = Object.freeze({
   'Video/ExclusiveFullscreen': 'browser',
   'Video/Fullscreen': 'browser',
   'Video/VSync': 'always',
+  get 'Video/EnableObjectCulling'() { return t('menu.settings.readout.objectCulling', 'by view'); },
+  get 'Video/EnableTextureArrays'() { return t('menu.settings.readout.textureArrays', 'always'); },
+  get 'Video/RunInBackground'() { return t('menu.settings.readout.runInBackground', 'browser'); },
+  get 'GUI/AccelerateUICopyTexture'() { return t('menu.settings.readout.uiCopyTexture', 'built in'); },
+  get 'Experimental/TerrainHeightmapPixelError'() { return t('menu.settings.readout.heightmapError', 'automatic'); },
+  get 'Experimental/AssetCacheThreshold'() { return t('menu.settings.readout.assetCache', 'automatic'); },
 });
 
 /** The sentence that says what you get INSTEAD - shown in the detail
@@ -313,6 +321,12 @@ export const INSTEAD = Object.freeze({
   'Video/ExclusiveFullscreen': "Use your browser's fullscreen, from its menu (F11 is Quick Load in this game). In the desktop app, use View > Toggle Full Screen (Alt+Enter on Windows and Linux).",   // DEATH-LOAD (issue #642): F11 never was fullscreen here - the page and the shell spend it on QuickLoad
   'Video/Fullscreen': "Use your browser's fullscreen, from its menu (F11 is Quick Load in this game). In the desktop app, use View > Toggle Full Screen (Alt+Enter on Windows and Linux).",   // DEATH-LOAD (issue #642): F11 never was fullscreen here - the page and the shell spend it on QuickLoad
   'Video/VSync': 'Frames always wait for your screen. To run slower than it, set a Frame Rate Cap.',
+  get 'Video/EnableObjectCulling'() { return t('menu.settings.instead.objectCulling', 'What is out of view is already skipped. Distant things stay drawn, so nothing pops in.'); },
+  get 'Video/EnableTextureArrays'() { return t('menu.settings.instead.textureArrays', 'The ground always draws from texture arrays.'); },
+  get 'Video/RunInBackground'() { return t('menu.settings.instead.runInBackground', 'Your browser decides whether the game keeps running while its window is hidden.'); },
+  get 'GUI/AccelerateUICopyTexture'() { return t('menu.settings.instead.uiCopyTexture', 'Menu pictures go to the graphics card once, as they load.'); },
+  get 'Experimental/TerrainHeightmapPixelError'() { return t('menu.settings.instead.heightmapError', 'The land sets its own detail. Land View Distance sets how far it reaches.'); },
+  get 'Experimental/AssetCacheThreshold'() { return t('menu.settings.instead.assetCache', 'The game manages the memory its files use by itself.'); },
 });
 
 /** The one-line status a row's tier earns, shown in the help panel. */

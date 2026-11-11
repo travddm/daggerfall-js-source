@@ -23,7 +23,7 @@
 //      this repo cannot know what ids a modded Morrowind carries. A
 //      row that resolves to nothing costs that item its MW model and
 //      it draws the classic sprite, with the miss NAMED in the
-//      report (mwItemReport, on the mw-inspect page).
+//      report (mwItemReport).
 //
 // ── THE ROWS THAT ARE JUDGEMENT, not translation ─────────────────
 // DF's armor materials are not MW's, and the misses are recorded
@@ -413,7 +413,7 @@ export function itemMapCoverage() {
 }
 
 /**
- * THE REPORT, for the mw-inspect page: every armor row x material
+ * THE REPORT: every armor row x material
  * against the archives actually attached, so a player (or Mac) sees
  * which items will wear Morrowind and which keep their sprite - with
  * the reason - before ever equipping one. Weapons ride the existing

@@ -8,14 +8,13 @@
 // recoloured for each paint. The port paints a few more it has no set for yet (the gate's, the Abyss's - the record's
 // Not yet). Each slot is a key the studio's names use (`38181_1-0`), a name a person reads, the
 // label the templates are saved under (`38181_1-0--cart-side-weathered-oak.png`) and its picture, painted on demand -
-// top-down RGBA, the way a PNG is - so the studio page (studio.html) and the tool (tools/studioArt.mjs) hand an artist
+// top-down RGBA, the way a PNG is - so the studio page (labs/studio.html) and the tool (tools/studioArt.mjs) hand an artist
 // the picture they are replacing at its own size and shape. Painted here as the game paints them before DF-LOOK lays
 // Daggerfall's palette on (there is no palette without the player's ARENA2): these are the port's own numbers, and a
 // template of them is ours to hand out (Port-Doctrine).
 //
 // Daggerfall's own textures are slots too - any `<archive>_<record>-<frame>` a texture pack can name - but they are
-// the player's data: the archive sheet (archive-sheet.html) reads them off the player's own ARENA2, and nothing here
-// draws them.
+// the player's data, and nothing here draws them.
 import { wagonArt, wagonLookArt, WAGON_ARCHIVE, TEX as WAGON_TEX, LOOK_RECORDS, lookRecord, isGlassRecord } from '../../world/wagonArt.js';
 import { WAGON_OUTSIDE_LOOKS, CARAVAN_INSIDE_LOOKS, LOOK_NAMES } from '../wagon/wagonLooks.js';
 import { GALLEON_ARCHIVE, TEX as GALLEON_TEX, GALLEON_NIGHT, galleonArt, galleonGlow, shipStandIns } from '../../world/ships/galleonArt.js';

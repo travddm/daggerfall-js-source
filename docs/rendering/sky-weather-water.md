@@ -77,7 +77,7 @@ program. Deep-water and ocean-hole features have their own passes (`src/render/d
 `src/render/oceanHolesRender.js`). The ocean-holes pass ports the Ocean Holes mod (`vendor/ocean-holes/`), which
 leaves core (decisions 77 and 99); its look stays reachable by loading the mod (decision 104).
 
-The lab page `water.html` (`src/tools/waterLab.js`) draws the water pass alone for tuning.
+The lab page `labs/water.html` (`src/tools/waterLab.js`) draws the water pass alone for tuning.
 
 ## Snow
 

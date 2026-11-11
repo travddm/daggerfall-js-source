@@ -65,9 +65,16 @@ commit of its own and say so in the pull request.
 ## Comments
 
 The rules are in [README.md](README.md#code-comments): a comment says why, in plain sentences, and carries no quotes of
-people, slice or audit tags, or dates with names. Write the prose of a comment as [technical writing](#documentation)
+people, decision, pull request, slice or audit tags, or dates with names. Write the prose of a comment as [technical writing](#documentation)
 asks. Do not duplicate those rules here. What they leave open, such as comments that a test or tool reads, is in
 [.claude/rules/comments.md](../.claude/rules/comments.md).
+
+`npm run comment-refs` (`tools/comment-refs.ts`) checks the comments and messages that your branch adds. It fails an
+added comment line that cites a decision (`decision 104`), a pull request (`PR 130`, `#64`), an `AUDIT` tag or an
+upper-case item tag (`SAFE8`, `LOOT-GATE`, `P2.2b`). It also fails an added `throw new Error(...)`, `console.warn(...)`
+or `console.error(...)` whose first string opens with such a tag (`'MWNPC1: ...'`). A tag passes once for each time the
+same change removes it, so old tags on lines you edit or move pass. The fix for a failure is the reason or the message
+in words, or no comment. Vendored code is skipped.
 
 ## TypeScript
 

@@ -1,5 +1,5 @@
 // ORG2: ONE SETTINGS
-// SCREEN FOR EVERY OPTION. Settings (DFU's 171 keys) and the Features home (the port's rows and the mods) were two doors
+// SCREEN FOR EVERY OPTION. Settings (DFU's 173 keys) and the Features home (the port's rows and the mods) were two doors
 // over one subject; one map (ui/settings/settingsMap.js) now places everything in a TAB, then a SECTION, and the screen draws
 // every option as a row of one shape. These pins hold the map total and disjoint over all three kinds of option, the
 // words every message uses for where a switch lives, the Graphics tab's quality preset, and one tab's restore.
@@ -53,7 +53,7 @@ function withRows(fn) {
   try { return fn(); } finally { delete globalThis.document; delete globalThis.window; }
 }
 
-const SPECIAL = ['preset:graphics', 'link:overhauls', 'bindings', 'mods-index'];
+const SPECIAL = ['preset:graphics', 'preset:classic', 'link:overhauls', 'bindings', 'mods-index'];
 const CARDS = ['card:morrowind', 'card:packs', 'card:peerSprites', 'card:nightSounds'];
 
 test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s keys, each Features row and each of the port\'s own rows stands in exactly one section of one tab (mutant: a row dropped, or placed twice)', () => {
@@ -84,13 +84,13 @@ test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s key
   assert.ok(pool.size >= 15, `the builders drew the port's rows (${pool.size})`);
   for (const id of pool.keys()) assert.ok(seen.has(`port:${id}`), `the port's row ${id} has no place - it would vanish from the screen`);
   for (const item of [...SPECIAL, ...CARDS]) assert.ok(seen.has(item), `${item} has a place`);
-  assert.equal(CATEGORY_IDS.reduce((n, c) => n + keysOf(c).length, 0), 171);
+  assert.equal(CATEGORY_IDS.reduce((n, c) => n + keysOf(c).length, 0), 173);
 });
 
 test('ORG2: Graphics leads, with the preset at its head, and the tabs a player looks for in the order they look (mutant: the preset or a tab moved)', () => {
   assert.deepEqual(CATEGORY_IDS, ['graphics', 'gameplay', 'combat', 'world', 'interface', 'audio', 'controls', 'accessibility', 'mods']);
   const g = CATEGORIES[0];
-  assert.deepEqual(g.sections[0].items, ['preset:graphics'], 'Quality first, the preset alone in it');
+  assert.deepEqual(g.sections[0].items, ['preset:graphics', 'preset:classic'], 'Quality first, the two presets alone in it');
   for (const id of PRESET_ROWS) assert.equal(whereIs(`feat:${id}`)?.tab.id, 'graphics', `${id}, a row the preset sets, is on the same tab`);
   assert.equal(whereIs('feat:render-scale')?.section.id, 'display', 'the picture\'s resolution is a choice of its own, under Display');
   for (const k of ['Video/FieldOfView', 'Video/TargetFrameRate', 'Video/VSync']) assert.equal(whereIs(k)?.section.id, 'display', k);

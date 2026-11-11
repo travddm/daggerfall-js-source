@@ -23,7 +23,7 @@
 //
 // IT IS INLINE SVG, NOT THE PROTOTYPE'S THREE.JS. `mountFigure` in
 // tools/enhanced/enhancedVisuals.js builds a small three.js scene and
-// enhanced.html loads that library from a CDN - and the port's
+// the old UI prototype page loads that library from a CDN - and the port's
 // doctrine already carries exactly one third-party request (Ledger A,
 // the web fonts), which is one more than it wants. Twenty-seven
 // positioned nodes need no library at all, and an SVG scales to a

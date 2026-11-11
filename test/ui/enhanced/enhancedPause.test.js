@@ -176,7 +176,7 @@ test('U51: the pause door mounts the FRONT DOOR, not a second design', () => {
   // unchanged - pause mode, the host's own hooks, one front door.
   assert.match(src, /mountEnhancedMenu\(host, \{ mode: 'pause', hooks, onAction: act, at: hooks\.at \?\? null \}\)/,
     'mounted in pause mode with the host’s own hooks');
-  // and it carries no design of its own, exactly as menu.html carries
+  // and it carries no design of its own, exactly as labs/menu.html carries
   // none - the tokens and the layout live in ui/enhanced/enhancedStyle.js
   assert.ok(!/--brass|--verdigris|\.railbtn|grid-template-columns/.test(src),
     'ui/pauseDoor.js must hold no layout - one design language, one home');

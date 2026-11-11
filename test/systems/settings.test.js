@@ -35,7 +35,7 @@ test('settings: the BAKE is the vendored file - a stale bake fails here', () => 
   assert.deepEqual(JSON.parse(JSON.stringify(DEFAULTS)), fresh,
     'run: node scripts/bakeSettings.mjs');
   assert.equal(Object.keys(DEFAULTS).length, 13, "DFU's 13 sections");
-  assert.equal(ALL_KEYS.length, 171, "DFU's 171 defaults");
+  assert.equal(ALL_KEYS.length, 173, "DFU's 173 defaults");
   // spot-check the values the Ledger row quotes, straight off the file
   assert.equal(DEFAULTS.Enhancements.EnhancedCombatAI, 'True');
   assert.equal(DEFAULTS.Enhancements.CombatVoices, 'True');

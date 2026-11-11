@@ -2,9 +2,8 @@
 // Pure + browser-safe: buildNeutralBody(ramps) returns faces
 // [{ p:[12], n:[3], c:[r,g,b] }] with AO + snapped-ramp palette shading
 // baked in. `ramps` = { skin:[[r,g,b]...], boot:[[r,g,b]...] } supplied
-// by the caller (engine passes ramps from the loaded ART_PAL; the
-// viewer tool passes them from the sprite). Geometry is authored as
-// loft profiles - see tools/neutral for the viewer.
+// by the caller (engine passes ramps from the loaded ART_PAL).
+// Geometry is authored as loft profiles.
 
 // The hand/forearm JUNCTION (pre-HSCALE): the hand's top row sits at
 // y 0.985 and the arm loft's wrist row at y 0.99 - the wrist joint is

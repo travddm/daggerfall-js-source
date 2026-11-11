@@ -50,16 +50,16 @@ test('settingsText: DFU words for the pages, the sections and the settings', () 
 });
 
 test('settingsText: the label key is the ini key with a lowered first letter', () => {
-  // the mapping the settings screen will rely on. It resolves 64 of
-  // our 171 keys - DFU's own UI exposes only those; the other 107 are
+  // the mapping the settings screen will rely on. It resolves 65 of
+  // our 173 keys - DFU's own UI exposes only those; the other 108 are
   // ini-only and DFU never shows them either, which is the honest
   // reason a settings screen may hide them behind an advanced view.
   const lc = (k) => k.charAt(0).toLowerCase() + k.slice(1);
   const all = Object.entries(SETTINGS_DEFAULTS).flatMap(([s, ks]) => Object.keys(ks).map((k) => [s, k]));
   const resolved = all.filter(([, k]) => SETTINGS_LABELS[lc(k)] || SETTINGS_LABELS[k]);
-  assert.equal(all.length, 171);
+  assert.equal(all.length, 173);
   assert.ok(resolved.length >= 60 && resolved.length <= 80,
-    `expected DFU to label ~64 of the 171 ini keys, got ${resolved.length}`);
+    `expected DFU to label ~65 of the 173 ini keys, got ${resolved.length}`);
   // spot-check the convention in both directions
   assert.ok(SETTINGS_LABELS[lc('SoundVolume')], 'SoundVolume -> soundVolume');
   assert.ok(SETTINGS_LABELS[lc('PlayerTorchFromItems')], 'PlayerTorchFromItems -> playerTorchFromItems');
