@@ -81,6 +81,6 @@ test('a corrupt stored value falls to the default, never throws', () => {
 // ── AND IT IS NOT A DFU SETTING ──────────────────────────────────
 test('the skin stays OUT of the DFU settings store', async () => {
   const { ALL_KEYS } = await import('../../src/systems/settings/settings.js');
-  assert.equal(ALL_KEYS.length, 171, 'the parity pin still holds');
+  assert.equal(ALL_KEYS.length, 173, 'the parity pin still holds');
   assert.ok(!ALL_KEYS.some((k) => /skin/i.test(k)), 'no port-invented key in DFU\u2019s store');
 });

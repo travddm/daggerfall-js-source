@@ -1,5 +1,5 @@
 // ORG2: ONE SETTINGS
-// SCREEN FOR EVERY OPTION. Settings (DFU's 171 keys) and the Features home (the port's rows and the mods) were two doors
+// SCREEN FOR EVERY OPTION. Settings (DFU's 173 keys) and the Features home (the port's rows and the mods) were two doors
 // over one subject; one map (ui/settings/settingsMap.js) now places everything in a TAB, then a SECTION, and the screen draws
 // every option as a row of one shape. These pins hold the map total and disjoint over all three kinds of option, the
 // words every message uses for where a switch lives, the Graphics tab's quality preset, and one tab's restore.
@@ -84,7 +84,7 @@ test('ORG2: the map is TOTAL and DISJOINT over every option - each of DFU\'s key
   assert.ok(pool.size >= 15, `the builders drew the port's rows (${pool.size})`);
   for (const id of pool.keys()) assert.ok(seen.has(`port:${id}`), `the port's row ${id} has no place - it would vanish from the screen`);
   for (const item of [...SPECIAL, ...CARDS]) assert.ok(seen.has(item), `${item} has a place`);
-  assert.equal(CATEGORY_IDS.reduce((n, c) => n + keysOf(c).length, 0), 171);
+  assert.equal(CATEGORY_IDS.reduce((n, c) => n + keysOf(c).length, 0), 173);
 });
 
 test('ORG2: Graphics leads, with the preset at its head, and the tabs a player looks for in the order they look (mutant: the preset or a tab moved)', () => {

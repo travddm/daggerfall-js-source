@@ -468,7 +468,7 @@ const HARDCODED = {
   'src/systems/serpent/serpentSite.js': 1,
   'src/systems/serpent/serpentSpoils.js': 4,
   'src/systems/settings/settings.js': 10,
-  'src/systems/settings/settingsText.js': 156,
+  'src/systems/settings/settingsText.js': 158,
   'src/systems/shellUpdates.js': 4,
   'src/systems/shipyards.js': 20,
   'src/systems/shopStock.js': 2,
