@@ -48,11 +48,7 @@
     "acctcard": "node tools/accountCardProbe.mjs",
     "savetile": "node tools/saveTileProbe.mjs",
     "chargenphone": "node tools/chargenPhoneProbe.mjs",
-    "deeds": "node tools/deedProbe.mjs",
-    "mwinspect": "node tools/mwInspectProbe.mjs",
-    "mwarm": "node tools/mwArmProbe.mjs",
-    "mwviewer": "node tools/mwViewerProbe.mjs",
-    "mwattach": "node tools/mwAttachProbe.mjs"
+    "deeds": "node tools/deedProbe.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

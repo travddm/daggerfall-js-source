@@ -171,7 +171,7 @@ test('TERMS1: the build seam dresses both documents in the skin - its tokens, th
     const out = handler('<html><head></head><body></body></html>', { path });
     assert.deepEqual(out, transformDocument('<html><head></head><body></body></html>'), `${path} is not dressed as a document`);
   }
-  assert.equal(handler('<p>x</p>', { path: '/viewer.html' }), '<p>x</p>', 'a lab page is still left alone');
+  assert.equal(handler('<p>x</p>', { path: '/labs/sky.html' }), '<p>x</p>', 'a lab page is still left alone');
   const { tags } = transformDocument('<html></html>');
   const byId = (id) => tags.find((t) => t.tag === 'style' && t.attrs?.id === id);
   assert.equal(byId('enhanced-tokens')?.children, ENHANCED_TOKENS, 'the skin\'s tokens, whole');

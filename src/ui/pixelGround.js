@@ -4,7 +4,7 @@
 // thresholds, two fog blobs mixed the same way, stars scattered on a
 // seeded LCG so every load and every screenshot sees the same sky.
 //
-// Prototyped in menu-redesign.html / menu-pixel.html; this module is
+// Prototyped in the old menu prototype pages; this module is
 // the ONE HOME the moment a second screen wants the ground (the pause
 // door will). All art procedural - no game data, per Port-Doctrine.
 //

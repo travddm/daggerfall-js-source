@@ -37,7 +37,7 @@ const [VW, VH] = (process.env.VIEW ?? '1280x800').split('x').map(Number);
 const page = await browser.newPage({ viewport: { width: VW, height: VH } });
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e.message)));
-await page.goto(`${BASE}/menu.html?skin=enhanced`, { waitUntil: 'networkidle' });
+await page.goto(`${BASE}/labs/menu.html?skin=enhanced`, { waitUntil: 'networkidle' });
 
 const state = await page.evaluate(async () => {
   const { createPartyPanel } = await import('/src/ui/partyPanel.js');

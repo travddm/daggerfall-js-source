@@ -6,7 +6,7 @@
 // settings, mods, about.
 //
 // ONE IMPLEMENTATION, THREE HOSTS. This module is mounted by the game
-// at boot (src/main.js), by the prototype page (/menu.html, via
+// at boot (src/main.js), by the prototype page (/labs/menu.html, via
 // src/tools/enhanced/enhancedMenu.js), and by the PAUSE DOOR once the game is
 // running (ui/pauseDoor.js) - and there is no second copy of any of
 // it. The prototype exists to be argued with and must therefore be the
@@ -4297,7 +4297,7 @@ function go(id) {
 }
 
 // ── PX1: THE PIXEL HOME (Mac, 2026-08-27) ────────────────────────
-// The boot door's FACE. The prototype of record is menu-pixel.html;
+// The boot door's FACE. The prototype of record is the old pixel-menu prototype;
 // what shipped is its structure over the REAL sections: every row
 // navigates to the pane that already carries that section's laws
 // (Continue's restorable card, the Mods waiting-room, the rail-hole

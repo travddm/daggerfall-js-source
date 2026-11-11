@@ -550,6 +550,6 @@ test('AUDIT STUDIO1 S15 (lane E K16): the slots are the keys the game asks under
 test('AUDIT STUDIO1 S16 (lane E K17): the studio is wired - its plugin serves and builds the listing, and its page is built', async () => {
   const cfg = (await import('../../../vite.config.js')).default;
   assert.ok(cfg.plugins.some((p) => p?.name === 'studio-art-index'), 'the listing is served and built (scripts/studioArtIndex.mjs)');
-  assert.equal(cfg.build.rollupOptions.input.studio, 'studio.html');
+  assert.equal(cfg.build.rollupOptions.input.studio, 'labs/studio.html');
 });
 

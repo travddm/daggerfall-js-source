@@ -112,8 +112,7 @@ export function moduleOf(file) {
 }
 /** Every module under src/ui - each may inject a sheet into the game's document. */
 export const uiModules = () => files('src/ui');
-/** Every module under src/ that writes a class into the game's document - src/tools are pages of their own (enhanced.html,
- *  the viewers), never the game's. */
+/** Every module under src/ that writes a class into the game's document - src/tools are pages of their own (the labs), never the game's. */
 export const classWriters = () => files('src').filter((f) => !f.startsWith('src/tools/') && /classList|className|setAttribute\(\s*['"]class['"]/.test(readFileSync(join(ROOT, f), 'utf8')));
 
 let literalCache = null;

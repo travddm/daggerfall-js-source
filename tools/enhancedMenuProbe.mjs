@@ -10,7 +10,7 @@
 //     npx vite --port 5199 &
 //     node tools/enhancedMenuProbe.mjs
 //
-// It drives index.html (the GAME), not menu.html (the prototype), on
+// It drives index.html (the GAME), not labs/menu.html (the prototype), on
 // purpose. The prototype has been green since the design landed; what
 // this proves is the integration.
 import { chromium, devices } from 'playwright';

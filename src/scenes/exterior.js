@@ -6213,7 +6213,7 @@ export async function bootExterior(canvas, renderer, params, status) {
         precip.intensity = fx.intensity; precip.snowShare = fx.snow ?? null;   // WX2: the front's share of the profile; PRECIP1: and its snow share
         // WX1: THE LAB'S WIND LAW, term for term - the rate handed to the
         // shader is the lab's metres a second WITHOUT the gust, and the
-        // travel integrated on the CPU carries it, as grass-proto.html's
+        // travel integrated on the CPU carries it, as the original grass lab page's
         // frame() does. WIND3: both come from the ONE mapping now
         // (systems/wind/windDrive.js, `wd` above) - the same rate the grass,
         // the wisps and the flats take, and WIND1's gust in place of the

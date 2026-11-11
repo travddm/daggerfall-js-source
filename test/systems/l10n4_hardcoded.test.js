@@ -533,8 +533,6 @@ const HARDCODED = {
   'src/tools/enhanced/enhancedUI.js': 24,
   'src/tools/enhanced/enhancedVisuals.js': 1,
   'src/tools/firmamentLab.js': 3,
-  'src/tools/mwViewer.js': 9,
-  'src/tools/paperdoll/paperdollViewer.js': 18,
   'src/tools/studioLab.js': 3,
   'src/ui/accountFlow.js': 2,
   'src/ui/arena/arenaWindow.js': 4,
