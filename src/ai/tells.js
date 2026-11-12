@@ -1,5 +1,5 @@
 // @ts-check
-// TELL1 - POISE AND THE STAGGER (;, then "Go" on every call of the arc).
+// POISE AND THE STAGGER (;, then "Go" on every call of the arc).
 //
 // Before this, one landed hit of anything cancelled any telegraphed wind-up for free: every damaging weapon hit writes
 // DFU's knockback (floored at 15 classic units, three times the hurt threshold) and the brain broke the wind-up on any
@@ -14,7 +14,7 @@
 import { weaponSkillUsed } from '../characters/weapons.js';
 import { SKILLS } from '../systems/skills.js';
 import { getItemHands, ITEM_HANDS } from '../characters/equipTable.js';
-import { TELL_NOW, TELL_NEAR_M, TELL_NEAR_FLOOR, TELL_IRON_EXTRA, TELL_FEINT_FADE, isElite, wholeSet } from './blowShapes.js';   // TELL2: the ground's numbers, homed in the leaf the renderer reads; TELL3: the iron wind-up's extra
+import { TELL_NOW, TELL_NEAR_M, TELL_NEAR_FLOOR, TELL_IRON_EXTRA, TELL_FEINT_FADE, isElite, wholeSet } from './blowShapes.js';   // the ground's numbers, homed in the leaf the renderer reads; the iron wind-up's extra
 
 /** Every TELL number on one table (section 27). Seconds, shares, multipliers. */
 export const TELL = Object.freeze({
@@ -23,7 +23,7 @@ export const TELL = Object.freeze({
   WEIGHT_MEDIUM: 200,
   WEIGHT_HEAVY: 700,
   WEIGHT_MASSIVE: 1500,
-  // AUDIT TELL (the duel harness, tools/tellDuel.mjs - section 28's MASSIVE): a massive foe's poise is never under this,
+  // The duel harness (tools/tellDuel.mjs) showed that a massive foe's poise is never under this,
   // whatever its health rolled - a Giant rolls 18 to 74, and at 0.5 of that the largest single front blow in the game
   // (a daedric warhammer at Strength 100: 34 x 1.725 = 58.6) broke most of them, a reference player's steel one (31)
   // half of them. The mass is the kind's, not the roll's.
@@ -31,7 +31,7 @@ export const TELL = Object.freeze({
   // ...and by what the foe is
   POISE_ELITE: 1.5,             // an elite (eliteFoes.js, `eliteFoe`)
   POISE_ELITE_DUNGEON: 1.25,    // an Elite Dungeon's foe (`elite`)
-  POISE_CHAMPION: 1.25,         // a LOOT7 champion...
+  POISE_CHAMPION: 1.25,         // a champion...
   POISE_STALWART: 1.5,          // ...a Stalwart one
   POISE_REVENANT_RANK: 0.1,     // a revenant, +0.1 a rank
   // a blow's weight: its damage by its kind
@@ -44,7 +44,7 @@ export const TELL = Object.freeze({
   K_TWO_HANDED: 1.15,           // on top of its class
   K_ARROW: 0.5,
   K_SPELL: 0.75,                // a spell's landing; its later rounds weigh nothing
-  K_PEER: 1,                    // a peer's relayed blow (TELL8 carries its class)
+  K_PEER: 1,                    // a peer's relayed blow (the wire carries its class)
   POISE_BACK: 1.5,              // a blow from behind the wind-up's locked facing...
   BACK_DEG: 110,                // ...more than this far off it (TACT's BACK_TURNED_DEG)
   // the stagger
@@ -52,7 +52,7 @@ export const TELL = Object.freeze({
   STAGGER_KNOCK: 1.5,           // the breaking blow's withheld knockback, written at this
   STAGGER_TAKEN: 1.25,          // every blow a staggered foe takes
   STAGGER_IMMUNE: 3,            // no new stagger for this long after one ends
-  // TELL2: the tell - the glint on the body, the cues in the ear, the ground near the player
+  // The tell - the glint on the body, the cues in the ear, the ground near the player
   GLINT_PULSE: 0.9,             // the glint's flare as the wind-up begins...
   GLINT_PULSE_S: 0.15,          // ...falling to the steady rim over this long
   GLINT_STEADY: 0.2,            // the rim through the wind-up
@@ -65,18 +65,18 @@ export const TELL = Object.freeze({
   RELEASE_PITCH: 0.45,
   NEAR_M: TELL_NEAR_M,          // a wind-up this near the player... (ai/blowShapes.js)
   NEAR_FLOOR: TELL_NEAR_FLOOR,  // ...draws at no less than this through the fog
-  // TELL3: iron blows - no poise; they land
-  IRON_SHAPES: Object.freeze(['slam', 'ring']),   // a heavy or massive body's iron shapes (the ring is TELL6's)
+  // Iron blows - no poise; they land
+  IRON_SHAPES: Object.freeze(['slam', 'ring']),   // a heavy or massive body's iron shapes (the ring is a later shape)
   IRON_ELITE: 1 / 3,            // an elite's blow is iron one time in this
   IRON_EXTRA: TELL_IRON_EXTRA,  // an iron wind-up runs this much longer (ai/blowShapes.js)
-  // TELL4: the punish window and the perfect dodge
+  // The punish window and the perfect dodge
   PUNISH_S: Object.freeze({ lunge: 1.0, sweep: 0.8, slam: 1.2, ring: 1.0, charge: 1.4, leap: 1.2 }),   // a missed blow's overreach
   PUNISH_IRON: 0.3,             // ...an iron one's, this much longer
   PUNISH_TAKEN: 1.3,            // every blow an overreached foe takes
   TELL_LATE: 0.25,              // the feet sampled this long before the landing: inside then, outside at it, a perfect dodge
   PERFECT_WINDOW: 1.5,          // ...whose window is this much longer
   PERFECT_PITCH: 1.25,          // ...and whose parry ring is bright (SOUND.Parry6)
-  // TELL5: patterns - the length, the tracking, the feint, the chain
+  // Patterns - the length, the tracking, the feint, the chain
   WINDUP_VARY: Object.freeze([0.9, 1.25]),   // a wind-up's length: its shape's times U(these), drawn at its start
   WINDUP_ELITE: 0.9,            // ...an elite's times this
   WINDUP_RANK: 0.03,            // ...a revenant's less this a rank
@@ -93,7 +93,7 @@ export const TELL = Object.freeze({
   CHAIN_FLOOR: 0.45,            // ...never under this
   CHAIN_GAP: 0.15,              // the landing's strike drawn before the chain winds up (a frame step and a margin)
   CHAIN_NEXT: Object.freeze({ sweep: 'lunge', lunge: 'sweep', slam: 'sweep', ring: 'slam' }),   // a sweep then a lunge; a slam then a sweep; a ring then a slam
-  // TELL7: the cooldowns by tier (seconds between one foe's blows)
+  // The cooldowns by tier (seconds between one foe's blows)
   COOLDOWN: Object.freeze({ ordinary: Object.freeze([8, 15]), champion: Object.freeze([7, 13]), elite: Object.freeze([6, 11]) }),
   COOLDOWN_RANK: 0.08,          // a revenant's, less this a rank
   // TELL6d: the aimed shot
@@ -128,7 +128,7 @@ export function poiseSpecial(entity) {
   return s;
 }
 
-/** P: the poise of a foe (its entity; DFU's `weight`, classic units, kit and all). AUDIT TELL: a massive one's at least
+/** P: the poise of a foe (its entity; DFU's `weight`, classic units, kit and all). A massive one's at least
  *  POISE_FLOOR_MASSIVE before what it is. */
 export function poiseOf(entity, weight) {
   const c = weightClass(weight);
@@ -182,7 +182,7 @@ export function blowWeight(damage, k, { back = false } = {}) {
   return damage * k * (back ? TELL.POISE_BACK : 1);
 }
 
-/** TELL2: the glint's strength `sinceStart` seconds into a wind-up with `toLand` seconds left (0 none): a flare that
+/** The glint's strength `sinceStart` seconds into a wind-up with `toLand` seconds left (0 none): a flare that
  *  falls to a steady rim, then a rise to full through the last TELL_NOW; reduced motion a steady rim alone. */
 export function glintStrength(sinceStart, toLand, reduced = false) {
   if (!(sinceStart >= 0) || !(toLand >= 0)) return 0;
@@ -194,9 +194,9 @@ export function glintStrength(sinceStart, toLand, reduced = false) {
   return k;
 }
 
-/** TELL3 (section 5): a blow's guard as it is wound up - 'iron' for the slam and the ring of a heavy or massive body
+/** A blow's guard as it is wound up - 'iron' for the slam and the ring of a heavy or massive body
  *  (`weight` DFU's, in classic units), and one blow in IRON_ELITE from an elite (`isElite`: the ELITE FOES gold or an
- *  Elite Dungeon's - section 9's reading of the word, taken at TELL5); else 'poise'. `roll` in [0, 1), drawn
+ *  Elite Dungeon's); else 'poise'. `roll` in [0, 1), drawn
  *  only for an elite. */
 export function blowGuard(kind, weight, ent = null, roll = null) {
   const cls = weightClass(weight);
@@ -205,14 +205,14 @@ export function blowGuard(kind, weight, ent = null, roll = null) {
   return 'poise';
 }
 
-/** TELL4 (section 6.1): how long a missed blow of `kind` leaves its foe overreached - its shape's `PUNISH_S`, an iron
+/** How long a missed blow of `kind` leaves its foe overreached - its shape's `PUNISH_S`, an iron
  *  blow's `PUNISH_IRON` longer, a perfect dodge's `PERFECT_WINDOW` times that. A shape with no row: the lunge's. */
 export function punishSeconds(kind, guard = 'poise', perfect = false) {
   const base = TELL.PUNISH_S[kind] ?? TELL.PUNISH_S.lunge;
   return (base + (guard === 'iron' ? TELL.PUNISH_IRON : 0)) * (perfect ? TELL.PERFECT_WINDOW : 1);
 }
 
-// ── TELL5: PATTERNS ─────────────────────────────────────────────────
+// Patterns
 /** An elite: the ELITE FOES gold or an Elite Dungeon's - the leaf's (ai/blowShapes.js, beside the whole set it decides),
  *  handed on. */
 export { isElite };
@@ -221,7 +221,7 @@ export const revenantRank = (ent) => (Number.isFinite(ent?.revenant?.rank) ? ent
 /** The higher tier (7.3): an elite, a champion, a revenant of rank 2 or more - never an ordinary level-10 foe. */
 export const higherTier = (ent) => isElite(ent) || !!ent?.champion || revenantRank(ent) >= 2;
 
-/** TELL5 (7.1): a wind-up's length - its shape's `base` (s) times U(WINDUP_VARY) (`roll` in [0, 1)), an elite's
+/** A wind-up's length - its shape's `base` (s) times U(WINDUP_VARY) (`roll` in [0, 1)), an elite's
  *  x WINDUP_ELITE, a revenant's x(1 - WINDUP_RANK a rank); iron's extra after; never under `floor`. A chain's passes its
  *  own base and floor and `roll` null (no draw: a chain is quick by law). The fill runs on it, so the mark tells the truth.
  *  @param {number} base @param {any} [ent] @param {{ guard?: string, roll?: number|null, floor?: number }} [opts] */
@@ -234,24 +234,24 @@ export function windupSeconds(base, ent = null, { guard = 'poise', roll = Math.r
   if (guard === 'iron') w += TELL.IRON_EXTRA;
   return Math.max(floor, w);
 }
-/** TELL5 (7.3): may this foe feint - a blade of the higher tier - now (`sinceFeint` wind-ups since its last)? */
+/** May this foe feint - a blade of the higher tier - now (`sinceFeint` wind-ups since its last)? */
 export function feints(family, ent, sinceFeint = Infinity) {
   return family === 'blade' && higherTier(ent) && sinceFeint >= TELL.FEINT_GAP;
 }
-/** TELL5 (7.4): may this foe chain - a brute of the higher tier, an elite, a revenant of rank 3 or more - with two shapes
+/** May this foe chain - a brute of the higher tier, an elite, a revenant of rank 3 or more - with two shapes
  *  or more to chain between? */
 export function chains(family, ent, shapes) {
   if (!Array.isArray(shapes) || shapes.length < 2) return false;
   return (family === 'brute' && higherTier(ent)) || isElite(ent) || revenantRank(ent) >= 3;
 }
-/** TELL5 (7.4): the chain's next shape - its law's (a sweep then a lunge; a slam then a sweep; a ring then a slam), or
+/** The chain's next shape - its law's (a sweep then a lunge; a slam then a sweep; a ring then a slam), or
  *  any other of its own. */
 export function chainShape(prev, shapes) {
   const want = TELL.CHAIN_NEXT[prev];
   if (want && shapes.includes(want)) return want;
   return shapes.find((k) => k !== prev) ?? null;
 }
-/** TELL5 (7.2): `yaw` turned toward `want` by at most TRACK_RATE x `dt` (radians, the short way). */
+/** `yaw` turned toward `want` by at most TRACK_RATE x `dt` (radians, the short way). */
 export function trackYaw(yaw, want, dt) {
   let d = want - yaw;
   d = Math.atan2(Math.sin(d), Math.cos(d));
@@ -259,11 +259,11 @@ export function trackYaw(yaw, want, dt) {
   return yaw + Math.max(-max, Math.min(max, d));
 }
 
-// ── TELL7: THE TIER AND THE COOLDOWNS ───────────────────────────────────
-/** TELL7: an elite, a champion or a revenant (any rank) - who throws its family's whole set of shapes: the leaf's
+// The tier and the cooldowns
+/** An elite, a champion or a revenant (any rank) - who throws its family's whole set of shapes: the leaf's
  *  (ai/blowShapes.js, where the whole set is), handed on. */
 export { wholeSet };
-/** TELL7 (9): the seconds before this foe's next telegraphed blow - an ordinary foe's 8-15, a champion's 7-13, an elite's
+/** The seconds before this foe's next telegraphed blow - an ordinary foe's 8-15, a champion's 7-13, an elite's
  *  6-11 (the best of its tiers), a revenant's less 8% a rank (rank 5: 4.8-9 of an ordinary's). `roll` in [0, 1). */
 export function blowCooldown(ent = null, roll = Math.random()) {
   const C = TELL.COOLDOWN;
