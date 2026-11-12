@@ -36,6 +36,7 @@
 import { CifRciFile } from '../formats/cifRciFile.js';
 import { frameToColor32 } from './fpsWeapon.js';   // the ONE indexed-bitmap bake
 import { weaponOffsetHeight } from '../ui/hud/hudLarge.js';
+import { spriteFilterScale } from '../render/world-texture-filter.ts';
 import { validCastRate } from '../systems/castSpeed.js';   // CAST-SPEED: the rate a cast runs at
 
 /** nativeScreenWidth / nativeScreenHeight (:44-45). NOT 320x200: the
@@ -155,7 +156,7 @@ export async function loadSpellCastArt(getBytes, palette, renderer, element) {
     records.push({
       width: size.width,
       height: size.height,
-      tex: renderer.uploadTexture('img', `fpsc:${fileName}:${r}`, c32, { clamp: true }),   // HAND-SEAM: one quad, never tiled - no wrap onto the far edge (render/renderer.js textureParams)
+      tex: renderer.uploadTexture('img', `fpsc:${fileName}:${r}`, c32, { clamp: true, world: true }),   // HAND-SEAM: one quad, never tiled - no wrap onto the far edge (render/renderer.js textureParams)
     });
   }
   return { element, records };
@@ -307,20 +308,14 @@ export const fpsSpellCasting = new SpellCastAnim();
  * retro-rendering rect, and this port composites its overlays onto
  * the canvas itself.
  *
- * The non-point filter adjust (:212-217) - "Adjust scale to be
- * slightly larger when not using point filtering... reduces the
- * effect of filter shrink at edge of display", handScaleX/Y *= 1.01 -
- * is CORRECTLY ABSENT, the same answer the 2026-08-17 classic-weapon
- * parity audit reached for FPSWeapon's identical fudge (Combat.md,
- * "NEAREST filtering (DFU's 1.01 non-point fudge correctly absent)").
- * renderer.uploadTexture binds NEAREST for every image texture
- * (render/renderer.js textureParams), so there is no filter shrink to
- * compensate for; applying it off the Video/MainFilterMode setting
- * alone would scale the hands up by 1% for nothing.
+ * The non-point filter adjust (:212-217): the hands take the world
+ * filter (render/world-texture-filter.ts), and off Point they are drawn
+ * 1% larger, as DFU does, so the filtered edge texels stay off screen.
  */
 export function spellHandRects(canvas, rec, { frameIndex, element, offsetHeight = 0 }) {
-  const handScaleX = canvas.width / NATIVE_SPELL_W;
-  const handScaleY = canvas.height / NATIVE_SPELL_H;
+  const filtered = spriteFilterScale();
+  const handScaleX = (canvas.width / NATIVE_SPELL_W) * filtered;
+  const handScaleY = (canvas.height / NATIVE_SPELL_H) * filtered;
   // "Frames 0 and 5 are always small frames"; "Fire frame 4 is also a
   // small frame" (:220-225).
   const offsetWidth = (frameIndex === 0 || frameIndex === 5

@@ -76,6 +76,7 @@ import { customWeaponImage } from '../diverseWeapons/diverseWeaponsAssets.js';  
 import { widgetMetalName } from './weaponWidgetAssets.js';
 import { getItemHands } from '../../systems/equip.js';
 import { ITEM_HANDS } from '../../characters/equipTable.js';
+import { spriteFilterScale } from '../../render/world-texture-filter.ts';
 import { mirrorRect } from '../twoHands/handsLaw.js';   // TWO-HANDS: a hand of a pair on the left of the screen, drawn whole in the mirror
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -257,7 +258,7 @@ export function createWeaponWidget({
         cache.set(name, null);
         customWeaponImage(name).then((img) => {
           if (!img) { misses.add(name); return; }
-          const tex = ctx.renderer.uploadTexture('img', `ww:${name}`, img);
+          const tex = ctx.renderer.uploadTexture('img', `ww:${name}`, img, { world: true });
           // AUDIT-DW F3: WHICH name answered rides the hit. The clone doubles
           // a custom idle's box under DoubleScaleTextures because a `w_`
           // texture IS double size; a plain name that answered through the
@@ -294,12 +295,9 @@ export function createWeaponWidget({
         else if (w.weaponState === S.Idle) { width *= 2; height *= 2; }
       }
     }
-    w.weaponScaleX = w.screenRect.width / NATIVE_W;
-    w.weaponScaleY = w.screenRect.height / NATIVE_H;
-    // MainFilterMode's 1.01 fudge (0x2633-0x2663) is CORRECTLY ABSENT, the
-    // answer the port's own FPSWeapon and spellcasting hands reached:
-    // every image texture here binds NEAREST, so there is no filter
-    // shrink to compensate for (combat/fpsSpellCasting.js's note).
+    // DFU's FPSWeapon draws the weapon 1% larger off Point, so its filtered edge texels stay off screen
+    w.weaponScaleX = (w.screenRect.width / NATIVE_W) * spriteFilterScale();
+    w.weaponScaleY = (w.screenRect.height / NATIVE_H) * spriteFilterScale();
     switch (anim.Alignment) {
       case ALIGN.Left: alignLeft(anim, width, height); break;
       case ALIGN.Center: alignCenter(anim, width, height); break;

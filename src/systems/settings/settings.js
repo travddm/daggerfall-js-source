@@ -299,6 +299,9 @@ export const LIVE = Object.freeze({
   'Video/UseMipMapsInRetroMode': 'src/systems/retroMode.js',
   'Video/RetroModeAspectCorrection': 'src/systems/retroMode.js',
   'Video/PalettizationLUTShift': 'src/systems/retroMode.js',
+  // The world's texture filter: each world texture takes it at upload, and a cached one the next time a scene asks
+  // for it.
+  'Video/MainFilterMode': 'src/render/world-texture-filter.ts',
   // FPS-CAP1: the Frame Rate Cap, stored-tier since the settings screen shipped.
   // StartGameBehaviour's two lines (:244-250), read by the four hosts' frame gate and the FPS counter every frame.
   'Video/TargetFrameRate': 'src/systems/frameCap.js',
