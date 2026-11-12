@@ -24,6 +24,9 @@ Rules from the data side, stated at the top of `renderer.js`:
   texture, its emission map, and the weapon and spell-hand sprites take it at upload. A cached texture takes a changed
   value the next time a scene asks for it (`Renderer._worldHit`). Off Point, the weapon and the spell hands draw 1%
   larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
+- `Video/QualityLevel` sets the anisotropy of that world art, as Unity's quality levels do: Beautiful and Fantastic
+  force 9x (capped by the driver), the lower levels leave it at 1x. It applies only off Point, because Direct3D under
+  ANGLE makes a sampler with anisotropy above 1 fully linear; so the default (Point, Fantastic) costs nothing.
 - The ground tile arrays take the world filter for magnification only. The Ground sharpness row decides their
   minification and anisotropy (`src/render/ground-sampler.ts`), and `applyGroundSharpness` applies both at every world
   load.

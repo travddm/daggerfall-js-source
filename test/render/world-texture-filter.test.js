@@ -6,7 +6,12 @@ import {
   NON_POINT_SPRITE_SCALE,
   POINT,
   TRILINEAR,
+  filterUpload,
+  needsRefilter,
+  parseQualityLevel,
   parseWorldFilterMode,
+  qualityAnisotropyFor,
+  refilterWorldTexture,
   worldFilterFor,
 } from '../../src/render/world-texture-filter.ts';
 import { Renderer } from '../../src/render/renderer.js';
@@ -173,6 +178,50 @@ test('the compass pictures take GUI/GUIFilterMode, Point by default; the bars ke
     assert.deepEqual(await load(), ['nearest', 'nearest', 'own']);
     setValue('GUI', 'GUIFilterMode', '1');
     assert.deepEqual(await load(), ['linear', 'linear', 'own']);
+  } finally {
+    resetSettings();
+  }
+});
+
+test("the quality level's anisotropy: forced to 9 from Beautiful up, off Point only, within the driver's ceiling", () => {
+  for (const level of [0, 1, 2, 3, 4, 5])
+    assert.equal(qualityAnisotropyFor(level, POINT, 16), 1, `Point keeps 1 at ${level}`);
+  for (const level of [0, 1, 2, 3])
+    assert.equal(qualityAnisotropyFor(level, BILINEAR, 16), 1, `level ${level} forces nothing`);
+  assert.equal(qualityAnisotropyFor(4, BILINEAR, 16), 9);
+  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 16), 9);
+  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 4), 4, "the driver's ceiling");
+  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 0), 1, 'no extension');
+  assert.equal(parseQualityLevel('3'), 3);
+  for (const bad of ['6', '-1', 'Fantastic', '', null])
+    assert.equal(parseQualityLevel(bad), 5, `${bad} reads as DFU's default`);
+});
+
+test('a world texture takes the anisotropy at upload, and a changed quality level re-filters it', () => {
+  resetSettings();
+  const ext = { TEXTURE_MAX_ANISOTROPY_EXT: 0x84fe, MAX_TEXTURE_MAX_ANISOTROPY_EXT: 0x84ff };
+  const set = [];
+  const gl = {
+    ...E,
+    getExtension: (name) => (name === 'EXT_texture_filter_anisotropic' ? ext : null),
+    getParameter: (name) => (name === ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT ? 16 : 0),
+    bindTexture: () => {},
+    texParameteri: () => {},
+    texParameterf: (target, name, value) => {
+      if (name === ext.TEXTURE_MAX_ANISOTROPY_EXT) set.push(value);
+    },
+  };
+  const texture = {};
+  try {
+    filterUpload(gl, texture, true, true, null, E.NEAREST);
+    choose(TRILINEAR);
+    assert.equal(needsRefilter(gl, texture), true, 'the filter changed');
+    refilterWorldTexture(gl, texture);
+    setValue('Video', 'QualityLevel', '3');
+    assert.equal(needsRefilter(gl, texture), true, 'the quality level changed');
+    refilterWorldTexture(gl, texture);
+    assert.equal(needsRefilter(gl, texture), false);
+    assert.deepEqual(set, [1, 9, 1], 'Point and Fantastic, then Trilinear and Fantastic, then Trilinear and Good');
   } finally {
     resetSettings();
   }

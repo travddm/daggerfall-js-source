@@ -302,6 +302,8 @@ export const LIVE = Object.freeze({
   // The world's texture filter: each world texture takes it at upload, and a cached one the next time a scene asks
   // for it.
   'Video/MainFilterMode': 'src/render/world-texture-filter.ts',
+  // Its anisotropy on world art off Point (Unity's quality levels), read with the filter.
+  'Video/QualityLevel': 'src/render/world-texture-filter.ts',
   // The video frames' filter (DFU's DaggerfallVideo), read at each frame's upload.
   'GUI/VideoFilterMode': 'src/ui/videoPlayer.js',
   // The compass pictures' filter (DFU's HUDCompass), read when the HUD loads them.

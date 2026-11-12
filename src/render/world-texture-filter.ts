@@ -45,25 +45,79 @@ export function worldFilterFor(gl: FilterGl, mode: number, mips: boolean): World
   return { min: mips ? gl.NEAREST_MIPMAP_NEAREST : gl.NEAREST, mag: gl.NEAREST };
 }
 
+/** The quality level's anisotropy on world art, Unity's three modes over DFU's quality levels (QualitySettings.asset):
+ *  Fastest and Fast disable it, Simple and Good use each texture's own level, Beautiful and Fantastic force it on.
+ *  DFU never sets a level on models or flats, so they stay at 1 unless it is forced, and forced on, Unity raises a
+ *  level from 1 to 9 to 9 (Texture.anisoLevel). The ground's anisotropy is the Ground sharpness row's.
+ *
+ *  Under Point it is always 1: Direct3D, under ANGLE, makes a sampler with anisotropy above 1 fully linear, so the
+ *  default Point picture keeps its square texels and its cost whatever the quality level. */
+export function qualityAnisotropyFor(level: number, mode: number, driverMax: number): number {
+  if (mode === POINT || level < FORCED_QUALITY_LEVEL) return 1;
+  return Math.max(1, Math.min(FORCED_ANISOTROPY, driverMax || 1));
+}
+
+/** Beautiful, the first quality level that forces anisotropy on. */
+const FORCED_QUALITY_LEVEL = 4;
+/** The level Unity gives a texture at level 1 to 9 when anisotropy is forced. */
+const FORCED_ANISOTROPY = 9;
+
+/** The quality level as DFU reads it: 0 to 5, anything else Fantastic (DFU's default). */
+export function parseQualityLevel(stored: string | null | undefined): number {
+  const level = Number.parseInt(String(stored ?? ''), 10);
+  return Number.isInteger(level) && level >= 0 && level <= 5 ? level : 5;
+}
+
+type AnisotropyExtension = {
+  readonly TEXTURE_MAX_ANISOTROPY_EXT: number;
+  readonly MAX_TEXTURE_MAX_ANISOTROPY_EXT: number;
+};
+
 type TextureGl = FilterGl & {
   readonly TEXTURE_2D: number;
   readonly TEXTURE_MIN_FILTER: number;
   readonly TEXTURE_MAG_FILTER: number;
   bindTexture(target: number, texture: unknown): void;
   texParameteri(target: number, name: number, value: number): void;
+  texParameterf(target: number, name: number, value: number): void;
+  getExtension(name: string): unknown;
+  getParameter(name: number): unknown;
 };
 
+/** The anisotropy extension and the driver's ceiling, asked once per context. */
+const anisotropyOf = new WeakMap<object, { ext: AnisotropyExtension | null; max: number }>();
+function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension | null; max: number } {
+  let found = anisotropyOf.get(gl);
+  if (!found) {
+    const ext = (gl.getExtension('EXT_texture_filter_anisotropic') as AnisotropyExtension | null) ?? null;
+    const max = ext ? Number(gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)) || 1 : 1;
+    found = { ext, max };
+    anisotropyOf.set(gl, found);
+  }
+  return found;
+}
+
+/** The world filter and anisotropy in force now, for this context. */
+function currentWorldSampling(gl: TextureGl): { mode: number; aniso: number } {
+  const mode = worldFilterMode();
+  const level = parseQualityLevel(getString('Video', 'QualityLevel'));
+  return { mode, aniso: qualityAnisotropyFor(level, mode, anisotropyExtension(gl).max) };
+}
+
 /** What a world texture was uploaded with. */
-type WorldTextureState = { mips: boolean; mode: number };
+type WorldTextureState = { mips: boolean; mode: number; aniso: number };
 
 /** Every world texture's state, by texture object; a deleted texture drops out on its own. */
 const worldTextures = new WeakMap<object, WorldTextureState>();
 
-function setWorldFilter(gl: TextureGl, state: WorldTextureState, mode: number): void {
-  const filter = worldFilterFor(gl, mode, state.mips);
+function setWorldSampling(gl: TextureGl, state: WorldTextureState, now: { mode: number; aniso: number }): void {
+  const filter = worldFilterFor(gl, now.mode, state.mips);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter.min);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter.mag);
-  state.mode = mode;
+  const { ext } = anisotropyExtension(gl);
+  if (ext) gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, now.aniso);
+  state.mode = now.mode;
+  state.aniso = now.aniso;
 }
 
 /** A texture's own filter, for art that is not world art. */
@@ -75,8 +129,9 @@ export function isWorldArt(opts: { smooth?: boolean; world?: boolean }, mips: bo
   return !own && !opts.smooth && (mips || opts.world === true);
 }
 
-/** Sets the bound TEXTURE_2D's filter at upload: world art the world filter (recorded, so a later change reaches it),
- *  other art its own sampler's, or `plain` (NEAREST over the mip chain when it has one). */
+/** Sets the bound TEXTURE_2D's filter at upload: world art the world filter and the quality level's anisotropy
+ *  (recorded, so a later change reaches it), other art its own sampler's, or `plain` (NEAREST over the mip chain when
+ *  it has one). */
 export function filterUpload(
   gl: TextureGl,
   texture: object | null,
@@ -86,8 +141,8 @@ export function filterUpload(
   plain: number,
 ): void {
   if (world) {
-    const state = { mips, mode: worldFilterMode() };
-    setWorldFilter(gl, state, state.mode);
+    const state = { mips, mode: POINT, aniso: 1 };
+    setWorldSampling(gl, state, currentWorldSampling(gl));
     if (texture) worldTextures.set(texture, state);
     return;
   }
@@ -95,18 +150,20 @@ export function filterUpload(
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, own ? own.mag : plain);
 }
 
-/** True when a cached world texture was given another mode than the current one. */
-export function needsRefilter(texture: object | null | undefined): boolean {
+/** True when a cached world texture was given another filter or anisotropy than the current ones. */
+export function needsRefilter(gl: TextureGl, texture: object | null | undefined): boolean {
   const state = texture ? worldTextures.get(texture) : undefined;
-  return !!state && state.mode !== worldFilterMode();
+  if (!state) return false;
+  const now = currentWorldSampling(gl);
+  return state.mode !== now.mode || state.aniso !== now.aniso;
 }
 
-/** Brings the cached world texture to the current mode; the caller has made its unit active. */
+/** Brings the cached world texture to the current filter and anisotropy; the caller has made its unit active. */
 export function refilterWorldTexture(gl: TextureGl, texture: object): void {
   const state = worldTextures.get(texture);
   if (!state) return;
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  setWorldFilter(gl, state, worldFilterMode());
+  setWorldSampling(gl, state, currentWorldSampling(gl));
 }
 
 /** A filter mode as the word a texture's own sampler takes (render/meshAlpha.js samplerParams). A picture without mip

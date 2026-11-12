@@ -3224,7 +3224,7 @@ export class Renderer {
 
   /** A cached world texture brought to a changed world filter when a host asks for it again. */
   _worldHit(tex, unit = this.gl.TEXTURE0) {
-    if (!needsRefilter(tex)) return tex;
+    if (!needsRefilter(this.gl, tex)) return tex;
     this._activeTexture(unit);
     refilterWorldTexture(this.gl, tex);
     this._forgetTextureShadows();
