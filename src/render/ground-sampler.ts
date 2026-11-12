@@ -30,10 +30,19 @@ export function anisotropyFor(tier: unknown, driverMax = 1): number {
  * shimmer is still gone, the texels stay square at every distance, and it is DFU's Point over a mip chain
  * (MaterialReader.MainFilterMode). `off` is that. `default` and `max` keep trilinear, because anisotropy wants a linear
  * filter within the level to have anything to spread its taps over.
+ *
+ * Under the Point world filter (`pointFilter`) the anisotropy is 1 at every tier. Direct3D, under ANGLE, makes a
+ * sampler with anisotropy above 1 anisotropic for magnification too, so the ground's NEAREST magnification was drawn
+ * linear and the texels under the player's feet were smeared, where DFU's Point ground shows square texels. The
+ * trilinear minification stays; it is not anisotropy.
  */
-export function groundSamplerFor(tier: unknown, driverMax = 1): { aniso: number; minFilter: string } {
+export function groundSamplerFor(
+  tier: unknown,
+  driverMax = 1,
+  pointFilter = false,
+): { aniso: number; minFilter: string } {
   return {
-    aniso: anisotropyFor(tier, driverMax),
+    aniso: pointFilter ? 1 : anisotropyFor(tier, driverMax),
     minFilter: tier === 'off' ? 'NEAREST_MIPMAP_NEAREST' : 'LINEAR_MIPMAP_LINEAR',
   };
 }

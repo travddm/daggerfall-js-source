@@ -15,6 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { waterSurfaceFs } from '../../src/render/waterSurface.js';
 import { Renderer, anisotropyFor, groundSamplerFor, groundSharpnessTier } from '../../src/render/renderer.js';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -92,7 +93,10 @@ function recordingRenderer(log, { aniso = true, max = 16 } = {}) {
 const calls = (log, name) => log.filter((c) => c[0] === name);
 const layers = () => [{ width: 2, height: 2, colors: new Uint8ClampedArray(16) }, { width: 2, height: 2, colors: new Uint8ClampedArray(16) }];
 
-test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive, nothing on a cached archive, the filter and the anisotropy by tier, and the dial LANDS on a world load', () => {
+test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive, nothing on a cached archive, the filter and the anisotropy by tier, and the dial LANDS on a world load', (t) => {
+  // the tiers' anisotropy applies off Point (the Point test below): this one runs under Trilinear
+  setValue('Video', 'MainFilterMode', '2');
+  t.after(resetSettings);
   assert.deepEqual(groundSamplerFor('off', 16), { aniso: 1, minFilter: 'NEAREST_MIPMAP_NEAREST' }, 'Off is the mipmap alone, point-sampled: ONE fetch, the pre-GRAIN1 cost with the boil gone');
   assert.deepEqual(groundSamplerFor('default', 16), { aniso: 4, minFilter: 'LINEAR_MIPMAP_LINEAR' });
   assert.deepEqual(groundSamplerFor('max', 16), { aniso: 16, minFilter: 'LINEAR_MIPMAP_LINEAR' });
@@ -145,4 +149,26 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
     const apply = h.indexOf('renderer.applyGroundSharpness();', guard);
     assert.ok(guard > 0 && apply > guard && apply - guard < 1200, `${host}: the tier is re-applied right after the guard, cached or not`);
   }
+});
+
+test('under the Point world filter the ground takes no anisotropy at any tier: its magnification stays NEAREST under ANGLE', () => {
+  for (const tier of ['off', 'default', 'max']) assert.equal(groundSamplerFor(tier, 16, true).aniso, 1, tier);
+  assert.equal(groundSamplerFor('default', 16, true).minFilter, 'LINEAR_MIPMAP_LINEAR', 'the trilinear minification stays');
+  resetSettings();
+  const log = [];
+  const r = recordingRenderer(log);
+  r.uploadTileArray(302, layers());
+  const anisoOf = (l) => calls(l, 'texParameterf').filter((c) => c[2] === 'TEXTURE_MAX_ANISOTROPY_EXT').map((c) => c[3]);
+  const filterOf = (l, name) => calls(l, 'texParameteri').filter((c) => c[2] === name).pop()?.[3];
+  assert.deepEqual(anisoOf(log), [1], 'Point, the default: 1');
+  assert.equal(filterOf(log, 'TEXTURE_MIN_FILTER'), 'LINEAR_MIPMAP_LINEAR');
+  assert.equal(filterOf(log, 'TEXTURE_MAG_FILTER'), 'NEAREST');
+  log.length = 0;
+  r.applyGroundSharpness('max');
+  assert.deepEqual(anisoOf(log), [1], 'Maximum under Point: still 1');
+  setValue('Video', 'MainFilterMode', '1');
+  log.length = 0;
+  r.applyGroundSharpness('default');
+  assert.deepEqual(anisoOf(log), [4], 'Bilinear: the tier’s 4x');
+  resetSettings();
 });

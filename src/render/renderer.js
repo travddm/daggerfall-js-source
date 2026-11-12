@@ -739,7 +739,7 @@ import { multiply as mat4Multiply } from '../world/mat4.js';   // PERF-CROWD2: p
 import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js';   // EL8: `?perf`   // EL5: the bounds every bundle carries for the replays' culling   // EL2: the lane's shadow maps - a leaf that compiles nothing until a lane asks
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
 import { DistanceShadePass } from './classic-distance-shading.ts';
-import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
+import { POINT, filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
@@ -7465,7 +7465,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   _setGroundSampler(tier) {
     const gl = this.gl;
     const ext = this._anisoExtension();
-    const s = groundSamplerFor(tier, this._anisoMax);
+    const s = groundSamplerFor(tier, this._anisoMax, worldFilterMode() === POINT);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl[s.minFilter]);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, groundMagFor(gl, worldFilterMode()));   // DFU's terrain array takes MainFilterMode
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
