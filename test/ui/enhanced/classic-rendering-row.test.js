@@ -8,7 +8,7 @@ import '../../../src/systems/featureLanes.js';
 import { FEATURES } from '../../../src/systems/features.js';
 import { getString, _resetForTests as resetSettings } from '../../../src/systems/settings/settings.js';
 import { getPref, _resetForTests as resetPrefs } from '../../../src/systems/uiPrefs.js';
-import { _resetModSettings, modSetting } from '../../../src/systems/modSettings.js';
+import { _resetModSettings } from '../../../src/systems/modSettings.js';
 import { _resetRenderScaleDoor } from '../../../src/systems/renderScale.js';
 import { retroFrameConfig } from '../../../src/systems/retroMode.js';
 import { tileStates } from '../../../src/ui/enhanced/enhancedMenu.js';
@@ -57,7 +57,7 @@ test('the Classic rendering row turns on the classic picture through the real st
   globalThis.location = { search: '' };
   try {
     const landViewBefore = rowValue('land-view-distance');
-    const skyBefore = modSetting('dynamic-skies', 'Enabled');
+    const outdoorsBefore = rowValue('enhanced-environments');
     const first = drawRow();
     assert.equal(first.off.attrs['aria-pressed'], 'true', 'off on a fresh shelf');
     press(first.on);
@@ -77,7 +77,7 @@ test('the Classic rendering row turns on the classic picture through the real st
     assert.equal(rowValue('land-view-distance'), landViewBefore);
     assert.equal(getPref('enhancedLighting'), true);
     assert.equal(getPref('enhancedEnvironments'), true);
-    assert.equal(modSetting('dynamic-skies', 'Enabled'), skyBefore, 'the same sky as before');
+    assert.equal(rowValue('enhanced-environments'), outdoorsBefore, 'the same sky as before');
     assert.equal(getString('Video', 'FieldOfView'), '65');
     assert.equal(getPref('classicRenderingSaved'), null);
   } finally {
