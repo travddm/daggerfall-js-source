@@ -8,7 +8,7 @@ import '../../../src/systems/featureLanes.js';
 import { FEATURES } from '../../../src/systems/features.js';
 import { getString, _resetForTests as resetSettings } from '../../../src/systems/settings/settings.js';
 import { getPref, _resetForTests as resetPrefs } from '../../../src/systems/uiPrefs.js';
-import { _resetModSettings } from '../../../src/systems/modSettings.js';
+import { _resetModSettings, modSetting } from '../../../src/systems/modSettings.js';
 import { _resetRenderScaleDoor } from '../../../src/systems/renderScale.js';
 import { retroFrameConfig } from '../../../src/systems/retroMode.js';
 import { tileStates } from '../../../src/ui/enhanced/enhancedMenu.js';
@@ -57,6 +57,7 @@ test('the Classic rendering row turns on the classic picture through the real st
   globalThis.location = { search: '' };
   try {
     const landViewBefore = rowValue('land-view-distance');
+    const skyBefore = modSetting('dynamic-skies', 'Enabled');
     const first = drawRow();
     assert.equal(first.off.attrs['aria-pressed'], 'true', 'off on a fresh shelf');
     press(first.on);
@@ -65,12 +66,19 @@ test('the Classic rendering row turns on the classic picture through the real st
     assert.equal(getString('Video', 'RetroModeAspectCorrection'), '1');
     assert.equal(getPref('groundSharpness'), 'off');
     assert.equal(rowValue('land-view-distance'), 'Classic (3)', 'land view went through its own door');
+    assert.equal(getPref('enhancedLighting'), false, 'the flat classic light');
+    assert.equal(getPref('enhancedEnvironments'), false, 'the painted sky');
+    assert.equal(getString('Video', 'FieldOfView'), '60');
     assert.equal(drawRow().on.attrs['aria-pressed'], 'true', 'a redrawn row reads On');
     press(drawRow().off);
     assert.equal(retroFrameConfig(), null, 'the retro picture is off again');
     assert.equal(getString('Video', 'RetroModeAspectCorrection'), '0');
     assert.equal(getPref('groundSharpness'), 'default');
     assert.equal(rowValue('land-view-distance'), landViewBefore);
+    assert.equal(getPref('enhancedLighting'), true);
+    assert.equal(getPref('enhancedEnvironments'), true);
+    assert.equal(modSetting('dynamic-skies', 'Enabled'), skyBefore, 'the same sky as before');
+    assert.equal(getString('Video', 'FieldOfView'), '65');
     assert.equal(getPref('classicRenderingSaved'), null);
   } finally {
     delete globalThis.document;
