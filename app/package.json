@@ -5,7 +5,7 @@
   "license": "MIT",
   "version": "0.1.0",
   "description": "DFO Online - the downloadable desktop shell. Loads the same dist/ the website deploys; adds ARENA2-from-disk and file-backed saves.",
-  "author": "DFO Online",
+  "author": "Daggerfall-JS",
   "homepage": "https://github.com/travddm/daggerfall-js-source",
   "repository": {
     "type": "git",
