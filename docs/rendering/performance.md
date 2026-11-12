@@ -84,7 +84,8 @@ world frame, so a change applies on the next frame.
   write the keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)",
   not classic: no source shows the original game drew at that size. The Classic rendering preset in the Quality
   section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
-  Off and land view distance 3 in one press. It keeps the values it replaced in the `classicRenderingSaved` preference,
+  Off, land view distance 3, Enhanced lighting Off, Enhanced environments Off (the painted sky) and `FieldOfView` 60
+  in one press. It keeps the values it replaced in the `classicRenderingSaved` preference,
   and Off puts back each one that still holds the preset's value.
 - **Classic distance shading** (`src/render/classic-distance-shading.ts`, source
   `src/systems/distance-shading-setting.ts`). Before the present, a full-screen pass reads the image's depth and

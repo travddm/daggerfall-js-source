@@ -1,7 +1,7 @@
 // The Classic rendering preset: one switch that sets the picture options closest to the original game, and puts back
 // what the player had when it is switched off, so today's look stays one press away. It writes Daggerfall Unity's
-// own [Video] retro keys as well as Features rows, so a DFU settings file keeps its meaning. It does not change the
-// skin, the field of view or the HUD.
+// own [Video] keys as well as Features rows, so a DFU settings file keeps its meaning. It does not change the skin or
+// the HUD.
 //
 // The stores are reached through doors the caller hands in, so this module holds the rule and imports no store.
 
@@ -29,18 +29,25 @@ export type ClassicRenderingDoors = {
 export const CLASSIC_RENDERING_SAVED_PREF = 'classicRenderingSaved';
 
 /** Features rows the preset sets. Land view 3 is Daggerfall Unity's default terrain distance; ground sharpness off draws
- *  the ground without mip-mapped sharpening, as the retro picture does. */
+ *  the ground without mip-mapped sharpening, as the retro picture does. Enhanced lighting off gives the flat classic
+ *  light, the closest to the original game's even dungeon light. Enhanced environments off gives the painted sky and
+ *  the classic weather; it also turns off the meadow grass and the evolving weather, which the original game did not
+ *  have either. */
 export const CLASSIC_RENDERING_ROWS: Readonly<Record<string, RowValue>> = Object.freeze({
   'land-view-distance': 3,
   'ground-sharpness': 'off',
+  'enhanced-lighting': false,
+  'enhanced-environments': 'off',
 });
 
-/** Daggerfall Unity's retro keys: 320x200, 4:3, palettization of the whole picture, and no mip maps. */
+/** Daggerfall Unity's retro keys: 320x200, 4:3, palettization of the whole picture, and no mip maps. Field of view 60
+ *  is the narrowest Daggerfall Unity allows; the original game's view was narrower still. */
 export const CLASSIC_RENDERING_VIDEO: Readonly<Record<string, string>> = Object.freeze({
   'Video/RetroRenderingMode': '1',
   'Video/RetroModeAspectCorrection': '1',
   'Video/PostProcessingInRetroMode': '3',
   'Video/UseMipMapsInRetroMode': 'False',
+  'Video/FieldOfView': '60',
 });
 
 function savedOf(doors: ClassicRenderingDoors): ClassicRenderingSaved | null {
