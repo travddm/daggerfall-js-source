@@ -181,6 +181,7 @@ test('AUDIT GALLEON-2 PF5: her pictures and her glass\'s glow are her CLASSIC AR
     TEXTURE_WRAP_S: 'WS', TEXTURE_WRAP_T: 'WT', TEXTURE_MIN_FILTER: 'MIN', TEXTURE_MAG_FILTER: 'MAG', TEXTURE_MAX_LEVEL: 'MAXL',
     REPEAT: 'REPEAT', NEAREST: 'NEAREST', NEAREST_MIPMAP_NEAREST: 'NMN', CLAMP_TO_EDGE: 'CLAMP', LINEAR: 'LINEAR',
     createTexture: () => ({ id: nextId++ }), bindTexture: (_, t) => { bound = t; }, pixelStorei() {}, texImage2D() {}, generateMipmap() {}, activeTexture() {},
+    getExtension: () => null,   // no anisotropy extension: world art takes its filter alone
     texParameteri: (_, p, v) => { if (bound && p === 'MAXL') maxLevel.set(bound.id, v); },
   };
   const renderer = Object.assign(Object.create(Renderer.prototype), {

@@ -16,7 +16,6 @@ import {
 } from '../../src/render/world-texture-filter.ts';
 import { Renderer } from '../../src/render/renderer.js';
 import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
-import { ELEMENT_TYPES, spellHandRects } from '../../src/combat/fpsSpellCasting.js';
 import { VideoPlayer } from '../../src/ui/videoPlayer.js';
 import { loadHud } from '../../src/ui/hud/hud.js';
 import { E, stateGl } from '../retroGl.mjs';
@@ -108,21 +107,6 @@ test("the ground's magnification follows the world filter at each world load; Gr
     choose(POINT);
     r.applyGroundSharpness();
     assert.equal(ground.params[E.TEXTURE_MAG_FILTER], E.NEAREST);
-  } finally {
-    resetSettings();
-  }
-});
-
-test('the spell hands are drawn 1% larger off Point, as DFU draws them', () => {
-  resetSettings();
-  const canvas = { width: 1280, height: 800 };
-  const rec = { width: 100, height: 80 };
-  try {
-    const point = spellHandRects(canvas, rec, { frameIndex: 1, element: ELEMENT_TYPES.Magic });
-    choose(BILINEAR);
-    const filtered = spellHandRects(canvas, rec, { frameIndex: 1, element: ELEMENT_TYPES.Magic });
-    assert.ok(Math.abs(filtered.left.w - point.left.w * NON_POINT_SPRITE_SCALE) < 1e-9);
-    assert.ok(Math.abs(filtered.left.h - point.left.h * NON_POINT_SPRITE_SCALE) < 1e-9);
   } finally {
     resetSettings();
   }

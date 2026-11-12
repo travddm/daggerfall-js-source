@@ -11,7 +11,7 @@ export const POINT = 0;
 export const BILINEAR = 1;
 export const TRILINEAR = 2;
 
-/** DFU draws the first-person weapon and spell hands this much larger off Point (FPSWeapon, FPSSpellCasting), so the
+/** DFU draws the first-person weapon and spell hands this much larger off Point (FPSWeapon and its spell-casting class), so the
  *  filtered edge texels fall off screen. */
 export const NON_POINT_SPRITE_SCALE = 1.01;
 
