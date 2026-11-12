@@ -291,7 +291,7 @@ export async function loadFpsWeaponArt(getBytes, palette, renderer, weaponType, 
       // and that is the other lane.
       const custom = customs[r][f];
       const c32 = custom ?? frameToColor32(cif.getDFBitmap(r, f), palette, dye);
-      frames.push(renderer.uploadTexture('img', custom ? `fpw:${name}` : `fpw:${fileName}:${material}:${r}:${f}`, c32));
+      frames.push(renderer.uploadTexture('img', custom ? `fpw:${name}` : `fpw:${fileName}:${material}:${r}:${f}`, c32, { world: true }));   // the world filter, as DFU's FPSWeapon.LoadWeaponAtlas
     }
     records.push({ width: size.width, height: size.height, frames });
   }

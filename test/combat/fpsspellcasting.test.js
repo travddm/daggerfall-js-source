@@ -23,6 +23,8 @@ import {
   SpellCastAnim, fpsSpellCasting, spellHandRects, drawSpellCastHands, RIGHT_HAND_UV,
 } from '../../src/combat/fpsSpellCasting.js';
 import { NATIVE_W, NATIVE_H } from '../../src/combat/fpsWeapon.js';
+import { NON_POINT_SPRITE_SCALE } from '../../src/render/world-texture-filter.ts';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { createWeaponRig } from '../../src/combat/weapon/weaponRig.js';
 import { CifRciFile } from '../../src/formats/cifRciFile.js';
 import { DFPalette } from '../../src/formats/dfPalette.js';
@@ -265,3 +267,18 @@ test('fpsSpellCasting: the five spell archives satisfy the animation on real dat
   }
 });
 
+
+test('the spell hands are drawn 1% larger off Point, as DFU draws them', () => {
+  resetSettings();
+  const canvas = { width: 1280, height: 800 };
+  const rec = { width: 100, height: 80 };
+  try {
+    const point = spellHandRects(canvas, rec, { frameIndex: 1, element: ELEMENT_TYPES.Magic });
+    setValue('Video', 'MainFilterMode', '1');
+    const filtered = spellHandRects(canvas, rec, { frameIndex: 1, element: ELEMENT_TYPES.Magic });
+    assert.ok(Math.abs(filtered.left.w - point.left.w * NON_POINT_SPRITE_SCALE) < 1e-9);
+    assert.ok(Math.abs(filtered.left.h - point.left.h * NON_POINT_SPRITE_SCALE) < 1e-9);
+  } finally {
+    resetSettings();
+  }
+});

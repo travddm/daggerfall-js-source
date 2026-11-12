@@ -299,6 +299,15 @@ export const LIVE = Object.freeze({
   'Video/UseMipMapsInRetroMode': 'src/systems/retroMode.js',
   'Video/RetroModeAspectCorrection': 'src/systems/retroMode.js',
   'Video/PalettizationLUTShift': 'src/systems/retroMode.js',
+  // The world's texture filter: each world texture takes it at upload, and a cached one the next time a scene asks
+  // for it.
+  'Video/MainFilterMode': 'src/render/world-texture-filter.ts',
+  // Its anisotropy on world art off Point (Unity's quality levels), read with the filter.
+  'Video/QualityLevel': 'src/render/world-texture-filter.ts',
+  // The video frames' filter (DFU's DaggerfallVideo), read at each frame's upload.
+  'GUI/VideoFilterMode': 'src/ui/videoPlayer.js',
+  // The compass pictures' filter (DFU's HUDCompass), read when the HUD loads them.
+  'GUI/GUIFilterMode': 'src/ui/hud/hud-picture.ts',
   // FPS-CAP1: the Frame Rate Cap, stored-tier since the settings screen shipped.
   // StartGameBehaviour's two lines (:244-250), read by the four hosts' frame gate and the FPS counter every frame.
   'Video/TargetFrameRate': 'src/systems/frameCap.js',

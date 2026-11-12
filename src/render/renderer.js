@@ -718,57 +718,8 @@ import { ShadowPass, SHADOW_GLSL, SHADOW_VIEW_SCALE } from './shadowPass.js';   
 import { boundsOf, spherePlanes, batchVisible, batchSphere, ZERO_ORIGIN, placementGrid, quadHalfDiagonal } from './bounds.js';   // PERF-EXT1: and a batch's placement grid; the review: and the half-diagonal's one home
 import { billboardKey, sortByKey } from './billboardKey.js';   // AUDIT 68 S16-bbkey-stale-shadow-reach: the batch's texture key - one home with the two replays; LA-COST2: and the cutout pass's sort by it
 import { cullDisabled } from './frustum.js';   // PERF-CROWD2: the billboard pass culls for every host, so no host can forget to
-import { getPref } from '../systems/uiPrefs.js';   // GRAIN2: the ground-sharpness dial, read where the tile array is built
 
-/**
- * GRAIN2: the
- * ground-sharpness tier as a max-anisotropy value, against what the
- * driver actually allows.
- *
- * The honest answer to the question is that 4 was a conservative guess.
- * Anisotropy is paid in fill rate on the pass that covers the most
- * screen, and this session cannot measure that - its only GL is
- * SwiftShader, a software rasteriser whose cost profile is nothing like
- * a GPU's, and the "16" it reports is its own. So the number is a DIAL
- * and the default is the safe end of it, not a claim.
- *
- * `1` is the extension's own word for no anisotropy, which is why `off`
- * answers it rather than 0; an unknown tier is the default, so a stored
- * pref from a future build cannot turn the ground to mush.
- */
-export function anisotropyFor(tier, driverMax = 1) {
-  const cap = Math.max(1, driverMax || 1);
-  if (tier === 'off') return 1;
-  if (tier === 'max') return cap;
-  return Math.min(4, cap);
-}
-/**
- * GRAIN AUDIT 1: THE TIER IS SAMPLER STATE,
- * AND THE FILTER IS PART OF IT.
- *
- * GRAIN1's `off` turned the anisotropy off and kept LINEAR_MIPMAP_LINEAR
- * - trilinear, eight texel fetches a fragment on the pass that covers
- * the most screen, where the ground had cost ONE before GRAIN1. So the
- * cheapest tier on the dial was still eight times the old fetch count,
- * and there was no way back to the old cost for the machine that felt
- * it. The mipmap is what cures the grain, not the filter within a
- * level: NEAREST_MIPMAP_NEAREST is one fetch, the boil is still gone,
- * the texels stay square at every distance, and it is the filter every
- * numeric archive in this renderer already uses (FilterMode.Point over
- * a chain, MaterialReader.cs:104). `off` is that. `default` and `max`
- * keep trilinear, because anisotropy wants a linear filter within the
- * level to have anything to spread its taps over.
- */
-export function groundSamplerFor(tier, driverMax = 1) {
-  return { aniso: anisotropyFor(tier, driverMax), minFilter: tier === 'off' ? 'NEAREST_MIPMAP_NEAREST' : 'LINEAR_MIPMAP_LINEAR' };
-}
-/** the tier in force: `?ground=off|default|max` over the pref. The door
- *  exists so the one real-GPU instrument this port has (tools/perfProbe
- *  .mjs, a fresh browser with an empty shelf every run) can be pointed
- *  at each tier - without it the dial could not be measured at all. */
-export function groundSharpnessTier(search = globalThis.location?.search ?? '') {
-  return pageParam('ground', search) ?? getPref('groundSharpness');   // PERF-URL
-}
+export { anisotropyFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 /** PERF-SCALE: THE GPU THE BROWSER DRAWS ON, as its driver names it - WEBGL_debug_renderer_info's
  *  UNMASKED_RENDERER_WEBGL where the browser hands it out, gl.RENDERER otherwise (a browser that masks it answers
  *  a generic name there). A laptop's browser on its integrated GPU, or on SwiftShader, is the first thing a report
@@ -788,6 +739,8 @@ import { multiply as mat4Multiply } from '../world/mat4.js';   // PERF-CROWD2: p
 import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js';   // EL8: `?perf`   // EL5: the bounds every bundle carries for the replays' culling   // EL2: the lane's shadow maps - a leaf that compiles nothing until a lane asks
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
 import { DistanceShadePass } from './classic-distance-shading.ts';
+import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
+import { groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -1575,7 +1528,6 @@ import { WATER_SURFACE_VS, waterSurfaceFs } from './waterSurface.js';   // WATER
 import { WATER_LAYER_UNITS, WATER_SCENE_UNIT, WATER_SCENE_DEPTH_UNIT, NO_BED_DEPTH, WATER_RIPPLE_UNIT } from './waterSurface.js';   // FIELD BUGS 2026-09-29 (the sea) #4: WATER1's offset is the sea's surface film's
 import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js';   // WATER-NEXT 2: the ground under the water is a bed
 import { packWaterMask, WATER_DRAW_MASK_TABLE } from '../world/water/waterCorners.js';   // MAC2: the corner table's one home; WATER-DRAW1: the PASS takes the draw's table, not the feet's
-import { pageParam } from '../systems/pageQuery.js';   // PERF-URL: the page's query, parsed once a search
 import { SKIN_PAL_ROW, SKIN_PALETTE_UNIT } from './skinPalette.js';   // MWNPC1: the GPU skin's palette shape
 import { lightIdsOf, lightList, packLight } from './lightId.js';   // LIGHT-ID: each light's identity, lifted off its list for the shadow pass (and the flash packed through the seam)
 import { roadEdgeGlsl, roadEdgesOn } from './roadEdgeGlsl.js';   // ROAD-LOOK: a road's edge blended into its ground, both terrain programs' one chunk, and its switch
@@ -3269,6 +3221,16 @@ export class Renderer {
    *  it exists so that the warning in `markForeignPass` names a remedy
    *  rather than a bug report. */
   endUiRun() { this._close2D(); }
+
+  /** A cached world texture brought to a changed world filter when a host asks for it again. */
+  _worldHit(tex, unit = this.gl.TEXTURE0) {
+    if (!needsRefilter(this.gl, tex)) return tex;
+    this._activeTexture(unit);
+    refilterWorldTexture(this.gl, tex);
+    this._forgetTextureShadows();
+    this._activeTexture(this.gl.TEXTURE0);
+    return tex;
+  }
 
   /** PERF-TEX3 / AUDIT-AIR1: FORGET EVERY TEXTURE SHADOW - ONE HOME.
    *
@@ -5367,7 +5329,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (this.textures.has(key)) {
       // WD3 (AUDIT WD3 T3): a stand-in's clear placeholder (no picture at the time - a fetch that failed, a gate shut) is
       // never the key's for good: a real picture asked under it later takes its place
-      if (!this._placeholders?.has(key) || opts.placeholder) return this.textures.get(key);
+      if (!this._placeholders?.has(key) || opts.placeholder) return this._worldHit(this.textures.get(key));
       this._placeholders.delete(key);
       const old = this.textures.get(key);
       this.textures.delete(key);
@@ -5407,8 +5369,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // likewise; those string-keyed uploads keep a single NEAREST level.
     const mips = !opts.smooth && (opts.mips ?? (typeof archive === 'number'));
     if (mips) gl.generateMipmap?.(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, own ? own.min : mips ? (gl.NEAREST_MIPMAP_NEAREST ?? filter) : filter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, own ? own.mag : filter);
+    filterUpload(gl, tex, isWorldArt(opts, mips, own), mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: TryImportTexture's - DFU's retro arm never reaches it (J7: a lost context's null is no key)
     else if (mips && !this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
     this.textures.set(key, tex);
@@ -6837,7 +6798,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     this._uploadSink?.(true, key);   // FIELD BUGS 2026-10-04d PLACE-LRU: hit or miss, as uploadTexture's
     if (opts.white) this.emissionWhite.add(key);
     if (opts.window) (this.windowMasks ??= new Set()).add(key);   // RW1: DFU's window mask - the rooms' glass outdoors, the street's indoors
-    if (this.emissionTextures.has(key)) return this.emissionTextures.get(key);
+    if (this.emissionTextures.has(key)) return this._worldHit(this.emissionTextures.get(key), this.gl.TEXTURE1);
     const gl = this.gl;
     const tex = gl.createTexture();
     this._activeTexture(gl.TEXTURE1);
@@ -6857,8 +6818,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // (MaterialReader.cs:448/:104). The shader subtracts one from the
     // other (:108-109): both samples must come from the same mip level.
     gl.generateMipmap?.(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, own ? own.min : (gl.NEAREST_MIPMAP_NEAREST ?? gl.NEAREST));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, own ? own.mag : gl.NEAREST);
+    filterUpload(gl, tex, !own, true, own, gl.NEAREST);   // the albedo's world filter too, so both samples still blend alike
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: a replacement albedo's map - neither is capped (J7: a lost context's null is no key)
     else if (!this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: the albedo's cap, so both samples still come from one level
     this._activeTexture(gl.TEXTURE0);
@@ -7415,12 +7375,11 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // gradient (see TERRAIN_FS), so the mip is chosen from the real
     // footprint and the fract() wrap cannot blur a line round every tile.
     //
-    // MAG stays NEAREST, deliberately. Magnification is the ground under
-    // the player's feet, where Daggerfall's texels are meant to be square
-    // and visible; a mipmap has no say there (there is no mip above
-    // level 0) and LINEAR would smear the one place the art is read at
-    // full size. So this buys the distance and spends nothing on the
-    // near field.
+    // MAG is the world filter's (_setGroundSampler), NEAREST under the
+    // default Point. Magnification is the ground under the player's feet,
+    // where Daggerfall's texels are square and visible; a mipmap has no
+    // say there (there is no mip above level 0). So this buys the
+    // distance and spends nothing on the near field.
     //
     // A 2D ARRAY mipmaps each layer on its own, so no tile can bleed into
     // another the way an atlas would - which is the other reason atlases
@@ -7508,6 +7467,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const ext = this._anisoExtension();
     const s = groundSamplerFor(tier, this._anisoMax);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl[s.minFilter]);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, groundMagFor(gl, worldFilterMode()));   // DFU's terrain array takes MainFilterMode
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
     this.groundTier = tier;
     return s;

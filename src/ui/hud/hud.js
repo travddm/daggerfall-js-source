@@ -15,7 +15,6 @@
 //   Scale: classic pixels x floor(canvasHeight / 200) (the 320x200
 //   reference), min 1 - integer scaling keeps the art crisp.
 
-import { bitmapToColor32 } from '../../formats/color32Order.js';   // BOOT2: the indexed-to-color32 door is a formats concern; it lived here and put the HUD on the entry's boot path through ui/cursor.js
 import { maxFatigue, maxBreath, liveStat } from '../../systems/statMods.js';
 import { isEnhanced } from '../../systems/uiSkin.js';   // PX30: the HUD is a skin too
 import { drawEnhancedHud, hideEnhancedHud } from '../enhanced/enhancedHud.js';   // PX30; FB1018f DUNGEON-DIGITS: its word under a window, for the hide door
@@ -57,11 +56,11 @@ import { uiCanvas, onUiScreen } from '../uiScreen.js';   // RETRO-UI: the HUD in
 import { frameMark } from '../../systems/frameClock.js';   // DISC22-C: the classic loot panel draws the frame resolved in THIS frame
 import { classicLootFrame } from '../../systems/classicLootFrame.js';   // DISC22-C: a leaf - hud.js must not reach the item graph
 import { drawLootPanel } from '../classicLootPanel.js';   // DISC22-C: quick loot's classic face
-import { packImgTexture } from '../packArt.js';   // OVH2: the worn UI pack's picture
 import { ToolTip } from '../toolTip.js';
 import { PARTY_GREEN } from '../../net/social.js';   // COMPASS-PARTY: the one green a party is drawn in
 import { nodeMarkRgb } from '../nodeMarks.js';   // NODE-MARKS: a profession's nodes in its own colour
 import { BOAT_MARK_RGB, BOAT_GLYPH_W, BOAT_GLYPH_ROWS } from '../boatMarks.js';   // BOAT-MARK: my boats, a sail over a hull
+import { compassPictureOptions, loadHudPicture } from './hud-picture.ts';
 // NODE-MARKS: PROF2's Prospector's veins were drawn here in one copper; every profession's nodes are drawn in their own now.
 
 export const COMPASS_BOX_OUTLINE = 2;
@@ -217,17 +216,12 @@ export async function loadHud({ fetchBytes, ImgFile, palette, renderer }) {
   // draws none.
   preloadSpellIcons({ fetchBytes, palette, renderer })
     .catch((e) => console.warn('[hud] spell icon sheets unavailable:', e?.message ?? e));
-  const load = async (name) => {
-    const img = new ImgFile();
-    img.load(await fetchBytes(name), name, palette);
-    const bmp = img.getDFBitmap();
-    const packed = await packImgTexture(renderer, name);   // OVH2: the worn UI pack's bars and compass, at the classic size (nativePanel.loadImg's law)
-    return { tex: packed ?? renderer.uploadTexture('img', name, bitmapToColor32(bmp, palette)), w: bmp.width, h: bmp.height };
-  };
+  const load = (name, opts) => loadHudPicture({ fetchBytes, ImgFile, palette, renderer }, name, opts);
+  const compassOpts = compassPictureOptions();
   try {
     const [health, fatigue, magicka, compass, compassBox] = await Promise.all([
       load('MAIN03I0.IMG'), load('MAIN04I0.IMG'), load('MAIN05I0.IMG'),
-      load('COMPASS.IMG'), load('COMPBOX.IMG'),
+      load('COMPASS.IMG', compassOpts), load('COMPBOX.IMG', compassOpts),
     ]);
     // P12: the breath bar is SOLID color (VerticalProgress), no art -
     // two generated 1x1 textures.
