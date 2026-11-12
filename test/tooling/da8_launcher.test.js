@@ -77,7 +77,7 @@ test('DA8: silence is not a reason to wait - an error, a timeout, or no check at
 
 test('DA8: the notice transport offers its own file beside Play - Download it, or play this version', () => {
   let s = fresh({ transport: 'notice' });
-  s = run(s, { type: 'check-available', version: '0.1.4684', download: 'https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-mac-arm64.dmg' });
+  s = run(s, { type: 'check-available', version: '0.1.4684', download: 'https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-mac-arm64.dmg' });
   assert.equal(s.update.status, 'notice');
   assert.equal(L.nextStep(s), 'wait', 'the player decides');
   const v = L.viewOf(s);
