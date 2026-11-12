@@ -2,9 +2,8 @@
 // Trilinear (2). DFU's MaterialReader puts it on every model, flat and terrain texture, and its weapon and spell-hand
 // sprites take it too. UI art, the sky, smoothed pictures and data textures keep their own filters.
 //
-// A texture keeps the filter it was given at upload, so the renderer asks `refilterWorldTexture` whenever a host asks
-// for a cached world texture again: a changed setting reaches each texture the next time a scene uses it. DFU itself
-// applies the setting only when the game starts.
+// A texture keeps the filter it was given at upload. A changed setting reaches every cached world texture on the next
+// frame (render/live-world-sampling.ts), and a host that asks for a cached texture again re-filters it too.
 import { getString } from '../systems/settings/settings.js';
 
 export const POINT = 0;

@@ -66,7 +66,7 @@ test('GRAIN2: the anisotropy is a DIAL, and its tiers never exceed what the driv
   assert.ok(row, 'the Features row is there for the player to turn');
   assert.deepEqual(row.control.tiers.map(([k]) => k), ['off', 'default', 'max']);
   assert.equal(row.control.online, 'player', 'one player’s dial is not everyone’s');
-  assert.match(row.effect, /world next loads/, 'the tile arrays are cached for the page, so the hosts RE-APPLY the tier at every world load (GRAIN AUDIT 1: before that this sentence was false - it landed on a page reload)');
+  assert.match(row.effect, /at once/, 'the renderer re-applies the tier to the cached arrays on the next frame after a change (render/live-world-sampling.ts), as well as at every world load');
   assert.deepEqual([...row.kinds], ['enhanced', 'classic'], 'GRAIN AUDIT 1: both lanes sample the one array, so both lanes get the dial');
 });
 

@@ -639,7 +639,7 @@ export const FEATURES = Object.freeze([
     get title() { return t('features.groundSharpness.title', 'Ground sharpness'); },
     get note() { return t('features.groundSharpness.note', 'How sharp the ground looks into the distance. Off is the cheapest and blurs far ground; Maximum is '
       + 'the sharpest. Turn it down if the outdoors run slow.'); },
-    get effect() { return t('features.effect.worldLoads', 'Takes effect when the world next loads.'); },
+    get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },   // the renderer re-filters the ground arrays on the frame after a change
     kinds: Object.freeze(['enhanced', 'classic']),
     control: Object.freeze({ store: 'prefs', key: 'groundSharpness', initial: 'default', online: 'player', tiers: Object.freeze([tier('off', OFF), tier('default', () => t('features.groundSharpness.default', 'Default (4x)')), tier('max', () => t('features.groundSharpness.max', 'Maximum'))]) }),
   }),

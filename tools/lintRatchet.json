@@ -39,7 +39,7 @@
     "src/render/farRing.js": 1210,
     "src/render/labGrass.js": 2622,
     "src/render/nodeGlint.js": 1032,
-    "src/render/renderer.js": 8845,
+    "src/render/renderer.js": 8832,
     "src/render/shadowPass.js": 2649,
     "src/render/volumetricClouds.js": 1736,
     "src/scenes/arena/arenaBouts.js": 1264,

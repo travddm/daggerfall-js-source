@@ -741,6 +741,7 @@ import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -5610,6 +5611,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   beginFrame(proj, view, lightDir, opts = null) {
     this._close2D();   // PERF-2D: the baseline back, before anything that needs it
     this._afterFlats = null;   // AUDIT RED-MOUNTAIN N2: an armed draw is its frame's
+    refreshWorldSamplingOnChange(this);   // a changed texture filter, quality level or ground sharpness reaches every cached texture now
     const s = this.stats;
     s.draws = 0; s.programBinds = 0; s.vaoBinds = 0; s.texBinds = 0; s.bbCulled = 0; s.shadowDraws = 0;   // PERF-CROWD2; PASS-COUNT
     // VC4: the cloud shadow deck is a FRAME's, not the renderer's - a host
@@ -7365,25 +7367,10 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       if ((i + 1) % TILE_LAYERS_A_STEP === 0 && i + 1 < layers.length) { yield; gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex); }
     }
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
-    // GRAIN1:
-    // THE MIPMAP, AND WHY THE MAGNIFIER DOES NOT MOVE.
-    //
-    // MIN was NEAREST, so a distant pixel covering a dozen texels picked
-    // ONE of them and picked a different one as the camera drifted: the
-    // ground boiled. That is minification aliasing and a mipmap is its
-    // only cure. The terrain shaders take textureGrad with the UNWRAPPED
-    // gradient (see TERRAIN_FS), so the mip is chosen from the real
-    // footprint and the fract() wrap cannot blur a line round every tile.
-    //
-    // MAG is the world filter's (_setGroundSampler), NEAREST under the
-    // default Point. Magnification is the ground under the player's feet,
-    // where Daggerfall's texels are square and visible; a mipmap has no
-    // say there (there is no mip above level 0). So this buys the
-    // distance and spends nothing on the near field.
-    //
-    // A 2D ARRAY mipmaps each layer on its own, so no tile can bleed into
-    // another the way an atlas would - which is the other reason atlases
-    // ship unmipped and this need not.
+    // The mip chain cures minification shimmer: a distant pixel over a dozen texels would pick a different one as the
+    // camera drifts. The terrain shaders pass textureGrad the unwrapped gradient (TERRAIN_FS), so the mip follows the
+    // real footprint and the tile wrap blurs no line round a tile. Magnification is the world filter's
+    // (_setGroundSampler), NEAREST under Point. A 2D array mipmaps each layer on its own, so no tile bleeds into another.
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
