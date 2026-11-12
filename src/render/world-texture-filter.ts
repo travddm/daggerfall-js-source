@@ -109,6 +109,12 @@ export function refilterWorldTexture(gl: TextureGl, texture: object): void {
   setWorldFilter(gl, state, worldFilterMode());
 }
 
+/** A filter mode as the word a texture's own sampler takes (render/meshAlpha.js samplerParams). A picture without mip
+ *  maps blends the same under Bilinear and Trilinear. */
+export function samplerFilterWord(mode: number): 'nearest' | 'linear' {
+  return mode === POINT ? 'nearest' : 'linear';
+}
+
 /** DFU's sprite scale for the current mode: 1 under Point, 1.01 otherwise. */
 export function spriteFilterScale(): number {
   return worldFilterMode() === POINT ? 1 : NON_POINT_SPRITE_SCALE;

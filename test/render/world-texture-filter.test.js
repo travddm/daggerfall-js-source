@@ -12,6 +12,8 @@ import {
 import { Renderer } from '../../src/render/renderer.js';
 import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { ELEMENT_TYPES, spellHandRects } from '../../src/combat/fpsSpellCasting.js';
+import { VideoPlayer } from '../../src/ui/videoPlayer.js';
+import { loadHud } from '../../src/ui/hud/hud.js';
 import { E, stateGl } from '../retroGl.mjs';
 
 const picture = () => ({ width: 2, height: 2, colors: new Uint8Array(16) });
@@ -116,6 +118,61 @@ test('the spell hands are drawn 1% larger off Point, as DFU draws them', () => {
     const filtered = spellHandRects(canvas, rec, { frameIndex: 1, element: ELEMENT_TYPES.Magic });
     assert.ok(Math.abs(filtered.left.w - point.left.w * NON_POINT_SPRITE_SCALE) < 1e-9);
     assert.ok(Math.abs(filtered.left.h - point.left.h * NON_POINT_SPRITE_SCALE) < 1e-9);
+  } finally {
+    resetSettings();
+  }
+});
+
+test('a video frame takes GUI/VideoFilterMode, Bilinear by default as in DFU', () => {
+  resetSettings();
+  const filtersAsked = [];
+  const renderer = {
+    uploadTexture: (archive, record, color32, opts) => {
+      filtersAsked.push(opts?.sampler?.filter);
+      return {};
+    },
+    releaseTexture: () => true,
+  };
+  try {
+    const player = new VideoPlayer({ renderer, now: () => 0, audioContext: () => null });
+    player.vidFile = { frameBuffer: new Uint8Array(16), frameWidth: 2, frameHeight: 2 };
+    player._uploadFrame();
+    setValue('GUI', 'VideoFilterMode', '0');
+    player._uploadFrame();
+    assert.deepEqual(filtersAsked, ['linear', 'nearest']);
+  } finally {
+    resetSettings();
+  }
+});
+
+test('the compass pictures take GUI/GUIFilterMode, Point by default; the bars keep their own', async () => {
+  resetSettings();
+  const asked = new Map();
+  const renderer = {
+    uploadTexture: (archive, record, color32, opts) => {
+      asked.set(record, opts?.sampler?.filter ?? 'own');
+      return { record };
+    },
+  };
+  class ImgFile {
+    load() {}
+    getDFBitmap() {
+      return { width: 2, height: 2, data: new Uint8Array(4) };
+    }
+  }
+  const load = () =>
+    loadHud({
+      fetchBytes: async () => new Uint8Array(0),
+      ImgFile,
+      palette: { get: () => ({ r: 0, g: 0, b: 0 }) },
+      renderer,
+    }).then(() => {
+      return [asked.get('COMPASS.IMG'), asked.get('COMPBOX.IMG'), asked.get('MAIN03I0.IMG')];
+    });
+  try {
+    assert.deepEqual(await load(), ['nearest', 'nearest', 'own']);
+    setValue('GUI', 'GUIFilterMode', '1');
+    assert.deepEqual(await load(), ['linear', 'linear', 'own']);
   } finally {
     resetSettings();
   }
