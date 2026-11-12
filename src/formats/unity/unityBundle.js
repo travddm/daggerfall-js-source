@@ -17,7 +17,7 @@
 //     the bundle carries, which is what keeps this reader independent
 //     of the Unity version, so a bundle without one is refused;
 //   - every texture format but the seven a mod's PNG import lands on
-//     (Alpha8, RGB24, RGBA32, ARGB32, DXT1, DXT5, and - DFMOD1 - BC7).
+//     (Alpha8, RGB24, RGBA32, ARGB32, DXT1, DXT5, and - BC7).
 //
 // Nothing here touches the DOM. It runs in node under the pins and in
 // the browser under the data door.
@@ -25,8 +25,8 @@
 import { lz4BlockDecompress } from '../lz4.js';
 import { dxtDecode } from '../dxt.js';
 import { bc7Decode } from '../bc7.js';
-import { unpackUnityCrunch } from '../crunch.js';   // DWHD1: Diverse Weapons HD's handhelds are crunched
-import { resampleRgba } from '../resample.js';   // DFMOD2: a picture past the detail with no smaller mip   // DFMOD1: DREAM's paperdoll ships its sprites as BC7
+import { unpackUnityCrunch } from '../crunch.js';   // Diverse Weapons HD's handhelds are crunched
+import { resampleRgba } from '../resample.js';   // a picture past the detail with no smaller mip   // DREAM's paperdoll ships its sprites as BC7
 
 // ---- binary reader ---------------------------------------------------
 
@@ -79,7 +79,7 @@ const COMPRESSION = Object.freeze({ NONE: 0, LZMA: 1, LZ4: 2, LZ4HC: 3 });
 function decompress(src, uncompressedSize, flags) {
   const mode = flags & COMPRESSION_MASK;
   if (mode === COMPRESSION.NONE) {
-    // AUDIT 68 S12-bundle-stored-block-short: a truncated stored block is
+    // A truncated stored block is
     // corrupt, as a short LZ4 block is - never a zero-filled tail
     if (src.length < uncompressedSize) throw new Error(`unity bundle: stored block holds ${src.length} of ${uncompressedSize} bytes`);
     return src.subarray(0, uncompressedSize);
@@ -105,7 +105,7 @@ export function usesNewArchiveFlags([a, b, c]) {
   return true;
 }
 
-/** DFMOD2: the bundle as a random-access BYTE SOURCE - `{ size, slice(start, end) -> Uint8Array }`. A Uint8Array
+/** The bundle as a random-access BYTE SOURCE - `{ size, slice(start, end) -> Uint8Array }`. A Uint8Array
  *  is its own; a multi-gigabyte `.dfmod` (DREAM's full set) is a Blob read by range in the worker
  *  (unityBundleWorker.js blobSource), because the whole file as one ArrayBuffer is past what a tab can hold. */
 export function byteSource(bytes) {
@@ -139,7 +139,7 @@ export function readUnityFs(bytes) {
   if (version >= 7 || (engine[0] === 2019 && (engine[1] > 4 || (engine[1] === 4 && engine[2] >= 15)))) r.align(16);
   const start = r.pos;
   let infoBytes;
-  let pos = start;   // DFMOD2: an absolute position in the source from here on
+  let pos = start;   // an absolute position in the source from here on
   if (flags & BLOCKS_INFO_AT_END) {
     infoBytes = src.slice(src.size - compressedInfoSize, src.size);
   } else {
@@ -161,7 +161,7 @@ export function readUnityFs(bytes) {
   }
   if (newFlags && (flags & BLOCK_INFO_NEED_PADDING)) pos = (pos + 15) & ~15;
   if (flags & BLOCKS_INFO_AT_END) pos = start;
-  // DW1: THE BLOCKS STAY COMPRESSED. This used to decompress every
+  // THE BLOCKS STAY COMPRESSED. This used to decompress every
   // block into one stream the directory indexed - which is the whole
   // bundle in memory, and for a bundle that is 58 MB of LZ4 around
   // 1.69 GB of pixels (Diverse Weapons: 12,934 textures inline in one
@@ -312,7 +312,7 @@ function readTypeTreeBlob(r, version) {
  *  version keeps it (the reference readers' IsSerializedFile rule). */
 /** Whether a file's first bytes are a SerializedFile header whose
  *  recorded size is the file's own. `size` is the whole file's length;
- *  `head` need only be its first 48 bytes (DW1: a lazy file is not
+ *  `head` need only be its first 48 bytes (a lazy file is not
  *  read whole to be recognised). */
 function looksSerialized(head, size = head.length) {
   if (head.length < 20) return false;
@@ -332,7 +332,7 @@ function looksSerialized(head, size = head.length) {
  * @param {string} name the container path
  */
 export function readSerializedFile(source, name) {
-  // DW1: a Uint8Array, or a lazy `{ size, read(offset, length) }` from
+  // A Uint8Array, or a lazy `{ size, read(offset, length) }` from
   // readUnityFs. The header and the metadata are read once, whole; an
   // object's body is read when `read()` is called, and only that body.
   const src = source instanceof Uint8Array
@@ -411,12 +411,12 @@ export function readSerializedFile(source, name) {
       pathId, classId, byteStart: dataOffset + byteStart, byteSize, type,
       /** Parse the object through its type tree. */
       read: () => readObject(src.read(dataOffset + byteStart, byteSize), 0, byteSize, type?.node, littleEndian),
-      /** DFMOD2: the object's top-level fields BEFORE `stopAt`, off the front of its body only - a texture's name,
+      /** The object's top-level fields BEFORE `stopAt`, off the front of its body only - a texture's name,
        *  size and format without reading (and, inline, decompressing) its pixels. Null when the front is not enough. */
       head: (stopAt, peek = 2048) => readObjectHead(src.read(dataOffset + byteStart, Math.min(byteSize, peek)), type?.node, littleEndian, stopAt),
     });
   }
-  // CSA-A: the files a pointer's m_FileID names (1 is the first entry) - a
+  // The files a pointer's m_FileID names (1 is the first entry) - a
   // mod's prefab points into Unity's own "unity default resources" for its
   // built-in cube, sphere and plane. Read when the metadata holds them; a
   // reader that stops short (an older header) leaves the list empty.
@@ -491,7 +491,7 @@ function readValue(node, r) {
   return value;
 }
 
-/** DFMOD2: the top-level fields of an object up to (not including) `stopAt`, from a prefix of its body; null when
+/** The top-level fields of an object up to (not including) `stopAt`, from a prefix of its body; null when
  *  the prefix runs out first (the caller reads the whole object instead). */
 function readObjectHead(prefix, node, littleEndian, stopAt) {
   if (!node) throw new Error('unity bundle: object has no type tree');
@@ -517,7 +517,7 @@ function readObject(fileBytes, start, size, node, littleEndian) {
 
 // ---- the objects a mod carries ------------------------------------------
 
-export const CLASS_ID = Object.freeze({ Texture2D: 28, TextAsset: 49, AssetBundle: 142, Texture2DArray: 187 });   // GROUND1: the array DREAM's terrain ships as
+export const CLASS_ID = Object.freeze({ Texture2D: 28, TextAsset: 49, AssetBundle: 142, Texture2DArray: 187 });   // the array DREAM's terrain ships as
 
 /** Unity's TextureFormat values this reader decodes. */
 export const TEXTURE_FORMAT = Object.freeze({ Alpha8: 1, RGB24: 3, RGBA32: 4, ARGB32: 5, DXT1: 10, DXT5: 12, BC7: 25, DXT1Crunched: 28, DXT5Crunched: 29 });
@@ -540,7 +540,7 @@ export const TEXTURE_FORMAT = Object.freeze({ Alpha8: 1, RGB24: 3, RGBA32: 4, AR
  * @returns {{width:number,height:number,data:Uint8Array}}
  */
 export function decodeTexture2D(tex, resource = null, { maxSize = Infinity } = {}) {
-  // DWHD1: A CRUNCHED TEXTURE is one CRN stream carrying its own mip levels - unpacked to plain DXT blocks at the
+  // A CRUNCHED TEXTURE is one CRN stream carrying its own mip levels - unpacked to plain DXT blocks at the
   // level the detail asks for, then decoded as DXT1/DXT5 are (Diverse Weapons HD, format 29)
   if (tex.m_TextureFormat === TEXTURE_FORMAT.DXT1Crunched || tex.m_TextureFormat === TEXTURE_FORMAT.DXT5Crunched) {
     let crn = tex['image data'];
@@ -558,7 +558,7 @@ export function decodeTexture2D(tex, resource = null, { maxSize = Infinity } = {
     for (let y = 0; y < u.height; y++) flipped.set(px.subarray(y * row, (y + 1) * row), (u.height - 1 - y) * row);
     return { width: u.width, height: u.height, data: flipped };
   }
-  // DFMOD2: A SMALLER MIP WHEN THE PICTURE IS BIGGER THAN ASKED. Unity stores the mip chain after mip 0, so a
+  // A SMALLER MIP WHEN THE PICTURE IS BIGGER THAN ASKED. Unity stores the mip chain after mip 0, so a
   // 2048-pixel DREAM wall asked at 512 is mip 2 - a sixteenth of the decode and of the memory it stands in.
   const level = mipLevelFor(tex, maxSize);
   const { offset: mipOffset, size: mipSize } = mipSpan(tex, level);
@@ -621,7 +621,7 @@ export function decodeTexture2D(tex, resource = null, { maxSize = Infinity } = {
   return { width, height, data: out };
 }
 
-// ---- GROUND1: TEXTURE ARRAYS (DREAM's terrain) ---------------------------------------------------------------------
+// ---- TEXTURE ARRAYS (DREAM's terrain) ---------------------------------------------------------------------
 // A Texture2DArray names its format as a GraphicsFormat, not a TextureFormat. The ones a DFU texture mod's terrain
 // is built with, mapped to the TextureFormat decode they share (UnityEngine.Experimental.Rendering.GraphicsFormat).
 const GRAPHICS_FORMAT = Object.freeze({
@@ -686,7 +686,7 @@ export function mipSpan(tex, level) {
  * text assets by name. Textures decode lazily through `rgba()`.
  * @param {Uint8Array} bytes
  */
-/** DFMOD2: one texture decoded no larger than `maxSize` - the mip that fits, else mip 0 box-filtered down. */
+/** One texture decoded no larger than `maxSize` - the mip that fits, else mip 0 box-filtered down. */
 function decodeCapped(tex, resource, maxSize) {
   const img = decodeTexture2D(tex, resource, { maxSize });
   if (Math.max(img.width, img.height) <= maxSize) return img;
@@ -696,7 +696,7 @@ function decodeCapped(tex, resource, maxSize) {
 }
 
 /**
- * DFMOD2: `knownTextures` - the texture list a stored index already carries ([[name, width, height], ...] in object
+ * `knownTextures` - the texture list a stored index already carries ([[name, width, height], ...] in object
  * order) - lets an open skip every texture's head read and every text asset (a 330 MB inline bundle's index is
  * otherwise 200 MB of decompression). It is used only when it counts exactly the Texture2D objects the file holds;
  * anything else reads the heads as before.
@@ -720,7 +720,7 @@ export function readUnityBundle(bytes, { maxTextureSize = Infinity, knownTexture
   const textAssets = [];
   const texObjects = [];
   for (const a of assets) for (const o of a.objects) if (o.classId === CLASS_ID.Texture2D) texObjects.push(o);
-  // GROUND1: the texture arrays, by their heads (a few per mod), whichever path reads the textures
+  // The texture arrays, by their heads (a few per mod), whichever path reads the textures
   const arrays = [];
   for (const a of assets) {
     for (const o of a.objects) {
@@ -742,14 +742,14 @@ export function readUnityBundle(bytes, { maxTextureSize = Infinity, knownTexture
   for (const a of assets) {
     for (const o of a.objects) {
       if (o.classId === CLASS_ID.Texture2D) {
-        // DFMOD2: the index reads each texture's HEAD only - name, size, format, mips, settings - and stops at its
+        // The index reads each texture's HEAD only - name, size, format, mips, settings - and stops at its
         // pixels. Reading every body at open was the whole bundle decompressed before the first picture (a
         // multi-gigabyte DREAM set, minutes and the tab); the body is read when a picture is asked for
         const tex = o.head('image data') ?? o.read();
         textures.push({
           name: tex.m_Name, width: tex.m_Width, height: tex.m_Height, format: tex.m_TextureFormat,
           mipCount: tex.m_MipCount, filterMode: tex.m_TextureSettings?.m_FilterMode, wrapU: tex.m_TextureSettings?.m_WrapU,
-          // DW1: the body is READ AGAIN on decode rather than kept. `tex`
+          // The body is READ AGAIN on decode rather than kept. `tex`
           // holds the pixels inline (`image data`), and a closure over
           // it for 12,934 textures is the whole bundle in memory by
           // another road; the index above keeps the few fields it needs

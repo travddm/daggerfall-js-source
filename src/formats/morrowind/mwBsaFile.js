@@ -24,7 +24,7 @@ export function normalizeBsaPath(path) {
   return String(path).toLowerCase().replace(/\\/g, '/');
 }
 
-// MW-LOAD: THE ARCHIVE IS OPENED, NOT READ. A retail set is
+// THE ARCHIVE IS OPENED, NOT READ. A retail set is
 // three archives of 150-300 MB and the store handed each one back as a
 // whole ArrayBuffer - a structured clone of every byte, one to three
 // seconds per archive measured, before a single mesh was asked for -
@@ -47,7 +47,7 @@ export class MwBsaFile {
     this._bytes = bytes;
     this._blob = null;
     this._loaded = new Map();
-    this._loading = new Map();   // AUDIT MW-TEXTHREAD F5: the reads in flight, by key
+    this._loading = new Map();   // the reads in flight, by key
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     if (bytes.byteLength < 12) throw new Error('MwBsaFile: too small to be a BSA');
     const { dirSize, fileCount } = MwBsaFile._header(view);
@@ -67,7 +67,7 @@ export class MwBsaFile {
   }
 
   /**
-   * MW-LOAD: open an archive off a Blob - the header and the directory
+   * open an archive off a Blob - the header and the directory
    * by range, the data buffer left where it is. `size` is the blob's.
    * @param {Blob} blob
    * @returns {Promise<MwBsaFile>}
@@ -133,12 +133,12 @@ export class MwBsaFile {
     return this._entries.has(normalizeBsaPath(path));
   }
 
-  /** MW-LOAD: is this a lazily opened archive (a Blob behind it)? */
+  /** Is this a lazily opened archive (a Blob behind it)? */
   get lazy() {
     return this._blob !== null;
   }
 
-  /** MW-LOAD: are the entry's bytes in hand - always, off a whole buffer;
+  /** Are the entry's bytes in hand - always, off a whole buffer;
    *  off a Blob, once `load` has brought them in. */
   loaded(path) {
     if (this._bytes) return this._entries.has(normalizeBsaPath(path));
@@ -169,13 +169,13 @@ export class MwBsaFile {
   }
 
   /**
-   * MW-LOAD: the entry's bytes, by range off the Blob (cached, so a
+   * the entry's bytes, by range off the Blob (cached, so a
    * second load is the first's answer), or `get`'s answer off a whole
    * buffer. The one async door.
    *
-   * AUDIT MW-TEXTHREAD F5: and a load asked while the same entry's read
+   * And a load asked while the same entry's read
    * is IN FLIGHT is that read's answer. The cache above answers only
-   * once the bytes land; MW-TEXTHREAD set the build's measures running
+   * once the bytes land; the build's measures run
    * side by side, and two garments or two heads sharing a mesh or a
    * texture each missed it and read the same range twice.
    * @param {string} path
@@ -203,12 +203,12 @@ export class MwBsaFile {
     return read;
   }
 
-  /** MW-LOAD: load every path in `paths` that this archive carries. */
+  /** Load every path in `paths` that this archive carries. */
   async loadAll(paths) {
     for (const p of paths) if (this.has(p)) await this.load(p);
   }
 
-  /** MW-LOAD: drop the loaded entries (a rebuild that no longer needs them). */
+  /** Drop the loaded entries (a rebuild that no longer needs them). */
   release() {
     this._loaded.clear();
   }

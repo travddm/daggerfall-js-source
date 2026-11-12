@@ -1,4 +1,4 @@
-// MW-CLOAK1: THE CLOAK AND WHAT HANGS AROUND IT.
+// THE CLOAK AND WHAT HANGS AROUND IT.
 //
 // The cloak is one sheet hung down the back (characters/ownModels/ownClothingModels.js), fitted on the steel plate's body - and a
 // body wears whatever its owner put on it: the ebony pauldrons come 2.6 units through it as baked, a retail robe flares,
@@ -6,10 +6,10 @@
 //
 //   1. THE CLOAK OVER WHAT IT COVERS (fitCloakOver), once. Every point of the body and its clothes that stands behind
 //      the cloak's sheet - through it - eases the sheet back past it by CLOAK_CLEARANCE: the cloak round it moves back,
-//      the whole at it and less out to CLOAK_EASE_RADIUS (MW-CLOAK2: a triangle's three corners alone left a facet over
+//      the whole at it and less out to CLOAK_EASE_RADIUS (a triangle's three corners alone left a facet over
 //      each pauldron's edge), a welded seam as one, and its normals are its new shape's. It is held over a set of
-//      poses, not one (CLOAK_FIT_POSES - AUDIT MW-CLOAK: fitted at rest alone, a pauldron came through the shoulders
-//      as its arm swung back): the rest, a stride each way with both arms swung back, and (MW-CAPE-RIGID) the chest
+//      poses, not one (CLOAK_FIT_POSES: fitted at rest alone, a pauldron came through the shoulders
+//      as its arm swung back): the rest, a stride each way with both arms swung back, and the chest
 //      leant back, which swings the whole hem forward into the legs. Each pose's push is carried
 //      into the bind the cloak is skinned from (the inverse of each vertex's own skin blend in that pose, measured), so
 //      it rides the bones as the cloak does. What stands more than CLOAK_PUSH_LIMIT through it is no body's - it is
@@ -24,8 +24,8 @@
 //          sheet - the addon hangs a longsword forty degrees back, its tip a hand's breadth through a cloak's side; it
 //          hangs nearer plumb under one. Pushed back over the cloak instead it would hang thirty units off the hip.
 //
-//   3. AND IT GOES WITH THE CLOAK, every pose after (followCloak, AUDIT MW-CLOAK). The cloak rides the chest alone
-//      (MW-CAPE-RIGID: one bone, tools/bakeCloak.mjs) and gear rides its own bone, so a rest fit alone lets the hem
+//   3. AND IT GOES WITH THE CLOAK, every pose after (followCloak). The cloak rides the chest alone
+//      (one bone, tools/bakeCloak.mjs) and gear rides its own bone, so a rest fit alone lets the hem
 //      sweep through hung gear as the chest turns over the hips. Each stowed piece is tied
 //      to the points of the cloak under or over it at rest (the triangle there, and where in it), and every pose it is
 //      turned about its own bone - slung gear also slid straight off the back, a unit costing as a turn of
@@ -42,7 +42,7 @@ import { placeAtBone, placeNormalsAtBone } from './mwFirstPerson.js';
 export const CLOAK_CLEARANCE = 1;
 /** The furthest a cloak vertex is eased back - past it, what is under the cloak is not a body, and is left through. */
 export const CLOAK_PUSH_LIMIT = 10;
-/** MW-CLOAK2: how far round a point that comes through it the cloak eases back, in units - the push falls from the
+/** How far round a point that comes through it the cloak eases back, in units - the push falls from the
  *  whole at the point to nothing here, (1 - (d / r)^2)^2, so the sheet bows over a pauldron's edge rather than
  *  creasing at a triangle's. */
 export const CLOAK_EASE_RADIUS = 8;
@@ -58,12 +58,12 @@ export const SAMPLE_STEP = 1;
 /** The bone a slung holster hangs under - the spine's first above the pelvis; a hip holster is under the pelvis alone. */
 export const SLUNG_UNDER = 'bip01 spine1';
 /**
- * AUDIT MW-CLOAK: the poses fit 1 holds the cloak over - each a turn of named bones about one of their own axes over
+ * the poses fit 1 holds the cloak over - each a turn of named bones about one of their own axes over
  * their rest, degrees: an upper arm about its z swings its hand back (the left +, the right -), a thigh about its z
  * steps its leg forward (+), a calf about its z bends its knee (+), the chest about its z leans back (-). The rest
  * first; then a stride each way, its back knee bent, with both arms swung back - the arms and the legs move apart parts
  * of the cloak, so one pose holds both (and a walk's smaller step stands between the rest and the stride); then
- * (MW-CAPE-RIGID) the chest leant back 10 - the cloak rides the chest alone, so a lean swings its whole hem forward
+ *  the chest leant back 10 - the cloak rides the chest alone, so a lean swings its whole hem forward
  * about the chest, into the legs and the tassets (2.5 units through the ebony plate's, fitted without it).
  */
 export const CLOAK_FIT_POSES = Object.freeze([
@@ -72,7 +72,7 @@ export const CLOAK_FIT_POSES = Object.freeze([
   Object.freeze({ 'bip01 l thigh': ['z', 35], 'bip01 r thigh': ['z', -30], 'bip01 r calf': ['z', 45], 'bip01 l upperarm': ['z', 25], 'bip01 r upperarm': ['z', -25] }),
   Object.freeze({ 'bip01 spine2': ['z', -10] }),
 ]);
-/** AUDIT MW-CLOAK: the follow's solve - its rounds of a linear law re-taken where the last left the gear, the sweeps of
+/** The follow's solve - its rounds of a linear law re-taken where the last left the gear, the sweeps of
  *  each, a unit's slide priced as a turn of `slideCost` radians, the most it turns and slides a pose, and the cell of
  *  the gear's (x, z) one contact stands for (the gear sampled at the same spacing). */
 export const FOLLOW = Object.freeze({ rounds: 6, sweeps: 40, slideCost: 0.1, maxTurn: 25 * Math.PI / 180, maxSlide: 8, cell: 2 });
@@ -299,7 +299,7 @@ export function fitCloakOver(assembly, { isCloak, isUnder, clearance = CLOAK_CLE
             if (!cell) continue;
             const over = cell.front - (u[v + 1] - clearance);
             if (over <= 1e-4) continue;
-            // AUDIT MW-CLOAK: a point the cloak has no room left to clear is no body's - left through and named, never
+            // A point the cloak has no room left to clear is no body's - left through and named, never
             // chased (chased, its ring crept up to the limit pass after pass round a point still through it)
             let room = Infinity;
             for (let k = 0; k < 3; k++) room = Math.min(room, limit - total[rep[cloak.indices[cell.frontTri + k]]]);
@@ -355,7 +355,7 @@ export function fitCloakOver(assembly, { isCloak, isUnder, clearance = CLOAK_CLE
     deep += deepSeen.size;
     for (let v = 0; v < n; v++) if (rep[v] === v && total[v] > 0) { pushed += 1; most = Math.max(most, total[v]); }
     if (total.some((t) => t > 0)) {
-      // MW-CLOAK2: the normals its new shape has, turned as the old ones faced
+      // The normals its new shape has, turned as the old ones faced
       const normals = cloak.batch.normals ? faceAs(vertexNormals(bind, cloak.indices, rep), cloak.batch.normals) : cloak.batch.normals;
       cloak.batch = { ...cloak.batch, positions: bind, normals };
       if (assembly.pose && assembly.mats) assembly.fns.skinBatch(cloak.batch, assembly.skeleton, assembly.pose, assembly.mats, cloak.positions, cloak.normals ?? null);
@@ -519,7 +519,7 @@ export function fitStowedGear(assembly, { isCloak, isGear, clearance = CLOAK_CLE
         src[v] = r[0] + dl[0] - o[0]; src[v + 1] = r[1] + dl[1] - o[1]; src[v + 2] = r[2] + dl[2] - o[2];
       }
       p.source = src;
-      p.sourceGen = (p.sourceGen | 0) + 1;   // MWNPC1: a GPU stream laid out of the old source streams this one (mwGpuSkin.js)
+      p.sourceGen = (p.sourceGen | 0) + 1;   // a GPU stream laid out of the old source streams this one (mwGpuSkin.js)
       if (lin && p.sourceNormals) {
         const nrm = new Float32Array(p.sourceNormals.length);
         for (let v = 0; v < nrm.length; v += 3) {
@@ -541,7 +541,7 @@ export function fitStowedGear(assembly, { isCloak, isGear, clearance = CLOAK_CLE
 }
 
 /**
- * FIT 3 (AUDIT MW-CLOAK): the stowed gear GOES WITH the cloak, every pose. Ties each holster bone's pieces to the
+ * FIT 3: the stowed gear GOES WITH the cloak, every pose. Ties each holster bone's pieces to the
  * points of the cloak under or over them at rest - one a FOLLOW.cell of the gear's (x, z), the cloak's triangle there
  * and where in it, the gear's point in its bone's frame, the gap between them along the triangle's normal - and sets
  * the assembly's afterPose to keep every gap, each pose, at least min(clearance, its rest gap): the least turn about
@@ -552,7 +552,7 @@ export function fitStowedGear(assembly, { isCloak, isGear, clearance = CLOAK_CLE
 export function followCloak(assembly, { isCloak, isGear, clearance = CLOAK_CLEARANCE }) {
   const cloak = assembly.pieces.find((p) => p.kind === 'skinned' && isCloak(p));
   assembly.afterPose = null;
-  for (const p of assembly.pieces) if (p.followAt) p.followAt = null;   // MWNPC1: a placement the last follow left goes with it
+  for (const p of assembly.pieces) if (p.followAt) p.followAt = null;   // a placement the last follow left goes with it
   if (!cloak) return null;
   const rest = poseOf(assembly);
   const C = rest.place(cloak); const T = cloak.indices;
@@ -649,7 +649,7 @@ function mulInto(p, q, out) {
 
 /**
  * The follow, one pose: each group turned (and slid) the least that keeps its contacts' gaps, and re-placed.
- * MWNPC1 (met at the MW-NPC arc's merge of main, 2026-10-10): a pose the GPU skins (`cpuSkinned` false) blends no
+ * A pose the GPU skins (`cpuSkinned` false) blends no
  * piece on the CPU, so the cloak alone is skinned here for the contacts to read - its few hundred vertices, by the
  * same law the shader draws it by - and each turned piece's placement is left on it (`followAt`) for the palette
  * (mwGpuSkin.js writeSkinPalette) instead of placing its vertices no one draws.

@@ -1,4 +1,4 @@
-// MW-SPELLFX1: A MORROWIND
+// A MORROWIND
 // EFFECT MESH, RUNNING.
 //
 // Morrowind draws its magic with records that name meshes - an MGEF's casting, bolt, hit and area visuals, and
@@ -27,8 +27,8 @@
 //                          AutoTransform; the first-root texture (:524-539): the ROOT's first NiTexturingProperty is
 //                          remembered, and any other node listing that same record is marked "overrideFx"
 //   nifosg/controller.cpp  ControllerFunction::calculate (mwParticles.controllerTime); KeyframeController (:179-200 -
-//                          a missing rotation rewrites the rest rotation, a missing translation or scale writes nothing:
-//                          Morrowind-Rules.md [B]); VisController::calculate (:364-377 - upper_bound, the key at or
+//                          a missing rotation rewrites the rest rotation, a missing translation or scale writes nothing
+//                          ); VisController::calculate (:364-377 - upper_bound, the key at or
 //                          before); AlphaController (:434-464 - the "alpha" uniform, 1 with no keys); MaterialColor-
 //                          Controller (:466-540 - the target in the flags, (1,1,1) with no keys); UVController::apply
 //                          (:316-337 - scaled about the centre, then the offset, U negated); FlipController::apply
@@ -77,7 +77,7 @@ import {
 /** NiTimeController's clock terms, as controllerTime takes them (the extrapolation bits unshifted, EXTRAPOLATION). */
 export const timingOf = (c) => ({ frequency: c.frequency, phase: c.phase, startTime: c.startTime, stopTime: c.stopTime, extrapolation: c.flags & 0x6 });
 
-/** Every ACTIVE controller on a record's chain (the reference makes no other), in chain order. MW-BOW1: exported - a
+/** Every ACTIVE controller on a record's chain (the reference makes no other), in chain order. Exported - a
  *  part's own clock (formats/morrowind/mwPartClock.js) reads the same chain. */
 export function activeControllers(nif, rec) {
   const out = [];

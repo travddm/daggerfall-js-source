@@ -2,7 +2,7 @@
 // fifth classic image format the port reads, after IMG, CIF/RCI, TEXTURE
 // and GFX. One record, N frames, all the same size, RLE-packed
 // end-to-end: MRED00I0.CFA is the horse the player rides and
-// MRED01I0.CFA the cart, four frames each (TR2).
+// MRED01I0.CFA the cart, four frames each.
 //
 // The header is 14 bytes (:118-127) and the only surprising field is
 // WidthCompressed, which is what the RLE run LENGTH is measured in -

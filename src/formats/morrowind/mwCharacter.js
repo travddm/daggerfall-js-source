@@ -9,7 +9,7 @@
 
 import { deref } from './mwNifFile.js';
 import { flattenNif } from './mwNifMesh.js';
-import { particleSystemOf, affineInverse } from './mwParticles.js';   // MAC-Q: a part's particle systems, off the same walk; MWNPC9: a creature node's rest undone
+import { particleSystemOf, affineInverse } from './mwParticles.js';   // a part's particle systems, off the same walk; a creature node's rest undone
 import { skeletonSpaceMatrices, poseSkeleton, GRAPH_ROOT } from './mwSkin.js';
 
 /**
@@ -77,7 +77,7 @@ import { skeletonSpaceMatrices, poseSkeleton, GRAPH_ROOT } from './mwSkin.js';
  *   world = boneMatrix * (translate(offset) * mirror(v))
  *
  * Absent from the reverted arc entirely, and absent from this port until
- * MW-D13 - which means every rigid part whose mesh carries the node has
+ * which means every rigid part whose mesh carries the node has
  * been drawn at the bone's bare origin.
  *
  * @returns {{rec: any, parents: any[]}|null}
@@ -113,7 +113,7 @@ export function findNodeByName(nif, name) {
     // down here so the next reader corrects it deliberately instead of
     // rediscovering it as fidelity.
     if (rec.type === 'NiTriShape' || rec.type === 'NiTriStrips') return;
-    // MW-D49: THE ONE CUT THE LOADER ACTUALLY MAKES. FindByNameVisitor
+    // THE ONE CUT THE LOADER ACTUALLY MAKES. FindByNameVisitor
     // is an osg::NodeVisitor (visitor.cpp:36-48) walking the BUILT
     // SCENE, so the only nodes it cannot answer with are the ones
     // handleNode never built - and handleNode drops exactly one
@@ -127,9 +127,8 @@ export function findNodeByName(nif, name) {
     // that the reference would not have answered with is a part in the
     // wrong place.
     if (!isRoot && String(rec.name || '').toLowerCase() === 'bounding box') return;
-    // AND NOTHING ELSE IS CUT. Corrected at ROAD review-p: MW-D49
-    // landed two filters MORE than the reference has, and a filter too
-    // many is the same defect as a filter too few, pointing the other
+    // AND NOTHING ELSE IS CUT. A filter the reference does not
+    // have is the same defect as a filter too few, pointing the other
     // way. A RootCollisionNode is KEPT - "Hide collision shapes, but
     // don't skip the subgraph" (nifloader.cpp:806-812): the node is
     // created, added to its parent, and merely given
@@ -144,7 +143,7 @@ export function findNodeByName(nif, name) {
     // every rigid part whose BoneOffset is hidden or sits under
     // collision: no offset found, no PositionAttitudeTransform, the
     // part back at the bone's bare origin - which is exactly what
-    // MW-D44 was landed to fix. flattenNif's identical early returns
+    // the search has to find. flattenNif's identical early returns
     // are NOT this rule: they are justified there by "this flattener
     // produces DRAWABLES, and a hidden subgraph contributes none"
     // (mwNifMesh.js:"RULE 58 (2): RootCollisionNode"), and carry an `includeHidden` escape
@@ -175,7 +174,7 @@ export function boneOffsetOf(nif) {
 }
 
 /**
- * MW-D16: THE ACCUMULATED transform of a named node INSIDE a mesh,
+ * THE ACCUMULATED transform of a named node INSIDE a mesh,
  * root-first, which is what `getInstance(model, parent)` means when the
  * parent is a node several levels down someone else's file.
  *
@@ -223,14 +222,14 @@ const mulAffine = (p, l) => {
 };
 
 export function bindPart(skeleton, partNif, opts = {}) {
-  // MAC-Q: the file's PARTICLE SYSTEMS come out of the same walk, into
+  // The file's PARTICLE SYSTEMS come out of the same walk, into
   // their own list - a flame is not a batch and a batch is not a flame.
   const sink = [];
-  const batches = flattenNif(partNif, { underNode: opts.underNode, excludeNode: opts.excludeNode, effects: sink });   // WS1
+  const batches = flattenNif(partNif, { underNode: opts.underNode, excludeNode: opts.excludeNode, effects: sink });
   const effects = [];
   for (const bundle of sink) {
     const d = particleSystemOf(partNif, bundle);
-    if (d) effects.push(Object.assign(d, { parentRef: bundle.parentRef ?? -1 }));   // MWNPC9: the node it hangs under
+    if (d) effects.push(Object.assign(d, { parentRef: bundle.parentRef ?? -1 }));   // the node it hangs under
   }
   const skinned = [];
   const attached = [];
@@ -257,7 +256,7 @@ export function bindPart(skeleton, partNif, opts = {}) {
       }
       return { ...bone, ref };
     });
-    // MW-D20: A REBOUND PART LIVES IN GRAPH SPACE, FULL STOP. The port
+    // A REBOUND PART LIVES IN GRAPH SPACE, FULL STOP. The port
     // used to resolve the part's declared skin-root NAME into the base
     // skeleton and make matrices relative to whatever node answered -
     // an invention the reference has no counterpart for. In OpenMW the
@@ -291,12 +290,12 @@ export function bindPart(skeleton, partNif, opts = {}) {
   return { skinned, attached, attachRef, boneOffset, missingBones: [...missingBones], effects };
 }
 
-/** MWNPC9: the debug shapes a creature's model carries ("Tri Bip01 ..."), which OpenMW strips from a creature's
+/** The debug shapes a creature's model carries ("Tri Bip01 ..."), which OpenMW strips from a creature's
  *  object root before it draws (animation.cpp setObjectRoot - RemoveTriBipVisitor, for a creature alone). */
 export const isTriBip = (name) => String(name || '').toLowerCase().startsWith('tri bip');
 
 /**
- * MWNPC9: A CREATURE'S MODEL, BOUND TO ITS OWN SKELETON. A
+ * A CREATURE'S MODEL, BOUND TO ITS OWN SKELETON. A
  * creature is not dressed: its model IS the object root (setObjectRoot), its skeleton is built from the same file, and
  * each of its shapes is drawn where the file puts it - the skinned ones by their bones (bindPart's rebind, rule 12),
  * and every RIGID one riding the node it hangs under, as the reference's scene graph carries it. A Morrowind skeleton

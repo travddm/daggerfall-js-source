@@ -1,4 +1,4 @@
-// WD1: A CLASSIC BLOCK IN DFU'S WORLD-DATA JSON, AND THE
+// A CLASSIC BLOCK IN DFU'S WORLD-DATA JSON, AND THE
 // DIFF THAT CARRIES A MOD'S EDIT OF IT.
 //
 // Mods such as Warm Ashes - Ships ship their world
@@ -123,7 +123,7 @@ function rmbJson(rmb) {
       GroundData: groundDataJson(h.groundData),
       AutoMapData: h.autoMapData ? [...h.autoMapData] : null,
       Name: h.name ?? null,
-      OtherNames: h.otherNames ? [...h.otherNames] : null,   // a block served from JSON carries the file's own, or none (worldDataReplacement.blockFromJson, WD3)
+      OtherNames: h.otherNames ? [...h.otherNames] : null,   // a block served from JSON carries the file's own, or none (worldDataReplacement.blockFromJson)
     },
     SubRecords: rmb.subRecords.map(rmbSubRecordJson),
     Misc3dObjectRecords: rmb.misc3dObjectRecords.map(modelJson),
@@ -184,7 +184,7 @@ export function blockToDfuJson(dfBlock) {
   };
 }
 
-// ---- WD3: a classic LOCATION in the same shape ----
+// ---- a classic LOCATION in the same shape ----
 //
 // Beautiful Villages and Beautiful Cities (carademono) ship `location-<r>-<i>.json`: DFLocation as DFU's World
 // Data Editor writes it - the MAPS.BSA record the editor read, with the author's layout in it. Most of each file is
@@ -389,7 +389,7 @@ function diffArrayLcs(a, b, ka, kb, path, ops, memo) {
   }
 }
 
-/** WD-OWNED (WD-COPY): THE JSON ROUND TRIP'S OWN COPY, WALKED. A pack's block file is laid on a copy of its classic
+/** THE JSON ROUND TRIP'S OWN COPY, WALKED. A pack's block file is laid on a copy of its classic
  *  block's JSON (~135 KB: it is kept for the next file), and the round trip was 63% of a block's build at the boot -
  *  the walk is ~4x its speed over the packs' bases. It writes what the round trip writes: a number JSON cannot write
  *  null and -0 as 0, an undefined (a function, a symbol) dropped from an object and null in an array; anything it
@@ -439,7 +439,7 @@ const clone = (v) => {
 /** Apply ops (diffJson's) to a deep copy of `base`. `resolve(ref)`
  *  answers a copy op's source - `{ block, path }`, a node of a classic
  *  block's JSON (the patch never carries what it can point at).
- *  WD-OWNED: `owned` - the base is the caller's
+ *  `owned` - the base is the caller's
  *  own, a plain JSON tree made for this patch and held nowhere else - is laid on in place: its copy would be itself
  *  (a JSON round trip changes no plain tree), and a pack's 7,727 town files each copied one at the boot. */
 export function patchJson(base, ops, resolve = null, { owned = false } = {}) {

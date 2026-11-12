@@ -147,7 +147,7 @@ export class BsaFile {
   }
 
   /**
-   * REGION-VIEWS: record data as a view into the
+   * record data as a view into the
    * archive's own bytes - nothing copied - or null if index invalid. For a reader that only ever reads a record (the
    * archive's bytes are held whole for its life): getRecordBytes' copy is DFU's ReadBytes, and the one a reader that
    * edits a record in place (a block's automap, BlocksFile.getBlockAutoMap) is owed.
