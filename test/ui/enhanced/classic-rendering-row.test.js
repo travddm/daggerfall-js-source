@@ -57,6 +57,7 @@ test('the Classic rendering row turns on the classic picture through the real st
   globalThis.location = { search: '' };
   try {
     const landViewBefore = rowValue('land-view-distance');
+    const outdoorsBefore = rowValue('enhanced-environments');
     const first = drawRow();
     assert.equal(first.off.attrs['aria-pressed'], 'true', 'off on a fresh shelf');
     press(first.on);
@@ -65,12 +66,19 @@ test('the Classic rendering row turns on the classic picture through the real st
     assert.equal(getString('Video', 'RetroModeAspectCorrection'), '1');
     assert.equal(getPref('groundSharpness'), 'off');
     assert.equal(rowValue('land-view-distance'), 'Classic (3)', 'land view went through its own door');
+    assert.equal(getPref('enhancedLighting'), false, 'the flat classic light');
+    assert.equal(getPref('enhancedEnvironments'), false, 'the painted sky');
+    assert.equal(getString('Video', 'FieldOfView'), '60');
     assert.equal(drawRow().on.attrs['aria-pressed'], 'true', 'a redrawn row reads On');
     press(drawRow().off);
     assert.equal(retroFrameConfig(), null, 'the retro picture is off again');
     assert.equal(getString('Video', 'RetroModeAspectCorrection'), '0');
     assert.equal(getPref('groundSharpness'), 'default');
     assert.equal(rowValue('land-view-distance'), landViewBefore);
+    assert.equal(getPref('enhancedLighting'), true);
+    assert.equal(getPref('enhancedEnvironments'), true);
+    assert.equal(rowValue('enhanced-environments'), outdoorsBefore, 'the same sky as before');
+    assert.equal(getString('Video', 'FieldOfView'), '65');
     assert.equal(getPref('classicRenderingSaved'), null);
   } finally {
     delete globalThis.document;

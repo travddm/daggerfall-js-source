@@ -37,12 +37,18 @@ function storesDoors(stores: Stores): ClassicRenderingDoors {
 
 function playerStores(): Stores {
   return {
-    rows: { 'land-view-distance': 5, 'ground-sharpness': 'max' },
+    rows: {
+      'land-view-distance': 5,
+      'ground-sharpness': 'max',
+      'enhanced-lighting': true,
+      'enhanced-environments': 'dome',
+    },
     video: {
       'Video/RetroRenderingMode': '0',
       'Video/RetroModeAspectCorrection': '2',
       'Video/PostProcessingInRetroMode': '1',
       'Video/UseMipMapsInRetroMode': 'True',
+      'Video/FieldOfView': '90',
     },
     locked: new Set(),
     saved: null,
