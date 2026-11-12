@@ -8,10 +8,6 @@ export type ProfileValue = boolean | number | string;
 export type OfflineValue = ProfileValue | { readonly setting: string };
 
 export type ProfileKey = {
-  /** The online census rows the key covers (dfu-gaps-audit/slice-online.md). */
-  readonly census: readonly string[];
-  /** The feature or mod the departure belongs to. */
-  readonly feature: string;
   readonly type: 'bool' | 'int' | 'number' | 'enum' | 'string';
   readonly values?: readonly string[];
   readonly min?: number;
@@ -33,8 +29,6 @@ export const PROFILE_KEYS = Object.freeze({
   // Whether a smith mends enchanted gear: every player meets the same counter, so the room holds one answer. DFU ships
   // False (defaults.ini AllowMagicRepairs).
   'repair.allowMagic': Object.freeze({
-    census: Object.freeze(['ON60'] as const),
-    feature: 'DISC22-A',
     type: 'bool',
     dfu: false,
     online: true,
@@ -47,8 +41,6 @@ export const PROFILE_KEYS = Object.freeze({
   // answer. DFU ships True (defaults.ini EnhancedCombatAI); online plays DFU's value (characters/enemy/
   // enhanced-combat-ai.ts).
   'combat.enhancedAI': Object.freeze({
-    census: Object.freeze(['ON64'] as const),
-    feature: 'DFU-ECAI',
     type: 'bool',
     dfu: true,
     online: true,
@@ -61,8 +53,6 @@ export const PROFILE_KEYS = Object.freeze({
   // off. DFU has no parties and no mentor mode, and single player has no party, so `dfu` and `offline` are false: no
   // switch, as in DFU.
   'party.allowNoMentoring': Object.freeze({
-    census: Object.freeze(['ON67'] as const),
-    feature: 'NO-MENTORING',
     type: 'bool',
     dfu: false,
     online: true,
@@ -75,8 +65,6 @@ export const PROFILE_KEYS = Object.freeze({
   // for goods, and Mercantile and Personality move a sale at full weight (FormulaHelper.CalculateTradePrice). Buying
   // back a counter's own piece for profit stays shut by the counter-paid mark, which this key does not touch.
   'trade.saleCap': Object.freeze({
-    census: Object.freeze(['ON2'] as const),
-    feature: 'REALM-P0.4',
     type: 'bool',
     dfu: false,
     online: false,
@@ -87,8 +75,6 @@ export const PROFILE_KEYS = Object.freeze({
   // Whether the haggle reads Mercantile and Personality inside 0 to 100 online. DFU reads them unbounded, so a skill
   // raised past 100 by enchantments drives a price under nothing (FormulaHelper.CalculateTradePrice).
   'trade.haggleRange': Object.freeze({
-    census: Object.freeze(['ON3'] as const),
-    feature: 'MERC-CAP',
     type: 'bool',
     dfu: false,
     online: true,
@@ -100,8 +86,6 @@ export const PROFILE_KEYS = Object.freeze({
   // (LootTables.GenerateLoot); 'flat' divides it back to level 1's (loot.js unlevelPileGold), so the hourly respawn
   // does not pay a high level's gold again.
   'loot.pileGold': Object.freeze({
-    census: Object.freeze(['ON16'] as const),
-    feature: 'REALM-P0.4',
     type: 'enum',
     values: Object.freeze(['dfu', 'flat'] as const),
     dfu: 'dfu',
@@ -115,8 +99,6 @@ export const PROFILE_KEYS = Object.freeze({
   // True is the rest act (systems/rest/restAct.js): only at a fire or a bed, one 8-hour night at most every 2 hours of
   // the character's time, a short rest between, and either ends with health, fatigue and magicka full.
   'rest.fireOnly': Object.freeze({
-    census: Object.freeze(['ON26'] as const),
-    feature: 'REST1',
     type: 'bool',
     dfu: false,
     online: false,
@@ -127,8 +109,6 @@ export const PROFILE_KEYS = Object.freeze({
   // Whether a guild review online promotes at once while the Roll paces the reputation. DFU waits 28 days between rank
   // changes (Guild.cs UpdateRank); online the days are the character's own (systems/guild/guild-rank-rule.ts).
   'guild.promoteNow': Object.freeze({
-    census: Object.freeze(['ON35'] as const),
-    feature: 'PROMO-NOW',
     type: 'bool',
     dfu: false,
     online: false,
@@ -140,8 +120,6 @@ export const PROFILE_KEYS = Object.freeze({
   // and 9 are earned by reputation and skill as the others are, and their services follow the rank (Guild.cs
   // CalculateNewRank; MagesGuild.cs CanAccessService).
   'guild.seatRanks': Object.freeze({
-    census: Object.freeze(['ON35'] as const),
-    feature: 'CHAP4b',
     type: 'bool',
     dfu: false,
     online: false,
@@ -153,8 +131,6 @@ export const PROFILE_KEYS = Object.freeze({
   // faction's allies and enemies (Quest.cs EndQuest). The cost was waived when deadlines ran on the character's clock in
   // travel and rest; a deadline now charges only the time lived.
   'quest.failureFree': Object.freeze({
-    census: Object.freeze(['ON32'] as const),
-    feature: 'QFAIL-FREE',
     type: 'bool',
     dfu: false,
     online: false,
@@ -166,8 +142,6 @@ export const PROFILE_KEYS = Object.freeze({
   // (PlayerActivate.cs ActivateLootContainer); shared, the first opener's roll is the room's list and its endless rows
   // never sell out or sell back (systems/shop-shelf-rule.ts).
   'shop.sharedShelf': Object.freeze({
-    census: Object.freeze(['ON1', 'ON5', 'ON6'] as const),
-    feature: 'WORLD6a',
     type: 'bool',
     dfu: false,
     online: false,
@@ -178,8 +152,6 @@ export const PROFILE_KEYS = Object.freeze({
   // Whether the sky runs on a clock of its own online (net/skyLaw.js, TimeScale 24 beside the event clock's 12). DFU has
   // one clock: the hour, the date, the season and the moons a player sees are the world's own.
   'time.skyClock': Object.freeze({
-    census: Object.freeze(['ON31'] as const),
-    feature: 'TIME1',
     type: 'bool',
     dfu: false,
     online: false,
@@ -193,8 +165,6 @@ export const PROFILE_KEYS = Object.freeze({
   // with players moves the world's date at once; set it before play. The relay, the account Worker and every client read
   // it. The Hunters' Mark days, the sea season, the court's round, the camp window and the Starfall's nights follow it.
   'time.worldScale': Object.freeze({
-    census: Object.freeze(['ON31'] as const),
-    feature: 'TIME1',
     type: 'int',
     min: 1,
     max: 100,
@@ -208,8 +178,6 @@ export const PROFILE_KEYS = Object.freeze({
   // world's 12; the sky clock this key sets is the port's own faster sky, which runs at 24 (a day every real hour)
   // unless a profile writes another. The sky's midnights fall on the hour UTC only at 24 (net/skyLaw.js).
   'time.skyScale': Object.freeze({
-    census: Object.freeze(['ON31'] as const),
-    feature: 'TIME1',
     type: 'int',
     min: 1,
     max: 100,

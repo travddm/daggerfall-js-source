@@ -14,11 +14,9 @@ import { OFFICIAL_PROFILE } from '../../../src/net/profile/officialProfile.ts';
 
 const rows = Object.entries(PROFILE_KEYS) as [string, ProfileKey][];
 
-test('P0 THE REGISTRY: every key names its census rows, its feature, who reads it and its words, and its DFU and online values fit its own type (mutants: a key without dfu; an online value of the wrong type)', () => {
+test('P0 THE REGISTRY: every key names who reads it and its words, and its DFU and online values fit its own type (mutants: a key without dfu; an online value of the wrong type)', () => {
   assert.ok(rows.length >= 1);
   for (const [name, key] of rows) {
-    assert.ok(key.census.length && key.census.every((c) => /^ON\d+$/.test(c)), `${name}: census rows`);
-    assert.ok(key.feature, `${name}: feature`);
     assert.ok(key.checkedBy.includes('client'), `${name}: the client reads every key`);
     assert.ok(key.words.startsWith('profile.'), `${name}: an l10n key`);
     assert.ok(validProfileValue(key, key.dfu), `${name}: dfu fits its type`);
@@ -66,6 +64,16 @@ test('P0 A PROFILE READ AGAINST THE REGISTRY: another schema, an unknown key and
   assert.deepEqual(profileRuleErrors(null), ['not a profile']);
 });
 
+// Object.freeze hides an entry's extra fields from the compiler, so this is the guard that keeps tag fields out.
+test('P0 REGISTRY FIELDS: a key holds only the fields of ProfileKey (mutant: a census or feature tag on a key)', () => {
+  const allowed = new Set(['type', 'values', 'min', 'max', 'dfu', 'online', 'offline', 'checkedBy', 'words', 'setting']);
+  for (const [name, key] of rows) {
+    for (const field of Object.keys(key)) {
+      assert.ok(allowed.has(field), `${name}: unknown field ${field}`);
+    }
+  }
+});
+
 test('P0 RESOLVED RULES: a written value wins, every other key reads its online default', () => {
   assert.equal(resolveRules({})['repair.allowMagic'], true);
   assert.equal(resolveRules({ 'repair.allowMagic': false })['repair.allowMagic'], false);
@@ -74,8 +82,6 @@ test('P0 RESOLVED RULES: a written value wins, every other key reads its online 
 
 test('P0 TYPES AND BOUNDS: an int, a number, an enum and a string are each held to their own law', () => {
   const base = {
-    census: ['ON0'],
-    feature: 'T',
     dfu: 0,
     online: 0,
     offline: 0,
