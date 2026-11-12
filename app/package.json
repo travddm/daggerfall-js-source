@@ -5,11 +5,11 @@
   "license": "MIT",
   "version": "0.1.0",
   "description": "DFO Online - the downloadable desktop shell. Loads the same dist/ the website deploys; adds ARENA2-from-disk and file-backed saves.",
-  "author": "Lattymoy",
-  "homepage": "https://daggerfalljs.dev/",
+  "author": "DFO Online",
+  "homepage": "https://github.com/travddm/daggerfall-js-source",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Lattymoy/daggerfall-js-source.git"
+    "url": "https://github.com/travddm/daggerfall-js-source.git"
   },
   "main": "main.cjs",
   "scripts": {
@@ -22,7 +22,7 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "dev.daggerfalljs.app",
+    "appId": "io.github.travddm.daggerfalljs",
     "productName": "DFO Online",
     "icon": "../public/icons/icon-512.png",
     "afterPack": "./afterPack.cjs",
@@ -33,7 +33,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "Lattymoy",
+        "owner": "travddm",
         "repo": "daggerfall-js-source"
       }
     ],

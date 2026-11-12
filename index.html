@@ -85,7 +85,8 @@
       background: rgba(10,12,17,0.55); border: 2px solid #7d7460;
       text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
     }
-    .plaque:hover, .plaque:focus-visible { outline: none; color: rgb(243,239,44); border-color: var(--brass); text-shadow: 2px 2px 0 rgb(93,77,12); }
+    .plaque[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+    .plaque:not([aria-disabled="true"]):hover, .plaque:focus-visible { outline: none; color: rgb(243,239,44); border-color: var(--brass); text-shadow: 2px 2px 0 rgb(93,77,12); }
     /* The door's three: Play into the browser, Install onto the desk,
        Discord for the people - the same plaque, side by side, wrapping
        to a stack on a phone.
@@ -211,7 +212,7 @@
     <div class="doorplaques">
       <a class="plaque" href="./play/">Play</a>
       <a class="plaque" href="#desktop">Install</a>
-      <a class="plaque" href="https://discord.gg/jM2JdwSM8w" rel="noopener">Discord</a>
+      <span class="plaque" aria-disabled="true" data-invite="">Discord</span>
     </div>
     <nav class="doorlinks caps" aria-label="Sections">
       <a href="#what">What it is</a>
@@ -221,11 +222,11 @@
     </nav>
     <div class="foot">
       <span class="l">
-        <a class="build" data-build="" href="https://github.com/Lattymoy/daggerfall-js-source/commit/"></a>
+        <a class="build" data-build="" href="https://github.com/travddm/daggerfall-js-source/commit/"></a>
         <span class="stat" data-stat="tests"></span>
       </span>
       <span class="c"><span class="stat" data-stat="lines"></span></span>
-      <span class="r"><a href="https://github.com/Lattymoy/daggerfall-js-source">Source</a></span>
+      <span class="r"><a href="https://github.com/travddm/daggerfall-js-source">Source</a></span>
     </div>
   </header>
 
@@ -244,7 +245,7 @@
         </div>
         <div>
           <h3>In progress</h3>
-          <p>Not finished. You cannot import classic or Daggerfall Unity saves yet, and there is no mod support. The <a href="https://github.com/Lattymoy/daggerfall-js-source/blob/main/bible/01-Overview/Port-Ledger.md">ledger</a> tracks the rest.</p>
+          <p>Not finished. You cannot import classic or Daggerfall Unity saves yet, and there is no mod support. The ledger tracks the rest.</p>
         </div>
       </div>
     </section>
@@ -284,11 +285,11 @@
 
         <div><dt id="desktop">The desktop app</dt>
           <dd>Optional. Saves become real files you can back up, it finds your Daggerfall install and reads ARENA2 straight from disk, and it works offline. The game updates itself before you play on every one, downloading only the files that changed; when the app itself changes, the Windows installer and the Linux AppImage update themselves, and the portable exe and the Mac tell you a new version is out.
-          <span class="dl"><a href="https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-setup.exe">Windows</a><a href="https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-mac-arm64.dmg">macOS</a><a href="https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-linux-x86_64.AppImage">Linux</a></span>
-          <span class="meta">On Windows the <code>-setup</code> file installs where you choose; the <code>-portable</code> one runs from wherever you put it (<a href="https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-portable.exe">get it here</a>). The app is not code-signed yet, so the first launch warns: on Windows choose More info, then Run anyway; on a Mac open it once, then choose Open Anyway under System Settings, Privacy &amp; Security. The Mac build is for Apple silicon. On Linux, make the AppImage executable. <a href="https://github.com/Lattymoy/daggerfall-js-source/releases/latest">Every file</a>, or <a href="https://github.com/Lattymoy/daggerfall-js-source/blob/main/bible/01-Overview/Desktop-App.md">build it from source</a>.</span></dd></div>
+          <span class="dl"><a href="https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-setup.exe">Windows</a><a href="https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-mac-arm64.dmg">macOS</a><a href="https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-linux-x86_64.AppImage">Linux</a></span>
+          <span class="meta">On Windows the <code>-setup</code> file installs where you choose; the <code>-portable</code> one runs from wherever you put it (<a href="https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-portable.exe">get it here</a>). The app is not code-signed yet, so the first launch warns: on Windows choose More info, then Run anyway; on a Mac open it once, then choose Open Anyway under System Settings, Privacy &amp; Security. The Mac build is for Apple silicon. On Linux, make the AppImage executable. <a href="https://github.com/travddm/daggerfall-js-source/releases/latest">Every file</a>, or <a href="https://github.com/travddm/daggerfall-js-source/blob/main/docs/operations/desktop-release.md">build it from source</a>.</span></dd></div>
 
         <div><dt>If it breaks</dt>
-          <dd>Reload first. If it is still broken, file it on the <a href="https://github.com/Lattymoy/daggerfall-js-source/issues">issue tracker</a> and say what you did.</dd></div>
+          <dd>Reload first. If it is still broken, write down what you did before it broke.</dd></div>
       </dl>
     </section>
 
@@ -323,14 +324,14 @@
           <dd>The format documentation the readers were checked against.</dd></div>
 
         <div><dt><a href="https://github.com/Lattymoy">Lattymoy</a></dt>
-          <dd>Built DFO Online. Source, docs and the ledger are on <a href="https://github.com/Lattymoy/daggerfall-js-source">GitHub</a>.<span class="meta">Set in Jacquard 12 and Pixelify Sans from Google Fonts.</span></dd></div>
+          <dd>Built DFO Online. Source, docs and the ledger are on <a href="https://github.com/travddm/daggerfall-js-source">GitHub</a>.<span class="meta">Set in Jacquard 12 and Pixelify Sans from Google Fonts.</span></dd></div>
       </dl>
     </section>
 
     <footer class="end">
       <span>DFO Online</span>
-      <a class="build" data-build="" href="https://github.com/Lattymoy/daggerfall-js-source/commit/"></a>
-      <a href="https://github.com/Lattymoy/daggerfall-js-source">Source</a>
+      <a class="build" data-build="" href="https://github.com/travddm/daggerfall-js-source/commit/"></a>
+      <a href="https://github.com/travddm/daggerfall-js-source">Source</a>
       <a href="./terms/">Terms</a>
       <a href="./privacy/">Privacy</a>
     </footer>
