@@ -1,17 +1,19 @@
-// The world's texture filter, Daggerfall Unity's Video/MainFilterMode: Point (0, the default), Bilinear (1) or
-// Trilinear (2). DFU's MaterialReader puts it on every model, flat and terrain texture, and its weapon and spell-hand
-// sprites take it too. UI art, the sky, smoothed pictures and data textures keep their own filters.
+// The world's texture filter, Daggerfall Unity's Video/MainFilterMode: Point (0, DFU's default), Bilinear (1),
+// Trilinear (2), and the port's Sharp (3, render/sharp-texels.ts), the port's default and a departure from DFU. DFU's
+// MaterialReader puts the filter on every model, flat and terrain texture, and its weapon and spell-hand sprites take it
+// too. UI art, the sky, smoothed pictures and data textures keep their own filters.
 //
 // A texture keeps the filter it was given at upload. A changed setting reaches every cached world texture on the next
 // frame (render/live-world-sampling.ts), and a host that asks for a cached texture again re-filters it too.
 import { getString } from '../systems/settings/settings.js';
+import { SHARP } from './sharp-texels.ts';
 
 export const POINT = 0;
 export const BILINEAR = 1;
 export const TRILINEAR = 2;
 
-/** DFU draws the first-person weapon and spell hands this much larger off Point (FPSWeapon and its spell-casting class), so the
- *  filtered edge texels fall off screen. */
+/** DFU draws the first-person weapon and spell hands this much larger off Point (FPSWeapon and its spell-casting
+ *  class), so the filtered edge texels fall off screen. */
 export const NON_POINT_SPRITE_SCALE = 1.01;
 
 /** The filter constants a WebGL2 context answers. */
@@ -31,14 +33,24 @@ export function parseWorldFilterMode(stored: string | null | undefined): number 
   return mode === BILINEAR || mode === TRILINEAR ? mode : POINT;
 }
 
+/** Video/MainFilterMode as stored: DFU's three, or Sharp; anything else Point. The video and compass keys have DFU's
+ *  three alone (parseWorldFilterMode). */
+export function parseMainFilterMode(stored: string | null | undefined): number {
+  return Number.parseInt(String(stored ?? ''), 10) === SHARP ? SHARP : parseWorldFilterMode(stored);
+}
+
 /** The player's choice, read when it is needed. */
 export function worldFilterMode(): number {
-  return parseWorldFilterMode(getString('Video', 'MainFilterMode'));
+  return parseMainFilterMode(getString('Video', 'MainFilterMode'));
 }
 
 /** Unity's three modes on a texture with or without mip maps. Bilinear blends within a mip level and picks the nearest
- *  level; Trilinear also blends between levels. */
+ *  level; Trilinear also blends between levels. Sharp samples a mip-mapped texture trilinear (its shaders keep the
+ *  texels square); a sprite without mip maps (the weapon, the spell hands) is drawn by a screen quad no Sharp shader
+ *  reaches, so it stays nearest. */
 export function worldFilterFor(gl: FilterGl, mode: number, mips: boolean): WorldFilter {
+  if (mode === SHARP)
+    return mips ? { min: gl.LINEAR_MIPMAP_LINEAR, mag: gl.LINEAR } : { min: gl.NEAREST, mag: gl.NEAREST };
   if (mode === TRILINEAR) return { min: mips ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR, mag: gl.LINEAR };
   if (mode === BILINEAR) return { min: mips ? gl.LINEAR_MIPMAP_NEAREST : gl.LINEAR, mag: gl.LINEAR };
   return { min: mips ? gl.NEAREST_MIPMAP_NEAREST : gl.NEAREST, mag: gl.NEAREST };
@@ -114,7 +126,8 @@ function setWorldSampling(gl: TextureGl, state: WorldTextureState, now: { mode: 
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter.min);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter.mag);
   const { ext } = anisotropyExtension(gl);
-  if (ext) gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, now.aniso);
+  // a texture without mip maps takes none: under Sharp it is a nearest sprite, which anisotropy would smear on ANGLE
+  if (ext) gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, state.mips ? now.aniso : 1);
   state.mode = now.mode;
   state.aniso = now.aniso;
 }
@@ -171,7 +184,8 @@ export function samplerFilterWord(mode: number): 'nearest' | 'linear' {
   return mode === POINT ? 'nearest' : 'linear';
 }
 
-/** DFU's sprite scale for the current mode: 1 under Point, 1.01 otherwise. */
+/** DFU's sprite scale for the current mode: 1 under Point and Sharp (both draw the sprites nearest), 1.01 otherwise. */
 export function spriteFilterScale(): number {
-  return worldFilterMode() === POINT ? 1 : NON_POINT_SPRITE_SCALE;
+  const mode = worldFilterMode();
+  return mode === POINT || mode === SHARP ? 1 : NON_POINT_SPRITE_SCALE;
 }

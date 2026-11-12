@@ -742,6 +742,7 @@ import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
+import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -1706,8 +1707,8 @@ export class Renderer {
     this._csMost = 0;   // MW-DETAIL: the most it may grow to - read off the GPU at the first growth
     /** @type {WebGLTexture|null} */ this._skinIdentity = null;    // MWNPC1: the identity palette (_skinIdentityTex) - before the first set is built, which makes it
     /** @type {WebGLTexture|null} */ this._skinUnitHolds = null;   // MWNPC1: what SKIN_PALETTE_UNIT holds, by our own binds
-    this._classicSet = this._buildWorldSet({ key: 'classic', meshFs: FS, bbFs: BB_FS, terrainFs: TERRAIN_FS, charFs: CHAR_FS, decalFs: DECAL_FS });   // MAC-BUG W6: and the decal pass, its fifth
-    this._installWorldSet(this._classicSet);
+    this._classicSet = this._buildWorldSet({ key: 'classic', meshFs: FS, bbFs: BB_FS, terrainFs: TERRAIN_FS, charFs: CHAR_FS, decalFs: DECAL_FS, sharp: sharpWanted() });   // MAC-BUG W6: and the decal pass, its fifth
+    startWorldSets(this);   // the classic set installed, and the world sets following the filter from now on (Sharp or plain)
     this._ambientTri = null;
 
     this.textures = new Map(); // "archive_record" -> WebGLTexture
@@ -2255,27 +2256,22 @@ export class Renderer {
    *  fragment is lit, never how a vertex lands; LA-COST3: a lane may ADD a
    *  per-quad term to the billboard's, bbVertexShader, and places nothing). */
   _buildWorldSet(src) {
+    const fs = (source) => setFragment(src, source);   // a Sharp set's world-art samples rewritten (render/sharp-world-sets.ts)
     return {
       key: src.key,
-      mesh: this._buildProgram(VS, src.meshFs),
-      char: this._charSkinProgram(src.charFs),   // MWNPC1: the skin in the world's character program
-      bb: this._buildProgram(bbVertexShader(src.bbVs), src.bbFs),   // LA-COST3: a lane may add to the billboard VS (its flat's sun, once a quad)
-      terrain: this._buildProgram(TERRAIN_VS, src.terrainFs),
-      // FAR-CLIP1: and the terrain's CLIP variant (terrainClipFs, above), built from this set's own terrain shader the
-      // first time it is asked for (_ensureTerrainClip: the streaming host's Deep Waters mount, or the draw of a pixel
-      // the cap patched) and kept with the set - a page that never draws the carved sea never compiles it
-      terrainFs: src.terrainFs,
+      sharp: !!src.sharp,
+      source: src,
+      mesh: this._buildProgram(VS, fs(src.meshFs)),
+      char: this._charSkinProgram(fs(src.charFs)),   // MWNPC1: the skin in the world's character program
+      bb: this._buildProgram(bbVertexShader(src.bbVs), fs(src.bbFs)),   // LA-COST3: a lane may add to the billboard VS (its flat's sun, once a quad)
+      terrain: this._buildProgram(TERRAIN_VS, fs(src.terrainFs)),
+      // The terrain's clip and snow variants are built from terrainFs the first time each is drawn, and kept with the set.
+      terrainFs: fs(src.terrainFs),
       terrainClip: null,
-      terrainSnow: null,   // SNOWFALL1: and its SNOW variant (snowTerrainFs), built the first time a snow surface is drawn (_ensureTerrainSnow)
-      // MAC-BUG W6: the decal is the set's FIFTH program. A set that brings
-      // no twin lights its marks on the classic one - which is the exact
-      // state W6 was reported in, so the lane the port ships carries one
-      // (pinned), and this fallback exists for a foreign lane alone.
-      decal: this._buildProgram(DECAL_VS, src.decalFs ?? DECAL_FS),
-      // BLOOD1 AUDIT 3: and the cap that program DECLARES. A foreign lane
-      // with no twin gets the classic program under its own forty-eight,
-      // and an upload of forty-eight into a vec4[16] is an INVALID_OPERATION
-      // and an unlit mark - so the cut is the program's, never the lane's.
+      terrainSnow: null,
+      // A lane with no decal shader of its own lights its marks with the classic one, and so under the classic light cap:
+      // the lane's count uploaded into the classic program's smaller array would fail and leave the marks unlit.
+      decal: this._buildProgram(DECAL_VS, fs(src.decalFs ?? DECAL_FS)),
       decalLights: src.decalFs ? (src.maxLights ?? CLASSIC_MAX_LIGHTS) : CLASSIC_MAX_LIGHTS,
       locate: null,   // LA-COST7: its programs' uniform locations, looked up once (_locations)
     };
@@ -2542,7 +2538,7 @@ export class Renderer {
     lane = lane ?? null;
     if (lane === this._lane) return;
     if (lane) {
-      if (!this._laneSet || this._laneSet.key !== lane.key) this._laneSet = this._buildWorldSet(lane);
+      if (!this._laneSet || this._laneSet.key !== lane.key) this._laneSet = this._buildWorldSet({ ...lane, sharp: this._classicSet.sharp });
       this._installWorldSet(this._laneSet);
     } else {
       this._installWorldSet(this._classicSet);
@@ -7540,7 +7536,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
    *  kept with the set (PERF-WARM's on-demand kind: a page that never draws
    *  the carved sea never compiles it). */
   _ensureTerrainClip(set = this._worldSet) {
-    return (set.terrainClip ??= this._buildProgram(TERRAIN_VS, terrainClipFs(set.terrainFs)));
+    return (set.terrainClip ??= this._buildProgram(TERRAIN_VS, setFragment(set, terrainClipFs(set.terrainFs))));
   }
 
   /** FAR-CLIP1: build the installed set's terrain clip program NOW - the
@@ -7554,14 +7550,14 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   prepareTerrainSnow() { this._ensureTerrainSnow(); }
   /** SHADER-STALL (render/glProgram.js startPrograms): the set's snow program STARTED, never waited on - answers whether
    *  the driver is done, so the host asks `prepareTerrainSnow` then, and its build reads a link already made. */
-  startTerrainSnow(set = this._worldSet) { return set.terrainSnow ? () => true : startPrograms(this.gl, [[SNOW_VS, snowTerrainFs(set.terrainFs)]]); }
+  startTerrainSnow(set = this._worldSet) { return set.terrainSnow ? () => true : startPrograms(this.gl, [[SNOW_VS, setFragment(set, snowTerrainFs(set.terrainFs))]]); }
 
   /** SNOWFALL1: the set's SNOW program - the mod's vertex law (SNOW_VS) over the set's own ground fragment program with
    *  its tile decode swapped for the mod's snow (snowTerrainFs) - and its tables, built the first time a snow surface is
    *  drawn and kept with the set (the clip variant's kind: a page that never stands snow never compiles it). */
   _ensureTerrainSnow(set = this._worldSet) {
     if (set.terrainSnow) return set.terrainSnow;
-    const program = this._buildProgram(SNOW_VS, snowTerrainFs(set.terrainFs));
+    const program = this._buildProgram(SNOW_VS, setFragment(set, snowTerrainFs(set.terrainFs)));
     const gl = this._locations(set);
     const loc = Object.fromEntries(['uProj', 'uView', 'uModel', 'uLightDir', 'uAmbient', 'uSunScale', 'uSunColor', 'uMoonDir', 'uMoonScale', 'uMoonColor',
       'uPointCount', 'uPointLights', 'uPointColors', 'uIndirect', 'uIndirectColor', 'uSnowDepths', 'uSnowLimits', 'uSnowDynMap', 'uSnowDynTexel',

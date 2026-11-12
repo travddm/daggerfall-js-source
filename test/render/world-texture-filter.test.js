@@ -48,6 +48,7 @@ test("Unity's three modes, with and without mip maps", () => {
 
 test('world art takes the world filter at upload and again when a scene asks for it after a change; UI art keeps NEAREST', () => {
   resetSettings();
+  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -55,7 +56,7 @@ test('world art takes the world filter at upload and again when a scene asks for
     const hands = r.uploadTexture('img', 'hands:test:0', picture(), { clamp: true, world: true });
     const ui = r.uploadTexture('img', 'ui:test', picture());
     const smooth = r.uploadTexture('img', 'logo:test', picture(), { smooth: true });
-    assert.deepEqual(filters(wall), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'Point by default: as before');
+    assert.deepEqual(filters(wall), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'Point: as before');
     assert.deepEqual(filters(hands), [E.NEAREST, E.NEAREST]);
 
     choose(BILINEAR);
@@ -81,6 +82,7 @@ test('world art takes the world filter at upload and again when a scene asks for
 
 test('an emission map follows its albedo, so both samples still blend alike', () => {
   resetSettings();
+  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -96,6 +98,7 @@ test('an emission map follows its albedo, so both samples still blend alike', ()
 
 test("the ground's magnification follows the world filter at each world load; Ground sharpness keeps its minification", () => {
   resetSettings();
+  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -184,6 +187,7 @@ test("the quality level's anisotropy: forced to 9 from Beautiful up, off Point o
 
 test('a world texture takes the anisotropy at upload, and a changed quality level re-filters it', () => {
   resetSettings();
+  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const ext = { TEXTURE_MAX_ANISOTROPY_EXT: 0x84fe, MAX_TEXTURE_MAX_ANISOTROPY_EXT: 0x84ff };
   const set = [];
   const gl = {
