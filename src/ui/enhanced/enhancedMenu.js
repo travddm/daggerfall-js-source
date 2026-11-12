@@ -2065,7 +2065,7 @@ function categoryCard({ pool = portPool(), pause = false } = {}) {
 const PRESET_WORDS = {
   name: () => t('menu.settings.preset.name', 'Quality preset'),
   note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.'),
-  effect: () => t('menu.settings.preset.effect', 'Steady shadows and the windows change at once; the rest when the world next loads.'),
+  effect: () => t('menu.settings.preset.effect', 'Steady shadows, the windows and ground sharpness change at once; the rest when the world next loads.'),
   custom: () => t('menu.settings.preset.custom', 'Custom'),
 };
 const PRESET_LABELS = {

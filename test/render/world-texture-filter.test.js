@@ -14,7 +14,8 @@ import {
   refilterWorldTexture,
   worldFilterFor,
 } from '../../src/render/world-texture-filter.ts';
-import { Renderer } from '../../src/render/renderer.js';
+import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
+import { getPref, setPref, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { VideoPlayer } from '../../src/ui/videoPlayer.js';
 import { loadHud } from '../../src/ui/hud/hud.js';
@@ -208,5 +209,44 @@ test('a world texture takes the anisotropy at upload, and a changed quality leve
     assert.deepEqual(set, [1, 9, 1], 'Point and Fantastic, then Trilinear and Fantastic, then Trilinear and Good');
   } finally {
     resetSettings();
+  }
+});
+
+test('a change made while playing reaches every cached world texture and ground array on the next frame, with no reload', async () => {
+  resetSettings();
+  resetPrefs();
+  const { GRAPHICS_PRESETS } = await import('../../src/systems/graphicsPresets.js');
+  const { applyGraphicsPreset } = await import('../../src/ui/enhanced/enhancedMenu.js');
+  const { canvas } = stateGl();
+  const r = new Renderer(canvas);
+  const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+  const frame = () => r.beginFrame(I, I, new Float32Array([0, 1, 0]), WORLD_FRAME);
+  try {
+    const wall = r.uploadTexture(5, 1, picture());
+    const glow = r.uploadEmissionTexture(5, 1, picture());
+    const ground = r.uploadTileArray(302, [picture(), picture()]);
+    frame();
+    choose(TRILINEAR);
+    frame();
+    assert.deepEqual(
+      filters(wall),
+      [E.LINEAR_MIPMAP_LINEAR, E.LINEAR],
+      'World Texture Filter: the cached wall, at once',
+    );
+    assert.deepEqual(filters(glow), [E.LINEAR_MIPMAP_LINEAR, E.LINEAR], 'and its glow');
+    assert.equal(ground.params[E.TEXTURE_MAG_FILTER], E.LINEAR, "and the ground's magnification");
+    setPref('groundSharpness', 'off');
+    frame();
+    assert.equal(ground.params[E.TEXTURE_MIN_FILTER], E.NEAREST_MIPMAP_NEAREST, 'Ground sharpness Off, at once');
+    applyGraphicsPreset(GRAPHICS_PRESETS.find((p) => p.id === 'ultra'));
+    frame();
+    assert.equal(getPref('groundSharpness'), 'max', 'the Quality preset wrote its ground');
+    assert.equal(ground.params[E.TEXTURE_MIN_FILTER], E.LINEAR_MIPMAP_LINEAR, 'and the arrays took it at once');
+    choose(POINT);
+    frame();
+    assert.deepEqual(filters(wall), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'and back to Point');
+  } finally {
+    resetSettings();
+    resetPrefs();
   }
 });
