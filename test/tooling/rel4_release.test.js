@@ -67,9 +67,9 @@ test('REL5: the build config produces EXACTLY the names the downloads promise - 
 });
 
 test('REL5: a download link names the file under releases/latest/download, which GitHub answers with the newest copy', () => {
-  assert.equal(RELEASES_URL, 'https://github.com/Lattymoy/daggerfall-js-source/releases');
+  assert.equal(RELEASES_URL, 'https://github.com/travddm/daggerfall-js-source/releases');
   assert.equal(latestDownloadUrl(DOWNLOAD_FILES.winSetup),
-    'https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-setup.exe');
+    'https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-setup.exe');
   // the copy that updates BY HAND is sent its own file, never a page of eleven
   assert.equal(manualDownloadFile({ platform: 'darwin', portable: false, packaged: true }), DOWNLOAD_FILES.mac);
   assert.equal(manualDownloadFile({ platform: 'win32', portable: true, packaged: true }), DOWNLOAD_FILES.winPortable);
@@ -188,7 +188,7 @@ test('REL5: the site links each installer by the name the release promises - the
   const row = entry.match(/<span class="dl">([\s\S]*?)<\/span>/)?.[1] ?? '';
   assert.deepEqual([...row.matchAll(/>([^<]+)<\/a>/g)].map((m) => m[1]), ['Windows', 'macOS', 'Linux'], 'one link per platform, in the page\'s own link style');
   assert.match(landing, /<a class="plaque" href="#desktop">Install<\/a>/, 'and the door\'s Install lands on them');
-  assert.doesNotMatch(landing.replace(/href="https:\/\/github\.com\/Lattymoy\/daggerfall-js-source\/releases\/latest"[^>]*>Every file</, ''), /href="https:\/\/github\.com\/[^"]*\/releases\/latest"/,
+  assert.doesNotMatch(landing.replace(/href="https:\/\/github\.com\/travddm\/daggerfall-js-source\/releases\/latest"[^>]*>Every file</, ''), /href="https:\/\/github\.com\/[^"]*\/releases\/latest"/,
     'the release PAGE is linked once, as "Every file" - never as the way to install');
 });
 

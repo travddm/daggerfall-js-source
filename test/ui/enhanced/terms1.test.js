@@ -83,8 +83,9 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
     // case's; the Terms' agreement the game asks for, never one it enforces
     // Material in both - the Terms lose their donations section, the Policy its payments section, its two
     // payment list items and the Discord moderation channel; later sections renumbered - so a new version, 2026-11-09
-    terms: 'bc3acaa4aadea29e13859bcb2b4ad6f9160a17accdb31d89fe1ed9926fd5a5c2',
-    privacy: '1756279fa050fe26cb998581439189200f6005d32270fd4ec6b0342e530afbfd',
+    // The contact line became a placeholder until the project has its own invite: not material, so the version stands.
+    terms: '983c77cd7a1d782c361399ef01607b61df493ab08f43bb2b4d78a51152775217',
+    privacy: 'e7ac6eca80fcde1009723001a43587b943b6f57e3ef4674cfa2d50f8ff9bf028',
   };
   for (const [name, d] of Object.entries(DOCS)) {
     const words = wordsOf(read(d.file));
@@ -96,10 +97,9 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
 test('TERMS1: nothing of the draft is left unfilled - no placeholder, no old name, and the contact is the Discord the site links', () => {
   // The draft carried [DATE] and three [... EMAIL] placeholders, and the
   // project's name from before BR4. The answer to all three contacts was
-  // the Discord server, so each is THE LANDING PAGE'S OWN INVITE - read
-  // from it, so a new invite moves the documents with it or reddens here.
-  const invite = /<a class="plaque" href="(https:\/\/discord\.gg\/[\w-]+)" rel="noopener">Discord<\/a>/.exec(read('index.html'))?.[1];
-  assert.ok(invite, 'the landing page no longer carries its Discord plaque');
+  // the Discord server. There is no invite of the project's own yet, so each
+  // contact is a placeholder and the landing page's plaque is inert.
+  assert.match(read('index.html'), /<span class="plaque" aria-disabled="true" data-invite="">Discord<\/span>/, 'the landing page no longer carries its Discord plaque');
   const counts = { terms: 2, privacy: 2 };   // the IP contact and the contact block; the requests line and the contact block
   for (const [name, d] of Object.entries(DOCS)) {
     const html = read(d.file);
@@ -110,12 +110,9 @@ test('TERMS1: nothing of the draft is left unfilled - no placeholder, no old nam
     // sweep is case-sensitive and the draft's titles were all capitals.
     assert.doesNotMatch(html, /DAGGERFALLJS/, `${name}: the old name survives in a title`);
     assert.equal((words.match(/DFO Online/g) ?? []).length > 10, true, `${name}: the documents speak of the project by its name`);
-    const contacts = [...html.matchAll(/<a href="(https:\/\/discord\.gg\/[\w-]+)" rel="noopener">discord\.gg\/([\w-]+)<\/a>/g)];
-    assert.equal(contacts.length, counts[name], `${name}: every contact is the Discord`);
-    for (const [, href, text] of contacts) {
-      assert.equal(href, invite, `${name}: a contact is not the invite the site links`);
-      assert.equal(`https://discord.gg/${text}`, href, `${name}: the link says one invite and goes to another`);
-    }
+    assert.doesNotMatch(html, /discord\.gg/, `${name}: no invite is linked until the project has its own`);
+    const contacts = [...html.matchAll(/<span data-contact="discord">Discord \(invite to follow\)<\/span>/g)];
+    assert.equal(contacts.length, counts[name], `${name}: every contact is the Discord placeholder`);
   }
 });
 

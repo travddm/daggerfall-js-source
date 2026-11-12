@@ -21,18 +21,25 @@ export type RowBarOf = (row: unknown) => RowBar | null;
 
 type Tier = readonly [RowValue, unknown];
 
+/** A preference switch has no tiers: the settings screen draws it as Off and On over false and true. */
+const SWITCH_TIERS: readonly Tier[] = Object.freeze([
+  [false, 'Off'],
+  [true, 'On'],
+]);
+
 const WORDS = {
   name: (): string => t('menu.settings.classicRendering.name', 'Classic rendering'),
   note: (): string =>
     t(
       'menu.settings.classicRendering.note',
       'Classic picture 320x200, Classic aspect 4:3 and Classic colours Palettization, with ground sharpness Off, ' +
-        'no mip maps and land view distance 3.',
+        'no mip maps, land view distance 3, Enhanced lighting and Enhanced environments Off, and field of view 60.',
     ),
   effect: (): string =>
     t(
       'menu.settings.classicRendering.effect',
-      'Off puts back what you had before. A setting you change while it is on keeps your choice.',
+      'Lighting and the outdoors change when the world next loads. Off puts back what you had before. A setting you ' +
+        'change while it is on keeps your choice.',
     ),
   off: (): string => t('menu.toggle.off', 'Off'),
   on: (): string => t('menu.toggle.on', 'On'),
@@ -44,9 +51,11 @@ export function classicRenderingSearchText(): string {
 }
 
 function tiersOf(id: string): readonly Tier[] | null {
-  const control: unknown = resolveControl(FEATURES.find((row: { id: string }) => row.id === id));
-  const tiers = (control as { tiers?: unknown } | undefined)?.tiers;
-  return Array.isArray(tiers) ? (tiers as readonly Tier[]) : null;
+  const control = resolveControl(FEATURES.find((row: { id: string }) => row.id === id)) as
+    { store?: unknown; initial?: unknown; tiers?: unknown } | undefined;
+  if (Array.isArray(control?.tiers)) return control.tiers as readonly Tier[];
+  if (control?.store === 'prefs' && typeof control.initial === 'boolean') return SWITCH_TIERS;
+  return null;
 }
 
 /** The preset's doors over the real stores. */

@@ -329,29 +329,17 @@ test('U63: the night is the MENU\'s night - pixelGround\'s ramp, seed and star l
 
 // (The corner asks retired with the asks themselves. The door keeps the 84px top they stood in.)
 
-test('DISC1: the Discord is front and centre - a plaque in the door\u2019s own row, one home, no new shape', () => {
-  // The plaque is what you PRESS, so the invite joins the plaque row
-  // rather than inventing a new shape or a corner.
+test('DISC1: the Discord stays in the door’s plaque row as an inert plaque until the project has an invite of its own', () => {
   const css = landing.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
-  const invites = [...landing.matchAll(/href="(https:\/\/discord\.gg\/[\w-]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(invites, ['https://discord.gg/jM2JdwSM8w'],
-    'ONE home for the invite - HK1\u2019s own law, and a link repeated in four places is how this page got to 973 words once');
-  // It is IN the door - above the fold, in the row with Play - and not
-  // in a section, the nav or the foot.
+  assert.doesNotMatch(landing, /discord\.gg/, 'no Discord invite is in the page');
   const door = landing.slice(landing.indexOf('<header class="door">'), landing.indexOf('<main id="main">'));
-  assert.ok(door.includes('https://discord.gg/jM2JdwSM8w'), 'the invite is not in the door at all');
   const row = door.slice(door.indexOf('<div class="doorplaques">'), door.indexOf('</div>', door.indexOf('<div class="doorplaques">')));
-  assert.ok(row.includes('https://discord.gg/jM2JdwSM8w'), 'the invite is in the door but not in the plaque row');
-  assert.ok(row.indexOf('./play/') < row.indexOf('discord.gg'), 'Play is still first and still leftmost');
-  // NO NEW SHAPE, NO NEW COLOUR, NO RASTER. The U63 pin above counts
-  // the page's box rules and this is why the count did not move: the
-  // invite wears the plaque that was already there.
+  assert.match(row, /<span class="plaque" aria-disabled="true" data-invite="">Discord<\/span>/, 'the plaque row keeps a disabled Discord plaque');
+  assert.ok(row.indexOf('./play/') < row.indexOf('Discord'), 'Play is still first and still leftmost');
   assert.equal((css.match(/border: 2px solid #7d7460/g) ?? []).length, 1,
     'a second box rule arrived with the Discord - the page has one shape');
   assert.doesNotMatch(css, /\.discord \{|\.dsc \{/, 'the invite grew its own rule');
-  assert.doesNotMatch(landing, /<img[^>]*discord/i, 'no badge image - the logo is this page\'s one raster');
-  // An external link opened from a page that is not ours to trust.
-  assert.match(landing, /href="https:\/\/discord\.gg\/jM2JdwSM8w" rel="noopener"/, 'the invite carries rel=noopener');
+  assert.doesNotMatch(landing, /<img[^>]*discord/i, "no badge image - the logo is this page's one raster");
 });
 
 // ── FIX-D: THE DIGIT FIVE ───────────────────────────────────────────────

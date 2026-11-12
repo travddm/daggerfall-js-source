@@ -13,16 +13,10 @@
 // JSON manifest; the constants below are the source, and every surface
 // is asserted against them.
 //
-// It also pins what did NOT change, and why. The GitHub repository
-// (Lattymoy/daggerfall-js-source), the live domain (daggerfalljs.dev)
-// and the desktop app's identifier (dev.daggerfalljs.app) still carry
-// the old spelling. Those are not branding, they are keys other systems
-// hold: renaming the repo breaks every link in the bible and every
-// release URL, changing the domain breaks the site, and changing the
-// appId orphans every installed copy from its updates - an install-over
-// becomes a second app beside the first. Each is a move outside this
-// tree, so each is pinned as deliberately unchanged rather than left to
-// look like an oversight.
+// The GitHub repository name (daggerfall-js-source) and the live domain
+// (daggerfalljs.dev) still carry the old spelling. They are keys other systems
+// hold: renaming the repo breaks every release URL, and changing the domain
+// breaks the site.
 //
 // BR4 - DAGGERFALL ONLINE. The same surfaces again, pinned HERE
 // again: NAME below is the only line that says what the product is called,
