@@ -170,7 +170,8 @@ body[data-busy] .gem { animation: gleam 1.6s steps(8) infinite; }
 
 .caps { font-size: 14px; letter-spacing: 0.26em; text-transform: uppercase; color: #a89f88; text-shadow: 2px 2px 0 rgba(0,0,0,0.7); }
 .link { padding: 2px 4px; border: 0; background: none; cursor: pointer; color: #a89f88; letter-spacing: inherit; text-transform: inherit; }
-.link:hover, .link:focus-visible { outline: none; color: rgb(243,239,44); text-shadow: 2px 2px 0 rgb(93,77,12); }
+.link:disabled { cursor: default; opacity: 0.5; }
+.link:not(:disabled):hover, .link:focus-visible { outline: none; color: rgb(243,239,44); text-shadow: 2px 2px 0 rgb(93,77,12); }
 .opt .link { padding: 2px 0; font-size: 14px; letter-spacing: 0.08em; }
 
 @media (prefers-reduced-motion: reduce) {
