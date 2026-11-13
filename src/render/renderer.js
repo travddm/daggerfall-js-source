@@ -739,8 +739,9 @@ import { multiply as mat4Multiply } from '../world/mat4.js';   // PERF-CROWD2: p
 import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js';   // EL8: `?perf`   // EL5: the bounds every bundle carries for the replays' culling   // EL2: the lane's shadow maps - a leaf that compiles nothing until a lane asks
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
 import { DistanceShadePass } from './classic-distance-shading.ts';
-import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
-import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+import { filterUpload, filterWorldPicture, freshWorldPicture, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
+import { bleedForFilter } from './alpha-bleed.ts';
+import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
@@ -3496,22 +3497,22 @@ export class Renderer {
    * `mips` is decodeDds's output shape ({width, height, rgba}[]), and
    * the wrap mode is the NIF's own clamp mode, mapped by the caller.
    */
-  createCharacterTexture(mips, { wrapS = 0x812f, wrapT = 0x812f } = {}) {
+  createCharacterTexture(mips, { wrapS = 0x812f, wrapT = 0x812f, effect = false } = {}) {
     const gl = this.gl;
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     this._tex0Bound = null;   // PERF-TEX3: this path owns unit 0 - the shadow may not speak for it
     for (let i = 0; i < mips.length; i++) {
       const m = mips[i];
-      gl.texImage2D(gl.TEXTURE_2D, i, gl.RGBA, m.width, m.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, m.rgba);
+      gl.texImage2D(gl.TEXTURE_2D, i, gl.RGBA, m.width, m.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, bleedForFilter(!effect, m.rgba, m.width, m.height));
     }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, mips.length - 1);
-    // NEAREST magnification: Morrowind's textures are small and the port
-    // draws the world with the same nearest-neighbour look everywhere
-    // else - a smoothed arm against a pixelated world reads as a bug.
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-      mips.length > 1 ? gl.NEAREST_MIPMAP_LINEAR : gl.NEAREST);
+    // A body part or a held item takes the world texture filter, so it matches the world it stands in (drawCharacter
+    // refreshes it after a change). A spell effect keeps the nearest look it was made with.
+    if (effect) {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mips.length > 1 ? gl.NEAREST_MIPMAP_LINEAR : gl.NEAREST);
+    } else filterWorldPicture(gl, tex, gl.TEXTURE_2D, mips.length > 1);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
     gl.bindTexture(gl.TEXTURE_2D, null);
@@ -3754,6 +3755,7 @@ export class Renderer {
         gl.uniform1f(c.useTex, r.tex ? 1 : 0);
         gl.uniform1f(c.alphaCut, r.alphaCut || 0);
         gl.bindTexture(gl.TEXTURE_2D, r.tex || this._blackTex);
+        freshWorldPicture(gl, r.tex);
         this._tex0Bound = null;   // PERF-TEX3: this path owns unit 0 - the shadow may not speak for it
         gl.drawArrays(gl.TRIANGLES, r.first, r.count);
         this.stats.texBinds++; this.stats.draws++;
@@ -5334,23 +5336,8 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     this._tex0Bound = null;   // PERF-TEX3: this path owns unit 0 - the shadow may not speak for it
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
-      // AUDIT 19 F7: respect the VIEW, not its backing buffer. Reaching
-      // through `.buffer` discards byteOffset and length, so any caller
-      // handing over a subarray - the video player hands a live view onto
-      // the reader's persistent frame buffer - would have uploaded the
-      // whole buffer from zero. Nothing did that wrongly today; it is a
-      // trap that would have gone unnoticed because the pin watching it
-      // shared the same blind spot.
-      gl.RGBA, gl.UNSIGNED_BYTE, color32Bytes(color32, `uploadTexture(${archive}, ${record})`)   // WW3: the shape's own error, not a TypeError three frames down
-    );
-    const { wrap, filter } = textureParams(gl, opts);
     // a texture's own sampler (render/meshAlpha.js) - a wrap per axis and its filter, its mips world art's as ever
     const own = opts.sampler && !opts.smooth ? samplerParams(gl, opts.sampler, !opts.smooth && (opts.mips ?? (typeof archive === 'number'))) : null;
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
     // INCIDENT 2026-09-04: every classic texture DFU builds carries a mip
     // chain (TextureReader.cs:31 `mipMaps = true`, :264 Apply(true)) and
     // samples it POINT (MaterialReader.cs:104/:437, FilterMode.Point =
@@ -5363,8 +5350,20 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // mipChain false (ImageReader.cs:59), the automaps and the video
     // likewise; those string-keyed uploads keep a single NEAREST level.
     const mips = !opts.smooth && (opts.mips ?? (typeof archive === 'number'));
+    const world = isWorldArt(opts, mips, own);
+    const bytes = color32Bytes(color32, `uploadTexture(${archive}, ${record})`);   // WW3: the shape's own error, not a TypeError three frames down
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
+      // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer, and
+      // `.buffer` would upload that whole buffer from zero (color32Bytes)
+      gl.RGBA, gl.UNSIGNED_BYTE, bleedForFilter(world, bytes, color32.width, color32.height),   // no black cut-out edge under a linear filter
+    );
+    const { wrap, filter } = textureParams(gl, opts);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
     if (mips) gl.generateMipmap?.(gl.TEXTURE_2D);
-    filterUpload(gl, tex, isWorldArt(opts, mips, own), mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
+    filterUpload(gl, tex, world, mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: TryImportTexture's - DFU's retro arm never reaches it (J7: a lost context's null is no key)
     else if (mips && !this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
     this.textures.set(key, tex);
@@ -7362,8 +7361,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
     // The mip chain cures minification shimmer: a distant pixel over a dozen texels would pick a different one as the
     // camera drifts. The terrain shaders pass textureGrad the unwrapped gradient (TERRAIN_FS), so the mip follows the
-    // real footprint and the tile wrap blurs no line round a tile. Magnification is the world filter's
-    // (_setGroundSampler), NEAREST under Point. A 2D array mipmaps each layer on its own, so no tile bleeds into another.
+    // real footprint and the tile wrap blurs no line round a tile. Magnification and the wrap are the world filter's
+    // (_setGroundSampler): NEAREST and a clamp under Point. A 2D array mipmaps each layer on its own, so no tile bleeds
+    // into another.
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
@@ -7385,10 +7385,6 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // are cached for the life of the page, so a tier read only at upload
     // landed on a page reload and on no other occasion.
     this._setGroundSampler(groundSharpnessTier());
-    // DFU's terrain texture array wraps Clamp (TextureReader) - keeps
-    // the far edge texel at transformed-uv 1.0 boundary ties.
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     if (!this._retroMips) gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
     this.tileArrays.set(archive, tex);
     this._tileDims.set(archive, [w, h, layers.length]);   // PRECIP4
@@ -7448,6 +7444,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const s = groundSamplerFor(tier, groundAnisotropy(this._anisoMax));
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl[s.minFilter]);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, groundMagFor(gl, worldFilterMode()));   // DFU's terrain array takes MainFilterMode
+    const wrap = groundWrapFor(gl, worldFilterMode());
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, wrap);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, wrap);
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
     this.groundTier = tier;
     return s;
@@ -8246,9 +8245,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     this._bindVao(null);
   }
 
-  /** LPT1: A LOW-POLY TREE ATLAS'S TEXTURE - `levels` of a mip chain allocated, filled after by uploadAtlasRows a band
-   *  at a time (the build breathes between), sampled as the mod's own (Point: nearest, its mips nearest - AUDIT LPT A4),
-   *  wrapped (REPEAT), and kept with the world's textures under retro mode's mip switch (AUDIT LPT A5). */
+  /** A tree atlas's texture: `levels` of a mip chain, filled by uploadAtlasRows a band at a time, wrapped (REPEAT),
+   *  capped by retro mode's mip switch, and sampled by the world texture filter (the per-frame check refilters it).
+   *  The trees mod samples it Point: the port's Point keeps that look, and the other filters depart from the mod. */
   createAtlasTexture(width, height, levels) {
     const gl = this.gl, tex = gl.createTexture();
     this._activeTexture(gl.TEXTURE0);
@@ -8257,8 +8256,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     for (let i = 0, w = width, h = height; i < levels; i++, w = Math.max(1, w >> 1), h = Math.max(1, h >> 1)) gl.texImage2D(gl.TEXTURE_2D, i, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    filterWorldPicture(gl, tex, gl.TEXTURE_2D, levels > 1);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, this._retroMips ? levels - 1 : 0);   // RETRO1: no chain read while retro mode says so
     gl.bindTexture(gl.TEXTURE_2D, null);
     this._tex0Bound = null;

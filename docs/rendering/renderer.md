@@ -31,7 +31,13 @@ Rules from the data side, stated at the top of `renderer.js`:
   as one uniform set at each frame's start (`src/render/retro-sharp.ts`). Every mip-mapped classic
   texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
   cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
-  and the spell hands draw 1% larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
+  and the spell hands draw 1% larger, as in DFU. Textures with an owner of their own take the filter too, and follow a
+  change at their next draw or through the same per-frame check: the far trees, banners and ship flags, the tree
+  atlases (`createAtlasTexture`), the body parts and held items (`createCharacterTexture`), and the seabed decorations
+  (`createDecorationTexture`), and the meadow's atlas (`src/render/grass-sheets.ts`); the decorations' and the
+  meadow's own programs carry Sharp's snap behind `uSharpOn`. UI art, the sky, smoothed pictures, data textures (the
+  pixel grass sheet among them: its texels are a tone index, a height and a blade ordinal), particles and a spell
+  effect's textures keep their own filters.
 - The Anisotropic Filtering row (preference `anisotropicFiltering`: Off, Per texture, 2x, 4x, 8x, 16x; 8x by default;
   `src/render/anisotropic-filtering.ts`) sets the anisotropy of that world art and of the ground, capped by the
   driver. Per texture is DFU's: 8x on the ground, none elsewhere. It applies only off Point, because Direct3D under
@@ -40,8 +46,15 @@ Rules from the data side, stated at the top of `renderer.js`:
 - The ground tile arrays take the world filter for magnification, the Ground sharpness row for minification (nearest-mip
   or trilinear) and the Anisotropic Filtering row for anisotropy (`src/render/ground-sampler.ts`). The snow ground's
   albedo takes the same (`filterGroundPicture`). `applyGroundSharpness` applies them at every world load, and on the
-  next frame after any of them changes.
-- A texel with alpha 0 is a palette cutout. The shaders discard it.
+  next frame after any of them changes. Where the driver drops a nearest-mip filter for anisotropy (ANGLE over Direct3D
+  11, `src/render/anisotropic-mip-filter.ts`), Off and Smooth draw alike while the ground takes anisotropy above 1, so
+  the settings screen shows the Ground sharpness row disabled with that reason. The `sampler` game probe records what
+  the CI browser's driver does (`tools/probes/lib/samplerCheck.mjs`).
+- A texel with alpha 0 is a palette cutout. The shaders discard it. Daggerfall stores such texels black, and a linear
+  filter or a mip level at a cut-out's edge would mix that black in. World art (`uploadTexture`) and the far trees'
+  layers are therefore uploaded with each transparent texel in the colour of its nearest opaque texel, alpha kept, and
+  their mips are built from that picture (`src/render/alpha-bleed.ts`). Point is unchanged. Banners and ship flags
+  upload premultiplied instead.
 
 ## Resources
 

@@ -50,7 +50,7 @@ export function createVfxGpu(renderer, textures, capacity) {
     const key = `${file}|${clampMode}`;
     if (texs.has(key)) return texs.get(key);
     const entry = textures?.get?.(file);
-    const tex = entry && entry.image && entry.image.mips ? renderer.createCharacterTexture(entry.image.mips, wrapModes(clampMode)) : null;
+    const tex = entry && entry.image && entry.image.mips ? renderer.createCharacterTexture(entry.image.mips, { ...wrapModes(clampMode), effect: true }) : null;
     texs.set(key, tex);
     return tex;
   }

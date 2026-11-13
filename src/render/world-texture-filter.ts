@@ -8,6 +8,7 @@
 import { getString } from '../systems/settings/settings.js';
 import { SHARP } from './sharp-texels.ts';
 import { anisotropyOf, anisotropySetting } from './anisotropic-filtering.ts';
+import { noteSamplingDriver } from './anisotropic-mip-filter.ts';
 
 export const POINT = 0;
 export const BILINEAR = 1;
@@ -63,6 +64,7 @@ type AnisotropyExtension = {
 };
 
 export type TextureGl = FilterGl & {
+  readonly RENDERER: number;
   readonly TEXTURE_2D: number;
   readonly TEXTURE_MIN_FILTER: number;
   readonly TEXTURE_MAG_FILTER: number;
@@ -82,6 +84,7 @@ export function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension |
     const max = ext ? Number(gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)) || 1 : 1;
     found = { ext, max };
     extensionOf.set(gl, found);
+    noteSamplingDriver(gl, max);   // the Ground sharpness row asks whether this driver keeps a nearest mip under anisotropy
   }
   return found;
 }
@@ -171,7 +174,8 @@ export function refilterWorldTexture(gl: TextureGl, texture: object, target: num
 export function filterWorldPicture(gl: TextureGl, texture: object, target: number, mips: boolean): void {
   const state = { mips, mode: POINT, aniso: 1 };
   setWorldSampling(gl, state, currentWorldSampling(gl), target);
-  worldTextures.set(texture, state);
+  // A WebGL texture is always an object; the tests' recording contexts hand back numbers, which no WeakMap can hold.
+  if (typeof texture === 'object' && texture !== null) worldTextures.set(texture, state);
 }
 
 /** Before a draw binds a world picture: re-filters it on the unit now active when a setting changed since. */

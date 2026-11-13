@@ -70,7 +70,7 @@ jobs:
           if [ -n "$PROBE" ]; then
             for i in $(seq 1 "$REPEAT"); do include="$include{\"probe\":\"$PROBE\",\"run\":$i},"; done
           else
-            for p in boot dungeon town travel rest save pause online; do
+            for p in boot dungeon town travel rest save pause online sampler; do
               case " $SKIP " in *" $p "*) continue ;; esac
               include="$include{\"probe\":\"$p\",\"run\":0},"
             done

@@ -33,6 +33,7 @@ import { barkPicture, leavesPicture, cardsPicture, mipChain } from '../render/gr
 import { LPT_INSTANCE_FLOATS } from '../world/lowPolyTrees.js';
 import { pageParam } from '../systems/pageQuery.js';
 import { isOnlinePage } from '../systems/online/onlineLane.js';
+import { bleedTransparentTexels } from '../render/alpha-bleed.ts';
 
 /** The renderer's tree slot the graht-oaks are handed to (0 Low Poly Trees', 1 the jungle's). */
 export const GRAHT_SLOT = 2;
@@ -153,7 +154,7 @@ export function createGrahtHost({ renderer, hides = null, breathe = async () => 
     const chain = mipChain(pic);
     const tex = renderer.createAtlasTexture(pic.width, pic.height, chain.length);
     for (let i = 0; i < chain.length; i++) {
-      const { width: w, height: h, data: d } = chain[i], row = w * 4, up = new Uint8Array(w * h * 4);
+      const { width: w, height: h } = chain[i], row = w * 4, up = new Uint8Array(w * h * 4), d = bleedTransparentTexels(chain[i].data, w, h);   // filtered: no black edge (render/alpha-bleed.ts)
       for (let y = 0; y < h; y++) up.set(d.subarray(y * row, (y + 1) * row), (h - 1 - y) * row);
       renderer.uploadAtlasRows(tex, i, 0, w, up);
     }
