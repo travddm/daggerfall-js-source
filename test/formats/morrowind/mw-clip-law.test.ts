@@ -25,11 +25,14 @@ const { inputs, recorded } = JSON.parse(
 );
 const now = JSON.parse(exactJson(recordClipLaw(law, inputs, KEY_TYPE.linear)));
 
+/** The part of a recorded answer that names a failure: the groups of one list and one digest for each. */
+type ListAnswer = { groups: string[]; digests: string[] };
+
 /** The first list whose recorded answer differs, named by its files or its number, so that a failure says where. */
-function firstDifference(answers: any[], expected: any[], nameOf: (index: number) => string) {
+function firstDifference(answers: ListAnswer[], expected: ListAnswer[], nameOf: (index: number) => string) {
   const index = expected.findIndex((one, at) => JSON.stringify(one) !== JSON.stringify(answers[at]));
   if (index < 0) return 'none';
-  const groups = expected[index].groups as string[];
+  const groups = expected[index].groups;
   const group = groups.findIndex((_name, at) => expected[index].digests[at] !== answers[index].digests[at]);
   return `${nameOf(index)}, group ${group < 0 ? '(absent or listing)' : groups[group]}`;
 }
