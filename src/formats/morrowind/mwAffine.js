@@ -1,11 +1,11 @@
-// AUDIT 68 S11-affine-dup: THE AFFINE, ONE HOME.
+// THE AFFINE, ONE HOME.
 //
 // {a: Float32Array(9) row-major rotation*scale, t: [x, y, z]} is the shape
 // the skin (mwSkin.js), the particle systems (mwParticles.js) and the rig's
 // placement (combat/fpArm.js, through mwParticles' re-export) compose. The
 // skin and the particles each carried a copy of the NIF-transform affine
 // and of the product; the copies were bit-identical, and the next fix to
-// composition order (the MW-D20 / MW-D31 class) would have landed in one.
+// composition order would have landed in one.
 // The two INVERSES stay where they are: they are different algorithms
 // (mwSkin's transpose / s^2 for a rotation times a uniform scale,
 // mwParticles' guarded cofactor), not two copies of one.

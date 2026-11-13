@@ -19,11 +19,11 @@
 // IS in the chain when the skin-root lookup falls back to it - the
 // reference cancels "everything up till the trishape" and takes the
 // trishape's parent as the root (riggeometry.cpp:301-307) - which is
-// the law MW-D20 landed below; the old "NetImmerse ignores it" claim
+// the law applied below; the old "NetImmerse ignores it" claim
 // was this header's own overstatement.
 
 import { deref } from './mwNifFile.js';
-import { affineOfTransform, affineMul } from './mwAffine.js';   // AUDIT 68 S11-affine-dup: one home
+import { affineOfTransform, affineMul } from './mwAffine.js';   // one home
 
 // Every NiNode-derived record, the reference's own membership test
 // (nifloader.cpp:932-937 recurses whatever casts to Nif::NiNode) - a
@@ -61,7 +61,7 @@ function affineInverse(m) {
   return { a: inv, t };
 }
 
-export function quatToMat33(q) {   // MW-SPELLFX1: exported - an effect mesh's keyframed node takes the same rotation
+export function quatToMat33(q) {   // exported - an effect mesh's keyframed node takes the same rotation
   const [w, x, y, z] = q;
   return Float32Array.from([
     1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y),
@@ -109,11 +109,11 @@ export function buildSkeleton(nif) {
   return { nodes, byName };
 }
 
-/** WS1: an injected node's ref - past any record index a NIF can carry,
+/** An injected node's ref - past any record index a NIF can carry,
  *  so it never collides with the skeleton file's own. */
 export const INJECTED_REF_BASE = 1 << 24;
 
-/** WS1: does a node carry the "BONE" NiStringExtraData the loader turns
+/** Does a node carry the "BONE" NiStringExtraData the loader turns
  *  into a CustomBone description (nifloader.cpp:630-633)? The extra
  *  chain is walked whole (:618-640 iterates `extra` -> `next`). */
 export function hasBoneMarker(nif, rec) {
@@ -129,7 +129,7 @@ export function hasBoneMarker(nif, rec) {
 }
 
 /**
- * WS1: CUSTOM BONES,
+ * CUSTOM BONES,
  * OpenMW's `use additional anim sources` (animation.cpp:1306-1322
  * injectCustomBones -> :1284-1304 loadBonesFromFile). Every .nif under
  * `animations/<model>/` is a bone addon. GetExtendedBonesVisitor
@@ -192,7 +192,7 @@ export function injectSkeletonNodes(skeleton, addonNif) {
 }
 
 /**
- * RULE 56: THE ACCUMULATION ROOT IS A TWO-NAME TABLE, not a search.
+ * THE ACCUMULATION ROOT IS A TWO-NAME TABLE, not a search.
  *
  * Morrowind animations carry the actor's locomotion in one bone's
  * translation channel (a flight cycle literally contains the flight path
@@ -211,7 +211,7 @@ export function injectSkeletonNodes(skeleton, addonNif) {
  *
  * and a candidate is accepted only if BOTH the name resolves in the node
  * map AND the loaded KF drives a controller of that same name
- * (case-insensitively). MW-D14 corrected it, and the difference is not
+ * (case-insensitively). The difference is not
  * academic: a first-person weapon .kf keys nothing on bip01, so "topmost
  * tracked bone" answered an UPPER ARM - and any translation channel on
  * that bone would then have had its X and Y zeroed, silently deforming
@@ -245,7 +245,7 @@ export function accumRootRef(skeleton, tracks) {
  * rest values where a channel has no keys. Pass `accumRoot` (from
  * accumRootRef) to extract root motion.
  *
- * MW-D33: the accumulated axes are ZEROED, not pinned to rest -
+ * The accumulated axes are ZEROED, not pinned to rest -
  * ResetAccumRootCallback multiplies the node's translation by
  * (0,0,1) component-wise ("anything that accumulates (1.f) should be
  * reset in the callback to (0.f)", animation.cpp:515-539), and it does
@@ -279,7 +279,7 @@ export function poseSkeleton(skeleton, tracks, sampleTrack, time, opts = {}) {
 }
 
 /**
- * MW-D20: THE GRAPH-SPACE SENTINEL. The reference's "skeleton space" is
+ * THE GRAPH-SPACE SENTINEL. The reference's "skeleton space" is
  * the full path below the SceneUtil::Skeleton GROUP - the file's root
  * node is a CHILD of that group, so the root's own transform (which
  * rule 34 KEEPS when the root is a NiNode named bip01) is INCLUDED in
@@ -340,7 +340,7 @@ export function skinToSkelMatrix(skeleton, pose, skeletonRoot, rootBone) {
   return affineInverse(m);
 }
 
-/** PERF-RIG1: the skin loop's scratch, sized to the batch and kept on it.
+/** The skin loop's scratch, sized to the batch and kept on it.
  *  A batch is one piece's geometry for the life of the assembly, so the
  *  arrays are made once per piece and reused every frame; a batch whose
  *  vertex count changed (none does, but the check is the law) gets a new
@@ -362,10 +362,10 @@ function skinScratch(batch, n) {
   return fresh;
 }
 
-/** PERF-RIG1: affineMul's arithmetic, written into `out` instead of a
+/** AffineMul's arithmetic, written into `out` instead of a
  *  fresh affine - the same products in the same order into a Float32Array
  *  `a` and a plain-number `t`, so the result is bit-for-bit affineMul's.
- *  MWNPC1: exported - the GPU skin's palette (mwGpuSkin.js) writes each
+ *  exported - the GPU skin's palette (mwGpuSkin.js) writes each
  *  bone's product through this same function, so the two skins blend the
  *  same per-bone matrices. */
 export function affineMulInto(p, l, out) {
@@ -384,14 +384,14 @@ export function affineMulInto(p, l, out) {
 
 /**
  * The piece's POST: the transform composed ONCE onto a vertex's blended
- * affine (MW-D31) - NiSkinData's root transform after the skin-to-skeleton
- * cancel, and the shape's own transform after that (MW-D20, below).
- * MWNPC1: one home for both skins - the CPU blend below and the GPU
+ * affine - NiSkinData's root transform after the skin-to-skeleton
+ * cancel, and the shape's own transform after that (below).
+ * one home for both skins - the CPU blend below and the GPU
  * palette (mwGpuSkin.js) apply this same affine, so a body drawn either way
  * stands in the same place.
  */
 export function skinPost(skin, skeleton, pose) {
-  // MW-D20: THE SHAPE'S OWN TRANSFORM APPLIES. The blend's output rides
+  // THE SHAPE'S OWN TRANSFORM APPLIES. The blend's output rides
   // the render chain, and the trishape's own transform node is the one
   // part of that chain the reference never cancels: the rebound
   // fallback stops its cancellation AT the trishape's parent
@@ -415,9 +415,9 @@ export function skinPost(skin, skeleton, pose) {
  */
 export function skinBatch(batch, skeleton, pose, skelMats, positionsOut, normalsOut) {
   const skin = batch.skin;
-  const post = skinPost(skin, skeleton, pose);   // MW-D20 / MWNPC1: the one home of the post
+  const post = skinPost(skin, skeleton, pose);   // the one home of the post
   const n = batch.positions.length / 3;
-  // PERF-RIG1: THE ACCUMULATORS ARE THE BATCH'S. This runs
+  // THE ACCUMULATORS ARE THE BATCH'S. This runs
   // once per skinned piece per body per FRAME - the player's arm, the
   // third-person body, every peer's - and it minted `acc` (12 floats a
   // vertex), `wsum`, `touched`, two 12-float scratches and one 9-float
@@ -434,7 +434,7 @@ export function skinBatch(batch, skeleton, pose, skelMats, positionsOut, normals
   const touched = sc.touched; touched.fill(0);
   const boneMat = sc.boneMat;
   // Per-vertex blended affines, translations included - 12 floats each.
-  // MW-D31: the blend accumulates ONLY invBind * boneInSkelSpace - the
+  // the blend accumulates ONLY invBind * boneInSkelSpace - the
   // reference's resultMat starts at zero with its W column pinned to
   // (0,0,0,1) and sums exactly those per-bone products
   // (riggeometry.cpp:172-202); `post` is applied ONCE to the blended
@@ -478,7 +478,7 @@ export function skinBatch(batch, skeleton, pose, skelMats, positionsOut, normals
   collapse[9] = post.t[0];
   collapse[10] = post.t[1];
   collapse[11] = post.t[2];
-  // MW-D31: post composed onto the BLENDED affine, once per vertex -
+  // Post composed onto the BLENDED affine, once per vertex -
   // the row-vector `resultMat *= transform` in column terms. The
   // collapse row is that same law on a zero accumulator: post.a*0 +
   // post.t, which is why it stays post.t verbatim.
@@ -536,7 +536,7 @@ export function skinBatch(batch, skeleton, pose, skelMats, positionsOut, normals
 }
 
 /**
- * MW-D7: WHICH BONES THE CLIP ACTUALLY DRIVES.
+ * WHICH BONES THE CLIP ACTUALLY DRIVES.
  *
  * poseSkeleton above answers a bone with no track by handing back
  * `node.rest` (:151-154). That is correct - it is what the reference

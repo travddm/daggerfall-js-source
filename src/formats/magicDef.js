@@ -12,8 +12,8 @@ export const MAGIC_ITEM_NAME_LENGTH = 32;
 export const MAGIC_ITEM_RECORD_SIZE = 62;
 export const MAGIC_ITEM_TYPES = Object.freeze({ RegularMagicItem: 0, ArtifactClass1: 1, ArtifactClass2: 2 });
 
-/** EnchantmentTypes (ItemsFile.cs:111-141), verbatim. V3 re-homed it
- *  HERE from systems/enchantments.js (which re-exports): the enum is
+/** EnchantmentTypes (ItemsFile.cs:111-141), verbatim. It sits
+ *  HERE, and systems/enchantments.js re-exports it: the enum is
  *  FallExe's - this file reads the records that carry it - and the
  *  artifact registry needs it without closing an import cycle with
  *  the enchantment system that consumes the registry. */

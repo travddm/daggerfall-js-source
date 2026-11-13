@@ -1,11 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════
-// MW-TEXTHREAD — MORROWIND TEXTURES, DECODED OFF THE MAIN THREAD, IN
+// MORROWIND TEXTURES, DECODED OFF THE MAIN THREAD, IN
 // PARALLEL.
 //
 // A Morrowind build decodes every texture its pieces name - the arms,
 // the third-person body's skin and clothes and armour, the weapon - and
-// MW-LOAD measured the decoder at 55-59 ms for one 1024x1024 DXT
-// texture with its mip chain, 11-13 ms at 512 (Morrowind-Assets.md).
+// the decoder takes 55-59 ms for one 1024x1024 DXT
+// texture with its mip chain, 11-13 ms at 512.
 // Each of them ran on the thread that draws the frame, one after
 // another, while the world was loading around the player. This client
 // hands them to a small pool of module Workers (mwTextureWorker.js)
@@ -30,7 +30,7 @@
 //    decoder is pure, and the same bytes would fail here too - the
 //    error is the answer (rejected, `decoderError` set), and the file
 //    is not decoded twice.
-//  - AN IDLE POOL LETS ITS WORKERS GO (AUDIT MW-TEXTHREAD F6): the
+//  - AN IDLE POOL LETS ITS WORKERS GO: the
 //    decodes come in a build's bursts, and a worker kept for the rest
 //    of the session after one is a heap and a thread for nothing. Once
 //    every job has answered and TEXTURE_IDLE_MS pass with nothing new,
@@ -43,7 +43,7 @@ import { decodeTextureImage } from './mwTexture.js';
  *  at once; past a few the cores are the limit, not the pool. */
 export const TEXTURE_WORKERS_MAX = 4;
 
-/** AUDIT MW-TEXTHREAD F6: how long a pool with nothing to do keeps its
+/** How long a pool with nothing to do keeps its
  *  workers - past one build's gaps (a parse, a read) between its bursts. */
 export const TEXTURE_IDLE_MS = 5000;
 
@@ -86,7 +86,7 @@ export function createTexturePool({ workerFactory = null, size = texturePoolSize
   let nextId = 1;
   const stats = { offThread: 0, onThread: 0, workers: 0 };
 
-  // AUDIT MW-TEXTHREAD F6: every job answered, the workers go after idleMs of quiet - a new job restarts the quiet
+  // Every job answered, the workers go after idleMs of quiet - a new job restarts the quiet
   // (wake), and a worker with a job in hand is never among them. A retired worker is not a dead one: `opened` gives
   // its place back, so the next decode opens it again (pick).
   let idle = null;
