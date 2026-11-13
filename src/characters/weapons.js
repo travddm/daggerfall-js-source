@@ -11,8 +11,8 @@
 import templates from './itemTemplates.json' with { type: 'json' };
 import { DYE_COLORS, DYE_TARGETS, getDyeColorTable } from './dyes.js';
 import { SKILLS } from '../systems/skills.js';   // GetWeaponSkillIDAsShort's return set
-import { SOUND } from '../systems/soundClips.js';   // F023: GetEquipSound's clips (soundClips is a leaf)
-import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: a custom weapon class answers its own skill, damage and equip sound (virtuals)
+import { SOUND } from '../systems/soundClips.js';   // GetEquipSound's clips (soundClips is a leaf)
+import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // a custom weapon class answers its own skill, damage and equip sound (virtuals)
 
 export const WEAPONS = Object.freeze({
   Dagger: 113, Tanto: 114, Staff: 115, Shortsword: 116, Wakazashi: 117,
@@ -25,7 +25,7 @@ export const WEAPONS = Object.freeze({
  *  sound a drawn weapon makes, which is what FPSWeapon actually plays
  *  on ToggleSheath (WeaponManager.SetWeapon :780 overwrites
  *  DrawWeaponSound with it; the declared 78 default never survives an
- *  applied weapon). AUDIT 26 F023: every draw used to sound alike.
+ *  applied weapon). Every draw used to sound alike.
  *
  *  Switched on templateIndex exactly as the C# is - NOT on the port's
  *  weaponTypeForItem, whose grouping differs (it folds Claymore and
@@ -36,7 +36,7 @@ export const WEAPONS = Object.freeze({
 export function equipSoundFor(item) {
   const W = WEAPONS;
   if (!item || item.werecreatureClaws) return null;
-  const cls = customItemClass(item.templateIndex);   // RRI1: GetEquipSound
+  const cls = customItemClass(item.templateIndex);   // GetEquipSound
   if (cls?.equipSound) return SOUND[cls.equipSound];
   switch (item.templateIndex) {
     case W.Battle_Axe: case W.War_Axe:
@@ -70,20 +70,19 @@ export const weightMultipliersByMaterial = Object.freeze([4, 5, 4, 4, 3, 4, 4, 2
 export const valueMultipliersByMaterial = Object.freeze([1, 2, 4, 8, 16, 32, 64, 128, 256, 512]);
 export const conditionMultipliersByMaterial = Object.freeze([4, 6, 6, 8, 12, 16, 20, 24, 28, 32]);
 
-/** WEAPON-POOL:
+/**
  *  EVERY WEAPON TYPE WEARS FROM ONE POOL - the Warhammer's 1,600, the deepest in Daggerfall's table, so no type has
  *  less than it had - and its material multiplies it as it always has (the ladder above: x1 iron to x8 Daedric).
  *  Daggerfall's rows run from 50 (Dagger, Tanto, Short Bow) to 1,600, and every condition cost is flat: a
  *  Cast-When-Strikes strike's 10 broke an iron dagger in 5 strikes and an iron warhammer in 160, a Cast-When-Held
  *  spell's casting cost at its first equip (5 at the least; the loot's held spells about 120-160, Loot-Rarity.md's
- *  watch item 9) broke the dagger the moment it went on (AUDIT WEAPON-POOL P5), and a 20-damage blow's 2 broke a
+ *  watch item 9) broke the dagger the moment it went on, and a 20-damage blow's 2 broke a
  *  short bow in 25. The light weapons and the bows spent more time broken than drawn, and a Legendary rolled on one
  *  carried its power for a few blows or none: Worm's Tooth (a Dagger or a Tanto) its strike for five, Nightwhisper on
  *  a Dagger or a Tanto its held Chameleon not past the equip, at that cost. Ammunition keeps its row's:
  *  CreateWeapon's arrow arm runs no material pass. The rows stay Daggerfall's - itemTemplates.js mintCondition reads
  *  this in their place, and conditionRepair.js repoolWeapon moves a piece minted on its row before its first
- *  wear. A departure
- *  (Ledger A, WEAPON-POOL). */
+ *  wear. It departs from Daggerfall's rows. */
 export const WEAPON_CONDITION_POOL = 1600;
 
 // FormulaHelper.CalculateWeaponMinDamage, verbatim case groups.
@@ -92,12 +91,12 @@ const MIN_DAMAGE = new Map([
   [[W.Dagger, W.Tanto, W.Wakazashi, W.Shortsword, W.Broadsword, W.Staff, W.Mace], 1],
   [[W.Longsword, W.Claymore, W.Battle_Axe, W.War_Axe, W.Flail], 2],
   [[W.Saber, W.Katana, W.Dai_Katana, W.Warhammer], 3],
-  [[W.Short_Bow, W.Long_Bow], 5],   // BAL-ARCHERY: +1 over FormulaHelper's 4
+  [[W.Short_Bow, W.Long_Bow], 5],   // +1 over FormulaHelper's 4
 ].flatMap(([ws, v]) => ws.map((w) => [w, v])));
 export function weaponMinDamage(weapon) {
-  const cls = customItemClass(weapon);   // RRI1: GetBaseDamageMin
+  const cls = customItemClass(weapon);   // GetBaseDamageMin
   if (cls?.baseDamageMin) return cls.baseDamageMin();
-  const o = _damageOverride.min?.(weapon);   // TryGetOverride("CalculateWeaponMinDamage") - RRI2's weaponBalance registers one
+  const o = _damageOverride.min?.(weapon);   // TryGetOverride("CalculateWeaponMinDamage") - weaponBalance registers one
   if (o != null) return o;
   return MIN_DAMAGE.get(weapon) ?? 0;
 }
@@ -121,13 +120,13 @@ const MAX_DAMAGE = new Map([
   [[W.Broadsword, W.Saber, W.Battle_Axe, W.Mace], 12],
   [[W.Flail], 14],
   [[W.Longsword, W.Katana, W.War_Axe], 16],
-  [[W.Short_Bow], 17],   // BAL-ARCHERY: +1 over FormulaHelper's 16
+  [[W.Short_Bow], 17],   // +1 over FormulaHelper's 16
   [[W.Claymore, W.Warhammer], 18],
-  [[W.Long_Bow], 19],   // BAL-ARCHERY: +1 over FormulaHelper's 18
+  [[W.Long_Bow], 19],   // +1 over FormulaHelper's 18
   [[W.Dai_Katana], 21],
 ].flatMap(([ws, v]) => ws.map((w) => [w, v])));
 export function weaponMaxDamage(weapon) {
-  const cls = customItemClass(weapon);   // RRI1: GetBaseDamageMax
+  const cls = customItemClass(weapon);   // GetBaseDamageMax
   if (cls?.baseDamageMax) return cls.baseDamageMax();
   const o = _damageOverride.max?.(weapon);   // TryGetOverride("CalculateWeaponMaxDamage")
   if (o != null) return o;
@@ -139,7 +138,7 @@ export function weaponMaxDamage(weapon) {
  *  TEMPLATE INDEX, which is immutable, and returns Skills.None for
  *  anything that is not one of the eighteen weapons.
  *
- *  AUDIT 18: the port keyed its table by the item's DISPLAY NAME
+ *  The port keyed its table by the item's DISPLAY NAME
  *  instead (systems/skills.js WEAPON_SKILL). A name is not immutable -
  *  loot.createRegularMagicItem renames an enchanted weapon to its
  *  MAGIC.DEF name - and itemTemplates.json spells 117/123 "Wakizashi"
@@ -155,7 +154,7 @@ export const WEAPON_SKILL_USED = new Map([
   [[W.Short_Bow, W.Long_Bow], SKILLS.Archery],
 ].flatMap(([ws, v]) => ws.map((w) => [w, v])));
 export function weaponSkillUsed(templateIndex) {
-  const cls = customItemClass(templateIndex);   // RRI1: GetWeaponSkillUsed
+  const cls = customItemClass(templateIndex);   // GetWeaponSkillUsed
   if (cls?.weaponSkillUsed) return SKILLS[cls.weaponSkillUsed];
   return WEAPON_SKILL_USED.get(templateIndex) ?? null;
 }
@@ -204,14 +203,14 @@ const byIndex = new Map(templates.map((t) => [t.index, t]));
 const roundHalfEven = (x) => { const f = Math.floor(x); return (x - f === 0.5) ? (f % 2 === 0 ? f : f + 1) : Math.round(x); };
 export function weightForMaterial(weightInKg, material) {
   const quarterKgs = Math.trunc(weightInKg * 4);
-  const matQuarterKgs = (quarterKgs * (weightMultipliersByMaterial[material] ?? 4)) / 4;   // AUDIT 68 S27-weightForMaterial-dup: an unknown material weighs its base (x4/4), never NaN - the inventory copy's guard, kept in the one home
+  const matQuarterKgs = (quarterKgs * (weightMultipliersByMaterial[material] ?? 4)) / 4;   // an unknown material weighs its base (x4/4), never NaN - the inventory copy's guard, kept in the one home
   return roundHalfEven(matQuarterKgs) / 4;
 }
 
 /** ItemBuilder.ApplyWeaponMaterial as a pure builder: template row +
  *  material -> the item record. value *= 3 * valueMult; weight via the
  *  quarter-kg rule; maxCondition = hitPoints * condMult / 4 (int) -
- *  WEAPON-POOL's one pool for hitPoints, the arrow (this table's one
+ *  the one condition pool for hitPoints, the arrow (this table's one
  *  piece of ammunition) its row's, as mintCondition reads them;
  *  dye from GetWeaponDyeColor; female uses playerTextureArchive - 1. */
 export function buildWeapon(templateIndex, material, { female = false } = {}) {

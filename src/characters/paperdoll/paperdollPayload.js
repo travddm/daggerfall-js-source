@@ -11,7 +11,6 @@
 // AND BECAUSE OF THE DOCTRINE. "A RENDER OF GAME DATA IS GAME DATA" —
 // the ramps come out of BODY00I0.IMG and the face out of FACE00I0.CIF,
 // so this payload IS game data and may never be committed or bundled.
-// AUDIT 21 caught exactly that being published once already.
 //
 // So nothing here touches the filesystem. It takes readers that are
 // ALREADY LOADED and hands back an object, which leaves the question of
@@ -25,7 +24,7 @@ import { buildNeutralBody, WRIST_JUNCTION_Y, ARM_X, NECK_PIVOT_Y } from '../neut
 import { ATTACKS_1H, ATTACKS_2H, ATTACKS_RANGED, ATTACKS_FP, REACTIONS, DIRECTION_TO_STRIKE, STRIKES } from '../anims.js';
 import { STEEL_RAMP } from '../pieces/cuirass.js';
 import { CLOTH_RAMP } from '../pieces/pieceLoft.js';
-// AUDIT 39: `buildCuirass`, `buildGreaves`, `clothingZones` and
+// `buildCuirass`, `buildGreaves`, `clothingZones` and
 // `armorZones` were imported here and never called - the four
 // item-to-geometry modules (pieces/cuirass.js, pieces/greaves.js,
 // clothing.js, armorSet.js) have no live consumer anywhere, and these
@@ -169,10 +168,7 @@ export function buildPaperdollPayload(pal, img, cif) {
   // is a sprite, not a colour, so without ARENA2 the head simply has
   // none. It is shipped in the payload and composited onto the head by
   // the viewer, which is where a sprite belongs: it cannot be baked into
-  // public/skin/ because a render of game data IS game data. AUDIT 68
-  // S05-payload-housekeeping: a record-0 decode was also handed to every
-  // buildNeutralBody here as `{ face }`, which reads opts.build /
-  // clothZones / armorZones / mats / cloth and never opts.face - gone.
+  // public/skin/ because a render of game data IS game data.
   let faceSet = null;
   if (cif) {
     faceSet = [];
@@ -285,8 +281,7 @@ export function buildPaperdollPayload(pal, img, cif) {
   for (const f of faces) for (let i=0;i<4;i++){ const y=f.p[i*3+1]; if(y<minY)minY=y; if(y>maxY)maxY=y; }
   const GI = { body:0, head:1, armL:2, armR:3, legL:4, legR:5 };
   // Every mesh the viewer draws - the base body and each piece - packs
-  // through this one encoder (AUDIT 68 S05-payload-housekeeping: the
-  // base body had its own copy of it).
+  // through this one encoder.
   const packPiece = (pf) => { const pP=[], pN=[], pC=[], pG=[], pI=[]; for (const f of pf) { for (let i=0;i<4;i++) pP.push(Math.round(f.p[i*3]*1000), Math.round(f.p[i*3+1]*1000), Math.round(f.p[i*3+2]*1000)); pN.push(Math.round(f.n[0]*127), Math.round(f.n[1]*127), Math.round(f.n[2]*127)); pC.push(f.c[0], f.c[1], f.c[2]); pI.push(Math.round((f._i ?? 0.6) * 255)); pG.push(GI[f.g] ?? 0); } return { P: pP, N: pN, C: pC, G: pG, I: pI }; };
   const { P, N, C, G, I: Ib } = packPiece(faces);
   // ── the VILLAGER DESIGNS (editor only - nothing here touches a game
@@ -302,7 +297,7 @@ export function buildPaperdollPayload(pal, img, cif) {
     return {
       archive: d.archive, race: d.race, gender: d.gender, name: d.name, build: d.build,
       tone: RACE_TONE[d.race],
-      // AUDIT 39: every design has named a hairstyle and a hair colour
+      // Every design has named a hairstyle and a hair colour
       // since the designs landed, and the viewer's applyVillagerHair
       // reads exactly `v.hair.style` / `v.hair.ramp` - the pack never
       // carried the field, so all 25 villagers came out bald.
@@ -312,7 +307,7 @@ export function buildPaperdollPayload(pal, img, cif) {
     };
   });
 
-  // ── HAIR. AUDIT 39: pieces/hair.js built seven styles in three
+  // ── HAIR. Pieces/hair.js built seven styles in three
   // colours and the viewer had the whole consumer written -
   // applyVillagerHair off `D.hair[race][style]` and `D.hairRamps` -
   // but this payload emitted neither, so every figure in the editor

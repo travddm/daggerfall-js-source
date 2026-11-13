@@ -1,8 +1,7 @@
-// MT-i - THE TARGET-SELECTION HALF of EnemySenses (MIT, Daggerfall
+// THE TARGET-SELECTION HALF of EnemySenses (MIT, Daggerfall
 // Workshop): MobileTeams, GetTargets' priority walk, and the classic
 // target machine (EnemySenses.Update:312-414) that the motor's own
-// header promised ("constants stay exported for E3 multi-target" -
-// SENSES_INTERVAL_UNITS sat exported and unconsumed since C8).
+// header anticipated ("constants stay exported for multi-target").
 //
 // The port's EnemyAI stays single-target in SHAPE - one target, one
 // destination - exactly as DFU's senses hold ONE Target field. What
@@ -47,25 +46,25 @@ export const enemyInfightingEnabled = () => getBool('Enhancements', 'EnemyInfigh
 /** The player's sentinel candidate - one identity so `target ===
  *  PLAYER_TARGET` is DFU's `target == player` reference compare. */
 export const PLAYER_TARGET = Object.freeze({ isPlayer: true });
-/** WORLD6b-iii / AUDIT WORLD6b-iii(a) A10: the ENTITY the cast decision reads for a PEER target - a peer's effects are
- *  not mine to read (AUDIT WORLD6b-ii A9), so the pick's EffectsAlreadyOnTarget veto sees none on it. Frozen: the veto
- *  only reads. ONE home for both pools (the dungeon read MY effects for a peer until the audit). */
+/** The ENTITY the cast decision reads for a PEER target - a peer's effects are
+ *  not mine to read, so the pick's EffectsAlreadyOnTarget veto sees none on it. Frozen: the veto
+ *  only reads. ONE home for both pools. */
 export const PEER_CAST_TARGET = Object.freeze({ activeEffects: Object.freeze([]) });
 export const isPlayerTarget = (c) => c === PLAYER_TARGET || c?.isPlayer === true;
-/** WORLD3: a PEER - another player in the room, a candidate the world host mints off the pose stream:
+/** A PEER - another player in the room, a candidate the world host mints off the pose stream:
  *  `{ isPlayer: true, isPeer: true, id, feet, height, health }`. A player to every gate of GetTargets (the
  *  team chain, the quest gate, the NoTarget mode) and to the melee fork, measured at its OWN feet and height
  *  where the local player is measured at playerFeet; its health the host's word (0 once it left). */
 export const isPeerTarget = (c) => c?.isPeer === true;
-/** AUDIT WATCH1 (one home): a target in the WIRE's spelling - '.' the owner (the local player), a peer's id, '' none
- *  (WORLD3's spelling for the dungeon's stream, WORLD6b-ii's for the cell's). Every pool that streams whom a foe's
- *  blow or cast was at reads it from here; the audit found three hand copies, one of them handed FEET instead of a
- *  target and so always '' (the watch's swing was never at anyone). */
+/** A target in the WIRE's spelling - '.' the owner (the local player), a peer's id, '' none.
+ *  Every pool that streams whom a foe's
+ *  blow or cast was at reads it from here, so no hand copy can hand FEET instead of a
+ *  target and so always ''. */
 export const wireRecipient = (t) => (t?.isPeer ? t.id : (t == null ? '' : (t.isPlayer ? '.' : '')));
-/** AUDIT WATCH1 (one home): the attack count on the wire - the count in the high bits, the ranged bit low (WORLD2's
- *  spelling); one more swing, this one ranged or not. */
+/** The attack count on the wire - the count in the high bits, the ranged bit low;
+ *  one more swing, this one ranged or not. */
 export const bumpAtkCount = (a, ranged) => ((((a | 0) >> 1) + 1) << 1) | (ranged ? 1 : 0);
-/** AUDIT WORLD3 C3: THE LOCAL player - the one this client answers for. WORLD3 made `isPlayer` true for a PEER, so
+/** THE LOCAL player - the one this client answers for. `isPlayer` is true for a PEER, so
  *  every guard that spelled "not another foe, therefore mine" as isPlayerTarget now admits another player's body: the
  *  alert, the rest gate, the exhaustion collapse, the encounter edge, the stealth roll. A site that means MY player
  *  reads this; a site that means ANY player reads isPlayerTarget. */
@@ -93,9 +92,8 @@ export const staticTeamOf = (mobileType) => ENEMY_BASICS[mobileType]?.team ?? 'P
 /** GetTargets' priority arithmetic (:829-841): +5 when the candidate
  *  is not already targeting someone, +10 when seen, plus the distance
  *  band 30 - d floored at 0. */
-/** ASSIST (FIELD BUGS 2026-10-05c, the port's own; 'revenants just "stand there" during fight sometimes' - "have to kite
- *  them INTO the enemy at times to register even if enemy is hitting me or im hitting them"): a COMPANION (a sworn
- *  revenant, a ship's hand ashore - CREW-COMPANIONS) puts a foe fighting his side first: one whose target is a player,
+/** ASSIST, the port's own: a COMPANION (a sworn
+ *  revenant, a ship's hand ashore) puts a foe fighting his side first: one whose target is a player,
  *  another companion, or himself. DFU has no companion and its chain knows no fight but the candidate's own: its +5 goes
  *  to a foe that targets NO ONE, so an idle foe in the spawn band behind a wall (unseen candidates are kept there,
  *  :824-825) outranked the one striking the player whenever it stood outside the companion's view cone - he walked into
@@ -108,7 +106,7 @@ export const fightsOurSide = (targetAi, self) => {
   return t != null && (isPlayerTarget(t) || t.companion != null || t === self);
 };
 /**
- * WATCH-PROTECTS: whether a foe hunts the living world's townspeople (a `civilian` body, systems/livingWorld/quarry.js):
+ * whether a foe hunts the living world's townspeople (a `civilian` body, systems/livingWorld/quarry.js):
  * a hostile monster that fights hand to hand. Never the watch, an ally, a companion or a quest's foe; never a class
  * (a man with a blade is no monster, and the city's own watch is one); never an archer or a caster, whose shot nothing
  * on the street would stop (arrows and spells meet foes and players alone). DFU weighs no civilian at all
@@ -122,7 +120,7 @@ export function huntsCivilians(self) {
   return !self.mobile?.basics?.hasRangedAttack1;
 }
 /**
- * STAR5: THE STAR'S HUNTERS. A fallen star stands in its owner's machine as
+ * THE STAR'S HUNTERS. A fallen star stands in its owner's machine as
  * a body of its own (scenes/starfall/starfallHost.js - `starWard`, the townsperson's shape): quarry for its own coven's
  * monsters alone - those the townsperson's law hunts (huntsCivilians: hostile, no class, no spell, no bow), stood at that
  * star (`starSite`, its site). No other foe, ally, companion or watchman takes it for a foe.
@@ -132,10 +130,10 @@ export const huntsStar = (self, ward) => self?.starSite != null && self.starSite
  *  before anyone beside it: this much over a target's own priority (distance, sight). */
 export const STAR_HUNT_PRIORITY = 40;
 /**
- * AUDIT WORLD-EVENTS L6-5 (RAID5): A RAID'S GOAL - its Standard-Bearer, its refugees
+ * A RAID'S GOAL - its Standard-Bearer, its refugees
  * (systems/raidingParties.js stamps each `raidGoal` with its raid's key) - is quarry for that raid's raiders (`raidKey`)
- * whatever infighting reads, and first, until a blow turns the raider (`raidTurned`, its health no longer whole) - STAR5's
- * shape. With infighting off a raider took no ally but a companion for its foe: the standard was never sacked and no
+ * whatever infighting reads, and first, until a blow turns the raider (`raidTurned`, its health no longer whole).
+ * With infighting off a raider took no ally but a companion for its foe: the standard was never sacked and no
  * refugee lost, every such raid held for nothing.
  */
 export const huntsRaidGoal = (self, c) => self?.raidKey != null && c?.raidGoal === self.raidKey && !!self.ai?.isHostile;
@@ -161,13 +159,13 @@ export function targetPriority(targetHasNoTarget, seen, distance) {
  */
 let _playerBout = null;
 /** The player's bout - `{ id, side, out?, hold? }` - or null (the host's, set as a ladder bout stands and cleared after).
- *  AUDIT ARENA-LADDER A3: THE DRIVER'S OWN TAG, HELD LIVE. The driver writes `out` and `hold` on it as the bout runs (a
+ *  THE DRIVER'S OWN TAG, HELD LIVE. The driver writes `out` and `hold` on it as the bout runs (a
  *  yield, a fall, the word, the verdict - scenes/arena/arenaBouts.js); a copy taken at the bell missed every one, so a player
  *  out of a Grand Melee stayed the fighters' target, beaten at the breath of life to its end. boutGate reads its fields
  *  as it reads a fighter's (`String(id)`, `side | 0`); `playerBoutOf` answers the read as plain data. */
 export function setPlayerBout(b) { _playerBout = b ?? null; }
-export const playerBoutOf = () => (_playerBout ? { id: String(_playerBout.id), side: _playerBout.side | 0, out: !!_playerBout.out, ...(_playerBout.hold ? { hold: true } : {}), ...(_playerBout.kit ? { kit: true } : {}) } : null);   // AUDIT ARENA-LADDER 2: `kit` a ladder bout's (systems/arena/arenaKit.js)
-/** AUDIT ARENA-LADDER A2: a fighter on the sand is its bout's alone - no Dispel Daedra/Undead sends it off and no
+export const playerBoutOf = () => (_playerBout ? { id: String(_playerBout.id), side: _playerBout.side | 0, out: !!_playerBout.out, ...(_playerBout.hold ? { hold: true } : {}), ...(_playerBout.kit ? { kit: true } : {}) } : null);   // `kit` a ladder bout's (systems/arena/arenaKit.js)
+/** A fighter on the sand is its bout's alone - no Dispel Daedra/Undead sends it off and no
  *  Wabbajack changes it (either door removed the body past the foe yield floor, and the driver read the gone body as a
  *  FALL: a champion dispelled in the Herald's call was a champion beaten, its purse and its title paid). */
 export const inBout = (f) => !!f?.entity?.bout;
@@ -198,9 +196,9 @@ export function boutGate(self, c, isPlayer, playerBout = _playerBout) {
  */
 export function getTargets(self, candidates, playerFeet, {
   noTargetMode = false,
-  dropLocal = false,   // AUDIT-F5 (the port's own, WILD-ALERT): the LOCAL player left off the list, every other candidate kept
+  dropLocal = false,   // the LOCAL player left off the list, every other candidate kept
   infighting = enemyInfightingEnabled(),
-  // AUDIT 62 F23: the PLAYER candidate's LIVE controller height - DFU
+  // The PLAYER candidate's LIVE controller height - DFU
   // reads the component (EnemySenses.cs:896-898 for the eye,
   // :816-818 for the transform distance) and PlayerHeightChanger.cs
   // :54-57/:475-478 makes it 0.9 crouched, 2.6 mounted, 0.30 swimming
@@ -224,7 +222,7 @@ export function getTargets(self, candidates, playerFeet, {
   // runTargetMachine for what that costs.
   let sawSecondaryTarget = false;
   let selectedDistance = 0;
-  // AUDIT WORLD6b-ii A5: DFU appends the player LAST (:748) so the player loses priority ties to foes; a caller that
+  // DFU appends the player LAST (:748) so the player loses priority ties to foes; a caller that
   // carries PEERS names the player's slot by putting PLAYER_TARGET in the list itself, so the peers walk AFTER the
   // local player and a peer never beats me on a tie (the recorded order: foes, me, the peers)
   const walk = (candidates ?? []).includes(PLAYER_TARGET) ? [...candidates] : [...(candidates ?? []), PLAYER_TARGET];
@@ -234,24 +232,24 @@ export function getTargets(self, candidates, playerFeet, {
     const targetAi = isPlayer ? null : c.ai;
     // Can't target self (:768)
     if (c === self || (targetAi && targetAi === ai)) continue;
-    // REVENANT-FATE: a beaten revenant on its knees, judged or burning, and COMPANION-PORTAL's body stepping through its
+    // A beaten revenant on its knees, judged or burning, and a companion's body stepping through its
     // portal, are nobody's foe - nothing can reach them, so nothing hunts them
     if (!isPlayer && (c.yielded || c.executing || c.sparing || c.leaving)) continue;
-    // WATCH-PROTECTS: a townsperson is quarry for a hostile monster alone (huntsCivilians), and no team's - the chain
+    // A townsperson is quarry for a hostile monster alone (huntsCivilians), and no team's - the chain
     // below weighs foes and players
     const civilian = !isPlayer && c.civilian === true;
     if (civilian && !huntsCivilians(self)) continue;
-    // STAR5: a fallen star is quarry for its own coven's monsters alone (huntsStar), and no team's
+    // A fallen star is quarry for its own coven's monsters alone (huntsStar), and no team's
     const star = !isPlayer && c.starWard === true;
     if (star && !huntsStar(self, c)) continue;
-    const goal = !isPlayer && !self.raidTurned && huntsRaidGoal(self, c);   // AUDIT WORLD-EVENTS L6-5: a raid's goal, past the chain below - until a blow turns the raider
+    const goal = !isPlayer && !self.raidTurned && huntsRaidGoal(self, c);   // a raid's goal, past the chain below - until a blow turns the raider
     // ARENA2: THE BOUT TEAM - a bout's pair skips the chain below; anyone else meets no fighter, and no fighter meets them
     const bout = boutGate(self, c, isPlayer, playerBout);
     if (bout === false) continue;
     if (bout !== true && !civilian && !star && !goal) {
     // NoTarget mode (:776-777): the BASICS team here
-    if ((noTargetMode || !ai.isHostile || selfMobileTeam === 'PlayerAlly' || self.companion != null) && isPlayer) continue;   // AUDIT CC-B2: a companion never the player's foe, whatever his team reads
-    if (dropLocal && isLocalPlayerTarget(c)) continue;   // AUDIT-F5: a wilderness foe unaware of a fast traveller (scenes/exteriorFoes.js) - them alone
+    if ((noTargetMode || !ai.isHostile || selfMobileTeam === 'PlayerAlly' || self.companion != null) && isPlayer) continue;   // a companion never the player's foe, whatever his team reads
+    if (dropLocal && isLocalPlayerTarget(c)) continue;   // a wilderness foe unaware of a fast traveller (scenes/exteriorFoes.js) - them alone
     // Pacified enemies should not attack player allies (:780-781)
     if (!ai.isHostile && targetEntity && targetEntity.team === 'PlayerAlly') continue;
     // Player allies should not attack pacified enemies (:784-789)
@@ -262,11 +260,11 @@ export function getTargets(self, candidates, playerFeet, {
     if (isPlayer && selfTeam === 'PlayerAlly') {
       continue;
     } else if (infighting && !self.entity?.suppressInfighting && targetEntity && !targetEntity.suppressInfighting) {
-      // CAMP-RIVALS: two
+      // Two
       // wilderness groups of the SAME kind (combat Team) keep the classic truce and never fight;
       // groups of different kinds fight on sight through this ordinary infighting arm.
       if (targetEntity.team === selfTeam) continue;
-      // CAMP2: campEncounters.js groups by THEME (mobileFactions.js), which can
+      // CampEncounters.js groups by THEME (mobileFactions.js), which can
       // straddle several combat Teams - a "vermin nest" is Spiders + Scorpions,
       // a "bandit gang" several classes - so the line above does not hold them
       // together and infighting has campmates fighting each other on sight.
@@ -277,38 +275,38 @@ export function getTargets(self, candidates, playerFeet, {
       // from nothing else, and it lapses with campId rather than outliving it.
       if (self.entity?.campId != null && targetEntity.campId === self.entity.campId) continue;
     } else {
-      // CREW-COMPANIONS: with infighting off a hostile still fights the player's companions (they fight at the
+      // With infighting off a hostile still fights the player's companions (they fight at the
       // player's side, and are fought back), and a companion never takes another ally for its foe - neither arm is
       // DFU's, which has no companion; every other pair keeps the chain above.
       if (!isPlayer && selfMobileTeam !== 'PlayerAlly' && !(c.companion != null && ai.isHostile)) continue;
     }
-    // AUDIT CC-B2: a companion's own side, by what he IS - never by his team, which a blow can reset for a frame: he
+    // A companion's own side, by what he IS - never by his team, which a blow can reset for a frame: he
     // takes no ally for his foe, and no ally takes him
     if (self.companion != null && (c.companion != null || targetEntity?.team === 'PlayerAlly')) continue;
     if (c.companion != null && selfTeam === 'PlayerAlly') continue;
     // Quest enemy AI only targets player unless marked attackable (:806-807)
-    if (self.isQuestFoe && !self.questAttackable && !isPlayer && c.companion == null) continue;   // AUDIT CC-B7: a quest's foe fights the player's companions
+    if (self.isQuestFoe && !self.questAttackable && !isPlayer && c.companion == null) continue;   // a quest's foe fights the player's companions
     // For now, quest AI can't be targeted (:814-815)
-    if (targetAi && c.isQuestFoe && !c.questAttackable && self.companion == null) continue;   // AUDIT CC-B7: and they fight it
+    if (targetAi && c.isQuestFoe && !c.questAttackable && self.companion == null) continue;   // and they fight it
     }   // ARENA2: the bout's pair rejoins here
-    const tFeet = isPlayer ? (c.feet ?? playerFeet) : targetAi.feet;   // WORLD3: a peer at its own feet
+    const tFeet = isPlayer ? (c.feet ?? playerFeet) : targetAi.feet;   // a peer at its own feet
     if (!tFeet) continue;
-    const tHeight = isPlayer ? (c.height ?? playerHeight) : targetAi.height;   // WORLD3: and its own capsule
+    const tHeight = isPlayer ? (c.height ?? playerHeight) : targetAi.height;   // and its own capsule
     // REVIEW 2026-09-05: EnemySenses.cs:818-819 measures transform to
     // transform - each side's feet lifted by its own centre offset.
     const tOff = isPlayer ? tHeight / 2 : (targetAi.centreOffset ?? (targetAi.height ?? CAPSULE_HEIGHT) / 2);
     const sOff = ai.centreOffset ?? (ai.height ?? CAPSULE_HEIGHT) / 2;
     const dx = tFeet[0] - ai.feet[0], dy = (tFeet[1] + tOff) - (ai.feet[1] + sOff), dz = tFeet[2] - ai.feet[2];
     const distance = Math.hypot(dx, dy, dz);
-    const see = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, tFeet, tHeight, null, distance, ai.sightRadius, ai.fieldOfView);   // CAMP-SIGHT; the enhanced AI's 190 (EnemySenses.Start)
+    const see = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, tFeet, tHeight, null, distance, ai.sightRadius, ai.fieldOfView);   // the enhanced AI's 190 (EnemySenses.Start)
     // Neither visible nor in the area around the player (:824-825) -
     // foe candidates only; the player has no senses.
     if (targetAi && !targetAi.wouldBeSpawned && !see) continue;
-    // WATCH-PROTECTS: a townsperson has no foe of their own, and is no likelier quarry for it than the player beside them
+    // A townsperson has no foe of their own, and is no likelier quarry for it than the player beside them
     let priority = targetPriority(targetAi && !civilian && !star ? (targetAi.target ?? null) === null : false, see, distance);
-    if (star && !self.starTurned) priority += STAR_HUNT_PRIORITY;   // STAR5: the star first, until a defender turns it
-    if (goal) priority += RAID_GOAL_PRIORITY;   // AUDIT WORLD-EVENTS L6-5: the raid's goal first
-    if (self.companion != null && fightsOurSide(targetAi, self)) priority += COMPANION_ASSIST_PRIORITY;   // ASSIST (FIELD BUGS 2026-10-05c)
+    if (star && !self.starTurned) priority += STAR_HUNT_PRIORITY;   // the star first, until a defender turns it
+    if (goal) priority += RAID_GOAL_PRIORITY;   // the raid's goal first
+    if (self.companion != null && fightsOurSide(targetAi, self)) priority += COMPANION_ASSIST_PRIORITY;   // ASSIST
     if (priority > highestPriority) {
       secondHighestPriority = highestPriority;
       highestPriority = priority;
@@ -338,7 +336,7 @@ export function getTargets(self, candidates, playerFeet, {
 }
 
 /**
- * AUDIT 62 F21 (review): the aim POINT every ranged component takes -
+ * the aim POINT every ranged component takes -
  * the TARGET'S TRANSFORM, one law for every host.
  *
  * DaggerfallMissile.cs:571-581 (GetAimDirection) reads
@@ -367,7 +365,7 @@ export function getTargets(self, candidates, playerFeet, {
  * `_targetFeet` already falls back to.
  */
 export function targetAimPoint(target, playerFeet, playerHeight = CAPSULE_HEIGHT) {
-  if (isPeerTarget(target)) return target.feet ? [target.feet[0], target.feet[1] + (target.height ?? CAPSULE_HEIGHT) / 2, target.feet[2]] : null;   // WORLD3: a peer's transform, its own capsule's half
+  if (isPeerTarget(target)) return target.feet ? [target.feet[0], target.feet[1] + (target.height ?? CAPSULE_HEIGHT) / 2, target.feet[2]] : null;   // a peer's transform, its own capsule's half
   if (target == null || isPlayerTarget(target)) {
     return playerFeet ? [playerFeet[0], playerFeet[1] + playerHeight / 2, playerFeet[2]] : null;
   }
@@ -376,14 +374,14 @@ export function targetAimPoint(target, playerFeet, playerHeight = CAPSULE_HEIGHT
   return [a.feet[0], a.feet[1] + (a.centreOffset ?? (a.height ?? CAPSULE_HEIGHT) / 2), a.feet[2]];
 }
 
-/** ROAD-H H1: GetAimPosition's ENEMY ARROW arm
+/** GetAimPosition's ENEMY ARROW arm
  *  (DaggerfallMissile.cs:528-539) - "Offset up so it comes from same
  *  place LOS check is done from". */
 export const ARROW_ORIGIN_FORWARD = 0.6;      // :534, caster.transform.forward * 0.6f
 export const ARROW_ORIGIN_HEIGHT_DIVISOR = 3; // :537, adjust.y += casterController.height / 3
 
 /** `caster.transform.position` for a foe - feet + centreOffset, the
- *  idle sprite's centre (AUDIT 62 F21's reading of SetupDemoEnemy.cs
+ *  idle sprite's centre (SetupDemoEnemy.cs
  *  :103-115). GetAimDirection measures FROM this (DaggerfallMissile.cs
  *  :581) even for an arrow, which leaves from the offset point below -
  *  DFU's two functions do not share an origin, and neither do these. */
@@ -393,7 +391,7 @@ export function enemyTransformPoint(ai) {
 }
 
 /**
- * ROAD-H H1 - where a non-player archer's shaft LEAVES ITS BOW, one
+ * where a non-player archer's shaft LEAVES ITS BOW, one
  * law for both foe pools (DaggerfallMissile.cs:521-551):
  *
  *     Vector3 aimPosition = caster.transform.position;   // :521
@@ -419,8 +417,8 @@ export function enemyTransformPoint(ai) {
  *     enemyAnchor.enemyControllerHeight), not the sprite's: a flyer's
  *     is halved and everything is floored at 1.6.
  *
- * The non-arrow enemy cast is the BARE transform (AUDIT 62 F21 landed
- * that in enemyCasting) - this offset is the arrow's alone.
+ * The non-arrow enemy cast is the BARE transform (enemyCasting
+ * uses it) - this offset is the arrow's alone.
  */
 export function enemyArrowOrigin(ai) {
   if (!ai?.feet) return null;
@@ -433,12 +431,12 @@ export function enemyArrowOrigin(ai) {
   ];
 }
 
-/** ROAD-H H1b: "Enemy archers must aim lower to compensate for
+/** "Enemy archers must aim lower to compensate for
  *  crouched player capsule" - DaggerfallMissile.cs:583-585. */
 export const ARROW_CROUCH_DIP = 0.05;
 
 /**
- * ROAD-H H1 + H1b - GetAimDirection's enemy arm for an ARROW
+ * GetAimDirection's enemy arm for an ARROW
  * (DaggerfallMissile.cs:570-586):
  *
  *     aimDirection = (predictedPosition - caster.transform.position).normalized;
@@ -458,7 +456,7 @@ export const ARROW_CROUCH_DIP = 0.05;
  * transform, not the offset loose point GetAimPosition returns - so
  * this takes the two apart at the call site, as DFU keeps them apart.
  */
-/** AUDIT WORLD6b-iii(a) C3: an ENEMY MISSILE's direction - normalized (aim - from), DaggerfallMissile.cs:571-581's
+/** An ENEMY MISSILE's direction - normalized (aim - from), DaggerfallMissile.cs:571-581's
  *  `direction = (target - transform.position).normalized`, no dip (the dip is the ARROW's, above). ONE law for the
  *  three hosts' fireMissile hooks (world.js, exterior.js, worldModes.js) - each carried its own subtraction, and two of
  *  them dropped the aim point the executor hands them, so a cast at a peer there flew at the local player. */
@@ -481,7 +479,7 @@ export function arrowAimDirection(casterTransform, aimPoint, { targetIsPlayer = 
  *  .CurrentHealth`): the player's rides the context; without it the
  *  player is presumed standing. */
 const targetHealth = (c, playerEntity) =>
-  (isPlayerTarget(c) ? (c.health ?? playerEntity?.health ?? 1) : (c.entity?.health ?? 0));   // WORLD3: a peer's is its own
+  (isPlayerTarget(c) ? (c.health ?? playerEntity?.health ?? 1) : (c.entity?.health ?? 0));   // a peer's is its own
 
 /** GetTargets :868-872: only DFU's Enhanced Combat AI keeps the runner-up as the secondary target. */
 const enhancedRunnerUp = (ai, runnerUp) => (ai.enhancedCombatAI === true ? runnerUp : null);
@@ -506,7 +504,7 @@ const secondaryTargetPosOf = (ai) => (ai.secondaryTargetPos ? [...ai.secondaryTa
  * ClassicUpdate block, run once per classic tick by EnemyAI._step
  * when the host arms candidates. Owns: the classicTargetUpdateTimer
  * cadence (>5 system-timer units; the port's classic-tick dt is
- * FIXED_DT per the P16/P17 folding, RECORDED - DFU adds the Unity
+ * FIXED_DT per the fixed-timestep folding - DFU adds the Unity
  * fixed delta on classic frames), the dead-target cull, the
  * non-hostile player drop, the null-target resets with the
  * secondary-switch arm, GetTargets behind the `wouldBeSpawned ||
@@ -519,10 +517,10 @@ const secondaryTargetPosOf = (ai) => (ai.secondaryTargetPos ? [...ai.secondaryTa
  */
 export function runTargetMachine(self, candidates, playerFeet, classicDt, {
   noTargetMode = false,
-  dropLocal = false,   // AUDIT-F5: getTargets' own
+  dropLocal = false,   // getTargets' own
   infighting,
   playerEntity = null,
-  playerHeight = CAPSULE_HEIGHT,   // AUDIT 62 F23: the live player capsule, off the senses context
+  playerHeight = CAPSULE_HEIGHT,   // the live player capsule, off the senses context
   playerBout = _playerBout,   // ARENA2: the player's bout (setPlayerBout), or null
 } = {}) {
   const ai = self.ai;
@@ -569,8 +567,8 @@ export function runTargetMachine(self, candidates, playerFeet, classicDt, {
   // player so enemies who see the player will try to attack.
   let playerInSight = false;
   if (!ai.wouldBeSpawned && playerFeet) {
-    playerInSight = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, playerFeet, playerHeight, null, null, ai.sightRadius, ai.fieldOfView);   // CAMP-SIGHT
-    // WORLD3: a PEER in sight is a player in sight - the area DFU draws around the one player is drawn around
+    playerInSight = canSeeTarget(ai.collider, ai.feet, ai.yaw, ai.height, playerFeet, playerHeight, null, null, ai.sightRadius, ai.fieldOfView);
+    // A PEER in sight is a player in sight - the area DFU draws around the one player is drawn around
     // every player in the room, so a foe far from the host and beside a joiner still takes its targets
     if (!playerInSight) for (const c of candidates ?? []) {
       if (!isPeerTarget(c) || !c.feet) continue;
@@ -604,7 +602,7 @@ export function runTargetMachine(self, candidates, playerFeet, classicDt, {
     }
   }
   if (ai.target == null) return null;
-  return isPlayerTarget(ai.target) ? (ai.target.feet ?? playerFeet) : ai.target.ai.feet;   // WORLD3: a peer's own feet
+  return isPlayerTarget(ai.target) ? (ai.target.feet ?? playerFeet) : ai.target.ai.feet;   // a peer's own feet
 }
 
 /**

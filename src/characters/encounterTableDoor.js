@@ -1,4 +1,4 @@
-// DEX3 - RandomEncounters.EncounterTables AS A MOD WRITES
+// RandomEncounters.EncounterTables AS A MOD WRITES
 // THEM. DFU's tables are an array of structs a mod writes in place (`ref RandomEncounterTable table = ref
 // RandomEncounters.EncounterTables[index]; table.Enemies = ...` - Daggerfall Enemy Expansion's SelectTable and
 // SelectDungeonTable, BestiaryMod.cs:1728-1766), and every reader then rolls from the mod's. The port's tables are DFU's
@@ -24,7 +24,7 @@ export function registerEncounterTableSelector(selector) {
   _selectors.push(selector);
   _gen++;
 }
-/** Whether `selector` stands on the door (TESA-BIOME: systems/tamrielFauna.js stands its own once). */
+/** Whether `selector` stands on the door (systems/tamrielFauna.js stands its own once). */
 export const hasEncounterTableSelector = (selector) => _selectors.includes(selector);
 /** Moves when the selectors do - what a reader that keeps an answer keys it by. */
 export const encounterTableGeneration = () => _gen;

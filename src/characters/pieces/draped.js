@@ -126,7 +126,7 @@ export function drapedGrid(name) {
   return { rows: R, cols, wrap, pos, faces };
 }
 // One grid quad -> a pieceLoft-convention face ({p: 12 floats, n, g}).
-// AUDIT 68 S06-draped-group-tag: g is the RIG GROUP every packer and
+// g is the RIG GROUP every packer and
 // animator keys on - a drape hangs off the torso, so 'body' (it carried
 // the DRAPE_MATERIAL table itself, and packed as body only by accident).
 function facesFromGrid(g) {

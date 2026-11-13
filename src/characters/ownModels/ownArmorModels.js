@@ -1,6 +1,6 @@
 // THE ARMOUR MORROWIND DOES NOT HAVE.
 //
-// MW-BRIG1. A leaf: mwItemMap.js asks it, and nothing it imports may
+// A leaf: mwItemMap.js asks it, and nothing it imports may
 // reach back.
 //
 // A worn Daggerfall piece reaches the Morrowind body through the player's
@@ -18,11 +18,11 @@
 //
 // Armour has a material ladder: Roleplay & Realism Items' Jerkin is
 // leather, fur or "Brigandine" by its material (rriItems.js lightWord -
-// Iron and up). Mac's model was the STEEL one (MW-BRIG1); since MW-BRIG4
+// Iron and up). Mac's model was the STEEL one; now
 // every brigandine metal wears it in its own painting, and the leather
 // and fur jerkins keep the retail cuirass they resolved to before.
 //
-// ═══ MW-STEEL1: THE STEEL PLATE ═══════════════════════════════════
+// ═══ THE STEEL PLATE ═══════════════════════════════════
 //
 // A
 // whole set: Daggerfall's seven classic pieces in STEEL wear Mac's plate
@@ -34,18 +34,18 @@
 // Helm switch (systems/features.js, pref `mwSteelHelm`; closed by default,
 // Mac's answer). is the record.
 //
-// MW-STEEL4: the plate's meshes
+// the plate's meshes
 // ship SKINNED, as retail's armour does - weighted to Morrowind's own
 // bones in its bind at bake time (tools/bakeSteelPlate.mjs) - so a steel
 // piece here is the parts it fills and nothing else, and the binder takes
 // it on the very path it takes a retail ARMO's BODY meshes. The runtime fit
-// and skin solve MW-STEEL1-3 carried (`fit`, `solvePose`, a part's own
+// and skin solve (`fit`, `solvePose`, a part's own
 // `skinFrom`) are gone with it.
-// MW-BRIG4: EVERY METAL
+// EVERY METAL
 // OF THE BRIGANDINE JERKIN wears the brigandine now, each in its own painting - the one mesh, baked once per metal
-// with that metal's texture (tools/bakeBrigandine.mjs). Steel keeps MW-BRIG1's red.
+// with that metal's texture (tools/bakeBrigandine.mjs). Steel keeps its red.
 //
-// ═══ MW-FIT1: WHAT THE PLATE COVERS ════════════════════════════════
+// ═══ WHAT THE PLATE COVERS ════════════════════════════════
 //
 // A PAULDRON IS A SLEEVE: both sets' pauldrons close round the upper arm from the shoulder to the elbow,
 // where the gauntlet's cuff takes over (measured on the bind - every ray out of the upper arm's bone line meets the
@@ -62,17 +62,17 @@ import { ARMOR_MATERIAL, isPlate } from '../../systems/armorMaterials.js';
  *  test/formats/morrowind/mwbrig2.test.js holds it to the mod's own row. */
 export const RRI_JERKIN_TEMPLATE = 520;
 
-/** MW-BRIG4: the metals the Jerkin is a BRIGANDINE in - every plate material, Iron to Daedric (rriItems.js lightWord:
+/** The metals the Jerkin is a BRIGANDINE in - every plate material, Iron to Daedric (rriItems.js lightWord:
  *  "Iron and up"), in the material ladder's order. Each wears the brigandine in its own painting. */
 export const BRIGANDINE_METALS = Object.freeze(Object.keys(ARMOR_MATERIAL).filter((k) => isPlate(ARMOR_MATERIAL[k])));
 
-/** MW-STEEL1: Daggerfall's classic armour templates (combat/enemyEquipment.js ARMOR_ENUM, DFU's ItemEnums.Armor),
+/** Daggerfall's classic armour templates (combat/enemyEquipment.js ARMOR_ENUM, DFU's ItemEnums.Armor),
  *  restated for the leaf's sake; test/tooling/mwsteel1.test.js holds them to the enum. */
 export const CLASSIC_ARMOR_TEMPLATE = Object.freeze({
   Cuirass: 102, Gauntlets: 103, Greaves: 104, Left_Pauldron: 105, Right_Pauldron: 106, Helm: 107, Boots: 108,
 });
 
-/** MW-STEEL1: the steel helm's two styles - the Steel Helm switch's values (systems/features.js, pref `mwSteelHelm`),
+/** The steel helm's two styles - the Steel Helm switch's values (systems/features.js, pref `mwSteelHelm`),
  *  the default first. */
 export const STEEL_HELM_STYLES = Object.freeze(['closed', 'open']);
 export const STEEL_HELM_DEFAULT = STEEL_HELM_STYLES[0];
@@ -83,19 +83,19 @@ const plate = (material) => (id, name, templateIndex, { parts, styles = null }) 
   ...(styles ? { styles: Object.freeze(styles) } : {}),
 });
 const steel = plate(ARMOR_MATERIAL.Steel);
-const ebony = plate(ARMOR_MATERIAL.Ebony);   // MW-EBONY1
+const ebony = plate(ARMOR_MATERIAL.Ebony);
 
-/** MW-STEEL1: Mac's steel plate, piece by piece (tools/bakeSteelPlate.mjs bakes the meshes, skinned - MW-STEEL4). Each
+/** Mac's steel plate, piece by piece (tools/bakeSteelPlate.mjs bakes the meshes, skinned). Each
  *  piece fills the ARMO_PART slots a retail piece of its shape fills, so the priority law and the skin shadows are the
- *  ordinary path: the cuirass the cuirass, and (MW-STEEL2, its painting come: "This is the missing texture for the
- *  morrowind steel armor's skirt") the plate skirt under it Morrowind's skirt slot - modelled from the same cuirass mesh
+ *  ordinary path: the cuirass the cuirass, and
+ *  the plate skirt under it Morrowind's skirt slot - modelled from the same cuirass mesh
  *  as the breastplate, shadowing nothing (ARMO_PART's skirt row), so a clothing skirt worn over it takes the slot at its
  *  higher priority as the law says; each gauntlet its hand, hiding the wrist and forearm under it; the greaves the
- *  upper legs; each pauldron its pauldron, hiding the upper arm it sleeves to the elbow (MW-FIT1); each boot its foot,
+ *  upper legs; each pauldron its pauldron, hiding the upper arm it sleeves to the elbow; each boot its foot,
  *  hiding the ankle and knee. The helm fills the HAIR slot, which hides the hair; the open helm leaves the head, its
- *  face showing, and the closed one hides it (MW-FIT1). */
+ *  face showing, and the closed one hides it. */
 function steelPlate() {
-  const helmClosed = Object.freeze([part('hair', 'steel_plate_helm_closed.nif', ['head'])]);   // MW-FIT1: a closed helm is the head
+  const helmClosed = Object.freeze([part('hair', 'steel_plate_helm_closed.nif', ['head'])]);   // a closed helm is the head
   const helmOpen = Object.freeze([part('hair', 'steel_plate_helm_open.nif')]);
   return [
     steel('daggerfall_steel_cuirass', 'Steel Cuirass', CLASSIC_ARMOR_TEMPLATE.Cuirass, {
@@ -128,7 +128,7 @@ function steelPlate() {
   ];
 }
 
-/** MW-BRIG1: Roleplay & Realism Items' Jerkin as a brigandine - MW-BRIG4: in every metal it is one, its painting the
+/** Roleplay & Realism Items' Jerkin as a brigandine - in every metal it is one, its painting the
  *  metal's (`brigandine_<metal>.nif`, which names `brigandine_<metal>.dds`). One piece, worn as a cuirass (it hides the
  *  chest skin). The skirt needs no split of its own: skinned from the groin, thighs and knees, it bends with the legs
  *  under it. */
@@ -139,11 +139,11 @@ const brigandine = (metal) => Object.freeze({
   templateIndex: RRI_JERKIN_TEMPLATE,
   material: ARMOR_MATERIAL[metal],
   skinFrom: BRIGANDINE_SKIN_FROM,
-  fitTo: 'chest',   // MW-BRIG3: its closed top sits where the chest skin it hides ends, at the base of the neck
+  fitTo: 'chest',   // its closed top sits where the chest skin it hides ends, at the base of the neck
   parts: Object.freeze([Object.freeze({ part: 'cuirass', model: `brigandine_${metal.toLowerCase()}.nif` })]),
 });
 
-/** MW-EBONY1: Mac's ebony plate,
+/** Mac's ebony plate,
  *  Daggerfall's seven classic pieces in Ebony (tools/bakeEbonyPlate.mjs bakes the meshes, skinned as the steel plate's
  *  are). Each piece fills the slots its steel twin fills and hides what it hides - the breastplate the cuirass and its
  *  plates the skirt, each gauntlet its hand over the wrist and forearm, each pauldron its pauldron over the upper arm,
@@ -185,21 +185,21 @@ function ebonyPlate() {
  *
  * `skinFrom`: the body slots the model was fitted over. It is SKINNED FROM THEM at bind time
  * (formats/morrowind/mwSkinTransfer.js): every vertex copies the skin of the body vertex under it, so it moves by the body's
- * own bones and binds and never comes away from it (MW-BRIG2).
+ * own bones and binds and never comes away from it.
  *
- * `fitTo`: the body slot the model HIDES, and so must cover (MW-BRIG3). At bind time the model is moved onto the
+ * `fitTo`: the body slot the model HIDES, and so must cover. At bind time the model is moved onto the
  * wearer - its top to that part's top, measured in the rest pose - before it is skinned. The meshes keep the
  * modeller's scene placement (tools/bakeBrigandine.mjs, `placement: 'scene'`), but that scene's body stood lower than
  * the Morrowind body: drawn at the scene's height, the brigandine sat below the torso and left the chest it hides
- * bare, in MW-BRIG1 and MW-BRIG2 alike.
+ * bare, in both models.
  *
- * A model with neither ships skinned (the steel plate, MW-STEEL4): its NIF carries its own weights and inverse binds,
+ * A model with neither ships skinned (the steel plate): its NIF carries its own weights and inverse binds,
  * as a retail armour mesh's do, and is bound exactly as one.
  *
  * `hides`, per part: the slots a part covers beyond its own, reserved with no mesh so their skin is not drawn (a
  * gauntlet over the wrist and forearm, a boot over the ankle and knee, a pauldron over the upper arm, a closed helm
  * over the head) - reserveIndividualPart's occupation, at the armour's priority like the part itself. A part the
- * first person does not draw hides nothing from it (mwItemMap.js composeWornArmor's `fpShadows`, MW-FIT1).
+ * first person does not draw hides nothing from it (mwItemMap.js composeWornArmor's `fpShadows`).
  *
  * `styles`: a piece that comes more than one way (the steel helm), the parts of each - `parts` is the default's.
  */
@@ -214,7 +214,7 @@ export const OWN_MW_ARMOR = Object.freeze([
 export const ownArmorModelFor = (piece) =>
   (piece && OWN_MW_ARMOR.find((a) => a.templateIndex === piece.templateIndex && a.material === piece.material)) || null;
 
-/** MW-STEEL1: the parts an own model wears in this style - its `styles` entry when it has one, else `parts`. */
+/** The parts an own model wears in this style - its `styles` entry when it has one, else `parts`. */
 export const ownArmorParts = (own, { helmStyle = STEEL_HELM_DEFAULT } = {}) =>
   (own?.styles?.[helmStyle] ?? own?.parts ?? []);
 

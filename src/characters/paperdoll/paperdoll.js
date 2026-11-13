@@ -10,7 +10,7 @@
 //     order (PaperDollRenderer.BlitItems).
 // Dye tables (C5b) and the GetEquipSlot assignment rules (C5c) follow.
 
-import { templateByIndex, ITEM_TEMPLATES } from '../../systems/item/itemTemplates.js';   // FIELD-GUN5: the custom rows too - see getTemplate
+import { templateByIndex, ITEM_TEMPLATES } from '../../systems/item/itemTemplates.js';   // the custom rows too - see getTemplate
 
 export const EQUIP_SLOTS = Object.freeze({
   None: -1,
@@ -41,15 +41,15 @@ export { ITEM_TEMPLATES };
 
 /** Template by classic index (templates are index-keyed but sparse-safe).
  *
- *  FIELD-GUN5. A map built ONCE from the frozen DFU JSON is blind to
+ *  A map built ONCE from the frozen DFU JSON is blind to
  *  `registerCustomTemplates` - and the doll's compose filters `worn`
  *  on `getTemplate` answering, so the port's own weapon was dropped
  *  from the draw list before anything could fail further down. A
  *  second copy of a lookup that a registration door can extend is a
  *  copy that goes stale the first time anyone uses the door.
  *
- *  So it asks the ONE home. AUDIT 68 S05-paperdoll-template-copy: and
- *  ONLY the one home - the map FIELD-GUN5 kept in front of it answered
+ *  So it asks the ONE home. And
+ *  ONLY the one home - a map kept in front of it answered
  *  a mod-patched classic row (registerTemplateOverrides, which
  *  `templateByIndex` asks first) with the unpatched copy. */
 export const getTemplate = (index) => templateByIndex(index) ?? undefined;

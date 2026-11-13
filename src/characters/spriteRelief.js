@@ -1,4 +1,4 @@
-// Sprite reliefs in classic canvas space (Characters C6 redesign).
+// Sprite reliefs in classic canvas space.
 // THE BODY AND THE PIECES ARE THE SAME CONSTRUCTION: every classic
 // paperdoll image (BODY*.IMG, item TEXTURE records) blits at its own
 // screen offset into one 320x200 canvas - so every image becomes a
