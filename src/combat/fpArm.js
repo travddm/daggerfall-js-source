@@ -1611,7 +1611,7 @@ async function buildCreatureBody({ creature, flies = false, deps = null }) {
     if (!arm.ok) return { ok: false, stage: arm.stage || 'assembly', error: arm.error, notes: arm.notes || [] };
     await preloadArmTextures([...arm.pieces, ...(arm.effects ?? [])], archives, gen);
     const textures = collectArmTextures([...arm.pieces, ...(arm.effects ?? [])], archives, gen);
-    const bipedal = (rec.flags & CREA_FLAG.Bipedal) !== 0;
+    const bipedal = (rec.flags & CREA_FLAG.Biped) !== 0;
     const sourcePaths = creatureAnimSources(modelPath, exists, { bipedal });
     if (!sourcePaths.length) return { ok: false, stage: 'clip', error: `no animation file - ${animSourceName(modelPath)} is not in your archives`, notes: arm.notes };
     await loadFromArchives(archives, sourcePaths);

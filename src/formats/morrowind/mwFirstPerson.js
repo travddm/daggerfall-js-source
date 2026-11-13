@@ -251,7 +251,7 @@ function readWeapon(bytes, rec) {
 }
 
 /** A CREA record's FLAG bits (UESP, Tes3Mod:File Format). Only the low byte is kept. */
-export const CREA_FLAG = Object.freeze({ Bipedal: 0x01, Respawn: 0x02, Weapon: 0x04, Base: 0x08, Swims: 0x10, Flies: 0x20, Walks: 0x40, Essential: 0x80 });
+export const CREA_FLAG = Object.freeze({ Biped: 0x01, Respawn: 0x02, WeaponAndShield: 0x04, None: 0x08, Swims: 0x10, Flies: 0x20, Walks: 0x40, Essential: 0x80 });
 
 /** The CREA records, which a creature's body is built from: its id, its model (MODL, the path as the WEAP reader
  *  keeps one), its name, its flags (FLAG's low byte) and its scale (XSCL, 1 when absent). */
@@ -1270,8 +1270,8 @@ export const FP_REQUIRED_BONES = Object.freeze([
   { name: 'Left Upper Arm', why: 'upper arm, left side' },
   { name: 'Right Upper Arm', why: 'upper arm, right side' },
   { name: 'Weapon Bone', why: 'every weapon type except the bow' },
-  { name: 'Weapon Bone Left', why: 'the BOW, and only the bow (rule 8)' },
-  { name: 'Bip01 Spine1', why: 'blend mask: Torso (rule 9)' },
+  { name: 'Weapon Bone Left', why: 'the BOW, and only the bow' },
+  { name: 'Bip01 Spine1', why: 'blend mask: Torso' },
   { name: 'Bip01 L Clavicle', why: 'blend mask: LeftArm' },
   { name: 'Bip01 R Clavicle', why: 'blend mask: RightArm' },
 ]);
@@ -1414,7 +1414,7 @@ export async function assembleCreature({ modelBytes, parseNif = null }) {
   } catch (err) {
     return { ok: false, stage: 'assembly', error: err.message };
   }
-  if (bound.missingBones.length) notes.push(`creature: its skin names no node ${bound.missingBones.map((b) => `"${b}"`).join(', ')} - those influences are skipped (rule 40)`);
+  if (bound.missingBones.length) notes.push(`creature: its skin names no node ${bound.missingBones.map((b) => `"${b}"`).join(', ')} - those influences are skipped`);
   const pieces = [];
   // A creature lit by its own normals, as a person's parts are - a skinned piece's posed by
   // skinBatch, a rigid one's turned by its pre-transform once here and placed with its vertices each pose
@@ -1498,7 +1498,7 @@ export function bindPartsInto(assembly, parts) {
       if (bound.missingBones?.length) {
         const say = `${part.slot}: this skeleton has no bone `
           + `${bound.missingBones.map((b) => `"${b}"`).join(', ')} - `
-          + 'those influences are skipped (rule 40)';
+          + 'those influences are skipped';
         if (!notes.includes(say)) notes.push(say);
       }
       shapeCensus ??= bound.skinned.map((b) => String(b.name || '').trim() || '(nameless)');
@@ -1553,7 +1553,7 @@ export function bindPartsInto(assembly, parts) {
       // into places the game never draws them.
       if (bound.attached.length && bound.skinned.length) {
         const say = `${part.slot}: ${bound.attached.length} unskinned shape(s) in a RIG file are not `
-          + 'attached (attach.cpp:42-46 seeds only skinned geometry)';
+          + 'attached (only skinned geometry is attached in a rig file)';
         if (!notes.includes(say)) notes.push(say);
       } else if (bound.attached.length) {
         // The mirror is fixed here, at bind time, because it is a fact about the bone's name, not about the pose.
@@ -1645,7 +1645,7 @@ export function bindPartsInto(assembly, parts) {
         // empty - a guard on it would be a branch no fixture can take.
         if (named.length) {
           notes.push(`${part.slot} @ ${bone}: no shape matched - the mesh offers `
-            + `${named.map((s) => `"${s}"`).join(', ')} (rule 15's filter is a `
+            + `${named.map((s) => `"${s}"`).join(', ')} (the shape filter is a `
             + 'case-insensitive prefix, "tri " stripped first)');
         }
       }
