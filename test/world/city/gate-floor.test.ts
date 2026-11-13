@@ -170,6 +170,24 @@ test('the models drawn for a placed model: floorless forms for a gate on a road,
   assert.deepEqual(gateMeshIds(41000, matrix, road), { own: 41000, other: 41000 }, 'a model that is no gate');
 });
 
+test('Open city gates on draws the floorless forms on a road, off draws the slab as Daggerfall does', () => {
+  const matrix = placement(300, 200);
+  const road = roadAt(matrix[0] * GATE_OPENING.along + matrix[12], matrix[2] * GATE_OPENING.along + matrix[14]);
+  assert.deepEqual(gateMeshIds(446, matrix, road, true), { own: floorlessGateId(446), other: floorlessGateId(447) });
+  assert.deepEqual(gateMeshIds(446, matrix, road, false), { own: 446, other: 447 }, 'option off: slab drawn');
+  assert.deepEqual(gateMeshIds(447, matrix, road, false), { own: 447, other: 446 }, 'option off, closed gate');
+  assert.deepEqual(
+    gateMeshIds(446, matrix, road),
+    { own: floorlessGateId(446), other: floorlessGateId(447) },
+    'default is on',
+  );
+});
+
+test('the Open city gates row is a player option, on by default', async () => {
+  const { FEATURE_PREF_DEFAULTS } = await import('../../../src/systems/features.js');
+  assert.equal(FEATURE_PREF_DEFAULTS.gateFloorHidden, true);
+});
+
 test('the floorless gate models are registered once, built from the classic record, under ids past every other model', () => {
   installFloorlessGates();
   installFloorlessGates();
