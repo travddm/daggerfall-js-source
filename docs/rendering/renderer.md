@@ -34,8 +34,10 @@ Rules from the data side, stated at the top of `renderer.js`:
   and the spell hands draw 1% larger, as in DFU. Textures with an owner of their own take the filter too, and follow a
   change at their next draw or through the same per-frame check: the far trees, banners and ship flags, the tree
   atlases (`createAtlasTexture`), the body parts and held items (`createCharacterTexture`), and the seabed decorations
-  (`createDecorationTexture`, whose own program carries Sharp's snap behind `uSharpOn`). UI art, the sky, smoothed
-  pictures, data textures, particles and a spell effect's textures keep their own filters.
+  (`createDecorationTexture`), and the meadow's atlas (`src/render/grass-sheets.ts`); the decorations' and the
+  meadow's own programs carry Sharp's snap behind `uSharpOn`. UI art, the sky, smoothed pictures, data textures (the
+  pixel grass sheet among them: its texels are a tone index, a height and a blade ordinal), particles and a spell
+  effect's textures keep their own filters.
 - The Anisotropic Filtering row (preference `anisotropicFiltering`: Off, Per texture, 2x, 4x, 8x, 16x; 8x by default;
   `src/render/anisotropic-filtering.ts`) sets the anisotropy of that world art and of the ground, capped by the
   driver. Per texture is DFU's: 8x on the ground, none elsewhere. It applies only off Point, because Direct3D under

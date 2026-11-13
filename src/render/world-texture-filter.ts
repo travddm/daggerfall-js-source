@@ -171,7 +171,8 @@ export function refilterWorldTexture(gl: TextureGl, texture: object, target: num
 export function filterWorldPicture(gl: TextureGl, texture: object, target: number, mips: boolean): void {
   const state = { mips, mode: POINT, aniso: 1 };
   setWorldSampling(gl, state, currentWorldSampling(gl), target);
-  worldTextures.set(texture, state);
+  // A WebGL texture is always an object; the tests' recording contexts hand back numbers, which no WeakMap can hold.
+  if (typeof texture === 'object' && texture !== null) worldTextures.set(texture, state);
 }
 
 /** Before a draw binds a world picture: re-filters it on the unit now active when a setting changed since. */
