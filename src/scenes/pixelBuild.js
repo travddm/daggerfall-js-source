@@ -16,7 +16,7 @@ import { boxNearPath, pointNearPath, UNITS_PER_METRE, WOD_PIECE_ROAD_CLEAR, wodP
 import { buildingKeysOfType, castleEntranceOf, siegeFieldOf } from '../systems/siegeField.js';
 import { buildingSummaries } from '../world/buildingSummaries.js';
 import { buildPixelWaterIndices, waterSwitchOn } from '../render/waterSurface.js';
-import { BULLETIN_BOARD_MODEL_ID, CITY_GATE_CLOSED_MODEL_ID, CITY_GATE_OPEN_MODEL_ID, isBulletinBoard, isCityGate } from '../world/rmbLayout.js';
+import { BULLETIN_BOARD_MODEL_ID, isBulletinBoard, isCityGate } from '../world/rmbLayout.js';
 import { carveLefay, isLefayTown, lefayExitOf, lefaySpotOf } from '../world/lefayMonument.js';
 import { carveYards } from '../world/merchantYards/merchantYardSites.js';
 import { CityNavigation, NAV_CELL } from '../world/city/cityNavigation.js';
@@ -90,8 +90,7 @@ import { keptPairs, standRoadside } from './roadsidePairs.js';   // JUNGLE-ROADS
 const COVER_SLICE = 2048;
 import { lptFitCap, lptTrunkCap, natureReach, pathTileMask, vergeClear } from '../world/road/roadVerge.js';   // FB1020c TRUNK-FIT: lptTrunkCap
 import { makeBuildingKey } from '../systems/talk/talkTopics.js';
-import { makeCityGate } from '../world/city/cityGate.js';
-import { floorlessGateId, gateOpensOnRoad, installFloorlessGates } from '../world/city/gate-floor.ts';
+import { gateMeshIds, makeCityGate, otherGateModelId } from '../world/city/cityGate.js';
 import { markRemapLaw, remapAsked, remapLawOf, remapSubMeshes, reskinRemap } from '../world/texRemap.js';
 import { MobilePerson, PERSON_MOVE_SPEED, walkerRace } from '../characters/mobile/mobilePerson.js';
 import { multiply, trs } from '../world/mat4.js';
@@ -575,11 +574,8 @@ export function createPixelBuild(host) {
           // departure; the 1:1 lane must not see it.
           if (placed.enhancedOnly && !isEnhanced()) continue;
           if (isHouseSign(placed, b, (id) => cpuModels.get(id)?.doors)) continue;   // HOUSE-SIGN: a shop's sign at a house's door does not stand
-          // A gate whose opening stands on the road leaves its floor face undrawn, so the road shows under the arch.
           const local = multiply(originMatrix, placed.matrix);
-          if (isCityGate(placed.modelIdNum)) installFloorlessGates();
-          const floorless = isCityGate(placed.modelIdNum) && gateOpensOnRoad(local, paths);
-          const meshId = floorless ? floorlessGateId(placed.modelIdNum) : placed.modelIdNum;
+          const { own: meshId, other: otherMeshId } = gateMeshIds(placed.modelIdNum, local, paths);
           const gpu = await getGpuMesh(meshId, () => breather.breathe());   // AUDIT PRE-MERGE 1003 W6: a model built here breathes with the pixel (the colosseum's seal)
           if (!gpu) continue;
           const climateFree = isClimateFreeModel(placed.modelIdNum);   // ARENA1: the colosseum - never swapped, nor a key of the pixel's table
@@ -656,9 +652,7 @@ export function createPixelBuild(host) {
           // the pixel union for BOTH variants so culling stays truthful
           // whichever is drawn.
           if (isCityGate(placed.modelIdNum)) {
-            const otherId = placed.modelIdNum === CITY_GATE_OPEN_MODEL_ID
-              ? CITY_GATE_CLOSED_MODEL_ID : CITY_GATE_OPEN_MODEL_ID;
-            const otherMeshId = floorless ? floorlessGateId(otherId) : otherId;
+            const otherId = otherGateModelId(placed.modelIdNum);
             const otherGpu = await getGpuMesh(otherMeshId);
             const otherCpu = cpuModels.get(otherMeshId);
             if (otherGpu && otherCpu) {

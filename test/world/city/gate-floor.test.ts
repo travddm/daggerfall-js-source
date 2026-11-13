@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { customModelFor } from '../../../src/world/customModels.js';
 import { GATE_OPENING } from '../../../src/world/townWalls.js';
+import { gateMeshIds, otherGateModelId } from '../../../src/world/city/cityGate.js';
 import {
   floorlessGateId,
   gateOpensOnRoad,
@@ -132,6 +133,30 @@ test('a pixel with no road paint, or a gate off the pixel, leaves the floor face
   assert.equal(gateOpensOnRoad(placement(300, 200), null), false, "no paths: the model is Daggerfall's");
   assert.equal(gateOpensOnRoad(placement(300, 200), new Uint8Array(128 * 128)), false, 'no road tile');
   assert.equal(gateOpensOnRoad(placement(-50, 2000), roadAt(300, 200)), false, 'off the pixel');
+});
+
+test('the models drawn for a placed model: floorless forms for a gate on a road, the placed forms for anything else', () => {
+  const matrix = placement(300, 200);
+  const road = roadAt(matrix[0] * GATE_OPENING.along + matrix[12], matrix[2] * GATE_OPENING.along + matrix[14]);
+  assert.equal(otherGateModelId(446), 447);
+  assert.equal(otherGateModelId(447), 446);
+  assert.deepEqual(
+    gateMeshIds(446, matrix, road),
+    { own: floorlessGateId(446), other: floorlessGateId(447) },
+    'an open gate on a road',
+  );
+  assert.deepEqual(
+    gateMeshIds(447, matrix, road),
+    { own: floorlessGateId(447), other: floorlessGateId(446) },
+    'a closed gate on a road',
+  );
+  assert.deepEqual(gateMeshIds(446, matrix, null), { own: 446, other: 447 }, 'no road network');
+  assert.deepEqual(
+    gateMeshIds(446, matrix, new Uint8Array(128 * 128)),
+    { own: 446, other: 447 },
+    'no road under the opening',
+  );
+  assert.deepEqual(gateMeshIds(41000, matrix, road), { own: 41000, other: 41000 }, 'a model that is no gate');
 });
 
 test('the floorless gate models are registered once, built from the classic record, under ids past every other model', () => {
