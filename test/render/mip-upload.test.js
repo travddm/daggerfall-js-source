@@ -21,6 +21,20 @@ function fresh(quality) {
   return { renderer, calls };
 }
 
+test('a fresh shelf is Standard, and so is a stored value that is not Sharp; a world texture then gets the driver chain', () => {
+  resetSettings();
+  resetPrefs();
+  assert.equal(mipQuality(), 'standard');
+  setPref('mipQuality', 'nonsense');
+  assert.equal(mipQuality(), 'standard');
+  resetPrefs();
+  const { canvas, calls } = stateGl();
+  const renderer = new Renderer(canvas);
+  calls.length = 0;
+  renderer.uploadTexture(7, 0, picture(8));
+  assert.equal(named(calls, 'generateMipmap').length, 1);
+});
+
 test('Sharp uploads every level of a world texture by hand and never asks the driver for a chain', () => {
   const { renderer, calls } = fresh('sharp');
   renderer.uploadTexture(7, 0, picture(8));

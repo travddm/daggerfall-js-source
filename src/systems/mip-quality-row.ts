@@ -8,8 +8,8 @@ import { t } from './textManager.js';
 
 export const MIP_QUALITY_PREF = 'mipQuality';
 
-/** The row's default. */
-export const MIP_QUALITY_DEFAULT = 'sharp';
+/** The row's default: Daggerfall Unity's own chain. Sharp is the player's choice. */
+export const MIP_QUALITY_DEFAULT = 'standard';
 
 type Tier = readonly [string, string];
 

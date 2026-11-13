@@ -46,10 +46,10 @@ export type MipGl = Pick<
   | 'isTexture'
 >;
 
-/** The row's value now. Anything stored that is not `standard` is Sharp. */
+/** The row's value now. Anything stored that is not `sharp` is Standard. */
 export function mipQuality(): MipQuality {
   const stored = getPref(MIP_QUALITY_PREF) ?? MIP_QUALITY_DEFAULT;
-  return stored === 'standard' ? 'standard' : 'sharp';
+  return stored === 'sharp' ? 'sharp' : 'standard';
 }
 
 type Tracked = {

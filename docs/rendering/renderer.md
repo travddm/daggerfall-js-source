@@ -55,16 +55,16 @@ Rules from the data side, stated at the top of `renderer.js`:
   layers are therefore uploaded with each transparent texel in the colour of its nearest opaque texel, alpha kept, and
   their mips are built from that picture (`src/render/alpha-bleed.ts`). Point is unchanged. Banners and ship flags
   upload premultiplied instead.
-- The Mip quality row (preference `mipQuality`: Standard or Sharp; `src/systems/mip-quality-row.ts`) picks how the
-  smaller levels of every mip-mapped world picture are built. Standard calls `gl.generateMipmap`, the driver's box
-  average, as Daggerfall Unity does. Sharp builds each level on the CPU in `src/render/mip-chain.ts`: in linear light,
-  with a Lanczos-windowed kernel, from the float level above, with colour weighted by alpha, with the coverage of a
-  pure cut-out (alpha only 0 or 255) kept at every level, and with each level's transparent texels bled as level 0's
-  are. A repeating texture filters across its edge; the ground tile arrays, the far trees and the decor arrays clamp.
-  `src/render/mip-upload.ts` uploads the levels by hand, so the memory is the same as Standard's, and remembers each
-  texture so a change of the row rebuilds the loaded ones on the next frame (`applyMipQuality`: Standard calls
-  `generateMipmap` again; Sharp reads level 0 back from the GPU). The tree atlases a mod ships, the Morrowind character
-  textures and every data texture keep their own levels.
+- The Mip quality row (preference `mipQuality`: Standard or Sharp, Standard by default;
+  `src/systems/mip-quality-row.ts`) picks how the smaller levels of every mip-mapped world picture are built. Standard
+  calls `gl.generateMipmap`, the driver's box average, as Daggerfall Unity does. Sharp builds each level on the CPU in
+  `src/render/mip-chain.ts`: in linear light, with a Lanczos-windowed kernel, from the float level above, with colour
+  weighted by alpha, with the coverage of a pure cut-out (alpha only 0 or 255) kept at every level, and with each
+  level's transparent texels bled as level 0's are. A repeating texture filters across its edge; the ground tile arrays,
+  the far trees and the decor arrays clamp. `src/render/mip-upload.ts` uploads the levels by hand, so the memory is the
+  same as Standard's, and remembers each texture so a change of the row rebuilds the loaded ones on the next frame
+  (`applyMipQuality`: Standard calls `generateMipmap` again; Sharp reads level 0 back from the GPU). The tree atlases a
+  mod ships, the Morrowind character textures and every data texture keep their own levels.
 
 ## Resources
 
