@@ -7,6 +7,8 @@
 // mask Point). Owned by scenes/snowfallHost.js, disposed with it.
 
 import { SNOW_ATTR } from './snowfallGlsl.js';
+import { filterGroundPicture } from './ground-sampler.ts';
+import { onWorldSamplingChange } from './live-world-sampling.ts';
 import { MID, BLANKET, snowUniforms } from '../systems/snowfallRuntime.js';
 
 /** The generic values a tier's absent channels read: the local window has no contexts of its own (Excluded), no tier
@@ -55,12 +57,22 @@ export class SnowfallSurface {
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+    filterGroundPicture(gl);   // the ground's sampling, so the snow ground matches the ground beside it
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
     gl.bindTexture(gl.TEXTURE_2D, null);
     this.albedo = tex;
+    this._unwatchSampling ??= onWorldSamplingChange(() => this._refilterAlbedo());
+  }
+
+  /** The albedo brought to a changed world filter, Ground sharpness or Anisotropic Filtering. */
+  _refilterAlbedo() {
+    if (!this.albedo) return;
+    const gl = this.gl;
+    this._seam();
+    gl.bindTexture(gl.TEXTURE_2D, this.albedo);
+    filterGroundPicture(gl);
+    gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
   /** AUDIT ENVIRONS G1: the seam a GL user outside the renderer owes it before it binds a buffer or a picture - the 2D
@@ -240,6 +252,8 @@ export class SnowfallSurface {
     this.local = null;
   }
   dispose() {
+    this._unwatchSampling?.();
+    this._unwatchSampling = null;
     const gl = this.gl;
     this._dropLocal();
     if (this.mid) { this._dropMesh(this.mid.mesh); for (const t of [this.mid.history, this.mid.statics, this.mid.context]) gl.deleteTexture(t); this.mid = null; }

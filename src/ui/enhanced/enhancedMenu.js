@@ -2064,8 +2064,8 @@ function categoryCard({ pool = portPool(), pause = false } = {}) {
 /** The quality preset's words, in the player's language; the search finds the row by them and by the rows' titles. */
 const PRESET_WORDS = {
   name: () => t('menu.settings.preset.name', 'Quality preset'),
-  note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.'),
-  effect: () => t('menu.settings.preset.effect', 'Steady shadows and the windows change at once; the rest when the world next loads.'),
+  note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, anisotropic filtering, water, windows and steady shadows.'),
+  effect: () => t('menu.settings.preset.effect', 'Steady shadows, the windows, ground sharpness and anisotropic filtering change at once; the rest when the world next loads.'),
   custom: () => t('menu.settings.preset.custom', 'Custom'),
 };
 const PRESET_LABELS = {
@@ -2073,7 +2073,7 @@ const PRESET_LABELS = {
   high: () => t('menu.settings.preset.high', 'High'), ultra: () => t('menu.settings.preset.ultra', 'Ultra'),
 };
 export const presetSearchText = () => ['quality preset graphics low medium high ultra performance frame rate slow',
-  'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.', PRESET_WORDS.name(), PRESET_WORDS.note(), PRESET_WORDS.effect(),
+  'View distance, grass, clouds, ground sharpness, anisotropic filtering, water, windows and steady shadows.', PRESET_WORDS.name(), PRESET_WORDS.note(), PRESET_WORDS.effect(),
   ...GRAPHICS_PRESETS.map((p) => PRESET_LABELS[p.id]?.() ?? p.label),
   ...PRESET_ROWS.map((id) => FEATURES.find((f) => f.id === id)?.title ?? ''),
   ...PRESET_PARTS.map((k) => FEATURES.flatMap((f) => resolveControl(f)?.parts ?? []).find((pt) => pt.key === k)?.label ?? k)].join(' ');
@@ -3552,20 +3552,24 @@ export function barReading(st) {
   return { off, switch: off >= 0, on: off < 0 || st.at !== off };
 }
 
-/** FT14: the bar. One object for two states or five. */
-function segBar(st, label) {
+/** What a row's name says when its bar refuses a press: online for an online lock, else the row's own reason it has
+ *  no effect now (its `inactive()`), or null when the bar takes a press. */
+const lockWords = (st, f) => (st?.locked ? t('menu.features.onlineLock', 'online') : (f.inactive?.() ?? null));
+
+/** The bar, one object for two states or five. With `lockText` (lockWords) it is drawn but refuses a press. */
+function segBar(st, label, lockText = null) {
   const r = barReading(st);
-  const seg = el('div', `ft-seg${r.switch ? ' ft-seg-switch' : ''}${st.locked ? ' locked' : ''}`);
+  const seg = el('div', `ft-seg${r.switch ? ' ft-seg-switch' : ''}${st.locked || lockText ? ' locked' : ''}`);
   seg.setAttribute('role', 'group');
   seg.setAttribute('aria-label', label);
   st.labels.forEach((L, i) => {
     const b = el('button', `ft-segb${i === r.off ? ' off' : ''}`, st.shown?.[i] ?? L);
     b.type = 'button';
     b.setAttribute('aria-pressed', String(i === st.at));
-    if (st.locked) {
+    if (st.locked || lockText) {
       b.disabled = true;
       b.setAttribute('aria-disabled', 'true');
-      b.title = noteText(ONLINE_LOCK_NOTE);
+      b.title = st.locked ? noteText(ONLINE_LOCK_NOTE) : lockText;
     } else {
       b.onclick = (e) => { e.stopPropagation(); st.set(i); render(); };
     }
@@ -3584,6 +3588,7 @@ let featureOpen = null;
 export function featureTile(f) {
   const c = resolveControl(f);
   const st = tileStates(f);
+  const lockText = lockWords(st, f);
   const tile = el('div', `ft-tile${pickedFeature === f.id ? ' sel' : ''}`);
   tile.id = `opt-${f.id}`;   // ORG2: the mods' list brings a row into view by it
   tile.dataset.fid = f.id;   // FT18: the search hides tiles by it
@@ -3595,26 +3600,21 @@ export function featureTile(f) {
   main.append(el('div', 'ft-tile-name', f.title));
   const meta = el('div', 'ft-tile-meta');
   for (const k of KIND_ORDER) if (f.kinds.includes(k)) meta.append(el('span', `kind ${k}`, KINDS[k].label));
-  if (st?.locked) meta.append(el('span', 'ft-tile-lock', t('menu.features.onlineLock', 'online')));
+  if (lockText) meta.append(el('span', 'ft-tile-lock', lockText));
   main.append(meta);
   main.onclick = () => { pickedFeature = f.id; pickedKey = null; sheetOpen = true; render(); };
   tile.append(main);
 
   // the control, or the row's own builder when it is not a bar
   const ctl = el('div', 'ft-tile-ctl');
-  if (st) ctl.append(segBar(st, f.title));
+  if (st) ctl.append(segBar(st, f.title, lockText));
   else ctl.append(featureRow(f));
   tile.append(ctl);
 
   // the drawer's door: a mod's modules and dials.
   //
-  // AUDIT FT14: the vendor is the row's OWN when it has one, and
-  // otherwise the one it COVERS. A condensed row (FT2's `also`) drives
-  // a mod's switch without living in the mods store - Enhanced
-  // environments is Dynamic Skies' Enabled, through its three-way -
-  // and reading `c.vendor` alone left that mod's five particle keys
-  // with no tile to open once the Mods pane was gone. `also` already
-  // declared the cover; the drawer follows it.
+  // The vendor is the row's own when it has one, else the one its `also` covers: a condensed row such as Enhanced
+  // environments drives a mod's switch (Dynamic Skies) without living in the mods store, and its drawer opens that mod.
   const vendor = c.store === 'mods' ? c.vendor
     : (Array.isArray(c.also) ? c.also.find((a) => a.store === 'mods')?.vendor : null) ?? null;
   if (vendor) {

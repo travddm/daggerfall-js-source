@@ -19,17 +19,28 @@ Rules from the data side, stated at the top of `renderer.js`:
 
 - UVs can be negative or above 1. Daggerfall's models rely on `REPEAT` wrapping.
 - Textures from `TextureFile.getColor32` are already bottom-up, which is GL's texel order. Upload with `flipY` off.
-- Indexed colour means hard pixels: world textures use `NEAREST` filtering by default. The filter is Daggerfall Unity's
-  `Video/MainFilterMode` (Point, Bilinear, Trilinear; `src/render/world-texture-filter.ts`). Every mip-mapped classic
-  texture, its emission map, and the weapon and spell-hand sprites take it at upload. A cached texture takes a changed
-  value the next time a scene asks for it (`Renderer._worldHit`). Off Point, the weapon and the spell hands draw 1%
-  larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
-- `Video/QualityLevel` sets the anisotropy of that world art, as Unity's quality levels do: Beautiful and Fantastic
-  force 9x (capped by the driver), the lower levels leave it at 1x. It applies only off Point, because Direct3D under
-  ANGLE makes a sampler with anisotropy above 1 fully linear; so the default (Point, Fantastic) costs nothing.
-- The ground tile arrays take the world filter for magnification only. The Ground sharpness row decides their
-  minification and anisotropy (`src/render/ground-sampler.ts`), and `applyGroundSharpness` applies both at every world
-  load.
+- Indexed colour means hard pixels. The world texture filter is Daggerfall Unity's `Video/MainFilterMode` (Point,
+  Bilinear, Trilinear; `src/render/world-texture-filter.ts`) plus the port's Sharp, the port's default (DFU's is
+  Point). Sharp samples through a linear sampler with anisotropy, and its world shaders move each coordinate to its
+  texel's centre with a one-pixel blend at each texel edge (`src/render/sharp-texels.ts`): square texels close up,
+  filtered ground in the distance. The world sets are built Sharp or plain for the filter, and swapped when it changes
+  (`src/render/sharp-world-sets.ts`). In the retro modes Sharp drops the edge blend, so every texel is sampled at its
+  centre as under Point, and its samples take the Retro Mip Bias row's bias (preference `retroMipBias`, 0 to -2 levels
+  in quarters, DFU's fixed -0.75 by default; `src/systems/retro-mip-bias-row.ts`). The bias acts only when Retro Mip
+  Maps keeps the mip chains, and the row is drawn disabled with that reason until then. The values reach the shaders
+  as one uniform set at each frame's start (`src/render/retro-sharp.ts`). Every mip-mapped classic
+  texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
+  cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
+  and the spell hands draw 1% larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
+- The Anisotropic Filtering row (preference `anisotropicFiltering`: Off, Per texture, 2x, 4x, 8x, 16x; 8x by default;
+  `src/render/anisotropic-filtering.ts`) sets the anisotropy of that world art and of the ground, capped by the
+  driver. Per texture is DFU's: 8x on the ground, none elsewhere. It applies only off Point, because Direct3D under
+  ANGLE makes a sampler with anisotropy above 1 fully linear. A change of `Video/QualityLevel` sets the row as DFU's
+  quality levels set Unity's anisotropy: Fastest and Fast Off, Simple and Good Per texture, Beautiful and Fantastic 8x.
+- The ground tile arrays take the world filter for magnification, the Ground sharpness row for minification (nearest-mip
+  or trilinear) and the Anisotropic Filtering row for anisotropy (`src/render/ground-sampler.ts`). The snow ground's
+  albedo takes the same (`filterGroundPicture`). `applyGroundSharpness` applies them at every world load, and on the
+  next frame after any of them changes.
 - A texel with alpha 0 is a palette cutout. The shaders discard it.
 
 ## Resources

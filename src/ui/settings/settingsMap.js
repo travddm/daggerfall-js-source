@@ -47,11 +47,11 @@ export const CATEGORIES = Object.freeze([
     sec("plants", "Plants, trees & wind", [
       "feat:grass", "feat:wind", "feat:mod-windfall", "feat:mod-low-poly-trees", "feat:mod-seasons-iliac-bay"]),
     sec("looks", "Textures & looks", [
-      "link:overhauls", "feat:dungeon-wall-style", "Video/RandomDungeonTextures", "Video/MainFilterMode", "GUI/GUIFilterMode", "GUI/VideoFilterMode",
+      "link:overhauls", "feat:dungeon-wall-style", "Video/RandomDungeonTextures", "Video/MainFilterMode", "feat:anisotropic-filtering", "GUI/GUIFilterMode", "GUI/VideoFilterMode",
       "Video/EnableTextureArrays", "GUI/AccelerateUICopyTexture"]),
     sec("retro", "Retro look", [
       "feat:classic-picture", "feat:classic-aspect", "feat:classic-colours", "feat:classic-distance-shading",
-      "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "Video/RetroModeAspectCorrection",
+      "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "feat:retro-mip-bias", "Video/RetroModeAspectCorrection",
       "Video/PalettizationLUTShift"]),
     sec("shadows", "Daggerfall Unity's shadows", [
       "Video/DungeonLightShadows", "Video/InteriorLightShadows", "Video/ExteriorLightShadows", "Video/MobileNPCShadows",

@@ -8,13 +8,12 @@ import {
   TRILINEAR,
   filterUpload,
   needsRefilter,
-  parseQualityLevel,
   parseWorldFilterMode,
-  qualityAnisotropyFor,
   refilterWorldTexture,
   worldFilterFor,
 } from '../../src/render/world-texture-filter.ts';
-import { Renderer } from '../../src/render/renderer.js';
+import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
+import { getPref, setPref, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { VideoPlayer } from '../../src/ui/videoPlayer.js';
 import { loadHud } from '../../src/ui/hud/hud.js';
@@ -47,6 +46,7 @@ test("Unity's three modes, with and without mip maps", () => {
 
 test('world art takes the world filter at upload and again when a scene asks for it after a change; UI art keeps NEAREST', () => {
   resetSettings();
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -54,7 +54,7 @@ test('world art takes the world filter at upload and again when a scene asks for
     const hands = r.uploadTexture('img', 'hands:test:0', picture(), { clamp: true, world: true });
     const ui = r.uploadTexture('img', 'ui:test', picture());
     const smooth = r.uploadTexture('img', 'logo:test', picture(), { smooth: true });
-    assert.deepEqual(filters(wall), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'Point by default: as before');
+    assert.deepEqual(filters(wall), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'Point: as before');
     assert.deepEqual(filters(hands), [E.NEAREST, E.NEAREST]);
 
     choose(BILINEAR);
@@ -80,6 +80,7 @@ test('world art takes the world filter at upload and again when a scene asks for
 
 test('an emission map follows its albedo, so both samples still blend alike', () => {
   resetSettings();
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -95,6 +96,7 @@ test('an emission map follows its albedo, so both samples still blend alike', ()
 
 test("the ground's magnification follows the world filter at each world load; Ground sharpness keeps its minification", () => {
   resetSettings();
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -167,22 +169,10 @@ test('the compass pictures take GUI/GUIFilterMode, Point by default; the bars ke
   }
 });
 
-test("the quality level's anisotropy: forced to 9 from Beautiful up, off Point only, within the driver's ceiling", () => {
-  for (const level of [0, 1, 2, 3, 4, 5])
-    assert.equal(qualityAnisotropyFor(level, POINT, 16), 1, `Point keeps 1 at ${level}`);
-  for (const level of [0, 1, 2, 3])
-    assert.equal(qualityAnisotropyFor(level, BILINEAR, 16), 1, `level ${level} forces nothing`);
-  assert.equal(qualityAnisotropyFor(4, BILINEAR, 16), 9);
-  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 16), 9);
-  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 4), 4, "the driver's ceiling");
-  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 0), 1, 'no extension');
-  assert.equal(parseQualityLevel('3'), 3);
-  for (const bad of ['6', '-1', 'Fantastic', '', null])
-    assert.equal(parseQualityLevel(bad), 5, `${bad} reads as DFU's default`);
-});
-
-test('a world texture takes the anisotropy at upload, and a changed quality level re-filters it', () => {
+test('a world texture takes the Anisotropic Filtering row at upload, and a change of the row or the filter re-filters it', () => {
   resetSettings();
+  resetPrefs();
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const ext = { TEXTURE_MAX_ANISOTROPY_EXT: 0x84fe, MAX_TEXTURE_MAX_ANISOTROPY_EXT: 0x84ff };
   const set = [];
   const gl = {
@@ -201,12 +191,80 @@ test('a world texture takes the anisotropy at upload, and a changed quality leve
     choose(TRILINEAR);
     assert.equal(needsRefilter(gl, texture), true, 'the filter changed');
     refilterWorldTexture(gl, texture);
-    setValue('Video', 'QualityLevel', '3');
-    assert.equal(needsRefilter(gl, texture), true, 'the quality level changed');
+    setPref('anisotropicFiltering', 'texture');
+    assert.equal(needsRefilter(gl, texture), true, 'the row changed');
     refilterWorldTexture(gl, texture);
     assert.equal(needsRefilter(gl, texture), false);
-    assert.deepEqual(set, [1, 9, 1], 'Point and Fantastic, then Trilinear and Fantastic, then Trilinear and Good');
+    assert.deepEqual(
+      set,
+      [1, 8, 1],
+      "Point (none), then Trilinear at the row's default 8x, then Per texture (none on a model)",
+    );
   } finally {
     resetSettings();
+    resetPrefs();
+  }
+});
+
+test('a change made while playing reaches every cached world texture and ground array on the next frame, with no reload', async () => {
+  resetSettings();
+  resetPrefs();
+  const { GRAPHICS_PRESETS } = await import('../../src/systems/graphicsPresets.js');
+  const { applyGraphicsPreset } = await import('../../src/ui/enhanced/enhancedMenu.js');
+  const { canvas } = stateGl();
+  const r = new Renderer(canvas);
+  const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+  const frame = () => r.beginFrame(I, I, new Float32Array([0, 1, 0]), WORLD_FRAME);
+  try {
+    const wall = r.uploadTexture(5, 1, picture());
+    const glow = r.uploadEmissionTexture(5, 1, picture());
+    const ground = r.uploadTileArray(302, [picture(), picture()]);
+    frame();
+    choose(TRILINEAR);
+    frame();
+    assert.deepEqual(
+      filters(wall),
+      [E.LINEAR_MIPMAP_LINEAR, E.LINEAR],
+      'World Texture Filter: the cached wall, at once',
+    );
+    assert.deepEqual(filters(glow), [E.LINEAR_MIPMAP_LINEAR, E.LINEAR], 'and its glow');
+    assert.equal(ground.params[E.TEXTURE_MAG_FILTER], E.LINEAR, "and the ground's magnification");
+    setPref('groundSharpness', 'off');
+    frame();
+    assert.equal(ground.params[E.TEXTURE_MIN_FILTER], E.NEAREST_MIPMAP_NEAREST, 'Ground sharpness Off, at once');
+    applyGraphicsPreset(GRAPHICS_PRESETS.find((p) => p.id === 'ultra'));
+    frame();
+    assert.equal(getPref('anisotropicFiltering'), 16, 'the Quality preset wrote its anisotropy');
+    assert.equal(ground.params[E.TEXTURE_MIN_FILTER], E.LINEAR_MIPMAP_LINEAR, 'and the arrays took it at once');
+    choose(POINT);
+    frame();
+    assert.deepEqual(filters(wall), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'and back to Point');
+  } finally {
+    resetSettings();
+    resetPrefs();
+  }
+});
+
+test('a world picture outside the caches (a banner, a flag, the far trees) follows the filter at its next draw', async () => {
+  const { BannerRenderer } = await import('../../src/render/bannerPass.js');
+  const { ShipFlagRenderer } = await import('../../src/render/shipFlagPass.js');
+  resetSettings();
+  resetPrefs();
+  const { gl } = stateGl();
+  try {
+    const banners = new BannerRenderer(gl, { paint: () => ({ width: 4, height: 4 }) });
+    const flags = new ShipFlagRenderer(gl, { paint: () => ({ width: 4, height: 4 }) });
+    const banner = banners.textureOf('hall', {}, 0);
+    const flag = flags.textureOf('ship', {}, 0);
+    assert.deepEqual(filters(banner), [E.LINEAR_MIPMAP_LINEAR, E.LINEAR], 'Sharp, the default: trilinear, as before');
+    assert.deepEqual(filters(flag), [E.LINEAR_MIPMAP_LINEAR, E.LINEAR]);
+    choose(POINT);
+    assert.equal(banners.textureOf('hall', {}, 1), banner, 'the cached texture');
+    flags.textureOf('ship', {}, 1);
+    assert.deepEqual(filters(banner), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'Point at the next draw');
+    assert.deepEqual(filters(flag), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST]);
+  } finally {
+    resetSettings();
+    resetPrefs();
   }
 });
