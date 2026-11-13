@@ -133,3 +133,19 @@ test('an opaque request ignores the fourth channel', () => {
   const rgba = filled(4, 4, () => [10, 20, 30, 0]);
   for (const level of buildMipChain(rgba, 4, 4, { ...clampBoth, opaque: true })) assert.equal(level.data[3], 255);
 });
+
+test('setMipKernel changes the kernel of a build that names none', async () => {
+  const { setMipKernel, DEFAULT_MIP_KERNEL } = await import('../../src/render/mip-chain.ts');
+  const rgba = filled(16, 2, (x) => (x === 8 ? [255, 255, 255, 255] : [0, 0, 0, 255]));
+  const first = (kernel?: 'box' | 'lanczos3') =>
+    buildMipChain(rgba, 16, 2, { wrapX: false, wrapY: false, kernel })[0].data.join(',');
+  const byDefault = first();
+  try {
+    setMipKernel('box');
+    assert.equal(first(), first('box'));
+    assert.notEqual(first(), byDefault);
+  } finally {
+    setMipKernel(DEFAULT_MIP_KERNEL);
+  }
+  assert.equal(first(), byDefault);
+});

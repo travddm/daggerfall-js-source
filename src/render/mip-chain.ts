@@ -31,8 +31,17 @@ export type MipOptions = {
   readonly opaque?: boolean;
 };
 
-/** The kernel the world's pictures use. Chosen from stills at the Daggerfall gate (docs/rendering/performance.md). */
+/** The kernel the world's pictures use. Lanczos3 and Kaiser looked the same in game stills at the Daggerfall gate and
+ *  cost a third to a half more to build, so the cheapest windowed sinc is used. */
 export const DEFAULT_MIP_KERNEL: MipKernel = 'lanczos2';
+
+let kernelInUse: MipKernel = DEFAULT_MIP_KERNEL;
+
+/** Changes the kernel a build uses when its options name none. The Mip quality row has no kernel choice: this is for
+ *  comparing kernels in the running game, followed by a rebuild (`Renderer.applyMipQuality`). */
+export function setMipKernel(kernel: MipKernel): void {
+  kernelInUse = kernel;
+}
 
 /** Below this share of a texel's alpha the world shaders discard it (uAlphaCut and the flats' cut are 0.5). */
 const ALPHA_CUT = 0.5;
@@ -66,7 +75,7 @@ export function buildMipChain(
 ): MipLevel[] {
   const count = mipLevelCount(width, height);
   if (count === 0) return [];
-  const kernel = options.kernel ?? DEFAULT_MIP_KERNEL;
+  const kernel = options.kernel ?? kernelInUse;
   const premultiplied = options.premultiplied === true;
   const opaque = options.opaque === true;
   const levelZero = toLinearPremultiplied(rgba, width * height, premultiplied, opaque);
