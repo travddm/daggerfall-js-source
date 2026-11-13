@@ -741,6 +741,7 @@ import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, filterWorldPicture, freshWorldPicture, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { bleedForFilter } from './alpha-bleed.ts';
+import { allocateArrayMips, applyMipQuality, hasMips, mipQuality, trackMips, uploadLayerMips, uploadWorldMips } from './mip-upload.ts';
 import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
@@ -5353,16 +5354,18 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const world = isWorldArt(opts, mips, own);
     const bytes = color32Bytes(color32, `uploadTexture(${archive}, ${record})`);   // WW3: the shape's own error, not a TypeError three frames down
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    const level0 = bleedForFilter(world, bytes, color32.width, color32.height);   // no black cut-out edge under a linear filter
     gl.texImage2D(
       gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
       // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer, and
       // `.buffer` would upload that whole buffer from zero (color32Bytes)
-      gl.RGBA, gl.UNSIGNED_BYTE, bleedForFilter(world, bytes, color32.width, color32.height),   // no black cut-out edge under a linear filter
+      gl.RGBA, gl.UNSIGNED_BYTE, level0,
     );
     const { wrap, filter } = textureParams(gl, opts);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
-    if (mips) gl.generateMipmap?.(gl.TEXTURE_2D);
+    const wrapS = own ? own.wrapS : wrap, wrapT = own ? own.wrapT : wrap;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+    if (mips) uploadWorldMips(gl, tex, level0, color32.width, color32.height, { wrapX: wrapS === gl.REPEAT, wrapY: wrapT === gl.REPEAT });
     filterUpload(gl, tex, world, mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: TryImportTexture's - DFU's retro arm never reaches it (J7: a lost context's null is no key)
     else if (mips && !this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
@@ -6799,19 +6802,18 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     gl.bindTexture(gl.TEXTURE_2D, tex);
     this._forgetTextureShadows();   // PERF-TEX: an upload owns unit 1 and leaves it ACTIVE - no shadow may speak past it (AUDIT-AIR1: through the one home, like the other six)
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
-      gl.RGBA, gl.UNSIGNED_BYTE, color32Bytes(color32, `uploadEmissionTexture(${archive}, ${record})`)   // AUDIT 19 F7: the view, not its buffer; WW3: named when the shape is wrong
-    );
+    const emissionBytes = color32Bytes(color32, `uploadEmissionTexture(${archive}, ${record})`);   // the view, not its buffer; named when the shape is wrong
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, emissionBytes);
     const own = opts.sampler ? samplerParams(gl, opts.sampler, true) : null;   // its albedo's own sampling
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : gl.REPEAT);
+    const wrapS = own ? own.wrapS : gl.REPEAT, wrapT = own ? own.wrapT : gl.REPEAT;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
     // REVIEW 2026-09-05: the emission map carries the same chain as the
     // albedo (TextureReader.cs:316/:328/:340 new Texture2D(..., MipMaps),
     // :306 reuses the mipped albedo) and is point-sampled over it
     // (MaterialReader.cs:448/:104). The shader subtracts one from the
     // other (:108-109): both samples must come from the same mip level.
-    gl.generateMipmap?.(gl.TEXTURE_2D);
+    uploadWorldMips(gl, tex, emissionBytes, color32.width, color32.height, { wrapX: wrapS === gl.REPEAT, wrapY: wrapT === gl.REPEAT, opaque: true });   // the albedo's chain kind
     filterUpload(gl, tex, !own, true, own, gl.NEAREST);   // the albedo's world filter too, so both samples still blend alike
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: a replacement albedo's map - neither is capped (J7: a lost context's null is no key)
     else if (!this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: the albedo's cap, so both samples still come from one level
@@ -7354,8 +7356,14 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const w = layers[0].width;
     const h = layers[0].height;
     gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, w, h, layers.length, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    // Mip quality Sharp: each layer's smaller levels are built as the layer goes up, so the cost spreads over the steps
+    const sharpMips = mipQuality() === 'sharp' && hasMips(w, h);
+    const mipSpec = { wrapX: false, wrapY: false };   // a tile is drawn rotated and flipped, so its far edge is not its neighbour
+    if (sharpMips) allocateArrayMips(gl, w, h, layers.length);
     for (let i = 0; i < layers.length; i++) {
-      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, w, h, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(layers[i].colors.buffer, layers[i].colors.byteOffset, w * h * 4));
+      const level0 = new Uint8Array(layers[i].colors.buffer, layers[i].colors.byteOffset, w * h * 4);
+      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, w, h, 1, gl.RGBA, gl.UNSIGNED_BYTE, level0);
+      if (sharpMips) uploadLayerMips(gl, level0, w, h, i, mipSpec);
       if ((i + 1) % TILE_LAYERS_A_STEP === 0 && i + 1 < layers.length) { yield; gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex); }
     }
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
@@ -7364,7 +7372,8 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // real footprint and the tile wrap blurs no line round a tile. Magnification and the wrap are the world filter's
     // (_setGroundSampler): NEAREST and a clamp under Point. A 2D array mipmaps each layer on its own, so no tile bleeds
     // into another.
-    gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+    if (!sharpMips) gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+    trackMips(tex, gl.TEXTURE_2D_ARRAY, w, h, layers.length, mipSpec);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
     // a grazing angle almost everywhere, and an isotropic mip has to take
@@ -7450,6 +7459,15 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
     this.groundTier = tier;
     return s;
+  }
+
+  /** Gives every cached world texture, emission map, ground array and far-tree array the mip chain the Mip quality row
+   *  asks for (render/mip-upload.ts), once a frame after the row changes (render/live-world-sampling.ts). */
+  applyMipQuality() {
+    const gl = this.gl;
+    this._activeTexture(gl.TEXTURE0);
+    applyMipQuality(gl);
+    this._forgetTextureShadows();   // the rebuild bound its own textures on unit 0
   }
 
   /** GRAIN AUDIT 1: THE DIAL LANDS. `uploadTileArray` returns the cached

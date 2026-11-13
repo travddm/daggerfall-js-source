@@ -46,6 +46,7 @@ import { classicLook } from './classicShadowLane.js';
 import { pipelinePictures } from './farFlora.js';
 import { bandTreeArt } from '../world/terrain/floraCover.js';   // TESA-LANDS: a band tree of a zone's own archive
 import { filterWorldPicture, freshWorldPicture } from './world-texture-filter.ts';
+import { mipQuality, trackMips, uploadLayerMips } from './mip-upload.ts';
 
 /** HORIZON-TREES: the samples of a tree's sight line read over the middle ring's ground (the eye's end and the tree's not). */
 export const HORIZON_STEPS = 24;
@@ -87,6 +88,8 @@ export const BAND_RING = 1;
 export const BAND_FADE = Object.freeze([0.5, 1.45]);
 /** An atlas layer's side (texels) and the layers it holds. */
 export const TREE_LAYER = 64;
+/** A tree picture's mips stop at its edge: it is one picture in a layer, not a tile. */
+const TREE_MIP_SPEC = { wrapX: false, wrapY: false };
 export const TREE_LAYERS = 48;
 /** The texture unit the atlas rides for the pass (inside the host's sky-to-markForeignPass span: render/farRing.js
  *  RING_SEA_UNIT's note). */
@@ -476,7 +479,6 @@ export class FarTreesBand {
       if (layer < 0) { this.arts.set(key, 'full'); this.version++; return; }
       this._upload(layer, layerPicture(pic));
       const gl = this.gl;
-      gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.tex); gl.generateMipmap(gl.TEXTURE_2D_ARRAY); gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
       this.layers.set(key, layer);
       this.sides[layer] = Math.max(size.w, size.h);
       this.arts.set(key, 'ready');
@@ -520,9 +522,13 @@ export class FarTreesBand {
       filterWorldPicture(gl, this.tex, gl.TEXTURE_2D_ARRAY, true);   // the world's texture filter and anisotropy
       gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      trackMips(this.tex, gl.TEXTURE_2D_ARRAY, TREE_LAYER, TREE_LAYER, TREE_LAYERS, TREE_MIP_SPEC);
     }
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.tex);
     gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, layer, TREE_LAYER, TREE_LAYER, 1, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
+    // the layer's own chain: the Mip quality row's, or the driver's over the whole array
+    if (mipQuality() === 'sharp') uploadLayerMips(gl, rgba, TREE_LAYER, TREE_LAYER, layer, TREE_MIP_SPEC);
+    else gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
   }
 

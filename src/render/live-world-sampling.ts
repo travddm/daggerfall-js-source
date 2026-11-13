@@ -10,15 +10,17 @@
 // reaches the textures through the Anisotropic Filtering row it sets (render/anisotropic-filtering.ts).
 import { anisotropyIndex, anisotropySetting } from './anisotropic-filtering.ts';
 import { groundSharpnessTier } from './ground-sampler.ts';
+import { mipQuality } from './mip-upload.ts';
 import { worldFilterMode } from './world-texture-filter.ts';
 
 const GROUND_TIERS = ['off', 'default'];
 const DEFAULT_TIER = 1;
 
-/** The three settings as one number, read without allocating. */
+/** The settings as one number, read without allocating. The Mip quality row is the thousands digit. */
 export function worldSamplingKey(): number {
   const tier = GROUND_TIERS.indexOf(String(groundSharpnessTier()));
-  return worldFilterMode() * 100 + anisotropyIndex(anisotropySetting()) * 10 + (tier < 0 ? DEFAULT_TIER : tier);
+  const mip = mipQuality() === 'sharp' ? 1 : 0;
+  return mip * 1000 + worldFilterMode() * 100 + anisotropyIndex(anisotropySetting()) * 10 + (tier < 0 ? DEFAULT_TIER : tier);
 }
 
 /** What the renderer hands in: its texture caches and the two re-apply doors it already has. */
@@ -32,6 +34,8 @@ export type SamplingRenderer = {
   _samplingKey?: number;
   /** Re-filters one cached world texture when its state differs from the settings; others are left alone. */
   _worldHit(texture: object | null, unit?: number): unknown;
+  /** Rebuilds the mip chain of every cached world texture for the Mip quality row (a renderer a test stubs may have none). */
+  applyMipQuality?(): unknown;
   /** Sets the Ground sharpness tier and the world filter's magnification on every cached ground array. */
   applyGroundSharpness(): unknown;
 };
@@ -52,8 +56,10 @@ export function refreshWorldSamplingOnChange(renderer: SamplingRenderer): void {
   const key = worldSamplingKey();
   if (renderer._samplingKey === key) return;
   const first = renderer._samplingKey === undefined;
+  const previous = renderer._samplingKey;
   renderer._samplingKey = key;
   if (first) return;
+  if (Math.floor(previous! / 1000) !== Math.floor(key / 1000)) renderer.applyMipQuality?.();
   for (const texture of renderer.textures.values()) renderer._worldHit(texture);
   for (const texture of renderer.emissionTextures.values()) renderer._worldHit(texture, renderer.gl.TEXTURE1);
   for (const atlas of renderer.lptAtlases ?? []) renderer._worldHit(atlas);
