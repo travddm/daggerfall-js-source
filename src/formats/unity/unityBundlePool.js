@@ -1,4 +1,4 @@
-// DFMOD3 - A FEW WORKERS FOR EVERY ATTACHED MOD, NOT ONE EACH.
+// A FEW WORKERS FOR EVERY ATTACHED MOD, NOT ONE EACH.
 //
 // A player with DREAM's HD set attached (ten-plus bundles) ran the tab out of memory: "Array buffer allocation
 // failed" on decodes, then on the game's own classic textures, IndexedDB and the navmesh. Each bundle had its own
@@ -97,7 +97,7 @@ export function createBundlePool({ size = 2, workerFactory = defaultWorkerFactor
             pump(lane);
           });
         },
-        /** GROUND1: every slice of a texture array - queued as a picture is, with no deadline (the ground waits for it). */
+        /** Every slice of a texture array - queued as a picture is, with no deadline (the ground waits for it). */
         layers(name) {
           const ready = held.filter((l) => !l.dead);
           if (!ready.length) return Promise.resolve(null);

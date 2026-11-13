@@ -1,10 +1,10 @@
 // @ts-check
-// MWNPC1: THE SKIN ON THE
+// THE SKIN ON THE
 // GPU. Every Morrowind body in the world - the player's third-person body, every other player's, the family's, the
-// card table's, and the NPCs the MW-NPC arc stands after it - was skinned
+// card table's, and the NPCs - was skinned
 // on the CPU per body per posed frame: poseAssembly blended every vertex of every skinned piece and placed every
 // rigid one (mwSkin.js skinBatch, mwFirstPerson.js placeAtBone), packFpArm de-indexed the whole stream with a cross
-// product per face, and updateCharacterMesh re-uploaded all of it. PERF-RIG1 costed that at ~0.3 ms a body at
+// product per face, and updateCharacterMesh re-uploaded all of it. That cost ~0.3 ms a body at
 // 3,000 vertices on the fixture rig, more on a clothed retail body, and paid per body; every page of
 // docs/rendering/performance.md since ends on the same open item - "the real answer is GPU skinning (bone
 // matrices as uniforms, the blend in the vertex shader, the static stream uploaded once)". This is that.
@@ -17,7 +17,7 @@
 // piece - kilobytes, where the CPU path re-uploaded the whole stream.
 //
 // THE LAW IS THE CPU SKIN'S, entry for entry, so a body drawn either way stands in the same place:
-//   - a skinned vertex is post o (SUM w_b * (skelMat_b o invBind_b)) applied once (MW-D31): the per-bone product is
+//   - a skinned vertex is post o (SUM w_b * (skelMat_b o invBind_b)) applied once: the per-bone product is
 //     the same affineMulInto skinBatch calls, the blend accumulates in BONE order (the order skinBatch's loop adds
 //     in), and the post is mwSkin.js skinPost - one home for both;
 //   - an influence naming a MISSING bone (rule 40) is skipped and nothing is renormalised (rule 39); a vertex
@@ -26,8 +26,8 @@
 //     an influence of one on entry 0 (the identity) with an identity post;
 //   - a rigid piece's mirror and BoneOffset (rule 13, rule 14) are facts about the FILE, fixed at bind, so they are
 //     baked into its stream positions here, and its entry is the placement placeAtBone applies - the bone's
-//     attachment affine, or hangAffine's for a part that hangs (HT-WAIST). The products are placeAtBone's own.
-// THE NORMAL (MW-SMOOTH x MWNPC1, met at the arc's merge of main, 2026-10-10). Main's MW-SMOOTH lights every
+//     attachment affine, or hangAffine's for a part that hangs. The products are placeAtBone's own.
+// THE NORMAL. The renderer lights every
 // Morrowind mesh by the normals its file authored, posed with it (skinBatch turns one by the composed 3x3, a rigid
 // part's is placed as its vertices are - placeNormalsAtBone), and by its face only where a mesh authored none or a
 // corner's is zero (packFpArm). The stream carries the AUTHORED normal in the pack's own lanes (a rigid part's
@@ -41,7 +41,7 @@
 // the face takes over only where it has all but vanished. A zero corner is a collapsed vertex (rule 40), which no
 // retail body is meant to show.
 //
-// A PART THAT MOVES ON ITS OWN CLOCK (MW-BOW1 x MWNPC1, the same merge). A bow's limbs and string, and the arrow on
+// A PART THAT MOVES ON ITS OWN CLOCK. A bow's limbs and string, and the arrow on
 // its ArrowBone, are rigid pieces whose SOURCE the weapon clock re-poses before each pose (mwFirstPerson.js
 // posePartClocks) - not an affine a palette entry could carry: a morph bends the string. Each re-pose counts the
 // piece's `sourceGen`; the layout keeps the count it streamed, and restreamMovedRows re-writes a moved piece's
@@ -53,13 +53,13 @@
 // influences than the shader carries (SKIN_MAX_INFLUENCES), which rule 39 forbids trimming. The refusal is a
 // sentence, kept on the rig's notes.
 //
-// THE BOXES. The sprite law frames a body by its posed boxes (fpArm.js drawThird, PR-BOW1), and with no CPU skin
+// THE BOXES. The sprite law frames a body by its posed boxes (fpArm.js drawThird), and with no CPU skin
 // there are no posed vertices to fold. Rule 42 is the reference's own answer - a skinned mesh's bounds come from its
 // BONES, never from posed vertices - and writeSkinPalette takes it: each piece keeps, per palette entry, the box of
 // the authored vertices that entry moves, and a pose carries those boxes through their entries (a box through an
 // affine is a box, centre and extent). The blend of points inside boxes lies inside their hull, scaled by the
 // weights' sum, so the union is a CONSERVATIVE box - never smaller than the fold it replaces. The box is the
-// sprite's window, never its size (PR-BOW1: a texel stays MW_ARM_PIXEL screen pixels however large the window), so
+// sprite's window, never its size (a texel stays MW_ARM_PIXEL screen pixels however large the window), so
 // a looser box draws the same picture with more margin. A portrait that frames ITSELF by the box (fpArm.js
 // figure) poses on the CPU for its exact fold, once, and draws through the palette.
 
@@ -72,7 +72,7 @@ export { SKIN_PAL_ROW };
 /** The influences a vertex may carry: two vec4 pairs. More is refused, never trimmed (rule 39). */
 export const SKIN_MAX_INFLUENCES = 8;
 /** The corner's static floats: position 3, diffuse 3, normal 3, UV 2, emission 3 - packFpArm's corner, lane for lane
- *  (fpArm.js FP_FLOATS), its position and normal the AUTHORED ones the shader poses (MW-SMOOTH x MWNPC1). */
+ *  (fpArm.js FP_FLOATS), its position and normal the AUTHORED ones the shader poses. */
 export const SKIN_STATIC_FLOATS = 14;
 /** Floats a corner for `pairs` influence pairs: the static fourteen, four indices and four weights a pair, the post. */
 export const skinStreamFloats = (pairs) => SKIN_STATIC_FLOATS + 8 * pairs + 1;
@@ -165,7 +165,7 @@ export function skinLayout(pieces) {
           continue;
         }
         postE[v] = post;
-        // AUDIT MW-NPC II G1: THE CPU SKIN'S COLLAPSE, by its own test - a touched vertex whose live weights sum to none
+        // THE CPU SKIN'S COLLAPSE, by its own test - a touched vertex whose live weights sum to none
         // or less (mwSkin.js skinBatch: `wsum[v] > 0 ? composePost(o) : touched[v] ? collapse : null`) lands on the
         // post's translation; its influences zeroed, the shader's accumulator is the CPU's zero one. The layout
         // collapsed only a vertex with no live influence, and blended a +0.5/-0.5 one the CPU had collapsed.
@@ -183,7 +183,7 @@ export function skinLayout(pieces) {
           grow(b, x, y, z);
         }
       }
-      // MW-SMOOTH: the authored normals, when the piece poses them (packFpArm reads `p.normals` beside its positions)
+      // The authored normals, when the piece poses them (packFpArm reads `p.normals` beside its positions)
       const nrm = p.normals && p.normals.length === pos.length && batch.normals && batch.normals.length === pos.length ? batch.normals : null;
       rows.push({ piece: p, kind: 'skinned', n, post, boneEntry, pos, nrm, batch, infE, infW, postE,
         boxes, untouched: untouched.minX <= untouched.maxX ? untouched : null, collapse, negative,
@@ -248,7 +248,7 @@ function syncRigidRow(r) {
 /**
  * True when `layout` was laid out of exactly these drawable pieces, in order - packFpArm's sameRanges question - and
  * each skinned one still skins by the batch it was laid out from: a fit replaces a cloak's batch (mwCloakFit.js
- * fitCloakOver), and the stream carries the weights (AUDIT MW-CLOAK x MWNPC1).
+ * fitCloakOver), and the stream carries the weights.
  */
 export function skinSamePieces(layout, pieces) {
   if (!layout || !layout.ok) return false;
@@ -281,14 +281,14 @@ export function packSkinStream(layout, lanesOf) {
   let o = 0;
   for (const r of layout.rows) {
     const p = r.piece;
-    if (r.kind === 'rigid') syncRigidRow(r);   // a source re-posed since the layout (MW-BOW1) streams where it is now
-    if (o !== r.corner0 * floats) throw new Error(`MWNPC1: ${p.slot}'s corners begin at ${o / floats}, the layout says ${r.corner0}`);
+    if (r.kind === 'rigid') syncRigidRow(r);   // a source re-posed since the layout streams where it is now
+    if (o !== r.corner0 * floats) throw new Error(`${p.slot}'s corners begin at ${o / floats}, the layout says ${r.corner0}`);
     o = writeRowCorners(layout, r, lanesOf(p), stream, o);
     const textured = !!(p.uvs && p.material && p.material.textureFile);
     const count = Math.floor(p.indices.length / 3) * 3;   // the corners written - a whole triangle list, as every retail piece is
     ranges.push({ first: r.corner0, count, slot: p.slot, piece: p, textureFile: textured ? p.material.textureFile : null, tex: null, hidden: false });
   }
-  if (o !== stream.length) throw new Error(`MWNPC1: the skin stream wrote ${o} of ${stream.length} floats (${slots} slots a corner)`);
+  if (o !== stream.length) throw new Error(`the skin stream wrote ${o} of ${stream.length} floats (${slots} slots a corner)`);
   return { stream, floats, ranges };
 }
 
@@ -319,7 +319,7 @@ function writeRowCorners(layout, r, lanes, out, o) {
 }
 
 /**
- * MW-BOW1 x MWNPC1: THE ROWS WHOSE SOURCE MOVED since they were streamed (a part on its own clock - the header), each
+ * THE ROWS WHOSE SOURCE MOVED since they were streamed (a part on its own clock - the header), each
  * re-synced and its corners re-written into a buffer of its own: answers `[{ offset, data }]` - the float offset of its
  * range in the stream and the floats to put there (renderer.updateSkinStream). The list and each buffer are reused
  * across poses; a body with nothing that moves answers an empty list and writes nothing.
@@ -378,7 +378,7 @@ export function writeSkinPalette(layout, assembly, pal = layout.palette) {
         putEntry(pal, r.boneEntry[j], affineMulInto(mats.get(bone.ref), bone.invBind, _bone));
       }
     } else {
-      // AUDIT MW-CLOAK x MWNPC1: stowed gear the cloak turned this pose (mwCloakFit.js applyCloakFollow) is placed where
+      // Stowed gear the cloak turned this pose (mwCloakFit.js applyCloakFollow) is placed where
       // the follow put it - the bone's attachment turned about the bone - as the CPU path places it
       const at = p.followAt ?? fns.attachmentTransform(mats, p.attachRef);
       putEntry(pal, r.entry, p.hang ? hangAffine(at, p.hang) : at);
@@ -483,7 +483,7 @@ export function skinnedVertex(layout, piece, v, pal = layout.palette, out = [0, 
   return skinPoint(pal, slots, r.postE[v], r.pos[v * 3], r.pos[v * 3 + 1], r.pos[v * 3 + 2], out);
 }
 
-/** MW-SMOOTH x MWNPC1: ONE vertex's normal by the shader's law - its authored normal through the composed 3x3,
+/** ONE vertex's normal by the shader's law - its authored normal through the composed 3x3,
  *  renormalised; zero where it has none (the face lights it then). Null when the piece is not in the layout. */
 export function skinnedNormal(layout, piece, v, pal = layout.palette, out = [0, 0, 0]) {
   const r = layout.byPiece.get(piece);
@@ -497,7 +497,7 @@ export function skinnedNormal(layout, piece, v, pal = layout.palette, out = [0, 
 
 /**
  * The stream's corner `c` by the shader's law - read off the STREAM exactly as the vertex attributes are, so a pin
- * holds the packing and the law together. `normal` asks for its normal instead (MW-SMOOTH x MWNPC1): the authored
+ * holds the packing and the law together. `normal` asks for its normal instead: the authored
  * normal through the same composed 3x3, renormalised - zero where there is none to light by (the face's then).
  */
 export function skinStreamCorner(stream, floats, pairs, c, pal, out = [0, 0, 0], { normal = false } = {}) {

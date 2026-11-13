@@ -20,7 +20,7 @@
 // All values little-endian (classic x86 data).
 
 /**
- * HARD3 - ONE CAREER, as a CLASS*.CFG record carries it. DFCareer's
+ * ONE CAREER, as a CLASS*.CFG record carries it. DFCareer's
  * StructureData, field for field, and the shape the character import
  * hands the live entity (`systems/classicSave.js`).
  *

@@ -20,8 +20,8 @@ export const FACTION_TYPES = Object.freeze({
   Courts: 14, People: 15,
 });
 
-/** FactionFile.Flags (:629-633) - the only two DFU names. Here, beside FACTION_TYPES, since FIELD BUGS 2026-10-14's
- *  SUMMON-REPAIR: the account Worker reads the bits (net/repairLaw.js), and systems/faction/factionRep.js, their home before, is
+/** FactionFile.Flags (:629-633) - the only two DFU names. Here, beside FACTION_TYPES, because
+ *  the account Worker reads the bits (net/repairLaw.js), and systems/faction/factionRep.js, their home before, is
  *  no module the Worker can bundle; factionRep hands these on. */
 export const FACTION_FLAGS = Object.freeze({ RulerImmune: 0x10, Summoned: 0x40 });
 
@@ -235,7 +235,7 @@ export class FactionFile {
         this.factionNameToId.set(faction.name, faction.id);
       }
 
-      // Ruler name seed + power bonus. AUDIT 18 F3: the draws happen -
+      // Ruler name seed + power bonus. The draws happen -
       // they advance the DFRandom stream and every later faction depends
       // on that - but the RESULTS ARE DISCARDED, because DFU discards
       // them. FactionData is a STRUCT (FactionFile.cs:640), so

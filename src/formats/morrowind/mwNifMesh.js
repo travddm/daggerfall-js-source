@@ -22,7 +22,7 @@ import { deref, TEX_SLOT } from './mwNifFile.js';
 // `ninode->mChildren` for anything that casts to Nif::NiNode, and the switch
 // and LOD classes get their own osg wrapper first (:907-924) rather than a
 // pruned subtree. Four of these were parsed and then dropped on the floor.
-export const NODE_TYPES = new Set([   // MW-SPELLFX1: exported - an effect mesh's node graph is the drawing walk's own membership (formats/morrowind/mwVfx.js)
+export const NODE_TYPES = new Set([   // exported - an effect mesh's node graph is the drawing walk's own membership (formats/morrowind/mwVfx.js)
   'NiNode',
   'NiBSAnimationNode',
   'NiBSParticleNode',
@@ -46,7 +46,7 @@ export const NODE_TYPES = new Set([   // MW-SPELLFX1: exported - an effect mesh'
  * NiSortAdjustNode and NiCollisionSwitch are plain NiNodes in the
  * reference (no Switch/LOD wrapper), so they keep every child.
  */
-export function selectedChild(rec) {   // MW-SPELLFX1: exported - an effect's switch shows the one branch the flattener shows
+export function selectedChild(rec) {   // exported - an effect's switch shows the one branch the flattener shows
   if (rec.type === 'NiLODNode') {
     const levels = rec.lodLevels;
     if (Array.isArray(levels)) {
@@ -70,9 +70,9 @@ export function selectedChild(rec) {   // MW-SPELLFX1: exported - an effect's sw
  *  1631) and a batch here is a triangle list by contract, so a line shape
  *  has no honest home downstream - it is dropped rather than drawn as
  *  triangles. */
-export const GEOMETRY_TYPES = new Set(['NiTriShape', 'NiTriStrips']);   // MW-SPELLFX1: exported (formats/morrowind/mwVfx.js)
+export const GEOMETRY_TYPES = new Set(['NiTriShape', 'NiTriStrips']);   // exported (formats/morrowind/mwVfx.js)
 
-/** MAC-Q: the PARTICLE
+/** The PARTICLE
  *  geometries. A batch here is a triangle list by contract, and a particle
  *  system is not one - it is an emitter and a law, drawn as quads that do
  *  not exist until the clock runs - so they do not become batches. They
@@ -83,15 +83,15 @@ export const GEOMETRY_TYPES = new Set(['NiTriShape', 'NiTriStrips']);   // MW-SP
  *  enclosing NiBSAnimationNode or NiBSParticleNode). formats/morrowind/mwParticles.js
  *  turns a bundle into a system. A caller with no sink gets exactly what
  *  it always got: nothing. */
-export const PARTICLE_TYPES = new Set(['NiParticles', 'NiAutoNormalParticles', 'NiRotatingParticles']);   // MW-SPELLFX1: exported - an effect's particle geometry is a node of its graph
-export const ANIM_FLAG_NODES = new Set(['NiBSAnimationNode', 'NiBSParticleNode']);   // MW-SPELLFX1: exported - formats/morrowind/mwVfx.js reads the same AutoPlay/LocalSpace flags
+export const PARTICLE_TYPES = new Set(['NiParticles', 'NiAutoNormalParticles', 'NiRotatingParticles']);   // exported - an effect's particle geometry is a node of its graph
+export const ANIM_FLAG_NODES = new Set(['NiBSAnimationNode', 'NiBSParticleNode']);   // exported - formats/morrowind/mwVfx.js reads the same AutoPlay/LocalSpace flags
 
 /** nifloader.cpp:1609-1621: one TRIANGLE_STRIP primitive per strip, strips
  *  shorter than 3 skipped, and a shape whose strips are ALL short draws
  *  nothing. Unrolled to the triangle list this module emits, with GL's own
  *  winding flip on odd triangles and the degenerate joins (a repeated index,
  *  which GL drops) left out. */
-export function stripsToTriangles(data) {   // MW-SPELLFX1: exported - an effect mesh's strips, the one expansion
+export function stripsToTriangles(data) {   // exported - an effect mesh's strips, the one expansion
   const out = [];
   for (const strip of data.strips ?? []) {
     if (!strip || strip.length < 3) continue;
@@ -173,7 +173,7 @@ export const DRAW_MODE = Object.freeze({ Default: 0, CounterClockwise: 1, Clockw
  * applyDrawableProperties (nifloader.cpp:2731-2934), which is a WALK OVER
  * AN ORDERED LIST and not a lookup per type.
  *
- * MW-D13 replaced a Map keyed by property type with the ordered chain the
+ * It is the ordered chain, not a Map keyed by property type, that the
  * reference builds - root first, the drawable's own properties last -
  * because ONE rule reads state the last property did not set.
  * `lightmode` is only assigned inside the SrcAmbDif branch (:2805), so an
@@ -207,7 +207,7 @@ export function resolveMaterial(nif, props, hasVertexColors = false) {
     alphaBlend: false,
     alphaTest: false,
     alphaThreshold: 0,
-    // MAC-Q: the blend FUNCTION, which a particle drawable is the first
+    // The blend FUNCTION, which a particle drawable is the first
     // consumer of. NiAlphaProperty's own bitfield (nif/property.hpp):
     // bits 1-4 the source factor, bits 5-8 the destination, each an
     // index into nifloader.cpp getBlendMode's table (:1899-1929); the
@@ -260,10 +260,10 @@ export function resolveMaterial(nif, props, hasVertexColors = false) {
         out.alphaBlend = (prop.flags & 0x0001) !== 0;
         out.alphaTest = (prop.flags & 0x0200) !== 0;
         out.alphaThreshold = prop.threshold;
-        out.srcBlend = (prop.flags >> 1) & 0xF;   // MAC-Q: sourceBlendMode()
-        out.dstBlend = (prop.flags >> 5) & 0xF;   // MAC-Q: destinationBlendMode()
+        out.srcBlend = (prop.flags >> 1) & 0xF;   // sourceBlendMode()
+        out.dstBlend = (prop.flags >> 5) & 0xF;   // destinationBlendMode()
         break;
-      case 'NiZBufferProperty':   // MAC-Q
+      case 'NiZBufferProperty':
         out.depthTest = (prop.flags & 0x1) !== 0;
         out.depthWrite = (prop.flags & 0x2) !== 0;
         break;
@@ -342,7 +342,7 @@ export function diffuseAt(material, colors, i) {
 }
 
 /**
- * MWT2 - THE
+ * THE
  * EMISSION, which this file has always RESOLVED and nobody has ever read.
  *
  * `resolveMaterial` above already ports the reference's two emissive laws
@@ -426,7 +426,7 @@ export function skipGeometryName(name, hasMarkers) {
 
 export function flattenNif(nif, opts = {}) {
   const includeHidden = opts.includeHidden === true;
-  // WS1: the scabbard files. `underNode` emits only the geometry BELOW
+  // The scabbard files. `underNode` emits only the geometry BELOW
   // the node of that name (case-insensitive exact - the reference's
   // FindByNameVisitor test), `excludeNode` everything but that subtree;
   // both keep the full transform chain from the file root, because the
@@ -455,8 +455,8 @@ export function flattenNif(nif, opts = {}) {
       // (mwSkin.js). Its own transform is NOT baked here and NOT ignored:
       // it rides the skin payload as `shapeTransform`, because the
       // reference's render chain applies it AFTER the blend and its
-      // skin-root cancellation deliberately stops short of it (MW-D20;
-      // riggeometry.cpp:303-309). "NetImmerse ignores a skinned shape's
+      // skin-root cancellation deliberately stops short of it
+      // (riggeometry.cpp:303-309). "NetImmerse ignores a skinned shape's
       // own transform", which stood here, is folk wisdom the reference's
       // own code contradicts.
       positions.set(data.vertices);
@@ -496,7 +496,7 @@ export function flattenNif(nif, opts = {}) {
         skeletonRoot: si.skeletonRoot,
         rootBone: si.skeletonRoot,
         transform: sd.transform,
-        // MW-D20: the shape's OWN local transform, which the reference's
+        // The shape's OWN local transform, which the reference's
         // render chain applies to the blend's output and its skin-root
         // cancellation deliberately stops short of (riggeometry.cpp:
         // 303-309). Carried as data; skinBatch composes it outermost.
@@ -524,7 +524,7 @@ export function flattenNif(nif, opts = {}) {
     }
     batches.push({
       name: shape.name || '',
-      // MW-BOW1: where the shape hangs - its record and every record from the file root down to it - and its
+      // Where the shape hangs - its record and every record from the file root down to it - and its
       // vertices as authored, so a part whose own controllers move it (a bow's string and its ArrowBone, on the weapon
       // clock - formats/morrowind/mwPartClock.js) can be posed again at another time. References, never copies.
       ref: shape,
@@ -540,7 +540,7 @@ export function flattenNif(nif, opts = {}) {
       colors: data.colors ? Float32Array.from(data.colors) : null,
       indices,
       material: resolveMaterial(nif, props, !!data.colors),
-      parentRef,   // MWNPC9: the node the shape hangs under - a creature's rigid piece rides it (mwCharacter.js bindCreatureModel)
+      parentRef,   // the node the shape hangs under - a creature's rigid piece rides it (mwCharacter.js bindCreatureModel)
     });
   }
 
@@ -548,14 +548,14 @@ export function flattenNif(nif, opts = {}) {
   // nowhere else, then carried down the whole traversal.
   let hasMarkers = false;
 
-  function walk(ref, world, props, isRoot = false, inside = !underNode, animFlags = 0, chain = [], parentRef = -1) {   // MWNPC9: and the node above
+  function walk(ref, world, props, isRoot = false, inside = !underNode, animFlags = 0, chain = [], parentRef = -1) {   // and the node above
     const rec = deref(nif, ref);
     if (!rec) return;
-    const nextChain = [...chain, rec];   // MW-BOW1: the records from the root down
-    if (ANIM_FLAG_NODES.has(rec.type)) animFlags = rec.flags | 0;   // MAC-Q: nifloader.cpp:786-787
+    const nextChain = [...chain, rec];   // the records from the root down
+    if (ANIM_FLAG_NODES.has(rec.type)) animFlags = rec.flags | 0;   // nifloader.cpp:786-787
     const lname = String(rec.name || '').toLowerCase();
-    if (excludeNode && lname === excludeNode) return;   // WS1: the masked subtree
-    if (underNode && lname === underNode) inside = true;   // WS1: from here down
+    if (excludeNode && lname === excludeNode) return;   // the masked subtree
+    if (underNode && lname === underNode) inside = true;   // from here down
     // RULE 58 (1): "Bounding Box", case-insensitive EXACT, and the node
     // AND ITS WHOLE SUBTREE never enter the scene at all. The guard is
     // `args.mRootNode && ...` and mRootNode is null on the first call, so
@@ -593,7 +593,7 @@ export function flattenNif(nif, opts = {}) {
       return;
     }
     if (PARTICLE_TYPES.has(rec.type)) {
-      // MAC-Q: a particle system takes the same gates a shape does (the
+      // A particle system takes the same gates a shape does (the
       // hidden flag above, the name skip here) and goes to the sink whole.
       if (inside && opts.effects && !skipGeometryName(rec.name, hasMarkers)) {
         opts.effects.push({ ref, rec, world: nextWorld, props: nextProps, animFlags, parentRef });
@@ -601,7 +601,7 @@ export function flattenNif(nif, opts = {}) {
       return;
     }
     if (NODE_TYPES.has(rec.type) && rec.children) {
-      // AUDIT 39r R18: a switch and a LOD hold every branch but SHOW one.
+      // A switch and a LOD hold every branch but SHOW one.
       // nifloader.cpp:907-924 hangs their children off an osg::Switch
       // (`setNewChildDefaultValue(false); setSingleChildOn(mInitialIndex)`,
       // :568-575) or an osg::LOD with one DISTANCE_FROM_EYE_POINT range per

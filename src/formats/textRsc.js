@@ -16,8 +16,8 @@
 // into text), every other control byte drops. Full token semantics
 // (positioning, fonts, pages) pend the book/scroll renderers.
 
-import { rand } from './dfRandom.js';   // ROAD-A7: GetRandomTokens' dfRand arm
-import { INTERNAL_RSC } from './rscTable.js';   // MAC-U: DFU's Internal_RSC rows, read before the file (TextProvider.cs:167-188)
+import { rand } from './dfRandom.js';   // GetRandomTokens' dfRand arm
+import { INTERNAL_RSC } from './rscTable.js';   // DFU's Internal_RSC rows, read before the file (TextProvider.cs:167-188)
 import { tryGetLocalizedText, currentLocale, TextCollections, BASE_LOCALE } from '../systems/textManager.js';   // L10N3a: the locale's own row first
 
 export const RSC = Object.freeze({
@@ -27,7 +27,7 @@ export const RSC = Object.freeze({
   FirstCharacter: 0x20, LastCharacter: 0x7f,
 });
 
-/** ROAD-A7 - GetRandomTokens' TWO draws (TextProvider.cs:203-233):
+/** GetRandomTokens' TWO draws (TextProvider.cs:203-233):
  *
  *      int index = dfRand ? (int)(DFRandom.rand() % tokenStreams.Count)
  *                         : UnityEngine.Random.Range(0, tokenStreams.Count);
@@ -56,7 +56,7 @@ function variantIndex(pick, n) {
   return Math.min(n - 1, Math.floor(pick() * n));
 }
 
-/** MAC-U - a table row's bytes in TEXT.RSC's own shape (TextFile.cs): printable
+/** A table row's bytes in TEXT.RSC's own shape (TextFile.cs): printable
  *  chars 0x20-0x7f, a break as NewLine 0x00, the variants joined by
  *  SubrecordSeparator 0xFF, EndOfRecord 0xFE last - exactly what
  *  TextRsc.bytesById hands its readers off the classic file, so every
@@ -86,14 +86,14 @@ export function rscTableBytes(table = INTERNAL_RSC) {
 }
 
 /** TextFile.ReadTokens (TextFile.cs:421-441), the byte-token stream
- *  reader the BOOK files ride (B1). Reads {formatting, text, x, y}
+ *  reader the BOOK files ride. Reads {formatting, text, x, y}
  *  tokens from `position` until `endToken` (e.g. RSC.EndOfPage).
  *  Printable bytes 0x20-0x7f gather into Text tokens (formatting -1
  *  in DFU; the byte-named RSC members name the rest); FontPrefix and
  *  PositionPrefix consume their argument byte exactly as the C# -
  *  including PositionPrefix's PEEK that survives a truncated tail. */
 export const TOKEN_TEXT = -1;   // TextFile.Formatting.Text
-/** The three that break a row (MultiFormatTextLabel.cs:333-345 - U11). */
+/** The three that break a row (MultiFormatTextLabel.cs:333-345). */
 const BREAKS = new Set([RSC.NewLine, RSC.JustifyLeft, RSC.JustifyCenter]);
 export function readTokens(buffer, position, endToken) {
   if (!buffer || buffer.length === 0) return null;
@@ -134,9 +134,9 @@ const latin1 = (buf, start, count) => {
 };
 
 /** A record's variant byte ranges, operand bytes skipped so a 0xFF
- *  payload cannot masquerade as a separator (AUDIT 39). These are
- *  TextProvider's tokenStreams before ReadTokens runs. AUDIT 68
- *  S12-textrsc-variant-walks: THE one variant-boundary walk - every
+ *  payload cannot masquerade as a separator. These are
+ *  TextProvider's tokenStreams before ReadTokens runs.
+ *  This is THE one variant-boundary walk - every
  *  variant reader below rides it rather than a copy of it. Always at
  *  least one range. */
 function variantRanges(raw) {
@@ -220,7 +220,7 @@ function tokenVariants(tokens) {
 }
 
 export class TextRsc {
-  /** MAC-U: `table` is DFU's Internal_RSC string table (rscTable.js),
+  /** `table` is DFU's Internal_RSC string table (rscTable.js),
    *  the rows a DFU build reads BEFORE the classic file - TextProvider
    *  .GetRSCTokens (TextProvider.cs:167-188) asks the table by id and
    *  opens TEXT.RSC only for a key it lacks. The default carries the
@@ -256,7 +256,7 @@ export class TextRsc {
   localeTokensByKey(key) { return this._localeTokens(key); }
 
   /** Raw record bytes INCLUDING the 0xFE terminator (GetBytesById).
-   *  MAC-U: a table row first, in the file's own byte shape
+   *  a table row first, in the file's own byte shape
    *  (encodeRscRecord), so every reader above this line sees one
    *  kind of record. */
   bytesById(id) {
@@ -279,7 +279,7 @@ export class TextRsc {
       let cur = '';
       for (let i = start; i < end; i++) {
         const b = raw[i];
-        // U11: JustifyLeft (0xFC) and JustifyCenter (0xFD) each BREAK
+        // JustifyLeft (0xFC) and JustifyCenter (0xFD) each BREAK
         // THE LINE - MultiFormatTextLabel.cs:333-345 calls NewLine() for
         // all three, JustifyCenter additionally centring the row it just
         // closed. The port dropped both as "every other control byte",
@@ -314,7 +314,7 @@ export class TextRsc {
   }
 
   /** ROWS of ONE VARIANT, chosen by `pick` (GetRandomTokens's
-   *  Random.Range over the record's subrecords). AUDIT 22 F2: the
+   *  Random.Range over the record's subrecords). The
    *  windows all read linesById, which is variant 0 forever - and
    *  DFU fetches nearly every message they show with GetRandomTokens.
    *  Thirteen of the records the guild and inventory windows draw
@@ -322,12 +322,12 @@ export class TextRsc {
    *  one of eight rank refusals for good.
    *
    *  This is linesById's job with a variant offset - plainText splits
-   *  variants but loses the per-row ALIGNMENT that AUDIT 17g F2
-   *  established matters, so neither existing reader could do it. */
+   *  variants but loses the per-row ALIGNMENT that
+   *  matters, so neither existing reader could do it. */
   variantLinesById(id, pick = Math.random) {
     const n = this.variantCount(id);
     if (n === 0) return [];
-    // ROAD-Ar R13: TextProvider.cs:225 completes the final stream
+    // TextProvider.cs:225 completes the final stream
     // unconditionally, so Count is at least 1 and :228's draw has NO
     // Count guard - a single-subrecord record still burns one value.
     // Short-circuiting before `pick` was free while `pick` was
@@ -335,12 +335,12 @@ export class TextRsc {
     // port's DFRandom one draw BEHIND classic, which is the desync
     // the painting reads exist to close. One variant draws index 0.
     const want = variantIndex(pick, n);
-    // AUDIT 23 (FTD-1) - TextProvider.cs:231: a record ending 0xFF 0xFE
+    // TextProvider.cs:231: a record ending 0xFF 0xFE
     // mints an empty trailing stream; DFU steps back one variant when
     // the picked stream has zero tokens, so the roll never shows
     // nothing. The distribution keeps DFU's shape (the last real
     // variant is picked twice as often on such records).
-    // AUDIT 39: the gate is that TOKEN count, not the rows linesById
+    // the gate is that TOKEN count, not the rows linesById
     // hands back - it drops trailing empties, so a variant made only of
     // break bytes (one formatting token, a blank row in DFU) trimmed to
     // nothing here and showed the PREVIOUS variant instead.
@@ -357,25 +357,25 @@ export class TextRsc {
   }
 
   /** TextProvider.GetRandomTokens' law over one record: a random
-   *  variant's TOKENS (readTokens' shape), with the FTD-1 step-back
+   *  variant's TOKENS (readTokens' shape), with the step-back
    *  when the picked stream is empty (TextProvider.cs:231 - the last
    *  real variant is picked twice as often on 0xFF 0xFE records).
-   *  TK-i: the rumor mill freezes one of these per AddNonQuestRumor. */
+   *  The rumor mill freezes one of these per AddNonQuestRumor. */
   variantTokensById(id, pick = Math.random) {
     const loc = this._localeTokens(id);
     if (loc) {
       const variants = tokenVariants(loc);
-      const want = variantIndex(pick, variants.length);   // R13's law: one variant still draws
+      const want = variantIndex(pick, variants.length);   // one variant still draws
       return !variants[want].length && want > 0 ? variants[want - 1] : variants[want];
     }
     const raw = this.bytesById(id);
     if (!raw) return [];
     const ranges = variantRanges(raw);
-    // ROAD-Ar R13, same law as variantLinesById: :228 draws whatever
+    // Same law as variantLinesById: :228 draws whatever
     // Count is, so a one-stream record consumes its LCG value too.
     const want = variantIndex(pick, ranges.length);
     // readTokens answers NULL on an empty stream (the 0xFF 0xFE tail
-    // variant) - exactly the case the FTD-1 step-back exists for
+    // variant) - exactly the case the step-back exists for
     let tokens = readTokens(raw.slice(ranges[want][0], ranges[want][1]), 0, RSC.EndOfRecord) ?? [];
     if (!tokens.length && want > 0) tokens = readTokens(raw.slice(ranges[want - 1][0], ranges[want - 1][1]), 0, RSC.EndOfRecord) ?? [];
     return tokens;
@@ -386,7 +386,7 @@ export class TextRsc {
    *  TextFile.Formatting.EndOfRecord)` over the raw bytes, subrecord
    *  separators and all. No variant draw, so no `rolls()` value is
    *  burned; that is the distinction from variantTokensById above.
-   *  AUDIT 63 F3: DaggerfallMessageBox.SetTextTokens(int) reads this,
+   *  DaggerfallMessageBox.SetTextTokens(int) reads this,
    *  not GetRandomTokens. */
   tokensById(id) {
     const loc = this._localeTokens(id);

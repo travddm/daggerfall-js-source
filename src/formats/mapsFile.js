@@ -61,7 +61,7 @@
 //     unbounded and would throw. See the comment there.
 //   - readLocationIdFast drops C#'s WorldDataReplacement early return, which
 //     is unreachable here. See the comment there.
-// GetNameBankOfRegion SHIPPED with the Characters arc (C2): it lives at
+// GetNameBankOfRegion SHIPPED with the Characters arc: it lives at
 // characters/nameHelper.js getNameBankOfRegion over the REGION_RACES table
 // exported from here, and scenes/townTalk.js calls it on every directory
 // rebuild.
@@ -70,7 +70,7 @@ import { BsaFile, DIRECTORY_TYPES } from './bsaFile.js';
 import { worldDataDoor } from './worldData/worldDataDoor.js';   // RR3b: WorldDataReplacement's three asks (MapsFile.cs:984, :999, :1027)
 import { PakFile } from './pakFile.js';
 import { readBuildingData, BUILDING_DATA_SIZE } from './blocksFile.js';
-// PROF1: the three FALL.EXE / MapsFile tables and the map's bounds the account service reads too, in a module that reads no file (mapsTables.js) -
+// The three FALL.EXE / MapsFile tables and the map's bounds the account service reads too, in a module that reads no file (mapsTables.js) -
 // one home, re-exported here so every importer stands where it stood.
 import { REGION_NAMES, REGION_RACES, CLIMATES, MAX_MAP_PIXEL_X, MAX_MAP_PIXEL_Y, BAY_REGION_COUNT, isProvinceRegion } from './mapsTables.js';
 export { REGION_NAMES, REGION_RACES, CLIMATES, MAX_MAP_PIXEL_X, MAX_MAP_PIXEL_Y };
@@ -110,7 +110,7 @@ export const REGION_TEMPLES = Object.freeze([
   88, 98, 82, 98, 84, 94, 36, 88, 94, 36,
   98, 84, 106, 88, 106, 88, 92, 84, 98, 88,
   82, 94,
-  0, 0, 0, 0, 0, 0, 0, 0, 0,   // WW-R: the provinces past the Bay - FALL.EXE names none of their temples
+  0, 0, 0, 0, 0, 0, 0, 0, 0,   // the provinces past the Bay - FALL.EXE names none of their temples
 ]);
 
 /** Block file prefixes indexed by blockIndex. */
@@ -159,7 +159,7 @@ export const CLIMATE_BASE_TYPES = Object.freeze({
 });
 
 // ClimateTextureSet nature archives.
-/** The climates' nature sets - their summer archives (DECOR-OUTDOOR: a yard's trees and plants are its climate's). */
+/** The climates' nature sets - their summer archives (a yard's trees and plants are its climate's). */
 export const CLIMATE_NATURE = Object.freeze({
   RainForest: 500, SubTropical: 501, Swamp: 502, Desert: 503,
   TemperateWoodland: 504, WoodlandHills: 506, HauntedWoodlands: 508,
@@ -200,7 +200,7 @@ export function mapPixelToWorldCoord(mapPixelX, mapPixelY) {
   return { x: mapPixelX * 32768, y: (499 - mapPixelY) * 32768 };
 }
 
-/** World coordinate to the map pixel it stands in. WW-C2 (WW-C): FLOORED - DFU's truncation to the bit on the Bay, where every coordinate is non-negative and the two agree; past its west and south edges (a negative x or z) truncation named the NEXT pixel toward the Bay, and Cyrodiil's halls stood on a pixel the player standing on them never read. */
+/** World coordinate to the map pixel it stands in. FLOORED - DFU's truncation to the bit on the Bay, where every coordinate is non-negative and the two agree; past its west and south edges (a negative x or z) truncation named the NEXT pixel toward the Bay, and Cyrodiil's halls stood on a pixel the player standing on them never read. */
 export function worldCoordToMapPixel(worldX, worldZ) {
   return { x: Math.floor(worldX / 32768), y: 499 - Math.floor(worldZ / 32768) };
 }
@@ -331,7 +331,7 @@ export class MapsFile {
     return true;
   }
 
-  /** Name of specified region ('' if out of range) - WW-R: a province's past the Bay too (formats/mapsTables.js
+  /** Name of specified region ('' if out of range) - a province's past the Bay too (formats/mapsTables.js
    *  PROVINCE_REGION_NAMES), which holds no MAPS.BSA record. */
   getRegionName(region) {
     if (isProvinceRegion(region)) return REGION_NAMES[region];
@@ -339,7 +339,7 @@ export class MapsFile {
     return REGION_NAMES[region];
   }
 
-  /** Index of region with specified name, or -1 - WW-R: a province's too. */
+  /** Index of region with specified name, or -1 - a province's too. */
   getRegionIndex(name) {
     for (let i = 0; i < this.regionCount; i++) {
       if (REGION_NAMES[i] === name) return i;
@@ -361,7 +361,7 @@ export class MapsFile {
 
     if (this.autoDiscard && this._lastRegion !== -1) this.discardRegion(this._lastRegion);
 
-    // Four consecutive records per region. REGION-VIEWS: read where MAPS.BSA holds them - the readers below only ever
+    // Four consecutive records per region. Read where MAPS.BSA holds them - the readers below only ever
     // read them, and with one region resident (autoDiscard) every walk over the regions copied all four again - 357 KB
     // a region on the mean, 2.3 MB the Wrothgarian Mountains' and 2.1 MB Daggerfall's: 364 regions read by a boot's 40th frame.
     const record = region * 4;
@@ -405,7 +405,7 @@ export class MapsFile {
     return this._regions[region].dfRegion;
   }
 
-  /** HUB1: how many locations the region's own MAPNAMES holds - a world-data mod's additions are appended past it
+  /** How many locations the region's own MAPNAMES holds - a world-data mod's additions are appended past it
    *  (formats/worldData/worldDataReplacement.js), so a row below this count is the game's own. 0 for an empty region. */
   baseLocationCount(region) {
     if (!this.loadRegion(region)) return 0;
@@ -428,7 +428,7 @@ export class MapsFile {
 
     dfLocation.regionIndex = region;
     dfLocation.locationIndex = location;
-    worldDataDoor()?.editLocation?.(dfLocation, this);   // ARENA1: the port's own edits (world/arena/arenaCity.js - Daggerfall's cell 4,3), on every layout's read
+    worldDataDoor()?.editLocation?.(dfLocation, this);   // the port's own edits (world/arena/arenaCity.js - Daggerfall's cell 4,3), on every layout's read
     return dfLocation;
   }
 
@@ -443,7 +443,7 @@ export class MapsFile {
 
   /** Block name for exterior block at x,y. */
   getRmbBlockName(dfLocation, x, y) {
-    // WD3: the town whose blocks are read next - a town a save keeps in another layout is read in it (systems/layoutPins.js)
+    // The town whose blocks are read next - a town a save keeps in another layout is read in it (systems/layoutPins.js)
     if (Number.isInteger(dfLocation.regionIndex) && Number.isInteger(dfLocation.locationIndex)) worldDataDoor()?.noteReadingLocation?.(dfLocation.regionIndex, dfLocation.locationIndex);
     const index = y * dfLocation.exterior.exteriorData.width + x;
     return dfLocation.exterior.exteriorData.blockNames[index];
@@ -491,7 +491,7 @@ export class MapsFile {
   }
 
   /** PlayerGPS.CurrentRegionIndex (PlayerGPS.cs:165-186) over this
-   *  pixel's politic index. AUDIT 24 (the seven-slice sweep): the
+   *  pixel's politic index. The
    *  region the player is IN is a property of the POLITIC map, which
    *  is defined on every pixel of the world - not of whether that
    *  pixel happens to carry a location. The port had been reading
@@ -502,8 +502,8 @@ export class MapsFile {
    *  (politic === regionIndex + 128, this file's own law).
    *
    *  NAMED -At, not getRegionIndex: this class already has a
-   *  getRegionIndex(NAME) (:297), and AUDIT 24 shipped this one under
-   *  that name for a day. A JS class body keeps the LAST definition,
+   *  getRegionIndex(NAME) (:297), and a second method under
+   *  that name would replace it. A JS class body keeps the LAST definition,
    *  so the by-name lookup vanished and getRegionByName /
    *  getLocationByName started handing a region NAME in as a map pixel
    *  x. The suite stayed green because nothing covered either - the
@@ -514,7 +514,7 @@ export class MapsFile {
     // High Rock sea coast is the one politic value below the +128 band
     let result = politicIndex === 64 ? 31 : politicIndex - 128;
     if (result === 105) result = 16;   // known bad value -> Wrothgarian Mountains
-    if (result < 0 || result >= REGION_NAMES.length) result = 0;   // clamp out of range - WW-R: a province's region past the Bay is in range (its politic world/tamriel/tamrielGround.js groundPoliticIndex's)
+    if (result < 0 || result >= REGION_NAMES.length) result = 0;   // clamp out of range - a province's region past the Bay is in range (its politic world/tamriel/tamrielGround.js groundPoliticIndex's)
     return result;
   }
 
@@ -646,7 +646,7 @@ export class MapsFile {
   }
 
   /**
-   * WD3: the location as MAPS.BSA holds it - past the world-data door (no replacement served), with its indices set
+   * the location as MAPS.BSA holds it - past the world-data door (no replacement served), with its indices set
    * as getLocation sets them. What a mod's `location-<r>-<i>.json` edit is taken against (formats/worldData/worldDataPack.js).
    * @returns {object|null}
    */
@@ -660,7 +660,7 @@ export class MapsFile {
   }
 
   /**
-   * AUDIT LANDFORMS III B1: whether the world-data door serves this location in place of MAPS.BSA's own row (a town
+   * whether the world-data door serves this location in place of MAPS.BSA's own row (a town
    * pack's) - the answer the door cached when getLocation asked, so a caller that needs every client's same row
    * (world/landforms.js's sites) re-reads the classic one only where it differs.
    * @returns {boolean}
@@ -671,7 +671,7 @@ export class MapsFile {
 
   _readLocation(region, location) {
     // Check for replacement location data and use it if found (MapsFile.cs:998-1000 - RR3b: the world-data door);
-    // WD3: the reader is handed over, so a mod's edit can be laid on this location as the BSA holds it
+    // the reader is handed over, so a mod's edit can be laid on this location as the BSA holds it
     const replacement = worldDataDoor()?.getDFLocationReplacementData(region, location, this);
     if (replacement) return replacement;
     return this._readClassicLocation(region, location);

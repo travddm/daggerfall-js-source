@@ -154,7 +154,7 @@ export class Arch3dFile {
    * @returns {boolean} true if successful.
    */
   load(bytes) {
-    // AUDIT 68 S10-arch3d-26mb-copy: copying the ~26 MB archive to patch
+    // Copying the ~26 MB archive to patch
     // 2 KB kept ARCH3D.BSA resident twice for the scene.
     this._bsa = new BsaFile(bytes);
     if (this._bsa.directoryType !== DIRECTORY_TYPES.NumberRecord) return false;

@@ -1,4 +1,4 @@
-// AUDIT 68 S11-colorkey-tbc: THE KEYGROUP SAMPLER, ONE HOME.
+// THE KEYGROUP SAMPLER, ONE HOME.
 //
 // A NIF KeyGroup - {type, keys: [{time, value, inTan?, outTan?, tbc?}]},
 // readKeyGroupOf's shape (mwNifFile.js) - is sampled by one law, the
@@ -23,7 +23,7 @@ function hermite(v0, out0, v1, in1, t) {
 }
 
 /**
- * MW-D33: TCB tangents for key i, exactly generateTCBTangents
+ * TCB tangents for key i, exactly generateTCBTangents
  * (nifkey.hpp:172-204) on the per-key coefficients readTCBKey derives
  * from tension/continuity/bias (nifkey.hpp:165-168):
  *
@@ -77,7 +77,7 @@ export function segment(keys, time) {
   if (time <= keys[0].time) return [0, 0, 0];
   const last = keys.length - 1;
   if (time >= keys[last].time) return [last, last, 0];
-  // AUDIT 68 S10-mwanim-linear-segment: binary search for the first key at
+  // Binary search for the first key at
   // or after `time` (keys are time-sorted). The linear walk from 0 cost
   // every channel of every bone the whole .kf timeline per frame.
   let lo = 1;
@@ -104,7 +104,7 @@ export function sampleKeyGroup(group, dim, time) {
     const v0 = dim === 1 ? k0.value : k0.value[axis];
     const v1 = dim === 1 ? k1.value : k1.value[axis];
     if (i0 === i1) return v0;
-    // MW-D33: Constant answers by WHICH HALF of the segment the playhead
+    // Constant answers by WHICH HALF of the segment the playhead
     // is in - `fraction > 0.5f ? b.mValue : a.mValue` (controller.hpp:
     // 140-141) - not "always the left key", which the port had.
     if (type === KEY_TYPE.constant) return u > 0.5 ? v1 : v0;
