@@ -32,6 +32,7 @@
 // is uploaded a slice a step and swapped in whole, so the frame never waits on it.
 // ═══════════════════════════════════════════════════════════════════
 
+import { bleedTransparentTexels } from './alpha-bleed.ts';
 import { TERRAIN_SIZE } from '../world/terrain/terrainSampler.js';
 import { TREE_RECORDS } from '../world/terrain/terrainNature.js';
 import { getWorldClimateSettings } from '../formats/mapsFile.js';
@@ -167,7 +168,7 @@ export function treeHash(px, py, k) {
 
 /**
  * A record's picture laid into an atlas layer: `pic` top-down rgba ({ width, height, data }), scaled so its larger side is
- * the layer's, bottom-centred, nearest texel; the rest clear. Answers the layer's rgba (top-down: row 0 the top - a point
+ * the layer's, bottom-centred, nearest texel; the rest clear (alpha 0, coloured by the nearest opaque texel). Answers the layer's rgba (top-down: row 0 the top - a point
  * sprite's coordinate runs down from its top, gl_PointCoord). Pure.
  */
 export function layerPicture(pic, side = TREE_LAYER) {
@@ -183,7 +184,7 @@ export function layerPicture(pic, side = TREE_LAYER) {
       out[b] = pic.data[a]; out[b + 1] = pic.data[a + 1]; out[b + 2] = pic.data[a + 2]; out[b + 3] = pic.data[a + 3];
     }
   }
-  return out;
+  return bleedTransparentTexels(out, side, side);   // the layers are mipped and filtered: no black edge (render/alpha-bleed.ts)
 }
 
 /**
