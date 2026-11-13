@@ -30,7 +30,8 @@ import { smoothstep } from '../systems/mathf.js';   // GRASS2: the host's blade 
 import { buildTuftMips, buildTuftSheet, pixelGrass, PX_RAMP_STEPS, PX_TINT_BANDS, PX_BLADES_PER_TUFT } from './grassPixelArt.js';   // GRASS-PX: the tuft sheet and the pixel style's numbers
 import { meadowGrass, buildMeadowMips, meadowCardCorners, meadowCardIndices, MEADOW_SLOTS, MEADOW_CARDS, MEADOW_CARDS_FAR, MEADOW_NEAR_AT, MEADOW_BLADES_PER_TUFT, MEADOW_VARIANTS, MEADOW_LUSH, MEADOW_SHARES, MEADOW_PATCH_SCALE,
   MEADOW_FACE, meadowArtGround, MEADOW_GREEN, MEADOW_SHIFT, MEADOW_GREEN_EDGE, MEADOW_TOP, MEADOW_REACH, MEADOW_WIND_REACH, MEADOW_BOXES, MEADOW_SEED, MEADOW_NEAR_BAND, MEADOW_SLOPE_FLOOR, MEADOW_CELL, MEADOW_BUSH, MEADOW_FLOWERS, MEADOW_DRY, MEADOW_SHORT, MEADOW_TALL } from './grassMeadow.js';   // MEADOW1: the owner's sprites on crossed cards
-import { buildProgram } from './glProgram.js';   // AUDIT 68 S17-gl-program-dup: the one compile and link
+import { buildProgram } from './glProgram.js';
+import { MEADOW_TEXEL_GLSL, bindGrassSheet, uploadGrassSheet } from './grass-sheets.ts';   // AUDIT 68 S17-gl-program-dup: the one compile and link
 import { FOG_GLSL } from './fogGlsl.js';   // AUDIT 68 S17-fog-glsl-dup: fogFactorAt's one home - the terrain's own text, not a tenth copy
 import { CLOUD_SHADOW_GLSL } from './cloudShadow.js';   // GRASS-LIT: the deck's shadow, the reader the terrain takes
 import { SHADOW_GLSL, SHADOW_SUN_UNIT, SHADOW_POINT_UNIT, SHADOW_LO_UNIT, SHADOW_POINT_CASTERS, SHADOW_CASTER_TABLE } from './shadowPass.js';   // GRASS-LIT: the sun map, the receiver the terrain takes
@@ -873,6 +874,7 @@ export const GRASSMEADOW_FS_EDITS = Object.freeze([
     why: 'the switch, the ground the owner\'s colours were drawn for, and how much of its hue a set takes (BANTHA2: the meadow all, the jungle floor none - its own greens under the ground\'s light)',
     from: 'uniform vec3 uGrassTone[4];',
     to: 'uniform float uArt; uniform vec3 uArtGround; uniform float uArtHue;   // MEADOW1: the owner\'s art, and the ground its colours are drawn for (meadowArtGround); BANTHA2: its hue\'s share\n'
+      + MEADOW_TEXEL_GLSL   // the meadow's sample under the world filter (render/grass-sheets.ts)
       + 'uniform vec3 uGrassTone[4];',
   }),
   Object.freeze({
@@ -886,7 +888,7 @@ export const GRASSMEADOW_FS_EDITS = Object.freeze([
     from: '    vec4 px = texture(uPxSheet, vec2((vVar + vUV.x) / uPxVariants, vUV.y));\n',
     to: '    vec2 pxUv = vec2((vVar + vUV.x) / uPxVariants, vUV.y);\n'
       + '    vec4 px;\n'
-      + `    if (uArt > 0.5) { float mLod = log2(max(max(abs(dFdx(vUV.y)), abs(dFdy(vUV.y))) * ${glf(MEADOW_CELL)}, 1.0)); px = textureLod(uPxSheet, pxUv, mLod); }   // MEADOW1: the cell's texels down a pixel - the switch a uniform, so the derivatives stand in uniform control\n`
+      + `    if (uArt > 0.5) { float mLod = log2(max(max(abs(dFdx(vUV.y)), abs(dFdy(vUV.y))) * ${glf(MEADOW_CELL)}, 1.0)); px = meadowTexel(pxUv, mLod, dFdx(pxUv), dFdy(pxUv)); }   // MEADOW1: the cell's texels down a pixel - the switch a uniform, so the derivatives stand in uniform control\n`
       + '    else px = texture(uPxSheet, pxUv);\n',
   }),
   Object.freeze({
@@ -1979,7 +1981,7 @@ export class LabGrassRenderer {
     this.u = {};
     for (const n of ['uVP', 'uTime', 'uWind', 'uRange', 'uEye', 'uSunDir', 'uWindDir', 'uSnowFull', 'uSlotN', 'uCellFrame', 'uBladeScale', 'uCellSize', 'uGField', 'uGFieldOrigin', 'uGFieldM', 'uSnowGlobal', 'uWindV', 'uAmb', 'uSunCol', 'uDim', 'uSunScale', 'uMoonDir', 'uMoonScale', 'uMoonCol',
       'uPixel', 'uPxVariants', 'uPxSteps', 'uPxTintBands', 'uPxSheet',   // GRASS-PX: the pixel style's five (GRASS-PX3 took the sway's two)
-      'uArt', 'uArtGround', 'uArtHue',   // MEADOW1: the meadow's switch and the ground its art was drawn for; BANTHA2: the share of its hue it takes
+      'uArt', 'uArtGround', 'uArtHue', 'uSharpOn', 'uSharpRetro',   // MEADOW1: the meadow's switch and the ground its art was drawn for; BANTHA2: the share of its hue it takes
       'uFogColor', 'uFogMode', 'uFogDensity', 'uFogRange', 'uCamPos', 'uDwFog', 'uJungleHaze',   // DISC20-A: the terrain's fog; DW-C: and the sea's; BANTHA1: and the jungle's haze
       'uLane', 'uELExposure', 'uAdapt', 'uIndirect', 'uIndirectColor', 'uCloudShadowMap', 'uCloudShadowRect', 'uGrassTone',   // GRASS-LIT: the lane, the eye, the player's light, the deck
       'uPointCount', 'uPointLights', 'uPointColors', 'uPointIdx']) this.u[n] = gl.getUniformLocation(prog, n);   // GRASS-LIT2: the lanterns; AUDIT A1: a cell's
@@ -2076,20 +2078,15 @@ export class LabGrassRenderer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.bindTexture(gl.TEXTURE_2D, null);
-    // GRASS-PX: THE TUFT SHEET, with its coverage mip chain, every level
-    // uploaded by hand (generateMipmap would AVERAGE, and an averaged
-    // sprite fails the alpha test a few cells out). NEAREST both ways -
-    // a pixel sprite is never filtered - and the level is the GPU's
-    // pick among the ones built here. Unit 4: the renderer's own passes
-    // stop at 3 and its reserved units start at 11, and the host marks
-    // the grass a foreign pass after every draw, so nothing counts on 4
-    // holding across it.
+    // The tuft sheet, with its coverage mip chain, every level uploaded by hand (generateMipmap would average, and an
+    // averaged sprite fails the alpha test a few cells out); the level is the GPU's pick among the ones built here.
+    // render/grass-sheets.ts says why it stays nearest and which unit it takes.
     const mips = buildTuftMips(tuft ? buildTuftSheet({ w: tuft.w, h: tuft.h }) : undefined);   // GRASS-PX4
     this.pxVariants = mips[0].variants;
-    this.pxSheet = this._sheet(mips);
+    this.pxSheet = uploadGrassSheet(gl, mips);
     // MEADOW1: THE OWNER'S ATLAS, up the same way - its own coverage chain (render/grassMeadow.js buildMeadowMips),
     // bound on the sheet's unit when the meadow draws
-    this.meadowSheet = this._sheet(art.mips());   // BANTHA2: its set's
+    this.meadowSheet = uploadGrassSheet(gl, art.mips(), true);   // BANTHA2: its set's
     this.count = 0;
     this._vp = new Float32Array(16);
     this._planes = new Float32Array(24);   // PERF2
@@ -2106,20 +2103,6 @@ export class LabGrassRenderer {
   setTones(tones, classic = false) {
     this[classic ? 'tonesClassic' : 'tones'] = new Float32Array(tones.flat());
     this[classic ? 'artGroundClassic' : 'artGround'] = new Float32Array(meadowArtGround(tones[1], this.art.green));
-  }
-
-  /** GRASS-PX: a sheet and its hand-built chain on a texture of its own - every level uploaded, NEAREST both ways,
-   *  clamped (the constructor says why). MEADOW1: the meadow's atlas goes up through the same door. */
-  _sheet(mips) {
-    const gl = this.gl, tex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    for (let i = 0; i < mips.length; i++) gl.texImage2D(gl.TEXTURE_2D, i, gl.RGBA, mips[i].width, mips[i].height, 0, gl.RGBA, gl.UNSIGNED_BYTE, mips[i].data);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-    return tex;
   }
 
   /** GR5: size the buffers for `slots` cells of `perCell` blades each,
@@ -2338,11 +2321,8 @@ export class LabGrassRenderer {
     gl.uniform1f(u.uPxVariants, meadow ? MEADOW_SLOTS : this.pxVariants);
     gl.uniform1f(u.uPxSteps, PX_RAMP_STEPS);
     gl.uniform1f(u.uPxTintBands, PX_TINT_BANDS);
-    if (pixel) {
-      gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, meadow ? this.meadowSheet : this.pxSheet);
-      gl.uniform1i(u.uPxSheet, 4);
-      gl.activeTexture(gl.TEXTURE0);
-    } else gl.uniform1i(u.uPxSheet, 4);   // AUDIT RETRO1 B1: the smooth style reads the sampler too (the mix at 0) - left on unit 0 it read whatever was bound there, and a frame image still bound there is a WebGL feedback loop; unit 4, which this style never binds
+    if (pixel) bindGrassSheet(gl, u, meadow ? this.meadowSheet : this.pxSheet, meadow, light.sharpRetro);
+    else gl.uniform1i(u.uPxSheet, 4);   // AUDIT RETRO1 B1: the smooth style reads the sampler too (the mix at 0) - left on unit 0 it read whatever was bound there, and a frame image still bound there is a WebGL feedback loop; unit 4, which this style never binds
     // GRASS5: the pack's decode frame. The blade scale and the cell size
     // are the same for every slot, so they go once a draw; the cell's own
     // origin and ground span go per slot, below.

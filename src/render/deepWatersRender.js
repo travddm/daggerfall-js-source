@@ -44,6 +44,9 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { buildProgram } from './glProgram.js';
+import { SHARP, SHARP_TEXEL_ARRAY_GLSL, SHARP_TEXEL_GLSL } from './sharp-texels.ts';
+import { filterWorldPicture, freshWorldPicture, worldFilterMode } from './world-texture-filter.ts';
+import { bleedTransparentTexels } from './alpha-bleed.ts';
 import { FOG_GLSL } from './fogGlsl.js';
 import { COLUMN_GLSL } from './columnGlsl.js';   // DW-F: the column's share, one home (the renderer's billboards take it too)
 import { WATER_LAYER_UNITS } from './waterSurface.js';   // FIELD BUGS 2026-09-29 (the sea) #4: the top's place in the sea's stack
@@ -279,6 +282,7 @@ void main() {
 export const DECOR_FS = `#version 300 es
 precision highp float;
 precision highp sampler2DArray;
+${SHARP_TEXEL_GLSL}${SHARP_TEXEL_ARRAY_GLSL}uniform float uSharpOn;
 in vec2 vUv;
 in float vStart;
 in vec3 vWorldPos;
@@ -297,7 +301,9 @@ out vec4 outColor;
 ${FOG_GLSL}
 ${COLUMN_GLSL}
 void main() {
-  vec4 t = texture(uMainTex, vec3(vUv, mod(vStart + uTick, uFrames)));
+  vec3 frameUv = vec3(vUv, mod(vStart + uTick, uFrames));
+  // Under the Sharp world filter a decoration is sampled at its texel centres, as the world's flats are.
+  vec4 t = uSharpOn > 0.5 ? sharpGrad(uMainTex, frameUv, dFdx(vUv), dFdy(vUv)) : texture(uMainTex, frameUv);
   if (t.w * uColor.w - uCutoff < 0.0) discard;
   vec3 tint = uSceneTint.www * (uSceneTint.xyz - vec3(1.0)) + vec3(1.0);
   vec3 col = dwColumn(t.xyz * uColor.xyz * tint, vWorldPos);   // the top's share over it, as over the floor
@@ -441,7 +447,8 @@ export class DeepWatersRenderer {
       look: { p: look, u: locs(gl, look, ['uRayC', 'uRayX', 'uRayY', 'uCamPos', 'uSeaY', 'uKeep', 'uBody', 'uSunW', 'uShaft', 'uReach', 'uTime', 'uPass']) },
       decor: { p: decor, u: locs(gl, decor, ['uProj', 'uView', 'uModel', 'uViewCol2', 'uUpVector', 'uMainTex', 'uColor', 'uCutoff', 'uSceneTint',
         'uTick', 'uFrames', 'uCamPos', 'uFogColor', 'uFogMode', 'uFogDensity', 'uFogRange', 'uDwFog', 'uFocus', 'uJungleHaze',
-        'uSurfaceTex', 'uDwCamFwd', 'uColumnOn', 'uSeaY', 'uTopColor', 'uTopVision', 'uSurfaceScroll', 'uPixelOrigin', 'uFacing', 'uCamRight', 'uCamUp']) },
+        'uSurfaceTex', 'uDwCamFwd', 'uColumnOn', 'uSeaY', 'uTopColor', 'uTopVision', 'uSurfaceScroll', 'uPixelOrigin', 'uFacing', 'uCamRight', 'uCamUp',
+        'uSharpOn', 'uSharpRetro']) },
       empty: gl.createVertexArray(),   // the sky pass's triangle is gl_VertexID's
     };
     return this._programs;
@@ -647,8 +654,8 @@ export class DeepWatersRenderer {
   /**
    * DW-E2: a decoration texture - a record's frames as the layers of one
    * array (every frame the record's own size; a frame of another size ends
-   * the array there), point-sampled over a mip chain as DFU's billboard
-   * atlas is. `frames`: [{width, height, data: RGBA rows}].
+   * the array there), over a mip chain, sampled by the world texture filter
+   * as DFU's billboard atlas is. `frames`: [{width, height, data: RGBA rows}].
    */
   createDecorationTexture(frames) {
     const gl = this.gl;
@@ -656,14 +663,13 @@ export class DeepWatersRenderer {
     let n = 1;
     while (n < frames.length && frames[n].width === w && frames[n].height === h) n++;
     const bytes = new Uint8Array(w * h * 4 * n);
-    for (let i = 0; i < n; i++) bytes.set(frames[i].data.subarray(0, w * h * 4), i * w * h * 4);
+    for (let i = 0; i < n; i++) bytes.set(bleedTransparentTexels(frames[i].data.subarray(0, w * h * 4), w, h), i * w * h * 4);   // no black cut-out edge once filtered
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, w, h, n, 0, gl.RGBA, gl.UNSIGNED_BYTE, bytes);
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    filterWorldPicture(gl, tex, gl.TEXTURE_2D_ARRAY, true);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
@@ -802,6 +808,8 @@ export class DeepWatersRenderer {
     gl.uniform4fv(u.uColor, DECORATION_COLOR);
     gl.uniform4fv(u.uSceneTint, frame.sceneTint);
     this._columnUniforms(u, frame);
+    gl.uniform1f(u.uSharpOn, worldFilterMode() === SHARP ? 1 : 0);
+    if (u.uSharpRetro) gl.uniform2fv(u.uSharpRetro, r._sharpRetro);   // the retro modes' values (render/retro-sharp.ts)
     gl.uniform1i(u.uMainTex, 0);
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
@@ -817,6 +825,7 @@ export class DeepWatersRenderer {
         gl.uniform1i(u.uFacing, g.facing);
         gl.uniform1f(u.uCutoff, g.cutoff ?? DECORATION_CUTOFF);   // DW-E3: a fish's is 0.1
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, g.texture.tex);
+        freshWorldPicture(gl, g.texture.tex, gl.TEXTURE_2D_ARRAY);
         gl.uniform1f(u.uFrames, g.texture.frames);
         gl.uniform1f(u.uTick, g.fps > 0 ? Math.floor((frame.seconds - g.born) * g.fps) : 0);
         gl.bindVertexArray(g.vao);

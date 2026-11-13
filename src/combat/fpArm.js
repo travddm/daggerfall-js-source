@@ -2703,7 +2703,7 @@ export function stepRigEffects(assembly, { dt, clock = null, hidden = () => fals
         gpu = renderer.createParticleEffect(eff.sim.quota, particleDrawState(eff.material));
         const file = eff.material && eff.material.textureFile;
         const entry = file && textures ? textures.get(file) : null;
-        if (entry && entry.image) gpu.tex = renderer.createCharacterTexture(entry.image.mips, wrapModes(eff.material.clampMode ?? 3));
+        if (entry && entry.image) gpu.tex = renderer.createCharacterTexture(entry.image.mips, { ...wrapModes(eff.material.clampMode ?? 3), effect: true });
         mesh.effects[i] = gpu;
       }
       gpu.hidden = !!hidden(eff);
