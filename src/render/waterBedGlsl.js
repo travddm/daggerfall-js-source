@@ -31,12 +31,12 @@ uniform uvec4 uBedMask[8];     // the draw's water corners, packed as the water'
 // AUDIT PRECIP GROUND-5: under the snow (\`snowC\`, the ground's cover - render/snowCoverGlsl.js) the art's water is the
 // texel's it wears there: the summer record's mask walked to its winter record's (uSnowArr.x layers on) by the cover
 // COAST-LOOK: \`blended\` a tile the ground drew as its two kinds - its line wanders at \`p\` as the sheet's, its art no fringe
-uniform float uBedMaskClamped;   // 1 when the ground's sampler clamps at the tile's edge (Point)
+uniform float uGroundClamped;   // 1 when the ground's sampler clamps at the tile's edge (Point)
 // The art's water mask is data, so its sample keeps every tap inside its tile: under a repeat wrap a shore tile's wet
 // edge would blend into its dry one. The margin is half a texel up close; at a distance it is the footprint, which
 // covers the coarser mip level and the anisotropic taps.
 vec3 bedMaskAt(vec3 tl, vec2 gx, vec2 gy) {
-  if (uBedMaskClamped > 0.5) return tl;
+  if (uGroundClamped > 0.5) return tl;
   vec2 texel = 1.0 / vec2(textureSize(uTileArr, 0).xy);
   vec2 margin = min(max(0.5 * texel, max(abs(gx), abs(gy))), vec2(0.5));
   return vec3(clamp(tl.xy, margin, 1.0 - margin), tl.z);

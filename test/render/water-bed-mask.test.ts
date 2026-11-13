@@ -65,7 +65,7 @@ function bedShader(mask: Mask, { clamped = 0, sharp = false } = {}) {
   const fns = glslFunctions(sharp ? sharpenWorldFs(SOURCE) : SOURCE, {
     uGroundEdge: 0,
     uWaterBed: 1,
-    uBedMaskClamped: clamped,
+    uGroundClamped: clamped,
     uSnowArr: [3, 0, 0, 0],
     uSharpRetro: [0, 0],
     uBedMask: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [...words.slice(4 * i, 4 * i + 4)]),
@@ -196,13 +196,13 @@ test(
 
 test("the renderer's flag follows the ground's wrap: set under Point, where the sampler clamps, and clear under the others", async () => {
   const { setValue } = await import('../../src/systems/settings/settings.js');
-  const { groundMaskClamped } = await import('../../src/render/ground-sampler.ts');
+  const { groundClampedFlag } = await import('../../src/render/ground-sampler.ts');
   const gl = { NEAREST: 0x2600, LINEAR: 0x2601, REPEAT: 0x2901, CLAMP_TO_EDGE: 0x812f } as Parameters<
-    typeof groundMaskClamped
+    typeof groundClampedFlag
   >[0];
   const flags = ['0', '1', '2', '3'].map((mode) => {
     setValue('Video', 'MainFilterMode', mode);
-    return groundMaskClamped(gl);
+    return groundClampedFlag(gl);
   });
   setValue('Video', 'MainFilterMode', '3');
   assert.deepEqual(flags, [1, 0, 0, 0]);

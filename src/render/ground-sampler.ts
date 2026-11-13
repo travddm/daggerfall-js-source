@@ -45,9 +45,9 @@ export function groundWrapFor(gl: FilterGl & { REPEAT: number; CLAMP_TO_EDGE: nu
   return mode === POINT ? gl.CLAMP_TO_EDGE : gl.REPEAT;
 }
 
-/** The water bed's `uBedMaskClamped`: 1 where the ground's wrap clamps, so the bed's mask sample needs no margin of its
- *  own (render/waterBedGlsl.js bedMaskAt). */
-export function groundMaskClamped(gl: FilterGl & { REPEAT: number; CLAMP_TO_EDGE: number }): number {
+/** The terrain programs' `uGroundClamped`: 1 where the ground's wrap clamps, so neither the bed's mask sample
+ *  (render/waterBedGlsl.js bedMaskAt) nor a two-ground tile's edge (render/tile-edge-glsl.ts) needs a margin of its own. */
+export function groundClampedFlag(gl: FilterGl & { REPEAT: number; CLAMP_TO_EDGE: number }): number {
   return groundWrapFor(gl, worldFilterMode()) === gl.CLAMP_TO_EDGE ? 1 : 0;
 }
 
