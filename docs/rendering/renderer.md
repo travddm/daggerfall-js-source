@@ -46,7 +46,10 @@ Rules from the data side, stated at the top of `renderer.js`:
 - The ground tile arrays take the world filter for magnification, the Ground sharpness row for minification (nearest-mip
   or trilinear) and the Anisotropic Filtering row for anisotropy (`src/render/ground-sampler.ts`). The snow ground's
   albedo takes the same (`filterGroundPicture`). `applyGroundSharpness` applies them at every world load, and on the
-  next frame after any of them changes.
+  next frame after any of them changes. Where the driver drops a nearest-mip filter for anisotropy (ANGLE over Direct3D
+  11, `src/render/anisotropic-mip-filter.ts`), Off and Smooth draw alike while the ground takes anisotropy above 1, so
+  the settings screen shows the Ground sharpness row disabled with that reason. The `sampler` game probe records what
+  the CI browser's driver does (`tools/probes/lib/samplerCheck.mjs`).
 - A texel with alpha 0 is a palette cutout. The shaders discard it. Daggerfall stores such texels black, and a linear
   filter or a mip level at a cut-out's edge would mix that black in. World art (`uploadTexture`) and the far trees'
   layers are therefore uploaded with each transparent texel in the colour of its nearest opaque texel, alpha kept, and
