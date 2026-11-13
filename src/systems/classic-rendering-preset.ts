@@ -1,32 +1,47 @@
-// The Classic rendering preset: one switch that sets the picture options closest to the original game, and puts back
-// what the player had when it is switched off, so today's look stays one press away. It writes Daggerfall Unity's
-// own [Video] keys as well as Features rows, so a DFU settings file keeps its meaning. It does not change the skin or
-// the HUD.
+// The Classic rendering preset: one switch between two stored graphics profiles, standard and classic. Each profile
+// holds every graphics setting the switch covers (the caller names them: the Graphics tab's Daggerfall Unity keys and
+// Features rows), so turning Classic on puts the classic profile in place and turning it off puts the standard one
+// back exactly. A setting changed while a profile is in use belongs to that profile and is there the next time. The
+// first time Classic is turned on, its profile is the standard one with the preset's values over it: the picture
+// options closest to the original game. It writes Daggerfall Unity's own [Video] keys as well as Features rows, so a
+// DFU settings file keeps its meaning. It does not change the skin, the HUD, the controls, gameplay or audio.
 //
 // The stores are reached through doors the caller hands in, so this module holds the rule and imports no store.
 
 /** A row's value, as its tiers hold it. */
 export type RowValue = string | number | boolean;
 
-/** What the preset found before it wrote, so switching it off can put it back. */
-export type ClassicRenderingSaved = {
+/** One profile: each covered Features row's value and each covered Daggerfall Unity key's stored value. */
+export type GraphicsProfile = {
   readonly rows: Readonly<Record<string, RowValue>>;
   readonly video: Readonly<Record<string, string>>;
 };
 
+/** Which profile is in use, and the stored copy of each. The profile in use lives in the stores themselves; its stored
+ *  copy is refreshed each time the player switches away from it. */
+export type GraphicsProfiles = {
+  readonly active: 'standard' | 'classic';
+  readonly standard: GraphicsProfile | null;
+  readonly classic: GraphicsProfile | null;
+};
+
 export type ClassicRenderingDoors = {
+  /** The Features rows a profile holds. */
+  readonly rowIds: readonly string[];
+  /** The Daggerfall Unity keys a profile holds, `Section/Key`. */
+  readonly videoKeys: readonly string[];
   /** A Features row's value, or null when the row cannot be set here (the online room decides it). */
   readRow(id: string): RowValue | null;
   writeRow(id: string, value: RowValue): void;
-  /** A Daggerfall Unity setting as the store holds it, `Section/Key`. */
+  /** A Daggerfall Unity setting as the store holds it. */
   readVideo(key: string): string;
   writeVideo(key: string, value: string): void;
-  readSaved(): unknown;
-  writeSaved(saved: ClassicRenderingSaved | null): void;
+  readProfiles(): unknown;
+  writeProfiles(profiles: GraphicsProfiles): void;
 };
 
-/** The pref that holds what the preset replaced. Null while the preset is off. */
-export const CLASSIC_RENDERING_SAVED_PREF = 'classicRenderingSaved';
+/** The pref that holds the two profiles. */
+export const GRAPHICS_PROFILES_PREF = 'graphicsProfiles';
 
 /** Features rows the preset sets. Land view 3 is Daggerfall Unity's default terrain distance; ground sharpness off draws
  *  the ground without mip-mapped sharpening, as the retro picture does. Enhanced lighting off gives the flat classic
@@ -52,49 +67,79 @@ export const CLASSIC_RENDERING_VIDEO: Readonly<Record<string, string>> = Object.
   'Video/MainFilterMode': '0',
 });
 
-function savedOf(doors: ClassicRenderingDoors): ClassicRenderingSaved | null {
-  const saved = doors.readSaved();
-  if (!saved || typeof saved !== 'object') return null;
-  const { rows, video } = saved as { rows?: unknown; video?: unknown };
-  if (!rows || typeof rows !== 'object' || !video || typeof video !== 'object') return null;
-  return { rows: rows as Record<string, RowValue>, video: video as Record<string, string> };
+const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object';
+
+function profileOf(value: unknown): GraphicsProfile | null {
+  if (!isRecord(value) || !isRecord(value.rows) || !isRecord(value.video)) return null;
+  return { rows: value.rows as Record<string, RowValue>, video: value.video as Record<string, string> };
 }
 
-/** On while it holds what it replaced. A value the player changes afterwards does not turn it off. */
-export function classicRenderingOn(doors: ClassicRenderingDoors): boolean {
-  return savedOf(doors) !== null;
+function profilesOf(doors: ClassicRenderingDoors): GraphicsProfiles {
+  const stored = doors.readProfiles();
+  if (!isRecord(stored)) return { active: 'standard', standard: null, classic: null };
+  return {
+    active: stored.active === 'classic' ? 'classic' : 'standard',
+    standard: profileOf(stored.standard),
+    classic: profileOf(stored.classic),
+  };
 }
 
-/** Saves the current values, then writes the preset's. A row the online room decides is left as it is. Returns false
- *  when the preset was already on: a second press must not save the preset's own values over the player's. */
-export function applyClassicRendering(doors: ClassicRenderingDoors): boolean {
-  if (classicRenderingOn(doors)) return false;
+/** The settings in use now, as a profile. A row the online room decides is left out. */
+function capture(doors: ClassicRenderingDoors): GraphicsProfile {
   const rows: Record<string, RowValue> = {};
   const video: Record<string, string> = {};
-  for (const id of Object.keys(CLASSIC_RENDERING_ROWS)) {
-    const now = doors.readRow(id);
-    if (now !== null) rows[id] = now;
+  for (const id of doors.rowIds) {
+    const value = doors.readRow(id);
+    if (value !== null) rows[id] = value;
   }
-  for (const key of Object.keys(CLASSIC_RENDERING_VIDEO)) video[key] = doors.readVideo(key);
-  // Saved before the writes, so a write that fails part way still leaves the way back.
-  doors.writeSaved({ rows, video });
-  for (const id of Object.keys(rows)) doors.writeRow(id, CLASSIC_RENDERING_ROWS[id]);
-  for (const key of Object.keys(video)) doors.writeVideo(key, CLASSIC_RENDERING_VIDEO[key]);
+  for (const key of doors.videoKeys) video[key] = doors.readVideo(key);
+  return { rows, video };
+}
+
+/** Puts a profile in the stores, writing only what differs. The Daggerfall Unity keys go first: a key can move a row
+ *  (Detail Level sets Anisotropic Filtering), and the row's own stored value must be the one that stays. */
+function putInPlace(doors: ClassicRenderingDoors, profile: GraphicsProfile): void {
+  for (const [key, value] of Object.entries(profile.video)) {
+    if (doors.readVideo(key) !== value) doors.writeVideo(key, value);
+  }
+  for (const [id, value] of Object.entries(profile.rows)) {
+    const now = doors.readRow(id);
+    if (now !== null && String(now) !== String(value)) doors.writeRow(id, value);
+  }
+}
+
+/** The classic profile the first time: the standard one with the preset's values over it. */
+function firstClassic(standard: GraphicsProfile): GraphicsProfile {
+  const rows: Record<string, RowValue> = { ...standard.rows };
+  for (const [id, value] of Object.entries(CLASSIC_RENDERING_ROWS)) if (id in rows) rows[id] = value;
+  return { rows, video: { ...standard.video, ...CLASSIC_RENDERING_VIDEO } };
+}
+
+/** On while the classic profile is in use. */
+export function classicRenderingOn(doors: ClassicRenderingDoors): boolean {
+  return profilesOf(doors).active === 'classic';
+}
+
+/** Stores the settings in use as the standard profile, then puts the classic profile in place. Returns false when
+ *  Classic was already on: a second press must not store the classic settings as the standard ones. */
+export function applyClassicRendering(doors: ClassicRenderingDoors): boolean {
+  const profiles = profilesOf(doors);
+  if (profiles.active === 'classic') return false;
+  const standard = capture(doors);
+  const classic = profiles.classic ?? firstClassic(standard);
+  // Stored before the writes, so a write that fails part way still leaves the way back.
+  doors.writeProfiles({ active: 'classic', standard, classic });
+  putInPlace(doors, classic);
   return true;
 }
 
-/** Puts back each saved value whose setting still holds the preset's value. A setting the player changed while the
- *  preset was on keeps the player's choice. Returns false when the preset was off. */
+/** Stores the settings in use as the classic profile, then puts the standard profile back. Returns false when Classic
+ *  was off. */
 export function removeClassicRendering(doors: ClassicRenderingDoors): boolean {
-  const saved = savedOf(doors);
-  if (!saved) return false;
-  for (const [id, before] of Object.entries(saved.rows)) {
-    const now = doors.readRow(id);
-    if (now !== null && String(now) === String(CLASSIC_RENDERING_ROWS[id])) doors.writeRow(id, before);
-  }
-  for (const [key, before] of Object.entries(saved.video)) {
-    if (doors.readVideo(key) === CLASSIC_RENDERING_VIDEO[key]) doors.writeVideo(key, before);
-  }
-  doors.writeSaved(null);
+  const profiles = profilesOf(doors);
+  if (profiles.active !== 'classic') return false;
+  const classic = capture(doors);
+  doors.writeProfiles({ active: 'standard', standard: profiles.standard, classic });
+  if (profiles.standard) putInPlace(doors, profiles.standard);
   return true;
 }
