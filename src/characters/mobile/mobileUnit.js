@@ -1,4 +1,4 @@
-// Classic mobile monster sprites (C11 - the monster pivot). Verbatim
+// Classic mobile monster sprites. Verbatim
 // from DFU's DaggerfallMobileUnit + EnemyBasics animation tables
 // (MIT, Daggerfall Workshop): 8 orientations over the fixed record
 // layout - Move 0-4, PrimaryAttack 5-9, Hurt 10-14, Idle 15-19, the
@@ -8,20 +8,20 @@
 // idle, ghost/wraith, slaughterfish). The scene owns rendering (a
 // live billboard batch per foe); this module owns the state/frames.
 //
-// C14: the Spell anim state is LIVE (casters play over records 20-24
+// the Spell anim state is LIVE (casters play over records 20-24
 // when HasSpellAnimation - Orc Shaman - else the primary records,
 // verbatim GetStateAnims). SpellAnimFrames only SEEDS the state: it
 // is not one of AnimateEnemy's doingAttackAnimation states, so the
 // run is a plain +1 walk from frames[0] to the record's frame count
-// (AUDIT 18). RangedAttack1/2 are N/A
+// . RangedAttack1/2 are N/A
 // for monsters (HasRangedAttack1 is class-enemy-only in EnemyBasics
 // - the rigs' bow path owns it).
-// C16: the -1 frame IS the damage moment (doMeleeDamage -> the scene's
+// the -1 frame IS the damage moment (doMeleeDamage -> the scene's
 // MeleeDamage resolution; the machine's hit frame stays the RIGS'
 // clock).
 //
-// A5 (ROAD TO 1:1): the SEDUCER TRANSFORM PAIR, which stood flagged
-// here since C16, is live. Daedra Seducer (29) is the one mobile with
+// the SEDUCER TRANSFORM PAIR is live.
+// Daedra Seducer (29) is the one mobile with
 // special states: SeducerTransform1 (record 23, crouch and grow wings)
 // runs as a one-shot into SeducerTransform2 (record 22, stand and
 // spread wings), whose end calls SetSpecialTransformationCompleted -
@@ -31,7 +31,7 @@
 // animation of frames 0-3. The trigger is DaedraSeducerMobileBehaviour
 // (8 seconds targeting the player, or the first wound), ported below.
 //
-// AUDIT 24 (wave 33): these two are LATCHES, not per-frame edges, and
+// these two are LATCHES, not per-frame edges, and
 // the names are DFU's for that reason. AnimateEnemy sets
 // doMeleeDamage/shootArrow when the sequence reaches its -1 marker
 // (DaggerfallMobileUnit.cs:303, :555-560) and the ONLY writer of false
@@ -42,7 +42,7 @@
 // port cleared both flags at the top of every update, which made them
 // edges: a blow the player should have taken on waking was dropped.
 
-import { rand } from '../../formats/dfRandom.js';   // NT2 (F210): the gender roll is a DFRandom draw
+import { rand } from '../../formats/dfRandom.js';   // the gender roll is a DFRandom draw
 import { MOBILE_TYPES } from './mobileTypes.js';
 
 // Speeds in frames-per-second (EnemyBasics).
@@ -92,7 +92,7 @@ export const SLAUGHTERFISH_MOVE_ANIMS = Object.freeze([
   A(0, MOVE_ANIM_SPEED, false, true), A(1, MOVE_ANIM_SPEED, false, true), A(2, MOVE_ANIM_SPEED, false, true), A(3, MOVE_ANIM_SPEED, false, true),
   A(4, MOVE_ANIM_SPEED, false, true), A(3, MOVE_ANIM_SPEED, true, true), A(2, MOVE_ANIM_SPEED, true, true), A(1, MOVE_ANIM_SPEED, true, true),
 ]);
-// C14: RangedAttack1Anims (records 20-24, 10 fps) - for MONSTERS this
+// RangedAttack1Anims (records 20-24, 10 fps) - for MONSTERS this
 // is the SPELL table when HasSpellAnimation (Orc Shaman 21 only);
 // actual ranged attacks belong to class enemies (rigs), N/A here.
 export const RANGED_ATTACK1_ANIM_SPEED = 10;
@@ -101,7 +101,7 @@ export const RANGED_ATTACK1_ANIMS = Object.freeze([
   A(24, RANGED_ATTACK1_ANIM_SPEED, false), A(23, RANGED_ATTACK1_ANIM_SPEED, true), A(22, RANGED_ATTACK1_ANIM_SPEED, true), A(21, RANGED_ATTACK1_ANIM_SPEED, true),
 ]);
 
-// AUDIT 26 F009: RangedAttack2Anims (EnemyBasics.cs:103-113 - records
+// RangedAttack2Anims (EnemyBasics.cs:103-113 - records
 // 25-29, RangedAttack2AnimSpeed 10, "475, 489, 490 humanoid mobiles
 // only"). Battlemage (130) and Nightblade (133) carry
 // hasRangedAttack2 AND hasSpellAnimation, so for them records 20-24
@@ -113,14 +113,14 @@ export const RANGED_ATTACK2_ANIMS = Object.freeze([
   A(29, RANGED_ATTACK2_ANIM_SPEED, false), A(28, RANGED_ATTACK2_ANIM_SPEED, true), A(27, RANGED_ATTACK2_ANIM_SPEED, true), A(26, RANGED_ATTACK2_ANIM_SPEED, true),
 ]);
 
-// C17: the female-thief idle (FemaleTexture 483) - record 11 rides
+// The female-thief idle (FemaleTexture 483) - record 11 rides
 // the front diagonals, verbatim quirk.
 export const FEMALE_THIEF_IDLE_ANIMS = Object.freeze([
   A(15, IDLE_ANIM_SPEED, false), A(11, IDLE_ANIM_SPEED, false), A(17, IDLE_ANIM_SPEED, false), A(18, IDLE_ANIM_SPEED, false),
   A(19, IDLE_ANIM_SPEED, false), A(18, IDLE_ANIM_SPEED, true), A(17, IDLE_ANIM_SPEED, true), A(11, IDLE_ANIM_SPEED, true),
 ]);
 
-// A5: the Seducer's four special tables (EnemyBasics.cs:167-212).
+// The Seducer's four special tables (EnemyBasics.cs:167-212).
 // Every one is EIGHT COPIES OF ONE ROW - the source's own comment says
 // "has player-facing orientation only", so the orientation index picks
 // the same record and the same (false) flip whichever way the foe
@@ -131,7 +131,7 @@ export const SEDUCER_TRANSFORM2_ANIMS = SEDUCER_ROW(22);   // stand and spread w
 export const SEDUCER_IDLE_MOVE_ANIMS = SEDUCER_ROW(21);    // the winged form's move, idle AND hurt
 export const SEDUCER_ATTACK_ANIMS = SEDUCER_ROW(20);       // the winged form's attack AND spell
 
-// AUDIT 68 S05-mobile-id-literals: the generated table's ids, not copies.
+// The generated table's ids, not copies.
 export const MOBILE_RAT = MOBILE_TYPES.Rat;
 export const MOBILE_SLAUGHTERFISH = MOBILE_TYPES.Slaughterfish;
 export const MOBILE_GHOST = MOBILE_TYPES.Ghost;
@@ -145,7 +145,7 @@ export const MOBILE_DAEDRA_SEDUCER = MOBILE_TYPES.DaedraSeducer;
  *  the Spell branch has NO ghost/wraith special (verbatim: they cast on
  *  PrimaryAttackAnims, not their own attack table).
  *
- *  A5: the Seducer branches are live. A DaedraSeducer with
+ *  The Seducer branches are live. A DaedraSeducer with
  *  `specialTransformationCompleted` reads its winged tables in FIVE
  *  states - Move, PrimaryAttack, Hurt, Idle and Spell - each at the
  *  exact place C# puts it: SECOND in Move/PrimaryAttack/Idle (after
@@ -174,7 +174,7 @@ export function stateAnims(state, mobileType, hasIdle, hasSpellAnimation = false
     return hasSpellAnimation ? RANGED_ATTACK1_ANIMS : PRIMARY_ATTACK_ANIMS;
   }
   if (state === 'ranged') {
-    // AUDIT 26 F009 - EnemyMotor.cs:594-597: RangedAttack1 only when
+    // EnemyMotor.cs:594-597: RangedAttack1 only when
     // `HasRangedAttack1 && !HasRangedAttack2`, else RangedAttack2
     // (records 25-29, DaggerfallMobileUnit.cs:837-842). Battlemage and
     // Nightblade carry both flags plus hasSpellAnimation, so their
@@ -248,11 +248,11 @@ export function _resetForcedGenders() { _forcedGenders.length = 0; }
  * @param frameCount (record) => frames in that record (texture data)
  */
 export class MobileUnit {
-  /** NT2 (F210) - GetTextureArchive's gender arm
+  /** GetTextureArchive's gender arm
    *  (DaggerfallMobileUnit.cs:621-630): a HUMAN enemy with unspecified
    *  gender rolls `DFRandom.random_range(0, 2)` - ONE draw off the
    *  shared classic LCG, == 0 male - and a monster stays unspecified,
-   *  which reads as the male texture. The ENGINE-PRNG rule (Ledger A)
+   *  which reads as the male texture. The ENGINE-PRNG rule
    *  says a DFRandom draw does NOT ride an injectable roll, so this
    *  reads the stream directly. Before this the hosts rolled
    *  Math.random at their spawn arms - and the dungeon LAYOUT path
@@ -272,10 +272,10 @@ export class MobileUnit {
   constructor(mobileType, basics, frameCount, rolls = Math.random, gender = 'male') {
     this.mobileType = mobileType;
     this.basics = basics;
-    /** AUDIT 63 F27: the SHARED row this unit stood on, kept so the
+    /** The SHARED row this unit stood on, kept so the
      *  save-restore rewind below can put it back. */
     this._sharedBasics = basics;
-    this.gender = gender;   // C17: the female-thief idle route + host archives
+    this.gender = gender;   // the female-thief idle route + host archives
     this.frameCount = frameCount;
     this.rolls = rolls;
     this.state = 'idle';
@@ -285,14 +285,14 @@ export class MobileUnit {
     this._reversed = false;
     this._attackFrames = null;
     this._iter = 0;
-    this.doMeleeDamage = false;   // LATCHED on the -1 marker; the consumer clears it (C16)
-    this.meleeSeq = 0;            // TELL2: one per -1 a melee swing reached (the LAND cue counts them; nothing else reads it)
-    this._hold = false;           // TELL2: the host's word this update - true holds a telegraphed swing, 'cancel' drops it
-    this._underHold = false;      // TELL2: the running attack began held (a telegraphed blow's wind-up)
-    this._heldSwing = false;      // TELL4: ...and stays so through its strike (the 'spent' word reads it)
-    this._struck = false;         // TELL4: that swing has struck - its follow-through on show
-    this.shootArrow = false;      // C17: the ranged -1
-    /** A5 - MobileUnit.SpecialTransformationCompleted (Base/MobileUnit
+    this.doMeleeDamage = false;   // LATCHED on the -1 marker; the consumer clears it
+    this.meleeSeq = 0;            // one per -1 a melee swing reached (the LAND cue counts them; nothing else reads it)
+    this._hold = false;           // the host's word this update - true holds a telegraphed swing, 'cancel' drops it
+    this._underHold = false;      // the running attack began held (a telegraphed blow's wind-up)
+    this._heldSwing = false;      // ...and stays so through its strike (the 'spent' word reads it)
+    this._struck = false;         // that swing has struck - its follow-through on show
+    this.shootArrow = false;      // the ranged -1
+    /** MobileUnit.SpecialTransformationCompleted (Base/MobileUnit
      *  .cs:50, DaggerfallMobileUnit.cs:121-124). Raised by
      *  setSpecialTransformationCompleted at the END of the second
      *  Seducer transform state, and by a save restore that finds the
@@ -338,7 +338,7 @@ export class MobileUnit {
   }
 
   /**
-   * AUDIT 63 F27 - the RESTORE's other arm, which DFU gets for free
+   * the RESTORE's other arm, which DFU gets for free
    * and this port has to spell.
    *
    * SerializableEnemy.cs:225-228 applies SetSpecialTransformationCompleted
@@ -356,7 +356,7 @@ export class MobileUnit {
     this.basics = this._sharedBasics;
     this._basicsOwned = false;
     this.specialTransformationCompleted = false;
-    // AUDIT 68 S05-seducer-rewind-incomplete: a save taken before the
+    // A save taken before the
     // transform also predates a transform in PROGRESS - a rebuilt
     // mobile is not crouched mid-wing.
     if (this.state === 'transform1' || this.state === 'transform2') this._change('idle');
@@ -378,7 +378,7 @@ export class MobileUnit {
     return this.state === 'transform1' || this.state === 'transform2';
   }
 
-  /** REVENANT-FATE: a HELD POSE the host draws instead of the clock's - `state`'s anim at `frame` (a negative frame
+  /** A HELD POSE the host draws instead of the clock's - `state`'s anim at `frame` (a negative frame
    *  counts back from its last: -1 the last), facing the camera as update() faces it (the scorpion's inverted flip
    *  too). The unit's own state, frame and clock are untouched: a beaten revenant kneels on its hurt's last frame. */
   heldPose(state, frame, yaw, feet, cameraPos) {
@@ -436,7 +436,7 @@ export class MobileUnit {
       // attack variants STARTS with the hit frame (-1) - flag damage
       // now and advance to the next frame (audit 08-17).
       if (this.frame === -1) {
-        // TELL2: a held swing's strike waits for the release - the first frame drawn, the -1 next on the iterator
+        // A held swing's strike waits for the release - the first frame drawn, the -1 next on the iterator
         if (this._hold === true) { this.frame = 0; this._iter = 0; }
         else {
           this.doMeleeDamage = true;
@@ -447,27 +447,27 @@ export class MobileUnit {
       this._underHold = this._hold === true;
       this._heldSwing = this._underHold; this._struck = false;
     }
-    // C14: ApplyEnemyState's Spell branch SEEDS from SpellAnimFrames
+    // ApplyEnemyState's Spell branch SEEDS from SpellAnimFrames
     // (currentFrame = frames[0]; frameIterator = 1) - but AnimateEnemy's
     // doingAttackAnimation is PrimaryAttack/RangedAttack1/RangedAttack2
     // ONLY (DaggerfallMobileUnit.cs:536-538), so that iterator is never
     // consumed for Spell: the state steps as a PLAIN frame run from the
     // seed until currentFrame >= NumFrames, then exits as a one-shot
-    // (AUDIT 18).
+    // .
     if (state === 'spell') {
       this._attackFrames = this.basics.spellAnimFrames ?? [0];
       this.frame = Math.max(0, this._attackFrames[0]);
       this._iter = 1;
       this._reversed = false;
     }
-    // C17: the RangedAttack1 one-shot (ApplyEnemyState's ranged
+    // The RangedAttack1 one-shot (ApplyEnemyState's ranged
     // branch) - the -1 marker is the shootArrow moment.
     if (state === 'ranged') {
       this._attackFrames = this.basics.rangedAttackAnimFrames ?? [0];
       this.frame = Math.max(0, this._attackFrames[0]);
       this._iter = 1;
     }
-    // A5: ApplyEnemyState's two Seducer arms (DaggerfallMobileUnit.cs:
+    // ApplyEnemyState's two Seducer arms (DaggerfallMobileUnit.cs:
     // 268-288). Each SWITCHES THE SPRITE ALIGNMENT before seeding -
     // transform1 goes Flying "while crouched and growing wings",
     // transform2 back to General "while standing and spreading wings" -
@@ -500,12 +500,12 @@ export class MobileUnit {
    * a level signal would replay the sequence inside one swing.
    */
   update(dt, { moving = false, striking = false, hurting = false, casting = false, rangedStriking = false, hold = false } = {}, yaw, feet, cameraPos) {
-    // TELL2: A TELEGRAPHED BLOW'S SWING, HELD. The port's own beat - DFU
+    // A TELEGRAPHED BLOW'S SWING, HELD. The port's own beat - DFU
     // has none: `hold` true plays the swing that began under it up to the frame before its first -1 (the raised arm) and
     // stands there; false lets it strike on the next step; 'cancel' drops it (its wind-up broke, a paralysis). Only a
     // swing that BEGAN under the hold answers it - a DFU swing in flight is never held, never dropped (the wind-up's own
     // swing replaces it, at the edge below).
-    // TELL4 (Feud-Arc.md 6.1): 'spent' - an overreach: the held swing strikes, then its follow-through STANDS (the frame
+    // 'spent' - an overreach: the held swing strikes, then its follow-through STANDS (the frame
     // after its strike - the world boss's SPENT_FRAME; never the list's later strike or its rest pose); when the word
     // goes, the swing is over (to idle - a stagger's Hurt may take the same frame).
     if (this._heldSwing && this._struck && this.state === 'attack' && this._hold === 'spent' && hold !== 'spent') { this._heldSwing = false; this._change('idle'); }
@@ -517,16 +517,15 @@ export class MobileUnit {
     // state - hurt included (ChangeEnemyState is unconditional at
     // MeleeAnimation); knockback-hurt never interrupts PrimaryAttack
     // (EnemyMotor gates on state != PrimaryAttack ONLY - so hurt CAN
-    // interrupt a Spell mid-cast, verbatim). C14: casting is an edge
+    // interrupt a Spell mid-cast, verbatim). Casting is an edge
     // like striking (the cast decision fires ChangeEnemyState once).
     //
-    // A5, CORRECTED AT ROAD-U: ...unless a one-shot that PAUSES
+    // ...unless a one-shot that PAUSES
     // ACTIONS is playing. This block is the ANIM half alone - it holds
     // the sequence against a strike, cast or hurt INTENT while the
     // clock below keeps stepping it. The other two halves are spent
-    // where DFU spends them, and the comment that used to stand here
-    // claimed all three fed this one block, which was false: the
-    // ACTOR went on acting. EnemyMotor.TakeAction returns at :464-466
+    // where DFU spends them.
+    // The ACTOR goes on acting. EnemyMotor.TakeAction returns at :464-466
     // (enemyMotor.js's `paused`, which also carries
     // KnockbackMovement's :267-269 return - no shove, no decay, no
     // CanAct write) and EnemyAttack.FixedUpdate returns at :59-61
@@ -537,7 +536,7 @@ export class MobileUnit {
     // and can never enter a transform state).
     if (this.isPlayingOneShot() && this.oneShotPauseActionsWhilePlaying()) {
       // no intent this frame
-    } else if (striking && (this.state !== 'attack' || (hold === true && !this._underHold))) this._change('attack');   // TELL2: a wind-up's swing replaces a DFU swing in flight, as the attack machine's restart does (enemyAttack.js `_blowWind`)
+    } else if (striking && (this.state !== 'attack' || (hold === true && !this._underHold))) this._change('attack');   // a wind-up's swing replaces a DFU swing in flight, as the attack machine's restart does (enemyAttack.js `_blowWind`)
     else if (rangedStriking && this.state !== 'ranged' && this.state !== 'attack') this._change('ranged');
     else if (casting && this.state !== 'spell' && this.state !== 'attack') this._change('spell');
     else if (hurting && this.state !== 'hurt' && this.state !== 'attack') this._change('hurt');
@@ -567,7 +566,7 @@ export class MobileUnit {
     let a = anims[this.orientation];
     let fps = (this.basics.behaviour === 'Flying' && (this.state === 'move' || this.state === 'idle'))
       ? FLY_ANIM_SPEED : a.fps;
-    // AUDIT 23 (characters-11) - DaggerfallMobileUnit.cs:530-534: the
+    // DaggerfallMobileUnit.cs:530-534: the
     // anim clock divides by FrameSpeedDivisor (EnemyAttack.cs:70-77
     // mints PermanentSpeed / max(8, LiveSpeed), so a Drain-Speed foe
     // animates slower), floored at 4 fps when a custom divisor bites.
@@ -579,7 +578,7 @@ export class MobileUnit {
       this._timer -= stepEvery;
       const before = this.state;
       this._stepFrame(a);
-      // AUDIT 68 S05-mobileunit-stale-record: a one-shot that ENDS here
+      // A one-shot that ENDS here
       // switches the table (ApplyEnemyState -> UpdateOrientation sets the
       // new state's material at once) - the old record with the new
       // state's frame 0 flashed the wrong sprite for a frame.
@@ -595,14 +594,14 @@ export class MobileUnit {
     // doingAttackAnimation (AnimateEnemy): PrimaryAttack and the two
     // RangedAttack states only - Spell is deliberately NOT in it.
     if (this.state === 'attack' || this.state === 'ranged') {
-      if (this.state === 'attack' && this._heldSwing && this._struck && this._hold === 'spent') return;   // TELL4: the follow-through stands
+      if (this.state === 'attack' && this._heldSwing && this._struck && this._hold === 'spent') return;   // the follow-through stands
       if (this._iter >= this._attackFrames.length) { this._underHold = false; this._heldSwing = false; this._change('idle'); return; }
-      // TELL2: held - the raised arm stands until the release; the strike is the next step after it
+      // Held - the raised arm stands until the release; the strike is the next step after it
       if (this.state === 'attack' && this._underHold && this._hold === true && this._attackFrames[this._iter] === -1) return;
       let f = this._attackFrames[this._iter++];
       if (f === -1) {
         if (this.state === 'ranged') this.shootArrow = true;   // AnimateEnemy
-        else { this.doMeleeDamage = true; this.meleeSeq++; this._underHold = false; this._struck = this._heldSwing; }   // C16: the scene resolves on it, then clears it
+        else { this.doMeleeDamage = true; this.meleeSeq++; this._underHold = false; this._struck = this._heldSwing; }   // the scene resolves on it, then clears it
         if (this._iter < this._attackFrames.length) f = this._attackFrames[this._iter++];
         else { this._change('idle'); return; }
       }
@@ -613,7 +612,7 @@ export class MobileUnit {
     if (this.frame >= n || (this._reversed && this.frame <= 0)) {
       // IsPlayingOneShot() -> NextStateAfterCurrentOneShot(). The
       // one-shots that reach this plain-run branch are Hurt, Spell and
-      // (A5) the two Seducer transforms - the attack states exit
+      //  the two Seducer transforms - the attack states exit
       // through the iterator above. The chain is the source's:
       // transform1 -> transform2 -> SetSpecialTransformationCompleted
       // -> idle, everything else straight to idle.
@@ -638,7 +637,7 @@ export class MobileUnit {
 export const SECONDS_TO_TRANSFORM = 8.0;
 
 /**
- * A5 - DaedraSeducerMobileBehaviour (Internal/DaedraSeducerMobile-
+ * DaedraSeducerMobileBehaviour (Internal/DaedraSeducerMobile-
  * Behaviour.cs), verbatim. DFU hangs this component on the seducer's
  * mobile at setup (SetupDemoEnemy.cs:191-195, gated on the mobile ID)
  * and its Update is the whole trigger:
@@ -679,7 +678,7 @@ export class SeducerTransformBehaviour {
     this.transformStarted = true;
   }
 
-  /** AUDIT 68 S05-seducer-rewind-incomplete: the in-place restore of a
+  /** The in-place restore of a
    *  save taken BEFORE the transform. DFU restores over a rebuilt enemy
    *  with a fresh component (SetupDemoEnemy.cs:191-195), so ALL of the
    *  transform's state goes: the mobile's rewrite and any transform in

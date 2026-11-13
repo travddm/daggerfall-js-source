@@ -55,7 +55,7 @@ export function loftPiece(faces, rows, { cx = 0, seg = SEG_DEFAULT, group, capTo
 const rampAt = (ramp, t) => ramp[Math.max(0, Math.min(ramp.length - 1, Math.round(t * (ramp.length - 1))))];
 
 // Bake per-face colour: metal ramp by normal (upper-right key), snapped.
-// AUDIT 68 S06-snap-shade-dup: the ONE key-light snap for every piece -
+// the ONE key-light snap for every piece -
 // hair (0.1/0.2) and tail/scales/fur/tusks (0.08/0.18) pass their own
 // floor/bias instead of keeping a copy of the light.
 export function shadePiece(faces, ramp, floor = 0.05, bias = 0.15) {
@@ -79,7 +79,7 @@ export function pushQuad(out, a, b, c, d, g) {
   out.push({ p: [...a, ...b, ...c, ...d], n: [nx/L, ny/L, nz/L], g });
 }
 
-// AUDIT 68 S06-creature-quadder-box-dup: the creature pieces' hand-shaded
+// The creature pieces' hand-shaded
 // quad emitter - pushQuad's face, colour snapped straight from `shade`
 // (no key light). One home; `group` is the rig tag.
 export function quadder(faces, ramp, group = 'body') {
@@ -117,16 +117,15 @@ export const CLOTH_RAMP = [[58, 48, 38], [86, 72, 54], [118, 100, 74], [150, 128
 export const MAIL_RAMP = [[32, 34, 40], [52, 56, 64], [80, 86, 96], [112, 120, 132], [146, 154, 168], [180, 188, 202]];
 export const LEATHER_RAMP = [[40, 28, 20], [62, 44, 30], [88, 62, 42], [116, 84, 56], [146, 110, 76], [176, 140, 100]];
 
-// ---- THE WEAPON GRIP SYSTEM (AUDIT 68 S06-weapon-grip-bake-dup: the
-// sword, claymore, blade, hafted and bow builders each kept their own
-// copy of all of this). Every weapon is authored pre-HSCALE at the LEFT
+// ---- THE WEAPON GRIP SYSTEM.
+// Every weapon is authored pre-HSCALE at the LEFT
 // fist, every face 'armL', and baked about the grip point in the fist.
 export const LEFT_FIST_X = -ARM_X;   // left-fist column (neutralBody's arm axis)
 export const GRIP_Y = 0.90;          // grip point inside the fist (pre-HSCALE)
 // THE SEAT (Mac's reference photo, 2026-07-05): a sword is NOT held
 // collinear with the forearm - the handle crosses the palm, so with
 // the arm hanging the blade sweeps UP-FORWARD and the pommel sits low
-// behind the fist. Mac: swd pitch +45deg baked - the
+// behind the fist. swd pitch +45deg baked - the
 // near-horizontal point-forward carry, family-wide.
 export const SEAT_PITCH = -2.40 + Math.PI / 4;
 // The CLAYMORE-STANDARD two-hand grip block: stations at 0.90 (grip, the

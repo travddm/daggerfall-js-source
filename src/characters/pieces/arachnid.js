@@ -106,7 +106,7 @@ export function buildArachnid(ramp = CHITIN_RAMP, s = {}) {
   for (const side of [-1, 1]) {
     for (let i = 0; i < n; i++) {
       // Fan from forward-ish to backward-ish along the body's side.
-      // AUDIT 68 S06-arachnid-legs-point-symmetric: the angle is measured
+      // the angle is measured
       // off the lateral axis and MIRRORED by side (43deg ahead of lateral
       // for the front pair to 66deg behind it for the rear). It was a
       // 180deg turn of the right side, so the front legs crossed the body.

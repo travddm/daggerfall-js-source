@@ -28,7 +28,7 @@ export function enemyControllerHeight(idleH, behaviour) {
 /** The idle record's scaled sprite height - dfMobile.GetSize() at setup
  *  (:104, the Idle state the unit is set up in). */
 export function idleSpriteHeight(t) {
-  return mobileBillboardSize(t, 0).h;   // AUDIT MM1: dfMobile.GetSize() reads RecordSizes, the xml applied
+  return mobileBillboardSize(t, 0).h;   // dfMobile.GetSize() reads RecordSizes, the xml applied
 }
 
 /** DFU's transform is the sprite's CENTRE (localPosition zero); the
@@ -52,7 +52,7 @@ export function flyerSpawnFeet(centre, idleH, floorY = null) {
   return feet;
 }
 
-/** AUDIT DISC28 MO-4 (the pre-merge audit, 2026-09-28): THE FLOOR UNDER A HANG, READ IN ONE PLACE. DISC28-H floors a
+/** THE FLOOR UNDER A HANG, READ IN ONE PLACE. DISC28-H floors a
  *  flyer's hang at the floor under its marker, and the ray that finds that floor lived inline in the dungeon builder -
  *  where its pin could only be a hand copy of it. One ray straight down from 0.2 over the point (a marker standing ON
  *  its floor still meets it; a face met above the point is refused by flyerSpawnFeet, never lifted onto) reaching 0.2
@@ -62,7 +62,7 @@ export function floorUnderHang(collider, at, idleH) {
   return Number.isFinite(d) ? at[1] + 0.2 - d : null;
 }
 
-/** AUDIT DISC28 MO-4: WHERE THE DUNGEON BUILDER STANDS A FLYER - one door for both kinds of position it is handed. A
+/** WHERE THE DUNGEON BUILDER STANDS A FLYER - one door for both kinds of position it is handed. A
  *  layout or quest marker, a placement's point and a Wabbajack's transform are DFU's TRANSFORM, the sprite's centre
  *  (RDBLayout ground-aligns every unit but a flyer): hung by flyerSpawnFeet over the floor floorUnderHang reads. A
  *  streamed puppet's position (`feetGiven`) is its owner's motor's FEET and is stood on as it is - hung again, every
@@ -82,7 +82,7 @@ export function centreFromFeet(feet, idleH) {
   return [feet[0], feet[1] + idleH / 2, feet[2]];
 }
 
-/** REVIEW 2026-09-05 (PR #55): a dungeon save written BEFORE this law
+/** A dungeon save written BEFORE this law
  *  holds every idle flyer's feet AT its marker - the old spawn stood
  *  them there, half a sprite too high. Such an entry carries no
  *  `anchor` stamp; when its saved feet are exactly the rebuilt spawn's
@@ -92,8 +92,8 @@ export function centreFromFeet(feet, idleH) {
 export function keepRebuiltSpawn(sf, feet, idleH, behaviour, marker = null) {
   if (sf.anchor != null || !sf.feet) return false;
   const eps = 1e-3;
-  // REVIEW 2026-09-05 (PR #57 review): the pre-fix spawn stood a SPECTRAL's
-  // feet at its marker too (C12's CanFly = Flying|Spectral), and a ghost
+  // The pre-fix spawn stood a SPECTRAL's
+  // feet at its marker too (CanFly = Flying|Spectral), and a ghost
   // never grounds by gravity - so an un-stamped ghost still AT its raw
   // marker keeps the floor-landed rebuild. The marker rides the record.
   if (behaviour === 'Spectral') {

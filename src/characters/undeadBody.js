@@ -306,7 +306,7 @@ export const UNDEAD_DESIGNS = [
     level: 20,
     damage: [70, 100],
     weaponTier: 2,
-    // THE MOST-MET ENEMY STILL UNBUILT — mapChance 4, higher than
+    // THE MOST-MET ENEMY: mapChance 4, higher than
     // anything else in the table — and the first design here that asks
     // whether the pieces COMPOSE.
     //

@@ -15,23 +15,23 @@ export const WEAPON_STATES = ['Idle', 'StrikeDown', 'StrikeDownLeft', 'StrikeLef
 export const CLASSIC_FRAME_UPDATE = 980;           // const int classicFrameUpdate
 export const CLASSIC_UPDATE_INTERVAL = 0.0625;     // GameManager.classicUpdateInterval (classic 16Hz); bow anim tick
 export function getMeleeWeaponAnimTime(liveSpeed, ctx = null) {
-  const o = _animTimeOverride?.(liveSpeed, ctx, CLASSIC_FRAME_UPDATE);   // TryGetOverride("GetMeleeWeaponAnimTime") - RRI2's weaponBalance registers one
-  // MARTIAL2: the swing's PACE, over whichever law answered - the port's own, or a mod's
+  const o = _animTimeOverride?.(liveSpeed, ctx, CLASSIC_FRAME_UPDATE);   // TryGetOverride("GetMeleeWeaponAnimTime") - weaponBalance registers one
+  // The swing's PACE, over whichever law answered - the port's own, or a mod's
   if (o != null) return paced(o, ctx, null);
-  // SWING-LAW: a wielder the port knows (`ctx.entity` - the player's machine, the Weapon Widget's clone, the third-person
+  // A wielder the port knows (`ctx.entity` - the player's machine, the Weapon Widget's clone, the third-person
   // body) swings on the port's own law; one it does not (a foe's machine, a peer's walker at PEER_SWING_SPEED, the
   // viewers) keeps DFU's line - which DFU never asks for a foe at all (characters/enemy/enemyAttack.js).
   if (ctx?.entity) {
     const w = _swingReader?.(ctx) ?? null;
     return paced(swingFrameSeconds(liveSpeed, {
       heft: w ? swingHeft(w.weight, w.strength) : 1,
-      handling: swingHandling(ctx.weaponType, !!w?.twoHanded, !!w?.shortBlade),   // BAL10: a short blade handles as a dagger
+      handling: swingHandling(ctx.weaponType, !!w?.twoHanded, !!w?.shortBlade),   // a short blade handles as a dagger
     }), ctx, w);
   }
   return (3 * (115 - liveSpeed)) / CLASSIC_FRAME_UPDATE;   // seconds per anim frame
 }
 
-// ── SWING-LAW: THE PLAYER'S SWING IS DFU'S SPEED LINE, PLUS THE WEAPON'S HEFT. ──────────────────────────
+// ── THE PLAYER'S SWING IS DFU'S SPEED LINE, PLUS THE WEAPON'S HEFT. ──────────────────────────
 // The swing time a frame is DFU's own, `3 * (115 - Speed) / 980`, with Speed held to 0..100. The port's
 // earlier law flattened the line (1.4 at Speed 0 to 0.6 at 100 on a pivot at 50) and put a heft of up to +35% and
 // handling of up to +12% on top: a Speed-100 build swung at 0.42 of DFU's rate and a heavy weapon cost a third more. A
@@ -41,7 +41,7 @@ export function getMeleeWeaponAnimTime(liveSpeed, ctx = null) {
 // never 0 (the machine's loop then never ended - Online-Arc "Recorded, not paid"). Roleplay & Realism's weaponSpeed and
 // Items' weaponBalance keep their own weight-and-Strength arithmetic as the Speed they read, and answer through this
 // curve and this handling (systems/roleplayRealism/rrRealism.js, systems/roleplayRealismItems/rriRealism.js). A declared
-// departure: Ledger A (SWING-LAW), for the heft and the handling; the Speed line is DFU's.
+// departure: Ledger A, for the heft and the handling; the Speed line is DFU's.
 /** DFU's frame at Speed 50 - the middle of the line, and the reference `swingTempo` divides by. */
 export const SWING_BASE_FRAME = (3 * (115 - 50)) / CLASSIC_FRAME_UPDATE;
 /** DFU's frame at a Speed over the frame at Speed 50 (held to 0..100; a Speed that is no number reads as 50): 1.69 at Speed 0,
@@ -79,11 +79,9 @@ export function modHeft(liveSpeed, modSpeed) {
  *  mace, a flail, an axe and a warhammer come round a little slower; a staff sweeps quicker than the other two-handers
  *  (every staff takes both hands: 0.97 x 1.03, against a claymore's 1.03 and a warhammer's 1.04 x 1.03 - a sword's
  *  1.0 is still quicker). A two-handed weapon takes SWING_TWO_HANDED on top of its kind. Anything else (the bow's draw,
- *  which keeps its own clock) reads 1. (AUDIT PRE-MERGE 0929 S2: this said a staff was "a little
- *  quicker", and the table's dagger row "and the tanto" - DFU draws the tanto as a long blade, fpsWeapon.js, and it
- *  handles as one.) */
+ *  which keeps its own clock) reads 1. */
 export const SWING_HANDLING = Object.freeze({
-  0: 1, 1: 1,           // LongBlade (every sword the sprites draw as one: the tanto and the shortsword to the dai-katana - BAL10: but a short blade takes the Dagger's row, SWING_SHORT_BLADE)
+  0: 1, 1: 1,           // LongBlade (every sword the sprites draw as one: the tanto and the shortsword to the dai-katana - but a short blade takes the Dagger's row, SWING_SHORT_BLADE)
   2: 0.97, 3: 0.97,     // Staff
   4: 0.9, 5: 0.9,       // Dagger
   6: 1.02, 7: 1.02,     // Mace
@@ -94,7 +92,7 @@ export const SWING_HANDLING = Object.freeze({
   16: 0.9,              // Werecreature - the beast's claws
 });
 export const SWING_TWO_HANDED = 1.03;
-/** BAL10 (; the owner chose "Short blades swing faster"): EVERY SHORT BLADE HANDLES
+/** EVERY SHORT BLADE HANDLES
  *  AS A DAGGER. The table keys DFU's WeaponTypes - the SPRITE a weapon is drawn with - and DFU draws the Tanto, the
  *  Shortsword and the Wakizashi as long blades, so only the Dagger came round quickly: the family that fights by speed was
  *  the slowest per second of the six (a Shortsword 8.7 a second to a Longsword's 12.6 at Strength 80, Speed 70). A weapon
@@ -110,14 +108,14 @@ export const SWING_FRAME_MAX = 0.4;
 export function swingFrameSeconds(speed, { heft = 1, handling = 1 } = {}) {
   return Math.max(SWING_FRAME_MIN, Math.min(SWING_FRAME_MAX, SWING_BASE_FRAME * swingTempo(speed) * heft * handling));
 }
-// ── MARTIAL2: THE SWING'S PACE ───────────────────────────────
+// ── THE SWING'S PACE ───────────────────────────────
 // A Short Blade mastered past 100 swings faster (systems/weaponMastery.js), and three martial paths quicken a swing for a
-// while (systems/martialPowers.js) - as CAST-SPEED's rate quickens a cast (systems/castSpeed.js). NAMED modifiers, each
+// while (systems/martialPowers.js) - as the cast-speed rate quickens a cast (systems/castSpeed.js). NAMED modifiers, each
 // `fn(ctx, w) -> percent` (`w` the swing reader's answer where the frame's law has read it already, else null - a
-// modifier that needs the weapon reads it itself, and only once it knows it may pay: AUDIT MARTIAL L2 F3, the reader is
-// no free call, and the override's arm read it again for every swing of every wielder): the frame's time is divided by 1 +
+// modifier that needs the weapon reads it itself, and only once it knows it may pay: the reader is
+// no free call, and the override's arm reads it again for every swing of every wielder): the frame's time is divided by 1 +
 // their sum, at most SWING_PACE_MOST, and never under SWING_FRAME_MIN - no swing is quicker than 0.45 s, whatever
-// quickens it (SWING-LAW's floor). Asked only for a wielder the port knows (`ctx.entity`), every frame of a swing: a
+// quickens it (the swing law's floor). Asked only for a wielder the port knows (`ctx.entity`), every frame of a swing: a
 // list, never a Map's iterator.
 /** The most every pace modifier together quickens a swing (%). */
 export const SWING_PACE_MOST = 50;
@@ -147,7 +145,7 @@ function paced(t, ctx, w) {
 
 /** The weapon in the hand as the law reads it - `(ctx) => {weaponType, weight, strength, twoHanded, shortBlade, family}` or null - from a
  *  module that can read the equip table (combat/swingLaw.js, which registers it as it loads - combat/weapon/weaponRig.js
- *  imports it: AUDIT PRE-MERGE 0929 S5); this module is a leaf. Without one the
+ *  imports it); this module is a leaf. Without one the
  *  law reads no heft, and the handling off `ctx.weaponType` alone. */
 let _swingReader = null;
 export function registerSwingReader(fn) { _swingReader = typeof fn === 'function' ? fn : null; }
@@ -169,7 +167,7 @@ export const MAX_BOW_HELD_DRAWN_SECONDS = 10;
 export const BOW_SWITCH_DIVISOR = 1.7;
 export const RESET_JOYSTICK_SWING_RADIUS = 0.4;
 export const ATTACK_THRESHOLD = 0.05;              // gesture travel / longest screen dim
-// AUDIT 23 (characters-14/combat-13): SWING_WEAPON_FATIGUE_LOSS and
+// SWING_WEAPON_FATIGUE_LOSS and
 // ARROW_MOVEMENT_SPEED were duplicates of the live single sources
 // (hostCombat.js's constant; spellcast.js's MISSILE_SPEED = the same
 // DaggerfallMissile.MovementSpeed) - deleted per ONE DFU MEMBER, ONE
@@ -185,7 +183,7 @@ export const MELEE_NUM_FRAMES = { Idle: 1, StrikeDown: 5, StrikeDownLeft: 5, Str
 // FPSWeapon.cs verbatim hit frames: damage lands when
 // currentFrame == GetHitFrame().
 export const HIT_FRAME_MELEE = 2;
-// GATHER-FEEL: the share of a melee strike its blow lands at - the hit frame of the strike's five. A
+// The share of a melee strike its blow lands at - the hit frame of the strike's five. A
 // gathering act's tool swings DFU's strike (scenes/treeHost.js axeHandFrame, scenes/mineHost.js pickHandFrame), so its
 // blow lands there too (systems/chopAct.js, mineAct.js `landsIn`).
 export const MELEE_HIT_SHARE = HIT_FRAME_MELEE / MELEE_NUM_FRAMES.StrikeDown;
@@ -194,7 +192,7 @@ export const BOW_SOUND_FRAME = 4;                  // swing sound fires here
 export const BOW_DRAWN_HOLD_FRAME = 3;             // fully drawn; drawback holds here
 // WeaponBasics.cs BowWeaponAnims, read off the table: row 0 (Idle)
 // NumFrames 1, rows 1-5 (every strike) 7, row 6 (StrikeUp, the draw)
-// 4. AUDIT 18: StrikeDown had been RECONSTRUCTED as 6 from the
+// 4. StrikeDown had been RECONSTRUCTED as 6 from the
 // mechanics rather than read, which cut frame 6 off every release and
 // started the bow cooldown one classic tick early.
 export const BOW_NUM_FRAMES = { Idle: 1, StrikeUp: 4, StrikeDown: 7 };
@@ -252,12 +250,12 @@ export function machineAttack(m, strikeState) {
   if (!m.isBow || strikeState === 'Idle') { m.frame = 0; m.ticks = 0; }
   m.acc = 0;
   m.animIndex = 0; m.damageDone = false;   // leftUnarmedAnimIndex / isDamageFinished
-  m.hold = 0;   // TWO-HANDS (AUDIT 2): ticks held at the swing's end - set by its caller for an off-hand blow, else none
+  m.hold = 0;   // ticks held at the swing's end - set by its caller for an off-hand blow, else none
   return true;
 }
 
 /** ActivateCenterObject / the hold cap: un-draw WITHOUT releasing an
- *  arrow (WeaponManager.cs:355-357). AUDIT 24 combat: the un-draw
+ *  arrow (WeaponManager.cs:355-357). The un-draw
  *  leaves isAttacking TRUE, so the very next Update takes the
  *  not-attacking reset block and charges the FULL bow cooldown -
  *  `if (WeaponType == Bow && isAttacking) cooldownTime = Time.time +
@@ -274,17 +272,17 @@ export function machineCancelBowDraw(m, liveSpeed = 50) {
 }
 
 /**
- * MW-PACE1: THE BLOW'S CLOCK, SAID AHEAD OF TIME - when the strike this machine has just begun lands its hit,
+ * THE BLOW'S CLOCK, SAID AHEAD OF TIME - when the strike this machine has just begun lands its hit,
  * and when it is done, in seconds from its first frame. The Morrowind arm is a picture of this machine (rule 24's note,
  * Morrowind-Rules.md: the hit frame is FPSWeapon's, not the .kf's), and a picture paced by the WEAP record's own speed
  * drew one blow while the machine struck two - the second refused, the hit landing mid-wind-up. The caller that starts
  * the arm's wind-up reads this at the strike's first frame (combat/weapon/weaponRig.js fpAttack) and the arm fits each section
  * of its blow into it (combat/fpArm.js blowRate).
  *
- * The machine steps ONCE per frame and drops the remainder (ARROW2, machineStep below), so a tick lasts the whole
+ * The machine steps ONCE per frame and drops the remainder (machineStep below), so a tick lasts the whole
  * frames it takes to cover it: given the frame's `dt`, a step is ceil(tick / dt) frames. Without one, the nominal tick.
  * The unarmed strike to the left is FPSWeapon's eight-tick list, its hit the first visit to frame 2. Null for Idle and
- * for a ranged machine - the bow's hit waits for the arm's own "shoot release" (MW-D42), and its arm keeps the record's
+ * for a ranged machine - the bow's hit waits for the arm's own "shoot release", and its arm keeps the record's
  * pace.
  * @returns {{ seconds: number, hitAt: number, step: number } | null}
  */
@@ -296,14 +294,14 @@ export function blowSchedule(m, liveSpeed, animCtx = null, dt = 0) {
   if (m.isUnarmed && m.state === 'StrikeLeft') {
     return { seconds: LEFT_UNARMED_ANIMS.length * step, hitAt: (LEFT_UNARMED_ANIMS.indexOf(HIT_FRAME_MELEE) + 1) * step, step };
   }
-  // TWO-HANDS (AUDIT): timed from the frame the strike stands on - 0 for every strike DFU begins, 1 for a pair's flurry
-  // (handsLaw.js DUAL.FLURRY_FROM_FRAME: the blow thrown from the raised hand) - and (AUDIT 2) to the end of the ticks
+  // Timed from the frame the strike stands on - 0 for every strike DFU begins, 1 for a pair's flurry
+  // (handsLaw.js DUAL.FLURRY_FROM_FRAME: the blow thrown from the raised hand) - and to the end of the ticks
   // held after its last frame (an off-hand blow's burden), the hit before them
   const at = Math.max(0, m.frame | 0);
   return { seconds: (strikeTicks(m) + holdOf(m)) * step, hitAt: Math.max(0, HIT_FRAME_MELEE - at) * step, step };
 }
 
-/** TWO-HANDS (AUDIT 2): the ticks a melee strike just begun takes from the frame it stands on to its end - FPSWeapon's
+/** The ticks a melee strike just begun takes from the frame it stands on to its end - FPSWeapon's
  *  eight-tick list for the unarmed strike to the left, else its frames past the one it stands on - before any held at
  *  its end (`m.hold`, machineStep). What an off-hand blow's burden is reckoned on (combat/twoHands/handsLaw.js offHandHold). */
 export function strikeTicks(m) {
@@ -313,11 +311,11 @@ export function strikeTicks(m) {
 }
 const holdOf = (m) => (m.hold > 0 ? m.hold | 0 : 0);
 
-export function machineStep(m, dt, liveSpeed, animCtx = null) {   // AUDIT-RR F1: the rig's { entity, weaponType, usingRightHand } for a registered GetMeleeWeaponAnimTime override
+export function machineStep(m, dt, liveSpeed, animCtx = null) {   // the rig's { entity, weaponType, usingRightHand } for a registered GetMeleeWeaponAnimTime override
   m.now += dt;
   const events = [];
   if (m.state === 'Idle') {
-    // ARROW2: FPSWeapon.AnimateWeapon's idle arm for a bow (FPSWeapon.cs:
+    // FPSWeapon.AnimateWeapon's idle arm for a bow (FPSWeapon.cs:
     // 527-537): the one-frame Idle runs off its end every tick and lands
     // on frame 3 with BowDrawback off - the drawn, nocked bow the instant
     // shot looses FROM (ChangeWeaponState keeps a bow's frame, :261-262,
@@ -336,10 +334,10 @@ export function machineStep(m, dt, liveSpeed, animCtx = null) {   // AUDIT-RR F1
     return events;
   }
   const frames = (m.isBow ? BOW_NUM_FRAMES : MELEE_NUM_FRAMES)[m.state] ?? 5;
-  const tick = m.isBow ? CLASSIC_UPDATE_INTERVAL : getMeleeWeaponAnimTime(liveSpeed, animCtx);   // AUDIT-RR F1: FPSWeapon's own animTickTime asks FormulaHelper's override (FormulaHelper.cs:830-838); without the ctx the two mods' arms were inert on the swing that lands
+  const tick = m.isBow ? CLASSIC_UPDATE_INTERVAL : getMeleeWeaponAnimTime(liveSpeed, animCtx);   // FPSWeapon's own animTickTime asks FormulaHelper's override (FormulaHelper.cs:830-838); without the ctx the two mods' arms were inert on the swing that lands
   m.acc += dt;
   while (m.acc >= tick) {
-    // ARROW2: ONE step per resume, the remainder dropped - FPSWeapon.
+    // ONE step per resume, the remainder dropped - FPSWeapon.
     // AnimateWeapon steps once and then `yield return new WaitForSeconds
     // (animTickTime)` (:545), and a coroutine resumes on the first frame
     // past its wait, never twice in one. Carrying the remainder let the
@@ -366,7 +364,7 @@ export function machineStep(m, dt, liveSpeed, animCtx = null) {   // AUDIT-RR F1
       m.ticks++;                                        // held-time keeps counting (GetAnimTime)
       if (m.ticks * tick > MAX_BOW_HELD_DRAWN_SECONDS) { machineCancelBowDraw(m, liveSpeed); events.push('undraw'); break; }
     } else {
-      // TWO-HANDS (AUDIT 2): an off-hand blow's burden (combat/twoHands/handsLaw.js offHandHold) - whole ticks held on its last
+      // An off-hand blow's burden (combat/twoHands/handsLaw.js offHandHold) - whole ticks held on its last
       // frame, after its hit, one a resume as every tick is; the picture's clones wait out a machine still attacking
       if (m.hold > 0 && m.frame >= frames - 1) { m.hold -= 1; continue; }
       m.frame++;

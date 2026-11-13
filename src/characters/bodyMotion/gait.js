@@ -1,13 +1,10 @@
 // @ts-check
-// BODY-MOTION - THE GAIT. The Morrowind body's walk, run and sneak in
+// THE GAIT. The Morrowind body's walk, run and sneak in
 // third person, made from the body's own measurements and the ground the body itself crosses, instead of a clip played
 // faster than it was drawn: Morrowind's walk is authored for 2.2 m/s and Daggerfall walks at 3.7 to 6.3, so the clip
 // ran at twice and more its own cadence and every foot slid.
 //
-// THE LAW, in the order the frame asks it (AUDIT BODY-MOTION, 2026-10-19
-// - rebuilt this law around feet that stand in the world: the first one placed each foot by a formula of the stride's
-// phase, which held a foot still only while the body went straight at a steady pace, and slid it under every start, stop,
-// turn, strafe, wall and change of key):
+// THE LAW, in the order the frame asks it:
 //  0. THE GROUND THE BODY CROSSED is the frame's own: the motor's own steps as drawn (player/motor.js travelAt - a wall
 //     that stops the capsule stops the stride, a deck's carry and a pin are never a step), a peer's drawn feet's travel
 //     (net/peer/peerBodies.js), else - a contact sheet, a pin - the word's pace along its keys. Its way, eased by its
@@ -53,7 +50,7 @@ const G = 9.81;
  *  - strideMax: the longest stride the style takes (legs); duty: [slow, fast] stance share; frFull: the Froude number at
  *    which the fast end is reached;
  *  - height / heightFast: the hips over the ankle (legs; 1 a straight leg), slow and at the style's fast end - a fast
- *    walk rides lower on a flexed knee, so the dip its long stance needs is shallower (AUDIT BODY-MOTION GAIT-3);
+ *    walk rides lower on a flexed knee, so the dip its long stance needs is shallower;
  *    bob: their rise and fall; sway: over the standing foot;
  *  - lift / liftFast: the ankle's rise in the swing, slow and fast; land: the share of the ground's speed a landing foot
  *    still has (a sprinter's foot is pulled back to meet the ground - the swing's retraction - so it lands near still);
@@ -97,9 +94,8 @@ export const GAIT_STYLES = Object.freeze({
 /**
  * THE STANDING BODY: the hips over the ankle (legs), the feet's track (hip widths, the left foot `lead` legs ahead),
  * the trunk's lean and the pelvis's tilt (degrees); the breath (`breath` s a cycle, `breathPitch` degrees of the chest)
- * and the weight's slow shift (`shift` s a cycle, `shiftSway` legs, `shiftList` degrees). `sneak`: AUDIT BODY-MOTION
- * GAIT-5 - crouched while it sneaks standing still (Morrowind's idlesneak is a crouch; the first law stood it bolt
- * upright between two crouched strides).
+ * and the weight's slow shift (`shift` s a cycle, `shiftSway` legs, `shiftList` degrees). `sneak`:
+ * crouched while it sneaks standing still (Morrowind's idlesneak is a crouch).
  */
 export const STAND = Object.freeze({
   height: 0.982, width: 1.0, lead: 0.03, lean: 2, hipTilt: 4,
@@ -124,16 +120,16 @@ export const BODY_STYLES = Object.freeze({
 export const STEER = Object.freeze({ forward: 0.68, max: 60, back: 105, hyst: 12, backShare: 0.55, backMax: 40 });
 
 /** THE EASES (seconds): the gait coming on and going off, the style's shares, the pace, the steer, the lean, the way
- *  of travel, the backpedal's share of the arms' swing (AUDIT BODY-MOTION GAIT-12 - flipped in one frame, it threw the
- *  free arm 54 degrees), and the ground's slope; and (strides, not seconds) the body's clock catching up the feet's
- *  when a strike or a lift sets it (GAIT-22). */
+ *  of travel, the backpedal's share of the arms' swing,
+ *  and the ground's slope; and (strides, not seconds) the body's clock catching up the feet's
+ *  when a strike or a lift sets it. */
 export const GAIT_EASE = Object.freeze({ moveIn: 0.09, moveOut: 0.16, style: 0.22, speed: 0.08, steer: 0.14, lean: 0.25, dir: 0.06, back: 0.12, slope: 0.25, phase: 0.25 });
 
 /**
  * TURNING AND SETTLING IN PLACE: a standing foot twisted `step` degrees off the body - or standing `dist` legs off its
  * place - steps back under it, over `time` seconds (quicker the faster the body turns, never under `minTime`), lifted
- * `lift` legs; one twisted past `max` steps at once, even while the other is in the air (AUDIT BODY-MOTION GAIT-11: the
- * feet twisted to 177 degrees under a fast turn); a turn of more than `snap` degrees in one frame, or faster than `rate`
+ * `lift` legs; one twisted past `max` steps at once, even while the other is in the air;
+ * a turn of more than `snap` degrees in one frame, or faster than `rate`
  * radians a second (a teleport, a cut, a flick), re-plants both at once. `quick`: a blow's lunge step's time.
  */
 export const TURN = Object.freeze({ step: 26, dist: 0.09, time: 0.26, minTime: 0.12, lift: 0.07, max: 70, snap: 90, rate: 9, quick: 0.16 });
@@ -143,8 +139,8 @@ export const TURN = Object.freeze({ step: 26, dist: 0.09, time: 0.26, minTime: 0
  *  held within `slope` (rise over run). A reversal of the way of travel past `reverse` degrees is taken at once. */
 export const GAIT_LIMITS = Object.freeze({ on: 0.2, off: 0.1, placed: 60, slope: 1.2, reverse: 150 });
 
-/** ON A SLOPE (AUDIT BODY-MOTION GAIT-20 - the level's stride on a grade stood the foot down it a half-stance under the
- *  hips, and the walk dipped twice the level's at 10 degrees, three times at 30): the stride shortens by `shorten` of
+/** ON A SLOPE:
+ *  the stride shortens by `shorten` of
  *  the grade along the travel (rise over run), and the stance moves `shift` legs a grade up the slope (never past
  *  `shiftMax` of its half) - the foot set further up it, lifted sooner below, as the hip flexes more at the strike
  *  uphill; and the foot that stands down the slope keeps the level's own pitch at that end of its stance (the push
@@ -183,7 +179,7 @@ export const flightOvershoot = (o, land) => 0.09 * o * o * Math.pow(Math.max(0, 
 /**
  * THE STRIDE'S SHAPE at the pace now: its length (rig units), its duty factor, its half-stance, the carriage it rides
  * at (legs over the ankle) and the legs' reach. A run's stance is never longer than its leg sweeps at that carriage
- * (AUDIT BODY-MOTION GAIT-3: a sprint's stood 1.2 legs long, so the hips sank to the leading foot in the air) - past it
+ * - past it
  * the stride takes more flight, as a sprinter's does; a walk keeps its double support and dips to it instead.
  */
 export function strideShape(s, input, body, P) {
@@ -277,7 +273,7 @@ export function footPlace(flat, pitch, fwd, body) {
 /**
  * THE FOOT ON A SLOPE: footPlace's law on ground that rises `grade` (rise over run) along the foot's `fwd` - the sole
  * laid along the ground (its own pitch, atan(grade)), the rockers' pitch on it turned about whichever of the heel or the
- * ball touches, where it meets the ground (AUDIT BODY-MOTION GAIT-13). `flat` [x, y, z]: the print, z the ground's height
+ * ball touches, where it meets the ground. `flat` [x, y, z]: the print, z the ground's height
  * under the ankle. Answers { at, toe, up } in the rig.
  */
 export function footPlaceOn(flat, rocker, grade, fwd, body) {
@@ -330,8 +326,7 @@ function plantAt(s, p, yaw) {
 const flightProgress = (sw) => (sw.kind === 'gait' ? clamp01((sw.s - sw.s0) / Math.max(1e-3, 1 - sw.s0)) : clamp01(sw.t / Math.max(1e-3, sw.dur)));
 /** Where a flight is at its own progress: the print it left carried to the target by the minimum-jerk path - bowed
  *  out to the turn's outside by `bow`, the radians the body turns over what is left of it, so the foot swings round
- *  with the hips along their arc (AUDIT BODY-MOTION GAIT-21: on the straight chord between print and foothold, a running
- *  turn's foot passed half a metre inside the hips, past the leg's reach, and dropped them 14 units as it came down). */
+ *  with the hips along their arc. */
 function flightAt(sw, sp = flightProgress(sw)) {
   const k = sw.kind === 'gait' ? flightPath(sp, sw.m ?? 0) : minJerk(sp);
   const p = lerpV(sw.from, sw.to, k);
@@ -366,7 +361,7 @@ function rebase(sw, to = null, stride = 0) {
  */
 export function stepGait(state, input, body, dt) {
   const s = state;
-  if (!finite(dt) || dt < 0) dt = 0;   // AUDIT BODY-MOTION GAIT-16: a NaN frame is no frame - it poisoned the state for good
+  if (!finite(dt) || dt < 0) dt = 0;   // a NaN frame is no frame - it poisoned the state for good
   const L = body.leg;
   const uH = finite(input.unitsPerM) && input.unitsPerM > 0 ? input.unitsPerM : 1;
   const uV = finite(input.unitsPerMz) && input.unitsPerMz > 0 ? input.unitsPerMz : uH;
@@ -407,9 +402,9 @@ export function stepGait(state, input, body, dt) {
   if (!finite(s.speed)) s.speed = 0;
   const was = s.walking;
   s.walking = grounded && (s.walking ? s.speed > GAIT_LIMITS.off : s.speed > GAIT_LIMITS.on);
-  // the way of travel (clockwise from the facing - a strafe to the right is +90 degrees), eased by its ANGLE: AUDIT
-  // BODY-MOTION GAIT-1 - eased as a vector, a key's flip from W to S stayed forward for good (the lerp's midpoint
-  // never left the old way), and the legs walked forward under a body going back
+  // the way of travel (clockwise from the facing - a strafe to the right is +90 degrees), eased by its ANGLE, not as a vector:
+  // a key's flip from W to S would stay forward for good (the lerp's midpoint
+  // never leaves the old way), and the legs would walk forward under a body going back
   if (dist > 1e-6 && (dx || dy)) {
     const thT = Math.atan2(dx, dy);
     const off = wrapAngle(thT - s.th);
@@ -422,7 +417,7 @@ export function stepGait(state, input, body, dt) {
   s.sneak = ease(s.sneak, input.sneaking ? 1 : 0, GAIT_EASE.style, dt);
   // ---- THE STRIDE and its clock: by the ground crossed, never by a clock of its own ----
   const P = blendStyle(s.run, s.sneak, input.kind);
-  const shape = strideShape(s, input, body, P);   // rig units - GAIT-3: what the rig's own leg reaches
+  const shape = strideShape(s, input, body, P);   // rig units - what the rig's own leg reaches
   const { stride, beta } = shape;
   s.dPhase = s.walking && stride > 1e-6 ? (dist * uH) / stride : 0;
   s.phase = frac(s.phase + s.dPhase);
@@ -435,14 +430,13 @@ export function stepGait(state, input, body, dt) {
   s.psi = ease(s.psi, psiWant, GAIT_EASE.steer, dt);
   s.backShare = ease(s.backShare, s.walking && s.back ? 1 : 0, GAIT_EASE.back, dt);
   // how much of the travel is along the hips' forward (- a backpedal's: its toe strike, its sway turned about) - eased, so
-  // a reversal rolls a foot from its heel onto its toes (GAIT-23: read off the way at once, it flipped every foot's pitch
-  // in the frame the way snapped round - a standing foot through 100 degrees - and the hips' sway with it)
+  // a reversal rolls a foot from its heel onto its toes.
   s.along = ease(s.along, Math.cos(s.th + s.psi), GAIT_EASE.back, dt);
-  // ---- the lean into a quickening, and the bank INTO a turn (AUDIT BODY-MOTION DOC-1: it leaned out of it - the yaw
+  // ---- the lean into a quickening, and the bank INTO a turn (the yaw
   // grows to the right, and a + roll drops the right side) ----
   const accel = dt > 0 ? (s.speed - s.lastSpeed) / dt : 0;
   s.lastSpeed = s.speed;
-  if (snap) s.yawRate = 0;   // AUDIT BODY-MOTION RIG-5: a snap is no turn - read as one, it banked a body 8 degrees
+  if (snap) s.yawRate = 0;   // a snap is no turn - read as one, it banked a body 8 degrees
   else if (dt > 0) s.yawRate = ease(s.yawRate, dYaw / dt, 0.1, dt);
   s.lean = ease(s.lean, clamp(accel * 0.012, -0.12, 0.16) * s.move, GAIT_EASE.lean, dt);
   s.bank = ease(s.bank, clamp(s.yawRate * s.speed * 0.022, -0.2, 0.2) * s.move, GAIT_EASE.lean, dt);
@@ -502,12 +496,10 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
   const A = (stride * beta) / 2;
   const hf = [-Math.sin(s.psi), Math.cos(s.psi)], hr = [Math.cos(s.psi), Math.sin(s.psi)];
   const d = s.dir;
-  // the lane across the travel on each foot's own side: the hips' right with its share along the travel taken out (AUDIT
-  // BODY-MOTION GAIT-7: measured across the hips' right, a strafe's lane moved the planted foot through its stance) - its
+  // the lane across the travel on each foot's own side: the hips' right with its share along the travel taken out
+  // - its
   // full width while the hips' right stands 30 degrees or more off the travel, narrowing to the travel's own line (a
-  // sidestep's) as it turns along it, and out the other side (GAIT-22: the perpendicular on the side the hips' right
-  // leaned to swapped the feet's lanes in a frame as a steer swung the hips through a strafe's, and a planted foot stood
-  // on in the other's lane, 13 units of the hips' height out of reach)
+  // sidestep's) as it turns along it, and out the other side.
   const hd = hr[0] * d[0] + hr[1] * d[1];
   const across = 1 / Math.max(0.5, Math.sqrt(Math.max(0, 1 - hd * hd)));
   const perp = [(hr[0] - hd * d[0]) * across, (hr[1] - hd * d[1]) * across];
@@ -533,9 +525,7 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
     return (p[0] - nx) * d[0] + (p[1] - ny) * d[1];
   };
   // a planted foot behind its lane's middle may hold the hips a twentieth of a leg under the plan's lowest, no more: past
-  // where its leg reaches with them there, it lifts (GAIT-23: let stand until it stood past its stance's end or out of
-  // reach of the hips' floor, a new key's foot out beside the travel held them down to the floor in two frames, and let
-  // them go in three)
+  // where its leg reaches with them there, it lifts.
   const holdZ = hipPlan(s, body, P, shape).low - 0.06 * L - body.ankle;
   const outOfPlan = (side, p) => {
     const r = (body.legs?.[side] ?? L) * 0.992, h = holdZ - p[2];
@@ -547,8 +537,7 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
   const standTarget = (side) => ({ p: [spots[side].p[0], spots[side].p[1], groundAt(s, spots[side].p[0], spots[side].p[1])], yaw: spots[side].yaw });
   const stepTime = () => s.stepTime ?? clamp(TURN.time / (1 + Math.abs(s.yawRate) / 3), TURN.minTime, TURN.time);
   /** Begin a flight for `f` from where it is now, carrying its pitch and lift into the new one - a stance's too: a foot
-   *  the ground lifts before its push (a reversal's, a new key's) leaves at the pitch it stood at (GAIT-23: it took the
-   *  push's at once, its ankle thrown up and back 50 degrees in a frame, and the hips 11 units down with it). */
+   *  the ground lifts before its push (a reversal's, a new key's) leaves at the pitch it stood at. */
   const fly = (f, kind, s0 = 0, dur = 0) => {
     const prior = f.swing;
     const here = prior ? flightAt(prior) : { p: f.p, yaw: f.yaw };
@@ -572,9 +561,8 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
   for (const side of SIDES) {
     const f = s.feet[side];
     // a standing foot keeps its own stance's clock - begun at its strike, run by the ground crossed - so the other's
-    // strike, which sets the stride's (resync), never moves it (AUDIT BODY-MOTION GAIT-25: read off the stride's, a
-    // re-based foot's early strike threw the standing one a seventh of a stride on, its pitch 21 degrees toward the push
-    // in a frame); a foot in the air flies to the stride's
+    // strike, which sets the stride's (resync), never moves it;
+    // a foot in the air flies to the stride's
     const clock = frac(s.phase - OFFSET[side]);
     if (!f.swing) f.u = s.walking && was && f.u != null ? frac(f.u + s.dPhase) : clock;
     const u = f.swing ? clock : f.u;
@@ -590,8 +578,7 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
       if (!was) f.armed = true;
       // ... and the ground lifts it too: a foot that stands past its stance's end along the travel (a reversal's, a new
       // key's way), or behind its middle out of the leg's reach with the hips where the gait plans them, or beyond what
-      // its leg reaches with the hips at their lowest is lifted now, the clock set to it if the other foot stands (AUDIT
-      // BODY-MOTION GAIT-1/GAIT-8 - kept by the clock alone, it stood on until the hips sank to it)
+      // its leg reaches with the hips at their lowest is lifted now, the clock set to it if the other foot stands.
       const along = !f.swing && s.walking ? alongOf(side, f.p) : 0;
       const behind = !f.swing && s.walking && (along < shift - (A + 0.1 * L) || (along < 0 && outOfPlan(side, f.p)) || Math.hypot(f.p[0] - body.restHip[0], f.p[1] - body.restHip[1]) > farReach);
       if (behind) {
@@ -604,7 +591,7 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
       if (lifts || (f.swing && f.swing.kind === 'step' && u >= beta)) {
         // the flight begins where the stance's share ended - this frame's ground past it already flown; a foot lifted
         // late (a walk's start, a duty factor fallen under it, a step become a stride) takes up its flight where the clock
-        // has it, so it lands on the clock (GAIT-22)
+        // has it, so it lands on the clock
         const late = u >= beta && !(prevU < beta);
         fly(f, 'gait', late ? clamp01((u - beta) / Math.max(1e-3, 1 - beta)) : 0);
         if (!late) f.swing.s = u >= beta ? clamp01((u - beta) / Math.max(1e-3, 1 - beta)) : 0;
@@ -615,8 +602,8 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
         const sw = f.swing;
         // ... keeping to the clock: its progress set against where the clock would have it (its stance's end, and the
         // share of the flight since), the gap closed at a quarter of the ground's pace at the most - a run's two feet,
-        // which no double support re-times, come back half a stride apart (GAIT-22: thrown a fourteenth of a stride
-        // apart, each strike set the clock to itself and the other foot landed off it, for good); by the ground crossed -
+        // which no double support re-times, come back half a stride apart;
+        // by the ground crossed -
         // and by the clock at the least (its own pace then), so a foot in the air under a body that slows to a stop comes
         // down within a slow walk's swing (it hung there until the gait went off)
         const byGround = s.dPhase / Math.max(1e-3, 1 - beta), byClock = dt / FLIGHT_MAX;
@@ -625,9 +612,7 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
         const inc = lifted ? 0 : Math.max(byGround * sw.rate, byClock);
         // its foothold read again before it may land, and a leap of it re-bases the flight from where the foot is: a
         // flight the travel turns from under (a reversal's, a new key's) flies on to the new way's, never set down where
-        // the old way had it (AUDIT BODY-MOTION GAIT-24: read after the strike, a strafe reversed the frame its foot came
-        // down landed it on the old way's foothold, 60 units off its hip past the leg's reach - the hips to their floor,
-        // 15 units in the frame)
+        // the old way had it.
         let t = gaitTarget(side, Math.min(1, sw.s + inc), sw.rate);
         const here = flightAt(sw).p;
         const leap = Math.max(LEAP * L, 0.3 * Math.hypot(t.p[0] - here[0], t.p[1] - here[1]));
@@ -640,13 +625,9 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
         if (leapt) { t = gaitTarget(side, sw.s, sw.rate); sw.to = t.p; sw.toYaw = t.yaw; }
         if (sw.s >= 1) {
           // the strike: set down on the foothold it flew to (it stands in the world - carried with it this frame) - and
-          // a strike begins its stance, on the foot's own clock (GAIT-25), as far on as the frame ran past the strike (set
+          // a strike begins its stance, on the foot's own clock, as far on as the frame ran past the strike (set
           // to its start, every stride lost half a frame: a stride 7 per cent long, and a backpedal's push stood 10 units
-          // past its end). The stride's clock is the flights' to keep to, never set by a strike (AUDIT BODY-MOTION
-          // GAIT-22: two feet a reversal put in the air together kept landing a fifth of a stride apart for good - the
-          // flights' lock to it brings them back half a stride apart; set to each strike, an early one jumped it, the
-          // flight's pace with it, and its foothold a fifth of its way - re-based, a run's strafe reversed dropped the
-          // hips 10 units in a frame)
+          // past its end). The stride's clock is the flights' to keep to, never set by a strike.
           const past = inc > 0 ? (clamp01((sRaw - 1) / inc) * s.dPhase) : 0;
           const n = plantAt(s, sw.to, sw.toYaw);
           n.p = [sw.to[0], sw.to[1], sw.to[2]]; n.lastU = past; n.u = past;
@@ -682,9 +663,8 @@ function stepFeet(s, input, body, P, shape, { dt, dx, dy, dz, dYaw, snap, was })
   // the level's own pitch, `push` and `strike` the shares of those ends now (SLOPE)
   const gradeAlong = (yaw) => -s.slope[0] * Math.sin(yaw) + s.slope[1] * Math.cos(yaw);
   const level = (g, push, strike) => -Math.atan(g) * Math.abs(c) * (c * g > 0 ? push : strike);
-  // A BACKPEDAL'S FOOT is the walk's played backward (AUDIT BODY-MOTION GAIT-23: its pitch was the walk's turned over -
-  // a toe strike as shallow as the walk's heel, a push 34 degrees toes-up, 50 at a run - and stood the ankle 45 degrees
-  // up toward the shin): it lands on its toes as the walk leaves them, and leaves on its heel as the walk lands on it.
+  // A BACKPEDAL'S FOOT is the walk's played backward:
+  // it lands on its toes as the walk leaves them, and leaves on its heel as the walk lands on it.
   // `qe`, `se` the shares the walk's own rockers are read at; the ends' shares at the push and at the strike
   const back = c < 0, ac = Math.abs(c);
   const toeEnd = (qe) => (qe > P.flat[1] ? smooth((qe - P.flat[1]) / (1 - P.flat[1])) : 0), heelEnd = (qe) => (qe < P.flat[0] ? 1 - smooth(qe / P.flat[0]) : 0);
@@ -763,10 +743,10 @@ function settle(s, body, spots, fly) {
  * THE HIPS' PLANNED HEIGHT (rig units, over the ground under the body) for the stride's `shape`: the standing or carried
  * height `hipH0`, the walk's `dip` where both feet are down, the run's spring `sink` and its height `runH`, and the
  * plan's `low` - shared by the pose (gaitPose lays the stride's waves on) and the feet (a planted foot lifts once its leg
- * no longer reaches it with the hips at the plan's lowest - GAIT-23).
+ * no longer reaches it with the hips at the plan's lowest).
  *
- * THE HIPS' RISE AND FALL (AUDIT BODY-MOTION GAIT-3 - the legs' reach was the dip's only shape, so it came as an edge:
- * the hips dropped 10 to 14 cm in a frame). A walk dips where both feet are down, as deep as legs a half-stance ahead
+ * THE HIPS' RISE AND FALL:
+ * A walk dips where both feet are down, as deep as legs a half-stance ahead
  * and behind need it (the foot's own overshoot on): planned over the stride, the reach its floor. A run sinks on the
  * standing leg's spring and rises on the flight's arc - the arc's rise the sink's own, so the two meet at the same speed
  * at every touchdown and push-off.
@@ -779,8 +759,8 @@ function hipPlan(s, body, P, shape) {
   const halfStance = (stride * beta) / 2 + flightOvershoot(1 - beta, P.land) * stride;
   // each end of the stance (`half` along the travel from its middle, the stance `shift` up a slope) stands on the
   // ground's own height there, its ankle where that end's rocker stands it (the strike's and the push's - a backpedal's
-  // its own, gaitPose: AUDIT BODY-MOTION GAIT-23, read at the bare ankle over the print, a backpedal's push stood 4
-  // units past the hips' plan at every stride): the hips reach the lower of the two
+  // its own, gaitPose):
+  // the hips reach the lower of the two
   const ac = Math.min(1, Math.abs(s.along)) * s.move, way = s.along < 0 ? -1 : 1;
   const strikeP = (way > 0 ? P.heel : -P.toeOff) * ac * RAD, pushP = (way > 0 ? -P.toeOff : P.heel) * ac * RAD;
   const top = (x, z, pitch) => {
@@ -792,7 +772,7 @@ function hipPlan(s, body, P, shape) {
   const sink = P.bob * L * Math.min(1, frShare * 2 + 0.3);
   const dip = Math.max(sink, need * 1.04);
   // a run rides no higher than its leg reaches its stance's ends (its carriage the sweep's own) - on a slope, the end that
-  // stands down it (AUDIT BODY-MOTION GAIT-20: up a 30 degree run the trailing foot stood 7 units under the planned hips)
+  // stands down it
   const runH = Math.min(hipH0, ends(Math.min(sweep, (stride * beta) / 2)));
   const low = lerp(hipH0 - s.move * dip, lerp(hipH0, runH, s.move) - s.move * sink, P.run);
   return { hipH0, dip, sink, runH, low };
@@ -860,8 +840,8 @@ export function gaitPose(state, input, body) {
   const standTilt = lerp(STAND.hipTilt, STAND.sneak.hipTilt, s.sneak) * P.standTilt;
   const hipPitch = lerp(standTilt, P.hipTilt, move) * RAD + P.hipTiltWave * RAD * Math.cos(4 * Math.PI * (phi - midL)) * move;
   // the legs hold the hips up: never higher than a standing leg reaches - nor than the swinging one reaches the ground
-  // under its own flight (AUDIT BODY-MOTION GAIT-3: left out until it stood, the landing leg dropped the hips 10 to 14
-  // cm in the frame it struck; taken in all through its flight - from the print it leaves, where the standing leg's own
+  // under its own flight
+  // (taken in all through its flight - from the print it leaves, where the standing leg's own
   // reach was, to the foothold it lands on - the hips come down to it as it comes forward) - a soft min, so the dip is round
   let hipZ = hipH;
   const limits = { planned: hipH, L: Infinity, R: Infinity };
@@ -873,23 +853,20 @@ export function gaitPose(state, input, body) {
     const dz = -sign * Math.sin(hipRoll) * body.hipWidth * 0.5;   // the joint's height over the middle (the right drops with a + roll)
     const reach = (body.legs?.[side] ?? L) * 0.992;
     const leaving = !f.stance && f.kind === 'gait' && f.sp < 0.35;
-    // a foot leaving the ground asks no more reach of its leg than it did as it left (GAIT-23: its flight starts at rest
-    // and the body draws away from it - after a new key's lift, half a leg in four frames - and its hold dragged the hips
+    // a foot leaving the ground asks no more reach of its leg than it did as it left (its flight starts at rest
+    // and the body draws away from it - after a new key's lift, half a leg in four frames - and its hold would drag the hips
     // down to their floor after a foot already in the air)
     const dxy = Math.min(Math.hypot(f.at[0] - jx, f.at[1] - jy), leaving && f.held ? Math.hypot(f.held[0] - jx, f.held[1] - jy) : Infinity);
     // a foot in the air past what its leg reaches at the hips' lowest (a reversal's flight, flung ahead) holds the hips to
     // nothing: the leg reaches toward it and falls short a frame - let go over the last fifth of a leg before it, so a
-    // flight that comes into reach takes the hips in by degrees (AUDIT BODY-MOTION GAIT-21: taken at once, a running
-    // turn's landing foot dropped the hips 14 units in the frame it came within reach; RUN-STIFF: over a tenth, the
-    // stiffer run's higher hips - less give in the leg - dropped 12 to 13.5 units in a back run turned fast into a strafe)
+    // flight that comes into reach takes the hips in by degrees.
     const inReach = f.stance || leaving ? 1 : smooth(clamp01((Math.sqrt(Math.max(0, reach * reach - (HIP_FLOOR * L) ** 2)) - dxy) / (0.2 * L)));
     // a leg asked past its reach asks the hips no lower than a deep knee's bend: the foot falls short instead - a crash to
     // the ground was the reach's answer to a foot it could not reach
     // a stride's foot in the air lets the hips go as it leaves the ground and holds them again as it comes down (a
     // trailing foot just off the ground is no foot to stand on: held to it, a sprinter's hips sank behind it) - leaving,
     // the leg reaches the foot itself, rising, and lets go by its own clock wherever it stood; coming down, the ground it
-    // lands on (GAIT-20: the ground under a leaving foot ran on down a slope behind it, and took the hips 15 units down
-    // with it in the frames after toe-off)
+    // lands on.
     const top = Math.max(f.at[2] - (leaving ? 0 : f.lift) + Math.sqrt(Math.max(0, reach * reach - dxy * dxy)) - dz, body.ankle + HIP_FLOOR * L);
     const holds = inReach * (f.stance || f.kind !== 'gait' ? 1 : Math.max(1 - smooth(clamp01(f.sp / 0.25)), smooth(clamp01((f.sp - 0.45) / 0.45))));
     if (!(holds > 0)) continue;
@@ -904,13 +881,13 @@ export function gaitPose(state, input, body) {
   const chestRoll = counterDrop + s.bank;
   const standLean = lerp(STAND.lean, STAND.sneak.lean, s.sneak) * P.standLean;
   const chestPitch = lerp(standLean, P.lean, move) * RAD + s.lean - breath + (stance?.lean ?? 0) * RAD * idle;
-  // ---- the free arms: a backpedal swings them the other way, eased over (GAIT-12) ----
+  // ---- the free arms: a backpedal swings them the other way, eased over ----
   const swing = (P.arm.swing * RAD * Math.cos(2 * Math.PI * phi)) * move * (1 - 2 * s.backShare);
   return {
     move, phase: phi, duty: beta, stride, frShare, run: P.run, sneak: P.sneak, back: s.back, speed: s.speed,
     hip: { at: [hipXY[0], hipXY[1], hipZ], yaw: hipYaw, roll: hipRoll, pitch: hipPitch, limits },
     // `wave`: the stride's own share of the chest's turn - the counter-turn and the counter-drop the swinging arms ride
-    // (a held weapon's arm takes them by its row's swing share alone - carry.js carryHands, HELD-STEADY)
+    // (a held weapon's arm takes them by its row's swing share alone - carry.js carryHands)
     chest: { yaw: chestYaw, roll: chestRoll, pitch: chestPitch, breath: Math.sin(breathT) * idle, wave: { yaw: chestYaw, roll: counterDrop } },
     feet,
     arm: { swing, bias: P.arm.bias * RAD * move, elbow: P.arm.elbow, abduct: P.arm.abduct * RAD, phase: phi },

@@ -1,5 +1,5 @@
 // @ts-check
-// WW1: THE NAME BANK OF AN AREA (world/worldWide/worldGrid.js) - on the Bay a
+// THE NAME BANK OF AN AREA (world/worldWide/worldGrid.js) - on the Bay a
 // region, and its bank is GetNameBankOfRegion's own; past it a province's district, and its bank its people's
 // (characters/nameHelper.js getNameBank - a Nord's in Skyrim, a Khajiit's in Elsweyr, the Imperial bank in the Imperial
 // Province and, by DFU's own quirk, in Black Marsh). Its own module, beside nameHelper.js rather than in it: the account
