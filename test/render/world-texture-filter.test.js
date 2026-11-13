@@ -244,3 +244,27 @@ test('a change made while playing reaches every cached world texture and ground 
     resetPrefs();
   }
 });
+
+test('a world picture outside the caches (a banner, a flag, the far trees) follows the filter at its next draw', async () => {
+  const { BannerRenderer } = await import('../../src/render/bannerPass.js');
+  const { ShipFlagRenderer } = await import('../../src/render/shipFlagPass.js');
+  resetSettings();
+  resetPrefs();
+  const { gl } = stateGl();
+  try {
+    const banners = new BannerRenderer(gl, { paint: () => ({ width: 4, height: 4 }) });
+    const flags = new ShipFlagRenderer(gl, { paint: () => ({ width: 4, height: 4 }) });
+    const banner = banners.textureOf('hall', {}, 0);
+    const flag = flags.textureOf('ship', {}, 0);
+    assert.deepEqual(filters(banner), [E.LINEAR_MIPMAP_LINEAR, E.LINEAR], 'Sharp, the default: trilinear, as before');
+    assert.deepEqual(filters(flag), [E.LINEAR_MIPMAP_LINEAR, E.LINEAR]);
+    choose(POINT);
+    assert.equal(banners.textureOf('hall', {}, 1), banner, 'the cached texture');
+    flags.textureOf('ship', {}, 1);
+    assert.deepEqual(filters(banner), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST], 'Point at the next draw');
+    assert.deepEqual(filters(flag), [E.NEAREST_MIPMAP_NEAREST, E.NEAREST]);
+  } finally {
+    resetSettings();
+    resetPrefs();
+  }
+});

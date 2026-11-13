@@ -14,6 +14,7 @@
 // wave never stutters as a 32-bit float's seconds grow; each flag's phase is its own.
 import { FOG_FACTOR_GLSL } from './labGrass.js';
 import { buildProgram } from './glProgram.js';
+import { filterWorldPicture, freshWorldPicture } from './world-texture-filter.ts';
 import { bannerClock, BANNER_TEXTURE_IDLE_S } from './bannerPass.js';
 import { BAYER_GLSL, DISSOLVE_GLSL } from './orderedDither.js';   // AUDIT 2: SHIP-FADE's dissolve, her cloth with her hull
 
@@ -168,7 +169,11 @@ export class ShipFlagRenderer {
    *  flag that would not paint). */
   textureOf(key, flag, seconds = 0) {
     const had = this.textures.get(key);
-    if (had) { had.seen = seconds; if (had.tex || seconds - had.failed < FLAG_REPAINT_S) return had.tex; }
+    if (had) {
+      had.seen = seconds;
+      freshWorldPicture(this.gl, had.tex);   // a texture setting changed since
+      if (had.tex || seconds - had.failed < FLAG_REPAINT_S) return had.tex;
+    }
     const gl = this.gl;
     const canvas = this.paint?.(flag) ?? null;
     if (!canvas) { this.textures.set(key, { tex: null, seen: seconds, failed: seconds }); return null; }
@@ -179,8 +184,7 @@ export class ShipFlagRenderer {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, /** @type {any} */ (canvas));
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    filterWorldPicture(gl, tex, gl.TEXTURE_2D, true);   // the world's texture filter and anisotropy
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.bindTexture(gl.TEXTURE_2D, null);

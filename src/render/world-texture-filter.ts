@@ -89,7 +89,12 @@ export function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension |
 /** The world filter and anisotropy in force now, for this context. */
 function currentWorldSampling(gl: TextureGl): { mode: number; aniso: number } {
   const mode = worldFilterMode();
-  return { mode, aniso: anisotropyOf(anisotropySetting(), anisotropyExtension(gl).max, false, mode === POINT) };
+  return { mode, aniso: currentAnisotropy(gl, mode) };
+}
+
+/** The Anisotropic Filtering row's level for world art under `mode`, read without allocating. */
+function currentAnisotropy(gl: TextureGl, mode: number): number {
+  return anisotropyOf(anisotropySetting(), anisotropyExtension(gl).max, false, mode === POINT);
 }
 
 /** What a world texture was uploaded with. */
@@ -98,13 +103,18 @@ type WorldTextureState = { mips: boolean; mode: number; aniso: number };
 /** Every world texture's state, by texture object; a deleted texture drops out on its own. */
 const worldTextures = new WeakMap<object, WorldTextureState>();
 
-function setWorldSampling(gl: TextureGl, state: WorldTextureState, now: { mode: number; aniso: number }): void {
+function setWorldSampling(
+  gl: TextureGl,
+  state: WorldTextureState,
+  now: { mode: number; aniso: number },
+  target: number = gl.TEXTURE_2D,
+): void {
   const filter = worldFilterFor(gl, now.mode, state.mips);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter.min);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter.mag);
+  gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, filter.min);
+  gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, filter.mag);
   const { ext } = anisotropyExtension(gl);
   // a texture without mip maps takes none: under Sharp it is a nearest sprite, which anisotropy would smear on ANGLE
-  if (ext) gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, state.mips ? now.aniso : 1);
+  if (ext) gl.texParameterf(target, ext.TEXTURE_MAX_ANISOTROPY_EXT, state.mips ? now.aniso : 1);
   state.mode = now.mode;
   state.aniso = now.aniso;
 }
@@ -143,16 +153,30 @@ export function filterUpload(
 export function needsRefilter(gl: TextureGl, texture: object | null | undefined): boolean {
   const state = texture ? worldTextures.get(texture) : undefined;
   if (!state) return false;
-  const now = currentWorldSampling(gl);
-  return state.mode !== now.mode || state.aniso !== now.aniso;
+  const mode = worldFilterMode();
+  return state.mode !== mode || state.aniso !== currentAnisotropy(gl, mode);
 }
 
 /** Brings the cached world texture to the current filter and anisotropy; the caller has made its unit active. */
-export function refilterWorldTexture(gl: TextureGl, texture: object): void {
+export function refilterWorldTexture(gl: TextureGl, texture: object, target: number = gl.TEXTURE_2D): void {
   const state = worldTextures.get(texture);
   if (!state) return;
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  setWorldSampling(gl, state, currentWorldSampling(gl));
+  gl.bindTexture(target, texture);
+  setWorldSampling(gl, state, currentWorldSampling(gl), target);
+}
+
+/** A world picture made outside the renderer's caches (the far trees' array, banners, flags), on the texture bound to
+ *  `target`: the world filter and the Anisotropic Filtering row, recorded so that `needsRefilter` and
+ *  `refilterWorldTexture` bring it to a later change when its owner draws it. */
+export function filterWorldPicture(gl: TextureGl, texture: object, target: number, mips: boolean): void {
+  const state = { mips, mode: POINT, aniso: 1 };
+  setWorldSampling(gl, state, currentWorldSampling(gl), target);
+  worldTextures.set(texture, state);
+}
+
+/** Before a draw binds a world picture: re-filters it on the unit now active when a setting changed since. */
+export function freshWorldPicture(gl: TextureGl, texture: object | null, target: number = gl.TEXTURE_2D): void {
+  if (texture && needsRefilter(gl, texture)) refilterWorldTexture(gl, texture, target);
 }
 
 /** A filter mode as the word a texture's own sampler takes (render/meshAlpha.js samplerParams). A picture without mip

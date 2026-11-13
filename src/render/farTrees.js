@@ -44,6 +44,7 @@ import { BAYER_MEAN } from './orderedDither.js';
 import { classicLook } from './classicShadowLane.js';
 import { pipelinePictures } from './farFlora.js';
 import { bandTreeArt } from '../world/terrain/floraCover.js';   // TESA-LANDS: a band tree of a zone's own archive
+import { filterWorldPicture, freshWorldPicture } from './world-texture-filter.ts';
 
 /** HORIZON-TREES: the samples of a tree's sight line read over the middle ring's ground (the eye's end and the tree's not). */
 export const HORIZON_STEPS = 24;
@@ -515,8 +516,7 @@ export class FarTreesBand {
       this.tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.tex);
       gl.texStorage3D(gl.TEXTURE_2D_ARRAY, Math.log2(TREE_LAYER) + 1, gl.RGBA8, TREE_LAYER, TREE_LAYER, TREE_LAYERS);
-      gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      filterWorldPicture(gl, this.tex, gl.TEXTURE_2D_ARRAY, true);   // the world's texture filter and anisotropy
       gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
@@ -625,6 +625,7 @@ export class FarTreesBand {
     gl.uniform1i(u.uCloudShadowMap, s.cloudUnit);
     if (this.lane) { gl.uniform1f(u.uELExposure, s.exposure); gl.uniform1i(u.uAdapt, 11); }
     gl.activeTexture(gl.TEXTURE0 + TREES_UNIT);
+    freshWorldPicture(gl, this.tex, gl.TEXTURE_2D_ARRAY);   // a texture setting changed since: on this unit, before the bind
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.tex);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(u.uTrees, TREES_UNIT);
