@@ -96,7 +96,7 @@
 // TextureReader builds no mip chain in retro mode unless
 // UseMipMapsInRetroMode. The albedo's retro mip bias (-0.75 whenever
 // retro mode is on, TextureReader.cs:271-274) reaches the Sharp filter's
-// samples alone (render/retro-sharp.ts): WebGL2 has no sampler LOD bias,
+// samples alone, where the Retro Mip Bias row sets it (render/retro-sharp.ts): WebGL2 has no sampler LOD bias,
 // and Point, Bilinear and Trilinear draw with DFU's shaders unbiased.
 
 import { setFrameTarget } from './renderTarget.js';

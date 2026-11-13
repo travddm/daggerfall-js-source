@@ -25,8 +25,10 @@ Rules from the data side, stated at the top of `renderer.js`:
   texel's centre with a one-pixel blend at each texel edge (`src/render/sharp-texels.ts`): square texels close up,
   filtered ground in the distance. The world sets are built Sharp or plain for the filter, and swapped when it changes
   (`src/render/sharp-world-sets.ts`). In the retro modes Sharp drops the edge blend, so every texel is sampled at its
-  centre as under Point, and its samples take DFU's retro mip bias of -0.75 levels, which acts when Retro Mip Maps
-  keeps the mip chains (`src/render/retro-sharp.ts`, one uniform set at each frame's start). Every mip-mapped classic
+  centre as under Point, and its samples take the Retro Mip Bias row's bias (preference `retroMipBias`, 0 to -2 levels
+  in quarters, DFU's fixed -0.75 by default; `src/systems/retro-mip-bias-row.ts`). The bias acts only when Retro Mip
+  Maps keeps the mip chains, and the row is drawn disabled with that reason until then. The values reach the shaders
+  as one uniform set at each frame's start (`src/render/retro-sharp.ts`). Every mip-mapped classic
   texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
   cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
   and the spell hands draw 1% larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
