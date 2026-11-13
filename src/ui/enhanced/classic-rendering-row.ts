@@ -33,7 +33,8 @@ const WORDS = {
     t(
       'menu.settings.classicRendering.note',
       'Classic picture 320x200, Classic aspect 4:3 and Classic colours Palettization, with ground sharpness Off, ' +
-        'no mip maps, land view distance 3, Enhanced lighting and Enhanced environments Off, and field of view 60.',
+        'no mip maps, land view distance 3, Enhanced lighting and Enhanced environments Off, field of view 60 and ' +
+        'World Texture Filter Point.',
     ),
   effect: (): string =>
     t(

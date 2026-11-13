@@ -51,7 +51,6 @@ const paints = (w, text) => { const s = spyFont(); w.draw(renderer(), CANVAS, s.
 const WORDED = [
   ['Video/RandomDungeonTextures', 'Internal_Settings', 'dungeonTextureModes'],
   ['Video/QualityLevel', 'Internal_Settings', 'qualitySettings'],
-  ['Video/MainFilterMode', 'Internal_Settings', 'filterModes'],
   ['GUI/GUIFilterMode', 'Internal_Settings', 'filterModes'],
   ['GUI/VideoFilterMode', 'Internal_Settings', 'filterModes'],
   ['GUI/HelmAndShieldMaterialDisplay', 'Internal_Settings', 'helmAndShieldMaterialDisplay'],
@@ -83,6 +82,8 @@ test('L10N3d settings: an enum row DFU words through its tables shows a translat
     assert.deepEqual(shown(key), asShown(key, ENUM_LAW[key].values.map((_, i) => frWord(keys, i))), `${key} reads the pack's words`);
     assert.equal(stepValue(key, '0', 1), '1', `${key}: the store still holds an index`);
   }
+  // the world filter: DFU's three words from its table, then the port's own Sharp
+  assert.deepEqual(shown('Video/MainFilterMode'), [...shown('GUI/GUIFilterMode'), 'Sharp'], "Video/MainFilterMode reads the pack's three and its own fourth");
   assert.deepEqual(ENUM_LAW['Video/QualityLevel'].values, ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], 'the law is not the words');
   assert.equal(formatValue('Video/RetroModeAspectCorrection', '1'), 'fr:FourThree', 'FourThree by its own key - English "4:3", DFU\'s shipped word');
   tm.setLocale('en');

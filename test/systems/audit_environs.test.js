@@ -20,6 +20,8 @@ import { createHeatHaze, hazeFrameSettings, HAZE_OFF, HEAT_HAZE_VENDOR } from '.
 import { hazePhase } from '../../src/render/heatHaze.js';
 import { ShadowPass } from '../../src/render/shadowPass.js';
 import { setModSetting, modSetting } from '../../src/systems/modSettings.js';
+import { refreshWorldSamplingOnChange } from '../../src/render/live-world-sampling.ts';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { SEASONS } from '../../src/systems/gameDate.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -229,7 +231,21 @@ test('AUDIT ENVIRONS G1 + G3 + G4: the snow\'s GL owes the renderer its seam bef
   surface.setAlbedo({ width: 64, height: 64 });
   assert.equal(log[0]?.[0], 'endUiRun');
   assert.ok(!log.some((c) => c[0] === 'pixelStorei' && c[1] === 'UNPACK_FLIP_Y_WEBGL' && c[2] === true), 'no flip asked of an ImageBitmap');
-  assert.ok(log.some((c) => c[0] === 'texParameteri' && c[2] === 'TEXTURE_MIN_FILTER' && c[3] === 'NEAREST_MIPMAP_NEAREST'), 'FilterMode.Point: the nearest level');
+  // the ground's sampling, not the mod's own Point: under Sharp, the default, linear over a blended chain
+  const filterOf = (name) => log.filter((c) => c[0] === 'texParameteri' && c[2] === name).pop()?.[3];
+  assert.deepEqual([filterOf('TEXTURE_MIN_FILTER'), filterOf('TEXTURE_MAG_FILTER')], ['LINEAR_MIPMAP_LINEAR', 'LINEAR']);
+  // and a change of the world filter reaches it on the next frame, through the renderer's per-frame check
+  const host = { textures: new Map(), emissionTextures: new Map(), tileArrays: new Map(), gl: { TEXTURE1: 1 }, _worldHit() {}, applyGroundSharpness() {} };
+  refreshWorldSamplingOnChange(host);
+  setValue('Video', 'MainFilterMode', '0');
+  log.length = 0;
+  try {
+    refreshWorldSamplingOnChange(host);
+    assert.equal(filterOf('TEXTURE_MAG_FILTER'), 'NEAREST', 'Point: the ground beside it is nearest, and so is the snow on it');
+  } finally {
+    resetSettings();
+  }
+  surface.dispose();
 });
 
 test('AUDIT ENVIRONS G6: the blanket\'s tiles are culled to the frame\'s frustum by their bounds - the ground\'s span and the deepest snow over it - as each tile\'s renderer is culled in the mod (mutants: the cull ignored; the bounds without the snow; the span unread)', () => {

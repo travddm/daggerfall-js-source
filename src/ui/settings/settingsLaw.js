@@ -35,7 +35,8 @@ export const ENUM_LAW = Object.freeze({
   'Controls/Handedness': { values: ['Right Hand', 'Left Hand'], encode: 'index', cite: 'SetupGameWizard:461-470 (a checkbox: 1 = left; 2 and 3 are in GetInt\'s range and do nothing)' },   // AUDIT 28 W13
   'MeleeAttacks/MeleeAttackDetection': { values: ['Performance', 'Quality'], encode: 'index', cite: 'AdvancedSettings:277-282' },
   'Video/QualityLevel': { values: ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], encode: 'index', cite: 'AdvancedSettings:360-379' },
-  'Video/MainFilterMode': { values: ['Point', 'Bilinear', 'Trilinear'], encode: 'index', cite: 'AdvancedSettings:360-379' },
+  // Sharp, the fourth, is the port's (render/sharp-texels.ts) and its default; DFU offers the first three, Point first
+  'Video/MainFilterMode': { values: ['Point', 'Bilinear', 'Trilinear', 'Sharp'], encode: 'index', cite: 'AdvancedSettings:360-379' },
   'GUI/GUIFilterMode': { values: ['Point', 'Bilinear', 'Trilinear'], encode: 'index', cite: 'AdvancedSettings:360-379' },
   'GUI/VideoFilterMode': { values: ['Point', 'Bilinear', 'Trilinear'], encode: 'index', cite: 'AdvancedSettings:360-379' },
   'GUI/HelmAndShieldMaterialDisplay': { values: ['Off', 'No Leather Chain', 'No Leather', 'On'], encode: 'index', cite: 'AdvancedSettings:309-321' },
@@ -64,7 +65,9 @@ export function enumWords(key) {
       return localizedTextList('dungeonTextureModes', ['Classic', 'Climate', 'Climate Only', 'Random', 'Random Only'], TextCollections.TextSettings);
     case 'Video/QualityLevel':
       return localizedTextList('qualitySettings', ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], TextCollections.TextSettings);
-    case 'Video/MainFilterMode': case 'GUI/GUIFilterMode': case 'GUI/VideoFilterMode':
+    case 'Video/MainFilterMode':
+      return [...enumWords('GUI/GUIFilterMode'), t('settings.filterSharp', 'Sharp')];
+    case 'GUI/GUIFilterMode': case 'GUI/VideoFilterMode':
       return localizedTextList('filterModes', ['Point', 'Bilinear', 'Trilinear'], TextCollections.TextSettings);
     case 'GUI/HelmAndShieldMaterialDisplay':
       return localizedTextList('helmAndShieldMaterialDisplay', ['Off', 'No Leather Chain', 'No Leather', 'On'], TextCollections.TextSettings);

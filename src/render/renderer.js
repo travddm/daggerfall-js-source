@@ -719,7 +719,7 @@ import { boundsOf, spherePlanes, batchVisible, batchSphere, ZERO_ORIGIN, placeme
 import { billboardKey, sortByKey } from './billboardKey.js';   // AUDIT 68 S16-bbkey-stale-shadow-reach: the batch's texture key - one home with the two replays; LA-COST2: and the cutout pass's sort by it
 import { cullDisabled } from './frustum.js';   // PERF-CROWD2: the billboard pass culls for every host, so no host can forget to
 
-export { anisotropyFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+export { groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 /** PERF-SCALE: THE GPU THE BROWSER DRAWS ON, as its driver names it - WEBGL_debug_renderer_info's
  *  UNMASKED_RENDERER_WEBGL where the browser hands it out, gl.RENDERER otherwise (a browser that masks it answers
  *  a generic name there). A laptop's browser on its integrated GPU, or on SwiftShader, is the first thing a report
@@ -740,7 +740,10 @@ import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js'
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
-import { groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
+import { applyRetroSharp } from './retro-sharp.ts';
+import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -1705,8 +1708,8 @@ export class Renderer {
     this._csMost = 0;   // MW-DETAIL: the most it may grow to - read off the GPU at the first growth
     /** @type {WebGLTexture|null} */ this._skinIdentity = null;    // MWNPC1: the identity palette (_skinIdentityTex) - before the first set is built, which makes it
     /** @type {WebGLTexture|null} */ this._skinUnitHolds = null;   // MWNPC1: what SKIN_PALETTE_UNIT holds, by our own binds
-    this._classicSet = this._buildWorldSet({ key: 'classic', meshFs: FS, bbFs: BB_FS, terrainFs: TERRAIN_FS, charFs: CHAR_FS, decalFs: DECAL_FS });   // MAC-BUG W6: and the decal pass, its fifth
-    this._installWorldSet(this._classicSet);
+    this._classicSet = this._buildWorldSet({ key: 'classic', meshFs: FS, bbFs: BB_FS, terrainFs: TERRAIN_FS, charFs: CHAR_FS, decalFs: DECAL_FS, sharp: sharpWanted() });   // MAC-BUG W6: and the decal pass, its fifth
+    startWorldSets(this);   // the classic set installed, and the world sets following the filter from now on (Sharp or plain)
     this._ambientTri = null;
 
     this.textures = new Map(); // "archive_record" -> WebGLTexture
@@ -2254,27 +2257,22 @@ export class Renderer {
    *  fragment is lit, never how a vertex lands; LA-COST3: a lane may ADD a
    *  per-quad term to the billboard's, bbVertexShader, and places nothing). */
   _buildWorldSet(src) {
+    const fs = (source) => setFragment(src, source);   // a Sharp set's world-art samples rewritten (render/sharp-world-sets.ts)
     return {
       key: src.key,
-      mesh: this._buildProgram(VS, src.meshFs),
-      char: this._charSkinProgram(src.charFs),   // MWNPC1: the skin in the world's character program
-      bb: this._buildProgram(bbVertexShader(src.bbVs), src.bbFs),   // LA-COST3: a lane may add to the billboard VS (its flat's sun, once a quad)
-      terrain: this._buildProgram(TERRAIN_VS, src.terrainFs),
-      // FAR-CLIP1: and the terrain's CLIP variant (terrainClipFs, above), built from this set's own terrain shader the
-      // first time it is asked for (_ensureTerrainClip: the streaming host's Deep Waters mount, or the draw of a pixel
-      // the cap patched) and kept with the set - a page that never draws the carved sea never compiles it
-      terrainFs: src.terrainFs,
+      sharp: !!src.sharp,
+      source: src,
+      mesh: this._buildProgram(VS, fs(src.meshFs)),
+      char: this._charSkinProgram(fs(src.charFs)),   // MWNPC1: the skin in the world's character program
+      bb: this._buildProgram(bbVertexShader(src.bbVs), fs(src.bbFs)),   // LA-COST3: a lane may add to the billboard VS (its flat's sun, once a quad)
+      terrain: this._buildProgram(TERRAIN_VS, fs(src.terrainFs)),
+      // The terrain's clip and snow variants are built from terrainFs the first time each is drawn, and kept with the set.
+      terrainFs: fs(src.terrainFs),
       terrainClip: null,
-      terrainSnow: null,   // SNOWFALL1: and its SNOW variant (snowTerrainFs), built the first time a snow surface is drawn (_ensureTerrainSnow)
-      // MAC-BUG W6: the decal is the set's FIFTH program. A set that brings
-      // no twin lights its marks on the classic one - which is the exact
-      // state W6 was reported in, so the lane the port ships carries one
-      // (pinned), and this fallback exists for a foreign lane alone.
-      decal: this._buildProgram(DECAL_VS, src.decalFs ?? DECAL_FS),
-      // BLOOD1 AUDIT 3: and the cap that program DECLARES. A foreign lane
-      // with no twin gets the classic program under its own forty-eight,
-      // and an upload of forty-eight into a vec4[16] is an INVALID_OPERATION
-      // and an unlit mark - so the cut is the program's, never the lane's.
+      terrainSnow: null,
+      // A lane with no decal shader of its own lights its marks with the classic one, and so under the classic light cap:
+      // the lane's count uploaded into the classic program's smaller array would fail and leave the marks unlit.
+      decal: this._buildProgram(DECAL_VS, fs(src.decalFs ?? DECAL_FS)),
       decalLights: src.decalFs ? (src.maxLights ?? CLASSIC_MAX_LIGHTS) : CLASSIC_MAX_LIGHTS,
       locate: null,   // LA-COST7: its programs' uniform locations, looked up once (_locations)
     };
@@ -2322,7 +2320,7 @@ export class Renderer {
   }
 
   _fogLocs(program) {
-    const gl = this._locations();   // LA-COST7: the installed set's memo
+    const gl = this._locations();   // the installed set's memo
     return {
       fogColor: gl.getUniformLocation(program, 'uFogColor'),
       fogMode: gl.getUniformLocation(program, 'uFogMode'),
@@ -2333,9 +2331,10 @@ export class Renderer {
       fogDensity: gl.getUniformLocation(program, 'uFogDensity'),
       fogRange: gl.getUniformLocation(program, 'uFogRange'),
       camPos: gl.getUniformLocation(program, 'uCamPos'),
-      focus: gl.getUniformLocation(program, 'uFocus'),   // TV1: the travel view's focus (render/fogGlsl.js FOCUS_GLSL)
-      dwFog: gl.getUniformLocation(program, 'uDwFog'),   // DW-C: the sea's distance fog - null where a program never calls it
-      haze: gl.getUniformLocation(program, 'uJungleHaze'),   // BANTHA1: the jungle's haze (render/hazeGlsl.js)
+      focus: gl.getUniformLocation(program, 'uFocus'),   // the travel view's focus (render/fogGlsl.js FOCUS_GLSL)
+      dwFog: gl.getUniformLocation(program, 'uDwFog'),   // the sea's distance fog: null where a program never calls it
+      sharpRetro: gl.getUniformLocation(program, 'uSharpRetro'),   // Sharp's retro values (render/retro-sharp.ts)
+      haze: gl.getUniformLocation(program, 'uJungleHaze'),   // the jungle's haze (render/hazeGlsl.js)
     };
   }
 
@@ -2541,7 +2540,7 @@ export class Renderer {
     lane = lane ?? null;
     if (lane === this._lane) return;
     if (lane) {
-      if (!this._laneSet || this._laneSet.key !== lane.key) this._laneSet = this._buildWorldSet(lane);
+      if (!this._laneSet || this._laneSet.key !== lane.key) this._laneSet = this._buildWorldSet({ ...lane, sharp: this._classicSet.sharp });
       this._installWorldSet(this._laneSet);
     } else {
       this._installWorldSet(this._classicSet);
@@ -2826,18 +2825,14 @@ export class Renderer {
    *  made. Every non-panel frame draws into a frame image, resolved by its
    *  first screen draw or by resolveFrame(). */
   _beginLane(proj, view, lightDir, world) {
-    // PERF-READ1: the frame still owed resolves FIRST, under its own
-    // clock and its own counters. It used to resolve after the line
-    // below had reset `draws` and begun the new frame's clock, so the
-    // perf line it prints - the owed frame's - read `draws 0` on every
-    // frame whose resolve was deferred to here (an enhanced-skin frame
-    // draws no screen quad of its own), and its GPU clock was begun
-    // twice before it was ended once.
+    // The frame still owed resolves first, under its own clock and counters: resolved after the new frame's clock starts,
+    // its perf line would read the new frame's zero draws, and its GPU clock would begin twice.
     if (this._retroOwed && !this._panelSaved) this._compositeAir();   // RETRO1: a retro image still owed is presented first, under its own frame's config (a lane image owed with it resolves into it on the way)
     if (this._perfOpen && !this._air?.pending) this._perfClose();   // AUDIT 68 S16-perf-no-resolve-leak: a world frame with no resolve owed (the classic lane, `?air=off`) that drew no screen quad
     if (this._air?.pending && !this._panelSaved) this._compositeAir();
     this._deckOwed = null;   // VC6c: whatever was owed is drawn; this frame's deck is its host's to set
     const retro = world && !this._panelSaved ? this._retroBegin() : null;   // RETRO1: after the owed present, which reads the frame it presents
+    this._sharpRetro = applyRetroSharp(this, retro);   // Sharp drops its edge blend and biases its mips in a retro frame
     if (world && this._perf) { this._perf.begin(); this._perf.mark('shadow'); this.stats.draws = 0; this._perfOpen = true; }   // EL8: the frame's clock starts with its passes; VC6d: and its first span
     if (this._shadows && world) this._renderPasses(proj, view, lightDir);
     // EL4: THE FRAME IMAGE - the world pass draws into it, the clear included; a panel frame keeps the canvas
@@ -5610,6 +5605,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   beginFrame(proj, view, lightDir, opts = null) {
     this._close2D();   // PERF-2D: the baseline back, before anything that needs it
     this._afterFlats = null;   // AUDIT RED-MOUNTAIN N2: an armed draw is its frame's
+    refreshWorldSamplingOnChange(this);   // a changed texture filter, quality level or ground sharpness reaches every cached texture now
     const s = this.stats;
     s.draws = 0; s.programBinds = 0; s.vaoBinds = 0; s.texBinds = 0; s.bbCulled = 0; s.shadowDraws = 0;   // PERF-CROWD2; PASS-COUNT
     // VC4: the cloud shadow deck is a FRAME's, not the renderer's - a host
@@ -6506,17 +6502,16 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     gl.uniform1f(prog.fogDensity, this._fogDensity);
     gl.uniform2fv(prog.fogRange, this._fogRange);
     gl.uniform3fv(prog.camPos, this._camPos);
-    if (prog.focus) gl.uniform4fv(prog.focus, this._focus);   // TV1: w 0 (no travel view) reads as the camera in the shader
-    if (prog.dwFog) gl.uniform4fv(prog.dwFog, this._dwFog);   // DW-C: the sea's distance fog (off is [0].x = 0)
-    // BANTHA1: the jungle's haze while it is on, and once as it goes off (off is [1].x = 0, as a linked program's uniforms
-    // start) - no frame outside the jungle pays a call. AUDIT BANTHA1 HAZE-2: what a program holds is the GL PROGRAM's -
-    // keyed by it (the bound one: every caller has just used it), never by a location table, which a set's re-install
-    // (FAR-CLIP1's variant, a panel, RW1's view out) makes anew while the program keeps the haze it was last sent
+    if (prog.focus) gl.uniform4fv(prog.focus, this._focus);   // w 0 (no travel view) reads as the camera in the shader
+    if (prog.sharpRetro) gl.uniform2fv(prog.sharpRetro, this._sharpRetro);
+    if (prog.dwFog) gl.uniform4fv(prog.dwFog, this._dwFog);   // the sea's distance fog (off is [0].x = 0)
+    // The jungle's haze goes while it is on and once as it goes off, so no frame outside the jungle pays a call. What a
+    // program was sent is kept by the bound program, not by a location table: a set's re-install makes a new table.
     const bound = this._lastProgram, keyed = bound !== null && typeof bound === 'object';   // a test's stub GL may hand back no object
     if (prog.haze && (this._haze[4] !== 0 || (keyed && this._hazeOn.get(bound)))) { gl.uniform4fv(prog.haze, this._haze); if (keyed) this._hazeOn.set(bound, this._haze[4] !== 0); }
-    if (prog.clipY) gl.uniform1f(prog.clipY, this._clipY);   // A1: only the mesh shader carries the slice
-    if (prog.amMode) gl.uniform1f(prog.amMode, this._automapMode);   // A2: and the automap presentation
-    if (prog.amWaterLevel) gl.uniform1f(prog.amWaterLevel, this._automapWaterLevel);   // c2/S6: with its water tint
+    if (prog.clipY) gl.uniform1f(prog.clipY, this._clipY);   // only the mesh shader carries the slice
+    if (prog.amMode) gl.uniform1f(prog.amMode, this._automapMode);   // and the automap presentation
+    if (prog.amWaterLevel) gl.uniform1f(prog.amWaterLevel, this._automapWaterLevel);   // with its water tint
     if (prog.amWaterColor) gl.uniform4fv(prog.amWaterColor, this._automapWaterColor);
   }
 
@@ -7365,25 +7360,10 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       if ((i + 1) % TILE_LAYERS_A_STEP === 0 && i + 1 < layers.length) { yield; gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex); }
     }
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
-    // GRAIN1:
-    // THE MIPMAP, AND WHY THE MAGNIFIER DOES NOT MOVE.
-    //
-    // MIN was NEAREST, so a distant pixel covering a dozen texels picked
-    // ONE of them and picked a different one as the camera drifted: the
-    // ground boiled. That is minification aliasing and a mipmap is its
-    // only cure. The terrain shaders take textureGrad with the UNWRAPPED
-    // gradient (see TERRAIN_FS), so the mip is chosen from the real
-    // footprint and the fract() wrap cannot blur a line round every tile.
-    //
-    // MAG is the world filter's (_setGroundSampler), NEAREST under the
-    // default Point. Magnification is the ground under the player's feet,
-    // where Daggerfall's texels are square and visible; a mipmap has no
-    // say there (there is no mip above level 0). So this buys the
-    // distance and spends nothing on the near field.
-    //
-    // A 2D ARRAY mipmaps each layer on its own, so no tile can bleed into
-    // another the way an atlas would - which is the other reason atlases
-    // ship unmipped and this need not.
+    // The mip chain cures minification shimmer: a distant pixel over a dozen texels would pick a different one as the
+    // camera drifts. The terrain shaders pass textureGrad the unwrapped gradient (TERRAIN_FS), so the mip follows the
+    // real footprint and the tile wrap blurs no line round a tile. Magnification is the world filter's
+    // (_setGroundSampler), NEAREST under Point. A 2D array mipmaps each layer on its own, so no tile bleeds into another.
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
@@ -7465,7 +7445,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   _setGroundSampler(tier) {
     const gl = this.gl;
     const ext = this._anisoExtension();
-    const s = groundSamplerFor(tier, this._anisoMax);
+    const s = groundSamplerFor(tier, groundAnisotropy(this._anisoMax));
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl[s.minFilter]);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, groundMagFor(gl, worldFilterMode()));   // DFU's terrain array takes MainFilterMode
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
@@ -7553,7 +7533,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
    *  kept with the set (PERF-WARM's on-demand kind: a page that never draws
    *  the carved sea never compiles it). */
   _ensureTerrainClip(set = this._worldSet) {
-    return (set.terrainClip ??= this._buildProgram(TERRAIN_VS, terrainClipFs(set.terrainFs)));
+    return (set.terrainClip ??= this._buildProgram(TERRAIN_VS, setFragment(set, terrainClipFs(set.terrainFs))));
   }
 
   /** FAR-CLIP1: build the installed set's terrain clip program NOW - the
@@ -7567,14 +7547,14 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   prepareTerrainSnow() { this._ensureTerrainSnow(); }
   /** SHADER-STALL (render/glProgram.js startPrograms): the set's snow program STARTED, never waited on - answers whether
    *  the driver is done, so the host asks `prepareTerrainSnow` then, and its build reads a link already made. */
-  startTerrainSnow(set = this._worldSet) { return set.terrainSnow ? () => true : startPrograms(this.gl, [[SNOW_VS, snowTerrainFs(set.terrainFs)]]); }
+  startTerrainSnow(set = this._worldSet) { return set.terrainSnow ? () => true : startPrograms(this.gl, [[SNOW_VS, setFragment(set, snowTerrainFs(set.terrainFs))]]); }
 
   /** SNOWFALL1: the set's SNOW program - the mod's vertex law (SNOW_VS) over the set's own ground fragment program with
    *  its tile decode swapped for the mod's snow (snowTerrainFs) - and its tables, built the first time a snow surface is
    *  drawn and kept with the set (the clip variant's kind: a page that never stands snow never compiles it). */
   _ensureTerrainSnow(set = this._worldSet) {
     if (set.terrainSnow) return set.terrainSnow;
-    const program = this._buildProgram(SNOW_VS, snowTerrainFs(set.terrainFs));
+    const program = this._buildProgram(SNOW_VS, setFragment(set, snowTerrainFs(set.terrainFs)));
     const gl = this._locations(set);
     const loc = Object.fromEntries(['uProj', 'uView', 'uModel', 'uLightDir', 'uAmbient', 'uSunScale', 'uSunColor', 'uMoonDir', 'uMoonScale', 'uMoonColor',
       'uPointCount', 'uPointLights', 'uPointColors', 'uIndirect', 'uIndirectColor', 'uSnowDepths', 'uSnowLimits', 'uSnowDynMap', 'uSnowDynTexel',
