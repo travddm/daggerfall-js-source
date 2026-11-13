@@ -8,10 +8,10 @@ import { stateGl } from '../retroGl.mjs';
 /** A 2 x 1 cut-out: one opaque red texel, one transparent black one. */
 const cutOut = () => ({ width: 2, height: 1, colors: new Uint8ClampedArray([200, 0, 0, 255, 0, 0, 0, 0]) });
 
-/** The bytes the last texImage2D call sent. */
+/** The bytes the last level-0 texImage2D call sent. */
 const uploaded = (calls) => [
   ...calls
-    .filter((c) => c[0] === 'texImage2D')
+    .filter((c) => c[0] === 'texImage2D' && c[2] === 0)
     .at(-1)
     .at(-1),
 ];

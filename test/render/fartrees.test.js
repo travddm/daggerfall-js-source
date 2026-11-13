@@ -33,7 +33,7 @@ function fakeGl() {
     createBuffer: () => { log.made++; return { id: ++n }; }, createVertexArray: () => { log.made++; return { vao: ++n }; }, createTexture: () => { log.made++; return { tex: ++n }; }, createProgram: () => ({ prog: ++n }),
     deleteBuffer: () => { log.deleted++; }, deleteVertexArray: () => { log.deleted++; }, deleteTexture: () => { log.deleted++; }, deleteProgram: () => { log.deleted++; },
     bufferSubData: (t, at, data) => log.subs.push([at, data.byteLength]),
-    texSubImage3D: (t, level, x, y, layer) => log.layers.push(layer),
+    texSubImage3D: (t, level, x, y, layer) => { if (level === 0) log.layers.push(layer); },
     drawArrays: (mode, first, count) => log.arrays.push([mode, first, count]),
     drawElements: (mode, count) => log.draws.push(count),
     uniform4f: (loc, x, y, z, w) => log.u4.push([loc, x, y, z, w]),

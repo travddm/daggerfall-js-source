@@ -19,6 +19,7 @@
 import { FOG_FACTOR_GLSL } from './labGrass.js';
 import { buildProgram } from './glProgram.js';
 import { filterWorldPicture, freshWorldPicture } from './world-texture-filter.ts';
+import { uploadCanvasMips } from './mip-upload.ts';
 
 /** The cloth, metres: a man's height and a half, a third of it wide. */
 export const BANNER_W_M = 0.9;
@@ -161,7 +162,7 @@ export class BannerRenderer {
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);   // AUDIT GUILD1d R8: the cut's edge mipmaps without a dark rim
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, /** @type {any} */ (canvas));
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-      gl.generateMipmap(gl.TEXTURE_2D);
+      uploadCanvasMips(gl, tex, canvas);
       filterWorldPicture(gl, tex, gl.TEXTURE_2D, true);   // the world's texture filter and anisotropy
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);

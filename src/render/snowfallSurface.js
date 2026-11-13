@@ -8,6 +8,7 @@
 
 import { SNOW_ATTR } from './snowfallGlsl.js';
 import { filterGroundPicture } from './ground-sampler.ts';
+import { uploadImageMips } from './mip-upload.ts';
 import { onWorldSamplingChange } from './live-world-sampling.ts';
 import { MID, BLANKET, snowUniforms } from '../systems/snowfallRuntime.js';
 
@@ -56,7 +57,7 @@ export class SnowfallSurface {
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.generateMipmap(gl.TEXTURE_2D);
+    uploadImageMips(gl, tex, image, { wrapX: true, wrapY: true });
     filterGroundPicture(gl);   // the ground's sampling, so the snow ground matches the ground beside it
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
