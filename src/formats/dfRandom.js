@@ -27,7 +27,7 @@ export function bumpSeed(delta) { setSeed((getSeed() + delta) | 0); }
 
 /** Next random value in [0, 0x7FFF]. */
 export function rand() {
-  // AUDIT 68 S10-dfrandom-bigint: three BigInt ops per draw bought nothing.
+  // Three BigInt ops per draw bought nothing.
   next = (Math.imul(next, 1103515245) + 12345) >>> 0;
   return (next >>> 16) & 0x7fff;
 }

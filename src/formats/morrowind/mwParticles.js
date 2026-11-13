@@ -1,4 +1,4 @@
-// MAC-Q: THE PARTICLE SYSTEM, as OpenMW builds it
+// THE PARTICLE SYSTEM, as OpenMW builds it
 // out of a NIF and osgParticle runs it.
 //
 // THE REFERENCE, file by file:
@@ -71,7 +71,7 @@ const IDENTITY_T = Object.freeze({ rotation: Float32Array.from([1, 0, 0, 0, 1, 0
 // ---- affine helpers: {a: row-major 3x3, t: [3]} is the shape the rig's
 // own placement uses (mwFirstPerson.js placeAtBone, applyPre) ----------------
 
-// AUDIT 68 S11-affine-dup: the product and the transform's affine live in
+// The product and the transform's affine live in
 // mwAffine.js (mwSkin composes the same ones); re-exported for the rig.
 export { affineOfTransform, AFFINE_IDENTITY, affineMul, affineApply, affineRotate };
 /** The inverse of an affine whose 3x3 is a rotation times a uniform scale. */
@@ -184,7 +184,7 @@ export function particleSystemOf(nif, bundle) {
         break;
       case 'NiParticleColorModifier': {
         const cd = m.colorData >= 0 ? deref(nif, m.colorData) : null;
-        if (cd && cd.data && cd.data.keys && cd.data.keys.length) modifiers.push({ type: 'color', keys: cd.data.keys.map((k) => ({ time: k.time, value: [...k.value], inTan: k.inTan ? [...k.inTan] : null, outTan: k.outTan ? [...k.outTan] : null, tbc: k.tbc ? [...k.tbc] : null })), interpolation: cd.data.type });   // AUDIT 68 S11-colorkey-tbc: a TCB key's tension/continuity/bias ride along
+        if (cd && cd.data && cd.data.keys && cd.data.keys.length) modifiers.push({ type: 'color', keys: cd.data.keys.map((k) => ({ time: k.time, value: [...k.value], inTan: k.inTan ? [...k.inTan] : null, outTan: k.outTan ? [...k.outTan] : null, tbc: k.tbc ? [...k.tbc] : null })), interpolation: cd.data.type });   // a TCB key's tension/continuity/bias ride along
         break;
       }
       case 'NiParticleRotation': break;   // "unused" (nifloader.cpp:1283-1286)
@@ -283,8 +283,8 @@ export function controllerTime(c, value) {
  *  :99-129, :135-166): first key at or before the range, last past it,
  *  linear between - Constant snaps at the half, Quadratic takes the cubic
  *  Hermite with the file's tangents and TCB with the generated ones. The
- *  KeyGroup sampler is mwKeys.js's, the bones' own (AUDIT 68
- *  S11-colorkey-tbc). Default (1,1,1,1) is ParticleColorAffector's own
+ *  KeyGroup sampler is mwKeys.js's, the bones' own.
+ *  Default (1,1,1,1) is ParticleColorAffector's own
  *  (particle.cpp:257). */
 export function interpColorKey(keys, time, interpolation = 1) {
   if (!keys || !keys.length) return [1, 1, 1, 1];
@@ -486,7 +486,7 @@ export function createParticleSystem(desc, { rolls = Math.random } = {}) {
       frozen = false;
       enabled = t >= c.emitStart && t < c.emitStop;   // ParticleSystemController (nifosg/controller.cpp:594-604)
       if (unsupported) return;
-      // MW-SPELLFX1: `emitterFrame` is the emitter's frame in the particle node's space THIS frame (orthonormalised, as
+      // `emitterFrame` is the emitter's frame in the particle node's space THIS frame (orthonormalised, as
       // :548 takes it) - an effect mesh keyframes the node its emitter rides; null is the file's own, as the torch's
       emit(dt, frame, emitterFrame ? affineOrthoNormalize(emitterFrame) : emitterToPs);
       operate(dt, frame);

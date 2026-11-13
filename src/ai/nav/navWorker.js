@@ -5,7 +5,7 @@
 // hydrates. The compact heightfield the motor queries every tick lives
 // on the main thread, because findPath is synchronous by his design.
 //
-// AUDIT 68 S02-hydrate-main-thread-revoxelize: the boxes the height layer
+// the boxes the height layer
 // reads ride back with the bake, packed and transferred, so the main
 // thread no longer re-voxelises the soup to rebuild them; a cache hit
 // asks for them alone ('cols'), cut here at the cached cell size.

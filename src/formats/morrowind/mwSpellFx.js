@@ -1,4 +1,4 @@
-// MW-SPELLFX1: WHICH
+// WHICH
 // MORROWIND VISUALS A DAGGERFALL SPELL IS DRAWN WITH.
 //
 // Morrowind draws a spell with its magic effects' records (MGEF, components/esm3/loadmgef.cpp): each effect names a
@@ -76,8 +76,8 @@ const DF_TO_MW = Object.freeze({
   '40,*': E.DetectEnchantment,   // Identify
   '43,*': E.Recall,   // Teleport
   '44,*': E.Sound,   // Comprehend Languages
-  '45,*': E.RestoreHealth,   // RESURRECT1: the port's own Resurrect
-  '46,*': E.Mark,   // PARTY-MAP: the port's own Shared Cartography
+  '45,*': E.RestoreHealth,   // the port's own Resurrect
+  '46,*': E.Mark,   // the port's own Shared Cartography
 });
 
 /** A family the table has no row for: its school's plainest member, by Daggerfall's skill (skills.js SKILLS) -

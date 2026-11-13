@@ -1,11 +1,11 @@
-// SNOWFALL1: RAW DEFLATE (RFC 1951), both ways and in step - what .NET's DeflateStream reads and writes
+// RAW DEFLATE (RFC 1951), both ways and in step - what .NET's DeflateStream reads and writes
 // with no zlib or gzip wrapper. Snowfall keeps its persistent tracks in its save record as deflated, base64 bytes
 // (PersistentTrackField.WriteSaveData / RestoreSaveData), and a save is written in step (systems/modSaveData.js
 // GetSaveData), so the platform's CompressionStream - which answers later - cannot pack it.
 //
 // THE WRITER is LZ77 over a 32 KiB window (a hash of three bytes, chains of 32) coded with the fixed Huffman tables, in
 // one final block: any inflater reads it, and the same bytes always pack the same way. .NET's own writer picks its
-// own blocks, so a record packs to different bytes than DFU's - a departure no reader sees (Port-Ledger A, SNOWFALL1).
+// own blocks, so a record packs to different bytes than DFU's - a departure no reader sees.
 // THE READER is the whole format: stored, fixed and dynamic blocks; it throws on a stream that is not deflate.
 
 const LEN_BASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258];

@@ -1,6 +1,6 @@
 // ENHANCED AI 1: TRIANGLES INTO THE HEIGHTFIELD, WITHOUT TOUCHING THE
 // NAVMESH. project-final's navmesh voxelizes COLLIDERS - boxes with a
-// footprint and a top (and E1's `bottom`), ramps with a plane - and its
+// footprint and a top (and a `bottom`), ramps with a plane - and its
 // body is ported byte-identical. Daggerfall's level is a triangle soup.
 // Rather than teach the body about triangles (and break the identity
 // that lets the two repos share one file), this turns triangles into
@@ -11,7 +11,7 @@
 // Recast's rasterizeTriangles does the same job into spans directly;
 // this does it into colliders and lets buildNav's own addSpan merge
 // them, so multi-level dungeons (a floor above a floor) fall out of the
-// span machinery E1 already models. Per cell, overlapping y-ranges are
+// span machinery the body already models. Per cell, overlapping y-ranges are
 // merged here first so the object count stays a few per cell rather
 // than one per triangle-cell pair.
 //
@@ -24,7 +24,7 @@ import { AGENT } from './nav/navmesh.js';
 /** Triangle t of the soup into a, b, c; answers its face normal's |y| over
  *  its length (sign-free: a floor seen from below is still a floor), or
  *  -1 for a zero-area triangle. The ONE degenerate test the voxeliser and
- *  soupExtent share (AUDIT 68 S02-coarsen-sizing-pass). */
+ *  soupExtent share. */
 function readTri(positions, indices, t, a, b, c) {
   const i = indices[t] * 3, j = indices[t + 1] * 3, k = indices[t + 2] * 3;
   a[0] = positions[i]; a[1] = positions[i + 1]; a[2] = positions[i + 2];
@@ -98,7 +98,7 @@ export function trianglesToColliders(positions, indices, { cs = AGENT.cs, maxSlo
  *  (Audit-55 cites :82). */
 export const FLAT_EPS = 1e-4;
 
-/** AUDIT 68 S02-coarsen-sizing-pass: the xz extent trianglesToColliders
+/** The xz extent trianglesToColliders
  *  would give the soup at cell size `cs`, without voxelising it - the
  *  cell-snapped bounds of its non-degenerate triangles, as one box (none
  *  for an empty soup). The cell holding each extreme vertex always gets a
@@ -117,8 +117,8 @@ export function soupExtent(positions, indices, cs = AGENT.cs) {
   return [{ x0, x1, z0, z1 }];
 }
 
-/** A collider set packed for a thread hop (AUDIT 68 S02-hydrate-main-
- *  thread-revoxelize): six doubles a box and its noNavTop, transferable. */
+/** A collider set packed for a thread hop (for the main-thread
+ *  re-voxelize): six doubles a box and its noNavTop, transferable. */
 export function packColliders(cols) {
   const box = new Float64Array(cols.length * 6), noNavTop = new Uint8Array(cols.length);
   for (let i = 0; i < cols.length; i++) {

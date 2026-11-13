@@ -148,7 +148,7 @@ function readTimeController(s, rec) {
  * KeyGroup<T> of `dim`-component float values: uint32 count, then (only
  * when count > 0) uint32 interpolation type and the keys.
  *
- * MW-D33: quadratic keys carry TWO tangents and the reference names the
+ * Quadratic keys carry TWO tangents and the reference names the
  * stream order - value, then mInTan, then mOutTan (readQuadratic,
  * nifkey.hpp:141-143). The sampler's Hermite then uses key0's OUT
  * tangent and key1's IN tangent (controller.hpp:158), i.e. the SECOND
@@ -653,7 +653,7 @@ const READERS = {
     rec.scales = readKeyGroup(s, 1);
   },
 
-  // --- MW-D9e: the rest of the Morrowind-era registry ---
+  // --- the rest of the Morrowind-era registry ---
   // Every layout below is nif.xml gated to 4.0.0.2 the same way NiCamera
   // was. They are here because a 4.0.0.2 record carries no size, so ONE
   // unknown type kills the whole file - a mesh that merely contains a

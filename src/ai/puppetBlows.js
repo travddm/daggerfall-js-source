@@ -1,6 +1,5 @@
 // @ts-check
-// TELL8 (;, then "Go" - OPEN 9:
-// wind-ups at peers, each client judging its own feet): A WIND-UP ON THE WIRE. Before it a telegraphed blow lived on
+// A wind-up on the wire (wind-ups at peers, each client judging its own feet). Before it a telegraphed blow lived on
 // its owner's machine alone - no peer saw its mark, its glint or its held arm, and a foe never wound up at a peer. Now:
 //   THE OWNER'S WORD (`blowWire`) - each foe record carries its live wind-up: `wk` the shape (0-6, WIRE_KINDS) +8 for
 //     iron +16 for a feint, `wy` its yaw, `wl` milliseconds to its landing (relative: the brain's clock is each
@@ -30,7 +29,7 @@ import { LOCAL_TARGET, PUPPET_HELD_UNTIL, releaseTactics } from './tactics.js';
 export const WIRE_KINDS = Object.freeze(['lunge', 'sweep', 'slam', 'ring', 'charge', 'leap', 'aimed']);
 export const WIRE_IRON = 8;
 export const WIRE_FEINT = 16;
-/** AUDIT TELL O2: `wk`'s landed flag - its owner's landing, written for WIRE_LANDED_S after it. */
+/** `wk`'s landed flag - its owner's landing, written for WIRE_LANDED_S after it. */
 export const WIRE_LANDED = 32;
 export const WIRE_LANDED_S = 0.5;
 /** `wl`'s ceiling (ms): no wind-up is longer. */
@@ -44,7 +43,7 @@ const q2 = (v) => Math.round(v * 100) / 100;
 const q3 = (v) => Math.round(v * 1000) / 1000;
 
 /** The owner's word for `ai`'s record now - `{ wk, wy, wl, wo, wn, wp?, ws? }`, or the parts that apply ({} none): a live
- *  wind-up (never a cut feint, never one past its landing - a charge's run is its landing), and AUDIT TELL O2 its
+ *  wind-up (never a cut feint, never one past its landing - a charge's run is its landing), and its
  *  LANDING for WIRE_LANDED_S after it (`wk` + WIRE_LANDED, `wl` 0) - so a receiver whose clock runs behind lands it on its
  *  owner's word rather than reading the field gone as a break; `wn` the blow's serial (its foe's own count, mod 256);
  *  and the stagger or the overreach. `toWire` the record's own projection of a scene point. A puppet's synthetic state
@@ -89,7 +88,7 @@ export const blowWireKey = (r) => `${r.wk ?? ''}/${r.wn ?? ''}/${r.wy ?? ''}/${r
  */
 export function applyBlowRecord(ai, r, { origin = null, me = false, entity = null, collider = null, now = tacticsNow() } = {}) {
   if (!ai || !r) return null;
-  if (ai._tac && !ai._tac.puppet) releaseTactics(ai);   // AUDIT TELL O4: a brain that was mine (a seat handed back) gives up its tokens
+  if (ai._tac && !ai._tac.puppet) releaseTactics(ai);   // a brain that was mine (a seat handed back) gives up its tokens
   const s = ai._tac?.puppet ? ai._tac : (ai._tac = { puppet: true, state: 'engage', blow: null, key: null, seen: now, cancel: false, landed: null, wn: null, feet: null });
   s.seen = now;
   const kind = Number.isInteger(r.wk) ? WIRE_KINDS[r.wk & 7] : null;
@@ -120,7 +119,7 @@ export function applyBlowRecord(ai, r, { origin = null, me = false, entity = nul
     if (r.ws === 2) landPuppetBlow(ai, s, live, now);   // an overreach follows a landing alone - it landed there
     else {
       if (live.feint) live.cut = now;   // its owner cut it: the plain swing goes on (the held arm released), the mark dashes out
-      else { if (r.ws === 1) shatterBlow(ai, now); else setLiveBlow(ai, null); s.cancel = true; }   // broken - a stagger, a knock, a paralysis, a turn: the held arm drops; AUDIT TELL (3.2): one its owner staggered shatters here too
+      else { if (r.ws === 1) shatterBlow(ai, now); else setLiveBlow(ai, null); s.cancel = true; }   // broken - a stagger, a knock, a paralysis, a turn: the held arm drops; one its owner staggered shatters here too
       s.blow = null; s.state = 'engage'; s.key = null;
     }
   }   // at or past its landing with the field gone: it lands on its own clock (puppetBlowTurn)
@@ -177,8 +176,7 @@ export function puppetBlowTurn(ai, feet = null, now = tacticsNow()) {
 }
 
 /** Did this puppet's gap-closer (a charge, a leap) land AT ME on its owner's word inside a verdict's life? Its run or
- *  its jump carried it farther than a walk could - the host's leap gate lets that one blow through, once (AUDIT TELL O6:
- *  not a charge at anyone, not twice). */
+ *  its jump carried it farther than a walk could - the host's leap gate lets that one blow through, once (not a charge at anyone, not twice). */
 export function puppetGapLanded(ai, now = tacticsNow()) {
   const l = ai?._tac?.puppet ? ai._tac.landed : null;
   if (!l || !l.mine || l.used || (l.kind !== 'charge' && l.kind !== 'leap') || now - l.at > BLOW_VERDICT_LIFE) return false;

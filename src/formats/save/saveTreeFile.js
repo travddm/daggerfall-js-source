@@ -1,4 +1,4 @@
-// SAVETREE.DAT reader (SAV1) - the fourteenth format reader. 1:1
+// SAVETREE.DAT reader - the fourteenth format reader. 1:1
 // translation of DFU API/Save (MIT, Daggerfall Workshop): SaveTree.cs,
 // SaveTreeHeader.cs, SaveTreeBaseRecord.cs, SaveTreeBuildingRecords.cs,
 // and the small typed records - ItemRecord.cs, GuildMembershipRecord.cs,
@@ -117,7 +117,7 @@ export const ITEM_FLAGS = Object.freeze({
 });
 
 /** FileProxy.ReadCString, both arms - fileProxy.js is their one home
- *  (AUDIT 68); re-exported for the save tree's own readers. */
+ *  ; re-exported for the save tree's own readers. */
 export { readCStringFixed, readCStringScan } from '../fileProxy.js';
 
 /** SaveTree.ReadPosition - i32 WorldX/WorldY/WorldZ. */
@@ -280,7 +280,7 @@ export const isWagonRecord = (record) => record.recordRoot?.spriteIndex === 4;
  * record and the offset after its data.
  */
 /**
- * HARD3 - ONE SAVETREE RECORD. The tree's nodes cross into
+ * ONE SAVETREE RECORD. The tree's nodes cross into
  * `systems/classicSave.js` as `{object}` before this, which is how a
  * reader of that file cannot tell `recordData` (the bytes after the
  * root) from `parsedData` (the typed parse) without opening this one.

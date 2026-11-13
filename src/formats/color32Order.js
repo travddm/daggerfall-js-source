@@ -15,10 +15,10 @@
 // A picture that entered through a PNG-shaped door is NOT: a canvas
 // `getImageData`, a browser decode and `unityBundle.decodeTexture2D`
 // all hand back the raster TOP row first. Such a door converts HERE,
-// once, on the way in - the lesson of AUDIT 62 F26, where the seasonal
+// once, on the way in - the lesson of the seasonal
 // flats drew vertically mirrored beside the classic flats in the same
-// batch loop because the conversion was missing, and of ROAD-H H4,
-// where the user texture pack's swap had the same gap (and threw
+// batch loop because the conversion was missing, and of the user texture pack's swap,
+// where it had the same gap (and threw
 // besides, for wearing the wrong field name).
 //
 // TWO DOORS IMPORT THIS, AND NEITHER OWNS IT: systems/
@@ -42,7 +42,7 @@ export function toColor32Order(image) {
 }
 
 /**
- * PERF-PEERS5: THE SAME ROWS REVERSED, IN THE RASTER'S OWN BYTES - for a caller that owns a raster no one
+ * THE SAME ROWS REVERSED, IN THE RASTER'S OWN BYTES - for a caller that owns a raster no one
  * else reads (a PNG it has just decoded and will only upload). toColor32Order's answer, byte for byte, without the
  * second raster a picture: one row of scratch, the rows swapped end for end.
  * @param {{width:number,height:number,data:Uint8Array}} image - its `data` is rewritten
@@ -66,7 +66,7 @@ export function toColor32OrderInPlace(image) {
  * The same conversion, handed back in the shape the upload path reads:
  * `{ colors, width, height }`, which is what `getColor32` returns and
  * what `uploadTexture`/`uploadEmissionTexture` take `asBytes` of
- * (renderer.js:"// WW3: the shape's", renderer.js:"// AUDIT 19 F7: the"). A decoded PNG's `{ width, height, data }`
+ * (the renderer's upload path). A decoded PNG's `{ width, height, data }`
  * is NOT that shape - `color32.colors` would be `undefined` and
  * `asBytes` would throw on the first swapped record.
  * @param {{width:number,height:number,data:Uint8Array}} image
@@ -78,7 +78,7 @@ export function toColor32(image) {
 }
 
 /**
- * HT3 - THE SHAPE, WITH THE ROWS LEFT ALONE.
+ * THE SHAPE, WITH THE ROWS LEFT ALONE.
  *
  * `toColor32` above is a FLIP, and a flip is right for a Unity texture
  * because Unity stores its rows bottom-up: flipped, row 0 becomes the
@@ -111,12 +111,12 @@ export function toScreenOrder(image) {
 }
 
 /**
- * BOOT2: THE THIRD DOOR, AND WHY IT IS HERE. A classic
+ * THE THIRD DOOR, AND WHY IT IS HERE. A classic
  * indexed bitmap (an IMG/CIF record + ART_PAL.COL) becomes color32 through
  * this - `{ width, height, colors }`, GetColor32's own shape and its own
  * `alphaIndex` parameter: classic IMG UI art keys index 0 transparent (the
  * box corners), the default every caller rode before it was a parameter,
- * while a save screenshot (SAV3, IMAGE.RAW) is opaque edge to edge and
+ * while a save screenshot (IMAGE.RAW) is opaque edge to edge and
  * passes -1.
  *
  * It lived in ui/hud/hud.js, and eleven modules imported it from there - among
@@ -132,7 +132,7 @@ export function bitmapToColor32(bmp, palette, alphaIndex = 0) {
   // alphaIndex is GetColor32's own parameter: classic IMG UI art keys
   // index 0 transparent (the box corners) - the default every caller
   // rode before it was a parameter - while a save screenshot
-  // (SAV3, IMAGE.RAW) is opaque edge to edge and passes -1.
+  // (IMAGE.RAW) is opaque edge to edge and passes -1.
   const colors = new Uint32Array(bmp.width * bmp.height);
   const u8 = new Uint8Array(colors.buffer);
   for (let i = 0; i < bmp.data.length; i++) {
