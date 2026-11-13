@@ -77,21 +77,21 @@ world frame, so a change applies on the next frame.
   and no effects. At 1 there is no extra image. Screen-space kernels (bloom blur, bolt width) are sized in the image's
   pixels.
 - **Retro mode** (`src/systems/retroMode.js`, Daggerfall Unity's settings `Video.RetroRenderingMode`,
-  `PostProcessingInRetroMode`, `UseMipMapsInRetroMode`, `RetroModeAspectCorrection`, `PalettizationLUTShift`). The
-  world draws into 320x200 or 640x400 (320x154 or 640x308 with the docked large HUD) and is point-sampled up, with
-  optional posterize or palettize post-processing. Retro mode wins over render scale. The settings screen shows the
-  first three keys as the Classic picture, Classic aspect and Classic colours rows (`src/systems/features.js`); the rows
-  write the keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)",
-  not classic: no source shows the original game drew at that size. The Classic rendering preset in the Quality
-  section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
-  Off, land view distance 3, Enhanced lighting Off, Enhanced environments Off (the painted sky), `FieldOfView` 60 and
-  the Point texture filter the first time it is turned on. It switches between two graphics profiles, standard and
-  classic, stored in the `graphicsProfiles` preference: each holds every Graphics tab setting and Features row, and the
-  choices in their drawers (a row's parts, a mod's modules and dials). Both share the display settings the machine
-  needs (resolution, fullscreen, frame rate, VSync, run in background) and a mod's sound dials
+  `PostProcessingInRetroMode`, `UseMipMapsInRetroMode`, `RetroModeAspectCorrection`, `PalettizationLUTShift`). The world
+  draws into 320x200 or 640x400 (320x154 or 640x308 with the docked large HUD) and is point-sampled up, with optional
+  posterize or palettize post-processing. Retro mode wins over render scale. The settings screen shows the first three
+  keys as the Classic picture, Classic aspect and Classic colours rows (`src/systems/features.js`); the rows write the
+  keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)", not classic:
+  no source shows the original game drew at that size. The Classic rendering preset in the Quality section
+  (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness Off, Mip
+  quality Standard, land view distance 3, Enhanced lighting Off, Enhanced environments Off (the painted sky),
+  `FieldOfView` 60 and the Point texture filter the first time it is turned on. It switches between two graphics
+  profiles, standard and classic, stored in the `graphicsProfiles` preference: each holds every Graphics tab setting and
+  Features row, and the choices in their drawers (a row's parts, a mod's modules and dials). Both share the display
+  settings the machine needs (resolution, fullscreen, frame rate, VSync, run in background) and a mod's sound dials
   (`src/ui/enhanced/classic-rendering-row.ts` `graphicsProfileScope`). On stores the standard settings and puts the
-  classic ones in place; Off stores the classic ones and puts the standard ones back exactly. A change made under
-  either profile stays with it, across reloads.
+  classic ones in place; Off stores the classic ones and puts the standard ones back exactly. A change made under either
+  profile stays with it, across reloads.
 - **Classic distance shading** (`src/render/classic-distance-shading.ts`, source
   `src/systems/distance-shading-setting.ts`). Before the present, a full-screen pass reads the image's depth and
   draws up to two fades over it:

@@ -57,6 +57,7 @@ function playerStores(): Stores {
       'enhanced-lighting': true,
       'enhanced-environments': 'dome',
       'anisotropic-filtering': 8,
+      'mip-quality': 'sharp',
     },
     video: {
       'Video/RetroRenderingMode': '0',

@@ -16,6 +16,7 @@ import { readFileSync } from 'node:fs';
 import { waterSurfaceFs } from '../../src/render/waterSurface.js';
 import { Renderer, groundSamplerFor, groundSharpnessTier } from '../../src/render/renderer.js';
 import { setValue } from '../../src/systems/settings/settings.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -86,6 +87,7 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   assert.deepEqual(groundSamplerFor('nonsense', 4), { aniso: 4, minFilter: 'LINEAR_MIPMAP_LINEAR' }, 'a junk tier is trilinear');
   assert.equal(groundSharpnessTier('?ground=max'), 'max', 'the ?ground door names the tier');
   assert.equal(groundSharpnessTier('?x=1'), 'default', '...and without it the pref answers (a fresh shelf: the row\u2019s default)');
+  setPref('mipQuality', 'standard');   // this test is about the driver's chain; Sharp's is in mip-upload.test.js
   const log = [];
   const r = recordingRenderer(log);
   r.uploadTileArray(302, layers());

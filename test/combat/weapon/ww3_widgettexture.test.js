@@ -43,7 +43,7 @@ function stubRenderer() {
       if (k === 'getProgramParameter' || k === 'getShaderParameter') return () => true;
       if (k === 'getUniformLocation' || k === 'getAttribLocation') return () => ({});
       if (typeof k === 'string' && k.startsWith('create')) return () => ({});
-      if (k === 'texImage2D') return (...a) => uploads.push({ width: a[3], height: a[4], pixels: a[8] });
+      if (k === 'texImage2D') return (...a) => { if (a[1] === 0) uploads.push({ width: a[3], height: a[4], pixels: a[8] }); };   // level 0: the mip levels are not uploads of the picture
       if (k === 'drawingBufferWidth' || k === 'drawingBufferHeight') return 320;
       if (typeof k === 'string' && k.toUpperCase() === k) return 1;   // GL enums
       return () => {};

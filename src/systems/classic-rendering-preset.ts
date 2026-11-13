@@ -58,6 +58,7 @@ export const GRAPHICS_PROFILES_PREF = 'graphicsProfiles';
 export const CLASSIC_RENDERING_ROWS: Readonly<Record<string, RowValue>> = Object.freeze({
   'land-view-distance': 3,
   'ground-sharpness': 'off',
+  'mip-quality': 'standard',
   'enhanced-lighting': false,
   'enhanced-environments': 'off',
 });

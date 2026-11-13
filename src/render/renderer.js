@@ -741,7 +741,8 @@ import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, filterWorldPicture, freshWorldPicture, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { bleedForFilter } from './alpha-bleed.ts';
-import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor, groundMaskClamped } from './ground-sampler.ts';
+import { ArrayMips, applyMipQuality, uploadWorldMips } from './mip-upload.ts';
+import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor, groundClampedFlag } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
@@ -993,7 +994,7 @@ const vec2 TRANS[4] = vec2[4](
   vec2(0.0, 0.0), vec2(0.0, 1.0), vec2(1.0, 1.0), vec2(1.0, 0.0));
 ${roadEdgeGlsl()}
 ${groundEdgeGlsl()}   // COAST-LOOK: a transition's two kinds, the sea's cut on their line (render/groundEdgeGlsl.js)
-${WATER_BED_GLSL}
+${WATER_BED_GLSL}${tileEdgeGlsl()}
 void main() {
   vec2 unwrapped = vLocalXZ / uTileSize;
   ivec2 cell = clamp(ivec2(floor(unwrapped)), ivec2(0), ivec2(127));
@@ -1001,7 +1002,7 @@ void main() {
   int layer = int(data >> 2u);
   int t = int(data & 3u);
   vec2 tileUV = fract(unwrapped);
-  vec2 tuv = ROT[t] * tileUV + TRANS[t];
+  vec2 tuv = ROT[t] * tileEdgeHold(tileUV, cell, data, dFdx(unwrapped), dFdy(unwrapped)) + TRANS[t];   // a two-ground tile does not wrap into a different neighbour (render/tile-edge-glsl.ts)
   // GRAIN1:
   // THE TILE ARRAY IS MIPMAPPED, AND THE GRADIENT IS THE UNWRAPPED ONE.
   //
@@ -1530,7 +1531,7 @@ export const PANEL_CLEAR_RGBA = Object.freeze([49 / 255, 77 / 255, 121 / 255, 5 
 import { WATER_MAP_COLOR } from './underwaterFog.js';
 import { WATER_SURFACE_VS, waterSurfaceFs } from './waterSurface.js';   // WATER1: the enhanced water pass over the terrain grid
 import { WATER_LAYER_UNITS, WATER_SCENE_UNIT, WATER_SCENE_DEPTH_UNIT, NO_BED_DEPTH, WATER_RIPPLE_UNIT } from './waterSurface.js';   // FIELD BUGS 2026-09-29 (the sea) #4: WATER1's offset is the sea's surface film's
-import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js';   // WATER-NEXT 2: the ground under the water is a bed
+import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js'; import { tileEdgeGlsl } from './tile-edge-glsl.ts';   // WATER-NEXT 2: the ground under the water is a bed
 import { packWaterMask, WATER_DRAW_MASK_TABLE } from '../world/water/waterCorners.js';   // MAC2: the corner table's one home; WATER-DRAW1: the PASS takes the draw's table, not the feet's
 import { SKIN_PAL_ROW, SKIN_PALETTE_UNIT } from './skinPalette.js';   // MWNPC1: the GPU skin's palette shape
 import { lightIdsOf, lightList, packLight } from './lightId.js';   // LIGHT-ID: each light's identity, lifted off its list for the shadow pass (and the flash packed through the seam)
@@ -2436,7 +2437,7 @@ export class Renderer {
     this.tUTilemap = gl.getUniformLocation(this.terrainProgram, 'uTilemap');
     this.tUTileSize = gl.getUniformLocation(this.terrainProgram, 'uTileSize');
     this.tUWaterBed = gl.getUniformLocation(this.terrainProgram, 'uWaterBed');   // WATER-NEXT 2: the bed under the water
-    this.tUBedMask = gl.getUniformLocation(this.terrainProgram, 'uBedMask'); this.tUBedMaskClamped = gl.getUniformLocation(this.terrainProgram, 'uBedMaskClamped');
+    this.tUBedMask = gl.getUniformLocation(this.terrainProgram, 'uBedMask'); this.tUGroundClamped = gl.getUniformLocation(this.terrainProgram, 'uGroundClamped');
     this.tURoadEdge = gl.getUniformLocation(this.terrainProgram, 'uRoadEdge');   // ROAD-LOOK: the road's edge blended (render/roadEdgeGlsl.js)
     this.tUGroundEdge = gl.getUniformLocation(this.terrainProgram, 'uGroundEdge');   // COAST-LOOK: the ground's kinds blended, the sea cut on their line (render/groundEdgeGlsl.js)
     // ECOTONE1 (render/ecotoneGlsl.js): the neighbours' tile sets' samplers, which set each neighbour wears, and the
@@ -5353,16 +5354,13 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const world = isWorldArt(opts, mips, own);
     const bytes = color32Bytes(color32, `uploadTexture(${archive}, ${record})`);   // WW3: the shape's own error, not a TypeError three frames down
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
-      // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer, and
-      // `.buffer` would upload that whole buffer from zero (color32Bytes)
-      gl.RGBA, gl.UNSIGNED_BYTE, bleedForFilter(world, bytes, color32.width, color32.height),   // no black cut-out edge under a linear filter
-    );
+    const level0 = bleedForFilter(world, bytes, color32.width, color32.height);   // no black cut-out edge under a linear filter
+    // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer (color32Bytes)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, level0);
     const { wrap, filter } = textureParams(gl, opts);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
-    if (mips) gl.generateMipmap?.(gl.TEXTURE_2D);
+    const wrapS = own ? own.wrapS : wrap, wrapT = own ? own.wrapT : wrap;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+    if (mips) uploadWorldMips(gl, tex, level0, color32.width, color32.height, { wrapX: wrapS === gl.REPEAT, wrapY: wrapT === gl.REPEAT });
     filterUpload(gl, tex, world, mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: TryImportTexture's - DFU's retro arm never reaches it (J7: a lost context's null is no key)
     else if (mips && !this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
@@ -6799,19 +6797,18 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     gl.bindTexture(gl.TEXTURE_2D, tex);
     this._forgetTextureShadows();   // PERF-TEX: an upload owns unit 1 and leaves it ACTIVE - no shadow may speak past it (AUDIT-AIR1: through the one home, like the other six)
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
-      gl.RGBA, gl.UNSIGNED_BYTE, color32Bytes(color32, `uploadEmissionTexture(${archive}, ${record})`)   // AUDIT 19 F7: the view, not its buffer; WW3: named when the shape is wrong
-    );
+    const emissionBytes = color32Bytes(color32, `uploadEmissionTexture(${archive}, ${record})`);   // the view, not its buffer; named when the shape is wrong
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, emissionBytes);
     const own = opts.sampler ? samplerParams(gl, opts.sampler, true) : null;   // its albedo's own sampling
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : gl.REPEAT);
+    const wrapS = own ? own.wrapS : gl.REPEAT, wrapT = own ? own.wrapT : gl.REPEAT;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
     // REVIEW 2026-09-05: the emission map carries the same chain as the
     // albedo (TextureReader.cs:316/:328/:340 new Texture2D(..., MipMaps),
     // :306 reuses the mipped albedo) and is point-sampled over it
     // (MaterialReader.cs:448/:104). The shader subtracts one from the
     // other (:108-109): both samples must come from the same mip level.
-    gl.generateMipmap?.(gl.TEXTURE_2D);
+    uploadWorldMips(gl, tex, emissionBytes, color32.width, color32.height, { wrapX: wrapS === gl.REPEAT, wrapY: wrapT === gl.REPEAT, opaque: true });   // the albedo's chain kind
     filterUpload(gl, tex, !own, true, own, gl.NEAREST);   // the albedo's world filter too, so both samples still blend alike
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: a replacement albedo's map - neither is capped (J7: a lost context's null is no key)
     else if (!this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: the albedo's cap, so both samples still come from one level
@@ -7354,8 +7351,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const w = layers[0].width;
     const h = layers[0].height;
     gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, w, h, layers.length, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    const mips = new ArrayMips(gl, w, h, layers.length);   // Mip quality Sharp builds each layer's levels as the layer goes up
     for (let i = 0; i < layers.length; i++) {
-      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, w, h, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(layers[i].colors.buffer, layers[i].colors.byteOffset, w * h * 4));
+      mips.put(i, new Uint8Array(layers[i].colors.buffer, layers[i].colors.byteOffset, w * h * 4));
       if ((i + 1) % TILE_LAYERS_A_STEP === 0 && i + 1 < layers.length) { yield; gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex); }
     }
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
@@ -7364,7 +7362,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // real footprint and the tile wrap blurs no line round a tile. Magnification and the wrap are the world filter's
     // (_setGroundSampler): NEAREST and a clamp under Point. A 2D array mipmaps each layer on its own, so no tile bleeds
     // into another.
-    gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+    mips.finish(tex);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
     // a grazing angle almost everywhere, and an isotropic mip has to take
@@ -7452,6 +7450,8 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     return s;
   }
 
+  /** Gives every remembered world texture the chain the Mip quality row asks for, the frame after it changes. */
+  applyMipQuality() { this._activeTexture(this.gl.TEXTURE0); applyMipQuality(this.gl); this._forgetTextureShadows(); }
   /** GRAIN AUDIT 1: THE DIAL LANDS. `uploadTileArray` returns the cached
    *  array for any archive the page has seen, and the cache lives as long
    *  as the renderer - the whole page - so a tier read at upload time
@@ -7769,7 +7769,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       gl.uniformMatrix4fv(this.tUView, false, this._view);
       // WATER-NEXT 2: the ground under the enhanced water is a bed - the switch and the corner table, a frame's like the rest
       gl.uniform1f(this.tUWaterBed, this.waterBed ? 1 : 0);
-      gl.uniform4uiv(this.tUBedMask, BED_MASK); gl.uniform1f(this.tUBedMaskClamped, groundMaskClamped(gl));   // the mask's margin, off where the ground clamps
+      gl.uniform4uiv(this.tUBedMask, BED_MASK); gl.uniform1f(this.tUGroundClamped, groundClampedFlag(gl));   // the margins at a tile's edge, off where the ground clamps
       gl.uniform1f(this.tURoadEdge, this.roadEdges ? 1 : 0);   // ROAD-LOOK: a frame's, as the bed's switch
       gl.uniform1f(this.tUGroundEdge, this.coastEdges ? 1 : 0);   // COAST-LOOK: a frame's, as the road edge's
       this._uploadFog(this._terrainFog);

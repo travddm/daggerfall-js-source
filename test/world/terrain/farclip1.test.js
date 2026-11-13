@@ -103,6 +103,7 @@ function terrainFragment(fs) {
   const f = glslFunctions(fs, {
     vLocalXZ: [TILE / 2, TILE / 2], vWorldPos: [0, 30, 0], vNormal: [0, 1, 0], uTileSize: TILE,
     texelFetch: (_s, c) => [byteAt(c[0], c[1]), 0, 0, 0],
+    textureSize: () => [64, 64, 56],   // the tile array's size, for a two-ground tile's edge margin (render/tile-edge-glsl.ts)
     dFdx: (x) => { dx = true; return x.map(() => 0.01); },
     dFdy: (x) => { dy = true; return x.map(() => 0.02); },
     textureGrad: (_s, p, gx, gy) => { sample = { layer: p[2], uv: p.slice(0, 2), gx, gy }; throw new Sampled(); },

@@ -15,6 +15,7 @@
 import { FOG_FACTOR_GLSL } from './labGrass.js';
 import { buildProgram } from './glProgram.js';
 import { filterWorldPicture, freshWorldPicture } from './world-texture-filter.ts';
+import { uploadCanvasMips } from './mip-upload.ts';
 import { bannerClock, BANNER_TEXTURE_IDLE_S } from './bannerPass.js';
 import { BAYER_GLSL, DISSOLVE_GLSL } from './orderedDither.js';   // AUDIT 2: SHIP-FADE's dissolve, her cloth with her hull
 
@@ -183,7 +184,7 @@ export class ShipFlagRenderer {
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, /** @type {any} */ (canvas));
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-    gl.generateMipmap(gl.TEXTURE_2D);
+    uploadCanvasMips(gl, tex, canvas);
     filterWorldPicture(gl, tex, gl.TEXTURE_2D, true);   // the world's texture filter and anisotropy
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
