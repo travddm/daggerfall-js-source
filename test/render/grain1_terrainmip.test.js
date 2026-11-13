@@ -14,7 +14,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { waterSurfaceFs } from '../../src/render/waterSurface.js';
-import { Renderer, anisotropyFor, groundSamplerFor, groundSharpnessTier } from '../../src/render/renderer.js';
+import { Renderer, groundSamplerFor, groundSharpnessTier } from '../../src/render/renderer.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -44,27 +44,13 @@ test('GRAIN1: every tile-array sample takes its footprint from the UNWRAPPED coo
   assert.doesNotMatch(fs, /texture\(uTileArr, vec3\(uv, 0\.0\)\)/, 'no implicit sample survives there either');
 });
 
-test('GRAIN2: the anisotropy is a DIAL, and its tiers never exceed what the driver allows', async () => {
-  const { anisotropyFor } = await import('../../src/render/renderer.js');
+test("GRAIN2: Ground sharpness is the ground's minification, and its row the player's own online", async () => {
   const { FEATURE_PREF_DEFAULTS, FEATURES } = await import('../../src/systems/features.js');
-  // 1 is the extension's own word for "no anisotropy" - not 0, which is
-  // not a legal value for TEXTURE_MAX_ANISOTROPY_EXT.
-  assert.equal(anisotropyFor('off', 16), 1);
-  assert.equal(anisotropyFor('default', 16), 4, 'the safe end, and the default');
-  assert.equal(anisotropyFor('max', 16), 16, 'the driver’s own ceiling');
-  // NEVER past the driver: a machine that allows 2 gets 2 for both the
-  // default and the maximum, and a driver with no extension at all is 1.
-  assert.equal(anisotropyFor('max', 2), 2);
-  assert.equal(anisotropyFor('default', 2), 2);
-  for (const t of ['off', 'default', 'max']) assert.equal(anisotropyFor(t, 0), 1, `${t} with no extension`);
-  // an unknown tier - a pref stored by a future build - is the default,
-  // never the maximum and never off
-  for (const t of [undefined, null, '', 'nonsense', 16, true]) assert.equal(anisotropyFor(t, 16), 4, `${JSON.stringify(t)} falls back`);
   // and the row exists, with the safe default, as the player's own online
   assert.equal(FEATURE_PREF_DEFAULTS.groundSharpness, 'default');
   const row = FEATURES.find((f) => f.id === 'ground-sharpness');
   assert.ok(row, 'the Features row is there for the player to turn');
-  assert.deepEqual(row.control.tiers.map(([k]) => k), ['off', 'default', 'max']);
+  assert.deepEqual(row.control.tiers.map(([k]) => k), ['off', 'default'], "nearest-mip or trilinear: its anisotropy is the Anisotropic Filtering row's");
   assert.equal(row.control.online, 'player', 'one player’s dial is not everyone’s');
   assert.match(row.effect, /at once/, 'the renderer re-applies the tier to the cached arrays on the next frame after a change (render/live-world-sampling.ts), as well as at every world load');
   assert.deepEqual([...row.kinds], ['enhanced', 'classic'], 'GRAIN AUDIT 1: both lanes sample the one array, so both lanes get the dial');
@@ -93,10 +79,10 @@ const calls = (log, name) => log.filter((c) => c[0] === name);
 const layers = () => [{ width: 2, height: 2, colors: new Uint8ClampedArray(16) }, { width: 2, height: 2, colors: new Uint8ClampedArray(16) }];
 
 test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive, nothing on a cached archive, the filter and the anisotropy by tier, and the dial LANDS on a world load', () => {
-  assert.deepEqual(groundSamplerFor('off', 16), { aniso: 1, minFilter: 'NEAREST_MIPMAP_NEAREST' }, 'Off is the mipmap alone, point-sampled: ONE fetch, the pre-GRAIN1 cost with the boil gone');
-  assert.deepEqual(groundSamplerFor('default', 16), { aniso: 4, minFilter: 'LINEAR_MIPMAP_LINEAR' });
-  assert.deepEqual(groundSamplerFor('max', 16), { aniso: 16, minFilter: 'LINEAR_MIPMAP_LINEAR' });
-  assert.deepEqual(groundSamplerFor('nonsense', 8), { aniso: 4, minFilter: 'LINEAR_MIPMAP_LINEAR' }, 'a junk tier is the default');
+  assert.deepEqual(groundSamplerFor('off'), { aniso: 1, minFilter: 'NEAREST_MIPMAP_NEAREST' }, 'Off is the mipmap alone, point-sampled: ONE fetch, the pre-GRAIN1 cost with the boil gone');
+  assert.deepEqual(groundSamplerFor('default', 8), { aniso: 8, minFilter: 'LINEAR_MIPMAP_LINEAR' }, 'the anisotropy is carried, not chosen: the Anisotropic Filtering row chooses it');
+  assert.deepEqual(groundSamplerFor('max', 8), { aniso: 8, minFilter: 'LINEAR_MIPMAP_LINEAR' }, 'a stored Maximum from before is trilinear');
+  assert.deepEqual(groundSamplerFor('nonsense', 4), { aniso: 4, minFilter: 'LINEAR_MIPMAP_LINEAR' }, 'a junk tier is trilinear');
   assert.equal(groundSharpnessTier('?ground=max'), 'max', 'the ?ground door names the tier');
   assert.equal(groundSharpnessTier('?x=1'), 'default', '...and without it the pref answers (a fresh shelf: the row\u2019s default)');
   const log = [];
@@ -106,7 +92,7 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   assert.ok(log.findIndex((c) => c[0] === 'texSubImage3D') < log.findIndex((c) => c[0] === 'generateMipmap'), 'built after the layers');
   const minOf = (l) => calls(l, 'texParameteri').filter((c) => c[2] === 'TEXTURE_MIN_FILTER').pop()?.[3];
   const anisoOf = (l) => calls(l, 'texParameterf').filter((c) => c[2] === 'TEXTURE_MAX_ANISOTROPY_EXT').pop()?.[3];
-  assert.equal(minOf(log), 'LINEAR_MIPMAP_LINEAR', 'the default tier: trilinear'); assert.equal(anisoOf(log), 4, '...at 4x');
+  assert.equal(minOf(log), 'LINEAR_MIPMAP_LINEAR', 'the default tier: trilinear'); assert.equal(anisoOf(log), 8, "...at the Anisotropic Filtering row's 8x (under Sharp, the default filter)");
   assert.equal(calls(log, 'texParameteri').find((c) => c[2] === 'TEXTURE_MAG_FILTER')[3], 'NEAREST');
   assert.equal(calls(log, 'getExtension').filter((c) => c[1] === 'EXT_texture_filter_anisotropic').length, 1, 'the extension asked once');
   log.length = 0;
@@ -119,16 +105,16 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   log.length = 0;
   r._tArrayTex = {};   // as if a terrain draw had bound an array this frame
   const s = r.applyGroundSharpness('off');
-  assert.deepEqual(s, { aniso: 1, minFilter: 'NEAREST_MIPMAP_NEAREST' });
+  assert.deepEqual(s, { aniso: 8, minFilter: 'NEAREST_MIPMAP_NEAREST' }, "Off sets the filter; the anisotropy stays the row's");
   assert.equal(calls(log, 'bindTexture').filter((c) => c[1] === 'TEXTURE_2D_ARRAY').length, 2, 'both cached arrays bound');
   assert.deepEqual(calls(log, 'texParameteri').filter((c) => c[2] === 'TEXTURE_MIN_FILTER').map((c) => c[3]), ['NEAREST_MIPMAP_NEAREST', 'NEAREST_MIPMAP_NEAREST'], 'Off: point-sampled over the chain, on BOTH');
-  assert.deepEqual(calls(log, 'texParameterf').map((c) => c[3]), [1, 1], 'and the anisotropy SET to 1, not skipped - a cached array at 16x must come down');
+  assert.deepEqual(calls(log, 'texParameterf').map((c) => c[3]), [8, 8], "and the row's anisotropy SET again on both, not skipped");
   assert.equal(calls(log, 'generateMipmap').length, 0, 'no chain rebuilt'); assert.equal(calls(log, 'texSubImage3D').length, 0, 'no upload');
   assert.equal(r.groundTier, 'off');
   assert.equal(r._tArrayTex, null, 'PERF-TEX2\u2019s array shadow is forgotten, so the next terrain draw binds its own');
   log.length = 0;
   r.applyGroundSharpness('max');
-  assert.deepEqual(calls(log, 'texParameterf').map((c) => c[3]), [16, 16], 'Maximum: the driver\u2019s ceiling');
+  assert.deepEqual(calls(log, 'texParameterf').map((c) => c[3]), [8, 8], "a stored Maximum: the row's anisotropy");
   assert.deepEqual(calls(log, 'texParameteri').filter((c) => c[2] === 'TEXTURE_MIN_FILTER').map((c) => c[3]), ['LINEAR_MIPMAP_LINEAR', 'LINEAR_MIPMAP_LINEAR']);
   // a driver WITHOUT the extension: asked once, remembered as false, never asked again, and the filter still set
   const log2 = [];

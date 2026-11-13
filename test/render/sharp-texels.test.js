@@ -8,12 +8,7 @@ import {
   sharpenWorldFs,
   worldSampleCount,
 } from '../../src/render/sharp-texels.ts';
-import {
-  worldFilterFor,
-  spriteFilterScale,
-  qualityAnisotropyFor,
-  POINT,
-} from '../../src/render/world-texture-filter.ts';
+import { worldFilterFor, spriteFilterScale, POINT } from '../../src/render/world-texture-filter.ts';
 import { Renderer } from '../../src/render/renderer.js';
 import { EL_LANE } from '../../src/render/enhancedLighting.js';
 import {
@@ -75,7 +70,6 @@ test('the rewrite: every world-art sample, the helpers once after the precisions
 test("Sharp's samplers: trilinear on mip-mapped world art, nearest and scale 1 on the sprites, the level's anisotropy", () => {
   assert.deepEqual(worldFilterFor(E, SHARP, true), { min: E.LINEAR_MIPMAP_LINEAR, mag: E.LINEAR });
   assert.deepEqual(worldFilterFor(E, SHARP, false), { min: E.NEAREST, mag: E.NEAREST });
-  assert.equal(qualityAnisotropyFor(5, SHARP, 16), 9, 'Fantastic forces 9x: the sampler is linear, so ANGLE keeps it');
   resetSettings();
   try {
     assert.equal(getString('Video', 'MainFilterMode'), '3', "the port's default is Sharp");

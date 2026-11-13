@@ -5,8 +5,8 @@
 // and anisotropy filter it. The sampler being linear also keeps Direct3D under ANGLE from smearing the texels, which it
 // does to a NEAREST sampler that has anisotropy.
 //
-// The world shaders are rewritten for Sharp as text: their world-art samples (the model and flat maps, the ground and
-// its neighbour sets) call the helpers below with the original coordinate's gradients, so the mip and the anisotropy
+// The world shaders are rewritten for Sharp as text: their world-art samples (the model and flat maps, the ground, its
+// neighbour sets and the snow ground's albedo) call the helpers below with the original coordinate's gradients, so the mip and the anisotropy
 // still follow the real footprint. Every other sample (screen quads, the sky, data textures) is left as it is.
 
 /** The Video/MainFilterMode value of Sharp. Points 0 to 2 are DFU's Point, Bilinear and Trilinear. */
@@ -44,6 +44,8 @@ const SAMPLE_REWRITES: ReadonlyArray<readonly [string, string]> = [
   ['textureGrad(uEcoArr1,', 'sharpGrad(uEcoArr1,'],
   ['textureGrad(uEcoArr2,', 'sharpGrad(uEcoArr2,'],
   ['textureGrad(uEcoArr3,', 'sharpGrad(uEcoArr3,'],
+  // the snow ground's albedo, in the terrain's snow program: the same arguments as sharpTex
+  ['textureGrad(uSnowAlbedo,', 'sharpTex(uSnowAlbedo,'],
 ];
 
 /** How many world-art samples a shader has, by the table above (for the tests). */

@@ -40,6 +40,7 @@ import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
 import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW, TERRAIN_SLOPE_CUT_ROW, CLAW_METAL_ROW, LEGENDARY_EQUIP_FREE_ROW, GENTLE_EQUIP_BILL_ROW, SOLD_GOODS_ON_SHELF_ROW, ABSORPTION_LIMITS_ROW, OPENING_DAMAGE_ROW, ELITE_STACKING_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
 import { CLASSIC_PICTURE_ROWS } from './classic-picture-rows.ts';
+import { ANISOTROPIC_FILTERING_ROW } from './anisotropic-filtering-row.ts';
 import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js'; import { SPAWNED_DUNGEONS_ROW } from './dungeon/spawned-dungeons-row.js'; import { ELTHERIC_SEA_ROW } from './elthericSeaRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
@@ -622,27 +623,19 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'cloudQuality', initial: 'default', online: 'player', tiers: Object.freeze([tier('default', () => t('features.cloudQuality.default', 'Default')), tier('lo', () => localizedText('low', 'Low')), tier('hi', () => localizedText('high', 'High'))]) }),   // PERF1: volumetricClouds.js QUALITY; a dial, the player's online
   }),
-  // GRAIN2: GROUND
-  // SHARPNESS. GRAIN1 mipmapped the terrain tiles, which took the grain
-  // off the distance and put a little blur in its place at a grazing
-  // angle - and terrain is grazing almost everywhere. Anisotropy is the
-  // one filtering term that buys that sharpness back, and how much of it
-  // to ask for is a MACHINE's question, not a number to guess at once
-  // for everybody: it is paid in fill rate, on the pass that covers the
-  // most screen. 4x was a conservative default and nothing more. This is
-  // the dial, so a machine with room can take the driver's maximum and a
-  // laptop can drop to the mipmap alone. The player's own online, as the
-  // cloud dial is.
+  // Ground sharpness: the ground's minification, the mip chain read nearest (Off, one fetch, the cheapest) or blended
+  // (trilinear). Its anisotropy is the Anisotropic Filtering row's, which follows it. The player's own online.
   Object.freeze({
     id: 'ground-sharpness',
     group: 'sight',
     get title() { return t('features.groundSharpness.title', 'Ground sharpness'); },
-    get note() { return t('features.groundSharpness.note', 'How sharp the ground looks into the distance. Off is the cheapest and blurs far ground; Maximum is '
-      + 'the sharpest. Turn it down if the outdoors run slow.'); },
+    get note() { return t('features.groundSharpness.note', 'How smoothly the ground blends into the distance. Off is the cheapest. How clear it stays at a '
+      + 'slant is Anisotropic filtering.'); },
     get effect() { return t('features.effect.atOnce', 'Takes effect at once.'); },   // the renderer re-filters the ground arrays on the frame after a change
     kinds: Object.freeze(['enhanced', 'classic']),
-    control: Object.freeze({ store: 'prefs', key: 'groundSharpness', initial: 'default', online: 'player', tiers: Object.freeze([tier('off', OFF), tier('default', () => t('features.groundSharpness.default', 'Default (4x)')), tier('max', () => t('features.groundSharpness.max', 'Maximum'))]) }),
+    control: Object.freeze({ store: 'prefs', key: 'groundSharpness', initial: 'default', online: 'player', tiers: Object.freeze([tier('off', OFF), tier('default', () => t('features.groundSharpness.default', 'Smooth'))]) }),
   }),
+  ANISOTROPIC_FILTERING_ROW,   // beyond DFU: every world texture and the ground (render/anisotropic-filtering.ts)
   // RW1: REAL WINDOWS - from the street a
   // room behind every house window, from inside the real world through the glass (render/realWindows.js carries the
   // law; `?windows=off|rooms|full` the kill door). Rooms only drops the costly half - the view out is a second pass over

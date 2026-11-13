@@ -2064,8 +2064,8 @@ function categoryCard({ pool = portPool(), pause = false } = {}) {
 /** The quality preset's words, in the player's language; the search finds the row by them and by the rows' titles. */
 const PRESET_WORDS = {
   name: () => t('menu.settings.preset.name', 'Quality preset'),
-  note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.'),
-  effect: () => t('menu.settings.preset.effect', 'Steady shadows, the windows and ground sharpness change at once; the rest when the world next loads.'),
+  note: () => t('menu.settings.preset.note', 'View distance, grass, clouds, ground sharpness, anisotropic filtering, water, windows and steady shadows.'),
+  effect: () => t('menu.settings.preset.effect', 'Steady shadows, the windows, ground sharpness and anisotropic filtering change at once; the rest when the world next loads.'),
   custom: () => t('menu.settings.preset.custom', 'Custom'),
 };
 const PRESET_LABELS = {
@@ -2073,7 +2073,7 @@ const PRESET_LABELS = {
   high: () => t('menu.settings.preset.high', 'High'), ultra: () => t('menu.settings.preset.ultra', 'Ultra'),
 };
 export const presetSearchText = () => ['quality preset graphics low medium high ultra performance frame rate slow',
-  'View distance, grass, clouds, ground sharpness, water, windows and steady shadows.', PRESET_WORDS.name(), PRESET_WORDS.note(), PRESET_WORDS.effect(),
+  'View distance, grass, clouds, ground sharpness, anisotropic filtering, water, windows and steady shadows.', PRESET_WORDS.name(), PRESET_WORDS.note(), PRESET_WORDS.effect(),
   ...GRAPHICS_PRESETS.map((p) => PRESET_LABELS[p.id]?.() ?? p.label),
   ...PRESET_ROWS.map((id) => FEATURES.find((f) => f.id === id)?.title ?? ''),
   ...PRESET_PARTS.map((k) => FEATURES.flatMap((f) => resolveControl(f)?.parts ?? []).find((pt) => pt.key === k)?.label ?? k)].join(' ');
