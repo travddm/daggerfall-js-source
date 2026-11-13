@@ -1232,8 +1232,8 @@ test('AUDIT-AIR1: the shadow reset is ONE HOME - six copies of a rule is five ch
   // RETRO1: an eighth - the retro present binds units 0..2, a program and a VAO of its own (render/retroPass.js), and
   // it runs as the classic lane's resolve as well as after the air's, so it forgets for itself
   // and a ninth: a cached world texture re-filtered for a changed world filter is bound on its unit (_worldHit)
-  assert.equal((src.match(/this\._forgetTextureShadows\(\);/g) || []).length, 9,
-    'the constructor, endWorldPass, _installWorldSet, markForeignPass, beginFrame, uploadEmissionTexture, the air resolve, the retro present and _worldHit');
+  assert.equal((src.match(/this\._forgetTextureShadows\(\);/g) || []).length, 10,
+    'the constructor, endWorldPass, _installWorldSet, markForeignPass, beginFrame, uploadEmissionTexture, the air resolve, the retro present, _worldHit and applyMipQuality');
   // the air resolve's call sits AFTER the composite, because the
   // composite is what invalidates them
   const air = src.slice(src.indexOf('_compositeAir() {'));

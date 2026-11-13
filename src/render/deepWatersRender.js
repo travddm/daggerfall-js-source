@@ -47,6 +47,7 @@ import { buildProgram } from './glProgram.js';
 import { SHARP, SHARP_TEXEL_ARRAY_GLSL, SHARP_TEXEL_GLSL } from './sharp-texels.ts';
 import { filterWorldPicture, freshWorldPicture, worldFilterMode } from './world-texture-filter.ts';
 import { bleedTransparentTexels } from './alpha-bleed.ts';
+import { allocateArrayMips, hasMips, mipQuality, trackMips, uploadLayerMips } from './mip-upload.ts';
 import { FOG_GLSL } from './fogGlsl.js';
 import { COLUMN_GLSL } from './columnGlsl.js';   // DW-F: the column's share, one home (the renderer's billboards take it too)
 import { WATER_LAYER_UNITS } from './waterSurface.js';   // FIELD BUGS 2026-09-29 (the sea) #4: the top's place in the sea's stack
@@ -668,7 +669,12 @@ export class DeepWatersRenderer {
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, w, h, n, 0, gl.RGBA, gl.UNSIGNED_BYTE, bytes);
-    gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+    const mipSpec = { wrapX: false, wrapY: false };
+    if (mipQuality() === 'sharp' && hasMips(w, h)) {
+      allocateArrayMips(gl, w, h, n);
+      for (let i = 0; i < n; i++) uploadLayerMips(gl, bytes.subarray(i * w * h * 4, (i + 1) * w * h * 4), w, h, i, mipSpec);
+    } else gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+    trackMips(tex, gl.TEXTURE_2D_ARRAY, w, h, n, mipSpec);
     filterWorldPicture(gl, tex, gl.TEXTURE_2D_ARRAY, true);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);

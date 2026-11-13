@@ -17,6 +17,7 @@ import { dayOfSky, dayAndHourOf, airFall, airFallInto, setAirGround } from '../.
 import { createSnowCoverHost } from '../../src/scenes/snowCoverHost.js';
 import { createGroundSets } from '../../src/scenes/groundSets.js';
 import { Renderer, TILE_LAYERS_A_STEP } from '../../src/render/renderer.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
 import { CLIMATES } from '../../src/formats/mapsFile.js';
 
 /** A WebGL2 just deep enough for the grass renderer and the tile arrays: every call recorded. */
@@ -270,6 +271,7 @@ test('OW-HITCH ground sets: a set is made ONCE a key while builds ask for it tog
       return (...args) => { log.push([k, ...args]); };
     },
   });
+  setPref('mipQuality', 'standard');   // this test counts the driver's chain; Sharp's is in mip-upload.test.js
   const renderer = new Renderer({ getContext: () => stub, clientWidth: 64, clientHeight: 64, width: 64, height: 64 });
   const set = paintedSet(5, 8);
   let texReads = 0;
