@@ -60,7 +60,7 @@ test('AUDIT NAVAL-REFIT the flag\'s cloth: a flag that will not paint is remembe
   const gl = {
     TEXTURE_2D: 1, created: 0, deleted: 0,
     createTexture() { this.created++; return { id: this.created }; }, deleteTexture() { this.deleted++; },
-    bindTexture() {}, pixelStorei() {}, texImage2D() {}, generateMipmap() {}, texParameteri() {}, getExtension() { return null; },
+    bindTexture() {}, pixelStorei() {}, texImage2D() {}, generateMipmap() {}, texParameteri() {}, getExtension() { return null; }, getParameter() { return null; },
   };
   let paints = 0, can = false;
   const pass = Object.assign(Object.create(ShipFlagRenderer.prototype), { gl, textures: new Map(), paint: () => { paints++; return can ? {} : null; } });
