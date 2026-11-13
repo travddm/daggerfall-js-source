@@ -14,21 +14,31 @@ export const SHARP = 3;
 
 /** The coordinate math, in texel space: `t` the coordinate times the texture size, `fw` the footprint of one screen
  *  pixel in texels. Inside a texel the result is its centre; within half a pixel of an edge it ramps across. Where a
- *  texel is smaller than a pixel (fw of 1 or more) the coordinate is unchanged. */
-export const SHARP_TEXEL_GLSL = `vec2 sharpTexel(vec2 t, vec2 fw) {
+ *  texel is smaller than a pixel (fw of 1 or more) the coordinate is unchanged. A footprint of zero snaps every
+ *  coordinate to its texel's centre.
+ *
+ *  `uSharpRetro` holds the retro modes' values (render/retro-sharp.ts): x 1 drops the edge blend (the footprint is
+ *  taken as zero), y is a mip bias in levels, applied by scaling the gradients the mip and the anisotropy are chosen
+ *  from. Both are 0 outside the retro modes. */
+export const SHARP_TEXEL_GLSL = `uniform vec2 uSharpRetro;
+vec2 sharpTexel(vec2 t, vec2 fw) {
   vec2 seam = floor(t + 0.5);
   return seam + clamp((t - seam) / clamp(fw, vec2(1e-5), vec2(1.0)), -0.5, 0.5);
 }
 vec4 sharpTex(sampler2D s, vec2 uv, vec2 gx, vec2 gy) {
   vec2 size = vec2(textureSize(s, 0));
-  return textureGrad(s, sharpTexel(uv * size, (abs(gx) + abs(gy)) * size) / size, gx, gy);
+  vec2 fw = (abs(gx) + abs(gy)) * size * (1.0 - uSharpRetro.x);
+  float mipScale = exp2(uSharpRetro.y);
+  return textureGrad(s, sharpTexel(uv * size, fw) / size, gx * mipScale, gy * mipScale);
 }
 `;
 
 /** The ground's overload, for shaders that declare a sampler2DArray precision. */
 const SHARP_TEXEL_ARRAY = `vec4 sharpGrad(sampler2DArray s, vec3 p, vec2 gx, vec2 gy) {
   vec2 size = vec2(textureSize(s, 0).xy);
-  return textureGrad(s, vec3(sharpTexel(p.xy * size, (abs(gx) + abs(gy)) * size) / size, p.z), gx, gy);
+  vec2 fw = (abs(gx) + abs(gy)) * size * (1.0 - uSharpRetro.x);
+  float mipScale = exp2(uSharpRetro.y);
+  return textureGrad(s, vec3(sharpTexel(p.xy * size, fw) / size, p.z), gx * mipScale, gy * mipScale);
 }
 `;
 

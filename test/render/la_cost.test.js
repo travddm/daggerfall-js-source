@@ -237,7 +237,7 @@ test('LA-COST1: THE SECOND CALL IN A FRAME SENDS ONLY ITS OWN - a billboard call
   // must not ride onto the next frame's flats)
   // LPT1: and the low-poly trees' mesh mode and handover, set off (two more - a
   // call the trees drew in leaves the handover on for the flats after it)
-  assert.deepEqual(counts, ['billboards 111 -> 30', 'decals 86 -> 12', 'a character 87 -> 13']);
+  assert.deepEqual(counts, ['billboards 112 -> 30', 'decals 87 -> 12', 'a character 88 -> 13']);
   // ...and the next frame sends them all again
   r.beginFrame(PROJ, VIEW, new Float32Array([0.3, 0.8, 0.2]), WORLD_FRAME);
   calls.length = 0; r.drawBillboards(bbs, R, UP);
@@ -365,6 +365,7 @@ test('LA-COST1: THE LAW, READ OFF THE SOURCE - every field the four gated frame 
     '_focus',   // TV1: the point the fog measures from (setFocus stamps)
     '_haze',   // BANTHA1: the jungle's haze (setJungleHaze stamps; beginFrame clears it unarmed)
     '_dwColumn',   // merged beside DW-F: the water column's frame (setWaterColumn stamps; beginFrame clears it)
+    '_sharpRetro',   // Sharp's retro values (applyRetroSharp moves the stamp when they change, inside beginFrame)
     '_snowFrame', '_snowTex'];   // AUDIT PRECIP GROUND-7: the frame's snowlines and their texture (setSnowFrame stamps)
   // NOT INPUTS: the programs' location tables (re-looked-up by _installWorldSet, which forgets the blocks), scratch the
   // block writes before it reads, the memo's own keys (the first test), the gates' stamps, the GL-state shadows - and
