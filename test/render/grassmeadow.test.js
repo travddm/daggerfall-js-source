@@ -27,6 +27,7 @@ import { EL_MAX_LIGHTS, elDecode3, elDecodeN } from '../../src/render/enhancedLi
 import { pixelGrass, PX_RAMP_STEPS } from '../../src/render/grassPixelArt.js';
 import { floraSwayOf, gustPhaseAfterShift, gustClock, GUST_RATE, GUST_K, LAB_WIND_RATE, WIND_SLIDER_MAX } from '../../src/systems/wind/windDrive.js';
 import { FEATURES } from '../../src/systems/features.js';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { perspective, mirrorProjectionX, lookAt } from '../../src/world/mat4.js';
 import { glslFunctions } from '../glsl.mjs';
 
@@ -409,7 +410,7 @@ test('MEADOW1: the owner\'s colours on any ground - the fragment stage\'s own te
       gl_FragCoord: [3, 5, 0.5, 1], o: [0, 0, 0, 0],
       texture: (name) => (name === 'uPxSheet' ? [...art, 1] : [0.5, 0.5, 0, 1]),
       textureLod: (name) => (name === 'uPxSheet' ? [...art, 1] : [0.5, 0.5, 0, 1]),
-      dFdx: () => 0.001, dFdy: () => 0.001,
+      dFdx: (v) => (Array.isArray(v) ? v.map(() => 0.001) : 0.001), dFdy: (v) => (Array.isArray(v) ? v.map(() => 0.001) : 0.001),
       ...extra,
     });
     f.main();
@@ -456,7 +457,7 @@ test('MEADOW1: the owner\'s colours on any ground - the fragment stage\'s own te
   // THE LEVEL: a card's own height down a pixel - the cell's 64 texels times the uv's steeper screen step up it
   for (const [ddx, ddy] of [[0.001, 0.001], [0.004, -0.03], [-0.2, 0.05], [0.0001, 0.0002]]) {
     let lod = null, flat = 0;
-    fs(leaf, VE, artGround, { dFdx: (v) => (v === 1 ? ddx : 7), dFdy: (v) => (v === 1 ? ddy : -7), textureLod: (n, uv, l) => { lod = l; return [...leaf, 1]; }, texture: (n) => { if (n === 'uPxSheet') flat++; return [...leaf, 1]; } });   // the uv's height is 1 here and its width 0.5: a step of 7 is the width's
+    fs(leaf, VE, artGround, { dFdx: (v) => (Array.isArray(v) ? [7, 7] : v === 1 ? ddx : 7), dFdy: (v) => (Array.isArray(v) ? [-7, -7] : v === 1 ? ddy : -7), textureLod: (n, uv, l) => { lod = l; return [...leaf, 1]; }, texture: (n) => { if (n === 'uPxSheet') flat++; return [...leaf, 1]; } });   // the uv's height is 1 here and its width 0.5: a step of 7 is the width's
     assert.ok(Math.abs(lod - Math.log2(Math.max(Math.max(Math.abs(ddx), Math.abs(ddy)) * MEADOW_CELL, 1))) < 1e-12, `the step ${ddx}, ${ddy}: level ${lod}`);
     assert.equal(flat, 0, 'the meadow never samples at the GPU\'s own level');
   }
@@ -511,15 +512,17 @@ function vertexArrays(calls, C) {
   return out;
 }
 
-test('MEADOW1: the renderer - the owner\'s atlas on its own texture, every level, NEAREST and clamped; the meadow binds it on unit 4 with its own counts and each lane its art\'s ground; AUDIT MEADOW1: the card arrays read back through their own pointers are meadowCardCorners and meadowCardIndices, the sprite styles draw unblended, the trees\' switch holds every style still, a palette moves the art\'s ground, and all of it goes with the renderer (mutants: the corners read at the blade\'s stride, the turn never enabled, the switch never on, one ground for both lanes, the pixel count on the meadow, blending back, the atlas leaked)', () => {
+test('MEADOW1: the renderer - the owner\'s atlas on its own texture, every level, clamped, and nearest under Point (it takes the world filter); the meadow binds it on unit 4 with its own counts and each lane its art\'s ground; AUDIT MEADOW1: the card arrays read back through their own pointers are meadowCardCorners and meadowCardIndices, the sprite styles draw unblended, the trees\' switch holds every style still, a palette moves the art\'s ground, and all of it goes with the renderer (mutants: the corners read at the blade\'s stride, the turn never enabled, the switch never on, one ground for both lanes, the pixel count on the meadow, blending back, the atlas leaked)', () => {
   const { gl, calls, C } = stubGl();
+  setValue('Video', 'MainFilterMode', '0');   // Point: the sampler the atlas had before it took the world filter
   const r = new LabGrassRenderer(gl);
+  resetSettings();
   let bound = null; const ups = [];
   for (const c of calls) { if (c[0] === 'bindTexture') bound = c[2]; else if (c[0] === 'texImage2D' && bound === r.meadowSheet) ups.push([c[2], c[4], c[5]]); }
   assert.deepEqual(ups, buildMeadowMips().map((l, i) => [i, l.width, l.height]), 'every level, by hand');
   const at = calls.findIndex((c) => c[0] === 'bindTexture' && c[2] === r.meadowSheet);
   assert.deepEqual(calls.slice(at).filter((c) => c[0] === 'texParameteri').slice(0, 4).map((c) => [c[2], c[3]]),
-    [[C.TEXTURE_MIN_FILTER, C.NEAREST_MIPMAP_NEAREST], [C.TEXTURE_MAG_FILTER, C.NEAREST], [C.TEXTURE_WRAP_S, C.CLAMP_TO_EDGE], [C.TEXTURE_WRAP_T, C.CLAMP_TO_EDGE]], 'a pixel sprite is never filtered');
+    [[C.TEXTURE_MIN_FILTER, C.NEAREST_MIPMAP_NEAREST], [C.TEXTURE_MAG_FILTER, C.NEAREST], [C.TEXTURE_WRAP_S, C.CLAMP_TO_EDGE], [C.TEXTURE_WRAP_T, C.CLAMP_TO_EDGE]], 'Point: nearest, as before');
   assert.notEqual(r.meadowSheet, r.pxSheet);
   // the arrays, as the GPU would read them
   const vaos = vertexArrays(calls, C);

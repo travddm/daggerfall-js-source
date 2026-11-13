@@ -16,10 +16,18 @@ import { HEIGHTMAP_DIMENSION } from '../../../src/world/terrain/terrainSampler.j
 import { FOG_GLSL } from '../../../src/render/fogGlsl.js';
 import { TOP_FS, TOP_FAR_FS, FLOOR_FS, DECOR_FS, COLUMN_GLSL, DeepWatersRenderer } from '../../../src/render/deepWatersRender.js';
 import { SURFACE_TEXTURE_TILING } from '../../../src/world/deepWater/deepWaterLook.js';
+import { setValue, _resetForTests as resetSettings } from '../../../src/systems/settings/settings.js';
+import { E, stateGl } from '../../retroGl.mjs';
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const CELL = 6.4, EDGE = 128 * CELL;   // a tile, a pixel
 const mix = (a, b, t) => a.map((x, i) => x + (b[i] - x) * t);
+const seaPass = (renderer) => new DeepWatersRenderer(renderer);
+const near = (a, b) => Math.abs(a - b) < 1e-6;
+const SIZE = 64;
+const filtersOf = (texture) => [texture.params[E.TEXTURE_MIN_FILTER], texture.params[E.TEXTURE_MAG_FILTER]];
+const SHARP_FILTERS = [E.LINEAR_MIPMAP_LINEAR, E.LINEAR];
+const POINT_FILTERS = [E.NEAREST_MIPMAP_NEAREST, E.NEAREST];
 const close = (a, b, eps, msg) => { for (let i = 0; i < b.length; i++) assert.ok(Math.abs(a[i] - b[i]) < eps, `${msg}: [${a}] vs [${b}]`); };
 
 /** A pixel's patched TileMap with `clip(tx, tz)` tiles clipped, the rest ground. */
@@ -207,7 +215,7 @@ test('DW-F: the pass hands the world\'s fog to every program that reads it - the
   const { gl, log } = recordingGl();
   const renderer = { gl, _proj: new Float32Array(16), _view: new Float32Array(16), _camPos: new Float32Array(3), _dwFog: new Float32Array(20),
     _fogColor: new Float32Array(FOG_COLOR), _fogMode: 3, _fogDensity: 0.0004, _fogRange: new Float32Array([0, 1]), markForeignPass() {} };
-  const r = new DeepWatersRenderer(renderer);
+  const r = seaPass(renderer);
   const frame = { surfaceTexture: {}, underwater: false, liftY: 0, surfaceScroll: [0, 0], topColor: TOP, topDepthWrite: false,
     sceneTint: [1, 1, 1, 0], seconds: 0, columnOn: true, seaY: 34, topVision: 18 };
   r.drawSurfaces([{ h: { surface: { vao: {}, count: 6 } }, model: new Float32Array(16) }], frame);
@@ -252,3 +260,120 @@ test('DW-F: WATER1 reads the cap\'s TileMap - the carved sea and the repainted w
   }
 });
 
+/** Where the decorations' shader samples its frame, in texels, at a footprint of `footprint` texels a pixel, and the
+ *  x gradient it hands the sampler. */
+function decorationSample(uniforms, footprint) {
+  const seen = [];
+  const fns = glslFunctions(DECOR_FS, {
+    vUv: [0.4, 0.6],
+    vStart: 0,
+    vWorldPos: [30, 20, 40],
+    uColor: [1.12, 1.12, 1.12, 1],
+    uCutoff: 0.5,
+    uSceneTint: [1, 1, 1, 0],
+    uTick: 0,
+    uFrames: 1,
+    uCamPos: [0, 420, 0],
+    uFogColor: [0.5, 0.5, 0.5],
+    uFogMode: 0,
+    uFogDensity: 0,
+    uFogRange: [0, 1],
+    uDwFog: Array(5).fill([0, 0, 0, 0]),
+    uDwCamFwd: [0, -1, 0],
+    uColumnOn: 0,
+    uSeaY: 34,
+    uTopColor: [1, 1, 1, 1],
+    uTopVision: 18,
+    uSurfaceScroll: [0, 0],
+    uPixelOrigin: [0, 0, 0],
+    ...uniforms,
+    textureSize: () => [SIZE, SIZE, 1],
+    dFdx: () => [footprint / SIZE, 0],
+    dFdy: () => [0, footprint / SIZE],
+    texture: (sampler, p) => {
+      seen.push({ how: 'plain', at: p[0] * SIZE });
+      return [0.4, 0.5, 0.2, 1];
+    },
+    textureGrad: (sampler, p, gx) => {
+      seen.push({ how: 'grad', at: p[0] * SIZE, gradientX: gx[0] * SIZE });
+      return [0.4, 0.5, 0.2, 1];
+    },
+  });
+  fns.main();
+  return seen[0];
+}
+
+test('the seabed decorations: Sharp samples each frame at its texel centres; the other filters sample as before', () => {
+  const plain = decorationSample({ uSharpOn: 0, uSharpRetro: [0, 0] }, 0.1);
+  assert.equal(plain.how, 'plain');
+  assert.ok(near(plain.at, 0.4 * SIZE), 'Point, Bilinear, Trilinear: the coordinate itself');
+  const closeUp = decorationSample({ uSharpOn: 1, uSharpRetro: [0, 0] }, 0.1);
+  assert.ok(near(closeUp.at, 25.5), `Sharp, close up: the texel's centre (${closeUp.at})`);
+  const far = decorationSample({ uSharpOn: 1, uSharpRetro: [0, 0] }, 2);
+  assert.ok(near(far.at, 0.4 * SIZE), 'Sharp, a texel under a pixel: left to the mips');
+  const retro = decorationSample({ uSharpOn: 1, uSharpRetro: [1, -1] }, 2);
+  assert.ok(near(retro.at, 25.5), 'a retro frame: the centre near and far, as Point');
+  assert.ok(near(retro.gradientX, 1), 'and the retro bias halves the footprint the mip is chosen by');
+});
+
+/** The decorations' pass over the stateful fake GL, with the renderer's retro values. */
+function decorationPass() {
+  const { gl } = stateGl();
+  const renderer = {
+    gl,
+    _proj: new Float32Array(16),
+    _view: new Float32Array(16),
+    _camPos: new Float32Array(3),
+    _dwFog: new Float32Array(20),
+    _fogColor: new Float32Array(3),
+    _fogMode: 0,
+    _fogDensity: 0,
+    _fogRange: new Float32Array([0, 1]),
+    _focus: new Float32Array(4),
+    _haze: new Float32Array(8),
+    _sharpRetro: new Float32Array([1, -0.75]),
+    markForeignPass() {},
+  };
+  const pass = seaPass(renderer);
+  const texture = pass.createDecorationTexture([{ width: 4, height: 4, data: new Uint8Array(64) }]);
+  const frame = {
+    sceneTint: [1, 1, 1, 0],
+    seconds: 0,
+    columnOn: false,
+    seaY: 0,
+    topColor: [1, 1, 1, 1],
+    topVision: 1,
+    surfaceScroll: [0, 0],
+    surfaceTexture: null,
+  };
+  const draw = () => {
+    pass.drawDecorations(
+      [
+        {
+          h: { groups: [{ vao: {}, count: 6, texture, fps: 0, born: 0, facing: 0 }] },
+          model: new Float32Array(16),
+          origin: [0, 0, 0],
+        },
+      ],
+      frame,
+    );
+    return pass._programs.decor.p.values;
+  };
+  return { texture, draw };
+}
+
+test('the seabed decorations take the world filter, follow a change at their next draw, and are told Sharp and the retro values', () => {
+  resetSettings();
+  try {
+    const { texture, draw } = decorationPass();
+    assert.deepEqual(filtersOf(texture.tex), SHARP_FILTERS, 'Sharp, the default: trilinear under the snap');
+    let uniforms = draw();
+    assert.deepEqual([uniforms.uSharpOn, [...uniforms.uSharpRetro]], [[1], [1, -0.75]]);
+    setValue('Video', 'MainFilterMode', '0');
+    uniforms = draw();
+    assert.deepEqual(filtersOf(texture.tex), POINT_FILTERS, 'Point: nearest, refiltered at the draw');
+    assert.deepEqual(uniforms.uSharpOn, [0], 'and no snap');
+  } finally {
+    resetSettings();
+  }
+});

@@ -31800,7 +31800,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
           // (exteriorAmbient, the sun's scale x wxNow.sun), and the lab's LAB_DIM on top darkened a rainy field a
           // third past the ground it stood in. And the rest of the ground's light: the lane and its eye, the deck's
           // shadow, the sun map, the player's light.
-          dim: 1, lane: renderer.lightingLane, exposure: renderer.exposure, adaptTex: renderer.adaptTexture,
+          dim: 1, lane: renderer.lightingLane, exposure: renderer.exposure, adaptTex: renderer.adaptTexture, sharpRetro: renderer._sharpRetro,
           cloud: renderer._cloudShadow, shadows: renderer._shadows, indirect: renderer._indirect, indirectColor: renderer._indirectColor,
           sunScale: renderer._sunScale, moonDir: renderer._moonDir, moonScale: renderer._moonScale, moonCol: renderer._moonColor,   // WX2: the dim crossed on the front until GRASS-LIT
           // GRASS-LIT2: the frame's lanterns, torches and candles - the list the ground took, its display colours (the
