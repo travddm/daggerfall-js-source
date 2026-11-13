@@ -22,12 +22,12 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   file-format documentation and the behaviour of Morrowind data before the repository goes public (decisions 25 and
   108), each rewrite held to the old module's answers by a parity test.
   - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
-    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js` and `mwAnimSources.js`.
-  - Still OpenMW-derived: `mwFirstPerson.js`, `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`),
-    `mwNifMesh.js` (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
-    `mwParticles.js`, `mwSpellFx.js`, `mwVfx.js`, and outside this folder parts of `src/combat/fpArm.js` and
-    `src/systems/weaponSheathing.js`. `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`)
-    only quote OpenMW in comments.
+    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`, the rest of
+    `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
+  - Still OpenMW-derived: `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`), `mwNifMesh.js`
+    (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`, `mwParticles.js`,
+    `mwSpellFx.js`, `mwVfx.js`, and outside this folder `src/systems/weaponSheathing.js`. `src/combat/fpArm.js`,
+    `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`) only quote OpenMW in comments.
 
   Do not add OpenMW logic to a derived module; change it only as part of its rewrite.
 
@@ -93,7 +93,7 @@ An async read must store its result in the cache generation it started under.
 
 ## Rules that are easy to get wrong
 
-These come from the engine's behaviour, read in OpenMW, and are recorded in detail in the readers' comments.
+These are facts about how Morrowind's data and engine behave, and the readers' comments record them in detail.
 
 - **A first-person part is a record, not a file name.** A `BODY` record whose id ends in `1st` is the first-person
   version. Never derive a mesh path by inserting `.1st`.
