@@ -1,31 +1,12 @@
-// THE DIAGNOSTIC, and it deliberately draws nothing.
-//
-// The Morrowind import arc was reverted whole on 2026-08-28 after three
-// "fixes" that all failed. Every one failed the same way: a rule was
-// guessed, verified against a fixture built from the same guess, and
-// reported working. The reverted rig hardcoded `meshes\base_anim.1st.nif`
-// - a name that appears NOWHERE in OpenMW's skeleton table, because
-// base_anim.nif is the THIRD-person skeleton (docs/formats/morrowind.md).
-// Nothing ever said so out loud; the layer
-// just fell back to the sprite for ever.
-//
-// So this module is the thing that should have existed first. It opens the
-// player's OWN archives and reports what is genuinely inside them. It
-// renders nothing, so it cannot be wrong about rendering, and every answer
-// it gives is a fact about their files rather than a claim about ours.
-//
-// Every parse below cites the rule it implements. Where a routine is a
-// HEURISTIC rather than a parse, it says so in its own name and its own
-// output - the one thing this module must never do is sound certain.
+// The diagnostic for the player's own Morrowind files: format readers and reports that say what the archives
+// genuinely contain. It draws nothing, so every answer is a fact about the files and never a claim about
+// rendering. Where a routine is a heuristic rather than a parse, its name and its output say so.
 
-/** Rule: Part V - the Morrowind BSA directory is ONE contiguous block.
- *  12-byte header of 3 uint32 LE (id must be 0x100, dirsize, filenum);
- *  then 3*filenum uint32 read as ONE run, indexed [i*2] size,
- *  [i*2+1] offset, [2*filenum + i] name offset; then the string buffer of
- *  (dirsize - 12*filenum) bytes of NUL-terminated names; then an
- *  8*filenum hash table WHICH THE ENGINE READS AND IGNORES. File data
- *  begins at 12 + dirsize + 8*filenum and every stored offset is relative
- *  to that. (components/bsa/bsafile.cpp:77-205) */
+/** The Morrowind BSA directory is one contiguous block: a 12-byte header of three uint32 LE (id 0x100, dirsize,
+ *  filenum); then 3*filenum uint32 read as one run, indexed [i*2] size, [i*2+1] offset and [2*filenum + i] name
+ *  offset; then a string buffer of (dirsize - 12*filenum) bytes of NUL-terminated names; then 8*filenum bytes of
+ *  name hashes, which this reader ignores. File data begins at 12 + dirsize + 8*filenum and every stored offset is
+ *  relative to that. */
 export function parseBsaIndex(bytes) {
   const size = bytes.byteLength;
   if (size < 12) throw new Error('file too small to be a BSA (under 12 bytes)');
@@ -37,7 +18,9 @@ export function parseBsaIndex(bytes) {
   const dirsize = dv.getUint32(4, true);
   const filenum = dv.getUint32(8, true);
 
-  // The engine's own corruption checks, copied rather than invented.
+  // The directory must fit inside the archive. A file takes at least 21 bytes of it: 8 for its size and offset, 4
+  // for its name offset, 8 for its hash and one for the NUL that ends its name. The name table and the hashes
+  // must fit as well.
   if (filenum * 21 > size - 12) throw new Error('directory larger than the archive (file count)');
   if (dirsize + 8 * filenum > size - 12) throw new Error('directory larger than the archive (dir size)');
 
@@ -58,7 +41,7 @@ export function parseBsaIndex(bytes) {
     while (end < stringStart + stringLen && bytes[end] !== 0) end++;
     if (end >= stringStart + stringLen) throw new Error(`unterminated name (entry ${i})`);
     files.push({
-      // Rule: VFS normalisation is backslash -> slash then ASCII lowercase.
+      // Stored names use backslashes and any case; paths are compared with forward slashes in lower case.
       name: latin1(bytes.subarray(stringStart + nameOffset, end)).replace(/\\/g, '/').toLowerCase(),
       size: fileSize,
       offset,
@@ -67,21 +50,18 @@ export function parseBsaIndex(bytes) {
   return { fileCount: filenum, dirSize: dirsize, dataStart, files };
 }
 
-/** Windows-1252 is the ENGLISH release's default, not a property of the
- *  format - engine.cpp:373 seeds it and :1106 can change it, because
- *  localised releases ship other code pages (Part V). This decoder is
- *  therefore named for what it assumes. The five bytes Windows-1252 maps
- *  differently from Latin-1 in the 0x80-0x9F range are the ones a bone
- *  name would never use, so Latin-1 is the honest cheap approximation and
- *  is labelled as such rather than called a decode. */
+/** Windows-1252 is the English release's code page, not a property of the format: localised releases ship other
+ *  code pages. This decoder is therefore named for what it assumes. The five bytes Windows-1252 maps differently
+ *  from Latin-1 in the 0x80-0x9F range are ones a bone name would never use, so Latin-1 is the honest cheap
+ *  approximation and is labelled as such rather than called a decode. */
 export function latin1(bytes) {
   let s = '';
   for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
   return s;
 }
 
-/** Rule: Part V - the NIF header is a PREFIX test on ONE '\n'-terminated
- *  line, then a raw uint32 BCD version. (niffile.cpp:539-562) */
+/** A NIF file starts with one newline-terminated text line that begins with one of these strings, then a raw
+ *  uint32 BCD version. */
 export const NIF_MAGICS = Object.freeze(['NetImmerse File Format', 'Gamebryo File Format']);
 
 export function readNifHeader(bytes) {
@@ -97,16 +77,14 @@ export function readNifHeader(bytes) {
   return {
     ok: true, magic, line, version,
     versionText: [24, 16, 8, 0].map((s) => (version >>> s) & 0xff).join('.'),
-    // Rule: a NIF `bool` is int32 BELOW version 4.1.0.0 and int8 at or
-    // above - the threshold is the rule, not the answer (Part V).
+    // A NIF `bool` is an int32 below version 4.1.0.0 and an int8 from it on.
     boolBytes: version < 0x04010000 ? 4 : 1,
   };
 }
 
-/** The first-person skeletons OpenMW will actually ask for, by actor.
- *  getActorSkeleton + settings-default.cfg [Models] (rules 6 and 18).
- *  base_anim.1st.nif is in this table ONLY as the name the reverted arc
- *  used, so the report can say plainly whether it was ever there. */
+/** The first-person skeletons the layer asks for, by actor. `base_anim.1st.nif` is listed so that the report can
+ *  say whether a skeleton by that name exists; the retail first-person skeletons are the three above it, and
+ *  `base_anim.nif` is the third-person skeleton. */
 export const FP_SKELETONS = Object.freeze([
   { path: 'meshes/xbase_anim.1st.nif', who: 'male, non-beast' },
   { path: 'meshes/base_anim_female.1st.nif', who: 'female' },
@@ -116,10 +94,9 @@ export const FP_SKELETONS = Object.freeze([
   { path: 'meshes/base_anim.1st.nif', who: 'THE NAME THE REVERTED RIG HARDCODED' },
 ]);
 
-/** Rule: TES3 records are name[4] + uint32 size + 8 bytes of header/flags,
- *  then `size` bytes of subrecords, each name[4] + uint32 size + data.
- *  Unlike NIF every record carries its size, so an unknown type is
- *  skippable by design - which is why this walk cannot desynchronise. */
+/** A TES3 record is name[4] + uint32 size + 8 bytes of header and flags, then `size` bytes of subrecords, each
+ *  name[4] + uint32 size + data. Unlike NIF, every record carries its size, so an unknown type is skippable by
+ *  design, and this walk cannot lose its place. */
 export function walkEsm(bytes, { limit = Infinity } = {}) {
   const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const out = [];
@@ -156,13 +133,8 @@ const zstr = (bytes, s, n) => {
   return latin1(bytes.subarray(s, e));
 };
 
-/** Morrowind's body-part slots, by BYDT index
- *  (components/esm3/loadbody.hpp MeshPart). ONE HOME: the ESM reader owns
- *  this table. The inspector carried its own copy while the format layer
- *  was reverted out of the tree; now that the layer is back, a second
- *  copy is exactly the duplicate-declaration the one-home audit exists to
- *  catch - and it caught it. Re-exported so this module's own API is
- *  unchanged for its page and its pins. */
+/** Morrowind's body-part slots, by BYDT index. The ESM reader owns this table; it is re-exported so this
+ *  module's API stays as it was. */
 export { MW_BODY_PARTS, isFirstPersonId } from './mwEsmFile.js';
 import { MW_BODY_PARTS, isFirstPersonId } from './mwEsmFile.js';
 import FACE_TABLE from '../mwFaceTable.json' with { type: 'json' };
@@ -177,14 +149,12 @@ import { MW_WEAPON_TYPE } from './mwWeaponAnim.js';
 export * from './mwWeaponAnim.js';
 import { SKIN_SWEEP_SLOTS, resolveBodyParts } from './mwBodyParts.js';
 export * from './mwBodyParts.js';
-export * from './mwAnimSources.js';   // the animation sources moved out; callers keep importing them from here   // the body-part resolution moved out; callers keep importing it from here   // the weapon animation rules moved out; callers keep importing them from here
+export * from './mwAnimSources.js';   // callers import the animation sources, body parts and weapon rules from here
 import { pitchNeck } from './mwHeadView.js';
 export * from './mwHeadView.js';   // the camera node and the neck turn moved out; callers keep importing them from here
 
-/** The four parts allowed to fall back to a third-person mesh when the
- *  first-person record is missing (rule 3 / npcanimation.cpp:1217-1253).
- *  NOT the list of what gets shown - the reverted arc inverted exactly
- *  this and so rendered nothing else. */
+/** The four parts that may fall back to a third-person mesh when the first-person record is missing. This is not
+ *  the list of what gets shown. */
 export const ARM_PARTS = Object.freeze(['hand', 'wrist', 'forearm', 'upperarm']);
 
 // Every record reader below is ONE record off the walk, so the
@@ -198,12 +168,12 @@ function readBodyPart(bytes, rec) {
     else if (sub.name === 'FNAM') e.race = zstr(bytes, sub.start, sub.len).toLowerCase();
     else if (sub.name === 'BYDT' && sub.len >= 4) {
       e.part = bytes[sub.start];
-      e.vampire = bytes[sub.start + 1] !== 0;   // BYDT's second byte, the vampire flag (getVampireHead reads it)
+      e.vampire = bytes[sub.start + 1] !== 0;   // the vampire flag is BYDT's second byte
       const flags = bytes[sub.start + 2];
-      e.female = (flags & 1) !== 0;            // BPF_Female = 1
-      e.playable = (flags & 2) === 0;          // BPF_NotPlayable = 2
-      e.skin = bytes[sub.start + 3] === 0;     // MT_Skin = 0
-      e.bodyKind = bytes[sub.start + 3];       // the raw MeshType - getShieldMesh gates on MT_Armor (2)
+      e.female = (flags & 1) !== 0;            // flag bit 1: female
+      e.playable = (flags & 2) === 0;          // flag bit 2: not playable
+      e.skin = bytes[sub.start + 3] === 0;     // mesh type 0: skin
+      e.bodyKind = bytes[sub.start + 3];       // the raw mesh type (0 skin, 2 armor); a shield's mesh is armor
     }
   }
   e.slot = MW_BODY_PARTS[e.part] ?? `#${e.part}`;
@@ -219,12 +189,9 @@ export function bodyParts(bytes) {
   return out;
 }
 
-/** The RACE records the build needs - the beast flag decides
- *  the skeleton column (getActorSkeleton) and the height/weight pairs
- *  scale the rig (npc.cpp's race scaling). RADT is 140 bytes
- *  (loadrace.hpp:50-70): 7 skill pairs (56) + 8x2 attributes (64), then
- *  maleHeight/femaleHeight/maleWeight/femaleWeight floats at 120..135
- *  and the flags int32 at 136 (Playable 0x1, Beast 0x2). */
+/** The RACE records the build needs: the beast flag decides the skeleton column, and the height and weight pairs
+ *  scale the rig. RADT is 140 bytes: 7 skill pairs (56) and 8x2 attributes (64), then the maleHeight, femaleHeight,
+ *  maleWeight and femaleWeight floats at 120..135 and the flags int32 at 136 (Playable 0x1, Beast 0x2). */
 function readRace(bytes, rec) {
   const e = { id: '', beast: false, playable: false, height: [1, 1], weight: [1, 1], radt: false };
   for (const sub of subrecords(bytes, rec)) {
@@ -256,13 +223,10 @@ export function raceRecords(bytes) {
 /**
  * The WEAP records in a player's .esm.
  *
- * WPDT is a 32-byte struct and its layout is CITED, not guessed
- * (components/esm3/loadweap.hpp:64-74): float mWeight; int32 mValue; int16
- * mType; uint16 mHealth; float mSpeed, mReach; uint16 mEnchant; uchar
- * mChop[2], mSlash[2], mThrust[2]; int32 mFlags. Only the offset of
- * mType matters here - byte EIGHT - and a short record is REFUSED rather
- * than read past, because a wrong offset silently yields a plausible
- * weapon type and this arc has already died of plausible.
+ * WPDT is a 32-byte struct: float weight; int32 value; int16 type; uint16 health; float speed, reach; uint16
+ * enchantment; uchar chop[2], slash[2], thrust[2]; int32 flags (UESP, Tes3Mod:File Format). Only the offset of the
+ * type matters here, byte 8, and a short record is refused rather than read past: a wrong offset silently yields
+ * a plausible weapon type.
  */
 function readWeapon(bytes, rec) {
   const e = { id: '', model: '', name: '', type: MW_WEAPON_TYPE.None, enchanted: false, speed: 1 };
@@ -273,37 +237,24 @@ function readWeapon(bytes, rec) {
     else if (sub.name === 'ENAM') e.enchanted = true;
     else if (sub.name === 'WPDT') {
       if (sub.len < 32) continue;   // refused, not read past
-      // MType is at byte EIGHT. loadweap.hpp's WPDTstruct is
-      // float mWeight (0-3), int32 mValue (4-7), int16 mType (8-9),
-      // uint16 mHealth (10-11), ... - 32 bytes. An earlier note recorded "byte
-      // 10" (4+4 does not make 10), the reader read 10, and the
-      // fixture writer was authored FROM THE SAME GUESS - so every
-      // pin passed while retail play read mHealth as the type:
-      // a shortsword (type 0) found no record with health 0 and drew
-      // EMPTY HANDS, and a staff (type 5) drew whatever record's
-      // health is 5. Only a check against retail data
-      // finds this: a fixture written from the same guess
-      // passes either way.
+      // The type is at byte 8, after the weight and the value; the health that follows is not the type. A fixture
+      // written from the same offset as the reader cannot expose a wrong one, so check a change here against
+      // retail data.
       const dv = new DataView(bytes.buffer, bytes.byteOffset + sub.start, 32);
       e.type = dv.getInt16(8, true);
-      // MSpeed at byte 12 (loadweap.hpp:70, after mHealth's
-      // uint16 at 10-11). It is the ONLY record field that changes an
-      // attack's played speed: character.cpp:1326 reads it for the
-      // drawn weapon and :1718/:1786/:1811 pass it as the speedmult of
-      // exactly the three attack sections - equip and unequip play at
-      // 1.0f (:1408, :1465).
+      // The speed is the float at byte 12, after the health. It is the only record field that changes how fast
+      // an attack plays: it scales the three attack sections, while equip and unequip play at normal speed.
       e.speed = dv.getFloat32(12, true);
     }
   }
   return e.id && e.model ? e : null;
 }
 
-/** A CREA record's FLAG bits (OpenMW components/esm3/loadcrea.hpp `enum Flags`, at openmw-0.48.0; the
- *  reader keeps the low byte, `mFlags = flags & 0xFF` - loadcrea.cpp). */
+/** A CREA record's FLAG bits (UESP, Tes3Mod:File Format). Only the low byte is kept. */
 export const CREA_FLAG = Object.freeze({ Bipedal: 0x01, Respawn: 0x02, Weapon: 0x04, Base: 0x08, Swims: 0x10, Flies: 0x20, Walks: 0x40, Essential: 0x80 });
 
-/** The CREA records - what a creature's body is built from: its id, its model (MODL, the path as the WEAP
- *  reader keeps one), its name, its flags (FLAG's low byte) and its scale (XSCL, 1 when absent - loadcrea.cpp). */
+/** The CREA records, which a creature's body is built from: its id, its model (MODL, the path as the WEAP reader
+ *  keeps one), its name, its flags (FLAG's low byte) and its scale (XSCL, 1 when absent). */
 function readCreature(bytes, rec) {
   const e = { id: '', model: '', name: '', flags: 0, scale: 1 };
   for (const sub of subrecords(bytes, rec)) {
@@ -337,16 +288,12 @@ export function weaponRecords(bytes) {
   return out;
 }
 
-/** THE CARRIABLE LIGHTS - Morrowind's torch is a LIGH record
- *  with a mesh, carried in the left hand at the Shield Bone (the same
- *  slot a shield takes: PRT_Shield / Slot_CarriedLeft) and animated by
- *  the "torch" group on the LEFT ARM's blend mask. LHDT is 24 bytes
- *  (loadligh.hpp): float mWeight (0), int mValue (4), int mTime (8),
- *  int mRadius (12), uint32 mColor (16), int mFlags (20) - and the
- *  flags are Dynamic 0x1, CARRY 0x2, Negative 0x4, Flicker 0x8, Fire
- *  0x10, OffDefault 0x20, FlickerSlow 0x40, Pulse 0x80, PulseSlow
- *  0x100. Only a light the player can CARRY is a candidate for the
- *  hand; a wall sconce is a LIGH record too. */
+/** The carriable lights. Morrowind's torch is a LIGH record with a mesh, carried in the left hand at the Shield
+ *  Bone (the slot a shield takes) and animated by the "torch" group on the left arm's blend mask. LHDT is 24
+ *  bytes: float weight (0), int value (4), int time (8), int radius (12), uint32 colour (16), int flags (20). The
+ *  flags are Dynamic 0x1, Can Carry 0x2, Negative 0x4, Flicker 0x8, Fire 0x10, Off By Default 0x20, Flicker Slow
+ *  0x40, Pulse 0x80 and Pulse Slow 0x100. Only a light the player can carry is a candidate for the hand; a wall
+ *  sconce is a LIGH record too. */
 export const MW_LIGHT_CARRY = 0x2;
 export const MW_LIGHT_FIRE = 0x10;
 function readLight(bytes, rec) {
@@ -367,12 +314,12 @@ function readLight(bytes, rec) {
 }
 
 /**
- * A MAGIC EFFECT (MGEF - components/esm3/loadmgef.cpp MagicEffect::load): INDX the effect's index; MEDT its
- * 36 bytes - school, base cost, flags, red, green, blue, size, speed, size cap; then, in any order, the icon and the
- * particle texture, four sounds, the four visuals by id (CVFX casting, BVFX bolt, HVFX hit, AVFX area) and the
- * description. The effects layer reads the colour, the speed, the flags' NegativeLight, the particle texture and the
- * visuals (formats/morrowind/mwSpellFx.js); nothing else is kept. The legacy format's own rule on the flags (only the three
- * modifiable bits are the file's) stands: the hard-coded rest is not read here, so it is not stored.
+ * A magic effect (MGEF; UESP, Tes3Mod:File Format): INDX is the effect's index and MEDT its 36 bytes (school, base
+ * cost, flags, red, green, blue, size, speed, size cap). The icon, the particle texture, four sounds, the four
+ * visuals by id (CVFX casting, BVFX bolt, HVFX hit, AVFX area) and the description follow in any order. The effects
+ * layer reads the colour, the speed, the flags' NegativeLight, the particle texture and the visuals
+ * (formats/morrowind/mwSpellFx.js); nothing else is kept. Only the three modifiable flag bits are the file's: the
+ * hard-coded rest is not read here, so it is not stored.
  */
 function readMagicEffect(bytes, rec) {
   const e = { index: -1, school: 0, flags: 0, color: [255, 255, 255], speed: 1, particle: '', casting: '', bolt: '', hit: '', area: '' };
@@ -405,9 +352,9 @@ export function magicEffectRecords(bytes) {
   return out;
 }
 
-/** A STAT's id and mesh - kept for the statics an effect is drawn with: every id that begins VFX_ (each
- *  visual the masters' MGEFs name, OpenMW's VFX_Default* and VFX_Hands among them) and any other id an MGEF in the
- *  SAME file names. A mod's MGEF naming a non-VFX_ static of another file is not found - recorded. */
+/** A STAT's id and mesh, kept for the statics an effect is drawn with: every id that begins VFX_ (each visual the
+ *  masters' MGEFs name, VFX_Default* and VFX_Hands among them) and any other id an MGEF in the same file names. An
+ *  MGEF in a mod that names a non-VFX_ static of another file is not found. */
 function readStatic(bytes, rec) {
   const e = { id: '', model: '' };
   for (const sub of subrecords(bytes, rec)) {
@@ -443,16 +390,12 @@ export function lightRecords(bytes) {
   return out;
 }
 
-/** WHICH TORCH. Daggerfall's Torch (TEMPLATES.Torch, 247) is
- *  one item; Morrowind's are many LIGH records. The reference holds
- *  whatever record the inventory's Slot_CarriedLeft carries - here the
- *  slot is DF's lit light, so the record is chosen by the same shape
- *  pickWeaponRecord uses for a blade: a CARRIABLE light whose
- *  id names a torch, the plain `torch` first (retail's "Torch"), then
- *  the shortest id (torch_256 over torch_256_yellow - the base over
- *  its variants), and only one whose mesh the
- *  attached archives carry, or a torch resolves to a mesh the build
- *  cannot read and the card says nothing useful. */
+/** Which torch. Daggerfall's Torch (TEMPLATES.Torch, 247) is one item; Morrowind's are many LIGH records. Here the
+ *  held light is Daggerfall's lit light, so the record is chosen by the same shape pickWeaponRecord uses for a
+ *  blade: a carriable light whose id names a torch, the plain `torch` first (retail's "Torch"), then the shortest
+ *  id (torch_256 over torch_256_yellow, the base over its variants), and only one whose mesh the attached
+ *  archives carry. Otherwise a torch would resolve to a mesh the build cannot read, and the card would say
+ *  nothing useful. */
 export function pickTorchRecord(lights, { has = null } = {}) {
   return pickCarriedLight(lights, /torch/, 'torch', has);
 }
@@ -472,15 +415,11 @@ function pickCarriedLight(lights, named, exactId, has) {
   return cands.slice().sort((a, b) => a.id.length - b.id.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))[0];
 }
 
-/** The bones of ONE blend mask, by the reference's
- *  own walk (Animation::detectBlendMask, animation.cpp): a bone belongs
- *  to the mask whose root name it meets FIRST walking up its parents -
- *  "Bip01 L Clavicle" is the left arm, and the arm test wins over the
- *  spine because the clavicle is met before the spine on the way up.
- *  Answers the LOWERCASED node names under `rootName` (itself
- *  included), which is the spelling poseSkeleton looks tracks up by.
- *  A skeleton without the root (the fixture rigs, a rig cut down to an
- *  arm) answers the empty set, and the caller overlays nothing. */
+/** The bones of one blend mask. A bone belongs to the mask whose root name it meets first walking up its
+ *  parents: "Bip01 L Clavicle" is the left arm, and the arm test wins over the spine because the clavicle is met
+ *  before the spine on the way up. Answers the lower-cased node names under `rootName` (itself included), which is
+ *  the spelling poseSkeleton looks tracks up by. A skeleton without the root (the fixture rigs, a rig cut down to
+ *  an arm) answers the empty set, and the caller overlays nothing. */
 export function blendMaskBones(skeleton, rootName = 'bip01 l clavicle') {
   const out = new Set();
   if (!skeleton || !skeleton.nodes) return out;
@@ -498,19 +437,13 @@ export function blendMaskBones(skeleton, rootName = 'bip01 l clavicle') {
   return out;
 }
 
-/** THE ONE MASK THIS PORT HAS: a second
- *  animation state WINNING one blend mask while the frame's winner
- *  keeps the rest. The reference resolves per bone group at
- *  resetActiveGroups and installs each winner's clock on its mask; in
- *  the port's single-winner pose pass (fpArm.js's update) the same
- *  outcome is a TRACK MAP that answers the overlay's track for a bone
- *  in the mask and the base's track for every other bone, read through
- *  a SAMPLER that samples an overlay track at the OVERLAY's own clock.
- *  poseSkeleton asks `tracks.get(name)` and `sampleTrack(track, time)`
- *  and nothing else, so the pair drops in with no change to the pass.
- *  A mask bone the overlay does not key falls to the base's track (the
- *  reference attaches no controller for it and the node keeps its last
- *  transform; the base's is the safer reading of "last"). */
+/** The one mask this port has: a second animation state wins one blend mask while the frame's winner keeps the
+ *  rest. In the single-winner pose pass (the update in fpArm.js) that is a track map, which answers the overlay's
+ *  track for a bone in the mask and the base's track for every other bone, read through a sampler that samples an
+ *  overlay track at the overlay's own clock. poseSkeleton asks `tracks.get(name)` and `sampleTrack(track, time)`
+ *  and nothing else, so the pair drops in with no change to the pass. A mask bone the overlay does not key falls
+ *  to the base's track: the node would otherwise keep its last transform, and the base's is the safer reading of
+ *  "last". */
 export function overlayTracks(base, overlay, bones) {
   // ONE merged Map per (base, overlay, mask) - built
   // eagerly so the frame's lookups allocate nothing. The caller memoises
@@ -526,15 +459,11 @@ export function overlaySampler(sampleTrack, clock) {
   return (track, time) => (track && track.__overlay ? sampleTrack(track.__overlay, at()) : sampleTrack(track, time));
 }
 
-/** THE WORN HALF, loadarmo.hpp's PartReferenceList - ONE
- *  structure on ARMO and CLOT, so one reader.
- *  An ARMO/CLOT MODL is the GROUND mesh - the
- *  thing a dropped cuirass looks like - and the worn shape is a list of
- *  PART REFERENCES: INDX (one byte, the sided PartReferenceType enum)
- *  opens a reference, then BNAM names the male BODY record and CNAM the
- *  female one, either optional. Reading MODL as the worn mesh would
- *  dress the player in ground clutter, which is this format's byte-eight
- *  trap. Any other subrecord is not this reader's. */
+/** The worn half of an ARMO or CLOT record: one structure on both, so one reader. An ARMO or CLOT MODL is the
+ *  ground mesh, the thing a dropped cuirass looks like; the worn shape is a list of part references. INDX (one
+ *  byte, the sided part type) opens a reference, then BNAM names the male BODY record and CNAM the female one,
+ *  either optional. Reading MODL as the worn mesh would dress the player in ground clutter. Any other subrecord
+ *  is not this reader's. */
 function readPartRef(bytes, sub, e, kind) {
   if (sub.name === 'INDX') {
     if (sub.len !== 1) throw new Error(`${kind} ${e.id}: INDX is ${sub.len} bytes`);
@@ -546,14 +475,11 @@ function readPartRef(bytes, sub, e, kind) {
   }
 }
 
-/** The CLOT records - the ARMO reader's twin, plus CTDT's
- *  TYPE, which the composer needs twice over: DF garments resolve to
- *  MW clothing BY TYPE (a shirt is any CLOT of type 2, id-sorted),
- *  and the robe/skirt types trigger the reference's slot RESERVES.
- *  CTDT is 12 bytes - u32 type, f32 weight, u16 value, u16 enchant
- *  points (loadclot.hpp) - refused at any other size. The part
- *  references are the same INDX/BNAM/CNAM list armor carries, and
- *  MODL is the ground mesh here too. */
+/** The CLOT records: the ARMO reader's twin, plus CTDT's type, which the composer needs twice over. Daggerfall
+ *  garments resolve to Morrowind clothing by type (a shirt is any CLOT of type 2, id-sorted), and the robe and
+ *  skirt types reserve body slots. CTDT is 12 bytes (u32 type, f32 weight, u16 value, u16 enchant points) and is
+ *  refused at any other size. The part references are the same INDX, BNAM and CNAM list armor carries, and MODL is
+ *  the ground mesh here too. */
 function readClothing(bytes, rec) {
   const e = { id: '', model: '', name: '', type: -1, enchanted: false, parts: [] };
   for (const sub of subrecords(bytes, rec)) {
@@ -566,10 +492,10 @@ function readClothing(bytes, rec) {
       e.type = new DataView(bytes.buffer, bytes.byteOffset + sub.start, 4).getUint32(0, true);
     } else readPartRef(bytes, sub, e, 'CLOT');
   }
-  // A GARMENT WORN BY ITS PARTS NEEDS NO GROUND MESH. Clothing::load requires NAME and CTDT and
-  // reads MODL as optional (components/esm3/loadclot.cpp), and "werewolfrobe" is a technical item - never shown, never
-  // dropped - so a record with part references and no MODL is kept; dropped, the whole wolf was refused on data that
-  // carries it. The Daggerfall garment pool still asks for a model (mwItemMap mwClothingRecord).
+  // A garment worn by its parts needs no ground mesh. A CLOT record requires NAME and CTDT and may leave MODL out.
+  // "werewolfrobe" is a technical item, never shown and never dropped, so a record with part references and no
+  // MODL is kept: dropping it refused the whole wolf on data that carries it. The Daggerfall garment pool still
+  // asks for a model (mwItemMap mwClothingRecord).
   return e.id && (e.model || e.parts.length) ? e : null;
 }
 
@@ -631,22 +557,16 @@ export function armorRecords(bytes) {
 }
 
 /**
- * The GMST the SNEAK SINK is measured in.
+ * The GMST the sneak sink is measured in: `i1stPersonSneakDelta`, the distance the first-person view sinks while
+ * the player sneaks and is neither swimming nor flying. It is a step change with no smoothing.
  *
- * `MWWorld::Player::update` reads `i1stPersonSneakDelta` ONCE, statically,
- * and Camera::setSneakOffset pushes `osg::Vec3f(0, 0, -offset)` into the
- * neck controller while the player has the Sneak stance and is neither
- * swimming nor flying. It is a STEP change with no smoothing.
+ * Read from the player's own .esm rather than hardcoded, because it is a GMST and a mod may move it, and a
+ * constant here would invent a number the data already carries. GMST layout: NAME is the id, and the value rides
+ * INTV, FLTV or STRV by the id's first letter (i, f or s), which is Morrowind's own convention and the reason the
+ * type does not need to be stored.
  *
- * Read from the player's own .esm rather than hardcoded, because it is a
- * GMST and a mod may move it - and because a constant here would be the
- * fourth time this arc invented a number the data already carries.
- * GMST layout: NAME is the id, and the value rides INTV / FLTV / STRV by
- * the id's first letter (i / f / s), which is Morrowind's own convention
- * and the reason the type does not need to be stored.
- *
- * @returns the number, or null when the .esm does not carry it - the
- *   caller decides, and a missing GMST is not a reason to refuse an arm.
+ * @returns the number, or null when the .esm does not carry it - the caller decides, and a missing GMST is not a
+ *   reason to refuse an arm.
  */
 function readGmst(bytes, rec) {
   let name = '';
@@ -742,14 +662,13 @@ export function isArmRecords(r) {
 }
 
 /**
- * RULE 32(a)'s vector, in the OBJECT ROOT's space: `Vec3f(0, 0, -offset)`
- * while sneaking and the zero vector otherwise. The whole first-person
- * body sinks by that much in -Z, through the NECK - so the Camera bone
- * goes with it and the eye drops too, which is the point.
+ * The sneak sink as a vector in the object root's space: [0, 0, -offset] while sneaking and the zero vector
+ * otherwise. The whole first-person body sinks by that much in -Z through the neck, so the Camera bone goes with
+ * it and the eye drops too, which is the point.
  *
- * "neither swimming nor flying" has no Daggerfall counterpart worth
- * porting here: the port's sneak input is already refused in those
- * states by the host, so the guard would be a branch no frame can take.
+ * The game also refuses the sink while swimming or flying. That has no Daggerfall counterpart worth porting here:
+ * the host already refuses the port's sneak input in those states, so the guard would be a branch no frame can
+ * take.
  */
 export function sneakOffset(sneaking, delta) {
   return sneaking && delta ? [0, 0, -delta] : [0, 0, 0];
@@ -932,7 +851,7 @@ export function armReport(parts, race, female) {
       slot,
       firstPerson: chosenFp,
       thirdPersonFallback: chosenTp,
-      // Rule 3: only these four may fall back at all, and this IS one of them.
+      // Only the four arm parts may fall back, and this is one of them.
       verdict: chosenFp ? 'first-person record found'
         : chosenTp ? 'no .1st record - falls back to the third-person mesh (allowed for arms)'
           : 'NOTHING for this slot',
@@ -995,13 +914,10 @@ export function facePools(parts, race, female, { has = null, own: ownAsked = fal
   return { heads: pool('head'), hairs: pool('hair') };
 }
 
-/** THE WEREWOLF'S HEAD AND HAIR - the BODY records `WerewolfHead`
- *  and `WerewolfHair`, looked up BY ID and nothing else (updateNpcBase,
- *  npcanimation.cpp:475-494: no race, sex, part or flag test; the actor's
- *  own head and hair are ignored), the last .esm to carry one winning (the
- *  load order). Third person only (:650-656). Every other slot is empty:
- *  getBodyParts answers nothing for a werewolf (:1200-1203), and the body
- *  is the robe's (mwItemMap composeWornArmor, a `record` piece). */
+/** The werewolf's head and hair: the BODY records `WerewolfHead` and `WerewolfHair`, looked up by id and nothing
+ *  else (no race, sex, part or flag test; the actor's own head and hair are ignored), the last .esm to carry one
+ *  winning (the load order). Third person only. Every other slot is empty for a werewolf, and the body is the
+ *  robe's (mwItemMap composeWornArmor, a `record` piece). */
 export const WEREWOLF_HEAD_ID = 'werewolfhead';
 export const WEREWOLF_HAIR_ID = 'werewolfhair';
 export function werewolfHeadRows(parts) {
@@ -1064,15 +980,11 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
   // the archives do not carry falls back to the walk (never traps),
   // and the row's verdict says which happened.
   const curated = curatedFace(race, female, faceIndex, faceTable);
-  // The sex law, list-shaped: the matching sex's pool, else the male
-  // pool retail relies on - never a mix, or the index would walk across
-  // sexes. The sort and the index are the FACE'S law and
-  // no one else's. Head and hair sort by id so a save's face survives
-  // any archive arrangement; the sweep slots above ride
-  // resolveBodyParts, the reference's own LAST-wins walk, untouched.
-  // facePools IS that law - the pools the
-  // matcher measured are the pools walked here, by construction (the
-  // same `has`).
+  // The sex law, list-shaped: the matching sex's pool, else the male pool retail relies on, never a mix, or the
+  // index would walk across sexes. The sort and the index are the face's law and no one else's. Head and hair sort
+  // by id so a save's face survives any archive arrangement; the sweep slots above ride resolveBodyParts, whose
+  // last-record-wins walk is untouched here. facePools is that law: the pools the matcher measured are the pools
+  // walked here, by construction (the same `has`).
   const pools = facePools(parts, race, female, { has, own: ownHeads });
   for (const slot of ['head', 'hair']) {
     const sorted = slot === 'head' ? pools.heads : pools.hairs;
@@ -1108,8 +1020,8 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
       counts: { all: sorted.length },   // the pool chosen among - the port's own where it stands
     });
   }
-  // A VAMPIRE'S FACE - the race's vampire head over the one walked (npcanimation.cpp updateNpcBase: the head
-  // model is getVampireHead's when there is one, the hair the actor's own); none for the race and the face stands
+  // A vampire's face: the race's vampire head replaces the one walked and the hair stays the actor's own. A race
+  // with no vampire head keeps the face as walked.
   const vamp = vampire ? vampireHeadRecord(parts, race, female) : null;
   if (vamp) {
     const row = rows.find((r) => r.slot === 'head');
@@ -1118,9 +1030,9 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
   return rows;
 }
 
-/** GetVampireHead (npcanimation.cpp, 0.48.0): the BODY record that is a vampire's, a skin, a head, of the sex
- *  and the race (ignoring case) - the LAST in load order of those, as the reference's mapping overwrites; NotPlayable
- *  is no bar (Morrowind's vampire heads are never offered at chargen). Null when the race has none. */
+/** The vampire's head: the BODY record that is a vampire's, a skin and a head, of the sex and the race (ignoring
+ *  case), the last in load order of those. NotPlayable is no bar (Morrowind's vampire heads are never offered at
+ *  chargen). Null when the race has none. */
 export function vampireHeadRecord(parts, race, female) {
   const want = String(race || '').toLowerCase();
   let out = null;
@@ -1128,25 +1040,19 @@ export function vampireHeadRecord(parts, race, female) {
   return out;
 }
 
-/** IS THIS MESH SKINNED, OR RIGID?
+/** Is this mesh skinned, or rigid?
  *
- * The question the whole attach design rests on, asked of a
- * real file. Reading OpenMW's two attach branches suggests Morrowind's arms are RIGID meshes hung off a
- * bone. If they are actually
- * SKINNED, a rigid attach is wrong.
+ * The question the whole attach design rests on, asked of a real file. The design assumes that Morrowind's arms
+ * are rigid meshes hung off a bone; if they are actually skinned, a rigid attach is wrong.
  *
- * THIS IS A SCAN, NOT A PARSE, and it is named so you cannot forget that.
- * A Morrowind NIF (4.0.0.2) stores each record's TYPE NAME as a sized
- * string immediately before the record, and there are no per-record sizes
- * - which is exactly why an unknown type is fatal to a real reader (rule:
- * niffile.cpp throws). A full walk therefore needs every record's layout.
- * But the type NAMES are recoverable without any of that: a uint32 length
- * followed by that many bytes of a NIF type name is a pattern a mesh's
- * other contents essentially never produce.
+ * This is a scan, not a parse, and it is named so. A Morrowind NIF (4.0.0.2) stores each record's type name as a
+ * sized string immediately before the record and has no per-record sizes, which is why an unknown type is fatal
+ * to a real reader: a full walk needs every record's layout. The type names are recoverable without that: a
+ * uint32 length followed by that many bytes of a NIF type name is a pattern a mesh's other contents essentially
+ * never produce.
  *
- * So this answers "does a NiSkinInstance appear in this file" with high
- * confidence and answers NOTHING about geometry, transforms or bones. It
- * is a census, offered as a census.
+ * So this answers "does a NiSkinInstance appear in this file" with high confidence and answers nothing about
+ * geometry, transforms or bones. It is a census, offered as a census.
  */
 export function scanNifRecordTypes(bytes) {
   const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -1193,10 +1099,9 @@ export function skinVerdict(bytes) {
   };
 }
 
-/** Where an arm slot's mesh actually lives in the archive: the record the
- *  engine would use for this actor, then its own MODL under meshes/.
- *  Rule: the .1st RECORD carries its own mesh name; the path is never
- *  built by splicing .1st into a filename. */
+/** Where an arm slot's mesh actually lives in the archive: the record used for this actor, then its own MODL under
+ *  meshes/. The first-person record carries its own mesh name; the path is never built by splicing `.1st` into a
+ *  filename. */
 export function armMeshPaths(rows) {
   return rows.map((row) => {
     const rec = row.firstPerson || row.thirdPersonFallback || null;
@@ -1209,20 +1114,14 @@ export function armMeshPaths(rows) {
   });
 }
 
-/** PARSE THE MESH FOR REAL, AND SHOW IT.
+/** Parse the mesh for real, and show it.
  *
- * The scan above answers "is there a NiSkinInstance" without parsing. This
- * does the opposite: it runs the restored strict reader (parseNif +
- * flattenNif) over an actual arm mesh and hands back
- * geometry a page can draw.
+ * The scan above answers "is there a NiSkinInstance" without parsing. This does the opposite: it runs the strict
+ * reader (parseNif and flattenNif) over an actual arm mesh and hands back geometry a page can draw.
  *
- * IT IS ALLOWED TO FAIL, AND SAYING SO IS THE POINT. An unknown record
- * type throws and kills the whole file - that is the format, not a bug in
- * the reader (niffile.cpp has no skip path). A community-mesh sweep put
- * 602 such failures across 14 record types on the worklist. So a failure
- * here is a FACT about which records this file needs, reported with the
- * message, not swallowed into an empty view the way the reverted rig
- * swallowed everything.
+ * It is allowed to fail, and saying so is the point. An unknown record type throws and kills the whole file,
+ * because NIF has no per-record sizes to skip it by. A failure here is a fact about which records this file needs,
+ * reported with the message, not swallowed into an empty view.
  */
 export async function parseMeshForPreview(bytes) {
   let parseNif; let flattenNif;
@@ -1326,18 +1225,13 @@ export function frontViewMapper(bounds, w, h, pad = 8) {
   return (x, y, z) => [w / 2 + (x - cx) * scale, h / 2 - (z - cz) * scale];
 }
 
-/** DOES YOUR SKELETON HAVE THE BONES THE RULES NAME?
+/** Does your skeleton have the bones the attach table names?
  *
- * Rule 5 records OpenMW's part-to-bone table verbatim - "Right Hand",
- * "Left Upper Arm", "Weapon Bone" and the rest - read out of
- * npcanimation.cpp:200-260. Rule 16 records that lookup is CASE-
- * INSENSITIVE, lowercased on both sides, and that duplicate names resolve
- * to the first in depth-first order.
+ * The table names bones such as "Right Hand", "Left Upper Arm" and "Weapon Bone". The lookup is
+ * case-insensitive (lower-cased on both sides), and duplicate names resolve to the first in depth-first order.
  *
- * All of that came off source. None of it has been checked against a
- * skeleton in an actual archive. If a name is wrong, every attach silently
- * finds nothing and the rig draws an empty view - which is the failure
- * this whole effort keeps circling. So ask the file.
+ * Until this report runs, no name has been checked against a skeleton in an actual archive. If a name is wrong,
+ * every attach silently finds nothing and the rig draws an empty view, so ask the file.
  */
 export async function skeletonReport(bytes) {
   let parseNif; let buildSkeleton;
@@ -1358,15 +1252,14 @@ export async function skeletonReport(bytes) {
     ok: true,
     boneCount: skel.nodes.size,
     names,
-    // Rule 16: lowercased on both sides. The report must use the SAME
-    // comparison the binder will, or it answers a question nobody asked.
+    // Lower-cased on both sides. The report must use the same comparison the binder does, or it answers a question
+    // nobody asked.
     has: (name) => skel.byName.has(String(name).toLowerCase()),
   };
 }
 
-/** The bones a first-person arm actually needs, per rule 5, plus the two
- *  weapon bones rule 17 says are chosen per weapon type. Names are given
- *  in the engine's own spelling; the lookup lowercases. */
+/** The bones a first-person arm actually needs, plus the two weapon bones chosen per weapon type. Names are given
+ *  in Morrowind's own spelling; the lookup lowercases. */
 export const FP_REQUIRED_BONES = Object.freeze([
   { name: 'Left Hand', why: 'hand, left side' },
   { name: 'Right Hand', why: 'hand, right side' },
@@ -1391,31 +1284,23 @@ export function checkRequiredBones(report) {
   return FP_REQUIRED_BONES.map((b) => ({ ...b, present: report.has(b.name) }));
 }
 
-/** ASSEMBLE THE ARM.
+/** Assemble the arm.
  *
- * The first step that PLACES parts relative to one another rather than
- * examining them one at a time. Everything here is a recorded rule, and
- * the two the reverted arc got backwards are the two doing the work:
+ * The first step that places parts relative to one another rather than examining them one at a time. Three rules
+ * do the work:
  *
- *  rule 12 - skinned and rigid parts take COMPLETELY different paths. A
- *    skinned part's geometry is skinned to the actor's skeleton and is
- *    never parented to a bone. A rigid part is placed AT a bone.
- *  rule 13 - a rigid part whose attach bone's name contains "Left" is
- *    drawn with x negated. One mesh serves both sides. Attaching the
- *    same mesh at both bones with no mirror makes the left hand a
- *    second right hand.
- *  rule 15 - for a skinned part the bone name is ALSO a geometry filter:
- *    a case-insensitive prefix match on the shape name with Morrowind's
- *    "Tri " convention stripped. That is how a skinned part picks its
- *    side, where a rigid one uses the mirror.
+ *  - Skinned and rigid parts take completely different paths. A skinned part's geometry is skinned to the actor's
+ *    skeleton and is never parented to a bone. A rigid part is placed at a bone.
+ *  - A rigid part whose attach bone's name contains "Left" is drawn with x negated. One mesh serves both sides.
+ *    Attaching the same mesh at both bones with no mirror makes the left hand a second right hand.
+ *  - For a skinned part the bone name is also a geometry filter: a case-insensitive prefix match on the shape
+ *    name with Morrowind's "Tri " convention stripped. That is how a skinned part picks its side, where a rigid
+ *    one uses the mirror.
  *
- * THIS IS ONE OF TWO STAGES.
- * This function BINDS only:
- * parse, skeleton, rule 15's filter, rule 13's mirror, the attach ref and
- * the output buffers, none of which depend on time. It ends by calling
- * poseAssembly once, so the rest pose is now "pose at t=0 with no tracks"
- * rather than a second copy of the same arithmetic - which is what lets
- * the result be re-posed at all.
+ * This is one of two stages. This function binds only: parse, skeleton, the shape filter, the mirror, the attach
+ * ref and the output buffers, none of which depend on time. It ends by calling poseAssembly once, so the rest
+ * pose is "pose at t=0 with no tracks" rather than a second copy of the same arithmetic, which is what lets the
+ * result be re-posed at all.
  */
 /** The readers an assembly carries (`fns`), resolved once so its per-frame calls are synchronous. One home,
  *  the arm's and the creature's. */
@@ -1453,10 +1338,9 @@ export async function assembleFirstPersonArm({ skeletonBytes, parts, boneSources
   const pieces = [];
   const notes = [];
   const effects = [];
-  // The bone addons (OpenMW's `use additional anim sources`) join
-  // the skeleton BEFORE any part binds, so a part may attach at a bone
-  // the addon brought. Each is `{ name, bytes }`; a file that will not
-  // parse is a note, never the assembly's refusal.
+  // The bone addons (extra skeleton files that bring extra bones) join the skeleton before any part binds, so a part
+  // may attach at a bone an addon brought. Each is `{ name, bytes }`; a file that will not parse is a note, never the
+  // assembly's refusal.
   const injected = [];
   for (const src of boneSources ?? []) {
     try {
@@ -1466,12 +1350,13 @@ export async function assembleFirstPersonArm({ skeletonBytes, parts, boneSources
       notes.push(`bones: ${src.name}: ${err.message}`);
     }
   }
-  // THE LEFT HAND'S WEAPON BONE, asked for by the player's two rigs
-  // (`offWeaponBone`). A skeleton without a "Weapon Bone Left" - every retail one - takes one made by the mirror from
-  // its own Weapon Bone (combat/twoHands/mirrorRig.js offWeaponBoneAddon), through the addons' own door and after them (an
-  // addon that brings one is the skeleton's), before any part binds and before the mirror's plan is first read. A bow
-  // never hangs on it: rule 17 asks the actor's own bytes (resolveWeaponParts), where retail has none. 
-  // the skeleton file itself rides along - its own skin (retail's Tri Shadow) is the frame the hands are mirrored in.
+  // The left hand's weapon bone, asked for by the player's two rigs (`offWeaponBone`). A skeleton without a
+  // "Weapon Bone Left", which is every retail one, takes one made by the mirror from its own Weapon Bone
+  // (combat/twoHands/mirrorRig.js offWeaponBoneAddon), through the addons' own door and after them (an addon that
+  // brings one is the skeleton's), before any part binds and before the mirror's plan is first read. A bow never
+  // hangs on it: resolveWeaponParts looks for the weapon's bone in the actor's own skeleton bytes, which hold no
+  // such bone in retail. The skeleton file itself rides along: its own skin (retail's Tri Shadow) is the frame the
+  // hands are mirrored in.
   if (offWeaponBone) {
     const addon = offWeaponBoneAddon(skeleton, GRAPH_ROOT, mod.skelMats, skeletonFile);
     if (addon) {
@@ -1567,18 +1452,14 @@ export function bindPartsInto(assembly, parts) {
   const mod = assembly.fns;
   const { skeleton, pieces, notes } = assembly;
   const effects = assembly.effects ?? (assembly.effects = []);   // the parts' particle systems
-  // The WEAPON's own BoneOffset, kept for the ammunition that
-  // rides inside its mesh. resolveWeaponParts pushes 'weapon' before
-  // 'arrow', so by the time the arrow binds this is the offset the
-  // reference has already applied one level above ArrowBone. Null for
-  // every other part list and reset per call, so a body without a
-  // weapon cannot inherit a stale one.
+  // The weapon's own BoneOffset, kept for the ammunition that rides inside its mesh. resolveWeaponParts pushes
+  // 'weapon' before 'arrow', so by the time the arrow binds this is the offset already applied one level above
+  // ArrowBone. Null for every other part list and reset per call, so a body without a weapon cannot inherit a stale
+  // one.
   let weaponBoneOffset = null;
-  // The SCABBARD's offset, for what rides inside its file - the
-  // holstered weapon the base mesh stands in for (getInstance(mesh,
-  // weaponNode)) and the quiver's arrows (getInstance(model, arrowNode))
-  // are bare instances under nodes of the scabbard's graph, so they wear
-  // the scabbard's PAT exactly as the arrow wears the weapon's.
+  // The scabbard's offset, for what rides inside its file: the holstered weapon the base mesh stands in for and the
+  // quiver's arrows are bare children of nodes in the scabbard's graph, so they wear the scabbard's transform
+  // exactly as the arrow wears the weapon's.
   let sheathBoneOffset = null;
   for (const part of parts) {
     // `part.bones` overrides the table so a test can drive real assembly
@@ -1612,9 +1493,8 @@ export function bindPartsInto(assembly, parts) {
         continue;
       }
       const bonePiecesBefore = pieces.length;
-      // RULE 40's report: skipped influences draw wrong, not invisibly,
-      // so the card must say WHY a finger sags or a strip collapses.
-      // One note per part, not per bone - the names are the same.
+      // A skipped influence draws wrong, not invisibly, so the card must say why a finger sags or a strip
+      // collapses. One note per part, not per bone: the names are the same.
       if (bound.missingBones?.length) {
         const say = `${part.slot}: this skeleton has no bone `
           + `${bound.missingBones.map((b) => `"${b}"`).join(', ')} - `
@@ -1623,37 +1503,24 @@ export function bindPartsInto(assembly, parts) {
       }
       shapeCensus ??= bound.skinned.map((b) => String(b.name || '').trim() || '(nameless)');
 
-      // RULE 12 + 15: skinned geometry carries its own bones, so it is
-      // never MIRRORED - it picks its side by the shape NAME. And it
-      // binds ONCE PER SIDE, not once per part.
+      // Skinned geometry carries its own bones, so it is never mirrored: it picks its side by the shape name. And
+      // it binds once per side, not once per part.
       //
-      // No `if (!tookSkinned)` latch wraps this block: such a latch,
-      // raised by the first bone that yielded
-      // any skinned batch, so a two-bone slot - and every arm slot is one
-      // (`PART_BONES.hand = ['left hand','right hand']`) - would emit the
-      // LEFT hand and never ask for the right. The filter that exists
-      // precisely to pick a side would run once and then be skipped, which on
-      // retail data is a one-handed arm.
+      // No `if (!tookSkinned)` latch wraps this block. Such a latch, raised by the first bone that yielded any
+      // skinned batch, would break every two-bone slot, and every arm slot is one (`PART_BONES.hand = ['left hand',
+      // 'right hand']`): it would emit the left hand and never ask for the right. The filter that exists precisely
+      // to pick a side would run once and then be skipped, which on retail data is a one-handed arm.
       //
-      // Rule 4 is what the latch contradicted: sPartList is a MULTIMAP,
-      // `{ MP_Hand, PRT_RHand }, { MP_Hand, PRT_LHand }` - one mesh part,
-      // two slots, "each side its own part reference at its own bone".
-      // Treating a part as
-      // one mesh attached at two bones in one pass is the error; the latch is the
-      // same error wearing the other face.
+      // One body part has two slots, each side its own part reference at its own bone. Treating a part as one mesh
+      // attached at two bones in one pass is the error, and the latch is the same error in another shape.
       //
-      // A latch is still needed, but only for the port's own EXTENSION to
-      // rule 15: a shape with no name matches every bone (OpenMW's
-      // ciStartsWith("", filter) is false and the engine drops it), so a
-      // nameless one-shape part would bind at every side and stack
-      // duplicates in the same place. That one binds once.
-      // HAIR EXCEPTION: the hair part attaches at the
-      // Head bone but its geometry filter is the word "hair"
-      // (npcanimation.cpp:801 - `bonefilter = (type == PRT_Hair) ?
-      // "hair" : bonename`). Every other slot filters on its bone name.
-      // on the part's OWN name, never its display slot - a worn
-      // add's slot reads "hair (record id)" (mwItemMap composeRefs) and
-      // silently missed this test, filtering a wig on the bone "head".
+      // A latch is still needed, but only for the port's own extension of that filter: a shape with no name matches
+      // every bone (a strict prefix test would drop it), so a nameless one-shape part would bind at every side and
+      // stack duplicates in the same place. That one binds once.
+      //
+      // Exception: the hair part attaches at the Head bone, but its geometry filter is the word "hair". Every other
+      // slot filters on its bone name. The test is on the part's own name, never its display slot: a worn add's slot
+      // reads "hair (record id)" (mwItemMap composeRefs) and would miss it, filtering a wig on the bone "head".
       const geomFilter = (part.partName ?? part.slot) === 'hair' ? 'hair' : bone;
       let namelessHere = false;
       for (const batch of bound.skinned) {
@@ -1677,35 +1544,23 @@ export function bindPartsInto(assembly, parts) {
       }
       tookNameless = tookNameless || namelessHere;
 
-      // RULE 12 + 13: a rigid part is PLACED at the bone, once per side,
-      // with x negated on the left.
+      // A rigid part is placed at the bone, once per side, with x negated on the left.
       //
-      // the skinned-vs-rigid branch is decided per FILE, not per
-      // shape. One skinned geometry makes the whole file a rig
-      // (node.cpp:275-276 sets mUseSkinning; nifloader wraps the roots
-      // in a Skeleton) and attach() then takes the CopyRigVisitor
-      // branch, which seeds ONLY RigGeometry drawables
-      // (attach.cpp:42-46 `if (!isRig) return;`) - an unskinned shape
-      // in that file never takes the rigid path's mirror/offset, it is
-      // drawn only as part of a copied rig ancestor's subtree, which
-      // this flattened graph cannot express. So a rig file's rigid
-      // batches are NOTED and dropped rather than mirrored into places
-      // the reference never draws them.
+      // The skinned-versus-rigid branch is decided per file, not per shape. One skinned geometry makes the whole
+      // file a rig, and in a rig file only the skinned geometry is attached: an unskinned shape in it never takes
+      // the rigid path's mirror or offset, and is drawn only as part of a copied rig ancestor's subtree, which this
+      // flattened graph cannot express. So a rig file's rigid batches are noted and dropped rather than mirrored
+      // into places the game never draws them.
       if (bound.attached.length && bound.skinned.length) {
         const say = `${part.slot}: ${bound.attached.length} unskinned shape(s) in a RIG file are not `
           + 'attached (attach.cpp:42-46 seeds only skinned geometry)';
         if (!notes.includes(say)) notes.push(say);
       } else if (bound.attached.length) {
-        // The mirror is fixed HERE, at bind time, because it is a fact
-        // about the bone's NAME, not about the pose. Re-deriving it per
-        // frame invites a pose-dependent mirror, which is a left hand
-        // that flips sides mid-clip.
+        // The mirror is fixed here, at bind time, because it is a fact about the bone's name, not about the pose.
+        // Re-deriving it per frame invites a pose-dependent mirror, which is a left hand that flips sides mid-clip.
         //
-        // The reference tests the RESOLVED node's own
-        // name, case-SENSITIVELY (attach.cpp:166 - `attachNode->getName()
-        // .find("Left") != npos`). The requested name in the part table
-        // is lowercase; the node the skeleton actually carries is what
-        // decides.
+        // The test is on the resolved node's own name, case-sensitively. The requested name in the part table is
+        // lowercase; the node the skeleton actually carries is what decides.
         const nodeRef = bone ? skeleton.byName.get(bone.toLowerCase()) : null;
         const nodeName = nodeRef != null && skeleton.nodes.has(nodeRef) ? skeleton.nodes.get(nodeRef).name : (bone || '');
         const mirror = nodeName.includes('Left');
@@ -1719,60 +1574,27 @@ export function bindPartsInto(assembly, parts) {
             // applied per frame, because it is a fact about two FILES and
             // not about the pose.
             batch: null, source: applyPre(batch.positions, part.preTransform), attachRef: bound.attachRef,
-            // Rule 14: the part's own BoneOffset node, resolved once at
-            // bind time because it is a fact about the FILE.
+            // The part's own BoneOffset node, resolved once at bind time because it is a fact about the file.
             //
-            // AMMUNITION is the one part that never takes it.
-            // attachArrow does not go through SceneUtil::attach - it is
-            // a bare `getInstance(model, parent)` under getArrowBone()
-            // (weaponanimation.cpp:80-94, the call at :91) - so the
-            // arrow mesh's own "BoneOffset" node is never searched for
-            // and never applied.
+            // Ammunition never takes its own. The arrow mesh's own "BoneOffset" node is never searched for or
+            // applied: the arrow is a bare child of its parent node, with no offset, attitude or mirror of its own.
+            // Whatever the arrow ends up wearing, it wears because its parent wears it.
             //
-            // THE ARROW ATTACHES WITH IDENTITY, and that is the whole
-            // law of its own transform. getInstance(path, parentNode)
-            // is `attachTo(cloned, parentNode)` and attachTo is
-            // `parentNode->addChild(instance)` - nothing else
-            // (scenemanager.cpp:1100-1110). No offset of its own, no
-            // attitude, no mirror of its own: whatever the arrow ends
-            // up wearing, it wears because its PARENT wears it.
+            // So it takes the weapon's offset, though never its own. The parent is the ArrowBone node inside the
+            // weapon mesh, and the weapon hangs from the actor's bone through one transform that carries the
+            // weapon's BoneOffset position and the left-side mirror scale. Everything under ArrowBone inherits that
+            // transform, the arrow included. Giving the arrow only preTransform (the weapon mesh's own
+            // root-to-ArrowBone chain) left it displaced from the hand by exactly the weapon's offset, every time.
             //
-            // SO IT TAKES THE WEAPON'S
-            // OFFSET, THOUGH NEVER ITS OWN. A reading that takes half the
-            // reference stops one level too high. That
-            // `parent` is getArrowBone(), the ArrowBone node INSIDE the
-            // weapon's live scene graph (npcanimation.cpp:1093-1101),
-            // and the weapon reached that graph through
-            // SceneUtil::attach, which put ONE
-            // PositionAttitudeTransform between the actor's bone and
-            // the weapon mesh (attach.cpp:145-198) carrying the
-            // weapon's BoneOffset position (:158-159) and rule 13's
-            // mirror scale (:166-179). Everything under ArrowBone
-            // inherits that PAT, the arrow included. The port gave the
-            // arrow only preTransform - the weapon NIF's own
-            // root-to-ArrowBone chain - so it sat displaced from the
-            // hand by exactly the weapon's offset, every time.
+            // Translation only, and that is exact. The offset node's rotation is never read, and the only rotation
+            // a part can be given when it is attached is the light attitude, which is for held lights alone and
+            // never for a weapon. So placeAtBone's bone x (offset + mirror(v)) is the whole transform: the
+            // translation, no rotation, and the mirror scale.
             //
-            // TRANSLATION ONLY, AND THAT IS EXACT rather than an
-            // approximation. One could suspect the port
-            // drops a 90-degree rotation that meshes carrying a
-            // BoneOffset are given. It does not: :159 is
-            // `setPosition(boneOffset->getMatrix().getTrans())` and the
-            // matrix's rotation is never read, and the only rotation
-            // SceneUtil::attach can apply is the caller's `attitude`
-            // (:181-186), which ActorAnimation::attach passes for
-            // `isLight` ALONE (actoranimation.cpp:98-103) - never for a
-            // weapon (:104-105). placeAtBone's bone x (offset +
-            // mirror(v)) is therefore the PAT's own
-            // T(position) x R(attitude=identity) x S(scale), exactly.
-            //
-            // ONLY WHEN IT RIDES THE WEAPON. preTransform is set in
-            // exactly the fallback case (getArrowBone's second branch,
-            // npcanimation.cpp:1097-1100). When the ACTOR's skeleton
-            // carries "Bip01 Arrow" the reference's parent is that bone
-            // and the weapon is not in the chain at all - inheriting
-            // its offset there would be the same mistake pointing the
-            // other way.
+            // Only when it rides the weapon. preTransform is set exactly in the fallback case, where the arrow's
+            // parent is the ArrowBone node inside the weapon mesh. When the actor's skeleton carries "Bip01
+            // Arrow", the parent is that bone and the weapon is not in the chain at all, so inheriting its offset
+            // there would be the same mistake pointing the other way.
             boneOffset: part.ammo
               ? (part.preTransform ? weaponBoneOffset : null)
               : part.bare
@@ -1791,14 +1613,11 @@ export function bindPartsInto(assembly, parts) {
             // bone and the mirror each frame (placeNormalsAtBone)
             sourceNormals: normals ? applyPreNormals(batch.normals, part.preTransform) : null, normals });
         }
-        // THE PART'S PARTICLE SYSTEMS ride the same placement its
-        // rigid shapes do - the bone, the mirror, rule 14's offset and the
-        // part's pre-transform - because they were authored in the same
-        // file at the same origin. A torch's flame is one. They are kept
-        // apart from the pieces (a piece is a triangle list; this is a
-        // law and a clock) on `assembly.effects`, which combat/fpArm.js
-        // runs and draws. Only a RIGID part carries them: a skinned file's
-        // particles would follow a bone this flattener does not track.
+        // The part's particle systems ride the same placement its rigid shapes do (the bone, the mirror, the bone
+        // offset and the part's pre-transform), because they were authored in the same file at the same origin. A
+        // torch's flame is one. They are kept apart from the pieces (a piece is a triangle list; this is a law and
+        // a clock) on `assembly.effects`, which combat/fpArm.js runs and draws. Only a rigid part carries them: a
+        // skinned file's particles would follow a bone this flattener does not track.
         for (const desc of bound.effects ?? []) {
           effects.push({
             slot: part.slot, bone, mirrored: mirror, tag: part.tag ?? null, hang: part.hang ?? null,   // a hanging part's flame hangs with it
@@ -1812,15 +1631,11 @@ export function bindPartsInto(assembly, parts) {
         if (part.slot === 'weapon') weaponBoneOffset = bound.boneOffset || null;
         if (part.slot === 'sheath') sheathBoneOffset = bound.boneOffset || null;
       }
-      // THE SILENT HOLE. A bone whose every NAMED skinned shape
-      // fails rule 15's filter would bind NOTHING and say NOTHING -
-      // the card would read "on - N pieces" with a side simply absent from
-      // the arm, which is both the missing-hand hole and the
-      // one-handed defect wearing a new face. If this bone gained no
-      // piece and the part had named shapes to offer, the note lists
-      // them against the filter. (A nameless shape skipped by the
-      // once-per-part latch is correct and stays silent: `named` is
-      // empty for it.)
+      // The silent hole. A bone whose every named skinned shape fails the shape filter would bind nothing and say
+      // nothing: the card would read "on - N pieces" with a side simply absent from the arm, which is both the
+      // missing-hand hole and the one-handed defect in a new shape. If this bone gained no piece and the part had
+      // named shapes to offer, the note lists them against the filter. (A nameless shape skipped by the
+      // once-per-part latch is correct and stays silent: `named` is empty for it.)
       if (pieces.length === bonePiecesBefore && bone) {
         const named = bound.skinned
           .map((b) => String(b.name || '').trim())
@@ -1844,33 +1659,28 @@ export function bindPartsInto(assembly, parts) {
 }
 
 /**
- * POSE THE ASSEMBLY. The one home for everything that changes when
- * time does - and the reason assembleFirstPersonArm's return value can be
- * re-posed at all.
+ * Pose the assembly. The one home for everything that changes when time does, and the reason
+ * assembleFirstPersonArm's return value can be re-posed at all.
  *
  * What is recomputed here, and nothing else:
  *   - the pose (one poseSkeleton over the whole skeleton);
- *   - the skeleton-space matrices, MEMOISED PER SKELETON ROOT. The
- *     assembly had been walking the chain once per skinned batch; the
- *     distinct roots are what the walk actually depends on, and on an arm
- *     that is one.
+ *   - the skeleton-space matrices, memoised per skeleton root. The assembly had been walking the chain once per
+ *     skinned batch; the distinct roots are what the walk actually depends on, and on an arm that is one.
  *   - per skinned piece: skinBatch into the piece's own buffer;
- *   - per rigid piece: the attachment affine, which now carries the
- *     bone's ANIMATED rotation, so rigid parts move too. A stage that
- *     re-skinned the skinned half and left the rigid half at rest would
- *     draw a hand that animates inside a cuff that does not.
+ *   - per rigid piece: the attachment affine, which now carries the bone's animated rotation, so rigid parts move
+ *     too. A stage that re-skinned the skinned half and left the rigid half at rest would draw a hand that
+ *     animates inside a cuff that does not.
  *
- * What is NOT recomputed, because it is a fact about the files and not
- * about time: the parse, the skeleton, the bind, rule 15's shape filter,
- * rule 13's mirror, the attach ref, the output buffers, and the draw
- * mapper. A mapper that follows the per-frame bounds renormalises the
- * picture every frame and hides the very motion this stage exists to show.
+ * What is not recomputed, because it is a fact about the files and not about time: the parse, the skeleton, the
+ * bind, the shape filter, the mirror, the attach ref, the output buffers, and the draw mapper. A mapper that
+ * follows the per-frame bounds renormalises the picture every frame and hides the very motion this stage exists
+ * to show.
  *
  * Mutates `assembly` in place and returns it.
  */
-/** The slots whose own controllers run on the WEAPON clock - the weapon's (PRT_Weapon takes
- *  mWeaponAnimationTime, npcanimation.cpp) and the arrow instanced under a node of it. Every other part's controllers
- *  run on the lower body's clock in the reference, which this port does not drive. */
+/** The slots whose own controllers run on the weapon clock: the weapon's (they follow the weapon's animation time)
+ *  and the arrow instanced under a node of it. Every other part's controllers run on the lower body's clock, which
+ *  this port does not drive. */
 export const WEAPON_CLOCK_SLOTS = Object.freeze(new Set(['weapon', 'arrow']));
 
 /**
@@ -1921,18 +1731,14 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
   // climb's hands): a left-hand blow, a second weapon held up. An arm read from ANOTHER clip (`clip`: the idle under a
   // blow) is posed here, on this skeleton, at that clip's own time.
   assembly.mirrored = mirror ? applyMirrorRig(skeleton, pose, GRAPH_ROOT, fns.skelMats, mirrorWithPoses(mirror, fns, skeleton, accumRoot)) : null;
-  // ONE SPACE. The reference poses every piece - skinned, rigid,
-  // and the camera node rule 54 reads - in the same space, the full
-  // graph below the Skeleton group with the root node's own transform
-  // included. What stood here memoised matrices PER DECLARED SKIN ROOT
-  // and placed rigid pieces relative to the file root: two spaces that
-  // coincide exactly when every declared root is the root and the root's
-  // transform is identity - true of every fixture, false of retail data,
-  // where the difference is a hand floating away from its forearm.
+  // One space: every piece (skinned, rigid, and the camera node) is posed in the same space, the full graph below
+  // the Skeleton group with the root node's own transform included. Memoising matrices per declared skin root and
+  // placing rigid pieces relative to the file root gives two spaces that coincide exactly when every declared root
+  // is the root and the root's transform is identity: true of every fixture, false of retail data, where the
+  // difference is a hand floating away from its forearm.
   pitchNeck(skeleton, pose, GRAPH_ROOT, fns.skelMats, neckPitch, neckAim, neckOffset);
-  // The third person's ranged aim - the spine controllers over the clip's pose, as the
-  // reference's run after its animation (weaponanimation.cpp:175-211), and under the body motion, which keeps the clip's
-  // chest while the clip has the arms
+  // The third person's ranged aim: the spine turns over the clip's pose, after the animation and under the body
+  // motion, which keeps the clip's chest while the clip has the arms.
   assembly.aimFit = aim ? aim(skeleton, pose, GRAPH_ROOT, fns.skelMats) : null;
   // Body motion (characters/bodyMotion/bodyMotion.js, the third-person body's): the gait, the carry and a blow's body
   // solved over the clip's pose - after the mirror (a pair's arm is the layer's to place) and UNDER the run, the climb
@@ -1972,8 +1778,8 @@ export function poseAssembly(assembly, { tracks = null, sampleTrack = null,
     }
   }
   assembly.pose = pose;
-  // The rig-space transform of every node, kept so rule 54 can read the
-  // camera node's translation without re-posing the skeleton.
+  // The rig-space transform of every node, kept so the camera node's translation can be read without re-posing the
+  // skeleton.
   assembly.mats = mats;
   assembly.time = time;
   // What the assembly's owner places after every piece is posed - the stowed gear that goes with the
@@ -2009,21 +1815,21 @@ function mirrorWithPoses(req, fns, skeleton, accumRoot) {
 }
 
 /**
- * A PART THAT HANGS. Every other rigid part RIDES its bone - the bone's whole transform, rotation and
- * all, is its placement (placeAtBone). A lantern hooked to a belt does not: it hangs PLUMB from the hook whatever
- * the pelvis is doing, and swings about it. So a part carrying a `hang` takes, instead of the bone's affine:
+ * A part that hangs. Every other rigid part rides its bone: the bone's whole transform, rotation and all, is its
+ * placement (placeAtBone). A lantern hooked to a belt does not: it hangs plumb from the hook whatever the pelvis
+ * is doing, and swings about it. So a part carrying a `hang` takes, instead of the bone's affine:
  *
  *   the hook   - a point fixed to the bone (`hookLocal`, in the bone's own frame), so it follows the hip's walk
- *   the anchor - the point of the part that hangs FROM the hook (`anchor`, in the part's placed coordinates:
- *                after its attitude, the mirror and rule 14's offset - hangAnchor measures it once, at bind)
+ *   the anchor - the point of the part that hangs from the hook (`anchor`, in the part's placed coordinates:
+ *                after its attitude, the mirror and the bone offset - hangAnchor measures it once, at bind)
  *   the attitude - `rot`, a rig-space 3x3 the part's owner writes each frame (plumb, times the swing)
  *   the size   - `size`, a uniform scale about the anchor its owner sets once at bind (a lantern made
  *                for a street or a hand, hung at a belt lantern's height - combat/fpArm.js hipLanternSize); 1 unset
  *
- * and the answer is an affine placeAtBone takes like any other: v -> rot * size * (v - anchor) + hook. The rig space
- * is the actor's own (Z up), so plumb there is plumb in the world - the body only turns in yaw. The result is
+ * and the answer is an affine placeAtBone takes like any other: v -> rot * size * (v - anchor) + hook. The rig
+ * space is the actor's own (Z up), so plumb there is plumb in the world: the body only turns in yaw. The result is
  * written into the hang's own scratch, so the per-frame path allocates nothing. (A normal under the size is
- * renormalised as a bone's scale is - placeNormalsAtBone, and the skin shader's.)
+ * renormalised as a bone's scale is: placeNormalsAtBone, and the skin shader's.)
  */
 export function hangAffine(at, hang) {
   const out = hang._at ?? (hang._at = { a: new Float32Array(9), t: [0, 0, 0] });
@@ -2092,15 +1898,12 @@ function invert33(m) {
     C * k, -(a * h - b * g) * k, (a * e - b * d) * k];
 }
 
-/** One row per assembled piece, for the page's table and the
- *  probe's readback - so neither invents its own summary of the same
- *  data and the two can disagree.
+/** One row per assembled piece, for the page's table and the probe's readback, so neither invents its own summary
+ *  of the same data and the two can disagree.
  *
- *  KEYED BY SLOT **AND** BONE. Every arm slot is two-boned (rule 4's
- *  multimap), so a key of slot alone collides on exactly the case this
- *  stage exists to show. Bounds are PER PIECE, not the assembly's, which
- *  is what makes a left/right mix-up readable in a table as well as on
- *  the canvas. */
+ *  Keyed by slot and bone. Every arm slot is two-boned (one body part has two slots), so a key of slot alone
+ *  collides on exactly the case this stage exists to show. Bounds are per piece, not the assembly's, which is
+ *  what makes a left/right mix-up readable in a table as well as on the canvas. */
 export function armPieceRows(pieces) {
   return (pieces ?? []).map((p) => ({
     key: `${p.slot} @ ${p.bone ?? '(no bone)'}`,
@@ -2108,9 +1911,8 @@ export function armPieceRows(pieces) {
     bone: p.bone ?? null,
     kind: p.kind,
     mirrored: !!p.mirrored,
-    // Rule 14, on the card: a part placed at its bone's bare origin and
-    // one placed at its authored offset are the same picture until you
-    // know which you are looking at.
+    // The bone offset, on the card: a part placed at its bone's bare origin and one placed at its authored offset
+    // are the same picture until you know which you are looking at.
     boneOffset: p.boneOffset || null,
     vertices: p.positions ? p.positions.length / 3 : 0,
     triangles: p.indices ? p.indices.length / 3 : 0,
@@ -2119,17 +1921,17 @@ export function armPieceRows(pieces) {
 }
 
 /**
- * bind a garment SKINNED FROM THE BODY. `part.skinFrom` lists the body parts it is fitted over (the
- * player's own skin meshes, `{ slot, bones?, bytes }`); each is bound exactly as the body binds it - a skinned
- * shape by rule 15's filter per bone, a rigid one at its bone with rule 13's mirror and rule 14's offset - and the
- * garment copies their skins (formats/morrowind/mwSkinTransfer.js), solved against the skeleton's rest pose. A garment with
- * no body under it is a note and is not drawn: floating free of the body is exactly the failure this exists to end.
+ * Bind a garment skinned from the body. `part.skinFrom` lists the body parts it is fitted over (the player's own
+ * skin meshes, `{ slot, bones?, bytes }`); each is bound exactly as the body binds it (a skinned shape by the
+ * shape filter per bone, a rigid one at its bone with the mirror and the bone offset) and the garment copies their
+ * skins (formats/morrowind/mwSkinTransfer.js), solved against the skeleton's rest pose. A garment with no body
+ * under it is a note and is not drawn: floating free of the body is exactly the failure this exists to end.
  *
- * `part.fitTo` names the body part the garment hides (the cuirass hides the chest), and the garment is first
- * MOVED ONTO THE WEARER - its top to that part's top, measured in the same rest pose (fitLift) - rather than trusted
- * to sit where the modeller's scene put it. That scene's body stood lower than this one, and the brigandine drawn at
- * the scene's height left the chest it hides bare. With no such part, the garment keeps its baked height and a note
- * says so.
+ * `part.fitTo` names the body part the garment hides (the cuirass hides the chest), and the garment is first moved
+ * onto the wearer, its top to that part's top, measured in the same rest pose (fitLift), rather than trusted to
+ * sit where the modeller's scene put it. That scene's body stood lower than this one, and the brigandine drawn at
+ * the scene's height left the chest it hides bare. With no such part, the garment keeps its baked height and a
+ * note says so.
  */
 function bindSkinnedFromBody(assembly, part, bones) {
   const mod = assembly.fns;
@@ -2210,10 +2012,9 @@ function applyPre(positions, pre) {
   return out;
 }
 
-/** RULE 15's filter, verbatim: a case-insensitive PREFIX match on the
- *  shape name, with Morrowind's "Tri " convention stripped first. A shape
- *  with NO name matches everything, because a nameless shape in a
- *  one-shape part file is the part. */
+/** The shape filter: a case-insensitive prefix match on the shape name, with Morrowind's "Tri " convention
+ *  stripped first. A shape with no name matches everything, because a nameless shape in a one-shape part file is
+ *  the part. */
 export function shapeMatchesBone(shapeName, bone) {
   const name = String(shapeName || '').trim().toLowerCase();
   if (!name) return true;
@@ -2222,23 +2023,18 @@ export function shapeMatchesBone(shapeName, bone) {
   return name.startsWith('tri ') && name.slice(4).startsWith(want);
 }
 
-/** RULE 13, alone and directly testable: place a rigid part's vertices at
- *  a bone, mirroring x first when the part is going on the LEFT.
+/** The mirror, alone and directly testable: place a rigid part's vertices at a bone, mirroring x first when the
+ *  part is going on the left.
  *
- *  Extracted because the mirror could not be reached end-to-end - no
- *  fixture skeleton carries a bone whose name contains "left", so an
- *  assembly test simply never took this branch and three mutants survived
- *  a full sweep. A rule that cannot be exercised is not pinned, whatever
- *  the test output says.
+ *  Extracted because the mirror could not be reached end to end: no fixture skeleton carries a bone whose name
+ *  contains "left", so an assembly test never took this branch and three mutants survived a full sweep. A rule
+ *  that cannot be exercised is not pinned, whatever the test output says.
  */
 export function placeAtBone(positions, at, mirror, out = new Float32Array(positions.length), offset = null) {
-  // RULE 14's OFFSET RIDES THE SAME TRANSFORM AS THE MIRROR, and the
-  // ORDER is decided by OSG rather than chosen here: both are set on one
-  // PositionAttitudeTransform, whose matrix is
-  // T(position) * R(attitude) * S(scale). So the mirror scales the
-  // vertex, the offset translates the result, and only then does the
-  // bone place it. Adding the offset BEFORE the mirror would negate its
-  // x on every left-hand part - the bow, among others.
+  // The bone offset rides the same transform as the mirror, and the order is that of a translate-rotate-scale
+  // transform (T * R * S): the mirror scales the vertex, the offset translates the result, and only then does the
+  // bone place it. Adding the offset before the mirror would negate its x on every left-hand part, the bow among
+  // them.
   const ox = offset ? offset[0] : 0;
   const oy = offset ? offset[1] : 0;
   const oz = offset ? offset[2] : 0;
@@ -2254,10 +2050,9 @@ export function placeAtBone(positions, at, mirror, out = new Float32Array(positi
 }
 
 /**
- * A RIGID PART'S NORMALS,
- * PLACED AS ITS VERTICES ARE (placeAtBone) - mirrored with them (rule 13's X negated: a reflection takes a normal to
- * the reflected surface's normal, so no flip follows) and turned by the bone. Rule 14's offset is a translation and
- * leaves a normal alone. Renormalised, so a bone's uniform scale does not dim the light.
+ * A rigid part's normals, placed as its vertices are (placeAtBone): mirrored with them (x negated: a reflection
+ * takes a normal to the reflected surface's normal, so no flip follows) and turned by the bone. The bone offset is
+ * a translation and leaves a normal alone. Renormalised, so a bone's uniform scale does not dim the light.
  */
 export function placeNormalsAtBone(normals, at, mirror, out = new Float32Array(normals.length)) {
   const a = at.a;
@@ -2317,27 +2112,21 @@ function applyPreNormals(normals, pre) {
 }
 
 /**
- * THE CLIP, READ AND REPORTED. One summary the page renders and the
- * probe reads back, so the two cannot invent different accounts of the
- * same file.
+ * The clip, read and reported. One summary the page renders and the probe reads back, so the two cannot invent
+ * different accounts of the same file.
  *
- * `binding` is the field that earns its place. poseSkeleton answers an
- * unmatched bone with its rest transform, so a .kf keyed to bones this
- * skeleton does not have poses NOTHING and draws a clean, static,
- * entirely plausible arm. That failure is invisible in a picture and
- * invisible in a pixel count; it is only ever visible as a sentence.
+ * `binding` is the field that earns its place. poseSkeleton answers an unmatched bone with its rest transform, so a
+ * .kf keyed to bones this skeleton does not have poses nothing and draws a clean, static, entirely plausible arm.
+ * That failure is invisible in a picture and invisible in a pixel count; it is only ever visible as a sentence.
  *
- * `tracks[].rotationType` is the second: it says how much of a player's
- * real file rides KEY_TYPE.constant, whose sampler this tree holds at the
- * previous key where the reference flips at the segment midpoint. That is
- * a different member with no fixture, deliberately not touched here - but
- * a player looking at their own data deserves to see how much of it is
- * affected rather than being told nothing.
+ * `tracks[].rotationType` is the second: it says how much of a player's real file rides KEY_TYPE.constant, whose
+ * sampler this tree holds at the previous key rather than flipping at the segment midpoint. That is a different
+ * member with no fixture, deliberately not touched here, but a player looking at their own data deserves to see
+ * how much of it is affected rather than being told nothing.
  *
- * `legacy` is parseAnimGroups' answer to the same question, carried so
- * the page can show both. On the fixture they disagree by construction:
- * the listing reports Idle [1.00 -> 0.50], a range that runs backwards,
- * while the clip law reads [1.00 -> 3.00].
+ * `legacy` is parseAnimGroups' answer to the same question, carried so the page can show both. On the fixture they
+ * disagree by construction: the listing reports Idle [1.00 -> 0.50], a range that runs backwards, while the clip
+ * law reads [1.00 -> 3.00].
  */
 
 export async function clipReport({ kfBytes, skeleton = null, group = 'Idle', clipOpts = {} } = {}) {
@@ -2378,9 +2167,8 @@ export async function clipReport({ kfBytes, skeleton = null, group = 'Idle', cli
     groups: mod.clipGroups(keys),
     group,
     clip,
-    // RULE 49's default loopStopTime is +Infinity, and JSON turns that
-    // into null on its way through a page evaluation. The boolean is what
-    // survives the trip, so a probe never asserts on a null it cannot read.
+    // The default loopStopTime is +Infinity, and JSON turns that into null on its way through a page evaluation.
+    // The boolean is what survives the trip, so a probe never asserts on a null it cannot read.
     loopStopFinite: !!clip.ok && Number.isFinite(clip.loopStopTime),
     legacy: legacyRaw
       ? { start: legacyRaw.start, stop: legacyRaw.stop,
