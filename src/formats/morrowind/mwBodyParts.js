@@ -39,6 +39,7 @@ const SWEEP_SLOT_SET = new Set(SKIN_SWEEP_SLOTS);
  * @property {boolean} skin BYDT MeshType is Skin.
  * @property {boolean} playable BYDT flag NotPlayable is clear.
  * @property {boolean} firstPerson The id marks a first-person mesh.
+ * @property {boolean} [vampire] BYDT vampire flag: the record is a vampire's head.
  */
 
 /**
@@ -135,12 +136,16 @@ export function resolveBodyParts(parts, race, female, { firstPerson = false } = 
   return new Map([...chosen].map(([slot, choice]) => [slot, choice.part]));
 }
 
+/** The ids of the BODY records that are a werewolf's head and hair. */
+export const WEREWOLF_HEAD_ID = 'werewolfhead';
+export const WEREWOLF_HAIR_ID = 'werewolfhair';
+
 /** The werewolf's head and hair: the BODY records `WerewolfHead` and `WerewolfHair`, looked up by id and nothing
  *  else (no race, sex, part or flag test; the actor's own head and hair are ignored), the last .esm to carry one
  *  winning (the load order). Third person only. Every other slot is empty for a werewolf, and the body is the
- *  robe's (mwItemMap composeWornArmor, a `record` piece). */
-export const WEREWOLF_HEAD_ID = 'werewolfhead';
-export const WEREWOLF_HAIR_ID = 'werewolfhair';
+ *  robe's (mwItemMap composeWornArmor, a `record` piece).
+ *  @param {BodyPartRecord[] | null | undefined} parts
+ *  @returns {{ slot: string, record: BodyPartRecord | null }[]} */
 export function werewolfHeadRows(parts) {
   const lastRecordWithId = (wantedId) =>
     (parts ?? []).filter((part) => String(part.id || '').toLowerCase() === wantedId).at(-1) ?? null;
@@ -152,12 +157,21 @@ export function werewolfHeadRows(parts) {
 
 /** The vampire's head: the BODY record that is a vampire's, a skin and a head, of the sex and the race (ignoring
  *  case), the last in load order of those. NotPlayable is no bar (Morrowind's vampire heads are never offered at
- *  chargen). Null when the race has none. */
+ *  chargen). Null when the race has none.
+ *  @param {BodyPartRecord[] | null | undefined} parts
+ *  @param {string | null | undefined} race
+ *  @param {boolean} female
+ *  @returns {BodyPartRecord | null} */
 export function vampireHeadRecord(parts, race, female) {
   const raceId = String(race || '').toLowerCase();
   const vampireHeads = (parts ?? []).filter(
     (part) =>
-      part.vampire && part.skin && part.slot === 'head' && !part.firstPerson && part.female === !!female && part.race === raceId,
+      part.vampire &&
+      part.skin &&
+      part.slot === 'head' &&
+      !part.firstPerson &&
+      part.female === !!female &&
+      part.race === raceId,
   );
   return vampireHeads.at(-1) ?? null;
 }

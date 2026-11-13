@@ -1,11 +1,11 @@
-// A fixed set of inputs for four small rules of mwFirstPerson.js, and the way their answers are recorded:
-//   - vampireHeadRecord and werewolfHeadRows, and the vampire row of playerBodyRows that uses them;
-//   - blendMaskBones: which bones of a skeleton belong to the blend mask under a root bone;
-//   - shapeMatchesBone: whether a mesh shape belongs to a bone.
+// A fixed set of inputs for four small rules that were rewritten, and the way their answers are recorded:
+//   - vampireHeadRecord and werewolfHeadRows (mwBodyParts.js), and the vampire row of playerBodyRows that uses them;
+//   - blendMaskBones (mw-bone-rules.ts): which bones of a skeleton belong to the blend mask under a root bone;
+//   - shapeMatchesBone (mw-bone-rules.ts): whether a mesh shape belongs to a bone.
 //
-// mw-first-person-rest.test.js runs the current module over these inputs and compares with the recording in
-// test/fixtures/mw/mw-first-person-rest-parity.json, which was made from the implementation the rewrite replaced. The
-// inputs are kept in the recording too, so the test does not need the game files:
+// mwBodyPartsParity.test.js and mw-bone-rules.test.ts run the current code over these inputs and compare with the
+// recording in test/fixtures/mw/mw-first-person-rest-parity.json, which was made from the implementation the rewrite
+// replaced. The inputs are kept in the recording too, so the tests do not need the game files:
 //   - the BODY records of Morrowind, Tribunal and Bloodmoon in load order, then seeded random record lists;
 //   - the nodes of four retail skeletons, then seeded random node trees;
 //   - the shape names of every retail body-part mesh against every bone name of the retail skeletons, then a set of
@@ -190,14 +190,13 @@ export const HAND_BONES = [
 const skeletonOf = (nodes) => ({ nodes: new Map(nodes.map(([ref, name, parent]) => [ref, { name, parent }])) });
 const sorted = (set) => [...set].sort();
 
-/** Everything the rules answer for the inputs, in a plain shape that survives JSON. */
-export function recordAnswers(fns, inputs) {
-  const { vampireHeadRecord, werewolfHeadRows, playerBodyRows, blendMaskBones, shapeMatchesBone } = fns;
+/** The answers of the vampire head, the werewolf head and the vampire row of playerBodyRows. */
+export function recordHeadAnswers(fns, inputs) {
+  const { vampireHeadRecord, werewolfHeadRows, playerBodyRows } = fns;
   const idOf = (record) => (record ? record.id : null);
   const rowsOf = (rows) => rows.map((row) => [row.slot, idOf(row.record), row.verdict]);
   const headRows = (rows) => rows.map((row) => [row.slot, idOf(row.record)]);
-
-  const out = { real: {}, synthetic: {}, trees: {}, shapes: {} };
+  const out = { real: {}, synthetic: {} };
 
   const races = [...inputs.races, inputs.races[0]?.toUpperCase(), '', undefined];
   for (const race of races) {
@@ -225,6 +224,13 @@ export function recordAnswers(fns, inputs) {
       [false, true].map((female) => idOf(vampireHeadRecord(list, race.toUpperCase(), female))),
     ),
   }));
+  return out;
+}
+
+/** The answers of the blend mask and the shape filter. */
+export function recordBoneAnswers(fns, inputs) {
+  const { blendMaskBones, shapeMatchesBone } = fns;
+  const out = { trees: {}, shapes: {} };
 
   for (const [id, nodes] of Object.entries(inputs.skeletons)) {
     const skeleton = skeletonOf(nodes);
@@ -256,5 +262,7 @@ export function recordAnswers(fns, inputs) {
   return out;
 }
 
-/** The recording's inputs, rebuilt for recordAnswers: the skeleton nodes and shape lists are already plain data. */
-export const inputsOf = (recording) => recording.inputs;
+/** Everything the rules answer for the inputs, in a plain shape that survives JSON. */
+export function recordAnswers(fns, inputs) {
+  return { ...recordHeadAnswers(fns, inputs), ...recordBoneAnswers(fns, inputs) };
+}
