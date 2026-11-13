@@ -37,6 +37,14 @@ export function groundMagFor(gl: FilterGl, mode: number): number {
   return mode === POINT ? gl.NEAREST : gl.LINEAR;
 }
 
+/** The ground's wrap. A tile lies edge to edge with copies of itself, so a linear filter must blend its far edge into
+ *  its near one, and a clamp would draw a line round every tile. Point keeps DFU's clamp (TextureReader): a texel
+ *  centre is never past the edge, but a rotated tile reaches u = 1 exactly on its edge, where a repeat would read the
+ *  opposite edge's texel. */
+export function groundWrapFor(gl: FilterGl & { REPEAT: number; CLAMP_TO_EDGE: number }, mode: number): number {
+  return mode === POINT ? gl.CLAMP_TO_EDGE : gl.REPEAT;
+}
+
 /** A ground picture outside the tile arrays, on the bound TEXTURE_2D: the snow ground's albedo. It takes the arrays'
  *  sampling: the world filter's magnification, Ground sharpness's minification, the Anisotropic Filtering row's
  *  anisotropy. The snow mod sets its albedo to Point (DynamicSnowController: `snowAlbedo.filterMode` 0); following
