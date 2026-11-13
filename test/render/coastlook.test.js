@@ -253,6 +253,7 @@ test('COAST-LOOK the silt and the sheet take the ground\'s line where the ground
     uGroundEdge: 1, uWaterBed: 1, uSnowArr: [0, 0, 0, 0],
     uBedMask: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [...words.slice(4 * i, 4 * i + 4)]),
     textureGrad: () => [0, 0, 0, 0.9],   // the art paints water everywhere: a fringe wherever it is read
+    textureSize: () => [64, 64, 1],
   });
   let shores = 0;
   for (let byte = 0; byte < 256; byte++) {
