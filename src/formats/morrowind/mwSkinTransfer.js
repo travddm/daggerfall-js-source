@@ -1,8 +1,8 @@
-// MW-BRIG2: A WORN MODEL SKINNED FROM THE BODY UNDER IT.
+// A WORN MODEL SKINNED FROM THE BODY UNDER IT.
 //
-// MW-BRIG1 hung the steel brigandine RIGID on the skeleton's "Chest" and "Groin" nodes and took each node's REST
+// A rigid fit hangs the steel brigandine on the skeleton's "Chest" and "Groin" nodes and takes each node's REST
 // transform back out (restPoseInverse). The body it was fitted to does not move that way. A retail body part is
-// SKINNED (Morrowind-Rules.md MW-D21: "authored part-local, is a torso on the ground"), and the reference places
+// SKINNED ("authored part-local, is a torso on the ground"), and the reference places
 // every one of its vertices by the part's OWN NiSkinData - v' = v * (Sum w_i * invBind_i * boneSkelMat_i) *
 // skinToSkel * skinTransform (rule 20) - on the spine, pelvis and leg bones, never on the Chest node. So the moment
 // the idle played, the torso moved by its bones and the brigandine by a node the body never uses, and the two came
@@ -20,10 +20,10 @@
 // the rigid path applies (rules 13 and 14) as the inverse bind, so a garment over it rides that bone exactly as the
 // part does.
 //
-// MW-BRIG3: THE DEFECT WAS WHERE IT SAT, BOTH TIMES. The skinning above holds the
+// THE DEFECT WAS WHERE IT SAT, BOTH TIMES. The skinning above holds the
 // garment to the body in every pose, and it holds it exactly as far from the body as it started - so a garment that
 // starts too LOW stays too low, and it hides the chest skin it was meant to cover (the cuirass slot shadows it), which
-// leaves the upper torso empty under the neck. Both MW-BRIG1 and MW-BRIG2 took the height from the modeller's scene
+// leaves the upper torso empty under the neck. Both fits took the height from the modeller's scene
 // on faith (tools/bakeBrigandine.mjs: that scene's body "is" the skeleton at rest), and nobody measured the result on a
 // real body. The brigandine itself says the scene's body was not this one: its collar peaks at z 94.8 and its belt at
 // z ~67, well under a Morrowind man's neck and waist. So the height is now MEASURED ON THE WEARER (fitLift below): the
@@ -54,10 +54,10 @@ export function sourceSkin(batch, { attachRef = null, mirrored = false, boneOffs
 }
 
 /**
- * MW-BRIG3: THE LIFT that puts a garment on the wearer. Morrowind is Z-up; this answers how far along +Z the garment
+ * THE LIFT that puts a garment on the wearer. Morrowind is Z-up; this answers how far along +Z the garment
  * must move so that its highest point meets the highest point of `anchors` - the body part it hides, SKINNED in
  * `ctx`'s pose (the rest pose the transfer is solved in). Skinned, never read raw: a retail part's authored vertices
- * are part-local, "a torso on the ground" (Morrowind-Rules.md MW-D21). A pure translation, so the garment's shape is
+ * are part-local, "a torso on the ground". A pure translation, so the garment's shape is
  * the modeller's to the last vertex. Null with no garment or no anchor vertex: nothing to measure against.
  * `ctx` is { skeleton, pose, mats, skinBatch }; the anchors are skins (sourceSkin).
  */
@@ -187,7 +187,7 @@ export function transferSkin(garment, sources, ctx) {
     const bones = batch.skin.bones.map((b) => ({ ref: b.ref, name: b.name, invBind: b.invBind, indices: [], weights: [] }));
     const positions = new Float32Array(sub.verts.length * 3);
     const uvs = garment.uvs ? new Float32Array(sub.verts.length * 2) : null;
-    // MW-SMOOTH: the garment's own normals, solved as its positions are - skinBatch turns a normal by the blended 3x3
+    // The garment's own normals, solved as its positions are - skinBatch turns a normal by the blended 3x3
     // and renormalises, so the inverse of that 3x3 gives back the authored normal in this pose
     const N = garment.normals && garment.normals.length === G.length ? garment.normals : null;
     const normals = N ? new Float32Array(sub.verts.length * 3) : null;

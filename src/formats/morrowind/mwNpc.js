@@ -44,7 +44,7 @@ export function indexSkins(bodies) {
   for (const body of bodies.values()) {
     // The sweep filters NotPlayable and skin-type only: there is no vampire
     // test (vampire heads ride the actor's own record path).
-    // AUDIT 68 S11-indexskins-1st: the other view's records are skipped, as
+    // the other view's records are skipped, as
     // resolveBodyParts skips them - a hand's .1st twin competed for its slot
     // and dressed the NPC in first-person arms.
     if (body.kind !== BODY_TYPE.skin || !body.playable || body.part < 0 || isFirstPersonId(body.id)) continue;
@@ -112,7 +112,7 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
   }
 
   // Beast races walk on their own skeleton; an NPC_ MODL overrides all.
-  // MW-D32: the FEMALE column was missing - getActorSkeleton
+  // the FEMALE column was missing - getActorSkeleton
   // (actorutil.cpp, !firstPerson branch) picks base_anim_female.nif for
   // a female non-beast, and beast wins over sex exactly as the
   // reference's if-ladder orders it.
@@ -127,7 +127,7 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
   return { npc, race, animFile, parts, missing };
 }
 
-// ── MW7: THE FIRST-PERSON ARMS ─────────────────────────────────────
+// ── THE FIRST-PERSON ARMS ─────────────────────────────────────
 //
 // Slice 5 built a first-person rig and slice 6 built body assembly,
 // and nothing ever joined them - so on RETAIL data the rig loaded
@@ -138,15 +138,15 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
 // by race and sex exactly as the third-person body is, in their
 // first-person variants.
 
-/* MW7's FIRST-PERSON HELPERS WERE REMOVED HERE, AND DELIBERATELY NOT
- * RESTORED. They were FIRST_PERSON_SLOTS, firstPersonModel and
- * firstPersonArmParts, and they encoded a rule that is wrong in kind:
- * firstPersonModel spliced ".1st" into a body part's MESH FILENAME and
- * asked the archive for the result.
+/* FIRST-PERSON HELPERS THAT SPLICE A FILENAME ARE DELIBERATELY NOT HERE.
+ * Such helpers (FIRST_PERSON_SLOTS, firstPersonModel and
+ * firstPersonArmParts) would encode a rule that is wrong in kind:
+ * firstPersonModel would splice ".1st" into a body part's MESH FILENAME and
+ * ask the archive for the result.
  *
  * The engine never transforms a path. A first-person body part is a
- * RECORD whose ID ends in "1st" (components/esm3/loadbody.cpp:85-88,
- * recorded as rule 1), and that record carries its OWN MODL, unrelated
+ * RECORD whose ID ends in "1st" (components/esm3/loadbody.cpp:85-88),
+ * and that record carries its OWN MODL, unrelated
  * to the third-person one. Retail data settled it beyond argument: the
  * Nord male hand record is `b_n_nord_m_handS.1st` - PLURAL - so a name
  * built from the singular slot stem finds nothing at all, and
@@ -155,8 +155,6 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
  * The correct lookup lives in src/formats/morrowind/mwEsmFile.js (isFirstPersonId) and
  * src/formats/morrowind/mwFirstPerson.js (armReport, armMeshPaths), pinned against hand-built records and proven
  * against real archives.
- *
- * See rules 1 and 3, and Part VI.
  */
 
 /**
@@ -171,7 +169,7 @@ export function mwRaceId(dfRace) {
 }
 
 /** The inverse spelling: 'dark elf' -> 'DarkElf', for the port's own
- *  race tables (MW-D35 reads the classic portrait archive by race key). */
+ *  race tables (the classic portrait archive is read by race key). */
 export function dfRaceKeyOf(mwRace) {
   if (!mwRace) return null;
   return String(mwRace).split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('');

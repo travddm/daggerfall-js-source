@@ -1,4 +1,4 @@
-// WD2: A MOD'S SPRITE THAT IS A CLASSIC RECORD, OR ONE WITH
+// A MOD'S SPRITE THAT IS A CLASSIC RECORD, OR ONE WITH
 // THE AUTHOR'S EDITS ON IT - REBUILT FROM THE PLAYER'S OWN ART.
 //
 // A mod can ship pictures under archives of its own that are classic
@@ -72,8 +72,8 @@ export function classicRecordRgba(bitmap, palette) {
 }
 /** A classic record of the player's own as such a picture, read through a texture source (`getTexture(archive)`, a
  *  pipeline's or an interior builder's) and its palette - null where the player's data has none: no archive, a mod's own
- *  (`vendor`), no such record, an empty one. The one read for every painter of a classic record (SHIP-LIVERY's paint
- *  shop, CABIN-LOOK's stain - AUDIT 2026-10-17: two copies, the paint shop's without the record's guard). */
+ *  (`vendor`), no such record, an empty one. The one read for every painter of a classic record (the ship paint
+ *  shop and the cabin stain). */
 export async function classicPictureOf(getTexture, palette, archive, record) {
   const t = await getTexture(archive);
   if (!t || t.vendor || !(record < t.recordCount)) return null;
@@ -110,7 +110,7 @@ export function deriveSpec(from, picture, src, at = [0, 0]) {
 }
 
 /**
- * CSA-A: A PICTURE THAT IS A CLASSIC RECORD TILED UNDER THE
+ * A PICTURE THAT IS A CLASSIC RECORD TILED UNDER THE
  * AUTHOR'S PAINT. Come Sail Away's thirty-two wave frames (archive 112395,
  * record 2, 640x640) are the author's wave shapes and dark troughs laid over
  * Daggerfall's own snow, TEXTURE.303 record 1, repeated across the frame:

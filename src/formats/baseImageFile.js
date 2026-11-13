@@ -25,7 +25,7 @@ export const COMPRESSION_FORMATS = Object.freeze({
 });
 
 /**
- * EG-ZH: UNITY'S Color -> Color32 (UnityCsReference 2019.4, Runtime/Export/Math/Color32.cs - the implicit operator DFU's
+ * UNITY'S Color -> Color32 (UnityCsReference 2019.4, Runtime/Export/Math/Color32.cs - the implicit operator DFU's
  * Unity 2019.4.41 compiles): each channel `(byte)Mathf.Round(Mathf.Clamp01(c) * 255f)`. Mathf.Round is .NET's
  * Math.Round, half to even; the product is a float (single precision). `c` is `[r, g, b]` or `[r, g, b, a]` (a Color
  * built of three takes a = 1). Pure.
@@ -41,7 +41,7 @@ export function unityColor32(c) {
   return [ch(c[0]), ch(c[1]), ch(c[2]), ch(c.length > 3 ? c[3] : 1)];
 }
 /**
- * EG-ZH: UNITY'S Color32.Lerp (the same file): `t` clamped to [0, 1], then each channel
+ * UNITY'S Color32.Lerp (the same file): `t` clamped to [0, 1], then each channel
  * `(byte)(a + (b - a) * t)` - an int times a float is a float, an int plus a float a float, and the byte cast truncates.
  * In single precision, as the CLR computes it (0.3f is 0.30000001192...). Pure.
  * @param {number} a a byte @param {number} b a byte @param {number} t
@@ -53,7 +53,7 @@ export function unityColor32Lerp(a, b, t) {
 
 /** Empty bitmap, matching DFU's `new DFBitmap()` returned on invalid access. */
 /**
- * HM1: ImageProcessing.ChangeMask, verbatim. Index 0xFF is Daggerfall's
+ * ImageProcessing.ChangeMask, verbatim. Index 0xFF is Daggerfall's
  * MASK - the halo around a helm, a cloak's hood - and ItemHelper's
  * GetItemImage strips it (`removeMask`) for every inventory image and
  * every paperdoll layer before the dye and the upload. Drawn as a
@@ -243,7 +243,7 @@ export class BaseImageFile {
   }
 
   /**
-   * EG-ZH: verbatim GetFireWallColors32 (BaseImageFile.cs) - the emission map of TextureReader's Mantellan Crux fire
+   * verbatim GetFireWallColors32 (BaseImageFile.cs) - the emission map of TextureReader's Mantellan Crux fire
    * walls (TEXTURE.356, TextureReader.cs:309-320: "lessen stroboscopic effect"): every texel of the albedo
    * `Color32.Lerp(neutralColor, srcTexture[i], scale)` over `width * height` texels - the fire drawn a share of the way
    * from one steady colour toward its own, so its frames flicker less in the light they give. `srcColors` the albedo's

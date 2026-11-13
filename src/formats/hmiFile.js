@@ -6,7 +6,7 @@
 // SoundFont from Unity Resources and renders them with its vendored
 // AudioSynthesis synth; SongFiles.cs is only an enum and
 // Game/Questing/Actions/PlaySong.cs only a quest action. So this reader is a
-// DEPARTURE in the Port-Ledger sense - it was written against the shipped bytes
+// DEPARTURE - it was written against the shipped bytes
 // of the user's own ARENA2/MIDI.BSA, not translated from C#. Every structural
 // claim below was established by parsing all 131 songs / 1286 tracks in the
 // retail archive and is pinned in test/formats/hmi.test.js.
@@ -26,7 +26,7 @@
 //   MIDI.BSA is a standard NameRecord BSA (see bsaFile.js), 131 records, each
 //   record one *.HMI song. No second container reader is introduced here.
 //
-// SONG (HMI-MIDISONG061595)
+// SONG
 //   0x000  18   signature "HMI-MIDISONG061595"
 //   0x0D2  u16  header resolution            (480 in every retail song - NOT
 //               the time base; see THE CLOCK below)
@@ -40,7 +40,7 @@
 //   The trailing 16 bytes of the file are a NUL-padded source-file name, almost
 //   always "*.mid" but sometimes the real one ("dungeon8", "fmover_c").
 //
-// TRACK (HMI-MIDITRACK)
+// TRACK
 //   +0x00  13   signature "HMI-MIDITRACK"
 //   +0x61  u16  stream event count minus one, i.e. every event before the
 //               end-of-track meta except the last (1285/1286 retail tracks;
@@ -87,7 +87,7 @@
 // Anything outside this vocabulary throws. A reader that decodes most of an
 // archive and says so is worth more than one that silently emits garbage.
 //
-// HOW STRONG THE EVIDENCE ACTUALLY IS (AUDIT 19 F1 - this used to overstate it)
+// HOW STRONG THE EVIDENCE ACTUALLY IS
 //   The byte-exact gate - every one of the 1286 tracks consuming to its
 //   end-of-track meta exactly at the next track's offset - was described here
 //   and in the manifest as proving all the 0xFE sizes. It does not. Measured,
@@ -446,7 +446,7 @@ export class HmiFile {
           break;
         }
         default:
-          // AUDIT 19 F3: pitch bend used to be the DEFAULT arm, so every
+          // Pitch bend used to be the DEFAULT arm, so every
           // undefined status - 0xF1..0xF6 and 0xF8..0xFD - was decoded as
           // a bend on a phantom channel taken from its low nibble (0xF8
           // became "channel 8"). That directly contradicted this file's
@@ -465,7 +465,7 @@ export class HmiFile {
     }
     events.sort((a, b) => a.tick - b.tick || a._rank - b._rank || a._seq - b._seq);
 
-    // AUDIT 19 F2: ENFORCE the gate rather than merely reporting it. A
+    // ENFORCE the gate rather than merely reporting it. A
     // track that does not consume exactly to its limit has been misparsed,
     // and continuing produces a plausible-looking event stream that is
     // simply wrong. The whole retail archive satisfies this at 1286/1286.
@@ -487,7 +487,7 @@ export class HmiFile {
       // are resolved into note-offs and excluding the end-of-track meta.
       streamEventCount,
       endTick,
-      // AUDIT 19 F2: this is the reader's OWN GATE and it used to be
+      // This is the reader's OWN GATE and it used to be
       // computed and thrown away - only the test looked at it. An injected
       // early FF 2F 00 made D1.HMI silently lose 839 events with load()
       // still returning true, which is exactly the "decodes to garbage

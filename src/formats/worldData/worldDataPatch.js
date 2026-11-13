@@ -1,4 +1,4 @@
-// WD1: A VENDORED WORLD-DATA PATCH, LAID BACK ON THE
+// A VENDORED WORLD-DATA PATCH, LAID BACK ON THE
 // PLAYER'S CLASSIC BLOCK.
 //
 // The file a mod ships (a whole block, or a whole building record, as
@@ -57,7 +57,7 @@ export function rebuildWorldDataPatch(patch, blocksFile) {
 /** sha256 of the canonical form, hex - WebCrypto, in the browser and under Node alike. */
 export async function canonicalSha256(json) {
   const bytes = new TextEncoder().encode(canonicalJson(json));
-  // BUILD-LEFTOVERS (AUDIT, the second read): every runtime this runs in has WebCrypto - a browser's secure context,
+  // Every runtime this runs in has WebCrypto - a browser's secure context,
   // and Node from 19 (package.json's engines: 20.19 and up). The `import('node:crypto')` fallback could never run in a
   // browser (Vite stubs node: modules out of a bundle), and made every build warn that it had stubbed it
   const subtle = globalThis.crypto?.subtle;

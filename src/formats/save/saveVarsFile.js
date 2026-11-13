@@ -1,4 +1,4 @@
-// SAVEVARS.DAT reader (SAV1). 1:1 translation of DFU API/Save/
+// SAVEVARS.DAT reader. 1:1 translation of DFU API/Save/
 // SaveVars.cs (MIT, Daggerfall Workshop) - the classic save's global
 // state file ("must be a .175 or later save"). Every value sits at a
 // named absolute offset; DFU reads exactly the fields below and so do
@@ -78,7 +78,7 @@ export const CHEAT_FLAGS = Object.freeze({
 // dependency rather than minting a second table. Re-exported so the
 // reader's API is whole.
 import { SHIP_TYPES } from '../../systems/banking.js';
-import { readCStringFixed } from '../fileProxy.js';   // FileProxy.ReadCString(reader, n) - AUDIT 68: the one home
+import { readCStringFixed } from '../fileProxy.js';   // FileProxy.ReadCString(reader, n) - the one home
 export { SHIP_TYPES };
 
 /** Represents a SAVEVARS.DAT file (SaveVars.cs). */
