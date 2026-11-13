@@ -44,7 +44,11 @@ Rules from the data side, stated at the top of `renderer.js`:
   11, `src/render/anisotropic-mip-filter.ts`), Off and Smooth draw alike while the ground takes anisotropy above 1, so
   the settings screen shows the Ground sharpness row disabled with that reason. The `sampler` game probe records what
   the CI browser's driver does (`tools/probes/lib/samplerCheck.mjs`).
-- A texel with alpha 0 is a palette cutout. The shaders discard it.
+- A texel with alpha 0 is a palette cutout. The shaders discard it. Daggerfall stores such texels black, and a linear
+  filter or a mip level at a cut-out's edge would mix that black in. World art (`uploadTexture`) and the far trees'
+  layers are therefore uploaded with each transparent texel in the colour of its nearest opaque texel, alpha kept, and
+  their mips are built from that picture (`src/render/alpha-bleed.ts`). Point is unchanged. Banners and ship flags
+  upload premultiplied instead.
 
 ## Resources
 

@@ -740,6 +740,7 @@ import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js'
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
+import { bleedForFilter } from './alpha-bleed.ts';
 import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
@@ -5334,23 +5335,8 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     this._tex0Bound = null;   // PERF-TEX3: this path owns unit 0 - the shadow may not speak for it
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
-      // AUDIT 19 F7: respect the VIEW, not its backing buffer. Reaching
-      // through `.buffer` discards byteOffset and length, so any caller
-      // handing over a subarray - the video player hands a live view onto
-      // the reader's persistent frame buffer - would have uploaded the
-      // whole buffer from zero. Nothing did that wrongly today; it is a
-      // trap that would have gone unnoticed because the pin watching it
-      // shared the same blind spot.
-      gl.RGBA, gl.UNSIGNED_BYTE, color32Bytes(color32, `uploadTexture(${archive}, ${record})`)   // WW3: the shape's own error, not a TypeError three frames down
-    );
-    const { wrap, filter } = textureParams(gl, opts);
     // a texture's own sampler (render/meshAlpha.js) - a wrap per axis and its filter, its mips world art's as ever
     const own = opts.sampler && !opts.smooth ? samplerParams(gl, opts.sampler, !opts.smooth && (opts.mips ?? (typeof archive === 'number'))) : null;
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
     // INCIDENT 2026-09-04: every classic texture DFU builds carries a mip
     // chain (TextureReader.cs:31 `mipMaps = true`, :264 Apply(true)) and
     // samples it POINT (MaterialReader.cs:104/:437, FilterMode.Point =
@@ -5363,8 +5349,20 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // mipChain false (ImageReader.cs:59), the automaps and the video
     // likewise; those string-keyed uploads keep a single NEAREST level.
     const mips = !opts.smooth && (opts.mips ?? (typeof archive === 'number'));
+    const world = isWorldArt(opts, mips, own);
+    const bytes = color32Bytes(color32, `uploadTexture(${archive}, ${record})`);   // WW3: the shape's own error, not a TypeError three frames down
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
+      // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer, and
+      // `.buffer` would upload that whole buffer from zero (color32Bytes)
+      gl.RGBA, gl.UNSIGNED_BYTE, bleedForFilter(world, bytes, color32.width, color32.height),   // no black cut-out edge under a linear filter
+    );
+    const { wrap, filter } = textureParams(gl, opts);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, own ? own.wrapS : wrap);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, own ? own.wrapT : wrap);
     if (mips) gl.generateMipmap?.(gl.TEXTURE_2D);
-    filterUpload(gl, tex, isWorldArt(opts, mips, own), mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
+    filterUpload(gl, tex, world, mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: TryImportTexture's - DFU's retro arm never reaches it (J7: a lost context's null is no key)
     else if (mips && !this._retroMips) gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
     this.textures.set(key, tex);

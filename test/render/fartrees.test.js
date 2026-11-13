@@ -110,12 +110,12 @@ test('FAR-TREES a record\'s picture in its layer: scaled to the layer by its lar
   const pic = { width: 2, height: 4, data: Uint8Array.from({ length: 32 }, (_, i) => [i < 8 ? 255 : 0, i < 8 ? 0 : 255, 0, 255][i % 4]) };
   const out = layerPicture(pic, 8);
   const at = (i, j) => [...out.subarray((j * 8 + i) * 4, (j * 8 + i) * 4 + 4)];
-  assert.deepEqual(at(0, 0), [0, 0, 0, 0], 'left of the picture: clear');
+  assert.deepEqual(at(0, 0), [255, 0, 0, 0], 'left of the picture: clear, in the colour of its nearest texel (no black edge when filtered)');
   assert.deepEqual(at(2, 0), [255, 0, 0, 255], 'the top row the picture\'s top');
   assert.deepEqual(at(3, 1), [255, 0, 0, 255]);
   assert.deepEqual(at(2, 7), [0, 255, 0, 255], 'its foot on the layer\'s bottom');
   assert.deepEqual(at(5, 4), [0, 255, 0, 255]);
-  assert.deepEqual(at(6, 4), [0, 0, 0, 0], 'right of it: clear');
+  assert.deepEqual(at(6, 4), [0, 255, 0, 0], 'right of it: clear, in its neighbour\'s colour');
   // a wide one: its width the layer's, standing on its bottom
   const wide = layerPicture({ width: 4, height: 2, data: new Uint8Array(32).fill(200) }, 8);
   assert.deepEqual([wide[(3 * 8) * 4 + 3], wide[(4 * 8) * 4 + 3], wide[(7 * 8 + 7) * 4 + 3]], [0, 200, 200]);
