@@ -8,9 +8,10 @@
 // the meadow's own mip level plus the retro modes' bias, as the world's flats are (render/sharp-texels.ts).
 import { SHARP, SHARP_TEXEL_GLSL } from './sharp-texels.ts';
 import { filterWorldPicture, freshWorldPicture, worldFilterMode } from './world-texture-filter.ts';
+import { bleedForFilter } from './alpha-bleed.ts';
 
 /** One level of a sheet's chain. */
-export type SheetLevel = { readonly width: number; readonly height: number; readonly data: ArrayBufferView | null };
+export type SheetLevel = { readonly width: number; readonly height: number; readonly data: Uint8Array };
 
 /** The grass program's locations by uniform name (labGrass.js `this.u`); this module uploads uPxSheet, uSharpOn and
  *  uSharpRetro. */
@@ -29,7 +30,19 @@ export function uploadGrassSheet(
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
   for (let i = 0; i < mips.length; i++) {
-    gl.texImage2D(gl.TEXTURE_2D, i, gl.RGBA, mips[i].width, mips[i].height, 0, gl.RGBA, gl.UNSIGNED_BYTE, mips[i].data);
+    const { width, height, data } = mips[i];
+    // the meadow is filtered, so its transparent texels take their neighbours' colour (render/alpha-bleed.ts)
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      i,
+      gl.RGBA,
+      width,
+      height,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      bleedForFilter(colour, data, width, height),
+    );
   }
   if (colour) {
     filterWorldPicture(gl, tex, gl.TEXTURE_2D, mips.length > 1);

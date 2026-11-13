@@ -127,3 +127,36 @@ test("the meadow's atlas takes the world filter and follows a change at its bind
     resetSettings();
   }
 });
+
+test('filtered surfaces go up with their clear texels coloured; a spell effect and the pixel grass sheet go up as they are', () => {
+  resetSettings();
+  const { canvas, gl, calls } = stateGl();
+  const renderer = new Renderer(canvas);
+  const cutOut = () => [
+    {
+      width: 2,
+      height: 1,
+      rgba: new Uint8Array([200, 0, 0, 255, 0, 0, 0, 0]),
+      data: new Uint8Array([200, 0, 0, 255, 0, 0, 0, 0]),
+    },
+  ];
+  const lastUpload = () => [
+    ...calls
+      .filter((c) => c[0] === 'texImage2D')
+      .at(-1)
+      .at(-1),
+  ];
+  try {
+    renderer.createCharacterTexture(cutOut());
+    assert.deepEqual(lastUpload(), [200, 0, 0, 255, 200, 0, 0, 0], 'a body part: the clear texel red, still clear');
+    renderer.createCharacterTexture(cutOut(), { effect: true });
+    assert.deepEqual(lastUpload(), [200, 0, 0, 255, 0, 0, 0, 0], 'a spell effect: as it is');
+    uploadGrassSheet(gl, cutOut(), true);
+    assert.deepEqual(lastUpload(), [200, 0, 0, 255, 200, 0, 0, 0], 'the meadow');
+    uploadGrassSheet(gl, cutOut());
+    assert.deepEqual(lastUpload(), [200, 0, 0, 255, 0, 0, 0, 0], 'the pixel sheet: its texels are data');
+  } finally {
+    setFrameTarget(null);
+    resetSettings();
+  }
+});

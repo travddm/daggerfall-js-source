@@ -25,6 +25,7 @@ import { EL_LANE, EL_BB_FS } from '../../src/render/enhancedLighting.js';
 import { FOREST_STAMP, sinkFelled } from '../../src/scenes/treeHost.js';
 import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
 import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
+import { bleedTransparentTexels } from '../../src/render/alpha-bleed.ts';
 import { SeasonHelper } from '../../src/systems/seasonsIliacBay.js';
 import { SEASONS } from '../../src/systems/gameDate.js';
 import { perspective, lookAt, mirrorProjectionX } from '../../src/world/mat4.js';
@@ -769,8 +770,9 @@ test('LPT1 the atlases\' upload (AUDIT LPT B7): the chain into one texture a ban
   assert.ok(one.every((r) => r.n <= LPT_ATLAS_BAND));
   const pic = d.lpt._atlases.get(`${p.subs[0].atlas}|`).pic;
   const top = one.find((r) => r.level === 0 && r.y === 1024 - LPT_ATLAS_BAND);
-  assert.deepEqual(top.head, Array.from(pic.data.subarray((LPT_ATLAS_BAND - 1) * 1024 * 4, LPT_ATLAS_BAND * 1024 * 4)), 'the picture\'s top band lands at the top, its last row first');
-  assert.notDeepEqual(top.head, Array.from(pic.data.subarray(0, 1024 * 4)), '(its first row is another)');
+  const bled = bleedTransparentTexels(pic.data, 1024, 1024);   // its clear texels coloured, so a filter draws no black edge
+  assert.deepEqual(top.head, Array.from(bled.subarray((LPT_ATLAS_BAND - 1) * 1024 * 4, LPT_ATLAS_BAND * 1024 * 4)), 'the picture\'s top band lands at the top, its last row first');
+  assert.notDeepEqual(top.head, Array.from(bled.subarray(0, 1024 * 4)), '(its first row is another)');
 });
 
 test('LPT1 the frame: the near set gathered and handed on, again only when the eye moves LPT_REGATHER_M, a pixel moves (a recentre), its set is made or let go, or a tree is felled; culled to the view EVERY frame (AUDIT LPT B4), each run its handle\'s', async () => {

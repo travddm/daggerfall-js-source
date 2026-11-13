@@ -21,6 +21,7 @@ import { toColor32 } from '../formats/color32Order.js';
 import { classicRecordRgba } from '../formats/derivedTexture.js';
 import { LowPolyTreesGpu } from '../render/lowPolyTreesRender.js';
 import { BUILD_RETRY_MS } from '../world/streamingWorld.js';   // AUDIT BANTHA1 TREE-6: a failed load's re-asks
+import { bleedTransparentTexels } from '../render/alpha-bleed.ts';
 
 export const LPT_TREES_JSON_URL = new URL('../../vendor/low-poly-trees/Trees/trees.json', import.meta.url).href;
 export const LPT_TREES_BIN_URL = new URL('../../vendor/low-poly-trees/Trees/trees.bin', import.meta.url).href;
@@ -199,7 +200,7 @@ export function createLowPolyTrees({ renderer, getTexture = async () => null, se
   async function uploadAtlas(mips) {
     const tex = renderer.createAtlasTexture(mips[0].width, mips[0].height, mips.length);
     for (let i = 0; i < mips.length; i++) {
-      const { width: w, height: h, data: d } = mips[i], row = w * 4;
+      const { width: w, height: h } = mips[i], row = w * 4, d = bleedTransparentTexels(mips[i].data, w, h);   // filtered: no black edge (render/alpha-bleed.ts)
       for (let y0 = 0; y0 < h; y0 += LPT_ATLAS_BAND) {
         const y1 = Math.min(h, y0 + LPT_ATLAS_BAND), n = (y1 - y0) * row;
         if (bandScratch.length < n) bandScratch = new Uint8Array(n);

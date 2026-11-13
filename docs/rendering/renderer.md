@@ -47,7 +47,11 @@ Rules from the data side, stated at the top of `renderer.js`:
   or trilinear) and the Anisotropic Filtering row for anisotropy (`src/render/ground-sampler.ts`). The snow ground's
   albedo takes the same (`filterGroundPicture`). `applyGroundSharpness` applies them at every world load, and on the
   next frame after any of them changes.
-- A texel with alpha 0 is a palette cutout. The shaders discard it.
+- A texel with alpha 0 is a palette cutout. The shaders discard it. Daggerfall stores such texels black, and a linear
+  filter or a mip level at a cut-out's edge would mix that black in. World art (`uploadTexture`) and the far trees'
+  layers are therefore uploaded with each transparent texel in the colour of its nearest opaque texel, alpha kept, and
+  their mips are built from that picture (`src/render/alpha-bleed.ts`). Point is unchanged. Banners and ship flags
+  upload premultiplied instead.
 
 ## Resources
 

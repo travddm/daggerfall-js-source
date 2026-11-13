@@ -46,6 +46,7 @@
 import { buildProgram } from './glProgram.js';
 import { SHARP, SHARP_TEXEL_ARRAY_GLSL, SHARP_TEXEL_GLSL } from './sharp-texels.ts';
 import { filterWorldPicture, freshWorldPicture, worldFilterMode } from './world-texture-filter.ts';
+import { bleedTransparentTexels } from './alpha-bleed.ts';
 import { FOG_GLSL } from './fogGlsl.js';
 import { COLUMN_GLSL } from './columnGlsl.js';   // DW-F: the column's share, one home (the renderer's billboards take it too)
 import { WATER_LAYER_UNITS } from './waterSurface.js';   // FIELD BUGS 2026-09-29 (the sea) #4: the top's place in the sea's stack
@@ -662,7 +663,7 @@ export class DeepWatersRenderer {
     let n = 1;
     while (n < frames.length && frames[n].width === w && frames[n].height === h) n++;
     const bytes = new Uint8Array(w * h * 4 * n);
-    for (let i = 0; i < n; i++) bytes.set(frames[i].data.subarray(0, w * h * 4), i * w * h * 4);
+    for (let i = 0; i < n; i++) bytes.set(bleedTransparentTexels(frames[i].data.subarray(0, w * h * 4), w, h), i * w * h * 4);   // no black cut-out edge once filtered
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
