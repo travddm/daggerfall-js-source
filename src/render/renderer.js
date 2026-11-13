@@ -741,7 +741,7 @@ import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, filterWorldPicture, freshWorldPicture, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { bleedForFilter } from './alpha-bleed.ts';
-import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor, groundMaskClamped } from './ground-sampler.ts';
+import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor, groundClampedFlag } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
@@ -993,7 +993,7 @@ const vec2 TRANS[4] = vec2[4](
   vec2(0.0, 0.0), vec2(0.0, 1.0), vec2(1.0, 1.0), vec2(1.0, 0.0));
 ${roadEdgeGlsl()}
 ${groundEdgeGlsl()}   // COAST-LOOK: a transition's two kinds, the sea's cut on their line (render/groundEdgeGlsl.js)
-${WATER_BED_GLSL}
+${WATER_BED_GLSL}${tileEdgeGlsl()}
 void main() {
   vec2 unwrapped = vLocalXZ / uTileSize;
   ivec2 cell = clamp(ivec2(floor(unwrapped)), ivec2(0), ivec2(127));
@@ -1001,7 +1001,7 @@ void main() {
   int layer = int(data >> 2u);
   int t = int(data & 3u);
   vec2 tileUV = fract(unwrapped);
-  vec2 tuv = ROT[t] * tileUV + TRANS[t];
+  vec2 tuv = ROT[t] * tileEdgeHold(tileUV, cell, data, dFdx(unwrapped), dFdy(unwrapped)) + TRANS[t];   // a two-ground tile does not wrap into a different neighbour (render/tile-edge-glsl.ts)
   // GRAIN1:
   // THE TILE ARRAY IS MIPMAPPED, AND THE GRADIENT IS THE UNWRAPPED ONE.
   //
@@ -1530,7 +1530,7 @@ export const PANEL_CLEAR_RGBA = Object.freeze([49 / 255, 77 / 255, 121 / 255, 5 
 import { WATER_MAP_COLOR } from './underwaterFog.js';
 import { WATER_SURFACE_VS, waterSurfaceFs } from './waterSurface.js';   // WATER1: the enhanced water pass over the terrain grid
 import { WATER_LAYER_UNITS, WATER_SCENE_UNIT, WATER_SCENE_DEPTH_UNIT, NO_BED_DEPTH, WATER_RIPPLE_UNIT } from './waterSurface.js';   // FIELD BUGS 2026-09-29 (the sea) #4: WATER1's offset is the sea's surface film's
-import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js';   // WATER-NEXT 2: the ground under the water is a bed
+import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js'; import { tileEdgeGlsl } from './tile-edge-glsl.ts';   // WATER-NEXT 2: the ground under the water is a bed
 import { packWaterMask, WATER_DRAW_MASK_TABLE } from '../world/water/waterCorners.js';   // MAC2: the corner table's one home; WATER-DRAW1: the PASS takes the draw's table, not the feet's
 import { SKIN_PAL_ROW, SKIN_PALETTE_UNIT } from './skinPalette.js';   // MWNPC1: the GPU skin's palette shape
 import { lightIdsOf, lightList, packLight } from './lightId.js';   // LIGHT-ID: each light's identity, lifted off its list for the shadow pass (and the flash packed through the seam)
@@ -2436,7 +2436,7 @@ export class Renderer {
     this.tUTilemap = gl.getUniformLocation(this.terrainProgram, 'uTilemap');
     this.tUTileSize = gl.getUniformLocation(this.terrainProgram, 'uTileSize');
     this.tUWaterBed = gl.getUniformLocation(this.terrainProgram, 'uWaterBed');   // WATER-NEXT 2: the bed under the water
-    this.tUBedMask = gl.getUniformLocation(this.terrainProgram, 'uBedMask'); this.tUBedMaskClamped = gl.getUniformLocation(this.terrainProgram, 'uBedMaskClamped');
+    this.tUBedMask = gl.getUniformLocation(this.terrainProgram, 'uBedMask'); this.tUGroundClamped = gl.getUniformLocation(this.terrainProgram, 'uGroundClamped');
     this.tURoadEdge = gl.getUniformLocation(this.terrainProgram, 'uRoadEdge');   // ROAD-LOOK: the road's edge blended (render/roadEdgeGlsl.js)
     this.tUGroundEdge = gl.getUniformLocation(this.terrainProgram, 'uGroundEdge');   // COAST-LOOK: the ground's kinds blended, the sea cut on their line (render/groundEdgeGlsl.js)
     // ECOTONE1 (render/ecotoneGlsl.js): the neighbours' tile sets' samplers, which set each neighbour wears, and the
@@ -7769,7 +7769,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       gl.uniformMatrix4fv(this.tUView, false, this._view);
       // WATER-NEXT 2: the ground under the enhanced water is a bed - the switch and the corner table, a frame's like the rest
       gl.uniform1f(this.tUWaterBed, this.waterBed ? 1 : 0);
-      gl.uniform4uiv(this.tUBedMask, BED_MASK); gl.uniform1f(this.tUBedMaskClamped, groundMaskClamped(gl));   // the mask's margin, off where the ground clamps
+      gl.uniform4uiv(this.tUBedMask, BED_MASK); gl.uniform1f(this.tUGroundClamped, groundClampedFlag(gl));   // the margins at a tile's edge, off where the ground clamps
       gl.uniform1f(this.tURoadEdge, this.roadEdges ? 1 : 0);   // ROAD-LOOK: a frame's, as the bed's switch
       gl.uniform1f(this.tUGroundEdge, this.coastEdges ? 1 : 0);   // COAST-LOOK: a frame's, as the road edge's
       this._uploadFog(this._terrainFog);
