@@ -8,6 +8,7 @@
 import { getString } from '../systems/settings/settings.js';
 import { SHARP } from './sharp-texels.ts';
 import { anisotropyOf, anisotropySetting } from './anisotropic-filtering.ts';
+import { noteSamplingDriver } from './anisotropic-mip-filter.ts';
 
 export const POINT = 0;
 export const BILINEAR = 1;
@@ -63,6 +64,7 @@ type AnisotropyExtension = {
 };
 
 export type TextureGl = FilterGl & {
+  readonly RENDERER: number;
   readonly TEXTURE_2D: number;
   readonly TEXTURE_MIN_FILTER: number;
   readonly TEXTURE_MAG_FILTER: number;
@@ -82,6 +84,7 @@ export function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension |
     const max = ext ? Number(gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)) || 1 : 1;
     found = { ext, max };
     extensionOf.set(gl, found);
+    noteSamplingDriver(gl, max);   // the Ground sharpness row asks whether this driver keeps a nearest mip under anisotropy
   }
   return found;
 }

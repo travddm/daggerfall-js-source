@@ -25,7 +25,8 @@ type RetroMipBiasRow = {
   readonly note: string;
   readonly effect: string;
   readonly kinds: readonly string[];
-  /** Why the row has no effect now, or null when it has. The settings screen draws the row disabled with this reason. */
+  /** Why the row has no effect now, or null when it has. The settings screen draws the row disabled with this reason,
+   *  and hands in the preference reader, which this row does not need. */
   readonly inactive: () => string | null;
   readonly control: {
     readonly store: 'prefs';

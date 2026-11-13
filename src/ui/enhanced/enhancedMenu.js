@@ -3553,8 +3553,8 @@ export function barReading(st) {
 }
 
 /** What a row's name says when its bar refuses a press: online for an online lock, else the row's own reason it has
- *  no effect now (its `inactive()`), or null when the bar takes a press. */
-const lockWords = (st, f) => (st?.locked ? t('menu.features.onlineLock', 'online') : (f.inactive?.() ?? null));
+ *  no effect now (its `inactive(getPref)`), or null when the bar takes a press. */
+const lockWords = (st, f) => (st?.locked ? t('menu.features.onlineLock', 'online') : (f.inactive?.(getPref) ?? null));
 
 /** The bar, one object for two states or five. With `lockText` (lockWords) it is drawn but refuses a press. */
 function segBar(st, label, lockText = null) {

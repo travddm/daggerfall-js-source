@@ -3,6 +3,9 @@
 // Anisotropic Filtering row's. The player's own online.
 // This file must not reach uiPrefs.js: features.js imports it, and uiPrefs.js imports features.js.
 import { t, localizedText } from './textManager.js';
+import { getInt } from './settings/settings.js';
+import { ANISOTROPY_PREF } from './anisotropic-filtering-row.ts';
+import { groundSharpnessInactive } from '../render/anisotropic-mip-filter.ts';
 
 type Tier = readonly [string, string];
 
@@ -13,6 +16,8 @@ type GroundSharpnessRow = {
   readonly note: string;
   readonly effect: string;
   readonly kinds: readonly string[];
+  /** Why the row has no effect now, or null when it has; `readPref` reads the Anisotropic Filtering row. */
+  readonly inactive: (readPref?: (key: string) => unknown) => string | null;
   readonly control: {
     readonly store: 'prefs';
     readonly key: string;
@@ -44,6 +49,13 @@ export const GROUND_SHARPNESS_ROW: GroundSharpnessRow = Object.freeze({
     return t('features.effect.atOnce', 'Takes effect at once.');
   },
   kinds: Object.freeze(['enhanced', 'classic']),
+  // Off and Smooth draw alike where the driver drops the nearest mip for anisotropy (render/anisotropic-mip-filter.ts).
+  inactive: (readPref) =>
+    groundSharpnessInactive(
+      readPref?.(ANISOTROPY_PREF),
+      getInt('Video', 'MainFilterMode', 0, 3) === 0,
+      t('features.groundSharpness.inactive', 'No effect while Anisotropic Filtering is on'),
+    ),
   control: Object.freeze({
     store: 'prefs',
     key: 'groundSharpness',

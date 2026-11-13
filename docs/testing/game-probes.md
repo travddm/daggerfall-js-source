@@ -14,6 +14,7 @@ these probes catch what breaks in the wiring when a host file (`src/scenes/world
 | `save`    | Save, load in the page, then reload the page and load again: position, gold, inventory and level match.                                                                             |
 | `pause`   | Every tab and side row of the pause menu opens and draws.                                                                                                                           |
 | `online`  | The real relay and account service in local workerd; two clients join one room (the starting dungeon, which software GL can boot), each sees the other move, one chat line arrives. |
+| `sampler` | No game: whether the browser's driver keeps a nearest-mip sampler under anisotropy, against the list in `src/render/anisotropic-mip-filter.ts`.                                     |
 
 ## Running
 
