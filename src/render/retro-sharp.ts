@@ -5,10 +5,8 @@
 // distance reads a smaller mip than at full size; a negative mip bias moves it back towards the detailed levels.
 // The values reach the world programs as one uniform (`uSharpRetro`, render/sharp-texels.ts), uploaded with the fog.
 // Zero in both is the full-size frame, so a program that never receives the upload draws as it does outside retro.
-
-/** The mip bias of the retro modes, in levels. DFU sets the same bias on its world textures whenever retro mode is on
- *  (TextureReader, the albedo's mipMapBias). It only acts when Retro Mip Maps keeps the mip chains. */
-export const RETRO_MIP_BIAS = -0.75;
+import { getPref } from '../systems/uiPrefs.js';
+import { RETRO_MIP_BIAS_DEFAULT, RETRO_MIP_BIAS_MIN, RETRO_MIP_BIAS_PREF } from '../systems/retro-mip-bias-row.ts';
 
 /** The part of the renderer this module writes: the values it uploads and the stamp that makes it upload them. */
 export type RetroSharpRenderer = {
@@ -16,11 +14,11 @@ export type RetroSharpRenderer = {
   _frameStamp: number;
 };
 
-let retroMipBias = RETRO_MIP_BIAS;
-
-/** Changes the retro mip bias for the frames that follow. For probes that compare biases in one session, and tests. */
-export function setRetroMipBias(bias: number): void {
-  retroMipBias = bias;
+/** The Retro Mip Bias row's value, in levels (DFU's -0.75 by default). A stored value outside the row's range reads as
+ *  the default. Read once a frame, so a change of the row reaches the next frame. */
+export function retroMipBias(): number {
+  const bias = Number(getPref(RETRO_MIP_BIAS_PREF));
+  return Number.isFinite(bias) && bias >= RETRO_MIP_BIAS_MIN && bias <= 0 ? bias : RETRO_MIP_BIAS_DEFAULT;
 }
 
 /** The world frame the renderer opened: a retro image, a render-scale image, or none (null). */
@@ -33,7 +31,7 @@ export function applyRetroSharp(renderer: RetroSharpRenderer, frame: OpenedFrame
   const values = (renderer._sharpRetro ??= new Float32Array(2));
   const retro = frame?.kind === 'retro';
   const edgeDrop = retro ? 1 : 0;
-  const bias = retro ? Math.fround(retroMipBias) : 0;
+  const bias = retro ? Math.fround(retroMipBias()) : 0;
   if (values[0] !== edgeDrop || values[1] !== bias) {
     values[0] = edgeDrop;
     values[1] = bias;

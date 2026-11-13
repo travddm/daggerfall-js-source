@@ -51,7 +51,7 @@ export const CATEGORIES = Object.freeze([
       "Video/EnableTextureArrays", "GUI/AccelerateUICopyTexture"]),
     sec("retro", "Retro look", [
       "feat:classic-picture", "feat:classic-aspect", "feat:classic-colours", "feat:classic-distance-shading",
-      "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "Video/RetroModeAspectCorrection",
+      "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "feat:retro-mip-bias", "Video/RetroModeAspectCorrection",
       "Video/PalettizationLUTShift"]),
     sec("shadows", "Daggerfall Unity's shadows", [
       "Video/DungeonLightShadows", "Video/InteriorLightShadows", "Video/ExteriorLightShadows", "Video/MobileNPCShadows",

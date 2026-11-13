@@ -40,7 +40,7 @@ import { MOD_SETTINGS } from './modSettings.js';
 import { declareOnlinePrefs, roomPinned } from './online/onlineLane.js';   // the lane learns the player's own switches from the rows
 import { GATE_PORTENT_LOOT_ROW } from './gatePortentLootRow.js'; import { REVENANTS_ROW } from './revenant/revenantsRow.js'; import { WEAPON_TECHNIQUES_ROW, CRIME_RECOVERY_ROW, HUMANOID_LOOT_ROW, REPAIR_PRICE_ROW, CURE_KEEPS_INFECTION_ROW, LOCKPICK_TUMBLERS_ROW, GUILD_PROBATION_ROW, DRESS_FOR_THE_PART_ROW, HORSE_WALKS_ROW, TERRAIN_SLOPE_CUT_ROW, CLAW_METAL_ROW, LEGENDARY_EQUIP_FREE_ROW, GENTLE_EQUIP_BILL_ROW, SOLD_GOODS_ON_SHELF_ROW, ABSORPTION_LIMITS_ROW, OPENING_DAMAGE_ROW, ELITE_STACKING_ROW } from './settingRows.js'; import { DUNGEON_FIRES_ROW } from './dungeonFiresRow.js';
 import { CLASSIC_PICTURE_ROWS } from './classic-picture-rows.ts';
-import { ANISOTROPIC_FILTERING_ROW } from './anisotropic-filtering-row.ts';
+import { ANISOTROPIC_FILTERING_ROW } from './anisotropic-filtering-row.ts'; import { RETRO_MIP_BIAS_ROW } from './retro-mip-bias-row.ts';
 import { QUEST_REWARDS_ROW } from './questlines/questRewardsRow.js'; import { TOWN_SEATS_ROW } from './town/townSeatsRow.js'; import { SPAWNED_DUNGEONS_ROW } from './dungeon/spawned-dungeons-row.js'; import { ELTHERIC_SEA_ROW } from './elthericSeaRow.js';
 import { t, localizedText } from './textManager.js';   // L10N4: the screen's words in the player's language, read as they are read
 
@@ -635,7 +635,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced', 'classic']),
     control: Object.freeze({ store: 'prefs', key: 'groundSharpness', initial: 'default', online: 'player', tiers: Object.freeze([tier('off', OFF), tier('default', () => t('features.groundSharpness.default', 'Smooth'))]) }),
   }),
-  ANISOTROPIC_FILTERING_ROW,   // beyond DFU: every world texture and the ground (render/anisotropic-filtering.ts)
+  ANISOTROPIC_FILTERING_ROW, RETRO_MIP_BIAS_ROW,   // beyond DFU: anisotropy, and Sharp's retro mip bias, which DFU fixes in code
   // RW1: REAL WINDOWS - from the street a
   // room behind every house window, from inside the real world through the glass (render/realWindows.js carries the
   // law; `?windows=off|rooms|full` the kill door). Rooms only drops the costly half - the view out is a second pass over

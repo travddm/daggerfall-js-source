@@ -2,10 +2,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SHARP_TEXEL_GLSL, sharpTexelCoordinate } from '../../src/render/sharp-texels.ts';
-import { RETRO_MIP_BIAS, applyRetroSharp, setRetroMipBias } from '../../src/render/retro-sharp.ts';
+import { applyRetroSharp, retroMipBias } from '../../src/render/retro-sharp.ts';
+import {
+  RETRO_MIP_BIAS_DEFAULT as RETRO_MIP_BIAS,
+  RETRO_MIP_BIAS_PREF,
+  RETRO_MIP_BIAS_ROW,
+} from '../../src/systems/retro-mip-bias-row.ts';
+import { featureTile } from '../../src/ui/enhanced/enhancedMenu.js';
+import { setPref, resetPrefs } from '../../src/systems/uiPrefs.js';
 import { setFrameTarget } from '../../src/render/renderTarget.js';
 import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
-import { _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { glslFunctions } from '../glsl.mjs';
 import { stateGl, retroCfg } from '../retroGl.mjs';
 
@@ -69,13 +76,13 @@ test('the frame values: set for a retro frame, cleared for any other, and the st
   applyRetroSharp(renderer, RETRO_FRAME);
   assert.equal(renderer._frameStamp, 1, 'the same values: no new stamp');
   try {
-    setRetroMipBias(-1.3);
+    setPref(RETRO_MIP_BIAS_PREF, -1.3);
     applyRetroSharp(renderer, RETRO_FRAME);
     assert.deepEqual([renderer._sharpRetro[1], renderer._frameStamp], [Math.fround(-1.3), 2]);
     applyRetroSharp(renderer, RETRO_FRAME);
     assert.equal(renderer._frameStamp, 2, 'a bias float32 cannot hold exactly still compares equal');
   } finally {
-    setRetroMipBias(RETRO_MIP_BIAS);
+    resetPrefs();
   }
   applyRetroSharp(renderer, null);
   assert.deepEqual([...renderer._sharpRetro, renderer._frameStamp], [0, 0, 3]);
@@ -104,5 +111,118 @@ test('the renderer: a retro world frame uploads the values to the Sharp programs
   } finally {
     setFrameTarget(null);
     resetSettings();
+  }
+});
+
+/** A fake document element: enough for the settings screen's tile builder. */
+function fakeElement(tag) {
+  const node = {
+    tag,
+    children: [],
+    className: '',
+    textContent: '',
+    title: '',
+    disabled: false,
+    style: {},
+    dataset: {},
+    attrs: {},
+    append(...children) {
+      for (const child of children) node.children.push(child);
+    },
+    setAttribute(name, value) {
+      node.attrs[name] = value;
+    },
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  return node;
+}
+
+function findByClass(node, name, out = []) {
+  if (typeof node.className === 'string' && node.className.split(/\s+/).includes(name)) out.push(node);
+  for (const child of node.children ?? []) findByClass(child, name, out);
+  return out;
+}
+
+/** The Retro Mip Bias row as the settings screen draws it: its segments, and the reason shown on it, if any. */
+function drawnRow() {
+  globalThis.document = {
+    createElement: fakeElement,
+    createTextNode: (text) => ({ textContent: text }),
+    querySelectorAll: () => [],
+  };
+  try {
+    const tile = featureTile(RETRO_MIP_BIAS_ROW);
+    const segments = findByClass(tile, 'ft-segb');
+    return {
+      segments,
+      reason: findByClass(tile, 'ft-tile-lock')[0]?.textContent ?? null,
+      press: (label) => segments.find((b) => b.textContent === label).onclick({ stopPropagation() {} }),
+    };
+  } finally {
+    delete globalThis.document;
+  }
+}
+
+test('the Retro Mip Bias row: a press on the drawn row is the bias the next retro frame takes, from 0 to -2', () => {
+  resetSettings();
+  resetPrefs();
+  setValue('Video', 'UseMipMapsInRetroMode', 'True');
+  const renderer = { _frameStamp: 0 };
+  try {
+    const row = drawnRow();
+    assert.deepEqual(
+      row.segments.map((b) => b.textContent),
+      ['0', '-0.25', '-0.5', '-0.75', '-1', '-1.25', '-1.5', '-1.75', '-2'],
+    );
+    assert.equal(row.reason, null, 'Retro Mip Maps on: no reason shown');
+    assert.ok(
+      row.segments.every((b) => !b.disabled),
+      'and every segment takes a press',
+    );
+    assert.equal(row.segments.find((b) => b.attrs['aria-pressed'] === 'true').textContent, '-0.75', "DFU's value");
+    for (const [label, bias] of [
+      ['-1.25', -1.25],
+      ['0', 0],
+      ['-2', -2],
+    ]) {
+      drawnRow().press(label);
+      applyRetroSharp(renderer, RETRO_FRAME);
+      assert.deepEqual([...renderer._sharpRetro], [1, bias], label);
+    }
+  } finally {
+    resetPrefs();
+    resetSettings();
+  }
+});
+
+test('the Retro Mip Bias row is drawn disabled, with its reason, while Retro Mip Maps is off', () => {
+  resetSettings();
+  resetPrefs();
+  try {
+    setValue('Video', 'UseMipMapsInRetroMode', 'False');
+    const row = drawnRow();
+    assert.equal(row.reason, 'Needs Retro Mip Maps on');
+    assert.ok(
+      row.segments.every((b) => b.disabled && b.title === 'Needs Retro Mip Maps on'),
+      'no segment takes a press',
+    );
+    setValue('Video', 'UseMipMapsInRetroMode', 'True');
+    assert.equal(drawnRow().reason, null, 'turned on: the row is live at once');
+  } finally {
+    resetSettings();
+  }
+});
+
+test('a stored bias outside the row reads as the default', () => {
+  try {
+    for (const stored of [0.5, -3, 'sharp', null]) {
+      setPref(RETRO_MIP_BIAS_PREF, stored);
+      assert.equal(retroMipBias(), RETRO_MIP_BIAS, String(stored));
+    }
+    setPref(RETRO_MIP_BIAS_PREF, -1.5);
+    assert.equal(retroMipBias(), -1.5);
+  } finally {
+    resetPrefs();
   }
 });
