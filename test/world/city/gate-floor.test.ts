@@ -23,6 +23,7 @@ const { gateMeshIds, otherGateModelId } = (await import(cityGatePath)) as {
     modelId: number,
     placement: ArrayLike<number>,
     paths: Uint8Array | null,
+    hideFloor?: boolean,
   ) => { own: number; other: number };
   otherGateModelId: (modelId: number) => number;
 };
