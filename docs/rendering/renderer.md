@@ -63,7 +63,7 @@ Rules from the data side, stated at the top of `renderer.js`:
   are. A repeating texture filters across its edge; the ground tile arrays, the far trees and the decor arrays clamp.
   `src/render/mip-upload.ts` uploads the levels by hand, so the memory is the same as Standard's, and remembers each
   texture so a change of the row rebuilds the loaded ones on the next frame (`applyMipQuality`: Standard calls
-  `generateMipmap` again; Sharp reads level 0 back from the GPU). The Low Poly Trees atlases, the Morrowind character
+  `generateMipmap` again; Sharp reads level 0 back from the GPU). The tree atlases a mod ships, the Morrowind character
   textures and every data texture keep their own levels.
 
 ## Resources
