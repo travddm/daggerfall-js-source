@@ -71,7 +71,7 @@ export function parseAnimGroups(textKeys) {
 }
 
 /**
- * MWAUDIT: THE CASE-INSENSITIVE DOOR onto that map, and the reason it
+ * THE CASE-INSENSITIVE DOOR onto that map, and the reason it
  * has to exist.
  *
  * parseAnimGroups above lowercases every MARKER (`m[2].toLowerCase()`)
@@ -98,7 +98,7 @@ export function findAnimGroup(groups, name) {
 
 // --- tracks ----------------------------------------------------------------
 
-/** MW-SPELLFX1: exported - an effect mesh's keyframed nodes are sampled by the same track (formats/morrowind/mwVfx.js). */
+/** Exported - an effect mesh's keyframed nodes are sampled by the same track (formats/morrowind/mwVfx.js). */
 export function trackFromController(nif, ctrl) {
   const data = deref(nif, ctrl.data);
   if (!data || data.type !== 'NiKeyframeData') return null;
@@ -157,7 +157,7 @@ export function extractTracks(nif) {
 
 // --- sampling --------------------------------------------------------------
 
-// AUDIT 68 S11-colorkey-tbc: the float KeyGroup sampler (Hermite, the TCB
+// The float KeyGroup sampler (Hermite, the TCB
 // tangents, the segment search) lives in mwKeys.js - the particle colour
 // ramp is a KeyGroup too, and its own copy dropped the TCB tangents.
 
@@ -241,7 +241,7 @@ function sampleRotation(track, time) {
   if (!keys || !keys.length) return null;
   const [i0, i1, u] = segment(keys, time);
   if (i0 === i1) return keys[i0].value.slice();
-  // MW-D33: the quaternion interpolate (controller.hpp:164-179) knows
+  // The quaternion interpolate (controller.hpp:164-179) knows
   // exactly two moves - Constant's which-half, and slerp for EVERYTHING
   // else (quadratic and TCB quats are unimplemented in the reference).
   if (track.rotationType === KEY_TYPE.constant) {
@@ -265,7 +265,7 @@ export function sampleTrack(track, time) {
 
 // --- the clip law ----------------------------------------------------------
 //
-// MW-D7. Four OpenMW members that had no JS home, ported here beside the
+// Four OpenMW members that had no JS home, ported here beside the
 // text keys they read:
 //
 //   TextKeyMap::emplace          normalise + register groups (rules 44, 45, 21)
@@ -281,7 +281,7 @@ export function sampleTrack(track, time) {
 // it accepts "Sneak:Start" where rule 21 requires colon-plus-one-space; it
 // compares the stop marker exactly where rule 22 truncates; and it takes
 // the last marker in file order where rule 22 walks backwards from the
-// group's LAST key. Re-basing it would move three MWAUDIT pins that
+// group's LAST key. Re-basing it would move three pins that
 // deliberately assert its present behaviour, and mixing that into the
 // first slice that animates anything would make a failure ambiguous - the
 // same reasoning assembleFirstPersonArm used to keep rest and clip apart.
@@ -571,7 +571,7 @@ export function resetClip(keys, group, opts = {}) {
     nextKey: 0,
   };
 
-  // Reset's THIRD stage: loop keys already behind the playhead. MW-D33:
+  // Reset's THIRD stage: loop keys already behind the playhead. 
   // the reference walks from groupend and STOPS AT THE START KEY -
   // `for (; key != startkey && key != keys.rend(); ++key)` (animation.
   // cpp:1028-1039) - so an EARLIER block of the same group (undeadwolf_2.

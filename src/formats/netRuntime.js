@@ -1,10 +1,10 @@
 // The .NET runtime members DFU's C# leans on for a seed, ported once. A leaf: it imports nothing.
 //
-// AUDIT 68 S24-string-hash-duplicate: string.GetHashCode had two byte-identical homes - answerPipeline's
+// string.GetHashCode had two byte-identical homes - answerPipeline's
 // knowledge seed (stringHash) and Better Ambience's dungeon fog seed (monoStringHash) - each recorded as its
 // own Ledger A departure. It lives here now and both import it.
 //
-// HAZE1: System.Random had the same two homes - scenes/shared.js's NetRandom (DaggerfallSky's stars) and
+// System.Random had the same two homes - scenes/shared.js's NetRandom (DaggerfallSky's stars) and
 // Better Ambience's SystemRandom (Foggy Dungeons' fog) - and Heat Haze's noise and Windfall's gusts each wanted a
 // third. It lives here now; shared.js and betterAmbience.js re-export it under their own names.
 

@@ -8,7 +8,7 @@
 // No worker here (the client that owns the worker and the cache is
 // ENHANCED AI 3b); no motor here (ENHANCED AI 4). Everything below is
 // pinnable on a synthetic room, and the real dungeons are pinned behind
-// ARENA2 (test/ai/nav/enhancedAI.test.js, DEGENERATE-BAKE ROOT).
+// ARENA2 (test/ai/nav/enhancedAI.test.js).
 //
 // THE PHANTOM FLOOR. project-final's buildNav lays an implicit floor
 // under every cell - y = 0 for its arenas, or the terrain when a ground
@@ -44,7 +44,7 @@ export const ANCHOR_Y_TOLERANCE = 0.6;
  *  applied so the soup is in the frame the queries use. `exclude` names
  *  buckets left out - the dungeon's openable doors, which are the motor's
  *  to open, not the navmesh's walls.
- *  FIELD BUGS 2026-10-16b INDOOR-WATCH, AUDIT W2: it runs on the main
+ *  it runs on the main
  *  thread, at the frame a room is asked for (the crime's), so it is
  *  counted first and written straight into the soup's own arrays - the
  *  same soup to the bit (each corner rounded to float32 as it is stored,
@@ -62,7 +62,7 @@ export function navInputFromCollider(collider, { buckets = null, exclude = null 
   let minY = Infinity, maxY = -Infinity, p = 0;
   for (const bucket of use) {
     const t = bucket.t ? bucket.t() : [0, 0, 0];
-    const R = bucket.r ? bucket.r() : null;   // AUDIT NAV1 (#12): a mover's bucket, its triangles turned as they stand
+    const R = bucket.r ? bucket.r() : null;   // a mover's bucket, its triangles turned as they stand
     for (const tri of bucket.tris) {
       for (let k = 0; k < 3; k++) {
         const v = tri[k];
@@ -83,7 +83,7 @@ export function navInputFromCollider(collider, { buckets = null, exclude = null 
  * than any real floor not itself at 0, so an anchor without y elects
  * the phantom and culls every real floor. Three call sites once built
  * this literal by hand and all three dropped the y; bakeSoup, their one
- * home now (AUDIT 68), builds it here.
+ * home now, builds it here.
  */
 export function regionAnchor(anchor) {
   return { x: anchor[0], y: anchor[1], z: anchor[2] };
@@ -119,7 +119,7 @@ export function landAnchors(chf, anchors, tol = ANCHOR_Y_TOLERANCE) {
 }
 
 /**
- * THE BAKE, ONE HOME (AUDIT 68 S02-bake-pipeline-triplicated): a world-
+ * THE BAKE, ONE HOME: a world-
  * space triangle soup in, the baked chf, the boxes it was voxelised into,
  * the agent it used and its stats out. navBake, navClient.bakeHere and
  * the worker each spelled this pipeline out and had drifted (stats
@@ -173,7 +173,7 @@ export function bakeSoup(positions, indices, { floor, anchor, anchors = null, ag
   // union, and unlanded they take his nearest-span pick, so none landing
   // keeps his single-anchor pick exactly.
   const feet = landAnchors(chf, [anchor]);
-  const landed = [...(feet.length ? feet : [regionAnchor(anchor)]), ...landAnchors(chf, anchors ?? [])];   // AUDIT PRE-MERGE 0928 N2: feet that do not land (a load while swimming or levitating) stay in the union - the foes' alone culled the player's own room
+  const landed = [...(feet.length ? feet : [regionAnchor(anchor)]), ...landAnchors(chf, anchors ?? [])];   // feet that do not land (a load while swimming or levitating) stay in the union - the foes' alone culled the player's own room
   buildRegions(chf, { anchor: regionAnchor(anchor), anchors: landed });
   buildContours(chf);
   buildPolyMesh(chf);

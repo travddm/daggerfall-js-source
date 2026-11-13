@@ -1,10 +1,10 @@
-// WD3: A WORLD-DATA PACK - a mod's whole world data carried as the author's EDITS over the player's own
+// A WORLD-DATA PACK - a mod's whole world data carried as the author's EDITS over the player's own
 // MAPS.BSA and BLOCKS.BSA, every piece the mod repeats stored once, rebuilt file by file when the door asks.
 //
-// WD1 (formats/worldData/worldDataPatch.js) carries a mod's world data one file at a time: a patch a file, globbed and rebuilt
-// at boot. Beautiful Villages of Daggerfall and Beautiful Cities of Daggerfall (carademono, 2026-10-01) ship 7,727 `location-<r>-<i>.json` and 820 RMB
+// worldDataPatch.js carries a mod's world data one file at a time: a patch a file, globbed and rebuilt
+// at boot. Beautiful Villages of Daggerfall and Beautiful Cities of Daggerfall (carademono) ship 7,727 `location-<r>-<i>.json` and 820 RMB
 // blocks between them - 439 MB of DFU JSON, most of it the classic game and the rest the same few thousand redecorated
-// buildings again and again (7,104 building records, 1,393 different interiors). WD3 is WD1's law at that scale:
+// buildings again and again (7,104 building records, 1,393 different interiors). This pack is the same law at that scale:
 //
 //   - the CLASSIC part is never carried: a file is an edit of a classic location or block, and a large piece of a
 //     classic block it repeats (a whole building, an interior) is a REFERENCE into the player's own BLOCKS.BSA,
@@ -21,10 +21,10 @@
 // base:  ['b', blockName, index]        a classic block, checked by name at its index
 //        ['l', region, index, name]     a classic location, checked by name
 //        ['f', fileName]                another file of the same pack (rebuilt first)
-// ops:   WD1's (['s'|'i', path, value], ['d'|'r', path]) and ['sr', path, runs] - runs [start, [values], ...]:
+// ops:   worldDataPatch.js's (['s'|'i', path, value], ['d'|'r', path]) and ['sr', path, runs] - runs [start, [values], ...]:
 //        consecutive elements of an array set at once (an automap with 1,400 cells changed is one op, not 1,400).
 // values may hold, anywhere inside them:
-//   { $n: k }            the pack's node k                \ either may carry `$o: ops` - WD1 ops laid on a COPY
+//   { $n: k }            the pack's node k                \ either may carry `$o: ops` - patch ops laid on a COPY
 //   { $c: [index, path] } a node of classic block `index`  / of the node, paths relative to it
 //   { $m | $f | $d | $3 | $b | $t | $g: rows }   records as rows (models, flats/people, doors, section 3, building
 //                        data, ground tiles, ground scenery) - a row that is an object is a record carried whole
@@ -121,7 +121,7 @@ export function runLength(a) {
 
 // ---- the reader -----------------------------------------------------------------------------------------------------
 
-/** AUDIT WD3 B4: how many decoded nodes a pack keeps - the most recently read; the rest are read again when asked. */
+/** How many decoded nodes a pack keeps - the most recently read; the rest are read again when asked. */
 export const DECODED_NODES_MAX = 1024;
 
 /** The `$` key of a reference object, or null. */
@@ -149,7 +149,7 @@ export function openWorldDataPack(pack, env) {
   const nodes = pack.nodes ?? [];
   const decodedNodes = new Map();
   const classicJson = new Map();   // block index -> the block's DFU JSON, as the editor would write it
-  const classicNames = pack.classicNames ?? null;   // AUDIT WD3 P5: block index -> the name the pack was built against
+  const classicNames = pack.classicNames ?? null;   // block index -> the name the pack was built against
   const keptFiles = new Map();     // a file another file is based on, rebuilt once
   const baseTargets = new Set(pack.bases ?? []);
   if (!pack.bases) for (const name of Object.keys(rawFiles)) { const base = fileEntry(name)?.[1]; if (base?.[0] === 'f') baseTargets.add(base[1]); }
@@ -199,7 +199,7 @@ export function openWorldDataPack(pack, env) {
     if (k === '$n') node = nodeAt(v.$n);
     else if (k === '$c') {
       const [index, path] = v.$c;
-      // AUDIT WD3 P5: the classic block a reference names is checked BY NAME where the pack says it (classicNames) - a
+      // The classic block a reference names is checked BY NAME where the pack says it (classicNames) - a
       // BLOCKS.BSA in another order refuses the file, and the classic stands, as a `b` base's does
       node = jsonAt(classicBlockJson(index, classicNames?.[index] ?? null), path);
       if (node === undefined) throw new Error(`world-data pack: ${pack.vendor}: classic node ${JSON.stringify(v.$c)} not found`);
@@ -220,12 +220,12 @@ export function openWorldDataPack(pack, env) {
     if (d === undefined) {
       const n = nodes[id]; d = expand(typeof n === 'string' ? JSON.parse(n) : n);
       decodedNodes.set(id, d);
-      if (decodedNodes.size > DECODED_NODES_MAX) decodedNodes.delete(decodedNodes.keys().next().value);   // AUDIT WD3 B4: bounded - a node let go is read again
+      if (decodedNodes.size > DECODED_NODES_MAX) decodedNodes.delete(decodedNodes.keys().next().value);   // bounded - a node let go is read again
     } else { decodedNodes.delete(id); decodedNodes.set(id, d); }
     return d;
   }
 
-  /** WD1 ops with their values expanded, and every 'sr' unrolled into element sets. */
+  /** Patch ops with their values expanded, and every 'sr' unrolled into element sets. */
   function expandOps(ops) {
     const out = [];
     for (const op of ops) {
@@ -262,7 +262,7 @@ export function openWorldDataPack(pack, env) {
     if (kept) return kept;
     if (!Object.hasOwn(rawFiles, name)) throw new Error(`world-data pack: ${pack.vendor} has no ${name}`);
     const [sha, base, ops] = fileEntry(name);
-    // WD-OWNED: a location's base is made here for this file alone (locationToDfuJson over a fresh read of the town), so
+    // A location's base is made here for this file alone (locationToDfuJson over a fresh read of the town), so
     // the edits are laid on it; a block's (classicJson) and a file's (keptFiles) are kept for the next, so laid on a copy
     const json = patchJson(baseOf(name, base, maps), expandOps(ops), null, { owned: base?.[0] === 'l' });
     if (baseTargets.has(name)) keptFiles.set(name, json);
@@ -300,7 +300,7 @@ export async function readPackText(bytes) {
   return new TextDecoder().decode(bytes);
 }
 
-/** AUDIT WD3 P5: every classic block index a pack's `$c` references name - its files' entries and its nodes, read
+/** Every classic block index a pack's `$c` references name - its files' entries and its nodes, read
  *  through their JSON text - sorted. */
 export function classicIndicesOf(pack) {
   const out = new Set();
@@ -318,7 +318,7 @@ export function classicIndicesOf(pack) {
 /** sha256 of the canonical form, hex - WebCrypto, in the browser and under Node alike. */
 export async function packFileSha256(json) {
   const bytes = new TextEncoder().encode(canonicalJson(json));
-  // BUILD-LEFTOVERS (AUDIT, the second read): every runtime this runs in has WebCrypto - a browser's secure context,
+  // Every runtime this runs in has WebCrypto - a browser's secure context,
   // and Node from 19 (package.json's engines: 20.19 and up). The `import('node:crypto')` fallback could never run in a
   // browser (Vite stubs node: modules out of a bundle), and made every build warn that it had stubbed it
   const subtle = globalThis.crypto?.subtle;

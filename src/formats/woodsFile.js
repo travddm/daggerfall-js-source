@@ -16,10 +16,10 @@
 //     source pixels with a DESCENDING map Y (mapPixelY - y), verbatim.
 // DFU's disk-usage FileProxy modes are not ported (read-only byte-buffer
 // runtime, as bsaFile.js). The writeable `Buffer` setter has exactly one
-// runtime caller - TerrainHelper.SmoothLocationNeighbourhood - and AUDIT
-// 54 F4 ports that, so `heightMapBuffer` IS written in place at startup;
+// runtime caller - TerrainHelper.SmoothLocationNeighbourhood - and the port
+// ports that, so `heightMapBuffer` IS written in place at startup;
 // syncHeightMapBytes below carries the result into the raw file bytes the
-// EV7 terrain worker builds its own reader from (DFU has no second copy
+// terrain worker builds its own reader from (DFU has no second copy
 // and so needs no equivalent).
 
 export const MAP_WIDTH = 1000;
@@ -90,8 +90,8 @@ export class WoodsFile {
     this.heightMapBuffer = this._bytes.slice(start, start + MAP_BUFFER_LENGTH);
   }
 
-  /** AUDIT 58 F4: write heightMapBuffer back over the raw WOODS.WLD
-   *  bytes. _readHeightMap takes a COPY, and the EV7 worker builds its
+  /** Write heightMapBuffer back over the raw WOODS.WLD
+   *  bytes. _readHeightMap takes a COPY, and the terrain worker builds its
    *  own WoodsFile from those bytes, so a startup repair of the live
    *  buffer (SmoothLocationNeighbourhood) has to land here too or the
    *  two kernels sample different heights.

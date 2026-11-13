@@ -21,6 +21,10 @@ export function bleedTransparentTexels<T extends Uint8Array | Uint8ClampedArray>
   for (let i = 0; i < count; i++) if (rgba[i * 4 + 3] === 0) transparent++;
   if (transparent === 0 || transparent === count) return rgba;
   const out = rgba.slice() as T;
+  // Whole texels move through a 32-bit view of the copy (a fresh array, so its offset is aligned). Every platform WebGL
+  // runs on is little-endian, so alpha is the top byte: a colour with it masked off keeps the texel transparent.
+  const texels = new Uint32Array(out.buffer, out.byteOffset, count);
+  const colourOnly = 0x00ffffff;
   const queue = new Int32Array(count);
   const filled = new Uint8Array(count);
   let tail = 0;
@@ -30,21 +34,34 @@ export function bleedTransparentTexels<T extends Uint8Array | Uint8ClampedArray>
       queue[tail++] = i;
     }
   }
+  // the four neighbours written out in place: a helper function per texel costs a quarter of the time
   for (let head = 0; head < tail; head++) {
     const from = queue[head];
+    const colour = texels[from] & colourOnly;
     const x = from % width;
-    const y = (from - x) / width;
-    for (let n = 0; n < 4; n++) {
-      const nx = n === 0 ? x - 1 : n === 1 ? x + 1 : x;
-      const ny = n === 2 ? y - 1 : n === 3 ? y + 1 : y;
-      if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
-      const to = ny * width + nx;
-      if (filled[to]) continue;
-      filled[to] = 1;
-      out[to * 4] = out[from * 4];
-      out[to * 4 + 1] = out[from * 4 + 1];
-      out[to * 4 + 2] = out[from * 4 + 2];
-      queue[tail++] = to;
+    const left = from - 1;
+    const right = from + 1;
+    const up = from - width;
+    const down = from + width;
+    if (x > 0 && !filled[left]) {
+      filled[left] = 1;
+      texels[left] = colour;
+      queue[tail++] = left;
+    }
+    if (x < width - 1 && !filled[right]) {
+      filled[right] = 1;
+      texels[right] = colour;
+      queue[tail++] = right;
+    }
+    if (up >= 0 && !filled[up]) {
+      filled[up] = 1;
+      texels[up] = colour;
+      queue[tail++] = up;
+    }
+    if (down < count && !filled[down]) {
+      filled[down] = 1;
+      texels[down] = colour;
+      queue[tail++] = down;
     }
   }
   return out;

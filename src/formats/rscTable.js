@@ -1,4 +1,3 @@
-// MAC-U.
 //
 // THE TABLE A DFU PLAYER READS. Daggerfall Unity does not read
 // TEXT.RSC first. TextProvider.GetRSCTokens (TextProvider.cs:167-188)
@@ -24,7 +23,7 @@
 // this module carries only the rows where the table diverges from
 // classic AND the divergence has been verified against a real
 // ARENA2. tools/rscTableDiff.mjs lists the candidates. It is DATA
-// with one import - the CSV law (L10N1: DFU's StringTableCSVParser,
+// with one import - the CSV law (DFU's StringTableCSVParser,
 // systems/textManager.js); textRsc.js encodes the rows into the file's
 // own byte shape (encodeRscRecord) and reads them first.
 
@@ -77,7 +76,7 @@ export function parseRscMarkup(value) {
 
 /** The master CSV (`Key,Value`, values quoted with doubled quotes and
  *  free to span lines) as id -> raw markup value. A non-numeric key
- *  (the header, the named rows) is skipped. L10N1: read by DFU's own
+ *  (the header, the named rows) is skipped. Read by DFU's own
  *  StringTableCSVParser (textManager.js), the one CSV law - its values
  *  lose a trailing newline this module's own reader kept (nine rows of
  *  the master CSV), which parseRscMarkup strips anyway. */

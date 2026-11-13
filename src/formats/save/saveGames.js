@@ -1,4 +1,4 @@
-// Classic save-game set (SAV1). 1:1 translation of DFU API/Save/
+// Classic save-game set. 1:1 translation of DFU API/Save/
 // SaveGames.cs (MIT, Daggerfall Workshop) - enumerates the SAVE0-SAVE5
 // directories beside ARENA2 and opens one save's whole file set:
 // SAVETREE.DAT, SAVEVARS.DAT, IMAGE.RAW, SAVENAME.TXT, MAPSAVE.SAV
@@ -17,7 +17,7 @@
 //     readMapSaveDiscovery below (the caller supplies per-region
 //     location counts from MAPS.BSA and applies the result), and the
 //     parsed rumor list sits on this.rumorFile for the mill to import.
-//     SAV3 wired both: world.js's classicLoadBoot resolves the
+//     world.js's classicLoadBoot resolves the
 //     discovery through MAPS and feeds each rumor to the mill's own
 //     ImportClassicRumor.
 //
