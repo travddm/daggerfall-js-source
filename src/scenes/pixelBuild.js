@@ -91,6 +91,7 @@ const COVER_SLICE = 2048;
 import { lptFitCap, lptTrunkCap, natureReach, pathTileMask, vergeClear } from '../world/road/roadVerge.js';   // FB1020c TRUNK-FIT: lptTrunkCap
 import { makeBuildingKey } from '../systems/talk/talkTopics.js';
 import { makeCityGate } from '../world/city/cityGate.js';
+import { floorlessGateId, gateOpensOnRoad, installFloorlessGates } from '../world/city/gate-floor.ts';
 import { markRemapLaw, remapAsked, remapLawOf, remapSubMeshes, reskinRemap } from '../world/texRemap.js';
 import { MobilePerson, PERSON_MOVE_SPEED, walkerRace } from '../characters/mobile/mobilePerson.js';
 import { multiply, trs } from '../world/mat4.js';
@@ -574,14 +575,18 @@ export function createPixelBuild(host) {
           // departure; the 1:1 lane must not see it.
           if (placed.enhancedOnly && !isEnhanced()) continue;
           if (isHouseSign(placed, b, (id) => cpuModels.get(id)?.doors)) continue;   // HOUSE-SIGN: a shop's sign at a house's door does not stand
-          const gpu = await getGpuMesh(placed.modelIdNum, () => breather.breathe());   // AUDIT PRE-MERGE 1003 W6: a model built here breathes with the pixel (the colosseum's seal)
+          // A gate whose opening stands on the road leaves its floor face undrawn, so the road shows under the arch.
+          const local = multiply(originMatrix, placed.matrix);
+          if (isCityGate(placed.modelIdNum)) installFloorlessGates();
+          const floorless = isCityGate(placed.modelIdNum) && gateOpensOnRoad(local, paths);
+          const meshId = floorless ? floorlessGateId(placed.modelIdNum) : placed.modelIdNum;
+          const gpu = await getGpuMesh(meshId, () => breather.breathe());   // AUDIT PRE-MERGE 1003 W6: a model built here breathes with the pixel (the colosseum's seal)
           if (!gpu) continue;
           const climateFree = isClimateFreeModel(placed.modelIdNum);   // ARENA1: the colosseum - never swapped, nor a key of the pixel's table
           if (!climateFree) await remapSubMeshes(gpu.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase);   // AUDIT PRECIP HOST-7: kept in the table's recipe under its climate
-          const local = multiply(originMatrix, placed.matrix);
           if (WATER_SOURCE_MODELS.includes(placed.modelIdNum)) pixelSprings.push({ pos: [local[12], local[13], local[14]], dry: false });   // SURV3: a trough is a water source
-          const cpu = cpuModels.get(placed.modelIdNum);
-          const box = transformedAabb(archAabb(placed.modelIdNum, cpu.positions), local);
+          const cpu = cpuModels.get(meshId);
+          const box = transformedAabb(archAabb(meshId, cpu.positions), local);
           unionBox(box);
           const entry = { gpu, local, _box: box, _order: placed.modelIdNum };   // EV6: sort key
           if (climateFree) entry.texRemap = NO_CLIMATE_REMAP;   // ARENA1: drawn by its own table (an empty one - never the pixel's)
@@ -653,11 +658,12 @@ export function createPixelBuild(host) {
           if (isCityGate(placed.modelIdNum)) {
             const otherId = placed.modelIdNum === CITY_GATE_OPEN_MODEL_ID
               ? CITY_GATE_CLOSED_MODEL_ID : CITY_GATE_OPEN_MODEL_ID;
-            const otherGpu = await getGpuMesh(otherId);
-            const otherCpu = cpuModels.get(otherId);
+            const otherMeshId = floorless ? floorlessGateId(otherId) : otherId;
+            const otherGpu = await getGpuMesh(otherMeshId);
+            const otherCpu = cpuModels.get(otherMeshId);
             if (otherGpu && otherCpu) {
               await remapSubMeshes(otherGpu.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase);
-              unionBox(transformedAabb(archAabb(otherId, otherCpu.positions), local));
+              unionBox(transformedAabb(archAabb(otherMeshId, otherCpu.positions), local));
             }
             pixelGates.push({
               gate: makeCityGate(placed.modelIdNum), entry, local, bucketKey: gateKey,
