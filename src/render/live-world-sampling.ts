@@ -1,7 +1,8 @@
 // Texture sampling that follows its settings at once. The world filter (Video/MainFilterMode), the Anisotropic
 // Filtering row and the Ground sharpness row (both preferences) are read when a texture is uploaded, and
 // a cached texture keeps what it was given. So the renderer asks here once a frame: when any of the three changed since
-// the last frame, every cached world texture and ground array takes the new state before the frame draws, and a player
+// the last frame, every cached world texture and ground array takes the new state before the frame draws (the Mip
+// quality row, the fourth setting, rebuilds the mip chains instead of refiltering), and a player
 // sees the row's effect while playing. Settings publish their changes and preferences do not, and the Quality preset
 // writes both, so a key compared each frame covers every way in.
 //
@@ -20,7 +21,9 @@ const DEFAULT_TIER = 1;
 export function worldSamplingKey(): number {
   const tier = GROUND_TIERS.indexOf(String(groundSharpnessTier()));
   const mip = mipQuality() === 'sharp' ? 1 : 0;
-  return mip * 1000 + worldFilterMode() * 100 + anisotropyIndex(anisotropySetting()) * 10 + (tier < 0 ? DEFAULT_TIER : tier);
+  return (
+    mip * 1000 + worldFilterMode() * 100 + anisotropyIndex(anisotropySetting()) * 10 + (tier < 0 ? DEFAULT_TIER : tier)
+  );
 }
 
 /** What the renderer hands in: its texture caches and the two re-apply doors it already has. */

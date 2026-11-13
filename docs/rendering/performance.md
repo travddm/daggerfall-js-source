@@ -84,7 +84,7 @@ world frame, so a change applies on the next frame.
   write the keys themselves, so a Daggerfall Unity settings file keeps its meaning. 640x400 is labelled "(sharper)",
   not classic: no source shows the original game drew at that size. The Classic rendering preset in the Quality
   section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
-  Off, land view distance 3, Enhanced lighting Off, Enhanced environments Off (the painted sky), `FieldOfView` 60 and
+  Off, Mip quality Standard, land view distance 3, Enhanced lighting Off, Enhanced environments Off (the painted sky), `FieldOfView` 60 and
   the Point texture filter the first time it is turned on. It switches between two graphics profiles, standard and
   classic, stored in the `graphicsProfiles` preference: each holds every Graphics tab setting and Features row, and the
   choices in their drawers (a row's parts, a mod's modules and dials). Both share the display settings the machine
