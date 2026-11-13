@@ -23,7 +23,7 @@ import { _resetModSettings } from '../../../src/systems/modSettings.js';
 import { _resetRenderScaleDoor } from '../../../src/systems/renderScale.js';
 import { retroFrameConfig } from '../../../src/systems/retroMode.js';
 import { tileStates } from '../../../src/ui/enhanced/enhancedMenu.js';
-import { classicRenderingRow } from '../../../src/ui/enhanced/classic-rendering-row.ts';
+import { classicRenderingRow, graphicsProfileScope } from '../../../src/ui/enhanced/classic-rendering-row.ts';
 
 function fakeNode() {
   const node = {
@@ -129,10 +129,16 @@ test('both profiles survive a reload: each comes back with its own changes, and 
     setValue('Effects', 'BloomEnable', 'False');
     saveSettings();
     setPref('anisotropicFiltering', 4);
-    const standard = { fov: getString('Video', 'FieldOfView'), landView: rowValue('land-view-distance') };
+    const standard = {
+      fov: getString('Video', 'FieldOfView'),
+      landView: rowValue('land-view-distance'),
+      grassStyle: getPref('grassStyle'),
+    };
+    const otherStyle = standard.grassStyle === 'smooth' ? 'pixel' : 'smooth';
     press(drawRow().on);
     setValue('Video', 'FieldOfView', '70');
     saveSettings();
+    setPref('grassStyle', otherStyle);
     setValue('Effects', 'BloomEnable', 'True');
     saveSettings();
     reload();
@@ -154,6 +160,7 @@ test('both profiles survive a reload: each comes back with its own changes, and 
     assert.equal(getString('Video', 'RetroRenderingMode'), '0');
     assert.equal(rowValue('land-view-distance'), standard.landView);
     assert.equal(getPref('anisotropicFiltering'), 4);
+    assert.equal(getPref('grassStyle'), standard.grassStyle, 'a drawer choice changed under Classic is not kept here');
     press(drawRow().on);
     reload();
     assert.deepEqual(
@@ -161,6 +168,7 @@ test('both profiles survive a reload: each comes back with its own changes, and 
       ['70', 'True'],
       'Classic comes back as it was left',
     );
+    assert.equal(getPref('grassStyle'), otherStyle, 'with its own grass style');
     setValue('Video', 'VSync', 'False');
     saveSettings();
     press(drawRow().off);
@@ -177,4 +185,11 @@ test('both profiles survive a reload: each comes back with its own changes, and 
     delete globalThis.localStorage;
     fresh();
   }
+});
+
+test('a profile holds the drawer choices that change the picture, and leaves out a mod dial for sound', () => {
+  const { partIds } = graphicsProfileScope();
+  assert.ok(partIds.includes('pref:grassStyle'), partIds.join(' '));
+  assert.ok(partIds.some((id) => id.startsWith('mod:')), 'a mod dial is held');
+  assert.ok(!partIds.some((id) => /audio/i.test(id)), 'a sound dial stays shared');
 });

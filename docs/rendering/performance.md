@@ -86,8 +86,9 @@ world frame, so a change applies on the next frame.
   section (`src/systems/classic-rendering-preset.ts`) sets 320x200, 4:3, palettization, no mip maps, ground sharpness
   Off, land view distance 3, Enhanced lighting Off, Enhanced environments Off (the painted sky), `FieldOfView` 60 and
   the Point texture filter the first time it is turned on. It switches between two graphics profiles, standard and
-  classic, stored in the `graphicsProfiles` preference: each holds every Graphics tab setting and Features row but the
-  display settings the machine needs (resolution, fullscreen, frame rate, VSync, run in background), which both share
+  classic, stored in the `graphicsProfiles` preference: each holds every Graphics tab setting and Features row, and the
+  choices in their drawers (a row's parts, a mod's modules and dials). Both share the display settings the machine
+  needs (resolution, fullscreen, frame rate, VSync, run in background) and a mod's sound dials
   (`src/ui/enhanced/classic-rendering-row.ts` `graphicsProfileScope`). On stores the standard settings and puts the
   classic ones in place; Off stores the classic ones and puts the standard ones back exactly. A change made under
   either profile stays with it, across reloads.
