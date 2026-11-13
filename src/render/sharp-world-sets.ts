@@ -6,9 +6,16 @@
 import { onSettingChange } from '../systems/settings/settings.js';
 import { SHARP, sharpenWorldFs } from './sharp-texels.ts';
 import { worldFilterMode } from './world-texture-filter.ts';
+import { followDetailLevel } from './anisotropic-filtering.ts';
 
 /** A world set as the renderer builds it, with the source it was built from. */
-export type WorldSet = { readonly key: string; readonly sharp: boolean; readonly source: object };
+export type WorldSet = {
+  readonly key: string;
+  readonly sharp: boolean;
+  readonly source: object;
+  readonly terrainSnow?: unknown;
+  readonly terrainClip?: unknown;
+};
 
 /** What the renderer hands in. */
 export type SharpRenderer = {
@@ -17,6 +24,9 @@ export type SharpRenderer = {
   readonly _worldSet: WorldSet;
   _buildWorldSet(source: object): WorldSet;
   _installWorldSet(set: WorldSet): void;
+  /** Build the installed set's snow and clip terrain programs now, outside a frame. */
+  prepareTerrainSnow(): void;
+  prepareTerrainClip(): void;
 };
 
 /** Each built set and its twin for the other side of Sharp. */
@@ -54,11 +64,17 @@ export function useSharpWorldSets(renderer: SharpRenderer, sharp: boolean = shar
   if (installed === classic && renderer._classicSet !== classic) renderer._installWorldSet(renderer._classicSet);
   if (lane && installed === lane && renderer._laneSet !== lane)
     renderer._installWorldSet(renderer._laneSet as WorldSet);
+  // the terrain variants the old set had built are built for the new one too, here on the settings write: left to their
+  // first draw, they would compile inside a frame
+  if (renderer._worldSet !== installed && installed.terrainSnow) renderer.prepareTerrainSnow();
+  if (renderer._worldSet !== installed && installed.terrainClip) renderer.prepareTerrainClip();
 }
 
-/** Installs the classic set and follows Video/MainFilterMode for the renderer's life. */
+/** Installs the classic set and follows Video/MainFilterMode for the renderer's life; and from then on a change of
+ *  Detail Level sets the Anisotropic Filtering row, as DFU's quality levels set Unity's anisotropy. */
 export function startWorldSets(renderer: SharpRenderer): void {
   renderer._installWorldSet(renderer._classicSet);
+  followDetailLevel();
   onSettingChange((section: string, key: string) => {
     if (section === 'Video' && key === 'MainFilterMode') useSharpWorldSets(renderer);
   });

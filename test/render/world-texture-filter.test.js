@@ -8,9 +8,7 @@ import {
   TRILINEAR,
   filterUpload,
   needsRefilter,
-  parseQualityLevel,
   parseWorldFilterMode,
-  qualityAnisotropyFor,
   refilterWorldTexture,
   worldFilterFor,
 } from '../../src/render/world-texture-filter.ts';
@@ -48,7 +46,7 @@ test("Unity's three modes, with and without mip maps", () => {
 
 test('world art takes the world filter at upload and again when a scene asks for it after a change; UI art keeps NEAREST', () => {
   resetSettings();
-  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -82,7 +80,7 @@ test('world art takes the world filter at upload and again when a scene asks for
 
 test('an emission map follows its albedo, so both samples still blend alike', () => {
   resetSettings();
-  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -98,7 +96,7 @@ test('an emission map follows its albedo, so both samples still blend alike', ()
 
 test("the ground's magnification follows the world filter at each world load; Ground sharpness keeps its minification", () => {
   resetSettings();
-  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const { canvas } = stateGl();
   const r = new Renderer(canvas);
   try {
@@ -171,23 +169,10 @@ test('the compass pictures take GUI/GUIFilterMode, Point by default; the bars ke
   }
 });
 
-test("the quality level's anisotropy: forced to 9 from Beautiful up, off Point only, within the driver's ceiling", () => {
-  for (const level of [0, 1, 2, 3, 4, 5])
-    assert.equal(qualityAnisotropyFor(level, POINT, 16), 1, `Point keeps 1 at ${level}`);
-  for (const level of [0, 1, 2, 3])
-    assert.equal(qualityAnisotropyFor(level, BILINEAR, 16), 1, `level ${level} forces nothing`);
-  assert.equal(qualityAnisotropyFor(4, BILINEAR, 16), 9);
-  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 16), 9);
-  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 4), 4, "the driver's ceiling");
-  assert.equal(qualityAnisotropyFor(5, TRILINEAR, 0), 1, 'no extension');
-  assert.equal(parseQualityLevel('3'), 3);
-  for (const bad of ['6', '-1', 'Fantastic', '', null])
-    assert.equal(parseQualityLevel(bad), 5, `${bad} reads as DFU's default`);
-});
-
-test('a world texture takes the anisotropy at upload, and a changed quality level re-filters it', () => {
+test('a world texture takes the Anisotropic Filtering row at upload, and a change of the row or the filter re-filters it', () => {
   resetSettings();
-  choose(POINT);   // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
+  resetPrefs();
+  choose(POINT); // DFU's Point; the port's default is Sharp (sharp-texels.test.js)
   const ext = { TEXTURE_MAX_ANISOTROPY_EXT: 0x84fe, MAX_TEXTURE_MAX_ANISOTROPY_EXT: 0x84ff };
   const set = [];
   const gl = {
@@ -206,13 +191,18 @@ test('a world texture takes the anisotropy at upload, and a changed quality leve
     choose(TRILINEAR);
     assert.equal(needsRefilter(gl, texture), true, 'the filter changed');
     refilterWorldTexture(gl, texture);
-    setValue('Video', 'QualityLevel', '3');
-    assert.equal(needsRefilter(gl, texture), true, 'the quality level changed');
+    setPref('anisotropicFiltering', 'texture');
+    assert.equal(needsRefilter(gl, texture), true, 'the row changed');
     refilterWorldTexture(gl, texture);
     assert.equal(needsRefilter(gl, texture), false);
-    assert.deepEqual(set, [1, 9, 1], 'Point and Fantastic, then Trilinear and Fantastic, then Trilinear and Good');
+    assert.deepEqual(
+      set,
+      [1, 8, 1],
+      "Point (none), then Trilinear at the row's default 8x, then Per texture (none on a model)",
+    );
   } finally {
     resetSettings();
+    resetPrefs();
   }
 });
 
@@ -244,7 +234,7 @@ test('a change made while playing reaches every cached world texture and ground 
     assert.equal(ground.params[E.TEXTURE_MIN_FILTER], E.NEAREST_MIPMAP_NEAREST, 'Ground sharpness Off, at once');
     applyGraphicsPreset(GRAPHICS_PRESETS.find((p) => p.id === 'ultra'));
     frame();
-    assert.equal(getPref('groundSharpness'), 'max', 'the Quality preset wrote its ground');
+    assert.equal(getPref('anisotropicFiltering'), 16, 'the Quality preset wrote its anisotropy');
     assert.equal(ground.params[E.TEXTURE_MIN_FILTER], E.LINEAR_MIPMAP_LINEAR, 'and the arrays took it at once');
     choose(POINT);
     frame();

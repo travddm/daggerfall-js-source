@@ -28,12 +28,15 @@ Rules from the data side, stated at the top of `renderer.js`:
   texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
   cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
   and the spell hands draw 1% larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
-- `Video/QualityLevel` sets the anisotropy of that world art, as Unity's quality levels do: Beautiful and Fantastic
-  force 9x (capped by the driver), the lower levels leave it at 1x. It applies only off Point, because Direct3D under
-  ANGLE makes a sampler with anisotropy above 1 fully linear; so the default (Point, Fantastic) costs nothing.
-- The ground tile arrays take the world filter for magnification only. The Ground sharpness row decides their
-  minification and anisotropy (`src/render/ground-sampler.ts`). `applyGroundSharpness` applies both at every world
-  load, and on the next frame after the world filter, the quality level or the row changes.
+- The Anisotropic Filtering row (preference `anisotropicFiltering`: Off, Per texture, 2x, 4x, 8x, 16x; 8x by default;
+  `src/render/anisotropic-filtering.ts`) sets the anisotropy of that world art and of the ground, capped by the
+  driver. Per texture is DFU's: 8x on the ground, none elsewhere. It applies only off Point, because Direct3D under
+  ANGLE makes a sampler with anisotropy above 1 fully linear. A change of `Video/QualityLevel` sets the row as DFU's
+  quality levels set Unity's anisotropy: Fastest and Fast Off, Simple and Good Per texture, Beautiful and Fantastic 8x.
+- The ground tile arrays take the world filter for magnification, the Ground sharpness row for minification (nearest-mip
+  or trilinear) and the Anisotropic Filtering row for anisotropy (`src/render/ground-sampler.ts`). The snow ground's
+  albedo takes the same (`filterGroundPicture`). `applyGroundSharpness` applies them at every world load, and on the
+  next frame after any of them changes.
 - A texel with alpha 0 is a palette cutout. The shaders discard it.
 
 ## Resources

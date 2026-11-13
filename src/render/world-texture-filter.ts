@@ -7,6 +7,7 @@
 // frame (render/live-world-sampling.ts), and a host that asks for a cached texture again re-filters it too.
 import { getString } from '../systems/settings/settings.js';
 import { SHARP } from './sharp-texels.ts';
+import { anisotropyOf, anisotropySetting } from './anisotropic-filtering.ts';
 
 export const POINT = 0;
 export const BILINEAR = 1;
@@ -56,35 +57,12 @@ export function worldFilterFor(gl: FilterGl, mode: number, mips: boolean): World
   return { min: mips ? gl.NEAREST_MIPMAP_NEAREST : gl.NEAREST, mag: gl.NEAREST };
 }
 
-/** The quality level's anisotropy on world art, Unity's three modes over DFU's quality levels (QualitySettings.asset):
- *  Fastest and Fast disable it, Simple and Good use each texture's own level, Beautiful and Fantastic force it on.
- *  DFU never sets a level on models or flats, so they stay at 1 unless it is forced, and forced on, Unity raises a
- *  level from 1 to 9 to 9 (Texture.anisoLevel). The ground's anisotropy is the Ground sharpness row's.
- *
- *  Under Point it is always 1: Direct3D, under ANGLE, makes a sampler with anisotropy above 1 fully linear, so the
- *  default Point picture keeps its square texels and its cost whatever the quality level. */
-export function qualityAnisotropyFor(level: number, mode: number, driverMax: number): number {
-  if (mode === POINT || level < FORCED_QUALITY_LEVEL) return 1;
-  return Math.max(1, Math.min(FORCED_ANISOTROPY, driverMax || 1));
-}
-
-/** Beautiful, the first quality level that forces anisotropy on. */
-const FORCED_QUALITY_LEVEL = 4;
-/** The level Unity gives a texture at level 1 to 9 when anisotropy is forced. */
-const FORCED_ANISOTROPY = 9;
-
-/** The quality level as DFU reads it: 0 to 5, anything else Fantastic (DFU's default). */
-export function parseQualityLevel(stored: string | null | undefined): number {
-  const level = Number.parseInt(String(stored ?? ''), 10);
-  return Number.isInteger(level) && level >= 0 && level <= 5 ? level : 5;
-}
-
 type AnisotropyExtension = {
   readonly TEXTURE_MAX_ANISOTROPY_EXT: number;
   readonly MAX_TEXTURE_MAX_ANISOTROPY_EXT: number;
 };
 
-type TextureGl = FilterGl & {
+export type TextureGl = FilterGl & {
   readonly TEXTURE_2D: number;
   readonly TEXTURE_MIN_FILTER: number;
   readonly TEXTURE_MAG_FILTER: number;
@@ -96,14 +74,14 @@ type TextureGl = FilterGl & {
 };
 
 /** The anisotropy extension and the driver's ceiling, asked once per context. */
-const anisotropyOf = new WeakMap<object, { ext: AnisotropyExtension | null; max: number }>();
-function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension | null; max: number } {
-  let found = anisotropyOf.get(gl);
+const extensionOf = new WeakMap<object, { ext: AnisotropyExtension | null; max: number }>();
+export function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension | null; max: number } {
+  let found = extensionOf.get(gl);
   if (!found) {
     const ext = (gl.getExtension('EXT_texture_filter_anisotropic') as AnisotropyExtension | null) ?? null;
     const max = ext ? Number(gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)) || 1 : 1;
     found = { ext, max };
-    anisotropyOf.set(gl, found);
+    extensionOf.set(gl, found);
   }
   return found;
 }
@@ -111,8 +89,7 @@ function anisotropyExtension(gl: TextureGl): { ext: AnisotropyExtension | null; 
 /** The world filter and anisotropy in force now, for this context. */
 function currentWorldSampling(gl: TextureGl): { mode: number; aniso: number } {
   const mode = worldFilterMode();
-  const level = parseQualityLevel(getString('Video', 'QualityLevel'));
-  return { mode, aniso: qualityAnisotropyFor(level, mode, anisotropyExtension(gl).max) };
+  return { mode, aniso: anisotropyOf(anisotropySetting(), anisotropyExtension(gl).max, false, mode === POINT) };
 }
 
 /** What a world texture was uploaded with. */

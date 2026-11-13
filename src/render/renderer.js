@@ -719,7 +719,7 @@ import { boundsOf, spherePlanes, batchVisible, batchSphere, ZERO_ORIGIN, placeme
 import { billboardKey, sortByKey } from './billboardKey.js';   // AUDIT 68 S16-bbkey-stale-shadow-reach: the batch's texture key - one home with the two replays; LA-COST2: and the cutout pass's sort by it
 import { cullDisabled } from './frustum.js';   // PERF-CROWD2: the billboard pass culls for every host, so no host can forget to
 
-export { anisotropyFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+export { groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 /** PERF-SCALE: THE GPU THE BROWSER DRAWS ON, as its driver names it - WEBGL_debug_renderer_info's
  *  UNMASKED_RENDERER_WEBGL where the browser hands it out, gl.RENDERER otherwise (a browser that masks it answers
  *  a generic name there). A laptop's browser on its integrated GPU, or on SwiftShader, is the first thing a report
@@ -740,7 +740,7 @@ import { PerfMeter, perfOn, perfZones, perfCpu, setMeter } from './perfMeter.js'
 import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT } from './airPass.js';   // EL3: the ambient occlusion, the bloom and the shafts - the same kind of leaf; EL4: the eye's unit; EL6: all of it off the frame's own depth, at the resolve
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
-import { groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
@@ -7448,7 +7448,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   _setGroundSampler(tier) {
     const gl = this.gl;
     const ext = this._anisoExtension();
-    const s = groundSamplerFor(tier, this._anisoMax);
+    const s = groundSamplerFor(tier, groundAnisotropy(this._anisoMax));
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl[s.minFilter]);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, groundMagFor(gl, worldFilterMode()));   // DFU's terrain array takes MainFilterMode
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
