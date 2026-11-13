@@ -1,23 +1,23 @@
 // @ts-check
-// LW2: THE RESIDENT'S BODY - a living-world townsperson on the street.
+// THE RESIDENT'S BODY - a living-world townsperson on the street.
 // DFU's walker (mobilePerson.js MobilePerson, verbatim) both chooses its steps and wears them; a resident's steps are
 // its day's (systems/livingWorld/livingTown.js lays it where its day says it is, every frame), so this keeps the
 // walker's BODY and nothing of its feet: the same billboard - MoveAnims records 0-4 on the mirrored 8-way wheel at 4
-// fps, the idle record 5 (the watch's 15) at 1 fps, the frame and timer reset at each change of state (AUDIT 26
-// F021's law) - worn on a yaw of its own instead of the grid's four, and the same talk fields the street's activation
+// fps, the idle record 5 (the watch's 15) at 1 fps, the frame and timer reset at each change of state
+// - worn on a yaw of its own instead of the grid's four, and the same talk fields the street's activation
 // reads (`nameNPC`, `personFaceRecordId`, `guard`, `facingYaw`). It is a MobilePerson, so every seam that takes a
 // walker - the talk ray, the pickpocket, the watch's conversion, the trample - takes it unchanged.
 //
-// LW3: ARMED (`arm`). A resident walking out to the road, or home from it, in their gear wears their
+// ARMED (`arm`). A resident walking out to the road, or home from it, in their gear wears their
 // class's sprite instead - the enemy's own eight-way MobileUnit (characters/mobile/mobileUnit.js, the band's and the crew's
 // body) on its class archive - and their own outfit again when the walk is done.
 //
-// LW-LOOKS: IN TOWN TOO - one whose calling is a class's walks the town in its
+// IN TOWN TOO - one whose calling is a class's walks the town in its
 // sprite (`arm` with their town class, systems/livingWorld/looks.js townClassOf; `cls` the one worn), and one keeping their
 // place alone stands as Daggerfall's still picture of their kind (`still`: an NPC flat's record, its frames animated on
 // the game's own billboard clock, render/flatAnimation.js FlatAnim) - themselves again when they go on.
 //
-// LW-TALK: STANDING, A RESIDENT KEEPS THE WAY THEY
+// STANDING, A RESIDENT KEEPS THE WAY THEY
 // FACE - the walk wheel's record for their yaw against the camera, held on its STAND_FRAME. DFU's idle record is one
 // front view: every talker in a circle faced the camera, never the one they talked to (88,358 of 88,358 standing
 // frames), and the watch's post the street, never the road. The idle record is the politeness gate's alone - DFU's own
@@ -26,7 +26,7 @@ import { MobilePerson, MOVE_RECORDS, MOVE_FLIPS, PERSON_MOVE_FPS, PERSON_IDLE_FP
 import { mobileOrientation, MobileUnit } from './mobile/mobileUnit.js';
 import { FlatAnim } from '../render/flatAnimation.js';
 
-/** LW-TALK: the walk record's frame a standing resident holds. */
+/** The walk record's frame a standing resident holds. */
 export const STAND_FRAME = 0;
 
 export class ResidentWalker extends MobilePerson {
@@ -48,32 +48,32 @@ export class ResidentWalker extends MobilePerson {
     this._talkSeed = undefined;
     this.pickpocketAttempted = false;
     this.gender = 0;
-    /** LW3: walking in their gear - the class sprite's unit, its archive, the outfit to go back to. @type {any} */
+    /** Walking in their gear - the class sprite's unit, its archive, the outfit to go back to. @type {any} */
     this.unit = null;
     this.armed = false;
     this.ownArchive = opts.archive;
-    /** LW-LOOKS: the class worn (null: their outfit), its archive; the still picture stood as (null: none) and its clock. */
+    /** The class worn (null: their outfit), its archive; the still picture stood as (null: none) and its clock. */
     /** @type {number|null} */
     this.cls = null;
     this.classArchive = opts.archive;
     /** @type {{ archive: number, record: number, frameCount: number } | null} */
     this.stillLook = null;
-    /** AUDIT MW-NPC II K1: the still picture's kind (looks.js stillRoleOf - 'beggar', a stall's, 'priest'), null with none:
+    /** The still picture's kind (looks.js stillRoleOf - 'beggar', a stall's, 'priest'), null with none:
      *  what the Morrowind body reads (characters/rosterBodies.js residentWalkerActor). @type {string|null} */
     this.stillRole = null;
     /** @type {FlatAnim|null} */
     this._stillAnim = null;
-    /** WATCH-PROTECTS: the walk wheel's cadence as a share of the walk's - the living town's run, twice (livingTown.js
+    /** The walk wheel's cadence as a share of the walk's - the living town's run, twice (livingTown.js
      *  _run): at the walk's four frames a second a runner's legs skated a stride twice their own. */
     this.pace = 1;
     this.state = 'idle';
     this.moveCount = 1;   // the anti-skate rule is the pool's: a resident is placed where it is, never mid-tile
   }
 
-  /** The facing the watch's conversion and a guard's spawn read (G1). */
+  /** The facing the watch's conversion and a guard's spawn read. */
   get facingYaw() { return this.yaw; }
 
-  /** Nothing on the grid to claim: a resident walks the path its day laid - LW-SPACE: and steps aside for the others
+  /** Nothing on the grid to claim: a resident walks the path its day laid - and steps aside for the others
    *  (livingTown.js `_dodge`; DFU's walkers keep apart by the tiles they claim, `_setTarget`). */
   release() {}
 
@@ -81,7 +81,7 @@ export class ResidentWalker extends MobilePerson {
   setIdentity(archive, guard) { super.setIdentity(archive, guard); this.ownArchive = archive; this.classArchive = archive; this.unit = null; this.armed = false; this.cls = null; this.stillLook = null; this.stillRole = null; this._stillAnim = null; }
 
   /**
-   * LW3: into their gear - `look` the class sprite ({ mobileType, basics, archive, frameCount, sex }) - or, null, out of
+   * into their gear - `look` the class sprite ({ mobileType, basics, archive, frameCount, sex }) - or, null, out of
    * it into their own outfit.
    * @param {{ mobileType: number, basics: any, archive: number, frameCount: (record: number) => number, sex?: 'male'|'female' } | null} look
    */
@@ -102,8 +102,8 @@ export class ResidentWalker extends MobilePerson {
   }
 
   /**
-   * LW-LOOKS: standing as a still picture - `look` an NPC flat ({ archive, record, frameCount }) - or, null, themselves
-   * again (their class's sprite, or their outfit). AUDIT MW-NPC II K1: `role` the picture's kind.
+   * standing as a still picture - `look` an NPC flat ({ archive, record, frameCount }) - or, null, themselves
+   * again (their class's sprite, or their outfit). `role` the picture's kind.
    * @param {{ archive: number, record: number, frameCount: number } | null} look @param {string|null} [role]
    */
   still(look, role = null) {
@@ -123,12 +123,12 @@ export class ResidentWalker extends MobilePerson {
   /**
    * One frame of the billboard. The position is the living town's; `wantsToStop` the street's politeness gate (the
    * walker's own, mobilePerson.js personWantsToStop), which stands it to face the player - the town holds its clock
-   * back while it does (livingTown.js). LW-TALK: standing otherwise (`stand`), the way it faces on the walk wheel.
+   * back while it does (livingTown.js). Standing otherwise (`stand`), the way it faces on the walk wheel.
    * @param {number} dt @param {number[]} cameraPos @param {boolean} [wantsToStop]
    * @returns {{ record: number, frame: number, flip: boolean }}
    */
   update(dt, cameraPos, wantsToStop = false) {
-    if (this.stillLook && this._stillAnim) return this._frameOut(this.stillLook.record, this._stillAnim.tick(dt), false);   // LW-LOOKS: a still picture
+    if (this.stillLook && this._stillAnim) return this._frameOut(this.stillLook.record, this._stillAnim.tick(dt), false);   // a still picture
     if (this.armed && this.unit) return this.unit.update(dt, { moving: this.moving && !wantsToStop }, this.yaw, this.pos, cameraPos);
     const st = wantsToStop ? 'idle' : this.moving ? 'move' : 'stand';
     if (st !== this.state) { this.state = st; this.frame = 0; this._timer = 0; }

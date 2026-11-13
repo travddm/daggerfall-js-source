@@ -10,7 +10,7 @@
 //     White 0x70, Aquamarine 0x80, Yellow 0x90, Green 0xA0).
 //   - Metal tables are the explicit 16-byte sequences below,
 //     EXTRACTION-GENERATED from GetMetalColorTable (never hand-copied).
-// C6's voxel pieces consume these directly: author a piece's colors as
+// The voxel pieces consume these directly: author a piece's colors as
 // band indices, resolve through applyDyeToIndex + ART_PAL at build.
 
 export const DYE_COLORS = Object.freeze({
@@ -22,7 +22,7 @@ export const DYE_COLORS = Object.freeze({
 });
 export const DYE_TARGETS = Object.freeze({ Clothing: 0, WeaponsAndArmor: 1 });
 
-/** DW3: DyeColors' names by value, as C#'s `dye.ToString()` prints them
+/** DyeColors' names by value, as C#'s `dye.ToString()` prints them
  *  into a replacement's file name (TextureReplacement.GetName :725-735:
  *  `{archive:000}_{record}-{frame}[_{dye}][_{map}]`). 18 is four names
  *  in the enum (Chain, Unchanged, SilverOrElven, Silver) and is NEVER
@@ -264,7 +264,7 @@ export function getDyeColorTable(dye, target) {
   return null;
 }
 
-/** DYE-ICON: ImageProcessing.ChangeDye over a whole indexed picture - every index through applyDyeToIndex below, into
+/** ImageProcessing.ChangeDye over a whole indexed picture - every index through applyDyeToIndex below, into
  *  a COPY (the cached record keeps its own, as changeMask's does). The picture as it came only for no target or no
  *  dye: ChangeDye has no Unchanged arm, and 18 (Unchanged = Chain = Silver) on a weapon or armour is the SILVER
  *  table - a silver sword, a chain hauberk, leather armour - never the swatch itself (a garment's 18 is). */

@@ -1,4 +1,4 @@
-// ENEMY SOUNDS (AUDIT 24, wave 41) - EnemySounds.cs, whole.
+// ENEMY SOUNDS - EnemySounds.cs, whole.
 //
 // `moveSound` and `barkSound` are in every one of the 62 rows of
 // ENEMY_BASICS and had ZERO consumers in the whole of src/. `attackSound`
@@ -20,14 +20,14 @@
 
 import { ENEMY_BASICS, isClassEnemyId } from './enemyBasics.js';
 import { KNIGHT_CITY_WATCH } from '../mobile/mobileTypes.js';
-import { SPECIAL_ABILITY_BITS } from '../../systems/specialAdvantages.js';   // CF1: the AcuteHearing career bit
-import { entityImprovedAcuteHearing } from '../../systems/enchantments.js';   // AUDIT 39: ImprovesTalents(0) lives in the enchantment fold's bag
+import { SPECIAL_ABILITY_BITS } from '../../systems/specialAdvantages.js';   // the AcuteHearing career bit
+import { entityImprovedAcuteHearing } from '../../systems/enchantments.js';   // ImprovesTalents(0) lives in the enchantment fold's bag
 
-/** CF1 - ACUTE HEARING's one reader (DaggerfallEnemy.Start :53-71,
+/** ACUTE HEARING's one reader (DaggerfallEnemy.Start :53-71,
  *  the last career flag with none). DFU multiplies each enemy
  *  AudioSource's maxDistance once at spawn: x1.25 with the career
  *  flag, x1.5 when the ImprovedAcuteHearing ENCHANTMENT also holds.
- *  AUDIT 39: that enchantment SHIPS - ImprovesTalents(0) decodes into
+ *  that enchantment SHIPS - ImprovesTalents(0) decodes into
  *  the fold's bag - and the ternary was reading a top-level entity
  *  field nothing writes, so the improved arm was dead. The port
  *  applies the multiplier at play time on the ONE clip seam
@@ -55,17 +55,17 @@ export const OCCLUDED_VOLUME_SCALE = 0.25;
 export const MOVE_SOUND_THRESHOLD = 0.8;
 /** :108 - "Play attack sound only about half the time". */
 export const ATTACK_SOUND_THRESHOLD = 0.5;
-/** QUIET-COMPANIONS (FIELD BUGS 2026-10-04b): a
+/** A
  *  companion's attract wait, as a multiple of the one it rolled - 18 to 54 s where DFU's foe waits 3 to 9. DFU's
  *  cadence is a foe announcing itself while it is near you, and a companion is near you always: a sworn revenant
  *  barked every six seconds on average for as long as it walked with the player. Its attack sound is DFU's. */
 export const COMPANION_ATTRACT_SCALE = 6;
-/** MONSTER-QUIET: a MONSTER's attract clock
+/** A MONSTER's attract clock
  *  runs at 1 / FOE_ATTRACT_SCALE of the game's at the host's one seam (scenes/hostCombat.js tickEnemySound) - 7.5 to
  *  22.5 s between calls where DFU's waits 3 to 9, so it calls 40% as often. This source stays DFU's, clock and all; a
  *  class foe (the city watch's Halt) and a companion (COMPANION_ATTRACT_SCALE, already quieter) keep their cadence. */
 export const FOE_ATTRACT_SCALE = 2.5;
-/** MONSTER-QUIET: the step the seam hands a source's clock for `dt` of the game's. */
+/** The step the seam hands a source's clock for `dt` of the game's. */
 export const attractStep = (source, dt, companion = false) => (companion || isClassEnemyId(source?.mobileType) ? dt : dt / FOE_ATTRACT_SCALE);
 
 /**
@@ -120,7 +120,7 @@ export class EnemySoundSource {
    * says why: "Keep stepping even when player not in attract radius.
    * This means the player will get audio feedback the moment an enemy
    * is near." Walk up to a sleeping dungeon and it greets you at once.
-   * QUIET-COMPANIONS: `companion` - the host's foe is the player's companion - waits COMPANION_ATTRACT_SCALE times
+   * `companion` - the host's foe is the player's companion - waits COMPANION_ATTRACT_SCALE times
    * its roll (read here, so a body that turns companion after its first roll is quiet from that tick).
    */
   tick(dt, dist, isOccluded = () => false, { companion = false } = {}) {
@@ -162,11 +162,11 @@ export class EnemySoundSource {
   }
 }
 
-/** HALT-ONE: the least time between two of the watch's calls (seconds) - the whole watch's, not a watchman's. */
+/** The least time between two of the watch's calls (seconds) - the whole watch's, not a watchman's. */
 export const HALT_GAP_S = 15;
 
 /**
- * HALT-ONE: THE WATCH CALLS AS ONE - the living
+ * THE WATCH CALLS AS ONE - the living
  * watch's lane (scenes/cityGuards.js `oneVoice`), a recorded departure from FixedUpdate above. DFU gives every
  * watchman his own attract clock: each within 16 m of the player says "Halt!" every 3 to 9 seconds, eight times a
  * minute, whatever he is doing - five of them forty times a minute, a squad arriving together in chorus. Here the

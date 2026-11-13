@@ -6,10 +6,10 @@
 // the best neighbor - "mobiles generally follow roads"), MovingForward
 // pushes at 1.3 u/s to the cell center, and the person idles ONLY
 // while the POLITENESS GATE holds - `personWantsToStop` below, which
-// is MobilePersonMotor.cs:216-230 whole. AUDIT 18 flagged that gate
-// as four terms with the AreEnemiesNearby() clause dropped, so a
-// townsperson idled beside a hostile city guard where DFU keeps it
-// walking; the clause is carried now, and both exterior hosts pass
+// is MobilePersonMotor.cs:216-230 whole. Without the
+// AreEnemiesNearby() clause the gate would have four terms, and a
+// townsperson would idle beside a hostile city guard where DFU keeps it
+// walking; the clause is carried, and both exterior hosts pass
 // their own live foe pool through it.
 // The billboard: MoveAnims records 0-4 over the same mirrored
 // 8-orientation wheel as the monsters (4 fps), idle record 5 (guards
@@ -21,7 +21,7 @@
 // locations - DFU samples the terrain collider).
 
 import { mobileOrientation } from './mobileUnit.js';
-import { areaRace } from '../../world/worldWide/worldGrid.js';   // REGIONAL-FOLK: the region's race, FALL.EXE's (WW1: an area's - the province's past the Bay)
+import { areaRace } from '../../world/worldWide/worldGrid.js';   // the region's race, FALL.EXE's (an area's - the province's past the Bay)
 
 export const PERSON_MOVE_SPEED = 1.3;          // movementSpeed
 export const PERSON_IDLE_DISTANCE = 2.5;       // idleDistance
@@ -39,7 +39,7 @@ export const PERSON_TEXTURES = Object.freeze({
   Breton: { male: [385, 386, 391, 394], female: [453, 454, 455, 456] },
 });
 export const GUARD_TEXTURE = 399;
-/** ROAD-D D10 - SetPerson's face tables (MobilePersonNPC.cs:30-39),
+/** SetPerson's face tables (MobilePersonNPC.cs:30-39),
  *  digit for digit and in the SAME outfit-variant order as
  *  PERSON_TEXTURES above (DFU's own comments pair them off texture by
  *  texture: maleRedguard 336/312/336/312 match 381-384, and so on).
@@ -58,15 +58,15 @@ export const PERSON_FACE_RECORDS = Object.freeze({
 export const RACE_OF_PEOPLE = Object.freeze({ 0: 'Nord', 2: 'Redguard', 3: 'Breton' });
 /** @param {number|undefined|null} people */
 export const raceOfPeople = (people) => RACE_OF_PEOPLE[/** @type {0|2|3} */ (people)] ?? 'Breton';
-/** REGIONAL-FOLK: FALL.EXE names the region Redguard (REGION_RACES 1). WW1: the number is an AREA
+/** FALL.EXE names the region Redguard (REGION_RACES 1). The number is an AREA
  *  (world/worldWide/worldGrid.js) - on the Bay its region, so every region's answer is FALL.EXE's; past the Bay a
  *  province's, and Hammerfell's beyond the Bay is Redguard as its regions on it are.
  *  @param {number|undefined|null} region */
 export const redguardRegion = (region) => Number.isInteger(region) && areaRace(/** @type {number} */ (region)) === 'Redguard';
-/** REGIONAL-FOLK (FIELD BUGS 2026-10-10, the Discord's "Add Regional NPCs"; Port-Ledger A): THE RACE A TOWN'S WALKERS
+/** THE RACE A TOWN'S WALKERS
  *  WEAR. DFU dresses them by the climate (above) and names them by the REGION (MobilePersonNPC.cs:214, FALL.EXE's
  *  REGION_RACES), so Sentinel and the Dragontail Mountains walked Breton and Nord bodies under Redguard names. A
- *  Redguard region's walkers are Redguards; every other region's are the climate's, as DFU's. MERCHANT-YARDS: a town's
+ *  Redguard region's walkers are Redguards; every other region's are the climate's, as DFU's. A town's
  *  yard keepers wear it too (scenes/world.js merchantYardSitesFor).
  *  @param {number|undefined|null} people @param {number|undefined|null} region */
 export const walkerRace = (people, region) => (redguardRegion(region) ? 'Redguard' : raceOfPeople(people));
@@ -79,7 +79,7 @@ export const walkerRace = (people, region) => (redguardRegion(region) ? 'Redguar
  *   playerStandingStill && withinIdleDistance && sheathed
  *     && !invisible && !inBeastForm
  *
- * and then the term AUDIT 18 found missing (:226-230), which DFU
+ * and then the last term (:226-230), which DFU
  * writes as an if/else rather than a fifth `&&` and explains in its
  * own comment - "greatly reduce # of calls to AreEnemiesNearby() by
  * short-circuit evaluation". JS `&&` short-circuits identically, so
@@ -171,7 +171,7 @@ export class MobilePerson {
     // origin target.
     this.target = [...this.pos];
     this.tx = -1; this.ty = -1;
-    // NT2 (F022): NO occupancy flag at spawn - DFU's spawn path sets
+    // NO occupancy flag at spawn - DFU's spawn path sets
     // none (SpawnAvailableMobile only positions the transform,
     // PopulationManager.cs:150-166; GetRandomSpawnPosition only tests
     // weight, CityNavigation.cs:512-535). Occupied is written solely in
@@ -190,7 +190,7 @@ export class MobilePerson {
    *  window portraits this walker from. Set by RandomiseNPC. */
   personFaceRecordId = 0;
 
-  /** The person's facing as a world yaw (G1: guard spawns inherit it). */
+  /** The person's facing as a world yaw (guard spawns inherit it). */
   get facingYaw() { return DIR_YAW[this.dir] ?? 0; }
 
   release() { this.nav.clearOccupied(this.gx, this.gy); this.nav.clearOccupied(this.tx, this.ty); }
@@ -269,7 +269,7 @@ export class MobilePerson {
    * @returns {record, frame, flip} for the billboard
    */
   update(dt, cameraPos, wantsToStop = false) {
-    // AUDIT 26 F021: SetIdle resets `currentFrame = 0` and
+    // SetIdle resets `currentFrame = 0` and
     // `animTimer = 1` on EVERY idle/move transition
     // (MobilePersonBillboard.cs:292-313), so each state starts at its
     // first frame. The port carried one monotonic frame/timer across
@@ -309,7 +309,7 @@ export class MobilePerson {
   }
 
   /**
-   * PERF-TOWN1: THIS PERSON'S OWN ROW, written through.
+   * THIS PERSON'S OWN ROW, written through.
    *
    * `update` answers once per person per frame and the caller reads the
    * three fields and drops them - so a fresh record each time was a

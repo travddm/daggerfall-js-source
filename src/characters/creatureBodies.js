@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC9: DAGGERFALL'S
+// DAGGERFALL'S
 // CREATURES, MATCHED TO MORROWIND'S. Every creature mobile (characters/mobile/mobileTypes.js, 0-42) is either matched to the
 // Morrowind creature that stands for it - an ordered list of CREA ids, the first the attached masters carry building
 // its body (combat/fpArm.js buildCreatureBody) - or a DECLARED MISS with its reason, keeping its Daggerfall sprite. The
@@ -7,16 +7,16 @@
 // (lich) and Bloodmoon's (BM_spriggan, BM_bear_black, bm_frost_giant, draugr); a master that lacks one refuses the
 // build and the sprite stands, as for any refused body.
 import { MOBILE_TYPES as M } from './mobile/mobileTypes.js';
-import { ENEMY_BASICS, isClassEnemyId } from './enemy/enemyBasics.js';   // MWNPC13: a spectral's own archive (a named one keeps its sprite); DEX7: a mod's row a monster's, never a class's
-import { BaseImageFile } from '../formats/baseImageFile.js';   // MWNPC13: the spectral sprite's opacity
+import { ENEMY_BASICS, isClassEnemyId } from './enemy/enemyBasics.js';   // a spectral's own archive (a named one keeps its sprite); a mod's row a monster's, never a class's
+import { BaseImageFile } from '../formats/baseImageFile.js';   // the spectral sprite's opacity
 
 /** The match: mobile type -> `{ creature: [CREA ids, first carried wins] }` or `{ miss: reason }`. Every creature
- *  mobile is named - the table is the census. MWNPC13: `veil` a spectral's - its body drawn translucent (SPECTRAL_VEIL).
- *  AUDIT MW-NPC II K5: `flies` a flyer's - stood only in a record that flies.
+ *  mobile is named - the table is the census. `veil` a spectral's - its body drawn translucent (SPECTRAL_VEIL).
+ *  `flies` a flyer's - stood only in a record that flies.
  *  @type {Readonly<Record<number, { creature?: string[], miss?: string, veil?: boolean, flies?: boolean }>>} */
 export const CREATURE_MATCH = Object.freeze({
   [M.Rat]: { creature: ['rat'] },
-  // AUDIT MW-NPC D4: Daggerfall's imp FLIES (its behaviour, its hover at the gate) and Morrowind's scamp walks - stood,
+  // Daggerfall's imp FLIES (its behaviour, its hover at the gate) and Morrowind's scamp walks - stood,
   // it paddled its walk cycle in the air; a flyer with no Morrowind flyer keeps its sprite, as the bat and the harpy do
   [M.Imp]: { miss: 'a flyer - Morrowind\'s scamp walks, and no imp flies there' },
   [M.Spriggan]: { creature: ['bm_spriggan'] },
@@ -35,18 +35,18 @@ export const CREATURE_MATCH = Object.freeze({
   [M.SkeletalWarrior]: { creature: ['skeleton warrior', 'skeleton'] },
   [M.Giant]: { creature: ['bm_frost_giant'] },             // Bloodmoon's frost giant
   [M.Zombie]: { creature: ['bonewalker'] },
-  [M.Ghost]: { creature: ['ancestor_ghost'], veil: true },   // MWNPC13: Morrowind's ancestor ghost, seen through as Daggerfall's is
+  [M.Ghost]: { creature: ['ancestor_ghost'], veil: true },   // Morrowind's ancestor ghost, seen through as Daggerfall's is
   [M.Mummy]: { creature: ['draugr'] },                     // Bloodmoon's draugr, the barrows' wrapped dead
   [M.GiantScorpion]: { miss: 'no giant scorpion' },
   [M.OrcShaman]: { miss: 'an orc is a person' },
   [M.Gargoyle]: { miss: 'no gargoyle' },
-  [M.Wraith]: { creature: ['ancestor_ghost'], veil: true },   // MWNPC13: Morrowind has no wraith - its ghost, the same veil
+  [M.Wraith]: { creature: ['ancestor_ghost'], veil: true },   // Morrowind has no wraith - its ghost, the same veil
   [M.OrcWarlord]: { miss: 'an orc is a person' },
   [M.FrostDaedra]: { creature: ['atronach_frost'] },
   [M.FireDaedra]: { creature: ['atronach_flame'] },
   [M.Daedroth]: { creature: ['daedroth'] },
   [M.Vampire]: { miss: 'a vampire is a person - its race\'s vampire head (MWNPC14, foeBodies.js isPersonFoe), never a creature' },
-  // AUDIT MW-NPC II K5: transformed she FLIES (mobileUnit.js setSpecialTransformationCompleted: 'Flying'), so her body
+  // Transformed she FLIES (mobileUnit.js setSpecialTransformationCompleted: 'Flying'), so her body
   // must be a creature that flies - the build asks the record's own Flies flag (fpArm.js buildCreatureBody) and a
   // winged twilight that walks keeps her sprite
   [M.DaedraSeducer]: { creature: ['winged twilight'], flies: true },
@@ -61,12 +61,12 @@ export const CREATURE_MATCH = Object.freeze({
   [M.IceAtronach]: { creature: ['atronach_frost'] },
   [M.Horse_Invalid]: { miss: 'not a foe' },
   [M.Dragonling_Alternate]: { miss: 'no dragon' },
-  [M.Dreugh]: { miss: 'a water creature - the swimming groups are not driven yet' },   // AUDIT MW-NPC D5: the slaughterfish's law - it swims (Aquatic), and its body walked through the water
+  [M.Dreugh]: { miss: 'a water creature - the swimming groups are not driven yet' },   // the slaughterfish's law - it swims (Aquatic), and its body walked through the water
   [M.Lamia]: { miss: 'no lamia' },
 });
 
-/** MWNPC13: A SPECTRAL'S VEIL - its body drawn translucent through
- *  the lanes' veiled pass (INVIS-LOOK: blended after the opaque world, ECV1's record) at the opacity Daggerfall's own
+/** A SPECTRAL'S VEIL - its body drawn translucent through
+ *  the lanes' veiled pass (blended after the opaque world) at the opacity Daggerfall's own
  *  spectral sprite is drawn (BaseImageFile.SPECTRAL_ALPHA of 255 - dataPipeline.js's spectral arm): mode 3, no tint, no
  *  clock. A look carries it, so every lane standing the look veils it (characters/npcBodies.js `stand`). */
 export const SPECTRAL_VEIL = Object.freeze({ mode: 3, alpha: BaseImageFile.SPECTRAL_ALPHA / 255, t: 0, phase: 0 });
@@ -76,12 +76,12 @@ const lookOf = (m) => Object.freeze({ creature: Object.freeze([...m.creature]), 
 /** The looks, one a mobile type. */
 const LOOKS = new Map(Object.entries(CREATURE_MATCH).filter(([, m]) => m.creature).map(([t, m]) => [Number(t), lookOf(m)]));
 
-/** DEX7: A MOD'S CREATURES, matched by the classic table's law - a
+/** A MOD'S CREATURES, matched by the classic table's law - a
  *  mod that adds monsters past the classic ids (characters/enemy/enemyBasics.js registerEnemyRows) registers a row for
  *  each here, a match or a declared miss, and creatureLook reads them after the classic table. CREATURE_MATCH stays the
  *  census of DFU's own; a mod names only its own mobiles. A row is refused where the classic table's audits would refuse
  *  it: a match or a miss, never both; ids as the reader keeps them; and a creature that flies or swims in Daggerfall
- *  never stood in one that walks (AUDIT MW-NPC D4/D5 - a flyer's row says `flies`, a swimmer has none).
+ *  never stood in one that walks (a flyer's row says `flies`, a swimmer has none).
  *  @type {Map<number, Readonly<{ creature?: string[], miss?: string, veil?: boolean, flies?: boolean }>>} */
 const _modMatch = new Map();
 /** Register a mod's rows: `[mobileType, row]` pairs, each mobile once. */
@@ -111,12 +111,12 @@ export function _resetCreatureMatches() {
  *  @param {any} f a foe record (its `mobileType`) */
 export function creatureLook(f) {
   const look = (f && LOOKS.get(f.mobileType)) ?? null;
-  // AUDIT MW-NPC D2: a Daedra Seducer in her MORTAL GUISE - the woman Daggerfall draws until SeducerTransformBehaviour
+  // A Daedra Seducer in her MORTAL GUISE - the woman Daggerfall draws until SeducerTransformBehaviour
   // completes (MobileUnit.specialTransformationCompleted) - keeps her sprite: the match is the winged daedra she becomes,
   // which would give her away (the Sigil Broker's law, section 15a). A record with no mobile (the gate's host) is the daedra.
   if (f?.mobileType === M.DaedraSeducer && f.mobile && !f.mobile.specialTransformationCompleted) return null;
   if (look?.veil) {
-    // MWNPC13: a NAMED spectral - Lysandus, placed by his quest in his own archive (473) - keeps his own sprite: the
+    // A NAMED spectral - Lysandus, placed by his quest in his own archive (473) - keeps his own sprite: the
     // body is the stock ghost's, and he is no stock ghost
     const a = f.mobileArchive ?? f.archive, b = ENEMY_BASICS[f.mobileType];
     if (a != null && b && a !== b.maleTexture && a !== b.femaleTexture) return null;

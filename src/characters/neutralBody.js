@@ -256,7 +256,7 @@ export function buildNeutralBody(ramps, opts = {}) {
   grp = 'legL'; leg(-1); grp = 'legR'; leg(1); grp = 'body';
 
   // FEET: forward, from the TRUE thin ankle (rx ~0.066). ANK is the
-  // ankle stump's top ring. AUDIT 68 S05-neutralbody-dead-writes: a
+  // ankle stump's top ring. A
   // "slim ankle" rewrite of legProf's bottom rows stood here, AFTER
   // leg() had lofted them - it never reached the geometry.
   const ANK = 0.045;
@@ -314,7 +314,7 @@ export function buildNeutralBody(ramps, opts = {}) {
   // neck, behind knee/elbow, under pec/delt) face a close opposing wall
   // and darken. No hardcoded positions.
 
-  // ARMOR-AS-BODY (prototype): instead of a separate mesh, thicken the
+  // Instead of a separate mesh, thicken the
   // rig's own surface where a piece sits and recolour it. No gaps, and
   // it animates with the body for free. Cuirass = the torso ('body')
   // faces in the chest->waist band pushed radially out + tagged steel.

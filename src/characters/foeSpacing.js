@@ -7,8 +7,8 @@
 // collider (no wall is crossed), and never off an edge (a walker the push would leave with no ground under its centre
 // stays where it was - the drop the motor's own fall check refuses, EnemyMotor's FallCheck, characters/enemy/enemyMotor.js
 // _fallCheck). A departure: DFU's controllers block, the port's pools push.
-import { worldAabb } from '../player/activate.js';   // AUDIT TACT C6: an action door's box
-import { CAPSULE_HEIGHT, CAPSULE_RADIUS, STEP_OFFSET } from '../player/motor.js';   // FIELD BUGS 2026-10-04d CRATE-FREE: a freed body keeps its own floor, a step at most
+import { worldAabb } from '../player/activate.js';   // an action door's box
+import { CAPSULE_HEIGHT, CAPSULE_RADIUS, STEP_OFFSET } from '../player/motor.js';   // a freed body keeps its own floor, a step at most
 import { FALL_CHECK_DROP } from './enemy/enemyMotor.js';
 
 /** How fast a body is pushed out of another, metres a second. */
@@ -16,7 +16,7 @@ export const FOE_SPACING_SPEED = 3;
 /** Two capsules' centres closer than this overlap. */
 export const FOE_SPACING_GAP = 2 * CAPSULE_RADIUS;
 
-/** DOOR-JAM (FIELD BUGS 2026-10-14b): the height a body's controller sweeps at - its motor's own (`controllerHeight`,
+/** The height a body's controller sweeps at - its motor's own (`controllerHeight`,
  *  EnemyMotor.HeightAdjust's crouch under a doorway's lintel, characters/enemy/enemyMotor.js _heightAdjust), else its capsule.
  *  Two controllers meet at their live heights, and a push at the full height would shove a crouched body back out from
  *  under the lintel it is passing. The ground check under a push keeps the body's own height (FallCheck's, `supported`). */
@@ -92,9 +92,9 @@ export function spaceFoes(foes, collider, dt, skip = spacingSkips) {
   return moved;
 }
 
-// ---- TACT3 (,; "guards blocking doors"; the classic lane too, his call) - THE CROWD AND THE DOOR -----------------------
+// ---- The crowd and the door ----------------------------------------------------------------------------------------
 
-/** TACT3: push apart bodies of DIFFERENT pools - a watchman and a bandit, the watch called indoors and the building's
+/** Push apart bodies of DIFFERENT pools - a watchman and a bandit, the watch called indoors and the building's
  *  own foes - which each pool's own spaceFoes never sees as a pair. The same push, the same collider law, the same
  *  edge rule; pairs within one pool are left to that pool. Answers how many moved.
  *  @param pools    arrays of the pools' records, all on `collider`
@@ -142,7 +142,7 @@ function nudge(ai, px, pz, cap, collider) {
   return true;
 }
 
-/** TACT3: a doorway's threshold - this far either side of the door's plane, and this far along it from its centre. */
+/** A doorway's threshold - this far either side of the door's plane, and this far along it from its centre. */
 export const DOORWAY_DEPTH = 1.4;
 export const DOORWAY_HALF_WIDTH = 1.2;
 /** ...how fast a foe with no business in it is eased out, metres a second (well under a walk: one passing through
@@ -150,11 +150,11 @@ export const DOORWAY_HALF_WIDTH = 1.2;
 export const DOORWAY_CLEAR_SPEED = 1.6;
 
 /**
- * TACT3: NO FOE STANDS IN A DOORWAY. A foe whose feet are in a door's threshold and whose way does not lie through it
+ * NO FOE STANDS IN A DOORWAY. A foe whose feet are in a door's threshold and whose way does not lie through it
  * (its motor's destination on its own side of the door, or none) is eased out along the door's normal to the edge of
  * the threshold on the side it stands - so a watch called to a door, a pack that chased someone to it, or a crowd a
  * griefer led there never holds it shut. A foe walking through (its destination across the door) is left to walk; one
- * fighting someone on the sill fights from the threshold's edge, which is within its reach (AUDIT TACT C2).
+ * fighting someone on the sill fights from the threshold's edge, which is within its reach.
  * `doors` are { pos: [x,y,z] (the door's centre), normal: [x,y,z] } in the foes' frame. Answers how many moved.
  */
 export function clearDoorways(foes, doors, collider, dt, skip = spacingSkips) {
@@ -177,7 +177,7 @@ export function clearDoorways(foes, doors, collider, dt, skip = spacingSkips) {
       if (dest) {
         const da = (dest[0] - p[0]) * nx + (dest[2] - p[2]) * nz;
         if (Math.sign(da) !== side && Math.abs(da) > 0.3) break;   // on its way through
-        // AUDIT TACT C1/C2: NO EXEMPTION FOR A FOE WHOSE QUARRY STANDS IN THE DOORWAY. It kept a griefer's watch on the
+        // NO EXEMPTION FOR A FOE WHOSE QUARRY STANDS IN THE DOORWAY. It kept a griefer's watch on the
         // sill for good (a stale destination after the quarry left kept it there forever, and other players' clicks
         // stopped on it). It need not stand there to fight: the threshold's edge is within its reach of anyone on the
         // sill (DOORWAY_DEPTH under DFU's 2.25 m).
@@ -190,7 +190,7 @@ export function clearDoorways(foes, doors, collider, dt, skip = spacingSkips) {
   return moved;
 }
 
-/** TACT3: a pool of doors ({ matrix, centre, normal } - a street's static doors, a building's own; `doorOf` maps an
+/** A pool of doors ({ matrix, centre, normal } - a street's static doors, a building's own; `doorOf` maps an
  *  entry to one) as threshold spots within `range` of `near` (the player's feet), for clearDoorways. */
 export function doorSpotsNear(doors, near, range = 40, doorOf = (e) => e) {
   const out = [];
@@ -206,7 +206,7 @@ export function doorSpotsNear(doors, near, range = 40, doorOf = (e) => e) {
   return out;
 }
 
-/** AUDIT TACT C6/C7: the ACTION doors' doorways (an interior's inner swing doors, a dungeon's doors) as threshold spots -
+/** The ACTION doors' doorways (an interior's inner swing doors, a dungeon's doors) as threshold spots -
  *  each door's CLOSED pose (its base matrix), its box's centre, the normal across its thin axis. `objects` an
  *  ActionSystem's (kind 'door'); within `range` of `near`. */
 const _doorBoxes = new WeakMap();
@@ -225,40 +225,38 @@ export function actionDoorSpots(objects, near, range = 30) {
   return out;
 }
 
-// ---- FIELD BUGS 2026-10-04d CRATE-FREE (Discord: "Vital quest enemies stuck in dungeon crates ... there are a few rooms
-// where they are stuck in crates"; the screenshot a giant stood INSIDE a wooden crate, its head over the lid) - NO FOE
-// STANDS INSIDE A MODEL -------------------------------------------------------------------------------------------------
+// ---- No foe stands inside a model ----------------------------------------------------------------------------------
 //
 // A crate is a MODEL (TEXTURE.090's crate faces, systems/searchables.js CRATES - five one-sided faces, 0.3 to 2.1 m tall),
 // solid as DFU makes it: RDBLayout.AddModels combines it into the block's mesh collider, and the dungeon files it in its
 // 'dungeon' bucket (dungeonContext.js). The collider's push is facing-blind - the centre away from the nearest point - so
 // a body whose centre stands INSIDE a closed model is pushed back in by the model's own walls, and never walks out. DFU's
 // is not held there: Unity's sweep reads no back face, and its CharacterController depenetrates from what it starts in
-// (enableOverlapRecovery) - the law collider.js already keeps for a hull in a rock (ROCK-FREE's hullSweepAll). The foes'
+// (enableOverlapRecovery) - the law collider.js already keeps for a hull in a rock (hullSweepAll). The foes'
 // motor has no such pass, so the stand frees the body: one lodged in a model is set on the nearest spot of its own floor
 // that is reached by passing only the skin it stands in. A body that is not lodged is left exactly where its law stood it.
 
-/** CRATE-FREE: how high over its feet a body is asked whether it stands in a model - a knee. A lid lower than this is one
- *  the body's lower sphere is already set ON (collider.js PH1's one-way floor); every lid that holds a body is higher. */
+/** How high over its feet a body is asked whether it stands in a model - a knee. A lid lower than this is one
+ *  the body's lower sphere is already set ON (collider.js's one-way floor); every lid that holds a body is higher. */
 export const LODGE_KNEE = 0.5;
-/** CRATE-FREE: how far the knee's line up and its four bearings look for the lid and the walls of the skin it stands in. */
+/** How far the knee's line up and its four bearings look for the lid and the walls of the skin it stands in. */
 export const LODGE_REACH = 4;
-/** CRATE-FREE: how far a face may reach inside a body's radius and the body still fit - the collider's own skin (a body
+/** How far a face may reach inside a body's radius and the body still fit - the collider's own skin (a body
  *  resting on its floor touches it at its radius exactly). */
 export const FIT_SKIN = 0.02;
-/** CRATE-FREE: the rings a lodged body's spot is sought on, nearest first, in metres. */
+/** The rings a lodged body's spot is sought on, nearest first, in metres. */
 export const FREE_RINGS = Object.freeze([0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3]);
-/** CRATE-FREE: the bearings round each ring - literals and one IEEE constant (the four axes, then the four diagonals:
+/** The bearings round each ring - literals and one IEEE constant (the four axes, then the four diagonals:
  *  dungeonFires.js ringOf's), so every client of a room frees a body to the same spot. */
 const FREE_BEARINGS = Object.freeze([[1, 0], [-1, 0], [0, 1], [0, -1],
   [Math.SQRT1_2, Math.SQRT1_2], [Math.SQRT1_2, -Math.SQRT1_2], [-Math.SQRT1_2, Math.SQRT1_2], [-Math.SQRT1_2, -Math.SQRT1_2]]);
 const KNEE_BEARINGS = Object.freeze([[1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1]]);
 const UP = [0, 1, 0];
-/** CRATE-FREE: how far past a face met from behind the next ray starts (the ray answers nothing nearer than 1e-4). */
+/** How far past a face met from behind the next ray starts (the ray answers nothing nearer than 1e-4). */
 const PASS_SKIN = 1e-3;
 const _knee = [0, 0, 0], _bead = [0, 0, 0];
 
-/** CRATE-FREE: does a body `height` tall fit at `feet` - no face within its radius (less the skin) of its axis? Beads a
+/** Does a body `height` tall fit at `feet` - no face within its radius (less the skin) of its axis? Beads a
  *  radius apart up the axis, each asked of the collider's OverlapSphere (sphereOverlaps). Not how far the resolve would
  *  move it (penetrationAt): a lid straight over a body pushes it down onto the floor that holds it up, and moves it not
  *  at all. */
@@ -273,15 +271,15 @@ export function bodyFits(collider, feet, height = CAPSULE_HEIGHT) {
 }
 
 /**
- * CRATE-FREE: does a body standing at `feet` stand INSIDE a model - a crate, a barrel, a bed - rather than in the room
+ * does a body standing at `feet` stand INSIDE a model - a crate, a barrel, a bed - rather than in the room
  * round it? A face's own winding says which way it looks (the world pass draws front faces alone - dungeonFires.js
  * colliderFireProbe reads a floor by it), and inside a solid every face is met from behind: the line straight up from the
  * body's knee meets a lid's BACK, and two of the knee's four bearings at least meet walls' backs (a crate in a corner
  * meets the room's two walls first; under a table or a walkway with no underside the room is open round it). A room's
  * own shell looks in at it, and a model whose faces look both ways holds it in DFU too. Whatever its height: a body in a
  * crate taller than itself (41833, a 2.1 m cube) is held by its walls all the same. A collider that cannot answer - no
- * raycastHit to read a face's side by, no sphereOverlaps for the free's fit (bodyFits) - holds nobody. QUEST-FOE-WALL
- * (FIELD BUGS 2026-10-15c, "Quest enemy spawned inside object"): and a COLUMN - a pillar to the ceiling has no lid in
+ * raycastHit to read a face's side by, no sphereOverlaps for the free's fit (bodyFits) - holds nobody.
+ * And a COLUMN - a pillar to the ceiling has no lid in
  * reach (no cap, or one past LODGE_REACH), so without one a body is held only when every bearing meets a face's back.
  */
 export function lodgedIn(collider, feet) {
@@ -294,10 +292,10 @@ export function lodgedIn(collider, feet) {
     const h = collider.raycastHit(_knee, dir, LODGE_REACH);
     if (h?.back === true && Number.isFinite(h.dist)) walls++;
   }
-  return walls >= (lidded ? 2 : KNEE_BEARINGS.length);   // QUEST-FOE-WALL: a column to the ceiling - no lid, every bearing in its skin
+  return walls >= (lidded ? 2 : KNEE_BEARINGS.length);   // a column to the ceiling - no lid, every bearing in its skin
 }
 
-/** CRATE-FREE: does the line from `from` along the unit `dir` run `dist` meeting no face that looks at it? The faces it
+/** Does the line from `from` along the unit `dir` run `dist` meeting no face that looks at it? The faces it
  *  meets from behind - the skin of the solid it starts in - it passes. */
 export function clearPast(collider, from, dir, dist) {
   const p = [from[0], from[1], from[2]];
@@ -313,7 +311,7 @@ export function clearPast(collider, from, dir, dist) {
   return left <= 0;
 }
 
-/** CRATE-FREE: the floor under (x, z) within a step of `y0` - a face that looks up (one met from behind is a ceiling's
+/** The floor under (x, z) within a step of `y0` - a face that looks up (one met from behind is a ceiling's
  *  top, never a floor), or the collider's analytic ground; null for none. */
 function floorNear(collider, x, y0, z) {
   _from[0] = x; _from[1] = y0 + STEP_OFFSET; _from[2] = z;
@@ -325,14 +323,14 @@ function floorNear(collider, x, y0, z) {
 }
 
 /**
- * CRATE-FREE: a body lodged in a model (lodgedIn) set free, `feet` moved in place: the nearest spot (FREE_RINGS round
+ * a body lodged in a model (lodgedIn) set free, `feet` moved in place: the nearest spot (FREE_RINGS round
  * FREE_BEARINGS) on its own floor - a step up or down at most; a flyer keeps its height - that the line from its knee
  * reaches passing only the skin it stands in (clearPast), where a body fits (bodyFits) and stands in nothing. Answers
  * whether it moved; a body with no such spot within the rings stands where it stood, as it did before.
  */
 export function freeLodgedFeet(collider, feet, { height = CAPSULE_HEIGHT, airborne = false } = {}) {
   if (!lodgedIn(collider, feet)) return false;
-  const fit = Math.min(height, CAPSULE_HEIGHT);   // the room's own body: a giant under a low ceiling is the motor's (SQUEEZE1)
+  const fit = Math.min(height, CAPSULE_HEIGHT);   // the room's own body: a giant under a low ceiling is the motor's
   const knee = [feet[0], feet[1] + LODGE_KNEE, feet[2]];
   for (const r of FREE_RINGS) {
     for (const [ux, uz] of FREE_BEARINGS) {
