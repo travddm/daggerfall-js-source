@@ -15,6 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { waterSurfaceFs } from '../../src/render/waterSurface.js';
 import { Renderer, groundSamplerFor, groundSharpnessTier } from '../../src/render/renderer.js';
+import { setValue } from '../../src/systems/settings/settings.js';
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
@@ -94,7 +95,15 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   const anisoOf = (l) => calls(l, 'texParameterf').filter((c) => c[2] === 'TEXTURE_MAX_ANISOTROPY_EXT').pop()?.[3];
   assert.equal(minOf(log), 'LINEAR_MIPMAP_LINEAR', 'the default tier: trilinear'); assert.equal(anisoOf(log), 8, "...at the Anisotropic Filtering row's 8x (under Sharp, the default filter)");
   assert.equal(calls(log, 'texParameteri').find((c) => c[2] === 'TEXTURE_MAG_FILTER')[3], 'NEAREST');
+  const wrapOf = (name) => calls(log, 'texParameteri').filter((c) => c[2] === name).pop()?.[3];
+  assert.deepEqual([wrapOf('TEXTURE_WRAP_S'), wrapOf('TEXTURE_WRAP_T')], ['REPEAT', 'REPEAT'], 'the tiles repeat under Sharp, so a linear filter draws no line between two copies of one tile');
   assert.equal(calls(log, 'getExtension').filter((c) => c[1] === 'EXT_texture_filter_anisotropic').length, 1, 'the extension asked once');
+  setValue('Video', 'MainFilterMode', '0');
+  log.length = 0;
+  r.applyGroundSharpness('default');
+  assert.deepEqual([wrapOf('TEXTURE_WRAP_S'), wrapOf('TEXTURE_WRAP_T')], ['CLAMP_TO_EDGE', 'CLAMP_TO_EDGE'], "Point keeps DFU's clamp: a tile's own edge texel at u = 1");
+  setValue('Video', 'MainFilterMode', '3');
+  r.applyGroundSharpness('default');
   log.length = 0;
   r.uploadTileArray(302, layers());
   assert.equal(log.length, 0, 'a cached archive costs NOTHING - no upload, no chain, no parameter (the cache is what makes this feature free per frame, and nothing had pinned it)');

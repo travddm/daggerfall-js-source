@@ -741,7 +741,7 @@ import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, filterWorldPicture, freshWorldPicture, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { bleedForFilter } from './alpha-bleed.ts';
-import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier } from './ground-sampler.ts';
+import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
@@ -7361,8 +7361,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
     // The mip chain cures minification shimmer: a distant pixel over a dozen texels would pick a different one as the
     // camera drifts. The terrain shaders pass textureGrad the unwrapped gradient (TERRAIN_FS), so the mip follows the
-    // real footprint and the tile wrap blurs no line round a tile. Magnification is the world filter's
-    // (_setGroundSampler), NEAREST under Point. A 2D array mipmaps each layer on its own, so no tile bleeds into another.
+    // real footprint and the tile wrap blurs no line round a tile. Magnification and the wrap are the world filter's
+    // (_setGroundSampler): NEAREST and a clamp under Point. A 2D array mipmaps each layer on its own, so no tile bleeds
+    // into another.
     gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
@@ -7384,10 +7385,6 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // are cached for the life of the page, so a tier read only at upload
     // landed on a page reload and on no other occasion.
     this._setGroundSampler(groundSharpnessTier());
-    // DFU's terrain texture array wraps Clamp (TextureReader) - keeps
-    // the far edge texel at transformed-uv 1.0 boundary ties.
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     if (!this._retroMips) gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
     this.tileArrays.set(archive, tex);
     this._tileDims.set(archive, [w, h, layers.length]);   // PRECIP4
@@ -7447,6 +7444,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const s = groundSamplerFor(tier, groundAnisotropy(this._anisoMax));
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl[s.minFilter]);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, groundMagFor(gl, worldFilterMode()));   // DFU's terrain array takes MainFilterMode
+    const wrap = groundWrapFor(gl, worldFilterMode());
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, wrap);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, wrap);
     if (ext) gl.texParameterf(gl.TEXTURE_2D_ARRAY, ext.TEXTURE_MAX_ANISOTROPY_EXT, s.aniso);
     this.groundTier = tier;
     return s;
