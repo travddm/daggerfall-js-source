@@ -1,10 +1,10 @@
 // @ts-check
-// MWNPC7: A
+// A
 // TOWNSPERSON, READ FOR THEIR BODY. The street's walkers (systems/town/townPopulation.js - characters/mobile/mobilePerson.js) carry
 // what Daggerfall rolled for them at each spawn: the climate's race, a gender, one of four outfit variants (the sprite
 // archive, PERSON_TEXTURES), a face record, a name - or the guard's arm (texture 399, a male in the watch's colours).
 // This reads that roll for a Morrowind body: the race and gender as rolled, a face off the face record, and a wardrobe
-// per outfit variant. MWNPC17 (section 25): the variant is the walker's ROLE and CUT - the commoner, the tradesman,
+// per outfit variant. The variant is the walker's ROLE and CUT - the commoner, the tradesman,
 // the traveller and the robed scholar, a woman's skirt or breeches or robe, as their sprite shows them - and the rest
 // is rolled off their own spawn by the wardrobe (characters/wardrobe.js dressPerson): the garments, the dyes, the cloak,
 // the rung of Morrowind's ladder, and through the look's `npc` hint the records, the head and the hair - so no two on a
@@ -14,11 +14,11 @@ import { GENDERS } from './nameHelper.js';
 import { PERSON_TEXTURES, GUARD_TEXTURE } from './mobile/mobilePerson.js';
 import { EQUIP_SLOTS } from '../systems/equip.js';
 import { ARMOR_ENUM } from '../combat/enemyEquipment.js';
-import { ARMOR_MATERIAL } from '../systems/armorMaterials.js';   // MWNPC12: steel is ARMOR_MATERIAL.Steel - a look's armour is resolved by it (mwItemMap.js mwArmorRecords)
-import { dressPerson, npcHint, WARDROBE_BEAST_RACES } from './wardrobe.js';   // MWNPC17
-import { townsfolkOutfitOf } from './ownModels/ownClothingModels.js';   // MW-FOLK1: the outfits the walkers' pictures wear, made for the body
+import { ARMOR_MATERIAL } from '../systems/armorMaterials.js';   // steel is ARMOR_MATERIAL.Steel - a look's armour is resolved by it (mwItemMap.js mwArmorRecords)
+import { dressPerson, npcHint, WARDROBE_BEAST_RACES } from './wardrobe.js';
+import { townsfolkOutfitOf } from './ownModels/ownClothingModels.js';   // the outfits the walkers' pictures wear, made for the body
 
-/** MWNPC17: what each outfit variant is, by gender, in PERSON_TEXTURES' variant order - the wardrobe's role and the cut
+/** What each outfit variant is, by gender, in PERSON_TEXTURES' variant order - the wardrobe's role and the cut
  *  their sprite shows (characters/wardrobe.js WARDROBE_ROLES, SILHOUETTES). */
 export const FOLK_DRESS = Object.freeze({
   male: Object.freeze([
@@ -77,27 +77,27 @@ export function folkLookOf(person, race, seed) {
     // the street's guard: the watch's iron and steel, his longsword drawn at need - and none of it rolled
     for (const [slot, piece] of [['ChestArmor', ARMOR_ENUM.Cuirass], ['LegsArmor', ARMOR_ENUM.Greaves], ['Head', ARMOR_ENUM.Helm], ['Feet', ARMOR_ENUM.Boots],
       ['LeftArm', ARMOR_ENUM.Left_Pauldron], ['RightArm', ARMOR_ENUM.Right_Pauldron], ['Gloves', ARMOR_ENUM.Gauntlets]]) {
-      items.push({ templateIndex: piece, group: 'Armor', equipSlot: EQUIP_SLOTS[slot], material: ARMOR_MATERIAL.Steel });   // steel - MWNPC12: 1 named no material, so none of it was ever worn
+      items.push({ templateIndex: piece, group: 'Armor', equipSlot: EQUIP_SLOTS[slot], material: ARMOR_MATERIAL.Steel });   // steel - 1 named no material, so none of it was ever worn
     }
     items.push({ templateIndex: 165, group: 'MensClothing', equipSlot: EQUIP_SLOTS.ChestClothes, dye: 1 });
     items.push({ templateIndex: 151, group: 'MensClothing', equipSlot: EQUIP_SLOTS.LegsClothes, dye: 1 });
-    // MWNPC17: the uniform is the watch's; the man in it his own - his head, his hair and the shirt under the plate
+    // The uniform is the watch's; the man in it his own - his head, his hair and the shirt under the plate
     return { race, gender: 'male', faceIndex: mix(seed ^ 0xfa) % 10, items, npc: npcHint(seed, 0) };
   }
   const faceIndex = ((person.personFaceRecordId ?? 0) + mix(seed ^ 0xfa)) % 10;
-  // MW-FOLK1: A PICTURE WITH ITS OWN OUTFIT WEARS IT - the clothes it draws, made for the body (ownClothingModels.js
+  // A PICTURE WITH ITS OWN OUTFIT WEARS IT - the clothes it draws, made for the body (ownClothingModels.js
   // TOWNSFOLK_OUTFITS), in its colours; the person in them their own (the hint's walk: their head, their hair, their
   // body's key). A picture of the other sex than the walker (never rolled - PERSON_TEXTURES keeps them apart) is not
   // theirs to wear, nor is one a beast race stands in (a resident's) - its boots on no Khajiit's or Argonian's feet,
-  // as Morrowind dresses none: the wardrobe dresses them, and the figure draws what a beast wears of it (BEAST-BOOTS).
+  // as Morrowind dresses none: the wardrobe dresses them, and the figure draws what a beast wears of it.
   const own = townsfolkOutfitOf(person.archive);
   if (own && spriteSex(person.archive) === gender && !WARDROBE_BEAST_RACES.includes(race)) return { race, gender, faceIndex, items: [], npc: npcHint(seed, 0), outfit: own.id };
   const { role, cut } = FOLK_DRESS[gender][folkVariant(person.archive, race)];
-  const d = dressPerson({ role, gender, seed, cut });   // MWNPC17: the role and cut their sprite shows, the rest their own
+  const d = dressPerson({ role, gender, seed, cut });   // the role and cut their sprite shows, the rest their own
   return { race, gender, faceIndex, items: d.items, npc: d.npc };
 }
 
-/** MW-FOLK1: the sex a walker's picture is (PERSON_TEXTURES' lists), or null for an archive no list holds. */
+/** The sex a walker's picture is (PERSON_TEXTURES' lists), or null for an archive no list holds. */
 export function spriteSex(archive) {
   for (const t of Object.values(PERSON_TEXTURES)) {
     if (t.male.includes(archive)) return 'male';

@@ -1,5 +1,4 @@
 // @ts-check
-// MWNPC17:
 // THE WARDROBE. Every person the lanes stand in a Morrowind body was dressed by a fixed outfit: a walker by one of four
 // per sprite (folkBodies.js FOLK_OUTFITS), a standing person by one per faction (peopleBodies.js PEOPLE_WARDROBE), the
 // faction's knights all in the same steel - and the item map resolved each garment by its TYPE and its dye alone
@@ -10,12 +9,12 @@
 //   - WHO WEARS WHAT. A role (the street's commoner, a tradesman, a traveller, a scholar, a merchant, a noble, a priest,
 //     a mage, the underworld, a fighter, a knight) holds weighted SILHOUETTES - a top and breeches, a top and a skirt, a
 //     robe, a dress or a gown - each with its own Daggerfall garments (itemTemplates.json, the men's and the women's),
-//     its own dyes, its odds of a cloak (the port's own, MW-CLOAK1), and the martial roles their ARMOUR: a knight's whole
+//     its own dyes, its odds of a cloak (the port's own), and the martial roles their ARMOUR: a knight's whole
 //     plate of one metal by rank, a fighter's mismatched pieces, a rogue's leathers. The garments are Daggerfall's, so
 //     the classic paperdoll and the item map read them as they read the player's.
 //   - HOW WELL. A wealth TIER per role - Morrowind's own clothing ladder (common, expensive, extravagant, exquisite: the
 //     records' ids say it) - so a noble is never in a peasant's shirt and a farmhand never in silk: a garment's rung
-//     strays one from the person's, but never past the role's own (the hint's `lo` and `hi`; AUDIT MWNPC16-18 C F1).
+//     strays one from the person's, but never past the role's own (the hint's `lo` and `hi`).
 //   - WHICH ONE. The look carries `npc` - its seed, its tier and its role's range - and the build (net/peer/peerBodies.js peerBuildOpts) reads
 //     it per garment: the tier's records of the garment's type, the few nearest the dye's colour, one picked off the
 //     seed (mwClothingRecord's `pick` and `tier`); and the head and the hair WALKED off the seed, each on its own (a
@@ -277,7 +276,7 @@ export function armorKit(kit, tier, seed) {
 
 const rung = (t) => Math.max(0, Math.min(3, t | 0));
 /** The `npc` hint a dressed look carries - its seed, its tier and the rungs its role dresses in (`lo`..`hi`, the
- *  role's tiers that are ever drawn - AUDIT MWNPC16-18 C F1), for the build (peerBuildOpts). */
+ *  role's tiers that are ever drawn), for the build (peerBuildOpts). */
 export const npcHint = (seed, tier, lo = 0, hi = 3) => {
   const t = rung(tier), l = Math.min(rung(lo), t), h = Math.max(rung(hi), t);
   return Object.freeze({ seed: seed >>> 0, tier: t, lo: l, hi: h });
@@ -298,7 +297,7 @@ export const npcKeyOf = (look) => { const n = npcHintOf(look); return n ? `|npc$
  * THE PICKS a hint asks of one worn garment (mwItemMap.js mwClothingRecord `pick` and `tier`): the person's tier, one
  * rung down for a garment in four and up for one in eight (a merchant's good coat over common breeches) - never past
  * the rungs the role dresses in (`lo`..`hi`: a noble's garment never on the common rung, a farmhand's never in silk -
- * AUDIT MWNPC16-18 C F1, a noble's top fell to common one time in eleven) - and the record among its candidates, each
+ * else a noble's top falls to common one time in eleven) - and the record among its candidates, each
  * off the seed and the garment. @param {any} n @param {any} piece
  */
 export function npcGarmentPick(n, piece) {
@@ -309,7 +308,7 @@ export function npcGarmentPick(n, piece) {
 }
 /** The races Morrowind builds on the beast skeleton (fpArm.js tpSkeletonPath `beast`). What a beast of them wears of
  *  its worn list is the item map's call for every look, an NPC's and a player's alike, by the viewer's Beast Footwear
- *  and Beast Helmets switches (mwItemMap.js beastCut, BEAST-BOOTS). */
+ *  and Beast Helmets switches (mwItemMap.js beastCut). */
 export const WARDROBE_BEAST_RACES = Object.freeze(['Khajiit', 'Argonian']);
 /** The worn list (mwItemMap.js dfWornEquipment's) with each garment's picks - the armour as it was. @param {any[]} worn @param {any} n */
 export function withNpcPicks(worn, n) {

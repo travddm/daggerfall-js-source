@@ -27,13 +27,12 @@ export function resolvePaperdollRecord(template, variant = 0) {
 }
 
 // --- Armor material addressing (ItemBuilder verbatim) ----------------
-// AUDIT 17f / ONE DFU MEMBER, ONE EXPORT: the constants, the
-// GetBodyMorphology table and the SetVariant clamps below were a
-// THIRD copy of what systems/armorMaterials.js already owns (17e F32
-// collapsed equip.js and paperDoll.js and stopped one file short).
-// They are re-exported from the single home so the C6a callers that
+// The constants, the
+// GetBodyMorphology table and the SetVariant clamps live in
+// systems/armorMaterials.js, the single home.
+// They are re-exported so the callers that
 // speak MATERIAL FAMILIES keep working, and `armorArchive` keeps its
-// C6a signature - (gender, RACE) - as a thin wrapper over the
+// signature - (gender, RACE) - as a thin wrapper over the
 // morphology-keyed law rather than a rival definition of the name.
 export { MATERIAL_FAMILY, armorVariant } from '../../systems/armorMaterials.js';
 
@@ -90,7 +89,7 @@ export function playerArchiveFor(item, template, { gender = 'male', race = 'Bret
     // characters use archive - 1 (i.e. 233 rather than 234) for
     // weapons". CreateWeapon/CreateRandomWeapon route every NON-arrow
     // weapon through it; the arrow branch sets stackCount/condition/
-    // material and never calls it. AUDIT 18: the rule was ported into
+    // material and never calls it. The rule was ported into
     // a private copy in characters/weapons.js that nothing minting a
     // real weapon ever called, so every female character drew the
     // male weapon art.

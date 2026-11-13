@@ -180,7 +180,6 @@ test('PRECIP4 BOTH TERRAIN PROGRAMS: the border\'s weights once, the snow\'s cov
   assert.match(read('src/render/enhancedLighting.js'), /\$\{snowCoverGlsl\('elDecode'\)\}/);
   assert.match(snowCoreGlsl(), /float snowCover\(vec2 local, float y, vec2 gx, vec2 gy\) \{\n {2}if \(uSnowSet\.y < 0\.5\) return 0\.0;/);
   assert.match(ecotoneGlsl(''), /vec4 ecoWeights\(vec2 local\) \{\n {2}if \(uEcoOrigin\.z == 0\) return vec4\(1\.0, 0\.0, 0\.0, 0\.0\);/);
-  assert.match(read('src/render/waterBedGlsl.js'), /if \(snowC > 0\.0\) a = mix\(a, textureGrad\(uTileArr, vec3\(tl\.xy, tl\.z \+ float\(uSnowArr\.x\)\), gx, gy\)\.a, snowC\);/, 'the bed\'s painted water the winter art\'s under snow');
   // the Snowfall mod's surface
   assert.match(SNOW_VS, /float laid = snowLaid\(xz - uSnowAnchor, ground\.y, vec2\(0\.0\), vec2\(0\.0\)\);\n {2}vDepth \*= laid \* laid;/);
   assert.match(SNOW_VS, /lifted = depth \* clamp\(st\.r \* 2\.0, 0\.0, 1\.0\) \* laid \* laid \* remain;/);

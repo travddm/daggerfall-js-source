@@ -1,4 +1,4 @@
-// Enemy attacks (C8 E2b). Verbatim port of DFU EnemyAttack.cs
+// Enemy attacks. Verbatim port of DFU EnemyAttack.cs
 // FixedUpdate/MeleeAnimation/ResetMeleeTimer (MIT, Daggerfall
 // Workshop), driving the SHARED weaponStates machine - one timing
 // implementation for player and enemies.
@@ -14,7 +14,7 @@
 //     targetRateOfApproach is assigned a non-zero value ONLY inside
 //     `if (DaggerfallUnity.Settings.EnhancedCombatAI)`
 //     (EnemySenses.cs:354-363), so on the classic path the term is
-//     identically 0 and the reach is a flat 2.25 (AUDIT 18); with the
+//     identically 0 and the reach is a flat 2.25; with the
 //     setting on, enhanced-combat-ai.ts keeps the rate
 //   - ResetMeleeTimer: Random.Range(1500, 3001) - an INT roll, one of
 //     1501 discrete values - then - 50*(playerLevel-10)
@@ -25,12 +25,12 @@
 // play the authored 1H strike clips, so the strike is a uniform roll
 // over STRIKES (the WeaponManager click-attack precedent), sampled
 // through the shared machine's frame clock.
-// E3 SHIPPED: callers wire the real playerLevel/reflexes/LiveSpeed
+// Callers wire the real playerLevel/reflexes/LiveSpeed
 // (dungeonContext builds each EnemyAttack from the live entities);
 // the constructor defaults (10 / 2 / 50) are neutral fallbacks only.
 
 import { rand } from '../../formats/dfRandom.js';
-import { tacticsNow } from '../../ai/tacticsClock.js';   // AUDIT TACT: a landing's swing is on the foes' own time
+import { tacticsNow } from '../../ai/tacticsClock.js';   // a landing's swing is on the foes' own time
 import { TELL } from '../../ai/tells.js';   // TELL6d: one shot in three aimed
 import {
   createWeaponMachine, machineAttack, machineStep,
@@ -38,7 +38,7 @@ import {
 } from '../weaponStates.js';
 import { STRIKES, ATTACKS_1H, sampleClip } from '../anims.js';
 import { MELEE_DISTANCE, CLASSIC_MELEE_DISTANCE_VS_AI, withinYaw, MIN_RANGED_DISTANCE, MAX_RANGED_DISTANCE } from './enemyMotor.js';
-/** AUDIT TACT A4: a telegraphed blow's swing not taken this long after its landing is spent (s). */
+/** A telegraphed blow's swing not taken this long after its landing is spent (s). */
 export const BLOW_SWING_LATE = 0.25;
 
 export const ATTACK_SPEED_FLOOR = 8;               // EnemyAttack.cs speedFloor
@@ -90,27 +90,27 @@ export class EnemyAttack {
    *  (hasBowAttack - mobile flags, not the equipped weapon). */
   constructor({ liveSpeed = 50, playerLevel = 10, reflexes = 2, rolls = Math.random } = {}) {
     this.machine = createWeaponMachine(false);
-    // AUDIT 39: FixedUpdate reads `entity.Stats.LiveSpeed` on every
+    // FixedUpdate reads `entity.Stats.LiveSpeed` on every
     // pass (:69-72), under the source's own note that the floor exists
     // "so Drain Speed does not prevent attack ever firing" - so DFU
     // expects a live drain on a foe to bite. A number captured at
     // spawn cannot drain; callers that own the entity pass a THUNK.
     this._liveSpeed = typeof liveSpeed === 'function' ? liveSpeed : () => liveSpeed;
-    // AUDIT 68 S04-melee-timer-stale-level: ResetMeleeTimer reads
+    // ResetMeleeTimer reads
     // PlayerEntity.Level live (EnemyAttack.cs:117) - the same class of
-    // capture AUDIT 39 fixed for LiveSpeed. Reflexes is set at chargen
+    // capture LiveSpeed avoids. Reflexes is set at chargen
     // only, so it stays a plain field.
     this._playerLevel = typeof playerLevel === 'function' ? playerLevel : () => playerLevel;
     this.reflexes = reflexes;
-    this.rolls = rolls;   // ENGINE-PRNG: DoRangedAttack's Random.value + the strike/timer picks
+    this.rolls = rolls;   // DoRangedAttack's Random.value + the strike/timer picks
     this.meleeTimer = 0;
     this._classicTimer = 0;
     this.firedRanged = false;   // C-slice: WHICH decision started the running swing
-    // AUDIT 68 S04-strike-edge-cut: one per started swing - the hosts'
+    // One per started swing - the hosts'
     // strike edge. A cut that restarts the machine inside one update()
     // never shows the hosts an Idle frame, so a state edge missed it.
     this.swingSeq = 0;
-    this._held = false;   // TELL2: the running swing began at a telegraphed wind-up and waits on its landing
+    this._held = false;   // the running swing began at a telegraphed wind-up and waits on its landing
     this._heldStrike = 'Idle';   // ...and the strike it rolled then
   }
 
@@ -126,7 +126,7 @@ export class EnemyAttack {
    * @returns events from the shared machine ('hit', 'done')
    */
   update(dt, ai, playerFeet, paused = false) {
-    // ROAD-U: "Unable to attack when playing certain oneshot anims" -
+    // "Unable to attack when playing certain oneshot anims" -
     // FixedUpdate returns at :59-61 (`mobile.IsPlayingOneShot() &&
     // mobile.OneShotPauseActionsWhilePlaying()`), ABOVE the melee
     // countdown on the next line, above the `DFRandom.rand() % speed`
@@ -134,36 +134,35 @@ export class EnemyAttack {
     // the predicate but never reached it from here, so a transforming
     // Seducer ran its timer down and burned ~32 bytes of the ONE
     // shared DFRandom stream over the transformation - the desync
-    // class this file already carries as AUDIT 24 characters-2 below.
+    // class this file already guards against below.
     // EnemyAttack.Update (:88-94) is NOT gated on the pause - only on
     // paralysis - so the machine step below still runs: a swing
     // already in flight keeps being stepped, and only the DECISION
     // half stops.
-    if (paused || ai?._pilot?.swing) return machineStep(this.machine, dt, this.liveSpeed);   // STAFF-PILOT (systems/staffBossPilot.js): a boss a staff member steers decides no swing of its own - a swing in flight still steps
+    if (paused || ai?._pilot?.swing) return machineStep(this.machine, dt, this.liveSpeed);   // a boss a staff member steers decides no swing of its own - a swing in flight still steps
     this.meleeTimer = Math.max(0, this.meleeTimer - dt);   // counts down, floored at 0
     markAttackOneShot(ai, this.machine);
     const dist = ai._dist;
     this._classicTimer += dt;
     while (this._classicTimer >= CLASSIC_UPDATE_INTERVAL) {
       this._classicTimer -= CLASSIC_UPDATE_INTERVAL;
-      // C2-slice (AUDIT 23 combat-12): the DFRandom byte DRAWS on
+      // The DFRandom byte DRAWS on
       // every classic tick - it is the LEFT operand of the source's
       // `rand-pass && MeleeTimer == 0` (FixedUpdate :81), and the
       // attack component draws even for a bow foe the band owns (the
       // band is the MOTOR's; the components both tick).
-      // AUDIT 24 characters-2: and it draws MID-SWING too. The only
+      // And it draws MID-SWING too. The only
       // early return above the draw is the SeducerTransform one-shot
       // (:59-60 -> MobileUnit.OneShotPauseActionsWhilePlaying
       // :174-183), which is NOT the attack anims - so an enemy with a
-      // strike in flight still burns one rand() per tick. The old
-      // `machine.state !== 'Idle'` gate above this line held the draw
-      // for the whole ~1s swing, and DFRandom is one shared global
-      // stream: every later consumer read a different value.
+      // strike in flight still burns one rand() per tick.
+      // Skipping the draw would shift every later consumer of DFRandom,
+      // one shared global stream.
       const meleePass = attackRollPasses(this.liveSpeed) && this.meleeTimer === 0;
       // mobile.IsPlayingOneShot() - true for any attack anim in flight.
       const oneShot = this.machine.state !== 'Idle';
       const dx = playerFeet[0] - ai.feet[0], dz = playerFeet[2] - ai.feet[2];
-      // C-slice (AUDIT 23 combat-3): EnemyMotor.DoRangedAttack
+      // EnemyMotor.DoRangedAttack
       // (:570-614) OWNS a bow foe inside the 6..51.2 band (strict) -
       // its whole cadence is the 1/32 classic-update roll within the
       // 22.5deg yaw; no melee timer, no speed roll, and the melee
@@ -171,27 +170,27 @@ export class EnemyAttack {
       // returns true even while only turning). Outside the band the
       // bow foe is a MELEE fighter - the fallback - so the reach
       // gate below applies to everyone.
-      // AUDIT 24 characters-3: the band arm carries DoRangedAttack's
+      // The band arm carries DoRangedAttack's
       // FULL gate - `inRange && TargetInSight && DetectedTarget`
       // (:573) - plus the CanAct chain that owns the call at all
       // (FixedUpdate :171 `if (CanAct) TakeAction()` -> HandleNoAction
       // :357-364 drops CanAct the moment GiveUpTimer hits 0). Sight
       // alone let a Chameleoned player be shot at, and let a foe that
       // had given up keep firing.
-      // AUDIT 26 F010: the bow band rides `if (CanAct) TakeAction`
+      // the bow band rides `if (CanAct) TakeAction`
       // (:171-172), so a knocked-back or paralyzed foe holds its
       // fire - the roll is UnityEngine.Random (:592), not the shared
       // DFRandom stream, so gating it slides nothing. `!== false`
       // keeps the old callers (and the headless tests' bare-object
       // ai stubs) on the permissive default.
-      // TACT4 (ai/foeBlows.js): a telegraphed blow's landing - the swing comes NOW, whatever the clock, the reach or the
-      // bow band (AUDIT TACT A4/D5: above the band's arm, so an archer's landing is never parked for later); a landing
+      // a telegraphed blow's landing - the swing comes NOW, whatever the clock, the reach or the
+      // bow band (above the band's arm, so an archer's landing is never parked for later); a landing
       // the swing could not take at once is spent, never fired seconds later off a stale verdict. Never set with the
       // switch off.
-      // TELL2: THE WIND-UP IS THE SWING, HELD. It begins with the wind-up
+      // THE WIND-UP IS THE SWING, HELD. It begins with the wind-up
       // (the sprite holds before its strike - characters/mobile/mobileUnit.js `hold`); a broken wind-up drops it; the landing
       // below releases it and the brain sees its blow then. Never set with the switch off.
-      // TELL6d: an aimed shot's landing - the bow drawn now, its arrow loosed by the sprite along the locked line
+      // An aimed shot's landing - the bow drawn now, its arrow loosed by the sprite along the locked line
       if (ai._blowShot && !ai._blowShot.fired) {
         ai._blowShot.fired = true;
         if (oneShot) { this.machine.state = 'Idle'; this.machine.acc = 0; }
@@ -212,7 +211,7 @@ export class EnemyAttack {
         ai._blowSwing = false;
         if (ai._blowAt != null && tacticsNow() - ai._blowAt > BLOW_SWING_LATE) { ai._blowVerdict = null; this._held = false; }
         else if (this._held) {
-          // TELL2: the held swing strikes now - no second swing; the brain sees its blow. The machine times its strike and
+          // The held swing strikes now - no second swing; the brain sees its blow. The machine times its strike and
           // follow-through from here, as the forced swing did (a swing in flight holds the bow roll, DFU's IsPlayingOneShot):
           // its own swing ran out under the hold. The strike it rolled at the start - no new draw.
           this._held = false;
@@ -233,24 +232,23 @@ export class EnemyAttack {
           && dist > MIN_RANGED_DISTANCE && dist < MAX_RANGED_DISTANCE) {
         // ...and the 1/32 roll itself sits behind `if (!isPlayingOneShot)`
         // (:587), so a swing in flight DOES hold the bow roll.
-        if (!oneShot && withinYaw(ai.yaw, dx, dz, ATTACK_YAW_DEG) && ai._tacShoot !== false && this.rolls() < BOW_SHOT_CHANCE) {   // TACT2: no ranged token, no shot (unset with the switch off)
+        if (!oneShot && withinYaw(ai.yaw, dx, dz, ATTACK_YAW_DEG) && ai._tacShoot !== false && this.rolls() < BOW_SHOT_CHANCE) {   // no ranged token, no shot (unset with the switch off)
           if (ai._aimReady === true && this.rolls() < TELL.AIMED_SHARE) { ai._wantAimed = true; continue; }   // TELL6d: this shot aimed - the brain winds it up (never set with the switch off)
           const strike = STRIKES[Math.floor(this.rolls() * STRIKES.length)];
-          if (machineAttack(this.machine, strike)) { this.firedRanged = true; this.swingSeq++; this._held = false; ai._tacShot = (ai._tacShot ?? 0) + 1; ai._blowShot = null; }   // AUDIT TACT A2: a shot spends the ranged token; AUDIT TELL B11: a plain shot is never an aimed one a Hurt cut short (its bearing and its weight)
+          if (machineAttack(this.machine, strike)) { this.firedRanged = true; this.swingSeq++; this._held = false; ai._tacShot = (ai._tacShot ?? 0) + 1; ai._blowShot = null; }   // a shot spends the ranged token; a plain shot is never an aimed one a Hurt cut short (its bearing and its weight)
         }
         continue;
       }
       if (!meleePass) continue;
-      // INVIS-SWING (FIELD BUGS 2026-10-15f, "inside dungeons, monsters still spot and attack me immediately while the
-      // spell is active"): MeleeAnimation faces senses.LastKnownTargetPos (EnemyAttack.cs:155), not the target's live
+      // MeleeAnimation faces senses.LastKnownTargetPos (EnemyAttack.cs:155), not the target's live
       // feet. The position is written only when the foe DETECTS its target (EnemySenses.cs:451-470) and holds
       // ResetPlayerPos until then (:28 - float.MaxValue, which no yaw test passes), so a foe its target's Invisibility
-      // blinds (BlockedByIllusionEffect) never starts a swing at it - it read the live feet, and every foe a corridor put
-      // in front of an invisible player struck. The blow's own test (MeleeDamage, meleeHitConnects) is the live one.
+      // blinds (BlockedByIllusionEffect) never starts a swing at it.
+      // The blow's own test (MeleeDamage, meleeHitConnects) is the live one.
       const known = ai.lastKnownTargetPos;
       if (!ai.inSight || !known || !withinYaw(ai.yaw, known[0] - ai.feet[0], known[2] - ai.feet[2], ATTACK_YAW_DEG)) continue;
-      // MT-ii: MeleeAnimation's OWN reach (:157-160), which the port
-      // exported as CLASSIC_MELEE_DISTANCE_VS_AI at C8 and never
+      // MeleeAnimation's OWN reach (:157-160), which the port
+      // exported as CLASSIC_MELEE_DISTANCE_VS_AI and never
       // consumed, because nothing but the player could be a target:
       //   float distance = MeleeDistance;
       //   if (!EnhancedCombatAI && Target != PlayerEntityBehaviour)
@@ -259,7 +257,7 @@ export class EnemyAttack {
       // and for targeting other AI" - 1.5 rather than 2.25. Unarmed
       // (and against the player) the reach is unchanged.
       if (dist > meleeReach(ai)) continue;
-      if (ai._tacStrike === false) continue;   // TACT2: no melee token - it holds the ring and waits its turn (unset with the switch off)
+      if (ai._tacStrike === false) continue;   // no melee token - it holds the ring and waits its turn (unset with the switch off)
       // MeleeAnimation (:151-176) has now returned TRUE, so FixedUpdate
       // :85 calls ResetMeleeTimer UNCONDITIONALLY - even when the state
       // change it just asked for did nothing. Classic mobiles have ONE
@@ -272,7 +270,7 @@ export class EnemyAttack {
       if (!oneShot || this.firedRanged) {
         if (oneShot) { this.machine.state = 'Idle'; this.machine.acc = 0; }
         const strike = STRIKES[Math.floor(this.rolls() * STRIKES.length)];
-        if (machineAttack(this.machine, strike)) { this.firedRanged = false; this.swingSeq++; this._held = false; ai._tacSwung = (ai._tacSwung ?? 0) + 1; }   // TACT2: the brain sees its blow
+        if (machineAttack(this.machine, strike)) { this.firedRanged = false; this.swingSeq++; this._held = false; ai._tacSwung = (ai._tacSwung ?? 0) + 1; }   // the brain sees its blow
       }
       this.meleeTimer = resetMeleeTimer(this.playerLevel, this.reflexes, this.rolls());
     }

@@ -31,6 +31,16 @@ uniform uvec4 uBedMask[8];     // the draw's water corners, packed as the water'
 // AUDIT PRECIP GROUND-5: under the snow (\`snowC\`, the ground's cover - render/snowCoverGlsl.js) the art's water is the
 // texel's it wears there: the summer record's mask walked to its winter record's (uSnowArr.x layers on) by the cover
 // COAST-LOOK: \`blended\` a tile the ground drew as its two kinds - its line wanders at \`p\` as the sheet's, its art no fringe
+uniform float uGroundClamped;   // 1 when the ground's sampler clamps at the tile's edge (Point)
+// The art's water mask is data, so its sample keeps every tap inside its tile: under a repeat wrap a shore tile's wet
+// edge would blend into its dry one. The margin is half a texel up close; at a distance it is the footprint, which
+// covers the coarser mip level and the anisotropic taps.
+vec3 bedMaskAt(vec3 tl, vec2 gx, vec2 gy) {
+  if (uGroundClamped > 0.5) return tl;
+  vec2 texel = 1.0 / vec2(textureSize(uTileArr, 0).xy);
+  vec2 margin = min(max(0.5 * texel, max(abs(gx), abs(gy))), vec2(0.5));
+  return vec3(clamp(tl.xy, margin, 1.0 - margin), tl.z);
+}
 vec2 bedCover(uint data, vec2 f, vec2 p, vec3 tl, vec2 gx, vec2 gy, float snowC, bool blended) {
   if (uWaterBed < 0.5) return vec2(0.0);
   uint rec = data >> 2u;
@@ -44,8 +54,9 @@ vec2 bedCover(uint data, vec2 f, vec2 p, vec3 tl, vec2 gx, vec2 gy, float snowC,
   float k = smoothstep(0.3, 0.7, c - (blended ? geWander(p) : 0.0));
   float art = 0.0;
   if (m != 15u && k < 1.0 && !blended) {
-    float a = textureGrad(uTileArr, tl, gx, gy).a;
-    if (snowC > 0.0) a = mix(a, textureGrad(uTileArr, vec3(tl.xy, tl.z + float(uSnowArr.x)), gx, gy).a, snowC);
+    vec3 maskAt = bedMaskAt(tl, gx, gy);
+    float a = textureGrad(uTileArr, maskAt, gx, gy).a;
+    if (snowC > 0.0) a = mix(a, textureGrad(uTileArr, vec3(maskAt.xy, maskAt.z + float(uSnowArr.x)), gx, gy).a, snowC);
     art = smoothstep(0.3, 0.7, a);
   }
   return vec2(max(k, art), max(art - k, 0.0));

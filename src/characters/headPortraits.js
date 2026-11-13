@@ -1,9 +1,9 @@
 // @ts-check
-// PORTRAIT3D: WHO WEARS A MORROWIND HEAD AS THEIR FACE, AND THE PICTURE OF IT.
+// WHO WEARS A MORROWIND HEAD AS THEIR FACE, AND THE PICTURE OF IT.
 //
 // combat/fpArm.js headPortrait takes the picture; this is the doors' side of it - who is asked, by which gate:
 //   THE PLAYER (and anyone shaped like one: a save's identity, the chargen grid's ten portraits) - whenever Morrowind's
-//     data is attached, the same switch the player's own body stands on (MWA4: the data, in either skin).
+//     data is attached, the same switch the player's own body stands on (the data, in either skin).
 //   AN NPC - by its look (characters/peopleBodies.js personLook, folkBodies.js folkLook, rosterBodies.js
 //     residentLook): wherever the people around you stand in Morrowind bodies (npcBodies.js npcBodiesOn - the
 //     enhanced skin, the data, Morrowind People not Off), so the face in the talk window is the head on the body that
@@ -38,7 +38,7 @@ export function headDataStamp() {
   return _data.morrowindDataCount() > 0 ? _data.morrowindDataGeneration() : 0;
 }
 /** A live character's Morrowind head, as a key: the data and the helm worn (its item, the steel helm's style,
- *  MW-STEEL1, and the Beast Helmets switch, BEAST-BOOTS) - '0' with no data. The curse's state is the caller's (its
+ *  and the Beast Helmets switch) - '0' with no data. The curse's state is the caller's (its
  *  override art, which changes with it).
  *  @param {any} entity */
 export function playerHeadKey(entity) {
@@ -59,7 +59,7 @@ async function dataAttached() {
  *  armBuildOptsOf, the build's own door): its helm and hood, the vampire's head, the transformed werewolf's;
  *  the transformed wereboar keeps Daggerfall's picture, as its body does (Morrowind has no wereboar). An identity alone (a
  *  save's envelope, a chargen portrait) is its bare face. A player's face wears the port's own heads where the race has
- *  them, as the player's body does (MW-HEADS2); `npc` - a portrait's face that is an NPC's (an escort) - the data's.
+ *  them, as the player's body does; `npc` - a portrait's face that is an NPC's (an escort) - the data's.
  *  @param {{ race?: string, gender?: string, faceIndex?: number, equip?: any, npc?: boolean }} who  Daggerfall's race key ('DarkElf'), 'female'/'male'
  *  @param {{ px?: number, ph?: number, renderer?: any }} [opts] */
 export async function playerHeadImage(who, { px = 128, ph = px, renderer = portraitRenderer() } = {}) {
@@ -92,7 +92,7 @@ export async function npcHeadImage(look, { px = 128, ph = px, renderer = portrai
 
 /** A face of the record (systems/legacy/facePose.js facePose - a member, a player's character; ui/partyPanel.js a
  *  seat's pose) as a Morrowind head: the race's head at the face, as the player's (a member of the line not played -
- *  `kin` - as one of the people: the data's heads, MW-HEADS2); a townsperson wed in (`common`, their
+ *  `kin` - as one of the people: the data's heads); a townsperson wed in (`common`, their
  *  census face) the head their body walks the street with - walked off their census id (`resident`) as their body's is
  *  (rosterBodies.js residentLook: the id's seed), behind the people's gate. `{ width, height, data }` or null.
  *  @param {{ race?: string, gender?: string, face?: number, common?: number, resident?: string, kin?: boolean }} pose

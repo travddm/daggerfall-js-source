@@ -1,6 +1,6 @@
 // THE CLOTHING MORROWIND DOES NOT HAVE.
 //
-// MW-CLOAK1. The clothing counterpart of ownArmorModels.js, and a leaf for the same reason: mwItemMap.js asks it, and nothing
+// The clothing counterpart of ownArmorModels.js, and a leaf for the same reason: mwItemMap.js asks it, and nothing
 // it imports may reach back.
 //
 // Daggerfall's Casual Cloak and Formal Cloak - a man's and a woman's of each - wore a whole Morrowind ROBE on the
@@ -39,20 +39,20 @@ export const ownCloakModelPaths = () => CLOAK_PAINTINGS.map((p) => `meshes/${clo
  *  `<part> (<record id>)`, and no part of ARMO_PART is named "cloak". */
 export const isCloakSlot = (slot) => String(slot ?? '').startsWith('cloak (');
 
-// ═══ MW-FOLK1: THE TOWNSFOLK'S OUTFITS ═══════════════════════════════════════════════════════════════════════════
+// ═══ THE TOWNSFOLK'S OUTFITS ═══════════════════════════════════════════════════════════════════════════
 //
 // Daggerfall's townspeople
 // are pictures, four outfits a race and a sex (mobilePerson.js PERSON_TEXTURES); these are those outfits made for the
 // Morrowind body - all four Redguard men's, all four Nord men's, the Bretons' 385 and 386 and the hooded Redguard
 // woman's 398 - so a body standing in for a picture wears what the picture wears (characters/folkBodies.js folkLookOf).
 // Each is ONE skinned part (tools/bakeTownsfolk.mjs, one shape a painting) claiming no slot of its own, as the cloak
-// claims none: the skin it covers all round - every ray out of the part's bone line meets the outfit, MW-FIT1's measure
+// claims none: the skin it covers all round - every ray out of the part's bone line meets the outfit, the same measure as the plate's
 // - is HIDDEN (`hides`, an occupation with no mesh at clothing's priority), and the skin a neckline, a short sleeve, a
 // sandal or a bare midriff leaves showing is the body's. So is a leg part inside cloth hanging round BOTH legs all
-// along its span: every ray out of the line between the two legs meets it (AUDIT MW-FOLK1 L2-F1 - one leg's rays cross
+// along its span: every ray out of the line between the two legs meets it: one leg's rays cross
 // to the other inside a skirt and never met it, so 398's dress hid nothing of the thighs it closes round, and they
 // stood out through it every stride; Morrowind's skirt and robe reserve the upper legs they reach past, mwItemMap.js
-// RESERVES). A hem short of a part's span hides none of it - the leg below a tunic is the body's, the cloth following
+// RESERVES. A hem short of a part's span hides none of it - the leg below a tunic is the body's, the cloth following
 // the thighs (tools/bakeTownsfolk.mjs hangOf) - and 398's knees are hers: her hem rises to 29.4 at her sides, and
 // hiding them would open the shin's top under it. A hood hides the hair, as a helmet does. `covers` names
 // the skin it dresses without hiding (398's open bodice over the chest - the modesty shirt a bare chest wears is not

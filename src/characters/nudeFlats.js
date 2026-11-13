@@ -20,7 +20,7 @@
 // THE STAND-IN is a dressed adult of the same sex, from the same archive
 // where one fits the role, so a room keeps its look. Only the PICTURE
 // changes: the person keeps the flat they were born as - faction, name
-// seed, FLATS.CFG face and caption - the way RR2's variants already do
+// seed, FLATS.CFG face and caption - the way the variants already do
 // (interiorContext.js `drawArchive`). Nothing is hidden, because these
 // are people a player clicks: the Kynareth pair are the temple's own
 // (faction 36) and talk, a coven's witches are who summons a Daedra
@@ -29,9 +29,9 @@
 // Read when a scene is built, like every other flat decision: flipping
 // the setting redraws the next scene, not the one standing.
 //
-// NUDE-HOSTS. The table was asked
+// The table was asked
 // by the five hosts that stood people on the day it shipped, and by no
-// host made after: the decorator's Vendors (HOME-VENDOR - every person
+// host made after: the decorator's Vendors (every person
 // Daggerfall stands in a room, the nude ones among them, offered, placed
 // and drawn as themselves) and the Arena's tiers (182.48 and 184.6 among
 // its seated crowd) drew the figures whatever the setting said. A rule
@@ -67,7 +67,7 @@ export const NUDE_FLAT_STAND_INS = Object.freeze({
  *  read (ui/paperDoll.js). Ships False. */
 export const showNudity = () => getBool('ChildGuard', 'PlayerNudity');
 
-/** NUDE-DECOR: whether a flat is one of the table's figures - what a
+/** Whether a flat is one of the table's figures - what a
  *  catalogue must not OFFER while Show Nudity is off (the decorator's
  *  people, systems/decor/decorCatalogue.js decorRoomEntries): a figure placed
  *  is drawn as its stand-in, but one chosen would be the nude figure to

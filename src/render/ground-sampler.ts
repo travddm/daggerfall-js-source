@@ -45,6 +45,12 @@ export function groundWrapFor(gl: FilterGl & { REPEAT: number; CLAMP_TO_EDGE: nu
   return mode === POINT ? gl.CLAMP_TO_EDGE : gl.REPEAT;
 }
 
+/** The terrain programs' `uGroundClamped`: 1 where the ground's wrap clamps, so neither the bed's mask sample
+ *  (render/waterBedGlsl.js bedMaskAt) nor a two-ground tile's edge (render/tile-edge-glsl.ts) needs a margin of its own. */
+export function groundClampedFlag(gl: FilterGl & { REPEAT: number; CLAMP_TO_EDGE: number }): number {
+  return groundWrapFor(gl, worldFilterMode()) === gl.CLAMP_TO_EDGE ? 1 : 0;
+}
+
 /** A ground picture outside the tile arrays, on the bound TEXTURE_2D: the snow ground's albedo. It takes the arrays'
  *  sampling: the world filter's magnification, Ground sharpness's minification, the Anisotropic Filtering row's
  *  anisotropy. The snow mod sets its albedo to Point (DynamicSnowController: `snowAlbedo.filterMode` 0); following

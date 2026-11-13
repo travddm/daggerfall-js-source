@@ -1,4 +1,4 @@
-// Interior people flats (Characters C1).
+// Interior people flats.
 // 1:1 translation of DaggerfallInterior.AddPeople's DATA layer (MIT,
 // Daggerfall Workshop). Verbatim:
 //   - Position: (XPos, -YPos, ZPos) * GlobalScale. DFU spawns the
@@ -10,10 +10,10 @@
 //     position triple (DFU's position hash feeds from these).
 //   - Visibility gates from AddPeople's tail (house ownership, shop
 //     open hours, building-type open rules, GuildHall anytime-access,
-//     the TG/DB House2 member rule) were ROUTED at C1 because they
+//     the TG/DB House2 member rule) were ROUTED because they
 //     depend on Systems the port did not have - banking above all.
-//     H1 shipped house ownership, which was the last of them, and P1
-//     takes the gate: `peopleAreVisible` below.
+//     House ownership was the last of them, and
+//     `peopleAreVisible` below takes the gate.
 
 import { GLOBAL_SCALE } from '../world/meshReader.js';
 import { BUILDING_TYPES } from '../world/buildingNames.js';
@@ -38,7 +38,7 @@ export function collectInteriorPeople(recordData) {
       textureRecord: obj.textureRecord,
       factionID: obj.factionID,
       flags: obj.flags,
-      // IC-INTERIORS: a person a made interior stands again keeps the position its own record gave it (`castPos` - its
+      // A person a made interior stands again keeps the position its own record gave it (`castPos` - its
       // name's and its identity's, world/interior/interiorLayout.js interiorCast), wherever the room stands it
       rawX: obj.castPos?.[0] ?? obj.xPos, rawY: obj.castPos?.[1] ?? obj.yPos, rawZ: obj.castPos?.[2] ?? obj.zPos,
       // Q4-v: the record's stream position - DFU's obj.Position, the
@@ -70,7 +70,7 @@ export function collectInteriorPeople(recordData) {
  * are all under it, so a Palace's people keep its 10:00-16:00 hours
  * while a House5 (21) or a Ship (24) is never gated at all. The hours
  * are isBuildingOpen's EFFECTIVE ones: online the relief shift
- * (buildingLocks.js onlineReliefBuilding - OL5's guild hall, OL6's
+ * (buildingLocks.js onlineReliefBuilding - the guild hall,
  * bank, library and palace) keeps their people standing at night, as
  * its door stays open.
  *
@@ -78,7 +78,7 @@ export function collectInteriorPeople(recordData) {
  * @param ctx.hour              - the classic hour (0-23)
  * @param ctx.insideOpenShop    - PlayerEnterExit.IsPlayerInsideOpenShop,
  *                                the entry-time latch above
- * @param ctx.isHouseOwned(key) - DaggerfallBankManager.IsHouseOwned (H1)
+ * @param ctx.isHouseOwned(key) - DaggerfallBankManager.IsHouseOwned
  * @param ctx.guildForBuilding(factionId) -> { hallAccessAnytime, isMember }
  * @returns true if the person stands and is wired to the quest machine
  */
@@ -111,7 +111,7 @@ export function peopleAreVisible(building, {
 }
 
 /**
- * ROAD-B B5 - DaggerfallInterior.UpdateNpcPresence (:341-361), whose
+ * DaggerfallInterior.UpdateNpcPresence (:341-361), whose
  * ONE caller in DFU's whole tree is DaggerfallRestWindow.OnPop
  * (:277-280): "Update NPC presence for shops and guilds after
  * resting/idling". Walk out of a rest window inside a building and the
@@ -130,8 +130,8 @@ export function peopleAreVisible(building, {
  *    left exactly as written for the bank's deed rather than tidied
  *    into the visibility law next door. A player's room ONLINE (an
  *    online home, a guild's hall, a private room) never reaches this
- *    law: the host's re-roll refuses it first (FIELD BUGS 2026-10-07
- *    HALL-FOLK, worldModes.js interiorRestDeps.updateNpcPresence).
+ *    law: the host's re-roll refuses it first (worldModes.js
+ *    interiorRestDeps.updateNpcPresence).
  *  - The shop arm is the NEGATION of AddPeople's: there, a shop shows
  *    its people when the player walked into an OPEN one; here, the arm
  *    is taken when they did NOT - which is precisely the case worth
@@ -141,8 +141,8 @@ export function peopleAreVisible(building, {
  *    house on the market stays empty.
  *  - The clock test is IsBuildingOpen (:352) - the effective hours
  *    buildingLocks.js already owns: PlayerActivate.cs:102-106's offline,
- *    and online the relief shift's for a relieved building (OL4-OL6; AUDIT
- *    WAITS O4), as the people above. It sits INSIDE the gate rather than
+ *    and online the relief shift's for a relieved building,
+ *    as the people above. It sits INSIDE the gate rather than
  *    beside it, so a building that fails both arms is never asked about
  *    the hour at all.
  *

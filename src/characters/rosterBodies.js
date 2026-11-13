@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC10: AN ACTOR FOR A
+// AN ACTOR FOR A
 // POPULATION THAT KEEPS NO FOE RECORD. The gate's boss and host, the siege's people, a ship's crew are driven by a relay
 // or a roster, not by a foe pool: no `_atkA` attack count, no hit flash marks, no entity. What their hosts DO change is a
 // key a frame - the relay's attack time, the time a blow met them - so the actor keeps its own counts on the record,
@@ -8,7 +8,7 @@
 // characters/creatureBodies.js; a person's).
 import { rosterLook } from './foeBodies.js';
 import { folkLookOf } from './folkBodies.js';
-import { dressPerson } from './wardrobe.js';   // MWNPC17: a still picture's kind, dressed by its role
+import { dressPerson } from './wardrobe.js';   // a still picture's kind, dressed by its role
 import { textSeed } from '../systems/livingWorld/seed.js';
 
 /** A key a host changed: a finite number or a string is one; null, undefined and NaN are none. */
@@ -37,10 +37,10 @@ export function rosterActor(rec, { id, look, feet, yaw, moving = false, running 
   return a;
 }
 
-/** MWNPC10c: what a still picture's kind wears (LW-LOOKS - systems/livingWorld/looks.js: a courtier at home in the
+/** What a still picture's kind wears (systems/livingWorld/looks.js: a courtier at home in the
  *  palace, a priest at the temple's door, a stall-keeper at their stall); a beggar and the rest the street's outfit.
  *  Keyed by the resident's job - a street's still picture is their job's kind (looks.js stillRoleOf: a priest's, a
- *  stall's merchant's), a room's flat their job's too (world/travellerSprites.js). MWNPC17: the wardrobe's role
+ *  stall's merchant's), a room's flat their job's too (world/travellerSprites.js). The wardrobe's role
  *  (characters/wardrobe.js WARDROBE_ROLES) each is dressed by. */
 export const STILL_WARDROBE = Object.freeze({ courtier: 'noble', priest: 'priest', keeper: 'merchant', merchant: 'merchant' });
 
@@ -52,7 +52,7 @@ export const STILL_WARDROBE = Object.freeze({ courtier: 'noble', priest: 'priest
  * everyone else the street's outfit their own sprite wears (folkBodies.js folkLookOf: their archive and face - the
  * watch's plate on duty, his own clothes off it) - each off their own id's seed, so they are one person wherever they
  * are drawn (never a walker's per-spawn roll). `rec` keeps what it reads - the sprites ask once a body.
- * AUDIT MW-NPC II K1: what the sprite wears NOW is the caller's - `cls` the class it is armed in (default the
+ * what the sprite wears NOW is the caller's - `cls` the class it is armed in (default the
  * resident's own), `guard` the watch's uniform on (his own clothes off it), `still` a still picture.
  * @param {any} rec @param {any} res @param {{ still?: boolean, cls?: number|null, guard?: boolean }} [o]
  */
@@ -62,20 +62,20 @@ export function residentLook(rec, res, { still = false, cls = res.cls, guard = f
   const kind = still ? STILL_WARDROBE[res.job] : undefined;
   if (kind) {
     const gender = res.sex === 'female' ? 'female' : 'male';
-    const d = dressPerson({ role: kind, gender, seed, cut: kind === 'priest' ? 'robe' : null });   // MWNPC17: their kind's role, off their own id's seed - a priest at the door in the robes his picture wears
+    const d = dressPerson({ role: kind, gender, seed, cut: kind === 'priest' ? 'robe' : null });   // their kind's role, off their own id's seed - a priest at the door in the robes his picture wears
     return { race: res.race ?? 'Breton', gender, faceIndex: (seed >>> 0) % 10, items: d.items, npc: d.npc };
   }
-  return folkLookOf({ archive: guard ? res.archive : (res.civvies ?? res.archive), personFaceRecordId: res.face ?? 0, gender: res.gender ?? 0, guard }, res.race ?? 'Breton', seed);   // WATCH-DAY: on duty in the uniform, off it in his own clothes, as his sprite is
+  return folkLookOf({ archive: guard ? res.archive : (res.civvies ?? res.archive), personFaceRecordId: res.face ?? 0, gender: res.gender ?? 0, guard }, res.race ?? 'Breton', seed);   // on duty in the uniform, off it in his own clothes, as his sprite is
 }
 
 /**
- * AUDIT MW-NPC C4: A RESIDENT WALKING THE STREET - a pooled walker the living town dressed as one of its residents
+ * A RESIDENT WALKING THE STREET - a pooled walker the living town dressed as one of its residents
  * (systems/livingWorld/livingTown.js _dress: `person.living.res`) - stands as that resident: their own id and
  * residentLook's look off it, never the pool row's spawn. folkActor seeded the look off the row (folkBodies.js
  * spawnOf's shell), so one resident wore other dyes on another row, another face indoors or on the road, and another
  * on another machine. Walking as the walker walks, facing its way, carrying what their sprite carries.
  *
- * AUDIT MW-NPC II K1: IN WHAT THE ROW WEARS NOW. The town dresses the row as the day goes (livingTown.js): the watch's
+ * IN WHAT THE ROW WEARS NOW. The town dresses the row as the day goes (livingTown.js): the watch's
  * uniform on duty and his own clothes off it (`guard`), a guild's member or a priest in their class's gear (`cls`, the
  * one it is armed in - looks.js townClassOf), a still picture where they keep their place (`stillLook`, its kind
  * `stillRole`). The look was read once off the resident alone, so an on-duty watchman stood in his own clothes, a

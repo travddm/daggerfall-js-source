@@ -76,7 +76,7 @@ import { groundEdgeGlsl } from './groundEdgeGlsl.js';   // COAST-LOOK: the groun
 import { ecotoneGlsl } from './ecotoneGlsl.js';   // ECOTONE1: the ground's share of its neighbours, both terrain programs' one chunk
 import { snowCoverGlsl, SNOW_TILE_M } from './snowCoverGlsl.js';   // PRECIP4: the snow the ground keeps, after it
 import { snowCapGlsl } from './snowCapGlsl.js';   // PEAKS1: a steep face over the cap's line is bare rock
-import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js';   // WATER-NEXT 2: under the enhanced water the ground is a bed
+import { WATER_BED_GLSL, waterBedMix } from './waterBedGlsl.js'; import { tileEdgeGlsl } from './tile-edge-glsl.ts';   // WATER-NEXT 2: under the enhanced water the ground is a bed
 import { RING_SEA_GLSL, FLORA_GLSL } from './horizonHaze.js';   // FAR-SEA1: the ring's sea and the horizon's haze, the classic ring's own text; FAR-FLORA: the canopy's grain
 import { RING_HAZE_GLSL } from './hazeGlsl.js';   // BANTHA1: and the jungle's haze over it, the classic ring's own text
 import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM } from './realWindows.js';   // RW1: the real windows, the classic FS's own block on the lane's codec
@@ -1010,7 +1010,7 @@ const vec2 TRANS[4] = vec2[4](
   vec2(0.0, 0.0), vec2(0.0, 1.0), vec2(1.0, 1.0), vec2(1.0, 0.0));
 ${roadEdgeGlsl('elDecode')}
 ${groundEdgeGlsl('elDecode')}   // COAST-LOOK: a transition's two kinds, the sea's cut on their line (render/groundEdgeGlsl.js)
-${WATER_BED_GLSL}
+${WATER_BED_GLSL}${tileEdgeGlsl()}
 void main() {
   vec2 unwrapped = vLocalXZ / uTileSize;
   ivec2 cell = clamp(ivec2(floor(unwrapped)), ivec2(0), ivec2(127));
@@ -1018,7 +1018,7 @@ void main() {
   int layer = int(data >> 2u);
   int t = int(data & 3u);
   vec2 tileUV = fract(unwrapped);
-  vec2 tuv = ROT[t] * tileUV + TRANS[t];
+  vec2 tuv = ROT[t] * tileEdgeHold(tileUV, cell, data, dFdx(unwrapped), dFdy(unwrapped)) + TRANS[t];   // a two-ground tile does not wrap into a different neighbour (render/tile-edge-glsl.ts)
   // GRAIN1:
   // THE TILE ARRAY IS MIPMAPPED, AND THE GRADIENT IS THE UNWRAPPED ONE.
   //

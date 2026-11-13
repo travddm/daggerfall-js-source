@@ -1,5 +1,5 @@
 // @ts-check
-// BODY-MOTION - THE BODY'S
+// THE BODY'S
 // MOTION, ONE PER RIG. The Morrowind body in third person walks, runs, creeps, stands, carries what is in its hands and
 // strikes with its whole body - the gait (gait.js), the carry (carry.js) and the blows (melee.js) joined into one request
 // and solved on the skeleton over the clip's pose (bodySolve.js), through poseAssembly's `motion` slot
@@ -30,12 +30,12 @@ const { add, scale, sub, cross, norm, len, lerp } = algebra;
 
 /** THE EASES (seconds): the layer on and off (off quicker - a recoil or a death takes the body at once), the arms on and
  *  off (a draw, a cast, a torch lit), and a change of carry class (a weapon drawn, a pair raised); `carry` (radians a
- *  second) the critically damped spring the carry's gait shares follow the gait's on (AUDIT BODY-MOTION CARRY-6). */
+ *  second) the critically damped spring the carry's gait shares follow the gait's on. */
 export const MOTION_EASE = Object.freeze({ in: 0.14, out: 0.1, outFast: 0.05, armIn: 0.12, armOut: 0.07, cls: 0.14, carry: 14 });
 
 /** A BLOW'S TRUNK: the share of the gait's steer (its hips turned toward a strafe's travel) a blow takes back toward the
- *  facing at its full weight, and the most the chest turns off the hips (degrees) - AUDIT BODY-MOTION MELEE-8: a blow
- *  swung while strafing laid its own wind on the steer, and twisted the trunk 80 to 92 degrees off the hips. */
+ *  facing at its full weight, and the most the chest turns off the hips (degrees): a blow
+ *  swung while strafing would otherwise lay its own wind on the steer and twist the trunk far off the hips. */
 export const BLOW_TRUNK = Object.freeze({ steer: 0.6, twist: 50 });
 
 /** The blade's length (MW units) each class draws on the contact sheets - the sheet's alone; the rig draws the mesh. */
@@ -76,7 +76,7 @@ const SECTION_OF = Object.freeze({ Winding: 'windup', Striking: 'release', Recov
  * path, its weapon type, the pieces it wears - a shield among them), `built` the rig's (its race's scale, a werewolf's or a creature's body), `dead`, `hit` (a
  * recoil in the clip), `climb` the climb's weight, `upper` the upper body's state by name, the blow's `attackType`,
  * `reversed` and `hand` and its section's `progress` and `strength`, `shown` the weapon in the hand, `hands` how the
- * hands are held (TWO-HANDS), `torch` the left hand's light, `spell` a spell readied or cast. The switch is systems/features.js 'mw-body-motion' (the viewer's - how this machine draws a body).
+ * hands are held, `torch` the left hand's light, `spell` a spell readied or cast. The switch is systems/features.js 'mw-body-motion' (the viewer's - how this machine draws a body).
  */
 export function motionWord({
   cam = null, third = false, rig = null, built = null, dead = false, hit = false, climb = 0, upper = 'Rest',
@@ -92,24 +92,24 @@ export function motionWord({
     on, kind, busy,
     speed: Number(mv.speed) || 0, forward: Number(mv.forward) || 0, strafe: Number(mv.strafe) || 0, running: !!mv.running,
     sneaking: !!cam?.sneaking, grounded: mv.grounded !== false, swimming: !!mv.swimming, levitating: !!mv.levitating,
-    // AUDIT BODY-MOTION GAIT-9 / GAIT-17 / RIG-3 / RIG-6: the ground the body's own steps crossed, the yaw it is DRAWN at
+    // The ground the body's own steps crossed, the yaw it is DRAWN at
     // (player/motor.js bodyYawFor's - the view's, a climb's easing offset on it), and a deck's turns
     travel: Array.isArray(mv.travel) ? mv.travel : null, carriedYaw: Number(mv.carriedYaw) || 0,
     yaw: Number.isFinite(mv.bodyYaw) ? mv.bodyYaw : (Number(cam?.yaw) || 0) + (Number(mv.bodyYawOff) || 0),
     height: built?.raceScale?.height ?? 1, weight: built?.raceScale?.weight ?? 1,
     mwType: rig?.mwType ?? MW_WEAPON_TYPE.None, shown: !!shown, hands, torch: !!torch, spell: !!spell,
-    spellHand: !!spellHand,   // AUDIT SPELL-HAND L3-5: a spell readied in the free (left) hand beside the drawn weapon - that arm is the Spell idle's
-    // SHIELD-RUN: a shield is a piece the body wears on its left arm, at the Shield Bone - the composer names its slot
+    spellHand: !!spellHand,   // a spell readied in the free (left) hand beside the drawn weapon - that arm is the Spell idle's
+    // A shield is a piece the body wears on its left arm, at the Shield Bone - the composer names its slot
     // `shield (<record>)` (formats/morrowind/mwItemMap.js composeWornArmor; fitThirdPersonCloak reads it so too)
     shield: !!rig?.arm?.pieces?.some((p) => /^shield\b/.test(p.slot ?? '')),
     equip: upper === 'Drawing' || upper === 'Stowing',
     blow: section && attackType ? { type: attackType, reversed: !!reversed, hand, section, progress, strength } : null,
-    // AUDIT BODY-MOTION MELEE-11: the pair's guard - each arm's dip while the other strikes (fpArm.js pairDip, radians)
+    // The pair's guard - each arm's dip while the other strikes (fpArm.js pairDip, radians)
     guard: guard && (guard.L > 0 || guard.R > 0) ? { L: Number(guard.L) || 0, R: Number(guard.R) || 0 } : null,
   };
 }
 
-/** TWO-CLEAR: the haft hand's wrist held this far (arm lengths) off the trunk's line - the audit's trunk, 9 units, and a
+/** The haft hand's wrist held this far (arm lengths) off the trunk's line - the audit's trunk, 9 units, and a
  *  forearm's thickness. `createBodyMotion({ trunkClear: 0 })` reads a blow's keys alone (the pins). */
 export const TRUNK_CLEAR = 0.29;
 
@@ -121,15 +121,14 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
   const armW = { L: 0, R: 0 };
   let cls = 'free', clsFrom = null, clsMix = 1;
   // THE CARRY'S OWN GAIT SHARES: the gait's (idle, walk, run, sneak) followed by a critically damped spring - the gait's
-  // first-order eases start a change at full speed, and the arms with them (AUDIT BODY-MOTION CARRY-6: a run's carry
-  // came on 20 to 41 degrees in a frame)
+  // first-order eases start a change at full speed, and the arms with them.
   const shares = { x: null, v: { idle: 0, walk: 0, run: 0, sneak: 0 } };
   let body = null;
   let last = null;
   let wasOn = false;
   let stance = null, stepTime = null, bpNow = null;
-  let lastBlow = null;   // the blow last seen - let go of by its weight when the machine drops it part-way (MELEE-6)
-  let cut = null;        // where a blow that cut the last one begins: that one's hand and trunk as they stood (MELEE-6)
+  let lastBlow = null;   // the blow last seen - let go of by its weight when the machine drops it part-way
+  let cut = null;        // where a blow that cut the last one begins: that one's hand and trunk as they stood
   let drawn = null;      // the striking hand as last drawn, as a blow's keys read it
   const gaitInput = () => ({
     speed: input.speed, forward: input.forward, strafe: input.strafe, running: input.running, sneaking: input.sneaking,
@@ -138,8 +137,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
     unitsPerM: MW_UNITS_PER_METER / (input.weight || 1), unitsPerMz: MW_UNITS_PER_METER / (input.height || 1),
     stance, stepTime,
   });
-  /** THE STANCE the feet stand in: the carry's (CARRY[cls].stand), eased from the class it leaves (AUDIT BODY-MOTION
-   *  CARRY-5: switched on the frame, a drawn two-hander threw the feet 11 units and the hips 16 degrees) - the feet step
+  /** THE STANCE the feet stand in: the carry's (CARRY[cls].stand), eased from the class it leaves, so the feet do not jump
    *  into it (gait.js) - and a blow's lunge laid on the lead foot, stepped quickly: the left for a right-hand blow, a
    *  guard's own lead (the left) for the fists. */
   function stanceNow(bp) {
@@ -164,8 +162,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
     const family = meleeFamilyOf(cls);
     if (!family || (b.type !== 'chop' && b.type !== 'slash' && b.type !== 'thrust')) return null;
     // a weapon held alone rides the right Weapon Bone (the mirror composes only a pair's or the fists' left): it strikes
-    // with the right whichever hand the machine leads with (AUDIT BODY-MOTION MELEE-7: a left lead swung the empty hand
-    // and flung the sword arm back as its counterweight)
+    // with the right whichever hand the machine leads with.
     const side = family !== 'fists' && input.hands !== 'dual' ? 'R' : b.hand === 'L' ? 'L' : 'R';
     const name = blowName(b.type, b.reversed);
     const bp = blowPose(family, name, blowU(b.section, b.progress), side, from);
@@ -174,7 +171,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
   };
 
   /** THE HANDS on the trunk that now stands: the carry's (the class it is changing to eased over the one it leaves),
-   *  a blow's over them; `steady` the turn that takes the stride's wave off the trunk (HELD-STEADY - carry.js
+   *  a blow's over them; `steady` the turn that takes the stride's wave off the trunk (carry.js
    *  carryHands). Exposed for the pins. */
   function handsFor(ctx, gp, bp, steady = null) {
     let hands = carryHands(cls, gp, ctx, { armW, shares: shares.x, steady });
@@ -182,14 +179,13 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
       const from = carryHands(clsFrom, gp, ctx, { armW, shares: shares.x, steady });
       hands = { L: blendHand(from.L, hands.L, clsMix), R: blendHand(from.R, hands.R, clsMix) };
     }
-    // the pair's guard: the arm whose fellow strikes lowered at its shoulder, as the mirror lowers the clip's (TWO-HANDS
-    // AUDIT - AUDIT BODY-MOTION MELEE-11: laid before the layer, the carry's own arm put it back up)
+    // the pair's guard: the arm whose fellow strikes lowered at its shoulder, as the mirror lowers the clip's.
     if (input.guard && (cls === 'dual' || cls === 'fists')) {
       for (const side of ['L', 'R']) if (input.guard[side] > 0 && hands[side]) hands[side] = lowered(hands[side], ctx.frames.shoulder[side], ctx.frames.up, input.guard[side]);
     }
     if (!bp || !(bp.w > 0)) return hands;
-    // the blow begun and ended on the striking hand's carry as it stands now (melee.js blowPose's `from` - MELEE-1); one
-    // that cut another begun where that one stood (MELEE-6)
+    // the blow begun and ended on the striking hand's carry as it stands now (melee.js blowPose's `from`); one
+    // that cut another begun where that one stood
     const from = carryFrom(hands[bp.side], bp.side, ctx, bp.family === 'fists');
     const keyed = from || cut ? blowPose(bp.family, bp.name, bp.u, bp.side, { start: cut ?? from, end: from }) : null;
     const strike = blowHands(keyed ? { ...bp, ...keyed } : bp, cls, ctx, armW, trunkClear);
@@ -203,28 +199,26 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
     step(dt, frame) {
       input = frame ?? sceneInput({ on: false });
       // switched on (third person again, the switch thrown, a body handed on): the gait begun afresh - the last frame it
-      // saw may be a minute old (AUDIT BODY-MOTION RIG-5: the heading alone was re-anchored, and a body came back in the
-      // walk, the bank and the feet it had left)
+      // saw may be a minute old.
       if (input.on && !wasOn) Object.assign(gait, createGaitState());
       wasOn = !!input.on;
       const free = !!input.on && !input.busy && input.grounded !== false && !input.swimming && !input.levitating;
       w = ease(w, free ? 1 : 0, free ? MOTION_EASE.in : (input.busy === 'dead' || input.busy === 'hit' ? MOTION_EASE.outFast : MOTION_EASE.out), dt);
-      if (!free && w < 1e-3) { w = 0; last = null; }   // AUDIT BODY-MOTION RIG-9: the card says off once the body is the clip's
+      if (!free && w < 1e-3) { w = 0; last = null; }   // the card says off once the body is the clip's
       const next = carryClassOf(input);
-      // a class changed back while its blend still ran turns the blend about where it stands (AUDIT BODY-MOTION
-      // CARRY-13: begun afresh from the class it was leaving, the hands leapt 3.9 units)
+      // a class changed back while its blend still ran turns the blend about where it stands.
       if (next !== cls) {
         if (clsFrom && next === clsFrom) { clsFrom = cls; cls = next; clsMix = 1 - clsMix; } else { clsFrom = cls; cls = next; clsMix = 0; }
       }
       clsMix = ease(clsMix, 1, MOTION_EASE.cls, dt);
       if (clsMix > 0.999) { clsMix = 1; clsFrom = null; }
       const hands = !input.equip && cls !== 'clip';
-      // SHIELD-RUN (the Discord's "sprinting with my mace and shield out just makes me look incredibly stupid"): a shield
+      // A shield
       // on the arm leaves the left arm to the clip, as a torch does - Morrowind's own groups carry a shield; the free
       // run's pump swung it up behind the head. Only where the reference shows it: drawn fists and a two-hander hide it.
       const shieldArm = !!input.shield && (cls === 'one' || cls === 'free');
       for (const side of ['L', 'R']) {
-        const want = hands && !(side === 'L' && (input.torch || shieldArm || input.spellHand)) ? 1 : 0;   // AUDIT SPELL-HAND L3-5: and the spell hand's left arm, as a torch's
+        const want = hands && !(side === 'L' && (input.torch || shieldArm || input.spellHand)) ? 1 : 0;   // and the spell hand's left arm, as a torch's
         armW[side] = ease(armW[side], want, want ? MOTION_EASE.armIn : MOTION_EASE.armOut, dt);
         if (!want && armW[side] < 1e-3) armW[side] = 0;
       }
@@ -244,8 +238,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
         }
       }
       // a blow the machine drops part-way (an interrupt, a stagger, a sheathe) is let go of over the layer's own ease out,
-      // held where it stood (AUDIT BODY-MOTION MELEE-6: dropped at once, the hand leapt 0.9 to 1.3 arm lengths and the
-      // chest 20 to 36 degrees in a frame)
+      // held where it stood.
       let seen = blowNow(cut ? { start: cut } : null);
       // cut by the next blow (the machine's sections begun afresh, or another blow): it begins where this one stands
       if (seen && lastBlow && lastBlow.w > 0.05 && (seen.name !== lastBlow.name || seen.u + 0.05 < lastBlow.u)) {
@@ -260,7 +253,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
       if (!seen) cut = null;
       // the strength's wind followed, never stepped to: it is 1 through the machine's wind-up and set only as the release
       // begins (combat/fpArm.js windUpStrength - a group with no min attack draws it at random), so read at once it
-      // turned the chest 9.5 to 14 degrees in the release's first frame (AUDIT BODY-MOTION MELEE-12)
+      // turned the chest 9.5 to 14 degrees in the release's first frame
       if (seen) seen.wind = lastBlow && !cut ? ease(lastBlow.wind, seen.wind, MOTION_EASE.cls, dt) : seen.wind;
       if (seen) lastBlow = seen;
       else if (lastBlow && lastBlow.w > 1e-3) lastBlow = { ...lastBlow, w: ease(lastBlow.w, 0, MOTION_EASE.out, dt) };
@@ -284,7 +277,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
       const gp = gaitPose(gait, gi, body);
       const L = body.leg;
       const runLean = lerp(CARRY[clsFrom]?.runLean ?? 0, CARRY[cls]?.runLean ?? 0, clsFrom ? clsMix : 1) * gp.run * gp.move * RAD;
-      // TWO-RUN: a class's chest turned toward its weapon at a run (CARRY's `runTurn`), as the lean, by the run's share
+      // A class's chest turned toward its weapon at a run (CARRY's `runTurn`), as the lean, by the run's share
       const runTurn = lerp(CARRY[clsFrom]?.runTurn ?? 0, CARRY[cls]?.runTurn ?? 0, clsFrom ? clsMix : 1) * gp.run * gp.move * RAD;
       const hipYaw = gp.hip.yaw - gait.psi * gp.move * BLOW_TRUNK.steer * k + (bp ? bp.hip * RAD * wind : 0);
       /** The chest's turn with `wave` of the stride's own counter-turn and counter-drop on it. */
@@ -293,7 +286,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
         roll: gp.chest.roll - gp.chest.wave.roll * (1 - wave) + (bp ? bp.chest[1] * RAD * wind : 0),
         pitch: gp.chest.pitch + runLean + (bp ? bp.chest[2] * RAD * wind : 0),
       });
-      // HELD-STEADY (carry.js strideRide, carryHands): the chest takes the stride's wave as far as its arms are free to ride
+      // The chest takes the stride's wave as far as its arms are free to ride
       // it (a weapon in both hands binds the shoulders), each arm as far as its row swings - turned back from the chest as
       // laid to the chest without the wave, as far as the solve lays the chest (the layer's weight, the arms it has)
       const sh = shares.x ?? gaitShares(gp);
@@ -333,7 +326,7 @@ export function createBodyMotion({ trunkClear = TRUNK_CLEAR } = {}) {
         blow: last?.bp ? `${last.bp.family} u=${last.bp.u.toFixed(2)}` : null,
         label: `${cls} ${mode}${last?.bp ? ` u${last.bp.u.toFixed(2)}` : ` psi${(gait.psi / RAD).toFixed(0)}`}`,
         blade: SHEET_BLADE[cls] ? { R: SHEET_BLADE[cls], L: cls === 'dual' ? SHEET_BLADE[cls] : null } : {},
-        arms: { L: armW.L, R: armW.R },   // AUDIT SPELL-HAND L3-5: each arm's weight under the layer (0: the clip's)
+        arms: { L: armW.L, R: armW.R },   // each arm's weight under the layer (0: the clip's)
       };
     },
     reset() { Object.assign(gait, createGaitState()); w = 0; armW.L = 0; armW.R = 0; cls = 'free'; clsFrom = null; clsMix = 1; last = null; shares.x = null; lastBlow = null; cut = null; drawn = null; },
@@ -393,7 +386,7 @@ function blowHands(bp, cls, ctx, armW, trunkClear = TRUNK_CLEAR) {
   if (bp.family === 'two' && TWO_HAND_GRIP[cls] != null && req.frame) {
     const slide = { shoulder: frames.shoulder.L, reach: body.arms.L, range: TWO_HAND_HAFT[cls] };
     let haf = hafHand(req, req.grip, req.frame, TWO_HAND_GRIP[cls], A, slide);
-    // TWO-CLEAR: the pair held before the trunk - where the haft hand would close inside it (a claymore's left a third of
+    // The pair held before the trunk - where the haft hand would close inside it (a claymore's left a third of
     // an arm down the grip, behind the right), both hands go forward by as much as it takes; the keys keep it near none
     const pelvis = mats.get(body.bones.pelvis ?? body.hipBone)?.t, neck = mats.get(body.bones.neck)?.t;
     const push = haf && pelvis && neck && bp.side === 'R' ? trunkPush(haf.at, pelvis, neck, frames.fwd, trunkClear * A) : 0;
@@ -403,7 +396,7 @@ function blowHands(bp, cls, ctx, armW, trunkClear = TRUNK_CLEAR) {
       out.R = { ...req, w: armW.R };
       haf = hafHand(req, req.grip, req.frame, TWO_HAND_GRIP[cls], A, slide);
     }
-    // its elbow out and FORWARD of the chest (TWO-CLEAR: a fixed way back and down, in the rig's frame, folded it into the chest)
+    // its elbow out and FORWARD of the chest (a fixed way back and down in the rig's frame folds it into the chest)
     if (haf) out.L = { ...haf, w: armW.L, pole: norm(add(scale(frames.right, -0.55), add(scale(frames.up, -0.75), scale(frames.fwd, 0.45)))) };
   } else if (bp.family === 'one' && cls === 'one' && bp.off) {
     const F = { right: frames.right, fwd: frames.fwd, up: frames.up };
