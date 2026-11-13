@@ -27,6 +27,11 @@ import { identity } from '../../src/world/mat4.js';
 import { Renderer, SKY_CLEAR, INTERIOR_CLEAR } from '../../src/render/renderer.js';
 import { TextureFile } from '../../src/formats/textureFile.js';
 import { RW_MAIN_CUTOUT } from '../../src/render/realWindows.js';   // RW1: the one alpha cut a model may wear - a picture's own, behind its flag
+import { setValue } from '../../src/systems/settings/settings.js';
+
+// These tests read the plain world shaders and DFU's Point filter: the port's default, Sharp, rewrites the shaders
+// and filters world art linear (render/sharp-texels.ts, test/render/sharp-texels.test.js).
+setValue('Video', 'MainFilterMode', '0');
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (p) => readFileSync(join(ROOT, p), 'utf8');
