@@ -741,7 +741,7 @@ import { AirPass, AIR_ADAPT_UNIT as ADAPT_UNIT, AIR_CONTACT_UNIT as CONTACT_UNIT
 import { DistanceShadePass } from './classic-distance-shading.ts';
 import { filterUpload, filterWorldPicture, freshWorldPicture, isWorldArt, needsRefilter, refilterWorldTexture, worldFilterMode } from './world-texture-filter.ts';
 import { bleedForFilter } from './alpha-bleed.ts';
-import { allocateArrayMips, applyMipQuality, hasMips, mipQuality, trackMips, uploadLayerMips, uploadWorldMips } from './mip-upload.ts';
+import { ArrayMips, applyMipQuality, uploadWorldMips } from './mip-upload.ts';
 import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, groundWrapFor } from './ground-sampler.ts';
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
@@ -5355,16 +5355,11 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const bytes = color32Bytes(color32, `uploadTexture(${archive}, ${record})`);   // WW3: the shape's own error, not a TypeError three frames down
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     const level0 = bleedForFilter(world, bytes, color32.width, color32.height);   // no black cut-out edge under a linear filter
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0,
-      // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer, and
-      // `.buffer` would upload that whole buffer from zero (color32Bytes)
-      gl.RGBA, gl.UNSIGNED_BYTE, level0,
-    );
+    // the view, never its backing buffer: the video player hands a live view onto its reader's frame buffer (color32Bytes)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, color32.width, color32.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, level0);
     const { wrap, filter } = textureParams(gl, opts);
     const wrapS = own ? own.wrapS : wrap, wrapT = own ? own.wrapT : wrap;
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
     if (mips) uploadWorldMips(gl, tex, level0, color32.width, color32.height, { wrapX: wrapS === gl.REPEAT, wrapY: wrapT === gl.REPEAT });
     filterUpload(gl, tex, world, mips, own, filter);   // world art: DFU's MainFilterMode (render/world-texture-filter.ts)
     if (opts.replacement) { if (tex) this._replacements.add(tex); }   // AUDIT RETRO1 A4: TryImportTexture's - DFU's retro arm never reaches it (J7: a lost context's null is no key)
@@ -7356,14 +7351,9 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     const w = layers[0].width;
     const h = layers[0].height;
     gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, w, h, layers.length, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    // Mip quality Sharp: each layer's smaller levels are built as the layer goes up, so the cost spreads over the steps
-    const sharpMips = mipQuality() === 'sharp' && hasMips(w, h);
-    const mipSpec = { wrapX: false, wrapY: false };   // a tile is drawn rotated and flipped, so its far edge is not its neighbour
-    if (sharpMips) allocateArrayMips(gl, w, h, layers.length);
+    const mips = new ArrayMips(gl, w, h, layers.length);   // Mip quality Sharp builds each layer's levels as the layer goes up
     for (let i = 0; i < layers.length; i++) {
-      const level0 = new Uint8Array(layers[i].colors.buffer, layers[i].colors.byteOffset, w * h * 4);
-      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, w, h, 1, gl.RGBA, gl.UNSIGNED_BYTE, level0);
-      if (sharpMips) uploadLayerMips(gl, level0, w, h, i, mipSpec);
+      mips.put(i, new Uint8Array(layers[i].colors.buffer, layers[i].colors.byteOffset, w * h * 4));
       if ((i + 1) % TILE_LAYERS_A_STEP === 0 && i + 1 < layers.length) { yield; gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex); }
     }
     if (this.tileArrays.has(archive)) { gl.deleteTexture(tex); return this.tileArrays.get(archive); }   // another upload of the key finished first (a caller that did not wait on this one)
@@ -7372,8 +7362,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // real footprint and the tile wrap blurs no line round a tile. Magnification and the wrap are the world filter's
     // (_setGroundSampler): NEAREST and a clamp under Point. A 2D array mipmaps each layer on its own, so no tile bleeds
     // into another.
-    if (!sharpMips) gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
-    trackMips(tex, gl.TEXTURE_2D_ARRAY, w, h, layers.length, mipSpec);
+    mips.finish(tex);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // GRAIN1: and anisotropy where the driver has it. Terrain is read at
     // a grazing angle almost everywhere, and an isotropic mip has to take
@@ -7461,15 +7450,8 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     return s;
   }
 
-  /** Gives every cached world texture, emission map, ground array and far-tree array the mip chain the Mip quality row
-   *  asks for (render/mip-upload.ts), once a frame after the row changes (render/live-world-sampling.ts). */
-  applyMipQuality() {
-    const gl = this.gl;
-    this._activeTexture(gl.TEXTURE0);
-    applyMipQuality(gl);
-    this._forgetTextureShadows();   // the rebuild bound its own textures on unit 0
-  }
-
+  /** Gives every remembered world texture the chain the Mip quality row asks for, the frame after it changes. */
+  applyMipQuality() { this._activeTexture(this.gl.TEXTURE0); applyMipQuality(this.gl); this._forgetTextureShadows(); }
   /** GRAIN AUDIT 1: THE DIAL LANDS. `uploadTileArray` returns the cached
    *  array for any archive the page has seen, and the cache lives as long
    *  as the renderer - the whole page - so a tier read at upload time

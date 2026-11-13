@@ -13,7 +13,13 @@ function filled(width: number, height: number, texel: (x: number, y: number) => 
 const clampBoth = { wrapX: false, wrapY: false };
 
 test('a chain is complete down to 1 x 1, each side the floor of half the one above, for odd and thin pictures', () => {
-  for (const [w, h] of [[37, 61], [1, 9], [8, 1], [64, 64], [3, 5]]) {
+  for (const [w, h] of [
+    [37, 61],
+    [1, 9],
+    [8, 1],
+    [64, 64],
+    [3, 5],
+  ]) {
     const levels = buildMipChain(new Uint8Array(w * h * 4).fill(255), w, h, clampBoth);
     assert.equal(levels.length, mipLevelCount(w, h));
     let wantW = w;
@@ -63,7 +69,8 @@ test('a lanczos level keeps more of a fine pattern than a box level', () => {
 
 test('a repeating axis filters across its edge and a clamped one does not', () => {
   const rgba = filled(8, 2, (x) => (x === 0 ? [255, 255, 255, 255] : [0, 0, 0, 255]));
-  const edgeRight = (wrapX: boolean) => buildMipChain(rgba, 8, 2, { wrapX, wrapY: false, kernel: 'box' })[0].data[3 * 4];
+  const edgeRight = (wrapX: boolean) =>
+    buildMipChain(rgba, 8, 2, { wrapX, wrapY: false, kernel: 'box' })[0].data[3 * 4];
   assert.equal(edgeRight(false), 0);
   assert.equal(edgeRight(true), 0);
   const wide = buildMipChain(rgba, 8, 2, { wrapX: true, wrapY: false, kernel: 'lanczos3' })[0];
@@ -91,7 +98,10 @@ test('a cut-out keeps its share of solid texels at every level', () => {
   };
   const base = solidShare(rgba);
   for (const level of buildMipChain(rgba, 32, 32, clampBoth).slice(0, 2)) {
-    assert.ok(Math.abs(solidShare(level.data) - base) < 0.08, `level ${level.width}: ${solidShare(level.data)} vs ${base}`);
+    assert.ok(
+      Math.abs(solidShare(level.data) - base) < 0.08,
+      `level ${level.width}: ${solidShare(level.data)} vs ${base}`,
+    );
   }
 });
 
@@ -101,11 +111,21 @@ test('a soft-alpha picture is not rescaled: its alpha is the filtered alpha', ()
 });
 
 test('a premultiplied picture comes back premultiplied, and zero where it is empty', () => {
-  const solid = buildMipChain(filled(8, 8, () => [50, 100, 25, 128]), 8, 8, { ...clampBoth, premultiplied: true });
+  const solid = buildMipChain(
+    filled(8, 8, () => [50, 100, 25, 128]),
+    8,
+    8,
+    { ...clampBoth, premultiplied: true },
+  );
   for (const level of solid) {
     for (let c = 0; c < 4; c++) assert.ok(Math.abs(level.data[c] - [50, 100, 25, 128][c]) <= 1);
   }
-  const empty = buildMipChain(filled(8, 8, () => [0, 0, 0, 0]), 8, 8, { ...clampBoth, premultiplied: true });
+  const empty = buildMipChain(
+    filled(8, 8, () => [0, 0, 0, 0]),
+    8,
+    8,
+    { ...clampBoth, premultiplied: true },
+  );
   assert.deepEqual([...empty[0].data.subarray(0, 4)], [0, 0, 0, 0]);
 });
 

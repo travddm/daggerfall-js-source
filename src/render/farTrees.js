@@ -478,7 +478,6 @@ export class FarTreesBand {
       const layer = this._layerFor();
       if (layer < 0) { this.arts.set(key, 'full'); this.version++; return; }
       this._upload(layer, layerPicture(pic));
-      const gl = this.gl;
       this.layers.set(key, layer);
       this.sides[layer] = Math.max(size.w, size.h);
       this.arts.set(key, 'ready');

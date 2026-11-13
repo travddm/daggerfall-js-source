@@ -106,13 +106,19 @@ export function uploadWorldMips(
 type Canvas2dSource = {
   readonly width: number;
   readonly height: number;
-  getContext?(kind: '2d'): { getImageData(x: number, y: number, w: number, h: number): { data: Uint8ClampedArray } } | null;
+  getContext?(
+    kind: '2d',
+  ): { getImageData(x: number, y: number, w: number, h: number): { data: Uint8ClampedArray } } | null;
 };
 
 /** The bound 2D texture's chain, for a texture uploaded from a canvas with UNPACK_PREMULTIPLY_ALPHA_WEBGL: its levels
  *  are premultiplied too, so a cut's edge mips without a dark rim. Level 0 is the caller's, as it was. A canvas that
  *  cannot be read as 2D takes the driver's chain. */
-export function uploadCanvasMips(gl: WebGL2RenderingContext, texture: WebGLTexture | null, canvas: Canvas2dSource): void {
+export function uploadCanvasMips(
+  gl: WebGL2RenderingContext,
+  texture: WebGLTexture | null,
+  canvas: Canvas2dSource,
+): void {
   const { width, height } = canvas;
   const spec: MipSpec = { wrapX: false, wrapY: false, premultiplied: true };
   const context = mipQuality() === 'sharp' && hasMips(width, height) ? canvas.getContext?.('2d') : null;
@@ -158,18 +164,49 @@ export function hasMips(width: number, height: number): boolean {
 }
 
 /** Allocates levels 1 and up of an array of `layers` pictures, ready for `uploadLayerMips`. */
-export function allocateArrayMips(
-  gl: MipGl,
-  width: number,
-  height: number,
-  layers: number,
-): void {
+export function allocateArrayMips(gl: MipGl, width: number, height: number, layers: number): void {
   let w = width;
   let h = height;
   for (let level = 1; level <= mipLevelCount(width, height); level++) {
     w = Math.max(1, w >> 1);
     h = Math.max(1, h >> 1);
     gl.texImage3D(gl.TEXTURE_2D_ARRAY, level, gl.RGBA, w, h, layers, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  }
+}
+
+/** A 2D array texture under construction, layer by layer: Sharp allocates every level up front and builds each layer's
+ *  levels as the layer goes up, so the cost spreads over the caller's steps; Standard asks the driver at the end.
+ *  The array must be bound by the caller, who has uploaded no level yet but level 0's allocation. */
+export class ArrayMips {
+  private readonly sharp: boolean;
+  private readonly spec: MipSpec = { wrapX: false, wrapY: false };
+
+  private readonly gl: WebGL2RenderingContext;
+  private readonly width: number;
+  private readonly height: number;
+  private readonly layers: number;
+
+  constructor(gl: WebGL2RenderingContext, width: number, height: number, layers: number) {
+    this.gl = gl;
+    this.width = width;
+    this.height = height;
+    this.layers = layers;
+    this.sharp = mipQuality() === 'sharp' && hasMips(width, height);
+    if (this.sharp) allocateArrayMips(gl, width, height, layers);
+  }
+
+  /** Uploads layer `index`: level 0 as it is, and under Sharp its other levels. */
+  put(index: number, rgba: Uint8Array | Uint8ClampedArray): void {
+    const gl = this.gl;
+    gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, index, this.width, this.height, 1, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
+    if (this.sharp) uploadLayerMips(gl, rgba, this.width, this.height, index, this.spec);
+  }
+
+  /** Ends the build: the driver's chain under Standard, and the array is remembered for a change of the row. Tiles are
+   *  drawn rotated and flipped, so their levels stop at the edge of the tile and never reach the neighbouring copy. */
+  finish(texture: WebGLTexture | null): void {
+    if (!this.sharp) this.gl.generateMipmap(this.gl.TEXTURE_2D_ARRAY);
+    trackMips(texture, this.gl.TEXTURE_2D_ARRAY, this.width, this.height, this.layers, this.spec);
   }
 }
 
@@ -204,7 +241,17 @@ export function uploadTextureMips(
 function putArrayLevels(gl: MipGl, levels: readonly MipLevel[], layer: number): void {
   levels.forEach((level, i) => {
     gl.texSubImage3D(
-      gl.TEXTURE_2D_ARRAY, i + 1, 0, 0, layer, level.width, level.height, 1, gl.RGBA, gl.UNSIGNED_BYTE, level.data,
+      gl.TEXTURE_2D_ARRAY,
+      i + 1,
+      0,
+      0,
+      layer,
+      level.width,
+      level.height,
+      1,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      level.data,
     );
   });
 }
