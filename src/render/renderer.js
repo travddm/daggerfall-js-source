@@ -7384,10 +7384,10 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     // are cached for the life of the page, so a tier read only at upload
     // landed on a page reload and on no other occasion.
     this._setGroundSampler(groundSharpnessTier());
-    // DFU's terrain texture array wraps Clamp (TextureReader) - keeps
-    // the far edge texel at transformed-uv 1.0 boundary ties.
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    // A ground tile lies edge to edge with copies of itself, so a linear filter must blend its far edge into its near
+    // one; a clamp draws a line round every tile. DFU's array clamps (TextureReader) but only ever point-samples it.
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.REPEAT);
     if (!this._retroMips) gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAX_LEVEL, 0);   // RETRO1: loaded under retro mode without mip maps (_applyRetroMips)
     this.tileArrays.set(archive, tex);
     this._tileDims.set(archive, [w, h, layers.length]);   // PRECIP4

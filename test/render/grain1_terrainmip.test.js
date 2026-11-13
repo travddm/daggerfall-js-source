@@ -94,6 +94,8 @@ test('GRAIN AUDIT 1: the tier is sampler state - EXECUTED: one chain per archive
   const anisoOf = (l) => calls(l, 'texParameterf').filter((c) => c[2] === 'TEXTURE_MAX_ANISOTROPY_EXT').pop()?.[3];
   assert.equal(minOf(log), 'LINEAR_MIPMAP_LINEAR', 'the default tier: trilinear'); assert.equal(anisoOf(log), 8, "...at the Anisotropic Filtering row's 8x (under Sharp, the default filter)");
   assert.equal(calls(log, 'texParameteri').find((c) => c[2] === 'TEXTURE_MAG_FILTER')[3], 'NEAREST');
+  const wrapOf = (name) => calls(log, 'texParameteri').filter((c) => c[2] === name).pop()?.[3];
+  assert.deepEqual([wrapOf('TEXTURE_WRAP_S'), wrapOf('TEXTURE_WRAP_T')], ['REPEAT', 'REPEAT'], 'the tiles repeat, so a linear filter draws no line between two copies of one tile');
   assert.equal(calls(log, 'getExtension').filter((c) => c[1] === 'EXT_texture_filter_anisotropic').length, 1, 'the extension asked once');
   log.length = 0;
   r.uploadTileArray(302, layers());
