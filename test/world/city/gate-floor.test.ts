@@ -7,7 +7,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { customModelFor } from '../../../src/world/customModels.js';
 import { GATE_OPENING } from '../../../src/world/townWalls.js';
-import { gateMeshIds, otherGateModelId } from '../../../src/world/city/cityGate.js';
 import {
   floorlessGateId,
   gateOpensOnRoad,
@@ -15,6 +14,18 @@ import {
   withoutGateFloor,
   FLOORLESS_GATE_BASE,
 } from '../../../src/world/city/gate-floor.ts';
+
+// cityGate.js reaches the networking modules, which need DOM types that tsconfig.node.json does not load, so the test
+// loads it by a computed path.
+const cityGatePath = ['../../../src/world/city', 'cityGate.js'].join('/');
+const { gateMeshIds, otherGateModelId } = (await import(cityGatePath)) as {
+  gateMeshIds: (
+    modelId: number,
+    placement: ArrayLike<number>,
+    paths: Uint8Array | null,
+  ) => { own: number; other: number };
+  otherGateModelId: (modelId: number) => number;
+};
 
 type SubMesh = { textureArchive: number; textureRecord: number; startIndex: number; primitiveCount: number };
 type Model = { positions: Float32Array; normals: Float32Array; indices: Uint32Array; subMeshes: SubMesh[] };
