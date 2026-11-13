@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ENHANCED AI 4 — the motor reads the switch.
 //
-// Decision #1 of the arc, honoured to the letter: `characters/
+// The rule of the arc: `characters/
 // enemyMotor.js` is NOT edited. EnemyAI resolves `this._getDestination`
 // by dynamic dispatch from `_classicTick`, and EVERYTHING downstream of
 // the classic tick keys off `this.destination` - the 5.625° turn gate,
@@ -13,7 +13,7 @@
 // one. Senses, decisions, attacks, sounds, knockback, water, flight:
 // classic, untouched, by construction.
 //
-// ── THE LAWS ARE PROJECT-FINAL'S ────────────────────────────────
+// The laws are project-final's.
 //
 // The follow laws are Mac's, from project-final's src/game/
 // enemyShared.js (repathToward, stuckWatch, the constants) and
@@ -57,8 +57,8 @@
 // ── ADAPTATION 3: THE ROUTE SUPPLIES X AND Z; THE Y IS CLASSIC'S ──
 //
 // findPath's waypoints carry y = surfH(chf.colliders, ...) when the chf
-// has colliders, and y = 0 otherwise. AUDIT 59 F4 corrected the premise
-// this adaptation was written on: the live chf DOES carry colliders -
+// has colliders, and y = 0 otherwise. The premise
+// this adaptation was written on was wrong: the live chf DOES carry colliders -
 // navClient hydrates over the boxes the bake was cut into (the worker
 // ships them back; a cache hit asks it for them) and hands them to
 // hydrateBakedNav, and the 3b pin reads the hydrated floor through
@@ -78,14 +78,14 @@
 // clear-path arm's vertical (EnemyMotor.cs:541-544, :559-564): the
 // target's transform lift, the flyer/levitator/slaughterfish face bump,
 // the grounded foe's own-height delta, converted back to feet once.
-// AUDIT 62 F1: this leg took the predicted position's RAW FEET, which is
+// this leg took the predicted position's RAW FEET, which is
 // classic's answer only when a foe's capsule equals its idle sprite -
 // a bat (capsule halved and floored at 1.6 under a 1.8 sprite) aimed
 // 0.9 m low and, at floor level, never climbed at all, because the
 // flyer's floor-lift clause only arms on a NEGATIVE heading.
 // The route bends x and z; nothing else changes. Its ENDPOINTS go in
 // with their real heights (the foe's feet, the predicted position) -
-// AUDIT 68: findPath's locate picks each end's level from them, and a
+// findPath's locate picks each end's level from them, and a
 // flat y = 0 routed a foe on a stacked floor along the wrong level.
 //
 // ── ADAPTATION 4: THE NUDGE RUNS THE FALL CHECK ─────────────────
@@ -160,12 +160,12 @@ export class EnhancedEnemyAI extends EnemyAI {
     this.nav = opts.nav ?? (() => null);
     this.navWorld = opts.navWorld ?? makeNavWorld();
     this.navSeed = (opts.navSeed ?? 0) >>> 0;
-    this.navGoal = opts.navGoal ?? null;   // INDOOR-WATCH W1: (feet) => the mesh's point a route to an off-mesh goal ends at, or null (_routeOffMesh)
+    this.navGoal = opts.navGoal ?? null;   // (feet) => the mesh's point a route to an off-mesh goal ends at, or null (_routeOffMesh)
     // his movement scratch (enemy.js:64), re-homed
     this.path = null; this.pathI = 1; this.repathT = 0; this.pathEpoch = undefined;
     this.stuckT = 0; this.lastX = feet[0]; this.lastZ = feet[2];
     this.navBroken = false;
-    this._wasFollowing = false;   // AUDIT CC-B5: the route's goal - the leader's or the foe's
+    this._wasFollowing = false;   // the route's goal - the leader's or the foe's
     /** observational, his stuckStats pattern - probes and tests only */
     this.navStats = { repaths: 0, fails: 0, stuckFires: 0, offMesh: 0 };
   }
@@ -180,14 +180,14 @@ export class EnhancedEnemyAI extends EnemyAI {
     if (this.path && world.navEpoch !== undefined && this.pathEpoch !== world.navEpoch) { this.path = null; this.repathT = 0; }
     if ((this.repathT -= dt) > 0) return false;
     if (world.pathBudget-- <= 0) return false;
-    const np = findPath(chf, this.feet, goal) ?? this._routeOffMesh(chf, goal);   // AUDIT 68 S02-motor-flat-y-locate: the real heights pick each endpoint's level (AUDIT 62 F1's locate); y = 0 routed a stacked floor's foe on the level nearest 0
+    const np = findPath(chf, this.feet, goal) ?? this._routeOffMesh(chf, goal);   // the real heights pick each endpoint's level (the level-aware locate); y = 0 routed a stacked floor's foe on the level nearest 0
     this.navStats.repaths++;
     if (np) { this.path = np; this.pathI = 1; this.repathT = REPATH_INT; this.pathEpoch = world.navEpoch; }
     else { this.path = null; this.repathT = REPATH_FAIL; this.navStats.fails++; }
     return true;
   }
 
-  /** FIELD BUGS 2026-10-16b INDOOR-WATCH, AUDIT W1: a goal findPath cannot place - off the mesh past its locate's
+  /** A goal findPath cannot place - off the mesh past its locate's
    *  half-metre snap (navmesh.js:"return bestD <= 2 ? best : -1;"), a player between two shelves 0.8 m deep or in a
    *  closet the erosion kept no floor of. The host's `navGoal` names the mesh's point a route there ends at (the room's
    *  meshPointNear, never through a wall); the route runs to it and its last leg is the straight walk in. No hook, or
@@ -220,7 +220,7 @@ export class EnhancedEnemyAI extends EnemyAI {
       // "no fall" without casting when obstacleDetected, foundUpwardSlope
       // or foundDoor is set - and a foe the watchdog fires on is stuck
       // against something, so it has obstacleDetected set almost by
-      // definition. AUDIT 55 found the check answering false in exactly
+      // definition, so the check answered false in exactly
       // the case it was added for. The flags are the classic tick's to
       // own; they are put back as they were.
       const od = this.obstacleDetected, us = this.foundUpwardSlope, fd = this.foundDoor;
@@ -229,9 +229,9 @@ export class EnhancedEnemyAI extends EnemyAI {
       const drop = this.fallDetected;
       this.obstacleDetected = od; this.foundUpwardSlope = us; this.foundDoor = fd; this.fallDetected = false;
       if (drop) continue;
-      const moveResult = this.collider.move(this.feet, nx - this.feet[0], 0, nz - this.feet[2], this.controllerHeight);   // a Move like any other: isGrounded is its (FIELD BUGS 2026-09-29 sea #2); DOOR-JAM: at the controller's own height
+      const moveResult = this.collider.move(this.feet, nx - this.feet[0], 0, nz - this.feet[2], this.controllerHeight);   // a Move like any other: isGrounded is its; at the controller's own height
       this.isGrounded = moveResult.grounded;
-      this.collidedSides = !!moveResult.sides;   // DOOR-JAM: and its CollidedSides, for HeightAdjust
+      this.collidedSides = !!moveResult.sides;   // and its CollidedSides, for HeightAdjust
       break;
     }
     this.path = null; this.repathT = 0;
@@ -249,8 +249,8 @@ export class EnhancedEnemyAI extends EnemyAI {
       // pursuing: CanAct, not given up, and a position to head for -
       // the classic tick's own three gates, read after it ran. The goal
       // is the classic destination's own target, the predicted position.
-      // CREW-COMPANIONS: a follower's route is _followGoal's (repathed there, toward the leader); only the watchdog here
-      // AUDIT CC-B5: a route is to one goal - the leader's or the foe's; turning from one to the other, it goes
+      // a follower's route is _followGoal's (repathed there, toward the leader); only the watchdog here
+      // a route is to one goal - the leader's or the foe's; turning from one to the other, it goes
       if (this._following !== this._wasFollowing) { this._wasFollowing = this._following; this.path = null; this.repathT = 0; }
       if (this._following) {
         if (this.path && this.moving) this._stuckWatch(chf, Math.sin(this.yaw), Math.cos(this.yaw), dt);
@@ -280,7 +280,7 @@ export class EnhancedEnemyAI extends EnemyAI {
     let wp = this.path[this.pathI];
     while (this.pathI < this.path.length - 1 && Math.hypot(wp[0] - this.feet[0], wp[2] - this.feet[2]) <= WP_REACH) wp = this.path[++this.pathI];
     const last = this.pathI === this.path.length - 1;
-    // INDOOR-WATCH AUDIT W1 - adaptation 1's other half: in sight, the classic stop is measured to the TARGET
+    // Adaptation 1's other half: in sight, the classic stop is measured to the TARGET
     // (EnemyMotor.cs:479-482), and a foe it stops turns to its destination - so one stopped within reach of the target
     // with a corner still ahead (the mouth of the aisle it was walked in by) faced the corner, and the swing's 22.5
     // degree gate (enemyAttack.js ATTACK_YAW_DEG) never opened. Stopped on the target, it faces the target.
@@ -297,9 +297,9 @@ export class EnhancedEnemyAI extends EnemyAI {
     this.destination = [this.feet[0] + dx * k, y, this.feet[2] + dz * k];
   }
 
-  /** CREW-COMPANIONS: a follower walks the navmesh route to its leader - the route's next corner (the pursuit's own
+  /** A follower walks the navmesh route to its leader - the route's next corner (the pursuit's own
    *  corner walk), the leader's live feet on the last leg, and the straight line when there is no mesh or a detour
-   *  is running. COMPANION-TRAIL (FIELD BUGS 2026-10-04b): the leader in sight, or a crumb of the leader's own trail
+   *  is running. The leader in sight, or a crumb of the leader's own trail
    *  in sight, comes first (enemyMotor.js _trailGoal) - the walked way through a doorway, where the bake's erosion
    *  trims the threshold - and the route only when the trail has nothing; no route, the nearest crumb. */
   _followGoal(leader, dt) {
@@ -322,10 +322,9 @@ export class EnhancedEnemyAI extends EnemyAI {
     }
   }
 
-  /** FIELD BUGS 2026-10-16b INDOOR-WATCH (scenes/interiorNav.js, NO ROUTE): stood at `feet` by the host, on the island
+  /** Stood at `feet` by the host, on the island
    *  the route could not reach. The pursuit stands - its target, its give-up timer, its belief of where the player is;
-   *  what the motor held of where it stood goes - EnemyAI._standAfresh, resumeLive's own list (AUDIT W4: this kept a
-   *  shorter one, and a watchman crouched at the wall that stopped him was stood crouched) - and the route and the
+   *  what the motor held of where it stood goes - EnemyAI._standAfresh, resumeLive's own list (a shorter one would leave a watchman crouched at the wall that stopped him) - and the route and the
    *  stuck clocks with it. */
   standAt(feet) {
     this.feet[0] = feet[0]; this.feet[1] = feet[1]; this.feet[2] = feet[2];
@@ -333,7 +332,7 @@ export class EnhancedEnemyAI extends EnemyAI {
     this.path = null; this.pathI = 1; this.repathT = 0; this.stuckT = 0; this.lastX = feet[0]; this.lastZ = feet[2];
   }
 
-  /** WORLD2: the base resume, and the cached path with it - the next pursuit paths from where the puppet stood. */
+  /** The base resume, and the cached path with it - the next pursuit paths from where the puppet stood. */
   resumeLive() {
     super.resumeLive();
     this.path = null; this.pathI = 1; this.repathT = 0; this.pathEpoch = undefined;
