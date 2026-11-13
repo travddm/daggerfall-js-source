@@ -147,8 +147,10 @@ import { applyMirrorRig, limbSkeleton, offWeaponBoneAddon, WEAPON_BONE_LEFT_SOUR
 import { ownFacePools } from '../../characters/ownModels/ownHeadModels.js';   // the port's own heads and hairs - a race's pools where it has them
 import { MW_WEAPON_TYPE } from './mwWeaponAnim.js';
 export * from './mwWeaponAnim.js';
-import { SKIN_SWEEP_SLOTS, resolveBodyParts } from './mwBodyParts.js';
+import { SKIN_SWEEP_SLOTS, resolveBodyParts, vampireHeadRecord } from './mwBodyParts.js';
 export * from './mwBodyParts.js';
+import { shapeMatchesBone } from './mw-bone-rules.ts';
+export * from './mw-bone-rules.ts';   // callers import the bone rules from here
 export * from './mwAnimSources.js';   // callers import the animation sources, body parts and weapon rules from here
 import { pitchNeck } from './mwHeadView.js';
 export * from './mwHeadView.js';   // the camera node and the neck turn moved out; callers keep importing them from here
@@ -413,34 +415,6 @@ function pickCarriedLight(lights, named, exactId, has) {
   const exact = exactId ? cands.find((l) => l.id === exactId) : null;
   if (exact) return exact;
   return cands.slice().sort((a, b) => a.id.length - b.id.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))[0];
-}
-
-/** The bones of one blend mask. A bone belongs to the mask whose root name it meets first walking up its
- *  parents: "Bip01 L Clavicle" is the left arm, and the arm test wins over the spine because the clavicle is met
- *  before the spine on the way up. Answers the lower-cased node names under `rootName` (itself included), which is
- *  the spelling poseSkeleton looks tracks up by. A skeleton without the root (the fixture rigs, a rig cut down to
- *  an arm) answers the empty set, and the caller overlays nothing. */
-export function blendMaskBones(skeleton, rootName = 'bip01 l clavicle') {
-  const mask = new Set();
-  if (!skeleton || !skeleton.nodes) return mask;
-  const rootBone = String(rootName).toLowerCase();
-  const lowerName = (node) => String(node.name || '').toLowerCase();
-  const childrenOf = new Map();
-  for (const [ref, node] of skeleton.nodes) {
-    if (!childrenOf.has(node.parent)) childrenOf.set(node.parent, []);
-    childrenOf.get(node.parent).push(ref);
-  }
-  const pending = [];
-  for (const [ref, node] of skeleton.nodes) if (lowerName(node) === rootBone) pending.push(ref);
-  const visited = new Set();
-  while (pending.length) {
-    const ref = pending.pop();
-    if (visited.has(ref)) continue;
-    visited.add(ref);
-    mask.add(lowerName(skeleton.nodes.get(ref)));
-    pending.push(...(childrenOf.get(ref) ?? []));
-  }
-  return mask;
 }
 
 /** The one mask this port has: a second animation state wins one blend mask while the frame's winner keeps the
@@ -920,21 +894,6 @@ export function facePools(parts, race, female, { has = null, own: ownAsked = fal
   return { heads: pool('head'), hairs: pool('hair') };
 }
 
-/** The werewolf's head and hair: the BODY records `WerewolfHead` and `WerewolfHair`, looked up by id and nothing
- *  else (no race, sex, part or flag test; the actor's own head and hair are ignored), the last .esm to carry one
- *  winning (the load order). Third person only. Every other slot is empty for a werewolf, and the body is the
- *  robe's (mwItemMap composeWornArmor, a `record` piece). */
-export const WEREWOLF_HEAD_ID = 'werewolfhead';
-export const WEREWOLF_HAIR_ID = 'werewolfhair';
-export function werewolfHeadRows(parts) {
-  const lastRecordWithId = (wantedId) =>
-    (parts ?? []).filter((part) => String(part.id || '').toLowerCase() === wantedId).at(-1) ?? null;
-  return [
-    { slot: 'head', record: lastRecordWithId(WEREWOLF_HEAD_ID) },
-    { slot: 'hair', record: lastRecordWithId(WEREWOLF_HAIR_ID) },
-  ];
-}
-
 /** THE CURATED FACE - mwFaceTable.json's judgement for a race, sex and portrait, `{ head, hair }` record ids,
  *  or null where the table holds none. One reading, for the rows that wear it and the match
  *  that stands down when it answers both halves. */
@@ -1034,18 +993,6 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
     if (row) { row.record = vamp; row.verdict = 'third-person record found, a vampire\'s head'; }
   }
   return rows;
-}
-
-/** The vampire's head: the BODY record that is a vampire's, a skin and a head, of the sex and the race (ignoring
- *  case), the last in load order of those. NotPlayable is no bar (Morrowind's vampire heads are never offered at
- *  chargen). Null when the race has none. */
-export function vampireHeadRecord(parts, race, female) {
-  const raceId = String(race || '').toLowerCase();
-  const vampireHeads = (parts ?? []).filter(
-    (part) =>
-      part.vampire && part.skin && part.slot === 'head' && !part.firstPerson && part.female === !!female && part.race === raceId,
-  );
-  return vampireHeads.at(-1) ?? null;
 }
 
 /** Is this mesh skinned, or rigid?
@@ -2018,17 +1965,6 @@ function applyPre(positions, pre) {
     out[v + 2] = pre.a[6] * x + pre.a[7] * y + pre.a[8] * z + pre.t[2];
   }
   return out;
-}
-
-/** The shape filter: a case-insensitive prefix match on the shape name, with Morrowind's "Tri " convention
- *  stripped first. A shape with no name matches everything, because a nameless shape in a one-shape part file is
- *  the part. */
-export function shapeMatchesBone(shapeName, bone) {
-  const name = String(shapeName || '').trim().toLowerCase();
-  if (!name) return true;
-  const prefix = String(bone).toLowerCase();
-  const nameWithoutTri = name.startsWith('tri ') ? name.slice('tri '.length) : name;
-  return name.startsWith(prefix) || nameWithoutTri.startsWith(prefix);
 }
 
 /** The mirror, alone and directly testable: place a rigid part's vertices at a bone, mirroring x first when the

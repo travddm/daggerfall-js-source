@@ -22,8 +22,8 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   file-format documentation and the behaviour of Morrowind data before the repository goes public (decisions 25 and
   108), each rewrite held to the old module's answers by a parity test.
   - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
-    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`, the rest of
-    `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
+    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`,
+    `mw-bone-rules.ts`, the rest of `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
   - Still OpenMW-derived: `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`), `mwNifMesh.js`
     (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`, `mwParticles.js`,
     `mwSpellFx.js`, `mwVfx.js`, and outside this folder `src/systems/weaponSheathing.js`. `src/combat/fpArm.js`,
@@ -67,7 +67,8 @@ An async read must store its result in the cache generation it started under.
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
 | `mwFirstPerson.js` | The first-person rules, the record extraction, and the diagnostics. |
-| `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
+| `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view, and the vampire's and werewolf's heads; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
+| `mw-bone-rules.ts` | Which bones belong to a blend mask, and which mesh shapes belong to a bone. |
 | `mwWeaponAnim.js`, `mwAnimSources.js` | Which animation group a weapon type plays and the text keys that time a swing; which `.kf` files an actor plays from. |
 | `mwItemMap.js` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. |
 | `mwFaceMatch.js` | Pairs Daggerfall portraits with Morrowind heads and hairs. |
