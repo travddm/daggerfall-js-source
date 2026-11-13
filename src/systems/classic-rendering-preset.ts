@@ -41,13 +41,15 @@ export const CLASSIC_RENDERING_ROWS: Readonly<Record<string, RowValue>> = Object
 });
 
 /** Daggerfall Unity's retro keys: 320x200, 4:3, palettization of the whole picture, and no mip maps. Field of view 60
- *  is the narrowest Daggerfall Unity allows; the original game's view was narrower still. */
+ *  is the narrowest Daggerfall Unity allows; the original game's view was narrower still. Point is DFU's own world
+ *  texture filter, where the port's default is Sharp. */
 export const CLASSIC_RENDERING_VIDEO: Readonly<Record<string, string>> = Object.freeze({
   'Video/RetroRenderingMode': '1',
   'Video/RetroModeAspectCorrection': '1',
   'Video/PostProcessingInRetroMode': '3',
   'Video/UseMipMapsInRetroMode': 'False',
   'Video/FieldOfView': '60',
+  'Video/MainFilterMode': '0',
 });
 
 function savedOf(doors: ClassicRenderingDoors): ClassicRenderingSaved | null {

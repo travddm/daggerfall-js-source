@@ -49,6 +49,7 @@ function playerStores(): Stores {
       'Video/PostProcessingInRetroMode': '1',
       'Video/UseMipMapsInRetroMode': 'True',
       'Video/FieldOfView': '90',
+      'Video/MainFilterMode': '3',
     },
     locked: new Set(),
     saved: null,

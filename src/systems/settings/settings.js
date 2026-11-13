@@ -386,9 +386,14 @@ export function tierOf(key) {
 // AllowMagicRepairs and InstantRepairs take DFU's own False offline (DFU-GAPS EL26): a smith keeps the item for days and
 // turns an enchanted one away, and the player's own True stands. Online the lane forces AllowMagicRepairs True
 // (onlineLane.js ONLINE_FORCED_SETTINGS) until the server profile owns it.
+//
+// MainFilterMode: DFU ships 0, Point. The port's default is 3, Sharp (render/sharp-texels.ts): square texels close up
+// with smooth edges, and filtered, anisotropic ground in the distance, where Point draws the ground blurred or
+// shimmering in the browser. Point, Bilinear and Trilinear stay one press away, and the Classic preset sets Point.
 export const PORT_DEFAULTS = Object.freeze({
   Enhancements: Object.freeze({ PlayerTorchFromItems: 'True' }),
   Controls: Object.freeze({ WeaponSwingMode: '2' }),
+  Video: Object.freeze({ MainFilterMode: '3' }),
 });
 
 /** The default in effect: the port's, else the vendored ini's. Every

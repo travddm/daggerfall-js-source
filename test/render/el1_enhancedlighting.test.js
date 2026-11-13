@@ -20,6 +20,7 @@ import {
   elScatterDensity, syncLightingLane, lanternColor,
 } from '../../src/render/enhancedLighting.js';
 import { Renderer } from '../../src/render/renderer.js';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { FarRingRenderer } from '../../src/render/farRing.js';
 import { FEATURES, featureForControl } from '../../src/systems/features.js';
 import { setPref, PREF_DEFAULTS } from '../../src/systems/uiPrefs.js';
@@ -297,7 +298,10 @@ test('EL1: on the lane every colour goes up decoded and the lane\'s uniforms rid
   assert.equal(r._pointColorData(1)[0], 0.5, 'classic: as given');
 });
 
-test('MAC-BUG W6: the set compiles the decal’s twin - the classic one at boot, the lane’s on install - and the draw uses whichever is installed', () => {
+test('MAC-BUG W6: the set compiles the decal’s twin - the classic one at boot, the lane’s on install - and the draw uses whichever is installed', (t) => {
+  // the plain shaders: under the Sharp filter (the default) each is compiled rewritten (render/sharp-texels.ts)
+  setValue('Video', 'MainFilterMode', '0');
+  t.after(resetSettings);
   const { calls, canvas } = recordingGl();
   const r = new Renderer(canvas);
   const sources = () => calls.filter((c) => c[0] === 'shaderSource').map((c) => c[2]);

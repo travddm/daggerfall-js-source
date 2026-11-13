@@ -334,8 +334,8 @@ test('BLOOD1a by source: the decal pass is ONE draw call, depth-tested and depth
   // the program is built off the draw path, like every other one here -
   // MAC-BUG W6: as the SET'S fifth program, the classic one at boot and
   // the lane's twin at install, never lazily on the first batch
-  assert.match(r, /decal: this\._buildProgram\(DECAL_VS, src\.decalFs \?\? DECAL_FS\),/);
-  assert.match(r, /decalFs: DECAL_FS \}\);/, 'the classic set names its own');
+  assert.match(r, /decal: this\._buildProgram\(DECAL_VS, fs\(src\.decalFs \?\? DECAL_FS\)\),/);
+  assert.match(r, /decalFs: DECAL_FS, sharp: sharpWanted\(\) \}\);/, 'the classic set names its own');
   assert.doesNotMatch(r, /_ensureDecalProgram/, 'no lazy build left');
   assert.match(r, /this\.decalProgram = set\.decal;/, 'the draw uses whichever set is installed');
 });
@@ -2043,7 +2043,7 @@ test('MAC-BUG W6 by source: the decal has a LANE TWIN, the flat’s model on the
 
   // the lane carries it, by the key the set builder reads
   assert.equal(EL_LANE.decalFs, EL_DECAL_FS, 'EL_LANE.decalFs is the twin');
-  assert.match(r, /decal: this\._buildProgram\(DECAL_VS, src\.decalFs \?\? DECAL_FS\),/, 'the set builds it from the lane’s key, the classic FS only for a lane that brings none');
+  assert.match(r, /decal: this\._buildProgram\(DECAL_VS, fs\(src\.decalFs \?\? DECAL_FS\)\),/, 'the set builds it from the lane’s key, the classic FS only for a lane that brings none');
 
   // THE FLAT'S MODEL, TERM FOR TERM WITH EL_BB_FS - a mark and a chunk
   // are the same blood, and under this lane they were not.

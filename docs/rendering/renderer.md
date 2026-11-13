@@ -19,8 +19,12 @@ Rules from the data side, stated at the top of `renderer.js`:
 
 - UVs can be negative or above 1. Daggerfall's models rely on `REPEAT` wrapping.
 - Textures from `TextureFile.getColor32` are already bottom-up, which is GL's texel order. Upload with `flipY` off.
-- Indexed colour means hard pixels: world textures use `NEAREST` filtering by default. The filter is Daggerfall Unity's
-  `Video/MainFilterMode` (Point, Bilinear, Trilinear; `src/render/world-texture-filter.ts`). Every mip-mapped classic
+- Indexed colour means hard pixels. The world texture filter is Daggerfall Unity's `Video/MainFilterMode` (Point,
+  Bilinear, Trilinear; `src/render/world-texture-filter.ts`) plus the port's Sharp, the port's default (DFU's is
+  Point). Sharp samples through a linear sampler with anisotropy, and its world shaders move each coordinate to its
+  texel's centre with a one-pixel blend at each texel edge (`src/render/sharp-texels.ts`): square texels close up,
+  filtered ground in the distance. The world sets are built Sharp or plain for the filter, and swapped when it changes
+  (`src/render/sharp-world-sets.ts`). Every mip-mapped classic
   texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
   cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
   and the spell hands draw 1% larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.

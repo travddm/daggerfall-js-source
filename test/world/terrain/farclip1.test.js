@@ -26,6 +26,11 @@ import { EL_LANE, EL_TERRAIN_FS } from '../../../src/render/enhancedLighting.js'
 import { CLIP_SENTINEL, patchTilemapForClip, clippedTerrainIndices } from '../../../src/world/deepWater/deepWaterCap.js';
 import { generateSamples, HEIGHTMAP_DIMENSION } from '../../../src/world/terrain/terrainSampler.js';
 import { generateTileData, assignTiles } from '../../../src/world/terrain/terrainTiles.js';
+import { setValue } from '../../../src/systems/settings/settings.js';
+
+// These tests read the plain world shaders and DFU's Point filter: the port's default, Sharp, rewrites the shaders
+// and filters world art linear (render/sharp-texels.ts, test/render/sharp-texels.test.js).
+setValue('Video', 'MainFilterMode', '0');
 
 const { Renderer } = RENDER;
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
