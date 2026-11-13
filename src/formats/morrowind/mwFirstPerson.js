@@ -421,20 +421,26 @@ function pickCarriedLight(lights, named, exactId, has) {
  *  the spelling poseSkeleton looks tracks up by. A skeleton without the root (the fixture rigs, a rig cut down to
  *  an arm) answers the empty set, and the caller overlays nothing. */
 export function blendMaskBones(skeleton, rootName = 'bip01 l clavicle') {
-  const out = new Set();
-  if (!skeleton || !skeleton.nodes) return out;
-  const want = String(rootName).toLowerCase();
+  const mask = new Set();
+  if (!skeleton || !skeleton.nodes) return mask;
+  const rootBone = String(rootName).toLowerCase();
+  const lowerName = (node) => String(node.name || '').toLowerCase();
+  const childrenOf = new Map();
   for (const [ref, node] of skeleton.nodes) {
-    let at = ref;
-    let hops = 0;
-    while (at !== undefined && at !== null && at >= 0 && hops++ < 256) {
-      const n = skeleton.nodes.get(at);
-      if (!n) break;
-      if (String(n.name || '').toLowerCase() === want) { out.add(String(node.name || '').toLowerCase()); break; }
-      at = n.parent;
-    }
+    if (!childrenOf.has(node.parent)) childrenOf.set(node.parent, []);
+    childrenOf.get(node.parent).push(ref);
   }
-  return out;
+  const pending = [];
+  for (const [ref, node] of skeleton.nodes) if (lowerName(node) === rootBone) pending.push(ref);
+  const visited = new Set();
+  while (pending.length) {
+    const ref = pending.pop();
+    if (visited.has(ref)) continue;
+    visited.add(ref);
+    mask.add(lowerName(skeleton.nodes.get(ref)));
+    pending.push(...(childrenOf.get(ref) ?? []));
+  }
+  return mask;
 }
 
 /** The one mask this port has: a second animation state wins one blend mask while the frame's winner keeps the
@@ -921,11 +927,11 @@ export function facePools(parts, race, female, { has = null, own: ownAsked = fal
 export const WEREWOLF_HEAD_ID = 'werewolfhead';
 export const WEREWOLF_HAIR_ID = 'werewolfhair';
 export function werewolfHeadRows(parts) {
-  const byId = new Map();
-  for (const p of parts ?? []) byId.set(String(p.id || '').toLowerCase(), p);
+  const lastRecordWithId = (wantedId) =>
+    (parts ?? []).filter((part) => String(part.id || '').toLowerCase() === wantedId).at(-1) ?? null;
   return [
-    { slot: 'head', record: byId.get(WEREWOLF_HEAD_ID) ?? null },
-    { slot: 'hair', record: byId.get(WEREWOLF_HAIR_ID) ?? null },
+    { slot: 'head', record: lastRecordWithId(WEREWOLF_HEAD_ID) },
+    { slot: 'hair', record: lastRecordWithId(WEREWOLF_HAIR_ID) },
   ];
 }
 
@@ -1025,7 +1031,7 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
   const vamp = vampire ? vampireHeadRecord(parts, race, female) : null;
   if (vamp) {
     const row = rows.find((r) => r.slot === 'head');
-    if (row) { row.record = vamp; row.verdict = 'third-person record found, a vampire\'s (getVampireHead)'; }
+    if (row) { row.record = vamp; row.verdict = 'third-person record found, a vampire\'s head'; }
   }
   return rows;
 }
@@ -1034,10 +1040,12 @@ export function playerBodyRows(parts, race, female, { beast = false, faceIndex =
  *  case), the last in load order of those. NotPlayable is no bar (Morrowind's vampire heads are never offered at
  *  chargen). Null when the race has none. */
 export function vampireHeadRecord(parts, race, female) {
-  const want = String(race || '').toLowerCase();
-  let out = null;
-  for (const p of parts ?? []) if (p.vampire && p.skin && p.slot === 'head' && p.female === !!female && p.race === want && !p.firstPerson) out = p;
-  return out;
+  const raceId = String(race || '').toLowerCase();
+  const vampireHeads = (parts ?? []).filter(
+    (part) =>
+      part.vampire && part.skin && part.slot === 'head' && !part.firstPerson && part.female === !!female && part.race === raceId,
+  );
+  return vampireHeads.at(-1) ?? null;
 }
 
 /** Is this mesh skinned, or rigid?
@@ -2018,9 +2026,9 @@ function applyPre(positions, pre) {
 export function shapeMatchesBone(shapeName, bone) {
   const name = String(shapeName || '').trim().toLowerCase();
   if (!name) return true;
-  const want = String(bone).toLowerCase();
-  if (name.startsWith(want)) return true;
-  return name.startsWith('tri ') && name.slice(4).startsWith(want);
+  const prefix = String(bone).toLowerCase();
+  const nameWithoutTri = name.startsWith('tri ') ? name.slice('tri '.length) : name;
+  return name.startsWith(prefix) || nameWithoutTri.startsWith(prefix);
 }
 
 /** The mirror, alone and directly testable: place a rigid part's vertices at a bone, mirroring x first when the

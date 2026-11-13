@@ -9,6 +9,9 @@
 // The recording came from src/formats/morrowind/mwFirstPerson.js at commit 1694f2b8c7: run readInputs and
 // recordAnswers from mw-first-person-rest-sweep.mjs over the retail files and that module. No third-party engine
 // source was read for the new code.
+//
+// One answer was changed on purpose after the recording: the verdict text of a vampire's head row no longer names a
+// function of the engine it was ported from, and reads "a vampire's head". The recording was edited to that text.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
