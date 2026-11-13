@@ -56,7 +56,7 @@ const HARDCODED = {
   'src/formats/morrowind/mwAnim.js': 11,
   'src/formats/morrowind/mwAnimSources.js': 1,
   'src/formats/morrowind/mwFaceMatch.js': 6,
-  'src/formats/morrowind/mwFirstPerson.js': 63,
+  'src/formats/morrowind/mwFirstPerson.js': 62,
   'src/formats/morrowind/mwGpuSkin.js': 3,
   'src/formats/morrowind/mwItemMap.js': 26,
   'src/formats/morrowind/mwNifFile.js': 1,

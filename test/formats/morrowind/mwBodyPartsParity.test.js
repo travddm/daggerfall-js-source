@@ -10,6 +10,14 @@
 // with the BODY records of the three retail .esm files (read with bodyParts, reduced with toPart) as `parts` and
 // every RACE id plus every race named by a BODY record as `races`. No third-party engine source was read for the
 // new code.
+//
+// The vampire's head and the werewolf's head and hair (vampireHeadRecord and werewolfHeadRows, here in mwBodyParts.js)
+// were rewritten the same way and are compared with a second recording
+// (test/fixtures/mw/mw-first-person-rest-parity.json, made from mwFirstPerson.js at commit 1694f2b8c7 with
+// recordHeadAnswers from mw-first-person-rest-sweep.mjs): every race and sex over the retail BODY records, the vampire
+// row of playerBodyRows, and seeded random record lists. One answer was changed on purpose after the recording: the
+// verdict text of a vampire's head row no longer names a function of the engine it was ported from, and reads "a
+// vampire's head". The recording was edited to that text.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -17,6 +25,7 @@ import { join } from 'node:path';
 import * as bodyPartsModule from '../../../src/formats/morrowind/mwBodyParts.js';
 import * as firstPerson from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { recordEdgeCalls, recordResolution, toPart } from './mwBodyPartsSweep.mjs';
+import { recordHeadAnswers, toPart as toHeadPart } from './mw-first-person-rest-sweep.mjs';
 
 const recording = JSON.parse(
   readFileSync(new URL('../../fixtures/mw/mwBodyPartsParity.json', import.meta.url), 'utf8'),
@@ -75,3 +84,36 @@ test('body-part resolution: a female first-person arm takes the later of her thi
   assert.equal(pick([femaleThird, maleFirst]), 'm1');
   assert.equal(pick([maleFirst, femaleThird]), 'f3');
 });
+
+const headRecording = JSON.parse(
+  readFileSync(new URL('../../fixtures/mw/mw-first-person-rest-parity.json', import.meta.url), 'utf8'),
+);
+const headsNow = JSON.parse(
+  JSON.stringify(
+    recordHeadAnswers(
+      {
+        vampireHeadRecord: bodyPartsModule.vampireHeadRecord,
+        werewolfHeadRows: bodyPartsModule.werewolfHeadRows,
+        playerBodyRows: firstPerson.playerBodyRows,
+      },
+      headRecording.inputs,
+    ),
+  ),
+);
+
+test('vampire and werewolf heads: every race and sex over the retail records match the recording', () => {
+  assert.deepEqual(headsNow.real, headRecording.recorded.real);
+});
+
+test('vampire and werewolf heads: seeded random record lists match the recording', () => {
+  assert.deepEqual(headsNow.synthetic, headRecording.recorded.synthetic);
+});
+
+test(
+  'vampire and werewolf heads: the recorded records are the retail BODY records',
+  { skip: !esms.every(existsSync) },
+  () => {
+    const live = esms.flatMap((path) => firstPerson.bodyParts(new Uint8Array(readFileSync(path))).map(toHeadPart));
+    assert.deepEqual(live, headRecording.inputs.parts);
+  },
+);
