@@ -34,7 +34,7 @@ vec4 sharpTex(sampler2D s, vec2 uv, vec2 gx, vec2 gy) {
 `;
 
 /** The ground's overload, for shaders that declare a sampler2DArray precision. */
-const SHARP_TEXEL_ARRAY = `vec4 sharpGrad(sampler2DArray s, vec3 p, vec2 gx, vec2 gy) {
+export const SHARP_TEXEL_ARRAY_GLSL = `vec4 sharpGrad(sampler2DArray s, vec3 p, vec2 gx, vec2 gy) {
   vec2 size = vec2(textureSize(s, 0).xy);
   vec2 fw = (abs(gx) + abs(gy)) * size * (1.0 - uSharpRetro.x);
   float mipScale = exp2(uSharpRetro.y);
@@ -69,7 +69,7 @@ export function sharpenWorldFs(fs: string): string {
   let out = fs;
   for (const [plain, sharp] of SAMPLE_REWRITES) out = out.split(plain).join(sharp);
   if (out.includes(MARKER)) return out;
-  const helpers = SHARP_TEXEL_GLSL + (/precision\s+\w+\s+sampler2DArray\s*;/.test(out) ? SHARP_TEXEL_ARRAY : '');
+  const helpers = SHARP_TEXEL_GLSL + (/precision\s+\w+\s+sampler2DArray\s*;/.test(out) ? SHARP_TEXEL_ARRAY_GLSL : '');
   const precisions = [...out.matchAll(/^[ \t]*precision[ \t][^;\n]*;[ \t]*$/gm)];
   const last = precisions[precisions.length - 1];
   const lineEnd = last ? last.index + last[0].length : out.indexOf('\n');

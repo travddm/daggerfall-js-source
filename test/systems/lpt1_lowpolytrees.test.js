@@ -24,6 +24,7 @@ import { Renderer, WORLD_FRAME, bbVertexShader, bbCornerX, LPT_SUN_FULL } from '
 import { EL_LANE, EL_BB_FS } from '../../src/render/enhancedLighting.js';
 import { FOREST_STAMP, sinkFelled } from '../../src/scenes/treeHost.js';
 import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
 import { SeasonHelper } from '../../src/systems/seasonsIliacBay.js';
 import { SEASONS } from '../../src/systems/gameDate.js';
 import { perspective, lookAt, mirrorProjectionX } from '../../src/world/mat4.js';
@@ -652,14 +653,23 @@ test('LPT1 a far picture whose handle is not drawn this frame stands whole - no 
   assert.ok(!calls.some((c) => c[0] === 'uniform4f' && c[1] === 'uLptCut' && c[5] === 140));
 });
 
-test('LPT1 the atlas texture (AUDIT LPT A4/A5): its chain allocated, sampled as the mod\'s Point (nearest, its mips nearest), wrapped, uploaded a band of rows at a time, under retro mode\'s mip switch, and freed by its owner', () => {
+test('LPT1 the atlas texture (AUDIT LPT A4/A5): its chain allocated, sampled by the world texture filter (the mod\'s Point under Point: nearest, its mips nearest), wrapped, uploaded a band of rows at a time, under retro mode\'s mip switch, and freed by its owner', () => {
   const { calls, canvas } = recordingGl();
   const r = new Renderer(canvas);
   calls.length = 0;
   const tex = r.createAtlasTexture(1024, 512, 11);
   assert.deepEqual(calls.filter((c) => c[0] === 'texImage2D').map((c) => [c[2], c[4], c[5], c[9]]), Array.from({ length: 11 }, (_, i) => [i, Math.max(1, 1024 >> i), Math.max(1, 512 >> i), null]));
   const params = Object.fromEntries(calls.filter((c) => c[0] === 'texParameteri').map((c) => [c[2], c[3]]));
-  assert.deepEqual(params, { TEXTURE_WRAP_S: 'REPEAT', TEXTURE_WRAP_T: 'REPEAT', TEXTURE_MIN_FILTER: 'NEAREST_MIPMAP_NEAREST', TEXTURE_MAG_FILTER: 'NEAREST', TEXTURE_MAX_LEVEL: 10 });
+  assert.deepEqual(params, { TEXTURE_WRAP_S: 'REPEAT', TEXTURE_WRAP_T: 'REPEAT', TEXTURE_MIN_FILTER: 'LINEAR_MIPMAP_LINEAR', TEXTURE_MAG_FILTER: 'LINEAR', TEXTURE_MAX_LEVEL: 10 });
+  try {
+    setValue('Video', 'MainFilterMode', '0');
+    calls.length = 0;
+    r.createAtlasTexture(64, 64, 7);
+    const point = Object.fromEntries(calls.filter((c) => c[0] === 'texParameteri').map((c) => [c[2], c[3]]));
+    assert.deepEqual([point.TEXTURE_MIN_FILTER, point.TEXTURE_MAG_FILTER], ['NEAREST_MIPMAP_NEAREST', 'NEAREST'], 'Point: the mod\'s own sampler');
+  } finally {
+    resetSettings();
+  }
   assert.ok(r.lptAtlases.has(tex));
   calls.length = 0;
   r.uploadAtlasRows(tex, 2, 64, 256, new Uint8Array(256 * 4 * 3));

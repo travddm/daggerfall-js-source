@@ -31,7 +31,11 @@ Rules from the data side, stated at the top of `renderer.js`:
   as one uniform set at each frame's start (`src/render/retro-sharp.ts`). Every mip-mapped classic
   texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
   cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
-  and the spell hands draw 1% larger, as in DFU. UI art, the sky, smoothed pictures and data textures keep their own filters.
+  and the spell hands draw 1% larger, as in DFU. Textures with an owner of their own take the filter too, and follow a
+  change at their next draw or through the same per-frame check: the far trees, banners and ship flags, the tree
+  atlases (`createAtlasTexture`), the body parts and held items (`createCharacterTexture`), and the seabed decorations
+  (`createDecorationTexture`, whose own program carries Sharp's snap behind `uSharpOn`). UI art, the sky, smoothed
+  pictures, data textures, particles and a spell effect's textures keep their own filters.
 - The Anisotropic Filtering row (preference `anisotropicFiltering`: Off, Per texture, 2x, 4x, 8x, 16x; 8x by default;
   `src/render/anisotropic-filtering.ts`) sets the anisotropy of that world art and of the ground, capped by the
   driver. Per texture is DFU's: 8x on the ground, none elsewhere. It applies only off Point, because Direct3D under

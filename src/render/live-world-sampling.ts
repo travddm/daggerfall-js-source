@@ -26,6 +26,8 @@ export type SamplingRenderer = {
   readonly textures: Map<unknown, object | null>;
   readonly emissionTextures: Map<unknown, object | null>;
   readonly tileArrays: Map<unknown, unknown>;
+  /** The tree atlases (createAtlasTexture), which take the world filter as the cached world textures do. */
+  readonly lptAtlases?: Set<object>;
   readonly gl: { readonly TEXTURE1: number };
   _samplingKey?: number;
   /** Re-filters one cached world texture when its state differs from the settings; others are left alone. */
@@ -54,6 +56,7 @@ export function refreshWorldSamplingOnChange(renderer: SamplingRenderer): void {
   if (first) return;
   for (const texture of renderer.textures.values()) renderer._worldHit(texture);
   for (const texture of renderer.emissionTextures.values()) renderer._worldHit(texture, renderer.gl.TEXTURE1);
+  for (const atlas of renderer.lptAtlases ?? []) renderer._worldHit(atlas);
   if (renderer.tileArrays.size > 0) renderer.applyGroundSharpness();
   for (const refilter of listeners) refilter();
 }
