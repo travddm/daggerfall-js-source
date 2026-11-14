@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { ALLOC_CHILD_ARGS } from '../allocChild.mjs';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildShipyardModel, SHIPYARD, HULL_STATIONS } from '../../src/world/shipyardModel.js';
 import { buildLighthouseModel, buildLighthouseFire, LIGHTHOUSE, LIGHTHOUSE_POINTS, GALLERY_Y, LANTERN_H, TOWER_SIDES, towerR, OIL_CASKS, WATER_BUTT, STEP_BOX } from '../../src/world/lighthouseModel.js';
 import { PORT_REC, PORT_PAINTERS, PORT_ARCHIVE } from '../../src/world/portArt.js';
@@ -349,7 +349,7 @@ test('AUDIT SHIPYARDS THE BEACON\'S FLAMES CAST NOTHING (L5-2\'s law; BEACON-TOW
 test('AUDIT SHIPYARDS A NIGHT FRAME ALLOCATES NOTHING HERE (L4-2, PERF-LIGHTS\' law): the pool\'s frame, its glows (a lit lighthouse\'s 37 particles: 16 KB a call) and its lights write their records in place - measured as perfextb measures, in a node of its own with the collector at hand and a control that allocates', () => {
   const root = fileURLToPath(new URL('../..', import.meta.url));
   const script = `
-    const { createPortHost } = await import(${JSON.stringify(root + 'src/scenes/portHost.js')});
+    const { createPortHost } = await import(${JSON.stringify(pathToFileURL(root + 'src/scenes/portHost.js').href)});
     const site = { key: '9:lighthouse', kind: 'lighthouse', x: 100, z: 100, yaw: 0, comp: 0, race: 'Breton', name: 'L', keeper: { name: 'K', sex: 'male', variant: 0 } };
     const yard = { key: '9:shipyard', kind: 'shipyard', x: 160, z: 100, yaw: 0, comp: 0, race: 'Breton', name: 'Y', keeper: { name: 'K', sex: 'male', variant: 0 }, crewmaster: { name: 'C', sex: 'male', variant: 1 } };
     const tex = { getSize: () => ({ width: 40, height: 76 }), getScale: () => ({ width: 0, height: 0 }), getFrameCount: () => 3 };

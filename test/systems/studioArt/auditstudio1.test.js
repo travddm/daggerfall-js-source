@@ -496,7 +496,7 @@ test('AUDIT STUDIO1 S14 (lane E K14, K15, E13): the tool - the check carries the
     assert.equal(await studioCli(['templates', out], { log: () => {} }), 0);
     const names = readdirSync(out, { recursive: true }).filter((f) => String(f).endsWith('.png'));
     assert.equal(names.length, 248);
-    for (const f of names) assert.ok(studioFile(`a/${String(f).split('/').pop()}`), f);
+    for (const f of names) assert.ok(studioFile(`a/${String(f).split(/[\\/]/).pop()}`), f);
     assert.ok(pngSize(readFileSync(join(out, String(names[0])))));
   } finally { rmSync(out, { recursive: true, force: true }); }
 });

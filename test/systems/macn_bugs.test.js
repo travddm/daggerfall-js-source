@@ -47,7 +47,7 @@ const walk = (dir, out = []) => {
   }
   return out;
 };
-const SRC = walk(join(root, 'src')).map((p) => [p.slice(root.length + 1), readFileSync(p, 'utf8')]);
+const SRC = walk(join(root, 'src')).map((p) => [p.slice(root.length + 1).split('\\').join('/'), readFileSync(p, 'utf8')]);
 const seq = (...vals) => { let i = 0; return () => vals[i++ % vals.length]; };
 const ICONS = { getTexture: async () => ({ recordCount: 0 }), uploadRecord: () => {}, textures: new Map() };
 const spyAudio = (fn) => {
