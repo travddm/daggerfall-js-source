@@ -1454,6 +1454,7 @@ import { armorRecords, clothingRecords, raceBeastFlag, pickWeaponRecord, facePoo
 import { OWN_MW_ARMOR } from '../../../src/characters/ownModels/ownArmorModels.js';   // MW-BRIG1: and the armour
 import { CLOAK_NAMES } from '../../../src/characters/ownModels/ownClothingModels.js';   // MW-CLOAK1: and the cloak
 import { CLOTHING_NAME } from '../../../src/formats/morrowind/mwItemMap.js';
+import { garmentPriority } from '../../../src/formats/morrowind/mw-worn-parts.ts';
 import { ARMOR_ENUM } from '../../../src/combat/enemyEquipment.js';
 import { ARMOR_MATERIAL } from '../../../src/systems/armorMaterials.js';
 
@@ -1828,22 +1829,20 @@ test('MW-D30: the priority law - armor beats clothing, the robe beats the cuiras
   assert.deepEqual(b.adds.map((x) => x.recordId), ['b_robe'], 'the robe did not beat the cuirass');
   assert.ok(b.shadows.includes('upperleg:right') && b.shadows.includes('forearm:left'),
     'the robe reserve did not hide the limbs');
-  // ties go to the LATER piece in the reference order: two garments of
+  // ties go to the later piece in the walk order: two garments of
   // one type cannot happen from DF slots, so prove it with the pieces
   // that CAN tie - nothing does at different bases - by symmetry:
   // shirt alone still dresses.
   const c = composeWornArmor({ pieces: [shirt], armors, clothes, bodyPool, female: false });
   assert.deepEqual(c.adds.map((x) => x.recordId), ['b_shirt']);
-  // THE +1 ITSELF, swept at the source: in the reference's own walk
-  // order armor always precedes the generic garments, so with a
-  // first-claimant tie rule the armor bit never flips an outcome this
-  // fixture can stage - an equivalent mutant. It stays because it is
-  // the reference's formula (npcanimation.cpp:625-630), and the sweep
-  // keeps a refactor from quietly flattening it into "equivalent
-  // today, wrong the day a garment walks first".
-  const src = readFileSync('src/formats/morrowind/mwItemMap.js', 'utf8');
-  assert.match(src, /\(\(0 \+ 1\) << 1\) \+ 1;/, 'armor lost its +1');
-  assert.match(src, /\(\(base \+ 1\) << 1\) \+ 0;/, 'clothing lost its +0 formula');
+  // The +1 itself, asked of the priority function: in the walk order armor
+  // always precedes the generic garments, so with a first-claimant tie rule
+  // the armor bit never flips an outcome this fixture can stage. It stays
+  // because the formula is the law, and a refactor must not quietly flatten it
+  // into "equivalent today, wrong the day a garment walks first".
+  assert.equal(garmentPriority(null, true), garmentPriority(null, false) + 1, 'armor lost its +1');
+  assert.equal(garmentPriority('robe', false), 24, 'the robe lost its base');
+  assert.equal(garmentPriority('skirt', false), 8, 'the skirt lost its base');
 });
 
 test('MW-D30: the skirt reserve and the readout - garments ride the equip table', () => {
@@ -2476,31 +2475,30 @@ test('IG3: the SHIELD wears getShieldMesh\'s whole ladder - body part, hard refu
     pieces: [{ templateIndex: ARMOR_ENUM.Kite_Shield, material: ARMOR_MATERIAL.Iron }],
     armors: [armo], bodyPool, female,
   });
-  // 1. A PRT_Shield ref naming an MT_Armor body: the body's model wins.
+  // 1. A shield part reference naming an armour body part: the body's model wins.
   const viaBody = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: 'b_shield_arm', female: null }] });
   assert.equal(viaBody.adds.length, 1);
   assert.equal(viaBody.adds[0].model, 'a/sh.nif');
   assert.deepEqual(viaBody.adds[0].bones, ['shield bone']);
-  // 2. NO shield ref at all: the GROUND MODEL - the reference's own
-  //    fallback (`return shield.getClass().getCorrectedModel(shield)`).
+  // 2. No shield reference at all: the item's own ground model.
   const viaGround = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false, parts: [] });
   assert.equal(viaGround.adds.length, 1);
   assert.equal(viaGround.adds[0].model, 'g/ground.nif');
   assert.match(viaGround.adds[0].slot, /ground mesh/, 'and the row says so');
-  // 3. THE HARD GATE: a NAMED body that is missing, or not MT_Armor,
-  //    answers EMPTY - the slot reserves INVISIBLE by law, never the
-  //    ground mesh (getShieldMesh returns an empty path there).
+  // 3. The hard gate: a named body part that is missing, or is not an armour
+  //    part, hides the shield - the slot is held empty, never given the
+  //    ground mesh.
   const missing = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: 'b_gone', female: null }] });
   assert.equal(missing.adds.length, 0, 'missing body: reserved empty, NOT the ground fallback');
-  assert.ok(missing.notes.some((n) => /reserves EMPTY/.test(n)));
+  assert.ok(missing.notes.some((n) => /held empty/.test(n)));
   const wrongKind = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: 'b_shield_cloth', female: null }] });
   assert.equal(wrongKind.adds.length, 0, 'a non-armor body part is the same refusal');
-  // 4. THE SEXED PICK has NO male-to-female fallback (`female &&
-  //    !mFemale.empty() ? mFemale : mMale`): a male facing a female-only
-  //    ref has NO name, and an unnamed ref walks on to the ground.
+  // 4. The sexed pick has no male-to-female fallback: a man facing a
+  //    female-only reference has no name, and an unnamed reference walks on
+  //    to the ground.
   const femOnly = { id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: null, female: 'b_shield_f' }] };
   assert.equal(worn(femOnly, false).adds[0].model, 'g/ground.nif', 'a man ignores the female-only ref');

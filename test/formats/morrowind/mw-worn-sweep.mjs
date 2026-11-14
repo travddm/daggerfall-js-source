@@ -123,18 +123,18 @@ const SKIN_SLOTS = [
 const SKIN_ROWS = SKIN_SLOTS.map((slot) => ({ slot, bones: [`left ${slot}`, `right ${slot}`], model: `${slot}.nif` }));
 
 /** Every answer about one composition under one dressing, as one value. */
-function answerFor(modules, records, pieces, options) {
+function answerFor(modules, records, pieces, options, restate) {
   const args = { pieces, armors: records.armors, clothes: records.clothes, bodyPool: records.bodies, ...options };
   const worn = modules.composeWornArmor(args);
-  return {
+  return restate({
     worn,
     firstPerson: modules.fpWornAdds(worn.adds),
     skin: modules.shadowSkinRows(SKIN_ROWS, worn.shadows),
-  };
+  });
 }
 
 /** The digests of every composition under every dressing: [composition][dressing]. */
-export function recordCompositions(modules, records, compositions) {
+export function recordCompositions(modules, records, compositions, restate = (value) => value) {
   const dressings = [];
   for (const female of [false, true]) {
     BEAST_SETS.forEach((beast, index) =>
@@ -142,7 +142,7 @@ export function recordCompositions(modules, records, compositions) {
     );
   }
   return compositions.map((pieces) =>
-    dressings.map((options) => digestOf(answerFor(modules, records, pieces, options))),
+    dressings.map((options) => digestOf(answerFor(modules, records, pieces, options, restate))),
   );
 }
 
