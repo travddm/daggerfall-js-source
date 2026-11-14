@@ -86,8 +86,10 @@ test('DA9: Steam - every library in libraryfolders.vdf, at the installdir app 18
   try {
     const root = path.join(home, '.local', 'share', 'Steam');
     const lib2 = path.join(home, 'drive2', 'SteamLibrary');
+    // Valve writes a path's backslashes escaped (a Windows path has them).
+    const vdfPath = (p) => p.split('\\').join('\\\\');
     write(path.join(root, 'steamapps', 'libraryfolders.vdf'),
-      `"libraryfolders"\n{\n\t"0"\n\t{\n\t\t"path"\t\t"${root}"\n\t}\n\t"1"\n\t{\n\t\t"path"\t\t"${lib2}"\n\t}\n}\n`);
+      `"libraryfolders"\n{\n\t"0"\n\t{\n\t\t"path"\t\t"${vdfPath(root)}"\n\t}\n\t"1"\n\t{\n\t\t"path"\t\t"${vdfPath(lib2)}"\n\t}\n}\n`);
     const manifest = '"AppState"\n{\n\t"appid"\t\t"1812390"\n\t"installdir"\t\t"The Elder Scrolls Daggerfall"\n}\n';
     // the main library holds one copy - and ~/.steam/steam is a LINK to it, so it is reachable twice
     write(path.join(root, 'steamapps', `appmanifest_${STEAM_APP_ID}.acf`), manifest);

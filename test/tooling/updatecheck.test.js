@@ -8,10 +8,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 const { parseReleaseTag, parseVersion, isNewerRelease } = require('../../app/lib/updateCheck.cjs');
-const root = path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 test('DA6/REL1/REL3: the release\'s number is ONE variable - the tag and the stamp both read it, and the committed version is only the base', () => {
   // THE NAG THIS FILE EXISTS TO PREVENT: app-v0.1.3 was cut from a

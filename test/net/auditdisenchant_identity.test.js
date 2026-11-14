@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-const root = resolve(process.env.DFO_REPO ?? new URL('../../', import.meta.url).pathname);
+import { fileURLToPath, pathToFileURL } from 'node:url';
+const root = resolve(process.env.DFO_REPO ?? fileURLToPath(new URL('../../', import.meta.url)));
 const { createProfBook } = await import(pathToFileURL(resolve(root, 'src/net/profBook.js')));
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 function fixture({ answer, sleep = async () => {} } = {}) {

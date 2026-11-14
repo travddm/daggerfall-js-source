@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const ROOT = new URL('../../', import.meta.url);
 const YML = readFileSync(new URL('.github/workflows/account-deploy.yml', ROOT), 'utf8');
@@ -71,9 +72,13 @@ curl() {
   printf '%s' "\${a%% *}"
 }
 sleep() { :; }
-${smokeToRenown().replace(/^base=.*$/m, `base=${SERVICE}`).replaceAll('/tmp/', `${dir}/`)}
+${smokeToRenown().replace(/^base=.*$/m, `base=${SERVICE}`).replaceAll('/tmp/', `${dir.split('\\').join('/')}/`)}
 echo ${REACHED}`;
-  const r = spawnSync('bash', ['-c', script], { cwd: ROOT.pathname, env: { PATH: process.env.PATH, CALLS: calls, LEGAL_TERMS: 't', LEGAL_PRIVACY: 'p' }, encoding: 'utf8' });
+  // Run from a file, as the runner runs a step: on Windows a script passed through `-c` is re-split by the shell's
+  // command-line parser, which mangles its quotes.
+  const scriptFile = join(dir, 'smoke-script.sh');
+  writeFileSync(scriptFile, script);
+  const r = spawnSync('bash', [scriptFile], { cwd: fileURLToPath(ROOT), env: { PATH: process.env.PATH, CALLS: calls, LEGAL_TERMS: 't', LEGAL_PRIVACY: 'p' }, encoding: 'utf8' });
   const asked = readFileSync(calls, 'utf8').trim().split('\n').filter(Boolean);
   return { ok: r.status === 0 && r.stdout.includes(REACHED), out: r.stdout + r.stderr, asked };
 }
