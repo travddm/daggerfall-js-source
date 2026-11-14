@@ -33,6 +33,16 @@ const arena2At = (dir, names = REQUIRED_ARENA2) => {
 };
 const write = (p, text) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, text); };
 const noReg = () => [];
+/** Whether the temp folder's filesystem tells `a` from `A`; NTFS and APFS by default do not. */
+const caseSensitiveTmp = () => {
+  const dir = tmp();
+  try {
+    fs.writeFileSync(path.join(dir, 'a'), '');
+    return !fs.existsSync(path.join(dir, 'A'));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+};
 
 test('DA9: the shell\'s list IS the game\'s - one law for a whole ARENA2, on both sides of the bridge', () => {
   assert.deepEqual([...REQUIRED_ARENA2], [...GAME_REQUIRED], 'app/lib/arena2Detect.cjs and src/scenes/dataSource.js must name the same seven files');
@@ -221,7 +231,9 @@ test('L4-3/L4-10: on a Mac the privacy-guarded folders are read only when nothin
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
 
-test('L4-9: ARENA2 and arena2 side by side (Linux): whichever is whole is the one', () => {
+// Two folders that differ only in case can exist only on a case-sensitive filesystem.
+const sideBySide = caseSensitiveTmp() ? {} : { skip: 'the temp filesystem ignores case' };
+test('L4-9: ARENA2 and arena2 side by side (Linux): whichever is whole is the one', sideBySide, () => {
   const root = tmp();
   try {
     arena2At(path.join(root, 'install', 'arena2'), ['ART_PAL.COL']);

@@ -163,9 +163,12 @@ branch, and the tests `tools/testChanged.mjs` selects:
 
 1. The installed dependencies: every dev dependency is in this checkout's `node_modules` at the lockfile's version. A
    worktree linked to an install made for another branch stops here.
-2. The Node version: a warning, not a failure, when this machine's major version differs from the `node-version`
-   in `.github/workflows/verify.yml`. A different V8 can change what an allocation or timing test measures
-   (`test/tooling/allocchild.test.js` passes in CI on Node 22 and fails on a Windows machine with Node 24).
+2. The Node version of the tests: a warning, not a failure, when it differs from the `node-version` in
+   `.github/workflows/verify.yml`. A different V8 can change what an allocation or timing test measures
+   (`test/tooling/allocchild.test.js` passes on Node 22 and fails on Node 24). To match CI on a machine with a newer
+   Node, unpack CI's major from nodejs.org into a folder of its own and name its binary in `CI_NODE`:
+   `CI_NODE=<folder>/node.exe npm run pre-push`. Only the tests run on it; the other steps use the Node that started
+   the command. The step fails when the `CI_NODE` binary does not run.
 3. `npm run lint`, then `node tools/lintRatchet.mjs --strict`.
 4. `npm run types`, both passes.
 5. The formatting of added files, markdown, spelling and the references in added comments (`tools/check-changed.mjs`,

@@ -58,7 +58,11 @@ const mem = () => { const m = new Map(); return { get length() { return m.size; 
 // ── one clock for the page and the realm: the wall, moved on by the pins (the service reads Date.now) ──────────────────
 const realNow = Date.now;
 let skew = 0;
-Date.now = () => realNow() + skew;
+// The clock stands still between pins. The real wall moves while settle() waits on its 80 timers, and
+// where a timer tick is about 15 ms (Windows) one settle can take a second, enough to close a window
+// the pins hold open by a second.
+const frozenAt = realNow();
+Date.now = () => frozenAt + skew;
 test.after(() => { Date.now = realNow; });
 const later = (ms) => { skew += ms; };
 
@@ -127,6 +131,8 @@ const service = async () => (_svc ??= await standService());
  * false` - Ysolde alone, offline.
  */
 async function party({ model = MODELS.bloodline, online = true, ear = true } = {}) {
+  // A family id is minted from the clock with a fixed seed, so each party founds its line a millisecond on from the last.
+  later(1);
   _resetModSaveData();
   _resetModSettings();
   setModSetting(LEGACY_MOD, 'Family.Siblings Probability', 0);   // a house of one - the reporter's "There is no one left"

@@ -5,6 +5,7 @@
 //   npm run pre-push                    # every step
 //   npm run pre-push -- --full          # also run every far test here, however many
 //   npm run pre-push -- --base <ref>    # measure the changes against another ref
+//   CI_NODE=<path to node> npm run pre-push   # run the tests on that Node binary (CI's major)
 //
 // Steps: the installed dependencies, lint and its ratchet, both type passes, the formatting of added files, markdown,
 // spelling, the references in added comments, the shaders when one changed, and the tests tools/testChanged.mjs
@@ -71,6 +72,20 @@ export function ciNodeMajor(workflow: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
+/**
+ * The version step's verdict on the Node that runs the tests (`version`, as `node --version` prints it) against CI's
+ * major. A different V8 can change what a timing or allocation test measures. `fromCiNode` says that `CI_NODE` named
+ * the binary; `version` is null when that binary did not run.
+ */
+export function nodeVersionStep(ci: number | null, version: string | null, fromCiNode: boolean): StepResult {
+  if (version === null) return { outcome: 'failed', note: 'the Node binary CI_NODE names did not run' };
+  const major = Number(version.replace(/^v/, '').split('.')[0]);
+  const source = fromCiNode ? ' (CI_NODE)' : '';
+  if (ci === null || ci === major) return { outcome: 'passed', note: `tests run on Node ${version}${source}` };
+  const hint = fromCiNode ? '' : `; set CI_NODE to a Node ${ci} binary to match it`;
+  return { outcome: 'warned', note: `tests run on Node ${version}${source}, CI runs Node ${ci}${hint}` };
+}
+
 /** Whether a changed file is a shader stage or chunk that tools/glsl-check.ts compiles. */
 export function changesShaders(changed: readonly string[]): boolean {
   return changed.some((path) => /\.(vert|frag|glsl)$/.test(path) || path === 'tools/glsl-check.ts');
@@ -119,18 +134,16 @@ function main(argv: string[]): number {
   }
 
   const node = (script: string, ...args: string[]) => statusResult(run(process.execPath, [script, ...args]));
+  // Only the tests move to CI_NODE: lint, types and the other checks do not depend on the V8 version.
+  const testNode = process.env.CI_NODE || process.execPath;
   const steps: [string, () => StepResult][] = [
     [
       'node version',
       () => {
         const ci = ciNodeMajor(readFileSync(join(ROOT, '.github/workflows/verify.yml'), 'utf8'));
-        const here = Number(process.versions.node.split('.')[0]);
-        if (ci === null || ci === here) return { outcome: 'passed' };
-        // A different V8 can change what a timing or allocation test measures.
-        return {
-          outcome: 'warned',
-          note: `Node ${process.versions.node} here, CI runs Node ${ci}; results can differ`,
-        };
+        const printed = spawnSync(testNode, ['--version'], { encoding: 'utf8' });
+        const version = printed.status === 0 ? printed.stdout.trim() : null;
+        return nodeVersionStep(ci, version, testNode !== process.execPath);
       },
     ],
     ['lint', () => statusResult(npmRun('lint'))],
@@ -168,7 +181,7 @@ function main(argv: string[]): number {
         // As `npm run test:changed` does first: tests read the vendored mods' published files, which git does not hold.
         if (run('sh', ['tools/fetch-vendor.sh']) !== 0)
           return { outcome: 'failed', note: 'tools/fetch-vendor.sh failed' };
-        const status = runTests(files) as number;
+        const status = runTests(files, { node: testNode }) as number;
         const note = leftToCi > 0 ? `${leftToCi} far tests left to CI; --full runs them here` : undefined;
         return { ...statusResult(status), note };
       },

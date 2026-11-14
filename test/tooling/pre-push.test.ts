@@ -3,7 +3,14 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test, type TestContext } from 'node:test';
-import { FAR_TIER_SHARE, changesShaders, ciNodeMajor, installProblems, testsToRun } from '../../tools/pre-push.ts';
+import {
+  FAR_TIER_SHARE,
+  changesShaders,
+  ciNodeMajor,
+  installProblems,
+  nodeVersionStep,
+  testsToRun,
+} from '../../tools/pre-push.ts';
 
 function install(t: TestContext, installed: Record<string, string> | null): string {
   const root = mkdtempSync(join(tmpdir(), 'pre-push-'));
@@ -53,4 +60,18 @@ test("CI's Node major is read from the workflow", () => {
   assert.equal(ciNodeMajor('      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n'), 22);
   assert.equal(ciNodeMajor('node-version: "24"'), 24);
   assert.equal(ciNodeMajor('no setup here'), null);
+});
+
+test("the version step passes on CI's major, warns on another, and fails when CI_NODE does not run", () => {
+  assert.deepEqual(nodeVersionStep(22, 'v22.23.5', true), {
+    outcome: 'passed',
+    note: 'tests run on Node v22.23.5 (CI_NODE)',
+  });
+  assert.deepEqual(nodeVersionStep(22, 'v24.21.0', false), {
+    outcome: 'warned',
+    note: 'tests run on Node v24.21.0, CI runs Node 22; set CI_NODE to a Node 22 binary to match it',
+  });
+  assert.equal(nodeVersionStep(22, 'v24.21.0', true).outcome, 'warned');
+  assert.equal(nodeVersionStep(null, 'v24.21.0', false).outcome, 'passed');
+  assert.equal(nodeVersionStep(22, null, true).outcome, 'failed');
 });
