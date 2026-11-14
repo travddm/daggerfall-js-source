@@ -25,7 +25,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { DFU_ROOT, dfuFile, missingDfu } from '../dfuRoot.mjs';
 
@@ -69,7 +69,8 @@ test('PY1: the resolver is prepare.sh\'s own precedence - DFU_PATH, then the in-
     env: { ...process.env, DFU_PATH: '/tmp/__py1_probe_root' },
     encoding: 'utf8',
   }).trim();
-  assert.equal(out, 'file:///tmp/__py1_probe_root/',
+  // pathToFileURL puts the current drive in front of a rooted path on Windows: file:///E:/tmp/... there, file:///tmp/... elsewhere.
+  assert.equal(out, `${pathToFileURL('/tmp/__py1_probe_root').href}/`,
     'DFU_PATH must WIN over the in-tree clone, with the trailing slash supplied');
   // a trailing slash is load-bearing: `new URL('Assets/...', root)` against
   // a root with no trailing slash silently drops the last segment

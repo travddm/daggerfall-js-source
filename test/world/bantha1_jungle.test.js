@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import {
   JUNGLE_ARCHIVE, JUNGLE_SPECIES, JUNGLE_MEASURES, jungleFiles, jungleRecord, parseObj, parseMtl, measureTree,
@@ -520,7 +520,7 @@ test('AUDIT BANTHA1 HAZE-1: every program a module under src/render exports comp
   const bad = [];
   let n = 0;
   for (const f of walk(join(ROOT, 'src', 'render'))) {
-    const m = await import(f);
+    const m = await import(pathToFileURL(f).href);
     for (const [k, v] of Object.entries(m)) {
       if (typeof v !== 'string' || !v.includes('#version 300 es')) continue;
       const key = `${f.slice(join(ROOT, 'src').length + 1).split('\\').join('/')} ${k}`;

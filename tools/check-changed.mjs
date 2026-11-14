@@ -6,19 +6,19 @@
 //   node tools/check-changed.mjs format-fix     # Prettier --write
 //   node tools/check-changed.mjs markdown       # markdownlint-cli2
 //   node tools/check-changed.mjs spell          # cspell
-//   --base <ref>   # default: $BASE_REF, else origin/feat/tamriel-review
+//   --base <ref>   # default: $BASE_REF, else package.json's config.baseRef (tools/lib/base-ref.ts)
 //   --added        # only the files this branch adds, not the ones it modifies (CI's formatting check)
 //   --list         # print the files instead of running the check
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { baseRef } from './lib/base-ref.ts';
 import { batchPaths, pathsFor } from './lib/changed-paths.ts';
 import { isMain } from './lib/isMain.mjs';
 import { changedFiles } from './testChanged.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DEFAULT_BASE = 'origin/feat/tamriel-review';
 const ARGV_BUDGET = 24000;
 
 const MODES = {
@@ -54,8 +54,7 @@ function main(argv) {
     );
     return 2;
   }
-  const at = argv.indexOf('--base');
-  const base = at >= 0 ? argv[at + 1] : process.env.BASE_REF || DEFAULT_BASE;
+  const base = baseRef(argv, ROOT);
   const files = pathsFor(mode.checker, argv.includes('--added') ? addedFiles(base) : changedFiles(base, ROOT)).filter(
     (f) => existsSync(join(ROOT, f)),
   );

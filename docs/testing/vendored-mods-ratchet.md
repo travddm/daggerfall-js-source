@@ -19,8 +19,8 @@ locally and is reported. In CI (where `CI` is set) the test also fails on a fall
 the lint ratchet's `--strict` does: an unrecorded fall would leave room for the same number of new lines.
 
 `tools/testTimes.json` is never measured: it lists test files by path, and a refresh rewrites it without adding to any
-mod. `npm run test:changed` does not pick this test for most changes, because it selects by imports. Run
-`node tools/vendored-mods.ts` before a push.
+mod. The test lists the tree with `git ls-files`, so `npm run test:changed` and `npm run pre-push` run it for every
+change.
 
 ## Commands
 

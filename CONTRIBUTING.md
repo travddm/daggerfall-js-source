@@ -31,14 +31,13 @@ they live in [CLAUDE.md](CLAUDE.md) and in [.claude/rules/](.claude/rules/), and
 Before a push ([docs/testing/running-tests.md](docs/testing/running-tests.md)):
 
 ```bash
-npm run lint
-npm run types
-npm run test:changed
+npm run pre-push
 ```
 
-`npm run test:changed` runs the tests your change can reach. For the files you changed, also run
-`npm run format:check`, `npm run markdown` and `npm run spell`. CI runs lint, types, every test in eight shards and the
-build on every pull request. A pull request is done when that run is green on its head.
+It runs lint, both type passes, the formatting, markdown, spelling and comment checks on the files you changed,
+the tree-wide tests and the tests your change can reach, and its summary says what it left to CI. CI runs lint,
+types, every test in eight shards and the build on every pull request. A pull request is done when that run is green
+on its head.
 
 ## Open a pull request
 

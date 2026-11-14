@@ -3,7 +3,7 @@
 // says why, a message says what went wrong in words, and a reference belongs in the commit message and the pull
 // request description.
 //
-//   node tools/comment-refs.ts [--base <ref>]     # default: $BASE_REF, else origin/feat/tamriel-review
+//   node tools/comment-refs.ts [--base <ref>]     # default: $BASE_REF, else package.json's config.baseRef
 //
 // Two kinds of added line are checked:
 //   - a comment line: any decision, pull request, audit or item tag in it;
@@ -16,9 +16,9 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { parse, type Comment, type Node, type Options } from 'acorn';
+import { baseRef } from './lib/base-ref.ts';
 import { isMain } from './lib/isMain.mjs';
 
-const DEFAULT_BASE = 'origin/feat/tamriel-review';
 const SCRIPT_EXTENSIONS = ['.js', '.mjs', '.cjs', '.ts', '.mts', '.cts'];
 const TYPESCRIPT_EXTENSIONS = ['.ts', '.mts', '.cts'];
 const SKIPPED_PREFIXES = ['vendor/', 'node_modules/'];
@@ -279,8 +279,7 @@ export function checkAgainst(base: string, cwd = process.cwd()): Hit[] {
 }
 
 function main(argv: string[]): number {
-  const at = argv.indexOf('--base');
-  const base = at >= 0 ? argv[at + 1] : process.env.BASE_REF || DEFAULT_BASE;
+  const base = baseRef(argv, process.cwd());
   const hits = checkAgainst(base);
   if (hits.length === 0) {
     console.log(`comment-refs: no added comment cites a decision, pull request or item tag (base ${base})`);

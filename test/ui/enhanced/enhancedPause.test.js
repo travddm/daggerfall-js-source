@@ -21,6 +21,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join, dirname, resolve, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
@@ -29,7 +30,7 @@ import { _resetForTests } from '../../../src/systems/uiPrefs.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 import { remainWords } from '../../../src/ui/quest/questRail.js';   // PX22: the words, pinned by what they say (AUDIT OW-REVISITED L5-6)
 
-const root = new URL('../../../', import.meta.url).pathname.replace(/\/$/, '');
+const root = fileURLToPath(new URL('../../../', import.meta.url)).replace(/[\\/]$/, '');
 const read = (p) => hostText(p);
 
 // uiSkin reads globalThis.location.search when it is given no string,
@@ -752,7 +753,7 @@ test('AUDIT UI 2: every enhanced window is REACHABLE from a host', () => {
     // INTRO4: and a worker - `new Worker(new URL('./x.js', import.meta.url))` is how Vite bundles one, so the module
     // it names is reached by the page that starts it (src/ui/intro/introBuildWorker.js, the first worker under src/ui/)
     edges[f] = [...new Set([...text[f].matchAll(/(?:from|import\(|new Worker\(new URL\()\s*['"](\.[^'"]+)['"]/g)]
-      .map((m) => relative(root, resolve(join(root, dirname(f)), m[1])))
+      .map((m) => relative(root, resolve(join(root, dirname(f)), m[1])).split('\\').join('/'))
       .filter((p) => text[p] !== undefined))];
   }
   // The roots are the hosts AND main.js: the cursor and the crash line

@@ -23,6 +23,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { buildPaperdollPayload } from '../../src/characters/paperdoll/paperdollPayload.js';
 import { ARGONIAN_HIDES, KHAJIIT_FURS, HUMAN_SKINS } from '../../src/characters/palettes.js';
 import eslintConfig from '../../eslint.config.js';
@@ -48,7 +49,7 @@ test('audit26 dupekeys: the configured rules actually fire', () => {
     let out;
     try {
       out = execFileSync('npx', ['eslint', '--stdin', '--stdin-filename', 'src/__audit26_fixture__.js', '--format', 'json'],
-        { cwd: new URL('../..', import.meta.url).pathname, input: src, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+        { cwd: fileURLToPath(new URL('../..', import.meta.url)), input: src, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     } catch (e) {
       // eslint exits non-zero when it reports errors; that is the normal path.
       if (e.stdout) out = e.stdout; else return null;
@@ -108,7 +109,7 @@ test('audit26 dupekeys: rdbLayout action doors carry exactly one position key', 
   // so the door's chain key is `position`. It was written twice in the same
   // literal with the same value - harmless, but the same defect shape.
   const src = execFileSync('node', ['-e', 'process.stdout.write(require("fs").readFileSync("src/world/rdbLayout.js","utf8"))'],
-    { cwd: new URL('../..', import.meta.url).pathname, encoding: 'utf8' });
+    { cwd: fileURLToPath(new URL('../..', import.meta.url)), encoding: 'utf8' });
   const block = src.slice(src.indexOf('actionDoors.push({'), src.indexOf('objectPositions.set', src.indexOf('actionDoors.push({')));
   const hits = block.match(/^\s*position:/gm) || [];
   assert.equal(hits.length, 1, `the actionDoors literal declares \`position\` ${hits.length} times`);
