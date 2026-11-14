@@ -163,15 +163,19 @@ branch, and the tests `tools/testChanged.mjs` selects:
 
 1. The installed dependencies: every dev dependency is in this checkout's `node_modules` at the lockfile's version. A
    worktree linked to an install made for another branch stops here.
-2. `npm run lint`, then `node tools/lintRatchet.mjs --strict`.
-3. `npm run types`, both passes.
-4. The formatting of added files, markdown, spelling and the references in added comments (`tools/check-changed.mjs`,
+2. The Node version: a warning, not a failure, when this machine's major version differs from the `node-version`
+   in `.github/workflows/verify.yml`. A different V8 can change what an allocation or timing test measures
+   (`test/tooling/allocchild.test.js` passes in CI on Node 22 and fails on a Windows machine with Node 24).
+3. `npm run lint`, then `node tools/lintRatchet.mjs --strict`.
+4. `npm run types`, both passes.
+5. The formatting of added files, markdown, spelling and the references in added comments (`tools/check-changed.mjs`,
    `tools/comment-refs.ts`).
-5. The shaders (`tools/glsl-check.ts`), when a shader file changed. Without `glslangValidator` installed, the step is
+6. The shaders (`tools/glsl-check.ts`), when a shader file changed. Without `glslangValidator` installed, the step is
    skipped and says so.
-6. The tests. The near tier always runs. The far tier runs too when the whole selection is at most a quarter of the
+7. The tests. The near tier always runs. The far tier runs too when the whole selection is at most a quarter of the
    suite (`FAR_TIER_SHARE`); a larger far tier is left to CI, and the summary says how many files. `--full` runs it
-   here. Several sessions share one machine, so a run of more than a quarter of the suite waits for a free slot.
+   here. The near tier has no cap: a change to a helper that many tests import directly can put a third of the suite
+   in it.
 
 Every step runs, and the summary lists each one's result and time. The exit status is 1 when a step failed. The
 command does not build; CI builds every pull request.

@@ -23,7 +23,7 @@ const ROOT = join(import.meta.dirname, '..');
 /** A test selection larger than this share of the suite runs only its near tier, unless `--full` is given. */
 export const FAR_TIER_SHARE = 0.25;
 
-export type Outcome = 'passed' | 'failed' | 'skipped';
+export type Outcome = 'passed' | 'failed' | 'skipped' | 'warned';
 
 export interface StepResult {
   outcome: Outcome;
@@ -63,6 +63,12 @@ export function installProblems(root: string): string[] {
     if (locked && installed !== locked) problems.push(`${name} is ${installed}, the lockfile wants ${locked}`);
   }
   return problems;
+}
+
+/** The Node major version CI's verify job runs (`node-version` in .github/workflows/verify.yml), or null. */
+export function ciNodeMajor(workflow: string): number | null {
+  const match = /node-version:\s*["']?(\d+)/.exec(workflow);
+  return match ? Number(match[1]) : null;
 }
 
 /** Whether a changed file is a shader stage or chunk that tools/glsl-check.ts compiles. */
@@ -114,6 +120,19 @@ function main(argv: string[]): number {
 
   const node = (script: string, ...args: string[]) => statusResult(run(process.execPath, [script, ...args]));
   const steps: [string, () => StepResult][] = [
+    [
+      'node version',
+      () => {
+        const ci = ciNodeMajor(readFileSync(join(ROOT, '.github/workflows/verify.yml'), 'utf8'));
+        const here = Number(process.versions.node.split('.')[0]);
+        if (ci === null || ci === here) return { outcome: 'passed' };
+        // A different V8 can change what a timing or allocation test measures.
+        return {
+          outcome: 'warned',
+          note: `Node ${process.versions.node} here, CI runs Node ${ci}; results can differ`,
+        };
+      },
+    ],
     ['lint', () => statusResult(npmRun('lint'))],
     ['lint ratchet is current', () => node('tools/lintRatchet.mjs', '--strict')],
     ['types (both passes)', () => statusResult(npmRun('types'))],

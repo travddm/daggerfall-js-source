@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test, type TestContext } from 'node:test';
-import { FAR_TIER_SHARE, changesShaders, installProblems, testsToRun } from '../../tools/pre-push.ts';
+import { FAR_TIER_SHARE, changesShaders, ciNodeMajor, installProblems, testsToRun } from '../../tools/pre-push.ts';
 
 function install(t: TestContext, installed: Record<string, string> | null): string {
   const root = mkdtempSync(join(tmpdir(), 'pre-push-'));
@@ -47,4 +47,10 @@ test('the far tier runs here when the whole selection is small, or with --full',
   assert.deepEqual(large.files, ['a', 'b']);
   assert.equal(large.leftToCi, small);
   assert.equal(testsToRun(['a', 'b'], Array(small).fill('f'), suite, true).files.length, small + 2);
+});
+
+test("CI's Node major is read from the workflow", () => {
+  assert.equal(ciNodeMajor('      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n'), 22);
+  assert.equal(ciNodeMajor('node-version: "24"'), 24);
+  assert.equal(ciNodeMajor('no setup here'), null);
 });
