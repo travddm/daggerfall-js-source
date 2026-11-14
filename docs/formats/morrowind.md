@@ -23,10 +23,10 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   108), each rewrite held to the old module's answers by a parity test.
   - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
     `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`,
-    `mw-bone-rules.ts`, `mw-clip-law.ts`, `mwParticles.js` with `mw-particle-sim.ts`, the rest of `mwFirstPerson.js`
-    and the arm rig's modules in `src/combat/fpArm/`.
+    `mw-bone-rules.ts`, `mw-clip-law.ts`, `mwParticles.js` with `mw-particle-sim.ts`, `mwItemMap.js` with `mw-worn-parts.ts`,
+    the rest of `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
   - Still OpenMW-derived: `mwKeys.js` (`tcbTangents`), `mwNifMesh.js`
-    (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
+    (`resolveMaterial`), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
     `mwSpellFx.js`, `mwVfx.js`, and outside this folder `src/systems/weaponSheathing.js`. `src/combat/fpArm.js`,
     `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`) only quote OpenMW in comments.
 
@@ -72,7 +72,7 @@ An async read must store its result in the cache generation it started under.
 | `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view, and the vampire's and werewolf's heads; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
 | `mw-bone-rules.ts` | Which bones belong to a blend mask, and which mesh shapes belong to a bone. |
 | `mwWeaponAnim.js`, `mwAnimSources.js` | Which animation group a weapon type plays and the text keys that time a swing; which `.kf` files an actor plays from. |
-| `mwItemMap.js` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. |
+| `mwItemMap.js`, `mw-worn-parts.ts` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. The worn body: the armour and clothing part table, which skin each part hides, the reserve lists of robes and skirts, the priority law, and the shield and part-group ladders. |
 | `mwFaceMatch.js` | Pairs Daggerfall portraits with Morrowind heads and hairs. |
 | `mwCloakFit.js`, `mwPartClock.js` | Cloak fitting and parts that animate on their own clock (for example an arrow on a bow). |
 | `mwParticles.js`, `mw-particle-sim.ts`, `mwSpellFx.js`, `mwVfx.js` | NIF particle systems (torch flames: the descriptors read from a file, and the running simulation), which Morrowind effect visuals a Daggerfall spell uses, and running an effect mesh (`scenes/mwMagicFx.js`). |

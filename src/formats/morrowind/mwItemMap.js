@@ -57,12 +57,16 @@ import { t } from '../../systems/textManager.js';   // the notes in the player's
 import { ARMOR_MATERIAL } from '../../systems/armorMaterials.js';
 import { ARMOR_ENUM } from '../../combat/enemyEquipment.js';
 import templates from '../../characters/itemTemplates.json' with { type: 'json' };
+import { ARMO_PART, RESERVES, SHIELD_PART, garmentPriority, layerRank, shieldMeshOf, partGroupPicks as pickPartGroups } from './mw-worn-parts.ts';   // the part table and the small rules of a worn body
+
+// The part table and the reserve lists live in mw-worn-parts.ts; callers keep importing them from here.
+export { ARMO_PART, RESERVES };
 
 /** ARMOR_ENUM.Helm, held as its own name because the composer's
  *  helmet-hides-hair rule keys on it. */
 const HELM_TEMPLATE = ARMOR_ENUM.Helm;
 
-/** MW's CLOT types (loadclot.hpp). Gloves and jewellery exist in the
+/** MW's CLOT types (the CLDT type byte). Gloves and jewellery exist in the
  *  enum and have no Daggerfall garment, so no row maps to them. */
 export const MW_CLOTHING_TYPE = Object.freeze({
   Pants: 0, Shoes: 1, Shirt: 2, Belt: 3, Robe: 4,
@@ -76,7 +80,7 @@ export const CLOTHING_NAME = Object.freeze(Object.fromEntries(
   templates.filter((t) => t.index >= 141 && t.index <= 216).map((t) => [t.index, t.name])));
 
 /** DF garment name -> the MW CLOT type it resolves against, plus the
- *  reference slot behaviour it triggers. JUDGEMENT ROWS, recorded:
+ *  slot behaviour it triggers. JUDGEMENT ROWS, recorded:
  *  - CLOAKS wear MW ROBES. Morrowind has no cloak; a robe is the one
  *    garment that drapes, and a cloak kept as a sprite would leave
  *    the most visible garment in the game undressed.
@@ -87,8 +91,8 @@ export const CLOTHING_NAME = Object.freeze(Object.fromEntries(
  *  - SASH wears a belt, and retail belts carry no worn part
  *    references - the composer will say so and the sprite stands,
  *    which is the honest outcome for a garment MW does not draw.
- *  `reserve` marks the reference's slot law: robes reserve eleven
- *  part slots, skirts three (npcanimation.cpp:635-650). */
+ *  `reserve` marks the slot law (RESERVES): robes occupy eleven
+ *  part slots, skirts three. */
 export const DF_CLOTHING_ROWS = Object.freeze({
   'Straps': { type: MW_CLOTHING_TYPE.Shirt }, 'Challenger Straps': { type: MW_CLOTHING_TYPE.Shirt },
   'Champion Straps': { type: MW_CLOTHING_TYPE.Shirt }, 'Armbands': { type: MW_CLOTHING_TYPE.Shirt },
@@ -124,14 +128,7 @@ export const DF_CLOTHING_ROWS = Object.freeze({
   'Day Gown': { type: MW_CLOTHING_TYPE.Robe, reserve: 'robe' },
 });
 
-/** The reference's reserve lists (npcanimation.cpp:635-650), by PRT
- *  index: a robe occupies eleven slots, a skirt three - hiding the
- *  skin AND any lower-priority garment there, refs or no refs. */
-export const RESERVES = Object.freeze({
-  robe: [4, 5, 21, 22, 13, 14, 19, 20, 11, 12, 3],
-  skirt: [4, 21, 22],
-});
-import { DF_TO_MW_WEAPON, DF_TO_MW_MATERIAL, ARM_PARTS, MOD_WEAPON_TO_MW } from './mwFirstPerson.js';   // ARM_PARTS, addPartGroup's first-person fallback parts; a mod's weapons
+import { DF_TO_MW_WEAPON, DF_TO_MW_MATERIAL, ARM_PARTS, MOD_WEAPON_TO_MW } from './mwFirstPerson.js';   // ARM_PARTS, the parts the first person falls back to a plain body part for; a mod's weapons
 import { drawnPiece } from '../../net/appearanceLaw.js';   // APPEARANCES: a worn piece's look
 
 /** DF armor material -> the token MW armor record ids carry. */
@@ -245,8 +242,8 @@ export const CLOTH_PICK_BAND = Object.freeze([1.5, 32]);
 export function mwClothingRecord(clothes, name, { dye = null, colourOf = null, tier = null, pick = null } = {}) {
   const row = DF_CLOTHING_ROWS[name];
   if (!row) return { record: null, row: null, note: `"${name}" is not a garment row` };
-  // Never the werewolf's robe - its parts are the wolf's body, not a garment (OpenMW hides it from the
-  // inventory, class.cpp), and a dark Daggerfall robe measured nearest its fur would have dressed a person in it.
+  // Never the werewolf's robe - its parts are the wolf's body, not a garment (Morrowind keeps it out of the
+  // inventory), and a dark Daggerfall robe measured nearest its fur would have dressed a person in it.
   // and never a record with no ground mesh - the reader keeps one for its parts (the robe may carry no MODL),
   // and a garment the item icon cannot draw is none of a Daggerfall item's
   let pool = (clothes ?? []).filter((c) => c.type === row.type && !c.enchanted && c.id !== WEREWOLF_ROBE_ID && c.model)
@@ -501,47 +498,6 @@ export function mwItemReport(armorRecords, { weapons = null, clothes = null, col
 
 // ═══ WORN ARMOR - the consumer ══════════════════════════════
 
-/** The ARMO/CLOT INDX enum - 27 SIDED entries (loadarmo.hpp's
- *  PartReferenceType), and NOT the 15-entry unsided BYDT enum the
- *  BODY records use. Confusing the two is this slice's byte-eight
- *  trap, so the table is written out whole: base slot, side, and the
- *  skeleton bone the reference hangs on (npcanimation's part list;
- *  PART_BONES already carries these exact spellings for the unsided
- *  pairs). `shadows` names the SKIN slot the piece hides - a pauldron
- *  and a skirt shadow nothing; they layer over clavicle and groin
- *  skin the way the reference layers them. Weapon (25) is not a row:
- *  the weapon door owns that bone.
- */
-export const ARMO_PART = Object.freeze([
-  { name: 'head', bones: ['head'], shadows: 'head' },
-  { name: 'hair', bones: ['head'], shadows: 'hair' },
-  { name: 'neck', bones: ['neck'], shadows: 'neck' },
-  { name: 'cuirass', bones: ['chest'], shadows: 'chest' },
-  { name: 'groin', bones: ['groin'], shadows: 'groin' },
-  { name: 'skirt', bones: ['groin'], shadows: null },
-  { name: 'right hand', bones: ['right hand'], shadows: 'hand:right' },
-  { name: 'left hand', bones: ['left hand'], shadows: 'hand:left' },
-  { name: 'right wrist', bones: ['right wrist'], shadows: 'wrist:right' },
-  { name: 'left wrist', bones: ['left wrist'], shadows: 'wrist:left' },
-  { name: 'shield', bones: ['shield bone'], shadows: null },
-  { name: 'right forearm', bones: ['right forearm'], shadows: 'forearm:right' },
-  { name: 'left forearm', bones: ['left forearm'], shadows: 'forearm:left' },
-  { name: 'right upper arm', bones: ['right upper arm'], shadows: 'upperarm:right' },
-  { name: 'left upper arm', bones: ['left upper arm'], shadows: 'upperarm:left' },
-  { name: 'right foot', bones: ['right foot'], shadows: 'foot:right' },
-  { name: 'left foot', bones: ['left foot'], shadows: 'foot:left' },
-  { name: 'right ankle', bones: ['right ankle'], shadows: 'ankle:right' },
-  { name: 'left ankle', bones: ['left ankle'], shadows: 'ankle:left' },
-  { name: 'right knee', bones: ['right knee'], shadows: 'knee:right' },
-  { name: 'left knee', bones: ['left knee'], shadows: 'knee:left' },
-  { name: 'right upper leg', bones: ['right upper leg'], shadows: 'upperleg:right' },
-  { name: 'left upper leg', bones: ['left upper leg'], shadows: 'upperleg:left' },
-  { name: 'right pauldron', bones: ['right clavicle'], shadows: null },
-  { name: 'left pauldron', bones: ['left clavicle'], shadows: null },
-  { name: 'weapon', bones: [], shadows: null },
-  { name: 'tail', bones: ['tail'], shadows: 'tail' },
-]);
-
 /** DF's whole worn readout: armor from its seven slots plus shields
  *  from the hands (a weapon there is the weapon door's business), and
  *  GARMENTS from the clothing slots - chest, legs, feet, and the two
@@ -596,19 +552,12 @@ export function composeWornArmor({ pieces, armors, clothes, bodyPool, female = f
   const notes = [];
   const wear = beast ? beastWear : null;
   const bodyById = new Map((bodyPool ?? []).map((b) => [String(b.id || '').toLowerCase(), b]));
-  // ── THE PRIORITY LAW (Audit 30's recording, now consumed) ────────
-  // Every PRT slot is an arbitration: the skin holds it at priority 1,
-  // a garment claims it at ((base+1)<<1) + (armor ? 1 : 0) - so armor
-  // beats clothing at the same base, a robe's base of 11 beats a
-  // cuirass's 0, and a skirt's 3 beats pants. The gate is STRICTLY
-  // GREATER (addOrReplaceIndividualPart, npcanimation.cpp:771;
-  // reserveIndividualPart, :746) - a tie keeps the FIRST claimant,
-  // which is why the robe's own refs survive the robe's reserve of
-  // the same slots at the same priority, and why the pieces walk in
-  // the reference's slotlist order (:590-604, robe first). A robe or
-  // a skirt RESERVES its slot list at its priority - occupation
-  // without a mesh - hiding the skin and any lesser garment there,
-  // refs or no refs.
+  // The priority law (garmentPriority, mw-worn-parts.ts): every part slot is an arbitration. The skin holds it at
+  // priority 1 and a garment claims it at its own priority. The gate is strictly greater, so a tie keeps the first
+  // claimant: that is why the robe's own part references survive the robe's reserve of the same slots at the same
+  // priority, and why the pieces are walked outermost layer first (layerRank), the robe first. A robe or a skirt
+  // reserves its slot list at its priority - occupation without a mesh - hiding the skin and any lesser garment
+  // there, whether or not it has a part reference for the slot.
   // `under` - the part a `hides` occupation lies under (an own model's), so the first person, which draws
   // only the arm-bone parts (fpWornAdds), keeps the skin a part it does not draw would hide (`fpShadows`, below)
   const slots = Array.from({ length: ARMO_PART.length }, () => ({ prio: 1, add: null, shadow: false, under: null }));
@@ -633,25 +582,24 @@ export function composeWornArmor({ pieces, armors, clothes, bodyPool, female = f
       // (fpArm.js wornVerdicts), so it stands outside the player's language as every label does; the rest is theirs
       if (!o) { notes.push(`outfit ${piece.id}: ${t('body.outfit.unknown', 'no outfit the port carries')}`); continue; }
       if (outfitAdd) { notes.push(`outfit ${o.id}: ${t('body.outfit.second', 'a second outfit - the first ({first}) is the one drawn', { first: outfitAdd.recordId })}`); continue; }
-      const prio = ((0 + 1) << 1) + 0;
+      const prio = garmentPriority(null, false);
       outfitAdd = { slot: `outfit (${o.id})`, partName: 'outfit', bones: [], model: o.model, recordId: o.id, piece, hides: o.hides };
       for (const h of o.hides) claim(ARMO_PART.findIndex((r) => r.name === h), prio, null, outfitAdd);
       for (const c of o.covers) covers.add(c);
       continue;
     }
-    // A CLOT RECORD HANDED IN WHOLE - the one garment no Daggerfall item names, the werewolf's robe
-    // (MechanicsManager::setWerewolf equips "werewolfrobe" in Slot_Robe, mechanicsmanagerimp.cpp:1896-1901). It is
-    // claimed exactly as a named garment is: clothing's priority at its reserve's base, and the reserve beside it.
+    // A CLOT record handed in whole - the one garment no Daggerfall item names, the werewolf's robe (the game
+    // equips "werewolfrobe" in the robe slot when the player turns into a werewolf). It is claimed exactly as a
+    // named garment is: clothing's priority at its reserve's base, and the reserve beside it.
     if (piece.kind === 'record') {
-      const base = piece.reserve === 'robe' ? 11 : piece.reserve === 'skirt' ? 3 : 0;
-      const prio = ((base + 1) << 1) + 0;
-      // ADDPARTGROUP'S OWN LADDER, the one the first person takes (firstPersonPartGroup) - a woman's CNAM
-      // falls back to the BNAM, a man never wears a CNAM, and a reference nothing answers HOLDS its slot empty
-      // (reserveIndividualPart): the robe's head held so is WerewolfHead's gate, as it is OpenMW's. composeRefs'
-      // never-traps reading is a Daggerfall garment's, where a skin stands under every miss; the wolf has no skin.
+      const prio = garmentPriority(piece.reserve, false);
+      // The part-group ladder, the one the first person takes (firstPersonPartGroup): a woman's female id falls back
+      // to the male one, a man never reads the female one, and a reference nothing answers holds its slot empty.
+      // So the robe's head, held empty, is what gates the werewolf's head. composeRefs' never-traps reading is a
+      // Daggerfall garment's, where a skin stands under every miss; the wolf has no skin.
       for (const { ref, row, body } of partGroupPicks(piece.record, bodyById, female, false)) {
         if (!body) {
-          notes.push(`${piece.record.id}: ${row.name} wants "${(female && ref.female) || ref.male || ref.female || '(none)'}" and no BODY record answers it - the slot is held empty (reserveIndividualPart)`);
+          notes.push(`${piece.record.id}: ${row.name} wants "${(female && ref.female) || ref.male || ref.female || '(none)'}" and no BODY record answers it - the slot is held empty`);
           claim(ref.part, prio, null);
           continue;
         }
@@ -677,13 +625,12 @@ export function composeWornArmor({ pieces, armors, clothes, bodyPool, female = f
       const cut = wear ? beastCut(res.record, wear) : null;
       if (cut?.refused) { notes.push(`${name}: ${beastRefusal(cut.refused, res.record.id)}`); continue; }
       if (cut?.bared) notes.push(`${name}: ${beastBared(res.record.id)}`);
-      const base = res.row.reserve === 'robe' ? 11 : res.row.reserve === 'skirt' ? 3 : 0;
-      const prio = ((base + 1) << 1) + 0;
+      const prio = garmentPriority(res.row.reserve, false);
       composeRefs(cut?.rec ?? res.record, prio, female, bodyById, claim, notes, piece);
       for (const part of RESERVES[res.row.reserve] ?? []) claim(part, prio, null);
       continue;
     }
-    const prio = ((0 + 1) << 1) + 1;
+    const prio = garmentPriority(null, true);
     // Helmets hidden - any helm-shaped piece (a mod's helmet too), an own model's or a record's, before
     // either is resolved, so it hides no hair either
     if (wear?.helm === 'hidden' && armorRowOf(piece.templateIndex) === DF_ARMOR_ROWS[HELM_TEMPLATE]) { notes.push(`armor ${piece.templateIndex}: ${beastNoHelm()}`); continue; }
@@ -708,7 +655,7 @@ export function composeWornArmor({ pieces, armors, clothes, bodyPool, female = f
         const add = { slot: `${row.name} (${own.id})`, partName: row.name, bones: row.bones, model: p.model, recordId: own.id, piece,
           ...(own.skinFrom ? { skinFrom: own.skinFrom, fitTo: own.fitTo ?? null } : {}) };   // skinned from the body under it; fitted onto the part it hides. A model shipped skinned (the steel plate) carries neither - its mesh is bound as a retail part's is
         claim(at, prio, add);
-        // What the part covers beyond its own slot is OCCUPIED with no mesh (reserveIndividualPart), so its
+        // What the part covers beyond its own slot is occupied with no mesh, so its
         // skin is not drawn under the plate - at the armour's priority, the law's own gate. Under that part
         for (const h of p.hides ?? []) claim(ARMO_PART.findIndex((r) => r.name === h), prio, null, add);
       }
@@ -719,28 +666,20 @@ export function composeWornArmor({ pieces, armors, clothes, bodyPool, female = f
     // A refused helm is not worn, so it hides no hair either - the cut comes before the rule below
     const refused = wear ? res.records.map((r) => ({ id: r.id, why: beastCut(r, wear).refused })).find((r) => r.why) : null;
     if (refused) { notes.push(`armor ${piece.templateIndex}: ${beastRefusal(refused.why, refused.id)}`); continue; }
-    // A HELMET HIDES THE HAIR - an engine rule, not a
-    // part reference (npcanimation.cpp:615), prior to the refs.
+    // A helmet hides the hair: a rule of the figure, not a part reference, applied before the references.
     if (armorRowOf(piece.templateIndex) === DF_ARMOR_ROWS[HELM_TEMPLATE]) hairHidden = Math.max(hairHidden, prio);   // any helm-shaped piece (a mod's helmet)
-    // A SHIELD is the
-    // one worn piece whose ladder ends at the item's own GROUND MESH -
-    // getShieldMesh (actoranimation.cpp:108-139) tries the PRT_Shield
-    // body part first (the sexed pick with NO male-to-female fallback
-    // for men, and a HARD gate: a named body that is missing or not
-    // MT_Armor answers EMPTY and the slot is reserved INVISIBLE), and
-    // only a record with no usable shield ref falls back to
-    // `shield.getClass().getCorrectedModel(shield)` - the ARMO's MODL.
-    // The generic refusal below ("the ground mesh is not a body") is
-    // right for every other slot and was exactly why no shield ever
-    // landed.
+    // A shield is the one worn piece whose ladder ends at the item's own ground mesh (shieldMeshOf): the shield body
+    // part is tried first, and only a record with no usable shield reference falls back to the ARMO's own model.
+    // The refusal below ("the ground mesh is not a body") is right for every other slot, and would keep every
+    // shield off the figure.
     const isShield = piece.templateIndex >= ARMOR_ENUM.Buckler && piece.templateIndex <= ARMOR_ENUM.Tower_Shield;
     for (const armo of res.records) {
       if (isShield) {
         const mesh = shieldMeshOf(armo, female, bodyById, notes);
-        if (mesh === null) { claim(PRT_SHIELD, prio, null); continue; }
-        claim(PRT_SHIELD, prio, {
-          slot: `shield (${armo.id})${mesh.ground ? ' - ground mesh, the reference\'s own fallback' : ''}`,
-          bones: ARMO_PART[PRT_SHIELD].bones, model: mesh.model, recordId: mesh.recordId, piece,
+        if (mesh === null) { claim(SHIELD_PART, prio, null); continue; }
+        claim(SHIELD_PART, prio, {
+          slot: `shield (${armo.id})${mesh.ground ? ' - ground mesh, no shield body part named' : ''}`,
+          bones: ARMO_PART[SHIELD_PART].bones, model: mesh.model, recordId: mesh.recordId, piece,
         });
         continue;
       }
@@ -784,13 +723,10 @@ export function composeWornModest(args, show) {
   return composeWornArmor({ ...args, pieces: [...(args.pieces ?? []), MODESTY_SHIRT] });
 }
 
-/** PRT_Shield's row index in ARMO_PART (the sided 27-enum). */
-const PRT_SHIELD = 10;
-
 /** WHAT A BEAST RACE (the RACE record's Beast flag) WEARS ON ITS FEET AND HEAD - the viewer's two switches
  *  (systems/features.js, prefs `mwBeastFeet` and `mwBeastHelm`), read by the caller as the Steel Helm's is. Morrowind
- *  refuses the whole item: Armor::canBeEquipped and Clothing::canBeEquipped (apps/openmw/mwclass/armor.cpp,
- *  clothing.cpp) answer "cannot equip" for a Beast race when any part reference is PRT_Head, PRT_LFoot or PRT_RFoot.
+ *  refuses the whole item: a Beast race cannot equip an armour or clothing record that has a head, left foot or right
+ *  foot part reference.
  *  Daggerfall equips every piece on every race, so the switches choose what the figure draws of it:
  *  - footwear: 'worn' draws it as on anyone (the default); 'shafts' drops a record's two FEET and draws the rest - a
  *    boot's ankle pieces over the beast's own foot, a shoe nothing: the judgement of Beast Boots MWSE (Adrala,
@@ -821,33 +757,6 @@ function beastCut(rec, wear) {
 }
 const beastRefusal = (refused, id) => (refused === 'helm' ? beastRefused(id) : beastNoFootwear(id));
 
-/**
- * getShieldMesh (actoranimation.cpp:108-139), verbatim shape:
- * walk the ARMO's refs for PRT_Shield; the sexed name is
- * `female && mFemale ? mFemale : mMale` (no male-to-female fallback);
- * a NAMED body that is missing or not MT_Armor returns EMPTY - the
- * caller reserves the slot and the shield is invisible BY LAW
- * (showCarriedLeft, npcanimation.cpp:1016-1037); a named armor body
- * with a model wins; and a record with no usable shield ref wears the
- * item's own ground model. @returns {model, recordId, ground?} | null
- * for the reserve case.
- */
-function shieldMeshOf(armo, female, bodyById, notes) {
-  for (const ref of armo.parts ?? []) {
-    if (ref.part !== PRT_SHIELD) continue;
-    const id = female && ref.female ? ref.female : ref.male;
-    if (!id) continue;
-    const body = bodyById.get(id);
-    if (!body || body.bodyKind !== 2) {
-      notes.push(`${armo.id}: shield body "${id}" ${!body ? 'is in no BODY record' : 'is not armor-kind'} - `
-        + 'the slot reserves EMPTY (getShieldMesh\'s own refusal)');
-      return null;
-    }
-    if (body.model) return { model: body.model, recordId: id };
-  }
-  return { model: armo.model, recordId: null, ground: true };
-}
-
 /** One record's part references, claimed at one priority. */
 function composeRefs(rec, prio, female, bodyById, claim, notes, piece = null) {
   for (const ref of rec.parts ?? []) {
@@ -859,9 +768,8 @@ function composeRefs(rec, prio, female, bodyById, claim, notes, piece = null) {
     const body = bodyById.get(id);
     if (!body) { notes.push(`${rec.id}: ${row.name} wants "${id}" and no BODY record carries it`); continue; }
     // `slot` names the record for the notes; `partName` is the part's own
-    // identity, which is what the binder's rules key on - the reference
-    // tests the part TYPE (npcanimation.cpp:799-801's PRT_Hair filter),
-    // never a display string.
+    // identity, which is what the binder's rules key on (the hair part is
+    // found by it), never a display string.
     claim(ref.part, prio, {
       slot: `${row.name} (${rec.id})`, partName: row.name,
       bones: row.bones, model: body.model, recordId: id, piece,
@@ -869,35 +777,31 @@ function composeRefs(rec, prio, female, bodyById, claim, notes, piece = null) {
   }
 }
 
-/** The reference's slotlist order (npcanimation.cpp:590-604), as a
- *  rank: robe, skirt, helm, cuirass, greaves, pauldrons, boots,
- *  gauntlets, shirt, pants, carried. Ties in priority go to the LATER
- *  rank, which this sort makes true by walking earlier ranks first. */
+/** The rank of a piece among the layers of a figure (layerRank): a tie in priority goes to the earlier rank, which
+ *  this sort makes true by walking the earlier ranks first. */
 function wornOrder(piece) {
-  if (piece.kind === 'outfit') return 0;   // a whole outfit, first as a robe is
-  if (piece.kind === 'record') return piece.reserve === 'robe' ? 0 : piece.reserve === 'skirt' ? 1 : 11;
+  if (piece.kind === 'outfit') return layerRank('robe');   // a whole outfit, first as a robe is
+  if (piece.kind === 'record') return layerRank(piece.reserve === 'robe' ? 'robe' : piece.reserve === 'skirt' ? 'skirt' : 'clothing');
   if (piece.kind === 'clothing') {
     const row = DF_CLOTHING_ROWS[piece.name ?? CLOTHING_NAME[piece.templateIndex]];
-    if (row?.reserve === 'robe') return 0;
-    if (row?.reserve === 'skirt') return 1;
-    if (row?.type === MW_CLOTHING_TYPE.Shirt) return 10;
-    return 11;                                   // pants, shoes, belts
+    if (row?.reserve === 'robe') return layerRank('robe');
+    if (row?.reserve === 'skirt') return layerRank('skirt');
+    if (row?.type === MW_CLOTHING_TYPE.Shirt) return layerRank('shirt');
+    return layerRank('clothing');                // pants, shoes, belts
   }
   const t = piece.templateIndex;
-  if (t === ARMOR_ENUM.Helm) return 2;
-  if (t === ARMOR_ENUM.Cuirass) return 3;
-  if (t === ARMOR_ENUM.Greaves) return 4;
-  if (t === ARMOR_ENUM.Left_Pauldron) return 5;
-  if (t === ARMOR_ENUM.Right_Pauldron) return 6;
-  if (t === ARMOR_ENUM.Boots) return 7;
-  if (t === ARMOR_ENUM.Gauntlets) return 8;
-  return 12;                                     // shields, the carried pair
+  if (t === ARMOR_ENUM.Helm) return layerRank('helm');
+  if (t === ARMOR_ENUM.Cuirass) return layerRank('cuirass');
+  if (t === ARMOR_ENUM.Greaves) return layerRank('greaves');
+  if (t === ARMOR_ENUM.Left_Pauldron) return layerRank('left pauldron');
+  if (t === ARMOR_ENUM.Right_Pauldron) return layerRank('right pauldron');
+  if (t === ARMOR_ENUM.Boots) return layerRank('boots');
+  if (t === ARMOR_ENUM.Gauntlets) return layerRank('gauntlets');
+  return layerRank('carried');                   // shields, the carried pair
 }
 
-/** THE WEREWOLF'S ROBE - the CLOT record "werewolfrobe"
- *  (mechanicsmanagerimp.cpp:1899), whose part references ARE the werewolf's
- *  body: getBodyParts answers nothing for one (npcanimation.cpp:1200-1203)
- *  and the wolf skeleton's own geometry is stripped (CleanObjectRootVisitor).
+/** THE WEREWOLF'S ROBE - the CLOT record "werewolfrobe", whose part references ARE the werewolf's body: no body part
+ *  of a race stands in for one, and the wolf skeleton's own geometry is not drawn.
  *  Bloodmoon.esm carries it; the last .esm to carry one wins (load order). */
 export const WEREWOLF_ROBE_ID = 'werewolfrobe';
 export function werewolfRobeOf(clothes) {
@@ -906,43 +810,15 @@ export function werewolfRobeOf(clothes) {
   return robe;
 }
 
-/** The four parts addPartGroup lets fall back from a missing `.1st` record
- *  to the plain one in first person (npcanimation.cpp:887-890). */
+/** The parts the first person draws: a missing `.1st` body part falls back to the plain record for these. */
 const FP_FALLBACK_PARTS = new Set(ARM_PARTS);
 
-/**
- * ADDPARTGROUP'S LADDER
- * (npcanimation.cpp:873-921) over one record's part references. Per
- * reference: a woman's CNAM - with ".1st" in first person, and there, failing
- * that, the plain record only if its part is a hand, wrist, forearm or upper
- * arm - then the BNAM the same way; a man's CNAM is never read. The record
- * found (with a model), or null: a reference nothing answers RESERVES its
- * slot (reserveIndividualPart).
- * @returns {Array<{ref: object, row: object, body: object|null}>}
- */
-function partGroupPicks(rec, bodyById, female, firstPerson) {
-  const ext = firstPerson ? '.1st' : '';
-  const pick = (id) => {
-    if (!id) return null;
-    const found = bodyById.get(`${id}${ext}`);
-    if (found) return found;
-    if (!firstPerson) return null;
-    const plain = bodyById.get(id);
-    return plain && FP_FALLBACK_PARTS.has(plain.slot) ? plain : null;
-  };
-  const out = [];
-  for (const ref of rec?.parts ?? []) {
-    const row = ARMO_PART[ref.part];
-    if (!row || row.name === 'weapon') continue;
-    const body = (female && ref.female ? pick(ref.female) : null) ?? pick(ref.male);
-    out.push({ ref, row, body: body && body.model ? body : null });
-  }
-  return out;
-}
+/** The part-group ladder over one record's part references (mw-worn-parts.ts partGroupPicks). */
+const partGroupPicks = (rec, bodyById, female, firstPerson) => pickPartGroups(rec, bodyById, female, firstPerson, FP_FALLBACK_PARTS);
 
 /**
  * ONE RECORD'S PARTS IN FIRST PERSON, for the werewolf's robe -
- * addPartGroup's ladder (partGroupPicks). A reference nothing answers is
+ * the part-group ladder (partGroupPicks). A reference nothing answers is
  * RESERVED: the slot is held with no mesh. The first claimant of a slot keeps
  * it (the strictly-greater gate at one priority).
  * @returns {{adds: object[], reserved: number[]}}
@@ -961,11 +837,10 @@ export function firstPersonPartGroup(rec, bodyPool, female = false) {
   return { adds, reserved };
 }
 
-/** WHAT THE FIRST PERSON WEARS. The reference shows the fp
- *  camera your gauntlets, your sleeves, and your shield - the body
- *  itself it hides with the neck-scale trick, so a helmet or a
- *  cuirass never floats in your face. The port has no body in fp at
- *  all, so the same picture falls out of a FILTER: worn adds pass
+/** WHAT THE FIRST PERSON WEARS. The first-person camera shows your
+ *  gauntlets, your sleeves, and your shield - never a helmet or a
+ *  cuirass floating in your face. The port has no body in fp at
+ *  all, so the picture falls out of a FILTER: worn adds pass
  *  into the fp build only on the arm-family bones and the shield
  *  bone. Everything else is the third person's business. */
 const FP_WORN_BONES = new Set([
