@@ -23,8 +23,9 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   108), each rewrite held to the old module's answers by a parity test.
   - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
     `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`,
-    `mw-bone-rules.ts`, the rest of `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
-  - Still OpenMW-derived: `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`), `mwNifMesh.js`
+    `mw-bone-rules.ts`, `mw-clip-law.ts`, the rest of `mwFirstPerson.js` and the arm rig's modules in
+    `src/combat/fpArm/`.
+  - Still OpenMW-derived: `mwKeys.js` (`tcbTangents`), `mwNifMesh.js`
     (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`, `mwParticles.js`,
     `mwSpellFx.js`, `mwVfx.js`, and outside this folder `src/systems/weaponSheathing.js`. `src/combat/fpArm.js`,
     `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`) only quote OpenMW in comments.
@@ -65,6 +66,7 @@ An async read must store its result in the cache generation it started under.
 | `mwDdsFile.js`, `mwTexture.js`, `mwTextureClient.js`, `mwTextureWorker.js` | DDS decode (DXT1/3/5, uncompressed masks) and the texture path rule; decoding runs in a worker pool. |
 | `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling. |
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
+| `mw-clip-law.ts` | The rules that read a list of text keys: normalise it, find a group's time range, play a clip through it, a movement clip's speed, and which groups loop. `mwAnim.js` re-exports them. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
 | `mwFirstPerson.js` | The first-person rules, the record extraction, and the diagnostics. |
 | `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view, and the vampire's and werewolf's heads; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |

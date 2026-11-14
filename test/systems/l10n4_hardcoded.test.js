@@ -53,7 +53,6 @@ const HARDCODED = {
   'src/formats/hmiFile.js': 17,
   'src/formats/imgFile.js': 1,
   'src/formats/mapsTables.js': 25,
-  'src/formats/morrowind/mwAnim.js': 11,
   'src/formats/morrowind/mwAnimSources.js': 1,
   'src/formats/morrowind/mwFaceMatch.js': 6,
   'src/formats/morrowind/mwFirstPerson.js': 62,
