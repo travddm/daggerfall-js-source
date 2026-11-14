@@ -29,6 +29,7 @@ processes that run one after another (`WIN32_ARGV_BUDGET`). Elsewhere it uses on
 
 | Command | What it runs |
 | --- | --- |
+| `npm run pre-push` | The checks a pull request's CI runs, on this branch's changes (`tools/pre-push.ts`, [Before a push](#before-a-push)). |
 | `npm test` | The whole suite: `node tools/testShards.mjs 1/1`. |
 | `npm run test:changed` | Only the test files a change can affect (`tools/testChanged.mjs`, below). |
 | `node tools/testShards.mjs 3/8` | Shard 3 of 8, as CI runs it. |
@@ -36,7 +37,7 @@ processes that run one after another (`WIN32_ARGV_BUDGET`). Elsewhere it uses on
 | `node tools/testShards.mjs --plan 8` | File count and recorded seconds for each of 8 shards. |
 | `node --import ./tools/raw-import-hooks.ts --test test/ui/chatscroll.test.js` | One file, directly. The `--import` lets Node load a shader file imported with `?raw`; without it, a test that reaches such a module fails with `ERR_UNKNOWN_FILE_EXTENSION`. The tools above add it for you. |
 | `npm run lint` | ESLint over `src/`, `server/src/`, `server-account/src/`, `test/`, `tools/`, `scripts/`, `app/` and the root `*.config.js`. It keeps a content-keyed cache in `node_modules/.cache/eslint/`. |
-| `npm run types` | `tsc -p tsconfig.json`. `checkJs` is off: only `src/` files with `// @ts-check` on their first line are reported. `test/systems/save/hard3_types.test.js` decides which files must opt in. |
+| `npm run types` | Two passes. `tsc -p tsconfig.json`: `checkJs` is off, so only `src/` files with `// @ts-check` on their first line are reported; `test/systems/save/hard3_types.test.js` decides which files must opt in. `tsc -p tsconfig.node.json`: the `.ts` files under `tools/` and `test/`, with Node's types. The second pass needs `@types/node` in this checkout's own `node_modules`. |
 | `npm run build` | `vite build` into `dist/`. |
 | `npm run check` | Lint, types, the whole suite and the build, in series. Slow; use it only when CI cannot run. |
 
@@ -57,22 +58,41 @@ is true:
    depth of modules (`closureOf`).
 3. The test file's text contains a changed file's path or its base name. This catches tests that read source files
    as text. Matching by base name can pick too many files, never too few.
+4. The test, or a file it imports, lists a folder that a changed file lies in (`tools/lib/test-scans.ts`). This catches
+   tests that find their files by listing a folder instead of importing them.
+
+Rule 4 knows a file's folders in three ways:
+
+- A comment line declares them: `// test:changed scans: src/ server/src/`. `.` is the whole tree. `none` says that the
+  file lists nothing in the tree, for a walk of a temporary folder.
+- A file with no declaration that walks folders recursively (`recursive: true`, `git ls-files`, or a function that
+  lists a folder and calls itself) scans the whole tree. Every tree-wide sweep, such as
+  `test/tree/typescript-no-any.test.ts`, therefore runs for every change. About 125 files are in that set.
+- A file that calls a listing function and names a changed file's folder lists that folder, when the folder is at
+  least two levels deep (`server-account/migrations`, which `test/accountDb.mjs` lists). A file that builds the
+  folder's path from parts needs a declaration.
 
 A change to `package.json`, `package-lock.json` or `tsconfig.json` runs the whole suite (`EVERYTHING`).
 
-"Changed" means: the diff from the merge base with `origin/main` (else `HEAD`), plus staged, unstaged and untracked
-files. Options:
+"Changed" means: the diff from the merge base with the base ref, plus staged, unstaged and untracked files. A rename
+counts as its old path and its new path. The base ref is `--base <ref>`, else `$BASE_REF`, else `config.baseRef` in
+`package.json` (`tools/lib/base-ref.ts`). `tools/check-changed.mjs` and `tools/comment-refs.ts` read the same base.
+When git cannot diff against the base (a ref that was never fetched), the tool stops with an error. A stacked pull
+request whose base is another branch passes `--base`; the default only adds the other branch's changes, so it selects
+more tests, never fewer.
 
 - `--list` prints the chosen files and runs nothing.
-- `--base <rev>` compares against another commit.
+- `--base <ref>` compares against another ref.
+- Any other argument, except the runner's own `--test-*` flags, is refused.
 
-Pull requests on this fork target `feat/tamriel-review`, not `main`, so the default base picks too many files. Pass the
-merge base with the branch the pull request targets:
-`node tools/testChanged.mjs --base $(git merge-base HEAD origin/feat/tamriel-review)`. The tool's default is not fixed
-yet.
+The chosen tests fall into two tiers (`selectTests`):
 
-When a change touches a module that most tests import (a scene host such as `src/scenes/world.js`), the tool picks
-most of the suite. In that case run the change's own test files and let CI run the rest.
+- **Near**: the test changed, imports a changed file itself, names one, or lists a changed file's folder (itself or
+  through a helper outside `src/`).
+- **Far**: the test reaches a changed file only through other modules. A hub module sits in most tests' imports
+  (`src/systems/features.js` in about 3,400), so an edit there puts most of the suite in the far tier.
+
+`npm run test:changed` runs both tiers. `npm run pre-push` runs the far tier only when it is small (below).
 
 ## Shards and recorded times
 
@@ -138,6 +158,23 @@ server are case-insensitive; the test harness reads the folder literally.
 
 ## Before a push
 
-1. `npm run lint` and `npm run types`.
-2. `npm run test:changed` (or the change's own files when it picks most of the suite).
-3. Push and let CI run the whole gate. A pull request is not done until `check` is green on its head commit.
+Run `npm run pre-push` (`tools/pre-push.ts`). It runs the checks of CI's `static` job and `standards` job on this
+branch, and the tests `tools/testChanged.mjs` selects:
+
+1. The installed dependencies: every dev dependency is in this checkout's `node_modules` at the lockfile's version. A
+   worktree linked to an install made for another branch stops here.
+2. `npm run lint`, then `node tools/lintRatchet.mjs --strict`.
+3. `npm run types`, both passes.
+4. The formatting of added files, markdown, spelling and the references in added comments (`tools/check-changed.mjs`,
+   `tools/comment-refs.ts`).
+5. The shaders (`tools/glsl-check.ts`), when a shader file changed. Without `glslangValidator` installed, the step is
+   skipped and says so.
+6. The tests. The near tier always runs. The far tier runs too when the whole selection is at most a quarter of the
+   suite (`FAR_TIER_SHARE`); a larger far tier is left to CI, and the summary says how many files. `--full` runs it
+   here. Several sessions share one machine, so a run of more than a quarter of the suite waits for a free slot.
+
+Every step runs, and the summary lists each one's result and time. The exit status is 1 when a step failed. The
+command does not build; CI builds every pull request.
+
+Push and let CI run the whole gate. A pull request is not done until `check` is green on its head commit. CI tests the
+merge of the branch into its base, so merge the base in when it has moved.
