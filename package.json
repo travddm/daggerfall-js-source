@@ -3,6 +3,9 @@
   "private": true,
   "license": "MIT",
   "version": "0.0.1",
+  "config": {
+    "baseRef": "origin/feat/tamriel-review"
+  },
   "type": "module",
   "engines": {
     "node": ">=22.18.0"
@@ -23,6 +26,7 @@
     "pretest:shard": "sh tools/fetch-vendor.sh",
     "test:shard": "node tools/testShards.mjs",
     "test:times": "node tools/testTimes.mjs",
+    "pre-push": "node tools/pre-push.ts",
     "types": "tsc -p tsconfig.json && tsc -p tsconfig.node.json",
     "format:check": "node tools/check-changed.mjs format-check",
     "format:fix": "node tools/check-changed.mjs format-fix",
