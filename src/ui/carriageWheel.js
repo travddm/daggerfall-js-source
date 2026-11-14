@@ -25,3 +25,4 @@ export function wheelPath(ctx, x, y, r) {
   ctx.moveTo(x + r * 0.3, y);
   ctx.arc(x, y, r * 0.3, 0, Math.PI * 2);
 }
+// A line for a CI check of the light run. The pull request that adds it is closed, never merged.
