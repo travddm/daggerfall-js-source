@@ -4,7 +4,8 @@ name: check
 #
 # - The full verification (verify.yml: lint and types, every test in eight shards, the build), then test-times.yml.
 #   It runs when the pull request is ready for review: on `ready_for_review` with no new push too, and on every push
-#   to a ready pull request. A draft gets it with the full-ci label (full-ci.yml) or when it changes a platform path.
+#   to a ready pull request. A draft gets it with the full-ci label or when it changes a platform path. full-ci.yml
+#   re-runs the last run when the label is added, so its `check` lands on the pull request as every other one does.
 # - The light run on a draft (verify-light.yml: lint and types, the near tier of the tests on two runners).
 #
 # `check` is the status a merge waits on. It passes only when the full verification ran and passed, so a light run
@@ -15,23 +16,21 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
-    inputs:
-      pr:
-        description: The pull request this run verifies (full-ci.yml sets it), so it shares that pull request's concurrency group.
-        type: string
-        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: check-${{ github.event.pull_request.number || inputs.pr || github.ref }}
+  group: check-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   plan:
     name: full or light
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    permissions:
+      contents: read
+      pull-requests: read   # the draft state and the labels, read when the job runs
     outputs:
       full: ${{ steps.plan.outputs.full }}
     steps:
@@ -47,8 +46,9 @@ jobs:
         run: node tools/ci-plan.ts
         env:
           EVENT: ${{ github.event_name }}
-          DRAFT: ${{ github.event.pull_request.draft }}
-          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
 
   verify:
     needs: plan

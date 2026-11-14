@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { FULL_LABEL, parseLabels, planRun } from '../../tools/ci-plan.ts';
+import { FULL_LABEL, planRun, pullRequestState } from '../../tools/ci-plan.ts';
 import { nearShard } from '../../tools/test-near.ts';
 
 const draft = { event: 'pull_request', draft: true, labels: [] as string[] };
@@ -51,11 +51,11 @@ test('a platform path makes a draft full and names the files', () => {
   ]);
 });
 
-test('the labels arrive as JSON, and an event without them has none', () => {
-  assert.deepEqual(parseLabels('["full-ci","docs"]'), ['full-ci', 'docs']);
-  assert.deepEqual(parseLabels(''), []);
-  assert.deepEqual(parseLabels(undefined), []);
-  assert.deepEqual(parseLabels('null'), []);
+test("the draft state and the label names are read from the API's pull request", () => {
+  const body = { draft: true, labels: [{ id: 1, name: 'full-ci' }, { id: 2, name: 'docs' }, { id: 3 }], title: 'x' };
+  assert.deepEqual(pullRequestState(body), { draft: true, labels: ['full-ci', 'docs'] });
+  assert.deepEqual(pullRequestState({ draft: false }), { draft: false, labels: [] });
+  assert.deepEqual(pullRequestState(null), { draft: false, labels: [] });
 });
 
 test('the near tier splits into shards that hold every file once', () => {

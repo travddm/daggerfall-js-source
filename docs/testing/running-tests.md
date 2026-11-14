@@ -145,8 +145,8 @@ stay with its branch; the times saved by `deploy.yml` on `main` are visible to e
 Windows and CI's Linux can disagree, or that the light run does not build: `.github/`, a `package.json` or
 `package-lock.json`, `app/`, `selfhost/`, `tools/`, `scripts/`, the shared helpers `test/*.mjs`, `vite.config.js`
 and `tsconfig*.json`. For any other change with a platform risk (path or file handling, a filesystem's case rules),
-add the `full-ci` label. `full-ci.yml` starts `check.yml` and `probes.yml` on the branch at once, and every later
-push to the draft gets the full run while the label stays.
+add the `full-ci` label. `full-ci.yml` re-runs the pull request's last `check.yml` and `probes.yml` runs, whose
+`plan` reads the labels when it runs, and every later push to the draft gets the full run while the label stays.
 
 The pull request check job `check` runs with `if: always()` and passes only when `plan` chose the full run and
 `verify` succeeded. On a light run it fails and says so, so a light run never satisfies it; read the `light` jobs
