@@ -1,22 +1,12 @@
 // ---------------------------------------------------------------------------
-// MAC-Q - THE MORROWIND TORCH'S FLAME.
+// The Morrowind torch's flame: a NIF particle system, read out of the file and run.
 //
-// and, told this port had never drawn a
-// Morrowind particle system and that one could not be verified in a
-// container with no Morrowind data, "Please take care of the morrowind
-// torch flame." His call. So the particle system is PORTED, law by law, from
-// the reference that OpenMW runs it with (components/nifosg/particle.cpp,
-// nifloader.cpp's handleParticleSystem and its two helpers, osgParticle's
-// Particle::update and the quad it draws), and pinned here against the
-// reference's own numbers rather than against a file nobody here can open.
-//
-// The flattener hands particle geometries to a sink (mwNifMesh.js), the
-// descriptor and the running system are formats/morrowind/mwParticles.js, a part's
-// systems ride the assembly beside its pieces (mwCharacter.js bindPart,
-// mwFirstPerson.js bindPartsInto), the arm steps and places them each frame
-// (fpArm.js stepRigEffects / effectPlacement), and the renderer draws them as
-// osgParticle's billboards after the body (render/renderer.js). What a node
-// test cannot reach - the pixels - is tools/macqFlameProbe.mjs's.
+// The flattener hands particle geometries to a sink (mwNifMesh.js), the descriptor and the running system are
+// formats/morrowind/mwParticles.js and mw-particle-sim.ts, a part's systems ride the assembly beside its pieces
+// (mwCharacter.js bindPart, mwFirstPerson.js bindPartsInto), the arm steps and places them each frame (fpArm.js
+// stepRigEffects / effectPlacement), and the renderer draws them as billboards after the body (render/renderer.js).
+// The rules are pinned here against numbers worked out from the format records, because no Morrowind file is needed
+// to run them. What a node test cannot reach - the pixels - is tools/macqFlameProbe.mjs's.
 // ---------------------------------------------------------------------------
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -78,7 +68,7 @@ test('MAC-Q: the flattener hands a particle geometry to the sink, whole, and sti
   assert.equal(b.rec.name, 'Flame');
   assert.deepEqual(b.world.translation, [0, 0, 10], 'the composed transform, as a shape would get it');
   assert.equal(b.props.length, 3, 'and the property chain');
-  assert.equal(b.animFlags, 0x20 | 0x80, 'and the NiBSParticleNode’s flags (nifloader.cpp:786-787)');
+  assert.equal(b.animFlags, 0x20 | 0x80, 'and the NiBSParticleNode’s flags');
   // no sink is the port before this change: nothing at all
   assert.equal(flattenNif(nif).length, 0);
   // and the hidden flag gates it like a shape
@@ -116,7 +106,7 @@ test('MAC-Q: the descriptor - controller, emitter frame, modifiers, colliders, m
   assert.equal(d.material.srcBlend, 6); assert.equal(d.material.dstBlend, 0);
   assert.equal(d.data.numParticles, 8);
 
-  // NO ACTIVE CONTROLLER IS NO SYSTEM (nifloader.cpp:1470-1474)
+  // A geometry with no active controller is no system
   const inert = torchNif({ ctrl: { flags: 0 } });
   assert.deepEqual(particleSystemsOf(inert), []);
   // the walk's own helper answers the emitter's world for ANY node
@@ -134,16 +124,16 @@ test('MAC-Q: NiAlphaProperty’s blend function and NiZBufferProperty’s flags 
   // defaults: a file with neither property draws opaque, tested and written
   const bare = resolveMaterial(nif, []);
   assert.equal(bare.alphaBlend, false); assert.equal(bare.depthTest, true); assert.equal(bare.depthWrite, true);
-  // the reference's table, one for one, with its own fallback
+  // the blend function names, one for one, with a fallback
   assert.deepEqual([...NIF_BLEND_MODES], ['ONE', 'ZERO', 'SRC_COLOR', 'ONE_MINUS_SRC_COLOR', 'DST_COLOR', 'ONE_MINUS_DST_COLOR',
     'SRC_ALPHA', 'ONE_MINUS_SRC_ALPHA', 'DST_ALPHA', 'ONE_MINUS_DST_ALPHA', 'SRC_ALPHA_SATURATE']);
-  assert.equal(nifBlendMode(42), 'SRC_ALPHA', 'getBlendMode’s default (nifloader.cpp:1926-1928)');
+  assert.equal(nifBlendMode(42), 'SRC_ALPHA', 'an unknown function falls back to SRC_ALPHA');
   const st = particleDrawState(m);
   assert.equal(st.blend, true); assert.equal(st.srcBlend, 6); assert.equal(st.dstBlend, 0); assert.equal(st.depthWrite, false);
   assert.equal(st.emissive, true, 'LightMode_Emissive: the flame is its own light');
 });
 
-// ---- the laws, each against the reference's numbers ------------------------
+// ---- the rules, each against worked numbers --------------------------------
 
 test('MAC-Q: ControllerFunction::calculate - inside the window as is, Cycle wraps, Reverse pendulums, Constant clamps', () => {
   const c = { frequency: 1, phase: 0, startTime: 1, stopTime: 3 };
@@ -163,7 +153,7 @@ test('MAC-Q: interpKey - before the first key, past the last, linear between, Co
   assert.ok(nearVec(interpColorKey(keys, 0.25), [0.75, 0.75, 0.75, 0.25]));
   assert.deepEqual(interpColorKey(keys, 0.4, 5), [1, 1, 1, 0], 'Constant: the low key below the half');
   assert.deepEqual(interpColorKey(keys, 0.6, 5), [0, 0, 0, 1], 'and the high one above it');
-  assert.deepEqual(interpColorKey([], 0.5), [1, 1, 1, 1], 'no keys is the affector’s default (particle.cpp:257)');
+  assert.deepEqual(interpColorKey([], 0.5), [1, 1, 1, 1], 'no keys is opaque white');
   const quad = [{ time: 0, value: [0, 0, 0, 0], outTan: [1, 1, 1, 1] }, { time: 1, value: [1, 1, 1, 1], inTan: [1, 1, 1, 1] }];
   // f(0.5) = a*b1 + b*b2 + outTan*b3 + inTan*b4 with b1=b2=0.5, b3=0.125, b4=-0.125
   assert.ok(nearVec(interpColorKey(quad, 0.5, 2), [0.5, 0.5, 0.5, 0.5]));
@@ -176,7 +166,7 @@ test('MAC-Q: ParticleShooter - the direction is Quat(vdir, Y) * Quat(hdir, Z) on
   const [d] = particleSystemsOf(torchNif({ ctrl: { speed: 10, speedVariation: 4, lifetime: 2, lifetimeVariation: 1, declination: 0.3, planarAngle: 0.7 } }));
   const at = (r) => { const ps = createParticleSystem(d, { rolls: () => r }); ps.update(1, 0); return ps.particles[0]; };
   const lo = at(0), hi = at(1);
-  assert.ok(near(Math.hypot(...lo.vel), 8), 'speed - variation/2 at the low die (particle.cpp:212, :1386)');
+  assert.ok(near(Math.hypot(...lo.vel), 8), 'speed - variation/2 at the low die');
   assert.ok(near(Math.hypot(...hi.vel), 12), 'speed + variation/2 at the high one');
   assert.ok(near(lo.life, 2) && near(hi.life, 3), 'lifetime + variation * die (:216-217)');
   const dir = shootDirection(0.7, 0.3);
@@ -214,7 +204,7 @@ test('MAC-Q: Particle::update - judged before it ages, moved after; the emit win
   const p = ps.particles[0];
   assert.ok(nearVec(p.pos, [0, 0, 0.1]), 'born at the emitter, moved one step at 6/s');
   assert.ok(near(p.age, 1 / 60));
-  // x = age/life is judged BEFORE the age advances (Particle.cpp:70-79), and
+  // The ratio age/life is judged BEFORE the age advances, and
   // the test is STRICTLY past one: a particle whose age exactly reaches its
   // life is still alive that step and dies the one after. Driven on a
   // quarter-second step over a one-second life, whose ratio is exact in
@@ -228,7 +218,7 @@ test('MAC-Q: Particle::update - judged before it ages, moved after; the emit win
   ex.update(0.25, 0);
   assert.ok(!ex.particles.includes(q), 'x = 1.25 > 1: gone');
 
-  // THE EMIT WINDOW is the controller's own clock (nifosg/controller.cpp:594-604)
+  // The emit window is read off the controller's own clock
   const [w] = particleSystemsOf(torchNif({ ctrl: { useBirthRate: 1, birthRate: 60, emitStartTime: 1, emitStopTime: 2 } }));
   const win = createParticleSystem(w);
   win.update(1 / 60, 0.5); assert.equal(win.particles.length, 0, 'before the window: nothing');
@@ -254,7 +244,7 @@ test('MAC-Q: GrowFade and the colour ramp - off the DEFAULT size, the key’s rg
   ps.update(1 / 60, 0);
   const p = ps.particles[0];
   // operate runs BEFORE the age advances, so the first frame is age 0
-  assert.ok(near(p.size, 0), 'age 0 over a 0.5 grow is size 0 (particle.cpp:249-250)');
+  assert.ok(near(p.size, 0), 'age 0 over a 0.5 grow is size 0');
   assert.ok(nearVec(p.color, [1, 1, 1]) && near(p.alpha, 0), 'the first key: white, transparent');
   for (let i = 0; i < 30; i++) ps.update(1 / 60, 0);
   // age 30/60 = 0.5: fully grown (4), colour halfway, alpha 0.5
@@ -268,7 +258,7 @@ test('MAC-Q: GrowFade and the colour ramp - off the DEFAULT size, the key’s rg
 });
 
 test('MAC-Q: GravityAffector - wind along the direction, point toward the position, both times dt and the magic 1.6, decayed by distance', () => {
-  assert.equal(GRAVITY_MAGIC, 1.6, 'particle.cpp:316');
+  assert.equal(GRAVITY_MAGIC, 1.6, 'the tuning constant');
   const wind = (o) => particleSystemsOf(torchNif({
     ctrl: { useBirthRate: 1, birthRate: 60, speed: 0, speedVariation: 0, particleModifier: 9 },
     extra: [{ type: 'NiGravity', next: -1, controller: 4, decay: 0, force: 10, fieldType: 0, position: [0, 0, 0], direction: [0, 0, 1], ...o }],
@@ -306,7 +296,7 @@ test('MAC-Q: the affines compose, invert and orthonormalise', () => {
   const inv = affineInverse(m);
   assert.ok(nearVec(affineApply(inv, ...affineApply(m, 5, 6, 7)), [5, 6, 7]));
   assert.ok(near(affineScale(m), 2));
-  assert.ok(near(affineScale(affineOrthoNormalize(m)), 1), 'orthoNormalize divides the scale out (particle.cpp:548)');
+  assert.ok(near(affineScale(affineOrthoNormalize(m)), 1), 'orthoNormalize divides the scale out');
   assert.ok(nearVec(affineOrthoNormalize(m).t, [1, 2, 3]), 'and keeps the translation');
   assert.ok(nearVec(affineApply(affineMul(m, inv), 9, 9, 9), [9, 9, 9]), 'm * m^-1 is identity');
   assert.ok(nearVec(affineApply(AFFINE_IDENTITY, 1, 2, 3), [1, 2, 3]));

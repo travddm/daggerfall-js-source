@@ -60,7 +60,6 @@ const HARDCODED = {
   'src/formats/morrowind/mwItemMap.js': 26,
   'src/formats/morrowind/mwNifFile.js': 1,
   'src/formats/morrowind/mwNpc.js': 1,
-  'src/formats/morrowind/mwParticles.js': 1,
   'src/formats/morrowind/mwSkin.js': 1,
   'src/formats/morrowind/mwTextureClient.js': 1,
   'src/formats/morrowind/mwWeaponAnim.js': 4,
