@@ -520,7 +520,6 @@ const HARDCODED = {
   'src/systems/wagon/wagonUpkeep.js': 10,
   'src/systems/wagon/wagonWarden.js': 2,
   'src/systems/walletItem.js': 9,
-  'src/systems/weaponSheathing.js': 3,
   'src/systems/weaponSheathingAssets.js': 1,
   'src/systems/windfall.js': 23,
   'src/systems/windfallEffects.js': 7,
