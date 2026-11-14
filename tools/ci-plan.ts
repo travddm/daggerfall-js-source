@@ -3,10 +3,13 @@
 // machine's platform and CI's Linux can disagree. Every other run is full: a ready pull request, a push to one, a
 // manual or dispatched run.
 //
-//   node tools/ci-plan.ts    # reads EVENT, DRAFT and LABELS; on a draft, diffs HEAD^1 against HEAD
+//   node tools/ci-plan.ts    # reads EVENT, and PR, REPO and GITHUB_TOKEN on a pull request event
 //
-// In check.yml the checkout is the pull request's merge commit, so HEAD^1 is the base it merges into. The decision
-// goes to $GITHUB_OUTPUT as `full=true` or `full=false`, and its reasons to the log and the job summary.
+// On a pull request event it reads the draft state and the labels from the API, not from the event: full-ci.yml
+// re-runs the pull request's last run after the label is added, and a re-run carries the event it started with. On a
+// draft it diffs HEAD^1 against HEAD. The checkout is the pull request's merge commit, so HEAD^1 is the base it merges
+// into. The decision goes to $GITHUB_OUTPUT as `full=true` or `full=false`, and its reasons to the log and the job
+// summary.
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 import { isMain } from './lib/isMain.mjs';
@@ -60,17 +63,35 @@ export function planRun({ event, draft, labels, changed }: PlanInput): Plan {
   return { full: reasons.length > 0, reasons };
 }
 
-/** The labels as the workflow hands them (`toJSON` of the names), or none. */
-export function parseLabels(text: string | undefined): string[] {
-  if (!text) return [];
-  const parsed: unknown = JSON.parse(text);
-  return Array.isArray(parsed) ? parsed.filter((label): label is string => typeof label === 'string') : [];
+export interface PullRequestState {
+  draft: boolean;
+  labels: string[];
 }
 
-function main(): void {
+/** The draft state and label names of a pull request as the REST API answers it (`GET /repos/{repo}/pulls/{n}`). */
+export function pullRequestState(body: unknown): PullRequestState {
+  const pull = (body ?? {}) as { draft?: unknown; labels?: unknown };
+  const labels = Array.isArray(pull.labels) ? pull.labels : [];
+  return {
+    draft: pull.draft === true,
+    labels: labels
+      .map((label) => (label as { name?: unknown } | null)?.name)
+      .filter((name): name is string => typeof name === 'string'),
+  };
+}
+
+async function readPullRequest(): Promise<PullRequestState> {
+  const api = process.env.GITHUB_API_URL ?? 'https://api.github.com';
+  const response = await fetch(`${api}/repos/${process.env.REPO}/pulls/${process.env.PR}`, {
+    headers: { authorization: `Bearer ${process.env.GITHUB_TOKEN}`, accept: 'application/vnd.github+json' },
+  });
+  if (!response.ok) throw new Error(`the pull request did not load: HTTP ${response.status}`);
+  return pullRequestState(await response.json());
+}
+
+async function main(): Promise<void> {
   const event = process.env.EVENT ?? '';
-  const draft = process.env.DRAFT === 'true';
-  const labels = parseLabels(process.env.LABELS);
+  const { draft, labels } = event === 'pull_request' ? await readPullRequest() : { draft: false, labels: [] };
   const needsDiff = event === 'pull_request' && draft;
   const changed = needsDiff
     ? execFileSync('git', ['diff', '--name-only', '--no-renames', 'HEAD^1', 'HEAD'], { encoding: 'utf8' })
@@ -86,4 +107,4 @@ function main(): void {
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${text}\n`);
 }
 
-if (isMain(import.meta.url)) main();
+if (isMain(import.meta.url)) await main();

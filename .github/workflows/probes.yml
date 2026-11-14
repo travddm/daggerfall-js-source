@@ -10,7 +10,7 @@ name: probes
 # a probe that finds a bug in the game should not hide behind the suite's green. Chromium renders on SwiftShader here.
 #
 # On a draft they wait, as check.yml's full verification does (tools/ci-plan.ts): they run when the pull request is
-# marked ready, on every push to a ready pull request, and on a draft with the full-ci label (full-ci.yml starts them)
+# marked ready, on every push to a ready pull request, and on a draft with the full-ci label (full-ci.yml re-runs them)
 # or a change to a platform path.
 
 on:
@@ -58,6 +58,9 @@ jobs:
   plan:
     name: plan
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    permissions:
+      contents: read
+      pull-requests: read   # the draft state and the labels, read when the job runs
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
       run: ${{ steps.draft.outputs.full }}
@@ -74,8 +77,9 @@ jobs:
         run: node tools/ci-plan.ts
         env:
           EVENT: ${{ github.event_name }}
-          DRAFT: ${{ github.event.pull_request.draft }}
-          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
       - id: plan
         env:
           PROBE: ${{ inputs.probe }}
