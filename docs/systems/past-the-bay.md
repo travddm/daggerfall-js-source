@@ -38,6 +38,8 @@ Towns past the Bay get an outline, ground shaped to it, and round walls of their
 - `src/world/townOutline.js` turns the shape into outline cells (`outlineTownLocation`).
 - `src/world/townWalls.js` stands walls, towers and gates on the outline (`townWall`, `wallPieces`, `gatesOnStreets`),
   using Daggerfall's wall models 444 to 446. `src/world/townGates.js` finds gates for the gate roads.
+  A gate whose opening stands on a road tile is drawn without its floor face, so the road shows under the arch
+  (`src/world/city/gate-floor.ts`). With no road the gate is Daggerfall's model, floor face included.
 - A location made past the Bay (`isPortMadeLocation`) is stamped and flattened to its outline
   (`blendShapedTerrain`), not to Daggerfall Unity's rectangle.
 
