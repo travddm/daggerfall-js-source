@@ -29,10 +29,13 @@ written for a maintainer and for a server owner: there is no official live servi
 - **Before a push**: run `npm run pre-push`. It runs lint and its ratchet, both type passes, the doc and comment
   checks, the tree-wide tests and the tests the change can reach, and it says what it left to CI
   (`docs/testing/running-tests.md`, "Before a push"). A step that cannot run here fails or names its skip; fix the
-  checkout instead of skipping a step by hand. CI's `verify` runs lint, types, every test file in eight shards and
-  the build on every pull request, before every deploy and every release. A pull request is done when `verify` is
-  green on its head. A pull request that conflicts with its base runs no workflow, so merge the base in before the
-  push you want verified.
+  checkout instead of skipping a step by hand. On a draft, CI runs the light run: lint, types and the near tier on
+  Linux. CI's full `verify` (every test file in eight shards and the build) runs when a pull request is marked ready,
+  on every push to a ready one, before every deploy and every release, and on a draft that changes a platform path
+  or carries the `full-ci` label. Add that label to a draft whose change can behave differently on another platform
+  (`docs/testing/running-tests.md`, "Local, draft and ready"). A pull request is done when `check` is green on its
+  head; a light run never makes it green. A pull request that conflicts with its base runs no workflow, so merge the
+  base in before the push you want verified.
 - **Docs follow the code**: a change that makes a page in `docs/` wrong updates that page. Docs hold no history:
   git does.
 - **Patch notes describe, they do not tabulate**: say what a player notices (for the loot level gate, that Rare and

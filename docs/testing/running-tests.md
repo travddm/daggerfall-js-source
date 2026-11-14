@@ -106,8 +106,10 @@ less even. They never drop a file.
 - `npm run test:times` (`tools/testTimes.mjs`) re-times every file on this machine. Run it on a quiet machine;
   background load inflates the numbers.
 - `node tools/testTimes.mjs --jobs 2` limits the parallel jobs.
-- `node tools/testTimes.mjs --merge <dir>` merges per-shard records (`*.json`) onto `tools/testTimes.json`. A recorded
-  time replaces the old one. A file not in the suite any more is dropped.
+- `node tools/testTimes.mjs --merge <dir>` merges per-shard records (`*.json`) onto `tools/testTimes.json`. A
+  recorded time moves the old one a third of the way towards it (`NEW_TIME_WEIGHT`): one run's time swings with the
+  files that share its runner, and the last time alone left the slowest shard about a third over the mean. A file
+  with no old time takes the recorded one. A file not in the suite any more is dropped.
 
 `node tools/testShards.mjs i/n --record <file>` sets `TEST_TIMES_RECORD`. The fail-summary reporter then adds each
 file's wall time to that JSON file (`tools/fileTimes.mjs`).
@@ -118,20 +120,38 @@ file's wall time to that JSON file (`tools/fileTimes.mjs`).
 
 | Job | Steps |
 | --- | --- |
-| `static` | `npm run lint`, `npm run types` |
+| `static` | `npm run lint` (ESLint's cache restored from the newest `eslint-*` entry), the lint ratchet, `npm run types`, the shaders |
 | `times` | Finds the newest saved times in the Actions cache (`test-times-*`), lookup only. |
 | `test` (matrix 1..8) | Restores those times, then `node tools/testShards.mjs <i>/8 --record ...`. Uploads each shard's record as an artifact. |
 | `build` | `npm run build`, unless the caller passes `build: false`. |
 
 Every job restores `node_modules` from a cache keyed on `package-lock.json` and runs `npm ci` only on a miss.
 
-`check.yml` (every pull request), `deploy.yml`, `relay-deploy.yml`, `account-deploy.yml` and `release-desktop.yml`
+`check.yml` (a pull request's full run), `deploy.yml`, `relay-deploy.yml`, `account-deploy.yml` and `release-desktop.yml`
 all call `verify.yml`. After a run, `test-times.yml` merges the eight shard records and saves them to the Actions
 cache under `test-times-<run_id>-<attempt>`. The next run's shards split by those times. A pull request's saved times
 stay with its branch; the times saved by `deploy.yml` on `main` are visible to every branch.
 
-The pull request check job `check` runs with `if: always()` and fails unless `verify` succeeded. A required check
-that is skipped would otherwise pass.
+### Local, draft and ready
+
+| Where | What runs |
+| --- | --- |
+| This machine, before a push | `npm run pre-push`: lint, types, the doc and comment checks, and the near tier of the tests (the far tier too when the selection is small). It runs on the machine's platform; `CI_NODE` picks the Node of the tests. |
+| A draft pull request | The light run (`.github/workflows/verify-light.yml`): lint and types, and the near tier on CI's Linux, two runners (`tools/test-near.ts`). No far tier, no build, no game probes. The `standards` job runs too. |
+| A draft with a platform path or the `full-ci` label | The full verification, as at ready, and the game probes. |
+| Marked ready for review, and every push after | The full verification (`verify.yml`): every test in eight shards and the build, then the game probes. |
+
+`check.yml`'s `plan` job chooses (`tools/ci-plan.ts`). A draft gets the full run when it changes a path where
+Windows and CI's Linux can disagree, or that the light run does not build: `.github/`, a `package.json` or
+`package-lock.json`, `app/`, `selfhost/`, `tools/`, `scripts/`, the shared helpers `test/*.mjs`, `vite.config.js`
+and `tsconfig*.json`. For any other change with a platform risk (path or file handling, a filesystem's case rules),
+add the `full-ci` label. `full-ci.yml` starts `check.yml` and `probes.yml` on the branch at once, and every later
+push to the draft gets the full run while the label stays.
+
+The pull request check job `check` runs with `if: always()` and passes only when `plan` chose the full run and
+`verify` succeeded. On a light run it fails and says so, so a light run never satisfies it; read the `light` jobs
+for a draft's result. A required check that is skipped would pass, so `check` is never skipped. `ready_for_review` is
+one of `check.yml`'s triggers, so marking a draft ready starts the full run on its head with no new push.
 
 A pull request that has a merge conflict with its base runs no workflow at all. Merge the base in before the push you
 want verified.
@@ -183,5 +203,6 @@ branch, and the tests `tools/testChanged.mjs` selects:
 Every step runs, and the summary lists each one's result and time. The exit status is 1 when a step failed. The
 command does not build; CI builds every pull request.
 
-Push and let CI run the whole gate. A pull request is not done until `check` is green on its head commit. CI tests the
+Push and let CI run. On a draft, CI runs the light run; the full gate runs when the pull request is marked ready
+(above, "Local, draft and ready"). A pull request is not done until `check` is green on its head commit. CI tests the
 merge of the branch into its base, so merge the base in when it has moved.

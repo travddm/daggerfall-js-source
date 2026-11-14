@@ -1,0 +1,33 @@
+name: full-ci
+
+# The full-ci label on a draft pull request asks for the full verification now, for a change whose platform risk the
+# path list in tools/ci-plan.ts does not catch. This starts check.yml and probes.yml on the pull request's branch.
+# Later pushes to the draft get the full run while the label stays (ci-plan.ts reads the labels).
+#
+# check.yml does not listen for labels itself: every label event would start a run, cancel the one in progress and
+# post a new `check` on the same commit.
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    name: full run for the label
+    if: github.event.label.name == 'full-ci' && github.event.pull_request.draft
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Start check and probes on the branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh workflow run check.yml --repo "$REPO" --ref "$BRANCH" -f pr="$PR"
+          gh workflow run probes.yml --repo "$REPO" --ref "$BRANCH"
