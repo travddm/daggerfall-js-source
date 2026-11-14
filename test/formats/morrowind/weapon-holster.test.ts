@@ -130,7 +130,7 @@ test('the quiver holds as many rounds as there are slots and rounds', () => {
   const full = quiverOf(Number.MAX_SAFE_INTEGER);
   assert.ok(full.length > 0);
   assert.deepEqual(
-    full.map((part: { tag: { i: number; n: number } }) => part.tag),
+    full.map((part) => part.tag),
     full.map((_part: unknown, at: number) => ({ i: at, n: full.length })),
   );
   assert.equal(quiverOf(0).length, 0);
