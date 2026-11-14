@@ -62,8 +62,10 @@ test('FLOW1 the workflows: verify.yml is the one check - lint and the types, eve
   assert.match(v, /build:\n {4}if: \$\{\{ inputs\.build \}\}[\s\S]*?run: npm run build/);
   for (const job of ['static', 'test', 'build']) assert.match(v, new RegExp(`\\n  ${job}:[\\s\\S]*?ref: \\$\\{\\{ inputs\\.ref \\}\\}`), `${job} checks out the ref it is asked`);
   const c = read('.github/workflows/check.yml');
-  assert.match(c, /verify:\n {4}uses: \.\/\.github\/workflows\/verify\.yml/);
-  assert.match(c, /\n {2}check:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify\]/);
+  assert.match(c, /verify:\n {4}needs: plan\n {4}if: needs\.plan\.outputs\.full == 'true'\n {4}uses: \.\/\.github\/workflows\/verify\.yml/);
+  assert.match(c, /\n {2}check:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[plan, verify, light\]/);
+  // a light run never passes `check`: only a planned full run whose verify succeeded does
+  assert.match(c, /if \[ "\$\{\{ needs\.plan\.outputs\.full \}\}" != "true" \]; then[\s\S]*?exit 1[\s\S]*?needs\.verify\.result/);
   assert.match(c, /if \[ "\$\{\{ needs\.verify\.result \}\}" != "success" \]; then[\s\S]*?exit 1/);
   const d = read('.github/workflows/deploy.yml');
   assert.match(d, /\n {2}main:\n[\s\S]*?ref: main\n[\s\S]*?sha=\$\(git rev-parse HEAD\)/, 'main\'s head, pinned once');
