@@ -73,7 +73,7 @@ test('MWNPC14-2 a real build: the fixture race\'s only head a vampire\'s - a vam
   assert.equal(living.head.record, null, 'the living walk offers no vampire\'s head');
   assert.ok(living.notes.includes('head: no third-person record for this actor'));
   assert.equal(vampire.head.record?.id, 'b_v_fprace_m_head_01', 'the vampire\'s, through the real record walk');
-  assert.match(vampire.head.verdict, /getVampireHead/);
+  assert.match(vampire.head.verdict, /a vampire's head/);
   assert.ok(!vampire.notes.includes('head: no third-person record for this actor'), 'built to its bone (the fixture\'s arm skeleton has none - its note says so)');
 });
 

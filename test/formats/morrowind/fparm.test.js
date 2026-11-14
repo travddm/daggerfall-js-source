@@ -787,8 +787,8 @@ test('MW-D18 rules 40+15: the assembly binds what it can and NAMES what it canno
   const hands = arm.pieces.filter((p) => p.slot === 'hand');
   assert.equal(hands.length, 1, 'the right hand made it');
   assert.equal(hands[0].bone, 'right hand');
-  assert.ok(arm.notes.some((n) => /hand: this skeleton has no bone "left xand" - those influences are skipped \(rule 40\)/.test(n)),
-    `rule 40 names the skipped bone (notes: ${arm.notes.join(' | ')})`);
+  assert.ok(arm.notes.some((n) => /hand: this skeleton has no bone "left xand" - those influences are skipped/.test(n)),
+    `the note names the skipped bone (notes: ${arm.notes.join(' | ')})`);
   assert.ok(arm.notes.some((n) => /hand @ left hand: no shape matched - the mesh offers "Tri Right Hand", "Tri Left Xand"/.test(n)),
     `rule 15's miss lists what the file offered (notes: ${arm.notes.join(' | ')})`);
 });
