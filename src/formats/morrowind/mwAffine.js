@@ -8,7 +8,7 @@
 // composition order would have landed in one.
 // The two INVERSES stay where they are: they are different algorithms
 // (mwSkin's transpose / s^2 for a rotation times a uniform scale,
-// mwParticles' guarded cofactor), not two copies of one.
+// mw-particle-sim.ts' guarded cofactor), not two copies of one.
 
 import { mat33Apply, mat33Mul } from './mwNifMesh.js';
 

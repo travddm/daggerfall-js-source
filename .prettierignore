@@ -29,3 +29,4 @@ test/fixtures/mw/animSlotsParity.json
 test/fixtures/mw/upperBodyParity.json
 test/fixtures/mw/mw-first-person-rest-parity.json
 test/fixtures/mw/mw-clip-law-parity.json
+test/fixtures/mw/mw-particle-parity.json
