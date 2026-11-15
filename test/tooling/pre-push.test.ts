@@ -8,7 +8,9 @@ import {
   changesShaders,
   ciNodeMajor,
   installProblems,
+  chooseTestNode,
   nodeVersionStep,
+  TEST_NODE_CONFIG,
   testsToRun,
 } from '../../tools/pre-push.ts';
 
@@ -62,16 +64,54 @@ test("CI's Node major is read from the workflow", () => {
   assert.equal(ciNodeMajor('no setup here'), null);
 });
 
-test("the version step passes on CI's major, warns on another, and fails when CI_NODE does not run", () => {
-  assert.deepEqual(nodeVersionStep(22, 'v22.23.5', true), {
+test("the version step passes on CI's major, warns on another, and fails when the binary does not run", () => {
+  const fromCiNode = { path: '/n22/node', source: 'CI_NODE', notices: [] };
+  const running = { path: '/n24/node', source: null, notices: [] };
+  assert.deepEqual(nodeVersionStep(22, 'v22.23.5', fromCiNode), {
     outcome: 'passed',
     note: 'tests run on Node v22.23.5 (CI_NODE)',
   });
-  assert.deepEqual(nodeVersionStep(22, 'v24.21.0', false), {
+  assert.deepEqual(nodeVersionStep(22, 'v24.21.0', running), {
     outcome: 'warned',
-    note: 'tests run on Node v24.21.0, CI runs Node 22; set CI_NODE to a Node 22 binary to match it',
+    note: `tests run on Node v24.21.0, CI runs Node 22; name a Node 22 binary in CI_NODE or git config ${TEST_NODE_CONFIG} to match it`,
   });
-  assert.equal(nodeVersionStep(22, 'v24.21.0', true).outcome, 'warned');
-  assert.equal(nodeVersionStep(null, 'v24.21.0', false).outcome, 'passed');
-  assert.equal(nodeVersionStep(22, null, true).outcome, 'failed');
+  assert.equal(nodeVersionStep(22, 'v24.21.0', fromCiNode).outcome, 'warned');
+  assert.equal(nodeVersionStep(null, 'v24.21.0', running).outcome, 'passed');
+  assert.equal(nodeVersionStep(22, null, fromCiNode).outcome, 'failed');
+});
+
+test('the tests take CI_NODE first, then the git config, then the running Node', () => {
+  const present = new Set(['/env/node', '/config/node']);
+  const exists = (path: string) => present.has(path);
+  assert.deepEqual(chooseTestNode('/env/node', '/config/node', '/running', exists), {
+    path: '/env/node',
+    source: 'CI_NODE',
+    notices: [],
+  });
+  assert.deepEqual(chooseTestNode(undefined, '/config/node', '/running', exists), {
+    path: '/config/node',
+    source: `git config ${TEST_NODE_CONFIG}`,
+    notices: [],
+  });
+  assert.deepEqual(chooseTestNode(undefined, undefined, '/running', exists), {
+    path: '/running',
+    source: null,
+    notices: [],
+  });
+});
+
+test('a named Node that does not exist falls back with a notice', () => {
+  const none = () => false;
+  const fallback = chooseTestNode(undefined, '/gone/node', '/running', none);
+  assert.deepEqual(fallback, {
+    path: '/running',
+    source: null,
+    notices: [`git config ${TEST_NODE_CONFIG} names /gone/node, which does not exist`],
+  });
+  const step = nodeVersionStep(22, 'v24.21.0', fallback);
+  assert.equal(step.outcome, 'warned');
+  assert.match(step.note ?? '', /names \/gone\/node, which does not exist/);
+  const config = chooseTestNode('/gone/env', '/config/node', '/running', (path) => path === '/config/node');
+  assert.equal(config.path, '/config/node');
+  assert.deepEqual(config.notices, ['CI_NODE names /gone/env, which does not exist']);
 });
