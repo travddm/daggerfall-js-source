@@ -135,6 +135,12 @@ test('the pool the chains are built from has 35 properties', () => {
   assert.equal(propertyPool().length, 35);
 });
 
+test('a file whose only record is a bare texture holds no scene, so it flattens to nothing', () => {
+  const texture = { type: 'NiPixelData', pixelFormat: 0, bitsPerPixel: 24, mipmaps: [], pixels: new Uint8Array(0) };
+  const textureOnly = { version: 0x04000002, records: [texture], roots: [0] };
+  assert.deepEqual(mesh.flattenNif(textureOnly), []);
+});
+
 const dataPath = process.env.MW_DATA_PATH;
 const archives = ['Morrowind', 'Tribunal', 'Bloodmoon'].map((name) => `${name}.bsa`);
 const present = !!dataPath && archives.every((name) => existsSync(join(dataPath, name)));
@@ -149,3 +155,20 @@ test('every NIF of the retail archives flattens as recorded', { skip: !present }
     assert.equal(first, -1, first < 0 ? '' : `${name}: ${live[name].list[first]}`);
   }
 });
+
+test(
+  'the two crystal files of the first archive are one bare texture each and flatten to nothing',
+  { skip: !present },
+  () => {
+    const archive = new MwBsaFile(new Uint8Array(readFileSync(join(dataPath as string, 'Morrowind.bsa'))));
+    for (const file of ['meshes/i/tx_crystal_02.nif', 'meshes/i/tx_crystal_03.nif']) {
+      const nif = parseNif(archive.get(file).slice());
+      assert.deepEqual(
+        nif.records.map((record: { type: string }) => record.type),
+        ['NiPixelData'],
+        file,
+      );
+      assert.deepEqual(mesh.flattenNif(nif), [], file);
+    }
+  },
+);
