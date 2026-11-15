@@ -24,10 +24,9 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
     `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`,
     `mw-bone-rules.ts`, `mw-clip-law.ts`, `mwParticles.js` with `mw-particle-sim.ts`, `mwItemMap.js` with `mw-worn-parts.ts`,
-    `src/systems/weaponSheathing.js` with `weapon-holster.ts`,
+    `src/systems/weaponSheathing.js` with `weapon-holster.ts`, `mwNifMesh.js` with `nif-material.ts`,
     the rest of `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
-  - Still OpenMW-derived: `mwKeys.js` (`tcbTangents`), `mwNifMesh.js`
-    (`resolveMaterial`), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
+  - Still OpenMW-derived: `mwKeys.js` (`tcbTangents`), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
     `mwSpellFx.js`, `mwVfx.js`. `src/combat/fpArm.js`,
     `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`) only quote OpenMW in comments.
 
@@ -64,6 +63,7 @@ An async read must store its result in the cache generation it started under.
 | `mwEsmFile.js` | TES3 `.esm`/`.esp`. Every record has a size, so unknown records are skipped and counted. Decodes `BODY`, `RACE`, `NPC_`, `CREA`; deleted records are dropped. Text is Windows-1252. |
 | `mwNifFile.js` | NIF 4.0.0.2 only. Records have no size field, so the reader is strict: an unknown record type throws with its name and index. |
 | `mwNifMesh.js` | Flattens a parsed NIF into draw batches: composed transforms, materials, base texture. |
+| `nif-material.ts` | The surface a shape has from its properties (colours, base texture, blend, depth, sidedness), the two per-vertex colour rules and the geometry-name skip list. `mwNifMesh.js` re-exports them. |
 | `mwDdsFile.js`, `mwTexture.js`, `mwTextureClient.js`, `mwTextureWorker.js` | DDS decode (DXT1/3/5, uncompressed masks) and the texture path rule; decoding runs in a worker pool. |
 | `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling. |
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
