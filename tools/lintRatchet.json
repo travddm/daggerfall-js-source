@@ -1177,7 +1177,6 @@
     "src/systems/useItem.js": 60,
     "src/systems/wagon/wagonRopes.js": 1,
     "src/systems/wayOut.js": 19,
-    "src/systems/weaponSheathing.js": 8,
     "src/systems/weather/airTemperature.js": 6,
     "src/systems/weather/snowpack.js": 6,
     "src/systems/weather/weatherFront.js": 30,
