@@ -6,6 +6,7 @@
 //   npm run pre-push -- --full          # also run every far test here, however many
 //   npm run pre-push -- --base <ref>    # measure the changes against another ref
 //   CI_NODE=<path to node> npm run pre-push   # run the tests on that Node binary (CI's major)
+//   git config pre-push.testNode <path to node>   # the same for every worktree of this clone, when CI_NODE is unset
 //
 // Steps: the installed dependencies, lint and its ratchet, both type passes, the formatting of added files, markdown,
 // spelling, the references in added comments, the shaders when one changed, and the tests tools/testChanged.mjs
@@ -72,18 +73,64 @@ export function ciNodeMajor(workflow: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
+/** The git config key that names the tests' Node binary. A clone's config is read by all of its worktrees. */
+export const TEST_NODE_CONFIG = 'pre-push.testNode';
+
+export interface TestNode {
+  /** The Node binary the tests run on. */
+  path: string;
+  /** What named it: `CI_NODE` or the git config key. Null for the Node that started this command. */
+  source: string | null;
+  /** Each named binary that does not exist, as one line for the log. */
+  notices: string[];
+}
+
+/**
+ * The Node binary for the tests: `CI_NODE` first, then the `pre-push.testNode` git config, and the Node that started
+ * this command when neither names a binary that exists. A missing binary is not an error: a config that names one
+ * machine's Node folder is read by every worktree of the clone, and the checks still run where that folder is gone.
+ */
+export function chooseTestNode(
+  ciNode: string | undefined,
+  configured: string | undefined,
+  running: string,
+  exists: (path: string) => boolean,
+): TestNode {
+  const named: [string | undefined, string][] = [
+    [ciNode, 'CI_NODE'],
+    [configured, `git config ${TEST_NODE_CONFIG}`],
+  ];
+  const notices: string[] = [];
+  for (const [path, source] of named) {
+    if (!path) continue;
+    if (exists(path)) return { path, source, notices };
+    notices.push(`${source} names ${path}, which does not exist`);
+  }
+  return { path: running, source: null, notices };
+}
+
 /**
  * The version step's verdict on the Node that runs the tests (`version`, as `node --version` prints it) against CI's
- * major. A different V8 can change what a timing or allocation test measures. `fromCiNode` says that `CI_NODE` named
- * the binary; `version` is null when that binary did not run.
+ * major. A different V8 can change what a timing or allocation test measures. `version` is null when the binary did
+ * not run.
  */
-export function nodeVersionStep(ci: number | null, version: string | null, fromCiNode: boolean): StepResult {
-  if (version === null) return { outcome: 'failed', note: 'the Node binary CI_NODE names did not run' };
+export function nodeVersionStep(ci: number | null, version: string | null, node: TestNode): StepResult {
+  const source = node.source ? ` (${node.source})` : '';
+  if (version === null) return { outcome: 'failed', note: `the Node binary ${node.path}${source} did not run` };
   const major = Number(version.replace(/^v/, '').split('.')[0]);
-  const source = fromCiNode ? ' (CI_NODE)' : '';
-  if (ci === null || ci === major) return { outcome: 'passed', note: `tests run on Node ${version}${source}` };
-  const hint = fromCiNode ? '' : `; set CI_NODE to a Node ${ci} binary to match it`;
-  return { outcome: 'warned', note: `tests run on Node ${version}${source}, CI runs Node ${ci}${hint}` };
+  const missing = node.notices.map((notice) => `; ${notice}`).join('');
+  if (ci === null || ci === major) {
+    return { outcome: 'passed', note: `tests run on Node ${version}${source}${missing}` };
+  }
+  const hint = node.source ? '' : `; name a Node ${ci} binary in CI_NODE or git config ${TEST_NODE_CONFIG} to match it`;
+  return { outcome: 'warned', note: `tests run on Node ${version}${source}, CI runs Node ${ci}${missing}${hint}` };
+}
+
+/** The `pre-push.testNode` value of this clone's git config, or undefined when it is not set. */
+function configuredTestNode(): string | undefined {
+  const result = spawnSync('git', ['config', '--get', TEST_NODE_CONFIG], { cwd: ROOT, encoding: 'utf8' });
+  const value = result.status === 0 ? result.stdout.trim() : '';
+  return value || undefined;
 }
 
 /** Whether a changed file is a shader stage or chunk that tools/glsl-check.ts compiles. */
@@ -134,20 +181,23 @@ function main(argv: string[]): number {
   }
 
   const node = (script: string, ...args: string[]) => statusResult(run(process.execPath, [script, ...args]));
-  // Only the tests move to CI_NODE: lint, types and the other checks do not depend on the V8 version.
-  const testNode = process.env.CI_NODE || process.execPath;
+  // Only the tests move to another Node: lint, types and the other checks do not depend on the V8 version.
+  const testNode = chooseTestNode(process.env.CI_NODE, configuredTestNode(), process.execPath, existsSync);
+  for (const notice of testNode.notices) console.log(`[pre-push] ${notice}; the tests run on ${process.execPath}`);
   const steps: [string, () => StepResult][] = [
     [
       'node version',
       () => {
         const ci = ciNodeMajor(readFileSync(join(ROOT, '.github/workflows/verify.yml'), 'utf8'));
-        const printed = spawnSync(testNode, ['--version'], { encoding: 'utf8' });
+        const printed = spawnSync(testNode.path, ['--version'], { encoding: 'utf8' });
         const version = printed.status === 0 ? printed.stdout.trim() : null;
-        return nodeVersionStep(ci, version, testNode !== process.execPath);
+        return nodeVersionStep(ci, version, testNode);
       },
     ],
     ['lint', () => statusResult(npmRun('lint'))],
     ['lint ratchet is current', () => node('tools/lintRatchet.mjs', '--strict')],
+    // Its test fails a fall only where CI is set, and this command does not set it.
+    ['vendored-mods ratchet', () => node('tools/vendored-mods.ts', '--strict')],
     ['types (both passes)', () => statusResult(npmRun('types'))],
     ['formatting of added files', () => node('tools/check-changed.mjs', 'format-check', '--added', '--base', base)],
     ['markdown', () => node('tools/check-changed.mjs', 'markdown', '--base', base)],
@@ -181,7 +231,7 @@ function main(argv: string[]): number {
         // As `npm run test:changed` does first: tests read the vendored mods' published files, which git does not hold.
         if (run('sh', ['tools/fetch-vendor.sh']) !== 0)
           return { outcome: 'failed', note: 'tools/fetch-vendor.sh failed' };
-        const status = runTests(files, { node: testNode }) as number;
+        const status = runTests(files, { node: testNode.path }) as number;
         const note = leftToCi > 0 ? `${leftToCi} far tests left to CI; --full runs them here` : undefined;
         return { ...statusResult(status), note };
       },

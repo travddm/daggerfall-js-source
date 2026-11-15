@@ -136,7 +136,7 @@ stay with its branch; the times saved by `deploy.yml` on `main` are visible to e
 
 | Where | What runs |
 | --- | --- |
-| This machine, before a push | `npm run pre-push`: lint, types, the doc and comment checks, and the near tier of the tests (the far tier too when the selection is small). It runs on the machine's platform; `CI_NODE` picks the Node of the tests. |
+| This machine, before a push | `npm run pre-push`: lint, types, the doc and comment checks, and the near tier of the tests (the far tier too when the selection is small). It runs on the machine's platform; `CI_NODE` or `git config pre-push.testNode` picks the Node of the tests. |
 | A draft pull request | The light run (`.github/workflows/verify-light.yml`): lint and types, and the near tier on CI's Linux, two runners (`tools/test-near.ts`). No far tier, no build, no game probes. The `standards` job runs too. |
 | A draft with a platform path or the `full-ci` label | The full verification, as at ready, and the game probes. |
 | Marked ready for review, and every push after | The full verification (`verify.yml`): every test in eight shards and the build, then the game probes. |
@@ -186,10 +186,14 @@ branch, and the tests `tools/testChanged.mjs` selects:
 2. The Node version of the tests: a warning, not a failure, when it differs from the `node-version` in
    `.github/workflows/verify.yml`. A different V8 can change what an allocation or timing test measures
    (`test/tooling/allocchild.test.js` passes on Node 22 and fails on Node 24). To match CI on a machine with a newer
-   Node, unpack CI's major from nodejs.org into a folder of its own and name its binary in `CI_NODE`:
-   `CI_NODE=<folder>/node.exe npm run pre-push`. Only the tests run on it; the other steps use the Node that started
-   the command. The step fails when the `CI_NODE` binary does not run.
-3. `npm run lint`, then `node tools/lintRatchet.mjs --strict`.
+   Node, unpack CI's major from nodejs.org into a folder of its own and name its binary once for the clone:
+   `git config pre-push.testNode <folder>/node.exe`. Every worktree of the clone reads that config. `CI_NODE` names a
+   binary for one run and wins over the config: `CI_NODE=<folder>/node.exe npm run pre-push`. Only the tests run on
+   it; the other steps use the Node that started the command. A named binary that does not exist prints a one-line
+   notice, and the tests run on the Node that started the command. The step fails when the named binary exists but
+   does not run. CI does not run this command, so neither setting reaches CI.
+3. `npm run lint`, then `node tools/lintRatchet.mjs --strict` and `node tools/vendored-mods.ts --strict`. Both fail on
+   a count that fell and was not recorded, as CI does ([vendored-mods-ratchet.md](vendored-mods-ratchet.md)).
 4. `npm run types`, both passes.
 5. The formatting of added files, markdown, spelling and the references in added comments (`tools/check-changed.mjs`,
    `tools/comment-refs.ts`).
