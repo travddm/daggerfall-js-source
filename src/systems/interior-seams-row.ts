@@ -1,5 +1,5 @@
 // The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall pieces
-// meet its floor and ceiling (world/interior/kit-wall-ends.ts). Off is Daggerfall Unity's look, with the thin slits its
+// meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js). Off is Daggerfall Unity's look, with the thin slits its
 // models leave. The player's own online: it changes only what this screen draws.
 // This file must not reach uiPrefs.js: features.js imports it, and uiPrefs.js imports features.js.
 import { t, localizedText } from './textManager.js';

@@ -623,8 +623,7 @@ export const FEATURES = Object.freeze([
     kinds: Object.freeze(['enhanced']),
     control: Object.freeze({ store: 'prefs', key: 'cloudQuality', initial: 'default', online: 'player', tiers: Object.freeze([tier('default', () => t('features.cloudQuality.default', 'Default')), tier('lo', () => localizedText('low', 'Low')), tier('hi', () => localizedText('high', 'High'))]) }),   // PERF1: volumetricClouds.js QUALITY; a dial, the player's online
   }),
-  GROUND_SHARPNESS_ROW,   // the ground's minification (systems/ground-sharpness-row.ts)
-  INTERIOR_SEAMS_ROW,   // wall pieces meet the floor and the ceiling inside buildings (systems/interior-seams-row.ts)
+  GROUND_SHARPNESS_ROW, INTERIOR_SEAMS_ROW,   // the ground's minification; wall pieces meeting the floor and ceiling indoors
   ANISOTROPIC_FILTERING_ROW, MIP_QUALITY_ROW, RETRO_MIP_BIAS_ROW,   // beyond DFU: anisotropy, and Sharp's retro mip bias, which DFU fixes in code
   // RW1: REAL WINDOWS - from the street a
   // room behind every house window, from inside the real world through the glass (render/realWindows.js carries the

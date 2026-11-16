@@ -105,7 +105,9 @@ test(
     const { layoutInterior, hasInteriorModels } = await import('../../src/world/interior/interiorLayout.js');
     const { dfMeshToModel } = await import('../../src/world/meshReader.js');
     const { patchSeams } = await import('../../src/world/arch3dSeams.js');
-    const { blockSeams } = await import('../../tools/seamCensus.mjs');
+    // by a computed path: the census reaches the dungeon layout, whose imports need the DOM types the Node pass lacks
+    const censusModule = '../../tools/seamCensus.mjs';
+    const { blockSeams } = await import(censusModule);
     const blocks = new BlocksFile();
     blocks.load(new Uint8Array(readFileSync(join(ARENA2 as string, 'BLOCKS.BSA'))));
     const arch = new Arch3dFile();
