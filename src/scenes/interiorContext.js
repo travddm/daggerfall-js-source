@@ -505,12 +505,12 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
     // `cpu.positions`, and the push would otherwise hand the frame
     // loop a {gpu: null} entry. A door model this data set lacks costs
     // the door, not the building.
-    const { gpu, cpu, shut } = await fittedDoors.door(d.modelIdNum, d.matrix, getGpuMesh);
+    const { gpu, cpu, matrix, shut } = await fittedDoors.door(d.modelIdNum, d.matrix, getGpuMesh);
     if (!gpu || !cpu) {
       console.warn(`[interior] action-door model ${d.modelIdNum} is not in this ARCH3D - the door is skipped`);
       continue;
     }
-    dynamicDraws.push(doorDraw(gpu, shut, actions.addDoor(cpu, parent(d.matrix))));   // fitted while shut, Daggerfall's size as it swings
+    dynamicDraws.push(doorDraw(gpu, shut, actions.addDoor(cpu, parent(matrix))));   // fitted while shut, Daggerfall's size as it swings
     hung.push([doorIndex, cpu, dynamicDraws[dynamicDraws.length - 1]]);
   }
   // FIELD BUGS 2026-10-25 DOOR-VOID: a door with no floor behind it stays shut - asked of the room's whole shell and its

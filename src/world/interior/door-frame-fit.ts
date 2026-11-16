@@ -8,9 +8,9 @@
 // foot), straight out, the distance to the first face of the room. An edge with a face between MIN_GAP and MAX_GAP away
 // moves out by exactly that distance, so it stops on the jamb, the floor or the lintel. A fixed move would lay the
 // door's border on the wall where the doorway is the door's own size, and the two would z-fight. A door that stands
-// proud of its wall's surface first moves back into the wall along its thickness (measureDoorDepth). The door is moved
-// on a copy of its model, one a door. The fit holds only while the door is shut: it swings at Daggerfall's size
-// (doorDraw), and the depth move holds always. Both are departures from Daggerfall Unity, behind the Close interior
+// proud of its wall's surface first moves back into the wall along its thickness (measureDoorDepth), its pivot with it.
+// The door is fitted on a copy of its model, one a door, and the copy is drawn only while the door is shut: it swings
+// at Daggerfall's size (doorDraw), and the depth move holds always. Both are departures from Daggerfall Unity, behind the Close interior
 // gaps row (systems/interior-seams-row.ts).
 
 /** The door model as world/meshReader.js dfMeshToModel answers it: positions in metres, three a vertex. */
@@ -144,10 +144,9 @@ export const hasGap = (gaps: DoorGaps): boolean => gaps.hinge > 0 || gaps.latch 
 
 /**
  * A copy of the door model with each edge moved out by its gap: the corners on the hinge side by `hinge`, on the latch
- * side by `latch`, at the top by `top`, at the foot by `foot`; and the whole door moved along its thickness by `depth`
- * (measureDoorDepth). Every other field of the model is the original's.
+ * side by `latch`, at the top by `top`, at the foot by `foot`. Every other field of the model is the original's.
  */
-export function fitDoorModel<M extends DoorModel>(model: M, gaps: DoorGaps, depth = 0): M {
+export function fitDoorModel<M extends DoorModel>(model: M, gaps: DoorGaps): M {
   const [low, high] = box(model);
   const EDGE = 1e-4;
   const positions = Float32Array.from(model.positions);
@@ -156,9 +155,18 @@ export function fitDoorModel<M extends DoorModel>(model: M, gaps: DoorGaps, dept
     else if (Math.abs(positions[i] - high[0]) < EDGE) positions[i] += gaps.latch;
     if (Math.abs(positions[i + 1] - high[1]) < EDGE) positions[i + 1] += gaps.top;
     else if (Math.abs(positions[i + 1] - low[1]) < EDGE) positions[i + 1] -= gaps.foot;
-    positions[i + 2] += depth;
   }
   return { ...model, positions };
+}
+
+/**
+ * The door's matrix moved along its own z by `depth` (measureDoorDepth). The pivot it swings about moves with it, so
+ * the door swings as Daggerfall's does, set into the wall.
+ */
+export function moveDoorMatrix(matrix: ArrayLike<number>, depth: number): number[] {
+  const moved = Array.from(matrix);
+  for (let k = 0; k < 3; k++) moved[12 + k] += matrix[8 + k] * depth;
+  return moved;
 }
 
 /** A room placement as world/interior/interiorLayout.js lays it. */
@@ -202,30 +210,26 @@ export function doorFitter(
   };
   return {
     /**
-     * The door's meshes: `gpu` and `cpu` are the door as it swings, Daggerfall's size moved into its wall; `shut`,
-     * when the door has a gap, is the mesh fitted to its doorway, drawn only while it is closed (doorDraw).
+     * The door as it is hung: `matrix` is the door's own, moved into its wall when it stood proud; `gpu` and `cpu` are
+     * the shared ones, the door as it swings; `shut`, when the door has a gap, is the mesh fitted to its doorway, drawn
+     * only while it is closed (doorDraw).
      */
     async door(
       modelId: number,
       matrix: ArrayLike<number>,
       shared: (id: number) => Promise<unknown>,
-    ): Promise<{ gpu: unknown; cpu: DoorModel | undefined; shut?: unknown }> {
+    ): Promise<{ gpu: unknown; cpu: DoorModel | undefined; matrix: ArrayLike<number>; shut?: unknown }> {
       const gpu = await shared(modelId);
       const cpu = models.get(modelId);
-      if (!on || !gpu || !cpu) return { gpu, cpu };
+      if (!on || !gpu || !cpu) return { gpu, cpu, matrix };
       // the depth first: the gaps are measured where the door will stand
       const depth = measureDoorDepth(cpu, matrix, roomFaces());
-      const moved = depth ? fitDoorModel(cpu, { hinge: 0, latch: 0, top: 0, foot: 0 }, depth) : cpu;
-      const gaps = measureDoorGaps(moved, matrix, roomFaces());
-      let swinging = gpu;
-      if (depth) {
-        swinging = renderer.createMesh(moved);
-        own.push(swinging);
-      }
-      if (!hasGap(gaps)) return { gpu: swinging, cpu: moved };
-      const shut = renderer.createMesh(fitDoorModel(cpu, gaps, depth));
+      const hung = depth ? moveDoorMatrix(matrix, depth) : matrix;
+      const gaps = measureDoorGaps(cpu, hung, roomFaces());
+      if (!hasGap(gaps)) return { gpu, cpu, matrix: hung };
+      const shut = renderer.createMesh(fitDoorModel(cpu, gaps));
       own.push(shut);
-      return { gpu: swinging, cpu: moved, shut };
+      return { gpu, cpu, matrix: hung, shut };
     },
     destroy() {
       for (const mesh of own) renderer.destroyMesh(mesh);

@@ -10,6 +10,7 @@ import {
   measureDoorGaps,
   measureDoorDepth,
   fitDoorModel,
+  moveDoorMatrix,
   doorFitter,
   doorDraw,
   hasGap,
@@ -97,9 +98,12 @@ test('a door thicker than its wall is set at its middle; a move past the cap is 
   assert.equal(+measureDoorDepth(door(), IDENTITY, wall(0.03, 0.13)).toFixed(4), 0.005, 'the middles meet at z = 0.08');
   const thick = boxModel(0, 1.2, 0, 2.2, 0, 0.4);
   assert.equal(measureDoorDepth(thick, IDENTITY, wall(-0.5, 0.25)), 0, `a move over ${MAX_DEPTH_MOVE} m`);
-  const moved = fitDoorModel(door(), { hinge: 0, latch: 0, top: 0, foot: 0 }, 0.023);
-  const z = Array.from({ length: 8 }, (_, i) => moved.positions[i * 3 + 2]);
-  assert.deepEqual([+Math.min(...z).toFixed(4), +Math.max(...z).toFixed(4)], [0.033, 0.163], 'the whole door moves');
+  const turned = [0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 5, 1, 2, 1]; // a quarter turn about y, at (5, 1, 2)
+  assert.deepEqual(
+    moveDoorMatrix(turned, 0.023),
+    [0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 5.023, 1, 2, 1],
+    'along its own z',
+  );
 });
 
 /** A room of one model, the given triangles, and one door model (9000), built through the fitter as the host builds it. */
@@ -126,7 +130,7 @@ const extent = (m: unknown, k: number) => {
 
 test('a door with a gap is fitted only while shut: it swings on the shared mesh, at Daggerfall size', async () => {
   const { meshes } = await fitInRoom(doorway);
-  assert.equal(meshes.gpu, 'shared', 'no depth move: the swinging door is the shared mesh');
+  assert.deepEqual([meshes.gpu, meshes.matrix], ['shared', IDENTITY], 'no depth move: the shared mesh, where it hung');
   assert.deepEqual(extent(meshes.cpu, 0), [0, 1.2], 'its collider is Daggerfall size');
   assert.deepEqual(extent(meshes.shut, 0), [-0.025, 1.225], 'the shut door fills its doorway');
   const object = { state: 'start', matrix: IDENTITY };
@@ -142,18 +146,16 @@ test('a door with a gap is fitted only while shut: it swings on the shared mesh,
   assert.equal(draw.gpu, 'shared', 'a door put back is read from the entry, not from the first object');
 });
 
-test('a proud door with no gap swings on its moved copy, and has no shut mesh; with the row off, nothing is made', async () => {
+test('a proud door is hung deeper, its pivot with it, on the shared mesh; with the row off, nothing moves', async () => {
   const { meshes, made } = await fitInRoom(wall(0.03, 0.25));
-  assert.equal(meshes.shut, undefined);
-  assert.equal(made.length, 1);
-  assert.equal(meshes.gpu, made[0]);
-  assert.deepEqual(extent(meshes.gpu, 2), [+(0.01 + 0.02 + RECESS).toFixed(4), +(0.14 + 0.02 + RECESS).toFixed(4)]);
-  assert.deepEqual(doorDraw(meshes.gpu, meshes.shut, { state: 'start', matrix: IDENTITY }).gpu, made[0]);
+  assert.deepEqual([meshes.gpu, meshes.shut, made.length], ['shared', undefined, 0], 'no gap: no copy');
+  assert.equal(+(meshes.matrix[14] as number).toFixed(4), +(0.02 + RECESS).toFixed(4), '3 mm inside the wall');
+  assert.equal(doorDraw(meshes.gpu, meshes.shut, { state: 'start', matrix: meshes.matrix }).gpu, 'shared');
   const off = await fitInRoom(doorway, false);
   assert.deepEqual(
-    [off.meshes.gpu, off.meshes.shut, off.made.length],
-    ['shared', undefined, 0],
-    'Daggerfall Unity: the shared mesh',
+    [off.meshes.gpu, off.meshes.shut, off.meshes.matrix, off.made.length],
+    ['shared', undefined, IDENTITY, 0],
+    'Daggerfall Unity: the shared mesh where it hung',
   );
 });
 
@@ -215,10 +217,10 @@ test(
           if (hasGap(measureDoorGaps(model, d.matrix, room))) gappedBefore++;
           const depth = measureDoorDepth(model, d.matrix, room);
           if (depth) proudBefore++;
-          const moved = fitDoorModel(model, { hinge: 0, latch: 0, top: 0, foot: 0 }, depth);
-          const fitted = fitDoorModel(model, measureDoorGaps(moved, d.matrix, room), depth);
-          if (hasGap(measureDoorGaps(fitted, d.matrix, room))) gappedAfter++;
-          if (measureDoorDepth(fitted, d.matrix, room)) proudAfter++;
+          const hung = moveDoorMatrix(d.matrix, depth);
+          const fitted = fitDoorModel(model, measureDoorGaps(model, hung, room));
+          if (hasGap(measureDoorGaps(fitted, hung, room))) gappedAfter++;
+          if (measureDoorDepth(fitted, hung, room)) proudAfter++;
         }
       });
     }
