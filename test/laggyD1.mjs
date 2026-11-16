@@ -48,10 +48,13 @@ export function laggy(P) {
   let R = null;
   let n = 0;
   const log = [];
+  const replicas = [];
   const sync = () => {
     const f = join(dir, `replica-${++n}.db`);
     P._raw.exec(`VACUUM INTO '${f}'`);
-    R = { api: apiOver(new DatabaseSync(f)), pos: d1Position(P) };
+    const raw = new DatabaseSync(f);
+    replicas.push(raw);
+    R = { api: apiOver(raw), pos: d1Position(P) };
     return R.pos;
   };
   class Session {
@@ -76,6 +79,10 @@ export function laggy(P) {
       return typeof v === 'function' ? v.bind(t) : v;
     },
   });
-  const close = () => { rmSync(dir, { recursive: true, force: true }); };
+  // Windows refuses to remove a database file that is still open, so every replica is closed first.
+  const close = () => {
+    for (const raw of replicas) raw.close();
+    rmSync(dir, { recursive: true, force: true });
+  };
   return { db, sync, log, close };
 }

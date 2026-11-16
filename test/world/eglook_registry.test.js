@@ -6,13 +6,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   PSEUDO_ARCHIVES, PSEUDO_ARCHIVE_KEYS, PSEUDO_ARCHIVE_FLOOR,
   pseudoArchiveCollisions, pseudoArchiveOwner, pseudoArchiveFree,
 } from '../../src/world/pseudoArchives.js';
 import { LAST_CLASSIC_TEXTURE_ARCHIVE } from '../../src/scenes/dataPipeline.js';
 
-const SRC = new URL('../../src/', import.meta.url).pathname;
+const SRC = fileURLToPath(new URL('../../src/', import.meta.url));
 function walk(dir, out = []) {
   for (const f of readdirSync(dir)) { const p = join(dir, f); if (statSync(p).isDirectory()) walk(p, out); else if (f.endsWith('.js')) out.push(p); }
   return out;
@@ -21,7 +22,7 @@ function walk(dir, out = []) {
 function sweep() {
   const nums = [], keys = [];
   for (const p of walk(SRC)) {
-    const rel = p.slice(SRC.length), text = readFileSync(p, 'utf8');
+    const rel = p.slice(SRC.length).split('\\').join('/'), text = readFileSync(p, 'utf8');
     for (const m of text.matchAll(/(?:export )?const ([A-Z0-9_]*ARCHIVE[A-Z0-9_]*) *= *([0-9_]+)\b/g)) {
       const v = Number(m[2].replace(/_/g, ''));
       if (v > PSEUDO_ARCHIVE_FLOOR && !/_MAX$|_MIN$/.test(m[1])) nums.push({ owner: rel, name: m[1], value: v });

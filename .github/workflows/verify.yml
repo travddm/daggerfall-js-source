@@ -82,6 +82,14 @@ jobs:
       - name: Install dependencies
         if: steps.deps.outputs.cache-hit != 'true'
         run: npm ci
+      # The lint script keeps ESLint's cache in node_modules/.cache/eslint/, keyed on file contents. The node_modules
+      # cache is saved only when the lockfile changes, so without a cache of its own every lint started cold.
+      - name: ESLint's cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/eslint
+          key: eslint-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: eslint-${{ runner.os }}-
       - name: Lint
         run: npm run lint
       - name: Lint ratchet is current

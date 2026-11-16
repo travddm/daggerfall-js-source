@@ -105,7 +105,8 @@ The Elder Scrolls: Arena data is optional. The player attaches their own ARENA f
 | `npm test` | Runs every `test/**/*.test.js` with `node --test`, in one shard (`tools/testShards.mjs 1/1`). |
 | `npm run test:changed` | Runs only the tests a change can affect (`tools/testChanged.mjs`). See below. |
 | `npm run lint` | ESLint over `src/`, `server/src/`, `server-account/src/`, `test/`, `tools/`, `scripts/`, `app/` and the configs. |
-| `npm run types` | `tsc -p tsconfig.json`: type-checks the files marked `// @ts-check` and the JSDoc types. No output is emitted. |
+| `npm run types` | Type-checks the files marked `// @ts-check` (`tsconfig.json`) and the `.ts` files under `tools/` and `test/` (`tsconfig.node.json`). No output is emitted. |
+| `npm run pre-push` | The checks a pull request's CI runs, on your branch's changes (`tools/pre-push.ts`). See below. |
 | `npm run check` | `lint`, `types`, `test` and `build` in series. Slow; CI runs the same steps in parallel. |
 | `npm run perf` | `tools/perfProbe.mjs`: boots the real game in Playwright and logs FPS, frame time and draw counts. Needs ARENA2. |
 | `npm run shot` | `tools/screenshot.mjs`: boots a scene with `?shot` and saves a screenshot. |
@@ -116,8 +117,9 @@ feature).
 ### How the tests choose what to run
 
 - `tools/testChanged.mjs` selects a test file when the file changed, when a file it imports changed (followed through
-  every relative `import`, `export ... from` and `import()`), or when its own text names a changed file. "Changed"
-  means against the merge base with `origin/main`, plus staged, unstaged and untracked files. A change to
+  every relative `import`, `export ... from` and `import()`), when its own text names a changed file, or when it lists
+  a folder a changed file lies in (tree-wide sweeps run for every change). "Changed" means against the merge base with
+  the base ref (`config.baseRef` in `package.json`), plus staged, unstaged and untracked files. A change to
   `package.json`, `package-lock.json` or `tsconfig.json` runs everything. `--list` prints the selection.
 - `tools/testShards.mjs N/M` splits the suite into M shards balanced by recorded times (`tools/testTimes.json`) and
   runs shard N, longest files first, on every core.
@@ -125,9 +127,9 @@ feature).
   request and before every deploy. A pull request that conflicts with its base runs no workflow, so merge the base in
   first.
 
-Before a push, run `npm run lint`, `npm run types` and `npm run test:changed`. When `test:changed` selects most of the
-suite (a change to a module everything imports, such as `src/scenes/worldModes.js`), run the change's own test files
-and let CI run the rest.
+Before a push, run `npm run pre-push`. When the change reaches most of the suite only through other modules (an edit to
+a module everything imports, such as `src/systems/features.js`), it runs the near tests and leaves the rest to CI
+([running-tests.md](testing/running-tests.md#before-a-push)).
 
 ## Running the game locally
 

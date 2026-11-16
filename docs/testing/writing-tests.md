@@ -66,6 +66,10 @@ test('a file with no recorded time weighs the median', () => {
   - `moduleload_smoke.test.js`: every module under `src/` imports under Node without throwing, except an exact list
     of browser-only modules.
   - `csstarget.test.js`: the CSS minifier target in `vite.config.js` stays below the browsers the game supports.
+- **A test that lists a folder tells the selector which one.** `npm run test:changed` finds a recursive walk by
+  itself and runs it for every change. A sweep of one area may declare it, `// test:changed scans: src/`, so it runs
+  only for changes there. A helper that builds a listed folder's path from parts must declare the folder, or a new
+  file there selects nothing ([running-tests.md](running-tests.md#the-changed-files-loop)).
 - **Use the real code under a fake boundary, not a fake of the code.** Fake the network, the Durable Object state, the
   database or the DOM. Do not fake the module under test.
 - **Use one shared fake.** If a fake exists in `test/*.mjs`, import it. Two copies of a fake drift apart, and a fake

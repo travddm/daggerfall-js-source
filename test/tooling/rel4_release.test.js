@@ -116,7 +116,7 @@ test('REL4: the notes are the patch notes the release brings, once, and say so p
 });
 
 test('AUDIT INSTALL L5-10: the script\'s own commands, run - a set one short exits 1, "latest" prints what the publish job reads', () => {
-  const script = new URL('../../scripts/desktopRelease.mjs', import.meta.url).pathname;
+  const script = fileURLToPath(new URL('../../scripts/desktopRelease.mjs', import.meta.url));
   const node = (...args) => spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
   const dir = mkdtempSync(join(tmpdir(), 'rel4-set-'));
   try {
@@ -235,6 +235,7 @@ test('REL6: the pull requests a release brings - every merge on the first-parent
     git('config', 'user.email', 'probe@example.invalid');
     git('config', 'user.name', 'probe');
     git('config', 'commit.gpgsign', 'false');
+    git('config', 'tag.gpgsign', 'false');
     commit('start');
     git('tag', 'app-v0.1.1');
     // a branch that merged another pull request into ITSELF - that merge is the branch's, never main's
@@ -313,6 +314,7 @@ test('REL6: the notes command, spawned as the publish job spawns it - the pull r
     git('config', 'user.email', 'p@example.invalid');
     git('config', 'user.name', 'p');
     git('config', 'commit.gpgsign', 'false');
+    git('config', 'tag.gpgsign', 'false');
     commit('one');
     git('tag', 'app-v0.1.1');
     for (const [pr, branch] of [[7, 'sea'], [8, 'pause']]) {

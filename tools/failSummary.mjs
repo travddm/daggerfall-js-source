@@ -13,6 +13,7 @@
 // (tools/fileTimes.mjs) - a CI shard's record, the next run's balance.
 import { appendFileSync } from 'node:fs';
 import { relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { fileTimeOf, addTimes } from './fileTimes.mjs';
 
 // CI-TIMES: the record's path, taken out of the environment as the reporter loads - before the runner starts any file's
@@ -30,10 +31,20 @@ export function whyOf(error) {
   return m.length > 300 ? `${m.slice(0, 299)}…` : m;
 }
 
+/** A file URL's path. On Windows the URL's pathname is /E:/..., which relative() cannot place, so fileURLToPath
+ *  reads it; a URL without a drive (a test's file:///r/...) keeps its pathname. */
+function pathOfFileUrl(url) {
+  try {
+    return fileURLToPath(url);
+  } catch {
+    return decodeURIComponent(new URL(url).pathname);
+  }
+}
+
 /** A path as the repository holds it - relative to `cwd` where it lies under it, a file URL read as its path. */
 export function repoPath(file, cwd = process.cwd()) {
   if (!file) return '';
-  const p = String(file).startsWith('file://') ? decodeURIComponent(new URL(String(file)).pathname) : String(file);
+  const p = String(file).startsWith('file://') ? pathOfFileUrl(String(file)) : String(file);
   const r = relative(cwd, p).split('\\').join('/');
   return r && !r.startsWith('..') ? r : p;
 }

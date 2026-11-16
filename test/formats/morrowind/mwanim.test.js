@@ -342,8 +342,8 @@ test('MWAUDIT: findAnimGroup resolves whatever case the file wrote - the map kee
   // GROUP name exactly as written, while the first-person layer looked
   // groups up by a hard-coded capitalisation. A file writing `idle1h:`
   // resolved nothing, and a rig with no group to play freezes in its
-  // bind pose. OpenMW lowercases group names on the way in for exactly
-  // this reason: real data and mods do not agree on case.
+  // bind pose. The clip law lower-cases group names on the way in for the
+  // same reason: real data and mods do not agree on case.
   const groups = parseAnimGroups([
     { time: 0, text: 'idle1h: Start' },
     { time: 1, text: 'idle1h: Stop' },
@@ -407,8 +407,8 @@ test('MW-D7 rule 44: the blob splits on the CHARACTER SET [\\r\\n], not on the p
 test('MW-D7 rule 45: the fold is a 256-entry ASCII table, not toLowerCase', () => {
   assert.equal(asciiLower('IDLE: START'), 'idle: start');
   // U+212A KELVIN SIGN and U+0130 both fold INTO ASCII under
-  // String.prototype.toLowerCase. The reference's table maps only 65-90
-  // and leaves every other byte, multibyte included, alone.
+  // String.prototype.toLowerCase. The fold maps only the letters A to Z
+  // and leaves every other character, multibyte included, alone.
   assert.equal(asciiLower('K'), 'K', 'KELVIN SIGN is not folded to k');
   assert.equal('K'.toLowerCase(), 'k', 'which is exactly what the wrong function does');
   assert.equal(asciiLower('İ'), 'İ', 'and dotted capital I is left alone too');
@@ -432,7 +432,7 @@ test('MW-D7 rule 22: the range is found by walking BACKWARDS from the group\'s l
   assert.equal(c.ok, true);
   // Block A is at [0.0, 0.5] and block B at [1.0, 3.0]. A forward scan
   // takes A, which is a real range, brackets time correctly, and is the
-  // wrong animation. undeadwolf_2.nif is why the reference scans back.
+  // wrong animation. undeadwolf_2.nif is why the search runs backwards.
   assert.equal(c.startTime, 1, 'the LATER block wins, not the first');
   // "Idle: Stop." - the Scrib's trailing period. An exact stop compare
   // walks past it to block A's 0.5, and then start(1.0) > stop(0.5)
@@ -481,9 +481,9 @@ test('MW-D7 rules 23/49: loopStopTime is +Infinity unless loopFallback, and rese
   const fb = resetClip(IDLE_KEYS, 'Idle', { loopFallback: true });
   assert.equal(fb.loopStopTime, 3, 'loopFallback substitutes the stop key, and only then');
 
-  // Reset's third stage, the half rule 49 states unconditionally and its
-  // own caveat corrects: loop keys AT OR BEFORE the startpoint-adjusted
-  // playhead are applied before a single frame runs. The asymmetry is the
+  // The last stage of resetClip: loop keys AT OR BEFORE the playhead
+  // (after the start point is applied) narrow the loop window before a
+  // single frame runs. The asymmetry is the
   // pin - 1.5 is behind the playhead and applies, 2.5 is ahead and does not.
   const resumed = resetClip(IDLE_KEYS, 'Idle', { startPoint: 0.6 });
   assert.equal(resumed.time, 2.2, '1.0 + (3.0 - 1.0) * 0.6');
@@ -593,11 +593,11 @@ test('MW-D7 rule 47: sound keys cross group lines, ordinary foreign keys do not'
   }
   const texts = fired.map((f) => f.text);
   assert.ok(texts.includes('idle: chop hit'),
-    'a key with no handler is still CROSSED - rule 24 dispatches nothing here, on purpose');
+    'a key with no handler is still CROSSED - the playback reports it and the caller decides');
   const sg = fired.find((f) => f.text === 'soundgen: left');
   assert.ok(sg, 'the soundgen key reaches the listener');
   assert.equal(sg.mine, false,
-    'flagged as another group\'s - the listener handles it BEFORE the group test and returns');
+    'flagged as another group\'s - the listener plays a sound key whatever its group');
   assert.ok(!texts.some((t) => t.startsWith('idle1h:')),
     'while block A and idle1h sit outside the clip and are never reached');
 });
@@ -622,17 +622,14 @@ test('MW-D7: trackBinding names the tracks that bind and the ones that do not', 
 
 // --- MW-D17: THE LOOPING SET, AND THE VIEWER RIDES THE LAW -----------------
 //
-// Animation::isLoopingAnimation (animation.cpp:792-826) is the SCRIPTED
-// path's loopFallback producer - playGroup, character.cpp:2631 - and the
-// mesh viewer's dropdown IS that path: a group named from outside the
-// movement machine. The player body's own paths hardcode their answer
-// (rule 51's recorded caveat) and fpArm keeps doing so, untouched.
+// isLoopingAnimation answers for a group named from outside the movement
+// code, as the mesh viewer's dropdown names one. The player body's own
+// paths hardcode their answer, and fpArm keeps doing so.
 
-test('MW-D17 rule 51: the hardcoded looping set, all forty-four names, verbatim', () => {
-  // Typed from the reference literal at animation.cpp:797-804, not
-  // computed from anything in the port - a dropped or misspelt name
-  // fails here and nowhere else.
-  assert.deepEqual([...LOOPING_ANIMATIONS], [
+test('MW-D17 rule 51: the looping set is all forty-four names', () => {
+  // Typed out, not computed from anything in the module - a dropped or
+  // misspelt name fails here and nowhere else. The order does not matter.
+  assert.deepEqual([...LOOPING_ANIMATIONS].sort(), [
     'walkforward', 'walkback', 'walkleft', 'walkright',
     'swimwalkforward', 'swimwalkback', 'swimwalkleft', 'swimwalkright',
     'runforward', 'runback', 'runleft', 'runright',
@@ -644,13 +641,13 @@ test('MW-D17 rule 51: the hardcoded looping set, all forty-four names, verbatim'
     'idle8', 'idle9', 'idlesneak', 'idlestorm', 'idleswim', 'jump',
     'inventoryhandtohand', 'inventoryweapononehand', 'inventoryweapontwohand',
     'inventoryweapontwowide',
-  ]);
+  ].sort());
   assert.equal(LOOPING_ANIMATIONS.length, 44);
 });
 
 test('MW-D17 rule 51: a real "loop start" key loops ANY group - and at time 0, because the test is >= 0', () => {
-  // getTextKeyTime answers the key's TIME with -1 for absent, and the
-  // reference guards `>= 0`. A key sitting exactly at t=0 is the
+  // getTextKeyTime answers the key's TIME with -1 for absent, so the
+  // test is `>= 0`. A key sitting exactly at t=0 is the
   // mutation that separates >= from >: real files start at zero.
   const atZero = [{ time: 0, text: 'move: loop start' }, { time: 1, text: 'move: loop stop' }];
   assert.equal(isLoopingAnimation(atZero, 'move'), true, 'loop start at t=0 still loops');
@@ -660,8 +657,7 @@ test('MW-D17 rule 51: a real "loop start" key loops ANY group - and at time 0, b
 });
 
 test('MW-D17 rule 51: the LONGEST short group is stripped - "bow" must not be picked over "crossbow"', () => {
-  // The reference's own comment names this case. Strip the shorter
-  // suffix and "idlecrossbow" becomes "idlecross", which is in no set.
+  // Strip the shorter suffix and "idlecrossbow" becomes "idlecross", which is in no set.
   assert.equal(isLoopingAnimation([], 'idlecrossbow'), true);
   assert.equal(isLoopingAnimation([], 'idlebow'), true);
   assert.equal(isLoopingAnimation([], 'idle1h'), true, 'the everyday variant, same rule');
@@ -671,7 +667,7 @@ test('MW-D17 rule 51: the LONGEST short group is stripped - "bow" must not be pi
 test('MW-D17 rule 51: the strip is a SUFFIX test, and set membership is of what remains', () => {
   // "spellturnleft" CONTAINS the short group "spell" but does not end
   // with it - an includes/startsWith mutant strips five letters off the
-  // tail and answers false. The reference answers true: nothing is
+  // tail and answers false. The right answer is true: nothing is
   // stripped and the whole name is in the set.
   assert.equal(isLoopingAnimation([], 'spellturnleft'), true);
   assert.equal(isLoopingAnimation([], '1hidle'), false, 'a LEADING short group is not a suffix');
@@ -687,14 +683,12 @@ test('MW-D17 rule 51: the group is folded at the door, like every other entry po
 });
 
 // ---------------------------------------------------------------------------
-// MW-D33: the clip law brought to 1:1 - interpolation, reset's third
-// stage, the accum axes, and the key reader's field order. Every law
-// cited from the reference read whole this slice.
+// MW-D33: interpolation, resetClip's last stage, the accum axes, and the
+// key reader's field order.
 
 test('MW-D33: constant keys answer by WHICH HALF, scalars and quaternions alike', () => {
-  // interpolate() (nifosg/controller.hpp:140-141 and :169-170):
-  // `fraction > 0.5f ? b.mValue : a.mValue`. The port had answered the
-  // left key always, which turns a step channel into a lagging one.
+  // Past the halfway point the right key answers. Answering the left key
+  // always turns a step channel into a lagging one.
   const track = {
     rotationType: KEY_TYPE.constant,
     rotationKeys: [
@@ -745,11 +739,10 @@ test('MW-D33: TCB interior tangents weight by TIME SPAN, not a flat half', () =>
 });
 
 test('MW-D33: reset\'s third stage stops at the START key - a doubled block leaks nothing', () => {
-  // Animation::reset (animation.cpp:1028-1039): `for (; key != startkey
-  // && key != keys.rend(); ++key)` - the scan for loop keys behind the
-  // playhead runs from groupend DOWN TO the start key, exclusive.
-  // undeadwolf_2.nif carries two walkforward blocks; playing the second
-  // must not inherit the first block's loop window.
+  // The scan for loop keys behind the playhead runs from the block's
+  // last key DOWN TO the start key, exclusive. undeadwolf_2.nif carries
+  // two walkforward blocks; playing the second must not inherit the
+  // first block's loop window.
   const keys = [
     { time: 0.0, text: 'walkforward: start' },
     { time: 0.2, text: 'walkforward: loop start' },

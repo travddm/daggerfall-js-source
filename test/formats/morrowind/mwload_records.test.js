@@ -134,8 +134,8 @@ test('MW-LOAD: extractArmRecords equals the six per-kind readers on every fixtur
     { id: 'rat', model: 'r/rat.nif', name: 'Rat', flags: 0x48, scale: 1 },
     { id: 'skeleton', model: 'r/skeleton.nif', name: '', flags: 0x49, scale: 1.25 },
   ], 'the blood type (FLAG >> 8) is not a flag; a modelless creature is dropped');
-  assert.equal(one.creatures[1].flags & CREA_FLAG.Bipedal, CREA_FLAG.Bipedal, 'Bipedal is bit 0 (loadcrea.hpp)');
-  assert.equal(one.creatures[0].flags & CREA_FLAG.Bipedal, 0);
+  assert.equal(one.creatures[1].flags & CREA_FLAG.Biped, CREA_FLAG.Biped, 'Biped is bit 0');
+  assert.equal(one.creatures[0].flags & CREA_FLAG.Biped, 0);
 });
 
 test('MW-LOAD: the answer survives JSON whole, and the envelope is refused when it is not this shape', () => {

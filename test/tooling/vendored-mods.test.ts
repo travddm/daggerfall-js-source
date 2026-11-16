@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
   MANIFEST_PATH,
+  checkFails,
   compare,
   lowered,
   measure,
@@ -68,6 +69,15 @@ test('a count that grows fails; one that falls is only reported', () => {
   );
   assert.deepEqual(grown, [{ key: 'a', kind: 'lines', was: 10, now: 11 }]);
   assert.deepEqual(fallen, [{ key: 'b', kind: 'lines', was: 3, now: 1 }]);
+});
+
+test('--strict fails on a fall that is not recorded; without it only growth fails', () => {
+  const fall = { key: 'b', kind: 'lines' as const, was: 3, now: 1 };
+  const rise = { key: 'a', kind: 'lines' as const, was: 10, now: 11 };
+  assert.equal(checkFails({ grown: [], fallen: [fall] }, false), false);
+  assert.equal(checkFails({ grown: [], fallen: [fall] }, true), true);
+  assert.equal(checkFails({ grown: [rise], fallen: [] }, false), true);
+  assert.equal(checkFails({ grown: [], fallen: [] }, true), false);
 });
 
 test('--update lowers counts and never raises one; --allow-growth takes the measurement', () => {

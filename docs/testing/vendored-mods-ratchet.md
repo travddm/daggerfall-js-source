@@ -17,15 +17,18 @@ chosen to name that mod only: a mod's count must reach zero when its removal lan
 `test/tooling/vendored-mods.test.ts` measures the tree and fails when a count grows. A count that falls passes
 locally and is reported. In CI (where `CI` is set) the test also fails on a fall that `--update` has not recorded, as
 the lint ratchet's `--strict` does: an unrecorded fall would leave room for the same number of new lines.
+`npm run pre-push` does not set `CI`, so it runs `node tools/vendored-mods.ts --strict` as its own step, which fails
+on the same fall.
 
 `tools/testTimes.json` is never measured: it lists test files by path, and a refresh rewrites it without adding to any
-mod. `npm run test:changed` does not pick this test for most changes, because it selects by imports. Run
-`node tools/vendored-mods.ts` before a push.
+mod. The test lists the tree with `git ls-files`, so `npm run test:changed` and `npm run pre-push` run it for every
+change.
 
 ## Commands
 
 ```bash
 node tools/vendored-mods.ts                  # check: fail when a count grows
+node tools/vendored-mods.ts --strict         # also fail on a fall that --update has not recorded
 node tools/vendored-mods.ts --update         # lower the counts to the measurement; never raises one
 node tools/vendored-mods.ts --report <folder>   # every hit of one mod, or of "shared"
 ```

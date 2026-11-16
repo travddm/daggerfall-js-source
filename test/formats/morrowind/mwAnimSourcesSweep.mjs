@@ -59,7 +59,7 @@ export async function readInputs({ dataPath, fs, path, modules }) {
       creatures.push({
         id: rec.id,
         model: correctActorModelPath(`meshes/${rec.model}`, has),
-        bipedal: (rec.flags & firstPerson.CREA_FLAG.Bipedal) !== 0,
+        bipedal: (rec.flags & firstPerson.CREA_FLAG.Biped) !== 0,
       });
     }
   }

@@ -10,7 +10,7 @@ import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { join, dirname } from 'node:path';
 import { STAR_MASTERS } from '../../../src/systems/starfall/starCoven.js';
 import { STAR_AT_TEXT } from '../../../src/systems/starfall/starWords.js';
@@ -168,7 +168,7 @@ async function everyCustomRow() {
   const walk = (d, out = []) => { for (const n of readdirSync(d)) { const p = join(d, n); if (statSync(p).isDirectory()) walk(p, out); else if (p.endsWith('.js')) out.push(p); } return out; };
   const files = walk(join(ROOT, 'src')).filter((f) => /registerCustomTemplates\(/.test(readFileSync(f, 'utf8')));
   assert.ok(files.length >= 20, `${files.length} homes`);
-  for (const f of files) await import(f);
+  for (const f of files) await import(pathToFileURL(f).href);
   registerCustomTemplates(RRI_TEMPLATES);
   return customTemplateRows();
 }

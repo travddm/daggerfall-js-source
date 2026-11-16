@@ -27,3 +27,9 @@ test/fixtures/mw/fpArmPartsParity.json
 test/fixtures/mw/buildRulesParity.json
 test/fixtures/mw/animSlotsParity.json
 test/fixtures/mw/upperBodyParity.json
+test/fixtures/mw/mw-first-person-rest-parity.json
+test/fixtures/mw/mw-clip-law-parity.json
+test/fixtures/mw/mw-particle-parity.json
+test/fixtures/mw/mw-worn-parity.json
+test/fixtures/mw/weapon-holster-parity.json
+test/fixtures/mw/nif-material-parity.json

@@ -1468,6 +1468,8 @@ features.eventBoard.note,"A board at the left of the screen lists the world even
 features.eventBoard.title,"Event board"
 features.firstPersonLighting.note,"What you hold in first person takes the light of where you stand: your weapon, your spellcasting hands, the torch in your off hand and the Morrowind arms."
 features.firstPersonLighting.title,"First-person lighting"
+features.gateFloorHidden.note,"Where a road runs through a city gate, the road shows under the arch. Off draws the flat slab Daggerfall lays under every gate, over the road."
+features.gateFloorHidden.title,"Open city gates"
 features.gatePortentLoot.effect,"Takes effect at once. Online it is always on."
 features.gatePortentLoot.note,"On a night with portents, each portent makes one of the Breach boss pieces Rare or better. Off, the night pays what a plain night pays."
 features.gatePortentLoot.title,"Breach portent loot"

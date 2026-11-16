@@ -22,12 +22,13 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
   file-format documentation and the behaviour of Morrowind data before the repository goes public (decisions 25 and
   108), each rewrite held to the old module's answers by a parity test.
   - Clean: `mwBsaFile.js`, `mwEsmFile.js` and `mwNifFile.js` (OpenMW read for behaviour only), and the rewrites
-    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js` and `mwAnimSources.js`.
-  - Still OpenMW-derived: `mwFirstPerson.js`, `mwAnim.js` (the clip law), `mwKeys.js` (`tcbTangents`),
-    `mwNifMesh.js` (`resolveMaterial`), `mwItemMap.js` (its tables), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
-    `mwParticles.js`, `mwSpellFx.js`, `mwVfx.js`, and outside this folder parts of `src/combat/fpArm.js` and
-    `src/systems/weaponSheathing.js`. `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`)
-    only quote OpenMW in comments.
+    `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`,
+    `mw-bone-rules.ts`, `mw-clip-law.ts`, `mwParticles.js` with `mw-particle-sim.ts`, `mwItemMap.js` with `mw-worn-parts.ts`,
+    `src/systems/weaponSheathing.js` with `weapon-holster.ts`, `mwNifMesh.js` with `nif-material.ts`,
+    the rest of `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
+  - Still OpenMW-derived: `mwKeys.js` (`tcbTangents`), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
+    `mwSpellFx.js`, `mwVfx.js`. `src/combat/fpArm.js`,
+    `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`) only quote OpenMW in comments.
 
   Do not add OpenMW logic to a derived module; change it only as part of its rewrite.
 
@@ -62,17 +63,20 @@ An async read must store its result in the cache generation it started under.
 | `mwEsmFile.js` | TES3 `.esm`/`.esp`. Every record has a size, so unknown records are skipped and counted. Decodes `BODY`, `RACE`, `NPC_`, `CREA`; deleted records are dropped. Text is Windows-1252. |
 | `mwNifFile.js` | NIF 4.0.0.2 only. Records have no size field, so the reader is strict: an unknown record type throws with its name and index. |
 | `mwNifMesh.js` | Flattens a parsed NIF into draw batches: composed transforms, materials, base texture. |
+| `nif-material.ts` | The surface a shape has from its properties (colours, base texture, blend, depth, sidedness), the two per-vertex colour rules and the geometry-name skip list. `mwNifMesh.js` re-exports them. |
 | `mwDdsFile.js`, `mwTexture.js`, `mwTextureClient.js`, `mwTextureWorker.js` | DDS decode (DXT1/3/5, uncompressed masks) and the texture path rule; decoding runs in a worker pool. |
 | `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling. |
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
+| `mw-clip-law.ts` | The rules that read a list of text keys: normalise it, find a group's time range, play a clip through it, a movement clip's speed, and which groups loop. `mwAnim.js` re-exports them. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
 | `mwFirstPerson.js` | The first-person rules, the record extraction, and the diagnostics. |
-| `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
+| `mwBodyParts.js`, `mwHeadView.js` | The body-part record that skins each slot for a race, sex and view, and the vampire's and werewolf's heads; the skeleton node that carries the first-person camera, and how the look pitch turns the neck. |
+| `mw-bone-rules.ts` | Which bones belong to a blend mask, and which mesh shapes belong to a bone. |
 | `mwWeaponAnim.js`, `mwAnimSources.js` | Which animation group a weapon type plays and the text keys that time a swing; which `.kf` files an actor plays from. |
-| `mwItemMap.js` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. |
+| `mwItemMap.js`, `mw-worn-parts.ts` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. The worn body: the armour and clothing part table, which skin each part hides, the reserve lists of robes and skirts, the priority law, and the shield and part-group ladders. |
 | `mwFaceMatch.js` | Pairs Daggerfall portraits with Morrowind heads and hairs. |
 | `mwCloakFit.js`, `mwPartClock.js` | Cloak fitting and parts that animate on their own clock (for example an arrow on a bow). |
-| `mwParticles.js`, `mwSpellFx.js`, `mwVfx.js` | NIF particle systems (torch flames), which Morrowind effect visuals a Daggerfall spell uses, and running an effect mesh (`scenes/mwMagicFx.js`). |
+| `mwParticles.js`, `mw-particle-sim.ts`, `mwSpellFx.js`, `mwVfx.js` | NIF particle systems (torch flames: the descriptors read from a file, and the running simulation), which Morrowind effect visuals a Daggerfall spell uses, and running an effect mesh (`scenes/mwMagicFx.js`). |
 
 ## Where it is used
 
@@ -93,7 +97,7 @@ An async read must store its result in the cache generation it started under.
 
 ## Rules that are easy to get wrong
 
-These come from the engine's behaviour, read in OpenMW, and are recorded in detail in the readers' comments.
+These are facts about how Morrowind's data and engine behave, and the readers' comments record them in detail.
 
 - **A first-person part is a record, not a file name.** A `BODY` record whose id ends in `1st` is the first-person
   version. Never derive a mesh path by inserting `.1st`.

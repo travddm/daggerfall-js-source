@@ -11,6 +11,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 
 import { TERMS_VERSION, PRIVACY_VERSION, ACCEPTED } from '../../src/net/legalLaw.js';
@@ -38,7 +39,8 @@ function runBlock(yml, stepName) {
 }
 
 /** bash, from the repository's root, with the environment given - how the runner runs a step. */
-const bash = (script, env = {}) => spawnSync('bash', ['-c', script], { cwd: ROOT.pathname, env: { PATH: process.env.PATH, ...env }, encoding: 'utf8' });
+// The runner's shell has LANG=C.UTF-8; without it, Git for Windows' grep refuses -P.
+const bash = (script, env = {}) => spawnSync('bash', ['-c', script], { cwd: fileURLToPath(ROOT), env: { PATH: process.env.PATH, LANG: 'C.UTF-8', ...env }, encoding: 'utf8' });
 
 test('AUDIT PRE-MERGE 0929 T-CI: every request a workflow makes that opens or names an account carries the versions both ends read - the deploy smoke opened its guest with a label alone, 400 under curl -f, and every check after the Worker went live never ran (mutants: a body without the versions; the versions typed in the workflow)', () => {
   let asked = 0;

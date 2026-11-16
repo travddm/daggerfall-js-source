@@ -14,11 +14,11 @@
 // that is a hole entire is computed, and its sheet must be one the evaluated exports carry.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import * as acorn from 'acorn';
 
 export const HOLE = '__hole__';
-const ROOT = new URL('../', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const kids = (n) => Object.keys(n).filter((k) => k !== 'loc').flatMap((k) => (Array.isArray(n[k]) ? n[k] : [n[k]])).filter((v) => v && typeof v.type === 'string');
 const isFn = (n) => /Function/.test(n.type);
 

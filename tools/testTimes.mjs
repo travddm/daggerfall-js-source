@@ -23,18 +23,26 @@ import { isMain } from './lib/isMain.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+/** The weight of a run's own time in a file's smoothed time; the rest is the time it had before. */
+export const NEW_TIME_WEIGHT = 1 / 3;
+
 /**
- * CI-TIMES: THE MERGE. Each of the suite's `files` takes its time from the records (a run's, file -> ms; a later record
- * over an earlier), else keeps the one `base` held, else has none (the split weighs it the median); a file no longer in
- * the suite is dropped. Sorted by file. Pure.
+ * The merge. Each of the suite's `files` takes its time from the records (a run's, file -> ms; a later record over an
+ * earlier), blended with the time `base` held for it: a third of the new time, two thirds of the old. One run's time
+ * swings with the files that share its runner, so the last time alone put the slowest shard about a third over the
+ * mean. A file with no record keeps its time, and a file with no time has none (the split weighs it the median). A file
+ * no longer in the suite is dropped. Sorted by file. Pure.
  * @param {Record<string, number>} base @param {Record<string, number>[]} records @param {string[]} files
  */
 export function mergeTimes(base, records, files) {
   const ok = (v) => Number.isFinite(v) && v >= 0;
   const out = {};
   for (const f of [...new Set(files)].sort()) {
-    let t = ok(base?.[f]) ? base[f] : undefined;
-    for (const r of records) if (ok(r?.[f])) t = Math.round(r[f]);
+    const before = ok(base?.[f]) ? base[f] : undefined;
+    let recorded;
+    for (const r of records) if (ok(r?.[f])) recorded = r[f];
+    let t = before;
+    if (recorded !== undefined) t = Math.round(before === undefined ? recorded : before + (recorded - before) * NEW_TIME_WEIGHT);
     if (t !== undefined) out[f] = t;
   }
   return out;

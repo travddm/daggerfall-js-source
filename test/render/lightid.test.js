@@ -13,6 +13,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { lightIdOf, relight, adoptLight, lightList, packLight, copyLights, lightIdsOf, NO_LIGHT_ID } from '../../src/render/lightId.js';
 import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
 import { EL_LANE } from '../../src/render/enhancedLighting.js';
@@ -25,7 +26,7 @@ import { bossGlow } from '../../src/world/gate/gateBoss.js';
 import { GATE_STATE_EMPTY } from '../../src/net/gate/gateLink.js';
 import { courtShadowCounts, meanOf, worstOf, CASE_FRAMES } from '../../tools/courtShadowProbe.mjs';
 
-const ROOT = new URL('../..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const rd = (p) => readFileSync(join(ROOT, p), 'utf8');
 const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : p.endsWith('.js') ? [p] : []; });
 const I = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -39,7 +40,7 @@ test('LIGHT-ID: THE ONE CONSTRUCTION SEAM - no light is written into a frame\'s 
   ];
   const hits = [];
   for (const f of walk(join(ROOT, 'src'))) {
-    const rel = f.slice(ROOT.length);
+    const rel = f.slice(ROOT.length).split('\\').join('/');
     if (rel === 'src/render/lightId.js') continue;
     readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
       const code = line.replace(/\/\/.*$/, '');

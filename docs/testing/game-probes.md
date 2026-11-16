@@ -79,7 +79,9 @@ downloaded once and cached. A `build` job builds the game once (and once more wi
 probes download it (`PROBE_DIST`). Playwright's Chromium is cached by its version. The set does not run for a
 change that touches only documents (`*.md`, `docs/`); it also runs every night and on demand. Running the probes on
 every pull request that touches `src/` is the agreed rule (decision 116 (10)); path-based guards are to narrow it
-later.
+later. On a draft the probes wait for the full run, as `check.yml`'s verification does: they run when
+the pull request is marked ready and on every push after, and on a draft that changes a platform path or carries the
+`full-ci` label ([running-tests.md](running-tests.md), "Local, draft and ready").
 
 To tell a flaky probe from a real fault, run one probe many times on CI (each run is its own runner):
 

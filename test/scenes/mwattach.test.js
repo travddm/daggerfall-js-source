@@ -25,7 +25,7 @@ function zIndexLiterals() {
       if (!e.name.endsWith('.js')) continue;
       const src = readFileSync(full, 'utf8');
       for (const m of src.matchAll(/z-index:\s*(\d+)/g)) {
-        out.push({ file: full.slice(ROOT.length + 1), z: Number(m[1]) });
+        out.push({ file: full.slice(ROOT.length + 1).split('\\').join('/'), z: Number(m[1]) });
       }
     }
   };

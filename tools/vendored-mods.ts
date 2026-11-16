@@ -6,6 +6,7 @@
 // shared by several mods are counted once, in the shared bucket.
 //
 //   node tools/vendored-mods.ts            # check: fail when a count grows
+//   node tools/vendored-mods.ts --strict   # also fail when a count fell and --update has not recorded it, as CI does
 //   node tools/vendored-mods.ts --update   # lower the recorded counts to the measurement; never raises one
 //   node tools/vendored-mods.ts --update --allow-growth   # set every count to the measurement: reviewed in the diff
 //   node tools/vendored-mods.ts --report <folder>   # print every hit of one mod (or "shared")
@@ -169,6 +170,14 @@ export function compare(measured: Record<string, Counts>, manifest: Manifest): {
   return { grown, fallen };
 }
 
+/**
+ * Whether a check fails. A count that grows always fails. Under `strict` a fall that is not recorded fails too: it
+ * leaves room for the same number of new lines, so a check before a push and CI hold the record to the tree.
+ */
+export function checkFails({ grown, fallen }: { grown: Change[]; fallen: Change[] }, strict: boolean): boolean {
+  return grown.length > 0 || (strict && fallen.length > 0);
+}
+
 /** The manifest with each count lowered to the measurement. A count never rises here. */
 export function lowered(manifest: Manifest, measured: Record<string, Counts>): Manifest {
   const low = (was: Counts, now: Counts | undefined): Counts => ({
@@ -233,10 +242,15 @@ function main(args: string[]): number {
     writeFileSync(MANIFEST_PATH, serialize(next));
     return 0;
   }
-  const { grown, fallen } = compare(measured, manifest);
-  for (const c of fallen) console.log(`fallen: ${c.key} ${c.kind} ${c.was} -> ${c.now} (run with --update to lock it)`);
-  for (const c of grown) console.error(`grown: ${c.key} ${c.kind} ${c.was} -> ${c.now}`);
-  return grown.length ? 1 : 0;
+  const changes = compare(measured, manifest);
+  const strict = args.includes('--strict');
+  for (const change of changes.fallen) {
+    const line = `fallen: ${change.key} ${change.kind} ${change.was} -> ${change.now} (run with --update to lock it)`;
+    if (strict) console.error(line);
+    else console.log(line);
+  }
+  for (const c of changes.grown) console.error(`grown: ${c.key} ${c.kind} ${c.was} -> ${c.now}`);
+  return checkFails(changes, strict) ? 1 : 0;
 }
 
 if (isMain(import.meta.url)) process.exitCode = main(process.argv.slice(2));

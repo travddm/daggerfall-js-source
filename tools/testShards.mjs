@@ -106,13 +106,14 @@ export function runnerEnv(root = ROOT, extra = {}) {
 }
 
 export const WIN32_ARGV_BUDGET = 30000;
+/** `node` is the Node binary that runs the tests: this process's own unless a caller names another (CI's major). */
 export function runTests(files, { root = ROOT, times = readTimes(root), cores = availableParallelism(), spawn = spawnSync, extra = [],
-  budget = process.platform === 'win32' ? WIN32_ARGV_BUDGET : Infinity, summary = true, record = '' } = {}) {
+  budget = process.platform === 'win32' ? WIN32_ARGV_BUDGET : Infinity, summary = true, record = '', node = process.execPath } = {}) {
   if (!files.length) return 0;
   const ordered = shardsOf(files, 1, times)[0].files;
   const head = ['--test', `--test-concurrency=${Math.max(1, cores | 0)}`, ...(summary || record ? summaryReporters(root) : []), ...extra];
   const env = runnerEnv(root, record ? { TEST_TIMES_RECORD: resolve(record) } : {});
-  const base = process.execPath.length + head.reduce((n, a) => n + a.length + 3, 0);   // a space and two quotes an argument
+  const base = node.length + head.reduce((n, a) => n + a.length + 3, 0);   // a space and two quotes an argument
   const runs = [];
   let run = [], used = base;
   for (const f of ordered) {
@@ -122,7 +123,7 @@ export function runTests(files, { root = ROOT, times = readTimes(root), cores = 
   runs.push(run);
   let status = 0;
   for (const list of runs) {
-    const r = spawn(process.execPath, [...head, ...list], { cwd: root, stdio: 'inherit', env });
+    const r = spawn(node, [...head, ...list], { cwd: root, stdio: 'inherit', env });
     if (r.error) console.error(`[tests] the test runner did not start: ${r.error.message ?? r.error}`);
     const s = r.status ?? 1;
     if (s !== 0 && status === 0) status = s;

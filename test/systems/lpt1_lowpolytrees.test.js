@@ -72,7 +72,7 @@ test('LPT1 the vendored data: 253 prototypes over the twelve nature archives, 11
     const s = LPT.atlases[name];
     assert.deepEqual([s.blits.length, s.fills?.length ?? 0, s.blits[0].slice(0, 6)], [1, 0, [a, r, 0, 0, 0, 0]], name);
   }
-  const files = readdirSync(join(ROOT, 'vendor/low-poly-trees'), { recursive: true }).map(String).filter((f) => /\.\w+$/.test(f)).sort();
+  const files = readdirSync(join(ROOT, 'vendor/low-poly-trees'), { recursive: true }).map((f) => String(f).split('\\').join('/')).filter((f) => /\.\w+$/.test(f)).sort();
   assert.deepEqual(files, ['README.md', 'Trees/atlases.bin', 'Trees/trees.bin', 'Trees/trees.json', 'lowpolytrees.dfmod.json'].sort());
   // the geometry's length is what the index says - vertices, then every submesh's u16 indices (padded to four)
   const idx = JSON_.meshes.reduce((n, m) => n + m.subs.reduce((k, s) => k + s[1], 0), 0);

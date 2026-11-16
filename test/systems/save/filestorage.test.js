@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
 import {
   SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX,
@@ -308,7 +309,7 @@ test('an image MIME with no honest extension stays verbatim - never webp bytes w
 // ---- AUDIT DA: the two drift pins -----------------------------------
 
 test('PIN: no storage consumer bypasses the seam - globalThis.localStorage lives in appStorage.js alone', () => {
-  const root = path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
+  const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
   const offenders = [];
   const walk = (dir) => {
     for (const e of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {

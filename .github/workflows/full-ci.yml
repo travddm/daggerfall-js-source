@@ -1,0 +1,44 @@
+name: full-ci
+
+# The full-ci label on a draft pull request asks for the full verification now, for a change whose platform risk the
+# path list in tools/ci-plan.ts does not catch. This re-runs the pull request's last check.yml and probes.yml runs on
+# its head. Their plan reads the labels when it runs, so the re-run is full, and its `check` lands in the pull
+# request's own checks: a run started with workflow_dispatch reports on the commit but not on the pull request. Later
+# pushes to the draft get the full run while the label stays.
+#
+# check.yml does not listen for labels itself: every label event would start a run, cancel the one in progress and
+# post a new `check` on the same commit.
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+jobs:
+  rerun:
+    name: full run for the label
+    if: github.event.label.name == 'full-ci' && github.event.pull_request.draft
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Re-run check and probes on the head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          for workflow in check.yml probes.yml; do
+            run=$(gh run list --repo "$REPO" --workflow "$workflow" --commit "$SHA" --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            if [ -z "$run" ]; then
+              echo "$workflow: no run on $SHA (probes run only for the paths they watch)"
+              continue
+            fi
+            # a run in progress cannot be re-run: stop it and wait for it to end
+            gh run cancel --repo "$REPO" "$run" 2>/dev/null || true
+            gh run watch --repo "$REPO" "$run" --interval 5 >/dev/null 2>&1 || true
+            gh run rerun --repo "$REPO" "$run"
+            echo "$workflow: run $run started again"
+          done

@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as acorn from 'acorn';
 import { riseLine, wrathLine, gateBossOf } from '../../../src/net/gate/gateLaw.js';
 import { GATE_NO_WORDS } from '../../../src/net/wire.js';
@@ -26,14 +27,15 @@ import { stonesText, BROKER_REFUSALS, DISMANTLED } from '../../../src/systems/si
 import { recoverSpoils, SPOILS_RECORD_V } from '../../../src/scenes/spoilsPool.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
 
-const ROOT = new URL('../../../', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
 const OLD = /Oblivion Gate|Sigil Stone/i;
 
 /** Every string a shipped file can show or send: its literals and its template text - never a comment. */
 function shippedStrings() {
   const files = [];
-  const walk = (d) => { for (const f of readdirSync(join(ROOT, d))) { const p = join(d, f); if (statSync(join(ROOT, p)).isDirectory()) walk(p); else if (/\.(m?js|cjs)$/.test(f)) files.push(p); } };
+  // A checkout that installed the desktop app's dependencies has app/node_modules: third-party code, not ours.
+  const walk = (d) => { for (const f of readdirSync(join(ROOT, d))) { if (f === 'node_modules') continue; const p = join(d, f); if (statSync(join(ROOT, p)).isDirectory()) walk(p); else if (/\.(m?js|cjs)$/.test(f)) files.push(p); } };
   for (const d of ['src', 'server/src', 'server-account/src', 'app']) walk(d);
   const out = [];
   for (const f of files) {

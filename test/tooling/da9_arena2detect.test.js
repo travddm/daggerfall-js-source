@@ -33,6 +33,16 @@ const arena2At = (dir, names = REQUIRED_ARENA2) => {
 };
 const write = (p, text) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, text); };
 const noReg = () => [];
+/** Whether the temp folder's filesystem tells `a` from `A`; NTFS and APFS by default do not. */
+const caseSensitiveTmp = () => {
+  const dir = tmp();
+  try {
+    fs.writeFileSync(path.join(dir, 'a'), '');
+    return !fs.existsSync(path.join(dir, 'A'));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+};
 
 test('DA9: the shell\'s list IS the game\'s - one law for a whole ARENA2, on both sides of the bridge', () => {
   assert.deepEqual([...REQUIRED_ARENA2], [...GAME_REQUIRED], 'app/lib/arena2Detect.cjs and src/scenes/dataSource.js must name the same seven files');
@@ -86,8 +96,10 @@ test('DA9: Steam - every library in libraryfolders.vdf, at the installdir app 18
   try {
     const root = path.join(home, '.local', 'share', 'Steam');
     const lib2 = path.join(home, 'drive2', 'SteamLibrary');
+    // Valve writes a path's backslashes escaped (a Windows path has them).
+    const vdfPath = (p) => p.split('\\').join('\\\\');
     write(path.join(root, 'steamapps', 'libraryfolders.vdf'),
-      `"libraryfolders"\n{\n\t"0"\n\t{\n\t\t"path"\t\t"${root}"\n\t}\n\t"1"\n\t{\n\t\t"path"\t\t"${lib2}"\n\t}\n}\n`);
+      `"libraryfolders"\n{\n\t"0"\n\t{\n\t\t"path"\t\t"${vdfPath(root)}"\n\t}\n\t"1"\n\t{\n\t\t"path"\t\t"${vdfPath(lib2)}"\n\t}\n}\n`);
     const manifest = '"AppState"\n{\n\t"appid"\t\t"1812390"\n\t"installdir"\t\t"The Elder Scrolls Daggerfall"\n}\n';
     // the main library holds one copy - and ~/.steam/steam is a LINK to it, so it is reachable twice
     write(path.join(root, 'steamapps', `appmanifest_${STEAM_APP_ID}.acf`), manifest);
@@ -219,7 +231,9 @@ test('L4-3/L4-10: on a Mac the privacy-guarded folders are read only when nothin
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
 
-test('L4-9: ARENA2 and arena2 side by side (Linux): whichever is whole is the one', () => {
+// Two folders that differ only in case can exist only on a case-sensitive filesystem.
+const sideBySide = caseSensitiveTmp() ? {} : { skip: 'the temp filesystem ignores case' };
+test('L4-9: ARENA2 and arena2 side by side (Linux): whichever is whole is the one', sideBySide, () => {
   const root = tmp();
   try {
     arena2At(path.join(root, 'install', 'arena2'), ['ART_PAL.COL']);

@@ -8,9 +8,14 @@ name: probes
 # They run on pull requests that touch the game, the relay or the account service, one runner per probe so that the
 # slowest probe (online) sets the wall time. They are not part of the `check` job: ARENA2 comes from a download, and
 # a probe that finds a bug in the game should not hide behind the suite's green. Chromium renders on SwiftShader here.
+#
+# On a draft they wait, as check.yml's full verification does (tools/ci-plan.ts): they run when the pull request is
+# marked ready, on every push to a ready pull request, and on a draft with the full-ci label (full-ci.yml re-runs them)
+# or a change to a platform path.
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'src/**'
       - 'server/**'
@@ -53,9 +58,28 @@ jobs:
   plan:
     name: plan
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    permissions:
+      contents: read
+      pull-requests: read   # the draft state and the labels, read when the job runs
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
+      run: ${{ steps.draft.outputs.full }}
     steps:
+      # The pull request's merge commit and its parents: HEAD^1 is the base it merges into
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: draft
+        run: node tools/ci-plan.ts
+        env:
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
       - id: plan
         env:
           PROBE: ${{ inputs.probe }}
@@ -82,6 +106,8 @@ jobs:
   # game world. The online probe's page needs three edits of the source; it gets a build made with them.
   build:
     name: build
+    needs: plan
+    if: needs.plan.outputs.run == 'true'
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:
@@ -139,6 +165,7 @@ jobs:
 
   probe:
     needs: [plan, build]
+    if: needs.plan.outputs.run == 'true'
     name: "probe ${{ matrix.probe }}${{ matrix.run > 0 && format(' #{0}', matrix.run) || '' }}"
     runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     timeout-minutes: 40

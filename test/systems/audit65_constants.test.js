@@ -255,7 +255,7 @@ test('AUDIT 65 CV-2: EVERY player-side capsule call carries the player body, at 
     for (const line of readFileSync(f, 'utf8').split('\n')) {
       if (!/(missileHitsCapsule|sphereOverlapsCapsule)\(/.test(line)) continue;
       if (!/playerFeet/.test(line)) continue;
-      sites.push([f.slice(root.length), line.trim()]);
+      sites.push([f.slice(root.length).split('\\').join('/'), line.trim()]);
     }
   }
   // SPELLFX1 added three DRAWN arms (a peer's shaft in ArrowFlight and in

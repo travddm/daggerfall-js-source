@@ -59,6 +59,10 @@ test('AUDIT FAST-SUITE F7: where the platform caps a command line (Windows: 32,7
   // no cap: one runner
   const one = []; runTests(files, { times, cores: 4, spawn: (c, a) => { one.push(a); return { status: 0 }; } , budget: Infinity });
   assert.equal(one.length, 1);
+  // a caller that names another Node binary (pre-push's CI_NODE) gets every runner started on it
+  const binaries = [];
+  runTests(files, { times, cores: 4, spawn: (c) => { binaries.push(c); return { status: 0 }; }, budget: Infinity, node: 'C:/node22/node.exe' });
+  assert.deepEqual(binaries, ['C:/node22/node.exe']);
   assert.ok(WIN32_ARGV_BUDGET < 32767, 'Windows\' cap, with room for the executable');
   // the runner that never started
   const said = [], orig = console.error;

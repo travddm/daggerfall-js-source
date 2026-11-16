@@ -12,6 +12,7 @@ import { readFileSync, existsSync, mkdtempSync, rmSync, readdirSync } from 'node
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { parseNif } from '../../src/formats/morrowind/mwNifFile.js';
 import { flattenNif } from '../../src/formats/morrowind/mwNifMesh.js';
@@ -290,11 +291,11 @@ test('MW-FOLK1 (AUDIT): a cut on a file written here - its loose vertex kept, it
   const dir = mkdtempSync(join(tmpdir(), 'mwfolk1-cut-'));
   try {
     const out = join(dir, 'cut.fbx');
-    const run = spawnSync(process.execPath, [new URL('../../tools/fbxStrip.mjs', import.meta.url).pathname, new URL(`../../${SOURCE}`, import.meta.url).pathname, out, '--cut=Breton_Male.018:7,Breton_Male.018:2'], { encoding: 'utf8' });
+    const run = spawnSync(process.execPath, [fileURLToPath(new URL('../../tools/fbxStrip.mjs', import.meta.url)), fileURLToPath(new URL(`../../${SOURCE}`, import.meta.url)), out, '--cut=Breton_Male.018:7,Breton_Male.018:2'], { encoding: 'utf8' });
     assert.equal(run.status, 0, run.stderr);
     assert.match(run.stdout, /cut "Breton_Male\.018" material 7: 92 polygons, material 2: 510 polygons; 379 vertices/);
     assert.equal(Buffer.compare(readFileSync(out), stripFbx(raw(SOURCE), { cut: [{ object: 'Breton_Male.018', material: 7 }, { object: 'Breton_Male.018', material: 2 }] }).bytes), 0);
-    assert.equal(spawnSync(process.execPath, [new URL('../../tools/fbxStrip.mjs', import.meta.url).pathname, 'a.fbx', 'b.fbx'], { encoding: 'utf8' }).status, 2, 'neither a drop nor a cut: the usage');
+    assert.equal(spawnSync(process.execPath, [fileURLToPath(new URL('../../tools/fbxStrip.mjs', import.meta.url)), 'a.fbx', 'b.fbx'], { encoding: 'utf8' }).status, 2, 'neither a drop nor a cut: the usage');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
