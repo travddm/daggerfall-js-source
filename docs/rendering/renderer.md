@@ -21,7 +21,8 @@ Rules from the data side, stated at the top of `renderer.js`:
 - Textures from `TextureFile.getColor32` are already bottom-up, which is GL's texel order. Upload with `flipY` off.
 - Indexed colour means hard pixels. The world texture filter is Daggerfall Unity's `Video/MainFilterMode` (Point,
   Bilinear, Trilinear; `src/render/world-texture-filter.ts`) plus the port's Sharp, the port's default (DFU's is
-  Point). Sharp samples through a linear sampler with anisotropy, and its world shaders move each coordinate to its
+  Point). Every quality preset leaves it Sharp, because Sharp measured no slower than Point (frame time at a town,
+  an interior and a dungeon, at 1280x800 and 3840x2160); the Classic preset sets Point. Sharp samples through a linear sampler with anisotropy, and its world shaders move each coordinate to its
   texel's centre with a one-pixel blend at each texel edge (`src/render/sharp-texels.ts`): square texels close up,
   filtered ground in the distance. The world sets are built Sharp or plain for the filter, and swapped when it changes
   (`src/render/sharp-world-sets.ts`). In the retro modes Sharp drops the edge blend, so every texel is sampled at its
