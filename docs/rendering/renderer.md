@@ -172,8 +172,8 @@ automap clear (`PANEL_CLEAR_RGBA`), nearly transparent so the panel art shows th
 With real windows on, a building's glass shows the other side: from the street the room behind it, from inside the
 street. `outsideViewFrame` draws the outside view into an offscreen target before the room's frame; `setWindowRooms`
 and `setGlassView` select the mode each frame. Inside, the outside view is painted on the glass panes and cutout holes
-alone, so a slit between two of the room's models shows the interior's black clear, as in Daggerfall Unity. The
-shader text and rules are in `src/render/realWindows.js`.
+alone (`src/render/glass-background.js`), so a slit between two of the room's models shows the interior's black
+clear, as in Daggerfall Unity. The shader text and rules are in `src/render/realWindows.js`.
 
 ## Shaders and GLSL modules
 
