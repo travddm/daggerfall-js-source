@@ -43,8 +43,8 @@ export const FOCAL_TRANSITION_SPEED = Object.freeze({ combat: 5.0, normal: 1.0 }
 /** The shoulder choices; anything else is read as 'off'. */
 export const SHOULDER_SIDES = Object.freeze(['off', 'right', 'left']);
 
-/** The camera never looks exactly straight up or down: the look direction would lose its yaw. */
-export const PITCH_LIMIT = Math.PI / 2 - 0.000001;
+/** The camera never looks straight up or down: past the pole the look direction turns round (pitchLimit.js). */
+export { PITCH_LIMIT } from './pitchLimit.js';
 
 const METRES_PER_UNIT = 1 / MW_UNITS_PER_METER;
 
