@@ -25,9 +25,9 @@ instead of Daggerfall sprites. The readers are in `src/formats/morrowind/`; the 
     `mwTexture.js`, `mwBodyParts.js`, `mwHeadView.js`, `mwWeaponAnim.js`, `mwAnimSources.js`,
     `mw-bone-rules.ts`, `mw-clip-law.ts`, `mwParticles.js` with `mw-particle-sim.ts`, `mwItemMap.js` with `mw-worn-parts.ts`,
     `src/systems/weaponSheathing.js` with `weapon-holster.ts`, `mwNifMesh.js` with `nif-material.ts`,
-    `mwVfx.js` with `nif-effect-motion.ts`,
+    `mwVfx.js` with `nif-effect-motion.ts`, `mwKeys.js` with `nif-key-tangents.ts`,
     the rest of `mwFirstPerson.js` and the arm rig's modules in `src/combat/fpArm/`.
-  - Still OpenMW-derived: `mwKeys.js` (`tcbTangents`), `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
+  - Still OpenMW-derived: `mwNpc.js` (`PART_BONES`), `mwSkin.js`,
     `mwSpellFx.js`. `src/combat/fpArm.js`,
     `src/combat/fpsSpellCasting.js` and the two-hand rig (`src/combat/twoHands/`) only quote OpenMW in comments.
 
@@ -67,7 +67,7 @@ An async read must store its result in the cache generation it started under.
 | `nif-material.ts` | The surface a shape has from its properties (colours, base texture, blend, depth, sidedness), the two per-vertex colour rules and the geometry-name skip list. `mwNifMesh.js` re-exports them. |
 | `nif-effect-motion.ts` | The small motion rules of an effect mesh: which way a billboard node turns to the camera, the UV-controller transform, the slot of a texture-flip list and the visibility key lookup. `mwVfx.js` re-exports them. |
 | `mwDdsFile.js`, `mwTexture.js`, `mwTextureClient.js`, `mwTextureWorker.js` | DDS decode (DXT1/3/5, uncompressed masks) and the texture path rule; decoding runs in a worker pool. |
-| `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling. |
+| `mwSkin.js`, `mwGpuSkin.js`, `mwSkinTransfer.js`, `mwAffine.js`, `mwKeys.js` | Skeleton, CPU skinning (the reference), GPU skinning (what the game draws), skinning a rigid worn mesh from the body under it, key-group sampling (the tangents of TCB keys are in `nif-key-tangents.ts`). |
 | `mwAnim.js` | Text-key animation groups and per-bone tracks from NIF and KF files. |
 | `mw-clip-law.ts` | The rules that read a list of text keys: normalise it, find a group's time range, play a clip through it, a movement clip's speed, and which groups loop. `mwAnim.js` re-exports them. |
 | `mwCharacter.js`, `mwNpc.js` | Assemble a character: base skeleton plus parts joined by bone name; pick body parts from ESM records by race, sex and slot. |
