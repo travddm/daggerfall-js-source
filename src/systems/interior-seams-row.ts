@@ -1,7 +1,8 @@
 // The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall pieces
 // meet its floor and ceiling (world/interior/kit-wall-ends.ts) and its doors fill their doorways (door-fit.ts), both
 // applied by interior-model-patches.js. Off is Daggerfall Unity's look, with the thin slits its models leave. The
-// player's own online: it changes only what this screen draws.
+// player's own online: the patched models feed the collider as well, but no edge moves more than a unit (2.5 cm), so
+// play is the same.
 // This file must not reach uiPrefs.js: features.js imports it, and uiPrefs.js imports features.js.
 import { t, localizedText } from './textManager.js';
 
