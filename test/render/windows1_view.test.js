@@ -1,8 +1,8 @@
 // RW1: THE VIEW OUT - from inside a
 // building, its glass shows the real street: drawn from the interior camera into a target of its own
 // (renderer.outsideViewFrame - a bracket that puts back everything it sets), cropped to the screen rectangle the glass
-// covered last frame, kept while the camera is still, painted as the interior frame's background inside that
-// rectangle (renderer.setGlassView), the glass texels cut to it. An interior's glass is DFU's window table drawn
+// covered last frame, kept while the camera is still, painted as the interior frame's background on the glass panes
+// inside that rectangle (renderer.setGlassView), the glass texels cut to it. An interior's glass is DFU's window table drawn
 // indoors, the panes of an interior set's window wall (GLASS-ALL, read off a real ARENA2), a declared mask
 // (renderer.uploadGlassMask), or a cutout picture's holes (uploadTexture { cutout: true }) - the caravan's door. Pinned by
 // execution over a recording GL; the hosts' wiring by their text.
@@ -39,6 +39,7 @@ function recordingRenderer(log) {
       if (k === 'getProgramParameter' || k === 'getShaderParameter') return () => true;
       if (k === 'getUniformLocation') return (p, name) => ({ name, p });
       if (k === 'getAttribLocation') return () => 0;
+      if (k === 'isVertexArray') return (v) => !!v;
       if (typeof k === 'string' && k.startsWith('create')) return () => ({ id: ++id, kind: k });
       if (k === 'getParameter') return () => new Float32Array([0, 0, 0, 0]);
       if (k === 'drawingBufferWidth') return 640;
@@ -255,9 +256,8 @@ test('RW1 view V5: the interior frame\'s glass - setGlassView paints the backgro
   r._rwEnsureTarget(64, 64);   // a view out already drawn
   log.length = 0;
   r.setGlassView({ rect: [-0.5, -0.25, 0.5, 0.75], view: true });
-  const bg = log.findIndex((c) => c[0] === 'drawArrays' && c[1] === 'TRIANGLE_STRIP' && c[3] === 4);
-  assert.ok(bg >= 0, 'the background, one strip');
   assert.deepEqual(uploads(log, 'uRect')[0], [-0.5, -0.25, 0.5, 0.75], 'inside the rectangle alone');
+  assert.deepEqual([...uploads(log, 'uRectPx')[0]], [160, 150, 480, 350], 'and its pixels, as the mesh shader cuts by');
   assert.deepEqual(uploads(log, 'uHasView')[0], [1], 'the street in it');
   log.length = 0;
   r.drawMesh(room, I);
@@ -274,6 +274,54 @@ test('RW1 view V5: the interior frame\'s glass - setGlassView paints the backgro
   r.takeGlassRect(); r.beginFrame(proj, view, new Float32Array([0, 1, 0]));
   r.drawMesh(room, I);
   assert.equal(r.takeGlassRect(), null, 'a frame that never armed the watch measures nothing');
+});
+
+test('view out on the glass alone: the background is painted on the last frame\'s glass panes and cutouts, each with the picture its cut is read from, and never over a wall, so a slit between two models shows the black clear (mutants: a full-rectangle background; the wall painted; the glass painted with the street off; a pane\'s own matrix or picture lost)', () => {
+  const log = [];
+  const r = recordingRenderer(log);
+  r.uploadTexture(9, 3, px, { opaque: true }); r.uploadEmissionTexture(9, 3, px, { window: true });   // DFU's window, drawn indoors
+  r.uploadTexture(9, 5, px); r.uploadGlassMask(9, 5, px);                                           // an interior's declared glass
+  r.uploadTexture(9, 6, px, { cutout: true });                                                       // a cutout
+  r.uploadTexture(9, 4, px, { opaque: true });                                                       // a wall, with a slit beside it
+  const sub = (rec, start, b) => ({ textureArchive: 9, textureRecord: rec, primitiveCount: 2, startIndex: start, _bounds: new Float32Array(b) });
+  const subs = [sub(3, 0, [0, 1.5, -4, 0.5]), sub(5, 6, [1, 1.5, -4, 0.5]), sub(6, 12, [-1, 1.5, -4, 0.5]), sub(4, 18, [0, 1.5, -6, 3])];
+  const room = { vao: { id: 'roomvao' }, subMeshes: subs };
+  const M = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0.25, 0, -0.5, 1]);
+  const proj = mirrorProjectionX(perspective(1, 1.6, 0.05, 500)), view = lookAt([0, 1.5, 0], [0, 1.5, -5], [0, 1, 0]);
+  // frame 1 measures the panes
+  r.beginFrame(proj, view, new Float32Array([0, 1, 0]));
+  r.setGlassView(null);
+  r.drawMesh(room, M);
+  const seen = r.takeGlassRect();
+  assert.ok(seen, 'the glass met');
+  const pictures = { window: subs[0]._evEmis, glass: subs[1]._evEmis, cutout: subs[2]._evTex };
+  assert.ok(pictures.window && pictures.glass && pictures.cutout, 'each pane\'s picture resolved by the room\'s draw');
+  /** The background's draws in one setGlassView: the range drawn, the picture on unit 1, the two switches, the matrix. */
+  const paint = (vo) => {
+    r.beginFrame(proj, view, new Float32Array([0, 1, 0]));
+    log.length = 0;
+    r.setGlassView(vo);
+    assert.equal(log.filter((c) => c[0] === 'drawArrays').length, 0, 'no rectangle painted whole');
+    const out = [];
+    let unit = null, onUnit1 = null, glass = null, cut = null, model = null;
+    for (const c of log) {
+      if (c[0] === 'activeTexture') unit = c[1];
+      if (c[0] === 'bindTexture' && unit === 'TEXTURE1') onUnit1 = c[2];
+      if (c[0] === 'uniform1f' && c[1]?.name === 'uPaneGlass') glass = c[2];
+      if (c[0] === 'uniform1f' && c[1]?.name === 'uPaneCut') cut = c[2];
+      if (c[0] === 'uniformMatrix4fv' && c[1]?.name === 'uModel') model = [...c[3]];
+      if (c[0] === 'drawElements') out.push({ offset: c[4], count: c[2], picture: onUnit1, glass, cut, model });
+    }
+    return out;
+  };
+  r._rwEnsureTarget(64, 64);   // a view out already drawn
+  const street = paint({ rect: padRect(seen.rect), view: true });
+  assert.deepEqual(street.map((d) => d.offset), [0, 6 * 4, 12 * 4], 'the window, the declared glass and the cutout - never the wall');
+  assert.deepEqual(street.map((d) => [d.glass, d.cut]), [[1, 0], [1, 0], [0, 1]], 'glass cut through, the cutout\'s holes');
+  assert.deepEqual(street.map((d) => d.picture), [pictures.window, pictures.glass, pictures.cutout], 'each tested by the picture the room cuts it by');
+  for (const d of street) assert.deepEqual(d.model, [...M], 'at the matrix the room drew it at');
+  const sky = paint({ rect: padRect(seen.rect), view: false });
+  assert.deepEqual(sky.map((d) => d.offset), [12 * 4], 'the street off: the glass is not cut, so only the cutout\'s holes show the sky');
 });
 
 test('RW1 view V6: the glass door a non-ARENA2 room declares - uploadGlassMask rides the emission unit as glass (never an emission, never a window style), refuses a record with an emission map of its own, and is freed by the emission eviction its `e:` key names (mutants: the glass kept as an emission, the refusal lost, the eviction leaking)', () => {
