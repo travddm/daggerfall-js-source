@@ -1,8 +1,9 @@
 // The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall
-// pieces meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js) and each
-// closed door is fitted to its own doorway (door-frame-fit.ts, applied by scenes/interiorContext.js). Off is Daggerfall
-// Unity's look, with the thin slits its models leave. The player's own online: the patched models feed the collider as
-// well, but a wall's end moves a unit (2.5 cm) and a door's edge no further than its gap, so play is the same.
+// pieces meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js), each
+// closed door is fitted to its own doorway, and a door that stands proud of its wall is set into it (door-frame-fit.ts,
+// applied by scenes/interiorContext.js). Off is Daggerfall Unity's look, with the thin slits its models leave. The
+// player's own online: the patched walls feed the collider as well, but a wall's end moves a unit (2.5 cm), a door's
+// collider keeps Daggerfall's size and moves at most 10 cm into its wall, so play is the same.
 // This file must not reach uiPrefs.js: features.js imports it, and uiPrefs.js imports features.js.
 import { t, localizedText } from './textManager.js';
 
