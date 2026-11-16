@@ -17,7 +17,8 @@
 // across the build's own awaits), and `finish()` regroups the index
 // ranges by texture into the shape `renderer.createMesh` takes.
 
-import { boundsOf, boundsSteps } from './bounds.js';   // PERF-EXT23: the spheres createMesh takes, measured in the merge's own slices - a leaf, no GL
+import { boundsOf, boundsSteps } from './bounds.js';
+import { sealCracks } from './crack-seal.ts';   // PERF-EXT23: the spheres createMesh takes, measured in the merge's own slices - a leaf, no GL
 
 /** The rotation part of a TRS matrix applied to a normal. The block
  *  matrices are rotations and translations (rmbLayout's trs, scale 1),
@@ -121,13 +122,15 @@ export function shadowCells(positions, indices, size) {
 export const SHADOW_CELL_SIZE = 16;
 
 export class StaticBatchBuilder {
-  /** @param {{ shadowCell?: number, pieces?: boolean }} [opts] shadowCell: LA-AUDIT A1's cell side; 0 (the default)
+  /** @param {{ shadowCell?: number, pieces?: boolean, seal?: boolean }} [opts] shadowCell: LA-AUDIT A1's cell side; 0 (the default)
    *  builds no cells. pieces: RW1 - every merged sub-mesh also carries one sphere per model that went into it
    *  (`pieces`, [cx, cy, cz, r] each), so a window's glass measured on the screen is that model's, not the whole batch's
    *  (render/realWindows.js: the view out is cropped to the glass a frame met). Off by default: a city pixel's batch
-   *  never measures them. */
-  constructor({ shadowCell = 0, pieces = false } = {}) {
+   *  never measures them. seal: the merge welds near corners and splits T-junctions (render/crack-seal.ts), so the
+   *  models' seams leave no gaps. */
+  constructor({ shadowCell = 0, pieces = false, seal = false } = {}) {
     this.pieces = !!pieces;
+    this.seal = !!seal;
     this.chunks = [];        // [{positions, normals, uvs, base}] one per model, already transformed
     this.groups = new Map(); // resolved key -> [Uint32Array index runs, already offset by base]
     this.vertexCount = 0;
@@ -248,9 +251,16 @@ export class StaticBatchBuilder {
     }
     const merged = /** @type {any} */ ({ positions, normals, uvs, indices, subMeshes, vertexCount: this.vertexCount, triangles: this.triangles, models: this.models });
     if (withBounds) merged.bounds = { whole, subs };
+    if (this.seal) {
+      yield;
+      merged.sealed = sealCracks(merged);
+      merged.vertexCount = merged.positions.length / 3;
+      merged.triangles = merged.indices.length / 3;
+      if (withBounds) merged.bounds = { whole: boundsOf(merged.positions), subs: subMeshes.map((sm) => boundsOf(merged.positions, merged.indices, sm.startIndex, sm.primitiveCount * 3)) };
+    }
     if (this.shadowCell > 0) {   // LA-AUDIT A1
       yield;
-      const c = shadowCells(positions, indices, this.shadowCell);
+      const c = shadowCells(merged.positions, merged.indices, this.shadowCell);
       merged.shadowIndices = c.indices; merged.shadowCells = c.cells;
     }
     this._spend();
