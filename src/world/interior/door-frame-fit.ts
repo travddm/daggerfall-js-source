@@ -7,9 +7,10 @@
 // Each closed door is measured against its room: from the middle of each narrow face (the two sides, the top, the
 // foot), straight out, the distance to the first face of the room. An edge with a face between MIN_GAP and MAX_GAP away
 // moves out by exactly that distance, so it stops on the jamb, the floor or the lintel. A fixed move would lay the
-// door's border on the wall where the doorway is the door's own size, and the two would z-fight. The door is moved on a
-// copy of its model, one a door; nothing moves in its thickness. A departure from Daggerfall Unity, behind the Close
-// interior gaps row (systems/interior-seams-row.ts).
+// door's border on the wall where the doorway is the door's own size, and the two would z-fight. A door that stands
+// proud of its wall's surface first moves back into the wall along its thickness (measureDoorDepth). The door is moved
+// on a copy of its model, one a door. Both are departures from Daggerfall Unity, behind the Close interior gaps row
+// (systems/interior-seams-row.ts).
 
 /** The door model as world/meshReader.js dfMeshToModel answers it: positions in metres, three a vertex. */
 export type DoorModel = { positions: ArrayLike<number>; indices: ArrayLike<number>; [key: string]: unknown };
@@ -99,14 +100,53 @@ export function measureDoorGaps(model: DoorModel, matrix: ArrayLike<number>, roo
   };
 }
 
+/** How far beside the door the wall is probed, past each side: two ARCH3D units. */
+const WALL_PROBE = 0.05;
+/** The furthest a wall's surface is looked for from the door's middle, and the furthest a door moves into its wall. */
+const WALL_REACH = 0.4;
+export const MAX_DEPTH_MOVE = 0.1;
+/** A moved door stops this far inside its wall's surface: flush with it, its border would z-fight where the wall's face
+ *  overlaps it. */
+export const RECESS = 0.003;
+
+/**
+ * How far the door must move along its own z (its thickness) to sit within its wall: 0 when it does already, or when no
+ * wall stands beside it. Beside each side, the wall's two surfaces are found along the door's normal; a door standing
+ * out of either surface moves back by just that much, and a door thicker than its wall is set at the wall's middle.
+ * Daggerfall's data and the town packs hang some doors a unit off their wall's middle, or a 6-unit door in a 5-unit
+ * wall, and the door's face stands proud of the wall by up to 7.5 cm.
+ */
+export function measureDoorDepth(model: DoorModel, matrix: ArrayLike<number>, room: ArrayLike<number>): number {
+  const [low, high] = box(model);
+  const half = (high[2] - low[2]) / 2;
+  const middle: Vec = [(low[0] + high[0]) / 2, (low[1] + high[1]) / 2, (low[2] + high[2]) / 2];
+  const forward = apply(matrix, [0, 0, 1], 0);
+  const back: Vec = [-forward[0], -forward[1], -forward[2]];
+  for (const x of [low[0] - WALL_PROBE, high[0] + WALL_PROBE]) {
+    const o = apply(matrix, [x, middle[1], middle[2]]);
+    const front = firstHit(room, o, forward, WALL_REACH);
+    const rear = firstHit(room, o, back, WALL_REACH);
+    if (!Number.isFinite(front) || !Number.isFinite(rear)) continue;
+    let move = 0;
+    if (front + rear < 2 * half)
+      move = (front - rear) / 2; // a wall thinner than the door: the door at its middle
+    else if (half - front > MIN_GAP)
+      move = front - half - RECESS; // proud of the front: back by that much, and a little more
+    else if (half - rear > MIN_GAP) move = half - rear + RECESS; // proud of the back: forward by that much, and a little more
+    return Math.abs(move) > MIN_GAP && Math.abs(move) <= MAX_DEPTH_MOVE ? move : 0;
+  }
+  return 0;
+}
+
 /** Whether a door has any gap to close. */
 export const hasGap = (gaps: DoorGaps): boolean => gaps.hinge > 0 || gaps.latch > 0 || gaps.top > 0 || gaps.foot > 0;
 
 /**
  * A copy of the door model with each edge moved out by its gap: the corners on the hinge side by `hinge`, on the latch
- * side by `latch`, at the top by `top`, at the foot by `foot`. Every other field of the model is the original's.
+ * side by `latch`, at the top by `top`, at the foot by `foot`; and the whole door moved along its thickness by `depth`
+ * (measureDoorDepth). Every other field of the model is the original's.
  */
-export function fitDoorModel<M extends DoorModel>(model: M, gaps: DoorGaps): M {
+export function fitDoorModel<M extends DoorModel>(model: M, gaps: DoorGaps, depth = 0): M {
   const [low, high] = box(model);
   const EDGE = 1e-4;
   const positions = Float32Array.from(model.positions);
@@ -115,6 +155,7 @@ export function fitDoorModel<M extends DoorModel>(model: M, gaps: DoorGaps): M {
     else if (Math.abs(positions[i] - high[0]) < EDGE) positions[i] += gaps.latch;
     if (Math.abs(positions[i + 1] - high[1]) < EDGE) positions[i + 1] += gaps.top;
     else if (Math.abs(positions[i + 1] - low[1]) < EDGE) positions[i + 1] -= gaps.foot;
+    positions[i + 2] += depth;
   }
   return { ...model, positions };
 }
@@ -163,9 +204,12 @@ export function doorFitter(
       const gpu = await shared(modelId);
       const cpu = models.get(modelId);
       if (!on || !gpu || !cpu) return { gpu, cpu };
-      const gaps = measureDoorGaps(cpu, matrix, roomFaces());
-      if (!hasGap(gaps)) return { gpu, cpu };
-      const fitted = fitDoorModel(cpu, gaps);
+      // the depth first: the gaps are measured where the door will stand
+      const depth = measureDoorDepth(cpu, matrix, roomFaces());
+      const moved = depth ? fitDoorModel(cpu, { hinge: 0, latch: 0, top: 0, foot: 0 }, depth) : cpu;
+      const gaps = measureDoorGaps(moved, matrix, roomFaces());
+      if (!depth && !hasGap(gaps)) return { gpu, cpu };
+      const fitted = fitDoorModel(cpu, gaps, depth);
       const mesh = renderer.createMesh(fitted);
       own.push(mesh);
       return { gpu: mesh, cpu: fitted };

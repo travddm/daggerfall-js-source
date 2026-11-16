@@ -5,7 +5,16 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { measureDoorGaps, fitDoorModel, MAX_GAP, type DoorModel } from '../../src/world/interior/door-frame-fit.ts';
+import {
+  measureDoorGaps,
+  measureDoorDepth,
+  fitDoorModel,
+  hasGap,
+  MAX_GAP,
+  MAX_DEPTH_MOVE,
+  RECESS,
+  type DoorModel,
+} from '../../src/world/interior/door-frame-fit.ts';
 
 const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 /** A box model, eight corners and its twelve triangles. */
@@ -64,9 +73,35 @@ test('an edge that already meets its frame, or stands clear of any face within r
   );
 });
 
+/** A wall with its two surfaces at z = `back` and z = `front`, beside and around the door. */
+const wall = (back: number, front: number) =>
+  new Float32Array([
+    ...quad([-1, -1, back], [3, -1, back], [3, 3, back], [-1, 3, back]),
+    ...quad([-1, -1, front], [3, -1, front], [3, 3, front], [-1, 3, front]),
+  ]);
+
+test('a door proud of its wall moves back into it, 3 mm inside the surface; a door within its wall stays', () => {
+  // the door's thickness runs from z = 0.01 to 0.14
+  const proudBack = measureDoorDepth(door(), IDENTITY, wall(0.03, 0.25));
+  assert.equal(+proudBack.toFixed(4), +(0.02 + RECESS).toFixed(4), 'forward: its back stood 2 cm out of the wall');
+  const proudFront = measureDoorDepth(door(), IDENTITY, wall(-0.2, 0.09));
+  assert.equal(+proudFront.toFixed(4), +(-0.05 - RECESS).toFixed(4), 'back: its face stood 5 cm out of the wall');
+  assert.equal(measureDoorDepth(door(), IDENTITY, wall(-0.05, 0.2)), 0, 'within the wall');
+  assert.equal(measureDoorDepth(door(), IDENTITY, doorway), 0, 'no wall surface beside it');
+});
+
+test('a door thicker than its wall is set at its middle; a move past the cap is left alone', () => {
+  assert.equal(+measureDoorDepth(door(), IDENTITY, wall(0.03, 0.13)).toFixed(4), 0.005, 'the middles meet at z = 0.08');
+  const thick = boxModel(0, 1.2, 0, 2.2, 0, 0.4);
+  assert.equal(measureDoorDepth(thick, IDENTITY, wall(-0.5, 0.25)), 0, `a move over ${MAX_DEPTH_MOVE} m`);
+  const moved = fitDoorModel(door(), { hinge: 0, latch: 0, top: 0, foot: 0 }, 0.023);
+  const z = Array.from({ length: 8 }, (_, i) => moved.positions[i * 3 + 2]);
+  assert.deepEqual([+Math.min(...z).toFixed(4), +Math.max(...z).toFixed(4)], [0.033, 0.163], 'the whole door moves');
+});
+
 const ARENA2 = process.env.ARENA2_PATH;
 test(
-  'over every residence, every closed door is fitted to its doorway: no gap is left (needs ARENA2)',
+  'over every residence, every closed door is fitted to its doorway and its wall: no gap and no proud door is left (needs ARENA2)',
   { skip: !(ARENA2 && existsSync(join(ARENA2, 'BLOCKS.BSA'))) && 'no ARENA2' },
   async () => {
     const { BlocksFile, BLOCK_TYPES } = await import('../../src/formats/blocksFile.js');
@@ -96,6 +131,8 @@ test(
     let doors = 0;
     let gappedBefore = 0;
     let gappedAfter = 0;
+    let proudBefore = 0;
+    let proudAfter = 0;
     for (let b = 0; b < blocks.count; b++) {
       if (blocks.getBlockType(b) !== BLOCK_TYPES.Rmb || !blocks.getBlockName(b).startsWith('RESI')) continue;
       const block = blocks.getBlock(b);
@@ -117,10 +154,13 @@ test(
           const model = getModel(d.modelIdNum);
           if (!model) continue;
           doors++;
-          const gaps = measureDoorGaps(model, d.matrix, room);
-          if (gaps.hinge || gaps.latch || gaps.top || gaps.foot) gappedBefore++;
-          const after = measureDoorGaps(fitDoorModel(model, gaps), d.matrix, room);
-          if (after.hinge || after.latch || after.top || after.foot) gappedAfter++;
+          if (hasGap(measureDoorGaps(model, d.matrix, room))) gappedBefore++;
+          const depth = measureDoorDepth(model, d.matrix, room);
+          if (depth) proudBefore++;
+          const moved = fitDoorModel(model, { hinge: 0, latch: 0, top: 0, foot: 0 }, depth);
+          const fitted = fitDoorModel(model, measureDoorGaps(moved, d.matrix, room), depth);
+          if (hasGap(measureDoorGaps(fitted, d.matrix, room))) gappedAfter++;
+          if (measureDoorDepth(fitted, d.matrix, room)) proudAfter++;
         }
       });
     }
@@ -129,5 +169,7 @@ test(
       `nearly every residence door has a gap as Daggerfall hangs it (${gappedBefore} of ${doors})`,
     );
     assert.equal(gappedAfter, 0, 'every one fitted');
+    assert.ok(proudBefore > 40, `some stand proud of their wall (${proudBefore})`);
+    assert.equal(proudAfter, 0, 'every one moved into its wall');
   },
 );
