@@ -40,26 +40,29 @@ const NO_TCB = [0, 0, 0] as const;
 export function tcbTangents(keys: readonly TcbKey[], index: number, component: number): [number, number] {
   if (keys.length <= 1) return [0, 0];
   const [tension, continuity, bias] = keys[index].tbc ?? NO_TCB;
-  const half = (1 - tension) / 2;
-  // How much of the step before and of the step after each tangent takes.
-  const into = { before: (1 - continuity) * (1 + bias), after: (1 + continuity) * (1 - bias) };
-  const out = { before: (1 + continuity) * (1 + bias), after: (1 - continuity) * (1 - bias) };
+  // The paper's factor of one half and the time scale's factor of two cancel between two neighbours, so the weights
+  // below carry (1 - tension) alone and the time scale is timeBefore / timeTotal. At an end the half stays.
+  const slack = 1 - tension;
+  const intoBefore = slack * (1 - continuity) * (1 + bias);
+  const intoAfter = slack * (1 + continuity) * (1 - bias);
+  const outBefore = slack * (1 + continuity) * (1 + bias);
+  const outAfter = slack * (1 - continuity) * (1 - bias);
   const at = (position: number): number => componentOf(keys[position], component);
 
   if (index === 0 || index === keys.length - 1) {
     const step = index === 0 ? at(1) - at(0) : at(index) - at(index - 1);
-    return [half * step * (into.before + into.after), half * step * (out.before + out.after)];
+    return [step * ((intoBefore + intoAfter) * 0.5), step * ((outBefore + outAfter) * 0.5)];
   }
 
   const timeBefore = keys[index].time - keys[index - 1].time;
-  const timeAfter = keys[index + 1].time - keys[index].time;
-  const timeTotal = timeBefore + timeAfter;
+  const timeTotal = keys[index + 1].time - keys[index - 1].time;
   if (timeTotal === 0) return [0, 0];
+  const timeAfter = keys[index + 1].time - keys[index].time;
   const stepBefore = at(index) - at(index - 1);
   const stepAfter = at(index + 1) - at(index);
   return [
-    half * (into.before * stepBefore + into.after * stepAfter) * ((2 * timeBefore) / timeTotal),
-    half * (out.before * stepBefore + out.after * stepAfter) * ((2 * timeAfter) / timeTotal),
+    (stepBefore * intoBefore + stepAfter * intoAfter) * (timeBefore / timeTotal),
+    (stepBefore * outBefore + stepAfter * outAfter) * (timeAfter / timeTotal),
   ];
 }
 

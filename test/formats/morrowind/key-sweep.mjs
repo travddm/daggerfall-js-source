@@ -12,9 +12,9 @@ import { seededRandom } from './mw-particle-sweep.mjs';
 //     with uneven spacing, repeated times and every extreme of tension, continuity and bias, each sampled at a grid of
 //     times that reaches before the first key, every key, the middle of every segment and past the last key,
 //   - with the game files, every key group found in every NIF and KF file of the three archives, sampled at a grid
-//     of times over the span of the group. A group that is not TCB takes the same path as before, so a digest of its
-//     samples is compared exactly. A TCB group takes the rule that was rewritten, so its samples are summarised by
-//     the sum, the least and the greatest of each column and compared within a tolerance.
+//     of times over the span of the group. A file keeps one digest of the samples of its groups that are not TCB,
+//     and each group that is TCB, the rule that was rewritten, keeps the sum, the least and the greatest of each
+//     column of its samples.
 
 const digestOf = (value) => createHash('sha256').update(exactJson(value)).digest('hex').slice(0, 8);
 

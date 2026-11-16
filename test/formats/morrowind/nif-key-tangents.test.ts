@@ -5,9 +5,9 @@
 // segment lookup, and, with the game files, every key group of every NIF and KF file of the three archives.
 //
 // The recording came from mwKeys.js at commit a68509ea05: run recordSynthetic, recordSegments and recordRetail from
-// key-sweep.mjs over that file. No third-party engine source was read for the new code. A TCB answer comes out of
-// float arithmetic whose order differs from the old code's, so it is compared with a tolerance; every other answer is
-// compared exactly.
+// key-sweep.mjs over that file. No third-party engine source was read for the new code. Every answer is compared
+// exactly: the new rule does its float arithmetic in the same order, and the particle colour ramps (mw-particle-sim.test.ts)
+// are digests that a one-bit difference changes.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -35,7 +35,7 @@ const closeTo = (actual: number, expected: number, tolerance: number) =>
 const numbersOf = (answer: unknown): number[] =>
   typeof answer === 'number' ? [answer] : Array.from(answer as ArrayLike<number>);
 
-test('synthetic groups: every sample answers as recorded, a TCB group within float noise', () => {
+test('synthetic groups: every sample answers as recorded', () => {
   const groups = syntheticGroups();
   assert.equal(groups.length, recorded.synthetic.length);
   groups.forEach((entry, index) => {
@@ -54,9 +54,7 @@ test('synthetic groups: every sample answers as recorded, a TCB group within flo
       assert.equal(got.length, wanted.length, `group ${index} time ${time}: width`);
       wanted.forEach((value, column) => {
         const where = `group ${index} (type ${entry.group.type}, ${entry.dim} wide) time ${time} column ${column}`;
-        if (entry.group.type === 3)
-          assert.ok(closeTo(got[column], value, 1e-9), `${where}: ${got[column]} against ${value}`);
-        else assert.equal(got[column], value, where);
+        assert.equal(got[column], value, where);
       });
     });
   });
@@ -157,16 +155,7 @@ test('every key group of the retail archives samples as recorded', { skip: !pres
     for (const file of Object.keys(then.tcb)) {
       then.tcb[file].forEach((group: Summary, at: number) => {
         const live: Summary = now.tcb[file][at];
-        assert.equal(live.dim, group.dim, `${file} group ${at}: width`);
-        assert.equal(live.count, group.count, `${file} group ${at}: key count`);
-        for (const part of ['sums', 'least', 'greatest'] as const) {
-          group[part].forEach((value, column) => {
-            assert.ok(
-              closeTo(live[part][column], value, 1e-9),
-              `${file} group ${at} ${part} column ${column}: ${live[part][column]} against ${value}`,
-            );
-          });
-        }
+        assert.deepEqual(live, group, `${file} group ${at}`);
       });
     }
   }
