@@ -1,3 +1,4 @@
+// @ts-check
 // How far the player's look may pitch up or down, and the guard that keeps it there.
 //
 // Every host turns the camera's yaw and pitch into a look direction,
