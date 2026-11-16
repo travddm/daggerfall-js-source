@@ -15,6 +15,9 @@ import { isInteriorGlassArchive, interiorGlassMask } from '../world/interior/int
 import { isEmissive, FIRE_WALLS_ARCHIVE, FIRE_WALL_COLOR, FIRE_WALL_SCALE } from '../world/emissiveTextures.js';   // TextureReader's auto-emissive table (lit lanterns, fireplaces, fire daedra)
 import { dfMeshToModel } from '../world/meshReader.js'; import { patchSeams } from '../world/arch3dSeams.js';   // DUNGEON-SEAMS (one line: the cites below stand)
 import { fetchBytes, texName } from './shared.js';
+import { extendKitWallEnds } from '../world/interior/kit-wall-ends.ts';
+import { INTERIOR_SEAMS_PREF, interiorSeamsOn } from '../systems/interior-seams-row.ts';
+import { getPref } from '../systems/uiPrefs.js';
 import { decodedTexture, preloadTextureArchive, isVendorArchive, vendorTextureStandIn, setTextureDeriveContext, textureTierEpoch, textureTiersSettled, vendorCutout } from '../systems/textureReplacement.js';   // M-TEX: user-supplied textures override the classic ones; AUDIT VE R1: the tiers' epoch
 import { classicRecordRgba } from '../formats/derivedTexture.js';   // WD2: a mod sprite rebuilt from the player's own record
 import { setDfLookPalette } from '../world/dfLook.js';   // DF-LOOK: the port's own painted pictures in this palette's colours
@@ -34,6 +37,9 @@ import { createPlaceHolds } from './placeHolds.js';   // FIELD BUGS 2026-10-04d 
 export { LAST_CLASSIC_TEXTURE_ARCHIVE };   // DS1's, kept here for its importers (formats/textureFile.js since STUDIO1: the studio reads it too)
 
 export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes }) {
+  // The Close interior gaps row, read once: a model is built once and kept, so a change takes effect at the next start.
+  const closeKitWalls = interiorSeamsOn(getPref(INTERIOR_SEAMS_PREF));
+  const drawnMesh = (modelId, dfMesh) => (closeKitWalls ? extendKitWallEnds(modelId, dfMesh) : dfMesh);
   const textureFiles = new Map();
   const texturePromises = new Map();
 
@@ -440,7 +446,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
       gpuMeshes.set(modelIdNum, null);
       return null;
     }
-    const dfMesh = patchSeams(modelIdNum, arch.getMesh(index));   // DUNGEON-SEAMS: the holes in Daggerfall's own stairs and ceilings closed - on a copy, the archive's mesh is shared
+    const dfMesh = drawnMesh(modelIdNum, patchSeams(modelIdNum, arch.getMesh(index)));   // DUNGEON-SEAMS: the holes in Daggerfall's own stairs and ceilings closed - on a copy, the archive's mesh is shared
     for (const sm of dfMesh.subMeshes) await getTexture(sm.textureArchive);
     const model = dfMeshToModel(dfMesh, getTextureSize);
     const pictures = [];   // PLACE-LRU: what this model's build put up, the model's to hold
@@ -467,7 +473,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
   async function buildAliasMesh(modelIdNum, alias) {
     const index = arch.getRecordIndex(alias.model);
     if (index === -1) { gpuMeshes.set(modelIdNum, null); return null; }
-    const dfMesh = patchSeams(alias.model, arch.getMesh(index));
+    const dfMesh = drawnMesh(alias.model, patchSeams(alias.model, arch.getMesh(index)));
     for (const sm of dfMesh.subMeshes) await getTexture(sm.textureArchive);
     const classic = dfMeshToModel(dfMesh, getTextureSize);
     const model = { ...classic, subMeshes: aliasSubMeshes(classic.subMeshes, alias.remap) };
