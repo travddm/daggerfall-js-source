@@ -203,8 +203,9 @@ import { mwViewPendingClicks, mwViewFrame as mwvf } from '../../src/player/mwVie
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
 test('MW-D30: the pitch clamp keeps the look off the vertical, and every host rides it', () => {
-  // The limit is a hair under straight up or down; a hand-rolled +/-1.5 stopped the look ~4 degrees short.
-  assert.equal(PITCH_LIMIT, Math.PI / 2 - 0.000001);
+  // The limit is Daggerfall Unity's 0.99 of straight up or down (89.1 degrees); a hand-rolled +/-1.5 stopped the look
+  // ~4 degrees short, and a hair under 90 let the head bob tip the view over the pole.
+  assert.equal(PITCH_LIMIT, (Math.PI / 2) * 0.99);
   // AUDIT 68 S22: the clamp is the look filter's (lookFilter.js), and a host rides it by driving its camera through
   // one - an import of PITCH_LIMIT the host never read satisfied this pin while proving nothing.
   assert.match(readFileSync(new URL('../../src/player/lookFilter.js', import.meta.url), 'utf8'), /Math\.min\(PITCH_LIMIT, cam\.pitch \+ this\.residualPitch\)/);
