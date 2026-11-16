@@ -1,5 +1,4 @@
-// SNOW-SWEEP (2026-10-23, after OW-HITCH's re-measure in the real game: "spread snowCoverHost's sweep across frames under
-// the snow budget"; bible/07-Rendering/Performance-Priority.md SNOW-SWEEP) - THE SWEEP KEEPS THE SNOW'S FRAME BUDGET. The
+// SNOW-SWEEP - THE SWEEP KEEPS THE SNOW'S FRAME BUDGET. The
 // frame's sweep checked every flat of every standing pixel in one frame - 40-70 ms on an i9 at each lattice cell the
 // window moved (every two map pixels), the most frequent hitch of a fast Overworld journey. Held here: the frame walks it
 // a slice a frame within what the frame's snow budget has left, and marks what the whole sweep marks, in its order; a

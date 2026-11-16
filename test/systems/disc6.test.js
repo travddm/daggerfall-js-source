@@ -1,9 +1,9 @@
-// DISC6 (2026-09-23, Discord through Mac): five reports and one ask, each fixed at its root and pinned BY EXECUTION
+// DISC6: five reports and one ask, each fixed at its root and pinned BY EXECUTION
 // where the seam is a function and by source where it is a call in a frame.
 //   - "Theres no quest notification when you killed all monsters and no quest update in the log" - a party's shared-
 //     quest resync rebuilt the quest's Foe resources under the standing foes, whose deaths went on counting into the
 //     orphans (quest/resourceBehaviour.js, quest/machine.js updateSharedQuest).
-//   - "the rain sound in Taverns is louder than outside" and Mac: "ensure cricket noises can be heard in interiors" -
+//   - "the rain sound in Taverns is louder than outside" and -
 //     the street's ambience was frozen at the door and Better Ambience's indoor rain played on top of it
 //     (systems/ambientEffects.js, the hosts' modal branch).
 //   - "even when putting it away it still makes the torch sound" - each mode's weapon rig owns its own burning loop,
@@ -163,7 +163,6 @@ test('DISC6 torch: two rigs, one lit torch (the street\'s and the building\'s) -
   assert.equal(burning(), 1, 'the rig that retakes the frame sounds again - its silenced handle was let go');
   street.dispose(); building.dispose();   // AUDIT DISC7 D11: nothing left listening on the light-source door
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /if \(_mode\(\) !== _torchesMode\) \{ droppedTorches\.destroyAll\(\); weaponRig\.silenceTorch\(\);/, f);
-  assert.match(rd('src/scenes/worldModes.js'), /const setMode = \(next\) => \{ dropDoorCache\(\); if \(next !== mode\) interiorWeapon\.silenceTorch\(\);/);
 });
 
 // ═══ the lights ══════════════════════════════════════════════════════════
@@ -188,5 +187,4 @@ test('DISC6 lights: a caster keeps its map on a tie - two lamps a hair apart do 
   assert.equal(pickShadowCasters(lights, [3, 1.7, 0], 1, null, held, heldN)[0], 0, 'clearly nearer: the other lamp casts');
   assert.ok(CASTER_KEEP_RATIO > 0 && CASTER_KEEP_RATIO < 1);
   assert.deepEqual(pickShadowCasters(lights, [0.03, 1.7, 0], 1), [0], 'no memory: the bare nearest, as before');
-  assert.match(rd('src/render/shadowPass.js'), /this\._heldCasterN = holdCasters\(this\._heldCasters, f\.pointLights, casters\);/, 'render() keeps the frame\'s casters for the next');
 });

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// REST3 PROBE (2026-10-03, bible/06-Systems/Rest-Arc.md section 4 and 13): where the dungeon's own campfires stand, on
+// REST3 PROBE: where the dungeon's own campfires stand, on
 // the real game files. The law is world/dungeon/dungeonFires.js and its rays are colliderFireProbe - the ones the dungeon host
 // casts. Gated on the game data, as every real-data check is:
 //

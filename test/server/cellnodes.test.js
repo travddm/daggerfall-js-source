@@ -1,4 +1,4 @@
-// COST-2 (2026-10-24; bible/11-Multiplayer/Scale-Arc.md COST-2): THE WORKER'S DOOR TO A CELL (server/src/cellNodes.js).
+// COST-2: THE WORKER'S DOOR TO A CELL (server/src/cellNodes.js).
 // The Worker asks the directory (one object, CELL_DIRECTORY) for the cell tree, keeps it CELL_TREE_KEEP_MS, and walks a
 // page's cell request to the node that holds it - the request unchanged, so the socket's key is still the fine cell, and
 // the object told its node. With the tree at L0 (COST-2's first drop) every object a cell's socket reaches is the one it
@@ -25,7 +25,7 @@ const SEEDED = { v: 1, base: 2, split: [], joined: [] };
 function relay({ tree = null, down = false } = {}) {
   const dir = fakeRoom(CELL_DIRECTORY);
   if (tree) dir.store.set(CELL_TREE_KEY, tree);
-  if (tree?.base) dir.room.env.CELL_SEED = String(tree.base);   // PIN MOVED (COST-2 part two): the directory serves the tree it stores only while `cellSeed` is on - L0_TREE while it is off
+  if (tree?.base) dir.room.env.CELL_SEED = String(tree.base);
   const asks = [], dirAsks = [];
   const ROOMS = {
     idFromName: (name) => name,
@@ -157,7 +157,6 @@ test('COST-2 AN OBJECT BELIEVES ITS NODE ONLY WHEN IT HOLDS THE CELL, AND SAYS I
   nodeHeard(room, req('world:25,9'), 'world:25,9');
   assert.equal(cellLevelOf(room), '0');
   // the directory: a stored tree read strictly, kept for the instance
-  // PIN MOVED (COST-2 part two): served only while `cellSeed` is on (L0 while it is off: the way back), and a tree it
   // cannot read seeded afresh at the setting's level - test/server/cellmoves.test.js holds the seed
   const dir = fakeRoom(CELL_DIRECTORY);
   dir.store.set(CELL_TREE_KEY, SEEDED);

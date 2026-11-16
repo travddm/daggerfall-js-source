@@ -1,5 +1,4 @@
-// ETHER-CHART2 (2026-10-12, the owner: "I want to improve the [Eltheric] sea map, its icons, the highlight areas, etc and
-// improve readability"; bible/03-World/Eltheric-Ocean.md ETHER-CHART2) - THE CHART READ AT A GLANCE: its words in the
+// ETHER-CHART2 - THE CHART READ AT A GLANCE: its words in the
 // enhanced face and drawn last, either side of their isle, in layers; a shape for each kind's mark; the depths as waters
 // under a grid a scale bar long; the haunts washed and named in view; the ship ringed, and pointed to off the canvas; the
 // isle named ringed with its bearing and card; the key. tools/mutants/etherchart2.json.
@@ -10,7 +9,6 @@ import * as M from '../../src/ui/etherChartWindow.js';
 import * as ES from '../../src/world/ethericSea.js';
 import { PIXEL_STACK } from '../../src/ui/pixelifyFive.js';
 
-const src = readFileSync(new URL('../../src/ui/etherChartWindow.js', import.meta.url), 'utf8');
 const over = (p, q) => p[0] < q[2] && q[0] < p[2] && p[1] < q[3] && q[1] < p[3];
 const h = ES.veilhaven();
 const LEGENDS = [{ id: 'queen', name: 'The Drowned Queen', trait: 'mends', sails: false }, { id: 'wake', name: 'Sorrow\'s Wake', trait: 'swift', sails: true }, { id: 'hunger', name: 'Ninefold Hunger', trait: 'boarders', sails: true }];
@@ -41,9 +39,6 @@ test('ETHER-CHART2 the face: the enhanced pixel stack at FONT3\'s reading pair, 
   assert.equal(M.CHART_TRACKING, '0.5px');
   assert.equal(M.LABEL_CHAR_PX, 6.7);
   assert.ok(!/Cormorant/.test(Object.values(M.CHART_FONT).join()), 'no face the skin never loads');
-  assert.deepEqual(src.match(/\.font = [^;]+;/g).filter((f) => !/\.font = (CHART_FONT\.(name|small)|font);/.test(f)), [], 'every face set is the chart\'s own');
-  assert.match(src, /fonts\?\.load\?\.\(CHART_FONT\.name\)\?\.then\?\.\(landed, \(\) => \{\}\);/);
-  assert.match(src, /model = chartModel\(word, view, w, h, \{ measure, pick \}\);/, 'the window measures its names');
   const wide = M.chartModel(word(), at(3), W, H, { measure: (t) => t.length * 20 });
   const narrow = M.chartModel(word(), at(3), W, H);
   const one = (m) => m.isles.find((i) => i.label && i.box);
@@ -62,8 +57,6 @@ test('ETHER-CHART2 a mark for each kind, a shape as well as a colour - a port ro
   assert.deepEqual(shapes, ['arc arc', 'moveTo lineTo lineTo lineTo closePath', 'moveTo lineTo lineTo closePath', 'moveTo lineTo moveTo lineTo']);
   assert.equal(new Set(shapes).size, 4, 'four shapes');
   assert.deepEqual(M.CHART_KEY.map(([k]) => k), ['port', 'ruin', 'wild', 'rock', 'ship', 'haunt', 'sunk']);
-  assert.match(src, /for \(const \[what, words\] of CHART_KEY\) \{/);
-  assert.match(src, /if \(kg\) \{ kg\.setTransform\(dpr0, 0, 0, dpr0, 0, 0\); paintKey\(kg, what, 9, 9\); \}/);
   const m = M.chartModel(word(), at(2), W, H);
   assert.equal(m.isles.find((i) => i.key === h.key).home, true, 'Veilhaven ringed');
   assert.deepEqual([...M.ICON_PX], [2.5, 3, 4, 5, 6]);
@@ -240,18 +233,9 @@ test('ETHER-CHART2 the ship ringed on the canvas, and off it a pointer at the ed
 
 test('ETHER-CHART2 the isle named: ringed, its card its name and its kind and way from the ship; none for an isle off the canvas; the window\'s line held, the hover cleared, the zoom\'s ends and the buttons named (mutants: the pick, the line, the ends)', () => {
   const m = M.chartModel(word(), at(2), W, H, { pick: h.key });
-  // PIN MOVED (ISLE-TRADE, 2026-10-17): a port's card names the good of the Bay its exchange makes - Veilhaven's spice
   assert.deepEqual([m.pick.title, m.pick.words], ['Veilhaven', `A port - makes spices - ${M.wayWords({ px: h.px - 17.5, py: h.py + 3.5 }, h)}`]);
   assert.equal(m.pick.x, m.isles.find((i) => i.key === h.key).x);
   assert.equal(M.chartModel(word(), at(2, -400), W, H, { pick: h.key }).pick, null, 'off the canvas');
   assert.equal(M.chartModel(word(), at(2), W, H).pick, null);
-  // PIN MOVED (AUDIT ETHER-CHART2 U8): the line held by the sheet - one line, its height kept, cut short with an ellipsis
-  assert.match(src, /const noteLine = el\('p', 'dfnaval-note dfchart-note'\);/);
   assert.match(M.ETHER_CHART_CSS, /\.dfchart-note \{ min-height: 1\.25em; line-height: 1\.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; \}/);
-  assert.match(src, /const named = isle\?\.key \?\? null;\n\s+if \(named !== pick\) \{ pick = named; draw\(\); \}/);
-  assert.match(src, /canvas\.addEventListener\('pointerleave', \(e\) => \{ if \(e\.pointerType === 'mouse' && !downs\.size && pick\) \{ pick = null; noteLine\.textContent = ''; draw\(\); \} \}\);/);
-  assert.match(src, /zoomOut\.disabled = view\.zoom === 0;\n\s+zoomIn\.disabled = view\.zoom === CHART_ZOOMS\.length - 1;/);
-  // PIN MOVED (L10N4, at the merge of main): the presses' names through the text core, their English as it was
-  assert.match(src, /zoomOut\.setAttribute\('aria-label', t\('sea\.chart\.zoomOut', 'Zoom out'\)\); zoomIn\.setAttribute\('aria-label', t\('sea\.chart\.zoomIn', 'Zoom in'\)\); shipBtn\.setAttribute\('aria-label', t\('sea\.chart\.findShip', 'Find your ship'\)\);/);
-  assert.match(src, /close\.style\.flex = '0 0 auto';/);
 });

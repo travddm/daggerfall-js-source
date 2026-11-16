@@ -1,8 +1,8 @@
 // @ts-check
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"): THE FAITHFUL'S CIRCLE, MADE - cut from the gate's own stone
+// WB12d: THE FAITHFUL'S CIRCLE, MADE - cut from the gate's own stone
 // (world/gate/gateModel.js faces, GATE_ARCHIVE): Dagon's sigil burned into the earth (its own art, world/gate/gateArt.js
 // riteSigilArt, laid on the ground's own heights), a ring of braziers, an altar stone and the faithful's casket - and
-// where their tents, their fire and the faithful themselves stand. Design: bible/11-Multiplayer/World-Bosses.md
+// where their tents, their fire and the faithful themselves stand. Design:
 // section 19 D.
 //
 // THE CIRCLE'S OWN FRAME: x east and z north from its centre, y up from the ground there - the host stands it at the

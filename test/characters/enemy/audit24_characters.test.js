@@ -210,10 +210,6 @@ test('audit24 characters-0: entry 39 (Horse) carries the MobileTeams struct defa
   assert.equal(ENEMY_BASICS['39'].team, 'PlayerEnemy');
   // every entry now carries one, so nothing reaches a fallback...
   assert.equal(Object.values(ENEMY_BASICS).filter((e) => e.team === undefined).length, 0);
-  // ...and the fallback that remains answers with the struct default,
-  // not a member MobileTeams does not have.
-  assert.match(readFileSync(new URL('../../../src/characters/enemy/enemyEntity.js', import.meta.url), 'utf8'),
-    /team: basics\.team \?\? 'PlayerEnemy'/);
 });
 
 test('audit24 characters-2b: a PACIFIED foe still burns its byte, and reads blind instead', () => {

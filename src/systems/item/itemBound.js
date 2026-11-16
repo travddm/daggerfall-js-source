@@ -1,27 +1,27 @@
 // @ts-check
-// SS1 (2026-09-27, Mac: "make sigil stones bound items and stackable"): A BOUND PIECE IS NEVER HANDED TO ANOTHER PLAYER.
+// SS1: A BOUND PIECE IS NEVER HANDED TO ANOTHER PLAYER.
 //
 // Binding is the item's own nature, not the player's choice. Its template row can say `bound` (the Sigil Stone's does -
 // systems/gate/gateSpoils.js), so every such piece is bound, one minted before the row said so included, and no field on
-// the record can unbind it; and SS4 (Mac: "make the items sold by the oblivion vendor bound also") a piece can carry
+// the record can unbind it; and SS4 a piece can carry
 // the mark itself (`bound: true`, a declared field - systems/item/itemFields.js), set where it is won: the Sigil Broker's
 // wares (systems/sigil/sigilBroker.js brokerStock), so what the stones bought stays with the one who spent them. It closes
 // every way a piece could leave its owner for good:
 //   - the trade (TRADE1, systems/tradePack.js): never put on the table, and a peer's lot carrying one refused whole;
-//   - SS3 (Mac: "They shouldnt be able to be dropped"): the world. A bound piece goes nowhere but the player's pack, the
+//   - SS3: the world. A bound piece goes nowhere but the player's pack, the
 //     player's wagon and the player's own storage (`BOUND_KEEPS`) - never the ground, a corpse, a chest or a reward tray
 //     (ui/enhanced/enhancedInventory.js, ui/native/nativeInventory.js). A world container is the ROOM's once it is opened online (WORLD4,
 //     WORLD6a: a dungeon's and a building's containers ride the room's memory, and a peer's body is granted to whoever
 //     loots it - scenes/exteriorFoes.js grantCorpse), so a stone put in one would reach the next player to open it;
 //     and every list a peer hands over - a body's grant, a container's record, a foe's items - lands without one
 //     (`unbound`), whatever build sent it.
-//   - SS4 (Mac: "Can't be traded, dropped or sold. Sigil stones shouldnt be able to be sold"): the COUNTER - neither
+//   - SS4: the COUNTER - neither
 //     skin's Sell nor Sell Magic stages a bound piece (ui/enhanced/enhancedTrade.js, ui/native/nativeTrade.js), in words; a repair and
 //     an identify still take one, because it comes back.
 // A bound piece is still worn, used, moved about the pack, and put in the wagon and the player's own storage; the lock
 // (LOCK1, itemLock.js) is the player's own word and closes the same three doors to anything. The two never mix.
 //
-// AUDIT AUTO-HOLD (2026-10-16, bible/06-Systems/Integrity-Arc.md): A PIECE THE REALM LOCKED IS BOUND TOO, while it is.
+// AUDIT AUTO-HOLD: A PIECE THE REALM LOCKED IS BOUND TOO, while it is.
 // The ledger locks a copy it finds (server-account/src/ledger.js item_dupes) - no route of the service's moves it - but a
 // counter, the ground and a room's container are the client's, and a locked copy sold to a shop or left in a chest was
 // taken up by the next player as a second of a piece another holds: locked on them in turn, an honest buyer's purchase

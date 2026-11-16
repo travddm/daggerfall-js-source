@@ -217,7 +217,7 @@ export function enforceShipRestriction(settings, opts, ctx) {
 export function scaleTripCost(c, settings, entity, { online = isOnlinePage() } = {}) {
   const scaled = modScaledTripCost(c, settings, entity);
   if (!online) return scaled;
-  // ESSENTIALS-HALF (2026-09-30, Discord: "cut the cost of most essential items by half"): online the fare costs half
+  // ESSENTIALS-HALF: online the fare costs half
   // (shopStock.js essentialPrice) - the inn nights and the passage each, after the mod's scaling, so both map skins
   // (this popup and ui/heldMap.js) quote and charge the same half
   const piecesCost = essentialPrice(scaled.piecesCost, { online });
@@ -311,7 +311,7 @@ export class TravelPopUpWindow {
    *  day countdown counts them as DFU's does, online too. [SUPERSEDES
    *  OL2's empty countdown and its "now".]
    *
-   *  TRAVEL-FARE (2026-09-22): the FARE is no longer waived. This used
+   *  TRAVEL-FARE: the FARE is no longer waived. This used
    *  to read "no inn night is paid (there are no nights)", which was
    *  right about the nights and wrong about the unit - DFU bills the
    *  trip's HOURS, and the journey has a length online even though the

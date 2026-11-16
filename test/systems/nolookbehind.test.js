@@ -1,4 +1,4 @@
-// SAFARI1 (2026-09-22) - NO REGEX LOOKBEHIND IN ANYTHING A BROWSER LOADS.
+// SAFARI1 - NO REGEX LOOKBEHIND IN ANYTHING A BROWSER LOADS.
 //
 // `(?<=...)` and `(?<!...)` are a PARSE error in Safari before 16.4 -
 // macOS 12 and older, iOS 16.3 and older. Not a wrong answer: the whole
@@ -14,9 +14,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { splitCamel } from '../../src/systems/controlsConfig.js';
 
-const root = new URL('../../src/', import.meta.url).pathname;
+const root = fileURLToPath(new URL('../../src/', import.meta.url));
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);

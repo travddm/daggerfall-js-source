@@ -1,4 +1,4 @@
-// L10N2 (2026-09-27): THE CLASSIC SCREENS DRAW ANY SCRIPT. Daggerfall's five FNT fonts hold printable ASCII, and DFU
+// L10N2: THE CLASSIC SCREENS DRAW ANY SCRIPT. Daggerfall's five FNT fonts hold printable ASCII, and DFU
 // draws them through Encoding.ASCII (ui/text.js asciiFold), so a translation's letters reach the classic windows as
 // question marks. DFU's answer is the localized font: a translation registers a face for each of the five fonts
 // (TextManager.RegisterLocalizedFont, which forces GUI/SDFFontRendering on), and DaggerfallUI.GetFont hands that face

@@ -1,4 +1,4 @@
-// PY1 - THE PARITY PINS WERE BLIND (2026-08-28).
+// PY1 - THE PARITY PINS WERE BLIND.
 //
 // Nine of the strongest pins in this suite do not assert a remembered
 // value - they REGENERATE the port's table from Daggerfall Unity's own

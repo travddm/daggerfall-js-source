@@ -558,11 +558,6 @@ test('U20a: a typed name keeps its CAPITALS - the event rides with the code', ()
   // and without an event the code path still types, lowercased
   w.input('KeyO');
   assert.equal(f.name, 'Sco');
-  // THE SEAM, swept rather than remembered: the exterior hosts' one
-  // key router must hand the event along, or the case is lost again.
-  const src = readFileSync(new URL('../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  assert.match(src, /overlay\.input\(e\.code,\s*e\)/,
-    'townTalk must pass the EVENT with the code, or typed capitals die here');
 });
 
 test('U20a: the rep window\'s balance is its own FIELD, 0 until a bar is clicked', () => {

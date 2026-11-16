@@ -1,9 +1,9 @@
-// SEAT2b part two (b) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): A SIEGE'S WORKS ON ITS PASS - frozen at
-// the battle's first pass (`town_seat_battles.works`, migration 0063): each work's tier then, a palace's Gatehouse or
-// none, the camp's Rams where a gate stands, a Siegewright on the attacking roster; every later pass carries the same
-// though a work stands between them (bible/11-Multiplayer/Seats-Arc.md 6.2, 7.5; server-account/src/seatSiege.js
+// SEAT2b part two (b): A SIEGE'S WORKS ON ITS PASS - frozen at
+// the battle's first pass (`town_seat_battles.works`): each work's tier then, a palace's Gatehouse or
+// none, the camp's Rams where a gate stands; every later pass carries the same
+// though a work stands between them (6.2, 7.5; server-account/src/seatSiege.js
 // siegePass). Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs), on
-// SEAT2a part three's battle week (test/net/seat2a_siege_service.test.js's harness, copied). `06-Systems/Online-Arc.md`
+// SEAT2a part three's battle week (test/net/seat2a_siege_service.test.js's harness, copied).
 // SEAT2b part two (b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,7 +12,6 @@ import { seatReportText, seatWeekOf, seatWeekStartMs, SEAT_MEMBER_WAIT_S, siegeS
 import { verifyOrder } from '../../src/net/identityToken.js';
 import { mintSiegeReceipt } from '../../src/net/siege/siegeReceipt.js';
 import { SIEGE_UNITS_PER_M } from '../../src/net/siege/siegeRef.js';
-import { xpForRank } from '../../src/net/professionLaw.js';
 
 const { subtle } = globalThis.crypto;
 const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pixel: [402, 151] };
@@ -23,7 +22,7 @@ const turning = (w) => Math.floor(seatWeekStartMs(w + 1) / 1000);
 const AFTER = (w) => turning(w) + 3 * 3600;
 const S = (ms) => Math.floor(ms / 1000);
 const START = S(siegeStartMs(W + 1, 0, 20));
-const F = [[0, 40], [40, 0], [-40, 0], [0, -40], [0, 80], [0, -60]].map(([x, z]) => [x * SIEGE_UNITS_PER_M, z * SIEGE_UNITS_PER_M]);
+const F = [[0, 100], [30, 50], [-30, 50], [0, 0], [0, 120], [0, 10.5]].map(([x, z]) => [x * SIEGE_UNITS_PER_M + 402 * 32768 + 16384, z * SIEGE_UNITS_PER_M + (499 - 151) * 32768 + 16384]);   // in Anticlere's pixel: the service holds a field to its seat's
 
 async function battleWeek(t) {
   let now = T0;
@@ -81,37 +80,35 @@ async function battleWeek(t) {
   return { svc, raw, sh, eo, a1, a2, d1, member, guild, treasury, purse, marks, earn, call, pass, receipt, claim, battle, holdOf, setNow: (n) => { now = n; }, getNow: () => now };
 }
 
-const work = (raw, w, tier, o = {}) => raw.prepare(`INSERT INTO town_seat_forts (key, work, tier, building, stands_at, at) VALUES (?, ?, ?, ?, ?, ?)
-  ON CONFLICT (key, work) DO UPDATE SET tier = excluded.tier, building = excluded.building, stands_at = excluded.stands_at`).run(ANTICLERE.key, w, tier, o.building ?? null, o.standsAt ?? null, T0);
+const work = (raw, w, tier) => raw.prepare(`INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, ?, ?, ?)
+  ON CONFLICT (key, work) DO UPDATE SET tier = excluded.tier`).run(ANTICLERE.key, w, tier, T0);
 const sxOf = async (s, who) => {
   const r = await s.pass(who, F);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   return (await verifyOrder(r.body.pass, s.svc.identityPublic, { subtle, nowS: s.getNow(), kind: 'siege' })).claims.sx;
 };
 
-test('SEAT2b part two (b) THE WORKS FROZEN AT THE FIRST PASS: the Walls\' tier, a palace\'s own Gatehouse, the camp\'s Rams and a Siegewright on the attacking roster, the Barracks\' tier - frozen on the battle\'s row; a Walls project standing between two passes moves nothing; every pass the same (mutants: each work\'s tier; the gate; the Rams; the Siegewright; the freeze)', async (t) => {
+test('SEAT2b part two (b) THE WORKS FROZEN AT THE FIRST PASS: the Walls\' tier, a palace\'s own Gatehouse, the camp\'s Rams, the Barracks\' tier - frozen on the battle\'s row; a Walls tier raised between two passes moves nothing; every pass the same (mutants: each work\'s tier; the gate; the Rams; the freeze)', async (t) => {
   const s = await battleWeek(t);
   work(s.raw, 'walls', 2);
   work(s.raw, 'gatehouse', 1);
-  work(s.raw, 'barracks', 2, { building: 3, standsAt: T0 + 60 });   // a tier whose day has come counts
-  work(s.raw, 'walls', 2, { building: 3, standsAt: START });   // ...one whose day comes after the door opens does not
+  work(s.raw, 'barracks', 3);
   s.raw.prepare('UPDATE town_seat_battles SET rams = 2 WHERE week = ? AND key = ?').run(W + 1, ANTICLERE.key);
-  s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, 'building', ?, 'siegewright', ?)`).run(s.a2.id, s.a2.character, xpForRank(100), T0);  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
   s.setNow(START - 600 + 1);
   assert.equal((await s.pass(s.d1, F)).body.error, 'field-unsettled', 'one side\'s field alone settles nothing - and freezes nothing');
   assert.equal(s.battle().works, null);
   const first = await sxOf(s, s.a1);
-  assert.deepEqual(first, [2, 1, 2, 1, 3], 'Walls 2, the tier-1 Gatehouse, two Rams, a Siegewright among the attackers, Barracks 3');
-  assert.deepEqual(JSON.parse(s.battle().works), [2, 1, 2, 1, 3], 'frozen on the battle\'s row');
-  s.setNow(START + 60);   // the Walls' third tier stands
+  assert.deepEqual(first, [2, 1, 2, 0, 3], 'Walls 2, the tier-1 Gatehouse, two Rams, no fourth slot, Barracks 3');
+  assert.deepEqual(JSON.parse(s.battle().works), [2, 1, 2, 0, 3], 'frozen on the battle\'s row');
+  s.setNow(START + 60);
+  work(s.raw, 'walls', 3);   // a tier raised mid-battle
   assert.deepEqual(await sxOf(s, s.d1), first, 'a work standing mid-battle moves no pass');
   assert.deepEqual(await sxOf(s, s.a1), first);
 });
 
-test('SEAT2b part two (b) A PALACE WITHOUT A GATE, AND NO SIEGEWRIGHT: no Gatehouse (-1) and no Ram whatever the camp sent; a Siegewright among the defenders is not the attackers\' (mutants: the gate\'s -1; the Rams\' gate; the attacking side)', async (t) => {
+test('SEAT2b part two (b) A PALACE WITHOUT A GATE: no Gatehouse (-1) and no Ram whatever the camp sent (mutants: the gate\'s -1; the Rams\' gate)', async (t) => {
   const s = await battleWeek(t);
   s.raw.prepare('UPDATE town_seat_battles SET rams = 3 WHERE week = ? AND key = ?').run(W + 1, ANTICLERE.key);
-  s.raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec100, updated_at) VALUES (?, ?, 'building', ?, 'siegewright', ?)`).run(s.d1.id, s.d1.character, xpForRank(100), T0);  // PIN MOVED (CRAFT3): Carpentry's and Masonry's are Building's track
   s.setNow(START - 600 + 1);
   await s.pass(s.a1, F);
   assert.deepEqual(await sxOf(s, s.d1), [0, -1, 0, 0, 0]);

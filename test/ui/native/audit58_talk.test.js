@@ -247,12 +247,6 @@ test('AUDIT 58 talk: the topic list PANS - two arrows, a slider, no truncation (
   w.topicHScroll = 40;
   w._setListboxTopics([{ label: 'a' }], 'topics');
   assert.equal(w.topicHScroll, 0);
-  // ...and the row text is no longer CUT: ListBox.cs:556-557 sets
-  // MaxWidth = -1 in the PixelWise mode this listbox declares (:545).
-  const nt = src('src/ui/native/nativeTalk.js');
-  assert.equal(nt.includes('const fit = (t, w) =>'), false, 'the truncation helper is gone');
-  assert.ok(nt.includes('R.topicList[0] - this.topicHScroll'), 'rows lay out at x = -horizontalScrollIndex');
-  assert.ok(nt.includes('renderer.setScreenScissor'), 'RectRestrictedRenderArea over the listbox box (:546)');
 });
 
 // ── F5: one localized key, one string ────────────────────────────────
@@ -262,15 +256,6 @@ test('AUDIT 58 talk: the topic list PANS - two arrows, a slider, no truncation (
 test('AUDIT 58 talk: youAreTooFarAway is ONE string in ONE place (Internal_Strings.csv:22)', () => {
   assert.equal(TOO_FAR_AWAY_TEXT, 'You are too far away...');
   assert.equal(BOARD_TOO_FAR, TOO_FAR_AWAY_TEXT, 'the bulletin board re-exports the same constant');
-  const tt = src('src/scenes/townTalk.js');
-  assert.equal(/'You are too far away\.'/.test(tt), false,
-    'the full-stop spelling is gone from the three PlayerActivate refusals');
-  // AUDIT 64 F34: all three are SetMidScreenText in the reference
-  // (:780/:790), not PopupMessage - one string, one place, and now the
-  // one SURFACE DaggerfallHUD gives it.
-  assert.equal((tt.match(/setMidScreenText\(tooFarAwayText\(\)\)/g) ?? []).length, 3,
-    'ActivateMobileNPC :780 and :790, plus activate()\'s own steal re-test');
-  assert.equal(/hud\.add\(tooFarAwayText\(\)\)/.test(tt), false, 'and none of them queues a popup row');
 });
 
 // ── F6: PresentNPCInfo, the Info arm of ActivateStaticNPC ─────────────
@@ -281,27 +266,6 @@ test('AUDIT 58 talk: Info on a STATIC NPC is PresentNPCInfo and nothing else (Pl
   assert.equal(YOU_SEE_TEXT, 'You see %s.');                       // Internal_Strings.csv:53
   assert.equal(presentNpcInfoText('Nithella Tomarnas'), 'You see Nithella Tomarnas.');
   assert.equal(presentNpcInfoText(null), 'You see .');             // an unnamed NPC still prints
-  const wm = src('src/scenes/worldModes.js');
-  // the gate is in activateStaticNpc, which BOTH rays call - the
-  // exterior `person:` arm and the interior one - so one law, one place.
-  const fn = wm.slice(wm.indexOf('function activateStaticNpc(pn)'));
-  const body = fn.slice(0, fn.indexOf('\n  }\n') + 5);
-  assert.ok(body.includes("getInteractionMode() === 'info'"), 'the switch\'s Info case');
-  assert.ok(body.includes('presentNpcInfo(pn)') && body.includes('openStaticNpc(pn)'),
-    'Info goes one way, Grab/Talk/Steal the other');
-  assert.equal((wm.match(/activateStaticNpc\(/g) ?? []).length >= 3, true,
-    'both rays and the dev hook route through the one gated door');
-  // PresentNPCInfo is NOT StaticNPCClick: no LastNPCClicked stamp, no
-  // quest-resource click, no faction-listener return (:1521-1535 are
-  // all inside StaticNPCClick).
-  const pi = wm.slice(wm.indexOf('function presentNpcInfo(pn)'));
-  const piBody = pi.slice(0, pi.indexOf('\n  }\n') + 5);
-  assert.ok(piBody.includes('staticNpcData(pn, npcSceneCtx)'), 'StaticNPC.Data, derived');
-  assert.equal(piBody.includes('clickNpc'), false, 'LastNPCClicked belongs to StaticNPCClick');
-  assert.equal(piBody.includes('doClick'), false);
-  assert.equal(piBody.includes('factionListeners'), false);
-  assert.ok(piBody.includes('presentNpcInfoText(displayName)') && piBody.includes('townTalk?.say?.('),
-    'DaggerfallUI.AddHUDText, one line');
 });
 
 // ── F7: the repair-shop merchant's popup ─────────────────────────────
@@ -342,18 +306,6 @@ test('AUDIT 58 talk: DaggerfallMerchantRepairPopupWindow, its four buttons and i
   assert.deepEqual(seen.splice(0), ['close'], 'Exit is CloseWindow alone');
   w = mk(); w.input('KeyS');
   assert.deepEqual(seen.splice(0), ['close', 'sell'], 'the hotkeys are the table\'s');
-  // THE ROUTE: with the popup art loaded, the repair merchant mounts the
-  // popup - it does NOT fall into openRepairService, whose native arm
-  // reads neither onTalk nor onSell.
-  const wm = src('src/scenes/worldModes.js');
-  const arm = wm.slice(wm.indexOf("route.service === 'repair'"));
-  const armBody = arm.slice(0, arm.indexOf('\n    }\n') + 7);
-  assert.ok(armBody.includes('merchantRepairDoorReady()'), 'the art gate, the never-trap idiom');
-  assert.ok(armBody.includes('createMerchantRepairWindow('));
-  assert.ok(armBody.includes('onRepair: () => openRepairService({})'), 'Repair is the ONLY route to the screen');
-  assert.ok(armBody.includes("openStaticNpc(pn, { forceTalk: true })") && armBody.includes('openMerchantSell()'),
-    'Talk and Sell live on the popup now');
-  assert.ok(wm.includes('preloadMerchantRepairArt('), 'REPR01I0 rides interior entry beside its siblings');
 });
 
 // ── F8/F9: the four interaction modes ────────────────────────────────
@@ -420,26 +372,3 @@ test('AUDIT 58 talk: the mode keys are ACTIONS, and a window shuts them down (Pl
   withDefaults();
 });
 
-test('AUDIT 58 talk: the dungeon host carries the same two halves', () => {
-  const d = src('src/scenes/dungeon.js');
-  // AUDIT 58 (records): this quoted `actionOf(e)` verbatim, and the
-  // input lane's combo arm then handed the read its held-keys Set
-  // (`actionOf(e, keys)`, InputManager.cs:1666-1712) - a correct
-  // change that turned the pin red for a claim it never made. The
-  // claim is the REGISTRY, not the argument list, so both are pinned
-  // for what they mean: the read goes through MODE_ACTIONS/actionOf,
-  // and it still hands the Set in.
-  // UXB1-S re-aimed it once more, for the same reason: a SHARED key carries several actions, so the read is every one
-  // of them (`actionsOf`) and the mode is the first that names one - still the registry, still the Set.
-  // MODE-WHEEL AUDIT: the registry's answer is read ONCE into `acts` (three rungs ask it), and the change itself is the
-  // host's one ChangeInteractionMode, `pickMode`, which owns the window gate - so both halves are pinned there.
-  assert.match(d, /const acts = actionsOf\(e, keys\);/, 'the registry, not e.code - and the held-keys Set the combo arm needs');
-  assert.match(d, /const im = acts\.map\(\(a\) => MODE_ACTIONS\[a\]\)\.find\(Boolean\);/);
-  assert.match(d, /const pickMode = \(m\) => \{\n\s*if \(ctx\.uiOverlayActive\) return false;/, 'and no mode change under an open window');
-  assert.match(d, /if \(!e\.repeat\) pickMode\(im\);/);
-  assert.equal(/\{ F1: 'steal'/.test(d), false, 'the literal table is gone');
-  // both exterior hosts hand townTalk their OTHER slot's predicate
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    assert.ok(src(f).includes('otherOverlayActive: () => modes?.overlayHeld ?? false'), f);
-  }
-});

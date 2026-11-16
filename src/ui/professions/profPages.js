@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "actual UI integration for life skills") -
+// PROF1 -
 // THE PROFESSIONS AND STORES PAGES of the character sheet: the
 // Professions page on the pause window's Stats rail (ui/enhanced/enhancedMenu.js),
 // beside Character, Attributes and Skills, and the Stores page on its
 // Holdings rail (HOLDINGS, 2026-10-03, moved it there with the other
-// things the player holds) - the sheet's own bones (bible/06-Systems/
-// Professions-Arc.md 8, 21, 22). Online only, and only while the
+// things the player holds) - the sheet's own bones (docs/systems/professions.md).
+// Online only, and only while the
 // professions are this account's: the host registers its book here
 // (`setProfessionsPages`), and a page with nothing behind it is never
 // drawn (PX14's drawn door).
@@ -181,15 +181,14 @@ import { capturePointer } from '../pointerCapture.js';   // RPT1026-CLIENT: a pa
  *   as the pack carries - anywhere, on either skin
  */
 let _provider = /** @type {ProfPagesProvider|null} */ (null);
-/** BAG-CRAFT (FIELD BUGS 2026-10-09d, Mac: "I just want players to also be able to craft from their inventory, not just
- *  the store"): WHAT A STATION MAY WORK OF A MATERIAL - every station's read, one home: the book's `workable` (the Stores,
+/** BAG-CRAFT (FIELD BUGS 2026-10-09d): WHAT A STATION MAY WORK OF A MATERIAL - every station's read, one home: the book's `workable` (the Stores,
  *  and the bag, the pack and the wagon counted or not - net/profBook.js); a book that has none answers its `held`. */
 const workOf = (/** @type {any} */ book, /** @type {string} */ k) => (typeof book?.workable === 'function' ? book.workable(k) : book.held(k));
 /** The host's book, or null to take the pages down (offline, a closed switch, the host gone). */
 export function setProfessionsPages(p) { _provider = p ?? null; }
 /** What a locked specialisation's card says it waits for (professionLaw.js `later`). */
 const LATER_WORDS = Object.freeze({
-  get SEAT2() { return t('prof.page.later.seat2', 'Comes with the sieges'); }, get SEAT2b() { return t('prof.page.later.seat2b', 'Comes with the fortifications'); },   // PROF11: the Builder's and the Fortifier's
+  get SEAT2() { return t('prof.page.later.seat2', 'Comes with the sieges'); },   // PROF11: the Builder's and the Fortifier's
   // PROF7 (Professions-Arc.md 29): what DFU gives these nothing to stand as - for Mac (HUNTERS-MARK built the trophy)
   get 'two-colour'() { return t('prof.page.later.twoColour', 'Comes when cloth can take a second dye'); },   // AUDIT 32 R11: never "DFU" where a player reads it; BR5: nor the game's name - the original game, the classic
   get wagon() { return t('prof.page.later.wagon', 'Comes when wagons can be upgraded'); },
@@ -205,7 +204,7 @@ export const forgeOffered = () => profPagesShown();
 export const FORGE_COLD_LINE = 'The forge is cold. Smelting is done online, from your Crafting page.';
 /** L10N4: the cold lines in the player's language - the constants stay the English the tests compare against. */
 export const forgeColdLine = () => t('prof.page.cold.forge', FORGE_COLD_LINE);
-/** PROF4 (bible/06-Systems/Professions-Arc.md 25): the home stations the Stores page works - the forge and the workbench -
+/** PROF4 (25): the home stations the Stores page works - the forge and the workbench -
  *  offered, sold and worked only where it is (forgeOffered's gate, AUDIT 29 B2). */
 export const PROF_STATIONS = Object.freeze(['forge', 'workbench', 'loom', 'mason', 'jeweller']);   // PROF7: the loom; PROF11: the mason's bench; PROF10: the jeweller's
 export const WORKBENCH_COLD_LINE = 'The workbench is bare. Carpentry is done online, from your Crafting page.';
@@ -221,7 +220,7 @@ const wordRow = (id, label) => {
   Object.defineProperty(row, 1, { enumerable: true, get: label });
   return Object.freeze(row);
 };
-/** STATION-DOOR (bible/01-Overview/bugs/Field-Bugs-2026-10-11f.md): the home stations whose press opens Daggerfall's maker AND
+/** STATION-DOOR: the home stations whose press opens Daggerfall's maker AND
  *  whose profession's act is this page's - each the act's word, as the press's chooser offers it beside the maker. A
  *  200,000-gold enchanting station opened the item maker alone, and Disenchanting stood at the foot of this page with no
  *  door from the station to it. */
@@ -312,7 +311,7 @@ export const BAG_PAGE_WORDS = Object.freeze({
    *  the picked bar's why. The page listed none of them and said nothing. */
   uncountedSplit: (n) => `${n.toLocaleString('en-US')} loose`,
   /** LOOT-LOOSE (FIELD BUGS 2026-10-15c, "a lot of alchemy and some other ingredients when looted from a dungeon are
-   *  unstorable"; Mac: "Store as loose"): Put in takes them now - as loose, a station's alone (BAG-CRAFT's origin). */
+   *  unstorable"): Put in takes them now - as loose, a station's alone (BAG-CRAFT's origin). */
   uncounted: 'Materials you loot, buy at a shop or get from another player go into your Stores as loose goods. Crafting stations can use them, but writs, guild Stores and the market only take what you gathered.',   // BAG-CRAFT: a station's put-in takes it, loose
 });
 /** AUDIT2 BAG1 U1: how many more units of a row's material the Stores take - their bound less what they hold, every
@@ -466,9 +465,6 @@ function purseShort(station, which) {
 /** What a Stores material of the smith's stock says in place of a withdrawal. */
 export const STOCK_STAYS_LINE = 'It stays at the bench for the anvil and the workbench to use.';   // PROF4: a counter's good with no pack form - none since PROF7 registered them all (NO_PACK_FORM empty), kept for a material to come
 const stockStaysLine = () => t('prof.page.stores.stockStays', STOCK_STAYS_LINE);
-/** SEAT2b part two: what a siege work (the Ram Kit) says in place of a withdrawal - its road is a Siege Camp's writ. */
-export const SIEGE_STAYS_LINE = 'Siege works stay in your Stores. Deliver them to your guild\'s Siege Camp with a writ on a Notice Board\'s Work tab.';
-const siegeStaysLine = () => t('prof.page.stores.siegeStays', SIEGE_STAYS_LINE);
 /** AUDIT PROF12 E1: what Arcane Essence says in place of a withdrawal - it never goes to the pack (NO_PACK_FORM). */
 export const ESSENCE_STAYS_LINE = 'Arcane Essence stays in your Stores and can\'t go to your pack. Sell it on the Market tab.';
 const essenceStaysLine = () => t('prof.page.stores.essenceStays', ESSENCE_STAYS_LINE);
@@ -478,7 +474,7 @@ const planeDownLine = () => t('prof.page.bench.down', 'You set the plane down; n
 const needleDownLine = () => t('prof.page.loom.down', 'You set the needle down; nothing is spent.');
 /** BAG1: what a material with no pack form says where Withdraw would stand - an essence's, a siege work's, the stock's -
  *  one law for the Stores page and the bag's page beside it (L10N4: in the player's language). */
-const staysLine = (pick) => (pick.family === 'essences' ? essenceStaysLine() : pick.family === 'siege' ? siegeStaysLine() : stockStaysLine());
+const staysLine = (pick) => (pick.family === 'essences' ? essenceStaysLine() : stockStaysLine());
 /**
  * AUDIT 32 P12: ESCAPE SETS AN ACT DOWN before it closes the window (AUDIT 31's law: Escape closes a form before the
  * window) - the heat, the plane or the stitch under way let go, nothing spent, and said. It closed the pause window, and
@@ -584,8 +580,7 @@ const gatherHow = (id) => (id === 'herbalism' ? t('prof.page.how.herbalism', GAT
 /** UNWITNESSED-ORE (FIELD BUGS 2026-10-09e, "Mining veins": hundreds of Iron veins in the mountains and not one of
  *  Silver, Gold, Platinum or Mithril, read as a bug): the ground's own law, said on the Mining page - a vein holds its
  *  ground's rarer ores only where three players have gathered (net/nodeLaw.js witnessedFact, UNCONFIRMED_VEIN_TIER).
- *  ORE-MAP: and where to read it for a place - the world map's ore card (ui/oreMapTip.js). DEEP-OPEN (bible/06-Systems/
- *  Professions-Arc.md section 53): a dungeon's deep veins draw their whole table on anyone's word (nodeLaw.js
+ *  ORE-MAP: and where to read it for a place - the world map's ore card (ui/oreMapTip.js). DEEP-OPEN (docs/systems/professions.md): a dungeon's deep veins draw their whole table on anyone's word (nodeLaw.js
  *  dungeonVein) - only the woods' Moonstone waits (deepClimateOres) - where this line had said "Silver anywhere". */
 export const MINING_GROUND_LINE = 'Veins hold Silver at most until three different players, each with an account at least a week old, have gathered on that ground. Then Gold, Platinum and Mithril in the mountains, and the region\'s own ore, can appear. Deep veins in dungeons can hold any of their ores, Dwarven Scrap and Adamantium among them, in any dungeon; only a woodland dungeon\'s Moonstone waits for three players to gather in it. Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet.';
 /** L10N4: MINING_GROUND_LINE in the player's language. */
@@ -596,7 +591,7 @@ export const MINING_SURVEYOR_LINE = 'As a {name}, you need no witnesses: your ve
 const miningSurveyorLine = () => t('prof.page.how.miningSurveyor', MINING_SURVEYOR_LINE, { name: specOf('mining', 100, SURVEYOR)?.name ?? '' });
 /** TOOL-SAID: the empty Stores say where their goods come from - a node's act (TOOL-USE: the key's, or the tool's Use
  *  there), never a tool used from the pack. */
-/** AUDIT (2026-10-04): the empty Stores on BAG1's page - a carrying book's harvest goes into the bag or the pack, never
+/** AUDIT: the empty Stores on BAG1's page - a carrying book's harvest goes into the bag or the pack, never
  *  straight into the Stores, so STORES_EMPTY_LINE (an older book's, below) said where its goods go wrongly there. */
 export const STORES_EMPTY_CARRY_LINE = 'Your Stores are empty. What you gather goes into your Materials Bag or pack. Put it in here in any town.';
 export const STORES_EMPTY_LINE = 'Your Stores are empty. What you gather online goes here. Press the use key at an herb patch, a tree, an ore vein, a boulder or a creature you killed, or in water with a net. You can also use the matching tool from your hotbar or a quick slot. Tools used from your pack gather nothing.';   // TOUCH-HOLD: the knife's Use
@@ -639,7 +634,7 @@ export const CRAFT_HOW = Object.freeze({
   provisioning: () => t('prof.page.how.cooking', 'Cook at any lit fire: a campfire, a hearth or a brazier. Stand close to the flame. Dishes use the meat you skin, the fish you net, herbs and Basket finds, and go to your pack.'),   // beside ALCHEMY_HOW: Provisioning's cooking (CRAFT3)
 });
 /**
- * POTION-DOOR (bible/06-Systems/Professions-Arc.md 52; SaberGGaming's report, 2026-10-25): THE POTION MAKER'S DOOR TO THE
+ * POTION-DOOR (52; SaberGGaming's report, 2026-10-25): THE POTION MAKER'S DOOR TO THE
  * BREW (scenes/potionMakerHost.js) - online, the pages standing: `station` whether the player stands at an alchemy station
  * (the provider's - an Alchemist's, a Mages Guild hall, a home's), `held` what the Stores alone hold of a material (the
  * station's read of them; what is carried the maker lists as DFU's own items), the brewer's rank and the station's fee,
@@ -778,7 +773,7 @@ export const craftsAboveJourneyman = (tracks) => craftsPastJourneyman(tracks).le
  *  craftXpCap of the same ranks), and the Firmament's percent on its XP (FIRM1: the stars in force; the service scales by
  *  its own firmStatsOf). ui/craftXpWords.js says them. @param {any} book @param {string} id a craft or a discipline */
 export const craftPayOf = (book, id) => ({ limit: craftLimitOf(book?.state?.tracks?.values?.() ?? [], id), pct: xpPct(firmamentStats(), trackOf(id)) });
-/** CLOTH-GEMS (AUDIT 32 S1 - bible/06-Systems/Professions-Arc.md 50): WHAT KEEPS A CRAFT OF `r` FROM ITS FIRST, as the book
+/** CLOTH-GEMS (AUDIT 32 S1 50): WHAT KEEPS A CRAFT OF `r` FROM ITS FIRST, as the book
  *  reads it - WOVEN-PAYS (AUDIT WOVEN-PAYS): the silver count of its cloth (net/profBook.js silver - the bolts bought with
  *  silver its stations have not used since; the most of its inputs'), 0 where none stands, whatever the units' origins.
  *  The service's decision reads the same count, and its answer says what it did (`firstPaid`). A book without the count
@@ -1034,8 +1029,8 @@ export function storesRows(stores, { family = null, query = '', sort = 'tier' } 
 
 /** A Stores card's split: own, bought and (GOLD-MARKET) bought with gold - "own" alone where nothing was bought. AUDIT
  *  BAG-CRAFT A1: and what a station's put-in brought from the pack, loose. FB1020h ESSENCE-LOOSE: a material with no pack
- *  form (Arcane Essence, a Ram Kit) never came from the pack itself - its loose units were MADE of goods that did (a piece
- *  of them disenchanted, a kit of them built), and say so. */
+ *  form (Arcane Essence) never came from the pack itself - its loose units were MADE of goods that did (a piece
+ *  of them disenchanted), and say so. */
 export function storesSplit(r) {
   const gold = r.gold | 0, loose = r.loose | 0;
   const own = () => t('prof.page.stores.own', '{n} own', { n: r.own }), bought = () => t('prof.page.stores.bought', '{n} bought', { n: r.bought });
@@ -1128,7 +1123,7 @@ export function drawStoresPage(detail, rerender, kit) {
     detail.append(bar);
     detail.append(el('p', 'px-note', withdrawable(pick.material)
       ? t('prof.page.stores.withdrawNote', 'A withdrawn material becomes an item in your pack and can\'t go back into the Stores. Writs are delivered on a Notice Board\'s Work tab.')
-      : staysLine(pick)));   // SEAT2b part two: a siege work's road
+      : staysLine(pick)));
     if ((pick.gold | 0) > 0) detail.append(el('p', 'px-note', goldGoodsLine(pick.material)));
     if ((pick.loose | 0) > 0) detail.append(el('p', 'px-note', looseGoodsLine(pick.material)));   // AUDIT BAG-CRAFT A1: an older book's page (another device's put-in)
   }
@@ -1152,7 +1147,7 @@ function drawStations(detail, rerender, kit) {
   ]);
 }
 
-/** MENU-ORDER (2026-10-12): a material card's name with its picture before it - the item the Stores withdraw it as, the
+/** MENU-ORDER: a material card's name with its picture before it - the item the Stores withdraw it as, the
  *  host's to make (`picture`); none (no data, or not made yet) is the name alone. */
 function matName(el, r, rerender) {
   const n = el('b', null, r.name);
@@ -1160,7 +1155,7 @@ function matName(el, r, rerender) {
   if (pic) { if (n.prepend) n.prepend(pic); else n.append(pic); }
   return n;
 }
-/** MENU-ORDER (2026-10-12): THE STATIONS AS TILES - each its picture and its short name, the ones worked here lit. */
+/** MENU-ORDER: THE STATIONS AS TILES - each its picture and its short name, the ones worked here lit. */
 export const STATION_TILES = Object.freeze({
   forge: ['Forge', 'forge'], anvil: ['Anvil', 'anvil'], 'temper-anvil': ['Temper (anvil)', 'temper'], workbench: ['Workbench', 'saw'],
   loom: ['Loom', 'spool'], 'temper-loom': ['Temper (loom)', 'temper'], mason: ['Mason\'s bench', 'chisel'], fire: ['Fire', 'fire'],
@@ -1245,7 +1240,7 @@ function drawStationTiles(detail, rerender, kit, list) {
 }
 
 /**
- * BAG1: THE STORES PAGE FOR A CARRYING BOOK (bible/06-Systems/Materials-Bag.md): the bag's load first (or that there is
+ * BAG1: THE STORES PAGE FOR A CARRYING BOOK: the bag's load first (or that there is
  * none, and where one is sold), then every material stored or carried - each card its Stores count and split and what
  * the bag and the pack hold of it - and, for the one picked, TAKE OUT (the Stores into the bag, then the pack, as many as
  * fit) and PUT IN (the bag and the pack into the Stores); both only in a town (`inTown`), where the Stores are kept. Put
@@ -1388,7 +1383,7 @@ function drawCarryStores(detail, rerender, kit) {
 }
 
 /** What the Stores make of a recipe now: the most it can smelt (every input's units over its need), to SMELT_MAX.
- *  DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): and over the Deadlands Embers it spends a unit
+ *  DAEDRIC-SMELT: and over the Deadlands Embers it spends a unit
  *  (professionLaw workEmbers) where `embers` - the pack's, the book's `embers()` - is known. */
 export function smeltable(r, held, embers = null) {
   let n = SMELT_MAX;
@@ -1485,7 +1480,7 @@ function counterBuy(line, { el, p, state, rerender, key, need, sale, who, counte
 }
 
 /**
- * PROF2: THE FORGE (bible/06-Systems/Professions-Arc.md 4.1, 23) - under the Stores, the smelts: each recipe's inputs
+ * PROF2: THE FORGE (4.1, 23) - under the Stores, the smelts: each recipe's inputs
  * as the Stores hold them, how many it can make, a count and Smelt; PROF4: and the logs burnt to Charcoal. Only at a
  * forge: a Weaponsmith's or an Armorer's, whose use fee is paid a smelt, or the player's own home forge.
  * @param {HTMLElement} detail @param {() => void} rerender @param {{ el: Function, divider: (w: string) => HTMLElement }} kit
@@ -1504,7 +1499,7 @@ function drawForge(detail, rerender, { el, divider }) {
   const short = purseShort(forge, 'forge');
   if (short) detail.append(el('p', 'px-note prof-short', short));
   workRows(detail, rerender, el, SMELT_RECIPES, _forge, t('prof.page.forge.smelt', 'Smelt'), t('prof.page.forge.smelting', 'Smelting...'), (id, n) => p.smelt(id, n), short);
-  // DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): where the Daedric smelt's heart and ember come from,
+  // DAEDRIC-SMELT: where the Daedric smelt's heart and ember come from,
   // said while the forge cannot smelt one - as the Steel line says the Charcoal (below)
   if (daedricWaits(book)) detail.append(el('p', 'px-note', daedricWord()));
   // PROF4: the logs a forge burns - those the Stores hold (a log a Charcoal; a Charcoal Burner's two)
@@ -1531,10 +1526,10 @@ const daedricWaits = (book) => !!DAEDRIC_SMELT && smeltable(DAEDRIC_SMELT, (k) =
 /** DAEDRIC-SMELT: the Daedric line - what its smelt takes, and where a heart and an ember are won (systems/loot/lootThemes.js
  *  CREATURE_INGREDIENT_THEME, the daedra's hearts; systems/riteChest.js RITE_HEART, the Breach's faithful's chest;
  *  accounts.js EMBERS_EARNED_SQL, the embers the account earned). */
-export const DAEDRIC_LINE = 'A Daedric Ingot takes an Ebony Ingot, a Daedra\'s Heart and a Deadlands Ember. Hearts are carried by the daedra you slay and won at Dagon\'s Breaches; embers are won closing the Breaches, slaying Sea Serpents and taking Elite Breach Redoubts, and each one is spent from what your account has won.';
+export const DAEDRIC_LINE = 'A Daedric Ingot takes an Ebony Ingot, a Daedra\'s Heart and a Deadlands Ember. Hearts are carried by the daedra you slay and won at Dagon\'s Breaches; embers are won closing the Breaches and slaying Sea Serpents, and each one is spent from what your account has won.';
 const daedricWord = () => t('prof.page.forge.daedric', DAEDRIC_LINE);
 
-// ─── PROF3: THE ANVIL (bible/06-Systems/Professions-Arc.md 9, 24) ─────
+// ─── PROF3: THE ANVIL (9, 24) ─────
 
 /** The anvil's families, in its row's order, and the metals a family is made in. */
 const toolsWord = () => t('prof.page.family.tools', 'Tools');
@@ -1548,7 +1543,7 @@ const spendsOf = (r, book, heartwood) => recipeInputs(r, { heartwood: heartwood 
 /** Whether the Stores make a recipe now - its inputs, or (PROF4) what it would spend (`inputs`). */
 export const craftable = (r, held, inputs = r.inputs) => inputs.every((inp) => held(inp.key) >= inp.n);
 
-// ─── CRAFT1: THE CHAIN (bible/06-Systems/Professions-Arc.md 41) ─────
+// ─── CRAFT1: THE CHAIN (41) ─────
 
 /** CRAFT1: the chain a recipe's inputs want from what is held (net/chainLaw.js) - null where they are held as they stand. */
 export function chainOf(inputs, book) {
@@ -1589,7 +1584,7 @@ export function chainNote(box, el, p, book, inputs) {
   return plan;
 }
 
-// ─── CRAFT2: PATTERNS, NOT A MATRIX (bible/06-Systems/Professions-Arc.md 41) ─────
+// ─── CRAFT2: PATTERNS, NOT A MATRIX (41) ─────
 
 /**
  * @typedef {{ open: boolean, can: boolean, raw: boolean, share: number }} Standing
@@ -1899,7 +1894,7 @@ function drawAnvil(detail, rerender, kit) {
   if (_anvil.word) detail.append(el('p', 'prof-word', _anvil.word));
 }
 
-// ─── PROF4: THE WORKBENCH (bible/06-Systems/Professions-Arc.md 4.2, 9.3, 9.4, 25) ─────
+// ─── PROF4: THE WORKBENCH (4.2, 9.3, 9.4, 25) ─────
 
 /** A Heartwood for one of a recipe's planks (PROF0 25) - a quality step, one with a Warforged ingot; offered where the
  *  recipe asks a plank and takes a quality, and the Stores hold one. */
@@ -1916,11 +1911,9 @@ function heartwoodToggle(box, el, r, book, state, rerender, locked = false) {
   lab.append(cb, globalThis.document.createTextNode(` ${t('prof.page.heartwood', 'Use a Heartwood for a plank one grade better ({n} stored)', { n: have })}`));
   box.append(lab);
 }
-/** The workbench's families, in its row's order: staves and bows by wood, the arrows, the furniture by wood, the Basket,
- *  the Ram Kit. */
+/** The workbench's families, in its row's order: staves and bows by wood, the arrows, the furniture by wood, the Basket. */
 export const BENCH_FAMILIES = Object.freeze([wordRow('staves', () => t('prof.page.family.staves', 'Staves')), wordRow('bows', () => t('prof.page.family.bows', 'Bows')),
-  wordRow('arrows', () => localizedText('Arrows', 'Arrows')), wordRow('furniture', () => t('prof.page.family.furniture', 'Furniture')), wordRow('tools', toolsWord),
-  wordRow('siege', () => t('prof.page.family.siege', 'Siege'))]);
+  wordRow('arrows', () => localizedText('Arrows', 'Arrows')), wordRow('furniture', () => t('prof.page.family.furniture', 'Furniture')), wordRow('tools', toolsWord)]);
 /** The woods a family is shown by - every wood for the staves and bows, DFU's furniture's four and the beds' for the
  *  furniture; none for the rest. */
 const WOODS_OF = Object.freeze({ staves: WOODS.map((w) => `plank:${w.id}`), bows: WOODS.map((w) => `plank:${w.id}`), furniture: ['plank:pine', 'plank:oak', 'plank:cherry', 'plank:mahogany', 'plank:teak'] });
@@ -2059,7 +2052,6 @@ function drawWorkbench(detail, rerender, kit) {
     const chain = chainNote(box, el, p, book, spends);   // CRAFT1: the works it runs first
     _bench.chained = chain?.ok === true;   // AUDIT CRAFT1 F1: a craft pressed now runs its chain - the work rows held under it
     if (r.later) box.append(el('p', 'px-note', t('prof.page.later.anyLine', 'Comes with a later work.')));   // a recipe named before its slice (none since SEAT2b part two)
-    else if (r.kind === 'siege') box.append(el('p', 'px-note', t('prof.page.bench.ramKit', 'A Ram Kit goes to your Stores. Deliver it to your guild\'s Siege Camp with a seat writ. If the camp wins a Right of Siege, it goes to the battle against a Gatehouse.')));   // SEAT2b part two: a siege work's road
     else if (r.kind === 'arrows') box.append(el('p', 'px-note', t('prof.page.bench.arrows', 'Makes a quiver of 20 arrows. Arrows have no quality.')));
     else if (r.family === 'furniture') box.append(el('p', 'px-note', t('prof.page.bench.furniture', 'Furniture goes to your things. Place it in a room of your own with Decorate.')));
     if (takesQuality(r) && recipeOpen(r, rank)) {
@@ -2119,7 +2111,7 @@ function drawWorkbench(detail, rerender, kit) {
   if (_bench.word) detail.append(el('p', 'prof-word', _bench.word));
 }
 
-// ─── PROF7: THE LOOM AND THE TANNING RACK (bible/06-Systems/Professions-Arc.md 4.4, 4.5, 9.3, 9.4, 29) ─────
+// ─── PROF7: THE LOOM AND THE TANNING RACK (4.4, 4.5, 9.3, 9.4, 29) ─────
 
 /** The loom's families, in its row's order: the leather armour, the clothing, the rugs, tapestries and skins, the
  *  Fishing-Net. */
@@ -2372,7 +2364,7 @@ function drawLoom(detail, rerender, kit) {
   if (_loom.word) detail.append(el('p', 'prof-word', _loom.word));
 }
 
-// ─── PROF11: THE MASON'S BENCH (bible/06-Systems/Professions-Arc.md 4.5, 9.3, 9.4) ─────
+// ─── PROF11: THE MASON'S BENCH (4.5, 9.3, 9.4) ─────
 
 /** What setting the chisel down says. */
 export const CHISEL_DOWN_LINE = 'You set the chisel down; nothing is spent.';
@@ -2627,7 +2619,7 @@ function drawMasonBench(detail, rerender, kit) {
   if (_mason.word) detail.append(el('p', 'prof-word', _mason.word));
 }
 
-// ─── PROF9: THE FIRE (bible/06-Systems/Professions-Arc.md 9.3, 9.4, 35) ─────
+// ─── PROF9: THE FIRE (9.3, 9.4, 35) ─────
 
 /** What setting the pan aside says. */
 export const PAN_DOWN_LINE = 'You take the pan off the fire; nothing is spent.';
@@ -2816,7 +2808,7 @@ function drawCookFire(detail, rerender, kit) {
   if (_cook.word) detail.append(el('p', 'prof-word', _cook.word));
 }
 
-// ─── PROF10: THE JEWELLER'S BENCH (bible/06-Systems/Professions-Arc.md 9.3, 9.4, 36) ─────
+// ─── PROF10: THE JEWELLER'S BENCH (9.3, 9.4, 36) ─────
 
 /** What setting the stone down says. */
 export const FACET_DOWN_LINE = 'You set the stone down; nothing is spent.';
@@ -3098,7 +3090,7 @@ function drawJewellerBench(detail, rerender, kit) {
   if (_jewel.word) detail.append(el('p', 'prof-word', _jewel.word));
 }
 
-// ─── PROF12: THE ALCHEMY STATION (bible/06-Systems/Professions-Arc.md 9.3, 37) ─────
+// ─── PROF12: THE ALCHEMY STATION (9.3, 37) ─────
 
 /** What the station says a potion's cauldron wants, and its word for the Apothecaries'. */
 const ALCHEMY_AWAY = 'Alchemy is brewed at an alchemy station: an Alchemist\'s or a Mages Guild hall ({fee} gold a brew), or your own home\'s. Your potions go to your pack.';   // POTION-DOOR: the Mages Guild's hall a station
@@ -3218,7 +3210,7 @@ function drawAlchemyStation(detail, rerender, kit) {
   if (_alchemy.word) detail.append(el('p', 'prof-word', _alchemy.word));
 }
 
-// ─── PROF12: THE ENCHANTING STATION (bible/06-Systems/Professions-Arc.md 9.3, 37) ─────
+// ─── PROF12: THE ENCHANTING STATION (9.3, 37) ─────
 
 const ENCHANT_AWAY = 'Disenchanting is done at an enchanting station: a Mages Guild hall ({fee} gold a piece), or your own home\'s. A crafted piece comes apart into Arcane Essence in your Stores.';
 export const ENCHANT_AWAY_LINE = formatMessage(ENCHANT_AWAY, { fee: ENCHANT_FEE });   // the English, as the tests compare it
@@ -3230,7 +3222,7 @@ export const ENCHANT_FULL_LINE = (room) => t('prof.page.enchant.full', 'Your Sto
 /** DISENCHANT-SAID: a piece whose points make no Essence - listed, greyed, and why (alchemyLaw ESSENCE_POINTS). */
 export const ENCHANT_UNDER_LINE = (points) => t('prof.page.enchant.under', '{points, number} points. One Arcane Essence needs {per, number}.', { points, per: ESSENCE_POINTS });
 /**
- * DISENCHANT-SAID (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "List them greyed with the reason"): THE PIECES THE
+ * DISENCHANT-SAID (FIELD BUGS 2026-10-19f): THE PIECES THE
  * ENCHANTING STATION LISTS, made here and wired by the host (scenes/world.js `disenchantable`), never in it. A player's
  * private report: crafted greaves and pauldrons could not be disenchanted, and the station never said why. PROF12 (9.3,
  * 37) gives a piece its DFU template's enchantment points, one Essence a hundred - Greaves 50, either Pauldron 40, so
@@ -3298,7 +3290,7 @@ function drawEnchantingStation(detail, rerender, kit) {
   if (capped) detail.append(el('p', 'px-note', capped));
   if (pieces.some((pc) => pc.essence >= 1 && counterMade(recipeById(pc.recipe)))) detail.append(el('p', 'px-note', t('prof.page.enchant.cloth', 'A piece made only of cloth gives Enchanting experience only if nothing bought or looted went into it and it was never sold.')));
   for (const pc of pieces) {
-    // DISENCHANT-SAID (the owner: "List them greyed with the reason"): a piece under one Essence - greyed, its reason, its
+    // DISENCHANT-SAID: a piece under one Essence - greyed, its reason, its
     // Disenchant never pressed (the service would refuse it: prof-no-essence)
     if (!(pc.essence >= 1)) {
       const row = el('div', 'prof-smelt prof-locked');
@@ -3335,7 +3327,7 @@ function drawEnchantingStation(detail, rerender, kit) {
   drawEssenceReforge(detail, rerender, { el, divider }, rank, short);   // CRAFT4
 }
 
-// ─── CRAFT4: THE TEMPER AND THE REFORGE WITH ESSENCE (bible/06-Systems/Professions-Arc.md 41.7) ─────
+// ─── CRAFT4: THE TEMPER AND THE REFORGE WITH ESSENCE (41.7) ─────
 
 /** CRAFT5 (Professions-Arc 41.8): what a Repair Kit's box says - its work, and the reach its quality gives. */
 export const KIT_REACH_LINE = 'A Repair Kit restores a quarter of the condition of a weapon or armor of its metal, once. It repairs up to three quarters, or nine tenths with a Superior or Masterwork kit.';
@@ -3399,7 +3391,7 @@ function drawTemper(detail, rerender, { el, divider }, where) {
 }
 
 /** What the Reforge with Essence says it is, and below its rank. */
-/** REFORGE-REPLACE (the owner: "Replace, price rises"): a line is replaced by another kind, any line, the price doubling. */
+/** REFORGE-REPLACE: a line is replaced by another kind, any line, the price doubling. */
 export const ESSENCE_REFORGE_HOW = () => t('prof.page.reforge.how', 'An Enchanter replaces one line of a Magic piece with a line of another kind for {magic} Arcane Essence, or of a Rare piece for {rare}. Any line can be reforged, and each reforge doubles the price of the next on that piece.', { magic: REFORGE_ESSENCE.magic, rare: REFORGE_ESSENCE.rare });
 export const ESSENCE_REFORGE_RANK_LINE = () => t('prof.page.reforge.rank', 'From Enchanting {rank}, you can replace one line of a Magic or Rare piece with a line of another kind here, for Arcane Essence.', { rank: REFORGE_RANK });   // REFORGE-REPLACE: a line replaced, never rolled again
 export const ESSENCE_REFORGE_NONE = 'Nothing in your pack can be reforged. It takes an identified Magic or Rare piece you are not wearing.';

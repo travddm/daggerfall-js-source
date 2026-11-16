@@ -1,13 +1,13 @@
 // FIELD BUGS 2026-10-15d MEND-TIERS (Unconquerable, "Repair Regression": "worn items should always repair before
 // backpack items. If you wear a Cast When Held ring or Item Deteriorates armor and pick up 20 damaged axes, bows, and
 // shoes off dungeon mobs to sell in town, the game decides those 20 pieces of vendor trash are more important than the
-// ring on your finger"). MEND-STARVE (2026-10-14) put a worn piece that wears itself on the round the tick mends - Cast
+// ring on your finger"). MEND-STARVE put a worn piece that wears itself on the round the tick mends - Cast
 // When Held's degrade, Item Deteriorates - behind every other damaged piece, the pack's included, so the ring wore a
 // point a tick while the loot was mended. Mac's call: three tiers - what is worn, then a worn piece that wears itself,
 // then the pack - and MEND-WORN's mend order within a tier. Through the round's own payloads (enchantmentMagicRound,
 // AllowMagicRepairs on as online forces it), every piece from its producer: the item maker's rows (applyEnchantments
 // over enchantmentSettings), the mobs' iron and leather (weaponOfMaterial, armorOfMaterial) at Roleplay & Realism's
-// found-loot 20-75% (randomConditionLootItems), put on by equipItem. bible/01-Overview/bugs/Field-Bugs-2026-10-15c.md.
+// found-loot 20-75% (randomConditionLootItems), put on by equipItem..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { enchantmentMagicRound, repairsObjectsTarget, repairsObjectsMend } from '../../src/systems/enchantments.js';
@@ -73,7 +73,6 @@ test('MEND-TIERS: the report - a worn Cast When Held ring, or worn Item Deterior
     assert.equal(repairsObjectsTarget(p.items, ALLOW), piece, `${what} first all the same`);
     const packed = conditions(trash);
     rounds(p, 1, 400);
-    // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): a point mended on each tick it wore one held it where it stood; a
     // fiftieth mended now climbs it to whole, less the point it wears on the tick's round - below its condition still,
     // so the pack still waits
     assert.equal(piece.currentCondition, piece.maxCondition - 1, `${what} held ahead of the pack: mended on each of the 100 ticks it wore a point, to whole less that point`);
@@ -88,7 +87,6 @@ test('MEND-TIERS: three tiers - a plain worn cuirass, the least worn, is mended 
   assert.ok(conditionShare(helm) < conditionShare(held) && conditionShare(held) < conditionShare(cuirass), 'the helm the most worn of what is worn, the cuirass the least');
   assert.equal(repairsObjectsTarget(p.items, ALLOW), cuirass, 'the plain worn piece first');
   const [h0, r0, c0, packed] = [helm.currentCondition, held.currentCondition, cuirass.currentCondition, conditions(trash)];
-  // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): a point a tick, the cuirass's 41 took 41 ticks and then the tick HELD
   // the helm while the ring wore; a fiftieth of the piece's own a tick now - the cuirass whole in one, then the more worn
   // of the two mended each tick (the helm first, until the ring has less share left), the other wearing its point
   const ticks = Math.ceil((cuirass.maxCondition - c0) / repairsObjectsMend(cuirass));
@@ -119,7 +117,6 @@ test('MEND-TIERS: once nothing worn is below its condition the pack is mended, i
   rounds(p, 57, 60, { inSunlight: () => true });
   const [packed, pair] = [conditions(trash), held.currentCondition + helm.currentCondition];
   assert.ok(pair < held.maxCondition + helm.maxCondition, 'they wore');
-  // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): one mended a point and two wearing one, the pair went a point a tick
   // down; the one mended takes its fiftieth now, so the more worn of the two is mended whole each tick
   eachTickTheMoreWorn(p, held, helm, 64, 460, { inSunlight: () => true });
   assert.deepEqual(conditions(trash), packed, 'from the next tick on the pack waits: a piece that wears on every tick holds every tick (Mac\'s trade-off)');

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW11 (2026-10-09, bible/06-Systems/Living-World-II.md "LW11"): THE CARAVAN'S DOOR - what a party on the road offers
-// the player, and what a deed against it costs. Mac: "caravans ... that can be assaulted, protected or traded with".
+// LW11: THE CARAVAN'S DOOR - what a party on the road offers
+// the player, and what a deed against it costs..
 // Pure: the trip's own data and the clock in, the law out; the host (scenes/world.js) opens the windows and keeps the
 // character's records (relations.js `wares`, `reports`, `escort`).
 //
@@ -11,7 +11,7 @@
 // Its stock is the counter's own roll (shopStock.js stockShopShelf), seeded by the trip - the same all trip - and what
 // the character bought or took stays gone (their `wares`).
 //
-// A DEED ON THE ROAD (Living World II decision 5) is a crime against the REGION where the road runs, charged only when a
+// A DEED ON THE ROAD is a crime against the REGION where the road runs, charged only when a
 // witness reaches a town alive (`reportAt`: the party's next arrival - the town it set out for on the way out, home on
 // the way back); the character killing every witness first voids it.
 //

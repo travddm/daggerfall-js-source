@@ -106,7 +106,7 @@ const bank = {
     // banking.js, THE STORE IS PER REGION), and nothing online said so - the teller in another region read "Account
     // balance 0" under "Bank of the Empire". The row names the region whose account it is, and each other region that
     // holds gold stands beneath it (CreateBankingStatusBox's list, which only the classic sheet's gold button opens).
-    // EMPIRE-ACCOUNT (2026-10-01): online every branch keeps ONE account, the Empire's - the row is that account, and
+    // EMPIRE-ACCOUNT: online every branch keeps ONE account, the Empire's - the row is that account, and
     // beneath it only a branch a character has not yet folded into it (banking.js foldEmpireAccounts, at its next boot)
     const here = REGION_NAMES[w.region];
     const gold = goldRegion(w.accounts ?? [], w.region), one = empire && gold === EMPIRE_ACCOUNT_REGION;
@@ -134,7 +134,7 @@ const bank = {
           { type: 'stats', items: [
             ['Silver held', marksText(w.hooks.marks.balance() ?? 0)],
             ['Sold today', `${(w.hooks.marks.today()?.exchanged ?? 0)} of ${MARKS_BANK.perDay}`],
-            ['From gates, raids, serpents and the Spire today', `${(w.hooks.marks.today()?.combat ?? 0)} of ${w.hooks.marks.today()?.combatMax ?? MARKS_COMBAT.perDay}`],   // SILVER-WAYS; SERPENT-SET: the serpents' under the same cap; EG-E1: and the Spire's Redoubts'
+            ['From gates, raids and serpents today', `${(w.hooks.marks.today()?.combat ?? 0)} of ${w.hooks.marks.today()?.combatMax ?? MARKS_COMBAT.perDay}`],   // SILVER-WAYS; SERPENT-SET: the serpents' under the same cap
             ['Found in loot today', `${(w.hooks.marks.today()?.found ?? 0)} of ${w.hooks.marks.today()?.findMax ?? MARKS_FAUCETS.find.perDay}`],   // SILVER-FINDS
             ['Found gathering today', `${(w.hooks.marks.today()?.gathered ?? 0)} of ${w.hooks.marks.today()?.gatherMax ?? MARKS_FAUCETS.gather.perDay}`],
             ['The Bank pays', `${MARKS_BANK.goldPerMark} gold for each silver`],
@@ -363,8 +363,7 @@ const spellMaker = {
 };
 
 // ── THE SPELL SHOP ─────────────────────────────────────────────────
-// SHOP-PLUS (Mac: "the buy spells vendors UI in guild halls is still in classic this must be reworked to enhanced
-// plus"). The guilds' and temples' Buy Spells is DFU's spellbook in BUY MODE (worldModes guildServiceSpellbook) -
+// SHOP-PLUS. The guilds' and temples' Buy Spells is DFU's spellbook in BUY MODE (worldModes guildServiceSpellbook) -
 // ported, not rewritten: every price is the window's own tradePrice (the building's quality against the player's
 // Mercantile and Personality, the Witches Festival half), the buy is its own buyButton (the spellbook check, the
 // gold check, the haggle line and the Yes/No, which take their enhanced faces), and an effect's full description is

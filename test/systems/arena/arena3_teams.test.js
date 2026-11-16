@@ -1,5 +1,5 @@
-// ARENA3 (2026-10-02, Mac: "join a team (red and blue)"): THE BANNERS AND THEIR SEASON, offline
-// (systems/arena/arenaLeague.js; bible/11-Multiplayer/Arena.md "3. The teams"). Pinned here: the season is the game's year and
+// ARENA3: THE BANNERS AND THEIR SEASON, offline
+// (systems/arena/arenaLeague.js; "3. The teams"). Pinned here: the season is the game's year and
 // its day the day of the year; joining is free and changing costs a season (quit at once, the other banner only next
 // season, the same banner again at once); team points 1 / 3 / 10 to the banner worn and to none unworn; the season
 // closed on the first read past it - its winner, the laurel to the winning banner's fighters, a level season none;
@@ -225,7 +225,6 @@ test('ARENA3 the gate: a recruiter\'s choice joins, quits after asking, opens th
     assert.match(W, /arenaRecruiter: \(role\) => arenaGate\.recruiter\(role\)/, f);
     assert.match(W, /gameMinutes: \(\) => worldMinutes\(\),   \/\/ ARENA3/, `${f}: the driver reads the clock`);
   }
-  assert.match(rd('src/scenes/worldModes.js'), /if \(\(gateRole === 'redRecruiter' \|\| gateRole === 'blueRecruiter'\) && host\.arenaRecruiter\?\.\(gateRole\)\) return;/);
 });
 
 const settle = () => new Promise((r) => setTimeout(r, 0));

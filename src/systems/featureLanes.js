@@ -1,4 +1,4 @@
-// FT18 (2026-09-25, Mac: "Lets do a comprehensive reorganize and consolidation of our mod/enhancements") - THE
+// FT18 - THE
 // CONDENSED ROWS' LANES OVER THE PORT'S OWN PREFS.
 //
 // RF4 has a condensed row's lane registered by the module that owns its keys, and the two before these own real

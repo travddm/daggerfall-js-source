@@ -1,5 +1,5 @@
 // @ts-check
-// STAFF-PANEL5-FREEZE (2026-10-22; design doc "DFO Staff Panel: design", Freeze player): THE "FROZEN BY STAFF" SCREEN - a
+// STAFF-PANEL5-FREEZE: THE "FROZEN BY STAFF" SCREEN - a
 // banner over the top of the world while a staff freeze stands (net/staffChat.js paints it): why, until when, and the
 // server's Discord invite with a Copy button. It holds nothing itself: the motor is held by the paralysis gates
 // (characters/playerEntity.js staffFrozen), and the relay and the account service hold a game that never draws this.

@@ -1,8 +1,8 @@
 // @ts-check
-// WB13e (2026-10-01, Mac: "just overall bring more AAA grade polish to what is already developed"): THE FIGHT'S BEATS,
+// WB13e: THE FIGHT'S BEATS,
 // LARGE - a card over the upper middle of the screen for the moments a fight turns on: his wake (his name, his epithet
 // under it, as he first moves), a phase's turn ("II", "The Burning Court", its one order under it until he lands) and his
-// fall ("Felled" under his name, over his spoils). Design: bible/11-Multiplayer/World-Bosses.md section 20, WB13e.
+// fall ("Felled" under his name, over his spoils). Design: WB13e.
 //
 // A READOUT, NOT A WINDOW (the gate banner's law, ui/gate/gateBanner.js): no click, no overlay stack, one node made on the
 // first word and UPDATED, NOT REBUILT - each part written only when it changes - hidden (never removed) when there is
@@ -13,7 +13,24 @@
 // Not a DFU member. Ledger A (WB).
 import { GATE_RING_CSS } from './gateMapMark.js';
 import { injectEnhancedFonts } from '../enhanced/enhancedStyle.js';   // the classic face, loaded by the gate's own screens
-import { egReducedMotion } from '../eliteGates/egAccess.js';   // AUDIT EG V (c, L7-17): reduced motion - the port's row or the system's
+import { getPref } from '../../systems/uiPrefs.js';
+
+// The window's `(prefers-reduced-motion: reduce)` query, asked once per window and kept; the draw reads its live answer.
+const motionQueryOfWindow = new WeakMap();
+
+/** Whether the cards should stand still: the port's `reducedMotion` row, or the system's own setting. */
+function reducedMotion(win = globalThis.window, pref = getPref('reducedMotion')) {
+  if (pref === true) return true;
+  if (!win || typeof win !== 'object') return false;
+  try {
+    if (!motionQueryOfWindow.has(win)) {
+      motionQueryOfWindow.set(win, win.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null);
+    }
+    return !!motionQueryOfWindow.get(win)?.matches;
+  } catch {
+    return false;   // a window without matchMedia, or one that throws, moves as the default does
+  }
+}
 
 /** A card comes in over TITLE_IN_MS and goes over TITLE_OUT_MS; it stands at least TITLE_HOLD_MS. */
 export const TITLE_IN_MS = 300;
@@ -74,11 +91,10 @@ function build(doc) {
   parts = { kicker, main, rule, sub };
 }
 
-/** Draw the card for a model (null hides it); `hidden` is the HUD's own hide and the step's fire. AUDIT EG V (c, L7-17;
- *  Elite-Gates.md section 25.7): `still` reduced motion - the port's row or the system's (ui/eliteGates/egAccess.js egReducedMotion,
- *  read here unless the caller says) - the name never flies in and the rule never sweeps: the wake's and the fall's card
- *  in the Spire stood still where its arrival card and THE FALL's did. */
-export function drawGateTitleCard(model, { hidden = false, doc = globalThis.document, still = egReducedMotion() } = {}) {
+/** Draw the card for a model (null hides it); `hidden` is the HUD's own hide and the step's fire. `still` is reduced
+ *  motion - the port's row or the system's (reducedMotion, read here unless the caller says) - the name never flies in
+ *  and the rule never sweeps. */
+export function drawGateTitleCard(model, { hidden = false, doc = globalThis.document, still = reducedMotion() } = {}) {
   const want = !hidden && !!model;
   if (!root) {
     if (!want || !doc?.createElement) return;

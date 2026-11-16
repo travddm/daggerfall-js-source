@@ -1,13 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CHAP2b (2026-10-08, Mac: "Keep going with the arc/slices") — THE
+// CHAP2b — THE
 // RECEIPTS' STANDING AND THE RECEIPT WRITS: a gate closed or a raided town
 // defended, by a realm character in a region where a guild it is a member
 // of keeps a chapter, is remembered on its Roll - RECEIPT_REP a guild a
 // receipt (Chapters-Arc 3.3), and HALL_WRIT_REP more for the chapter's
 // receipt writ, its first such receipt of the UTC day there (section 4).
 // The law is src/net/npcChapterLaw.js (receiptCreditsOf); the record is
-// migration 0100_npc_receipts.
+// the `npc_receipts` table.
 //
 // AFTER THE RECEIPT, NEVER INSTEAD OF IT. The claim's own row is written
 // first (accounts.js claimGate, raids.js claimRaid) and its answer stands
@@ -34,7 +34,7 @@ import { chaptersOpenFor } from './npcRoll.js';
 import { meritStatement, meritOfAct } from './npcMerit.js';   // CHAP3a: a receipt's Merit
 import { regionChapters } from './npcHalls.js';
 import { REALM_ID_RE } from './realm.js';
-import { regionOk } from '../../src/net/nodeLaw.js';
+import { regionOk } from '../../src/net/nodeLaw.js';   // WW7-5: a town book's region any of the world's
 import { utcDay } from '../../src/net/marksLaw.js';
 import { gateTimes } from '../../src/net/gate/gateLaw.js';   // AUDIT CHAP3 E1: the week a gate rose in
 import { MAX_REPUTATION } from '../../src/systems/guild/guildFactions.js';

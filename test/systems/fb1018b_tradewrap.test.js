@@ -1,4 +1,4 @@
-// TRADE-WRAP and NO-NAN-PAY (FIELD BUGS 2026-10-18b - bible/01-Overview/bugs/Field-Bugs-2026-10-18b.md; shaman, "Letter
+// TRADE-WRAP and NO-NAN-PAY (FIELD BUGS 2026-10-18b; shaman, "Letter
 // of Credit vanishing from wallet": "i grinded tens of dungeons for daedric items to sell just for it to simply vanish").
 // TRADE-WRAP: CalculateTradePrice's last step - the haggle's factor times the lot's whole cost, `>> 8` - was int32, so a
 // sale of a big enough lot of Daedric pieces (a cost of about 9.6 to 18 million, by the shop and the skills) paid about

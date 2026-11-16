@@ -183,7 +183,6 @@ test('RPT1026-CHESTGOLD a chest left open past its hold moves nothing - the gold
   assert.equal(recordOf(t.env, M.id).items.some((it) => it.group === 'Currency'), false, 'no pile of it in the pack');
 });
 
-// PIN MOVED (AUDIT RPT1026 B2): the owner's change is never refused by a guest's open window (a guest who kept the hold
 // shut the owner out for good) - the guest's gold is the owner's chest's, poured, and the guest's close moves nothing.
 test('RPT1026-CHESTGOLD the owner sets the chest private under a guest\'s open window: the gold is in the owner\'s chest once, never the guest\'s purse as well', async () => {
   const t = await stand();

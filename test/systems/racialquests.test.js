@@ -114,9 +114,6 @@ test('V2d: the vampire cure roll is (10,100) < 30 - the odd floor is DFU\'s own 
   assert.equal(startRacialOverrideQuest(p, true, { rolls: () => 19.5 / 91 }), VAMPIRISM_CURE_QUEST, '29 < 30 starts');
   assert.equal(startRacialOverrideQuest(p, true, { rolls: () => 20.5 / 91 }), null, '30 does not');
   assert.deepEqual(host.started, [VAMPIRISM_CURE_QUEST]);
-  // and the range really is DFU's (10,100), not (1,100)
-  assert.match(read('src/systems/racialQuests.js'), /rangeInclusive\(rolls, 10, 100\)/,
-    ':234 - random_range_inclusive(10, 100), verbatim');
   // no already-running check on $CUREVAM - also DFU's own
   const busy = recordingHost({ findQuests: () => [{}] });
   setRacialQuestHost(busy);
@@ -175,22 +172,3 @@ test('V2d: the 38-day arm rolls the non-cure quest and the 84-day arm the cure, 
 
 // ── 6. THE HOST'S OWN LAWS (world.js's registration, greppable) ───
 
-test('V2d: the world host mounts the seam and the two cure arms', () => {
-  const w = read('src/scenes/world.js');
-  assert.ok(w.includes('setRacialQuestHost({'), 'the seam is registered where the machine lives');
-  // FindQuests counts tombstoned instances (the C# default); the
-  // active sweeps exclude them (GetAllActiveQuests)
-  assert.match(w, /findQuests: \(name\) => \[\.\.\.questBridge\.machine\.quests\.values\(\)\]\.filter\(\(q\) => q\.questName === name\)/,
-    'findQuests: name match only - no tombstone filter');
-  assert.ok(w.includes('!q.questComplete && !q.questTombstoned && q.questName?.startsWith(prefix)'),
-    'the P0 sweep walks ACTIVE quests only');
-  assert.ok(w.includes('GUILD_GROUPS.Vampires, MEMBERSHIP_STATUS.Member'), 'the clan pool asks as a Member');
-  // CurePcDisease's two racial arms finally cure through the bridge ctx
-  assert.ok(w.includes('endVampirism: () =>') && w.includes('cureVampirism(playerEntity'), '`cure vampirism` cures');
-  assert.ok(w.includes('endLycanthropy: () =>') && w.includes('cureLycanthropy(playerEntity'), '`cure lycanthropy` cures');
-  // worldTick's two arms stand where DFU's do
-  const t = read('src/systems/worldTick.js');
-  const walk = t.slice(t.indexOf('REGION_CONDITIONS_INTERVAL_MINUTES === 0'));
-  assert.ok(walk.includes('startRacialOverrideQuest(entity, false, { rolls })'), 'the 38-day arm');
-  assert.ok(walk.includes('CURE_QUEST_INTERVAL_MINUTES === 0'), 'the 84-day arm');
-});

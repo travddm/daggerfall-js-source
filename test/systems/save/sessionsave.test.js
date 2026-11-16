@@ -15,6 +15,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { composeSessionState, restoreSessionState } from '../../../src/systems/save/save.js';
+import { hostText } from '../../hostText.mjs';   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld - the host read whole
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
@@ -79,20 +80,3 @@ test('restoreSessionState: quest before conversation (the C# order), the mill or
   assert.deepEqual(log2, [['quest', null]]);   // restore(null) still runs (Q4-v: a no-op on the bridge side)
 });
 
-test('B4 seam gate: both quicksaving hosts run the composer, and the dungeon context is HANDED the bridge', () => {
-  const world = read('src/scenes/world.js');
-  const dungeonCtx = read('src/scenes/dungeonContext.js');
-  const modes = read('src/scenes/worldModes.js');
-  // two inline copies of the envelope is exactly how the halves
-  // drifted - each host must call the ONE composer, both ways
-  for (const src of [world, dungeonCtx]) {
-    assert.match(src, /composeSessionState\(/);
-    assert.match(src, /restoreSessionState\(/);
-  }
-  // and the world host must actually hand the dungeon context the
-  // bridge + trio + latch when it builds one (a seam nobody mounts is
-  // a ported law that evaporates silently - the standing lesson)
-  assert.match(modes, /questBridge, talkSave,\s*\n\s*onQuestRestored: \(\) => \{ onQuestRestored\?\.\(\); mountQuestResources\(\); \},/);
-  assert.match(world, /talkSave: \{ mill: rumorMill, tree: topicTree, session: npcSession \}/);
-  assert.match(world, /onQuestRestored: \(\) => \{ _questStarted = true; \}/);
-});

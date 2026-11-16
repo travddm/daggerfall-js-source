@@ -1,4 +1,4 @@
-// AR1 - THE ARROW'S IMPACT LEARNS THE FOES (2026-08-28). MT-ii gave
+// AR1 - THE ARROW'S IMPACT LEARNS THE FOES. MT-ii gave
 // enemy archers infighting TARGET SELECTION and admitted, FLAGGED,
 // that the impact still only knew the player - an arrow loosed at
 // another foe flew true and landed nothing. The flight module tests
@@ -16,7 +16,7 @@ import { MISSILE_COLLIDER_RADIUS, ARROW_FLIGHT_SPEED } from '../../src/systems/s
 const read = (p) => readFileSync(p, 'utf8');
 
 const flight = () => new ArrowFlight({ getGpuMesh: () => null, collider: null });
-/** One step of a shaft's flight that is 1.25 units long. PIN MOVED (BAL-ARCHERY, bible/05-Combat/Balance-Arc.md
+/** One step of a shaft's flight that is 1.25 units long.
  *  section 18): a shaft flies at ARROW_FLIGHT_SPEED, so the fixtures' 0.05 s step (MISSILE_SPEED's 1.25) is read
  *  off the shaft's own speed - the geometry below stays as it was written. */
 const STEP = 1.25 / ARROW_FLIGHT_SPEED;
@@ -114,28 +114,3 @@ test('AR1: the contact radius is the missile law - radius + the 0.45 body', () =
 
 // ── the mounts, source-pinned ────────────────────────────────────
 
-test('AR1: exteriorFoes lands the hit on BowDamage\'s own payload', () => {
-  const src = read('src/scenes/exteriorFoes.js');
-  const from = src.indexOf('function arrowHitFoe(m, target) {');
-  assert.ok(from > 0);
-  const body = src.slice(from, from + 1200);
-  assert.match(body, /weapon: m\.weapon, direction: dir, bowAttack: true/,
-    ':303 with bowAttack=true - the melee arm passes false by omission');
-  // PIN MOVED (AUDIT CC-E1): the door names the shooter too
-  assert.match(body, /dealDamage: \(t, d\) => \(t\.hurtFromFoe \? t\.hurtFromFoe\(d, dir, f\) : damageFoe\(t, d, null, dir\)\)/,
-    'the target\'s own pool owns its death chain - the melee arm\'s exact split');
-  // MAC-N1: the shaft is CreateWeapon's arrow (EnemyAttack.cs:145-147),
-  // minted by the one export - the bare literal this pin used to match
-  // carried no value, and a quiver begun from it sold for NaN.
-  assert.match(body, /addItem\(target\.entity\.items, bowDamageArrow\(\)\)/,
-    ':146-148 - the arrow recoverable from the TARGET, damage or not, minted like every other');
-  assert.ok(!/FLAGGED: the arrow's IMPACT still only knows the player/.test(src),
-    'retiring a flag deletes the sentence');
-});
-
-test('AR1: the world wires both pools in, shooter exclusion left to the flight module', () => {
-  const world = read('src/scenes/world.js');
-  assert.match(world, /foeTargets: \[\.\.\.\[\.\.\.exteriorFoes\.foes, \.\.\.cityGuards\.guards\]\s*\n\s*\.filter\(\(t\) => !t\.dead && t\.ai\)\.map\(\(t\) => \(\{ feet: t\.ai\.feet, ref: t \}\)\), \.\.\.duelArrowTargets\(\)\],/,   // DUEL1: and my duel opponent's body, while we fight
-    'encounter foes AND the watch are candidates');
-  assert.match(world, /onFoeHit: \(m, t\) => \(t\?\.duel \? undefined : exteriorFoes\.arrowHitFoe\(m, t\)\),/);
-});

@@ -1,4 +1,4 @@
-// STAR7 (bible/11-Multiplayer/Starfall.md section 6): THE STAR RECEIPTS CARRIED - the device keeps each with the character
+// STAR7: THE STAR RECEIPTS CARRIED - the device keeps each with the character
 // that held the star until the account service has counted it; the service's answers settle it or keep it; the spoils are
 // the service's word, given into the pack once and remembered across a crash; the Renown is the holding character's; the
 // card says the stars held. Driven on a real signed receipt. tools/mutants/star7.json.
@@ -65,7 +65,7 @@ test('STAR7 THE CARRIER: a signed receipt kept with the character that held it a
     assert.deepEqual([asked[0].ch, asked[0].nm], [CH, 'Ann']);
     assert.match(asked[0].cid, /^[0-9a-f]{16}$/);
     assert.deepEqual(said, [STAR_CLAIM_TEXT.recorded(3, 70)]);
-    assert.equal(said[0], 'Star recorded. Stars held: 3. +70 toward your Renown.');   // PIN MOVED (AUDIT STAR W5): the gate's claim's shape
+    assert.equal(said[0], 'Star recorded. Stars held: 3. +70 toward your Renown.');
     assert.deepEqual(acts, [['star-held', 1]], 'the act, once');
     assert.equal(c.kept().length, 0, 'let go');
     assert.deepEqual(store.get(STAR_SETTLED_KEY), [`${N}.1|${A}`], 'remembered');
@@ -165,7 +165,7 @@ test('STAR7 THE REWARDS ON THIS DEVICE: a receipt the relay hands is kept with t
   assert.deepEqual(acts, ['star-held'], 'the act, the standing character\'s own (AUDIT STARFALL 7: the host hands `who`)');
   assert.ok(took.some((p) => p.kind === 'item' && p.item.templateIndex === 576), 'the Starglass into the pack');
   assert.ok(took.some((p) => p.kind === 'gold' && p.gold > 0), 'the gold');
-  assert.ok(said.some((t) => t.startsWith('Star recorded.')));   // PIN MOVED (AUDIT STAR W5)
+  assert.ok(said.some((t) => t.startsWith('Star recorded.')));
   assert.ok(said.includes('30 silver (star)'), 'the silver, the star\'s kind');
   assert.deepEqual(xp, [600], 'the Renown, the holding character\'s');
   const takenOnce = took.length;

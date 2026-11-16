@@ -1,6 +1,5 @@
 // @ts-check
-// SD13 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16; Mac: "The detail needs to
-// exceed that of the oblivion gates. These are the pinnacle of the hardest content in the game"): THE SCORE OF THE HOUR
+// SD13: THE SCORE OF THE HOUR
 // - the Hollow's and the Shattered Hour's own music, written here as notes, and the law of which of it plays where.
 //
 // WHY MADE: as the Warden's (systems/gate/gateScore.js): Daggerfall has no fight music, and nothing in MIDI.BSA rises and

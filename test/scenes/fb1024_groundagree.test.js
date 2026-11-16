@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-24 (bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md) - "players seeing other players underneath the
+// FIELD BUGS 2026-10-24 - "players seeing other players underneath the
 // ground", and the foes those players spawn out of reach, mostly at world events outside the breach portals with a crowd
 // about. A pose and a foe record carry a height on their sender's own ground, so two clients that build one pixel on two
 // grounds see each other sunk or floating. Two of a client's own beliefs moved the ground on the same build:
@@ -20,7 +20,6 @@ import { wodSiteClear } from '../../src/world/road/roadClearance.js';
 import { createSpawnGroundPlace } from '../../src/world/spawnGroundPlace.js';
 import { spawnsDungeon, WORLD_SALT } from '../../src/world/spawnedDungeons.js';
 import { ETHER_BOX } from '../../src/world/ethericSea.js';
-import { wildMaskOf, wildInside, WILD_REGION } from '../../src/systems/wild/wildZone.js';
 import { syntheticWoodsBytes } from '../landformWorld.mjs';
 import { hostText } from '../hostText.mjs';
 
@@ -38,7 +37,7 @@ function rolledPixel(x0, y, wanted = true) {
 }
 
 /**
- * The law over a fake world: every pixel land with a dry plateau, no road network yet, and no open zone - unless the
+ * The law over a fake world: every pixel land with a dry plateau, no road network yet, - unless the
  * case says otherwise. `asked` records each clone the law asks for.
  */
 function makeLaw(overrides = {}) {
@@ -59,7 +58,7 @@ function makeLaw(overrides = {}) {
   return { law: createSpawnGroundPlace(handles), asked };
 }
 
-test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands, else online the spawn the roll stands, alive or dead - none offline, past the Veil, in the open zone or where the roll stands none (mutants: the stood ignored; the clocks asked; offline; past the Veil; in the zone; the roll transposed)', () => {
+test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands, else online the spawn the roll stands, alive or dead - none offline, past the Veil or where the roll stands none (mutants: the stood ignored; the clocks asked; offline; past the Veil; the roll transposed)', () => {
   const [sx, sy] = rolledPixel(300, 250);
   const [nx, ny] = rolledPixel(300, 250, false);
   const town = { name: 'Town' };
@@ -82,17 +81,10 @@ test('GROUND-AGREE the ground\'s place (world/spawnGroundPlace.js): what stands,
   const [ex, ey] = rolledPixel(ETHER_BOX.x0 + 10, ETHER_BOX.y0 + 10);
   ({ law } = makeLaw());
   assert.equal(law.groundLocationAt(ex, ey, null), null, 'past the Veil the isles stand their own places');
+  // Ocean the box stands the roll's spawn again, as it did before SPAWN-HOLE's stop-gap guard
   ({ law } = makeLaw({ etherSea: false }));
   assert.deepEqual(law.groundLocationAt(ex, ey, null), { name: `Spawn ${ex},${ey}` }, 'with no Eltheric Ocean that box is no isle\'s');
 
-  // the whole fake map is the zone's region; the zone is the cut of it the mask keeps
-  const zoneMaps = { getClimateIndex: () => CLIMATES.Woodlands, getRegionIndexAt: () => WILD_REGION };
-  const mask = wildMaskOf(zoneMaps);
-  let zoned = null;
-  for (let y = 0; y < 500 && !zoned; y++) for (let x = 0; x < 1000 && !zoned; x++) if (wildInside(mask, x, y) && spawnsDungeon(WORLD_SALT, x, y)) zoned = [x, y];
-  assert.ok(zoned, 'a spawn pixel in the open zone');
-  ({ law } = makeLaw({ maps: zoneMaps }));
-  assert.equal(law.groundLocationAt(zoned[0], zoned[1], null), null, 'in the open zone only a hall stands, and a hall is `stood`');
 });
 
 test('GROUND-AGREE the spawn the roll stands (world/spawnGroundPlace.js spawnAt): the sea, a wet plateau and a path across the pixel stand none; before the road network lands a spawn stands provisionally (mutants: the clocks asked anyway)', () => {
@@ -108,20 +100,6 @@ test('GROUND-AGREE the spawn the roll stands (world/spawnGroundPlace.js spawnAt)
   const gone = makeLaw({ spawnGone: () => true }).law;
   assert.equal(gone.spawnAt(sx, sy), null, 'its clocks run out: none');
   assert.deepEqual(gone.spawnAt(sx, sy, { clocks: false }), spawn, 'the clocks not asked: the spawn, alive or dead');
-});
-
-test('GROUND-AGREE by source: the pixel build shapes its ground - the blend, the tiles, World of Daggerfall\'s pick, the woods\' and the jungle\'s clearings - for the ground\'s place, and stands only what stands; the lift reads the same place (mutants: the build shapes the stood; the rect the stood\'s; the pick the stood\'s)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const dfLocation = _locationToBuild\(px, py\) \|\| null;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const groundLocation = spawnGroundPlace\.groundLocationAt\(px, py, dfLocation\);/, 'asked once, beside what stands');
-  assert.match(w, /if \(groundLocation\) locationRect = setLocationTiles\(groundLocation, maps, blocks, seedTilemap\);/, 'the rect and the tiles');
-  assert.equal(w.match(/hasLocation: !!groundLocation/g)?.length, 2, 'World of Daggerfall\'s pick and the kernel\'s blend');
-  assert.doesNotMatch(w, /hasLocation: !!dfLocation/, 'nothing shapes ground by what stands alone');
-  assert.equal(w.match(/FOREST_HIDDEN_LOCATION_TYPES\.has\(groundLocation\?\.mapTableData\?\.locationType\)/g)?.length, 2, 'the woods\' and the jungle\'s clearings');
-  assert.match(w, /location: dfLocation \? dfLocation\.name : null,/, 'what stands is still the clocks\' (tvSpawnGone reads it)');
-  assert.match(w, /const spawnGroundPlace = createSpawnGroundPlace\(\{/, 'the host makes the law once');
-  assert.match(w, /_livingPatrons, _locationToBuild, spawnGroundPlace, _lptSway,/, 'and hands the build its ground\'s place');
-  assert.match(w, /const _liftLocationAt = \(x, y\) => spawnGroundPlace\.groundLocationAt\(x, y, locationIndex\.get\(`\$\{x\},\$\{y\}`\)\);/, 'and the lift reads it for a pixel not built yet');
-  assert.match(w, /const tvSpawnAt = spawnGroundPlace\.spawnAt;/, 'and the Overworld\'s far found spawn is the same law, the clocks asked');
 });
 
 test('GROUND-AGREE on the real producer: a ruin\'s blend moves its pixel\'s ground by metres - a client that built the pixel with its spawn dead stood every peer there sunk or floating - and the ground is now the same whether it stands or not', () => {

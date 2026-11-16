@@ -1,5 +1,4 @@
-// LW-ROOMS (2026-10-08, Mac: "With living world integration, NPCs still group up in taverns"; bible/06-Systems/
-// Living-World.md "LW-ROOMS"): THE TAVERN, MEASURED - no GPU and no ARENA2: the synthetic towns the pins stand
+// LW-ROOMS: THE TAVERN, MEASURED - no GPU and no ARENA2: the synthetic towns the pins stand
 // (test/lwTown.mjs) and the synthetic hall on the port's own collider (test/lwRoom.mjs).
 //   - THE TAVERN'S DAY: the people the plans put in a town's tavern (livingTown.js insideAt), the most at once before
 //     noon, at noon, in the afternoon and in the evening, over five days; and its stays of four hours and more.
@@ -7,7 +6,7 @@
 //     way in, the sounding's cost - and twelve the day has inside, stood and left astir ten real minutes: the biggest
 //     crowd (people within CROWD_M of one another, chained), the nearest other, the distance from the way in.
 //
-// Usage: node tools/livingRoomProbe.mjs
+// Usage: node --import ./tools/raw-import-hooks.ts tools/livingRoomProbe.mjs
 import { synthTown, walledTown } from '../test/lwTown.mjs';
 import { tavernHall } from '../test/lwRoom.mjs';
 import { LivingTown } from '../src/systems/livingWorld/livingTown.js';

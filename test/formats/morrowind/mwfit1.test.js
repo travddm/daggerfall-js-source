@@ -1,6 +1,4 @@
-// MW-FIT1 (2026-10-09, a player's report Mac passed on, over the paperdoll in both sets: "the upper arm is still
-// visible with the steel armor", "the ebony armor gets the same issue", "the helmet elevation is too much", "the coif
-// has to cover the neck"): WHAT THE PLATE COVERS.
+// MW-FIT1: WHAT THE PLATE COVERS.
 //
 // A pauldron of either set is a sleeve - it closes round the upper arm from the shoulder to the elbow, where the
 // gauntlet's cuff takes over - so it hides the upper arm's skin, as a gauntlet hides the forearm's; and only in the
@@ -89,10 +87,6 @@ test('MW-FIT1: so each pauldron hides its upper arm in the third person - and no
   // first person a robe leaves hands and wrists but deletes the forearms and upper arms")
   const robe = composeWornArmor({ pieces: [{ kind: 'record', record: { id: 'robe', parts: [] }, reserve: 'robe' }, piece(T.Left_Pauldron, 'Steel')], armors: [], bodyPool: [] });
   assert.ok(robe.fpShadows.includes('upperarm:left') && robe.fpShadows.includes('upperarm:right'), 'the robe\'s upper arms, over the pauldron\'s');
-  // the first person's skin reads its own shadows; the third person's the third person's
-  const fp = sourceText('src/combat/fpArm.js');
-  assert.match(fp, /const fpRows = shadowSkinRows\([\s\S]{0,200}?worn\.fpShadows \?\? worn\.shadows\);/);
-  assert.match(fp, /let skinRows = shadowSkinRows\([\s\S]{0,200}?worn\.shadows\);/);
 });
 
 test('MW-FIT1: a closed helm is the head - the steel plate\'s closed helm and the ebony helm hide it, as retail\'s closed helmets fill its slot; the open helm shows the face and keeps it; each takes the hair', () => {

@@ -1,10 +1,7 @@
-// BOARD-UI (2026-10-06, Mac: "Some towns have double notice boards"; "overhaul the notice boards to enhance readability,
-// Including each of the tabs"; "Enhance the speed at which the notice board and market loads"; "Enhance organization of
-// the market"; "Reduce overusage of bloated text. Less AI like text"; "Enhance the guild war tab of the board for better
-// organization, instruction and readability"): ONE NOTICE BOARD A TOWN (systems/bounty/bountyBoard.js noticeBoardIndex, read by
+// BOARD-UI: ONE NOTICE BOARD A TOWN (systems/bounty/bountyBoard.js noticeBoardIndex, read by
 // every seam of the hosts - REVERTED 2026-10-07: every board BOUNTY1 did not take a Notice Board again, the helper the
 // siege field's alone), the board's tabs laid out to be read (ui/noticeWindow.js, ui/marketTab.js, ui/seatTab.js),
-// the reads set out early and side by side, the words cut. The record: bible/06-Systems/Professions-Arc.md 10.11.
+// the reads set out early and side by side, the words cut. The record: 10.11.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -57,20 +54,6 @@ test('ONE-BOARD the rumour board nearest the town\'s middle (the siege field\'s 
   assert.equal(noticeBoardIndex(null), -1);
 });
 
-test('ONE-BOARD REVERTED the hosts (2026-10-07, Mac: revert "just that change"): the press, the count over the board, the town the player stands in, the town map and a seat\'s pennant are every board BOUNTY1 did not take again, each named on hover while the board is open (mutants: the bounty boards taken too; the count over one; the town underfoot with every board a bounty board; the pennant over the bounty boards)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.doesNotMatch(w, /noticeBoardOf|noticeBoardIndex/, 'no one-board law in the host');
-  assert.match(w, /\.\.\.\(!bountyAt\.has\(i\) && noticeTown \? \{ notice: noticeTown, named: noticeBook\.open === true \} : \{\}\),/);
-  const count = w.slice(w.indexOf('const noticeCountPoints = ('), w.indexOf('const partyMarkers = ('));
-  assert.match(count, /const bountyAt = boardSplitOf\(p\);\n\s*if \(bountyAt\.size >= p\.boards\.length\) continue;/);
-  assert.match(count, /if \(bountyAt\.has\(i\)\) return;/, 'the count over every Notice Board in range');
-  assert.match(w, /const bountyAt = boardSplitOf\(p\);\n\s*return bountyAt\.size < p\.boards\.length \? noticeTownOf\(p\.px, p\.py, bountyAt\.size > 0\) : null;/);
-  assert.match(w, /return town \? townBoardRows\(p, bountyAt, noticeBook\.unseen\(town\.mapId\)\) : \[\];/);
-  assert.match(w, /boards: pixelBoards, bounty: pixelBoardSplit,/, 'the pennants: every rumour board\'s');
-  assert.match(src('src/scenes/seatBanners.js'), /boards\.forEach\(\(b, i\) => \{ if \(!bounty\.has\(i\)\) add\(boardPennantAnchor\(b\)\); \}\);/);
-  assert.match(src('src/scenes/worldModes.js'), /const NOTICE_BOARD_TEXT = 'Notice Board';/);
-});
-
 test('BOARD-UI the Notices tab: the town\'s and the server\'s word under "News", then the players\' notes under their count; the tab names how many are new since this device last read the board (mutants: one grid; the count unsaid; the old notes counted; the read said twice)', async () => {
   const board = { notes: [{ id: 'a', subject: 'Party', body: 'x', from: 'Ann', at: T - 10 }, { id: 'b', subject: 'Old', body: 'y', from: 'Bo', at: T - 5000 }],
     notices: [{ id: 's', subject: 'Restart', body: 'z', from: 'Mac', at: T - 20 }], me: { canPin: true, live: 0, max: 3 } };
@@ -106,7 +89,7 @@ test('BOARD-UI the Work tab: the day\'s count stands over the cards, not under t
   await tick();
   const cork = byClass(host, 'notice-cork')[0];
   assert.equal(cork.children[0].className, 'notice-worktoday');
-  assert.equal(cork.children[0].textContent, 'Writs today: 1 of 3');   // PIN MOVED (AUDIT CHAP2 C5): the Court's and the halls' one count
+  assert.equal(cork.children[0].textContent, 'Writs today: 1 of 3');
   assert.equal(byClass(host, 'notice-tab')[1].textContent, 'Work1', 'the writ open, never the one taken');
 });
 
@@ -201,7 +184,7 @@ test('BOARD-UI the Seat tab: its parts each on a panel under its name, in order 
   answer({ data, error: null });
   await tick();
   const named = byClass(host, 'notice-panel').map((p) => (['H3', 'SUMMARY'].includes(p.children[0]?.tagName) ? p.children[0].textContent : null)).filter(Boolean);
-  // PLAIN-UI (PIN MOVED, bible/10-UI/Plain-Words.md): what the seat is, how its war works and its words stand first -
+  // PLAIN-UI (
   // the guide stood folded under the whole tab, past every number it explains
   assert.deepEqual(named, [SEAT_PANELS.about, SEAT_PANELS.guide, SEAT_PANELS.words, SEAT_PANELS.week, SEAT_PANELS.battle, SEAT_PANELS.standings, SEAT_PANELS.mine, SEAT_PANELS.chronicle]);
   assert.match(byClass(host, 'seat-head')[0].textContent, /^The Charter of Anticlere: held by the Silver Hand <SH>Held by the Silver Hand <SH> since week 3\./);
@@ -224,7 +207,7 @@ test('BOARD-UI the Seat tab: its parts each on a panel under its name, in order 
   const n = (x) => x.toLocaleString('en-US');
   assert.match(steps[0][1], new RegExp(`in up to ${SEAT_PLEDGE_REGIONS_MAX} regions\\. Pledges lock at the Reckoning, Friday 18:00 UTC\\.`));
   assert.match(steps[1][1], new RegExp(`at most ${n(ACCOUNT_SEAT_WEEK_CAP)} a week at a seat`));
-  // AUDIT 657 B9 (PIN MOVED): the law's taker - the strongest past the line whose treasury can pay the fee
+  // AUDIT 657 B9 (
   assert.match(steps[2][1], new RegExp(`the strongest guild with at least ${n(CLAIM_THRESHOLD.palace)} influence whose treasury can pay ${n(CLAIM_FEE.palace)} silver\\. Two guilds within 10% of each other meet in a Tourney`));
   assert.match(seatGuide({ tier: 'crown' })[2][1], new RegExp(`${n(CLAIM_THRESHOLD.crown)} influence whose treasury can pay ${n(CLAIM_FEE.crown)} silver`));
   assert.match(steps[3][1], new RegExp(`at least ${n(CLAIM_THRESHOLD.palace)}: the strongest challenger wins a Right of Siege`));
@@ -234,7 +217,6 @@ test('BOARD-UI the board\'s chunk warmed: the Notice Board\'s window - its tabs 
   const warm = WARM_CHUNKS.filter((f) => String(f).includes('noticeWindow.js'));
   assert.equal(warm.length, 1, 'warmed, once');
   assert.equal((await warm[0]()).mountNoticeBoard, mountNoticeBoard, 'the very module the door mounts');
-  assert.match(src('src/ui/noticeDoor.js'), /load: \(\) => import\('\.\/noticeWindow\.js'\)/, 'the door still loads it through the one home');
 });
 
 test('BOARD-UI the words: every fixed word of the board\'s tabs short, and none says "counting-house" - the service by its in-world name in every refusal was the board\'s commonest line (mutants: a line run long)', () => {

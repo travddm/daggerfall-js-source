@@ -53,7 +53,6 @@ test('NT2 (F210): a specified gender passes through and CONSUMES NO DRAW; a mons
 
 test('NT2 (F210): the hosts ride the one resolver - no ad-hoc Math.random gender roll survives', () => {
   const dc = src('scenes/dungeonContext.js');
-  // PIN MOVED (DEX4b): the resolver takes the mobile type too, for a mod's forced gender over its roll
   assert.ok(dc.includes('e.gender = MobileUnit.resolveGender(e.gender, basics, e.mobileType);'),
     'buildFoeAt resolves at the ONE entry every spawn record passes - the layout path rolls now too');
   assert.ok(src('scenes/exteriorFoes.js').includes("MobileUnit.resolveGender(forcedGender ?? 'unspecified', basics, mobileType)"),

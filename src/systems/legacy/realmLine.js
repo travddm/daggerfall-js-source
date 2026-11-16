@@ -1,5 +1,5 @@
 // @ts-check
-// LEGACY7 (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9): THE LINE'S REALM COPY - online, the device's store
+// LEGACY7: THE LINE'S REALM COPY - online, the device's store
 // (store.js) is a cache of the account service's (server-account/src/legacy.js). Read at every online boot, before a save
 // is restored (`pull`: each line the account holds, its facts merged with the device's both ways - store.js
 // mergeFacts, a death only ever added); written after every write of the device's (`push`: made from the service's rev

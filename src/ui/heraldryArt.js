@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1d (2026-09-30, Mac: "Lets do this") — THE HERALDRY, DRAWN
-// (bible/11-Multiplayer/Seats-Arc.md 8.1: "A device, one of 24 of the
+// GUILD1d — THE HERALDRY, DRAWN
+// (8.1: "A device, one of 24 of the
 // port's own drawn charges (SVG silhouettes committed as the port's
 // own art)").
 //
@@ -65,7 +65,7 @@ export const DEVICE_ART = Object.freeze({
   eye: [fg('M6 50 C28 18 72 18 94 50 C72 82 28 82 6 50 Z'), bg(circle(50, 50, 17)), fg(circle(50, 50, 9))],
   rose: [...[0, 1, 2, 3, 4].map((i) => fg(circle(+(50 + 17 * Math.cos(-Math.PI / 2 + (i * 2 * Math.PI) / 5)).toFixed(1), +(50 + 17 * Math.sin(-Math.PI / 2 + (i * 2 * Math.PI) / 5)).toFixed(1), 15))), bg(circle(50, 50, 9)), fg(circle(50, 50, 5))],
   tree: [fg('M44 58 h12 v34 h-12 Z'), fg(circle(50, 30, 22)), fg(circle(32, 48, 17)), fg(circle(68, 48, 17)), fg(circle(50, 52, 16))],
-  // GUILD2c (bible/11-Multiplayer/Guild-Overhaul.md): the sixteen more - the port's own drawing, as the twenty-four are
+  // GUILD2c: the sixteen more - the port's own drawing, as the twenty-four are
   skull: [fg(circle(50, 42, 30)), fg('M32 58 h36 v20 a6 6 0 0 1 -6 6 h-24 a6 6 0 0 1 -6 -6 Z'), bg(circle(38, 44, 8)), bg(circle(62, 44, 8)),
     bg('M50 53 L44 64 H56 Z'), bg('M41 72 h4 v10 h-4 Z'), bg('M48 72 h4 v10 h-4 Z'), bg('M55 72 h4 v10 h-4 Z')],
   key: [fg(circle(50, 24, 17)), bg(circle(50, 24, 8)), fg('M46 39 h8 v53 h-8 Z'), fg('M54 72 h13 v7 h-13 Z'), fg('M54 84 h9 v7 h-9 Z')],
@@ -267,7 +267,7 @@ export function drawBanner(ctx, heraldry, w) {
 /** Every device has its art (a pin holds it). */
 export const DEVICES_DRAWN = HERALDRY_DEVICES.every((d) => Array.isArray(DEVICE_ART[d]) && DEVICE_ART[d].length > 0);
 
-// ─── HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work"): THE SWATCH ──────────────────────────────────────
+// ─── HERALDRY-SHOWN: THE SWATCH ──────────────────────────────────────
 // Seats-Arc 8.1's small faces - the guild tag's frame, the siege HUD, the Chronicle - draw the heraldry as a SHIELD, not a
 // three-tall banner: the same field, border and device (deviceSvg, the banner's own parts) on a heater shield in a 100 x
 // 104 box, so a row of text keeps its height. ui/heraldrySwatch.js is its one DOM door.

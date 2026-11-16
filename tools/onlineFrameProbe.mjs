@@ -1,8 +1,7 @@
-// PERF-ON4 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"): THE ONLINE FRAME PROBE - the REAL game online, in headless Chromium over the freeware ARENA2, joined to the
+// PERF-ON4: THE ONLINE FRAME PROBE - the REAL game online, in headless Chromium over the freeware ARENA2, joined to the
 // REAL relay and the REAL account service in local workerd (tools/loadHarness.mjs's own two services), with a crowd of
 // bots round the player - each bot the client's own OnlineSession, as the harness's fleet is. PERF-NEXT measured online
-// in node, over the modules (bible/07-Rendering/Performance-Next.md "Online, measured"); this measures the frame a player
+// in node, over the modules ("Online, measured"); this measures the frame a player
 // online pays, through the frame probe's own three windows (tools/frameProbe.mjs measure): the census of every WebGL
 // call, the CPU profile by sample count, and the sampled heap.
 //
@@ -34,7 +33,7 @@
 // default's last crowd is 0 again: the drift between the first and the last is the run's own noise floor.
 //
 // Three probe-only transforms beside the frame probe's own, the tree untouched: the account base may be the local service
-// (net/accountClient.js serviceBase answers an https base alone); `?shot` survives the online boot (REALM P0.1 refuses
+// (net/account-service-address.ts isServiceUrl answers an https base alone); `?shot` survives the online boot (REALM P0.1 refuses
 // it there - systems/online/onlineLane.js ONLINE_REFUSED_FLAGS - because it installs the probe seams, which are the instrument
 // here: `__frame`, `__shotReady`); and the composer's hook (`__probeSaveText`, with `__onlinePeers`, the peers the
 // session draws, its status and the way book's size - `__probeOnline`). `?tod` is still refused online, so the sky is the shared clock's: an A/B's two arms stand at
@@ -83,8 +82,8 @@ const dropState = () => { if (stateDir) { try { rmSync(stateDir, { recursive: tr
 /** The edits this probe makes beside the frame probe's (FRAME_PROBE_EDITS' shape: each needle asserted, and held to the
  *  tree by test/tooling/perfon4_probes.test.js). */
 export const ONLINE_PROBE_EDITS = Object.freeze([
-  // the account base may be the local service - serviceBase answers an https base alone
-  { file: 'src/net/accountClient.js', edits: [["/^https:\\/\\/\\S+$/.test(v)", "/^(https:\\/\\/\\S+|http:\\/\\/127\\.0\\.0\\.1:\\d+)$/.test(v)"]] },
+  // the account base may be the local service - isServiceUrl answers an https base alone
+  { file: 'src/net/account-service-address.ts', edits: [["/^https:\\/\\/\\S+$/.test(value)", "/^(https:\\/\\/\\S+|http:\\/\\/127\\.0\\.0\\.1:\\d+)$/.test(value)"]] },
   // REALM P0.1 drops `?shot` from an online boot - it installs the probe seams, `__addGold` among them, which no player's
   // world may carry. Here the world is this run's own, local, and the seams are the instrument
   { file: 'src/systems/online/onlineLane.js', edits: [["export const ONLINE_REFUSED_FLAGS = Object.freeze(['shot', ", 'export const ONLINE_REFUSED_FLAGS = Object.freeze([']] },

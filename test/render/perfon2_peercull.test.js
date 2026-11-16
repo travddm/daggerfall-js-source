@@ -1,6 +1,4 @@
-// PERF-ON2 + PERF-CPU (2026-09-19, Mac: "Online mode needs further
-// performance improvements", with a readout: 51 fps, frame 19.7 ms,
-// script 23.3 ms, draws 1365, binds 820).
+// PERF-ON2 + PERF-CPU.
 //
 // A frame whose SCRIPT outruns its frame time is CPU-bound, and every
 // instrument the port had measured the GPU. These pins hold the two
@@ -69,7 +67,7 @@ test('PERF-ON2 / PERF-CROWD: the host culls the peers AND the live crowd, by the
   assert.match(w, /const billboardOutside = \(b\) => !batchVisible\(_planes, b\);/, 'the host delegates, it does not hand-roll the sphere');
   assert.doesNotMatch(w, /sphereInPlanes\(_planes/, 'no second copy of the test in the host');
   const bounds = read('src/render/bounds.js');
-  // PERF-EXT (2026-09-25, the review of the shadows): the lift has ONE home,
+  // PERF-EXT: the lift has ONE home,
   // batchLift, which the sphere and the shadow pass's placement queries take.
   assert.match(bounds, /s\[1\] \+ \(o \? o\[1\] : 0\) \+ batchLift\(b\)/, 'the sphere centre is lifted, in batchVisible');
   assert.match(bounds, /export function batchLift\(b\) \{\n\s*return \(b\.size\?\.h \?\? 0\) \* 0\.5;/, '...by half a height, at the lift\'s one home');

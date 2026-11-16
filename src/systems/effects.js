@@ -33,11 +33,12 @@
 import { savingThrow, rollMagnitude, EFFECT_FLAGS, careerTolerance, isDamageHealthEffect } from './spellcast.js';   // BAL9: the damage-health pair a pierce reads
 import { mentorDamageTakenMult } from './mentorMode.js';   // SOFTCAP2: a leaf
 import { spellPowerMult, spellPierce, schoolMult } from './spell/spellPower.js';   // BAL9: my damage spell's power and pierce (a leaf); SCHOOLS2: every school past 100
+import { cureKeepsInfection } from './cureKeepsInfection.js';   // INFECTION-KEPT: DFU's cure ends every disease unless the player chose otherwise
 import { castSchool } from './spellcost.js';   // SCHOOLS3: the school an effect is cast in (a signature spell's path's)
-import { noteFeudHarm, elementFeudClass } from './feudLedger.js';   // RVN1: my spell's round, in its fight's ledger (a leaf)
 import { raceById, raceByKey } from './races.js';   // L2-slice (magic-10): the racial immunity arm
 import { STAT_KEYS_ORDER, FATIGUE_MULTIPLIER, maxFatigue, increaseDrainMagnitude, liveStat } from './statMods.js';
 import { dice100 } from '../combat/formulas.js';
+import { hasActiveEffect } from './active-effects.ts';   // a leaf, so the foe AI reads it without this file's imports
 import { tryAbsorption, absorbRefund } from './absorption.js';
 import { identifyRefund } from './spell/identifyRefund.js';   // the refund priced as the cast was (a discount included)
 import { enemyGroupOf, NEARBY } from './nearbyObjects.js';   // X8: Pacify matches on DFU's EnemyGroups, the same table X4 ported
@@ -158,8 +159,7 @@ export const BUFF_KINDS = Object.freeze({
   // it - in the candle producer, not in this table - so a foe really
   // does carry the effect and really does stay dark.
   '15,255': 'light',
-  // PARTY-MAP (2026-09-30, Discord: "share map data between party members, possibly with a spell effect so that
-  // maintaining some kind of buff for it becomes part of the dungeoneering loop"): SHARED CARTOGRAPHY (46,255 - the
+  // PARTY-MAP: SHARED CARTOGRAPHY (46,255 - the
   // port's own, no classic key uses 46; RESURRECT1's 45 is the precedent). Duration-only and CasterOnly, renewing
   // its rounds on a re-cast as every row here does (STACK-CAP); the entry's PRESENCE is the share -
   // systems/party/partyMap.js reads it, and a caster in no party (offline, solo) holds a buff that does nothing at all.
@@ -200,7 +200,7 @@ export const concealmentFlags = (en) => ({
   invisible: isInvisible(en), blending: isBlending(en), shade: isAShade(en),
 });
 
-/** INVIS-NET (2026-09-27): THE SAME THREE, ON THE WIRE - the pose's `cv` (net/wire.js validPose): 1 invisible, 2
+/** INVIS-NET: THE SAME THREE, ON THE WIRE - the pose's `cv` (net/wire.js validPose): 1 invisible, 2
  *  blending, 4 a shade; 0 (omitted) for none. The sender packs its own entity's; a reader unpacks a peer's for the
  *  foes' senses (a peer candidate's concealment() closure) and for the draw. */
 export const concealBits = (en) => (en?.staffPilot ? 7 : 0) | (isInvisible(en) ? 1 : 0) | (isBlending(en) ? 2 : 0) | (isAShade(en) ? 4 : 0);   // STAFF-PILOT (systems/staffBossPilot.js): a staff member steering its event's boss says all three - its body no one's (a departure from DFU)
@@ -332,11 +332,7 @@ export const isCharmEffect = (e) => e.type === 34 && classicSub(e) === 255;
 export const spellSways = (sp) => (sp?.effects ?? []).some((e) => e && (isPacifyEffect(e) || isCharmEffect(e)));
 /** X7: Identify (40,255) - a window opener, not a lasting effect. */
 export const isIdentifyEffect = (e) => e.type === 40 && classicSub(e) === 255;
-/** presence = active; expired entries End on the NEXT tick pass (DFU shape). HELD-CONCEAL: an ENDED entry is not -
- *  DoConstantEffects runs no ConstantEffect once HasEnded (EntityEffectManager.cs:1693-1694), so it sets no flag. A worn
- *  item's concealment a blow broke stands ended on its item until the reroll (concealment.js). */
-export const hasActiveEffect = (entity, kind) =>
-  !!entity?.activeEffects?.some((a) => a.kind === kind && !a.ended);
+export { hasActiveEffect };   // its home is the leaf systems/active-effects.ts, which the foe AI reads
 /** CSA-I: Come Sail Away's WaterWalkingSilent (WaterWalkingSilent.cs) - an incumbent of its own kind, as its
  *  IsLikeKind keeps it from stacking onto the spell's Water Walking; no spell icon (ShowSpellIcon false). */
 export const WATER_WALKING_SILENT_KIND = 'waterWalkingSilent';
@@ -358,7 +354,7 @@ export const effectKindLoaded = (kind) => !_modEffectKinds.has(kind) || !!_modEf
 // member: the ASSIGN gate calls the MANAGER's
 // IsEntityImmuneToParalysis, which adds the career/racial arms -
 // see isEntityImmuneToParalysis below (L2-slice, magic-10).
-export const isImmuneToParalysis = (entity) => hasActiveEffect(entity, 'freeAction') || !!entity?.staffBoss;   // BOSS-UNSHAKEN (mob 2026-10-25: "make the boss not able to be stun locked"): a staff event's mini boss is never held - a departure from DFU, which has no such foe
+export const isImmuneToParalysis = (entity) => hasActiveEffect(entity, 'freeAction') || !!entity?.staffBoss;   // BOSS-UNSHAKEN: a staff event's mini boss is never held - a departure from DFU, which has no such foe
 
 /** EntityEffectManager.IsEntityImmuneToParalysis (:644-660, L2-slice
  *  AUDIT 23 magic-10) - the HARD-immunity gate AssignBundle tests
@@ -590,14 +586,11 @@ export function cureAllOfKind(target, kind, keepInfections = false) {
   if (target?.activeEffects) target.activeEffects = target.activeEffects.filter((a) => a.kind !== kind || (keepInfections && !!a.infection));
 }
 export const cureAllDiseases = (t) => cureAllOfKind(t, 'disease');
-/** FIELD BUGS 29h (INFECTION-KEPT; Julian: "during this time i had gotten another disease from a dungeon and had to cure
- *  it which likely wiped my lycanthropy progress"; Mac: "Dont worry abour DFU"): A CURE OF DISEASE TAKES THE PLAIN
- *  DISEASES FIRST. DFU stores a lycanthropy or vampirism infection as a disease bundle, and CureAllDiseases ended it
- *  with the plague caught beside it. While a plain disease runs, a cure (the temple's, a spell's, a potion's) ends the
- *  plain ones and leaves the infection to its turn; a cure with nothing else to end ends the infection, so curing it
- *  before the turn still saves a player who does not want it. The turn's CureAll of the old life
- *  (lycanthropy.js endOldLifeEffects) still ends every disease there is. */
-export const plainDiseaseLive = (t) => (t?.activeEffects ?? []).some((a) => a.kind === 'disease' && !a.ended && !a.infection);
+/** INFECTION-KEPT: DFU stores a lycanthropy or vampirism infection as a disease bundle, and CureAllDiseases ends it with
+ *  the plague caught beside it. With the Cure keeps infection option on and a plain disease running, a cure (temple,
+ *  spell, potion) ends the plain ones first and leaves the infection to its turn; a cure with nothing else to end ends the
+ *  infection. The turn's CureAll of the old life (lycanthropy.js endOldLifeEffects) still ends every disease. */
+export const plainDiseaseLive = (t) => cureKeepsInfection() && (t?.activeEffects ?? []).some((a) => a.kind === 'disease' && !a.ended && !a.infection);
 export const cureDiseasesInfectionsLast = (t) => cureAllOfKind(t, 'disease', plainDiseaseLive(t));
 export const cureAllPoisons = (t) => cureAllOfKind(t, 'poison');
 export const cureParalyzation = (t) => cureAllOfKind(t, 'paralyze');
@@ -615,8 +608,7 @@ export function rollDuration(effect, casterLevel) {
   return effect.durationBase + effect.durationMod * mult;
 }
 
-/** STACK-CAP (2026-10-11, the owner: "the ability to keep accumulating spell times to max out spells and never have to
- *  refresh" - answered "Refresh, never stack"): A LIKE-KIND RE-CAST RENEWS ITS INCUMBENT, IT NEVER STACKS. DFU's
+/** STACK-CAP: A LIKE-KIND RE-CAST RENEWS ITS INCUMBENT, IT NEVER STACKS. DFU's
  *  AddState adds the arrival's rounds to the incumbent's (`incumbent.RoundsRemaining += RoundsRemaining`), so a caster
  *  with magicka to spare banked weeks of a buff - a Shield Group stood at 11,397 rounds (BUFF-END, mysticism.js) - and
  *  never cast it again. Recorded departure (Port-Ledger A). The incumbent is topped up to what the cast would stand at
@@ -702,7 +694,7 @@ export const casterDamageScaled = (n, ent, target = null, school = null) => {
     const m = mentorDamageTakenMult(target);
     if (m > 1) v = Math.max(1, Math.round(v * m));
   }
-  // BAL9 (bible/05-Combat/Balance-Arc.md section 15): MY spell's power - the school past 100 and the loot's potency
+  // BAL9: MY spell's power - the school past 100 and the loot's potency
   // (systems/spell/spellPower.js spellPowerMult); 1 for a foe's, a peer's stand-in's and at any player. The same rounding and
   // floor of one; a spell the throw turned whole stays nothing. SCHOOLS3: `school` the school the effect is cast in
   // (spellcost.js castSchool - a signature spell's path's), Destruction's when none is said.
@@ -725,9 +717,6 @@ function runEffectRound(a, target, sinks, rolls) {
     // DUEL1: and the entry's duel tag rides along - a duel's damage over time (bundleDuel) stops at the duel's floor
     if (n > 0 && target?.isPlayer && a.caster && !a.caster.isPlayer) markPlayerHarm(a.caster);   // REVENANT-HARM: the round that may be the death is its caster's
     if (n > 0 && sinks.hurt) sinks.hurt(n, { fromPlayer: !a.caster || !!a.caster.isPlayer, bundleDuel: !!a.bundleDuel, round: true, element: a.element ?? null });   // TELL1: a round, not a landing - it weighs nothing on a wind-up's poise; BOSS-TRAITS: its element (a resistance reads it)
-    // RVN1 (Feud-Arc.md section 12): MY round on a foe goes in its fight's ledger by its element (the provenance law
-    // above - no caster is mine; a peer's stand-in, a foe's, never)
-    if (n > 0 && target && !target.isPlayer && (!a.caster || (a.caster.isPlayer && !a.caster.peer))) noteFeudHarm(target, elementFeudClass(a.element), n);
     handleAttackFromSource(a.caster);   // DamageHealthFromSource's tail, wave 31
   } else if (a.kind === 'continuousDamageSpellPoints') {
     const n = effectMagnitude(a.effect, a.casterLevel, a.saveScaled ?? true, a.element, a.flag, target, rolls);
@@ -885,7 +874,7 @@ export function applySpell(spell, casterLevel, target, sinks, rolls = Math.rando
   // BiographyResistMagicMod where DFU folds in Career.Fire.
   const saveFlag = () => flag;
   const magnitude = (e) => effectMagnitude(e, casterLevel, saveScaled, saveElement(e), saveFlag(e), target, rolls, caster?.entity ?? null);   // BAL9: the caster, for a damage spell's pierce
-  // SCHOOLS2 (bible/06-Systems/Arcane-Specialisations.md section 4): A SCHOOL PAST 100 PAYS IN ITS OWN DIMENSION - the
+  // SCHOOLS2: A SCHOOL PAST 100 PAYS IN ITS OWN DIMENSION - the
   // effect's school (the one it is cast in: spellcost.js castSchool, a signature spell's path's) multiplies where the
   // target is mine to strengthen (systems/spell/spellPower.js schoolMult): on MYSELF (`self`) a heal, a Shield, a concealment's
   // rounds, a ward's chance; at a FOE a chance. 1 for every cast but my own, offline, while mentoring, in a refereed fight.
@@ -1631,7 +1620,7 @@ export function applySpell(spell, casterLevel, target, sinks, rolls = Math.rando
     if (isPacifyEffect(e) || isCharmEffect(e)) {
       const mt = target?.mobileType;
       if (mt == null) continue;                 // not an enemy: IsGroupMatch/IsEnemyClass both refuse
-      // WB8a (2026-09-28, Mac: "Make the oblivion gate boss not be able to be pacified"): a target that cannot be swayed
+      // WB8a: a target that cannot be swayed
       // (world/gate/gateBoss.js bossStandIn - the gate's Warden) refuses it before any roll: no chance, no save, no flag
       if (target.pacifyImmune) { out.swayRefused = (out.swayRefused ?? 0) + 1; continue; }
       const matches = isCharmEffect(e)
@@ -1917,7 +1906,7 @@ export function applySpell(spell, casterLevel, target, sinks, rolls = Math.rando
     // to the raw target entity never matched, so the cap was dead.
     if (caster?.entity === target && selfCastCost > 0 && totalAbsorbed > selfCastCost) totalAbsorbed = selfCastCost;
     out.absorbed = totalAbsorbed;
-    // ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): the refund is HALF the points
+    // ABSORB-NERF: the refund is HALF the points
     // absorbed, floored - every source, the Sorcerer's Always included (absorption.js absorbRefund)
     if (target.maxMagicka != null) {
       target.magicka = Math.min(target.maxMagicka, (target.magicka ?? 0) + absorbRefund(totalAbsorbed));

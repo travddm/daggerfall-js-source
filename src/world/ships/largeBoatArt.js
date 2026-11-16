@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPS-2 (2026-10-07, Mac: "implement both of these new ship placement models, UV Map/Texture, and ensure it matches the
-// love we gave the other new ship model we implemented"): THE NEW LARGE BOAT'S OWN ART, MADE AT THE LOAD.
+// SHIPS-2: THE NEW LARGE BOAT'S OWN ART, MADE AT THE LOAD.
 //
 // world/ships/carrackArt.js's law, for Mac's Tiny Ship (Come Sail Away's hull 1): painted from numbers on fixed seeds under a
 // pseudo-archive of her own (LARGE_BOAT_ARCHIVE), every picture 64 x 64, the pictures every ship of the port's wears

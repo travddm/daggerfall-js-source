@@ -3,7 +3,6 @@
 // character climb and let go of the surface at an extremely fast rate, making levelling climbing a joke. An easy fix
 // could be disabling climbing during overworld travel." - and Sahh, of House R'is: "disabling climbing during overworld
 // travel would also reduce the mortality rate of travellers falling from mountains at 60x speed").
-// `01-Overview/bugs/Field-Bugs-2026-10-07b.md`.
 //
 // At x60 the motor's fixed step is a second of game time (systems/timeScale.js: the step scales, the count does not),
 // so the climb's 0.77 s start and 0.82 s checks fell due every step or two - a roll and a Climbing tally each - and a

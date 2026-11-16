@@ -1,4 +1,4 @@
-// TELL6c - THE LEAP (bible/12-Enhanced-AI/Feud-Arc.md section 8.1; Mac, 2026-10-04: "breath more depth into it", then
+// TELL6c - THE LEAP (;, then
 // "Go" on every call). A disc 1.8 m about the target's feet, up to 9 m off, locked at its start: the leaper of the
 // whole set (the Spider, the Werewolf, the Sabertooth, the Vampire) crouches through its wind-up, then jumps - its last
 // 0.35 s an arc to the point on the motor's own gravity - and the verdict is the point's at its landing. Begun 3-9 m
@@ -29,7 +29,7 @@ beforeEach(() => { resetTactics(); resetBlows(); T = 0; setPref('enhancedAI', tr
 // ── the law ─────────────────────────────────────────────────────────
 
 test('TELL6c: the leap - a disc 1.8 m at its point, a second, x1.6, 3-9 m off, its last 0.35 s the jump; the ground draws the disc at the point in a quad of its own (mutants: any number moved; the disc at the feet)', () => {
-  assert.deepEqual({ ...BLOW.leap }, { windup: 1.0, r: 1.8, mult: 1.6, from: 3, range: 9, arc: 0.35 });
+  assert.deepEqual({ ...BLOW.leap }, { windup: 1.0, r: 1.8, from: 3, range: 9, arc: 0.35 });
   const b = makeBlow('leap', [0, 0, 0], 0, 0);
   b.ahead = 6;
   assert.equal(inBlow(b, 0, 6), true);
@@ -42,9 +42,6 @@ test('TELL6c: the leap - a disc 1.8 m at its point, a second, x1.6, 3-9 m off, i
     for (let across = -H; across <= H; across += 0.21) assert.equal(blowField('leap', across, along, 6).inside, inBlow(b, -across, along));
   }
   assert.equal(BLOW_KIND.leap, BLOW_KIND.slam, 'the shader\'s disc ahead');
-  // PIN MOVED (RVN5: the pyre's disc shares the leap's uniforms - its own radius and point)
-  assert.match(rd('src/render/foeTelegraph.js'), /else if \(b\.kind === 'leap' \|\| b\.kind === 'pyre'\) gl\.uniform4f\(U\.uP, P\.r, b\.ahead \?\? 0, 0, 0\);/);
-  assert.match(rd('src/render/foeTelegraph.js'), /gl\.uniform1f\(U\.uHalf, quadHalf\(b\.kind, b\.ahead\)\);/);
   assert.equal(punishSeconds('leap'), 1.2);
   assert.equal(TELL.TRACKERS.includes('leap'), false, 'its point locks at its start');
   assert.deepEqual([...GAP_CLOSERS], ['charge', 'leap']);

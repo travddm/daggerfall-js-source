@@ -1,4 +1,4 @@
-// ARENA5 (2026-10-03): YOUR LADDER REPLAY, DRIVEN (bible/11-Multiplayer/Arena.md 2, the Spectate row - offline: "exhibitions,
+// ARENA5: YOUR LADDER REPLAY, DRIVEN (2, the Spectate row - offline: "exhibitions,
 // your ladder replay"). The recording's law (systems/arena/arenaReplay.js - ten ticks a second of each fighter's feet, facing
 // and health as closed-loop byte deltas with standing runs folded, the law's events and the strikes; bounded and
 // measured); the record through the save's arena record (systems/save/save.js - versioned, an older save none, a broken one
@@ -328,7 +328,5 @@ test('ARENA5 offered: the Herald\'s R when the records keep a bout, the Records 
     assert.match(s, /if \(arenaBouts\.askReplay\(rec\)\) modes\?\.enterArenaFloor\?\.\('watch'\);/, f);
     assert.match(s, /playerFeet: player\.pos, playerYaw: cam\.yaw,/, f);
   }
-  // AUDIT PRE-MERGE 1003 U14: each press named by its bout (its opponent and its day)
-  assert.match(read('src/ui/arena/arenaWindow.js'), /if \(b\.replay\) \{ const acts = el\('div', 'aw-boutacts'\); acts\.append\(press\(b\.replay, \(\) => doAct\('replay', \{ i: b\.replay\.i \}\), '', `\$\{b\.opp\}, \$\{b\.when\}`\)\); li\.append\(acts\); \}/);
   assert.equal(YOU, 'you');
 });

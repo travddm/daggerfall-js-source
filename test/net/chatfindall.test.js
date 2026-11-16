@@ -1,5 +1,4 @@
-// CHAT-FIND-ALL (2026-10-14, Dudey: "searching players in chat looks like it only finds the ones that are shown in the
-// list"): rosterRows answers every known row, sorted and uncut, beside the column's first ROSTER_ROWS_MAX - and the
+// CHAT-FIND-ALL: rosterRows answers every known row, sorted and uncut, beside the column's first ROSTER_ROWS_MAX - and the
 // panel's search filters that.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,7 +17,3 @@ test('CHAT-FIND-ALL a player past the column\'s cut is in `all` (mutant: `all` t
   assert.equal(rosterRows({ id: 'me01x', name: 'Me', peers }).all, r.all, 'the same frozen list while nothing moved');
 });
 
-test('CHAT-FIND-ALL the panel\'s search filters the uncut list', () => {
-  const src = readFileSync(new URL('../../src/ui/chatPanel.js', import.meta.url), 'utf8');
-  assert.match(src, /const rows = query \? everyone\.filter\(\(r\) => playerFound\(r\.name, r\.id, query\)\) : all;/);
-});

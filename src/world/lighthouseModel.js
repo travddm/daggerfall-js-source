@@ -1,7 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11; asked what the lighthouse is, Mac chose "Climbable, with keeper - stone tower and keeper's
-// cottage; the lamp lit from dusk with a sweeping beam seen far out at sea; the keeper lets you climb to the gallery for
-// the view"): WHAT A PORT TOWN'S LIGHTHOUSE IS MADE OF - the port's own geometry in its own frame (y up from its ground,
+// SHIPYARDS: WHAT A PORT TOWN'S LIGHTHOUSE IS MADE OF - the port's own geometry in its own frame (y up from its ground,
 // its FRONT - its gate and its doors, the town's side - along +z, the SEA behind it along -z, x across), worn in the
 // port's own art (world/portArt.js) through the yards' face kit (world/merchantYards/merchantYardModels.js). Every face is wound
 // outward and the collider is the same triangles - with one more: a GUARD round the gallery (`guardBand`), a closed
@@ -9,7 +7,7 @@
 // neither a step back, nor a jump, nor a climb takes anyone off the gallery (AUDIT SHIPYARDS L4-1), stood by the pool
 // while someone is on the gallery under it (its lid kept nobody coming down from landing).
 //
-// BEACON-TOWER (2026-10-11, Mac: "The lighthouse model is insanely good but way too modern for daggerfall's lore"): THE
+// BEACON-TOWER: THE
 // ILIAC BAY'S LIGHT IS A BEACON. The first tower was a lighthouse of the age of steam - whitewash and two red bands, a
 // glazed lantern room in iron mullions, a copper dome and its vent ball, an iron railing - and the Third Era lights its
 // coasts as a medieval coast was lit: a tower of bare stone with a fire on its head. Its shape and every point the climb,

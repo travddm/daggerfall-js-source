@@ -1,7 +1,4 @@
-// FIELD-CSA1 (2026-09-28, Discord, Julian: "in my case w the large deed specifically - first attempt just didn't spawn
-// in the boat and the deed disappeared. i could hear ocean bout sounds as if i was on a boat in the background. lost the
-// boat forever. second attempt, spawned in a large boat deed. it spawned in after a delay but i got killed by an ocean
-// mob before i could climb onto it. also lost that boat forever after respawning"). The runtime's halves - the seabed
+// FIELD-CSA1. The runtime's halves - the seabed
 // hit floated, the sea plane held to the ray's reach, every boat riding every recentre, OnWorldReanchored - are pinned
 // in csa_placing.test.js. This pins the host's: StreamingWorldState.init's own record of the move it made
 // (`initOffset`), and world.js's csaReanchor - mounted from its source - called by _teleportToPixel after the init, so

@@ -1,7 +1,5 @@
 // @ts-check
-// BOSS-TRAITS (2026-10-25, the owner: "possibly implementing boss types that might be shielded, have resistances, curb
-// power, etc for more artifical difficulty"; asked where, "Raid leaders", "Elite foes" and "Relay bosses";
-// bible/05-Combat/Boss-Traits.md): A HARD FOE'S OWN RULES, where the made levels had taken the player's away
+// BOSS-TRAITS: A HARD FOE'S OWN RULES, where the made levels had taken the player's away
 // (EVENT-RULES gave regeneration back - systems/courtRules.js). Each trait is one plain rule a player can read off the
 // foe's title and its target frame, and answer:
 //
@@ -26,7 +24,7 @@
 // `bv` the ward's share standing (0-100) - a puppet stands with its owner's traits, so its title, its blows at me and the
 // striker's half agree, and its ward is drawn as its owner holds it (AUDIT WORLD-EVENTS L2-7).
 //
-// AUDIT WORLD-EVENTS (2026-10-25, bible/01-Overview/audits/Audit-World-Events.md): L2-4 the ward is a SHARE of the foe's
+// AUDIT WORLD-EVENTS: L2-4 the ward is a SHARE of the foe's
 // health as it stands, not a number fixed before the host's later scaling (the open zone's x4 left a 4% ward); L2-5 the
 // owner's half is for BLOWS alone (a fall, a SetHealth(0) - L2-10 - is neither curbed nor warded), the wrath's clock
 // starts at a PLAYER's first blow, runs on the host's game clock (a pause holds it, and the ward's regrowth), turns the

@@ -1,5 +1,5 @@
 // @ts-check
-// EL2 (2026-09-17, the Enhanced Lighting arc, tier two - SHADOWS).
+// EL2.
 //
 // WHAT THIS IS. The renderer has no scene graph: the hosts issue every
 // world draw themselves, in their own order, from their own culled lists
@@ -35,7 +35,7 @@
 // classic page never loads a shadow program) over two tiny fragment
 // shaders: nothing at all for a solid, the 0.5 cutout for a flat.
 //
-// EL5 (2026-09-17, THE FIELD - the first report from the game): "the lights
+// EL5: "the lights
 // from inside the city are all bleeding through, tanking my framerate too"
 // (a town gate at night). Two of this file's own laws were the cause.
 //   - EVERY REPLAY DREW EVERY RECORD. Six faces of the cube map, two
@@ -73,7 +73,7 @@ export const SHADOW_SUN_SIZE = 2048;
 /** A caster's face size (six layers of the point depth array per caster). */
 export const SHADOW_POINT_SIZE = 512;
 /** EL5: how many lanterns cast at once - the nearest to the eye. */
-export const SHADOW_POINT_CASTERS = 12;   // FLICKER-FIX (2026-10-02): twelve, not eight - a lamp past the eight read the lo map (static casters only), so the player's and the townsfolk's shadows vanished for it and came back when it swapped in (+48 MB of depth layers). EL6: six; HQ1: eight - SC1's cache made a still caster nearly free.
+export const SHADOW_POINT_CASTERS = 12;   // FLICKER-FIX: twelve, not eight - a lamp past the eight read the lo map (static casters only), so the player's and the townsfolk's shadows vanished for it and came back when it swapped in (+48 MB of depth layers). EL6: six; HQ1: eight - SC1's cache made a still caster nearly free.
 /** EL8: the caster-slot table's size - one int per light slot the lane can
  *  hold (enhancedLighting.js EL_MAX_LIGHTS, pinned equal): a light's slot in
  *  one lookup, not a search over the casters per light per fragment. */
@@ -86,8 +86,7 @@ export const SHADOW_CASTER_TABLE = 48;
 export const SHADOW_FAR_CASCADE_EVERY = 2;
 export const SHADOW_FAR_CASTER_EVERY = 3;
 /**
- * PERF-FLICKER (2026-09-19, Mac: "Online mode needs further performance
- * improvements", 51 fps with script at 23.3 ms): THE FLICKER WAS
+ * PERF-FLICKER: THE FLICKER WAS
  * REBUILDING EVERY SHADOW CUBE, EVERY FRAME.
  *
  * EL8 spends the point casters carefully: the nearest SHADOW_NEAR_CASTERS
@@ -119,8 +118,7 @@ export const SHADOW_FAR_QUANTUM = 4;
  *  range, rounded UP so a flicker cannot move it. */
 export const shadowFarFor = (far) => Math.ceil(far / SHADOW_FAR_QUANTUM) * SHADOW_FAR_QUANTUM;
 /**
- * LA-SHADOW4 (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look for flickering issues, performance
- * improvements"): THE SHADOW'S FAR IS HELD ACROSS THE FLICKER, not re-rounded every frame. PERF-FLICKER's quantum
+ * LA-SHADOW4: THE SHADOW'S FAR IS HELD ACROSS THE FLICKER, not re-rounded every frame. PERF-FLICKER's quantum
  * swallows a lantern's wobble only when the wobble stays inside one quantum - true of the town's 18 (AnimateLight
  * wanders 16.6 to 18.4, all rounding to 20), false of a dungeon, where every light flickers about its own
  * radius-derived range: a range of 12.3 wanders 10.9 to 12.7 and its far flipped 12 <-> 16 as often as the flicker
@@ -144,8 +142,7 @@ export const SHADOW_NEAR_CASTERS = 2;
  *  than EL2's 40-unit cascade left it), the street, and the town. */
 export const SHADOW_CASCADES = Object.freeze([12, 48, 240]);
 /**
- * PERF-SUN (2026-09-19, Mac: "exterior shadows at a distance ... over 1000
- * calls and looking up in the sky restores frame rate"): HOW MANY OF THE
+ * PERF-SUN: HOW MANY OF THE
  * NEAREST CASCADES TAKE THE 3x3 KERNEL.
  *
  * `sunShadowAt` filtered 3x3 in EVERY cascade - nine samples per lit
@@ -191,7 +188,7 @@ export const SUN_CASCADE_BAND = 0.2;
 /** The ortho box's half-depth along the light: enough to take a mountain
  *  pixel's height above or below the eye. */
 export const SHADOW_SUN_DEPTH = 600;
-/** AUDIT DEEP R-3 (the travel view, bible/06-Systems/Travel-View.md): the cascades' SCALE while the view looks down on
+/** AUDIT DEEP R-3 (the travel view): the cascades' SCALE while the view looks down on
  *  the traveller - radii and depth both. At the ground's radii (12/48/240 m) the shadows stopped in a circle 216 m about
  *  the traveller while the picture reached half a kilometre past them, and the two near maps spent centimetre texels
  *  where a pixel covers a metre. Four times: 48/192/960 m, the far texel under a metre. */
@@ -201,9 +198,8 @@ export const SHADOW_VIEW_SCALE = 4;
 export const SHADOW_MIN_SUN_Y = 0.05;
 /** The cube map's near plane. */
 export const SHADOW_POINT_NEAR = 0.1;
-// LIGHT-NEAR1 (2026-09-23, kurkku on Discord, with video: "shadows disappear seemingly when you're too close to the
-// light source" - a tavern lamp at head height, the shadows gone as the player walks under it): THERE IS NO
-// CAMERA-DISTANCE RULE ANY MORE. F3 (2026-09-17) kept the light in the hand out of the caster slots by the proxy
+// LIGHT-NEAR1: THERE IS NO
+// CAMERA-DISTANCE RULE ANY MORE. F3 kept the light in the hand out of the caster slots by the proxy
 // "within 1.5 of the eye" (SHADOW_CASTER_MIN_DISTANCE), and MAC-T1 replaced that proxy with the fact BY NAME - the
 // torch and candle records say `carried`, every host composes them through withPlayerLights, and the pick, the
 // contact march (-2 in the caster table) and the glare skip a carried light in any camera. The proxy stayed
@@ -216,8 +212,7 @@ export const SHADOW_POINT_NEAR = 0.1;
  *  caster - six 512^2 replays of the whole town to a far plane of a
  *  thousand, for a frame, were a hitch and nothing else. */
 export const SHADOW_CASTER_MAX_RANGE = 120;
-/** F2 (2026-09-17, Mac: "objects on the ground can sometimes have standing
- *  shadows"): a flat is a standing card, and the sun drew a loot pile, a
+/** F2: a flat is a standing card, and the sun drew a loot pile, a
  *  dropped bottle or a coin heap as a card standing on its point - a
  *  standing shadow off a thing lying on the ground. The treasure archive
  *  (216, every loot pile) casts nothing, a batch a host marks `noShadow`
@@ -227,7 +222,7 @@ export const SHADOW_CASTER_MAX_RANGE = 120;
 export const SHADOW_NO_CAST_ARCHIVES = Object.freeze(new Set([216]));
 export const SHADOW_FLAT_MIN_HEIGHT = 0.5;
 /**
- * WEEDS1 (2026-09-19, Mac: "its better, what else can we do?"): HOW MANY
+ * WEEDS1: HOW MANY
  * TEXELS OF A CASCADE A SPRITE MUST BE TALL TO CAST INTO IT.
  *
  * F5 already culls a caster too small to shadow a texel - but it measures
@@ -284,8 +279,7 @@ export const SHADOW_LIGHT_FLATS = 210;
 /** The record pool's ceiling - a city frame draws ~1000 meshes. Past it a
  *  frame's casters are truncated, never reallocated. */
 export const SHADOW_RECORD_MAX = 6000;
-// SC1 (2026-09-23, Mac: "make some insane improvements to our lighting system ... while also improving
-// performance"; the second step): THE STATIC CASTERS ARE DRAWN ONCE. A lantern's cube map was replayed - six
+// SC1: THE STATIC CASTERS ARE DRAWN ONCE. A lantern's cube map was replayed - six
 // faces of everything in its range - every frame for the two nearest slots and every third for the rest, whether
 // or not anything in that range had moved. In a tavern nothing has: the walls, the tables and the beams stand
 // where they stood, and the only thing that ever changes a lantern's shadow is the light itself, a door on its
@@ -309,7 +303,7 @@ export const SHADOW_DYNAMIC_HOLD = 60;
  *  draw may sit from a remembered placement and still be that placement's (a door swings a hand's breadth a frame). */
 export const SHADOW_INSTANCE_MAX = 1024;   // AUDIT REACH: and a placement not drawn for a hold is evicted for a new one (a mesh cache is never destroyed - the doors of every dungeon of a session would fill it); PERF-INST: 128 before the placements were filed by place (AUDIT PERF-INST: 1024, not 4096 - ~0.6 KB a placement, a full mesh's memory kept for the session)
 export const SHADOW_INSTANCE_REACH = 2;
-/** PERF-INST (2026-10-10, the owner: "prob caused by placed objects by players"): A MESH'S PLACEMENTS ARE FILED BY PLACE
+/** PERF-INST: A MESH'S PLACEMENTS ARE FILED BY PLACE
  *  past this many. Each draw scanned every placement its mesh had - a frame of N copies of one model was N x N
  *  distances - and past SHADOW_INSTANCE_MAX (128 then) every further copy read as moved, for ever: a town of yards
  *  furnished with the same chair, a room of two hundred placed pieces or a long view of a model too odd to batch had
@@ -343,7 +337,7 @@ export const SHADOW_INSTANCE_PHASE = 0.3819660112501051;
  *  and every frame for every flora batch of a pixel handed SC1's whole saving back in a town with trees. */
 export const SHADOW_SWAY_STILL = 0.02;
 export const SHADOW_SWAY_EVERY = 4;
-/** FLICKER-FIX (2026-10-02): STEADY SHADOWS. The cadences above (far cascade every 2nd frame, far lanterns every 3rd,
+/** FLICKER-FIX: STEADY SHADOWS. The cadences above (far cascade every 2nd frame, far lanterns every 3rd,
  *  sway every 4th) show up on screen as shadows popping on and off from frame to frame. With this on, every map is
  *  redrawn every frame. It also (a) makes the caster hold much stickier, so two lamps at nearly the same distance never swap a full
  *  shadow map (with dynamic shadows) for the lo map (static only) from one frame to the next, and (b) lifts the lo
@@ -361,8 +355,7 @@ export const SHADOW_TUNING = { steady: true, override: null, debug: false, debug
 // PERF-VOL: `volumeMemo` false asks every placed batch of every replay afresh, as before the planes were named (bounds.js
 // volumeName) - the pins' oracle and an A/B's off arm (window.__DF_SHADOW_TUNING.volumeMemo = false).
 // AUDIT 637 B8: declared here, where the console finds it.
-/** STEADY-BALANCE (2026-10-04, Discord: "shadows too dark and too light where they should be normal ... light of candles too
- *  bright ... it fixed the flickering tho"): THE PLAYER'S OWN CARD CASTS INTO THE TWO LAMPS NEAREST IT AGAIN, steady or not.
+/** STEADY-BALANCE: THE PLAYER'S OWN CARD CASTS INTO THE TWO LAMPS NEAREST IT AGAIN, steady or not.
  *  FLICKER-FIX had cast it into EVERY lamp with a full map under Steady shadows (twelve): in first person the card
  *  ("Shadows Only", the default) stands a pace before the eye, so every lamp BEHIND the player threw a silhouette right
  *  where the player was looking - a tavern's dozen lamps stacked a dozen into one black mass at the crosshair, and a
@@ -388,7 +381,7 @@ const quadRadius = (r, wl, law, b) => { const h = b.size.h; return placementRadi
  *  than the host did, and the last bit of a float is no motion. */
 export const SHADOW_STILL_EPS = 1e-3;
 /**
- * DISC15 (2026-09-24, Mac: "Constant reports of interior light flickering ... Its not solved"): EVERY LIGHT IN A ROOM
+ * DISC15: EVERY LIGHT IN A ROOM
  * CASTS.
  *
  * DISC6 held the eight caster maps against ties, and the flicker stayed, because the tie was never the cause. A
@@ -407,7 +400,7 @@ export const SHADOW_STILL_EPS = 1e-3;
  * casters at SHADOW_LO_SIZE - six layers of a second depth array, sticky by position like SC1's slots, drawn when
  * its light first reads it and again only when its static set changes (SC1's signature, SHADOW_LO_REBUILDS a frame -
  * the old map stands meanwhile, the same light's). A lamp is never unshadowed, and a change of the twelve changes a
- * shadow's resolution, never whether the ceiling is there. LIGHT-ID (2026-10-14, Mac: "Engine fix (Recommended)"): a
+ * shadow's resolution, never whether the ceiling is there. LIGHT-ID: a
  * light holding a 512 slot draws no lo map, since no shader reads one while it holds the slot; a map it already has
  * is kept as it stands, and the frame it loses the slot it reads one drawn then, or its kept one asked its static
  * signature then (_renderLo). The contact march has no light left to run for indoors. `uCasterOf[i]` carries the lo
@@ -429,7 +422,7 @@ export const SHADOW_LO_REBUILDS = 2;
 /** FLICKER-FIX: the lo tier's rebuilds a frame under Steady shadows - a stale lo map settles in a third of the frames. */
 export const SHADOW_LO_REBUILDS_STEADY = 6;
 /** SC1: the door - `?shadowcache=off` replays every caster at the cadence, as before.
- *  CACHE-COPY (2026-10-07): ON unless asked off, again. The anti-flicker patch's CACHE-OFF had turned it OFF unless
+ *  CACHE-COPY: ON unless asked off, again. The anti-flicker patch's CACHE-OFF had turned it OFF unless
  *  asked on (the address, the device, an Enhanced Lighting part "Shadow cache (faster, may flicker)") because the
  *  cached shadows blinked - the blink was the cache's COPY on Direct3D (_blitSlot), not the cache, and the copy is a
  *  draw now; with the cache off every lamp replayed its whole room six faces a frame. */
@@ -465,7 +458,7 @@ function sunBoxesAt(scale) {
 }
 
 /**
- * LA-SHADOW1 (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look for flickering issues"): THE
+ * LA-SHADOW1: THE
  * SUN'S TEXEL GRID IS SNAPPED AT A POINT BESIDE THE EYE, NOT AT THE WORLD'S ORIGIN.
  *
  * The snap below makes one world point land on a whole texel, and every other point sits at its offset from that
@@ -558,7 +551,7 @@ const CUBE_FACES = Object.freeze([
 /** The six face view-projections of a point light at `pos` reaching `far`.
  *  `out` is six Float32Array(16). */
 export function pointFaceMatrices(pos, far, out) {
-  // PERF-ALLOC1 (2026-10-10): into two scratches - the same floats (lookAtInto / perspectiveInto, below), where every
+  // PERF-ALLOC1: into two scratches - the same floats (lookAtInto / perspectiveInto, below), where every
   // lantern's every frame minted a projection, six views and their twenty-four arrays (the real game at Knightstale by
   // night: lookAt alone 47 KB a frame of the 1.4 MB the frame allocates)
   const proj = perspectiveInto(_faceProj, Math.PI / 2, 1, SHADOW_POINT_NEAR, far);
@@ -786,8 +779,7 @@ float sunCascadeTap(int c, vec3 wp, vec3 n, bool soft, float h) {
   // screen. The near cascades keep the kernel: that is EL7's contact
   // hairline, at a texel of 1.2 cm.
   //
-  // TREES1 (2026-09-19, Mac: "there's this weird darkening effect
-  // happening to trees"): UNLESS THE CALLER IS A FLAT. The trade above
+  // TREES1: UNLESS THE CALLER IS A FLAT. The trade above
   // is an ANTIALIASING one, and it only holds for a surface that shades
   // PER FRAGMENT - the terrain and the meshes, where neighbouring pixels
   // smooth a coarse filter whatever this returns. A flat is not like
@@ -800,9 +792,7 @@ float sunCascadeTap(int c, vec3 wp, vec3 n, bool soft, float h) {
   // kernel at every distance, and they are a thin slice of the frame's
   // fragments beside the ground, so nearly all of the saving stands.
   if (!soft && c >= ${SHADOW_PCF_CASCADES}) return texture(uSunShadow, vec4(p.xy, float(c), ref));
-  // PERF-EXT5 (2026-09-25, the players' "fps issues in the exterior but
-  // fine in the interior" and "me too my friend.. don't know why. I got a
-  // RX6600"): THE 3x3 KERNEL IN FOUR TAPS, THE SAME WEIGHTS. It was nine
+  // PERF-EXT5: THE 3x3 KERNEL IN FOUR TAPS, THE SAME WEIGHTS. It was nine
   // hardware 2x2s one texel apart. Per axis they weigh the four texels
   // under them [1-f, 1, 1, f] (f the sample's fraction past a texel
   // centre), and two bilinear taps give exactly that: one over the first
@@ -826,7 +816,7 @@ float sunCascadeTap(int c, vec3 wp, vec3 n, bool soft, float h) {
     + wA.x * wB.y * texture(uSunShadow, vec4(tA.x, tB.y, lc, ref)) + wB.x * wB.y * texture(uSunShadow, vec4(tB.x, tB.y, lc, ref));
   return lit / 9.0;
 }
-// LA-SHADOW2 (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look for flickering issues"): THE
+// LA-SHADOW2: THE
 // CASCADES HAND OVER IN A BAND, AND THE LAST ONE FADES OUT. The pick was a hard line at nine tenths of each radius:
 // a shadow crossing it changed its texel four- or fivefold, its normal offset with it (the edge stepped sideways by
 // centimetres) and, at the far line, its kernel - a ring about the player that popped every shadow it swept over as
@@ -949,7 +939,7 @@ uniform sampler2D uTex;
 void main() {
   if (texture(uTex, vUV).a < 0.5) discard;
 }`;
-/** CACHE-COPY (2026-10-07): SC1's cache into the live layers BY A DRAW (_blitSlot) - a full-screen triangle made of
+/** CACHE-COPY: SC1's cache into the live layers BY A DRAW (_blitSlot) - a full-screen triangle made of
  *  gl_VertexID alone (deepWatersRender.js's), drawn with an empty vertex array. */
 export const DEPTH_COPY_VS = `#version 300 es
 void main() {
@@ -976,7 +966,7 @@ const DYN_NONE = 0, DYN_SWAY = 1, DYN_MOVER = 2, DYN_BODY = 3;
 const REC_MESH = 0, REC_TERRAIN = 1, REC_BB = 2, REC_CHAR = 3;   // EL7: the character rigs cast
 const REPLAY_ALL = 0, REPLAY_STATIC = 1, REPLAY_DYNAMIC = 2, REPLAY_LO = 3;   // SC1: what a replay draws; DISC29-E: the lo tier's - the still, and a flat that only animates where it stands
 /**
- * PERF-FACE (2026-10-10, the owner: "prob caused by ... crowded places"): A LIVE FACE THAT HOLDS THE CACHE IS LEFT.
+ * PERF-FACE: A LIVE FACE THAT HOLDS THE CACHE IS LEFT.
  * SC1 keeps a lantern's statics in a cache and draws its movers over a copy of it - and the copy was of all six faces
  * whenever anything moved in the lantern's reach: a walker by a lamp, a peer, a townsman, a swaying tree under Steady
  * shadows, every frame, six full 512^2 depth copies (CACHE-COPY's draw) for a mover that stands in front of one or two
@@ -987,7 +977,7 @@ const REPLAY_ALL = 0, REPLAY_STATIC = 1, REPLAY_DYNAMIC = 2, REPLAY_LO = 3;   //
  * movers in it - the picture the six copies made.
  */
 const FACES_ALL = 0x3f;
-/** PERF-SHADOW1 (2026-10-06): how far past a lantern's shadow `far` the centre of a sphere of radius r may stand, on any
+/** PERF-SHADOW1: how far past a lantern's shadow `far` the centre of a sphere of radius r may stand, on any
  *  axis, and still be taken by one of its cube's six faces - in units of r. Each face is a 90-degree perspective
  *  (pointFaceMatrices): its far plane takes a centre to far + r along the face's axis, and its four sides - planes
  *  through the light at 45 degrees - take one to (along) + r sqrt 2 <= far + r (1 + sqrt 2) across it; the near plane
@@ -1252,7 +1242,7 @@ export class ShadowPass {
    * DISC15: THE LO TIER'S FRAME - every light that may cast and has no 512 map this frame keeps a lo slot (sticky by
    * position, as SC1's slots) and reads its map of the room's static casters (uCasterOf = SHADOW_POINT_CASTERS + j), drawn
    * when the light arrives or moves and redrawn for a changed static set SHADOW_LO_REBUILDS a frame.
-   * LIGHT-ID (2026-10-14, Mac: "Engine fix (Recommended)"): A LIGHT HOLDING A 512 SLOT DRAWS NO LO MAP - no shader reads one
+   * LIGHT-ID: A LIGHT HOLDING A 512 SLOT DRAWS NO LO MAP - no shader reads one
    * while it holds the slot (uCasterOf names the 512 slot). A lo map it has already keeps its slot as it stands, unminded;
    * the frame the light loses its 512 slot it reads its lo map, drawn then - a new one at once, a kept one asked its static
    * signature at once and redrawn if the room changed under it - so no lo map is read stale.
@@ -1345,7 +1335,7 @@ export class ShadowPass {
     this.count++;
     return r;
   }
-  /** SHADOW-REACH (2026-09-23, Mac: "Can you tackle the 2 limitations"): WOULD A CASTER HERE CAST INTO THIS FRAME'S
+  /** SHADOW-REACH: WOULD A CASTER HERE CAST INTO THIS FRAME'S
    *  MAPS. The hosts cull what they draw to the VIEW frustum, and the maps are replayed from what they drew - so a
    *  tree behind the camera cast no sun shadow into the view, a wall just off screen cast none from the lantern
    *  beside it, and SC1's caches churned as the camera turned (the still set in a lantern's reach changed with the
@@ -1620,7 +1610,7 @@ export class ShadowPass {
     if (r.bounded) transformSphere(matrix, surface.bounds, r.sphere);
   }
   /** EL7: a character rig (createCharacterMesh's bundle: vao, count, ranges) casts too.
-   *  MWNPC16 (2026-10-11, a player's screenshot via Mac: "Old sprite shadows still show"): AND A MORROWIND BODY, in its
+   *  MWNPC16: AND A MORROWIND BODY, in its
    *  own shape. MWNPC1 turned a GPU-skinned body away here - CHAR_VS has no skin, so it would have cast its bind pose -
    *  and MWNPC5b kept each NPC's classic billboard in the pass to cast for it (`castOnly`): a Daggerfall sprite's
    *  silhouette thrown on the wall behind a man in Morrowind's steel. A skinned body now replays through the world's
@@ -1708,9 +1698,7 @@ export class ShadowPass {
       const placeChanged = b._shSeen === true && !(Math.abs(b._shOx - ox) <= SHADOW_STILL_EPS && Math.abs(b._shOy - oy) <= SHADOW_STILL_EPS && Math.abs(b._shOz - oz) <= SHADOW_STILL_EPS);
       const lookChanged = b._shSeen === true && !(b._shFrame === fr && b._shRec === rec && b._shFlip === flip);
       if (placeChanged || lookChanged) b._shMovedAt = this.frameNo;
-      // IDLER-STICKY (2026-10-06, the player's log: two townsfolk flats, 455-5 and 386-5, in and out of the static set on
-      // their idle's beat - 180 frames still, 60 animating - and every turn rebuilt nine lamps' static caches and the lo
-      // maps around them at once: the whole room's shadows blinked): a flat whose LOOK changes where it stands (an idle,
+      // IDLER-STICKY: a flat whose LOOK changes where it stands (an idle,
       // a 211 prop) animates again and again, so it is a mover for good - its shadow drawn with the movers', never
       // baked, never the reason a static cache rebuilds. A walker that stops is still the hold's alone, as before.
       // IDLER-STICKY II (the player's next log: the same two, still in and out - they HAVE an origin, so the first cut's
@@ -1763,8 +1751,7 @@ export class ShadowPass {
     this.frameNo++;
     this.stats.cascadesDrawn = 0; this.stats.facesDrawn = 0; this.stats.staticFaces = 0; this.stats.dynFaces = 0; this.stats.moverFaces = 0; this.stats.blits = 0; this.stats.cachedSlots = 0;   // SC1; LIGHT-ID
     this.stats.loSlots = 0; this.stats.loFaces = 0;   // DISC15
-    // EMPTY-HOLD (2026-10-06, the player: "everything blinked at once ... it only happens with enhanced lighting on", on
-    // every card): a frame that recorded NO caster (a hitch, a room's memory restored, a chunk swapped mid-frame) cleared
+    // EMPTY-HOLD: a frame that recorded NO caster (a hitch, a room's memory restored, a chunk swapped mid-frame) cleared
     // every lamp's map and forgot every slot - the whole room's shadows off for a frame and every cube redrawn on the
     // next. A short run of empty frames now keeps the last frame's maps and their uniforms untouched (the maps are
     // still in their layers); only a run past SHADOW_EMPTY_HOLD frames - the scene really without casters - clears
@@ -1825,7 +1812,7 @@ export class ShadowPass {
     // the same table): F3's "never for the light in the hand", said by name rather than by distance from the camera
     if (f.carried) for (let i = 0, m = Math.min(L.length >> 2, SHADOW_CASTER_TABLE); i < m; i++) if (f.carried[i]) this.casterOf[i] = -2;
     // SC1: STICKY SLOTS - a picked light keeps the slot whose cache is its own, and the rest take the free slots
-    // nearest-first. LIGHT-ID (2026-10-14, Mac: "Engine fix (Recommended)"): its own slot is found by its IDENTITY first -
+    // nearest-first. LIGHT-ID: its own slot is found by its IDENTITY first -
     // the light the slot was drawn for last frame, wherever that light stands now (render/lightId.js: the hosts re-sort
     // their lights by distance every frame, so an index is no name) - and then by PLACE, as SC1 found every slot: a map
     // drawn from a place is the map of any light standing there, and a place is all an anonymous light is called.
@@ -2015,8 +2002,7 @@ export class ShadowPass {
     if (st.staticFaces > 0 || st.loFaces > 0) this._debugStaticDiff();   // STATIC-WHO: what changed in the static set
   }
   /**
-   * STATIC-WHO (2026-10-06, the player's log: the static caches rebuilt on a beat - 60 frames, then 180 - with no lamp
-   * changed): the static set the signatures fold (the same filters), keyed by identity and place; on a rebuild frame the
+   * STATIC-WHO: the static set the signatures fold (the same filters), keyed by identity and place; on a rebuild frame the
    * entries that came and went are named - the record's kind, its archive and record (a flat) or its mesh's name, its
    * place, and the flags that move a batch in and out of the set (conceal, _shDyn, _dead).
    */
@@ -2049,7 +2035,7 @@ export class ShadowPass {
   /** SC1: the static signature of a lantern's reach - every static record (and static batch) whose sphere touches
    *  the light's, folded by identity and position, order-free. An unbounded record touches everything.
    *
-   *  PERF-EXT3 (2026-09-25, the players' "fps issues in the exterior but fine in the interior"): EVERY CASTER'S IN ONE
+   *  PERF-EXT3: EVERY CASTER'S IN ONE
    *  WALK. The rank loop asked this once a caster, and each ask walked every record and every batch of the frame -
    *  the filter chain, the archive Set, batchSphere, the touch, the fold - even when every cache was valid and nothing
    *  was drawn: eight lanterns in a town at night were eight whole walks a frame, 0.2 ms of the harness town's frame
@@ -2060,7 +2046,7 @@ export class ShadowPass {
    *  change. An item's id is minted on its first touch of ANY caster, item by item where the walks minted caster by
    *  caster; an id is a name, held for the item's life, and a cache compares only its own last answer.
    *
-   *  PERF-EXT (2026-09-25, the review of the shadows): `quads` - a pixel-wide batch asked by its QUADS (PERF-EXT1), or
+   *  PERF-EXT: `quads` - a pixel-wide batch asked by its QUADS (PERF-EXT1), or
    *  by its sphere alone as the base asked. A ROOM DRAWN WHOLE (DISC15's everyLightCasts, `f.everyLight`) asks by the
    *  sphere: there the host culls nothing by view and streams nothing, so a room's static set moves only when a thing
    *  in it does, and the quads could only spare a rebuild on that rare frame - while DISC15's lo tier asks EVERY lamp
@@ -2125,8 +2111,7 @@ export class ShadowPass {
     return out;
   }
   /**
-   * PERF-SHADOW1 (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for
-   * online"): A LANTERN'S SIX FACES SHARE ONE WALK. Every face replay walked every record and every flat of the frame -
+   * PERF-SHADOW1: A LANTERN'S SIX FACES SHARE ONE WALK. Every face replay walked every record and every flat of the frame -
    * the filter chain, batchSphere, the planes, and a pixel-wide wood's placements - and so did _dynamicNear, once a
    * lantern: under Steady shadows (FLICKER-FIX, on by default) every lantern with a mover or a swaying tree near it
    * redraws its six dynamic faces EVERY frame, so a windy town of twelve lanterns walked the whole record list some
@@ -2292,9 +2277,7 @@ export class ShadowPass {
   /**
    * SC1: the cache's six layers into the live ones.
    *
-   * CACHE-COPY (2026-10-07, Mac: "instead of one of my developers fixing the flickering shadow issue, they just turned
-   * on the non-baked version on by default, which really really kill performance ... I want to fix the flickering
-   * issue properly"): BY A DRAW, NOT A BLIT. This was six blitFramebuffer(DEPTH_BUFFER_BIT) calls from a layer of the
+   * CACHE-COPY: BY A DRAW, NOT A BLIT. This was six blitFramebuffer(DEPTH_BUFFER_BIT) calls from a layer of the
    * cache array into a layer of the live one - valid by the spec, and the one path AUDIT FLICKER left "whose result a
    * driver decides", unconfirmed. Confirmed in ANGLE's source: on Windows every browser's WebGL is ANGLE over Direct3D
    * 11, and there this blit is no copy. DEPTH_COMPONENT24 is stored D24S8, so a depth-only blit is a "partial" depth-
@@ -2343,8 +2326,7 @@ export class ShadowPass {
   }
 
   /**
-   * PERF-SUN3 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-   * online"): THE SUN'S CASCADES SHARE ONE WALK - PERF-SHADOW1's half for the sun (PERF-NEXT item 1). Every cascade's
+   * PERF-SUN3: THE SUN'S CASCADES SHARE ONE WALK - PERF-SHADOW1's half for the sun (PERF-NEXT item 1). Every cascade's
    * replay walked every record and every flat of the frame, three walks of the whole list, to draw what stood within
    * 12, 48 and 240 units of the eye: the frame's records are what the view DREW, out to the draw distance.
    *
@@ -2452,8 +2434,7 @@ export class ShadowPass {
         const cells = r.bounded && !mesh._evAnyCut ? mesh.shadowCells : null;   // RW1: a mesh with a cutout picture replays its sub-meshes - a cell mixes pictures
         const subs = cells ?? mesh.subMeshes;
         const vao = cells ? mesh.shadowVao : mesh.vao;
-        // PERF-EXT2 (2026-09-25, the players' "fps issues in the exterior
-        // but fine in the interior"): A RUN OF SUB-MESHES IS ONE DEPTH DRAW.
+        // PERF-EXT2: A RUN OF SUB-MESHES IS ONE DEPTH DRAW.
         // PERF4's static batch is one sub-mesh per texture, laid end to end
         // from index 0 (StaticBatchBuilder.finish), each spanning the whole
         // pixel - so nearly all of them pass every cascade and face, and a
@@ -2542,7 +2523,7 @@ export class ShadowPass {
         if (P.bb.wfAxis) { gl.uniform4fv(P.bb.wfSway, r.wfSway); gl.uniform4fv(P.bb.wfAxis, r.wfAxis); }   // WINDFALL1: the mod's law, as the flats were drawn
         gl.activeTexture(gl.TEXTURE0);
         let lastSway = null;
-        // PERF-BASIS (2026-09-19): THE BASIS IS UPLOADED ONCE, NOT ONCE A
+        // PERF-BASIS: THE BASIS IS UPLOADED ONCE, NOT ONCE A
         // FLAT. Both vectors went up twice per batch per replay, and only
         // ONE of the four cases varies: `up` is the constant [0,1,0] (or
         // the record's, fixed for the record), and `right` is the frame's
@@ -2560,8 +2541,7 @@ export class ShadowPass {
         // the same texture once apiece.
         let lastTex = null;
         let faced = null;   // DISC29-E: the face uniform's state for this record (set at its first flat)
-        // PERF-EXT11 (2026-09-25, the players' "fps issues in the exterior
-        // but fine in the interior"): and the origin and the size skip
+        // PERF-EXT11: and the origin and the size skip
         // theirs. A record is one host call's list in pixel order, and a
         // pixel's batches share ONE origin array (world.js: `b.origin = t`),
         // so the origin changed about one flat in five on the harness town

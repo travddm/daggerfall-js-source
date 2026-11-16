@@ -1,9 +1,9 @@
-// AUDIT 31 (2026-09-29, Mac: "let's first do a comprehensive audit and ensure everything so far is perfect") - THE
+// AUDIT 31 - THE
 // AUCTIONS' AND THE WRITS' LAW, AUDITED (src/net/marketLaw.js, writLaw.js): a won auction's grace for its seller's cap
 // (S3); no kit a Masterwork (L9); nothing commissioned that nothing yields the stuff of (L2); a power's own name
 // (L9); a member takes back their own deposit (R1); the ranks that take the guild Stores out deliver to none of its
 // writs (S6); the seat week's first Sunday the online epoch's own (L8); the Tithe nought until SEAT1 writes its line
-// (L5). bible/06-Systems/Online-Arc.md "AUDIT 31"; bible/06-Systems/Professions-Arc.md 18, 27, 28.
+// (L5). "AUDIT 31"; 18, 27, 28.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -25,9 +25,8 @@ test('AUDIT 31 S3, L9: a won auction waits seven days past its end for its selle
 test('AUDIT 31 L2: a listable piece of a material nothing yields yet is never commissioned; every other listable piece is - DAEDRIC-SMELT: every Daedric piece, 27, is now (the forge smelts its ingot); CLOTH-GEMS: a graded gem\'s jewel never is', () => {
   const listable = RECIPES.filter((r) => pieceListable(r.id));
   const unmade = listable.filter((r) => commissionUnyielded(r.id));
-  // PIN MOVED (CLOTH-GEMS, Professions-Arc 50): and every jewel of a graded gem - the loose door's alone, so its piece fills
-  // no Drakes commission (32 gems in twelve gemmed pieces and bases: 384). PIN MOVED (AUDIT-SEATS): the sieges' Spoils
-  // yield the Warforged ingot (26 pieces) and Standard-bearer's Silk (76 garments) now. PIN MOVED (DAEDRIC-SMELT,
+  // no Drakes commission (32 gems in twelve gemmed pieces and bases: 384).
+  // yield the Warforged ingot (26 pieces) and Standard-bearer's Silk (76 garments) now.
   // Professions-Arc.md section 53): the forge smelts the Daedric ingot - its 27 pieces no longer wait
   assert.equal(unmade.length, 384);
   assert.deepEqual(unmade.filter((r) => r.kind !== 'jewel'), [], 'no piece of a metal waits');

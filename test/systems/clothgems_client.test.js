@@ -1,7 +1,7 @@
-// CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids") - THE LOOM'S PAGE.
+// CLOTH-GEMS - THE LOOM'S PAGE.
 // The loom lists its Linen weaves and Wool spins beside its cures where the Stores or the pack hold their goods, and says
 // where Linen and Wool come from where they hold none; a box of a garment wholly of cloth says its first's share and
-// when it pays. bible/06-Systems/Professions-Arc.md 50. WOVEN-PAYS (FIELD BUGS 2026-10-26b) and AUDIT WOVEN-PAYS: PIN
+// when it pays. 50. WOVEN-PAYS (FIELD BUGS 2026-10-26b) and AUDIT WOVEN-PAYS: PIN
 // MOVED - the wall is silver, and counted: the box reads the cloth's silver count (ui/professions/profPages.js silverOf -
 // the book's silver: the bolts bought with silver not yet used), never the units' origins.
 import '../chargenDom.mjs';
@@ -70,20 +70,19 @@ test('CLOTH-GEMS the loom\'s page: Spin and Weave rows for the furs and Root Ten
     // a garment wholly of Linen: the share and its condition while no silver count stands, the count said once one does
     buttons().find((b) => b.textContent === 'Clothing').onclick();
     buttons().find((b) => b.textContent.startsWith('Straps')).onclick();
-    assert.match(text(), /20 Outfitting experience, and 511 more the first time you make this piece at this grade from cloth not bought with silver\./);   // PIN MOVED (WOVEN-PAYS): the wall named silver   // PIN MOVED (FIRST-BUDGET, Professions-Arc 52): Outfitting's first-make share
+    assert.match(text(), /20 Outfitting experience, and 511 more the first time you make this piece at this grade from cloth not bought with silver\./);
     use(bookOf({ 'cloth:linen': { own: 4, bought: 1 } }));
     draw();
     assert.match(text(), /from cloth not bought with silver\./, 'PIN MOVED (AUDIT WOVEN-PAYS): a bought unit is no silver');
     use(bookOf({ 'cloth:linen': { own: 4, bought: 1 } }, {}, { 'cloth:linen': 3 }));
     draw();
-    assert.match(text(), /20 Outfitting experience\. Bolts of this cloth bought with silver and not yet used: 3\. Until you have used that many, no piece of it earns a first-time bonus\./);   // PIN MOVED (WOVEN-PAYS)
+    assert.match(text(), /20 Outfitting experience\. Bolts of this cloth bought with silver and not yet used: 3\. Until you have used that many, no piece of it earns a first-time bonus\./);
   } finally {
     setProfessionsPages(null);
     root?.remove?.();
   }
   // the craft's word reads the service's answer: a judged recipe's first paid, or not
   assert.equal(craftXpText(recipeById('garment-141:linen'), { xp: 520, first: true, firstPaid: true }, 'Outfitting'), '(+520 Outfitting experience, with the first-time bonus)');
-  // PIN MOVED (WOVEN-PAYS): the wall named silver, and the first still owed
   assert.equal(craftXpText(recipeById('garment-141:linen'), { xp: 20, first: true, firstPaid: false }, 'Outfitting'), '(+20 Outfitting experience. Cloth bought with silver earns no first-time bonus, so this piece\'s is still yours to earn)');
   assert.equal(craftXpText(recipeById('garment-141:linen'), { xp: 20, first: true }, 'Outfitting'), '(+20 Outfitting experience. Cloth bought with silver earns no first-time bonus, so this piece\'s is still yours to earn)', 'an older service: by the recipe');
   assert.equal(craftXpText(recipeById('garment-149:linen'), { xp: 520, first: true }, 'Outfitting'), '(+520 Outfitting experience, with the first-time bonus)');

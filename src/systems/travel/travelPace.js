@@ -1,17 +1,13 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PACE-DIALS (2026-10-06, the player: "Revert back to the overworld timer multiplier for ppl to set to 60x and 100x on
-// roads and the nearby enemy timer to set to 60x max. Those options should also be available when the player stands
-// still on the overworld map."; then: "speed settings should be 5x 10x 20x 30x 40x 60x and 100x should be only setable
-// when on a road and it has to go to 60 instantly again when leaving the road. Same for enemies nearby multiplier and
-// same rules. The multipliers ... should have the same rules in other uis in online mode").
+// PACE-DIALS.
 //
 // TWO DIALS, ONE LADDER (PACE_STEPS: 5, 10, 20, 30, 40, 60, 100):
 //   speed - the rate a fast journey (and the Overworld's own walk) runs at
 //   foe   - the slowest the clock runs while an enemy holds it (ENEMY-PACE's floor)
 // THE ROAD RULE, for both: x100 may be chosen only while the traveller stands on a road or a track; the moment they
 // leave it, a dial at x100 runs (and reads) x60. Off the road the ladder ends at x60.
-// PACE-KEEP (2026-10-12, Mac: "sometimes your multiplier slows down randomly without an enemy nearby"): the player's
+// PACE-KEEP: the player's
 // x100 is KEPT and comes back on the next road. It was written down to x60 the moment the ground said "off the road" -
 // and a journey by the road says so for a moment wherever its route crosses one pixel of open ground between two road
 // pixels (a gap in the network, a corner the search cut), so a x100 journey dropped to x60 for the rest of the trip with
@@ -62,26 +58,8 @@ export function clampPace(n, onRoad = false) {
 
 let pace = null;
 let ground = false;   // the host's last word: on a road or a track
-/** WILD3 (the owner: "Youre also slower in this zone max 20x in the wilds and 40x on the roads"): THE ZONE'S CAP - while
- *  the host says the traveller stands in the open PvP zone, the ground's top is the zone's (`WILD_PACE_CAP`). A cap,
- *  never a write: the dials keep the player's choice and run under it, and leaving the zone gives it back at once. */
-export const WILD_PACE_CAP = Object.freeze({ road: 40, open: 20 });
-let zoneCap = null;
-/** The ground's top in force: the road's or the open's, under the zone's cap while one stands. */
-const topOn = (onRoad) => {
-  const t = onRoad ? ROAD_PACE_MAX : OPEN_PACE_MAX;
-  return zoneCap ? Math.min(t, onRoad ? zoneCap.road : zoneCap.open) : t;
-};
-/** The host's word on the zone, each frame (scenes/world.js wildFrame): `cap` the zone's tops, or null outside it. */
-export function setPaceZoneCap(cap) {
-  const next = cap ? { road: Number(cap.road) || WILD_PACE_CAP.road, open: Number(cap.open) || WILD_PACE_CAP.open } : null;
-  if ((next?.road ?? 0) === (zoneCap?.road ?? 0) && (next?.open ?? 0) === (zoneCap?.open ?? 0)) return;
-  zoneCap = next;
-  const cur = travelPace();
-  for (const fn of [...listeners]) { try { fn(cur, 'zone'); } catch { /* a listener's own fault */ } }   // a running journey asks its clock again
-}
-/** The zone's cap in force, or null. */
-export const paceZoneCap = () => zoneCap;
+/** The ground's top in force: the road's or the open's. */
+const topOn = (onRoad) => (onRoad ? ROAD_PACE_MAX : OPEN_PACE_MAX);
 const listeners = new Set();
 
 function read() {
@@ -125,10 +103,10 @@ export function setPaceGround(onRoad) {
 /** A dial's rate in force now (the stored one, under the ground's top). */
 export function paceNow(which) {
   const v = travelPace()[which] ?? TRAVEL_PACE_DEFAULT[which];
-  return Math.min(v, topOn(ground));   // WILD3: under the zone's cap too
+  return Math.min(v, topOn(ground));
 }
 /** The journey's rate on a ground (systems/timeScale.js travelRateOf asks). */
-export const paceRateOn = (onRoad) => Math.min(topOn(onRoad), travelPace().speed);   // WILD3: the zone's top where it stands
+export const paceRateOn = (onRoad) => Math.min(topOn(onRoad), travelPace().speed);
 
 /** Set one dial - onto the ladder, under the ground's top (x100 refused off the road). Returns the rate set. */
 export function setTravelPace(which, n) {
@@ -160,4 +138,4 @@ export function onTravelPace(fn) {
 }
 
 /** Pins: back to the device's word. */
-export function _resetTravelPace() { pace = null; ground = false; zoneCap = null; listeners.clear(); }
+export function _resetTravelPace() { pace = null; ground = false; listeners.clear(); }

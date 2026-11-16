@@ -1,5 +1,5 @@
 // @ts-check
-// SHIP-LIVERY (2026-10-17; bible/03-World/Naval-Refit.md SHIP-LIVERY) - THE PAINT SHOP: a livery's pictures painted and
+// SHIP-LIVERY - THE PAINT SHOP: a livery's pictures painted and
 // uploaded the first time a boat wears it, and the remap she is drawn by (scenes/comeSailAway/comeSailAwayPool.js draw -
 // the one draw every host's boats go through, so a painted ship is painted on the street, on a dungeon's water and in a
 // peer's sight alike). The wagons' paint's own shape (scenes/horseCartPool.js lookRemap): the remap maps each record her

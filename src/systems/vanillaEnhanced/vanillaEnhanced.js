@@ -1,9 +1,9 @@
-// VE3 (2026-10-05) - VANILLA ENHANCED, THE TEXTURE OVERHAUL'S FIRST PACK.
+// VE3 - VANILLA ENHANCED, THE TEXTURE OVERHAUL'S FIRST PACK.
 //
 // carademono's Vanilla Enhanced (Nexus Mods, Daggerfall Unity mod 273; its sources at
 // github.com/drcarademono/vanilla-enhanced) is Daggerfall's own textures remastered - the terrain's tile sets, the
 // nature flats, the city walls, the dungeons. VE3 had the player attach it (Port-Doctrine: A RENDER OF GAME DATA IS
-// GAME DATA); VE4 (Mac, 2026-10-05: "Put it in the codebase") ships it, under the exception Port-Doctrine records:
+// GAME DATA); VE4 ships it, under the exception Port-Doctrine records:
 // systems/vanillaEnhanced/vanillaEnhancedPack.js registers the Base, Masked Roads and Snowless Swamps and Jungles in the texture-mod
 // door (systems/dfmodTextures.js) - the Base on by default (AUDIT VE), its add-ons off. A copy the player attaches under the same name - a newer version
 // from Nexus - shadows the shipped one. This module names which registered mods are Vanilla Enhanced and wears them as

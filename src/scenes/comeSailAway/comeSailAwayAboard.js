@@ -10,8 +10,7 @@
 //   ray (FixedUpdate casts each rider's height down from its centre), CSA_ABOARD_BELOW longer so a fall is met before
 //   it lands - meeting the boat's colliders no higher than a step over the feet. A swimmer is never taken aboard by the
 //   ray (inside a hull the ray meets its floor from within): the ladder is the way up out of the water, as in the mod.
-// - HER DECK STANDS FOR EVERYONE (FIELD BUGS 2026-10-01b, Mac: "Players aren't colliding with other players' boats and
-//   can't stand on board" - PR-WAGON1's "Others' wagons don't block" set aside for boats): its colliders stand in every
+// - HER DECK STANDS FOR EVERYONE (FIELD BUGS 2026-10-01b, - PR-WAGON1's "Others' wagons don't block" set aside for boats): its colliders stand in every
 //   player's collider as their own boats' do, aboard it or not (the host's csaSyncColliders); standing on it is aboard.
 // - CARRIED. Each frame, once the peers' boats are posed, the one aboard is carried by their boat's move - its root's
 //   pose before the frame and after (scenes/comeSailAway/comeSailAwayPeers.js moveOf): the feet kept at their place on the deck and
@@ -30,8 +29,7 @@
 //   own copy of that boat at that place (`glue`): its owner on the boat they sail, the others on the one they lead - so
 //   the deck I walk is the deck they see me on, never a stride behind it. The owner law is the boats' own: a word
 //   replaces the sender's alone, a sender gone or quiet past the stale time takes theirs, a clear takes everyone's.
-//   DECK-POSE (2026-10-23, the owner: "Players on board the ship jitter while sailing instead of staying put. Other
-//   players also slide when on board your ship/npc ships"): the same place rides every pose I send (net/wire.js
+//   DECK-POSE: the same place rides every pose I send (net/wire.js
 //   validAboard, `ab` on the pose), and a reader stands me where my drawn pose says - played out with my walk, ten times
 //   a second, never eased toward a word that comes at most five (`glue`).
 import { raycastColliders, invertAffine } from '../../world/prefabColliders.js';

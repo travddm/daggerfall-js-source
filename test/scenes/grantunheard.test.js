@@ -1,5 +1,4 @@
-// GRANT-UNHEARD (2026-10-18, Mac: a case in #mod-queue - "3 players' games refused 6 of this account's foes in 10
-// minutes: unsigned 6" - "Is this the system working?"; bible/11-Multiplayer/Spawn-Grants.md section 18): A GRANT NEVER
+// GRANT-UNHEARD: A GRANT NEVER
 // HEARD IS NO FORGERY. The relay drops a foes frame past the room's byte budget (server/src/index.js _foesFan), the full
 // ones - the frames that carry the grants again - first, so in a crowded cell a reader can hold an owner's records and
 // none of its grants for longer than GRANT_VERDICT_WAIT_MS. It was tallied `unsigned`, a case's reason; it is tallied

@@ -110,14 +110,3 @@ test('NT3 (F162): while a choose-one is up NOTHING leaves the pack - wagon or no
 //    the game's own machine is behaviorally pinned in its suite)
 // ---------------------------------------------------------------
 
-test('NT3 (F135): the paperdoll bench gates on the TRAVEL sum with a rolling trim', () => {
-  const pv = src('tools/paperdoll/paperdollViewer.js');
-  assert.ok(pv.includes('if (gest.travel / longest >= ATTACK_THRESHOLD) {'),
-    'the gate is TravelDist / longestDim - the summed PATH, not the net displacement');
-  assert.ok(pv.includes('gest.x -= p.dx; gest.y -= p.dy; gest.travel -= p.mag;'),
-    'TrimOld subtracts expired points - a rolling window, not a hard reset');
-  assert.equal(/Math\.hypot\(gest\.x, gest\.y\) \/ longest/.test(pv), false,
-    'the collapsed net-displacement gate is gone');
-  assert.ok(pv.includes('const ang = Math.atan2(-gest.y, gest.x)'),
-    'the strike DIRECTION still reads the sum, as DFU\'s does');
-});

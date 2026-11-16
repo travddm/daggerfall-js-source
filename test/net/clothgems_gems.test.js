@@ -1,11 +1,11 @@
-// CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids") - EVERY GEM'S GRADE
+// CLOTH-GEMS - EVERY GEM'S GRADE
 // AT THE JEWELLER'S BENCH. The jeweller took DFU's eight and the Pearl alone; the port's graded gems (Chipped, Flawed,
 // Flawless, Perfect - templates 1900-1931, systems/gems.js) were pack-only socket loot and no material at all. The
 // owner's decision: accept every grade. Each grade has a material key (net/professionLaw.js GRADED_GEMS) that enters the
 // Stores by the loose door alone (net/bagLaw.js looseOrder), a recipe id a grade (net/recipeLaw.js JEWEL_GEMS -
 // 'ring:gold:flawless-ruby'), the first-craft key still the pattern at its tier, and a gem's points its grade's own ladder
 // (gemPointsPct over systems/loot/gemGrades.js GEM_GRADE_PRICE). The law, then the real Worker over node:sqlite.
-// bible/06-Systems/Professions-Arc.md 50; bible/06-Systems/Gem-Sockets.md 7.
+// 50; 7.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -49,7 +49,7 @@ test('CLOTH-GEMS law: A MATERIAL KEY A GRADE - the thirty-two graded gems, `gem:
 });
 
 test('CLOTH-GEMS law: THE LOOSE DOOR ALONE - a graded gem is a material a station spends and a withdrawal gives back, and in no market\'s catalogue, no writ\'s choice and no Stores form a pack listing is refused for (mutants: a graded key in MINED_KEYS, the wall lost)', () => {
-  assert.deepEqual(LOOSE_ONLY_KEYS, [...GRADED_GEMS.map((g) => g.key), 'part:daedra-heart']);   // PIN MOVED (DAEDRIC-SMELT, Professions-Arc.md section 53): and the Daedra's Heart - loot's word, no door of the service counts one
+  assert.deepEqual(LOOSE_ONLY_KEYS, [...GRADED_GEMS.map((g) => g.key), 'part:daedra-heart']);
   assert.ok(LOOSE_ONLY_KEYS.every((k) => looseOnly(k) && withdrawable(k) && !MINED_KEYS.includes(k)));
   assert.equal(looseOnly('gem:ruby'), false, 'DFU\'s own gems are the veins\', every door\'s');
   const catalogue = marketCatalogue().map((m) => m.key);
@@ -153,7 +153,7 @@ test('CLOTH-GEMS service: a Flawless Ruby from the pack comes in by the loose do
     give('plank:ghostwood', 'own', 2);
     await put('gem:perfect-amber', 1);
     const wand = await cut('wand:ironwood:perfect-amber');
-    assert.deepEqual([wand.status, wand.body.first, wand.body.xp], [200, true, 6 * 20 + 500], JSON.stringify(wand.body));   // PIN MOVED (FIRST-BUDGET, Professions-Arc 52): Smithing's share, the 500 it always was
+    assert.deepEqual([wand.status, wand.body.first, wand.body.xp], [200, true, 6 * 20 + 500], JSON.stringify(wand.body));
     assert.equal(firstCraftXp(recipeById('wand:ironwood:perfect-amber')), 500);
     give('gem:ruby', 'own', 1);
     const second = await cut('wand:ghostwood:ruby');

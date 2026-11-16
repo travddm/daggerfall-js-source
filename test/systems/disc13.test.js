@@ -1,7 +1,7 @@
-// DISC13 - four Discord reports (2026-09-23, Mac: "Got some bugs for you"). Each was reproduced against the real
+// DISC13 - four Discord reports. Each was reproduced against the real
 // modules before it was touched, and every pin here fails at a40d13e0 and passes with its fix - except A's first,
 // which measures the cause through the motor's own law and stands either way
-// (bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC13).
+// (, DISC13).
 //
 // ── DISC13-A: "The shadows seem to flicker when i move" (icebreyker, a torch in a dungeon) ──
 // The camera draws from the motor's INTERPOLATED eye (motor.js eyeAt, EV1) and every host built the lights in the
@@ -55,7 +55,6 @@ import { perspective } from '../../src/world/mat4.js';
 import { CHAR_SPRITE_RT_SIZE } from '../../src/render/renderer.js';
 import { Collider } from '../../src/player/collider.js';
 import { playerTorchLight } from '../../src/systems/playerTorch.js';
-import { thunderlockMuzzleLight } from '../../src/systems/thunderlock.js';
 import { createPlayerMagic } from '../../src/scenes/hostMagic.js';
 import { candleBase, CANDLE } from '../../src/scenes/magicCandle.js';
 import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
@@ -99,13 +98,12 @@ const RATES = {
   '144 Hz': Array(144).fill(1 / 144),
   '60 Hz, +-1 ms': Array.from({ length: 120 }, () => 1 / 60 + (jitter() - 0.5) * 0.002),
 };
-const torchIn = { _torch: { range: 14 } }, gunIn = { _thunderlockFlash: 1 };
+const torchIn = { _torch: { range: 14 } };
 const HAND = {
   torch: (feet) => playerTorchLight(torchIn, feet, 0),
-  'Thunderlock flash': (feet) => thunderlockMuzzleLight(gunIn, feet, 0),
 };
 
-test('DISC13-A: the torch and the Thunderlock\'s flash hold still against the camera while walking when built on the render feet; on the stepped feet (the hosts\' old read) they slide every frame', () => {
+test('DISC13-A: the torch holds still against the camera while walking when built on the render feet; on the stepped feet (the hosts\' old read) it slides every frame', () => {
   for (const [name, lightOf] of Object.entries(HAND)) {
     for (const [rate, dts] of Object.entries(RATES)) {
       assert.ok(slide(dts, (m) => m.feetAt(), lightOf) < 1e-6, `${name}, ${rate}: rigid to the eye on feetAt`);
@@ -115,14 +113,14 @@ test('DISC13-A: the torch and the Thunderlock\'s flash hold still against the ca
   }
 });
 
-test('DISC13-A: every host builds the hand lights off the render feet - both builders in every light array, and no host hands them player.pos (mutants: any one site back to player.pos)', () => {
+test('DISC13-A: every host builds the hand light off the render feet - the torch\'s builder in every light array, and no host hands it player.pos (mutants: any one site back to player.pos)', () => {
   let sites = 0;
   for (const [file, n] of [['src/scenes/world.js', 2], ['src/scenes/worldModes.js', 2], ['src/scenes/exterior.js', 1], ['src/scenes/dungeon.js', 1]]) {
     const src = rd(file);
-    for (const b of ['playerTorchLight(playerEntity, player.feetAt(), cam.yaw)', 'thunderlockMuzzleLight(playerEntity, player.feetAt(), cam.yaw)']) {
+    for (const b of ['playerTorchLight(playerEntity, player.feetAt(), cam.yaw)']) {
       assert.equal(src.split(b).length - 1, n, `${file}: ${b.slice(0, b.indexOf('('))} in all ${n} arrays`);   // AUDIT DISC19: counted apart - the world host's dungeon arm tints each with the dungeon's colour
     }
-    assert.doesNotMatch(src, /(?:playerTorchLight|thunderlockMuzzleLight)\(playerEntity, player\.pos,/, `${file} hands no builder the stepped feet`);
+    assert.doesNotMatch(src, /playerTorchLight\(playerEntity, player\.pos,/, `${file} hands no builder the stepped feet`);
     sites += n;
   }
   assert.equal(sites, 6);
@@ -190,7 +188,7 @@ test('DISC13-B: the Bandage card offers Use, and Use heals Min(medical/3, MaxHea
   const e = medic([bandage()]);
   withBandageCard(e, ({ acts, press }) => {
     // PLUS10: Enhanced Plus - the default dress since PLUS-DEFAULT - adds Info to every card, last; LOCK1 the lock before it;
-    // HB-LYCFREE: the hotbar, the default since, its Add to hotbar before the lock (PIN MOVED)
+    // HB-LYCFREE: the hotbar, the default since, its Add to hotbar before the lock (
     assert.deepEqual(acts(), ['Drop', 'Use', 'Add to hotbar', 'Lock', 'Info'], 'the card icebreyker saw showed Drop alone');
     press('Use');
   });
@@ -350,7 +348,7 @@ function shipLocationOf({ loc = null, travelOptions = false, ports = [], onShip 
   const line = rd('src/scenes/world.js').split('\n').find((l) => l.includes('shipLocation: () => {'));
   assert.ok(line, 'world.js answers shipLocation');
   const src = line.slice(line.indexOf('() => {'), line.lastIndexOf('; },') + 3);
-  // SEAT2b part two (PIN MOVED): the host asks hasPortFor - HasPort, or a members' Harbour at a seat
+  // SEAT2b part two (
   const make = new Function('_questLoc', 'modSetting', 'hasPortFor', 'isOnShip', 'playerEntity', 'playerTravelPixel', `return (${src});`);
   return make(() => loc, (v, k) => (v === 'travel-options' && k === 'Enabled' ? travelOptions : undefined),
     (mapId) => ports.includes(mapId), () => onShip, { boardShipPosition: null }, () => ({ x: 0, y: 0 }))();

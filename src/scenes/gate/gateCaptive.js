@@ -1,5 +1,5 @@
 // @ts-check
-// WB14f (2026-10-19, Mac: "And whatever else you can cook up"; bible/11-Multiplayer/Breach-Portents.md section 7): THE CAPTIVE
+// WB14f: THE CAPTIVE
 // ON MY SCREEN - a knight of the Covenant (the day's own, net/gate/gateLaw.js captiveNameOf) on his knees at the Pen's heart,
 // chained to his gaolers: the relay's host bodies of kind 7, seen, heard and struck as his host is (scenes/gate/gateHost.js).
 // The last one down, the knight stands free in the Covenant's gold until his ward takes a Dagon's Reckoning (the relay's `cp`,

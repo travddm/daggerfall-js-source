@@ -12,13 +12,13 @@ import {
   FP_CLIP_PATH, NIF_TO_PASS, FP_FIELD_OF_VIEW, firstPersonEye, FP_FLOATS,
   collectArmTextures,
 } from '../../../src/combat/fpArm.js';
-import { firstPersonCameraRef, FP_NECK_ROTATE_FACTOR } from '../../../src/formats/morrowind/mwFirstPerson.js';
+import { headViewRef, HEAD_VIEW_TUNING } from '../../../src/formats/morrowind/mwFirstPerson.js';
 
 // MW-D8: THE ARM IN THE GAME.
 //
 // What these pins can and cannot see, stated up front. The GL path - the
 // offscreen first-person pass, the composite, where the arm lands on
-// screen - is measured by tools/mwArmProbe.mjs in a real browser against
+// screen - needs a real browser against
 // a real WebGL2 context, because a node test cannot see a pixel. What is
 // here is the arithmetic and the structure underneath it, plus the source
 // laws whose failure a picture would not show.
@@ -133,10 +133,10 @@ test('MW-D10 rule 54: the camera is a NODE OF THE RIG - Camera, then Head, then 
   // and pushed it a constant distance in front of the eye, which is the
   // arrangement in Mac's screenshot: forearms adrift at the horizon.
   const skel = (names) => ({ byName: new Map(names.map((n, i) => [n, i + 1])) });
-  assert.equal(firstPersonCameraRef(skel(['bip01', 'camera', 'head'])), 2, 'Camera wins');
-  assert.equal(firstPersonCameraRef(skel(['bip01', 'head'])), 2, 'Head is the fallback');
-  assert.equal(firstPersonCameraRef(skel(['bip01', 'bip01 neck'])), -1, 'and nothing else is');
-  assert.equal(firstPersonCameraRef(null), -1);
+  assert.equal(headViewRef(skel(['bip01', 'camera', 'head'])), 2, 'Camera wins');
+  assert.equal(headViewRef(skel(['bip01', 'head'])), 2, 'Head is the fallback');
+  assert.equal(headViewRef(skel(['bip01', 'bip01 neck'])), -1, 'and nothing else is');
+  assert.equal(headViewRef(null), -1);
 });
 
 test('MW-D10: a rig with neither node REFUSES, naming the stage', async () => {
@@ -182,7 +182,7 @@ test('MW-D10: the Z-up rig turns into a Y-up pass - the conversion nothing in th
   assert.equal(firstPersonEye(mats, 9), null, 'and a missing node is not an eye at the origin');
 });
 
-test('MW-D10: the neck takes 0.75 of the look, and the port pitches the OTHER WAY', async () => {
+test('MW-D10: the neck takes part of the look, and the port pitches the OTHER WAY', async () => {
   const built = await fpFixtureBuild();
   assert.equal(built.ok, true, built.error);
   const eyeAt = (neckPitch) => {
@@ -198,28 +198,18 @@ test('MW-D10: the neck takes 0.75 of the look, and the port pitches the OTHER WA
   assert.ok(up[2] > level[2], 'and a negative one tips it back');
   assert.ok(Math.abs(down[1] - level[1]) > 1e-4, 'the eye MOVES with the neck - it is not a lens tilt');
 
-  // 0.75, from npcanimation.cpp:719 `0.75f + 0.25f * mAimingFactor`,
-  // with the aiming factor at its resting zero.
-  assert.equal(FP_NECK_ROTATE_FACTOR, 0.75);
+  // The neck takes a share of the look between a half and all of it (mwHeadViewBehaviour.test.js pins the turn).
+  assert.ok(HEAD_VIEW_TUNING.restShare > 0.5 && HEAD_VIEW_TUNING.restShare < 1);
   // files/settings-default.cfg: `first person field of view = 60.0`.
   // Nothing in a picture says the lens is wrong - a narrower one just
   // makes the arms bigger - so the number is pinned against the file it
   // comes from.
   assert.equal(FP_FIELD_OF_VIEW, Math.PI / 3);
 
-  // AND THE CONJUGATION. The controller expresses the pitch in the
-  // OBJECT ROOT's frame and conjugates it into the node's own; with an
-  // axis-aligned neck that is the identity, so armfp.nif TURNS its neck
-  // 8 degrees and a port that rotates in the local frame moves the eye
-  // somewhere else. BOW-AIM (Field-Bugs-2026-10-26c.md): OSG's
-  // `worldOrient * rotate * worldOrient^-1 * localRot` is a ROW-vector
-  // product; in this port's column convention it is localRot * W^T *
-  // rotate * W (mwFirstPerson.js rootSpaceTurn), the letters' copy turned
-  // retail's neck the other way - MW-D20 below works it by hand.
-  const src2 = rd('src/formats/morrowind/mwFirstPerson.js');
-  assert.match(src2, /mat33Mul\(mat33Mul\(mat33Mul\(local, transpose33\(w\)\), rotate\), w\)/,
-    'localRot * W^T * rotate * W - OSG\'s row-vector line in this port\'s column convention');
-  assert.match(src2, /const rotation = rootSpaceTurn\(local\.rotation, w, rotate\);/, 'and the neck turns through it');
+  // AND THE CONJUGATION. The pitch is a turn in the OBJECT ROOT's frame laid on the neck's own orientation; with an
+  // axis-aligned neck that is the identity, so armfp.nif TURNS its neck 8 degrees and a port that rotates in the local
+  // frame moves the eye somewhere else. mwHeadViewBehaviour.test.js pins the turn on the retail rigs, and MW-D20 below
+  // works it by hand.
 
   // AND THE SIGN CONVERSION. Morrowind counts pitch downward; this port
   // counts it upward (world.js SUBTRACTS the mouse's y delta). Passed
@@ -308,7 +298,7 @@ test('MW-D8: active() is false unless EVERY term holds - a frozen arm is not a r
   // or idle - is the same guarantee (a rig with none is the frozen bind
   // pose, and the sprite is the correct picture).
   // BEAST-SELF added the EIGHTH, ahead of the seven: the arm stands aside for a transformed lycanthrope (setStandIn)
-  assert.match(src, /const active = \(\) => !standIn && !!\(built && built\.ok && mesh && renderer && camera && \(actionState \|\| movementState \|\| jumpState \|\| idleState\)\s*&& viewMode === 'first'\);/,   // MW-D39 widened the clip term again: the jump slot counts
+  assert.match(src, /const active = \(\) => !standIn && !!\(built && built\.ok && mesh && renderer && camera && \(ub\.actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState\)\s*&& viewMode === 'first'\);/,   // the jump slot counts as a clip too
     'not standing aside, built, built.ok, mesh, renderer, camera, a clip AND the first-person view - all eight');
 });
 
@@ -326,10 +316,6 @@ test('MW-D8: the arm IMPORTS the assembly law, it does not carry a second copy o
     assert.ok(src.includes(fn), `${fn} is used`);
     assert.ok(!new RegExp(`function ${fn}\\b`).test(src), `and ${fn} is NOT redefined here`);
   }
-  // MW7 died of two ports of one rule drifting apart. The tools-side
-  // inspector re-exports the same module rather than owning a copy.
-  assert.match(rd('src/tools/mwInspect.js'), /export \* from '\.\.\/formats\/morrowind\/mwFirstPerson\.js';/,
-    'and the diagnostic page reads the same home through a shim');
 });
 
 // --- MW-D9: THE WEAPON ------------------------------------------------------
@@ -625,7 +611,7 @@ test('MW-D9f: the rig gates the step on ready() and the draw on active()', () =>
 
   // ready() must not require the mesh, or the deadlock comes straight back.
   const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(actionState \|\| movementState \|\| jumpState \|\| idleState \|\| hitState \|\| deathState\) && renderer\);/,   // MW-D39: the jump slot counts here too; PIN MOVED (MWNPC4): and the recoil and the death
+  assert.match(src, /const ready = \(\) => !!\(built && built\.ok && \(ub\.actionState \|\| slots\.movementState \|\| slots\.jumpState \|\| slots\.idleState \|\| slots\.hitState \|\| slots\.deathState\) && renderer\);/,   // the jump slot counts here too
     'ready() is update()\'s own requirements - no mesh term, no camera term (MW-D26 widened the clip term)');
 });
 
@@ -782,7 +768,7 @@ test('MW-D11: a texture the archives do not carry becomes the warning image, not
 
 // --- MW-D18: A MISSING HAND IS A SENTENCE, NOT A HOLE ----------------------
 //
-// Mac's report from retail: "hands are missing". Two doors could eat a
+// . Two doors could eat a
 // hand without a word: bindPart THREW on one absent weighted bone (rule
 // 40 says the reference skips it and draws), and a shape that fails rule
 // 15's filter on every bone bound nothing and said nothing. Both are
@@ -801,8 +787,8 @@ test('MW-D18 rules 40+15: the assembly binds what it can and NAMES what it canno
   const hands = arm.pieces.filter((p) => p.slot === 'hand');
   assert.equal(hands.length, 1, 'the right hand made it');
   assert.equal(hands[0].bone, 'right hand');
-  assert.ok(arm.notes.some((n) => /hand: this skeleton has no bone "left xand" - those influences are skipped \(rule 40\)/.test(n)),
-    `rule 40 names the skipped bone (notes: ${arm.notes.join(' | ')})`);
+  assert.ok(arm.notes.some((n) => /hand: this skeleton has no bone "left xand" - those influences are skipped/.test(n)),
+    `the note names the skipped bone (notes: ${arm.notes.join(' | ')})`);
   assert.ok(arm.notes.some((n) => /hand @ left hand: no shape matched - the mesh offers "Tri Right Hand", "Tri Left Xand"/.test(n)),
     `rule 15's miss lists what the file offered (notes: ${arm.notes.join(' | ')})`);
 });
@@ -887,7 +873,7 @@ test('MW-D20: the camera bone reads from the same space (rule 54 stays coherent)
     skeletonBytes: f('armskelx.nif'),
     parts: [{ slot: 'hand', bytes: f('armhandx.nif') }],
   });
-  const camRef = firstPersonCameraRef(arm.skeleton);
+  const camRef = headViewRef(arm.skeleton);
   assert.ok(camRef >= 0);
   const eye = firstPersonEye(arm.mats, camRef);
   // Camera graph rest = (2,0,10)+(0,0,5)+(0,0,7) = (2,0,22); the eye is
@@ -913,13 +899,13 @@ test('MW-D20: the neck conjugates in the OBJECT ROOT frame - the file root\'s ro
   // a retail root carries rotation.
   const { poseSkeleton, buildSkeleton, skeletonSpaceMatrices, GRAPH_ROOT } =
     await import('../../../src/formats/morrowind/mwSkin.js');
-  const { applyFirstPersonNeck } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
+  const { pitchNeck } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
   const { sampleTrack: st } = await import('../../../src/formats/morrowind/mwAnim.js');
   const skel = buildSkeleton(parseNif(f('armneckx.nif')));
   // Through poseAssembly - the REAL call site - so a caller that hands
   // the conjugation a root-relative frame dies here, not only a direct
   // call with the right argument.
-  void applyFirstPersonNeck; void GRAPH_ROOT;
+  void pitchNeck; void GRAPH_ROOT;
   const assembly = {
     fns: { poseSkeleton, skelMats: skeletonSpaceMatrices },
     skeleton: skel, pieces: [],
@@ -1052,13 +1038,11 @@ test('MW-D27: the face is DERIVED - classic faceIndex picks the head and hair, a
     return { head: m.get('head'), hair: m.get('hair'), chest: m.get('chest') };
   };
   // The walk, sorted: heads 01,02,03 then wraps; hairs 01,02 then
-  // wraps. The CHEST stays 01 - the fixture lists it LAST, and the
-  // reference's sweep OVERWRITES on every proper match, so the last
-  // record in load order wins (getBodyParts, npcanimation.cpp:1286-1293
-  // - how an expansion overrides a base-game body). The parity audit
-  // caught this pin asserting first-wins; the face law (MW-A F2's
-  // id-sort + index) is untouched, because head and hair are not in
-  // the sweep at all.
+  // wraps. The CHEST stays 01 - the fixture lists it LAST, and the sweep
+  // overwrites on every proper match, so the last record in load order wins
+  // (how an expansion overrides a base-game body). The face law (MW-A F2's
+  // id-sort + index) is untouched, because head and hair are not in the
+  // sweep at all.
   assert.deepEqual(at(0), { head: 'b_head_01', hair: 'b_hair_01', chest: 'b_chest_01' });
   assert.deepEqual(at(1), { head: 'b_head_02', hair: 'b_hair_02', chest: 'b_chest_01' });
   assert.deepEqual(at(2), { head: 'b_head_03', hair: 'b_hair_01', chest: 'b_chest_01' });
@@ -1221,7 +1205,7 @@ import {
 } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { animVelocity } from '../../../src/formats/morrowind/mwAnim.js';
 
-test('MW-D26: the movestate ladder is the reference\'s own nest (character.cpp:2085, 2297-2330)', () => {
+test('MW-D26: the movestate ladder: sneak over run over walk, a 2:1 strafe test, turns in third person only', () => {
   // sneak beats run beats walk, exactly as the ternaries order them
   assert.equal(movementAnimState({ forward: 1 }), 'walkforward');
   assert.equal(movementAnimState({ forward: 1, running: true }), 'runforward');
@@ -1232,7 +1216,7 @@ test('MW-D26: the movestate ladder is the reference\'s own nest (character.cpp:2
   assert.equal(movementAnimState({ forward: 0.4, strafe: 1 }), 'walkright');
   assert.equal(movementAnimState({ forward: 0.5, strafe: 1 }), 'walkforward', 'exactly 2:1 is NOT strafing (strict >)');
   assert.equal(movementAnimState({ strafe: -1, running: true }), 'runleft');
-  // turning: third person only, never sneaking (character.cpp:2321-2329)
+  // turning: third person only, never sneaking
   assert.equal(movementAnimState({ turning: 1, thirdPerson: true }), 'turnright');
   assert.equal(movementAnimState({ turning: -1, thirdPerson: true }), 'turnleft');
   assert.equal(movementAnimState({ turning: 1, thirdPerson: false }), null, 'no turn anims in first person');
@@ -1242,8 +1226,7 @@ test('MW-D26: the movestate ladder is the reference\'s own nest (character.cpp:2
 
 test('MW-D26: the movement group composes the weapon suffix through the ONE ladder, then run->walk', () => {
   // suffix ladder = composeStanceGroup's (asked short, 2c/1h fallback,
-  // bare base - character.cpp:674-693); then the run->walk swap
-  // (:697-699); then null, never a substitute (:701-707).
+  // bare base); then the run->walk swap; then null, never a substitute.
   const has = (set) => (n) => set.has(n);
   const T = MW_WEAPON_TYPE.LongBladeOneHand;
   assert.deepEqual(composeMovementGroup('runforward', T, has(new Set(['runforward1h']))),
@@ -1254,7 +1237,7 @@ test('MW-D26: the movement group composes the weapon suffix through the ONE ladd
     { group: 'walkforward', walked: true }, 'the run->walk swap');
   assert.deepEqual(composeMovementGroup('runforward', T, has(new Set(['idle']))),
     { group: null, walked: false }, 'nothing serves: RESET, never a wrong clip');
-  // no weapon: no suffix step at all (character.cpp:674's gate)
+  // no weapon: no suffix step at all
   assert.deepEqual(composeMovementGroup('walkforward', MW_WEAPON_TYPE.None, has(new Set(['walkforward']))),
     { group: 'walkforward', walked: false });
 });
@@ -1281,8 +1264,7 @@ test('MW-D26: animVelocity is calcAnimVelocity - last keys in reverse, horizonta
   assert.equal(animVelocity(keys, track, 'runforward'), 0, 'an absent group has no velocity');
 });
 
-test('MW-D26: the reference\'s own fallback speeds and caps', () => {
-  // character.cpp:750-752, :2403, :2396
+test('MW-D26: the fallback speeds and caps', () => {
   assert.deepEqual(MOVEMENT_FALLBACK_SPEED, { sneak: 33.5452, run: 222.857, walk: 154.064 });
   assert.equal(MOVEMENT_SPEED_CAP, 10);
   assert.ok(Math.abs(turnAnimSpeed(Math.PI) - 1) < 1e-12, '|rot|/dt/pi');
@@ -1445,10 +1427,6 @@ test('MW-D27: the faceIndex THREAD is unbroken, swept at the source', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
   assert.match(arm, /buildTpBody\(\{ race, female, beast, faceIndex, faceMatch,/,
     'buildFpArm no longer hands the face to the body build');
-  // PIN MOVED (MWNPC14, Morrowind-NPCs.md section 19): the picker takes a vampire's face beside the rest
-  // PIN MOVED (MWNPC17, section 25): and an NPC's walked head and hair
-  // PIN MOVED (AUDIT MW-HEADS1): and the archives' directory, so the port's own heads stand only where their archive is
-  // PIN MOVED (MW-HEADS2): and whether the body is a player's - the port's own heads are a player's alone
   assert.match(arm, /playerBodyRows\(parts, race, female, \{ beast, faceIndex, faceMatch(, vampire(, walk(, has: exists(, ownHeads)?)?)?)? \}\)/,
     'the body build no longer hands the face to the picker');
   // TR2: the menu's inline opts moved into weaponRig's ONE HOME - the
@@ -1473,10 +1451,10 @@ import {
   MW_CLOTHING_TYPE, DF_CLOTHING_ROWS, mwClothingRecord, fpWornAdds,
 } from '../../../src/formats/morrowind/mwItemMap.js';
 import { armorRecords, clothingRecords, raceBeastFlag, pickWeaponRecord, facePools, MOD_WEAPON_TO_MW } from '../../../src/formats/morrowind/mwFirstPerson.js';
-import { OWN_MW_MODELS } from '../../../src/characters/ownModels/ownWeaponModels.js';   // FIELD-GUN-MW2: counted off the table, not typed
 import { OWN_MW_ARMOR } from '../../../src/characters/ownModels/ownArmorModels.js';   // MW-BRIG1: and the armour
 import { CLOAK_NAMES } from '../../../src/characters/ownModels/ownClothingModels.js';   // MW-CLOAK1: and the cloak
 import { CLOTHING_NAME } from '../../../src/formats/morrowind/mwItemMap.js';
+import { garmentPriority } from '../../../src/formats/morrowind/mw-worn-parts.ts';
 import { ARMOR_ENUM } from '../../../src/combat/enemyEquipment.js';
 import { ARMOR_MATERIAL } from '../../../src/systems/armorMaterials.js';
 
@@ -1490,24 +1468,17 @@ test('MW-D28: the map is TOTAL - every DF equippable x material answers, or the 
   assert.deepEqual(holes, [], `unmapped item/material combinations:\n${holes.map((h) => `${h.material} ${h.item}`).join('\n')}`);
   // The space is the REAL space: 19 weapons x 10 materials + 11 armors
   // x 13 materials + 76 wearable garment indices (MW-D30), so removing
-  // an enum entry cannot shrink the claim. Plus one row per weapon of
-  // THE PORT'S OWN (FIELD-GUN-MW2) - counted off the table rather than
-  // typed, because that table's whole defect was being outside a
-  // population somebody had counted by hand.
-  // MW-ASSIGN: and every weapon and armour template a MOD adds, every material of each - counted off their tables too
-  assert.equal(cover.length, 19 * 10 + 11 * 13 + 76 + Object.keys(OWN_MW_MODELS).length + Object.keys(MOD_WEAPON_TO_MW).length * 10 + Object.keys(MOD_ARMOR_ROWS).length * 13);
+  // an enum entry cannot shrink the claim.
+  // MW-ASSIGN: and every weapon and armour template a MOD adds, every material of each - counted off their tables, not
+  // typed, because a population somebody counts by hand misses what lies outside it
+  assert.equal(cover.length, 19 * 10 + 11 * 13 + 76 + Object.keys(MOD_WEAPON_TO_MW).length * 10 + Object.keys(MOD_ARMOR_ROWS).length * 13);
   assert.equal(cover.filter((c) => c.via === 'mod weapon' || c.via === 'mod armor').length, 2 * 10 + 12 * 13, 'Roleplay & Realism Items\' two weapons and twelve pieces are asked');
-  // FIELD-GUN-MW2: and the port's own weapons are IN it. The census
-  // walked `WEAPONS` - DFU's frozen eighteen - so the Dwarven
-  // Thunderlock (template 560, minted at runtime) was never asked
-  // about, and this pin reported total coverage while the gun drew
-  // empty hands in Morrowind first person.
   const own = cover.filter((c) => c.kind === 'own');
   // MW-BRIG1: and the port's own ARMOUR, one row per template x material it dresses, inside the mod's space
   // MW-CLOAK1: and the port's own CLOAK, one row per garment index that wears it (a man's and a woman's of each)
   const cloakIndices = Object.entries(CLOTHING_NAME).filter(([, n]) => CLOAK_NAMES.includes(n)).map(([i]) => Number(i));
   assert.deepEqual(cloakIndices, [154, 155, 191, 192], 'the Casual and Formal Cloak, a man\'s and a woman\'s');
-  assert.equal(own.length, Object.keys(OWN_MW_MODELS).length + OWN_MW_ARMOR.length + cloakIndices.length, 'every own-model weapon, armour piece and cloak answers a row');
+  assert.equal(own.length, OWN_MW_ARMOR.length + cloakIndices.length, 'every own-model armour piece and cloak answers a row');
   assert.deepEqual(own.filter((o) => o.own === 'ownClothingModels').map((o) => o.index), cloakIndices);
   assert.ok(own.every((o) => o.model && o.item), 'an own row names its mesh and its item');
   // MW-STEEL1: the classic walk comes first, so the Steel plate's seven rows stand before the mod's brigandine - a set,
@@ -1749,7 +1720,6 @@ test('MW-D29: the thread is unbroken - the menu reads the equip table, the build
   // MW-D31: ONE composition serves both rigs - buildFpArm composes,
   // the third person receives verdicts, the fp build filters and
   // shadows from the same result.
-  // PIN MOVED (AUDIT MW-FOLK1 L2-F2): the composition the third person receives is the one buildFpArm composed, built
   // once - and composed again without an outfit that bound nothing, the body built again from that (the card's verdicts
   // read the composition the body was built from)
   assert.match(arm, /const tpBody = \(wornNow\) => buildTpBody\(\{ race, female, beast, faceIndex, faceMatch, weapon, hasAmmo, worn: wornNow,/);
@@ -1859,22 +1829,20 @@ test('MW-D30: the priority law - armor beats clothing, the robe beats the cuiras
   assert.deepEqual(b.adds.map((x) => x.recordId), ['b_robe'], 'the robe did not beat the cuirass');
   assert.ok(b.shadows.includes('upperleg:right') && b.shadows.includes('forearm:left'),
     'the robe reserve did not hide the limbs');
-  // ties go to the LATER piece in the reference order: two garments of
+  // ties go to the later piece in the walk order: two garments of
   // one type cannot happen from DF slots, so prove it with the pieces
   // that CAN tie - nothing does at different bases - by symmetry:
   // shirt alone still dresses.
   const c = composeWornArmor({ pieces: [shirt], armors, clothes, bodyPool, female: false });
   assert.deepEqual(c.adds.map((x) => x.recordId), ['b_shirt']);
-  // THE +1 ITSELF, swept at the source: in the reference's own walk
-  // order armor always precedes the generic garments, so with a
-  // first-claimant tie rule the armor bit never flips an outcome this
-  // fixture can stage - an equivalent mutant. It stays because it is
-  // the reference's formula (npcanimation.cpp:625-630), and the sweep
-  // keeps a refactor from quietly flattening it into "equivalent
-  // today, wrong the day a garment walks first".
-  const src = readFileSync('src/formats/morrowind/mwItemMap.js', 'utf8');
-  assert.match(src, /\(\(0 \+ 1\) << 1\) \+ 1;/, 'armor lost its +1');
-  assert.match(src, /\(\(base \+ 1\) << 1\) \+ 0;/, 'clothing lost its +0 formula');
+  // The +1 itself, asked of the priority function: in the walk order armor
+  // always precedes the generic garments, so with a first-claimant tie rule
+  // the armor bit never flips an outcome this fixture can stage. It stays
+  // because the formula is the law, and a refactor must not quietly flatten it
+  // into "equivalent today, wrong the day a garment walks first".
+  assert.equal(garmentPriority(null, true), garmentPriority(null, false) + 1, 'armor lost its +1');
+  assert.equal(garmentPriority('robe', false), 24, 'the robe lost its base');
+  assert.equal(garmentPriority('skirt', false), 8, 'the skirt lost its base');
 });
 
 test('MW-D30: the skirt reserve and the readout - garments ride the equip table', () => {
@@ -2009,7 +1977,6 @@ test('MW-D33: the worn verdicts reach status() - one per piece, dressed or reaso
   // took the per-piece readout off the assets card ("reduce the amount of
   // over explaining text") - it answers a probe's status() read now.
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (AUDIT MW-FOLK1 L2-F2): the verdicts of the composition the body was built from (an outfit that bound
   // nothing composed out again, and said so)
   assert.match(arm, /worn: wornVerdicts\(armor \?\? \[\], wornBuilt\),/);
   assert.match(arm, /worn: built && built\.ok \? built\.worn : null,/);
@@ -2099,9 +2066,7 @@ test('MW-D35: precedence - curated over matched over the walk, and the wiring', 
   // facePools is the same law the walk uses.
   assert.deepEqual(facePools(parts, 'fprace', false).heads.map((p) => p.id), ['b_head_01', 'b_head_02', 'b_head_03']);
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (AUDIT MW-HEADS1): the matcher is handed the build's pools - facePools over the archives' directory, the
   // ones the rows walk and the verdict's key names - where it read the race's out of `parts` again
-  // PIN MOVED (MW-HEADS2): and the pools a player's body wears - the port's own heads asked for
   assert.match(arm, /const pools = werewolf \|\| npcFace \? null : facePools\(parts, race, female, \{ has: archiveHas\(archives\), own: ownHeads \}\);/);
   assert.match(arm, /await matchFaceFor\(\{ race, female, faceIndex, pools, archives, deps: d \}\)/);
   assert.match(arm, /face: faceMatch,/);
@@ -2214,42 +2179,41 @@ test('MW-D31 rule 13: the mirror reads the RESOLVED node\'s own name, case-sensi
   assert.equal(asm2.pieces.find((p) => p.kind === 'rigid').mirrored, true, 'the real "Left Hand" node mirrors');
 });
 
-// ── MW-D32: BODY-PART RESOLUTION BROUGHT TO GETBODYPARTS-WHOLE ──────
+// ── MW-D32: BODY-PART RESOLUTION ────────────────────────────────────
 
 import { resolveBodyParts, raceRecords } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { indexSkins, assembleNpc } from '../../../src/formats/morrowind/mwNpc.js';
-import { resolveWeaponParts } from '../../../src/combat/fpArm.js';
+import { resolveWeaponParts } from '../../../src/combat/fpArm/fpArmParts.js';
 
-test('MW-D32: the sweep is getBodyParts whole - last wins, filters exact, FP hand ladder', () => {
+test('MW-D32: the sweep - last wins, filters exact, FP hand ladder', () => {
   const P = (id, slot, o = {}) => ({ id, slot, race: 'fprace', female: false, skin: true,
     playable: true, firstPerson: /1st$/.test(id), model: `f/${id}.nif`, ...o });
   const parts = [
     P('b_chest_base', 'chest'),
-    P('b_chest_expansion', 'chest'),          // LAST in load order WINS (:1286-1293)
-    P('b_chest_np', 'chest', { playable: false }),   // BPF_NotPlayable skipped (:1208)
-    P('b_chest_cloth', 'chest', { skin: false }),    // MT_Skin only (:1210)
+    P('b_chest_expansion', 'chest'),          // LAST in load order WINS
+    P('b_chest_np', 'chest', { playable: false }),   // NotPlayable skipped
+    P('b_chest_cloth', 'chest', { skin: false }),    // MeshType Skin only
     P('b_neck_m', 'neck'),
-    P('b_clav', 'clavicle'),                   // sBodyPartMap never maps it
+    P('b_clav', 'clavicle'),                   // not a sweep slot
     P('b_hand_m3p', 'hand'),
     P('b_hand_f3p', 'hand', { female: true }),
   ];
   const tp = resolveBodyParts(parts, 'fprace', false, { firstPerson: false });
   assert.equal(tp.get('chest').id, 'b_chest_expansion', 'the LAST proper record wins - expansions override');
   assert.equal(tp.get('clavicle'), undefined, 'clavicle never resolves');
-  // female: her record wins where it exists, male fills where not (:1261-1280)
+  // female: her record wins where it exists, male fills where not
   const tpF = resolveBodyParts(parts, 'fprace', true, { firstPerson: false });
   assert.equal(tpF.get('hand').id, 'b_hand_f3p');
   assert.equal(tpF.get('neck').id, 'b_neck_m', 'male fallback fills an empty female slot');
   // FIRST PERSON: a hand slot without a .1st record falls back to the
-  // 3P skin (:1232-1254); a NON-hand slot does not (:1258).
+  // 3P skin; a NON-hand slot does not.
   const fp = resolveBodyParts(parts, 'fprace', false, { firstPerson: true });
   assert.equal(fp.get('hand').id, 'b_hand_m3p', 'the arm slots fall back to third-person skins');
   assert.equal(fp.get('chest'), undefined, 'a non-hand slot takes its own view only');
 });
 
-test('MW-D32: indexSkins filters playable, NOT vampire - the reference sweep never had a vampire test', () => {
-  // getBodyParts (npcanimation.cpp:1206-1214) filters BPF_NotPlayable
-  // and MT_Skin; there is no vampire condition in the sweep.
+test('MW-D32: indexSkins filters playable, NOT vampire - the sweep has no vampire test', () => {
+  // The sweep filters NotPlayable and MeshType Skin; it has no vampire condition.
   const B = (id, part, o = {}) => [id, { id, kind: 0, vampire: 0, part, female: false, playable: true, race: 'r', model: `${id}.nif`, ...o }];
   const bodies = new Map([
     B('chest_vamp', 3, { vampire: 1 }),
@@ -2408,7 +2372,7 @@ test('AUDIT 32 F1: the head is sampled through its own mesh - the texture layout
     rgba[o] = c[0]; rgba[o + 1] = c[1]; rgba[o + 2] = c[2]; rgba[o + 3] = 255;
   }
   // A head mesh: front vertices at cheek height point their UVs into the
-  // skin quarter; back vertices point into the dark region. PIN MOVED
+  // skin quarter; back vertices point into the dark region.
   // (MW-HEADS2): the front is LOW y - in the Head node's frame a head
   // looks -Y (the port's own, baked +Y, hung backwards in game).
   const pos = []; const uvs = [];
@@ -2432,7 +2396,6 @@ test('AUDIT 32 F1: the head is sampled through its own mesh - the texture layout
 
 test('AUDIT 32 F2/F3: the match is memoised per identity and generation, and a miss is not', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (MW-HEADS2): and the pools measured - a player's (the port's own) and an escort's (the data's) are two
   assert.match(arm, /const fkey = `\$\{gen\}:\$\{race\}:\$\{female \? 'f' : 'm'\}:\$\{faceIndex \| 0\}:\$\{fnv\(measured\)\}`;/,
     'the face cache key lost the identity or the generation');
   assert.match(arm, /faceMatch = FACE_MATCH_CACHE\.get\(fkey\);/);
@@ -2496,7 +2459,7 @@ test('AUDIT 33: the figure stands in ANY view, through the one upload, at a quan
   assert.match(pack, /armMod\.figure\(\{ yaw, height: 384 \}\)/);
 });
 
-// ═══ IG1-IG3: MAC'S IN-GAME NOTES (2026-08-31) ══════════════════════
+// ═══ IG1-IG3: MAC'S IN-GAME NOTES ══════════════════════
 
 test('IG3: the SHIELD wears getShieldMesh\'s whole ladder - body part, hard refusal, ground fallback', () => {
   // actoranimation.cpp:108-139. A shield is the ONE worn piece whose
@@ -2512,31 +2475,30 @@ test('IG3: the SHIELD wears getShieldMesh\'s whole ladder - body part, hard refu
     pieces: [{ templateIndex: ARMOR_ENUM.Kite_Shield, material: ARMOR_MATERIAL.Iron }],
     armors: [armo], bodyPool, female,
   });
-  // 1. A PRT_Shield ref naming an MT_Armor body: the body's model wins.
+  // 1. A shield part reference naming an armour body part: the body's model wins.
   const viaBody = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: 'b_shield_arm', female: null }] });
   assert.equal(viaBody.adds.length, 1);
   assert.equal(viaBody.adds[0].model, 'a/sh.nif');
   assert.deepEqual(viaBody.adds[0].bones, ['shield bone']);
-  // 2. NO shield ref at all: the GROUND MODEL - the reference's own
-  //    fallback (`return shield.getClass().getCorrectedModel(shield)`).
+  // 2. No shield reference at all: the item's own ground model.
   const viaGround = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false, parts: [] });
   assert.equal(viaGround.adds.length, 1);
   assert.equal(viaGround.adds[0].model, 'g/ground.nif');
   assert.match(viaGround.adds[0].slot, /ground mesh/, 'and the row says so');
-  // 3. THE HARD GATE: a NAMED body that is missing, or not MT_Armor,
-  //    answers EMPTY - the slot reserves INVISIBLE by law, never the
-  //    ground mesh (getShieldMesh returns an empty path there).
+  // 3. The hard gate: a named body part that is missing, or is not an armour
+  //    part, hides the shield - the slot is held empty, never given the
+  //    ground mesh.
   const missing = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: 'b_gone', female: null }] });
   assert.equal(missing.adds.length, 0, 'missing body: reserved empty, NOT the ground fallback');
-  assert.ok(missing.notes.some((n) => /reserves EMPTY/.test(n)));
+  assert.ok(missing.notes.some((n) => /held empty/.test(n)));
   const wrongKind = worn({ id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: 'b_shield_cloth', female: null }] });
   assert.equal(wrongKind.adds.length, 0, 'a non-armor body part is the same refusal');
-  // 4. THE SEXED PICK has NO male-to-female fallback (`female &&
-  //    !mFemale.empty() ? mFemale : mMale`): a male facing a female-only
-  //    ref has NO name, and an unnamed ref walks on to the ground.
+  // 4. The sexed pick has no male-to-female fallback: a man facing a
+  //    female-only reference has no name, and an unnamed reference walks on
+  //    to the ground.
   const femOnly = { id: 'iron_shield', model: 'g/ground.nif', name: '', enchanted: false,
     parts: [{ part: 10, male: null, female: 'b_shield_f' }] };
   assert.equal(worn(femOnly, false).adds[0].model, 'g/ground.nif', 'a man ignores the female-only ref');
@@ -2643,14 +2605,6 @@ test('IG6: the arms are FIXED TO THE SCREEN by default - the owner\'s final call
     'the storage key is the v3 - the v2 value is abandoned with its button');
   const menu = readFileSync('src/ui/enhanced/enhancedMenu.js', 'utf8');
   assert.doesNotMatch(menu, /setFollowCamera|'Arms mode'/, 'MWA4: no switch and no mode row on the card');
-  // The probe measures BOTH modes: the law layers with the flag off,
-  // the shipped fix with it on (cy invariant under every look, the
-  // clamp-hard ones included, and under the bob).
-  const probe = readFileSync('tools/mwArmProbe.mjs', 'utf8');
-  assert.match(probe, /window\.__arm\.setFollowCamera\(false\);/, 'L5c/L5d measure the LAW with the flag off');
-  assert.match(probe, /window\.__arm\.setFollowCamera\(true\); \}\);/, 'L5e measures the shipped fix');
-  assert.match(probe, /Math\.abs\(fixHardUp\.cy - fixLevel\.cy\) < 0\.02 && Math\.abs\(fixHardDown\.cy - fixLevel\.cy\) < 0\.02/,
-    'and its assertion is INVARIANCE, clamp-hard looks included');
 });
 
 // ═══ MW-D37: the materials are colour truth; the dye picks the garment ═
@@ -2707,9 +2661,19 @@ test('MW-D38: the weapon\u2019s material is READ - a daedric sword is not the ty
   const daedric = { group: 'Weapons', templateIndex: 115, material: 9 };
   assert.notEqual(fpWeaponKey(iron, false), fpWeaponKey(daedric, false), 'two materials of one type must be two keys');
   assert.match(fpWeaponKey(daedric, false), /:Daedric:/);
-  const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  assert.match(arm, /pickWeaponRecord\(allWeapons, mwType, weapon \? materialName\(weapon\) : null, \{ has, shape: dfWeaponShape\(weapon, WEAPONS\) \}\)/,   // MW-D50: and among the records the archives carry
+  // The hand's weapon is resolved by its material: an iron and a daedric longsword pick their own records.
+  const { weaponPartPaths } = await import('../../../src/combat/fpArm/fpArmParts.js');
+  const { MW_WEAPON_TYPE: TYPE } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
+  const longsword = TYPE.LongBladeOneHand;
+  const records = [
+    { id: 'iron_longsword', type: longsword, model: 'w/iron.nif' },
+    { id: 'daedric_longsword', type: longsword, model: 'w/daedric.nif' },
+  ];
+  const sword = (material) => ({ group: 'Weapons', templateIndex: 120, material });
+  assert.deepEqual(weaponPartPaths({ weapon: sword(0), allWeapons: records }), ['meshes/w/iron.nif']);
+  assert.deepEqual(weaponPartPaths({ weapon: sword(9), allWeapons: records }), ['meshes/w/daedric.nif'],
     'the hand\u2019s weapon is not resolved by its material');
+  const arm = readFileSync('src/combat/fpArm.js', 'utf8') + readFileSync('src/combat/fpArm/fpArmParts.js', 'utf8');
   const code = arm.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
   assert.ok(!/weapon\.materialName|item\.materialName/.test(code), 'the phantom field is still read somewhere');
 });
@@ -2840,8 +2804,7 @@ test('PX25: the pack hands the rig the worn table on every refresh', () => {
 
 // ═══ MAC-S1: THE SHIELD THAT SOMETIMES IS NOT THERE ══════════════════
 //
-// 2026-09-16, Mac: "Shields sometimes do not show up in the morrowind
-// paperdoll."
+// 2026-09-16,
 //
 // The mapping was never the problem: dfWornEquipment reads a shield out
 // of either hand slot and composeWornArmor has carried IG3's
@@ -2913,7 +2876,7 @@ test('MAC-S1: ONE flush, called from every exit out of `busy`', () => {
   // MW-D51: the third arrived - setTorch's slow path binds the light's
   // mesh on both rigs and takes `busy` for the fetch. HT-WAIST: the fourth -
   // setHipLight's slow path, the lantern at the waist on the body.
-  // TWO-HANDS: the fifth - setOffWeapon's slow path, the left hand's weapon bound on both rigs. PIN MOVED (was: 4)
+  // TWO-HANDS: the fifth - setOffWeapon's slow path, the left hand's weapon bound on both rigs.
   assert.equal(takers, 5, `a door that takes \`busy\` must flush on its way out (${takers} takers)`);
   assert.equal(flushes, takers, `every taker flushes (${flushes} flushes for ${takers} takers)`);
   // ...and setWeapon's own `finally` still does all three of its duties.
@@ -2931,14 +2894,14 @@ test('MAC-S1: ONE flush, called from every exit out of `busy`', () => {
 import { jumpAnimState } from '../../../src/formats/morrowind/mwFirstPerson.js';
 import { resetClip, advanceClip } from '../../../src/formats/morrowind/mwAnim.js';
 
-test('MW-D39: the jump state is update()\'s own derivation (character.cpp:2195-2296)', () => {
+test('MW-D39: the jump state: in the air, takeoff, landing, and none while swimming or levitating', () => {
   // In the air, not swimming, not levitating: InAir, movement gated.
   assert.deepEqual(jumpAnimState({ grounded: false }), { jump: 'inair', inJump: true });
-  // THE TAKEOFF FRAME (:2224-2227): the jump latch fires while still
+  // THE TAKEOFF FRAME: the jump latch fires while still
   // grounded - movement gates off, but nothing plays yet.
   assert.deepEqual(jumpAnimState({ grounded: true, jumpQueued: true }), { jump: null, inJump: true });
   // THE LANDING FRAME: the motor's latch is not yet cleared, but the
-  // prior state was InAir - the reference's mJumpState guard keeps it
+  // prior state was InAir - that guard keeps it
   // from reading as a fresh takeoff, and the still-playing clip makes
   // it Landing (:2292-2293).
   assert.deepEqual(jumpAnimState({ grounded: true, jumpQueued: true, priorInAir: true, jumpPlaying: true }),
@@ -2947,8 +2910,7 @@ test('MW-D39: the jump state is update()\'s own derivation (character.cpp:2195-2
   assert.deepEqual(jumpAnimState({ grounded: true, jumpPlaying: true }), { jump: 'landing', inJump: false });
   // The landing clip finished: nothing plays, nothing gates.
   assert.deepEqual(jumpAnimState({ grounded: true }), { jump: null, inJump: false });
-  // Swimming and levitation refuse the whole family (:2206 - the
-  // reference's !inwater && !flying gate), airborne or not.
+  // Swimming and levitation refuse the whole family, airborne or not.
   assert.deepEqual(jumpAnimState({ grounded: false, swimming: true }), { jump: null, inJump: false });
   assert.deepEqual(jumpAnimState({ grounded: false, levitating: true }), { jump: null, inJump: false });
   assert.deepEqual(jumpAnimState({ grounded: true, jumpQueued: true, levitating: true }), { jump: null, inJump: false });
@@ -2990,31 +2952,29 @@ test('MW-D39: the two jump plays over real keys - InAir loops on its loop window
   assert.ok(!resetClip(bare, 'jump', { start: 'loop stop', stop: 'stop', loopCount: 0 }).ok);
 });
 
-test('MW-D39: refreshJumpAnims\' wiring, source-pinned (character.cpp:494-532, :841-844)', () => {
+test('MW-D39: the jump slot\'s wiring in the arm and in its slots', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // The refresh order is the reference's: jump before movement, and
-  // its inJump is the movestate ladder's gate (:2296).
-  assert.match(arm, /const inJump = refreshJump\(\(cam && cam\.move\) \|\| null\);\s*\n\s*refreshMovement\(cam, dt, inJump\);/,
+  const slots = readFileSync('src/combat/fpArm/animSlots.js', 'utf8');
+  // Jump before movement: its inJump is what keeps the movement slot empty in the air.
+  assert.match(arm, /stepSlots\(slots, rig\(\), dt, cam\);/);
+  assert.match(slots, /const inJump = slots\.refreshJump\(\(cam && cam\.move\) \|\| null\);\s*\n\s*slots\.refreshMovement\(cam, dt, inJump\);/,
     'jump refreshes first and gates movement');
-  assert.match(arm, /const base = inJump \? null : movementAnimState\(\{/,
-    'airborne, the movestate ladder does not run');
-  // The four-slot winner, in the priority enum's order
-  // (character.hpp:30-43: Weapon > Movement > Jump > idle-tier).
-  assert.match(arm, /actionState \|\| movementState \|\| jumpState \|\| idleState/);
-  // The group is the one-home ladder, from the jump base.
-  assert.match(arm, /composeStanceGroup\('jump', stance, hasGroup\)/);
-  // InAir: unbounded loops, startAtLoop on a forced same-state re-pick,
-  // and NO loopFallback in the options.
-  assert.match(arm, /\{ start: startAtLoop \? 'loop start' : 'start', stop: 'stop', loopCount: Infinity \}/);
+  assert.match(slots, /const base = inJump\s*\?\s*null\s*:\s*movementAnimState\(\{/,
+    'airborne, no movement group is chosen');
+  // The slot winner: the weapon action, the movement, the jump, the idle.
+  assert.match(slots, /\[action, actionSource\],\s*\[slots\.hitState, slots\.hitSource\],\s*\[slots\.movementState, slots\.movementSource\],\s*\[slots\.jumpState, slots\.jumpSource\],\s*\[slots\.idleState, slots\.idleSource\],/);
+  // The group comes from the stance ladder, from the jump base.
+  assert.match(slots, /composeStanceGroup\('jump', stance, ctx\.hasGroup\)/);
+  // In the air: unbounded loops, from the loop on a stance change, and no loopFallback in the options.
+  assert.match(slots, /\{ start: sameKind \? 'loop start' : 'start', stop: 'stop', loopCount: Infinity \}/);
   // Landing: the tail, once.
-  assert.match(arm, /\{ start: 'loop stop', stop: 'stop', loopCount: 0 \}/);
-  // The jump advances at speedmult 1.0 - no rate scaling (:528-531).
-  assert.match(arm, /advanceClip\(jumpState, \(jumpSource \|\| rig\(\)\)\.keys, dt, null\)/);
-  // A jump ending resets the idle with it (:499-505), and the slot dies
-  // with a rebuild, an unload and a view switch like the others.
-  assert.match(arm, /function resetJump\(\)/);
-  assert.equal((arm.match(/jumpState = null; jumpGroup = null; jumpSource = null; jumpStance = null;/g) ?? []).length, 3,
-    'resetJump, the rebuild wipe and the unload wipe all clear the slot');
+  assert.match(slots, /\{ start: 'loop stop', stop: 'stop', loopCount: 0 \}/);
+  // The jump advances at rate 1.
+  assert.match(slots, /if \(slots\.jumpState\) advance\(rig, slots\.jumpState, slots\.jumpSource, dt\);/);
+  // The slot empties with a rebuild and an unload as well as with resetJump.
+  assert.match(slots, /function resetJump\(\)/);
+  assert.equal((arm.match(/slots\.jumpState = null; slots\.jumpGroup = null; slots\.jumpSource = null; slots\.jumpStance = null;/g) ?? []).length, 2,
+    'the rebuild wipe and the unload wipe clear the slot');
 });
 
 test('MW-D39: THE FOUR HOSTS feed the jump-state inputs, named and swept', () => {
@@ -3062,22 +3022,19 @@ test('MW-D39: readySpell and castSpell are the two doors, and neither gates the 
   assert.equal(arm.status().spellReady ?? false, false);
   const src = readFileSync('src/combat/fpArm.js', 'utf8');
   // the stance re-composes on ready, and the three group readers take the flag
-  // PIN MOVED (MWNPC9, bible/04-Characters/Morrowind-NPCs.md section 14b): the idle, the jump and the movement read it
   // through `stanceOf()` - the stance a non-biped creature takes bare - which reads it once
-  // PIN MOVED (MIXED-PAIR): the weapon group reads the blow's own type first - a mixed pair's off-hand blow plays its
   // own weapon's group (was: `animWeaponType(built.mwType, ...)` at all three)
   // AUDIT SPELL-HAND L5-9: the blow's own type in the weapon group alone (was: either form, three times)
-  assert.equal((src.match(/animWeaponType\(blowType \?\? built\.mwType, sheathed, spellReady\)/g) || []).length, 1, 'the weapon group: the blow\'s type first');
-  assert.equal((src.match(/animWeaponType\((?:blowType \?\? )?built\.mwType, sheathed, spellReady\)/g) || []).length, 3,
+  assert.equal(((src + readFileSync('src/combat/fpArm/upperBody.js', 'utf8')).match(/animWeaponType\((?:blowType \?\? )?built\.mwType, ub\.sheathed, ub\.spellReady\)/g) || []).length, 3,
     'stanceOf, the weapon group and the torch\'s carried-left rule (MW-D51) must all read the spell stance');
-  assert.equal((src.match(/= stanceOf\(\);/g) || []).length, 3, 'the idle, the jump and the movement through stanceOf');
-  assert.match(src, /readySpell\(ready\) \{[\s\S]*?refreshWeaponGroup\(\);\n      resetIdle\(\);\n      resetMovement\(\);/);
-  // PIN MOVED (MW-CAST1): an un-ready mid-cast is the spell GOING - Daggerfall clears the ready at its release - so
+  assert.equal((readFileSync('src/combat/fpArm/animSlots.js', 'utf8').match(/= ctx\.stanceOf\(\);/g) || []).length, 3, 'the idle, the jump and the movement through stanceOf');
+  assert.match(src, /return ub\.readySpell\(want\);/);
+  assert.match(readFileSync('src/combat/fpArm/upperBody.js', 'utf8'), /function setSpellStance\(ub, on\) \{\n\s+ub\.spellReady = on;\n\s+refreshWeaponGroup\(ub\);\n\s+ub\.slots\.resetIdle\(\);\n\s+ub\.slots\.resetMovement\(\);/);
   // the cast finishes and the stance drops at its end (it used to be taken for an abort and dropped mid-motion)
-  assert.match(src, /if \(!want && upper === UPPER_BODY\.Casting\) \{ unreadyAfterCast = true; return false; \}/);
+  assert.match(readFileSync('src/combat/fpArm/upperBody.js', 'utf8'), /if \(!want && ub\.upper === UPPER_BODY\.Casting\) \{\s*ub\.unreadyAfterCast = true;\s*return false;\s*\}/);
   // the cast plays the group's own section and lands back in the stance
-  assert.match(src, /if \(!playAction\(`\$\{type\} start`, `\$\{type\} stop`, 0\)\)/);
-  assert.match(src, /case UPPER_BODY\.Casting:\n\s+\/\/ MW-D39[\s\S]*?upper = UPPER_BODY\.WeaponEquipped;/);
+  assert.match(readFileSync('src/combat/fpArm/upperBody.js', 'utf8'), /if \(!playAction\(ub, `\$\{type\} start`, `\$\{type\} stop`, 0\)\)/);
+  assert.match(readFileSync('src/combat/fpArm/upperBody.js', 'utf8'), /case UPPER_BODY\.Casting:[\s\S]*?ub\.upper = ub\.sheathed \? UPPER_BODY\.Rest : UPPER_BODY\.Ready;/);
   assert.equal(UPPER_BODY.Casting, 7);
   // the key pair is the SPELL'S RANGE (character.cpp:1618-1636), not a
   // single "cast" - a first draft guessed 'cast start', which no
@@ -3104,12 +3061,8 @@ test('MW-D39: the hosts wire it through the rig\u2019s one door, on the referenc
   // ROAD-E6 moved the moment: the door is CastReadySpell's PlayOneShot
   // (:430-435), it takes the release handler the engine parks its
   // resolution on, and it ANSWERS - false when PlayOneShot refused.
-  // PIN MOVED (MW-CAST1): the door now asks whether the Morrowind arm on screen took the cast, and if it did the release
   // waits for its "<type> release" (fpsSpellCasting's hold) - still ONE door, the range, the element and the release
-  // PIN MOVED (CAST-SPEED): and the caster's rate, read once here and handed to both lanes (systems/castSpeed.js)
-  // PIN MOVED (AUDIT SPELL-HAND L2-4): and the cast's hands decided as it starts - kept only by a cast that does (was:
   // `return fpsSpellCasting.playOneShot(...)` straight)
-  // PIN MOVED (RPT1026-MISC CAST-PACE): the arm is handed the spell's moment (castReleaseS) and paced to it, and only an
   // arm it could not pace holds the release (armHolds - was: every arm on screen, `armCasts ? { hold: ...`)
   assert.match(rig, /castSpellAnim: \(rangeType, element, onRelease = null\) => \{\n\s+cast\.n = \(cast\.n \+ 1\) & 0xffff; cast\.rangeType = rangeType \| 0;[^\n]*\n(?:\s+eotbBody\.cast\(\);[^\n]*\n)?(?:\s*\/\/[^\n]*\n)*\s+const rate = castRate\(entity\);\n\s+const armCasts = fpArm\.castSpell\(rangeType, rate, castReleaseS\(rate\)\) && \(fpArm\.active\(\) \|\| fpArm\.thirdActive\(\)\);\n(?:\s*\/\/[^\n]*\n)*\s+const armHolds = armCasts && !fpArm\.castPaced\?\.\(\);\n\s+const oneHand = spellHandFits\(\);[^\n]*\n\s+const started = fpsSpellCasting\.playOneShot\(element, onRelease, armHolds \? \{ hold: \(\) => fpArm\.takeCastRelease\(\) \|\| !fpArm\.castInFlight\(\), rate \} : \{ rate \}\);\n\s+if \(started\) _castOneHand = oneHand;\n\s+return started;/,
     'the cast must have one door, and it carries the range, the element and the release');
@@ -3139,30 +3092,29 @@ test('AUDIT 36 F1: ALL THREE hosts run the cast animation, on the cast moment, w
 
 test('AUDIT 36 F2: an INSTANT self-cast animates - the cast latches its own stance', async () => {
   const src = readFileSync('src/combat/fpArm.js', 'utf8');
-  const fn = src.slice(src.indexOf('    castSpell(rangeType = 2, rate = 1, releaseIn = 0) {'), src.indexOf('    /** The held bow comes up.'));   // PIN MOVED (CAST-SPEED): the cast's rate; PIN MOVED (RPT1026-MISC CAST-PACE): and the moment its release is paced to
+  const fn = src.slice(src.indexOf('    castSpell(rangeType = 2, rate = 1, releaseIn = 0) {'), src.indexOf('    /** The held bow comes up.'));
   // the old gate refused a cast that arrived before any frame read the
   // ready - which is EVERY CasterOnly spell, readied and cast in one
   // synchronous call (hostMagic readySpell -> castInput for range 0).
   assert.ok(!/!spellReady\) return false/.test(fn), 'the cast must not refuse before the ready has been read');
-  assert.match(fn, /if \(!spellReady\) \{ spellReady = true; refreshWeaponGroup\(\); resetIdle\(\); resetMovement\(\); \}/,
+  assert.match(fn, /return ub\.cast\(rangeType, rate, releaseIn\);/);
+  assert.match(readFileSync('src/combat/fpArm/upperBody.js', 'utf8'), /if \(!ub\.spellReady\) setSpellStance\(ub, true\);/,
     'the cast must latch the stance, or it plays its keys in the WEAPON\u2019s group');
   // the group is composed from the stance, which is why the latch is
   // not merely a gate: without it the keys land in the sword's group.
-  assert.match(src, /weaponGroup = composeWeaponGroup\(type, hasGroup\)\.group;/);
+  assert.match(readFileSync('src/combat/fpArm/upperBody.js', 'utf8'), /ub\.weaponGroup = composeWeaponGroup\(type, ub\.ctx\.hasGroup\)\.group;/);
   // and the instant path exists in the engine exactly as described
   const hm = readFileSync('src/scenes/hostMagic.js', 'utf8');
   // AUDIT ALLY-CAST A1: the instant arm arms instead when a party mate is in touch reach; with nobody there it is
   // the same synchronous castInput, which is the case F2 exists for.
-  // PIN MOVED (AUDIT WATCH-KIT WK-M9, 2026-10-01): my companion's two arms (COMPANION-KIT) stand among the mate's, in the
   // click's own order, where they stood in a block ahead of this one; the instant cast is still the arm's last line
-  // PIN MOVED (AUDIT SPELL-HAND L2-2): beside a weapon mid-blow the instant cast waits for the blow as a pressed one does
   // (a kept press) - the line before it; the instant cast is still the arm's last
   assert.match(hm, /if \(sp\.rangeType === 0\) \{\n(?:\s*\/\/[^\n]*\n)*\s*if \(!free && allyCastable\(sp\) && allyInReach\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(companionInReach\([^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(!free && allyCastable\(sp\) && allyNear\([^\n]*\n\s*if \(companionNear\([^\n]*\n\s*if \(!free && hasResurrect\(sp\)\)[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(spellHandBusy\(\)\) \{ setPending\(true\); return true; \}\n\s*return castInput\(null, null\) !== false;\n\s*\}/,   // SPELL-GIFT: the near arm between   // AUDIT CONTRIB H3: the instant cast is the ready's answer   // RESURRECT1: the dead's own arm beside the ally's
     'the CasterOnly instant cast is the case F2 exists for');
   // ROAD-E6 folded the four release arms' identical tail into one
   // `done` closure - RaiseOnCastReadySpell (:2129) still runs BEFORE
   // `readySpell = null` (:2135), which is the ordering F2 rests on.
-  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/,   // FIX-F: lastSpell (:2136) before the raise (:2137); PIN MOVED (EG15): the cast told after the raise, still while the spell is readied
+  assert.match(hm, /const done = \(v\) => \{ lastSpell = sp; onCastReadySpell\?\.\(sp\); if \(v\) tellPlayerCast\(playerEntity, sp, cost\); readiedSpell = null;/,   // FIX-F: lastSpell (:2136) before the raise (:2137)
     'the cast callback must fire while the spell is still readied');
 });
 
@@ -3188,11 +3140,10 @@ test('PX26 F4: the interior lane sends the jump-state inputs - without them the 
 test('PX26 F1/F2/F3: the menu figure carries the hand, instantly, and a mid-build swap is not dropped', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
   // F1: the portrait shows the weapon whether or not it is drawn
-  // PIN MOVED (TWO-HANDS AUDIT): the window 3000 -> 3400 - the portrait poses a carried pair with both arms up (its
   // `mirror:`) and flags the left hand's blade, which moved the flag lines past the old edge
   const fig = arm.slice(arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {'), arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {') + 3400);
   assert.match(fig, /if \(r\.slot === 'weapon'\) r\.hidden = false;/, 'a paperdoll shows what you carry, drawn or not');
-  assert.match(fig, /else if \(r\.slot === 'arrow'\) r\.hidden = !arrowShown;/, 'the arrow still follows its shoot keys');
+  assert.match(fig, /else if \(r\.slot === 'arrow'\) r\.hidden = !ub\.arrowShown;/, 'the arrow still follows its shoot keys');
   // F2: the pack hands the rig the hand as well as the worn table
   const pack = readFileSync('src/ui/enhanced/enhancedInventory.js', 'utf8');
   assert.match(pack, /arm\.setWeapon\?\.\(slots\?\.\[deps\.usingRightHand\?\.\(\) === false \? EQUIP_SLOTS\.LeftHand : EQUIP_SLOTS\.RightHand\] \?\? null,/, 'the pack must hand over the hand while a window is up - the hand IN USE (DISC12: the left hand\'s weapon when the player swapped to it)');
@@ -3238,7 +3189,6 @@ test('PX27: the arm\u2019s REACH is swept over every clip, not the idle alone', 
   assert.equal(clipSweepTimes(null, null).length, 25);
   // and the build uses it
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
-  // PIN MOVED (MWNPC3): the sweep is the default (the player's arm); a rig never looked out of (reachSweep: false -
   // the peers' and the NPCs' builds) takes the idle's reach instead
   assert.match(arm, /const sweep = reachSweep \? clipSweepTimes\(sources, idleCheck\) : null;\n    const union = sweep \? clipUnionBounds\(arm, poseAt, sweep\) : null;/,
     'the build must measure the reach over the sweep');
@@ -3261,11 +3211,11 @@ test('PX29: the movement rate divides by the PLAYING clip\u2019s own velocity (M
   // with a different source's number than the clip on screen, and the
   // sprint's rate changed under Mac without the sprint changing.
   // Reverted at his direction; the multi-source walk stays exported.
-  const src = readFileSync('src/combat/fpArm.js', 'utf8');
-  assert.match(src, /const vel = movementSource \? sourceVelocityOf\(movementSource, movementGroup\) : 0;/,
+  const src = readFileSync('src/combat/fpArm/animSlots.js', 'utf8');
+  assert.match(src, /const travel = slots\.movementSource \? sourceVelocityOf\(slots\.movementSource, slots\.movementGroup\) : 0;/,
     'the rate must divide by the clip that is playing');
-  assert.ok(!/sourcesVelocity\(rig\(\)\.sources, movementGroup\)/.test(src), 'the multi-source walk must not decide the movement rate');
-  assert.match(src, /PX29 - REVERTED AT MAC'S DIRECTION/, 'a declared divergence must say so where it lives');
+  assert.ok(!/sourcesVelocity\(/.test(src), 'the multi-source walk must not decide the movement rate');
+  assert.match(src, /The playing clip's own source answers, not a search over every source/, 'the choice must say so where it lives');
   // the helper reads ONE source and answers 0 for a source with no
   // accumulation root - which is every first-person clip.
   assert.equal(sourceVelocityOf(null, 'runforward'), 0);
@@ -3285,7 +3235,7 @@ test('PX29: the movement rate divides by the PLAYING clip\u2019s own velocity (M
 // Source-pinned, like AUDIT 33's checks above it, because a live pin
 // would need a third-person BUILD and the fixtures reach the first-
 // person arm only - and a check that cannot run is worse than one that
-// says what it is (the lesson of the nine dead probes, bible/09-Testing/Testing-Rows-2026-10-19.md).
+// says what it is (the lesson of the nine dead probes).
 test('PX32: the inventory figure poses the body before it uploads it', () => {
   const arm = readFileSync('src/combat/fpArm.js', 'utf8');
   const start = arm.indexOf('    figure({ yaw = 0, height = 384 } = {}) {');

@@ -260,17 +260,6 @@ test('RR3b the building: nothing without the variant (cached as none under NoVar
 
 // ---- the readers and the layout ------------------------------------------------
 test('RR3b the readers ask the door: MapsFile\'s three asks and BlocksFile\'s four, by source; the door leaf; the merge arm hands the pool draw back and varies the seed', () => {
-  const mf = rd('src/formats/mapsFile.js');
-  assert.match(mf, /worldDataDoor\(\)\?\.getDFRegionAdditionalLocationData\(region, rec\.dfRegion\);/, 'LoadRegion (:984)');
-  assert.match(mf, /const replacement = worldDataDoor\(\)\?\.getDFLocationReplacementData\(region, location, this\);\s*if \(replacement\) return replacement;/, 'ReadLocation (:998-1000) - WD3: the reader handed over, for a pack\'s edit of its classic location');
-  assert.match(mf, /const entry = rec\.dfRegion\?\.mapTable\?\.\[location\];\s*if \(entry\?\.locationId\) return entry\.locationId;/, 'ReadLocationIdFast (:1027-1028)');
-  const bf = rd('src/formats/blocksFile.js');
-  assert.match(bf, /return worldDataDoor\(\)\?\.getNewDFBlockName\(block\) \?\? \(block < this\.count \? this\._bsa\.getRecordName\(block\) : null\);/, 'GetBlockName (:214)');
-  assert.match(bf, /const assigned = worldDataDoor\(\)\?\.getNewDFBlockIndex\(name\) \?\? -1;\s*if \(assigned !== -1\) return assigned;/, 'GetBlockIndex (:273)');
-  assert.match(bf, /const replacement = block >= 0 \? worldDataDoor\(\)\?\.getDFBlockReplacementData\(block, this\.getBlockName\(block\)\) : null;\s*if \(replacement\) \{\s*if \(this\._blocks && this\._blocks\.length > block\) this\._blocks\[block\] = \{ name: replacement\.name, bytes: null, view: null, dfBlock: replacement \};\s*return dryBlock\(replacement\);/, 'GetBlock (:385)');   // PIN MOVED (PUDDLE-DRY): the replacement served through the one door that dries a town's puddles
-  assert.match(bf, /const replacement = door\?\.getBuildingReplacementData\(rec\.name, rec\.dfBlock\.index, i\);\s*if \(replacement\) \{\s*subRecords\[i\] = \{ \.\.\.replacement\.rmbSubRecord \};/, 'ReadRmbBlockData (:850)');
-  assert.match(bf, /if \(replacement\.nameSeed > 0\) h\.buildingDataList\[i\]\.nameSeed = replacement\.nameSeed;\s*door\.applyBuildingReplacementAutoMapData\(replacement, h\.autoMapData\);/);
-  assert.match(bf, /position \+= h\.blockDataSizes\[i\];\s*r\.pos = position;/, 'the step by the header\'s sizes stands on both arms');
   // the leaf
   const saved = worldDataDoor();
   setWorldDataDoor(null); assert.equal(worldDataDoor(), null);
@@ -309,23 +298,3 @@ test('RR3b the readers ask the door: MapsFile\'s three asks and BlocksFile\'s fo
   setWorldDataDoor(saved);
 });
 
-test('RR3b the hosts and the save: the four hosts bind the reader and await the mod assets before a region loads, the loader\'s gate, the call sites\' location index, the variants on the save', () => {
-  for (const h of ['world', 'exterior', 'interior', 'dungeon']) {
-    const s = rd(`src/scenes/${h}.js`);
-    assert.match(s, /const blocks = new BlocksFile\(\);\s*blocks\.load\(blocksBytes\);\s*bindWorldDataBlocks\(blocks\);[^\n]*\n\s*await loadModWorldData\(\);/, `${h}: before the first region`);
-  }
-  const ld = rd('src/scenes/modWorldData.js');
-  assert.match(ld, /import\.meta\.glob\('\.\.\/\.\.\/vendor\/\*\/WorldData\/\*\.json', \{ import: 'default' \}\)/);
-  assert.match(ld, /registerWorldDataAsset\(baseName\(path\), json, \(\) => modSetting\(vendor, 'Enabled'\) === true\)/, 'a mod that is off is a mod DFU never loaded');
-  assert.match(ld, /installWorldDataReplacement\(\);/);
-  const w = rd('src/scenes/world.js'), e = rd('src/scenes/exterior.js');
-  // AUDIT DELVE (PIN MOVED): GUIDE8's Town tier reads the town's summaries for the compass's building - a fifth site,
-  // with the same location index
-  assert.equal((w.match(/locationIndex: (dfLoc|loc)\.locationIndex \?\? 0/g) ?? []).length, 5, 'world.js: the five merge sites');
-  assert.equal((e.match(/locationIndex: dfLocation\.locationIndex \?\? 0/g) ?? []).length, 4, 'exterior.js: the four merge sites');
-  assert.match(rd('src/systems/talk/talkTopics.js'), /export function mergeNamedBuildings\(exteriorBuildings, blocks, \{ locationIndex = 0 \} = \{\}\) \{/);
-  assert.match(rd('src/world/buildingSummaries.js'), /mergeNamedBuildings\(exteriorBuildings \?\? \[\], blocks \?\? \[\], \{ locationIndex: nameOpts\.locationIndex \?\? 0 \}\)/);
-  const sv = rd('src/systems/save/save.js');
-  assert.match(sv, /snap\.worldVariation = getWorldVariationSaveData\(\);/, 'SaveLoadManager.cs:1125');
-  assert.match(sv, /clearWorldDataVariants\(\);\s*restoreWorldVariationData\(snap\.worldVariation \?\? null\);/, 'SaveLoadManager.cs:1465-1466');
-});

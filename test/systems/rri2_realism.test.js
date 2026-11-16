@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
 import {
   RRI_LOOT_MATRICES, RRI_MOB_LOOT_KEYS, rriLootMatrix, rriEnemyLootTableKey, isRriStackable, bandageHeal, shelfBandageStack,
   randomConditionLootItems, conditionCostBase, conditionRepairCostBase, storeQualityLow, storeQualityItemCondition,
@@ -22,7 +23,7 @@ import { useItem } from '../../src/systems/useItem.js';
 import { calculateCost } from '../../src/systems/shopStock.js';
 import { dfuItemRepairCost as calculateItemRepairCost } from '../../src/systems/repairService.js';   // REPAIR-EASE: the mod's formula, before the port's two-thirds
 import { weaponMinDamage, weaponMaxDamage, WEAPONS, WEAPON_MATERIALS } from '../../src/characters/weapons.js';
-import { getMeleeWeaponAnimTime, CLASSIC_FRAME_UPDATE, swingFrameSeconds, swingHandling, swingHeft } from '../../src/characters/weaponStates.js';
+import { getMeleeWeaponAnimTime, CLASSIC_FRAME_UPDATE, swingFrameSeconds, swingHandling, swingHeft, modHeft } from '../../src/characters/weaponStates.js';
 import { installSwingLaw } from '../../src/combat/swingLaw.js';
 import { assignEnemyStartingEquipment, equipmentItems, rollEnemyEquipment } from '../../src/combat/enemyEquipment.js';
 import { equipEnemy } from '../../src/scenes/hostCombat.js';
@@ -124,8 +125,10 @@ test('RRI2 conditionBasedPrices: CalculateCost scales the base by the condition,
   assert.equal(conditionRepairCostBase(1000, 50, 100, false), 300, '0.6 * (100 - 50) / 100 of 1000');
   assert.equal(conditionRepairCostBase(1000, 50, 100, true), 450, 'InstantRepairs: 0.9');
   assert.equal(conditionRepairCostBase(1, 99, 100, false), 1, 'floored at 1');
+  setPref('repairPriceByDamage', true);   // DFU-GAPS EL25: the damage-scaled price is an option, off as shipped
   assert.equal(calculateItemRepairCost(1000, 10, 50, 100, { instantRepairs: false }), 600, '300 through CalculateCost at quality 10');
   assert.equal(calculateItemRepairCost(1000, 10, 100, 100, { instantRepairs: false }), 0, 'free at full condition, both laws');
+  setPref('repairPriceByDamage', false);
   // the loot roll: armor, weapons, books - not artifacts, not ingredients
   const items = [mint({ group: 'Armor', templateIndex: 102, material: 0 }), mint({ group: 'Weapons', templateIndex: 120, material: 0 }), mint({ group: 'Books', templateIndex: 277 }), mint({ group: 'Armor', templateIndex: 107, material: 0, artifact: true }), mint({ group: 'Gems', templateIndex: 0 })];
   const before = items.map((it) => it.currentCondition);
@@ -204,18 +207,18 @@ test('RRI2 weaponBalance: the two damage overrides (:312-379) answer ahead of DF
   assert.equal(weaponMaxDamage(WEAPONS.Claymore), 19, 'on: the override (DFU says 18)');
   assert.equal(weaponMinDamage(WEAPONS.Arrow), 0, 'the override\'s default arm: 0');
   assert.equal(weaponMinDamage(513), 2, 'a custom class answers its own GetBaseDamageMin ahead of the formula');
-  // GetMeleeWeaponAnimTime: speed 50, strength 50, a 4 kg weapon. SWING-LAW (2026-09-28): the adjusted speed is the Speed
+  // GetMeleeWeaponAnimTime: speed 50, strength 50, a 4 kg weapon. SWING-LAW: the adjusted speed is the Speed
   // the swing is read at; the port's law turns it into time (its bounded curve, the weapon's handling), not the mod's
   // `3 * (115 - speed)`
   installSwingLaw();
-  const law = (speed, type = 0, both = false) => swingFrameSeconds(speed, { handling: swingHandling(type, both) });
+  const law = (live, speed, type = 0, both = false) => swingFrameSeconds(live, { heft: modHeft(live, speed), handling: swingHandling(type, both) });
   assert.equal(SPEED_REDUCTION_FACTOR, 3.4);
   const t = rriMeleeWeaponAnimTime({ liveSpeed: 50, liveStrength: 50, weaponWeight: 4 });
   // strWeightPerc 100 -> adjustedWeight 4 -> reduction 13.6 -> 50 - (int)(50 * 13.6 / 90) = 42
-  assert.equal(t, law(42));
-  assert.equal(rriMeleeWeaponAnimTime({ liveSpeed: 50, liveStrength: 50, melee: true }), law(50, 15), 'bare hands: the live speed, a fist\'s handling');
-  assert.equal(rriMeleeWeaponAnimTime({ liveSpeed: 100, liveStrength: 50, weaponWeight: 0 }), law(98), 'speed capped at 98');
-  assert.equal(rriMeleeWeaponAnimTime({ liveSpeed: 50, liveStrength: 50, weaponWeight: 7.5, weaponType: 0, twoHanded: true }), law(Math.trunc(50 - (50 * (7.5 * 3.4)) / 90), 0, true), 'a two-hander: its weight in the speed, its hands in the handling');
+  assert.equal(t, law(50, 42));
+  assert.equal(rriMeleeWeaponAnimTime({ liveSpeed: 50, liveStrength: 50, melee: true }), law(50, 50, 15), 'bare hands: the live speed, a fist\'s handling');
+  assert.equal(rriMeleeWeaponAnimTime({ liveSpeed: 100, liveStrength: 50, weaponWeight: 0 }), law(100, 98), 'speed capped at 98');
+  assert.equal(rriMeleeWeaponAnimTime({ liveSpeed: 50, liveStrength: 50, weaponWeight: 7.5, weaponType: 0, twoHanded: true }), law(50, Math.trunc(50 - (50 * (7.5 * 3.4)) / 90), 0, true), 'a two-hander: its weight in the speed, its hands in the handling');
   // through the registered override, off a player wielding a longsword (4 kg)
   const player = { stats: { strength: 50, speed: 50 }, activeEffects: [], items: [] };
   const sword = mint({ group: 'Weapons', templateIndex: WEAPONS.Longsword, material: 0 });
@@ -224,7 +227,7 @@ test('RRI2 weaponBalance: the two damage overrides (:312-379) answer ahead of DF
   assert.equal(templateByIndex(WEAPONS.Longsword).baseWeight, 4.5, 'ItemTemplate.baseWeight, the C#\'s read');
   assert.equal(getMeleeWeaponAnimTime(50, { entity: player, weaponType: 0, usingRightHand: true }), swordTime, 'the widget\'s ctx reaches the override');
   assert.equal(getMeleeWeaponAnimTime(50), 3 * (115 - 50) / CLASSIC_FRAME_UPDATE, 'no ctx: DFU\'s line');
-  assert.equal(getMeleeWeaponAnimTime(50, { entity: player, weaponType: 15, usingRightHand: true }), law(50, 15), 'WeaponTypes.Melee: the live speed');
+  assert.equal(getMeleeWeaponAnimTime(50, { entity: player, weaponType: 15, usingRightHand: true }), law(50, 50, 15), 'WeaponTypes.Melee: the live speed');
   on('weaponBalance', false);
   assert.equal(weaponMinDamage(WEAPONS.Saber), 3, 'off: DFU');
   assert.equal(weaponMaxDamage(WEAPONS.Claymore), 18);
@@ -309,7 +312,7 @@ test('RRI2 realisticEnemyEquipment, AUDIT DEX E2: every piece the kit puts on go
   assert.ok(claymore && !eq.worn.includes(claymore), 'the Claymore stays in Items (the corpse\'s), not worn');
   assert.ok(eq.armorPieces.some((a) => a.shield && a.piece === 109), 'the shield is worn');
   // through the spawn: no weapon, the table as EquipItem left it, and no poison drawn (`mainWeapon != null`, :667-668) -
-  // the variant's Range(0, 2), the arm's draws and the humanoid cut's one per piece, and nothing else
+  // the variant's Range(0, 2), the arm's draws and nothing else (the whole kit rolls no coin per piece; the Cut choice rolls one)
   const foe = barb();
   const spawn = counted(() => 0);
   equipEnemy(foe, MOBILE_TYPES.Barbarian, 5, spawn, { player });
@@ -317,7 +320,7 @@ test('RRI2 realisticEnemyEquipment, AUDIT DEX E2: every piece the kit puts on go
   const slots = equipTableOf(foe);
   assert.equal(slots[EQUIP_SLOTS.RightHand], null);
   assert.equal(slots[EQUIP_SLOTS.LeftHand]?.templateIndex, 109);
-  assert.equal(spawn.calls, 1 + arm.calls + eq.items.length, 'no poison draw for an empty right hand');
+  assert.equal(spawn.calls, 1 + arm.calls, 'no poison draw for an empty right hand');
   // a Knight (the coin blunt, the Mace): the shield's Dice100 at 60 fails, the left-hand weapon's at 0 lands - a Dagger, carried
   const knight = assignRriEnemyEquipment({ mobileType: MOBILE_TYPES.Knight, isClass: true, level: 5, careerIndex: 16 }, 0, 5, { player, rolls: seq(0, 0, 0, 0, 0.6, 0, 0, 0, 0, 0) });
   assert.equal(knight.rightHand.templateIndex, WEAPONS.Mace);
@@ -476,7 +479,7 @@ test('RRI2 wiring: the install registers the six delegates; the read-through sit
   assert.match(rd('src/systems/loot/loot.js'), /randomlyAddPotionRecipe\(2, items, rolls\);\n  \}\n[\s\S]{0,900}?if \(lootTableKey !== '-'\) raiseTabledLootSpawned\(\{ locationIndex, key: lootTableKey, items, rolls, luck, where, quarters \}\);\n  return items;\n\}/, 'the pile: LootTables.OnLootSpawned after the J..O tail - for every key GenerateLoot finds (AUDIT OH-F B3: the rolling host rides along)');
   assert.match(rd('src/systems/loot/loot.js'), /const _tabledLootHandlers = new Map\(\[\n  \[RRI_VENDOR, \(\{ items, rolls \}\) => \{ if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(items, rolls\); \}\],\n\]\);/, 'RRI\'s the first subscriber');
   const hc = rd('src/scenes/hostCombat.js');
-  assert.match(hc, /addEnemyLootExtras\(entity\.items, basics, rolls, \{ quarters: ease \}\);\n[\s\S]{0,1100}?if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(\[\.\.\.new Set\(\[\.\.\.entity\.items, \.\.\.\(eq\?\.worn \?\? \[\]\)\]\)\], rolls\);\n  enemyLootSpawned\.raise\([^\n]*\n(?:  (?:\/\/|const plain = plainFoeLootRule\(|if \(plain\) entity\.lootCap = )[^\n]*\n)*  rollCorpseLoot/, 'the corpse: EnemyEntity.OnLootSpawned after the trio, before the port\'s arm (RRI\'s own subscriber, then the list - OH-E)');   // PIN MOVED (PARTY-LOOT): the extras take the roll's Renown share, and the keep's line names what it let go
+  assert.match(hc, /addEnemyLootExtras\(entity\.items, basics, rolls, \{ quarters: ease \}\);\n[\s\S]{0,1100}?if \(conditionBasedPricesOn\(\)\) randomConditionLootItems\(\[\.\.\.new Set\(\[\.\.\.entity\.items, \.\.\.\(eq\?\.worn \?\? \[\]\)\]\)\], rolls\);\n  enemyLootSpawned\.raise\([^\n]*\n(?:  (?:\/\/|const plain = plainFoeLootRule\(|if \(plain\) entity\.plainLadder = )[^\n]*\n)*  rollCorpseLoot/, 'the corpse: EnemyEntity.OnLootSpawned after the trio, before the port\'s arm (RRI\'s own subscriber, then the list - OH-E)');
   assert.match(hc, /const worn = eq\.worn \?\? all;\n  eq\.worn = worn;/, 'the assigner\'s worn subset is what the table takes');
   assert.match(hc, /for \(const it of worn\) \{\n    const slot = getEquipSlot\(entity, it\);/, 'and only that');
   const wm = rd('src/scenes/worldModes.js');
@@ -486,10 +489,9 @@ test('RRI2 wiring: the install registers the six delegates; the read-through sit
   assert.match(rd('src/systems/inventory.js'), /if \(isRriStackable\(item\)\) return true;/);
   assert.match(rd('src/systems/shopStock.js'), /let cost = conditionBasedPricesOn\(\) \? conditionCostBase\(baseValue, conditionPercentage\) : baseValue;/);
   assert.match(rd('src/systems/tradeModes.js'), /calculateCost\(counterValueOf\(item\), quality, priceAdjustment, saleConditionPercentage\(item, \{ online \}\)\) \* stack;/, 'the Sell arm passes ConditionPercentage (:462) - offline as it is, online the find and a third of its owner\'s own mends past it (SELL-AS-FOUND, MEND-THIRD - test/systems/sell_as_found.test.js, mend_third.test.js)');   // PIN MOVED (CRAFT-WORTH): the value the counter pays on (tradeModes.js counterValueOf)
-  assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
+  assert.match(rd('src/systems/repairService.js'), /conditionBasedPricesOn\(\) && repairPriceByDamageOn\(\) \? conditionRepairCostBase\(baseItemValue, condition, max, instantRepairs\) : Math\.trunc\(10 \* baseItemValue \/ 100\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingSpells\(setIndex, spellsByIndex, result\.career\)/);
   assert.match(rd('src/systems/chargenSession.js'), /assignStartingEquipment\(playerEntity, \{ classIndex: result\.careerIndex/);
-  // PIN MOVED (TWO-HANDS, bible/05-Combat/Two-Hands.md): the clone's own three fields, unless the rig hands its swing's
   // ctx (a hand of a pair: the striking hand and the strike's tempo - the clock the machine runs on)
   assert.match(rd('src/combat/weapon/weaponWidget.js'), /const animCtx = \(\) => ctx\?\.animCtx\?\.\(\) \?\? \(\{ entity: ctx\?\.entity \?\? null, weaponType: w\.currentWeaponType, usingRightHand: usingRightHand\(\) \}\);/);
   assert.equal((rd('src/combat/weapon/weaponWidget.js').match(/widgetAnimTickTime\(w\.currentWeaponType, liveSpeed\(\), w\.s\.swing, animCtx\(\)\)/g) ?? []).length, 4, 'every tick asks with the ctx');

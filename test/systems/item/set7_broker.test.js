@@ -1,5 +1,4 @@
-// SET7 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 7; Mac: "Sigil stones become a currency to
-// trade for daily reset sigil items at a new NPC vendor that stands outside the oblivion gate"): THE SIGIL BROKER'S LAW
+// SET7: THE SIGIL BROKER'S LAW
 // (systems/sigil/sigilBroker.js) - the day of the shared clock and when it turns; the day's stock, the same for every player
 // and minted from fixed tables (a piece of each world set, a set weapon, a piece of the Regalia), every piece known,
 // fresh, a valid loot item; the prices in Deadlands Embers; what an offer asks and the sale it plans; and the one-a-day

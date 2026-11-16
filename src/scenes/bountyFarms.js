@@ -1,6 +1,5 @@
 // @ts-check
-// BOUNTY-FARM (2026-09-28, Mac: "can you spawn some farmhouses there it says the granary is overrun? the thing is how
-// do those farmhouses despawn again"): A FARM ON A FARM BOUNTY'S PIXEL - the world host's props pool, on the gate's
+// BOUNTY-FARM: A FARM ON A FARM BOUNTY'S PIXEL - the world host's props pool, on the gate's
 // and the camps' shape (scenes/gate/gatePool.js, scenes/camps.js): models through the host's pipeline, a collider bucket of
 // its own, drawn in the host's world pass.
 //
@@ -34,8 +33,7 @@ export const FARM_LINGER_M = 200;
 export const FARM_PIXEL_SIDE = 819.2;
 const FARM_BAND = [0.25, 0.75];
 /** How many spots a farm weighs on its pixel: every one clear of roads, the sea and towns is measured, and the
- *  FLATTEST wins (Mac, 2026-09-28: "the house was on hill side stuck into a ground i was able to almost only see its
- *  roof, no fences"). */
+ *  FLATTEST wins. */
 export const FARM_SPOT_TRIES = 16;
 /** How far each model is sunk below the ground under its own centre, metres - enough to hide the gap on a gentle
  *  slope's downhill side, never enough to bury a fence. */
@@ -51,7 +49,7 @@ export const FARM_BUILDING_CLEAR_M = 1.5;
 /** The collider bucket prefix - one bucket a farm. */
 export const FARM_BUCKET = 'bounty:farm:';
 
-/** BOUNTY-FARM-PICK (Mac, 2026-09-28: "Pick from several farms ... Yes this sounds good"): a notice's farm is one of
+/** BOUNTY-FARM-PICK: a notice's farm is one of
  *  the nearest this many real farmsteads - so neighbouring hunts get different layouts - picked by the notice. */
 export const FARM_PICK_NEAREST = 8;
 /** A string's 32-bit hash (FNV-1a) - the same on every client. */

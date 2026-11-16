@@ -1,5 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11): THE PORT'S OWN ART, MADE AT BOOT - every picture the shipyard and the lighthouse wear
+// SHIPYARDS: THE PORT'S OWN ART, MADE AT BOOT - every picture the shipyard and the lighthouse wear
 // (world/shipyardModel.js, world/lighthouseModel.js) is the port's, made here from noise and drawn shapes the moment a
 // host asks, under the pseudo-archive PORT_ARCHIVE (world/merchantYards/merchantYardArt.js's law and its own tools: pixels and numbers,
 // no renderer, no GL). Nothing of Daggerfall's is read.

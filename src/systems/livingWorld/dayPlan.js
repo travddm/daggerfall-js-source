@@ -1,11 +1,11 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE DAY - what a resident does from one 04:00 to the next, drawn
+// LW1: THE DAY - what a resident does from one 04:00 to the next, drawn
 // from their seed and the day's number, so it is the same day for every reader and a new one tomorrow.
 //
 // THE DAY TURNS AT 04:00 (DAY_START_MIN): the one hour everyone is abed - the larks rise at five, the night owls are in
 // by two - so no night is cut in half by the turn. Each day is a run of ENTRIES covering every minute of it once:
 // a stay at a place (a building, through its door; a spot in the street) or a WALK from one place to the next. The
-// walk's minutes are the walk itself at the resident's pace (`mpm`, metres a minute of the clock: LW0 decision 3) over
+// walk's minutes are the walk itself at the resident's pace (`mpm`, metres a minute of the clock) over
 // the grid's own distance and a detour; the host walks the real path (townPaths.js) and the resident arrives when the
 // path says (`realised`).
 //
@@ -14,8 +14,7 @@
 // farmer is in the fields by six, the watch walks its beat in shifts - and the TEMPER, the drink, the piety and the
 // liking for company set the rest: the errand, the meal, the evening's tavern, temple or square, a neighbour visited.
 //
-// WATCH-DAY (2026-10-05, Mac: "improve the guards" - asked, the night watch, gate posts and pairs, the uniform only on
-// duty): THE WATCH KEEPS THE TOWN ROUND THE CLOCK. Four companies of it (census.js WATCH_COMPANIES) turn through the day's
+// WATCH-DAY: THE WATCH KEEPS THE TOWN ROUND THE CLOCK. Four companies of it (census.js WATCH_COMPANIES) turn through the day's
 // shift, the evening's and the night's, the fourth day off; in each, two of a company walk a patrol together on the
 // patrol's own stops, the rest stand POSTS at the town's gates; the night runs past the day's turn, and the next day
 // begins where it stands. On duty - the walk out, the watch, the walk home - they are in uniform (`duty`); off it, the
@@ -24,7 +23,7 @@
 //
 // AWAY: a window the roads hold the resident (trips.js) is handed in and the day bends round it - geared at home (an
 // armed traveller), walked out to the exit facing the road, away, walked home after; every walk to or from an away
-// window ARMED (LW0 decision 5 - the host draws the class sprite).
+// window ARMED (the host draws the class sprite).
 import { NAV_CELL } from '../../world/city/cityNavigation.js';
 import { BUILDING_TYPES } from '../../world/buildingNames.js';
 import { lwRng, lwSeed, rollInt, pickOf } from './seed.js';

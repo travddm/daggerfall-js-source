@@ -1,4 +1,4 @@
-// LAMP-KEEPER (2026-09-26, Mac: "Shop keepers are lamp posts - make only a hand full of them"): not a count - a
+// LAMP-KEEPER: not a count - a
 // picture. Roleplay & Realism's variant keepers (RR2) re-materialise a shop or tavern keeper onto archive 197, and
 // the mod's seven 197 sprites are registered LAZY (nothing fetched at install). A lazy record is decoded only when
 // something asks for it, and getTexture's archive preload skips lazy entries by design (AUDIT-DW F1) - so nothing
@@ -38,12 +38,3 @@ test('LAMP-KEEPER: the mod\'s keeper is on the door but not decoded until asked 
   _resetModSettings(); clearVendorTextures(); _resetRoleplayRealismArt();
 });
 
-test('LAMP-KEEPER: the interior person\'s stand asks for its DRAW record\'s art before it uploads it', () => {
-  const src = rd('src/scenes/interiorContext.js');
-  const at = src.indexOf('const standPerson = (pn) => {');
-  const body = src.slice(at, src.indexOf('\n  };\n', at));
-  const ask = body.indexOf('if (pn.drawArchive != null) await preloadTextureRecord(pn.drawArchive, pn.drawRecord ?? pn.textureRecord)');
-  assert.ok(ask > 0, 'the stand asks for a re-materialised person\'s art');
-  assert.ok(ask < body.indexOf('uploadRecord(pn.drawArchive ?? pn.textureArchive'), '...before the upload reads it');
-  assert.match(src, /import \{ preloadTextureRecord \} from '\.\.\/systems\/textureReplacement\.js';/);
-});

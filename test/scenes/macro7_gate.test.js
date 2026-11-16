@@ -1,5 +1,5 @@
-// MACRO-7 (2026-09-22, the macro audit): THE GATE - NO RAW TOKEN BACK.
-// Mac: "a recurring issue with a lot of things". It recurred because
+// MACRO-7: THE GATE - NO RAW TOKEN BACK.
+// . It recurred because
 // nothing stopped a new window reading a TEXT.RSC record and drawing it
 // without a macro walk (MACRO-3's four boxes), and nothing stopped a
 // record carrying a token no source answers (MACRO-4/5/6).
@@ -23,6 +23,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { macroTableCoverage } from '../../src/systems/quest/questMacros.js';
 import { spellMakerDescriptionId, SPELLBOOK_DESCRIPTION_IDS } from '../../src/systems/spell/spellEffects.js';
 import { REST_TEXT } from '../../src/systems/rest/restSession.js';
@@ -44,8 +45,9 @@ function census() {
     return statSync(p).isDirectory() ? walk(p) : p.endsWith('.js') ? [p] : [];
   });
   const out = [];
-  for (const f of walk(new URL('src', ROOT).pathname)) {
-    const rel = f.slice(f.indexOf('/src/') + 1);
+  for (const f of walk(fileURLToPath(new URL('src', ROOT)))) {
+    const posix = f.split('\\').join('/');
+    const rel = posix.slice(posix.indexOf('/src/') + 1);
     if (rel === 'src/formats/textRsc.js') continue;   // the parser itself
     const lines = readFileSync(f, 'utf8').split('\n');
     lines.forEach((l, i) => {
@@ -67,7 +69,6 @@ const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 const RACES = range(2000, 2007), CLASSES = range(2100, 2117);
 const CHARGEN_TEXT = [300, 301, 302, 303, 306, ...range(2400, 2407)];
 // the rest boxes, off the constants the rest law speaks them from
-// PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): 1072 (EXHAUSTED_ENEMIES_TEXT_ID) left the list with the constant -
 // the collapse with foes about is a HUD line now, no box, and no host speaks the record
 const REST_BOXES = [...Object.values(REST_TEXT), EXHAUSTED_SAFE_TEXT_ID, NOT_SATED_TEXT_ID];
 
@@ -299,7 +300,6 @@ test('MACRO-7: every token in DFU’s TEXT.RSC has a table row or a named consum
   const rowless = [...tokens].filter((tok) => !handled.includes(tok)).sort();
   assert.deepEqual(rowless, Object.keys(TOKEN_LEDGER).sort(),
     'a token with no row and no consumer - give it a source, or record who answers it and why');
-  assert.match(read('src/ui/travel/travelMapWindow.js'), /%tcn/, '%tcn’s consumer still does its Replace');
 });
 
 test('MACRO-7: the gate’s own net - the census finds the read shapes it claims to', () => {

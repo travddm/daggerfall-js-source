@@ -1,8 +1,5 @@
 // @ts-check
-// DUEL1 (2026-09-24, Mac: "When inspecting a player, they should be able to send an invite to duel which then traps both
-// players in a surrounding transparent holographic wall that keeps them from going outside of the duel space."; and,
-// asked: weapons, bows and spells all count; "Loser drops to 1HP and both are fully healed on duel end. Add a dueling
-// K/D to the profile menu and player inspect profile"; outdoors only; the record per account): THE DUEL, AS A STATE
+// DUEL1: THE DUEL, AS A STATE
 // MACHINE. Pure - no DOM, no game import: everything the game owns (the socket, the bodies, the ring's place, the
 // blow's resolution) is handed in, so test/net/duel/duel_session.test.js drives two of these against each other over a fake
 // wire and pins the law without a browser.
@@ -20,7 +17,7 @@
 // itself, and a side whose opponent stands far outside it calls the duel off (a teleport, a crafted client).
 //
 // THE BLOWS. After a DUEL_COUNTDOWN_MS count, my blows at my opponent leave as `strike` and `spell` frames (numbered),
-// each carrying the damage MY game rolled - and INT8 (bible/06-Systems/Integrity-Arc.md lane 2): THE RELAY REFEREES THEM
+// each carrying the damage MY game rolled - and INT8 (lane 2): THE RELAY REFEREES THEM
 // (net/duel/duelRef.js). It holds both fighters' vitality (the Royal Tourney's: 300 + 2 x Renown), clips each blow to the
 // weapon my look holds and the arms my token signs, and says the vitality left to both of us (`dref` `hp`); a blow is
 // routed to nobody, and neither save's health is touched. DUEL1 had the DEFENDER resolve every blow on its own machine,

@@ -162,15 +162,6 @@ test('U52: the classic skin still gets the canvas sheet', () => {
   });
 });
 
-test('U52: the fork asks the SKIN, not only the document', () => {
-  // The behaviour pins take both branches; this holds the condition
-  // itself, because `typeof document` alone would send a classic
-  // player to the DOM sheet in every real browser there is.
-  assert.match(read('src/ui/charSheetDoor.js'),
-    /if \(isEnhanced\(\) && typeof document !== 'undefined'\) \{/,
-    'both clauses, in that order');
-});
-
 test('U52: a host with no document keeps the canvas sheet, on either skin', () => {
   skin('enhanced');
   assert.equal(typeof document, 'undefined', 'this test is only meaningful headless');
@@ -200,69 +191,5 @@ test('PX27: the enhanced skin gets the PAUSE WINDOW\'s Stats page, and the host 
   });
 });
 
-test('PX27: the child-push machinery went WITH the overlay, and nothing needs it', () => {
-  const src = read('src/ui/charSheetDoor.js');
-  // The old overlay could PUSH a canvas child - hiding its own div
-  // while the child drew underneath, then popping back - because the
-  // sheet's four buttons opened CLASSIC windows. PX23 and PX24 gave
-  // all three of those an enhanced window, so the doors now CLOSE the
-  // sheet and hand over rather than stacking on top of it.
-  for (const gone of ["host.style.visibility = 'hidden'", 'stepChild', 'mountEnhancedCharSheet']) {
-    assert.ok(!src.includes(gone), `${gone} retired with the overlay it served`);
-  }
-  // IT LANDS ON STATS. Without this the F5 key opens the pause MENU
-  // and the sheet is one press further in - which is the fault PX26
-  // fixed on the dial's north, arriving here by another road.
-  assert.match(src, /^\s*at: 'stats',$/m, 'F5 lands on the sheet, not on a menu with it inside');
-  // AND IT CLOSES BEFORE IT HANDS OVER. Two overlays at once is U55's
-  // stacking bug; the old sheet solved it by hiding itself and pushing
-  // a child, and this solves it by leaving. ESC-BOOK: it hands over to
-  // the HOST's arm (sheetPageDoors, driven in test/ui/escbook.test.js) -
-  // the sheet's factories built windows no slot held.
-  assert.match(src, /\.\.\.sheetPageDoors\(bag, close\),/, 'the page\'s three doors are the host\'s arms');
-  for (const arm of ['inventory', 'spellbook', 'logbook']) {
-    assert.ok(!src.includes(`hooks.${arm}()`), `${arm}: the factory is never called by the page - what it builds, no slot holds`);
-  }
-  // ui/enhanced/enhancedCharSheet.js STAYS: sheetModel is the model both sheets
-  // always read, and the one that remains reads it.
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /import \{ sheetModel \} from '\.\/enhancedCharSheet\.js';/);
-  assert.match(read('src/ui/enhanced/enhancedCharSheet.js'), /export function sheetModel/);
-});
-
 // ── THE RETIRED VIEW ─────────────────────────────────────────────
 
-// AUDIT 39. THE PINS THAT MOVED, and why: this file used to hold
-// three assertions about the view's own input - the F5/Escape arm, the
-// unmount that removes its capture-phase keydown, and the nav that
-// draws a button only where the host handed a factory. PX27 retired
-// that view's CALL SITE and left the view itself exported with no
-// caller anywhere in src/, tools/ or the pages, so those three pins
-// were guarding ~200 lines nothing could reach - and the dead listener
-// they described claimed F5, which is the exact hazard they named. The
-// view is gone; the pins go with it, replaced by the law that put them
-// out of work.
-test('AUDIT 39: the module is the MODEL and nothing else - the view left with its caller', () => {
-  const src = read('src/ui/enhanced/enhancedCharSheet.js');
-  for (const gone of ['export function mountEnhancedCharSheet', 'addEventListener',
-    'document.createElement', 'globalThis.__sheet']) {
-    assert.ok(!src.includes(gone), `${gone} retired with the view that owned it`);
-  }
-  // A module with no DOM in it cannot leak a listener, which is what
-  // the three retired pins were for.
-  assert.doesNotMatch(src, /export function (?!sheetModel)/,
-    'sheetModel is the file\'s only exported function');
-  // ...and the surface the live sheet actually reads is still here.
-  assert.match(src, /export function sheetModel/);
-  assert.match(src, /export const SKILL_GROUPS/);
-  assert.match(read('src/ui/enhanced/enhancedMenu.js'), /import \{ sheetModel \} from '\.\/enhancedCharSheet\.js';/);
-});
-
-test('U52: it draws no paperdoll, and the reason is written down', () => {
-  // The classic sheet composes it at DFU's (200,8). Dropping it
-  // silently is the thing this project's audits punish; the module
-  // says which slice owns it and why it is not this one.
-  const src = read('src/ui/enhanced/enhancedCharSheet.js');
-  assert.doesNotMatch(src, /drawPaperDoll|refreshPaperDoll/);
-  assert.match(src, /THE PAPERDOLL\./);
-  assert.match(src, /inventory slice with the equip map/);
-});

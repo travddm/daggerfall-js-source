@@ -1,6 +1,5 @@
 // @ts-check
-// LC1 (2026-09-23, Mac: "We need to take a chance and also make some insane improvements to our lighting system.
-// Its already really good, but it could be much better while also improving performance"): CLUSTERED LIGHTS -
+// LC1: CLUSTERED LIGHTS -
 // the first step, and the foundation the rest stand on.
 //
 // THE COST IT REMOVES. Every lit fragment of the lane (enhancedLighting.js EL_POINT_LIT_GLSL) walked ALL of the

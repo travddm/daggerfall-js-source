@@ -1,9 +1,8 @@
 // @ts-check
-// STAR7 (2026-10-20): A HELD STAR'S REWARDS ON THIS DEVICE - the receipts carried to the account service, the spoils given
+// STAR7: A HELD STAR'S REWARDS ON THIS DEVICE - the receipts carried to the account service, the spoils given
 // when it says this claim is theirs, and the Renown it pays adopted by the character that held the star. The sea serpent's
 // three (scenes/world.js serpentClaims, serpentSpoils, grantSerpentSpoils), made by the Starfall's host (scenes/starfall/
 // starfallHost.js) on the world's bindings by name, so the world host keeps none of it (HOST-SPLIT). Design:
-// bible/11-Multiplayer/Starfall.md section 6.
 //
 //   the receipts    net/starfall/starClaims.js - kept on the device with the character that held the star, offered to
 //                   `/v1/star/claim` until counted; a counted one notes the questline's act for that character alone

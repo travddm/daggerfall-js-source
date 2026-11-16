@@ -7,7 +7,6 @@
 // room's rivers are on, so each was a straight sunken channel - a canal - up to the town. Each such arm is the path's
 // now, once, as the arrays load (world/roadsProducer.js waterOffPaths): the painter, the channel's cut and the maps read
 // the arrays, so all three agree, and a crossing (no shared arm) is a ford or a causeway as it was.
-// `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

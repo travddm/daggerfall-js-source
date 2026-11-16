@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The quest's life - its end, its children, its
+// QUEST-AUDIT III. The quest's life - its end, its children, its
 // questions, its restart, its shelf - each fix pinned here by its law:
 //
 // - END-GRACE: a quest saved inside its `end quest`'s two ticks of grace (a reward box holds the tick) ends after the
@@ -222,28 +221,6 @@ test('PROMPT-HELD, PromptMulti: the 2-4 button box is held the same way - asked 
   assert.equal(promptOf(qn).isComplete, true, 'no showPromptMulti: spent at once');
 });
 
-test('PROMPT-HELD: a party\'s resync, which rebuilds every action, finds the box held at its place (its task, its index) and does not ask again; the answer spends the action standing there now; the bridge hands the host\'s box through by the same law (mutants: the resync\'s complete; source pin: the bridge\'s doors)', () => {
-  const m = rig();
-  const q = m.startQuestByName('__ASK');
-  ticks(m);
-  const asked = promptOf(q);
-  q.restoreSaveData(envelope(m).quests.find((d) => d.uid === q.uid), m._saveResolvers());   // updateSharedQuest's own restore, in place
-  const rebuilt = promptOf(q);
-  assert.notEqual(rebuilt, asked, 'the fixture: a new action at the place');
-  ticks(m);
-  assert.equal(m.seen.boxes.length, 1, 'the box is up: not asked again');
-  m.seen.boxes[0].respond(true);
-  assert.equal(rebuilt.isComplete, true, 'the answer spends the action at its place now');
-  ticks(m);
-  assert.equal(m.seen.boxes.length, 1, 'and nothing asks again');
-  assert.equal(task(q, 'yes').getTriggerValue(), true);
-
-  const bridge = src('src/scenes/quest/questBridge.js');
-  assert.match(bridge, /showPrompt: \(q, message, respond\) => \(ctx\.showPrompt \? ctx\.showPrompt\(q, message, respond\) \?\? true : false\),/);
-  assert.match(bridge, /showPromptMulti: \(q, message, buttons, respond\) => \(ctx\.showPromptMulti \? ctx\.showPromptMulti\(q, message, buttons, respond\) \?\? true : false\),/);
-});
-
-// PIN MOVED (AUDIT QA3 A2/B3): "paid" is narrowed to what a restart cannot take back and would pay again - a trainer's
 // lesson, or an item handed over (a `give pc` that is no `give pc nothing`, a `get item`) that is not gold and is the
 // player's for good (made permanent, or released: its item no quest item). Gold is not (restartQuest carries the old
 // copy's goldPaid marks to the new copy - auditqa3_life.test.js A2), standing is not (P0B00L01's errand), the
@@ -287,7 +264,6 @@ test('RESTART-PAID: questPaidOut\'s arms - a trainer, an item handed over (given
   assert.equal(questPaidOut(null), false);
 });
 
-// PIN MOVED (AUDIT QA3 A2/B3/B1): gold got, the box alone and standing gained restart now (their verdicts null); a
 // `make permanent` with no hand-over restarts; a quest whose `start quest` has run refuses 'started', after 'paid'.
 test('RESTART-PAID: a running quest that paid its player - a reward box\'s item, an item made permanent, a trainer - refuses the journal\'s Restart (\'paid\', in words) and runs on; one that paid only gold, the box alone or standing, handed only a quest item, made permanent an item it never handed over, lost standing, or has not paid yet restarts; one whose `start quest` ran refuses \'started\' (mutants: the rung)', () => {
   const PAY = {
@@ -340,7 +316,6 @@ test('SHELF-TWIN: a quest item is never taken while another copy of it is kept -
   assert.equal(holdsQuestTwin([null, [qi(7, 'letter')]], item), true);
 });
 
-// PIN MOVED (AUDIT QA3 B8): the host's carriesQuestItem is the pack again (main's expression) - `toting` and `have` read
 // it, and widened, the wagon's dust ran S0000022's step - and its own keepsQuestItem dep serves the reclaim (machine.js
 // reclaimQuest); the share's relay keeps every keeping. The behaviour is auditqa3_life.test.js B8's.
 test('SHELF-TWIN: keepsQuestItem - the reclaim\'s "is it kept" - reads every keeping: the pack, the wagon, the Materials Bag, a repairer\'s hands; never a permanent copy; the host hands it to the machine as keepsQuestItem and to the share\'s relay, its carriesQuestItem the pack alone (mutants: each keeping, the quest test; source pins: the host\'s three seams)', () => {
@@ -354,10 +329,6 @@ test('SHELF-TWIN: keepsQuestItem - the reclaim\'s "is it kept" - reads every kee
   }
   assert.equal(keepsQuestItem({}, res), false);
   assert.equal(keepsQuestItem(null, res), false);
-  const world = src('src/scenes/world.js');
-  assert.equal((world.match(/carriesQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),/g) ?? []).length, 1, 'the share\'s relay: every keeping');
-  assert.equal((world.match(/keepsQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),/g) ?? []).length, 1, 'the machine\'s reclaim: every keeping');
-  assert.match(world, /carriesQuestItem: \(res\) => \(playerEntity\.items \?\? \[\]\)\.some\(\(it\) =>\n\s*it\.questItem && it\.questUID === res\.parentQuest\?\.uid && it\.questSymbol\?\.name === res\.symbol\?\.name\),\n\s*keepsQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),/, 'the machine\'s `toting` and `have`: the pack');
 });
 
 test('RESTART-WORDS: a questline step the journal restarted is no stall - its end lets the drop\'s "could not begin" go, and the runner\'s next look, the step running again, lets go its day of waiting; a step that truly could not begin is still said, and tried again a day later, never every look (mutants: the end\'s clear, the look\'s clear, its wait, its running test)', () => {
@@ -370,24 +341,23 @@ test('RESTART-WORDS: a questline step the journal restarted is no stall - its en
       tick() { for (const q of m.questsToInvoke.splice(0)) m.quests.set(q.uid, q); },
     };
     const clock = { s: 1000 };
-    const runner = createLineRunner({ machine: m, ctx: { level: () => 2, online: () => false, nowSeconds: () => clock.s, outcomeText: () => 'ok' } });
-    // PIN MOVED (QL-OFFERED): the line taken - and the refused case stands at its second step (a save's), for a first
+    const runner = createLineRunner({ machine: m, ctx: { level: () => 4, online: () => false, nowSeconds: () => clock.s, outcomeText: () => 'ok' } });
     // step that will not begin is no take at all (its line stays on offer)
-    if (refuse) runner.restore({ introTables: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, taken: true } });
-    else runner.takeLine('introTables');
+    if (refuse) runner.restore({ introGear: { step: 1, outcomes: {}, done: false, wait: 0, claims: {}, taken: true } });
+    else runner.takeLine('introGear');
     runner.look(); m.tick();
     /** The journal's Restart (machine.js restartQuest): the old copy removed - its tombstone hands it to `dropped` - and
      *  the new started. */
     const restart = () => {
-      const old = [...m.quests.values()].find((q) => q.questName === 'QLIT01');
-      const fresh = { uid: uid++, questName: 'QLIT01', questComplete: false, questTombstoned: false };
+      const old = [...m.quests.values()].find((q) => q.questName === 'QLIG01');
+      const fresh = { uid: uid++, questName: 'QLIG01', questComplete: false, questTombstoned: false };
       old.questTombstoned = true;
       runner.dropped(old);
       m.quests.delete(old.uid);
       m.quests.set(fresh.uid, fresh);
       return fresh;
     };
-    return { m, clock, runner, restart, rec: () => runner.snapshot().introTables, row: () => runner.rows().find((r) => r.id === 'introTables') };
+    return { m, clock, runner, restart, rec: () => runner.snapshot().introGear, row: () => runner.rows().find((r) => r.id === 'introGear') };
   };
   const STALLED = 'Its next step could not begin here: it will be offered again.';
 

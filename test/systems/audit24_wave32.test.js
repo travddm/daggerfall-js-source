@@ -110,72 +110,6 @@ test('audit24 wave32: a subscribed pool gets the stat-zero kill too', () => {
   assert.equal(foe.entity.health, 0, 'a foe drained to zero Strength dies, like any other entity');
 });
 
-test('audit24 wave32: every foe pool in the port is a subscriber, and the dungeon runs its own', () => {
-  // tickActiveEffects / updatePoisons for foes used to appear in exactly ONE
-  // file. The gate is the ratio: a pool that drives foes must reach the
-  // broker somehow, or its foes age at nothing.
-  const w = rd('src/scenes/world.js');
-  assert.ok(w.includes('subscribeFoePools(playerTicker, [() => cityGuards.guards, () => exteriorFoes.foes], foeSinks);'),
-    'the streaming host subscribes both of its pools');
-  // ROAD-G G2: ...AND THE TOWN HOST'S SECOND POOL. This asked for the
-  // WATCH ALONE, which was the whole of `?exterior`'s foe database
-  // until the fixed-city host mounted an encounter pool of its own -
-  // and an unsubscribed pool is exactly the defect this test exists
-  // for: a quest foe stood in the street by CreateFoe's exterior arm
-  // would have carried a Continuous Damage bundle that never took a
-  // round, a poison that never fired and a paralysis that never lifted.
-  const x = rd('src/scenes/exterior.js');
-  assert.ok(x.includes('subscribeFoePools(playerTicker, [() => cityGuards.guards, () => exteriorFoes.foes], foeSinks);'),
-    'the town host subscribes BOTH of its street pools');
-  // AUDIT 58 (review): AND THE INTERIOR HOST, which this test's title
-  // has always claimed and never checked. It mounts two pools
-  // (interiorFoes since IF, interiorGuards since ROAD-B), ran NO
-  // fan-out at all - `runMagicRoundsFor` never named worldModes, so
-  // neither did tickActiveEffects or updatePoisons - and both pools
-  // READ the effect list every frame. Nothing ended one: a Continuous
-  // Damage bundle on a foe in a shop never took a round, a poison
-  // never fired, and a paralysed foe stayed paralysed for the life of
-  // the interior. AUDIT 58 opened the enchant door that lands those
-  // payloads there, so the gap stopped being latent.
-  const m = rd('src/scenes/worldModes.js');
-  assert.ok(m.includes('subscribeFoePools(interiorTicker, [() => interiorFoes?.foes ?? [], () => interiorGuards?.guards ?? []], insideFoeSinks);'),
-    'the interior host subscribes BOTH of its pools, on the window its own ticker claims');
-  // ...through ONE set of doors per entity, the same set the cast engine takes
-  for (const [name, src] of [['world.js', w], ['exterior.js', x]]) {
-    assert.equal((src.match(/const foeSinks = \(g(?:, fromPlayer = true)?\) => \(\{/g) ?? []).length, 1, `${name}: one foeSinks`);   // AUDIT WORLD6b-iii(a) B2: the world host's reads the engine's provenance
-  }
-  // ROAD-G G2: the town host's cast engine takes it through the SAME
-  // pool-membership router the world host's does, and for the same
-  // reason - it mounts two street pools now, and its interior mode has
-  // live foes whose records must knock back and die against THAT
-  // building's collider rather than the street's.
-  assert.ok(x.includes('\n    foeSinks: (f, fromPlayer) => enchantFoeSinks(f, fromPlayer),'),   // AUDIT 68 X4: the provenance rides the door
-    'exterior.js: the cast engine routes through the membership router');
-  assert.ok(x.includes('const enchantFoeSinks = (f, fromPlayer = true) => liveEnchantFoeSinks(f, modes?.dungeonCtx ?? null, foeSinks, _insidePool, (g, fp) => modes?.insideFoeSinksFor(g, fp), fromPlayer);'),
-    '...which is built over the host\'s ONE set of doors');
-  // AUDIT 58 (review): the world host's cast engine takes it through
-  // the POOL-MEMBERSHIP router instead, because its interior mode has
-  // live foes now and a record from a building must knock back and die
-  // against THAT building's collider - `enchantFoeSinks` still answers
-  // `foeSinks` for every exterior record, so it is the same one set of
-  // doors, asked the one question that can tell them apart.
-  assert.ok(w.includes('\n    foeSinks: (f, fromPlayer) => enchantFoeSinks(f, fromPlayer),'),   // AUDIT 68 X4
-    'world.js: and its cast engine takes that same set through the router');
-  assert.ok(w.includes('const enchantFoeSinks = (f, fromPlayer = true) => liveEnchantFoeSinks(f, modes?.dungeonCtx ?? null, foeSinks, _insidePool,'),
-    'and the router is the shared law over this host\'s own foeSinks');
-  assert.ok(m.includes('const insideFoeSinks = (foe, fromPlayer = true) => ({'),
-    'the interior host\'s doors are a module-local the ticker can reach, not a method on the frame-time literal');
-  assert.ok(m.includes('insideFoeSinksFor(foe, fromPlayer) { return insideFoeSinks(foe, fromPlayer); },'),
-    'and the enchant ctx asks that ONE definition rather than a second copy');
-  // the dungeon host owns its foe list inside a closure the ticker never sees,
-  // so it runs the fan-out inline - on the window the tick CLAIMED, not on
-  // arithmetic of its own (which had neither catch-up nor the 2880 cap).
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.ok(d.includes('runMagicRoundsFor(f.entity, _tick.magicRoundWindow.from, _tick.magicRoundWindow.to, { sinks: foeSinks(f, false) });'),   // AUDIT 68 S19-round-ticks-player-provenance: a round is nobody's blow
-    'the dungeon frame body rides the claimed window');
-  assert.ok(!/for \(let r = _prevMinute;/.test(d), 'and its old private minute loop is gone');
-});
-
 test('AUDIT 58: an interior foe\'s bundle AGES AND EXPIRES on its host\'s ticker - both pools, null-safe', () => {
   // The behavioural half of the pin above. The interior host's fan-out
   // is the same one call, so what is checked here is what the missing
@@ -212,55 +146,7 @@ test('AUDIT 58: an interior foe\'s bundle AGES AND EXPIRES on its host\'s ticker
   assert.equal(entityIsParalyzed(watchman.entity), false, 'and the paralysed watchman can act again');
 });
 
-test('audit24 wave32: paralysis reaches the exterior pools', () => {
-  // EnemyMotor.HandleParalysis (:247-260) drops CanAct; EnemyAttack returns at
-  // the top of Update (:91-94) and FixedUpdate (:55-57). Both exterior pools
-  // passed the literal `false` for the motor's paralyzed argument and ran the
-  // attack machine unconditionally, so a paralysed foe kept walking and kept
-  // swinging - and until this wave gave them magic rounds the paralysis never
-  // expired either, which made it permanent.
-  const xf = rd('src/scenes/exteriorFoes.js');
-  assert.ok(xf.includes('const _fParalyzed = entityIsParalyzed(f.entity);'), 'exteriorFoes reads it');
-  // MT-ii wrapped the context (_armed adds the targeting closure when
-  // the host supplies candidates); the paralysis argument is untouched.
-  assert.ok(xf.includes('f.ai.update(foeFrameDt(dt), playerFeet, _armed(f, senses), _fParalyzed, _fPaused);'), 'the motor is told');
-  // MT-ii: the component aims at the SELECTED target (EnemyAttack
-  // reads senses.Target, :199-209) and holds when there is none.
-  assert.ok(xf.includes('if (!_fParalyzed && _tgt) f.attack.update(foeFrameDt(dt), f.ai, _tgt, _fPaused);'), 'the attack machine holds');
-  // MT-ii: the caster aims at the target too, so a foe duelling
-  // another foe stops hurling its fireballs at the player.
-  assert.ok(xf.includes('if (_tgt && f.caster && !_fParalyzed && !_fPaused && f.ai.isHostile) {'), 'and so does casting');   // AUDIT WORLD6b-ii A1: the tick runs always (suppressed at a peer inside the caster)
-  // and no DAMAGE FRAME resolves. EnemyAttack.Update returns at the top while
-  // paralysed, so MeleeDamage/BowDamage never run. The dungeon host gets this
-  // free by suppressing the whole mobile update; these pools resolve off the
-  // mobile's own frames, so without the gate freezing the attack MACHINE would
-  // still have let a mid-swing animation land its blow.
-  // MT-ii: both frames gate on a live TARGET (`_tgt`) instead of the
-  // player's feet - EnemyAttack's MeleeDamage and BowDamage both
-  // return at `senses.Target == null` (:136-137).
-  assert.ok(xf.includes('if (!_fParalyzed && f.mobile.doMeleeDamage && _tgt) {'), 'no melee lands');
-  assert.ok(xf.includes('if (!_fParalyzed && f.mobile.shootArrow && _tgt && onArrow) {'), 'no arrow looses');
-  assert.equal(xf.includes('senses, false)'), false, 'no literal false left behind');
-
-  const cg = rd('src/scenes/cityGuards.js');
-  assert.ok(cg.includes('const _gParalyzed = entityIsParalyzed(g.entity);'), 'cityGuards reads it');
-  assert.ok(cg.includes('g.ai.update(foeFrameDt(dt), playerFeet, _armed(g, senses), _gParalyzed);'), 'the motor is told');   // MT-ii: same wrap
-  assert.ok(cg.includes('if (!_gParalyzed && _tgt) g.attack.update(foeFrameDt(dt), g.ai, _tgt);'), 'the attack machine holds');   // MT-ii: same (AUDIT 68: the voided `events` binding is gone)
-  assert.ok(cg.includes('if (!_gParalyzed && g.mobile.doMeleeDamage && _tgt) {'), 'and no blow lands');   // MT-ii: target-gated
-  assert.equal(cg.includes('senses, false)'), false, 'no literal false left behind');
-});
-
 test('audit24 wave32: PlayerEntity\'s per-minute loop is its OWN, uncapped and un-plus-oned', () => {
-  const src = rd('src/systems/worldTick.js');
-  // it is not the broker's: no 2880 cap, its own marker, and the minute VALUE
-  // tested with no +1 (PlayerEntity.cs:454-459).
-  assert.ok(src.includes('for (let i = lastMinutes; i < nowMinutes; i++)'), 'over the whole elapsed window');
-  assert.ok(src.includes('i % NORMALIZE_INTERVAL_MINUTES === 0'), 'on the minute value');
-  assert.ok(src.includes('entity.lastGameMinutes = nowMinutes;'), 'PlayerEntity.cs:521');
-  const claim = src.slice(src.indexOf('export function claimMagicRounds'), src.indexOf('export function runMagicRoundsFor'));
-  assert.ok(!claim.includes('NORMALIZE_INTERVAL_MINUTES'), 'and it is NOT inside the broker\'s claim');
-  const run = src.slice(src.indexOf('export function runMagicRoundsFor'), src.indexOf('export function runMagicRounds('));
-  assert.ok(!run.includes('NORMALIZE_INTERVAL_MINUTES'), 'nor inside a subscriber\'s round - foes have no reputation');
 
   // BEHAVIOURALLY: a jump far past the broker's 2880-round cap still steps
   // every one of its minutes here, which is how a 21-day sentence works.

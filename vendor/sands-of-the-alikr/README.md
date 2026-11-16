@@ -37,7 +37,3 @@ water, the dirt and the paving at their edges are the original's). Records
 
 Every file here but this note is made by
 `node tools/environmentModsExtract.mjs`.
-
-## The port
-
-`bible/07-Rendering/Sands-Of-The-Alikr.md` is the record.

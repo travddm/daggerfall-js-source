@@ -1,4 +1,4 @@
-// AUDIT GALLEON (2026-10-02, Mac: "Audit this. It must be perfect") - HER RIG AND HER RIG'S HIT BOXES (world/
+// AUDIT GALLEON - HER RIG AND HER RIG'S HIT BOXES (world/
 // galleonRig.js, systems/naval/navalShips.js HULL_BUILDS[2].rig, scenes/naval/navalHost.js rigBoxesOf). Every pin reads her
 // rig AS BUILT, off the runtime's own models (test/csaScene.mjs's MODELS - hull 2 on Mac's galleon): the sails' bones
 // where their clips stand them, the spars and the standing rope out of their meshes (each prism's two rings), the
@@ -495,7 +495,7 @@ test('AUDIT GALLEON R5/G9 her rig\'s hit boxes follow her trim: each square sail
   const s = scene({ settings: { 'SailingAssist.AutoTrimming': false } });
   const boat = s.place(HULL.SmallShip, 0, [37, 2, -91], [0.6, 0, 0.8]);
   boat.MeshObject.localRotation = quatEuler(3, 0, -8);   // her heel and pitch: the boxes ride her MeshObject
-  for (const sail of boat.Sails) stowSail(animatorOf(sail), false);   // PIN MOVED (AUDIT GALLEON-2 RG3): her canvas set - a furled sail's box is gone
+  for (const sail of boat.Sails) stowSail(animatorOf(sail), false);
   const rig = hullBuild(HULL.SmallShip).rig, mo = boat.MeshObject, lp = mo.localPosition;
   // each boom's box on its own boom - the k-th of Come Sail Away's walk - and turned about where that boom stands
   for (const box of rig.filter((b) => b.boom != null)) {
@@ -546,7 +546,6 @@ test('AUDIT GALLEON R5/G9 her rig\'s hit boxes follow her trim: each square sail
   const sb = hullBuild(HULL.SmallShip);
   for (const [mn, mx] of sb.rig) assert.ok(mx[1] > sb.top || mx[2] > sb.bowZ || mn[2] < sb.aftZ || mx[0] > sb.halfWidth || mn[0] < -sb.halfWidth, 'each of her boxes reaches out of her hull\'s box');
   assert.deepEqual(rigBand(sb), [sb.top, Math.max(...sb.rig.map(([, mx]) => mx[1]))], 'the band from her roof to her highest box\'s top');
-  // PIN MOVED (SHIPS-2, 2026-10-07): hulls 4 and 1 are Mac's carrack and Tiny Ship - their boxes ride their booms and
   // their sails as hers do (test/systems/naval/ships2_carrack.test.js, test/world/ships/ships2_largeboat.test.js); the galley's stand as they did
   const theirs = [HULL.SmallShip, HULL.Carrack, HULL.LargeBoat];
   for (const b of HULL_BUILDS.filter((x) => !theirs.includes(x.hull))) for (const box of b.rig) assert.ok(box.boom == null && box.obb == null, `hull ${b.hull}'s boxes as they stood`);

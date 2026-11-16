@@ -1,4 +1,4 @@
-// CharacterRecord parse (SAV1). 1:1 translation of DFU API/Save/
+// CharacterRecord parse. 1:1 translation of DFU API/Save/
 // CharacterRecord.cs ReadCharacterData (MIT, Daggerfall Workshop) - the
 // player character as stored in a SAVETREE.DAT record of type 0x03.
 // The record data (beyond the 71-byte record root) is read at DFU's
@@ -29,7 +29,7 @@ const SKILL_COUNT = 35;
  *  @param {Uint8Array} recordData - the record data AFTER the record
  *  root (SaveTreeBaseRecord.RecordData). */
 /**
- * HARD3 - THE CLASSIC CHARACTER RECORD, written down as a type.
+ * THE CLASSIC CHARACTER RECORD, written down as a type.
  *
  * This is the save envelope's far bank: every field `systems/
  * classicSave.js` reads off a SaveTree Character record's `parsedData`

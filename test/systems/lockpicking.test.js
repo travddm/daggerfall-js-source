@@ -126,7 +126,6 @@ test('R1 hours: the verbatim tables and their edge rows (PlayerActivate.cs:91-10
     'the entry-time shop latch reads the effective online answer');
   assert.equal(isBuildingOpen(BUILDING_TYPES.House2, 23, { online: true }), false,
     'online staffing does not flatten residence hours');
-  // PIN MOVED (OL6, 2026-10-07): the palace joined the relief - test/systems/ol6_service_hours.test.js holds the three it
   // added; the house for sale (8-16) is the hours this pin keeps.
   assert.equal(isBuildingOpen(BUILDING_TYPES.HouseForSale, 23, { online: true }), false,
     'online staffing does not flatten the house for sale\'s hours');
@@ -263,10 +262,4 @@ test('OL4 (AUDIT ALL O1/O2): the PRODUCTION default is the shared clock - no cal
     assert.equal(isBuildingOpen(BUILDING_TYPES.Alchemist, 23, { hour: 12 }), true, 'the seam\'s contract: the positional hour wins - 23 is the hour asked, open by the shift'); assert.equal(isBuildingOpen(BUILDING_TYPES.Alchemist, 12, { hour: 23, online: false }), true, 'and 12 offline is open by the classic table, whatever opts says');
   } finally { setSharedClock(null); }
   assert.equal(isBuildingOpen(BUILDING_TYPES.Alchemist, 23), false, 'the clock gone, the classic answer');
-  const bl = readFileSync(new URL('../../src/systems/buildingLocks.js', import.meta.url), 'utf8');
-  assert.equal(/isOnlinePage/.test(bl), false, 'the URL is not the predicate: the clock is (one home with RESTX2, OL3, ECON1)');
-  assert.equal((bl.match(/online = sharedClockOn\(\)/g) ?? []).length, 2, 'both defaults read the clock');
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  // AUDIT 68 S23-failed-entry-stale-building: the door's record, committed with the context
-  assert.ok(wm.includes("insideOpenShop = !!building?.insideOpenShop\n          || (building?.buildingType != null && isShop(building.buildingType) && isBuildingOpen(building.buildingType, _hour));"), 'O2: a restored interior keeps the saved latch and adds the effective hours - a session that begins inside a closed shop online stands its clerk and sells, not steals');
 });

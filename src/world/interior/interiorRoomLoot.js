@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, SLICE 2 (2026-10-17, test-harness/outdoor-loot/DESIGN.md section 4, DESIGN-REVIEW R-1, R-3, R-5, D-1, D-1a):
+// OUTDOOR-LOOT, SLICE 2:
 // A BUILDING'S CUPBOARD IS ONE LIST FOR EVERYONE IN THE BUILDING, AND EVERY TAKE OF IT IS A CLAIM THE BUILDING'S SEAT JUDGES.
 //
 // WHY. WORLD6a made a building a world room and a stranger's cupboard the room's from its first open - and the room's word
@@ -45,6 +45,7 @@ import {
   ROOM_ANSWERS_KEPT, ROOM_CLAIM_TIMEOUT_MS, ROOM_CLAIMS_MAX, ROOM_PUT_RESAY_MS, ROOM_TAKEN_TEXT,
 } from '../../systems/roomLoot.js';
 import { createClaimLedger, CLAIM_KEEP_MS } from '../../systems/loot/claimLedger.js';
+import { weighLedger } from '../../systems/item/pendingCarry.js';   // my takes in flight weigh at the carry gate
 import { validLootList, LOOT_LIST_MAX } from '../../systems/loot/loot.js';
 import { markRoomCarried } from '../../systems/loot/roomCarriedList.js';
 import { neverPeerHanded, peerHanded } from '../../systems/peerWord.js';
@@ -82,7 +83,7 @@ export function createInteriorRoomLoot(net, bag) {
   let claimN = 0;
   let wasSeat = false;
   const entity = net.entity();
-  const ledger = createClaimLedger({ entity, say: (t) => net.say(t), newId: () => roomClaimId(net.selfId() ?? 'self', bag.stamp, ++claimN) });
+  const ledger = weighLedger('interior-loot', entity, createClaimLedger({ entity, say: (t) => net.say(t), newId: () => roomClaimId(net.selfId() ?? 'self', bag.stamp, ++claimN) }));
 
   const live = () => net.selfId() != null;
   /** Whether this client judges: it holds the relay's seat - or no other holds it that it knows of (no welcome yet, a socket

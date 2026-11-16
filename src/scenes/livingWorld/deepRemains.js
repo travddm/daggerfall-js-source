@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW6b (2026-10-05, bible/06-Systems/Living-World.md "LW6b"): THE FALLEN IN THE DEEP - the dead of a dive left in its
-// dungeon, to be found. Mac: "You can find them dungeon diving ... explore a dynamic world". LW6's companies go down
+// LW6b: THE FALLEN IN THE DEEP - the dead of a dive left in its
+// dungeon, to be found.. LW6's companies go down
 // into the dungeons near their towns and some never come up (trips.js diveTrip, trouble.js diveTrouble); their town
 // says so (DIVE_NEWS). This lays what the deep kept where a player can find it.
 //

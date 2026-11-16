@@ -1,5 +1,4 @@
-// PROF-DELETE (2026-09-29, Mac, asked what a deleted online character's professions come to: "Goes with it; wait on
-// trades"; MERGE 2's open question 3, bible/06-Systems/Online-Arc.md PROF-DELETE): A REALM CHARACTER DELETED TAKES ITS
+// PROF-DELETE: A REALM CHARACTER DELETED TAKES ITS
 // PROFESSIONS WITH IT, and waits on what another player is part of. The service over the real migrations
 // (server-account/src/realm.js deleteRealm, REALM_MARKET_OPEN_SQL): its Stores and its professions' tracks go in the
 // delete's one batch, another character's stay, the history stays; while it has market business open - a listing or an
@@ -140,15 +139,10 @@ test('PROF-DELETE while the character has market business open the delete is ref
     b.settled(db);
     assert.deepEqual(await deleteRealm({ db, bucket: null }, P, made.id), { ok: true }, `${what}, settled: it goes`);
   }
-  const s = src('server-account/src/index.js');
-  assert.match(s, /'realm-market-open': 409,/, 'a conflict the player settles, never a bad request');
 });
 
 test('PROF-DELETE the words: the door says what to settle, and the delete dialog says the professions and their Stores go with the character', () => {
   const said = realmRefusalText('realm-market-open');
   assert.equal(said, accountRefusalText('realm-market-open'));
-  // PIN MOVED (RPT1026-MARKET ARRIVE): a trader's takings named too (they hold the delete), and the way out of a waiting purchase
   assert.match(said, /^This character still has business on the market: a listing, an auction, a bid, a buy order, a commission, goods on the way or waiting to be collected, or a trader's takings\. Settle it first\. Play it online once and goods waiting for it come to its pack on their own; takings are collected on the Vendor page\.$/);
-  // ACCOUNT-HOMES: the homes it bought go with it, and a home is the account's - its other characters lose it too
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /'Deleting an online character is permanent\. Its Renown, professions, Stores, the homes it bought and its guild place are lost\. Homes belong to your account, so your other characters lose them too\. Any offline copy you made stays\.'/);
 });

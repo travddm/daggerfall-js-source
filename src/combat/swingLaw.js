@@ -1,6 +1,5 @@
 // @ts-check
-// SWING-LAW (2026-09-28, Mac: "swing speed is insane", then "Do whatever is the most detailed. I dont care about departure,
-// especially if we can do it better"): THE WEAPON IN THE HAND, AS THE SWING LAW READS IT. characters/weaponStates.js holds
+// SWING-LAW: THE WEAPON IN THE HAND, AS THE SWING LAW READS IT. characters/weaponStates.js holds
 // the law (swingFrameSeconds - the tempo of the wielder's Speed, the heft of the weapon's weight against their Strength,
 // the handling of its kind) and is a leaf, so what it needs of the player is read here and registered: the held item
 // off the equip table - the hand the swing is in (`ctx.usingRightHand`, AUDIT-RR F1's ctx) - its template's base weight

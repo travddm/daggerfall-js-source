@@ -1,4 +1,4 @@
-// L10N3f (2026-09-28): DFU'S TEXT DATABASES FROM A PACK - the Table-format files under StreamingAssets/Text that
+// L10N3f: DFU'S TEXT DATABASES FROM A PACK - the Table-format files under StreamingAssets/Text that
 // TextManager reads by name (GetText / HasText, "schema: *key,text", '-' comments). A pack installs its own over
 // DFU's. Pinned through the port's real functions and windows, over made-up French rows in the pack's format:
 //  - the reader: HasText, GetText and its error string, a file that will not parse, English holding none;

@@ -1,4 +1,4 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): WRITTEN IN THE STARS, step 2 of 2.
+-- QL15 (2026-10-19; docs/systems/quests.md): WRITTEN IN THE STARS, step 2 of 2.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner an hour after
 -- step 1 ends: the astrologer's word is in the journal at once. The giver is unnamed (an astrologer): a Spellcaster of
 -- the player's own town, at its temple. The act is the Firmament's (qlActs.js star-taken, three). Lore: canon - the

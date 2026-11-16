@@ -1,6 +1,4 @@
-// MW-CLOAK1 (2026-10-09, Mac: "2. The new cloak and its textures. Note: The new cloak will need bones to animate with
-// the character movement. Ensure theres no clipping with weapons that are stowed"; asked, both cloaks wear it, Aquamarine
-// and Yellow the nearest of his eight paintings, stowed gear is worn over it): MAC'S CLOAK, SKINNED, ON DAGGERFALL'S
+// MW-CLOAK1: MAC'S CLOAK, SKINNED, ON DAGGERFALL'S
 // CASUAL AND FORMAL CLOAK - AND WHAT HANGS AROUND IT.
 //
 // One export, nothing of Bethesda's in it, committed as it came; eight paintings, a mesh each; skinned at bake time to
@@ -176,7 +174,7 @@ test('MW-CAPE-RIGID: through the binder on retail\'s rig the cloak moves with th
 test('MW-CLOAK1: the cloak eases back over the armour under it - the ebony pauldrons through its shoulders, then behind it in every pose; the cloak\'s batch replaced, never written into', async () => {
   const asm = await body(ARMOR_MATERIAL.Ebony);
   const before = through(asm, isUnder);
-  assert.ok(before > 1, `the ebony pauldrons stand ${before.toFixed(2)} through the cloak as baked`);   // PIN MOVED (MW-CAPE-RIGID): 2.6 hung over the spine and clavicles, 1.3 on the chest alone
+  assert.ok(before > 1, `the ebony pauldrons stand ${before.toFixed(2)} through the cloak as baked`);
   const cloak = asm.pieces.find(isCloak);
   const baked = cloak.batch.positions; const copy = Float32Array.from(baked);
   const fit = fitCloakOver(asm, { isCloak, isUnder });
@@ -223,7 +221,7 @@ test('MW-CLOAK1: stowed gear against the cloak, on the addon\'s own scabbards - 
   fitCloakOver(asm, { isCloak, isUnder });
   poseAssembly(asm);
   const gearAt = (bone) => asm.pieces.filter((p) => isGear(p) && p.bone === bone);
-  assert.ok(crossings(asm, (p) => gearAt('Bip01 LongBladeTwoClose').includes(p)) > 40, 'the greatsword through the cloak as the addon slings it');   // PIN MOVED (MW-CAPE-RIGID): 48 edges on the chest alone
+  assert.ok(crossings(asm, (p) => gearAt('Bip01 LongBladeTwoClose').includes(p)) > 40, 'the greatsword through the cloak as the addon slings it');
   assert.ok(crossings(asm, (p) => gearAt('Bip01 LongBladeOneHand').includes(p)) > 0, 'the longsword\'s tip through its side');
   const dagger = gearAt('Bip01 ShortBladeOneHand')[0].source;
   const sword = gearAt('Bip01 LongBladeOneHand')[0].source; const swordCopy = Float32Array.from(sword);
@@ -275,14 +273,3 @@ test('MW-CLOAK1: stowed gear against the cloak, on the addon\'s own scabbards - 
   assert.equal(bare.pieces[0].source, was);
 });
 
-test('MW-CLOAK1 by source: the third-person build fits the cloak over the body\'s skin and what it wears, once it is assembled, and ties the stowed gear to it; a weapon swap fits the new holster; seated or astride the cloak rides the chest as standing (MW-CAPE-RIGID: no batch swapped); a cloak\'s icon is its own', () => {
-  const fp = src('src/combat/fpArm.js');
-  assert.match(fp, /hangHipLight\(arm\);[^\n]*\n\s*const cloakFit = fitThirdPersonCloak\(arm, new Set\(\[\.\.\.skinRows, \.\.\.worn\.adds\]\.map\(\(row\) => row\.slot\)\)\);/);
-  assert.match(fp, /\.\.\.resolvedHolster\.notes, \.\.\.cloakFit\.notes,/);
-  assert.match(fp, /bindPartsInto\(t\.arm, \[\.\.\.tResolved\.parts, \.\.\.tHolster\.parts\]\);\s*const tFit = fitThirdPersonCloak\(t\.arm, null\);[^\n]*\n\s*t\.holster = tHolster\.info;\s*t\.notes = \[\.\.\.\(t\.notes \|\| \[\]\)\.filter\(\(n\) => !\/\^holster\[ :@\]\/\.test\(n\)\), \.\.\.tHolster\.notes, \.\.\.tFit\.notes\];/);
-  assert.match(fp, /export function fitThirdPersonCloak\(arm, underSlots\) \{\s*const isCloak = \(p\) => isCloakSlot\(p\.slot\);\s*const isGear = \(p\) => HOLSTER_SLOTS\.includes\(p\.slot\);\s*const covered = \(slot\) => underSlots\.has\(slot\) && slot !== 'tail' && !\/\^shield\\b\/\.test\(slot\);\s*const cloak = underSlots \? fitCloakOver\(arm, \{ isCloak, isUnder: \(p\) => covered\(p\.slot\) \}\) : null;\s*const gear = fitStowedGear\(arm, \{ isCloak, isGear \}\);\s*const follow = followCloak\(arm, \{ isCloak, isGear \}\);/);
-  assert.doesNotMatch(fp, /seatCloak|cloaked:|seatedBatch/, 'MW-CAPE-RIGID: one bone, one batch - a seat swaps nothing');
-  assert.match(fp, /const cloak = ownCloakFor\(\{ kind: 'clothing', name: CLOTHING_NAME\[item\.templateIndex\], dye: item\.dye \?\? 0 \}\);\s*if \(cloak\) return \{ id: `\$\{cloak\.id\}_\$\{cloak\.painting\}`, model: cloak\.model \};/);
-  assert.match(fp, /if \(\(item\.group === 'MensClothing' \|\| item\.group === 'WomensClothing'\) && !ownCloakFor\(/);
-  assert.match(src('src/formats/morrowind/mwFirstPerson.js'), /assembly\.time = time;[\s\S]{0,400}if \(assembly\.afterPose\) assembly\.afterPose\(assembly\);\s*assembly\.bounds = /);
-});

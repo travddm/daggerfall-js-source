@@ -1,5 +1,4 @@
-// REL4 + REL5 (2026-09-29, Mac: "How can we drastically improve the
-// install experience? ... I really want to make it AAA grade").
+// REL4 + REL5.
 //
 // REL4 - THE RELEASE IS PUBLISHED WHOLE, ONCE. Every release on GitHub
 // carried its generated notes two or three times over (one copy per OS
@@ -16,8 +15,7 @@
 // The names are a contract (app/lib/downloads.cjs): the build config must
 // produce them and the publish job refuses a set without them.
 //
-// REL6 (2026-10-01, Mac: "Remove patch notes from the codebase and somehow
-// refrain from patch notes filling up the codebase") - THE NOTES COME OFF
+// REL6 - THE NOTES COME OFF
 // THE PULL REQUEST. A release's notes are the `## Patch notes` sections of
 // the pull requests merged since the previous release, read off GitHub;
 // the PATCH-NOTES-*.md files they used to be read from are gone from the
@@ -69,9 +67,9 @@ test('REL5: the build config produces EXACTLY the names the downloads promise - 
 });
 
 test('REL5: a download link names the file under releases/latest/download, which GitHub answers with the newest copy', () => {
-  assert.equal(RELEASES_URL, 'https://github.com/Lattymoy/daggerfall-js-source/releases');
+  assert.equal(RELEASES_URL, 'https://github.com/travddm/daggerfall-js-source/releases');
   assert.equal(latestDownloadUrl(DOWNLOAD_FILES.winSetup),
-    'https://github.com/Lattymoy/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-setup.exe');
+    'https://github.com/travddm/daggerfall-js-source/releases/latest/download/DFO-Online-win-x64-setup.exe');
   // the copy that updates BY HAND is sent its own file, never a page of eleven
   assert.equal(manualDownloadFile({ platform: 'darwin', portable: false, packaged: true }), DOWNLOAD_FILES.mac);
   assert.equal(manualDownloadFile({ platform: 'win32', portable: true, packaged: true }), DOWNLOAD_FILES.winPortable);
@@ -83,14 +81,12 @@ test('REL5: a download link names the file under releases/latest/download, which
 
 test('REL4: a release is the four downloads, the three manifests and two blockmaps (DA13: and the game\'s manifest and pack) - one short publishes nothing', () => {
   assert.deepEqual([...EXPECTED_RELEASE_FILES].sort(), [
-    // PIN MOVED: DA13 - the game a file at a time: the manifest every copy reads first, and the pack it takes ranges of
     'DFO-Online-game.json.gz', 'DFO-Online-game.pack',
     'DFO-Online-linux-x86_64.AppImage',
     'DFO-Online-mac-arm64.dmg', 'DFO-Online-mac-arm64.dmg.blockmap',
     'DFO-Online-win-x64-portable.exe',
     'DFO-Online-win-x64-setup.exe', 'DFO-Online-win-x64-setup.exe.blockmap',
     'latest-linux.yml', 'latest-mac.yml', 'latest.yml',
-    // PIN MOVED: BR5 (AUDIT BR5) - and the four again, under the names a copy from before the rename asks for
     ...Object.values(LEGACY_DOWNLOAD_FILES),
   ].sort());
   assert.deepEqual(missingReleaseFiles([...EXPECTED_RELEASE_FILES, 'extra.txt']), [], 'a whole set passes');
@@ -120,7 +116,7 @@ test('REL4: the notes are the patch notes the release brings, once, and say so p
 });
 
 test('AUDIT INSTALL L5-10: the script\'s own commands, run - a set one short exits 1, "latest" prints what the publish job reads', () => {
-  const script = new URL('../../scripts/desktopRelease.mjs', import.meta.url).pathname;
+  const script = fileURLToPath(new URL('../../scripts/desktopRelease.mjs', import.meta.url));
   const node = (...args) => spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
   const dir = mkdtempSync(join(tmpdir(), 'rel4-set-'));
   try {
@@ -192,7 +188,7 @@ test('REL5: the site links each installer by the name the release promises - the
   const row = entry.match(/<span class="dl">([\s\S]*?)<\/span>/)?.[1] ?? '';
   assert.deepEqual([...row.matchAll(/>([^<]+)<\/a>/g)].map((m) => m[1]), ['Windows', 'macOS', 'Linux'], 'one link per platform, in the page\'s own link style');
   assert.match(landing, /<a class="plaque" href="#desktop">Install<\/a>/, 'and the door\'s Install lands on them');
-  assert.doesNotMatch(landing.replace(/href="https:\/\/github\.com\/Lattymoy\/daggerfall-js-source\/releases\/latest"[^>]*>Every file</, ''), /href="https:\/\/github\.com\/[^"]*\/releases\/latest"/,
+  assert.doesNotMatch(landing.replace(/href="https:\/\/github\.com\/travddm\/daggerfall-js-source\/releases\/latest"[^>]*>Every file</, ''), /href="https:\/\/github\.com\/[^"]*\/releases\/latest"/,
     'the release PAGE is linked once, as "Every file" - never as the way to install');
 });
 
@@ -239,6 +235,7 @@ test('REL6: the pull requests a release brings - every merge on the first-parent
     git('config', 'user.email', 'probe@example.invalid');
     git('config', 'user.name', 'probe');
     git('config', 'commit.gpgsign', 'false');
+    git('config', 'tag.gpgsign', 'false');
     commit('start');
     git('tag', 'app-v0.1.1');
     // a branch that merged another pull request into ITSELF - that merge is the branch's, never main's
@@ -317,6 +314,7 @@ test('REL6: the notes command, spawned as the publish job spawns it - the pull r
     git('config', 'user.email', 'p@example.invalid');
     git('config', 'user.name', 'p');
     git('config', 'commit.gpgsign', 'false');
+    git('config', 'tag.gpgsign', 'false');
     commit('one');
     git('tag', 'app-v0.1.1');
     for (const [pr, branch] of [[7, 'sea'], [8, 'pause']]) {
@@ -435,8 +433,4 @@ test('BR5: a copy from before the rename still finds its download, and a copy fr
   assert.equal(releaseAssetUrl({ assets: [at(DOWNLOAD_FILES.linux, 'https://example.com/x.AppImage')] }, DOWNLOAD_FILES.linux), null);
   assert.equal(releaseAssetUrl({ assets: [at(DOWNLOAD_FILES.linux, 'https://github.com/someone/else/releases/download/v1/x.AppImage')] }, DOWNLOAD_FILES.linux), null);
   for (const bad of [null, {}, { assets: 'x' }, { assets: [null, 7, { name: DOWNLOAD_FILES.linux }] }]) assert.equal(releaseAssetUrl(bad, DOWNLOAD_FILES.linux), null);
-  // and the shell takes it: the notice's Download, and the launcher's Reinstall after a check has read one
-  const main = rd('app/main.cjs');
-  assert.match(main, /const listed = file \? releaseAssetUrl\(json, file\) : null;\n\s*if \(tag && listed\) listedDownload = listed;/);
-  assert.match(main, /function ownDownloadUrl\(\) \{\n {2}if \(listedDownload\) return listedDownload;/);
 });

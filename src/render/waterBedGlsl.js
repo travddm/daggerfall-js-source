@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WATER-NEXT 2 - THE BED'S FACE (2026-10-07): UNDER CLEAR WATER, THE GROUND IS A BED, NOT A PAINTING OF WATER. The water
+// WATER-NEXT 2 - THE BED'S FACE: UNDER CLEAR WATER, THE GROUND IS A BED, NOT A PAINTING OF WATER. The water
 // carves its bed (world/water/waterBed.js) and looks through to it - and the first shots from the real game (Daggerfall's
 // moat, tools/waterLookProbe.mjs) showed the same flat blue as before: the ground under the water wore Daggerfall's
 // WATER TILE, so the look through clear water was a look at more painted water. Where the enhanced water lies over the
@@ -30,7 +30,18 @@ uniform uvec4 uBedMask[8];     // the draw's water corners, packed as the water'
 // share and, of it, the FRINGE's - the art's water past the sheet, which no water darkens: drawn as wet mud, not silt.
 // AUDIT PRECIP GROUND-5: under the snow (\`snowC\`, the ground's cover - render/snowCoverGlsl.js) the art's water is the
 // texel's it wears there: the summer record's mask walked to its winter record's (uSnowArr.x layers on) by the cover
-vec2 bedCover(uint data, vec2 f, vec3 tl, vec2 gx, vec2 gy, float snowC) {
+// COAST-LOOK: \`blended\` a tile the ground drew as its two kinds - its line wanders at \`p\` as the sheet's, its art no fringe
+uniform float uGroundClamped;   // 1 when the ground's sampler clamps at the tile's edge (Point)
+// The art's water mask is data, so its sample keeps every tap inside its tile: under a repeat wrap a shore tile's wet
+// edge would blend into its dry one. The margin is half a texel up close; at a distance it is the footprint, which
+// covers the coarser mip level and the anisotropic taps.
+vec3 bedMaskAt(vec3 tl, vec2 gx, vec2 gy) {
+  if (uGroundClamped > 0.5) return tl;
+  vec2 texel = 1.0 / vec2(textureSize(uTileArr, 0).xy);
+  vec2 margin = min(max(0.5 * texel, max(abs(gx), abs(gy))), vec2(0.5));
+  return vec3(clamp(tl.xy, margin, 1.0 - margin), tl.z);
+}
+vec2 bedCover(uint data, vec2 f, vec2 p, vec3 tl, vec2 gx, vec2 gy, float snowC, bool blended) {
   if (uWaterBed < 0.5) return vec2(0.0);
   uint rec = data >> 2u;
   if (${PUDDLE_RECORDS.map((r) => `rec == ${r}u`).join(' || ')}) return vec2(0.0);
@@ -40,11 +51,12 @@ vec2 bedCover(uint data, vec2 f, vec3 tl, vec2 gx, vec2 gy, float snowC) {
   uint m = (word >> ((data & 7u) * 4u)) & 15u;
   if (m == 0u) return vec2(0.0);
   float c = mix(mix(float(m & 1u), float((m >> 1u) & 1u), f.x), mix(float((m >> 2u) & 1u), float((m >> 3u) & 1u), f.x), f.y);
-  float k = smoothstep(0.3, 0.7, c);
+  float k = smoothstep(0.3, 0.7, c - (blended ? geWander(p) : 0.0));
   float art = 0.0;
-  if (m != 15u && k < 1.0) {
-    float a = textureGrad(uTileArr, tl, gx, gy).a;
-    if (snowC > 0.0) a = mix(a, textureGrad(uTileArr, vec3(tl.xy, tl.z + float(uSnowArr.x)), gx, gy).a, snowC);
+  if (m != 15u && k < 1.0 && !blended) {
+    vec3 maskAt = bedMaskAt(tl, gx, gy);
+    float a = textureGrad(uTileArr, maskAt, gx, gy).a;
+    if (snowC > 0.0) a = mix(a, textureGrad(uTileArr, vec3(maskAt.xy, maskAt.z + float(uSnowArr.x)), gx, gy).a, snowC);
     art = smoothstep(0.3, 0.7, a);
   }
   return vec2(max(k, art), max(art - k, 0.0));
@@ -52,7 +64,7 @@ vec2 bedCover(uint data, vec2 f, vec3 tl, vec2 gx, vec2 gy, float snowC) {
 
 /** The call site's line: the bed's texel mixed into `tex` (a decode wrapped round the sample for the lane). */
 export const waterBedMix = (decode = (s) => s) =>
-  `vec2 bedK = bedCover(data, tileUV, vec3(tuv, float(layer)), gx, gy, snowC);
+  `vec2 bedK = bedCover(data, tileUV, unwrapped, vec3(tuv, float(layer)), gx, gy, snowC, ge);
   if (bedK.x > 0.0) {   // WATER-NEXT 2: under the water, a bed
     vec3 silt = ${decode(`textureGrad(uTileArr, vec3(tuv, ${BED_RECORD.toFixed(1)}), gx, gy).rgb`)} * vec3(${BED_SILT.map((v) => v.toFixed(2)).join(', ')});
     silt = mix(silt, vec3(dot(silt, vec3(0.299, 0.587, 0.114))) * ${WET_MUD.toFixed(2)}, ${WET_MUD_SHARE.toFixed(2)} * bedK.y);   // SHORE-SILT: the fringe past the sheet is wet mud - darker, greyer

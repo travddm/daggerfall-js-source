@@ -1,9 +1,9 @@
 // @ts-check
-// TELL1 (bible/12-Enhanced-AI/Feud-Arc.md section 3.2): WHAT A BLOW'S TARGET TAKES - a leaf, importing nothing.
+// TELL1: WHAT A BLOW'S TARGET TAKES - a leaf, importing nothing.
 //
 // `entityMods.registerWeaponBlowMod` scales a WEAPON blow by its striker's lights; nothing scaled a blow by the state
 // of the one it lands on, for hands and spells as for weapons. A staggered foe takes a quarter more (TELL1), an
-// overreached one more again (TELL4), a revenant's adaptations take some away and its weakness adds (RVN2, RVN3) - all
+// overreached one more again (TELL4) - both
 // here, read once at the tail of `combat/formulas.js calculateAttackDamage` (after either core, every attacker-side
 // scale and mentor mode, before the reports - so they say what landed) and once at a spell's landing on a foe
 // (`scenes/hostMagic.js applySpellToFoe`). A leaf because the brain registers into it and the formulas read it, and the

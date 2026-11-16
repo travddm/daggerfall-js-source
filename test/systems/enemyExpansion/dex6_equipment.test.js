@@ -1,4 +1,4 @@
-// DEX6 (2026-10-20, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION'S EQUIPMENT.
+// DEX6 - DAGGERFALL ENEMY EXPANSION'S EQUIPMENT.
 // BestiaryMod.Start takes EnemyEntity.AssignEnemyEquipment over: while Roleplay & Realism: Items' realisticEnemyEquipment
 // is on, the mod's copy of RRI's class arm (DEX_RRICompat.cs) kits a class foe - its class read off the row's
 // EquipmentTable, its armor off its career's forbidden armor, an unknown class armed with a longblade, its second weapon

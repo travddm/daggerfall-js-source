@@ -137,7 +137,7 @@ export const FORCED_TEXT_COLOR = [186 / 255, 207 / 255, 125 / 255, 1];
  *  decides. MagicItems lists NOTHING - DFU disabled it because
  *  classic lists nothing there either, and the empty tab is kept
  *  (Ledger B).
- *  AUDIT PROF10 J2 (DECIDED, Mac: "Item maker can add to it"): a
+ *  AUDIT PROF10 J2 (DECIDED): a
  *  CRAFTED piece of jewellery is taken with the enchantments it
  *  carries (enchanting.js keptEnchantments - a Masterwork's Rare
  *  roll); MAKER-RARE (FIELD BUGS 2026-10-26): and an identified Rare,
@@ -278,7 +278,7 @@ export class ItemMakerWindow {
    *  credit - which is what both the label (:193) and the enchant
    *  check (:734) read; the deduction seam spends the letters too. */
   gold() { return totalGoldAmount(this.hooks.player ?? this.hooks.entity ?? {}); }
-  /** PROF12 (bible/06-Systems/Professions-Arc.md 9.3): Enchanting's share off the gold, percent - the host's (online, the
+  /** PROF12 (9.3): Enchanting's share off the gold, percent - the host's (online, the
    *  professions this account's), none else: DFU's own price. */
   goldDiscountPct() { const v = this.hooks.goldDiscountPct?.(); return Number.isSafeInteger(v) && v > 0 && v < 100 ? v : 0; }
 

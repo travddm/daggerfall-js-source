@@ -1,5 +1,4 @@
-// STAFF-PANEL5-MESSAGE (2026-10-22, mob, 04:14Z: a message in the middle of one player's screen; design doc "DFO Staff
-// Panel: design", Message on screen) - THE HUB'S HALF: a staff message's nudge, to one account's own sockets.
+// STAFF-PANEL5-MESSAGE - THE HUB'S HALF: a staff message's nudge, to one account's own sockets.
 //
 // The account service stores the message first and posts a signed order of its own kind ('smsg': the account `s` and the
 // message's id `mi`, never its words) to the relay's door (index.js lawDoor), which hands it to the hub. Only that order

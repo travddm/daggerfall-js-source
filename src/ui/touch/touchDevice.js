@@ -1,6 +1,5 @@
 // @ts-check
-// TI3 (2026-09-17, Mac: "Some desktop users are reportably recieving the
-// mobile UI instead of desktop"). THE ONE HOME of "is this a touch
+// TI3. THE ONE HOME of "is this a touch
 // device": ui/touch/touch.js re-exports it for the layer and its callers,
 // scenes/dataSource.js's diet reads it too.
 //

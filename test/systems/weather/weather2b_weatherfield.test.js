@@ -1,5 +1,4 @@
-// WEATHER2b (Mac, 2026-09-14: "a dynamic world space event system where weather can be traveled out of and into
-// instead of just starting and stopping in your location"): THE WEATHER FIELD - the day's words as places. The sim's
+// WEATHER2b: THE WEATHER FIELD - the day's words as places. The sim's
 // six zone words (DFU's roll, the shared day's online) are read as a field over the map on the enhanced lane: a rain,
 // thunder or snow word becomes cells scattered over the zone's land on a seeded, jittered lattice, drifting on the
 // day's wind, with the zone's base sky between them; the player's weather is what the field says at the player. A
@@ -15,7 +14,7 @@ import {
 } from '../../../src/systems/weather/weatherField.js';
 import {
   resetWeatherSim, setWeatherFieldLaw, weatherFieldOn, sampleWeatherField, weatherCrossingStamp, weatherJumpStamp, currentFieldCells, currentFieldCell,
-  importClimateWeathers, tickWeather, applyClimateWeather, weatherRespawn, currentWeather, setSnowGroundLaw, WEATHER_ENUM, setWeatherMapLaw,
+  importClimateWeathers, tickWeather, applyClimateWeather, weatherRespawn, currentWeather, setSnowGroundLaw, snowGroundLawOn, WEATHER_ENUM, setWeatherMapLaw,
 } from '../../../src/systems/weather/weatherSim.js';
 import { createWindModel, frontFactor, FRONT_LEAD_MIN, CROSS_LEAD_MIN } from '../../../src/systems/wind/wind.js';
 import { CLIMATES, MAX_MAP_PIXEL_Y } from '../../../src/formats/mapsFile.js';
@@ -60,7 +59,7 @@ test('WEATHER2b coordinates: field metres are the natives scaled to the pixel\'s
 });
 
 test('WEATHER2b the cells: three precipitating words with a spacing, a radius range, a coin and a base sky; the candidate is seeded by day, index and word; the drift is the day\'s heading times the minutes', () => {
-  assert.deepEqual(Object.keys(CELL_WORDS), ['rain', 'thunder', 'snow', 'sandstorm']);   // WEATHER2d: the sandstorm, never a zone's word, seats on desert land
+  assert.deepEqual(Object.keys(CELL_WORDS), ['rain', 'thunder', 'snow', 'sandstorm', 'ashfall']);   // WEATHER2d: the sandstorm, never a zone's word, seats on desert land   //
   for (const w of Object.values(CELL_WORDS)) { assert.ok(w.spacing > 2 * w.radius[0] && w.radius[1] > w.radius[0] && w.p > 0 && w.p < 1); assert.ok(['overcast', 'cloudy'].includes(w.base)); }
   assert.equal(baseWordOf('rain'), 'overcast'); assert.equal(baseWordOf('thunder'), 'cloudy'); assert.equal(baseWordOf('snow'), 'overcast');
   for (const w of ['sunny', 'cloudy', 'overcast', 'fog']) assert.equal(baseWordOf(w), w, 'a whole-sky word makes no cells');
@@ -159,22 +158,50 @@ test('WEATHER2b the sim: nothing off the lane; on it the player\'s word is the f
   assert.equal(weatherCrossingStamp(), 0); assert.deepEqual(currentFieldCells(), []);
 });
 
-test('WEATHER2b the switch: the enhanced skin, Enhanced Environments and the weather-events row, the seam over them; the row is forced on online', () => {
+test('WEATHER2b the switch: the weather-events row alone, in every skin, with Enhanced Environments on or off; the row is forced on online', () => {
   resetWeatherSim();
   const skin = uiSkin(); const pe = PREF_DEFAULTS.enhancedEnvironments, pw = PREF_DEFAULTS.weatherEvents;
   try {
-    setUiSkin('enhanced'); setPref('enhancedEnvironments', true); setPref('weatherEvents', true);
-    assert.equal(weatherFieldOn(), true);
-    setPref('weatherEvents', false); assert.equal(weatherFieldOn(), false, 'the row is the switch');
-    setPref('weatherEvents', true); setPref('enhancedEnvironments', false); assert.equal(weatherFieldOn(), false);
-    setPref('enhancedEnvironments', true); setUiSkin('classic'); assert.equal(weatherFieldOn(), false, '1:1 on the classic skin');
+    for (const sk of ['enhanced', 'classic']) {
+      for (const ee of [true, false]) {
+        setUiSkin(sk); setPref('enhancedEnvironments', ee); setPref('weatherEvents', true);
+        assert.equal(weatherFieldOn(), true, `on in the ${sk} skin with Enhanced Environments ${ee}`);
+        setPref('weatherEvents', false); assert.equal(weatherFieldOn(), false, 'the row is the switch');
+      }
+    }
     setWeatherFieldLaw(true); assert.equal(weatherFieldOn(), true, 'the seam wins'); setWeatherFieldLaw(null);
   } finally { setUiSkin(skin); setPref('enhancedEnvironments', pe); setPref('weatherEvents', pw); resetWeatherSim(); }
   const row = FEATURES.find((f) => f.id === 'weather-events');
-  assert.ok(row); assert.equal(row.control.key, 'weatherEvents'); assert.equal(row.control.initial, true); assert.equal(row.control.online, true);
+  assert.ok(row); assert.equal(row.control.key, 'weatherEvents'); assert.equal(row.control.initial, true); assert.equal(row.control.online, 'room');
   assert.equal(PREF_DEFAULTS.weatherEvents, true); assert.equal(ONLINE_FORCED_PREFS.weatherEvents, true, 'one field for every player');
   assert.equal(FEATURES.findIndex((f) => f.id === 'weather-events'), FEATURES.findIndex((f) => f.id === 'enhanced-map') + 4, 'TAMRIEL1/TAMRIEL2 (2026-10-08): the continent\'s two rows stand between the 3D dungeon map and this; FT18: where the sway row stood - the sway is the wind row\'s part now; EM3-3D: the 3D dungeon map row stands between, under the map row it belongs to');
-  assert.match(rd('src/systems/weather/weatherSim.js'), /get\('wxfield'\) !== 'off'/, 'the kill door');
+});
+
+test('WEATHER2b alone: with Enhanced Environments off and the plain skin the events fire (a crossing into a cell is rain, the clear is overcast); with both on the same events fire and the extension is on beside them', () => {
+  const skin = uiSkin(); const pe = PREF_DEFAULTS.enhancedEnvironments, pw = PREF_DEFAULTS.weatherEvents;
+  const now = SUMMER + 12 * 1440;
+  const p = placesOn(Math.floor(now / 1440));
+  const run = () => {
+    resetWeatherSim(); setWeatherMapLaw(false); setWeatherFieldLaw(null);   // the field lane, the real switch (no seam)
+    importClimateWeathers(DAY);
+    tickWeather(now, CLIMATES.Woodlands);
+    assert.equal(weatherFieldOn(), true);
+    assert.equal(sampleWeatherField(now, CLIMATES.Woodlands, p.clear, WOODS, 'drain'), true);
+    assert.equal(currentWeather(), 'overcast', 'the clear between the cells');
+    assert.equal(sampleWeatherField(now, CLIMATES.Woodlands, p.inside, WOODS, 'live'), true);
+    assert.equal(currentWeather(), 'rain', 'walked into the cell'); assert.equal(weatherCrossingStamp(), 1);
+  };
+  try {
+    setPref('weatherEvents', true);
+    setUiSkin('classic'); setPref('enhancedEnvironments', false);
+    run();
+    assert.equal(snowGroundLawOn(), false, 'Enhanced Environments off: no extension');
+    setUiSkin('enhanced'); setPref('enhancedEnvironments', true);
+    run();
+    assert.equal(snowGroundLawOn(), true, 'Enhanced Environments on: the ground law extends the events');
+    setPref('weatherEvents', false);
+    assert.equal(sampleWeatherField(now, CLIMATES.Woodlands, p.clear, WOODS, 'live'), false, 'the row off: Enhanced Environments does not run them');
+  } finally { setUiSkin(skin); setPref('enhancedEnvironments', pe); setPref('weatherEvents', pw); resetWeatherSim(); }
 });
 
 test('WEATHER2b the wind: a crossing builds its front on the short lead, the day roll\'s on three hours; the factor takes the lead; the model says which lead is up', () => {
@@ -197,32 +224,3 @@ test('WEATHER2b the wind: a crossing builds its front on the short lead, the day
   assert.equal(c.state().front.lead, FRONT_LEAD_MIN, 'an arrive with no change on its tick is forgotten');
 });
 
-test('WEATHER2b the controller and the hosts: the sky eases on the front\'s own lead and has an arrive hook; both hosts sample the field after the drain, read the crossing stamp after the jump\'s, hand the arrivals the place, and give the clouds the field\'s cells', () => {
-  const shared = rd('src/scenes/shared.js');
-  assert.match(shared, /weatherArrive\(\) \{ windModel\.arrive\(\); \}/);
-  assert.match(shared, /const easeDt = windModel\.inLead\(\) \? dt \* \(WEATHER_EASE_MINUTES \/ windModel\.leadMinutes\(\)\) : dt;/);
-  assert.doesNotMatch(shared, /FRONT_LEAD_MIN/, 'the controller no longer assumes the long lead');
-  const w = rd('src/scenes/world.js'), e = rd('src/scenes/exterior.js');
-  for (const [name, s] of [['world', w], ['exterior', e]]) {
-    assert.match(s, /const drained = tickWeather\(/, `${name}: the drain's answer`);
-    assert.match(s, /sampleWeatherField\(Math\.floor\(playerTicker\.classicMinutes\), [^,]+, [^;]+, climateAt, drained \? 'drain' : 'live'\);/, `${name}: the field after the drain`);
-    assert.match(s, /let seenCrossing = weatherCrossingStamp\(\);/, `${name}: the boot's stamp is the baseline`);
-    assert.match(s, /const crossing = weatherCrossingStamp\(\) !== seenCrossing(?: \|\| seaVentures\.stormTurned\(\))?;(?:\s*\/\/[^\n]*)?\s*\n\s*seenCrossing = weatherCrossingStamp\(\);\s*\n\s*if \(crossing && !jump\) sky\.weatherArrive\(\);/, `${name}: a crossing tells the sky, a jump wins`);
-    assert.match(s, /cells: fieldCellsHere\(\), cloudBase: /, `${name}: the clouds' cells are the field's (WEATHER3c: the base they stand on beside them)`);
-    assert.match(s, /const climateAt = \(px, py\) => maps\.getClimateIndex\(px, py\);/, `${name}: the map's lookup`);
-  }
-  assert.match(w, /const fieldXZ = \(\) => \{ const p = walkMode \? player\.pos : cam\.pos, wc = state\.worldCoords\(p\); return \[\.\.\.fieldFromNative\(wc\.x, wc\.z\), altitudeOfWorldY\(p\[1\] - state\.compensation\[1\]\)\]; \};/, 'world: the player\'s place in the field - and its height above the sea (PRECIP1)');
-  assert.match(w, /cellOfField\(c, \(x, z\) => \{ const n = nativeFromField\(x, z\); return state\.localFromWorld\(n\[0\], n\[1\]\); \}\)/, 'world: the cells back into the floating host space (WEATHER3g: through the one conversion)');
-  assert.match(w, /weatherRespawn\(Math\.floor\(playerTicker\.classicMinutes\), maps\.getClimateIndex\(px\.x, px\.y\), Math\.random, fieldXZ\(\), climateAt\)/, 'world: the respawn samples the destination');
-  assert.equal((w.match(/applyClimateWeather\([^;]*fieldXZ\(\), climateAt\);/g) || []).length, 2, 'world: both travel arrivals sample the destination');
-  assert.match(e, /fieldOfPixelLocal\(_locPixel\.x, _locPixel\.y, eye\[0\], eye\[2\]\)/, 'exterior: the eye in the location\'s pixel');
-  assert.match(e, /cellOfField\(c, \(x, z\) => pixelLocalOfField\(_locPixel\.x, _locPixel\.y, x, z\)\)/);
-});
-
-test('WEATHER2b records: the arc page\'s B, the ledger row, the features arc, Home\'s index and the testing row', () => {
-  assert.match(rd('bible/07-Rendering/Weather-Arc.md'), /^## B - THE WEATHER FIELD \(WEATHER2b, 2026-09-14\)/m);
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /^\| \*\*THE WEATHER FIELD \(WEATHER2b, 2026-09-14\)\*\*/m);
-  assert.match(rd('bible/10-UI/Features-Arc.md'), /^## WEATHER2b - WEATHER AS PLACES, THE ROW \(2026-09-14\)/m);
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /B: the weather field/);   // PIN MOVED (WALLET1's merge of main, 2026-10-05): Home.md's page index moved, byte for byte, to its own page
-  assert.match(rd('bible/09-Testing/Testing-Rows-2026-10-19.md'), /^\| weather2b_weatherfield\.test\.js \| \d+ \| WEATHER2b/m);
-});

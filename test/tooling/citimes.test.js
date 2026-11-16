@@ -1,4 +1,4 @@
-// CI-TIMES (2026-10-19, Mac: "Do it" - the shards' times recorded by CI, not re-taken by hand): every shard records
+// CI-TIMES: every shard records
 // each of its files' wall time (tools/fileTimes.mjs, through the summary's reporter), a green run's eight records are
 // merged onto the times it was split by and saved in the Actions cache (tools/testTimes.mjs --merge, test-times.yml),
 // and every later run's shards are split by the newest saved - all eight by the same one (verify.yml's `times`).
@@ -77,7 +77,9 @@ test('CI-TIMES THE PIECES: a file\'s own event is the one at nesting 0 named its
   const files = ['test/b.test.js', 'test/a.test.js', 'test/c.test.js', 'test/d.test.js'];
   const merged = mergeTimes({ 'test/a.test.js': 10, 'test/c.test.js': 30, 'test/gone.test.js': 7, 'test/d.test.js': -4 },
     [{ 'test/a.test.js': 11.4, 'test/b.test.js': 20 }, { 'test/a.test.js': 12, 'test/b.test.js': 'slow', 'test/x.test.js': 1 }], files);
-  assert.deepEqual(merged, { 'test/a.test.js': 12, 'test/b.test.js': 20, 'test/c.test.js': 30 });
+  // a: the later record (12) blended with the base's 10, a third of the way; b: no base time, the record's own
+  assert.deepEqual(merged, { 'test/a.test.js': 11, 'test/b.test.js': 20, 'test/c.test.js': 30 });
+  assert.deepEqual(mergeTimes({ 'test/a.test.js': 900 }, [{ 'test/a.test.js': 0 }], ['test/a.test.js']), { 'test/a.test.js': 600 }, 'a zero is a time too');
   assert.deepEqual(Object.keys(merged), ['test/a.test.js', 'test/b.test.js', 'test/c.test.js'], 'sorted');
   assert.deepEqual(mergeTimes({}, [{ 'test/a.test.js': 2.5 }], ['test/a.test.js']), { 'test/a.test.js': 3 }, 'whole milliseconds');
   assert.deepEqual(mergeTimes(undefined, [], ['test/a.test.js']), {});
@@ -101,7 +103,7 @@ test('CI-TIMES THE MERGE OF A RUN: every record under the downloaded folder (one
   writeFileSync(join(dl, 'test-times-shard-2', 'notes.txt'), 'not a record');
   assert.deepEqual(mergeDir(dl, root), { files: 4, recorded: 2, kept: 1, untimed: 1 });
   assert.equal(readFileSync(join(root, 'tools/testTimes.json'), 'utf8'),
-    JSON.stringify({ 'test/a.test.js': 40, 'test/c.test.js': 30, 'test/sub/b.test.js': 20 }, null, 1) + '\n');
+    JSON.stringify({ 'test/a.test.js': 20, 'test/c.test.js': 30, 'test/sub/b.test.js': 20 }, null, 1) + '\n');
 });
 
 test('CI-TIMES THE SHARD RECORDS: runTests hands a runner with a record the summary\'s reporter - on even where the summary is not - and the record\'s path, absolute, in its environment, and none without one; `node tools/testShards.mjs i/n --record <file>` runs its files into it, and asks for the file when none is given (mutants: the reporter off with the summary; the path relative; the record not handed on)', (t) => {
@@ -110,7 +112,7 @@ test('CI-TIMES THE SHARD RECORDS: runTests hands a runner with a record the summ
   runTests(['test/a.test.js'], { root: ROOT, times: {}, cores: 2, spawn, summary: false });
   assert.deepEqual(calls[0].args.slice(0, 2 + summaryReporters(ROOT).length), ['--test', '--test-concurrency=2', ...summaryReporters(ROOT)]);
   assert.equal(calls[0].opts.env.TEST_TIMES_RECORD, join(process.cwd(), 'rel/times.json'), 'absolute - the runner runs in the root');
-  assert.equal(calls[1].opts.env, undefined, 'no record, the environment as it was');
+  assert.equal(calls[1].opts.env.TEST_TIMES_RECORD, process.env.TEST_TIMES_RECORD, 'no record, none added');
   assert.ok(!calls[1].args.some((a) => a.includes('failSummary')), 'and no summary asked');
 
   const all = testFiles(ROOT), rec = join(scratch(t), 'shard.json');
@@ -154,7 +156,7 @@ test('CI-TIMES THE WORKFLOWS: `times` finds the newest saved times (a lookup, no
   for (const w of [v, tt]) for (const m of w.matchAll(/uses: actions\/cache\/(?:restore|save)@v4\n {8}with:\n {10}path: (\S+)\n/g)) assert.equal(m[1], 'tools/testTimes.json', 'one path - a cache is found only by the path it was saved with');
 
   assert.match(c, /\n {2}times:\n {4}needs: \[verify\]\n {4}uses: \.\/\.github\/workflows\/test-times\.yml\n {4}with:\n {6}planned: \$\{\{ needs\.verify\.outputs\.times \}\}\n/);
-  assert.match(c, /\n {2}check:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify\]\n/, 'the check never waits on the save');
+  assert.match(c, /\n {2}check:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[plan, verify, light\]\n/, 'the check never waits on the save');
   assert.match(d, /\n {2}times:\n {4}needs: \[main, verify\]\n {4}uses: \.\/\.github\/workflows\/test-times\.yml\n {4}with:\n {6}ref: \$\{\{ needs\.main\.outputs\.sha \}\}\n {6}planned: \$\{\{ needs\.verify\.outputs\.times \}\}\n/);
   assert.match(d, /\n {2}deploy:\n {4}needs: \[verify, site\]\n/, 'nor the publish');
 });

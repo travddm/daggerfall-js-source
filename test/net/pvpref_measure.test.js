@@ -1,5 +1,5 @@
-// PVP-REF (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE MEASUREMENT GATE
-// (bible/11-Multiplayer/Seats-Arc.md 6.1: "PVP-REF's slice must run a full room - 40 fighters, 60 spectators and 6
+// PVP-REF: THE MEASUREMENT GATE
+// (6.1: "PVP-REF's slice must run a full room - 40 fighters, 60 spectators and 6
 // relay-run guards ... with headless clients, the SLAM probes' way, at or under 60% of every room budget
 // (FOES_ROOM_BYTES_PER_S, HIT_ROOM_BYTES_PER_S, the pose fan). If it cannot, siege sizes drop to 8 against 8 and 16
 // against 16 until it can").
@@ -17,7 +17,7 @@
 // (SLAM1/SLAM6: 200 standing in one block, every one moving - N x (POSE_FAN_MAX + the rest / POSE_FAR_SHARE) x
 // POSE_HZ_MIN = 59,000 sends a second, arithmetic).
 //
-// MEASURED (2026-10-01, this file): 106 sockets at 4 Hz - 21,293 pose sends a second (36% of the 59,000; 3,407 KiB/s, the
+// MEASURED: 106 sockets at 4 Hz - 21,293 pose sends a second (36% of the 59,000; 3,407 KiB/s, the
 // town's own per-send cost, nothing a siege adds); 160 blows and 24 casts landed a second, fanned as 19,462 siege sends,
 // 1,045 KiB/s (26% of FOES_ROOM_BYTES_PER_S's 4,096); the busiest socket 10 KiB/s of siege frames (4% of
 // HIT_ROOM_BYTES_PER_S's 256), 50 KiB/s of everything. The sizes stand - 6.4's 20 a side and 4 sellswords - and the fall
@@ -31,7 +31,7 @@ import { poseHzFor, POSE_HZ_MIN } from '../../src/net/online.js';
 import { fakeRoom } from '../fakeRoom.mjs';
 
 const M = SIEGE_UNITS_PER_M;
-const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // PIN MOVED (AUDIT-SEATS): R8 - the weapon in the right hand (EquipSlots.RightHand 19); slot 0 is an amulet's, and a weapon there is held no more
+const LOOK = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };
 const SHARE = 0.6;
 const SECONDS = 10;
 /** The pose fan's design point (SLAM1/SLAM6): 200 in one block, all moving, at the crowded floor. */

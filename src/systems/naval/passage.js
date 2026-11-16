@@ -1,7 +1,6 @@
 // @ts-check
-// PASSAGE (2026-10-19, the owner: "Add the ability to buy and ride a friendly boat (if one is docked) at any port. You
-// can have the ability to choose where you want to sail. A new form of immersive travel") - PASSAGE UNDER SAIL, its
-// law. Design: bible/03-World/Passage.md.
+// PASSAGE - PASSAGE UNDER SAIL, its
+// law. Design:.
 //
 // A port's own friendly ships lie at its quays (scenes/naval/navalHost.js harbourFrame: a harbour's merchantmen and its
 // crown's ships, moored at their berths). Walk up to one and Activate: her master names the ports he will sail for -

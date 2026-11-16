@@ -1,5 +1,4 @@
-// DW2 - THE SPRITES INTO THE CODEBASE. Mac (2026-09-23): "this needs to
-// be in the codebase, not an attachable file". Reads Diverse Weapons'
+// DW2 - THE SPRITES INTO THE CODEBASE.. Reads Diverse Weapons'
 // shipped `.dfmod` (the zip's `Mods/diverse weapons.dfmod`) with the
 // port's own UnityFS reader and writes every Texture2D out under
 // public/art/diverse-weapons/ by the exact name DFU asks for

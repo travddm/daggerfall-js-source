@@ -8,7 +8,7 @@
 import { shadePiece, pushQuad } from './pieceLoft.js';
 import { KHAJIIT_FURS, ARGONIAN_HIDES } from '../palettes.js';
 
-// AUDIT 68 S06-race-ramp-table-dup: the defaults are the palette
+// The defaults are the palette
 // table's FIRST swatch (Tabby coat/belly - cats are counter-shaded: dark
 // back/top, pale belly/chest/inner legs - and Swamp hide), not copies.
 export const KHAJIIT_FUR   = KHAJIIT_FURS[0].coat;

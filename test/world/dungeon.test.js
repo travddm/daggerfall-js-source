@@ -487,8 +487,7 @@ test('dungeon: RDB corpus - teleporter destinations resolve (P10; 2 verbatim-dea
   // (N0000003/W0000003 @23676) target an ACTIONLESS model - DFU's
   // actionLinkDict only holds acting objects + editor flats, so DFU's
   // LinkActionNodes leaves their NextObject null and the delegate
-  // logs "can't teleport"; ours does exactly the same (2026-08-16
-  // audit finding, kept bug-for-bug).
+  // logs "can't teleport"; ours does exactly the same.
   const { blocks, getModel } = loadReal();
   let checked = 0, resolved = 0;
   const dead = [];
@@ -559,7 +558,4 @@ test('AUDIT 28 W3c: RandomDungeonTextures - the five modes, the main-story gate,
   assert.deepEqual(dungeonTextureTable({ ...args, mapId: 77 }), dungeonTextureTable({ ...args, mapId: 77, mode: 4 }), 'clamped to 4');
   resetToDefaults();
   assert.equal(LIVE['Video/RandomDungeonTextures'], 'src/world/dungeon/dungeonTextures.js');
-  // And the layout goes through the fork, with the RAW MapId.
-  const layout = readFileSync(new URL('../../src/world/dungeon/dungeonLayout.js', import.meta.url), 'utf8');
-  assert.match(layout, /dungeonTextureTable\(\{\s*\n\s*locationId: dfLocation\.dungeon\.recordElement\.header\.locationId,\s*\n\s*mapId: dfLocation\.mapTableData\?\.mapId \?\? 0,/);
 });

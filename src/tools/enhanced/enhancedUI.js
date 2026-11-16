@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // ENHANCED — a modern UI for Daggerfall
 //
 // A PROTOTYPE. It is wired to the real data and to nothing else: no
@@ -50,7 +49,6 @@
 // structural, no bevels. The accent is brass because the game already
 // owns it, and its counterpart is verdigris, which is what brass
 // becomes.
-// ═══════════════════════════════════════════════════════════════════
 
 import { SKILL_NAMES } from '../../systems/skills.js';
 import { ITEM_GROUPS } from '../../characters/equipRules.js';

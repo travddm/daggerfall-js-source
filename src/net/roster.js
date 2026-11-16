@@ -1,7 +1,5 @@
 // @ts-check
-// CHAT-R1 (2026-09-16, Mac: "an attached sidepanel on the chat ui
-// showing all currently online players in alphabetical order.
-// Scrollable"): WHO IS HERE, and in what order.
+// CHAT-R1: WHO IS HERE, and in what order.
 //
 // The session already keeps the answer - `OnlineSession.peers`, a Map
 // of id -> { id, name, ... } merged over every room it holds
@@ -73,7 +71,7 @@ export const ROSTER_ROWS_MAX = 200;
  *             hubFound?: { q?: string, l?: any[] }|null }} RosterSource   // CHAT-FIND-HUB: the hub's answer to the search box
  */
 
-// PERF-ON3 (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for online"):
+// PERF-ON3:
 // THE ROSTER IS DERIVED ONCE, NOT ONCE A FRAME. The chat panel asks for these rows on EVERY frame the chat is open
 // (ui/chatPanel.js paintWho - a peer can join without a line being said), and the World tab's list is everyone the hub
 // knows: up to CHAT_ROSTER_MAX from the welcome and every join after it. Each ask rebuilt every row (sanitizeName's
@@ -178,7 +176,7 @@ export function rosterRows(session) {
   // one name a player looks at most is the one name with no title on
   // it (ACC1d-MARK's shape, again - a signal true for everybody but
   // you reads as a fault in your own account).
-  // HIDDEN-UNCOUNTED (2026-10-24, Mac: "Invisible players dont count towards the online count"): EXCEPT WHILE I AM HIDDEN.
+  // HIDDEN-UNCOUNTED: EXCEPT WHILE I AM HIDDEN.
   // The relay leaves a hidden staff socket out of every roster and count (server/src/staffHidden.js, NAMED BY NOBODY), so
   // every other screen's "Online - N" leaves me out; my own still listed my row and counted it, so a hidden staff member
   // read a count one higher than everyone else's - themselves, the one player nobody can see.
@@ -202,8 +200,7 @@ export function rosterRows(session) {
   const n = Number(session?.roomCount);
   const total = Number.isFinite(n) && n > rows.length ? n : rows.length;
   const label = typeof session?.label === 'string' && session.label ? session.label : 'Online';
-  // CHAT-FIND-ALL (2026-10-14, Dudey: "searching players in chat looks like it only finds the ones that are shown in the
-  // list"): `all` is every row this client knows, sorted and UNCUT - the panel's search filters it, not the first
+  // CHAT-FIND-ALL: `all` is every row this client knows, sorted and UNCUT - the panel's search filters it, not the first
   // ROSTER_ROWS_MAX the column draws. The same frozen array while nothing moved (PERF-ON3), so the panel's key holds.
   // non-enumerable: the answer's shape (rows, total, shown, label) is what its callers and pins compare; `all` rides beside it
   // CHAT-FIND-HUB: and the players the hub's own search found (`hubFound`) that this client does not know
@@ -211,8 +208,7 @@ export function rosterRows(session) {
 }
 
 let _hubOf = /** @type {any} */ (null), _hubBase = /** @type {readonly RosterRow[]|null} */ (null), _hubOut = _lastAll;
-/** CHAT-FIND-HUB (2026-10-15, Mac: "player search isnt working properly. Even in world tab I try to search for someone
- *  and they can't be found cause it only shows like 25 ppl out of 600"): past CHAT_ROSTER_MAX online the hub lets the
+/** CHAT-FIND-HUB: past CHAT_ROSTER_MAX online the hub lets the
  *  World tab's everyone go (net/online.js sendHubWho) and a shard's link knows its own shard alone, so the search -
  *  which filters `all` (CHAT-FIND-ALL) - found nobody on the other fifteen. The hub's answer to the box's query
  *  (net/online.js askFind, `hubFound`) joins `all`: each player once (my own row is my session's), by name.

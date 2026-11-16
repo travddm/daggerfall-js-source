@@ -1,10 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HUB1 (2026-09-25) — EVERY REGION'S MAIN CITY IS ITS HUB.
+// HUB1 — EVERY REGION'S MAIN CITY IS ITS HUB.
 //
-// Mac: "One big thing Im trying to brain storm is giving each region's
-// main city a natural player hub and future ownership for online
-// guilds". Asked, Mac chose the whole arc - exclusive homes, a
+// . Asked, Mac chose the whole arc - exclusive homes, a
 // decorator of our own, guilds, and seat ownership "all out" - and left
 // respawning at a hub out of it ("That'll be a seperate idea"). This
 // slice is the ground the rest stands on: WHICH city is each region's
@@ -39,6 +37,9 @@ const KIND_RANK = Object.freeze({
 });
 
 const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.trim().toLowerCase() === b.trim().toLowerCase();
+/** BAY-LEFT-SEA (systems/region/marketHubs.js): a settlement kind's rank - 3 a city, 2 a town, 1 a village, 0 no
+ *  settlement - the claim's first word, read by a province's market hub off a registry row's type. */
+export const settlementRank = (type) => KIND_RANK[type] ?? 0;
 
 /**
  * A location's claim to be its region's hub, read in order: [kind, named for the region, exterior blocks,

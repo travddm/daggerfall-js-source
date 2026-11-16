@@ -1,6 +1,5 @@
-// CHAT-COLOURS + PING1 + NAME-INK (2026-10-11). The players: "Chat color-coding per channel (i.e. White for Global,
-// Green for Regional, Purple for Guild, Grey for Local)" and "A unique color or alert for @name pings"; Mac: "the color
-// was the problem not the font" (a player's name drawn in the same ink as their words), "make sure the colors are all
+// CHAT-COLOURS + PING1 + NAME-INK. The players: "Chat color-coding per channel (i.e. White for Global,
+// Green for Regional, Purple for Guild, Grey for Local)" and "A unique color or alert for @name pings"; (a player's name drawn in the same ink as their words), "make sure the colors are all
 // good readable".
 //
 // ONE TABLE, TWO GROUNDS. Every colour comes twice: `light` for the dark grounds - Enhanced Plus's chat box, and the
@@ -29,7 +28,7 @@ export const CHANNEL_COLOURS = Object.freeze({
   lfg: Object.freeze({ light: '#98c4ff', dark: '#173478' }),      // CHAT-TRADE: blue
 });
 
-/** CHAT-RP (2026-10-14, Mac: "/rp Italicizes and makes text color green. For roleplay purposes"): a line of roleplay's
+/** CHAT-RP: a line of roleplay's
  *  words - green and leaning on every tab, whatever the channel's colour (its kind keeps its own, as an action's does);
  *  a yellower green than the Region's, so the lean is not the only thing that tells them apart. */
 export const RP_COLOURS = Object.freeze({ light: '#a8e66e', dark: '#1d420a' });

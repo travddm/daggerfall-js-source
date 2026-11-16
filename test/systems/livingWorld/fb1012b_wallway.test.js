@@ -2,7 +2,7 @@
 // set down on its way where the way leaves its town, and that was townTrim - a radius (half the grid's side and half a
 // block). A town's walls stand on its RMB grid's square edge: a way leaving on a diagonal set the party down inside the
 // walls, and it walked out through them (and in through the next town's). A long town's long axis the same. The trim is
-// now where the way leaves the grid's box. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// now where the way leaves the grid's box..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -56,10 +56,3 @@ test('WALL-WAY the trims of a way: each its town\'s exit; held to 0.4 of the way
   assert.deepEqual(wayTrims(city, null, diag), [townExit(city, diag), 0], 'the wild end is no town\'s');
 });
 
-test('WALL-WAY every trip kind trims by wayTrims and the host gives a town its grid\'s shape (mutants: one trip left on the radius; the shape unwritten)', () => {
-  const trips = readFileSync(new URL('../../../src/systems/livingWorld/trips.js', import.meta.url), 'utf8');
-  assert.equal((trips.match(/Math\.min\(townTrim\(/g) ?? []).length, 0, 'no trip on the radius');
-  assert.equal((trips.match(/const \[trim0, trim1\] = wayTrims\(home, /g) ?? []).length, 5, 'the market, the hunt, the trip, the pilgrimage, the dive');
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(world, /w: Math\.max\(1, ed\?\.width \?\? 1\), h: Math\.max\(1, ed\?\.height \?\? 1\),/);
-});

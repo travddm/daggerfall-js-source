@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-B: DeepWaterTileData.cs (Iliac Puddle No More 1.2.2, jet082) - what
 // the deep bay knows about ONE streamed pixel: its climate and the 3 x 3
 // climates around it (blended into the floor's base depth and colour
@@ -18,7 +17,6 @@
 // ETHER-DEEP: the C#'s map is the bake's FRAME (deepWatersBake.js BAY_FRAME, the Bay's 1000 x 500) - its clamps and its
 // map-edge refusals read the frame that holds the pixel, so an Eltheric Ocean pixel walks its own box's cells
 // (etherWatersBake.js) where it walked the Bay's clamped corner; the Bay's are the C#'s to the integer.
-// ═══════════════════════════════════════════════════════════════════
 
 import { climateBaseDepth, climateBandSignal } from './deepBathymetry.js';
 import { mapDataHasWater, isLocalPointWater } from './deepWaterClassification.js';

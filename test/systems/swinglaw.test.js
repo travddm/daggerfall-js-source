@@ -1,11 +1,10 @@
-// SWING-LAW (2026-09-28, Mac: "swing speed is insane", then "Do whatever is the most detailed. I dont care about departure,
-// especially if we can do it better") - THE PLAYER'S SWING IS THE PORT'S OWN LAW.
+// SWING-LAW - THE PLAYER'S SWING IS DFU'S SPEED LINE AND THE WEAPON'S HEFT.
 //
 // DFU's line (FormulaHelper.GetMeleeWeaponAnimTime, `3 * (115 - LiveSpeed) / 980` a frame, five frames a blow) is a
 // hyperbola in the rate: a second a blow at Speed 50, four blows a second at 100. DISC28-D gave the rig the live Speed
-// it had never read, and a werewolf's +40 put it on the cap (DISC29-G, test/systems/disc29_swing.test.js). The law
-// (characters/weaponStates.js): DFU's frame at Speed 50 x TEMPO(Speed) x HEFT(weight, Strength) x HANDLING(weapon,
-// hands), bounded; the reader of the weapon in the hand (combat/swingLaw.js); Roleplay & Realism's weaponSpeed and
+// it had never read, and a werewolf's +40 put it on the cap (DISC29-G, test/systems/disc29_swing.test.js). B3 (balance
+// lane) gave the Speed line back: the law (characters/weaponStates.js) is DFU's frame at the Speed (held to 0..100) x
+// HEFT(weight, Strength) x HANDLING(weapon, hands), bounded, and a fast build keeps 86% of DFU's rate at the least; the reader of the weapon in the hand (combat/swingLaw.js); Roleplay & Realism's weaponSpeed and
 // Items' weaponBalance answer through it (test/systems/rr1_realism.test.js, test/systems/rri2_realism.test.js). A wielder the port does
 // not know (a foe's machine, a peer's walker, the viewers) keeps DFU's line.
 import { test } from 'node:test';
@@ -14,7 +13,7 @@ import { readFileSync } from 'node:fs';
 
 import {
   getMeleeWeaponAnimTime, machineAttack, registerMeleeWeaponAnimTime, CLASSIC_FRAME_UPDATE,
-  SWING_BASE_FRAME, SWING_TEMPO_AT_0, SWING_TEMPO_AT_100, swingTempo, swingHeft, SWING_HEFT_FREE_KG, SWING_HEFT_PER_KG,
+  SWING_BASE_FRAME, swingTempo, swingHeft, SWING_HEFT_FREE_KG, SWING_HEFT_PER_KG,
   SWING_HEFT_MAX, SWING_HANDLING, SWING_TWO_HANDED, swingHandling, SWING_FRAME_MIN, SWING_FRAME_MAX, swingFrameSeconds,
 } from '../../src/characters/weaponStates.js';
 import { installSwingLaw, readSwing } from '../../src/combat/swingLaw.js';
@@ -52,38 +51,57 @@ function blowTime(entity) {
   return t;
 }
 
-test('SWING-LAW: the tempo - Speed 50 is DFU\'s own frame, 100 swings 1.67 times as often, 0 takes 1.4 times as long; a straight line, held to 0..100, never 0', () => {
-  assert.equal(SWING_BASE_FRAME, dfu(50), 'the middle is the swing every player had before DISC28-D');
-  assert.equal(SWING_TEMPO_AT_0, 1.4); assert.equal(SWING_TEMPO_AT_100, 0.6);
+test("SWING-LAW: the tempo - DFU's own line, held to 0..100 and never 0: 100 swings 4.3 times as often as 50 would, and a frame is DFU's to the digit", () => {
+  assert.equal(SWING_BASE_FRAME, dfu(50), "the middle of DFU's line");
   assert.equal(swingTempo(50), 1);
-  assert.ok(Math.abs(swingTempo(100) - 0.6) < 1e-12 && Math.abs(swingTempo(0) - 1.4) < 1e-12);
-  assert.ok(Math.abs(swingTempo(75) - 0.8) < 1e-12, 'a straight line: 0.8% of the swing a point of Speed');
-  assert.equal(swingTempo(150), swingTempo(100), 'held at 100 (a mod or a spell past the cap is still the cap)');
+  for (const sp of [0, 20, 50, 70, 100]) assert.ok(Math.abs(swingTempo(sp) * SWING_BASE_FRAME - dfu(sp)) < 1e-12, `Speed ${sp}: DFU's frame`);
+  assert.equal(swingTempo(150), swingTempo(100), "held at 100 (a mod or a spell past the cap is still the cap)");
   assert.equal(swingTempo(-40), swingTempo(0));
-  assert.equal(swingTempo(NaN), 1, 'no number reads as 50');
+  assert.equal(swingTempo(NaN), 1, "no number reads as 50");
   assert.equal(swingFrameSeconds(50), dfu(50));
-  assert.ok(Math.abs(swingFrameSeconds(100) / swingFrameSeconds(50) - 0.6) < 1e-12);
-  for (let s = -50; s <= 200; s += 5) {
-    assert.ok(swingFrameSeconds(s) > 0, `Speed ${s}: a frame is never 0 (DFU's line was 0 at 115 and the machine's loop never ended)`);
-    if (s > 0 && s <= 100) assert.ok(swingFrameSeconds(s) < swingFrameSeconds(s - 5), `Speed ${s}: quicker than ${s - 5}`);
+  for (const sp of [0, 20, 50, 70, 100]) assert.ok(Math.abs(swingFrameSeconds(sp) - dfu(sp)) < 1e-12, `Speed ${sp}: the law with no weapon is DFU's line`);
+  for (let sp = -50; sp <= 200; sp += 5) {
+    assert.ok(swingFrameSeconds(sp) > 0, `Speed ${sp}: a frame is never 0 (DFU's line was 0 at 115 and the machine's loop never ended)`);
+    if (sp > 0 && sp <= 100) assert.ok(swingFrameSeconds(sp) < swingFrameSeconds(sp - 5), `Speed ${sp}: quicker than ${sp - 5}`);
   }
-  assert.ok(5 * dfu(100) < 0.25 && 5 * swingFrameSeconds(100) > 0.55, 'DFU\'s four blows a second at the cap; the law\'s under two');
+  assert.ok(5 * swingFrameSeconds(100) < 0.25 && SWING_FRAME_MIN < dfu(100), "DFU's four blows a second at the cap are the law's, and the floor sits under them");
 });
 
-test('SWING-LAW: the heft - a weapon\'s base weight as the arm feels it, (150 - Strength)% of it, costs 4.5% a kilogram past the 2.5 any arm carries lightly, to at most 35%', () => {
-  assert.equal(SWING_HEFT_FREE_KG, 2.5); assert.equal(SWING_HEFT_PER_KG, 0.045); assert.equal(SWING_HEFT_MAX, 0.35);
+test("SWING-LAW: a fast build loses at most 15% of DFU's swing rate to the weapon in the hand - any weapon, any Strength, any Speed", () => {
+  const T = WEAPON_TYPES;
+  const kinds = [T.LongBlade, T.Staff, T.Dagger, T.Mace, T.Flail, T.Warhammer, T.Battleaxe, T.Melee, T.Werecreature];
+  let slowest = 1;
+  for (const speed of [50, 70, 85, 100]) {
+    for (const kind of kinds) {
+      for (const strength of [0, 30, 50, 100]) {
+        for (const weight of [0, 2.5, 7.5, 20]) {
+          for (const twoHanded of [false, true]) {
+            const frame = swingFrameSeconds(speed, { heft: swingHeft(weight, strength), handling: swingHandling(kind, twoHanded) });
+            const rate = dfu(Math.min(speed, 100)) / frame;
+            slowest = Math.min(slowest, rate);
+            assert.ok(rate >= 0.85, `Speed ${speed}, kind ${kind}, Strength ${strength}, ${weight} kg, two-handed ${twoHanded}: ${(rate * 100).toFixed(1)}% of DFU's rate`);
+          }
+        }
+      }
+    }
+  }
+  assert.ok(slowest > 0.85 && slowest < 0.9, `the worst case, a warhammer in two hands at Strength 0: ${(slowest * 100).toFixed(1)}%`);
+});
+
+test("SWING-LAW: the heft - a weapon's base weight as the arm feels it, (150 - Strength)% of it, costs 2% a kilogram past the 2.5 any arm carries lightly, to at most 8%", () => {
+  assert.equal(SWING_HEFT_FREE_KG, 2.5); assert.equal(SWING_HEFT_PER_KG, 0.02); assert.equal(SWING_HEFT_MAX, 0.08);
   assert.equal(swingHeft(templateByIndex(WEAPONS.Dagger).baseWeight, 50), 1, 'a dagger weighs nothing to the swing');
   assert.equal(swingHeft(templateByIndex(WEAPONS.Shortsword).baseWeight, 50), 1, 'nor a shortsword to an average arm');
   assert.equal(templateByIndex(WEAPONS.Claymore).baseWeight, 7.5);
-  assert.ok(Math.abs(swingHeft(7.5, 50) - (1 + 5 * 0.045)) < 1e-12, 'a claymore, a fifth and more at Strength 50');
-  assert.ok(Math.abs(swingHeft(7.5, 90) - (1 + 2 * 0.045)) < 1e-12, 'and less than a tenth at 90 (60% of 7.5 is 4.5)');
-  assert.ok(swingHeft(7.5, 20) > swingHeft(7.5, 50) && swingHeft(7.5, 50) > swingHeft(7.5, 90), 'the stronger the arm, the lighter the blade');
-  assert.equal(swingHeft(40, 0), 1 + SWING_HEFT_MAX, 'at most 35%, whatever the load');
+  assert.equal(swingHeft(7.5, 50), 1 + SWING_HEFT_MAX, 'a claymore, the whole 8% at Strength 50 (5 kg past the free 2.5 would be 10%)');
+  assert.ok(Math.abs(swingHeft(7.5, 90) - (1 + 2 * 0.02)) < 1e-12, 'and 4% at 90 (60% of 7.5 is 4.5)');
+  assert.ok(swingHeft(5, 0) > swingHeft(5, 50) && swingHeft(5, 50) > swingHeft(5, 90), 'the stronger the arm, the lighter the blade');
+  assert.equal(swingHeft(40, 0), 1 + SWING_HEFT_MAX, 'at most 8%, whatever the load');
   assert.equal(swingHeft(7.5, 150), swingHeft(7.5, 100), 'Strength held to 0..100');
   assert.equal(swingHeft(NaN, 50), 1, 'no weight weighs nothing');
 });
 
-test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fpsWeapon.js; the law is a leaf): a dagger, bare hands and claws quick, a sword the measure, the heavy kinds a little slower; both hands 6% more; the bow and the gun keep their own clocks', () => {
+test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fpsWeapon.js; the law is a leaf): a dagger, bare hands and claws quick, a sword the measure, the heavy kinds a little slower (at most 4%); both hands 3% more; the bow keeps its own clock', () => {
   const T = WEAPON_TYPES;
   const kinds = [T.LongBlade, T.LongBlade_Magic, T.Staff, T.Staff_Magic, T.Dagger, T.Dagger_Magic, T.Mace, T.Mace_Magic, T.Flail, T.Flail_Magic, T.Warhammer, T.Warhammer_Magic, T.Battleaxe, T.Battleaxe_Magic, T.Melee, T.Werecreature];
   assert.deepEqual(Object.keys(SWING_HANDLING).map(Number).sort((a, b) => a - b), [...kinds].sort((a, b) => a - b), 'every melee kind, and only they');
@@ -91,16 +109,16 @@ test('SWING-LAW: the handling - by DFU\'s WeaponTypes (pinned equal to combat/fp
   assert.ok(SWING_HANDLING[T.Dagger] < 1 && SWING_HANDLING[T.Melee] < 1 && SWING_HANDLING[T.Werecreature] < 1);
   for (const k of [T.Mace, T.Flail, T.Warhammer, T.Battleaxe]) assert.ok(SWING_HANDLING[k] > 1, `kind ${k} comes round slower`);
   for (let k = 0; k < 14; k += 2) assert.equal(SWING_HANDLING[k], SWING_HANDLING[k + 1], `a magic ${k} handles as its plain one`);
-  assert.equal(SWING_TWO_HANDED, 1.06);
-  assert.ok(Math.abs(swingHandling(T.LongBlade, true) - 1.06) < 1e-12);
-  assert.equal(swingHandling(T.Bow), 1); assert.equal(swingHandling(T.Thunderlock), 1); assert.equal(swingHandling(undefined), 1);
+  assert.equal(SWING_TWO_HANDED, 1.03);
+  assert.ok(Math.abs(swingHandling(T.LongBlade, true) - 1.03) < 1e-12);
+  assert.equal(swingHandling(T.Bow), 1); assert.equal(swingHandling(undefined), 1);
   assert.equal(swingFrameSeconds(100, { handling: 0.1 }), SWING_FRAME_MIN, 'no frame under the floor, whatever a handling says');
   assert.equal(swingFrameSeconds(0, { heft: 1 + SWING_HEFT_MAX, handling: swingHandling(T.Warhammer, true) }), SWING_FRAME_MAX, 'nor over the ceiling: two seconds a blow at the most');
 });
 
 test('SWING-LAW: the reader - the item in the swinging hand, its template\'s weight, both hands or one, the live Strength; bare hands and claws weigh nothing; no wielder, nothing', () => {
   const e = fighter({ strength: 70 }, WEAPONS.Claymore);
-  assert.deepEqual(readSwing({ entity: e, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true }), { weaponType: WEAPON_TYPES.LongBlade, weight: 7.5, strength: 70, twoHanded: true, family: 'longBlade', shortBlade: false });   // PIN MOVED (BAL10): the reader names the swing's family
+  assert.deepEqual(readSwing({ entity: e, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true }), { weaponType: WEAPON_TYPES.LongBlade, weight: 7.5, strength: 70, twoHanded: true, family: 'longBlade', shortBlade: false });
   const left = fighter({}, WEAPONS.Dagger, EQUIP_SLOTS.LeftHand);
   equipTableOf(left)[EQUIP_SLOTS.RightHand] = weapon(WEAPONS.Claymore);
   assert.equal(readSwing({ entity: left, weaponType: WEAPON_TYPES.Dagger, usingRightHand: false }).weight, 0.5, 'the left hand\'s blade when the left hand swings');
@@ -133,7 +151,7 @@ test('SWING-LAW: GetMeleeWeaponAnimTime - a wielder the port knows swings on the
   }
 });
 
-test('SWING-LAW: the real rig - an average fighter about a second a blow, the quickest under two a second, a claymore slower than a dagger and a strong arm quicker with it; the mods on or off', () => {
+test('SWING-LAW: the real rig - an average fighter about a second a blow, the quickest at four a second (the DFU line), a claymore slower than a dagger and a strong arm quicker with it; the mods on or off', () => {
   installSwingLaw();
   installRoleplayRealismItems({ fetchBytes: () => { throw new Error('no art in this pin'); } });
   installRoleplayRealism();
@@ -145,29 +163,42 @@ test('SWING-LAW: the real rig - an average fighter about a second a blow, the qu
       const avg = blowTime(fighter({}, WEAPONS.Longsword));
       assert.ok(avg > 0.9 && avg < 1.3, `mods ${mods ? 'on' : 'off'}: an average fighter's longsword, ${avg.toFixed(3)}s a blow`);
       const quick = blowTime(fighter({ speed: 100, strength: 100 }, WEAPONS.Dagger));
-      assert.ok(1 / quick < 2 && 1 / quick > 1.4, `mods ${mods ? 'on' : 'off'}: the quickest, ${(1 / quick).toFixed(2)} a second (DFU's line: 4)`);
+      assert.ok(1 / quick < 4.3 && 1 / quick > 3.2, `mods ${mods ? 'on' : 'off'}: the quickest, ${(1 / quick).toFixed(2)} a second (DFU's line: 4)`);
       const dagger = blowTime(fighter({ speed: 70, strength: 50 }, WEAPONS.Dagger));
       const claymore = blowTime(fighter({ speed: 70, strength: 50 }, WEAPONS.Claymore));
       assert.ok(claymore > dagger * 1.2, `mods ${mods ? 'on' : 'off'}: a claymore (${claymore.toFixed(3)}s) is slower than a dagger (${dagger.toFixed(3)}s)`);
-      const strong = blowTime(fighter({ speed: 70, strength: 95 }, WEAPONS.Claymore));
-      assert.ok(strong < claymore, `mods ${mods ? 'on' : 'off'}: a strong arm swings it quicker (${strong.toFixed(3)}s)`);
+      // the rig steps a blow in whole ticks, which hides a heft of a few per cent: the strong arm is read from the law's own time
+      const frameOf = (strength) => {
+        const e = fighter({ speed: 70, strength }, WEAPONS.Claymore);
+        return getMeleeWeaponAnimTime(70, { entity: e, weaponType: WEAPON_TYPES.LongBlade, usingRightHand: true });
+      };
+      assert.ok(frameOf(95) < frameOf(30), `mods ${mods ? 'on' : 'off'}: a strong arm swings it quicker (${frameOf(95).toFixed(4)}s a frame against ${frameOf(30).toFixed(4)}s)`);
       const slow = blowTime(fighter({ speed: 20, strength: 50 }, WEAPONS.Longsword));
       assert.ok(slow > avg * 1.15 && slow <= 5 * SWING_FRAME_MAX + 5 * DT, `mods ${mods ? 'on' : 'off'}: a slow fighter is slower (${slow.toFixed(3)}s), never past two seconds`);
     } finally { _resetModSettings(); }
   }
 });
 
-test('SWING-LAW: one law, every clock that times the player\'s swing - the leaf stays a leaf; the reader is registered as its module loads, and the rig imports it (AUDIT PRE-MERGE 0929 S5: it was a boot call, and a rig built without that boot swung with no weight); both mods answer through the curve', () => {
-  const leaf = rd('src/characters/weaponStates.js');
-  assert.doesNotMatch(leaf, /^import /m, 'weaponStates.js imports nothing (tools/neutral/build-viewer.mjs pastes its source)');
-  assert.match(rd('src/combat/swingLaw.js'), /^installSwingLaw\(\);$/m, 'registered as the module loads - called, not a comment');
-  assert.match(rd('src/combat/weapon/weaponRig.js'), /^import '\.\.\/swingLaw\.js';/m, 'the one maker of a swing\'s ctx imports it');
-  assert.doesNotMatch(rd('src/scenes/shared.js'), /installSwingLaw/, 'no second home at boot');
-  assert.match(rd('src/systems/roleplayRealism/rrRealism.js'), /return swingFrameSeconds\(blend, \{ heft: swingHeft\(weight, liveStrength\), handling: swingHandling\(weaponType, hands === 'Both', shortBlade\) \}\);/, 'AUDIT PRE-MERGE 0929 S3: RR\'s blend has no weight - the heft is the port\'s');
-  assert.match(rd('src/systems/roleplayRealismItems/rriRealism.js'), /return swingFrameSeconds\(adjustedSpeed, \{ handling: swingHandling\(weaponType, twoHanded, shortBlade\) \}\);/);   // PIN MOVED (BAL10): both arms hand the short blade's handling on
-  for (const [f, re] of [
-    ['src/characters/weaponStates.js', /getMeleeWeaponAnimTime\(liveSpeed, animCtx\)/],   // the machine
-    ['src/combat/weapon/weaponWidget.js', /getMeleeWeaponAnimTime\(liveSpeed, ctx\)/],          // the Weapon Widget's clone
-    ['src/player/eyeOfTheBeholder/eotbBody.js', /getMeleeWeaponAnimTime\(last\.liveSpeed, last\.animCtx\)/],   // the third-person body
-  ]) assert.match(rd(f), re, `${f} asks the one law with the wielder`);
+test("SWING-LAW: with Roleplay & Realism's weaponSpeed or Items' weaponBalance on, a fast build still keeps 85% of DFU's swing rate", () => {
+  installSwingLaw();
+  installRoleplayRealismItems({ fetchBytes: () => { throw new Error('no art in this pin'); } });
+  installRoleplayRealism();
+  const kinds = [[WEAPONS.Dagger, WEAPON_TYPES.Dagger], [WEAPONS.Longsword, WEAPON_TYPES.LongBlade], [WEAPONS.Claymore, WEAPON_TYPES.LongBlade], [WEAPONS.Warhammer, WEAPON_TYPES.Warhammer], [WEAPONS.Battle_Axe, WEAPON_TYPES.Battleaxe]];
+  try {
+    for (const [balance, speedMod] of [[true, false], [false, true]]) {
+      _resetModSettings();
+      setModSetting('roleplay-realism-items', 'weaponBalance', balance);
+      setModSetting('roleplay-realism', 'weaponSpeed', speedMod);
+      for (const speed of [75, 100]) {
+        for (const strength of [30, 50, 70, 100]) {
+          for (const [template, weaponType] of kinds) {
+            const e = fighter({ speed, strength }, template);
+            const frame = getMeleeWeaponAnimTime(speed, { entity: e, weaponType, usingRightHand: true });
+            const rate = dfu(speed) / frame;
+            assert.ok(rate >= 0.85, `weaponBalance ${balance}, weaponSpeed ${speedMod}, Speed ${speed}, Strength ${strength}, weapon ${template}: ${(rate * 100).toFixed(1)}% of DFU's rate`);
+          }
+        }
+      }
+    }
+  } finally { _resetModSettings(); }
 });

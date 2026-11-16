@@ -1,4 +1,4 @@
-// PICKUP-FEED (2026-10-01, Mac: "a better center screen notification for pickups") - WHAT A PRESS PUT IN THE PACK, AS
+// PICKUP-FEED - WHAT A PRESS PUT IN THE PACK, AS
 // CARDS AT THE CENTRE OF THE SCREEN, ON THE ENHANCED SKIN.
 //
 // A quick-loot take was SAID: "You take the Longsword.", "You take 3 items." - DaggerfallHUD's line, through whatever

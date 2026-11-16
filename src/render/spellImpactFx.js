@@ -1,7 +1,5 @@
 // @ts-check
-// IMPACTFX (2026-10-05, the player: "give it a high quality effect that suits the game and the spell that sprays to the
-// ground based on the element, you have to see that it is shock and fire, water and heal like green heal lineish
-// sparkles that rise up"): A LANDING SPELL, SEEN. The classic impact flash (record 1 of the element's own archive,
+// IMPACTFX: A LANDING SPELL, SEEN. The classic impact flash (record 1 of the element's own archive,
 // scenes/hostMagic.js showImpactFlash) still plays - this is drawn OVER it, in light:
 //
 //   FIRE    a fireball bloom, ember streaks thrown out and up that fall, land and smoulder before they go out, licks of
@@ -57,7 +55,7 @@ export const FX_LOOK = Object.freeze({
 
 const TAU = Math.PI * 2;
 
-/** TECH-FX (bible/05-Combat/Weapon-Techniques.md THE FEEL): a weapon technique's two looks - its ENERGY, in the
+/** TECH-FX (THE FEEL): a weapon technique's two looks - its ENERGY, in the
  *  technique's own blue (combat/techniques.js TECH_COLOR, the marks' and the HUD chip's), and the STONE-DUST its blows
  *  throw off the ground, warm and short-lived (the pass is additive, so it reads as glowing grit, never grey). Not
  *  elements: no art replaces them and `artColours` never lists them. */
@@ -72,9 +70,39 @@ export const TECH_FX_RECIPES = Object.freeze(['shock', 'land', 'sweep', 'arc', '
 
 
 /**
+ * A missile record's own colour: the CHROMA-WEIGHTED mean of its opaque texels, normalised so the brightest channel is 1.
+ * A glowing missile sprite is a blown-out white core inside a coloured halo; the core is over-exposed, not white, so a
+ * texel with no saturation does not vote (the weight is alpha times chroma, max channel minus min), and the halo - where a
+ * viewer reads the colour from - decides. A record with no chromatic texel answers its plain alpha-weighted mean, so a
+ * white missile answers white. Normalised, not averaged raw, because the caller wants a light's direction, not its
+ * strength. Null for an empty or black record.
+ */
+export function missileColourFrom(color32) {
+  const d = color32?.colors;
+  if (!d || !d.length) return null;
+  let r = 0, g = 0, b = 0, w = 0;          // chroma-weighted
+  let pr = 0, pg = 0, pb = 0, pw = 0;      // plain alpha-weighted, for the greyscale fallback
+  for (let i = 0; i < d.length; i += 4) {
+    const a = d[i + 3];
+    if (!a) continue;
+    const R = d[i], G = d[i + 1], B = d[i + 2];
+    pr += R * a; pg += G * a; pb += B * a; pw += a;
+    const chroma = Math.max(R, G, B) - Math.min(R, G, B);
+    if (!chroma) continue;
+    const k = a * chroma;
+    r += R * k; g += G * k; b += B * k; w += k;
+  }
+  if (!w) { r = pr; g = pg; b = pb; w = pw; }   // nothing chromatic: the old answer, on purpose
+  if (!w) return null;
+  const peak = Math.max(r, g, b);
+  if (peak <= 0) return null;
+  return [r / peak, g / peak, b / peak];
+}
+
+/**
  * ART-COLOUR (the player: "magic spells are also greenish ... i dont know if the violet effects fit"): A LOOK OUT OF THE
  * ELEMENT'S OWN ART. `rgb` the colour sampled off the element's missile archive (375-379, the player's own ARENA2 -
- * characters/thunderlockIds.js orbColourFrom: chroma-weighted, peak-normalised, so the halo votes and the white core
+ * missileColourFrom, above: chroma-weighted, peak-normalised, so the halo votes and the white core
  * does not), `base` the guess it replaces (its range and timing kept). The art's colour, a shade more saturated so it
  * still reads as light, is the burst's colour; white-hot at birth is that colour lifted most of the way to white; what
  * it cools to is that colour deepened; the light it throws is that colour. Pure. Null for no usable colour.
@@ -450,7 +478,7 @@ export class SpellImpactFx {
   }
 
   /**
-   * TECH-FX: A WEAPON TECHNIQUE'S BURST (bible/05-Combat/Weapon-Techniques.md THE FEEL). `recipe` one of TECH_FX_RECIPES,
+   * TECH-FX: A WEAPON TECHNIQUE'S BURST (THE FEEL). `recipe` one of TECH_FX_RECIPES,
    * `at` where (scene frame): the feet for a ring, the blow's point for a star, the eye for a tracer, the start of a
    * trail. `ground` the floor's height (default `at`'s), `yaw` the facing (forward on the floor is [sin, 0, cos]), `r` a
    * ring's reach, `dir` a shot's or a punch's unit direction, `len` a tracer's length, `to` a trail's end, `spin` +1 (a

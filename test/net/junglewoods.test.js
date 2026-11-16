@@ -1,9 +1,8 @@
-// JUNGLE-WOODS (2026-10-19, the owner: "The forest region we recently implemented should be a large tree gathering spot.
-// Moreso than other places within daggerfall"): a map pixel of the Jungle of Bantha - the owner's area
+// JUNGLE-WOODS: a map pixel of the Jungle of Bantha - the owner's area
 // (world/jungle/banthaArea.js) - stands JUNGLE_TREE_SLOTS trees a day, four times the richest woods' anywhere else, and
 // every one of them stands: a slot whose wood waits on the witnesses (an unconfirmed Rainforest's Teak and Mahogany)
 // stands Pine there, where elsewhere it stands nothing. The law is the area's, never the switch's - the service
-// recomputes every tree from it. bible/06-Systems/Professions-Arc.md (JUNGLE-WOODS), bible/03-World/Bantha-Jungle.md.
+// recomputes every tree from it. (JUNGLE-WOODS),.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -102,7 +101,7 @@ test.after(() => { Date.now = realNow; });
 test('JUNGLE-WOODS service: a jungle tree past the climate\'s twelve is felled - its Pine, on ground nobody confirmed; the jungle\'s 49th and a Woodlands pixel\'s 13th are no node (mutants: the service\'s slots the climate\'s)', async () => {
   const now = utcDay(T0) * DAY + 12 * 3600;
   Date.now = () => now * 1000;
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
   raw.prepare(`INSERT INTO prof_tracks (player, char_id, profession, xp, spec50, spec100, updated_at) VALUES (?, ?, ?, ?, NULL, NULL, ?)

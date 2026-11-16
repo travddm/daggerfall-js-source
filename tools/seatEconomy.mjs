@@ -1,7 +1,5 @@
-// SEAT1d (2026-10-01, Mac: "Finish the seats"; "Continue") - THE ECONOMY MODEL, AS A TOOL (bible/06-Systems/
-// Professions-Arc.md Appendix C: "SEAT1d ships the model as a tool reading townSeatLaw.js and professionLaw.js
-// directly, so every later balance pass is re-run, not re-guessed"; Seats-Arc 13: "the model re-runs Appendix C's
-// table").
+// SEAT1d - THE ECONOMY MODEL, AS A TOOL. It reads townSeatLaw.js and professionLaw.js directly, so every later balance
+// pass is re-run, not re-guessed. The model re-runs Appendix C's table.
 //
 // A seeded Monte Carlo of a guild's week: its members drawn from Appendix C's three players (35% casual, 45% regular,
 // 20% hardcore), each one's influence at its pledged seat counted by the law's own sources and caps (the Watch, gate
@@ -17,7 +15,7 @@
 //   node tools/seatEconomy.mjs --runs 2000 --seed 7
 //   node tools/seatEconomy.mjs --json
 import {
-  WATCH_INFLUENCE, WATCH_DAY_CAP, GATE_INFLUENCE, GATE_WEEK_CAP, RENOWN_XP_PER_INFLUENCE, RENOWN_WEEK_CAP, WRIT_INFLUENCE_PER_MARK,
+  WATCH_INFLUENCE, WATCH_DAY_CAP, GATE_INFLUENCE, GATE_WEEK_CAP, RENOWN_XP_PER_INFLUENCE, RENOWN_WEEK_CAP,
   ACCOUNT_SEAT_WEEK_CAP, SEAT_UPKEEP, CLAIM_THRESHOLD, crownScale,
 } from '../src/net/townSeatLaw.js';
 import { COURT_WRITS_PER_DAY, WRIT_UNITS, WRIT_TIER_WEIGHTS, writPay } from '../src/net/professionLaw.js';
@@ -75,8 +73,7 @@ export function memberWeek(profile, r) {
   }
   const gates = Math.min(GATE_WEEK_CAP, poisson(p.gates * ASSUME.inRegion, r) * GATE_INFLUENCE);
   const renown = Math.min(RENOWN_WEEK_CAP, Math.floor(around(p.renownXp, r) * ASSUME.inRegion / RENOWN_XP_PER_INFLUENCE));
-  const camp = Math.floor(harvests * ASSUME.inRegion * ASSUME.unitsAHarvest * ASSUME.marksAUnit * ASSUME.toCamp) * WRIT_INFLUENCE_PER_MARK;
-  return { influence: Math.min(ACCOUNT_SEAT_WEEK_CAP, watch + gates + renown + camp), writMarks: Math.round(writMarks), writs };
+  return { influence: Math.min(ACCOUNT_SEAT_WEEK_CAP, watch + gates + renown), writMarks: Math.round(writMarks), writs };
 }
 
 const pct = (sorted, q) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];

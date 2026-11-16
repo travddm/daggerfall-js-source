@@ -1,5 +1,5 @@
 // @ts-check
-// PRIMARY-FOLD (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, PRIMARY-FOLD): THE DOOR'S READS IN ONE
+// PRIMARY-FOLD: THE DOOR'S READS IN ONE
 // TRIP. Every authenticated request that names a `character` asks whether it is one of the account's tombstones
 // (legacy.js isTombstone), and every progression claim (progress.js PROGRESS_ROUTES) asks the account's seat
 // (progressRefusal) and, while the line is enforced, its stream's bucket (progressRoom) - each its own round trip to the

@@ -8,7 +8,7 @@
 // the hall - named '' (a House2 has no name of its own, world/buildingNames.js). The port's own re-stamp (DISC28-K: a
 // discovered building takes the live quest's name, at a door's look and at the town map's open) read that '' as a
 // name and wrote it over the reveal: no plate, no prompt, the door still opening for a member. It never stamps a
-// hideout now (UndiscoverBuilding's own shield), and a nameless Place names nothing. `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
+// hideout now (UndiscoverBuilding's own shield), and a nameless Place names nothing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as discovery from '../../../src/systems/discovery.js';

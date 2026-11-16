@@ -1,4 +1,4 @@
-// PERF7 - THE STREAM BUILD BREATHES (2026-09-11). A streamed pixel is
+// PERF7 - THE STREAM BUILD BREATHES. A streamed pixel is
 // built by an async function that awaits per model, and an await on a
 // promise that is already settled continues as a MICROTASK - it never
 // gives the frame back. On a cold load the fetches are real and the
@@ -34,16 +34,14 @@ export const BUILD_SLICE_MARGIN_MS = 2.5;
 /** PERF-EXT24: a stream that has been at it this long gets the whole
  *  slice again - the bound on how much later a pixel can arrive. */
 export const BUILD_STREAM_AGE_MS = 2000;
-/** OW-BUILD (bible/06-Systems/Travel-View.md OW-BUILD): the frame a slice is sized against while the Overworld is up -
+/** OW-BUILD (OW-BUILD): the frame a slice is sized against while the Overworld is up -
  *  30 a second, whatever the display's. */
 export const BUILD_OVERWORLD_FRAME_MS = 1000 / 30;
 /** OW-BUILD: the most an Overworld slice lends - a light frame still draws at 30 a second or better. */
 export const BUILD_SLICE_OVERWORLD_MS = 20;
 
 /**
- * PERF-EXT24 (2026-09-25, the players: "fps issues in the exterior but
- * fine in the interior", "me too my friend.. don't know why. I got a
- * RX6600"): THE SLICE IS WHAT THE FRAME LEFT. The breather resumes inside
+ * PERF-EXT24: THE SLICE IS WHAT THE FRAME LEFT. The breather resumes inside
  * its own animation-frame callback - the SAME rendering opportunity as the
  * frame's (60 of 60 resumptions carried the frame's timestamp in headless
  * Chromium) - so a flat 6 ms slice sat on top of a frame that had already
@@ -58,7 +56,7 @@ export const BUILD_SLICE_OVERWORLD_MS = 20;
  * a build something is waiting on (the boot's, a teleport's) always does.
  * Pure: every input is an argument.
  *
- * OW-BUILD (bible/06-Systems/Travel-View.md OW-BUILD; the owner's call, 2026-10-18): UNDER THE OVERWORLD THE GROUND
+ * OW-BUILD (OW-BUILD; the owner's call, 2026-10-18): UNDER THE OVERWORLD THE GROUND
  * COMES FIRST. A journey there runs the clock at up to a hundred times walking pace, the ground the stream has not
  * built is what holds it (TV2's governor halves it to x1 - systems/travel/travelGovernor.js), and the traveller is
  * watching the land from the sky, not fighting on it. So while the view is up (`overworld`) a slice is what a frame of
@@ -117,6 +115,12 @@ export function createBreather({
   let sliceBudget = budget ? budget() : sliceMs;   // PERF-EXT24: asked once a slice, not once a breath
   const framesNow = frames ?? (() => 0);
   let sliceFrame = null;   // PERF-EXT24 (the review): the frame count at this slice's resume; null for a slice a reset (or the breather's birth) began
+  // TESA-LANDS' second audit (lane C): ONE SLICE A FRAME, HOWEVER MANY WAIT. A pixel's sets load together (scenes/
+  // pixelBuild.js - its own and its neighbours'), each a chain of breaths on this one clock, and every waiter's resume
+  // began the slice again: four chains spent four slices in one frame (24 ms against a 6 ms slice; 80 ms under the
+  // Overworld's 20). Every waiter now waits on the ONE next frame (`wake`), which begins the slice once; the chains share
+  // it, each running on while it has budget.
+  let wake = null, wakeToken = null;
   const b = {
     yields: 0,
     /** Call between units of work. Resolves at once while the slice has budget; otherwise on the next frame. */
@@ -124,11 +128,21 @@ export function createBreather({
       const spent = now() - sliceStart;
       if (spent < sliceBudget) return;
       b.yields++;
-      if (sliceFrame !== null && sliceFrame === framesNow()) onSlice?.(spent);   // PERF-EXT24 (the review): a resumed slice no frame ran inside
-      await new Promise((resolve) => raf(resolve));
-      sliceStart = now();
-      sliceFrame = framesNow();
-      sliceBudget = budget ? budget() : sliceMs;
+      let w = wake;
+      if (!w) {
+        if (sliceFrame !== null && sliceFrame === framesNow()) onSlice?.(spent);   // PERF-EXT24 (the review): a resumed slice no frame ran inside - heard once, by the slice's first waiter
+        const token = {};
+        wakeToken = token;
+        w = new Promise((resolve) => raf(() => {
+          if (wakeToken === token) { wakeToken = null; wake = null; }
+          sliceStart = now();
+          sliceFrame = framesNow();
+          sliceBudget = budget ? budget() : sliceMs;
+          resolve();
+        }));
+        if (wakeToken === token) wake = w;   // still to come: the frame's other waiters wait on it too (a raf that ran at once has begun the slice already)
+      }
+      await w;
     },
     /** A new build starts a fresh slice (the awaits before it were someone else's). */
     reset() { sliceStart = now(); sliceFrame = null; sliceBudget = budget ? budget() : sliceMs; },

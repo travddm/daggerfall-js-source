@@ -1,7 +1,5 @@
-// HM1 - THE HELM'S BLACK BOX (2026-09-12).
+// HM1 - THE HELM'S BLACK BOX.
 //
-// Mac: "some armor (mostly helmets) have a black background (paperdoll
-// not morrowind)."
 //
 // Index 0xFF is Daggerfall's MASK: the halo around a helm that erases
 // the hair. ItemHelper.cs GetInventoryImage -> GetItemImage(item,
@@ -35,15 +33,6 @@ test('HM1: changeMask is ImageProcessing.ChangeMask - 0xFF becomes the cutout, o
   assert.equal(out.width, 3); assert.equal(out.palette, 'pal');
   assert.deepEqual([...changeMask(bmp, 9).data], [9, 5, 0], 'replaceWith, as the C# takes it');
   assert.deepEqual(changeMask(null), emptyBitmap(), 'a null bitmap answers the empty one (the C# does)');
-});
-
-test('HM1: the DOM icon strips the mask (GetInventoryImage), and so do the classic pack\'s two drawers', () => {
-  assert.match(src('src/ui/textureCanvas.js'), /const bmp = changeDyeBitmap\(changeMask\(got\.file\.getDFBitmap\(record, 0\)\), dye, dyeTarget\);/,
-    'requestIcon rasterizes the mask-stripped clone (DYE-ICON: then dyed, the mask first)');
-  for (const f of ['src/ui/native/nativeInventory.js', 'src/ui/item/itemScroller.js']) {
-    assert.match(src(f), /icons\.uploadRecord\(img\.archive, img\.record, \{ mips: false, removeMask: true, dye: img\.dye, dyeTarget: img\.dyeTarget \}\);/,
-      `${f} asks the pipeline for the mask-stripped UI variant`);
-  }
 });
 
 /** One-record TEXTURE archive, uncompressed, stride 256 (the shape

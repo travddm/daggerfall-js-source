@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL3-DESK (2026-10-22, mob picked these at 04:13Z, Moderators' share at 06:28Z; design doc "DFO Staff Panel:
-// design") - THE PANEL'S DESK: what a staff member keeps beside the reports.
+// STAFF-PANEL3-DESK - THE PANEL'S DESK: what a staff member keeps beside the reports.
 //
 //   - STAFF NOTES: a short shared history on one player, newest first ("warned in person 21 Oct"), every staff member
 //     reading and adding, Moderators too (staff_notes).
@@ -16,7 +14,7 @@
 // NOTHING NEW IS JUDGED: a notice, a note's removal or restoration is the game's own act (board.js), made as this member
 // and written in the audit log beside it. Pulling a listing is another door's (the market's).
 //
-// EVERY LIST PAGES (mob, 19:25Z: "put inf scroll in anything that pull lists"): `from` or `before`, answered `next`.
+// EVERY LIST PAGES: `from` or `before`, answered `next`.
 import { displayName } from './accounts.js';
 import { findAccount } from './sanctions.js';
 import { postNotice, moderateNote } from './board.js';
@@ -58,9 +56,9 @@ export const DESK_ROUTES = Object.freeze(['/v1/staff/notes', '/v1/staff/notes/ad
 /** The doors a Moderator may not open (design doc: everything but reports, notes and their own watchlist is Admin's). */
 const ADMIN_ONLY = Object.freeze(['/v1/staff/notice', '/v1/staff/ai-score', '/v1/staff/board/reported', '/v1/staff/board/moderate', '/v1/staff/market/reported']);
 
-// ═══ YOUR SETTINGS: the design doc's list, each key's shape. The panel owns what sits inside a list's columns and filters;
+// YOUR SETTINGS: the design doc's list, each key's shape. The panel owns what sits inside a list's columns and filters;
 // the service bounds the whole and refuses a key the list does not name. The watchlist is its own table, and Hide me is the
-// hidden spectator's (the token's mark), so neither is a key here. ═══
+// hidden spectator's (the token's mark), so neither is a key here.
 const LOOKS = Object.freeze(['ember', 'iliac', '8bit']);
 const ORDERS = Object.freeze(['urgent', 'usual']);
 const TOPS = Object.freeze([3, 5, 10]);
@@ -225,7 +223,7 @@ export async function staffDesk(ctx, env, path, body, who, audit) {
     return { error: 'staff-admin' };
   }
 
-  // ═══ STAFF NOTES - every staff member (mob, 06:28Z) ═══
+  // STAFF NOTES - every staff member (mob, 06:28Z)
   if (path === '/v1/staff/notes' || path === '/v1/staff/notes/add') {
     const row = await findAccount(db, { target: body.target, name: body.name });
     if ('error' in row) return row;
@@ -247,7 +245,7 @@ export async function staffDesk(ctx, env, path, body, who, audit) {
       return { ok: true, note: { id, at: nowS, by: me.id, byName: displayName(me), text } };
     }
     const before = Number.isSafeInteger(body.before) && body.before > 0 ? body.before : null;
-    // STAFF-PANEL-SPEED (mob: "slow when moving in menus"): the page and its audit row in one batch, one trip
+    // STAFF-PANEL-SPEED: the page and its audit row in one batch, one trip
     const [found] = await db.batch([db.prepare('SELECT id, author, author_name, text, at FROM staff_notes WHERE target = ?1 AND (?2 IS NULL OR id < ?2) ORDER BY id DESC LIMIT ?3')
       .bind(row.id, before, STAFF_NOTES_PAGE + 1), audit('notes-read', row.id, { name: displayName(row) }, { onceIn: READ_ROW_S })]);
     const r = found?.results ?? [];
@@ -259,7 +257,7 @@ export async function staffDesk(ctx, env, path, body, who, audit) {
     };
   }
 
-  // ═══ THE WATCHLIST - each member's own (mob, 06:28Z) ═══
+  // THE WATCHLIST - each member's own (mob, 06:28Z)
   if (path === '/v1/staff/watch') {
     const [found] = await db.batch([db.prepare(`SELECT w.target, w.at, p.handle, p.guest_name FROM staff_watch w JOIN players p ON p.id = w.target WHERE w.staff = ?1
       ORDER BY w.at DESC, w.target LIMIT ?2`).bind(me.id, STAFF_WATCH_MAX), audit('watch-read', null, null, { onceIn: READ_ROW_S })]);   // STAFF-PANEL-SPEED: one trip
@@ -296,7 +294,7 @@ export async function staffDesk(ctx, env, path, body, who, audit) {
     return { online, events: events.slice(from, from + WATCH_PAGE), next: from + WATCH_PAGE < events.length ? from + WATCH_PAGE : null, total: events.length, cursor: until, since };
   }
 
-  // ═══ YOUR SETTINGS - the member's own (mob, 03:24Z: "comes back exactly the same every time they log in") ═══
+  // YOUR SETTINGS - the member's own
   if (path === '/v1/staff/settings') {
     const r = await db.prepare('SELECT doc, at FROM staff_settings WHERE player = ?1').bind(me.id).first();
     let settings = {};
@@ -317,7 +315,7 @@ export async function staffDesk(ctx, env, path, body, who, audit) {
     return { ok: true, at: nowS };
   }
 
-  // ═══ THE ADMINS' DOORS ═══
+  // THE ADMINS' DOORS
   if (path === '/v1/staff/notice') {
     // the server's notice on every board for 1 to NOTICE_DAYS_MAX days (board.js postNotice, a developer's - every Admin
     // is one); `rid` the panel's request id, so a notice asked again is the one it made

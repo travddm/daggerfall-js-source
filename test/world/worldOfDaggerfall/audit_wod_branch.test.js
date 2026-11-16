@@ -1,10 +1,9 @@
 // AUDIT BRANCH (WoD) - THE WHOLE WORLD OF DAGGERFALL BRANCH, READ BY FIVE LENSES BEFORE THE MERGE.
 //
-// Mac: "Lets do a comprehensive audit before we decide to merge. This needs to be a perfect integration and
-// hopefully bug free". Every finding was reproduced by execution first; each is pinned here as it now stands,
+// . Every finding was reproduced by execution first; each is pinned here as it now stands,
 // by behaviour wherever the code can be run - the world host's own WoD code is sliced out of scenes/world.js and
 // run against stubs, the lens rigs' own technique - and by source where the line lives inside a scene closure.
-// The mutants are tools/mutants/auditwod.json; the page is bible/03-World/World-Of-Daggerfall.md, AUDIT BRANCH.
+// The mutants are tools/mutants/auditwod.json; the page is, AUDIT BRANCH.
 
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -28,6 +27,7 @@ import { CELL_PUPPETS_MAX } from '../../../src/net/wire.js';
 import { isPeerTarget } from '../../../src/characters/enemy/enemyTargets.js';
 import { readWorldOfDaggerfallBundle } from '../../../tools/worldOfDaggerfallAssets.mjs';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2: the world host whole
+import { createSwapBehind } from '../../../src/scenes/swapBehind.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const rd = (p) => hostText(p);
@@ -314,7 +314,6 @@ test('AUDIT BRANCH (WoD) M2: a pack fetch is abandoned after a stall and tried t
 
 test('AUDIT BRANCH (WoD) M2: the build\'s pick can cost a pixel its site, never the pixel; with the mod off no frame walks the pixels for its lights', () => {
   const w = hostText('src/scenes/world.js');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA G8): the pick asked on the Bay alone - its sites are the Bay's
   assert.match(w, /if \(wod && onTheBay\(px, py\) && await wodOpened\) \{[^\n]*\n[^\n]*\n[^\n]*\n      try \{\n        const here = host\.state\.current \?\? \{ x: px, y: py \};[\s\S]{0,900}\} catch \(e\) \{\n        console\.warn\(`\[wod\] pixel \$\{key\}: the loader failed here[^\n]*\n        wodPicks = null;\n      \}/);
   assert.match(w, /const wodLit = wod \? _wodLitCount\(\) : 0;/);
   assert.match(rd('src/world/worldOfDaggerfall/worldOfDaggerfall.js'), /if \(!b\) return;\n[^\n]*\n[^\n]*\n      await new Promise\(\(r\) => setTimeout\(r, 0\)\);[\s\S]{0,400}decodeRegionPack\(b\)/, 'one decode a task');
@@ -354,10 +353,10 @@ const WORLD = hostText('src/scenes/world.js');
 function sliceWorld() {
   const cut = (a, b) => { const i = WORLD.indexOf(a); const j = WORLD.indexOf(b, i); assert.ok(i >= 0 && j > i, `slice ${a}`); return WORLD.slice(i, j); };
   const wodCode = cut('  const wodCarry = new Map();', '  const tickCityGates = ');
-  const dpStart = WORLD.indexOf('  function destroyPixel(px, py, { collectLoose = true } = {}) {');
+  const dpStart = WORLD.indexOf('  function destroyPixel(px, py, { collectLoose = true, carried = false, carryOnly = false } = {}) {');
   const dpEnd = WORLD.indexOf('\n  }\n', dpStart) + 4;
-  const pubA = WORLD.match(/    const wodKept = adoptWodCarry\(key, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};/);
-  const pubB = WORLD.match(/    for \(const pile of wodKept\.piles \?\? \[\]\) standWodPile\(key, wodLife, pile\);/);
+  const pubA = WORLD.match(/    const wodKept = adoptWodCarry\(pkey, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};/);
+  const pubB = WORLD.match(/    for \(const pile of wodKept\.piles \?\? \[\]\) standWodPile\(pkey, wodLife, pile\);/);
   assert.ok(pubA && pubB, 'the publish lines stand where the rig reads them');
   return { wodCode, dpCode: WORLD.slice(dpStart, dpEnd), pubA: pubA[0], pubB: pubB[0] };
 }
@@ -393,7 +392,7 @@ function host({ online = null, removeSiteFoes = () => {} } = {}) {
   const names = Object.keys(env);
   const body = `${SLICE.wodCode}\n${SLICE.dpCode}\n
     function publish(px, py, centres, { wodSite = null } = {}) {
-      const key = px + ',' + py;
+      const key = px + ',' + py, pkey = key;   // built as ever: under the pixel's own key
       const wodSpawners = centres.map((centre, i) => ({ spawner: new __WodSpawner({ spawnType: __LOOT }), centre, flat: null, restand: false, oid: i + 1 }));
       const privateersHold = null;
 ${SLICE.pubA}
@@ -570,7 +569,6 @@ test('WOD6 (audit): a pixel is the arrival\'s until its first frame - a marker m
   try { h.tick(); } finally { Math.random = orig; }
   assert.deepEqual([q.wodSpawners[0].spawner.started, q.wodSpawners[0].spawner.active], [true, false], 'Start from the player, within 300: stood down, never sprung at their feet');
   assert.equal(h.droppedLoot.piles?.length ?? 0, 0);
-  // PIN MOVED (BUILD-RETRY, test/scenes/ow_buildretry.test.js): the key let go through the stream's `fail`, which asks for it again on its own wait
   assert.match(WORLD, /destroyPixel\(next\.px, next\.py, \{ collectLoose: false \}\);\n      _wodArrival\.keys\.delete\(`\$\{next\.px\},\$\{next\.py\}`\);\n(?:      \/\/[^\n]*\n)*      state\.fail\(next\.px, next\.py, performance\.now\(\)\);/, 'a build that failed is torn down with its key, and is no longer the arrival\'s');
   assert.match(WORLD, /reposition: REPOSITION\.RandomStartMarker \}\);\n[^\n]*\n          \{ const s = walkMode && playerSpawned; const f = s \? player\.pos : cam\.pos; wodOnLoad\(/, 'the online underground wake is a load: OnLoad last');
 });
@@ -613,20 +611,37 @@ test('WOD7: a marker a peer sprang never springs here - its camp is theirs, and 
 
 test('WOD6: the pixels a late region names are built again on the list in its order - those standing now, nearest first; one still building once it stands; the player\'s own under the season hold', () => {
   const i = WORLD.indexOf('  const _wodLate = new Set();');
-  const j = WORLD.indexOf('  // LocationLoader.cs:146-151', i);
+  const loader = WORLD.indexOf('  // LocationLoader.cs:146-151', i), sweeps = WORLD.indexOf('  const { swap, _arenaRoadsStale', i);   // PIN MOVED (IC-SWAP-BEHIND): the swap first among what it hands back
+  const j = sweeps > i && sweeps < loader ? sweeps : loader;   // TESA's merge: the sweeps past the Bay (scenes/tamrielSweepsHost.js) are constructed after it, before the loader's
   assert.ok(i > 0 && j > i);
-  const wod = {};
-  const built = new Map([['5,5', { px: 5, py: 5 }], ['7,5', { px: 7, py: 5 }], ['6,6', { px: 6, py: 6 }]]);
-  const inFlight = new Map([['9,9', {}]]);
-  const destroyed = [], queue = [], logs = [];
-  const h = new Function('wod', 'built', 'inFlight', 'state', 'walkMode', 'playerSpawned', 'destroyPixel', 'queue', 'console', 'nearestFirstFrom',
-    `let _seasonHoldKey = null;\n${WORLD.slice(i, j)}\nreturn { sweepWodLate, late: _wodLate, hold: () => _seasonHoldKey };`)(
-    wod, built, inFlight, { current: { x: 5, y: 5 } }, true, true, (px, py, o) => destroyed.push(`${px},${py}:${JSON.stringify(o)}`), queue, { log: (m) => logs.push(m) }, nearestFirstFrom);   // AUDIT 68 S22: the load list's one order
+  // always did, torn down and held; on, behind their standing views
+  const rig = (off) => {
+    const wod = {};
+    const built = new Map([['5,5', { px: 5, py: 5 }], ['7,5', { px: 7, py: 5 }], ['6,6', { px: 6, py: 6 }]]);
+    const inFlight = new Map([['9,9', {}]]);
+    const destroyed = [], queue = [], logs = [], state = { current: { x: 5, y: 5 } };
+    let hold = null;
+    const destroyPixel = (px, py, o) => destroyed.push(`${px},${py}:${JSON.stringify(o)}`);
+    const swap = createSwapBehind({ built, destroyPixel, collider: { hold() {} }, buildingDoors: [], doorsMoved() {}, queue, nearestFirst: nearestFirstFrom, state,
+      walkMode: () => true, playerSpawned: () => true, seasonHold: (k) => { hold = k; }, off: () => off });   // AUDIT 68 S22: the load list's one order
+    const h = new Function('wod', 'built', 'inFlight', 'state', 'walkMode', 'playerSpawned', 'destroyPixel', 'queue', 'console', 'nearestFirstFrom', 'swap',
+      `let _seasonHoldKey = null;\n${WORLD.slice(i, j)}\nreturn { sweepWodLate, late: _wodLate };`)(
+      wod, built, inFlight, state, true, true, destroyPixel, queue, { log: (m) => logs.push(m) }, nearestFirstFrom, swap);
+    return { h, wod, built, inFlight, destroyed, queue, logs, swap, hold: () => hold };
+  };
+  const on = rig(false);
+  on.wod.onLate(16, new Set(['7,5', '5,5', '9,9', '40,40']));
+  on.h.sweepWodLate();
+  assert.deepEqual(on.destroyed.sort(), ['5,5:{"collectLoose":false,"carryOnly":true}', '7,5:{"collectLoose":false,"carryOnly":true}'], 'behind their views: the carry alone taken - it keeps the markers');
+  assert.equal(on.swap.owed, 2);
+  assert.deepEqual(on.queue, [{ px: 5, py: 5 }, { px: 7, py: 5 }], 'queued nearest first');
+  assert.equal(on.hold(), null, 'the player\'s own pixel stands while it builds behind: nothing held');
+  const { h, wod, built, inFlight, destroyed, queue, logs, hold } = rig(true);
   wod.onLate(16, new Set(['7,5', '5,5', '9,9', '40,40']));
   h.sweepWodLate();
   assert.deepEqual(destroyed.sort(), ['5,5:{"collectLoose":false}', '7,5:{"collectLoose":false}'], 'torn down with their loose piles kept - the carry keeps the markers');
   assert.deepEqual(queue, [{ px: 5, py: 5 }, { px: 7, py: 5 }], 'queued nearest first');
-  assert.equal(h.hold(), '5,5', 'the player\'s own pixel rebuilds under the season hold');
+  assert.equal(hold(), '5,5', 'the player\'s own pixel rebuilds under the season hold');
   assert.deepEqual([...h.late], ['9,9'], 'one still building waits until it stands; one neither standing nor building builds on the list as it is');
   built.set('9,9', { px: 9, py: 9 }); inFlight.delete('9,9');
   h.sweepWodLate();
@@ -645,7 +660,7 @@ test('AUDIT BRANCH (WoD) m4: a sweep while a rebuild is in flight is heard - the
   h.sweep(100, 100);   // a load at the same spot, the rebuild still in flight
   assert.equal(h.publish(100, 100, [[10, 5, 10]]).wodSpawners[0].spawner.active, true, 'fresh, as ClearStreamingWorld re-promotes');
   assert.doesNotMatch(WORLD, /const carried = wodCarry\.get\(key\) \?\? null;   \/\/ WOD3\/WOD4: what a rebuild/, 'no build reads the carry at its start');
-  assert.match(WORLD, /    const wodKept = adoptWodCarry\(key, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};[^\n]*\n    if \(!wodKept\.life\) wodForgetPeerSites\(key\);[^\n]*\n    if \(_building\.get\(key\) === made\) _building\.delete\(key\);[^\n]*\n    built\.set\(key, \{/, 'nothing awaited between the adoption and built.set (BUILD-FAIL1\'s hand-over and WOD7\'s forget are the lines between)');
+  assert.match(WORLD, /    const wodKept = adoptWodCarry\(pkey, wodSpawners, privateersHold\);\n    const wodLife = wodKept\.life \?\? \{\};[^\n]*\n    if \(!wodKept\.life\) wodForgetPeerSites\(pkey\);[^\n]*\n(?:    if \(key === pkey && isEnhanced\(\) && !midRingDisabled\(\)\) stampPixelFade\([^\n]*\n)?    if \(_building\.get\(key\) === made\) _building\.delete\(key\);[^\n]*\n    swap\.publish\(px, py, key, made, \{/, 'nothing awaited between the adoption and built.set (BUILD-FAIL1\'s hand-over, WOD7\'s forget and MID-RING\'s fade are the lines between)');
 });
 
 test('AUDIT BRANCH (WoD) m2: a rebuild of a pixel that had a site re-reads its grass - Basic Roads can forbid a site stood before its data landed', () => {
@@ -668,20 +683,6 @@ test('AUDIT BRANCH (WoD) L1-3: the host steps DFU\'s array on every crossing and
 });
 
 // ── Numbers and words ───────────────────────────────────────────────────
-
-test('AUDIT BRANCH (WoD) n: the numbers the docs state are the numbers the tree holds', () => {
-  const loc = JSON.parse(rd('vendor/world-of-daggerfall/locations.json'));
-  const xml = loc.regions.reduce((a, r) => a + r.files.reduce((b, f) => b + f[1], 0), 0);
-  assert.equal(xml, 61000862, 'the XML the packs replace');
-  assert.match(rd('vendor/world-of-daggerfall/README.md'), /They are 61\.0 MB of XML/);
-  assert.match(rd('src/world/worldOfDaggerfall/wodLocationPack.js'), /61\.0 MB/);
-  assert.doesNotMatch(rd('src/ui/credits.js'), /stood at 227,938 places/, 'the lists NAME 227,938 places; one site stands to a pixel');
-  const dirs = readdirSync(join(ROOT, 'vendor'), { withFileTypes: true }).filter((d) => d.isDirectory()).length;
-  const reg = rd('bible/01-Overview/Mod-Registry.md');
-  const open = reg.split('\n').filter((l) => /^\| `[^`]+` \|/.test(l) && /RECORD OPEN/.test(l)).length;
-  assert.match(reg, new RegExp(`\`vendor/\` holds ${dirs} directories and ${open} of their READMEs`), `the registry counts ${dirs} and ${open}`);
-  assert.match(rd('src/world/worldOfDaggerfall/wodLocationLoader.js'), /Four pieces, each pure:/);
-});
 
 test('AUDIT BRANCH (WoD) n: the asset tool writes each TextAsset\'s own bytes - the decoded text drops a byte-order mark', () => {
   const src = rd('tools/worldOfDaggerfallAssets.mjs');

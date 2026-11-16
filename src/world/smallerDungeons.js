@@ -52,18 +52,16 @@ export const SMALLER_DUNGEON_THRESHOLD = 5;
  * Every quest guard Smaller Dungeons keeps, Medium keeps: main story, the arena's undercroft and a quest's frozen size.
  * Smaller Dungeons, when it is on, wins. Not a DFU member.
  *
- * SD-ONLINE (2026-10-05, Mac: "So medium dungeons will be the new by default option thats on (online only)", then "On
- * second thought. Large, medium and small should all play into account online" - and, asked which, "World mixes
- * sizes"; bible/11-Multiplayer/Super-Dungeons.md section 13): ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S. Not
+ * SD-ONLINE: ONLINE EVERY DUNGEON HAS ITS OWN SIZE, THE WORLD'S. Not
  * the player's settings, which are each player's own while every peer in a dungeon's room must lay one layout (AUDIT
  * WORLD34 B2, which made it the whole dungeon): online each dungeon the guards let through is built at the size one
- * seeded draw on its map id gives it - small, medium or large, half of them medium (ONLINE_DUNGEON_SIZES,
+ * seeded draw on its map id gives it - small, medium or large, five in eight of them large (ONLINE_DUNGEON_SIZES,
  * onlineDungeonSize) - the same on every client and every visit, whatever either switch says. A dungeon's room is its
  * layout's (net/online.js roomKeyFor: `dungeon:m<id>.s`, `dungeon:m<id>.m`, or the plain room for the whole dungeon).
  * The quest freeze carries it as ONLINE_DUNGEONS_STATE, so a quest started online builds its dungeons at their online
  * sizes offline too; and offline the `world-dungeon-sizes` row asks for the world's sizes outright.
  *
- * AUDIT DELVE (MAPS.BSA, read whole - bible/01-Overview/audits/Audit-Delve.md): the first cut was a cross of five interior
+ * AUDIT DELVE (MAPS.BSA, read whole): the first cut was a cross of five interior
  * blocks and its eight-block ring over THIRTEEN, and the real data had it backwards. Of the 4,232 dungeons, 159 have
  * more than thirteen blocks, and every one of them is four interior blocks in a ring of ten: the cross made them
  * BIGGER inside (five interior draws from a pool of four) and touched nothing else. The real sizes are 5 (775), 8
@@ -76,7 +74,7 @@ export const SMALLER_DUNGEON_THRESHOLD = 5;
  */
 export const MEDIUM_DUNGEON_THRESHOLD = 8;
 export const MEDIUM_DUNGEONS_STATE = 3;
-/** MEDIUM-DISTINCT (2026-10-08): the save stamp of a medium build whose second interior block was taken again
+/** MEDIUM-DISTINCT: the save stamp of a medium build whose second interior block was taken again
  *  (distinctInterior, below) - its own value past the online sizes' 4, never a quest's frozen size: the layout the
  *  stamp 3 named laid that block twice, so a save made in it stands at the start rather than in a block that moved. */
 export const MEDIUM_DISTINCT_STAMP = 5;
@@ -88,8 +86,11 @@ export const mediumDungeonsWanted = () => isEnhanced() && getPref(MEDIUM_DUNGEON
 /** SD-ONLINE: the quest freeze's value for "each dungeon at the size the online world gives it" (onlineDungeonSize) -
  *  appended past the medium size, as the medium size was past DFU's three, and read by an older build as neither. */
 export const ONLINE_DUNGEONS_STATE = 4;
-/** SD-ONLINE: the online world's sizes and their weights - small 1, medium 2, large (the whole dungeon) 1. */
-export const ONLINE_DUNGEON_SIZES = Object.freeze([['small', 1], ['medium', 2], ['full', 1]].map((r) => Object.freeze(r)));
+/** SD-ONLINE: the online world's sizes and their weights - small 1, medium 2, large (the whole dungeon) 5. DWHOLE: Daggerfall
+ *  Unity lays every dungeon whole (Smaller Dungeons is a player's option there), so the whole dungeon is the common size
+ *  here, five in eight, and the shorter ones are the exception; it was one in four, and the online world laid
+ *  about 23% less map than Unity. */
+export const ONLINE_DUNGEON_SIZES = Object.freeze([['small', 1], ['medium', 2], ['full', 5]].map((r) => Object.freeze(r)));
 /** SD-ONLINE: the draw's own salt, so a dungeon's size is not any other roll the port makes on its map id. */
 export const ONLINE_DUNGEON_SIZE_SALT = 0x5d1e5a2b;
 /** SD-ONLINE: THE SIZE THE ONLINE WORLD GIVES A DUNGEON - one draw of the port's seeded die on its map id and the
@@ -135,7 +136,7 @@ const SMALLER_LAYOUT = Object.freeze([
  *  taken offline builds the dungeon its markers know. SD-ONLINE: those are the online world's sizes (it was the whole
  *  dungeon), ONLINE_DUNGEONS_STATE - and offline too, when the world's sizes are asked for and Smaller is not on. */
 export function smallerDungeonsStateNow(enabled = getBool('Experimental', 'SmallerDungeons'), medium = mediumDungeonsWanted(), online = isOnlinePage(), world = worldDungeonSizesWanted()) {
-  // INSTANCES (bible/11-Multiplayer/Instances.md): online a quest's markers are chosen on the dungeon WHOLE (dungeonSizeFor's
+  // INSTANCES: online a quest's markers are chosen on the dungeon WHOLE (dungeonSizeFor's
   // `whole` - the quest's world asks so), the layout its instance builds - so its stamp is the whole dungeon's, DFU's
   // Disabled, and a copy taken offline builds the layout its markers know
   if (online) return SMALLER_DUNGEONS_STATE.Disabled;
@@ -181,6 +182,9 @@ export function dungeonSizeFor(dfLocation, { questMachine = null,
   // Master's ring and the Keeper's Hall stand by their distance out from the stair over Kamer's 32 blocks, and a five-
   // block plus of random ones drawn from his list would stand the pit in a cellar and the Hall nowhere. Main story's rule.
   if (isArenaUndercroft(dfLocation)) return 'full';
+  // WW7-4 (World-Wide.md WW7-4): A CAPITAL'S CASTLE NEVER SHRINKS. Its halls are a Bay palace's (world/capitalCastles.js), and
+  // the Bay's castles are main story's - whole, the guild's instance the public room's own layout. Main story's rule.
+  if (dfLocation.capital) return 'full';
   // AUDIT SD (Super-Dungeons.md section 5): A HOLLOW IS LAID WHOLE - its feat is the longest walk its template has, the
   // world's sizes are for the Bay's own dungeons; online, offline, whatever a setting or a quest says.
   if (dungeonTier(dfLocation) === 'super') return 'full';
@@ -192,7 +196,7 @@ export function dungeonSizeFor(dfLocation, { questMachine = null,
   // large by one seeded draw on its map id (onlineDungeonSize), the same for every client (it was the dungeon as
   // MAPS.BSA has it) - and since an older page still lays the whole, a re-laid dungeon stands in a room of its own
   // (builtDungeonSize, below; net/online.js roomKeyFor), so two layouts never share a stream or a memory.
-  // INSTANCES (bible/11-Multiplayer/Instances.md): AND AN INSTANCE'S, A QUEST'S, IS THE DUNGEON WHOLE - an instance's room
+  // INSTANCES: AND AN INSTANCE'S, A QUEST'S, IS THE DUNGEON WHOLE - an instance's room
   // builds Daggerfall's own layout (net/instanceRoom.js), a quest's world enumerates its markers on it, and a quest's
   // dungeon is entered whole where no instance can be had (an older relay: its whole room, `dungeon:m<id>`)
   if (online) return whole ? 'full' : onlineDungeonSize(dfLocation);
@@ -262,7 +266,7 @@ function generateRdbBlock(x, z, borderBlock, startingBlock, dfLocation) {
 }
 
 /**
- * MEDIUM-DISTINCT (2026-10-08, Mac: "Medium dungeons just copy and paste 2 layouts together"): NO INTERIOR BLOCK LAID
+ * MEDIUM-DISTINCT: NO INTERIOR BLOCK LAID
  * TWICE. GetRandomBlock draws with replacement, and the medium size draws its two interior blocks from a pool of two to
  * four (a dungeon of 10 to 22 blocks; MAPS.BSA repeats names in a list as well), so a quarter to a half of them laid
  * the same block twice side by side - one area and its copy. An interior block that repeats one already laid takes, in

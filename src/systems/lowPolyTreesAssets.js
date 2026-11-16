@@ -1,5 +1,5 @@
 // @ts-check
-// LPT1 (bible/07-Rendering/Low-Poly-Trees.md): LOW POLY TREES IN THE GAME - the host's one door.
+// LPT1: LOW POLY TREES IN THE GAME - the host's one door.
 //
 // - THE DATA is fetched once, the first time a pixel asks for a tree (vendor/low-poly-trees/Trees/, ~3.3 MB, a page that
 //   never stands a nature flat never fetches it).
@@ -21,6 +21,7 @@ import { toColor32 } from '../formats/color32Order.js';
 import { classicRecordRgba } from '../formats/derivedTexture.js';
 import { LowPolyTreesGpu } from '../render/lowPolyTreesRender.js';
 import { BUILD_RETRY_MS } from '../world/streamingWorld.js';   // AUDIT BANTHA1 TREE-6: a failed load's re-asks
+import { bleedTransparentTexels } from '../render/alpha-bleed.ts';
 
 export const LPT_TREES_JSON_URL = new URL('../../vendor/low-poly-trees/Trees/trees.json', import.meta.url).href;
 export const LPT_TREES_BIN_URL = new URL('../../vendor/low-poly-trees/Trees/trees.bin', import.meta.url).href;
@@ -82,7 +83,7 @@ export const lptAlphaOf = (sub) => (sub.opaque ? 0 : 0.5 / Math.max(1e-3, sub.cu
  *   `seasonal.key(archive)` - the source a prototype of that archive is painted under ('' the classic records);
  *   `seasonal.picture(archive, record)` - the season's texture for a record it re-skins now (`image` in the port's
  *   order), or null; `seasonal.generation()` - the install, so a paint a new install overtook is never kept.
- *   BANTHA1 (bible/03-World/Bantha-Jungle.md): ONE DOOR, TWO SETS OF TREES. `treeSet` - another set's own: `load()` its trees
+ *   BANTHA1: ONE DOOR, TWO SETS OF TREES. `treeSet` - another set's own: `load()` its trees
  *   in readLowPolyTrees's shape (world/jungle/jungleModels.js readJungleTrees), `picture(atlas)` an atlas's picture
  *   top-down (decoded, never painted from the player's records) - absent, Low Poly Trees' vendored mod; `slot` the
  *   renderer's tree slot its frame is handed to (render/renderer.js setLowPolyTrees); `scaleMax` the largest a tree of it
@@ -199,7 +200,7 @@ export function createLowPolyTrees({ renderer, getTexture = async () => null, se
   async function uploadAtlas(mips) {
     const tex = renderer.createAtlasTexture(mips[0].width, mips[0].height, mips.length);
     for (let i = 0; i < mips.length; i++) {
-      const { width: w, height: h, data: d } = mips[i], row = w * 4;
+      const { width: w, height: h } = mips[i], row = w * 4, d = bleedTransparentTexels(mips[i].data, w, h);   // filtered: no black edge (render/alpha-bleed.ts)
       for (let y0 = 0; y0 < h; y0 += LPT_ATLAS_BAND) {
         const y1 = Math.min(h, y0 + LPT_ATLAS_BAND), n = (y1 - y0) * row;
         if (bandScratch.length < n) bandScratch = new Uint8Array(n);

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// EM3-3D, THE CLASSIC WAY (Mac, 2026-09-27: "just make it like the classic dungeon 3d map but in this drawn
-// style"). DFU's 3D automap draws the dungeon's OWN geometry - every model the player has revealed, as it was
+// EM3-3D, THE CLASSIC WAY. DFU's 3D automap draws the dungeon's OWN geometry - every model the player has revealed, as it was
 // built - and three things make it readable, all of which this keeps:
 //
 //   BACK FACES ARE NOT DRAWN. A Daggerfall room is a shell of one-sided faces looking inward, so the wall between
@@ -36,15 +35,14 @@ export const SLICE_ABOVE = slicingPositionY(0, EYE_HEIGHT, DEFAULT_SLICING_BIAS_
 /** How far under the slice (metres) a surface keeps its full ink; below that it fades to POCHE... the classic
  *  shader's "brightness falls with distance below the slice, floored at 40%", as ink. */
 export const FADE_FROM = 1.5, FADE_OVER = 9, FADE_FLOOR = 0.35;
-/** A standing face no taller than this (metres) is a step's RISER. Mac: "when i drag it all the way sideways the
- *  ground is black" - a Daggerfall stair is dozens of treads and risers, and at any zoom that puts several steps in
+/** A standing face no taller than this (metres) is a step's RISER. - a Daggerfall stair is dozens of treads and risers, and at any zoom that puts several steps in
  *  a pixel every riser met every tread in a crease, so a flight was inked solid. A riser is drawn as part of the
  *  slope it climbs (a faint line where it is big enough to see), as the classic map shows a stair. */
 export const RISER_MAX = 0.45;
 /** The pencil the floors are shaded with: graphite, a touch cool against the brown ink. */
 export const LEAD_RGB = Object.freeze([74, 74, 80]);
 /** Water: a blue-grey wash over everything under a block's water level (the classic shader's _WaterLevel tint), and
- *  small waves drawn on the flat under it (Mac: "when there is water on the map add small waves to it"). */
+ *  small waves drawn on the flat under it. */
 export const WATER_RGB = Object.freeze([40, 86, 128]);
 /** How far apart the waves are set (metres) and how many of the places they could go get one. */
 export const WAVE_STEP = 1.6, WAVE_SHARE = 0.6;
@@ -144,7 +142,7 @@ void main() {
   float stones = 0.0;   // how much of the flagstone pattern is laid (0 = none: too small to draw, or not a floor)
   float joint = 0.0, bevel = 0.0; vec2 cell = vec2(0.0);
   if (n.y > ${FNY}) {
-    // FLAGSTONES (Mac: "make the blocky floor a bit more visible"): courses a stone deep, each course set half a
+    // FLAGSTONES: courses a stone deep, each course set half a
     // stone over, every stone a little its own shade, its joint a crisp pen line and its far edges a touch shaded,
     // as a draughtsman shades a paving
     // A LEVEL OF DETAIL, so the paving is there at every zoom: the stones where they are 10 px or more, and where
@@ -161,7 +159,7 @@ void main() {
     stones = 1.0;
   }
   if (n.y > ${FNY}) {
-    // floor (Mac: "the ground has to be very slightly grey like youve done it with a pencil"): a light graphite
+    // floor: a light graphite
     // shading in close diagonal strokes that wander a little, with the flagstones in it
     float grain = 0.5 + 0.5 * sin((vW.x - vW.z) * 23.0 + h(floor(vec2(vW.x + vW.z, vW.y) * 1.3)) * 6.0);
     float grainAA = 1.0 - smoothstep(0.35, 0.9, fwidth((vW.x - vW.z) * 23.0) / 6.2832);   // the grain, only where it resolves
@@ -177,7 +175,7 @@ void main() {
     float hatch = (1.0 - smoothstep(0.06, 0.16, abs(fract(u) - 0.5) * 2.0 - 0.78)) * (1.0 - smoothstep(0.2, 0.55, lit));
     tone = 0.06 + 0.1 * (1.0 - lit) + hatch * 0.16;
   }
-  // UNDER WATER (FLOOR-WATER, Mac: "adjust the water to look better"): the classic map tints everything below its
+  // UNDER WATER (FLOOR-WATER): the classic map tints everything below its
   // block's water level; here the water is a wash that deepens with the depth over it, the floor's stones faintly
   // seen through it, and on top small waves in loose courses. On a wall the water is ruled in level lines, as an
   // engraver draws water, under a crisp WATERLINE - so a flooded room reads from the side as well as from above.
@@ -254,7 +252,7 @@ void main() {
     if (dot(a, b) < 0.8) edge = max(edge, 0.85);                          // a crease: floor meets wall, wall turns
   }
   // A JUMP IN DEPTH (a cut, a drop, a wall standing in front), read as the depth's CURVATURE across the pixel,
-  // not its slope (Mac: "when i drag it all the way sideways the ground is black"): a floor seen nearly edge-on
+  // not its slope: a floor seen nearly edge-on
   // falls away fast from pixel to pixel, and a slope test inked every pixel of it. A plane has no curvature
   // however steep it lies; a step or a silhouette has a great deal. Inked on the near side, so it is one line.
   if (here) {
@@ -296,8 +294,7 @@ const _rowMesh = new WeakMap();   // row -> { pos: Float32Array, nrm: Float32Arr
 /**
  * One row's faces, un-indexed, in world space, each vertex carrying its face's WOUND normal: (B - A) x (C - A).
  *
- * THE GAME'S OWN CULLING LAW, derived from its matrices and not guessed (Mac: "it shows the outside the wall to
- * the viewer"): the world pass projects through mat4's right-handed lookAt and perspective with the NDC x row
+ * THE GAME'S OWN CULLING LAW, derived from its matrices and not guessed: the world pass projects through mat4's right-handed lookAt and perspective with the NDC x row
  * mirrored (mirrorProjectionX), and culls with frontFace(CW) - so a face is DRAWN exactly when its wound normal
  * points at the eye (test/ui/ink/em3_3d_dungeon.test.js proves it through those very functions). The classic automap
  * draws the dungeon through that same pass. The file's own normals are NOT used for this: the earlier cut trusted
@@ -336,7 +333,7 @@ export function rowMesh(r) {
   for (let k = 0; k < n; k += 3) if (nrm[k * 4 + 3] > 1.5) risers++;
   if (risers >= 4 * 2) for (let k = 0; k < n; k += 3) if (nrm[k * 4 + 3] < 1.5 && nrm[k * 4 + 1] > FLOOR_FACE_NY) for (let v = 0; v < 3; v++) nrm[(k + v) * 4 + 3] = 1.4;
   // ALL-FLOORS: the storey a row stands on is read off ITS FLOOR - the height where most of its up-facing area lies
-  // (Mac: "when i press all it should still highlight my floor"): the lowest point was the bottom of the rock under
+  // : the lowest point was the bottom of the rock under
   // a room, or a slab's underside, a storey too low - so the player's own rooms were drawn as another floor, faint.
   // A row with no floor in it (a wall, a pillar) falls back to its lowest point.
   const area = new Map();

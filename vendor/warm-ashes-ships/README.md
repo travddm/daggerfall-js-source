@@ -80,13 +80,13 @@ To re-derive the patches from the shipped bundle's six text assets
       SHIPAA00.RMB_base.json SHIPAA00.RMB_raid.json SHIPAA00.RMB_smallraid.json \
       SHIPAA01.RMB_base.json SHIPAA01.RMB_raid.json SHIPAA01.RMB_smallraid.json
 
-## With Detailed Ships
+## With a mod that rebuilds the ship
 
 DFU serves a variant block and then lays the block's building files over
-it (`ReplaceRmbBlockBuildingData`), so with both mods on the player's own
-ship in `_smallraid` is Detailed Ships' ship, and the pirate vessels -
-copies of the classic ship subrecord, record 1 and 2 of the block - stay
-classic. The port's door does the same.
+it (`ReplaceRmbBlockBuildingData`), so with a ship-building mod on, the
+player's own ship in `_smallraid` is that mod's ship, and the pirate
+vessels - copies of the classic ship subrecord, record 1 and 2 of the
+block - stay classic. The port's door does the same.
 
 ## Online
 

@@ -1,5 +1,5 @@
 // @ts-check
-// LW2 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVING TOWN - the residents on the street. It stands where
+// LW2: THE LIVING TOWN - the residents on the street. It stands where
 // DFU's wandering pool stood (systems/town/townPopulation.js TownPopulation) and answers the street's seams in the pool's own
 // shape - `pool` rows of { person, active, scheduleEnable, scheduleRecycle, visible }, `update()` the live seats,
 // `retire(person)`, `nav`, `maxPopulation` - so the talk ray, the watch's conversion, the trample, the probes and the
@@ -35,7 +35,7 @@
 //    to the exit facing the road, home again - dayPlan.js schedule), and walks it ARMED in their class's sprite
 //    (`o.armOf`, ResidentWalker.arm); a party of another town staying here is a VISITOR - in by the exit facing the road
 //    it came, lodged at a tavern, out by the same exit when it leaves.
-//  - LW7, THE DEEDS (bible/06-Systems/Living-World.md "LW7"). A resident the player STRUCK DOWN (`slain` - DFU's one-hit
+//  - LW7, THE DEEDS ("LW7"). A resident the player STRUCK DOWN (`slain` - DFU's one-hit
 //    civilian) is dead for good: the host makes the hand's turn (`o.slay`; lives.js takes the place from that minute -
 //    the town's people read `o.holderOf` and `o.deadAt`), their own - the household they live in, the party they came
 //    with, the crew they came ashore with - count the player their enemy for it, and every resident who saw it
@@ -44,8 +44,10 @@
 //    talks of it for NEWS_DAYS (`deedNews`): one of its own struck down - and, seen, by whom.
 import { POP_RECYCLE_DISTANCE, maxPopulationFor, popAllowChange } from '../town/townPopulation.js';
 import { PERSON_MOVE_SPEED } from '../../characters/mobile/mobilePerson.js';
-import { townPlaces, exitToward, harbourDock, streetGeometry } from './places.js';
-import { townCensus, isHome, watchShiftSize } from './census.js';
+import { townPlaces, townPlacesSteps, exitToward, harbourDock, streetGeometry } from './places.js';
+import { stepsBreathing } from '../../world/puddleMask.js';   // IC-STUTTER: OW-HITCH's runner
+import { townCensus, quarterCensus, isHome, watchShiftSize } from './census.js';
+import { isCapitalPlaceId } from '../../world/capitalLane.js';   // IC-GRAND: a capital's slice a town of quarters
 import { dayPlan, entryAt, isOutdoor, walkMinutes, DAY_START_MIN, DAY_MIN, GUILD_DAY_OFFSETS } from './dayPlan.js';
 import { townClassOf, stillRoleOf, stillFlatOf } from './looks.js';
 import { BUILDING_TYPES } from '../../world/buildingNames.js';
@@ -193,8 +195,7 @@ export const WITNESS_M = LINE_RANGE;
  *  gone round). */
 export const DEED_KNOWN_MIN = 60;
 
-// LW-DAWN (2026-10-07, a screenshot in Daggerfall - 1 fps, "script 6179.8 ms" - and the ask: "Something is killing CPU
-// performance"): A DAY'S CACHE KEEPS THE DAY BESIDE IT.
+// LW-DAWN: A DAY'S CACHE KEEPS THE DAY BESIDE IT.
 // The plans (`_plans`), the roads' word (`_roads`), the people (`_people`) and the walks by their door (`_departures`)
 // each kept ONE day, and from the day's turn at four a reader asks two: WATCH-DAY's morning walk is today's first entry
 // and leaves before the turn, so a company's file (`_fileOf`) is read off yesterday's walks while everything else reads
@@ -247,6 +248,20 @@ export function townChapters(places, temples = false) {
  *   politeness gate, a pause)
  */
 
+/** IC-GRAND x THE LIVING WORLD: how a town's places are read - a capital's slice a town of quarters (places.js); IC-STUTTER:
+ *  the constructor's and livingTownPlaces' one law. @param {{ town: { mapId: number } }} o */
+export const livingPlacesWay = (o) => ({ quarters: isCapitalPlaceId(o.town.mapId) });
+/**
+ * IC-STUTTER: A TOWN'S PLACES MADE A STEP AT A TIME - the constructor's own (townPlaces over the
+ * town's grid, every quarter's again: 0.1-0.4 s of one task on a near slice of the Imperial City) through `breathe` (the
+ * pixel's build's breather), handed to it as `o.places`. The same places.
+ * @param {any} nav @param {{ town: { mapId: number }, doors: readonly any[], buildings: readonly any[] }} o
+ * @param {() => Promise<unknown>} breathe
+ */
+export function livingTownPlaces(nav, o, breathe) {
+  return stepsBreathing(townPlacesSteps(nav, o.doors, o.buildings, livingPlacesWay(o)), breathe);
+}
+
 export class LivingTown {
   /**
    * @param {any} nav - the town's CityNavigation
@@ -254,6 +269,7 @@ export class LivingTown {
    *   town: import('./census.js').LwTown,
    *   buildings: readonly import('./census.js').LwBuilding[],
    *   doors: readonly { key: number, x: number, z: number, nx: number, nz: number }[],
+   *   places?: import('./places.js').Places,
    *   makePerson: (archive: number, guard: boolean) => any,
    *   clock: () => number, rate: () => number, mpm: number,
    *   suppressSpawns?: () => boolean,
@@ -286,7 +302,7 @@ export class LivingTown {
    *   when, who of elsewhere stays here; LW-TALK `places` the towns its roads and news name, its talk's {place}), undefined while its ways are still being asked; `armOf(res)` a resident's
    *   class sprite once its art is loaded, else null (LW-LOOKS: `res.cls` the class asked - their town's), `flatOf(flat)` a
    *   still picture's art and its frames once loaded, else null - `clock` the sky's minute (worldTick.js skyMinutes); `rate` the clock's minutes a real second now (a
-   *   journey's scale in it); `mpm` the walking pace in the clock's metres a minute (LW0 decision 3). LW5: `ashore(res)`
+   *   journey's scale in it); `mpm` the walking pace in the clock's metres a minute. LW5: `ashore(res)`
    *   where one of its sailors is by their packet's clock (portCrews.js - at sea or abroad, in no street of this town);
    *   `crews()` the hands of the packets lying here from elsewhere, each ashore from `inT` to `outT` (the clock's
    *   minutes); `harbour()` the harbour's berth in the location's frame (the dock of a port with no Ship building).
@@ -307,7 +323,8 @@ export class LivingTown {
   constructor(nav, o) {
     this.nav = nav;
     this.o = o;
-    this.places = townPlaces(nav, o.doors, o.buildings);
+    // IC-GRAND x THE LIVING WORLD: a capital's slice is cut from a city at its pixel's lines - a town of quarters (places.js)
+    this.places = o.places ?? townPlaces(nav, o.doors, o.buildings, livingPlacesWay(o));   // IC-STUTTER: made beforehand a step at a time (livingTownPlaces), or here
     /** CHAP5b: a hall's chapter's band by its guild's faction, as the host's sheet said it this clock minute - null with no
      *  sheet (dayPlan's bandOf): a plan is made of the bands its stamp names. */
     this._bandOf = o.chapterOf ? (/** @type {number} */ f) => this._chapterRead().bands.get(f) ?? null : null;
@@ -316,7 +333,7 @@ export class LivingTown {
     /** LW-STAND: the street a person stands and walks on - never in a wall nor over the water (places.js streetGeometry:
      *  the stands about a spot, the way to one) */
     this._street = streetGeometry(this.nav, this.places);
-    this.residents = townCensus(o.town, o.buildings, new Set(this.places.doors.keys()));   // LW-WALLS: the watch's and a traveller's home on the street
+    this.residents = this.places.quarters ? quarterCensus(o.town, o.buildings, this.places.quarters.map((q) => new Set(q.doors.keys()))) : townCensus(o.town, o.buildings, new Set(this.places.doors.keys()));   // LW-WALLS: the watch's and a traveller's home on the street; IC-GRAND: each quarter's people its own
     /** WATCH-DAY: the town's watch a shift (census.js) - its companies' duties (dayPlan.js watchDuty) */
     this._watchSize = watchShiftSize(o.town);
     this.maxPopulation = maxPopulationFor(o.town.blocks);
@@ -513,21 +530,22 @@ export class LivingTown {
         const dock = this.dockSpot() ?? this.places.square ?? null;
         const D0 = day * DAY_MIN + DAY_START_MIN;
         const away = [{ t0: D0 - DAY_MIN, t1: crew.inT, exit: dock, armed: false }, { t0: crew.outT, t1: D0 + 2 * DAY_MIN, exit: dock, armed: false }];
-        plan = dayPlan(res, this.places, day, { mpm: this.o.mpm, visitor: true, home: this._lodging(res), away, bandOf: this._bandOf });
+        plan = dayPlan(res, this._placesFor(this._lodging(res)), day, { mpm: this.o.mpm, visitor: true, home: this._lodging(res), away, bandOf: this._bandOf });
         e = { day, plan, roads: true, inT: crew.inT, home: res.home, other, sheet };
         this._planGen++;
         this._plans.set(res.id, e);
         return e.plan;
       }
       if (visit) {
-        const exit = visit.dock ? (this.dockSpot() ?? exitToward(this.places, visit.yaw)) : exitToward(this.places, visit.yaw);   // LW5b: off a ship, by the dock
+        const exit = visit.dock ? (this.dockSpot() ?? exitToward(this._placesFor(this._lodging(res)), visit.yaw)) : exitToward(this._placesFor(this._lodging(res)), visit.yaw);   // LW5b: off a ship, by the dock; IC-GRAND: its lodging's quarter's
         const D0 = day * DAY_MIN + DAY_START_MIN;
         const halt = visit.dock ? 0 : this._gateHalt(exit, visit.inT, day);   // LW-STIR: halted at a gate the watch keeps
         const away = [{ t0: D0 - DAY_MIN, t1: visit.inT, exit, armed: false, halt }, { t0: visit.outT, t1: D0 + 2 * DAY_MIN, exit, armed: false }];
-        plan = dayPlan(res, this.places, day, { mpm: this.o.mpm, visitor: true, home: this._lodging(res), away, bandOf: this._bandOf });
+        plan = dayPlan(res, this._placesFor(this._lodging(res)), day, { mpm: this.o.mpm, visitor: true, home: this._lodging(res), away, bandOf: this._bandOf });
       } else {
-        const away = (roads?.away.get(res.id) ?? []).map((w) => ({ t0: w.t0, t1: w.t1, exit: w.dock ? (this.dockSpot() ?? exitToward(this.places, w.yaw)) : exitToward(this.places, w.yaw), armed: w.armed }));   // LW5b: a passage leaves by the dock
-        plan = dayPlan(res, this.places, day, { mpm: this.o.mpm, away, watch: this._watchSize, bandOf: this._bandOf, ...this._patronsFor(res, day) });   // LW15: a patron's errand, a browser's
+        const P = this._placesFor(res.home != null ? this.places.doors.get(res.home) : null);   // IC-GRAND: its home's quarter's
+        const away = (roads?.away.get(res.id) ?? []).map((w) => ({ t0: w.t0, t1: w.t1, exit: w.dock ? (this.dockSpot() ?? exitToward(P, w.yaw)) : exitToward(P, w.yaw), armed: w.armed }));   // LW5b: a passage leaves by the dock
+        plan = dayPlan(res, P, day, { mpm: this.o.mpm, away, watch: this._watchSize, bandOf: this._bandOf, ...this._patronsFor(res, day, P) });   // LW15: a patron's errand, a browser's
         signed = this._patronSign(res, day);   // AUDIT LW-II-2 W5: what it read of the patrons' word
       }
       e = { day, plan, roads: !!roads, home: res.home, other, sheet, ...signed };
@@ -545,11 +563,12 @@ export class LivingTown {
    * every reader the same), each its house's door - and the public traders' doors a browser's errand may take.
    * @param {any} res @param {number} day @returns {{ errands?: any[], browse?: any[] }}
    */
-  _patronsFor(res, day) {
+  _patronsFor(res, day, P = this.places) {
     const d = this._patronDayOf(day);
     if (!d) return {};
-    const errands = d.byRes.get(res.id)?.errands ?? [];
-    return { ...(errands.length ? { errands } : {}), ...(d.browse.length ? { browse: d.browse } : {}) };
+    const inP = (/** @type {any} */ s) => P === this.places || !s?.cell || this._placesFor(s) === P;   // IC-GRAND: its quarter's doors alone
+    const errands = (d.byRes.get(res.id)?.errands ?? []).filter((e) => inP(e.at)), browse = d.browse.filter(inP);
+    return { ...(errands.length ? { errands } : {}), ...(browse.length ? { browse } : {}) };
   }
 
   /**
@@ -742,6 +761,13 @@ export class LivingTown {
    *  @param {{ id: string }} res @returns {string | null} */
   _homeOf(res) {
     return this._roads?.visitorOf?.get(res.id)?.trip?.from?.name || null;
+  }
+
+  /** IC-GRAND: the places a day is planned over - a town of quarters' the quarter `spot` stands in (a home's door, a
+   *  lodging's), else the town's own. @param {any} spot */
+  _placesFor(spot) {
+    const Q = this.places.quarters;
+    return Q && spot?.cell ? Q[/** @type {(cell: number[]) => number} */ (this.places.quarterAt)(spot.cell)] ?? Q[0] : (Q ? Q[0] : this.places);
   }
 
   /** A visitor's lodging: one of the town's taverns, by their id (none: the square). */
@@ -1607,14 +1633,14 @@ export class LivingTown {
     // visit's and every relay's turns again: 18-80 ms a frame once a sky minute for a character of many deeds), kept with
     // the turns they were read over
     if (this._deedsKept?.v !== v) this._deedsKept = { v, map: new Map() };
-    const kept = this._deedsKept.map, region = this.o.town.region ?? null;
+    const kept = this._deedsKept.map, region = this.o.town.area ?? this.o.town.region ?? null;   // WW1: the tales' grouping, an area
     const deedsAt = (/** @type {any} */ town, /** @type {number} */ minute) => {
       const k = `${town.mapId >>> 0}:${minute}`;
       let d = kept.get(k);
       if (!d) {
         // AUDIT LW-II B8: a tale of this town's own region (a band routed, a party robbed) is its own word - carried in
         // again, it outlived its own days
-        d = this.deedNews(minute, town).filter((x) => !((x.kind === 'routed' || x.kind === 'held') && region != null && town.region === region));
+        d = this.deedNews(minute, town).filter((x) => !((x.kind === 'routed' || x.kind === 'held') && region != null && (town.area ?? town.region) === region));
         if (kept.size > 4096) kept.clear();
         kept.set(k, d);
       }
@@ -1798,7 +1824,7 @@ export class LivingTown {
    * character robbed on the road, charged (`held`, `who` the one robbed); and any town's deeds (`town`: the word a
    * visitor carries from theirs - livingWorld/carried.js).
    * The character's own, read over the town's pure news (relations.js turns).
-   * @param {number} [t] @param {{ mapId: number, region?: number }} [town]
+   * @param {number} [t] @param {{ mapId: number, region?: number, area?: number }} [town]
    * @returns {{ kind: string, who: string, foe: string, place: string, t: number, seen: boolean, watch?: boolean }[]}
    */
   deedNews(t = this._now, town = this.o.town) {
@@ -1822,8 +1848,9 @@ export class LivingTown {
       if (!key.startsWith(prefix) || known > t || t - known >= NEWS_DAYS * DAY_MIN || !h.who) continue;
       out.push({ kind: 'home', who: h.who, foe: '', place: '', t: known, seen: true });
     }
-    // LW12: a band the character routed - told in its region's towns (the hideout's key names its region), by its name
-    const region = `O${(town.region ?? -1) >>> 0}.`;
+    // LW12: a band the character routed - told in its region's towns (the hideout's key names its region - WW1: its
+    // AREA, the region on the Bay and the province past it), by its name
+    const region = `O${(town.area ?? town.region ?? -1) >>> 0}.`;
     for (const [key, h] of turns.routed ?? []) {
       const known = h.t + DEED_KNOWN_MIN;
       if (!key.startsWith(region) || known > t || t - known >= NEWS_DAYS * DAY_MIN || !h.who) continue;
@@ -1867,7 +1894,7 @@ export class LivingTown {
     return this.residents.find((r) => r.id === place)?.home ?? null;
   }
 
-  /** PLAIN-UI (bible/10-UI/Plain-Words.md): a body's resident's regard of the character as the talk panel shows it -
+  /** PLAIN-UI: a body's resident's regard of the character as the talk panel shows it -
    *  `{ regard, standing }` on the day refuses() reads, or null for a body that is no resident or a character with no
    *  relations. */
   regardCard(person) {

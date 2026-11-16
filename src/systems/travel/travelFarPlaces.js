@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV5 - THE FAR PLACES (bible/06-Systems/Travel-View.md).
+// TV5 - THE FAR PLACES.
 //
-// Mac (2026-09-28), choosing between the horizon's town shapes and these: "Edge markers". The view's camera sees half
+// Mac, choosing between the horizon's town shapes and these: "Edge markers". The view's camera sees half
 // a kilometre ahead at its default tilt, and the world past the streamed grid is fog; so the towns a traveller could
 // set out for are not drawn on the land - they are MARKED: every discovered settlement beyond the grid, within
 // TV_FAR_RANGE map pixels, the nearest TV_FAR_MAX of them, each a plate held at the screen's edge pointing its way

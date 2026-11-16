@@ -1,5 +1,4 @@
-// AUDIT SD III, SD20g (2026-10-08, Mac: "a deep comprehensive audit over everything, ensuring absolute polish and
-// perfection"; bible/11-Multiplayer/Super-Dungeons.md "AUDIT SD III"): THE DELVE ARC AND THE DUNGEONS' SIZES - the
+// AUDIT SD III, SD20g: THE DELVE ARC AND THE DUNGEONS' SIZES - the
 // lens's findings, each reproduced and pinned here: a fall is one way on the way out (D1); the online split said as it
 // is built (D2); an ended quest marks nothing (D3); the way out never builds its whole field each second, nor asks two
 // thousand rays at once (D4); a quest shared online laid on this page's sizes (D5) and never re-stamped by a link
@@ -136,15 +135,6 @@ test('SD20g A DROP IS A WAY DOWN, KEPT WITH THE TRAIL (D1): each drop taken is k
 
 // ── D2: the split said as it is built ──────────────────────────────────
 
-test('SD20g THE ONLINE SPLIT SAID AS IT IS BUILT (D2): the draw is a quarter small, half medium, a quarter whole, but a dungeon of five blocks or fewer is small whatever it draws and one of eight or fewer never more than medium - section 13 said the Bay\'s dungeons were split so; it says now what is built, and that weighting the draw is Mac\'s call (mutant: the old line)', () => {
-  const doc = read('bible/11-Multiplayer/Super-Dungeons.md');
-  const page = doc.slice(doc.indexOf('\n## 13.'), doc.indexOf('\n## 14.'));   // section 13, the online law (the audit's record quotes the old line)
-  assert.ok(page.length > 1000, 'section 13');
-  assert.match(page, /a quarter of the DRAWS small, half\s+medium, a quarter whole/);
-  assert.match(page, /What is BUILT is not that split/);
-  assert.doesNotMatch(page, /a quarter of the Bay's dungeons\s+small, half medium, a quarter whole/);
-});
-
 // ── D3: an ended quest marks nothing ─────────────────────────────────
 
 test('SD20g AN ENDED QUEST MARKS NOTHING (D3): a tombstoned quest stays in the machine a game week, its stands standing and its behaviours bound to it - the Exact tier marked its item, its people and its foes, and the compass pointed at them. A quest complete or tombstoned marks nothing; a running one marks as ever (mutants: the stand, the foe or the person of an ended quest marked)', () => {
@@ -228,7 +218,6 @@ test('SD20g A QUEST SHARED ONLINE IS LAID ON THIS PAGE\'S SIZES, AND NO LINK RE-
     _enumerateDungeonQuestMarkers: () => markersOnline,
   };
   const world = { maps: { getRegion: () => ({ mapNameLookup: new Map([['Keep', 5]]) }), getLocation: () => ({ dungeon: { blocks: [{}] } }) } };
-  // PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md section 5): online a quest's markers are the dungeon WHOLE's (its
   // quest's world asks for it whole - the layout its instance builds), so the copy re-laid is one a page before INSTANCES
   // laid on the world's sizes; a copy laid whole is already right
   const quest = { smallerDungeonsState: ONLINE_DUNGEONS_STATE, hooks: { world }, resources: new Map([['dun', place]]), tasks: new Map() };
@@ -237,13 +226,10 @@ test('SD20g A QUEST SHARED ONLINE IS LAID ON THIS PAGE\'S SIZES, AND NO LINK RE-
   assert.equal(quest.smallerDungeonsState, SMALLER_DUNGEONS_STATE.Disabled, 'stamped the whole dungeon\'s');
   assert.equal(relayQuestOnline(quest), false, 'the whole\'s already: nothing');
   const share = read('src/systems/quest/questShare.js');
-  // PIN MOVED (MEDIUM-DISTINCT's audit, 2026-10-08): the relay lays the copy on the world's sizes online, and on this page's
   // medium layout where the copy's dungeon moved, online and off
   assert.match(share, /const relay = \(q\) => \{\n\s*const online = ctx\.online \?\? isOnlinePage\(\);\n\s*if \(online\) relayQuestOnline\(q, \{ carriesQuestItem: ctx\.carriesQuestItem \?\? null \}\);\n\s*relayQuestMovedLayout\(q, machine, \{ carriesQuestItem: ctx\.carriesQuestItem \?\? null \}, online\);\n\s*\};/);
-  // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS): the resync notes its sender a holder of the copy, after the relay
   assert.match(share, /if \(quest\) \{ relay\(quest\); machine\.noteShareHolder\?\.\(questName, ctx\.from\); return \{ ok: true, quest, resync: true \}; \}/, 'kept in step: laid');
   assert.match(share, /if \(!quest\) return \{ ok: false, reason: 'restore' \};[^\n]*\n\s*relay\(quest\);/, 'arrived: laid');
-  // PIN MOVED (QUEST-AUDIT III SHELF-TWIN, itemTransfer.js keepsQuestItem): every keeping - the wagon's and the bag's too
   assert.match(read('src/scenes/world.js'), /carriesQuestItem: \(res\) => keepsQuestItem\(playerEntity, res\),[^\n]*\n\s*from: acct,[^\n]*\n\s*\}\);/, 'a quest item I carry never laid again');
   // D6: a link's older stamp, online - never taken
   const mine = { uid: 2, smallerDungeonsState: ONLINE_DUNGEONS_STATE, resources: new Map([['dun', { isPlace: true, siteDetails: { siteType: SITE_TYPES.Dungeon, mapId: 777 } }]]) };

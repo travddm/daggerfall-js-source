@@ -1,4 +1,4 @@
-// LEGACY4 (2026-10-05, bible/06-Systems/Legacy-Arc.md section 7): HEIRLOOMS, THE REMAINS AND THE DEATH QUEST - Mac:
+// LEGACY4: HEIRLOOMS, THE REMAINS AND THE DEATH QUEST - Mac:
 // "Upon your current characters death, have a chance to drop a gear item deemed an heirloom. These heirlooms, along with
 // your characters remains can be acquired by completing the death quest on your descendant."
 import { test } from 'node:test';
@@ -143,7 +143,6 @@ function quest({ model = MODELS.bloodline } = {}) {
 /** The heir takes the mantle: a newborn of the fallen, played by the same test entity under the heir's own id. */
 function heirOf(t) {
   assert.equal(t.host.succeed({ newborn: true }), true);
-  // PIN MOVED (AUDIT LEGACY II B1): the heir LANDS through the birth's own door - the boot's takeBorn, finishChargen's
   // entity, onBorn (the fall answered there, never at the choice)
   const id = t.host.current().id;
   assert.ok(t.host.takeBorn(id), 'the birth waits for its own person');
@@ -191,7 +190,6 @@ test('LEGACY4 + AUDIT LEGACY H1/H4/H6/H8: found, taken, laid to rest - the list 
   host.tick();
   assert.equal(w.opened.length, 1);
   assert.equal(w.opened[0], r.items, 'THE RECORD\'S LIST - what is left in it stays with the remains');
-  // PIN MOVED (AUDIT LEGACY II H5): opened is no claim - the member who CHANGES the list claims it
   assert.equal(r.by, null, 'opened and left as it lies: nobody\'s');
   host.tick();
   assert.equal(w.opened.length, 1, 'once a visit');

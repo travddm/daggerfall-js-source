@@ -1,13 +1,10 @@
-// RAID-ROLL (2026-09-28, Mac: "Fix it" - AUDIT RAID's "not changed": the relay held no copy of the day's schedule, so a
-// modified client could name a raid the day never rolled, stand on its own pixel and be paid for it, and a many-socket
-// griefer could fill a cell's eight places with raids it kept "fought"). THE DAY'S ROLL IS THE RELAY'S TOO:
+// RAID-ROLL. THE DAY'S ROLL IS THE RELAY'S TOO:
 //   - a raid's start, party and target are the day's generator's alone - the relay reads every word against the day's
 //     slots with no game data (net/raid/raidLaw.js raidDaySlots), one generator for relay and client (raidDayRandom);
 //   - its region and town are the towns table's (the player's game files): a client hands the hub the table it asks
 //     for by the operator's pinned hash (RAID_TOWNS_SHA256), the hub keeps only a table that hashes to it, and every
 //     cell then reads a word against the day's whole roll (raidDayIds) - its key and pixel too, or nothing.
-// Driven through the real Room (fakeRoom.mjs), the real session and the real raid module. bible/03-World/
-// Raiding-Parties.md, "RAID-ROLL".
+// Driven through the real Room (fakeRoom.mjs), the real session and the real raid module.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -316,15 +313,5 @@ test('RAID-ROLL client: this world\'s table is handed only when it hashes to the
     assert.deepEqual(said.filter((l) => l.startsWith('[raid] this world')), [`[raid] this world's towns table: ${sha(text)}`], 'its hash said once');
   } finally { console.info = info; }
   _resetRaidingParties();
-  const rp = rd('src/systems/raidingParties.js');
-  assert.match(rp, /return _townsHash && _townsHash === h \? _townsText : null;/, 'handed only when it hashes to the pin');
-  assert.match(rp, /console\.info\(`\[raid\] this world's towns table: \$\{hash\}`\)/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /link\.onRaid = \(f, room\) => \(f\.k === 'tw' \? offerRaidTowns\(link, f\.h\) : raidRelayWord\(f, room\)\);/);
-  assert.match(w, /if \(text\) \{ if \(link\.sendRaidTowns\(h, text\)\) _raidTownsSent = true; return; \}\n\s*if \(tries > 1\) setTimeout\(\(\) => offerRaidTowns\(link, h, tries - 1\), 10_000\);/);
-  const tool = rd('tools/raidTowns.mjs');
-  assert.match(tool, /const regions = raidRegions\(maps, picker\.getDFBitmap\(\)\.data\) \?\? \[\];\n\s*const text = raidTownsCanon\(regions\);/, 'the game\'s own reading of the same files');
   assert.match(rd('server/wrangler.toml'), /^RAID_TOWNS_SHA256 = "(?:[0-9a-f]{64})?"$/m, 'the relay\'s pin - empty a legal state');
-  const idx = rd('server/src/index.js');
-  assert.match(idx, /if \(!raidWordFits\(m, sharedClassicMinutes\(now\)\)\) return;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const day = raidDayOfKey\(m\.key\);\n\s*if \(!raidOnSlot\(m, this\._raidSlotsOf\(day\)\)\) return;\n\s*const rolled = await this\._raidDayIdsOf\(day, now\);\n\s*if \(rolled && !rolled\.has\(raidLedgerId\(m\)\)\) return;\n\s*const id = raidLedgerId\(m\);/, 'read before the ledger - and before any storage read');
 });

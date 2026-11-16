@@ -1,8 +1,6 @@
 // @ts-check
-// ARENA4 (2026-10-02, Mac: "Players can choose to watch AI fights, player fights, join a team (red and blue) and climb
-// esclating tiers of opponents, or choose to matchmake for a real opponent to take on in real time"; "Being the #1 pvp
-// arena player comes with it's own temporary title/glyph"): THE ARENA ONLINE, AS LAW - what the relay, the account
-// service and the game all read the same way. Design: bible/11-Multiplayer/Arena.md "7. Online".
+// ARENA4: THE ARENA ONLINE, AS LAW - what the relay, the account
+// service and the game all read the same way. Design: "7. Online".
 //
 //   THE ROOMS     `arena:hall` (the queue, the offers, the list of live bouts), `arena:b<16 hex>` (one bout's floor:
 //                 its fighters, its spectators, the relay's referee and, on the ladder, its AI fighters) and (ARENA4b)
@@ -42,8 +40,7 @@ export const isArenaExhibitionRoom = (key) => ARENA_EX_ROOM_RE.test(String(key ?
 export const arenaExhibitionRoom = (hour) => `arena:x${Math.max(0, Math.floor(Number(hour) || 0))}`;
 /** The hour out of an exhibition room's key, or null. */
 export const arenaExhibitionHourOf = (key) => { const m = ARENA_EX_ROOM_RE.exec(String(key ?? '')); return m ? Number(m[1]) : null; };
-/** ARENA6 (2026-10-03, the owner: "a way to simply host private matches ... a session where people can join, watch,
- *  participate, and allow the host of the session to choose who is fighting and who is in the crowd"): A PRIVATE
+/** ARENA6: A PRIVATE
  *  SESSION'S ROOM, `arena:p<code>` - six of an alphabet with no letter or digit read as another (no I, L, O, 0 or 1), so
  *  a code read off a stream is typed right. Its sessions' bouts stand on the floor as every other bout's do. */
 export const ARENA_PRIVATE_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -88,7 +85,7 @@ export const ARENA_SEASON_S = 8 * 7 * 24 * 3600;
 export const arenaSeasonOf = (nowS) => Math.max(1, Math.floor((Math.floor(Number(nowS) || 0) - ARENA_SEASON_EPOCH_S) / ARENA_SEASON_S) + 1);
 /** When a season ends (its last second's successor), epoch seconds. */
 export const arenaSeasonEndsS = (season) => ARENA_SEASON_EPOCH_S + Math.max(1, Math.floor(season)) * ARENA_SEASON_S;
-/** EG-E (bible/11-Multiplayer/Elite-Gates.md section 19): THE ARENA WEEK holding `nowS` - 0 the season epoch's first, seven
+/** EG-E: THE ARENA WEEK holding `nowS` - 0 the season epoch's first, seven
  *  days each, Monday 00:00 UTC to Monday; the week an Elite Breach's Redoubt pays once an account in (server-account/src/eg.js),
  *  the Spire's Proclamation's (net/eliteGates/egLaw.js egProclamationOf) and the Broker's Panoply sink's. Never before the epoch's. */
 export const ARENA_WEEK_S = 7 * 24 * 3600;
@@ -220,8 +217,8 @@ export const ARENA_CLASS_SPEED = 5.0;
 export const ARENA_BEAST_SPEED = 6.0;
 /** AUDIT ARENA-LADDER (the owner's call, "Elite champions"): A TIER'S CHAMPION IS AN ELITE FOE - systems/eliteFoes.js
  *  ELITE_FOE_HEALTH_MULT and ELITE_FOE_DAMAGE_MULT on its body, pinned equal (this law imports nothing). */
-export const ARENA_ELITE_HP_MULT = 5;
-export const ARENA_ELITE_DMG_MULT = 3;
+export const ARENA_ELITE_HP_MULT = 2;
+export const ARENA_ELITE_DMG_MULT = 1.3;
 /** One AI fighter's body as the relay runs it; `elite` a tier champion's. Pure. */
 export function arenaFoeStats(mobile, level, { elite = false } = {}) {
   const beast = ARENA_BEASTS[mobile] ?? null;
@@ -244,7 +241,7 @@ export function arenaLadderBout(tier, bout) {
 }
 
 // ── AUDIT ARENA-LADDER: THE RELAY'S TELEGRAPHED BLOWS ─────────────────────────────────────────────
-// (the owner, 2026-10-05: "Ensure AI enemies sometimes receive telegraphed attacks"). The relay's fighters throw the
+// . The relay's fighters throw the
 // foes' three shapes (ai/blowShapes.js - the leaf the relay reads) by the tactics' own law: of the tier that telegraphs
 // (ai/foeBlows.js BLOW_TIER_LEVEL, or an elite - a champion), its cooldown spent, a roll - at whoever it fights, a
 // player or another fighter. The constants are the brain's, pinned equal.
@@ -362,12 +359,21 @@ export const ARENA_HIT = Object.freeze({ Melee: 0, Shaft: 1, Spell: 2 });
 export const ARENA_SPELLS_IN = 3;
 export const ARENA_SPELL_WINDOW_MS = 5000;
 export const ARENA_SPELL_MAX = 60;
+/** A damaging spell reaches as far as a shaft. */
+export const ARENA_SPELL_REACH = ARENA_BOW_REACH;
+/** The relay's own magicka for a fighter's casts: it knows no spell book, so each damaging cast costs the damage it
+ *  lands from a pool that refills at a fixed rate. DFU's most magicka is Intelligence 100 x the class's 3.0 = 300
+ *  (combat/formulas.js spellPointsFor, systems/chargen.js SPELL_POINT_MULTIPLIERS); the pool is twice that for the
+ *  gear, Renown and folds that add to it, and its refill is slower than the cast count's own ceiling. A refusal is
+ *  counted (the relay's `magickaDry` metric) so a false one shows. */
+export const ARENA_MAGICKA_DEPTH = 600;
+export const ARENA_MAGICKA_REGEN = 12;
 /** The fastest a fighter moves (Seats-Arc 6.1's starting ceiling) and the slack: a pose further than this from the last
  *  good one is not believed (the referee measures reach from the last good pose). */
 export const ARENA_SPEED_MAX = 12.5;
 export const ARENA_SPEED_SLACK = 0.5;
 /** DFU's CalculateWeaponMaxDamage, verbatim case groups, by template (characters/weapons.js, pinned) - the bows one
- *  higher, BAL-ARCHERY's (bible/05-Combat/Balance-Arc.md section 18). */
+ *  higher, BAL-ARCHERY's. */
 export const ARENA_WEAPON_MAX = Object.freeze({ 113: 6, 114: 8, 115: 8, 116: 8, 117: 10, 118: 12, 119: 12, 120: 16, 121: 16, 122: 18, 123: 21, 124: 12, 125: 14, 126: 18, 127: 12, 128: 16, 129: 17, 130: 19 });
 /** DFU's weapon material modifier (combat/formulas.js WEAPON_MATERIAL_MODIFIER, pinned), by material 0..9. */
 export const ARENA_MATERIAL_MOD = Object.freeze([-1, 0, 0, 1, 2, 3, 3, 4, 5, 6]);
@@ -376,7 +382,7 @@ export const ARENA_MATERIAL_MOD = Object.freeze([-1, 0, 0, 1, 2, 3, 3, 4, 5, 6])
 export const ARENA_HAND_MAX = 41;
 export const ARENA_MOD_MAX = 20;
 /** INT7: the most reach a weapon has (net/siege/siegeRef.js ARMS_TOP_MAX, pinned equal - this law imports nothing). */
-export const ARENA_ARMS_TOP_MAX = 32;
+export const ARENA_ARMS_TOP_MAX = 27;
 /** INT7: a signed arms claim (net/identityToken.js `wa`, net/siege/siegeRef.js armsOk - pinned equal): `[reach, bow]`. */
 export const arenaArmsOk = (wa) => Array.isArray(wa) && wa.length === 2 && Number.isInteger(wa[0]) && wa[0] >= 0 && wa[0] <= ARENA_ARMS_TOP_MAX && (wa[1] === 0 || wa[1] === 1);
 /**
@@ -390,8 +396,25 @@ export function arenaBlowCap({ r, w = -1, m = 0, wa = null }) {
   if (r === ARENA_HIT.Spell) return ARENA_SPELL_MAX;
   const wmax = ARENA_WEAPON_MAX[/** @type {any} */ (w)];
   const mat = Number.isInteger(m) && m >= 0 && m < ARENA_MATERIAL_MOD.length ? ARENA_MATERIAL_MOD[m] : 0;
+  // A blow that names no weapon (or a template no table names) is a fist's: DFU's hand-to-hand most. The referee refuses
+  // that claim while a weapon is in the striker's hand (arenaHeld), so leaving the weapon out buys an armed fighter nothing.
   const reach = wmax != null ? (arenaArmsOk(wa) ? Math.min(wmax + mat, wa[0]) : wmax + mat) : ARENA_HAND_MAX;
   return 2 * (reach + ARENA_MOD_MAX);
+}
+
+/** The look's two hand slots a weapon is wielded from (net/siege/siegeRef.js SIEGE_HAND_SLOTS, pinned equal). */
+export const ARENA_HAND_SLOTS = Object.freeze([19, 21]);
+/**
+ * THE WEAPON A FIGHTER HOLDS, off its look (net/wire.js validLook's items), for a blow that claims weapon `w` of material
+ * `m`: a claim of no weapon is refused (null) where a weapon is in a hand, and a claimed weapon must be one in a hand. A
+ * fighter with no look on record is taken at its word. Pure.
+ * @param {any} look
+ */
+export function arenaHeld(look, w = -1, m = 0) {
+  if (!look || !Array.isArray(look.items)) return { w, m };
+  const inHand = look.items.filter((i) => i?.group === 'Weapons' && ARENA_HAND_SLOTS.includes(i.equipSlot));
+  if (w === -1) return inHand.length ? null : { w: -1, m: 0 };
+  return inHand.some((i) => i.templateIndex === w && (i.material ?? 0) === m) ? { w, m } : null;
 }
 
 // ── THE FLOOR ─────────────────────────────────────────────────────────────────────────────────

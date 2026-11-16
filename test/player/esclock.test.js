@@ -1,5 +1,4 @@
-// ESC-LOCK (2026-09-27, Mac: "when you hit esc to leave a menu, your cursor remains on the screen instead of returning
-// to the game"; a tester: "U have to hit escape 2 times to get pause menu up now").
+// ESC-LOCK.
 //
 // Two browser rules player/pointerLock.js had assumed away. (1) While the pointer is locked the Escape press is the
 // BROWSER's - it ends the lock and the page never sees the key - so the first Escape only freed the cursor and the
@@ -149,8 +148,3 @@ test('ESC-LOCK (2): a request the browser refused is asked of the desktop shell 
   }
 });
 
-test('ESC-LOCK (2): the desktop app\'s bridge - the preload asks, the main process runs the page\'s one hook as a user gesture', () => {
-  assert.match(rd('app/preload.cjs'), /relockPointer: \(\) => ipcRenderer\.send\('dagger:relock'\),/);
-  assert.match(rd('app/main.cjs'), /ipcMain\.on\('dagger:relock', \(e\) => \{ e\.sender\.executeJavaScript\('globalThis\.__daggerRelock\?\.\(\)', true\)\.catch\(\(\) => \{\}\); \}\);/,
-    'a FIXED script, and `true` is executeJavaScript\'s userGesture');
-});

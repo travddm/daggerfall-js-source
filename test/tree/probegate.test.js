@@ -1,4 +1,4 @@
-// AUDIT ANTICHEAT A2 (2026-10-17; #955 picked up) - A PROBE'S SEAM SITS BEHIND THE SHOT GATE.
+// AUDIT ANTICHEAT A2 - A PROBE'S SEAM SITS BEHIND THE SHOT GATE.
 //
 // #955 published the live entity on a `?shot` boot alone and said every other probe seam already stood behind
 // `shotMode`. The audit read all 285 install sites in src/ and found three that did not: world.js's `__readyRanged`
@@ -9,7 +9,7 @@
 // `pageHas('shot')`), or inside one of the two installers whose every call does, or is named below as ALWAYS ON with
 // its reason. Counted both ways: a new ungated seam fails, and so does a name left here after its seam was gated.
 //
-// src/tools/ is the lab pages' (mw-viewer, the paperdoll viewer, the card and sky labs), and is swept only for the
+// src/tools/ is the lab pages' (the card and sky labs), and is swept only for the
 // premise that lets it go: no module outside it imports one inside it, so no played page carries a lab's seams.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

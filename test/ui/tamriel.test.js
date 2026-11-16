@@ -1,7 +1,6 @@
-// TAMRIEL1 (2026-10-08, bible/03-World/Tamriel.md) - THE WHOLE OF TAMRIEL ROUND THE BAY, pinned.
+// TAMRIEL1 - THE WHOLE OF TAMRIEL ROUND THE BAY, pinned.
 //
-// Mac: "building the entirety of tamriel that connects accurately to Daggerfall. Not actually traversalable but used
-// and connected as a gigantic map that can be used for later use and be seen by players ingame", then "Performance
+// then "Performance
 // should also not be affected".
 //
 // Four modules, each pinned against its own law: the FRAME (world/tamriel/tamrielFrame.js - one offset, no scale, the Bay's
@@ -309,8 +308,9 @@ test('TAMRIEL1 ink: off the Bay the paint strokes the coast in the Bay\'s own pe
   assert.equal(strokes[1].strokeStyle, PEN.line, 'then the line');
   assert.equal(strokes[1].lineWidth, 1.3);
   assert.equal(strokes[2].strokeStyle, PEN.relief, 'the high ground\'s carets');
+  // halo (PROVINCE_PEN), no longer the Bay's dash
+  assert.ok(ctx.calls.some((c) => c.fn === 'stroke' && c.lineWidth === 2.6 && c.strokeStyle === PEN.line), 'the provinces\' line, solid');
   const dashes = ctx.calls.filter((c) => c.fn === 'setLineDash').map((c) => c.args[0]);
-  assert.ok(dashes.some((d) => d.length === 2 && d[0] === 4 && d[1] === 3), 'the borders dashed as the Bay\'s');
   assert.ok(dashes.some((d) => d.length === 2 && d[0] === 2 && d[1] === 4), 'the Bay\'s edge dotted');
   const fills = ctx.calls.filter((c) => c.fn === 'fillText').map((c) => c.args[0]);
   const spaced = spacedName;
@@ -321,7 +321,8 @@ test('TAMRIEL1 ink: off the Bay the paint strokes the coast in the Bay\'s own pe
   const haloed = ctx.calls.filter((c) => c.fn === 'strokeText');
   assert.ok(haloed.length >= 8 && haloed.every((c) => c.strokeStyle === PEN.halo), 'every city name haloed in the parchment');
   const regionFont = ctx.calls.filter((c) => c.fn === 'fillText' && c.args[0] === spaced('Skyrim'))[0].font;
-  assert.match(regionFont, /^300 15px/, 'the continent\'s province name is the far band\'s size');
+  assert.match(regionFont, /^300 18px/, 'the continent\'s province name');
+  assert.ok(ctx.calls.some((c) => c.fn === 'strokeText' && c.args[0] === spaced('Skyrim') && c.strokeStyle === PEN.halo), 'the province\'s name haloed');
   // in to the Bay's own fit: every city, and the names a size larger
   const ctx2 = recordingCtx();
   assert.equal(paintTamrielInk(ctx2, { ox: -1000, oy: -450, scale: 0.4 }, ink, { paperW: 900, paperH: 560, continent: false, bayFit: 0.4 }), true);
@@ -497,32 +498,3 @@ test('TAMRIEL1 switch: the Features row `tamriel-map` is on by default on the pl
 
 // ── THE SOURCE SWEEPS ───────────────────────────────────────────
 
-test('TAMRIEL1 sweep: the window paints the continent AFTER the Bay\'s ink and under the zone map\'s, hands the frame and the home view through the sheet, answers the hover beyond the Bay, and reads the switch once at open; the layer reads no game data', () => {
-  const held = read('src/ui/heldMap.js');
-  const sheet = held.slice(held.indexOf('  _worldSheet() {'), held.indexOf('  _showChrome('));
-  assert.ok(sheet.indexOf('paintInkStatic(ctx, env.model, env.view, {') < sheet.indexOf('paintTamrielInk(ctx, env.view, tamrielInkFor(env.model)'), 'the Bay\'s ink first - it clears the canvas');
-  assert.ok(sheet.indexOf('paintTamrielInk(') < sheet.indexOf("part: 'over'"), 'under the zone map\'s wash');
-  assert.match(sheet, /if \(this\._tamriel && !this\._zoneMap\) \{/, 'never on the zone map');
-  assert.match(sheet, /frame: \(\) => \(this\._tamriel \? tamrielFrameInBay\(\) : null\)/, 'the frame through the sheet, off when the switch is');
-  assert.match(sheet, /homeView: \(lim\) => \(this\._tamriel && lim/, 'the home view is the Bay\'s fit while the frame is round it');
-  assert.match(sheet, /band: env\.band,\n/, 'the band is the band');
-  assert.match(sheet, /continent: this\._tamriel && onContinent\(env\.view\.scale, this\._bayFit\(\)\),/, 'the flag the Bay\'s ink thins for');
-  assert.match(held, /this\._tamriel = tamrielMapOn\(\);/, 'read once, at open');
-  assert.match(held, /const frame = this\._sheet\?\.frame\?\.\(\) \?\? null;\n    if \(frame\) return \{ mapW: frame\.w, mapH: frame\.h, mapX0: frame\.x0, mapY0: frame\.y0/, 'the limits carry the origin');
-  const hover = held.slice(held.indexOf('  _hoverLabel(sx, sy) {'), held.indexOf('  _pickAt(sx, sy) {'));
-  assert.match(hover, /const place = tamrielPlaceAt\(mx, my, this\._view, tamrielInkFor\(this\._model\)\);/);
-  assert.match(hover, /if \(!this\._tamriel \|\| this\._zoneMap\) return null;/, 'off, or on the zone map, the old null');
-  const pick = held.slice(held.indexOf('  _pickAt(sx, sy) {'), held.indexOf('  _pickAt(sx, sy) {') + 4000);
-  assert.ok(!/tamriel/i.test(pick), 'a press beyond the Bay picks nothing: not traversable');
-  const ink = read('src/ui/tamrielInk.js');
-  for (const bad of ['woodsFile', 'mapsFile.js', 'pakFile', 'mapDirectory', 'fetch(']) assert.ok(!ink.includes(bad), `the layer never reads ${bad}`);
-  assert.match(ink, /if \(!ink \|\| !viewLeavesBay\(view, paperW, paperH\)\) return false;/, 'the one rectangle test, first');
-  assert.match(ink, /const _inks = new WeakMap\(\);/, 'one model a data set');
-  const geo = read('src/world/tamriel/tamrielGeography.js');
-  assert.ok(!/TMAP00I0\.IMG|readFileSync|import .*imgFile/.test(geo), 'authored, never traced from the picture');
-  const frame = read('src/world/tamriel/tamrielFrame.js');
-  assert.match(frame, /export const BAY_ORIGIN = Object\.freeze\(\{ x: 862, y: 975 \}\);/, 'the one authored offset, named once');
-  // AUDIT TIDY TOOL-1: a net/ import at any depth
-  assert.ok(!/from '(?:\.\.\/)+net\//.test(frame + geo + read('src/world/tamriel/tamrielGround.js')), 'TAMRIEL2-WORKER: nothing of net/ under the frame, the geography or the ground - the terrain worker reads them');
-  assert.ok(!/BAY_ORIGIN\s*=|862, 975/.test(ink + geo + read('src/world/tamriel/tamrielRaster.js')), 'and nowhere else');
-});

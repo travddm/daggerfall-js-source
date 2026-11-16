@@ -1,14 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CRAFT4 (2026-10-07) — TEMPERING AND REFORGING: the crafter improves
-// what loot gives, never past law 7 (bible/06-Systems/Professions-Arc.md
+// CRAFT4 — TEMPERING AND REFORGING: the crafter improves
+// what loot gives, never past law 7 (
 // section 41, CRAFT0's fourth slice; 41.7 as built). Pure: no clock, no
 // DOM, no network - the account service decides by it, the stations
 // draw by it.
 //
-// Asked (2026-10-07, Mac: "How could we enhance the profession element
-// of the game while reducing complexity and making crafting more
-// viable"; then, of the five proposals, "Lets do it"). FACT (41.1): a
+// Asked. FACT (41.1): a
 // craft reaches Rare at most and loot reaches Legendary, Aetheric,
 // Artifact and Sigil - a crafted piece was never the best a slot holds,
 // so a crafter had nothing to offer a player wearing loot. NOW THE
@@ -132,7 +130,7 @@ export const REFORGE_RANK = 50;
 /** The Arcane Essence a piece's first Reforge takes, by the piece's tier (41.2: "2 (Magic) or 5 (Rare)"). */
 export const REFORGE_ESSENCE = Object.freeze({ magic: 2, rare: 5 });
 /** The Essence a piece's next Reforge takes, or null for a tier it does not take (Legendary and up - law 7) or a count
- *  that is no piece's. REFORGE-REPLACE (the owner: "Replace, price rises"): its tier's first price doubled for every
+ *  that is no piece's. REFORGE-REPLACE: its tier's first price doubled for every
  *  reforge the piece has taken (`count`, lootRarity.js reforgeCount - none by default, a request from before the count; at most REFORGES_MAX),
  *  as the Mages Guild's doubles (systems/reforge.js reforgePrice). */
 export const reforgeEssence = (/** @type {string|null|undefined} */ tier, count = 0) => (

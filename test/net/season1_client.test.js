@@ -1,6 +1,6 @@
-// SEASON1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE SEASON ON THE SEAT TAB - the week
+// SEASON1 part one: THE SEASON ON THE SEAT TAB - the week
 // of the Season the standings name, above the week's clock; nothing where no Season is counted; a Season's titles in
-// words on the badge (bible/11-Multiplayer/Seats-Arc.md 9.1, 7.4).
+// words on the badge (9.1, 7.4).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';
@@ -33,5 +33,5 @@ test('SEASON1 THE SEAT TAB\'S SEASON: the standings\' Season said as its week of
     assert.match(byClass(host, 'notice-seat-week')[0].textContent, /^The Muster/);
   }
   const place = (k) => (k === ANTICLERE.key ? ANTICLERE : null);
-  assert.deepEqual([seatTitleText('crowned', [5023, 2], place), seatTitleText('keeper', [3021, 2], place), seatTitleText('keeper', [9999, 2], place)], ['Crowned in Season 2', 'Keeper of Anticlere, Season 2', null]);
+  assert.deepEqual([seatTitleText('crowned', [5023, 2], place), seatTitleText('keeper', [3021, 2], place), seatTitleText('keeper', [9999, 2], place)], [null, null, null], 'Season titles are cut: the words say nothing for them');
 });

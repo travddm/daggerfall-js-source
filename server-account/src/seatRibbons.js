@@ -1,6 +1,5 @@
 // @ts-check
-// SEASON1 part two (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE BANNER RIBBON (bible/
-// 11-Multiplayer/Seats-Arc.md 9.1) - a thin band in the guild's colours under the name tag of every member of a guild
+// SEASON1 part two: THE BANNER RIBBON - a thin band in the guild's colours under the name tag of every member of a guild
 // that kept a seat a whole Season, worn through the next Season. Written at the Turning that ends a Season
 // (seatTurning.js settleWeek, `town_seat_ribbons`); read here at the token's mint, the named character's alone.
 import { ribbonSeasonOf } from '../../src/net/townSeatLaw.js';
@@ -13,9 +12,9 @@ import { ribbonClaimOf } from '../../src/net/heraldryLaw.js';
  * the colours are the guild's as they are now (a banner changed is a ribbon changed).
  * @param {any} db
  */
-export async function ribbonOf(db, playerId, character, season, member = undefined) {
+export async function ribbonOf(db, playerId, character, season, member = undefined, on = true) {
   const n = ribbonSeasonOf(season);
-  if (n == null || typeof character !== 'string') return null;
+  if (!on || n == null || typeof character !== 'string') return null;
   // SCALE4f part two: the mint's one membership read (guilds.js mintMemberOf) - its guild's ribbon of the Season, earned
   // while it was a member (the join's own `m.joined_at <= r.at`), in the guild's colours as they are now
   const r = member !== undefined

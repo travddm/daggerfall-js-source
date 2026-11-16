@@ -1,4 +1,4 @@
-// SHARE-COPY (2026-09-26, Mac: "Shared Quest did not match copy bug - affect player quality of life"): EVERY quest
+// SHARE-COPY: EVERY quest
 // share was refused with "received a quest that did not match your own copy". AUDIT DROPS A1 holds an incoming
 // envelope against the receiver's own parse of the quest by name, task symbol by task symbol - and two kinds of task
 // take their symbol from the UID counter at parse (task.js, DFU's own NextUID): the headless startup task EVERY quest

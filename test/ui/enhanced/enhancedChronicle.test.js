@@ -1,6 +1,5 @@
 // PX24 - THE CHRONICLE: the logbook and the history as ONE window.
 //
-// Mac: "with the logbook and history, I want them as one detailed UI."
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -17,8 +16,7 @@ test('MAC-K2: FOUR sections, and QUESTS leads them - the L key opens what it is 
   // The reasoning behind it was about duplication and it was sound;
   // what it got wrong was WHICH DOOR. `LogBook` is InputManager's own
   // name for the L key, this is the window it opens, and what a player
-  // pressing it got was their notebook. Mac, 2026-09-15: "Logbook not
-  // reflecting quests."
+  // pressing it got was their notebook.
   assert.deepEqual(CHRONICLE_SECTIONS.map(([id]) => id), ['quests', 'notes', 'messages', 'history']);
   assert.equal(CHRONICLE_SECTIONS[0][1], 'Quests', 'and it leads, because it is what the key is for');
 
@@ -37,7 +35,7 @@ test('MAC-K2: FOUR sections, and QUESTS leads them - the L key opens what it is 
   assert.match(read('src/ui/enhanced/enhancedMenu.js'), /from '\.\.\/quest\/questRail\.js'/, 'and so does the pause tab');
   assert.doesNotMatch(cr, /getLogMessages|remainingTimeInSeconds/,
     'neither face walks the machine itself - that is scenes/quest/questBridge.js questLog()');
-  assert.match(read('src/scenes/quest/questBridge.js'), /questLog\(\{ windows = true \} = \{\}\) \{/, 'the one walk');   // PIN MOVED (AUDIT QUESTLINES LAW-11): the lens's look asks it without the windows' rows
+  assert.match(read('src/scenes/quest/questBridge.js'), /questLog\(\{ windows = true \} = \{\}\) \{/, 'the one walk');
   assert.match(read('src/ui/chronicleDoor.js'), /QUESTS ARE IN IT, and MAC-K2 is why/);
 });
 
@@ -123,7 +121,7 @@ test('PX24: the window is the family\'s, not a fourth dialect', () => {
 });
 
 // ── PX24b: THE FIRST DRAFT WAS THIN, AND LOST TWO THINGS ──────────
-// Mac: "you can do better than this." He was right on both counts.
+// He was right on both counts.
 test('PX24b: an entry keeps its DATED HEAD - the notebook wrote one and the first draft dropped it', () => {
   // PlayerNotebook._createNote puts a HIGHLIGHT token first: the
   // dated header, from the host's own clock and city (notebook.js:"this.deps.dateTimeString?.()").
@@ -212,7 +210,7 @@ test('PX24c: the history says WHO it is about, and the family shares its parts',
 });
 
 // ── PX24d: A DOOR WITH NO CALLERS IS UNREACHABLE UI ───────────────
-// Mac: "the new chronicles UI is nowhere to be found ingame." It was
+// It was
 // not: PX24 built ui/chronicleDoor.js and the window behind it and
 // then hung the door on NOTHING - zero callers - so every host still
 // constructed the classic QuestJournalWindow directly, and PX25's

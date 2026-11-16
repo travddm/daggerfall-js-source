@@ -29,4 +29,4 @@ on 2026-09-08 and pinned by `test/tooling/vendorIntegrity.test.js`):
 
 The port's painter is a port of the mod's (`src/world/road/roadPainter.js`,
 tables and geometry read from `BasicRoadsTexturing.cs`), credited in
-`bible/03-World/Roads.md`. Thank you, Hazelnut.
+`docs/formats/mods-and-vendor.md`. Thank you, Hazelnut.

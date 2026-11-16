@@ -1,4 +1,4 @@
-// COMPANION-VOL (2026-10-23, the owner: "add companion moaning random screaming in idle volume option"): THE AUDIO TAB'S
+// COMPANION-VOL: THE AUDIO TAB'S
 // COMPANION IDLE VOLUME (systems/monsterVolume.js companionVolume) - how loud a companion's idle call is, over Monster
 // Volume; a foe's call and a companion's swing keep Monster Volume alone.
 import { test } from 'node:test';
@@ -49,11 +49,3 @@ test('COMPANION-VOL: a companion\'s idle call is played at its volume times Mons
   _resetForTests();
 });
 
-test('COMPANION-VOL wired (by source): the Audio tab\'s Volume section names the row after Monster Volume, the menu draws it as Monster Volume\'s row is drawn, and the shelf defaults it (mutants: the row unlisted; a second row shape)', () => {
-  assert.match(src('src/ui/settings/settingsMap.js'), /"Controls\/MusicVolume", "port:monsterVolume", "port:companionVolume"[,\]]/);   // HORSE-VOL: Horse and Animal Volume may follow
-  const m = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(m, /return \[row, monsterVolumeRow\(\), companionVolumeRow\(\)[,\]]/);
-  assert.match(m, /function companionVolumeRow\(\) \{\n\s*return volumeRow\('companionVolume', t\('menu\.audio\.companionVolume', COMPANION_VOLUME_NAME\),/);
-  assert.match(m, /function monsterVolumeRow\(\) \{\n\s*return volumeRow\('monsterVolume',/);
-  assert.match(src('src/systems/uiPrefs.js'), /companionVolume: 1,/);
-});

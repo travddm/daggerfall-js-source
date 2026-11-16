@@ -1,6 +1,4 @@
-// FONT1 (2026-09-16, Mac: "Enhanced mode UI ... Ambient Text mod also
-// doesnt use it. Any enhanced UI or text must be our enhanced
-// version"): THE HUD'S TEXT, IN THE ENHANCED FACE.
+// FONT1: THE HUD'S TEXT, IN THE ENHANCED FACE.
 //
 // DaggerfallHUD owns the text surfaces a player READS without opening
 // a window: the popup column (PopupText - AddHUDText), the mid-screen
@@ -16,16 +14,15 @@
 // this renderer the FRAME they would have painted. A second timer here
 // would be a second model, and two of them drift.
 //
-// ENH-NOTICE3 (2026-09-21, Mac: "All mods, including climates and
-// calories need to utilize the enhanced notification popup"): THE
+// ENH-NOTICE3: THE
 // POPUP COLUMN LEFT THIS MODULE. FONT1 drew PopupText's rows as a DOM
 // column at the top of the screen, under the compass block, one
 // `.hudtext` per model inside one `.hudtext-stack` (AUDIT FONT F1 keyed
 // them, F2 scaled them, F7 stepped them out of the chat's peek, F8 let
 // them wrap). That column was a SECOND enhanced face beside the notice
 // panel ENH-NOTICE1 gave the message box - and the rows it carried
-// (Climates & Calories' hunger, thirst and cold, the Ambient Text mod's
-// street lines, the torches' burn-out, every skill-up and loot tally)
+// (Climates & Calories' hunger, thirst and cold, the
+// torches' burn-out, every skill-up and loot tally)
 // were exactly the lines the player expected in the panel. So each
 // PopupText row is a TOAST in the notice stack now (ui/enhancedNotice
 // .js drawEnhancedToasts, handed HudText.frame each draw as this module
@@ -55,7 +52,7 @@
 // element cites a DFU rect (THE NATIVE-WINDOW RULE), so the face
 // cannot change without the metrics changing with it. (FONT3, 2026-10-02: that list is history - five of the seven
 // now always open an enhanced DOM face and the other two are reached only from the classic map a player chose; the
-// prison countdown and Come Sail Away's map words were the gaps left, and are enhanced too. 10-UI/UI-Arc.md FONT3.)
+// prison countdown and Come Sail Away's map words were the gaps left, and are enhanced too. docs/systems/ui.md.)
 import { injectEnhancedStyle, injectEnhancedFonts } from './enhancedStyle.js';
 import { nativeMetrics } from '../native/nativePanel.js';
 

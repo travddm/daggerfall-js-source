@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-06c CAT-MEOW (bible/01-Overview/bugs/Field-Bugs-2026-10-06c.md; Flylighter on Discord, with a video:
+// FIELD BUGS 2026-10-06c CAT-MEOW (; Flylighter on Discord, with a video:
 // "NPC sound glitch of a rapid cat meow. This one is in Chesterwark, Daggerfall; doubtful it's the only one").
 //
 // A person's name is StaticNPC.DisplayName (characters/staticNpc.js staticNpcName): DFRandom seeded with the NPC's

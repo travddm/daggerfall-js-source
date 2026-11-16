@@ -1,4 +1,4 @@
-// TELL5 - PATTERNS: LENGTH, TRACKING, FEINTS, CHAINS (bible/12-Enhanced-AI/Feud-Arc.md section 7; Mac, 2026-10-04:
+// TELL5 - PATTERNS: LENGTH, TRACKING, FEINTS, CHAINS (; Mac, 2026-10-04:
 // "breath more depth into it", then "Go" on every call). Before it every wind-up of a shape was one length, aimed once,
 // honest and alone - learnt in a fight and beaten by rote. Now its length is drawn (an elite's quicker, a revenant's
 // by its rank, never under 0.55 s); a lunge turns after its target through the first half of its wind-up; a blade of
@@ -107,7 +107,6 @@ function run(foes, secs, player, each = null) {
     noteLocalPlayer(player, [0, 0, 1]);
     for (const f of foes) {
       f.ai.update(DT, player); f.atk.update(DT, f.ai, player);
-      // PIN MOVED (AUDIT TELL B9: a chain waits for its first blow's verdict to be spent) - the host's door spends it at
       // the sprite's strike, a frame step after the landing (this rig has no sprite)
       if (f.ai._blowVerdict != null && T - (f.ai._blowAt ?? T) >= 0.1) blowConnects(f.ai, false, T);
     }
@@ -185,7 +184,6 @@ test('TELL5: A FEINT - a higher-tier blade\'s wind-up cut at 0.55, no glint; a p
   assert.notEqual(f.ai._tac.state, 'windup');
   assert.notEqual(f.ai._tac.state, 'overreach', 'a feint is no missed blow');
   assert.equal(f.ai._blowVerdict ?? null, null, 'no verdict: DFU\'s reach decides');
-  assert.equal(f.ai._blowMult, undefined, 'no weight: DFU\'s damage');
   assert.equal(blowConnects(f.ai, 'classic'), 'classic');
   assert.equal(f.ai._blowHold, false, 'its held swing goes at once');
   const ph = blowPhase(b, b.cut + TELL_FEINT_FADE / 3);
@@ -248,10 +246,6 @@ test('TELL5: a break ends a chain; an ordinary giant never chains (mutants: the 
 // ── the ground and the ear ──────────────────────────────────────────
 
 test('TELL5: the ground fades a cut feint out dashed; the ear plays no WIND for a feint and lands its plain blow at the strike (mutants: the fade unset; the feint\'s WIND)', async () => {
-  const P = rd('src/render/foeTelegraph.js');
-  assert.match(P, /uniform float uCut;/);
-  assert.match(P, /if \(uCut > 0\.0\) oColor \*= uCut \* step\(0\.5, fract\(\(across \+ along\) \* 2\.5\)\);/);
-  assert.match(P, /gl\.uniform1f\(U\.uCut, phase\.cut > 0 \? phase\.cut : 0\);/);
   const R = ENEMY_BASICS[M.Orc];
   const f = { mobileType: M.Orc, mobile: { meleeSeq: 0 }, ai: { feet: [0, 0, 0], _blowHold: true } };
   const blow = { start: 10, land: 10.8, feint: true };

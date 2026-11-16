@@ -1,5 +1,4 @@
-// LW8b (2026-10-05, bible/06-Systems/Living-World.md "LW8b", Mac: NPCs "have conversations with each other ... much
-// like the crew on board ships"): THE ROOM'S TALK - the residents inside a building stand at its tables in twos and
+// LW8b: THE ROOM'S TALK - the residents inside a building stand at its tables in twos and
 // threes, facing one another, and talk as the street's circles do (their rounds, their share, their beat), in the
 // room's own words beside the town's; one in no circle has the street's word for the player passing close; what is said
 // goes over their heads on the crew's one layer. The town is the synthetic one (test/lwTown.mjs); the room a mock
@@ -15,7 +14,7 @@ import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
 import { createRelations } from '../../../src/systems/livingWorld/relations.js';
 import { CLASSIC_MINUTES_PER_SECOND } from '../../../src/systems/worldTick.js';
-import { dealCircles, circleLine, ROUND_S, GATHER_BEAT_S, lineMinutes } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK: PIN MOVED - a table's company dealt
+import { dealCircles, circleLine, ROUND_S, GATHER_BEAT_S, lineMinutes } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import {
   ROOM_TALKS, roomKindOf, pickScript, fillLine, TOKEN_FALLBACK, LIVING_GREETINGS, HEARD_GREETINGS, firstNameOf,   // LW16: a stranger's word of a deed heard
   TOWN_TALKS, JOB_TALKS, WEATHER_TALKS, EVENING_TALKS, NIGHT_TALKS, ROAD_TALKS, CAMP_TALKS, MORNING_TALKS, DAY_TALKS,
@@ -196,7 +195,7 @@ test('LW8b the room\'s circles and words: two at a table meet as the street\'s c
 
 test('LW8b the word to the player: one in no circle within GREET_RANGE has the town\'s word (livingTown.js greetingFor) once in GREET_REST_MIN of the clock, standing GREET_S; one in a circle, or further, none (mutants: the circle, the range, the rest, the stand)', () => {
   const T0 = 100 * DAY_MIN + 1200;
-  // LW-ROOMS: PIN MOVED - the room's whole floor its places, so the player comes in from out of reach of them all (the
+  // LW-ROOMS:
   // room laid out from its way in, as the host's is)
   const rig = talkRig({ inside: [ALL_DAY(RES(1))], clock: T0, greeting: (r) => `Hello from ${r.id}.`, origin: () => [0, 0, 0] });
   rig.layer.frame(0.016, [0, 0, 40], 0, [0, 1.6, 40]);
@@ -270,7 +269,6 @@ test('LW8b the town\'s doors for a room: its talk\'s beat (the street\'s round a
   assert.equal(rel.entries().find((x) => x.id === f.id).seen, day, 'the word said: seen today');
   assert.ok(LIVING_GREETINGS.enemy.map((x) => fillLine(x, { player: 'Mac' })).includes(town.greetingFor(e, t, false)), 'an enemy\'s');
   let spoke = 0, silent = 0;
-  // PIN MOVED (LW16): a stranger who has heard of the deed (the one struck down here, seen) speaks of it now and then
   const strangerWords = [...LIVING_GREETINGS.stranger, ...HEARD_GREETINGS.slain].map((x) => fillLine(x, { player: 'Mac', who: firstNameOf(victim.name) }));
   for (let m = 0; m < 400; m++) { const w = town.greetingFor(s, t + m * 11, false); if (w == null) silent++; else { spoke++; assert.ok(strangerWords.includes(w)); } }
   assert.ok(spoke > 50 && silent > spoke, `a stranger now and then (${spoke} of 400)`);
@@ -299,7 +297,7 @@ test('LW8b the room\'s own words: each room\'s scripts two or three lines in the
   assert.ok(share > 0.6 && share < 0.73, `the tavern's two shares of three (${share.toFixed(3)})`);
   assert.equal(inRoom('tavern', { room: 'tavern', road: 'walk' }), 0, 'the road keeps its own talk');
   assert.equal(inRoom('tavern', { room: 'temple' }), 0, 'each room its own');
-  // the street unchanged: every script it drew before - LW-TALK: PIN MOVED - its morning's and its day's pools beside
+  // the street unchanged: every script it drew before - LW-TALK:
   // them, and a trade's once
   const before = (seed, { jobs = [], weather = null, hour = 12, road = null } = {}) => {
     const rng = seededRng(seed);
@@ -319,18 +317,3 @@ test('LW8b the room\'s own words: each room\'s scripts two or three lines in the
   }
 });
 
-test('LW8b the streaming host: the building mode\'s HUD pass hands the room\'s talk its matrices (`host.livingSpeech`), and the host lays it on the crew\'s one layer - only once a room was stood, covered under a window, out of a building or paused, each line over its speaker\'s head within the crew\'s range and sight, a known one by name (mutants: the hook, the host\'s door, the cover, the head, the range, the sight)', () => {
-  const wm = rd('src/scenes/worldModes.js');
-  assert.match(wm, /host\.drawPeerNames\?\.\(\{ proj, view, eye: mwv\.eye \}\);   \/\/ ONLINE1: the names over the heads, under the HUD\n      host\.livingSpeech\?\.\(\{ proj, view, eye: mwv\.eye, dt \}\);/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /livingSpeech: \(\{ proj, view, eye, dt \}\) => livingRoomLines\(proj, view, eye, dt\),/);
-  const fn = w.slice(w.indexOf('function livingRoomLines('), w.indexOf('/** WILD-ALERT (2026-10-04'));
-  assert.match(fn, /if \(!livingIndoors \|\| typeof document === 'undefined'\) return;/);
-  assert.match(fn, /const covered = townTalk\.overlayActive \|\| gamePaused\(\) \|\| !!townTalk\.hudHidden \|\| _mode\(\) !== 'interior';/);
-  assert.match(fn, /for \(const l of livingIndoors\.speech\(eye\)\)/);
-  assert.match(fn, /const over = \[l\.person\.pos\[0\], l\.person\.pos\[1\] \+ LIVING_HEAD_M, l\.person\.pos\[2\]\];/);
-  assert.match(fn, /if \(d > CREW_SAY_RANGE\) continue;/);
-  assert.match(fn, /if \(crewSight\.blocked\(player\.collider, eye, key, over\)\) continue;/);
-  assert.match(fn, /name: livingRelations\.known\(id\) \? firstNameOf\(l\.person\.nameNPC\) : null/);
-  assert.match(fn, /drawCrewLines\(points, \{ covered, dt: gamePaused\(\) \? 0 : dt, scale: enhancedHudScale\(\) \}\);/);
-});

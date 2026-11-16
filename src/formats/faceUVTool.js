@@ -43,7 +43,7 @@ export function computeFaceUVCoordinates(faceVertsIn, faceVertsOut) {
   const m0 = Math.sqrt(dot(V0[0], V0[1], V0[2], V0[0], V0[1], V0[2]));
   const m1 = Math.sqrt(dot(V1[0], V1[1], V1[2], V1[0], V1[1], V1[2]));
   if (m0 === 0 || m1 === 0) throw new Error('Can not normalize a vector when it\'s magnitude is zero');
-  // AUDIT 18 F4: DFU's Vector3.Normalize (API/Vector3.cs:583-597) computes
+  // DFU's Vector3.Normalize (API/Vector3.cs:583-597) computes
   // `double inverse = 1 / Magnitude` and MULTIPLIES each component by it.
   // x*(1/m) and x/m are not the same double, and the difference survives
   // the (Int32) truncations below that pick the 2D basis: dividing put 611

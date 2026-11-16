@@ -1,5 +1,4 @@
-// WD-OWNED (2026-10-20, the owner: "do your own performance pass ... go deep"; bible/07-Rendering/Performance-Priority.md
-// WD-OWNED) - A TOWN FILE'S EDITS LAID ON ITS OWN BASE. The boot reads every location of the world (its index), and each
+// WD-OWNED - A TOWN FILE'S EDITS LAID ON ITS OWN BASE. The boot reads every location of the world (its index), and each
 // town a pack edits is rebuilt then: its classic location read afresh, made DFU's JSON (locationToDfuJson) and the
 // author's edits laid on it (worldDataPack.js rebuild) - over a deep copy of that JSON, which nothing else held: the
 // copy was 7,727 JSON round trips of 40 MB at the boot. A location's base is laid on in place now; a block's base (the

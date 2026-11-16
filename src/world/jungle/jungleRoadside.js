@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// JUNGLE-ROADSIDE (2026-10-23, the owner, through Mac, with pine.obj, pine-1.obj and pine2.obj: "These trees are meant
-// for the jungle biome and roadside. Making it more like a jungle with the vines stringing across the roads", and to have
-// them "sunk into the ground so they dont float") - THE ROADSIDE PAIRS, READ. bible/03-World/Bantha-Jungle.md, The
-// roadside pairs, is the design and the record; 01-Overview/audits/Audit-Jungle-Roadside.md its audit.
+// JUNGLE-ROADSIDE - THE ROADSIDE PAIRS, READ., The
+// roadside pairs, is the design and the record.
 //
 // Each of the owner's three files is a PAIR: the mahogany and a second tree of the jungle's own (a kapok they leant over
 // the road, a fig, a kapok they sank 2 m), 33 m apart, and lianas strung between their crowns - ribbons cut from the fig
@@ -28,9 +26,9 @@
 import { parseObj, parseMtl, objMesh, eachDrawn, FOOT_TOP, JUNGLE_SPECIES } from './jungleModels.js';
 import { HEIGHTMAP_DIMENSION, MAX_TERRAIN_HEIGHT, STREAMING_TERRAIN_SCALE, TERRAIN_SIZE } from '../terrain/terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from '../terrain/terrainTiles.js';
-import { surfaceHeightAt } from '../terrain/terrainSurface.js';
+import { walkGroundAt } from '../terrain/terrainSurface.js';   // FLORA-GROUND: the ground the player walks on - one law
 import { ARMS, roadRoom, PATH_HALF_M } from '../road/roadBand.js';
-import { pathsDataPoint } from '../road/pathData.js';
+import { tablePathsDataPoint } from '../road/pathData.js';   // BAY-LEFT-MAPS: the mod's table's lanes alone - past the Bay a road is a curve
 import { tileDraw } from '../terrain/terrainNature.js';
 
 /**
@@ -233,23 +231,23 @@ const PIXEL = TERRAIN_SIZE, HALF = PIXEL / 2;
 
 /**
  * THE LOWEST DRAWN GROUND under a disc of `r` about (x, z) - the ground as it is drawn (terrainSurface.js
- * surfaceHeightAt: two planes a heightmap cell, cut on its diagonal - AUDIT JUNGLE-ROADSIDE DOC-5: not the bilinear
+ * surfaceHeightAt: two planes a heightmap cell, cut on one of its diagonals (terrain-quad-cut.ts) - AUDIT JUNGLE-ROADSIDE DOC-5: not the bilinear
  * groundAt, which stands up to half a metre over it). The drawn ground is flat on each triangle, so its lowest under the
  * disc is at a sample inside the disc or on its rim; and on the rim, between two of the rim's crossings of the triangles'
  * edges, it is the one plane's - lowest at a crossing or where the rim faces straight down that plane. Every such point
- * is asked: the answer is the drawn ground's lowest, exactly.
+ * of either cut is asked, and every point is read off the drawn ground: the answer is its lowest, exactly.
  * @param {Float32Array} heightmapData @param {number} x @param {number} z @param {number} r
  */
 export function lowestDrawn(heightmapData, x, z, r) {
   const hDim = HEIGHTMAP_DIMENSION, cell = PIXEL / (hDim - 1), yScale = MAX_TERRAIN_HEIGHT * STREAMING_TERRAIN_SCALE;
   const at = (i, j) => heightmapData[Math.max(0, Math.min(hDim - 1, i)) * hDim + Math.max(0, Math.min(hDim - 1, j))];
-  let lo = surfaceHeightAt(heightmapData, x, z);
-  const ask = (px, pz) => { lo = Math.min(lo, surfaceHeightAt(heightmapData, px, pz)); };
+  let lo = walkGroundAt(heightmapData, x, z);
+  const ask = (px, pz) => { lo = Math.min(lo, walkGroundAt(heightmapData, px, pz)); };
   const i0 = Math.floor((x - r) / cell), i1 = Math.ceil((x + r) / cell), j0 = Math.floor((z - r) / cell), j1 = Math.ceil((z + r) / cell);
   for (let i = Math.max(0, i0); i <= Math.min(hDim - 1, i1); i++) {
     for (let j = Math.max(0, j0); j <= Math.min(hDim - 1, j1); j++) if (Math.hypot(i * cell - x, j * cell - z) <= r) lo = Math.min(lo, heightmapData[i * hDim + j] * yScale);
   }
-  // the rim's crossings of the grid's lines (x, then z) and of the cells' diagonals (x - z constant)
+  // the rim's crossings of the grid's lines (x, then z) and of the cells' diagonals (x - z constant, then x + z)
   for (let i = i0; i <= i1; i++) { const e = i * cell - x; if (Math.abs(e) <= r) { const h = Math.sqrt(r * r - e * e); ask(i * cell, z + h); ask(i * cell, z - h); } }
   for (let j = j0; j <= j1; j++) { const e = j * cell - z; if (Math.abs(e) <= r) { const h = Math.sqrt(r * r - e * e); ask(x + h, j * cell); ask(x - h, j * cell); } }
   for (let k = i0 - j1; k <= i1 - j0; k++) {
@@ -258,11 +256,17 @@ export function lowestDrawn(heightmapData, x, z, r) {
     const w = Math.acos(v);
     for (const t of [w - Math.PI / 4, -w - Math.PI / 4]) ask(x + r * Math.cos(t), z + r * Math.sin(t));
   }
-  // where the rim faces straight down each triangle's plane
+  for (let k = i0 + j0; k <= i1 + j1; k++) {
+    const v = (k * cell - x - z) / (r * Math.SQRT2);   // cos(t - pi/4) on the rim
+    if (Math.abs(v) > 1) continue;
+    const w = Math.acos(v);
+    for (const t of [w + Math.PI / 4, -w + Math.PI / 4]) ask(x + r * Math.cos(t), z + r * Math.sin(t));
+  }
+  // where the rim faces straight down each triangle's plane, the south-west to north-east cut's two and the other's two
   for (let i = i0; i < i1; i++) {
     for (let j = j0; j < j1; j++) {
       const h00 = at(i, j), h10 = at(i + 1, j), h01 = at(i, j + 1), h11 = at(i + 1, j + 1);
-      for (const [gx, gz] of [[h11 - h01, h01 - h00], [h10 - h00, h11 - h10]]) {
+      for (const [gx, gz] of [[h11 - h01, h01 - h00], [h10 - h00, h11 - h10], [h10 - h00, h01 - h00], [h11 - h01, h11 - h10]]) {
         const g = Math.hypot(gx, gz);
         if (g > 0) ask(x - (r * gx) / g, z - (r * gz) / g);
       }
@@ -274,19 +278,19 @@ export function lowestDrawn(heightmapData, x, z, r) {
 /**
  * THE HIGHEST DRAWN GROUND over a convex polygon (`corners`, [x, z] each, in order round it) - the drawn ground is flat
  * on each triangle (lowestDrawn), so its highest over the polygon is at a corner, where an edge crosses a triangle's
- * edge (a grid line or a cell's diagonal), or at a grid point inside: every one is asked.
+ * edge (a grid line or either of a cell's diagonals), or at a grid point inside: every one is asked.
  * @param {Float32Array} heightmapData @param {ReadonlyArray<ReadonlyArray<number>>} corners
  */
 export function highestDrawn(heightmapData, corners) {
   const hDim = HEIGHTMAP_DIMENSION, cell = PIXEL / (hDim - 1), yScale = MAX_TERRAIN_HEIGHT * STREAMING_TERRAIN_SCALE;
   let hi = -Infinity;
-  const ask = (x, z) => { hi = Math.max(hi, surfaceHeightAt(heightmapData, x, z)); };
+  const ask = (x, z) => { hi = Math.max(hi, walkGroundAt(heightmapData, x, z)); };
   const n = corners.length;
   for (let k = 0; k < n; k++) {
     const [x0, z0] = corners[k], [x1, z1] = corners[(k + 1) % n];
     ask(x0, z0);
-    // the edge's crossings of the lines x, z and x - z a whole number of cells
-    for (const [f0, f1] of [[x0, x1], [z0, z1], [x0 - z0, x1 - z1]]) {
+    // the edge's crossings of the lines x, z, x - z and x + z a whole number of cells
+    for (const [f0, f1] of [[x0, x1], [z0, z1], [x0 - z0, x1 - z1], [x0 + z0, x1 + z1]]) {
       if (f0 === f1) continue;
       for (let c = Math.ceil(Math.min(f0, f1) / cell); c * cell <= Math.max(f0, f1); c++) {
         const t = (c * cell - f0) / (f1 - f0);
@@ -328,7 +332,7 @@ export function highestDrawn(heightmapData, corners) {
  *     and the road anywhere under the pair (across its band, along it as far as anything hangs over it) keeps it under
  *     UNDER_TOP (highestDrawn, both);
  *   - no trunk of a pair it already stood is within `clear`.
- * SUNK, NEVER FLOATING (the owner: "sunk into the ground so they dont float"): the pair is one rigid thing - its lianas
+ * SUNK, NEVER FLOATING: the pair is one rigid thing - its lianas
  * hang from both crowns - so it stands at the LOWEST drawn ground beneath either foot (lowestDrawn, exact) less `sink`:
  * nowhere under its feet is the ground lower than its own, and the uphill tree's roots go into the slope. Answers
  * `[{ kind, js, turn, ax, az, y, trees: [{ species, record, x, z, y }] }]`, pixel-local - `y` where the pair stands (its
@@ -337,11 +341,11 @@ export function highestDrawn(heightmapData, corners) {
  *   trailOk: (x: number, z: number, r: number) => boolean }} job
  */
 export function standPairs({ px, py, net, heightmapData, tileOk, trailOk }) {
-  const bits = net ? pathsDataPoint(net, px, py) : 0;
+  const bits = net ? tablePathsDataPoint(net, px, py) : 0;
   if (!bits) return [];
   const R = JUNGLE_ROADSIDE, tile = PIXEL / WORLD_MAP_TILE_DIM;
   const ox = px * WORLD_MAP_TILE_DIM, oz = -py * WORLD_MAP_TILE_DIM;
-  const ground = (x, z) => surfaceHeightAt(heightmapData, x, z);
+  const ground = (x, z) => walkGroundAt(heightmapData, x, z);
   const out = [], trunks = [];
   for (const [bit, sx, sz] of ARMS) {
     if (!(bits & bit)) continue;

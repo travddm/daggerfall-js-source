@@ -1,5 +1,5 @@
 // @ts-check
-// LW3 (2026-10-04, bible/06-Systems/Living-World.md): THE ROADS' LAYER - the parties of the living world on the road
+// LW3: THE ROADS' LAYER - the parties of the living world on the road
 // near the player, stood in the open world and marked under the Overworld. The trips are pure (systems/livingWorld/
 // trips.js: where every party is at the sky's minute, the same for every reader); this layer reads them about the
 // player's pixel each ROADS_TICK_S, places each member, and hands the bodies to the sprites (world/travellerSprites.js).
@@ -752,7 +752,7 @@ export function createLivingRoads(deps) {
       deps.relations?.()?.note(id, kind, dayOf(deps.clock()));
       return id;
     },
-    /** AUDIT PLAIN-UI C2 (bible/10-UI/Plain-Words.md): a road body's regard as the talk panel shows it - the one its
+    /** AUDIT PLAIN-UI C2: a road body's regard as the talk panel shows it - the one its
      *  refusal reads (LW13: a company's word is its head's), on the same day; null for no resident or no relations. */
     regardCard(person) {
       const id = person?.living?.id;

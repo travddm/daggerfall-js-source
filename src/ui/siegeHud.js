@@ -1,6 +1,6 @@
 // @ts-check
-// SEAT2a part four (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): THE SIEGE
-// HUD AND THE RESULT CARD (bible/11-Multiplayer/Seats-Arc.md 19). The bar across the top - the seat, the holder against
+// SEAT2a part four: THE SIEGE
+// HUD AND THE RESULT CARD (19). The bar across the top - the seat, the holder against
 // the challenger, the clock, each banner by name and mark, the Throne (SEAT2b part two (b): and the works - the
 // Gatehouse, the Ram, the Walls) - each side's fighters up and down under it, and
 // this fighter's own vitality and wave (a spectator's count instead); at the end, the result card over it, with the
@@ -12,7 +12,7 @@
 //
 // `siegeHudModel` (net/siege/siegeLink.js) is pure - the state, the battle and the clock in, the lines out; the pins read it.
 //
-// AUDIT-SEATS C1 (2026-10-01): AND A WAY OUT - the bar's own Leave (`onLeave`, a battle's or a Royal Tourney's: the world
+// AUDIT-SEATS C1: AND A WAY OUT - the bar's own Leave (`onLeave`, a battle's or a Royal Tourney's: the world
 // leaves whichever is entered), and the result card's Close, which dismisses the card by leaving the battle it ended.
 // The two buttons and the card's Claim are the readout's only clicks.
 //

@@ -1,5 +1,5 @@
-// AUDIT 68 (2026-09-24), cluster "backend": the relay (server/src) and the account service (server-account/src).
-// Mac: "a deep comprehensive audit across the entirety of the codebase ... No band aids." Every pin here fails on the
+// AUDIT 68, cluster "backend": the relay (server/src) and the account service (server-account/src).
+// Every pin here fails on the
 // base (ad238de0) and names its finding. The relay is driven over test/fakeRoom.mjs with real signed tokens; the
 // account service over node:sqlite with its real migrations, through its own functions and its own worker.
 import { test } from 'node:test';
@@ -179,7 +179,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -212,7 +212,7 @@ test('AUDIT 68 S01-register-recover-lost-update: two recoveries racing on ONE co
   ]);
   const won = both.filter((x) => !x.error);
   assert.equal(won.length, 1, 'a single-use code spent once');
-  assert.deepEqual(both.filter((x) => x.error).map((x) => x.error), ['codes-moved']);   // PIN MOVED: AUDIT RECOVERY-SET A4
+  assert.deepEqual(both.filter((x) => x.error).map((x) => x.error), ['codes-moved']);
   assert.ok(await resolveSession(ctx, won[0].secret), 'the winner\'s session is live');
   assert.ok((await recover(ctx, { handle: 'Foo', code: won[0].recoveryCode, password: 'password-four' })).id, 'and so is its new code');
 });

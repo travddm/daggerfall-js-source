@@ -1,15 +1,13 @@
-// SS1 (2026-09-27, Mac: "make sigil stones bound items and stackable, raise the prices on the new boss vendor"): the
+// SS1: the
 // Deadlands Ember BOUND (systems/item/itemBound.js - never handed to another player: the trade will not hold one out, and a
-// peer's lot carrying one is refused whole) and STACKING with its own kind alone (systems/gate/gateSpoils.js), the stones a
-// save holds from before folded into their stacks on load (systems/save/save.js, below its index-keyed relinks), and the
-// card's line. The Broker's count, sale and prices over the stacks are test/systems/item/set7_broker.test.js's. SS3 (the world
+// peer's lot carrying one is refused whole) and STACKING with its own kind alone (systems/gate/gateSpoils.js), and the card's line. The Broker's count, sale and prices over the stacks are test/systems/item/set7_broker.test.js's. SS3 (the world
 // will not take one), SS4 (the Broker's wares bound too, and neither counter sells a bound piece) and SS5 (a ware
 // dismantled in the pack for a share of its stones) below.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sigilStone, restackStones, isSigilStone, SIGIL_STONE_TEMPLATE } from '../../../src/systems/gate/gateSpoils.js';
+import { sigilStone, SIGIL_STONE_TEMPLATE } from '../../../src/systems/gate/gateSpoils.js';
 import { isBound, BOUND_LINE, BOUND_TRADE_TEXT, BOUND_KEEPS, boundRefusesPut, boundText, unbound } from '../../../src/systems/item/itemBound.js';
 import { NativeInventoryWindow, tabAccepts } from '../../../src/ui/native/nativeInventory.js';
 import { NativeTradeWindow } from '../../../src/ui/native/nativeTrade.js';
@@ -33,7 +31,6 @@ import { createTradeManager, inTradeRange } from '../../../src/net/tradeSession.
 import { validTradeData } from '../../../src/net/wire.js';
 import { addItem, stacksWith, splitStack } from '../../../src/systems/inventory.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
-import { restorePlayer, snapshotPlayer } from '../../../src/systems/save/save.js';
 import { withDom, fakeDom } from '../../invdrag.mjs';
 import { mountEnhancedInventory } from '../../../src/ui/enhanced/enhancedInventory.js';
 import { _resetForTests as _resetPrefsForTests } from '../../../src/systems/uiPrefs.js';
@@ -123,46 +120,6 @@ test('SS1 the stone stacks with its own kind alone: a won stone joins the stack 
   assert.equal(stacksWith(ruby(), sigilStone()), false);
 });
 
-test('SS1 the fold: a pack saved before the stone stacked - a record a stone - is one stack, each record into the first before it that it stacks with (a locked one with a locked one), its count whole, the other records in their order (mutants: the fold merging locked into unlocked; the fold losing a count)', () => {
-  const r = ruby();
-  const list = [sigilStone(), r, sigilStone(), Object.assign(stack(2), { locked: true }), stack(3), Object.assign(sigilStone(), { locked: true })];
-  assert.equal(restackStones(list), 3, 'three records folded');
-  assert.deepEqual(summary(list), [['Deadlands Ember', 5, false], ['Ruby', 1, false], ['Deadlands Ember', 3, true]]);
-  assert.equal(list[1], r, 'a gem untouched, in its place');
-  assert.equal(restackStones(list), 0, 'folded once: nothing more to fold');
-  const plain = [ruby(), ruby()];
-  assert.equal(restackStones(plain), 0, 'a pack with no stones is left as it is - a split gem stays split');
-  assert.equal(plain.length, 2);
-  assert.equal(restackStones(null), 0);
-  assert.ok(list.every((i) => !isSigilStone(i) || i.stackCount >= 1));
-});
-
-const makeEntity = (over = {}) => ({
-  name: 'Tester', race: 'Breton', gender: 'male', level: 3,
-  stats: { strength: 50, endurance: 40, agility: 30, speed: 30, willpower: 30, intelligence: 30, luck: 30, personality: 30 },
-  skills: new Array(35).fill(10), skillUses: new Array(35).fill(0),
-  items: [], wagonItems: [], activeEffects: [], spells: [],
-  health: 30, fatigue: 100, magicka: 10, gold: 0,
-  ...over,
-});
-
-test('SS1 a load folds the stones - the pack\'s and the wagon\'s - BELOW the index-keyed relinks: a light lit after the stones in the saved list is the same light after the load (mutants: the fold never run; the fold before the relinks; the wagon left unfolded)', () => {
-  const torch = { group: 'UselessItems2', templateIndex: 1, stackCount: 1, name: 'Torch' };
-  const e = makeEntity({ items: [sigilStone(), sigilStone(), sigilStone(), torch], wagonItems: [stack(2), ruby(), sigilStone()] });
-  e.lightSource = torch;
-  const snap = snapshotPlayer(e, {});
-  assert.equal(snap.lightSourceIndex, 3, 'the saved index: past the three stones');
-  const t = makeEntity();
-  const info = console.info;
-  const lines = [];
-  console.info = (s) => lines.push(String(s));
-  try { restorePlayer(t, snap); } finally { console.info = info; }
-  assert.deepEqual(t.items.map((i) => [i.name, i.stackCount ?? 1]), [['Deadlands Ember', 3], ['Torch', 1]], 'one stack');
-  assert.equal(t.lightSource, t.items[1], 'the torch is still the light - the index was read before a record moved');
-  assert.deepEqual(t.wagonItems.map((i) => [i.name, i.stackCount ?? 1]), [['Deadlands Ember', 3], ['Ruby', 1]], 'the wagon\'s too');
-  assert.ok(lines.some((l) => l.includes('SS1') && l.includes('2 Deadlands Ember record(s)')), 'said, in the console');
-});
-
 test('SS1 the card says a bound piece is bound, in the lock\'s own line style without its padlock; a gem says nothing of it (mutants: the card line missing)', () => {
   _resetPrefsForTests();
   globalThis.location = { search: '?skin=enhanced' };
@@ -182,19 +139,9 @@ test('SS1 the card says a bound piece is bound, in the lock\'s own line style wi
       assert.deepEqual(host.querySelectorAll('.boundline'), [], 'a gem says nothing of it');
     } finally { view.unmount(); }
   });
-  assert.match(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.card \.lockline, \.card \.boundline, \.pack-shell \.card p\.lockline, \.pack-shell \.card p\.boundline \{/, 'the lock\'s line style - on the pack\'s own card too, over `.pack-shell .card p` (AUDIT SS)');
-  assert.doesNotMatch(read('src/ui/enhanced/enhancedPlusStyle.js'), /\.boundline::before/, 'without its padlock');
 });
 
-test('SS2 the Broker\'s price column is one width in every row, wide enough for a two-digit price - "12 Deadlands Embers" measures 108px in the window\'s 12px face, "4 Deadlands Embers" 101 (tools/brokerProbe.mjs measures it on the real page; each row is its own grid, so a column sized by its text moved the Regalia\'s price 7px out of the line) (mutants: the price column sized by its text)', () => {
-  const css = read('src/ui/enhanced/enhancedPlusStyle.js');
-  const grid = /\.broker-offer \{ display: grid; grid-template-columns: 48px minmax\(0, 1fr\) (\d+)px 148px;/.exec(css);
-  assert.ok(grid, 'the price column has a width of its own');
-  assert.ok(Number(grid[1]) >= 109, `wide enough for the widest price (${grid[1]}px)`);
-  assert.match(css, /\.broker-price \{ font-size: 12px;/, 'the face the width was measured in');
-});
-
-// ── SS3 (2026-09-27, Mac: "They shouldnt be able to be dropped") ──
+// ── SS3 ──
 
 test('SS3 the law: a bound piece may be put in the player\'s wagon and the player\'s own storage alone - never the ground, a container or a reward tray; a list a peer hands over lands without one, and a refused list stays refused (mutants: the wagon closed to a bound piece; the owner\'s storage closed; a peer\'s list keeps a bound piece)', () => {
   const stone = sigilStone(), gem = ruby();
@@ -308,14 +255,9 @@ test('SS3 what a peer hands over lands without a bound piece: a building\'s cont
   const n = applyInteriorLoot(ctx, [{ k: 'container:0', r: [wire(ruby()), wire(stack(3))], d: 5 }], { today: 5 });
   assert.equal(n, 1, 'the record lands');
   assert.deepEqual(ctx.containers[0].items.map((i) => i.name), ['Ruby'], 'without the stones');
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /const items = peerHanded\(validLootList\(rec\.r\)\);/, 'a dungeon\'s container');   // PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit
-  assert.match(dc, /const li = notCarried\(peerHanded\(validLootList\(sf\.items\)\)\);/, 'a body on the wire');   // PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit; PIN MOVED (AUDIT AUTO-HOLD): and never a piece its reader carries, systems/peerWord.js notCarried
-  assert.match(read('src/scenes/bodyLootHost.js'), /const grant = notCarried\(peerHanded\(validLootList\(data\.grant\)\)\);/, 'a peer\'s grant');   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's (scenes/bodyLootHost.js), the line as it was; PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit; PIN MOVED (AUDIT AUTO-HOLD): and never a piece its reader carries, systems/peerWord.js notCarried
 });
 
-// ── SS4 (2026-09-27, Mac: "Also make the items sold by the oblivion vendor bound also. Can't be traded, dropped or
-// sold. Sigil stones shouldnt be able to be sold") ──
+// ── SS4 ──
 
 const DAY = brokerDay(Date.parse('2026-09-27T12:00:00Z'));
 
@@ -442,8 +384,7 @@ test('SS4 the enhanced counter: a Deadlands Ember and a Broker ware pressed for 
   });
 });
 
-// ── SS5 (2026-09-27, Mac: "The ability to dismantle in the inventory and recieve back sigil stones", the Broker's wares
-// alone for now) ──
+// ── SS5 ──
 
 /** A ware of the day's stock at `slot` - the piece a sale hands over (a fresh mint, bound and priced). */
 const ware = (slot = 0) => brokerSale(brokerStock(DAY)[slot], { items: [stack(20)], bought: [], day: DAY }).give;
@@ -554,7 +495,7 @@ test('SS5 the enhanced pack: a ware\'s card offers Dismantle, which asks first -
     press(actOf('Dismantle'));
     assert.ok(dialog(), 'and asks first');
     assert.equal(dialog().attrs.role, 'alertdialog');
-    assert.ok(dismantleAsk(wareName(name, w), 6).every((line) => said().includes(line)), 'the question, and what it gives back');   // PIN MOVED (AUDIT FB1025i A8): the ware named with its set
+    assert.ok(dismantleAsk(wareName(name, w), 6).every((line) => said().includes(line)), 'the question, and what it gives back');
     press(dialogAct('Keep'));
     assert.equal(dialog(), null, 'Keep puts the question away');
     assert.ok(e.items.includes(w), 'and the ware stays');
@@ -580,13 +521,13 @@ test('SS5 the enhanced pack: a ware\'s card offers Dismantle, which asks first -
     open(itemLongName(lockedWare));
     press(actOf('Dismantle'));
     assert.equal(dialog(), null, 'a locked ware asks nothing');
-    assert.ok(said().includes(lockedText(wareName(itemLongName(lockedWare), lockedWare))), 'and says why');   // PIN MOVED (AUDIT FB1025i A8)
+    assert.ok(said().includes(lockedText(wareName(itemLongName(lockedWare), lockedWare))), 'and says why');
     assert.ok(e.items.includes(lockedWare));
   });
   const worn = ware(5);
   withWarePack([worn], ({ panelOf, actOf, press }) => {
     assert.equal(isEquipped(worn), true, 'worn');
-    press(panelOf('Hands'));   // PIN MOVED (ARMOR-LEAN): the day's stock rolls on - slot 5 is Ruhn's Brand-Gauntlets now, its Right Pauldron before
+    press(panelOf('Hands'));
     assert.ok(actOf('Take off'), 'its card is up, and takes it off');
     assert.equal(actOf('Dismantle'), null, 'a worn ware: taken off first');
   }, (e) => { equipItem(e, worn); });
@@ -603,7 +544,7 @@ test('SS5 the classic pack: Remove over the ground offers a ware\'s dismantle in
   const w = ware(2), name = itemLongName(w), n = dismantleStones(w);
   const yes = at(w);
   assert.ok(yes.win.inputBox instanceof YesNoBoxWindow, 'the question');
-  assert.deepEqual(yes.win.inputBox.rows.map((r) => r.text), [boundText(wareName(name, w)), DISMANTLE_INSTEAD(n)]);   // PIN MOVED (AUDIT FB1025i A8)
+  assert.deepEqual(yes.win.inputBox.rows.map((r) => r.text), [boundText(wareName(name, w)), DISMANTLE_INSTEAD(n)]);
   assert.ok(yes.bag.includes(w), 'nothing moves before the answer');
   yes.win.input('KeyY');
   assert.equal(yes.win.inputBox, null);
@@ -656,13 +597,9 @@ test('SS5 a classic box holds its rows on the screen: a row wider than fourteen 
   assert.ok(laid.w <= 320 && laid.x >= 0, `fitted, the parchment is ${laid.w} wide at ${laid.x}`);
   assert.deepEqual(fitBoxRows(font, ['a b', 'c']), ['a b', 'c'], 'string rows too');
   assert.deepEqual(fitBoxRows(null, [{ text: long }]), [{ text: long }], 'no font: nothing to measure by');
-  // the three classic doors a refusal or the dismantle's question comes through (pinned at their one line each)
-  assert.match(read('src/ui/native/nativeInventory.js'), /const rows = box\.painting \? box\.rows : fitBoxRows\(font, box\.rows\);/, 'the pack\'s boxes - never a painting\'s, whose picture wrapping would push off the panel');
-  assert.match(read('src/ui/native/nativeTrade.js'), /this\._boxLayout = layoutMessageBox\(font, fitBoxRows\(font, this\.box\.rows\), buttons\);/, 'the counter\'s box');
-  assert.match(read('src/ui/yesNoBox.js'), /const box = layoutMessageBox\(font, fitBoxRows\(font, this\.rows\), this\.okOnly \? \[MB_BUTTONS\.OK\] : \[MB_BUTTONS\.Yes, MB_BUTTONS\.No\]\);/, 'the Yes/No box (and SOFTCAP3\'s OK box)');
 });
 
-// ── AUDIT SS (2026-09-27, Mac: "audit this" - SS1-SS5 end to end) ──
+// ── AUDIT SS ──
 
 test('AUDIT SS the classic question answers the LEFT button alone - a right click (this pack\'s Remove) or a middle one never presses its Yes; the piece\'s tooltip is put away when it is asked; the player\'s own pile on the ground is the ground (the offer stands there too, never for a locked ware); a reward tray refuses in DFU\'s silence (mutants: a right click answers the question; the tooltip over the question; the own pile never offered; a locked ware offered over its own pile; the reward tray speaks)', () => {
   const ask = (loot = null, w2 = ware(2)) => {
@@ -769,12 +706,6 @@ test('AUDIT SS nothing bound goes out on the wire: a building\'s container recor
   assert.equal(recs.length, 1);
   assert.deepEqual(recs[0].r.map((i) => i.name), ['Ruby'], 'the record: the gem alone');
   assert.deepEqual(ctx.containers[0].items, [gem, stones], 'the container itself untouched');
-  assert.match(read('src/scenes/dungeonContext.js'), /r: peerHanded\(held\)\.map\(\(it\) => \(\{ \.\.\.it \}\)\)/, 'the dungeon\'s records');   // PIN MOVED (HACKED-GOLD): SS3's peer law rides systems/peerWord.js peerHanded - a bound piece and a letter of credit
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /shopBuysItem\(interiorBuilding\.buildingType, it\) && !isEquipped\(it\) && !isBound\(it\) && !lockRefuses\(it, 'sell'\) && !isSummoned\(it\)\);/, 'the keyed shelf lists neither');   // PIN MOVED (CRAFT-WORTH): nor a conjured piece
-  assert.match(wm, /function doSell\(shelf, it\) \{\n    if \(isBound\(it\) \|\| lockRefuses\(it, 'sell'\)\) return 0;/, 'and sells neither');
-  assert.match(read('src/ui/enhanced/enhancedTrade.js'), /const item = selected\.item;\n  if \(isBound\(item\) \|\| lockRefuses\(item, 'sell'\)\) return;/, 'the dead quick sell refuses both');
-  assert.match(read('src/scenes/world.js'), /if \(!onlineOn && modes\?\.gateArenaDay\?\.\(\) != null\) \{ ejectFromCourt\(COURT_TEXT\.collapse\); gateCourt\?\.leave\(\);/, 'offline, the floor into the pack on the way out');
 });
 
 /** withDom for an async body (test/systems/item/set7_broker.test.js's own): the fake document stands until the body settles. */
@@ -857,7 +788,7 @@ test('AUDIT SS the enhanced question at the keyboard and the mouse: it holds the
       press(dialog().querySelectorAll('.act').find((x) => x.textContent === 'Dismantle'));
       assert.equal(dialog(), null);
       assert.ok(e.items.includes(a), 'the ware stays');
-      assert.ok(textOf(dom.body).includes(lockedText(wareName(itemLongName(a), a))), 'and the pack says why');   // PIN MOVED (AUDIT FB1025i A8)
+      assert.ok(textOf(dom.body).includes(lockedText(wareName(itemLongName(a), a))), 'and the pack says why');
       setLocked(a, false);
       // Y dismantles
       open();

@@ -24,7 +24,7 @@
 import { DEFAULTS, tierOf, UNAVAILABLE } from '../../systems/settings/settings.js';
 import { READOUT } from './settingsCopy.js';
 import { FRAME_CAP_FLOOR, FRAME_CAP_STOPS } from '../../systems/frameCap.js';   // FPS-CAP1: the cap's floor and the rates its row walks
-import { localizedText, localizedTextList, TextCollections } from '../../systems/textManager.js';   // L10N3d: DFU's words, read in the player's language
+import { t, localizedText, localizedTextList, TextCollections } from '../../systems/textManager.js';   // DFU's words, read in the player's language
 
 /** DFU's own value names, in DFU's order. `encode:'index'` means the
  *  store holds the position; `'token'` means it holds the word. */
@@ -35,7 +35,8 @@ export const ENUM_LAW = Object.freeze({
   'Controls/Handedness': { values: ['Right Hand', 'Left Hand'], encode: 'index', cite: 'SetupGameWizard:461-470 (a checkbox: 1 = left; 2 and 3 are in GetInt\'s range and do nothing)' },   // AUDIT 28 W13
   'MeleeAttacks/MeleeAttackDetection': { values: ['Performance', 'Quality'], encode: 'index', cite: 'AdvancedSettings:277-282' },
   'Video/QualityLevel': { values: ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], encode: 'index', cite: 'AdvancedSettings:360-379' },
-  'Video/MainFilterMode': { values: ['Point', 'Bilinear', 'Trilinear'], encode: 'index', cite: 'AdvancedSettings:360-379' },
+  // Sharp, the fourth, is the port's (render/sharp-texels.ts) and its default; DFU offers the first three, Point first
+  'Video/MainFilterMode': { values: ['Point', 'Bilinear', 'Trilinear', 'Sharp'], encode: 'index', cite: 'AdvancedSettings:360-379' },
   'GUI/GUIFilterMode': { values: ['Point', 'Bilinear', 'Trilinear'], encode: 'index', cite: 'AdvancedSettings:360-379' },
   'GUI/VideoFilterMode': { values: ['Point', 'Bilinear', 'Trilinear'], encode: 'index', cite: 'AdvancedSettings:360-379' },
   'GUI/HelmAndShieldMaterialDisplay': { values: ['Off', 'No Leather Chain', 'No Leather', 'On'], encode: 'index', cite: 'AdvancedSettings:309-321' },
@@ -64,12 +65,14 @@ export function enumWords(key) {
       return localizedTextList('dungeonTextureModes', ['Classic', 'Climate', 'Climate Only', 'Random', 'Random Only'], TextCollections.TextSettings);
     case 'Video/QualityLevel':
       return localizedTextList('qualitySettings', ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], TextCollections.TextSettings);
-    case 'Video/MainFilterMode': case 'GUI/GUIFilterMode': case 'GUI/VideoFilterMode':
+    case 'Video/MainFilterMode':
+      return [...enumWords('GUI/GUIFilterMode'), t('settings.filterSharp', 'Sharp')];
+    case 'GUI/GUIFilterMode': case 'GUI/VideoFilterMode':
       return localizedTextList('filterModes', ['Point', 'Bilinear', 'Trilinear'], TextCollections.TextSettings);
     case 'GUI/HelmAndShieldMaterialDisplay':
       return localizedTextList('helmAndShieldMaterialDisplay', ['Off', 'No Leather Chain', 'No Leather', 'On'], TextCollections.TextSettings);
     case 'Video/RetroRenderingMode':
-      return [localizedText('retroModeOff', 'Off'), localizedText('retroMode320x200', '320x200'), localizedText('retroMode640x400', '640x400')];
+      return [localizedText('retroModeOff', 'Off'), localizedText('retroMode320x200', '320x200'), retroSharperWord()];
     case 'Video/PostProcessingInRetroMode':
       return [localizedText('off', 'Off'), localizedText('posterizationFull', 'Posterization (full)'),
         localizedText('posterizationMinusSky', 'Posterization (-sky)'), localizedText('palettizationFull', 'Palettization (full)'),
@@ -79,6 +82,12 @@ export function enumWords(key) {
     default:
       return ENUM_LAW[key]?.values ?? [];
   }
+}
+
+/** DFU's 640x400 word, marked as the sharper choice: no source shows the original game drew at that size, so it is not
+ *  offered as the classic look. */
+function retroSharperWord() {
+  return t('settings.retroMode640x400Sharper', '{size} (sharper)', { size: localizedText('retroMode640x400', '640x400') });
 }
 
 /** {min,max,step,coarse,format,source}. format: pct | mult | a unit.
@@ -95,8 +104,7 @@ export const NUMBER_LAW = Object.freeze({
   'Controls/MusicVolume': { min: 0, max: 1, step: 0.05, coarse: 0.2, format: 'pct', source: 'DFU (:272-274)' },
   'Controls/MouseLookSensitivity': { min: 0.1, max: 16.0, step: 0.1, coarse: 1.0, format: 'mult', source: 'DFU GetFloat(0.1,16.0) (SettingsManager:524)' },   // ROAD-G G6: the range is DFU's now, not ours
   'Controls/MouseLookSmoothingFactor': { min: 0, max: 0.9, step: 0.05, coarse: 0.2, format: 'pct', source: 'DFU GetFloat(0,0.9) + SmoothingMax 0.9 (SettingsManager:523, PlayerMouseLook:45)' },   // AUDIT 28 W7: the range is DFU's now, not ours
-  // PAD-SETTINGS (2026-09-27, Discord - an AYN Thor: "doesnt seem to let me change controller sensitivity either, i
-  // press the 1.0 to try and change it but it doesnt register"). The four gamepad keys went LIVE at GP1 and never
+  // PAD-SETTINGS. The four gamepad keys went LIVE at GP1 and never
   // got a row here, so each fell through to widgetFor's readout: a bare "1.0" with nothing to press. The ranges are
   // the consumer's own clamps (systems/gamepad.js controllerSettings - the range-equals-clamp law, MENU T5), which are
   // DFU's JoystickControlsWindow sliders (:161-167) for the look speed, and within them for the other three.
@@ -126,7 +134,7 @@ export const COLOUR_KEYS = Object.freeze([
 const isBoolDefault = (v) => v === 'True' || v === 'False';
 const isHex8 = (v) => /^[0-9A-F]{8}$/i.test(String(v ?? ''));
 
-/** Total and decidable over all 171 keys - no implementer judgement.
+/** Total and decidable over all 173 keys - no implementer judgement.
  *  Returns one of: switch | enum | number | colour | text | blocked. */
 export function widgetFor(key) {
   if (tierOf(key) === 'unavailable') return 'blocked';
@@ -184,7 +192,7 @@ export function formatValue(key, raw) {
     const eff = Math.min(law.max, Math.max(law.min, n));
     return Number.isFinite(n) ? fmtNumber(eff, law) : String(raw ?? '');
   }
-  if (w === 'blocked') return READOUT[key] ?? 'not here';   // never the stored value: EnhancedCombatAI holds True while the port runs the classic path
+  if (w === 'blocked') return READOUT[key] ?? 'not here';   // never the stored value: a blocked key's store says nothing about what the port runs
   if (w === 'colour') return String(raw ?? '').toUpperCase();
   const s = String(raw ?? '');
   return s === '' ? 'default' : s;   // DFU's own substitution for an empty SoundFont (:264-267)

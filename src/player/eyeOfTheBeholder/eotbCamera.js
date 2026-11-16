@@ -6,7 +6,7 @@
 // is how a "1:1" port quietly stops being one. `monodis` segfaults on
 // this assembly; it was read with dncil/dnfile.
 //
-// EOTB-IL (2026-09-17): READ AGAIN, AGAINST THE VENDORED DUMP, and
+// EOTB-IL: READ AGAIN, AGAINST THE VENDORED DUMP, and
 // fourteen readings corrected - each cites its offset where it lands.
 // The ones a player meets: the auto-toggle table was DISARMED by the
 // mod's own LoadSettings whenever every row is Don'tChange (the sum of
@@ -640,7 +640,7 @@ export function createEotbCamera() {
       // FIELD BUGS 2026-09-29 (the sea) #3: AT A HELM THE FAR END IS THE HULL'S REACH (player/seaZoom.js) - past the
       // mod's own MAX_Z a notch is a ratio, one a frame and by its sign as the mod reads a notch, down to MAX_Z coming
       // in; the mod's own boat override (CameraOverrideBoat) keeps its own ladder, scaled by the hull already
-      // HELM-ZOOM (Mac: "increase the sensitivity ... when on the wheel"): at a helm the ratio runs from the offset's own
+      // HELM-ZOOM: at a helm the ratio runs from the offset's own
       // base distance out - the mod's 0.2 a notch took forty notches from it to MAX_Z - and below the base the mod's own
       // ladder takes her in to first person
       const far = seaReach > -MAX_Z && !(cfg.overrides.Boat.enabled && isSailing) ? -seaReach : MAX_Z;
@@ -672,7 +672,7 @@ export function createEotbCamera() {
       lastEye = fpEye;
       lastDt = dt;
       if (!offset) return { eye: fpEye, thirdPerson: false, distance: 0, focal: null };
-      // BENCH-CAM (2026-10-10, from play: "this is what i see when i use my carriage"): on a wagon's bench the head the
+      // BENCH-CAM: on a wagon's bench the head the
       // camera turns about stands under the wagon's roof, 0.4 m in front of the caravan's room - every cast back met it,
       // the bound came out under the mod's own clearance, and the camera stood in the sprite's head. The host's
       // `pivotFloor` (over the roof) lifts the head the camera reads - the casts, the target and the line of sight all
@@ -706,8 +706,7 @@ export function createEotbCamera() {
         if (local[2] > minZ) local[2] = minZ;
         posCurrent = add(feet, bodyVector(local, yaw));
       }
-      // EOTB-WALL (2026-09-17, Mac: "3rd person clips through walls and ceilings allowing you to see outside wall
-      // bounds. Morrowind 3rd person doesnt have this issue"): THE PORT'S OWN LINE-OF-SIGHT CAST, after the mod's.
+      // EOTB-WALL: THE PORT'S OWN LINE-OF-SIGHT CAST, after the mod's.
       // CheckBounds stands as the IL has it - one cast per AXIS of the eye's basis, from the head - and that is
       // exactly how the eye ends up inside a wall: the three axis casts never measure the DIAGONAL the camera
       // actually stands on (a wall at the back-right corner is missed by the "right" cast and by the "back" cast

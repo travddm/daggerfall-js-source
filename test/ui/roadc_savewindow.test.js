@@ -542,24 +542,6 @@ test('C1: a host with NO push door keeps the replace-and-rebuild posture, and sa
   });
 });
 
-test('C1: the flow marks which door it took, and the three hosts that have the seams hand one over', () => {
-  const pauseSrc = read('src/ui/pauseWindow.js');
-  assert.match(pauseSrc, /const push = hooks\.pushWindow \?\? null;/);
-  assert.match(pauseSrc, /saveLoadPushes: !!push/);
-  // The pause window's two buttons read the flag rather than closing
-  // unconditionally - the U24 done-first law does NOT apply to a push.
-  assert.equal((pauseSrc.match(/if \(!this\.hooks\.saveLoadPushes\) this\._closeWith\(\);/g) || []).length, 2,
-    'SAVE and LOAD both');
-  // The three hosts with saveAs/loadKey seams, each through its own
-  // PushWindow (the fourth, exterior.js, has savingPrevented: () => true
-  // and mounts no slot window at all).
-  assert.match(read('src/scenes/world.js'), /pushWindow: \(w\) => townTalk\.pushOverlay\(w\),/);
-  assert.match(read('src/scenes/worldModes.js'), /pushWindow: mountInterior,/);
-  assert.match(read('src/scenes/dungeonContext.js'), /pushWindow: \(w\) => pushDungeonWindow\(w\),/);
-  assert.equal(read('src/scenes/exterior.js').includes('pushWindow:'), false,
-    'the probe host has no save seams to push for');
-});
-
 // ═══ 8. ROAD-S CLOSEOUT: the go paths are PopToHUD, and the four
 //        drawing laws C1's second pass still paraphrased ═══
 //

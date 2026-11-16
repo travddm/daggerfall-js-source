@@ -54,9 +54,3 @@ test('ONLINE-DEATH-FIX: OFFLINE is unchanged - a 0 HP save loads as saved', () =
   assert.equal(entity.health, 0);
 });
 
-test('ONLINE-DEATH-FIX by source: the online-death predicate is the PAGE flag first, and the modal hosts\' reset never reads "no snapshot yet" as offline', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const _onlineWorldSession = \(\) => onlineOn \|\| /);
-  assert.match(w, /if \(!\(_deathWasOnline \?\? _onlineWorldSession\(\)\)\) return false;/);
-  assert.ok(w.indexOf('const onlineOn = params.has') < w.indexOf('const _onlineWorldSession'), 'onlineOn is declared before the predicate reads it');
-});

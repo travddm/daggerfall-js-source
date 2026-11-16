@@ -38,7 +38,7 @@ archive carries no licence text and no readme.**
   aspect at run time) decoded at its first mip, every pixel the game
   samples. None is a classic record: `tools/iliacPuddleAssets.mjs`
   measures each against every record of every TEXTURE file by the search
-  Detailed Ships' pictures went through, and refuses to write one a record
+  in `tools/lib/classic-source.ts`, and refuses to write one a record
   covers.
 - `ItemTemplates.json` - the mod's seven item templates (9001-9007, the
   fish as items), the bundle's text verbatim (DW-E3).
@@ -66,5 +66,3 @@ writes both from the shipped bundle.
   `src/render/renderer.js`, FAR-CLIP1 - until then the port had only left
   whole clipped quads out of the ground's index set); the compiled blobs
   are not carried.
-
-The page for the whole port is `bible/03-World/Deep-Waters.md`.

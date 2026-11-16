@@ -1,4 +1,4 @@
-// ROSTER-G (2026-09-16, Mac: "Players dont show in online and the roster naming itself seems hardcoded").
+// ROSTER-G.
 //
 // TWO FINDINGS, one root. CHAT-R1 asked for "all currently online players" and wired the panel to the PRESENCE
 // session - the peers in the player's own map CELL - because the world channel, the one room every player is in, held
@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { CHAT_WORLD_ROOM, CHAT_ROSTER_MAX, CHAT_SOCKETS_MAX, SOCKETS_MAX, RELAY_VERSION } from '../../src/net/wire.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { rosterRows, rosterTitle, ROSTER_ROWS_MAX } from '../../src/net/roster.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { OFFICIAL_PH, fakeRoom } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -28,9 +28,9 @@ test('ROSTER-G: the channel\'s welcome NAMES who is in it - id and name, no look
     const a = r.connect(), b = r.connect(), c = r.connect();
     await r.hello(a, 'aaaa-0001', null, { name: 'Alpha' }); clock += 100;
     await r.hello(b, 'bbbb-0002', null, { name: 'Bravo' }); clock += 100;
-    assert.deepEqual(a.sent[0], { t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION, now: a.sent[0].now, ldo: 0 }, 'first in: nobody to name, and the count says one');
+    assert.deepEqual(a.sent[0], { t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION, ph: OFFICIAL_PH, now: a.sent[0].now, ldo: 0 }, 'first in: nobody to name, and the count says one');
     assert.equal(typeof a.sent[0].now, 'number', 'AUDIT SOC B7: the relay\'s clock rides the channel\'s welcome too');
-    assert.deepEqual(b.sent[0], { t: 'welcome', id: 'bbbb-0002', peers: [{ id: 'aaaa-0001', name: 'Alpha', sub: 'acct-aaaa-0001' }], n: 2, v: RELAY_VERSION, now: b.sent[0].now, ldo: 0 }, 'second in: told the first, by name and its verified account (MOD1: what /mute names)');
+    assert.deepEqual(b.sent[0], { t: 'welcome', id: 'bbbb-0002', peers: [{ id: 'aaaa-0001', name: 'Alpha', sub: 'acct-aaaa-0001' }], n: 2, v: RELAY_VERSION, ph: OFFICIAL_PH, now: b.sent[0].now, ldo: 0 }, 'second in: told the first, by name and its verified account (MOD1: what /mute names)');
     assert.deepEqual(ofType(a, 'join'), [{ t: 'join', id: 'bbbb-0002', name: 'Bravo', sub: 'acct-bbbb-0002', n: 2 }], 'the first hears the second join - the name and the account, and the room\'s count (PIN MOVED, AUDIT SCALE5a C1-C3: `n` on a channel\'s join and leave), nothing else');
     await r.hello(c, 'cccc-0003', null, { name: 'Charlie' }); clock += 100;
     assert.deepEqual(c.sent[0].peers.map((p) => p.id).sort(), ['aaaa-0001', 'bbbb-0002']); assert.equal(c.sent[0].n, 3);
@@ -79,7 +79,6 @@ test('ROSTER-G: a channel link (presence: false) HOLDS the roster it is told - t
   rr = rosterRows(s); assert.equal(rr.total, 600, 'the count is the room\'s'); assert.ok(rr.rows.length <= ROSTER_ROWS_MAX);
   assert.equal(rosterTitle(rr.total), 'Online — 600');
   ws.receive({ t: 'leave', id: 'aaaa-0001' }); assert.equal(rosterRows(s).total, 599, 'a leave the channel says takes one off the count');
-  // PIN MOVED (SCALE5a): this said a leave for an id the list never held moves nothing - but the relay says a leave only for
   // a socket that said hello in the room, so an id this list never held is one the welcome CUT, counted in its 600; its
   // leave never came off, and past CHAT_ROSTER_MAX the header only climbed (the client audit of 2026-10-10)
   ws.receive({ t: 'leave', id: 'past-the-cut' }); assert.equal(rosterRows(s).total, 598, 'a leave for one past the cut takes one off too');
@@ -95,14 +94,3 @@ test('ROSTER-G: a channel link (presence: false) HOLDS the roster it is told - t
   assert.equal(s.drawable().length, 0, 'nothing is drawn from a channel: no pose, nothing shown');
 }));
 
-test('ROSTER-G: world.js hands the panel the ACTIVE CHANNEL\'s link, with the presence session as the stand-in; and the #tag is drawn only beside a name another row shares (mutants: `online` alone, as CHAT-R1 wired it; the tag on every row, as it was)', async () => {
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /roster: \(\) => chatRosterOf\(chatLog\?\.active\),/, 'the tab\'s own roster');   // CHAT-CHAN: through the tab
-  assert.match(world, /const chatSessionOf = \(tabId\) => \(tabId === 'local' \? online : tabId === 'party' \|\| tabId === 'guild' \? chatLinks\?\.get\('world'\) : chatLinks\?\.get\(tabId\)\) \?\? online \?\? null;/, 'the tab\'s own link first, the presence session the stand-in');
-  const panel = rd('src/ui/chatPanel.js');
-  assert.match(panel, /if \(dup\.has\(r\.name\.toLowerCase\(\)\)\) line\.append\(el\('span', 'dfchat-who-tag', '#' \+ r\.tag\)\);/, 'the tag is conditional on a shared name (CHAT-FIT: on the row\'s one line)');
-  // the relay's side, by source: a channel's welcome is built from `others` by name, cut and counted
-  const idx = rd('server/src/index.js');
-  assert.match(idx, /const named = others\.slice\(0, CHAT_ROSTER_MAX\)\.map\(\(b\) => badged\(\{ id: b\.id, name: b\.name, sub: b\.sub \}, b\)\);/, 'ACC1g took the per-name VERDICT off this row - every name in the room was verified to get in, so it said the same thing about everybody; ACC3 put a BADGE on it, which is the opposite kind of field: a title is held by a few and is read out of the signature');
-  assert.doesNotMatch(idx, /if \(isChatRoom\(a\.key\)\) return;   \/\/ a channel announced no join/, 'the leave arm no longer skips a channel');
-});

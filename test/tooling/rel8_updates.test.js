@@ -1,5 +1,4 @@
-// REL8 (2026-10-09, Mac: "Let's officially start numbering updates beginning with 0.0.1"; `01-Overview/Desktop-App.md`
-// REL8) - EVERY MERGE TO MAIN IS A NUMBERED UPDATE. MAJOR.MINOR is the line (scripts/updateLine.mjs, by hand); PATCH is
+// REL8 - EVERY MERGE TO MAIN IS A NUMBERED UPDATE. MAJOR.MINOR is the line (scripts/updateLine.mjs, by hand); PATCH is
 // the count of main's first-parent commits from the merge that last changed the line - derived, never bumped, so the
 // merge that brings the line is 0.0.1 whatever merged before it. The number is stamped into the build beside the
 // commit (scripts/buildTag.mjs), shown in the game, named on the release and read back by the launcher's news; the
@@ -14,11 +13,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { updateNumber, UPDATE_LINE_FILE, UPDATE_LINE_RE, UPDATE_RE, UPDATE_ENV } from '../../scripts/updateNumber.mjs';
 import { UPDATE_LINE } from '../../scripts/updateLine.mjs';
 import { tagSource } from '../../scripts/buildTag.mjs';
 
-const ROOT = new URL('../..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const rd = (p) => readFileSync(join(ROOT, p), 'utf8');
 const require = createRequire(import.meta.url);
 const L = require('../../app/lib/launcherState.cjs');
@@ -27,7 +27,8 @@ const L = require('../../app/lib/launcherState.cjs');
 function repo(t) {
   const d = mkdtempSync(join(tmpdir(), 'rel8-'));
   t.after(() => rmSync(d, { recursive: true, force: true }));
-  const git = (...a) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...a], { cwd: d, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  // The scratch repository must not inherit a developer's signing settings: a signer that needs a passphrase fails the commit.
+  const git = (...a) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', '-c', 'tag.gpgsign=false', ...a], { cwd: d, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   git('init', '-q', '-b', 'main');
   const put = (p, text) => { mkdirSync(join(d, p, '..'), { recursive: true }); writeFileSync(join(d, p), text); };
   const commit = (msg) => { git('add', '-A'); git('commit', '-qm', msg); return git('rev-parse', 'HEAD'); };

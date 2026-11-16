@@ -1,5 +1,4 @@
-// GRANT5 and GRANT7 (2026-10-18, Mac: "Do all slices"; the owner, question 2: "3 accounts / 10 min"; bible/11-Multiplayer/
-// Spawn-Grants.md section 15): THE MEASURE SUGGESTS, THE READERS' WORD OPENS A CASE (server-account/src/grants.js) - the
+// GRANT5 and GRANT7: THE MEASURE SUGGESTS, THE READERS' WORD OPENS A CASE (server-account/src/grants.js) - the
 // measure's read says each kind's rate and the cell's ceiling half again past what honest play reached; readers on three
 // accounts that count, tallying what only a changed client gives against one sender inside ten minutes, open the
 // moderators' case on it - a reviewer's case with one line a window, never a report, so never the reports' mute.
@@ -15,7 +14,7 @@ const URL_ = `https://accounts.invalid${GRANT_FEED_PATH}`;
 const hex16 = () => [...crypto.getRandomValues(new Uint8Array(8))].map((x) => x.toString(16).padStart(2, '0')).join('');
 
 async function rig() {
-  const s = await standService({ DEVELOPER_HANDLES: 'Mac' });
+  const s = await standService({ SEAT_ADMINS: 'Mac' });
   const raw = s.env.DB._raw;
   const aged = async (handle) => { const p = await s.registered(handle); raw.prepare('UPDATE players SET created_at = created_at - ?1 WHERE id = ?2').run(60 * 86400, p.id); return p.id; };
   /** One cell's window: each tally [reader, sender, reason, n]. */
@@ -32,7 +31,7 @@ async function rig() {
   return { s, raw, aged, post, cases, lines };
 }
 
-test('GRANT7 THREE READERS\' ACCOUNTS IN TEN MINUTES OPEN THE CASE: two are not enough, a guest or a sprout does not count, and a timing word counts for nothing; the third opens a reviewer\'s case on the sender - one line under `grant`, the readers, the foes and why - and the Discord post due; no report is filed and nobody is muted (mutants: a guest counted; a timing word counted; the case a report\'s)', async () => {
+test('GRANT7 THREE READERS\' ACCOUNTS IN TEN MINUTES OPEN THE CASE: two are not enough, a guest or a sprout does not count, and a timing word counts for nothing; the third opens a reviewer\'s case on the sender - one line under `grant`, the readers, the foes and why - no report is filed and nobody is muted (mutants: a guest counted; a timing word counted; the case a report\'s)', async () => {
   assert.deepEqual([GRANT_CASE_READERS, GRANT_CASE_WINDOW_S, GRANT_CASE_TAB], [3, 600, 'grant']);
   const R = await rig();
   const bad = await R.aged('Badger'), ann = await R.aged('Annie'), bo = await R.aged('Bobby'), cy = await R.aged('Cyrus');

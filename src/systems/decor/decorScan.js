@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR1d (2026-09-25) — THE CATALOGUE, READ OUT OF THE GAME'S OWN
+// DECOR1d — THE CATALOGUE, READ OUT OF THE GAME'S OWN
 // BLOCKS A FEW AT A TIME.
 //
 // Mac: the catalogue is "Everything Daggerfall furnishes" and the panel

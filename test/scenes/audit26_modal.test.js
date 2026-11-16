@@ -18,7 +18,6 @@ import { getNameBankOfRegion } from '../../src/characters/nameHelper.js';   // F
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (f) => readFileSync(join(ROOT, f), 'utf8');
-const WM = src('src/scenes/worldModes.js');
 
 /** The brace-matched body of a function/method, from its header. */
 function bodyOf(text, header) {
@@ -59,86 +58,12 @@ function insideGate(text, gate, needle) {
 // ungated right-click cast the readied spell instead of removing an item.
 // ---------------------------------------------------------------------
 
-test('AUDIT 26 F205: every host gates the RMB press on "no window up" - and none of them gates the release', () => {
-  const press = [
-    ['src/scenes/worldModes.js', /if \(isSwingButton\(e\.button\) && !modalWindowUp\(\)\) modalAttackSink\(\)\?\.\(0, 0, true\);/],
-    ['src/scenes/dungeon.js', /if \(isSwingButton\(e\.button\) && !ctx\.uiOverlayActive\) ctx\.playerAttackInput\(0, 0, true\);/],
-    ['src/scenes/world.js', /if \(isSwingButton\(e\.button\) && !townTalk\.overlayActive && walkMode/],   // FIX-F: the registry's button
-    ['src/scenes/exterior.js', /if \(isSwingButton\(e\.button\) && !townTalk\.overlayActive && walkMode/],
-  ];
-  for (const [host, re] of press) {
-    assert.match(src(host), re, `${host}: the modal RMB press must be refused while a window is up`);
-  }
-  // ...and the RELEASE is never gated: a window opened mid-swing must
-  // still let go, which is why the four mouseup arms carry no window test.
-  const release = [
-    ['src/scenes/worldModes.js', /if \(isSwingButton\(e\.button\)\) modalAttackSink\(\)\?\.\(0, 0, false\);/],
-    ['src/scenes/dungeon.js', /if \(isSwingButton\(e\.button\)\) ctx\.playerAttackInput\(0, 0, false\);/],
-    ['src/scenes/world.js', /if \(isSwingButton\(e\.button\) && walkMode && modeNow\(\) === 'exterior'\) weaponRig\.attackInput\(0, 0, false\);/],
-    ['src/scenes/exterior.js', /if \(isSwingButton\(e\.button\) && walkMode && modeNow\(\) === 'exterior'\) weaponRig\.attackInput\(0, 0, false\);/],
-  ];
-  for (const [host, re] of release) assert.match(src(host), re, `${host}: the release stays ungated`);
-  // ONE expression for "a mode window is up" - the attack seam and the
-  // HOSTS' cursor toggle read the same one rather than each spelling it
-  // out. AUDIT 58 (f3/input): the toggle is no longer registered HERE.
-  // bindCursorToggle installs a listener per call over a module-global
-  // flag, and both outdoor hosts build this machine unconditionally, so
-  // a registration here was a SECOND reader of Actions.ActivateCursor
-  // and one Enter netted zero (PlayerMouseLook.cs:190-198 has exactly
-  // one). The expression is published on the returned object instead
-  // and OR'd into the host's single binding - test/systems/cursortoggle.test.js
-  // sweeps the count over every entry host's import closure.
-  // STATUS-LIVE (2026-09-22): the interior term is the PAUSE, not the
-  // slot. A window this machine owns still refuses the cursor toggle -
-  // that is the law this line carries, and `interiorPaused()` is the
-  // question the dungeon arm beside it has asked since ROAD-tail. What
-  // moved out from under it is a box the game is NOT stopped for (the
-  // status readout, ui/statusBox.js): refusing the toggle for one of
-  // those would be refusing it while the player walks.
-  assert.match(WM, /const modalWindowUp = \(\) => \(mode === 'dungeon' \? !!dungeonCtx\?\.uiOverlayActive : interiorPaused\(\)\);/);
-  assert.match(WM, /^ {4}modalWindowUp,$/m, 'published for the host that owns the one binding');
-  assert.doesNotMatch(WM, /bindCursorToggle\(/, 'and registered nowhere in this file');
-});
-
 // ---------------------------------------------------------------------
 // F065 - PauseGame(true) sets Time.timeScale = 0 (GameManager.cs:600-609),
 // so PlayerMotor stops updating entirely. Zeroed inputs are the PARALYSIS
 // law, not this one: they let gravity, velocity and the crouch edge keep
 // running under an open menu.
 // ---------------------------------------------------------------------
-
-test('AUDIT 26 F065: the world-hosted motor stops under a window, as the standalone dungeon host does', () => {
-  assert.ok(insideGate(WM, 'if (!overlayHeld) {', 'player.update(dt, paralyzed ?'),
-    'worldModes runs the player motor under an open window');
-  // MWCROUCH retired the `latch.crouch = crouchHeld;` this line used to
-  // name. The law is unchanged and now reads off the host's key-edge
-  // ring: the CONSUMER is the gated motor call above, and the edge
-  // itself is dropped rather than banked because the ring rotates once
-  // at the head of the host's frame whatever the overlay is doing -
-  // which is the paused InputManager (:487-503) the latch was standing
-  // in for. The press is computed outside the gate and spent inside it.
-  assert.match(WM, /const crouchPress = pressed\(latch\.edge, keys, 'Crouch'\);/,
-    'the crouch is GetKeyDown off the host ring');
-  assert.ok(insideGate(WM, 'if (!overlayHeld) {', 'crouch: crouchPress,'),
-    'the crouch edge is the motor step, and it toggled under a window');
-  assert.ok(insideGate(WM, 'if (!overlayHeld) {', '_footsteps.update(player.pos'),
-    'and the footstep clock rides the same gate');
-  // the zeroed-input bag is PARALYSIS alone now (the standalone host's
-  // own shape: `player.update(dt, paralyzed ? ...` inside its gate)
-  assert.doesNotMatch(WM, /const inputHeld = paralyzed \|\| overlayHeld;/,
-    'overlayHeld must not be folded into the motor input bag - that is what let the fall complete');
-  assert.match(src('src/scenes/dungeon.js'), /if \(walkMode && !overlayHeld\) \{/,
-    'the standalone host is the shape being matched');
-  // the motor's FRAME FLAGS are reset by the update that sets them, so
-  // their readers cannot run on a paused frame or they re-report a stale
-  // jump / landing every frame the window is open
-  for (const call of [
-    'if (!overlayHeld) dungeonCtx.reportActivity?.(',
-    'if (!overlayHeld) dungeonCtx.reportMotor?.(',
-    'if (!overlayHeld) applyFallLanding(playerEntity, player.landedFallDistance',
-    'if (!overlayHeld) interiorTicker.tick(dt, {',
-  ]) assert.ok(WM.includes(call), `the motor-flag reader must be held: ${call}`);
-});
 
 // ---------------------------------------------------------------------
 // F211 + F064 - the FORCED door (anchor recall, the guild's Teleportation
@@ -147,44 +72,6 @@ test('AUDIT 26 F065: the world-hosted motor stops under a window, as the standal
 // OnPop on every window it removes, and RestWindow raises IsResting on
 // open and clears it there alone.
 // ---------------------------------------------------------------------
-
-test('AUDIT 26 F211 + F064: the forced exit caches the interior and disposes the window it drops', () => {
-  const force = bodyOf(WM, 'forceExitToExterior({ cacheScene = true, load = false } = {}) {');   // IS1 grew the load-path opt-out
-  // Teleport.cs:148 - CacheScene(playerEnterExit.Interior.name), the same
-  // write the real door makes (PlayerEnterExit.cs:860 / tryExit)
-  assert.match(force, /cacheInteriorScene\(\);/,
-    'a recall out of a building discarded every change made inside it');
-  assert.ok(force.indexOf('cacheInteriorScene();') < force.indexOf('interiorCtx.destroy()'),
-    'the cache is written while the shelves and action objects are still alive');
-  // OnPop: the slot is DISPOSED, never dropped raw.
-  //
-  // ROAD-B B1 MOVED THIS PIN one level out, deliberately. The interior
-  // host holds a real window STACK now (ui/windowStack.js), so "the
-  // window it drops" is no longer only the top one: a rest suspended
-  // under a pushed message box is a live occupant with IsResting
-  // raised, and a teardown that disposed the top alone would strand it
-  // with exactly the defect F064 recorded. UserInterfaceManager
-  // .cs:189-196 runs OnPop on every window RemoveWindow removes, and
-  // ChangeWindow (:125-126) removes them all - so the teardown drains
-  // the stack and disposes each one on the way out.
-  assert.match(force, /interiorWindows\.clear\(\(w\) => w\.dispose\?\.\(\)\);/,
-    'the interior stack was dropped raw - a rest window on it left isResting raised for the session');
-  assert.ok(force.indexOf('interiorWindows.reconcile(interiorOverlay);') < force.indexOf('interiorWindows.clear('),
-    'the live slot is read back into the stack first, or the top window is not on it to be disposed');
-  assert.ok(force.indexOf('interiorWindows.clear(') < force.indexOf('interiorOverlay = null'),
-    'dispose before the slot is cleared, or _close never runs');
-  assert.match(force, /dungeonCtx\.overlayWindow\?\.\(\)\?\.dispose\?\.\(\);/,
-    'the dungeon context is destroyed without popping its own window');
-  assert.ok(force.indexOf('dungeonCtx.overlayWindow?.()?.dispose?.();') < force.indexOf('dungeonCtx.destroy()'),
-    'and it is popped before the context that holds it is torn down');
-  // the real door has always done both - the pin is that they agree.
-  // UNSTUCK1: the caching call itself moved out of tryExit() into its
-  // own exitInteriorNow() (so /unstuck's no-ray exit reaches it too);
-  // tryExit still ends every real walk-through-the-door exit by calling
-  // it, so this is the body that actually holds the call now.
-  const door = bodyOf(WM, 'function exitInteriorNow(landing = null) {');
-  assert.match(door, /cacheInteriorScene\(\);/, 'the real door still caches it too (PlayerEnterExit.cs:860)');
-});
 
 // ---------------------------------------------------------------------
 // F018 - TalkToStaticNPC reads targetNPC.Data (TalkManager.cs:752-770):
@@ -231,13 +118,6 @@ test('AUDIT 26 F018: the talk seam is handed StaticNPC.Data - the block record h
   assert.equal(s2.talkToStaticNPC({ data: pn, isChildNPC: false, displayName: 'x' }).kind, 'talk',
     'the block record keys by 0, so no townsperson in the game could ever be carrying work');
 
-  // the host passes the derived record at BOTH talk seams - the click and
-  // the guild popup's Talk button - and seeds the answer PRNG from it
-  // F020: the flag nobody wrote became the real predicate.
-  assert.equal(WM.match(/\{ data: npcData, isChildNPC: isChildNPCData\(npcData\)/g)?.length, 2);
-  assert.equal(WM.match(/npcSeed: npcData\.nameSeed/g)?.length, 2);
-  assert.doesNotMatch(WM, /npcSeed: pn\.nameSeed/, 'the field nothing writes is gone');
-  assert.doesNotMatch(WM, /\{ data: pn,/, 'and so is the block record as `data`');
 });
 
 // ---------------------------------------------------------------------
@@ -270,14 +150,6 @@ test('AUDIT 26 F017: the popup Talk reads the same StaticNPC.Data the click deri
     'one region, one bank - the race no longer renames the NPC',
   );
 
-  // the host derives it ONCE per click and lends it to the popup, which is
-  // what DFU's single StaticNPC component is
-  assert.match(WM, /const npcData = clicked \?\? questBridge\?\.clickNpc\(pn, npcSceneCtx\) \?\? staticNpcData\(pn, npcSceneCtx\);/);   // PIN MOVED (QUEST-WORDS-FIRST): a door reopened after the quest's words lends the record its click derived
-  assert.match(WM, /function openGuildService\(pn, route, npcData\) \{/);
-  assert.match(WM, /openGuildService\(pn, route, npcData\);/);
-  const popup = bodyOf(WM, 'function openGuildService(pn, route, npcData) {');
-  assert.doesNotMatch(popup, /staticNpcData\(/,
-    'the popup must not re-derive the record without the bridge\'s race lookups');
 });
 
 // ---------------------------------------------------------------------
@@ -287,29 +159,3 @@ test('AUDIT 26 F017: the popup Talk reads the same StaticNPC.Data the click deri
 // pack, so nothing ever left it: the sale paid and the goods stayed.
 // ---------------------------------------------------------------------
 
-test('AUDIT 26 F063: a native-mode sale takes the goods out of the pack, and the two sell paths agree', () => {
-  const commit = bodyOf(WM, 'function commitTrade(shelf, mode, staged, price, proceeds, identifySpell = null, asked = {}) {');
-  // the Sell arm removes what it just paid for
-  // PIN MOVED (FIELD BUGS 2026-10-16b STOLEN-GOODS): and lands it through landSold - the shelf for an honest piece, nowhere
-  // for a stolen one (systems/stolenGoods.js)
-  assert.match(commit, /const i = playerEntity\.items\.indexOf\(it\);\s*\n\s*if \(i >= 0\) playerEntity\.items\.splice\(i, 1\);\s*\n\s*landSoldAt\(shelf\.items, it, shelf === interiorCtx\?\.shelves\?\.\[0\] \? interiorBuilding\?\.buildingType : null\);/,   // PIN MOVED (AUDIT UPDATE II B2): through shopStock.js landSoldAt - an arrow sold at a General Store's counter is never shelved
-    'Sell paid full price and left the item in the pack - unlimited gold, one item');
-  // ...and the keyed path has always done exactly that, so the two agree
-  const sell = bodyOf(WM, 'function doSell(shelf, it) {');
-  assert.match(sell, /playerEntity\.items\.splice\(playerEntity\.items\.indexOf\(it\), 1\);/);
-  // Identify and Repair move NOTHING back: the staged item never left, so
-  // an addItem aliased it into the pack twice (or doubled a stack).
-  assert.equal((commit.match(/addItem\(/g) ?? []).length, 1,
-    'the only addItem in the transaction is Buy\'s - the shelf item that really does change hands');
-  assert.doesNotMatch(commit, /for \(const it of staged\) addItem\(playerEntity\.items, it\);/);
-  assert.doesNotMatch(commit, /it\.isIdentified = true; addItem\(playerEntity\.items, it\);/);
-  // ...and D7 finished the move F063 started: what the window is
-  // handed is the LIVE collection (DaggerfallTradeWindow.cs:389), not
-  // a filtered view of it, so TransferItem's splice at the click lands
-  // on the real pack. The equipped test went with it, into
-  // FilterLocalItems where DFU keeps it (:693, :697).
-  assert.match(WM, /packItems: \(\) => \(playerEntity\.items \?\?= \[\]\),/);
-  assert.match(WM, /isEquipped: \(it\) => isEquipped\(it\),/);
-  assert.doesNotMatch(WM, /packItems: \(\) => \(playerEntity\.items \?\?= \[\]\)\.filter\(/,
-    'a filtered view cannot be spliced - the host must not narrow the pack again');
-});

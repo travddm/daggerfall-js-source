@@ -10,7 +10,7 @@ import { layoutInterior } from '../../src/world/interior/interiorLayout.js';
 
 // WM2g - THE MILL HAS AN INSIDE.
 //
-// Mac, having been asked twice whether to do it: "Put it in". So the
+// . So the
 // interior of the subrecord Kamer adds to each farm block is vendored
 // and attached, and the door his building carries now leads somewhere.
 //
@@ -91,8 +91,6 @@ test('WM2g: a model the player\'s ARCH3D lacks drops its placement, not the inte
 });
 
 test('MAC-BUG1: an interior with no door of its own gets one at its enter marker - the mill is no longer a trap', async () => {
-  // Mac, 2026-09-20: "got locked inside a windmill when i went inside.
-  // not sure if it's all of them that do that."
   //
   // IT IS ALL OF THEM, and the reason is that a building's way out is
   // not a record in its own data - it is a STATIC DOOR baked into one

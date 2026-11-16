@@ -1,0 +1,23 @@
+[Unit]
+Description=DFO CI runner slot %i (one just-in-time runner container at a time)
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+User=dfo-ci
+Group=dfo-ci
+SupplementaryGroups=docker
+EnvironmentFile=/etc/dfo-runner/runner.env
+ExecStartPre=+/opt/dfo-runner/network.sh
+ExecStart=/opt/dfo-runner/supervisor.sh %i
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+# The supervisor mints tokens and calls Docker; it needs nothing else on the host.
+NoNewPrivileges=true
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

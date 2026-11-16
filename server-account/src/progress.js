@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT16-INT17 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7; the owner: "Take
-// care of the integrity arc"): PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT PAYS FOR THEM.
+// INT16-INT17: PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT PAYS FOR THEM.
 //
 // The world runs on the player's machine, so a kill's Renown, a find's silver, a camp cleared, a node harvested and the
 // XP a craft earns are each the client's word (a raid's cleanse and a watch's tick are the relay's). Lanes 1-3 bounded
@@ -15,7 +14,7 @@
 // refuses is a request naming an offline id (`char-anything` - each a fresh set of nodes a day), a seat another device
 // took, and a character the judge holds.
 //
-// INT17 - THE PLAY THAT PAYS, MEASURED FIRST (the owner, asked: "Measure first" - as the wealth budget and the boss
+// INT17 - THE PLAY THAT PAYS, MEASURED FIRST (- as the wealth budget and the boss
 // fights' count were). Each stream is a bucket, the wealth budget's own law (budget.js stepBudget): it fills at its
 // line's rate for every second the account played (players.played_s - the service's own count, accounts.js creditPlay:
 // "The client sends no number"), up to its cap, and each claim spends it. While the line only measures, the bucket
@@ -33,7 +32,6 @@ import { RAID_CLAIMS_DAY_MAX } from './raids.js';
 import { RENOWN_XP_HOUR_MAX } from '../../src/net/renown.js';
 import { WATCH_DAY_CAP, BOUNTY_CAMPS_DAY } from '../../src/net/townSeatLaw.js';
 import { WATCH_TICK_MS } from '../../src/net/watchReceipt.js';
-import { TIDE_EFFECTS } from '../../src/net/tideLaw.js';
 import { MARKS_FAUCETS } from '../../src/net/marksLaw.js';
 import { writXp } from '../../src/net/professionLaw.js';
 
@@ -50,7 +48,6 @@ export const PROGRESS_LINE = Object.freeze({
     renown: Object.freeze({ rate: RENOWN_XP_HOUR_MAX, cap: RENOWN_XP_HOUR_MAX }),   // Renown's clock hour, read per hour of play
     raid: Object.freeze({ rate: RAID_CLAIMS_DAY_MAX / RAID_GAME_DAY_HOURS, cap: RAID_CLAIMS_DAY_MAX }),   // a game day's six cleanses
     bounty: Object.freeze({ rate: BOUNTY_CAMPS_DAY, cap: BOUNTY_CAMPS_DAY }),   // a seat's Bounty camps, and (HUNTERS-MARK) the boards' clears
-    camp: Object.freeze({ rate: TIDE_EFFECTS.orcsCampsDay, cap: TIDE_EFFECTS.orcsCampsDay }),   // an Orc Raid's camps
     watch: Object.freeze({ rate: 3_600_000 / WATCH_TICK_MS, cap: WATCH_DAY_CAP }),   // a tick for each two minutes stood
     find: Object.freeze({ rate: MARKS_FAUCETS.find.perDay, cap: MARKS_FAUCETS.find.perDay }),   // silver finds
     gather: Object.freeze({ rate: MARKS_FAUCETS.gather.perDay, cap: MARKS_FAUCETS.gather.perDay }),   // a harvest's silver
@@ -69,7 +66,6 @@ export const PROGRESS_ROUTES = Object.freeze({
   '/v1/raid/claim': Object.freeze(['raid', true]),
   '/v1/seats/bounty': Object.freeze(['bounty', true]),
   '/v1/hunt/clear': Object.freeze(['bounty', true]),   // HUNTERS-MARK: a bounty board's clear (hunts.js)
-  '/v1/seats/orc-camp': Object.freeze(['camp', true]),
   '/v1/seats/watch': Object.freeze(['watch', true]),
   // AUDIT TOWN-ECON 2 SVC-2: the town Watch's footsteps too - asked of the account's seat (the body names none), as every
   // claim of the Watch is; it earns its player nothing, so it spends no bucket (progressSpentOf), and an enforced line
@@ -226,7 +222,6 @@ export function progressSpentOf(path, a) {
     case '/v1/star/claim': if (a.recorded === true) add('renown', n(a.renown?.credited)); break;   // STAR7: the Renown a star paid (its count is bounded by the day - stars.js STAR_CLAIMS_DAY_MAX)
     case '/v1/seats/bounty': if (n(a.paid)) add('bounty', 1); break;
     case '/v1/hunt/clear': if (a.recorded === true) add('bounty', 1); break;   // HUNTERS-MARK: a clear recorded
-    case '/v1/seats/orc-camp': if (a.counted === true) add('camp', 1); break;
     case '/v1/seats/watch': add('watch', n(a.counted)); break;
     case '/v1/towns/watch': break;   // AUDIT TOWN-ECON 2 SVC-2: a town's share, never its player's progress
     case '/v1/marks/find': if (n(a.struck)) add('find', 1); break;

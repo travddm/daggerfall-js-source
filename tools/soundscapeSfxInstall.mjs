@@ -1,4 +1,4 @@
-// THE SOUNDSCAPE'S RECORDINGS, INSTALLED (SOUNDSCAPE, 2026-10-24 - bible/08-Audio/Audio.md SOUNDSCAPE).
+// THE SOUNDSCAPE'S RECORDINGS, INSTALLED (SOUNDSCAPE, 2026-10-24 SOUNDSCAPE).
 //
 // The sea's and the wild's sounds that a synthesiser does badly - a gull, a crow, a frog, a hammer on an anvil - are
 // recordings: each CC0 (public domain), from OpenGameArt.org, fetched from its own page's file, decoded in Chromium

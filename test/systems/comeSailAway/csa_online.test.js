@@ -1,4 +1,4 @@
-// CSA-J (2026-09-28) - COME SAIL AWAY ONLINE: a player's boats as the others in a cell see them - the `sa` word on
+// CSA-J - COME SAIL AWAY ONLINE: a player's boats as the others in a cell see them - the `sa` word on
 // the owner's foes frame (systems/comeSailAway/comeSailAwayWire.js), a peer's boats in the pool's PEER list
 // (scenes/comeSailAway/comeSailAwayPeers.js, scenes/comeSailAway/comeSailAwayPool.js), and the host's four doors (world.js, exteriorFoes.js).
 // The pool runs over the vendored models and a stand-in renderer and pipeline (test/systems/comeSailAway/csa_pool.test.js's).

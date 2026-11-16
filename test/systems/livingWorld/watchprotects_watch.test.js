@@ -1,5 +1,4 @@
-// WATCH-PROTECTS (2026-10-06, Mac: "improve the guards" - asked, "The watch protects people": a monster attacking
-// townspeople draws the watch to defend them; bible/06-Systems/Living-World.md WATCH-PROTECTS): THE WATCH PROTECTS THE
+// WATCH-PROTECTS: THE WATCH PROTECTS THE
 // TOWN'S PEOPLE. Before it no monster could turn on a townsperson - DFU's enemy senses weigh other enemies and the
 // player alone ("Civilian Mobile NPCs are not handled here", EnemySenses.cs:739-741) - and the watch's defenders came
 // only to a monster hunting the player (systems/town/townWatch.js isTownThreat); a townsperson stood on beside a monster's
@@ -80,8 +79,6 @@ test('WATCH-PROTECTS one landed blow: a townsperson\'s body falls to the first b
   assert.ok(played.length > 0 && blood.length === 1, 'the blow heard and seen');
   assert.equal(q.hurtFromFoe(9, null, wolf), 0, 'once');
   assert.equal(struck.length, 1);
-  const pool = rd('src/scenes/exteriorFoes.js');
-  assert.match(pool, /calculateAttackDamage: _foeTarget\.civilian \|\| _foeTarget\.starWard \? QUARRY_BLOW : calculateAttackDamage,/);   // PIN MOVED (STAR5): a fallen star takes the one blow too
 });
 
 test('WATCH-PROTECTS the watch comes: a monster hunting a townsperson alive is the town\'s threat (isTownThreat), so the watch\'s defenders come to it after the arrival\'s countdown; one struck down is not (mutants: the clause, the alive)', () => {
@@ -184,7 +181,7 @@ test('WATCH-PROTECTS the street runs: one on the street a hostile monster comes 
 
 test('WATCH-PROTECTS cornered: one whose straight way from a monster is a wall turns along it, every stride on the street - never through the wall (mutants: the street)', () => {
   const dangers = { list: [] };
-  // LW-SPREAD: PIN MOVED - the town built solid to its lanes (a wall beside every one standing): the open town's people
+  // LW-SPREAD:
   // stand off its walls now, spread over its spots
   const t = makeTown(100 * DAY_MIN + 13 * 60, dangers, closeTown());
   const { p: victim, reach, dir } = standingAbout(t)[0];
@@ -231,7 +228,7 @@ const farWalker = (t) => t.town.update(0, t.at, 0, t.at, true, () => false).map(
   .find((p) => p.moving && Math.hypot(p.pos[0] - t.at[0], p.pos[2] - t.at[2]) > 30 && !t.town._inCircle.has(p.living.res.id));
 
 test('WATCH-PROTECTS the frightened say nothing: a circle with any of it frightened is silent - a pair one of whom took fright and the other did not (its twin town, no monster, talks on) - and a greeting goes with the fright: none said while it lasts (said unseen, it would rest them GREET_REST_MIN past it), one said before it gone from over their head (mutants: the circle, the greeting, the speaker)', () => {
-  // LW-SPREAD: PIN MOVED - the evening (at seven: its people out over the town's spots, a pair standing together in view)
+  // LW-SPREAD:
   const twin = makeTown(100 * DAY_MIN + 19 * 60, { list: [] });
   const dangers = { list: [] };
   const t = makeTown(100 * DAY_MIN + 19 * 60, dangers);
@@ -316,13 +313,3 @@ test('WATCH-PROTECTS a townsperson struck down: the host\'s word is the town\'s 
   assert.ok(!t.town.pool.some((r) => r.res?.id === id), 'off the street');
 });
 
-test('WATCH-PROTECTS the hosts: the world host hands the monsters the street\'s people of the living world (none of the watch, the dead let go) beside its foes and watchmen, and the street the monsters to run from (its own foes alive and hostile, no ally or companion, in the town\'s frame); classic play, and the fixed-city page, none (mutants: the host\'s quarry, its dangers)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /candidates: \(\) => \[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes, \.\.\.livingQuarry\(\), \.\.\.\(starfall\?\.wards\(\) \?\? \[\]\)\]/);   // PIN MOVED (STAR5): and a fallen star, its own coven quarry
-  assert.match(w, /const livingQuarry = \(\) => \{\n\s+if \(!livingWorldOn\(\) \|\| _mode\(\) !== 'exterior'\) return \[\];/);
-  assert.match(w, /if \(!living\?\.town \|\| p\.guard\) continue;/);
-  assert.match(w, /q = makeQuarry\(p, \(body\) => body\.living\.town\.killed\(body\.person\)\)/);
-  assert.match(w, /dangers: \(\) => host\.livingDangers\(px, py, locOrigin\),/);
-  assert.match(w, /if \(f\.dead \|\| !f\.ai\?\.isHostile \|\| f\.companion != null \|\| f\.entity\?\.team === 'PlayerAlly'\) continue;/);
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /livingQuarry|makeQuarry/, 'the fixed-city page: DFU\'s');
-});

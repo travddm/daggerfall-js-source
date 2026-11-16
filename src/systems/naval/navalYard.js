@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT NAV1 (2026-09-29, the helm - Mac: "Lets do a deep comprehensive audit and ensure this is perfection") - THE
+// AUDIT NAV1 - THE
 // SHIPWRIGHT'S YARD, and HER OWN HANDS' MENDING AT SEA: what a hurt boat buys back at a port, and what her crew makes
 // good between fights. The helm audit's first finding: the page promised a shipwright and none stood - `repairCost`
 // was written into the readout and read by nothing, the one mend was a prize's timber, and a wreck stayed a wreck (with
@@ -22,7 +22,7 @@ import { BARREL } from './navalShips.js';
 export const BARREL_PRICE = 40;
 /** The mending at sea: quiet this long first (s), then this share of the whole a second at a full crew, this share of
  *  that with none aboard, up to this share of the whole; a wreck afloat again past this share of her hull.
- *  QUICK-REPAIRS (2026-10-03, Mac: "allow for more streamlined repairs"): her hands turn to sooner (15 s, from 30) and
+ *  QUICK-REPAIRS: her hands turn to sooner (15 s, from 30) and
  *  work twice as fast (0.4% a second, from 0.2% - half her whole in a little over two minutes at a full crew). */
 export const FIELD_QUIET_S = 15;
 export const FIELD_MEND_PER_S = 0.004;
@@ -91,7 +91,7 @@ export function fieldMend(damage, dt, { crewed, crewShare, scale = 1 }) {
   return { hull: part(damage.hull, damage.maxHull), sail: damage.maxSail > 0 ? part(damage.sail, damage.maxSail) : 0 };
 }
 
-// ── SEA-REPAIR (2026-09-30, Mac: "a way to repair ships on the high seas" - "Carpenter's stores") ──────────────────────
+// ── SEA-REPAIR ──────────────────────
 // The yard sells CARPENTER'S STORES (timber, pitch and canvas - an item of the hold, navalStores.js) and a ROUND OF
 // GROG for her crew (shipCrew.js's spirits). At sea, her captain's order MAKE REPAIRS (shipCrew.js ORDERS.repair) sets
 // her hands to work while nothing threatens her (the mending's own quiet): SEA_REPAIR_PER_S of the whole a second -
@@ -99,7 +99,7 @@ export function fieldMend(damage, dt, { crewed, crewShare, scale = 1 }) {
 // canvas, ALL THE WAY TO WHOLE, a store spent for every STORE_POINTS of work it makes good (AUDIT CC-D1). A wreck floats again past
 // FIELD_REFLOAT as the free mending's. The free mending to FIELD_MEND_CAP stands beside it, as it was.
 //
-// QUICK-REPAIRS (2026-10-03, Mac: "allow for more streamlined repairs"): her carpenter's crew work twice as fast
+// QUICK-REPAIRS: her carpenter's crew work twice as fast
 // (SEA_REPAIR_PER_S), and need no order for it - once the fight is over (the mending's own quiet) her hands spend her
 // stores on their own (the host's AutoRepair, Features > Naval Combat > Crew repairs on their own) - and thriftily: on
 // what the free mending cannot reach (`paidDamage`: her hull and canvas past FIELD_MEND_CAP), so no store goes on work
@@ -110,7 +110,7 @@ export function fieldMend(damage, dt, { crewed, crewShare, scale = 1 }) {
 // under fire, the next ball wrecked her again). With no enemy near and a fire aboard or a ball lately in her, the
 // order waits for the quiet, as it did.
 
-/** AUDIT CC-D1 (Mac: "Priced per hull, no port use"): A STORE OF TIMBER, PITCH AND CANVAS MAKES GOOD STORE_POINTS OF
+/** AUDIT CC-D1: A STORE OF TIMBER, PITCH AND CANVAS MAKES GOOD STORE_POINTS OF
  *  WORK - a hull point a point, canvas at its yard price's share of the hull's (SAIL_WORK) - and costs STORE_YARD_SHARE
  *  of what the yard asks for that work. A flat 25 gold for a TENTH of any ship had ten of them make a wrecked Small
  *  Ship whole for 250 gold against the yard's 6000, in the harbour beside it. So a bigger ship needs more stores, and

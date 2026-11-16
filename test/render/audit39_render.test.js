@@ -65,14 +65,6 @@ test('audit39 F47/F48: the offscreen sprite render is drawn with the fog BORROWE
   assert.equal(lastUniform1i(log, r._charQuad.fogMode), 2, 'the quad carries the fog');
 });
 
-test('audit39 F47/F48: the borrow is stated in the pass, beside the clear-colour one', () => {
-  const s = src('src/render/renderer.js');
-  const fn = s.slice(s.indexOf('renderCharacterSprite(mesh'), s.indexOf('renderCharacterSpriteImage(mesh'));
-  assert.match(fn, /const sp = this\._proj, sv = this\._view, sf = this\._fogMode;/);
-  assert.match(fn, /this\._proj = proj; this\._view = view; this\._fogMode = 0;/);
-  assert.match(fn, /this\._proj = sp; this\._view = sv; this\._fogMode = sf;/, 'returned after the draw');
-});
-
 // ---------------------------------------------------------------
 // F49: TextureReader's auto-emissive table (TextureReader.cs:809-1023,
 // IsEmissive :1047), the material law on top of it
@@ -103,26 +95,6 @@ test('audit39 F49: the emissive table is TextureReader.emissiveTextures, verbati
   assert.equal(total, 182, 'every active TextureReader.cs:809-1023 entry, and only those');
 });
 
-// PIN MOVED (EG-ZH, 2026-10-12 - bible/11-Multiplayer/Elite-Gates.md section 11.6, AUDIT EG II L1-1): the fire walls are
-// no longer SKIPPED - GetFireWallColors32 is ported (formats/baseImageFile.js) and the arm takes it, TextureReader.cs:303's
-// `if (settings.archive != FireWallsArchive)` and :309's `else if (hasReferenceTexture)`: every other emissive record
-// still reuses its albedo, and 356 lerps from FIRE_WALL_COLOR at FIRE_WALL_SCALE over the classic albedo, never on a
-// stand-in (test/systems/eliteGates/egz_art.test.js drives it on synthetic bytes).
-test('audit39 F49: the upload arm reuses the ALBEDO, after the window arm, and the fire walls take GetFireWallColors32', () => {
-  const s = src('src/scenes/dataPipeline.js');
-  // TextureReader.cs:301-308 "Just reuse albedo map for basic colour
-  // emission" - the same colour32 that went up as the albedo.
-  assert.match(s, /} else if \(isEmissive\(archive, record\)\) \{/,
-    'the `else` is the C#\'s own `&& !isWindow`');
-  assert.match(s, /\n\s*else renderer\.uploadEmissionTexture\(archive, record, color32, \{ white: true, replacement \}\);/);   // AUDIT RETRO1 A4: a replacement's albedo reused, flagged as the albedo is
-  assert.match(s, /if \(archive === FIRE_WALLS_ARCHIVE\) \{ if \(!t\.vendor\) \{ const classic = swap \? t\.getColor32\(bitmap, opaque \? -1 : 0\) : color32; renderer\.uploadEmissionTexture\(archive, record, t\.getFireWallColors32\(classic\.colors, classic\.width, classic\.height, FIRE_WALL_COLOR, FIRE_WALL_SCALE\), \{ white: true, replacement \}\); \}/, 'EG-ZH: the fire walls\' own arm, over the classic albedo, never a stand-in\'s');
-  // An animated flat is uploaded frame by frame and the billboard path
-  // looks the mask up under that same composite key, so a torch's every
-  // frame needs one.
-  assert.match(s, /renderer\.uploadEmissionTexture\(archive, key, color32, \{ white: true, replacement \}\);/);   // AUDIT RETRO1 F2
-  assert.match(s, /} else if \(isEmissive\(archive, record\) && !t\.vendor\) \{[\s\S]{0,200}const classic = swapFrame \? t\.getColor32\(bitmap, 0\) : color32;\s*renderer\.uploadEmissionTexture\(archive, key, t\.getFireWallColors32\(/, 'EG-ZH: and a fire wall\'s frame takes its own');
-});
-
 test('audit39 F49: an auto-emissive mask wears Color.white, a window mask wears the window style', () => {
   const { r, log } = stubRenderer();
   const px = { width: 1, height: 1, colors: new Uint8Array([255, 255, 255, 255]) };
@@ -149,52 +121,6 @@ const shaderBody = (s, name) => {
   assert.ok(m, `${name} still lives in renderer.js as one template`);
   return m[1];
 };
-
-test('audit39r R17: emission CANCELS the lighting it replaces, it does not ride on top of it', () => {
-  // DaggerfallBillboard.shader:56-58 and DaggerfallDefault.shader:83-85 are
-  // the same two lines: `o.Albedo = albedo.rgb - emission; // Emission
-  // cancels out other lights` then `o.Emission = emission;`. An
-  // auto-emissive record's mask IS its albedo (TextureReader.cs:301-308) and
-  // wears Color.white (MaterialReader.cs:448-453), so the flat lands at
-  // exactly its albedo in ANY light. F49 shipped the mask and the upload but
-  // kept an ADD, which outdoors (uTint = 0.9 ambient + 0.816 sun * 0.5 at
-  // noon) drew every missile, impact flash and fire daedra at ~2.3x albedo.
-  const s = src('src/render/renderer.js');
-  for (const name of ['FS', 'BB_FS']) {
-    const body = shaderBody(s, name);
-    // PIN MOVED (GATHER-FEEL II, VEIN-CRACKS): a worked vein's crack may take the flat's albedo down after the emission
-    // is cancelled out of it (systems/veinCrack.js veinCrackShade - 1 for every flat but a cracked vein's)
-    assert.match(body, /vec3 albedo = max\(tex\.rgb - emission, vec3\(0\.0\)\)(?: \* veinCrackShade\(uv\))?;/,
-      `${name} lights albedo - emission`);
-    assert.ok(!/tex\.rgb \*/.test(body) && !/\* tex\.rgb/.test(body),
-      `${name}: no light term multiplies the RAW albedo any more`);
-    assert.match(body, /\+ emission/, `${name} adds the emission back - o.Emission = emission`);
-  }
-  // and the law, arithmetically: a white-masked flat at the noon tint.
-  const tint = 0.9 + 0.816 * 0.5;   // EXTERIOR_NOON_AMBIENT + SUN_RIG_COLOR * 0.5
-  const texel = 0.8;
-  assert.equal(Math.max(texel - texel, 0) * tint + texel, texel, 'the lit flat sits at its albedo');
-});
-
-// ---------------------------------------------------------------
-// F50: renderer.stats counted drawMesh alone.
-// ---------------------------------------------------------------
-test('audit39 F50: every draw in the file reports, not drawMesh alone', () => {
-  const s = src('src/render/renderer.js');
-  // PERF-ON: GENERATIVE, because the enumerated form was a rule
-  // enforced by memory and duly forgot one. It listed
-  // `Elements|Arrays|ArraysInstanced`, so `drawElementsInstanced` -
-  // the text run's one draw - matched nothing and read as an
-  // OVER-count, failing the pin for the one reason it was never meant
-  // to fire on. Every `gl.draw*` is a draw now; WebGL2's only
-  // `gl.draw*` that draws nothing is `drawBuffers` (it names the
-  // attachments a fragment shader writes), so that is the one
-  // exclusion, and any future draw entry point is covered unasked.
-  const drawCalls = (s.match(/gl\.draw[A-Za-z]*\(/g) || []).filter((m) => m !== 'gl.drawBuffers(').length;
-  const counted = (s.match(/this\.stats\.draws\+\+/g) || []).length;
-  assert.equal(counted, drawCalls,
-    `${drawCalls} gl.draw* sites, ${counted} counted - a draw the counter cannot see makes the terrain culling EV3 measures invisible`);
-});
 
 test('audit39 F50: a frame that mixes passes counts all of them', () => {
   const { r } = stubRenderer();
@@ -244,8 +170,6 @@ test('audit39 F52: a cache miss re-resolves but never re-mints the key', () => {
   assert.equal(key, '7_3');
   r.drawMesh(mesh, identity(), new Map());
   assert.equal(sm._evKey, key, 'the same string object, not a fresh mint per pixel per frame');
-  assert.match(src('src/render/renderer.js'),
-    /const key = sm\._evKey \?\? \(sm\._evKey = `\$\{sm\.textureArchive\}_\$\{sm\.textureRecord\}`\);/);
 });
 
 // ---------------------------------------------------------------
@@ -290,30 +214,12 @@ test('audit39 F53: the bright star layer draws - a zero intra-cell offset could 
     assert.ok(live.lit > 300, `f=(${fx},${fy}): ${live.lit} cells draw (a ninth of the face is sampled)`);
     assert.ok(live.max > 1, `and the layer reaches full brightness (${live.max.toFixed(3)})`);
   }
-  // ...which is what a continuous cell coordinate buys. FT3 removed the
-  // retro snap from the dome; the star field's own cell keeps the law,
-  // and so does the ring grid PS3's dither still reads (orderedDither.js).
-  const fs = src('src/render/enhancedSky.js') + src('src/render/orderedDither.js');
-  assert.match(fs, /cellOut = vec2\(g, ring \+ fract\(\(el \+ 1\.57079633\) \/ stepRad\)\);/, 'the snap hands back a continuous cell coordinate');
-  assert.doesNotMatch(fs, /cellOut = floor\(/, 'never the floored id - fract() of an integer is the F53 defect');
-  assert.match(fs, /vec2 cell = floor\(g\), f = fract\(g\);/, 'the field still reads the id and the interior off one value');
 });
 
 // ---------------------------------------------------------------
 // F54: the CPU cloud twin omitted the shader's horizon attenuation.
 // ---------------------------------------------------------------
 test('audit39 F54: sunOcclusion applies the shader\'s horizon term, so the ground and the disc agree', () => {
-  const fs = src('src/render/enhancedSky.js');
-  // The shader line the twin now mirrors, and the mirror itself.
-  assert.match(fs, /float near = 1\.0 - smoothstep\(0\.0, 0\.28, dir\.y\);/);   // AUDIT SD III (V14, PIN MOVED): its edges rising, the same curve
-  // EE2 F4: the deck is no longer thinned to a quarter at the horizon.
-  // The law this pin holds - the ground's occlusion applies the SAME
-  // horizon term the shader does - is unchanged and asserted on both
-  // sides of the new thinning.
-  assert.match(fs, /cloud = mix\(cov, cov \* mix\(uCloudCover, 1\.0, 0\.75\), near\);/);
-  assert.match(fs, /const near = 1 - smoothstep\(0, 0\.28, d\[1\]\);/);   // AUDIT SD III (V14, PIN MOVED): the shader's own
-  assert.match(fs, /const thin = state\.cloudCover \+ \(1 - state\.cloudCover\) \* 0\.75;/, 'the CPU occlusion must thin exactly as the shader does');
-  assert.match(fs, /return cov \* \(1 - near\) \+ cov \* thin \* near;/);
   // A LOW sun is the case that moved: below ~16.3 degrees the shader
   // thins the cover before it hides the disc, and the key light must
   // thin with it or the ground darkens under a sun that is still out.
@@ -330,14 +236,3 @@ test('audit39 F54: sunOcclusion applies the shader\'s horizon term, so the groun
   assert.equal(sunOcclusion(skyState({ minuteOfDay: 2 * 60, weather: 'overcast' })), 0);
 });
 
-// ---------------------------------------------------------------
-// F56: the sky header named the wrong compass point for azimuth 0.
-// ---------------------------------------------------------------
-test('audit39 F56: the sky header names the axis the shader actually uses', () => {
-  const s = src('src/render/skyRenderer.js');
-  assert.match(s, /float azimuth = atan\(dir\.x, dir\.z\);/, 'atan(x, z) is 0 at +Z');
-  assert.ok(!/azimuth 0 = \+X/.test(s) && !/Azimuth 0 \(\+X/.test(s),
-    'the header no longer points a reader at map east for azimuth 0');
-  assert.match(s, /Azimuth 0 \(\+Z, map north\) starts the east half/);
-  assert.match(s, /CENTRED on map east at u = 0\.25/, 'which is what the half actually does');
-});

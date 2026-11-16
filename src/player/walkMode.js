@@ -1,4 +1,4 @@
-// PADWALK (Mac: "make ... walk mode bindable on controller"): WALK MODE, ONE BUTTON ON AND OFF.
+// PADWALK: WALK MODE, ONE BUTTON ON AND OFF.
 //
 // DFU's slow, quiet walk is Sneak, held (LeftAlt). Walk mode is the same walk LATCHED: the WalkMode action's key or
 // pad button turns it on, the same press turns it off. The hosts read `walkModeOn()` beside their held Sneak, so the

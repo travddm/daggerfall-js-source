@@ -1,9 +1,8 @@
 // FIELD BUGS 2026-10-26 ANY-GOODS (#bug-reports, "Crafting writs not accepting": "I brewed the 7 heal true potions
-// myself and its showing like I haven't made any"; the owner: "Crafting writs should work with even store bought
-// ingredients. I hate this"; bible/01-Overview/bugs/Field-Bugs-2026-10-26.md) - a crafting writ is filled by what the
+// myself and its showing like I haven't made any";) - a crafting writ is filled by what the
 // character MADE, whatever it was made of: a brew that spent loose units (looted, or bought with gold at a shop - a
 // station's put-in from the pack, AUDIT BAG-CRAFT A1) counts as any other (craftWrits.js brewedLeftSql no longer asks
-// migration 0145's `witnessed`), and a dish or kit made of them fills one (pieceOkSql: a piece walled by its goods,
+// `witnessed`), and a dish or kit made of them fills one (pieceOkSql: a piece walled by its goods,
 // `products.loose` 1). A piece BOUGHT back with gold on the market (`bought_with` 'gold', `loose` 0) still fills none.
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
 import { test } from 'node:test';

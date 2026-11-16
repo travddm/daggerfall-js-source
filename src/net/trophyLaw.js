@@ -1,5 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; bible/06-Systems/Bounty-Boards.md 12.5, bible/06-Systems/Professions-Arc.md section 58): A
+// HUNTERS-MARK: A
 // MOUNTED TROPHY - the item a named mark's payday and a Trophy Hunter's clean pelt give, hung in a home as a mount. A
 // leaf both ends read: the item law knows the template headless (systems/item/itemLaw.js through profTemplates.js), and
 // the decor law hangs it (net/decorLaw.js decorIsTrophy). Its picture is drawn at runtime from the player's own data

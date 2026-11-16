@@ -19,7 +19,7 @@ import { RACES } from '../systems/races.js';
 import { FACTION_TYPES } from '../formats/factionFile.js';
 import { getLocalizedFactionName } from '../systems/textManager.js';   // L10N3e: a named NPC's faction name, shown in the player's language
 
-// RR2: `flatsDict[flatId] = new FlatsFile.FlatData { faceIndex }`
+// `flatsDict[flatId] = new FlatsFile.FlatData { faceIndex }`
 // (RoleplayRealism.cs:1017-1023) - a mod rewrites FLATS.CFG's face for a
 // flat it re-drew, keyed by the flat the person was born as, the last
 // writer winning. The pipeline's flatFaceIndex asks here first.
@@ -36,7 +36,7 @@ export const NPC_CONTEXT = Object.freeze({ Custom: 0, Dungeon: 1, Building: 2 })
  *  enum's zero (Genders.Male, Context.Custom, BankTypes.Breton, and
  *  `(Races)0`, which is not even a member).
  *
- *  AUDIT 24 (the seven-slice sweep): the port used `null`, and three
+ *  The port used `null`, and three
  *  reads dereferenced it without a guard - topicTree's
  *  GetPersonBuildingKey and its quest-topic rebuild, and sceneMount's
  *  questor billboard pick. Every one of them is reachable: the OTHER
@@ -77,7 +77,7 @@ export function staticNpcData(pn, {
 } = {}) {
   const factionID = pn.factionID ?? 0;
   return {
-    // AUDIT 24 (the seven-slice sweep): over the ZERO STRUCT, because
+    // Over the ZERO STRUCT, because
     // that is what C# starts from - the layout overload writes nine of
     // the thirteen fields and leaves the rest at their struct zeros.
     ...ZERO_NPC_DATA,
@@ -89,12 +89,12 @@ export function staticNpcData(pn, {
     // C# precedence kept: position ^ (buildingKey + locationIndex)
     nameSeed: (((pn.position ?? 0) ^ (buildingKey + locationIndex)) | 0),
     gender: ((pn.flags ?? 0) & 32) === 32 ? GENDERS.Female : GENDERS.Male,
-    // SetLayoutData's own line (:220). AUDIT 24: the port left `race`
+    // SetLayoutData's own line (:220). The port left `race`
     // off entirely, so QuestMCP.Oath's clicked-NPC arm - the one the
     // main quests lean on before a questor is set - read undefined and
     // fell through to the region every time.
     race: raceFromFaction(factionID, getFaction, raceOfCurrentRegion ?? (() => 0)),
-    // AUDIT 24: the port left every mint at the struct's 0 (Custom),
+    // The port left every mint at the struct's 0 (Custom),
     // and topicTree's castle-questor test - the only reader - compared
     // it against the STRING 'dungeon', so both halves were dead.
     context,
@@ -166,7 +166,7 @@ export function layoutNpcData({
  */
 export function raceFromFaction(factionId, getFaction, raceOfCurrentRegion) {
   if (factionId !== 0) {
-    // AUDIT 24 (the seven-slice sweep): C# IGNORES GetFactionData's
+    // C# IGNORES GetFactionData's
     // bool (:362) and reads the `out` struct regardless - and a MISS
     // leaves that struct at its default, whose `race` field is 0,
     // which GetRaceFromFactionRace maps to FactionRaces.Nord. So an
@@ -241,7 +241,7 @@ export function raceFromFactionRace(factionRace) {
  *  @param {object} [deps]
  *  @param {function(number):object|null} [deps.getFaction]
  *  @param {number} [deps.nameBank]  BankTypes - the CURRENT REGION's
- *    (MapsFile.GetNameBankOfRegion). AUDIT 26 F016: this defaulted
+ *    (MapsFile.GetNameBankOfRegion). This defaulted
  *    from the NPC's race, which DFU never does anywhere -
  *    SetRuntimeData stores `GetNameBankOfCurrentRegion()` (:309) and
  *    GetDisplayName reads that bank (:325-326). The fallback here is
@@ -253,14 +253,14 @@ export function staticNpcName(data, { getFaction = null, nameBank = null } = {})
   // GetDisplayName (:319) tests `factionData.type == (int)FactionTypes.Individual`.
   if (fd && fd.type === FACTION_TYPES.Individual) return fd.name;
   srand(data.nameSeed);
-  const bank = nameBank ?? BANK_TYPES.Breton;   // F016: GetNameBankOfCurrentRegion's own fallback
-  // AUDIT 24 (wave 24): `data.gender` is the Genders enum, which is
+  const bank = nameBank ?? BANK_TYPES.Breton;   // GetNameBankOfCurrentRegion's own fallback
+  // `data.gender` is the Genders enum, which is
   // what FullName takes - C# passes `npcData.gender` straight through
   // (:328). The string compare here was propping up the stale
   // staticNpcData above, which wrote 'female'/'male'; that one is gone
   // and this is the C# line.
   const drawn = fullName(bank, data.gender);
-  // QUEST-NAME-ONE (a departure): a quest Person's stand answers to the
+  // A quest Person's stand answers to the
   // Person's own name (systems/quest/person.js personOwnName, carried as
   // `personName` by the stand's one builder) - the name its quest's
   // words, journal and guide say. DFU re-draws it here, and the two meet
@@ -289,7 +289,7 @@ export function staticNpcShownName(data, deps = {}) {
 
 /** TextureReader.IsChildNPCTexture (:1076-1137), verbatim - the eight
  *  archives that hold child sprites and the exact records checked in
- *  each. AUDIT 26 F020: neither this table nor the 514 faction lived
+ *  each. Neither this table nor the 514 faction lived
  *  in the port, so `isChildNPC` was read in four places and written
  *  nowhere. */
 const CHILD_NPC_TEXTURES = Object.freeze({
@@ -314,7 +314,7 @@ export function isChildNPCData(data) {
     || data.factionID === CHILDREN_FACTION_ID;
 }
 
-// AUDIT 26 F016: `bankForRace` and its raceKeyOf helper lived here to
+// `bankForRace` and its raceKeyOf helper lived here to
 // serve the race default above. DFU has no such path - no line in
 // StaticNPC, TalkManager or anywhere else derives a name bank from a
 // race - so both are gone with the default that invented them.

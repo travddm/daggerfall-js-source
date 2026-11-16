@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPMATES (2026-09-29, Mac: "Ally crew member's should have green health bars above their head, and not be able to
-// engage in friendly fire") - WHO THE PLAYER'S OWN HARM PASSES BY, one law for every door it goes through: the swing
+// SHIPMATES - WHO THE PLAYER'S OWN HARM PASSES BY, one law for every door it goes through: the swing
 // (scenes/exteriorFoes.js resolvePlayerHit - the one pool a shipmate stands in: its candidates are never him), the shaft
 // and the gun (combat/arrowFlight.js), the spell (scenes/hostMagic.js), the torch, the charge and the trample
 // (scenes/world.js). The swing asks `isShipmate` alone: a town's defender keeps MeleeAttackFriendlyProtection's law in

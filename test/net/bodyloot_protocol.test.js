@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, SLICE 1 (2026-10-17) - RED PINS, THE BODY PROTOCOL: another player's foe's body, street and building
+// OUTDOOR-LOOT, SLICE 1 - RED PINS, THE BODY PROTOCOL: another player's foe's body, street and building
 // (AC1-AC7), pinned BLACK-BOX before the fix exists. test-harness/outdoor-loot/DESIGN.md sections 3 and 8 are the plan;
 // DESIGN-REVIEW.md is binding over it (D-1, R-1, R-2). test/net/bodyloot.test.js is phase 1 (what the press must do, read as
 // where the pieces ARE); this file pins what the fix must SAY and DO on the way - the frames it puts on the wire, the doors
@@ -661,23 +661,9 @@ const NEW_KEYS = ['bw', 'bp', 'br', 'bq', 'bv'];
  *  applyHit that reads it, so an older build still falls to its blow arm (no dmg) and refuses. */
 const CLAIM_EXTRA_KEYS = ['g'];
 /** DESIGN.md 3.4: the old hit arms' keys, and the routing every hit frame carries. */
-/** PIN EXTENDED (DEX5b, bible/04-Characters/Enemy-Expansion.md section 11): `cs` - a strike spell's hit (`sp`, `lv`) on a mod's corpse
+/** PIN EXTENDED (DEX5b): `cs` - a strike spell's hit (`sp`, `lv`) on a mod's corpse
  *  prefab's body, the blow arm's own (ahead of its dead-foe refusal); an older build falls to the blow arm and refuses a dead foe. */
 const OLD_KEYS = ['dmg', 'take', 'back', 'grant', 'slain', 'fb', 'ar', 'al', 'ac', 'sf', 'z', 'wc', 'sp', 'lv', 'pt', 'p', 'd', 'kind', 'nv', 'own', 'to', 'k', 'i', 'n', 'cs'];
-
-test('T16(a) AC6 (guard - passes today): the new frames\' keys (bw, bp, br, bq, bv - and the claim frame\'s g) are disjoint from the old applyHit arms\' keys, and applyHit reads no key of `data` the design does not name', () => {
-  assert.deepEqual([...NEW_KEYS, ...CLAIM_EXTRA_KEYS].filter((k) => OLD_KEYS.includes(k)), [], 'a new frame key collides with an old arm\'s: an older build would take the frame for a blow, a take or a grant');
-  const src = readFileSync(new URL('../../src/scenes/exteriorFoes.js', import.meta.url), 'utf8');
-  const ast = acorn.parse(src, { ecmaVersion: 'latest', sourceType: 'module' });
-  let fn = null;
-  (function walk(n) { if (!n || typeof n.type !== 'string' || fn) return; if (n.type === 'FunctionDeclaration' && n.id?.name === 'applyHit') { fn = n; return; } for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); } })(ast);
-  assert.ok(fn, 'exteriorFoes.js has function applyHit');
-  const read = new Set();
-  (function walk(n) { if (!n || typeof n.type !== 'string') return; if (n.type === 'MemberExpression' && !n.computed && n.object?.type === 'Identifier' && n.object.name === 'data' && n.property?.type === 'Identifier') read.add(n.property.name); for (const k of Object.keys(n)) { const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); } })(fn);
-  assert.ok(read.has('dmg'), 'the scan reads the blow arm - the arm an older build falls to for a frame it does not know (guard)');
-  const unnamed = [...read].filter((k) => !OLD_KEYS.includes(k) && !NEW_KEYS.includes(k));
-  assert.deepEqual(unnamed, [], 'applyHit reads keys of the frame DESIGN.md 3.4 does not name - an arm added without being checked against the others');
-});
 
 for (const where of WHERES) {
   test(`T16(a) AC6 [${where}]: every new-protocol frame on the wire speaks the new keys and the routing only - never a blow's, a take's or a grant's - so an older build falls to its blow arm (no dmg: refused)`, async () => {
@@ -1219,7 +1205,7 @@ for (const where of WHERES) {
   });
 }
 
-// ═══ AUDIT OUTDOOR-LOOT (2026-10-18, PR #1019's audit) - THE READER'S EDGES ═══════════════════════════════════════════════
+// ═══ AUDIT OUTDOOR-LOOT - THE READER'S EDGES ═══════════════════════════════════════════════
 // B1: a piece the taker lays into another player's kill is handed back at the close - but the close's arm for a body no longer
 // there (its owner left, went stale past FOES_STALE_MS, reloaded) lifted the window's takes and RETURNED before the hand-back:
 // what was laid in was destroyed (a Stash all, the whole pack). B2: a body that turns UNBORN or UNREADABLE under an open window

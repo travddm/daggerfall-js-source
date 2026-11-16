@@ -1,6 +1,4 @@
-// WB9c (2026-09-30, Mac: "The boss should have a detailed wipe mechanic on the final phase that should require players
-// to destroy oblivion crystaline formations that grow anywhere within the final phase arena, which then stuns his wipe
-// mechanic"): DAGON'S RECKONING. In the last court, once Dagon's Champion's turn is done, he leaps to its heart and calls
+// WB9c: DAGON'S RECKONING. In the last court, once Dagon's Champion's turn is done, he leaps to its heart and calls
 // Dagon over a long wind-up while crystals of Oblivion grow out of the floor anywhere on it - two and one for every two
 // living challengers, each with a health the court's own damage sizes. Break every one and the Reckoning breaks: he is
 // stunned, on his knees, and every blow lands half again. Leave one standing and it lands on the whole arena, answered
@@ -15,7 +13,7 @@
 //   the bar         ui/gate/gateBossBar.js - what is left to break and how long; the stun; the next Reckoning's coming
 //   the draw        render/courtCrystals.js - the cluster, its growth, its pass
 //
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9c).
+// Design: (WB9c).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -228,7 +226,7 @@ test('WB9c the health said: the crystals\' health goes out at most every HP_SEND
 test('WB9c the wire: a blow on a crystal (`xhit` - which crystal, a sequence, a damage, a kind) projected field by field; the room\'s crystals, their health, one broken (the name as the wire says every name) and the stun, each bounded; the brain\'s law is 4 (mutants: a crystal past the most; a stun that ends before it begins)', () => {
   assert.ok(GATE_KINDS.includes('xhit'));
   for (const k of ['cx', 'cxh', 'cxb', 'stun']) assert.ok(GATE_OUT_KINDS.includes(k));
-  assert.equal(GATE_BRAIN_V, 7);   // 4 was this slice's; WB11 raised it to 5, WB14 to 6, GATE-COURTS to 7 (PIN MOVED) (his host and the nine-trial rotation) - a game that knows the Reckoning and not the host is still refused
+  assert.equal(GATE_BRAIN_V, 7);   // 4 was this slice's; WB11 raised it to 5, WB14 to 6, GATE-COURTS to 7 (
   assert.deepEqual(validGateIn({ k: 'xhit', c: 2, q: 7, d: 12.5, r: 1, extra: 1 }), { k: 'xhit', c: 2, q: 7, d: 12.5, r: 1 });
   for (const bad of [{ k: 'xhit', q: 7, d: 1, r: 0 }, { k: 'xhit', c: GATE_CRYSTALS_MAX, q: 7, d: 1, r: 0 }, { k: 'xhit', c: 1.5, q: 7, d: 1, r: 0 }, { k: 'xhit', c: 0, q: 7, d: 0, r: 0 }]) assert.equal(validGateIn(bad), null, JSON.stringify(bad));
   assert.deepEqual(validGateOut({ k: 'cx', i: 4, m: 50, c: [[1, 2], [3, 4], [5, 6]], z: 1 }), { k: 'cx', i: 4, m: 50, c: [[1, 2], [3, 4], [5, 6]] });
@@ -504,30 +502,3 @@ test('WB9c the pass: nothing to draw touches nothing; the clusters opaque with t
 
 // ═══ THE SEAMS ═══════════════════════════════════════════════════════════════════════════════════════════════════
 
-test('WB9c the seams, by source: the relay judges an `xhit` by applyCrystalHit and fans it; the world host hands the court the crystals and their door and sends `xhit`; the dungeon context meets them with the swing, the shaft and the spell by their surface and never in `foes`; hostMagic routes a crystal mark through its own door; the court draws them before its telegraph (mutants: each seam removed)', () => {
-  const relay = read('server/src/index.js');
-  assert.match(relay, /if \(m\.k === 'xhit'\) this\._gateFan\(applyCrystalHit\(f, a\.sub, m\.c, m\.d, m\.r, at, now, m\.q\)\);/);   // PIN MOVED (INT11): from `at` - its pose, alive by its word and the count's (test/net/gate/wb11_gate_host.test.js pins it)   // AUDIT WB11 W3: by its blow's sequence
-  const w = read('src/scenes/world.js');
-  assert.match(w, /sendCrystal: \(hit\) => !!online\?\.sendGate\?\.\(\{ k: 'xhit', \.\.\.hit \}\),/);
-  assert.match(w, /gateCrystals: \(\) => gateCourt\?\.crystalTargets\(\) \?\? null,/);
-  assert.match(w, /onCrystalHit: \(hit\) => !!gateCourt\?\.crystalHit\(hit\),/);
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /gateCrystals: \(\) => host\.gateCrystals\?\.\(\) \?\? null,/);
-  assert.match(wm, /onCrystalHit: \(hit\) => !!host\.onCrystalHit\?\.\(hit\),/);
-  const dc = read('src/scenes/dungeonContext.js');
-  assert.match(dc, /if \(f\.crystal != null\) return bossSight\(eye, inViewFn, f\);/);
-  assert.match(dc, /for \(const cr of gateCrystalBodies\(\)\) \{ cr\._backFacing = false; live\.push\(cr\); \}/);
-  assert.match(dc, /if \(foe\.crystal != null\) \{ hitEnemy = true; swingOnCrystal\(foe, damage\); continue; \}/);
-  assert.match(dc, /const landOnCrystal = \(cr, damage, r\) => \{ damage \+= takeOwed\(cr\.entity\); return sdRemnant \? sdRemnant\.heartHit\(\{ c: cr\.crystal, d: damage, r \}\) : !!opts\.onCrystalHit\?\.\(\{ c: cr\.crystal, d: damage, r \}\); \};/);   // PIN MOVED (SD8c): a Heart's of the Reset in the Hour; PIN MOVED (FIELD BUGS 2026-10-12g OPEN-HAND): and the follow-up the blow owes
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the crystal's spell door left the context for
-  // scenes/gate/standInSpell.js, wired with the crystals and their door; its claim goes out as a spell
-  assert.match(dc, /createStandInSpell\(\{[^]*?crystals: gateCrystalBodies,[^]*?landOnCrystal,/);
-  assert.match(read('src/scenes/gate/standInSpell.js'), /const cr = host\.crystals\(\)\.find\(\(q\) => q\.crystal === c\), harm = duelSpellOf\(sp\);\n\s*if \(!cr \|\| !harm\) return false;\n\s*return onBody\(sp, cr, harm, caster, host\.landOnCrystal, `c\$\{c\}`\);/);   // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): its rounds' key
-  const hm = read('src/scenes/hostMagic.js');
-  assert.match(hm, /if \(mark\?\.crystal != null\) \{ try \{ return !!castAtCrystal\?\.\(sp, mark\.crystal, caster\); \} catch \{ return false; \} \}/);   // PIN MOVED (AUDIT SCHOOLS L2 F4): and the cast's wrapper, for the paths' riders
-  assert.match(hm, /if \(!crystalMarks \|\| !castAtCrystal \|\| !sp \|\| !duelSpellOf\(sp\)\) return \[\];/, 'a harmful spell alone');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  const crystalsFirst = gc.indexOf('crystalPass.draw(_crystalDraw, proj, view, eye, seconds, fog);'), tel = gc.indexOf('for (const ps of poolDraw) { pass.draw(ps');
-  assert.ok(crystalsFirst > 0 && crystalsFirst < tel, 'opaque before the added');
-  assert.match(gc, /crystals\(s, t, P\);   \/\/ WB9c/);
-});

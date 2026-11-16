@@ -30,6 +30,8 @@ import { mapPixelWorldOrigin } from '../../../src/systems/travel/travelPaths.js'
 import { rectOf } from '../../../src/systems/travel/travelAutopilot.js';
 import { TravelControlUI } from '../../../src/ui/travel/travelControlUI.js';
 import { planRoute, routeLegs, routeGround, joinPoint, routeDrawPoints, roadShare, crossesWater, dryLine, TV_MOUNTAIN_CLIMATE } from '../../../src/systems/travel/travelRoute.js';
+import { planJourney } from '../../../src/systems/travel/planSlices.js';   // PLAN-SLICES
+import { tvMooredDry, tvSeaAsk } from '../../../src/systems/travel/seaAsk.js';   // PLAN-SLICES: out of the host
 import { WATER_BYTE } from '../../../src/world/roadsProducer.js';
 import { DIR_DELTA } from '../../../src/world/road/roadNetwork.js';
 import { worldCoordToMapPixel } from '../../../src/formats/mapsFile.js';
@@ -52,7 +54,7 @@ test('TO-ROADS THE SWITCH: the port\'s own key beside First-Person Travel - OFF 
   assert.ok(def, 'declared on Travel Options\' pane');
   assert.equal(def.default, false, 'OFF - First-Person Travel keeps "the original travel option" (Mac, OW-TOGGLE)');
   assert.equal(typeof def.default, 'boolean', 'a toggle');
-  // PLAIN-TEXT (2026-10-19): the words a player reads, exactly - what it does on and off, and that it takes effect at once
+  // PLAIN-TEXT: the words a player reads, exactly - what it does on and off, and that it takes effect at once
   // (read live, as First-Person Travel is - AUDIT OW5 T1; the tile's "when the world next loads" is the mod's other keys');
   // the note that the switch is the port's own is gone from the pane
   assert.equal(def.description, 'With First Person Travel on, journeys follow the roads and tracks as Overworld journeys do, and a place with no way there by land can\u2019t be picked. Off, you head straight for your destination. Takes effect at once.');
@@ -102,13 +104,13 @@ const ON_TRAVEL = grab(/buildTravelMapWindow\(\{ \.\.\.travelTown\(\), onTravel:
 const ON_COORDS = grab(/\n\s*onTravelToCoords: (\(pick, opts\) => \{ [^\n]*? \}),/, 'the map\'s onTravelToCoords');
 const HOST = [
   lineSource('const TV_SEA_EPS_M = '), lineSource('const tvQuiet = '), lineSource('const tvTrip = '), lineSource('const tvWater = '),
-  lineSource('let _tvRouteGround = null;'), lineSource('let _tvRocksFrom = null, _tvRocksRoads = null, _tvRocks = null;'), lineSource('let _tvRocksMask = null;'), fnSource('tvWodRocks'),
-  lineSource('const tvWildFree = '), lineSource('let _tvGroundWild = false;'), constBlock('tvRouteGround'), lineSource('const tvLegMid = '), lineSource('const tvSeaAsk = '),   // WILD1: the ground's open zone (none here: wildMapMask null) - its block, re-read as the zone comes or goes
+  lineSource('let _tvRouteGround = null;'), lineSource('let _tvRocksFrom = null, _tvRocksRoads = null, _tvRocks = null;'), fnSource('tvWodRocks'),
+  constBlock('tvRouteGround'), lineSource('const tvLegMid = '),
   lineSource('const _tvTownRects = new Map();'), fnSource('tvTownRects'), fnSource('tvRingAt'),   // OW-WOD-PATH, OW-TOWN-RING: the host's own (no World of Daggerfall list here; no location on the way)
   constBlock('travelViewAllowed'),
   fnSource('tvOwnsJourneys'), fnSource('tvRoutesJourneys'), fnSource('tvMapForcesRoads'), fnSource('travelViewResume'), fnSource('beginAcceleratedTravel'),
   fnSource('travelViewRouteTo'), fnSource('tvFreePull'), fnSource('tvJoinedLegs'), fnSource('travelViewWalkTo'), fnSource('tvJourneyUp'),
-  fnSource('tvMooredDry'), fnSource('tvSeaNoWay'), lineSource('const climbingNow = '), fnSource('travelViewCanGo'),   // AUDIT FB1007b C2: no journey from a wall
+  fnSource('tvSeaNoWay'), lineSource('const climbingNow = '), fnSource('travelViewCanGo'),   // AUDIT FB1007b C2: no journey from a wall
   `const onLower = ${ON_LOWER};`, `const onTravel = ${ON_TRAVEL};`, `const onTravelToCoords = ${ON_COORDS};`,
   'return { tvOwnsJourneys, tvRoutesJourneys, travelViewResume, beginAcceleratedTravel, tvJourneyUp, onLower, onTravel, onTravelToCoords, tvTrip };',
 ].join('\n');
@@ -185,7 +187,8 @@ function host({ firstPerson = false, roads = false, enhanced = true } = {}) {
     terrainGen: { roads: () => NET }, maps: { getClimateIndex: climateAt }, woods: { getHeightMapValue: heightAt }, WATER_BYTE, wod: null, _locationToBuild: () => null,
     planRoute, routeGround, routeLegs, joinPoint, routeDrawPoints, roadShare, crossesWater, dryLine, TV_MOUNTAIN_CLIMATE, travelTripLine,
     travelPathUsesRoads, TRAVEL_PATH_TEXT,   // OW-PATH (main's Roads / Free switch on the Overworld's bar): the route asks it
-    freePull,   // PIN MOVED (GRANT3, HOST-SPLIT): tvFreePull's pull is systems/travel/freePull.js
+    freePull,
+    planJourney, tvMooredDry, tvSeaAsk,
     tvSeaMeans: () => null, tvSeaBegin: () => {}, csaRuntime: null, csaOn: () => false, csaAboard: { aboard: false },
     tvOfferPassage: (place) => { h.offered.push(place.name); return false; },
     tvCautious: () => false, partyWalkBegin: (dest) => h.party.push(dest), travelGovernor: { reset() {} },
@@ -195,6 +198,7 @@ function host({ firstPerson = false, roads = false, enhanced = true } = {}) {
     TEST_GODMODE: false, staffPowers: () => ({ god: false }), teleportTo: refuse('teleportTo'),   // TESTBUILD: the shipped build's god mode is off
     wildMapMask: () => null, wildInside: () => false,   // WILD1: no open zone on this map
     wagonRiders: null,   // WAGONS2: seated in no one's wagon - the Overworld's own refusal of a rider stands unasked
+    rumareSeaPixel: () => false,
   };
   Object.assign(h, new Function(...Object.keys(env), HOST)(...Object.values(env)));
   Object.assign(h, { to, ui, view });
@@ -213,7 +217,7 @@ test('TO-ROADS REPRODUCED, then fixed (the host\'s own code over the real planne
   const off = host({ firstPerson: true });
   assert.deepEqual([off.tvOwnsJourneys(), off.tvRoutesJourneys()], [false, false]);
   off.onTravel(pick(510, 250), WALKED, { minutes: 90 });
-  assert.equal(off.to.route, null, 'no route: Travel Options\' own journey');
+  assert.deepEqual(off.to.route?.legs, [], 'no road legs: Travel Options\' own journey (a town on its way walked on its streets)');
   assert.equal(off.to.destinationName, 'Ripwych');
   assert.deepEqual(off.walk(), [{ x: 510, y: 250 }], 'REPRODUCED - the autopilot aimed at the place itself, the straightest shot, through the forest');
   assert.deepEqual([off.party, off.fast, off.said], [[], [], []], 'asked nobody (OW-TOGGLE\'s group travel), no teleport, nothing said');
@@ -276,7 +280,7 @@ test('TO-ROADS, the journey\'s life (the host\'s own code): a foe stops it as th
     setTimeScale(20);   // the journey's own ask, set by the mod's panel
     const g = mountGovernor({
       travelControlUI: { isShowing: true },   // RATE-LAW: no spinner, no limit - the journey's ask is travelAsked below
-      foePaced, foeRate, tvInTown: () => false, TOWN_PACE_MAX: 5,   /* OW-TOWN-WALK: out of town */ travellerOnRoad: () => false,
+      foePaced, foeRate, tvTownPace: () => null,   /* OW-TOWN-WALK: out of town */ travellerOnRoad: () => false,
       travelOptions: { state: { autopilot: {} } },
       travelWalkRate, TV_MOVE_ACTIONS,
       travelView: { active: false, state: 'off' },   // the view left down
@@ -343,7 +347,7 @@ test('TO-ROADS, both switches both ways (the host\'s own doors over the real set
   const cl = host({ firstPerson: true, roads: true, enhanced: false });
   assert.deepEqual([cl.tvOwnsJourneys(), cl.tvRoutesJourneys()], [false, false], 'the classic skin keeps Travel Options exactly');
   cl.onTravel(pick(510, 250), WALKED, { minutes: 90 });
-  assert.deepEqual([cl.to.route, cl.walk(), cl.said], [null, [{ x: 510, y: 250 }], []], 'the mod\'s own journey, at the place');
+  assert.deepEqual([cl.to.route?.legs, cl.walk(), cl.said], [[], [{ x: 510, y: 250 }], []], 'the mod\'s own journey, at the place');
   // read live: flipped mid-game, the next pick answers the new way (AUDIT OW5 T1's law for its switch)
   const h = host({ firstPerson: true });
   assert.equal(h.tvRoutesJourneys(), false);

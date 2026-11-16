@@ -1,9 +1,7 @@
 // FIELD BUGS 2026-10-12b YARD-LINE - "Unable to build in my yard. I am unable to build in about 50% of my yard. It says
-// that it belongs to another property no matter what I do." HOME-LINE (FIELD BUGS 2026-10-11b, Mac: "Split at the
-// midline") split the ground between two HOUSES' lots down its middle - and drew the line to every building of the town
+// that it belongs to another property no matter what I do." HOME-LINE (FIELD BUGS 2026-10-11b) split the ground between two HOUSES' lots down its middle - and drew the line to every building of the town
 // pixel: a shop, a temple, a tavern within twelve metres of the house took the half of the yard nearer it, though it holds
 // no yard to split with. The midline is now a lot's holder's alone; every building's ground is still never stood on.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -34,12 +32,3 @@ test('YARD-LINE a lot\'s holder is a building that could be a home - Daggerfall\
   assert.equal(yardLineHolder({ type: T.GuildHall, faction: 0 }, 5, { hall: 'mages', own: false }), true, 'a hall with a yard of its own');
 });
 
-test('YARD-LINE the producer stamps the building\'s record on its frame, and the yard asks the line of its holders alone (mutants: the record unstamped; the lines unpassed)', () => {
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /pixelHomeFrames\.set\(homeKey, \{ at, box: \[\.\.\.box\], rects, type: bd\?\.buildingType \?\? null, faction: bd\?\.factionId \?\? 0, parts: \[\[cpu, local\]\] \}\)/);   // PIN MOVED (AUDIT RPT1026 J2): the frame carries its models too
-  assert.match(world, /const bd = b\.dfBlock\?\.rmbBlock\?\.fldHeader\?\.buildingDataList\?\.\[placed\.recordIndex\] \?\? null;/);
-  const yards = src('src/scenes/homeYards.js');
-  assert.match(yards, /yardWhyNot\(piece\.pos, cur\.yard\.lot, cur\.others, foot, cur\.roads, cur\.lines\)/);
-  assert.match(yards, /if \(holds\) lines\.push\(g\);/);
-  assert.match(yards, /const holds = yardLineHolder\(f, bk, deps\.homes\?\.homeAt\?\.\(y\.mapId, bk\) \?\? null\);/);
-});

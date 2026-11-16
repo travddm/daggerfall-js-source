@@ -1,6 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11, Mac: "A new highly detailed shipmaster vendor and crew recruitment station within it. All
-// detailed functions including ship upgrading should be present here, along with ship buying, etc."; asked, Mac chose
+// SHIPYARDS (2026-10-11,; asked, Mac chose
 // "Shipyard only - the shipyard sells every hull (Rowboat to Carrack/galleon) and buys them back; Come Sail Away's
 // random shelf deeds/parts are retired"): THE SHIPMASTER'S TRADE - THE LAW.
 //
@@ -23,7 +22,8 @@
 // counter's one law (shopStock.js calculateCost, tradeModes.js getTradePrice - Mercantile and Personality, live). A ship
 // SOLD BACK fetches the counter's sale price on her WORTH: what she was bought for (a claimed prize her papers' quarter -
 // SHIP-CLAIM), half what her refits cost in gold (REFIT_RESALE), and her hull's state (a wreck SALE_FLOOR of it). Online a
-// sale is capped at half the least ask, as at every counter (calculateTradePrice), so no buy and sell back pays.
+// sale fetches at most what the yard asks that seller for her (shipSalePrice), and with the server profile's sale cap at
+// most half the least ask, as at every counter (calculateTradePrice), so no buy and sell back pays.
 //
 // WHAT IT TAKES BACK (`saleRefusal`): a ship of the player's that is HERE - made fast or lying at this port, laid up (her
 // title in the book), or packed (her parts in the pack) - with nothing in her hold, nobody of hers ashore at the
@@ -41,6 +41,7 @@ import { mintDeed, mintParts, BOAT_PARTS_TEMPLATE, BOAT_DEED_TEMPLATE } from './
 import { YARD_QUALITY, YARD_PRICE_INDEX } from './merchantYards.js';
 import { calculateCost } from './shopStock.js';
 import { getTradePrice } from './tradeModes.js';
+import { isOnlinePage } from './online/onlineLane.js';
 import { upgradeCost, UPGRADE_LINES, UPGRADE_TIERS } from './fleet.js';
 import { hullBuild, batteriesOf } from './naval/navalShips.js';
 import { playerCrewCount } from './naval/crewLife.js';
@@ -113,23 +114,24 @@ export function shipBuyPrice(value, skills) {
   const pieces = 1;   // a ship is one piece (FB0929's floor: a gold a piece)
   return getTradePrice('Buy', calculateCost(Math.max(0, value), SHIPYARD_QUALITY, SHIPYARD_PRICE_INDEX), SHIPYARD_QUALITY, skills, pieces);
 }
-/** What the shipyard pays for a ship of `worth` (shipWorth's) - the counter's selling law (online, half the least ask
- *  at most). Pure. */
-export function shipSalePrice(worth, skills) {
+/** What the shipyard pays for a ship of `worth` (shipWorth's) - the counter's selling law. Online it is never more than
+ *  the yard asks the same seller for her: a ship's worth is her hull's value, not the gold paid, so the counter-paid
+ *  mark that holds every other piece to its price does not reach her, and DFU's haggle pays a skilled seller more
+ *  than it asks. Pure. */
+export function shipSalePrice(worth, skills, { online = isOnlinePage() } = {}) {
   const pieces = 1;
-  return Math.max(0, getTradePrice('Sell', calculateCost(Math.max(0, worth), SHIPYARD_QUALITY, SHIPYARD_PRICE_INDEX), SHIPYARD_QUALITY, skills, pieces));   // never a negative offer (AUDIT SHIPYARDS L1-2)
+  const sale = Math.max(0, getTradePrice('Sell', calculateCost(Math.max(0, worth), SHIPYARD_QUALITY, SHIPYARD_PRICE_INDEX), SHIPYARD_QUALITY, skills, pieces));   // never a negative offer (AUDIT SHIPYARDS L1-2)
+  return online ? Math.min(sale, shipBuyPrice(worth, skills)) : sale;
 }
 
 /**
  * WHY A SHIP CANNOT BE SOLD HERE, or null: `where` where she is (scenes/fleetHost.js whereIs - 'sailing', 'here',
  * 'laidup', 'away', 'packed'), `hold` the goods in her hold (her laid-up or packed cargo, or her own), `ashore` the hands of
- * hers at the player's side, `fighting` whether she is in a fight, `aboard` another player standing on her, `crossed`
- * whether she came into the realm through customs (systems/fleet.js fleetCrossed - kept, never sold). Pure.
- * @param {{ where: string, hold?: number, ashore?: number, fighting?: boolean, aboard?: number, atPort?: boolean, crossed?: boolean }} o
+ * hers at the player's side, `fighting` whether she is in a fight, `aboard` another player standing on her. Pure.
+ * @param {{ where: string, hold?: number, ashore?: number, fighting?: boolean, aboard?: number, atPort?: boolean }} o
  */
-export function saleRefusal({ where, hold = 0, ashore = 0, fighting = false, aboard = 0, atPort = true, crossed = false }) {
+export function saleRefusal({ where, hold = 0, ashore = 0, fighting = false, aboard = 0, atPort = true }) {
   if (!atPort) return SHIPYARD_TEXT.notPort;
-  if (crossed) return SHIPYARD_TEXT.crossed;
   if (where === 'sailing') return 'Step away from the helm first.';
   if (where === 'away') return 'Bring the ship to this port first. The shipmaster buys only what he can see.';
   if (where !== 'here' && where !== 'laidup' && where !== 'packed') return 'No such ship of yours here.';
@@ -147,7 +149,6 @@ export const SHIPYARD_TEXT = Object.freeze({
   bought: (name, port) => `${name} is yours, laid up at ${port || 'this port'}. Press Bring here to have it brought to the quay.`,
   boughtParts: (name) => `${name} are in your pack. Use them by the water to launch the ship.`,
   heavy: (name) => `${name} weigh more than you can carry. Lighten your pack first.`,
-  crossed: 'This ship came in through customs, so the shipmaster won\'t buy it. It stays yours.',
   sold: (name, gold) => `The shipmaster buys ${name} for ${Math.round(gold).toLocaleString('en-US')} gold.`,
   short: (gold) => `The shipmaster asks ${Math.round(gold).toLocaleString('en-US')} gold. You don't have enough.`,
   notPort: 'The shipmaster deals in ships at his own yard.',

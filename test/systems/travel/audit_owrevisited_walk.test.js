@@ -1,5 +1,4 @@
-// AUDIT OW-REVISITED (2026-10-20, the owner, of THE OVERWORLD REVISITED: "Audit this and ensure perfection";
-// bible/01-Overview/audits/Audit-Overworld-Revisited.md): THE WALKS - OW-ROAD-TRUE's lanes and OW-TOWN-WALK's streets, as
+// AUDIT OW-REVISITED: THE WALKS - OW-ROAD-TRUE's lanes and OW-TOWN-WALK's streets, as
 // the cold lanes found them (L1, the town walk; L2, the road; L6, the record's pins) and as they are now. Each test names
 // the findings it pins; each flies the real autopilot, the real Travel Options or the real town walk host.
 import { test } from 'node:test';
@@ -9,7 +8,7 @@ import { TravelAutopilot, pathPursuit, rectOf, LANE_CORNER_FORCE_MIN } from '../
 import { createTravelOptions, readTravelOptionsSettings, ringPassPoints } from '../../../src/systems/travel/travelOptions.js';
 import { createTravelSteer, steerDrive } from '../../../src/systems/travel/travelSteer.js';
 import { finalRoadVia, routeDrawPoints, joinPoint } from '../../../src/systems/travel/travelRoute.js';
-import { clearLine, simplifyWay, townWayCells, componentsOf, edgePieces, TOWN_WAY_MARGIN } from '../../../src/systems/travel/townWalk.js';
+import { clearLine, simplifyWay, townWayCells, componentsOf, edgePieces, TOWN_WAY_MARGIN, TOWN_PACE_MAX } from '../../../src/systems/travel/townWalk.js';
 import { createTownWalk, JOURNEY_GRIDS_MAX } from '../../../src/scenes/townWalkHost.js';
 import { TRAVEL_NAV_TEXT } from '../../../src/systems/travel/travelOptionsText.js';
 import { TravelControlUI } from '../../../src/ui/travel/travelControlUI.js';
@@ -30,11 +29,12 @@ function grid(w, h, wall = () => false) {
 }
 /** The real Travel Options over a stub world: `rect` the place's rect law, `town`/`way` the town walk's, `words` every
  *  word the mod says or boxes. */
-function rig({ rect = null, town = () => null, way = () => null, atSea = () => false } = {}) {
+function rig({ rect = null, town = () => null, way = () => null, atSea = () => false, avoidObstacles = true, steer = undefined } = {}) {
   const state = { pos: mid(500, 250), pixel: { x: 500, y: 250 } };
   const words = [], asked = [];
   const ui = new TravelControlUI({ defaultStartingAccel: 10, accelerationLimit: 60 });
-  const settings = readTravelOptionsSettings((vendor, key) => (vendor === 'roads-hazelnut' ? key === 'Enabled' : modSetting(vendor, key)));
+  const settings = readTravelOptionsSettings((vendor, key) => (vendor === 'roads-hazelnut' ? key === 'Enabled'
+    : key === 'GeneralOptions.AvoidObstacles' ? avoidObstacles : modSetting(vendor, key)));
   const to = createTravelOptions({
     settings, ui,
     roads: () => ({ roads: new Uint8Array(1000 * 500), tracks: new Uint8Array(1000 * 500), source: 'basic-roads' }),
@@ -45,7 +45,7 @@ function rig({ rect = null, town = () => null, way = () => null, atSea = () => f
     setTimeScale: () => {}, now: () => 0, worldTimeNow: () => 0, roll100: () => 100,
     locationWorldRect: rect ?? ((s) => { const o = mapPixelWorldOrigin(s.pixel.x, s.pixel.y); return rectOf(o.x + 16000, o.z + 16000, 768, 768); }),
     locationTileRect: () => null, pushWindow: (w) => { w.show(); },
-    townKey: (n) => town(n), townWay: (a, b) => { asked.push([a, b]); return way(a, b); }, atSea,
+    townKey: (n) => town(n), townWay: (a, b) => { asked.push([a, b]); return way(a, b); }, atSea, steer,
   });
   const go = (at, px, py) => { const p = px == null ? worldCoordToMapPixel(at.x, at.z) : { x: px, y: py }; state.pixel = p; state.pos = at; return to.update({ topWindowIsTravelUI: true, isPlayerOnHUD: false }); };
   return { to, state, words, asked, go };
@@ -225,18 +225,18 @@ function walledTown({ yard = false } = {}) {
 
 test('AUDIT OW-REVISITED L1-4: A TOWN\'S PACE IS ITS STREETS\' - a walled city\'s fields (inside its grid, outside its wall: where every route round it walks its ring) are not "in town", its streets and their doorsteps are; a town with no wall is all town; townKey still answers the fields (the way out through the gate is asked there) (mutants: the fields in town; the walls unread)', () => {
   const { tw, cellAt, nav } = walledTown();
-  assert.equal(tw.townPace(cellAt(32, 32)), '100,200', 'within the walls');
+  assert.equal(tw.townPace(cellAt(32, 32)), TOWN_PACE_MAX, 'within the walls: a town\'s pace (IC-PACE: the pace, where it was the key)');
   assert.equal(tw.townPace(cellAt(5, 5)), null, 'the fields: no town\'s pace');
   assert.equal(tw.townKey(cellAt(5, 5)), '100,200', 'but in the grid: its way is asked');
-  assert.equal(tw.townPace(cellAt(22, 32)), '100,200', 'in the wall, nearest the streets inside: a doorstep reads as its street');
+  assert.equal(tw.townPace(cellAt(22, 32)), TOWN_PACE_MAX, 'in the wall, nearest the streets inside: a doorstep reads as its street');
   const pieces = edgePieces(nav);
   assert.ok(pieces.edge.size >= 1 && pieces.all === 2, `two pieces, the fields' at the edge (${pieces.edge.size} of ${pieces.all})`);
   const open = createTownWalk({ built: new Map([['100,200', { population: { nav: new CityNavigation(1, 1) }, locOrigin: walledTown().built.get('100,200').locOrigin }]]), state: walledTown().state });
-  assert.equal(open.townPace(cellAt(5, 5)), '100,200', 'a town with no wall: all of it');
+  assert.equal(open.townPace(cellAt(5, 5)), TOWN_PACE_MAX, 'a town with no wall: all of it');
   // gates, but a wall that does not close (a breach): one piece - all of it town
   const breach = walledTown();
   for (let y = 30; y <= 34; y++) for (let x = 20; x <= 22; x++) breach.nav.grid[y * 64 + x] = 15 << 4;
-  assert.equal(breach.tw.townPace(breach.cellAt(5, 5)), '100,200', 'a wall that does not close: no fields apart, all town');
+  assert.equal(breach.tw.townPace(breach.cellAt(5, 5)), TOWN_PACE_MAX, 'a wall that does not close: no fields apart, all town');
 });
 
 test('AUDIT OW-REVISITED L6-3 / L1-6: THE GATES BLAMED ONLY WHEN THEY ARE THE REASON - a way short behind a gate shut is `shut` only if the gates open would have let it through; a yard the houses close in is walked as far as it reaches, by day or night; the journey grids kept a town and its gates\' state, JOURNEY_GRIDS_MAX at most, made again when the pixel is built again (mutants: every short way blamed on the gates; the grids unbounded; a rebuilt pixel\'s stale grid)', () => {
@@ -322,4 +322,61 @@ test('AUDIT OW-REVISITED L1-9: a line of runs is arrived at its end\'s square on
   assert.equal(ap.update({ worldX: 160, worldZ: 50, mapPixelX: 0, mapPixelY: 0 }).arrived, false, 'in the end\'s square from the first run\'s side: walked on');
   const lane = new TravelAutopilot({ x: 0, y: 0 }, rectOf(150, 0, 100, 100), 1, { path: [[0, 0], [200, 40]] });
   assert.equal(lane.update({ worldX: 160, worldZ: 50, mapPixelX: 0, mapPixelY: 0 }).arrived, true, 'a lane\'s end square: arrived');
+});
+
+test('the mod\'s named journey walks the streets of the town it starts in and of every town it crosses, under Avoid Obstacles; off, it is the mod\'s beeline and asks no town', () => {
+  const start = mid(500, 250), exit = { x: start.x - 6000, z: start.z }, other = mid(499, 250);
+  const town = (n) => (Math.abs(n.x - start.x) < 8000 ? '500,250' : Math.abs(n.x - other.x) < 8000 ? '499,250' : null);
+  const r = rig({ town, way: () => ({ pts: [exit], pace: 5 }) });
+  r.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(r.asked.length, 1, 'the town the traveller stands in is asked for its way');
+  assert.equal(r.to.state.route.street.pts.length, 1, 'and its way is the journey\'s first run');
+  assert.deepEqual(r.to.state.autopilot.path.at(-1), [exit.x, exit.z], 'walked to where the way ends');
+  r.go(exit);
+  assert.equal(r.to.state.route.street, null, 'the way walked, the straight walk on');
+  // a town met on the way is walked through on its streets too
+  r.go(other);
+  assert.equal(r.asked.length, 2, 'the second town is asked for its way');
+  assert.equal(r.to.state.route.townAt, '499,250');
+  // begun in the open: the straight walk, a town asked only where one is entered
+  const open = rig({ town: (n) => (Math.abs(n.x - other.x) < 8000 ? '499,250' : null), way: () => ({ pts: [exit] }) });
+  open.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.ok(open.to.state.route, 'a route of no legs');
+  assert.equal(open.asked.length, 0, 'no town where it starts: none asked');
+  open.go(other);
+  assert.equal(open.asked.length, 1, 'the town it crosses is asked');
+  // Avoid Obstacles off: the mod's beeline exactly - no route, and no town asked, begun in one or crossing one
+  const plain = rig({ town, way: () => ({ pts: [exit] }), avoidObstacles: false });
+  plain.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(plain.to.state.route, null, 'no route');
+  plain.go(other);
+  assert.equal(plain.asked.length, 0, 'no town asked');
+});
+
+test('a steering stop in a town\'s streets asks the town for its way again from where the body stands, twice a town, and only then stops the journey; in the open the stop stands at once', () => {
+  const start = mid(500, 250), exit = { x: start.x - 6000, z: start.z };
+  let block = 0;
+  const steer = () => (block > 0 ? (block--, 'blocked') : null);
+  const r = rig({ town: (n) => (Math.abs(n.x - start.x) < 8000 ? '500,250' : null), way: () => ({ pts: [exit], pace: 5 }), steer });
+  r.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  assert.equal(r.asked.length, 1, 'the town\'s way, asked at the start');
+  const step = (dx) => r.go({ x: start.x - dx, z: start.z });
+  step(100);
+  assert.equal(r.words.length, 0, 'an open street: walked on');
+  block = 1; step(200);
+  assert.equal(r.asked.length, 2, 'stopped in the streets: the way asked again');
+  assert.ok(r.to.state.route.street, 'and walked');
+  assert.equal(r.words.length, 0, 'the journey goes on');
+  block = 1; step(300);
+  assert.equal(r.asked.length, 3, 'a second time');
+  assert.equal(r.words.length, 0);
+  block = 1; step(400);
+  assert.equal(r.asked.length, 3, 'the third stop asks no more');
+  assert.ok(r.words.includes(TRAVEL_NAV_TEXT.MsgBlocked), 'and stops the journey with the steering\'s own words');
+  // in the open, no street: a stop is a stop
+  const open = rig({ town: () => null, steer: () => 'stuck' });
+  open.to.beginTravel({ pixel: { x: 497, y: 250 }, name: 'Burgcester', mapId: 7 });
+  open.go({ x: start.x - 100, z: start.z });
+  assert.ok(open.words.includes(TRAVEL_NAV_TEXT.MsgStuck), 'stopped at once');
+  assert.equal(open.asked.length, 0);
 });

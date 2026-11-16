@@ -1,4 +1,4 @@
-// GRANT4, GRANT8, GRANT9 (2026-10-18, Mac: "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections 14 and 16):
+// GRANT4, GRANT8, GRANT9:
 // THE RELAY'S SIDE OF THE LAST SLICES, over real Rooms (test/fakeRoom.mjs): a world room (a building's, a dungeon's) takes
 // its own lane's asks - no pixel, no open-country kind, no carry in or out; with `grantRoll` on an encounter's grant is
 // `encr`, its species its seed's; with `grantStrip` on the relay drops a record its grant does not stand.

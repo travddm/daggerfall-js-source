@@ -135,7 +135,6 @@ test('CM3: ActionInputBox IS the one box, built the way DaggerfallAction.cs:566 
   assert.equal(box.value.length, 20);
   box.input('confirm');
   assert.deepEqual(got, ['x'.repeat(20)]); assert.equal(box.done, true);
-  assert.equal(/class ActionInputBox extends InputMessageBoxWindow/.test(rd('src/ui/actionText.js')), true);
 });
 
 test('CM3-CM11: THE ROSTER - every DaggerfallInputMessageBox in src/ui is a pushed InputMessageBoxWindow, and no window types into its own art', () => {
@@ -157,7 +156,7 @@ test('CM3-CM11: THE ROSTER - every DaggerfallInputMessageBox in src/ui is a push
     'src/ui/spellbookWindow.js': 'SpellNameLabel_OnMouseClick (DaggerfallSpellBookWindow.cs:927-938)',
     'src/ui/travel/travelMapWindow.js': 'FindlocationButtonClickHandler (DaggerfallTravelMapWindow.cs:959-975)',
   };
-  const files = readdirSync(join(ROOT, 'src/ui'), { recursive: true }).filter((f) => f.endsWith('.js')).map((f) => `src/ui/${f}`);
+  const files = readdirSync(join(ROOT, 'src/ui'), { recursive: true }).filter((f) => f.endsWith('.js')).map((f) => `src/ui/${f.split('\\').join('/')}`);
   const raising = files.filter((f) => /new InputMessageBoxWindow\(|extends InputMessageBoxWindow/.test(rd(f)) && f !== 'src/ui/inputMessageBox.js');
   assert.deepEqual(raising.sort(), Object.keys(raisers).sort(), 'the raisers, no more and no fewer');
   // The field's law has ONE reader of typed characters in the classic

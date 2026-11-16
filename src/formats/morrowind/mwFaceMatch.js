@@ -1,5 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════
-// MW-D35: THE FACE IS MATCHED, NOT WALKED.
+// THE FACE IS MATCHED, NOT WALKED.
 //
 // Mac's call: pair the classic portraits to Morrowind heads and hairs
 // METICULOUSLY, and not by handing him a sheet to read. A likeness is
@@ -25,7 +24,6 @@
 //     cheeks - Morrowind bakes beards into the head texture).
 //   hair:     colour (alpha-weighted texture mean), length (the mesh's
 //     vertical extent, rank-normalised within the pool).
-// ═══════════════════════════════════════════════════════════════════
 
 const dist3 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const lum = (c) => 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2];
@@ -88,7 +86,7 @@ export function portraitFeatures(bitmap, palette) {
 
 /**
  * A Morrowind head's features - SAMPLED THROUGH THE MESH, not read off
- * the texture in place. AUDIT 32 F1: the first cut took the texture's
+ * the texture in place. The first cut took the texture's
  * middle band for the cheeks and its lower band for the chin, which
  * assumes the face sits centred in UV space. Nothing in this repo has
  * seen a retail head texture's layout, so that was a guess wearing a
@@ -97,11 +95,10 @@ export function portraitFeatures(bitmap, palette) {
  * Head node's frame a head looks -Y, so the FRONT vertices (the least y)
  * are the face, the lower front vertices the chin, and each vertex's UV
  * says exactly which texel is its skin. Layout-agnostic by construction.
- * MW-HEADS2 (2026-10-15): this read +Y as the front ("Morrowind's
+ * this read +Y as the front ("Morrowind's
  * forward" - the actor's, not the Head node's frame), never seen on a
  * retail head; the port's own heads, baked looking +Y in that frame, hung
- * backwards on the body in game (the owner: "some of the ingame heads are
- * backwards on the body") - so every head the match measured was read off
+ * backwards on the body in game - so every head the match measured was read off
  * the back of the skull.
  * `geometry` is [{positions, uvs}] from flattenNif; with no UVs the
  * old band read stands, named as such by the caller.
@@ -127,7 +124,7 @@ export function headFeatures(rgba, w, h, geometry = null) {
     const cheeks = []; const chin = [];
     for (const g of shapes) {
       for (let i = 0, k = 0; i < g.positions.length; i += 3, k += 2) {
-        const fy = (maxY - g.positions[i + 1]) / spanY;   // 1 = the front of the face (MW-HEADS2: on -Y)
+        const fy = (maxY - g.positions[i + 1]) / spanY;   // 1 = the front of the face (on -Y)
         const fz = (g.positions[i + 2] - minZ) / spanZ;   // 1 = the crown
         if (fy < 0.62) continue;                          // the back and the sides are not the face
         const c = texel(g.uvs[k], g.uvs[k + 1]);
@@ -179,11 +176,11 @@ export function hairFeatures(rgba, w, h, extentZ) {
  * Returns {head, hair, reasons:string[]} with null where no candidate
  * had features - the caller falls back to the walk for that half.
  */
-/** MW-LOAD: the version of THIS matcher's verdict. buildFpArm keeps a
+/** The version of THIS matcher's verdict. buildFpArm keeps a
  *  verdict in the derived store against the stored set and the
  *  identity; a change to how heads and hairs are measured or scored
  *  is a bump here, so an older verdict is re-measured, never read. */
-export const FACE_MATCH_VERSION = 2;   // MW-HEADS2: the face read on -Y - every verdict kept was measured off the back of the skull
+export const FACE_MATCH_VERSION = 2;   // the face read on -Y - every verdict kept was measured off the back of the skull
 
 export function matchFace(portrait, heads, hairs, { female = false } = {}) {
   const reasons = [];

@@ -1,7 +1,5 @@
 // @ts-check
-// RAID5 (2026-10-25, the owner: "I was want to rework town raids to bring them up to par with other world events,
-// implementing mechanics (not the puzzle), different types of structure like wave based, defend, escort, etc"; asked
-// which, "Waves", "Defend", "Escort" and "Classic skirmish"; bible/03-World/Raiding-Parties.md RAID5): A RAID'S KIND.
+// RAID5: A RAID'S KIND.
 //
 // Every raid the day rolls is one of four, and the kind is the raid's own - read off what the day already drew (its
 // key, start, target and party: `raidKindOf`), never a new draw, so the roll the relay checks a word against

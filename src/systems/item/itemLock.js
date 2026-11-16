@@ -1,5 +1,5 @@
 // @ts-check
-// LOCK1 (2026-09-26, the players: "A way to lock/favorite items"): A LOCKED PIECE STAYS YOURS.
+// LOCK1: A LOCKED PIECE STAYS YOURS.
 //
 // The lock is one flag on the item (`locked: true`, declared in systems/item/itemFields.js, so it rides the save and the
 // wire as every other field does), set and cleared from the item's own card and its right-click menu. It closes

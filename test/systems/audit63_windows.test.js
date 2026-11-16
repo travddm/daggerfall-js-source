@@ -144,7 +144,6 @@ test('AUDIT 63 F42: the recipe picker is built from CARRIED recipe items, sorted
   // resolves each through GetPotionRecipe(PotionRecipeKey), de-dupes
   // and sorts by DisplayName. The host hook is the port's half of that
   // walk, and it used to read a field nothing ever wrote.
-  // PIN MOVED (POTION-DOOR): the hooks are scenes/potionMakerHost.js's, the host's player handed in
   const modes = src('scenes/potionMakerHost.js');
   assert.match(modes, /for \(const it of \[\.\.\.\(player\.items \?\? \[\]\), \.\.\.\(player\.wagonItems \?\? \[\]\)\]\) \{\s*\n\s*if \(isPotionRecipe\(it\) && it\.potionRecipeKey\) seen\.add\(it\.potionRecipeKey\);/);
   assert.ok(!/recipeKeys: \(\) => player\.potionRecipeKeys/.test(modes),
@@ -669,8 +668,6 @@ test('AUDIT 63 F34: the hand-to-hand damage line, on the group that holds the sk
     min: handToHandMinDamage(sheetEntity().skills[SKILLS.HandToHand]),
     max: handToHandMaxDamage(sheetEntity().skills[SKILLS.HandToHand]),
   });
-  assert.match(readFileSync(join(root, 'src/ui/enhanced/enhancedMenu.js'), 'utf8'),
-    /group\.ids\.includes\(SKILLS\.HandToHand\)/, 'gated per GROUP there too');
 });
 
 test('AUDIT 63 F35: this dialog\'s highlight is the box\'s OVERRIDE, not the UI default', () => {

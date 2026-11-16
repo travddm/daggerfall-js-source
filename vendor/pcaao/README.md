@@ -37,7 +37,7 @@ the decompiler numbered. Neither the DLL nor the decompiled text is
 carried here; the port is `src/combat/pcaao.js` (every formula, cited
 by the C# method it restates) and `src/combat/pcaaoMeanerMonsters.js`
 (InitMod's Meaner Monsters table). The page is
-`bible/05-Combat/Physical-Combat-Overhaul.md`.
+`docs/formats/mods-and-vendor.md`.
 
 The "Vanilla Combat Event Handler" dependency (GUID
 fb086c76-38e7-4d83-91dc-f29e6f1bb17e) is a hook mod: PCAAO mirrors its

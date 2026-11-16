@@ -1,10 +1,10 @@
-// GOLD-WIRE (FIELD BUGS 2026-10-25b, bible/01-Overview/bugs/Field-Bugs-2026-10-25b.md): A GOLD PILE PAST THE WIRE'S STACK
+// GOLD-WIRE (FIELD BUGS 2026-10-25b): A GOLD PILE PAST THE WIRE'S STACK
 // BOUND NEVER LANDS IN A CONTAINER THE ROOM SHARES.
 //
 // Online, a purse dropped into a dungeon's room container or a building's cupboard became one gold stack, and a stack past
 // LOOT_STACK_MAX (65,535) is no item on the wire (loot.js wireLootItem). The room's word about that container then failed
 // validRoomWord whole at everyone who read it - "Something in here is from a newer version of the game", which no reload
-// mends. The owner's call (2026-10-25): keep the bound, and clamp the drop into a container the room shares at the room
+// mends. The owner's call: keep the bound, and clamp the drop into a container the room shares at the room
 // left on the gold stack it lands on; a home's cupboards, the ground and the wagon are not clamped.
 //
 // Each test runs the real chain: the room module composes the container's list (and marks it), the drop is planned by

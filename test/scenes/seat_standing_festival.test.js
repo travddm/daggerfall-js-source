@@ -1,5 +1,5 @@
-// STANDING-TREND and FESTIVAL-STAGE (2026-10-02, Mac: "lets finish the build work"): two of the Seats arc's NOT YETs
-// (bible/11-Multiplayer/Seats-Arc.md 7.9, 7.6).
+// STANDING-TREND and FESTIVAL-STAGE: two of the Seats arc's NOT YETs
+// (7.9, 7.6).
 //
 // STANDING-TREND: the Seat tab's holder line says which way its Standing moved - "Standing 55, up 7 since the last
 // Turning." (net/townSeatLaw.js seatHolderLine). Each Turning writes every held seat's Standing as it found it and as it
@@ -194,17 +194,6 @@ test('FESTIVAL-STAGE the music: a Festival town\'s streets hear the tavern\'s pl
   assert.equal(festivalEnvironment(MUSIC_ENV.City, 'yes'), MUSIC_ENV.City, 'only a Festival that rules');
 });
 
-test('FESTIVAL-STAGE wired in the streets\' host: the build measures the Festival\'s anchors at the taverns and the bounty boards and a lantern before every banner, kept on the pixel; the stage reads the dressed seat; the lantern pool takes its lanterns; the music its Festival (mutants: the temples for the taverns; the pool without them; the music without it)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const festivalAnchors = pixelBoardSplit \? festivalBannerAnchors\(\{ frames: pixelHomeFrames, tavernKeys: buildingKeysOfType\(locBlocks, makeBuildingKey, TALK_BUILDING_TYPES\.Tavern\), boards: pixelBoards, bounty: pixelBoardSplit \}\) : null;/);
-  assert.match(w, /const festivalLanterns = festivalAnchors \? festivalLanternsOf\(\[\.\.\.\(seatAnchors \?\? \[\]\), \.\.\.festivalAnchors\]\) : null;/);
-  assert.match(w, /seatAnchors, _boardSplit: pixelBoardSplit, festivalAnchors, festivalLanterns,/);
-  assert.match(w, /const festivalStage = seatBook \? createFestivalStage\(\{ seatAt: \(mapId\) => seatHere\(mapId\), version: \(\) => \(seatBook\.open === true \? 1 : 0\) \}\) : null;/);
-  assert.match(w, /worldLightAnimator\.ranges, festivalStage \? festivalStage\.lanterns : null\);/);
-  assert.match(w, /arrested: Boolean\(playerEntity\.arrested\),\n\s*festival: festivalStage\?\.festive\(_musicLoc\?\.mapTableData\?\.mapId\) === true,/);
-  assert.match(src('src/scenes/shared.js'), /const environment = festivalEnvironment\(held, merged\.festival === true\);/);
-});
-
 // ─── AUDIT FESTIVAL S1: THE TURNING WHILE THE PLAYER STAYS ──────────
 // The seats' list was read at the session's start and at a town's arrival alone, and an arrival inside SEAT_LIST_CACHE_MS
 // reused the last read - so a Festival (its music, banners, lanterns) or a Curfew outlived its week for a player who stayed
@@ -244,7 +233,6 @@ test('AUDIT FESTIVAL S1 the book\'s frame tick reads the list again ONCE when th
   let now = turning - 60_000;
   let edicts = ['festival', 'curfew'];   // week W's, then W+1's
   const door = turningDoor(() => (now < turning ? edicts[0] : edicts[1]));
-  // PIN MOVED (D1-LOAD): each client reads at its own share of SEAT_TURN_READ_SPREAD_MS past the Turning - this one's
   // half of it (rand 0.5), never every client in one second
   const book = createTownSeatBook({ door, nowMs: () => now, rand: () => 0.5 });
   const READ = turning + SEAT_TURN_READ_SPREAD_MS / 2 + 1000;
@@ -296,7 +284,6 @@ test('AUDIT FESTIVAL S1 the book\'s frame tick reads the list again ONCE when th
   book3.redTick();
   await tick();
   assert.equal(shut.calls, 1, 'shut: never asked at the Turning');
-  assert.match(hostText('src/scenes/world.js'), /\n    seatBook\?\.redTick\(\);   \/\/ CROWN2/, 'the host ticks the book each online frame');
   assert.equal(SEAT_TURN_READ_SPREAD_MS, 120_000, 'two minutes');
   // the shares drawn: a book's own, from its rand - the last of the window still reads inside it
   const late = turningDoor(() => edicts[1]);

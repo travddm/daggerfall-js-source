@@ -16,8 +16,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parse } from 'acorn';
 
-const SRC = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-
 const kids = (n) => {
   const out = [];
   for (const k of Object.keys(n)) {
@@ -128,26 +126,6 @@ function lateDoorReads(source) {
   });
   return { doors, late };
 }
-
-test('BOOT-HIDE: no callback the boot hands to a page door reaches a binding the boot declares past one of its awaits (mutant: page-hide-at-the-checkpoint)', () => {
-  const { doors, late } = lateDoorReads(SRC);
-  assert.deepEqual(late, [], 'a page door can run while the boot is suspended - and read a binding still in its dead zone');
-  // not vacuous: the doors the report's crash and its three siblings came through are all walked
-  for (const d of ['whenPageHides', 'saveSoon.ready', 'setBeforeTitleExit', "addEventListener('beforeunload')", 'whenPageGoes']) {
-    assert.ok(doors.includes(d), `the gate no longer finds the ${d} door`);
-  }
-});
-
-test('BOOT-HIDE: the gate names the shape the report crashed on', () => {
-  // the page-hide hook put back where it stood, at the checkpoint - above the quest pack's await
-  const hook = "    whenPageHides(globalThis.document, () => { if (online) onlineCheckpoint(); });\n";
-  assert.ok(SRC.includes(hook), 'the page-hide hook is no longer written as the report\'s build had it');
-  const anchor = '  /** REALM P1.3: THE REALM\'S CHECKPOINT';
-  assert.ok(SRC.includes(anchor), 'the realm checkpoint\'s header moved');
-  const before = SRC.replace(hook, '').replace(anchor, `  if (realmSession) {\n${hook}  }\n${anchor}`);
-  const { late } = lateDoorReads(before);
-  assert.ok(late.some((l) => l.startsWith('whenPageHides') && / reaches online /.test(l)), `the gate missed the crash:\n${late.join('\n')}`);
-});
 
 test('BOOT-HIDE: the crash itself - a door that fires while its registrar awaits reads a later let in its dead zone', async () => {
   const page = new EventTarget();

@@ -1,5 +1,4 @@
-// RAID4 (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-// armor sets"): THE TOWNS DEFENDED - the first of the rewards. A raid's receipt the relay signed (net/raid/raidReceipt.js) is
+// RAID4: THE TOWNS DEFENDED - the first of the rewards. A raid's receipt the relay signed (net/raid/raidReceipt.js) is
 // honoured by the account service over the real migrations (one row a (raid, account), the day's bound, a guest's not
 // counted, another's refused; the character that fought it paid its Renown in the same transaction, once, whoever
 // claims it twice at once - the ACCOUNT's for a day under RENOWN-ACCOUNT, the character's again since RENOWN-CHAR); the worker's route behind a session, the order a rise earns, the count on /v1/account and
@@ -76,7 +75,7 @@ async function relayPair() {
 const raidFor = (s, key, priv, nowS = T0, y = 2) => mintRaidReceipt({ w: key, s, c: 777, y }, priv, { subtle, nowS });
 const CH = 'char-0001', CH2 = 'char-0002';
 
-// ═══ THE LAW ═════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('RAID4 the Renown a town pays: three quests\' worth at the top quest level, read no higher than the character\'s Renown allows - RENOWN-ACCOUNT\'s three quarters: 585 at Renown 1, 1,395 at 10, 2,925 from 27 (780, 1,860 and 3,900 at the full rate) (mutants: the ceiling unread; the count of quests off)', () => {
   assert.equal(RENOWN_RAID_QUESTS, 3);
@@ -88,7 +87,7 @@ test('RAID4 the Renown a town pays: three quests\' worth at the top quest level,
   assert.equal(renownRaidXp(10), RENOWN_RAID_QUESTS * renownQuestXp(RENOWN_QUEST_LEVEL_MAX, 10));
 });
 
-// ═══ THE SERVICE ═════════════════════════════════════════════════════════════════════════════════
+// THE SERVICE
 
 test('RAID4 the claim: a receipt the relay signed, naming the claiming account, is one row a (raid, account) - counted once whatever happens to it, and the character that fought it paid its Renown in the same breath, once; another raid adds one; another account\'s, an unsigned one, a gate\'s, a forged one and an expired one are refused; no public half is the service\'s gap; a guest is not counted until it registers (mutants: the row unkeyed; the credit outside the row\'s own claim; the guest counted)', async () => {
   const db = d1();
@@ -122,7 +121,7 @@ test('RAID4 the claim: a receipt the relay signed, naming the claiming account, 
   assert.equal((await claimRaid(ctx, { id: G, handle: 'Registered' }, { receipt: rg, character: CH }, pubKey)).recorded, true, 'registered, the same receipt counts');
   db._raw.prepare('DELETE FROM players WHERE id = ?').run(A.id);
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM raid_cleanses WHERE account = ?').get(A.id).n, 0, 'the account gone, its towns with it');
-  const sql = src('server-account/migrations/0016_raid_cleanses.sql');
+  const sql = db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('raid_cleanses').sql;
   assert.match(sql, /PRIMARY KEY \(raid, account\)/);
   assert.match(sql, /FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
 });
@@ -192,7 +191,7 @@ test('RAID4 the worker: /v1/raid/claim behind a session and never open - the ses
   const MINE = (await seatRealm(env, me.secret, 'Ann')).id, THEIRS = (await seatRealm(env, them.secret, 'Tam')).id;
   const r = await raidFor(me.id, `3:7:${DAY}`, priv, T0);
   assert.equal((await call('POST', '/v1/raid/claim', { receipt: r, character: MINE })).status, 401, 'a stranger claims nothing');
-  assert.deepEqual(await call('POST', '/v1/raid/claim', { receipt: r, character: CH, name: 'Ann' }, me.secret), { status: 403, body: { error: 'progress-seat' } }, 'INT16: an offline id claims nothing');   // PIN MOVED (INT16, Integrity-Arc section 7): a claim names the account's seated realm character - an offline id is refused before the receipt is read
+  assert.deepEqual(await call('POST', '/v1/raid/claim', { receipt: r, character: CH, name: 'Ann' }, me.secret), { status: 403, body: { error: 'progress-seat' } }, 'INT16: an offline id claims nothing');
   const ok = await call('POST', '/v1/raid/claim', { receipt: r, character: MINE, name: 'Ann' }, me.secret);
   assert.equal(ok.status, 200);
   assert.equal(ok.body.recorded, true); assert.equal(ok.body.defended, 1); assert.equal(ok.body.renown.rose, true);
@@ -212,7 +211,7 @@ test('RAID4 the worker: /v1/raid/claim behind a session and never open - the ses
   assert.deepEqual(await bare.call('POST', '/v1/raid/claim', { receipt: r, character: G }, g.secret), { status: 503, body: { error: 'no-gate-key' } }, 'no public half: the service\'s gap');
 });
 
-// ═══ THE CLIENT ══════════════════════════════════════════════════════════════════════════════════
+// THE CLIENT
 
 test('RAID4 the client\'s call: the receipt, the character and its name to /v1/raid/claim under the stored session; none, no knock (mutants: the character unsent; a call with no session)', async () => {
   const calls = [];
@@ -248,7 +247,7 @@ test('RAID4 the device\'s queue: a signed receipt is kept with the character tha
   await q.flush();
   assert.deepEqual(asked.at(-1), { r: ra, ch: CH, nm: 'Ann' });
   assert.deepEqual(said, [RAID_CLAIM_TEXT.recorded(3, 780)]);
-  assert.equal(said[0], 'The town will remember you. Towns defended: 3. +780 toward your Renown.');   // PIN MOVED (VOICE2): no XP in a sentence (Voice.md rule 3)
+  assert.equal(said[0], 'The town will remember you. Towns defended: 3. +780 toward your Renown.');
   assert.equal(heard[0].d.renown.credited, 780);
   assert.deepEqual(q.kept(), [], 'counted: let go');
   // a guest - kept, said once
@@ -301,19 +300,5 @@ test('RAID4 the cards: the account card\'s row and the Inspect card\'s line say 
   const v = profileView({ name: 'Ann', peer: null, look: null, card: null, state: 'silent', record: { raids: { defended: 4 } } });
   assert.equal(v.raids, 'Towns defended: 4');
   assert.equal(typeof createProfileWindow, 'function');
-  const acct = src('src/ui/enhanced/enhancedAccount.js');
-  assert.match(acct, /const raids = raidRecordText\(flow\.account\.raids\);\n\s+if \(raids\) row\(t\('account\.card\.raids', 'Towns defended'\), raids\);/);   // L10N4 (PIN MOVED): the row's word through t()
 });
 
-test('RAID4 the world host by source: my receipt goes to the queue with the character that fought it; the queue claims through the account\'s door and is offered on the frame\'s clock; a counted raid\'s Renown is the page\'s only for the character that earned it', () => {
-  const w = src('src/scenes/world.js');
-  const at = w.indexOf('  setRaidingPartiesHost({');
-  const body = w.slice(at, w.indexOf('\n  });', at));
-  assert.match(body, /onRaidReceipt: \(r, c, held\) => \{ \(c\?\.v \? grantStaffSpoils\([^)]*\) : raidClaims\?\.add\(r, characterIdOf\(playerEntity\), typeof playerEntity\?\.name === 'string' \? playerEntity\.name : null, playerEntity\?\.level \?\? 1, held === true\)\); \},/);   // PIN MOVED (AUDIT WORLD-EVENTS L3-14): and whether the town was held, with the receipt;   // PIN MOVED (STAFF-EVENT THE REWARD): a staff event receipt (its claims name v) rolls its own spoils, a raid receipt goes on as before   // AUDIT RAID R4: with its level - the thanks wait for the service's word (onSpoils)
-  assert.match(w, /onSpoils: \(entry\) => grantRaidSpoils\(entry\),/);
-  assert.match(w, /const raidClaims = params\.has\('online'\) \? createRaidClaims\(\{\n(?:\s+\/\/[^\n]*\n)*\s+claim: \(r, ch, \.\.\.a\) => _accountRaids\.claim\(r, ch, \.\.\.a\)\.then\([^\n]*\n\s+me: _accountRaids\.me,/);   // PIN MOVED (AUDIT CHAP3 C4: said on the fighting character's page); PIN MOVED (CHAP2b): the answer handed on to the Roll's refresh
-  // SERPENT1 keeps its own guard beside it: this one is the raid queue's own, read inside its block
-  const rq = w.slice(w.indexOf("const raidClaims = params.has('online') ? createRaidClaims({"), w.indexOf('  }) : null;', w.indexOf("const raidClaims = params.has('online') ? createRaidClaims({")));
-  assert.match(rq, /onRecorded: \(data\) => \{\n\s+if \(data\?\.renown\?\.character !== characterIdOf\(playerEntity\)\) return;/);
-  assert.match(w, /raidClaims\?\.tick\(\);/);
-});

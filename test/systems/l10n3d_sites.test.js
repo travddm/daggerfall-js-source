@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): EVERY DFU WORD THE PORT ROUTES, CHECKED WHERE IT STANDS. Read off the whole of src/: each
+// L10N3d: EVERY DFU WORD THE PORT ROUTES, CHECKED WHERE IT STANDS. Read off the whole of src/: each
 // `localizedText('key', 'English')` and `localizedTextList('key', [...])` with a literal key, and each entry of a
 // `localizedStrings({...})` or `localizedTable({...})` table. Pinned for every one: the key is one of DFU's in the
 // collection it names (vendor/dfu-text), and the English is DFU's, byte for byte, unless it is named below with the
@@ -49,7 +49,9 @@ const ROUTED = {
   'src/scenes/exterior.js': 1,
   'src/scenes/hostMagic.js': 6,
   'src/scenes/menu.js': 1,
-  'src/scenes/world.js': 16,
+  'src/scenes/questWorld.js': 2,   // TESA's merge (HOST-SPLIT): moved verbatim out of world.js's bootWorld, its two with it
+  'src/scenes/world.js': 13,
+  'src/scenes/worldQuickSave.js': 1,   // TESA's merge (HOST-SPLIT): the quick save's, likewise
   'src/scenes/worldModes.js': 7,
   'src/systems/answerPipeline.js': 24,
   'src/systems/artifactEffects.js': 1,
@@ -83,6 +85,7 @@ const ROUTED = {
   'src/systems/modSettings.js': 16,   // L10N4: the mods' option names DFU has - Unleveled Loot's ten materials, None, Low/Medium/High
   'src/systems/mysticism.js': 14,
   'src/systems/notebook.js': 5,
+  'src/systems/online/onlineHomes.js': 1,   // IC-PROPS: a nameless house's door says DFU's "Residence" (PlayerGPS.cs:1306-1309)
   'src/systems/playerTorch.js': 1,
   'src/systems/potions.js': 20,
   'src/systems/quest/actions.js': 2,
@@ -119,7 +122,6 @@ const ROUTED = {
   'src/ui/enhanced/enhancedMenu.js': 20,
   'src/ui/enhanced/enhancedRest.js': 2,
   'src/ui/guildServiceWindows.js': 3,
-  'src/ui/iliacTableHud.js': 1,
   'src/ui/item/itemMakerWindow.js': 1,
   'src/ui/joystickControlsWindow.js': 1,
   'src/ui/levelUp/levelNotice.js': 1,

@@ -1,4 +1,4 @@
-// SD20b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md "SD20 - AUDIT SD III"): THE RELAY
+// SD20b: THE RELAY
 // AND THE ACCOUNT, AUDITED A THIRD TIME - each finding reproduced on the arc's own rooms first. A premature word for the
 // next slot poisoned the cell that heard it: kept as told and answered, that slot's real find was never told from there.
 // A word for the old slot told a minute before the rise held the new Hollow's every find at that door nine minutes. The
@@ -80,7 +80,7 @@ test('SD20b THE NEXT SLOT TOLD ONCE IT MAY HAVE RISEN (R3): the hub\'s answer sa
     set(riseAt - 60_000);
     const grief = cell.connect(); await cell.hello(grief, 'peer-grief', doorPose(0), { name: 'Grief' });
     await cell.raw(grief, found(1));
-    assert.deepEqual(cell.room._sdHubSlot, { s: 1, at: riseAt - 60_000, next: riseAt }, 'the hub\'s slot and when the next may rise');
+    assert.deepEqual(cell.room._sdHubSlot.get(0), { s: 1, at: riseAt - 60_000, next: riseAt }, 'the hub\'s slot and when the next may rise');   // PIN MOVED (WW5): the hub's word a lane at a time - the Bay's lane's
     const early = asks();
     await cell.raw(grief, found(2));
     assert.equal(asks(), early, 'before it may rise: held');
@@ -108,13 +108,12 @@ test('SD20b ONE LIFE A HOLLOW, HOWEVER MANY HAVE DIED IN IT (R2): past the realm
     const main = await hello('peer-main');
     assert.equal(main.closed, null, 'alive: admitted past the list');
     await realm.raw(main, JSON.stringify({ t: 'pose', p: inArena({ dd: 1 }) }));
-    // PIN MOVED (SD-REZ, EVENT-RULES): down first, for a friend's Resurrect - buried past the window
     assert.deepEqual(realm.store.get(SD_REALM_KEY).down.map(([x]) => x), ['acct-peer-main'], 'down');
     await realm.drop(main);
     step(SD_REZ_MS + 1);
     const back = await hello('peer-main');
     assert.equal(realm.store.get(SD_REALM_KEY).dead.length, SD_FIGHTERS_MAX, 'the list as it was');
-    assert.equal(back.closed, null, 'its own Hour takes it back');   // PIN MOVED (SD-BACK, 2026-10-28): it was SD_NO_FALLEN, never back in
+    assert.equal(back.closed, null, 'its own Hour takes it back');
     assert.equal(realm.store.get(sdDeadKey('acct-peer-main')), undefined, 'and its own key let go');
     assert.equal((await hello('peer-other')).closed, null, 'another, alive: admitted');
   });

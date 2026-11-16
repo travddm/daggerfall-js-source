@@ -109,7 +109,7 @@ const ROWS = [
   // MorphSelf is not: it is sold ready-made, online, at the spell shop (worldModes `resurrectionSpell`), and a
   // Spell Maker copy crafted offline would be a spell with no one to raise.
   [45, 255, 'Resurrect', '', [], false],
-  // PARTY-MAP (2026-09-30): the port's own (no classic key uses 46) - while it lasts, the dungeon automap rows the
+  // PARTY-MAP: the port's own (no classic key uses 46) - while it lasts, the dungeon automap rows the
   // caster reveals reach party mates in the same dungeon (systems/party/partyMap.js). Duration alone, and CRAFTABLE: a copy
   // made offline is a harmless buff (no party, nothing shared); sold ready-made at the spell shop online.
   [46, 255, 'Shared Cartography', '', [D]],

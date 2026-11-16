@@ -1,8 +1,8 @@
-// ESSENTIALS-HALF (2026-09-30, Discord: "things are way too expensive rn for money to be nerfed so heavily... cut the
-// cost of most essential items by half"). REALM P0.4 / MERC-RISE / MERC-CAP cut what a player earns online and left
+// ESSENTIALS-HALF. REALM P0.4 / MERC-RISE / MERC-CAP cut what a player earns online and left
 // what they pay: online now a tavern room, its food and drink, a temple's cure, a travel fare and a potion bought at
 // any counter cost half (rounded up, at least a gold, a free one kept free). Offline, DFU's prices stand; repairs,
 // training, spells, enchanting, houses and ships never move.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ONLINE_ESSENTIALS_PRICE_SCALE, essentialPrice, calculateCost, calculateTradePrice } from '../../src/systems/shopStock.js';
@@ -116,7 +116,8 @@ test('ESSENTIALS-HALF: a potion bought at a counter costs half online; a sword d
   assert.equal(lotOn.pieces, lotOff.pieces);
 });
 
-test('ESSENTIALS-HALF: a potion bought online never sells back for more than it cost', () => {
+test('ESSENTIALS-HALF: a potion bought online never sells back for more than it cost', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   onlinePage(() => {
     for (const value of [1, 3, 7, 25, 50, 101, 333]) {
       for (const q of [1, 10, 20]) {
@@ -139,7 +140,8 @@ test('ESSENTIALS-HALF: repairs stay at their price online', () => {
   assert.equal(on.cost, off.cost);
 });
 
-test('AUDIT ESSENTIALS F1: the online potion half never stacks on a holiday\'s half - bought on the holidays, sold for no more', () => {
+test('AUDIT ESSENTIALS F1: the online potion half never stacks on a holiday\'s half - bought on the holidays, sold for no more', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   onlinePage(() => {
     for (const [holidayId, guildFactionId] of [[HOLIDAYS.Merchants_Festival, null], [HOLIDAYS.Tales_and_Tallow, GUILDS.MagesGuild.factionId]]) {
       const ctx = { quality: 10, holidayId, guildFactionId };

@@ -73,14 +73,14 @@ export const isGuestShaped = (name) => typeof name === 'string' && GUEST_NAME_RE
 export const isHandleShaped = (name) => typeof name === 'string' && HANDLE_RE.test(name);
 
 /**
- * HANDLE-EMAIL (2026-10-11, the owner: "ban account names as email"). A HANDLE IS NEVER AN EMAIL ADDRESS. The handle is
+ * HANDLE-EMAIL. A HANDLE IS NEVER AN EMAIL ADDRESS. The handle is
  * the name the world reads (accounts.js displayName - the token's `n`, every roster, every home's owner, every board
  * note), so a player who typed their address into the Username field published it to everyone they met. HANDLE_RE takes
  * any non-space character, `@` among them; an address cannot be written without one, so a handle carrying one is refused
  * at registration (accounts.js handleRefusal, `handle-email`) and at the form before it is sent (ui/accountFlow.js). A
  * handle chosen before this keeps signing in by it, and the world reads its guest name in its place (displayName). A
  * copy of the old handle a row wrote down by value before this (a home's owner, a roster's line, a board's note) keeps
- * it until that row is written again - putting them back is the owner's call (bible/06-Systems/Accounts-And-Cloud-Saves-Arc.md
+ * it until that row is written again - putting them back is the owner's call (
  * HANDLE-EMAIL).
  */
 export const handleLooksLikeEmail = (name) => typeof name === 'string' && name.includes('@');

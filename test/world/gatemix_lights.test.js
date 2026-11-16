@@ -1,6 +1,6 @@
-// GATE-MIX (2026-10-20): a flash in the court casts no shadow - its lights wear `carried` (the mask a spell's impact light
+// GATE-MIX: a flash in the court casts no shadow - its lights wear `carried` (the mask a spell's impact light
 // wears), world/gate/gateArena.js withCourtLights carries it into the frame's mask, and the shadow pick passes it by.
-// Design: bible/11-Multiplayer/World-Bosses.md section 28.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ATTACKS } from '../../src/net/gate/gateBrain.js';

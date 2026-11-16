@@ -1,8 +1,6 @@
 // @ts-check
-// RVN-STARS (2026-10-17; bible/06-Systems/Revenants.md section 44) - A SKY OF STARS, DRAWN: the one window every sky the
-// port grows past the Firmament is drawn in - CAPTAIN-TREE's captain's stars (ui/captainTreeWindow.js, bible/03-World/
-// Naval-Refit.md) and RVN-STARS' sworn revenant's (ui/revenantStarsWindow.js). Taken out of the captain's window whole when
-// the second sky came (one home, never two copies that drift): the Firmament's own sky (ui/firmamentWindow.js - its sheet,
+// RVN-STARS - A SKY OF STARS, DRAWN: the one window every sky the
+// port grows past the Firmament is drawn in - CAPTAIN-TREE's captain's stars (ui/captainTreeWindow.js, docs/systems/naval.md). Taken out of the captain's window whole (one home, never copies that drift): the Firmament's own sky (ui/firmamentWindow.js - its sheet,
 // its two palettes, its stars' sizes) over the whole screen.
 //
 // WHAT A PLAYER DOES HERE - the Firmament's ways, kept:
@@ -77,7 +75,7 @@ function seeded(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 10
 
 /**
  * Mount a sky over `host`. `changed` once a sky is accepted (the save's word); `onExit` when it closes.
- * GROWTH3 (bible/10-UI/Growth.md section 6): `embed` draws it in the pause window's Growth tab - the Firmament's own
+ * GROWTH3: `embed` draws it in the pause window's Growth tab - the Firmament's own
  * embedding (ui/firmamentWindow.js): the stage's size, no Close and no Escape of its own; the window asks `back()`.
  * @param {HTMLElement} host @param {SkyDesc} sky
  * @param {{ changed?: () => void, onExit?: (reason?: string) => void, doc?: Document, embed?: boolean }} [deps]

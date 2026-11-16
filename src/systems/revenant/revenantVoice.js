@@ -1,5 +1,5 @@
 // @ts-check
-// REVENANT-CARD (2026-10-02): THE FACE A REVENANT SPEAKS THROUGH. systems/revenant/revenant.js builds each thing a revenant says or
+// REVENANT-CARD: THE FACE A REVENANT SPEAKS THROUGH. systems/revenant/revenant.js builds each thing a revenant says or
 // does as an EVENT (its portrait, its name, its words, and the one `line` a text surface says instead); a face
 // registers here to draw them - ui/revenant/revenantCard.js, the enhanced skin's card - and answers whether it did. With none, or
 // one that declines (the classic skin, a page without a document), the host's own `say` speaks the line. A LEAF: it

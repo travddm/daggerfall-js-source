@@ -1,6 +1,5 @@
 // @ts-check
-// WAGONS1 (2026-10-09, Mac: "Is a closed wagon varient that also increases storage but also acts as an enterable and
-// customizable interior"): THE CARAVAN'S ROOM - THE LAW.
+// WAGONS1: THE CARAVAN'S ROOM - THE LAW.
 //
 // The caravan is entered as a ship's cabin is (SAILING-CABINS, scenes/sailingCabin.js): through the interior host's own
 // transition (scenes/worldModes.js interiorTransition), its door a logical anchor at the parked caravan (never drawn,
@@ -11,8 +10,7 @@
 // slept in. Inside, the wagon's storage is the room's chest too: Horse Cart and Cargo's door law gives the wagon's
 // inventory to a building whose door stands within its 50 m - and this door stands at the wagon.
 //
-// WAGONS2 (2026-10-09, Mac: "People should be able to use the interior just like houses ... allowing players to see
-// inside/outside of house windows + the new wagon"; asked, "Caravan-shaped room"): THE ROOM IS THE CARAVAN'S OWN.
+// WAGONS2: THE ROOM IS THE CARAVAN'S OWN.
 // WAGONS1 borrowed the small ship's cabin (Warm Ashes' SHIPAA00.RMB), a room of another shape stood axis-aligned on the
 // wagon however it was parked. The room now is the caravan's inside (world/caravanRoomModel.js), one model in a block
 // of its own making (`caravanRoomBlock` - RMB's shape, read by world/interior/interiorLayout.js as any record is: the model, an

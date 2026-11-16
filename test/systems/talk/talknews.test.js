@@ -1,4 +1,4 @@
-// TN1 - THE TALK-NEWS GETTERS (2026-08-28). Seven seams the machine
+// TN1 - THE TALK-NEWS GETTERS. Seven seams the machine
 // and the macro table declared and nothing production-side answered:
 // the four npcData faction names (TK-iv computed them in every arm of
 // getGreetingIndex and recorded "the names nobody reads" - stale: the
@@ -17,6 +17,7 @@ import { GENDERS, getNameBank, fullName } from '../../../src/characters/nameHelp
 import { srand } from '../../../src/formats/dfRandom.js';
 import { getContextValue } from '../../../src/systems/quest/questMacros.js';
 import { FACTION_TYPES } from '../../../src/formats/factionFile.js';
+import { hostText } from '../../hostText.mjs';   // HOST-SPLIT (at the merge of main into TESA): the world host read whole - questWorld is scenes/questWorld.js's
 
 const read = (p) => readFileSync(p, 'utf8');
 
@@ -110,24 +111,3 @@ test('TN1 macros: the seven handlers answer the world hooks, C#\'s own asymmetri
 
 // ── the world mounts, source-pinned ──────────────────────────────
 
-test('TN1 world: the seven hooks stand on questWorld, wired to their one homes', () => {
-  const world = read('src/scenes/world.js');
-  for (const field of ['npcFactionName', 'allyFactionName', 'enemyFactionName']) {
-    assert.match(world, new RegExp(`npcSession\\.npcData\\?\\.${field} \\?\\? ''`),
-      `the ${field} hook reads TK-iv's computed name`);
-  }
-  assert.ok((world.match(/npcSession\.npcData\?\.pcFactionName \?\? ''/g) ?? []).length >= 2,
-    'factionPC and factionName\'s fall-through both read pcFactionName');
-  // AUDIT 39 (#26) MOVED THIS PIN: it pinned `factionID`, the
-  // uppercase spelling, which the building record does not carry -
-  // buildingDataForDoor's merge writes `factionId`, every other read
-  // in the tree uses it, and the uppercase one belongs to StaticNPC
-  // records. So getDivine was always called with 0, always missed,
-  // and the HolyOrder arm always fell through to pcFactionName.
-  assert.match(world, /GUILD_GROUPS\.HolyOrder[^]{0,400}getDivine\(townTalk\.factionDict, modes\?\.interiorBuilding\?\.factionId \?\? 0\)/,
-    'GetFactionName\'s HolyOrder arm answers the temple\'s deity (:1815-1822)');
-  assert.match(world, /lordNameForFaction: \(id, old = false\) => lordNameForFaction\(townTalk\.factionDict, id, old\)/,
-    'the lord names ride the one home in systems/talk/talk.js');
-  assert.match(world, /oldLeaderFate: \(i\) => answerPipeline\.getOldLeaderFateString\(i\)/,
-    'the fates ride the pipeline\'s own localized strings');
-});

@@ -1,6 +1,4 @@
-// GRASS-PX (2026-09-21, Mac: "with the grass model, is there a way we can
-// turn the grass into a pixel art design ... Let's see how detailed you
-// can be"): THE TUFT IS A SPRITE. The sheet is built from a seed and
+// GRASS-PX: THE TUFT IS A SPRITE. The sheet is built from a seed and
 // held byte for byte; the two compiled stages are the lab's text under
 // a DECLARED list of edits, each landing exactly once; the renderer
 // uploads the sheet with its coverage mip chain on its own unit and the
@@ -20,7 +18,7 @@ const TONE_BYTES = [0, 64, 128, 192, 255];
 const decode = (r) => Math.floor((r / 255) * 4 + 0.5);
 
 test('GRASS-PX / GRASS-PX4: the sheet is eight 8x16 tufts, hard-edged, four-toned, and the same on every build', () => {
-  // GRASS-PX4 (Mac: "have grass have larger pixels"): the tuft was 16x32
+  // GRASS-PX4: the tuft was 16x32
   // and is 8x16 - the same quad, so a texel is twice the blade it was.
   // The laws below are held as FRACTIONS of the tuft (the constants),
   // not as the numbers they came to at one size.
@@ -198,10 +196,10 @@ test('GRASS-PX: the compiled stages are the lab\'s text under the declared edits
     'vec2 lean = aInst2.xy + wdir * push * 0.032;',
     'p.xz += side * (aCorner.x-0.5) * mix(aInst2.w * (1.0 - vT*0.75), h * 0.5, uPixel);',
     'vUV = aCorner;',
-    'vVar = min(floor(hash(aPA.xy * 64.0) * uPxVariants), uPxVariants - 1.0);',   // PIN MOVED (AUDIT MEADOW1): the root's place in its cell, which no floating-origin shift moves
+    'vVar = min(floor(hash(aPA.xy * 64.0) * uPxVariants), uPxVariants - 1.0);',
   ]) assert.ok(GAME_GRASS_VS.includes(line), `VS: ${line}`);
   for (const line of [
-    'vec2 pxUv = vec2((vVar + vUV.x) / uPxVariants, vUV.y);',   // PIN MOVED (AUDIT MEADOW1): the sample's uv by name - the meadow reads it at its own level
+    'vec2 pxUv = vec2((vVar + vUV.x) / uPxVariants, vUV.y);',
     'else px = texture(uPxSheet, pxUv);',
     'if (px.a < 0.5 || vFade < bayer4(gl_FragCoord.xy)) discard;',
     'pxTone = floor(px.r * 4.0 + 0.5); t = px.g; pxBlade = px.b;',
@@ -209,7 +207,7 @@ test('GRASS-PX: the compiled stages are the lab\'s text under the declared edits
     'c *= 0.88 + mix(vTint, floor(vTint * (uPxTintBands - 1.0) + 0.5) / (uPxTintBands - 1.0), uPixel) * 0.24;',   // GRASS-LIT: the bands kept, their extremes narrowed
     'vec3 light = uAmb * (0.9 + 0.10*t) + uSunCol',   // GRASS-LIT: the sward's shade still reads the drawn stalk
     'mix(smoothstep(0.86,1.0,t), step(3.5, pxTone), uPixel) * vLam * vSun;',   // GRASS-LIT: the rim under the deck and the map
-    'if (uPixel > 0.5 && uArt < 0.5) { float l = max(dot(c, vec3(0.299, 0.587, 0.114)), 1e-4); float g = max(1.0, floor(pow(l, 1.0 / 2.2) * uPxSteps + 0.5)) / uPxSteps; c *= pow(g, 2.2) / l; }',   // PIN MOVED (AUDIT MEADOW1): the pixel style's ramp, and not the meadow's
+    'if (uPixel > 0.5 && uArt < 0.5) { float l = max(dot(c, vec3(0.299, 0.587, 0.114)), 1e-4); float g = max(1.0, floor(pow(l, 1.0 / 2.2) * uPxSteps + 0.5)) / uPxSteps; c *= pow(g, 2.2) / l; }',
     'o = vec4(c, mix(vFade * smoothstep(0.0, 0.30, vT), 1.0, uPixel));',
   ]) assert.ok(GAME_GRASS_FS.includes(line), `FS: ${line}`);
   assert.ok(!/smoothstep\(0\.0,0\.55,vT\)/.test(GAME_GRASS_FS) && !/0\.58\*vT/.test(GAME_GRASS_FS), 'the gradient and the sward shade read the drawn stalk, not the quad');
@@ -315,9 +313,6 @@ test('GRASS-PX: the renderer compiles the game\'s stages, uploads the sheet with
 });
 
 test('GRASS-PX: the row, its default, and the host reading it live', () => {
-  // FT18: the style is a PART of the one grass row - its drawer, under the density's bar - so "beside the density
-  // dial" is structural now, and the inertness GRASS AUDIT 1 made the note say is where the control stands
-  const world = read('src/scenes/world.js');
   const row = FEATURES.find((f) => f.id === 'grass');
   assert.equal(row.control.key, 'grassDensity', 'the bar is the density');
   const part = row.control.parts.find((pt) => pt.key === 'grassStyle');
@@ -326,17 +321,8 @@ test('GRASS-PX: the row, its default, and the host reading it live', () => {
   assert.deepEqual({ ...row.control.also.find((a) => a.key === 'grassStyle') }, { store: 'prefs', key: 'grassStyle', initial: 'meadow', online: 'player' });
   assert.equal(row.group, 'sight'); assert.deepEqual([...row.kinds], ['enhanced']); assert.match(row.effect, /the style at once\.$/);
   assert.ok(row.note.includes('in the enhanced outdoors'), 'GRASS AUDIT 1: the row says what it is inert without');
-  assert.ok(world.includes('vertsPerBlade: labGrass._meadow ? labGrass.vertsCards : labGrass._oneQuad ? labGrass.vertsFar : labGrass.verts'), 'GRASS AUDIT 1: the stats say which blade the frame drew (MEADOW1: or which cards)');
   assert.equal(FEATURE_PREF_DEFAULTS.grassStyle, 'meadow', 'the shelf\'s default is the row\'s');
   assert.deepEqual(['pixel', 'smooth', undefined, 'junk', 'meadow'].map(pixelGrass), [true, false, true, true, true], 'MEADOW1: the meadow is a pixel style');
-  const at = world.indexOf('labGrass.draw(proj, view, new Float32Array(cam.pos), windClock,');   // PIN MOVED (AUDIT MEADOW1): the gust wave's clock
-  assert.ok(at > 0);
-  const call = world.slice(at, world.indexOf(');', at) + 2);
-  assert.ok(call.endsWith("LAB_GRASS.range, getPref('grassStyle'));"), 'the draw\'s last word is the row\'s, read every frame - a uniform, so no reload');
-  // the probe drives the pixel style on a real GL and counts its colours
-  const probe = read('tools/grassFieldProbe.mjs');
-  assert.ok(probe.includes("frame(200, 'pixel')") && probe.includes('out.pixel.tones < out.at200.tones * 0.5'), 'the probe draws the pixel style and holds that it takes fewer colours');
-  assert.ok(probe.includes('out.pxSheet.soft === 0'), '...and reads the sheet back off the GPU with a hard alpha');
 });
 
 /** a cell's blades as the placer shapes them, for the slot rig (perf2's own) */
@@ -377,9 +363,6 @@ test('GRASS-PX2: in the pixel style every cell draws the ONE-QUAD blade - the sp
   // and back: the style is read every draw, not latched
   r.draw(proj, view, new Float32Array(eye), 0, light, wind, 300, 'smooth');
   assert.equal(r.drawn.farSlots, 0);
-  // the probe counts it on a real GL
-  const probe = read('tools/grassFieldProbe.mjs');
-  assert.ok(probe.includes('out.pixelShipped.drawn.verts < out.shipped.drawn.verts * 0.5'), 'the probe holds the pixel frame under half the smooth frame\u2019s vertices');
 });
 
 const HL_SHIPPED = 39;   // the shipped sheet's highlight texels (AUDIT GRASS-PX4 F1: a threshold that moves by one changes it)

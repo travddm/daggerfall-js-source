@@ -1,5 +1,4 @@
-// GROUND-BOLT (FIELD BUGS 2026-10-23c; the owner: "spells cast at the ground outdoors don't collide with it at all and
-// sail straight through"). The world and fixed-city hosts handed the cast engine a collider proxy carrying `raycast`
+// GROUND-BOLT (FIELD BUGS 2026-10-23c). The world and fixed-city hosts handed the cast engine a collider proxy carrying `raycast`
 // alone - the MESH ray - and outdoors the ground is not a mesh (player/collider.js surfaceHit's note), so a missile met
 // the buildings and never the terrain. The hosts hand `liveCollider` now (the live collider whole: its ground with its
 // ray), and the flight asks `flightStop` (the mesh ray, cover, and the terrain marched - player/groundRay.js). Driven

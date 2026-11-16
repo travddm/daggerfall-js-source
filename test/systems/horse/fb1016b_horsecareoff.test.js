@@ -5,8 +5,8 @@
 // - though the choice itself (chooseRiddenHorse) was never the tier's. Now every horse owned has its card and the choice
 // on every tier; only the care drops. Driven over the real accessor (systems/upkeep/upkeepSwitch.js horseCareRules, the
 // player's own `horseCare` pref and the page's skin), the real upkeep (createUpkeep, as world.js and exterior.js build
-// it), the hosts' provider seam (stableProviderFor) and the real page (drawStablePage). bible/06-Systems/Horse-Care.md,
-// The Stable page; bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md HORSE-CARE-OFF.
+// it), the hosts' provider seam (stableProviderFor) and the real page (drawStablePage).,
+// The Stable page; HORSE-CARE-OFF.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { horseCareRules, HORSE_CARE_PREF } from '../../../src/systems/upkeep/upkeepSwitch.js';

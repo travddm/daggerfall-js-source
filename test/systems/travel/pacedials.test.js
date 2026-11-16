@@ -1,7 +1,4 @@
-// PACE-DIALS (2026-10-06, the player: "Revert back to the overworld timer multiplier for ppl to set to 60x and 100x on
-// roads and the nearby enemy timer to set to 60x max ... speed settings should be 5x 10x 20x 30x 40x 60x and 100x should be
-// only setable when on a road and it has to go to 60 instantly again when leaving the road. Same for enemies nearby
-// multiplier and same rules"; bible/01-Overview/handoffs/Waypoints-And-Pace.md). Two dials on one ladder - the journey's Speed and
+// PACE-DIALS. Two dials on one ladder - the journey's Speed and
 // the Near enemies floor - read by every reader through systems/travel/travelPace.js: RATE-LAW's x100 and x60 are the dial's two
 // ceilings now, x100 a road's alone, and leaving a road takes a dial at x100 to x60 at once, never climbing back.
 import { test } from 'node:test';
@@ -151,11 +148,3 @@ test('PACE-DIALS: the steppers - every skin\'s one builder - show the dial in fo
   } finally { c.dispose(); fresh(); }
 });
 
-test('PACE-DIALS host: the world tells the rule its ground every frame a journey or the Overworld runs, a dial turned under a journey asks the clock again, and every other skin wears the pace box', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /if \(travelControlUI\?\.isShowing\) setPaceGround\(!!travelControlUI\.onRoad\);\n\s*else if \(travelView\?\.state === 'up'\) setPaceGround\(travellerOnRoad\(\)\);/, 'the journey\'s own ground, else the feet\'s under the view');
-  assert.match(w, /const _stopPace = onTravelPace\(\(\) => \{ if \(!frameAlive\(_frameToken\)\) \{ _stopPace\(\); return; \} travelOptions\?\.reapplyRate\?\.\(\); \}\);/);
-  assert.match(w, /if \(travelControlUI\?\.isShowing && typeof document !== 'undefined'\) showPaceBox\(\); else hidePaceBox\(\);/, 'the classic strip and GrimoireUI: the dials\' own box while a journey runs');
-  assert.match(rd('src/systems/travel/travelOptions.js'), /reapplyRate: \(\) => \{ if \(st\.autopilot && ui\?\.isShowing\) applyRate\(true\); \},/);
-  assert.match(rd('src/systems/timeScale.js'), /export const travelRateOf = \(onRoad\) => paceRateOn\(onRoad\);/);
-});

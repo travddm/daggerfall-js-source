@@ -1,5 +1,5 @@
 // @ts-check
-// GUILD1d (2026-09-30, Mac: "Lets do this"): A GUILD'S BANNERS, DRAWN (bible/11-Multiplayer/Seats-Arc.md 3.4: "the
+// GUILD1d: A GUILD'S BANNERS, DRAWN (3.4: "the
 // port's own cloth quad, 1 wide by 3 tall (in DFU's scale, a man's height and a half), its field the holder's first
 // colour, a border in the second, the device centred; it sways on the weather's wind").
 //
@@ -18,6 +18,8 @@
 // Unity has no player guilds. Ledger A (ONLINE).
 import { FOG_FACTOR_GLSL } from './labGrass.js';
 import { buildProgram } from './glProgram.js';
+import { filterWorldPicture, freshWorldPicture } from './world-texture-filter.ts';
+import { uploadCanvasMips } from './mip-upload.ts';
 
 /** The cloth, metres: a man's height and a half, a third of it wide. */
 export const BANNER_W_M = 0.9;
@@ -149,7 +151,7 @@ export class BannerRenderer {
    *  AUDIT GUILD1d R7: asked again next time, never remembered as none). `seconds` stamps its use. */
   textureOf(key, heraldry, seconds = 0) {
     const had = this.textures.get(key);
-    if (had) { had.seen = seconds; return had.tex; }
+    if (had) { had.seen = seconds; freshWorldPicture(this.gl, had.tex); return had.tex; }   // a texture setting changed since
     const gl = this.gl;
     const canvas = this.paint?.(heraldry) ?? null;
     let tex = null;
@@ -160,9 +162,8 @@ export class BannerRenderer {
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);   // AUDIT GUILD1d R8: the cut's edge mipmaps without a dark rim
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, /** @type {any} */ (canvas));
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-      gl.generateMipmap(gl.TEXTURE_2D);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      uploadCanvasMips(gl, tex, canvas);
+      filterWorldPicture(gl, tex, gl.TEXTURE_2D, true);   // the world's texture filter and anisotropy
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.bindTexture(gl.TEXTURE_2D, null);

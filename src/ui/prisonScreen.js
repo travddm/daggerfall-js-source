@@ -242,7 +242,7 @@ export class PrisonScreenWindow {
     } else {
       drawRect(renderer, m, 0, 0, NATIVE_W, 200, [0.03, 0.03, 0.04, 1]);
     }
-    // FONT3 (2026-10-02, Mac: "we need to ensure everything recieves our enhanced font"): the one line on this screen
+    // FONT3: the one line on this screen
     // is the whole presentation (the header above), and under the enhanced skin it was the 1996 bitmap face over the
     // picture. It is the mid-screen label's DOM face there now, at the label's own native row - the horse's name
     // (ui/horseNameTooltip.js) is the same seam. A DOM line stays painted until it is told, so dispose takes it down.

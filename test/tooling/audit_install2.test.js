@@ -1,4 +1,4 @@
-// AUDIT INSTALL, ROUND 2 (2026-09-29, Mac: "Audit this"): PR #429's
+// AUDIT INSTALL, ROUND 2: PR #429's
 // install work read again by five fresh lanes - the launcher's lifecycle,
 // security, the release pipeline and its notes, ARENA2 detection, and the
 // tests, docs and the player's eye - after round 1's fixes had landed.
@@ -6,7 +6,7 @@
 // one of them: L1-5 kept a tag's text out of the build legs' scripts, and
 // in doing so broke the Windows leg. Every finding a lane verified is
 // fixed at its root and pinned here; the record, finding by finding, is
-// bible/01-Overview/audits/Audit-Install.md ("Round 2"). Lane C's notes findings
+// ("Round 2"). Lane C's notes findings
 // (C1, C4, E-48..E-51) pinned the PATCH-NOTES-*.md reader REL6 retired -
 // the notes come off the pull requests now (test/tooling/rel4_release.test.js).
 import { test } from 'node:test';
@@ -218,11 +218,13 @@ test('R2-D4: the search goes on past its deadline, and a later find is added - n
 });
 
 test('R2-D5: on a Mac the privacy-guarded folders are read LAST - after ~/Games, as "only when nothing else was found" says', () => {
-  const roots = looseRoots({ platform: 'darwin', home: '/Users/p', env: {} }, ['/Users/p/Downloads']);
+  // The folders are joined with the host's own separator, so the paths here are too: the same text off Windows.
+  const mac = (d) => join('/Users/p', d);
+  const roots = looseRoots({ platform: 'darwin', home: '/Users/p', env: {} }, [mac('Downloads')]);
   assert.deepEqual(roots.map((r) => [r.dir, r.guarded]), [
-    ['/Users/p/Games', false], ['/Users/p/Downloads', true], ['/Users/p/Desktop', true], ['/Users/p/Documents', true],
+    [mac('Games'), false], [mac('Downloads'), true], [mac('Desktop'), true], [mac('Documents'), true],
   ]);
-  assert.deepEqual(looseRoots({ platform: 'linux', home: '/h', env: {} }, []).map((r) => r.dir), ['/h/Downloads', '/h/Desktop', '/h/Documents', '/h/Games'], 'elsewhere the order stands');
+  assert.deepEqual(looseRoots({ platform: 'linux', home: '/h', env: {} }, []).map((r) => r.dir), ['Downloads', 'Desktop', 'Documents', 'Games'].map((d) => join('/h', d)), 'elsewhere the order stands');
   // run: the files in ~/Games, and not one guarded folder read on the way (each read would be a system prompt)
   const home = mkdtempSync(join(tmpdir(), 'r2-mac-'));
   try {

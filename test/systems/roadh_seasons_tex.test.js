@@ -139,7 +139,7 @@ function recordingRenderer(log) {
   log.length = 0;
   return r;
 }
-const uploads = (log) => log.filter((c) => c[0] === 'texImage2D').map((c) => c[c.length - 1]);
+const uploads = (log) => log.filter((c) => c[0] === 'texImage2D' && c[2] === 0).map((c) => c[c.length - 1]);
 
 /**
  * A TEXTURE.### file, built here: the container has no ARENA2 and the

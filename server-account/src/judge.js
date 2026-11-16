@@ -1,12 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// INT2 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and do it
-// properly"): THE JUDGE. Every checkpoint a realm character's tab writes is READ here - not only its first.
+// INT2: THE JUDGE. Every checkpoint a realm character's tab writes is READ here - not only its first.
 //
 // ═══ WHAT REALM-ARC SECTION 4 PROMISED, AND THE SAVE NEVER GOT ═════
 //
 // "The service reads the checkpoint's summary, spot-checks the blob, and refuses a checkpoint that breaks the law." Until
-// this module the service read a save twice - customs' wealth at the first checkpoint (realm.js firstSaveRefusal) and
+// this module the service read a save twice - a new character's wealth at the first checkpoint (realm.js firstSaveRefusal) and
 // the goods a hand-over takes (realmTradeLaw.js) - and stored every other checkpoint unopened. A client could write any
 // character it liked one checkpoint after its first: a sword no producer mints, a level it never earned, a purse that
 // grew by a million between two saves, and every route that hands a realm character's goods to another player
@@ -14,12 +13,12 @@
 //
 // ═══ THE VERDICT FREEZES TRADE, NEVER PROGRESS ═════════════════════
 //
-// Mac's call (2026-10-09, asked what a breach does): "Freeze trading". A checkpoint that breaks the law is STORED - the
+// . A checkpoint that breaks the law is STORED - the
 // player loses nothing they played, because a finding can be the law's mistake and "THE CLOUD IS A BACKUP" exists
 // because players lost games - and the character is HELD: every route that moves its value to another player refuses
 // it (realm.js holdRefusal) until a later checkpoint is clean or staff clear it. A character the law has found three
 // times is held for a time, whatever its next checkpoint says (STRIKES_FOR_TIMED, verdict.js LAW_HOLD_S): a client that
-// keeps writing impossible things is not an accident - and since AUTO-HOLD (2026-10-16) the hold lifts on its own when
+// keeps writing impossible things is not an accident - and since AUTO-HOLD the hold lifts on its own when
 // its time is out, never on a person's review.
 //
 // ═══ WHAT IS JUDGED ════════════════════════════════════════════════
@@ -27,7 +26,7 @@
 //   - THE CHARACTER: its level a whole number in the realm's range and the one its summary claims (the summary's level
 //     is the token's `cl`, which the ladder's health reads - arenaLaw.js ladderVitality); its eight attributes within
 //     MAX_STAT_VALUE (statMods.js, both leveling lanes' cap); its skills within SKILL_HARD_CAP (skillSoftcap.js); and
-//     SCHOOLS5 (bible/06-Systems/Arcane-Specialisations.md section 7) its specialisation, when it carries one - a path the
+//     SCHOOLS5 its specialisation, when it carries one - a path the
 //     table holds and both its schools mastered (arcanePaths.js pathFindings - no signature spell is judged).
 //   - EVERY ITEM IT HOLDS (possessedItemLists) - the pack, the wagon, the bag, the furnisher's and the repairer's lists,
 //     what it set out or stored in its own rooms, a rented room's and a deed's chests, a boat's hold, a companion's pack -
@@ -51,12 +50,12 @@ import { SKILL_HARD_CAP } from '../../src/systems/skillSoftcap.js';
 import { STAT_KEYS_ORDER } from '../../src/systems/statMods.js';
 import { pathFindings } from '../../src/systems/arcanePaths.js';   // SCHOOLS5: a save's specialisation
 import { isMasterWork, masterSignature, masterLinesOfRecord } from '../../src/net/masterLaw.js';   // MASTER-ART: a Master's work's lines, its record's
-import { readProductRecord } from '../../src/net/productRecord.js';
+import { readProductRecord, masterTierOfVersion } from '../../src/net/productRecord.js';
 
 /** The judge's version: the item law's, and its own character law beside it. */
 export const JUDGE_VERSION = ITEM_LAW_VERSION;
 /** The highest level the realm reads (realm.js REALM_LEVEL_CLAIM_MAX, the summary's own bound - pinned equal). LEVEL-45
- *  (2026-10-27, mob: "juidge will need changed to lvl 45"): the online cap (src/systems/levelCap.js ONLINE_LEVEL_CAP,
+ *  the online cap (src/systems/levelCap.js ONLINE_LEVEL_CAP,
  *  pinned equal), which every realm character is converted to at its join before its next checkpoint. */
 export const JUDGE_LEVEL_MAX = 45;
 /** The holds the law has come to before a held character is held for a time (verdict.js LAW_HOLD_S), whatever its next
@@ -230,7 +229,7 @@ export function judgeSave(save, summary = null, o = {}) {
     list.forEach((/** @type {any} */ it, /** @type {number} */ i) => {
       items++;
       for (const code of findingsOf(it)) keep({ code, list: li, at: i, t: it?.templateIndex ?? null });
-      if (typeof it?.provenance === 'string' && PROVENANCE_RE.test(it.provenance)) provenances.push({ provenance: it.provenance, t: it.templateIndex, m: it.material, q: it.quality, w: worthless(it) ? 0 : itemWorth(it), ...(isMasterWork(it) ? { l: masterSignature(it.affixes) } : {}) });   // MASTER-ART: a Master's work's lines
+      if (typeof it?.provenance === 'string' && PROVENANCE_RE.test(it.provenance)) provenances.push({ provenance: it.provenance, t: it.templateIndex, m: it.material, q: it.quality, w: worthless(it) ? 0 : itemWorth(it), ...(isMasterWork(it) ? { l: `${it.rarity}|${masterSignature(it.affixes)}` } : {}) });   // MASTER-ART: a Master's work's lines, after its tier
     });
   });
   // INT7: THE ARMS - the most reach of the weapons in the pack the law takes, and whether a lawful bow is among them
@@ -266,10 +265,11 @@ export function ledgerPieces(/** @type {any} */ save) {
 
 /** MASTER-ART: the lines a record's Master's work mints, as one string - '' for a record that names none, so no piece
  *  claims a Master's lines on another craft's provenance. AUDIT HORIZONTAL B1: the values the record signs
- *  (masterLaw.js masterLinesOfRecord), never a roll of today's bands. @param {unknown} record */
+ *  (masterLaw.js masterLinesOfRecord), never a roll of today's bands. After the tier its version mints, so a
+ *  Rare record's piece cannot claim Legendary. @param {unknown} record */
 const recordLines = (record) => {
   const c = readProductRecord(record);
-  return c?.l ? masterSignature(masterLinesOfRecord(c.l) ?? []) : '';
+  return c?.l ? `${masterTierOfVersion(c.v)}|${masterSignature(masterLinesOfRecord(c.l) ?? [])}` : '';
 };
 /** How many provenances one statement asks about - D1 binds at most 100 a statement. */
 const PROVENANCE_CHUNK = 90;

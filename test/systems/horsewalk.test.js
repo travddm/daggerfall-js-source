@@ -1,5 +1,4 @@
-// HORSE-WALK (2026-10-12, the owner: "when youre riding a horse, it walks by default and to gallop you must shift to
-// sprint, just like when you are walking as a character") - THE WALK (bible/06-Systems/Horse-Care.md THE WALK): horse
+// HORSE-WALK - THE WALK (THE WALK): horse
 // care's horse walks unless the run gallops it. The law (player/motor.js - the walk on DFU's walk base, its base for
 // IsMovingLessThanHalfSpeed, the gallop on the ride base as ever; systems/transport.js setRideWalk; systems/upkeep/upkeepRuntime.js
 // rideWalks), and everything that reads the gait: the riding sprite and its clop (systems/riding.js, player/mountRig.js),
@@ -9,7 +8,7 @@
 // Features row, the Horses tutorial and the four hosts.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { HORSE_CARE_HARD as HARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS (PIN MOVED): the upkeep is handed a tier's rules - these pins pin the system as it stood, Hard
+import { HORSE_CARE_HARD as HARD } from '../../src/systems/upkeep/upkeepTiers.js';   // HORSE-TIERS (
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { PlayerMotor } from '../../src/player/motor.js';
@@ -30,6 +29,10 @@ import { TUTORIALS } from '../../src/systems/tutorialCatalogue.js';
 import { setModSetting, onlineModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { rrRidingOn, rrCanRunRiding, rrRidingSetting, RR_VENDOR } from '../../src/systems/roleplayRealism/rrRealism.js';
 import { fakeDoc, one } from '../decorFakes.mjs';
+import { setPref } from '../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Horse walks on. The default (off, DFU's ride base) is the last test.
+setPref('horseWalks', true);
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const near = (a, b) => Math.abs(a - b) < 1e-6;
@@ -212,7 +215,7 @@ test('HORSE-WALK x THE OVERWORLD (the owner: "Ensure the overworld speed isnt af
   m.transportMode = TRANSPORT_MODES.Horse;
   setCanRunOverride(null);
   setGallopGate((mode, mods) => upkeep.gallopGate(mode, mods));
-  // HORSE-TIERS (PIN MOVED): the panel reads the walk the motor TOOK, handed by the host's frame (saddleHost.motion's
+  // HORSE-TIERS (
   // `walk`, the motor's rideWalking) - so each step hands it, as the hosts do
   const step = (input) => { ride(m, input); saddle.motion(1 / 60, m.speed / 60, !!input?.run, m.rideWalking); };
   try {
@@ -285,7 +288,7 @@ test('HORSE-WALK THE 3D HORSE UNDER ITS RIDER: a slow ride (gallops false - the 
   rig.release(h);
   // the player's horse holds to the host's slow ride, a peer's to its pose's hs
   assert.match(rd('src/player/mwView.js'), /look: horse\.look \| 0, gallops: !horse\.slow \}\);/);
-  assert.match(rd('src/net/peer/peerBodies.js'), /look: shown\.rc \| 0, gallops: !shown\.hs, pose: false \}\);/);   // PIN MOVED (HORSE-VIEW): the gait alone stepped here - the pose waits for the rider's
+  assert.match(rd('src/net/peer/peerBodies.js'), /look: shown\.rc \| 0, gallops: !shown\.hs, pose: false \}\);/);
 });
 
 test('HORSE-WALK THE SADDLE PANEL SAYS IT: Walking where horse care walks the horse, Galloping on the run, Trotting at DFU\'s ride (care off, or on the road), Rolling on a bench, Standing still; the host reads the very walk the motor took (its rideWalking, handed by the host\'s frame - HORSE-TIERS, PIN MOVED: the motor alone knows a gallop asked and refused), and the panel draws it (mutants: HORSEWALK-saddle-trots, -saddle-cart-walks, -saddle-host-unread, -saddle-panel-unread)', () => {
@@ -321,7 +324,7 @@ test('HORSE-WALK THE HOSTS (world.js, exterior.js): the walk installed beside th
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = rd(host);
     assert.match(s, /import \{ setGallopGate, setRideWalk \} from '\.\.\/systems\/transport\.js';/, host);
-    // HORSE-TIERS (PIN MOVED): the run asked rides with the question
+    // HORSE-TIERS (
     const install = host.endsWith('world.js') ? 'setRideWalk\\(\\(mode, runAsked\\) => !rideOnTheRoad\\(\\) && upkeep\\.rideWalks\\(mode, runAsked\\)\\);' : 'setRideWalk\\(\\(mode, runAsked\\) => upkeep\\.rideWalks\\(mode, runAsked\\)\\);';
     assert.match(s, new RegExp(`\\n\\s*${install}[^\\n]*\\n\\s*setGallopGate\\(\\(mode, mods\\) => upkeep\\.gallopGate\\(mode, mods\\)\\);`), `${host}: the walk beside the gallop (world.js never on the road - the Overworld's view and the journeys are its alone)`);
     assert.match(s, /\{ look: riddenHorseLook\(playerEntity\.items \?\? \[\]\), slow: player\.slowRide \}/, `${host}: the 3D horse held on a slow ride`);
@@ -377,4 +380,21 @@ test('HORSE-WALK THE WORDS: the Features row and the Horses tutorial say the hor
   assert.ok(TUTORIALS.find((t) => t.id === 'horse').body.some((b) => b.includes('Your horse walks; hold {Run} to gallop. Do not gallop into people in town: trampling them is a crime.')));
   _resetModSettings();
   assert.equal(rrRidingSetting('TrampleCivilians'), true, 'the trample the page warns of ships on');
+});
+
+test("DFU-GAPS SW5: by default a cared-for horse rides at DFU's base with no Run - the walk is the Horse walks option's - and the row is off and the player's own online", async () => {
+  const { FEATURES } = await import('../../src/systems/features.js');
+  const { ONLINE_PLAYERS_OWN_PREFS } = await import('../../src/systems/online/onlineLane.js');
+  const items = [horse(2, { horseFed: T0 + 600 })];
+  setPref('horseWalks', false);
+  try {
+    const u = createUpkeep({ items: () => items, now: () => T0, horseCare: () => HARD });
+    assert.equal(u.rideWalks('Horse', false), false, 'no Run asked: the DFU ride base, not the walk');
+  } finally {
+    setPref('horseWalks', true);
+  }
+  assert.equal(createUpkeep({ items: () => items, now: () => T0, horseCare: () => HARD }).rideWalks('Horse', false), true, 'the option on: the walk');
+  const row = FEATURES.find((f) => f.id === 'horse-walks');
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['horseWalks', false, 'player']);
+  assert.ok(ONLINE_PLAYERS_OWN_PREFS.includes('horseWalks'));
 });

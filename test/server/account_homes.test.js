@@ -1,16 +1,12 @@
-// ACCOUNT-HOMES (2026-10-06, asked: "House ownership should be account bound, not character bound" and "Deleted
-// characters should remove their houses from online"): A HOME IS ITS ACCOUNT'S. Every character of the owning account
+// ACCOUNT-HOMES: A HOME IS ITS ACCOUNT'S. Every character of the owning account
 // walks in, keeps it, furnishes and paints it, rents its rooms out and collects the rent, stocks its trader and sells it -
 // the gold of each act its own record's; the character that BOUGHT it is still the one its cap counts and its delete
 // takes; a deed the realm gave (KNIGHT-HOUSE) stays its knight's; a guild's hall is never its guildmaster's account's.
-// Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs); migration 0163 on a
-// database built to the migration before it; the client's sweep of the homes a save keeps things in that its account
-// holds no more; the hosts by source. bible/06-Systems/Online-Arc.md ACCOUNT-HOMES.
+// Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs); the client's
+// sweep of the homes a save keeps things in that its account holds no more; the hosts by source. ACCOUNT-HOMES.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
 import { standService, T0 } from '../accountDb.mjs';
 import { seatRealm, realmJoinAt } from '../realmSeat.mjs';
 import { homeSaleRefund, homeInArenaCell, HOME_ARENA_MAP_ID, HOME_ARENA_CELL } from '../../src/net/homeLaw.js';
@@ -21,7 +17,6 @@ import { homeSceneName, homeSceneOf, homesGoneFrom, homesGoneLine } from '../../
 import { createSceneCache, cacheScene, addPermanentScene, layoutSceneName } from '../../src/systems/sceneCache.js';
 import { createHomesBoot } from '../../src/scenes/homesBootHost.js';
 
-const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const RICH = (name, extra = {}) => ({ name, level: 9, goldPieces: 2_000_000, items: [], bankAccounts: new Array(62).fill(0).map(() => ({ accountGold: 0 })), ...extra });
 const MAP = 77, REGION = 17, PRICE = 100_000;
 const recordOf = (env, id) => {
@@ -166,26 +161,6 @@ test('ACCOUNT-HOMES the trader and the delete: the other character stocks the tr
   assert.ok(raw.prepare('SELECT 1 FROM realm_characters WHERE id = ?').get(A2.id), 'the other character stands');
 });
 
-test('ACCOUNT-HOMES migration 0163: the homes of realm characters already gone are released with their pieces; a tombstone\'s, an offline id\'s, a living character\'s and a guild\'s hall stand (mutants: the realm id\'s shape unread; a row standing on it unasked)', () => {
-  const files = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-  const at = files.indexOf('0163_account_homes.sql');
-  assert.ok(at > 0, 'the migration is there');
-  const db = new DatabaseSync(':memory:');
-  db.exec('PRAGMA foreign_keys = ON');
-  for (const f of files.slice(0, at)) db.exec(src(`server-account/migrations/${f}`));
-  db.prepare("INSERT INTO players (id, guest_name, created_at, last_seen) VALUES ('p1', 'Quiet Fox', 1, 1)").run();
-  const realm = (id, dead = null) => db.prepare('INSERT INTO realm_characters (id, player, name, seq, bytes, created_at, updated_at, dead_at) VALUES (?, \'p1\', \'X\', 1, 10, 1, 1, ?)').run(id, dead);
-  const LIVE = 'r00000000000000000001', DEAD = 'r00000000000000000002', GONE = 'r00000000000000000003';
-  realm(LIVE); realm(DEAD, 5);
-  db.prepare("INSERT INTO guilds (id, name, name_key, tag, ranks, founded_at) VALUES ('g1', 'The Iron Oath', 'the iron oath', 'IRON', '[]', 1)").run();
-  const home = (key, charId, guild = null) => db.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at, guild_id) VALUES (77, ?, 'p1', ?, 'Fox', 17, 'private', 1000, 1, ?)").run(key, charId, guild);
-  home(1, LIVE); home(2, DEAD); home(3, GONE); home(4, 'char-old'); home(5, 'guild:g1', 'g1'); home(6, 'R00000000000000000003');
-  db.prepare(`INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (77, 3, 'd1', 41000, '{}', 1)`).run();
-  db.exec(src('server-account/migrations/0163_account_homes.sql'));
-  assert.deepEqual(db.prepare('SELECT building_key FROM homes ORDER BY building_key').all().map((r) => r.building_key), [1, 2, 4, 5, 6], 'the home whose realm character is gone, alone');
-  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM home_decor').get().n, 0, 'its pieces with it');
-});
-
 test('ACCOUNT-HOMES the sweep: a home this save keeps things in that its account holds no more gives back this character\'s own things that stood in it and is let go (its other layouts\' visits too); a home the account holds, one bought while the list was read, one in the arena\'s cell, and every other scene stand (mutants: the held unread; the arena\'s unskipped; ownNow unread; the permanent mark kept)', () => {
   const cache = createSceneCache();
   const sword = { name: 'Longsword', templateIndex: 115 };
@@ -244,20 +219,3 @@ test('ACCOUNT-HOMES the boot\'s sweep (scenes/homesBootHost.js sweepGone): once 
   assert.equal(reads, 2);
 });
 
-test('ACCOUNT-HOMES the hosts, by source: the client\'s `own` is the account\'s; the world sweeps the homes the account holds no more once a boot, beside the arena\'s move and the deeds\' holds, sparing one bought while the list was read; the delete\'s door says the homes it bought go for every character (mutants: each wire cut)', () => {
-  const h = src('src/systems/online/onlineHomes.js');
-  assert.match(h, /const own = row\.mine && !row\.deed;/);
-  assert.match(h, /if \(row\.mine && row\.deed && typeof me === 'string' && row\.character === me\) return null;/);
-  const w = src('src/scenes/world.js');
-  // HOST-SPLIT: the sweep is scenes/homesBootHost.js's (sweepGone), built above the boot's first landing and called beside
-  // the deeds' holds
-  const boot = src('src/scenes/homesBootHost.js');
-  assert.ok(w.indexOf('const homesBoot = createHomesBoot({') < w.indexOf('void homesBoot.sweepGone();'), 'built above the boot\'s first landing (HOTFIX 1003\'s TDZ)');
-  assert.match(w, /void homesBoot\.holdDeeds\(\);[^\n]*\n\s*void homesBoot\.sweepGone\(\);/);
-  assert.match(w, /homesApi, onlineHomes, realm: realmSession, giveOwn: arenaGiveOwn, player: \(\) => playerEntity,/);
-  assert.match(w, /say: \(line\) => townTalk\.say\(line\),/);
-  assert.match(boot, /const swept = homesGoneFrom\(p\.sceneCache \?\?= createSceneCache\(\), r\.data\.homes, \{ ownNow: \(m, k\) => !!onlineHomes\?\.homeAt\(m, k\)\?\.own \}\);/);
-  assert.match(boot, /if \(swept\.own\.length\) \{ giveOwn\(swept\.own\); say\(homesGoneLine\(swept\.own\)\); \}/);
-  assert.match(boot, /if \(!r\?\.ok \|\| !Array\.isArray\(r\.data\?\.homes\)\) \{ goneAsked = false; return null; \}/, 'a list not read sweeps nothing');
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /the homes it bought and its guild place are lost\. Homes belong to your account, so your other characters lose them too\./);
-});

@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster formats_a - src/formats arch3dFile..
+// AUDIT 68, cluster formats_a - src/formats arch3dFile..
 // mwCharacter. ARCH3D.BSA wrapped and patched per record instead of copied
 // whole; DFRandom and the DXT5 alpha selectors off BigInt; key segments
 // found by binary search; one BuildingData and one people/flat reader;

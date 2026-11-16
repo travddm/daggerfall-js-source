@@ -254,7 +254,7 @@ test('%oth reads the NPC-s FACTION race, falling back to the region-s - DFUs fix
 });
 
 test('the four pronouns are the POTENTIAL QUESTORs gender, and anything but female is he', () => {
-  // QUESTOR-SHE (PIN MOVED): the gender is the Genders enum the pool's NPCData carries - these fixtures handed in the
+  // QUESTOR-SHE (
   // strings 'male'/'female', which no producer mints, and so held up a helper that never said "her" in the game
   const male = talkMacroHandlers(makeCtx({ questorGender: () => GENDERS.Male }));
   const female = talkMacroHandlers(makeCtx({ questorGender: () => GENDERS.Female }));

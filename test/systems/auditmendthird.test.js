@@ -1,10 +1,11 @@
-// AUDIT MEND-THIRD (2026-10-19, Mac: "Audit this"; bible/01-Overview/audits/Audit-Mend-Third.md): what the four cold
+// AUDIT MEND-THIRD: what the four cold
 // lanes found of the found-condition law beyond the sale's own arithmetic (mend_third.test.js) - each pinned on the code
 // as fixed, red on the code it replaced. L3-1: an enchanted found piece fenced whole online. L3-2: PARTY-LOOT's personal
 // bonus and a foe's worn kit handed pieces over worn and unmarked. L3-3 / L1-5: a found book's stack merge and split
 // handed it over whole. L3-4: There's a Hole in the Bottom of the Ocean's re-mint left a stale mark. L1-6 / L2-6 / L3-5:
 // a temper moved the maximum and left the mark. L3-6: a new character's worn kit, and the questions' dagger, unmarked.
 // L1-4: a patron read no condition at all. Every piece from its producer.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -26,7 +27,7 @@ import { createRandomBook, setBookPrice } from '../../src/systems/books.js';
 import { upgradeLoot } from '../../src/world/oceanHoles.js';
 import { temperItem } from '../../src/systems/smithItems.js';
 import { pieceQuality, temperRefusal } from '../../src/net/temperLaw.js';
-import { repoolWeaponConditions, repairUnmintedConditions } from '../../src/systems/conditionRepair.js';
+import { repoolWeapon } from '../../src/systems/conditionRepair.js';
 import { creditOwnMend } from '../../src/systems/item/foundMark.js';
 import { assignSkillEquipment } from '../../src/systems/roleplayRealismItems/rriKits.js';
 import { patronWorth, patronCap } from '../../src/net/patronLaw.js';
@@ -47,7 +48,8 @@ const quote = (mode, item, { quality = 10, priceAdjustment = 1000, skills = { me
 const found = (piece, r) => randomConditionLootItems([piece], at(r))[0];
 const worn = (it) => it && (it.group === 'Weapons' || it.group === 'Armor' || it.group === 'Books') && it.name !== 'Arrow' && (it.maxCondition ?? 0) > 0 && (it.currentCondition ?? 0) < it.maxCondition;
 
-test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted at the item maker for one side effect at no gold, a Daedric cuirass found at 47% fenced, unmended, at its whole 47,553 where it sold for 22,350 (23,776 and 11,175 since DAEDRIC-SALE); offline, and an unmarked piece, fence as DFU\'s (mutants: the fence reads no mark; reads it offline)', () => {
+test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted at the item maker for one side effect at no gold, a Daedric cuirass found at 47% fenced, unmended, at its whole 47,553 where it sold for 22,350 (23,776 and 11,175 since DAEDRIC-SALE); offline, and an unmarked piece, fence as DFU\'s (mutants: the fence reads no mark; reads it offline)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the figures below are priced under the server profile's sale cap
   const plate = found(armorOfMaterial(CUIRASS, ARMOR_MATERIAL.Daedric), 0.5);
   const side = sideEffectTypes().flatMap((t) => enchantmentParamValues(t).map((p) => enchantmentSettings(t, p))).filter(Boolean)
     .find((se) => { const d = enchantDecision(structuredClone(plate), [], [se], { gold: 0 }); return d.kind === 'enchant' && d.goldCost === 0; });
@@ -56,11 +58,11 @@ test('AUDIT MEND-THIRD L3-1: online a found piece fences as it sells - enchanted
   assert.ok(isEnchanted(plate) && plate.foundCondition === 15564 && plate.currentCondition === 15564);
   online(() => {
     assert.equal(quote('SellMagic', plate), quote('Sell', plate), 'fenced as it sells');
-    assert.equal(quote('SellMagic', plate), 11175);   // PIN MOVED (DAEDRIC-SALE): 22,350 - a counter pays half for Daedric now
-    assert.equal(quote('SellMagic', { ...plate, foundCondition: undefined }), 23776, 'unmarked: DFU\'s whole fence');   // PIN MOVED (DAEDRIC-SALE): 47,553
+    assert.equal(quote('SellMagic', plate), 22350);
+    assert.equal(quote('SellMagic', { ...plate, foundCondition: undefined }), 47553, 'unmarked: DFU\'s whole fence');   // PIN MOVED (B4: the Daedric sale rule is gone)
   });
   assert.equal(quote('SellMagic', plate), quote('SellMagic', { ...plate, foundCondition: undefined }), 'offline: the mark unread');
-  assert.equal(quote('SellMagic', plate), 67200, 'offline: DFU\'s whole fence, its haggle uncapped');   // PIN MOVED (DAEDRIC-SALE): 134,400
+  assert.equal(quote('SellMagic', plate), 134400, 'offline: DFU\'s whole fence, its haggle uncapped');   // PIN MOVED (B4: the Daedric sale rule is gone)
 });
 
 test('AUDIT MEND-THIRD L3-2: a foe\'s worn kit is marked as it is worn - PLAIN-LOOT\'s rejects, and PARTY-LOOT\'s personal bonus cloned from them, hand nothing over worn and unmarked over 1,600 class bodies (it was 133 rejects and 43 bonus pieces of 3,200; mutant: the kit\'s mark dropped)', () => {
@@ -135,11 +137,11 @@ test('AUDIT MEND-THIRD L1-6, L2-6, L3-5: a temper moves a found piece\'s mark an
   assert.equal(plate.selfMended, plate.maxCondition - plate.foundCondition, 'mended whole, then tempered: the room above the mark, moved');
   // WEAPON-POOL: an iron dagger on its row's 50, found at 25 and mended by its owner to 40, moves to the pool's 1,600
   const dagger = Object.assign(randomConditionLootItems([weaponOfMaterial(WEAPONS.Dagger, WEAPON_MATERIALS.Iron)], at(0.5))[0], { maxCondition: 50, currentCondition: 40, foundCondition: 25, selfMended: 15 });
-  assert.equal(repoolWeaponConditions([dagger]), 1);
+  assert.equal(repoolWeapon(dagger), true);
   assert.deepEqual([dagger.maxCondition, dagger.currentCondition, dagger.foundCondition, dagger.selfMended], [1600, 1280, 800, 480]);
 });
 
-test('AUDIT MEND-THIRD L3-6: a new character\'s worn kit and the questions\' dagger are handed over marked - at creation and at a classic load\'s mint (mutants: the kit\'s or the dagger\'s mark dropped)', () => {
+test('AUDIT MEND-THIRD L3-6: a new character\'s worn kit and the questions\' dagger are handed over marked at creation (mutants: the kit\'s or the dagger\'s mark dropped)', () => {
   installRoleplayRealismItems({ fetchBytes: async () => new Uint8Array() });
   let wornPieces = 0, unmarked = 0;
   for (let s = 0; s < 40; s++) {
@@ -151,11 +153,6 @@ test('AUDIT MEND-THIRD L3-6: a new character\'s worn kit and the questions\' dag
   }
   assert.ok(wornPieces > 80, `${wornPieces} worn pieces`);
   assert.equal(unmarked, 0);
-  // a classic load's questions' dagger, never minted: minted at 20% and marked there
-  const old = setItemFields({ group: 'Weapons', templateIndex: WEAPONS.Dagger, material: WEAPON_MATERIALS.Ebony });
-  delete old.maxCondition; old.currentCondition = 0;
-  assert.equal(repairUnmintedConditions([old]), 1);
-  assert.ok(old.currentCondition > 0 && old.foundCondition === old.currentCondition);
 });
 
 test('AUDIT MEND-THIRD L1-4: a patron values a piece at the condition a counter\'s sale reads, through the mod\'s condition price - a found Daedric cuirass at 20% was worth its whole 153,600 (a cap of 92,160, the best counter paying 25,344); mended at a smith it is worth what it was found at, by its owner\'s kit a third more, whole and unmarked the whole (mutants: the condition unread; the mark unread)', () => {

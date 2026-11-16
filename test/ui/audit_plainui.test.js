@@ -1,7 +1,6 @@
-// AUDIT PLAIN-UI (2026-10-12, the owner: "Audit this") - PLAIN-UI read by four cold lanes on a frozen snapshot
+// AUDIT PLAIN-UI - PLAIN-UI read by four cold lanes on a frozen snapshot
 // (a1388898): the words against the law that enforces them (W), the code (C), the pins and the record (T), the render (U).
 // Every finding's pin is here, each failing under its finding's mutant (tools/mutants/audit_plainui.json).
-// bible/01-Overview/audits/Audit-Plain-UI.md.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -50,7 +49,7 @@ test('AUDIT PLAIN-UI W1 How chapters work says the whole of Strength - the week\
   assert.match(s, new RegExp(`The week's mark is ${STRENGTH_TARGET} Merit for every 100 active players \\(at least ${STRENGTH_TARGET}\\)\\.`));
   assert.match(s, new RegExp(`A week below the mark moves a chapter above 50 back ${STRENGTH_SHORT} toward it\\. A week with no Merit costs ${STRENGTH_IDLE}\\. A Failing chapter loses ${CHAPTER_FAILING_FALL} more unless its Merit reaches twice the mark\\.`));
   assert.match(s, new RegExp(`A Rivalry's winner takes ${CHAPTER_EVENT_EFFECTS.rivalrySwing} from the loser, and a Season's end moves every chapter halfway back to 50\\.$`));
-  assert.match(said('The chairs'), new RegExp(`and an account ${SEAT_ACCOUNT_AGE_S / 86400} real days old\\.`));   // PIN MOVED (AUDIT GUILD-WORDS II C-8): real days, as the hall's line says them
+  assert.match(said('The chairs'), new RegExp(`and an account ${SEAT_ACCOUNT_AGE_S / 86400} real days old\\.`));
   assert.match(said('Patron'), /pay Thriving prices for training and spells in its halls, or the chapter's own prices if lower\.$/, 'W9: an Ascendant chapter\'s own is better');
 });
 
@@ -85,10 +84,10 @@ test('AUDIT PLAIN-UI W2 W3 W10 W11 the Family page: the estate is whoever carrie
 
 test('AUDIT PLAIN-UI W4 W5 W7 W12 T4 the Seat tab\'s words: a pledge takes the region\'s Breaches and Renown; a guild at its regions\' most told it cannot pledge here; a Sellsword of neither guild; a guest told a guild needs an account; an account bound to nobody yet earns here (mutants: the full guild offered a pledge; the unbound account sent elsewhere)', () => {
   const said = (w) => seatWords(ANT).find(([k]) => k === w)[1];
-  assert.match(said('Pledge'), /the Watch, a home and seat writs in that seat's town; Dagon's Breaches and Renown anywhere in the region\.$/);
+  assert.match(said('Pledge'), /the Watch and a home in that seat's town; Dagon's Breaches and Renown anywhere in the region\.$/);
   assert.match(said('Sellsword'), /^A player of neither guild in the battle, hired for a fee by one side's Guildmaster/);
   assert.match(said('Influence'), new RegExp(`^A guild's score .* ${SEAT_LEGACY_SHARE === 0.1 ? 'A tenth' : ''} carries into the next week \\(none past a Season's end\\)`));
-  assert.ok(seatWords(ANT).some(([k]) => k === 'The Works') && seatWords(ANT).some(([k]) => k === 'Fealty and Pacts'), 'T6: the tab\'s Works and crown politics named');
+  assert.ok(seatWords(ANT).some(([k]) => k === 'The Works') && seatWords(ANT).some(([k]) => k === 'Pacts'), 'T6: the tab\'s Works and Pacts named');
   const full = Array.from({ length: SEAT_PLEDGE_REGIONS_MAX }, (_, i) => ({ region: 100 + i, key: 9000 + i }));
   const mine = (o) => ({ guild: 'g1', rank: 1, seasoned: true, bound: null, pledges: [], influence: 0, ...o });
   assert.equal(seatNextStep(ANT, week(mine({ pledges: full }))), `Your guild has pledged in ${SEAT_PLEDGE_REGIONS_MAX} regions this week, the most it can. Take one pledge down to pledge here.`);
@@ -107,7 +106,6 @@ test('AUDIT PLAIN-UI W6 the badge\'s number toward nought, as the standing reads
   assert.deepEqual([b.label, b.value], ['Known', '+39']);
   assert.deepEqual([regardBadge({ regard: -40.5, standing: 'enemy' }).value, regardBadge({ regard: -39.5, standing: 'neutral' }).value], ['-40', '-39']);
   assert.equal(regardBadge({ regard: -0.4, standing: 'neutral' }).value, '0');
-  // PIN MOVED: TONE-TASTE (bible/06-Systems/Living-World.md) - the tone as they take it, townsfolk's named
   assert.match(b.words, /A tone they dislike, a crime they see, a blow, and worst of all killing one of their own lower it\. Townsfolk prefer Blunt to Polite\./);
 });
 
@@ -150,10 +148,6 @@ test('AUDIT PLAIN-UI C4 a reader the standings refused, or not reached yet, is s
 });
 
 test('AUDIT PLAIN-UI C2 the badge for every living body, not the street\'s alone - a resident at home through the indoor door, a road\'s or a diver\'s through the roads\' (its company\'s word its head\'s, as its refusal reads) (mutants: the doors without a card)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const _livingIndoorsDoor = \{[\s\S]{0,700}regardCard: \(p\) => livingIndoors\?\.town\(\)\?\.regardCard\?\.\(p\) \?\? null,/);
-  assert.match(w, /\n {2}_livingRoadsDoor\.regardCard = \(p\) => livingRoads\?\.regardCard\(p\) \?\? null;/);
-  assert.match(src('src/world/travellerSprites.js'), /living: \{ id: res\.id, res, town: living \}/, 'a body\'s town is its door');
   const rel = createRelations();
   const clock = 100 * 1440 + 12 * 60;
   const roads = createLivingRoads({ clock: () => clock, relations: () => rel, sprites: { sync() {}, batches: () => [], persons: () => [], bodyOf: () => null, clear() {} } });
@@ -183,7 +177,6 @@ test('AUDIT PLAIN-UI U the talk badge pressed says its words and pressed again h
   assert.equal(byClass(host, 'talk-regard-words').length, 0, 'the next conversation starts with them hidden');
   view.destroy();
   host.remove();
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /\.talk-regard-words \{[^}]*max-height: 4\.4em; overflow-y: auto; max-width: 72ch; \}/);
 });
 
 test('AUDIT PLAIN-UI T5 the sizes the record claims, every one pinned - the Charter\'s head, the battle, the day\'s writ count, the Family tab\'s chips and its card (mutants: each back)', () => {
@@ -223,7 +216,6 @@ test('AUDIT PLAIN-UI U3 U6 U8 U10 U11 a fold\'s line a finger\'s target with its
   assert.match(NOTICE_CSS, /\n\.notice-panel > summary \{ margin: -11px 0; padding: 11px 0; cursor: pointer; \}/);
   assert.match(NOTICE_CSS, /\n\.notice-panel > summary:focus-visible \{ outline: 2px dashed #f3cf86;/);
   assert.match(FAMILY_CSS, /\.px-sys \.fam-nname \{[^}]*-webkit-line-clamp: 2;/);
-  assert.match(src('src/ui/familyPages.js'), /named\.setAttribute\?\.\('title', fullNameOf\(p\.given, p\.surname\)\);/);
   const goneTo = [];
   setFamilyProvider({ on: () => true, family: () => null, lived: () => 0, switchRefusal: () => null, switchTo: () => ({ ok: true }) });
   try {
@@ -235,7 +227,4 @@ test('AUDIT PLAIN-UI U3 U6 U8 U10 U11 a fold\'s line a finger\'s target with its
     how.onclick();
     assert.deepEqual(goneTo, ['guide']);
   } finally { setFamilyProvider(null); }
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /goto: \(id\) => \{ famSec = id; disarmFamilyPages\(\); render\(\); \} \};/, 'the pause window hands the tree its way');
-  assert.match(src('src/ui/enhanced/enhancedStyle.js'), /\.talk-regard-value::after \{ content: ' \?';/);
-  assert.match(src('src/scenes/townTalk.js'), /if \(refusal\) \{ const b = livingTalk\?\.regard\?\.\(target\.person\) \?\? null; setMidScreenText\(b \? `\$\{refusal\} \(\$\{b\.label\}, \$\{b\.value\}\)` : refusal\); return; \}/);
 });

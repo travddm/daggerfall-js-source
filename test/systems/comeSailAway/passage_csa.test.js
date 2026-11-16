@@ -1,4 +1,4 @@
-// PASSAGE (2026-10-19; bible/03-World/Passage.md) - A BOOKED SHIP IN COME SAIL AWAY'S RUNTIME (the port's own two lines
+// PASSAGE - A BOOKED SHIP IN COME SAIL AWAY'S RUNTIME (the port's own two lines
 // in systems/comeSailAway/comeSailAway.js): her voyage rides the save with her and comes back on her at a load, and she
 // is never packed into parts in my pack - her master's, not mine. Over the vendored hulls (test/csaScene.mjs).
 

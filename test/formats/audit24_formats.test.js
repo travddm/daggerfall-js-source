@@ -26,15 +26,6 @@ test('audit24 formats: the BIOG # id parses like int.TryParse, all-or-nothing', 
 });
 
 test('audit24 formats: a 1-frame weapon-anim record answers (0,0), not undefined', () => {
-  // ReadWeaponCif sets only Header.FrameCount over a default
-  // ImgFileHeader STRUCT (CifRciFile.cs:456), so Width/Height/XOffset/
-  // YOffset are 0 - and GetSize/GetOffset's frameCount <= 1 arms
-  // (:223-226, :240-243) hand those zeros back. The port's record
-  // carried no such keys, so the arms answered undefined and any
-  // arithmetic on them NaN.
-  const src = readFileSync(new URL('../../src/formats/cifRciFile.js', import.meta.url), 'utf8');
-  assert.match(src, /header: \{ frameCount, width: 0, height: 0, xOffset: 0, yOffset: 0 \}/,
-    'the mint carries the struct defaults');
   const f = Object.create(CifRciFile.prototype);
   f._records = [{ header: { frameCount: 1, width: 0, height: 0, xOffset: 0, yOffset: 0 } }];
   assert.deepEqual(f.getSize(0), { width: 0, height: 0 });
@@ -62,7 +53,11 @@ test('audit24 formats: MapsFile.getRegionIndex is PlayerGPS\'s politic derivatio
   politic = 0;
   assert.equal(m.getRegionIndexAt(0, 0), 0, 'below the band clamps to 0');
   politic = 128 + 62;
-  assert.equal(m.getRegionIndexAt(0, 0), 0, 'and >= 62 clamps to 0');
+  assert.equal(m.getRegionIndexAt(0, 0), 62, 'High Rock beyond the Bay, the first province');
+  politic = 128 + 70;
+  assert.equal(m.getRegionIndexAt(0, 0), 70, 'Cyrodiil');
+  politic = 128 + 71;
+  assert.equal(m.getRegionIndexAt(0, 0), 0, 'and >= 71 clamps to 0');
   politic = 128 + 61;
   assert.equal(m.getRegionIndexAt(0, 0), 61, '61 is the last real one');
   // NEVER -1: the derivation cannot answer "no region", which is the
@@ -70,7 +65,7 @@ test('audit24 formats: MapsFile.getRegionIndex is PlayerGPS\'s politic derivatio
   for (let p = 0; p < 256; p++) {
     politic = p;
     const r = m.getRegionIndexAt(0, 0);
-    assert.ok(r >= 0 && r < 62, `politic ${p} -> ${r} stays in range`);
+    assert.ok(r >= 0 && r < 71, `politic ${p} -> ${r} stays in range`);
   }
 });
 

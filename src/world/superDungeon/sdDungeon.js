@@ -1,5 +1,5 @@
 // @ts-check
-// SD4a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 5): THE SUPER DUNGEON'S
+// SD4a: THE SUPER DUNGEON'S
 // DIFFICULTY - the port's hardest. A Hollow is a Super dungeon by its location's word (`superTier`, read by the one law,
 // systems/dungeon/dungeonTier.js), and the dungeon host (scenes/dungeonContext.js) reads these where it reads the Elite's
 // (world/spawnedDungeons.js ELITE_*):
@@ -109,8 +109,7 @@ export const SD_BORDER_BLOCK_RE = /^b/i;
 
 /**
  * The end's candidates, in the dungeon's frame ({ x, y, z }): the layout's enemy markers, each once (a list's Elite
- * copies left out). SD-REACH (2026-10-08, the Discord, of a Rift: "In a place with absolutely no connection to the other
- * blocks... was this done on purpose?"): NEVER A BLOCK'S START MARKERS - DFU reads them off the starting block alone
+ * copies left out). SD-REACH: NEVER A BLOCK'S START MARKERS - DFU reads them off the starting block alone
  * (FindMarkers), and a block's first carries its water level and castle flag (SetRDBResourceData), set down wherever its
  * maker put the data, pockets no walk reaches among them - and AN INTERIOR BLOCK'S FIRST: a border block (its name
  * begins B) is a cap DFU closes the layout with, and the caps ring it, so the point farthest from the way in all but
@@ -255,7 +254,7 @@ export function sdRiftSweep(at, size, face, probe) {
 export const SD_SWEEP_HALVINGS = 8;
 
 /**
- * SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md section 1): THE RIFT'S FACE - square to its hall's
+ * SD-LOOK: THE RIFT'S FACE - square to its hall's
  * long line, so the walk down the hall meets it face on. Of the four opposite pairs of the eight chest-height bearings,
  * the one whose two rays reach farthest together (each asked to SD_RIFT_FACE_M, a miss counted that) is the hall's long
  * line - the first of a tie - and its face lies along it; unless a ray along the ring's own plane, at half its height, falls short of half
@@ -418,8 +417,7 @@ export function sdReturnStands(rec, s, now) {
 }
 
 /**
- * SD-THROUGH (2026-10-21, the owner: "When someone finds and enters the portal. I want a portal to show up for anyone in
- * the dungeon and anyone entering that automatically leads them there."): THE WAY THROUGH - once the first soul has
+ * SD-THROUGH: THE WAY THROUGH - once the first soul has
  * stepped through the Rift (the hub's record's `inAt`, stamped at its realm's first admission - net/superDungeon/sdLaw.js
  * sdEnter), a second Rift stands beside everyone in the Hollow, and beside everyone who enters it, and leads to the
  * Shattered Hour through the Rift's own door (its word asked, its veil, the realm's hello). It stands while the Hollow is

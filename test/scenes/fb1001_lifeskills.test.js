@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-01 - the life skills' audit, the rest (Mac: "Fix the rest").
+// FIELD BUGS 2026-10-01 - the life skills' audit, the rest.
 //
 // CAST-LOOK. Fishing's cast is a loose node "just ahead of the look" (scenes/fishHost.js), and it stood 0.6 m under the
 // eye 3 m ahead whatever the look - a point the host's 12-degree cone held only between some 23 degrees down and under a

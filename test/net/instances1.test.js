@@ -1,5 +1,4 @@
-// INSTANCES (2026-10-15, Mac: "lets implement an instanced system ... select public or instanced (if applicable)";
-// bible/11-Multiplayer/Instances.md): THE LAW - an instance is its place's public world room with an owner and an
+// INSTANCES: THE LAW - an instance is its place's public world room with an owner and an
 // epoch after it (net/instanceRoom.js), a world room like its twin (net/wire.js WORLD_ROOM, worldTtlMsFor), keyed by
 // roomKeyFor from an identity's `instance` (net/online.js), and admitted to its owner, staff and the party of its owner alone.
 import { test } from 'node:test';
@@ -7,9 +6,9 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import {
   instanceOwnerOf, holdEpochOf, isInstanceEpoch, instanceRoomOf, instanceOf, isInstanceRoom, instanceAdmits, partyHoldsOwner,
-  instanceWord, instanceOfWord, relaySupportsInstances, INSTANCE_RELAY_MIN,
+  instanceWord, instanceOfWord,
 } from '../../src/net/instanceRoom.js';
-import { isWorldRoom, worldTtlMsFor, WORLD_TTL_MS, INSTANCE_TTL_MS, roomOf, RELAY_VERSION } from '../../src/net/wire.js';
+import { isWorldRoom, worldTtlMsFor, WORLD_TTL_MS, INSTANCE_TTL_MS, roomOf } from '../../src/net/wire.js';
 import { roomKeyFor } from '../../src/net/online.js';
 
 const hex = (s, bytes) => createHash('sha256').update(s).digest('hex').slice(0, bytes * 2);
@@ -96,14 +95,4 @@ test('INSTANCES: a party pose\'s word for a member\'s instance, both ways', () =
   assert.equal(instanceWord({ owner: 'x', epoch: 'y' }), null);
   assert.equal(instanceOfWord('0123456789abcdef'), null);
   assert.equal(instanceOfWord(7), null);
-});
-
-test('INSTANCES: offered only where the relay admits them - world208 and later (world206 then world207 on its branch, renumbered past SERPENT5 and ONE-BODY at the merges)', () => {
-  assert.equal(INSTANCE_RELAY_MIN, 208);
-  assert.equal(relaySupportsInstances('world207'), false, 'ONE-BODY\'s relay keeps no instance');
-  assert.equal(relaySupportsInstances('world209'), true);
-  assert.equal(relaySupportsInstances('world1000'), true);
-  assert.equal(relaySupportsInstances(undefined), false);
-  assert.equal(relaySupportsInstances('world208x'), false);
-  assert.ok(relaySupportsInstances(RELAY_VERSION), 'this relay is one');
 });

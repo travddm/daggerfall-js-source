@@ -1,4 +1,4 @@
-// FOES-FIRST (2026-10-21; bible/11-Multiplayer/Scale-Arc.md FOES-FIRST): WHICH FOES FRAMES A CROWDED ROOM LETS THROUGH,
+// FOES-FIRST: WHICH FOES FRAMES A CROWDED ROOM LETS THROUGH,
 // MEASURED ON THE REAL ROOM over the pins' fake object (test/fakeRoom.mjs) - every hello a signed token, every frame
 // through the relay's own door (`webSocketMessage`), the room's own budget deciding. A scene is OWNERS sockets of
 // SOCKETS in one cell's block, each streaming its foes as the client does (scenes/world.js foesStream): a frame every

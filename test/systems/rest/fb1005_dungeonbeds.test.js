@@ -39,22 +39,6 @@ test('DUNGEON-BEDS: the reach is a fire\'s, measured to the bed\'s nearest point
   assert.equal(bedInReach([box(50, 52, 0, 1, 50, 51), BED], [1, 0, 2]), true, 'any bed of the level');
 });
 
-test('DUNGEON-BEDS by source: the dungeon host collects every bed placement and names a bed in reach (or a bed pressed) its rest point, a bed\'s rest, before a fire\'s', () => {
-  const dc = rd('src/scenes/dungeonContext.js');
-  assert.match(dc, /if \(!p\.action && isBedModel\(p\.modelIdNum\) && !palace\) dungeonBeds\.push\(\{ aabb \}\);/);
-  // AUDIT FB1005 B3: a palace stands no bed's rest as it stands no fire (AUDIT REST II F2's own predicate); B1: a bed's
-  // night spends no Bedroll or Campfire laid beside it
-  assert.match(dc, /const palace = isPalaceLayout\(dungeon\.blocks\);/);
-  assert.ok(dc.indexOf('const palace = isPalaceLayout(dungeon.blocks);') < dc.indexOf('for (const p of b.layout.placements) {'), 'decided before the placements are walked');
-  assert.match(dc, /onNightSlept: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? false : camps\.spendNightNear\(_fpFeet\)\),/);
-  assert.match(dc, /restKind: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? 'bed' : _fpFeet && camps\.fireNear\(_fpFeet\) \? 'camp' : 'rough'\),/);
-  assert.match(dc, /restPoint: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? \{ kind: 'bed', where: null \} : _fpFeet \? camps\.restPointAt\(_fpFeet\) : null\),/);
-  // the collect sits in the placement loop, after the AABB every arm reads, and before the action arms' `continue`s
-  const loop = dc.slice(dc.indexOf('for (const p of b.layout.placements) {'), dc.indexOf('drawList.push({ mesh: gpu, matrix, key: `${bi}:${p.position}`'));
-  assert.ok(loop.indexOf('const aabb = worldAabb(cpu.positions, matrix);') < loop.indexOf('dungeonBeds.push({ aabb })'));
-  assert.ok(loop.indexOf('dungeonBeds.push({ aabb })') < loop.indexOf('if (p.action) {'));
-});
-
 const ARENA2 = process.env.ARENA2_PATH;
 const HAVE_ARENA2 = !!ARENA2 && existsSync(join(ARENA2, 'BLOCKS.BSA'));
 

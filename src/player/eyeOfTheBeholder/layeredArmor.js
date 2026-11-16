@@ -63,7 +63,7 @@ const CHAIN = new Set([0x0100, 0x0103]);
 
 /** One slot's look: 'l' leather (or nothing worn), 'c' chain, 'p0'..'p6' plate in METALS[n]. */
 export function pieceCode(piece) {
-  const m = drawnPiece(piece)?.material;   // APPEARANCES (bible/04-Characters/Wardrobe.md): a piece wearing a look is drawn as the look - my body's and every peer walker's
+  const m = drawnPiece(piece)?.material;   // APPEARANCES: a piece wearing a look is drawn as the look - my body's and every peer walker's
   if (!Number.isInteger(m)) return 'l';
   if (CHAIN.has(m)) return 'c';
   if (m >= 0x0200) return `p${Math.max(0, METALS.indexOf(PLATE_METAL[m] ?? 'steel'))}`;
@@ -95,7 +95,7 @@ export const outfitCombo = (p) => `${FAMILY[p.head[0]]}_${FAMILY[p.top[0]]}_${FA
 
 const bodyOf = (gender) => (gender === 'female' ? 'female' : 'male');
 
-/** LAYERED-GEAR-ON (2026-10-19, the owner: "Make sure this is on by default"): Graphics.LayeredGear's value for THE
+/** LAYERED-GEAR-ON: Graphics.LayeredGear's value for THE
  *  CHARACTER'S OWN BODY, and its default - every character is drawn in its armor, in its own body, until the player
  *  chooses a body or Skins on the profile. Never on the wire: the look sends the body it resolves to (`lg` 1 or 2). */
 export const LAYERED_OWN = 3;

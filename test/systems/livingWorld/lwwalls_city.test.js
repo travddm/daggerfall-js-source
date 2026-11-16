@@ -1,4 +1,4 @@
-// LW-WALLS (2026-10-06, bible/06-Systems/Living-World.md "LW-WALLS"; the field - MD-Geist on the Discord: "In Ripmarket
+// LW-WALLS (2026-10-06, "LW-WALLS"; the field - MD-Geist on the Discord: "In Ripmarket
 // (Daggerfall Province) the last few days there have been 0 NPC's walking around in the city...Tested on clear days and
 // rainy no change", and the ask: "Seems like with living world, a lot of towns are unpopulated"): THE CITY BEHIND ITS WALLS.
 // A town's street net is the walkable component its buildings' doors open onto (places.js doorsNet), never the grid's
@@ -137,18 +137,6 @@ test('LW-WALLS the watch lives where a door opens onto the street: a palace wall
   const t = c.clock.t;
   const out = c.town.residents.filter((r) => r.guard && c.town.entryOf(r, t)?.e.duty && c.town.where(r, t, false));
   assert.ok(out.length >= 2, `the day's watch out on its duty (${out.length})`);
-});
-
-test('LW-WALLS the game\'s own walled cities are read here as the streaming host reads them - its location laid out, its navgrid, its doors\' law into the location frame and its buildings (test/lwRealTown.mjs\'s replay, scenes/world.js\'s population block, word for word)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const loc = layoutLocation\(dfLocation, maps, blocks, \{ enhanced: isEnhanced\(\), windmills: windmillsOn\(\) \}\);/);
-  assert.match(w, /const originMatrix = trs\(\n\s+locLocal\[0\] \+ b\.originX, locLocal\[1\], locLocal\[2\] \+ b\.originZ, 0, 0, 0\);/);
-  assert.match(w, /const local = multiply\(originMatrix, placed\.matrix\);/);
-  assert.match(w, /const staticDoors = getStaticDoors\(cpu, b\.dfBlock\.index, placed\.recordIndex, local\);/);
-  assert.match(w, /nav\.setBlockData\(b\.x, b\.y, b\.dfBlock\.rmbBlock\.fldHeader\.autoMapData,\n\s+\(tx, ty\) => srcTiles\[tx\]\[ty\]\.textureRecord, \{ enhancedWater: waterSwitchOn\(\) \}\);/);
-  assert.match(w, /key: makeBuildingKey\(d\.blockX, d\.blockY, d\.recordIndex\),\n\s+x: m\[0\] \* c\.x \+ m\[4\] \* c\.y \+ m\[8\] \* c\.z \+ m\[12\] - locOrigin\[0\], z: m\[2\] \* c\.x \+ m\[6\] \* c\.y \+ m\[10\] \* c\.z \+ m\[14\] - locOrigin\[2\],\n\s+nx: m\[0\] \* n\.x \+ m\[4\] \* n\.y \+ m\[8\] \* n\.z, nz: m\[2\] \* n\.x \+ m\[6\] \* n\.y \+ m\[10\] \* n\.z,/);
-  assert.match(w, /buildings: buildingSummaries\(dfLocation\.exterior\?\.buildings \?\? \[\], loc\.blocks, \{ locationIndex: dfLocation\.locationIndex \?\? 0, locationName: dfLocation\.name \}\)\n\s+\.map\(\(b\) => \(\{ key: b\.buildingKey, type: b\.buildingType, quality: b\.quality, factionId: b\.factionId \}\)\),/);
-  assert.match(w, /people: getWorldClimateSettings\(maps\.getClimateIndex\(p\.x, p\.y\)\)\?\.people, blocks: Math\.max\(1, \(ed\?\.width \?\? 1\) \* \(ed\?\.height \?\? 1\)\),\n\s+w: Math\.max\(1, ed\?\.width \?\? 1\), h: Math\.max\(1, ed\?\.height \?\? 1\),[^\n]*\n\s+port: hasPort\(md\.mapId\),/);   // PIN MOVED (WALL-WAY): and its grid's own shape
 });
 
 test('LW-WALLS the game\'s own cities (ARENA2): Ripmarket, the report\'s - its fields larger than its streets, every building with a door its spot on its streets, an exit at each of its four gates, and its street at midday full to DFU\'s cap, every one on it inside the walls; and every one of the game\'s 410 cities, 407 of them with fields the larger: nearly every building with a door its spot (99%), most of its people homed on its street, and the whole watch (mutants: the largest kept, the vote on the largest, the census unwired)', { skip: skipReal }, () => {

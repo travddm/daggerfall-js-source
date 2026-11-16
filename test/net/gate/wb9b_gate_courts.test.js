@@ -1,5 +1,4 @@
-// WB9b (2026-09-30, Mac: "I want to add 2 more arena's of the same size that the boss leaps to between each phase. A
-// walkway should form to allow players to traverse through each arena."): THREE COURTS AND THE WALKWAYS LAID BETWEEN
+// WB9b: THREE COURTS AND THE WALKWAYS LAID BETWEEN
 // THEM. The Warden fights each phase in its own court - the first where the players arrive, then west, then north - and
 // at each phase's turn he BOUNDS across the fire to the next court's heart; the bound's word lays a walkway from the
 // court he leaves, stone by stone out of the fire, and he waits there under his ward for a challenger to cross it.
@@ -11,7 +10,7 @@
 //   the screen          the motor's clamp (world/gate/gateArena.js courtArena), the slabs rising (slabRise, slabMatrix), the
 //                       telegraph over the court it lands in, the braziers nearest first, the land clear of the floor
 //
-// Design: bible/11-Multiplayer/World-Bosses.md section 14 (WB9b).
+// Design: (WB9b).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -47,7 +46,7 @@ function fightOf(lvs = [10]) {
 const body = (sub, x, z, dead = false) => ({ sub, x, z, dead });
 const at = (k, dx = 0, dz = 0) => [COURTS[k][0] + dx, COURTS[k][1] + dz];
 
-// ═══ THE FLOOR ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE FLOOR
 
 test('WB9b the courts: three of the first court\'s size, never meeting, each rim a walkway\'s length from the next; west then north, clear of the great tower\'s window; each phase fought in its own (mutants: a court moved onto another)', () => {
   assert.equal(COURTS_HIS, 3, 'his three - WB14b: the portents\' floors follow them in the one table (wb14b_portents.test.js)');
@@ -116,7 +115,7 @@ test('WB9b the floor a body may stand on - the relay\'s bound on a blow and the 
   assert.equal(clampToFloor(...at(1, 2, 2), xa, whole), null, 'standing in the court the walkway reached');
 });
 
-// ═══ THE BRAIN ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE BRAIN
 
 test('WB9b the bound: at each phase\'s turn he bounds from the court he fights in to the next one\'s heart - the ward raised through it, the walkway\'s word said with it (`xa` on the fight and in its state), his flight the leap\'s law over CROSS_AIR_MS, and from its landing he fights in the new court (mutants: the walkway never laid; the court never changed)', () => {
   const f = fightOf([10, 10]);
@@ -214,7 +213,7 @@ test('WB9b a blow from the floor as it is laid: from a walkway not yet laid, or 
   assert.deepEqual(keepInCourt(COURTS[1][0] + 40, COURTS[1][1], BOSS_REACH_R, COURTS[1]), [COURTS[1][0] + BOSS_REACH_R, COURTS[1][1]], 'the ring he keeps to is his court\'s');
 });
 
-// ═══ THE WIRE AND THE LINK ═══════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE AND THE LINK
 
 test('WB9b the wire and the link: the state says his court (0..2) and the crossings (at most two relay moments); a bound\'s word lays its walkway on every screen that hears it, from its own moment (its landing less its wind-up) - never twice, never from another attack (mutants: the court unbounded; the walkway left to the next state)', () => {
   const f = fightOf([10]);
@@ -237,7 +236,7 @@ test('WB9b the wire and the link: the state says his court (0..2) and the crossi
   assert.deepEqual(crossLaid({ xa: [] }, { ...word, tg: [[...COURTS[1]]] }), { xa: [T0 + 20_000 - ATTACKS.cross.windup] });
 });
 
-// ═══ THE SCREEN ══════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SCREEN
 
 test('WB9b the motor\'s floor: the court\'s arena answers the nearest point of the floor as laid (the brain\'s own law, in the dungeon\'s frame), a player\'s capsule in; the motor puts a body back there and takes the airborne momentum out of the floor away - off a walkway\'s side as off the rim (mutants: the arena\'s clamp ignored; the momentum kept)', () => {
   const a = courtArena([], T0);
@@ -337,22 +336,8 @@ test('WB9b the Deadlands keep clear of the floor: no island within LAND_CLEAR_M 
 });
 
 test('WB9b the seams, by source: the world host refills one arena a frame from the link\'s crossings on the relay\'s clock; the dungeon arm stands the slabs and moves them before the frame\'s draws; the court draws his mark over the court he stands in; the relay carries the brain\'s floor (mutants: each seam removed)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const _courtArena = courtArena\(_gateFloor\.none, 0\);/);
-  assert.match(w, /player\.arena = courtArenaAt\(_courtArena, gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none, Date\.now\(\) \+ _sharedOffsetMs, modes\?\.gateArenaDay\?\.\(\)\);/);   // WB14b: and the night whose plan holds me; PIN MOVED (WB14e): guarded, as every read of modes above its making (audit24_wave37); PIN MOVED (WB14, the merge of LAYERED-GEAR): refilled by courtArenaAt - the host's ceiling
   const A = courtArena([], 0), xs = [1, 2];
   assert.equal(courtArenaAt(A, xs, 77, 9), A, 'the one arena, never a new one a frame');
   assert.deepEqual([A.xa, A.now, A.day], [xs, 77, 9]);
-  assert.match(w, /gateFloor: \(\) => \{ _gateFloor\.xa = gateLink\?\.state\(\)\?\.xa \?\? _gateFloor\.none; _gateFloor\.now = Date\.now\(\) \+ _sharedOffsetMs; return _gateFloor; \},/);
-  const wm = read('src/scenes/worldModes.js');
-  // WB14b (PIN MOVED): the court is stood by scenes/gate/gateStand.js, out of the host - the night's walkways
-  assert.match(read('src/scenes/gate/gateStand.js'), /for \(const sl of walkSlabs\(plan\.pt\)\) ctx\.dynamicDraws\.push\(\{ gpu: slabMesh, object: \{ matrix: slabMatrix\(sl, fl\?\.xa \?\? NO_XA, fl\?\.now \?\? 0\) \}, slab: sl \}\);/);
-  const moved = wm.indexOf('if (d.slab) slabMatrix(d.slab, _floor?.xa ?? NO_XA, _floor?.now ?? 0, d.object.matrix);'), begin = wm.indexOf('renderer.beginFrame(proj, view, _ktLook?.sunDir ?? INTERIOR_LIGHT_DIR, WORLD_FRAME);');   // PIN MOVED (KETCH): the dungeon arm's frame, on a ship's deck in the sun's own direction
-  assert.ok(moved > 0 && moved < begin, 'the stones moved before the frame\'s draws');
-  const gc = read('src/scenes/gate/gateCourt.js');
-  assert.match(gc, /_mark\.court = nearestCourt\(mx, mz\); mark = _mark;/);
-  const brain = read('src/net/gate/gateBrain.js');
-  assert.match(brain, /if \(!onFloor\(pose\.x, pose\.z, f\.xa, now, POSE_SLACK, planOf\(f\)\)\) return 0;/);   // WB14b: the night's plan's floor
-  assert.match(read('src/player/motor.js'), /if \(typeof a\.clamp === 'function'\) \{ this\._putBack\(a\.clamp\(this\.pos, CAPSULE_RADIUS\)\); return; \}/);
   assert.equal(PHASE_TURN[2][0].a, 'cross');
 });

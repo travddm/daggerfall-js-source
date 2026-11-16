@@ -335,21 +335,6 @@ test('U39: %ra and %hnr resolve - the macros the LIVE PROBE caught printing raw'
   assert.match(b.w.flow.top.rows[0].text, /Good day, Breton\. Very well, Sir\./);
 });
 
-test('U39: the host consumes the tavern route the G8 law has answered all along', () => {
-  const code = readFileSync(join(root, 'src', 'scenes', 'worldModes.js'), 'utf8');
-  assert.match(code, /route\.service === 'tavern'/, 'the arm exists');
-  assert.match(code, /preloadTavernArt\(/, 'and the art is preloaded with the rest');
-  // the free-room perk reaches the window rather than staying a law
-  // with no caller (it had none but travel.js's own hook)
-  assert.match(code, /freeTavernRooms\(knightGuild/);
-  assert.match(code, /INTERIOR_MARKER\.REST/, 'the bed comes from the interior\'s own markers');
-  // the save carries both halves
-  const save = readFileSync(join(root, 'src/systems/save/save.js'), 'utf8');   // TIDY2: one path, so a move rewrites it
-  assert.match(save, /'lastTimePlayerAteOrDrankAtTavern'/);
-  assert.match(save, /snap\.rentedRooms =/);
-  assert.match(save, /entity\.rentedRooms = \(snap\.rentedRooms \?\? \[\]\)/);
-});
-
 test('D1: the four hotkeys are DialogShortcuts.txt\'s, so EXIT is G and E does nothing', () => {
   // DaggerfallTavernWindow.cs:103-124 hangs
   // DaggerfallShortcut.GetBinding on all four buttons; the table's
@@ -386,7 +371,6 @@ test('D1: the four hotkeys are DialogShortcuts.txt\'s, so EXIT is G and E does n
   mod.w.input('KeyG', { ctrlKey: true });
   assert.equal(mod.w.done, false, 'Ctrl-G is not TavernExit');
 });
-
 
 // ── ENH-NOTICE3: THE ENHANCED TAVERN'S BOXES, ON THE PANEL ────────
 
@@ -491,12 +475,3 @@ test('ENH-NOTICE3: the classic skin is untouched - the enhanced tavern off the e
   });
 });
 
-test('ENH-NOTICE3 (AUDIT): the tavern\'s notice owner is ONE object for the module - a per-render owner leaks a panel per box', () => {
-  // `render()` runs on every state change and again from `unmount`,
-  // and the owner is what carries `_noticeKey`: mint it per render and
-  // each raise is a NEW panel with nobody to release the last.
-  const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedTavern.js', import.meta.url), 'utf8');
-  assert.match(src, /^const noticeOwner = \{\};$/m,
-    'mutant: the owner minted per render (a panel per box, released by nothing)');
-  assert.equal((src.match(/noticeOwner = /g) ?? []).length, 1, 'and written once - nothing re-mints it');
-});

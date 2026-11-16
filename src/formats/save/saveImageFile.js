@@ -1,4 +1,4 @@
-// IMAGE.RAW reader (SAV1) - the classic save's 80x50 screenshot. 1:1
+// IMAGE.RAW reader - the classic save's 80x50 screenshot. 1:1
 // translation of DFU API/Save/SaveImage.cs (MIT, Daggerfall Workshop):
 // a headerless raw of ART_PAL.COL indexes, one record, one frame. The
 // bitmap data is the file's bytes verbatim (DFU hands the whole

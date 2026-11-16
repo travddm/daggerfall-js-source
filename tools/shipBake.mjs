@@ -1,8 +1,6 @@
 // THE BAKE FOR A SCENE OF PARTS - one ship of Mac's Blender scene into the boat's frame.
 //
-// SHIPS-2 (2026-10-07, Mac, sending Tiny_Ship.fbx, New_Ship_2.fbx and New_Ship_2_Shutter.fbx: "implement both of these
-// new ship placement models, UV Map/Texture, and ensure it matches the love we gave the other new ship model we
-// implemented"): the galleon's bake (tools/bakeGalleon.mjs, GALLEON and its two audits) made the home of every ship's.
+// SHIPS-2: the galleon's bake (tools/bakeGalleon.mjs, GALLEON and its two audits) made the home of every ship's.
 // Mac builds his ships as a scene of parts - a hull, decks, masts, a hatch cover, a shutter, each its own object - and
 // keeps working stations of them along the scene's Y: the bake reads ONE ship of it, by a SPEC (`bakeScene`):
 //
@@ -25,7 +23,7 @@
 //    GlobalSettings (`sceneFrame`) take the result back to Mac's Z-up scene in metres, where a ship's bow is +X and her
 //    port side +Y. Come Sail Away's hulls - and so the port's boats - stand in Unity's frame: +x starboard, +y up, +z the
 //    bow, the root on the waterline (systems/naval/navalShips.js's header). So a scene point (X, Y, Z) is the boat's
-//    ( CENTRELINE - Y, Z - WATERLINE, X - MIDSHIP ) times SCALE: a mirror, which is why every polygon's corners are
+//    (CENTRELINE - Y, Z - WATERLINE, X - MIDSHIP ) times SCALE: a mirror, which is why every polygon's corners are
 //    REVERSED on the way through - Blender's front is counter-clockwise in a right-handed frame and the port's is
 //    clockwise in Unity's (renderer.js frontFace(CW)), so the reversal keeps each face's front its front.
 //

@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV2 - THE TRAVEL VIEW'S PICK (bible/06-Systems/Travel-View.md).
+// TV2 - THE TRAVEL VIEW'S PICK.
 //
-// Mac (2026-09-27): "Even adding the option to tap/click to move to a
-// specific location." His call on what a click means: BOTH, BY TARGET -
+// His call on what a click means: BOTH, BY TARGET -
 // a town or a marker is reached by the roads, open ground by walking
 // straight there.
 //
@@ -14,7 +13,7 @@
 // `cam.pos`. Nothing in the tree met a slanted ray with the ground: the
 // collider's raycast answers meshes, and outdoors the ground is not a
 // mesh (world/collider.js). So the march is here, PURE - it takes the
-// host's `heightAt` (a bilinear read of the BUILT terrain, -Infinity off
+// host's `heightAt` (the BUILT terrain's walk floor, -Infinity off
 // it) and nothing else, which is what lets the pins drive it over a
 // table of hills.
 //

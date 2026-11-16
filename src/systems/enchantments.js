@@ -55,7 +55,7 @@ import { skillValue } from './skills.js';
 import { unitWeightInKg } from './inventory.js';   // AUDIT-RR2 G1: ExtraWeight's base
 import { enchantmentCost, defaultParam } from './enchantmentCatalogue.js';   // G4: the legacy value sum reads M4's costs
 import { artifactHook } from './artifactEffects.js';   // V3: the nine artifact classes' sub-registry
-import { applyDressStanding } from './clothingStanding.js';   // DRESS1 (2026-09-30, Discord): the clothing reaction, a leaf
+import { applyDressStanding } from './clothingStanding.js';   // DRESS1: the clothing reaction, a leaf
 
 // EnchantmentTypes moved HOME to formats/magicDef.js (V3) - it is
 // FallExe's enum and the artifact registry reads it below this module
@@ -67,6 +67,7 @@ import { ITEM_TEMPLATES, templateByIndex, mendOrder, mintCondition, TRANSPORT_HO
 import { WEAPONS } from '../characters/weapons.js';   // MEND-WORN / MEND-ARMOUR: a tick is the classic Dagger's share
 import { repoolWeapon } from './conditionRepair.js';   // MEND-WORN: a weapon on its row's pool moves before a mend on the pool, as before a wear
 import { creditOwnMend } from './item/foundMark.js';   // MEND-THIRD: the ring's mend credited past a found piece's mark
+import { legendaryEquipFree, gentleEquipBill } from './equipBill.js';   // DFU's bill by default, the port's two laws as options
 import { stampedTier } from './rarityTier.js';   // RPT1026-ITEMS RARE-KEPT: a laddered piece breaks and stays (RARE-BREAK1's law), a leaf
 export { ENCHANTMENT_TYPES };
 
@@ -302,30 +303,28 @@ export function assignHeldSpell(record, entity, item, { ctx = null, nowMinutes =
   item.timeEffectsLastRerolled = nowMinutes;
 }
 
-/** HELD-REWEAR (FIELD BUGS 2026-10-09f, BigOOF: "My 'Cast on held' gear is breaking sometimes IMMEDIATELY when
- *  re-equipping ... I swapped something out with an amulet and it auto-broke the other one"; a DEPARTURE, Port-Ledger A).
- *  DFU bills a Cast-When-Held spell's whole casting cost in condition at EVERY equip (CastWhenHeld.cs
- *  InstantiateSpellBundle) - a hundred-odd points on an 800-point amulet - so a piece swapped on and off (the hotbar's
- *  wear slots, a ring traded for an amulet and back) was spent by the swapping, and one whose bill passed what it had
- *  left broke the moment it went on, repaired or not. Two laws now: */
-/** (1) A piece re-worn within REROLL_MINIMUM_HOURS of its spell's last casting (`timeEffectsLastRerolled`, the stamp
- *  every equip and reroll writes) pays nothing: its spell is still fresh, the clock DFU itself recasts it by. */
+/** DFU bills a Cast-When-Held spell's whole casting cost in condition at EVERY equip
+ *  (CastWhenHeld.cs InstantiateSpellBundle), and a bill past what the piece has left breaks it. That is the default.
+ *  Two options keep the port's earlier laws (systems/equipBill.js):
+ *  - `gentleEquipBill` (a piece swapped on and off was spent by the swapping):
+ *    (1) a piece re-worn within REROLL_MINIMUM_HOURS of its spell's last casting (`timeEffectsLastRerolled`) pays
+ *    nothing, and (2) the bill stops at 1 condition, so wear while worn is what ends it.
+ *  - `legendaryEquipFree` (the Aegis of Dawn cost a leather buckler a third of
+ *    its life): (3) a Legendary's equip bills nothing. */
+/** (1) Whether a re-wear is still fresh. Pure: the caller asks it only with `gentleEquipBill` on. */
 export function heldEquipIsFree(item, nowMinutes) {
   const at = item?.timeEffectsLastRerolled;
   if (!Number.isFinite(at) || !Number.isFinite(nowMinutes)) return false;
   const since = nowMinutes - at;
   return since >= 0 && since < REROLL_MINIMUM_HOURS * MINUTES_PER_HOUR;
 }
-/** (2) The equip bill never breaks the piece: it stops at 1 condition. What wears a held piece out is its wear while
- *  worn (the MagicRound arm, 1 every 4 rounds), as DFU's own comment says it should "die of use".
- *  (3) LEGEND-HELD (FIELD BUGS 2026-10-11b, Boar: "Equipping legendary shield Aegis of Dawn damage it by 1/3 of its
- *  durability"; Mac: "I dont care about DFU parity"; a DEPARTURE, Port-Ledger A): a Legendary's equip bills nothing -
- *  its held spell is its record's (the Loot arc's), and the Aegis's Spell Resistance cost a leather buckler a third of
- *  its life the first time it went on. Its wear while worn is (2)'s, unmoved. */
-export function heldEquipBill(item, cost) {
+/** The condition an equip takes for a held spell of casting cost `cost`: the whole cost (DFU), or (2) and (3) under
+ *  their options. The defaults read the prefs; a caller may pass them. */
+export function heldEquipBill(item, cost, { legendaryFree = legendaryEquipFree(), neverBreaks = gentleEquipBill() } = {}) {
   // the condition lowerCondition will lower: minted, and a weapon on its row's pool moved to the one pool first
   if (item && Object.isExtensible(item)) { mintCondition(item); repoolWeapon(item); }
-  if (item?.rarity === 'legendary') return 0;   // LEGEND-HELD
+  if (legendaryFree && item?.rarity === 'legendary') return 0;
+  if (!neverBreaks) return Math.max(0, cost);
   const left = Number.isFinite(item?.currentCondition) ? item.currentCondition : Infinity;
   return Math.max(0, Math.min(cost, left - 1));
 }
@@ -371,7 +370,7 @@ export function mobileAffinityMatches(mobileType, paramType) {
 }
 
 // ---- MEND-WORN: what a Repairs Objects tick mends -------------------
-// MEND-WORN (2026-10-07, Mac: "Now we just gotta fix the 'repairs objects' not working"). DFU mends the FIRST damaged
+// MEND-WORN. DFU mends the FIRST damaged
 // piece in the whole pack, in the pack's order, by a point (RepairsObjects.cs:86-101 - 6846029b4, 2022: "RepairsObjects
 // should repair all items in inventory"; its loop before walked the equip table, which the class's own comment records
 // as classic's: "Only equipped items will receive repairs"). The port's default pack is Roleplay & Realism's - its kit
@@ -402,7 +401,7 @@ export const repairsObjectsMend = (it) => (it.magic || it.artifact ? CONDITION_A
  *  that wears itself, then the pack), and within a tier the mend order's first (itemTemplates.js mendOrder, the repair
  *  kit's: the lowest share left first, ties in the pack's order). Never what a smith refuses as not
  *  repairable (repairService.js repairRefusal) - DFU's own flag on the quiver it mints at 0 and on the lights, whose
- *  condition is their fuel (Arrow, Torch, Lantern, Candle, Holy Candle), and the port's on the Dwemer Pellet, a
+ *  condition is their fuel (Arrow, Torch, Lantern, Candle, Holy Candle), and the port's on a
  *  campfire's nights and the rest items' doses (AUDIT REST II H7). RepairsObjects.cs reads no such flag, so a lit
  *  torch first in the pack was refuelled as it burned. An enchanted piece only under AllowMagicRepairs
  *  (RepairsObjects.cs:93). */
@@ -513,8 +512,8 @@ const REGISTRY = new Map([
   [T.CastWhenStrikes, {
     flags: PAYLOAD.Strikes,
     strikes({ param, entity, target, damage, ctx }) {
-      // AUDIT FB1018f L3-2: a blow its referee turns whole (a stand-in `warded` - the Warden's ward, the Remnant shut, the
-      // Spire's turned blows) DEALT nothing, and the class's own sourceDamage == 0 guard casts nothing and wears nothing for
+      // AUDIT FB1018f L3-2: a blow its referee turns whole (a stand-in `warded` - the Warden's ward, the Remnant shut) DEALT
+      // nothing, and the class's own sourceDamage == 0 guard casts nothing and wears nothing for
       // it (VAMPIRIC-WARD's reading, below) - its spell met the same turned body and landed nothing either
       if (!target || damage === 0 || target.warded) return null;
       const record = ctx?.spellsByIndex?.()?.get?.(param);
@@ -573,8 +572,8 @@ const REGISTRY = new Map([
     },
     strikes({ param, entity, damage, target }) {
       // FIELD BUGS 2026-10-18f VAMPIRIC-WARD (Low_Poly_Gaming: "an exploit for heals if you have a vampiric weapon"): the damage
-      // DEALT - a blow a referee's ward turns whole (a stand-in `warded`: the Warden's ward, the Remnant shut, the Spire's turned
-      // blows - scenes/eliteGates/egFight.js turnStandIn) dealt nothing, and heals nothing, as the leech's own rule says
+      // DEALT - a blow a referee's ward turns whole (a stand-in `warded`: the Warden's ward, the Remnant shut) dealt
+      // nothing, and heals nothing, as the leech's own rule says
       // (systems/loot/lootPowers.js lootStrike, AUDIT WORLD-REWARDS B3). DFU never meets one - its target is always the entity
       // whose health the blow then takes - so this is VampiricEffect.cs's own law told what the blow dealt, no departure.
       if (param !== 1 || target?.warded) return null;
@@ -879,7 +878,7 @@ export function doItemEnchantmentPayloads(flags, item, { entity = null, target =
     if ((flags & PAYLOAD.Strikes) && (row.flags & PAYLOAD.Strikes)) {
       const r = row.strikes?.(env);
       if (r?.strikesModulateDamage) damageOut += r.strikesModulateDamage;
-      // AUDIT WBX F2 (2026-09-26): a blow on the Oblivion Gate's boss wears no gear (WBX6 - world/gate/gateBoss.js's stand-in
+      // AUDIT WBX F2: a blow on the Oblivion Gate's boss wears no gear (WBX6 - world/gate/gateBoss.js's stand-in
       // carries `spareGear`), and that is every Strikes payload's bill too: a Cast When Strikes blade paid 10 a blow and
       // the Mace of Molag Bal the blow's damage, and a fight of hundreds of blows destroyed them
       applyResults(target?.spareGear && r?.durabilityLoss ? { ...r, durabilityLoss: 0 } : r, env);
@@ -991,7 +990,7 @@ export function computeEnchantmentMods(entity, ctx = null, { clampMagicka = true
 export function enchantmentMagicRound(entity, round, { nowMinutes = 0, ctx = null } = {}) {
   ctx = mergeCtx(ctx);
   if (entity.isPlayer) (entity.reactionMods ??= new Array(SOCIAL_GROUP_COUNT).fill(0)).fill(0);   // ClearReactionMods (PlayerEntity.cs:1567-1570 - Array.Clear over all socialGroupCount = 11 entries)
-  applyDressStanding(entity);   // DRESS1 (2026-09-30, Discord "reputation buffs for clothing items"): worn clothing refills the just-cleared mods - BEFORE the early return, so plain clothes count with nothing enchanted worn
+  applyDressStanding(entity);   // DRESS1: worn clothing refills the just-cleared mods - BEFORE the early return, so plain clothes count with nothing enchanted worn
   const items = equippedEnchantedItems(entity);
   if (!items.length) { entity._enchantMods = null; return; }
   computeEnchantmentMods(entity, ctx);
@@ -1026,9 +1025,7 @@ export function enchantmentMagicRound(entity, round, { nowMinutes = 0, ctx = nul
  *  item reference) and this re-instantiates them from the worn set -
  *  a RECAST, so no durability is billed.
  *
- *  ENCHANT-LOAD (2026-09-26, DragynDance on the Discord: "Reloading a
- *  save with an enchanted item equipped makes you lose the enchantment
- *  until you take it off and put it on again"). Three things a load
+ *  ENCHANT-LOAD. Three things a load
  *  lost, all restored here:
  *   - the CONSTANT fold (EnhancesSkill, StrengthensArmor, ExtraSpellPts,
  *     AbsorbsSpells, IncreasedWeightAllowance, ImprovesTalents...). It
@@ -1126,9 +1123,9 @@ setEnchantmentHooks({
   onItemEquipped: (entity, item) => {
     if (!isEnchantedItem(item)) return;
     const nowMinutes = mergeCtx(null)?.now?.() ?? 0;
-    // HELD-REWEAR: decided ONCE for the piece, before its first held power restamps the clock - an item with two
-    // Cast-When-Held powers is billed for both or for neither
-    const ctx = heldEquipIsFree(item, nowMinutes) ? { heldEquipFree: true } : null;
+    // The gentleEquipBill option: decided ONCE for the piece, before its first held power restamps the
+    // clock - an item with two Cast-When-Held powers is billed for both or for neither
+    const ctx = gentleEquipBill() && heldEquipIsFree(item, nowMinutes) ? { heldEquipFree: true } : null;
     doItemEnchantmentPayloads(PAYLOAD.Equipped | PAYLOAD.Held, item, { entity, nowMinutes, ctx });
   },
   onItemUnequipped: (entity, item) => {

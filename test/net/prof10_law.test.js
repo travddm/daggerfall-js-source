@@ -1,9 +1,9 @@
-// PROF10 (2026-10-02) - JEWELCRAFTING'S LAW: DFU's eight pieces of jewellery as recipes (their templates read off DFU's
+// PROF10 - JEWELCRAFTING'S LAW: DFU's eight pieces of jewellery as recipes (their templates read off DFU's
 // own Jewellery enum, their inputs as 9.3 writes them, Silver, Gold and Platinum on the jeweller's ladder, a gem a recipe),
 // the enchantment points the metal and the gem add, the jeweller's hand at 50 (a Goldsmith's Silver, a Gemcutter's gem)
 // signed into the record, a Lapidary's Siege-cracked Gem, a Master Jeweler's Masterwork points, the facet (its numbers and
 // its machine), the bench (a Pawn Shop's or a Gem Store's, 50 gold; a home's, 50,000) and the market's Jewellery.
-// bible/06-Systems/Professions-Arc.md 3.3, 4.6, 9.3, 9.4, 36.
+// 3.3, 4.6, 9.3, 9.4, 36.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -38,7 +38,7 @@ test('PROF10 law: DFU\'s eight pieces of jewellery, read off DFU\'s own Jeweller
   assert.deepEqual(jewelBases('clothamulet').map((b) => [b.id, b.key, b.tier]), [['linen', 'cloth:linen', 1]]);
   assert.deepEqual(jewelBases('wand').map((b) => [b.id, b.key, b.word, b.tier]), [['ironwood', 'plank:ironwood', 'Ironwood', 6], ['ghostwood', 'plank:ghostwood', 'Ghostwood', 6]]);
   assert.deepEqual(JEWEL_METALS.map((m) => minedMaterial(m.key)?.templateIndex), [73, 74, 75], 'DFU\'s Silver, Gold and Platinum, the raw metals the Stores keep');
-  // THE GEMS: DFU's eight and the sea's Pearl, each its DFU template's name - PIN MOVED (CLOTH-GEMS, Professions-Arc 50):
+  // THE GEMS: DFU's eight and the sea's Pearl, each its DFU template's name
   // and the port's thirty-two graded ones after them, each its row's name (test/net/clothgems_gems.test.js)
   assert.deepEqual([...JEWEL_GEMS].slice(0, 9), ['gem:ruby', 'gem:emerald', 'gem:sapphire', 'gem:diamond', 'gem:jade', 'gem:turquoise', 'gem:malachite', 'gem:amber', 'gem:pearl']);
   assert.deepEqual(JEWEL_GEMS, [...GEMS.map((g) => g.key), PEARL.key, ...GRADED_GEMS.map((g) => g.key)]);
@@ -48,7 +48,6 @@ test('PROF10 law: DFU\'s eight pieces of jewellery, read off DFU\'s own Jeweller
 });
 
 test('PROF10 law: the jeweller\'s bench\'s 504 recipes (CLOTH-GEMS: every grade of every gem; 120 before) - each piece in each base, the plain Ring then a gem each; Silver and the Cloth Amulet at rank 0, Gold at 25, Platinum at 55, the Wand at 70; every input a Stores material; Jewelcrafting\'s, a jewel, the Jewellery family; after every other recipe', () => {
-  // PIN MOVED (CLOTH-GEMS, Professions-Arc 50): every grade of every gem a recipe - 41 gems where 9 were (504, was 120)
   assert.equal(JEWELCRAFTING_RECIPES.length, 504);
   const by = (product) => JEWELCRAFTING_RECIPES.filter((r) => r.product === product).length;
   assert.deepEqual(['ring', 'mark', 'bracelet', 'bracer', 'amulet', 'torc', 'clothamulet', 'wand'].map(by), [126, 123, 3, 3, 123, 3, 41, 82]);
@@ -66,19 +65,18 @@ test('PROF10 law: the jeweller\'s bench\'s 504 recipes (CLOTH-GEMS: every grade 
   assert.deepEqual([recipeById('bracelet:gold:ruby'), recipeById('mark:gold'), recipeById('clothamulet:linen'), recipeById('wand:oak:ruby')], [null, null, null, null], 'a gem only where the piece takes one, and only 9.3\'s bases');
   assert.deepEqual([TIER_RANKS[0], TIER_RANKS[2], TIER_RANKS[4], TIER_RANKS[5]], [0, 25, 55, 70]);
   for (const r of JEWELCRAFTING_RECIPES) for (const i of r.inputs) assert.ok(material(i.key), `${r.id}: ${i.key} a Stores material`);
-  assert.deepEqual(RECIPES.slice(-504), [...JEWELCRAFTING_RECIPES]);   // PIN MOVED (CLOTH-GEMS): 504
+  assert.deepEqual(RECIPES.slice(-504), [...JEWELCRAFTING_RECIPES]);
   assert.deepEqual(RECIPES.slice(-511, -504), [...COOKING_RECIPES]);
   assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length, 'every id its own');
   assert.deepEqual([recipeOpen(recipeById('ring:gold'), 24), recipeOpen(recipeById('ring:gold'), 25), recipeOpen(recipeById('torc:platinum'), 54), recipeOpen(recipeById('torc:platinum'), 55),
     recipeOpen(recipeById('wand:ironwood:jade'), 69), recipeOpen(recipeById('wand:ironwood:jade'), 70), recipeOpen(recipeById('clothamulet:linen:jade'), 0)], [false, true, false, true, false, true, true]);
   assert.ok(JEWELCRAFTING_RECIPES.every((r) => firstCraftPays(r)), 'a gathered metal or gem in every one: the first time\'s 500 pays (the Cloth Amulet\'s gem)');
-  assert.deepEqual([craftXp(1, 0), craftXp(3, 25) + firstCraftXp(recipeById('ring:gold')), craftXp(1, 40), craftXp(5, 100)], [20, 60 + 500, 5, 100], 'a craft\'s XP by its tier (3.2) - the ladder\'s first quartered from 40');   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp, brewFirstXp, workFirstXp), no longer a flat 500 - a jewel is Smithing's, its share the 500 it was
+  assert.deepEqual([craftXp(1, 0), craftXp(3, 25) + firstCraftXp(recipeById('ring:gold')), craftXp(1, 40), craftXp(5, 100)], [20, 60 + 500, 5, 100], 'a craft\'s XP by its tier (3.2) - the ladder\'s first quartered from 40');
 });
 
 test('PROF10 law: a piece of jewellery takes a quality and lists among the Jewellery (commissioned at a quality; a Masterwork to auction); one piece a craft; a Wand takes a Heartwood for a plank, its step; no family step for a jeweller', () => {
   for (const r of JEWELCRAFTING_RECIPES) {
     assert.equal(takesQuality(r), true, r.id);
-    // PIN MOVED (CLOTH-GEMS): a graded gem's jewel is no commission's - the loose door's goods fill none (writLaw commissionUnyielded)
     assert.deepEqual([pieceListable(r.id), commissionable(r.id), commissionTakesQuality(r.id), auctionable(r.id, 4), auctionable(r.id, 3)], [true, !looseOnly(r.gem), true, true, false], r.id);
     assert.equal(craftCount(r, 'quartermaster', 'cook'), 1);
   }
@@ -92,13 +90,12 @@ test('PROF10 law: a piece of jewellery takes a quality and lists among the Jewel
 // ─── THE SPECIALISATIONS AND THE POINTS (3.3, 9.3) ───────────────────
 
 test('PROF10 law: Jewelcrafting\'s four (3.3) - the Gemcutter and the Goldsmith at 50, the Master Jeweler and the Lapidary at 100, every one chosen now', () => {
-  // PIN MOVED (CRAFT3): Jewelcrafting's four stand under the Smithing track now, after the smith's own two at each rank
   assert.deepEqual(SPECIALISATIONS.smithing[50].map((s) => [s.id, s.name, s.later ?? null]), [['weaponsmith', 'Weaponsmith', null], ['armoursmith', 'Armoursmith', null], ['gemcutter', 'Gemcutter', null], ['goldsmith', 'Goldsmith', null]]);
   assert.deepEqual(SPECIALISATIONS.smithing[100].map((s) => [s.id, s.name, s.later ?? null]), [['masterwright', 'Masterwright', null], ['quartermaster', 'Quartermaster', null], ['master-jeweller', 'Master Jeweler', null], ['lapidary', 'Lapidary', null]]);
-  assert.equal(SPECIALISATIONS.jewelcrafting, undefined);   // PIN MOVED (CRAFT3): no track of its own
-  assert.deepEqual([GEMCUTTER, GOLDSMITH, MASTER_JEWELLER, LAPIDARY].map(specDiscipline), ['jewelcrafting', 'jewelcrafting', 'jewelcrafting', 'jewelcrafting']);   // PIN MOVED (CRAFT3): still Jewelcrafting's choices
+  assert.equal(SPECIALISATIONS.jewelcrafting, undefined);
+  assert.deepEqual([GEMCUTTER, GOLDSMITH, MASTER_JEWELLER, LAPIDARY].map(specDiscipline), ['jewelcrafting', 'jewelcrafting', 'jewelcrafting', 'jewelcrafting']);
   assert.deepEqual([GEMCUTTER, GOLDSMITH, MASTER_JEWELLER, LAPIDARY], ['gemcutter', 'goldsmith', 'master-jeweller', 'lapidary']);
-  assert.ok([[50, GEMCUTTER], [50, GOLDSMITH], [100, MASTER_JEWELLER], [100, LAPIDARY]].every(([r, s]) => specOk('jewelcrafting', r, s) && specOk('smithing', r, s)));   // PIN MOVED (CRAFT3): asked of the discipline or its track
+  assert.ok([[50, GEMCUTTER], [50, GOLDSMITH], [100, MASTER_JEWELLER], [100, LAPIDARY]].every(([r, s]) => specOk('jewelcrafting', r, s) && specOk('smithing', r, s)));
 });
 
 test('PROF10 law: the piece\'s enchantment points (9.3) - Silver +0%, Gold +10%, Platinum +20%, a set gem +10% (a Gemcutter\'s +20%), a Goldsmith\'s Silver counted as Gold; over DFU\'s template\'s, floored', () => {
@@ -144,12 +141,11 @@ test('PROF10 law: a Lapidary\'s Siege-cracked Gem stands in for a piece\'s gem (
   assert.deepEqual(recipeInputs(plain, { cracked: true }), [{ key: 'metal:gold', n: 1 }], 'no gem to stand in for');
   assert.deepEqual(recipeInputs(wand, { cracked: true, heartwood: true }), [{ key: 'plank:ghostwood', n: 1 }, { key: SIEGE_GEM.key, n: 1 }, { key: 'wood:heartwood', n: 1 }], 'a Heartwood and a cracked gem together');
   assert.equal(SIEGE_GEM.key, 'gem:siege');
-  // PIN MOVED (CRAFT3): both choices the Smithing track's now - the Master Jeweler's points a jewel's alone, the Masterwright's every other (none asked, the smith's)
   const sword = recipeById('longsword:iron');
   assert.deepEqual([masterworkSpec(MASTER_JEWELLER, ruby), masterworkSpec('masterwright', ruby), masterworkSpec(LAPIDARY, ruby), masterworkSpec(null, ruby)], [true, false, false, false]);
   assert.deepEqual([masterworkSpec('masterwright', sword), masterworkSpec(MASTER_JEWELLER, sword), masterworkSpec('masterwright'), masterworkSpec(MASTER_JEWELLER), masterworkSpec(null)], [true, false, true, false, false]);
-  assert.deepEqual(qualityOdds(100, { masterwright: masterworkSpec(MASTER_JEWELLER, ruby) }), [0, 0, 35, 52, 13]);   // PIN MOVED (CRAFT3): asked of the jewel
-  assert.deepEqual(qualityOdds(100, { masterwright: masterworkSpec(LAPIDARY, ruby) }), [0, 0, 40, 52, 8]);   // PIN MOVED (CRAFT3): asked of the jewel
+  assert.deepEqual(qualityOdds(100, { masterwright: masterworkSpec(MASTER_JEWELLER, ruby) }), [0, 0, 35, 52, 13]);
+  assert.deepEqual(qualityOdds(100, { masterwright: masterworkSpec(LAPIDARY, ruby) }), [0, 0, 40, 52, 8]);
 });
 
 test('PROF10 law: a piece of jewellery\'s card says its quality, its maker and its enchantment points; the bench is a Pawn Shop\'s or a Gem Store\'s at 9.3\'s 50 gold, or a home\'s jeweller\'s bench - the eighth station, the workbench\'s 50,000', () => {
@@ -157,7 +153,7 @@ test('PROF10 law: a piece of jewellery\'s card says its quality, its maker and i
   assert.deepEqual(pieceLines({ provenance: '0123456789abcdef', recipe: 'ring:gold:ruby', quality: 2 }), ['Fine']);
   assert.deepEqual(pieceLines({ provenance: '0123456789abcdef', recipe: 'longsword:iron', quality: 2, enchantmentPoints: 900 }), ['Fine'], 'a sword says none');
   assert.deepEqual([JEWEL_FEE, MASON_FEE], [50, 50]);
-  assert.equal(DECOR_STATIONS.at(-2), 'jeweller');   // PIN MOVED (HOME-VENDOR): the hired trader a ninth after it
+  assert.equal(DECOR_STATIONS.at(-2), 'jeweller');
   assert.deepEqual([DECOR_STATION_FEES.jeweller, DECOR_STATION_NAMES.jeweller], [50_000, 'Jeweller\'s bench']);
   assert.equal(decorPlaceOf({ pos: [0, 0, 0], rot: [0, 0, 0], scale: 1, paid: 120, station: 'jeweller' })?.station, 'jeweller');
 });

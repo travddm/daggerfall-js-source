@@ -198,7 +198,7 @@ export function plaqueAnchor(canvas) {
 }
 
 /**
- * PROF-RETICLE (2026-10-01, Mac: "use the mechanics on something that doesnt cover the screen"): WHERE THE CROSSHAIR'S
+ * PROF-RETICLE: WHERE THE CROSSHAIR'S
  * MIDDLE IS, in CSS pixels, and the lens's focal length in them - `focal`, so an angle off the look `a` stands
  * `focal * tan(a)` from the middle, as the world draws it (the frame's perspective over the world's viewport: the canvas
  * under the docked large HUD, the crosshair's own middle). `fovRad` the vertical field of view (viewSettings

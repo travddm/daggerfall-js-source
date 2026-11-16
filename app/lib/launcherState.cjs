@@ -1,6 +1,4 @@
-// DA8 (2026-09-29, Mac: "How can we drastically improve the install
-// experience? Is there anyway to send a notification that a new update is
-// available ... A launcher? I really want to make it AAA grade"):
+// DA8:
 // THE LAUNCHER'S PURE HALF - what the first window is doing, what it says,
 // and what happens next.
 //
@@ -19,7 +17,7 @@
 // reopening itself), says what changed, finds the player's Daggerfall
 // files, and hands over to the game.
 //
-// DA13 (2026-10-14, Mac: "B only: per-file channel"): AND THE GAME'S UPDATE
+// DA13: AND THE GAME'S UPDATE
 // IS ONLY THE FILES THAT CHANGED. DA8 counted on the installer's blockmap
 // delta being small (~4.5 MB of a 208 MB installer, measured then); DA11 put
 // the site in one archive and it stopped being so - ~130 MB an update,
@@ -29,9 +27,7 @@
 // Play at once - no install, no restart (`game-applied`). A release it
 // cannot carry is the installer's, as before (`game-failed` hands it back).
 //
-// DA10 (2026-09-29, Mac: "So this is an actual launcher now? Like
-// warframe?" - and to the offer of one that stays open with a Play
-// button, the patch notes and the player's options: "Yes please"):
+// DA10:
 // THE LAUNCHER STAYS. DA8's window was Discord's - a splash that went
 // away by itself whenever it had nothing to ask. Now it is the game's
 // front door, the way Warframe's is: it opens on every launch and waits
@@ -643,8 +639,7 @@ function viewOf(s) {
   return v;
 }
 
-/** DA12 (2026-10-08, Mac: "some game managers, like PlayNite, don't reconigze the launcher as a game and also I
- *  can't control the Launcher with a controller"): THE SWITCH PAST THE FRONT DOOR. A copy started with `--play`
+/** DA12: THE SWITCH PAST THE FRONT DOOR. A copy started with `--play`
  *  goes straight into the game - for a game manager or a couch (Playnite, Steam's Big Picture), which start a
  *  game and watch its process, and read an install-and-reopen before play as the game having quit. Updates are
  *  the game's then, as they always were after Play: checked at launch and hourly, told on the HUD, installed at

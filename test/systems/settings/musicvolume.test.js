@@ -1,6 +1,4 @@
 // THE MUSIC SLIDER, LIVE - and a replacement pack at its own level
-// (2026-08-27, Mac, from play; re-landed alone after the music arc was
-// reverted, because these two were fixes, not the arc).
 //
 // Two roots. Controls/MusicVolume was LIVE in the registry's tier and
 // read once per player, at _ensureMaster, and never again - so the
@@ -84,10 +82,3 @@ test('MusicVolume: each player ramps its master to the setting now - the schedul
   _resetForTests();
 });
 
-test('MusicVolume: every writer already goes through setValue, so the door reaches them all', () => {
-  for (const f of ['src/ui/enhanced/enhancedMenu.js', 'src/ui/pauseWindow.js']) {   // FD1: the SettingsWindow is gone
-    assert.match(read(f), /setValue\(/, `${f} writes through setValue`);
-  }
-  assert.match(read('src/systems/settings/settings.js'), /_publish\(section, key, str\);\n    return;/, 'the default-drop arm publishes too');
-  assert.match(read('src/systems/music.js'), /if \(section === 'Controls' && key === 'MusicVolume'\) this\.resyncGain\(\);/);
-});

@@ -1,5 +1,5 @@
 // @ts-check
-// SOUNDSCAPE (2026-10-24): THE SEA'S AND THE WILD'S CLIPS, at run time - the ones tools/soundscapeSfx.mjs synthesises
+// SOUNDSCAPE: THE SEA'S AND THE WILD'S CLIPS, at run time - the ones tools/soundscapeSfx.mjs synthesises
 // and the CC0 recordings tools/soundscapeSfxInstall.mjs bakes (public/sfx/{sea,shore,wild,town}-*.wav, provenance in
 // public/sfx/SOURCES.md), registered on the audio bus under string keys - the door a mod's WAV already uses
 // (audio.registerSound, MW-D40; the naval host's own loader in systems/naval/navalSounds.js). Each group is a set of
@@ -12,7 +12,7 @@ import { createClipInstaller } from './clipInstall.js';
 const takes = (stem, n) => Object.freeze(Array.from({ length: n }, (_, i) => `${stem}-${i + 1}`));
 
 /** The keys, by group: each a take's key, which is its file's stem (`sea-gull-1` is public/sfx/sea-gull-1.wav). DECK-QUIET
- *  (2026-10-26, the owner: "Remove all deck at sea"): the deck's five groups - the slaps, creaks, ropes, luffs and
+ *  the deck's five groups - the slaps, creaks, ropes, luffs and
  *  spray - are gone. */
 export const SCAPE_SFX = Object.freeze({
   gull: takes('sea-gull', 6),

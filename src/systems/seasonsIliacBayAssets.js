@@ -38,8 +38,7 @@ export const LOOSE_KEY_PREFIX = 'Seasons of the Iliac Bay/';
 
 const FOLDERS = new Set(Object.values(PREFIX_FOLDER).map((f) => f.toLowerCase()));
 const isPng = (name) => /\.png$/i.test(name);
-/** The bundle this door takes. SIB2 (2026-09-08, Mac: "ensure the
- *  seasons mod is 1:1 and working"): a mod's IDENTITY is its manifest -
+/** The bundle this door takes. SIB2: a mod's IDENTITY is its manifest -
  *  the GUID and the title inside the bundle, which `seasonsBundle` reads
  *  - never its file name, which DFU does not check either and which no
  *  record here evidences (the mod's own manifest names its manifest

@@ -1,6 +1,5 @@
 // @ts-check
-// POTION-COMMON (2026-10-01, the field: "make health potions more common"; the economy arc - bible/06-Systems/
-// Economy-Arc.md: "Potions are the solo answer to healing, so they are easy to come by"). A Potion of Healing was a
+// POTION-COMMON. A Potion of Healing was a
 // twentieth of DFU's random potion (CreateRandomPotion, loot.js - kept as it is) and so came in 0.15% of looting foes and
 // 0.2% of J-O piles, and no shop stocked one of its own: a ranked temple member could buy one, and an alchemist's random
 // few under Roleplay & Realism: Items' alchemistPotions (at twice the price) were one in twenty such. It has three
@@ -15,22 +14,19 @@
 //    count by the shop's quality and drawn from no roll, so the shelf's own rolls - DFU's, pinned - are the same rolls
 //    as before. Online, half price like every potion (shopStock.js ESSENTIALS-HALF).
 //
-// MAGICKA-COMMON (LOOT-EASE, 2026-10-05, Mac: "majicka potions should be more common loot drops, same with health
-// pots"): the Potion of Restore Power (potions.js: Heal Spell Points, 5 + 4 a level; price 75) was the same twentieth
+// MAGICKA-COMMON (LOOT-EASE, 2026-10-05): the Potion of Restore Power (potions.js: Heal Spell Points, 5 + 4 a level; price 75) was the same twentieth
 // of the random potion the healing potion had been - 0.15% of looting foes (before PLAIN-LOOT halved even that) and
 // 0.2% of J-O piles. It rides the healing potion's two loot doors, a little less often (MAGICKA_ENEMY_CHANCE,
 // MAGICKA_PILE_CHANCE: a caster's need, not everyone's), drawn after it; and the healing potion's own two chances are
 // raised (6 -> 10 a foe, 12 -> 18 a pile). The counter is unchanged.
 //
-// RENOWN-LOOT (2026-10-05, Mac: "tie it to renoun level"; systems/renownLoot.js): those raises - and the Restore
+// RENOWN-LOOT: those raises - and the Restore
 // Power potion's own two chances, whose step starts from none - are LOOT-EASE's buff, and online they come by the
 // roller's Renown: half of each at Renown 1, all at Renown 20, half again at Renown 40 (a foe's healing potion 3, 4
 // and 5 in 100; its Restore Power 1, 2 and 3 - POT-THIN's, below). Offline, the numbers below. `healingSupplyChances` is
 // the one read.
 //
-// POT-THIN (2026-10-21, the Discord's #feature-feedback, "Crafting seems unrewarding": "I collect so many potions from
-// enemy drops that I never need to make potions... who needs to buy pots when you find them everywhere?"; the owner:
-// "I definitely want to decrease pot drops"; bible/06-Systems/Professions-Arc.md section 48): THE FLOOD TURNED DOWN. A
+// POT-THIN: THE FLOOD TURNED DOWN. A
 // looting foe at Renown 20 carried 19 potions in 100 (this file's 10 and 6, DFU's random 3); it carries 9 in 100 now -
 // the healing potion 4 and Restore Power 2 (AUDIT CRAFT-WRITS E8: an expected count, the chance of at least one some
 // 8.7 in 100) - so the brewer's bottle is the steady supply and the
@@ -38,7 +34,12 @@
 // was 8 to 12), its Restore Power 1 to 3 (3 to 9); a deep pile's healing potion 6 to 10 (15 to 21), its Restore Power 2
 // to 6 (5 to 15). DFU's own random potion (3 a foe, 4 a pile) and the counter's shelf are untouched.
 //
-// A departure (Ledger A, POTION-COMMON; POT-THIN its numbers).
+// B4 (tame loot and economy): DFU's own random potion makes a Potion of Healing in about 0.15 foes in 100 and 0.2 piles
+// in 100 (3% and 4% of a potion, a twentieth of them healing). The extras above were 27 and 40 times that. They are
+// 0.35 and 0.45 now (2.3 and 2.25 times DFU's) and top out at 2.8 and 2.75 times at Renown 40 online, so the drop stays
+// a windfall and the alchemist's shelf is the supply. The Restore Power potion, which DFU also rolls inside its random potion, is halved to 1 and 2.
+//
+// A departure (Ledger A, POTION-COMMON; POT-THIN and B4 its numbers).
 import { createPotion, registerTabledLootHandler, registerEnemyLootExtra, CLASSIC_RECIPE_KEYS } from './loot/loot.js';
 import { BUILDING_TYPES } from '../world/buildingNames.js';
 import { renownLootQuarters, lootEased } from './renownLoot.js';   // RENOWN-LOOT: the chances by the roller's Renown
@@ -47,21 +48,21 @@ import { renownLootQuarters, lootEased } from './renownLoot.js';   // RENOWN-LOO
  *  ONE EXPORT (AUDIT ECON: the key was a second literal of loot.js's). */
 export const HEALING_RECIPE_KEY = CLASSIC_RECIPE_KEYS[2];
 /** A looting foe's chance in 100 of carrying one (POT-THIN: 10 until 2026-10-21). */
-export const HEALING_ENEMY_CHANCE = 4;
+export const HEALING_ENEMY_CHANCE = 0.35;
 /** A J-O pile's chance in 100 of holding one (POT-THIN: 18). */
-export const HEALING_PILE_CHANCE = 8;
+export const HEALING_PILE_CHANCE = 0.45;
 /** MAGICKA-COMMON: PotionRecipe "restorePower" (Heal Spell Points) - classicRecipeKeys[4]. */
 export const MAGICKA_RECIPE_KEY = CLASSIC_RECIPE_KEYS[4];
 /** MAGICKA-COMMON: a looting foe's chance in 100 of carrying a Potion of Restore Power (POT-THIN: 6). */
-export const MAGICKA_ENEMY_CHANCE = 2;
+export const MAGICKA_ENEMY_CHANCE = 1;
 /** MAGICKA-COMMON: a J-O pile's chance in 100 of holding one (POT-THIN: 10). */
-export const MAGICKA_PILE_CHANCE = 4;
+export const MAGICKA_PILE_CHANCE = 2;
 /** Where RENOWN-LOOT's step starts: a foe's healing potion 2 in 100 and a pile's 4; no Restore Power of their own at
  *  all. POT-THIN: the live game's before LOOT-EASE had been 6 and 12, and the step began there - "BEFORE" names the
  *  step's start now, an invented one below the live game's (AUDIT CRAFT-WRITS E5: the names kept, so every pin and
  *  record reads them as they stood). Offline takes LOOT-EASE's buff whole - this file's 4 and 2 - so it is cut as well. */
-export const HEALING_ENEMY_CHANCE_BEFORE = 2;
-export const HEALING_PILE_CHANCE_BEFORE = 4;
+export const HEALING_ENEMY_CHANCE_BEFORE = 0.2;
+export const HEALING_PILE_CHANCE_BEFORE = 0.25;
 /** RENOWN-LOOT: the four chances at `quarters` of LOOT-EASE's buff (systems/renownLoot.js) - the ones above offline and
  *  at Renown 20. */
 export function healingSupplyChances(quarters = renownLootQuarters()) {

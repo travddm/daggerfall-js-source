@@ -1,10 +1,8 @@
 // @ts-check
-// WB5 (2026-09-25, Mac: "On death the boss would physically spew out per player loot and bounce (sort of how dropping a
-// torch works) and have a sort of rarity glow attached to it"): THE SPOILS' GLOW - the first place in the port a rarity
-// is drawn in the world. Design: bible/11-Multiplayer/World-Bosses.md section 7 ("The glow").
+// WB5: THE SPOILS' GLOW - the first place in the port a rarity
+// is drawn in the world. Design: ("The glow").
 //
-// WBX3 (2026-09-26, Mac: "Loot drops should show their sprite and have a small colored loot line that extrudes from the
-// sprite itself"): A LINE, NOT A BEAM. WB5 stood each piece in a wide beam over a halo on the floor - a column 0.64 m
+// WBX3: A LINE, NOT A BEAM. WB5 stood each piece in a wide beam over a halo on the floor - a column 0.64 m
 // across and up to 8 m tall, which read as a light standing beside the piece rather than as the piece itself, and hid
 // what it marked. Now each resting piece sends a THIN LINE of its tier's colour straight up out of the top of its own
 // sprite (scenes/spoilsPool.js hands the line's root, the sprite's crown): brightest where it leaves the sprite,

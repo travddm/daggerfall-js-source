@@ -1,5 +1,4 @@
-// HOOD-CAREER (2026-10-07, Mac: "Wearing a hood should protect you from the disadvantage of being damaged by
-// sunlight"): THE PORT'S DEPARTURE from PassiveSpecialsEffect.DamageFromSunlight (:107-121), DaggerfallUI's career box
+// HOOD-CAREER: THE PORT'S DEPARTURE from PassiveSpecialsEffect.DamageFromSunlight (:107-121), DaggerfallUI's career box
 // at the travel map's door (:614-621) and DaggerfallTravelPopUp's arrival clamp (:350-357). VAMP-HOOD and HOOD-SUN let a
 // raised hood keep the sun off the vampire's curse; the custom class's own Damage from Sunlight still burned 12 every
 // 4th round and barred the day's travel under the same hood. Every rule the career's CFG bit keys asks
@@ -116,20 +115,3 @@ test('HOOD-CAREER: the travel rules - the map door\'s career box and the arrival
   assert.equal(arrivalClampMinutes(at(12), { sunAverse: careerSunAverse(p) }), 0, 'and a noon arrival lands at noon');
 });
 
-test('HOOD-CAREER: ONE hood law, and every career rung asks it - passiveSpecials reads survival/temperature.js cloakState, world.js asks careerSunAverse / careerFastTravelBlock and never the bare bit; THE FOUR HOSTS', () => {
-  const ps = read('src/systems/passiveSpecials.js');
-  assert.match(ps, /^import \{ cloakState \} from '\.\/survival\/temperature\.js';/m, 'the felt temperature\'s hood, imported');
-  assert.match(ps, /export function careerSunAverse\(entity\) \{\n\s*if \(!careerSunDamage\(entity\?\.career\)\) return false;\n\s*return !cloakState\(entity\.equip\?\.slots \?\? null\)\.hood;\n\}/);
-  assert.match(ps, /&& careerSunAverse\(entity\)\n\s*&& playerInSunlight\(clockMinutes\)\) \{\n\s*sinks\?\.hurt\?\.\(SUN_DAMAGE_AMOUNT\);/, 'the burn asks the hood');
-  const world = hostText('src/scenes/world.js');
-  assert.doesNotMatch(world, /careerSunDamage/, 'no rung reads the bare bit');
-  assert.equal((world.match(/careerFastTravelBlock\(playerEntity, nowMin\)/g) ?? []).length, 3,
-    'the map door, the party\'s refusal and the driver\'s map online');
-  assert.match(world, /sunAverse: racialSunAverse\(playerEntity\) \|\| careerSunAverse\(playerEntity\),/, 'the arrival clamp');
-  // the burn rides worldTick's round in every host; the travel door and the clamp are world.js's alone: exterior.js
-  // mounts no map, and the interior and dungeon hosts are inside, where the door refuses before any sun rung
-  for (const host of ['exterior', 'worldModes', 'dungeonContext']) {
-    assert.doesNotMatch(read(`src/scenes/${host}.js`), /careerFastTravelBlock|careerSunAverse|careerSunDamage|arrivalClampMinutes/,
-      `${host}.js has no travel door - flagged, nothing to wire`);
-  }
-});

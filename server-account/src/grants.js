@@ -1,5 +1,5 @@
 // @ts-check
-// GRANT2 (2026-10-18, Mac: "Lets build the plan"; bible/11-Multiplayer/Spawn-Grants.md section 12): THE SPAWN GRANTS'
+// GRANT2: THE SPAWN GRANTS'
 // MEASURE, KEPT AND READ. The relay's cells post their windows of grant asks (src/net/grantMeasure.js), signed with the
 // relay's receipt key, to POST /v1/mod/grant-feed - a door proven by that signature, never a session (the chat feed's,
 // safety.js takeFeed). A developer reads them with /v1/mod/realm-grants (review.js; tools/realmReview.mjs grants):
@@ -7,27 +7,26 @@
 // cells' most live granted members. GRANT5 sets the buckets and the ceiling from it after seven days (the owner, question 3):
 // each kind's rate and the ceiling come back suggested beside the standing ones (grantRateSuggested, grantCeilingSuggested).
 // GRANT7 (section 15): readers' tallies against one sender, from enough accounts at once, open the moderators' case.
-// FOE-BOUNDS and GRANT-ASKS (2026-10-19, Mac: "Spec + B + A"; sections 19 and 21): so does the relay's OWN count - a
+// FOE-BOUNDS and GRANT-ASKS: so does the relay's OWN count - a
 // record of a sender's it stripped because no builder could give it, and an account's own asks far past its budget.
 import { openGrantMeasure, GRANT_RELAY_READER } from '../../src/net/grantMeasure.js';
 import { GRANT_KINDS, GRANT_CELL_CEILING, GRANT_CASE_REASONS } from '../../src/net/grantLaw.js';
 import { gatePublicKey } from './signing.js';
 import { openCaseFor, keepCaseLines, credibleReporter } from './safety.js';
 import { displayName, overRate } from './accounts.js';
-import { discordOn } from './discord.js';
 
 /** The door's path - the relay's GRANT_FEED_URL names it (server/wrangler.toml). */
 export const GRANT_FEED_PATH = '/v1/mod/grant-feed';
 /** The shortest window an account's rate is read over, s - a cell that slept a minute after one ask is not sixty an hour. */
 export const GRANT_RATE_SPAN_MIN_S = 600;
-/** GRANT7 (the owner, 2026-10-18, question 2: "3 accounts / 10 min"): how many readers' accounts, each one that counts
+/** GRANT7: how many readers' accounts, each one that counts
  *  (safety.js credibleReporter: registered, not muted, no sprout), tallying a case's reasons against one sender inside
  *  GRANT_CASE_WINDOW_S open its moderators' case. */
 export const GRANT_CASE_READERS = 3;
 export const GRANT_CASE_WINDOW_S = 10 * 60;
 /** The most senders one batch's tallies are weighed for (a batch holds GRANT_MEASURE_ROWS rows at most). */
 export const GRANT_CASE_SENDERS_MAX = 32;
-/** The tab a grant case's line is kept under (mod_case_lines.tab; the Discord card prints it). */
+/** The tab a grant case's line is kept under (mod_case_lines.tab; the staff panel prints it). */
 export const GRANT_CASE_TAB = 'grant';
 /** GRANT-ASKS (Spawn-Grants section 21): an account's own asks of a kind in one cell's window open its case at this many
  *  times the most its budget lets honest play ask in that window (the kind's `cap` and its `rate` over the window, never
@@ -97,7 +96,7 @@ export function grantAskText(r, span) {
  * so a ring of fresh guests opens nothing) open its case, or add to the one open: one line under the `grant` tab - how
  * many players' games refused how many of its foes, and why - once a window. The case is the reviewer's own kind
  * (`review`): no report is filed, so the reports' automatic mute (REPORT_AUTO_MUTE) is never reached, and the AI reader
- * (chat's) is not asked; the Discord post is due where it is on. A moderator decides; nothing here sanctions anyone.
+ * (chat's) is not asked. A moderator decides; nothing here sanctions anyone.
  * Answers each sender's line (grantCaseLines writes it). @param {{ db: any, nowS: number, rand: (b: Uint8Array) => void }} ctx
  * @param {any} env @param {string[]} senders
  */
@@ -129,7 +128,7 @@ export async function grantCases(ctx, env, senders) {
 /**
  * GRANT7 and FOE-BOUNDS / GRANT-ASKS: THE CASES WRITTEN - each sender's findings of one batch as ONE line under the
  * `grant` tab (a line is keyed by its case, second and account: two of one batch's would keep the first alone), once a
- * window: its case opened, or the one open added to, the Discord post due where it is on. The relay's own count opens no
+ * window: its case opened, or the one open added to. The relay's own count opens no
  * new case past GRANT_OWN_CASES_HOUR an hour (readers' cases are GRANT7's own law, three accounts that count). Answers
  * how many cases it touched. @param {{ db: any, nowS: number, rand: (b: Uint8Array) => void }} ctx @param {any} env
  * @param {Map<string, { texts: string[], readers: boolean }>} found
@@ -146,7 +145,7 @@ export async function grantCaseLines(ctx, env, found) {
     const caseId = await openCaseFor(ctx, env, sender, 'review', 'spawn');   // STAFF-PANEL2-FIX: a spawn case, never a chat report's
     if (await db.prepare('SELECT 1 AS y FROM mod_case_lines WHERE case_id = ?1 AND tab = ?2 AND at > ?3').bind(caseId, GRANT_CASE_TAB, since).first()) continue;   // one line a window
     await keepCaseLines(db, caseId, [{ tab: GRANT_CASE_TAB, sub: sender, name: displayName(target), at: nowS, text: f.texts.join('; ') }], sender);
-    await db.prepare("UPDATE mod_cases SET updated_at = ?2, discord_state = CASE WHEN ?3 = 1 THEN 'due' ELSE discord_state END WHERE id = ?1").bind(caseId, nowS, discordOn(env) ? 1 : 0).run();
+    await db.prepare('UPDATE mod_cases SET updated_at = ?2 WHERE id = ?1').bind(caseId, nowS).run();
     touched++;
   }
   return touched;

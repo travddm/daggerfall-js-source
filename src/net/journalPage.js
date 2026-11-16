@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // JOURNAL1 - A PAGE OF MY JOURNAL, SHOWN; AND ONE SHOWN TO ME, KEPT.
 //
 // Addison Knox, on Discord: "Player journals ... shared in-world for
@@ -34,7 +33,6 @@
 // the window and the letters.
 //
 // Not a DFU member: Daggerfall Unity has no other players. Ledger A row (ONLINE).
-// ═══════════════════════════════════════════════════════════════════
 import { pageLaw, PAGE_LINES_MAX } from './wire.js';
 import { breakableNote } from '../systems/notebook.js';
 
@@ -173,7 +171,6 @@ export function pageOfferText(name, how = null) {
 /** The line the writer reads when a page went, and the ones for when it did not. */
 export const pageShownText = (name) => `You hold out the page to ${name || 'them'}.`;
 export const pageTooFarText = (name) => `${name || 'They'} ${name ? 'is' : 'are'} not near enough any more.`;
-export const PAGE_UNSUPPORTED_TEXT = 'This server cannot share journal pages yet.';
 export const PAGE_NO_READERS_TEXT = 'No one is near enough to show it to.';
 /** The reader's line when the page they turned to read is no longer held out (it waited too long). */
 export const PAGE_GONE_TEXT = 'That page is no longer held out to you.';

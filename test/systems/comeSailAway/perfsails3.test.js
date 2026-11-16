@@ -1,5 +1,4 @@
-// PERF-SAILS3 (2026-10-14, a live capture of the owner's client in a port, online - the boats' frame 1.8 ms of a 10 ms
-// frame and 1.5 MB a frame of its garbage; bible/07-Rendering/Performance-Crowd.md PERF-SAILS3) - A BOAT'S PLAN: what
+// PERF-SAILS3 - A BOAT'S PLAN: what
 // of her walk the frame, the flats and the draw read is found once and kept while her walk's nodes and the trees' shape
 // stand, the walk written where it stood, the flats' sizes and scales and the ropes' bones and poses in records of their
 // own - and everything the pool draws, bakes and stands is what it was before, to the bit.

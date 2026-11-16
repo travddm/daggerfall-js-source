@@ -9,7 +9,7 @@
 // slot, and omitted `tick`, which interior.js calls unguarded every
 // frame. A second copy of that list would have been a second thing to
 // keep in step, which is the failure this whole program exists to
-// remove (01-Overview/Hardening.md). So the arms are READ OFF THE
+// remove. So the arms are READ OFF THE
 // HOSTS, the population is READ OFF THE HOSTS, and both gates ask this
 // module rather than each other.
 import { readFileSync, readdirSync } from 'node:fs';

@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV7 - THE ROAMING BANDS (bible/06-Systems/Travel-View.md, THE OVERHAUL).
+// TV7 - THE ROAMING BANDS (, THE OVERHAUL).
 //
-// Mac (2026-09-28): "think mount and blade and how you can see enemies in the overworld. Like a true overhaul for the
-// new overworld"; his calls "Roaming parties" and "Shared per area". Enemy bands roam the wilderness and are seen from
+// his calls "Roaming parties" and "Shared per area". Enemy bands roam the wilderness and are seen from
 // the Overworld; one that SPOTS the traveller CHASES; one that reaches them stands as the real foes it was.
 //
 // SHARED WITH NOTHING SENT: a band is BORN of the land and the shared clock - a pure function of (a cell of map pixels,
@@ -23,8 +22,7 @@ import { worldPixelOk } from '../../net/wire.js';   // ETHER-OW: a chaser's plac
 export const BAND_CELL_PX = 2;
 /** A band's life, real milliseconds on the shared clock - born at its bucket's start, gone at its end. */
 export const BAND_LIFE_MS = 12 * 60 * 1000;
-/** The chance a cell holds a band in a life (by day, by night). OW6 (2026-09-29, the player: "Enemies should spawn in
- *  varying numbers and roam more often"): half as many again by day, a third more by night - 0.3 and 0.45 left a
+/** The chance a cell holds a band in a life (by day, by night). OW6: half as many again by day, a third more by night - 0.3 and 0.45 left a
  *  league of empty road between most bands. */
 export const BAND_CHANCE_DAY = 0.75;   // was 0.45: a band in three cells of four, so the nearest one is about a quarter nearer
 export const BAND_CHANCE_NIGHT = 0.9;   // was 0.6
@@ -201,7 +199,7 @@ export const BANDS_WIRE_MAX = 8;
 /** A chase word heard is believed this long (ms) - a frame every FOES_MS, so a chaser that stopped saying so is gone. */
 export const BAND_WORD_MS = 3000;
 /** A chaser's place is a point of the world: its pixel (floored - MapsFile's rows counted south, 499 - z's) a pixel the wire
- *  carries (net/wire.js worldPixelOk, TV-BEYOND's law). ETHER-OW (2026-10-13): it was the Bay's 1000 x 500 alone - and
+ *  carries (net/wire.js worldPixelOk, TV-BEYOND's law). ETHER-OW: it was the Bay's 1000 x 500 alone - and
  *  the bands and raiders are born on the Eltheric Ocean's box too (scenes/world.js bandOk, tvRaidOpen), so every chase
  *  said there was thrown out by the peers who heard it. */
 const chaserPlaceOk = (x, z) => Number.isInteger(x) && Number.isInteger(z) && worldPixelOk(Math.floor(x / PIXEL_NATIVE)) && worldPixelOk(499 - Math.floor(z / PIXEL_NATIVE));

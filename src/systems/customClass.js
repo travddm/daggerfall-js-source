@@ -47,7 +47,7 @@ export function daggerY(points) {
   return Math.min(DAGGER_Y_MAX, Math.trunc(DAGGER_Y_DEFAULT + 41 * (-points / 12)));
 }
 
-/** UXB1-I (2026-09-25, the UX backlog: "Restore the difficulty dagger or some other similar visual indicator"): THE
+/** UXB1-I: THE
  *  DAGGER'S PLACE ON ITS TRACK, 0 at the bottom (maxDaggerY, the easiest) to 1 at the top (minDaggerY, the hardest)
  *  - daggerY itself, normalised, so the enhanced gauge stands exactly where the classic dagger does, lopsided scale
  *  and truncation included (37px for 40 points above the default, 41px for 12 below). */
@@ -181,8 +181,7 @@ export const REP_GROUPS = Object.freeze(['merchants', 'peasants', 'scholars', 'n
 /** CC-REP: the ledger's reach - a bar is 0..50px in 5px steps, so a
  *  group's reputation is -10..+10 (UpdateRep's `height / 5`). */
 export const REP_MAX = 10;
-/** CC-REP (2026-09-16, Ember: "Class creation menu seems to be missing a
- *  reputation setting"): ONE STEP on one group's bar - the same value law
+/** CC-REP: ONE STEP on one group's bar - the same value law
  *  as a bar click (an integer, -REP_MAX..REP_MAX, and JS's negative zero
  *  normalised as UpdateRep's short would), reachable from a control
  *  shaped for a thumb rather than a pixel faked from one. Answers the
@@ -234,7 +233,7 @@ export function repPointsToDistribute(reps) {
 
 // ---- UXB1-H: a custom class, to a file and back ----
 //
-// (2026-09-25, the UX backlog: "Export/Import class from file/clipboard.") DFU has no such door - a custom class
+// DFU has no such door - a custom class
 // lives only in the character it made - so this is the port's own, and it is a DOCUMENT of the builder's choices,
 // not of the career built from them: the name, the hit points, the twelve skills in their three groups, the eight
 // attributes, the two special lists and the five reputations. Everything the builder's windows would have refused

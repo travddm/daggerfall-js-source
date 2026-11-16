@@ -1,6 +1,5 @@
 // @ts-check
-// CAPTAIN-TREE (2026-10-17, the owner: "A firmament styled captain skill tree along with making improvements to the ship
-// upgrade system"; bible/03-World/Naval-Refit.md CAPTAIN-TREE) - THE CAPTAIN'S STARS, DRAWN: the Firmament's own sky
+// CAPTAIN-TREE - THE CAPTAIN'S STARS, DRAWN: the Firmament's own sky
 // (ui/firmamentWindow.js - its sheet, its two palettes, its stars' sizes) over the whole screen, for the captain's sky of
 // systems/naval/captainTree.js. Opened from the Captain page (ui/captainPage.js) through the sea's window door
 // (ui/naval/navalPlunderDoor.js createCaptainStarsOverlay), over the world, which stands still under it.
@@ -16,9 +15,8 @@
 // THE TWO HALVES: THE MASTER, to the left, in the Firmament's life ring's verdigris; THE COMMANDER, to the right, in its
 // battle ring's brass. Nothing here decides what may be set - the law is captainTree.js, and the ledger asks it again.
 //
-// RVN-STARS (2026-10-17): the window itself is ui/skyWindow.js now - taken out of this file whole when the sworn
-// revenant's sky came (ui/revenantStarsWindow.js), one home for both; this file is the captain's sky as that window
-// draws it (its words, its tones, its wheel).
+// RVN-STARS: the window itself is ui/skyWindow.js now, one home for every sky; this file is the captain's sky as that
+// window draws it (its words, its tones, its wheel).
 
 import { t, formatNumber } from '../systems/textManager.js';
 import {
@@ -123,8 +121,7 @@ function drawHelm(ctx, x, y, r, rim, line) {
 
 /**
  * Mount the captain's stars over `host`. `ledger` the captain's (systems/naval/captainLedger.js: `captain()`, `tree()`,
- * `setTree(ids)`); `changed` once a sky is accepted (the save's word); `onExit` when it closes. GROWTH3 (bible/10-UI/
- * Growth.md section 6): `embed` draws it in the pause window's Growth tab (skyWindow.js's embedding).
+ * `setTree(ids)`); `changed` once a sky is accepted (the save's word); `onExit` when it closes. GROWTH3: `embed` draws it in the pause window's Growth tab (skyWindow.js's embedding).
  * @param {HTMLElement} host
  * @param {{ ledger: { captain: () => { xp: number, level: number, points: number, next: number|null }, tree: () => string[], setTree: (ids: string[]) => string[] },
  *   changed?: () => void, onExit?: (reason?: string) => void, doc?: Document, embed?: boolean }} deps

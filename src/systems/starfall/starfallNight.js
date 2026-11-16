@@ -1,6 +1,6 @@
 // @ts-check
-// STAR2 (2026-10-20): THE WITCHES' NIGHT - the night of the sky's own 13th of Frostfall, when the night's third star is the
-// Heart-Star. Design: bible/11-Multiplayer/Starfall.md section 1.
+// STAR2: THE WITCHES' NIGHT - the night of the sky's own 13th of Frostfall, when the night's third star is the
+// Heart-Star. Design:
 //
 // Canon, and two tables that never meant to agree: the Witches' Festival is day 283 of the year (systems/holidays.js,
 // DFU's holidayDaysOfYear, its id 43 - TEXT.RSC 8349 + 43, "Today is the 13th of Frostfall, known throughout Tamriel as
@@ -11,7 +11,7 @@
 //
 // Not a DFU member. Ledger A (STARFALL).
 import { skyClassicMinutes } from '../../net/skyLaw.js';
-import { STAR_HOUR_MS, STAR_FALLS_MS, STAR_PER_NIGHT } from '../../net/starfall/starfallLaw.js';
+import { starTimes, STAR_PER_NIGHT, starIndexOf } from '../../net/starfall/starfallLaw.js';
 import { dayOfYearFromMinutes } from '../gameDate.js';
 import { HOLIDAYS, holidayDayOfYear } from '../holidays.js';
 
@@ -21,8 +21,9 @@ export const WITCHES_FESTIVAL_DAY = /** @type {number} */ (holidayDayOfYear(HOLI
 export const HEART_STAR = STAR_PER_NIGHT - 1;
 
 /** The sky's day of the year at night `n`'s dusk (its first star's landing). */
-export const nightDayOfYear = (n) => dayOfYearFromMinutes(Math.floor(skyClassicMinutes(n * STAR_HOUR_MS + STAR_FALLS_MS[0])));
+export const nightDayOfYear = (n) => dayOfYearFromMinutes(Math.floor(skyClassicMinutes(starTimes(n, 0).fallAt)));
 /** Whether night `n` is the Witches' Night - its dusk on the festival's day. */
 export const witchesNight = (n) => nightDayOfYear(n) === WITCHES_FESTIVAL_DAY;
-/** Whether star (n, k) is the Heart-Star. */
-export const heartStar = (n, k) => k === HEART_STAR && witchesNight(n);
+/** Whether star (n, k) is the Heart-Star - WW5: every theatre's night's last on the Witches' Night (its place in the night,
+ *  net/starfall/starfallLaw.js starIndexOf - the Bay's is its 2, as it always was). */
+export const heartStar = (n, k) => starIndexOf(k) === HEART_STAR && witchesNight(n);

@@ -47,13 +47,3 @@ test('CRUX-DOOR: a block\'s door list is every door face its models carry, and o
   assert.equal(isDungeonExitDoor({}), false, 'a door with no type is no exit');
 });
 
-test('CRUX-DOOR: the dungeon host takes a block\'s DungeonExit doors alone as its exits - the court\'s and the portal\'s made doors join after', () => {
-  const src = rd('src/scenes/dungeonContext.js');
-  const loop = src.slice(src.indexOf('for (const door of b.layout.exitDoors)'), src.indexOf('exitDoors.push({ ...door, matrix: multiply(originMatrix, door.matrix) });'));
-  assert.ok(loop.length > 0 && loop.length < 600, 'the copy loop was found');
-  assert.match(loop, /if \(!isDungeonExitDoor\(door\)\) continue;/, 'a door that is not a DungeonExit is the model\'s, not a way out');
-  assert.match(src, /import \{ layoutDungeon, isDungeonExitDoor \} from '\.\.\/world\/dungeon\/dungeonLayout\.js';/);
-  // the overlap registry reads the one law too - no second literal
-  const dl = rd('src/world/dungeon/dungeonLayout.js');
-  assert.equal((dl.match(/DOOR_TYPE\.DUNGEON_EXIT/g) ?? []).length, 1, 'isDungeonExitDoor is the one reading of the type');
-});

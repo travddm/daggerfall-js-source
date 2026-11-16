@@ -1,7 +1,5 @@
 // @ts-check
-// WB3 (2026-09-25, Mac, Option B: "the relay's Durable Object tracks boss HP from hit frames, stamps the kill, issues a
-// signed kill record the account service honours"): THE KILL RECEIPT - the relay's first signature. Design:
-// bible/11-Multiplayer/World-Bosses.md section 6.
+// WB3: THE KILL RECEIPT - the relay's first signature. Design:
 //
 // Today the relay holds no secret at all (ACC1: it verifies, the account service signs). A kill the account service
 // will honour has to be signed by the one party that SAW it, so the relay gets ONE key, and it can sign ONE thing:

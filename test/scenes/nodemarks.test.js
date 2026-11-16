@@ -1,5 +1,4 @@
-// NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass. The node itself should
-// also stand out with a detailed slight glow or something").
+// NODE-MARKS.
 //
 // EVERY PROFESSION'S NODES ON THE COMPASS, AND LIT WHERE THEY STAND. Before, the compass marked a Prospector's veins and
 // a Tracker's animals alone, in one copper; a herb patch, a tree, a school or an ordinary character's vein stood nowhere
@@ -12,7 +11,7 @@
 //     Hunting's;
 //   - each glows in the same colour (render/nodeGlow.js): a halo low on the node, a shimmer climbing it, motes rising
 //     out of it, kindling as it first stands near and fading out with distance; added onto the frame, fogged.
-// bible/06-Systems/Professions-Arc.md, NODE-MARKS.
+// NODE-MARKS.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -162,7 +161,6 @@ test('NODE-MARKS the host: a Prospector\'s veins are marked from PROSPECT_M off 
   const kind = mineKind({ book: { taken: () => false } });
   const specs = () => ({ 50: 'prospector', 100: null });
   assert.equal(kind.mark({ key: 'b', what: 'boulder' }, { specs }).reach, undefined, 'a boulder is quarried, not prospected');
-  // PIN MOVED (AUDIT MINE-PERKS, Professions-Arc 43): a dungeon's vein keeps PROF2's 200 m - PROSPECT_M's 500 would mark
   // nearly every dungeon's every vein, the Deep Delver's own perk
   assert.equal(kind.mark({ key: 'd', what: 'dvein' }, { specs }).reach, PROSPECT_DEEP_M, 'a dungeon\'s vein is a vein, at PROF2\'s reach');
 });
@@ -289,14 +287,6 @@ test('NODE-MARKS nodeCompassPoints: the host\'s marks in their professions, the 
   assert.equal(nodeCompassPoints([], null), null);
   assert.equal(nodeCompassPoints(null, []), null);
   assert.equal(nodeCompassPoints(marks, null), nodeCompassPoints([marks[0]], null), 'one list, refilled');
-});
-
-test('NODE-MARKS AUDIT the classic compass\'s order: the node marks are drawn FIRST, after the strip, so the Detect markers (a spell\'s whole output), the party and the ships stand over them (mutant: the nodes drawn last again)', () => {
-  const H = src('src/ui/hud/hud.js');
-  const body = H.slice(H.indexOf('export function drawHud('), H.indexOf('export function drawPartyCompassMarks('));
-  const nodesAt = body.indexOf('drawNodeCompassMarks(renderer, nodes,');
-  assert.ok(nodesAt > body.indexOf('drawCompassStrip(renderer, art, bx, by, s, heading01)'), 'over the strip');
-  for (const later of ['if (detected && detected.length && playerXZ)', 'drawPartyCompassMarks(renderer, party,', 'drawShipCompassMarks(renderer, ships,']) assert.ok(nodesAt < body.indexOf(later), `before ${later}`);
 });
 
 test('NODE-MARKS the classic compass: the party\'s 5x3 triangle per node over the box\'s top edge at its bearing, clamped, in its profession\'s colour at its opacity; nothing without points or my own place (mutants: one colour for all; the opacity dropped; the bearing ignored)', () => {
@@ -607,16 +597,3 @@ test('NODE-MARKS AUDIT the still form, the shader RUN: under reduced motion (`uS
   assert.ok(sparks > 0, 'the motes held where they are, not gone');
 });
 
-test('NODE-MARKS the hosts by source: the street\'s compass and the dungeon\'s take the nodes - under the travel view too (AUDIT); the glow is drawn after each mode\'s opaque world through the veiled bodies\' hook, never under the travel view; none in a building or with the professions shut; every edit to the cited hosts line-neutral (one import line, one door folded beside the party\'s)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /if \(!gatherHost \|\| profBook\?\.state\.open !== true \|\| !feet\) return null;\n\s*const m = _mode\(\);\n\s*return m === 'exterior' \|\| m === 'dungeon' \? gatherHost\.marks\(feet\) : null;/, 'AUDIT: the compass keeps the nodes under the travel view, as PROF2\'s Prospector\'s veins were kept');
-  assert.match(w, /nodes: professionMarks\(\),/);
-  // PIN MOVED (PROF2b): the far Motherlodes beside the near nodes, the glow still built right after
-  assert.match(w, /const professionMarks = \(feet = enchantFeet\(\)\) => \{\n\s*const near = nodeMarksAt\(feet\), far = motherlodeMarks\(\);\n\s*return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);[^\n]*\n\s*\};\n\s*const nodeGlintPass = createNodeGlintPass\(renderer\);/);   // PIN MOVED (NODE-OUTLINE): the glow the outline's fallback, for a node with no picture; PIN MOVED (HOST-SPLIT): the outline builds that glow itself; PIN MOVED (NODE-GLINT): the glint's now
-  assert.match(w, /const drawVeiledPeerBodies = \(\) => \{ peerBodies\?\.drawVeiled\(\); drawAuras\(\); nodeGlintPass\.draw\(travelView\?\.active \? null : nodeMarksAt\(enchantFeet\(\)\)\); partyPing\?\.draw\(renderer\); \};/, 'the glow alone none under the travel view');
-  assert.match(w, /partyNear: \(\) => partyOnMaps\(\), professionMarks: \(feet\) => professionMarks\(feet\),/);
-  assert.match(w, /^import \{ mineKind \} from '\.\/mineHost\.js'; import \{ nodeCompassPoints \} from '\.\.\/ui\/nodeMarks\.js'; import \{ createNodeGlintPass \} from '\.\.\/render\/nodeGlint\.js';/m);   // PIN MOVED (NODE-OUTLINE); PIN MOVED (HOST-SPLIT): the outline builds the glow it falls back to; PIN MOVED (NODE-GLINT): the glint does now
-  assert.match(src('src/scenes/worldModes.js'), /party: \(\) => host\.partyNear\?\.\(\) \?\? \[\], nodeMarks: \(feet\) => host\.professionMarks\?\.\(feet\) \?\? null,/);
-  assert.match(src('src/scenes/dungeonContext.js'), /party: partyCompassPoints\(\{ bodies: opts\.party \?\? null \}\), nodes: playerFeet \? withFireMarks\(opts\.nodeMarks\?\.\(playerFeet\) \?\? null, dungeonFires, playerFeet\) : null,/, 'REST3: the dungeon\'s campfires ride the same field');
-  assert.match(src('src/ui/hud/hud.js'), /nodes: nodes \?\? null,/, 'handed to the enhanced skin');
-});

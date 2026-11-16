@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WATER-NEXT 4 - THE RIPPLES (2026-10-07, Mac: "proper waves and shoreline interactivity"): THE WATER ANSWERS WHAT
+// WATER-NEXT 4 - THE RIPPLES: THE WATER ANSWERS WHAT
 // MOVES IN IT. A wading or swimming player leaves rings and a wake, a hull under way a bow wave - none of which the
 // swell's trains or the wind's ripples can say, because they are the world's and these are a body's. (AUDIT WATER-NEXT
 // m10: the player and the boats are what stir it; a creature's splash is not wired.)

@@ -198,7 +198,7 @@ function encumbranceOf(entity) {
   if (!rrModule('encumbranceEffects') || !entity?.isPlayer || !entity?.stats || entity.isResting || !((entity.health ?? 0) > 0) || syntheticTimeIncrease()) return null;   // AUDIT-RR2 G20: `!EntityEffectBroker.SyntheticTimeIncrease` (:587) - a fast travel's catch-up rounds drain nothing   // AUDIT-RR F5: the C# reads GameManager.Instance.PlayerEntity alone (:582) - a foe's loot is not its burden
   return rrEncumbranceEffect({
     carriedWeight: carriedWeight(entity),
-    // ENC-CEIL (2026-09-27): `playerEntity.MaxEncumbrance` (:590) is the PROPERTY - GetMaxEncumbrance, live strength
+    // ENC-CEIL: `playerEntity.MaxEncumbrance` (:590) is the PROPERTY - GetMaxEncumbrance, live strength
     // x1.5 plus IncreasedWeightAllowance's share (DaggerfallEntity.cs:272, :501-507) - the pack's own ceiling, not the
     // bare formula: a player carrying 502 was penalised in full past 105
     maxEncumbrance: entityMaxEncumbrance(entity),

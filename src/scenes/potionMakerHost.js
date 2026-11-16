@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// POTION-DOOR (SaberGGaming's report, 2026-10-25: "potions from recipes give no XP"; the owner: "No band aids") - THE
-// POTION MAKER'S HOOKS, ONE HOME (bible/06-Systems/Professions-Arc.md 52).
+// POTION-DOOR (SaberGGaming's report, 2026-10-25: "potions from recipes give no XP") - THE
+// POTION MAKER'S HOOKS, ONE HOME (52).
 //
 // DFU'S OWN, AS M2 WIRED THEM (moved here from scenes/worldModes.js createWorldModes, HOST-SPLIT - the host builds the
 // window and mounts it, nothing more): the grid is the pack and the cart, the Materials Bag after the cart (BAG1); the

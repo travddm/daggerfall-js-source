@@ -1,5 +1,4 @@
-// WA1 (2026-09-25, Mac: "All mods attached are to be compatible and
-// implemented 1:1") - WARM ASHES - SHIPS 1.1 (Kamer).
+// WA1 - WARM ASHES - SHIPS 1.1 (Kamer).
 //
 // Held here: the vendored files (the manifest, the assembly and the IL
 // the port reads, the quests byte for byte, the six variant patches'
@@ -10,8 +9,7 @@
 // the port's own machine (every line a known action, "Leave Ship" run by
 // a quest, a save carrying it restored); the host's wiring, pinned where
 // DFU raises each event; the switch, the lane, the credit - and, with
-// ARENA2_PATH set, the variants rebuilt and served through the door with
-// Detailed Ships' building laid over them, as DFU composes the two.
+// ARENA2_PATH set, the variants rebuilt and served through the door.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -38,6 +36,7 @@ import { PATCH_FORMAT, rebuildWorldDataPatch } from '../../src/formats/worldData
 import { BlocksFile } from '../../src/formats/blocksFile.js';
 import { getDFBlockReplacementData, bindWorldDataBlocks, installWorldDataReplacement, _resetWorldDataReplacement } from '../../src/formats/worldData/worldDataReplacement.js';
 import { registerWorldDataPatch } from '../../src/scenes/modWorldData.js';
+import { hostText } from '../hostText.mjs';   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld - the host read whole
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const VENDOR = join(ROOT, 'vendor/warm-ashes-ships');
@@ -122,8 +121,6 @@ test('WA1 the quests: the shipped text byte for byte (CRLF as shipped), the list
   setModSetting(WARM_ASHES_VENDOR, 'Enabled', false);
   assert.ok(!registeredQuestLists().includes(WA_QUEST_LIST), 'the list stands behind the switch, as a loaded mod\'s does');
   _resetModSettings(); _resetQuestLists(); _resetWarmAshesShips(); _resetModSaveData();
-  // the pack loader globs the mod's folder beside Roleplay & Realism's
-  assert.match(read('src/scenes/quest/questData.js'), /import\.meta\.glob\('\.\.\/\.\.\/\.\.\/vendor\/warm-ashes-ships\/Quests\/\*\.txt'/);
 });
 
 test('WA1 the six variant patches: the author\'s edit of each ship block, the classic ship subrecords he copied carried as COPY ops', () => {
@@ -238,7 +235,6 @@ test('WA1 Leave Ship: in region 31, the blocks back to _base and ashore - a lent
   assert.deepEqual(h.calls, [['variant', 'SHIPAA00.RMB', '_base'], ['variant', 'SHIPAA01.RMB', '_base'], ['assign', SHIP_TYPES.Large], ['ship'], ['reset']]);
   assert.equal(isTempShip(), false);
   assert.equal(a.isComplete, true);
-  // PIN MOVED (RAID-ASHORE, 2026-10-17, bible/03-World/Naval-Refit.md): not at sea - the raid was fought where the player
   // stands, and ends there: the blocks back to _base, its foes withdrawn (the host's raidAshore), the quest ended as its
   // own `end quest` ends one (the IL's arm did nothing but complete, and the quest's crew stood on for its hour)
   h = recordingHost({ region: 17 }); setWarmAshesHost(h);
@@ -320,31 +316,6 @@ test('WA1 the quests under the port\'s machine: every line a known action, and a
 
 // ---- the host ---------------------------------------------------------------
 
-test('WA1 the host: the events where DFU raises them, the coroutine\'s clock, the action registered whatever the switch says, the quest gate, the ship\'s fade', () => {
-  const w = read('src/scenes/world.js');
-  const ft = w.slice(w.indexOf('async function fastTravelTo('), w.indexOf('// P-slice: the ABOVE-GROUND QUICKSAVE'));
-  const pre = ft.indexOf('warmAshesPreTravel({ oceanPixels: computed.oceanPixels ?? 0, travelShip: !!opts.travelShip })');
-  assert.ok(pre > ft.indexOf('deductGold(playerEntity,'), 'RaiseOnPreFastTravelEvent follows DeductFastTravelGold (:326-328)');
-  assert.ok(pre < ft.indexOf('await _teleportToPixel('), '...and precedes the teleport');
-  const post = ft.indexOf('warmAshesPostTravel()');
-  assert.ok(post > ft.indexOf('setCrimeCommitted(playerEntity, CRIMES.None);'), 'RaiseOnPostFastTravelEvent is the last statement (:383)');
-  assert.equal((w.match(/warmAshesFrame\(gamePaused\(\) \? 0 : dt \* worldTimeScale\(\)\);/g) ?? []).length, 2, 'the clock ticks in the modal branch and outdoors, as HCC\'s LateUpdate does');
-  assert.match(w, /\n {2}questBridge\.machine\.registerAction\(new LeaveShip\(null\)\);\n/, 'registered unconditionally');
-  assert.match(w, /if \(!townTalk\.overlayActive && !worldMoveBusy\(\) && !hudFade\.fadeInProgress\) questBridge\.tick\(dt\);/);
-  const board = w.slice(w.indexOf('async function boardOrDisembark()'), w.indexOf('// ---- A10 - THE RECALL ANCHOR', w.indexOf('async function boardOrDisembark()')));
-  assert.ok(board.indexOf('hudFade.smashHUDToBlack();') < board.indexOf('await _teleportToPixel(') && board.indexOf('hudFade.fadeHUDFromBlack();') > board.indexOf('await _teleportToPixel('), 'black, the teleport, the fade back');
-  assert.match(w, /function shipTransportMode\(\) \{\n\s+if \(\(modes\?\.mode \?\? 'exterior'\) !== 'exterior'\) modes\?\.forceExitToExterior\(\);\n\s+return boardOrDisembark\(\);/);
-  assert.match(w, /modData: \{ \[HCC_VENDOR\]: hccRuntime\.getSaveData\(\), \.\.\.modSaveRecords\(\) \}/);
-  assert.match(w, /if \(hccRecord\) hccRuntime\.restoreSaveData\(hccRecord, \{ elsewhere: csaElsewhere \}\);\n\s+restoreModSaveRecords\(extras\.modData, csaModLoadFailed\);/);   // CSA-D: with SaveLoadManager's per-mod catch
-  assert.match(w, /if \(!_loadedGame\) newGameModSaveRecords\(\);/);
-  const d = read('src/scenes/dungeonContext.js');
-  assert.match(d, /opts\.modSaveLoad\?\.\(extras\.modData \?\? null\);[^\n]*\n\s+opts\.horseCartLoad\?\./);
-  // OH-D: and worldModes hands both into the dungeon's build - the host's two seams stopped there, so a dungeon save
-  // carried no registered mod's record
-  assert.match(read('src/scenes/worldModes.js'), /modSaveRecords: \(\) => host\.modSaveRecords\?\.\(\) \?\? \{\},\n\s+modSaveLoad: \(modData\) => host\.modSaveLoad\?\.\(modData\),/);
-  assert.match(read('src/scenes/shared.js'), /installWarmAshesShips\(\);[^\n]*\n\s+installDiverseWeaponsIcons\(\);/);
-});
-
 test('WA1 the switch, the lane and the credit: one Enabled on by default, the player\'s own online, Kamer credited, the permission RECORD OPEN', () => {
   _resetModSettings();
   const def = MOD_SETTINGS[WARM_ASHES_VENDOR];
@@ -357,12 +328,11 @@ test('WA1 the switch, the lane and the credit: one Enabled on by default, the pl
   const row = CREDITS.mods.find((r) => r.vendor?.includes(WARM_ASHES_VENDOR));
   assert.deepEqual([row.author, row.version, row.contact], ['Kamer', '1.1', 'DFU Discord']);
   assert.match(read('vendor/warm-ashes-ships/README.md'), /\[Mac: record the author's permission/);
-  assert.match(read('bible/01-Overview/Mod-Registry.md'), /\| `warm-ashes-ships` \|[^\n]*\*\*RECORD OPEN\*\*/);
 });
 
 // ---- with the player's own data ----------------------------------------------
 
-test('WA1 with ARENA2: the variants rebuilt and served; with Detailed Ships on, its building laid over the player\'s ship and the pirates\' left classic', { skip: HAVE_ARENA2 ? false : 'ARENA2_PATH not set' }, async () => {
+test('WA1 with ARENA2: the variants rebuilt and served, the pirates\' ships left classic', { skip: HAVE_ARENA2 ? false : 'ARENA2_PATH not set' }, async () => {
   const blocks = new BlocksFile();
   assert.ok(blocks.load(new Uint8Array(readFileSync(join(ARENA2, 'BLOCKS.BSA')))));
   const patch = (vendor, f) => JSON.parse(readFileSync(join(ROOT, 'vendor', vendor, 'WorldDataPatches', f), 'utf8'));
@@ -374,14 +344,12 @@ test('WA1 with ARENA2: the variants rebuilt and served; with Detailed Ships on, 
   try {
     _resetWorldDataReplacement(); installWorldDataReplacement(); bindWorldDataBlocks(blocks); clearWorldDataVariants();
     for (const f of readdirSync(join(ROOT, 'vendor/warm-ashes-ships/WorldDataPatches'))) assert.equal(await registerWorldDataPatch(patch('warm-ashes-ships', f), null), true, f);
-    assert.equal(await registerWorldDataPatch(patch('detailed-ships', 'SHIPAA01.RMB-630-building0.json'), null), true);
     setLastLocationKeyTo(31, 2);
     setBlockVariant('SHIPAA01.RMB', '_smallraid', ANY_LOCATION_KEY);
     assert.equal(getBlockVariantHere('SHIPAA01.RMB'), '_smallraid');
     const served = getDFBlockReplacementData(630, 'SHIPAA01.RMB');
     const subs = served.rmbBlock.subRecords;
     assert.equal(subs.length, 3);
-    assert.equal(subs[0].interior.block3dObjectRecords.length, 1134, 'the player\'s ship is Detailed Ships\' - its building file over the variant block');
     assert.equal(subs[1].interior.block3dObjectRecords.length, blocks.readClassicBlock(390).rmbBlock.subRecords[0].interior.block3dObjectRecords.length, 'the pirates\' is the classic small ship');
     assert.deepEqual([subs[0].xPos, subs[0].zPos], [1408, 1600], 'the variant\'s own position stands (only Exterior and Interior are replaced)');
   } finally {

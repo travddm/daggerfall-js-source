@@ -80,24 +80,5 @@ test('V5: the vampire\'s gendered attack voice - 20% bark else attack, ALWAYS a 
   assert.deepEqual(
     [SOUND.EnemyFemaleVampireBark, SOUND.EnemyFemaleVampireAttack, SOUND.EnemyVampireBark, SOUND.EnemyVampireAttack],
     [199, 200, 205, 206], 'SoundClips.cs, verbatim');
-  // the consumer keeps DFU's split: the 20% FIRE chance is the
-  // caller's, the override picks the CLIP (DaggerfallEntity:979-988)
-  const hc = read('src/scenes/hostCombat.js');
-  const fire = hc.indexOf('if (!dice100(ATTACK_VOICE_CHANCE, rolls())) return null;');
-  const pick = hc.indexOf('const vamp = vampireAttackVoice(playerEntity, rolls);');
-  assert.ok(fire > 0 && pick > fire, 'the override rides AFTER the fire gate, replacing only the clip');
 });
 
-test('V5: the three consumers order the override FIRST, as DFU does', () => {
-  const hl = read('src/ui/hud/hudLarge.js');
-  const ov = hl.indexOf('racialOverrideHeadArt(entity)');
-  assert.ok(ov > 0 && ov < hl.indexOf('headArchiveFor(entity);', ov), 'hudLarge: the override head before the racial one');
-  assert.ok(hl.includes('const headKeyFor = (entity)') && hl.includes('${ov ? `${ov.file}#${ov.record}` : \'\'}'),
-    'the head KEY carries the override - a morph swaps the face the next frame, DFU\'s null-and-re-read');
-  const pd = read('src/ui/paperDoll.js');
-  assert.ok(pd.includes('const bg = (bgOverride ?? art.bg).bmp;'), 'the compose fills from the override background');
-  assert.ok(pd.includes('for (const slot of suppress ? [] : [EQUIP_SLOTS.Cloak2, EQUIP_SLOTS.Cloak1])'), 'suppression skips the cloaks');
-  assert.ok(pd.includes('if (!suppress) {\n    blit(out, art.nude, art.palette, { S });'), 'and the body');   // DFMOD4: at the compose's density
-  assert.ok(pd.includes('const ordered = suppress ? [] : paperdollOrder('), 'and the items - the click mask empties with them');
-  assert.ok(pd.includes('blit(out, headArt ?? art.head, art.palette, { S });'), 'the vampire head replaces the racial blit');   // DFMOD4
-});

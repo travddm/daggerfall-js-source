@@ -1,7 +1,7 @@
 // @ts-check
-// WB4 (2026-09-25, Mac: "an oversized enemy with telegraphed attacks (like wind ups, etc)"): WHERE AN ATTACK LANDS -
+// WB4: WHERE AN ATTACK LANDS -
 // the shapes net/gate/gateBrain.js's ATTACKS name, tested against a point on the court, the telegraph's clock, and the
-// verdict a struck player's machine reaches at the landing. Design: bible/11-Multiplayer/World-Bosses.md section 5
+// verdict a struck player's machine reaches at the landing. Design:
 // ("Its attacks - every one telegraphed").
 //
 // CO-OP'S LAW, the struck player's own machine: the relay says an attack's word once (`atk` - which, when it lands on

@@ -101,16 +101,6 @@ export const CREDITS = Object.freeze({
   ]),
   mods: Object.freeze([
     Object.freeze({
-      title: 'Meaner Monsters',
-      version: '1.5.2',
-      author: 'Ralzar',
-      get what() { return t('credits.meanerMonsters.what', 'Twenty monsters made tougher, with new damage, health, level and armor. Rats, bats and zombies are gentler. Werewolves and wereboars are a fifth larger, and the dragonling is two and a half times its size. Based on version 1.5.2. With the combat overhaul on, Kirk.O\u2019s version of these numbers is used instead.'); },
-      get terms() { return t('credits.meanerMonsters.terms', 'Used with permission under its MIT License (Copyright (C) 2020 Ralzar; Author: Hazelnut & Ralzar).'); },
-      get contact() { return t('credits.contact.manifest', '{contact}', { contact: 'forums.dfworkshop.com' }); },
-      vendor: Object.freeze(['meanerMonsters']),
-      link: 'https://github.com/Ralzar81/Meaner-Monsters',
-    }),
-    Object.freeze({
       title: 'Unleveled Loot',
       version: '1.1.2',
       author: 'Ralzar',
@@ -311,15 +301,6 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['seasons-iliac-bay']),
     }),
     Object.freeze({
-      title: 'Ambient Text',
-      version: '1.8',
-      author: 'Regnier',
-      get what() { return t('credits.ambientText.what', 'Now and then, a short line about your surroundings: 918 written by the author, chosen by the kind of place or dungeon you are in, the hour and the weather. It stays quiet indoors and waits longer after each line.'); },
-      get terms() { return t('credits.ambientText.terms', 'Used with the author\u2019s permission, with the author\u2019s own lines.'); },
-      contact: 'forums.dfworkshop.net',
-      vendor: Object.freeze(['ambient-text']),
-    }),
-    Object.freeze({
       title: 'Eye Of The Beholder',
       version: '2.1',
       author: 'RedRoryOTheGlen',
@@ -347,21 +328,6 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['better-ambience']),
     }),
     Object.freeze({
-      title: 'Oblivion Remaster Like Leveling',
-      version: '0.5.3',
-      // THE ONE ROW ON THIS SCREEN WHOSE AUTHOR IS NOT KNOWN. Nothing
-      // in the shipped archive names them - no licence file, no script
-      // header, an empty author field in the `.omwaddon` - so the
-      // screen says so and names the page the mod comes from, rather
-      // than crediting a guess. The record is open in
-      // vendor/oblivion-remaster-leveling/README.md and in the
-      // registry row, and it is filled in the moment Mac has the name.
-      get author() { return t('credits.author.unnamed', 'Unnamed ({source})', { source: 'Nexus Morrowind 56569' }); },
-      get what() { return t('credits.oblivionLeveling.what', 'Another way to level, offered when you create a character. Raising skills fills a 100-point bar instead of Daggerfall’s skill total: primary and major skills fill it fastest, minor skills next and the rest slowest, and any overflow carries into the next level. Each level up gives you points to spend on a few attributes, with Luck costing more. You can set the points, how many attributes, and Luck’s cost on the mod’s tile. Originally an OpenMW Lua mod for Morrowind.'); },
-      get terms() { return t('credits.oblivionLeveling.terms', 'Used with the author\u2019s permission, on Mac\u2019s word. The archive states no license and names no author.'); },
-      vendor: Object.freeze(['oblivion-remaster-leveling']),
-    }),
-    Object.freeze({
       title: 'Horse Cart and Cargo',
       version: '1.0.0-rc12',
       author: 'demifiend000',
@@ -378,26 +344,6 @@ export const CREDITS = Object.freeze({
       what: 'Your family and its tree. When you fall, an heir carries on your line: a sibling, a child or a newborn, with traits from their blood and upbringing. Switch between siblings, in a Bloodline house where death is final or an Enduring house where it costs years. Recover the remains and heirloom of the fallen and lay them to rest. Family members you are not playing live at the family home, where you can meet them and play them. Find it on the pause menu\u2019s Family tab.',
       terms: 'Used with permission: Mac is Lattymoy, the mod\u2019s first-named author. Rebuilt from the released mod with its bugs fixed.',
       vendor: Object.freeze(['project-legacy']),
-    }),
-    Object.freeze({
-      title: 'Aquatic Sprites',
-      version: '1.0',
-      author: 'Cliffworms',
-      get what() { return t('credits.aquaticSprites.what', 'Weed, coral and shells: underwater sprites that come with Daggerfall but were never used. 119 of them are placed in 3 flooded dungeon areas, exactly where the author put them.'); },
-      get terms() { return t('credits.aquaticSprites.terms', 'Used with the author’s permission, under terms that ask only for credit: “The mod may be distributed/translated without my authorization as long as I am credited as the author.” The dungeon areas are rebuilt from your own game files.'); },
-      get contact() { return t('credits.contact.nexus', '{author}, through the Nexus page ({page})', { author: 'Cliffworms', page: 'daggerfallunity mod 276' }); },
-      vendor: Object.freeze(['aquatic-sprites']),
-      link: 'https://www.nexusmods.com/daggerfallunity/mods/276',
-    }),
-    Object.freeze({
-      title: 'Detailed Ships',
-      version: '1.0.0',
-      author: 'Cliffworms',
-      get what() { return t('credits.detailedShips.what', 'The 2 ships you can own, rebuilt inside and out. On deck: rigging, crates and barrels, tenders, rudders and railings. Below: your quarters, the crew’s, a kitchen, a cargo hold, an armory and a shrine to Kynareth, with sailors to talk to. The Kynareth statue is by King of Worms and Zoran, as the author’s readme credits it. Pieces the mod borrows from Ninelan’s Daggerfall Expanded Textures are replaced with stand-ins made for this game.'); },
-      get terms() { return t('credits.detailedShips.terms', 'Used with the author’s permission, under terms that ask only for credit: “The mod may be distributed/translated without my authorization as long as I am credited as the author.” The ships and the original pictures are rebuilt from your own game files.'); },
-      get contact() { return t('credits.contact.nexus', '{author}, through the Nexus page ({page})', { author: 'Cliffworms', page: 'daggerfallunity mod 1080' }); },
-      vendor: Object.freeze(['detailed-ships']),
-      link: 'https://www.nexusmods.com/daggerfallunity/mods/1080',
     }),
     // WD3: carademono's two town mods, one entry each (two vendors, two pages).
     Object.freeze({
@@ -526,8 +472,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['physical-items']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/1411',
     }),
-    // HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1 (2026-10-08, Mac: "We have permission to use and
-    // implement everything into the codebase"): the four environment mods, handed over together.
+    // HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1: the four environment mods, handed over together.
     Object.freeze({
       title: 'Heat Haze',
       version: '1.0.1',
@@ -567,17 +512,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['sands-of-the-alikr']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/1390',
     }),
-    // KG3 (bible/11-Multiplayer/Kings-Gambit.md section 10.7): the bundle names no author - the credits' own unnamed form
-    // until the owner names them (CR1 asks every row for an author; AUDIT KG C17)
-    Object.freeze({
-      get title() { return t('credits.kingsGambit.title', 'The King\u2019s Gambit'); },   // the game's name as its table says it (L10N4)
-      version: '1',
-      get author() { return t('credits.author.unnamed', 'Unnamed ({source})', { source: 'thekingsgambit.dfmod' }); },
-      get what() { return t('credits.kingsGambit.what', 'A battle of armies and kings, played at a tavern\u2019s card table against the regulars, or online against another player. Its units use the Iliac Hand cards\u2019 pictures, and its kings the Bay deck\u2019s.'); },
-      get terms() { return t('credits.kingsGambit.terms', 'Used with permission, on Mac\u2019s word. The bundle names no author.'); },
-      vendor: Object.freeze(['kings-gambit']),
-    }),
-    // DEX0 (bible/04-Characters/Enemy-Expansion.md): Kamer & Kab's fifty enemies and their encounter tables.
+    // DEX0: Kamer & Kab's fifty enemies and their encounter tables.
     Object.freeze({
       get title() { return t('credits.dex.title', 'Daggerfall Enemy Expansion'); },   // the mod's name as its manifest says it (L10N4)
       version: '1.3.4',
@@ -588,7 +523,7 @@ export const CREDITS = Object.freeze({
       vendor: Object.freeze(['daggerfall-enemy-expansion']),
       link: 'https://www.nexusmods.com/daggerfallunity/mods/372',
     }),
-    // MUDEX1 (bible/04-Characters/Enemy-Expansion.md, MUDEX): Meaner Monsters' own form beside DEX, by its author.
+    // MUDEX1 (, MUDEX): Meaner Monsters' own form beside DEX, by its author.
     Object.freeze({
       title: 'MUDEX',
       version: '1.0.1',
@@ -608,8 +543,8 @@ const listOf = (names) => {
 
 /** L10N6: THE TRANSLATIONS, credited as the works are - one row a language the game holds text for, English and the
  *  pseudo-locale aside (textManager availableLocales, as scenes/localeData.js registers them): its name in itself,
- *  whose words they are, and a bundled pack's terms and source. Mac's decisions (Localization-Arc.md): a machine draft
- *  says it is one; the people who translate or check a language are credited by name (`locales/<tag>/translators.json`);
+ *  whose words they are, and a bundled pack's terms and source. The people who translate or check a language are
+ *  credited by name (`locales/<tag>/translators.json`);
  *  a pack is bundled only on its authors' terms, and those travel with it. A pack the player installed is their own -
  *  the Language row says so, the credits do not. Read as the About pane draws it, so every sentence is the player's
  *  language's. */
@@ -618,21 +553,15 @@ export function translationCredits(infos = availableLocales()) {
     const people = i.translators ?? [];
     const pack = i.bundled ?? null;
     const lines = [];
-    if (i.source === 'machine') {
-      lines.push(people.length
-        ? t('credits.l10n.checked', 'Machine translation by Claude, checked and corrected by {names}.', { names: listOf(people) })
-        : t('credits.l10n.machine', 'Machine translation by Claude, still being checked. Corrections from native speakers are welcome.'));
-    } else {
-      lines.push(people.length
-        ? t('credits.l10n.people', 'Translated by {names}.', { names: listOf(people) })
-        : t('credits.l10n.community', 'Translated by the community.'));
-    }
+    lines.push(people.length
+      ? t('credits.l10n.people', 'Translated by {names}.', { names: listOf(people) })
+      : t('credits.l10n.community', 'Translated by the community.'));
     if (pack) lines.push(t('credits.l10n.bundled', 'Daggerfall\u2019s original text is {pack}, used with its authors\u2019 permission.', { pack: pack.name }));
     const authors = [...(pack?.authors ?? []), ...people];
     return Object.freeze({
       code: i.code,
       title: i.name,
-      author: authors.length ? listOf(authors) : 'Claude (Anthropic)',
+      author: authors.length ? listOf(authors) : t('credits.l10n.anyone', 'The community'),
       what: lines.join(' '),
       ...(pack ? { terms: t('credits.l10n.terms', '{license}: {terms}', { license: pack.license, terms: pack.terms }) } : {}),
       ...(pack && /^https?:\/\//.test(pack.source) ? { link: pack.source } : {}),

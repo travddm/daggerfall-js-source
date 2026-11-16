@@ -75,7 +75,7 @@ test('F070: the trade window\'s Repair arm applies the SAME queue law as the liv
   // once per item - one UpdateRepairTimes(true) over the whole lot.
   assert.match(wm, /updateRepairTimes\(\[\.\.\.staged\], \{ commit: true, nowMinutes: now, buildingKey: bk, mapId: homeTownOf\(interiorBuilding\) \}\);/,
     'the trade arm must stretch the whole queue in ONE pass');
-  // the instant-repair branch mends in place and does NOT book a job. PIN MOVED (RPT1026-LEDGERLAW): it mends through
+  // the instant-repair branch mends in place and does NOT book a job.
   // the paid repair's one door (systems/repairService.js repairWhole - DFU's `currentCondition = maxCondition`, a found
   // piece's spent own mends kept spent)
   assert.ok(wm.includes("repairWhole(it);   // the InstantRepairs branch (:1062-1065)"),
@@ -99,7 +99,6 @@ test('F077: a filled soul trap says whose soul it holds', () => {
   // early return (:302) sits BEFORE the soul arm. IM1 reshaped the
   // ternary (the unidentified arm leads, the Books arm follows), so
   // the pin holds the exact identified tail instead of source order.
-  // PIN MOVED (TEXT-F1): a typed name read through shownItemName, its words starred - the suffix's arm unchanged;
   // L10N3e: and every name as shown (templateText, shownSoulName)
   assert.match(ii, /const itemName = !identified \? templateText\(t\)\n\s+: item\?\.group === 'Books' \? [^\n]+\n\s+: \(name \?\? shownItemName\(item\) \?\? templateText\(t\)\) \+ soulTrapNameSuffix\(item, shownSoulName\);/,
     'the suffix is on the identified non-book arm, behind the unidentified early return');

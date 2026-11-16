@@ -2,12 +2,7 @@
 //
 //     node tools/bakeWagons.mjs [--fbx=src/assets/wagons/source/Wagon_Cart_Tiny_1.fbx] [--list]
 //
-// WAGONS1 (2026-10-09, Mac, sending Wagon_Cart_1.fbx, Wagon_1.fbx, Caravan_1-1.fbx and then Wagon_Cart_Tiny_1.fbx: "Here
-// are 3 new models that will need to be textured - 1. Is a replacement model for the current cart ingame 2. Theres an
-// open wagon which I want to implement as a new type of cart with increased storage and the ability for players to
-// request to sit in the back of the cart and be transported across daggerfall 3. Is a closed wagon varient that also
-// increases storage but also acts as an enterable and customizable interior"; asked, the cart that replaces the Small
-// Cart is the Wagon Cart).
+// WAGONS1.
 //
 // THE FOUR FILES ARE ONE SCENE SAVED FOUR TIMES ("wagons.blend" in each header), each a Blender 5.1.1 export:
 // Caravan_1-1.fbx at 16:34:29 on 2026-09-22, Wagon_1.fbx at 16:58:24, Wagon_Cart_1.fbx at 17:06:30 and

@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW15 (2026-10-09, bible/06-Systems/Living-World-II.md "LW15"): THE PATRONS - the living world's townsfolk buying from
-// a player's hired trader (HOME-VENDOR's `vendor` station). Mac: "npc autonomy that can visit player shops and purchase
-// from them".
+// LW15: THE PATRONS - the living world's townsfolk buying from
+// a player's hired trader (HOME-VENDOR's `vendor` station)..
 //
 // WHO DECIDES A SALE: THE SERVICE, BY THIS LAW. The service holds the trader's stock and the seller's gold, and bundles no
 // ARENA2 - it cannot know a town's people - so it decides WHICH PIECE SELLS IN WHICH HOUR, and names a SEED and a
@@ -90,7 +89,7 @@ export const COUNTER_VALUE_MARK = 'counterValue';
 /** Whether a patron would take the piece at all: never a quest's, never a keepsake - and AUDIT LW-II-2 S1, never a piece
  *  an NPC counter sold online (PATRON_COUNTER_MARK): a patron paid more than an online counter asks for the same piece
  *  (a book three times its file price; a quality-1 counter's weapon a fifth over its ask), so a player bought at the
- *  counter, stocked a trader and printed the difference. STOLEN-GOODS AUDIT (2026-10-16, S6): and never a STOLEN piece
+ *  counter, stocked a trader and printed the difference. STOLEN-GOODS AUDIT: and never a STOLEN piece
  *  (`stolen`, systems/stolenGoods.js STOLEN_MARK): a town's patron is its townsfolk, and the town's counters buy a stolen
  *  piece only to be rid of it (landSold) - a hired trader was the fence they are not, paying three fifths of the piece's
  *  worth in the service's gold for a shut shop's shelf emptied by night. A player may still buy it from the trader; the
@@ -107,7 +106,7 @@ const ownPrice = (item) => {
 };
 /** The marks of a crafted piece (itemLaw.js's own `crafted` findings read these). */
 const CRAFT_MARKS = Object.freeze(['provenance', 'quality', 'hand', 'kitMetal', 'fieldKit', 'potent']);
-/** CRAFT-WORTH (2026-10-11, the exploit audit): and what its quality ROLLED onto it (smithItems.js mintPiece - a
+/** CRAFT-WORTH: and what its quality ROLLED onto it (smithItems.js mintPiece - a
  *  Superior's Magic tier, a Masterwork's Rare: the tier, its lines, a Rare's flavour), which the marks alone left on the
  *  piece - so a Masterwork Iron Dagger (a found one worth 3) drew a patron's cap of ~1,200, paid in the service's own
  *  gold. The piece it was made as carries none of it. */
@@ -137,7 +136,7 @@ function wholeWorth(item, worthOf) {
   return Math.min(worth, worthOf(plain));
 }
 /**
- * AUDIT MEND-THIRD L1-4 (2026-10-19, Mac: "Fix it here"): A PIECE'S WORTH TO A PATRON, AT THE CONDITION A COUNTER'S SALE
+ * AUDIT MEND-THIRD L1-4: A PIECE'S WORTH TO A PATRON, AT THE CONDITION A COUNTER'S SALE
  * READS IT - the whole worth above (wholeWorth) through Roleplay & Realism: Items' condition price (rriRealism.js
  * conditionCostBase, CalculateConditionCost: the share, never under a fifth), at the condition an online counter's Sell
  * arm reads (systems/item/foundMark.js foundSalePercentage: a found piece's mark, and a third of its owner's own mends past

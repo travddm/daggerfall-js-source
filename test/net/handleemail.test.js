@@ -1,4 +1,4 @@
-// HANDLE-EMAIL (2026-10-11, the owner: "ban account names as email"). The handle is the name the world reads - the
+// HANDLE-EMAIL. The handle is the name the world reads - the
 // token's `n`, every roster, every home's owner - so a player who typed their address into the Username field published it
 // to everyone they met. A handle carrying an `@` is refused at registration (server-account/src/accounts.js
 // handleRefusal, `handle-email`) and at the form before it is sent (ui/accountFlow.js); one chosen before still signs in
@@ -23,7 +23,7 @@ test('HANDLE-EMAIL the law: a handle with an `@` is an address and refused as on
   assert.equal(handleRefusal('@olga'), 'shape', 'a handle starts with a letter: its shape first');
   assert.equal(handleRefusal('Nystul'), null);
   assert.match(REFUSALS['handle-email'], /cannot be an email address, because other players see it/);
-  assert.match(REFUSALS['handle-email'], /cannot be an email address/);   // PIN MOVED (VOICE2): no dash aside (Voice.md rule 5)
+  assert.match(REFUSALS['handle-email'], /cannot be an email address/);
 });
 
 test('HANDLE-EMAIL registration: an address offered as a username is refused and nothing is written - the guest stays a guest; a name is taken (mutants: the refusal)', async () => {

@@ -293,7 +293,7 @@ export class ChargenFlow {
     // without a source the box opens EMPTY: a refusal with no reason
     // in it, which reads as a dead button.
     this.bonusPointsRows = () => bonusPointsRows();
-    // LEVEL-45 (2026-10-27, mob: "get rid of it for online"): ONLINE THERE IS NO BIOGRAPHY - the class goes straight to
+    // LEVEL-45: ONLINE THERE IS NO BIOGRAPHY - the class goes straight to
     // the name, so no answer's skill, reputation, item or gold lands on a new online character. Injectable for the pins.
     this.biographyOff = isOnlinePage();
     this.cursor = 0;          // the BIOGRAPHY screen's answer cursor
@@ -1001,7 +1001,7 @@ export class ChargenFlow {
     else c.disadvantageAdjust = totalAdjust(c.disadvantages);
   }
 
-  /** UXB1-H (2026-09-25, the UX backlog: "Export/Import class from file/clipboard."): A CLASS DOCUMENT LOADED INTO
+  /** UXB1-H: A CLASS DOCUMENT LOADED INTO
    *  THE BUILDER - the one door, so the view never writes `custom` (systems/customClass.js parseCustomClassDoc has
    *  put every value through the builder's own laws first). What the windows DERIVE is derived here, never read
    *  from the file: the freeEdit pool (the zero-sum ledger - the eight at the default 50 are a balanced 400), each
@@ -2025,7 +2025,7 @@ export class ChargenFlow {
    *  not land on the same row, because MouseClick has already moved
    *  the selection to it by the time MouseDoubleClick reads it. */
   clickClassRow(idx, now) {
-    // UI-CALM (2026-10-14, a player: "when i randomly click around in the class selection i hear drums all the time"):
+    // UI-CALM:
     // under the enhanced wizard (`classCalm`) a double click is two on the SAME row - a quick click on one class and
     // then another is browsing, not a pick (DFU's time-alone test stands for the classic screen)
     const wasDouble = this._lastClassClick != null && (now - this._lastClassClick) < DOUBLE_CLICK_DELAY_MS
@@ -2038,9 +2038,7 @@ export class ChargenFlow {
   }
 
   /**
-   * DISC24-A (2026-09-24, Quest on Discord: "When left clicking other classes the description stays the same for the
-   * original class that was double clicked previously but the `Play as a <insertClass>` changes and the class name also
-   * change at the top"): THE ONE DOOR THE LIST'S SELECTION MOVES THROUGH WHILE A DESCRIPTION CAN BE OPEN.
+   * DISC24-A: THE ONE DOOR THE LIST'S SELECTION MOVES THROUGH WHILE A DESCRIPTION CAN BE OPEN.
    *
    * DFU's description is a MODAL DaggerfallMessageBox pushed over the list (CreateCharClassSelect.cs :70-96), so while it
    * is up the selection under it cannot move - the classic port keeps that (chargenArt's hit test answers only Yes/No

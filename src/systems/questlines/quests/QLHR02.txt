@@ -1,9 +1,9 @@
--- QL14 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.2): THE HOUR THAT WAS NOT, step 2 of 2 - the line's
+-- QL14 (2026-10-19; docs/systems/quests.md): THE HOUR THAT WAS NOT, step 2 of 2 - the line's
 -- last, its branch the line's outcome. Witnessed (net/questlineClaims.js: `hour`, the h1 receipt): it waits on the
 -- Brass Remnant broken (`ql act hour-broken 1`). Six powers are two asks: the first's fourth choice opens the second.
 -- It says nothing of which ending comes, and ends no main quest. Lore: canon - the Numidium, Kagrenac, the Mantella, a
--- Dragon Break, the Order of the Hour Akatosh's. The port's own: the Hour, its Orrery and Remnant, and (decision 5,
--- the owner's) the Hour read as the echo of a Break still to come - said in the Prior's words, and no year named.
+-- Dragon Break, the Order of the Hour Akatosh's. The port's own: the Hour, its Orrery and Remnant, and
+-- the Hour read as the echo of a Break still to come - said in the Prior's words, and no year named.
 -- AUDIT QUESTLINES LINES-26: the letter signs off on one line, its sender's name and calling - DFU's pack names a
 -- quest letter by its last line (ItemHelper.cs:335-348, itemInfo.js questLetterName), and it was
 -- "Letter: of the Order of the Hour".

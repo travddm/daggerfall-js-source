@@ -26,7 +26,7 @@ const el = (tag, cls, text) => {
   return n;
 };
 
-/** MENU-ORDER (2026-10-12): a merchant's presses, each its picture (ui/menu/menuGlyphs.js), by its word. */
+/** MENU-ORDER: a merchant's presses, each its picture (ui/menu/menuGlyphs.js), by its word. */
 export const MERCHANT_ICONS = Object.freeze({ Talk: 'talk', Sell: 'treasure', Banking: 'treasure', 'Repair item': 'anvil', Exit: 'back' });
 
 let host = null;

@@ -1,5 +1,5 @@
 // @ts-check
-// PERF-URL (2026-09-29, Mac: "I'm receiving reports after some updates, performance seems to be worse") - THE PAGE'S
+// PERF-URL - THE PAGE'S
 // QUERY, PARSED ONCE A SEARCH.
 //
 // Every URL door in the port - `?online`, `?skin=`, `?air=off`, `?water=off`, `?lighting=classic`, `?blood=off` and
@@ -10,7 +10,7 @@
 // skin's - at about 4.5 us each in headless Chromium on a quiet CPU (~0.4 ms a frame), where the same read keyed on
 // the search string is under 1 us (the `location.search` read it still pays is most of that).
 //
-// PERF-SUN (2026-09-19) paid exactly this for ONE door - the sway's `swayDisabled` in systems/wind/windDrive.js keeps its
+// PERF-SUN paid exactly this for ONE door - the sway's `swayDisabled` in systems/wind/windDrive.js keeps its
 // answer until the search string changes, `cullDisabled`'s shape - and every door written since was written the old
 // way again, because the fix lived in one file. So the shape has ONE HOME now, and test/systems/perfurl_doors.test.js sweeps
 // src/ for a door that parses on its own.

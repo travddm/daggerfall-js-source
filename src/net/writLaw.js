@@ -1,12 +1,12 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF6 (2026-09-29, Mac: "continue") - THE WRITS' LAW BESIDE THE COURT'S:
+// PROF6 - THE WRITS' LAW BESIDE THE COURT'S:
 // a guild's writs, paid from its Marks treasury and delivered from the
 // Stores into the guild Stores; a player's commission, naming a crafter and
 // a piece of their make; the guild Stores' bounds; the seat week an
 // Officer's writ budget is counted in. Pure, both ends - the service
 // (server-account/src/writs.js) decides by it, the Work tab says it.
-// bible/06-Systems/Professions-Arc.md 7, 11 and 28.
+// 7, 11 and 28.
 //
 // The Court's writs stay professionLaw.js's (PROF1): they mint Marks and
 // Renown; these move Marks a guild or a player already holds.
@@ -138,7 +138,7 @@ export const writDeliverMay = (rank) => rank == null || !writMay(rank, 'storesWi
 // ─── GUILD CONTRACTS (SILVER-WAYS) ───────────────────────────────────
 
 /**
- * SILVER-WAYS (2026-10-03, Mac: "Do it"): A GUILD CONTRACT - a writ for DEEDS where a guild writ asks materials. A guild
+ * SILVER-WAYS: A GUILD CONTRACT - a writ for DEEDS where a guild writ asks materials. A guild
  * puts up `pay` silver for each defender of a raid in a region, `deeds` of them, from its treasury (escrowed, as a
  * writ's pay is); every account a raid's receipt pays there is paid by the contract as its claim is counted, less the
  * market's 5% tax. It mints nothing: it moves a guild's silver to the fighters who hold its towns, so a guild of

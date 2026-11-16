@@ -1,7 +1,7 @@
 // @ts-check
 // THE AIM CAMERA (AUDIT NAV1's broadside camera; AIM-ENDS, 2026-10-24, Discord - "Aiming front ship cannons impossible":
 // "The camera moves to the side of the ship when you're aiming the side cannons, so likewise the camera should move to
-// the front/back accordingly when aiming"; bible/03-World/Naval-Combat.md AIM-ENDS) - where the helm's eye stands while
+// the front/back accordingly when aiming"; AIM-ENDS) - where the helm's eye stands while
 // a battery is laid. The port's own: Daggerfall has no sea. Wired by the naval host (navalHost.js createNavalHost
 // `aimCam`, its `aimEye` the frame's: scenes/world.js reads it as before).
 //

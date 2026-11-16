@@ -1,4 +1,4 @@
-// HCC (2026-09-23): THE FOLLOWING, PINNED BY EXECUTION - systems/horse/horseFollow.js's breadcrumb path, the follow
+// HCC: THE FOLLOWING, PINNED BY EXECUTION - systems/horse/horseFollow.js's breadcrumb path, the follow
 // controller over a fake flat world, the wagon's trail and the grounded pose, all read off HorseFollowController /
 // HorseFollowPath / TrailingWagonRuntime's trail methods in TrailingWagon.dll's IL.
 import { test } from 'node:test';

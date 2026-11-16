@@ -1,5 +1,4 @@
-// SEA-CAP (2026-09-26, SquidKamer on the Discord: "puddle no more is too aggressive ... I jumped in last night and it
-// summoned an army of everything"; Mac, asked: "Yes, cap at 32"). Iliac Puddle No More's pulse fills every sea pixel
+// SEA-CAP. Iliac Puddle No More's pulse fills every sea pixel
 // within 200 m of an outdoor player from nothing to its cap in about two seconds - on a shore or a ship's deck as much
 // as in the water - each foe made hostile and told where the player is. The mod ships the cap at 128; the port's
 // default is 32, and the room forces the same online. The rules are the mod's, and so is the range: a player offline

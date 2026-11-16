@@ -1,4 +1,4 @@
-// FOES-FIRST (2026-10-21; bible/11-Multiplayer/Scale-Arc.md FOES-FIRST): THE FULL FRAMES FIRST ON A ROOM'S FOES BUDGET.
+// FOES-FIRST: THE FULL FRAMES FIRST ON A ROOM'S FOES BUDGET.
 // The live relay's `world` rooms dropped 2.8% of their foes frames in ten hours (double14, 482k of 17.0M), every one to
 // `_foesFan`'s room budget, and the readers tallied 285k grants never heard in nine: one bucket for every frame let the
 // deltas hold it below what a full frame's fan costs, so the full frames - the sweep, the grants, the sites sprung, the
@@ -70,7 +70,7 @@ test('FOES-FIRST the fan over the real Room: every frame reaches exactly the lis
     for (let round = 0; round < 600; round++) {
       tick(100 + Math.floor(rnd() * 500));
       for (const ws of socks) ws.sent.length = 0;
-      R.room._foesHolds = null;   // PIN MOVED (FOES-HOLD): a first frame refused is held for its turn - each round from an empty hold, the turns test/net/fb1021b_foeshold.test.js's
+      R.room._foesHolds = null;
       if (rnd() < 0.6) from = socks[Math.floor(rnd() * socks.length)];   // else the last sender again - a full frame inside its cadence
       const pick = rnd();
       const data = { n: round, ...(pick < 0.35 ? { full: 1 } : pick < 0.45 ? { lc: 4 } : { full: 0 }), f: Array.from({ length: 1 + Math.floor(rnd() * 6) }, (_, i) => ({ i, x: 1, y: 0, z: 1, h: 10 })) };
@@ -223,7 +223,7 @@ test('FOES-FIRST HIT-DROPS: a blow a destination\'s funnel drops - its frames a 
     await R.raw(a, JSON.stringify({ t: 'foes', data: { n: 1, full: 1, f: [{ i: 0 }] } }));
     R.room._metricsTick(true);
     assert.equal(points.length, 1);
-    assert.deepEqual(points[0].blobs.slice(0, 5), ['world', String(RELAY_VERSION), '2', '0', '1'], 'blob3 the blows dropped, blob4 the full frames dropped, blob5 the full frames asked');   // PIN MOVED (FOES-HOLD): blob6 on are the hold's (test/net/fb1021b_foeshold.test.js)
+    assert.deepEqual(points[0].blobs.slice(0, 5), ['world', String(RELAY_VERSION), '2', '0', '1'], 'blob3 the blows dropped, blob4 the full frames dropped, blob5 the full frames asked');
     assert.equal(points[0].doubles.length, 20, 'the doubles as they were');
     assert.equal(R.room._metrics.c.hitDrops, 0, 'a new window counts from nothing');
   });

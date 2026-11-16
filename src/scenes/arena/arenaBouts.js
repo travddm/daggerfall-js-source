@@ -1,8 +1,7 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "Players can choose to watch AI fights ... and climb esclating tiers of opponents"; "During
-// fights, the crowd is present and can cheer/boo you"; "extremely detailed and authentic"): THE BOUT ON THIS SCREEN -
+// ARENA2: THE BOUT ON THIS SCREEN -
 // the bout law (systems/arena/arenaBout.js) driven over real bodies, its crowd (systems/arena/arenaCrowd.js) seen and heard, its
-// HUD (ui/arena/arenaHud.js), its music (systems/arena/arenaScore.js), its Herald. Design: bible/11-Multiplayer/Arena.md "2. The
+// HUD (ui/arena/arenaHud.js), its music (systems/arena/arenaScore.js), its Herald. Design: "2. The
 // fights", "4. The crowd".
 //
 // ONE DRIVER, TWO FLOORS. A bout stands on a STAGE the host hands in (`setStage`): the CITY's floor (the colosseum in

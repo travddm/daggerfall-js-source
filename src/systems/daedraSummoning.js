@@ -84,8 +84,7 @@ export const SUMMON_TEXT = Object.freeze({
 });
 
 /**
- * SUMMON-NAME (2026-10-07, bible/06-Systems/Online-Waits.md WAIT3; Mac: "Take care of this", over the sweep of the
- * waits still long online). DFU's temple and Mages Guild answer one prince on his own day of the year and nobody on the
+ * SUMMON-NAME. DFU's temple and Mages Guild answer one prince on his own day of the year and nobody on the
  * other 344 (`daedraForSummoner` below, unchanged); a single player rests out the days to his, minutes of it. Online
  * the day is the sky's (TIME1) and no rest moves the sky: since SKY-SLOW a sky year is fifteen real days, so a prince
  * answered for one real hour in fifteen days, and between Vaernima's day (190) and Nocturnal's (248) no temple and no
@@ -187,7 +186,7 @@ export const summoningChance = (daedraRep, bonus) => 30 + daedraRep + bonus;
  *
  * Answers the DAEDRA record, or null for "not a summoning day".
  *
- * TIME1 (bible/06-Systems/Online-Time-Arc.md 5.2): `rerollDay` is the coven's re-roll key, a STAMP saved on the
+ * TIME1 (5.2): `rerollDay` is the coven's re-roll key, a STAMP saved on the
  * player - the event clock's day online, so a coven re-rolls once per two real hours whatever the sky's rate; a
  * prince's own day is `dayOfYear`, the sky's calendar. Offline both are DFU's one clock (the default: the same day).
  */

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FORAGE1-FORAGE2 (2026-09-28): FORAGING 1.7 (Harbinger451) - THE LAW.
-// Mac: "Heres this for life skills"; "Yes, permission"; "Your lead".
-// bible/06-Systems/Foraging.md is the record; this file is every rule
+// FORAGE1-FORAGE2: FORAGING 1.7 (Harbinger451) - THE LAW.
+// "Yes, permission"; "Your lead".
+// is the record; this file is every rule
 // the mod's compiled script and its quests hold, pure: the templates, the
 // six tools' checks in their order with their lines, the rolls, the
 // yields' lines, the foods, the console command, the quest names, Quest
@@ -31,7 +31,7 @@ import { SEA_REGION } from '../../net/nodeLaw.js';   // PROF8: the sea coast's r
 import { applyTextPatches } from '../quest/questPatches.js';   // SHAM-TRAIL: FORAGE-FIX's exact-count law, one home
 import { TEMPLATE as CC_TEMPLATE } from '../survival/food.js';   // Climates & Calories' own ids, imported (ONE DFU MEMBER, ONE EXPORT)
 // PROF1: the draws, the bands, the day and the Basket's blocks live in foragingCore.js - pure, so the account service rolls
-// the Basket's food with the IL's own tables (bible/06-Systems/Professions-Arc.md 22) - and are this module's still.
+// the Basket's food with the IL's own tables (22) - and are this module's still.
 import {
   pickOneOf, attributeAverage, attributeBand, isForagingDaylight, isDesertClimate, isWinterMonth, basketBlock, BASKET_BLOCKS,
 } from './foragingCore.js';

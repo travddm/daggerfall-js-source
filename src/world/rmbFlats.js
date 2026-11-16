@@ -158,9 +158,7 @@ export function heldFootprints(autoMap, subRecords) {
  *  Enhancements/AssetInjection. `scaledBillboardSize` below stays the
  *  pure law, and a texture with no archive stamped takes no xml. */
 /**
- * PERF-TOWN1 (2026-09-20, Mac: "the exterior is really heavy rn", and
- * the `?perf=cpu` line that answered it - `people` swinging 1.14 to
- * 7.36 ms a frame).
+ * PERF-TOWN1.
  *
  * THE TEXTURE'S OWN SIZE IS A FACT ABOUT THE FILE, and this recomputed
  * it for every person, every frame. `getSize` and `getScale` each mint
@@ -226,8 +224,7 @@ export function classicBillboardSize(t, record) {
 }
 
 /**
- * FIELD-GUN20 (2026-09-21, Mac: "The orb projectile that fires is still
- * not aligned with coming out of the barrel"): THE BASE OF A CENTRED
+ * FIELD-GUN20: THE BASE OF A CENTRED
  * BILLBOARD. The renderer bottom-anchors EVERY batch - its centre sits
  * half a height above the placement base - because that is
  * DaggerfallBillboard.AlignToBase (:410-416, `offset.y = Size.y / 2`)

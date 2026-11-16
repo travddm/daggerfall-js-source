@@ -1,5 +1,4 @@
-// TL3 (2026-09-08, Mac, the second report: "when traveling, sometimes
-// you'll spawn inside building geometry").
+// TL3.
 //
 // THE ROOT: the fast-travel arrival never asked for the reposition.
 // DaggerfallTravelPopUp.performTravel teleports WITH a reposition

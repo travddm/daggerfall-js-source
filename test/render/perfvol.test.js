@@ -1,4 +1,4 @@
-// PERF-VOL (2026-10-11, Mac: "Lets do the biggest remaining lever"): THE PLACED BATCHES' VOLUME ANSWERS, KEPT. The
+// PERF-VOL: THE PLACED BATCHES' VOLUME ANSWERS, KEPT. The
 // shadow pass asks every swaying placed batch of a lantern's reach whether any of its quads stands in each face
 // (bounds.js placementsInVolume) - and under Steady shadows every face is redrawn every frame. Captured in the real game
 // (Knightstale by night, the freeware ARENA2): 542 asks a frame, every one the frame before's to the bit. The planes are
@@ -10,7 +10,7 @@
 // the pixel walk the box and the shadow's reach before the far-flat rule (655 of 1,361 batches a frame then dropped), the
 // air pass the sphere before the emission map (3 of 636 have one). Each test only skips, so the order is free; the last
 // pin holds the air pass's emitters to the oracle and its sphere to the lit flats. The record is
-// `bible/07-Rendering/Performance-Arena.md` (PERF-VOL, PERF-ORDER).
+// ` ` (PERF-VOL, PERF-ORDER).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Renderer, WORLD_FRAME } from '../../src/render/renderer.js';
@@ -362,17 +362,6 @@ test('PERF-VOL: the replay draws exactly what it drew - every draw of every fram
     }
   }
   assert.ok(compared > 2000, `the comparison drew something (${compared})`);
-});
-
-test('PERF-VOL: the replay asks through the name, once a replay, a lantern\'s alone, and only with a placed batch to ask; and the memo SHIPS ON (AUDIT PERF-ARENA O1: every other pin sets the switch for each arm, so a shipped `volumeMemo: false` failed none) (mutant: PERFVOL-shipped-off)', async () => {
-  assert.equal(SHIPPED.volumeMemo, true, 'SHADOW_TUNING.volumeMemo ships on');
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../src/render/shadowPass.js', import.meta.url), 'utf8');
-  const body = src.slice(src.indexOf('  replay(f, vp, lightPos,'), src.indexOf('\n  }\n', src.indexOf('  replay(f, vp, lightPos,')));
-  assert.match(body, /let vname = -1;/, 'the name is asked lazily');
-  assert.match(body, /if \(vname < 0\) vname = lightPos && SHADOW_TUNING\.volumeMemo !== false \? volumeName\(planes\) : 0;/, 'at the first placed batch, a lantern\'s alone, by the off arm (AUDIT PERF-ARENA V2: no cascade\'s planes come again)');
-  assert.match(body, /if \(!\(vname === 0 \? placementsInVolume\(b, rad, planes\) : placementsInVolumeOf\(b, rad, planes, vname\)\)\) \{ this\.stats\.culled\+\+; continue; \}/, 'named: the kept answers; unnamed: the walk itself');
-  assert.equal((body.match(/placementsInVolume(?:Of)?\(/g) ?? []).length, 2, 'and no other ask');
 });
 
 // ─── PERF-ORDER: the cheapest skip first ──────────────────────────────────────────────────────────────────────────

@@ -64,8 +64,7 @@ export const pauseWhileOpen = (win) => !!win && win.pauseWhileOpen !== false;
  *  every port window that is not a message box wants. */
 export const paintsPreviousWindow = (win) => !!win && win.previousWindow === true;
 
-/** MAP-FIELD2 (Mac, 2026-09-18): "the status and magicka/health/fatigue
- *  UI element's should go away when it is taken out".
+/** MAP-FIELD2 (.
  *
  *  A window that HIDES the HUD outright, on both skins. This is not
  *  `hudCovered`, and the difference is the whole reason it exists:

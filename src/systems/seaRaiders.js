@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OWS3 - WARM ASHES' RAIDERS, SEEN COMING (bible/06-Systems/Travel-View.md,
+// OWS3 - WARM ASHES' RAIDERS, SEEN COMING (,
 // "OWS - the sea"). The player's ask: "The pirate quest system should work
 // like how we're changing enemies and nearby dungeons. Like mount and
 // blade, being able to see other players sailing in the overworld and

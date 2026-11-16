@@ -1,6 +1,5 @@
 // @ts-check
-// DECK-PROPS (2026-10-17, the owner: "Allowing prop placement on the ship itself and inside if not already enabled";
-// bible/03-World/Naval-Refit.md DECK-PROPS) - A SHIP'S DECK FITTINGS: the law. The port's own; pure.
+// DECK-PROPS - A SHIP'S DECK FITTINGS: the law. The port's own; pure.
 //
 // INSIDE was enabled already: her cabin below (SAILING-CABINS) is a room the decorator furnishes as a house is
 // (scenes/worldModes.js decorRoomHere's `ship`). ON HER DECK nothing could stand: Come Sail Away's hulls carry the mod's

@@ -3,9 +3,9 @@
 // the entrance ... no matter if I went down a diffrent hallway went down various floors"). Not the spell: the online
 // build of the Daggerfall region's Edworyan Laboratory (MAPS 17/643) is medium, its first block N0000014, and six
 // hanging roots there (TEXTURE.213 records 7-10, MultiTrigger flat Teleports, at head height over three floors) each
-// send the body to object 21538, beside the start marker. FLAT-RELAY (2026-10-05c) had made a flat relay a walk's; in
+// send the body to object 21538, beside the start marker. FLAT-RELAY had made a flat relay a walk's; in
 // DFU an acting flat's box is a trigger the controller never hits (RDBLayout.AddAction `isTrigger = true`), so a root
-// fires on a click or a blow alone. The record: bible/01-Overview/bugs/Field-Bugs-2026-10-21d.md.
+// fires on a click or a blow alone. The record:.
 //
 // On the real ARENA2 (skipped without it): the build the online room stands, the host's own collision pass and its
 // teleport landing lifted out of dungeonContext.js and worldModes.js, the real motor walked under every root from every

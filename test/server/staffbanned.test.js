@@ -1,10 +1,9 @@
-// STAFF-BANNED (2026-10-23, mob: "player that are banned need to be taken out of staff panel list of players we need a
-// tab for banned players as well", "add a ban status as well to player list", "so we can filter them") - THE PLAYERS
+// STAFF-BANNED - THE PLAYERS
 // LIST'S BAN STATUS AND FILTER (server-account/src/staffPlayers.js /v1/staff/players `ban`) and THE BANNED TAB
 // (server-account/src/staffCases.js /v1/staff/banned), driven through the real Worker on the node:sqlite database every
 // account pin stands on (test/accountDb.mjs): a banned account out of the list unless asked for, a lapsed ban none, the
 // cursor paging the filtered list, the Banned tab's rows, order, cursor and Unban, its audit row, and both reads on
-// migration 0164's index.
+// the `players_banned` index.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
@@ -38,7 +37,7 @@ async function extensionKey() {
  *  lays an account in by hand (a handle, or a guest's name with `handle: null`), its ban among `cols`. */
 async function stand() {
   const mobKey = await extensionKey();
-  const s = await standService({ DEVELOPER_HANDLES: 'SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
+  const s = await standService({ SEAT_ADMINS: 'SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.1', ...(token ? { [STAFF_SESSION_HEADER]: token } : {}) }, body: JSON.stringify(body),
@@ -142,7 +141,7 @@ test('STAFF-BANNED: THE CURSOR PAGES THE FILTERED LIST - each account once, none
   assert.ok(!seen.includes('P56') && !seen.includes('P01'), 'the newly banned left; the unbanned was behind the cursor');
 });
 
-test('STAFF-BANNED: SERVER LOAD - the banned filter and the Banned tab read migration 0164\'s index, never a walk of every account (mutants: the index; the filter beside the handle\'s range)', async () => {
+test('STAFF-BANNED: SERVER LOAD - the banned filter and the Banned tab read the players_banned index, never a walk of every account (mutants: the index; the filter beside the handle\'s range)', async () => {
   const s = await stand();
   const t = nowS();
   for (let i = 0; i < 40; i++) s.player(`L${String(i).padStart(2, '0')}`, i === 7 ? { banned_until: t + 600 } : {});

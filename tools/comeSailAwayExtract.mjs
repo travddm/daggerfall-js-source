@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-// CSA-A (2026-09-27): COME SAIL AWAY 2.1 (RedRoryOTheGlen) - THE VENDORED
+// CSA-A: COME SAIL AWAY 2.1 (RedRoryOTheGlen) - THE VENDORED
 // PICTURES AND SOUNDS, OUT OF THE SHIPPED BUNDLE AND THE PLAYER'S OWN ARENA2.
 //
 //   node tools/comeSailAwayExtract.mjs "<path-to>/come sail away.dfmod" [outDir] --arena2 <ARENA2>
 //
 // Default outDir is vendor/come-sail-away. Every picture is measured before
 // anything is written, because a render of game data is game data
-// (Port-Doctrine) and never enters the tree - bible/03-World/Come-Sail-Away.md
+// (Port-Doctrine) and never enters the tree
 // "The bundle" has the measurements:
 //
 // - `Textures/112395_0-0.png`, `Textures/112395_1-<frame>.png` - the splash
 //   and the wind widget's 24 frames: the author's own drawings. Each is held
-//   to Detailed Ships' bar first (no record within a pixel of its size covers
+//   to the classic-record bar first (no record within a pixel of its size covers
 //   DERIVED_SHARE of it - the picture whole, and cut to its visible box, so a
 //   small sprite on a clear canvas is judged at its own size) and to the
 //   block search (tools/lib/classicBlocks.mjs: no square record that is not
@@ -68,7 +68,7 @@ import { DFPalette } from '../src/formats/dfPalette.js';
 import { TextureFile } from '../src/formats/textureFile.js';
 import { ImgFile } from '../src/formats/imgFile.js';
 import { classicRecordRgba, composeTiledPicture, deriveTiledPaint } from '../src/formats/derivedTexture.js';
-import { classicRecords, findClassicSource } from './detailedShipsAssets.mjs';
+import { classicRecords, findClassicSource } from './lib/classic-source.ts';
 import { bestClassicBlock, isDerivedBlock, cropToVisible } from './lib/classicBlocks.mjs';
 import { encodeIndexedPng, pictureColours } from './lib/indexedPng.mjs';
 import { fsb5ToOgg } from './lib/fsb5Vorbis.mjs';

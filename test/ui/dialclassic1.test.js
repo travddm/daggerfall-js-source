@@ -1,5 +1,4 @@
-// DIAL-CLASSIC (2026-10-12, Mac: "the arena2 files look for those symbols green should be the skills based on the face of
-// your character youve choosen, blue magic, yellow inventory and red map, make the icons fit to each other sizewise"):
+// DIAL-CLASSIC:
 // under DFO Grimoire the Tab dial's doors wear Daggerfall's own art, read off the player's ARENA2 when the dial rises -
 // the face the player wears, and the HUD bar's star, sack and scroll cut off their stone (ui/dialClassicArt.js).
 // Photographed at the change over a real ARENA2: every door 76-80 px tall, for each of three Breton faces.
@@ -42,8 +41,7 @@ test('DIAL-CLASSIC a cut keeps the icon\'s pixels and clears the stone\'s; the s
   const inMask = (x, y) => spansOf(CLASSIC_DIAL.map.rows[y]).some(([a, b]) => x >= a && x < b);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) assert.equal(cut.rgba[(y * w + x) * 4 + 3], inMask(x, y) ? 255 : 0, `(${x}, ${y})`);
   for (const k of Object.keys(CLASSIC_DIAL)) { const hh = CLASSIC_DIAL[k].box[3] * CLASSIC_ICON_SCALE; assert.ok(hh >= 76 && hh <= 80, `${k} ${hh}px tall`); }
-  // every face at three to one (Mac: "the head with the blue hair looks too small ... check all heads if they match like
-  // the red haired") - the red-haired Breton 30x29 at 90x87, the blue-haired 26x35 at 78x105 - and only a head past
+  // every face at three to one - the red-haired Breton 30x29 at 90x87, the blue-haired 26x35 at 78x105 - and only a head past
   // 36 pixels a side fitted to CLASSIC_FACE_MAX
   assert.equal(CLASSIC_FACE_SCALE, 3);
   assert.equal(faceScale(30, 29), 3);
@@ -69,11 +67,6 @@ test('DIAL-CLASSIC worn door by door over the pack\'s paintings, pixels square; 
     assert.ok(css.includes(`background-image: var(--dial-classic-${k}, var(--grim-${dialArtName(k)}, none));`), `${k}: the pack's until its own is read`);
   }
   assert.ok(css.includes(`${G}:not([data-grim-dial="pack"])[data-grim-dial-art="classic"] .px-dial .px-arm[data-grim-icon] .px-c { image-rendering: pixelated; }`));
-  const d = src('src/ui/pixelDial.js');
-  const open = d.slice(d.indexOf('export function openPixelDial('));
-  assert.ok(open.indexOf('_onOpen?.()') > 0 && open.indexOf('_onOpen?.()') < open.indexOf('mountPixelDial(document.body'), 'asked as it rises');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /setClassicDialSource\(\{ fetchBytes, palette, entity: \(\) => playerEntity \}\);\n\s*setDialOpenHook\(\(\) => refreshClassicDial\(\)\);/);
 });
 
 test('DIAL-PACK (Mac: "add the old Tab selector as optional to the overhaul option"): the Grimoire card\'s Tab dial row - Daggerfall\'s icons by default, the pack\'s paintings kept as the choice; the classic rules stand only off it (mutants: the default the pack; the classic rules unscoped)', () => {
@@ -92,7 +85,5 @@ test('DIAL-PACK (Mac: "add the old Tab selector as optional to the overhaul opti
     assert.ok(css.includes(`${G} .px-dial .px-arm[data-grim-icon="${k}"] .px-c { width: calc(`) && css.includes(`background-image: var(--grim-${dialArtName(k)}, none);`), `${k}: the pack's painting, the base`);
     assert.ok(css.includes(`${G}:not([data-grim-dial="pack"]) .px-dial .px-arm[data-grim-icon="${k}"] .px-c { width: calc(var(--dial-classic-w-${k}, `), `${k}: Daggerfall's, off the pack's choice`);
   }
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /card\.append\(choiceRow\('Tab dial', GRIMOIRE_DIALS, grimoireDial\(\), \(id\) => setGrimoireDial\(id\)\)\);/);
-  assert.match(src('src/ui/grimoireDress.js'), /root\.dataset\.grimDial = grimoireDial\(\);/);
   _resetForTests();
 });

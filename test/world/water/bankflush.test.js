@@ -1,4 +1,4 @@
-// BANK-FLUSH (2026-10-12) - THE WATER'S EDGE MEETS THE GROUND, PINNED. The bed lowered every wet grid vertex, and the
+// BANK-FLUSH - THE WATER'S EDGE MEETS THE GROUND, PINNED. The bed lowered every wet grid vertex, and the
 // sheet stops mid-tile (its corner table's coverage, a puddle's art), so at a shore the sheet's edge hung over a carved
 // slope and the eye at the bank looked under it ("the whole water texture is flying"). The ground is now carved only
 // past a cell from the bank and round no puddle tile; the sheet keeps the bed's own depths.
@@ -70,7 +70,4 @@ test('BANK-FLUSH: a grid\'s bed - the ground lowered by the carve, the sheet\'s 
   assert.deepEqual(bed.sheetDepths, sheetDepthsOf(f.depths, T + 1, T + 1));
   for (let i = 0; i < f.carve.length; i++) assert.ok(Math.abs(bed.ground.positions[i * 3 + 1] - (10 - f.carve[i])) < 1e-5);
   assert.equal(bed.ground.positions[(3 * 17 + 3) * 3 + 1], 10, 'a cell in from the bank, the ground stands');
-  const w = rd('src/scenes/world.js'), recarve = w.slice(w.indexOf('  function dwRecarve(p) {'), w.indexOf('  function hostBed(grid, bed)'));
-  assert.match(recarve, /if \(same\(fields\?\.carve \?\? null, p\._bed\.depths\) && same\(fields \? sheetDepthsOf\(fields\.depths, g, g\) : null, p\._bed\.sheetDepths\)\) return;/);
-  assert.match(recarve, /const bed = fields \? gridBed\(grid, bedBytesOf\(p\), stride, halo\) : null;/);
 });

@@ -1,11 +1,10 @@
-// THE SEA'S AND THE WILD'S SOUNDS, SYNTHESISED AND BAKED (SOUNDSCAPE, 2026-10-24, the owner: "enhancing sound and
-// ambience, different music and ambience sounds for sailing ... and whatever else we could improve" -
-// bible/08-Audio/Audio.md SOUNDSCAPE).
+// THE SEA'S AND THE WILD'S SOUNDS, SYNTHESISED AND BAKED (SOUNDSCAPE, 2026-10-24, -
+// SOUNDSCAPE).
 //
 // OURS, the gathering's way (tools/gatherSfx.mjs): built here from noise and sine with the shared kit
 // (tools/sfxSynth.mjs) and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own 11025 Hz unsigned 8-bit
 // mono - so a wave on a shore sits IN Daggerfall's world. DAGGER.SND has splashes, a bell and a lap of water; it has no
-// surf, no owl and no wolf. These six (DECK-QUIET, 2026-10-26, the owner: "Remove all deck at sea" - the deck's eleven,
+// surf, no owl and no wolf. These six (DECK-QUIET, 2026-10-26, - the deck's eleven,
 // a wave's slap on the hull, the timbers, the ropes, the canvas luffing and the spray, are gone):
 //
 //   shore-crash-1/-2   a wave breaking on a shore: its roar rising as it curls, the crash, the foam running back

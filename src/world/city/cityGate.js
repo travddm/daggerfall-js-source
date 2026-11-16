@@ -30,8 +30,7 @@
 // mesh.ApplyCurrentClimate(). The hosts supply that swap; this leaf owns
 // the state.
 //
-// OL5 (2026-09-20, Mac: "Town gates online... should all be open at night time
-// online mode"). A closed gate is not decoration - SetOpen swaps the
+// OL5. A closed gate is not decoration - SetOpen swaps the
 // MeshCollider with the mesh (:246-250), so 447 is a wall. Offline that is
 // classic and the player sleeps to morning; online the clock is the world's,
 // nobody can move it, and a shut gate is a walled city sealed for two real
@@ -42,8 +41,10 @@
 // one of them forgets. The classic state machine above is untouched; `online`
 // only decides whether NIGHT is a thing this gate is told about, and it is
 // injectable so the law is testable without a clock.
-import { sharedClockOn } from '../../systems/worldTick.js';   // the one predicate every clock-derived online law reads (RESTX2, OL3, OL4, ECON1)
-import { CITY_GATE_OPEN_MODEL_ID, CITY_GATE_CLOSED_MODEL_ID } from '../rmbLayout.js';
+import { sharedClockOn } from '../../systems/worldTick.js'; // the one predicate every clock-derived online law reads (RESTX2, OL3, OL4, ECON1)
+import { CITY_GATE_OPEN_MODEL_ID, CITY_GATE_CLOSED_MODEL_ID, isCityGate } from '../rmbLayout.js';
+import { getPref } from '../../systems/uiPrefs.js';
+import { floorlessGateId, gateOpensOnRoad, installFloorlessGates } from './gate-floor.ts';
 
 /**
  * A freshly stood gate: `isOpen` true (DaggerfallCityGate.cs:19) and the
@@ -83,4 +84,25 @@ export function updateCityGate(gate, night, { online = sharedClockOn() } = {}) {
   gate.isOpen = !gate.isOpen;
   gate.modelId = gate.isOpen ? CITY_GATE_OPEN_MODEL_ID : CITY_GATE_CLOSED_MODEL_ID;
   return true;
+}
+
+/** The other form of a gate: the closed model for the open one and the open model for the closed one. */
+export const otherGateModelId = (modelId) =>
+  modelId === CITY_GATE_OPEN_MODEL_ID ? CITY_GATE_CLOSED_MODEL_ID : CITY_GATE_OPEN_MODEL_ID;
+
+/**
+ * The models to draw for a placed model and for the other form of the gate it swaps to: `{ own, other }`. A gate whose
+ * opening stands on a road tile gets the forms with no floor face (world/city/gate-floor.ts), so the road shows under
+ * the arch while the Open city gates option is on (the default). Any other model, a gate with no road under it and every
+ * gate with the option off are drawn as they are placed, floor face included, as Daggerfall draws them.
+ * @param {number} modelId @param {ArrayLike<number>} placement the model's matrix in pixel-local metres
+ * @param {Uint8Array|null} paths the pixel's road tiles, null where no network was painted
+ * @param {boolean} [hideFloor] the Open city gates option
+ */
+export function gateMeshIds(modelId, placement, paths, hideFloor = getPref('gateFloorHidden') !== false) {
+  if (!isCityGate(modelId)) return { own: modelId, other: modelId };
+  installFloorlessGates();
+  const other = otherGateModelId(modelId);
+  if (!hideFloor || !gateOpensOnRoad(placement, paths)) return { own: modelId, other };
+  return { own: floorlessGateId(modelId), other: floorlessGateId(other) };
 }

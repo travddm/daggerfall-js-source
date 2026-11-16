@@ -113,11 +113,9 @@ function fireListener(lineSrc, event = {}) {
   // the state this pin fires in), so the fall-through past it is what
   // gets witnessed, exactly as with `travelControlUI` above.
   const quickLootWheel = () => false;
-  // PIN MOVED (SPYGLASS): the wheel statement grew the captain's glass's rung - a raised glass takes the notch for its
   // zoom (world.js spyglassWheel). No glass is raised before the first frame, which is the state this pin fires in, so it
   // answers false and the fall-through past it is what gets witnessed, as with `quickLootWheel` above.
   const spyglassWheel = () => false;
-  // PIN MOVED (SHOT-KINDS): and the laid guns' rung - the guns take the notch for their load (world.js shotWheel); none are
   // laid before the first frame, so it answers false too
   const shotWheel = () => false;
   // DISC22-E: the strip's gate is the lock, asked through the real predicate - with `travelControlUI` null it

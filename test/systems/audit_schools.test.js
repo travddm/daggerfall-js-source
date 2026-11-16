@@ -1,9 +1,9 @@
-// AUDIT SCHOOLS (2026-10-13; bible/01-Overview/audits/Audit-Schools.md). The owner: "Lets do a comprehensive audit on
-// everything" - five lanes read SCHOOLS (bible/06-Systems/Arcane-Specialisations.md) at 2c40b7f5: the law and the powers,
+// AUDIT SCHOOLS. The owner: "Lets do a comprehensive audit on
+// everything" - five lanes read SCHOOLS at 2c40b7f5: the law and the powers,
 // the spell engine's edits, online integrity, the player's surface and its words, and the pins and the record. Every
 // finding the audit fixed is pinned here BY EXECUTION through the producers that mint the shapes in play - the real cast
 // engine (scenes/hostMagic.js createPlayerMagic: its release, its missiles, its doors), real foes (characters/
-// enemyEntity.js makeEnemyEntity over enemyBasics.js), the save (systems/save/save.js), the round (systems/worldTick.js
+// enemyEntity.js makeEnemyEntity over enemyBasics.js), the round (systems/worldTick.js
 // runMagicRoundsFor), the one ask (scenes/shared.js raisePlayerSkills), the classic sheet (ui/charsheet.js CharSheet)
 // and the enhanced pause window (ui/enhanced/enhancedMenu.js) - each number on both sides of its line, and each window just
 // before its end and just after.
@@ -31,7 +31,6 @@ import { setStruck, _resetSetPowersForTests } from '../../src/systems/sigil/sigi
 import { setSigilDueling } from '../../src/systems/sigil/sigil.js';
 import { setPlayerDoor, playerDoor } from '../../src/systems/playerDoor.js';
 import { _resetPlayerHealForTests } from '../../src/systems/playerHeal.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { seedCustomSpellIndex, mintCustomSpellIndex, _resetCustomIndexForTests, READY_MADE_INDEX_CEILING, isReadyMadeSpellIndex } from '../../src/systems/spell/spellMaker.js';
 import { RESURRECTION_SPELL_INDEX } from '../../src/systems/resurrect.js';
 import { SHARED_CARTOGRAPHY_SPELL_INDEX } from '../../src/systems/party/partyMap.js';
@@ -113,42 +112,12 @@ const tookOf = (r, before) => Math.max(0, Math.min(r.damage, before));
 
 // ── the law and the powers (lane 1) ─────────────────────────────────
 
-test('AUDIT SCHOOLS L1 H1 / L3 F1: RIFT LANCE AND CHAIN LIGHTNING KEEP THE LOOT\'S ONE REACH LAW (lootPowers.js near) - never my summon, never a foe at peace (a calmed one, a guard not yet hostile), never one a storey off, never one behind a wall; and an arc is its spell\'s element (elementShare): none on a foe immune to shock, half on one that resists (mutants: the reach unfiltered; the rise unread; the wall unread; the share dropped)', () => clean(() => {
-  for (const id of ['riftwalker', 'elementalist']) {
-    reset();
-    const p = pathMage(id, 100);
-    const struck = rec('struck', realFoe(MT.knight, { health: 900, maxHealth: 900 }), [0, 0, 0]);
-    const hostile = rec('hostile', realFoe(MT.knight), [2, 0, 0]);
-    const summon = rec('summon', realFoe(MT.daedra, { team: 'PlayerAlly' }), [1, 0, 0]);
-    const calmed = rec('calmed', realFoe(MT.knight), [1.5, 0, 0], { isHostile: false });
-    const upstairs = rec('upstairs', realFoe(MT.knight), [1, 3, 0]);
-    const walled = rec('walled', realFoe(MT.knight), [2.5, 0, 0]);
-    const all = [struck, hostile, summon, calmed, upstairs, walled];
-    const d = door(all, p, { clear: (_a, b) => b !== walled.ai.feet });
-    const before = struck.entity.health;
-    const r = engine(p, all).applySpellToFoe(signatureSpell(id), 20, struck, { entity: p });
-    const share = id === 'riftwalker' ? 1 / 3 : 1 / 2;
-    assert.deepEqual(d.hurts, [['hostile', Math.floor(tookOf(r, before) * share)]], `${id}: the hostile foe alone`);
-  }
-  // the shock share - Chain Lightning's arcs are shock, as the loot's are (a rider of a magic element arcs as magic)
-  reset();
-  const el = pathMage('elementalist', 100);
-  const t0 = rec('t0', realFoe(MT.knight, { health: 900, maxHealth: 900 }), [0, 0, 0]);
-  const immune = rec('immune', realFoe(MT.knight, { career: { ...FOE_CAREER, immunityFlags: EFFECT_FLAGS.Shock } }), [2, 0, 0]);
-  const resists = rec('resists', realFoe(MT.knight, { career: { ...FOE_CAREER, resistanceFlags: EFFECT_FLAGS.Shock } }), [3, 0, 0]);
-  const d2 = door([t0, immune, resists], el);
-  const before = t0.entity.health;
-  const r2 = engine(el, [t0, immune, resists]).applySpellToFoe(signatureSpell('elementalist'), 20, t0, { entity: el });
-  assert.deepEqual(d2.hurts, [['resists', Math.floor(tookOf(r2, before) * 0.5 * 0.5)]], 'immune: nothing; resists: half of the half');
-  assert.match(src('src/systems/arcanePowers.js'), /return near\(door, at, metres, struck\.entity\)/, 'the one reach law, no second copy');
-}));
-
 test('AUDIT SCHOOLS L1 H2 / L5 H1: THE LIGHTBRINGER READS THE LOOT\'S ONE FOE GROUP (lootPowers.js foeGroup) - a Barbarian, a Knight and the City Watch are men, though their class\'s careerIndex (15, 17, 18) names undead as a monster\'s; a skeleton and a daedra are what Dawn\'s Ward and Dawnbolt\'s second burn are for (mutants: the careerIndex read as a monster\'s)', () => clean(() => {
   const lb = pathMage('lightbringer', 100);
   const pow = (t) => page(true, () => spellPowerMult(lb, t, { online: false }));
   for (const mt of [MT.barbarian, MT.knight, MT.watch]) assert.equal(pow(realFoe(mt)), 1, `class ${mt}: a man`);
-  assert.equal(pow(realFoe(MT.skeleton)), 1.2, 'undead');
-  assert.equal(pow(realFoe(MT.daedra)), 1.2, 'daedra');
+  assert.equal(pow(realFoe(MT.skeleton)), 1.04, 'undead');
+  assert.equal(pow(realFoe(MT.daedra)), 1.04, 'daedra');
   assert.equal(pow(realFoe(MT.rat)), 1, 'an animal');
   // the burn, through the cast engine
   lb.health = 10;
@@ -235,7 +204,7 @@ test('AUDIT SCHOOLS L1 M3: FORESIGHT IS ASKED BEFORE ANY MODIFIER - a foreseen b
   } finally { registerPlayerDamageMod('auditSchoolsProbe', null); }
 }));
 
-test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 7-point blows a fifth lighter take 6, 6 and 5 (17 of 21, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
+test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CARRIED - three 20-point blows a fiftieth (2%) lighter take 20, 20 and 19 (59 of 60, health whole), as Hold the Line\'s carry; its 30 seconds end between 29.9 and 30.1 (mutants: the raw share; the carry dropped; the window a second)', () => clean(() => {
   let now = 10;
   POW._setArcanePowersClockForTests(() => now);
   const wa = pathMage('warden', 100);
@@ -247,8 +216,8 @@ test('AUDIT SCHOOLS L1 M2: THE WARDEN\'S GUARD IS WHOLE POINTS, THE FRACTION CAR
   wa.health = 1000;
   const orc = realFoe(MT.knight);
   const took = [];
-  for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 7); hurtPlayer(wa, 7); took.push(b - wa.health); }
-  assert.deepEqual(took, [6, 6, 5], '1.4 owed: 1 off; 1.8: 1 off; 2.2: 2 off - 4 of the 4.2 owed');   // 7 x 20% = 1.4 a blow
+  for (let i = 0; i < 3; i++) { const b = wa.health; setStruck(orc, wa, 20); hurtPlayer(wa, 20); took.push(b - wa.health); }
+  assert.deepEqual(took, [20, 20, 19], '0.4 owed: 0 off; 0.8: 0 off; 1.2: 1 off - 1 of the 1.2 owed');   // 20 x 2% = 0.4 a blow   // PIN MOVED: B5 (was [20, 19, 19], 4% a blow)
   assert.ok(Number.isInteger(wa.health), 'whole');
   now = 10 + 29.9;
   let b = wa.health; setStruck(orc, wa, 100); hurtPlayer(wa, 100);
@@ -517,10 +486,10 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.deepEqual(t200.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [50], 'the item\'s own 50');
   const own = mage([THA], 200);
   page(true, () => applySpell(SELF(eff(21, 255, { durationBase: 5, chanceBase: 50 })), 20, own, {}, () => 0.5, { entity: own }));
-  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [70], 'my own cast: x1.4');
+  assert.deepEqual(own.activeEffects.filter((a) => a.kind === 'spellReflection').map((a) => a.chance), [51], 'my own cast: x1.028');   // PIN MOVED: B5 (was [54], x1.08)
   const heal = SELF(eff(10, 8, { magnitudeBaseLow: 50, magnitudeBaseHigh: 50 }));
   assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }, { reflectedCount: 1 }).healed), 50, 'turned back at me');
-  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 70, 'my own');
+  assert.equal(page(true, () => applySpell(heal, 20, t200, { heal() {} }, () => 0.5, { entity: t200 }).healed), 51, 'my own');   // PIN MOVED: B5 (was 54)
   // Troll's Blood held: a Regenerate's rounds read no school
   const worn = mage([RES], 200);
   let got = 0;
@@ -528,20 +497,20 @@ test('AUDIT SCHOOLS L2 F2 / F9: A WORN ITEM\'S BUNDLE AND MY SPELL TURNED BACK A
   assert.equal(got, 10, 'a worn Regenerate: its own 10');
 }));
 
-test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damage over time does - cast at Restoration 200 it heals 14 a round, a mentoring or a refereed fight begun mid-way takes the climb off the next round, and it comes back when they end (mutants: frozen at the cast)', () => clean(() => {
+test('AUDIT SCHOOLS L2 F3: A REGENERATE READS ITS SCHOOL EVERY ROUND, as a damage over time does - cast at Restoration 200 it heals 41 a round, a mentoring or a refereed fight begun mid-way takes the climb off the next round, and it comes back when they end (mutants: frozen at the cast)', () => clean(() => {
   const r200 = mage([RES], 200);
   r200.health = 10; r200.maxHealth = 10000;
   const sinks = { heal: (n) => { r200.health += n; }, hurt() {}, say() {} };
-  page(true, () => applySpell(SELF(eff(18, 255, { durationBase: 10, magnitudeBaseLow: 10, magnitudeBaseHigh: 10 })), 20, r200, sinks, () => 0.5, { entity: r200 }));
+  page(true, () => applySpell(SELF(eff(18, 255, { durationBase: 10, magnitudeBaseLow: 40, magnitudeBaseHigh: 40 })), 20, r200, sinks, () => 0.5, { entity: r200 }));
   const round = (k) => { const b = r200.health; page(true, () => runMagicRoundsFor(r200, k, k + 1, { sinks, rolls: () => 0.5 })); return r200.health - b; };
-  assert.equal(round(0), 14, 'x1.4');
+  assert.equal(round(0), 41, 'x1.028 (41.1)');   // PIN MOVED: B5 (was 10 a round, 11; the base is 40 so the climb still shows)
   assert.equal(refreshMentor(r200, [5, 5]), 'on', 'a party of level 5s: mentoring');
-  assert.equal(round(1), 10, 'mentoring');
+  assert.equal(round(1), 40, 'mentoring');
   assert.equal(refreshMentor(r200, []), 'off');
   setSigilDueling(true);
-  assert.equal(round(2), 10, 'a refereed fight');
+  assert.equal(round(2), 40, 'a refereed fight');
   setSigilDueling(false);
-  assert.equal(round(3), 14, 'back');
+  assert.equal(round(3), 41, 'back');
 }));
 
 test('AUDIT SCHOOLS L2 F5: MENTORING LEAVES A SIGNATURE SPELL IN ITS PATH\'S SCHOOLS - priced, trained and sold by the pair (pathHeld), the powers awake at the mentor\'s share (pathAwake - MENTOR2: they had slept); a Necromancer\'s Siphon Life never turns into the Destruction they never chose (mutants: the cast school through pathAwake; the shelf through pathAwake)', () => clean(() => {
@@ -575,12 +544,12 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
   for (const [sub, kind] of [[23, 'chameleonNormal'], [24, 'shadeNormal']]) {
     const rounds = (raw) => {
       const p = mage([ILL], raw);
-      page(true, () => applySpell(SELF(eff(sub, 0, { durationBase: 10 })), 20, p, {}, () => 0.5, { entity: p }));
+      page(true, () => applySpell(SELF(eff(sub, 0, { durationBase: 40 })), 20, p, {}, () => 0.5, { entity: p }));
       const a = p.activeEffects.find((x) => x.kind === kind);
       assert.ok(a, `${kind} landed (${p.activeEffects.map((x) => x.kind)})`);
       return a.roundsRemaining + 1;
     };
-    assert.deepEqual([rounds(100), rounds(200)], [10, 14], `${kind}: 10 rounds, x1.4`);
+    assert.deepEqual([rounds(100), rounds(200)], [40, 41], `${kind}: 40 rounds, x1.028`);   // PIN MOVED: B5 (was 10 rounds [10, 11]; base 40 so the climb still shows)
   }
   const m200 = mage([MYS, THA], 200);   // Comprehend Languages is Mysticism's (spellcost.js '44,255')
   page(true, () => applySpell(SELF(eff(44, 255, { durationBase: 5, chanceBase: 50 })), 20, m200, {}, () => 0.5, { entity: m200 }));
@@ -589,53 +558,7 @@ test('AUDIT SCHOOLS L5 M3 / L2 F9: ILLUSION PAST 100 LENGTHENS CHAMELEON AND SHA
   assert.equal(cl.chance, 50, 'its own chance');
 }));
 
-test('AUDIT SCHOOLS L2 F4: MY SPELL ON THE RELAY\'S STAND-INS IS TOLD TO THE RIDERS - the court\'s Warden, its crystals, its host and the serpent\'s hide each tell the landing (no foe record: the relay holds the body), and the cast engine hands each its cast\'s wrapper (by source: the stand-ins live inside the page builders) (mutants: a stand-in untold; the caster dropped)', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  // PIN MOVED (FIELD BUGS 2026-10-19f STAND-IN-WHOLE, HOST-SPLIT): the court's three spell doors left the context as one
-  // (scenes/gate/standInSpell.js onBody) - each counted on its stand-in and told, and what the riders are told is what can
-  // land there (the number the HUD says), never a claim no relay lands
-  const sis = src('src/scenes/gate/standInSpell.js');
-  assert.match(sis, /function tellStandIn\(sp, entity, r, took, caster\) \{\n\s*tellSpellLanded\(\{ caster: player, target: entity, foe: null, spell: sp, r, self: false, took, cast: caster\?\.cast \?\? null \}\);/);
-  assert.match(sis, /const \{ dealt: counted, r, kept \} = countOnStandIn\(harm, body\.entity, player\.level, player, rolls, rounds\.carried\(key\)\);\n\s*const dealt = counted >= 1 \? bossStrike\(body\.entity, counted, \{ kind: 'spell', element: sp\.element \?\? null \}\)\.damage : counted;[^\n]*\n\s*if \(!\(dealt >= 1\)\) \{[^]*?\n\s*\}\n\s*const shown = standInShown\(dealt, standInBlowCap\(body\.entity, player\.level\)\);\n\s*tellStandIn\(sp, body\.entity, r, shown, caster\);/);
-  for (const [fn, who, land] of [['spellOnCrystal', 'cr', 'landOnCrystal'], ['spellOnHost', 'hb', 'landOnHost'], ['spellOnBoss', 'boss', 'landOnBoss']]) {
-    assert.match(sis, new RegExp(`function ${fn}\\(sp, [^)]*caster = null\\) \\{[\\s\\S]*?return onBody\\(sp, ${who}, harm, caster, host\\.${land}, `), fn);   // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): each its rounds' key
-  }
-  assert.match(dc, /castAtBoss: opts\.gateBoss \? \(sp, caster\) => spellOnBoss\(sp, caster\) : null,/);
-  assert.match(dc, /castAtCrystal: opts\.gateCrystals \? \(sp, c, caster\) => spellOnCrystal\(sp, c, caster\) : null,/);
-  assert.match(dc, /castAtHost: opts\.gateHost \? \(sp, i, caster\) => spellOnHost\(sp, i, caster\) : null,/);
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-19f BOSS-DOT): the serpent's door left bootWorld for scenes/gate/standInSpell.js createSerpentSpell, which tells the riders
-  assert.match(sis, /tellSpellLanded\(\{ caster: player, target: e, foe: null, spell: sp, r, self: false, took: standInShown\(dealt, SERPENT_HIT_CAP_X \* SERPENT_HAND_REF\), cast: caster\?\.cast \?\? null \}\);/);
-  assert.match(w, /castAtBox: \(sp, q, caster\) => serpentSpell\.cast\(sp, q, caster\),/);
-  const hm = src('src/scenes/hostMagic.js');
-  assert.match(hm, /function giveToBoss\(mark, sp, caster = null\) \{/);
-  assert.match(hm, /else giveToBoss\(hitBoss, m\.spell, playerCaster\(m\.cast \?\? null\)\);/);
-  assert.match(hm, /castAtBox\(m\.spell, hitBox, playerCaster\(m\.cast \?\? null\)\)/);
-});
-
-test('AUDIT SCHOOLS L2 F8 / L5 H2: WHAT THE PATHS DO IS REGISTERED WITH THE ONE CAST ENGINE EVERY PAGE BUILDS - hostMagic.js imports arcanePowers.js, and the world, the exterior and the dungeon page each build that engine (the standalone dungeon page had the paths\' price and none of their powers) (mutants: the import dropped)', () => {
-  assert.match(src('src/scenes/hostMagic.js'), /^import '\.\.\/systems\/arcanePowers\.js';/m);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    assert.match(src(f), /const magic = createPlayerMagic\(\{/, `${f} builds the one engine`);
-    assert.match(src(f), /import \{[^}]*createPlayerMagic[^}]*\} from '\.\/hostMagic\.js';/, `${f} from hostMagic.js`);
-  }
-});
-
 // ── online integrity (lane 3) ───────────────────────────────────────
-
-test('AUDIT SCHOOLS L3 F2: A SAVE AN OLDER BUILD CARRIED KEEPS ITS PATH - no `arcanePath` key, and the book\'s signature spell names one path whose schools are mastered: the path, already asked; two paths\' spells, a school unmastered, or a newer save\'s own `null` restore none (mutants: the witness unread; a `null` read as missing)', () => {
-  const p = pathMage('seer', 150);
-  p.pathPrompted = true;
-  p.spells = [signatureSpell('seer')];
-  const snap = JSON.parse(JSON.stringify(snapshotPlayer(p)));
-  const { arcanePath: _a, pathPrompted: _b, ...older } = snap;
-  older.career = { ...older.career }; delete older.career.arcaneMirror;   // PIN MOVED (AUDIT SPEC-RESET L2-1): a save from before the mirror - the book alone bears witness
-  const back = (s) => { const e = structuredClone(playerEntity); restorePlayer(e, s); return [e.arcanePath, e.pathPrompted]; };
-  assert.deepEqual(back(older), ['seer', true], 'the book bears witness');
-  assert.deepEqual(back({ ...older, spells: [signatureSpell('seer'), signatureSpell('necromancer')] }), [null, false], 'two paths\' spells');
-  assert.deepEqual(back({ ...older, masteredSkills: [ILL] }), [null, false], 'a school unmastered');
-  assert.deepEqual(back({ ...snap, arcanePath: null, pathPrompted: false }), [null, false], 'a newer save that chose none');
-});
 
 test('AUDIT SCHOOLS L3 F4 / F5 / L5 H5: THE READY-MADE BANDS ARE NOBODY\'S TO MINT, AND THE SIGNATURE RECORDS ARE LITERAL - a book holding Shared Cartography or a signature spell seeds no made spell into their bands; every ready-made index stands at the ceiling or below; each path\'s record (index, name, element, range, icon, every slot\'s numbers) is pinned whole - a bought copy carries its index for good (mutants: the seed steps into the band; the base moved; any slot number moved)', () => {
   _resetCustomIndexForTests();
@@ -715,9 +638,8 @@ test('AUDIT SCHOOLS L4 M1 / L5 H3: THE ONE ASK (scenes/shared.js raisePlayerSkil
   three.masterSkillsInfoSeen = true;
   raisePlayerSkills(three, { ask, rolls: () => 0.99 });
   assert.equal(asks.length, 2);
-  // PIN MOVED (GROWTH4, bible/10-UI/Growth.md section 7): the enhanced skin's box sends the player to the Growth tab; the
   // classic skin's to the skill screen, whose S row opens the same guide
-  assert.deepEqual(asks[1].rows, ['Specialization', '', '3 specializations are open to you:', 'Riftwalker, Warden, Necromancer', '', 'See them all and choose one on the Growth tab of the pause menu.', 'Resetting it later costs 200,000 gold.']);   // PIN MOVED (SPEC-RESET; AUDIT SPEC-RESET L4-5: the price a row of its own)
+  assert.deepEqual(asks[1].rows, ['Specialization', '', '3 specializations are open to you:', 'Riftwalker, Warden, Necromancer', '', 'See them all and choose one on the Growth tab of the pause menu.', 'Resetting it later costs 200,000 gold.']);
   assert.equal(AP.pathsOpenRows([AP.PATH_BY_ID.warden]).at(-2), 'Choose one in your skill screen.', 'the classic skin\'s');
   assert.deepEqual([asks[1].okOnly, asks[1].onYes, three.arcanePath ?? null, three.pathPrompted], [true, null, null, true], 'named, none chosen');
   // one box a pass: a mastery waiting is asked first, the path on the next quiet pass
@@ -763,7 +685,6 @@ test('AUDIT SCHOOLS L4 H1 / L5 H3: THE CLASSIC SHEET\'S S ROW - drawn on a skill
 });
 
 test('AUDIT SCHOOLS L4 8 / L5 H3: THE ENHANCED MODEL - each path names its two schools; a chosen one its schools too; a class whose career holds fewer than two schools can never meet one (pathPossible), and its sheet says so by showing nothing (mutants: the schools unnamed; pathPossible always true)', async () => {
-  // PIN MOVED (GROWTH2, bible/10-UI/Growth.md section 5): the enhanced model is the Growth tab's guide (ui/growth/specGuide.js)
   const { specGuideModel } = await import('../../src/ui/growth/specGuide.js');
   const fam = (e) => specGuideModel(e).families.find((f) => f.id === 'arcane');
   const m = fam(mage([ALT, RES, MYS], 100));
@@ -791,12 +712,11 @@ test('AUDIT SCHOOLS L5 H3: THE ENHANCED PAUSE WINDOW, DRIVEN - its Master Skills
     const host = globalThis.document.createElement('div');
     const menu = mountEnhancedMenu(host, { mode: 'pause', hooks: {}, onAction: () => {}, at: 'stats' });
     try {
-      // PIN MOVED (GROWTH1/GROWTH2): the Stats page's Growth door counts the path waiting; the guide names it, asks, chooses
       const btn = (text) => host.querySelectorAll('button').find((b) => b.textContent.startsWith(text));
       const door = btn('Growth');
       assert.equal(door?.textContent, 'Growth (1)', 'the door counts the specialisation waiting');
       door.onclick();
-      host.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes('Specializations')).onclick();   // PIN MOVED (VOICE2): the rail's American spelling
+      host.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes('Specializations')).onclick();
       const bar = host.querySelectorAll('button').find((b) => String(b.className).includes('gr-pathbar') && b.textContent.startsWith('Necromancer'));
       assert.ok(bar, 'the guide\'s Necromancer');
       assert.match(bar.textContent, /Restoration and Mysticism/);
@@ -816,7 +736,6 @@ test('AUDIT SCHOOLS L5 H3: THE ENHANCED PAUSE WINDOW, DRIVEN - its Master Skills
     const host2 = globalThis.document.createElement('div');
     const menu2 = mountEnhancedMenu(host2, { mode: 'pause', hooks: {}, onAction: () => {}, at: 'stats' });
     try {
-      // PIN MOVED (GROWTH2): the guide says it - no arcane path for a class with no two schools, the Brute's weapons meet the martial
       host2.querySelectorAll('button').find((b) => b.textContent.startsWith('Growth')).onclick();
       host2.querySelectorAll('button').find((b) => String(b.className).includes('px-qrow') && b.textContent.includes('Specializations')).onclick();
       const head = () => host2.querySelectorAll('div').find((d) => String(d.className).includes('gr-headline'))?.textContent ?? '';

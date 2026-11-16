@@ -1,4 +1,4 @@
-// MWNPC11 (2026-10-10, the MW-NPC arc's eleventh slice - bible/04-Characters/Morrowind-NPCs.md section 16): EVERY NPC
+// MWNPC11: EVERY NPC
 // LANE'S ONE FRAME. Ten slices gave every population a lane of its own, each under its own caps, and the stated bound
 // was their sum - a port's street in a siege with a party on the road stood eight lanes' worth. Now the lanes share one
 // frame budget (characters/npcBodies.js createFrameBudget, NPC_FRAME_TIERS): the nearest bodies across every lane stand,
@@ -16,7 +16,6 @@ const flush = () => new Promise((r) => setTimeout(r, 0));
 const F = (...v) => Float64Array.from(v);
 
 test('MWNPC11-1 the budget: the cut is the k-th nearest across every lane\'s report, Infinity while fewer stand; a stale lane or a dropped one takes no share; the skins one a lane with a body in the cut and the rest by share - their sum the budget\'s, or one a lane where more lanes stand', () => {
-  // PIN MOVED (AUDIT MW-NPC B4): a lane reports once a frame, and the frames are written out - a report is the frame's
   // while it is of this round of reports or the last (NPC_BUDGET_ROUNDS), never by the clock
   const b = createFrameBudget();
   const A = {}, B = {}, C = {};
@@ -158,8 +157,6 @@ test('MWNPC11-4 the frame\'s tiers sit below what MWNPC7 summed for the foes, th
   assert.deepEqual({ ...NPC_FRAME_TIERS.near }, { bodies: 24, skins: 8 });
   assert.deepEqual({ ...NPC_FRAME_TIERS.all }, { bodies: 48, skins: 16 });
   assert.equal(NPC_FRAME_TIERS.off, null);
-  const n = rd('src/characters/npcBodies.js');
-  assert.ok(n.includes("tier: () => getPref('mwNpcBodies') ?? NPC_BODIES_DEFAULT, collider, tiers, budget: NPC_FRAME_BUDGET });"), 'every host\'s lane on the page\'s one budget');
 });
 
 test('MWNPC11-5 a lane reports what it could stand - its nearest within its range, to its cap, in whatever order it offers them: the six nearest stand from a shuffled crowd; a lane whose people are all past its range takes no skin of the frame\'s', async () => {

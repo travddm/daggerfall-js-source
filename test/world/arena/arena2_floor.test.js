@@ -1,4 +1,4 @@
-// ARENA2 (2026-10-02): THE FLOOR'S INSTANCE (world/arena/arenaFloor.js) - the colosseum stood on its own as a made dungeon
+// ARENA2: THE FLOOR'S INSTANCE (world/arena/arenaFloor.js) - the colosseum stood on its own as a made dungeon
 // level (the Burning Court's law: no fifth host): the made location, the made block carried out of ARENADAG.RMB (every
 // model in its place against every other, the light flats as flats and as the dungeon's lights, the undercroft's stair
 // and the gate's people left in the city), the start marker by the bout's kind, the blocks file answering one name

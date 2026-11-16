@@ -1,4 +1,4 @@
-// STORE-CACHE (2026-10-11, a profile of the live desktop client in a town: 19% of the main thread was readFileSync) -
+// STORE-CACHE -
 // THE DESKTOP STORE ANSWERS A READ FROM MEMORY, AS localStorage DOES. The game's readers ask storage as if it were free:
 // the professions' book asks the signed-in session for every harvest node near the player, every frame, and the remains
 // waypoint, the claims and the weapon's glyphs each read their key a frame too. app/lib/fileStorage.cjs kept no copy, so

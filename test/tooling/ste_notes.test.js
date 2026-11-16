@@ -1,5 +1,4 @@
-// STE-NOTES (2026-10-26, the owner: "The law for patch notes is now
-// ASD-STE100 Simplified Technical English (STE)") - A PULL REQUEST'S PATCH
+// STE-NOTES - A PULL REQUEST'S PATCH
 // NOTES ARE WRITTEN IN STE. scripts/steNotes.mjs reads a description's notes
 // as the release reads them (patchNotesOf) and reports each place they break
 // a rule of STE a machine can read; .github/workflows/ste-notes.yml runs it

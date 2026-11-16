@@ -1,5 +1,4 @@
-// LW6d (2026-10-05, bible/06-Systems/Living-World.md "LW6d", Mac: "make friends or enemies, and explore a dynamic
-// world"): THE TOWN'S WORD OF IT - a keepsake carried home (LW6c) is a tale the town tells: the character's record of it
+// LW6d: THE TOWN'S WORD OF IT - a keepsake carried home (LW6c) is a tale the town tells: the character's record of it
 // (relations.js TALE_KINDS `home`, with its minute and the name it tells of), the town's talk of it (livingTown.js
 // deedNews beside the deeds), in its own words (lines.js HOME_NEWS). The town is the synthetic one (test/lwTown.mjs).
 import test from 'node:test';
@@ -28,9 +27,9 @@ function makeTown(extra = {}) {
 }
 
 test('LW6d the character\'s record: a tale (`home`, a keepsake carried home) kept with its minute and the name it tells of, once, beside - not among - the hand deaths; written into the save only once there is one, and read back (mutants: the kind, the minute, the name, the once, the save, the read)', () => {
-  assert.deepEqual([...TALE_KINDS], ['home', 'routed', 'held']);   // PIN MOVED (LW12): a band routed is a tale too; PIN MOVED (LW16): a party robbed, charged
+  assert.deepEqual([...TALE_KINDS], ['home', 'routed', 'held']);
   assert.deepEqual([...HAND_KINDS], ['slain', 'died', 'killed'], 'the hand deaths as they were - WATCH-FIX: PIN MOVED, and one of the watch another hand cut down');
-  assert.deepEqual([...MARK_KINDS], ['laid', 'heard', 'looted']);   // PIN MOVED (LW12): a band heard of, its chest looted
+  assert.deepEqual([...MARK_KINDS], ['laid', 'heard', 'looted']);
   const rel = createRelations();
   rel.turn('spared', 'L5.t2@3');
   assert.equal(rel.snapshot().turns.home, undefined, 'none yet: none written');

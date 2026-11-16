@@ -1,7 +1,7 @@
-// AUDIT WB9 (2026-09-30, before the merge - Mac: "Audit this before we merge"). The WB9 slices audited in five parts - the
+// AUDIT WB9. The WB9 slices audited in five parts - the
 // relay's brain (WB9b/c), the court's client and its drawing (WB9a/c/d/e), the spoils (WB9f), the Broker's insignia
 // (WB9g) and the bodies in a crowd (WB9h) - each finding reproduced, then fixed. The insignia's are pinned beside its own
-// (test/net/wb9g_insignia.test.js); the rest here, one test a finding. bible/11-Multiplayer/World-Bosses.md section 14.
+// (test/net/wb9g_insignia.test.js); the rest here, one test a finding.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,7 +42,7 @@ function reckoning() {
 /** A point on walkway `k` `along` metres from its start (court k's end). */
 const onWalk = (k, along) => ({ x: WALKS[k].ax + WALKS[k].ux * along, z: WALKS[k].az + WALKS[k].uz * along });
 
-// ═══ THE BRAIN (WB9b/c) ═══════════════════════════════════════════════════════════════════════════════════════════
+// THE BRAIN (WB9b/c)
 
 test('AUDIT WB9 brain F1 - no blow lands from outside the court he fights in: he chooses, aims at and waits for only those in it, so a caster on a laid walkway, or in a court he has left, struck him (three at the first court\'s rim took him from 66% to 33% while he answered nothing) - on him and on a crystal alike; within POSE_SLACK of its rim it lands (mutants: a blow on him from anywhere on the floor; a crystal\'s)', () => {
   const f = newFight(7, T0, T0 + 3_600_000, 'ruhn');
@@ -145,7 +145,7 @@ test('AUDIT WB9 brain F5 - a bound\'s word lays every walkway up to the court it
   assert.deepEqual(crossLaid({ xa: [40_000, 45_000] }, g), {}, 'both laid: nothing');
 });
 
-// ═══ THE COURT'S DRAWING (WB9c/e) ═════════════════════════════════════════════════════════════════════════════════
+// THE COURT'S DRAWING (WB9c/e)
 
 /** The telegraph's fragment stage run over a top-down grid (`step` metres a pixel), its derivatives taken as the GPU
  *  takes them - the difference across each 2x2 quad of whatever `fwidth` is asked of (two passes: the first records each
@@ -269,17 +269,11 @@ test('AUDIT WB9 court F4 - his shapes and his burning ground are drawn on over t
   assert.ok(Math.hypot(past[0] - meteor.points[0][0], past[1] - meteor.points[0][1]) < meteor.r, 'the point is under the Meteor');
   assert.equal(fs({ uOnWalk: 0 }, past), -1, 'the court\'s pass: past its rim, cut');
   assert.ok(fs({ uOnWalk: 1 }, past) > 0, 'the walkway\'s: drawn');
-  // the court hands the pass how far each walkway is laid, every frame, for his shapes and his ground (never his mark)
-  const court = readFileSync(new URL('../../../src/scenes/gate/gateCourt.js', import.meta.url), 'utf8');
-  assert.match(court, /for \(const w of WALKS\) _walked\[w\.k\] = walkFormed\(s\.xa, w\.k, t\);/);
-  assert.match(court, /for \(const ps of poolDraw\) \{ pass\.draw\(ps, proj, view, eye, seconds, fog, COURT_CENTRE, _walked, _floors\);/);   // WB14b: and the night's floors
-  assert.match(court, /if \(mark\) \{ pass\.draw\(mark, proj, view, eye, seconds, fog\); drew = true; \}/);
-  assert.match(court, /if \(shape\) \{ pass\.draw\(shape, proj, view, eye, seconds, fog, COURT_CENTRE, _walked, _floors\);/);
   assert.equal(fs({ uOnWalk: 1 }, rim), -1, 'inside the court\'s disc the walkway\'s strip draws nothing - the court\'s pass has it');
   assert.ok(fs({ uOnWalk: 0 }, rim) > 0, 'where the court\'s pass draws it');
 });
 
-// ═══ THE SPOILS (WB9f) ════════════════════════════════════════════════════════════════════════════════════════════
+// THE SPOILS (WB9f)
 
 test('AUDIT WB9 spoils F1 - every piece of a kept throw comes to rest on the court\'s floor over the REAL collider: the collider takes no hit nearer than a tenth of a millimetre, so a flight step begun that close above the floor missed it and the next began under it - about one kill in fifty (court 0, the fall at its heart, bearing pi/4, seed 35: the gold 292 m down); they fly over the floor they were kept to now (mutants: flown over the collider alone)', () => {
   const c = new Collider();
@@ -314,7 +308,7 @@ test('AUDIT WB9 spoils F2 - P or J pressed over a piece of his spoils is spent o
   assert.equal(pile.length, 2, 'E took the lit row alone');
 });
 
-// ═══ THE BODIES IN A CROWD (WB9h) ═════════════════════════════════════════════════════════════════════════════════
+// THE BODIES IN A CROWD (WB9h)
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 const settle = async (n = 8) => { for (let i = 0; i < n; i++) await flush(); };
@@ -376,7 +370,7 @@ test('AUDIT WB9 bodies F2 - a hand-over allowed on a spare stands the newcomer i
   // a standing stranger changes gear: rebuilt (a build in flight, held)
   const s1 = list.find((p) => p.id === 's1');
   now += BODY_REBUILD_MS;
-  s1.look = { ...s1.look, items: [{ templateIndex: 1, group: 'Armor', equipSlot: 20 }] };   // PIN MOVED (MW-CROWD, FIELD BUGS 2026-10-01 #8): a weapon is the arm's live door and rebuilds no body now - armor does
+  s1.look = { ...s1.look, items: [{ templateIndex: 1, group: 'Armor', equipSlot: 20 }] };
   sync(list); await settle();
   assert.ok([...pb._bodies.values()].some((b) => b.state === 'building'), 'a build in flight');
   const twin = peer('twin', 1, -1.5, 'Nord');

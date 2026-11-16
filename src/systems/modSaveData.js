@@ -1,4 +1,4 @@
-// WA1 (2026-09-25): DFU'S PER-MOD SAVE SLOT, FOR EVERY MOD THAT HAS ONE.
+// WA1: DFU'S PER-MOD SAVE SLOT, FOR EVERY MOD THAT HAS ONE.
 //
 // A mod that implements IHasModSaveData gets one record per save:
 // SaveLoadManager writes `GetSaveData()` beside the save (:1200-1210),

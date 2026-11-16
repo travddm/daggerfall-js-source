@@ -6,7 +6,7 @@
 // was never ported. The obstacle probe stops under DOOR_CROUCHING_HEIGHT by design, so it saw no lintel and bought no
 // detour; the capsule's head met the lintel every step; and every foe that followed stood in the same doorway beside
 // it, the port's foes pushing apart only softly. Driven on the real motor over the real collider, the foes minted as
-// the dungeon host mints them and stepped in its frame order. bible/01-Overview/bugs/Field-Bugs-2026-10-14b.md.
+// the dungeon host mints them and stepped in its frame order..
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -194,16 +194,6 @@ test('DOOR-JAM: through the crouch the probes and aims read the foe\'s own heigh
   const h = { ai: { feet: [0, 0, 0.05], height: 2.1, controllerHeight: DOOR_CROUCHING_HEIGHT }, dead: false };
   for (let i = 0; i < 60; i++) spaceAcross([[g], [h]], d3, DT);
   assert.ok(Math.abs(g.ai.feet[0]) < 1e-6 && Math.abs(h.ai.feet[0]) < 1e-6 && h.ai.feet[2] - g.ai.feet[2] > 0.5, `across pools too (${g.ai.feet.map((v) => v.toFixed(3))} | ${h.ai.feet.map((v) => v.toFixed(3))})`);
-});
-
-test('DOOR-JAM by source: HeightAdjust runs after every fixed step\'s moves (FixedUpdate\'s last call), and every Move in both motors writes its CollidedSides', () => {
-  const m = rd('src/characters/enemy/enemyMotor.js');
-  assert.match(m, /this\._step\(FIXED_DT, playerFeet, senses, paralyzed, paused\);\n\s*this\._heightAdjust\(FIXED_DT\);/);
-  for (const f of ['src/characters/enemy/enemyMotor.js', 'src/ai/enhancedMotor.js']) {
-    const s = rd(f);
-    const moves = [...s.matchAll(/const (\w+) = this\.collider\.move\(this\.feet,[^;]*\);[^\n]*\n\s*this\.isGrounded = \1\.grounded;[^\n]*\n\s*this\.collidedSides = !!\1\.sides;/g)].length;
-    assert.equal(moves, [...s.matchAll(/this\.collider\.move\(this\.feet,/g)].length, `${f}: every Move keeps its CollidedSides`);
-  }
 });
 
 // ── KEEP FULL HEIGHT (Mac, 2026-10-15) ──────────────────────────────

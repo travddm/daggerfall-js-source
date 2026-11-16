@@ -1,5 +1,4 @@
-// AUDIT NAVAL-REFIT (2026-10-17, the owner: "Lets do a comprehensive audit and ensure perfection"; bible/03-World/
-// Naval-Refit.md AUDIT) - what the audit of the refit found, each on the real module it lives in: a near miss searched
+// AUDIT NAVAL-REFIT - what the audit of the refit found, each on the real module it lives in: a near miss searched
 // only past her bounding sphere's reach; a ship another player stands going down blows her magazine on my screen as on
 // hers (her seed's), and is heard going; the flag's cloth remembers a flag that will not paint; a classic record read for its picture through one door, guarded alike for the paint
 // shop and the cabin. tools/mutants/auditrefit.json.
@@ -61,7 +60,7 @@ test('AUDIT NAVAL-REFIT the flag\'s cloth: a flag that will not paint is remembe
   const gl = {
     TEXTURE_2D: 1, created: 0, deleted: 0,
     createTexture() { this.created++; return { id: this.created }; }, deleteTexture() { this.deleted++; },
-    bindTexture() {}, pixelStorei() {}, texImage2D() {}, generateMipmap() {}, texParameteri() {},
+    bindTexture() {}, pixelStorei() {}, texImage2D() {}, generateMipmap() {}, texParameteri() {}, getExtension() { return null; }, getParameter() { return null; },
   };
   let paints = 0, can = false;
   const pass = Object.assign(Object.create(ShipFlagRenderer.prototype), { gl, textures: new Map(), paint: () => { paints++; return can ? {} : null; } });

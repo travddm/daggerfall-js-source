@@ -2,10 +2,10 @@
 // guns joined the gun lab's). Moved out of tools/gunSfx.mjs unchanged, so its three clips come out byte for byte as
 // they did; tools/navalSfx.mjs builds the sea fight's six from the same pieces. Everything here synthesises at RATE
 // and is baked down to DAGGER.SND's own 11025 Hz 8-bit mono by tools/sndify.mjs.
-// GATHER-FEEL (2026-10-13): the climb's pieces (unit, knock, rough, bandSweep, rub, grit) moved here out of
+// GATHER-FEEL: the climb's pieces (unit, knock, rough, bandSweep, rub, grit) moved here out of
 // tools/climbSfx.mjs unchanged - its eleven clips come out byte for byte as they did - so tools/gatherSfx.mjs builds the
 // gathering's sounds from them too.
-// SOUNDSCAPE (2026-10-24): the gathering's own pieces (modes, burst, bubble, leaves, groan, splash, bellNote and TOP_HZ)
+// SOUNDSCAPE: the gathering's own pieces (modes, burst, bubble, leaves, groan, splash, bellNote and TOP_HZ)
 // moved here out of tools/gatherSfx.mjs unchanged - its thirty-six clips come out byte for byte as they did - so
 // tools/soundscapeSfx.mjs builds the sea's and the wild's sounds from them too.
 

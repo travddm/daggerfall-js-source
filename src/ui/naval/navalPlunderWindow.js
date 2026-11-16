@@ -1,6 +1,5 @@
 // @ts-check
-// NAV-F (2026-09-28, Mac: "actual sailing ships to the world that players can encounter and pillage ... All UI elements
-// should follow enhanced plus UI. This task is to be extremely detailed, authentic and easy to use") - THE PLUNDER
+// NAV-F - THE PLUNDER
 // WINDOW: a taken ship, laid open. Black Flag's moment after the boarding - her cargo, the one thing you take from her
 // for your own ship, and what becomes of her - in Daggerfall's words and the stone-and-brass kit.
 //
@@ -19,8 +18,7 @@
 //               window without either and she lies taken where she is - Activate opens her again. AUDIT NAV1 (B11):
 //               LEAVE HER is its own way out ('leave') - she lies taken as she is, and the host puts the captor back
 //               at their own helm; the back key or the scrim only shut the window, her deck still underfoot.
-//               SHIP-CLAIM (2026-10-01, Mac: "Claim captured prizes - Keep a ship you take by boarding as your own
-//               boat, instead of scuttling her or casting her adrift"): CLAIM HER, the third - while the host offers it
+//               SHIP-CLAIM: CLAIM HER, the third - while the host offers it
 //               (`claimOffer`: a prize of mine Come Sail Away can place), its line under the three saying what she
 //               becomes; the press asks the host again, and a refusal stays with a word instead of leaving.
 // A RAID'S PRIZE (Warm Ashes' voyage ambush beaten: scenes/naval/navalHost.js leaveShipGate) has a hold and no choice, and

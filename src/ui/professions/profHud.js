@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "actual UI integration for life skills") -
-// THE PROFESSIONS IN THE WORLD'S FACE (bible/06-Systems/
-// Professions-Arc.md 8, 21, 22), each in the Enhanced Plus stone and
+// PROF1 -
+// THE PROFESSIONS IN THE WORLD'S FACE (docs/systems/professions.md), each in the Enhanced Plus stone and
 // brass (ui/enhanced/enhancedPlusStyle.js PROF_CSS), scaled by the HUD's scale:
 //
 //   the PROMPT  - bottom centre above the hotbar: "[E] Pick Red Rose -
@@ -25,7 +24,7 @@
 // The toasts' law is pure (`createToastQueue`); the rest is the DOM the
 // host's frame feeds. One owner: the host builds it online and disposes
 // it with the page. The HUD draws and says nothing aloud: GATHER-FEEL
-// (2026-10-13) moved the acts' sounds, which it said as it drew the
+// moved the acts' sounds, which it said as it drew the
 // reticle, to the gathering's ear (systems/gatherSounds.js), which hears
 // them where they happen and when the blow lands.
 // ═══════════════════════════════════════════════════════════════════

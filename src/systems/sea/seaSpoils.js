@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-SET (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected" - the Eltheric
-// Ocean's Abyss-only gear; bible/03-World/Eltheric-Ocean.md SEA-SET, bible/11-Multiplayer/Sigil-Sets.md section 6h) - THE
+// SEA-SET - THE
 // DEEP'S SPOILS: where a piece of the Eltheric Tidemail is found off a place of the sea. A treasure pile of an isle's
 // ruin, and (SEA-VAULTS) of a vault of the deep, rolls the Tidemail LAST - after everything the pile rolled before, so
 // every earlier piece stays what it was for its dice (the room's seeded base, online, is every client's alike) - on the
@@ -22,7 +21,7 @@ export function seaPlaceBand(loc) {
 }
 
 /** The source a place's pile rolls as: a vault of the deep's (SEA-VAULTS - an isle's place entered as today's vault wears
- *  the hall's ring the door stamps, scenes/worldModes.js `wildRing`) or a ruin's. */
+ *  the ring the door stamps, scenes/worldModes.js `wildRing`) or a ruin's. */
 export const seaPileSource = (loc) => (loc?.ether && loc.wildRing > 0 ? 'vault' : 'ruin');
 
 /**

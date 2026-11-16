@@ -1,4 +1,4 @@
-// AUDIT REST-PARTY, the quest lens (2026-10-03; bible/06-Systems/Rest-Arc.md section 8, REST8 as built): online a
+// AUDIT REST-PARTY, the quest lens: online a
 // quest clock that is a DELAY is cut once to the short wait (ONLINE_DELAY_SECONDS of the character's clock) and lands;
 // a DEADLINE runs on played world time. The edge is a deadline read as a delay - its end, a loss, two minutes in - and
 // the audit found three more of it and a reading that changed across a save:

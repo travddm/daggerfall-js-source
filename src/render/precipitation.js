@@ -105,7 +105,7 @@ const SNOW = {
 // WX1 (Mac: implement the weather effects BYTE-EXACT to the proto - rain
 // and snow still stick to the screen in game). The enhanced profile is
 // no longer a mixed branch of DFU's sheet: it is the lab's own program,
-// both stages copied VERBATIM from grass-proto.html, with the lab's
+// both stages copied VERBATIM from the original grass lab page, with the lab's
 // instance layout (a world-space seed in a 42m box plus a phase), the
 // lab's fall speeds (22 rain, 1.6 snow), the lab's counts (26,000 and
 // 20,000), the lab's wind law (integrated travel, per-drop gust) and
@@ -218,7 +218,7 @@ export const LAB_FALL = Object.freeze({ rain: 22.0, storm: 22.0, snow: 1.6 });
 // uTime x fall ~ 2.5e6 m, where a float32's step is a quarter metre: the
 // rain moved in visible jumps, and only got worse. The wisps wrap theirs
 // on commensurate periods (windWisps.js, AUDIT 68 S17-wisp-wrap-gust),
-// but the lab's stage is pinned byte for byte to grass-proto.html and its
+// but the lab's stage is held to a fingerprint (test/render/labGrass.test.js) and its
 // fall and gust are continuous per drop, so no wrap of either is unseen.
 // So the clock is RE-ORIGINED instead - uTime counts from it and windOff
 // goes back to 0 - and only where no one can see the field move: on the
@@ -245,8 +245,8 @@ export const PRECIP_CLOCK_MAX_S = 3600;
 // color.a under Blend One OneMinusSrcAlpha, the particle colour white.
 // The texture is white everywhere with alpha only at its dot, so under
 // that blend a flake is a white square of the clamped size, which is
-// what the mod draws. Its own program: the lab's above is pinned byte
-// for byte against grass-proto.html and stays so.
+// what the mod draws. Its own program: the lab's above is held to a
+// fingerprint and stays so.
 export const PIXEL_SNOW_VS = LAB_HEAD + `layout(location=0) in vec2 aCorner;
 layout(location=1) in vec4 aSeed;      // x,y,z in the box + phase
 uniform mat4 uVP; uniform vec3 uEye;
@@ -596,7 +596,7 @@ export class PrecipitationRenderer {
     if (!this.labProgram) this._buildLab();
     const kind = mode === 'snow' ? 1 : 0;
     // WX2: the lab's own scaling - `Math.round(wx.n * wsky.fall)` in
-    // grass-proto.html's frame() - the profile times the front's
+    // the original grass lab page's frame() - the profile times the front's
     // intensity, so a sprinkle is a few thousand drops and a front
     // fills the volume in rather than switching it on.
     const full = Math.round((LAB_COUNTS[mode] ?? LAB_COUNTS.rain) * Math.min(1, Math.max(0, this.intensity)));

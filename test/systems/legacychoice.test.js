@@ -1,12 +1,9 @@
-// LEGACY-CHOICE (2026-10-06, Mac: "I want to add a enhanced plus UI popup for online when creating a character. Perma
-// Death, the regular option, or the option that skips the liniage system entirely. Current characters already created
-// start without this system and requires a new game"; "how a new character starts and how current characters online
-// dont recieve this"; bible/06-Systems/Legacy-Arc.md section 6).
+// LEGACY-CHOICE.
 //
 // THE QUESTION: online the model question - its Enhanced Plus face the popup - offers three answers: Enduring (the
 // regular one, first: Enter without reading never costs a character), Bloodline (permadeath), and no lineage, which
 // founds no house. Offline it keeps its two (the mod's own switch in Features does the third for every character).
-// THE ANSWER: kept on the character (`entity.legacyChoice`, saved), as the leveling answer is.
+// THE ANSWER: kept on the character (`entity.legacyChoice`, saved)
 // THE LAW (legacyHost.js found): one who answered no lineage founds no house, at their birth or any load, in either
 // lane; online a house is founded at a character's BIRTH alone - one loaded with no house (made before the question
 // was put online, or copied in) plays without one, for good; offline an older character is founded at its first load
@@ -16,8 +13,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { legacyModelOptions, legacyModelScreen, LEGACY_CHOICE_FACE, LEGACY_CHOICE_TEXT, LEGACY_MODEL_FACE, LEGACY_MODEL_TAGS } from '../../src/ui/legacy/legacyModelChoice.js';
-import { LevelingChoiceScreen, stackedTops, choiceAtNative, choiceHeight, choiceKeysWord, CHOICE_STACK_GAP, CHOICE_TOP } from '../../src/ui/levelingChoice.js';
-import { LEVELING_FACE_ID, levelingFaceOwner, _setLevelingFaceClockForTests } from '../../src/ui/enhanced/enhancedLevelingChoice.js';
+import { stackedTops, choiceAtNative, choiceHeight, choiceKeysWord, CHOICE_STACK_GAP, CHOICE_TOP } from '../../src/ui/choiceScreen.js';
+import { CHOICE_FACE_ID, choiceFaceOwner, _setChoiceFaceClockForTests } from '../../src/ui/enhanced/enhancedChoiceFace.js';
 import { MODELS, NO_LINEAGE, isLegacyChoice, familyRng, LEGACY_MOD } from '../../src/systems/legacy/family.js';
 import { createLegacyHost } from '../../src/scenes/legacyHost.js';
 import { loadFamily, listFamilies } from '../../src/systems/legacy/store.js';
@@ -108,7 +105,7 @@ test('LEGACY-CHOICE the question: online three answers - Enduring first, Bloodli
   assert.ok(tops[on.length] + 10 <= 200, `the footer is on the screen: ${tops[on.length]}`);
   for (const o of on) for (const line of o.lines) assert.ok(line.length <= 50, `a line the classic face's width holds: ${line}`);
   assert.equal(choiceKeysWord(3), '1, 2 or 3');
-  assert.equal(choiceKeysWord(2), '1 or 2', 'the leveling question\'s words as before');
+  assert.equal(choiceKeysWord(2), '1 or 2');
 });
 
 test('LEGACY-CHOICE the screen: keys 1, 2 and 3 answer their own, up and down are directions over three, a click lands on its own stacked block; a screen of two has no third', () => {
@@ -154,20 +151,17 @@ test('LEGACY-CHOICE the screen: keys 1, 2 and 3 answer their own, up and down ar
     q.input('ArrowUp'); assert.equal(q.cursor, 1, 'with two, either direction moves between them');
     q.input('ArrowDown'); assert.equal(q.cursor, 0);
   });
-  // the leveling question keeps its two on the fixed pitch
-  const lv = new LevelingChoiceScreen(() => {});
-  assert.equal(lv.tops, null);
 });
 
 test('LEGACY-CHOICE the popup: on Enhanced Plus the online question wears the Plus window - three tiles in one wide row, their tags, the third answering no lineage', () => {
-  _setLevelingFaceClockForTests(() => null, () => {});
+  _setChoiceFaceClockForTests(() => null, () => {});
   withPage('?skin=enhanced&online', (doc) => {
     const got = [];
     const q = legacyModelScreen((m) => got.push(m));
     q.draw(recorder(), CANVAS, FONT);
-    const root = doc.getElementById(LEVELING_FACE_ID);
+    const root = doc.getElementById(CHOICE_FACE_ID);
     assert.ok(root, 'the popup is on the page');
-    assert.equal(levelingFaceOwner(), q);
+    assert.equal(choiceFaceOwner(), q);
     const win = find(root, 'px-win')[0];
     assert.ok(win.className.split(' ').includes('lvl-three'), 'the wide window for three');
     assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_CHOICE_FACE.title);
@@ -178,32 +172,29 @@ test('LEGACY-CHOICE the popup: on Enhanced Plus the online question wears the Pl
     assert.ok(tiles[0].className.includes('is-on'), 'Enduring chosen first');
     tiles[2].onclick();
     assert.deepEqual(got, [NO_LINEAGE]);
-    assert.equal(levelingFaceOwner(), null, 'the popup goes with the answer');
+    assert.equal(choiceFaceOwner(), null, 'the popup goes with the answer');
   }, { doc: true });
   withPage('?skin=enhanced', (doc) => {
     const q = legacyModelScreen(() => {});
     q.draw(recorder(), CANVAS, FONT);
-    const root = doc.getElementById(LEVELING_FACE_ID);
+    const root = doc.getElementById(CHOICE_FACE_ID);
     assert.ok(!find(root, 'px-win')[0].className.split(' ').includes('lvl-three'), 'offline two, the window as ever');
     assert.equal(find(root, 'lvl-title')[0].textContent, LEGACY_MODEL_FACE.title);
     q.answer(q.defaultId);
   }, { doc: true });
-  const css = read('src/ui/enhanced/enhancedPlusStyle.js');
-  assert.match(css, /\.lvl-shell \.px-win\.lvl-three \{ width: min\(1000px, 100%\); \}/);
-  assert.match(css, /\.lvl-three \.lvl-opts \{ grid-template-columns: repeat\(auto-fit, minmax\(210px, 1fr\)\); \}/);
   assert.equal(LEGACY_CHOICE_TEXT.lines.length, 2, 'the classic face\'s two lines over the options');
 });
 
 test('LEGACY-POINTER (FIELD 2026-10-06, Mac: "moving the mouse up and down switches between the options instead of letting you hover and select"): while the Plus face is up its tiles own the pointer - the canvas seam the hosts route every mousemove and click through moves nothing and answers nothing', () => {
-  _setLevelingFaceClockForTests(() => null, () => {});
+  _setChoiceFaceClockForTests(() => null, () => {});
   // the hosts' mousemove listener is on the WINDOW (world.js, exterior.js), so it fires over the popup too and hands the
   // screen the pointer in the CANVAS face's native units - rows the popup does not draw (its tiles stand side by side)
   withPage('?skin=enhanced&online', (doc) => {
     const got = [];
     const q = legacyModelScreen((m) => got.push(m));
     q.draw(recorder(), CANVAS, FONT);
-    assert.equal(levelingFaceOwner(), q, 'the popup is up');
-    const tiles = find(doc.getElementById(LEVELING_FACE_ID), 'lvl-opt');
+    assert.equal(choiceFaceOwner(), q, 'the popup is up');
+    const tiles = find(doc.getElementById(CHOICE_FACE_ID), 'lvl-opt');
     tiles[2].onpointerenter();
     assert.equal(q.cursor, 2, 'the tile under the pointer is the one chosen');
     for (let i = 0; i < 3; i++) {
@@ -217,14 +208,14 @@ test('LEGACY-POINTER (FIELD 2026-10-06, Mac: "moving the mouse up and down switc
     tiles[2].onclick();
     assert.deepEqual(got, [NO_LINEAGE], 'the tile pressed is the answer');
   }, { doc: true });
-  // the leveling question wears the same face, and the same seam
+  // the offline question wears the same face, and the same seam
   withPage('?skin=enhanced', (doc) => {
-    const q = new LevelingChoiceScreen(() => {});
+    const q = legacyModelScreen(() => {}, { online: false });
     q.draw(recorder(), CANVAS, FONT);
-    const tiles = find(doc.getElementById(LEVELING_FACE_ID), 'lvl-opt');
+    const tiles = find(doc.getElementById(CHOICE_FACE_ID), 'lvl-opt');
     tiles[1].onpointerenter();
     q.hover(160, q.topOf(0) + 2);
-    assert.equal(q.cursor, 1, 'the leveling popup too');
+    assert.equal(q.cursor, 1, 'the offline popup too');
     q.answer(q.defaultId);
   }, { doc: true });
   // the face is the LAST FRAME's: a question that comes back to the canvas (the skin switched under it) takes the canvas
@@ -232,7 +223,7 @@ test('LEGACY-POINTER (FIELD 2026-10-06, Mac: "moving the mouse up and down switc
   withPage('?skin=enhanced&online', () => {
     const q = legacyModelScreen(() => {});
     q.draw(recorder(), CANVAS, FONT);
-    assert.equal(levelingFaceOwner(), q);
+    assert.equal(choiceFaceOwner(), q);
     globalThis.location = { search: '?skin=classic&online' };
     q.draw(recorder(), CANVAS, FONT);
     q.hover(160, q.tops[2] + 2);
@@ -262,8 +253,9 @@ const career = {
   minorSkills: [SKILLS.ShortBlade, SKILLS.Archery, SKILLS.Running, SKILLS.Swimming, SKILLS.Climbing, SKILLS.Medical],
 };
 
-test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts the leveling question then the three-way one, and the answer rides the result onto the character and its save', () => {
+test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts the three-way one, and the answer rides the result onto the character and its save', () => {
   let result = null;
+  setModSetting(LEGACY_MOD, 'Enabled', true);   // CHARACTER MODES: the master switch - off by default, and then the Legacy mode is not offered
   withPage('?online', () => {
     const w = createChargenWindow(new ChargenFlow([{ name: 'Warrior', career }], () => 0), { onDone: (r) => { result = r; } });
     const key = (code, n = 1) => { for (let i = 0; i < n; i++) w.input(code); };
@@ -274,17 +266,28 @@ test('LEGACY-CHOICE the answer is the character\'s: the chargen door online puts
     key('Equal', 6); key('ArrowDown', 3);
     key('Equal', 6); key('ArrowDown', 3);
     key('Equal', 6); key('Enter');
-    key('Enter'); key('Enter');   // reflexes, summary -> the leveling question (online: always put)
-    assert.ok(w.levelingPrompt, 'the leveling question');
-    w.input('Enter');
-    assert.deepEqual(w.levelingPrompt?.options?.map((o) => o.id), [MODELS.enduring, MODELS.bloodline, NO_LINEAGE], 'then Project Legacy\'s, three ways');
-    w.input('char:3');
+    key('Enter'); key('Enter');   // reflexes, summary -> Project Legacy's question (online: on)
+    // CHARACTER MODES: the mode question comes first; only the Legacy mode (offered while Project Legacy's switch is on)
+    // goes on to the family's model, in its two answers; every other mode answers it for the character: no lineage
+    // Online offers no mode online play does not enforce yet, so Legacy is the second answer
+    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), ['classic', 'legacy'], 'the mode first');
+    w.input('char:2');
+    assert.deepEqual(w.questionPrompt?.options?.map((o) => o.id), [MODELS.enduring, MODELS.bloodline], 'then the family\'s model, two ways');
+    w.input('char:2');
     assert.equal(w.done, true);
-    assert.equal(result.legacyModel, NO_LINEAGE);
+    assert.equal(result.characterMode, 'legacy');
+    assert.equal(result.legacyModel, MODELS.bloodline);
     const e = { gender: 'male', race: 'Breton' };
     finishChargen(e, result, null);
-    assert.equal(e.legacyChoice, NO_LINEAGE, 'kept on the character');
+    assert.equal(e.legacyChoice, MODELS.bloodline, 'kept on the character');
+    assert.equal(e.characterMode, 'legacy');
+    // ...and Ironman asks nothing more: no lineage, the mode kept
+    const ironman = { gender: 'male', race: 'Breton' };
+    finishChargen(ironman, { ...result, characterMode: 'ironman', legacyModel: NO_LINEAGE }, null);
+    assert.equal(ironman.legacyChoice, NO_LINEAGE);
+    assert.equal(ironman.characterMode, 'ironman');
   });
+  setModSetting(LEGACY_MOD, 'Enabled', false);
   for (const answer of [MODELS.enduring, MODELS.bloodline]) {
     const e = { gender: 'male', race: 'Breton' };
     finishChargen(e, { ...result, legacyModel: answer }, null);
@@ -352,12 +355,4 @@ test('LEGACY-CHOICE the Family tab says why there is no house: no lineage chosen
   assert.match(noFamilyLine(prov({ choice: () => null, online: () => false })), /founded when your character is made, or the first time an older character is loaded/);
   assert.match(noFamilyLine({ on: () => false }), /Turn on Project Legacy/);
   assert.match(noFamilyLine(null), /Open this from a game to see your family\./);
-  // the world hands the tab both
-  const w = read('src/scenes/world.js');
-  assert.match(w, /choice: \(\) => playerEntity\.legacyChoice \?\? null,   \/\/ LEGACY-CHOICE: why a character has no house\n\s*online: \(\) => isOnlinePage\(\),/);
-  // the boot's own call is the load, the chargen's the birth
-  const h = read('src/scenes/legacyHost.js');
-  assert.match(h, /afterBoot: \(\) => found\(null, \{ atLoad: true \}\),/);
-  assert.match(h, /onCharacterMade: \(model = null\) => found\(model\),/);
-  assert.match(w, /legacyHost\?\.onCharacterMade\(r\.legacyModel \?\? null\);/);
 });

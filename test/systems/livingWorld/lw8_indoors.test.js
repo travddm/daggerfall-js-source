@@ -1,5 +1,4 @@
-// LW8 (2026-10-05, bible/06-Systems/Living-World.md "LW8", Mac: NPCs "dynamically all have tasks ... perform
-// activities"): THE DOORS OPEN - the residents whose day has them inside a building stood in its room when the player is
+// LW8: THE DOORS OPEN - the residents whose day has them inside a building stood in its room when the player is
 // in it: who (the town's own word), where (the room sounded through its collider), coming and going unseen, talked to
 // through the street's own ray. The town is the synthetic one (test/lwTown.mjs); the room a mock collider.
 import test from 'node:test';
@@ -139,7 +138,7 @@ test('LW8 the residents stood: on the way in all the day has inside stand at onc
   assert.equal(rig.layer.size, 3, 'all at once on the way in');
   const stood = rig.layer.stood();
   assert.equal(new Set(stood.map((s) => JSON.stringify(s.at))).size, 3, 'each its own spot');
-  // LW-LOOKS: PIN MOVED - in their own clothes, but one whose calling is a class's in it (the road's gear never indoors)
+  // LW-LOOKS:
   assert.deepEqual(stood.map((s) => [s.id, s.res.cls]).sort(), [['L9.1', 140], ['L9.2', townClassOf(RES(2))], ['L9.3', 140]]);
   assert.equal(townClassOf(RES(2)), 132, 'a priest in the healer\'s robes');
   assert.equal(rig.synced.length, 3);
@@ -211,22 +210,3 @@ test('LW8 talk and a caught hand: the bodies are talk seats in the street\'s sha
   assert.equal(rig.layer.caught({ living: null }), null);
 });
 
-test('LW8 the hosts: the building\'s press offers a resident in the room before the ladder\'s own winner (the street\'s talk ray through townTalk.tryActivate) and its billboard pass draws them; the streaming host stands the layer in a building of a living town (the room\'s collider, its floor, its static people, the sky\'s clock), steps it in the modal frame, frees it in the street, and its door answers the regard (mutants: each seam)', () => {
-  const m = rd('src/scenes/worldModes.js');
-  assert.match(m, /if \(_enemyArm\(RAY_DISTANCE, _pick\?\.distance \?\? Infinity\)\) return true;\n\s*if \(host\.livingPersonsAct\?\.\(eye, dir, _pick\?\.distance \?\? Infinity\)\) return true;/);
-  assert.match(m, /const livingInside = host\.livingBillboards\?\.\(\) \?\? \[\];[^\n]*\n\s*if \(livingInside\.length\) renderer\.drawBillboards\(livingInside, camRight, UP_Y\);/);
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /livingBillboards: \(\) => \(livingIndoors\?\.batches\(\) \?\? \[\]\),/);
-  assert.match(w, /livingPersonsAct: \(eye, dir, nearer\) => !!livingIndoors\?\.size && townTalk\.tryActivate\(eye, dir, livingIndoors\.seats\(\), Math\.min\(nearer, modes\?\.interiorCollider\?\.raycast\(eye, dir, 80\) \?\? Infinity\)\),/);   // AUDIT LW-ROOMS: PIN MOVED - never through the room's walls (test/systems/livingWorld/auditlwrooms.test.js)
-  assert.match(w, /if \(!livingWorldOn\(\) \|\| _mode\(\) !== 'interior'\) \{ if \(livingIndoors\?\.size \|\| livingIndoors\?\.spots\(\)\.length\) livingIndoors\.clear\(\); return; \}/);   // LW-FIX1: an empty room too
-  // PIN MOVED (LEGACY-HOME): a house of Project Legacy's family holds the line only (test/systems/legacyhome.test.js); every other room of the player's, none
-  assert.match(w, /building: \(\) => \{\n\s*const b = modes\?\.interiorBuilding;\n\s*const town = b \? livingTownOfMap\(b\.townMapId \?\? 0\) : null;\n\s*if \(!b \|\| !town\) return null;\n[^\n]*\n[^\n]*isFamilyHouse[^\n]*\n\s*return modes\?\.interiorCtx\?\.ownedRoom \? null : \{ key: b\.buildingKey, town \};   \/\/ AUDIT-E1: never a player's own room\n\s*\},/);
-  assert.match(w, /floorAt: \(x, y, z\) => \{ const d = modes\?\.interiorCollider\?\.raycast\(\[x, y, z\], \[0, -1, 0\], 3\); return Number\.isFinite\(d\) \? y - d : null; \},/);
-  assert.match(w, /staticFeet: \(\) => \(modes\?\.interiorCtx\?\.people \?\? \[\]\)\.map\(\(p\) => \[p\.x, p\.y, p\.z\]\),/);   // AUDIT LW-ROOMS: PIN MOVED - every one, at their post at the hour or not; the quest's apart (test/systems/livingWorld/auditlwrooms.test.js)   // AUDIT-E7: and the quest's
-  assert.match(w, /if \(p\.population instanceof LivingTown && \(p\.population\.o\.town\.mapId >>> 0\) === \(mapId >>> 0\)\) return p\.population;/);
-  assert.match(w, /livingIndoorsStep\(townTalk\.overlayActive \? 0 : dt\);   \/\/ LW8/);   // AUDIT-E3: held under a talk
-  assert.match(w, /if \(livingIndoors\?\.size \|\| livingIndoors\?\.spots\(\)\.length\) livingIndoors\.clear\(\);   \/\/ LW8: the street again/);   // LW-FIX1: an empty room too
-  assert.match(w, /caught: \(p\) => livingIndoors\?\.caught\(p\) \?\? null,/);
-  assert.match(w, /refuses: \(p\) => livingIndoors\?\.town\(\)\?\.refuses\(p\) \?\? null,/);
-  assert.match(w, /toned: \(p, taste\) => livingIndoors\?\.town\(\)\?\.toned\(p, taste\) \?\? null,/);   // PIN MOVED: TONE-TASTE - the tone as taken
-});

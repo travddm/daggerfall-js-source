@@ -1,5 +1,4 @@
-// LW5b (2026-10-05, bible/06-Systems/Living-World.md "LW5b", Mac: NPCs "travel between towns ... link with the ship AI
-// at ports"): THE PASSAGE BY SEA - a port town's travellers now and then sail the Bay's lanes to a port across the water:
+// LW5b: THE PASSAGE BY SEA - a port town's travellers now and then sail the Bay's lanes to a port across the water:
 // out on a morning tide from the dock, at a ship's pace by night as by day, home on a later tide; never on the road; in
 // and out of both towns by the dock; a passenger the lives take lost at sea; the towns' talk. On the synthetic map's
 // ports (test/lwRoads.mjs `sea`) and the synthetic town.
@@ -15,6 +14,7 @@ import { LivingTown } from '../../../src/systems/livingWorld/livingTown.js';
 import { ResidentWalker } from '../../../src/characters/residentWalker.js';
 import { lwRng } from '../../../src/systems/livingWorld/seed.js';
 import { DAY_MIN } from '../../../src/systems/livingWorld/dayPlan.js';
+import { createLivingLanes } from '../../../src/scenes/livingWorld/livingLanes.js';   // AUDIT WW F7: a town's lanes, the living lanes' book's
 
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const O = () => ({ mpm: CALENDAR_MPM, memo: new Map() });
@@ -182,7 +182,13 @@ test('LW5b the town by the dock: a traveller sailing walks to the dock and is go
 });
 
 test('LW5b the streaming host: a port town\'s lanes from the Bay\'s own network - the far port, the lane\'s length - none for a town with no harbour, none yet while the map is unread (mutants: the lanes, the harbour, the unread)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /livingTripWorld\.lanesFrom = \(town\) => \{\n\s*if \(!town\?\.port\) return \[\];\n\s*if \(!mapDict \|\| \(typeof _lanesReady !== 'undefined' && !_lanesReady\)\) return undefined;/);
-  assert.match(w, /got = laneNet\(\)\.filter\(\(l\) => l\.a\.id === id \|\| l\.b\.id === id\)\.flatMap\(\(l\) => \{\n\s*const way = livingLaneWay\(l\), to = livingTownOfPort\(l\.a\.id === id \? l\.b\.id : l\.a\.id\);\n\s*return way && to \? \[\{ to, len: way\.len, key: l\.key \}\] : \[\];/);
+  // (scenes/livingWorld/livingLanes.js), run here - the far port's town, the lane's length, none where the water joins not
+  const town = (px, py) => ({ mapId: (1 << 20) | (py * 1000 + px), px, py, port: true });
+  const a = town(200, 100), b = town(300, 110), c = town(400, 120);
+  const byPort = new Map([a, b, c].map((t) => [t.py * 1000 + t.px, t]));
+  const lane = (key, p, q) => ({ key, a: { id: p.py * 1000 + p.px, px: p.px, py: p.py }, b: { id: q.py * 1000 + q.px, px: q.px, py: q.py } });
+  const lanes = createLivingLanes({ lanes: () => [lane('ab', a, b), lane('bc', b, c)], way: (l) => (l.key === 'ab' ? { len: 9, pts: [] } : null), townOfPort: (id) => byPort.get(id) ?? null, sailorsOf: () => [], generation: () => 0 });
+  assert.deepEqual(lanes.from(a), [{ to: b, len: 9, key: 'ab' }], 'the far port, the lane\'s length');
+  assert.deepEqual(lanes.from(b), [{ to: a, len: 9, key: 'ab' }], 'from either end, the other');
+  assert.deepEqual(lanes.from(c), [], 'a lane its water joins not: none');
 });

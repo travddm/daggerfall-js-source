@@ -1,4 +1,4 @@
-// SD6a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 8): THE ORRERY OF ENDINGS'
+// SD6a: THE ORRERY OF ENDINGS'
 // LAW (net/superDungeon/sdBrain.js) - six Ending-stones, each an hour of twelve; a turn turns one stone one hour and its partners
 // with it (the gearing, hidden); the true hours said in riddles on six plaques; the dial lighting how many stand true;
 // the fray snapping the Hour back at 48 turns. Everything drawn from the slot, the same on the relay and every page.
@@ -107,7 +107,7 @@ test('SD6a the riddles\' words - the design\'s own four forms (mutants: more and
   assert.equal(sdRiddleText({ kind: 'offset', a: 5, b: 3, k: -4 }), 'The Blades keeps the hour Orsinium keeps, and four fewer.');
   assert.equal(sdRiddleText({ kind: 'offset', a: 1, b: 5, k: 0 }), 'Sentinel keeps the hour the Blades keeps.');
   assert.equal(sdRiddleText({ kind: 'opposite', a: 4, b: 3 }), 'The Underking stands opposite Orsinium.');
-  assert.equal(sdRiddleText({ kind: 'mirror', a: 5, b: 0 }), 'The Blades stands as far before twelve as Daggerfall stands past it.');   // AUDIT SD II (SD11e, PIN MOVED): L4 C5 - "read from twelve backwards" also read 13 - h
+  assert.equal(sdRiddleText({ kind: 'mirror', a: 5, b: 0 }), 'The Blades stands as far before twelve as Daggerfall stands past it.');   // AUDIT SD II (SD11e
   assert.ok(sdRiddleHolds({ kind: 'mirror', a: 5, b: 0 }, [3, 0, 0, 0, 0, 9]) && !sdRiddleHolds({ kind: 'mirror', a: 5, b: 0 }, [3, 0, 0, 0, 0, 3]));
   assert.ok(sdRiddleHolds({ kind: 'opposite', a: 4, b: 3 }, [0, 0, 0, 10, 4, 0]) && !sdRiddleHolds({ kind: 'opposite', a: 4, b: 3 }, [0, 0, 0, 10, 5, 0]));
   assert.ok(sdRiddleHolds({ kind: 'offset', a: 2, b: 1, k: 2 }, [0, 11, 1, 0, 0, 0]));

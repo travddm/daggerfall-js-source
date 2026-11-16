@@ -1,6 +1,5 @@
 // @ts-check
-// BOLT (2026-09-24, Mac: "detailed cloud and cloud to ground lighting ...
-// being able to be seen far away"): THE CHANNEL, DRAWN.
+// BOLT: THE CHANNEL, DRAWN.
 //
 // A ground strike's channel (systems/lightning.js boltPath) as ribbons of
 // light: each segment a quad turned to face the eye, a hot core with a

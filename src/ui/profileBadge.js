@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // PROFILE1 — THE PROFILE MARK IS A PORTRAIT, NOT A BUTTON.
 //
-// Mac (2026-09-25): "I kinda wanna make the menu profile icon more
-// relevant, more like a profile icon less like a button" - and, asked
+// and, asked
 // what the picture should be, the LAST CHARACTER'S FACE.
 //
 // ACC1f drew the mark as a bordered box holding a gem and a word, which

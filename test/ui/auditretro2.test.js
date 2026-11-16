@@ -1,4 +1,4 @@
-// AUDIT RETRO1, THE SECOND PASS (2026-09-24, Mac: "One more audit") - main
+// AUDIT RETRO1, THE SECOND PASS - main
 // merged in first (DISC22, OVH1-OVH4, FGH2H, QUEST-UID1), then five fresh
 // lenses: the first pass's own fixes (F), integration with main and play
 // (G), fidelity (H - records only), the pins and the docs (I), cost and
@@ -225,7 +225,7 @@ test('AUDIT RETRO1 G1: a held modifier the event does not report is stale - Shif
   assert.equal(keyboardModifiers(ev({}), new Set(['ShiftLeft'])), MOD.None);
   assert.equal(keyboardModifiers({ code: 'F11' }, new Set(['ShiftLeft'])), MOD.LeftShift | MOD.Shift, 'an event with no flags leaves the Set its say');
   let loads = 0;
-  const ctx = { uiOverlayActive: true, overlayIsNative: false, overlayInput() {}, overlayWindow: () => ({ loadsUnder: true }), quickLoad: () => { loads++; } };   // PIN MOVED (DUPE-LOAD): the death screen
+  const ctx = { uiOverlayActive: true, overlayIsNative: false, overlayInput() {}, overlayWindow: () => ({ loadsUnder: true }), quickLoad: () => { loads++; } };
   _resetRetroPostprocessing();
   assert.equal(retroToggleKey(ev({ shiftKey: true }), new Set(['AltLeft'])), true);
   routeKey(ev({ shiftKey: true }), ctx, null, new Set(['AltLeft', 'ShiftLeft']));

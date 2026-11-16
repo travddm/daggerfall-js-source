@@ -1,5 +1,5 @@
 // @ts-check
-// PEACE-WAY (2026-10-17, the owner: "When out of combat, the ship should traverse 15% faster") - HER WAY OUT OF A FIGHT:
+// PEACE-WAY - HER WAY OUT OF A FIGHT:
 // the port's own, a leaf Come Sail Away's runtime reads through its `peaceWay` seam (systems/comeSailAway/comeSailAway.js
 // oarSpeed, sailSpeed, moveAccelOwn) and the world host answers (scenes/world.js, the runtime's deps). The mod has no such
 // law and DFU no sea; Port-Ledger section A carries the departure.
@@ -13,7 +13,7 @@
 // sail set and no oar pulling), so the moment a fight begins she sheds the bonus at her own coast and no quicker.
 //
 // Only the player's own boat: the captains of the sea sail their own law (navalAI.js helm - SAIL-FREE's lesson, recorded
-// on bible/03-World/Come-Sail-Away.md: scaling the captains broke the duels' tuning), so a fight's odds are what they
+// on: scaling the captains broke the duels' tuning), so a fight's odds are what they
 // were and a ship that runs from me runs from the way I make in a fight, not the way I make crossing. Online each
 // player's boat is stood by her own client and said by her measured velocity (comeSailAwayWire.js), so the bonus needs
 // no word of its own.

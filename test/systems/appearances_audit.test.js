@@ -1,5 +1,4 @@
-// AUDIT HORIZONTAL E (2026-10-27, the owner: "Audit this", of the horizontal-progression pull request; bible/04-Characters/
-// Wardrobe.md, bible/10-UI/Collections.md section 9): lane E's findings on the wardrobe, each pinned where its fix lives -
+// AUDIT HORIZONTAL E: lane E's findings on the wardrobe, each pinned where its fix lives -
 // a peer's re-dressed weapon (E1), the first-person shield (E2), the catalogue's unmade look (E3), the Collections part's
 // words (E4), a Light Flail at the Wardrobe (E5) and a W held at a shop's popup (E7). E6's pin is the doll's own
 // (test/ui/appearances2_preview.test.js); E8, E9 and E10 are records.

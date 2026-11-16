@@ -4,7 +4,7 @@
 // service settles with it (server-account/src/realmTrade.js); the client
 // names its half with it (net/tradeSession.js, systems/realmSaves.js).
 //
-// Mac: "eliminate duping". The plan is bible/06-Systems/Realm-Arc.md
+// . The plan is
 // section 3: "Escrowed on the service ... Both offers are checked
 // against both characters' last checkpoints. The swap is applied to
 // both records at once, both `seq`s go up, and both clients load the
@@ -62,7 +62,7 @@ export const VALUE_IS_IDENTITY_TEMPLATES = Object.freeze([275]);
  *  read it. FIELD BUGS 2026-10-09b MARK-WIRE: ACQUIRE1 added `acquired` to the first two and not here, so every
  *  marked piece - a weapon, armour, clothing, jewellery - carried it on its record and not on its offer, and the
  *  market, a stall and a realm trade all refused it ("The realm does not hold that piece where your pack had it"). */
-export const RECEIVER_MARKS = Object.freeze(['equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // APPEARANCES (bible/04-Characters/Wardrobe.md): the look a piece wears is its wearer's, who collected it - a piece handed over arrives in its own; WAGONS2-VISIT (AUDIT): who may enter a caravan is its owner's word - a buyer's caravan opens to its owner alone; STEED1: a horse's bond is with its owner - it comes to the next a stranger; AUDIT STEED1: and its food's clock is its owner's character's - it comes fed as a horse first seen (steedCare.js NEW_HORSE_FED), and an offer's record never mismatches its checkpoint for a minute's grazing
+export const RECEIVER_MARKS = Object.freeze(['equipSlot', 'questItem', 'acquired', 'wagonEntry', 'horseBond', 'horseFed', 'appearance']);   // APPEARANCES: the look a piece wears is its wearer's, who collected it - a piece handed over arrives in its own; WAGONS2-VISIT (AUDIT): who may enter a caravan is its owner's word - a buyer's caravan opens to its owner alone; STEED1: a horse's bond is with its owner - it comes to the next a stranger; AUDIT STEED1: and its food's clock is its owner's character's - it comes fed as a horse first seen (steedCare.js NEW_HORSE_FED), and an offer's record never mismatches its checkpoint for a minute's grazing
 /** The fields that are never part of what an item IS: its count and its price (the offer's own, which the wire floors),
  *  and the RECEIVER's marks. */
 export const TRADE_VOLATILE_FIELDS = Object.freeze(['stackCount', 'value', ...RECEIVER_MARKS]);
@@ -75,7 +75,7 @@ export const REALM_TRADE_RECORD_MAX = 4096;
  *  Stone's row (systems/gate/gateSpoils.js SIGIL_STONE_TEMPLATES) is the one; test/systems/auditrealm.test.js holds this list equal to
  *  every row the game registers with `bound`. The service read `rec.bound` alone, and a stone's record carries no mark
  *  of its own - so two halves naming a stone moved it between two realm characters. */
-export const BOUND_TEMPLATES = Object.freeze([570, 571, 572, 575, 580, 582, 2000, 2001]);   // WITCH1: the Soul Cake's and the Hearth Offering's (systems/festival/festivalRows.js) -   // EG-PLAY: the Weir Key's (systems/eliteGates/weirKey.js) -   // LOOT9: the Welkynd Shard's row beside the Stone's; PORTAL1: the Portal Stone's beside the shard's; WALLET1: the Wallet's (systems/walletItem.js); CARDS8: the Card Binder's (systems/iliac/iliacItems.js)
+export const BOUND_TEMPLATES = Object.freeze([570, 571, 572, 580, 2000, 2001]);   // WITCH1: the Soul Cake's and the Hearth Offering's (systems/festival/festivalRows.js) -   // LOOT9: the Welkynd Shard's row beside the Stone's; PORTAL1: the Portal Stone's beside the shard's; WALLET1: the Wallet's (systems/walletItem.js)
 /** A bound record, as systems/item/itemBound.js isBound reads a piece: its own mark (SS4), or its row's (SS1) - and no field
  *  on the record unbinds what the row binds. */
 export const boundRecord = (/** @type {any} */ rec) => rec?.bound === true || BOUND_TEMPLATES.includes(rec?.templateIndex);
@@ -239,7 +239,7 @@ export function settleRealmTrade(saveA, saveB, halfA, halfB) {
  *  checkpoint), and the third holds for a time even once the piece is gone - so dropping it and taking it up again is
  *  no way out, and the player who did exactly that (the Ring report) was told only "until it is gone". The rule is
  *  kept: a piece parked on the ground while its carrier trades, then taken up again, is what the strikes are for.
- *  AUTO-HOLD (2026-10-16): that third hold is a week (a month each time after) even once the piece is gone - no staff's
+ *  AUTO-HOLD: that third hold is a week (a month each time after) even once the piece is gone - no staff's
  *  look - and the piece still carried past it holds as any law hold does. */
 export const TRADE_HELD_STRIKES = ' Holds add up: from the third, the freeze stays for a week even after it is gone, and for a month each time after that.';   // RPT1026-MARKET HOLD-SAID: the freeze, never "trading" alone
 // RPT1026-MARKET HOLD-SAID (private reports 2026-10-26: gathering stopped overnight under a notice that named only a

@@ -1,4 +1,4 @@
-// CRASH2 - THE CONTRACT ITSELF, DERIVED (2026-09-15).
+// CRASH2 - THE CONTRACT ITSELF, DERIVED.
 //
 // CRASH1 fixed a live crash (ui/chronicleDoor.js answered a contract no
 // host reads) and shipped a gate to stop the next one. This file is

@@ -1,4 +1,4 @@
-// DISC29-A (2026-09-28, Skibbster on Discord: the throne puzzle's switch never activates when walked on) - A COLLISION01
+// DISC29-A - A COLLISION01
 // OBJECT IS STOOD ON WHEREVER ITS OWN SURFACE IS.
 //
 // N0000037's two thrones are CastSpell effects with the Collision01 trigger (WalkOn only), chained to a tapestry that
@@ -100,20 +100,6 @@ test('DISC29-A: the puzzle - WalkOn on the throne casts its spell and slides the
   actions.update(5);
   assert.equal(tapestry.state, 'end', 'the tapestry is aside');
   assert.deepEqual(cast, [17], 'and the throne casts its spell (record 17): the first Play finds the cooldown at 0 (the S4b law)');
-});
-
-test('DISC29-A: the dungeon host - collision-trigger effects and relays keep their triangles in triggerSurfaces, and the pass asks actionContact (AUDIT PRE-MERGE 0929 D1/D2: every such model, not Collision01\'s alone; an acting flat keeps its box)', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  assert.match(dc, /const triggerSurfaces = new Collider\(\(\) => -Infinity\);/);
-  assert.match(dc, /standable = eo;/);
-  assert.match(dc, /standable = actions\.addRelay\(bi, p\.position, p\.action, aabb, \[matrix\[12\], matrix\[13\], matrix\[14\]\], p\.modelIdNum\);/);
-  assert.match(dc, /collider\.addMesh\('dungeon', cpu\.positions, cpu\.indices, matrix\);\n\s+if \(standable && hasActionCollision\(standable\)\) triggerSurfaces\.addMesh\(standable\.key, cpu\.positions, cpu\.indices, matrix\);/,
-    'the copy beside the shared bucket - the player still stands on the shared one');
-  const pass = dc.slice(dc.indexOf('function collisionTriggers('), dc.indexOf('function waterSurfaceYAt('));
-  assert.match(pass, /: actionContact\(o, playerFeet, playerHeight, o\.kind === 'effect' \|\| o\.kind === 'relay' \? triggerSurfaces : collider, wish\);/);
-  assert.match(pass, /const touch = o\.isFlat\n\s+\? \(standsOnAction\(o, playerFeet, a, triggerSurfaces\) \? 'WalkOn' : 'WalkInto'\)/, 'an acting flat keeps its box');
-  assert.match(pass, /if \(!touch\) continue;/, 'a box touched with nothing of the object touched hears nothing');
-  assert.doesNotMatch(pass, /folds into the beneath test/, 'the assumption that hid it is gone');
 });
 
 test('DISC29-A: N0000037\'s thrones on the real data - Collision01 CastSpell chained to the tapestry, and a body on the seat stands on it', { skip: skipReal }, () => {

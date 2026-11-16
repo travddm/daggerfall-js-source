@@ -1,5 +1,5 @@
 // @ts-check
-// QL1 (bible/06-Systems/Questlines-Arc.md section 2.4): A STAMPED QUEST'S STATE - its one home, a leaf with no imports,
+// QL1: A STAMPED QUEST'S STATE - its one home, a leaf with no imports,
 // because the quest itself (systems/quest/quest.js) saves and restores it and the quest must not pull the layer's
 // world in behind it. The stamp's meaning, the switch and every reader of the state are systems/questlines/qlLaw.js's.
 
@@ -39,7 +39,7 @@ export function readState(data) {
 /** The state written into a save: a deep copy, so a later change to the live quest never reaches a snapshot. */
 export const writeState = (state) => (state ? structuredClone(state) : null);
 
-/** QL1 (decision 7): A SHARED COPY'S STATE (QUEST1, quest/questShare.js). What the party did is the party's - the
+/** QL1: A SHARED COPY'S STATE (QUEST1, quest/questShare.js). What the party did is the party's - the
  *  objectives done, the branches chosen, the outcome reached - and what the holder is paid is the holder's: a copy
  *  arrives with its reward unpaid, its standing unmoved and no acts heard (an act is this world's, as a kill's count is).
  *  AUDIT QUESTLINES REWARD-1: and its TIER is the holder's - the envelope's was the sender's (a level-21 member's town
@@ -53,7 +53,7 @@ export function receivedState(data) {
   return st ? { ...st, tier: 1, paid: false, moved: false, acts: {}, received: true } : null;
 }
 
-/** QL1 (decision 7): A RESYNC'S STATE (machine.js updateSharedQuest). Monotonic, as action completion is: an objective
+/** QL1: A RESYNC'S STATE (machine.js updateSharedQuest). Monotonic, as action completion is: an objective
  *  either copy saw done is done, a choice either copy made stands (this copy's first - the sharer's arrived with the
  *  receive), an outcome either copy reached stands; and what is the holder's own (paid, moved, the acts heard, the tier,
  *  whether it was received) is never the partner's. A copy that was DFU's stays DFU's. */

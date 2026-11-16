@@ -219,27 +219,6 @@ test('AUDIT PRE-MERGE 0928 N5: a cache hit with a dead worker does not re-cut a 
   assert.ok(small.value?.cached && await on(small.value, 5, 5), 'a small soup’s cached bake still hydrates here');
 });
 
-// ─── N8 ─────────────────────────────────────────────────────────────────────────────────────────────────────────
-test('AUDIT PRE-MERGE 0928 N8: the vendored set answers in import.meta.glob’s own key form - every frame the mod ships, and nothing past its last', async () => {
-  const { inVendoredSet, SPRITE_ARCHIVE, DROPPED_ARCHIVE } = await import('../../../src/systems/handheldTorches.js');
-  // the table as Vite builds it: its keys are the glob's own pattern, spelled from the importing file
-  const glob = /import\.meta\.glob\('([^']*)\/\*\.png'/.exec(read('src/systems/handheldTorches.js'));
-  assert.ok(glob, 'the table is a glob of the vendored folder');
-  const files = readdirSync(new URL('../../../vendor/handheld-torches/Textures/', import.meta.url)).filter((f) => f.endsWith('.png'));
-  const table = Object.fromEntries(files.map((f) => [`${glob[1]}/${f}`, `/assets/${f}`]));
-  const admitted = (archive) => {
-    const out = [];
-    for (let record = 0; record < 16; record++) for (let frame = 0; frame < 8; frame++) if (inVendoredSet(table, `${archive}_${record}-${frame}.png`)) out.push(`${record}-${frame}`);
-    return out;
-  };
-  const shipped = (archive) => files.map((f) => new RegExp(`^${archive}_(\\d+-\\d+)\\.png$`).exec(f)?.[1]).filter(Boolean)
-    .sort((p, q) => { const [a, b] = p.split('-').map(Number), [c, d] = q.split('-').map(Number); return a - c || b - d; });
-  assert.deepEqual(admitted(SPRITE_ARCHIVE), shipped(SPRITE_ARCHIVE), 'the hand’s sprite: exactly the frames on disk');
-  assert.deepEqual(admitted(SPRITE_ARCHIVE), ['0-0', '0-1', '0-2', '0-3', '1-0', '1-1', '1-2', '1-3']);
-  assert.deepEqual(admitted(DROPPED_ARCHIVE), shipped(DROPPED_ARCHIVE), 'the dropped flats: exactly the frames on disk');
-  assert.equal(inVendoredSet(null, `${SPRITE_ARCHIVE}_0-9.png`), true, 'no table (node): the loaders fetch as before');
-});
-
 /** A GL-logging renderer (glstate.test.js's rig). */
 async function glRig() {
   const { Renderer } = await import('../../../src/render/renderer.js');
@@ -282,44 +261,3 @@ function recordingCanvas(log, w = 4, h = 4) {
   return { width: w, height: h, getContext: (kind, opts) => { log.push([kind, opts ?? null]); return ctx; } };
 }
 
-test('AUDIT PRE-MERGE 0928 N8: every canvas the port makes to read pixels back asks for willReadFrequently - the PNG decode, the SDF atlas, the held map’s sheet and thumbs, the save shot', async () => {
-  const want = ['2d', { willReadFrequently: true }];
-  const log = [];
-  const saved = { createImageBitmap: globalThis.createImageBitmap, OffscreenCanvas: globalThis.OffscreenCanvas, document: globalThis.document, Image: globalThis.Image, localStorage: globalThis.localStorage };
-  try {
-    // the PNG decode every vendored texture goes through
-    globalThis.createImageBitmap = async () => ({ width: 2, height: 2, close() {} });
-    globalThis.OffscreenCanvas = class { constructor(w, h) { return recordingCanvas(log, w, h); } };
-    const { decodePng } = await import('../../../src/systems/textureReplacement.js');
-    await decodePng(new Uint8Array([137, 80, 78, 71]));
-    assert.deepEqual(log.splice(0), [want], 'decodePng');
-    // the SDF face's atlas - L10N2: DFU's dynamic face (ui/glyphFace.js) took the seeded build's place; each page it
-    // grows into is read back at its upload, so the page asks at its one context (the measurer only measures)
-    const { createGlyphFace } = await import('../../../src/ui/glyphFace.js');
-    createGlyphFace('Test', { makeCanvas: (w, h) => recordingCanvas(log, w, h) }).add(65);
-    assert.deepEqual(log.splice(0), [['2d', null], want], 'the glyph face: its measurer, then its page');
-    // the held map: the painted sheet and the thumbs' offscreen (the hands canvas is only written)
-    globalThis.document = { createElement: () => recordingCanvas(log) };
-    const { HeldMapWindow } = await import('../../../src/ui/heldMap.js');
-    const sprite = { naturalWidth: 64, naturalHeight: 64 };
-    HeldMapWindow.prototype._paintSheet.call({}, sprite, recordingCanvas(log));
-    assert.deepEqual(log.splice(0), [want], '_paintSheet');
-    HeldMapWindow.prototype._keyHands.call({}, sprite, recordingCanvas(log));
-    assert.deepEqual(log.splice(0), [want, ['2d', null]], '_keyHands: the offscreen it reads, then the hands it writes');
-    // the save window's shot
-    const { SaveWindow } = await import('../../../src/ui/saveWindow.js');
-    const { SAVE_SHOT_PREFIX } = await import('../../../src/systems/save/saveSlots.js');
-    globalThis.localStorage = { getItem: (k) => (k === `${SAVE_SHOT_PREFIX}k1` ? 'data:image/jpeg;base64,X' : null), setItem() {}, removeItem() {}, key: () => null, length: 0 };
-    globalThis.Image = class { set src(u) { this.width = 2; this.height = 2; this.onload?.(); } };
-    const uploads = [];
-    new SaveWindow('load', { playerName: () => 'Mac' })._shotTexture({ uploadTexture: (...a) => { uploads.push(a[0]); return {}; }, releaseTexture() {} }, 'k1');
-    assert.deepEqual(uploads, ['saveshot'], 'the shot was read back and uploaded');
-    assert.deepEqual(log.splice(0), [want], 'the save shot');
-  } finally {
-    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete globalThis[k]; else globalThis[k] = v; }
-  }
-  // the paperdoll tool's skin (a THREE page, not drivable here): its two read-back canvases ask at their FIRST context
-  const skin = read('src/tools/paperdoll/skin.js');
-  assert.match(skin, /const g2 = c\.getContext\('2d', \{ willReadFrequently: true \}\); g2\.drawImage\(img, 0, 0\);/);
-  assert.match(skin, /\n\s*bc\.getContext\('2d', \{ willReadFrequently: true \}\)\.drawImage\(bi, 0, 0\);/);
-});

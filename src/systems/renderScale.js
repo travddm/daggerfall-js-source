@@ -1,10 +1,8 @@
 // @ts-check
-// PERF-SCALE (2026-09-25) - THE RENDER SCALE: THE SETTING AND ITS DOOR.
-// Two players, relayed by Mac the same day: "One user is reporting fps
-// issues in the exterior but fine in the interior ... GPU is NVIDIA
-// GeForce RTX 4060 Ti", and "me too my friend.. don't know why. I got a
-// RX6600". Mac: "It has nothing to do with our updates" - FPS1
-// (2026-09-11) had already heard "the outside still has optimization
+// PERF-SCALE - THE RENDER SCALE: THE SETTING AND ITS DOOR.
+// Two players, relayed by, and "me too my friend.. don't know why. I got a
+// RX6600". - FPS1
+// had already heard "the outside still has optimization
 // issues". A 4060 Ti is no weak card. What the reports share is the
 // SIZE of the frame: the renderer sized the world at the window's full
 // CSS size (Renderer.beginFrame, clientWidth x clientHeight) with no cap

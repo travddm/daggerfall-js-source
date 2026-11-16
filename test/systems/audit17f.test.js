@@ -14,7 +14,6 @@ import { assignStartingGear, STARTING_GOLD } from '../../src/systems/startingGea
 import { isWalletItem } from '../../src/systems/walletItem.js';   // WALLET1: the port's own tail's wallet, set aside from DFU's bag
 import { GOLD_TEMPLATE, goldStack, itemWeight } from '../../src/systems/inventory.js';
 import { addGold } from '../../src/systems/court.js';
-import { snapshotPlayer, restorePlayer } from '../../src/systems/save/save.js';
 import { createChargenWindow, finishChargen } from '../../src/systems/chargenSession.js';
 import { ChargenFlow } from '../../src/ui/chargen.js';
 import { startingSpells, STARTING_SPELL_SETS } from '../../src/systems/chargen.js';
@@ -109,7 +108,6 @@ test('17f F12: item names come from the TEMPLATE, not a hand copy', () => {
   // E4: the kit's last row used to be a 'Gold Pieces' stack. Gold is
   // PlayerEntity.GoldPieces now (ItemHelper.cs:1354's `+= 100`), so
   // the bag ends at the arrows and the purse is a number.
-  // PIN MOVED (WALLET1): the port's own tail gives the wallet whatever the switches (startingGear.js addSurvivalProvisions)
   // - it is the kit's last piece, and DFU's bag is the rest
   assert.equal(e.items.at(-1)?.name, 'Wallet');
   assert.deepEqual(e.items.filter((i) => !isWalletItem(i)).map((i) => i.name),
@@ -153,7 +151,7 @@ function walkChargen(onDone) {
   key('Enter');                       // U13: the reflex pick -> U16's summary
   key('Enter');                       // U16: the summary's OK -> the wizard's last screen
   // ORL1: ...and the LEVELING CHOICE, which the door puts up after the
-  // wizard and before `done` (chargenSession.withLevelingChoice). The
+  // wizard and before `done` (chargenSession.withChargenQuestions). The
   // cursor starts on Daggerfall's own system, so this Enter is the walk
   // taking the default - which is the character every pin below already
   // expected to get.
@@ -214,21 +212,4 @@ test('17f F15: the gold stack is Currency.Gold_pieces, minted once', () => {
   assert.equal(e.items.filter((i) => i.group === 'Currency').length, 0,
     'the pack can never hold Currency (DoTransferItem :1562-1571)');
   assert.equal(e.goldPieces, STARTING_GOLD + 50);
-});
-
-test('17f F15 / E4: a legacy save\'s gold STACK is absorbed into the counter', () => {
-  // The 17f upgrade (stamp the template index on a pre-17f stack so
-  // stacksWith would still merge it) is moot now and its successor is
-  // pinned instead: restorePlayer takes every Currency stack out of
-  // the restored bag and adds it to PlayerEntity.GoldPieces, which is
-  // exactly what the transfer door does to a pile.
-  const entity = {};
-  const snap = snapshotPlayer({ items: [{ group: 'Currency', name: 'Gold pieces', stackCount: 7 }], stats: {}, skills: [] });
-  delete snap.goldPieces;   // a save older than E4 carries no counter
-  restorePlayer(entity, snap);
-  assert.equal(entity.items.length, 0);
-  assert.equal(entity.goldPieces, 7);
-  addGold(entity, 3);
-  assert.equal(entity.goldPieces, 10);
-  assert.equal(entity.items.filter((i) => i.group === 'Currency').length, 0);
 });

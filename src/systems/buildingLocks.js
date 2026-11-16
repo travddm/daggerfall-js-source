@@ -158,8 +158,7 @@ export const LOCKED_EXTERIOR_DOOR_TEXT = 'Locked.';
 /** The popup line as the player reads it, for the door arm that pops it. */
 export const lockedExteriorDoorText = () => localizedText('lockedExteriorDoor', LOCKED_EXTERIOR_DOOR_TEXT);
 
-// OL4 - ONLINE COMMERCE (2026-09-17, a player complaint relayed by Mac:
-// players could not shop at night online). A RECORDED DEPARTURE - Ledger
+// OL4 - ONLINE COMMERCE. A RECORDED DEPARTURE - Ledger
 // A carries it as SHOPS STAFFED AROUND THE CLOCK ONLINE (OL4), naming
 // this file. Classic's schedule remains a pure primitive; the
 // shared-world policy is layered above it. Online players cannot
@@ -176,8 +175,7 @@ export const lockedExteriorDoorText = () => localizedText('lockedExteriorDoor', 
 // ONLINE_SHIFT for a distinct night clerk without guessing from the
 // clock or changing the access law again.
 /**
- * OL5 (2026-09-20, Mac: "Town gates online, guild services, should all be
- * open at night time online mode"). THE BUILDINGS THE SHARED WORLD RELIEVES.
+ * OL5. THE BUILDINGS THE SHARED WORLD RELIEVES.
  * OL4 gave the relief shift to storefronts alone and its pin said so in as
  * many words ("guild access unchanged online"); this widens it by ONE subject
  * - the guild hall - and the reason is OL4's own, unchanged: an online player
@@ -185,8 +183,7 @@ export const lockedExteriorDoorText = () => localizedText('lockedExteriorDoor', 
  * and a guild hall shut from 18:00 is a guild service nobody can buy for two
  * real hours.
  *
- * OL6 (2026-10-07, Mac: "Take care of this", over the sweep of the waits still
- * long online - bible/06-Systems/Online-Waits.md WAIT1). THE BANK, THE LIBRARY
+ * OL6. THE BANK, THE LIBRARY
  * AND THE PALACE join, for OL4's reason again. Their hours are read on the sky
  * (TIME1), whose day is one real hour since SKY-SLOW, so DFU's 8-15 shut the
  * bank from :37:30 to :20 - forty-two and a half minutes of every real hour,

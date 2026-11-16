@@ -1,5 +1,4 @@
-// SUMMON-REPAIR (2026-10-15; bible/01-Overview/bugs/Field-Bugs-2026-10-14.md SUMMON-OFFER; Mac, asked how to mend the
-// reporter's save: "Operator tool"). SUMMON-OFFER stops a summoning whose quest cannot be made from taking the gold and
+// SUMMON-REPAIR. SUMMON-OFFER stops a summoning whose quest cannot be made from taking the gold and
 // setting the prince's Summoned flag - but the reporter's save already holds both: faction 8's flags at 65 (FACTION.TXT's
 // 0x01 and Summoned, 0x40), 100,000 gold gone. Nothing in a save tells that flag from one a refused offer set, so staff
 // mend the one character: the review's `repair` act (server-account/src/review.js, net/repairLaw.js).
@@ -15,7 +14,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
 import { seatRealm } from '../realmSeat.mjs';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { realmIo, createRealmSession, openRealmBoot } from '../../src/systems/realmSaves.js';
 import { realmLetterOfCredit } from '../../src/net/realm/realmGoldLaw.js';
 import { FACTION_FLAGS } from '../../src/formats/factionFile.js';
@@ -32,12 +31,12 @@ const stuck = () => ({
 
 /** A device's storage - the session (SESSION_KEY) and whatever the realm's rescue copy writes. */
 function deviceOf(who) {
-  const m = new Map([[SESSION_KEY, JSON.stringify({ secret: who.secret, id: who.id })]]);
+  const m = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ secret: who.secret, id: who.id })]]);
   return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: (k) => { m.delete(k); }, _map: m };
 }
 
 async function stand() {
-  const s = await standService({ DEVELOPER_HANDLES: 'mac' });
+  const s = await standService({ SEAT_ADMINS: 'mac' });
   const raw = s.env.DB._raw;
   const mac = await s.registered('mac');
   const sucean = await s.registered('sucean');

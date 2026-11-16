@@ -1,4 +1,4 @@
-// INDOOR-WATCH (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord: "If you just sit near
+// INDOOR-WATCH (FIELD BUGS 2026-10-16b,; the Discord: "If you just sit near
 // the wall between the shelves, when you fail to steal something, the guard will come running, but they simply can't
 // reach you because they run into the wall instead of going through the door. And you can sit like that for as long as
 // you like"). The watch called into a building (cityGuards.js, PlayerEntity.SpawnCityGuards' indoor arm) walked the

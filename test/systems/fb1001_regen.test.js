@@ -86,7 +86,6 @@ test('CURE-ALL: the turn cures the old life whole - the pools full, the poison a
   assert.equal(p.fatigue, maxFatigue(p), 'fatigue full');
   assert.equal(p.activeEffects.filter((a) => a.kind === 'poison').length, 0, 'the poison cured');
   assert.equal(p.activeEffects.filter((a) => a.kind === 'disease').length, 0, 'the disease cured');
-  // PIN MOVED (AUDIT 2026-10-01 part four, CURE-ENDS): the cured drain ends - at nothing it stood on the HUD for good
   assert.ok(p.activeEffects.filter((a) => a.kind === 'drainAttribute').every((a) => a.magnitude === 0 && a.ended), 'the drain healed, and ended');
   // the werewolf's turn, walked from its bite: the same cure, the same buff left running
   const w = P();

@@ -3,8 +3,6 @@
 // EM2 — THE FLOOR MODEL: a Daggerfall dungeon has no floors, so the
 // map derives them.
 //
-// Mac (2026-09-21): "The automap should become a 2d map and floor
-// based instead of the current 3D implementation, streamlining it."
 //
 // THERE IS NO FLOOR FIELD TO READ. An RDB dungeon is a 3D volume of
 // blocks laid on an X/Z grid, each block holding geometry at whatever
@@ -52,9 +50,7 @@
 // out, and test/systems/automap/automapfloors.test.js drives it with hand-built
 // geometry - two stacked rooms, a ramp, a partly revealed hall.
 //
-// DISC25-A (2026-09-25, tannim and kurkku on Discord, through Mac: "the
-// plane you are on + stairs going down", "clicking stairs to move up or
-// down a level is good"). Three things changed, and one reason sits under
+// DISC25-A. Three things changed, and one reason sits under
 // all three: on a real dungeon the model above was too literal. Privateer's
 // Hold came out as THIRTEEN storeys, because Daggerfall lays its rooms on a
 // 3.2 m grid and every step of that grid is a headroom apart; each sheet

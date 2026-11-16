@@ -21,7 +21,7 @@
 //
 // THE ART is the mod's own `TOcontrolUI.png`, vendored and re-encoded
 // out of its bundle (vendor/travel-options/README.md says how and why).
-// RATE-LAW (2026-10-04, Mac: "Remove travel options dials"): the mod's
+// RATE-LAW: the mod's
 // spinner is gone. It was DFU's `UpDownSpinner` (CHAR02I1.IMG, the mod
 // ships no art for it - :106-110) over the strip's own recess after
 // "TIME x:"; the recess now carries the rate the journey's ground runs at
@@ -97,8 +97,7 @@ export async function preloadTravelControlArt(deps = {}) {
 export const travelControlArtLoaded = () => !!_art;
 export function _setTravelControlArtForTests(art) { _art = art; }
 
-/** DISC22-E (2026-09-24, Tony H.: "When using Classic UI or GrimoireUI I'm not able to increase the speed from 10x in
- *  accelerated travel ... online"): DOES THE CLASSIC STRIP TAKE THIS CLICK? AUDIT-TO1 I2 gated it on DFU's
+/** DISC22-E: DOES THE CLASSIC STRIP TAKE THIS CLICK? AUDIT-TO1 I2 gated it on DFU's
  *  `cursorActive` flag, for the right reason - with the pointer LOCKED, clientX/clientY are frozen at the last free
  *  position, so a world click landed on whatever control the cursor had been parked over. But the port frees the
  *  pointer without that flag: the chat, the friends panel and the F-menu release it with the flag DOWN (world.js
@@ -224,8 +223,7 @@ export class TravelControlUI {
 
   /** :180-186, Draw. The mod also draws the HUD's vitals and compass
    *  over its own panel because a DFU window hides the HUD; the port's
-   *  HUD is already underneath, so that pair is a recorded no-op here
-   *  (bible/06-Systems/Travel-Options.md). */
+   *  HUD is already underneath, so that pair is a recorded no-op here */
   draw(renderer, canvas, font) {
     if (!this.isShowing) return;
     const m = nativeMetrics(canvas);

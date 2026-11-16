@@ -1,8 +1,5 @@
 // @ts-check
-// HOLDINGS (2026-10-03, Mac: "Lets add a new tab to the pause menu as the stat page is starting to get bloated. Lets
-// organize everything appropriately. Under the new tab add a page that allows you to see your currently owned mounts
-// ships and carts. You can summon your horse/cart from this page/send away much like the companion system. You can also
-// do this with ships instead of relying on a deed item") - THE HOLDINGS TAB's own pages (bible/03-World/Holdings.md).
+// HOLDINGS - THE HOLDINGS TAB's own pages.
 // The tab (ui/enhanced/enhancedMenu.js pauseHoldings) is a rail of what the player owns and who follows them: these two pages,
 // and the Companions, Revenants and Stores pages that stood on the Stats rail before it.
 //
@@ -273,7 +270,7 @@ export const wagonMeterTone = (w) => (w.wearSlows === false && w.stateKey === 'f
 const WAGON_ADVICE_BOONS = Object.freeze({   // in the player's language (L10N4's ratchet), read as it is shown
   get rickety() { return t('holdings.wagon.boons.rickety', 'Rickety, but it still rolls at full pace.'); },
   get failing() { return t('holdings.wagon.boons.failing', 'Failing, but it still rolls at full pace.'); },
-  get sound() { return t('holdings.wagon.boons.sound', 'Sound, and it rolls faster for it.'); },   // Mac: "Sound wagon rolls faster"
+  get sound() { return t('holdings.wagon.boons.sound', 'Sound, and it rolls faster for it.'); },
 });
 /** STEED-UI: what a Wagon Yard asks to make it whole - at the yard, and with its wright going out to it. */
 export const mendLine = (w) => (w.mend > 0 ? `A Wagon Yard repairs it fully for ${w.mend} gold, or ${w.mendAway} if its wright must travel to it.` : 'A town’s Wagon Yard mends it.');
@@ -360,8 +357,7 @@ export const LOOK_SWATCHES = Object.freeze({
 });
 
 /**
- * WAGONS2/COATS1: a card's row of choices. UI-CALM (2026-10-14, a player: "Why are horse coat colors huge buttons
- * instead of a selector? Why do they take up more space than the horse stats?"): A SELECTOR, NOT A WALL OF PRESSES - its
+ * WAGONS2/COATS1: a card's row of choices. UI-CALM: A SELECTOR, NOT A WALL OF PRESSES - its
  * word, then where every choice has a colour (a coat, a wagon's paint) a row of small swatches, the one worn ringed and
  * named beside them; else a stepper, ‹ the one worn › . Each swatch says its name to a reader and under the pointer.
  */

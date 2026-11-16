@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-B (2026-09-27): COME SAIL AWAY'S BOATS, DRAWN - what Unity draws of a
+// CSA-B: COME SAIL AWAY'S BOATS, DRAWN - what Unity draws of a
 // built boat (systems/comeSailAway/comeSailAwayBoat.js), drawn through the port's renderer:
 //
 // - every ACTIVE object's switched-on MeshRenderer over its MeshFilter's mesh,
@@ -74,7 +74,7 @@ export const CSA_LIGHTS_MAX = 8;
 /** AUDIT NAV1 (the presentation): the hull whose FlagObject a flagless sea ship is given (the Small Ship - graftColours). */
 export const FLAG_DONOR_HULL = 2;
 /** SHIPS-2: THE PORT'S OWN SHIPS' PICTURES - each standing ship's archive, how it is put on the texture door, which
- *  of its records hold glass to see through (DF-LOOK, DF-ART II kept - Mac: "windows should always be see through" -
+ *  of its records hold glass to see through (DF-LOOK, DF-ART II kept -
  *  uploaded cut-outs), each of those records' NIGHT TWIN and the twin's glow (DF-ART III kept - Mac, of the stern
  *  windows: "See-through by day, lit at night" - world/ships/galleonArt.js NIGHT_RECORD_OFFSET; the glow cut while the world
  *  loads), by the models' key for the ship (systems/comeSailAway/comeSailAwayModels.js PORT_SHIPS). */
@@ -254,13 +254,13 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
     l[0] = q[0]; l[1] = q[1]; l[2] = q[2]; l[3] = q[3]; l[4] = t[0]; l[5] = t[1]; l[6] = t[2]; l[7] = sc[0]; l[8] = sc[1]; l[9] = sc[2];
     return false;
   }
-  // PERF-SAILS1 (2026-10-10, Dudey's readout in a port at night: the boats' frame 5-7.6 ms - `sails`, ?perf=cpu): THE
+  // PERF-SAILS1: THE
   // WALK MAKES A MATRIX ONLY WHERE ONE MOVED. A ship is hundreds of objects (twelve hulls: 7,384), and every one's world
   // matrix was made again every frame - a quaternion's matrix and a product a node - where all but her sails, booms,
   // flags and oars stand as they stood. A node's matrix is made again when its own local values read otherwise than
   // they did at its last making, or the parent's matrix it stands under is not the making it was made under (made again,
   // or another parent's); else it is the one already made from those same values - the same floats.
-  // PERF-SAILS2 (Dudey: "iam not near water btw" - "lets say water is there like 2 pixel away"): AND MADE WHEN READ. A
+  // PERF-SAILS2 (- "lets say water is there like 2 pixel away"): AND MADE WHEN READ. A
   // harbour's moored ships stand within HARBOUR_STAND of its mouth, ashore too, and navalHost's poseShip rocks each in
   // the wind every frame - her MeshObject turned, so every object under it moved and PERF-SAILS1 made them all again.
   // Most are read by nobody: her still parts draw as her one batch at the MeshObject's matrix (AUDIT NAV1 #13). The walk
@@ -268,8 +268,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
   // asks: the draw for what it draws one by one, the flats for theirs, a probe's walkOf for all. A due matrix is made
   // from the local values the walk read (`lq`/`lt`/`ls`, the same numbers) under the parent's as made then - the eager
   // walk's floats. tools/csaBench.mjs, twelve ships, the frame and the draw: 9.6 -> 4.6 ms standing, 9.5 -> 5.4 rocking.
-  // PERF-SAILS3 (2026-10-14, a live capture in a port, online: the boats' frame 1.8 ms of a 10 ms frame, and 1.5 MB a
-  // frame of its garbage): THE WALK IS WRITTEN WHERE IT STOOD. Its three lists were emptied and pushed again every frame
+  // PERF-SAILS3: THE WALK IS WRITTEN WHERE IT STOOD. Its three lists were emptied and pushed again every frame
   // (an emptied array gives its storage back, so every frame grew them anew); now each slot is written over and `ver`
   // counts the walks whose nodes were other than the last's - a boat's plan (planOf) stands while it does.
   function walkBoat(boat, stamp) {
@@ -360,8 +359,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
   /** PERF-SAILS2: the same walk with every matrix made - a probe's reading (the pool's own readers make what they read). */
   const walkMade = (boat) => { const w = walkOf(boat); for (const r of w.recs) made(r); return w; };
 
-  // BOAT-FAR (2026-10-21, a player's profile online: the boats' pool frame 11% of the frame, 6% with the peers' boats
-  // not loaded - walkBoat, lateUpdateHolder and syncFlats over every boat drawn, wherever she sailed): A FAR BOAT LIVES BY
+  // BOAT-FAR: A FAR BOAT LIVES BY
   // NAVALHOST'S LAW (scenes/comeSailAway/farLife.js). Past NEAR_LIFE_M of the eye she is walked, her holders baked and
   // her lanterns decided one frame in FAR_LIFE_EVERY - each boat on her own frame of the stride - on the time she
   // missed. On the frames between, her last walk is HELD: the flats and the draw read it (walkOf), never walking her
@@ -375,8 +373,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
   /** @type {Float32Array | null} */ let _shift = null;   // the boat being read's held shift (heldShift), or null
   /** BOAT-FAR: a boat's frame of the law - the time her walk, bakes and lanterns step by, or null: held. One with no
    *  frame's walk to hold - none yet, or one dropped (a re-dress, the origin's move: walks.delete) - or whose tree was
-   *  reshaped since it (a fitting stood, a part hung) is walked whatever her range. AUDIT (2026-10-21, a far Carrack
-   *  switched off drew her 18 meshes up to three frames more, and switched on drew nothing for as many): and so is one
+   *  reshaped since it (a fitting stood, a part hung) is walked whatever her range. AUDIT: and so is one
    *  with a node of her tree switched on or off since (prefabSwitchStamp: her root - a peer's look 'hidden',
    *  UpdateBoatVisibility - her helm's IdleObject and ActiveObject, a sea ship's sails set), whose walk reaches other
    *  nodes now. BOAT-OWN: the shape and the switches read by farTreeStep (scenes/comeSailAway/farLife.js), the rule her
@@ -579,7 +576,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
     }
     return rig;
   }
-  /** MENU-ORDER (bible/10-UI/Menu-Order.md): A HULL'S PORTRAIT - the shipmaster's card's picture of her (scenes/
+  /** MENU-ORDER: A HULL'S PORTRAIT - the shipmaster's card's picture of her (scenes/
    *  shipPortraits.js). A boat of the hull built once as hullRig's is (at the origin, standing), never placed and never
    *  in the drawn lists; her sails baked once as they stand. Her parts - each drawn mesh and its matrix, as the draw
    *  finds them - and her box (the parts' boxes, joined), once every part has come; null until then (asked again a
@@ -806,7 +803,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
         if (!r || r.m_Enabled === false) continue;
         const size = bb.Summary.Size, w = size[0], h = size[1];
         if (!(w > 0 && h > 0)) continue;
-        // BOAT-OWN (bible/07-Rendering/Performance-Priority.md): held, a flat she stood when she was walked keeps the scale
+        // BOAT-OWN: held, a flat she stood when she was walked keeps the scale
         // that frame found and only its place is made (placedAt: placed()'s own translation, to the bit) - neither the
         // whole product nor its world rotation's climb, a flat a frame. Its place and its size are both her held walk's:
         // an Animator of hers may step on a frame that holds her (mine on createBoatLives' stride, a peer's on
@@ -821,7 +818,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
           b.origin = [0, 0, 0];
           b._csaSweep = 0; b._csaSize = null;
           flats.set(n, b);
-          // STAND-FLAT (bible/04-Characters/Morrowind-NPCs.md section 28): one of her crew - a person's flat - is a person
+          // STAND-FLAT: one of her crew - a person's flat - is a person
           // the host's people lane can stand a body for, read as a placed figure is; her deed's uid (or her hull) and the
           // flat's place in her walk name them, so a boat's crew is the same people on every machine
           if (isNpcFlat(bb.Summary.Archive)) crew.set(n, { piece: { id: `csa:${boat.uid || `h${boat.hull}`}:${i}`, flat: [bb.Summary.Archive, bb.Summary.Record] } });
@@ -881,7 +878,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
       r.drawMesh(gpu, m, texRemap); n++;
     };
     for (const boat of drawn()) {
-      // SHIP-FADE (2026-10-02): a ship fading in or out of the world draws her share of her fragments (the renderer's
+      // SHIP-FADE: a ship fading in or out of the world draws her share of her fragments (the renderer's
       // dissolve), put back whole after her; one faded away draws nothing
       const fade = Math.max(0, Math.min(1, boat.fade ?? 1));
       if (fade <= 0) continue;
@@ -890,7 +887,7 @@ export function createComeSailAwayPool({ renderer = null, pipeline = null, fetch
       const walk = walkOf(boat);   // AUDIT PRE-MERGE 0928 R5
       _shift = heldShift(boat, walk);   // BOAT-FAR: a held boat's walk, carried to where she stands now
       const recs = walk.recs, parts = planOf(boat, walk).parts;   // PERF-SAILS3: her renderers, found once
-      // BOAT-OWN (bible/07-Rendering/Performance-Priority.md): A HELD BOAT'S PARTS ARE THE ONES HER WALK'S DRAW FOUND.
+      // BOAT-OWN: A HELD BOAT'S PARTS ARE THE ONES HER WALK'S DRAW FOUND.
       // Between her lives nothing a part is read for here moves - her switches and her shape end a hold (lifeOf), her
       // bakes step as she lives, a part's meshes and materials are her build's - so which of her parts draw, with which
       // mesh, alone or in her hull's frame, are what the draw over this walk found (`walk.draws`), and only where each

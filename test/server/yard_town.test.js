@@ -1,10 +1,9 @@
-// YARD-TOWN (2026-10-25, players: "Decorative items placed in any house yard in that area disappear after restarting the
-// game, even when the Saved to the Realm notification pops up") - A TOWN'S YARDS ARE BOUND AT THE PLACEMENT, NOT CUT AT
+// YARD-TOWN - A TOWN'S YARDS ARE BOUND AT THE PLACEMENT, NOT CUT AT
 // THE READ. Through the real Worker: a yard piece past DECOR_YARDS_TOWN_MAX in its town is refused, in its own word
 // (`yard-town-full`), whichever way it is paid; another town's pieces never count, a room's piece is never refused for
 // it, and one taken away makes room again. Over the real build: a town at the bound, every row as wide as Daggerfall's
 // widest, is kept in its built row (keptBoard.js KEPT_BOARD_MAX_BYTES), so the bound is never one the read walks.
-// `06-Systems/Online-Arc.md` YARD-TOWN.
+// YARD-TOWN.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -62,6 +61,6 @@ test('YARD-TOWN a town at DECOR_YARDS_TOWN_MAX, every row as wide as Daggerfall\
   assert.notEqual(row?.rows, null, 'the town kept in its built row');
   const rows = yardRowsOf(row.rows);
   assert.equal(rows.length, DECOR_YARDS_TOWN_MAX);
-  // Daggerfall's widest live row is 187 bytes in the built row (2026-10-25): the fixture's are no narrower
+  // Daggerfall's widest live row is 187 bytes in the built row: the fixture's are no narrower
   assert.ok(Buffer.byteLength(JSON.stringify(Object.values(rows[0]))) >= 187, 'as wide as the widest real row');
 });

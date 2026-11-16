@@ -159,7 +159,7 @@ test('X4 detect: the cast lands as a plain duration buff and the catalog stops w
   assert.equal(out.buffs, 1);
   assert.deepEqual(e.activeEffects.map((a) => a.kind), ['detectEnemy']);
   assert.ok(e.activeEffects[0].roundsRemaining > 0);
-  // AddState merges ROUNDS into the incumbent and nothing else - renewed, never stacked (PIN MOVED, STACK-CAP)
+  // AddState merges ROUNDS into the incumbent and nothing else - renewed, never stacked (
   const first = e.activeEffects[0].roundsRemaining;
   e.activeEffects[0].roundsRemaining = 1;
   castDetect(e, 1);

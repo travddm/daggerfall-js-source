@@ -1,9 +1,7 @@
 // @ts-check
-// WB2 (2026-09-25, Mac: "A gate model would be spawned with a timer that leads to a completely different area, a gate
-// of oblivion"): THE GATE'S SHAPE. Design: bible/11-Multiplayer/World-Bosses.md section 3.
+// WB2: THE GATE'S SHAPE. Design:
 //
-// GATE-FBX (2026-10-09, Mac: "replace the oblivion gate model with this handcrafted model which also needs
-// texturing"): MAC'S OWN GATE, baked out of his Blender scene (src/assets/gate/oblivionGate.json, tools/bakeGate.mjs) -
+// GATE-FBX: MAC'S OWN GATE, baked out of his Blender scene (src/assets/gate/oblivionGate.json, tools/bakeGate.mjs) -
 // two pillars of black volcanic stone on clawed feet, a lintel flaring over them, the opening's top corners cut in, three
 // spines down each pillar's outside. WB2's gate, two horns swept along a cubic over a stepped plinth in code, is gone
 // with it. The portal hangs between the pillars (the membrane is a pass of its own - render/gate/gatePass.js - never this
@@ -38,13 +36,6 @@ export const RITE_SIGIL_RECORD = 2;
 /** GATE-FBX: the spines' horn and the stone seared round the opening (world/gate/gateArt.js gateSpineArt, gateRimArt). */
 export const GATE_SPINE_RECORD = 3;
 export const GATE_RIM_RECORD = 4;
-/** EG-F (bible/11-Multiplayer/Elite-Gates.md section 6.3): AN ELITE BREACH'S ARCH is this gate at 0.62, in Imperial white
- *  marble inlaid with gold and cracked through with the Warden's basalt (world/gate/gateArt.js archArt) - its stone, its rim
- *  and its spines, each the gate's own record's twin (`EG_ARCH_RECORD_OF`). */
-export const EG_ARCH_STONE_RECORD = 5;
-export const EG_ARCH_SPINE_RECORD = 6;
-export const EG_ARCH_RIM_RECORD = 7;
-export const EG_ARCH_RECORD_OF = Object.freeze({ [GATE_STONE_RECORD]: EG_ARCH_STONE_RECORD, [GATE_SPINE_RECORD]: EG_ARCH_SPINE_RECORD, [GATE_RIM_RECORD]: EG_ARCH_RIM_RECORD });
 
 /** The bake's one part: the gate, in its own frame (tools/bakeGate.mjs FRAME - Mac's metres x 0.53). */
 const PART = GATE_BAKE.parts[0];

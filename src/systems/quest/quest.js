@@ -21,12 +21,13 @@
 // PRNG rule) - Clock ranges and randompermanent Places draw from it.
 // `nowSeconds` is the world-time seam the machine injects (classic
 // game seconds) - clocks and log entries read it.
-// TIME3 (bible/06-Systems/Online-Time-Arc.md 6.3): online it is the
+// TIME3 (6.3): online it is the
 // CHARACTER's clock (LIVED1's own) - every countdown and interval - and
 // two more ride beside it: `skySeconds`, the sky an hour, a date and a
 // season are read on, and `worldSeconds`, the event clock the journal's
 // dates are stamped on. Offline all three are DFU's one clock.
 
+import { questFailureFree } from './quest-failure-rule.ts';   // QFAIL-FREE, the server profile's option
 import { travelTimeSeconds } from './clock.js';
 import { Message, Formatting } from './message.js';
 import { localizedQuestMessage } from './localizedQuest.js';   // L10N3c: GetMessage's Internal_Quests lookup
@@ -35,7 +36,7 @@ import { smallerDungeonsStateNow } from '../../world/smallerDungeons.js';   // A
 import { askAgain } from './noAsksAgain.js';   // NO-ASKS-AGAIN (FIELD BUGS 2026-10-13e): a No that leads nowhere asks again
 import { isInstanceEpoch } from '../../net/instanceRoom.js';   // INSTANCES: a quest's instance epoch, its one spelling
 import { QUEST_SUCCESS_REP, QUEST_FAILURE_REP } from './questRepute.js';   // WAY-BACK: Quest.cs:36-37's one home, a leaf the guild hall reads
-import { readState, writeState } from '../questlines/qlState.js';   // QL1: a stamped quest's state - the layer's, kept by the quest (bible/06-Systems/Questlines-Arc.md 2.4)
+import { readState, writeState } from '../questlines/qlState.js';   // QL1: a stamped quest's state - the layer's, kept by the quest (2.4)
 
 /** ShowMessagePopup's chunker (Quest.cs:777, 793-819): a message
  *  longer than 22 LINES becomes several click-through boxes. A line
@@ -97,7 +98,7 @@ export function ensureUidAtLeast(uid) { if (uid > _uid) _uid = uid; }
 /** Test seam. */
 export function resetUid() { _uid = 0; }
 
-/** QUEST-SHELF (2026-10-08): whether a quest is set aside - abandoned, kept to be reclaimed (machine.js shelveQuest). It
+/** QUEST-SHELF: whether a quest is set aside - abandoned, kept to be reclaimed (machine.js shelveQuest). It
  *  stands in the machine untouched: no tick, no questor's door shut, no topics, no site links, nothing stood in a scene. */
 export const isShelved = (quest) => quest?.shelvedAt != null;
 
@@ -162,14 +163,14 @@ export class Quest {
     this.pendingClickRearms = [];            // Quest.cs:48 - resources whose click clears after the current task
     this.questors = new Map();               // Quest.cs:47 - symbol name -> QuestorData { symbol, name }
     this.oneTime = false;                    // Quest.OneTime - QuestListsManager stamps it at load (Q2b-ii)
-    // QUEST-SHELF (2026-10-08, Mac: "All quests should be able to be abandoned and reclaimed"): ABANDONED, KEPT. The
+    // QUEST-SHELF: ABANDONED, KEPT. The
     // character-clock second it was set aside (null: not set aside - machine.js shelveQuest / reclaimQuest), and the
     // Places whose site links it held then (their symbol names - the links stand again from them on its reclaim).
     this.shelvedAt = null;
     this.shelvedSites = null;
     this.shelvedItems = null;   // QUEST-SHELF-DROP: its items the pack held as it was set aside, by symbol
     this.instanceEpoch = null;   // INSTANCES: its instance's epoch, minted when one first opens (systems/instancePlaces.js questInstanceEpoch)
-    // QL1 (bible/06-Systems/Questlines-Arc.md decision 1): the questlines' stamp and state - null, DFU's quest; set once,
+    // QL1: the questlines' stamp and state - null, DFU's quest; set once,
     // at its start (machine.js startQuestImmediate), and kept for life. The machine never reads it; the layer does.
     this.ql = null;
   }
@@ -384,7 +385,7 @@ export class Quest {
     // Two ticks of grace so tasks started directly before "end quest"
     // still execute (DFU's Sx017 note).
     this.ticksToEnd = 2;
-    // QL3 (bible/06-Systems/Questlines-Arc.md section 5): a stamped quest's outcome is settled HERE, at its own `end
+    // QL3: a stamped quest's outcome is settled HERE, at its own `end
     // quest` - before the notebook files it, so the filed entry carries how it ended. A quest that never ends this way
     // (an error's removal, a restart) has no outcome and pays nothing, as it moves no reputation in DFU.
     this.hooks?.questEnding?.(this);
@@ -393,12 +394,12 @@ export class Quest {
     // tombstone later scrubs the "rumor mill" rumors and info topics.
     this.hooks?.removeProgressRumors?.(this.uid);
     this.hooks?.removeQuestorPostMessage?.(this.uid);
-    // QFAIL-FREE (2026-10-02, Mac: "Soften failure cost"): online a quest
+    // The server profile's option (quest.failureFree; off: DFU's -2 online too): online a quest
     // that ends unfinished costs the faction nothing. TIME3 put the
-    // countdowns on the character's clock, so a journey or a rest spends
+    // countdowns on the character's clock, so a journey or a rest spent
     // them, and DFU's -2 (propagated through the tree) bled every
-    // standing a player held. Offline DFU's -2 stands. Port-Ledger A.
-    const failureFree = !this.questSuccess && !!this.hooks?.sharedClock?.();
+    // standing a player held; a deadline now charges only lived time.
+    const failureFree = questFailureFree(this.questSuccess, this.hooks);
     if (this.factionId > 0 && !failureFree) {
       const repChange = this.questSuccess ? QUEST_SUCCESS_REP : QUEST_FAILURE_REP;
       // Quest.cs:385 passes propagate=TRUE - the ally/enemy/tree

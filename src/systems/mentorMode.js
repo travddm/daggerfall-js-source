@@ -1,4 +1,4 @@
-// SOFTCAP1 (2026-09-29), MENTOR2 (2026-10-27; bible/06-Systems/Mentor-Mode.md): playing with lower-level friends.
+// SOFTCAP1, MENTOR2: playing with lower-level friends.
 // Automatic (Mac, 2026-09-29: no switch), and since MENTOR2 only beside them: a partner counts while their body is in
 // my room (outdoors within MENTOR_NEAR_METRES), after MENTOR_JOIN_MS, and for MENTOR_LEAVE_MS after they go.
 //

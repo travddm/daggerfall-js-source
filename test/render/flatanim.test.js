@@ -207,9 +207,8 @@ test('FA1: every host that MOUNTS a missile arms it and drops its clock on retir
   const read = (f) => hostText(`src/${f}`);
   for (const host of ['scenes/dungeonContext.js', 'scenes/hostMagic.js']) {
     const src = read(host);
-    // FIELD-GUN14: dungeonContext's record is a variable now, because
-    // an arrow can bring its own flat (the Thunderlock's orb) - it is
-    // still 0 for every spell missile, which is what the `0` was.
+    // FIELD-GUN14: dungeonContext names its record in a variable - it
+    // is 0 for every spell missile, which is what the `0` was.
     assert.match(src, /armFlatAnim\(m\.batch, t, archive, (?:0|record), flatAnims, uploadRecordFrame, \{ fps: MISSILE_FPS \}\)/,
       `${host} mounts a missile flat it never animates`);
     assert.match(src, /flatAnims\.remove\(m\.batch\)/,
@@ -244,7 +243,6 @@ test('FA1 slice 3: no site hand-writes a frame into a record any more', () => {
     const src = read(host);
     assert.ok(!/createBillboardBatch\([^,]+, `\$\{[^}]+\}#0`/.test(src),
       `${host} still writes a frame into the record it passes`);
-    // PIN MOVED (AUDIT DEX B3): a corpse marker carries its own clock now (corpseMarker.js tickCorpseMarkers), so the
     // street's rebuilt corpse batch says the frame its clock is on - still a frame named, never one in the record
     assert.match(src, /\.frame = (?:0|c\.anim\?\.frame \?\? 0);/, `${host} mounts a frame-keyed batch without saying which frame`);
   }

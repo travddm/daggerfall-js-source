@@ -1,4 +1,4 @@
-// LW1/LW2 (bible/06-Systems/Living-World.md): A SYNTHETIC TOWN for the living world's pins - the producers' own
+// LW1/LW2: A SYNTHETIC TOWN for the living world's pins - the producers' own
 // inputs on a town with no game data: a CityNavigation grid of streets and building footprints, the buildings'
 // summaries' columns (world/buildingSummaries.js), the doors' location-frame centres and normals (the streaming host's
 // own mapping of its static doors).

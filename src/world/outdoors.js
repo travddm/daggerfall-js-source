@@ -1,5 +1,4 @@
-// FT4 (2026-09-14, the Features arc; Mac's own example of a condensed
-// row: "our enhanced environments + dynamic skies"): THE OUTDOORS, ONE
+// FT4: THE OUTDOORS, ONE
 // ROW. Two switches in two panes decided what the sky is - the Enhanced
 // category's Enhanced environments (uiPrefs, EE1: the whole enhanced
 // outdoors as one switch) and the Mods pane's Dynamic Skies `Enabled`

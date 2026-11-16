@@ -1,6 +1,4 @@
-// DF-LOOK (2026-10-15, bible/01-Overview/DF-Art.md, Mac: "we recently took away custom textures for certain models. Is
-// there any way to revert those changes and instead make those textures more daggerfall-esq"; asked, every model DF-ART
-// dressed, "Palette + grain"): the port's own painted pictures back, grained and snapped to the player's ART_PAL.COL at
+// DF-LOOK: the port's own painted pictures back, grained and snapped to the player's ART_PAL.COL at
 // every door they go up through.
 //
 //   L1  no palette, painted as painted - the picture itself

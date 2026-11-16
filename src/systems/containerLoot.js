@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FORAGE3 (2026-09-28): PlayerActivate.OnLootSpawned (PlayerActivate.cs
+// FORAGE3: PlayerActivate.OnLootSpawned (PlayerActivate.cs
 // :60) - the event ActivateLootContainer raises after it stocks a shop
 // shelf (:885) or a house container (:914), with DFU's
 // ContainerLootSpawnedEventArgs: the container's type and its items.

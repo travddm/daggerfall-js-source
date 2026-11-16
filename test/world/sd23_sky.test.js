@@ -1,13 +1,11 @@
-// SD-SKY (2026-10-08, the Super Dungeons arc; the Discord, of a live Abyss Dungeon - maya: "WHY DID I GET TPED HERE WHEN
-// I WENT INTO THE RIFT", ValenValarys: "portal keep teleporting me out of dungeon", each picture high over the Hollow by its
-// column of light, its banner still saying it stands): THE WAY OUT OF THE HOUR LANDED IN THE PIXEL'S FRAME. The world
+// SD-SKY: THE WAY OUT OF THE HOUR LANDED IN THE PIXEL'S FRAME. The world
 // host's door list (scenes/world.js buildingDoors) keeps each door in its PIXEL's frame - doorTargets hands the mode
 // machine the scene's (shiftedDoor: the pixel's translation under the floating origin, AUDIT 68 S22) - and the Hollow's
 // two seams read the list raw: `sdHollowDoors`, which the Hour's way out lands before (scenes/worldModes.js
 // returnLanding), and the find's door (scenes/superDungeon/sdHost.js `door`). A door found stood the player at its native height - the
 // streamer's vertical shift (StreamingWorldState.compensation[1], minus the eye's height at each recentre past 500 m) over
 // the Hollow: in the sky. SD-LAND read the same picture as a door NOT found; it was a door found in the wrong frame.
-// Design: bible/11-Multiplayer/Super-Dungeons.md sections 6 and 16.
+// Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -27,7 +25,7 @@ function worldSeams(tr, buildingDoors) {
   const sd = /\n {2}(const shiftedDoor = \(entry\) => \{\n[\s\S]*?\n {2}\};)\n/.exec(W);
   assert.ok(sd, 'the world host\'s shiftedDoor');
   const shiftedDoor = new Function('state', `${sd[1]}\nreturn shiftedDoor;`)(state);
-  // AUDIT SD IV (F40, PIN MOVED): the list is one const, the mode machine's seam and the step out to the pixel both read it
+  // AUDIT SD IV (F40
   const hd = /\n {2}const sdHollowDoorsOf = (\(h\) => .*?);\n/.exec(W);
   assert.ok(hd && /\n {4}sdHollowDoors: \(h\) => sdHollowDoorsOf\(h\),/.test(W), 'the world host\'s sdHollowDoors');
   const sdHollowDoors = new Function('buildingDoors', 'DOOR_TYPE', 'shiftedDoor', `return ${hd[1]};`)(buildingDoors, DOOR_TYPE, shiftedDoor);

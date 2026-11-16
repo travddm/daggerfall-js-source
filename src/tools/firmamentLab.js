@@ -1,4 +1,4 @@
-// FIRM1 (bible/06-Systems/Firmament.md) - THE FIRMAMENT LAB: the passive tree's window on a page of its own, with made-up
+// FIRM1 - THE FIRMAMENT LAB: the passive tree's window on a page of its own, with made-up
 // purses and no service and no game data, so the sky can be judged on a real screen at real sizes, in either dress
 // (`?dress=grimoire`), and driven by a probe. Everything but the purses is the SHIPPING code: the tree, the law and the
 // window are the game's own; a confirm here is kept in this browser's storage alone.

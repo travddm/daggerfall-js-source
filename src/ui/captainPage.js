@@ -1,5 +1,5 @@
 // @ts-check
-// CAPT-LOG (2026-10-11, bible/03-World/Captains-Sea.md) - THE CAPTAIN PAGE, on the pause menu's Holdings rail
+// CAPT-LOG - THE CAPTAIN PAGE, on the pause menu's Holdings rail
 // (ui/enhanced/enhancedMenu.js pauseHoldings), after the Fleet: a captain's standing with each of the Bay's three crowns - the
 // rank it has named them and what that rank brings in its harbours, how far the next lies, and whether its harbours keep
 // no favours for them (their notoriety in its waters PERKS_REFUSED_AT and over) - the letter of marque held, the contracts
@@ -57,7 +57,7 @@ export function drawCaptainPage(detail, rerender, { el, divider, meter = null, d
   const m = holdingsProvider()?.captain?.model?.() ?? null;
   detail.append(divider('Captain'));
   if (!m) { detail.append(el('p', 'px-note', 'Your standing at sea is shown once you are in the game.')); return; }
-  // CAPTAIN-TREE (bible/03-World/Naval-Refit.md): her level, earned at sea, and the stars it buys - the Firmament's sky
+  // CAPTAIN-TREE: her level, earned at sea, and the stars it buys - the Firmament's sky
   if (m.stars) {
     const s = m.stars;
     const card = el('div', 'hld-refit');
@@ -69,7 +69,7 @@ export function drawCaptainPage(detail, rerender, { el, divider, meter = null, d
     const left = Math.max(0, s.points - s.set);
     card.append(el('span', 'hld-sub', left ? t('captain.page.left', '{set} of {points} stars set - {left} to spend.', { set: s.set, points: s.points, left }) : t('captain.page.spent', '{set} of {points} stars set.', { set: s.set, points: s.points })));
     card.append(el('span', 'hld-sub', t('captain.page.what', 'Master stars improve your ships\' speed, steering, cargo, hull and trade prices. Commander stars improve guns, shot and boarding. Your captain\'s level also opens metal refits, from Steel at level 3 up to Daedric.')));
-    // GROWTH3 (bible/10-UI/Growth.md section 6; the owner, asked: "Move them"): the stars are drawn in the Growth tab - the
+    // GROWTH3 (): the stars are drawn in the Growth tab - the
     // press goes there; a menu with no Growth tab opens them over the world, as CAPTAIN-TREE did
     const open = holdingsProvider()?.captain?.openStars;
     if (typeof growth === 'function' || typeof open === 'function') {

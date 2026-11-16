@@ -1,5 +1,5 @@
 // @ts-check
-// PRIVATE-REPORT (2026-10-17, Mac: "Can we add a private disclosure method for exploits/bugs with the client").
+// PRIVATE-REPORT.
 //
 // THE REPORT FORM AND THE READERS' INBOX, drawn in the mailbox's window (ui/enhanced/enhancedPost.js postWindow) - the
 // door every player already has on either skin (`/mail`, and `/bug` straight to the form). Three panes over the box's

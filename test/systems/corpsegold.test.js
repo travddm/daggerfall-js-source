@@ -1,8 +1,7 @@
-// CORPSE-GOLD (2026-09-27, a player on the Discord: "out of sync dungeons can generate infinite gold upon entry if there
-// are dead corpses of monsters"). Mounted, not matched: the room's memory is restored through the REAL
+// CORPSE-GOLD. Mounted, not matched: the room's memory is restored through the REAL
 // restoreSharedWorld, applyWorld, patchFoe, applyLoot, retypeFoe and buildFoeAt's `stand`, sliced out of
 // src/scenes/dungeonContext.js (the context cannot be stood up here). buildFoeAt's art await and its fresh loot roll are
-// the one stand-in. Recorded in bible/01-Overview/bugs/Field-Bugs-2026-09-27f.md.
+// the one stand-in. Recorded in.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -11,7 +10,7 @@ import { validSharedFoe, respawnDue } from '../../src/net/wire.js';
 import { validActionRecord } from '../../src/world/actionSystem.js';
 import { validLootList } from '../../src/systems/loot/loot.js';
 import { peerHanded } from '../../src/systems/peerWord.js';
-import { withoutCarried } from '../../src/world/interior/interiorShared.js';   // PIN MOVED (AUDIT AUTO-HOLD): the lifted landing keeps off a piece the player carries   // SS3 (the Sigil Stones merge): the lifted loot seams drop a bound piece from a peer's list; PIN MOVED (HACKED-GOLD): and a letter of credit - the seams read systems/peerWord.js peerHanded
+import { withoutCarried } from '../../src/world/interior/interiorShared.js';
 import { keepRebuiltSpawn } from '../../src/characters/enemy/enemyAnchor.js';
 import { renownFoeCarry, renownFoeRevived } from '../../src/net/renownTracker.js';
 import { registerFoeDoor } from '../../src/systems/artifactEffects.js';
@@ -78,16 +77,16 @@ const deadRecord = (mobileType) => ({ health: 0, maxHealth: 10, dead: true, feet
 function restoreHarness(foes) {
   let roll = 500;
   const state = {
-    ...ROOM_LOOT_OFF,   // PIN MOVED (PARTY-LOOT): the dungeon's room-loot seams, answering as an offline dungeon's (test/roomLootOff.mjs)
+    ...ROOM_LOOT_OFF,
     foes, _layoutFoes: foes.length, _locationKey: 'dungeon:7', _sharedStamp: 'mine', _sharedApplied: false,
     _lootSeen: new Set(), _lootUnreadable: new Set(), _lootAt: new Map(), _lootOpenKey: null, _lootTooBig: new Set(), _retyping: new Set(), _sharedById: new Map(),
     lootPiles: [], billboardBatches: [], _ctxDead: false, playerEntity: { isPlayer: true, items: [] },
-    withoutCarried, carriedPieces: () => ({ keys: new Set(), stowed: new Set(), keyOf: () => null }),   // PIN MOVED (AUDIT AUTO-HOLD): the player carries nothing here
+    withoutCarried, carriedPieces: () => ({ keys: new Set(), stowed: new Set(), keyOf: () => null }),
     validSharedFoe, respawnDue, validActionRecord, validLootList, peerHanded, keepRebuiltSpawn, renownFoeCarry, renownFoeRevived, registerFoeDoor, ENEMY_BASICS,
     _wallNow: () => null,   // no shared clock: nothing is due back (WORLD8's hour is not this seam)
     liveStat: () => 50,
     rollCorpseKit: () => [], addCorpseFood: () => {}, stampWonWeapons: () => {}, capFoeLoot: () => [],   // the body's kit, food, sigils and cap (AUDIT 625 L5): rolled on the copy, not this seam
-    dropFoeCard: () => null,   // PIN MOVED (AUDIT CARDS-6 A3): and its card, the copy's own draw - not this seam either
+    dropFoeCard: () => null,
     spawnCorpseNow: async () => {},   // the flat's mint; the corpse FLAG is spawnCorpse's own, raised before it
     applyCampMemory: () => {}, clearOwnPuppets: () => {}, respawnFoe: () => false, dropCandidate: () => {}, damageFoe: () => {}, settleLootFlat: () => {},
     forgetDelveRun: () => {},   // THE DELVE ARC (AUDIT DELVE B3/E8): the restore puts the delve's own state away first - not this seam

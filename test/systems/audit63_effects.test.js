@@ -428,7 +428,7 @@ test('AUDIT 63 F16: a Silence LANDING says so - once, and only to the player hos
   p.activeEffects.find((a) => a.kind === 'silenced').roundsRemaining = 1;
   castSilence(p, said);
   assert.deepEqual(said, ['You are silenced.'], 'still one line');
-  assert.equal(p.activeEffects.find((a) => a.kind === 'silenced').roundsRemaining, rounds, 'and the rounds renewed, never stacked');   // PIN MOVED (STACK-CAP)
+  assert.equal(p.activeEffects.find((a) => a.kind === 'silenced').roundsRemaining, rounds, 'and the rounds renewed, never stacked');
 
   // A FOE'S silence lands in silence, and that is the port's whole
   // rendering of `manager.EntityBehaviour == PlayerEntityBehaviour`:

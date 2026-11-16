@@ -1,4 +1,4 @@
-// Enemy spellcasting AI (S16, audit F15). Verbatim port of the DFU
+// Enemy spellcasting AI. Verbatim port of the DFU
 // classic-AI shape (MIT, Daggerfall Workshop): EnemyMotor's
 // DoRangedAttack spell branch (the 6..51.2m band, sight + 22.5deg
 // yaw, Random.value < 1/40 per classic update, bow foes take the bow
@@ -9,13 +9,13 @@
 // then the EffectsAlreadyOnTarget veto), and the
 // EntityEffectManager.Update rule "enemies always cast ready spell
 // instantly once queued" - the decision IS the cast; the scene owns
-// the spend + release. AUDIT 18: both branches also require
+// the spend + release. Both branches also require
 // DetectedTarget (EnemyMotor.cs:573 and :620), and both live inside
 // TakeAction, which HandleNoAction (:359-365) skips once GiveUpTimer
 // hits 0 - so a concealed target stops the casting entirely. The
 // melee reach is a FLAT MeleeDistance: DFU's
 // `+ senses.TargetRateOfApproach` term is only ever non-zero under
-// EnhancedCombatAI (EnemySenses.cs:354-363). E6 SHIPPED DFU's clear-path probe
+// EnhancedCombatAI (EnemySenses.cs:354-363). DFU's clear-path probe
 // (HasClearPathToShootProjectile) as its own geometry - the veto below
 // asks the motor, which owns the collider - rather than leaning on the
 // senses' LOS; the Enhanced Combat AI branches are off, as everywhere
@@ -31,20 +31,20 @@ import { effectsAlreadyOnTarget } from '../../systems/effects.js';
 // gate belongs to the DECISION, not only to the executor below.
 import { silenceBlocksCast } from '../../systems/mysticism.js';
 
-// AUDIT 24 (wave 24): EnemyAttack.cs's two ranged bounds have one
+// EnemyAttack.cs's two ranged bounds have one
 // home; this module declared them again. Wave 35 MOVED that home to
 // enemyMotor.js (DoRangedAttack's stand-off needs them, and
 // enemyAttack.js already imports from the motor) - enemyAttack.js
 // re-exports, so this import still reads from the module it belongs to.
 import { MIN_RANGED_DISTANCE, MAX_RANGED_DISTANCE } from './enemyAttack.js';
-// E6: CanCastRangedSpell's three shooting constants, each already at
+// CanCastRangedSpell's three shooting constants, each already at
 // home. ":788 - All range spells are currently 25 speed and 0.45f
 // radius" is spellcast.js's MISSILE_SPEED / MISSILE_COLLIDER_RADIUS
 // word for word, and the cast origin is DaggerfallMissile.ArmLength,
 // which weaponStates.js declares for the arrow that shares it.
 import { MISSILE_SPEED, MISSILE_COLLIDER_RADIUS } from '../../systems/spellcast.js';
 import { ARROW_ARM_LENGTH } from '../weaponStates.js';
-import { bloodCentre as sparkleCentre } from '../../scenes/hitEffects.js';   // AUDIT 24 (wave 44): the same centre+height/8 point
+import { bloodCentre as sparkleCentre } from '../../scenes/hitEffects.js';   // the same centre+height/8 point
 
 export { MIN_RANGED_DISTANCE, MAX_RANGED_DISTANCE };
 export const RANGED_SPELL_CHANCE = 1 / 40; // DoRangedAttack: Random.value < 1/40f
@@ -69,24 +69,24 @@ export function pickRangedSpell(entity, target, rolls = Math.random) {
  *                              && (hasBowAttack || entity.CurrentMagicka > 0))
  *
  * - a bare `CurrentMagicka > 0`, no spell list, no selection, no
- * veto. D9 split it out: the motor used to serve BOTH that arm and
- * the stand-off band from one dep, which was harmless while the dep
- * was the magicka-and-a-ranged-spell half and wrong the moment the
- * band gate grew CanCastRangedSpell's vetoes.
+ * veto. It is split out so that one dep does not serve BOTH that arm and
+ * the stand-off band: harmless while the dep
+ * is the magicka-and-a-ranged-spell half, wrong once the
+ * band gate takes CanCastRangedSpell's vetoes.
  */
 export const hasMagickaToCast = (entity) => (entity?.magicka ?? 0) > 0;
 
 /**
  * The SELECTION-FREE half of CanCastRangedSpell (EnemyMotor.cs:759-789).
  *
- * AUDIT 24 (wave 35). DFU's CanCastRangedSpell is not a predicate: it
+ * DFU's CanCastRangedSpell is not a predicate: it
  * picks a spell with `Random.Range(0, count)`, stores it as
  * SelectedSpell, and vetoes on EffectsAlreadyOnTarget and on a clear
  * shooting path - and DoRangedAttack calls it every frame the band
  * condition is evaluated, so it also decides whether the foe STANDS
  * OFF.
  *
- * D9: the stand-off band no longer asks this. EnemyCaster now KEEPS
+ * The stand-off band no longer asks this. EnemyCaster now KEEPS
  * the tick's SelectedSpell (DFU sets it inside the band condition,
  * BEFORE the 1/40 roll - :573 then :601) and answers the band from
  * it, so the EffectsAlreadyOnTarget veto reaches the band exactly as
@@ -94,10 +94,10 @@ export const hasMagickaToCast = (entity) => (entity?.magicka ?? 0) > 0;
  * target closes in instead of standing off forever. This half is kept
  * for probes and for the doctrine it records: the motor must never
  * call pickRangedSpell itself, because that would draw a SECOND time
- * off the caster's stream every frame (AUDIT 21 F5's roll-order law).
+ * off the caster's stream every frame (the roll-order law).
  *
- * E6 SHIPPED the last term, HasClearPathToShootProjectile (:788), as
- * DFU's own probe rather than as the senses' LOS: PredictNextTargetPos
+ * The last term, HasClearPathToShootProjectile (:788), is
+ * DFU's own probe rather than the senses' LOS: PredictNextTargetPos
  * (25) for the cast direction, a CheckSphere of radius 0.45 at the
  * body plus dir * DaggerfallMissile.ArmLength, then a SphereCast of
  * that radius over the distance measured from the body
@@ -123,7 +123,7 @@ export function pickTouchSpell(entity, target, rolls = Math.random) {
   return effectsAlreadyOnTarget(sp, target) ? null : sp;
 }
 
-/** E6: CanCastRangedSpell's clear-path term, asked of the motor that
+/** CanCastRangedSpell's clear-path term, asked of the motor that
  *  owns the collider - "All range spells are currently 25 speed and
  *  0.45f radius" (:786-788). */
 export function clearPathToShootSpell(ai) {
@@ -139,7 +139,7 @@ export class EnemyCaster {
     this.entity = entity;
     this.rolls = rolls;
     this._classicTimer = 0;
-    // D9: EnemyMotor.SelectedSpell. CanCastRangedSpell writes it and
+    // EnemyMotor.SelectedSpell. CanCastRangedSpell writes it and
     // DoRangedAttack's own `Random.value < 1/40f && SetReadySpell(
     // SelectedSpell)` reads it back (:601), so the selection outlives
     // the pick by design - and the BAND condition that decides
@@ -167,17 +167,17 @@ export class EnemyCaster {
    */
   update(dt, ai, attack, playerFeet, playerEntity) {
     const ent = this.entity;
-    if (!ent.spells?.length || ai?._pilot?.cast) return null;   // STAFF-PILOT (systems/staffBossPilot.js): a boss a staff member steers casts only after their right click
+    if (!ent.spells?.length || ai?._pilot?.cast) return null;   // a boss a staff member steers casts only after their right click
     const dist = ai._dist;
     const idle = attack.machine.state === 'Idle';
-    // AUDIT 26 F010: both cast branches live inside TakeAction, behind
+    // Both cast branches live inside TakeAction, behind
     // `if (CanAct)` (:171-172) - a foe in knockback hit-stun or
     // paralysis casts nothing. `!== false` keeps bare-object ai stubs
     // on the permissive default.
     const canAct = ai.canAct !== false;
     // DoTouchSpell: sight + melee reach + the melee timer at 0; a
     // touch cast RESETS the melee timer (ResetMeleeTimer, verbatim).
-    // AUDIT 26 F013: NO one-shot term - DFU's condition (:621-623) has
+    // NO one-shot term - DFU's condition (:621-623) has
     // none (the only one-shot early-out above it covers the Seducer
     // transform states alone), so a foe whose melee timer floors to 0
     // mid-swing casts anyway and ChangeEnemyState CUTS the swing. The
@@ -185,7 +185,7 @@ export class EnemyCaster {
     // landing an interrupted blow DFU would have cancelled. Reachable
     // where ResetMeleeTimer floors: player level ~22+ at low reflexes.
     if (canAct && ai.inSight && ai.detected && ai.giveUpTimer > 0
-        && attack.meleeTimer === 0 && dist <= MELEE_DISTANCE && ai._tacStrike !== false) {   // TACT2: a touch spell is a blow - it waits its turn
+        && attack.meleeTimer === 0 && dist <= MELEE_DISTANCE && ai._tacStrike !== false) {   // a touch spell is a blow - it waits its turn
       const sp = pickTouchSpell(ent, playerEntity, this.rolls);
       // EnemyMotor.cs:619-628: SetReadySpell is the LAST term of
       // DoTouchSpell's `&&` chain and ResetMeleeTimer runs INSIDE the
@@ -211,7 +211,7 @@ export class EnemyCaster {
     let decision = null;
     while (this._classicTimer >= CLASSIC_UPDATE_INTERVAL) {
       this._classicTimer -= CLASSIC_UPDATE_INTERVAL;
-      // D9: DFU's ORDER, restored. DoRangedAttack's band condition is
+      // DFU's ORDER, restored. DoRangedAttack's band condition is
       //
       //   inRange && TargetInSight && DetectedTarget
       //           && (CanShootBow() || CanCastRangedSpell())
@@ -233,7 +233,7 @@ export class EnemyCaster {
       if (!canAct || ai.giveUpTimer <= 0 || !inBand || !ai.inSight || !ai.detected
           || attack.rangedAttack) { this.selectedSpell = null; continue; }
       this.selectedSpell = pickRangedSpell(ent, playerEntity, this.rolls);
-      // E6: CanCastRangedSpell's LAST term (:786-788), after the pick
+      // CanCastRangedSpell's LAST term (:786-788), after the pick
       // and after the EffectsAlreadyOnTarget veto - "Check that there
       // is a clear path to shoot a spell". A false here answers the
       // WHOLE of CanCastRangedSpell false, which is DoRangedAttack's
@@ -250,10 +250,10 @@ export class EnemyCaster {
       // nor the yaw gate touches the selection: outside 22.5 degrees
       // DFU turns to face and still stands off (:603-604).
       if (!idle || !withinYaw(ai.yaw, dx, dz, SPELL_YAW_DEG)) continue;
-      if (ai._tacShoot === false) continue;   // TACT2: no ranged token - it waits its turn (unset with the switch off)
+      if (ai._tacShoot === false) continue;   // no ranged token - it waits its turn (unset with the switch off)
       if (this.rolls() >= RANGED_SPELL_CHANCE) continue;
       decision = { spell: this.selectedSpell, touch: false };
-      ai._tacShot = (ai._tacShot ?? 0) + 1;   // AUDIT TACT A2: a ranged spell spends the ranged token as a shot does
+      ai._tacShot = (ai._tacShot ?? 0) + 1;   // a ranged spell spends the ranged token as a shot does
     }
     return decision;
   }
@@ -261,7 +261,7 @@ export class EnemyCaster {
 
 /** X3-slice: THE ONE CAST EXECUTOR - "enemies always cast ready
  *  spell instantly once queued", extracted from the dungeon host so
- *  both foe pools release through the same arms (the M3 one-engine
+ *  both foe pools release through the same arms (the one-engine
  *  doctrine). The gates ride the deps:
  *  - the silence gate runs for enemies too, bypassed by a free
  *    rider exactly as the cost is (magic-15);
@@ -277,19 +277,19 @@ export class EnemyCaster {
  *  the player only - foe-vs-foe friendly fire pends the missile
  *  seam's target sweep. */
 export function castEnemySpell(f, spell, {
-  noSpellPointCost = false, playerEntity, playerFeet = null, playerHeight = 1.8,   // ROAD-H H2: the LIVE player capsule the AoC OverlapSphere measures against (DaggerfallMissile.cs:481)
+  noSpellPointCost = false, playerEntity, playerFeet = null, playerHeight = 1.8,   // the LIVE player capsule the AoC OverlapSphere measures against (DaggerfallMissile.cs:481)
   applySpell, foeSinks, calculateCastCost, silenceBlocksCast,
   playCastSound = null, explodeAt = null, fireMissile = null,
-  hitEffects = null,   // AUDIT 24 (wave 44): ShowMagicSparkles
+  hitEffects = null,   // ShowMagicSparkles
   rolls = Math.random,
   aimAt = null,   // WORLD6b-iii: the missile's aim point when the target is not the local player (a peer's transform) - null aims at the player, as ever
 } = {}) {
   if (!noSpellPointCost && silenceBlocksCast(f.entity)) return false;
   if (!noSpellPointCost) {
-    const cost = calculateCastCost(spell, playerEntity, { portMods: false }).sp;   // SET2: a foe's cast is priced with no port modifier of mine
+    const cost = calculateCastCost(spell, playerEntity, { portMods: false }).sp;   // a foe's cast is priced with no port modifier of mine
     f.entity.magicka = Math.max(0, (f.entity.magicka ?? 0) - cost);
   }
-  // AUDIT 62 F21: GetAimPosition (DaggerfallMissile.cs:513-525) is
+  // GetAimPosition (DaggerfallMissile.cs:513-525) is
   // `caster.transform.position` for a non-player caster, with the
   // forward*0.6 + height/3 offset added ONLY for an arrow - so a spell
   // looses (and its cast sound rings) at the caster's TRANSFORM, which
@@ -301,9 +301,9 @@ export function castEnemySpell(f, spell, {
   // capsule half rather than to the player's constant.
   const casterTransformY = f.ai.feet[1] + (f.ai.centreOffset ?? (f.ai.height ?? 1.8) / 2);
   const from = [f.ai.feet[0], casterTransformY, f.ai.feet[2]];
-  f._castPending = true;   // C14: the sprite Spell one-shot
+  f._castPending = true;   // the sprite Spell one-shot
   playCastSound?.(spell.element, from);
-  // AUDIT 24 (wave 44) - EntityEffectManager.cs:2055-2068, right after
+  // EntityEffectManager.cs:2055-2068, right after
   // the cast sound and BEFORE the bundle is assigned. The gate is on
   // the target type: anything that is not SingleTargetAtRange (2) or
   // AreaAtRange (4) sparkles - so a self cast, a touch and an
@@ -322,14 +322,14 @@ export function castEnemySpell(f, spell, {
     return true;
   }
   if (spell.rangeType === 3) {
-    // AUDIT 62 F21: DaggerfallMissile.cs:280-282 `case TargetTypes
+    // DaggerfallMissile.cs:280-282 `case TargetTypes
     // .AreaAroundCaster: DoAreaOfEffect(caster.transform.position,
     // true)` - the CASTER'S TRANSFORM, feet + centreOffset. The
     // hardcoded 0.9 was the PLAYER's half-capsule on a foe caster:
     // wrong under both models, and off by up to a metre against the
     // 4.0-radius OverlapSphere, which flips rim membership.
     explodeAt?.([f.ai.feet[0], casterTransformY, f.ai.feet[2]], spell, f.entity.level, playerFeet,
-      { entity: f.entity, sinks: foeSinks(f), foe: f }, { excludeFoe: f, playerHeight });   // AUDIT NAV2 F56: the wrapper carries its foe, as a missile's does (hostMagic.js missileCaster) - the engine asks it whose blast this is, and a crewman's passes the player and the crew by
+      { entity: f.entity, sinks: foeSinks(f), foe: f }, { excludeFoe: f, playerHeight });   // the wrapper carries its foe, as a missile's does (hostMagic.js missileCaster) - the engine asks it whose blast this is, and a crewman's passes the player and the crew by
     return true;
   }
   fireMissile?.(from, spell, f.entity.level, f, aimAt);

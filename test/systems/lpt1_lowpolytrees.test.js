@@ -1,7 +1,5 @@
-// LPT1 (2026-10-05, the owner: "Next mod to integrate is this ... Its important we make this compatible with seasons of
-// daggerfall, ensure performance doesnt take a hit and draw distance can remain the same. A true visual overhaul with no
-// performance loss"): LOW POLY TREES 5 (SquidKamer). bible/07-Rendering/Low-Poly-Trees.md is the design and
-// bible/01-Overview/audits/Audit-Low-Poly-Trees.md the audit; this file pins the pure module (world/lowPolyTrees.js), the
+// LPT1: LOW POLY TREES 5 (SquidKamer). is the design and
+// the audit; this file pins the pure module (world/lowPolyTrees.js), the
 // vendored data, the renderer's mesh mode and handover, the host's door (systems/lowPolyTreesAssets.js) and the two
 // exterior hosts' wiring.
 import { test } from 'node:test';
@@ -26,6 +24,8 @@ import { Renderer, WORLD_FRAME, bbVertexShader, bbCornerX, LPT_SUN_FULL } from '
 import { EL_LANE, EL_BB_FS } from '../../src/render/enhancedLighting.js';
 import { FOREST_STAMP, sinkFelled } from '../../src/scenes/treeHost.js';
 import { MOD_SETTINGS } from '../../src/systems/modSettings.js';
+import { setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
+import { bleedTransparentTexels } from '../../src/render/alpha-bleed.ts';
 import { SeasonHelper } from '../../src/systems/seasonsIliacBay.js';
 import { SEASONS } from '../../src/systems/gameDate.js';
 import { perspective, lookAt, mirrorProjectionX } from '../../src/world/mat4.js';
@@ -72,7 +72,7 @@ test('LPT1 the vendored data: 253 prototypes over the twelve nature archives, 11
     const s = LPT.atlases[name];
     assert.deepEqual([s.blits.length, s.fills?.length ?? 0, s.blits[0].slice(0, 6)], [1, 0, [a, r, 0, 0, 0, 0]], name);
   }
-  const files = readdirSync(join(ROOT, 'vendor/low-poly-trees'), { recursive: true }).map(String).filter((f) => /\.\w+$/.test(f)).sort();
+  const files = readdirSync(join(ROOT, 'vendor/low-poly-trees'), { recursive: true }).map((f) => String(f).split('\\').join('/')).filter((f) => /\.\w+$/.test(f)).sort();
   assert.deepEqual(files, ['README.md', 'Trees/atlases.bin', 'Trees/trees.bin', 'Trees/trees.json', 'lowpolytrees.dfmod.json'].sort());
   // the geometry's length is what the index says - vertices, then every submesh's u16 indices (padded to four)
   const idx = JSON_.meshes.reduce((n, m) => n + m.subs.reduce((k, s) => k + s[1], 0), 0);
@@ -462,13 +462,23 @@ test('LPT1 BB_VS mesh mode: the tree\'s vertex turned about +Y and scaled at its
   assert.ok(near(banded.vFade, 2.5, 1e-3));
 });
 
-test('LPT1 BB_VS mesh mode light (AUDIT LPT A2): at night a face takes the far picture\'s own law - LPT_IMPOSTOR_LIGHT turned to the eye - so the tree and its picture agree where they hand over; by day the sun\'s by its share; times its material\'s colour', () => {
-  const shade = (n, sun = [0, 1, 0, 0], color = [1, 1, 1]) => bbAt({ uMesh: 1, aCenter: [0, 1, 0], aCorner: [0, 0], aNormal: n, aInst: [0, 0, 0, 0], uLptCut: [0, 0, 10, 140], uLptSun: sun, uMeshColor: color }).vShade;
+// the far picture's light is the sky's, straight above (LPT_IMPOSTOR_LIGHT), and the 3D tree takes it unturned: a matte
+// face, the same from every side, as DFU's Lambert nature batch (DaggerfallBillboardBatch.shader) lights its flats.
+test('LPT1 BB_VS mesh mode light (AUDIT LPT A2; FLORA-GROUND): at night a face takes the far picture\'s own law - LPT_IMPOSTOR_LIGHT, the sky\'s from straight above, never turned to the eye - so the tree and its picture agree where they hand over and no face shines toward the viewer; by day the sun\'s by its share; times its material\'s colour', () => {
+  const shade = (n, sun = [0, 1, 0, 0], color = [1, 1, 1], eye = [0, 0, 10]) => bbAt({ uMesh: 1, aCenter: [0, 1, 0], aCorner: [0, 0], aNormal: n, aInst: [0, 0, 0, 0], uLptCut: [...eye, 140], uLptSun: sun, uMeshColor: color }).vShade;
   const law = (n) => Math.min(1, Math.max(0.5, 0.72 + 0.28 * (n[0] * LPT_IMPOSTOR_LIGHT[0] + n[1] * LPT_IMPOSTOR_LIGHT[1] + n[2] * LPT_IMPOSTOR_LIGHT[2])));
-  // the eye is at +z: a face toward it is the far picture's face toward its viewer (-z there)
-  assert.ok(near(shade([0, 0, 1])[0], law([0, 0, -1])), 'toward the eye');
-  assert.ok(near(shade([0, 1, 0])[0], law([0, 1, 0])), 'up');
-  assert.ok(near(shade([0, 0, -1])[0], 0.5), 'away: at the floor');
+  assert.deepEqual([...LPT_IMPOSTOR_LIGHT], [0, 1, 0], 'the sky\'s light, straight above');
+  // a face's light is the picture's law - and the same wherever the eye stands round the tree
+  for (const n of [[0, 0, 1], [0, 0, -1], [1, 0, 0], [0.6, 0.8, 0], [0, 1, 0], [0, -1, 0]]) {
+    for (const eye of [[0, 0, 10], [0, 0, -10], [10, 0, 0], [-7, 3, 7]]) assert.ok(near(shade(n, undefined, undefined, eye)[0], law(n)), `the face ${n} from ${eye}: the picture's law, unturned`);
+  }
+  assert.ok(near(shade([0, 1, 0])[0], 1), 'up: whole');
+  assert.ok(near(shade([0, 0, 1])[0], 0.72) && near(shade([0, 0, -1])[0], 0.72), 'a side toward the eye and one away alike');
+  assert.ok(near(shade([0, -1, 0])[0], 0.5), 'down: at the floor');
+  // the sun low in the east: no share, the sky's law alone (its face to the sun no brighter); its whole share, the sun's
+  const east = [Math.cos(0.2), Math.sin(0.2), 0];
+  assert.ok(near(shade([1, 0, 0], [...east, 0])[0], law([1, 0, 0])), 'no sun: the sky\'s, never the sun\'s');
+  assert.ok(near(shade([1, 0, 0], [...east, 1])[0], Math.min(1, 0.72 + 0.28 * east[0])), 'the sun\'s whole share: its face to the sun lit by it');
   assert.ok(near(shade([0, 1, 0], [0, 1, 0, 1])[0], 1), 'the sun overhead, whole');
   assert.ok(near(shade([0, 1, 0], [0, 1, 0, 0.5])[0], (law([0, 1, 0]) + 1) / 2), 'half the sun\'s share');
   assert.deepEqual(shade([0, 1, 0], [0, 1, 0, 1], [0.8, 0.8, 0.8]).map((x) => Math.round(x * 1e4) / 1e4), [0.8, 0.8, 0.8], 'Atlas_Opaque\'s _Color');
@@ -541,7 +551,7 @@ test('LPT1 createBillboardBatch / moveBillboardBatch: each flat\'s scale written
   const r = new Renderer(canvas);
   calls.length = 0;
   const b = r.createBillboardBatch(504, '12#lpt', { w: 4, h: 8 }, [[0, 0, 0], [5, 0, 5]], { scales: [0.5, 1] });
-  const data = calls.find((c) => c[0] === 'bufferSubData' && c[3]?.length === 40)[3];   // PIN MOVED (PERF-ARENA): a still batch's corners are written into its arena's range
+  const data = calls.find((c) => c[0] === 'bufferSubData' && c[3]?.length === 40)[3];
   assert.equal(data[3], Math.fround(bbCornerX(-0.5, 0.5)));
   assert.equal(data[23], Math.fround(bbCornerX(-0.5, 1)));
   assert.ok('lptProto' in b && '_scales' in b && 'farH' in b && !('_tints' in b));
@@ -644,14 +654,23 @@ test('LPT1 a far picture whose handle is not drawn this frame stands whole - no 
   assert.ok(!calls.some((c) => c[0] === 'uniform4f' && c[1] === 'uLptCut' && c[5] === 140));
 });
 
-test('LPT1 the atlas texture (AUDIT LPT A4/A5): its chain allocated, sampled as the mod\'s Point (nearest, its mips nearest), wrapped, uploaded a band of rows at a time, under retro mode\'s mip switch, and freed by its owner', () => {
+test('LPT1 the atlas texture (AUDIT LPT A4/A5): its chain allocated, sampled by the world texture filter (the mod\'s Point under Point: nearest, its mips nearest), wrapped, uploaded a band of rows at a time, under retro mode\'s mip switch, and freed by its owner', () => {
   const { calls, canvas } = recordingGl();
   const r = new Renderer(canvas);
   calls.length = 0;
   const tex = r.createAtlasTexture(1024, 512, 11);
   assert.deepEqual(calls.filter((c) => c[0] === 'texImage2D').map((c) => [c[2], c[4], c[5], c[9]]), Array.from({ length: 11 }, (_, i) => [i, Math.max(1, 1024 >> i), Math.max(1, 512 >> i), null]));
   const params = Object.fromEntries(calls.filter((c) => c[0] === 'texParameteri').map((c) => [c[2], c[3]]));
-  assert.deepEqual(params, { TEXTURE_WRAP_S: 'REPEAT', TEXTURE_WRAP_T: 'REPEAT', TEXTURE_MIN_FILTER: 'NEAREST_MIPMAP_NEAREST', TEXTURE_MAG_FILTER: 'NEAREST', TEXTURE_MAX_LEVEL: 10 });
+  assert.deepEqual(params, { TEXTURE_WRAP_S: 'REPEAT', TEXTURE_WRAP_T: 'REPEAT', TEXTURE_MIN_FILTER: 'LINEAR_MIPMAP_LINEAR', TEXTURE_MAG_FILTER: 'LINEAR', TEXTURE_MAX_LEVEL: 10 });
+  try {
+    setValue('Video', 'MainFilterMode', '0');
+    calls.length = 0;
+    r.createAtlasTexture(64, 64, 7);
+    const point = Object.fromEntries(calls.filter((c) => c[0] === 'texParameteri').map((c) => [c[2], c[3]]));
+    assert.deepEqual([point.TEXTURE_MIN_FILTER, point.TEXTURE_MAG_FILTER], ['NEAREST_MIPMAP_NEAREST', 'NEAREST'], 'Point: the mod\'s own sampler');
+  } finally {
+    resetSettings();
+  }
   assert.ok(r.lptAtlases.has(tex));
   calls.length = 0;
   r.uploadAtlasRows(tex, 2, 64, 256, new Uint8Array(256 * 4 * 3));
@@ -751,8 +770,9 @@ test('LPT1 the atlases\' upload (AUDIT LPT B7): the chain into one texture a ban
   assert.ok(one.every((r) => r.n <= LPT_ATLAS_BAND));
   const pic = d.lpt._atlases.get(`${p.subs[0].atlas}|`).pic;
   const top = one.find((r) => r.level === 0 && r.y === 1024 - LPT_ATLAS_BAND);
-  assert.deepEqual(top.head, Array.from(pic.data.subarray((LPT_ATLAS_BAND - 1) * 1024 * 4, LPT_ATLAS_BAND * 1024 * 4)), 'the picture\'s top band lands at the top, its last row first');
-  assert.notDeepEqual(top.head, Array.from(pic.data.subarray(0, 1024 * 4)), '(its first row is another)');
+  const bled = bleedTransparentTexels(pic.data, 1024, 1024);   // its clear texels coloured, so a filter draws no black edge
+  assert.deepEqual(top.head, Array.from(bled.subarray((LPT_ATLAS_BAND - 1) * 1024 * 4, LPT_ATLAS_BAND * 1024 * 4)), 'the picture\'s top band lands at the top, its last row first');
+  assert.notDeepEqual(top.head, Array.from(bled.subarray(0, 1024 * 4)), '(its first row is another)');
 });
 
 test('LPT1 the frame: the near set gathered and handed on, again only when the eye moves LPT_REGATHER_M, a pixel moves (a recentre), its set is made or let go, or a tree is felled; culled to the view EVERY frame (AUDIT LPT B4), each run its handle\'s', async () => {
@@ -936,7 +956,6 @@ test('LPT1 the felled trees: a sink or a stand moves FOREST_STAMP (the near set 
 });
 
 test('LPT1 the hosts: world.js and exterior.js stand the trees behind the mod\'s switch and ?trees=off, through the one door; a far-picture batch a handle, HELD while it stands (AUDIT LPT B5), MAC1\'s far rings reading the flat\'s own height (AUDIT LPT A8/B1); the near set handed on between the gibs\' call and the wind (WIND3 keeps the wind and the flats\' draw adjacent), culled to the view; the terrain\'s own flats alone take DFU\'s variety', () => {
-  // PIN MOVED (BANTHA1, HOST-SPLIT): the streaming host's door, its near sets and its handles' owners are the trees' host's
   // (scenes/treesHost.js), which world.js builds behind the same switch and the same door
   const w = hostText('src/scenes/world.js'), x = read('src/scenes/exterior.js'), th = read('src/scenes/treesHost.js');
   assert.match(w, /lowPolyTreesOn: modSetting\('low-poly-trees', 'Enabled'\) && params\.get\('trees'\) !== 'off'/, 'world.js: the switch and the door');
@@ -953,11 +972,9 @@ test('LPT1 the hosts: world.js and exterior.js stand the trees behind the mod\'s
     assert.match(src.slice(gibs, wind), name === 'world.js' ? /trees\.frame\(_pixelOrder/ : /lowPolyTrees/, `${name}: the frame's trees between the gibs and the wind`);
   }
   assert.match(th, /seasonsActive\(\) && !seasons\.installing && seasons\.lookup\(a, 1\)/, 'the streaming host paints nothing seasonal mid-install (AUDIT LPT B3)');
-  // PIN MOVED (ECOTONE1, 2026-10-07): by the archive the flat is drawn in - a border's flat is a neighbour climate's
-  // PIN MOVED (AUDIT PRECIP HOST-7): logged wild, and marked by the log's grouping (scenes/pixelBuild.js groupFlats) - the build's and a re-skin's
   assert.match(w, /addFlat\(archive, f\.record, f\.x, f\.y, f\.z, \{ wild: base, tree \}\);/, 'the terrain layout\'s flats logged wild');
   assert.match(w, /if \(log\[j\]\.wild != null\) wild\.add\(`\$\{k\}#\$\{g\.length\}`\);/, '...and marked');
-  assert.match(w, /wild\[i\] = g\.wild\.has\(`\$\{k\}#\$\{i\}`\) \? 1 : 0;\n\s+const v = lptVariety\(g\.px, g\.py, c\[0\], c\[2\], !wild\[i\]\)\.scale;\n[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(fit && !wild\[i\]\) fit\[i\] = Math\.min\(fit\[i\], lptTrunkCap\([^\n]*\n\s+scales\[i\] = \(fit \? Math\.min\(v, fit\[i\]\) : v\) \/ LPT_SCALE_MAX;/);   // PIN MOVED (LPT-FIT): the variety read into `v`, the far picture the lesser of it and the tree's fit; PIN MOVED (FB1020c TRUNK-FIT): that fit the lesser of the crown's and, for a location's tree, the trunk's
+  assert.match(w, /wild\[i\] = g\.wild\.has\(`\$\{k\}#\$\{i\}`\) \? 1 : 0;\n\s+const v = lptVariety\(g\.px, g\.py, c\[0\], c\[2\], !wild\[i\]\)\.scale;\n[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(fit && !wild\[i\]\) fit\[i\] = Math\.min\(fit\[i\], lptTrunkCap\([^\n]*\n\s+scales\[i\] = \(fit \? Math\.min\(v, fit\[i\]\) : v\) \/ LPT_SCALE_MAX;/);
   assert.match(x, /buildTreeSet\(0, 0, lptGroups\)/, 'the location host: one set, none of it wild');
   assert.match(x, /lptGroups\.push\(\{ h: lptHandles\.length - 1, centers, wild: null \}\);/);
   assert.match(w, /lowPolyTrees: lptGroups\.length \? \{ px, py, ox: 0, oy: 0, oz: 0, handles: lptHandles, groups: lptGroups, trees: null, centers: null \} : null/);
@@ -980,7 +997,6 @@ test('LPT1 the hosts: world.js and exterior.js stand the trees behind the mod\'s
   assert.match(fr, /ready\(a, p\._t\)/, '...the pixel\'s, this frame');
   assert.match(fr, /opts\.stamp = FOREST_STAMP\.n;/, 'a felling regathers');
   for (const [name, src] of [['world.js', w], ['exterior.js', x]]) {
-    // PIN MOVED (ECOTONE1, 2026-10-07): the streaming host's pixel asks by its nature set (its climate's and a border's)
     assert.match(src, name === 'world.js' ? /batch\.sway = floraSwayOf\(archive, g\.natureSet, plain\.h\);/ : /batch\.sway = floraSwayOf\(archive, natureArchive, plain\.h\);/, `${name}: the flat's sway share`);
     assert.match(src, /coverProxies\(c, plain, \{ tree:/, `${name}: the flat's cover (AUDIT LPT D3)`);
   }

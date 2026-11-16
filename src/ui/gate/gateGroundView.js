@@ -1,6 +1,5 @@
 // @ts-check
-// WB9d (2026-09-30, Mac: "Further improve his effects, ensure his ground affects actually cause damage and the player
-// recieves proper feedback"): HIS GROUND AND HIS ELEMENT, FELT. His ground bit, and his fire landed - but a strike with
+// WB9d: HIS GROUND AND HIS ELEMENT, FELT. His ground bit, and his fire landed - but a strike with
 // an element never flashed the screen (ui/damageFlash.js: DFU's red flash rides a blow, never spell damage - the law the
 // port keeps for every foe), so a fighter standing in his fire lost a tenth of their health a second to a hiss they
 // could not place. The court is not DFU's: its ground and its elemental blows say themselves here, in their own colour.
@@ -9,12 +8,12 @@
 //     at each bite - and at each of his elemental blows that lands on me - fading over GROUND_BITE_MS.
 //   - THE WARNING: while I stand in it, its name and the one thing to do, under the crosshair - "Burning ground - step
 //     out!" - pulsing.
-//   - WB13a (2026-10-01, Mac: "hone in telegraphs"): A BLOW STILL TO COME, ON ME. In first person at sword reach his
+//   - WB13a: A BLOW STILL TO COME, ON ME. In first person at sword reach his
 //     Cleave's shape is none of the frame and his Slam's a sliver - the ground under my own feet is out of sight. While
 //     my feet stand in a blow still to land (his, or his host's), the rim rises in the danger edge's colour as it winds
 //     up, the blow's name and the order stand under the crosshair - "Cleave - move!" - and an arrow points the nearest
 //     way out of it.
-//   - WB14a (2026-10-19, bible/11-Multiplayer/Breach-Portents.md section 6): A MARKED BLOW'S ORDER - the Chains, the Brand,
+//   - WB14a: A MARKED BLOW'S ORDER - the Chains, the Brand,
 //     the Torment and the Gaze say the one thing to do in its own words ("Chained! Run from him!", "Look away!") in the
 //     warning's place (`peril.order`); and THE GAZE'S BLINDING - the screen washed white as it lands on me, fading over
 //     GAZE_BLIND_MS.

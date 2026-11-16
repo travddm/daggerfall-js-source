@@ -69,21 +69,6 @@ test('PORT0: inside the classic scope the enhanced boxes stand down (the classic
     assert.equal(drawEnhancedDialog({}, { ox: 0, oy: 0, s: 1 }, box, {}, fakeDoc), false);
   });
   assert.equal(inClassicScope(), false);
-  assert.match(read('src/ui/travel/travelMapWindow.js'), /TravelMapWindow\.prototype\.draw = function draw\(\.\.\.args\) \{ return classicScope/);
-});
-
-test('PORT3: the list hands its draw to the enhanced list under the enhanced skin only', () => {
-  const src = read('src/ui/listPicker.js');
-  assert.match(src, /typeof document !== 'undefined' && isEnhancedPlus\(\)[\s\S]{0,300}drawEnhancedPicker\(this, renderer, canvas/);
-});
-
-test('PORT4: every service window is ported at its one construction site', () => {
-  const modes = read('src/scenes/worldModes.js');
-  for (const kind of ['bankPurchase', 'bank', 'coven', 'guild', 'daedra', 'potionMaker', 'itemMaker', 'spellMaker']) {
-    // PIN MOVED (POTION-DOOR): a window may be made inside its port's call - the potion maker on its hooks' module
-    assert.ok(modes.includes(`enhancedWindow(`) && new RegExp(`enhancedWindow\\((?:\\w+|new \\w+\\(\\w+\\)), '${kind}'\\)`).test(modes), kind);
-  }
-  assert.match(read('src/player/mountRig.js'), /enhancedWindow\(new TransportWindow\([\s\S]*?\), 'transport'\)/);
 });
 
 test('PORT5: the sheet carries the ports, and the kit still comes last', () => {

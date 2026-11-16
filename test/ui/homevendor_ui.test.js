@@ -84,7 +84,6 @@ test('HOME-VENDOR the stall: a visitor buys off the purse; the owner takes back 
   assert.ok(!buttons(b).some((x) => x.textContent === 'Buy'), 'the owner buys nothing of their own');
   buttons(b).find((x) => x.textContent === 'Take back').onclick();
   b = mine.body();
-  // PIN MOVED (PACK-PICK): what may not go is never a piece to press - it stands folded under the picker with why
   const pressable = byClass(b, 'packpick-tile').filter((n) => n.tagName === 'BUTTON').map((n) => n.textContent);
   assert.deepEqual(pressable, ['Leather Cuirass'], 'what may not go is not offered');
   assert.match(texts(byClass(b, 'packpick-refused')[0]), /Quest Letter.*a quest's/, 'and is said, with why');

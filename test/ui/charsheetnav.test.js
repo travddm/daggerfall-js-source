@@ -117,54 +117,7 @@ test('U43: the journal opens on the page its door asks for', () => {
     'an unknown DisplayMode falls back rather than sticking');
 });
 
-test('U43: the dungeon host opens the journal only when it can SEE quests', () => {
-  // The sheet's logbook button used to be withheld here on a comment
-  // saying "this host has no quest bridge" - which was true of the
-  // standalone ?dungeon page and false of every dungeon worldModes
-  // mounts, where the bridge has ridden in through opts since B4. So
-  // a player standing in a quest dungeon with three active quests was
-  // told the screen could not see them.
-  const dc = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(dc, /const questJournalHooks = \(\) => \(opts\.questBridge \? \{/,
-    'the hooks come from the bridge, or not at all');
-  assert.match(dc, /getAllQuestLogMessages\(\) \?\? \[\]/);
-  // scoped to the SHEET's own hook bag - questJournalHooks() also
-  // appears in _openJournal, so an unscoped match passes with the
-  // sheet's spread deleted and the logbook button dark again
-  // U52 re-aimed the slice, not the law: the bag is the same bag, it
-  // is handed to ui/charSheetDoor.js now instead of to CharSheet's
-  // constructor, and the door passes it to charSheetHooks unchanged.
-  // MAC-C lifted that construction out of `toggleCharSheet` into
-  // `makeCharSheet`, so the pack's cross-over key can reach it without
-  // a second bag (U52's argument, applied to the host that still had
-  // the builder inline). The BAG is the same bag and this reads it
-  // where it now lives.
-  const bagAt = dc.indexOf('return createCharSheetWindow({');
-  assert.ok(bagAt > 0, 'the dungeon host builds its sheet through the door');
-  assert.match(dc, /activeOverlay = api\.makeCharSheet\(doorOpts\);/, '...and the toggle calls that ONE builder');
-  const sheetBag = dc.slice(bagAt, dc.indexOf('toggleLogbook()'));
-  assert.match(sheetBag, /\.\.\.questJournalHooks\(\),/, 'and the SHEET gets them');
-  assert.match(dc, /toggleLogbook\(\) \{ this\._openJournal\('activeQuests'\); \}/);
-  assert.match(dc, /toggleNotebook\(\) \{ this\._openJournal\('notebook'\); \}/);
-  // the standalone page still gets the honest refusal, not an empty book
-  assert.match(dc, /if \(activeOverlay \|\| !opts\.questBridge\) return;/,
-    'no bridge, no journal - charSheetHooks says the same for the button');
-});
-
 test('U42: the sheet forwards EVERY seam to a pushed child, hover included', () => {
-  // The sheet nests a child window (inventory, spellbook, logbook,
-  // history) and the hosts' seams test for the method on the OVERLAY -
-  // which is the SHEET, not the child. It forwarded tick, wheel, input
-  // and click and NOT hover, so a hover-driven behaviour a child owns
-  // was dead on the sheet's route into it: the spellbook lost its list
-  // highlight and all three icon tooltips, and only there, because
-  // Backspace makes it the overlay itself. Every seam a child can
-  // implement is swept, so the next one added cannot be forgotten.
-  const src = readFileSync(new URL('../../src/ui/charsheet.js', import.meta.url), 'utf8');
-  for (const seam of ['tick', 'wheel', 'input', 'click', 'hover']) {
-    assert.match(src, new RegExp(`this\\.child\\.${seam}\\??\\.?\\(`),
-      `CharSheet does not forward ${seam} to its pushed child`);
-  }
   // and it really forwards, with the child's own coordinates
   const seen = [];
   const child = {

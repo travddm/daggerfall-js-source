@@ -1,5 +1,4 @@
-// DEX7 (2026-10-20, Mac, 2026-10-19: "We also need to ensure these get proper morrowind model replacements if
-// applicable") - DAGGERFALL ENEMY EXPANSION'S FIFTY IN MORROWIND'S BODIES (systems/enemyExpansion/dexBodies.js): every
+// DEX7 - DAGGERFALL ENEMY EXPANSION'S FIFTY IN MORROWIND'S BODIES (systems/enemyExpansion/dexBodies.js): every
 // monster of the mod's a Morrowind creature that is it and moves as it does, or a declared miss; the lizard men
 // Argonians; the classes people by the class law, the riders their sprites. Held by the classic table's own audits
 // (test/characters/mwnpc9b_creaturerig.test.js MWNPC9b-8, mwnpc_audit.test.js D4/D5), now at the doors a mod registers

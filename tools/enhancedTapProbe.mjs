@@ -117,7 +117,7 @@ for (const [label, opts] of [
 for (const [label, opts] of [['phone', { ...devices['Pixel 5'] }]]) {
   const ctx = await browser.newContext(opts);
   const page = await ctx.newPage();
-  await page.goto(`${BASE}/chargen.html`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/labs/chargen.html`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.prov', { timeout: 20000 });
   const at = async (name) => {
     const bad = await page.evaluate(MEASURE, FLOOR);

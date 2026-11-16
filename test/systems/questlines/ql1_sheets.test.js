@@ -1,4 +1,4 @@
-// QL1/QL5-QL10 (bible/06-Systems/Questlines-Arc.md sections 2.5 and 3): THE SHEETS AND THE BRANCHES, HELD TO THEIR
+// QL1/QL5-QL10: THE SHEETS AND THE BRANCHES, HELD TO THEIR
 // SCRIPTS. Every sheet is checked against the quest it names, parsed as the game reads it (test/qlSources.mjs, the pack
 // loader's node twin): a binding of a kind the law reads, a task, item, clock or foe the script holds, a step it logs, a
 // choice task something in it can set (tools/qlSheetLaw.mjs sheetProblems). And the sets are exact: every quest a player can be
@@ -98,7 +98,7 @@ test('QL1 the set is exact: every quest a player can be given has its sheet, and
   // every quest the pack holds is either given or named here with why not
   const unaccounted = [...QUEST_FILES.values()].filter((f) => f.dir !== 'questlines' && !fam.has(f.name.toUpperCase()) && !EXCLUDED[f.name.toUpperCase()]).map((f) => f.name);
   assert.deepEqual(unaccounted, []);
-  assert.equal([...fam.values()].filter((f) => f !== 'Questlines').length, 248, 'the scope (Questlines-Arc.md decision 3)');
+  assert.equal([...fam.values()].filter((f) => f !== 'Questlines').length, 250, 'the scope (Questlines-Arc.md decision 3), the Bay\'s start quest (START1: systems/starts/starts.js) and the commission in hand (START2)');
   assert.equal([...fam.values()].filter((f) => f === 'Questlines').length, lineQuestNames().length, 'and the questlines\' own, every step of every line');
 });
 

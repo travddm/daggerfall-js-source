@@ -1,4 +1,4 @@
-// AUDIT RPT1026 (lane L, MISC - the audit of FIELD BUGS 2026-10-26r, bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md): the
+// AUDIT RPT1026 (lane L, MISC - the audit of FIELD BUGS 2026-10-26r): the
 // batch's screen fixes read cold, in Chromium where they are layout (Playwright's Chromium over Vite's dev server, the
 // real modules mounted alone) and here where a node test can hold them.
 //   L1 - TOUCH-FIELD raised the touch layer's entry for the Bank's amount, but the entry was the layer's child: one

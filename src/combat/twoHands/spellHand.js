@@ -1,7 +1,6 @@
 // @ts-check
-// SPELL-HAND (2026-10-23, the owner: "Using the spell hand and any 1 handed weapon in tandem. Basically being able to cast
-// one handed spells and visually seeing the one handed spell sprite hand/morrowind"; "Make the best decisions"). A SPELL IN
-// THE FREE HAND, A WEAPON IN THE OTHER. Design and record: bible/05-Combat/Two-Hands.md "The spell hand".
+// SPELL-HAND. A SPELL IN
+// THE FREE HAND, A WEAPON IN THE OTHER. Design and record: "The spell hand".
 //
 // DFU is the reference and never mixes the two: a readied spell hides the weapon (WeaponManager's HasReadySpell leg) and
 // FPSSpellCasting's own header says its hands "are never mixed with weapons directly on screen at same time" - both hands
@@ -45,7 +44,7 @@ export function spellHandOf({ lead = 'R', right = null, left = null, leftBusy = 
   if (leftBusy) return null;
   const weaponHand = lead === 'L' ? 'L' : 'R', spellHand = otherHand(weaponHand);
   const weapon = weaponHand === 'R' ? right : left, free = spellHand === 'R' ? right : left;
-  if (!dualEligible(weapon)) return null;   // a one-handed weapon fights: a blade or a Pistolet (never a bow's, a staff's)
+  if (!dualEligible(weapon)) return null;   // a one-handed weapon fights: a blade (never a bow's, a staff's)
   if (free?.item) return null;   // a weapon or a shield in the free hand
   return { weaponHand, spellHand };
 }

@@ -1,4 +1,4 @@
-// SLAM9 (2026-09-16, AUDIT SLAM over SLAM1..SLAM7): THE ROOM COULD NOT INTRODUCE ITSELF.
+// SLAM9: THE ROOM COULD NOT INTRODUCE ITSELF.
 //
 // Three lenses hit this from three sides, and it was the biggest thing wrong with the branch.
 //

@@ -1,5 +1,5 @@
 // @ts-check
-// FONT3 (2026-10-02, Mac: "we need to ensure everything recieves our enhanced font"): A CANVAS DRAW LIST'S WORDS, IN
+// FONT3: A CANVAS DRAW LIST'S WORDS, IN
 // THE ENHANCED FACE.
 //
 // Some windows hand the host a list of draws in the canvas's own pixels - a picture here, a line of text there - and

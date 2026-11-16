@@ -1,5 +1,4 @@
-// PERF-ROPE (2026-10-12, an allocation profile of a player's live client walking the overworld's coast: the moving
-// teams' harnesses were some 7% of what the page allocated; bible/07-Rendering/Performance-Priority.md PERF-ROPE) - A
+// PERF-ROPE - A
 // ROPE STEPS IN PLACE: the rope it was (the old law restated here, Math.hypot and new end arrays every step), to within
 // a float's rounding, over every step a team makes - laid, stepped, a leap, a still frame; its ends kept in its own
 // arrays.

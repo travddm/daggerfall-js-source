@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// VERGE1 (2026-10-07, Mac: "Making sure objects, like trees, avoid
-// pathways and roads. Currently they slightly overlap") - THE VERGE: a
+// VERGE1 - THE VERGE: a
 // wilderness flat keeps its whole footprint off the roads and tracks.
 //
 // Every placer of the wild's flats asked ONE TILE - the one its root
@@ -75,7 +74,7 @@ export function natureReach(halfWidth, baseArchive, record, px, py, x, z) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// LPT-FIT (2026-10-07, Mac: "roads still show on roads and pathways. You're not taking the entire model into account")
+// LPT-FIT
 // - THE WHOLE TREE FITS ITS ROOM. VERGE1 refuses a WILD flat whose reach touches the road band, and that was all it
 // asked: a location's own trees (a town's, a farm's, a tavern's RMB blocks - and road pixels are full of them) stand
 // where DFU's block designer set a two-metre picture beside a street, and Low Poly Trees stands a 5-15 m crown on each.

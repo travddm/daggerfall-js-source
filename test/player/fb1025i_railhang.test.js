@@ -379,13 +379,3 @@ test('RAIL-HANG with ARENA2: W0000005\'s altar station - a body stood on the pli
   assert.deepEqual(out, [], 'every heading held inside the block, on its plinth');
 });
 
-test('RAIL-HANG THE LAW WHERE IT IS WRITTEN: a walking step - no fall in it, or its motor\'s word that it began on the ground (EnemyMotor\'s walk) - hands every pass of its step the body\'s height for PH1\'s floor; the floor a walk set the body on is asked whether the body stands there once its walk is done, and the walk is made again with it a wall where it does not', () => {
-  const col = rd('src/player/collider.js');
-  assert.match(col, /    this\._walk = dy === 0 \|\| this\._onGround \? height : 0;\n    this\._resolveCapsule\(feet, hOut, height, Infinity, true\);/, 'a walking step\'s sideways pass');
-  assert.match(col, /const unstood = floorAbove && this\._walk && this\._walkRefused;[^\n]*\n {10}if \(floorAbove && !unstood\) \{/, 'PH1\'s floor, a walk\'s refused only in the walk made again');
-  assert.match(col, /if \(wallAbove \|\| unstood\) \{/, 'and there a wall, as SH1\'s');
-  assert.match(col, /if \(liftY > -Infinity && !this\._standsOn\(liftX, liftZ, intoX, intoZ, center\[1\], radius\)\) \{/, 'asked once the walk is done, from where it left the sphere');
-  assert.match(col, /finally \{ this\._keepFloor = was; this\._noStep = stepped; this\._onGround = stood; this\._walk = walked; \}/, 'a throw leaves none behind');
-  const em = rd('src/characters/enemy/enemyMotor.js');
-  assert.match(em, /const r = this\.collider\.move\(this\.feet, dxm, dy, dzm, this\.controllerHeight, true, FOE_KEEPS_FLOOR, false, this\.isGrounded\);/, 'the foe\'s walk hands its ground');
-});

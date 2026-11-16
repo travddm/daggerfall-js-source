@@ -1,4 +1,4 @@
-// CI-FAST (2026-10-19, Mac: "Do both and whatever else could speed up everything"): THE FAILURES, NAMED WHERE THEY ARE
+// CI-FAST: THE FAILURES, NAMED WHERE THEY ARE
 // LOOKED FOR. A red shard's log was TAP from first to last: its tail said "# fail 2" and nothing else, and the failing
 // test stood somewhere in tens of thousands of lines - found only by running the shard again locally, ten minutes a
 // round. This is a second reporter beside the runner's own (tools/testShards.mjs runTests hands both to every runner):
@@ -9,10 +9,11 @@
 //   - on GitHub Actions, one `::error` annotation a failure (each on the check's own page, at its file and line), and
 //     the same list in the job's summary ($GITHUB_STEP_SUMMARY).
 // A run with no failure writes nothing. It changes no test and no verdict: the runner's exit status is its own.
-// CI-TIMES (2026-10-19): and where TEST_TIMES_RECORD names a file, it adds each file's wall time in this run to it
+// CI-TIMES: and where TEST_TIMES_RECORD names a file, it adds each file's wall time in this run to it
 // (tools/fileTimes.mjs) - a CI shard's record, the next run's balance.
 import { appendFileSync } from 'node:fs';
 import { relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { fileTimeOf, addTimes } from './fileTimes.mjs';
 
 // CI-TIMES: the record's path, taken out of the environment as the reporter loads - before the runner starts any file's
@@ -30,10 +31,20 @@ export function whyOf(error) {
   return m.length > 300 ? `${m.slice(0, 299)}…` : m;
 }
 
+/** A file URL's path. On Windows the URL's pathname is /E:/..., which relative() cannot place, so fileURLToPath
+ *  reads it; a URL without a drive (a test's file:///r/...) keeps its pathname. */
+function pathOfFileUrl(url) {
+  try {
+    return fileURLToPath(url);
+  } catch {
+    return decodeURIComponent(new URL(url).pathname);
+  }
+}
+
 /** A path as the repository holds it - relative to `cwd` where it lies under it, a file URL read as its path. */
 export function repoPath(file, cwd = process.cwd()) {
   if (!file) return '';
-  const p = String(file).startsWith('file://') ? decodeURIComponent(new URL(String(file)).pathname) : String(file);
+  const p = String(file).startsWith('file://') ? pathOfFileUrl(String(file)) : String(file);
   const r = relative(cwd, p).split('\\').join('/');
   return r && !r.startsWith('..') ? r : p;
 }

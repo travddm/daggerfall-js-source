@@ -1,5 +1,4 @@
-// ENEMY-PACE: the slowest pace the clock runs at with enemies holding a journey. RATE-LAW (2026-10-04, Mac: "Remove
-// travel options dials"): the pace is FIXED now - the panel's near-enemies stepper is gone - and the law has one home,
+// ENEMY-PACE: the slowest pace the clock runs at with enemies holding a journey. RATE-LAW: the pace is FIXED now - the panel's near-enemies stepper is gone - and the law has one home,
 // systems/travel/travelThreat.js `foePaced`, which both of the host's governed paths call.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,7 +11,6 @@ const panel = readFileSync(new URL('../../../src/ui/enhanced/enhancedTravelContr
 const css = readFileSync(new URL('../../../src/ui/enhanced/enhancedStyle.js', import.meta.url), 'utf8');
 
 test('ENEMY-PACE x RATE-LAW: the enemies\' cap is floored at the fixed pace on both governed paths, and no stepper is wired (mutants: a path left on the raw cap, the floor moved)', () => {
-  // PIN MOVED (TIME-DILATION): through foeRate - the floor itself outside a hostile ship's hold (travelThreat.js), x1 inside it
   assert.match(world, /foeRate\(foes, travelAsked\)/, 'the classic skin\'s journey on the ground');
   assert.match(world, /foeRate\(foes, want\)/, 'under the view');
   assert.doesNotMatch(world, /foeFaster|foeSlower|tvFoeRate|foeLadder/, 'the stepper and its rate are gone');

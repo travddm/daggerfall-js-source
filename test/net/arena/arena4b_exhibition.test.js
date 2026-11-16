@@ -1,5 +1,4 @@
-// ARENA4b (2026-10-03, bible/11-Multiplayer/Arena.md 2: "Exhibition - online: yes - the relay runs it, every client sees
-// one bout"; the ARENA2 record: "ARENA4's relay runs the schedule on the shared clock"): THE HOUR'S EXHIBITION ON THE
+// ARENA4b: THE HOUR'S EXHIBITION ON THE
 // RELAY, over fake sockets and fake objects (test/fakeRoom.mjs) - the law moved into the relay's graph (one copy, the
 // game's draw unchanged), the Worker's door for `arena:x<hour>`, its first watcher opening it inside its window on the
 // shared clock, one bout for every watcher, the relay's two fighters to a verdict in the `st`, the verdict kept a game

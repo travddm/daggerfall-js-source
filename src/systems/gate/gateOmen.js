@@ -1,6 +1,6 @@
 // @ts-check
-// WB1 (2026-09-25): THE OMEN - what the clock's gate says to one player: the chat's lines, the map's ring, the
-// compass's mark. Design: bible/11-Multiplayer/World-Bosses.md sections 1-2.
+// WB1: THE OMEN - what the clock's gate says to one player: the chat's lines, the map's ring, the
+// compass's mark. Design:
 //
 // ONE CALL A FRAME from the online frame (scenes/world.js `gateFrame`, beside the chat's and the duel's - before the
 // dead return, so the omen still speaks to a player on the death screen), and reads for the maps and the HUD.
@@ -17,13 +17,13 @@
 // silent rather than naming nowhere.
 //
 // Not a DFU member. Ledger A (WB).
-import { gateAt, gatePhase, gateCountdown, countdownText, countdownWords, gateMarked, gateStands, gateBossOf, gateModsOf, riseLine, wrathLine, marksLine, gatePortentsOf, portentsLine, GATE_OPEN_MINUTE, GATE_SEAL_MINUTE, GATE_WRATH_MINUTE, GATE_DAY_MINUTES, GATE_COLLAPSE_MS, PIXEL_M } from '../../net/gate/gateLaw.js';
+import { gateAt, gateBaseMinute, gatePhase, gateCountdown, countdownText, countdownWords, gateMarked, gateStands, gateBossOf, gateModsOf, riseLine, wrathLine, marksLine, gatePortentsOf, portentsLine, GATE_OPEN_MINUTE, GATE_SEAL_MINUTE, GATE_WRATH_MINUTE, GATE_COLLAPSE_MS, PIXEL_M } from '../../net/gate/gateLaw.js';
 import { gateModsWords, gatePortentsWords } from '../../net/gate/gateMods.js';   // WB8c: tonight's marks on the card
 import { GATE_TOWN_MAX_PX } from './gateSite.js';
 import { t } from '../textManager.js';   // GATE-COURTS: a court's kill in the player's language (L10N4)
 import { RITE_OMEN_LINE, cageStands } from '../../net/gate/gateRite.js';   // BROKER-CAGE: the Broker's cage, omen to midnight
 
-// TIME1 (bible/06-Systems/Online-Time-Arc.md section 7): THE GATE SAYS REAL TIMES ALONE. Its schedule is the EVENT
+// TIME1: THE GATE SAYS REAL TIMES ALONE. Its schedule is the EVENT
 // clock's (net/gate/gateLaw.js, unchanged: a gate every two real hours, its phases the same real minutes), and the sky the
 // player sees turns at its own rate, so the event clock's game time ("opens there at 20:00") would contradict the
 // clock in front of them. The three lines that named a time say this machine's local time alone, in WB12's words
@@ -43,11 +43,11 @@ export const insideGateRing = (mark, px, py, slack = 1) => !!mark && Math.hypot(
  *  south-west corner) plus the spot, [east, north] metres - spawned dungeons' own sum (scenes/world.js, the sight line). */
 export const gateSceneXZ = (standing, t) => [t[0] + standing.spot[0], t[2] + standing.spot[1]];
 /** WB12d: the faithful's rite, said right after the omen's line while it holds (scenes/riteHost.js stands its circle) -
- *  AUDIT WB12d (D3): the Discord post's own sentences (net/gate/gateRite.js RITE_OMEN_LINE). */
+ *  net/gate/gateRite.js RITE_OMEN_LINE. */
 export const riteOmenLine = () => RITE_OMEN_LINE;
 
 // ═══ WBX8: THE SKY BURNS ═════════════════════════════════════════════════════════════════════════════════════════
-// Mac (2026-09-26): "Improve the sky effect to be more like the /event dread command" - "When I say sky effect, I mean
+// "When I say sky effect, I mean
 // daggerfall, not the inside". The omen has always SAID it - "The sky burns over the wilds near ..." - and the sky over
 // the site never did: the gate's only mark on it was its beacon. Now the sky over a gate wears the live event's dread
 // (world/dreadSky.js: the crimson grade on the sky, its fog and the light the land stands in, the storm's deck) with
@@ -117,7 +117,7 @@ export const courtFellLine = ({ near, boss, top, c = 0 }) => {
 };
 
 /**
- * EVENT-TIP (2026-09-28, Mac: "I also want to add a tooltip to the map for these type of events"): THE GATE'S CARD on
+ * EVENT-TIP: THE GATE'S CARD on
  * the held map (ui/eventMapMarks.js) - what it is, where, when it next moves (opens, seals, collapses: the countdown's
  * own words), and who holds it, or that he fell. WB8c: and while he stands, the marks he comes under tonight (net/gate/gateLaw.js
  * gateModsOf - "The Rime-Wrought - Colossal, Echoing"). Pure.
@@ -127,21 +127,25 @@ export const courtFellLine = ({ near, boss, top, c = 0 }) => {
  */
 export function gateTip(c, cd, fell = null, boss = gateBossOf(c.t.day)) {
   const when = cd
-    ? (cd.to === 'open' ? `Opens in ${countdownText(cd.ms)}` : cd.to === 'seal' ? `Open. Seals in ${countdownText(cd.ms)}` : `Sealed. Collapses in ${countdownText(cd.ms)}`)
-    : (c.phase === 'collapsing' ? 'Collapsing' : null);
+    ? (cd.to === 'open' ? t('gate.tip.opens', 'Opens in {left}', { left: countdownText(cd.ms) }) : cd.to === 'seal' ? t('gate.tip.seals', 'Open. Seals in {left}', { left: countdownText(cd.ms) }) : t('gate.tip.collapses', 'Sealed. Collapses in {left}', { left: countdownText(cd.ms) }))
+    : (c.phase === 'collapsing' ? t('gate.tip.collapsing', 'Collapsing') : null);
   const pt = gatePortentsWords(gatePortentsOf(c.t.day));   // WB14b: the night's portents, named
-  return { title: 'Dagon\'s Breach', lines: [`Near ${c.site.place}`, ...(when ? [when] : []), ...(Number.isFinite(fell) ? [`${boss.name} has fallen`] : [`${boss.name}, ${boss.title}`, marksLineOf(c.t.day), ...(pt ? [pt] : [])])] };
+  return { title: t('gate.tip.title', "Dagon's Breach"), lines: [t('gate.tip.near', 'Near {place}', { place: c.site.place }), ...(when ? [when] : []), ...(Number.isFinite(fell) ? [t('gate.tip.fallen', '{boss} has fallen', { boss: boss.name })] : [t('gate.tip.boss', '{name}, {title}', { name: boss.name, title: boss.title }), marksLineOf(c.t.day), ...(pt ? [pt] : [])])] };
 }
 /** AUDIT PRE-MERGE 0929 W2-2: a day's marks as the card says them, worded once a day - the card is asked every frame a
- *  gate stands on the map, and the marks were read and joined anew each time. */
-let _marksDay = null, _marksLine = '';
+ *  gate stands on the map, and the marks were read and joined anew each time. WW2: once a gate - every lane's card is
+ *  asked each frame, so the gates standing at once keep a line each (the oldest let go past MARKS_LINES_KEPT). */
+const MARKS_LINES_KEPT = 32;
+const _marksLines = new Map();
 function marksLineOf(day) {
-  if (day !== _marksDay) {
+  let line = _marksLines.get(day);
+  if (line === undefined) {
     const marks = gateModsWords(gateModsOf(day));
-    _marksLine = `${marks.charAt(0).toUpperCase()}${marks.slice(1)}`;
-    _marksDay = day;
+    line = `${marks.charAt(0).toUpperCase()}${marks.slice(1)}`;
+    if (_marksLines.size >= MARKS_LINES_KEPT) _marksLines.delete(_marksLines.keys().next().value);
+    _marksLines.set(day, line);
   }
-  return _marksLine;
+  return line;
 }
 
 /** The phases that say a line on arrival, and the line each says. */
@@ -160,10 +164,12 @@ export const OMEN_SETTLE_MS = 1500;
  * knows the relay's clock and has heard the hub (until then nothing is said and no gate stands - the machine's own
  * clock is not the world's), and `settleMs` how long past that the omen still holds (OMEN_SETTLE_MS in the game).
  * AUDIT WB12d (C8, L5): `riteBroken(day, site)` whether the hub said that breach's rite broken, and `riteReady()` whether
- * the relay keeps the rite at all - the rite's order is not said otherwise.
- * @param {{now: () => number, site: (day: number) => any, say: (text: string) => void, localTime?: (classicMinutes: number) => (string|null), fellAt?: (day: number) => (number|null), ready?: () => boolean, settleMs?: number, riteBroken?: (day: number, site: any) => boolean, riteReady?: () => boolean}} deps
+ * the relay keeps the rite at all - the rite's order is not said otherwise. WW2: `lane` the theatre's lane whose gates it
+ * speaks of (net/gate/gateLaw.js gateAt's - the Bay's, 0, by default); every `day` it hands and is handed is that lane's
+ * gate's NUMBER (gateNumber - the game day on the Bay's).
+ * @param {{now: () => number, site: (day: number) => any, say: (text: string, day?: number) => void, localTime?: (classicMinutes: number) => (string|null), fellAt?: (day: number) => (number|null), ready?: () => boolean, settleMs?: number, riteBroken?: (day: number, site: any) => boolean, riteReady?: () => boolean, lane?: number}} deps
  */
-export function createGateOmen({ now, site, say, localTime = () => null, fellAt = () => null, ready = () => true, settleMs = 0, riteBroken = () => false, riteReady = () => true }) {
+export function createGateOmen({ now, site, say, localTime = () => null, fellAt = () => null, ready = () => true, settleMs = 0, riteBroken = () => false, riteReady = () => true, lane = 0 }) {
   let saidDay = null, saidRank = -1;   // the day the last line was said for, and how far through its lines
   let marksDay = null;   // WB8c: the day whose marks were said (once, beside the first of its omen, rise or open)
   let riteDay = null;   // WB12d: the day whose rite was said (once, beside its omen or its rise)
@@ -174,7 +180,7 @@ export function createGateOmen({ now, site, say, localTime = () => null, fellAt 
     if (cache.day !== day) cache = { day, site: site(day) ?? null };
     return cache.site;
   };
-  const at = (day, minute) => localTime(day * GATE_DAY_MINUTES + minute) ?? '?';
+  const at = (day, minute) => localTime(gateBaseMinute(day) + minute) ?? '?';   // WW2: the gate's own day's minute, its lane's stagger in it
   let current = null;
 
   return {
@@ -188,7 +194,8 @@ export function createGateOmen({ now, site, say, localTime = () => null, fellAt 
         if (now() - readyAt < settleMs) { current = null; return null; }
         settled = true;
       }
-      const t = gateAt(now());
+      const t = gateAt(now(), lane);
+      const sayOf = (/** @type {string} */ text) => say(text, t.day);   // WW2: each line with its gate's number - a lane past the Bay's card is its own
       const fell = fellAt(t.day);
       const phase = gatePhase(t, now(), fell);
       if (phase === 'quiet' || phase === 'gone') { current = { t, phase, site: null }; return current; }
@@ -204,22 +211,22 @@ export function createGateOmen({ now, site, say, localTime = () => null, fellAt 
       if (line && (t.day !== saidDay || rank > saidRank) && !(line === 'wrath' && Number.isFinite(fell))) {
         saidDay = t.day; saidRank = rank;
         const words = { place: s.place, near: s.near, boss: gateBossOf(t.day).name };
-        if (line === 'omen') say(omenTimeLine({ ...words, at: at(t.day, GATE_OPEN_MINUTE) }));   // TIME1: local time alone
-        else if (line === 'rise') say(riseLine({ ...words, left: countdownText(t.openAt - now()) }));
-        else if (line === 'open') say(openTimeLine({ ...words, at: at(t.day, GATE_SEAL_MINUTE) }));
+        if (line === 'omen') sayOf(omenTimeLine({ ...words, at: at(t.day, GATE_OPEN_MINUTE) }));   // TIME1: local time alone
+        else if (line === 'rise') sayOf(riseLine({ ...words, left: countdownText(t.openAt - now()) }));
+        else if (line === 'open') sayOf(openTimeLine({ ...words, at: at(t.day, GATE_SEAL_MINUTE) }));
         // WB12d: the faithful's rite, while it holds - right after the omen's or the rise's line (AUDIT WB12d D3: its
         // "nearby" is the breach just named), once a day; AUDIT WB12d (C8, L5): never once the hub says it broken, nor
         // where the relay cannot keep it
-        if ((line === 'omen' || line === 'rise') && riteDay !== t.day) { riteDay = t.day; if (riteReady() && !riteBroken(t.day, s)) say(riteOmenLine()); }
+        if ((line === 'omen' || line === 'rise') && riteDay !== t.day) { riteDay = t.day; if (riteReady() && !riteBroken(t.day, s)) sayOf(riteOmenLine()); }
         // WB8c: tonight's marks, beside the first line of a gate still to be fought (never after it has sealed)
         if ((line === 'omen' || line === 'rise' || line === 'open') && marksDay !== t.day) {
           marksDay = t.day;
-          say(marksLine({ boss: words.boss, md: gateModsOf(t.day) }));
+          sayOf(marksLine({ boss: words.boss, md: gateModsOf(t.day) }));
           const pt = portentsLine(gatePortentsOf(t.day));   // WB14b: and the night's portents, after them - announced, always
-          if (pt) say(pt);
+          if (pt) sayOf(pt);
         }
-        else if (line === 'seal') say(sealTimeLine({ ...words, at: at(t.day, GATE_WRATH_MINUTE) }));   // GATE-COLLAPSE: and when it goes
-        else if (line === 'wrath') say(wrathLine(words));
+        else if (line === 'seal') sayOf(sealTimeLine({ ...words, at: at(t.day, GATE_WRATH_MINUTE) }));   // GATE-COLLAPSE: and when it goes
+        else if (line === 'wrath') sayOf(wrathLine(words));
       }
       return current;
     },

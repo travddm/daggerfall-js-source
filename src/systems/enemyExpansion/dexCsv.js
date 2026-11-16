@@ -1,4 +1,4 @@
-// DEX1 (2026-10-19, Mac: "I want to implement this as our next mod 1:1") - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
+// DEX1 - DAGGERFALL ENEMY EXPANSION 1.3.4 (Kamer &
 // Kab), THE TABLES' OWN READING. The mod keeps its whole bestiary in five CSV files (the `.mdb.csv`, `.cdb.csv` and
 // `.tdb.csv` its manifest names, vendor/daggerfall-enemy-expansion/) and reads them with three helpers of its own,
 // BestiaryMod.SplitCsvLine (BestiaryMod.cs:593-608), ParseArrayArg (:610-628) and ParseBool (:650-661). They are

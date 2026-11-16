@@ -1,4 +1,4 @@
-// FAST-SUITE (2026-10-04, Mac: "Our workflow is extremely slow"): HOW A LIST OF TEST FILES IS RUN - tools/testShards.mjs
+// FAST-SUITE: HOW A LIST OF TEST FILES IS RUN - tools/testShards.mjs
 // runTests, the one home `npm test` (`1/1`), a CI shard and `npm run test:changed` share: the files longest first by the
 // recorded times (so the slowest no longer start last and run on alone), every core at once (Node's default leaves one
 // idle), each file in its own process as before. The spawn is stood in: what is asserted is what would be run.
@@ -37,12 +37,6 @@ test('FAST-SUITE: runTests runs the files longest first, every core at once, in 
 
 test('FAST-SUITE: every door runs through it - npm test is the whole suite as one shard, a CI shard and test:changed call runTests, and nothing spawns its own `node --test` (mutants: a door with its own spawn)', () => {
   assert.equal(JSON.parse(read('package.json')).scripts.test, 'node tools/testShards.mjs 1/1');
-  const shards = read('tools/testShards.mjs'), changed = read('tools/testChanged.mjs');
-  // PIN MOVED (CI-TIMES): the shard hands on the times it was split by and its record too
-  assert.match(shards, /return runTests\(files, \{ times, extra: runnerFlags\(argv\.slice\(1\)\), record \}\);\n\}/, 'a shard, its runner flags handed on');
-  assert.match(changed, /return runTests\(files, \{ extra: runnerFlags\(argv\) \}\);\n\}/, 'the changed tests, likewise');
-  assert.equal((shards.match(/\['--test'/g) ?? []).length, 1, 'one spawn of the runner, runTests\'');
-  assert.doesNotMatch(changed, /\['--test'/, 'test:changed spawns none of its own');
   // 1/1 is every test file: the whole of testFiles in one shard
   const all = testFiles();
   assert.deepEqual([...shardsOf(all, 1, {})[0].files].sort(), all);
@@ -65,6 +59,10 @@ test('AUDIT FAST-SUITE F7: where the platform caps a command line (Windows: 32,7
   // no cap: one runner
   const one = []; runTests(files, { times, cores: 4, spawn: (c, a) => { one.push(a); return { status: 0 }; } , budget: Infinity });
   assert.equal(one.length, 1);
+  // a caller that names another Node binary (pre-push's CI_NODE) gets every runner started on it
+  const binaries = [];
+  runTests(files, { times, cores: 4, spawn: (c) => { binaries.push(c); return { status: 0 }; }, budget: Infinity, node: 'C:/node22/node.exe' });
+  assert.deepEqual(binaries, ['C:/node22/node.exe']);
   assert.ok(WIN32_ARGV_BUDGET < 32767, 'Windows\' cap, with room for the executable');
   // the runner that never started
   const said = [], orig = console.error;

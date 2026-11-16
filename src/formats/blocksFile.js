@@ -16,7 +16,7 @@
 
 import { BsaFile, DIRECTORY_TYPES } from './bsaFile.js';
 import { worldDataDoor } from './worldData/worldDataDoor.js';   // RR3b: WorldDataReplacement's four asks (BlocksFile.cs:214, :273, :385, :850)
-import { dryPuddles } from '../world/puddleDry.js';   // PUDDLE-DRY: a town's puddles are dry ground, served so to every reader
+import { dryPuddles } from '../world/puddleDry.js';   // a town's puddles are dry ground, served so to every reader
 
 export const BLOCK_TYPES = Object.freeze({
   Unknown: 0,
@@ -100,7 +100,7 @@ function defaultResources() {
 /** Size of one BuildingData record (DFLocation.BuildingData). */
 export const BUILDING_DATA_SIZE = 26;
 
-/** One BuildingData record at `pos`. AUDIT 68 S10-rmb-record-readers-dup:
+/** One BuildingData record at `pos`. 
  *  the RMB FLD header, the MAPS exterior and SAVETREE's building records
  *  all store this shape - one reader for the three. */
 export function readBuildingData(view, pos) {
@@ -119,7 +119,7 @@ export function readBuildingData(view, pos) {
   };
 }
 
-/** PUDDLE-DRY (world/puddleDry.js): the block as the port serves it - an RMB's puddles dried, once; readClassicBlock
+/** The block as the port serves it - an RMB's puddles dried, once; readClassicBlock
  *  keeps BLOCKS.BSA's bytes. */
 const dryBlock = (dfBlock) => { dryPuddles(dfBlock?.rmbBlock?.fldHeader?.groundData?.groundTiles); return dfBlock; };
 
@@ -199,7 +199,7 @@ export class BlocksFile {
   /** Load a block into memory and decompose it for use. */
   loadBlock(block) {
     if (block < 0 || block >= this.count) return false;
-    if (this._blocks[block] !== null && this._blocks[block].bytes !== null) return true;   // AUDIT-RR F38: a replacement stored in the slot (GetBlock) has no MemoryFile - LoadBlock reads the record again (BlocksFile.cs:303)
+    if (this._blocks[block] !== null && this._blocks[block].bytes !== null) return true;   // a replacement stored in the slot (GetBlock) has no MemoryFile - LoadBlock reads the record again (BlocksFile.cs:303)
 
     if (this.autoDiscard && this._lastBlock !== -1) this.discardBlock(this._lastBlock);
 
@@ -232,7 +232,7 @@ export class BlocksFile {
   }
 
   /**
-   * WD1: the block as BLOCKS.BSA holds it - read fresh, past the
+   * the block as BLOCKS.BSA holds it - read fresh, past the
    * world-data door (no building replacement laid on, no block served
    * from JSON) and without touching the block cache. What a mod's
    * world-data diff is taken against (formats/worldData/worldDataJson.js).
@@ -492,7 +492,7 @@ export class BlocksFile {
     const recordCount = h.numBlockDataRecords;
     const subRecords = new Array(recordCount);
     let position = r.pos;
-    const door = rec.classic ? null : worldDataDoor();   // WD1: readClassicBlock reads past the door
+    const door = rec.classic ? null : worldDataDoor();   // readClassicBlock reads past the door
     for (let i = 0; i < recordCount; i++) {
       // Check for replacement building data and use it, if found (BlocksFile.cs:848-861 - RR3b: the world-data door)
       const replacement = door?.getBuildingReplacementData(rec.name, rec.dfBlock.index, i);
@@ -554,7 +554,7 @@ export class BlocksFile {
       r.pos += 16;
     }
 
-    // AUDIT 68 S10-rmb-record-readers-dup: a people record is the flat
+    // A people record is the flat
     // record's 17 bytes (DFU's two structs differ only in name).
     const blockPeopleRecords = this._readRmbFlatObjectRecords(r, rec, header.numPeopleRecords);
 

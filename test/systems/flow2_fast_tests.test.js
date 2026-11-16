@@ -1,4 +1,4 @@
-// FLOW2 (2026-09-26, Mac: "is there a way to really ensure we have a faster workflow with the same standards?"): THE
+// FLOW2: THE
 // TWO SLOWEST TESTS, FAST - BY MAKING THE GAME'S OWN CODE FAST, THE SAME ANSWERS. ROADS-CLEAR's whole-world sweep spent
 // 130 s inside world/worldOfDaggerfall/wodLocationLoader.js pickLocations - the mod's AddLocation loop, verbatim, scanning all 227,938
 // instances for each of 146,446 pixels (a tile load in the game paid the same 228k-entry pass); WEATHER3a's calibration
@@ -105,7 +105,7 @@ const WIND_GOLDEN = [
   [265063.7811748311, 270196.0719306953, 773306.6319487989, 776035.2069104556, [0.3592610381619238, 0.20905598178361867], [1053.1657527219982, -379.77157241788404]],
 ];
 // [climate, x, z, minutes, word, intensity, system id, system x, system z, its shape's second term]
-// RAIN-HOURS (2026-10-13): taken again under the law as it stands. The calibration moved every birth (the ceilings and
+// RAIN-HOURS: taken again under the law as it stands. The calibration moved every birth (the ceilings and
 // the weights are the table's, as worn), so the first set's places read other skies; RAIN-HEART's strength is in a rain
 // front's intensity. Before the calibration moved, the strength alone left every system, place, shape and cell of the
 // first set the same bits and scaled each rain intensity by exactly its front's strength.

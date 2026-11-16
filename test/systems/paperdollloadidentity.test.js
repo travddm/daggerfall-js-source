@@ -1,5 +1,4 @@
-// THE ART FOLLOWS THE ENTITY (Mac, 2026-09-16: "Characters face and
-// gender completely changed after a few hours of playtime").
+// THE ART FOLLOWS THE ENTITY.
 //
 // The doll's art set - BODY, FACE, SCBG - is decoded ONCE per identity
 // and kept in ui/paperDoll.js's module state. Every host warms it at

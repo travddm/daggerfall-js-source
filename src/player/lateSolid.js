@@ -34,8 +34,7 @@
 // moves. Another player in the home walks on their own client, where their
 // own gate holds the same piece back from them.
 //
-// ROCK-CLEAR (FIELD BUGS 2026-10-19f; the owner, 2026-10-19: "Apply to rocks
-// too"): and the open world's. A pixel's statics - World of Daggerfall's
+// ROCK-CLEAR (FIELD BUGS 2026-10-19f): and the open world's. A pixel's statics - World of Daggerfall's
 // rocks, mountains scaled by hundreds that reach past their own pixel, the
 // town's models, its mills, the Hold's camp - go into ONE bucket a pixel,
 // part by part as its build runs, each riding the floating origin (a
@@ -185,6 +184,16 @@ function makeGate(collider) {
     },
     /** @param {string} key */
     forget(key) { held.delete(key); },
+    /** IC-SWAP-BEHIND (scenes/swapBehind.js): a held bucket woken under its pixel's own key - its withheld parts (and its
+     *  keys' - `from:...`, a gate's) stand there when they stand. @param {string} from @param {string} to */
+    rename(from, to) {
+      for (const [k, parts] of [...held]) {
+        const as = k === from ? to : k.startsWith(`${from}:`) ? `${to}${k.slice(from.length)}` : null;   // its own key and its keys' (a gate's)
+        if (as === null) continue;
+        held.delete(k);
+        held.set(as, [...(held.get(as) ?? []), ...parts]);
+      }
+    },
     /** @param {LateBody} body */
     settle(body) {
       if (typeof body === 'function' || body?.pos) guarded = body;

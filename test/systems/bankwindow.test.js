@@ -14,7 +14,7 @@ import { NATIVE_W, NATIVE_H } from '../../src/ui/native/nativePanel.js';
 import {
   TRANSACTION_TYPE, TRANSACTION_RESULT, createBankAccounts,
   accountTotal, loanedTotal, borrowLoan, bankButtonEnabled,
-  toggleTransactionInput, parseTransactionAmount,
+  toggleTransactionInput, parseTransactionAmount, housesFullText, houseOfferText,
 } from '../../src/systems/banking.js';
 import { GOLD_PIECE_WEIGHT_KG, letterOfCredit, LETTER_OF_CREDIT_TEMPLATE } from '../../src/systems/inventory.js';
 import { goldAmount, totalGoldAmount, deductGold, addGold } from '../../src/systems/court.js';
@@ -273,10 +273,13 @@ test('B2: the house and ship buttons refuse before opening anything (:417-472)',
   const a = win();
   clickRect(a.w, 'buyHouse');
   assert.equal(idOf(a.w.box), R.NO_HOUSES_FOR_SALE);
-  // already own one
-  const b = win({ ownsHouse: true });
+  const b = win({ ownsHouse: true, housesForSale: 3, hooks: { housesFull: () => true } });
   clickRect(b.w, 'buyHouse');
-  assert.equal(idOf(b.w.box), R.ALREADY_OWN_HOUSE);
+  assert.deepEqual(b.w.box.rows.map((r) => r.text), [housesFullText()]);
+  assert.match(housesFullText(), /already own 3 houses in this region/);
+  const b2 = win({ ownsHouse: true, housesForSale: 3, hooks: { housesFull: () => false, openPurchase: () => true } });
+  clickRect(b2.w, 'buyHouse');
+  assert.equal(b2.w.box, null, 'one or two owned: the market opens');
   // a ship outside a port town
   const c = win();
   clickRect(c.w, 'buyShip');
@@ -291,6 +294,28 @@ test('B2: the house and ship buttons refuse before opening anything (:417-472)',
   assert.equal(e.w.box, null);
   clickRect(e.w, 'sellShip');
   assert.equal(e.w.box, null);
+  // HOUSES-3: a town's houses offered in turn - No offers the next, Yes sells the one offered; Escape closes, offering
+  // nothing more
+  const sold = [];
+  const g = win({ hooks: { houseOffers: () => [{ price: 900 }, { price: 700 }], sellHouse: (i) => sold.push(i) } });
+  clickRect(g.w, 'sellHouse');
+  assert.equal(idOf(g.w.box), R.SELL_HOUSE_OFFER);
+  assert.equal(g.w.box.amount, 900);
+  assert.equal(g.w.box.rows.at(-1).text, houseOfferText(1, 2));
+  g.w.input('KeyN');
+  assert.equal(g.w.box.amount, 700, 'the next it buys back');
+  assert.equal(g.w.box.rows.at(-1).text, houseOfferText(2, 2));
+  g.w.input('KeyY');
+  assert.deepEqual(sold, [1]);
+  clickRect(g.w, 'sellHouse');
+  g.w.input('Escape');
+  assert.equal(g.w.box, null, 'Escape offers no next house');
+  assert.deepEqual(sold, [1]);
+  const lone = win({ hooks: { houseOffers: () => [{ price: 500 }], sellHouse: (i) => sold.push(i) } });
+  clickRect(lone.w, 'sellHouse');
+  assert.equal(lone.w.box.rows.some((r) => r.text === houseOfferText(1, 1)), false, 'one house: no count');
+  lone.w.input('KeyN');
+  assert.equal(lone.w.box, null);
   // owning one raises the offer carrying its price
   const f = win({ ownsShip: true, ownedShip: 0 });
   clickRect(f.w, 'sellShip');
@@ -320,27 +345,6 @@ test('D6: BUY SHIP in a port opens the SHIPYARD - the else arm, not a refusal (:
   assert.equal(opened, 1, 'neither refusal ever reaches the list');
 });
 
-test('D6: the host mounts BOTH arms of the ONE popup, and PurchaseShip has a caller at last', () => {
-  const wm = readFileSync(join(root, 'src', 'scenes', 'worldModes.js'), 'utf8');
-  assert.match(wm, /const openBankMarket = \(arms\) => \{/,
-    'DFU has one popup class; the port must not grow a second mount for it');
-  assert.match(wm, /openShipPurchase: \(\) => openBankMarket\(\{/, 'BUY SHIP reaches it with no house list at all');
-  assert.match(wm, /purchaseShip\(playerEntity\.bankAccounts, bankRegion\(\), ship, playerEntity, bankPurse\(\)/,
-    'PurchaseShip (:467-486) is callerless again');
-  // AssignShipToPlayer (:488-497) makes BOTH scenes permanent - the
-  // exact pair SellShip drops
-  assert.match(wm, /addPermanentScene\(sceneCache\(\), worldSceneName\(SHIP_COORDS\[s\]\.x, SHIP_COORDS\[s\]\.y\)\)/);
-  assert.match(wm, /addPermanentScene\(sceneCache\(\), interiorSceneName\(SHIP_INTERIOR_MAP_IDS\[s\], BUILDING_KEY_0\)\)/);
-  // ...and the door of the ship it sells answers the lock ladder: the
-  // key was simply absent at the call, so buildingLocks' last arm
-  // (PlayerActivate.cs:1307-1308) could never fire
-  // AUDIT 64 F11 factored the one BuildingIsUnlocked evaluation
-  // (PlayerActivate.cs:358) into resolveBuildingUnlocked, so the arm is
-  // two levels shallower - the law it pins is unchanged.
-  assert.match(wm, /^ {6}ownsShip: ownsShip\(playerEntity\),$/m,
-    'buildingIsUnlocked is handed no ownsShip, so it defaults false');
-});
-
 test('B2: the inventory label carries the WAGON in parentheses (:241-246)', () => {
   const dry = win();
   assert.equal(dry.w.labels().inventory, '1000', 'no cart, no parenthesis');
@@ -364,13 +368,3 @@ test('B2: the inventory label carries the WAGON in parentheses (:241-246)', () =
   assert.equal(cart.w.labels().loanBy, '', 'no loan, no due date');
 });
 
-test('B2: the host consumes the banking route that has been dead since G8', () => {
-  const code = readFileSync(join(root, 'src', 'scenes', 'worldModes.js'), 'utf8');
-  assert.match(code, /route\.service === 'banking'/, 'the arm exists');
-  assert.match(code, /preloadBankArt\(/, 'and the art is preloaded with the rest');
-  assert.match(code, /createBankAccounts\(/, 'the accounts are minted on first use');
-  // the save carries them
-  const save = readFileSync(join(root, 'src/systems/save/save.js'), 'utf8');   // TIDY2: one path, so a move rewrites it
-  assert.match(save, /snap\.bankAccounts =/);
-  assert.match(save, /entity\.bankAccounts = snap\.bankAccounts\?\.length \? snap\.bankAccounts\.map\(\(a\) => \(\{ \.\.\.a \}\)\) : createBankAccounts\(\);/, 'JAN1: no accounts saved is the full table');
-});

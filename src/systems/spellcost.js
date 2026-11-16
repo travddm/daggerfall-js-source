@@ -34,7 +34,7 @@ import { pathCastSchool } from './arcanePaths.js';   // SCHOOLS3: a signature sp
 
 export const CAST_COST_FLOOR = 5;
 
-// SPELL-COST-PAST (FIELD BUGS 2026-10-12c, bible/01-Overview/bugs/Field-Bugs-2026-10-12c.md; from the field: "AoE buffing
+// SPELL-COST-PAST (FIELD BUGS 2026-10-12c,; from the field: "AoE buffing
 // infinitely still - creating negative spell costs which makes things only cost 5"). Both of DFU's cost formulas scale by
 // (110 - skill), which is 10 at DFU's 100 and nothing at 110. A mastered school reads up to 140 in a formula (SOFTCAP1),
 // and worn gear adds on top without bound (Enhances Skill +15 a piece, the rarity affixes, Mora's Forbidden Lore), so
@@ -150,7 +150,7 @@ const component = (c, starting, increase, per) =>
 export function effectSchool(e) {
   return EFFECT_COST_TABLE[`${e.type},${e.subType & 0xff}`]?.skill ?? 22;
 }
-/** SCHOOLS3 (bible/06-Systems/Arcane-Specialisations.md section 6): THE SCHOOL AN EFFECT OF `spell` IS CAST IN by
+/** SCHOOLS3: THE SCHOOL AN EFFECT OF `spell` IS CAST IN by
  *  `entity` - its own (effectSchool), except in the caster's signature spell of their awake path, which is cast in that
  *  path's two schools (arcanePaths.js pathCastSchool). The price below, the cast engine's tally (scenes/hostMagic.js
  *  tallyCastSkills) and the school past 100 (systems/effects.js) all read it, so the three never disagree. */
@@ -185,7 +185,7 @@ export function effectCost(e, casterSkillOf, { online = isOnlinePage() } = {}) {
   return { gold, sp: skillScaledCost(gold, skill, 400, { online }) };   // SPELL-COST-PAST
 }
 
-// SET2 (Mora's Mantle's Waters of Oblivion, bible/11-Multiplayer/Sigil-Sets.md): THE PORT'S SAY OVER A PLAYER'S COST.
+// SET2 (Mora's Mantle's Waters of Oblivion): THE PORT'S SAY OVER A PLAYER'S COST.
 // Named modifiers, `fn(entity, sp) -> sp`, over the spell points a PLAYER's cast costs after DFU's floor - read by every
 // door that prices the player's cast (the ready, the charge, the spellbook's and the HUD's figures all come through
 // here), and by NONE that prices a foe's: enemyCasting.js prices a foe's cast with the player's own skills (its
@@ -193,7 +193,7 @@ export function effectCost(e, casterSkillOf, { online = isOnlinePage() } = {}) {
 // never takes a cost under 1.
 const _costMods = new Map();
 export function registerSpellCostMod(name, fn) { if (typeof fn === 'function') _costMods.set(name, fn); else _costMods.delete(name); }
-// EG-ZS (bible/11-Multiplayer/Elite-Gates.md section 15, Spellweave: "every fourth damage spell costs nothing"): A FREE CAST -
+// EG-ZS (Spellweave: "every fourth damage spell costs nothing"): A FREE CAST -
 // named doors, `fn(entity, spell) -> boolean`, asked after the modifiers above under the same law (a player's own cast,
 // never a foe's): one that answers true prices the cast at nothing, the one cost under the modifiers' floor of 1.
 const _freeCasts = new Map();

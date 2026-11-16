@@ -9,9 +9,9 @@
   },
   {
    "file": "src/net/gate/gateLaw.js",
-   "has": "export const gameDayAt = (nowMs) => Math.floor(sharedClassicMinutes(nowMs) / GATE_DAY_MINUTES);",
+   "has": "export const gameDayAt = (nowMs, lane = 0) => Math.floor((sharedClassicMinutes(nowMs) - lane * GATE_LANE_STAGGER) / GATE_DAY_MINUTES);",
    "clock": "event",
-   "why": "the gate's day - its number, its room, its marks"
+   "why": "the gate's day - its number, its room, its marks; WW2: a lane's, its stagger behind the Bay's (gateAt and the herald read it)"
   },
   {
    "file": "src/net/gate/gateLaw.js",
@@ -85,6 +85,18 @@
    "has": "return wallMsForClassicMinutes(classicMinutes);",
    "clock": "law",
    "why": "the sky's own law"
+  },
+  {
+   "file": "src/net/skyLaw.js",
+   "has": ": sharedClassicMinutes(nowMs));",
+   "clock": "law",
+   "why": "one clock, as in DFU: without the sky's own clock (time.skyClock) the sky is the event clock"
+  },
+  {
+   "file": "src/net/skyLaw.js",
+   "has": ": wallMsForClassicMinutes(classicMinutes));",
+   "clock": "law",
+   "why": "one clock, as in DFU: without the sky's own clock (time.skyClock) the sky is the event clock"
   },
   {
    "file": "src/scenes/arrestFlow.js",
@@ -322,12 +334,6 @@
    "has": "Float32Array(roomAmbient(isNight(skyMinutes() %",
    "clock": "sky",
    "why": "the interior's night light (RPT1026-WORLD DARK-ROOM: an unlit room keeps it as its ambient)"
-  },
-  {
-   "file": "src/scenes/worldModes.js",
-   "has": "ketchDeck.frameLook(mwv.eye, _dgLit, skyMinutes() % 1440)",
-   "clock": "sky",
-   "why": "KETCH: the sky-ketch's deck by the hour - her light, her haze, her sun"
   },
   {
    "file": "src/scenes/shared.js",
@@ -722,12 +728,6 @@
   },
   {
    "file": "src/scenes/worldModes.js",
-   "has": "const cardDay = () => Math.floor(worldMinutes() / MINUTES_PER_DAY);",
-   "clock": "event",
-   "why": "the card table regulars' day - their purses kept till the day turns (AUDIT CARDS-2 H2)"
-  },
-  {
-   "file": "src/scenes/worldModes.js",
    "has": "worldNow: () => Math.floor(skyMinutes()),",
    "clock": "sky",
    "why": "the tavern's calendar and kitchen hours"
@@ -811,6 +811,12 @@
    "why": "the interior's night light (RPT1026-WORLD DARK-ROOM: an unlit room keeps it as its ambient)"
   },
   {
+   "file": "src/scenes/townProbes.js",
+   "has": "const at = partyAt(p.trip, skyMinutes());",
+   "clock": "sky",
+   "why": "WW7-7's probe door: the road's parties where their trips have them at the sky's minute, as the roads layer places them"
+  },
+  {
    "file": "src/scenes/worldModes.js",
    "has": "hour: Math.floor((Math.floor(skyMinutes()) % 1440) / 60),",
    "clock": "sky",
@@ -847,18 +853,6 @@
    "why": "a moon power's night"
   },
   {
-   "file": "src/systems/revenant/revenant.js",
-   "has": "const skyIsNight = () => { try { return isNight(skyMinutes()); }",
-   "clock": "sky",
-   "why": "RVN1/RVN2: whether a fight with a revenant began by night (its ledger's night scar), and a Night-stalker's night - its return and its blows"
-  },
-  {
-   "file": "src/systems/revenant/revenant.js",
-   "has": "const skyIsDay = () => { try { return !isNight(skyMinutes()); }",
-   "clock": "sky",
-   "why": "RVN3: whether the sky reads day - a daylight weakness bites"
-  },
-  {
    "file": "src/systems/save/save.js",
    "has": "? Math.floor(worldMinutes()), worldMinutes",
    "clock": "event",
@@ -893,12 +887,6 @@
    "has": "export const eventOfSkyLaw = (skyMinutes) => sharedClassicMinutes(wallMsForSkyMinutes(skyMinutes));",
    "clock": "law",
    "why": "BANISH-SKY: the event minute at a sky minute - a banishment's thirty days of the sky's calendar, stamped on the event clock"
-  },
-  {
-   "file": "src/systems/revenant/revenantCompanions.js",
-   "has": "export const errandWorldNow = () => errandWorldMinute(trustedWorldMinutes(), sharedClockHeardMark(), _monotonic());",
-   "clock": "event",
-   "why": "OFFLINE-ROAD: a sworn one abroad keeps the world's time, held to the session's monotonic time since the welcome (AUDIT FB1021 L3-1)"
   },
   {
    "file": "src/systems/worldTick.js",
@@ -953,12 +941,6 @@
    "has": "const sky = skyMinutes();",
    "clock": "law",
    "why": "the nightfall words"
-  },
-  {
-   "file": "src/ui/enhanced/enhancedMenu.js",
-   "has": "const copy = onlineCopyOf(snap, sharedClassicMinutes(Date.now()));",
-   "clock": "event",
-   "why": "the event minute a character joins at"
   },
   {
    "file": "src/ui/enhanced/enhancedMenu.js",
@@ -1258,22 +1240,10 @@
    "why": "WITCH1: the Wyrd Sister's window says the night the dead walk"
   },
   {
-   "file": "src/net/sea/seaSeasonLaw.js",
-   "has": "arenaSeasonOf(Math.floor(wallMsForClassicMinutes(",
-   "clock": "event",
-   "why": "a voyage's game day as the realm's wall time - the season of the realm's eight weeks it falls in (SEA-SEASON, the arena's)"
-  },
-  {
-   "file": "src/scenes/ketch/ketchDeckHost.js",
-   "has": "export function ketchMoonNow(sky = skyMinutes(), weather = currentWeather()) {",
-   "clock": "sky",
-   "why": "KETCH-LOOK KL1: the moons over her decks - the world's own sky, its night key"
-  },
-  {
    "file": "src/scenes/world.js",
    "has": "drawSky: (yaw, pitch, fov, aspect, vp) => { sky.draw(yaw, pitch, fov, aspect, vp, minuteNow(), playerTicker.classicMinutes, skyMinutes());",
    "clock": "sky",
-   "why": "KETCH-LOOK KL1: a made level's sky (the arena's floor, her decks) retimed to the sky's own hour"
+   "why": "KETCH-LOOK KL1: a made level's sky (the arena's floor) retimed to the sky's own hour"
   }
  ]
 }

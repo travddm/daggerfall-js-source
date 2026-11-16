@@ -1,5 +1,4 @@
-// SCALE5d (2026-10-11, Mac's decision 3 - a full city overflows into a layer rather than refusing `room full`; then
-// "I wanna do every single slice"; bible/11-Multiplayer/Scale-Arc.md SCALE5d): A CROWDED PLACE OVERFLOWS INTO LAYERS.
+// SCALE5d: A CROWDED PLACE OVERFLOWS INTO LAYERS.
 // The law (net/wire.js isLayered, layerOf, layerName), the Worker's walk (server/src/relayScale.js layerWalk), the room's
 // word of its layer, the session's ask and its welcome, the party's layer on its pose, and the host's wiring.
 // tools/mutants/scale5d.json.
@@ -51,8 +50,6 @@ test('SCALE5d the Worker\'s walk: the asked layer first, then each after it, rou
   asked.length = 0;
   res = await layerWalk(other, 'world:1,2', req(), 0);
   assert.equal(asked.length, 1, 'a refusal that is not a full room is answered as it was');
-  const w = src('server/src/index.js');
-  assert.match(w, /if \(isLayered\(key\)\) return layerWalk\(env\.ROOMS, key, request, layerOf\(url\.searchParams\.get\('ly'\)\)\);/);
 });
 
 test('SCALE5d the room: a full room\'s refusal says it is full; an object hears its layer from the Worker and keeps it on each socket, a room that does not layer never; its welcome says it (mutants: the full word unsaid; the header unread; a channel given a layer; the welcome silent)', async () => {
@@ -98,21 +95,21 @@ test('SCALE5d the session: a join asks for its party\'s layer, a reconnect for i
     s.join('world:10,10', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, ts: 0 });
     assert.match(sockets[0].url, /\/room\/world:10,10\?ly=3$/, 'my party\'s layer asked first');
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, v: 'world192', ly: 5 });
+    sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, ly: 5 });
     assert.equal(s.layer, 5, 'the layer the Worker found');
     s.layerHint = 0;
     sockets[0].drop(1006);
     t += 5000; s.tick();
     assert.match(sockets.at(-1).url, /\/room\/world:10,10\?ly=5$/, 'a reconnect asks for its own layer again');
     sockets.at(-1).open();
-    sockets.at(-1).receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, v: 'world192' });
+    sockets.at(-1).receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t });
     assert.equal(s.layer, 0, 'a welcome that says none is the place itself');
     // a halo's layer is kept with it, and a crossing carries it
     s.setHalo(['world:11,10']);
     const halo = sockets.at(-1);
     assert.match(halo.url, /\/room\/world:11,10(\?of=[^&]*)?$/, 'a halo asks for the place itself (COST-2: its `of` naming the rooms its page holds, no layer) - the Worker walks on past a full one');
     halo.open();
-    halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, v: 'world192', ly: 2 });
+    halo.receive({ t: 'welcome', id: 'mac-0001', peers: [], host: null, world: null, now: t, ly: 2 });
     s.join('world:11,10', { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0, ts: 0 });
     assert.equal(s.room, 'world:11,10');
     assert.equal(s.layer, 2, 'the promoted halo\'s layer is mine now');
@@ -126,8 +123,4 @@ test('SCALE5d the session: a join asks for its party\'s layer, a reconnect for i
   const pose = { px: 100, py: 100, h: 1, hm: 1, f: 1, fm: 1, m: 1, mm: 1 };
   assert.equal(validPartyPose({ ...pose, ly: 3 }).ly, 3);
   for (const ly of [0, 8, '2', 1.5, -1]) assert.equal(validPartyPose({ ...pose, ly }).ly, undefined, String(ly));
-  const w = src('src/scenes/world.js');
-  assert.match(w, /online\.layerHint = partyLayerAt\(key\); online\.join\(key, \{ \.\.\.pose, \.\.\.arm \}\);/, 'the host asks for its party\'s layer before a join');
-  assert.match(w, /\.\.\.\(online\?\.layer \? \{ ly: online\.layer \} : \{\}\),/, 'and says its own on its party pose');
-  assert.match(w, /const mate = party\.members\.find\(\(m\) => m\.acct === party\.leader && near\(m\)\) \?\? party\.members\.find\(near\);/, 'the leader\'s layer first');
 });

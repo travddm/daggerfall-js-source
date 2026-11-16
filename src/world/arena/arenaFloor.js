@@ -1,7 +1,7 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "Players can choose to watch AI fights ... and climb esclating tiers of opponents"): THE
+// ARENA2: THE
 // FLOOR'S INSTANCE - the colosseum stood on its own as a made level, so a ladder bout (or an exhibition watched from
-// the stands) is fought on a floor of its own, never in the city's street. Design: bible/11-Multiplayer/Arena.md
+// the stands) is fought on a floor of its own, never in the city's street. Design:
 // "2. The fights" ("An instance of the floor").
 //
 // NOT A FIFTH HOST - the Burning Court's law (world/gate/gateArena.js): a made DUNGEON level, entered and left through the
@@ -346,8 +346,7 @@ export function pickSeats(seats, n, rng) {
   return a.slice(0, Math.max(0, Math.min(a.length, n | 0)));
 }
 
-/** HOTFIX 1003i (2026-10-03, the owner, live: "add a barrier where players can jump in" - "Host should still be
- *  allowed"): THE STANDS' RAIL - a watcher up on the terrace (feet more than STANDS_RAIL_UP over the sand) is kept out of
+/** HOTFIX 1003i: THE STANDS' RAIL - a watcher up on the terrace (feet more than STANDS_RAIL_UP over the sand) is kept out of
  *  the sand's circle by the motor's own clamp (player/motor.js `arena.clamp`), so nobody jumps down into a bout. Whoever
  *  stands on the sand already (a fighter called down, a ladder bout's) is never held, nor `free` (the session's host).
  *  `centre` the sand's centre in the scene (its y the sand's), `feetY` mine. Null: no rail. Pure. */

@@ -1,4 +1,4 @@
-// SESSION-SIGN (2026-10-18; bible/11-Multiplayer/Scale-Arc.md THE PLAN PAST 1,000, decision 4): THE PAGE'S SIDE OF THE
+// SESSION-SIGN: THE PAGE'S SIDE OF THE
 // SESSION'S PASS (net/accountClient.js). The page keeps the pass an answer handed it, with the secret it rides with, sends
 // it with that secret's calls alone - the one door and the realm's checkpoint (systems/realmSaves.js) - and lets it go on a
 // sign-out, a refusal of the session and a call that could not be made, so a page is never left sending a header a
@@ -43,7 +43,7 @@ test('SESSION-SIGN the page keeps the pass an answer handed it, with its secret,
     d.throws = new DOMException('gone', name);
     assert.equal((await call({ fetch: d.fetch, secret: 'secret-of-eve-0001' }, '/v1/heartbeat', { mail: true })).error, 'offline');
     assert.equal(sessionPassFor('secret-of-eve-0001'), 'p1.eve.mac', `kept through a ${name}`);
-    _resetBusyForTests();   // PIN MOVED (SLOW-SHED): a heartbeat timed out holds the reads now; the pass's law is the same
+    _resetBusyForTests();
   }
   // a call that could not be made - a preflight refusing the header, a service rolled back past SESSION-SIGN
   d.throws = true;

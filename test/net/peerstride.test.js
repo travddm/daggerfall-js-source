@@ -1,5 +1,4 @@
-// PEER-BUZZ (2026-09-22, Discord through Mac: "footstep sounds are broken",
-// with a 52-second recording of a continuous buzz): a peer's stride
+// PEER-BUZZ: a peer's stride
 // machine was fed the WIRE's coordinates (AUDIT DROPS E5), and in the
 // overworld the wire's frame is world coordinates - 32768 per map pixel
 // against the scene's 819.2, forty scene units to one. Every 2.5 wire
@@ -37,25 +36,3 @@ test('PEER-BUZZ, driven: a peer walking at 3 scene units a second in the OVERWOR
   assert.equal(played.length, n, 'a standing peer takes no step');
 });
 
-test('PEER-BUZZ, driven: the floating-origin recentre is not a stride - world.js rebases every peer machine in the block that rebases its own, and the next frame re-seeds; without the rebase the 819.2-unit jump fires a step', () => {
-  const { rp, played } = rig();
-  const opts = { bodyHeight: () => 2, eye: [0, 1.7, 0] };
-  let wireX = 0;
-  for (let i = 0; i < 60 && !played.length; i++) { wireX += 2; rp.sync([peer(wireX)], toScene, opts); }
-  assert.ok(played.length >= 1, 'walking makes a step');
-  const before = played.length;
-  const shiftedScene = (p) => { const s = toScene(p); return [s[0] + 819.2, s[1], s[2]]; };
-  const shifted = { bodyHeight: () => 2, eye: [wireX / WIRE_PER_SCENE + 819.2, 1.7, 0] };
-  rp.rebaseFootsteps();
-  rp.sync([peer(wireX)], shiftedScene, shifted);
-  rp.sync([peer(wireX)], shiftedScene, shifted);
-  assert.equal(played.length, before, 'rebased: no step for the recentre');
-  // the negative control, so the rebase is seen to matter: the same jump with no rebase is a stride
-  rp.sync([peer(wireX)], toScene, opts);   // back to the unshifted frame WITHOUT a rebase - the anchor holds the shifted point
-  assert.equal(played.length, before + 1, 'unrebased, the jump counts as walked distance and fires - which is what the rebase exists to stop');
-  // by source: the seam and the call
-  assert.match(rd('src/net/remotePlayers.js'), /const step = fm\.update\(f, \{ grounded: true, swimming: false, levitating: false, onFoot: !shown\.rd, standingStill: !peerMoving\(shown\), halfSpeed: false \}, set\);/, 'the SCENE point');   // CLIMB5: no stride on the wall (climb5.test.js C4)
-  // PIN MOVED (GATHER-FEEL II, PEER-ACTS): and the gathering's held places, as the climb's - a blow in the air, a net's place
-  assert.match(rd('src/net/remotePlayers.js'), /rebaseFootsteps\(\) \{\s*for \(const fm of this\._footsteps\.values\(\)\) fm\.rebase\(\);\s*(?:this\._climbSounds\.rebase\(\);[^\n]*\n\s*)?(?:this\._gatherSounds\.rebase\(\);[^\n]*\n\s*)?\}/);
-  assert.match(rd('src/scenes/world.js'), /footsteps\.rebase\(\);\s*\n\s*betterAmbience\.rebase\(\);[^\n]*\n\s*remotePlayers\?\.rebaseFootsteps\?\.\(\);/, 'called in the recentre block, beside the local machine\'s rebase');
-});

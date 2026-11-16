@@ -1,9 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Life skills will utilize things like tree
-// chopping, picking up ingredients, fishing, etc. Active player
-// involvement and actual UI integration for life skills") - HERBALISM IN
-// THE STREAMING WORLD (bible/06-Systems/Professions-Arc.md 5, 6, 8, 22;
+// PROF1 - HERBALISM IN
+// THE STREAMING WORLD (5, 6, 8, 22;
 // FORAGE0 14). PROF2 made the host every gathering profession's
 // (scenes/gatherHost.js - one prompt, one act, one book); this is
 // Herbalism's KIND in it:
@@ -52,15 +50,16 @@ export const PATCH_MARK = Object.freeze({ w: 2.2, h: 1.3 });
  * and glowing, and no look reached it; it stands nowhere, as VEIN-CLEAR's last vein does.
  * VERGE1: `verge` (`(x, z, reach) => boolean`, the pixel's - world/road/roadVerge.js vergeClear), when handed, keeps a patch's
  * glow off the roads: a patch whose ring (PATCH_MARK's width) would reach one stands nowhere that day.
- * @param {{ px: number, py: number, day: number, climate: number, confirmed?: boolean, seasonalEye?: boolean,
+ * WW-C1: `region` - the pixel's, an herb-rich province's richness on confirmed ground (net/nodeLaw.js nodeSlots).
+ * @param {{ px: number, py: number, day: number, climate: number, region?: number|null, confirmed?: boolean, seasonalEye?: boolean,
  *   samples: Float32Array, tilemap: Uint8Array, locationRect?: any, rocks?: number[][],
  *   verge?: ((x: number, z: number, reach: number) => boolean)|null, beach?: ?Float32Array }} p
  */
-export function standPatches({ px, py, day, climate, confirmed = false, seasonalEye = false, samples, tilemap, locationRect = null, rocks = [], verge = null, beach = null }) {
+export function standPatches({ px, py, day, climate, region = null, confirmed = false, seasonalEye = false, samples, tilemap, locationRect = null, rocks = [], verge = null, beach = null }) {
   const out = [];
   if (!HERB_TABLES[climate]) return out;
   const clear = verge ? (x, z) => verge(x, z, PATCH_MARK.w / 2) : null;
-  for (const p of herbPatches({ x: px, y: py, day, climate, confirmed, seasonalEye })) {
+  for (const p of herbPatches({ x: px, y: py, day, climate, region, confirmed, seasonalEye })) {
     const tx = Math.min(WORLD_MAP_TILE_DIM - 1, Math.floor(p.u * WORLD_MAP_TILE_DIM));
     const ty = Math.min(WORLD_MAP_TILE_DIM - 1, Math.floor(p.v * WORLD_MAP_TILE_DIM));
     const base = natureStandsAt(samples, tilemap, locationRect, tx, ty, clear, beach);   // AUDIT LANDFORMS II H2
@@ -143,7 +142,7 @@ export function herbKind({ book }) {
     nodesOf({ px, py, day, info, confirmed, specs, entry, near }) {
       if (!HERB_TABLES[info.climate]) return [];
       return standPatches({
-        px, py, day, climate: info.climate, confirmed, seasonalEye: specs('herbalism')[100] === 'seasonal-eye',
+        px, py, day, climate: info.climate, region: info.region, confirmed, seasonalEye: specs('herbalism')[100] === 'seasonal-eye',
         samples: entry.samples, tilemap: entry.tilemap, locationRect: entry.locationRect ?? entry.wodSite ?? null,   // AUDIT 29 C8: a WoD site's rect, as nature keeps off it (terrainGen.js)
         rocks: [...(entry.rocks ?? []), ...(near ?? [])],   // NODE-CLEAR: and never inside a rock piece; ROCK-NEAR: a neighbour's reaching in too
         verge: entry.verge ?? null,   // VERGE1: nor over a road
@@ -165,7 +164,7 @@ export function herbKind({ book }) {
       const only = tool === FT.Sickle ? 'herbs' : tool === FT.Basket ? 'food' : null;
       return planOf(p, { entity, info, rank }, only ? only === 'food' : false, !!only);
     },
-    /** PROF-MENU (2026-10-01, Mac: "use the same menu the loot menu uses"): THE PATCH'S TWO HARVESTS AS THE MENU'S ROWS -
+    /** PROF-MENU: THE PATCH'S TWO HARVESTS AS THE MENU'S ROWS -
      *  its herbs and its food (the act choice key's toggle, retired), each its own refusal; gathered whole, its one row. */
     rows(p, ctx) {
       const herbs = planOf(p, ctx, false, true), food = planOf(p, ctx, true, true);

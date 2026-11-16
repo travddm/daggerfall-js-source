@@ -8,7 +8,7 @@
 // THE HELD MAP with its automap sheet inked on the parchment - the
 // dungeon's plan in the pen that drew the Iliac Bay, one storey at a
 // time (EM3; ui/automap/automapSheet.js's header carries the design,
-// bible/10-UI/Enhanced-Maps-Arc.md the arc).
+// the arc).
 //
 // THE CLASSIC WINDOW IS NOT RETIRED. `Held-Map-Arc.md`'s own law: a
 // departure from DFU is a departure only where the enhanced skin is

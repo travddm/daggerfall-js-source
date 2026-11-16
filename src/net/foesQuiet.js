@@ -1,5 +1,5 @@
 // @ts-check
-// SCALE2c (2026-10-10; bible/11-Multiplayer/Scale-Arc.md SCALE2c): A FULL FOES FRAME THAT SAYS NOTHING IS SAID ONCE.
+// SCALE2c: A FULL FOES FRAME THAT SAYS NOTHING IS SAID ONCE.
 // In a cell every client streams its own foes whenever anyone else is there, and a FULL frame went every FOES_FULL_MS
 // even from a player with nothing in the world at all - no foe, no camp, no horse, no boat, no ring, no portal. Its
 // whole word was "none", said again every two seconds to everyone in range: in a crowded city about 128 such frames a

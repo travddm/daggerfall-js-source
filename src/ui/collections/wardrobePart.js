@@ -1,5 +1,5 @@
 // @ts-check
-// COLLECTIONS-II (2026-10-22; bible/10-UI/Collections.md): THE WARDROBE'S PARTS of the Collections page - Titles, Auras,
+// COLLECTIONS-II: THE WARDROBE'S PARTS of the Collections page - Titles, Auras,
 // Icons and Glyphs, one kind a part, every thing of its kind listed whether the account holds it or not (the catalogue:
 // ui/collections/wardrobeCatalogue.js), grouped by where it comes from, each row pressed open to say how it is had, whether
 // it can be had now, what comes with it - and, held, worn from here as the account card wears it.
@@ -106,9 +106,9 @@ export const WARDROBE_PART_CSS = `
 .px-sys .coll-tag.is-worn { color: #f3cf86; }
 .px-sys .coll-tag.is-held { color: #8fc7a0; }
 .px-sys .coll-tag.is-char { color: #b8b0a0; }
-.px-sys .coll-tag.av-open, .px-sys .coll-tag.av-chance, .px-sys .coll-tag.av-ranked, .px-sys .coll-tag.av-patron { color: #b8b0a0; }
+.px-sys .coll-tag.av-open, .px-sys .coll-tag.av-chance, .px-sys .coll-tag.av-ranked { color: #b8b0a0; }
 .px-sys .coll-tag.av-seasonal { color: #a7e08a; }
-.px-sys .coll-tag.av-retired, .px-sys .coll-tag.av-closed, .px-sys .coll-tag.av-bestowed, .px-sys .coll-tag.av-staff { color: #c49a8a; }
+.px-sys .coll-tag.av-retired, .px-sys .coll-tag.av-closed, .px-sys .coll-tag.av-staff { color: #c49a8a; }
 .px-sys .coll-whole { margin: 2px 0 8px; padding: 10px 12px 12px; border-width: 2px; border-style: solid; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; }
 .px-sys .coll-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .px-sys .coll-show { display: flex; align-items: flex-start; justify-content: center; padding-top: 2px; }

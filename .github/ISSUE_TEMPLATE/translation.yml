@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you. A person's translation always outranks the machine's drafts: a fix you send is kept as yours from then on.
+        Thank you. Only translations that a person has reviewed are added to the game.
         If you can edit the file yourself, a pull request to `locales/<tag>/Port_Strings.csv` is the quickest way in (see `locales/README.md`).
   - type: input
     id: language

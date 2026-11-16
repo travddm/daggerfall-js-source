@@ -1,16 +1,16 @@
 // @ts-check
-// ARENA3 (2026-10-02, Mac: "join a team (red and blue)"; "Joining a team comes with it's own enhanced UI"): THE GATE'S
+// ARENA3: THE GATE'S
 // PEOPLE WHO ARE NOT THE HERALD - the Red and Blue Banners' recruiters, and (with the book) the bookmaker - answered in
 // ONE place for both hosts that stand the colosseum (scenes/world.js, the streaming world; scenes/exterior.js, the city
 // alone), so the two never drift; and THE ARENA WINDOW's model and its presses (ui/arena/arenaDoor.js, systems/arena/arenaBoard.js).
-// Design: bible/11-Multiplayer/Arena.md "3. The teams", "5. The Arena window".
+// Design: "3. The teams", "5. The Arena window".
 //
 // Each person's word is a keyed choice (ui/talkWindow.js ChoiceWindow - the enhanced dialog on the Plus skin, the panel
 // on the classic one) built by the pure law (systems/arena/arenaHerald.js recruiterChoice); this file only does what a choice
 // asks - joins the banner, quits it (asked twice), opens the Arena window on its Team page - and says what was done.
 // The league rides the player (`playerEntity.arenaLeague`, systems/save/save.js), rolled to the season on every read.
 //
-// ARENA4b: ONLINE THE ACCOUNT IS THE LAW (bible/11-Multiplayer/Arena.md "7. Online"). While the arena online is live
+// ARENA4b: ONLINE THE ACCOUNT IS THE LAW ("7. Online"). While the arena online is live
 // (scenes/arena/arenaOnline.js): a recruiter's choice reads and writes the ACCOUNT's banner (the board's `me.banner`, `left`,
 // `leftSeason`; the service refuses in its own words) and the save's league is left untouched; the Herald's choice
 // (`heraldChoice`, both hosts' Herald) reads the account's climb - Fight offers its next bout, "the ladder done" is its,

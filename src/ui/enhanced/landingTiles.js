@@ -1,19 +1,16 @@
-// ═══════════════════════════════════════════════════════════════════
 // LANDING TILES (VIRT, 2026-10-16; one home since TRADE-VIRT, 2026-10-20) — A PICTURE INTO ITS TILE, NOT A REPAINT.
 //
 // The enhanced screens rebuild their DOM on every state change (ui/domRepaint.js says why that is the shape), and a cold
 // picture's `onReady` was the screen's `render`: a pile of 312 cold pictures was 311 whole repaints of the pack (VIRT,
-// bible/10-UI/UI-Arc.md). And where `onReady` was a fresh function a row (the player-to-player window's), the fitted
+// ). And where `onReady` was a fresh function a row (the player-to-player window's), the fitted
 // door woke each of up to eight per picture (ui/textureCanvas.js WAKE_MAX), and each wake was a repaint that signed more
 // rows up for the pictures still on their way: 2,160 repaints of a 300-piece pack, 200 s to settle (TRADE-VIRT,
-// bible/07-Rendering/Performance-Priority.md).
 //
 // A tile drawn on its initials waits here with what it was drawn from; a landing asks for ONE pass on the next frame,
 // and the pass gives each waiting tile the tile `draw` makes for the same spec now, the wear bar the old one carried.
 // The pictures that land together are one pass; a tile still waiting stays waiting; a tile a repaint threw away (no
 // longer in the document), or every tile once the screen is gone (`alive`), is dropped, never drawn into. The pack's,
 // the shop counter's and the trade between players' windows each keep one.
-// ═══════════════════════════════════════════════════════════════════
 
 const nextFrame = (f) => (globalThis.requestAnimationFrame ?? ((g) => setTimeout(g, 16)))(f);
 

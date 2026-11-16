@@ -33,12 +33,12 @@ export const UNSUPPORTED_FILENAMES = Object.freeze([
  *  It lives HERE, with the reader, because both callers need it and
  *  neither can import the other: scenes/shared.js pulls in the sky
  *  renderer and half the scene layer, which a DOM screen must not
- *  drag in, and ui/textureCanvas.js is imported BY a DOM screen. U54
- *  restated it in the second one and the audit24_onehome ratchet
- *  caught it in the same slice - two modules exporting one name is
+ *  drag in, and ui/textureCanvas.js is imported BY a DOM screen.
+ *  A second copy trips the audit24_onehome ratchet:
+ *  two modules exporting one name is
  *  the drift that gate exists for. */
 export const texName = (archive) => `TEXTURE.${String(archive).padStart(3, '0')}`;
-/** DS1: TEXTURE.511 is the last archive Daggerfall ships; a higher number is a mod's own, or the port's. */
+/** TEXTURE.511 is the last archive Daggerfall ships; a higher number is a mod's own, or the port's. */
 export const LAST_CLASSIC_TEXTURE_ARCHIVE = 511;
 
 export class TextureFile extends BaseImageFile {
@@ -109,7 +109,7 @@ export class TextureFile extends BaseImageFile {
     else this._solidType = SOLID_TYPES.None;
 
     if (palette) this.palette = palette;
-    this.archive = Number.parseInt(fileName.slice('TEXTURE.'.length), 10);   // MM1: the archive number, for the xml billboard scale (world/billboardXml.js)
+    this.archive = Number.parseInt(fileName.slice('TEXTURE.'.length), 10);   // the archive number, for the xml billboard scale (world/billboardXml.js)
     this._setBytes(bytes, fileName);
 
     try {

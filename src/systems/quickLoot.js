@@ -1,6 +1,6 @@
 // QUICK-LOOT - TAKING FROM THE PLAQUE, WITHOUT A WINDOW.
 //
-// Arc B of the world-hover arcs (2026-09-22). Arc A put a plaque under
+// Arc B of the world-hover arcs. Arc A put a plaque under
 // the crosshair that names what you are looking at and lists what a
 // pile or a body holds; this makes that list a way to TAKE.
 //
@@ -61,7 +61,7 @@ import { isEnchanted } from './inventory.js';   // LOOT18: and DFU's own magic i
  *  always opened and the plaque stays the readout Arc A shipped. */
 export const quickLootOn = () => !!getPref('quickLoot');
 
-/** LOOT18 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 10): THE TAKE-ALL'S TIER - the quick-loot row's
+/** LOOT18 (the Loot arc II): THE TAKE-ALL'S TIER - the quick-loot row's
  *  part (features.js, `quickLootTier`): 'all' takes every piece of gear, 'magic' leaves a Common piece on the pile,
  *  'rare' a Common and a Magic one. Gear is what the ladder grades (a weapon, armour, a jewel, a garment - never a
  *  quiver); gold, supplies, a quest's items, DFU's own magic items and everything else are always taken. With the ladder
@@ -87,10 +87,7 @@ export const QUICK_LOOT_LEFT = (n) => `${n} left by your quick-loot filter.`;
 export const tookItemText = (item) => `You take the ${itemNameParts(item).name || 'item'}.`;
 
 /**
- * QL-WEIGHT1 (2026-09-23, Satranath on Discord: "The quick loot system
- * lets you pick up items even if you are overencumbered. Applies only to
- * quick loot - vanilla loot interaction still gives the appropriate error
- * that you are carrying too much"): THE TAKE IS THE WINDOW'S TAKE.
+ * QL-WEIGHT1: THE TAKE IS THE WINDOW'S TAKE.
  *
  * Quick loot used to move a row with `takeOneInto` - DoTransferItem's
  * first statement and nothing before it - so it had no CanCarryAmount
@@ -145,7 +142,7 @@ function takeThrough(playerEntity, items, item, getQuest, moved = null, wholeSta
 }
 
 /**
- * PICKUP-FEED (2026-10-01, Mac: "a better center screen notification for pickups"): WHAT MOVED, TOLD TO THE HOST'S
+ * PICKUP-FEED: WHAT MOVED, TOLD TO THE HOST'S
  * FACE. `took` is the host's optional hook (ui/pickupFeed.js showPickups, handed by each of the four hosts), given what
  * one press put in the pack - `[{ item, count }]`, in the order it moved - and the player it went to. It answers TRUE
  * when it SHOWED them (the enhanced skin's cards), and the take's own line is then not said: the cards are its words.
@@ -304,10 +301,7 @@ export const quickLootRow = (frame) => selectedRow(_sel, frame);
 export const quickLootSelection = () => (_sel ? { ..._sel } : null);
 
 /**
- * QUICK-LOOT-STATS (2026-09-22, a player to Mac: "i love the quick loot
- * but can it show the stats of the items next to the quickloot window?
- * So i dont have to pick up everything to check in my inventory if its
- * worth keeping"): THE HIGHLIGHTED ROW'S OWN NUMBERS.
+ * QUICK-LOOT-STATS: THE HIGHLIGHTED ROW'S OWN NUMBERS.
  *
  * THE WHOLE POINT OF THE ARC WAS TO DECIDE IN THE WORLD RATHER THAN
  * THROUGH A DOOR, and without this the decision was only half moved:

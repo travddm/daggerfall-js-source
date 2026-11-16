@@ -1,4 +1,4 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE BAY'S TROUBLES, step 2 of 2.
+-- QL15 (2026-10-19; docs/systems/quests.md): THE BAY'S TROUBLES, step 2 of 2.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner an hour after
 -- step 1 ends: the watch's word is in the journal at once. The giver is unnamed (a captain of the watch, of the
 -- region's ruling faction) - and ANOTHER captain than step 1's, a Person being made fresh in each step's quest, so the

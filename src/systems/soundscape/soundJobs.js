@@ -1,9 +1,9 @@
 // @ts-check
-// SOUNDSCAPE (2026-10-24): THE SOUNDS THE PORT MAKES, MADE AND REGISTERED - a bed of soundBeds.js, a town's murmur or its
+// SOUNDSCAPE: THE SOUNDS THE PORT MAKES, MADE AND REGISTERED - a bed of soundBeds.js, a town's murmur or its
 // tavern (townBeds.js) - each made once and registered on the engine under its key (audio.registerSamples), so every entry
 // point takes the key as a clip.
 //
-// AUDIT SOUNDSCAPE W4 + S5 (2026-10-24): MADE OFF THE MAIN THREAD. The first cut made each in the page's idle time, as one
+// AUDIT SOUNDSCAPE W4 + S5: MADE OFF THE MAIN THREAD. The first cut made each in the page's idle time, as one
 // call - but an idle callback with a timeout runs as an ordinary task on a busy page and never yields, so each was one
 // stall of 15 to 170 ms all the same, and a page with no idle callbacks made all three of a deck's at once inside its
 // first frame. Now a job goes to a module worker (soundWorker.js - spelled the way Vite bundles one, as the nav and the

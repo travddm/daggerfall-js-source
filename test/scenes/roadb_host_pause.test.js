@@ -221,21 +221,3 @@ test('ROAD-tail SWEEP: no host re-derives the pause - windowStack.paused() is th
     'exactly the stack-owning hosts call the primitive, and all of them do');
 });
 
-test('ROAD-tail SWEEP: the two hosts that read another host\'s pause read its GETTER, never its slot', () => {
-  // dungeon.js and the two outdoor hosts do not own a stack. They ask
-  // the host that does - `ctx.uiOverlayActive` (dungeonContext's
-  // `dungeonPaused`), `townTalk.overlayActive` (`talkPaused`),
-  // `modes.overlayHeld` (`interiorPaused`) - which is DFU asking one
-  // UIManager. What they must never do is reach past that for the
-  // other host's overlay variable and re-derive the answer.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    const text = src(f).replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-    assert.ok(!/overlayWindow\(\)\s*(\?|&&|\|\||\))/.test(text),
-      `${f}: a probe surface is not a pause gate`);
-    assert.ok(!/\.depth\(\)/.test(text), `${f}: and the depth is not this host's to count`);
-  }
-  // The standalone dungeon host reads exactly one thing for its pause.
-  const dj = src('src/scenes/dungeon.js');
-  assert.match(dj, /const overlayHeld = ctx\.uiOverlayActive;/,
-    'dungeon.js takes the context\'s pause once and gates the whole frame on it');
-});

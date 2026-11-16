@@ -76,7 +76,7 @@ export function parseBiog(text, classIndex = 0) {
     if (cur === null) break;
 
     if (i === 0 && cur[0] === '#') {
-      // AUDIT 24 formats: int.TryParse (BiogFile.cs:74) rejects the
+      // int.TryParse (BiogFile.cs:74) rejects the
       // WHOLE string unless it parses cleanly - "4116abc", "0x10" and
       // "12.5" all fail and fall to the default. parseInt takes the
       // leading digits and answers 4116 / 0 / 12 instead.

@@ -1,5 +1,4 @@
-// AUDIT LW-STIR (2026-10-08, Mac, of LW-STIR: "Lets audit everything and ensure perfection"; the record is
-// bible/01-Overview/audits/Audit-LW-Stir.md) - every pin red on the code as it stood (its mutants,
+// AUDIT LW-STIR - every pin red on the code as it stood (its mutants,
 // tools/mutants/auditlwstir.json), on the synthetic towns (test/lwTown.mjs) and, where ARENA2_PATH names the data, the
 // game's own (test/lwRealTown.mjs).
 import test from 'node:test';

@@ -1,10 +1,10 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT1c (2026-09-30, Mac: "Finish the seats") - THE TURNING: the week
+// SEAT1c - THE TURNING: the week
 // settled, the Charters claimed, the Contested seats and the Rights of
 // Siege named, the Legacy carried.
 //
-// bible/11-Multiplayer/Seats-Arc.md 5.2: "The Turning is never a job that
+// 5.2: "The Turning is never a job that
 // runs. The account service settles week N the first time anything asks
 // about any seat after N's boundary (settleWeek(N), one D1 transaction,
 // idempotent on town_seat_weeks.week - a second reader finds it
@@ -28,9 +28,7 @@
 // the coming week (step 8) - their fighting is the relay's. CROWN1: a crown's Conscription
 // that ruled the week paid out of the conscripted guilds' Tithe (7.6), after their upkeep;
 // and part two: a Royal Tourney's prize escrowed as it is made law, and the week's champion
-// named, paid and titled as its week settles. CROWN2: each vassal's tribute to its liege (5% of
-// its week's Tithe, after its upkeep), the liege's half-reach on a vassal's defence, a fealty
-// broken (the breaker's Standing -10 at every seat) or lapsed (a pair that no longer fits).
+// named, paid and titled as its week settles.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
 // ═════════════════════════════════════════════════════════════════════
@@ -40,8 +38,7 @@ import { activeIn, edictsOf, edictsRead, edictsFrom } from './seatHolding.js';
 import { redRead, redFrom } from './seatPolitics.js';   // SEAT-BATCH: the list's red lines, in its one batch
 import { windowOf } from './seatBattles.js';   // SEAT2a: the holder's window, frozen into its battle
 import { royalTurning } from './seatRoyal.js';   // CROWN1 part two: a Royal Tourney's champion named
-import { incursionStatements } from './seatIncursion.js';   // AUDIT-SEATS: a Daedric Incursion's Marks
-import { fortsSeasonStatements, campsSpent, fortTiersOf, fortsLapsedStatements, campsWorn } from './seatForts.js';   // SEAT2b: a Season's wear, the Siege Camps spent; part two: a holder's Shrine; AUDIT SEATS-2 S5, S4: a lapse's projects fallen, the worn gate's Rams
+import { fortsSeasonStatements, campsSpent, fortTiersOf, campsWorn } from './seatForts.js';   // SEAT2b: a Season's wear, the Siege Camps spent; part two: a holder's Shrine; AUDIT SEATS-2 S5, S4: a lapse's projects fallen, the worn gate's Rams
 import { shrineStanding, marketHallTitheCap } from '../../src/net/fortLaw.js';   // SEAT2b part two (7.5): the Shrine's Standing a week
 import { weekSettled, keepWeekSettled } from './weekKept.js';   // PRIMARY-FOLD: a week read settled, kept
 import { swordsSettled } from './seatSiege.js';   // AUDIT-SEATS S3: a void battle's Sellsword escrow home
@@ -51,20 +48,21 @@ import { mustChange } from './realm.js';
 import { utcDay } from '../../src/net/marksLaw.js';
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';
 import { seatWeekOf, seatWeekStartMs, seatKeyOk, turningPlan, seatGlyphsOf, seatTitleOf, SEAT_WEEK_MS, STANDING_START, placeBattles, atSiegeWindow, CROWN_SEAT_REGIONS, conscriptionDue,
-  fealtyReckoning, fealtyTribute, TITHE_CAP, seasonEndingAt, seasonStanding, seasonTitles, seasonOf, seasonRibbons, keptWholeSeason } from '../../src/net/townSeatLaw.js';
-import { tideAt } from '../../src/net/tideLaw.js';   // SEASON1 part two: the Tides
+  TITHE_CAP, seasonEndingAt, seasonStanding, seasonKeepers, seasonRibbons, keptWholeSeason, seasonFloor } from '../../src/net/townSeatLaw.js';
 import { MARKS_MAX } from '../../src/net/marksLaw.js';
+import { confirmedDomains } from './domains.js';   // DOMAIN3: the regions' seats of power, as the Turning reads them
+import { releaseCastles } from './castles.js';   // DOMAIN2: a castle goes with its region at the Turning
+import { charterSeats, domainsRule } from '../../src/net/domainLaw.js';   // DOMAIN3: the Charters, and the week the region law rules
 
 /** SEASON1 (18: "At its end seats, influence, fortifications and history are wiped; Marks, the Stores and profession
  *  tracks are kept"): what Season 0's last Turning clears, after it has settled its own week. DECIDED: what money is
  *  still owed out of - a battle's contracts, an Edict's escrow, a Royal Tourney's prize - and the titles and Honours
  *  earned stay, and so does every red line. */
 export const SEASON_ZERO_WIPED = Object.freeze(['town_seat_holds', 'town_seat_legacy', 'town_seat_pledges', 'town_seat_binds', 'town_seat_influence',
-  'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_stockpile', 'town_seat_levies', 'town_seat_history',
-  'guild_fealty', 'guild_pacts',
-  // SEAT2b (18: "At its end seats, influence, fortifications and history are wiped"): the works, their projects' holds, the
-  // Fortifiers' saves and the Siege Camps
-  'town_seat_forts', 'town_seat_fort_held', 'town_seat_fortifier', 'town_seat_camps']);
+  'town_seat_renown', 'town_seat_rights', 'town_seat_aftermath', 'town_seat_windows', 'town_seat_history',
+  'guild_pacts',
+  // SEAT2b (18: "At its end seats, influence, fortifications and history are wiped"): the works and the Siege Camps
+  'town_seat_forts', 'town_seat_camps']);
 /** AUDIT-SEATS S5 (3.2: "a struck key is never witnessed again" - the strike's own history row says so, townSeats.js
  *  struck): what the wipe keeps of a table it clears - every strike, so a seat struck in Season 0 stays struck. */
 export const SEASON_ZERO_KEPT = Object.freeze({ town_seat_history: "kind = 'strike'" });
@@ -99,16 +97,26 @@ async function namesOf(db, ids) {
  * @param {number} week
  * @param {number} nowS
  * @param {number|null} [zero]
+ * @param {number|null} [domainsWeek] DOMAIN3: the seat week the region law first rules (domainLaw.js domainsWeekOf), or null
  */
-export async function settleWeek(db, week, nowS, zero = null) {
+export async function settleWeek(db, week, nowS, zero = null, domainsWeek = null) {
   if (await db.prepare('SELECT 1 FROM town_seat_weeks WHERE week = ?').bind(week).first()) return { settled: false };
   const atS = turningOf(week);
   const registry = await confirmedSeats(db, nowS, { fresh: true });   // D1-LOAD: the Turning reads the table as it stands
   const { results: pledgedKeys = [] } = await db.prepare('SELECT DISTINCT key FROM town_seat_pledges WHERE week = ?').bind(week).all();
   const { results: holdRows = [] } = await db.prepare('SELECT key, guild_id, region, tier, standing, truce_week, tithe, owed, since_week FROM town_seat_holds').all();
   const holds = new Map(holdRows.map((h) => [Number(h.key), h]));
-  const keys = [...new Set([...pledgedKeys.map((p) => Number(p.key)), ...holds.keys()])].filter((k) => registry.has(k)).sort((a, b) => a - b);
+  // DOMAIN3 (Domains.md section 7): THE TURNING THAT OPENS A REGION-LAW WEEK - the week after this one ruled by region -
+  // claims a Charter at a region's seat of power alone, and FOLDS every Charter held at another seat of a region whose seat
+  // of power is confirmed (below). Season 0's last Turning wipes every Charter instead, and folds nothing.
+  // A week the law rules is settled by region too - its standings count the region's homes at a seat of power (gatherStandings)
+  const lawNow = domainsRule(week, domainsWeek), lawNext = domainsRule(week + 1, domainsWeek);
+  const ruled = lawNow || lawNext ? await confirmedDomains(db, nowS, { fresh: true }) : null;
+  const domains = lawNext && seasonEndingAt(week, zero)?.n !== 0 ? ruled : null;
+  const charterKeys = new Set(charterSeats(registry.values(), domains).map((x) => x.key));
+  const keys = [...new Set([...pledgedKeys.map((p) => Number(p.key)), ...holds.keys()])].filter((k) => charterKeys.has(k)).sort((a, b) => a - b);
   const unregistered = holdRows.filter((h) => !registry.has(Number(h.key)));   // AUDIT-SEATS S4: lapsed at this Turning
+  const folded = holdRows.filter((h) => registry.has(Number(h.key)) && !charterKeys.has(Number(h.key)));   // DOMAIN3: the fold
   const { results: legacyRows = [] } = await db.prepare('SELECT key, guild_id, amount FROM town_seat_legacy WHERE week = ?').bind(week).all();
   const legacyOf = new Map(legacyRows.map((l) => [`${l.key}\n${l.guild_id}`, Number(l.amount)]));
   const next = week + 1;
@@ -139,20 +147,14 @@ export async function settleWeek(db, week, nowS, zero = null) {
   // revolt nobody came to has no room and no receipt; one fought out carries `attack`, applied at its claim) - its
   // holder's Charter lapses at this Turning (the plan's 'revolt')
   const revolted = new Set(unfought.filter((u) => u.state === 'scheduled' && u.kind === 'revolt' && u.defender === holds.get(Number(u.key))?.guild_id).map((u) => Number(u.key)));
-  // CROWN2 (7.8): THE FEALTIES standing - each pair's Charters as they stand now; one that no longer fits lapses (no
-  // Standing), one broken ends (its breaker's Standing -10 at every seat), the rest give the liege's half-reach on the
-  // vassal's defence; each sworn the week through pays its tribute
+  // the Charters as they stand now
   const charters = holdRows.map((h) => ({ key: Number(h.key), guild: h.guild_id, tier: h.tier, region: Number(h.region) }));
-  const chartersOf = (g) => charters.filter((h) => h.guild === g);
-  const { results: fealtyRows = [] } = await db.prepare("SELECT vassal, liege, state, broken_by FROM guild_fealty WHERE state IN ('sworn', 'breaking')").all();
-  const reckoned = fealtyReckoning(fealtyRows, charters);
-  const { fealties, breakers } = reckoned;
   // CROWN1 (7.6): THE CONSCRIPTIONS that ruled the week - each crown's, still held by the guild that proclaimed it, over
-  // the Tithe every guild took this week; a seat that pays loses its Standing row (CROWN2: never a vassal of that crown's)
+  // the Tithe every guild took this week; a seat that pays loses its Standing row
   const conscriptions = [];
   const ruling = [...(await edictsOf(db, week))].filter(([key, e]) => e.edict === 'conscription' && holds.get(key)?.guild_id === e.guild && holds.get(key)?.tier === 'crown');
   let tithes = new Map();
-  if (ruling.length || fealties.length) {
+  if (ruling.length) {
     // AUDIT-SEATS S11: the week's days bound the walk (idx_marks_day) - `at` alone has no index, and the ledger is every Mark
     const { results: titheRows = [] } = await db.prepare(`SELECT dst_id, SUM(amount) AS n FROM marks_ledger
       WHERE day BETWEEN ? AND ? AND dst_kind = 'guild' AND kind = 'tithe' AND at >= ? AND at < ? GROUP BY dst_id`)
@@ -160,18 +162,16 @@ export async function settleWeek(db, week, nowS, zero = null) {
     tithes = new Map(titheRows.map((t) => [t.dst_id, Number(t.n)]));
   }
   for (const [key, e] of ruling) {
-    const vassals = new Set(fealties.filter((f) => f.liege === e.guild).map((f) => f.vassal));
-    for (const d of conscriptionDue({ kingdom: CROWN_SEAT_REGIONS[Number(holds.get(key).region)], crownGuild: e.guild, holds: charters, tithes, vassals })) {
+    for (const d of conscriptionDue({ kingdom: CROWN_SEAT_REGIONS[Number(holds.get(key).region)], crownGuild: e.guild, holds: charters, tithes })) {
       if (d.amount > 0) conscriptions.push({ crownKey: key, crown: e.guild, ...d });
     }
   }
   const conscripted = new Set(conscriptions.flatMap((c) => c.keys));
-  const counted = !!seasonOf(week, zero);   // SEASON1 part two: the Tides roll while a Season is counted
   const seats = [];
   for (const key of keys) {
     const seat = registry.get(key);
     const at = await seatGuildsOf(db, key, week);
-    const list = await gatherStandings(db, seat, week, atS, counted);
+    const list = await gatherStandings(db, seat, week, atS, lawNow ? ruled : null);   // DOMAIN3: the region's homes at a seat of power
     const h = holds.get(key);
     let holder = null;
     if (h) {
@@ -184,13 +184,7 @@ export async function settleWeek(db, week, nowS, zero = null) {
         tithe: Number(h.tithe), owed: Number(h.owed), watched: !!watched, gates: gatesIn.get(Number(h.region)) ?? 0, writs: Number(writs?.n ?? 0),
         edict: e?.edict ?? null, setAside: Number(e?.set_aside ?? 0), bonus: aftermath(key, 'bonus').includes(h.guild_id),
         conscripted: conscripted.has(key),
-        // CROWN2: a vassal's liege's reach here, halved in the defence (seatDefence); a breaker's Standing row
-        liegeReach: reckoned.liegeReach(h.guild_id, registry.get(key)),
-        brokeFealty: breakers.has(h.guild_id),
-        // SEASON1 part two (9.3): the week's Tide here (a Royal Wedding's Standing, a Tax Revolt's) and the coming week's
-        // (a Festival's cost)
-        tide: tideAt(week, seat.region, counted), tideNext: tideAt(next, seat.region, !!seasonOf(next, zero)),
-        // SEAT2b part two (7.5: "Standing +1 a week" a tier): the Shrine standing at the Turning's clock (its due raised first)
+        // SEAT2b part two (7.5: "Standing +1 a week" a tier): the Shrine standing at the Turning's clock
         ...(await (async () => { const f = await fortTiersOf(db, key, atS); return { shrine: shrineStanding(f.shrine ?? 0), titheCap: marketHallTitheCap(TITHE_CAP[h.tier] ?? 0, f.market ?? 0) }; })()),   // AUDIT SEATS-2 L1: and the Market Hall's Tithe cap, Standing's measure
         revolted: revolted.has(key),   // SEAT2b part two (c)
       };
@@ -212,7 +206,7 @@ export async function settleWeek(db, week, nowS, zero = null) {
   // SEAT2b part two (c): a Season's end sets every Standing halfway back toward 50 - no seat revolts at it
   const plan = wipe ? { ...reckonedPlan, claims: [], contested: [], rights: [], edicts: [], standings: [], held: [], legacy: [], revolts: [] }
     : ending ? { ...reckonedPlan, revolts: [] } : reckonedPlan;
-  const names = await namesOf(db, [...purseIds, ...fealties.flatMap((f) => [f.vassal, f.liege]), ...unfought.flatMap((u) => [u.attacker, u.defender])]);   // CROWN2: a lapsed liege may hold nothing now; AUDIT-SEATS S3: a void battle's two
+  const names = await namesOf(db, [...purseIds, ...unfought.flatMap((u) => [u.attacker, u.defender])]);   // CROWN2: a lapsed liege may hold nothing now; AUDIT-SEATS S3: a void battle's two
   const history = (key, kind, data) => db.prepare('INSERT INTO town_seat_history (key, week, kind, data, at) VALUES (?, ?, ?, ?, ?)')
     .bind(key, week, kind, JSON.stringify(data), nowS);
   /** AUDIT-SEATS: a Chronicle row naming what a payment PAID - the amount of ledger row `rid`, which this batch wrote just
@@ -286,7 +280,6 @@ export async function settleWeek(db, week, nowS, zero = null) {
       stmts.push(history(u.key, 'neglect', { guild: names.get(u.guild), owed: u.owed }));
     } else {
       stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(u.key, u.guild));
-      stmts.push(...fortsLapsedStatements(db, u.key, atS));   // AUDIT SEATS-2 S5: its building projects fall with it
       stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(u.key, next));
       stmts.push(history(u.key, u.state === 'revolt' ? 'revolt-stood' : 'lapse', { guild: names.get(u.guild) }));   // SEAT2b part two (c): a revolt's lapse
     }
@@ -339,30 +332,8 @@ export async function settleWeek(db, week, nowS, zero = null) {
     stmts.push(paidHistory(c.crownKey, 'conscription', { guild: names.get(c.crown), from: names.get(c.guild) }, rid));
     for (const k of c.keys) stmts.push(paidHistory(k, 'conscripted', { guild: names.get(c.guild), crown: names.get(c.crown) }, rid));
   }
-  // CROWN2 (7.8): THE FEALTIES - each vassal's tribute (5% of its week's Tithe, a fealty that stood the week through,
-  // broken at this Turning or not), after its upkeep and Edicts and Conscription, from what is left of its treasury; then
-  // the broken and the lapsed ended, the Chronicle saying so at the liege's crown and the vassal's seats
-  const crownKeyOf = (g) => chartersOf(g).find((h) => h.tier === 'crown')?.key ?? null;
-  for (const f of fealties) {
-    const both = [crownKeyOf(f.liege), ...chartersOf(f.vassal).map((h) => h.key)].filter((k) => k != null);
-    const owed = f.fits ? fealtyTribute(tithes.get(f.vassal) ?? 0) : 0;
-    if (owed > 0) {
-      const to = `COALESCE((SELECT balance FROM guild_marks WHERE guild_id = ?2), 0) + MIN(?3, balance) <= ${MARKS_MAX} AND EXISTS (SELECT 1 FROM guilds WHERE id = ?2)`;
-      stmts.push(db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-        SELECT 'guild', ?1, CASE WHEN ${to} THEN 'guild' ELSE 'burn' END, CASE WHEN ${to} THEN ?2 END, 'fealty-tribute', MIN(?3, balance), ?4, ?5, 'seats', 'The Turning', ?6
-        FROM guild_marks WHERE guild_id = ?1 AND balance > 0`).bind(f.vassal, f.liege, owed, utcDay(nowS), nowS, `fealty-${week}-${f.vassal}`));
-      const k = crownKeyOf(f.liege);
-      if (k != null) stmts.push(paidHistory(k, 'fealty-tribute', { vassal: names.get(f.vassal), liege: names.get(f.liege) }, `fealty-${week}-${f.vassal}`));   // AUDIT-SEATS: what was paid
-    }
-    if (f.broken || !f.fits) {
-      stmts.push(db.prepare('DELETE FROM guild_fealty WHERE vassal = ? AND liege = ?').bind(f.vassal, f.liege));
-      for (const k of both) stmts.push(history(k, f.broken ? 'fealty-broken' : 'fealty-lapsed', { vassal: names.get(f.vassal), liege: names.get(f.liege), ...(f.broken ? { breaker: names.get(f.broken) } : {}) }));
-    }
-  }
   // CROWN1 part two (7.6): THE WEEK'S ROYAL TOURNEYS - each champion named, paid its prize and titled; none, the prize home
   stmts.push(...(await royalTurning(db, week, nowS, history, registry)));
-  // AUDIT-SEATS (9.3): A DAEDRIC INCURSION'S MARKS - the gate days' second half, now three claims agree on their regions
-  stmts.push(...incursionStatements(db, { week, agreed, counted, nowS }));
   // every held seat's Standing after its week (7.3) - SEASON1: halfway back toward 50 at a Season's end; the unchallenged
   // in the Chronicle
   for (const w of plan.standings) {
@@ -379,9 +350,31 @@ export async function settleWeek(db, week, nowS, zero = null) {
   // Edict void; no fee refunded (a strike's own batch refunds it, townSeats.js strikeSeat)
   for (const h of unregistered) {
     stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(Number(h.key), h.guild_id));
-    stmts.push(...fortsLapsedStatements(db, Number(h.key), atS));   // AUDIT SEATS-2 S5: its building projects fall with it
     stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(Number(h.key), next));
     stmts.push(history(Number(h.key), 'unregistered', { guild: names.get(h.guild_id) ?? { name: '', tag: '' } }));
+  }
+  // DOMAIN3 (Domains.md section 3, "If it opens later"): THE FOLD - a Charter held at a seat that is not its region's seat
+  // of power, released: its claim fee home where it began this Season (`domain-fold`, what the treasury has room for - the
+  // strike's refund, townSeats.js strikeSeat), its coming Edict void, its building projects fallen and what it held, with
+  // its stockpile, to the region's Charter's stockpile; its standing works stay on a town that is no Charter now
+  const floor = seasonFloor(week, zero);
+  for (const h of folded) {
+    // AUDIT DOMAINS S7: the region the registry says the seat is in - the one the Charters were read by - never the hold
+    // row's own, which a seat's witnesses may since have moved (an undefined target would fail every Turning after)
+    const key = Number(h.key), into = domains.get(registry.get(key).region).key, rid = `fold-${week}-${key}`;
+    stmts.push(db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
+      SELECT 'mint', NULL, 'guild', h.guild_id, 'domain-fold', MIN(l.amount, ${MARKS_MAX} - COALESCE((SELECT balance FROM guild_marks WHERE guild_id = h.guild_id), 0)),
+        ?2, ?3, 'seats', 'The Turning', ?4
+      FROM town_seat_holds h JOIN marks_ledger l ON l.actor = 'seats' AND l.kind = 'seat-claim' AND l.src_id = h.guild_id
+        AND l.rid IN ('claim-' || (h.since_week - 1) || '-' || h.key, 'tourney-' || h.since_week || '-' || h.key)
+      WHERE h.key = ?1 AND h.since_week >= ?5 AND EXISTS (SELECT 1 FROM guilds WHERE id = h.guild_id)
+        AND COALESCE((SELECT balance FROM guild_marks WHERE guild_id = h.guild_id), 0) < ${MARKS_MAX}
+      LIMIT 1`).bind(key, utcDay(nowS), nowS, rid, floor));
+    stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(key, next));
+    stmts.push(db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(key, h.guild_id));
+    stmts.push(db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at)
+      SELECT ?1, ?2, 'fold', json_set(?3, '$.refund', COALESCE((SELECT amount FROM marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4`)
+      .bind(key, week, JSON.stringify({ guild: names.get(h.guild_id) ?? { name: '', tag: '' }, into }), nowS, rid));
   }
   // AUDIT-SEATS S3 (17): THE BATTLES NO RESULT REACHED, void - after every payment the plan reckoned, so the escrow coming
   // home moves none of them; the void asked in its own write (a result that landed since the read rolls the settle back
@@ -402,19 +395,14 @@ export async function settleWeek(db, week, nowS, zero = null) {
   // so a service catching up keeps every week it has yet to settle)
   stmts.push(db.prepare('DELETE FROM town_seat_influence WHERE week <= ?').bind(week - INFLUENCE_KEPT_WEEKS));
   stmts.push(db.prepare('DELETE FROM town_seat_renown WHERE week <= ?').bind(week - INFLUENCE_KEPT_WEEKS));
-  // SEASON1 (9.1): A SEASON'S END - its titles, each its guild's guildmaster's for good ("Crowned in Season N" for every
-  // crown's, "Keeper of <Town>, Season N" for a seat held the whole Season), over the Charters that stood its last week
-  // through (none lapsed now); and the Chronicle's line at every one of them (Season 0's titles none, its lines wiped below)
+  // SEASON1 (9.1): A SEASON'S END - the keepers (a seat held the whole Season) over the Charters that stood its last week
+  // through (none lapsed now), their ribbons; and the Chronicle's line at every one of them (Season 0's none, its lines wiped below)
   if (ending) {
-    const lapsed = new Set([...plan.upkeep.filter((u) => u.state === 'lapse' || u.state === 'revolt').map((u) => u.key), ...unregistered.map((h) => Number(h.key))]);   // AUDIT-SEATS S4
+    const lapsed = new Set([...plan.upkeep.filter((u) => u.state === 'lapse' || u.state === 'revolt').map((u) => u.key), ...unregistered.map((h) => Number(h.key)), ...folded.map((h) => Number(h.key))]);   // AUDIT-SEATS S4; DOMAIN3: the fold
     const stood = holdRows.filter((h) => !lapsed.has(Number(h.key))).map((h) => ({ key: Number(h.key), guild: h.guild_id, tier: h.tier, since: Number(h.since_week) }));
-    const titles = seasonTitles(ending, stood);
-    const masters = await guildmastersOf(db, [...new Set(titles.map((t) => t.guild))]);
-    for (const t of titles) {
-      if (masters.has(t.guild)) stmts.push(db.prepare('INSERT OR IGNORE INTO town_seat_titles (account, title, key, week, at) VALUES (?, ?, ?, ?, ?)').bind(masters.get(t.guild), t.title, t.key, week, nowS));
-    }
+    const keepers = seasonKeepers(ending, stood);
     // SEASON1 part two (9.1): the banner ribbon - each keeper's guild, for its members as they stand at this Turning
-    for (const g of seasonRibbons(titles)) stmts.push(db.prepare('INSERT OR IGNORE INTO town_seat_ribbons (season, guild_id, at) VALUES (?, ?, ?)').bind(ending.n, g, atS));
+    for (const g of seasonRibbons(keepers)) stmts.push(db.prepare('INSERT OR IGNORE INTO town_seat_ribbons (season, guild_id, at) VALUES (?, ?, ?)').bind(ending.n, g, atS));
     for (const h of stood) stmts.push(history(h.key, 'season-end', { guild: names.get(h.guild), season: ending.n, kept: keptWholeSeason(ending, h.since) }));
     // SEAT2b (9.1: "fortifications decay one tier"): every seat's works a tier down (Season 0's are wiped below)
     if (!wipe) stmts.push(...fortsSeasonStatements(db));
@@ -428,29 +416,22 @@ export async function settleWeek(db, week, nowS, zero = null) {
   // AUDIT-SEATS S1: `failed` - the batch rolled back for a reason of its own (not a racing reader's key), so settleDue
   // stops there rather than settle a later week over it
   try { await db.batch(stmts); } catch { return { settled: false, failed: !(await db.prepare('SELECT 1 FROM town_seat_weeks WHERE week = ?').bind(week).first()) }; }
+  // DOMAIN2 (Domains law 3; AUDIT DOMAINS S2): every castle whose guild this Turning left without its region's crown, released
+  // at once - half its price home - not at the next read; a release that fails is the next read's (castles.js, idempotent)
+  try { await releaseCastles(db, nowS); } catch { /* the next read releases it */ }
   return { settled: true, plan, season: ending };
-}
-
-/** SEASON1: each guild's guildmaster's account, by guild. */
-async function guildmastersOf(db, guilds) {
-  if (!guilds.length) return new Map();
-  const results = await allIn(db, guilds, (qs) => `SELECT guild_id, player FROM guild_members WHERE rank = ? AND guild_id IN (${qs})`, [GUILD_RANK_MASTER]);
-  return new Map(results.map((r) => [r.guild_id, r.player]));
 }
 
 /** THE SEATS AS THE MAP AND THE ARRIVAL NEED THEM: each listed seat with its holder and this week's battle at it (a
  *  Contested seat's Tourney, a held seat's siege), or null. SEAT1d: the holder with the Edict that rules this week (the
  *  client's shops, its arrival and its Festival read it), or null. And the day's red lines (seatPolitics.js redOf).
- *  SEAT-BATCH (2026-10-16, the account database's primary at its ceiling of round trips - bible/11-Multiplayer/
- *  Scale-Arc.md SEAT-BATCH): the six reads in ONE batch, where each was a round trip of its own - every list asked the
+ *  SEAT-BATCH: the six reads in ONE batch, where each was a round trip of its own - every list asked the
  *  primary seven times past its session's lookup, and the primary's ceiling is its round trips, not its rows. Answers
  *  `{ seats, red }`. */
 export async function seatsBoard(db, seats, nowS) {
   const week = weekAt(nowS);
-  // SEAT2b part two (7.5): each seat's works standing now - a project whose day has come counts (seatForts.js fortTierAt's
-  // rule, read and never written) - so every client knows a members' Harbour, the Watchtowers and the crafting halls
-  const fortsRead = db.prepare(`SELECT key, work, CASE WHEN building IS NOT NULL AND stands_at IS NOT NULL AND stands_at <= ?1
-    THEN building ELSE tier END AS t FROM town_seat_forts WHERE tier > 0 OR (building IS NOT NULL AND stands_at IS NOT NULL AND stands_at <= ?1)`).bind(nowS);
+  // SEAT2b part two (7.5): each seat's works standing now, so every client knows a members' Harbour, the Watchtowers and the crafting halls
+  const fortsRead = db.prepare('SELECT key, work, tier AS t FROM town_seat_forts WHERE tier > 0');
   const [heldRes, rightsRes, revoltsRes, edictsRes, fortsRes, redRes] = await db.batch([holdsRead(db), ...battlesRead(db, week), edictsRead(db, week), fortsRead, redRead(db, nowS)]);
   const holds = holdsFrom(heldRes?.results), battles = battlesFrom(rightsRes?.results, revoltsRes?.results), edicts = edictsFrom(edictsRes?.results);
   const forts = new Map();
@@ -470,13 +451,13 @@ export async function seatsBoard(db, seats, nowS) {
  * @param {number} nowS
  * @param {number|null} [zero] SEASON1: the week Season 0 began, or null
  */
-export async function settleDue(db, nowS, zero = null) {
+export async function settleDue(db, nowS, zero = null, domainsWeek = null) {   // DOMAIN3: `domainsWeek`, the region law's first week
   const current = weekAt(nowS);
   const last = (await db.prepare('SELECT MAX(week) AS w FROM town_seat_weeks').first())?.w;
   const from = Math.max(last == null ? current - 1 : Number(last) + 1, current - SETTLE_WEEKS_MAX);
   let n = 0;
   for (let w = from; w < current; w++) {
-    const r = await settleWeek(db, w, nowS, zero);
+    const r = await settleWeek(db, w, nowS, zero, domainsWeek);
     if (r.settled) n++;
     // AUDIT-SEATS S1: a week that failed is the first the next read settles - never one left behind under a later week
     // (the next read starts after the last settled, so a week past a failure would be skipped for good)
@@ -498,7 +479,7 @@ export const SETTLE_LEASE_S = 60;
  * holds the Turning. Nothing due costs the one read it always did - once a week an isolate, since PRIMARY-FOLD (weekKept.js).
  * @param {any} db @param {number} nowS @param {number|null} [zero]
  */
-export async function settleDueOnce(db, nowS, zero = null) {
+export async function settleDueOnce(db, nowS, zero = null, domainsWeek = null) {   // DOMAIN3: `domainsWeek`, the region law's first week
   if (weekSettled(db, 'seats', weekAt(nowS))) return { settled: 0, pending: false };   // PRIMARY-FOLD: this isolate read the week settled (weekKept.js)
   const last = (await db.prepare('SELECT MAX(week) AS w FROM town_seat_weeks').first())?.w;
   if (last != null && Number(last) + 1 >= weekAt(nowS)) { keepWeekSettled(db, 'seats', weekAt(nowS)); return { settled: 0, pending: false }; }
@@ -511,7 +492,7 @@ export async function settleDueOnce(db, nowS, zero = null) {
     ON CONFLICT (id) DO UPDATE SET holder = ?1, until = ?2 WHERE until <= ?3`).bind(holder, nowS + SETTLE_LEASE_S, nowS).run();
   if (!Number(took?.meta?.changes)) return { settled: 0, pending: true };
   try {
-    return { settled: await settleDue(db, nowS, zero), pending: false };
+    return { settled: await settleDue(db, nowS, zero, domainsWeek), pending: false };
   } finally {
     // a release that fails is the lease's own end, SETTLE_LEASE_S on - never the settle's answer lost
     try { await db.prepare('DELETE FROM town_seat_settling WHERE id = 1 AND holder = ?').bind(holder).run(); } catch { /* it runs out */ }
@@ -536,7 +517,6 @@ export async function relinquishSeat({ db, nowS }, player, env, { character, key
     db.prepare(`INSERT INTO town_seat_history (key, week, kind, data, at) SELECT ?1, ?2, 'relinquish', ?3, ?4 WHERE changes() > 0`)
       .bind(key, weekAt(nowS), JSON.stringify({ guild: names.get(a.me.guild_id) }), nowS),
     // AUDIT SEATS-2 S5: its building projects fall with the Charter (the tiers stay) - nothing where the DELETE moved none
-    ...fortsLapsedStatements(db, key, nowS),
   ]);
   return gone?.meta?.changes ? { ok: true } : { error: 'seat-not-held' };
 }
@@ -562,8 +542,8 @@ export async function seatTitlesOf(db, playerId) {
   const { results = [] } = await db.prepare(`SELECT h.key, h.tier, h.region FROM town_seat_holds h
     JOIN guild_members m ON m.guild_id = h.guild_id WHERE m.player = ? AND m.rank = ?`).bind(playerId, GUILD_RANK_MASTER).all();
   const out = new Set(results.map((h) => (h.tier === 'crown' ? 'protector' : 'warden')));
-  // CROWN1 part two: and a Royal Tourney's champion, the account's own for good; SEASON1: and a Season's crowned and keeper
+  // CROWN1 part two: and a Royal Tourney's champion, the account's own for good
   const { results: kept = [] } = await db.prepare('SELECT DISTINCT title FROM town_seat_titles WHERE account = ?').bind(playerId).all();
   for (const k of kept) out.add(k.title);
-  return ['warden', 'protector', 'crowned', 'keeper', 'champion'].filter((t) => out.has(t));
+  return ['warden', 'protector', 'champion'].filter((t) => out.has(t));
 }

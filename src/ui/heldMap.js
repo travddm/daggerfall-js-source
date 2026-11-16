@@ -2,11 +2,7 @@
 // MAP1 — THE HELD MAP: the enhanced travel map is a parchment in the
 // player's own hands.
 //
-// Mac (2026-09-18): "A complete replacement of the current enhanced
-// map. Using the sprite, players should be able to open the map showing
-// on the sprite itself in a hand drawn format, with roads and all. The
-// player should be able to scale around, zoom in and out, and select
-// their destination." The arc is bible/10-UI/Held-Map-Arc.md.
+// The arc is.
 //
 // THE SPRITE IS THE WINDOW. public/art/held-map.png - Mac's own
 // painting of two gauntleted hands holding a blank sheet (the FOURTH,
@@ -46,7 +42,7 @@
 // inked in the party green (SOC6), stacked on a shared pixel (AUDIT SOC
 // D2), with the hover line that names every member on it.
 //
-// RECORDED DEPARTURES (bible/10-UI/Held-Map-Arc.md): the 3D relief, the
+// RECORDED DEPARTURES: the 3D relief, the
 // cloud veil and the camera flight are gone - a journey begins the
 // moment Begin is pressed, the sheet lowers, and the host's own travel
 // runs; the province pages and the region picker have no meaning on one
@@ -72,7 +68,7 @@
 // card (TravelOptionsPopUp.cs UpdateLabels: hours and minutes and no
 // fare when the trip is player-controlled). The teleport fee is MAP1's.
 //
-// AUDIT-MAP (2026-09-18, bible/10-UI/Held-Map-Arc.md): the fare is the
+// AUDIT-MAP: the fare is the
 // mod's SCALED one (scaleTripCost, the popup's own export); a walked
 // trip hands its walked minutes to the host's ETA; No on the fee closes
 // the map; online the trip's days pass on the traveller's own clock (LIVED1) and the fare is billed; the static
@@ -83,7 +79,8 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { MAP_WIDTH, MAP_HEIGHT } from '../formats/woodsFile.js';
-import { REGION_NAMES, longitudeLatitudeToMapPixel, getPixelFromPixelID, patchRegionIndex } from '../formats/mapsFile.js';
+import { REGION_NAMES, longitudeLatitudeToMapPixel, patchRegionIndex } from '../formats/mapsFile.js';
+import { summaryPixel } from './overworldModel.js';   // WW-C2: a place's own pixel where it carries one
 import { locationSummaryAt } from '../systems/map/mapDirectory.js';
 import { calculateTravelTime, calculateTripCost, travelDays } from '../systems/travel/travel.js';
 import { guildFastTravel } from '../systems/guild/guildVariants.js';   // TP1: GuildManager.FastTravel
@@ -102,16 +99,13 @@ import { noticeHold, noticeRelease } from './enhanced/enhancedNotice.js';   // E
 import { TRAVEL_OPTIONS_TEXT as TO_TEXT, format as toFormat } from '../systems/travel/travelOptionsText.js';
 import { getDaggerfallDistance, MatchesCutOff } from '../systems/editDistance.js';
 import { checkLocationDiscovered, flipTravelMapFilter, travelMapDotColors } from './travel/travelMapWindow.js';   // MAP-KEY: the classic's filter flip and its dots' colours
-import { readGateMark, gateMarkKey, GATE_RING_CSS, GATE_LEGEND_TEXT } from './gate/gateMapMark.js';   // WB1: the Oblivion Gate's ring, read as the party is (SERPENT1: and the serpent's, by the same reader)
+import { readGateMarkIn, gateMarkKey, readGateMarks, gateMarksKey, GATE_RING_CSS, GATE_LEGEND_TEXT } from './gate/gateMapMark.js';   // WB1: the Oblivion Gate's ring, read as the party is (SERPENT1: and the serpent's, by the same reader)
 import { SERPENT_RING_MAP_CSS, SERPENT_LEGEND_TEXT } from './serpentMapMark.js';   // SERPENT1: the sea serpent's ring, in the sea's colours
 import { SD_RING_MAP_CSS, SD_LEGEND_TEXT } from './superDungeon/sdMapMark.js';   // SD2c: the Super dungeon's ring once it is found, in its omen's brass
-import { EG_ARCH_RING_CSS, EG_ARCH_LEGEND_TEXT } from './eliteGates/egArchMapMark.js';   // EG-F: my company's Elite arch, in its gold
-import { KT_RING_CSS, ketchLegendText } from './ketch/ketchMapMark.js';   // KETCH: the Sky-Ketch over Daggerfall
 import { LODE_RING_CSS, LODE_LEGEND_TEXT, lodeLegendText } from './lodeMapMark.js';   // MINE-PERKS: a Motherlode Sense's day's Motherlodes, read by the bounty's reader
-import { POI_RING_CSS, POI_MARKS_MAX, poiLegendText } from './poi/poiMapMark.js';   // POI-2: the approved POIs' marks, read by the bounty's reader
-import { readBountyMarks, bountyMarksKey, BOUNTY_RING_CSS, BOUNTY_LEGEND_TEXT, BOUNTY_LEGEND_RIM_CSS, REVENANT_RING_CSS, REVENANT_LEGEND_TEXT } from './bounty/bountyMapMark.js';   // BOUNTY1: held bounties' black circles, read as the gate's ring is
-import { readRaidMarks, raidMarksKey, placeTip, tipKey, readTip, RAID_MARK_CSS, RAID_LEGEND_TEXT, RAID_HIT_PX, SEAT_TIP_TEXT_MAX, TOWN_TIP_LINES_MAX } from './eventMapMarks.js';   // EVENT-TIP: the raided towns, and the card a world event answers a hover with
-import { readVendorMark, vendorMarkKey, VENDOR_MARK_CSS, VENDOR_RIM_CSS, VENDOR_LEGEND_TEXT } from './vendor/vendorMapMark.js';   // HOME-VENDOR: the trader's waypoint
+import { readBountyMarksIn, bountyMarksKey, BOUNTY_RING_CSS, BOUNTY_LEGEND_TEXT, BOUNTY_LEGEND_RIM_CSS, REVENANT_RING_CSS, REVENANT_LEGEND_TEXT } from './bounty/bountyMapMark.js';   // BOUNTY1: held bounties' black circles, read as the gate's ring is
+import { readRaidMarksIn, raidMarksKey, placeTip, tipKey, readTip, RAID_MARK_CSS, RAID_LEGEND_TEXT, RAID_HIT_PX, SEAT_TIP_TEXT_MAX, TOWN_TIP_LINES_MAX } from './eventMapMarks.js';   // EVENT-TIP: the raided towns, and the card a world event answers a hover with
+import { vendorMarkKey, VENDOR_MARK_CSS, VENDOR_RIM_CSS, VENDOR_LEGEND_TEXT, readVendorMarkIn } from './vendor/vendorMapMark.js';   // HOME-VENDOR: the trader's waypoint
 import { readQuestMarks, questMarksKey, QUEST_MARK_CSS, QUEST_LEGEND_TEXT, QUEST_HIT_PX, QUEST_MARK_LIFT, QUEST_RAID_LIFT, QUEST_FOLLOWED_TEXT } from './quest/questMarks.js';   // GUIDE5: where the quests point
 import {
   buildInkModel, buildInkMarks, paintInkStatic, paintInkOverlay, zoomBand, clampView, scaleMinOf, SCALE_MAX,   // MAP-FIELD2: placeNames is inkMap's law still, but this sheet no longer inks the names
@@ -122,9 +116,9 @@ import {
 } from './ink/inkMap.js';
 // SOC6: the party's marks, read the one way both maps read them.
 import {
-  readPartyMarks, partyMarksKey, partyHoverText, partyLabelText,
+  readPartyMarksIn, partyMarksKey, partyHoverText, partyLabelText,
   PARTY_MARK_CSS, PARTY_OFFLINE_CSS, PARTY_LEGEND_TEXT,
-  readTravellerMarks, travellerMarksKey, TRAVELLER_MARK_CSS, TRAVELLER_LEGEND_TEXT,   // TV3
+  readTravellerMarksIn, travellerMarksKey, TRAVELLER_MARK_CSS, TRAVELLER_LEGEND_TEXT,   // TV3
 } from './partyMapMarks.js';
 // EM1: the tab strip inked on the paper, the slot under it, and the
 // contract whatever is inked answers. `mapContextOf` turns the flags
@@ -135,12 +129,18 @@ import {
 import { mapContextOf } from '../systems/map/mapTabs.js';
 import { createAutomapSheet } from './automap/automapSheet.js';
 import { dungeonMap3dOn, tamrielMapOn } from './map/mapSkin.js';   // EM3-3D: the solid dungeon map's switch; TAMRIEL1: the continent's
-// TAMRIEL1 (2026-10-08, Mac: "the entirety of tamriel ... connected as a gigantic map ... seen by players ingame"): the
+// TAMRIEL1: the
 // continent inked round the Bay on the world sheet - the sheet's pan box grows to the whole frame, the home view stays
-// the Bay's own fit, and past that fit the sheet is on the continent (ui/tamrielInk.js; bible/03-World/Tamriel.md)
-import { tamrielInkFor, paintTamrielInk, tamrielPlaceAt, onContinent } from './tamrielInk.js';
-import { tamrielFrameInBay } from '../world/tamriel/tamrielFrame.js';
+// the Bay's own fit, and past that fit the sheet is on the continent (ui/tamrielInk.js)
+import { tamrielInkFor, paintTamrielInk, paintPastBay, pastBayStamp, tamrielHoverAt, tamrielCityAt, onContinent, releasePastBayInk, viewLeavesBay, tamrielFindRows } from './tamrielInk.js';   // TESA2: the press's city beside the hover's; BAY-LEFT-MAPS C9: the find box's places past the Bay
+import { tamrielFrameInBay, inBay } from '../world/tamriel/tamrielFrame.js';
 import { tamrielLandVersion } from '../world/tamriel/tamrielLand.js';   // TAMRIEL3: the trace's version, in the static key
+import { arenaPlacesVersion } from '../world/arenaPlaces.js';   // TESA1: the places' version past the Bay, beside it
+import { arenaRoadsVersion } from '../world/arenaRoads.js';   // TESA13: and the roads past the Bay, landing while it stands (AUDIT TESA II M9: the tick's word)
+import { pastBayPlacesVersion } from '../world/pastBayPlaces.js';
+import { portalLandAt } from '../systems/travel/pastBayTravel.js';   // PORTAL-ANYWHERE: the land a Portal Stone's portal reaches past the Bay   // TESA15: and the places the roads' regions laid
+import { createTamrielTiles } from './tamrielTiles.js';   // TESA15: the land past the Bay's paint, kept a tile at a time
+import { pageHas } from '../systems/pageQuery.js';   // MAP-WHOLE: the load probe's door behind the shot gate
 import { NOTE_MAX_CHARACTERS } from '../systems/automap/automap.js';
 /** PLUS-MAP: the 3D map's tool glyphs - line drawings in the button's own colour (currentColor). */
 const TOOL_SVG = (d) => `<svg class="hmtoolicon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">${d}</svg>`;
@@ -163,6 +163,19 @@ export const PAD_DEADZONE = 0.2, PAD_ZOOM = 1.6, PAD_TURN = 420;
 export const ORBIT_LOCK_PX = 8;   // DISC22-G: DFU's note box's own cap (:1603)
 /** WB13c: a finger's tap on a mark with a card holds the card this long (seconds) - a finger has no hover. */
 export const TAP_TIP_S = 4;
+/** ZOOM-FAST: a scale moved within this many ms is a zoom still going - no road tile painted, no marks bake (the world sheet). */
+export const ZOOM_SETTLE_MS = 150;
+/** ZOOM-FAST - AUDIT TESA II K3: THE SETTLE, a law of its own. `settling(scale, now)` answers whether the scale moved within
+ *  `ms` - the first scale asked settles none (a map opening is no zoom), a change settles for `ms` from it, then none.
+ *  Pinned pure (it had no pin: answering always yes painted no road tile ever, and no test failed). */
+export function createZoomSettle(ms = ZOOM_SETTLE_MS) {
+  let at = /** @type {?number} */ (null), since = -Infinity;
+  return (scale, now) => {
+    if (at === null) at = scale;
+    else if (scale !== at) { at = scale; since = now; }
+    return now - since < ms;
+  };
+}
 /** ORBIT-FREE: how far (px) a locked drag must go the other way - past its drift - before it turns and tilts at once;
  *  and the drift itself: off-axis travel under ORBIT_DRIFT of the locked axis's, the slope the lock's own 2:1 forgives. */
 export const ORBIT_FREE_PX = 24, ORBIT_DRIFT = 0.5;
@@ -188,9 +201,6 @@ import {
   WAYPOINT_KINDS, WAYPOINT_TEXT, shownWaypoints, onWaypoints, isWaypointFollowed, waypointKindsShown, toggleWaypointKind, listWaypoints,
 } from '../systems/map/mapWaypoints.js';   // WAYPOINTS: the flags on the sheet, and their key row
 import { openWaypointMenu, closeWaypointMenu } from './waypointMenu.js';   // WAYPOINTS: the right-click menu
-import { wildInk, paintWildZone, paintWildRemains, paintWildKeyChip, paintWildCrows, paintWildFlames, paintWildLocks, paintWildGiants } from './wild/wildMapInk.js';   // WILD1: the open zone's fog, red line and my remains
-import { WILD_TEXT, wildInside, wildRingAt } from '../systems/wild/wildZone.js';   // WILD1: the zone's words on the map
-import { zoneMapInk, paintWildRings, paintZoneMapStatic, zoneMapView, zoneMapLimits, buildZoneLegend } from './wild/wildZoneMap.js';   // WILD2: the rings, and the zone's own map
 import { paintWaypointFlag, flagBox } from './waypointFlags.js';   // WAYPOINTS: the small flags
 import { mapUiScale } from './map/mapScale.js';   // FIELD BUGS 2026-10-09e MAP-SCALE: the map's interface at the screen's size
 import { getPref } from '../systems/uiPrefs.js';
@@ -203,14 +213,14 @@ import { capturePointer } from './pointerCapture.js';   // RPT1026-CLIENT: a pad
 export const HELD_MAP_URL = new URL('art/held-map.png', APP_ROOT ?? globalThis.document?.baseURI ?? 'https://invalid.invalid/').href;
 /** Its own pixels, and the stage's aspect. */
 export const SPRITE = Object.freeze({ w: 1648, h: 1086 });   // MAP-FIELD8: the FOURTH painting - wider (1648, not 1448), the same height
-/** MAP-FIELD4 (2026-09-19, Mac: "Try this instead"): THE SECOND
+/** MAP-FIELD4: THE SECOND
  *  PAINTING, and it changes the rules this module was built on.
  *
  *  It carries a real ALPHA CHANNEL - 857,265 of its pixels are exactly
  *  transparent and nothing is matted - where the first was a fully
  *  opaque picture on its own black. So the black key is gone (see the
  *  departure recorded where that key used to live, in
- *  bible/10-UI/Held-Map-Arc.md): the painting says what is picture and
+ *  ): the painting says what is picture and
  *  what is not, and this module no longer has to guess it from
  *  brightness. Guessing it here would now be actively wrong, because
  *  the gauntlets in this painting are grey and run down to luma 0 - a
@@ -224,8 +234,7 @@ export const SPRITE = Object.freeze({ w: 1648, h: 1086 });   // MAP-FIELD8: the 
 /** The parchment's rectangle, as fractions of the sprite: the largest
  *  upright rectangle that lies WHOLLY on the sheet.
  *
- *  MAP-FIELD3 (Mac: "the ingame map on the map appears going off the
- *  edge") - the ink canvas is laid EXACTLY here, so a rectangle larger
+ *  MAP-FIELD3 - the ink canvas is laid EXACTLY here, so a rectangle larger
  *  than the sheet prints the map onto the torn edge and out over the
  *  sky. That bug predates both new paintings: on the ORIGINAL art this
  *  constant sat about 10 px left and 12 px above the sheet's real edge.
@@ -289,8 +298,7 @@ export const HAND_CHROMA = 75;
  *  where the erode treats off-zone as kept and so cannot pull the blob
  *  back, so a blob within `grow` of an edge keeps its bulge. */
 export const THUMB_GROW = 4;
-/** MAP-FIELD2 (Mac, 2026-09-18): "...and is full screen with a BLACK
- *  BACKGROUND" - and MAP-FIELD4, which ended that law.
+/** MAP-FIELD2 (- and MAP-FIELD4, which ended that law.
  *
  *  The first painting was fully opaque and carried its own black matte,
  *  so this module keyed the black out by brightness to put hands on the
@@ -301,12 +309,11 @@ export const THUMB_GROW = 4;
  *  and a brightness key would punch holes through them. The painting
  *  states its own silhouette now; nothing here guesses it.
  *
- *  Recorded as a departure in bible/10-UI/Held-Map-Arc.md. If a
+ *  Recorded as a departure in. If a
  *  matted painting is ever supplied again it comes back from there,
  *  keyed to that file - it must not be revived by feel. */
 
-/** MAP-FIELD2, Mac's second look: "there's still a gap at the bottom of
- *  the arms, any way you can author the gap?"
+/** MAP-FIELD2,
  *
  *  There is, and cropping alone could not close it. The cuffs are CUT
  *  BY THE FRAME - the painting simply stops partway down the forearms -
@@ -371,8 +378,7 @@ export function extendCuffs(data, w, h, foot = CUFF_BAND, alphaMin = 128) {
   return data;
 }
 
-/** MAP-FIELD2 (Mac, 2026-09-18): "the held map should be at the bottom
- *  of the screen, arms should sit slighty below where there is no gap".
+/** MAP-FIELD2 (.
  *
  *  The sheet was fitted to the whole viewport and CENTRED, letterboxed
  *  into the root's own black - a picture of hands, not hands. It is a
@@ -388,7 +394,7 @@ export function extendCuffs(data, w, h, foot = CUFF_BAND, alphaMin = 128) {
  *  if the map reads too small to use or too big to see past. (AUDIT
  *  MAP-FIELD: it read 0.617, a PAPER two paintings old.) */
 export const HELD_MAP_HEIGHT = 0.92;
-// MAP-FIELD5 (2026-09-19, Mac: "Can you lower it on the screen more").
+// MAP-FIELD5.
 // 0.03 to 0.11 - about 60px further down a 720p screen. This is the
 // number to turn for that, and the only one: HEIGHT sets how big the
 // sheet is, BITE sets how far down it sits, and neither disturbs the
@@ -411,8 +417,7 @@ export const HELD_MAP_BITE = 0.11;
  *  had to be read off the brightness. */
 export const SPRITE_ART_FOOT = 0.872;   // MAP-FIELD8: the fourth painting's lowest opaque row is 946 of 1086
 
-/** HOLD-CLOSE (2026-09-27, Mac: "make the map hold bigger means closer to your face so the interactable objects and
- *  functions have more place and you see more of the map"): THE SHEET IS HELD UP TO THE FACE. The painting used to
+/** HOLD-CLOSE: THE SHEET IS HELD UP TO THE FACE. The painting used to
  *  be fitted by its own height (HELD_MAP_HEIGHT of the screen, never wider than it), which left the PAPER about half
  *  the screen tall with the gauntlets whole round it. Now the PAPER is what is fitted: as wide as `paperW` of the
  *  screen and as tall as `paperH` of it, whichever binds first, with its head `top` of the screen down, clear of the
@@ -463,9 +468,7 @@ export function heldStageRect(vw, vh) {
 export const CUFF_BAND = 0.827;   // MAP-FIELD8: the fourth painting's silhouette columns end by 0.8158 and its cut cuffs begin at 0.8379 (tools/heldMapArtProbe.mjs) - a 24-row gap, the band in its middle with eleven rows either side
 
 // ── THE CLOCKS (skin) ────────────────────────────────────────────
-/** MAP-FIELD7 (2026-09-19, Mac: "when you open or close your map, I
- *  want the sprite to come in and go out at the bottom of the screen
- *  instead of fading in"). These two always SAID the sheet rises and
+/** MAP-FIELD7. These two always SAID the sheet rises and
  *  lowers - the comment was the intent and the code was a fade. It
  *  really moves now (`_setRaise`), and it takes a little longer than
  *  the fade did, because a fade of a third of a second reads as instant
@@ -481,8 +484,6 @@ const PARTY_POLL_S = 0.25;
 /** The foot's line while a sheet with no keys of its own is up. DISC25-A: a sheet that has keys says them instead
  *  (`hint`, an optional member beside `breathes`) - the dungeon's floor keys were on no line a player could read. */
 export const MAP_HINT = 'drag to pan · scroll to zoom · Esc to close';
-/** WILD2: the foot's line on the zone map. */
-export const ZONE_MAP_HINT = 'drag to pan · scroll to zoom · Esc for the world map';
 /** TV1: the foot row's door into the travel view, and its key on the sheet: O - the view's own words (scenes/travelView.js
  *  TRAVEL_VIEW_BUTTON, one home since ETHER-OW: the Eltheric Ocean's chart wears the same door). */
 export { TRAVEL_VIEW_BUTTON };
@@ -540,7 +541,7 @@ export class HeldMapWindow {
     this.done = false;
     this.isChoiceWindow = true;
     // MAP-WEAPON / EM-BUG1: the scene's tick tag, this file's own idiom
-    // (`isRestWindow`, `isVirtueLevelUp`): the weapon rig asks whether
+    // (`isRestWindow`): the weapon rig asks whether
     // a map holds the screen and must not import a UI class to ask.
     //
     // THIS IS ITS OWN TAG NOW, AND THAT IS THE BUG EM4 LEFT. The rig's
@@ -550,8 +551,7 @@ export class HeldMapWindow {
     // one flag was answering two unrelated questions, and narrowing it
     // for the travel one silently un-answered the other: a town or
     // dungeon sheet stopped hiding the weapon, so the player stood
-    // holding a map AND a drawn sword (Mac: "your equipped weapon isnt
-    // stowed when the map is out").
+    // holding a map AND a drawn sword.
     //
     // Hands holding a map are not also holding a sword, wherever the
     // map came from. So this is constant, declared here, and true for
@@ -575,9 +575,6 @@ export class HeldMapWindow {
     }
     this._inks = null;     // MAP-KEY: each kind's ink once a palette answers (_markInks)
     this._keySig = '';     // MAP-KEY: what the key last said, so it is rebuilt only when that changes
-    // WILD2: THE ZONE MAP - the world sheet held to the Wrothgarian Mountains, its rings filled and its legend beside it
-    // (ui/wild/wildZoneMap.js); `_zoneLegend` the legend's element while it stands, `_zoneRing` the ring it was built for
-    this._zoneMap = false; this._zoneLegend = null; this._zoneRing = -1;
     this.teleportationTravel = false;    // one-shot, cleared on close
     // IT1: IMMERSIVE TRAVEL. `_it` is a driver's or a captain's map - `{ kind, settings }` (the mod's CarriageMap built
     // CreatedByNPC, its SeafarersMap); null for the player's own, which asks `deps.immersiveSettings` for the mod's
@@ -683,18 +680,18 @@ export class HeldMapWindow {
     this._travKey = '';
     // WB1: the gate's ring - the host's `gate` read on the party's own poll; null while no gate is marked
     this._gate = null;
+    // WW2: the rings of the gates past the Bay - the host's `gates`, every lane's but the Bay's, read as the gate's is
+    this._gates = [];
+    this._gatesKey = '';
     this._gateKey = '';
     // SERPENT1: the sea serpent's ring - the host's `serpent`, read as the gate's is
     this._serpent = null;
     this._serpentKey = '';
-    // SD2c: the Super dungeon's ring - the host's `sd`, read as the gate's is, once it is found (a find before that)
-    this._sd = null;
+    // SD2c: the Super dungeon's ring - the host's `sd`, read as the gate's is, once it is found (a find before that).
+    // WW5 (WW5): every theatre's Hollow - the host's `sd` a ring a lane (the Bay's one ring,
+    // as it was, read the same), over the continent's frame while it is shown, as WW2's gates are
+    this._sds = [];
     this._sdKey = '';
-    // EG-F: my company's Elite arch's ring - the host's `arch`, read as the gate's is, while the arch stands
-    this._arch = null;
-    this._archKey = '';
-    this._ketch = null;   // KETCH: the Sky-Ketch over Daggerfall while she is in its sky
-    this._ketchKey = '';
     // BOUNTY1: the held bounties' black circles - the host's `bounties`, read on the same poll
     this._bounties = [];
     this._bountiesKey = '';
@@ -702,8 +699,6 @@ export class HeldMapWindow {
     this._revenantsKey = '';
     this._lodes = [];   // MINE-PERKS: a Motherlode Sense's day's Motherlodes - the host's `lodes`, read on the same poll
     this._lodesKey = '';
-    this._pois = [];   // POI-2: the approved POIs' marks - the host's `pois`, read on the same poll
-    this._poisKey = '';
     // EVENT-TIP: the raided towns (the host's `raids`, on the same poll), and the card under the pointer
     this._raids = [];
     this._raidsKey = '';
@@ -716,7 +711,7 @@ export class HeldMapWindow {
     // HOME-VENDOR: the trader's waypoint (the host's `vendor`, on the same poll) - one coin, apart from the yellow mark
     this._vendor = null;
     this._vendorKey = '';
-    // WAYPOINTS (2026-10-06): the flags - the store's own list, read at each paint; a change repaints the sheet and its key
+    // WAYPOINTS: the flags - the store's own list, read at each paint; a change repaints the sheet and its key
     this._wpHover = null;
     this._stopWaypoints = onWaypoints(() => { this._dirty = true; this._keySig = ''; });
     this._tipKey = '';
@@ -776,6 +771,10 @@ export class HeldMapWindow {
       save: this.getTravelMapSaveData(),
     });
     globalThis.__heldMap = this._probeFn;
+    // MAP-WHOLE (tools/heldMapLoadProbe.mjs): a view set as a zoom or a pan sets it, and how the last paint left the sheet -
+    // its milliseconds, whether a tile past the Bay is still owed, and the tiles' own count of what they showed
+    this._loadFn = { view: (v) => this._setView(v), state: () => ({ phase: this._phase, view: { ...this._view }, paintMs: this._paintMs ?? 0, dirty: !!this._dirty, owed: !!this._pastBayTiles?.stats?.().owed, tiles: this._pastBayTiles?.stats?.() ?? null }) };
+    if (pageHas('shot')) globalThis.__heldMapLoad = this._loadFn;   // behind the shot gate (AUDIT ANTICHEAT A2)
   }
 
   // ── THE CLASSIC WINDOW'S CONTRACT, kept ────────────────────────
@@ -814,7 +813,7 @@ export class HeldMapWindow {
         e?.preventDefault?.();
         if (code === 'KeyY' || code === 'Enter' || code === 'NumpadEnter') { this._top = null; this._renderBox(); this.deps.onResumeTravel?.(); this._beginClose(null); }
         else if (code === 'KeyN' || code === 'Escape' || code === 'KeyE') { this._top = null; this._renderBox(); }
-        // RESUME-OUT (2026-09-28, Mac: "option persists"): the mod keeps the destination on No, so it asked at EVERY
+        // RESUME-OUT: the mod keeps the destination on No, so it asked at EVERY
         // open with no way to be rid of it - Forget ends the journey (ClearTravelDestination) and the asking with it
         else if (code === 'KeyF') { this._top = null; this._renderBox(); this.deps.onForgetTravel?.(); }
         return;
@@ -825,8 +824,7 @@ export class HeldMapWindow {
     // it took the TravelMap action and Escape. EM3 and EM4 gave the
     // same window three more doors - a dungeon's plan, a town's, a
     // building's - all of them behind the AutoMap key, and none of
-    // them could be closed by the key that opened them (Mac: "You
-    // cannot press the M key to stow the map"). The classic twin has
+    // them could be closed by the key that opened them. The classic twin has
     // always taken its own binding back (ui/automap/automapWindow.js); so does
     // this one now. Both actions, on every sheet, because the tabs mean
     // one window can be entered by either key and the player should not
@@ -844,7 +842,6 @@ export class HeldMapWindow {
       if (this._panel === 'teleport') { this._confirmTeleport(false); return; }
       if (this._panel) { this._closePanel(); return; }
       if (this._selected) { this._select(null); return; }
-      if (this._zoneMap && code === 'Escape') { this._closeZoneMap(); return; }   // WILD2: Escape steps back to the world map first
       this._beginClose(null);
       return;
     }
@@ -907,11 +904,6 @@ export class HeldMapWindow {
     if (this.done) return;   // a torn-down window has no chrome to drive
     this._clock += dt;
     if (this._findMeT > 0) { this._findMeT -= dt; this._dirty = true; }
-    { const hs = (this.deps.wildDungeons?.() ?? []).map((h) => h.key).join(','); if (hs !== (this._hallSig ?? '')) { this._marksDirty = true; this._dirty = true; this._hallSig = hs; } }   // PVPDUNGEONS: a new day's halls re-mark the sheet
-    // PVPDUNGEONS: the crows and the flames move - the overlay alone (the kept layer is one drawImage), at FX_HZ, and only
-    // while there is something moving: crows over a hall, or the pointer on the zone on the world map
-    if (this.deps.wildGiants && this.deps.wildMask?.()) { const gb = Math.floor(this._clock * 2); if (gb !== this._giantBeat) { this._giantBeat = gb; this._dirty = true; } }   // ZONE-GIANTS: they walk - the sheet redrawn twice a second
-    if (this.deps.wildCrows?.()?.size || this._flamesUp()) { const fb = Math.floor(this._clock * 20); if (fb !== this._fxBeat) { this._fxBeat = fb; this._dirty = true; } }   // FINDME: the cross blinks while it lasts
     if (this._tipUntil !== null && this._clock >= this._tipUntil) { this._tipUntil = null; this._hoverAt = null; this._showTip(null); }   // WB13c: a tap's card goes
     this._padTick(dt);
     this._renderTools();
@@ -971,14 +963,11 @@ export class HeldMapWindow {
     this._t += dt;
     switch (this._phase) {
       case 'opening': {
-        // ZONE-FIRST (the owner: "when iam in the zone and press V it should open the zone map"): standing in the zone,
-        // the map opens on the zone's own map - the world map one button (World map) away
-        if (!this._zoneFirstTried && this._paper?.w > 1 && this._view && this._sheet) {
-          this._zoneFirstTried = true;
+        if (!this._findFirstTried && this._paper?.w > 1 && this._view && this._sheet) {
+          this._findFirstTried = true;
           try {
-            if (this.deps.zoneFirst?.() && this._openZoneMap()) this._centerOnMe();
-            else if (this._findsMeFirst()) this._findMe();   // FIND-FIRST: the world map opens as Find me
-          } catch (e) { console.warn('[map] zone map', e?.message ?? e); }
+            if (this._findsMeFirst()) this._findMe();   // FIND-FIRST: the world map opens as Find me
+          } catch (e) { console.warn('[map] find me', e?.message ?? e); }
         }
         this._setRaise(clamp(this._t / OPEN_S, 0, 1));
         if (this._t >= OPEN_S) { this._phase = 'map'; this._t = 0; this._renderCard(); }
@@ -1078,6 +1067,7 @@ export class HeldMapWindow {
     // ownership-checked: a second window minted after this one owns
     // the surface now, and an unconditional delete would blind it
     if (globalThis.__heldMap === this._probeFn) delete globalThis.__heldMap;
+    if (globalThis.__heldMapLoad === this._loadFn) delete globalThis.__heldMapLoad;
   }
 
   /** closeTravelWindows' tail: teardown, done, one-shots cleared,
@@ -1087,6 +1077,9 @@ export class HeldMapWindow {
     if (this._panelState) this._rememberPanel();
     this.teleportationTravel = false;
     this._teardown();
+    this._pastBayTiles?.clear();
+    releasePastBayInk();   // AUDIT TESA II M11: the road ink's walked chains, runs and dots let go with the tiles
+    this._subLayers = null; this._sheetLayersKey = '';   // ZOOM-FAST: the sheet's sub-layers let go with the tiles   // TESA15: its kept tiles go with it
     this.done = true;
     this.deps.onClose?.();
   }
@@ -1275,12 +1268,29 @@ export class HeldMapWindow {
         this._marksVersion, this._portsShown() ? 1 : 0, this.markedMapId,
         this.filters.roads ? 1 : 0, this.filters.tracks ? 1 : 0,
         this._markInks() ? 1 : 0,   // MAP-KEY: a palette that lands after the sheet rose repaints it tinted
-        this.deps.wildMask?.() ? 1 : 0,   // WILD1: the open zone inked once it is known (online)
-        this._zoneMap ? 1 : 0,   // WILD2: the zone map's own ink
-        this._zoneNames === false ? 0 : 1,   // the zone map's place names
         tamrielLandVersion(),   // TAMRIEL3: the picture's trace landing after the sheet rose repaints it
+        arenaPlacesVersion(),   // TESA1: and the places past the Bay, their standing moved while it stands
       ].join('|'),
       paintStatic: (ctx, env) => {
+        // ZOOM-FAST: THE SHEET IN THREE
+        // PARTS - the Bay's ink and the continent's land under the roads past the Bay, those roads' kept tiles, and what
+        // stands over them (the borders, the Bay's frame, the cities, the names). The
+        // first and the last are kept on canvases of their own (_sheetLayers) and painted again only when the view or the
+        // sheet moves; a frame whose only news is a road tile painted (the window empties its key for those - the tick's
+        // takePending) is two drawImages and the tiles, where it was the whole sheet stroked again - a fill frame's 100 ms
+        // at two pixels a point, measured. While the scale still moves (ZOOM_SETTLE_MS) no tile is painted and the marks are
+        // inked without their padded bake.
+        const settling = this._scaleSettling(env.view.scale);
+        const continentOn = this._tamriel;
+        const bayFit = continentOn ? this._bayFit() : 0;
+        const ink = continentOn ? tamrielInkFor(env.model) : null;
+        // TESA13: the roads past the Bay under the Bay's band and filters, and the countryside's and the lairs' marks off the
+        // host's atlas (deps.tamrielPlacesIn) - in each kind's hue as the Bay's
+        const tamOpts = { paperW: env.paperW, paperH: env.paperH, continent: onContinent(env.view.scale, bayFit), bayFit,
+          band: env.band, filters: this.filters, inks: this._markInks(), placesIn: this.deps.tamrielPlacesIn ?? null,
+          portsOnly: this.portsFilter,   // BAY-LEFT-MAPS (C11): the Ports filter past the Bay too - a port alone, its anchor beside it
+          seatAt: (c) => this.deps.seatAt?.({ mapId: c.mapId }) ?? null,   // WW7-6: a seat past the Bay ringed as the Bay's (its ring moves with the marks' version)
+          tiles: (this._pastBayTiles ??= createTamrielTiles({ paint: (c, v, w, h, o, job) => paintPastBay(c, v, { ...o, paperW: w, paperH: h }, job), stamp: pastBayStamp })), dpr: env.dpr, settling };
         // MAP-PAN: the place marks are one layer. A pan shifts it; a zoom, or a pan that
         // walks off what was baked, paints them again. The key is everything but the pan.
         // One opts object, so the bake and the inline ink (no 2D context on the layer) cannot drift.
@@ -1289,59 +1299,74 @@ export class HeldMapWindow {
           markedMapId: this._it ? -1 : this.markedMapId,   // AUDIT IT1 C1: the mod's maps draw no mark
           markColor: rgbaCss(this._to?.settings?.markLocationColor),
           inks: this._markInks(),   // MAP-KEY: each kind in its classic dot's hue, or the pen with no palette
+          continent: this._tamriel && onContinent(env.view.scale, this._bayFit()),   // REGION-LINES: out on the continent the Bay's capitals stand in the continent's layer
         };
-        const synced = syncMarksLayer(this._marksLayer, {
-          view: env.view, paperW: env.paperW, paperH: env.paperH, dpr: env.dpr,
-          contentKey: [env.view.scale, env.band, env.dpr, env.paperW, env.paperH, sheet.staticKey()].join('|'),
-          model: env.model, markOpts,
-          createCanvas: () => document.createElement('canvas'),
-        });
-        this._marksLayer = synced.layer;
-        // MAP-FIELD2 (Mac, 2026-09-18): "all the town names need to be
-        // taken off the map, since its too cluttered". The sheet inks
-        // the GLYPHS alone - a place is its mark, and its name is read
-        // off the label under the pointer and off the search, which is
-        // where a hand-drawn map puts it anyway. The PROVINCE names
-        // stay: far/mid only, a handful of words across the whole bay,
-        // and they are what makes the sheet readable zoomed out.
-        //
-        // `placeNames` itself is NOT deleted - it is inkMap's law and
-        // its own pin stands (test/ui/heldmap.test.js): what went is this
-        // sheet's use of it, and the measure cache it needed.
-        paintInkStatic(ctx, env.model, env.view, {
-          paperW: env.paperW, paperH: env.paperH, dpr: env.dpr, band: env.band,
-          filters: this.filters, names: null, regionNames: REGION_NAMES,
-          // MAP2: the mark in the mod's colour. PORT-MAP: the harbours
-          // always - the quays stand at every port, whatever Travel Options
-          // says of where a ship may sail from (the Ports filter, the P key,
-          // still the mod's: _portsShown)
-          ...markOpts,
-          // PORT-MAP: the quays, whatever Travel Options says of where a ship may sail from
-          ports: true,
-          // TAMRIEL1: past the Bay's own fit the sheet is on the continent, and the Bay's ink thins for it
-          continent: this._tamriel && onContinent(env.view.scale, this._bayFit()),
-          marksLayer: synced.layer,   // MAP-PAN: one blit of the marks, or null and they are inked here
-          // WILD1 (the owner: "the high risk area is marked with a highquality fog of war on the world map and red lines
-          // around it"): the open zone's fog and red line, under the marks (ui/wild/wildMapInk.js)
-          // WILD2: and its four rings - their lines and bonuses here, filled and named on the zone map
-          underMarks: (c) => {
-            const ink = this._wildInk();
-            if (!ink) return;
-            const zone = this._zoneInk();
-            if (this._zoneMap && zone) paintZoneMapStatic(c, env.view, zone, { paperW: env.paperW, paperH: env.paperH, part: 'under' });
-            paintWildZone(c, env.view, ink, { paperW: env.paperW, paperH: env.paperH, far: env.band === 'far' && !this._zoneMap, fog: this._zoneMap ? 0.35 : 1 });   // the zone map's fog a breath, so the rings' tones read
-            if (zone && !this._zoneMap) paintWildRings(c, env.view, zone, { paperW: env.paperW, paperH: env.paperH, far: env.band === 'far' });
-          },
-        });
-        // TAMRIEL1: the continent round the Bay, AFTER the Bay's ink (which clears the canvas first) and clipped to
-        // the outside of its rectangle; one rectangle test and nothing more while the view is within the Bay
-        if (this._tamriel && !this._zoneMap) {
-          const bayFit = this._bayFit();
-          paintTamrielInk(ctx, env.view, tamrielInkFor(env.model), { paperW: env.paperW, paperH: env.paperH, continent: onContinent(env.view.scale, bayFit), bayFit });
+        const paintUnder = (ctx) => {
+          // ZOOM-FAST: no padded bake while the scale still moves - the marks inked on the paper alone
+          const synced = settling ? null : syncMarksLayer(this._marksLayer, {
+            view: env.view, paperW: env.paperW, paperH: env.paperH, dpr: env.dpr,
+            contentKey: [env.view.scale, env.band, env.dpr, env.paperW, env.paperH, sheet.staticKey()].join('|'),
+            model: env.model, markOpts,
+            createCanvas: () => document.createElement('canvas'),
+          });
+          if (synced) this._marksLayer = synced.layer;
+          // MAP-FIELD2 (. The sheet inks
+          // the GLYPHS alone - a place is its mark, and its name is read
+          // off the label under the pointer and off the search, which is
+          // where a hand-drawn map puts it anyway. The PROVINCE names
+          // stay: far/mid only, a handful of words across the whole bay,
+          // and they are what makes the sheet readable zoomed out.
+          //
+          // `placeNames` itself is NOT deleted - it is inkMap's law and
+          // its own pin stands (test/ui/heldmap.test.js): what went is this
+          // sheet's use of it, and the measure cache it needed.
+          paintInkStatic(ctx, env.model, env.view, {
+            paperW: env.paperW, paperH: env.paperH, dpr: env.dpr, band: env.band,
+            filters: this.filters, names: null, regionNames: REGION_NAMES,
+            // MAP2: the mark in the mod's colour. PORT-MAP: the harbours
+            // always - the quays stand at every port, whatever Travel Options
+            // says of where a ship may sail from (the Ports filter, the P key,
+            // still the mod's: _portsShown)
+            ...markOpts,
+            // PORT-MAP: the quays, whatever Travel Options says of where a ship may sail from
+            ports: true,
+            // TAMRIEL1: past the Bay's own fit the sheet is on the continent, and the Bay's ink thins for it
+            continent: this._tamriel && onContinent(env.view.scale, this._bayFit()),
+            marksLayer: synced?.layer ?? null,   // MAP-PAN: one blit of the marks, or null and they are inked here
+          });
+          // TAMRIEL1: the continent round the Bay, AFTER the Bay's ink (which clears the canvas first) and clipped to
+          // the outside of its rectangle; one rectangle test and nothing more while the view is within the Bay.
+          if (continentOn) paintTamrielInk(ctx, env.view, ink, { ...tamOpts, part: 'under' });
+        };
+        const paintOver = (ctx) => {
+          if (continentOn) paintTamrielInk(ctx, env.view, ink, { ...tamOpts, part: 'over' });
+        };
+        // AUDIT TESA II M11: the kept parts only while the land past the Bay is in the view - with none of its tiles to
+        // paint there is no frame they save, and a sheet held on the Bay kept two canvases of its own size for nothing
+        const subs = continentOn && viewLeavesBay(env.view, env.paperW, env.paperH) ? this._sheetLayers(ctx) : null;
+        if (!subs) {   // no 2D context for a layer: the three parts straight onto the sheet, as before
+          paintUnder(ctx);
+          if (continentOn) paintTamrielInk(ctx, env.view, ink, { ...tamOpts, part: 'roads' });
+          paintOver(ctx);
+          return;
         }
-        // WILD2: on the zone map the rest of the bay sinks under its wash, over its marks, and the zone's places are named
-        const zone = this._zoneMap ? this._zoneInk() : null;
-        if (zone) paintZoneMapStatic(ctx, env.view, zone, { paperW: env.paperW, paperH: env.paperH, part: 'over', places: this._zoneNames === false ? [] : this._zonePlaces(), zoom: this._zoneZoom() });
+        const subKey = [env.view.ox, env.view.oy, env.view.scale, env.band, env.paperW, env.paperH, env.dpr, sheet.staticKey(), settling ? 1 : 0].join('|');
+        if (subKey !== this._sheetLayersKey) {
+          this._sheetLayersKey = subKey;
+          paintUnder(subs.underCtx);
+          subs.overCtx.setTransform(1, 0, 0, 1, 0, 0);
+          subs.overCtx.clearRect(0, 0, subs.over.width, subs.over.height);
+          subs.overCtx.setTransform(env.dpr, 0, 0, env.dpr, 0, 0);
+          paintOver(subs.overCtx);
+        }
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, subs.under.width, subs.under.height);
+        ctx.drawImage(subs.under, 0, 0);
+        ctx.setTransform(env.dpr, 0, 0, env.dpr, 0, 0);
+        if (continentOn) paintTamrielInk(ctx, env.view, ink, { ...tamOpts, part: 'roads' });
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(subs.over, 0, 0);
+        ctx.setTransform(env.dpr, 0, 0, env.dpr, 0, 0);
       },
       paintOverlay: (ctx, env) => {
         paintInkOverlay(ctx, env.view, {
@@ -1356,14 +1381,12 @@ export class HeldMapWindow {
             color: m.online ? PARTY_MARK_CSS : PARTY_OFFLINE_CSS,
           })),
           gate: this._gate,   // WB1
+          gates: this._gates,   // WW2
           serpent: this._serpent,   // SERPENT1
-          sd: this._sd,   // SD2c
-          arch: this._arch,   // EG-F
-          ketch: this._ketch,   // KETCH
+          sds: this._sds,   // SD2c; WW5: every lane's
           bounties: this._bounties,   // BOUNTY1
           revenants: this._revenants,   // RVN7c
           lodes: this._lodes,   // MINE-PERKS
-          pois: this._pois,   // POI-2
           raids: this._raids,   // EVENT-TIP: the towns under attack
           stars: this._stars,   // STAR6: the night's fallen stars
           quests: this._quests,   // GUIDE5: where the quests point
@@ -1371,22 +1394,7 @@ export class HeldMapWindow {
           travellers: this._trav.filter((t) => playersOnMaps() && playerShown(t)).map((t) => ({ x: t.x, y: t.y, name: t.name, color: TV_KIN_COLORS[t.kin] ?? TRAVELLER_MARK_CSS, journey: t.journey, ship: t.ship })),   // TV3; OWS1: at sea, a ship; OW-WHO: the players' filters; OW-KIN: a friend's and a guild-mate's in theirs
           pulse: env.pulse,
         });
-        // ZONE-GIANTS: the zone's giants where they walk, on both maps - UNDER the waypoints (the owner: "when you mark the
-        // map there the mark is behind the symbol"), so a flag set on a giant stands over it
-        { const giants = this.deps.wildGiants?.() ?? []; if (giants.length) paintWildGiants(ctx, env.view, giants, { paperW: env.paperW, paperH: env.paperH, t: this._clock }); }
         this._paintWaypoints(ctx, env);   // WAYPOINTS: the flags over everything the sheet breathes
-        // WILD1: my remains in the open zone, where they lie and for how long (net/wild/wildRemains.js, the host's word)
-        const remains = this.deps.wildRemains?.() ?? [];
-        if (remains.length) paintWildRemains(ctx, env.view, remains, { pulse: env.pulse, label: WILD_TEXT.mine });
-        // PVPDUNGEONS: crows circling every hall a body lies in (the hub's word - everyone's deaths), over the hall's own mark;
-        // and the zone's border alight while the pointer is on it - on the world map alone, never the zone's own
-        const crows = this.deps.wildCrows?.();
-        if (crows?.size) paintWildCrows(ctx, env.view, (this.deps.wildDungeons?.() ?? []).filter((h) => crows.has(h.key)), { t: this._clock, paperW: env.paperW, paperH: env.paperH });
-        const locked = this.deps.wildLocks?.();   // HALL-LOCK MARK: the halls my hour's lock still shuts, a padlock beside each
-        if (locked?.size) paintWildLocks(ctx, env.view, (this.deps.wildDungeons?.() ?? []).filter((h) => locked.has(h.key)), { paperW: env.paperW, paperH: env.paperH });
-        if (this._flamesUp()) { const fm = this.deps.wildMask?.(); const fi = fm ? wildInk(fm) : null; if (fi) paintWildFlames(ctx, env.view, fi, this._clock, { paperW: env.paperW, paperH: env.paperH }); }
-        // WILD2: the rings' plaques over every mark, mine edged in gold
-        // (the tiers' plaques over the zone are left off: the legend beside it names each tier already)
       },
       // the bay's keys stay with the WINDOW: I, H, P, the travel
       // panel's S/T/N/B and the resume prompt's Y/N are about this
@@ -1404,7 +1412,14 @@ export class HeldMapWindow {
         this._partyPoll -= dt;
         if (this._partyPoll <= 0) { this._partyPoll = PARTY_POLL_S; this._refreshParty(); }
         this._renderKey();   // MAP-KEY: a zoom across a band, or a palette landing, changes what the key says
-        this._renderZoneLegend();   // WILD2: the zone map's legend says where I stand
+        // TESA13: the land past the Bay's paint still owed for the view - TESA15: its kept tiles (ui/tamrielTiles.js) - the
+        // kept layer painted again, and the next frame paints its share
+        if (this._pastBayTiles?.takePending()) { this._staticKey = ''; this._dirty = true; }
+        // AUDIT TESA II M9: the roads and the places past the Bay are the kept tiles' own words (TESA15) - a region landing
+        // repaints the window, and the tiles it reached paint again; the sheet's static ink and the marks' bake are not
+        // stroked again for it (in the static key they were, up to ninety-six times as the forty-eight landed)
+        const pastBay = `${arenaRoadsVersion()}|${pastBayPlacesVersion()}`;
+        if (pastBay !== this._pastBayWord) { this._pastBayWord = pastBay; this._staticKey = ''; this._dirty = true; }
       },
       // THE TRAVEL CHROME IS THE WORLD SHEET'S. The search box, the
       // ports button, the legend and the travel card exist to pick a
@@ -1420,7 +1435,6 @@ export class HeldMapWindow {
         this._marksLayer = null;   // MAP-PAN: the bay's marks bitmap does not outlive the sheet
         this._showChrome(['search', 'ports', 'legend', 'card', 'key'], false);
         this._closePanel?.();
-        if (this._zoneMap) this._closeZoneMap({ quiet: true });   // WILD2: the zone map is the world sheet's
       },
       // at rest the whole bay is on the sheet, centred - TAMRIEL1: and still so with the continent round it: the
       // home is the BAY's fit, centred on the Bay, and the continent is where the zoom goes from there
@@ -1428,20 +1442,11 @@ export class HeldMapWindow {
         ? viewCentredOn(this._size.width / 2, this._size.height / 2, this._bayFit(lim), lim)
         : null),
       // FINDME-TOWN: where I stand on the bay (the cross goes through it), and Find me's view of it - my pixel at the
-      // find's zoom or nearer, the zone map at its own (FINDME's glide, as it was)
+      // find's zoom or nearer (FINDME's glide, as it was)
       me,
       findMe: (lim, view) => {
         const p = me();
-        return p ? viewCentredOn(p.x, p.y, this._zoneMap ? view.scale : Math.max(view.scale, FOCUS_SCALE), lim) : null;
-      },
-      // WILD2: the zone map is this sheet's - offered here, and its view held to the zone's box (and its band of the bay),
-      // the legend's room left on the right
-      zoneMap: true,
-      hint: () => (this._zoneMap ? ZONE_MAP_HINT : null),   // the foot says the way back
-      limits: (paper) => {
-        if (!this._zoneMap) return null;
-        const mask = this.deps.wildMask?.() ?? null;
-        return mask ? zoneMapLimits(mask, { paperW: paper.w, paperH: paper.h }) : null;
+        return p ? viewCentredOn(p.x, p.y, Math.max(view.scale, FOCUS_SCALE), lim) : null;
       },
     };
     return sheet;
@@ -1501,7 +1506,7 @@ export class HeldMapWindow {
   }
 
   _limits() {
-    // WILD2: a sheet that holds the view to a box of its own (the world sheet's zone map) answers its limits whole
+    // a sheet that holds the view to a box of its own answers its limits whole
     const held = this._sheet?.limits?.(this._paper) ?? null;
     if (held) return held;
     // TAMRIEL1: a sheet with a FRAME round its map (the world sheet with the continent) pans over the frame, whose
@@ -1587,8 +1592,7 @@ export class HeldMapWindow {
     if (key === this._cornersKey) return;
     this._cornersKey = key;
     // MAP-FIT1 (icebreyker and Hog Goblin on Discord, 2026-09-22: "Map
-    // gets cut at the bottom"; Mac: "the morrowind arms dont show holding
-    // the map and it sits too low on the screen"): A SHEET THE SCREEN
+    // gets cut at the bottom"): A SHEET THE SCREEN
     // CANNOT HOLD GOES BACK TO THE PAINTING. The arm places the sheet in
     // ITS space - a fixed reach and drop off the eye, at the arm pass's
     // own field of view - and the ink follows the corners wherever they
@@ -1632,107 +1636,39 @@ export class HeldMapWindow {
    *  `ensure` (EM1) rather than called by the window directly - the
    *  world map's own picks and labels go on calling it, because they
    *  ARE the world sheet. */
-  /** WILD1: the open zone's ink - the fog's canvas and the edge's chains, built once a map (ui/wild/wildMapInk.js) - or null
-   *  before the host hands the zone's mask (no maps yet, or offline: the zone is online's alone). */
-  _wildInk() {
-    const mask = this.deps.wildMask?.() ?? null;
-    return mask ? wildInk(mask) : null;
+  /** AUDIT TESA II M2: THE SHEET INKED AGAIN, WHOLE - the window's kept layer and the world sheet's kept parts with it
+   *  (_sheetLayers, keyed by the view and the static key alone): every "paint it again" for news the static key does not
+   *  carry (the zones' borders landing, the web face landing, a note's words, the hands' thumbs) comes here. Emptying the
+   *  window's key alone repainted it out of the parts as they were - the zones' borders and the face appeared at the next
+   *  pan. The tiles' own owed paint (takePending) is the one repaint that needs no part again. */
+  _inkAgain() { this._staticKey = ''; this._sheetLayersKey = ''; this._dirty = true; }
+  /** ZOOM-FAST: the world sheet's two kept sub-layers (under the roads past the Bay and over them), the sheet's own size -
+   *  or null where there is no canvas or no 2D context (painted straight on, as the window's kept layer falls back). */
+  _sheetLayers(ctx) {
+    const w = ctx?.canvas?.width, h = ctx?.canvas?.height;
+    if (!w || !h || typeof document === 'undefined') return null;
+    const L = (this._subLayers ??= { under: document.createElement('canvas'), over: document.createElement('canvas') });
+    const underCtx = L.under.getContext?.('2d'), overCtx = L.over.getContext?.('2d');
+    if (!underCtx || !overCtx) return null;
+    if (L.under.width !== w || L.under.height !== h) { L.under.width = w; L.under.height = h; L.over.width = w; L.over.height = h; this._sheetLayersKey = ''; }
+    return { under: L.under, over: L.over, underCtx, overCtx };
   }
-  /** WILD2: the rings' ink (ui/wild/wildZoneMap.js), built once a map - or null offline. */
-  _zoneInk() {
-    const mask = this.deps.wildMask?.() ?? null;
-    return mask ? zoneMapInk(mask) : null;
-  }
-  /** WILD2: the ring I stand in (1-4), or 0 - off the player's caret, as the sheet draws it. */
-  _myZoneRing() {
-    const mask = this.deps.wildMask?.() ?? null;
-    const p = this._player;
-    return mask && p ? wildRingAt(p.x, p.y, mask) : 0;
-  }
-  /** WILD2: the zone's places for the zone map's names - the world model's marks inside the zone. */
-  /** ZONEINK2: how far in the zone map is, over its own fit (1 at the fit) - the names come in with it. */
-  _zoneZoom() {
-    const mask = this.deps.wildMask?.() ?? null;
-    const fit = mask ? zoneMapView(mask, { paperW: this._paper.w, paperH: this._paper.h })?.scale : null;
-    return fit ? this._view.scale / fit : 1;
-  }
-  _zonePlaces() {
-    const mask = this.deps.wildMask?.() ?? null;
-    if (!mask) return [];
-    return (this._ensureWorldModel()?.marks ?? []).filter((m) => wildInside(mask, m.x, m.y)).map((m) => ({ x: m.x, y: m.y, name: m.name, kind: m.kind }));
-  }
-  /** WILD2: THE ZONE MAP up - the world sheet held to the zone, its legend mounted beside it, the key stepped aside. */
-  _openZoneMap() {
-    const mask = this.deps.wildMask?.() ?? null;
-    if (!mask?.box || this._zoneMap || !this._sheet?.zoneMap) return false;   // the sheet that offers one (the world's)
-    this._zoneMap = true;
-    this._worldViewBeforeZone = this._view ? { ...this._view } : null;
-    if (this._selected) this._select(null);
-    this._closePanel?.();
-    this._showChrome(['card'], false);   // the key (the world map's own filters) stays on the zone map
-    this._zoneNames = true;
-    this._keySig = ''; this._renderKey?.();
-    this._renderZoneLegend();
-    this._writeHint();
-    this._staticKey = '';
-    this._setView(zoneMapView(mask, { paperW: this._paper.w, paperH: this._paper.h }) ?? this._view);
-    this._dirty = true;
-    return true;
-  }
-  /** ZONE-FIRST (the owner: "when you press V in the zone it should also center to you same on the world map"): the
-   *  view centred on my pixel at once - the zone map at its own scale, the world map at the find-me's. */
-  _centerOnMe(scale = null) {
-    const p = this.deps.getPlayerPixel?.() ?? this._player;
-    if (!p || !this._paper || !this._view) return;
-    this._player = { x: p.x, y: p.y };
-    const sc = scale ?? this._view.scale;
-    this._setView({ ox: p.x + 0.5 - this._paper.w / (2 * sc), oy: p.y + 0.5 - this._paper.h / (2 * sc), scale: sc });
-  }
-  /** WILD2: back to the world map, where it was looking. */
-  _closeZoneMap({ quiet = false } = {}) {
-    if (!this._zoneMap) return;
-    this._zoneMap = false;
-    this._zoneLegend?.remove?.(); this._zoneLegend = null; this._zoneRing = -1;
-    this._writeHint();
-    this._staticKey = '';
-    if (!quiet) {
-      this._showChrome(['card'], true);
-      this._setView(this._worldViewBeforeZone ?? { ox: 0, oy: 0, scale: scaleMinOf(this._limits()) });
-      if (this.deps.zoneFirst?.()) this._centerOnMe(FOCUS_SCALE);   // ZONE-FIRST: standing in the zone, the world map opens on me
-      this._keySig = ''; this._renderKey();
-    }
-    this._worldViewBeforeZone = null;
-    this._dirty = true;
-  }
-  /** WILD2: the legend panel, rebuilt when the ring I stand in changes. */
-  _renderZoneLegend() {
-    if (!this._zoneMap || !this._chrome?.root) return;
-    const ring = this._myZoneRing();
-    const goSig = this._zoneMap && this._panel === 'travel' && this._panelState?.trip ? 'go' : '';
-    if (this._zoneLegend && ring === this._zoneRing && this._zoneLegendNames === this._zoneNames && this._zoneGoSig === goSig) return;
-    this._zoneGoSig = goSig;
-    this._zoneLegend?.remove?.();
-    this._zoneRing = ring;
-    this._zoneLegendNames = this._zoneNames;
-    this._zoneLegend = buildZoneLegend(document, { ring, canBegin: this._zoneGoSig === 'go', onBegin: () => this._begin(), names: this._zoneNames !== false, onNames: () => { this._zoneNames = this._zoneNames === false; this._staticKey = ''; this._dirty = true; this._renderZoneLegend(); }, onBack: () => { if (this._phase === 'map') this._closeZoneMap(); } });
-    this._chrome.root.append(this._zoneLegend);
-  }
-  /** PVPDUNGEONS: is the pointer over the zone (the flames at its border burn while it is) */
-  /** PVPDUNGEONS (the owner: "the border only burns when you hover over it on the world map not when youre already zoomed
-   *  in on the zone"): the world map, the pointer on the zone. */
-  _flamesUp() { return !this._zoneMap && !this._phase?.startsWith?.('clos') && this._hoverInZone(); }
-  _hoverInZone() {
-    const h = this._hoverAt, mask = this.deps.wildMask?.() ?? null;
-    if (!h || !mask || !this._view) return false;
-    const [mx, my] = toMap(this._view, h.sx, h.sy);
-    return wildInside(mask, mx, my);
+  /** ZOOM-FAST: whether the view's scale moved within ZOOM_SETTLE_MS - a zoom still going (the first scale settles none). */
+  _scaleSettling(scale) { return (this._settle ??= createZoomSettle())(scale, performance.now()); }   // AUDIT TESA II K3: the law, createZoomSettle
+  /** TESA13 / AUDIT TESA II M7, M8, M14: the hover past the Bay - the continent's answer as the sheet inks it (its marks
+   *  where it inks them, its cities under the map's filters and, on the continent, its capitals alone) and what it is on,
+   *  with the city the press would take (`city`). */
+  _pastBayHover(mx, my) {
+    const ink = tamrielInkFor(this._model), continent = onContinent(this._view.scale, this._bayFit());
+    const at = tamrielHoverAt(mx, my, this._view, ink, { placesIn: continent ? null : this.deps.tamrielPlacesIn ?? null, nameOf: this.deps.tamrielPlaceName ?? null, filters: this.filters, band: zoomBand(this._view.scale), continent, portsOnly: this.portsFilter });   // TESA13: and the countryside's marks, where the sheet inks them (BAY-LEFT-MAPS C11: under the Ports filter too)
+    return at ? { ...at, city: at.on === 'city' ? tamrielCityAt(mx, my, this._view, ink, { filters: this.filters, continent, portsOnly: this.portsFilter }) : null } : null;
   }
   /** FIND-FIRST (FIELD BUGS 2026-10-10, the Discord: "make 'Find me' the standard functionality on the world map when
    *  I first open it"): the player's own world map opens as a press of Find me - unless the open was for somewhere
    *  else: a journal's place, a journey Travel Options centres (MAP2) or asks to resume, a teleport's pick, a driver's
    *  map. The host says which opens are the player's own (`openOnMe`). */
   _findsMeFirst() {
-    return this._findMeFirst && !this._zoneMap && !this._openedOnPlace
+    return this._findMeFirst && !this._openedOnPlace
       && !this.teleportationTravel && !this._it && !this._to?.isTravelActive && this._top !== 'resume';
   }
   /** FINDME: glide to me and blink a red cross over me for three seconds.
@@ -1749,13 +1685,6 @@ export class HeldMapWindow {
     this._findMeT = 3;
     this._goal = clampView(at, this._limits());   // the dungeon's Me may change the floor - the clamp is the new one's
     this._dirty = true;
-  }
-  /** PVPJOURNEY: on the zone map a journey is always Cautiously / By land / At inns - no choices. */
-  _forceZoneOpts(o) { if (o) { o.speedCautious = true; o.travelShip = false; o.sleepModeInn = true; } return o; }
-  /** PVPJOURNEY: a press on the zone map's ground (or a place) is a destination - the panel opens with the forced trip. */
-  _zoneTravelTo(sel) {
-    this._select(sel);
-    this._openPanel('travel');
   }
   _ensureWorldModel() {
     const bytes = this.deps.woods?.heightMapBuffer;
@@ -1789,20 +1718,16 @@ export class HeldMapWindow {
     if (this._marksDirty) {
       this._marksDirty = false;
       this._marksVersion = (this._marksVersion ?? 0) + 1;
-      // PVPDUNGEONS: the zone's halls ride in as place rows of their own - marked as every place is (the dungeons' filter,
-      // the bands, the glyph's size), always discovered (everyone in the zone sees the day's halls), their glyph a door
-      const halls = this.deps.wildHallSummaries?.() ?? [];
-      this._hallSig = halls.map((h) => h.wildHall.key).join(',');
       this._model.marks = buildInkMarks({
-        summaries: halls.length ? [...(this.deps.mapDict?.values() ?? []), ...halls] : (this.deps.mapDict?.values() ?? []),
+        summaries: this.deps.mapDict?.values() ?? [],
         filters: this.filters,
-        isDiscovered: (s) => (s?.wildHall ? true : this._discovered(s)),   // MAP2: the ports arm before DFU's own test
+        isDiscovered: (s) => this._discovered(s),   // MAP2: the ports arm before DFU's own test
         isPort: (s) => hasPort(s?.mapID ?? s?.mapId),
         nameOf: (s) => this._summaryName(s),
         hubAt: (s) => this.deps.hubAt?.(s) ?? null,   // HUB1: online, the region's hub flies its pennant
         seatAt: (s) => this.deps.seatAt?.(s) ?? null,   // SEAT1a: online, while the seats are open, a seat's ring
         carriageAt: (s) => !!this.deps.carriageAt?.(s),   // OW-HUBS: a carriage at the town's gate - its wheel
-      }).map((m) => (m.summary?.wildHall ? { ...m, kind: 'hall', wildHall: m.summary.wildHall } : m));
+      });
     }
     return this._model;
   }
@@ -1813,6 +1738,7 @@ export class HeldMapWindow {
    *  strip's layout and every law above are exercised without it. */
   _paint() {
     this._dirty = false;
+    const paintAt = performance.now();   // MAP-WHOLE: the paint's milliseconds, the load probe's read
     const canvas = this._chrome?.ink;
     const ctx = canvas?.getContext?.('2d');
     const sheet = this._sheet;
@@ -1903,6 +1829,7 @@ export class HeldMapWindow {
       ctx.restore();
     }
     if (this._bandShown !== band) { this._bandShown = band; this._chrome.band.textContent = band; }
+    this._paintMs = performance.now() - paintAt;
   }
 
   /** THE HANDS, in paper pixels: each THUMB_ZONE divided into PAPER's
@@ -1955,8 +1882,7 @@ export class HeldMapWindow {
       c.noteInput.onkeydown = null;
       c.noteInput.onblur = null;
       done(v);
-      this._staticKey = '';
-      this._dirty = true;
+      this._inkAgain();
     };
     this._noteDone = finish;
     c.note.style.display = '';
@@ -1989,8 +1915,7 @@ export class HeldMapWindow {
    *  let the point under the cursor drift at the ends of the range (the
    *  browser probe caught it at SCALE_MAX). */
   /**
-   * EM3-3D (Mac: "the map should also be controllable with controller - zooming in and out with right stick forward
-   * and backward, same for the world map"): the RIGHT stick, read straight off the pad each tick while the map is
+   * EM3-3D: the RIGHT stick, read straight off the pad each tick while the map is
    * up. Forward zooms in and back zooms out, about the middle of the paper; on the dungeon's 3D sheet across turns
    * it. The poller (ui/gamepadInput.js) gives the right stick nothing to do on a sheet with no scrolling in it, so
    * nothing else answers it here. Standard mapping: axes[2] across, axes[3] up-negative.
@@ -2017,7 +1942,7 @@ export class HeldMapWindow {
   _zoomBy(factor, px, py) {
     const lim = this._limits();
     // ME-PIVOT: a zoom about any point but the middle moves what is in the middle - the Me pivot lets go
-    // TURN-FIXED (Mac: "it should rotate around me till i drag the object again"): a zoom keeps the Me pivot -
+    // TURN-FIXED: a zoom keeps the Me pivot -
     // only a drag lets it go; the pivot's paper point is simply re-taken from the zoomed view
     if (Math.abs(px - lim.paperW / 2) > 2 || Math.abs(py - lim.paperH / 2) > 2) this._sheet?.viewMoved?.({ keepMe: true });
     const target = clamp(this._view.scale * factor, scaleMinOf(lim), SCALE_MAX);
@@ -2047,6 +1972,14 @@ export class HeldMapWindow {
     return [(clientX - r.left) / k, (clientY - r.top) / k];
   }
 
+  /** BAY-LEFT-MAPS: THE BOX THE SHEET'S MARKS AND FLAGS ARE READ OVER - the continent's frame
+   *  (world/tamriel/tamrielFrame.js tamrielFrameInBay) while the sheet shows it;
+   *  the Bay's own sheet else. One box for every reader, so no mark the sheet can draw is dropped by a
+   *  bound the sheet does not have. */
+  _marksBox() {
+    return this._tamriel ? tamrielFrameInBay() : { x0: 0, y0: 0, w: this._size.width, h: this._size.height };
+  }
+
   // ── SOC6: THE PARTY ON THE MAP ─────────────────────────────────
 
   /** The host's party, read and placed. Returns whether anything the
@@ -2058,67 +1991,65 @@ export class HeldMapWindow {
     // opened during a journey, the cross keeps up with the rings
     const p = this.deps.getPlayerPixel?.();
     if (p && (p.x !== this._player.x || p.y !== this._player.y)) { this._player = { x: p.x, y: p.y }; this._dirty = true; }
+    // BAY-LEFT-MAPS: EVERY MARK OVER THE SHEET'S OWN BOX - the continent's frame while it is
+    // shown, the Bay's own sheet else (_marksBox). The gates past the Bay, the
+    // bounties and the quests were read so; the party, the travellers, the trader's coin, the serpent's ring, the Super
+    // dungeon's, the Motherlodes, the raids and the stars were read against the Bay's
+    // 1000 x 500 and dropped past it
+    const sheet = this._marksBox();
     // WB1: the gate's ring rides the same poll - its words tick each second, so its key is its own and a changed
     // ring repaints without touching the party's labels
-    const gate = readGateMark(this.deps.gate, this._size);
+    const gate = readGateMarkIn(this.deps.gate, sheet);
     const gateKey = gateMarkKey(gate);
     let gateMoved = false;
     if (gateKey !== this._gateKey) { this._gateKey = gateKey; this._gate = gate; gateMoved = true; this._dirty = true; }
+    // WW2: and every lane's past the Bay, over the continent's frame while it is shown
+    const gates = readGateMarks(this.deps.gates, sheet);
+    const gatesKey = gateMarksKey(gates);
+    if (gatesKey !== this._gatesKey) { this._gatesKey = gatesKey; this._gates = gates; gateMoved = true; this._dirty = true; }
     // SERPENT1: the sea serpent's ring rides the same poll, on its own key
-    const serpent = readGateMark(this.deps.serpent, this._size);
+    const serpent = readGateMarkIn(this.deps.serpent, sheet);
     const serpentKey = gateMarkKey(serpent);
     if (serpentKey !== this._serpentKey) { this._serpentKey = serpentKey; this._serpent = serpent; gateMoved = true; this._dirty = true; }
-    // SD2c: and the Super dungeon's, on its own key
-    const sd = readGateMark(this.deps.sd, this._size);
-    const sdKey = gateMarkKey(sd);
-    if (sdKey !== this._sdKey) { this._sdKey = sdKey; this._sd = sd; gateMoved = true; this._dirty = true; }
-    // EG-F: and my company's Elite arch, on its own key
-    const arch = readGateMark(this.deps.arch, this._size);
-    const archKey = gateMarkKey(arch);
-    if (archKey !== this._archKey) { this._archKey = archKey; this._arch = arch; gateMoved = true; this._dirty = true; }
-    // KETCH: and the Sky-Ketch's, on its own key
-    const ketch = readGateMark(this.deps.ketch, this._size);
-    const ketchKey = gateMarkKey(ketch);
-    if (ketchKey !== this._ketchKey) { this._ketchKey = ketchKey; this._ketch = ketch; gateMoved = true; this._dirty = true; }
+    // SD2c: and the Super dungeon's, on its own key - WW5: every lane's (one ring a Hollow), over the sheet's box (BAY-LEFT-MAPS)
+    const sds = readGateMarks(() => { const v = typeof this.deps.sd === 'function' ? this.deps.sd() : null; return Array.isArray(v) ? v : v ? [v] : []; }, sheet);
+    const sdKey = gateMarksKey(sds);
+    if (sdKey !== this._sdKey) { this._sdKey = sdKey; this._sds = sds; gateMoved = true; this._dirty = true; }
     // BOUNTY1: the circles ride the gate's poll and its repaint - a bounty taken or paid with the map open
-    const bounties = readBountyMarks(this.deps.bounties, this._size);
+    // LAIR-WORLD: and past the Bay, over the continent's frame while it is shown (as WW2's rings above)
+    const bounties = readBountyMarksIn(this.deps.bounties, sheet);
     const bKey = bountyMarksKey(bounties);
     if (bKey !== this._bountiesKey) { this._bountiesKey = bKey; this._bounties = bounties; gateMoved = true; this._dirty = true; }
     // RVN7c: and the lairs heard of - a rumour heard, or a hunt given up, with the map open
-    const lairs = readBountyMarks(this.deps.revenants, this._size, REVENANT_LEGEND_TEXT);
+    const lairs = readBountyMarksIn(this.deps.revenants, sheet, REVENANT_LEGEND_TEXT);
     const lKey = bountyMarksKey(lairs);
     if (lKey !== this._revenantsKey) { this._revenantsKey = lKey; this._revenants = lairs; gateMoved = true; this._dirty = true; }
     // MINE-PERKS: and a Motherlode Sense's Motherlodes - one rising, spent or gone, or the day's find made, with the map open
-    const lodes = readBountyMarks(this.deps.lodes, this._size, LODE_LEGEND_TEXT);
+    const lodes = readBountyMarksIn(this.deps.lodes, sheet, LODE_LEGEND_TEXT);
     const mKey = bountyMarksKey(lodes);
     if (mKey !== this._lodesKey) { this._lodesKey = mKey; this._lodes = lodes; gateMoved = true; this._dirty = true; }
-    // POI-2: and the approved POIs - one approved, moved or retired with the map open
-    const pois = readBountyMarks(this.deps.pois, this._size, poiLegendText(), POI_MARKS_MAX);   // AUDIT POI R7: every marked POI, past the bounty's eight
-    const pKey = bountyMarksKey(pois);
-    if (pKey !== this._poisKey) { this._poisKey = pKey; this._pois = pois; gateMoved = true; this._dirty = true; }
     // EVENT-TIP: the raided towns ride the same poll (a raid begins, withdraws or is cleansed while the map stands
     // open), and the card under a still pointer follows the marks - a countdown's second, a town cleansed under it
-    const raids = readRaidMarks(this.deps.raids, this._size);
+    const raids = readRaidMarksIn(this.deps.raids, sheet);   // WW6: past the Bay too, over the continent's frame while it is shown (the bounties' law above)
     const raidsKey = raidMarksKey(raids);
     if (raidsKey !== this._raidsKey) { this._raidsKey = raidsKey; this._raids = raids; gateMoved = true; this._dirty = true; }
     // STAR6: and the night's stars - an omen, a fall, a hold while the map stands open
-    const stars = readRaidMarks(this.deps.stars, this._size);
+    const stars = readRaidMarksIn(this.deps.stars, sheet);
     const starsKey = raidMarksKey(stars);
     if (starsKey !== this._starsKey) { this._starsKey = starsKey; this._stars = stars; gateMoved = true; this._dirty = true; }
     // GUIDE5: the quests' places ride the same poll (a step logged, a place found, the followed quest changed while the
     // map stands open); a card is bounded by the world events' own reader
-    const quests = readQuestMarks(this.deps.quests, this._size).map((m) => ({ ...m, tip: readTip(m.tip),
+    const quests = readQuestMarks(this.deps.quests, this._size, sheet).map((m) => ({ ...m, tip: readTip(m.tip),   // START3: past the Bay over the continent's frame, as WW2's rings
       // AUDIT GUIDE K7: over a raided town the diamond stands clear of the blades
       lift: this._raids.some((r) => r.px === m.px && r.py === m.py) ? QUEST_RAID_LIFT : QUEST_MARK_LIFT }));
     const questsKey = `${questMarksKey(quests)}#${quests.map((m) => m.lift).join(',')}`;
     if (questsKey !== this._questsKey) { this._questsKey = questsKey; this._quests = quests; gateMoved = true; this._dirty = true; }
     // HOME-VENDOR: the trader's waypoint rides the same poll (set or cleared with the map open)
-    const vendor = readVendorMark(this.deps.vendor, this._size);
+    const vendor = readVendorMarkIn(this.deps.vendor, sheet);
     const vendorKey = vendorMarkKey(vendor);
     if (vendorKey !== this._vendorKey) { this._vendorKey = vendorKey; this._vendor = vendor; gateMoved = true; this._dirty = true; }
     // TV3: the region's travellers ride the same poll, on their own key
-    const hid = this.deps.travellerHidden;   // WILD1: the open zone's hiding - my party and my guild alone are seen there
-    const trav = readTravellerMarks(this.deps.travellers, this._size).filter((t) => !hid?.(t));
+    const trav = readTravellerMarksIn(this.deps.travellers, sheet);
     const travKey = travellerMarksKey(trav);
     if (travKey !== this._travKey) { this._travKey = travKey; this._trav = trav; gateMoved = true; this._dirty = true; }
     if (gateMoved) this._refreshTip();
@@ -2126,7 +2057,7 @@ export class HeldMapWindow {
     // Edict proclaimed, a day turned move no mark - asked at the poll's cadence while a card shows, rewritten only when
     // its words change (_showTip)
     if (!gateMoved && this._tipKey && this._hoverAt) this._refreshTip();
-    const marks = readPartyMarks(this.deps.party, this._size);
+    const marks = readPartyMarksIn(this.deps.party, sheet);
     const key = partyMarksKey(marks);
     if (key === this._partyKey) { if (gateMoved) this._renderLegend(); return gateMoved; }
     this._partyKey = key;
@@ -2153,7 +2084,7 @@ export class HeldMapWindow {
     if (!leg) return;
     leg.innerHTML = '';
     const trav = this._trav.filter((t) => playersOnMaps() && playerShown(t));   // OW-WHO; MAP-PLAYERS: the legend speaks for the players the sheet draws
-    if (!this._party.length && !this._gate && !this._serpent && !this._sd && !this._arch && !this._ketch && !this._bounties.length && !this._revenants.length && !this._raids.length && !this._stars.length && !trav.length && !this._quests.length && !this._pois.length && !this._vendor && !this._lodes.length) { leg.classList.toggle('open', false); leg.style.display = 'none'; return; }
+    if (!this._party.length && !this._gate && !this._gates.length && !this._serpent && !this._sds?.length && !this._bounties.length && !this._revenants.length && !this._raids.length && !this._stars.length && !trav.length && !this._quests.length && !this._vendor && !this._lodes.length) { leg.classList.toggle('open', false); leg.style.display = 'none'; return; }
     if (this._party.length) {
       const dot = el('span', 'hmlegdot');
       dot.style.background = this._party.some((m) => m.online) ? PARTY_MARK_CSS : PARTY_OFFLINE_CSS;
@@ -2170,7 +2101,7 @@ export class HeldMapWindow {
         leg.append(k, el('span', 'hmlegtext', word));
       }
     }
-    if (this._gate) {   // WB1: the ring explains itself too, while there is one
+    if (this._gate || this._gates.length) {   // WB1: the ring explains itself too, while there is one (WW2: or one past the Bay)
       const dot = el('span', 'hmlegdot');
       dot.style.background = GATE_RING_CSS;
       leg.append(dot, el('span', 'hmlegtext', GATE_LEGEND_TEXT));
@@ -2180,20 +2111,10 @@ export class HeldMapWindow {
       dot.style.background = SERPENT_RING_MAP_CSS;
       leg.append(dot, el('span', 'hmlegtext', SERPENT_LEGEND_TEXT));
     }
-    if (this._sd) {   // SD2c: and the Super dungeon's
+    if (this._sds?.length) {   // SD2c: and the Super dungeon's (WW5: any lane's)
       const dot = el('span', 'hmlegdot');
       dot.style.background = SD_RING_MAP_CSS;
       leg.append(dot, el('span', 'hmlegtext', SD_LEGEND_TEXT));
-    }
-    if (this._arch) {   // EG-F: and my company's Elite arch
-      const dot = el('span', 'hmlegdot');
-      dot.style.background = EG_ARCH_RING_CSS;
-      leg.append(dot, el('span', 'hmlegtext', EG_ARCH_LEGEND_TEXT));
-    }
-    if (this._ketch) {   // KETCH: and the Sky-Ketch
-      const dot = el('span', 'hmlegdot');
-      dot.style.background = KT_RING_CSS;
-      leg.append(dot, el('span', 'hmlegtext', ketchLegendText()));
     }
     if (this._bounties.length) {   // BOUNTY1: the black circle explains itself
       const dot = el('span', 'hmlegdot');
@@ -2211,11 +2132,6 @@ export class HeldMapWindow {
       const dot = el('span', 'hmlegdot');
       dot.style.background = LODE_RING_CSS;
       leg.append(dot, el('span', 'hmlegtext', lodeLegendText()));
-    }
-    if (this._pois.length) {   // POI-2: and a POI's violet circle
-      const dot = el('span', 'hmlegdot');
-      dot.style.background = POI_RING_CSS;
-      leg.append(dot, el('span', 'hmlegtext', poiLegendText()));
     }
     if (this._raids.length) {   // EVENT-TIP: and a raided town
       const dot = el('span', 'hmlegdot');
@@ -2283,7 +2199,7 @@ export class HeldMapWindow {
     const wpShown = waypointKindsShown(), wpAll = listWaypoints();
     const sig = [band, inks ? 1 : 0, dpr, ...groups.map((g) => (this.filters[g.filter] ? 1 : 0)),
       this._trav.length ? 1 : 0, playersOnMaps() ? 1 : 0, ...TV_WHO_GROUPS.map((g) => (who[g] ? 1 : 0)), who.renown,
-      ...WAYPOINT_KINDS.map((k) => `${wpShown[k] ? 1 : 0}:${wpAll.filter((w) => w.kind === k).length}`), this.deps.wildMask?.() ? 1 : 0].join('|');   // OW-WHO: and the players' row; WAYPOINTS: and theirs; WILD1: and the open zone's
+      ...WAYPOINT_KINDS.map((k) => `${wpShown[k] ? 1 : 0}:${wpAll.filter((w) => w.kind === k).length}`)].join('|');   // OW-WHO: and the players' row; WAYPOINTS: and theirs
     if (sig === this._keySig) return;
     this._keySig = sig;
     if (typeof box.replaceChildren === 'function') box.replaceChildren(); else box.innerHTML = '';
@@ -2345,7 +2261,7 @@ export class HeldMapWindow {
       row.append(btns);
       box.append(row);
     }
-    // WAYPOINTS (2026-10-06, the player: "Add Waypoints to the filter on the worldmap"): THE WAYPOINTS' ROW - a switch per
+    // WAYPOINTS: THE WAYPOINTS' ROW - a switch per
     // kind, the Overworld's own (systems/map/mapWaypoints.js - one store, so both maps answer alike), each with how many
     {
       const row = el('div', 'hmkeyrow');
@@ -2365,30 +2281,6 @@ export class HeldMapWindow {
         btns.append(b);
       }
       row.append(btns);
-      box.append(row);
-    }
-    // WILD1: THE OPEN ZONE'S ROW - its own swatch (the fog and the red line, as the sheet inks them) and its name, while
-    // the zone is inked (online); nothing to switch: a danger is never hidden
-    if (this._wildInk()) {
-      const row = el('div', 'hmkeyrow hmkeywild');
-      row.append(el('span', 'hmkeywho', 'Danger'));
-      const kinds = el('div', 'hmkeykinds');
-      const item = el('span', 'hmkeykind');
-      item.title = WILD_TEXT.chipTip;
-      const chip = el('canvas', 'hmkeychip');
-      chip.width = chip.height = Math.round(KEY_CHIP_PX * dpr);
-      chip.style.width = chip.style.height = `${KEY_CHIP_PX}px`;
-      paintWildKeyChip(chip.getContext?.('2d'), { dpr, size: KEY_CHIP_PX });
-      item.append(chip, el('span', 'hmkeyname', WILD_TEXT.mapKey));
-      kinds.append(item);
-      // WILD2: the door to the zone's own map (a press on the zone does the same)
-      const open = el('button', 'act hmkeyflt on hmkeyzone', 'Zone map');
-      open.type = 'button'; open.tabIndex = -1;
-      open.onpointerdown = (ev) => ev.preventDefault?.();   // never the focus (the key's own law)
-      open.title = 'Open the Wrothgarian Mountains map, with its four rings and their loot';
-      open.onclick = () => { if (this._top || this._info || this._phase !== 'map') return; this._openZoneMap(); };
-      kinds.append(open);
-      row.append(kinds);
       box.append(row);
     }
   }
@@ -2415,7 +2307,7 @@ export class HeldMapWindow {
     this._renderKey();
   }
 
-  // ── WAYPOINTS (2026-10-06) ────────────────────────────────────────
+  // ── WAYPOINTS ────────────────────────────────────────
 
   /** The flags, painted over the sheet's overlay (paper pixels, the overlay's own dpr transform) - each its colour, a
    *  party's pip, a guild's bar, a followed one on its ring, its name under its foot on the parchment's halo. */
@@ -2472,16 +2364,20 @@ export class HeldMapWindow {
     const w = this._waypointAt(pp[0], pp[1]);
     if (w) {
       openWaypointMenu({ x: clientX, y: clientY, id: w.id, by: ctx.by, canKind: ctx.canKind ?? { party: false, guild: false }, owner: 'heldmap', onNote: note,
-        onTravel: this._coordsAllowedHere() ? (wp) => this._waypointTravel(wp) : null });
+        onTravel: this._coordsAllowedHere() && inBay(Math.floor(w.mx), Math.floor(w.my)) ? (wp) => this._waypointTravel(wp) : null });   // BAY-LEFT-MAPS: no "Travel here" on a flag past the Bay (TESA-NO-FAST)
       return true;
     }
     const [mx, my] = toMap(this._view, pp[0], pp[1]);
-    if (!(mx >= 0 && my >= 0 && mx < this._size.width && my < this._size.height)) return false;
+    // BAY-LEFT-MAPS: a flag anywhere the sheet shows - the continent's frame while it is up, the Bay's sheet else (_marksBox);
+    // the store holds it to the world's grid (systems/map/mapWaypoints.js onMap)
+    const box = this._marksBox();
+    if (!(mx >= box.x0 && my >= box.y0 && mx < box.x0 + box.w && my < box.y0 + box.h)) return false;
     openWaypointMenu({ x: clientX, y: clientY, point: { mx, my }, by: ctx.by, canKind: ctx.canKind ?? { party: false, guild: false }, owner: 'heldmap', onNote: note });
     return true;
   }
 
-  /** "Travel here" on a flag: the bare pixel's own journey, as a click there opens it (MAP2's coordinates decision). */
+  /** "Travel here" on a flag: the bare pixel's own journey, as a click there opens it (MAP2's coordinates decision) - on the
+   *  Bay alone (BAY-LEFT-MAPS: TESA-NO-FAST - a flag past the Bay is walked to on the Overworld, never travelled to here). */
   _waypointTravel(w) {
     if (this._phase !== 'map' || !this._coordsAllowedHere()) return;
     const px = Math.floor(w.mx), py = Math.floor(w.my);
@@ -2547,6 +2443,7 @@ export class HeldMapWindow {
    *  shows (the player pointed at the quest's diamond, which every band draws), else - its kind hidden by the key - the
    *  place's own record, the journal goto's way (_consumeGotoPlace). Null for a place the player has not found. */
   _questPlace(q) {
+    if (!inBay(q.px, q.py)) return this._pastBayPick(q.px, q.py, q.placeName);   // START3: past the Bay, the quest's own place
     const hit = (this._ensureWorldModel()?.marks ?? []).find((k) => Math.floor(k.x) === q.px && Math.floor(k.y) === q.py);
     if (hit) return hit;
     const summary = locationSummaryAt(this.deps.mapDict, q.px, q.py);
@@ -2560,7 +2457,7 @@ export class HeldMapWindow {
     const [mx, my] = toMap(this._view, sx, sy);
     // AUDIT SD III (T7): a ring answers all it is drawn over - at a far zoom the paper draws it larger than its reach
     const least = GATE_RING_MIN_PX / this._view.scale;
-    for (const g of [this._gate, this._serpent, this._sd, this._arch, this._ketch]) if (g && Math.hypot(mx - g.cx, my - g.cy) <= Math.max(g.r, least)) return g;   // EG-F: and my company's arch   // SERPENT1: the sea serpent's ring answers as the gate's does (SD2c: and the Super dungeon's)
+    for (const g of [this._gate, ...this._gates, this._serpent, ...(this._sds ?? [])]) if (g && Math.hypot(mx - g.cx, my - g.cy) <= Math.max(g.r, least)) return g;   // WW5: every lane's Hollow   // SERPENT1: the sea serpent's ring answers as the gate's does (SD2c: and the Super dungeon's)
     return null;
   }
 
@@ -2571,7 +2468,7 @@ export class HeldMapWindow {
     let best = null, bestD = Infinity;
     if (m) { const [x, y] = toPaper(this._view, m.x, m.y); bestD = (x - sx) * (x - sx) + (y - sy) * (y - sy); }
     const scale = this._view.scale;
-    for (const g of [this._gate, this._serpent, this._sd, this._arch, this._ketch]) {   // EG-F: and my company's arch; KETCH: and the Sky-Ketch
+    for (const g of [this._gate, ...this._gates, this._serpent, ...(this._sds ?? [])]) {   // WW5: every lane's Hollow   // WW2: and the gates past the Bay
       if (!g) continue;
       const [x, y] = toPaper(this._view, g.cx, g.cy), d = (x - sx) * (x - sx) + (y - sy) * (y - sy);
       const r = Math.max(GATE_RING_MIN_PX, g.r * scale);
@@ -2601,7 +2498,7 @@ export class HeldMapWindow {
     box.style.top = `${at.top / k}px`;
   }
 
-  /** WB13c (2026-10-01, Mac: "AAA grade polish"): A FINGER HAS NO HOVER, so a phone never saw the breach's card (nor a
+  /** WB13c: A FINGER HAS NO HOVER, so a phone never saw the breach's card (nor a
    *  raid's or a quest's). A tap on a mark with a card shows it, with its label, for TAP_TIP_S - the press still picks
    *  what it picks. */
   _tapTip(sx, sy, cx, cy) {
@@ -2702,8 +2599,7 @@ export class HeldMapWindow {
     }
   }
   /** TV1: the Overworld door stands only where the host can lift the camera. */
-  // TV1 (bible/06-Systems/Travel-View.md, Mac: "When opening the map, there should be a toggle to go to the overworld
-  // style map"): THE DOOR UP. The foot's Overworld button is shown only where the host can honour it (the open air, the
+  // TV1 (): THE DOOR UP. The foot's Overworld button is shown only where the host can honour it (the open air, the
   // enhanced lane) and never under the teleport arm; the sheet lowers as it does for a journey, and the host lifts the
   // camera (scenes/travelView.js) at the bottom of the close.
   _travelViewShown() { return typeof this.deps.onTravelView === 'function' && (this.deps.travelViewAllowed?.() ?? true) && !this.teleportationTravel; }
@@ -2877,16 +2773,19 @@ export class HeldMapWindow {
     return playerPopUpRefusal(this.deps.immersiveSettings?.() ?? null, summary.locationType);
   }
 
+  /** The teleport card's place line for a bare pixel: its region by the politic map (DFU's +128 band). BAY-LEFT-MAPS (AUDIT
+   *  LEFT IN THE BAY C11): bounded by the world's regions (REGION_NAMES - the Bay's 62 and the provinces', WW-R), where it
+   *  read MAPS.BSA's region count: a pixel past the Bay (the host's politic map answers a province there,
+   *  world/tamriel/tamrielGround.js groundPoliticIndex) named no province on the card. */
   _regionNameAt(px, py) {
     const politic = this.deps.maps?.getPoliticIndex?.(px, py) ?? -1;
     const region = politic - 128;
-    return (region >= 0 && region < (this.deps.maps?.regionCount ?? 0)) ? (REGION_NAMES[region] ?? '') : '';
+    return (region >= 0 && region < REGION_NAMES.length) ? (REGION_NAMES[region] ?? '') : '';
   }
 
   // ── SELECTION, TRAVEL, TELEPORT ────────────────────────────────
 
   _summaryName(summary) {
-    if (summary?.wildHall) return summary.wildHall.name;   // PVPDUNGEONS: a hall names itself
     // AUDIT-MAP A9: a summary with no region index (a stub, a malformed
     // row) names nothing rather than throwing out of every paint
     if (!Number.isInteger(summary?.regionIndex)) return '';
@@ -2899,7 +2798,7 @@ export class HeldMapWindow {
   _pickOf(selected) {
     if (selected.coords) return { pixel: { x: Math.floor(selected.x), y: Math.floor(selected.y) }, name: selected.name };
     const { summary } = selected;
-    const pos = getPixelFromPixelID(summary.id);
+    const pos = summaryPixel(summary);   // WW-C2: a place's own pixel where it carries one (past the Bay)
     return {
       pixel: pos,
       name: selected.name,
@@ -2929,6 +2828,10 @@ export class HeldMapWindow {
     // armed (:1162-1182), so a fast-travel panel here would commit into an
     // onTravel the teleport host never hands over
     if (kind === 'travel' && this.teleportationTravel) kind = 'teleport';
+    // AUDIT STARTS U1/U2/U4: a quest's place past the Bay (`_pastBayPick`): on
+    // the world sheet a portal's end only where it is a city's (TESA13); else no panel at all - TESA-NO-FAST: the land
+    // past the Bay is walked. The one gate, whatever opens it (the card, the pick's own confirm, a key)
+    if (this._selected.pastBay && !(kind === 'teleport' && this._selected.portal)) return;
     // IT1: the mod asks first - a refused place is its box over the sheet and no panel
     if (kind === 'travel') {
       this._itRefusal = null;   // AUDIT IT1 H-L1: asked again at every press, as the classic asks at every pick
@@ -2955,12 +2858,11 @@ export class HeldMapWindow {
         // AUDIT-TO1 C2: the mod, for its ship laws - IT1: none over the mod's popup, which is DFU's
         to: it ? null : (d.travelOptions?.() ?? null),
       };
-      if (this._zoneMap) this._forceZoneOpts(this._panelState.opts);   // PVPJOURNEY: the zone's own trip, no choice
       this._refreshTrip();
       // AUDIT-TO1 C2: OnPush's guard (TravelOptionsPopUp.cs:53-67) over
       // the remembered toggles, with the trip now billed.
       const st = this._panelState;
-      // SHIP-PORT (2026-09-28): a guard that knocked the ship off re-bills the trip, as the classic window refreshes
+      // SHIP-PORT: a guard that knocked the ship off re-bills the trip, as the classic window refreshes
       // after it (travelMapWindow.js). The card showed By land over the ship's days and fare, and Begin gold-checked
       // that fare - a walk the purse could not "afford" was refused.
       if (st.to) {
@@ -3013,7 +2915,7 @@ export class HeldMapWindow {
    *  goes, however it goes. */
   _rememberPanel() {
     const o = this._panelState?.opts;
-    if (o && !this._panelState.it && !this._zoneMap) setTravelMapPopUpState(o);   // PVPJOURNEY: the zone's forced trip is not the player's choice   // IT1: the mod's popups are new each time - nothing of theirs is kept
+    if (o && !this._panelState.it) setTravelMapPopUpState(o);   // IT1: the mod's popups are new each time - nothing of theirs is kept
   }
 
   /** ONE JOURNEY for the card's bill: the walk priced once by
@@ -3036,7 +2938,7 @@ export class HeldMapWindow {
     const st = this._panelState;
     if (!st?.opts || !this._selected) return;
     const sel = this._selected;
-    const dest = sel.coords ? { x: Math.floor(sel.x), y: Math.floor(sel.y) } : getPixelFromPixelID(sel.summary.id);
+    const dest = sel.coords ? { x: Math.floor(sel.x), y: Math.floor(sel.y) } : summaryPixel(sel.summary);
     // IT1: the mod's popup bills its own calculator's trip (systems/immersiveTravel.js itTrip) - DFU's fast travel,
     // never walked, never Travel Options' scaled fare nor online's half
     if (st.it) {
@@ -3069,7 +2971,7 @@ export class HeldMapWindow {
     // zero online. [LIVED1 SUPERSEDES it: the trip's days pass on the
     // traveller's own clock, so the count is the trip's, online too.]
     //
-    // TRAVEL-FARE (2026-09-22, kurkku): the FARE is billed online now -
+    // TRAVEL-FARE: the FARE is billed online now -
     // the inn's gold is the price of the journey, not rent on elapsed
     // time, and the popup's own reasoning is at ui/travel/travelPopUp.js. The
     // two surfaces bill the SAME trip, so this clause has to move with
@@ -3113,7 +3015,6 @@ export class HeldMapWindow {
   _toggleOpt(key) {
     const st = this._panelState;
     if (!st?.opts) return;
-    if (this._zoneMap) { this._forceZoneOpts(st.opts); return; }   // PVPJOURNEY: no chooseable options on the zone map
     // IT1: the mod's popup - T and N are the foot/horse and inn buttons' toggles, which the mod overrides
     if (st.it && key !== 'speedCautious') {
       this._itPress(key === 'travelShip' ? 'transportToggle' : 'sleepToggle', { campOutButton: false });
@@ -3220,6 +3121,7 @@ export class HeldMapWindow {
       this._closePanel();
       return;
     }
+    if (this._selected?.pastBay && !this._selected.portal) { this._closePanel(); return; }   // AUDIT STARTS U2: no portal's end, whoever asks
     // AUDIT-TO1 C3: Yes on the fee prompt DEDUCTS (:487-489) and goes.
     // AUDIT-MAP2: with no purse for the fee there IS no yes - the classic's
     // 'teleportpoor' box closes the map on any key (:1510); Y had teleported
@@ -3235,6 +3137,14 @@ export class HeldMapWindow {
    *  to it and put the decision on screen. */
   _consumeGotoPlace() {
     const site = this._gotoPlace?.siteDetails ?? this._gotoPlace ?? {};
+    // START3: a site past the Bay by its own pixel (systems/quest/place.js siteWorldPixel) - MAPS.BSA names none there
+    if (site.worldPixel) {
+      const pick = this._pastBayPick(site.worldPixel.x, site.worldPixel.y, site.locationName);
+      if (!pick) return;
+      this._focusOn(pick.x, pick.y);
+      this._select(pick);
+      return;
+    }
     patchRegionIndex(site.regionIndex ?? -1, site.regionName ?? '');
     const region = this.deps.maps?.getRegionByName?.(site.regionName ?? '');
     const index = region?.mapNameLookup?.get(site.locationName ?? '');
@@ -3248,10 +3158,25 @@ export class HeldMapWindow {
     if (!this.teleportationTravel) this._openPanel('travel');
   }
 
+  /** START3: a place past the Bay a quest names: its pixel and its name, no record of MAPS.BSA's under it (`pastBay`). On
+   *  the travel map no journey (TESA-NO-FAST: the land past the Bay is walked - AUDIT STARTS U1: the card offers none);
+   *  on the teleport map the portal's end only where it is a city's (`portal`, TESA2's: TESA13 keeps a portal's ends to
+   *  the cities - U2), else picked and named alone. Null while the sheet shows no land past the Bay. */
+  _pastBayPick(px, py, name) {
+    if (!this._tamriel || !Number.isInteger(px) || !Number.isInteger(py)) return null;
+    const portal = !!tamrielInkFor(this._model)?.cities?.some((c) => c.pixel?.x === px && c.pixel?.y === py) || (!!this.deps.portalLandPastBay && !!portalLandAt(px, py));   // PORTAL-ANYWHERE: on the stone's map any land
+    return { coords: true, x: px + 0.5, y: py + 0.5, colorIndex: -1, kind: 'coords', name: String(name ?? ''), summary: null, mapId: null, arena: true, pastBay: true, portal };
+  }
+
   // ── SEARCH (the find box's laws, bay-wide) ─────────────────────
 
   _ensureSearchIndex() {
-    if (this._searchIndex) return this._searchIndex;
+    // BAY-LEFT-MAPS (AUDIT LEFT IN THE BAY C9): and the places past the Bay while the sheet shows the continent - the
+    // registry's listed rows as its ink stands them (ui/tamrielInk.js tamrielFindRows); kept by that ink, which moves as the
+    // places stand. The box read MAPS.BSA's regions alone, so Solitude, Whiterun, the Imperial City - every one of the 296
+    // names past the Bay - was never found.
+    const ink = this._tamriel ? tamrielInkFor(this._model) : null;
+    if (this._searchIndex && this._searchIndex.ink === ink) return this._searchIndex;
     const byName = new Map();   // display name -> [entry]
     const maps = this.deps.maps;
     const count = maps?.regionCount ?? 0;
@@ -3269,9 +3194,14 @@ export class HeldMapWindow {
         byName.set(name, list);
       });
     }
+    for (const row of tamrielFindRows(ink)) {
+      const list = byName.get(row.name) ?? [];
+      list.push({ name: row.name, regionName: row.regionName, pastBay: true, port: row.port, pos: { x: row.x, y: row.y } });
+      byName.set(row.name, list);
+    }
     const distance = getDaggerfallDistance();
     distance.setDictionary([...byName.keys()]);
-    this._searchIndex = { byName, distance };
+    this._searchIndex = { byName, distance, ink };
     return this._searchIndex;
   }
 
@@ -3288,7 +3218,9 @@ export class HeldMapWindow {
     for (const match of matches) {
       const entries = byName.get(match.text) ?? [];
       for (const entry of entries) {
-        if (!this._discovered(entry.summary)) continue;
+        // BAY-LEFT-MAPS (C9): a place past the Bay is on the sheet found or not (TESA1's law, tamrielMarksIn) - under the
+        // Ports filter a port alone, as the sheet inks it (C11)
+        if (entry.pastBay ? this.portsFilter && !entry.port : !this._discovered(entry.summary)) continue;
         if (cutoff === null) cutoff = new MatchesCutOff(match.relevance);
         else if (!cutoff.keep(match.relevance)) return out;
         out.push(entry);
@@ -3299,8 +3231,11 @@ export class HeldMapWindow {
   }
 
   _searchPick(entry) {
-    this._focusOn(entry.pos.x + 0.5, entry.pos.y + 0.5);
-    this._select({ x: entry.pos.x + 0.5, y: entry.pos.y + 0.5, colorIndex: 11, kind: 'city', name: entry.name, summary: entry.summary });
+    // BAY-LEFT-MAPS (C9): a place past the Bay picked as a quest's site past it is (START3's _pastBayPick: no journey -
+    // TESA-NO-FAST - and on the teleport map a portal's end where it is one)
+    const pick = entry.pastBay ? this._pastBayPick(entry.pos.x, entry.pos.y, entry.name)
+      : { x: entry.pos.x + 0.5, y: entry.pos.y + 0.5, colorIndex: 11, kind: 'city', name: entry.name, summary: entry.summary };
+    if (pick) { this._focusOn(pick.x, pick.y); this._select(pick); }
     this._chrome.searchInput.value = '';
     this._renderSearch([]);
   }
@@ -3312,7 +3247,7 @@ export class HeldMapWindow {
     injectEnhancedFonts();
     const root = el('div', 'hmroot');
     root.id = 'enhanced-travelmap';
-    // FINDME-SHEET (2026-10-11, Mac: "the worldmap is also missing the find me button next to close"): the root says
+    // FINDME-SHEET: the root says
     // which sheet is up, so a dress can drop a press on one sheet and keep it on another (ui/grimoireDress.js: Find me
     // goes on the dungeon's sheet alone, as it was asked to)
     root.dataset.hmSheet = this._slot?.live ?? '';
@@ -3416,7 +3351,7 @@ export class HeldMapWindow {
     // run before it lands, so the sheet is repainted once when it does
     try {
       const fonts = document.fonts;
-      const landed = () => { if (!this.done) { this._staticKey = ''; this._dirty = true; } };
+      const landed = () => { if (!this.done) this._inkAgain(); };   // AUDIT TESA II M2: the sheet's kept parts lettered again too
       (fonts?.load?.("14px 'Cormorant'") ?? fonts?.ready)?.then?.(landed);
       fonts?.ready?.then?.(landed);
     } catch { /* no font set */ }
@@ -3471,14 +3406,14 @@ export class HeldMapWindow {
     // EM3-3D: THE RIGHT BUTTON TURNS A SOLID SHEET, as it turns DFU's 3D automap (and Shift with the left, for a
     // trackpad). Only a sheet that says it turns is given it; every other sheet keeps the right button as it was.
     let orbitDrag = null;   // { id, x, y, btn } - btn is the buttons-bitmask bit (1 left, 2 right) that owns the orbit
-    // EM3-3D fix (Mac: "those floors there are almost not clickable"): A PRESS ON A BUTTON IS A PRESS. A tab, a floor
+    // EM3-3D fix: A PRESS ON A BUTTON IS A PRESS. A tab, a floor
     // row or an on-paper button under the pointer on the way DOWN takes the whole press: it never pans, and it is
     // answered at the point it went down on, so a hand that drifts a few pixels while it clicks still gets its floor.
     // It used to be read on the way up, after four pixels of drift had already made it a drag of the map.
     let uiPress = null;     // { id, px, py }
     // EM3-3D merge: the right-drag's context menu is the ONE guard's (ui/input.js installContextMenuGuard, which every
     // host installs on the document - MAC-L3); a door rolls no copy of that rule
-    // EM3-3D (Mac: "doubleclicking somewhere should create points where you can make notes"): a double click marks
+    // EM3-3D: a double click marks
     // the place, as the middle button does - on a sheet that takes marks (the dungeon's); the world map has none
     stage.addEventListener('dblclick', (e) => {
       if (this._phase !== 'map' || this._top || this._panel) return;
@@ -3496,8 +3431,7 @@ export class HeldMapWindow {
       // AUDIT-MAP2: in the hands lane a press off the sheet is a press on
       // the world, not on the map - no pan, no pick, no pinch from it
       if (this._lane === 'hands' && this._paperPoint(e.clientX, e.clientY) === OFF_SHEET) return;
-      // PAN-LEFT-ONLY (Mac: "sometimes when i rotate the map with right click it can still be moved ... moving the map
-      // around should only be possible with left click"): a mouse's buttons share ONE pointer id, so a left press
+      // PAN-LEFT-ONLY: a mouse's buttons share ONE pointer id, so a left press
       // whose release never arrived (let go outside the window, a lost capture) left a pan armed - and the next
       // right-drag's moves, on that same id, panned the map. A pan armed with the left button up is stale: gone.
       if (downAt && e.pointerType === 'mouse' && !(e.buttons & 1)) { downAt = null; second = null; pinch = null; }
@@ -3547,7 +3481,7 @@ export class HeldMapWindow {
     stage.addEventListener('pointermove', (e) => {
       if (this._phase !== 'map') return;
       if (orbitDrag && e.pointerId === orbitDrag.id) {
-        // TURN-STEADY (Mac: "its a bit hard to control"): A DRAG PICKS ITS AXIS. Every hand's sideways drag drifts a
+        // TURN-STEADY: A DRAG PICKS ITS AXIS. Every hand's sideways drag drifts a
         // little up or down, and every pixel of it tilted the map as well as turning it. The first ORBIT_LOCK_PX of
         // travel decide: mostly across is a turn only, mostly up and down a tilt only, a true diagonal both.
         const dx = e.clientX - orbitDrag.x, dy = e.clientY - orbitDrag.y;
@@ -3562,7 +3496,7 @@ export class HeldMapWindow {
           return;
         }
         // ORBIT-FREE (FIELD BUGS 2026-10-01, "rotate the 3D map only works on one axis ... should work for both vertical
-        // and horizontal simultaneously"; Mac: "Unlock on intent"): the lock held for the WHOLE drag, so one set off
+        // and horizontal simultaneously"): the lock held for the WHOLE drag, so one set off
         // sideways never tilted however far it then went down. A locked drag keeps what it holds back the other way,
         // less its drift (each move forgives ORBIT_DRIFT of its own travel along the lock); past ORBIT_FREE_PX of it
         // the drag turns AND tilts, every move, to its release - the travel held back spent first, so nothing is lost.
@@ -3766,8 +3700,7 @@ export class HeldMapWindow {
       });
       // DISC25-A: the kept ink was laid out against the zones before the sprite loaded - lay it again against the
       // thumbs the key found (the static key does not carry the hands)
-      this._staticKey = '';
-      this._dirty = true;
+      this._inkAgain();
     } catch (e) {
       console.warn('[heldmap] the hands would not key', e);
     }
@@ -3819,7 +3752,7 @@ export class HeldMapWindow {
       const tier = tierPhrase(this.deps.tierAt?.(m.summary) ?? null);
       // SEAT-TIP (FIELD BUGS 2026-10-04e): a seat - a town that can be taken - answers with its card: who holds it, and
       // this week's battle (the mark's seat is the one the poll dressed; the EVENT-TIP card shows it). TOWN-ECON
-      // (bible/06-Systems/Town-Economy-Arc.md 3): online every town answers with its own - its economy, then its guild
+      // (3): online every town answers with its own - its economy, then its guild
       // control, a seat's lines after the town's (deps.townTipAt, net/townEconLaw.js townTipOf)
       const card = this.deps.townTipAt?.(m.summary) ?? (m.seat ? seatTipOf(m.seat) : null);
       const tip = card ? readTip(card, { textMax: SEAT_TIP_TEXT_MAX, linesMax: TOWN_TIP_LINES_MAX }) : null;
@@ -3830,11 +3763,19 @@ export class HeldMapWindow {
     if (g) return { label: g.label, cursor: '', tip: g.tip };
     const [mx, my] = toMap(this._view, sx, sy);
     const px = Math.floor(mx), py = Math.floor(my);
-    if (px < 0 || py < 0 || px >= this._size.width || py >= this._size.height) {
-      // TAMRIEL1: beyond the Bay the continent answers - a city, its province, or the sea - and nothing is picked
-      if (!this._tamriel || this._zoneMap) return null;
-      const place = tamrielPlaceAt(mx, my, this._view, tamrielInkFor(this._model));
-      return place ? { label: place, cursor: '' } : null;
+    const outside = px < 0 || py < 0 || px >= this._size.width || py >= this._size.height;
+    // TAMRIEL1: beyond the Bay the continent answers - a city, its province, or the sea - and nothing is picked. AUDIT TESA II M14: and on the Bay's side of the
+    // seam a city's or a mark's glyph past it answers (tamrielHoverAt: the city and the mark alone, within their reach)
+    const past = this._tamriel ? this._pastBayHover(mx, my) : null;
+    if (outside || past) {
+      if (!past) return null;
+      // AUDIT TESA II M8: bare land past the Bay answers with its ore card, as the Bay's own ground below - the host's
+      // card off its maps, which read the province's climate and region past the Bay (world/tamriel/tamrielGround.js groundMaps)
+      const ore = past.on === 'land' ? readTip(this.deps.oreAt?.(px, py, () => this._refreshTip()) ?? null) : null;
+      // WW7-6: a seat past the Bay answers with its card, as the Bay's (SEAT-TIP)
+      const seat = past.city?.mapId != null ? this.deps.seatAt?.({ mapId: past.city.mapId }) ?? null : null;
+      const tip = seat ? readTip(seatTipOf(seat), { textMax: SEAT_TIP_TEXT_MAX, linesMax: TOWN_TIP_LINES_MAX }) : ore;
+      return { label: past.label, cursor: this.teleportationTravel && (past.city?.pixel || (this.deps.portalLandPastBay && portalLandAt(px, py))) ? 'pointer' : '', ...(tip ? { tip } : {}) };   // PORTAL-ANYWHERE: and on the stone's map its land   // TESA2: a place the stone's portal reaches points (TESA-NO-FAST: on the teleport map alone)
     }
     // the raw politic read, range-checked - the classic window's own
     // region-under-cursor law; the sea answers nothing
@@ -3852,27 +3793,28 @@ export class HeldMapWindow {
 
   _pickAt(sx, sy) {
     if (!this._onSheet([sx, sy])) return;   // AUDIT-MAP2: off the paper is off the map (the sprite's hands, the world)
-    // ZONE-ZOOM (2026-10-08, the owner: "when you click a town or any other POI in the zone out from the world map it
-    // dosent zoom you in it should always zoom you into the zone map doesnt matter what you click there"): on the world
-    // map ANY press inside the zone - a town, a hall, a quest's mark or bare ground - opens the zone map first
-    if (!this._zoneMap) {
-      const mask = this.deps.wildMask?.() ?? null;
-      const [zx, zy] = toMap(this._view, sx, sy);
-      if (mask && wildInside(mask, zx, zy) && this._openZoneMap()) return;
-    }
-    const m = this._markerAt(sx, sy);   // PVPDUNGEONS: a hall is a mark like every place - pressed, it is picked
-    if (m) { if (this._zoneMap && !this.teleportationTravel) this._zoneTravelTo(m); else this._select(m); return; }
+    const m = this._markerAt(sx, sy);
+    if (m) { this._select(m); return; }
     // AUDIT GUIDE K1/K4: a quest's diamond stands above its place, out of the place mark's reach - pressed, it picks the
     // place (never a journey to the bare pixel north of it), whatever this band or the key hides
     const quest = this._questAt(sx, sy);
     const place = quest ? this._questPlace(quest) : null;
     if (place) { this._select(place); return; }
-    // WILD2 (the owner: "when clicking on this zone it opens its own ... map"): a press on the open zone's bare ground
-    // opens the zone map; on the zone map itself the press is the world sheet's, as ever
-    if (!this._zoneMap) {
-      const mask = this.deps.wildMask?.() ?? null;
-      const [zx, zy] = toMap(this._view, sx, sy);
-      if (mask && wildInside(mask, zx, zy) && this._openZoneMap()) return;
+    // TESA2: beyond the Bay a place the world stands - Arena's, a capital (TESA10d) -
+    // is a portal's end: on the teleport map (the Portal Stone's, the guild's) the press picks its pixel and the
+    // teleport is to it. TESA-NO-FAST: on the travel map it is no journey - the land past the Bay is
+    // walked, or a stone's portal reaches it; a place the world does not stand picks nothing, as TAMRIEL1's did
+    if (this._tamriel && this.teleportationTravel) {
+      const [mx, my] = toMap(this._view, sx, sy);
+      const city = tamrielCityAt(mx, my, this._view, tamrielInkFor(this._model), { filters: this.filters, continent: onContinent(this._view.scale, this._bayFit()), portsOnly: this.portsFilter });   // AUDIT TESA II M7: a city the sheet inks (BAY-LEFT-MAPS C11: under the Ports filter too)
+      // PORTAL-ANYWHERE (): on the Portal Stone's map
+      // (`portalLandPastBay`) bare land past the Bay is a portal's end too, named by its province - the guild's keeps TESA13's
+      const end = city?.pixel ? city : this.deps.portalLandPastBay ? portalLandAt(Math.floor(mx), Math.floor(my)) : null;
+      if (end) {
+        this._select({ coords: true, x: end.pixel.x + 0.5, y: end.pixel.y + 0.5, colorIndex: -1, kind: 'coords', name: end.name, summary: null, mapId: null, arena: true });
+        this._openPanel('teleport');
+        return;
+      }
     }
     // MAP2 (:1375): a bare pixel opens the coordinates decision when the
     // mod allows it - the classic page's own click, on the sheet.
@@ -3880,15 +3822,6 @@ export class HeldMapWindow {
     // - a discovered place on the pixel - not whether this band inks it):
     // a click dead on a hamlet the far band hides is not a nameless walk
     // to its pixel. The band still hides it from the pick (MAP1's law).
-    if (this._zoneMap) {
-      const mask = this.deps.wildMask?.() ?? null;
-      const [zx, zy] = toMap(this._view, sx, sy);
-      const px = Math.floor(zx), py = Math.floor(zy);
-      if (mask && wildInside(mask, zx, zy) && px >= 0 && py >= 0 && px < this._size.width && py < this._size.height) {
-        this._zoneTravelTo({ coords: true, x: px + 0.5, y: py + 0.5, colorIndex: -1, kind: 'coords', name: toFormat(TO_TEXT.MsgTargetCoords, px, py), summary: null, mapId: null });
-        return;
-      }
-    }
     if (this._coordsAllowedHere()) {
       const [mx, my] = toMap(this._view, sx, sy);
       const px = Math.floor(mx), py = Math.floor(my);
@@ -4064,7 +3997,7 @@ export class HeldMapWindow {
         card.append(dl);
       }
       if (t?.online && !t.walked) card.append(el('p', 'hmmeta', ONLINE_TRAVEL_LINE));   // OL2: the popup's own line   // TO-ONLINE: and not over a walked trip, which online is a real ride now and not an arrival at once
-      // TO-FIELD (2026-09-18, Mac: "it... doesn't travel on the road"):
+      // TO-FIELD:
       // THE FOLLOW KEY, SAID WHERE THE TRIP IS BOUGHT. Travel Options
       // does not route along roads to a destination - it beelines, and
       // road following is a MODE the player starts with a key mid-
@@ -4089,8 +4022,10 @@ export class HeldMapWindow {
       return;
     }
 
-    const row = el('div', 'hmacts');
     const armed = this.teleportationTravel;   // AUDIT-MAP2: the armed map's only offer is the teleport
+    // AUDIT STARTS U1/U2: a quest's place past the Bay offers no journey (TESA-NO-FAST), and a portal only to a city's
+    if (this._selected.pastBay && !(armed && this._selected.portal)) return;
+    const row = el('div', 'hmacts');
     const travel = el('button', 'act', armed ? 'Teleport here' : 'Travel here');
     travel.onclick = () => this._openPanel(armed ? 'teleport' : 'travel');
     row.append(travel);

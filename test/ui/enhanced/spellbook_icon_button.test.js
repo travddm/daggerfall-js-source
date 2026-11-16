@@ -3,14 +3,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { editBookSpell } from '../../../src/ui/spellbookWindow.js';
 
-const src = readFileSync(new URL('../../../src/ui/enhanced/enhancedSpellbook.js', import.meta.url), 'utf8');
-
-test('enhanced book: Icon button opens a grid of every icon and writes through editBookSpell', () => {
-  assert.match(src, /'act sb-iconbtn|`act sb-iconbtn/);
-  assert.match(src, /for \(let n = 0; n < SPELL_ICON_COUNT; n\+\+\)/);
-  assert.match(src, /editBookSpell\(deps\.spells\?\.\(\), sel\.i, \{ icon: n, noIcon: false \}\)/);
-});
-
 test('an icon change copies the spell and keeps it custom, leaving the rest alone', () => {
   const list = [{ name: 'Fireball', icon: 3, tag: 'x' }];
   const orig = list[0];

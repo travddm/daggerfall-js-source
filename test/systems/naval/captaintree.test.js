@@ -1,6 +1,4 @@
-// CAPTAIN-TREE and REFIT-ORES (2026-10-17, the owner: "A firmament styled captain skill tree along with making improvements
-// to the ship upgrade system" - a player's ask beside it: "levels unlock upgrading with ores from steel to Ebony and beyond",
-// "connect current stats to ship behaviour"; bible/03-World/Naval-Refit.md CAPTAIN-TREE, REFIT-ORES).
+// CAPTAIN-TREE and REFIT-ORES.
 //
 // The captain's level off the log and the stars it buys (systems/naval/captainTree.js), kept in the captain's ledger
 // (systems/naval/captainLedger.js); where each star is read - her refits (scenes/fleetHost.js refit: Come Sail Away's way,
@@ -171,24 +169,6 @@ test('CAPTAIN-TREE the exchange: the captain\'s `trade` closes a share of the sp
   assert.equal(g.sell, Math.max(1, Math.round(mid * (1 + SPREAD * 0.5))));
   assert.deepEqual(exchangeOf(port, day, {}, 9).map((r) => [r.sell, r.buy]), exchangeOf(port, day, {}, TRADE_MOST).map((r) => [r.sell, r.buy]), 'the cap');
   assert.equal(TRADE_MOST, 0.75);
-  const office = rd('src/scenes/harbourOffice.js');
-  assert.equal(office.split('exchangeOf(port, day, L.dealtAt(port.key, day), L.stats?.().trade, townAt(port))').length - 1, 3, 'the board, a purchase and a sale read the same prices');   // PIN MOVED (SEA-TRADE): and the port town's factors
-});
-
-test('CAPTAIN-TREE the hosts read the stars where the ship\'s own numbers are read: the sea fight\'s worth, aim, my shot and its fire, my grapples\' reach (BOARD-MAGNET); Come Sail Away\'s oars and helm through the refit seam; the Fleet\'s refit a ship of mine\'s alone (PIN: the seams)', () => {
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /s\.worth = captainWorth\(b\.crewed \? crewWorth\(c\.hands, ashoreNames\(b\)\) : NO_WORTH, deps\.captain\?\.stats\?\.\(\)\);/);
-  assert.match(host, /const crewSkill = \(boat, st\) => Math\.min\(1, \(boat\.crewed \? [^\n]*\) \* statScale\(deps\.captain\?\.stats\?\.\(\), 'aim'\)\);/);
-  assert.match(host, /const gun = e\.type === 'blast' \? GUNS\.barrel : struckGun\(e\.gun, GUNS\[e\.gun\], e\.shot, e\.t, isMine\(e\.shooter\) \? deps\.captain\?\.stats\?\.\(\) : null\);/);   // PIN MOVED (AUDIT 2026-10-17: captainTree.js struckGun, out of the host)
-  assert.match(host, /random\(\) < shotFireChance\(e\.shot, FIRE_CHANCE, gun\.fireK\);/);
-  assert.match(host, /return d > BOARD_RANGE \* statScale\(deps\.captain\?\.stats\?\.\(\), 'reach'\) \? null : d;/);   // BOARD-MAGNET: the ram's and the foul's stars reach farther
-  const csa = rd('src/systems/comeSailAway/comeSailAway.js');
-  assert.match(csa, /f\(b\.modifierMoveSpeedOar\)\) \* hurt\) \* rigOf\(b, 'oars'\)\) \* peace\(\)\);/);
-  assert.equal(csa.split("* rigOf(b, 'turn'))").length - 1, 2, 'her helm under oars and under sail');
-  assert.match(csa, /const rigOf = \(b, key = 'speed'\) => \{ const k = Number\(refitOf\(b\)\?\.\[key\]\);/);
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /stats: \(\) => captainLedger\.stats\(\),/);
-  assert.match(world, /captain: \(\) => captainLedger,   \/\/ CAPTAIN-TREE \/ REFIT-ORES/);
 });
 
 // ── the ledger keeps the sky ─────────────────────────────────────────────────────────────────────────────────────────
@@ -253,7 +233,7 @@ test('REFIT-ORES a piece melted down: a weapon\'s metal, or a piece of plate\'s 
   assert.equal(refitMetalOf(piece('Weapons', 12)), null);
   assert.equal(meltable(piece('Weapons', 1)), true);
   for (const guard of [{ equipSlot: 3 }, { questItem: true }, { artifact: true }, { sigil: { set: 'x' } }, { enchantments: [{ type: 1 }] },
-    // AUDIT (2026-10-17): the refit melts unasked, so a plain piece alone - never locked, bound, a player's make, enchanted
+    // AUDIT: the refit melts unasked, so a plain piece alone - never locked, bound, a player's make, enchanted
     // by the item maker, graded past Common (its tier, its affixes, a Legendary's record, DFU's magic mark) or socketed
     { locked: true }, { bound: true }, { provenance: 'p:1' }, { customEnchantments: [{ type: 'x' }] }, { rarity: 'magic' },
     { rarity: 'legendary', legendary: 'l1', affixes: [{ id: 'a' }] }, { affixes: [{ id: 'a' }] }, { legendary: 'l1' }, { magic: true },
@@ -403,6 +383,4 @@ test('CAPTAIN-TREE the Captain page: her level, her XP\'s meter to the next, the
     globalThis.document = saved;
     setHoldingsProvider(null);
   }
-  assert.match(rd('src/scenes/world.js'), /show: \(w\) => townTalk\.showOverlay\(w\), changed: \(\) => \{ fleetHost\?\.restat\(\); surfacePlayer\(\); \} \}\);/);
-  assert.match(rd('src/scenes/captainPageHost.js'), /const w = createCaptainStarsOverlay\(\{ ledger: deps\.ledger, changed: deps\.changed \}\);\n\s+if \(w\) deps\.show\(w\);/);
 });

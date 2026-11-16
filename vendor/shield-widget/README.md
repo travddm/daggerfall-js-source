@@ -39,9 +39,8 @@ this author's other mod, and one answer closes both.]**
 
 **The script.** The bundle carries `Shield Widget.dll` (24,574 bytes), a
 compiled assembly; the `ShieldWidget.cs` its manifest names is not in
-the bundle. The port read the IL method by method - the record is
-`bible/05-Combat/Shield-Widget.md`, a table of every method against
-where it lives in `src/combat/shieldWidget.js`. The DLL itself is the
+the bundle. The port read the IL method by method into
+`src/combat/shieldWidget.js`. The DLL itself is the
 author's compiled work and is not carried.
 
 **The 600 textures are HERE**, under `Textures/`, and the mod works out
@@ -51,7 +50,7 @@ That is a departure from `vendor/weapon-widget/README.md`, and the
 reason is worth stating because the first cut of this port got it wrong
 by copying the sibling's ruling without checking whether its reason
 applied. The doctrine
-(`bible/01-Overview/Port-Doctrine.md`) is that **a render of game data
+(`test/tooling/doctrine.test.js`) is that **a render of game data
 is game data**: Weapon Widget's 173 textures are repaints of the classic
 `WEAPON*.CIF` frames, and Seasons of the Iliac Bay's are repaints of
 classic flats, so both answer yes to "did these pixels come from

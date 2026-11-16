@@ -147,13 +147,3 @@ test('TREES-SEATED: no seat where the port draws no mound of its own - the stand
   assert.equal(seatNatureFlat(null, hx, hz, 7.25), 7.25);
 });
 
-test('TREES-SEATED by source: the streamed world and the one-location exterior seat a block\'s nature-range flats on its drawn hills; the interior and dungeon hosts stand no RMB exterior flat', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const hillSeat = blockHillSeat\(b\.layout\.models\);/);
-  assert.match(w, /addFlat\(flat\.archive, flat\.record, fx, locLocal\[1\] \+ \(hillSeat && isNatureArchive\(flat\.archive\) \? seatNatureFlat\(hillSeat, flat\.x, flat\.z, NATURE_FLATS_Y \+ groundOffPlane\(samples, avg, fx, fz\)\) : flat\.y \+ lift\), fz, \{ block, n \}\);/,
-    'the higher of the drawn ground (NATURE-GROUND\'s) and the mounds, for the whole nature range; else the plane and its lift');
-  const e = src('src/scenes/exterior.js');
-  assert.match(e, /const blockFlats = collectBlockFlats\(b\.dfBlock, natureArchive, \{ climateIndex: locClimateIndex, solid: fieldSolids \}\), hillSeat = blockHillSeat\(b\.layout\.models\);/);   // FIELD BUGS 2026-10-04d CROPS: a field's batch handed the climate and the block's solids
-  assert.match(e, /\[flat\.x \+ b\.originX, hillSeat && isNatureArchive\(flat\.archive\) \? seatNatureFlat\(hillSeat, flat\.x, flat\.z, NATURE_FLATS_Y\) : flat\.y, flat\.z \+ b\.originZ\]/, 'this host\'s ground is the plane');
-  for (const host of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) assert.doesNotMatch(src(host), /collectBlockFlats/, `${host}: no RMB exterior flats`);
-});

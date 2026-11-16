@@ -1,5 +1,4 @@
-// DISC25-B (2026-09-25, kurkku on Discord: "hands on the enhanced map sprite go over the black bars in retro mode" -
-// "1996 Fantasy ruined", with a shot of the held map's gauntlets and its top row standing out over the pillars).
+// DISC25-B.
 //
 // DFU lays every window out in DaggerfallUI.CustomScreenRect while the retro pillarbox is up - `new Rect(pillarWidth,
 // 0, Screen.width - pillarWidth * 2, Screen.height)` (ViewportChanger.cs:139-140). The port's 2D kept the whole
@@ -68,8 +67,6 @@ test('DISC25-B: retroScreenRect is CustomScreenRect - the pillars in whole pixel
   retro(1, RETRO_ASPECT.FOUR_THREE);
   assert.equal(retroScreenRect(1000, 1080), null);
   assert.equal(retroScreenRect(0, 1080), null);
-  assert.match(readFileSync(new URL('../../src/systems/retroMode.js', import.meta.url), 'utf8'),
-    /const pillarWidth = retroPillarWidth\(screenW, screenH, aspect\);/, 'the world rect cuts from the same pillar');
   resetToDefaults();
 });
 

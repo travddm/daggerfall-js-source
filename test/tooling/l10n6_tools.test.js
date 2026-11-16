@@ -1,4 +1,4 @@
-// L10N6 (2026-10-03): TRANSLATIONS SHIPPED - the three tools around the drafts, over fixtures. THE COVERAGE REPORT
+// L10N6: TRANSLATIONS SHIPPED - the three tools around the drafts, over fixtures. THE COVERAGE REPORT
 // (tools/l10nCoverage.mjs): each language's share of the English catalog, the machine's rows from a person's by the
 // pipeline's own ownership law, what is owed and what a person must review because its English moved, and a bundled
 // pack's tables against DFU's masters. THE REVIEW FILE (tools/l10nReview.mjs): a language exported as a sheet and a
@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { languageCoverage, coverageMarkdown } from '../../tools/l10nCoverage.mjs';
 import { exportReview, importReview, parseCsv, REVIEW_COLUMNS } from '../../tools/l10nReview.mjs';
 import { readBundledPack, packMetaProblems } from '../../tools/l10nPack.mjs';
-import { hash } from '../../tools/translate.mjs';
+import { hash } from '../../tools/lib/translation-rows.mjs';
 import { formatStringTableCsv } from '../../src/systems/textManager.js';
 
 const EN = [['a.hello', 'Hello'], ['a.gold', '{n, plural, one {# gold piece} other {# gold pieces}}'], ['a.name', 'Hello, {name}.'], ['a.new', 'Brand new']];

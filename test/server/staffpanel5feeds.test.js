@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FEEDS (2026-10-22, design doc "DFO Staff Panel: design": Network bursts, Monster watch, Bot check, Server
-// load) - THE RELAY'S STAFF FEEDS, KEPT AND READ (server-account/src/staffNet.js, staffMonsters.js, staffReactions.js),
+// STAFF-PANEL5-FEEDS - THE RELAY'S STAFF FEEDS, KEPT AND READ (server-account/src/staffNet.js, staffMonsters.js, staffReactions.js),
 // driven through the real Worker on the node:sqlite database every account pin stands on (test/accountDb.mjs): the two
 // doors in, by the relay's signature alone; Network bursts and Monster watch most urgent first, "not measured" while
 // the batches say `ms` 0 (an older relay's, grantStrip off - STAFF-PANEL5-MONSTERS: a world248 relay always says 1); a Flag
@@ -43,7 +42,7 @@ async function extensionKey() {
 async function stand() {
   _resetReactionsForTests();
   const mobKey = await extensionKey();
-  const s = await standService({ DEVELOPER_HANDLES: 'SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
+  const s = await standService({ SEAT_ADMINS: 'SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}` });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.1', ...(token ? { [STAFF_SESSION_HEADER]: token } : {}) }, body: JSON.stringify(body),

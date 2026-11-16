@@ -1,5 +1,5 @@
 // @ts-check
-// INT1 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): CREATE ITEM'S ROWS, A LEAF. The rows were
+// INT1: CREATE ITEM'S ROWS, A LEAF. The rows were
 // createItem.js's own, and that module pulls the UI in (its window's doors); the item law (systems/item/itemLaw.js) runs on
 // the account service, which loads no UI, and asks one thing of them - which items a cast conjures, the only items that
 // vanish. One home, two readers: createItem.js imports and re-exports every name here.

@@ -1,8 +1,4 @@
-// SKILL-READY / FIRM-STARS (2026-10-20, Dudey: "add a symbol that tells you when you hover over it that you have stars
-// not applied for the firmament ... on the right of the renown bar and when skills are ready to level up left of the
-// renown bar (dont use this annoying message bar for this anymore) and when you click the firmament symbol it can bring
-// you to firmament"; "The new skill up symbol and firmament points symbol should also be movable with alt + u"; "make sure
-// those symbols have the same quality as buffs and debuffs symbols") - THE TWO TILES BESIDE THE RENOWN BAR.
+// SKILL-READY / FIRM-STARS - THE TWO TILES BESIDE THE RENOWN BAR.
 //
 //   left   the skills a rest or a journey would raise (levelNotice.js skillsImprovable - the count the level strip's
 //          standing line said, which the strip no longer draws), their number at the tile's foot
@@ -111,8 +107,7 @@ export function bindAdvanceTiles(parts) {
   return parts;
 }
 
-/** CLEAR-HOTBAR (2026-10-20, Dudey: "make sure the symbols are not under the hotbar ... still in the same line as the
- *  exp but not under the hotbar"): how far past each end of the Renown row a tile stands, in the row's own pixels - its
+/** CLEAR-HOTBAR: how far past each end of the Renown row a tile stands, in the row's own pixels - its
  *  10px, or past the hotbar's end where the hotbar above is wider than the row. Pure over two screen rectangles and the
  *  row's scale (its drawn width over its own). */
 export const ADV_GAP = 10;

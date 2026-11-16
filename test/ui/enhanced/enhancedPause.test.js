@@ -21,6 +21,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join, dirname, resolve, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
@@ -29,7 +30,7 @@ import { _resetForTests } from '../../../src/systems/uiPrefs.js';
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 import { remainWords } from '../../../src/ui/quest/questRail.js';   // PX22: the words, pinned by what they say (AUDIT OW-REVISITED L5-6)
 
-const root = new URL('../../../', import.meta.url).pathname.replace(/\/$/, '');
+const root = fileURLToPath(new URL('../../../', import.meta.url)).replace(/[\\/]$/, '');
 const read = (p) => hostText(p);
 
 // uiSkin reads globalThis.location.search when it is given no string,
@@ -176,7 +177,7 @@ test('U51: the pause door mounts the FRONT DOOR, not a second design', () => {
   // unchanged - pause mode, the host's own hooks, one front door.
   assert.match(src, /mountEnhancedMenu\(host, \{ mode: 'pause', hooks, onAction: act, at: hooks\.at \?\? null \}\)/,
     'mounted in pause mode with the host’s own hooks');
-  // and it carries no design of its own, exactly as menu.html carries
+  // and it carries no design of its own, exactly as labs/menu.html carries
   // none - the tokens and the layout live in ui/enhanced/enhancedStyle.js
   assert.ok(!/--brass|--verdigris|\.railbtn|grid-template-columns/.test(src),
     'ui/pauseDoor.js must hold no layout - one design language, one home');
@@ -212,7 +213,7 @@ test('U51: the enhanced screen is a DYNAMIC import - classic pays nothing', () =
   const src = read('src/ui/pauseDoor.js');
   assert.doesNotMatch(src, /^import .*enhancedMenu\.js/m,
     'a static import would load the whole enhanced design for a player who chose classic');
-  // MENU1 (2026-09-15): THE LAW STANDS, THE SHAPE MOVED. This read
+  // MENU1: THE LAW STANDS, THE SHAPE MOVED. This read
   // back one door's `.catch((e) => { ... host.remove() }` - the
   // implementation, not the rule - and the rule is the sentence below
   // it: a failed load must not leave the host holding an overlay that
@@ -356,8 +357,6 @@ test('U51: save and load answer the host, not the rail', () => {
 });
 
 // ── PX22: THE JOURNAL'S THREE SECTIONS ────────────────────────────
-// Mac: "quests aren't supposed to be titled as main quest, etc. What we
-// developed had 3 sections for main, side and archived."
 //
 // WHAT THE RECORD SAID, stated plainly because it did not match: PX5
 // shipped the two active headings CONDITIONALLY ("headings only when
@@ -371,9 +370,7 @@ test('PX22: the rail is three named sections, always - Main, Side, Archived', ()
   const at = src.indexOf('const mains = active.filter');
   const fn = src.slice(at, src.indexOf('wrap.append(rail);', at));
   // One helper, three calls, in order - not a conditional pair.
-  // PIN MOVED (QL3): Main Quests is the first heading unless the rewards waiting stand above it (their section takes the
   // first heading's place while any wait) - the three sections stand either way
-  // PIN MOVED (QUEST-AUDIT III STORY-AGAIN): and the main story's failed steps under it, after the running ones
   assert.match(fn, /section\(t\('pause\.journal\.main', 'Main Quests'\), \[\.\.\.mains, \.\.\.story\], '', !offers\.length\);/);
   assert.match(fn, /section\(t\('pause\.journal\.side', 'Side Quests'\), sides, ''\);/);
   assert.match(fn, /section\(t\('pause\.journal\.archived', 'Archived'\), finished, ' done'\);/);
@@ -414,8 +411,9 @@ test('PX22: a quest is filed under its kind, never TITLED by it', () => {
   // AUDIT 68 S31-questshare-mainquest-dup: MOVED, deliberately - the predicate had a second copy in
   // systems/quest/questShare.js; its one home is systems/quest/questLists.js and the rail imports it.
   assert.match(read('src/ui/quest/questRail.js'), /import \{ isMainQuestName as isMainQuest \} from '\.\.\/\.\.\/systems\/quest\/questLists\.js';/);
+  // START1: and a start's quest (systems/starts/starts.js), the main quest's prologue - by its own name too
   assert.match(read('src/systems/quest/questLists.js'),
-    /export const isMainQuestName = \(questName\) => \/\^S0000\/\.test\(questName \?\? ''\) \|\| questName === '_BRISIEN';/);
+    /export const isMainQuestName = \(questName\) => \/\^S0000\/\.test\(questName \?\? ''\) \|\| questName === '_BRISIEN' \|\| isStartQuestName\(questName\);/);
   assert.match(src, /from '\.\.\/quest\/questRail\.js'/, 'and the pause window takes it from there');
   // The archive is NOT split by kind, and that is the data's shape: the
   // notebook's filed header keeps only the display name, so the
@@ -425,8 +423,7 @@ test('PX22: a quest is filed under its kind, never TITLED by it', () => {
 });
 
 test('PX22: the timer PX5 designed is still there, and only when there is one', () => {
-  // Mac, checking: "the timer we also designed is integrated when
-  // needed, correct?" It was never pinned - PX5 shipped it live-probed
+  // It was never pinned - PX5 shipped it live-probed
   // - so it is pinned now, on the way past.
   const src = read('src/ui/enhanced/enhancedMenu.js');
   // THE WORDS. Days show days and hours; under a day, hours and
@@ -435,7 +432,6 @@ test('PX22: the timer PX5 designed is still there, and only when there is one', 
   const rail = read('src/ui/quest/questRail.js');
   assert.match(rail, /export function remainWords\(s\) \{/);
   assert.match(src, /remainWords \} from '\.\.\/quest\/questRail\.js'/);
-  // PIN MOVED (AUDIT OW-REVISITED L5-6): the words go through the text core now - pinned by what they say
   assert.deepEqual([remainWords(2 * 86400 + 3 * 3600), remainWords(86400), remainWords(86400 + 3600)], ['2 days 3 hours', '1 day', '1 day 1 hour']);
   assert.deepEqual([remainWords(3 * 3600 + 5 * 60), remainWords(3600), remainWords(25 * 60)], ['3 hours 5 min', '1 hour', '25 min']);
   assert.equal(remainWords(30), '1 min', 'never "0 min" - a live clock always has a minute left');
@@ -463,7 +459,6 @@ test('PX22: the timer PX5 designed is still there, and only when there is one', 
   // and the whole thing collapsed into `scenes/quest/questBridge.js`.
   const bridge = read('src/scenes/quest/questBridge.js');
   assert.match(bridge, /if \(r\.clockEnabled && !r\.clockFinished && Number\.isFinite\(r\.remainingTimeInSeconds\) && clockCounts\(q, r\)\)/);   // DEAD-CLOCK re-aim: a clock that counts
-  // PIN MOVED (QUEST-SHELF, 2026-10-08): a quest set aside shows its clock as it stopped - no time counts while it is away
   assert.match(bridge, /const left = isShelved\(q\) \? r\.remainingTimeInSeconds : r\.liveRemainingSeconds\(q\);/, 'QT-LIVE1: the remainder as of NOW, off the clock\'s own arithmetic');
   assert.match(bridge, /Math\.min\(clockSeconds, left\)/, 'the TIGHTEST clock');
   assert.equal((bridge.match(/clockSeconds = clockSeconds == null/g) ?? []).length, 1, 'once, in one place');
@@ -495,7 +490,7 @@ test('PX25: the Stats page carries the doors, and only the ones a host handed ov
   // The window goes DOWN before it opens: two overlays at once is the
   // stacking bug U55 found the other way round on this seam. ESC-BOOK:
   // as a handoff - the door's window takes the slot, nothing relocks.
-  assert.match(fn, /b\.onclick = \(\) => \{ handoff\(fn\); \};/);   // PIN MOVED (AUDIT SEASON-BOOK S3): the handoff's one home
+  assert.match(fn, /b\.onclick = \(\) => \{ handoff\(fn\); \};/);
   assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.px-sheetdoors \.act \{ min-height: 44px; \}/);
 });
 
@@ -537,8 +532,7 @@ test('PX25: every host hands the pause window the arms it already had', () => {
 });
 
 // ── PX26: THE DIAL'S NORTH, AND THE SHEET THAT SAT LEFT ───────────
-// Mac, two reports that are one window: "the north option should be
-// the new journal we developed" and "the skill ui opens on the
+// and "the skill ui opens on the
 // lefthand side of the screen when it should be center". North was
 // the F5 overlay - the last pre-PX surface, and the one whose
 // three-column grid fills the viewport from the left edge.
@@ -552,7 +546,6 @@ test('PX26: the pause window lands on the page the door was pressed for', () => 
     'the reset runs first, then the landing');
   // The tabbed window IS the pause home face, so a landing sets the
   // TAB and leaves the section alone.
-  // PIN MOVED (HOLDINGS, bible/03-World/Holdings.md): the tabs a landing may name are the strip's own list, Holdings among
   // them (test/systems/horse/holdings.test.js pins the strip)
   assert.match(menu, /if \(PAUSE_TAB_IDS\.includes\(at\)\) pauseTab = at;/);
   assert.match(menu, /export const PAUSE_TAB_IDS = Object\.freeze\(PAUSE_TABS\.map\(\(\[id\]\) => id\)\);/);
@@ -592,7 +585,7 @@ test('PX26 / THE FOUR HOSTS: north opens a REAL arm on every host', () => {
     assert.match(s, /togglePause(?::\s*)?\(doorOpts = \{\}\)/, `${host}'s togglePause takes ONE options bag, spelt the same as every other host`);
   }
   // Each host calls its OWN pause flow - no host reaches into another's.
-  // LV2 FIX (2026-09-19): ...and each now asks `levelOwed` FIRST, so an
+  // LV2 FIX: ...and each now asks `levelOwed` FIRST, so an
   // owed level takes the sheet door instead of the stats page. The
   // pause call is unchanged and still each host's own; this pin used to
   // spell the whole line, which made it a pin on the IMPLEMENTATION
@@ -605,8 +598,7 @@ test('PX26 / THE FOUR HOSTS: north opens a REAL arm on every host', () => {
 });
 
 test('PX28b: TAB ITSELF closes an open window - the registry answers the key', () => {
-  // Mac: "Tab should also minimize any open UI menus, currently it only
-  // applies to the radial." PX28 taught the DIAL to put a window away,
+  // PX28 taught the DIAL to put a window away,
   // and that was the wrong half: openPixelDial is only reached through
   // the HOST's key routing, and while an enhanced window is up the
   // WINDOW owns the keyboard - so Tab never got there.
@@ -637,7 +629,6 @@ test('PX28b: TAB ITSELF closes an open window - the registry answers the key', (
 });
 
 test('PX28: Tab puts away what it opened, then raises the dial', () => {
-  // Mac: "when hitting tab a second time, it should minimize any UI."
   // The dial already closed ITSELF on a second press; what it could not
   // do was close what it had OPENED, because each enhanced window owns
   // its own keyboard and knows nothing of the others.
@@ -658,7 +649,6 @@ test('PX28: Tab puts away what it opened, then raises the dial', () => {
   // teardown - a stack that grows a dead arm would swallow a Tab.
   for (const door of ['inventoryDoor', 'spellbookDoor', 'chronicleDoor', 'charSheetDoor']) {
     const s = read(`src/ui/${door}.js`);
-    // PIN MOVED (GROWTH5, bible/10-UI/Growth.md section 6): the sheet's arm asks a sky on the Growth stage first, then closes
     assert.match(s, door === 'charSheetDoor' ? /const dialClose = \(\) => \{ if \(view\?\.asksFirst\?\.\(\)\) \{ unregister = registerOverlay\(dialClose\); return; \} close\(\); \};\n\s+unregister = registerOverlay\(dialClose\);/ : /unregister = registerOverlay\(close\);/, `${door} registers`);
     assert.match(s, /unregister\(\);/, `${door} unregisters on teardown`);
   }
@@ -679,7 +669,7 @@ test('PX29: the framed windows are CENTRED, and it is the family that is fixed',
   assert.match(read('src/ui/enhanced/enhancedChronicle.js'), /'px-home px-over cr-shell'/);
 });
 
-// ── AUDIT UI 2 (2026-08-27): THE TWO FAULTS THAT KEPT RECURRING ───
+// ── AUDIT UI 2: THE TWO FAULTS THAT KEPT RECURRING ───
 // Mac asked for a comprehensive audit before continuing. The live
 // sweep across three viewports and every enhanced surface came back
 // clean, so the value is in the two STATIC sweeps - because the two
@@ -763,7 +753,7 @@ test('AUDIT UI 2: every enhanced window is REACHABLE from a host', () => {
     // INTRO4: and a worker - `new Worker(new URL('./x.js', import.meta.url))` is how Vite bundles one, so the module
     // it names is reached by the page that starts it (src/ui/intro/introBuildWorker.js, the first worker under src/ui/)
     edges[f] = [...new Set([...text[f].matchAll(/(?:from|import\(|new Worker\(new URL\()\s*['"](\.[^'"]+)['"]/g)]
-      .map((m) => relative(root, resolve(join(root, dirname(f)), m[1])))
+      .map((m) => relative(root, resolve(join(root, dirname(f)), m[1])).split('\\').join('/'))
       .filter((p) => text[p] !== undefined))];
   }
   // The roots are the hosts AND main.js: the cursor and the crash line

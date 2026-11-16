@@ -1,10 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GEM-GRADES (2026-10-25, CLOTH-GEMS; the player SaberGGaming's "Profession
-// oversights", the owner: "No band aids") - A GEM'S KIND AND GRADE, THE
+// GEM-GRADES - A GEM'S KIND AND GRADE, THE
 // ONE HOME. DFU's eight gems are the plain grade; the port's four others
 // of each - Chipped, Flawed, Flawless, Perfect - are its rows 1900-1931
-// (bible/06-Systems/Gem-Sockets.md section 4, GEM2). These lived in
+// (GEM2). These lived in
 // systems/loot/lootRarity.js (the ids, the grades, the templates) and
 // systems/gems.js (the grade's price), and the jeweller's bench now reads
 // them too: a graded gem is set at it, its points the grade's own
@@ -18,7 +17,7 @@
 export const GEM_IDS = Object.freeze(['ruby', 'emerald', 'sapphire', 'diamond', 'jade', 'turquoise', 'malachite', 'amber']);
 /** Each kind's name, DFU's own (its template's). */
 export const GEM_KIND_NAMES = Object.freeze({ ruby: 'Ruby', emerald: 'Emerald', sapphire: 'Sapphire', diamond: 'Diamond', jade: 'Jade', turquoise: 'Turquoise', malachite: 'Malachite', amber: 'Amber' });
-/** GEM2 (bible/06-Systems/Gem-Sockets.md section 4): A GEM'S GRADE, poorest first. 'plain' is DFU's own gem; the four
+/** GEM2: A GEM'S GRADE, poorest first. 'plain' is DFU's own gem; the four
  *  others are the port's rows (GEM_GRADE_TEMPLATE_BASE). */
 export const GEM_GRADES = Object.freeze(['chipped', 'flawed', 'plain', 'flawless', 'perfect']);
 export const GEM_GRADE_WORDS = Object.freeze({ chipped: 'Chipped', flawed: 'Flawed', plain: '', flawless: 'Flawless', perfect: 'Perfect' });

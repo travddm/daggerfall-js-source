@@ -4,7 +4,7 @@
 // relay's hash reads the order this returns, so the walk is unchanged
 // byte for byte in what it visits and when.
 //
-// IMPORT-GRAPH1 (2026-10-10, the owner: "Make your own decisions and take care of any issues"; found by AUDIT TECH1):
+// IMPORT-GRAPH1:
 // THE WALK READS EACH FILE AS THE BUNDLER DOES - parsed (acorn, a devDependency), never a regex over the text. The
 // regex stripped block comments before line comments, so a line comment carrying a stray `/*` opened a "block" that ran
 // to the next `*/` and swallowed the imports between: the account Worker bundled nine files the walk never saw
@@ -15,12 +15,15 @@
 // Workers' graphs are what esbuild bundles from them (test/server/accountdeploy.test.js IMPORT-GRAPH1).
 import { readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
+import { stripTypeScriptTypes } from 'node:module';
 import { parse } from 'acorn';
 
 /** The relative specifiers a file names, in the order they are written. */
 function specifiers(file) {
-  if (!/\.m?js$/.test(file)) return [];
-  const ast = parse(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' });
+  if (!/\.(m?js|ts)$/.test(file)) return [];
+  const text = readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+  // A .ts file is read as Node runs it, its types stripped, so a type-only import is no edge (esbuild drops it too).
+  const ast = parse(file.endsWith('.ts') ? stripTypeScriptTypes(text) : text, { ecmaVersion: 'latest', sourceType: 'module' });
   const found = [];
   const visit = (node) => {
     if (Array.isArray(node)) { for (const n of node) visit(n); return; }

@@ -1,0 +1,5 @@
+# Shader files are read as text by Vite's `?raw` and by tools/raw-import-hooks.ts, with no line-end conversion. A CRLF
+# checkout would hand the GPU a different source from the one the browser build compiles.
+*.vert text eol=lf
+*.frag text eol=lf
+*.glsl text eol=lf

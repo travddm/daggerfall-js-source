@@ -1,7 +1,6 @@
 // @ts-check
-// STAR7 (2026-10-20): THE STAR RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the stars held as the cards say them.
+// STAR7: THE STAR RECEIPTS THIS DEVICE CARRIES TO THE ACCOUNT SERVICE, and the stars held as the cards say them.
 // The sea serpent's carrier (net/serpent/serpentClaims.js), rung for rung, on its own key and its own route. Design:
-// bible/11-Multiplayer/Starfall.md section 6.
 //
 // THE RELAY SIGNS, THE ACCOUNT SERVICE COUNTS AND PAYS, THIS FILE CARRIES. A receipt a star's cell hands this socket at the
 // master's fall (or the hub again at the next hello) is kept on the device (STAR_CLAIMS_KEY) WITH THE CHARACTER THAT HELD
@@ -126,7 +125,7 @@ export function createStarClaims({ claim, store = null, nowS = () => Math.floor(
   /** B3: a kept entry's `lost` mark, laid or cleared on the entry as it is stored */
   const mark = (e, lost) => { e.lost = lost; keep(kept().map((k) => (k.r === e.r ? { ...k, lost } : k))); };
 
-  // ═══ THE ACTS (AUDIT STARFALL 7, T-A) ═══
+  // THE ACTS (AUDIT STARFALL 7, T-A)
   let owedMemory = [];
   /** The acts owed characters not standing (STAR_ACTS_KEY). */
   function owed() {

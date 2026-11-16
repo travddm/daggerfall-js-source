@@ -1,5 +1,5 @@
 // @ts-check
-// SD6c (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 8): THE ORRERY'S HALL, MADE -
+// SD6c: THE ORRERY'S HALL, MADE -
 // where its parts stand and the meshes they are, in the realm's frame (net/superDungeon/sdBrain.js) and drawn in the dungeon's.
 // Pure: the scene (scenes/superDungeon/sdHall.js) uploads, stands and moves them.
 //
@@ -14,7 +14,7 @@
 //   THE BRIDGE - from the hall's rim on its way on (+z) to THE FIRST STEP, an island of the Steps (SD7) hanging past it.
 //     The step is there from the first; the bridge, and both as floors for the edge, with the Concord.
 //
-// SD-LOOK S10 (2026-10-09; bible/11-Multiplayer/Super-Dungeons-Look.md section 7): THE HALL REBUILT IN THE DAGGERFALL
+// SD-LOOK S10: THE HALL REBUILT IN THE DAGGERFALL
 // MANNER, INSIDE THE LAW'S SHAPES - every stone's visual within 5 cm of its solids (stoneSolids, the collider's own boxes,
 // unchanged; over its crown, within its footprint): a two-step plinth and a chamfered shaft of dressed basalt, its
 // kingdom's heraldry in relief, a raised dial in a 16-gon brass BEZEL (its own mesh, so the scene swaps its state by

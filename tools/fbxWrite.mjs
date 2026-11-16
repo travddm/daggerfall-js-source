@@ -2,7 +2,7 @@
 //
 // FIELD-GUN-MW1 wrote it inside test/tooling/fbxmesh.test.js, "forty lines of the same container tools/fbxRead.mjs reads, so the
 // pin drives the reader against bytes this file's own reader wrote: if the two ever disagree about the format, one of
-// them is wrong and the suite says so". EG6c (2026-10-12, bible/11-Multiplayer/Elite-Gates.md section 11.6) needs it
+// them is wrong and the suite says so". EG6c needs it
 // outside a test: the reference hero fragment (tools/egRefFragScene.mjs) is a scene the port writes itself, committed as
 // an .fbx so tools/fragBake.mjs bakes it exactly as it bakes one of Mac's. ONE EXPORT: the writer moved here whole and the
 // test imports it, so the fixture and the reference are written by one writer. (The MW-FOLK1 audit's pins of

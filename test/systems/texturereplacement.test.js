@@ -173,7 +173,7 @@ test('texture: the pipeline decodes AHEAD and overrides SYNCHRONOUSLY', () => {
   // INCIDENT 2026-09-04: the record door carries the caller's alphaIndex
   // choice - a mesh material is opaque (-1), a flat cuts index 0.
   assert.match(p, /const color32 = swap \?\? t\.getColor32\(dyed \? changeDyeBitmap\(masked, dye, dyeTarget\) : masked, opaque \? -1 : 0\);/);   // DYE-ICON: the classic arm's mask and dye ride `masked`
-  assert.match(p, /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/);   // PIN MOVED (DF-ART, kept by DF-LOOK): + the cut-out a ship's window asks (comeSailAwayPool.js cutOf)
+  assert.match(p, /renderer\.uploadTexture\(archive, record, color32, variant !== undefined \? \{ opaque, mips, variant, replacement, cutout \} : \{ opaque, mips, replacement, cutout \}\);/);
   assert.match(p, /const swapFrame = decodedTexture\(archive, record, frame\);/);
   assert.match(p, /const color32 = swapFrame \?\? t\.getColor32\(bitmap, 0\);/);
   assert.match(p, /renderer\.uploadTexture\(archive, key, color32, \{ replacement \}\);/);   // AUDIT RETRO1 F2: a pack's frame flagged as its record is
@@ -202,7 +202,6 @@ test('texture: BOTH packs have a URL door, and one trip can set up both', () => 
 });
 
 test('texture: registration rides the ONE bootstrap, and the row reports it', () => {
-  // PIN MOVED (AUDIT VE R2): the bootstrap's registration is the store's one (dataSource.js registerTextureStore)
   assert.match(src('scenes/shared.js'), /const textures = registerTextureStore\(\)\.catch\(\(\) => 0\);/);
   assert.match(src('scenes/dataSource.js'), /const n = setTextureReplacements\(names, loadTextureFile\);/);
   assert.match(src('scenes/shared.js'), /Promise\.all\(\[sound, songs, replacements, textures, studio, morrowind\]\)/);   // STUDIO1: the studio's install rides it too

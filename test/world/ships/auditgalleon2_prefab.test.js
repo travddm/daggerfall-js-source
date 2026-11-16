@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03): HER PREFAB, HER PICTURES, HER MESHES AND HER LOADER, read a second time (the first:
+// AUDIT GALLEON-2: HER PREFAB, HER PICTURES, HER MESHES AND HER LOADER, read a second time (the first:
 // test/world/ships/auditgalleon_prefab.test.js). Each pin failed on the code as it stood (57baee705) or, where the law was right and
 // unpinned, on its mutant (tools/mutants/auditgalleon2_prefab.json); each fix carries an `AUDIT GN2-<id>` comment.
 //   PF3  her pictures painted and her glass's glow cut at the preload, never at her first draw
@@ -181,6 +181,7 @@ test('AUDIT GALLEON-2 PF5: her pictures and her glass\'s glow are her CLASSIC AR
     TEXTURE_WRAP_S: 'WS', TEXTURE_WRAP_T: 'WT', TEXTURE_MIN_FILTER: 'MIN', TEXTURE_MAG_FILTER: 'MAG', TEXTURE_MAX_LEVEL: 'MAXL',
     REPEAT: 'REPEAT', NEAREST: 'NEAREST', NEAREST_MIPMAP_NEAREST: 'NMN', CLAMP_TO_EDGE: 'CLAMP', LINEAR: 'LINEAR',
     createTexture: () => ({ id: nextId++ }), bindTexture: (_, t) => { bound = t; }, pixelStorei() {}, texImage2D() {}, generateMipmap() {}, activeTexture() {},
+    getExtension: () => null,   // no anisotropy extension: world art takes its filter alone
     texParameteri: (_, p, v) => { if (bound && p === 'MAXL') maxLevel.set(bound.id, v); },
   };
   const renderer = Object.assign(Object.create(Renderer.prototype), {

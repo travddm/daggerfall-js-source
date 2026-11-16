@@ -1,9 +1,9 @@
-// PROF6 (2026-09-29, Mac: "continue") - THE WRITS' LAW BESIDE THE COURT'S (src/net/writLaw.js, guildLaw.js, boardLaw.js,
+// PROF6 - THE WRITS' LAW BESIDE THE COURT'S (src/net/writLaw.js, guildLaw.js, boardLaw.js,
 // marksLaw.js): a guild writ's seven days, twenty a guild, 1 to 5,000 units of what the market takes, its pay each 1 to
 // 1.5 x the value rounded down; the Officers' budget 0 to the cap; the seat week from the first Turning; the guild
 // Stores' 50,000; a commission's pay, its listable recipes, its least quality where one is taken, the piece that answers
 // it; the ranks' new powers, the note's fourth button, the ledger's six kinds each a move.
-// bible/06-Systems/Professions-Arc.md 7, 11, 28.
+// 7, 11, 28.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

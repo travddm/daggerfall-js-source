@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-22c SPELL-CLIMB (#bug-reports, Panthyon: "Spell+Climbing=4 arms" - "When you hold a spell and dont
-// drop it, climbing will then manifest a second set of arms"). Record: bible/01-Overview/bugs/Field-Bugs-2026-10-22c.md.
+// drop it, climbing will then manifest a second set of arms"). Record:.
 // Driven through the REAL weapon rig on the classic lane, over a synthetic casting CIF (RSH1's) and the climb law's own
 // hands: a readied spell's hands (RSH1) and the fists on the wall (CLIMB-HANDS) are never on the screen together. The
 // readied hands stand down while the fists show and come back off the wall; a cast on the wall takes the hands off the

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF7 (2026-09-29, Mac: "Do it") - HUNTING, a kind in the gathering
-// host (scenes/gatherHost.js; bible/06-Systems/Professions-Arc.md 4.4,
+// PROF7 - HUNTING, a kind in the gathering
+// host (scenes/gatherHost.js; 4.4,
 // 5.2, 6, 29; FORAGE0 14):
 //
 //   THE BODY. "A body your own blow felled" (5.2): a foe's death is told
@@ -200,7 +200,7 @@ export function huntKind({ book, bodies, openLoot = null, trophy = null }) {
     gone: (b) => goneIn(book, b.key, 'hide'),   // GATHER-SPEED: or being counted
     mark: (b) => (goneIn(book, b.key, 'hide') ? null : BODY_MARK),   // NODE-MARKS: a body the knife may still skin
     marksLoose: true,
-    /** TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife Use"): the Skinning Knife's Use at a body is E
+    /** TOUCH-HOLD: the Skinning Knife's Use at a body is E
      *  there (TOOL-USE) - a phone and a pad had no E to start Hunting with, nor to hold while the line was drawn. */
     tools: Object.freeze([SKINNING_KNIFE.templateIndex]),
     /** PROF-MENU: the menu's title - the foe the body is. */
@@ -215,7 +215,7 @@ export function huntKind({ book, bodies, openLoot = null, trophy = null }) {
       });
       return { ...plan, profession: 'hunting' };
     },
-    /** PROF-MENU (2026-10-01, Mac: "use the same menu the loot menu uses"): THE BODY'S TWO ACTS AS THE MENU'S ROWS - the
+    /** PROF-MENU: THE BODY'S TWO ACTS AS THE MENU'S ROWS - the
      *  knife and the search (the act choice key's toggle, retired). The search opens the body's own loot by its key (AUDIT
      *  32 H8), or - with no door by key - hands the press on to the ray's corpse (AUDIT 29 C1); an emptied body has none. */
     rows(b, ctx) {

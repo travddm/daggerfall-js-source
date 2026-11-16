@@ -1,9 +1,9 @@
-// AUDIT DISC28 (2026-09-28, the pre-merge audit of the 2026-09-28 Discord batch, before the merge) - lane 3, TIME: the
+// AUDIT DISC28 - lane 3, TIME: the
 // dead span (DISC28-E, worldTick.js skipDeadMinutes) and the absence (DISC28-F, alignEntityClocks -> normalizeAcross),
 // read against PlayerEntity.Update and the port's online time model. Every finding was reproduced on the merged tree
 // (2a8b70b2a) by driving the real modules, and each pin below FAILS there, except TM-5's, which pins a law the tree
 // already kept and nothing held (two one-line mutants of skipDeadMinutes survived every revival suite):
-//   TM-1 (Mac, 2026-09-28: "Recovery only") - an absence paid NormalizeReputations both ways, so a break wore every
+//   TM-1 - an absence paid NormalizeReputations both ways, so a break wore every
 //        positive standing down a point per 112 world days away and a guild member at their rank's line was demoted
 //        on the next rank check. An absence now pays the recovery half only; the minutes spent DEAD are not an
 //        absence and pay both halves, as any minute the world ran.
@@ -20,7 +20,7 @@
 //   TM-5 - the round broker's marker and the tick's reading move with the rise: a buff held across a death spends
 //        one round on the first tick, not the span. [LIVED1: the tick's reading alone moves - the broker's marker is on
 //        the character's clock, which stood under the screen; AUDIT LIVED1 T12 renamed its record to what it mutates.]
-// LIVED1 (2026-09-29, Mac: "We need a better system for time online instead of a band aid fix") re-aims TM-1's dead
+// LIVED1 re-aims TM-1's dead
 // span, TM-3 and TM-4: the character's own clock stands under the death screen, so nothing of theirs moves and none
 // of their calendar walks the span - the cure and clan rolls, the landlord, the loans and the drift are theirs, and
 // they did not live it. The world's half (the day's price flags and zones, the powers and conditions) walks it still.
@@ -71,7 +71,7 @@ test('AUDIT DISC28 TM-1: an absence pays the recovery half only - a Fighters Gui
   m.rank = 4;   // rank 4 asks a reputation of 40 (Guild.cs rankReqReputation)
   alignEntityClocks(e, back, { worldLeft: last });   // the arrival - save.js's load arm, from the world's minute the save left at (LIVED1)
   assert.equal(getReputation(e.factionRep, g.factionId), 40, 'a positive standing is not worn down by the time away');
-  // REP4 (the reputation overhaul, "Earn it + faster drift"): PIN MOVED - the recovery half is WEEKLY now, so the ten
+  // REP4 (the reputation overhaul, "Earn it + faster drift"):
   // 112-day spans away are 160 weeks and the -15 is home (DFU's ten boundaries: -5); the good standing is kept as ever
   assert.deepEqual(e.legalRep, [0, 0, 3], 'a legal reputation below zero drifts back a point a week; one above it is kept');
   assert.equal(updateRank(memberships, g, e, e.factionRep, dateFromClassicMinutes(back)), null, 'and the next rank check moves nothing');
@@ -149,7 +149,7 @@ test('AUDIT DISC28 TM-2: a Resurrect replays no dead minute of the encounter loo
   // eslint-disable-next-line no-new-func
   const host = new Function(...deps, body)({ rise() {} }, { get classicMinutes() { return worldMinutes(); }, get ownMinutes() { return ownMinutes(); } }, e, () => true, null,
     { feetAt: () => [0, 0, 0], isPlayerSwimming: false, stopAutorun() {} }, () => [], { mode: 'exterior', clearDeath() {} }, true, true,
-    // REP1: PIN MOVED - the loop's minute no longer rolls DFU's conspiracy (the watch's stop replaced it), so the minute
+    // REP1:
     // this pin counts is the encounter roll's own ask - every minute the loop walks asks it once
     () => { guardCalls++; return null; }, () => true, { getClimateIndex: () => 0 }, () => ({ x: 0, y: 0 }), new Set(), () => 0, () => 1, () => {}, () => 1,
     (ctx) => passiveGuardSpawns(ctx, () => 0), legalRepOf, setCrimeCommitted, CRIMES, () => {},

@@ -2,8 +2,7 @@
 
 Twenty redrawn sprite sheets of Daggerfall's own enemy classes, worn as
 on-foot skins 16-35 after Eye of the Beholder's sixteen sets
-(`src/player/classSkins.js`; the arc's record is
-`bible/06-Systems/Eye-Of-The-Beholder.md` SKIN2).
+(`src/player/classSkins.js`).
 
 Mac (Lattymoy) handed the archive over on 2026-09-25
 (`ExistingClasses.rar`, a RAR5 holding one RAR per set): "Implement

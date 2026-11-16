@@ -5,7 +5,6 @@
 // camel milk, the Rainforest the north-east's carrot cake, the Ocean nobody's (the default), and a 233 nothing stands on.
 // The table is keyed by the CLIMATES enum's own names now.
 //
-// PIN MOVED (AUDIT C&C I8, 2026-10-12): the climate is the mod's FALLBACK now. Its regionMenuDay keys a tavern by the
 // REGION first (test/systems/survival/auditcc_tavern.test.js) and asks the climate only where the region names none, and the climate
 // table is the mod's own switch - still by the enum's names: the deserts and the subtropics eat the South's, the
 // rainforest and the swamp the SouthEast's (its bananas), the woods and the mountains the North's, and the Ocean, which

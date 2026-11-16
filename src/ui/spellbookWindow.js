@@ -737,8 +737,7 @@ export class SpellbookWindow {
     const price = this.tradePrice();
     const hasBook = (entity?.items ?? []).some(
       (it) => it.group === 'MiscItems' && it.templateIndex === SPELLBOOK_TEMPLATE_INDEX);
-    // BOX1 (2026-09-17, Mac: "When buying a spell, the dialouge ui Flickers
-    // between 2 seperate conversations"): a box's text is READ ONCE, when
+    // BOX1: a box's text is READ ONCE, when
     // the box opens. The host's `rows(id)` is TextProvider's random-variant
     // draw (townTalk.lines -> variantLinesById), and this window used to
     // ask it again on every draw() - so a record with two variants (the

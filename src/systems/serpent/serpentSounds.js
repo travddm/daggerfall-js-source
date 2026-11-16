@@ -1,9 +1,9 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): SETHRAKUL'S VOICE - DAGGER.SND's own records by
+// SERPENT1: SETHRAKUL'S VOICE - DAGGER.SND's own records by
 // index, never a new clip (the game data stays the player's - Port-Doctrine): the Dreugh's bark, the Bay's own sea-thing,
 // pitched down an octave and more for a beast a hundred and seventy metres long; the Lamia's hiss under it as the venom
 // is spat and the coils close; the sea's own splashes and bubbles (systems/naval/navalSounds.js NAVAL_CLASSIC) thrown up
-// deep and loud for the breach and the lash. Design: bible/11-Multiplayer/Sea-Serpent.md section 9.
+// deep and loud for the breach and the lash. Design:
 //
 // THE DISTANCES ARE A LEVIATHAN'S. A navalSounds.js gun carries 2400 m; the serpent's roar carries further - a ship
 // sailing in hears it before she sees it - and its death cry furthest of all. Each cue says its clip, its pitch, its

@@ -1,7 +1,6 @@
 // TV-BEYOND (FIELD BUGS 2026-10-09 #8 and #9, maya on Discord: "if i bug the game outside of the bay i can become
 // invisible to everyone and everyone becomes invisible to me", "i relogged and im still invisible"; and from the same
-// wilds, a click on the Overworld: "CRASH (2) RangeError: invalid array length" up through `onPick`;
-// `01-Overview/bugs/Field-Bugs-2026-10-09.md`) - THE LAND PAST THE BAY IS THE WORLD'S. TAMRIEL2 streams the ground beyond
+// wilds, a click on the Overworld: "CRASH (2) RangeError: invalid array length" up through `onPick`) - THE LAND PAST THE BAY IS THE WORLD'S. TAMRIEL2 streams the ground beyond
 // the Bay's edge, and two laws still ended at it:
 //
 // - THE PLANNER (systems/travel/travelRoute.js) clamped its search box to the map. Two ends beyond one edge clamped it inside
@@ -102,7 +101,7 @@ test('TV-BEYOND, the host: the Overworld\'s water law is the ground\'s own past 
   const composed = tvWaterOf({ isTamrielGround: true, getHeightMapValue: (x) => (x < -10 ? 0 : 60) });
   assert.equal(composed(-1, 5), false, 'the land past the Bay is land');
   assert.equal(composed(-20, 5), true, 'and its sea the sea');
-  assert.match(w, /WATER_BYTE, 1000, 500, \(x, y\) => !tvWater\(x, y\)\)\)\.setRocks\(tvWodRocks\(\)\);/, 'routeGround is handed the land past the Bay as the view\'s own law reads it');
+  assert.match(w, /WATER_BYTE, 1000, 500, \(x, y\) => !tvWater\(x, y\), undefined, rumareSeaPixel\)\)\.setRocks\(tvWodRocks\(\)\);/, 'routeGround is handed the land past the Bay as the view\'s own law reads it');
 });
 
 test('TV-BEYOND, the wire\'s world: every fit\'s frame lies inside WORLD_PIXEL_BOUND, and a pose anywhere on it is carried - the relay refused one past 1024 pixels and closed the socket on it ("bad pose")', () => {

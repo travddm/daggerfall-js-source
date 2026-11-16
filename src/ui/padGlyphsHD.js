@@ -1,4 +1,4 @@
-// PADHD1 (2026-09-25): THE HIGH-DEFINITION PAD GLYPHS - Enhanced Plus only.
+// PADHD1: THE HIGH-DEFINITION PAD GLYPHS - Enhanced Plus only.
 //
 // ui/padGlyphs.js draws every button as an 11x11 bitmap, which is the right
 // answer for the plain Enhanced skin's pixel language and the wrong one for

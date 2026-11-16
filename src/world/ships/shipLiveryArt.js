@@ -1,5 +1,5 @@
 // @ts-check
-// SHIP-LIVERY (2026-10-17; bible/03-World/Naval-Refit.md SHIP-LIVERY) - THE PORT'S SHIPS REPAINTED: each port-built
+// SHIP-LIVERY - THE PORT'S SHIPS REPAINTED: each port-built
 // hull's pictures (world/ships/galleonArt.js, carrackArt.js, largeBoatArt.js - the painters their stand-ins are built
 // by) with a livery's paints laid over their families (systems/naval/shipLivery.js paintFamilies). Each ship's families
 // are her own palette's: her STRAKE (the galleon's oxblood and its planks' seams, the carrack's Bay blue, the large boat's

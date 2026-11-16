@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13; bible/06-Systems/Firmament.md) - THE FIRMAMENT, DRAWN: the whole sky over the whole screen, as Path
+// FIRM1 - THE FIRMAMENT, DRAWN: the whole sky over the whole screen, as Path
 // of Exile opens its tree - and as the Ascension opens its stars (ui/enhanced/enhancedLevelUp.js: a screen that is the whole screen,
 // swapped in over the pause window, which it puts back when it closes).
 //
@@ -274,7 +274,7 @@ function seeded(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 10
 /**
  * Mount the Firmament over `host`. `book` the page's (net/firmament/firmamentBook.js) - or `preview` for a sky with no service
  * (the lab page, an offline look): `{ tree, stars, craft, renown, commit? }`. `onExit` when it closes.
- * GROWTH3 (bible/10-UI/Growth.md section 6): `embed` draws it IN the pause window's Growth tab (ui/growth/growthStage.js) -
+ * GROWTH3: `embed` draws it IN the pause window's Growth tab (ui/growth/growthStage.js) -
  * the stage's size, not the screen's; no Close (the tab is left as any page is), no overlay of its own and no Escape of its
  * own: the window's back stack asks `back()` (a confirm shut, unaccepted stars asked about once) before it goes on.
  * @param {HTMLElement} host
@@ -720,7 +720,7 @@ export function mountFirmamentWindow(host, { book = firmamentBook(), preview = n
     if (status === 'duel') return t('firmament.status.duel', 'Your combat stars are off during this duel or Arena fight. Your crafting and trade stars still work.');
     return t('firmament.status.active', 'Your accepted stars are active.');
   }
-  /** UI-CALM (2026-10-14, a player: "why dont i get any stars ... with renown lvl 5"): a read the service refused was
+  /** UI-CALM: a read the service refused was
    *  silent - the purses stood at their empty defaults ("0 of 0", Renown 1) as if that were the answer. Now it says so. */
   function readFailText(st) {
     if (!st?.error) return null;

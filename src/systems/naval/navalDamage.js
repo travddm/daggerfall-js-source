@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-A (2026-09-28) - THE DAMAGE: what a shot does to a ship, and what a ship does about it. The port's own; pure.
+// NAV-A - THE DAMAGE: what a shot does to a ship, and what a ship does about it. The port's own; pure.
 //
 // A SHIP IS THREE NUMBERS. Its HULL (holed, it sinks), its SAILS (cut, it slows - a ship's way is 35% of its best
 // under bare poles and the rest in proportion to the canvas left), and its CREW (thinned, the guns reload slower -
@@ -13,7 +13,7 @@
 // once, a new one past that taking the place of the one with the least harm left in it (its bite times its seconds)
 // when it carries more. A ship that strikes has her fires put out.
 //
-// AUDIT NAV1 (2026-09-29, the guns) set this law on what the gunnery audit measured: a hull hit was judged by the
+// AUDIT NAV1 set this law on what the gunnery audit measured: a hull hit was judged by the
 // hull box's own up axis (65 of 2,121 misjudged on a heeled hull), the rigging was the box's top 0.4 m (so the
 // masts were no target and a plunging ball did no harm), FIRE_CHANCE was read by nothing (the host rolled its own
 // on every zone), a barrel burned as a ball's fire, and a fire could not spread nor touch her canvas or crew.

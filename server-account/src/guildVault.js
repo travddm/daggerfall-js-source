@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD2b (2026-10-03) — THE GUILD'S VAULT, AS THE SERVICE KEEPS IT
-// (bible/11-Multiplayer/Guild-Overhaul.md; the law is src/net/
+// GUILD2b — THE GUILD'S VAULT, AS THE SERVICE KEEPS IT
+// (; the law is src/net/
 // guildVaultLaw.js).
 //
 // Asked: "guild item storage with the leader able to grant and revoke

@@ -1,7 +1,7 @@
-// AUDIT RAID (2026-09-28, Mac: "1. Audit this properly 2. Ensure online functionality is perfect"): the raid's online
+// AUDIT RAID: the raid's online
 // arm, audited against its own tree (RAID3's relay ledger, RAID4a's claim, RAID4b's thanks) and each finding pinned
 // here - driven through the real Room (fakeRoom.mjs), the real account service over node:sqlite and its real
-// migrations, the real session and the real device queue. bible/03-World/Raiding-Parties.md, "AUDIT RAID".
+// migrations, the real session and the real device queue., "AUDIT RAID".
 //   R1 a raid is its whole tuple (key + signature), its ledger made only from its town's pixel, and a client hears only
 //      its own raid's words;
 //   R2 an earner's receipt kept by the hub - handed wherever the earner stands, and at a hello for a day;
@@ -24,7 +24,7 @@ import {
 } from '../../src/net/raid/raidLaw.js';
 import { mintRaidReceipt, readRaidReceipt } from '../../src/net/raid/raidReceipt.js';
 import {
-  raidLedgerKey, raidReceiptKeyOf, RAID_RC_KEEP, RAID_RC_KEEP_MS, RAID_RELAY_MIN, relaySupportsRaid, worldRoom,
+  raidLedgerKey, raidReceiptKeyOf, RAID_RC_KEEP, RAID_RC_KEEP_MS, worldRoom,
   wallMsForClassicMinutes, SOCIAL_ROOM, PIXEL_UNITS, RELAY_VERSION,
 } from '../../src/net/wire.js';
 import { fakeRooms } from '../fakeRoom.mjs';
@@ -44,7 +44,7 @@ const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 const subtle = globalThis.crypto.subtle;
 const quiet = async (fn) => { const w = console.warn, i = console.info; console.warn = () => {}; console.info = () => {}; try { return await fn(); } finally { console.warn = w; console.info = i; } };
 
-// ═══ THE RIG ══════════════════════════════════════════════════════════════════════════════════════
+// THE RIG
 
 const D = 600;
 /** RAID-ROLL: the relay hears only a raid the day drew - A (the honest raid) and B are day D's own slots. */
@@ -75,7 +75,7 @@ const signing = async () => {
 };
 const ledgers = (r) => [...r.store.keys()].filter((k) => k.startsWith('raid:'));
 
-// ═══ THE LAW ══════════════════════════════════════════════════════════════════════════════════════
+// THE LAW
 
 test('AUDIT RAID R1/R5/R6 law: a raid key is canonical (no leading zero - forty spellings of one raid were forty rows); a raid is its whole tuple - its key and its signature (start, target, party, town pixel), which every honest machine computes alike; a word no day could roll is not sane (mutants: the old key law; the signature missing a field; sanity by the window alone)', () => {
   for (const ok of ['3:7:600', '0:0:0', '61:9999:9999999', '10:100:1']) assert.ok(RAID_KEY_RE.test(ok), ok);
@@ -109,7 +109,7 @@ test('AUDIT RAID R3 law: WHICH LEDGER GIVES ITS PLACE - never a cleansed one (it
   assert.equal(RAID_LEDGERS_MAX, 8); assert.equal(RAID_LEDGERS_BY_MAX, 2);
 });
 
-// ═══ THE RELAY ════════════════════════════════════════════════════════════════════════════════════
+// THE RELAY
 
 test('AUDIT RAID R1 relay: A SOCKET\'S FIRST WORD NO LONGER DECIDES AN HONEST RAID - a word off the town\'s pixel makes nothing; a forged tuple on its own pixel is its own ledger and cleanse; the honest defenders\' words make theirs, count, and cleanse it at ITS target, and the cleanse carries its signature (mutants: the ledger made off the town; the key alone the ledger\'s identity; the cleanse unsigned)', async () => {
   const { pkcs8 } = await signing();
@@ -245,7 +245,7 @@ test('AUDIT RAID R7 relay: THE HUB\'S LIST IS WRITTEN BEFORE ITS COPY MOVES - a 
   });
 });
 
-// ═══ THE SESSION ══════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
 test('AUDIT RAID R8b session: A HALO SAYS FOR ITSELF - a raid word goes down a halo only when the halo\'s own relay keeps raids (a halo on an older object, a deploy under way, closed on the frame); the primary\'s word is the primary\'s (mutants: the halo sent on the primary\'s word)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
@@ -260,20 +260,15 @@ test('AUDIT RAID R8b session: A HALO SAYS FOR ITSELF - a raid word goes down a h
     s.setHalo([other]);
     const halo = sockets[1];
     halo.open();
-    halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: `world${RAID_RELAY_MIN - 1}` });
-    assert.equal(s.raidOk, true);
-    assert.equal(s.sendRaid(word({ px: PX + 16 }), other), false, 'the halo\'s relay would close the socket for it');
-    assert.equal(halo.sent.filter((x) => JSON.parse(x).t === 'raid').length, 0);
     halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
     const before = sockets[0].sent.filter((x) => JSON.parse(x).t === 'raid').length;
     assert.equal(s.sendRaid(word({ px: PX + 16 }), other), true, 'its own relay keeps raids');
     assert.equal(halo.sent.filter((x) => JSON.parse(x).t === 'raid').length, 1, 'down the halo\'s own socket');
     assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).t === 'raid').length, before, 'never the primary\'s (the relay strikes a word said in the wrong cell)');
-    assert.equal(relaySupportsRaid('world122'), false, 'world122 never carried a signature');
   } finally { console.info = log; }
 });
 
-// ═══ THE ACCOUNT SERVICE ══════════════════════════════════════════════════════════════════════════
+// THE ACCOUNT SERVICE
 
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
 function d1() {
@@ -338,7 +333,7 @@ test('AUDIT RAID R4 service: A TOWN\'S THANKS ONCE A (RAID, ACCOUNT) - the first
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM raid_spoils WHERE account = ?').get(A.id).n, 0, 'an account gone takes its thanks');
   assert.ok(RAID_CID_RE.test(CID1) && !RAID_CID_RE.test('0123'));
   assert.equal(String(RAID_CID_RE), String(CLIENT_CID_RE), 'the client mints what the service reads');
-  const sql = rd('server-account/migrations/0017_raid_spoils.sql');
+  const sql = db._raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('raid_spoils').sql;
   assert.match(sql, /PRIMARY KEY \(raid, account\)/);
   assert.match(sql, /FOREIGN KEY \(account\) REFERENCES players\(id\) ON DELETE CASCADE/);
 });
@@ -370,7 +365,7 @@ test('AUDIT RAID R5 service: A RAID\'S RENOWN IS THE HOUR\'S - charged to the ac
   assert.equal(db._raw.prepare('SELECT renown_hour_xp AS x FROM players WHERE id = ?').get(B.id).x, 0, 'no place to pay: the hour untouched');
 });
 
-// ═══ THE DEVICE ═══════════════════════════════════════════════════════════════════════════════════
+// THE DEVICE
 
 const memStore = () => { const m = new Map(); return { get: (k) => (m.has(k) ? JSON.parse(m.get(k)) : undefined), set: (k, v) => m.set(k, JSON.stringify(v)), remove: (k) => m.delete(k), m }; };
 
@@ -428,7 +423,7 @@ test('AUDIT RAID wiring by source: the relay keeps receipts at the hub and hands
   assert.match(idx, /if \(!here\) return;   \/\/ AUDIT RAID R1/);
   assert.match(idx, /if \(!\(await this\._raidMakeRoom\(now, acct\)\)\) return;/);
   assert.match(idx, /if \(!raidWordSane\(m\)\) \{ this\._junk\(ws\); return; \}/);
-  assert.match(idx, /if \(!raidWordFits\(m, sharedClassicMinutes\(now\)\)\) return;   \/\/ outside its raid's time: nothing read, kept or said\n(?:[^\n]*\n){0,8}?\s*const id = raidLedgerId\(m\);/);   // RAID-ROLL's reads of the day's roll sit between (test/systems/raidroll.test.js)
+  assert.match(idx, /if \(!raidWordFits\(m, sharedClassicMinutes\(now\)\)\) return;   \/\/ outside its raid's time: nothing read, kept or said\n(?:[^\n]*\n){0,10}?\s*const id = raidLedgerId\(m\);/);   // RAID-ROLL's reads of the day's roll sit between (test/systems/raidroll.test.js); PIN MOVED (WW6): and the word's lane, two lines of it said
   assert.match(idx, /await this\.state\.storage\.put\('raidcl', next\);\n\s*this\._raidCleans = next;/);
   assert.match(idx, /await this\._raidReceiptsKeep\(cl, body\?\.rc, now\);/);
   assert.match(idx, /if \(sub\) \{ try \{ await this\._raidReceiptsTo\(ws, sub, now\); \}/);
@@ -439,8 +434,7 @@ test('AUDIT RAID wiring by source: the relay keeps receipts at the hub and hands
   assert.match(rp, /const raid = raidOfWord\(f\.key, f\.g\);/);
   const on = rd('src/net/online.js');
   assert.match(on, /r\.k === 'cl' \|\| r\.k === 'rc' \? isCellRoom\(room\) \|\| isSocialRoom\(room\)/);
-  assert.match(on, /if \(!\(this\._mine\(cell\) \? this\.raidOk : halo\?\.raidOk\)\) return false;/);   // PIN MOVED (COST-2): my own room, or a cell my socket covers
-  assert.match(on, /else \{ const h = this\._halo\.get\(room\); if \(h\) h\.raidOk = relaySupportsRaid\(relayV\); \}/);
+  assert.match(on, /if \(!ws \|\| !this\._welcomed\.has\(ws\)\) return false;   \/\/ a socket says nothing past its hello until its own welcome/);
   assert.match(rd('src/net/accountClient.js'), /claim: async \(receipt, character, name = null, cid = null\) =>/);
   assert.match(rd('server-account/src/index.js'), /cid: body\.cid \?\? null \}/);
   assert.ok(readRaidReceipt, 'the relay reads its own receipts back');

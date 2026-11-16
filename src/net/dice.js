@@ -1,5 +1,5 @@
 // @ts-check
-// DICE1 (2026-09-23, the community arc - Addison Knox: "Chat dice-rolling"): THE DICE'S LAW - pure, DOM-free, one home
+// DICE1: THE DICE'S LAW - pure, DOM-free, one home
 // for both ends (net/wire.js re-exports it, so the relay reads it through server/src/relay.js like every other law).
 //
 // THE RELAY ROLLS. A roll said by the client would be a number the client chose: a player who wants a 20 types one. So
@@ -48,8 +48,7 @@ export function parseRollSpec(text) {
 export const rollSpecText = ({ n, m, k }) => `${n}d${m}${k > 0 ? `+${k}` : k < 0 ? `${k}` : ''}`;
 
 /**
- * ONE UNBIASED DRAW in 0..m-1 from a source of uniform 32-bit integers - the dice's and the cards' (CARDS1,
- * `net/card/cardLaw.js` shuffleDeck) one home. A draw at or past the largest multiple of `m` below 2^32 is thrown back and
+ * ONE UNBIASED DRAW in 0..m-1 from a source of uniform 32-bit integers - the dice's. A draw at or past the largest multiple of `m` below 2^32 is thrown back and
  * drawn again, so every value is exactly as likely (a bare `x % m` favours the low values whenever m does not divide
  * 2^32). `m` is an integer 1..2^32.
  * @param {number} m

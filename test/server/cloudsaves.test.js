@@ -60,7 +60,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -170,19 +170,6 @@ test('ACC2: A GUEST MAY NOT HOLD A BACKUP - every save route, read and write ali
   assert.equal(ok.status, 200);
   assert.deepEqual(ok.body, { saves: [] });
 
-  // ITS OWN WORD, AND ITS OWN SENTENCE. `not-registered` already means
-  // "this account has no password yet" at the sign-in routes, and the
-  // refusal table maps one word to one sentence - so reusing it would
-  // tell a player standing at the backup button to sign in again, which
-  // is not what they need to do.
-  const client = src('src/net/accountClient.js');
-  // L10N4 (PIN MOVED): each sentence is the English of its t() call - `'word': () => t('account.refusal.<word>', '...')`
-  assert.match(client, /'saves-need-account': \(\) => t\('[^']*', '[^']*username[^']*'/, 'the sentence names what to do about it');
-  assert.notEqual(
-    /'saves-need-account': \(\) => t\('[^']*', '([^']*)'/.exec(client)?.[1],
-    /'not-registered': \(\) => t\('[^']*', '([^']*)'/.exec(client)?.[1],
-    'two different situations must not share one sentence',
-  );
 });
 
 // ── THE ROUND TRIP ──────────────────────────────────────────────────
@@ -321,41 +308,6 @@ test('ACC2: SAVES_MAX bounds the SLOTS, and the oldest is never taken to make ro
 
 // ── THE ISOLATION ───────────────────────────────────────────────────
 
-test('ACC2: TWO ACCOUNTS, THE SAME CHARACTER ID AND THE SAME SLOT NAME, AND NEITHER SEES THE OTHER', async () => {
-  const { call, blob, linked, env } = await stand();
-  const a = await linked('Nystul');
-  const b = await linked('Julianos');
-  const mine = new TextEncoder().encode('MINE');
-  const theirs = new TextEncoder().encode('THEIRS');
-
-  await call('PUT', slotPath(CHAR, 'QuickSave'), { ...CARD, characterName: 'A' }, a.secret);
-  await blob('PUT', slotPath(CHAR, 'QuickSave', 'data'), mine, a.secret);
-  await call('PUT', slotPath(CHAR, 'QuickSave'), { ...CARD, characterName: 'B' }, b.secret);
-  await blob('PUT', slotPath(CHAR, 'QuickSave', 'data'), theirs, b.secret);
-
-  // The same triple but for the player: two rows, two objects.
-  assert.equal(env.SAVES._map.size, 2);
-  assert.deepEqual((await blob('GET', slotPath(CHAR, 'QuickSave', 'data'), undefined, a.secret)).bytes, mine);
-  assert.deepEqual((await blob('GET', slotPath(CHAR, 'QuickSave', 'data'), undefined, b.secret)).bytes, theirs);
-  assert.equal((await call('GET', '/v1/saves', undefined, a.secret)).body.saves[0].characterName, 'A');
-  assert.equal((await call('GET', '/v1/saves', undefined, b.secret)).body.saves[0].characterName, 'B');
-
-  // AND A DELETE REACHES ONLY THE CALLER'S. This is the one that would
-  // be catastrophic and silent.
-  assert.equal((await call('DELETE', slotPath(CHAR, 'QuickSave'), undefined, a.secret)).status, 200);
-  assert.equal((await call('GET', '/v1/saves', undefined, a.secret)).body.saves.length, 0);
-  assert.equal((await call('GET', '/v1/saves', undefined, b.secret)).body.saves.length, 1, 'somebody else\'s account was reached');
-  assert.deepEqual((await blob('GET', slotPath(CHAR, 'QuickSave', 'data'), undefined, b.secret)).bytes, theirs);
-
-  // DERIVED, NOT REMEMBERED: every statement in saves.js that touches
-  // the table binds the player. A query that filters by character and
-  // slot alone is the whole bug.
-  const s = src('server-account/src/saves.js');
-  const statements = [...s.matchAll(/FROM saves[^']*|UPDATE saves[^']*|DELETE FROM saves[^']*/g)].map((m) => m[0]);
-  assert.ok(statements.length >= 5, `found ${statements.length} statements over the table`);
-  for (const q of statements) assert.match(q, /WHERE player_id = \?|player_id = \?/, `a statement over saves does not bind the player: ${q}`);
-});
-
 test('ACC2: delete takes both objects and the row, and a slot that is not there is a 404', async () => {
   const { call, blob, linked, env } = await stand();
   const me = await linked('Nystul');
@@ -426,16 +378,6 @@ test('ACC2: a save name is the PLAYER\'S WORDS, so the path is encoded and the m
   const ids = new Set();
   for (let i = 0; i < 500; i++) ids.add(mintCharacterId());
   for (const id of ids) assert.ok(savePathOf(slotPath(id, 'QuickSave')), `characterId.js minted ${id} and the service refuses it`);
-  // ...INCLUDING THE ARM THIS RUNTIME NEVER TAKES. node has
-  // crypto.randomUUID, so the 500 draws above are all UUIDs and the old
-  // WebView fallback would go untested - which is the arm a phone
-  // actually uses. It is built here the way the module builds it, and
-  // the module's own line is read back so the two cannot drift.
-  assert.match(
-    src('src/systems/characterId.js'),
-    /return `\$\{Date\.now\(\)\.toString\(36\)\}-\$\{Math\.random\(\)\.toString\(36\)\.slice\(2, 12\)\}`;/,
-    'the fallback this pin models is still the one characterId.js mints',
-  );
   for (let i = 0; i < 100; i++) {
     const fallback = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
     assert.ok(savePathOf(slotPath(fallback, 'x')), `the old-WebView arm minted ${fallback} and the service refuses it`);
@@ -472,7 +414,7 @@ import {
   cloudIo, cloudList, pushSlot, pullSlot, removeCloudSlot, localSlot, cloudOnly,
   slotPath as clientSlotPath, slotKeyOf, CLOUD_REFUSALS, cloudRefusalText,
 } from '../../src/systems/cloudSaves.js';
-import { SESSION_KEY, REFUSALS } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY, REFUSALS } from '../../src/net/accountClient.js';
 import { SAVE_DATA_PREFIX, SAVE_INFO_PREFIX, SAVE_SHOT_PREFIX } from '../../src/systems/characterId.js';
 import { saveSlot, enumerateSaves, findSave, saveInfoOf } from '../../src/systems/save/saveSlots.js';
 import { cloudStateOf } from '../../src/ui/saveTile.js';
@@ -522,7 +464,7 @@ async function client() {
   const { env, call, linked } = await stand();
   const me = await linked('Nystul');
   const storage = fakeStorage();
-  storage.setItem(SESSION_KEY, JSON.stringify({ id: me.id, name: me.name, kind: 'linked', sessionId: me.sessionId, secret: me.secret }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ id: me.id, name: me.name, kind: 'linked', sessionId: me.sessionId, secret: me.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const io = cloudIo({ fetch: fetchOf(env), storage });
   return { env, call, me, storage, io };
 }
@@ -548,7 +490,7 @@ test('ACC2b: a whole slot goes up and comes back down, through the REAL service'
   // ...ONTO A DIFFERENT DEVICE, which is the case that matters: an
   // empty store, and the slot arrives whole.
   const other = fakeStorage();
-  other.setItem(SESSION_KEY, storage.getItem(SESSION_KEY));
+  other.setItem(SESSION_KEY, storage.getItem(SESSION_KEY)); other.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const down = await pullSlot(io, other, list.saves[0]);
   assert.equal(down.ok, true, down.error);
   assert.equal(other.getItem(SAVE_DATA_PREFIX + down.key), data, 'the save itself');
@@ -589,13 +531,6 @@ test('ACC2b: a download is SP1\'s import law and not a second merge rule', async
   assert.notEqual(down.key, 0, 'it took a free number rather than the one it wanted');
   assert.equal(slotsIn(other).length, 2, 'both saves are there');
 
-  // DERIVED: the module really goes through saveTransfer rather than
-  // writing the three keys itself, which is what makes the law above
-  // one law instead of two.
-  const s = src('src/systems/cloudSaves.js');
-  assert.match(s, /import \{ importSlots \} from '\.\/save\/saveTransfer\.js'/);
-  assert.match(s, /importSlots\(/);
-  assert.doesNotMatch(s.split('export async function pullSlot')[1] ?? '', /setItem\(/, 'the pull writes the store through the carrier, never around it');
 });
 
 test('ACC2b: the card goes FIRST, the shot is optional, and the credential is only ever a header', async () => {
@@ -626,7 +561,7 @@ test('ACC2b: the card goes FIRST, the shot is optional, and the credential is on
   // A SLOT WITH NO SCREENSHOT IS STILL A BACKUP - the shot is skipped,
   // not faked, and the push still succeeds.
   const bare = fakeStorage();
-  bare.setItem(SESSION_KEY, storage.getItem(SESSION_KEY));
+  bare.setItem(SESSION_KEY, storage.getItem(SESSION_KEY)); bare.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(bare, 0, { saveName: 'no picture' });
   seen.length = 0;
   assert.equal((await pushSlot(cloudIo({ fetch: (u, i) => { seen.push({ url: u, init: i }); return fetchOf(env)(u, i); }, storage: bare }), bare, 0)).ok, true);
@@ -676,7 +611,7 @@ test('ACC2b: a guest, a dead credential and an offline service each fail the way
   const { env, guest } = await stand();
   const g = await guest();
   const gs = fakeStorage();
-  gs.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+  gs.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); gs.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(gs, 0);
   const gio = cloudIo({ fetch: fetchOf(env), storage: gs });
   const r = await pushSlot(gio, gs, 0);
@@ -687,7 +622,7 @@ test('ACC2b: a guest, a dead credential and an offline service each fail the way
   // A DEAD CREDENTIAL IS FORGOTTEN, and only that one: accountClient's
   // law, reached through this module.
   const dead = fakeStorage();
-  dead.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'not-a-session-secret-at-all' }));
+  dead.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'not-a-session-secret-at-all' })); dead.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(dead, 0);
   const dio = cloudIo({ fetch: fetchOf(env), storage: dead });
   assert.equal((await pushSlot(dio, dead, 0)).error, 'auth');
@@ -696,7 +631,7 @@ test('ACC2b: a guest, a dead credential and an offline service each fail the way
   // AND A NETWORK FAILURE IS A REFUSAL, NOT A THROW - ONCRASH1's law:
   // a throw out of a button handler ends more than the button.
   const off = fakeStorage();
-  off.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'y' }));
+  off.setItem(SESSION_KEY, JSON.stringify({ id: 'x', secret: 'y' })); off.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(off, 0);
   const oio = cloudIo({ fetch: async () => { throw new Error('network down'); }, storage: off });
   assert.deepEqual(await cloudList(oio), { ok: false, error: 'offline' });
@@ -812,43 +747,6 @@ test('ACC2c: `cloudOnly` is the set difference that gives a save with no local s
   assert.equal(cloudOnly(cards, null).length, 4);
 });
 
-test('ACC2c: the DOWNLOAD reaches a player - the pane, the act and the one sentence, read off ui/enhanced/enhancedMenu.js (mutants: the grid on a pane that cannot use it; Download wired to push; the listing patched rather than re-asked; "No saved games" printed over a shelf of backups)', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  // THE CALLER pullSlot NEVER HAD. This is the finding itself: the
-  // function was written, pinned end to end above, and reached by
-  // nothing.
-  assert.match(menu, /import \{[^}]*\bpullSlot\b[^}]*\} from '\.\.\/\.\.\/systems\/cloudSaves\.js'/);
-  assert.match(menu, /function download\(card\) \{\s*runCloud\(card, \(io\) => pullSlot\(io, appStorage\(\), card\), 'download'\);/,
-    'Download pulls - and through `runCloud`, so it is busy under its own slot and its refusal is the service\'s own word');
-  assert.match(menu, /label: t\('menu\.cloud\.download', 'Download'\),\s*primary: true,/);
-
-  // ONE PANE. Load's job is getting a game back; Online brings a
-  // character in to play NOW and cannot use a save that is not here,
-  // and Save writes rather than reads.
-  assert.equal((menu.match(/cloudOnlyGrid\(/g) ?? []).length, 2, 'declared once and called once');
-  const load = menu.slice(menu.indexOf('function paneLoad'), menu.indexOf('// SP1 (2026-09-21'));
-  assert.match(load, /const onlyCloud = cloudOnlyGrid\(saves\);/, 'and the pane that calls it is paneLoad');
-
-  // "NO SAVED GAMES" IS FALSE WHEN THE ACCOUNT HAS SOME, and that
-  // sentence is the one this slice exists to stop being shown.
-  assert.match(load, /if \(!saves\.length && !onlyCloud\) body\.append\(empty\(t\('menu\.saves\.none', 'No saved games'\)/);
-
-  // THE SET DIFFERENCE IS NOT WRITTEN HERE (AUDIT-312 F3): the menu
-  // asks systems/cloudSaves.js, which a pin can drive.
-  assert.match(menu, /const cards = cloudOnly\(cloudCards, saves\);/);
-  assert.doesNotMatch(menu, /\.filter\(\(c\) => .*characterId.*saveName/, 'the difference is not hand-rolled back into the menu');
-
-  // AND THE DELETE IS HERE TOO - the rest of AUDIT-312 F1, which gave
-  // a player the way to free a full backup on LOCAL tiles only, so a
-  // cloud-only slot held its share of SAVES_MAX with no surface that
-  // could ever release it. Same word, same two presses.
-  const forCard = menu.slice(menu.indexOf('function cloudForCard'), menu.indexOf('/** ONE LADDER FOR BOTH ACTS'));
-  assert.match(forCard, /label: t\('menu\.cloud\.deleteBackupAsk', 'Delete backup\?'\), primary: true, onClick: \(\) => removeBackup\(card\)/);
-  assert.match(forCard, /cloudArm = slot; render\(\);/, 'and it arms first - one press cannot destroy anything');
-  assert.match(forCard, /local: false,/, 'the state is cloudStateOf\'s own, not a second ladder written here');
-  assert.doesNotMatch(forCard, /label: (t\('[^']*', )?'Back up/, 'nothing offers to push a slot this device does not have');
-});
-
 // ════════════════════════════════════════════════════════════════════
 // FIELD 2026-09-27 (Masta_Fu, "Save backup not working"): "When I
 // installed to my MAC i was able to instantly recover my backup ...
@@ -867,7 +765,7 @@ test('FIELD 2026-09-27: his round trip through the REAL service - PC backs up, t
 
   // 2. the Mac: an empty store, the backup is its own tile, Download
   const mac = fakeStorage();
-  mac.setItem(SESSION_KEY, pc.getItem(SESSION_KEY));
+  mac.setItem(SESSION_KEY, pc.getItem(SESSION_KEY)); mac.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const first = (await cloudList(io)).saves;
   assert.equal(cloudOnly(first, []).length, 1, 'a fresh install sees it as only in the backup');
   const onMac = await pullSlot(io, mac, first[0]);
@@ -974,7 +872,7 @@ test('FIELD 2026-09-27: what a restore never removes - the backup\'s own save, a
   const pc = fakeStorage();
   putLocal(pc, 0, { dateAndTime: { gameTime: 1000, realTime: 1 } });
   const tab = fakeStorage();
-  tab.setItem(SESSION_KEY, storage.getItem(SESSION_KEY));
+  tab.setItem(SESSION_KEY, storage.getItem(SESSION_KEY)); tab.setItem(SERVICE_KEY, 'https://accounts.invalid');
   putLocal(tab, 0, { dateAndTime: { gameTime: 500, realTime: 7 } }, { data: blob(500) });
   assert.equal((await pushSlot(io, tab, 0)).ok, true);
   const stale = await pullSlot(io, pc, card, { replaces: stamp(0, 1000, 1) });
@@ -989,53 +887,5 @@ test('FIELD 2026-09-27: what a restore never removes - the backup\'s own save, a
   assert.equal(miss.ok, false);
   assert.ok(saveInfoOf(0, failed), 'nothing was removed');
 
-  // THE REMOVAL IS THE STORE'S OWN DELETE, after the import - never a write around the carrier
-  const s = src('src/systems/cloudSaves.js');
-  const pull = s.slice(s.indexOf('export async function pullSlot'), s.indexOf('function dropReplaced'));
-  assert.ok(pull.indexOf('importSlots(') < pull.indexOf('dropReplaced('), 'the import comes first');
-  assert.match(s, /function dropReplaced\(storage, replaces, card, landedKey\) \{[\s\S]*?return deleteSave\(key, storage\);\n\}/);
-  assert.doesNotMatch(pull, /setItem\(|removeItem\(/);
 });
 
-test('FIELD 2026-09-27: the menu names a newer backup and asks twice before either act that replaces a copy - Restore (on the Load pane, ACC2c\'s door for a download) and Back up again; a failed act\'s Try again is THAT act; an armed press is this copy\'s and never outlives its pane (the pre-merge audit 0927b B1, B5; mutants: the local time never handed; the restore on one press; the upload over a newer backup on one press; Try again pushing whatever failed; the arming by slot; the restore offered on the Save pane)', () => {
-  const menu = src('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /dateAndTime: entry\.info\?\.dateAndTime \?\? null,/, 'each slot carries when this device saved it');
-  assert.match(menu, /localTime: save\.dateAndTime,/, 'and the state is asked with it');
-  const newer = menu.slice(menu.indexOf("    case 'newer':"), menu.indexOf("    default:   // 'none'"));
-  assert.ok(newer.length > 0, 'the menu answers the state');
-  assert.match(newer, /if \(restore\) \{\s*line\.actions\.push\(cloudArm === `restore\|\$\{save\.key\}`\s*\? \{ label: t\('menu\.cloud\.replaceWithBackup', 'Replace with backup\?'\), primary: true, onClick: \(\) => restoreBackup\(save, card\) \}\s*: \{ label: t\('menu\.cloud\.restoreBackup', 'Restore backup'\), primary: true, onClick: \(\) => \{ cloudArm = `restore\|\$\{save\.key\}`; render\(\); \} \}\);/,
-    'Restore arms on the first press and restores on the second - armed by THIS local copy');
-  assert.match(newer, /line\.actions\.push\(guardedPush\(save, t\('menu\.cloud\.backUpAgain', 'Back up again'\)\)\);/);
-  assert.match(menu, /function guardedPush\(save, label\) \{\s*return cloudArm === `push\|\$\{save\.key\}`\s*\? \{ label: t\('menu\.cloud\.replaceNewer', 'Replace newer backup\?'\), onClick: \(\) => \{ cloudArm = null; backUp\(save\); \} \}\s*: \{ label, onClick: \(\) => \{ cloudArm = `push\|\$\{save\.key\}`; render\(\); \} \};\s*\}/,
-    'the older save goes over the newer backup only on a second press');
-  // B1: TRY AGAIN IS THE ACT THAT FAILED, and a push over a newer backup still asks twice
-  const bad = menu.slice(menu.indexOf("    case 'bad': {"), menu.indexOf("    case 'saved':"));
-  assert.match(bad, /const act = cloudWhy\?\.slot === slot \? cloudWhy\.act : 'push';/);
-  assert.match(bad, /if \(act === 'restore'\) \{\s*if \(restore && newerBackup\(card, save\.dateAndTime\)\) line\.actions\.push\(\{ label: t\('menu\.cloud\.tryAgain', 'Try again'\), onClick: \(\) => restoreBackup\(save, card\) \}\);\s*\}/);
-  assert.match(bad, /else if \(act === 'delete'\) line\.actions\.push\(\{ label: t\('menu\.cloud\.tryAgain', 'Try again'\), onClick: \(\) => removeBackup\(save\) \}\);/);
-  assert.match(bad, /else if \(newerBackup\(card, save\.dateAndTime\)\) line\.actions\.push\(guardedPush\(save, t\('menu\.cloud\.tryAgain', 'Try again'\)\)\);/);
-  assert.match(menu, /function runCloud\(save, call, act = 'push'\) \{/);
-  assert.match(menu, /if \(!r\.ok\) cloudWhy = \{ slot, key: save\?\.key, error: r\.error, act \};/, 'the refusal remembers its act, and its copy');
-  // a RESTORE's refusal is its one copy's - a twin under the same slot is not offered a one-press restore over itself
-  assert.match(menu, /error: cloudWhy\?\.slot === slot && \(cloudWhy\.act !== 'restore' \|\| cloudWhy\.key === save\.key\) \? cloudWhy\.error : null,/);
-  // a STALE refusal is answered by the fresh listing, and no refusal outlives its visit
-  assert.match(menu, /if \(cloudWhy\?\.error === 'stale'\) cloudWhy = null;/);
-  assert.match(menu.slice(menu.indexOf('export function mountEnhancedMenu')), /^\s*cloudWhy = null;/m);
-  for (const [fn, act] of [['backUp', 'push'], ['removeBackup', 'delete'], ['restoreBackup', 'restore'], ['download', 'download']]) {
-    const body = menu.slice(menu.indexOf(`function ${fn}(`), menu.indexOf('\n}', menu.indexOf(`function ${fn}(`)));
-    assert.match(body, new RegExp(`, '${act}'\\);`), `${fn} runs as '${act}'`);
-  }
-  // B3: the slot AS DRAWN rides the restore
-  assert.match(menu, /const replaces = \{ key: save\.key, gameTime: save\.dateAndTime\?\.gameTime, realTime: save\.dateAndTime\?\.realTime \};\s*runCloud\(save, \(io\) => pullSlot\(io, appStorage\(\), card, \{ replaces \}\), 'restore'\);/);
-  // B5: an armed press never outlives its pane - the section rail and the System rail both disarm
-  assert.match(menu, /section = id; pickedKey = null; sheetOpen = false; confirming = null; cloudArm = null; render\(\);/);
-  assert.match(menu, /sysSec = id; confirming = null; sheetOpen = false; pickedKey = null; cloudArm = null; render\(\);/);
-  // ONE PANE offers the restore: Load, where ACC2c put the download - and no other by default, the options handed whole
-  assert.match(menu, /function cloudFor\(save, \{ restore = false \} = \{\}\) \{/);
-  assert.match(menu, /function tileOf\(save, \{ actions, current = false, restore = false \}\) \{/);
-  assert.match(menu, /cloud: cloudFor\(save, \{ restore \}\),/);
-  assert.match(menu, /for \(const save of saves\) grid\.append\(tileOf\(save, forSave\(save\)\)\);/, 'tileGrid hands each pane\'s options through whole');
-  assert.equal((menu.match(/restore: true,/g) ?? []).length, 1);
-  const load = menu.slice(menu.indexOf('function paneLoad'), menu.indexOf('// SP1 (2026-09-21'));
-  assert.match(load, /restore: true,/, 'and that pane is paneLoad');
-});

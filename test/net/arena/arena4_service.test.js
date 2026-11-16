@@ -1,6 +1,4 @@
-// ARENA4 (2026-10-02, Mac: "join a team (red and blue) and climb esclating tiers of opponents, or choose to matchmake for
-// a real opponent ... view your ranking and even player leaderboards ... Being a top rank PvE fighter comes with it's own
-// title. Being the #1 pvp arena player comes with it's own temporary title/glyph"): THE ARENA'S RECORDS, DRIVEN - the
+// ARENA4: THE ARENA'S RECORDS, DRIVEN - the
 // account service over node:sqlite with every migration (test/accountDb.mjs), the relay's receipts signed with the relay's
 // own key: the climb in order, the bouts between players and both ratings, the pair's day, the banners, the boards
 // counted from the rows, and the arena's titles and laurel derived at the token's mint.
@@ -283,6 +281,4 @@ test('AUDIT COLLECTIONS-II (lanes 1, 2): the glyph\'s and the icon\'s doors answ
   r = await S.call('/v1/account/icon', { icon: null }, A.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.ok(r.body.titles.includes('arenachampion') && r.body.glyphs.includes('laurel'), 'an icon taken off keeps them too');
-  const src = readFileSync(new URL('../../../server-account/src/index.js', import.meta.url), 'utf8');
-  assert.match(src, /const r = await equipGlyph\(ctx, await withSeatTitles\(ctx, who\.player, env\), env, body\.glyph, body\.on !== false\);/, 'the glyph\'s door reads a Charter\'s and a chapter\'s titles');
 });

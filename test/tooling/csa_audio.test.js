@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27) - COME SAIL AWAY'S SOUNDS: the FSB5 Vorbis remux
+// CSA-A - COME SAIL AWAY'S SOUNDS: the FSB5 Vorbis remux
 // (tools/lib/fsb5Vorbis.mjs) and what it wrote (vendor/come-sail-away/Sounds/).
 // The five played clips are the bundle's own Vorbis packets in a rebuilt Ogg
 // stream, so the pins are the container's: the setup headers are the ones
@@ -7,7 +7,7 @@
 // vendored file's pages check, carry the vendored setup and end on the clip's
 // own sample count. (The PCM was compared against libvorbis's own remux of
 // the same banks in Chromium's decoder on 2026-09-27: identical, sample for
-// sample - bible/03-World/Come-Sail-Away.md.)
+// sample.)
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

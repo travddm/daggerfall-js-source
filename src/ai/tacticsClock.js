@@ -1,5 +1,5 @@
 // @ts-check
-// TACT (AUDIT TACT, 2026-10-02): THE BRAIN'S CLOCK IS THE FOES' OWN TIME. The tactics brain (ai/tactics.js) and the
+// TACT: THE BRAIN'S CLOCK IS THE FOES' OWN TIME. The tactics brain (ai/tactics.js) and the
 // telegraphed blows (ai/foeBlows.js) read one clock - patience, the beat after a blow, a wind-up's landing, a token's
 // staleness - and it runs on the time the foes are stepped with, not the wall: each host ticks it with the frame's
 // foe step (0 under whatever holds the foes), so a window or a quest box held over a fight freezes the brain with the

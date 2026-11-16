@@ -1,4 +1,4 @@
-// WD3 (2026-10-01): LAYOUT PINS - A TOWN KEEPS THE LAYOUT A SAVE'S THINGS WERE MADE IN.
+// WD3: LAYOUT PINS - A TOWN KEEPS THE LAYOUT A SAVE'S THINGS WERE MADE IN.
 //
 // Mac, 2026-10-01, handing over Beautiful Villages and Beautiful Cities: "ensure this doesn't conflict or regress
 // anything (For example housing customization)". The two mods do not edit Daggerfall's towns, they REPLACE them:
@@ -26,7 +26,7 @@
 import { setLayoutPinOracle, worldDataVendorCarries, locationReplacementFilename, blockReplacementFilename } from '../formats/worldData/worldDataReplacement.js';
 
 /** The world-data mods that MOVE BUILDINGS in towns - the only ones a pin speaks for. A mod that adds scenery to a
- *  dungeon or a ship's deck (Aquatic Sprites, Detailed Ships) moves no building a save keeps by key. */
+ *  dungeon or a ship's deck moves no building a save keeps by key. */
 export const LAYOUT_MODS = Object.freeze(['beautiful-villages', 'beautiful-cities']);
 
 /**
@@ -104,7 +104,7 @@ export function stampVendors(stamp) {
 }
 
 /**
- * WD3 (AUDIT WD3 G2, Mac: "Fix anything. This needs to be perfect"): THE PORT'S CURATION - a town a mod would leave
+ * WD3 (AUDIT WD3 G2): THE PORT'S CURATION - a town a mod would leave
  * without what it IS. Beautiful Villages rebuilds TVRNAS00 and TVRNAS06 as houses, no tavern among them (the classic
  * blocks hold three each), and leaves the 274 roadside taverns standing on them (142 and 132, their location files not
  * replaced) with no tavern: no room to rent, no innkeeper, no tavern quest. The mod is kept out of a TAVERN location

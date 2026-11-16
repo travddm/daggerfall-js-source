@@ -1,5 +1,4 @@
-// PR-WAGON1 (2026-09-24, a player's report Mac relayed: "Players can grief other players with the wagon by putting it
-// in front of dungeon entryways and building entrances"; Mac's choice: "Others' wagons don't block").
+// PR-WAGON1.
 //
 // THE GRIEF: AUDIT HCC O3 stood another player's PARKED wagon a box in my collider (`hccWagon:<owner>`), and HCC-PARK
 // keeps a parked team for 72 hours after its owner leaves - so a wagon left across a shop door or a dungeon's mouth

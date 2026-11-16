@@ -1,5 +1,4 @@
-// HOST-CLOCK (2026-10-21, OWNER-CLOCK's Left in bible/01-Overview/bugs/Field-Bugs-2026-10-21c.md; bible/06-Systems/Online-Arc.md
-// OWNER-CLOCK, HOST-CLOCK). OWNER-CLOCK kept a slow owner's STREET foes to its own clamped frame (scenes/ownerCatchUp.js), and
+// HOST-CLOCK. OWNER-CLOCK kept a slow owner's STREET foes to its own clamped frame (scenes/ownerCatchUp.js), and
 // FLAGGED the rest: a building's foes (scenes/worldModes.js) and a dungeon's (scenes/dungeonContext.js) were stepped
 // inside their hosts' frames at FOE-CATCHUP's half of a slow host's frame - half speed for everyone in the room below
 // 10 fps - and the town watch's bodies (scenes/cityGuards.js) kept that half while its brains, on the page's one tactics
@@ -417,7 +416,7 @@ test('HOST-CLOCK the hosts by source: world.js\'s one statement hands the street
   assert.match(body, /\n {4}spaceFoes\(foes, collider, foeFrameDt\(dt\), [^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*clearDoorways\(foes, [^\n]*\n\s*for \(const f of foes\) \{\n {6}_fi\+\+;/, 'the spacing and the loop, inside it, on the call\'s step');
   assert.match(body, /f\.ai\.update\(foeFrameDt\(dt\), _pf, /, 'the body handed FOE-CATCHUP\'s step of the CALL');
   assert.match(body, /\n {4}\};\n {4}ownerFoes\.step\(foes, frameDt, stepFoes, foes\.some\(\(f, i\) => !f\.dead && !isPuppetFoe\(f, i\)\)\);[^\n]*\n {4}dt = frameDt;/, 'the loop handed to the page\'s catch-up, keyed by the context\'s one foe list - caught up with a live foe of mine among them');
-  assert.match(DC, /_peerFrame\+\+;[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const frameDt = dt;[^\n]*\n\s*const stepFoes = \(stepDt\) => \{/, 'the peers read once a frame, outside the calls');
+  assert.match(DC, /_peers\.nextFrame\(\);[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*const frameDt = dt;[^\n]*\n\s*const stepFoes = \(stepDt\) => \{/, 'the peers read once a frame, outside the calls');
   assert.equal((DC.match(/ownerFoes\./g) ?? []).length, 1);
   for (const [f, t] of [['world.js', w], ['worldModes.js', WM], ['dungeonContext.js', DC]]) assert.doesNotMatch(t, /catchUpOwnerFoes|createOwnerCatchUp/, `${f}: the page's one catch-up, never one of its own`);
 });

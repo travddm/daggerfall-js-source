@@ -110,7 +110,7 @@ const QW_PARAMS = [
   'placeFoeEnv', 'placeFoeFreely', 'entityOccupancy', 'questFoeGender', 'ENEMY_BASICS',
   'fieldOfView', 'walkMode', 'player', 'cam', 'collider', 'exteriorFoes', 'exteriorFoePool',
   // ...and the G4 spell registry CastSpellDo reads through this host's
-  // own `getClassicSpellEffects` (world.js:".HasMatchForClassicEffect"'s seam).
+  // own `getClassicSpellEffects` (questWorld.js:".HasMatchForClassicEffect"'s seam).
   'spellRecordOfIndex',
   // QUEST-WAVE: the held spots a placement keeps until its stand lands (questFoeHost.js) - appended, as above
   'heldSpots', 'holdSpotWhile',
@@ -309,7 +309,7 @@ test('QX1 review: every faction read is the PERSISTENT store, and the Person cha
   // (4) ...and the family degrades to the charter's refusal when
   // FACTION.TXT has not loaded - never a throw on `store.dict`. The
   // People/Courts pair is left out of this arm deliberately: their
-  // expressions are world.js:"currentRegionPeople:"/world.js:"currentRegionCourt:"'s verbatim, and talk.js's
+  // expressions are questWorld.js:"currentRegionPeople:"/questWorld.js:"currentRegionCourt:"'s verbatim, and talk.js's
   // findFactions dereferences the dictionary it is handed, so the two
   // hosts share one shape there and neither invents a private guard.
   const cold = mountQuestWorld({ factionDict: null });
@@ -536,7 +536,7 @@ test('ROAD-G G2 review: questWorld answers CastSpellDo\'s two classic-spell read
   // Without these the action self-completes at PARSE
   // (actions.js:"= parentQuest?.hooks?.world?.getClassicSpellEffects?.(action.spellID)"/actions.js:"CastSpellDo could not find".."this.setComplete();   // C#: the TEMPLATE completes - kept" - no effects, so C#'s template completes and
   // the task can never fire), which would have left `cast X spell do`
-  // dead on this route even with the doors above wired. world.js:".HasMatchForClassicEffect"'s
+  // dead on this route even with the doors above wired. questWorld.js:".HasMatchForClassicEffect"'s
   // pair, byte-folded on both sides exactly as MakeClassicKey folds.
   const { world } = mountQuestWorld();
   assert.deepEqual(world.getClassicSpellEffects(0x105), [{ type: 5, subType: 1 }],
@@ -756,7 +756,7 @@ test('QX1: every surface that recorded "no quest bridge" reads the machine now',
   // this is the pin that stops any being reverted alone.
   assert.match(SRC, /tickQuests: \(\) => questBridge\?\.machine\?\.tick\?\.\(\),/, 'TickRest :379');
   assert.match(SRC, /getQuest: \(uid\) => questBridge\?\.machine\?\.getQuest\?\.\(uid\) \?\? null,/, 'the quest letter\'s name');
-  // STATUS-LIVE (2026-09-22): this host hands the macro context to the
+  // STATUS-LIVE: this host hands the macro context to the
   // ONE composer (ui/statusBox.js) instead of calling statusInfoRows
   // itself. The law QX1 holds is that it passes the LIVE context and
   // not the `null` the fixed-city host used to - that is still here.
@@ -851,7 +851,6 @@ function mountRecall({ anchorContext, insideContext, mode = 'exterior', startInD
     'ANCHOR_MUST_BE_SET', 'ActionTextBox', 'plainLines', 'STREAMING_TERRAIN_SCALE',
     'dfLocation', 'locationName', '_locPixel', 'walkMode', 'player', 'cam', 'playerEntity',
     'townTalk', 'surfacePlayer', 'ChoiceWindow', 'modes', 'arenaBouts', 'ARENA_TEXT',
-    // PIN MOVED (RVN10, bible/12-Enhanced-AI/Feud-Arc.md 21.2): a Recall out of a mode's fight routs its engaged specials
     // first - none engaged here
     'revenantRoutSweep', 'revenantSay', 'revenantRoutedEvent',
     `${body} return { setRecallAnchor, recallToAnchor, teleportPrompt, anchorLanding };`,

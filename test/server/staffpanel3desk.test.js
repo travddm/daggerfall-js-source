@@ -1,5 +1,4 @@
-// STAFF-PANEL3-DESK (2026-10-22, mob picked these at 04:13Z, Moderators' share at 06:28Z; design doc "DFO Staff Panel:
-// design") - THE PANEL'S DESK (server-account/src/staffDesk.js), driven through the real Worker on the node:sqlite database
+// STAFF-PANEL3-DESK - THE PANEL'S DESK (server-account/src/staffDesk.js), driven through the real Worker on the node:sqlite database
 // every account pin stands on (test/accountDb.mjs): staff notes, each member's own watchlist and its events, Your settings,
 // and the Admins' server notice, AI check scorecard and reported board notes and market listings.
 import { test } from 'node:test';
@@ -36,7 +35,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, BOARD_OPEN: 'on',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, BOARD_OPEN: 'on',
   });
   const staff = async (path, body = {}, token = null) => {
     const res = await s.fetch(`https://accounts.invalid${path}`, {
@@ -66,7 +65,7 @@ async function stand() {
   /** A chat case on `who` with one report `ago` seconds back, or a reviewer's case. */
   const caseOn = (who, { ago = 10, reason = 'harassment', source = 'report', ...cols } = {}) => {
     const id = `case${(++n).toString(16).padStart(12, '0')}`;
-    insert('mod_cases', { id, target: who.id, source, status: 'open', opened_at: nowS() - ago, updated_at: nowS() - ago, reports: source === 'report' ? 1 : 0, credible: 0, ai_state: 'off', discord_state: 'off', ...cols });
+    insert('mod_cases', { id, target: who.id, source, status: 'open', opened_at: nowS() - ago, updated_at: nowS() - ago, reports: source === 'report' ? 1 : 0, credible: 0, ai_state: 'off', ...cols });
     if (source === 'report') insert('mod_reports', { case_id: id, reporter: s.sylviaId ?? sylvia.id, reason, at: nowS() - ago, counted: 1 });
     return id;
   };
@@ -287,7 +286,7 @@ test('STAFF-PANEL3-DESK: THE AI CHECK\'S SCORECARD - the cases staff decided tha
   const t = nowS();
   let k = 0;
   const decided = (status, cat, sev, { mode = 'shadow', ago = 3600, by = 'Asynian', state = 'done' } = {}) => s.insert('mod_cases', {
-    id: `sc${(++k).toString(16).padStart(14, '0')}`, target: s.troll.id, source: 'report', status, opened_at: t - ago - 10, updated_at: t - ago, ai_state: state, discord_state: 'off',
+    id: `sc${(++k).toString(16).padStart(14, '0')}`, target: s.troll.id, source: 'report', status, opened_at: t - ago - 10, updated_at: t - ago, ai_state: state,
     ai_category: cat, ai_severity: sev, ai_mode: mode, resolved_at: t - ago, resolved_by: by,
   });
   decided('actioned', 'hate', 3);        // said, acted: agreed

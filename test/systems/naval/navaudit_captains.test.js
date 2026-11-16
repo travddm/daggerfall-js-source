@@ -1,6 +1,5 @@
-// AUDIT NAV1 (2026-09-29, Mac: "Lets do a deep comprehensive audit and ensure this is perfection. I want ship movement
-// and combat to flow perfectly, just like assisins creed black flag") - THE CAPTAINS' SEAMANSHIP, rebuilt on what the
-// movement audit measured (bible/03-World/Naval-Combat.md "AUDIT NAV1"): the way the player's own hulls make, the
+// AUDIT NAV1 - THE CAPTAINS' SEAMANSHIP, rebuilt on what the
+// movement audit measured ("AUDIT NAV1"): the way the player's own hulls make, the
 // turn a hull's length allows, eased and heeling on a spring; no course nearer the wind than close-hauled - a tack or
 // a wear; room given to other hulls; the land sounded by the hull's own width and never stood on; the true intercept,
 // the broadside that bears soonest, the chase given up; a pirate coming alongside to board; the traffic's berths and
@@ -378,7 +377,7 @@ test('AUDIT NAV1 M12 giving up: a chase that has not closed in CHASE_GIVE_UP_S w
   assert.ok(gaveUp != null && gaveUp >= CHASE_GIVE_UP_S - 1, `given up at ${gaveUp}`);
   assert.ok(b.spare.get('me') > b.clock, 'left be');
   assert.ok(SPARE_S >= 60);
-  // in the fight: never given up, however long - though her passes take her out and back. PIN MOVED (AUDIT NAV2 F21: the
+  // in the fight: never given up, however long - though her passes take her out and back.
   // gain is read against the farthest she lay in the last CHASE_GIVE_UP_S, so each return from a pass refreshed the
   // chase by itself): a spell in the fight longer than CHASE_GIVE_UP_S before the passes, and never given up between
   const f = ship('pirateBrig', { yaw: 0 });
@@ -431,7 +430,7 @@ test('AUDIT NAV1 M1/G3 alongside to board: a pirate with men comes up to a playe
   steps(st, still, 1);
   assert.equal(st.mode, 'board', 'lying still: they come to board');
   // coming to board a still boat, the boat abeam and loaded guns in reach but past GRAPE_CLOSE_M: she holds them (her
-  // prize kept whole); PIN MOVED (SHOT-KINDS): lying alongside, inside it, she loads grape and sweeps the deck she will
+  // prize kept whole)
   // take - her broadsides grape alone, never a ball into her prize (navalAI.js captainLoads)
   const broadsidesOf = (s, seconds) => {
     const out = [];
@@ -647,7 +646,7 @@ test('AUDIT NAV1 B1 the host lets a prize go: a boarding won clears her boarded 
   assert.equal(e.ship.boarded, false, 'the fight is over');
   // out of sight: she goes
   view.feet = [DESPAWN_BEYOND + 500, 0, 0];
-  run(2 + SHIP_FADE_S);   // SHIP-FADE (2026-10-02) PIN MOVED: she fades as she goes
+  run(2 + SHIP_FADE_S);   // SHIP-FADE
   assert.equal(host._sea.has(id), false, 'let go past DESPAWN_BEYOND');
 });
 
@@ -689,7 +688,7 @@ test('AUDIT NAV1 M8 the sea keeps the world\'s time: a long frame (Come Sail Awa
 test('AUDIT NAV1 NAV-R a raider coming alongside to board is chasing me - the Overworld\'s map says so, and losing me spends her (mutants: the board mode unread)', async () => {
   const { host, run, log } = await sea({ hull: 2, settings: { ShipsAtSea: 'off', Boarders: true } });
   host.raiders([{ id: 'r1', seed: 0x51f00d, pos: [300, 0, 0], yaw: Math.PI / 2, ahead: [600, 0, 0] }], { sight: 1000, spent: new Set() });
-  run(GRAPPLE_STILL_S + 3);   // SEA-EASE (PIN MOVED): a boat lying still is boarded after GRAPPLE_STILL_S (it was 5 s, the run 8)
+  run(GRAPPLE_STILL_S + 3);   // SEA-EASE (
   const e = [...host._sea.values()].find((x) => x.raider);
   assert.equal(e.ship.mode, 'board', 'my boat lies still: she comes to board');
   assert.equal(host.raiderShipOf(0x51f00d).chase, true);

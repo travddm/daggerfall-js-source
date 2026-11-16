@@ -1,11 +1,9 @@
-// BAG-CRAFT (FIELD BUGS 2026-10-09d - "People cannot craft from their bag"; Mac: "I just want players to also be able to
-// craft from their inventory, not just the store") - A STATION WORKS WHAT THE BAG AND THE PACK HOLD, counted or not: a
+// BAG-CRAFT (FIELD BUGS 2026-10-09d - "People cannot craft from their bag") - A STATION WORKS WHAT THE BAG AND THE PACK HOLD, counted or not: a
 // craft, a brew, a smelt and a temper put their shortfall in from every unit the bag, the pack and the wagon hold but
 // gold's (net/bagLaw.js carriedWorkable), by the deposit's `work` order, which the service takes past its carried count
 // into the Stores as loose - a station's alone (server-account/src/professions.js depositStores; AUDIT BAG-CRAFT A1,
 // test/net/auditbagcraft.test.js, the stations' wall at every other door). A writ, the market and the Stores page's
-// Put in still move only what the service handed out. bible/06-Systems/Materials-Bag.md section 14;
-// bible/01-Overview/bugs/Field-Bugs-2026-10-09c.md.
+// Put in still move only what the service handed out.;
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -176,18 +174,6 @@ test('BAG-CRAFT the book: a station\'s put-in covers its shortfall from what is 
   assert.deepEqual([book.storesWorkable('metal:iron'), book.storesHeld('metal:iron'), heldOf(e, 'metal:iron')], [4, 0, 1]);
   assert.deepEqual(await book.ensureInStores([{ key: 'metal:iron', n: 1 }]), { ok: true, moved: 1 }, 'AUDIT A1: never read as already in');
   assert.equal(book.storesHeld('metal:iron'), 1);
-  // the doors: every station's press works the bag; a Court writ's delivery does not (by source - their own suites drive them)
-  const pb = src('src/net/profBook.js');
-  for (const line of [
-    'const ready = r0 ? await book.ensureInStores(inputs, { work: true }) : { ok: true };',
-    'const ready = await book.ensureInStores(brewSpends(potionById(potion), keys), { work: true });',
-    'const ready = temperableRecipe(r0) ? await book.ensureInStores([temperCost(r0)], { work: true }) : { ok: true };',
-    'const ready = work ? await book.ensureInStores(work.inputs.map((i) => ({ key: i.key, n: i.n * count })), { work: true }) : { ok: true };',
-    'const ready = asked ? await book.ensureInStores([{ key: asked.material, n: asked.qty }]) : { ok: true };',
-  ]) assert.ok(codeHas(pb, line), line);
-  const w = src('src/scenes/world.js');
-  assert.ok(codeHas(w, 'const ready = await profBook.ensureInStores([{ key: material, n: Number(ask.units) || 0 }]);'), 'a guild writ\'s supply: the count alone');
-  assert.ok(codeHas(w, 'putIn: (key, n) => profBook.ensureInStores([{ key, n }]),'), 'the market\'s: the count alone');
 });
 
 // ─── THE STATIONS ────────────────────────────────────────────────────

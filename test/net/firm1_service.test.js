@@ -1,8 +1,7 @@
-// FIRM1 (2026-10-13) - THE FIRMAMENT, AS THE SERVICE KEEPS IT (server-account/src/firmament.js; the law
+// FIRM1 - THE FIRMAMENT, AS THE SERVICE KEEPS IT (server-account/src/firmament.js; the law
 // src/net/firmament/firmamentLaw.js): the switch, the purses read off the Renown and profession tracks, a change judged whole by
 // the law, a request asked twice charged once, a refund free below Renown 10 and silver after it, and the tree's hand
 // on a harvest's XP. Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs).
-// bible/06-Systems/Firmament.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -36,7 +35,7 @@ function walk(start, ...targets) {
 }
 
 async function stand(env = { FIRMAMENT_OPEN: 'on' }) {
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac', ...env });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', ...env });
   const raw = s.env.DB._raw;
   const state = (who) => s.call('/v1/firmament/state', { character: who.character }, who.secret);
   const set = (who, tree, id = rid()) => s.call('/v1/firmament/set', { character: who.character, tree: typeof tree === 'string' ? tree : packTree(tree), rid: id }, who.secret);

@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // U61 — THE OVERWORLD MODEL: the whole Iliac Bay as one relief, from
 // data alone.
 //
@@ -34,7 +33,6 @@
 // PALETTE here is ours; the dot BUCKETS are not: which locations a
 // filter hides and which type gets which slot is getPixelColorIndex,
 // imported from the classic window - one home, both skins.
-// ═══════════════════════════════════════════════════════════════════
 
 import { CLIMATES, getPixelFromPixelID } from '../formats/mapsFile.js';
 import { SCALED_OCEAN_ELEVATION, BASE_HEIGHT_SCALE, STREAMING_TERRAIN_SCALE } from '../world/terrain/terrainSampler.js';   // AUDIT EV F-DOC7: one home for the byte*8 base term
@@ -236,13 +234,17 @@ export const OVERWORLD_DOT_SIZES = Object.freeze([
  * Returns [{ x, z, colorIndex, summary }] - scene position on the
  * relief's own pixel centers.
  */
+/** A place summary's map pixel: its own `pixel` where it carries one (WW-C2: a zone hall past the Bay - an id's
+ *  `y * 1000 + x` names a pixel of the Bay's map alone), else its id's (MapsFile.getPixelFromPixelID). */
+export const summaryPixel = (summary) => (summary?.pixel ? { x: summary.pixel.x, y: summary.pixel.y } : getPixelFromPixelID(summary.id));
+
 export function buildMarkerModel(summaries, filters, { isDiscovered = checkLocationDiscovered } = {}) {
   const out = [];
   for (const summary of summaries) {
     if (!isDiscovered(summary)) continue;
     const colorIndex = getPixelColorIndex(summary.locationType, filters);
     if (colorIndex === -1) continue;
-    const { x, y } = getPixelFromPixelID(summary.id);
+    const { x, y } = summaryPixel(summary);
     out.push({ x: x + 0.5, z: -(y + 0.5), colorIndex, summary });
   }
   return out;
@@ -308,8 +310,7 @@ export function reliefPoint(px, py, { heightBytes, width, height }, lift = 0) {
  * because the reason for a lift is the ground, not its neighbours: a
  * line at zero z-fights the surface it is drawn on.
  */
-/** ROADS 25 (Mac: "use the first iteration's design instead of the
- *  smeared dirt look"): the FIRST road drawing on this map - R1-RH1,
+/** ROADS 25: the FIRST road drawing on this map - R1-RH1,
  *  removed whole in RX - drew the network as LINES lifted over the
  *  relief, one chain per run between junctions, simplified so the grid
  *  stairs go and rounded so the corners do. Restored here for four

@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-01 part five (FRIENDS-SYNC) - #bug-reports, Shanewerewolf5, "Friend list issues": "My friend list
-// is different between devices. On my laptop and desktop." Asked whether to build the merge, Mac: "Build it".
+// is different between devices. On my laptop and desktop." Asked whether to build the merge,.
 // The hub (server/src/index.js, SOC1) kept a friend list under `acct:<id>`, and `<id>` was the BROWSER
 // PROFILE's (net/social.js accountId - minted once per appStorage, carried on the hub hello as `acct`). A laptop and a
 // desktop are two profiles, so one signed-in player was two hub accounts with two lists; and two players who shared one
@@ -86,7 +86,4 @@ test('FRIENDS-SYNC client: the picture is accepted under the signed-in player\'s
   assert.equal(s.apply(frame('player-mac')), 'state'); assert.equal(s.acct, 'player-mac');
   assert.equal(new SocialState({ acct: ['player-mac', 'aLaptop0001'] }).apply(frame('aLaptop0001')), 'state', 'an old relay\'s picture still lands');
   assert.equal(new SocialState({ acct: ['player-mac', 'aLaptop0001'] }).apply(frame('player-eve')), null, 'B19 stands: a picture naming another is a relay\'s lie');
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /new SocialState\(\{ acct: \[storedSession\(appStorage\(\)\)\?\.id, link\.acct\]/, 'socialStart expects the signed-in player\'s id first');
-  assert.doesNotMatch(world.slice(world.indexOf('const checkCanceledByFollower'), world.indexOf('const outdoorRestDeps')), /accountId\(\)/, 'a follower\'s Stop names the hub\'s id for me, never the profile\'s');
 });

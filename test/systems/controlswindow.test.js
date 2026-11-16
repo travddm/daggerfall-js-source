@@ -105,14 +105,12 @@ test('I4: staging copies BOTH dicts and writes nothing live until applied', () =
 });
 
 test('I4 + UXB1-S: the SAME key on two actions is a SHARE - marked, never blocking; DFU\'s law still finds, and blocks on, a combo against its own modifier - red inside the shown dict, blue across the two (:230-267)', () => {
-  // UXB1-S (2026-09-25, the UX backlog: "So you wont add multiple key bindings even when asked? I dont care if it goes
-  // against daggerfall"): the pin DFU's duplicate law held here is re-aimed, not dropped. Two actions on one code were
+  // UXB1-S: the pin DFU's duplicate law held here is re-aimed, not dropped. Two actions on one code were
   // DFU's red clash and refused the exit; they are a share now, chosen and kept. What the law still refuses is the
   // clash no press can resolve - a combo whose modifier is bound bare - and that keeps both of DFU's colours.
   const store = freshStore();
   const u = createUnsavedKeybinds(store);
   assert.equal(checkDuplicates(u).ok, true, 'the defaults are clean');
-  // PIN MOVED (SPYGLASS, 2026-10-11): as a set - K's share (the glass beside the road's follow) comes in the bindings' order, ahead of the arrows
   assert.deepEqual([...checkDuplicates(u).shared].sort(), DEFAULT_SHARES.map(([c]) => c).sort(), '...and share only the default shares (HELM-KEYS: the up arrow; SPYGLASS: K)');
   // two actions on one code, in the SHOWN dict: a share
   setUnsavedBinding(u, 'Rest', 'KeyW');
@@ -150,7 +148,7 @@ test('I4 + UXB1-S: the SAME key on two actions is a SHARE - marked, never blocki
   setUnsavedBinding(u2, 'Rest', null);
   setUnsavedBinding(u2, 'Jump', null);
   assert.equal(checkDuplicates(u2).ok, true, 'two unbound actions are not duplicates');
-  assert.deepEqual([...checkDuplicates(u2).shared].sort(), DEFAULT_SHARES.map(([c]) => c).sort(), '...nor a share (the default share alone stands)');   // PIN MOVED (SPYGLASS): as a set, K's share among them
+  assert.deepEqual([...checkDuplicates(u2).shared].sort(), DEFAULT_SHARES.map(([c]) => c).sort(), '...nor a share (the default share alone stands)');
   assert.equal(getDuplicates([null, null, 'KeyW']).size, 0);
   // the two colours are DFU's own; the share's is the port's, and neither of them
   assert.deepEqual([...INTERNAL_DUPE_COLOR], [1, 0, 0, 1]);
@@ -274,7 +272,7 @@ test('I4: the window wiring - one flow factory, the right-click seam, both panel
   // ...and the guard is on the window in BOTH, which is the defect
   // routed 62 named: a window with no click handler must still eat
   // the pointer, or the host grabs pointer lock behind the menu.
-  // STATUS-LIVE (2026-09-22): the guard is still on the WINDOW - what it
+  // STATUS-LIVE: the guard is still on the WINDOW - what it
   // asks is the PAUSE. A press under a box the game is not stopped for
   // (the status readout, ui/statusBox.js) belongs to the world, and the
   // box declines `click()` itself.

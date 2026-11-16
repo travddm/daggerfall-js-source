@@ -1,4 +1,4 @@
-// AUDIT GALLEON-2 (2026-10-03) - HER RIG'S ROPE, ITS BAKE, AND HER SAILS' POSES (world/ships/galleonRig.js; systems/
+// AUDIT GALLEON-2 - HER RIG'S ROPE, ITS BAKE, AND HER SAILS' POSES (world/ships/galleonRig.js; systems/
 // comeSailAwayBoat.js's FixDeformations holder; scenes/comeSailAway/comeSailAwayPool.js's bake). The second audit of Mac's galleon.
 // Every pin reads her AS BUILT on the runtime: the real pool's frame (FixDeformations' LateUpdate and the bake, at 60
 // frames a second) for her rope and her canvas's bakes; the real Animator on her placed prefab, and on the mod's own

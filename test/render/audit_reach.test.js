@@ -1,5 +1,4 @@
-// AUDIT REACH (2026-09-23, Mac: "let's do an audit" - three lenses over SHADOW-REACH, VOL1 and BOUNCE1 and the audit
-// commit before them): the shadow cache's motion memory paid twice more, and the recentre's records.
+// AUDIT REACH: the shadow cache's motion memory paid twice more, and the recentre's records.
 //
 // B1: `_moved` matched a draw to the NEAREST remembered placement within the reach, so two still placements of one
 // mesh closer than two units (double doors, an arrow beside another) overwrote each other every draw and read as

@@ -1,5 +1,4 @@
-// LW-SPREAD (2026-10-06, bible/06-Systems/Living-World.md "LW-SPREAD"; Mac: "in towns some NPCs can group up too much
-// when talking to each other. Almost like they are all situated in one place"): THE TOWN GATHERS IN MANY PLACES. The
+// LW-SPREAD: THE TOWN GATHERS IN MANY PLACES. The
 // square was one point, and six in ten of a town kept it for their first social spot; every stall stood there, and a
 // mercenary's morning, an adventurer's afternoon, a visitor's and a courtier's talk: on the game's own towns at six
 // in the evening 30-64 of a town stood about that one point (Bubyrydata: 64 of the 161 out of doors); the town went out

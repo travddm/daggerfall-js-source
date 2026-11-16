@@ -1,4 +1,4 @@
-// AUDIT REST-PARTY C (2026-10-03, bible/06-Systems/Rest-Arc.md section 4, the placement law; REST3's dungeon fires).
+// AUDIT REST-PARTY C.
 // The law placed a fire a metre from a brazier (the layout's fires were measured from the start alone, and the
 // fallbacks asked nothing - C2), read a stair's tread and a 25.8 degree ramp as a floor (one ray, ny > 0.9 - C3), put
 // the fire of a marker on a lift's platform in the shaft under it (the floor ray read the dungeon's bucket alone - C4),
@@ -77,26 +77,21 @@ test('AUDIT REST-PARTY C2/C5: a layout fire nearer the door than any clear candi
   assert.deepEqual(fires, [[400, 0, 0]], 'the brazier is the door\'s; one more - the deep fire, measured from the door');
 });
 
-test('AUDIT REST-PARTY C5: a brazier by the door counts toward N - N - 1 placed past it; an elite\'s half keeps the brazier as its entrance', () => {
-  const blocks = row(12);   // 11 inner blocks -> N 4, an elite 2
+test('AUDIT REST-PARTY C5: a brazier by the door IS the one fire (DUNGEON-FIRE-ONE) - none placed past it; with the count at four it counts toward N and N - 1 are placed', () => {
+  const blocks = row(12);
   const base = { blocks, probe: open, seed: 1234 };
   const brazier = [[8, 0, 8]];
-  assert.equal(placeDungeonFires(base).length, 4);
-  const withB = placeDungeonFires({ ...base, existing: brazier });
+  assert.equal(placeDungeonFires(base).length, 1);
+  assert.deepEqual(placeDungeonFires({ ...base, existing: brazier }), [], 'the brazier is the entrance fire, and the entrance fire is the only one');
+  assert.deepEqual(placeDungeonFires({ ...base, elite: true, existing: brazier }), []);
+  // a brazier far from the door is not the entrance\'s: the entrance fire by the start
+  const far = placeDungeonFires({ ...base, existing: [[RDB_SIDE * 6, 0, 30]] });
+  assert.deepEqual(far, [[5 + DFIRE.ringM, 0, 5]]);   // AUDIT REST II F3: on the start\'s ring
+  // the choice keeps its law for a larger count: the brazier and three more, none within 80 m of it
+  const valid = landCandidates(fireCandidates(blocks), { probe: open, doors: [], enemies: [], items: [] });
+  const withB = chooseFires(valid, { seed: 1234, start: [5, 0, 5], existing: brazier, count: 4 });
   assert.equal(withB.length, 3, 'N in all: the brazier and three');
   assert.ok(withB.every((p) => (p[0] - 8) ** 2 + (p[2] - 8) ** 2 >= DFIRE.spacingM ** 2), 'none by the brazier');
-  const elite = placeDungeonFires({ ...base, elite: true });
-  assert.equal(elite.length, 2);
-  assert.deepEqual(elite[0], [5 + DFIRE.ringM, 0, 5], 'an elite\'s first is the entrance\'s');   // AUDIT REST II F3 (PIN MOVED): on the start's ring, 2 m out - never on the start, where the player appears
-  const eliteB = placeDungeonFires({ ...base, elite: true, existing: brazier });
-  assert.deepEqual(eliteB, [elite[1]], 'the brazier is the entrance\'s, the deep fire the other');
-  // an elite of one with a brazier at its door: the brazier is the one
-  const small = row(4);   // 3 inner -> N 2, an elite 1
-  assert.equal(placeDungeonFires({ blocks: small, probe: open, seed: 5, elite: true }).length, 1);
-  assert.deepEqual(placeDungeonFires({ blocks: small, probe: open, seed: 5, elite: true, existing: brazier }), []);
-  // a brazier far from the door is not the entrance's: the full count, the entrance fire by the start
-  const far = placeDungeonFires({ ...base, existing: [[RDB_SIDE * 6, 0, 30]] });
-  assert.deepEqual(far[0], [5 + DFIRE.ringM, 0, 5]);   // AUDIT REST II F3 (PIN MOVED): the start's ring, 2 m out
 });
 
 test('AUDIT REST-PARTY C3: a stair\'s tread and a ramp are no floor - the floor sampled half a metre round on eight bearings, level to 5 cm, flat past 0.99', () => {
@@ -180,7 +175,7 @@ test('AUDIT REST-PARTY C6: tools/dungeonFireProbe.mjs stands what the game stand
   const r = probeFires(col, blocks, { seed: 3, sizeOf });
   assert.equal(r.braziers, 1);
   assert.equal(r.valid, 1, 'the start marker kept beside a door face that is not an exit; the lift\'s marker refused');
-  assert.deepEqual(r.fires, [[5 + DFIRE.ringM, 0, 5]]);   // AUDIT REST II F3 (PIN MOVED): the start's ring, 2 m out - where the door face that is no exit stands
+  assert.deepEqual(r.fires, [[5 + DFIRE.ringM, 0, 5]]);   // AUDIT REST II F3 (
   // the game's own call over the same inputs, read the game's way, stands the same fires
   const { doors, existing } = fireLayoutInputs(blocks, layoutHearths(blocks, sizeOf));
   assert.deepEqual(placeDungeonFires({ blocks, probe: colliderFireProbe(col), doors, existing, seed: 3 }), r.fires);

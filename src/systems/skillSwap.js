@@ -1,8 +1,5 @@
 // @ts-check
-// SKILL-SWAP (2026-10-19, Discord #suggestions "With the addition of arcane and martial specialisations...", Brother
-// Frank, through Mac: "I'd very much like it if the team considered adding the ability (if it is possible) to either change
-// one of our skills out or allow some of these specializations to work with just the one weapon skill"; asked, Mac: "Paid
-// skill swap") - A CLASS SKILL GIVEN UP FOR ONE OUTSIDE THE CLASS, FOR GOLD. A career's primary, major and minor lists are
+// SKILL-SWAP - A CLASS SKILL GIVEN UP FOR ONE OUTSIDE THE CLASS, FOR GOLD. A career's primary, major and minor lists are
 // set at creation (formats/classFile.js, chargen) and nothing changed them after: a class holding one weapon skill could
 // never master two, so no martial path would ever open for it (martialPaths.js martialPossible), however long it played.
 //

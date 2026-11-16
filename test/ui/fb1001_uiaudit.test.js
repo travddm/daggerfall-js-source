@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part five (Mac: "audit this") - ORBIT-FREE and CURSOR-EDGE. Real-cursor checks ran in Chromium under
+// AUDIT 2026-10-01 part five - ORBIT-FREE and CURSOR-EDGE. Real-cursor checks ran in Chromium under
 // Xvfb (the X server's cursor read back through XFixes). Both fixes hold for what was reported; and:
 //   UI1 the classic skin never lays ENHANCED_CSS, so its scrollers - the chat (it mounts on either skin), the social
 //       panel, the profile, the decorator - kept native bars, the OS arrow over them: the document cursor now brings

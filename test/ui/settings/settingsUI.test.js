@@ -1,5 +1,5 @@
 // MENU: the settings screen's pins - the map, the copy and the law.
-// FD1/SO1 (2026-09-11): the keyed native screen (ui/settingsWindow.js)
+// FD1/SO1: the keyed native screen (ui/settingsWindow.js)
 // and its launcher are gone; the enhanced menu's Settings pane is THE
 // settings screen under both skins, and its pins follow T5 below.
 //
@@ -30,12 +30,12 @@ test('MENU T1: the category map is TOTAL and DISJOINT over the store', () => {
     }
   }
   for (const k of ALL_KEYS) assert.ok(seen.has(k), `${k} has no category - it would vanish from the screen`);
-  assert.equal(seen.size, 171);
+  assert.equal(seen.size, 173);
   // the shape the design settled on, so a re-bake that renames a key
   // fails the build rather than quietly dropping a row
   // SO1 gave ENHANCED a category with no store key; FT12 took it off the rail. ORG2: one screen for every option - nine
-  // TABS by subject over the 171 and the Features rows; World holds none of DFU's keys, only the port's and the mods'
-  assert.deepEqual(CATEGORY_IDS.map((c) => keysOf(c).length), [67, 16, 5, 0, 37, 5, 15, 19, 7]);
+  // TABS by subject over the 173 and the Features rows; World holds none of DFU's keys, only the port's and the mods'
+  assert.deepEqual(CATEGORY_IDS.map((c) => keysOf(c).length), [68, 17, 5, 0, 37, 5, 15, 19, 7]);
   assert.deepEqual(CATEGORY_IDS, ['graphics', 'gameplay', 'combat', 'world', 'interface', 'audio', 'controls', 'accessibility', 'mods']);
 });
 
@@ -71,9 +71,11 @@ test('MENU T4: the widget law is total, and a blocked row never shows a stored v
       assert.ok(INSTEAD[k], `${k} has no "instead" sentence`);
     }
   }
-  // THE HONESTY CASE: EnhancedCombatAI stores DFU's True while this
-  // port runs the classic path. Printing "On" would be a lie.
-  assert.equal(formatValue('Enhancements/EnhancedCombatAI', 'True'), 'classic');
+  // THE HONESTY CASE: a blocked row never prints its stored value. AdvancedClimbing can store True while the port runs
+  // the classic climbing, so "On" would be a lie.
+  assert.equal(formatValue('Enhancements/AdvancedClimbing', 'True'), 'classic');
+  // EnhancedCombatAI is live: it prints the value the foes run by
+  assert.equal(formatValue('Enhancements/EnhancedCombatAI', 'True'), 'On');
   // enums are DFU's names in DFU's order
   for (const [k, law] of Object.entries(ENUM_LAW)) {
     assert.ok(law.values.length >= 2 && law.cite, `${k}: enum needs values and a citation`);
@@ -115,11 +117,7 @@ test('MENU T5: a slider never offers travel its consumer ignores', () => {
   }
 });
 
-// ── FD1 + SO1 (2026-09-11): ONE SETTINGS SCREEN, ORGANISED ──────────
-// Mac: "Remove the classic Manager screen and instead use the enhanced
-// menu for both enhanced and classic ... a comprehensive organization
-// of all the settings options, and settings audit ensuring proper
-// organization and bloat reduction."
+// ── FD1 + SO1: ONE SETTINGS SCREEN, ORGANISED ──────────
 
 test('FD1: the launcher and the keyed settings window are gone, nothing imports them, and ShowOptionsAtStart is stored (mutant: the gate left in main.js)', () => {
   for (const f of ['src/scenes/launcherScene.js', 'src/ui/settingsWindow.js', 'src/ui/settingsMetrics.js', 'src/ui/colorPicker.js', 'tools/settingsProbe.mjs']) {
@@ -163,7 +161,7 @@ test('SO1: the settings pane is organised - the port\'s rows sit in the categori
     assert.match(menu, new RegExp(`function ${fn}\\(`), `${fn} exists`);
   }
   // ORG2: the port's rows are built once a paint and the MAP places each by the id it carries - no category switch
-  // RPT1026-CLIENT (PIN MOVED): the Motion section's other players' shake rides the pool beside the Game rows
+  // RPT1026-CLIENT (
   assert.match(menu, /for \(const r of \[\.\.\.portRowsGame\(\{ pause \}\), peerSpellShakeRow\(\), \.\.\.portRowsAudio\(\), \.\.\.portRowsControls\(\{ pause \}\), \.\.\.portRowsInterface\(\{ pause \}\)\]\) \{\s*\n\s*if \(r\?\.dataset\?\.opt\) pool\.set\(r\.dataset\.opt, r\);/);
   assert.doesNotMatch(menu, /function portRows\(/, 'the per-category switch went with the categories');
   // FT12: the Enhanced category is GONE from the settings rail - every switch it held is a Features row now
@@ -191,7 +189,6 @@ test('SO1: the settings pane is organised - the port\'s rows sit in the categori
   assert.match(menu, /function drawsFlat\(key\) \{ const t = tierOf\(key\); return t === 'live' \|\| t === 'restart'; \}/);
   assert.match(menu, /const TIER_GROUPS = Object\.freeze\(\[[^\n]*\n\s*\['stored', \(\) => t\('menu\.settings\.storedTitle', 'Saved for later'\)/);
   assert.match(menu, /\['unavailable', \(\) => t\('menu\.settings\.unavailableTitle', 'Not available here'\)/);
-  // PIN MOVED (L10N4): the group's title and blurb are read as it is drawn
   assert.match(menu, /const ks = fold\.filter\(\(k\) => tierOf\(k\) === tier\);\s*\n\s*if \(ks\.length\) body\.append\(tierGroup\(tab\.id, tier, title\(\), blurb\(\), ks\)\);/, 'each tab folds its own');
   assert.match(menu, /const open = isOpen\(catId, tier\);[\s\S]*?headBtn\.onclick = \(\) => \{ setOpen\(catId, tier, !open\); render\(\); \};/, 'the fold is the shelf\'s open map');
   assert.match(menu, /el\('span', 'count', String\(keys\.length\)\)/, 'the heading counts');

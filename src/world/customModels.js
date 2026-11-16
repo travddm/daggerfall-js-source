@@ -1,10 +1,10 @@
-// DS1 (2026-09-25): MODELS NO ARCH3D CARRIES - the port's door for them.
+// DS1: MODELS NO ARCH3D CARRIES - the port's door for them.
 //
 // DFU asks MeshReplacement.ImportCustomGameobject before it reads a
 // model out of ARCH3D.BSA, which is how a mod stands a model Daggerfall
 // never had. The port's mill machinery (41601) was the first such model
-// and was answered by a special case in the pipeline; Detailed Ships
-// names ten more (the pieces it borrows from Daggerfall Expanded Textures,
+// and was answered by a special case in the pipeline; the town mods
+// name more (the pieces they borrow from Daggerfall Expanded Textures,
 // which the port stands in itself - world/detStandIns.js), so the door is
 // a registry now: a model id, a builder that answers the dfMeshToModel
 // shape (metres, Unity's frame, UVs over the named classic textures), and
@@ -16,6 +16,29 @@
 // (`emptyModel`).
 
 const _models = new Map();   // id -> { build, isOn, cached, climateFree, needs, buildSliced }
+/** IC-GRAND (IC-GRAND): MODEL FAMILIES - a run of ids answered by one law, built when first
+ *  asked and kept a bounded number at a time (an LRU, `keep`), so a city of forty thousand cells registers no model up
+ *  front and holds only the ones near it: `{ owns(id), build(id, ctx), keep, climateFree, solid }`. A family is asked
+ *  after the ids registered one by one. `solid: false` - a model no collider files (scenes/pixelBuild.js isSolidModel: a
+ *  far view's skyline, which nothing walks). */
+const _families = [];
+/** @param {{ owns: (id: number) => boolean, build: (id: number, ctx?: any) => any, keep?: number, climateFree?: boolean, solid?: boolean }} f */
+export function registerCustomModelFamily(f) {
+  if (!f || typeof f.owns !== 'function' || typeof f.build !== 'function') return false;
+  _families.push({ owns: f.owns, build: f.build, keep: Math.max(1, f.keep ?? 256), climateFree: !!f.climateFree, solid: f.solid !== false, cache: new Map() });
+  return true;
+}
+const familyOf = (id) => _families.find((f) => f.owns(id)) ?? null;
+/** A family's model for `id`, built once and kept while it is among the family's `keep` latest asked. */
+function familyModel(f, id, ctx) {
+  if (f.cache.has(id)) { const m = f.cache.get(id); f.cache.delete(id); f.cache.set(id, m); return m; }
+  const m = f.build(id, ctx) ?? null;
+  f.cache.set(id, m);
+  if (f.cache.size > f.keep) f.cache.delete(f.cache.keys().next().value);
+  return m;
+}
+/** IC-GRAND: whether a placed model is solid - every model is, but a family's that says otherwise. */
+export const isSolidModel = (id) => !(_models.has(Number(id)) ? false : familyOf(Number(id))?.solid === false);
 
 /** Register a model for `id`: `build(ctx)` answers { positions, normals, uvs, indices, subMeshes, doors }.
  *  ARENA1: `climateFree` - DFU's RuntimeMaterials with ApplyClimate off: the hosts never swap its pictures for the
@@ -30,13 +53,14 @@ export function registerCustomModel(id, build, isOn = () => true, { climateFree 
  *  build. Built once either way. */
 export async function customModelBuilt(id, ctx = null, breathe = null) {
   const m = _models.get(Number(id));
-  if (!m || !m.isOn()) return null;
+  if (!m) { const f = familyOf(Number(id)); return f ? familyModel(f, Number(id), ctx) : null; }   // IC-GRAND: a family's
+  if (!m.isOn()) return null;
   if (m.cached || !breathe || !m.buildSliced) return customModelFor(id, ctx);
   const built = await m.buildSliced(ctx, breathe);
   return (m.cached ??= built);
 }
 /** ARENA1: whether a registered model wears its pictures whatever the climate (RuntimeMaterials, ApplyClimate 0). */
-export const isClimateFreeModel = (id) => !!_models.get(Number(id))?.climateFree;
+export const isClimateFreeModel = (id) => !!(_models.get(Number(id))?.climateFree ?? familyOf(Number(id))?.climateFree);
 /** ARENA1: the texture table a climate-free model is drawn and merged by - empty, so no swap a host made for the
  *  models around it reaches it. Never written. */
 export const NO_CLIMATE_REMAP = new Map();
@@ -44,7 +68,7 @@ export const NO_CLIMATE_REMAP = new Map();
 export const customModelNeeds = (id) => _models.get(Number(id))?.needs ?? [];
 export function unregisterCustomModel(id) { _models.delete(Number(id)); _aliases.delete(Number(id)); }
 
-// WD3 (2026-10-01): A MODEL THAT IS A CLASSIC ONE WITH OTHER PICTURES ON IT. Beautiful Villages' and Beautiful Cities'
+// WD3: A MODEL THAT IS A CLASSIC ONE WITH OTHER PICTURES ON IT. Beautiful Villages' and Beautiful Cities'
 // eighteen beds (42069-42086) are Daggerfall's own three beds (41000-41002) under blankets of six colours; the bundle's
 // meshes are copies of the ARCH3D records, which the port never carries. An ALIAS names the classic model to read out
 // of the player's ARCH3D and the textures to swap on it - `remap`, `"<archive>_<record>"` -> [archive, record] - so the
@@ -72,14 +96,22 @@ export const classicModelIdOf = (id) => customAliasFor(id)?.model ?? Number(id);
 /** The model registered for `id` while its switch is on, built once; else null. */
 export function customModelFor(id, ctx = null) {
   const m = _models.get(Number(id));
-  if (!m || !m.isOn()) return null;
+  if (!m) { const f = familyOf(Number(id)); return f ? familyModel(f, Number(id), ctx) : null; }   // IC-GRAND: a family's
+  if (!m.isOn()) return null;
   return (m.cached ??= m.build(ctx));
 }
-export const hasCustomModel = (id) => !!_models.get(Number(id))?.isOn();
+export const hasCustomModel = (id) => (_models.has(Number(id)) ? !!_models.get(Number(id))?.isOn() : !!familyOf(Number(id)));
+/** IC-STUTTER (IC-STUTTER): whether customModelFor(id) answers without building - a
+ *  registered model built once (or off), a family's kept. @param {number} id */
+export function customModelReady(id) {
+  const m = _models.get(Number(id));
+  if (m) return m.cached != null || !m.isOn();
+  return !!familyOf(Number(id))?.cache.has(Number(id));
+}
 
 /** GetModelData's `false`: a model with nothing in it - no geometry, no doors. */
 export function emptyModel() {
   return { positions: new Float32Array(0), normals: new Float32Array(0), uvs: new Float32Array(0), indices: new Uint32Array(0), subMeshes: [], doors: [] };
 }
 /** Test seam. */
-export function _resetCustomModels() { _models.clear(); _aliases.clear(); }
+export function _resetCustomModels() { _models.clear(); _aliases.clear(); _families.length = 0; }

@@ -1,6 +1,5 @@
 // @ts-check
-// HEARTH1 (2026-09-19, Mac: "Does this version of C&C not let you use
-// braziers as extra campfires to cook from?") - THE WORLD'S OWN FIRES
+// HEARTH1 - THE WORLD'S OWN FIRES
 // ARE FIRES.
 //
 // SURV3 gave the survival law exactly one fire: a camp the player or a
@@ -56,8 +55,7 @@
 // at its foot. `BY_FIRE_REACH` is four metres and swallows the
 // difference whole; the ACTIVATION BOX does not.
 //
-// FIX-D (2026-09-22, Discord: "Fire detected behind a door" - "the
-// torch beside the door, moreso than one behind the door itself"). The
+// FIX-D. The
 // first answer to that was a GUESSED box - 1.2 m square and 2.4 m tall
 // hung off the flame (HEARTH_HALF, HEARTH_DROP) - because the flame was
 // all a hearth carried. A town's brazier torch stands a pace from a

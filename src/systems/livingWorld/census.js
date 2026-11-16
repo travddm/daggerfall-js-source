@@ -1,5 +1,5 @@
 // @ts-check
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE CENSUS - who lives in a town, minted from the town itself.
+// LW1: THE CENSUS - who lives in a town, minted from the town itself.
 //
 // TWO ROLLS, BECAUSE TWO READERS. A traveller is read from far off - the roads near the player, a town a caravan is
 // bound for, the dungeon an adventurer dives - where nothing but the MAPS row is at hand; so a town's TRAVELLERS
@@ -7,17 +7,18 @@
 // (`householdCensus`) are minted from its buildings, read only for the town the player stands in. `townCensus` is the
 // whole town: both, every traveller given a home among the households' houses.
 //
-// A RESIDENT IS A DFU TOWNSPERSON WHO KEEPS THEIR IDENTITY FOR LIFE (LW0 decision 4): RandomiseNPC's own parts -
+// A RESIDENT IS A DFU TOWNSPERSON WHO KEEPS THEIR IDENTITY FOR LIFE: RandomiseNPC's own parts -
 // the climate's people for the billboard - a Redguard region's Redguards (REGIONAL-FOLK, characters/mobile/mobilePerson.js walkerRace;
 // FIELD BUGS 2026-10-10) - (PERSON_TEXTURES, one of four outfits a sex), the talk portrait's record law
 // (PERSON_FACE_RECORDS + one of 24), the region's name bank (MobilePersonNPC.cs:214) - drawn ONCE from the resident's
 // seed instead of at every spawn. The watch rides GUARD_TEXTURE, male, outfit 0 (RandomiseNPC's guard arm). The armed -
-// adventurers, sellswords, couriers - carry a CLASS too (LW0 decision 5): the sprite they wear beyond the walls.
+// adventurers, sellswords, couriers - carry a CLASS too: the sprite they wear beyond the walls.
 //
 // Slot ids are the town's and the slot's: `L<mapId>.<slot>` for a household, `L<mapId>.t<slot>` for a traveller,
 // `L<mapId>.w<slot>` for the watch - the same person for every reader, the key a relation is saved under (relations.js).
 import { PERSON_TEXTURES, PERSON_FACE_RECORDS, NUM_PERSON_FACE_VARIANTS, GUARD_TEXTURE, walkerRace } from '../../characters/mobile/mobilePerson.js';
-import { fullName, getNameBankOfRegion, GENDERS } from '../../characters/nameHelper.js';
+import { fullName, GENDERS } from '../../characters/nameHelper.js';
+import { nameBankOfArea } from '../../characters/areaNameBank.js';   // WW1: an area's people - the region's bank on the Bay
 import { srand, getSeed, setSeed } from '../../formats/dfRandom.js';
 import { BUILDING_TYPES } from '../../world/buildingNames.js';
 import { MOBILE_TYPES } from '../../characters/mobile/mobileTypes.js';
@@ -38,14 +39,14 @@ export const JOBS = Object.freeze({
   labourer: 'labourer', farmer: 'farmer', fisher: 'fisher', crafter: 'crafter', homemaker: 'homemaker', beggar: 'beggar',
   merchant: 'merchant', mercenary: 'mercenary', adventurer: 'adventurer', sailor: 'sailor', pilgrim: 'pilgrim',
   courier: 'courier', pedlar: 'pedlar',
-  // LW9 (bible/06-Systems/Living-World-II.md): the road's new traffic
+  // LW9: the road's new traffic
   carter: 'carter', hunter: 'hunter', patrol: 'patrol', noble: 'noble', retainer: 'retainer', minstrel: 'minstrel',
 });
 /** The jobs that travel (trips.js): the traveller roster's own. */
 export const TRAVELLER_JOBS = Object.freeze(['merchant', 'mercenary', 'adventurer', 'sailor', 'pilgrim', 'courier', 'pedlar']);
 /** LW9: THE ROAD'S NEW TRAFFIC, APPENDED - a traveller's id is `L<mapId>.t<slot>`, dealt in the jobs' order, so a job
- *  anywhere but after every one before it would re-key the regard and the turns of every traveller after it (Living
- *  World II decision 9): these are dealt after TRAVELLER_JOBS' own, in this order. A farm's or a village's CARTER takes
+ *  anywhere but after every one before it would re-key the regard and the turns of every traveller after it:
+ *  these are dealt after TRAVELLER_JOBS' own, in this order. A farm's or a village's CARTER takes
  *  its produce to market; a HUNTER goes into the wild; a city's PATROL keeps the region's roads; its NOBLE goes in
  *  procession with their RETAINERS; its MINSTREL plays the taverns of the towns about. */
 export const ROAD_JOBS = Object.freeze(['carter', 'hunter', 'patrol', 'noble', 'retainer', 'minstrel']);
@@ -72,13 +73,15 @@ export const HUNTER_CLASSES = Object.freeze([MOBILE_TYPES.Archer, MOBILE_TYPES.R
 export const RETAINER_CLASSES = Object.freeze([MOBILE_TYPES.Knight, MOBILE_TYPES.Warrior, MOBILE_TYPES.Archer]);
 
 /**
- * @typedef {{ mapId: number, name?: string, px?: number, py?: number, type?: number, region?: number, people?: number,
- *   blocks: number, w?: number, h?: number, port?: boolean, wild?: boolean }} LwTown - a town as its MAPS row says it:
+ * @typedef {{ mapId: number, name?: string, px?: number, py?: number, type?: number, region?: number, area?: number, people?: number,
+ *   blocks: number, w?: number, h?: number, port?: boolean, wild?: boolean }} LwTown - a town as its MAPS row says it (WW1: or
+ *   a provider past the Bay - `area` what it is grouped by, the region on the Bay and the province past it, `region`
+ *   MapsFile's, -1 past the Bay):
  *   `blocks` its RMB grid's cells, WALL-WAY `w` and `h` the grid's own width (east) and height (north), `people` the climate's (0 Nord, 2 Redguard, 3 Breton), `port` whether ships put in; LW9 `wild` no town - a
  *   hunter's point in the wild (trips.js wildTrip)
  * @typedef {{ key: number, type: number, quality?: number, factionId?: number }} LwBuilding - a building summary's own
  *   columns (world/buildingSummaries.js: buildingKey, buildingType, quality, factionId)
- * @typedef {{ id: string, town: number, slot: number, roll: 'h'|'t'|'w', name: string, gender: number, sex: 'male'|'female',
+ * @typedef {{ id: string, town: number, slot: number, roll: 'h'|'t'|'w'|'q', name: string, gender: number, sex: 'male'|'female',
  *   race: string, variant: number, archive: number, face: number, guard: boolean, job: string, home: number|null,
  *   work: number|null, temper: 0|1|2, social: number, pious: number, drink: number, cls: number|null, level: number,
  *   faction: number, civvies?: number }} Resident - `gender` GENDERS' number (the walkers' own field), `sex` the class
@@ -107,7 +110,7 @@ const DEFAULT_TEMPER = Object.freeze([2, 7, 1]);
  * One resident from the town, the roll, the slot and the job. LW4: `at.gen` - a NEWCOMER to a place the road emptied
  * (lives.js): the cycle of the death they came after, in the seed and the id (`L<map>.t<slot>~<gen>`), so the same
  * place holds the same newcomer for every reader.
- * @param {LwTown} town @param {'h'|'t'|'w'} roll @param {number} slot @param {string} job
+ * @param {LwTown} town @param {'h'|'t'|'w'|'q'} roll @param {number} slot @param {string} job
  * @param {{ home?: number|null, work?: number|null, faction?: number, gen?: number|null }} [at]
  * @returns {Resident}
  */
@@ -115,7 +118,7 @@ export function mintResident(town, roll, slot, job, at = {}) {
   const gen = at.gen ?? null;
   const seed = gen == null ? lwSeed(town.mapId >>> 0, roll.charCodeAt(0), slot) : lwSeed(town.mapId >>> 0, roll.charCodeAt(0), slot, 0x67656e, gen);   // 'gen'
   const rng = seededRng(seed);
-  const race = walkerRace(town.people, town.region);   // REGIONAL-FOLK: a Redguard region's residents are Redguards
+  const race = walkerRace(town.people, town.area ?? town.region);   // REGIONAL-FOLK: a Redguard region's residents are Redguards (WW1: an area's - Hammerfell's past the Bay too)
   const guard = job === 'guard';
   const female = !guard && rng() < 0.5;
   const tables = PERSON_TEXTURES[race] ?? PERSON_TEXTURES.Breton;
@@ -139,7 +142,7 @@ export function mintResident(town, roll, slot, job, at = {}) {
   return {
     id: `L${town.mapId >>> 0}.${roll === 'h' ? '' : roll}${slot}${gen == null ? '' : `~${gen}`}`,
     town: town.mapId >>> 0, slot, roll,
-    name: residentName(seed ^ 0x5eed1e55, getNameBankOfRegion(town.region ?? -1), gender),
+    name: residentName(seed ^ 0x5eed1e55, nameBankOfArea(town.area ?? town.region ?? -1), gender),   // WW1: the area's people - the region's bank on the Bay, the province's past it
     gender, sex: female ? 'female' : 'male', race, variant,
     archive: guard ? GUARD_TEXTURE : set[variant], face, guard, job,
     // WATCH-DAY: a watchman's own clothes, for off duty - one of his people's outfits, drawn on its own stream so the
@@ -252,10 +255,12 @@ export function watchRoster(town) {
  * the palace two of its court. The trades are dealt to the houses' people in a seeded order; a trade left over lives
  * where it works; a house's people left over take the common work of the town (a port's fishing, a village's fields,
  * a city's beggars and labourers). Trimmed to CENSUS_MAX, the common hands first.
- * @param {LwTown} town @param {readonly LwBuilding[]} buildings @returns {Resident[]}
+ * IC-GRAND: `quarter` a town of quarters' other quarter's (places.js): its households minted on their own roll and slots
+ * ('q', the quarter's thousand) off a stream of their own, so no two of a town's people share an identity.
+ * @param {LwTown} town @param {readonly LwBuilding[]} buildings @param {{ quarter?: number }} [o] @returns {Resident[]}
  */
-export function householdCensus(town, buildings) {
-  const rng = seededRng(lwSeed(town.mapId >>> 0, 0x686f));   // 'ho'
+export function householdCensus(town, buildings, { quarter = 0 } = {}) {
+  const rng = seededRng(quarter ? lwSeed(town.mapId >>> 0, 0x686f, quarter) : lwSeed(town.mapId >>> 0, 0x686f));   // 'ho'
   const list = [...(buildings ?? [])].filter((b) => b && Number.isFinite(b.key)).sort((a, b) => a.key - b.key);
   const houses = list.filter((b) => isHome(b.type));
   /** @type {{ job: string, work: number|null, faction: number, livesAt: number|null }[]} */
@@ -308,7 +313,24 @@ export function householdCensus(town, buildings) {
   for (; k < order.length; k++) common.push({ job: commonJob(), home: people[order[k]], work: null, faction: 0 });
   // trimmed: the trades kept whole, the common hands to the cap
   const keep = placed.concat(common.slice(0, Math.max(0, CENSUS_MAX - placed.length)));
-  return keep.map((p, slot) => mintResident(town, 'h', slot, p.job, { home: p.home, work: p.work, faction: p.faction }));
+  return keep.map((p, slot) => mintResident(town, quarter ? 'q' : 'h', quarter * QUARTER_SLOTS + slot, p.job, { home: p.home, work: p.work, faction: p.faction }));
+}
+/** IC-GRAND: a quarter's households' slots begin at its number times this (CENSUS_MAX a quarter at the most). */
+export const QUARTER_SLOTS = 1000;
+/**
+ * IC-GRAND: A TOWN OF QUARTERS' PEOPLE (places.js `quarters`) - its own quarter's as townCensus mints a town's (its
+ * households, its watch, its travellers, homed on its own quarter's doors), and each other quarter's households of that
+ * quarter's buildings alone (householdCensus's `quarter`): each lives and works in its quarter. `opens` each quarter's
+ * buildings (the keys of its door spots), the town's own first; a building of none counts as the town's own quarter's
+ * (a home off the net: always in, as townCensus keeps it).
+ * @param {LwTown} town @param {readonly LwBuilding[]} buildings @param {ReadonlyArray<ReadonlySet<number>>} opens
+ * @returns {Resident[]}
+ */
+export function quarterCensus(town, buildings, opens) {
+  const elsewhere = (/** @type {LwBuilding} */ b) => opens.some((keys, q) => q > 0 && keys.has(b.key));
+  const out = townCensus(town, (buildings ?? []).filter((b) => b && !elsewhere(b)), opens[0]);
+  for (let q = 1; q < opens.length; q++) out.push(...householdCensus(town, (buildings ?? []).filter((b) => b && opens[q].has(b.key)), { quarter: q }));
+  return out;
 }
 
 /**

@@ -397,7 +397,7 @@ export async function loadHudLarge({ fetchBytes, palette, renderer }, entity = n
 let _mwHeadSeq = 0;
 export async function loadHudLargeHead({ fetchBytes, palette, renderer }, entity) {
   try {
-    // PORTRAIT3D (2026-10-15, the owner: "#2 is exactly I wanted", and of the curse's heads: "Do this"): with Morrowind's
+    // PORTRAIT3D: with Morrowind's
     // data attached, the head is the Morrowind head the player's body wears - the vampire's head, the transformed
     // werewolf's, the helm worn - its picture the head rect's own shape at four times its pixels. Where none is drawn
     // (no data, the wereboar - Morrowind has no wereboar; Bloodmoon's boar is a beast) Daggerfall's stand, the curse's override first.

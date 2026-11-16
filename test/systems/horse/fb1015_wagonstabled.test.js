@@ -5,7 +5,7 @@
 // the next door and stands a WithPlayer horse behind the player there. The record now carries two words of the port's
 // own (WagonStabled, HorseStabled - horseCartLaw.js newSaveData): set by Send away, let go by a summon, a park, a mount,
 // a record laid afresh, a new game or a load. All through the REAL runtime over test/hccWorld.mjs, the Stable page's
-// words off its real view, the save round-tripped as JSON. bible/03-World/Holdings.md section 2 (WAGON-STABLED).
+// words off its real view, the save round-tripped as JSON. (WAGON-STABLED).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { makeWorld } from '../../hccWorld.mjs';

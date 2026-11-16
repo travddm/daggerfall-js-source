@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEAT1a (2026-09-30, Mac: "Finish the seats") — THIS DEVICE'S SEATS:
+// SEAT1a — THIS DEVICE'S SEATS:
 // whether the seats are open to this account (the service's SEATS_OPEN),
 // the seats the witnesses confirmed as the service last said them, and
 // the seat this client stands in reported once a UTC day
-// (bible/11-Multiplayer/Seats-Arc.md 3.2: "A client standing in a seat
+// (3.2: "A client standing in a seat
 // town online reports {key, name, region, tier, pixel} once a day").
 //
 // A seat is DRAWN off the client's own derivation (systems/town/townSeats.js):
@@ -24,13 +24,13 @@
 //
 // Pure - the door, the storage and the clock are handed in.
 // ═══════════════════════════════════════════════════════════════════
-import { SEAT_REPORT_EVERY_S, SEAT_WATCH_CLAIM_MAX, seatReportOf, seatKeyOk, EDICTS, siegeWindowText, seatWeekOf, seasonOf, guildWords } from './townSeatLaw.js';
+import { SEAT_REPORT_EVERY_S, SEAT_WATCH_CLAIM_MAX, seatReportOf, seatKeyOk, EDICTS, siegeWindowText, seatWeekOf, guildWords } from './townSeatLaw.js';
 import { accountRefusalText } from './accountClient.js';
 import { readWatchReceipt } from './watchReceipt.js';
 import { mintMarksRid } from './marksBook.js';
-import { tideAt } from './tideLaw.js';   // SEASON1 part two: the Tides
 import { fortWork, towersText } from './fortLaw.js';   // SEAT2b: the works; part two: the Watchtowers' word
 import { jittered } from './backoff.js';   // STORM-SHED: a failed claim's wait, jittered as every book's is
+import { seatPixelTest } from '../systems/town/townSeats.js';   // DOMAIN3: the Watch's pixels off the derivation the book is handed
 
 /** How long a list read is kept before the next is asked, ms. */
 export const SEAT_LIST_CACHE_MS = 5 * 60_000;
@@ -51,7 +51,7 @@ export const SEAT_WATCH_KEY = 'seat1.watch';
 export const SEAT_WATCH_HELD_MAX = 60;
 /** SEAT1b: the longest a held receipt waits before the kept ones are claimed, ms. */
 export const SEAT_WATCH_CLAIM_EVERY_MS = 10 * 60_000;
-/** STORM-SHED (2026-10-06 evening, the account service overloaded a second time - "D1 DB is overloaded"): HOW LONG A
+/** STORM-SHED: HOW LONG A
  *  WATCH CLAIM THAT FAILED WAITS BEFORE THE NEXT, ms - doubling with each failure in a row to SEAT_WATCH_CLAIM_EVERY_MS,
  *  jittered (net/backoff.js), and an answer lets it go. The claim is asked each frame and keeps its receipts through a
  *  failure, so the frame after a failed answer claimed again: in the outage's two hours /v1/seats/watch was asked 5,587
@@ -62,7 +62,7 @@ export const SEAT_RED_SEEN_KEY = 'crown2.redSeen';
 export const SEAT_RED_SEEN_MAX = 100;
 /** CROWN2: how often an online client reads the seats' list again for the server's red lines, ms. */
 export const SEAT_RED_READ_MS = 15 * 60_000;
-/** D1-LOAD (2026-10-11, the service slow after SEAT-LEASE): THE TURNING'S READ SPREAD - each client asks its list once the
+/** D1-LOAD: THE TURNING'S READ SPREAD - each client asks its list once the
  *  seat week turns (AUDIT FESTIVAL S1), and every client online asked it in the same second; each now waits its own
  *  share of this window, drawn once a book, so the reads arrive over two minutes. */
 export const SEAT_TURN_READ_SPREAD_MS = 120_000;
@@ -118,15 +118,18 @@ export function parseSiegeCommand(text) {
  *   nowMs?: () => number,
  *   me?: () => (string|null), character?: () => (string|null), rid?: () => string,
  *   isSeatPixel?: (x: number, y: number) => boolean, relayNowS?: () => (number|null),
+ *   seats?: { list: any[], powers?: Map<number, number> }|null,
  *   onRed?: ((line: { text: string, at: number }) => boolean)|null,
  *   rand?: () => number, turnMs?: number,
  * }} deps SEAT1b: `me` the signed-in account's id, `character` the character standing here, `rid` a fresh request id
  *   (the Marks' own shape), `isSeatPixel` whether this client's own derivation holds a seat at a map pixel, `relayNowS`
  *   the relay's clock (null unheard - a receipt's life is the relay's); CROWN2: `onRed` says a red line (false: not yet);
  *   STORM-SHED: `rand` Math.random's shape, a failed Watch claim's jitter; DAY-TURN: `turnMs` this page's moment past
- *   midnight (net/dayTurn.js)
+ *   midnight (net/dayTurn.js);
+ *   DOMAIN3: `seats` this client's own derivation (systems/town/townSeats.js deriveTownSeats) - its seats' pixels (the
+ *   Watch's, where `isSeatPixel` is not handed) and each region's seat of power, reported beside a seat (`witness`)
  */
-export function createTownSeatBook({ door, storage = null, nowMs = () => Date.now(), me = () => null, character = () => null, rid = () => mintMarksRid(), isSeatPixel = () => false, relayNowS = () => null, onRed = null, rand = Math.random, turnMs = 0 }) {
+export function createTownSeatBook({ door, storage = null, nowMs = () => Date.now(), me = () => null, character = () => null, rid = () => mintMarksRid(), seats = null, isSeatPixel = seats ? seatPixelTest(seats) : () => false, relayNowS = () => null, onRed = null, rand = Math.random, turnMs = 0 }) { 
   const turnSpreadMs = Math.floor(rand() * SEAT_TURN_READ_SPREAD_MS);   // D1-LOAD: this client's share of the Turning's read
   /** CROWN2: the red lines already said, by id - read from the device once */
   let redSeen = null;
@@ -182,7 +185,7 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
   const recordsAt = new Map();
   /** @type {{ ask: string, rid: string }|null} */
   let tributeAsk = null;
-  /** SEAT2b: a project begun - its ask and its one request id, as the Tribute's */
+  /** SEAT2b: a tier raised or a camp pitched - its ask and its one request id, as the Tribute's */
   /** @type {{ ask: string, rid: string }|null} */
   let fortAsk = null;
   /** SEAT2b part two: the Watchtowers' words already said (`week:seat:guild:share`), read from the device once, and the
@@ -242,7 +245,8 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (r?.ok) {
         open = true; data = r.data;
         states = new Map((data?.seats ?? []).map((s) => [s.key, s.state]));
-        dress = new Map((data?.seats ?? []).map((s) => [s.key, { holder: s.holder ?? null, battle: s.battle ?? null, forts: s.forts ?? null }]));   // SEAT2b part two: its works standing
+        dress = new Map((data?.seats ?? []).map((s) => [s.key, { holder: s.holder ?? null, battle: s.battle ?? null, forts: s.forts ?? null,   // SEAT2b part two: its works standing
+          ...(s.domain ? { domain: true } : {}), ...(s.charter != null ? { charter: s.charter } : {}), listed: s }]));   // DOMAIN3: a seat of power, a holding's Charter
         sayRed(data?.red);   // CROWN2: the server's red lines, each said once
         return { data, error: null };
       }
@@ -262,7 +266,17 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
     get data() { return data; },
     /** SEAT1c: a seat this client derived, dressed in what the service last said of it - its holder and this week's battle
      *  there (both null for an unheld, quiet one, or a seat not read yet). */
-    dressed: (seat) => (seat ? { ...seat, holder: dress.get(seat.key)?.holder ?? null, battle: dress.get(seat.key)?.battle ?? null, forts: dress.get(seat.key)?.forts ?? null } : null),   // SEAT2b part two: and its works
+    dressed: (seat) => {
+      if (!seat) return null;
+      const d = dress.get(seat.key);
+      const out = { ...seat, holder: d?.holder ?? null, battle: d?.battle ?? null, forts: d?.forts ?? null };   // SEAT2b part two: and its works
+      // DOMAIN3 (Domains.md section 7): a seat of power named for its region; a HOLDING dressed in its Charter as the list
+      // says it (`charterSeat`) - its war, its Edicts and its members' discount are its Charter's
+      if (d?.domain) out.domain = true;
+      const c = d?.charter != null ? dress.get(d.charter)?.listed : null;
+      if (c) out.charterSeat = c;
+      return out;
+    },
     /** SEAT1c: the guildmaster gives up a Charter at its board - `{ ok, text }`, the list and standings read afresh after. */
     async relinquish(seat) {
       let r;
@@ -283,7 +297,9 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (t[String(s.key)] === dayNow()) return false;
       t[String(s.key)] = dayNow();
       writeReported(t);
-      try { await door.witness(s); } catch { /* the next day asks again */ }
+      // DOMAIN3: and the region's seat of power as this client's own MAPS.BSA ranks it (deriveTownSeats `powers`)
+      const power = seats?.powers?.get(s.region);
+      try { await door.witness(s, power == null ? undefined : { region: s.region, key: power }); } catch { /* the next day asks again */ }
       return true;
     },
     // ─── SEAT1d: THE HOLDER'S LEVERS, A BOUNTY'S CAMP ───────────────
@@ -371,7 +387,7 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       const d = r.data ?? {};
       return { ok: true, counted: !!d.counted, wins: Number(d.wins ?? 0) };
     },
-    // ─── CROWN2: FEALTY AND PACTS ────────────────────────────────────
+    // ─── CROWN2: PACTS ────────────────────────────────────────────
     /** One act on this guild's crown politics - `{ ok, text }`, the standings read afresh after it. */
     async politicsAct(ask, said) {
       let r;
@@ -379,27 +395,11 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       standingsAt.clear();
       return r?.ok ? { ok: true, text: said(r.data ?? {}) } : { ok: false, text: accountRefusalText(r?.error) };
     },
-    /** Fealty offered to the guild tagged `tag` - `as` 'vassal' (this guild swears to it) or 'liege' (takes it as vassal). */
-    offerFealty(tag, as) {
-      return this.politicsAct(() => door.fealty(character(), tag, as), () => (as === 'vassal' ? `Your guild offers to swear fealty to <${tag}>.` : `Your guild offers to take <${tag}> as its vassal.`));
-    },
-    /** The fealty <tag> offered, accepted - sworn from this week. */
-    acceptFealty(tag) {
-      return this.politicsAct(() => door.fealtyAccept(character(), tag), () => `The fealty with <${tag}> is sworn.`);
-    },
-    /** This guild's fealty with <tag> broken at the next Turning (a vassal's needs no tag) - or its offer withdrawn. */
-    breakFealty(tag) {
-      return this.politicsAct(() => door.fealtyBreak(character(), tag), (d) => (d.withdrawn ? 'Your guild\'s offer of fealty is withdrawn.' : 'The fealty ends at the Turning. Your guild loses 10 Standing at each seat it holds.'));
-    },
     /** A Pact offered to <tag>, or its offer signed. */
     offerPact(tag) {
       return this.politicsAct(() => door.pact(character(), tag), (d) => (d.signed ? `The Pact with <${tag}> is signed, until week ${d.until}.` : `Your guild offers <${tag}> a Pact of non-aggression.`));
     },
     /** The Pact with <tag> broken (a signed one is announced to everyone in red) - or its offer withdrawn. */
-    /** AUDIT-SEATS: the offer of fealty the guild tagged `tag` made to this one, declined. */
-    declineFealty(tag) {
-      return this.politicsAct(() => door.fealtyBreak(character(), tag), (d) => (d.declined ? `The offer of fealty from <${tag}> is declined.` : d.withdrawn ? 'Your guild\'s offer of fealty is withdrawn.' : 'The fealty ends at the Turning. Your guild loses 10 Standing at each seat it holds.'));
-    },
     /** AUDIT-SEATS: the offer of a Pact the guild tagged `tag` made to this one, declined (an unsigned offer's break). */
     declinePact(tag) {
       return this.politicsAct(() => door.pactBreak(character(), tag), (d) => (d.announced ? `Your guild has broken its Pact with <${tag}>. Everyone has been told.` : `The offer of a Pact from <${tag}> is declined.`));
@@ -418,24 +418,9 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       // D1-LOAD: this client's share of SEAT_TURN_READ_SPREAD_MS past the boundary - never every client in one second
       else if (!pending && open === true && seatWeekOf(at) !== seatWeekOf(nowMs() - turnSpreadMs)) read({ force: true });
     },
-    // ─── SEASON1 part two: THE TIDES AS THIS CLIENT READS THEM ───────
+    // ─── SEASON1 part two: SEASON ZERO AS THIS CLIENT READS IT ───
     /** The week Season 0 began, as the seats' list last said - or null (no Season counted: every land is Calm). */
     get zero() { return Number.isSafeInteger(data?.zero) ? data.zero : null; },
-    /** The Tide at `region` this seat week, while the seats are open to this account and a Season is counted - else Calm. */
-    tideAt(region) {
-      if (open !== true) return 'calm';
-      const week = seatWeekOf(nowMs());
-      return tideAt(week, region, !!seasonOf(week, this.zero));
-    },
-    /** An Orc Raid's camp cleared in `region` - its influence for this character's guild where the Tide is Orc Raids.
-     *  Quiet: `{ counted }`. */
-    async orcCamp(site, region) {
-      if (open !== true) return { counted: false };
-      let r;
-      try { r = await door.orcCamp(character(), site, region); } catch { r = { ok: false, error: 'offline' }; }
-      if (r?.ok) standingsAt.clear();
-      return { counted: !!(r?.ok && r.data?.counted) };
-    },
     /** A World of Daggerfall camp cleared in `region` - the Bounty's twenty Drakes where one rules there. Quiet: `{ paid }`. */
     async bounty(site, region) {
       if (open !== true) return { paid: 0 };
@@ -472,20 +457,20 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (SHUT.includes(r?.error)) open = false;
       return { data: null, error: r?.error ?? 'server' };
     },
-    /** SEAT2b (Seats-Arc 7.9): A SEAT'S WORKS (`/v1/seats/forts`) - each work's tier and the project raising it, and the
-     *  stockpile, `{ data: { works, stockpile }, error }`. Read afresh each time the tab is: a delivery moves it. */
+    /** SEAT2b (Seats-Arc 7.9): A SEAT'S WORKS (`/v1/seats/forts`) - each work's tier, `{ data: { works }, error }`. Read afresh
+     *  each time the tab is. */
     async forts(key) {
       if (open !== true) return { data: null, error: 'seats-closed' };
       let r;
       try { r = await door.forts(key); } catch { r = { ok: false, error: 'offline' }; }
-      if (r?.ok) return { data: { works: r.data?.works ?? {}, stockpile: Array.isArray(r.data?.stockpile) ? r.data.stockpile : [] }, error: null };
+      if (r?.ok) return { data: { works: r.data?.works ?? {} }, error: null };
       if (SHUT.includes(r?.error)) open = false;
       return { data: null, error: r?.error ?? 'server' };
     },
-    /** SEAT2b (7.5): a project begun on `work` at `seat` - its tier's Drakes burnt from the holder's treasury (an Officer's
-     *  or the guildmaster's), `port` whether DFU names the town a port (a Harbour's ask). `{ ok, text, forts }`. ONE
-     *  REQUEST ID A PROJECT, as the Tribute's: the same work asked again after an answer that never came carries the same
-     *  id, and the service answers it `repeat` rather than burning twice. */
+    /** SEAT2b (7.5): the next tier of `work` raised at `seat` - its Marks burnt from the holder's treasury (an Officer's or the
+     *  guildmaster's), `port` whether DFU names the town a port (a Harbour's ask). `{ ok, text, forts }`. ONE REQUEST ID A
+     *  TIER, as the Tribute's: the same work asked again after an answer that never came carries the same id, and the
+     *  service answers it `repeat` rather than burning twice. */
     async fortFund(seat, work, port = false) {
       const ask = `${seat.key}:${work}`;
       if (fortAsk?.ask !== ask) fortAsk = { ask, rid: rid() };
@@ -497,8 +482,21 @@ export function createTownSeatBook({ door, storage = null, nowMs = () => Date.no
       if (!r?.ok) return { ok: false, text: accountRefusalText(r?.error) };
       const name = fortWork(work)?.name ?? 'work';
       const forts = r.data?.forts ?? null;
-      if (r.data?.repeat) return { ok: true, text: `Work on the ${name} at ${seat.name} was already begun.`, forts };
-      return { ok: true, text: `Work on the ${name} at ${seat.name} is begun toward grade ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} silver from the treasury. Seat writs deliver what they need.`, forts };
+      if (r.data?.repeat) return { ok: true, text: `Already raised: the ${name} at ${seat.name}.`, forts };
+      return { ok: true, text: `Raised the ${name} at ${seat.name} to tier ${r.data?.tier}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} Marks from the treasury.`, forts };
+    },
+    /** A Siege Camp pitched at `seat`, where this guild pledged it this week (an Officer's or the guildmaster's) - its Marks
+     *  burnt from the treasury, once; `{ ok, text }`. ONE REQUEST ID A CAMP, as a tier's. */
+    async camp(seat) {
+      const ask = `camp:${seat.key}`;
+      if (fortAsk?.ask !== ask) fortAsk = { ask, rid: rid() };
+      const id = fortAsk.rid;
+      let r;
+      try { r = await door.camp(character(), seat.key, id); } catch { r = { ok: false, error: 'offline' }; }
+      if (r?.ok || (r?.error && !['offline', 'server', 'timeout'].includes(r.error))) { if (fortAsk?.rid === id) fortAsk = null; }
+      standingsAt.clear();
+      if (!r?.ok) return { ok: false, text: accountRefusalText(r?.error) };
+      return { ok: true, text: r.data?.repeat ? `The Siege Camp at ${seat.name} was already pitched.` : `A Siege Camp is pitched at ${seat.name}: ${Number(r.data?.marks ?? 0).toLocaleString('en-US')} Marks from the treasury. It brings its Rams if your guild wins the Right of Siege.` };
     },
     /** A pledge to `seat` for this week (an Officer's or the guildmaster's) - `{ ok, text }`, the standings read afresh after. */
     async pledge(seat) {

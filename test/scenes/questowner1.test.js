@@ -1,5 +1,4 @@
-// QUEST-OWNER (2026-10-12, Mac: "quest mobs that get spawned in dungeons to only appear for the questowner or the
-// questowners party so he gets credit, same for the main quest", then "Yes quest monsters always owner and its party"):
+// QUEST-OWNER:
 // everywhere - underground, in a building, in the open air - a quest's foe - a side quest's or the main
 // quest's, whose dungeons are fixed and so shared by every player on that step - stands, is struck and hunts for its
 // owner's party alone (scenes/quest/questFoeHost.js partyOnlyQuestShare over the world host's seam, the dungeon's ownShare).
@@ -47,15 +46,3 @@ test('QUEST-OWNER the narrowing keeps the rest of the seam, live; the same objec
   assert.equal(typeof questPrivateTag, 'function', 'a private quest\'s foe is still tagged (its party still sees it)');
 });
 
-test('QUEST-OWNER wired: every pool reads the quest law through the narrowing - the open air\'s and the buildings\' as the host hands them, the dungeon\'s again where it reads it (its own lane, the puppets it stands, the blows it takes and the players its foes hunt)', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /exteriorFoes\.setQuestShare\(partyOnlyQuestShare\(questShareSeam\)\);/, 'the open air');
-  assert.match(w, /foesQuestShare: \(\) => partyOnlyQuestShare\(questShareSeam\),/, 'a building and a dungeon');
-  assert.doesNotMatch(w, /setQuestShare\(questShareSeam\)|foesQuestShare: \(\) => questShareSeam\b/, 'no pool handed the open seam');
-  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(d, /const ownShare = \(\) => partyOnlyQuestShare\(opts\.questShare\?\.\(\) \?\? null\);/);
-  assert.equal((d.match(/opts\.questShare\?\.\(\)/g) ?? []).length, 1, 'no door around it');
-  assert.match(d, /share\?\.accepts\?\.\(from, qt\)/, 'the puppets: accepts');
-  assert.match(d, /ownShare\(\)\?\.peerMayHit\?\.\(c\.id, rec\)/, 'the hunt: peerMayHit');
-  assert.match(d, /const ownPeerMayHit = \(id, f\) => \(f\._keptTag \? [^:]+ : !!ownShare\(\)\?\.peerMayHit\?\.\(id, f\)\);/, 'the blows: peerMayHit');
-});

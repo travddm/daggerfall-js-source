@@ -28,11 +28,12 @@ import { SOCIAL_GROUP_COUNT, FACTION_TYPES, SOCIAL_GROUPS, GUILD_GROUPS } from '
 import { racialSuppressCrime } from '../lycanthropy.js';   // V4: SuppressCrime's inline gate (court.js imports this module)
 import { CRIMES } from '../crimes.js';   // GUARD1: the enum's leaf home - reachable from BOTH sides of the court/talk cycle
 import { tallyCrimeGuildRequirements } from '../crimeGuilds.js';   // CG2: a leaf, so this module can reach it
-import { dressTempleBonus } from '../clothingStanding.js';   // DRESS1 (2026-09-30, Discord): the temple half of the clothing reaction, a leaf
+import { dressTempleBonus } from '../clothingStanding.js';   // DRESS1: the temple half of the clothing reaction, a leaf
 import { calculatePickpocketingChance, dice100 } from '../../combat/formulas.js';
 import { skillValue, tallySkill, SKILLS } from '../skills.js';
 import { addGoldPieces } from '../inventory.js';   // E4: the pinched purse lands in the counter
 import { longitudeLatitudeToMapPixel } from '../../formats/mapsFile.js';   // wave 26: the compass law
+import { REGION_NAMES } from '../../formats/mapsTables.js';   // BAY-LEFT-B: the compass law's regions are the world's
 
 // PlayerActivate constants. AUDIT 24 (wave 23): these were a SECOND
 // declaration of PlayerActivate.cs:76-88, written out as bare
@@ -178,15 +179,21 @@ export function buildingCompassDirection({
  *  the y axis is INVERTED before the hint, because map pixels grow
  *  southwards while the hint's bands are drawn on a normal y-up plane.
  *
+ *  BAY-LEFT-B (B3): the region is bounded by the world's regions
+ *  (formats/mapsTables.js REGION_NAMES - the Bay's 62 and the provinces'
+ *  62..70, WW-R), where DFU's MapFileReader.RegionCount is the Bay's: a
+ *  province's region reads its table off the quest layer's maps
+ *  (scenes/questWorld.js), and a site past the Bay names its direction.
+ *
  *  @param {object} deps
  *  @param {function():{x:number,y:number}} deps.playerMapPixel
- *  @param {object} deps.maps  the MapsFile reader
+ *  @param {object} deps.maps  the MapsFile reader - the quest layer's, a province's region its table
  *  @param {string} locationName
  */
 export function locationCompassDirection({ playerMapPixel, maps }, locationName) {
   const player = playerMapPixel?.() ?? { x: 0, y: 0 };
   let region = (maps?.getPoliticIndex?.(player.x, player.y) ?? 0) - 128;
-  if (region < 0 || region >= (maps?.regionCount ?? 0)) region = -1;
+  if (region < 0 || region >= REGION_NAMES.length) region = -1;
   const dfRegion = maps?.getRegion?.(region) ?? null;
   const names = dfRegion?.mapNames ?? [];
   const wanted = String(locationName ?? '').toLowerCase();
@@ -293,7 +300,7 @@ export function getReactionToPlayer(faction, player) {
   const sgroup = faction.sgroup;
   if (sgroup >= 0 && sgroup < player.reactionMods.length) reaction += player.reactionMods[sgroup];
   if (sgroup >= 0 && sgroup < player.sGroupReputations.length) reaction += player.sGroupReputations[sgroup];
-  reaction += dressTempleBonus(faction, player);   // DRESS1 (2026-09-30, Discord "temple-specific robes with a positive buff for that temple faction"): a port addition, 0 unless priest(ess) robes are worn and the faction is a Temple
+  reaction += dressTempleBonus(faction, player);   // DRESS1: a port addition, 0 unless priest(ess) robes are worn and the faction is a Temple
   return reaction;
 }
 

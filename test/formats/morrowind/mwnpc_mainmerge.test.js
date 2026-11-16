@@ -1,4 +1,4 @@
-// MW-NPC x MAIN (2026-10-10, the arc's merge of main #723-#744 - bible/04-Characters/Morrowind-NPCs.md section 22):
+// MW-NPC x MAIN:
 // what main learned while the arc was on its branch, met on the merged tree. MWNPC1 moved every third-person body's
 // skin into the vertex shader, and three of main's slices since do per-pose work on the CPU skin that the GPU's pose
 // never ran: MW-SMOOTH lights a mesh by its own normals, posed (pinned with the stream's law in
@@ -130,7 +130,7 @@ test('MW-BOW1 x MWNPC1: the rig - a third-person body whose part moved on its ow
 
 const GEAR = [['w_claymore_daedric_sh.nif', 'Bip01 LongBladeTwoClose'], ['w_iron_longsword_sh.nif', 'Bip01 LongBladeOneHand']];
 // MW-CAPE-RIGID: the cloak rides the chest alone, so a stride moves none of it and turns no gear - the chest leant back
-// swings its hem onto the hip-hung sword (PIN MOVED: these were the two strides)
+// swings its hem onto the hip-hung sword (
 const LEANS = [{ 'bip01 spine2': -10 }, { 'bip01 spine2': -5 }];
 
 test('AUDIT MW-CLOAK x MWNPC1: a cloak whose batch was replaced skins by another batch, so its layout is not the old one\'s; and the gear goes with the cloak on a GPU pose as on a CPU one - placed by the palette where the CPU places it, the cloak alone skinned for it', async () => {
@@ -219,25 +219,9 @@ test('WAGONS2 x MWNPC5c: a companion drawn grown on a wagon under the Overworld 
   assert.deepEqual(lane.offered, [seated.uid], 'on the ground at its seat: its body');
 });
 
-test('RW1 x MWNPC8b/8c: the view out through a building\'s glass draws no Morrowind body, so every flat it draws is shown - a standing person\'s never left cast-only by the street frame\'s last mark (by source: both exterior hosts\' view outs; the interiors\' host draws its exterior host\'s, and a dungeon has no glass)', () => {
-  const world = rd('src/scenes/world.js');
-  const out = world.slice(world.indexOf('  const drawOutsideStreet = (r, planes) => {'), world.indexOf('  const outsideView = () => ({'));
-  assert.match(out, /fb\.origin = t;\n(\s*\/\/[^\n]*\n)*\s*fb\.castOnly = false;\n\s*flats\.push\(fb\);/, 'world.js: each flat shown before it joins the view out\'s draw');
-  assert.ok(out.indexOf('fb.castOnly = false;') < out.indexOf('r.drawBillboards(flats'), 'and before the draw');
-  const ext = rd('src/scenes/exterior.js');
-  const extOut = ext.slice(ext.indexOf('  const outsideView = () => ({'), ext.indexOf('  var modes = createWorldModes({'));
-  assert.match(extOut, /const flats = billboardBatches\.filter\([^\n]*\n\s*for \(const b of flats\) b\.castOnly = false;[^\n]*\n\s*if \(flats\.length\) r\.drawBillboards\(flats,/, 'exterior.js: the same');
-  // the people are in what the view outs draw: the street's standing people's batches are the pixel's (world.js) and the
-  // town's (exterior.js) flats - so a mark left on them is a person missing from the glass
-  assert.match(world, /pn\.standBatch = batch;\n\s*entry\.npcBatches\.push\(batch\);\n\s*entry\.batches\.push\(batch\);/);
-  assert.match(ext, /billboardBatches\.push\(batch\);\n\s*flatCount\+\+;\n\s*person\.standBatch = batch;/);
-  assert.match(rd('src/scenes/worldModes.js'), /scene: host\.outsideView\?\.\(/, 'the interiors draw their exterior host\'s view out');
-  assert.doesNotMatch(rd('src/scenes/dungeonContext.js'), /outsideView/, 'a dungeon has none');
-});
-
 test('ORG2 x MWNPC5b: the Morrowind People row stands on the one Settings screen, in Combat\'s Morrowind section beside the Steel Helm and the spell effects', () => {
   const at = whereIs('feat:mw-npc-bodies');
   assert.equal(at?.tab.id, 'combat');
   assert.equal(at.section.id, 'morrowind');
-  assert.deepEqual(at.section.items, ['feat:mod-weapon-sheathing', 'feat:steel-helm', 'feat:beast-footwear', 'feat:beast-helmets', 'feat:mw-spell-effects', 'feat:mw-body-motion', 'feat:mw-npc-bodies', 'feat:mw-billboard-look', 'feat:mw-model-detail', 'feat:npc-marks']);   // PIN MOVED (BEAST-BOOTS, 2026-10-24): Beast Footwear and Beast Helmets beside the Steel Helm; PIN MOVED (BODY-MOTION, 2026-10-18): the Morrowind Body Motion beside the spell effects; PIN MOVED (BODY-CARD): the Billboard Look beside Morrowind People; PIN MOVED (NPC-MARKS, 2026-10-21): the People Marks after them; PIN MOVED (MW-DETAIL, 2026-10-22): the Morrowind Model Detail beside the Billboard Look
+  assert.deepEqual(at.section.items, ['feat:mod-weapon-sheathing', 'feat:steel-helm', 'feat:beast-footwear', 'feat:beast-helmets', 'feat:mw-spell-effects', 'feat:mw-body-motion', 'feat:mw-npc-bodies', 'feat:mw-billboard-look', 'feat:mw-model-detail', 'feat:npc-marks']);
 });

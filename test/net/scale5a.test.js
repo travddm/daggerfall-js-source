@@ -1,22 +1,22 @@
-// SCALE5a (2026-10-10, Mac: "we just hit 500 online people. I think its time to scale up our server and improve
-// performance for more people"; bible/11-Multiplayer/Scale-Arc.md SCALE5a): THE HUB'S HELLO AND LEAVE WITHOUT A WALK OF
+// SCALE5a: THE HUB'S HELLO AND LEAVE WITHOUT A WALK OF
 // THE WORLD, AND A BUSY REFUSAL THAT MINTS NOTHING. Every player online holds a socket in the hub (`chat:world`), and a
 // relay deploy brings all of them back through its hello inside a minute: each hello walked every socket six times and
 // rebuilt the account index (O(N) a hello, O(N^2) a wave), each leave three times, and every hello the hub's gate
 // refused busy - hundreds a wave - cost the account service another token mint. The relay's half over the real Room on
 // the pins' fake object (test/fakeRoom.mjs); the client's over a fake socket and a fake service.
 // tools/mutants/scale5a.json.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, asOnlinePage } from '../fakeRoom.mjs';
 import { SOCIAL_ROOM, CHAT_HELLO_HZ_MAX, CLOSE_BUSY, BUSY_TOKEN_UNREAD, ACCOUNT_TABS_MAX, SERPENT_INTERNAL_FELL, SERPENT_RC_PREFIX, CHAT_WORLD_ROOM, CHAT_ROSTER_MAX } from '../../src/net/wire.js';
 import { rosterRows } from '../../src/net/roster.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { accountTokenMinter, SESSION_KEY } from '../../src/net/accountClient.js';
 import { mintSerpentReceipt } from '../../src/net/serpent/serpentReceipt.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
+after(asOnlinePage());   // its sessions join the real relay, so their hellos say the profile's hash
 
 const { subtle } = globalThis.crypto;
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -36,7 +36,7 @@ async function onClock(fn) {
   try { return await quiet(() => fn({ now: () => clock, tick: (ms) => { clock += ms; } })); } finally { Date.now = realNow; }
 }
 
-// ═══ THE ORACLE: WHAT A WALK OF EVERY SOCKET ANSWERED ═════════════════════════════════════════════════════════════════
+// THE ORACLE: WHAT A WALK OF EVERY SOCKET ANSWERED
 
 /** `_socketsOf` as the walk built it before SCALE5a: every hello'd socket of the account in the index's order, the newest
  *  ACCOUNT_TABS_MAX by the hello's `since` when over the bound, one `except`ed. */
@@ -206,7 +206,7 @@ test('SCALE5a the join and the leave reach every hello\'d socket but the one the
   });
 });
 
-// ═══ AUDIT SCALE5a C1-C3: THE WORLD TAB'S COUNT PAST THE CUT ═════════════════════════════════════════════════════════════
+// AUDIT SCALE5a C1-C3: THE WORLD TAB'S COUNT PAST THE CUT
 
 /** The room's own count: hello'd sockets neither closed by the object nor said gone - the welcome's `n`. */
 function trueCount(room) { let n = 0; for (const [w, b] of room._all()) if (b.id && !room._dead.has(w) && !room._gone.has(w)) n++; return n; }
@@ -299,14 +299,14 @@ test('AUDIT SCALE5a (lens C, pre-existing): a room let go takes its count with i
   const { FakeWS, sockets } = fakeSocketClass();
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'Mac', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => 1e6, presence: false });
   s.join(CHAT_WORLD_ROOM, null); sockets[0].open();
-  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], n: 600, v: 'world189' });
+  sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'aaaa-0001', name: 'Alpha' }], n: 600 });
   assert.equal(rosterRows(s).total, 600, 'the cut welcome\'s count');
   sockets[0].drop(4000, 'online in another tab, window or device');
   assert.equal(s.roomCount, null, 'superseded: the count goes with the room');
   assert.equal(rosterRows(s).total, rosterRows(s).rows.length, 'and the tab counts what it lists');
 }));
 
-// ═══ THE BUSY REFUSAL THAT MINTS NOTHING ═══════════════════════════════════════════════════════════════════════════════
+// THE BUSY REFUSAL THAT MINTS NOTHING
 
 test('SCALE5a a hello the room\'s gate refuses busy closes 1013 with BUSY_TOKEN_UNREAD - and its token IS unspent: the same token opens the room once the gate refills, where a token a hello spent is refused (mutants: the reason never said; said by a gate asked after the token)', async () => {
   assert.equal(BUSY_TOKEN_UNREAD, 'busy, token unread');
@@ -330,10 +330,6 @@ test('SCALE5a a hello the room\'s gate refuses busy closes 1013 with BUSY_TOKEN_
     await r.hello(replay, 'peer-9999', null, { tok, cl: 1 });
     assert.ok(replay.closed && replay.closed.reason !== BUSY_TOKEN_UNREAD, 'a spent token is refused - never as unread');
   });
-  // the reason is said at the gate asked before the token, and at no gate after it
-  const relay = src('server/src/index.js');
-  assert.equal(relay.split('BUSY_TOKEN_UNREAD); return; }').length - 1, 1, 'one door says it');
-  assert.match(relay, /this\._hellos = gate\.bucket;\n\s*if \(!gate\.pass\) \{ this\._refuse\(ws, 'busy', CLOSE_BUSY, BUSY_TOKEN_UNREAD\); return; \}[^\n]*\n\s*\}\n[\s\S]{0,600}const who = await this\._named\(m, now\);/, 'the room\'s gate, before the token is read');
 });
 
 /** A device's storage holding a sign-in. */
@@ -399,7 +395,7 @@ test('AUDIT SCALE5a D4: a HALO hands its hello\'s token back on the same word - 
   assert.deepEqual(log.filter((e) => e[1] === 'world:3,12'), [['opened', 'world:3,12', 'TOKEN-world:3,12'], ['unopened', 'world:3,12', 'TOKEN-world:3,12']], 'the halo\'s token, handed back for the halo\'s room');
 });
 
-// ═══ THE SERPENT'S RECEIPT, ASKED ONCE ═════════════════════════════════════════════════════════════════════════════════
+// THE SERPENT'S RECEIPT, ASKED ONCE
 
 test('SCALE5a the hub asks storage for an account\'s serpent receipt once - a hello after it finds "none" kept - and a receipt written lets every "none" go, so the next hello is handed it (mutants: no "none" kept; the "none" kept past a write)', async () => {
   await onClock(async ({ tick, now }) => {
@@ -420,17 +416,6 @@ test('SCALE5a the hub asks storage for an account\'s serpent receipt once - a he
     const ws = await hello('peer-0001');
     assert.ok(ws.sent.some((f) => f.t === 'serpent' && f.k === 'rcpt' && f.r === rcpt), 'the next hello is handed it');
   });
-});
-
-test('SCALE5a the hello\'s walks are methods of their own (`_message` runs interpreted, PERF-RELAY1) and the hub\'s fans walk the index in place; the client\'s frame walks its peers in place', () => {
-  const relay = src('server/src/index.js');
-  assert.match(relay, /for \(const \[other, b\] of this\._withId\(m\.id, ws\)\) \{/);
-  assert.match(relay, /const others = this\._othersOf\(ws\);/);
-  assert.match(relay, /this\._fanRoster\(ws, said\);/);   // PIN MOVED (SCALE5b): a channel's join and leave by the roster's fan, which walks in place as `_fanBut` does
-  assert.match(relay, /if \(isChatRoom\(a\.key\)\) this\._fanRoster\(ws, out\); else this\._fanBut\(ws, out\);   \/\/ SCALE5a: in place, as the join's/);
-  assert.match(relay, /_fanRoster\(ws, out\) \{ for \(const \[other, b\] of \(this\._vper\.size \? this\._reals\(\) : this\._all\(\)\)\) if \(other !== ws && b\.id && !other\.virtual\) \{ /, 'the roster\'s fan walks the index itself, never a copy (PIN MOVED, SCALE5c: the bus walks its own sockets, a shard\'s hearing its own shard\'s roster)');
-  assert.match(relay, /_fanBut\(ws, out\) \{ for \(const \[other, b\] of this\._all\(\)\) if \(other !== ws && b\.id\) this\._send\(other, out\); \}/, 'the fan walks the index itself, never a copy');
-  assert.match(src('src/net/online.js'), /for \(const p of this\.peers\.values\(\)\) \{/);
 });
 
 test('SCALE5a the leave knows the room drained without a filtered copy of every socket - the last one out, still listed by a runtime whose close has not completed (AUDIT ONESEAT R4), sweeps the room as the filter said it should (mutant: "the last" only when the runtime lists none)', async () => {

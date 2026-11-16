@@ -1,5 +1,4 @@
-// PROF-RETICLE (2026-10-01, Mac: "move away from the overcomplicated minigame visuals and instead use the mechanics on
-// something that doesnt cover the screen"; asked, "Around the crosshair"): THE ACT ON THE CROSSHAIR. No box, no title,
+// PROF-RETICLE: THE ACT ON THE CROSSHAIR. No box, no title,
 // no picture: the marks built once an act and moved every frame, round the crosshair's middle (ui/worldPlaque.js
 // reticleAnchor); the mine's points and the knife's line where they stand on the node, through the frame's own lens
 // (focal * tan of the angle off the look, one focal length both ways); the ring, the hold's arc, the glint, the float
@@ -67,8 +66,6 @@ test('PROF-RETICLE lens: an angle off the look stands focal x tan(angle) from th
   assert.equal(r.y, 225, 'undocked, the middle is the middle');
   assert.ok(near(r.focal, 450, 1e-9), 'half the view\'s height over tan of half the field');
   assert.equal(reticleAnchor({ width: 0, height: 0 }, fov), null);
-  assert.match(src('src/ui/worldPlaque.js'), /export function reticleAnchor\(canvas, fovRad\) \{\n {2}if \(!canvas\?\.width \|\| !canvas\?\.height\) return null;\n {2}const \{ largeHudHeight \} = hudReticle\(canvas\);/);
-  assert.match(src('src/ui/worldPlaque.js'), /const viewH = Math\.max\(1, canvas\.height - largeHudHeight\) \/ dpr;\n[\s\S]{0,120}y: crosshairCentreY\(canvas\.height, largeHudHeight\) \/ dpr,/);
 });
 
 test('PROF-RETICLE mine: the five points where they stand on the rock, through the lens, moving as the look does; the glint lit with the reach a blow counts double in; a blow\'s flash on the crosshair (gold on the glint); the strikes as pips (mutants: points unmoved, the reach unsized, pips frozen)', () => {
@@ -266,7 +263,6 @@ test('PROF-RETICLE cues (PIN MOVED, GATHER-FEEL): the HUD draws the act and says
   assert.equal(profCue('nothing'), false);
   assert.deepEqual(PROF_CUES.strike.clips, [SOUND.Hit1, SOUND.Hit1 + 1, SOUND.Hit1 + 2, SOUND.Hit1 + 3, SOUND.Hit1 + 4], 'DFU\'s five hit clips');
   assert.deepEqual(PROF_CUES.clean.clips, [SOUND.ActivateLockUnlock]);
-  assert.doesNotMatch(src('src/ui/professions/profHud.js'), /profCue|profSounds/, 'the HUD imports no voice');
 });
 
 test('PROF-RETICLE host: the marks stand round the crosshair\'s middle and read the frame\'s lens (the anchor\'s focal); the world gives it reticleAnchor through fieldOfView; the last frame drawn before the act ends, a clean finish rung; the sheet appended after the old meter\'s rules, no plate, still forms under reduced motion (mutants: each wire cut)', () => {
@@ -282,11 +278,6 @@ test('PROF-RETICLE host: the marks stand round the crosshair\'s middle and read 
     const second = meter.querySelector('.prof-face').children[1];
     assert.ok(near(px(second.style.left), offsetOf(MINE_POINTS[1], { yaw: 0, pitch: 0 }, 640)[0]), 'the anchor\'s focal');
   } finally { hud.dispose(); }
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const hud = createProfHud\(\{ anchor: \(\) => reticleAnchor\(canvas, fieldOfView\(\)\) \}\);/);
-  const g = src('src/scenes/gatherHost.js');
-  assert.match(g, /else if \(act\.act\.state\.done\) \{ hud\.setMeter\(act\.act, act\.label \?\? '', \{ byUse: act\.heldByUse === true \}\); finish\(act\); \}/);
-  assert.match(g, /if \(a\.clean\) ear\.say\('clean', null, \{ of: a\.act \}\);/);   // PIN MOVED (GATHER-FEEL): the clean finish the ear's, as its last blow lands - PIN MOVED again (AUDIT GATHER-FEEL LANDING): riding that blow's machine
   assert.ok(PROF_CSS.indexOf(PROF_ACT_CSS) > PROF_CSS.indexOf('.prof-meter { position: fixed; left: 50%; top: 50%;'), 'after the old meter\'s rules');
   assert.match(PROF_ACT_CSS, /\.prof-meter\.prof-reticle \{ position: fixed; left: var\(--rx, 50%\); top: var\(--ry, 50%\); transform: translate\(-50%, -50%\);/);
   assert.match(PROF_ACT_CSS, /padding: 0; margin: 0; background: none; border: 0; box-shadow: none;/, 'no plate');

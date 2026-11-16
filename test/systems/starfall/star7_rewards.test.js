@@ -1,4 +1,4 @@
-// STAR7 (bible/11-Multiplayer/Starfall.md section 6): A HELD STAR'S SPOILS - the Starspun Weave (the festival's own Aetheric
+// STAR7: A HELD STAR'S SPOILS - the Starspun Weave (the festival's own Aetheric
 // set: its law, its nine pieces, its three powers through SET2's seams), Starglass (template 576, its row, its picture, its
 // law's leaf) and the roll off the receipt's seed (the Heart-Star's doubled). tools/mutants/star7.json.
 import '../../modsOff.js';
@@ -14,7 +14,7 @@ import {
   _resetSigilSetsForTests,
 } from '../../../src/systems/sigil/sigilSets.js';
 import {
-  AETHERIC_RECORDS, PANOPLY_SET_PIECES, WYRD_SET_PIECES, STARSPUN_SET_PIECES, ELTHERIC_SET_PIECES, STARSPUN_SET_CHANCE, RAID_SET_CHANCE, RAID_SET_POWER, aethericById,
+  AETHERIC_RECORDS, WYRD_SET_PIECES, STARSPUN_SET_PIECES, ELTHERIC_SET_PIECES, STARSPUN_SET_CHANCE, RAID_SET_CHANCE, RAID_SET_POWER, aethericById,
   aethericMaterial, mintAetheric, rollStarspunPiece, validSetMarks, AETHERIC,
 } from '../../../src/systems/aetheric.js';
 import { _resetPlayerHealForTests } from '../../../src/systems/playerHeal.js';
@@ -36,7 +36,7 @@ import { STARGLASS_TEMPLATE, STARGLASS_LAW_ROW } from '../../../src/systems/star
 import { starglass, isStarglass, STARGLASS_ROW } from '../../../src/systems/starfall/starglass.js';
 import { starglassArt, starglassTexel, registerStarglassArt, _resetStarglassArt, STARGLASS_ARCHIVE, STARGLASS_ART, STARGLASS_ART_SIZE, STARGLASS_OUTLINE } from '../../../src/world/starfall/starglassArt.js';
 import { STAR_RAMPS } from '../../../src/world/starfall/starArt.js';
-import { PSEUDO_ARCHIVES, pseudoArchiveCollisions } from '../../../src/world/eliteGates/pseudoArchives.js';
+import { PSEUDO_ARCHIVES, pseudoArchiveCollisions } from '../../../src/world/pseudoArchives.js';
 import { rollStarSpoils, starSpoilsList, starSpoilsDay, STAR_SPOILS_GOLD_PER_LEVEL, STARGLASS_MAX, STAR_SPOILS_KEYS, STAR_SPOILS_TEXT } from '../../../src/systems/starfall/starSpoils.js';
 import { RAID_SPOILS_KEYS } from '../../../src/systems/raidSpoils.js';
 import { SERPENT_SPOILS_KEYS } from '../../../src/systems/serpent/serpentSpoils.js';
@@ -83,7 +83,7 @@ const seq = (...xs) => { let i = 0; return () => xs[Math.min(i++, xs.length - 1)
 const swing = (e, weapon, target, n = 100) => { const d = setBlow(weapon, n, e, target, {}); setStrike(e, target, d, weapon); return d; };
 
 test('STAR7 THE LAW: the Starspun Weave last of every set - Aetheric, Mephala its patron, the star\'s violet its colour, no raiding party\'s, never a world set; Spinner\'s Thread, Bound in Silk and Mephala\'s Veil at 2, 4 and 6 pieces with the design\'s numbers Faint to Ascendant, every brief inside BRIEF_MAX at every stage (mutants: a tier\'s number; the set\'s place; a world set)', () => {
-  assert.deepEqual(SIGIL_SET_IDS.slice(-2), ['starspun', 'eltheric']);   // PIN MOVED (SEA-SET): the Eltheric Tidemail after it
+  assert.deepEqual(SIGIL_SET_IDS.slice(-2), ['starspun', 'eltheric']);
   const s = setById('starspun');
   assert.deepEqual([s.id, s.name, s.prince, s.colour, s.aetheric, 'raid' in s, s.role],
     ['starspun', 'The Starspun Weave', 'Mephala', STAR_VIOLET_CSS, true, false, 'The coven\'s thread, turned on the coven']);
@@ -91,7 +91,7 @@ test('STAR7 THE LAW: the Starspun Weave last of every set - Aetheric, Mephala it
   assert.ok(![0, 1, 2].some((p) => raidSetOf(p)?.id === 'starspun'), 'no raiding party pays it');
   assert.deepEqual(s.tiers.map((t) => [t.at, t.key, t.name, t.values]), [
     [2, 'spinners-thread', "Spinner's Thread", { poison: [10, 30], agility: [2, 6] }],
-    [4, 'bound-in-silk', 'Bound in Silk', { more: [60, 140] }],
+    [4, 'bound-in-silk', 'Bound in Silk', { more: [2, 3] }],   // PIN MOVED: B5 (Bound in Silk 6-10 -> 2-3)
     [6, 'mephalas-veil', "Mephala's Veil", { rounds: [2, 4], recover: [240, 120] }],
   ]);
   assert.deepEqual([STRAND_HITS, STRAND_SECONDS, VEIL_BELOW], [4, 8, 0.3]);
@@ -100,7 +100,7 @@ test('STAR7 THE LAW: the Starspun Weave last of every set - Aetheric, Mephala it
     assert.ok(b.length <= BRIEF_MAX, `${t.key} at ${st}: "${b}" (${b.length})`);
     assert.ok(!/\S - \S/.test(t.text(tierValues(t, st))), `${t.key}: no dash aside`);
   }
-  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], 0)), 'Every 4th hit on a foe +60%');
+  assert.equal(s.tiers[1].brief(tierValues(s.tiers[1], 0)), 'Every 4th hit on a foe +2%');   // PIN MOVED: B5 (Bound in Silk Faint 6 -> 2)
   assert.equal(s.tiers[2].brief(tierValues(s.tiers[2], SET_STAGE_MAX)), `Under 30%: Chameleon ${4 * ROUND_SECONDS}s`);
   assert.equal(s.tiers[2].text(tierValues(s.tiers[2], 0)), 'When a hit drops you below 30% health, the web hides you. Chameleon for 10 s. Recovers in 240 s');
 });
@@ -125,7 +125,7 @@ test('STAR7 THE RECORDS: nine in the places\' order - the seven body pieces, a b
   assert.ok(!resists.includes('poison'), 'never poison - Spinner\'s Thread carries it');
   assert.equal(new Set(resists).size, resists.length);
   for (const r of STARSPUN_SET_PIECES) assert.ok(r.lore.length > 20 && r.lore.length <= 100 && !/\S - \S/.test(r.lore), `${r.id}: a line of lore`);
-  assert.deepEqual(AETHERIC_RECORDS.slice(-ELTHERIC_SET_PIECES.length - STARSPUN_SET_PIECES.length - WYRD_SET_PIECES.length - PANOPLY_SET_PIECES.length), [...PANOPLY_SET_PIECES, ...WYRD_SET_PIECES, ...STARSPUN_SET_PIECES, ...ELTHERIC_SET_PIECES]);   // PIN MOVED (SEA-SET): the Tidemail's nine after the Weave's   // PIN MOVED (WITCH1): the Wyrd's Raiment between the Panoply and the Weave
+  assert.deepEqual(AETHERIC_RECORDS.slice(-ELTHERIC_SET_PIECES.length - STARSPUN_SET_PIECES.length - WYRD_SET_PIECES.length), [...WYRD_SET_PIECES, ...STARSPUN_SET_PIECES, ...ELTHERIC_SET_PIECES]);
   assert.equal(new Set(AETHERIC_RECORDS.map((r) => r.id)).size, AETHERIC_RECORDS.length, 'every id its own');
 });
 
@@ -182,14 +182,14 @@ test('STAR7 BOUND IN SILK (4): every 4th weapon blow of mine that lands on the s
   door({ me: e });
   const s = sword();
   at(10);
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(() => swing(e, s, RAT)), [100, 100, 100, 160, 100, 100, 100, 160], 'every 4th: +60% at Faint');
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(() => swing(e, s, RAT)), [100, 100, 100, 102, 100, 100, 100, 102], 'every 4th: +2% at Faint');   // PIN MOVED: B5 (Bound in Silk Faint 6 -> 2)
   assert.equal(strandsAt(RAT), 0, 'the held blow cut the count');
   swing(e, s, RAT); swing(e, s, RAT);
   assert.equal(swing(e, s, WOLF), 100, 'another foe: its own count');
   assert.equal(strandsAt(RAT), 2, 'the first keeps its own');
   assert.equal(strandCount(), 1, 'the states say the foe struck last');
   assert.equal(swing(e, s, RAT), 100);
-  assert.equal(swing(e, s, RAT), 160, 'its 4th');
+  assert.equal(swing(e, s, RAT), 102, 'its 4th');
   swing(e, s, RAT); swing(e, s, RAT); swing(e, s, RAT);
   at(10 + STRAND_SECONDS + 0.01);
   assert.equal(strandsAt(RAT), 0, 'fallen away past the window');
@@ -203,7 +203,7 @@ test('STAR7 BOUND IN SILK (4): every 4th weapon blow of mine that lands on the s
   fresh(); online(40);
   const asc = wearSet(player(), 'starspun', 4, XP[4]);
   door({ me: asc });
-  assert.deepEqual([1, 2, 3, 4].map(() => swing(asc, s, WOLF)), [100, 100, 100, 240], 'Ascendant: +140%');
+  assert.deepEqual([1, 2, 3, 4].map(() => swing(asc, s, WOLF)), [100, 100, 100, 103], 'Ascendant: +3%');   // PIN MOVED: B5 (Bound in Silk Ascendant 10 -> 3)
   fresh(); online(1);
   const three = wearSet(player(), 'starspun', 3);
   door({ me: three });
@@ -265,7 +265,7 @@ test('STAR7 STARGLASS: template 576, its row a leaf the law reads headless - lig
   assert.deepEqual(STARGLASS_LAW_ROW, { index: 576, baseWeight: 0.1, hitPoints: 1000, basePrice: 400, rarity: 20, stackable: true });
   assert.ok(!('bound' in STARGLASS_LAW_ROW), 'never bound - the holder\'s to sell or give');
   assert.equal(lawTemplate(576)?.index, 576, 'the law knows it');
-  assert.equal(templateByIndex(576)?.name, 'Starfall Glass');   // PIN MOVED (AUDIT STAR I1): the sea's trade good is Starglass
+  assert.equal(templateByIndex(576)?.name, 'Starfall Glass');
   assert.equal(STARGLASS_ROW.worldTextureArchive, STARGLASS_ARCHIVE);
   const s = starglass(3);
   assert.deepEqual([s.group, s.templateIndex, s.stackCount], ['UselessItems2', 576, 3]);

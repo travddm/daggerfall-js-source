@@ -1,8 +1,5 @@
 // @ts-check
-// GUIDE5 (2026-09-29, Mac: "How can we set the foundation and improve the
-// quest system substantially? Like really modernize it, make it more
-// accessible", then, of the Quest Guide arc: "This is your baby. Take
-// your time"): THE MARKS - where a quest points, on the held map and the
+// GUIDE5: THE MARKS - where a quest points, on the held map and the
 // enhanced compass.
 //
 // ONLY WHAT THE PLAYER'S MAP ALREADY KNOWS. A mark stands exactly where
@@ -12,8 +9,7 @@
 // the place the player stands in. A named place not yet on the map gets
 // no mark; it gets the talk arc's answer instead, the tracker card's "Not
 // on your map yet. Ask around for directions." - which is what
-// Daggerfall's directions are for (06-Systems/Talk-Arc.md, THE COMPASS
-// MARK: a person who knows marks it). Nothing here is the quest
+// Daggerfall's directions are for (a person who knows marks it). Nothing here is the quest
 // debugger's knowledge; GUIDE8's Exact tier is that, off by default.
 //
 // THE MAP marks every active quest's place - the one the tracker follows
@@ -22,7 +18,8 @@
 // the tracker's quest, on the street (the gate's bearing law). The host
 // resolves a place to its map pixel (scenes/world.js questPixel - the held
 // map's goto law, ui/travel/travelMapWindow.js placePixelOf, read once a place
-// through the host's memo: AUDIT GUIDE O3); this
+// through the host's memo: AUDIT GUIDE O3; START3: a site past the Bay,
+// which MAPS.BSA holds none of, by the pixel its `find` carries); this
 // module is PURE and imports nothing of the maps or the quest machine,
 // because the HUD reads its switch (GUIDE3's lesson: the HUD stays light).
 //
@@ -89,7 +86,7 @@ export function questMapMarks(views, trackedId, pixelOf) {
     const key = `${p.x},${p.y}`;
     const tracked = v.id != null && v.id === trackedId;
     // AUDIT GUIDE K2: a mark says its town; each quest says its own building (the entry's, when it names one)
-    const at = byPixel.get(key) ?? { px: p.x, py: p.y, town: v.words?.town || find.locationName, quests: [], tracked: false };
+    const at = byPixel.get(key) ?? { px: p.x, py: p.y, town: v.words?.town || find.locationName, placeName: find.locationName, quests: [], tracked: false };
     at.quests.push({ title: String(v.title ?? ''), clockSeconds: v.clockSeconds, tracked, building: v.target?.buildingName ?? null, where: v.words?.where || find.locationName });
     at.tracked = at.tracked || tracked;
     byPixel.set(key, at);
@@ -111,6 +108,7 @@ export function questMapMarks(views, trackedId, pixelOf) {
       px: m.px,
       py: m.py,
       tracked: m.tracked,
+      placeName: m.placeName,   // START3: the place's own name - what a press on a mark past the Bay picks it by (ui/heldMap.js _questPlace)
       label: titles.length ? fitHead(titles.join(' / '), place, QUEST_LABEL_MAX) : place,   // the place kept, the titles cut
       // one quest: its title, where, and the time left; several: how many, the town, and each quest
       tip: one
@@ -125,11 +123,15 @@ export function questMapMarks(views, trackedId, pixelOf) {
 /**
  * The host's marks, read and checked - [] for none, a throw, or anything a map could not place (the raids' shape,
  * ui/eventMapMarks.js readRaidMarks): each `{key, px, py, x, y, label, tip, tracked}`, x/y the pixel's centre. The
- * tip is the host's; the map bounds it with its own reader.
+ * tip is the host's; the map bounds it with its own reader. START3: `frame` - the continent's, while the sheet shows it
+ * (world/tamriel/tamrielFrame.js tamrielFrameInBay, WW2's gate rings' own bound) - admits a place past the Bay; without
+ * it the bound is the Bay's `size`.
  * @param {(() => any) | undefined} fn
  * @param {{width:number, height:number}} size
+ * @param {{x0:number, y0:number, w:number, h:number} | null} [frame]
  */
-export function readQuestMarks(fn, size) {
+export function readQuestMarks(fn, size, frame = null) {
+  const box = frame ?? { x0: 0, y0: 0, w: size.width, h: size.height };
   let list = null;
   try { list = typeof fn === 'function' ? fn() : null; } catch { return []; }
   if (!Array.isArray(list)) return [];
@@ -137,9 +139,9 @@ export function readQuestMarks(fn, size) {
   for (const m of list) {
     if (!m || typeof m !== 'object') continue;
     const { px, py } = m;
-    if (!Number.isInteger(px) || !Number.isInteger(py) || px < 0 || py < 0 || px >= size.width || py >= size.height) continue;
+    if (!Number.isInteger(px) || !Number.isInteger(py) || px < box.x0 || py < box.y0 || px >= box.x0 + box.w || py >= box.y0 + box.h) continue;
     const quests = (Array.isArray(m.quests) ? m.quests : []).slice(0, 12).map((q) => ({ title: String(q?.title ?? '').slice(0, QUEST_TIP_TEXT), left: String(q?.left ?? '').slice(0, 40) }));
-    out.push({ key: String(m.key ?? `quest:${px},${py}`), px, py, x: px + 0.5, y: py + 0.5, tracked: !!m.tracked, label: String(m.label ?? '').slice(0, QUEST_LABEL_MAX), tip: m.tip ?? null, quests, lift: QUEST_MARK_LIFT });
+    out.push({ key: String(m.key ?? `quest:${px},${py}`), px, py, x: px + 0.5, y: py + 0.5, tracked: !!m.tracked, label: String(m.label ?? '').slice(0, QUEST_LABEL_MAX), placeName: String(m.placeName ?? '').slice(0, QUEST_LABEL_MAX), tip: m.tip ?? null, quests, lift: QUEST_MARK_LIFT });
   }
   return out;
 }

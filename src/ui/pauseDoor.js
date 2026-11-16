@@ -53,7 +53,6 @@
 import { isEnhanced } from '../systems/uiSkin.js';
 import { mountEnhancedChunk } from './enhanced/enhancedChunk.js';   // MENU1: the one lazy-chunk door
 import { growthPageAt } from './growth/growthPages.js';   // GROWTH1: the Growth tab's pages, on either skin (a leaf: the tab is the menu chunk's)
-import { revenantStarsOver } from './firmamentOver.js';   // RVN-STARS: a sworn one's stars, over Companions
 import { levelUpScreenFor } from './charSheetDoor.js';   // GROWTH1: a level owed's rollout, drawn in the Growth tab (the view is the tab's own)
 import { playerEntity } from '../characters/playerEntity.js';   // the shared entity the Stats page already reads (enhancedMenu's sheetModel)
 import { profPagesShown, PROF_PAGE_SECTIONS, professionsKeyAt } from './professions/profPages.js';   // CLASSIC-PAGES: the professions' pages, on either skin
@@ -123,7 +122,7 @@ export function pauseOpts(opts) {
 }
 
 /**
- * F5-QUESTS (2026-09-26, Mac: "Cant see quest on f5 menu but can on tab menu"): THE PAUSE WINDOW'S HOOKS, for BOTH
+ * F5-QUESTS: THE PAUSE WINDOW'S HOOKS, for BOTH
  * doors that mount it - this one (Escape, the dial's Stats arm) and ui/charSheetDoor.js's F5 page, which IS this
  * window opened on Stats (PX27). F5's page was handed the sheet's four doors and nothing else, so on it the Quests
  * tab said "The journal is not wired into this place yet", Save and Load said there was no door, and Exit did
@@ -151,8 +150,7 @@ export function pauseMenuAct(hooks, close) {
     // DISC22-B: opened from the classic pause window, Resume goes back to that window - the settings were a page of
     // it, not the way out of it (save, load and exit still leave as they always do).
     if (action === 'resume' && typeof hooks.onResume === 'function') { hooks.onResume(); return; }
-    // MAC1 (Mac, 2026-09-10: "opening menu returning to game requiring
-    // player to press buttons twice"). This close runs INSIDE the Resume
+    // MAC1. This close runs INSIDE the Resume
     // click - the transient activation a pointer-lock request needs; an
     // Escape keydown is NOT one (ESC-LOCK, player/pointerLock.js: a tab
     // relocks on the next click or key, the desktop shell re-runs the
@@ -193,7 +191,7 @@ export const familyPageAt = (at) => at === 'family' || FAMILY_PAGE_SECTIONS.some
  * 'quests', 'stats', 'holdings' or 'system' (or a page of one - PAUSE_TAB_IDS). The CLASSIC flow takes the same hooks
  * and ignores it, because the classic pause has no tabs to land on.
  *
- * CLASSIC-PAGES (2026-09-30, Mac: "Enhanced pages + key"): EXCEPT a
+ * CLASSIC-PAGES: EXCEPT a
  * professions page ('professions', 'stores' - the Professions key, a
  * shop's or a home's station). The classic pause has no pages, so an
  * online classic player could neither read a rank nor withdraw a
@@ -225,7 +223,7 @@ function openPauseFlowNow(show, hooks) {
   // LEGACY3: Project Legacy's Family tab (its key, the death's Succession) - the classic pause has no tabs, so the family's
   // pages open the enhanced pause on either skin, as the professions' do
   if (familyPageAt(hooks.at)) {
-    // FAMILY-TAB (2026-10-06): a game played without Project Legacy has no Family tab - the key says why (the pages' own
+    // FAMILY-TAB: a game played without Project Legacy has no Family tab - the key says why (the pages' own
     // words) and opens nothing, as a professions door with no pages does
     if (!familyTabShown()) { hudText(noFamilyLine(familyProvider())); return null; }
     if (typeof document !== 'undefined') return enhancedPauseOverlay(show, hooks);
@@ -248,7 +246,7 @@ function openPauseFlowNow(show, hooks) {
   return classicPauseWithSettings(show, hooks);
 }
 
-/** DISC22-B (2026-09-24, kurkku on Discord: "could replace the controls button here with the full settings menu"):
+/** DISC22-B:
  *  THE CLASSIC PAUSE WINDOW'S CONTROLS BUTTON OPENS THE PORT'S WHOLE SETTINGS SCREEN. DFU's button opens its controls
  *  grid alone, and on the classic skin that grid was the only settings a player could reach from a game in progress -
  *  every other key (the video, the HUD, the gameplay rules, the mods' dials) lived behind the enhanced screen. That
@@ -291,15 +289,7 @@ function enhancedPauseOverlay(show, base) {
     // Ascension and the Firmament in its own pane (ui/growth/growthStage.js) - this door hands it the screen to draw, a
     // level owed or the view of the stars, off the shared entity the Stats page reads
     ascendScreen: () => (playerEntity ? levelUpScreenFor(playerEntity) : null),
-    // RVN-STARS: the Companions page's Stars - a sworn one's sky over this window, the window back on Companions (the
-    // owner: "Keep it on the companion page")
-    get openRevenantStars() { return rvnStars.hook; },
   };
-  const rvnStars = revenantStarsOver({
-    alive: () => !fired,
-    below: () => { try { view?.unmount(); } catch { /* already gone */ } view = null; },
-    back: () => { if (!fired && seams) view = seams.mountEnhancedMenu(host, { mode: 'pause', hooks, onAction: act, at: 'companions' }); },
-  });
   const host = document.createElement('div');
   host.id = 'enhanced-pause';
   host.setAttribute?.('data-dom-focus', '');   // AUDIT LEGACY II U3: Tab walks its controls (ui/input.js isDomFocusWalk)
@@ -345,7 +335,6 @@ function enhancedPauseOverlay(show, base) {
 
   const close = () => {
     if (fired) return;
-    rvnStars.drop();   // RVN-STARS: a sworn one's stars go with this window
     document.removeEventListener?.('keydown', tabIn, true);
     view?.unmount();
     view = null;

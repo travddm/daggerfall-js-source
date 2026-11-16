@@ -54,7 +54,7 @@ test('CRAFT-PROCS: the report\'s jewel - a Superior and a Masterwork take the la
     for (let i = 0; i < N; i++) {
       const r = jewels[i % jewels.length];
       const seed = seedOf(i + q * 100_000);
-      const now = mint(r, q, seed, MINT_V_LAST_PASS);   // PIN MOVED (AFFIX-LINES): the last pass's own version - MINT_V_LINES moves the numbers too (affixlines_reforge.test.js)
+      const now = mint(r, q, seed, MINT_V_LAST_PASS);
       const was = mint(r, q, seed, 0);
       assert.equal(now.rarity, tier);
       assert.equal(procsOf(was).length, 0, 'the old law: no line that does something');
@@ -117,7 +117,7 @@ test('CRAFT-PROCS: a crafted weapon takes a weapon\'s kinds and armour thorns - 
   assert.ok(thorns > 300 * 0.2, `${thorns} pieces of armour of 300 carry thorns`);
   // a garment: its group carries no such kind - the pass's chance draws, and nothing follows it
   for (const [i, r] of recipesOf('garment').slice(0, 60).entries()) {
-    for (const q of [3, 4]) assert.deepEqual(mint(r, q, seedOf(i), MINT_V_LAST_PASS), mint(r, q, seedOf(i), 0), `${r.id} q${q}`);   // PIN MOVED (AFFIX-LINES): the pass's version - the lines' moves a garment's numbers
+    for (const q of [3, 4]) assert.deepEqual(mint(r, q, seedOf(i), MINT_V_LAST_PASS), mint(r, q, seedOf(i), 0), `${r.id} q${q}`);
   }
   // THE SWITCH: the piece is its record's on every client - Loot Rarity off mints it the same (the line sleeps in its
   // reader, systems/loot/lootPowers.js), as the quality's roll always was
@@ -134,9 +134,10 @@ test('CRAFT-PROCS: a crafted weapon takes a weapon\'s kinds and armour thorns - 
 
 test('CRAFT-PROCS: the record says the law - the service stamps the mint version at the craft and the answer\'s pieces mint at it (a Superior\'s and a Masterwork\'s cast lines through the real Worker); a version the record does not know is refused; a record made before is version 0', async () => {
   assert.deepEqual([MINT_VERSION, MINT_V_LAST_PASS, MINT_V_LINES], [4, 1, 2], 'PIN MOVED (AFFIX-LINES): its lines drawn over the lines; PIN MOVED (ARMOR-LEAN): the craft stamps 3 - armour\'s lines on its family\'s leans; PIN MOVED (JEWEL-KIN, Field-Bugs-2026-10-26d): 4 now - a jewel\'s skill lines lean to the bare hand\'s two as well (3 on its branch, renumbered past ARMOR-LEAN at the merge)');
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on', PROF_DAY_CAPS: 'off' });
   const raw = s.env.DB._raw;
   const mac = await s.seated('Mac');
+  s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
   const r = recipeById('ring:silver:ruby');
   raw.prepare('INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at) VALUES (?, ?, \'smithing\', ?, 1)').run(mac.id, mac.character, xpForRank(100));
   for (const { key, n } of r.inputs) raw.prepare('INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, \'own\', ?)').run(mac.id, mac.character, key, n * 100);
@@ -148,8 +149,7 @@ test('CRAFT-PROCS: the record says the law - the service stamps the mint version
   };
   const lined = { 3: [], 4: [] };
   let n = 0;
-  for (let b = 0x60; b < 0x100; b += 2) {   // PIN MOVED (AFFIX-LINES): every second byte - version 2's roll moved the stream, and the fourth bytes' Masterworks drew no line
-    // PIN MOVED (AUDIT FB1026d C3): the craft names the version its client mints, as net/accountClient.js craft does
+  for (let b = 0x60; b < 0x100; b += 2) {
     const res = await steered(b, () => s.call('/v1/prof/craft', { character: mac.character, recipe: r.id, clean: false, name: 'Silverthorn', rid: `craftprocs-${String(++n).padStart(6, '0')}`, mint: MINT_VERSION }, mac.secret));
     assert.equal(res.status, 200, JSON.stringify(res.body));
     const [{ record, provenance }] = res.body.pieces;
@@ -184,7 +184,9 @@ test('CRAFT-PROCS: a piece made before is minted again as it was, and a new one 
     const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
+    s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
     const ann = await s.seated('Ann');
+    s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(ann.id);   // PROFESSION-CAPS: a level the Rare gate is open at
     const sword = recipeById('longsword:steel');
     // a seed whose Superior takes a line under the pass - the one a record made before must never grow
     let seed = 0;
@@ -196,7 +198,6 @@ test('CRAFT-PROCS: a piece made before is minted again as it was, and a new one 
       raw.prepare(`INSERT INTO products (provenance, owner, char_id, maker, recipe, template, material, quality, seed, record, made_at)
         VALUES (?, ?, ?, 'Silverthorn', ?, ?, ?, ?, ?, ?, 1)`).run(provenance, who.id, who.character, sword.id, sword.templateIndex, sword.material, quality, seed, record);
       const minted = mintPiece({ recipe: sword.id, quality, seed, maker: 'Silverthorn', version: mintVersionOf(record) }, provenance);
-      // PIN MOVED (INT19, Integrity-Arc section 7): the pack's piece is its record's too - a listing takes it out of there
       const save = recordOf(s.env, who.character);
       layRecord(s.env, who.character, { ...save, items: [...(save.items ?? []), JSON.parse(JSON.stringify(minted))] });
       return minted;
@@ -222,7 +223,7 @@ test('CRAFT-PROCS: a piece made before is minted again as it was, and a new one 
     const bought = await s.call('/v1/market/buy', { character: ann.character, region: DF, listing: ln.body.listing.id, max: 500, hubs: HUBS, rid: rid() }, ann.secret);
     assert.equal(bought.status, 200, JSON.stringify(bought.body));
     assert.deepEqual(mintPiece(bought.body.piece, bought.body.piece.provenance), after, 'the new piece arrives with its line');
-    // cancelled: the seller's piece comes back as it was - PIN MOVED (INT19): as the very record that left, collected into
+    // cancelled: the seller's piece comes back as it was
     // the seller's record, never minted again at the pack
     const back = await s.call('/v1/market/cancel', { character: mac.character, listing: lo.body.listing.id, rid: rid() }, mac.secret);
     assert.equal(back.status, 200, JSON.stringify(back.body));

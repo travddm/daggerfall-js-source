@@ -1,5 +1,4 @@
-// NET-SMOOTH (2026-10-04, Mac: "Sometimes other players rubberband, I want to continue to improve performance and
-// future proof for larger amounts of players"). Four causes of a peer drawn jumping back or dashing, all on the
+// NET-SMOOTH. Four causes of a peer drawn jumping back or dashing, all on the
 // client (src/net/online.js, the NET-SMOOTH block above keptToken and OnlineSession._arrive):
 //   1. the snap taken in the scene frame's units for every room not named `world:` - a 0.75 m snap in a siege's battle,
 //      a Royal Tourney and an owned interior, whose poses are MapsFile's frame;

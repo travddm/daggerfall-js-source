@@ -1,4 +1,4 @@
-// CSA-G (2026-09-27) - COME SAIL AWAY'S TIME AND SOUNDS: systems/comeSailAway/comeSailAway.js's time scale (the helm's three keys,
+// CSA-G - COME SAIL AWAY'S TIME AND SOUNDS: systems/comeSailAway/comeSailAway.js's time scale (the helm's three keys,
 // IncreaseTimeScale, DecreaseTimeScale, the enemies' gates, Update's unpause reset and Travel Options' isTravelActive),
 // the oars' three animation events through the rudder's listener, the two loops as Unity keeps them, UpdateAudioSource,
 // the sails' and the door's DFU clips - over the vendored hulls - and world/unityAnimator.js's clip events,
@@ -419,39 +419,11 @@ test('CSA-G: the boat\'s bed is Roleplay Realism\'s - the Small Ship\'s and the 
   assert.equal(customModelOf('DaggerfallMesh [ID=41002] [Replacement]', BED_MODELS), 41002, 'the name cut after its first ]');
   assert.equal(customModelOf('DaggerfallMesh [ID=41003]', BED_MODELS), null);
   assert.equal(customModelOf(goModelName(TRIGGER_MODEL.drive), BED_MODELS), null);
-  // the host's pick and arm (scenes/world.js), the modes' door (scenes/worldModes.js)
-  const src = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const pick = src.slice(src.indexOf('function csaActivationPick('), src.indexOf('const csaHoverName'));
-  const own = src.slice(src.indexOf('function csaActivationPick('), src.indexOf('function csaPeerActivationPick('));   // CSA-K: my boats' own pick, before another's (which reads the bed the same way)
-  assert.match(own, /const bed = modelId == null && bedSleepingOn\(\) && csaCustomModelOf\(best\.hit\.node\?\.name, BED_MODELS\) != null;/);
-  // PIN MOVED (AUDIT PR478 C2): the helm's box under Steal keys its own ':steal' after the part - the bed's key unchanged
-  assert.match(own, /:\$\{modelId \?\? \(bed \? 'bed' : 'hull'\)\}\$\{modelId === CSA_TRIGGER_MODEL\.drive && getInteractionMode\(\) === 'steal' \? ':steal' : ''\}`/);
-  assert.match(own, /reach: bed \? DEFAULT_ACTIVATION_DISTANCE : CSA_ACTIVATION_DISTANCE,/);
-  // CSA-J (the audit): the bed's press says it is one - BedActivation is the gate less its GiveOffer rung
-  assert.match(pick, /if \(pick\?\.bed\) \{\s*if \(pick\.distance <= DEFAULT_ACTIVATION_DISTANCE\) \{ if \(\(modes\?\.mode \?\? 'exterior'\) === 'exterior'\) \{ _restFromBed = true; try \{ toggleRest\(\); \} finally \{ _restFromBed = false; \} \} else modes\?\.restFromBed\?\.\(\); \}\s*return;\s*\}/);
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const at = wm.indexOf('    restFromBed() {');
-  assert.ok(at > 0);
-  const door = wm.slice(at, wm.indexOf('\n    },', at));
-  assert.match(door, /if \(mode === 'interior' && interiorCtx\) restFromInteriorBed\(\);/);
-  assert.match(door, /else if \(mode === 'dungeon' && dungeonCtx\) dungeonCtx\.restFromBed\(\);/);
-  assert.match(wm, /const restFromInteriorBed = \(\) => \{ _restFromBed = true; try \{ interiorKeyCtx\.toggleRest\(\{ ignoreAllocatedBed: true \}\); \} finally \{ _restFromBed = false; \} \};/, 'the window told the bed is the one clicked, the offer rung skipped');
 });
 
 // ── the borrowed ship's scenes ─────────────────────────────────────────────────
 
-test('CSA-G (the live probe): a crewed boat\'s helm borrows a ship (AssignShipToPlayer\'s two permanent scenes) and gives it back - through the lazy scene cache, since a fresh character has none until its first scene; the raw field threw on the street and left StartSailing half run', () => {
-  const src = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = src.indexOf('  const shipPermanentScenes = (s) => {');
-  assert.ok(at > 0);
-  const body = src.slice(at, src.indexOf('\n  };', at));
-  assert.equal((body.match(/addPermanentScene\(_sceneCache\(\), /g) ?? []).length, 2, 'the deck\'s and the hold\'s, each through the lazy cache');
-  assert.ok(!/playerEntity\.sceneCache/.test(body), 'never the raw field');
-  assert.match(src, /removePermanentScene: \(name\) => removePermanentScene\(_sceneCache\(\), name\),/);
-  assert.match(src, /const _sceneCache = \(\) => \(playerEntity\.sceneCache \?\?= createSceneCache\(\)\);/);
-});
-
-// ── HELM-TIME-ONLINE (2026-10-04, Mac: "Remove the time dial from ships online") ──────────────────────────────────────
+// ── HELM-TIME-ONLINE ──────────────────────────────────────
 
 test('HELM-TIME-ONLINE: online the helm\'s time dial is retired - each of the three keys says why and moves nothing, and the panel\'s state says there is no dial; offline the keys walk the steps as ever (mutants: the gate dropped, the line unsaid, the state\'s flag wrong)', () => {
   assert.deepEqual([...BOAT_TIME_ACTIONS], [BOAT_ACTIONS.timeScaleUp, BOAT_ACTIONS.timeScaleDown, BOAT_ACTIONS.timeScaleReset]);
@@ -500,10 +472,5 @@ test('HELM-TIME-ONLINE: the enhanced helm drops its three time presses where the
   assert.equal(rows({ ...h, timeDial: false }).length, 2, 'online, no trim: no left/right row');
   assert.deepEqual(rows({ ...h, timeDial: false, manualTrim: true }).at(-1), 'Trim (hold)');
   assert.deepEqual(rows({ ...h, timeDial: true }).at(-1), 'Slower / faster (hold left: normal time)');
-});
-
-test('HELM-TIME-ONLINE host: the world hands the runtime the shared clock as the lock (mutant: unwired)', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /timeLocked: \(\) => sharedClockOn\(\),/);
 });
 

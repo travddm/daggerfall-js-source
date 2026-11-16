@@ -1,4 +1,4 @@
-// LOOT-BULK (2026-10-16): a container and a wagon filter by name, by the pack's pages and by rarity, and Take all /
+// LOOT-BULK: a container and a wagon filter by name, by the pack's pages and by rarity, and Take all /
 // Stash all walk the list on screen from the top until the next row does not fit.
 import '../modsOff.js';
 import { test } from 'node:test';

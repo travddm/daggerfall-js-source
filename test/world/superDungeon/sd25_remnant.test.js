@@ -1,4 +1,4 @@
-// SD25 S8 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 10): THE BRASS
+// SD25 S8: THE BRASS
 // REMNANT, THE REST OF IT - its tells (a tell atlas in its own archive; a part's remap lights its region alone), its
 // back-dial and the hand that keeps the fight's time, its rib lamps counting the Hearts, its fall (the heart torn out,
 // the dial rolling free). Each law run from its own code; the frames measured for what they make.

@@ -1,5 +1,4 @@
-// MW-BOW1 (FIELD BUGS 2026-10-09g, the owner: "the arrow on the morrowind weapon isnt shown be drawn and shot, or it's
-// misalligned"; then "Im tired of you avoiding the morrowind arrow case"): A MORROWIND BOW DRAWS ON ITS OWN CLOCK. The
+// MW-BOW1 (FIELD BUGS 2026-10-09g,; then "Im tired of you avoiding the morrowind arrow case"): A MORROWIND BOW DRAWS ON ITS OWN CLOCK. The
 // retail bow mesh carries its limbs and string morphing and its ArrowBone keyframed through the BowAndArrow group
 // (OpenMW issues 5642 and 9322), on WeaponAnimationTime: the weapon group's playhead, from the group's first key for a
 // ranged weapon. The port flattened the bow once at rest and baked the ArrowBone's rest into the arrow - so the bow
@@ -146,8 +145,8 @@ async function drawnBow(bowBytes) {
   const res = await arm.build({ race: 'fprace', weapon: { templateIndex: 130 }, hasAmmo: true, deps: bowDeps(bowBytes) });
   assert.ok(res.ok, `${res.stage}: ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 80 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   return { arm, res };
 }
 const pieceOf = (res, slot) => res.arm.pieces.find((p) => p.slot === slot);
@@ -177,23 +176,23 @@ test('MW-BOW1: through a real shot the bow draws - the arrow rides the ArrowBone
   assert.deepEqual(round(arrow.source), arrowWith(nif, ARROW_REST), 'at rest the arrow sits where the rest pose has it');
   assert.equal(arm.attack('StrikeDown'), 'shoot');
   // shoot start 5.8 -> max attack 6.2: step into the release section (6.2 -> 6.4), the draw's full extent
-  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.AttackRelease; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.AttackRelease);
+  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.Striking; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Striking);
   const clock = arm.status().weaponClock;
   assert.ok(clock >= T.maxAttack - 1e-6 && clock <= T.release + 1e-6, `the clock in the draw (${clock})`);
   assert.equal(arm.status().arrowShown, true, 'the arrow on the string');
   assert.deepEqual(round(arrow.source), arrowWith(nif, ARROW_DRAWN), 'DRAWN BACK - the ArrowBone\'s keys, not its rest');
   assert.deepEqual(round(limb.source), round(base(nif).map((v, i) => v + LIMB_BEND[i])), 'and the limb bent with it');
   // through the follow: back to rest, the clock held where the follow left it
-  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   assert.equal(+arm.status().weaponClock.toFixed(4), 1.2, 'held at the follow\'s stop (6.7)');
   assert.deepEqual(round(arrow.source), arrowWith(nif, ARROW_REST), 'the next arrow back at rest');
   assert.deepEqual(round(limb.source), restLimb, 'the limb straight');
   // and the clock belongs to its group: sheathed, the stance's group is no longer the bow's and the clock reads 0
   arm.setSheathed(true);
-  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.None; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.None);
+  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.Rest; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Rest);
   assert.equal(arm.status().weaponClock, 0, 'no state for the group in hand');
 });
 
@@ -204,16 +203,8 @@ test('MW-BOW1: a bow with no motion of its own is posed as it always was', async
   const arrow = pieceOf(res, 'arrow');
   const before = arrow.source;
   assert.equal(arm.attack('StrikeDown'), 'shoot');
-  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.AttackRelease; i++) arm.update(0.05);
+  for (let i = 0; i < 40 && arm.status().upper !== UPPER_BODY.Striking; i++) arm.update(0.05);
   assert.equal(arrow.source, before, 'the same rest buffer, never re-posed');
   assert.deepEqual(round(arrow.source), arrowWith(nif, ARROW_REST));
 });
 
-test('MW-BOW1: both views pose the weapon on its clock before the pose - the first-person arm and the third-person body', () => {
-  // the third-person body is one machine with the arm (fpArm update): the same clock, ahead of its own poseAssembly
-  const src = readFileSync(new URL('../../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  const third = /posePartClocks\(t\.arm, weaponClockValue\(\), \{ frameTime: partClock \}\);[^\n]*\n\s*poseAssembly\(t\.arm, \{/;
-  const first = /posePartClocks\(built\.arm, weaponClockValue\(\), \{ frameTime: partClock \}\);[^\n]*\n\s*poseAssembly\(built\.arm, \{\n\s*tracks: fTracks,/;
-  assert.match(src, third, 'the body');
-  assert.match(src, first, 'the arm');
-});

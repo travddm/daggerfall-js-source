@@ -7,7 +7,7 @@
 import { sub, add, mul, cross, len, norm } from './math.js';
 
       function face(out, a, b, c, d, n, col) {
-        // T1.3: vertices packed flat [ax,ay,az, bx,by,bz, cx,cy,cz, dx,dy,dz] (one array, not four
+        // Vertices packed flat [ax,ay,az, bx,by,bz, cx,cy,cz, dx,dy,dz] (one array, not four
         // sub-arrays) for cache locality + fewer GC objects per face. n/c stay small arrays.
         out.push({ p: [a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2], d[0], d[1], d[2]], n, c: col });
       }

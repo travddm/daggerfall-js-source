@@ -1,8 +1,4 @@
-// MAC1 (Mac, 2026-09-10): "Fix fps outside issue. Issue is def caused
-// by all the billboards in the distance ESPECIALLY ALL THE SMALL ONES
-// not being culled out. Make the distant trees visible, but everything
-// else not. Also stop the billboard rotations for the ones that are
-// REALLY far away. It is okay not to have them rotate."
+// MAC1 (
 //
 // WHAT THE COST WAS. The streaming host builds one billboard batch per
 // (archive, record) per pixel and drew every one of them every frame,
@@ -43,8 +39,7 @@ export const TALL_FLAT_HEIGHT = 2.5;
 /**
  * Does this flat batch draw at this ring? THE RULE'S ONE HOME.
  *
- * PERF-EXT12 (2026-09-25, the players' "fps issues in the exterior but
- * fine in the interior"): POSITIONAL, because the streaming host asks it of
+ * PERF-EXT12: POSITIONAL, because the streaming host asks it of
  * every flat batch of every pixel it can see or reach, every frame - 1,131
  * times a frame on the harness town - and the object form built a
  * `{ ring, height, animated }` for each. AUDIT 65 had judged that object

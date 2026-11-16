@@ -1,4 +1,4 @@
-// YARD-ROWS (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord: "Shipyard formatting is
+// YARD-ROWS (FIELD BUGS 2026-10-16b,; the Discord: "Shipyard formatting is
 // cooked" - "The text here may need a bit of work, as you can see!"). A shipyard row was a three-track grid whose acts'
 // track was `auto`: grid layout grows an auto track to its content's max-content before the fr tracks get a pixel, so a
 // fleet row's four presses and her name box took every free pixel and her words stood a word a line, 400-700 px tall

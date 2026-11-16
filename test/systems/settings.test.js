@@ -35,7 +35,7 @@ test('settings: the BAKE is the vendored file - a stale bake fails here', () => 
   assert.deepEqual(JSON.parse(JSON.stringify(DEFAULTS)), fresh,
     'run: node scripts/bakeSettings.mjs');
   assert.equal(Object.keys(DEFAULTS).length, 13, "DFU's 13 sections");
-  assert.equal(ALL_KEYS.length, 171, "DFU's 171 defaults");
+  assert.equal(ALL_KEYS.length, 173, "DFU's 173 defaults");
   // spot-check the values the Ledger row quotes, straight off the file
   assert.equal(DEFAULTS.Enhancements.EnhancedCombatAI, 'True');
   assert.equal(DEFAULTS.Enhancements.CombatVoices, 'True');
@@ -103,11 +103,11 @@ test('settings: the LIVE tier does not lie - each consumer really reads the stor
   setValue('Enhancements', 'PlayerTorchFromItems', true);
   const e = { items: [], stats: {}, skills: [] };
   assignStartingGear(e, { classIndex: 0, rolls: () => 0 });
-  assert.ok(e.items.some((it) => it.group === 'UselessItems2' && !isWalletItem(it)), 'torches arrive with the setting on');   // PIN MOVED (WALLET1): never the wallet - it is miscellany whatever the setting
+  assert.ok(e.items.some((it) => it.group === 'UselessItems2' && !isWalletItem(it)), 'torches arrive with the setting on');
   setValue('Enhancements', 'PlayerTorchFromItems', false);
   const e2 = { items: [], stats: {}, skills: [] };
   assignStartingGear(e2, { classIndex: 0, rolls: () => 0 });
-  assert.equal(e2.items.filter((it) => it.group === 'UselessItems2' && !isWalletItem(it)).length, 0, 'and not with it off');   // PIN MOVED (WALLET1): the wallet is miscellany too, and the port's own tail's
+  assert.equal(e2.items.filter((it) => it.group === 'UselessItems2' && !isWalletItem(it)).length, 0, 'and not with it off');
   // MouseLookSensitivity + InvertMouseVertical
   setValue('Controls', 'MouseLookSensitivity', 1.0);
   assert.equal(lookScale(), LOOK_BASE, 'sensitivity 1.0 IS the port feel constant');
@@ -136,9 +136,9 @@ test('settings: the tier map is complete and honest', () => {
     assert.ok(ALL_KEYS.includes(key), `${key} is a real DFU setting`);
     assert.ok(why && why.length > 10, `${key} states WHY it is unavailable`);
   }
-  // the two the Ledger calls out by name are unavailable for the
-  // documented reason - the port implements one side of each branch
-  assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'unavailable');
+  // the Ledger's climbing row is unavailable for the documented reason - the port implements one side of the branch.
+  // EnhancedCombatAI left the row when the port ran both sides.
+  assert.equal(tierOf('Enhancements/EnhancedCombatAI'), 'live');
   assert.equal(tierOf('Enhancements/AdvancedClimbing'), 'unavailable');
 });
 

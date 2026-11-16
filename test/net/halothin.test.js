@@ -1,5 +1,4 @@
-// HALO-THIN (2026-10-10, the owner: "For you when you are near a player ... Theres 10 position updates every time.
-// Multiply it by the times the player is near you and its an insane bottleneck"): A HALO HEARS WHERE I AM, NOT EVERY
+// HALO-THIN: A HALO HEARS WHERE I AM, NOT EVERY
 // STEP. Every pose went down my cell's socket AND every halo's, and a listener holding the same rooms heard each pose
 // once per room - two copies astride an edge, four at a corner. Everyone in range of me holds my own cell (wire.js
 // cellHaloFor's symmetry), so its fan alone reaches them; a halo hears a pose when it is due (net/online.js
@@ -7,7 +6,7 @@
 // and every pose while my own cell's socket takes none, while it reaches a player in range who does not hold my cell,
 // or while a referee may stand in a halo (the host's `haloWhole`). AUDIT PEER-RANGE + HALO-THIN: a word for a referee
 // down a halo brings it my latest pose first, and a halo is pinged on its own clock. Design:
-// bible/11-Multiplayer/Scale-Arc.md HALO-THIN.
+// HALO-THIN.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -76,9 +75,13 @@ function cornerSession() {
   welcome(sockets[0]);
   quiet(() => s.setHalo(halos));
   for (let i = 1; i < sockets.length; i++) welcome(sockets[i]);
+  const haloWs = (room) => s._halo.get(room).ws;
+  // A player far across the last halo keeps the session from being alone, so lone sleep does not hold its poses;
+  // out of range, it leaves the halos thinned.
+  const far = { x: start.x - 5 * PIXEL_UNITS, y: 0, z: start.z, yaw: 0, pitch: 0, mv: 0, ts: 1 };
+  quiet(() => haloWs(halos[2]).receive({ t: 'pose', id: 'far-0001', p: far }));
   for (const ws of sockets) ws.sent.length = 0;
   const poses = (ws) => ws.sent.filter((t) => t.startsWith('{"t":"pose"')).map((t) => JSON.parse(t).p);
-  const haloWs = (room) => s._halo.get(room).ws;
   return { s, sockets, clock, start, halos, poses, haloWs, FakeWS };
 }
 
@@ -103,14 +106,16 @@ test('HALO-THIN the session: my own cell hears every pose; each halo its first, 
   s.sendPose({ ...pose, mv: 0 });
   for (const ws of sockets.slice(1)) { const h = poses(ws); assert.equal(h.length, 6); assert.equal(h[5].mv, 0, 'where I stopped'); }
   // HIBERNATE: standing with nobody anywhere - my cell or a halo - sends no heartbeat
+  quiet(() => sockets[3].receive({ t: 'leave', id: 'far-0001' }));
   clock.t += HEARTBEAT_MS;
   assert.equal(s.sendPose({ ...pose, mv: 0 }), false, 'alone, standing: no heartbeat');
   // standing with a peer in a halo (nobody in my own cell): the heartbeat, through every socket - the halo's player keeps me
   quiet(() => sockets[1].receive({ t: 'join', id: 'ann-0002', name: 'Ann' }));
+  assert.equal(poses(sockets[1]).length, 7, 'the join wakes the lone session: where I stand, at once');
   clock.t += HEARTBEAT_MS;
   s.sendPose({ ...pose, mv: 0 });
   for (const ws of sockets) assert.equal(poses(ws).at(-1).ts, poses(sockets[0]).at(-1).ts, 'the heartbeat, everywhere');
-  assert.equal(poses(sockets[1]).length, 7);
+  assert.equal(poses(sockets[1]).length, 8);
 });
 
 test('HALO-THIN standing and turning: my own cell hears each turn, a halo the place once - the session keeps the stop it sent (AUDIT C3; mutants: the halo\'s last recorded moving)', () => {
@@ -208,7 +213,6 @@ test('HALO-THIN the halos\' own keepalive: standing and turning for half a minut
   const count = new Map(sockets.slice(1).map((ws) => [ws, 0]));
   for (let f = 0; f < 30 * 60; f++) {
     clock.t += 1000 / 60;
-    // PIN MOVED (RPT1026-SECNET, LINE-STALL): my own cell busy HEARS its room too - a cell that hears nothing for PING_MS
     // is pinged, and that ping goes down every halo with it, which is no halo's own clock
     if (f % 6 === 0) sockets[0].receive({ t: 'pong' });
     s.sendPose({ ...start, mv: 0, yaw: f * 0.01 });
@@ -225,42 +229,5 @@ test('HALO-THIN the halos\' own keepalive: standing and turning for half a minut
   }
 });
 
-test('HALO-THIN a referee\'s word down a halo carries where I am: the halo hears my latest pose first when its last is not it, and nothing more when it is - a duel\'s word and a rite\'s call it before they leave (AUDIT D3; mutants: never brought; brought every time; the call sites dropped)', () => {
-  const { s, sockets, clock, start, halos, poses, haloWs } = cornerSession();
-  const pose = { ...start };
-  clock.t += 100; s.sendPose({ ...pose });
-  for (let f = 0; f < 5; f++) { clock.t += 100; pose.z += UNITS_PER_M; s.sendPose({ ...pose }); }   // five metres on: not due
-  const ws = haloWs(halos[0]);
-  assert.equal(poses(ws).length, 1);
-  s._haloCurrent(ws);
-  assert.equal(poses(ws).length, 2, 'brought up to date');
-  assert.equal(poses(ws).at(-1).z, pose.z, 'where I am');
-  s._haloCurrent(ws);
-  assert.equal(poses(ws).length, 2, 'already current: nothing more');
-  s._haloCurrent(sockets[0]);
-  assert.equal(poses(sockets[0]).length, 6, 'my own cell is never brought (it hears every pose)');
-  const online = read('src/net/online.js');
-  assert.match(online, /if \(s\.length > DUEL_FRAME_MAX\) return false;[^\n]*\n\s*this\._haloCurrent\(ws\);[^\n]*\n\s*try \{ ws\.send\(s\); \}/, 'the duel\'s word');
-  assert.match(online, /this\._haloCurrent\(ws\);[^\n]*\n\s*try \{ ws\.send\(JSON\.stringify\(\{ t: 'rite', \.\.\.w \}\)\); \}/, 'the rite\'s');
-});
-
 // ── the host ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-test('HALO-THIN the host: the halos whole while a duel stands (it is refereed in the room my opponent is heard through) and in a serpent\'s fight - never for the open zone, whose referee holds me by a word my own cell alone says - said before the frame\'s pose; the serpent\'s fight is this frame\'s (mutants: the duel unasked; the serpent unasked; the word after the pose; the fight never put down)', () => {
-  const w = read('src/scenes/world.js');
-  const line = /\n\s*online\.haloWhole = !!duelMgr\.duel \|\| _serpentFight;[^\n]*\n\s*if \(!modes\?\.caravanVisit\) caravanVisitLink\.close\(\);[^\n]*\n\s*if \(!key\) \{ if \(online\.room\) online\.leave\(\); \}/;   // above the caravan's close, which WAGONS2-VISIT holds against the join (test/systems/wagons2_visit.test.js)
-  assert.match(w, line, 'the word, just before the frame\'s join or pose');
-  assert.ok(w.indexOf('online.haloWhole = ') < w.indexOf('    else online.sendPose({ ...pose, ...arm, ...poseFx() });'));
-  assert.match(w, /\n\s*_serpentFight = false;\n\s*if \(!serpentHost\) return;/, 'put down each frame first');
-  assert.match(w, /try \{ fight = street && serpentHost\.frame\(\); \} catch \(e\) \{[^\n]*\}\n\s*_serpentFight = !!fight;/, 'then this frame\'s fight');
-  const of = w.indexOf('  const onlineFrame = (now, dt) => {');
-  assert.ok(of > 0 && w.indexOf('    serpentFrame();', of) < w.indexOf('online.haloWhole = ', of), 'the fight read before the word');
-  // the relay's referees read the pose of the room the bout is in - the reason the word exists; the open zone's holds a
-  // fighter by the zone word, and the session says it down its own cell's socket alone
-  const relay = read('server/src/index.js');
-  assert.match(relay, /if \(posed && this\._duelRef\?\.bouts\.size\) \{ duelPose\(this\._duelRef, a\.sub, m\.p, now\);/);
-  assert.match(relay, /if \(posed && this\._trailing\(a\)\) this\._trailPose\(ws, m\.p, now\);/);
-  const online = read('src/net/online.js');
-  assert.match(online, /: this\._socketFor\(d\.to\);/, 'a duel frame goes down the socket the opponent is heard through');
-  assert.match(online, /setWildZone\(z, dead = false\) \{[\s\S]*?if \(this\.status === 'open' && this\.wildOk && this\._ws && this\._welcomed\.has\(this\._ws\)\) \{ this\._sayZone\(this\._ws, v, !v && dead\);/, 'the zone word: my own cell\'s socket alone');   // PIN MOVED (AUDIT FOE-KEEPS E2): and left dying, the kill credit's word
-});

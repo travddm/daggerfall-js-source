@@ -10,16 +10,14 @@
 // serializes KeyCode NAMES into KeyBindings.txt, so the port's stored
 // shape is the same idea one alphabet over.
 //
-// SOC5 (2026-09-16, Mac: "Players should be able to interact with others in
-// the world upon encountering them by pressing F on their body, which should
-// show options to add as a friend or invite to a party"): THE ONE ACTION IN
+// SOC5: THE ONE ACTION IN
 // THIS LIST DFU DOES NOT HAVE. 'SocialInteract' is appended past DFU's
 // forty-four, on KeyF, which SetupDefaults leaves free. It is the port's own
 // because the thing it does is the port's own - Daggerfall Unity has no other
 // players to stand in front of, no friends and no parties - so it is a
 // Ledger A row (ONLINE), not a parity claim.
 //
-// QS2 (2026-09-17): and three more beside it - 'QuickUse1', 'QuickUse2' and
+// QS2: and three more beside it - 'QuickUse1', 'QuickUse2' and
 // 'QuickSwap', the enhanced HUD's quickslot diamond (systems/quickslots.js).
 // Same class, same reason: DFU's HUD carries no item slots, so these are the
 // port's own rows and not a parity claim either.
@@ -58,20 +56,17 @@ export const ACTIONS = Object.freeze([
   // SOC5: the port's own, past DFU's last row - see the header. The F-menu on
   // another player's body, and the friends/party panel when nobody is in reach.
   'SocialInteract',
-  // QS2 (2026-09-17, Mac: the Demon's Souls quickslot diamond on the enhanced
-  // HUD): three more of the port's own, appended for the same reason
+  // QS2: three more of the port's own, appended for the same reason
   // 'SocialInteract' was - Daggerfall has no item slots on its HUD at all, so
   // these are Ledger A rows, not parity claims. The two consumable presses and
   // the weapon swap the diamond's cells name (systems/quickslots.js).
   'QuickUse1', 'QuickUse2', 'QuickSwap',
-  // QS4 (2026-09-17, Mac: "The 4th quickslot doesnt have a keybind"): the
+  // QS4: the
   // diamond's OFF-HAND cell, which had none - it spoke only through Handheld
   // Torches' own mod key, which the enhanced pane cannot rebind and no pad can
   // carry. Appended, like the three above and for the same reason.
   'QuickOffHand',
-  // QS6 (2026-09-17, Mac: "for slot 3, I want to change it to be for spells.
-  // So you should be able to hold the keybind to switch between applicable
-  // spells, and then press the keybind to equip"): the diamond's SPELL slot.
+  // QS6: the diamond's SPELL slot.
   // Appended, like the four above; 'QuickSwap' keeps its row and its place -
   // an action is never removed from this list, and the swap is still
   // rebindable - it only gives up the DEFAULT key, which the cell it is drawn
@@ -88,8 +83,7 @@ export const ACTIONS = Object.freeze([
   // player would rebind into a clash.
   'QuickLootAll',
   'QuickLootOpen',
-  // FREEMOUSE (2026-09-22, Mac: "an entirely new keybind. A mouse free
-  // that allows you to toggle the use of your mouse"). APPENDED, like
+  // FREEMOUSE. APPENDED, like
   // every port action before it.
   //
   // THE TOGGLE ITSELF IS NOT NEW - `ActivateCursor` is DFU's own
@@ -105,7 +99,7 @@ export const ACTIONS = Object.freeze([
   // (player/pointerLock.js bindCursorToggle) so there is no second
   // toggle to keep in step.
   'FreeMouse',
-  // KB1 (2026-09-23, Mac: "We have a lot of mods, a lot of keybinds. I really want to formalize a solid solution"):
+  // KB1:
   // EVERY KEY THAT DOES SOMETHING IN THE WORLD IS AN ACTION HERE. Appended, like every port action before them.
   //  - 'Interact': the E activate, a raw `KeyE` read in four hosts beside DFU's E-AbortSpell - one press did both.
   //  - 'QuickDial': the pixel dial, a raw `Tab` read in three places.
@@ -129,37 +123,36 @@ export const ACTIONS = Object.freeze([
   'BoatToggleSail', 'BoatTrimRight', 'BoatTrimLeft', 'BoatTrimModifier',
   // CSA-G: and the time scale's three (Controls.IncreaseTimeScale, DecreaseTimeScale, ResetTimeScale) - appended
   'BoatTimeScaleUp', 'BoatTimeScaleDown', 'BoatTimeScaleReset',
-  // TV1 (2026-09-27, bible/06-Systems/Travel-View.md): the travel view from play. Its door is the map's Overworld
+  // TV1: the travel view from play. Its door is the map's Overworld
   // button (and O on the sheet); this row is for a player who wants a key without the map. It SHIPS UNBOUND, as
   // DebugOverlay does, and for the reason FREEMOUSE's own sweep records: every letter is spent, and a default on a
   // free-but-strange key would be one more thing the pane has to explain. Appended, like every port action.
   'TravelView',
-  // PADWALK (Mac: "make ... walk mode bindable on controller"): one key or button that turns walking - DFU's slow,
+  // PADWALK: one key or button that turns walking - DFU's slow,
   // quiet walk (Sneak) - on and off (player/walkMode.js). Appended, like every port action before it. Ships unbound;
   // the Controls pane and the Controller bindings window (ui/plus/plusPadBinds.js) both draw its row.
   'WalkMode',
-  // VIEW-TOGGLE (Mac: "a force first person/third person toggle"): one press, the other view, for whichever body
+  // VIEW-TOGGLE: one press, the other view, for whichever body
   // answers (player/mwView.js mwViewTogglePerspective). Appended, like every port action before it.
   'TogglePerspective',
-  // PROF1 (bible/06-Systems/Professions-Arc.md 8, 22): THE ACT CHOICE - at an herb patch, what Interact starts: the
+  // PROF1 (8, 22): THE ACT CHOICE - at an herb patch, what Interact starts: the
   // herbs or the Basket's food. KB1's rule, one key one action: every letter and digit is spent, and `-`, `=` and `/`
   // are the decorator's own keys (scenes/decor/decorTool.js DECOR_FREE_KEYS), so it ships on the up arrow, which nothing
   // reads in play (THE MERGE: `;`, its key on its branch, is Come Sail Away's lantern - CSA-D, shipped first); the
   // prompt names it. (MERGE 2: after main's TogglePerspective, which shipped first.)
   'ActChoice',
-  // HELM-KEYS (2026-09-29, the player: "Arrow keys should not only control your ship, but also setting and raising
-  // your sails"): Come Sail Away's helm on the arrows - MORE SAIL and LESS SAIL, the port's own two steps through the
+  // HELM-KEYS: Come Sail Away's helm on the arrows - MORE SAIL and LESS SAIL, the port's own two steps through the
   // mod's sail states (systems/comeSailAway/comeSailAway.js MoreSail, LessSail), the down arrow's and the up arrow's (a DEFAULT
   // SHARE beside ActChoice, below). Appended, like every port action before them.
   'BoatSailUp', 'BoatSailDown',
-  // CLASSIC-PAGES (2026-09-30, Mac: "Enhanced pages + key"): THE PROFESSIONS KEY - the Professions and Stores pages on
+  // CLASSIC-PAGES: THE PROFESSIONS KEY - the Professions and Stores pages on
   // either skin (ui/pauseDoor.js openPauseFlow: the classic pause has no pages). A DEFAULT SHARE on the down arrow beside
   // HELM-KEYS' less sail (DEFAULT_SHARES), as more sail shares the up arrow with the act choice: the professions' two keys
   // on the arrows, and at a helm both arrows the sails' (ui/input.js routeAction: the key opens nothing while sailing).
   // Every function key a player would guess is DFU's, the HUD's or the browser's (F7 caret browsing, F10 the large HUD,
   // F12 the dev tools - HT4). Appended after main's two, like every port action before it.
   'Professions',
-  // LEGACY1 (bible/06-Systems/Legacy-Arc.md): PROJECT LEGACY'S FAMILY TREE - the mod's "Key Input" (G) as the registry's
+  // LEGACY1: PROJECT LEGACY'S FAMILY TREE - the mod's "Key Input" (G) as the registry's
   // own action (KB1's law for a mod's key; LEGACY-KEY in DEFAULT_BINDINGS for why it is not G). Appended, like every
   // port action before it.
   'LegacyFamily',
@@ -169,32 +162,30 @@ export const ACTIONS = Object.freeze([
   // rows and their positions - they only give up their F1-F4 DEFAULTS, so a player who wants them binds them back.
   // Appended, like every port action before it.
   'ModeWheel',
-  // TECH1 (bible/05-Combat/Weapon-Techniques.md; the owner: "This would have its own keybinding"): THE WEAPON'S
+  // TECH1 (): THE WEAPON'S
   // TECHNIQUE - the line a weapon (or the Gauntlets, bare-handed) carries, done: a technique that aims is HELD to aim and
   // let go to loose it, a tap looses it at the look; one that does not goes on the press (combat/techniques.js). Every
   // host's weapon rig reads it through the one door the torches' keys take (actionDown). Appended, like every port
   // action before it.
   'WeaponTechnique',
-  // SPYGLASS (2026-10-11, the owner: "a spyglass option where you can aim and view to observe other ships"): THE
+  // SPYGLASS: THE
   // CAPTAIN'S GLASS - one press raises it to the eye aboard a ship, the next lowers it (scenes/world.js spyglassStep;
   // the naval host makes out the ship it holds). A DEFAULT SHARE on K beside Travel Options' FollowPaths
   // (DEFAULT_SHARES): the road's key ashore, the glass's aboard - a deck has no road, and the road is never followed
   // from one. Appended, like every port action before it.
   'Spyglass',
-  // UI-CALM (2026-10-14, a player: "the horse riding menu would be great in a blocky form in the bottom right and we
-  // need a keybind to make it appear and disappear"): THE SADDLE PANEL'S KEY - one press shows the panel while riding, the
+  // UI-CALM: THE SADDLE PANEL'S KEY - one press shows the panel while riding, the
   // next puts it away (ui/enhanced/enhancedSaddle.js toggleSaddlePanel). On F2: the letters are spent, and Slash, Minus and
   // Equal are the decorator's (scenes/decor/decorTool.js DECOR_FREE_KEYS); F1-F4 are free since MODE-WHEEL let the four modes
   // go, and a file that still keeps GrabMode on F2 keeps it (the action stands unbound until the player gives it a key).
   // Appended, like every port action before it.
   'SaddlePanel',
-  // CARGO-ANYWHERE (2026-10-17, the owner: "Cargo should be able to be accessed at any time"; bible/03-World/Naval-Refit.md):
+  // CARGO-ANYWHERE:
   // THE SHIP'S HOLD - one press opens the hold of the ship at hand (her helm, her deck, her cabin), else of the last whose
   // helm I took, else the first of my fleet, wherever she lies (scenes/holdDoor.js). On F4: the letters are spent, F1 and
   // F3 are the browser's (ui/input.js BROWSER_STEALS), F2 the saddle panel's. Appended, like every port action before it.
   'ShipHold',
-  // SHOT-KINDS (2026-10-17, the owner: "Different cannon shot types, for example a grape shot to thin out crew, Chain to
-  // try to take down their sail, etc"; bible/03-World/Naval-Refit.md): THE GUNS' LOAD - one press steps the load of the
+  // SHOT-KINDS: THE GUNS' LOAD - one press steps the load of the
   // guns at hand (the battery laid, else the one the look bears on) on: round, grape, chain, heated (scenes/naval/
   // navalLoads.js). It ships with no key - every letter is spent, and the helm's own Shot button and the wheel while the
   // guns are laid choose it - and a player gives it one in the Controls pane, or a pad button (ui/plus/plusPadBinds.js).
@@ -277,7 +268,7 @@ export const DEFAULT_BINDINGS = Object.freeze([
   ['F8', 'PrintScreen'],
   ['F9', 'QuickSave'],
   ['F11', 'QuickLoad'],
-  // SOC5 (Mac: "by pressing F on their body"): the port's own row, past DFU's
+  // SOC5: the port's own row, past DFU's
   // table. KeyF is the key Mac named and SetupDefaults never spends - the one
   // free letter next to the movement hand. It rides in DEFAULT_BINDINGS rather
   // than in any host, so a SAVED file from before this slice gains it without a
@@ -360,9 +351,9 @@ export const DEFAULT_BINDINGS = Object.freeze([
   // mod's TextKey defaults.
   ['Digit4', 'QuickOffHand'],
   // KB1 - THE REST OF THE STANDARD'S DEFAULTS.
-  //  - E INTERACTS (Mac, 2026-09-23: "E = Activate"). DFU spends E on AbortSpell, which moves to Backquote above.
+  //  - E INTERACTS. DFU spends E on AbortSpell, which moves to Backquote above.
   //  - TAB IS THE DIAL, as it has been since PX15 - an action now, so the pane sees it and a player can move it.
-  //  - THE DIGITS ARE THE QUICK SLOTS' AND THE HOTBAR'S (Mac: "Digits = quickbar/hotbar"): 1-4 above, 5-0 here.
+  //  - THE DIGITS ARE THE QUICK SLOTS' AND THE HOTBAR'S: 1-4 above, 5-0 here.
   //  - THE MODS' KEYS keep the port's shipped defaults (HT4's O/G/X, EOTB's B and NumpadAdd, Travel Options' K), and
   //    Horse Cart and Cargo moves off the digits to the comma and the period - every letter is spent, F7 is the
   //    browser's caret browsing and F10 DFU's HUD toggle (AUDIT HCC K1), and these two are free on every count.
@@ -424,8 +415,7 @@ export const DEFAULT_BINDINGS = Object.freeze([
 ]);
 
 /**
- * HELM-KEYS (2026-09-29, the player: "Arrow keys should not only control your ship, but also setting and raising your
- * sails"): A DEFAULT SHARE - one key shipped to two actions that are never live at once (UXB1-S's share, as a default;
+ * HELM-KEYS: A DEFAULT SHARE - one key shipped to two actions that are never live at once (UXB1-S's share, as a default;
  * KB1 law 3 keeps every OWNER once). `[code, action, partner]`: `action` answers `code` beside `partner`, the key's
  * owner in DEFAULT_BINDINGS. resetDefaults seats it only while the key's owner IS the partner - a player's own rebind
  * of the key is never shared onto - and an autofill only while the action is keyless and not force-removed, so a
@@ -628,8 +618,7 @@ export function actionLabel(action) {
 }
 
 /**
- * PAD1 (2026-09-21, Mac: "a comprehensive pass on m/kb keybinds and
- * controller support ... including the quickbar"): THE PAD LAYOUT.
+ * PAD1: THE PAD LAYOUT.
  *
  * DFU's ResetDefaults binds no action to a controller button. Out of the
  * box a pad moves and looks (the axis dict) and clicks (the joystick UI
@@ -662,8 +651,7 @@ export function actionLabel(action) {
  * buttons and four directions is what a pad has, and the rest is the
  * grid's to bind - a combo with View or Menu held is DFU's own way.
  *
- * TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife
- * Use"): B is INTERACT in the world - E, the professions' start and
+ * TOUCH-HOLD: B is INTERACT in the world - E, the professions' start and
  * their hold (a common herb, a body, the net's haul) and the sea's,
  * which no pad row reached. B did nothing there (DFU's Back answers
  * only while a window is up, and a window's press never reaches the
@@ -876,9 +864,7 @@ export function createBindings() {
 const NO_SHARERS = Object.freeze([]);   // AUDIT UXB1 F5: dictEntries' unshared key - not a fresh [] per key per walk
 
 /**
- * UXB1-S (2026-09-25, the UX backlog: "Is there a reason you cannot have multiple keys bound to the same action such
- * as jump+swim-up?", and then: "So you wont add multiple key bindings even when asked? I dont care if it goes against
- * daggerfall"): ONE KEY, SEVERAL ACTIONS - A DEPARTURE FROM DFU, AND RECORDED AS ONE (Ledger A's UXB1 row).
+ * UXB1-S: ONE KEY, SEVERAL ACTIONS - A DEPARTURE FROM DFU, AND RECORDED AS ONE (Ledger A's UXB1 row).
  *
  * DFU's two dicts are KeyCode -> Action and its window refuses to close on a duplicate (CheckDuplicateKeyCodes), so a
  * key means one thing per dict. The port keeps that orientation and every reader of it, and adds beside each dict
@@ -1624,7 +1610,7 @@ export function endFrame(state) {
 // test/systems/a8_combos.test.js' two-modifier pair. (test/systems/combohosts.test.js
 // is AUDIT 58's sweep of the Set ARGUMENT and carries neither claim.)
 //
-// GP1 (2026-09-11) PORTED THE AXES AND THE JOYSTICK: AxisActions and
+// GP1 PORTED THE AXES AND THE JOYSTICK: AxisActions and
 // JoystickUIActions live on this store (the three dicts above, their
 // setters and the KeyBindData_v1 blocks), systems/gamepad.js holds
 // InputManager's stick and axis-key law, and ui/gamepadInput.js polls

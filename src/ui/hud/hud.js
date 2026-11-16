@@ -15,7 +15,6 @@
 //   Scale: classic pixels x floor(canvasHeight / 200) (the 320x200
 //   reference), min 1 - integer scaling keeps the art crisp.
 
-import { bitmapToColor32 } from '../../formats/color32Order.js';   // BOOT2: the indexed-to-color32 door is a formats concern; it lived here and put the HUD on the entry's boot path through ui/cursor.js
 import { maxFatigue, maxBreath, liveStat } from '../../systems/statMods.js';
 import { isEnhanced } from '../../systems/uiSkin.js';   // PX30: the HUD is a skin too
 import { drawEnhancedHud, hideEnhancedHud } from '../enhanced/enhancedHud.js';   // PX30; FB1018f DUNGEON-DIGITS: its word under a window, for the hide door
@@ -57,11 +56,11 @@ import { uiCanvas, onUiScreen } from '../uiScreen.js';   // RETRO-UI: the HUD in
 import { frameMark } from '../../systems/frameClock.js';   // DISC22-C: the classic loot panel draws the frame resolved in THIS frame
 import { classicLootFrame } from '../../systems/classicLootFrame.js';   // DISC22-C: a leaf - hud.js must not reach the item graph
 import { drawLootPanel } from '../classicLootPanel.js';   // DISC22-C: quick loot's classic face
-import { packImgTexture } from '../packArt.js';   // OVH2: the worn UI pack's picture
 import { ToolTip } from '../toolTip.js';
 import { PARTY_GREEN } from '../../net/social.js';   // COMPASS-PARTY: the one green a party is drawn in
 import { nodeMarkRgb } from '../nodeMarks.js';   // NODE-MARKS: a profession's nodes in its own colour
 import { BOAT_MARK_RGB, BOAT_GLYPH_W, BOAT_GLYPH_ROWS } from '../boatMarks.js';   // BOAT-MARK: my boats, a sail over a hull
+import { compassPictureOptions, loadHudPicture } from './hud-picture.ts';
 // NODE-MARKS: PROF2's Prospector's veins were drawn here in one copper; every profession's nodes are drawn in their own now.
 
 export const COMPASS_BOX_OUTLINE = 2;
@@ -196,8 +195,7 @@ export function barFill(current, max) {
 
 /** Classic-UI integer scale: FIT the 320x200 virtual screen inside
  *  the canvas (min axis), never overflow it. Height-only scaling blew
- *  classic layouts past the edges on portrait phones (2026-08-14 -
- *  Mac's report); on landscape desktop min() picks the same value the
+ *  classic layouts past the edges on portrait phones; on landscape desktop min() picks the same value the
  *  old formula did. */
 export const hudScale = (canvasWidth, canvasHeight) =>
   Math.max(1, Math.floor(Math.min(canvasWidth / 320, canvasHeight / 200)));
@@ -218,17 +216,12 @@ export async function loadHud({ fetchBytes, ImgFile, palette, renderer }) {
   // draws none.
   preloadSpellIcons({ fetchBytes, palette, renderer })
     .catch((e) => console.warn('[hud] spell icon sheets unavailable:', e?.message ?? e));
-  const load = async (name) => {
-    const img = new ImgFile();
-    img.load(await fetchBytes(name), name, palette);
-    const bmp = img.getDFBitmap();
-    const packed = await packImgTexture(renderer, name);   // OVH2: the worn UI pack's bars and compass, at the classic size (nativePanel.loadImg's law)
-    return { tex: packed ?? renderer.uploadTexture('img', name, bitmapToColor32(bmp, palette)), w: bmp.width, h: bmp.height };
-  };
+  const load = (name, opts) => loadHudPicture({ fetchBytes, ImgFile, palette, renderer }, name, opts);
+  const compassOpts = compassPictureOptions();
   try {
     const [health, fatigue, magicka, compass, compassBox] = await Promise.all([
       load('MAIN03I0.IMG'), load('MAIN04I0.IMG'), load('MAIN05I0.IMG'),
-      load('COMPASS.IMG'), load('COMPBOX.IMG'),
+      load('COMPASS.IMG', compassOpts), load('COMPBOX.IMG', compassOpts),
     ]);
     // P12: the breath bar is SOLID color (VerticalProgress), no art -
     // two generated 1x1 textures.
@@ -519,7 +512,6 @@ export function hideHudTextSurfaces(hudText = null) {
 
 export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
   { font = null, cursorActive = false, reticleHidden = false, windowCoversHud = null, hudHidden = false, detected = null, playerXZ = null, gate = null, quest = null, wayOut = null, party = null, ships = null, nodes = null, boats = null, largeHud = null, hover = null,
-    arch = null,   // EG-F: my company's Elite arch, scene XZ, while it stands - the compass's mark (scenes/eliteGates/egArch.js compass)
     // STAR6: the compass's event marks the host has long handed and this door never took - the sea serpent's (SERPENT1,
     // scenes/world.js serpentCompassMark) and a found Hollow's (SD2c, sdCompassMark), each drawn by the enhanced HUD and
     // dropped here, so neither showed - and a fallen star's (starfall.compassMark), scene XZ each, or null
@@ -686,13 +678,13 @@ export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
   // it answers that itself (ui/quest/questHerald.js). Its clock is the frame's
   // real seconds and stops under the HUD's hide gate - DFU's HUD does not
   // Update under a window (DaggerfallUI.cs:429-433).
-  // EVENTS1 (bible/10-UI/Event-Board.md): and the event board just before it, under the herald's own gate and clock, on
+  // EVENTS1: and the event board just before it, under the herald's own gate and clock, on
   // every skin - the events' lines come to it instead of the chat, so the classic skin must show them too
   drawEventBoard({ hidden: cursorActive || !hudRenderEnabled(), dt });
   drawQuestHerald({ hidden: cursorActive || !hudRenderEnabled(), dt });
   drawQuestTracker({ hidden: cursorActive || !hudRenderEnabled() });   // GUIDE4: the tracker's card, the same gate and the same hide door
   drawRevenantCards({ hidden: cursorActive || !hudRenderEnabled(), dt });   // REVENANT-CARD: the same gate, its clock the frame's - no card stands on the classic skin, so this is outside its gate as the herald is
-  try { noteHeldLooks(vitals); } catch { /* a look missed this frame is read the next */ }   // APPEARANCES (bible/04-Characters/Wardrobe.md): every look held is collected, on every skin and in every host
+  try { noteHeldLooks(vitals); } catch { /* a look missed this frame is read the next */ }   // APPEARANCES: every look held is collected, on every skin and in every host
   // LOOT-BANNER: the same gate and clock, outside the skin's gate for a reason of its own - the watcher reads and marks the
   // pack on EVERY skin (the four hosts hand drawHud the player entity as `vitals`), so a piece found on the classic skin
   // is not announced when the player switches to Enhanced Plus; only Plus draws a banner
@@ -717,7 +709,6 @@ export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
       detected: detected ?? null,
       playerXZ: playerXZ ?? null,
       gate: gate ?? null,   // WB1: the Oblivion Gate's scene XZ while the player stands in its ring - the compass's own mark
-      arch: arch ?? null,   // EG-F: my company's Elite arch, scene XZ, while it stands (scenes/eliteGates/egArch.js compass)
       serpent: serpent ?? null, sd: sd ?? null, star: star ?? null,   // STAR6: forwarded at last (SERPENT1's, SD2c's) - and the star's
       quest: quest ?? null,   // GUIDE5: the tracker's quest's place, scene XZ, on the street - the compass's quest mark
       wayOut: wayOut ?? null,   // WAYOUT1: underground, the way out along the walked trail, scene XZ (systems/wayOut.js)
@@ -890,7 +881,7 @@ export function drawHud(renderer, canvas, art, vitals, heading01, dt = 0,
   drawSpellIconRows(renderer, canvas, vitals, dt, { font, cursorActive, largeHudRect: null, hover });
 }
 
-/** COMPASS-PARTY (2026-09-27, Discord - Ashley: "just lil green marks that point in that direction"): the party on
+/** COMPASS-PARTY: the party on
  *  the classic compass - the Detect marker's 5x3 triangle, its row over the box's top edge and its bearing law
  *  (compassMarkerLerp, clamped: a mate behind stands at the box's end on the side to turn toward), in the party's one
  *  green (net/social.js PARTY_GREEN). `points` are scene XZ (ui/partyMapMarks.js partyCompassPoints); `box` is the
@@ -961,7 +952,7 @@ export function escortBottomPx(canvas) {
   return native * hudScale(canvas.width, canvas.height) * (view / canvas.height);
 }
 
-/** NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass"): the professions'
+/** NODE-MARKS: the professions'
  *  nodes on the classic compass - the party's 5x3 triangle, its row over the box's top edge and its bearing law
  *  (compassMarkerLerp, clamped), each in its profession's colour (ui/nodeMarks.js nodeMarkRgb) at its own opacity, the
  *  nearer brighter. `points` are ui/nodeMarks.js NodeCompassPoints, the nearest last (drawn over the rest). Answers
@@ -988,7 +979,7 @@ export function drawNodeCompassMarks(renderer, points, playerXZ, heading01, { bx
   return drawn;
 }
 
-/** BOAT-MARK (2026-10-01, "I want to build a compass icon that tracks your boat"): my boats on the classic compass -
+/** BOAT-MARK: my boats on the classic compass -
  *  a little boat (ui/boatMarks.js BOAT_GLYPH_ROWS: a sail over a hull, BOAT_GLYPH_W native pixels across), its foot on
  *  the box's top edge as the Detect markers' row stands, by their bearing law (compassMarkerLerp, clamped: a boat
  *  behind stands at the box's end on the side to turn toward), in the boats' teal. `points` are scene XZ

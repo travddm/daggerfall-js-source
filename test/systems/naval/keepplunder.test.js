@@ -1,4 +1,4 @@
-// KEEP-PLUNDER and KEEP-BOATS (2026-09-30, Mac: ship ownership "less punishing" - "Keep boats & cargo"). The sea is
+// KEEP-PLUNDER and KEEP-BOATS. The sea is
 // never a save's, and a transition or a fast travel empties it: a prize whose hold was not yet emptied and the casks of
 // the ships I sank went with it. Before it goes, my crew stows them (scenes/naval/navalHost.js stowPlunder). And a boat
 // placed in a dungeon is kept, hold and all, when the player leaves it (the mod's PersistentDungeonBoats, shipped on).
@@ -15,7 +15,7 @@ import { scene } from '../../csaScene.mjs';
 import { Boat } from '../../../src/systems/comeSailAway/comeSailAwayBoat.js';
 
 const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-/** A peer's blow - PIN MOVED (TOUGHER-SHIPS): one past a hit's most (navalWire.js NAVAL_HIT_MAX, a broadside's worth) lands
+/** A peer's blow
  *  as several, her fire and her men with the first; a toughened hull outweighs one hit. The pieces after one that strikes
  *  her are the same volley's (STRUCK_GRACE_S: floored at 1) - a blow meant to take her from afloat straight under is
  *  two blows a grace apart, never one. */
@@ -108,7 +108,6 @@ test('KEEP-PLUNDER / KEEP-BOATS: THE WORLD\'S WIRING - the crew stows before eve
   assert.match(WORLD, /const navalStow = \(\) => \{ if \(!_loading\) naval\?\.stowPlunder\?\.\(\); \};/);
   for (const hook of ['onTransitionInterior: () => { navalStow(); csaOnTransition(); navalTransition(); },', 'onTransitionExterior: () => { navalStow(); csaOnTransition(); navalTransition(); },',
     'onTransitionDungeonInterior: (ctx) => { navalStow(); ohAbyss', 'onTransitionDungeonExterior: () => { navalStow(); ohAbyss']) assert.ok(WORLD.includes(hook), hook);
-  // PIN MOVED (HELM-JUMP, FIELD BUGS 2026-10-11): the crew still stows first - then a jump with no event of its own lets
   // go of the helm (packing her, as a fast travel does after its stow), then Come Sail Away hears the teleport
   assert.match(WORLD, /if \(modEvent !== 'load'\) navalStow\(\);[^\n]*\n(?:\s+\/\/[^\n]*\n)*\s+if \(modEvent == null && !resolveArrival\) csaPreJump\(\);\n\s+csaOnTeleport\(\);/);
   assert.match(WORLD, /navalStow\(\);[^\n]*\n\s+if \(csaRuntime && !partyArrival\) csaCall\(\(\) => csaRuntime\.OnPreFastTravel\(\)\);/);

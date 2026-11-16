@@ -1,5 +1,5 @@
 // @ts-check
-// STAND-FLAT / STAND-HORSE (2026-10-12, bible/04-Characters/Morrowind-NPCs.md section 28): THE FLATS THAT STAND FOR A
+// STAND-FLAT / STAND-HORSE: THE FLATS THAT STAND FOR A
 // BODY - a town horse (TEXTURE.201's horse records) and a person's flat no StaticNPC holds (a person archive's flat with
 // no faction, RMBLayout's scenery: a World of Daggerfall site's people, a block's factionless figure). Each is drawn in a
 // batch of its own so a 3D horse (world/standingHorses.js) or a Morrowind body (the street's 'people' lane, read as a

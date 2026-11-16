@@ -1,5 +1,5 @@
 // @ts-check
-// STAFF-EVENT (2026-10-24, mob; net/staffEvent/staffEventLaw.js, bible/11-Multiplayer/Staff-Events.md): A STAFF EVENT ON
+// STAFF-EVENT: A STAFF EVENT ON
 // THIS MACHINE. The hub's book of the events live, each held as a RAID of its own (systems/raidingParties.js runs it - one
 // player in the place stands its monsters, the rest stand them as puppets, by RAID2's own law), and each event's ledger
 // as its place's cell last said it: whether its mini boss is due, stood, fell, and the kills so far. The kills are read
@@ -8,6 +8,7 @@
 //
 // Nothing here is saved: an event is the hub's, said again at every hello.
 import { validStaffEvent, staffEventKey, staffEventIdOf, isAreaEvent, STAFF_EVENTS_MAX } from '../net/staffEvent/staffEventLaw.js';
+import { raidTownIs } from '../world/raidShared.js';   // WW6: a town's event's town - the Bay's by region and location, past the Bay by its own index
 
 /**
  * A staff event held as a raid: the fields systems/raidingParties.js reads off a raid, and the event's own.
@@ -78,7 +79,7 @@ export const staffLedgerOf = (id) => _ledgers.get(id) ?? null;
 export const staffRaids = () => [..._raids.values()].filter((r) => !r.cleansed);
 /** The events that ended and whose monsters are not yet routed (raidingParties routs each once). */
 /**
- * BOSS-BOUND (2026-10-25, mob: "heal was set to 10000 for zombie its wromng", "the event boss had to low of health"): the
+ * BOSS-BOUND: the
  * most health a peer's mini boss of the event `key` may claim - the exact health staff typed (`hp`), or its kind's
  * normal bound (net/foeBounds.js, `normal`) times the event's multiplier (`bh`), whichever is more. FOE-BOUNDS judged it
  * as a plain elite, and every copy but its owner's took a boss past that down as impossible. Null when no live event
@@ -96,13 +97,14 @@ export const staffRaidOfKey = (key) => { const id = staffEventIdOf(key); return 
 
 /**
  * THE EVENT I STAND IN, or null: a town's while I stand in its town (the host's `townHere` - outdoors, in the rect, the
- * raid's own test); an area's while I stand outdoors on its pixel.
+ * raid's own test - WW6: a town past the Bay by its own location index, world/raidShared.js raidTownIs); an area's while
+ * I stand outdoors on its pixel.
  * @param {{regionIndex: number, locationIndex: number}|null} town @param {{x: number, y: number}|null} px @param {boolean} outdoors
  */
 export function staffRaidHere(town, px, outdoors) {
   for (const r of _raids.values()) {
     if (r.cleansed) continue;
-    if (isAreaEvent(r.staff) ? outdoors && !!px && px.x === r.px && px.y === r.py : !!town && town.regionIndex === r.regionIndex && town.locationIndex === r.locationIndex) return r;
+    if (isAreaEvent(r.staff) ? outdoors && !!px && px.x === r.px && px.y === r.py : raidTownIs(r, town)) return r;
   }
   return null;
 }
@@ -126,7 +128,7 @@ export function staffBossWanted(r) {
 /** @param {StaffRaid} r */
 export const staffBossByHand = (r) => (r.staff.fb ?? 0) > (r.handSeen ?? 0);
 /**
- * BOSS-LOST (mob 2026-10-25: "boss seems to not spawn every time"): the call whose boss stood but stands nowhere now -
+ * BOSS-LOST: the call whose boss stood but stands nowhere now -
  * not fallen, not mine, no puppet of it - for STAFF_BOSS_LOST_MS, or -1. A jump's sweep, a removal or a runner gone took
  * it, and the cell, told it stood, would never call it again: the one who runs the event stands it again, for the same
  * call. The wait lets a fallen runner's boss come over to me (raidingParties.js tookStaffBoss) first.

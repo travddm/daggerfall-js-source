@@ -1,7 +1,6 @@
 // @ts-check
-// WB1 (2026-09-25, Mac: "at any point in the world, on the timer, a large area would be shown on the map, also in
-// chat ... A gate model would be spawned with a timer that leads to a completely different area, a gate of oblivion"):
-// THE GATE'S LAW - when it comes, where, and which room it opens onto. Design: bible/11-Multiplayer/World-Bosses.md.
+// WB1:
+// THE GATE'S LAW - when it comes, where, and which room it opens onto. Design:.
 //
 // A FUNCTION OF THE CLOCK, AND NOTHING ELSE. The online world's clock is wall time (WORLD5: wire.js
 // sharedClassicMinutes, TimeScale 12, a game day every two real hours), so a gate a game day at dusk is a set of
@@ -14,7 +13,8 @@
 // the world's own data (systems/gate/gateSite.js), with the rolls below; the relay never needs to know where a gate is.
 //
 // Not a DFU member: Daggerfall has no other players and no world events. Ledger A (WB).
-import { sharedClassicMinutes, wallMsForClassicMinutes } from '../wire.js';
+import { sharedClassicMinutes, wallMsForClassicMinutes, GATE_LANES_OPEN, gateLaneOpen } from '../wire.js';   // AUDIT WW F2: the lanes that stand
+import { t } from '../../systems/textManager.js';   // the omen lines in the player's language (the relay's herald sets none: English)
 import { GATE_COURTS_MAX } from './gateCourts.js';   // GATE-COURTS: a night's courts' rooms - gateCourts.js imports nothing
 import { GATE_ASPECTS, GATE_TRIALS, readGateMods, GATE_DIRE, gateDireLine, CAPTIVE_NAMES, validGatePortents, portentOf } from './gateMods.js';   // WB8b: the Warden's marks, drawn by the day; WB14b: and the night's portents
 
@@ -35,40 +35,89 @@ export const GATE_COLLAPSE_MS = 10_000;
 /** The one salt every client rolls a gate's site with. Changing it moves every gate in the world. */
 export const GATE_SALT = 0x6a7e;
 
-/** The game day a relay-clock instant stands in. */
-export const gameDayAt = (nowMs) => Math.floor(sharedClassicMinutes(nowMs) / GATE_DAY_MINUTES);
-/** Does game day `day` hold a gate? */
-export const isGateDay = (day) => Number.isSafeInteger(day) && day >= 0 && day % GATE_EVERY_DAYS === 0;
+/** The game day a relay-clock instant stands in - WW2: on lane `lane`, whose days run its stagger behind the Bay's (0, by
+ *  default; GATE_LANE_STAGGER below). */
+export const gameDayAt = (nowMs, lane = 0) => Math.floor((sharedClassicMinutes(nowMs) - lane * GATE_LANE_STAGGER) / GATE_DAY_MINUTES);
+
+// ═══ WW2: THE LANES - A GATE A GAME DAY IN EVERY THEATRE ═══════════════════════════════════════
+//
+// The world's THEATRES (world/worldWide/worldGrid.js - the Iliac Bay, and each
+// province beyond its rectangle) each hold their own gate a game day: LANE `t` is theatre `t`'s. Lane 0 is the Bay's,
+// the gate every client and the relay have always known, to the instant and the roll.
+//
+// A GATE'S NUMBER. Everything that names a gate - its room `gate:<n>`, its receipt's `d`, the account service's
+// gate_kills row, the marks' rid, a chapter's ref, the spoils' and the lost spoils' keys - names it by ONE number,
+// which on lane 0 is its game day, as it always was: `gateNumber(day, lane) = day + lane * GATE_LANE_SPAN`. So every
+// record already written is still the Bay gate's, every key a lane past the Bay mints is its own, and the room law
+// (nine digits) holds every lane's for 99,999,999 days. Every function below that takes a `day` takes this number.
+//
+// THE STAGGER. Lane `t`'s day runs GATE_LANE_STAGGER classic minutes behind lane t - 1's (twelve real minutes), so the
+// ten gates of a game day open across 108 of its 120 real minutes, two or three standing at once, and a player can
+// ride from one to the next. Its whole life (omen to wrath, 35 real minutes) is its own; a lane's wrath never reaches
+// past the next game day's end.
+
+/** How many lanes - the world's theatres (world/worldWide/worldGrid.js THEATRE_COUNT, pinned equal; not imported: this
+ *  file is the relay's, and its graph stays flat). */
+export const GATE_LANES = 10;
+/** AUDIT WW F2: the lanes that stand - the Bay's, and a province's once its places are registered (net/wire.js
+ *  GATE_LANES_OPEN, the law the relay and the client both read). */
+export { GATE_LANES_OPEN, gateLaneOpen };
+/** A lane's gate numbers start this far past the last's: lane `t`'s day `d` is d + t * GATE_LANE_SPAN. */
+export const GATE_LANE_SPAN = 100_000_000;
+/** Classic minutes a lane's gate runs behind the lane before it - twelve real minutes (a classic minute is five). */
+export const GATE_LANE_STAGGER = 144;
+/** A gate's number: its game day on lane 0, the Bay's; `day + lane * GATE_LANE_SPAN` on the lanes beyond it.
+ *  @param {number} day @param {number} [lane] */
+export const gateNumber = (day, lane = 0) => day + lane * GATE_LANE_SPAN;
+/** The game day a gate's number names. @param {number} n */
+export const gateDayOf = (n) => n % GATE_LANE_SPAN;
+/** The lane (its theatre) a gate's number names. @param {number} n */
+export const gateLaneOf = (n) => Math.floor(n / GATE_LANE_SPAN);
+/** The classic minute a gate's day begins at - its game day's midnight, its lane's stagger behind. @param {number} n */
+export const gateBaseMinute = (n) => gateDayOf(n) * GATE_DAY_MINUTES + gateLaneOf(n) * GATE_LANE_STAGGER;
+/** Does `n` number a gate - a whole number of a lane the world has, on a gate day? (Lane 0's numbers are its days.) */
+export const isGateDay = (n) => Number.isSafeInteger(n) && n >= 0 && gateLaneOf(n) < GATE_LANES && gateDayOf(n) % GATE_EVERY_DAYS === 0;
 
 /**
  * A gate's instants, RELAY-CLOCK milliseconds (the client reads its own through the welcome's offset - WORLD5).
  * Whole milliseconds: a classic minute is 5000 real ms, and the division that says so is not exact in doubles.
+ * `day` is the gate's NUMBER (WW2): its day on the Bay's lane, its lane's stagger on another.
  * @param {number} day
  */
 export function gateTimes(day) {
   let t = _gateTimesOf.get(day);   // AUDIT WB C7: a day's instants made once - the client's clock asks for them every frame
   if (t) return t;
-  const base = day * GATE_DAY_MINUTES;
+  const base = gateBaseMinute(day);
   const at = (minute) => Math.round(wallMsForClassicMinutes(base + minute));
   t = Object.freeze({ day, omenAt: at(GATE_OMEN_MINUTE), riseAt: at(GATE_RISE_MINUTE), openAt: at(GATE_OPEN_MINUTE), sealAt: at(GATE_SEAL_MINUTE), wrathAt: at(GATE_WRATH_MINUTE) });
-  if (_gateTimesOf.size >= 8) _gateTimesOf.delete(_gateTimesOf.keys().next().value);
+  if (_gateTimesOf.size >= GATE_TIMES_KEPT) _gateTimesOf.delete(_gateTimesOf.keys().next().value);
   _gateTimesOf.set(day, t);
   return t;
 }
-/** The days' instants already made (frozen, so one answer serves every asker). */
+/** The gates' instants already made (frozen, so one answer serves every asker) - two days' of every lane (WW2: the
+ *  eight one lane kept were asked of ten lanes each frame, and made again each frame). */
+const GATE_TIMES_KEPT = 4 * GATE_LANES;
 const _gateTimesOf = new Map();
 
 /**
- * The gate the clock is about at `nowMs`: yesterday's while it is still sinking (its wrath is today's midnight),
- * else the next gate day's from today on - live from its omen, upcoming before it.
+ * The gate the clock is about at `nowMs` on lane `lane` (WW2; the Bay's, 0, by default): its yesterday's while it is
+ * still sinking (its wrath is its next day's midnight), else its next gate day's from today on - live from its omen,
+ * upcoming before it. A lane's today is its own, its stagger behind the Bay's.
  * @param {number} nowMs relay clock
+ * @param {number} [lane]
  */
-export function gateAt(nowMs) {
-  let day = gameDayAt(nowMs);
-  if (isGateDay(day - 1) && nowMs < gateTimes(day - 1).wrathAt + GATE_COLLAPSE_MS) return gateTimes(day - 1);
-  while (!isGateDay(day)) day++;
-  return gateTimes(day);
+export function gateAt(nowMs, lane = 0) {
+  let day = gameDayAt(nowMs, lane);
+  if (day >= 1 && isGateDay(gateNumber(day - 1, lane)) && nowMs < gateTimes(gateNumber(day - 1, lane)).wrathAt + GATE_COLLAPSE_MS) return gateTimes(gateNumber(day - 1, lane));
+  while (!isGateDay(gateNumber(day, lane))) day++;
+  return gateTimes(gateNumber(day, lane));
 }
+
+/** WW2: two gates in the order they open - negative when `a` opens first, positive when `b` does, 0 for one gate (the
+ *  number breaks a tie). On one lane a gate's number IS its order; across lanes it is not (lane 1's day 900 opens before
+ *  the Bay's day 901, and its number is a hundred million past it), so a record that keeps "the latest gate" whatever its
+ *  lane weighs them by this. @param {number} a @param {number} b */
+export const gateOrder = (a, b) => (gateTimes(a).openAt - gateTimes(b).openAt) || (a - b);
 
 /** The phases, in the order a gate lives them. */
 export const GATE_PHASES = Object.freeze(['quiet', 'omen', 'rising', 'sealed', 'open', 'closed', 'collapsing', 'gone']);
@@ -99,8 +148,7 @@ export const gateStands = (phase) => phase === 'rising' || phase === 'sealed' ||
 export const gateMarked = (phase) => phase !== 'quiet' && phase !== 'gone';
 
 /** What a countdown on the gate counts toward, and says: to the opening while it is sealed or rising, to the seal
- *  while it is open, and to the collapse once it has sealed for the night; nothing otherwise. GATE-COLLAPSE (2026-09-28,
- *  the field: "gate under the rock didnt go away stayed there" - "Never left"; Mac: "Count down to collapse"): the sealed
+ *  while it is open, and to the collapse once it has sealed for the night; nothing otherwise. GATE-COLLAPSE: the sealed
  *  hours said nothing - no countdown on the plaque, the banner or the map - so a gate still standing after "has sealed"
  *  read as one that would never go. It goes at the wrath (a kill inside ends it sooner, and then it is collapsing). */
 export function gateCountdown(t, nowMs, phase = gatePhase(t, nowMs)) {
@@ -135,9 +183,9 @@ export const gateDayOfRoom = (key) => (isGateRoom(key) ? Number(String(key).slic
 /** GATE-COURTS: the court a gate room is, 0 the first, or null. */
 export const gateCourtOfRoom = (key) => (isGateRoom(key) ? Number(String(key).split('.')[1] ?? 0) : null);
 /** WB3: may a player enter this day's arena for the first time now? From the opening to the seal. */
-export const gateAdmits = (day, nowMs) => { const t = gateTimes(day); return isGateDay(day) && nowMs >= t.openAt && nowMs < t.sealAt; };
+export const gateAdmits = (day, nowMs) => { const t = gateTimes(day); return isGateDay(day) && gateLaneOpen(gateLaneOf(day)) && nowMs >= t.openAt && nowMs < t.sealAt; };
 /** WB3: may a player who has already entered be in the room now (a reconnect after a blip)? Until the wrath's end. */
-export const gateHolds = (day, nowMs) => { const t = gateTimes(day); return isGateDay(day) && nowMs >= t.openAt && nowMs < t.wrathAt + GATE_COLLAPSE_MS; };
+export const gateHolds = (day, nowMs) => { const t = gateTimes(day); return isGateDay(day) && gateLaneOpen(gateLaneOf(day)) && nowMs >= t.openAt && nowMs < t.wrathAt + GATE_COLLAPSE_MS; };
 
 // ═══ THE ROLLS ════════════════════════════════════════════════════════
 //
@@ -161,8 +209,12 @@ export function gateHash(...ns) {
 export const gateRoll = (day, k) => gateHash(GATE_SALT, day, k);
 const unit = (day, k) => gateRoll(day, k) / 4294967296;
 
-/** A gate's place in the sequence of gates: its day over GATE_EVERY_DAYS (a gate day divides evenly). */
-export const gateIndex = (day) => Math.floor(day / GATE_EVERY_DAYS);
+/** WW2: a lane's place in the cycles is GATE_LANE_INDEX_STEP gates on from the lane before it - so the gates of one game
+ *  day, and of two that touch, never stand at one place in the marks' cycle (144 places; ten lanes fourteen apart). */
+export const GATE_LANE_INDEX_STEP = 14;
+/** A gate's place in the sequence of gates: its day over GATE_EVERY_DAYS (a gate day divides evenly), and WW2 its lane's
+ *  step beyond (none on the Bay's). */
+export const gateIndex = (day) => Math.floor(gateDayOf(day) / GATE_EVERY_DAYS) + gateLaneOf(day) * GATE_LANE_INDEX_STEP;
 
 /** The shuffle of `n` provinces for one round of the bag - Fisher-Yates on the round's own rolls. */
 function bagRound(round, n) {
@@ -252,7 +304,7 @@ function shuffledRound(round, key, n) {
 const marksApart = (x, y) => x.a !== y.a && !x.t.some((k) => y.t.includes(k));
 
 /**
- * WB8b (2026-09-28, Mac: "give him unique and different modifers on every 2 hour spawn"): THE CYCLE OF MARKS - every
+ * WB8b: THE CYCLE OF MARKS - every
  * aspect with every pair of trials, ONCE EACH, in an order where no two gates running share an aspect or a trial, each
  * round of four gates (gates 4k to 4k+3) brings all four aspects and two trials a gate, and a pair of trials rests a
  * long while before it comes back, under another aspect each time. (AUDIT PRE-MERGE 0929 W1-4: this said "every four
@@ -263,7 +315,7 @@ const marksApart = (x, y) => x.a !== y.a && !x.t.some((k) => y.t.includes(k));
  * ones under the next, and so on. Each round's gates stand in its own shuffled order, its first and last chosen, depth
  * first, so the seam between two rounds shares nothing either - the cycle's last gate and its first included, for it
  * comes round again. The same cycle on every client and the relay; made once.
- * WB11a (2026-10-01, Mac: "4. Trial rotation" - the ninth trial, Legion-Lord): NINE TRIALS. An odd count cannot be
+ * WB11a: NINE TRIALS. An odd count cannot be
  * paired whole, so the circle method sits one out: a BYE takes the last seat, and the trial a matching pairs with it
  * RESTS that round - nine matchings of four real pairs, 4 x 36 = 144 gates (twelve real days); each round brings every
  * aspect and eight of the nine trials, the ninth a different one each round; a pair rests 33 gates at least. (Eight
@@ -323,7 +375,7 @@ export function gateModsOf(day) {
 
 // ═══ WB14b: THE PORTENTS' BAG ═════════════════════════════════════════
 //
-// (2026-10-19, bible/11-Multiplayer/Breach-Portents.md section 1.) A night's portents are drawn by its place among the
+// A night's portents are drawn by its place among the
 // gates that can carry one - every gate but a Legion-Lord night (his host is tied to his courts and phases: the Vanguard
 // would put two hosts in one fight, the Sundering two of him for his Sappers to walk at). Every other one of those
 // carries one, so no two gates running ever share a portent and none is lost to the trial that excludes it; WHICH one is
@@ -365,7 +417,7 @@ export function gatePortentsOf(day) {
 const _onePortent = new Map();
 const _portentOne = (id) => { let a = _onePortent.get(id); if (!a) { a = Object.freeze([id]); _onePortent.set(id, a); } return a; };
 
-/** WB14e: THE TITHE-IMP - one night in TITHE_ONE_IN, unannounced (bible/11-Multiplayer/Breach-Portents.md section 9). */
+/** WB14e: THE TITHE-IMP - one night in TITHE_ONE_IN, unannounced. */
 export const TITHE_ONE_IN = 5;
 /** WB14e: it rises this long after his wake at the soonest, and up to TITHE_SPREAD_MS later, by the day's roll. */
 export const TITHE_AFTER_MS = 50_000;
@@ -390,16 +442,16 @@ export const portentsLine = (pt) => {
 // World-Bosses.md section 2). `near` is the town ("Copperham"); `left` a countdown ("4:07"). TIME1: the three that
 // named a time (the omen, the opening, the seal) are systems/gate/gateOmen.js's, in local time alone; WB12's relay deploy
 // (world151) retired them here.
-// WB13b (2026-10-01, Mac: "clean up text to be less explanatory and less AI"): each line the event, where and when -
+// WB13b: each line the event, where and when -
 // the map's ring, the banner and the countdowns say the rest
-export const riseLine = ({ near, left }) => `Dagon's Breach rises near ${near}. It opens in ${left}.`;
-export const wrathLine = ({ near, boss }) => `The Covenant tears Dagon's Breach near ${near} shut. ${boss} is cast back into the Deadlands.`;
+export const riseLine = ({ near, left }) => t('gate.line.rise', "Dagon's Breach rises near {near}. It opens in {left}.", { near, left });
+export const wrathLine = ({ near, boss }) => t('gate.line.wrath', "The Covenant tears Dagon's Breach near {near} shut. {boss} is cast back into the Deadlands.", { near, boss });
 /** WB8c: the Warden's marks said beside the omen (and to a player who comes in later, beside the line they hear first).
  *  WB13b: by name - "Valkynaz Ruhn comes the Rime-Wrought tonight, Colossal and Echoing." - the marks' card and the bar
  *  say what each does; Discord says the same sentence. */
 export const marksLine = ({ boss, md }) => {
   const { aspect, trials } = readGateMods(md);
-  const names = trials.map((t) => t.name);
-  const said = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0] ?? '';
-  return `${boss} comes ${aspect.epithet} tonight${said ? `, ${said}` : ''}.`;
+  const names = trials.map((trial) => trial.name);
+  const said = names.length > 1 ? t('gate.line.marksList', '{head} and {last}', { head: names.slice(0, -1).join(', '), last: names[names.length - 1] }) : names[0] ?? '';
+  return said ? t('gate.line.marksTrials', '{boss} comes {epithet} tonight, {said}.', { boss, epithet: aspect.epithet, said }) : t('gate.line.marks', '{boss} comes {epithet} tonight.', { boss, epithet: aspect.epithet });
 };

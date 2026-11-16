@@ -1,5 +1,4 @@
-// MW-SMOOTH (2026-10-09, Mac: "Can we also enable smooth shading for the morrowind models? Not sure what type of
-// shading is used now"): THE MORROWIND MODELS LIT BY THEIR OWN NORMALS.
+// MW-SMOOTH: THE MORROWIND MODELS LIT BY THEIR OWN NORMALS.
 //
 // What was used: every Morrowind mesh - the arms, the body, the worn armour, the held weapon, the icons - was lit by
 // one normal per TRIANGLE, its face's, computed at pack time; the per-vertex normals each NIF carries were read and

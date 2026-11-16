@@ -1,5 +1,4 @@
-// THE GATHERING'S SOUNDS, SYNTHESISED AND BAKED (GATHER-FEEL, 2026-10-13, Mac: "I want to improve gathering, add
-// gathering sounds and overall make the experience more palatable" - bible/06-Systems/Professions-Arc.md section 44).
+// THE GATHERING'S SOUNDS, SYNTHESISED AND BAKED (GATHER-FEEL, 2026-10-13, ).
 //
 // OURS, the climb's way (tools/climbSfx.mjs): built here from noise and sine with the shared kit (tools/sfxSynth.mjs)
 // and put through the one bake - tools/sndify.mjs, down to DAGGER.SND's own 11025 Hz unsigned 8-bit mono - so an axe in
@@ -39,9 +38,9 @@
 //   gather-haul            the goods into the bag: a leather satchel's thump, its flap, the goods settling
 //   gather-rank            a rank risen: three bell notes rising, and a fourth above them
 //
-//     node tools/gatherSfx.mjs             # writes public/sfx/gather-*.wav
-//     node tools/gatherSfx.mjs --measure   # and prints each clip's attack, crest, tail and brightness (tools/sfxBake.mjs)
-//     node tools/gatherSfx.mjs --raw=dir   # also the 44.1 kHz source
+//     node --import ./tools/raw-import-hooks.ts tools/gatherSfx.mjs             # writes public/sfx/gather-*.wav
+//     node --import ./tools/raw-import-hooks.ts tools/gatherSfx.mjs --measure   # and prints each clip's attack, crest, tail and brightness (tools/sfxBake.mjs)
+//     node --import ./tools/raw-import-hooks.ts tools/gatherSfx.mjs --raw=dir   # also the 44.1 kHz source
 //
 // DETERMINISTIC: every noise is a seeded PRNG (each clip its own seed), so re-running writes the same bytes - the rule
 // public/README.md sets for anything of ours that ships. Provenance: public/sfx/SOURCES.md; the doctrine allow-list

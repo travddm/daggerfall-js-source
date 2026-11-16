@@ -1,5 +1,4 @@
-// OW-TOWN-WALK (2026-10-19, the owner: "When in a town, slow down overworld navigation and have it navigate properly on
-// town pathways instead of bumping into buildings"; bible/06-Systems/Travel-View.md OW-TOWN-WALK): A JOURNEY IN A TOWN
+// OW-TOWN-WALK: A JOURNEY IN A TOWN
 // WALKS ITS STREETS, AT A TOWN'S PACE. Pinned on the law (systems/travel/townWalk.js: the snap, the edge, the line of
 // sight, the string-pull, the way), the line walked (travelAutopilot.js pathPursuit), the journey (the real Travel
 // Options: its street way first, at TOWN_PACE_MAX, once a leg and a town, again on a resume and on a town walked into,
@@ -202,7 +201,6 @@ test('OW-TOWN-WALK the host: the town a native point stands in is its pixel\'s -
   const end = way.pts.at(-1);
   assert.ok(Math.abs(end.x - cellAt(50, 10).x) < 1e-6 && Math.abs(end.z - cellAt(50, 10).z) < 1e-6, 'to the street cell at the point, as natives');
   assert.ok(way.pts.some((q) => q.z >= cellAt(0, 49).z), 'round the wall by its gate');
-  // PIN MOVED (AUDIT OW-REVISITED L1-2): the traveller's own cell KEPT - the walk's first run is the string-pulled one from it
   // (the pursuit takes it up from where the body stands); left out, the line from the body to the next corner was never checked
   assert.ok(Math.hypot(way.pts[0].x - cellAt(10, 10).x, way.pts[0].z - cellAt(10, 10).z) < 1e-6, 'the traveller\'s own cell kept');
   assert.equal(tw.townWay(mapPixelWorldOrigin(101, 200), cellAt(5, 5)), null, 'no town where it stands: none');
@@ -228,9 +226,9 @@ test('OW-TOWN-WALK the steering keeps the walk\'s own line: a leg that walks a l
 
 test('OW-TOWN-WALK the host\'s wiring: Travel Options handed the town and its way; under the view the clock held to a town\'s pace in a town - the keys\' travel too - and the panel says why; the route line drawn down the streets still ahead (mutants: the cap unread; the reason not the town\'s; the streets undrawn)', () => {
   const w = hostText('src/scenes/world.js');
-  assert.match(w, /const townWalk = createTownWalk\(\{ built, state \}\);[^\n]*\n(?:[^\n]*\n)?\s+travelOptions = travelOptionsOn \? createTravelOptions\(\{[^\n]*\n\s+townKey: townWalk\.townKey, townWay: townWalk\.townWay,/);
-  assert.match(w, /const tvInTown = \(\) => !!townWalk\.townPace\(state\.worldCoords\(player\.pos\)\);/);
-  assert.match(w, /const town = tvInTown\(\) \? TOWN_PACE_MAX : Infinity;[^\n]*\n\s+const rate = Math\.min\(load, foeCap, town\);/);
+  assert.match(w, /const townWalk = createTownWalk\(\{ built, state, cpuModels \}\);[^\n]*\n(?:[^\n]*\n)?\s+travelOptions = travelOptionsOn \? createTravelOptions\(\{[^\n]*\n\s+townKey: townWalk\.townKey, townWay: townWalk\.townWay,/);
+  assert.match(w, /const tvTownPace = \(\) => townWalk\.townPace\(state\.worldCoords\(player\.pos\)\);/);
+  assert.match(w, /const town = tvTownPace\(\) \?\? Infinity;[^\n]*\n\s+const rate = Math\.min\(load, foeCap, town\);/);
   assert.match(w, /tvHeldWhy = tvHeld == null \? null : town < Math\.min\(load, foeCap\) \? 'town' : foeCap < load \? 'foes' : 'load';/);
   assert.match(w, /sw = travelOptions\.route\?\.street\?\.pts\.slice\(travelOptions\.state\?\.autopilot\?\.seg \?\? 0\) \?\? \[\];\n\s+let at = me;\n\s+for \(const q of j \? \[\.\.\.sw, j\] : sw\) \{ leg\(at\.x, at\.z, q\.x, q\.z, pts\); at = q; \}/);
   assert.equal(TRAVEL_HELD_WHY.town, 'in town');

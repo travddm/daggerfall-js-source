@@ -1,5 +1,4 @@
-// QUEST-UID1 (2026-09-24, found tracing the "two letters from the queen" report; Mac: "Go ahead and tackle your
-// reported weaknesses").
+// QUEST-UID1.
 //
 // THE WEAKNESS: QuestMachine.StartQuest ends in `quests.Add(quest.UID, quest)` (QuestMachine.cs:725), a Dictionary.Add
 // that THROWS on a UID already live - and the port's `quests.set` replaced it in silence. The door it came through is

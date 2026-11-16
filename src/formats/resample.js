@@ -1,8 +1,8 @@
-// DFMOD1/DFMOD2 - a box filter for RGBA pictures. Pure, no DOM: the paperdoll fits a mod's hi-res sprite into its
+// a box filter for RGBA pictures. Pure, no DOM: the paperdoll fits a mod's hi-res sprite into its
 // classic rect with it, and the bundle worker (unityBundle.js) shrinks a picture past the chosen texture detail with it
 // when the mod carries no smaller mip.
 
-/** VE4: the size a mip chain reaches under `maxSize` on its longer side - halved until it fits, the level
+/** The size a mip chain reaches under `maxSize` on its longer side - halved until it fits, the level
  *  unityBundle.mipLevelFor picks - so a picture that carries no mips (a shipped PNG) is fitted to the texture detail at
  *  the size an attached bundle's would be. Pure: the page and the shipped pack's decode worker both read it. */
 export function mipFitSize(width, height, maxSize = Infinity) {

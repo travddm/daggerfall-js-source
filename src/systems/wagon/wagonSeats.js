@@ -1,6 +1,5 @@
 // @ts-check
-// WAGONS1 (2026-10-09, Mac: "an open wagon ... with ... the ability for players to request to sit in the back of the
-// cart and be transported across daggerfall"; asked, "Players and companions"): THE SEATS IN THE BACK - THE LAW.
+// WAGONS1: THE SEATS IN THE BACK - THE LAW.
 //
 // The Open Wagon has four seats in its bed (world/wagonModels.js seatsFor - two a side along its back half, each facing
 // across it). They are its OWNER's to give: another player ASKS for one and the owner answers (scenes/wagon/wagonRiders.js),

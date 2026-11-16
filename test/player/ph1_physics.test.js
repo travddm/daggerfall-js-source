@@ -1,7 +1,4 @@
-// PH1 / PH2 - THE FLOOR IS ONE-WAY, THE STAIRS ARE DESCENDED (2026-09-14,
-// Mac: "It's possible to randomly walk into the floor in dungeons and
-// get stuck in the ground" / "Running up/down stairs makes the screen
-// really jitter").
+// PH1 / PH2 - THE FLOOR IS ONE-WAY, THE STAIRS ARE DESCENDED.
 //
 // PH1. The resolve pushes a sphere along centre-minus-closest, so once
 // the lower sphere's centre had crossed a floor's plane the floor pushed
@@ -89,7 +86,6 @@ test('PH1: a lift advancing past the sphere\'s radius in one frame carries the r
     assert.ok(Math.abs(m.pos[1] - y) < 1e-3, `lift ${lift}/frame: feet ${m.pos[1].toFixed(3)} on the plate at ${y.toFixed(2)}`);
     assert.equal(m.grounded, true);
   }
-  // PIN MOVED (FIELD BUGS 2026-10-19f MOVER-BODY): the ride is the mover's own carry, a bare Move of the body's own stance
   assert.match(read('src/player/moverBody.js'), /collider\.move\(to, want\[0\], want\[1\], want\[2\], body\.height, false\);/, 'the ride resolves the rider\'s own capsule');
 });
 
@@ -156,8 +152,7 @@ test('PH2: the snap descends a quantum at a time from the feet, accepts a hair o
   assert.ok(Math.abs(m.pos[1] + (STEP_OFFSET + 0.3)) < 1e-3, `and it lands on the lower floor (${m.pos[1].toFixed(3)})`);
 });
 
-// COL1 (2026-09-15, Mac: "3d Geometry has no collison. For example, in the
-// first dungeon the table legs do have collison but the table top doesnt").
+// COL1.
 //
 // A capsule is a sphere SWEPT along a segment. _resolveCapsule resolved two
 // spheres at the segment's ENDS, which is the same shape only while those two
@@ -223,7 +218,7 @@ test('COL1: a mid-body contact is a wall, never a floor you are set on', () => {
   }
 });
 
-// AUDIT COL1 F8 (2026-09-15): THE MIDDLE SPHERE'S PLAIN PUSH IS A LIFT.
+// AUDIT COL1 F8: THE MIDDLE SPHERE'S PLAIN PUSH IS A LIFT.
 // The test above pins the ONE-WAY FLOOR flag, and at the standing stance
 // a shelf near 1.0 is met almost side-on, so the plain push happens to
 // come out sideways and the pin passes either way. Out of a near-

@@ -3,6 +3,7 @@
 // had zero consumers: the SORCERER ships absorb = Always AND
 // NoRegenSpellPoints and only the penalty was live, so the class paid
 // its whole cost and got nothing back.
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -94,7 +95,8 @@ test('S24: the career branches - Always, InDarkness, InLight', () => {
   assert.equal(careerAbsorbs(null, {}), false);
 });
 
-test('S24: an absorbed effect does NOT land, and the points are credited', () => {
+test('S24: an absorbed effect does NOT land, and the points are credited', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   // :510-517 - the absorbed effect `continue`s, so no damage is dealt
   // at all; :606 credits the pool.
   const spell = { element: 0, rangeType: 0, effects: [damageEffect(20)] };
@@ -106,7 +108,7 @@ test('S24: an absorbed effect does NOT land, and the points are credited', () =>
   assert.equal(out.damage, 0, 'the damage branch never ran');
   assert.deepEqual(hurt, [], 'and nothing reached the hurt sink');
   assert.ok(out.absorbed > 0, 'the points are reported');
-  // ABSORB-NERF (2026-09-30): the pool is credited HALF the points absorbed, floored (absorption.js absorbRefund)
+  // ABSORB-NERF: the pool is credited HALF the points absorbed, floored (absorption.js absorbRefund)
   assert.equal(target.magicka, Math.floor(out.absorbed / 2), 'and half of them credited to the pool');
   assert.deepEqual(said, [SPELL_ABSORBED_TEXT]);
 });
@@ -133,7 +135,8 @@ test('S24: with no caster entity there is no absorption at all', () => {
   assert.equal(target.magicka, 0);
 });
 
-test('S24: a SELF-cast cannot refund more than it cost', () => {
+test('S24: a SELF-cast cannot refund more than it cost', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   // :598-605 - absorption is tallied per effect and can exceed the
   // spell's own price; the cap applies ONLY when caster === target.
   const spell = { element: 0, rangeType: 0, effects: [damageEffect(20), damageEffect(20)] };

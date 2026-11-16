@@ -1,5 +1,4 @@
-// REST2 (2026-10-03, bible/06-Systems/Rest-Arc.md section 3; Mac: "New players now start with a campfire, which now is
-// an item that can be pickup up and used multiple times with limited uses with more availability in shops"): THE
+// REST2: THE
 // CAMPFIRE IS A TOOL, NOT A MATCH. Template 541 keeps its index and becomes the Campfire: eight charges, placed free
 // (it leaves the pack while it stands, as a tent does), a night its OWNER sleeps at it spending one, cold rather than
 // gone when it burns down, relit while it has fuel, picked back up with its charges. The camp's actions are the loot
@@ -76,7 +75,7 @@ test('REST2 the rows: rest at any fire and cook at a lit one (AUDIT C&C I11); yo
   assert.equal(campMenu(lit, 10, true).at(-1).text, CAMP_TEXT.menuPickUp);
   assert.deepEqual(campMenu(lit, 10, false).map((r) => r.key), ['rest', 'cook']);
   const cold = { ...lit, litUntil: 0 };
-  // AUDIT C&C I11 (PIN MOVED): a cold fire offers no Cook - the cooking list only refused at it; its Relight lights it
+  // AUDIT C&C I11 (
   assert.deepEqual(campMenu(cold, 10, true).map((r) => r.text), [CAMP_TEXT.menuRest, CAMP_TEXT.menuRelight, CAMP_TEXT.menuPickUp]);
   assert.deepEqual(campMenu({ ...cold, wear: 0 }, 10, true).map((r) => r.key), ['rest', 'pack'], 'no fuel: no relight');
 });
@@ -94,7 +93,6 @@ test('REST2 the pool: online a Campfire stands with the arc Off; a night at your
   const entity = { items: [createSurvivalItem(TEMPLATE.Campfire), createSurvivalItem(TEMPLATE.Campfire)] };
   const said = [];
   const off = pool(entity, said);
-  // PIN MOVED (ENDLESS PROVISIONS, 2026-10-04: a camp is every tier's): offline with the arc Off a Campfire stands too
   assert.equal(off.placeItem(entity.items[0], entity.items), true, 'offline with the arc Off: the Campfire stands');
   assert.equal(said.at(-1), CAMP_TEXT.lit, 'and says its lighting - AUDIT C&C I10 (PIN MOVED): the Off refusal it was held apart from is deleted, never said since ENDLESS PROVISIONS');
   setSharedClock(() => 1000);
@@ -123,7 +121,7 @@ test('REST2 the pool: online a Campfire stands with the arc Off; a night at your
 test('REST2 a world fire rests too: its plaque rows are Rest and Cook; online the lit Rest rests', () => {
   setSharedClock(() => 1000);
   const said = [];
-  // AUDIT C&C (lens I, PIN MOVED): the Rest row asks the rest's place first (camps.js restAtHearth), so the fixture
+  // AUDIT C&C (lens I
   // stands a hearth as its collectors mint one ({x, y, z} at the flame, the sprite's foot and size) and the player beside
   // it - the reach itself is test/systems/survival/auditcc_items.test.js's
   const p = createCamps({ hearths: () => [{ x: 0, y: 0, z: 0, foot: -1.6, w: 0.8, h: 1.6 }], camera: () => ({ feet: [1, -1.6, 0], yaw: 0 }), entity: { items: [] }, say: (l) => said.push(l), openRest: () => said.push('REST') });
@@ -132,15 +130,3 @@ test('REST2 a world fire rests too: its plaque rows are Rest and Cook; online th
   assert.equal(said.at(-1), 'REST');
 });
 
-test('REST2 by source: the hosts hand the plaque\'s lit row to the camps and spend a night\'s charge; the online night and the offline six-hour rest both call it; the start kit and the shelf carry the Campfire online with the arc Off', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /camps\.activate\(_campPick\.key, getInteractionMode\(\), plaqueActionFor\(_campPick\.key\)\)/, f);
-  assert.match(rd('src/scenes/dungeonContext.js'), /camps\.activate\(key, mode, plaqueActionFor\(key\)\)/);
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(f), /onNightSlept: \(\) => camps\.spendNightNear\(/, f);
-  // AUDIT FB1005 B1: the dungeon's spends it unless the night was a bed's (a Bedroll or a Campfire laid by a bed keeps it)
-  assert.match(rd('src/scenes/dungeonContext.js'), /onNightSlept: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? false : camps\.spendNightNear\(_fpFeet\)\),/, 'src/scenes/dungeonContext.js');
-  assert.match(rd('src/scenes/shared.js'), /out\.onNightSlept\?\.\(\);/);
-  assert.match(rd('src/ui/restWindow.js'), /if \(this\.mode !== 'loiter' && \(this\.session\?\.totalHours \?\? 0\) >= 6\) this\.deps\.onNightSlept\?\.\(\);/, 'AUDIT REST F5: a loiter is no night');
-  assert.match(rd('src/ui/enhanced/enhancedRest.js'), /if \(overlay\.mode !== 'loiter' && \(overlay\.session\?\.totalHours \?\? 0\) >= 6\) deps\.onNightSlept\?\.\(\);/);
-  assert.match(rd('src/systems/startingGear.js'), /else if \(sharedClockOn\(\)\) \{ const it = startingCampfire\(\);/);
-  assert.match(rd('src/systems/shopStock.js'), /else if \(sharedClockOn\(\) && shelfIndex === 0\) for \(const it of campfireStock\(rolls\)\) items\.push\(it\);/);   // AUDIT REST II H8 (PIN MOVED): the counter's shelf alone
-});

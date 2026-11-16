@@ -1,0 +1,18 @@
+// @ts-check
+// The Features rows that live in files of their own, so systems/features.js does not grow (docs/testing/lint-ratchet.md).
+export { WEAPON_TECHNIQUES_ROW } from './weaponTechniquesRow.js';
+export { CRIME_RECOVERY_ROW } from './crimeRecoveryRow.js';
+export { HUMANOID_LOOT_ROW } from './humanoidLootRow.js';
+export { CURE_KEEPS_INFECTION_ROW } from './cureKeepsInfectionRow.js';
+export { REPAIR_PRICE_ROW } from './repairPriceRow.js';
+export { LOCKPICK_TUMBLERS_ROW } from './lockpick/lockpickTumblersRow.js';
+export { DRESS_FOR_THE_PART_ROW } from './dressForThePartRow.js';
+export { GUILD_PROBATION_ROW } from './guildProbationRow.js';
+export { HORSE_WALKS_ROW } from './upkeep/horseWalksRow.js';
+export { TERRAIN_SLOPE_CUT_ROW } from './terrainSlopeCutRow.js';
+export { CLAW_METAL_ROW } from '../combat/clawMetalRow.js';
+export { LEGENDARY_EQUIP_FREE_ROW, GENTLE_EQUIP_BILL_ROW } from './equipBillRows.js';
+export { SOLD_GOODS_ON_SHELF_ROW } from './sold-goods-on-shelf-row.ts';
+export { ABSORPTION_LIMITS_ROW } from './absorption-limits-row.ts';
+export { OPENING_DAMAGE_ROW } from '../ai/opening-damage-row.ts';
+export { ELITE_STACKING_ROW } from './elite-stacking-row.ts';

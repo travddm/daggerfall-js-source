@@ -1,6 +1,6 @@
 // @ts-check
-// SEAT2a part four (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and do sieges"; "Continue"): A SEAT
-// TOWN'S BATTLEFIELD, derived from its own layout (bible/11-Multiplayer/Seats-Arc.md 6.2) - the banners' points, the
+// SEAT2a part four: A SEAT
+// TOWN'S BATTLEFIELD, derived from its own layout (6.2) - the banners' points, the
 // Throne's and the two camps', which a fighter's game sends the account service for its pass (the service settles the
 // battle's field on an attacker's and a defender's agreeing - server-account/src/seatSiege.js).
 //
@@ -15,8 +15,7 @@
 //   - A CROWN'S PALACE SQUARE (the fourth banner): 20 m before its door. AUDIT-SEATS G21 (6.2: "the Gatehouse stands at
 //     the castle's entrance in the city" and "the Throne (the castle entrance)"): where the town's records stand the
 //     castle's dungeon-entrance door (`castle`, its frame), a crown's Throne, its defenders' camp and its Palace square
-//     stand before THAT door - the palace's only where none is found. CASTLE-GATE (2026-10-02, Mac: "lets finish the
-//     build work"): the city's host now finds it - castleEntranceOf, the LOWEST of the pixel's dungeon-entrance doors
+//     stand before THAT door - the palace's only where none is found. CASTLE-GATE: the city's host now finds it - castleEntranceOf, the LOWEST of the pixel's dungeon-entrance doors
 //     by its centre, of those a face is taken from (DFU lands a player leaving the castle at its lowest:
 //     player/enterExit.js dungeonEntranceLanding), facing along the door record's own outward normal (doorFaceSign).
 //

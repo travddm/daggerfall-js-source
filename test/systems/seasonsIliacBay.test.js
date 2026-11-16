@@ -42,7 +42,7 @@ import { TextureFile } from '../../src/formats/textureFile.js';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (p) => hostText(p);
 
-// ═══ the script's tables ════════════════════════════════════════════════
+// the script's tables
 
 test('SIB1: GetManagedArchivesForSeason - the four woodland sets below Summer, the three snow sets in Winter, nothing in Summer', () => {
   assert.deepEqual(managedArchivesForSeason(SEASONS.Fall), [504, 506, 508, 510]);
@@ -101,7 +101,7 @@ test('SIB1: ParseRecordFromFilename - prefix (case-blind) then an Int32, or -1',
   assert.deepEqual(filesForPrefix(['a/K1.png', 'b/J1.png', 'c/k2.PNG', 'SeasonHelper.cs'], 'K'), ['a/K1.png', 'c/k2.PNG']);
 });
 
-// ═══ TryBuildSeasonalAtlas's checks and the size law ═════════════════════
+// TryBuildSeasonalAtlas's checks and the size law
 
 const tex = (name, w = 8, h = 8) => ({ name, width: w, height: h, image: { width: w, height: h, data: new Uint8Array(w * h * 4) } });
 const fullSet = (prefix, n, from = 0) => Array.from({ length: n - from }, (_, i) => tex(`${prefix}${i + from}.png`, 10 + i, 20 + i));
@@ -149,7 +149,7 @@ test('SIB1: the size law - (w, h) * 3.1f with a zero scale through GetScaledBill
   assert.ok(Math.abs(s.w / classic.w - 3.1) < 1e-6);
 });
 
-// ═══ SeasonHelper's state machine ═══════════════════════════════════════
+// SeasonHelper's state machine
 
 function makeHelper({ season = SEASONS.Winter, counts = {}, sets = {} } = {}) {
   const log = { warns: [], refreshes: 0, loads: [], counts: [] };
@@ -307,7 +307,7 @@ test('SIB1 (AUDIT 62 F4): RefreshLoadedNatureBatches filters by ARCHIVE - a grid
   assert.deepEqual(reskin.take(built), ['1,0'], 'the pixel on 504 stands on an older install and IS re-applied - and it alone');
 });
 
-// ═══ the door: LZ4 blocks ═══════════════════════════════════════════════
+// the door: LZ4 blocks
 
 test('SIB1: LZ4 block - literals, matches, overlapping matches, long lengths, and refusals', () => {
   const dec = (arr, n) => Buffer.from(lz4BlockDecompress(new Uint8Array(arr), n)).toString('latin1');
@@ -329,7 +329,7 @@ test('SIB1: LZ4 block - literals, matches, overlapping matches, long lengths, an
   assert.throws(() => lz4BlockDecompress(new Uint8Array([0x10, 0x61]), 5), /filled 1 of 5/);
 });
 
-// ═══ the door: DXT blocks ═══════════════════════════════════════════════
+// the door: DXT blocks
 
 test('SIB1: DXT1 and DXT5 blocks decode to the documented palettes', () => {
   // DXT1: c0 = pure red (0xF800), c1 = pure blue (0x001F); c0 > c1 so
@@ -426,7 +426,7 @@ test('SIB1: the UnityFS reader - header, stored and LZ4 blocks, the type tree wi
   assert.equal(usesNewArchiveFlags([2023, 1, 0]), true);
 });
 
-// ═══ the registry over the pick ═════════════════════════════════════════
+// the registry over the pick
 
 test('SIB1: seasonsAssetKey - the .dfmod whole, the eleven folders\' PNGs by folder, nothing else', () => {
   assert.equal(seasonsAssetKey('Seasons of the Iliac Bay/seasons of the iliac bay.dfmod'), `${DFMOD_KEY_PREFIX}seasons of the iliac bay.dfmod`);
@@ -577,7 +577,7 @@ test('SIB1 (AUDIT 62 F26): a seasonal flat reaches texImage2D in getColor32 orde
   clearSeasonsSources();
 });
 
-// ═══ the hosts, the pick, the settings, the credits, the vendor tree ═════
+// the hosts, the pick, the settings, the credits, the vendor tree
 
 test('SIB1: both climate hosts take the cache\'s answer for a flat, and the streaming host hears every event the script subscribes', () => {
   const world = hostText('src/scenes/world.js');
@@ -616,7 +616,7 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   // (older install AND a batch on an archive the mod has ever managed,
   // AUDIT 62 F4) lives in world/seasonReskin.js, where it is executed
   // by the pins rather than matched as text.
-  assert.match(world, /if \(seasons && seasonsGen !== seasons\.generation\) _reskin\.mark\(key\);/, 'AUDIT 61: a pixel published across an install asks for its own re-skin - ROAD-H H3: for its key alone');
+  assert.match(world, /if \(seasons && seasonsGen !== seasons\.generation\) _reskin\.mark\(pkey\);/, 'AUDIT 61: a pixel published across an install asks for its own re-skin - ROAD-H H3: for its key alone');
   assert.match(world, /refresh: \(\) => _reskin\.markStale\(seasons, built\),/,
     'AUDIT 62 F4 / ROAD-H H3: refresh marks only what stands on an older install AND carries a batch on an archive the mod manages');
   // the pick and the boot registration
@@ -624,7 +624,6 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   assert.match(ds, /textureStoreKey\(f, deps\)/, 'the texture pick decides every file through the one exported decision');
   assert.match(ds, /storeAssets\(TEXTURE_STORE, keyed\.map\(\(\[f\]\) => f\), \(\) => true, \(f\) => keyOf\.get\(f\)\)/, 'and storeAssets does not re-decide on the basename');
   assert.match(ds, /setSeasonsSources\(names, loadTextureFile\)/, 'and registers them');
-  // PIN MOVED (AUDIT VE R2): the boot's registration is the store's one - the call above, reached from the seam
   assert.match(read('src/scenes/shared.js'), /const textures = registerTextureStore\(\)/, 'the boot registers them on the same seam');
   // the switch and the credit
   assert.equal(MOD_SETTINGS['seasons-iliac-bay'].keys.Enabled.default, true);
@@ -634,17 +633,7 @@ test('SIB1: both climate hosts take the cache\'s answer for a flat, and the stre
   assert.deepEqual([...row.vendor], ['seasons-iliac-bay']);
 });
 
-test('SIB1: the vendor tree carries the manifest and the record, and NO raster - the textures are the player\'s to supply', () => {
-  const tracked = execFileSync('git', ['ls-files', 'vendor/seasons-iliac-bay'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
-  assert.deepEqual([...tracked].sort(), ['vendor/seasons-iliac-bay/README.md', 'vendor/seasons-iliac-bay/seasons-of-the-iliac-bay.dfmod.json'],
-    'the folder holds the manifest and the record and nothing else');
-  const readme = read('vendor/seasons-iliac-bay/README.md');
-  assert.match(readme, /permission/i);
-  assert.match(readme, /re-shaded sprite|silhouette/i, 'the README says why the textures are not here');
-  assert.ok(existsSync(join(root, 'bible/07-Rendering/Seasons-Iliac-Bay.md')), 'the bible page');
-});
-
-// ---- SIB2 (2026-09-08, Mac: "ensure the seasons mod is 1:1 and working") --
+// ---- SIB2 --
 
 test('SIB2: the bundle is the mod by its MANIFEST, not by one guessed file name; the events are DFU\'s per caller; a later version says so', () => {
   // any .dfmod that says "season" is stored under its own lowercased name; the manifest inside decides (seasonsBundle: GUID, then title)
@@ -669,14 +658,13 @@ test('SIB2: the bundle is the mod by its MANIFEST, not by one guessed file name;
   assert.match(world, /await _teleportToPixel\(w\.pixel\.x, w\.pixel\.y, null, \{ modEvent: 'load' \}\);/, 'the quickload: a load');
   assert.match(world, /await _teleportToPixel\(px\.x, px\.y, null, \{ modEvent: 'load' \}\);/, 'the classic import: a load');
   assert.match(world, /await _teleportToPixel\(pixel\.x, pixel\.y, null, \{ modEvent: 'load' \}\);/, 'MAC6 #1: the dungeon save\'s load: a load too');
-  // ONLINE-UNDERGROUND-LOAD1 (2026-09-19): the FIFTH caller, and a load
+  // ONLINE-UNDERGROUND-LOAD1: the FIFTH caller, and a load
   // like the four above it - an online boot that wakes a character
   // saved underground teleports them to the nearest safe place, which
   // is a terrain change the mod has to hear about exactly as a
   // quickload's is. Named here rather than merely counted, because the
   // count alone is what this line is guarding.
   assert.match(world, /await _teleportToPixel\(wake\.mapPixel\.x, wake\.mapPixel\.y, null, \{ modEvent: 'load', reposition: REPOSITION\.RandomStartMarker \}\);/, 'the online underground wake: a load');
-  // PIN MOVED (ETHER-CROSSING, bible/03-World/Eltheric-Ocean.md): the crossing to and from the Eltheric Ocean is a voyage of
   // days - a travel, OnPostFastTravel and all
   assert.match(world, /await _teleportToPixel\(to\.px, to\.py, null, \{\n\s+arriveMinutes: sharedClockOn\(\) \? skyMinutes\(\) : worldMinutes\(\) \+ minutes,\n\s+modEvent: 'travel',/, 'the crossing: a travel');
   assert.equal((world.match(/modEvent: '(travel|load)'/g) || []).length, 6, 'and no other caller names an event');

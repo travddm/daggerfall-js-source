@@ -1,5 +1,5 @@
 // @ts-check
-// CREW-SIGNED (2026-10-27; bible/03-World/Shipyards.md CREW-SIGNED) - A CREW HALL'S RECRUIT SIGNED ONCE ONLINE, the
+// CREW-SIGNED - A CREW HALL'S RECRUIT SIGNED ONCE ONLINE, the
 // client's half: a hire asks the account service first (server-account/src/crewSigns.js), and the first character to
 // sign a recruit holds him for his day - every ask names it (`character`, AUDIT HORIZONTAL C8). Built by
 // scenes/shipyardHost.js.

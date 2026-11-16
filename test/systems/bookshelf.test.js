@@ -79,12 +79,12 @@ test('BS1: the interior shelf click routes - bookshelf in the three types, loot 
   assert.ok(!wm.includes('Library/Guild/Temple bookshelves + owned-house storage pend'),
     'the old flag sentence is gone (the house half is re-flagged in place)');
   // the pick opens the reader on the id, through the one book hook
-  assert.match(wm, /_openBookById\(\{ message: shelf\.books\[roll \? i - 1 : i\] \}\);/);   // PIN MOVED (CHAP5a): the hall's roll, online, the shelf's first book
+  assert.match(wm, /_openBookById\(\{ message: shelf\.books\[roll \? i - 1 : i\] \}\);/);
   assert.match(wm, /const _openBookById = makeOpenBookHook\(\{ fetchBytes, showReader: \(w\) => \{ interiorOverlay = w; \} \}\);/);
   // the shelf's book list is lazy and PER SHELF, the stock idiom
   assert.match(wm, /shelf\.books \?\?= populateBookshelf\(\);/);
   // the refusal is DFU's box, not a silent return
-  assert.match(wm, /interiorOverlay = roll \? chapterRollWindow\(\{ \.\.\.roll, lines: \[\.\.\.roll\.lines, access\.text\] \}\) : new ActionTextBox\(\[access\.text\]\);/);   // PIN MOVED (CHAP5a): a stranger to the guild reads its roll alone, online; (AUDIT CHAP4 D4) DFU's refusal said under it
+  assert.match(wm, /interiorOverlay = roll \? chapterRollWindow\(\{ \.\.\.roll, lines: \[\.\.\.roll\.lines, access\.text\] \}\) : new ActionTextBox\(\[access\.text\]\);/);
 });
 
 test('F198: the health box decision, arm by arm - over the entries the PRODUCER mints (MAC-ILL1)', () => {
@@ -107,7 +107,7 @@ test('F198: the health box decision, arm by arm - over the entries the PRODUCER 
   // an INCUBATING disease (contracted today) showed nothing in DFU - and
   // nothing qualified meant record 18 again (the `if (tokens == null)`
   // tail) while the travel popup's condition (diseaseCount > 0) already
-  // warned. PIN MOVED (FIELD BUGS 2026-10-19f DISEASE-UNWELL, the owner's
+  // warned.
   // departure, "Unnamed 'Unwell' tile"): the box says the house's unwell
   // line, naming none, in the shape of the host's own rows
   const pc = P();
@@ -150,7 +150,7 @@ test('F198: all four hosts hand the Status action a showStatus - the seam input.
   for (const h of ['scenes/world.js', 'scenes/exterior.js', 'scenes/dungeonContext.js', 'scenes/worldModes.js']) {
     const src = code(h);
     assert.match(src, /showStatus/, `${h} provides showStatus`);
-    // STATUS-LIVE (2026-09-22): the ROWS are built by the one composer
+    // STATUS-LIVE: the ROWS are built by the one composer
     // now (ui/statusBox.js's statusReadoutRows, which calls
     // healthStatusRows itself); what the host still owes is the LIVE
     // ENTITY, which is what this line has always been about - four

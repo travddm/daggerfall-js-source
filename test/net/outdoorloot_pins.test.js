@@ -1,7 +1,7 @@
-// OUTDOOR-LOOT, HARDENING (2026-10-18): THE PINS THE MUTANTS FOUND MISSING. `tools/mutants/outdoorloot.json` was first run against the
+// OUTDOOR-LOOT, HARDENING: THE PINS THE MUTANTS FOUND MISSING. `tools/mutants/outdoorloot.json` was first run against the
 // three slices' tests and sixteen of its seventy-two records SURVIVED; nine of them were laws the slices decided and no test held.
 // This file holds them (the other seven were equivalent in outcome, or narrow edges - AUDIT OUTDOOR-LOOT, 2026-10-18, pinned the ones
-// a player could meet in the files its record names: bible/06-Systems/Online-Arc.md OUTDOOR-LOOT, "AUDIT OUTDOOR-LOOT"):
+// a player could meet in the files its record names: OUTDOOR-LOOT, "AUDIT OUTDOOR-LOOT"):
 //   1. THE DIGEST MERGES MONOTONELY (net/bodyLoot.js mergeDigest): two words land the same in either order and a stale word never
 //      brings a taken place back, or a drawn-down stack back up - the law a verdict's digest and a delayed stream frame both
 //      meet.

@@ -1,6 +1,6 @@
 // @ts-check
-// WB6b (2026-09-25, Mac: "the arena needs to be an oblivion masterpiece ... Whole thing needs to feel alive"): THE
-// DEADLANDS' AIR - what the Burning Court sounds like under its sky. Design: bible/11-Multiplayer/World-Bosses.md
+// WB6b: THE
+// DEADLANDS' AIR - what the Burning Court sounds like under its sky. Design:
 // section 4 ("The Deadlands").
 //
 // THE BEDS, always under the court: the deep moan of the wind over the fire (a named bed - audio.setBed, looped by the

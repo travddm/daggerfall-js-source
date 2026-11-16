@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-B (2026-09-27): COME SAIL AWAY'S BOAT, BUILT - `Boat` (Boat.cs), and
+// CSA-B: COME SAIL AWAY'S BOAT, BUILT - `Boat` (Boat.cs), and
 // ComeSailAway.cs's SpawnBoat (1120-1270), ApplyBoatVariant / ReinitializeBoat
 // / SetBoatVariant (1270-1308), SetupBillboardHelper / AddBillboardLight /
 // SetupModelHelper / SetLights (1344-1526) and GetBoatTransforms (1526-1811),
@@ -107,6 +107,7 @@ export class Boat {
     this.groundAsked = false;   // FIELD BUGS 29h (LOST-BOAT, the port's own): the ground under it asked once (comeSailAway.js recoverLostBoats)
     /** @type {any} */ this.charter = null;   // PASSAGE (the port's own): a booked ship's voyage (systems/naval/passage.js charterRecord) - none on a boat of mine
     this.way = 0;   // PASSAGE-PACE (the port's own): her way at the helm (m/s), laid each step - the journey's leads read it (systems/travel/travelGovernor.js travellerPace)
+    this.helmAfar = false;   // HELM-SIGHT (the port's own): her helm held across a jump that landed on another pixel than hers (comeSailAway.js OnWorldReanchored)
     this.modifierMoveSpeedOar = 0; this.modifierMoveAccelerationOar = 0;
     this.modifierMoveSpeedSail = 0; this.modifierMoveAccelerationSail = 0;
     this.modifierTurnSpeedOar = 0; this.modifierTurnAccelerationOar = 0;

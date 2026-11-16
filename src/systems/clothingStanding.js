@@ -1,45 +1,25 @@
-// DRESS1 (2026-09-30, Discord: "Add positive and negative reputation
-// buffs for clothing items... common clothes would provide a positive
-// reputation buff with the Commoner faction but a negative one with
-// the Noble faction. A next step would be ... temple-specific robes
-// with a positive buff for that temple faction."): DRESS FOR THE PART.
+// DRESS1: dress for the part. A port feature: DFU has no clothing reaction. What you wear in the five clothing slots tints
+// how people take you, when the Dress for the part option is on (systems/dressForThePart.js):
+//   - common wear (casual, plain, peasant, work clothes): +3 Commoners, -3 Nobility, per garment.
+//   - fine wear (formal cloaks and tunics, gowns, surcoats, kimono, toga, the Formal Eodoric): +3 Nobility, +1 Merchants,
+//     -1 Commoners, per garment.
+//   - religious wear (Priest / Priestess Robes): +3 with every temple faction (FactionFile type Temple, read in talk.js's
+//     getReactionToPlayer) and +1 Scholars, per garment.
+// Every group's total is capped at +/-10; everything else is neutral.
 //
-// A port feature, NOT classic - Daggerfall and DFU have no clothing
-// reaction at all. What you WEAR in the five clothing slots now tints
-// how people take you:
-//   - COMMON wear (casual / plain / peasant / work clothes): +3 with
-//     Commoners, -3 with Nobility, per garment.
-//   - FINE wear (formal cloaks and tunics, gowns, surcoats, kimono,
-//     toga, the Formal Eodoric): +3 with Nobility, +1 with Merchants,
-//     -1 with Commoners, per garment.
-//   - RELIGIOUS wear (Priest / Priestess Robes): +3 with every TEMPLE
-//     faction (FactionFile type Temple, read in talk.js's
-//     getReactionToPlayer) and +1 with Scholars, per garment.
-// Every group's total is capped at +/-10. Everything else (boots,
-// shoes, long shirts, the arena straps, the Khajiit suit...) is
-// neutral.
+// The social-group half rides DFU's live channel, the player's `reactionMods` (PlayerEntity.cs:129, not serialized),
+// which enchantmentMagicRound clears at the head of every magic round. applyDressStanding runs right after that clear,
+// before the no-enchanted-items early return, so a plain tunic counts with nothing magical worn. A temple is a faction
+// type, not a social group, so its half sits on the same live snapshot, `entity._dressStanding`, beside the group
+// figures the Enhanced Plus Standing page draws.
 //
-// The social-group half rides DFU's own live channel: the player's
-// `reactionMods` (PlayerEntity.cs:129, "do not serialize, set by live
-// effects"), which enchantmentMagicRound clears at the head of every
-// magic round and the worn items refill. applyDressStanding runs
-// straight after that clear - BEFORE the no-enchanted-items early
-// return - so a plain tunic counts with nothing magical worn, and
-// nothing is ever saved: take the garment off and the next round
-// forgets it. The temple half cannot live in a per-sgroup array (a
-// temple is a faction TYPE, not a social group), so it sits on the
-// same live snapshot, `entity._dressStanding`, beside the group
-// figures the Enhanced Plus Standing page draws. Online and offline
-// alike: the pump is worldTick's in both, and the reads are local.
-//
-// Leaf module on purpose: talk.js reads it, and equip.js's import
-// graph is heavy - so the equip table is read by shape
-// (`entity.equip.slots`, equipTableOf's own field) with the bag's
-// `equipSlot` mark as the fallback, as equippedEnchantedItems does.
+// A leaf: talk.js reads it and equip.js's import graph is heavy, so the equip table is read by shape
+// (`entity.equip.slots`) with the bag's `equipSlot` mark as the fallback, as equippedEnchantedItems does.
 
 import { EQUIP_SLOTS } from '../characters/paperdoll/paperdoll.js';
 import { ITEM_GROUPS } from '../characters/equipRules.js';
 import { FACTION_TYPES } from '../formats/factionFile.js';
+import { dressForThePartOn } from './dressForThePart.js';   // DRESS1: off, DFU's reaction - clothes change nothing
 
 /** The five named social groups, by index (FactionFile.SocialGroups). */
 export const DRESS_GROUP = Object.freeze({ Commoners: 0, Merchants: 1, Scholars: 2, Nobility: 3, Underworld: 4 });
@@ -98,7 +78,7 @@ export const DRESS_EFFECT = Object.freeze({
   [DRESS_CLASS.Religious]: Object.freeze({ groups: Object.freeze([0, 0, 1, 0, 0]), temple: 3 }),
 });
 export const DRESS_CAP = 10;
-/** LOOT14 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 6): THE WARDROBE'S STANDING - a garment's `standing`
+/** LOOT14 (the Loot arc II): THE WARDROBE'S STANDING - a garment's `standing`
  *  lines and a Legendary's Royal Bearing, summed by the loot ladder's fold onto `entity._mods.standing` (read here as a
  *  field, so this stays a leaf; empty with the ladder off) - held to its own cap a group, BESIDE the dress's: a fine
  *  outfit already at the dress's +10 with the Nobility still feels a Courtier's line. */
@@ -131,7 +111,7 @@ const clamp = (v) => Math.max(-DRESS_CAP, Math.min(DRESS_CAP, v));
 export function dressStanding(entity) {
   const groups = new Array(DRESS_GROUP_COUNT).fill(0);
   let temple = 0;
-  for (const it of wornClothing(entity)) {
+  for (const it of dressForThePartOn() ? wornClothing(entity) : []) {
     const fx = DRESS_EFFECT[dressClassOf(it)];
     if (!fx) continue;
     for (let g = 0; g < DRESS_GROUP_COUNT; g++) groups[g] += fx.groups[g];

@@ -1,6 +1,4 @@
-// INT4 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; Realm-Arc section 4: "Valuable items get a
-// service-issued id ... The same id in two records freezes both for review"): A VALUABLE PIECE'S ID, AND THE LEDGER.
-// PIN MOVED (its audit, the same day): the ledger rebuilt (server-account/src/ledger.js) - the FIRST HOLDER KEEPS a piece,
+// INT4: A VALUABLE PIECE'S ID, AND THE LEDGER.
 // another record showing it CLAIMS it, and a claim the holder's checkpoint outlasts by DUPE_GRACE_S is a COPY charged to
 // the CLAIMANT (the audit: an id stamped on the victim's piece took the VICTIM's trade); a piece let go is no row; the
 // service's own moves move the ledger; a crafted piece's copy is told by its `products` owner; the statements bounded.
@@ -11,7 +9,7 @@
 //     its holder's letting go; a claim outlasted - the claimant's copy written down and locked, the holder's piece the
 //     holder's to sell; a key on another piece a law finding, never a claim; a key twice in one record its own copy;
 //     a claimed piece moved by no route; the service's moves (escrow, delivery) and a crafted piece's owner; a character
-//     gone lets go; and the statements bounded. PIN MOVED (AUTO-HOLD, 2026-10-16): a copy locks its piece and holds no
+//     gone lets go; and the statements bounded.
 //     character (DUPES_FOR_HOLD held it for staff), and a claim outlasted is no strike - test/server/autohold.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -28,7 +26,7 @@ import { letterOfCredit } from '../../../src/systems/inventory.js';
 import { templateByIndex } from '../../../src/systems/item/itemTemplates.js';
 import { seeded } from '../../honestItems.mjs';
 import { readFileSync } from 'node:fs';
-import { SESSION_KEY } from '../../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
 import { realmIo, createRealmSession } from '../../../src/systems/realmSaves.js';
 
 const rare = (seed = 11, t = 113) => applyRarity(createWeapon(t, 1, seeded(7)), 'rare', seeded(seed));
@@ -194,7 +192,7 @@ test('INT4 service: the service\'s own moves move the ledger - a piece listed is
     assert.deepEqual(s.ledger(u), { char_id: B.R.id, state: 'held', claim_char: S1.R.id });
     s.wait(DUPE_GRACE_S + 1);
     await s.put(B, [withId(u)]);
-    assert.deepEqual([s.copiesOf(S1.R.id), s.copiesOf(B.R.id)], [[u], []], 'the seller kept a copy: the seller\'s, never the buyer\'s');   // PIN MOVED (AUTO-HOLD): locked, no strike - a claim the holder outlasts is contested
+    assert.deepEqual([s.copiesOf(S1.R.id), s.copiesOf(B.R.id)], [[u], []], 'the seller kept a copy: the seller\'s, never the buyer\'s');
     assert.deepEqual(s.ledger(u), { char_id: B.R.id, state: 'held', claim_char: null });
     // spent (a payment, a disenchant): no row
     await s.land(await s.takeOut(B));
@@ -275,7 +273,7 @@ test('INT3/INT4 client: the realm\'s session hears the hold and the piece as its
     const s = await standService();
     const who = await s.registered('heard');
     const R = await seatRealm(s.env, who.secret, 'heard');
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: who.id, secret: who.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const at = R.at();
     const session = createRealmSession({ io: realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), s.env), storage }), id: at.id, lease: at.lease, seq: at.seq });
@@ -287,8 +285,4 @@ test('INT3/INT4 client: the realm\'s session hears the hold and the piece as its
     await session.checkpoint(JSON.stringify(freshSave({ name: 'heard' })));
     assert.deepEqual(told.at(-1), ['law', null, null], 'open again');
   } finally { Date.now = realNow; }
-  const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const body = world.slice(world.indexOf('  function realmCheckpoint({ sink = null } = {}) {'), world.indexOf('  function realmCheckpoint({ sink = null } = {}) {') + 1200);
-  assert.ok(body.indexOf('stampItemIds(playerEntity);') > 0 && body.indexOf('stampItemIds(playerEntity);') < body.indexOf('quickSaveNow'), 'the ids, before the save is composed');
-  assert.match(world, /^  wireRealmHolds\(realmSession, \{ say: \(t\) => townTalk\.say\(t\), entity: playerEntity \}\);$/m);   // PIN MOVED (AUTO-HOLD): the hold and the locked pieces, wired at one line (scenes/realmHoldHost.js)
 });

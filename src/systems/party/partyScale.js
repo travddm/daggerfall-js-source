@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PSCALE1 (2026-09-25) — A FIGHT WEIGHS WHAT THE PARTY WEIGHS.
+// PSCALE1 — A FIGHT WEIGHS WHAT THE PARTY WEIGHS.
 //
-// Mac: "I want enemy difficulty, enemy numbers, etc to scale approriately
-// with party size". Asked three things, Mac answered: "+50% HP, +10% dmg"
+// . Asked three things,
 // a player past the first, "One roll per group" outdoors with a foe more
 // for every two players past the first, and in a dungeon "Everyone in it"
 // counts. AUDIT PSCALE1 found "everyone in it" counted every player

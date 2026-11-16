@@ -43,6 +43,7 @@ import { themedIngredientPool } from './lootThemes.js';   // MOD: a monster's Cr
 import { pathOfSignatureIndex } from '../arcanePaths.js';   // AUDIT SCHOOLS: a signature spell's name, by its index band
 import { getLocalizedSpellName } from '../textManager.js';   // L10N3e: a stock spell's name, by its SPELLS.STD index (shownSpellName)
 import { isOnlinePage } from '../online/onlineLane.js';   // REALM P0.4: online, a pile's gold is not the level's
+import { onlineRule } from '../online/serverProfile.ts';   // the server profile's loot.pileGold
 import { rriLootMatrix, rriEnemyLootTableKey, conditionBasedPricesOn, randomConditionLootItems } from '../roleplayRealismItems/rriRealism.js';   // RRI2: LootRealismTables over DefaultLootTables, MobLootKeys over the basics' key, the condition roll on tabled loot
 import { RRI_VENDOR } from '../roleplayRealismItems/rriItems.js';   // FORAGE3: the pile event's first subscriber, named by its mod
 import { RECEIVER_MARKS, VALUE_IS_IDENTITY_TEMPLATES, BOAT_TEMPLATES } from '../../net/realm/realmTradeLaw.js';   // MARK-WIRE: the receiver's marks, one list with the realm's trade law; HACKED-GOLD: the records whose `value` is no price
@@ -336,8 +337,7 @@ function magicItemBase(magicItem, playerLevel, gender, rolls) {
 
 /** HELD-BASE (FIELD BUGS 2026-10-18f, SuperDaddy: "appears on things you can't equip like wands"): POWERS THAT WORK
  *  WORN - a piece has a live row that does not work off the body (enchantments.js worksUnworn: no Used payload).
- *  MAGIC.DEF's own: Cast When Held, Absorbs Spells and Enhances Skill. AUDIT FB1018f L1-4 (decided, Mac: "Stop with the
- *  decisions for me"): ANY such row - a piece with a Used cast and a worn power takes a base a slot takes, which loses
+ *  MAGIC.DEF's own: Cast When Held, Absorbs Spells and Enhances Skill. AUDIT FB1018f L1-4 (decided): ANY such row - a piece with a Used cast and a worn power takes a base a slot takes, which loses
  *  neither half (the cast works from any base); every regular MAGIC.DEF row is one power, so no draw moves. */
 export const powersNeedWearing = (rows) => rows.some((r) => !worksUnworn(r));
 /** HELD-BASE: the draws a held power's base takes before the stream is called dead - the soul trap's bound
@@ -627,7 +627,7 @@ function clampLootValue(v, depth) {
  *  below covers every declared field's kind, not the arrays alone. */
 export const LOOT_ARRAY_FIELDS = Object.freeze(itemFieldsOfKind('array'));
 
-/** INT1 (the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): THE ITEM LAW, registered by its home
+/** INT1 (the INTEGRITY arc): THE ITEM LAW, registered by its home
  *  (systems/item/itemLaw.js setItemLaw at its import) - the findings on a record, empty for one an honest client could have
  *  minted. A registration, not an import: the law reads the loot graph whole (the records, the spoils, the Broker), and
  *  this module sits under it. Until a host imports the law, the wire checks the shapes alone, as it always did. */
@@ -703,7 +703,7 @@ function wireLootItem(v) {
   return out;
 }
 
-/** AUDIT SETS M2 (2026-09-28): what a player hears opening a container whose room word THIS build cannot read - a
+/** AUDIT SETS M2: what a player hears opening a container whose room word THIS build cannot read - a
  *  newer game's item in it (a raid set piece before RAID4b): it is not opened, claimed or closed over here. */
 export const LOOT_NEWER_TEXT = 'Something in here is from a newer version of the game. Reload to open it.';
 /** AUDIT ONLINE2 F4: a body's pile a peer granted that this build cannot read - handed back to its owner. */
@@ -887,11 +887,11 @@ export function addEnemyLootExtras(items, basics, rolls = Math.random, { quarter
 const _enemyLootExtras = new Map();
 export function registerEnemyLootExtra(name, fn) { if (typeof fn === 'function') _enemyLootExtras.set(name, fn); else _enemyLootExtras.delete(name); }
 
-/** REALM P0.4 (2026-09-28, bible/06-Systems/Realm-Arc.md "Pile gold divided by level"): ONLINE A PILE'S GOLD IS NOT
- *  THE LEVEL'S. GenerateRandomLoot rolls a pile's gold times the player's level, so a level-30 character found thirty
+/** The server profile's option (loot.pileGold 'flat'; DFU's level multiple by default): A PILE'S GOLD IS
+ *  NOT THE LEVEL'S. GenerateRandomLoot rolls a pile's gold times the player's level, so a level-30 character found thirty
  *  times a level-1 one's in the same pile, and the hour's respawn (WORLD8) paid it again. Unleveled Loot's own arm
- *  divides it back (unleveledLoot.js unleveledGoldLootPiles), and DFU never calls it; online the division runs for
- *  every pile, the mod on or off, never under one piece. Answers the items. */
+ *  divides it back (unleveledLoot.js unleveledGoldLootPiles); with the option the division runs online for every pile,
+ *  the mod on or off, never under one piece. Answers the items. */
 export function unlevelPileGold(items, level) {
   const by = Math.max(1, Math.trunc(level) || 1);
   for (const it of items) if (it?.group === 'Currency') it.stackCount = Math.max(1, Math.trunc((it.stackCount ?? 0) / by));
@@ -906,7 +906,7 @@ export const PILE_MAP_CHANCES = Object.freeze([2, 1, 1, 2, 2, 15]);   // J, K, L
 
 export function addPileLootExtras(items, lootTableKey, rolls = Math.random, { locationIndex = null, luck = 50, level = 1, online = isOnlinePage(), where = null, quarters = undefined } = {}) {   // PARTY-LOOT: `quarters` the roll's RENOWN-LOOT share for the subscribers (undefined: the roller's own)
   if (!items || !lootTableKey) return items;
-  if (online) unlevelPileGold(items, level);   // REALM P0.4: every pile, whatever its key
+  if (online && onlineRule('loot.pileGold') === 'flat') unlevelPileGold(items, level);   // REALM P0.4: every pile, whatever its key
   // `int alphabetIndex = key - 64` on the FIRST character: 'A' is 1,
   // so J is 10 and O is 15.
   const alphabetIndex = lootTableKey.charCodeAt(0) - 64;

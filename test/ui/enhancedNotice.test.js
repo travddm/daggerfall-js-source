@@ -1,8 +1,4 @@
-// ENH-NOTICE1 (2026-09-21, Mac: "classic DFU has text that shows in
-// the middle of the screen, instead of this, for enhanced I want a
-// panel that slides in from the right side of the screen showing the
-// notification. This should work for any and all mods that utilize
-// this text."): THE NOTICE PANEL.
+// ENH-NOTICE1: THE NOTICE PANEL.
 //
 // The model is the box (ActionTextBox, the no-options ChoiceWindow -
 // the port's two homes for DFU's click-anywhere DaggerfallMessageBox);
@@ -460,7 +456,6 @@ test('ENH-NOTICE2: the service flow - plain text steps ride the panel in place, 
 });
 
 test('ENH-NOTICE2: THE ROSTER - the nine windows drawn on both skins that raise their own click-anywhere box, and (ENH-NOTICE3) the model, the three DOM windows and the wait page - no more and no fewer', () => {
-  // PIN MOVED, SPELLSHOP-SAID (FIELD BUGS 2026-10-19f): the spellbook is the ninth - ENH-NOTICE2 counted it among the
   // windows the enhanced skin replaces with a DOM twin, and SHOP-PLUS brought it back, in buy mode, inside the port
   const ROSTER = ['potionMakerWindow', 'itemMakerWindow', 'spellMakerWindow', 'bankWindow', 'restWindow', 'covenWindow', 'guildServiceWindow', 'guildServiceWindows', 'spellbookWindow'];
   const AT = { itemMakerWindow: 'item/', spellMakerWindow: 'spell/' };   // TIDY2: the two in feature folders
@@ -487,8 +482,7 @@ test('ENH-NOTICE2: THE ROSTER - the nine windows drawn on both skins that raise 
   assert.deepEqual(importers, [...ROSTER, 'actionText', 'talkWindow', 'hudText', 'enhancedTavern', 'enhancedInventory', 'heldMap', 'questHerald', 'waitWindow', 'enhancedPort'].sort());
 });
 
-// ── ENH-NOTICE3 (2026-09-21, Mac: "All mods, including climates and
-// calories need to utilize the enhanced notification popup") - THE
+// ── ENH-NOTICE3 - THE
 // SAME STACK CARRIES THE HUD LINE, AND A DOM WINDOW HOLDS A PANEL ────
 //
 // The toasts' laws as HudText drives them are pinned where the model

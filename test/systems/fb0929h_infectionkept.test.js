@@ -10,7 +10,7 @@
 // first now - the temple's (paid or free), a spell's and a potion's alike - and the infection only when it is all there
 // is, so a player who wants rid of it still cures it before the turn; the temple prices what it takes. The turn's own
 // CureAll of the old life still ends every disease there is.
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startInfection, infectionStep, markDreamPlayed, INFECTION } from '../../src/systems/infection.js';
 import { startDisease, DISEASES, diseaseCount, curableDiseaseCount } from '../../src/systems/diseases.js';
@@ -18,6 +18,13 @@ import { applySpell, cureAllDiseases, cureDiseasesInfectionsLast } from '../../s
 import { cureDiseaseOffer, payForCure, cureForFree } from '../../src/systems/guild/guildServiceActions.js';
 import { endOldLifeEffects } from '../../src/systems/lycanthropy.js';
 import { templeOf } from '../../src/systems/guild/guildVariants.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
+import { FEATURES } from '../../src/systems/features.js';
+import { ONLINE_FORCED_PREFS } from '../../src/systems/online/onlineLane.js';
+
+// These tests are the option's: Cure keeps infection on. The default (off, DFU's cure) is the last test.
+before(() => setPref('cureKeepsInfection', true));
+after(() => setPref('cureKeepsInfection', false));
 
 const MARA = templeOf('Mara');   // a temple of the eight, its healer's counter
 
@@ -79,4 +86,29 @@ test('INFECTION-KEPT: what ends everything at once - the turn\'s CureAll of the 
   startDisease(q, DISEASES.Plague, 0);
   cureAllDiseases(q);
   assert.deepEqual([plain(q), infections(q)], [0, []], 'CureAllDiseases, the turn\'s, ends both');
+});
+
+test("DFU-GAPS SW14: by default a cure ends every disease, the infection with the plague, as DFU's CureAllDiseases does - at the temple, cast and by the primitive", () => {
+  setPref('cureKeepsInfection', false);
+  try {
+    const p = player();
+    startInfection(p, INFECTION.Werewolf, { day: 0 });
+    startDisease(p, DISEASES.Plague, 0);
+    assert.equal(curableDiseaseCount(p), 2, 'the temple prices and claims both');
+    castCure(p);
+    assert.deepEqual([plain(p), infections(p)], [0, []], 'a cast ends the plague and the lycanthropy');
+    const q = player();
+    startInfection(q, INFECTION.Vampirism, { day: 0 });
+    startDisease(q, DISEASES.Plague, 0);
+    cureDiseasesInfectionsLast(q);
+    assert.deepEqual([plain(q), infections(q)], [0, []], 'the law\'s own primitive');
+  } finally {
+    setPref('cureKeepsInfection', true);
+  }
+});
+
+test("DFU-GAPS SW14: the row defaults to DFU's cure and the online lane forces it", () => {
+  const row = FEATURES.find((f) => f.id === 'cure-keeps-infection');
+  assert.deepEqual([row.control.key, row.control.initial, row.control.online], ['cureKeepsInfection', false, 'room']);
+  assert.equal(ONLINE_FORCED_PREFS.cureKeepsInfection, false);
 });

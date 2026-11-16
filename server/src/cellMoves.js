@@ -1,5 +1,5 @@
 // @ts-check
-// THE CELL TREE MOVES (bible/11-Multiplayer/Scale-Arc.md, COST-2 part two). The directory (cellNodes.js CELL_DIRECTORY)
+// THE CELL TREE MOVES (, COST-2 part two). The directory (cellNodes.js CELL_DIRECTORY)
 // seeds its tree at the `cellSeed` setting's level (cellNodes.js directoryTree) and moves it one node at a time, by the
 // counts its nodes tell it:
 //   COUNTS   - an object the Worker says stands in a moving tree (CELL_TELL_HEADER) tells the directory its named

@@ -39,7 +39,7 @@ const check = (name, ok, detail = '') => {
 // enumeration of it. Every file under src/ is served at its own path
 // instead, and the browser resolves the relative imports itself - the
 // same thing the bundler does, with nothing to keep in step.
-// NAME-AS (2026-10-12): AND vendor/ BESIDE IT. The card's graph left src/ -
+// NAME-AS: AND vendor/ BESIDE IT. The card's graph left src/ -
 // accountClient.js -> marketLaw.js -> ... -> player/classSkins.js imports
 // vendor/class-skins/skins.json - and the probe aborted that one request,
 // so the card's first import failed and the probe had stopped running at
@@ -130,7 +130,7 @@ const measured = await page.evaluate(async (stages) => {
     const card = accountCard(document, flow);
     app.append(card.root);
     const cs = (el) => (el ? getComputedStyle(el) : null);
-    const label = card.root.querySelector('label.field .fieldlabel');   // ACC1e F1's subject, a FORM field's label - NAME-AS: a signed-in card's section labels (the wardrobe's Title, Aura, Glyphs, Patreon and the name-in-game toggle's) wear the card's own bone, never measured as one
+    const label = card.root.querySelector('label.field .fieldlabel');   // a FORM field's label - a signed-in card's section labels (the wardrobe's Title, Aura, Glyphs and the name-in-game toggle's) wear the card's own bone, never measured as one
     const code = card.root.querySelector('.acctcode code');
     const primary = card.root.querySelector('.act.primary');
     out.push({

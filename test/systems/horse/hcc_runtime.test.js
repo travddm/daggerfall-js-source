@@ -1,4 +1,4 @@
-// HCC (2026-09-23): THE RUNTIME, PINNED BY EXECUTION - systems/horse/horseCart.js is TrailingWagonRuntime off the IL,
+// HCC: THE RUNTIME, PINNED BY EXECUTION - systems/horse/horseCart.js is TrailingWagonRuntime off the IL,
 // driven here over a fake host: a flat world, a player who walks and mounts, the eight settings, the hotkeys, the
 // windows' questions, the transitions and the save. Every scenario is a thing a player does with the mod on.
 import { test } from 'node:test';

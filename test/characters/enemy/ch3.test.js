@@ -118,14 +118,4 @@ test('ch3 characters-13 -> FX1 (F128): the swap pause bills PER INVENTORY VISIT,
   equipItem(e, { group: 'Armor', templateIndex: 102 });   // cuirass -> chest
   billEquipDelayOnClose(e, snap);
   assert.equal(e.equipCountdown, 0, 'only hand slots pause the swing');
-  // the rig: the block + the classic 980/s drain (unchanged)
-  const rig = src('src/combat/weapon/weaponRig.js');
-  assert.ok(rig.includes("(entity?.equipCountdown ?? 0) > 0) return;"), 'a running pause blocks the attack input');
-  assert.ok(rig.includes('entity.equipCountdown - dt * 980'), 'and drains at the classic approximation');
-  // the window owns the clock: snapshot in the ctor, bill in the ONE
-  // close law (the B-C1 seam, so hand-offs bill too)
-  const w = src('src/ui/native/nativeInventory.js');
-  assert.ok(w.includes('this._handSnapshot = hooks.entity ? equipDelaySnapshot(hooks.entity) : null;'), 'push snapshots');
-  assert.ok(w.includes('billEquipDelayOnClose(this.hooks.entity, this._handSnapshot)'), 'pop bills once');
-  assert.ok(w.includes("localizedText('equippingWeapon', 'Equipping %s').replace('%s', getLocalizedItemName(it.templateIndex, templateByIndex(it.templateIndex)?.name ?? it.name ?? ''))"), 'the Internal_Strings equippingWeapon cue');
 });

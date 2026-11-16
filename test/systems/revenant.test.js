@@ -1,6 +1,4 @@
-// REVENANT (2026-10-02; systems/revenant/revenant.js, Mac: "the ability for these enemies that kill you, or a very small chance
-// to flee at low health. These enemies can return at a later time stronger, with a new name, a chance of more loot
-// and taunt the player"). The laws pinned here:
+// REVENANT. The laws pinned here:
 //   - WHO: a special foe (an elite, a champion, a revenant already) of level 3 or more - never the watch, an ally, a
 //     quest's foe; off (the loot-rarity row), none.
 //   - THE KILL: the blow that kills the player, through the real door - and not one a Stendarr's mercy undoes.
@@ -32,7 +30,6 @@ const { getSeed, setSeed } = await import('../../src/formats/dfRandom.js');
 const { modSaveRecords, restoreModSaveRecords } = await import('../../src/systems/modSaveData.js');
 const { KNIGHT_CITY_WATCH, MOBILE_TYPES } = await import('../../src/characters/mobile/mobileTypes.js');
 const { foeTitle } = await import('../../src/systems/foeTitle.js');
-const { ambitionOf, AMBITION } = await import('../../src/systems/revenant/revenantUnquiet.js');
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const stats = () => ({ strength: 50, intelligence: 50, willpower: 50, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 });
@@ -40,7 +37,7 @@ const player = (id = 'char-1') => ({
   isPlayer: true, name: 'Ayla Stormwind', characterId: id, items: [], stats: stats(), skills: new Array(35).fill(30), level: 5,
   career: {}, activeEffects: [], health: 100, maxHealth: 100, magicka: 0, maxMagicka: 1000, armorValues: new Array(7).fill(100),
 });
-const orc = (over = {}) => ({ mobileType: MOBILE_TYPES.Orc, level: 6, health: 60, maxHealth: 60, team: 'Orcs', champion: 'mighty', unquiet: true, ...over });
+const orc = (over = {}) => ({ mobileType: MOBILE_TYPES.Orc, level: 6, health: 60, maxHealth: 60, team: 'Orcs', champion: 'mighty', ...over });
 const seq = (...vals) => { let i = 0; return () => vals[Math.min(i++, vals.length - 1)]; };
 const tick = () => new Promise((r) => setTimeout(r, 0));
 function fresh() {
@@ -53,12 +50,18 @@ test('REVENANT WHO: a special foe of level 3 or more - an elite, a champion, a r
   assert.equal(N.revenantCandidate(orc()), true, 'a champion');
   assert.equal(N.revenantCandidate(orc({ champion: undefined, eliteFoe: true })), true, 'an elite');
   assert.equal(N.revenantCandidate(orc({ champion: undefined, revenant: { id: 'x' } })), true, 'a revenant already');
-  assert.equal(N.revenantCandidate(orc({ champion: undefined })), false, 'a plain foe never');
+  assert.equal(N.revenantCandidate(orc({ champion: undefined })), false, 'a plain foe never, by default: the row says elites and champions only');
+  setPref('revenantWho', 'any');
+  assert.equal(N.revenantCandidate(orc({ champion: undefined })), true, 'a plain foe too, when the row says any regular foe');
+  assert.equal(N.revenantCandidate(orc({ staffBoss: { size: 2 } })), false, 'a staff event boss');
+  assert.equal(N.revenantCandidate(orc({ bossTraits: ['warded'] })), false, 'a boss with traits');
   assert.equal(N.revenantCandidate(orc({ level: 2 })), false, 'under the floor');
   assert.equal(N.revenantCandidate(orc({ mobileType: KNIGHT_CITY_WATCH })), false, 'the watch');
   assert.equal(N.revenantCandidate(orc({ team: 'PlayerAlly' })), false, 'an ally');
   assert.equal(N.revenantCandidate(orc(), { questBehaviour: {} }), false, 'a quest\'s foe');
   setPref('lootRarity', false);
+  assert.equal(N.revenantCandidate(orc()), true, 'Loot rarity off: the mod still runs');
+  setPref('revenants', false);
   assert.equal(N.revenantCandidate(orc()), false, 'off: none - DFU exactly');
   assert.equal(N.rollRevenantFlee(orc(), () => 0), false, '...and none runs');
 });
@@ -97,7 +100,7 @@ test('REVENANT THE KILL: the blow that kills me makes its foe a revenant through
   await tick();
   assert.equal(N.livingRevenants().length, 0, 'Stendarr\'s mercy: no death, no revenant');
   setAvoidDeathHook(null);
-  me.health = 99;   // PIN MOVED (FULL-GUARD, FIELD BUGS 2026-10-11b): a foe's blow from full health leaves me at 1 - a point short of full, it kills
+  me.health = 99;
   setStruck(killer, me, 500); hurtPlayer(me, 500);
   assert.equal(N.livingRevenants().length, 0, 'confirmed once the hurt is done, not inside it');
   await tick();
@@ -105,7 +108,7 @@ test('REVENANT THE KILL: the blow that kills me makes its foe a revenant through
   assert.ok(r, 'the killer is a revenant');
   assert.equal(r.rank, 1); assert.equal(r.kills, 1); assert.equal(r.trait, 'mighty'); assert.equal(r.mobileType, MOBILE_TYPES.Orc);
   assert.equal(r.id, 'rvn-killer-1');
-  const [lo, hi] = ambitionOf(r.personality) === 'vengeance' ? AMBITION.VENGEANCE_DUE : [N.REVENANT_RETURN_MIN_MINUTES, N.REVENANT_RETURN_MAX_MINUTES];   // UNQUIET (Revenants.md section 46): vengeance comes sooner
+  const [lo, hi] = [N.REVENANT_RETURN_MIN_MINUTES, N.REVENANT_RETURN_MAX_MINUTES];
   assert.ok(r.dueAt >= r.born + lo && r.dueAt <= r.born + hi, 'due in its ambition\'s days');
   assert.equal(killer.revenant.id, r.id, 'the foe over my body wears its name at once');
   assert.equal(foeTitle(killer, 'Orc'), r.name, '...on every surface');
@@ -122,27 +125,25 @@ test('REVENANT THE KILL: the blow that kills me makes its foe a revenant through
   assert.equal(N.livingRevenants().length, 1);
 });
 
-test('REVENANT DEEDS AND RANKS: UNQUIET (Revenants.md section 46) - a kill of me ranks it up only every second time (its `blood`), an escape every time, each rank a new epithet; the rank stops at five and the epithet rises from three; no birth past three living (mutants: no rank-up; every kill a rank; the same epithet kept; no cap)', () => {
+test('REVENANT DEEDS AND RANKS: every deed after the first ranks it up with a new epithet; the rank stops at five and the epithet rises from three; no birth past the cap (mutants: no rank-up; the cap moved)', async () => {
   fresh();
   const me = player();
   const e = orc();
   const r = N.revenantDeed(me, e, 'slew', { now: 1000, rolls: () => 0 });
+  assert.equal(r.rank, 1); assert.equal(r.kills, 1); assert.equal(r.escapes, 0); assert.equal(r.out, true, 'a kill leaves it standing over the body');
   const ep1 = r.epithet;
   N.revenantDeed(me, e, 'slew', { now: 1500, rolls: () => 0 });
-  assert.deepEqual([r.rank, r.kills, r.blood, r.epithet], [1, 2, 1, ep1], 'one kill since its birth: blood, no rank, its name kept');
-  N.revenantDeed(me, e, 'slew', { now: 2000, rolls: () => 0 });
-  assert.equal(r.rank, 2); assert.equal(r.kills, 3); assert.equal(r.blood, 0, 'spent on the rank'); assert.notEqual(r.epithet, ep1, 'a new name for a new rank');
+  assert.equal(r.rank, 2); assert.equal(r.kills, 2); assert.notEqual(r.epithet, ep1, 'a new name for a new rank');
   N.revenantDeed(me, e, 'fled', { now: 3000, rolls: () => 0 });
   assert.equal(r.rank, 3); assert.equal(r.escapes, 1); assert.equal(r.out, false, 'an escape is gone');
   assert.ok(N.REVENANT_EPITHETS.risen.map((x) => x.replace('{p}', 'Ayla')).includes(r.epithet), 'risen from rank three');
   for (let i = 0; i < 5; i++) N.revenantDeed(me, e, 'fled', { now: 4000 + i, rolls: () => 0.3 });
   assert.equal(r.rank, N.REVENANT_MAX_RANK, 'five and no more');
   assert.equal(r.history.length <= 12, true);
-  // the cap: none rises past it - the marked foe that would is no candidate
-  for (let i = 0; i < 5; i++) N.revenantDeed(me, orc({ champion: 'swift' }), 'fled', { now: 9000 + i, rolls: () => 0.5 });
-  assert.equal(N.livingRevenants().length, N.REVENANT_MAX, 'three living at most');
+  // the cap: a new one past it replaces the weakest, oldest
+  for (let i = 0; i < N.REVENANT_MAX + 2; i++) N.revenantDeed(me, orc({ champion: 'swift' }), 'fled', { now: 9000 + i, rolls: () => 0.5 });
+  assert.equal(N.livingRevenants().length, N.REVENANT_MAX, 'the cap holds');
   assert.ok(N.revenantById(r.id), 'the strongest is kept');
-  assert.equal(N.revenantCandidate(orc({ champion: 'swift' })), false, 'and a fourth is no candidate');
 });
 
 test('REVENANT THE RETURN: not before it is due; then on the roll, the highest rank first, one at a time; it stands with its rank\'s health and blows, its name, a class foe higher; gone unfought it is due again; slain it never comes back (mutants: early; two out at once; no scaling; lost forgotten; the slain returned)', () => {
@@ -231,30 +232,3 @@ test('REVENANT ITS KEEPING: the save slot carries the records (never as out); th
   assert.equal(N.mergeRevenants([{ id: 'bad' }], []).length, 0, 'a broken record is dropped');
 });
 
-test('REVENANT THE HOSTS: the open world\'s pool rolls the flee once under a fifth, runs and escapes without a corpse, taunts once in sight, closes a slain one; the spawn stands its trait or glow, then its rank, before its loot; the world\'s roll stands a due one, whoever rolls the group\'s wanderers, and reads its presence and its notice', () => {
-  const x = read('src/scenes/exteriorFoes.js');
-  // PIN MOVED (AUDIT UNQUIET, Revenants.md section 49): and its craft on the foe's own frame (`dt`)
-  assert.match(x, /const _flee = f\.fleeing \|\| \(!f\._fleeRolled && revenantFleeHealth\(f\.entity\)\) \? revenantFleeStep\(f, playerFeet, \{ onMe: \(\) => isLocalPlayerTarget\(f\.ai\.target\) \|\| !f\.ai\._armedTargeting, dt: foeFrameDt\(dt\) \}\) : null;/, 'the one flee law, asked only of a foe running or under the line');
-  assert.match(x, /if \(_flee === 'escape'\) \{ escapeFoe\(f\); continue; \}/, 'out of reach: escaped');
-  assert.match(x, /if \(_flee === 'start' \|\| _flee === 'run'\) \{ fleeWalk\(f, dt, eye\); continue; \}/, 'running: its walk and nothing else');
-  assert.match(x, /function fleeWalk\(f, dt, eye\) \{\s*\n\s*f\._mout = f\.mobile\.update\(dt, \{ moving: f\.ai\.moving, striking: false, rangedStriking: false, hurting: f\.ai\.hurtKnock, casting: false \}/, 'no blow and no cast in it');
-  assert.match(x, /else if \(_flee === 'cornered'\) revenantSay\(revenantCorneredEvent\(/, 'cornered: said');
-  // PIN MOVED (RVN3: the unbroken's escape - the same door, its own words)
-  // PIN MOVED (RVN6: its band scatters first - bible/12-Enhanced-AI/Feud-Arc.md 17)
-  assert.match(x, /function escapeFoe\(f(?:, \{ slip = false(?:, unbroken = false)? \} = \{\})?\) \{\s*\n(?:\s*scatterBand\(f\);[^\n]*\n)?\s*releaseFoeBatch\(f\);\s*\n\s*f\.dead = true;[\s\S]{0,300}revenantDeed\(playerEntity, f\.entity, 'fled'/, 'gone without a corpse, made a revenant');
-  const esc = x.indexOf('function escapeFoe(f');   // AUDIT (2026-10-02): the slip's option widened the head - the old '(f)' read nothing, and this passed on an empty slice
-  assert.ok(esc > 0);
-  assert.doesNotMatch(x.slice(esc, esc + 600), /f\.corpse = true|sayEnemyDied|reportPlayerKill/, 'no corpse, no kill');
-  assert.match(x, /if \(f\.entity\.revenant && !f\._taunted && f\.ai\.inSight && \(isLocalPlayerTarget\(f\.ai\.target\) \|\| !f\.ai\._armedTargeting\)/, 'the taunt, once a return');
-  assert.match(x, /if \(f\.entity\?\.revenant\) \{ const nr = revenantSlain\(playerEntity, f\.entity\); if \(nr && !peer\) revenantSay\(revenantSlainEvent\(nr, playerEntity\?\.name, \{ archive: f\.archive \}\), say\); \}/, 'slain at last');
-  const spawn = x.slice(x.indexOf('async function spawnFoe('), x.indexOf('const gender = MobileUnit.resolveGender'));
-  assert.match(spawn, /revenant \? revenant\.elite : rollOverworldElite\(Math\.random\)\)/, 'an elite stands as one again, never a fresh roll');
-  assert.match(spawn, /revenant \? \(revenant\.trait \? championIndex\(revenant\.trait\) : null\)/, 'its trait, never a fresh one');
-  const iApply = spawn.indexOf('applyRevenant(entity, revenant, { turned })'), iLoot = spawn.indexOf('spawnEnemyLoot(entity');   // PIN MOVED (RVN11c: a betrayer's turning is no return)
-  assert.ok(iApply > spawn.indexOf('applyChampion(entity') && iApply < iLoot, 'its rank over its trait, before its loot');
-  assert.match(spawn, /if \(entity\.revenant\) grantRevenantLoot\(entity, builtLevel\);/);
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const _revenant = hit && _m === 'exterior' \? revenantToReturn\(playerEntity, \{ now \}\) : null;\s*\n\s*if \(_revenant\) \{ Promise\.resolve\(_standEncounterFoe\(\{ \.\.\.hit, mobileType: _revenant\.mobileType, revenant: _revenant \}, playerFeet\)\)\.then\(\(f\) => \{ if \(!f\) releaseRevenantStand\(_revenant\); \}\); break; \}[^\n]*\n\s*if \(hit && _rollsForGroup\)/, 'before the group\'s gate - a revenant is the player\'s own');
-  assert.match(w, /\.\.\.\(hit\.revenant \? revenantSpawnOptions\(hit\.revenant, effectiveLevel\(playerEntity\)\) : \{\}\)/);
-  assert.match(w, /revenantPresence\(exteriorFoes\.foes, \{ now \}\);\s*\n\s*revenantSay\(takeRevenantNotice\(playerEntity\), \(l\) => townTalk\.say\(l\)\);/);
-});

@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK (2026-10-08, bible/11-Multiplayer/Super-Dungeons-Look.md sections 1 and 2): THE RIFT'S WINDOW AND ITS LIGHT ON
+// SD-LOOK: THE RIFT'S WINDOW AND ITS LIGHT ON
 // THE FLOOR, and THE RETURN'S WINDOW HOME - one foreign pass (the gate membrane's law, render/gate/gatePass.js: depth-tested,
 // never written, fogged, both faces, every rate whole over its wrapped clock), drawn by the dungeon arm after the flats.
 //

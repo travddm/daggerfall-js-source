@@ -1,8 +1,7 @@
 // @ts-check
-// NPC-MARKS (2026-10-21, the owner: "For morrowind models, vendors and quests npcs are hard to find due to everyone looking
-// the same. Could we make a bobbing icon above their character for morrowind specifically?"): THE MARKS OVER THE PEOPLE
+// NPC-MARKS: THE MARKS OVER THE PEOPLE
 // WHO DO SOMETHING. Daggerfall's standing people are pictures, and the picture says who they are - a shop's keeper wears
-// the shop's own sprite. In a Morrowind body (bible/04-Characters/Morrowind-NPCs.md) everyone is dressed by their
+// the shop's own sprite. In a Morrowind body everyone is dressed by their
 // faction's wardrobe off their seed (characters/wardrobe.js), so a shopkeeper and a customer can look alike. Over each
 // person whose body stands, whom a click takes somewhere other than talk, a mark bobs (render/npcMarkPass.js):
 //

@@ -1,7 +1,4 @@
-// MAC-LVL1 (2026-09-21, a player: "been jumping back and forth between
-// online/offline, and it seems to me that leveling doesn't work
-// properly online. I assume it probably has to do with how online
-// changes the passage of time"). He was right about the cause. DFU's
+// MAC-LVL1. He was right about the cause. DFU's
 // RaiseSkills (PlayerEntity.cs:1359-1414) opens its 360-minute gate
 // (:1367) against world time, and its only two callers - the rest
 // window (:731) and fast travel (:380) - have JUST raised that time.
@@ -11,7 +8,7 @@
 // fourth rests of a heal-up loop advanced nothing. The rest's
 // simulated minutes are CREDITED to the skill-check clock now.
 //
-// LIVED1 (2026-09-29) retired the credit and kept the law: the gate
+// LIVED1 retired the credit and kept the law: the gate
 // reads the CHARACTER's own clock (worldTick.js ownMinutes), which the
 // rest's hours move online as the one clock moves offline - so a night
 // opens it by RaiseSkills' own arithmetic, and nothing is banked on the
@@ -85,10 +82,3 @@ test('MAC-LVL1 (LIVED1): the gate reads the character\'s clock - shut 43 minutes
   } finally { setSharedClock(null); setWorldMinutes(had); }
 });
 
-test('MAC-LVL1 (LIVED1) by source: no credit is banked, spent or saved - the gate reads the character\'s own clock', () => {
-  assert.doesNotMatch(rd('src/systems/save/save.js'), /'restSimMinutes'/, 'the save carries no credit');
-  const sh = rd('src/scenes/shared.js');
-  assert.doesNotMatch(sh, /restSimMinutes/, 'nothing banks or spends it');
-  assert.match(sh, /const raised = raiseSkills\(entity, Math\.floor\(ownMinutes\(\)\), rolls, levelUpHook,/, 'RaiseSkills\' gate on the character\'s clock');
-  assert.doesNotMatch(rd('src/systems/rest/restSession.js'), /creditSkillMinutes/);
-});

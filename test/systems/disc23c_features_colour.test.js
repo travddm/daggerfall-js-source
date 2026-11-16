@@ -1,6 +1,4 @@
-// DISC23-C (2026-09-24, Skeptikali on Discord, over an ENHANCED tile's Off | On bar: "if a feature would be enabled,
-// the ON button would turn Green, and if a feature would be disabled, the OFF button would turn Red, it would help a
-// lot for people with darker screens or smaller resolutions").
+// DISC23-C.
 //
 // THE GAP: a pressed segment was a grey block whose letters alone were tinted, so on a dark or small screen On and Off
 // read the same. And under it, "off" was read by POSITION - the first segment - which is wrong wherever the Off is

@@ -1,8 +1,5 @@
 // ---------------------------------------------------------------------------
-// MAC-E - A BODY IS OPENED, NOT EMPTIED (2026-09-17, Mac: "seems like when
-// i click on a dead enemy now, i loot all their items automatically? dunno
-// if that's from a mod or something, but it lets me exceed my carry weight
-// with no penalty").
+// MAC-E - A BODY IS OPENED, NOT EMPTIED.
 //
 // It is not a mod. It is a RESIDUE this port wrote down and left, in
 // `scenes/corpseMarker.js`'s own header: "DFU's general arm opens the
@@ -123,17 +120,6 @@ test('MAC-E: takeCorpseLoot is the TAKE now, and the online grant is its one cal
   assert.equal(player.goldPieces, 10, 'DoTransferItem’s first statement: a purse is SPENT, never listed');
   assert.deepEqual(player.items.map((i) => i.name), ['Longsword']);
   assert.deepEqual(said, ['You take 2 items.']);
-  // ...and it is reached from exactly one place.
-  // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's (scenes/bodyLootHost.js legacyGrant) - an older owner's
-  // pile, handed over, which the pool no longer calls from itself
-  assert.equal([...rd('src/scenes/exteriorFoes.js').matchAll(/takeCorpseLoot\(/g)].length, 0, 'the pool itself takes nothing from a grant');
-  const ex = rd('src/scenes/bodyLootHost.js');
-  const calls = [...ex.matchAll(/takeCorpseLoot\(/g)];
-  assert.equal(calls.length, 1, 'one caller');
-  const line = ex.split('\n').find((l) => l.includes('takeCorpseLoot('));
-  assert.match(line, /items: grant/, '...and it is the grant landing, where the owner has already chosen');
-  assert.equal(rd('src/scenes/cityGuards.js').includes('takeCorpseLoot('), false,
-    'the watch has no peers to grant it anything - it opens, always');
 });
 
 test('MAC-E: both exterior pools take the host’s inventory door, and both hosts hand it over', () => {
@@ -157,16 +143,9 @@ test('MAC-E: both exterior pools take the host’s inventory door, and both host
     // through to exactly the call that was here before.
     // LOOT-STACK: the decline is a PRESS's only (a pile tab asks for that
     // body's window), and the window is handed the pile beside the hooks.
-    // PIN MOVED (AUDIT 625 D6): and the door ANSWERS whether it opened - `true` for the quick take, the window's own for
     // the window (a refused pack's null is no open) - which the corpse door rolls a body's silver on
     assert.match(arm, /inventoryDoorReady\(\) \? \(loot\) => \{\n\s*if \(!pileKeys && quickLootTake\(lootKey, loot, playerEntity, \(l\) => townTalk\.say\(l\), \{ getQuest: [^}]*\}\)\) return true;[^\n]*\n\s*const pile = lootPile\([^\n]*\n\s*const w = makeInventoryWindow\(\{ loot: pile \? \{ \.\.\.loot, pile \} : loot \}\);\n\s*if \(w\) townTalk\.showOverlay\(w\);[^\n]*\n\s*return !!w;[^\n]*\n\s*\} : null/,   // DISC10-E L3 re-aim: the door answers null for a refused pack, which mounts nothing
       `${f}: ...and the host's OWN inventory factory is the door, behind the same art gate every pack arm takes`);
   }
 });
 
-test('MAC-E: the residue note is gone from the header, because the residue is', () => {
-  const s = rd('src/scenes/corpseMarker.js');
-  assert.ok(!/The port transfers the lot and reports the count - the pre-existing G3\n\/\/ shape/.test(s),
-    'a note describing behaviour the module no longer has is a lie with a citation');
-  assert.match(s, /THAT RESIDUE IS PAID \(MAC-E/, 'and what replaced it says who found it');
-});

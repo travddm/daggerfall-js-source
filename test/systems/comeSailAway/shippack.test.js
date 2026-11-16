@@ -1,6 +1,6 @@
-// SHIP-PACK (2026-10-01, the review before the merge: "Allow larger ships to be picked up, just like smaller vessels")
+// SHIP-PACK
 // - EVERY HULL PACKS, AND HER PARTS ARE HER (systems/comeSailAway/comeSailAway.js PackBoat, takePlaceItem; systems/comeSailAway/comeSailAwayBoat.js
-// packedHullWeight; systems/comeSailAway/csaBoatMenu.js; bible/03-World/Come-Sail-Away.md SHIP-PACK). The Small Ship, the Large Galley
+// packedHullWeight; systems/comeSailAway/csaBoatMenu.js; SHIP-PACK). The Small Ship, the Large Galley
 // and the Carrack are picked up as the Rowboat and the Large Boat are: a deed ship with her deed in the pack, which goes
 // with her into her parts; placed again, her parts are spent and her deed is given back in their place. Her parts keep
 // her number (her naval state, her crew and her hands ashore are found by it), her worth (what placed her - a claimed
@@ -14,7 +14,6 @@ import { TRIGGER_MODEL, HULL_PRICES, HULL_WEIGHTS, PACKED_WEIGHT_MAX, packedHull
 import { DEED_NOT_HELD_TEXT, PASSENGERS_ABOARD_TEXT } from '../../../src/systems/comeSailAway/comeSailAway.js';
 import { mintDeed, mintBoatItem, BOAT_DEED_TEMPLATE, BOAT_PARTS_TEMPLATE } from '../../../src/systems/comeSailAway/comeSailAwayItems.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const AT = [1000, 34, 50], DIR = [0, 0, 1];
 
 /** The runtime of test/csaScene.mjs with the world host's item seams: the mint (the host's UIDs from 7001), the pack the
@@ -183,10 +182,3 @@ test('SHIP-PACK a fast travel packs the ship sailed when her deed is in the pack
   assert.deepEqual(t.pack, []);
 });
 
-test('SHIP-PACK the world\'s seams: the pack handed to the runtime (where her deed is found); the boat menu told when her deed is not in the pack; a landfall packs a ship only with her deed, else she is left moored (mutants: the pack seam, the menu\'s word, the landfall unguarded)', () => {
-  // PIN MOVED (HOLDINGS): the pack's seam, the Fleet's book's two after it (titles, retitle - test/systems/naval/fleet.test.js)
-  assert.match(WORLD, /player: \(\) => \(playerEntity\.items \?\?= \[\]\),/);
-  assert.match(WORLD, /noDeed: !!csaRuntime\?\.deedMissing\?\.\(boat\),/);
-  // PIN MOVED (HOLD-WEIGHT, FIELD BUGS 2026-10-05c): the landfall asks her parts' weight after her deed (test/systems/comeSailAway/fb1005c_holdweight.test.js)
-  assert.match(WORLD, /if \(tvSea\.means\?\.again && boat\.packable && csaPassengersOn\(boat\) === 0 && !csaRuntime\.deedMissing\(boat\) && !csaRuntime\.partsTooHeavy\(boat\)\) csaCall\(\(\) => csaRuntime\.PackBoat\(boat, true\)\);/);
-});

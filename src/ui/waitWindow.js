@@ -10,7 +10,7 @@
 // `extend(seconds)` - a second `raise time by` joins the one standing.
 //
 // This page was Climates & Calories' hunt window (SURV6) until the text
-// hunt was removed (2026-10-04); its Yes/No and result pages went with it.
+// hunt was removed; its Yes/No and result pages went with it.
 import { nativeMetrics } from './native/nativePanel.js';
 import { layoutMessageBox, drawMessageBox } from './messageBox.js';
 import { noticeFrame, noticeRelease } from './enhanced/enhancedNotice.js';   // ENH-NOTICE3: the page's own parchment, as the enhanced panel

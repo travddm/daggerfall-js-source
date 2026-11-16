@@ -1,7 +1,8 @@
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
-// the REAL migrations (test/accountDb.mjs, migration 0140): the finds the service's own die decides and a day caps, the
+// WITCH1: THE WITCHES' FESTIVAL, SERVICE SIDE - the REAL functions over
+// the REAL migrations (test/accountDb.mjs): the finds the service's own die decides and a day caps, the
 // sales under a request id, the Hearth Offerings set out, filled, taken from once a day and taken in, an orphan's cakes
 // sent home, and the festival's wardrobe - the titles, the aura and the profile icon, held only as the rows say.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService } from '../accountDb.mjs';
@@ -19,7 +20,9 @@ import { utcDay } from '../../src/net/marksLaw.js';
 const ON = { FESTIVAL_OPEN: 'on' };
 /** An instant inside the festival that is not a night the dead walk, one that is, and one after it. */
 const DAY_S = FESTIVALS[0].fromMs / 1000 + 3600;
-const NIGHT_S = (() => { for (let s = FESTIVALS[0].fromMs / 1000; s < FESTIVALS[0].toMs / 1000; s += 600) if (festivalNight(skyDayAt(s))) return s; return null; })();
+// The first night the dead walk on the sky's own clock (time.skyClock). Read inside a test that plays by that rule: with
+// one clock the sky's date is the world's, and the window's first night falls on a later UTC day than DAY_S.
+const firstSkyNight = () => { for (let s = FESTIVALS[0].fromMs / 1000; s < FESTIVALS[0].toMs / 1000; s += 600) if (festivalNight(skyDayAt(s))) return s; return null; };
 const AFTER_S = FESTIVALS[0].toMs / 1000 + 60;
 /** The die: a hit (every byte 0 - a roll of 0) or a miss (every byte 255). */
 const HIT = (/** @type {Uint8Array} */ b) => b.fill(0);
@@ -64,7 +67,8 @@ function interleaved(db, re, hook) {
   });
 }
 
-test('WITCH1 the routes and the switch: every festival route behind a session, FESTIVAL_OPEN off, dev or on', () => {
+test('WITCH1 the routes and the switch: every festival route behind a session, FESTIVAL_OPEN off, dev or on', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   for (const r of ['/v1/festival/mine', '/v1/festival/find', '/v1/festival/buy', '/v1/festival/town', '/v1/festival/offering/set',
     '/v1/festival/offering/fill', '/v1/festival/offering/take-in', '/v1/festival/offering/take', '/v1/account/icon']) assert.ok(ROUTES.has(r), r);
   assert.equal(festivalSwitchOf('on'), 'on');
@@ -74,18 +78,19 @@ test('WITCH1 the routes and the switch: every festival route behind a session, F
   assert.equal(festivalOpenFor({ handle: 'x' }, {}), false, 'unset is shut');
   assert.equal(festivalOpenFor({ handle: 'x' }, ON), true);
   assert.deepEqual(FEST_STATUS, { guest: 403, closed: 409, rate: 429, capped: 429 });
-  assert.ok(NIGHT_S != null, 'the festival holds a night the dead walk on the sky\'s clock');
+  assert.ok(firstSkyNight() != null, 'the festival holds a night the dead walk on the sky\'s clock');
   assert.equal(festivalNight(skyDayAt(DAY_S)), false);
 });
 
-test('WITCH1 A FIND: the service\'s die decides at the source\'s odds; a guest, a shut switch, the days\' end and a word that is no source are refused', async () => {
+test('WITCH1 A FIND: the service\'s die decides at the source\'s odds; a guest, a shut switch, the days\' end and a word that is no source are refused', async (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
+  const NIGHT_S = firstSkyNight();
   const { alice, player, ctx, row, S } = await stand();
   const g = await S.guest();
   assert.deepEqual(await findFestival(ctx(), { id: g.id, handle: null }, { source: 'foe' }, ON), { error: 'guest' });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'foe' }, {}), { error: 'closed' });
   assert.deepEqual(await findFestival(ctx(AFTER_S), player(alice), { source: 'foe' }, ON), { error: 'closed' });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'gold' }, ON), { error: 'source' });
-  // PIN MOVED (CAKE-CAP-SAID, FIELD BUGS 2026-10-21b): each answer says the day's cakes found, this find's with them
   assert.deepEqual(await findFestival(ctx(DAY_S, MISS), player(alice), { source: 'foe' }, ON), { found: 0, cakes: 0, today: 0 });
   assert.deepEqual(await findFestival(ctx(DAY_S, HIT), player(alice), { source: 'foe' }, ON), { found: 1, cakes: 1, today: 1 });
   assert.deepEqual(await findFestival(ctx(DAY_S, HIT), player(alice), { source: 'endgame' }, ON), { found: 4, cakes: 5, today: 5 });
@@ -102,7 +107,7 @@ test('WITCH1 THE DAY\'S CAPS: FIND_ASKS_PER_DAY asks and FIND_CAKES_PER_DAY cake
   const { alice, player, ctx, db, row } = await stand();
   const day = utcDay(DAY_S);
   db._raw.prepare('INSERT INTO fest_finds (account, day, asks, found) VALUES (?, ?, ?, ?)').run(alice.id, day, FIND_ASKS_PER_DAY - 1, FIND_CAKES_PER_DAY - 3);
-  // the last ask of the day: the cakes it gives stop at the day's cap - and say it (PIN MOVED, CAKE-CAP-SAID)
+  // the last ask of the day: the cakes it gives stop at the day's cap - and say it (
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'endgame' }, ON), { found: 3, cakes: 3, today: FIND_CAKES_PER_DAY, capped: true });
   assert.deepEqual(await findFestival(ctx(), player(alice), { source: 'foe' }, ON), { error: 'capped', cakes: 3 });
   assert.equal(row(alice.id).fest_cakes, 3);
@@ -136,8 +141,9 @@ test('WITCH1 A SALE: the price taken only while the cakes cover it; an account w
   assert.deepEqual(await buyFestival(ctx(), player(alice), { ware: 'title:witchwarden', rid: 'aaaaaaaaaaab' }, ON), { repeat: true, ware: 'title:witchwarden', cakes: 40, bowls: 0, wares: ['title:witchwarden'] }, 'asked again: answered, nothing moved');
   assert.deepEqual(await buyFestival(ctx(), player(alice), { ware: 'title:witchwarden', rid: 'aaaaaaaaaaac' }, ON), { error: 'owned' });
   // a pack's ware is bought as often as the cakes go round
-  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaad' }, ON)).cakes, 20);
-  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaae' }, ON)).cakes, 0);
+  cakes(alice, 80);
+  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaad' }, ON)).cakes, 40);
+  assert.equal((await buyFestival(ctx(), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaae' }, ON)).cakes, 0);
   assert.equal(row(alice.id).fest_wares, 'title:witchwarden');
   assert.equal(db._raw.prepare('SELECT COUNT(*) AS n FROM fest_sales WHERE account = ?').get(alice.id).n, 3);
   // a Hearth Offering is the account's count, as the cakes are - asked twice, one bowl
@@ -146,8 +152,8 @@ test('WITCH1 A SALE: the price taken only while the cakes cover it; an account w
   assert.equal((await buyFestival(ctx(), player(alice), { ware: 'item:offering', rid: 'aaaaaaaaaab0' }, ON)).bowls, 1, 'a repeat counts no second bowl');
   assert.equal(row(alice.id).fest_bowls, 1);
   // the days over: a new sale is closed, a sale asked before it is still answered
-  assert.deepEqual(await buyFestival(ctx(AFTER_S), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaaf' }, ON), { error: 'closed' });
-  assert.equal((await buyFestival(ctx(AFTER_S), player(alice), { ware: 'card:warlock', rid: 'aaaaaaaaaaae' }, ON)).repeat, true);
+  assert.deepEqual(await buyFestival(ctx(AFTER_S), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaaf' }, ON), { error: 'closed' });
+  assert.equal((await buyFestival(ctx(AFTER_S), player(alice), { ware: 'piece:wyrd-hood', rid: 'aaaaaaaaaaae' }, ON)).repeat, true);
 });
 
 test('WITCH1 THE HEARTH OFFERING: set out only at a home the character owns (never a hall), filled from the owner\'s cakes, taken from once a day by others, taken in with its cakes', async () => {

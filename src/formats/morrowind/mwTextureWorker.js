@@ -1,11 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════
-// MW-TEXTHREAD — THE TEXTURE WORKER. The other half of
+// THE TEXTURE WORKER. The other half of
 // mwTextureClient.js: one 'decode' message hands it a texture file's
 // bytes and its archive path, it runs the SAME decoder the main thread
 // runs (mwTexture.js decodeTextureImage - the extension picks DDS, TGA
 // or BMP) and answers the image with every mip level's pixels
 // TRANSFERRED. A 1024x1024 DXT texture with its chain is 55-59 ms of
-// decode (Morrowind-Assets.md, MW-LOAD's measurement), and a body build
+// decode, and a body build
 // decodes dozens of them on the thread that draws the frame.
 //
 // The shape is unityBundleWorker.js's: answers keyed by the client's

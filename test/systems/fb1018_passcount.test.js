@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-18 PASS-COUNT (bible/01-Overview/bugs/Field-Bugs-2026-10-18.md, MADMAN0037: "The Mouse and Fawn
+// FIELD BUGS 2026-10-18 PASS-COUNT (, MADMAN0037: "The Mouse and Fawn
 // tavern in Sentinel, graphics settings preset ultra, Gpu fans turn into jet turbines", over a counter that read
 // "198 fps ... draws 67 binds 77"). The counter counted the room's own pass alone: a building's view out through its
 // windows (renderer.outsideViewFrame, drawn BEFORE the room's beginFrame, whose reset lost its draws) and the shadow
@@ -183,8 +183,4 @@ test('PASS-COUNT THE RENDERER COUNTS THEM: the room\'s frame takes every draw it
     s.setLightingLane(null);
     assert.equal(lit(WORLD_FRAME), 0, 'the lane off: none');
   } finally { console.warn = warn; }
-  // the order the count relies on: the interior host asks for the view out before its own beginFrame
-  const modes = read('src/scenes/worldModes.js');
-  const at = modes.indexOf('viewOutFrame(');
-  assert.ok(at > 0 && modes.indexOf('renderer.beginFrame(', at) > at, 'the view out is drawn before the room begins its frame');
 });

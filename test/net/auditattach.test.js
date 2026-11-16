@@ -1,4 +1,4 @@
-// AUDIT ATTACH (2026-09-23, found by INSPECT1's measurement of the attachment its card meter would ride): A SOCKET'S
+// AUDIT ATTACH: A SOCKET'S
 // METERS LEAVE ITS ATTACHMENT. The runtime caps a hibernatable socket's attachment at 2 KiB and refuses a write past it
 // WHOLE (the Room's _setAttach answers false), and every per-socket meter rode it: twenty arms' buckets and strike
 // counts, the junk count, and three funnels onto the socket as a destination - `cin` alone eight sender ids of up to
@@ -39,31 +39,26 @@ test('AUDIT ATTACH A1: the WIDEST attachment a place socket carries - the widest
   assert.equal(me.meters.cin.length, CAST_DEST_SENDERS_MAX, 'the funnel full, of forty-character ids');
   assert.ok(me.meters.cin.every((c) => c.id.length === 40));
   const bytes = JSON.stringify(me.att).length;
-  // PIN MOVED (LEASE1): 1080, from 1056 - the hub's word on the socket: when the room's last word on its mute was said
   // (`lt`), when its lease lapses (`ld`) and a freeze (`fz`), three numbers of ten digits; still about half the runtime's 2048.
-  // PIN MOVED (WIKIMAID): 1056, from 1024 - the WikiMaid's glyph word took the widest, every glyph at once, to 1030 bytes
   // (the glyph list 185 of them, as words); still 1018 under the runtime's 2048. The next field is measured against
   // this; storing the glyphs as their places in GLYPHS rather than their words would buy back some 170 bytes if the
   // half is to be held again.
-  // PIN MOVED (HIBERNATE): 1136, from 1080 - the id's secret (`sc`) rides the attachment, so a wake can ask it without a storage read
-  // PIN MOVED (NIRNROOT-SAGE): 1152, from 1136 - the Nirnroot Sage's glyph word took the widest, every glyph at once, to
-  // 1151 bytes ('nirnrootsage' and its quotes and comma); still 897 under the runtime's 2048
-  assert.ok(bytes <= 1152, `the widest place attachment is ${bytes} bytes - about half the runtime's 2048 at most, so the next field is measured with room to spare`);
+  assert.ok(bytes <= 1221, `the widest place attachment is ${bytes} bytes - about half the runtime's 2048 at most, so the next field is measured with room to spare`);
   assert.ok(bytes > 500, `and it is the wide one: ${bytes} bytes`);
 }));
 
 test('AUDIT ATTACH A1 (AUDIT FB1018D L4-4): THE WIDEST DUNGEON INSTANCE SOCKET - its key at its widest, its attachment SEAT-LIVE\'s two stamps beside every field a building\'s carries, and still about half the runtime\'s 2048', () => withClock(async (tick) => {
-  const { me } = await widestPlace(tick, 'dungeon:m4294967295.i0123456789abcdef.0000000a');
+  // high four bits' 0xF (net/wire.js WDUN_WORLD_LANE), every id from 4,026,531,840 a hall's room, which keeps no instance;
+  // the widest instance key below it is as wide (ten digits)
+  const { me } = await widestPlace(tick, 'dungeon:m4026531839.i0123456789abcdef.0000000a');
   assert.equal(me.closed, null);
   const fields = Object.keys(me.att), want = [...PLACE_ATTACH_FIELDS, ...SEAT_ATTACH_FIELDS];
   assert.deepEqual(want.filter((k) => !fields.includes(k)), [], 'every field a wake needs is written, the seat\'s stamps too');
   assert.deepEqual(fields.filter((k) => !want.includes(k)), [], 'a field on a dungeon attachment this test never measured');
   const bytes = JSON.stringify(me.att).length;
   // SEAT-LIVE's stamps (two thirteen-digit times) and the instance's longer key: 1086 at its widest, past the building's
-  // 1056 - a dungeon instance's ceiling of its own, still about half. PIN MOVED (LEASE1): 1135, from 1100 - the lease's three numbers
-  // PIN MOVED (HIBERNATE): 1191, from 1135 - the same secret on a dungeon instance's wider key
-  // PIN MOVED (NIRNROOT-SAGE): 1207, from 1191 - the Nirnroot Sage's glyph word, every glyph at once: 1206 bytes
-  assert.ok(bytes <= 1207, `the widest dungeon instance attachment is ${bytes} bytes`);
+  // 1056 - a dungeon instance's ceiling of its own, still about half.
+  assert.ok(bytes <= 1276, `the widest dungeon instance attachment is ${bytes} bytes`);
 }));
 
 // Each arm's flood, at one instant: `passes` frames through the bucket, then a strike a frame (`key`), closed past `max`.

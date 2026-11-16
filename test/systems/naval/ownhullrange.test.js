@@ -1,6 +1,4 @@
-// OWN-HULL-RANGE (2026-10-12, a player's live client travelling the overworld: 14 hulls of its own sea 9-727 km off -
-// the peers' ships it adopted as they left, wherever they lay - and 90 -> 37 FPS while they stood; bible/07-Rendering/
-// Performance-Priority.md OWN-HULL-RANGE) - MY OWN SEA'S SHIP FAR OFF STANDS NO HULL EITHER. PEER-HULL-RANGE's edges
+// OWN-HULL-RANGE - MY OWN SEA'S SHIP FAR OFF STANDS NO HULL EITHER. PEER-HULL-RANGE's edges
 // for a ship with no owner: none built past PEER_HULL_NEAR_M, given back past PEER_HULL_FAR_M, her record kept; an
 // adopted peer's ship stays hull-less; and what reads a ship BY her hull keeps it wherever she is (hullKept): bodies
 // on her deck, the boarding, a prize not yet settled, a fight - hers or one that targets her. The sea of

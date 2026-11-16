@@ -1,5 +1,4 @@
-// SEA-LANES (2026-10-02, Mac: "ships should be more persistant and actively engage with multiple docks and multiple
-// pathways around daggerfall") - the sea's traffic was the director's alone: ships stood on a ring about the player and
+// SEA-LANES - the sea's traffic was the director's alone: ships stood on a ring about the player and
 // were let go out of sight for good; a harbour's errands reached only a port the player had stood by. A ship seen
 // leaving a port was never the ship met at the next, and none sailed between two. Now THE BAY'S PACKETS:
 //   the lanes   - every port town with open sea by it (its roadstead, within ROADSTEAD_PX) runs packets to its
@@ -19,7 +18,7 @@
 //                 map's own ports, water and climate, at the shared clock
 // The pure law (systems/naval/seaLanes.js) over a coast of its own; the real host (scenes/naval/navalHost.js liners) through
 // real frames over Come Sail Away's pool (test/navalSea.mjs); world.js's feed lifted from its source and run. Each is
-// red on the record's code (168bf2587). `03-World/Naval-Combat.md` (SEA-LANES).
+// red on the record's code (168bf2587). `docs/systems/naval.md`.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -37,8 +36,12 @@ import { findHarbour, alongside } from '../../../src/systems/naval/shipLife.js';
 import { hash32 } from '../../../src/world/spawnedDungeons.js';
 import { mulberry32 } from '../../../src/combat/blood/bloodArt.js';
 import { sea } from '../../navalSea.mjs';
+import { createWorldLanes } from '../../../src/scenes/naval/worldLanes.js';
+import { createWorldPorts } from '../../../src/world/worldWide/worldPorts.js';
+import { createWorldPlaces } from '../../../src/world/worldWide/worldPlaces.js';
 
 const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
+import { hostText } from '../../hostText.mjs';   // PORT-SHIPS: the port near the player moved whole to scenes/harbourHost.js - a host's whole
 const M_PER_NATIVE = 819.2 / NATIVE_PIXEL;
 
 // ── a coast of its own: land north of map row 200 (y < 200), the sea south of it; a jetty of land down x = 120 from
@@ -252,7 +255,7 @@ test('SEA-LANES ON THE SHARED CLOCK: a packet sails her lane out at her cruise, 
 // ── the host ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 const GLEN = { key: 'port:1', name: 'Glenpoint' }, WAYR = { key: 'port:2', name: 'Wayrest' };
-/** A packet under way in the scene, her leg running north through her place (AUDIT BAY A6/A9/A17 PIN MOVED: her leg,
+/** A packet under way in the scene, her leg running north through her place (AUDIT BAY A6/A9/A17
  *  her seeds and her ports by key - her place ahead and her ports' names were the list's). */
 const under = (id, seed, x, z, o = {}) => ({ id, seed, seeds: [seed], classId: 'merchantGalleon', region: -1, phase: 'sail', pos: [x, 0, z], yaw: 0, leg: [[x, z - 3000], [x, z + 3000]], port: null, to: WAYR, from: GLEN, ...o });
 const liners = (h) => [...h.host._sea.values()].filter((e) => e.liner);
@@ -395,7 +398,7 @@ function provokeMe(e) { e.ship.provoked.set('local', 1e9); }
 // ── the world's feed, lifted from world.js and run ──────────────────────────────────────────────────────────────────
 
 function liftFeed() {
-  const i = WORLD.indexOf('  const LANE_LIST_MS = 2000, LANE_NEAR_PX = 4;');
+  const i = WORLD.indexOf('  const LANE_LIST_MS = 2000;');
   const j = WORLD.indexOf('    naval.liners(list);\n  }\n', i);
   assert.ok(i > 0 && j > i, 'the feed lifted');
   return WORLD.slice(i, j + '    naval.liners(list);\n  }\n'.length);
@@ -408,14 +411,18 @@ function feedOn({ at = { x: 200, y: 200 }, clock = 1.7e12 } = {}) {
   const PORTS = FEED_PORTS;
   const S = 40;   // native units a scene metre (SCENE_MAP_RATIO)
   const origin = nativeOfPixel(at.x, at.y);
-  const calls = { liners: [], ways: 0 };
+  const calls = { liners: [], ways: 0, water: 0 };
   const env = {
-    tvWater: (px, py) => water(px, py), maps: { getClimateIndex: (px, py) => (open(px, py) ? OCEAN : 1), getRegion: (ri) => ({ mapNames: PORTS.map((p) => p.name) }) },
+    tvWater: (px, py) => { calls.water++; return water(px, py); }, maps: { getClimateIndex: (px, py) => (open(px, py) ? OCEAN : 1), getRegion: (ri) => ({ mapNames: PORTS.map((p) => p.name) }) },
     CLIMATES: { Ocean: OCEAN }, RAID_NATIVE_PIXEL: NATIVE_PIXEL, pixelOfNative,
     PORT_LOCATION_IDS: [...PORTS.map((p) => p.id), PORTS[0].id, 5],   // a repeat, and an id the map has not
     mapDict: new Map(PORTS.map((p, k) => [p.id & 0xfffff, { id: p.y * 1000 + p.x, regionIndex: 1, mapIndex: k }])),
     getPixelFromPixelID: (id) => ({ x: id % 1000, y: Math.floor(id / 1000) }),
-    laneNetwork, laneWay: (...a) => { calls.ways++; return laneWay(...a); }, packetsAt, LANE_PATH_PX, LANE_MAX_PX,
+    // the map's directory, none past the Bay here (the world's ports empty, its land not standing); a way sounded is one
+    // that read the water
+    createWorldLanes: (o) => { const wl = createWorldLanes(o); return { ...wl, way: (l) => { const was = calls.water, w = wl.way(l); if (calls.water > was) calls.ways++; return w; } }; },
+    worldPorts: createWorldPorts({ places: createWorldPlaces(), openSea: () => false }), tamrielLand: false,
+    packetsAt, LANE_PATH_PX, LANE_MAX_PX,
     performance: { now: () => env.t }, t: 10000,
     naval: { enabled: true, liners: (list) => calls.liners.push({ list }) },
     playerTravelPixel: () => ({ ...at }), player: { feetAt: () => [NATIVE_PIXEL / 2 / S, 0, NATIVE_PIXEL / 2 / S] }, raidNowMs: () => clock,
@@ -428,10 +435,9 @@ function feedOn({ at = { x: 200, y: 200 }, clock = 1.7e12 } = {}) {
 }
 
 test('SEA-LANES THE WORLD\'S FEED: before the frame poses the sea\'s ships, every LANE_LIST_MS the world hands the host every packet of the lanes about the player at the shared clock (AUDIT BAY A19 PIN MOVED: those within LANE_LIST_M of the player) - the lanes of the map\'s own ports (Travel Options\' list, by its water and the ocean\'s climate), a lane\'s way sounded once and only near the player, each packet in the scene with her seeds, her leg, her ports by key and name and her home port\'s region', () => {
-  assert.match(WORLD, /if \(_mode\(\) === 'exterior' && !gamePaused\(\) && !_loading\) \{ laneShips\(\);[^\n]*\n\s*naval\.frame\(dt \* worldTimeScale\(\)/, 'stood and steered before the frame poses them, outdoors and running');   // PIN MOVED (SEA-EVENTS, 2026-10-22): the sea's events stepped beside the lanes (scenes/seaVenturesHost.js step)
-  // PIN MOVED (AUDIT CAPTAIN'S SEA H1): and its sounding's reach - an isle port's its shore's
-  // PIN MOVED (RPT1026-WORLD FAR-QUAY): the harbour a town is handed as moved to systems/naval/harbourBook.js harbourOf
+  assert.match(WORLD, /if \(_mode\(\) === 'exterior' && !gamePaused\(\) && !_loading\) \{ laneShips\(\);[^\n]*\n\s*naval\.frame\(dt \* worldTimeScale\(\)/, 'stood and steered before the frame poses them, outdoors and running');
   assert.match(readFileSync(new URL('../../../src/systems/naval/harbourBook.js', import.meta.url), 'utf8'), /return \{ key: `port:\$\{t\.id\}`, name: t\.name \?\? null, rect, ready, reach \};/, 'the harbour named, its key a lane port\'s');   // PIN MOVED (AUDIT HOLDINGS O1): and whether its scan's pixels are built
+  assert.match(hostText('src/scenes/world.js'), /return \{ \.\.\.h, keep: harbourKeep\(t\.loc, h\.rect\) \};/);
   // the clock where the lane's first packet lies at her home port, by the player
   const [lane] = laneNetwork(FEED_PORTS.map((p) => ({ id: p.y * 1000 + p.x, name: p.name, px: p.x, py: p.y, region: 1 })), open);
   const way = laneWay(lane, water, waterNative);
@@ -440,10 +446,10 @@ test('SEA-LANES THE WORLD\'S FEED: before the frame poses the sea\'s ships, ever
   const clock = ((v - p0.phase) * period + 2 * leg + LANE_DWELL_S + 10) * 1000;
   const f = feedOn({ clock });
   assert.deepEqual(f.laneNet().map((l) => [l.key, l.a.name, l.b.name, l.a.region]), [['199200-199225', 'Glenpoint', 'Wayrest', 1]], 'the map\'s ports: the far harbour too far for a lane, the lake\'s towns none (its water no ocean\'s)');
-  assert.match(WORLD, /towns\.push\(\{ id: summary\.id, loc, x: p\.x \+ dx, y: p\.y \+ dy, name: maps\.getRegion\(summary\.regionIndex\)\?\.mapNames\?\.\[summary\.mapIndex\] \?\? null \}\);/, 'the harbour\'s town by its name');   // PIN MOVED (RPT1026-WORLD FAR-QUAY): every port town near
+  assert.match(hostText('src/scenes/world.js'), /add\(\{ id: summary \? summary\.id : portIdOf\(beyond\), loc, x: p\.x \+ dx, y: p\.y \+ dy, name: summary \? maps\.getRegion\(summary\.regionIndex\)\?\.mapNames\?\.\[summary\.mapIndex\] \?\? null : beyond\.name \}\);/, 'the harbour\'s town by its name');   // PIN MOVED (PORT-SHIPS): scenes/harbourHost.js, the host read whole   // PIN MOVED (RPT1026-WORLD FAR-QUAY): every port town near, each once
   f.laneShips();
   assert.equal(f.calls.liners.length, 1);
-  const { list } = f.calls.liners[0];   // AUDIT BAY A6 PIN MOVED: her phase on the clock sails her - the clock's second was the host's to time a dwell by
+  const { list } = f.calls.liners[0];   // AUDIT BAY A6
   const want = packetsAt(lane, way, clock);
   assert.ok(want[0].phase === 'dwell' && want[0].port.id === lane.a.id, 'her first packet at home');
   assert.deepEqual(list.map((l) => l.id), want.map((p) => p.id), 'every packet of the lane');

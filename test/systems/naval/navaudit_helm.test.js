@@ -1,7 +1,6 @@
-// AUDIT NAV1 (2026-09-29, Mac: "Lets do a deep comprehensive audit and ensure this is perfection. I want ship movement
-// and combat to flow perfectly, just like assisins creed black flag") - THE HELM: the aim a look lays (its reach on the
+// AUDIT NAV1 - THE HELM: the aim a look lays (its reach on the
 // sea, a ship under the crosshair), the aim's red as the truth of where each gun stops, why a battery will not fire yet,
-// the zone stood up and the strikes marked, and the broadside camera. The law is bible/03-World/Naval-Combat.md
+// the zone stood up and the strikes marked, and the broadside camera. The law is
 // "AUDIT NAV1 - The helm".
 import { byClass, keydown, Node_ } from '../../chargenDom.mjs';   // the suite's minimal DOM: the plate's Brace under a finger, the shipwright's window
 import { test } from 'node:test';
@@ -89,7 +88,7 @@ test('AUDIT NAV1 H1 the look\'s reach: where it meets the sea while that point m
 test('AUDIT NAV1 H2 a look on a ship lays the guns for its very point - its range out along the fire and its own height, the middle gun\'s arc through it; a look on the sea lays its reach out along the look\'s own bearing, measured along the fire (mutants: the point\'s height ignored, the slant taken for the range)', () => {
   const ship = { position: [0, 0, 0], rotation: ID, velocity: [0, 0, 0], hull: HULL.SmallShip };
   const bat = batteryOf(HULL.SmallShip, 'starboard');
-  assert.deepEqual(bat.muzzles[2], [5.949, 2.2435, -0.714]);   // PIN MOVED (GALLEON, 2026-10-01): the new galleon's middle port
+  assert.deepEqual(bat.muzzles[2], [5.949, 2.2435, -0.714]);
   const at = [85, 6, -0.714];   // on her side, 6 m over the sea, abeam my middle gun
   const aim = aimSolution(ship, 'starboard', { origin: EYE, dir: [1, 0, 0], at }, 0);
   assert.deepEqual(aim.lookPoint, at);
@@ -119,7 +118,7 @@ test('AUDIT NAV1 H3 the crosshair on her hull lays the broadside into her side: 
   const m = h.host.hudModel();
   assert.deepEqual([m.aim.side, m.aim.state, m.aim.hot], ['starboard', 'ready', true], 'laid, loaded and red');
   const d = h.host.drawFrame().aim;
-  assert.equal(d.strikes.length, 5, 'all five guns into her');   // PIN MOVED (GALLEON, 2026-10-01): five ports a side
+  assert.equal(d.strikes.length, 5, 'all five guns into her');
   assert.equal(d.zone.length, 0, 'none on to the sea');
   assert.equal(d.hot, true);
   for (const p of d.strikes) { near(p[0], side[0], 0.5, 'at her side'); near(p[1], side[1], 0.5, 'at the height the crosshair is on'); }
@@ -143,7 +142,6 @@ test('AUDIT NAV1 H4 the crosshair on her canvas: round shot is laid for her hull
   const h = await helm();
   const abeam = { pos: [90, 0, 0], yaw: 0 };
   frames(h, [[h.e, abeam]], 3);
-  // PIN MOVED (GALLEON, 2026-10-01): the new galleon's main topsail amidships (rig 1) - her fore course's yard (rig 0)
   // reaches past her sides, as a square sail's does (AUDIT GALLEON R5/G9: rig 0 her fore topsail's now, the course's
   // after her gaff's - the main topsail still rig 1)
   const box = boxOf(h, h.e), rig = rigBoxesOf(h.e.boat)[1];
@@ -161,7 +159,6 @@ test('AUDIT NAV1 H4 the crosshair on her canvas: round shot is laid for her hull
   // dead ahead and broadside on: the chasers (chain) on her canvas, 14 m up
   const ahead = { pos: [0, 0, 90], yaw: Math.PI / 2 };
   frames(h, [[h.e, ahead]], 2);
-  // PIN MOVED (AUDIT GALLEON R5/G9): her main topsail's box is its canvas, forward of her mast (0.42 to 1.44 m forward
   // of her middle) - the crosshair on its own middle along her, where her middle (0) was in the old box's metre and more
   const rig2 = rigBoxesOf(h.e.boat)[1], box2 = boxOf(h, h.e);
   const canvas = [rig2.c[0], 14, rig2.c[2] - rig2.h[0] - 0.05];
@@ -358,7 +355,7 @@ test('AUDIT NAV1 H8 the broadside camera: while a broadside is laid the eye ease
   assert.ok(back[0] < eye[0] && back[0] > own[0], 'on its way home');
   for (let i = 0; i < 60; i++) eye = h.host.aimEye(own, 0.1);
   assert.equal(eye, own, 'home: the eye its own again');
-  // a ship alongside: the way out stops AIM_CAM_CLEAR short of her side - PIN MOVED (GALLEON, 2026-10-01): 14 m off,
+  // a ship alongside: the way out stops AIM_CAM_CLEAR short of her side
   // 2.3 m of water between the new galleons' 5.9 m half beams (20 m stood the mod's 3.1 m apart)
   const alongside = { pos: [14, 0, 0], yaw: 0 };
   frames(h, [[h.e, alongside]], 2);
@@ -368,10 +365,10 @@ test('AUDIT NAV1 H8 the broadside camera: while a broadside is laid the eye ease
   const entry = segmentBoxEntry(c, want, boxOf(h, h.e), AIM_CAM_CLEAR);
   assert.ok(entry && entry.t > 0 && entry.t < 1, 'her side across the camera\'s way');
   for (let i = 0; i < 3; i++) near(eye[i], entry.point[i], 1e-6, 'short of her side');
-  // AIM-ENDS (2026-10-24, Discord - "Aiming front ship cannons impossible"): over the bow the eye goes with the chasers,
+  // AIM-ENDS: over the bow the eye goes with the chasers,
   // AIM_CAM_UP over them and ahead along her keel - AIM_CAM_AHEAD past them, and AIM_CAM_CLEAR past all of her: her hull
-  // and her canvas set (PIN MOVED: AUDIT NAV1 kept the eye home for the chasers, and from behind her rig the jib hid every
-  // arc they drew; PIN MOVED, AUDIT AIM-ENDS A2/A4/A6: the first cut stood AIM_CAM_AHEAD past the guns alone, behind her
+  // and her canvas set (
+  // arc they drew
   // set jib, and this pin asked it with her canvas furled - no box of hers standing)
   const mid = (side) => {
     const m = batteryOf(HULL.SmallShip, side).muzzles;
@@ -394,7 +391,7 @@ test('AUDIT NAV1 H8 the broadside camera: while a broadside is laid the eye ease
   near(eye[1], bow[1] + AIM_CAM_UP, 1e-6, 'AIM_CAM_UP over her chasers');
   near(eye[2], Math.max(bow[2] + AIM_CAM_AHEAD, reach + AIM_CAM_CLEAR), 1e-6, 'past her chasers and AIM_CAM_CLEAR past all of her');
   assert.ok(reach + AIM_CAM_CLEAR > bow[2] + AIM_CAM_AHEAD, `her jib reaches past AIM_CAM_AHEAD (${reach.toFixed(2)}) - the case the reach is for`);
-  // over the stern, her barrels: straight over the rail they roll from, AIM_CAM_UP over it and clear over her (PIN MOVED, AUDIT AIM-ENDS A1:
+  // over the stern, her barrels: straight over the rail they roll from, AIM_CAM_UP over it and clear over her (
   // it stood AIM_CAM_AHEAD astern, past the barrel's mark - looking astern, the fall it drew was never on the screen)
   h.host.cancelAim();
   for (let i = 0; i < 60; i++) h.host.aimEye(own, 0.1);
@@ -498,7 +495,7 @@ test('AUDIT NAV1 H12 her hurts in her handling: Come Sail Away\'s way is the hos
   assert.equal(h.host.wayScale(false), 1);
   assert.equal(h.host.sailRefused(), null);
   // half her canvas shot away
-  for (const sail of h.boat.Sails) stowSail(animatorOf(sail), false);   // PIN MOVED (AUDIT GALLEON-2 RG3): her canvas set - furled, no box stands
+  for (const sail of h.boat.Sails) stowSail(animatorOf(sail), false);
   const bat = { delay: 0, p0: [0, 20, -60], v0: [0, 0, 120], gun: 'chain', index: 0 };
   const rig = rigBoxesOf(h.boat)[0];
   assert.ok(rig, 'her rig');
@@ -555,7 +552,6 @@ async function atPort(o = {}) {
 
 test('AUDIT NAV1 H13 the shipwright: a port\'s yard sells hull, canvas, hands and fire barrels by the piece - as much of each as the purse pays for, never past her whole; MAKE HER WHOLE the four in that order as far as the purse goes; he stands at the helm in a port\'s waters, her way under YARD_SPEED and no hostile near, Activate his door and the plate\'s hint naming him (mutants: a row past her whole, the purse unread, the order, the port unread, her way unread, a hostile unread)', async () => {
   assert.deepEqual(YARD_PRICE, { hull: REPAIR_PRICE.hull, sail: REPAIR_PRICE.sail, crew: REPAIR_PRICE.crew, barrels: BARREL_PRICE });
-  // PIN MOVED (TOUGHER-SHIPS): a hull point 7 gold and a yard of canvas 4 (12 and 6 before) - the purse 723, short of her hull
   assert.deepEqual([REPAIR_PRICE.hull, REPAIR_PRICE.sail], [7, 4]);
   const o = yardOffer(hurt(), 1, 723);
   assert.deepEqual(o.rows.map((r) => [r.id, r.missing, r.whole, r.afford, r.cost]), [
@@ -576,7 +572,7 @@ test('AUDIT NAV1 H13 the shipwright: a port\'s yard sells hull, canvas, hands an
   const model = h.at.opened.at(-1);
   assert.ok(model, 'his window');
   // one row, as far as the purse goes
-  h.at.purse = 71 * 7 + 4;   // PIN MOVED (TOUGHER-SHIPS): the yard's prices 7 and 4 a piece
+  h.at.purse = 71 * 7 + 4;
   const hull0 = model.ship().hull;   // her hands have been at it since she came in
   let r = model.buy('hull');
   assert.deepEqual([r.ok, r.n, r.cost], [true, 71, 71 * 7]);
@@ -594,8 +590,7 @@ test('AUDIT NAV1 H13 the shipwright: a port\'s yard sells hull, canvas, hands an
   assert.equal(r.ok, true);
   assert.equal(r.whole, true);
   assert.deepEqual([h.at.paid.length, h.at.paid.at(-1)], [3, r.cost], 'one payment for the whole of it');
-  // PIN MOVED (SEA-REPAIR, SHIP-CREW): her stores in the hold and her crew's spirits beside her hurts
-  const b2 = hullBuild(HULL.SmallShip);   // PIN MOVED (TOUGHER-SHIPS): her toughened build
+  const b2 = hullBuild(HULL.SmallShip);
   assert.deepEqual(model.ship(), { hull: b2.hullHp, maxHull: b2.hullHp, sail: b2.sailHp, maxSail: b2.sailHp, crew: 24, maxCrew: 24, barrels: 4, wrecked: false, stores: 0, morale: MORALE_START });
   assert.equal(yardOffer(model.ship(), 4, 99999).whole, 0);
   assert.equal(model.hasBarrels, true, 'a Small Ship rolls barrels off her stern');
@@ -637,7 +632,6 @@ test('AUDIT NAV1 H14 her hands mend her at sea: no hostile ship near and nothing
   const d0 = h.host.hudModel().ship;
   frames(h, [[h.e, { pos: [0, 0, 1500], yaw: 0 }]], 100);
   const d1 = h.host.hudModel().ship;
-  // PIN MOVED (SHIP-CREW): a crewed boat's mending by her crew's spirits (a new crew's, MORALE_START)
   near((d1.hull - d0.hull) * 420, 420 * FIELD_MEND_PER_S * 10 * mendScaleOf(MORALE_START), 0.2, 'ten seconds of mending');
   near((d1.sail - d0.sail) * 160, 160 * FIELD_MEND_PER_S * 10 * mendScaleOf(MORALE_START), 0.1);
   assert.equal(d1.crew, 1, 'hands are hired, not mended');
@@ -672,7 +666,7 @@ test('AUDIT NAV1 H14 her hands mend her at sea: no hostile ship near and nothing
   const w = await atPort({ save: SAVE({ hull: 0, sail: 160, crew: 24, state: 'wrecked' }) });
   w.at.port = false;
   w.boat.crewed = true;
-  const secs = (FIELD_REFLOAT * 420) / (420 * FIELD_MEND_PER_S * mendScaleOf(MORALE_START));   // PIN MOVED (SHIP-CREW): her crew's spirits
+  const secs = (FIELD_REFLOAT * 420) / (420 * FIELD_MEND_PER_S * mendScaleOf(MORALE_START));
   frames(w, [[w.e, { pos: [0, 0, 1500], yaw: 0 }]], Math.floor(secs * 10) - 10);
   assert.equal(w.host.hudModel().ship.wrecked, true, 'a wreck, mending');
   frames(w, [[w.e, { pos: [0, 0, 1500], yaw: 0 }]], 20);
@@ -680,7 +674,7 @@ test('AUDIT NAV1 H14 her hands mend her at sea: no hostile ship near and nothing
 });
 
 test('AUDIT NAV1 H15 the shipwright\'s window: his words for her - each row what she has, what is wanting at what a piece, its press for all of it or what the purse pays, greyed when it pays for none or she is whole; MAKE HER WHOLE or what the purse pays; the press\'s word under the title; the back key leaves; one window through his own door, warmed (mutants: a row\'s press unwired, the whole press unwired, the note unsaid, a crewless boat\'s hands shown)', async () => {
-  let purse = 723;   // PIN MOVED (TOUGHER-SHIPS): short of her hull at 7 gold a point
+  let purse = 723;
   const st = { hull: 262, maxHull: 420, sail: 80, maxSail: 160, crew: 18, maxCrew: 24, barrels: 1, wrecked: false };
   const bought = [];
   const model = {
@@ -751,7 +745,7 @@ test('AUDIT NAV1 H17 the sea\'s ships on the compass: within COMPASS_SHIP_RANGE,
   frames(h, held, 2);
   struck.ship.damage.apply({ hull: Math.ceil(struck.ship.damage.maxHull * (1 - STRUCK_AT)) + 1, sail: 0, crew: 0 }, 0);
   frames(h, held);
-  knowAll(h.host);   // PIN MOVED (AUDIT CAPTAIN'S SEA S4): the compass marks a ship by what I know of her - her colours made out first
+  knowAll(h.host);
   const marks = h.host.compassShips();
   const byPos = (x, z) => marks.find((m) => Math.abs(m.x - x) < 1 && Math.abs(m.z - z) < 1)?.kind;
   assert.equal(byPos(300, 0), 'ship', 'a merchantman');

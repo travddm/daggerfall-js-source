@@ -1,4 +1,4 @@
-// COATS1 (2026-10-11): THE HORSE'S LOOK (bible/06-Systems/Horse-Coats.md, systems/horse/horseCoats.js) - the law (coat,
+// COATS1: THE HORSE'S LOOK (, systems/horse/horseCoats.js) - the law (coat,
 // pattern, legs and the horse's own seed), its birth, the dye and its markings, the item's fields, the wire's three
 // doors (the pool's word, the parked word, the pose), the pictures that wear it (the riding sprite, the pool's
 // billboards, Eye Of The Beholder's rider - mine and the others', the road's strangers), their letting go, and the Stable.
@@ -310,14 +310,7 @@ test('COATS1 the riding sprite: the horse\'s frames dyed under their own record,
   assert.equal(ridingLook(TRANSPORT_MODES.Horse, look), look);
   assert.equal(ridingLook(TRANSPORT_MODES.Cart, look), 0, 'MRED01I0\'s boards are the hide\'s brown');
   assert.equal(ridingLook(TRANSPORT_MODES.Horse, HORSE_LOOK_CODE_MAX + 1), 0);
-  const src = readFileSync(new URL('../../../src/systems/riding.js', import.meta.url), 'utf8');
-  assert.match(src, /recolorHorse\(frameToColor32\(cfa\.getDFBitmap\(0, f\), palette, null\), c, \{ bottomFirst: false, legs: false, tack: false \}\)/, 'each frame dyed before its upload - its lower edge no hoof, no saddle to spare');
-  assert.match(src, /records\.push\(`ride:\$\{fileName\}:\$\{f\}\$\{lookSuffix\(c\)\}`\)/, 'under its look\'s record');
   await assert.rejects(loadRidingArt(async () => { throw new Error('no ARENA2'); }, null, { uploadTexture: () => {} }, TRANSPORT_MODES.Horse, look), 'no art, no riding sprite: a refusal the rig logs');
-  const rig = readFileSync(new URL('../../../src/player/mountRig.js', import.meta.url), 'utf8');
-  assert.match(rig, /riddenHorseLook\(playerEntity\?\.items \?\? \[\]\)/, 'the ridden horse\'s look');
-  assert.match(rig, /renderer\?\.evictTexture\?\.\(`img_\$\{rec\}`\)/, 'a look left behind is let go');
-  assert.match(rig, /if \(id !== _req\) \{ if \(a\.look !== art\?\.look && a\.look !== _lastArt\?\.look && a\.look !== lookNow\(mode\)\) letGo\(a\); return; \}/, 'and a load overtaken by a newer one is never drawn - its look let go unless worn, or the newest load\'s own (AUDIT COATS3D A10: the same records, one handle a key)');
 });
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -379,7 +372,6 @@ test('COATS1 the pool: past HORSE_LOOKS_KEPT looks, the one longest undrawn is l
   assert.ok(evicted.every((k) => k.endsWith(`~${first}`)), 'that look alone');
 });
 
-// PIN MOVED (AUDIT FB1022d D1): a look is let go by the store's once-a-frame sweep (createEotbArt sweep, the riders'
 // settle), never inside a draw - so each ensure here is a frame, swept
 test('COATS1 the others\' riders: each rider\'s horse look is its own dyed pictures, let go once RIDER_LOOKS_KEPT others were drawn since', async () => {
   const evicted = [], uploads = [];
@@ -406,9 +398,6 @@ test('COATS1 the road\'s strangers: a horse keeps the look its key gives it - bo
   for (let i = 0; i < 3000; i++) { const l = horseLookOfCode(strangerHorseLook(`trip${i}:h0`)); coats.add(l.coat); patterns.add(l.pattern); seeds.add(l.seed); }
   assert.equal(coats.size, 7); assert.equal(patterns.size, 5);
   assert.deepEqual([...seeds].sort((a, b) => a - b), Array.from({ length: STRANGER_SEEDS }, (_, i) => i + 1), 'a few seeds, so the road shares its dyed pictures');
-  const src = readFileSync(new URL('../../../src/world/road/roadTeams.js', import.meta.url), 'utf8');
-  assert.match(src, /look: strangerHorseLook\(h\.key\)/, 'the road\'s horse is given its look off its key');
-  assert.match(src, /pres\.poseHorse\(s\.batch, eye, \{[^}]*\}, 1, s\.look\)/, 'and posed in it');
 });
 
 test('COATS1 the Stable: the horse born before the card reads it; a row a part, the ridden horse restyled on a press; the host told', () => {

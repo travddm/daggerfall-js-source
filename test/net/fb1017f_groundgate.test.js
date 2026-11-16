@@ -1,16 +1,18 @@
 // FIELD BUGS 2026-10-17f (GROUND-GATE) - "People floating in mid air for some users", a screenshot from the Oblivion Gate
 // in the Alik'r: the crowd drawn tens of metres over the sand. A pose's height is its sender's own ground's, so a copy on
-// an older ground (a macOS or portable desktop copy never updates itself - bible/03-World/Landforms.md C2) drew every
+// an older ground (a macOS or portable desktop copy never updates itself C2) drew every
 // peer in the air. Mac's call: the relay turns such a build away. A ground room's hello says the ground it stands on
 // (net/wire.js GROUND_LAW, `gl`), the relay refuses less or none while `groundGate` is on, and the ground is held to a
 // print recorded under that law, so the law moves whenever the ground does.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { GROUND_LAW, GROUND_LAW_WIRE_MAX, GROUND_OLD_REASON, GRANT_HELLO_LAW, LOOT_HELLO_LAW, groundRoom, isLayered, nativePoseRoom, parseClient, CLOSE_POLICY } from '../../src/net/wire.js';
 import { RELAY_CFG_KEYS, RELAY_INTERNAL_CFG, RELAY_CFG_TTL_MS, parseRelayCfgCommand } from '../../src/net/relayCfg.js';
 import { OnlineSession } from '../../src/net/online.js';
 import { groundPrint, groundMoved, GROUND_PRINT_FILE, GROUND_PRINT_TOLERANCE_M } from '../../tools/groundPrint.mjs';
+import { asOnlinePage } from '../fakeRoom.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return await fn(); } finally { console.warn = w; console.log = l; } };
 
@@ -20,7 +22,7 @@ test('GROUND-GATE the law is the ground: the shaped ground this tree stands (lan
   const { most, at } = groundMoved(recorded, groundPrint());
   assert.ok(most <= GROUND_PRINT_TOLERANCE_M,
     `THE GROUND MOVED under GROUND_LAW ${GROUND_LAW}: ${most} m at ${at}.\n`
-    + '  A copy on the old ground draws every peer on this one in the air (or under it) - bible/03-World/Landforms.md C2.\n'
+    + '  A copy on the old ground draws every peer on this one in the air (or under it).\n'
     + '  Bump GROUND_LAW in src/net/wire.js (and RELAY_VERSION: the relay refuses the old ground by it), then record the\n'
     + '  print: node tools/groundPrint.mjs --write. Every copy before the bump is turned away while groundGate is on.');
   assert.ok(Object.keys(recorded.cells).some((k) => k.startsWith('Desert@')), 'the Alik\'r\'s dunes among them - the report\'s ground');
@@ -69,7 +71,7 @@ test('GROUND-GATE the relay\'s door, through a real Room: off, an old build is l
       const fetch0 = H.room.fetch.bind(H.room);
       H.room.fetch = (req) => { if (new URL(req.url).pathname === RELAY_INTERNAL_CFG) asked++; return fetch0(req); };
       const B = W.room('world:10,10');
-      const now0 = await join(B, 'new-0001', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW });   // PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): and the loot it reads - one that did not would ask the hub for the loot door. PIN MOVED (GRANT-DOOR, Spawn-Grants section 20): the current build says its spawn grants too - one that did not would ask the hub for the grant door. PIN MOVED (LEASE1, net/roomLease.js): and that it hands its hub's lease on - one that did not would ask the hub for the lease door
+      const now0 = await join(B, 'new-0001', { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW });
       assert.equal(now0.closed, null, 'the current build is let in');
       assert.equal(asked, 0, 'and asks the hub nothing');
       const old2 = await join(B, 'old-0003');

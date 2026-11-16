@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // HOUSE-WAITS (FIELD BUGS 2026-10-09f, Sahh: "Blocked out of continuing as another bloodline character" - "My bloodline
 // permadeath character with two siblings died, and I was for a brief second shown the prompt to continue playing as one
 // of the two remaining siblings. The game however loaded me back into main menu right after and now despite the
@@ -17,7 +16,6 @@
 // says it), the record stored and written to the realm, the birth left for the boot - which is the world host's own
 // birth door (`?online&realmnew&legacyborn=`), so the birth, its first save and the fall's settling are the law that
 // already ran. Pure where it can be: storage, the tab and the realm line come in.
-// ═══════════════════════════════════════════════════════════════════
 import { MODELS, isAlive, personOf, fullNameOf, setCurrent, touch, newbornAllowed, addChild, rollSiblings } from './family.js';
 import { loadFamily, storeFamily, leaveBirth } from './store.js';
 import { t } from '../textManager.js';   // RPT1026-MISC HEIR-WAITS: the newborn's door, in the player's language
@@ -105,5 +103,6 @@ export function takeUpLine({ storage, tab, familyId, personId, now = Date.now(),
   if (!leaveBirth(tab, { familyId: family.id, personId: heir.id, region: place.region, loc: place.loc, estate: 0, ...(newborn ? { newborn: true } : {}) }, now)) {
     return { ok: false, why: 'The new heir could not be saved in this window. Try again.' };
   }
-  return { ok: true, family, heirId: heir.id, place: { region: place.region, loc: place.loc } };   // RPT1026-MISC HEIR-WAITS: a newborn's id is minted here
+  const mapId = /** @type {{ mapId?: number }} */ (place).mapId;
+  return { ok: true, family, heirId: heir.id, place: { region: place.region, loc: place.loc, ...(Number.isInteger(mapId) ? { mapId } : {}) } };   // RPT1026-MISC HEIR-WAITS: a newborn's id is minted here; BAY-LEFT-B: and its map id - a seat past the Bay is booted by it (places.js birthSearch's `seat`)
 }

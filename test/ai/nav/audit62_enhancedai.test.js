@@ -1,4 +1,4 @@
-// AUDIT 62 (2026-09-07), the ENHANCED AI lens - the navmesh under a STACKED
+// AUDIT 62, the ENHANCED AI lens - the navmesh under a STACKED
 // dungeon. project-final's arenas had no floor over a floor; a Daggerfall
 // dungeon is built of them, and the poly-mesh stage welded every vertex by
 // (x,z) alone, so the levels fused, the shared edges got 3-4 owners,
@@ -49,7 +49,7 @@ test('AUDIT 62 F1: a floor over a floor bakes as ONE connected mesh, and both le
   assert.ok(cross[0][1] < 0.5 && cross[cross.length - 1][1] > 2.5, 'and climbs from the lower floor to the mezzanine');
   assert.ok(cross.some((p) => p[1] > 0.5 && p[1] < 2.9), `...through the ramp, not a teleport: ${JSON.stringify(cross)}`);
   // the control room (no mezzanine) still bakes the shape it always did - under AGENT, the agent the 54 was
-  // measured with. The soup bake's own SOUP_AGENT (2026-09-27) erodes one ring, not two (58 polys), and lays no
+  // measured with. The soup bake's own SOUP_AGENT erodes one ring, not two (58 polys), and lays no
   // implicit plane, whose deep interior had set the watershed's first level for every room (44, two regions for
   // four): a partition count that moves with the agent, not the weld this pins.
   const flat = bakeNavFromCollider(stackedRoom({ mezz: false }), { anchor: [2, 0, 8], agent: AGENT }).chf;
@@ -83,7 +83,7 @@ test('AUDIT 62 F1: the bake carries vertex heights, and a hydrated stacked mesh 
 });
 
 test('AUDIT 62 F3: the nav cache key is versioned past the fixes and carries its anchor', () => {
-  assert.equal(NAV_BAKE_VERSION, 4);   // 3: DUNGEON-SEAMS - the collider's corners moved under the same key's inputs; 4 (2026-09-27, the merge): the soup bake's cell, agent, floors and anchors - every earlier bake was coarse and sealed
+  assert.equal(NAV_BAKE_VERSION, 4);   // 3: DUNGEON-SEAMS - the collider's corners moved under the same key's inputs; 4: the soup bake's cell, agent, floors and anchors - every earlier bake was coarse and sealed
   const base = { key: 'loc', tris: 10, minY: -5, maxY: 3, agent: AGENT };
   assert.match(navCacheKey(base), /^nav:v4:/);
   const door = navCacheKey({ ...base, anchor: [1, 0, 1] }), pocket = navCacheKey({ ...base, anchor: [40, -6, 40] });

@@ -1,5 +1,4 @@
-// COURT-WATCH (2026-10-18; bible/11-Multiplayer/World-Bosses.md section 24, Scale-Arc.md THE PLAN PAST 1,000 decision 5 -
-// the owner: "Make the best call for future proofing"): A FULL COURT KEEPS ITS WATCHERS. A court's fight seats
+// COURT-WATCH: A FULL COURT KEEPS ITS WATCHERS. A court's fight seats
 // GATE_FIGHTERS_MAX accounts (net/gate/gateBrain.js), and the next one asking was told `the court is full` and cast out
 // before the gate. It stays now, as the court's watcher - the fight heard and drawn (every beat is the room's), no blow of
 // its own sent and none of his landed on it - and asks for a seat again every COURT_WATCH_ASK_MS; the relay's answer to an
@@ -14,7 +13,6 @@ import { COURT_CENTRE, GATE_FIGHTERS_MAX, HIT_KINDS, ATTACKS, HOST, COURT_WATCH_
 import { createGateLink, GATE_STATE_EMPTY, courtWatchText, GATE_NO_TEXT } from '../../../src/net/gate/gateLink.js';
 import { createGateCourt } from '../../../src/scenes/gate/gateCourt.js';
 import { GATE_COURTS_MAX, GATE_COURT_FIGHTERS, bookNew } from '../../../src/net/gate/gateCourts.js';   // GATE-COURTS: a night's courts
-import { relaySupportsCourtWatch } from '../../../src/net/wire.js';
 import * as TM from '../../../src/systems/textManager.js';
 import { courtToDungeon, ARRIVE_Z } from '../../../src/world/gate/gateArena.js';
 
@@ -125,7 +123,6 @@ test('COURT-WATCH the court: a watcher strikes nothing (a blow refused, nothing 
   assert.equal(h.c.askAgain(), false, 'seated: never asks');
   assert.equal(h.c.hit({ d: 50, r: HIT_KINDS.Melee }), true, 'seated, the same blow lands');
   assert.equal(h.sent.filter(([k]) => k === 'hit').length, 1, 'and is sent');
-  assert.match(src('src/scenes/world.js'), /\(online\.welcomes !== _gateInFor \|\| gateCourt\?\.askAgain\(\)\) && online\.sendGate\(\{ k: 'in',/, 'the host\'s `in` door asks again for a watcher');
 });
 
 test('COURT-WATCH his blows land on his fighters, never on the court\'s watchers: the slam that lands on a fighter standing there lands on nobody watching from the same stone (mutant: a watcher struck)', () => {
@@ -168,7 +165,7 @@ test('COURT-WATCH a watcher holds no fighter\'s part: a mate\'s heal owed it is 
   assert.deepEqual(run(true), [], 'a watcher none');
 });
 
-test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter standing in it and never a watcher (G1); a watcher breaks no crystal (G11), is owed no heal - none said once seated (G6) - and asks for no seat once he has fallen or his Wrath is on the court (G4); the ask\'s cadence is the brain\'s fifteen seconds, its clock let go once seated (G11); a full court keeps a watcher only on a relay that says `me` (G3); and the watcher\'s line is the player\'s language\'s (F4) (mutants: the ground biting watchers; a crystal broken; a heal owed; the ask after the fall; the cadence; the ask clock kept; watching on an old relay; the line\'s key)', () => {
+test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter standing in it and never a watcher (G1); a watcher breaks no crystal (G11), is owed no heal - none said once seated (G6) - and asks for no seat once he has fallen or his Wrath is on the court (G4); the ask\'s cadence is the brain\'s fifteen seconds, its clock let go once seated (G11); and the watcher\'s line is the player\'s language\'s (F4) (mutants: the ground biting watchers; a crystal broken; a heal owed; the ask after the fall; the cadence; the ask clock kept; the line\'s key)', () => {
   // G1: the burning ground
   const burnt = (watching) => {
     const link = { st: GATE_STATE_EMPTY, state() { return this.st; }, watching: () => watching };
@@ -226,22 +223,14 @@ test('AUDIT PLAN-1000 the watcher, cold-read: his burning ground bites a fighter
   h.clock.t = 80_000 + COURT_WATCH_ASK_MS; assert.equal(h.c.askAgain(), true);
   h.link.word({ ...st, fell: { at: 1, top: [], n: 3 } });
   h.clock.t = 80_000 + 3 * COURT_WATCH_ASK_MS; assert.equal(h.c.askAgain(), false, 'fallen: no seat to ask for');
-  // G3: a relay that says `me`, or a refusal as before
-  assert.deepEqual(['world221', 'world222', 'world300', null].map(relaySupportsCourtWatch), [false, true, true, false]);
-  const refused = [];
-  const old = createGateLink({ now: () => 0, watches: () => false, onRefused: (m) => refused.push(m) });
-  old.word({ k: 'no', m: 'the court is full' });
-  assert.deepEqual([old.watching(), refused], [false, ['the court is full']], 'an older relay: refused as it was, never left watching');
-  assert.match(src('src/scenes/world.js'), /watches: \(\) => !!online\?\.courtWatchOk,/, 'the host hands the link the relay\'s word');
-  assert.match(src('src/net/online.js'), /if \(primary\) this\.courtWatchOk = relaySupportsCourtWatch\(relayV\);/, 'read off the welcome');
   // F4: the line in the player's language, at say-time
-  const row = readFileSync(new URL('../../../locales/de/Port_Strings.csv', import.meta.url), 'utf8').split('\n').find((l) => l.startsWith('net.gate.courtWatch,'));
-  assert.ok(row, 'German has the line');
+  // A fixture row stands in for a German translation; the subject is the line read at say-time.
+  const german = 'Der Brennende Hof ist voll.';
   TM.registerLocale({ code: 'de', name: 'Deutsch' });
-  TM.patchLocaleTable('de', TM.runtimeCollectionName(TM.TextCollections.Port), [['net.gate.courtWatch', JSON.parse(row.slice('net.gate.courtWatch,'.length))]]);
+  TM.patchLocaleTable('de', TM.runtimeCollectionName(TM.TextCollections.Port), [['net.gate.courtWatch', german]]);
   try {
     TM.setLocale('de');
-    assert.equal(courtWatchText(), JSON.parse(row.slice('net.gate.courtWatch,'.length)), 'said in German');
+    assert.equal(courtWatchText(), german, 'said in German');
   } finally { TM.setLocale('en'); }
 });
 

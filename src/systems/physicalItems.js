@@ -1,11 +1,8 @@
 // @ts-check
-// PI1 (2026-10-07, Mac: "This is the next mod I would like to integrate (permission has been granted). This should work
-// for both morrowind and the sprite system, and should also included the rarity treatment (like we do for the world
-// boss)"): PHYSICAL ITEMS 0.1.29 - demifiend000's items in the world as themselves. THE LAW, PURE: what the mod's
+// PI1: PHYSICAL ITEMS 0.1.29 - demifiend000's items in the world as themselves. THE LAW, PURE: what the mod's
 // assembly decides (vendor/physical-items/il/PhysicalItems.il.txt - every `[IL_xxxx]` below is an offset in it, the
 // method named beside it), read off the IL because the bundle carries the build and not the sources. The scene half -
 // the proxies, their pictures, their flight and their press - is scenes/physicalItemsLayer.js; the design is
-// bible/06-Systems/Physical-Items.md.
 //
 // - THE CATEGORIES (GetItemCategory [IL_28e4]): sixteen, each item in exactly one; a corpse shows the categories the
 //   settings leave on (ReconcileCorpseGroup [IL_4bcd]).
@@ -475,7 +472,7 @@ export function constrainMove(from, to, halfW, h, rayHit) {
 
 // ---- the rarity dress ------------------------------------------------------------------------------------------------
 
-/** PI1 (Mac: "the rarity treatment (like we do for the world boss)"): the world boss's loot line rises out of a
+/** PI1: the world boss's loot line rises out of a
  *  Rare-or-better item's own picture (scenes/lootLines.js, WBX3's form), and a Magic-or-better picture wears its tier's
  *  rim - the port's own, the foes' tell outline (systems/hitFlash.js setBatchGlint) in the tier's colour - stronger up
  *  the ladder. The body's own playRareDrop chimed at the kill; its items do not chime again. The mod draws no rarity. */

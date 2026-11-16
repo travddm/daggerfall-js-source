@@ -10,6 +10,7 @@
 // a lot costing 17397) a seller at 346 was offered -2311 gold, and the sale's addGold took it from the purse. Every
 // purchase fell with it - the counter's gold a piece, a room and a cure free and then paying the buyer. Online the
 // haggle reads its own range now, 0 to 100; offline, DFU's reads stand.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateTradePrice, calculateCost, ONLINE_SALE_SHARE, ONLINE_HAGGLE_MAX, essentialPrice } from '../../src/systems/shopStock.js';
@@ -35,7 +36,8 @@ function onlinePage(fn) {
 }
 const [Q, COST] = [5, 17397];   // the field's counter and lot (MERC-RISE, Field-Bugs-2026-09-29d)
 
-test('MERC-CAP: the field\'s seller at 346 Mercantile - offered -2311 gold for the lot, now what the best haggler is paid', () => {
+test('MERC-CAP: the field\'s seller at 346 Mercantile - offered -2311 gold for the lot, now what the best haggler is paid', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   // the root, in DFU's own numbers (offline, where they stand): past 100 the ask keeps falling, and at 346 it is under nothing
   assert.equal(ask(COST, Q, 100, 100, false), 5436);
   assert.equal(ask(COST, Q, 346, 100, false), -4622);
@@ -50,7 +52,8 @@ test('MERC-CAP: the field\'s seller at 346 Mercantile - offered -2311 gold for t
   });
 });
 
-test('MERC-CAP: online the haggle reads 0..100 - a sale never falls with a skill or goes under nothing, no price is under the best haggler\'s, P0.4 holds for every seller, and inside the range nothing moves', () => {
+test('MERC-CAP: online the haggle reads 0..100 - a sale never falls with a skill or goes under nothing, no price is under the best haggler\'s, P0.4 holds for every seller, and inside the range nothing moves', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the server profile's counter-half sale cap, the online rule before DFU's sale
   assert.equal(ONLINE_HAGGLE_MAX, 100, 'DFU\'s maximum skill and stat');
   let checked = 0;
   for (let q = 0; q <= 20; q++) {
@@ -67,7 +70,6 @@ test('MERC-CAP: online the haggle reads 0..100 - a sale never falls with a skill
           assert.ok(a >= least, `${at}: asks ${a}, under the best haggler's ${least}`);
           assert.ok(s <= Math.floor(a * ONLINE_SALE_SHARE), `${at}: pays ${s} against an ask of ${a}`);
           // past either end the haggle reads the end; inside the range it is Daggerfall's, under MERC-RISE's half -
-          // PIN MOVED (MERC-SLOPE, FIELD BUGS 2026-10-08): where the seller's own offer stands against the best haggler's,
           // at half its strength, under that half and never over Daggerfall's own offer
           assert.equal(a, ask(cost, q, mm, pp, false), at);
           const off = sale(cost, q, mm, pp, false), top = sale(cost, q, 100, 100, false);
@@ -111,7 +113,7 @@ test('MERC-CAP: the purchases the haggle prices past the counter - a room, a cur
       assert.equal(cure(m), cure(100), `the cure at Mercantile ${m}`);
     }
     assert.ok(room(100) > 0 && cure(100) > 0, `${room(100)} and ${cure(100)}`);
-    // ESSENTIALS-HALF (2026-09-30): online a cure costs half the best haggler's own price (shopStock.js essentialPrice)
+    // ESSENTIALS-HALF: online a cure costs half the best haggler's own price (shopStock.js essentialPrice)
     assert.equal(cure(100), essentialPrice(calculateTradePrice(calculateCost(250, 10), 10, skills(100), false, { online: false }), { online: true }), 'the best haggler\'s own price, halved - inside the range nothing else moves');
   });
 });

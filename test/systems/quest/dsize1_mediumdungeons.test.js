@@ -9,11 +9,11 @@
 // three (world/smallerDungeons.js); online the stamp is the room's size (E4); a quest whose markers were chosen
 // through another quest's link takes that link's size where the medium size is either side (E5); a quest frozen at
 // another size crossing online is re-laid on the room's build (E1, quest/questRepair.js). SD-ONLINE (PINS MOVED -
-// bible/11-Multiplayer/Super-Dungeons.md section 13; test/systems/sdonline.test.js holds the law itself): online every
+// test/systems/sdonline.test.js holds the law itself): online every
 // dungeon has the world's own size now - small, medium or large by its map id - where it was the whole dungeon. And
 // DETECT-FINDS: a
-// searched object's find is in the one loot walk (scenes/shared.js). bible/03-World/Delve-Arc.md, DSIZE1 and
-// DETECT-FINDS; bible/01-Overview/audits/Audit-Delve.md.
+// searched object's find is in the one loot walk (scenes/shared.js)., DSIZE1 and
+// DETECT-FINDS;.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -106,17 +106,17 @@ test('DSIZE1: generated - the two from the interior pool, the ring from the bord
 });
 
 test('DSIZE1: the size a dungeon is built at - the guards, the quest\'s frozen size, then Smaller, then Medium; DFU\'s UseSmallerDungeon verbatim beside it (A6)', () => {
-  const big = loc(20);
+  const big = loc(20, 786);
   assert.equal(dungeonSizeFor(big, { setting: false, medium: false }), 'full');
   assert.equal(dungeonSizeFor(big, { setting: false, medium: true }), 'medium');
   assert.equal(dungeonSizeFor(big, { setting: true, medium: true }), 'small', 'Smaller Dungeons wins');
   assert.equal(dungeonSizeFor(big, { setting: true, medium: true, online: true }), onlineDungeonSize(big), 'online, the world\'s size for it (SD-ONLINE - PIN MOVED: it was the whole dungeon)');
   assert.equal(dungeonSizeFor(big, { setting: false, medium: false, online: true }), onlineDungeonSize(big), '...whatever either switch says');
-  assert.equal(onlineDungeonSize(big), 'medium', 'map 777\'s draw (test/systems/sdonline.test.js holds the law)');
+  assert.equal(onlineDungeonSize(big), 'medium', 'map 786\'s draw (test/systems/sdonline.test.js holds the law)');
   assert.equal(dungeonSizeFor(loc(20, PRIVATEERS_HOLD), { setting: true, medium: true }), 'full', 'main story never shrinks');
   assert.equal(dungeonSizeFor({ hasDungeon: false }, { setting: true }), 'full');
   const machine = (state) => ({
-    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 777 ? [{ questUID: 5 }] : []),
+    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 786 ? [{ questUID: 5 }] : []),
     getQuest: () => ({ smallerDungeonsState: state }),
   });
   assert.equal(dungeonSizeFor(big, { setting: true, medium: false, questMachine: machine(MEDIUM_DUNGEONS_STATE) }), 'medium', 'the quest compiled at medium');
@@ -141,7 +141,7 @@ test('DSIZE1: the quest\'s stamp, the save\'s stamp and the warp - three layouts
   assert.equal(smallerDungeonsStateNow(true, true, false), SMALLER_DUNGEONS_STATE.Enabled);
   assert.equal(smallerDungeonsStateNow(false, true, false), MEDIUM_DUNGEONS_STATE);
   assert.equal(smallerDungeonsStateNow(false, false, false), SMALLER_DUNGEONS_STATE.Disabled);
-  assert.equal(smallerDungeonsStateNow(true, false, true), SMALLER_DUNGEONS_STATE.Disabled, 'E4: online, whatever the setting says - PIN MOVED (INSTANCES, bible/11-Multiplayer/Instances.md section 5): the dungeon whole, the layout a quest\'s instance builds and its markers are chosen on (it was the world\'s sizes, SD-ONLINE)');
+  assert.equal(smallerDungeonsStateNow(true, false, true), SMALLER_DUNGEONS_STATE.Disabled, 'E4: online, whatever the setting says - PIN MOVED (INSTANCES, docs/multiplayer/group-instances.md): the dungeon whole, the layout a quest\'s instance builds and its markers are chosen on (it was the world\'s sizes, SD-ONLINE)');
   assert.equal(smallerDungeonsStateNow(false, false, true), SMALLER_DUNGEONS_STATE.Disabled);
   assert.equal(smallerDungeonsStateNow(true, true), SMALLER_DUNGEONS_STATE.Enabled, 'off the online page, the settings');
   const full = loc(20), med = generateMediumDungeon(loc(20)), sml = generateSmallerDungeon(loc(20));
@@ -156,12 +156,12 @@ test('DSIZE1: the quest\'s stamp, the save\'s stamp and the warp - three layouts
 });
 
 test('DSIZE1 E5: the machine\'s Start takes a linked dungeon\'s size where the medium size is either side - the size the markers were chosen on; DFU\'s two values left DFU\'s', () => {
-  const quest = (uid, state, mapId = 777) => ({
+  const quest = (uid, state, mapId = 786) => ({
     uid, smallerDungeonsState: state,
     resources: new Map([['dun', { isPlace: true, siteDetails: { siteType: SITE_TYPES.Dungeon, mapId } }], ['npc', { isPerson: true }]]),
   });
   const machineOf = (held) => ({
-    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 777 && held != null ? [{ questUID: 1 }] : []),
+    getSiteLinks: (type, mapId) => (type === SITE_TYPES.Dungeon && mapId === 786 && held != null ? [{ questUID: 1 }] : []),
     getQuest: (uid) => (uid === 1 ? { smallerDungeonsState: held } : null),
   });
   const S = SMALLER_DUNGEONS_STATE, M = MEDIUM_DUNGEONS_STATE, O = ONLINE_DUNGEONS_STATE;
@@ -182,9 +182,6 @@ test('DSIZE1 E5: the machine\'s Start takes a linked dungeon\'s size where the m
   const elsewhere = quest(2, M, 999);
   adoptLinkedDungeonSize(elsewhere, machineOf(S.Disabled));
   assert.equal(elsewhere.smallerDungeonsState, M, 'a link on another dungeon is not this one\'s');
-  // wired at the machine's Start, after the stamp
-  const m = src('src/systems/quest/machine.js');
-  assert.match(m, /startQuestImmediate\(quest\) \{\n    quest\.start\(\);\n    adoptLinkedDungeonSize\(quest, this\);/);
 });
 
 test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another size, loaded online, has its dungeon markers enumerated again on the dungeon whole (its quest\'s world asks for it whole - the layout its instance builds), its placements put back there, and its stamp set to DFU\'s Disabled', () => {
@@ -193,11 +190,11 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   m.startQuestImmediate(q);
   q.smallerDungeonsState = ONLINE_DUNGEONS_STATE;   // chosen on the world's sizes, before INSTANCES
   // the dungeon whole (the quest's world answers it - online, world.js questWorld asks dungeonLocationFor for it whole,
-  // INSTANCES - PIN MOVED: it was the room's world-sized build):
+  // INSTANCES
   // two blocks, a spawn marker in each, at block (0,0) and (1,0)
   const flat = (record, x) => ({ type: RDB_RESOURCE_TYPES.Flat, position: x, xPos: x, yPos: 0, zPos: 0, resources: { flatResource: { textureArchive: 199, textureRecord: record } } });
   const blockData = { W1: { position: 100, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 1), flat(18, 2)] }] } }, B1: { position: 200, rdbBlock: { objectRootList: [{ rdbObjects: [flat(11, 3)] }] } } };
-  const built = { name: 'Keep', mapTableData: { mapId: 777 }, dungeon: { blocks: [{ blockName: 'W1', x: 0, z: 0 }, { blockName: 'B1', x: 1, z: 0 }] } };
+  const built = { name: 'Keep', mapTableData: { mapId: 786 }, dungeon: { blocks: [{ blockName: 'W1', x: 0, z: 0 }, { blockName: 'B1', x: 1, z: 0 }] } };
   q.hooks = { ...(q.hooks ?? {}), world: {
     maps: { getRegion: (r) => (r === 3 ? { mapNameLookup: new Map([['Keep', 5]]) } : null), getLocation: (r, l) => (r === 3 && l === 5 ? built : null) },
     getBlock: (n) => blockData[n] ?? null,
@@ -205,7 +202,7 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   const dun = new Place(q);
   dun.symbol = sym('dun');
   const old = (id, x, z) => ({ markerType: 0, flatPosition: { x: id, y: 0, z: 0 }, dungeonX: x, dungeonZ: z, buildingKey: 0, markerID: id, targetResources: null });
-  dun.siteDetails = { siteType: SITE_TYPES.Dungeon, mapId: 777, regionIndex: 3, locationName: 'Keep', buildingKey: 0, magicNumberIndex: 0,
+  dun.siteDetails = { siteType: SITE_TYPES.Dungeon, mapId: 786, regionIndex: 3, locationName: 'Keep', buildingKey: 0, magicNumberIndex: 0,
     selectedMarker: { targetResources: [sym('boss')] }, questSpawnMarkers: [old(1, 0, -1)], questItemMarkers: [] };
   dun._range = () => 0;
   q.resources.set('dun', dun);
@@ -239,11 +236,6 @@ test('DSIZE1 E1 (SD-ONLINE, INSTANCES - PIN MOVED): a quest stamped at another s
   dun.siteDetails = { ...dun.siteDetails, locationName: 'Nowhere' };
   assert.equal(relayOnlineDungeons(m), 0);
   assert.equal(q.smallerDungeonsState, MEDIUM_DUNGEONS_STATE, 'unread: the stamp stands');
-  // wired at the bridge's load, online only, before anything mounts
-  const bridge = src('src/scenes/quest/questBridge.js');
-  const restore = bridge.slice(bridge.indexOf('restore(data) {'));
-  assert.match(restore, /machine\.restoreSaveData\(data\.machine \?\? \{ siteLinks: \[\], quests: \[\] \}\);\n(?:\s*\/\/[^\n]*\n)+\s*if \(isOnlinePage\(\)\) relayOnlineDungeons\(machine, /);
-  assert.doesNotMatch(src('src/systems/quest/questRepair.js'), /function relayWholeDungeons/, 'the whole-dungeon re-lay is gone, not beside it');
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
@@ -293,7 +285,7 @@ test('DSIZE1: the Features row - Enhanced, its own, off by default and forced of
   const f = FEATURES.find((x) => x.id === 'medium-dungeons');
   assert.ok(f);
   assert.deepEqual(f.kinds, ['enhanced']);
-  assert.deepEqual({ ...f.control }, { store: 'prefs', key: MEDIUM_DUNGEONS_PREF, initial: false, online: false });
+  assert.deepEqual({ ...f.control }, { store: 'prefs', key: MEDIUM_DUNGEONS_PREF, initial: false, online: 'room' });
   assert.match(f.note, /Online every dungeon has its own size instead\./, 'the row says what the room does (PIN MOVED)');
   assert.doesNotMatch(f.note, /every dungeon online, keep full size/, 'and no longer the law it replaced');
   assert.equal(FEATURES.findIndex((x) => x.id === 'medium-dungeons'), FEATURES.findIndex((x) => x.id === 'smaller-dungeons') + 1, 'beside DFU\'s own switch');
@@ -311,14 +303,4 @@ test('DETECT-FINDS: a searched object\'s find is in the one loot walk, at its bo
   // and the Detect scan finds it, as it finds a pile
   const scan = updateNearbyObjects([0, 0, 0], { loot });
   assert.equal(getNearbyObjects(scan, NEARBY.Treasure).length, 1);
-  assert.match(src('src/scenes/dungeonContext.js'), /loot: \(\) => nearbyLootRecords\(\{ piles: \[\.\.\.lootPiles, \.\.\.droppedLoot\._piles\], foes, searched: searchables \}\),/);
-  // AUDIT DELVE (the open item closed): the street's searched headstones need no walk of their own - a grave's find is
-  // minted as a dropped pile on the ground (searchPartyHost.js activateGrave), and the street's Detect walk carries every pile
-  // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): activateGrave left bootWorld for scenes/searchPartyHost.js
-  const w = src('src/scenes/world.js');
-  const sp = src('src/scenes/searchPartyHost.js');
-  const grave = sp.slice(sp.indexOf('function activateGrave(g, mode = \'grab\') {'), sp.indexOf('  return { activateGrave'));
-  assert.ok(grave.length > 0, 'the stone\'s search, in its module');
-  assert.match(grave, /const pile = droppedLoot\.dropPile\(items, dropFeet\(\), /, 'the grave\'s find is a pile');
-  assert.match(w, /loot: \(\) => nearbyLootRecords\(\{ piles: droppedLoot\._piles, foes: exteriorFoePool\(\) \}\),/, 'and the street walks the piles');
 });

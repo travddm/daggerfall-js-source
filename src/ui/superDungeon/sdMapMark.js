@@ -1,5 +1,5 @@
 // @ts-check
-// SD2c (2026-10-06, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 4): THE SUPER DUNGEON'S RING
+// SD2c: THE SUPER DUNGEON'S RING
 // ON THE HELD MAP - the gate's ring's twin (ui/gate/gateMapMark.js), read by its reader (readGateMark - the same
 // `{day, cx, cy, r, label, phase, tip}`, systems/superDungeon/sdOmen.js sdMapMark, the slot in the day's place) and painted by its
 // painter (ui/ink/inkMap.js paintGateRing) in the Hollow's brass. Once it is found it is news: ringed on its own pixel - a

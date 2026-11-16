@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -49,7 +49,7 @@ export function createVendorHost(host) {
   };
   /** A trader's piece BOUGHT at its stall: off the purse at its own price, its delivery collected into the pack at once. */
   const vendorBuy = async (vendor, row) => {
-    const hub = marketHubs[row.region];
+    const hub = marketHubs()[row.region];   // BAY-LEFT-SEA: the hubs as they stand now (systems/region/marketHubs.js)
     const r = await marketBook.buy({ region: row.region, listing: row.id, units: 1, max: row.price, hubs: hub ? { [row.region]: hub } : {}, currency: 'gold', vendor }, marketMint);
     if (r?.ok && r.data?.delivery?.id && !(await collectedAtPress(r.data.delivery.id))) {
       return { ok: true, text: t('vendor.buy.onWay', 'Bought {name} for {price}. It is on its way to your pack and will reach it on its own.', { name: vendorNameOf(row.item), price: vendorGoldText(row.price) }) };
@@ -87,7 +87,7 @@ export function createVendorHost(host) {
     if (ok) townTalk.say(`Waypoint set: ${row.owner ?? 'a trader'}'s house in ${vendorTownOf(row.map)}. A gold coin marks it on your world map.`);
     return ok;
   };
-  /** THE TRADERS THIS PLAYER MAY REACH (Mac: "Show only traders whose house a given player can actually enter"): the
+  /** THE TRADERS THIS PLAYER MAY REACH: the
    *  region's directory kept to the houses whose door lets this character in - the door's own law (net/homeLaw.js
    *  homeMayEnter: theirs, public, their party's owner, their guild's, a room they rent); the service says each door, the
    *  party's names are the relay's. A row with no door said is kept (an older service). */

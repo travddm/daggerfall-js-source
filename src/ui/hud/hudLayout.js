@@ -1,6 +1,4 @@
-// HUD-MOVE (2026-10-01, Mac: "for the enhanced plus UI can you make chat, hp mana stamina bar segment and all the
-// element moveable and add a reset UI and lock UI in the settings (lock should be on by default)? Also make the
-// additional uis on the overworld movable too.") - THE MOVABLE HUD.
+// HUD-MOVE - THE MOVABLE HUD.
 //
 // ONE SEAM, NO HOST EDITS. Every piece is found by its selector, so the modules that build them (enhancedHud,
 // chatPanel, questTracker, partyPanel, travelViewHud, enhancedTravelControl...) learn nothing: a piece built late or
@@ -32,12 +30,12 @@ export const SNAP_PX = 8;
 /** The pieces, in the order the banner would name them. `sel` must match only while the piece stands in its place. */
 export const HUD_PIECES = Object.freeze([
   // the gameplay HUD
-  // TURN1 (Dudey: "let the players rotate the compass with alt + u"): `turn` - the piece can be turned over in the editor
+  // TURN1: `turn` - the piece can be turned over in the editor
   // (its own press, beside the X); a dress that draws a compass with a top and a bottom (DFO Grimoire's, hung from the
   // screen's top) stands it up again when it is turned. The flag rides the piece's layout and Reset clears it
   { id: 'compass', sel: '.hud .hud-compass', name: 'Compass', len: true, turn: true },
   // AUDIT C&C S3: the temperature plate stands INSIDE another piece in the page but is its own piece, as the status
-  // widget is the quick block's - the outer piece's move and size undone on it, its own X. UI-CALM (2026-10-14): it stands
+  // widget is the quick block's - the outer piece's move and size undone on it, its own X. UI-CALM: it stands
   // in the bottom-left corner now, the quick block's caption (ui/enhanced/enhancedHud.js), so the quick block is its outer piece
   { id: 'temp', sel: '.hud .hud-temp', name: 'Temperature', inside: 'quick' },
   // `dummy`: hidden until there is something to show (no foe targeted) - while unlocked it stands as a preview to move
@@ -51,7 +49,7 @@ export const HUD_PIECES = Object.freeze([
   { id: 'health', sel: '.hud .hud-bars .hud-health', name: 'Health bar', edit: 'split', len: '--hml-b' },
   { id: 'fatigue', sel: '.hud .hud-bars .hud-fatigue', name: 'Fatigue bar', edit: 'split', len: '--hml-b' },
   { id: 'renown', sel: '.hud .hud-renown', name: 'Renown bar', len: true, dummy: true },
-  // SKILL-READY / FIRM-STARS (Dudey: "should also be movable with alt + u"): the two tiles beside the Renown bar
+  // SKILL-READY / FIRM-STARS: the two tiles beside the Renown bar
   // (ui/hud/hudAdvance.js) - each its own piece, standing in the bar's row, so they ride it until moved on their own
   { id: 'skillsReady', sel: '.hud .hud-adv-skill', get name() { return t('menu.hud.piece.skillsReady', 'Skills ready'); }, dummy: true },
   { id: 'starsUnspent', sel: '.hud .hud-adv-firm', get name() { return t('menu.hud.piece.starsUnspent', 'Firmament stars'); }, dummy: true },
@@ -66,7 +64,7 @@ export const HUD_PIECES = Object.freeze([
   { id: 'boss', sel: '.wb-boss-bar', name: 'Boss bar', dummy: true, ghost: 'boss', len: true },   // HUD-LEN: and its length
   { id: 'revenant', sel: '.rvncard-stack', name: 'Revenant taunts', dummy: true, ghost: 'revenant' },   // REVENANT-CARD
   { id: 'loot', sel: '.lootbanner-stack', name: 'Loot banners', dummy: true, ghost: 'loot' },   // LOOT-BANNER
-  // EVENTS1 (bible/10-UI/Event-Board.md): the event board, its news at its head - one piece; built when there is first an
+  // EVENTS1: the event board, its news at its head - one piece; built when there is first an
   // event to show, a preview until then
   { id: 'events', sel: '.evhud', get name() { return t('menu.hud.piece.events', 'Event board'); }, dummy: true, ghost: 'events' },
   // HUD-SADDLE (FIELD BUGS 2026-10-14, Discord: "Riding Window is not able to be edited in the HUD Editor (Alt+U)"): the
@@ -74,7 +72,7 @@ export const HUD_PIECES = Object.freeze([
   // preview while nobody rides (its stand-in is that layer, the bar inside it the piece - ghostOf). No `dummy`: the
   // panel is built only when there is a ride to show, and a window over the HUD covers it as it covers the HUD
   { id: 'saddle', sel: '.saddlepanel .saddlepanel-bar', get name() { return t('menu.hud.piece.saddle', 'Riding panel'); }, ghost: 'saddle' },
-  // HUD-HELM (2026-10-15, Mac: "Yes, same branch"): the helm panel's bar (ui/enhanced/enhancedHelm.js), the saddle's twin - its
+  // HUD-HELM: the helm panel's bar (ui/enhanced/enhancedHelm.js), the saddle's twin - its
   // layer the whole screen, the piece the bar inside it, a preview while nobody is at a helm; the sea's target card
   // stands under the bar wherever it is moved (ui/naval/navalHud.js drawNavalHud's `under`)
   { id: 'helm', sel: '.helmpanel .helmpanel-bar', get name() { return t('menu.hud.piece.helm', 'Helm panel'); }, ghost: 'helm' },
@@ -96,8 +94,7 @@ const SWEEP_MS = 250;
 const KEEP_PX = 32;
 
 export const hudLocked = () => getPref(HUD_LOCK_PREF) !== false;
-/** ENHANCED PLUS ONLY (Mac: "what does happen when u press alt + u or activate unlock mode in other uis outside of
- *  enhanced plus, those shouldn't be customizable"): under Classic or GrimoireUI the editor never opens, Alt+U does
+/** ENHANCED PLUS ONLY: under Classic or GrimoireUI the editor never opens, Alt+U does
  *  nothing (the key passes on as it was), and no saved place, size or length is put on anything - the other UIs stand
  *  exactly as their sheets have them. The layout is kept for when Enhanced Plus is chosen again. */
 const customisable = () => { try { return isEnhanced(); } catch { return false; } };
@@ -184,7 +181,7 @@ ${MOVED} { translate: var(--hmx, 0px) var(--hmy, 0px); scale: var(--hms, 1); }
 .hud .hud-foe[data-hm-dummy]:not(.on) .hud-foetrack .hud-fill { width: 70% !important; transform: none !important; }
 .hud .hud-foe[data-hm-dummy]:not(.on) .hud-ghost, .hud .hud-foe[data-hm-dummy]:not(.on) .hud-chunk { display: none !important; }
 .hud .hud-foe[data-hm-dummy]:not(.on) .hud-bladefull { clip-path: inset(0 15% 0 15%) !important; }   /* the blade face's 70% */
-/* HUD-PREVIEW (Mac: "show in unlocked mode all notification popups and everything else that can pop up"): every piece
+/* HUD-PREVIEW: every piece
    that is only there sometimes stands while unlocked - its own face where it has one, a named sample where it is empty */
 .hud .hud-breath[data-hm-dummy]:not(.on) { display: flex !important; opacity: 0.85; }
 .hud .hud-breath[data-hm-dummy]:not(.on) .hud-fill { width: 70% !important; }
@@ -637,7 +634,7 @@ function onMove(e) {
   if (onScreen) drag.cur = want; else paint(drag.node, drag.cur);
 }
 
-// HUD-SNAP (Mac: "add a snap option in the mode so parts can snap to each other"): while a piece is moved, its left
+// HUD-SNAP: while a piece is moved, its left
 // edge, centre and right edge catch on any other piece's left edge, centre or right edge (and the screen's edges and
 // middle) within SNAP_PX - likewise top, middle and bottom - and a blue guide shows the line it caught on. Hold Alt
 // while dragging to move freely for that drag.
@@ -711,7 +708,7 @@ function onDouble(e) {
   saveLayout(node.dataset.hm, null);   // place, scale and length back
 }
 
-/** ALT+U (Mac: "alt + U should also open the UI unlocked editor"): unlock the HUD, or lock it again. Taken in the
+/** ALT+U: unlock the HUD, or lock it again. Taken in the
  *  capture phase and swallowed, so the plain U beneath it (Use Magic Item) never fires with it; never while a text box
  *  has the keys (the chat - and Option+U is the umlaut's dead key on a Mac keyboard). */
 export const HUD_EDITOR_KEY = Object.freeze({ code: 'KeyU', alt: true, label: 'Alt+U' });

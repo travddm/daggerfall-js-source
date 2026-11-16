@@ -1,6 +1,6 @@
 // @ts-check
-// WB7 (2026-09-25, Mac: "Proper boss audio during the boss fight"): THE WARDEN'S SCORE - the Burning Court's own music,
-// written here as notes, and the law of which of it plays. Design: bible/11-Multiplayer/World-Bosses.md section 5
+// WB7: THE WARDEN'S SCORE - the Burning Court's own music,
+// written here as notes, and the law of which of it plays. Design:
 // ("His voice and his music").
 //
 // WHY MADE, NOT CHOSEN. Daggerfall has no fight music: its dungeon tracks are made to be walked through, and none of
@@ -23,7 +23,7 @@
 //              then quiet: the court is the Deadlands' air alone.
 // Each loops (the player's own law) but GATEFELL, which the law stops once it has sounded.
 //
-// WBX9 (2026-09-26, Mac: "The music needs to be louder and more intense"): LOUDER - every voice's level raised and each
+// WBX9: LOUDER - every voice's level raised and each
 // song played SCORE_LEVEL over the player's own (systems/song/songPlayer.js `song.level`: the game's songs stand at 1), so the
 // fight sounds over the Deadlands' air and the dungeon's tracks it replaces, its peaks still under the clip at the
 // highest MusicVolume (tools/gateScoreProbe.mjs measures both); MORE INTENSE - no song waits to begin: the strings,
@@ -33,8 +33,7 @@
 // beats, the kit's fills every fourth bar, the third song's choir chanting on the beat. The key, the tempos, the themes
 // and the law are as they were.
 //
-// WB10a (2026-09-30, Mac: "improve the boss music, make it more loud, just feel like its too quite, and I feel like the
-// music is too jolly"): LOUDER - WBX9's level had spent the headroom (a decibel under the clip at the highest
+// WB10a: LOUDER - WBX9's level had spent the headroom (a decibel under the clip at the highest
 // MusicVolume, the drums' peaks 15 to 19 dB over the song's body), so each song is now PRESSED (SCORE_PRESS through
 // systems/song/songPlayer.js `song.press`: a compressor, its own drive, a soft ceiling) - its peaks held down and the whole
 // of it raised, never past a decibel under the clip. LESS JOLLY - what made it bright went: the pizzicato's pluck and

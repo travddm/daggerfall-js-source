@@ -1,4 +1,4 @@
-// SOUNDSCAPE (2026-10-24; bible/08-Audio/Audio.md SOUNDSCAPE): THE BEDS THE PORT MAKES (systems/soundscape/soundBeds.js) -
+// SOUNDSCAPE: THE BEDS THE PORT MAKES (systems/soundscape/soundBeds.js) -
 // the sea's swell, the wash past a hull, the wind in the rigging, the surf, the lap and the marsh, each seeded noise cut
 // by a chain of the wind bed's own sections. Each bed its length at its rate, levelled to its RMS, the same every boot
 // and another for another seed; SEAMLESS - its last sample runs into its first as any sample into the next (the chain

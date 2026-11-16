@@ -1,4 +1,4 @@
-// HITFLASH1 (2026-09-26): A BODY STRUCK FLASHES RED - every foe sprite and every player you can see.
+// HITFLASH1: A BODY STRUCK FLASHES RED - every foe sprite and every player you can see.
 //
 // The player: "2d sprites and billboards and maybe even the morrowind assets should flash red when getting hit ...
 // there may be a red flash already integrated but maybe it's too short?"
@@ -82,7 +82,7 @@ export function puppetHurtStep(p, mobile, now) {
   return !!p.hurtUntil && now < p.hurtUntil;
 }
 
-// ELITE FOES (2026-10-01, Mac: "make those enemies also bigger by 25% and make em glow"): THE GLOW - a per-batch value
+// ELITE FOES: THE GLOW - a per-batch value
 // (`batch.eliteGlow`, 0 off, else the pulse 0.55..1 that systems/eliteFoes.js eliteGlow answers) read by both billboard
 // shaders beside the hit flash. Two parts: the sprite itself warmed toward a molten gold, and a RIM - the transparent
 // texels touching the silhouette (one pixel) drawn as a bright blue edge, so the foe reads as haloed from across a room
@@ -101,7 +101,7 @@ float eliteAlphaAt(sampler2D t, ivec2 p) {
   if (p.x < 0 || p.y < 0 || p.x >= ts.x || p.y >= ts.y) return 0.0;
   return texelFetch(t, p, 0).a;
 }
-// THE OUTLINE'S WIDTH (Mac: "make it like it was before without lines"): every texel within 2 of the silhouette
+// THE OUTLINE'S WIDTH: every texel within 2 of the silhouette
 // (dx*dx + dy*dy <= 4) - the eight round it plus a second texel straight out on each axis, the ~1.5-texel weight
 // the filtered reads used to give it, now from exact texels.
 float eliteRim(sampler2D t, vec2 uv) {
@@ -114,13 +114,11 @@ float eliteRim(sampler2D t, vec2 uv) {
   }
   return 0.0;
 }
-// THE OUTLINE'S PULSE (Mac: "the outline to have the same effect as yellow just more visible and the max brightness it
-// should reach is what we have right now"): it breathes with the body's warmth, on the same pulse (k 0.55..1) but
+// THE OUTLINE'S PULSE: it breathes with the body's warmth, on the same pulse (k 0.55..1) but
 // deeper - from a dim blue at the pulse's low to the outline's full brightness at its peak, and never past it.
 // A corpse's batch is static - nothing writes its pulse each frame - so a NEGATIVE glow carries its phase instead
-// (-0.05..-1) and the shader runs the same pulse off the clock (Mac: "corpses need to pulse too").
-// STAFF-EVENT: a staff event's MINI BOSS glows YELLOW (mob: "instead of the blue elite glow lets make the mini boss
-// have a yellow glow") - its glow is an elite's past STAFF_BOSS_GLOW (systems/eliteFoes.js), kept through the pulse here
+// (-0.05..-1) and the shader runs the same pulse off the clock.
+// STAFF-EVENT: a staff event's MINI BOSS glows YELLOW - its glow is an elite's past STAFF_BOSS_GLOW (systems/eliteFoes.js), kept through the pulse here
 // so the colour reads it: a living one's 2.55..3, a corpse's -2.05..-3.
 const vec3 STAFF_BOSS_RIM = vec3(1.0, 0.82, 0.18);   // the outline: a bright yellow
 float eliteRimK(float g, float secs) {
@@ -135,7 +133,7 @@ vec3 eliteRimColor(float k) {
   float s = clamp((k - 0.55) / 0.45, 0.0, 1.0);
   return full * mix(0.4, 1.0, s);
 }
-// THE EMBERS (Mac: "make the outline flow into the air a bit ... pixels that fly in the air"): single pixels of the
+// THE EMBERS: single pixels of the
 // outline's colour rising off the top of the silhouette. Each texel column holds at most one ember a cycle; whether it
 // burns, how fast it climbs and when it starts are hashes of the column and the cycle, so nothing is stored and nothing
 // is sent online. A fragment finds the body under it by scanning down its own column (a transparent elite fragment only).
@@ -162,7 +160,7 @@ float eliteEmber(sampler2D t, vec2 uv, float secs) {
   return 1.0 - fract(cyc);   // fades as it climbs
 }
 // A NEGATIVE glow is an elite's corpse: the rim alone at |k| - no embers, no gold (systems/eliteFoes.js).
-// The body (Mac: "the yellow glow is too much make the enemy glow from normal to a bit yellow"): the pulse runs from
+// The body: the pulse runs from
 // the sprite's own colours (k at its low, 0.55) to a light yellow warmth (k at 1) - a tint, never a wash.
 vec3 eliteGlowLit(vec3 lit, vec3 albedo, float k) {
   if (k <= 0.0) return lit;
@@ -173,7 +171,7 @@ vec3 eliteGlowLit(vec3 lit, vec3 albedo, float k) {
   return lit * mix(vec3(1.0), vec3(1.10, 1.04, 0.82), s) + ELITE_GOLD * (0.035 * s * l);
 }`;
 
-// TELL2 (bible/12-Enhanced-AI/Feud-Arc.md section 4.2; Mac, 2026-10-04: "breath more depth into it"): A WIND-UP'S GLINT
+// TELL2 (): A WIND-UP'S GLINT
 // - a per-batch value (`batch.glint`, [r, g, b, strength] or none) read by both billboard shaders beside the elite glow:
 // the sprite's OUTLINE (the elite rim's own texel test, `eliteRim` above) in the blow's colour, and the body lifted
 // toward it. A flare as the wind-up begins, a steady rim through it, a rise to full in its last 0.2 s (ai/tells.js

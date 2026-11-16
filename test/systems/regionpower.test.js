@@ -204,7 +204,7 @@ test('S43 wiring: the tick walks the powers every 7 days and again every 38', ()
   assert.equal(solo.power, 48, 'both arms fired on the aligned minute - two points, not one');
 });
 
-// ── RS1: THE STRUCT-COPY LAW (2026-08-27) ───────────────────────────
+// ── RS1: THE STRUCT-COPY LAW ───────────────────────────
 // The re-sweep of the shipped conditions body against PlayerEntity.cs
 // found three places where C# copies a FactionData STRUCT and later
 // reads its power - so the read sees the value AT THE COPY, not the

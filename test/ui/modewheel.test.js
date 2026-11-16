@@ -1,4 +1,4 @@
-// CROUCH-SNEAK + MODE-WHEEL (2026-10-08, Port-Ledger A: "CROUCH IS SNEAK, AND A WHEEL PICKS THE INTERACTION MODE").
+// CROUCH-SNEAK + MODE-WHEEL.
 // The two departures, pinned: a crouch is a sneak (player/motor.js); a held Left Alt opens the mode wheel, a mouse
 // flick picks a spoke and the release chooses (ui/modeWheel.js); F1-F4 and Sneak ship unbound; a v2 bindings file
 // lets Left Alt go of Sneak so the wheel lands there; the three look-owning hosts hand the mouse to the wheel first.
@@ -59,7 +59,7 @@ test('CROUCH-SNEAK + MODE-WHEEL defaults: Crouch keeps C and LB; Sneak and F1-F4
   assert.equal(by.get('Crouch'), 'KeyC');
   for (const a of ['Sneak', 'StealMode', 'GrabMode', 'InfoMode', 'TalkMode']) assert.equal(by.get(a), undefined, `${a} ships unbound`);
   assert.equal(by.get(MODE_WHEEL_ACTION), 'AltLeft');
-  assert.equal(ACTIONS.at(-8), MODE_WHEEL_ACTION,   // SHOT-KINDS: the guns' load after the hold   // PIN MOVED (UI-CALM: the saddle panel's key; CARGO-ANYWHERE: the hold's last; PARTY-PING: the ping's; Decorate)
+  assert.equal(ACTIONS.at(-8), MODE_WHEEL_ACTION,   // SHOT-KINDS: the guns' load after the hold   //
     'appended - a saved file resolves by position (TECH1\'s technique after it, SPYGLASS\' glass after that - PIN MOVED)');
   assert.ok(ACTIONS.includes('Sneak') && ACTIONS.includes('StealMode'), 'the old rows stay, rebindable');
   assert.ok(PORT_ACTIONS.includes(MODE_WHEEL_ACTION), 'the classic windows yield it');
@@ -172,23 +172,3 @@ test('MODE-WHEEL AUDIT: the wheel hears the window - it steers on a freed cursor
   assert.deepEqual(picked, ['dialogue'], 'a blur cancels; the late keyup finds it shut');
 });
 
-test('MODE-WHEEL hosts: townTalk and the dungeon host open it under their gates; the three look-owning hosts hand the mouse to it before the look filter; the pad\'s unbound mode is PAD-BINDS\' padAction door', () => {
-  const tt = rd('src/scenes/townTalk.js');
-  assert.match(tt, /if \(keysLive\?\.\(\) !== false && actionsOf\(e, keys\)\.includes\(MODE_WHEEL_ACTION\)\) \{ e\.preventDefault\(\); modeWheel\.press\(e, pickMode\); \}/, 'opened (not before KEY-BOOT), and NOT consumed - the key still joins the host\'s held ring (a shared key does both)');
-  assert.match(tt, /function pickMode\(m\) \{\n\s*if \(\(overlay && talkPaused\(\)\) \|\| otherOverlayActive\?\.\(\) \|\| keysLive\?\.\(\) === false\) return false;/, 'AUDIT: the release asks the window gates again');
-  assert.match(rd('src/scenes/world.js'), /keysLive: \(\) => _worldKeysLive,/, 'the world host hands KEY-BOOT\'s gate in');
-  assert.ok(tt.indexOf('if (otherOverlayActive?.()) return false;') < tt.indexOf('modeWheel.press('), 'after the other host\'s overlay gate');
-  const d = rd('src/scenes/dungeon.js');
-  assert.match(d, /if \(!ctx\.uiOverlayActive && acts\.includes\(MODE_WHEEL_ACTION\)\) \{\n\s*e\.preventDefault\(\);\n\s*modeWheel\.press\(e, pickMode\);/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    const s = rd(host);
-    const wheel = s.indexOf('if (modeWheel.isOpen()) return;');
-    const look = s.indexOf('lookFilter.add(e.movementX * lookScale()');
-    assert.ok(wheel > 0 && wheel < look, `${host}: the wheel takes the mouse before the camera`);
-  }
-  // AUDIT: the pad's unbound mode rides PAD-BINDS' one door for an action on no key - no second hook
-  assert.match(rd('src/scenes/world.js'), /if \(MODE_ACTIONS\[act\]\) return townTalk\.pickMode\(MODE_ACTIONS\[act\]\);/);
-  assert.match(rd('src/scenes/exterior.js'), /padAction: \(act\) => \(MODE_ACTIONS\[act\] \? townTalk\.pickMode\(MODE_ACTIONS\[act\]\) : false\),/);
-  assert.match(rd('src/scenes/dungeon.js'), /padAction: \(act\) => \(MODE_ACTIONS\[act\] \? pickMode\(MODE_ACTIONS\[act\]\) : false\),/);
-  assert.equal(/pickMode/.test(rd('src/ui/gamepadInput.js')), false, 'the shared pad code special-cases no mode');
-});

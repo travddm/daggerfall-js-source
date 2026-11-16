@@ -1,5 +1,4 @@
 // IMMERSIVE FOOTSTEPS 1.01 (Kirk.O), THE MOD, 1:1 (IF1, 2026-09-16,
-// Mac: "Next mod we will be adding 1:1").
 //
 // "Adds New Footsteps Sounds That Change Based On What Terrain Is
 // Being Walked On, Also Armor Sway Sounds Based On What Type Of Armor
@@ -494,7 +493,7 @@ export function createImmersiveFootsteps({ audio = defaultAudio, settings = read
 
   /** DetermineExteriorClimateFootstep (Object.cs:220-299).
    *
-   *  SHIP-DECK (DECLARED, the Port-Ledger's SHIP-DECK row; 2026-09-29, Mac: "Walking on the deck gives water sounds") - A
+   *  SHIP-DECK (DECLARED, the Port-Ledger's SHIP-DECK row; 2026-09-29) - A
    *  FLOOR UNDER THE FEET DECIDES. The mod reads the terrain tile under the player's X/Z and nothing else - its own noted
    *  bug ("keep the bug where when on the player ship the footstep sounds are not always accurate", Object.cs:165-166) -
    *  so a deck over the open sea (tile 0) stepped in deep water for the whole voyage, the set re-read only on a new

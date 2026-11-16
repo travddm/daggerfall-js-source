@@ -1,5 +1,5 @@
 // @ts-check
-// MERCHANT-YARDS (2026-10-10): A TOWN'S TWO YARDS, WHERE THEY STAND - the exterior host's pool on the runtime pools'
+// MERCHANT-YARDS: A TOWN'S TWO YARDS, WHERE THEY STAND - the exterior host's pool on the runtime pools'
 // shape (scenes/lefayMonumentHost.js, scenes/sigilBrokerPool.js): each yard's timber drawn in the host's world pass and
 // standing in its collider, its horses and its keeper on the flats' axis, its wagons on show drawn as a parked wagon is,
 // the eye's boxes and their names, and the press - the trade (systems/merchantYards.js).
@@ -22,7 +22,7 @@
 // the trade window, the Sell row opens it to sell to the yard; Info names the keeper; Steal takes nothing. A press on a
 // horse or a wagon on show opens the Buy as the keeper's does. The window is the host's (`open`).
 //
-// CARP-YARD (2026-10-12): THE JOINERY - its carpenter at the gate, and its WORKBENCH: a press on the carpenter, the
+// CARP-YARD: THE JOINERY - its carpenter at the gate, and its WORKBENCH: a press on the carpenter, the
 // board or the bench (the plaque's one row, Workbench) is Carpentry at the bench - the host's Stores page (`bench`); and
 // the bench is the station the Stores page asks after while the player's feet are within YARD_REACH of it
 // (`workbenchNear`). Steal takes nothing there either.
@@ -30,7 +30,7 @@
 // NOTHING HERE IS SAVED OR SENT: where a yard stands is the town's layout, who keeps it its map id - every client stands
 // the same yard with the same keeper.
 //
-// THE FOUR HOSTS (bible/Home.md): scenes/world.js - WIRED (each town pixel's build places its yards and carves the
+// THE FOUR HOSTS: scenes/world.js - WIRED (each town pixel's build places its yards and carves the
 // people's navgrid round them; the pool is made beside the monument, framed, drawn - in the street and in the view out
 // of a window (AUDIT MERCHANT-YARDS G5) - its flats on the live axis, taken down at a re-anchor and a load; through a
 // door it stands as it stood, for the street a window shows; YARDS-FOUND: each yard standing marked on the Overworld,
@@ -376,7 +376,7 @@ export function createMerchantYards({
       return n;
     },
     /**
-     * AUDIT MW-NPC II P1 (bible/04-Characters/Morrowind-NPCs.md section 23): EACH KEEPER OFFERED THEIR MORROWIND BODY - a
+     * AUDIT MW-NPC II P1: EACH KEEPER OFFERED THEIR MORROWIND BODY - a
      * standing person of the town's race in the street's outfit their own picture wears (folkBodies.js folkLookOf: its
      * archive), off the yard's own key, so every client stands the same keeper; turned to the eye as a standing person
      * is (peopleBodies.js personActor). `offer(actor, batch)` is the host's lane's (world.js streetPeople), the keeper's
@@ -395,7 +395,7 @@ export function createMerchantYards({
         offer(personActor(y, y._mwLook, b.origin, eyeAt, dt), b);
       }
     },
-    /** STAND-HORSE (bible/04-Characters/Morrowind-NPCs.md section 28): each standing yard's horses offered to the
+    /** STAND-HORSE: each standing yard's horses offered to the
      *  host's standing horses (world/standingHorses.js) - where it stands, the way it faces, the bay its sprite is drawn
      *  in (look 0, the art's own), its billboard. @param {{ offer: Function }} horses */
     offerHorses(horses) {
@@ -457,8 +457,7 @@ export function createMerchantYards({
       return true;
     },
     /**
-     * YARDS-FOUND (2026-10-10, from play: "The new stable and transport merchant shops dont show on town
-     * maps/overworld"): EACH YARD STANDING, AS AN OVERWORLD MARK - its name over its ground (YARD_MARK_LIFT up), its kind
+     * YARDS-FOUND: EACH YARD STANDING, AS AN OVERWORLD MARK - its name over its ground (YARD_MARK_LIFT up), its kind
      * the look's (`yard stable`, `yard transport` - ui/travel/travelViewHud.js yardGlyph: its signboard's emblem) and the
      * Towns switch's (systems/travel/travelViewFilters.js markGroup). The yards of every town built about the player, as the
      * pool stands them - a town out of the build stands none, and is marked by its own plate.

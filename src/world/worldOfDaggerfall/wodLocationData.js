@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // WOD1 - WORLD OF DAGGERFALL: THE DATA SHAPES AND THEIR READERS.
 //
 // "World of Daggerfall" 2.0 (Kamer, Daggerfall Unity mod, GUID
@@ -35,7 +34,6 @@
 // entities, comments, CDATA or declarations - the packer asserts that
 // over every shipped file) that throws on malformed input as
 // XmlDocument.Load does. A LEAF: no imports.
-// ═══════════════════════════════════════════════════════════════════
 
 /** LocationData.cs:50-62 - the defaults a fresh LocationInstance carries. */
 export function newLocationInstance() {

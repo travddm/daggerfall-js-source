@@ -1,4 +1,4 @@
-// QUEST-AUDIT II NEAR-SITE / NEAR-REGION (bible/01-Overview/audits/Quest-Audit-II.md; the owner, on the audit's findings:
+// QUEST-AUDIT II NEAR-SITE / NEAR-REGION (; the owner, on the audit's findings:
 // "Rework so quests can work"). A town the town mods lay can hold fewer buildings of a kind than Daggerfall's quests
 // ask of it - one tavern for two `local tavern`s, three houses for five, a city without the weaponsmith its Mages Guild
 // quest wants - and a region can be left without a kind at all (Pothago's weaponsmiths). DFU's Place throws, and the
@@ -356,7 +356,7 @@ test('AUDIT QA2: NEAR-SITE\'s nearest town is the nearest by the travel reckonin
 // FIELD BUGS 2026-10-12g QUEST-TOWN ("'Open a Chest' quest doesn't record the town you need to go to": "The town is mentioned
 // in the first message you get ('... the finest locksmiths in Gothhead...') but not in the text in the quest list, and it
 // doesn't show up as a quest location on the map either"). N0B00Y16's `Place _shop_ local pawnshop` taken by NEAR-SITE in
-// the nearest town that has one; its log names "a local merchant" and no town. bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// the nearest town that has one; its log names "a local merchant" and no town..
 const chestQuest = () => readFileSync(new URL('../../../vendor/dfu-quests/Quests/N0B00Y16.txt', import.meta.url), 'utf8').replace(/^\uFEFF/, '')
   .replace('group Spellcaster remote', 'group Questor').replace('group Pawnbroker female', 'group Questor').split(/\r?\n/);   // the rig's factions: questors all
 test('QUEST-TOWN a local site NEAR-SITE takes in another town is marked so; the quest\'s start puts that town on the travel map; the log entry that names its merchant points at it, the town and the region named - and a site in the quest\'s own town is DFU\'s, unmarked, unrevealed, its entry pointing nowhere (mutants: the mark never written; the reveal never made; the lens not following the merchant; the town not named)', () => {

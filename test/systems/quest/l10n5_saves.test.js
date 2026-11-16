@@ -1,4 +1,4 @@
-// L10N5 (2026-10-03): SAVES HOLD THE GAME'S OWN WORDS, AND EACH LANGUAGE READS ITS OWN AGAIN AFTER A LOAD. DFU saves
+// L10N5: SAVES HOLD THE GAME'S OWN WORDS, AND EACH LANGUAGE READS ITS OWN AGAIN AFTER A LOAD. DFU saves
 // what a translation replaced - a quest begun in French is saved in French and stays French in English (L10N3c recorded
 // it as owed). The port saves the source and renders the language when the text is read:
 //   - A QUEST'S MESSAGES (quest/message.js localize, quest/quest.js getMessage): a translation's lines are read in

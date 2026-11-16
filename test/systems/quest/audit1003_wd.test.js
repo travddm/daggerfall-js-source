@@ -1,9 +1,9 @@
-// AUDIT PRE-MERGE 1003 (2026-10-03) - lens WD, WD3's half of PR 545: Beautiful Villages and Beautiful Cities, and the
+// AUDIT PRE-MERGE 1003 - lens WD, WD3's half of PR 545: Beautiful Villages and Beautiful Cities, and the
 // housing promise. A guild's hall is a home (a row of `homes`, GUILD1d), so it is bought in its town's layout, as a
 // home's claim is - stored with it, refused in another, asked to update from a build that says none, kept to one layout
 // in its own write - and the client asks it as it asks a claim, behind the same gates; and a quest's building site
 // chosen again in a town that moved carries what was ASSIGNED to its markers, never the old building's markers. The
-// record: AUDIT PRE-MERGE 1003's WD lens, and bible/03-World/Beautiful-Towns.md.
+// record: AUDIT PRE-MERGE 1003's WD lens, and.
 //
 // Each test failed on the unfixed tree for its finding's reason: a hall bought in a Villages town was stored as
 // Daggerfall's own and `/v1/homes/layouts` answered `[[town, null]]`; a Cities hall in a Villages town, and a hall that
@@ -83,7 +83,7 @@ test('AUDIT PRE-MERGE 1003 WD1: a hall in ANOTHER layout of a town that holds ho
   assert.deepEqual([old.status, old.body?.error], [426, 'home-update'], 'a build from before the town mods: its key may name a stranger\'s building');
   const bad = await buy({ layout: 'classic' });
   assert.deepEqual([bad.status, bad.body?.error], [400, 'bad-home']);
-  assert.equal((await buy({ layout: 'detailed-ships@1.0.0' })).body?.error, 'bad-home', 'a mod that moves no building');
+  assert.equal((await buy({ layout: 'ship-scenery@1.0.0' })).body?.error, 'bad-home', 'a mod that moves no building');
   assert.equal(treasury(), before, 'nothing paid');
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE guild_id IS NOT NULL').get().n, 0, 'nothing seated');
   // the same town in its own layout: bought, the town's stamp kept

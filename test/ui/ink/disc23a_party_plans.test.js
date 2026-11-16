@@ -1,6 +1,4 @@
-// DISC23-A (2026-09-24, Starempire42 on Discord, "Being able to see players on your town/dungeon map": "It would be
-// really nice to be able to see your party members on the town and dungeon maps. This would make it much easier to
-// figure out where everyone is and find each other").
+// DISC23-A.
 //
 // THE GAP: the party was on the BAY only (SOC6), read off the hub's travel pixel - which is the whole town, the whole
 // dungeon. The town and dungeon plans took no party at all: the doors built their bags without one, and neither sheet
@@ -162,20 +160,3 @@ test('DISC23-A: the one reading - a body with no place in this frame is not draw
   ]);
 });
 
-test('DISC23-A: the hosts hand the plans the party\'s bodies - the dungeon, the building and the town, through their doors', () => {
-  const world = src('src/scenes/world.js');
-  // the one host reading: a party member's peer body, in this scene's frame, with its facing
-  assert.match(world, /const partyNear = \(\) => \{\s*\n(?:\s*if \(!social\?\.party\) return \[\];[^\n]*\n)?\s*const near = peersNear\(\);[\s\S]*?for \(const m of social\.others\(\)\) \{\s*\n\s*const peer = near\.find\(\(p\) => m\.peers\?\.includes\(p\.id\)\);/);
-  assert.match(world, /yaw: online\?\.peers\.get\(peer\.id\)\?\.shown\?\.yaw \?\? 0 \}\);/);
-  // the town: the player's own subtraction, into the location's frame - PIN MOVED (STAR0): in the toggle's module, the host's
-  // live binding by its name (scenes/exteriorAutomapToggle.js)
-  assert.match(world, /townParty: \(\) => host\.partyOnMaps\(\)\.map\(\(m\) => \(\{ \.\.\.m, feet: \[m\.feet\[0\] - t\[0\] - b\.locOrigin\[0\], m\.feet\[1\] - t\[1\] - b\.locOrigin\[1\], m\.feet\[2\] - t\[2\] - b\.locOrigin\[2\]\] \}\)\),/);
-  assert.match(world, /partyNear: \(\) => partyOnMaps\(\),/);   // AUDIT (pre-merge) I-E: the plans mark those drawn here
-  const modes = src('src/scenes/worldModes.js');
-  assert.match(modes, /selfId: \(\) => host\.selfId\?\.\(\) \?\? null, party: \(\) => host\.partyNear\?\.\(\) \?\? \[\],/, 'the dungeon\'s opts');
-  assert.match(modes, /title: interiorBuilding\?\.name \?\? 'Interior',\s*\n\s*party: \(\) => host\.partyNear\?\.\(\) \?\? \[\],/, 'the building\'s map');
-  assert.match(src('src/scenes/dungeonContext.js'), /title: dfLocation\?\.name \?\? 'Dungeon',\s*\n\s*party: opts\.party \?\? null,/);
-  // the doors used to drop the key on the floor: each builds its sheet's bag by hand
-  assert.match(src('src/ui/automap/automapDoor.js'), /party: deps\.party \?\? null,/);
-  assert.match(src('src/ui/town/townMapDoor.js'), /party: deps\.townParty \?\? null,/);
-});

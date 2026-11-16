@@ -1,8 +1,7 @@
 // THE TWO UPKEEP SWITCHES' TIERS, AS DATA - horse care's (HORSE-TIERS, below) and wagon upkeep's (WAGON-TIERS, at the
 // end): systems/upkeep/upkeepSwitch.js's two Features rows, each one key with Off, Boons (the default) and Hard on it.
 //
-// HORSE-TIERS (2026-10-15, Mac: "Allow turn off. Rework this system to be more in line with how we handle climates and
-// calories boons.") - HORSE CARE'S TIERS, AS DATA (bible/06-Systems/Horse-Care.md). Climates & Calories' model
+// HORSE-TIERS - HORSE CARE'S TIERS, AS DATA. Climates & Calories' model
 // (survival/difficulty.js, SURV-TIERS and SURV-BOONS) laid over the horse: ONE KEY, THREE ANSWERS -
 //
 //   OFF    DFU's plain horse: no stats, one pace, no gallop of its own, nothing to feed (the law runs nothing).
@@ -91,7 +90,7 @@ export const HORSE_CARE_HARD = HORSE_CARE_RULES.hard;
 export const horseCareRulesForTier = (tier) => (typeof tier === 'string' && Object.hasOwn(HORSE_CARE_RULES, tier) ? HORSE_CARE_RULES[tier] : null);
 
 // ── WAGON-TIERS ─────────────────────────────────────────────────────
-// WAGON-TIERS (2026-10-15, Mac: "Yes, same tiers") - WAGON UPKEEP'S TIERS, AS DATA (bible/06-Systems/Wagon-Upkeep.md),
+// WAGON-TIERS - WAGON UPKEEP'S TIERS, AS DATA,
 // horse care's model on the wagon's own key, `wagonUpkeep`:
 //
 //   OFF    DFU's plain wagon: it never wears, rolls at its team's pace, and sells as a whole one.
@@ -125,7 +124,7 @@ export const WAGON_UPKEEP_OLD_ON_TIER = 'hard';
 /** The tier a stored value names; anything else reads as the default (the shelf drops it at the load). */
 export const wagonUpkeepTierOfStored = (v) => WAGON_TIER_OF_STORED.get(v) ?? WAGON_UPKEEP_DEFAULT;
 
-/** WAGON-TIERS (Mac, 2026-10-15: "Sound wagon rolls faster"): a Sound wagon's pace on Boons, times DFU's - the one
+/** WAGON-TIERS: a Sound wagon's pace on Boons, times DFU's - the one
  *  number of the boon, read through the tier's rules (`soundPace`, wagonUpkeep.js wagonPace). */
 export const WAGON_SOUND_BOON = 1.1;
 /** What each tier charges and earns - a field only where the tiers differ (the world's numbers live in wagonUpkeep.js). */

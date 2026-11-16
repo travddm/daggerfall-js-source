@@ -1,4 +1,4 @@
-// LOAD-OWED / BUILD-RETRY (bible/06-Systems/Travel-View.md): THE PIXEL BUILD, SWEPT OVER THE MAP ON THE PLAYER'S DATA.
+// LOAD-OWED / BUILD-RETRY: THE PIXEL BUILD, SWEPT OVER THE MAP ON THE PLAYER'S DATA.
 //
 // "The speed randomly drops and gets locked at 1x after traveling for a while" was the load governor holding the clock
 // for a pixel whose build had thrown (LOAD-OWED). This asks which builds throw: the world host booted in headless

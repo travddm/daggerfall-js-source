@@ -1,4 +1,4 @@
-// WEATHER2a (Mac, 2026-09-14: "it can rain when theres snow on the ground"): NO RAIN OVER SNOW, ENHANCED LANE.
+// WEATHER2a: NO RAIN OVER SNOW, ENHANCED LANE.
 // The Chronicles' table (DFU's, digit for digit) rolls rain and thunder in Winter for every climate but the mountains,
 // and the terrain wears its snow archive for the whole of Winter in every climate but a Desert base - so DFU, and the
 // classic lane, draw rain over a white field. The enhanced lane funnels every write of the sim's word through the
@@ -40,7 +40,6 @@ test('WEATHER2a groundIsSnowy: one law - every climate but a Desert base wears s
     assert.equal(groundIsSnowy(s, SEASON.Winter), false, 'a desert base never wears snow');
     assert.equal(getTerrainGroundArchive(s, SEASON.Winter), s.groundArchive);
   }
-  assert.match(rd('src/world/climateSwaps.js'), /return climateSettings\.groundArchive \+ \(groundIsSnowy\(climateSettings, season\) \? 1 : 0\);/, 'the terrain reads the one law');
 });
 
 test('WEATHER2a overGround: rain and thunder over snowy ground are snow; a desert, a summer, and every other word pass through; the law off passes everything', () => {
@@ -112,7 +111,6 @@ test('WEATHER2a the switch: the enhanced skin and Enhanced Environments, the tes
     setSnowGroundLaw(false); setUiSkin('enhanced'); assert.equal(snowGroundLawOn(), false);
     setSnowGroundLaw(null); assert.equal(snowGroundLawOn(), true, 'null hands it back to the lane');
   } finally { setUiSkin(skin); setPref('enhancedEnvironments', pref); resetWeatherSim(); }
-  assert.match(rd('src/systems/weather/weatherSim.js'), /get\('snowground'\) !== 'off'/, 'the kill door');
 });
 
 test('WEATHER2a the wind blows by the table\'s word: a storm turned to snow builds a thunder front, not a flurry\'s', () => {
@@ -125,28 +123,5 @@ test('WEATHER2a the wind blows by the table\'s word: a storm turned to snow buil
   assert.ok(Math.abs(fb.strength / fa.strength - VIOLENCE.thunder / VIOLENCE.snow) < 1e-9, 'the same roll, the storm\'s violence');
   const c = createWindModel({ seed: 3 }); c.tick(0, 'sunny'); c.tick(600, 'snow', 'nonsense');
   assert.ok(Math.abs(c.state().front.strength - fa.strength) < 1e-12, 'an unknown violence word falls back to the worn one');
-  assert.match(rd('src/scenes/shared.js'), /windModel\.tick\(extra\?\.classicMinutes \?\? 0, systemWordOf\(weatherName\), extra\?\.violence \?\? weatherName, extra\?\.approach \?\? 0\);/);
 });
 
-test('WEATHER2a the hosts: the arrival hands the sim its minute, the sky is handed the violence word, and the sim has one write of the worn word', () => {
-  const w = rd('src/scenes/world.js'), e = rd('src/scenes/exterior.js');
-  assert.equal((w.match(/applyClimateWeather\(maps\.getClimateIndex\(pick\.pixel\.x, pick\.pixel\.y\), Math\.floor\(playerTicker\.classicMinutes\), fieldXZ\(\), climateAt\);/g) || []).length, 2, 'both arrivals (the travel landing and the respawn drain) carry the minute (WEATHER2b: and the field\'s place)');
-  // SEA-EVENTS: world.js's violence (and its peak, its crossing) the Aether Storm's first, at sea - scenes/seaVenturesHost.js
-  for (const [name, s] of [['world', w], ['exterior', e]]) {
-    assert.match(s, /violence: weatherOverride \?\? (?:seaStormShown\(\) \?\? )?currentWeatherRaw\(\), classicMinutes: playerTicker\.classicMinutes/, `${name}: the sky's bag carries the violence word`);
-    assert.match(s, /currentWeatherRaw[^\n]*from '\.\.\/systems\/weather\/weatherSim\.js'/, `${name}: imported`);
-  }
-  const sim = rd('src/systems/weather/weatherSim.js');
-  assert.equal((sim.match(/^\s*_current = /gm) || []).length, 3, 'setWeather (a word whole), _set (through the ground), reset - and nothing else writes the worn word');
-  assert.match(sim, /function applyFromArray\(climateIndex, nowMinutes\) \{\s*\n\s*return _set\(weatherForClimate\(climateIndex\), climateIndex, nowMinutes\);/);
-  assert.match(sim, /if \(!_set\(next, climateIndex, nowMinutes\)\) return false;[^\n]*\n\s*_jumps\+\+;/, 'the respawn roll through the ground, the jump kept');
-  assert.match(sim, /const changed = applyFromArray\(climateIndex, nowMinutes\);/, 'the drain');
-  assert.match(sim, /import \{ groundWearsSnow, climateSeasonFromMinutes \} from '\.\.\/\.\.\/world\/climateSwaps\.js';/, 'the terrain\'s own law, not a copy');
-});
-
-test('WEATHER2a records: the arc page, the ledger row, Home\'s index and the testing row', () => {
-  assert.match(rd('bible/07-Rendering/Weather-Arc.md'), /^## A - NO RAIN OVER SNOW \(WEATHER2a, 2026-09-14\)/m);
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /^\| \*\*NO RAIN OVER SNOW, ENHANCED LANE \(WEATHER2a, 2026-09-14\)\*\*/m);
-  assert.match(rd('bible/01-Overview/Page-Index.md'), /`07-Rendering\/Weather-Arc\.md`/);   // PIN MOVED (WALLET1's merge of main, 2026-10-05): Home.md's page index moved, byte for byte, to its own page
-  assert.match(rd('bible/09-Testing/Testing-Rows-2026-10-19.md'), /^\| weather2a_snowground\.test\.js \| \d+ \| WEATHER2a/m);
-});

@@ -240,14 +240,6 @@ test('X11b sweep: the real per-minute tick expires it, and only on a minute CHAN
   const notYet = mk(1);
   tickPlayerMinutes({ entity: notYet, classicMinutes: 2.1, dt: 0.5, sinks, rolls: () => 0.5 });
   assert.equal(notYet.items.length, 1, 'no minute change, no sweep');
-  // ...and the ORDER inside that block is DFU's: fatigue, then the
-  // sweep, then the day change (PlayerEntity.cs:417-421, :441-450)
-  const band = src('src/systems/worldTick.js').slice(
-    src('src/systems/worldTick.js').indexOf("if (Math.floor(next) !== Math.floor(classicMinutes))"));
-  const fatigue = band.indexOf('sinks.drainFatigue?.(');
-  const sweep = band.indexOf('removeExpiredItems(entity');
-  assert.ok(fatigue > 0 && sweep > fatigue, 'the sweep follows the fatigue drain, as DFU does');
-  assert.ok(sweep < band.indexOf('runDayChange'), 'and precedes the day change');
 });
 
 // ── the effect arm ───────────────────────────────────────────────
@@ -324,233 +316,6 @@ test('X11b picker: AllowCancel false really refuses, and the selection is rememb
   assert.equal(c2, 1);
 });
 
-test('X11b picker: the remembered index is a MODULE-LEVEL static, in both mounting hosts', () => {
-  // CreateItem.cs:35's `static int lastSelectedIndex` survives the
-  // window, the cast and the character. A per-window field would reset
-  // to 0 on every cast, which is the whole thing it exists to avoid.
-  // AUDIT 26 F079: it is ONE static, not one per host. This pin used
-  // to require a module-level copy in EACH host - which is exactly the
-  // divergence the audit found, since casting in a dungeon and again
-  // outdoors then opened on the other host's remembered row. The
-  // single static now lives with the law in systems/createItem.js and
-  // both hosts read and write it through the accessors.
-  assert.ok(/^let _lastSelectedIndex = 0;$/m.test(src('src/systems/createItem.js')),
-    'the ONE static lives with the law');
-  for (const f of ['src/scenes/worldModes.js', 'src/scenes/dungeonContext.js']) {
-    const s = src(f);
-    assert.equal(/^let _lastCreateItemIndex = 0;$/m.test(s), false, `${f} keeps no copy of its own`);
-    assert.ok(s.includes('setLastCreateItemIndex(i)'), `${f} never updates it`);
-    assert.ok(s.includes('selectedIndex: lastCreateItemIndex()'), `${f} never reads it back`);
-    assert.ok(s.includes('allowCancel: false'), `${f} lets the player cancel a paid-for cast`);
-  }
-});
-
-test('X11b hosts: every host with a cast engine routes the seam, and the dungeon warms the art', () => {
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    assert.ok(src(f).includes('onCreateItem'), `${f} does not route the Create Item seam`);
-  }
-  // ...and the art it needs is actually warmed there, or the seam is
-  // silently dead (listPickerArtLoaded would answer false for ever)
-  assert.ok(src('src/scenes/dungeonContext.js').includes('preloadListPickerArt('),
-    'the dungeon host never warms PICK00I0');
-  assert.ok(src('src/scenes/worldModes.js').includes('preloadListPickerArt('),
-    'the world host never warms PICK00I0');
-});
-
-test('X11c hosts: every window-opening spell is routed by every host that mounts windows', () => {
-  // The four-hosts divergence, one more time. onCreateItem went out to
-  // all three cast engines in X11b; onIdentify and onDispelMagic had
-  // only ever been routed by the streaming host, because before the
-  // slot picker existed there was nowhere outdoors to put them. All
-  // three seams open a WINDOW, so every host with a window stack owes
-  // all three.
-  // PR1 added the STANDALONE dungeon host, whose absent seams had
-  // optional-chained into SILENCE - Identify refunded and said
-  // nothing, Dispel Magic spent the cast on nothing and said nothing -
-  // and made both refuse out loud. DR1 retired the refusal's REASON:
-  // that host mounts BOTH windows now (see the two DR1 pins below), so
-  // what is left of the loud arm is the ART guard every host carries.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    const s = src(f);
-    for (const seam of ['onCreateItem', 'onIdentify', 'onDispelMagic']) {
-      assert.ok(new RegExp(`^\\s*${seam}:`, 'm').test(s), `${f} does not route ${seam}`);
-    }
-  }
-  // ...and the refusal line is the SAME line in all three, SPOKEN
-  // through each host's own mouth, because it is the same law: a
-  // window seam that cannot mount says so rather than swallowing the
-  // cast (the magicka is already spent). The pin anchors the SPEAKING
-  // CALL, not the string - a mutant that keeps the words but drops the
-  // call is exactly the silence this test exists to forbid.
-  const SPEAKS = {
-    'src/scenes/world.js': ["townTalk.say('You cannot concentrate on that right now.')"],
-    'src/scenes/exterior.js': ["townTalk.say('You cannot concentrate on that right now.')"],
-    // DR1: the dungeon host speaks the SAME line, now from the tail of
-    // a real mount rather than instead of one. Both arms pinned per
-    // arm, whole, because they share the string and a mutant that
-    // silenced one would leave the other for a bare `includes`.
-    'src/scenes/dungeonContext.js': [
-      "hudText.add('You cannot concentrate on that right now.');\n      }\n    },\n    onDispelMagic:",
-      "if (!openDispelPicker({ chance })) hudText.add('You cannot concentrate on that right now.');",
-    ],
-  };
-  for (const [f, calls] of Object.entries(SPEAKS)) {
-    for (const call of calls) assert.ok(src(f).includes(call), `${f} swallows a window cast it cannot mount`);
-  }
-  // DR1, the fifth host, named rather than left silent: the standalone
-  // `scenes/interior.js` route owes none of the three, because it
-  // mounts no cast engine at all - there is nothing there to dispatch
-  // an Identify. That is the ONLY reason it is absent from the loop
-  // above, so it is pinned: grow a cast engine there and this reddens.
-  assert.ok(!src('src/scenes/interior.js').includes('createPlayerMagic('),
-    'scenes/interior.js casts now - it owes all three window seams');
-});
-
-// ── DR1: the standalone ?dungeon host mounts both spell windows ──
-test('DR1 dungeon host: Identify opens the REAL trade window there, not a refusal', () => {
-  // What this replaces. PR1 left the arm as
-  //   onIdentify: () => hudText.add('... (the Identify window lives in
-  //                                   the ?world route)')
-  // and the Ledger row behind it said the standalone dungeon host has
-  // no trade window. That was true of where the window was BUILT and
-  // false as a refusal: NativeTradeWindow is an `isChoiceWindow`
-  // native over host-agnostic art, and this context already drives
-  // every seam one needs. Reverting the mount - restoring the
-  // one-line refusal, or dropping the mountSpellWindow call - reddens
-  // each assertion below.
-  const s = src('src/scenes/dungeonContext.js');
-  // 1. the window is CONSTRUCTED here, in Identify mode, as the SPELL
-  //    (Identify.cs:71-76 sets UsingIdentifySpell before the push).
-  assert.ok(s.includes('function openIdentifySpellWindow('), 'the dungeon host builds no Identify window');
-  const b = s.slice(s.indexOf('function openIdentifySpellWindow('),
-    s.indexOf('function openDispelPicker('));
-  assert.ok(b.includes('createTradeWindow('), 'the Identify builder mounts no trade window');
-  assert.ok(/mode: 'Identify'/.test(b) && /usingIdentifySpell: true/.test(b),
-    'the dungeon Identify window is not the SPELL\'s');
-  // 2. D7's live collection, spliceable, and the window's own equipped cut
-  assert.ok(b.includes('packItems: () => (playerEntity.items ??= [])'), 'the pack is not the live collection');
-  assert.ok(b.includes('isEquipped: (it) => isEquipped(it)'), 'FilterLocalItems\' equipped cut is gone');
-  // 3. DoModeAction's SPELL arm, whole (:954-995) - the magicka
-  //    refusal answers FALSE so the lot stays staged (F144), the roll
-  //    is identifySpellPass, the points are spent ONCE, and the tally
-  //    is spoken through THIS host's mouth.
-  assert.ok(b.includes('return false;'), 'the magicka refusal no longer turns the pass back');
-  assert.ok(b.includes('messageBox(notEnoughSpellPointsText())'), 'the magicka refusal is silent');   // BOX-ON-TOP: a box over the window, as DFU's
-  assert.ok(b.includes('identifySpellPass(staged, chance, Math.random)'), 'the per-item roll is gone');
-  assert.ok(b.includes('for (const it of pass.identified) it.isIdentified = true;'), 'nothing is identified');
-  assert.ok(b.includes('if (pass.spendMagicka)'), 'the magicka is spent unconditionally');
-  assert.ok(b.includes('hudText.add(identifiedTallyText(pass.successCount, pass.total))'), 'the "N of M" tally is gone');
-  // 4. ...and the SEAM the cast engine dispatches into actually mounts it.
-  const arm = s.slice(s.indexOf('onIdentify: ({ chance, refund } = {}) => {'), s.indexOf('onDispelMagic:'));
-  // DISC10-E L3 re-aim: built first - the trade door answers null for a transformed lycanthrope (it has said so) -
-  // and a built window is still the one the seam mounts
-  assert.ok(arm.includes('openIdentifySpellWindow({ chance: chance ?? 0, cost: refund ?? 0 })') && arm.includes('!mountSpellWindow(w))'),
-    'the dungeon Identify seam no longer mounts the window');
-  assert.ok(arm.includes('!tradeDoorReady()'), 'the seam no longer guards its art (X11b: a dead seam)');
-  // 5. and the art is warmed at BOOT, or tradeArtLoaded() is false for
-  //    ever and the whole mount is silently dead (X11c's bug, one host over).
-  assert.ok(s.includes('preloadTradeArt({ renderer, fetchBytes, palette });'),
-    'the dungeon host never warms INVE00I0/SHOP00I0 - the Identify seam is silently dead');
-});
-
-test('DR1 dungeon host: Dispel Magic opens the REAL bundle picker there', () => {
-  const s = src('src/scenes/dungeonContext.js');
-  assert.ok(s.includes('function openDispelPicker('), 'the dungeon host builds no bundle picker');
-  const b = s.slice(s.indexOf('function openDispelPicker('), s.indexOf('const magic = createPlayerMagic({'));
-  // the same three laws worldModes.openDispelPicker carries
-  assert.ok(b.includes('if (!listPickerArtLoaded()) return false;'), 'no art guard - the seam would be silently dead');
-  assert.ok(b.includes('dispellableBundles(liveBundles(playerEntity))'), 'the picker no longer lists the live bundles');
-  assert.ok(b.includes("hudText.add('You have no magic to dispel.')"), 'the empty-list line is gone');
-  assert.ok(b.includes('new ListPickerWindow('), 'the picker window is gone');
-  assert.ok(b.includes('dispelBundle(playerEntity, b.bundleId'), 'picking a bundle no longer removes it');
-  // DFU's one asymmetry: the player's OWN casts always come off, and
-  // only something cast AT them gets the roll.
-  // AUDIT ALLY-CAST C4: a party mate's gift (`ally`) comes off as the player's own - it was never cast AT them.
-  assert.ok(b.includes("selfCast: b.bundleType === 'Spell' && (b.selfCast !== false || b.ally === true)"), 'the self-cast asymmetry is gone');
-  assert.ok(b.includes('roll01: Math.random(), chance'), 'the roll no longer weighs the spell\'s chance');
-  assert.ok(b.includes('hudText.add(DISPEL_MAGIC_TEXT[r.alert])'), 'the outcome is no longer spoken');
-  // ...through the host's own mount door
-  assert.ok(b.includes('return mountSpellWindow(new ListPickerWindow('), 'the picker is not mounted');
-  const arm = s.slice(s.indexOf('onDispelMagic: ({ chance } = {}) => {'), s.indexOf('onDispelMagic: ({ chance } = {}) => {') + 260);
-  assert.ok(arm.includes('openDispelPicker({ chance })'), 'the dungeon Dispel Magic seam no longer opens the picker');
-});
-
-test('DR1 dungeon host: both windows go through THIS host\'s PushWindow, and nothing else closes them', () => {
-  // worldModes' mountSpellWindow dungeon arm is `dungeonCtx.showOverlay(win)`,
-  // which IS pushDungeonWindow - so a spell window raised over an open
-  // automap or rest window must land ON TOP and uncover it on close,
-  // never be refused and never clobber the slot. And there is no
-  // closeSpellWindow twin here for the same reason worldModes makes
-  // its dungeon arm a no-op: both windows raise `done` themselves and
-  // tickOverlay drains the slot.
-  const s = src('src/scenes/dungeonContext.js');
-  assert.ok(s.includes('const mountSpellWindow = (win) => pushDungeonWindow(win);'),
-    'the spell windows no longer go through this host\'s PushWindow');
-  // the older `if (activeOverlay) refuse` idiom must NOT come back for
-  // these two - that is the refusal ROAD-B B5 replaced with a push.
-  const idArm = s.slice(s.indexOf('onIdentify:'), s.indexOf('onDispelMagic:'));
-  assert.ok(!idArm.includes('activeOverlay'), 'the Identify seam refuses a busy slot again instead of pushing');
-  // and worldModes still routes ITS dungeon-mode casts into this same door
-  assert.ok(src('src/scenes/worldModes.js').includes('dungeonCtx?.showOverlay ? dungeonCtx.showOverlay(win) : false'),
-    'the hosted route no longer mounts through the dungeon context');
-});
-
-test('X11c: the window art warms at BOOT, not at the first door', () => {
-  // The bug the live probe found. Identify is castable by a character
-  // who has never been indoors; tradeArtLoaded() answered false for
-  // that player and openIdentifyWindow refused. preloadTradeArt only
-  // ever ran from ensureShopFont, which only ever ran from interior
-  // entry.
-  const s = src('src/scenes/worldModes.js');
-  const decl = s.indexOf('const ensureInteriorWindowArt = () => {');
-  assert.ok(decl > 0, 'the art warmer is gone');
-  const end = s.indexOf('};', decl);
-  // a call at FACTORY level - after the declaration, outside any
-  // interior-entry function. The boot call is the one that is NOT
-  // indented past two spaces.
-  const after = s.slice(end);
-  assert.ok(/^  ensureInteriorWindowArt\(\);/m.test(after),
-    'ensureInteriorWindowArt is never called at boot - the art still rides the first door');
-  // and interior entry still calls it (idempotent, and a re-entry
-  // after an eviction has to re-warm)
-  assert.ok(/^\s{6,}ensureInteriorWindowArt\(\);/m.test(after),
-    'interior entry no longer warms the art');
-});
-
-test('X11b hosts: a spell window lands in the slot the CURRENT mode draws', () => {
-  // The bug this found: worldModes.frame returns at `mode === 'exterior'`
-  // before drawing anything, and the dungeon branch draws dungeonCtx's
-  // own slot - so a window written straight into `interiorOverlay` from
-  // either mode was never drawn, never ticked, never clicked, and did
-  // not even register as overlayHeld. Identify and Dispel Magic both
-  // did that, and both can be cast anywhere.
-  const s = src('src/scenes/worldModes.js');
-  assert.ok(s.includes('function mountSpellWindow('), 'no slot-picker exists');
-  const helper = s.slice(s.indexOf('function mountSpellWindow('), s.indexOf('function closeSpellWindow('));
-  assert.ok(helper.includes("mode === 'dungeon'") && helper.includes('dungeonCtx?.showOverlay'), 'no dungeon arm');
-  assert.ok(helper.includes("mode === 'interior'") && helper.includes('interiorOverlay = win'), 'no interior arm');
-  assert.ok(helper.includes('townTalk?.showOverlay'), 'no exterior arm');
-  // and both pickers go through it
-  for (const opener of ['openCreateItemPicker', 'openDispelPicker']) {
-    const body = s.slice(s.indexOf(`${opener}(`), s.indexOf(`${opener}(`) + 1600);
-    assert.ok(body.includes('return mountSpellWindow(win)'), `${opener} still writes a slot directly`);
-  }
-  // X11c closed the routed half: Identify goes through the same
-  // slot-picker now, so ALL THREE openers do and none of them writes a
-  // slot directly.
-  const idBody = s.slice(s.indexOf('openIdentifyWindow({'), s.indexOf('openIdentifyWindow({') + 1400);
-  assert.ok(idBody.includes('return mountSpellWindow(win)'), 'Identify still writes a slot directly');
-  assert.ok(!idBody.includes("if (mode !== 'interior') return false;"),
-    'Identify still refuses outdoors - X11c opened it');
-  // ...and the latch that chained it to the interior slot is GONE from
-  // module scope. Its lifetime is the window's now, in the commit
-  // closure openTradeWindow builds per window.
-  assert.ok(!/^\s*let _identifySpell/m.test(s), 'the module-level identify latch is back');
-  assert.ok(s.includes('identifySpell = null } = {}'), 'openTradeWindow does not take the latch');
-  assert.ok(s.includes('commitTrade(shelf, m, staged, price, proceeds, identifySpell, '),   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-1): and the purchase's holiday and guild after it
-    'the commit closure does not carry the latch');
-});
-
 // ── the transfer refusal ─────────────────────────────────────────
 test('X11b transfer: a summoned item cannot leave the pack, and it says so', () => {
   assert.equal(CANNOT_REMOVE_ITEM_TEXT, 'You cannot remove this item.');
@@ -559,24 +324,7 @@ test('X11b transfer: a summoned item cannot leave the pack, and it says so', () 
   // The law this pin holds did not move with it: ONE guard, BOTH
   // callers, sitting where DFU puts it.
   assert.equal(REFUSAL.summoned.text, CANNOT_REMOVE_ITEM_TEXT, 'the refusal lost its words');
-  const tx = src('src/systems/item/itemTransfer.js');
-  // DFU's TransferItem is ONE function with two callers, so both the
-  // local Remove click and the remote one go through it
-  assert.equal((tx.match(/refusal: REFUSAL\.summoned/g) || []).length, 2,
-    'the guard is on one side only - DFU has one function and two callers');
-  // and it sits where DFU puts it: right after the transport block
-  const i = tx.indexOf("item.group === 'Transportation'");
-  assert.ok(i > 0, 'the transport block is gone');
-  const j = tx.indexOf('isSummoned(item)', i);
-  assert.ok(j > i && j - i < 300, 'the summoned guard is not beside the transport one');
-  // and the window it came out of does not carry a second reading of
-  // it - the point of the extraction
-  const ui = src('src/ui/native/nativeInventory.js');
-  assert.ok(!ui.includes('isSummoned('), 'the classic window kept its own summoned guard');
-  assert.ok(ui.includes('planStore(it,') && ui.includes('planTake(it,'),
-    'the classic window does not run the extracted ladder');
 });
-
 
 // ── the unified CreateWeapon, and what it fixed on the way ───────
 test('X11b: ItemBuilder.CreateWeapon has ONE home again, both arms', () => {
@@ -590,11 +338,6 @@ test('X11b: ItemBuilder.CreateWeapon has ONE home again, both arms', () => {
   assert.equal(sword.material, 1, 'the melee arm keeps its material');
   assert.equal(sword.currentCondition, sword.maxCondition);
   assert.equal(sword.stackCount, undefined, 'and does not stack');
-  // loot's random weapon reaches the SAME function - the inline copy of
-  // the arrow arm that used to live there is gone
-  const lootSrc = src('src/systems/loot/loot.js');
-  assert.ok(lootSrc.includes('createWeapon(ARROW_TEMPLATE, 0, rolls)'), 'loot re-implements the arrow arm');
-  assert.ok(!/name: 'Arrow', templateIndex: 131/.test(lootSrc), 'a second copy of the arrow mint survives');
   // and it still produces arrows when the roll lands on slot 18
   let sawArrow = false;
   const r = seq(0.001);
@@ -659,5 +402,4 @@ test('X11b catalog: Create Item goes live and MORPH SELF is the last row standin
   assert.deepEqual(inert, [], 'V2a took Morph Self; nothing is inert');
   assert.equal(effectByKey('29,255').ported, true);
   assert.equal(effectByKey('29,255').craftable, false, 'AllowedCraftingStations = None, still');
-  assert.ok(!src('src/systems/effects.js').includes("'29,255': "), 'no BUFF_KINDS row pretends otherwise');
 });

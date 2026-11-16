@@ -1,6 +1,6 @@
 // ROADS 14: THE ANSWER KEY, MEASURED. Basic Roads' hand-drawn network
 // is what "as close as we can" means, and its data cannot ship with the
-// port (bible/03-World/Roads.md, "The line"). What CAN be taken from it
+// port (, "The line"). What CAN be taken from it
 // is its judgement, expressed as numbers the generator's dials control:
 // how often a road bends, by how much, how many steps are diagonal, how
 // many ends dead, how many junctions. This tool prints those numbers

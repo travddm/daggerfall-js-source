@@ -1,4 +1,4 @@
-// STAFF-PANEL3-REALM (2026-10-22, design doc "DFO Staff Panel: design", build step 3) - THE PANEL'S TRADE HOLDS, ROLLBACKS,
+// STAFF-PANEL3-REALM - THE PANEL'S TRADE HOLDS, ROLLBACKS,
 // FIXES, GAINS AND REMOVALS (server-account/src/staffRealm.js), driven through the real Worker on the node:sqlite database
 // every account pin stands on (test/accountDb.mjs) with R2 beside it (test/realmSeat.mjs): the held characters most
 // urgent first with why, a hold laid on one character or a whole account and lifted (saying it excused the finding and
@@ -57,7 +57,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
     PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on',
   });
   const raw = s.env.DB._raw;

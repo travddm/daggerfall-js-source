@@ -1,5 +1,4 @@
-// OWNER-CLOCK (2026-10-21, the field: players report enemy desync; a player's profile shows boats, peers, horses and grass
-// each taking a tenth to a quarter of the main thread, so a slow owner is common). A foe is its owner's to step and
+// OWNER-CLOCK. A foe is its owner's to step and
 // stream, and a reader leads each puppet along the way its last two records show (DESYNC-ZERO, scenes/puppetLead.js) -
 // measured on the READER's arrival clock and carried LEAD_MAX_S at most. An owner at 3 fps sends a frame every 333 ms,
 // and every hitch on its machine or on the road between stood its foes still and jumped them; below 20 fps its foes also
@@ -21,7 +20,7 @@ import { OnlineSession } from '../../src/net/online.js';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { fakeRoom } from '../fakeRoom.mjs';
 import { createOwnerClock, ownerClock, ownerTmOf, ownerTmDiffS, stampedFrameText, applyingOwnerTm, appliedOwnerTm, OWNER_TM_MOD } from '../../src/net/ownerClock.js';
-import { POSE_TS_MOD, parseClient, FOES_FRAME_MAX, OWN_RELAY_MIN, GROUND_LAW, GRANT_HELLO_LAW, cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
+import { POSE_TS_MOD, parseClient, FOES_FRAME_MAX, RELAY_VERSION, GROUND_LAW, GRANT_HELLO_LAW, cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
 import { puppetLead, LEAD_MAX_S, LEAD_DIST_MAX, LEAD_SLOW_MAX_S, LEAD_DIST_SLOW_MAX, LEAD_SLACK_S, LEAD_GAP_EASE } from '../../src/scenes/puppetLead.js';
 import { catchUpPlan, catchUpOwnerFoes, markModalSteps, wireOwnerClock, extrasAfforded, OWNER_CATCHUP_MAX_S, OWNER_CATCHUP_SHARE, OWNER_CATCHUP_STEPS_MAX, FRAME_MS_MAX } from '../../src/scenes/ownerCatchUp.js';
 import { FOE_MAX_FRAME_DT, foeFrameDt } from '../../src/characters/enemy/enemyMotor.js';
@@ -147,7 +146,7 @@ test('OWNER-CLOCK the session: every foes frame - a cell\'s, a world room\'s hos
     // a world room: the host's stream and the own lane
     s.join('dungeon:m188', pose);
     ws = sockets.at(-1); ws.open();
-    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'mac-0001', world: null, v: `world${OWN_RELAY_MIN}` });
+    ws.receive({ t: 'welcome', id: 'mac-0001', peers: [bob], host: 'mac-0001', world: null, v: RELAY_VERSION });
     now += 1000; tm = 9001;
     const host = { n: 1, k: 'dungeon:m188', f: [] };
     assert.equal(s.sendFoes(host), true);
@@ -578,7 +577,6 @@ test('OWNER-CLOCK the mode machine: a building\'s and a dungeon\'s foes are step
 test('OWNER-CLOCK the wiring by source: the world host wires it once, beside the mode machine, with nobody-else-here as the street\'s test; the hosts\' own calls stand as they stood (the street\'s step, the modal frame, the streams); the session stamps at its two doors and holds the frame at its two deliveries; both pools copy the moment beside the feet; no pool reads `data.tm` itself (mutants: the dungeon\'s door drops the stamp)', () => {
   const w = rd('src/scenes/world.js');
   assert.equal((w.match(/wireOwnerClock\(/g) ?? []).length, 1);
-  // PIN MOVED (HOST-CLOCK, test/scenes/fb1021b_hostclock.test.js): the street's watch rides the one statement beside its encounter pool
   assert.match(w, /\n {2}\}\);\n {2}wireOwnerClock\(\[exteriorFoes, cityGuards\], modes, \(\) => online\?\.status === 'open' && online\.othersHere > 0\);/, 'after the mode machine is made, with the streams\' own nobody-to-hear test (foesStream\'s `othersHere === 0`)');
   assert.match(w, /exteriorFoes\.update\(foeDt, _pf, cam\.pos, _foeSenses\(\)\);/, 'the street\'s step is the host\'s as it was');
   assert.match(w, /if \(modes\.frame\(dt, now\)\) \{/);
@@ -604,7 +602,7 @@ test('OWNER-CLOCK the wiring, executed: wireOwnerClock - the world host\'s one s
   const street = { update(dt) { calls.push(dt); now += 2; } };   // a call the page's clock sees cost 2 ms
   let ran = true, shared = true;
   const modes = { frame: () => ran };
-  wireOwnerClock([street], modes, () => shared);   // PIN MOVED (HOST-CLOCK): the street's pools, a list (world.js hands the encounter pool and the watch)
+  wireOwnerClock([street], modes, () => shared);
   street.update(0.1, me);
   assert.deepEqual(calls, [0.1], 'the first frame: nothing measured, the host\'s one call');
   assert.equal(ownerClock.tm(), 50_000, 'the street\'s call marks the page\'s clock');

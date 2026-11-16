@@ -1,6 +1,5 @@
 // @ts-check
-// BOARD-MAGNET (2026-10-26, the owner: "a prompt to board should show within range and properly magnitize to the other
-// ship"; bible/03-World/Naval-Refit.md BOARD-MAGNET and its AUDIT) - THE GRAPPLES' HAUL, wired by the naval host
+// BOARD-MAGNET - THE GRAPPLES' HAUL, wired by the naval host
 // (scenes/naval/navalHost.js startBoarding, stepBoarding, wayScale, brake - HOST-SPLIT: the module the host wires, as
 // fishHost.js is) over the boarding's own law (systems/naval/navalBoarding.js berthPose, drawHaul, haulBrake). The port's
 // own - Daggerfall has no sea.

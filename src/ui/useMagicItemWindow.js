@@ -24,8 +24,7 @@
 //   - ParentPanel.BackgroundColor = Color.clear (:33): no backdrop.
 //   - Refresh() lists LongName per item (:50-57) - DaggerfallUnityItem.LongName,
 //     which is ItemHelper.ResolveItemLongName (systems/item/itemInfo.js
-//     itemLongName). UMI-NAMES (2026-10-07, the field: "Use Magic Item
-//     Menu is crowded"): the factory listed the raw `name` field, so
+//     itemLongName). UMI-NAMES: the factory listed the raw `name` field, so
 //     every potion read its template's "Glass Bottle" (or nothing, off
 //     createPotion's own mint) and a MAGIC.DEF item its unfilled
 //     "%it of Venom Spitting". A potion now names its recipe ("Potion

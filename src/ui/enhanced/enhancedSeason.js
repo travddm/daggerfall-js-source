@@ -1,6 +1,5 @@
 // @ts-check
-// SEASON-BOOK (2026-10-22, the owner: "I think we need a new pause menu icon, like we did for the timers and mail. A
-// condensed place to see season related content and descriptions"; bible/10-UI/UI-Arc.md SEASON-BOOK).
+// SEASON-BOOK.
 //
 // THE LAUREL. A wreath beside the envelope over the paused game (ui/enhanced/enhancedPost.js's mark, placed as it is -
 // online only, as the hourglass: every clock it shows is the relay's) opens a window in the pause window's own frame: the
@@ -8,7 +7,7 @@
 // each), the seats' Season, and the festival - with what each one holds, in a line apiece, and the time left on each
 // counting down. The model is systems/seasonBook.js; this file draws it and keeps it live.
 //
-// AUDIT SEASON-BOOK (bible/01-Overview/audits/Audit-Season-Book.md): S2/U2 - every line is rewritten IN PLACE each
+// AUDIT SEASON-BOOK: S2/U2 - every line is rewritten IN PLACE each
 // second (a board's answer, the day turning), and the list is rebuilt only when its rows or their doors change - a door
 // with the focus keeps it across that rebuild; U3 - the focus goes into the window when it OPENS, never when the face
 // around it repaints; R1 - only the window's first read may ask the service; W1 - the moment and the countdown in the
@@ -24,12 +23,11 @@ export const SEASON_TICK_MS = 1000;
 /** A row's door (systems/seasonBook.js `door`) -> its button's words. */
 const SEASON_DOOR_TEXT = Object.freeze({
   arena: () => t('season.book.door.arena', 'Arena'),
-  spire: () => t('season.book.door.spire', 'Boards'),
 });
 
 /**
  * WHAT THE WINDOW READS, off the pause face's hooks: the hourglass's source (hooks.timers - the relay's clock, the seats'
- * word, the Spire's boards' door) under the laurel's own reads (hooks.season - the boards), and the Arena's door once a
+ * word) under the laurel's own reads (hooks.season - the boards), and the Arena's door once a
  * banner is worn. Null where there is no clock: offline, or before the relay's has been heard. `opening` - the window's
  * first read, the one that may ask the service (AUDIT SEASON-BOOK R1).
  * @param {any} hooks
@@ -39,7 +37,7 @@ export function seasonSource(hooks, { opening = false } = {}) {
   if (!clock) return null;
   const reads = hooks.season?.({ opening, now: clock.now }) ?? null;
   const arena = hooks.arenaJoined?.() && typeof hooks.openArena === 'function' ? () => hooks.openArena() : null;
-  return { ...reads, now: clock.now, seatsOpen: clock.seatsOpen, zero: clock.zero, doors: { arena, spire: clock.doors?.board ?? null } };
+  return { ...reads, now: clock.now, seatsOpen: clock.seatsOpen, zero: clock.zero, doors: { arena } };
 }
 
 /** THE TIME LEFT, as the hourglass counts it (eventTimers.js timerText) with its days' letters in the player's language

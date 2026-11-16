@@ -1,7 +1,5 @@
-// QUEST-NOTE (2026-10-13, a player on the DFO Discord: "Would it be possible to implement kill/quest notifications? I just
-// got done doing 'A Dangerous Wizard' questline and killed the mage in question, but DFO never popped up saying the mage
-// was killed"): a quest's foe fallen is told by the port itself (the HUD strip's row, a chat line), and a quest's box is
-// not closed by the press already on its way when it comes up. bible/06-Systems/Quest-Arc.md QUEST-NOTE.
+// QUEST-NOTE: a quest's foe fallen is told by the port itself (the HUD strip's row, a chat line), and a quest's box is
+// not closed by the press already on its way when it comes up. QUEST-NOTE.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';

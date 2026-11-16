@@ -3,6 +3,7 @@
 // Daggerfall Workshop). The port's magic items have carried their
 // MAGIC.DEF pairs since S1 and nothing ever read them.
 
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -121,7 +122,6 @@ test('E1 pump: CastWhenHeld wear (4 normal / 60 resting), HealthLeech\'s daily l
   const enchDamaged = item(T.PotentVs, 0, { currentCondition: 10, equipSlot: null });
   const rep = wearer([enchDamaged, damaged, item(T.RepairsObjects, -1)], { isPlayer: true });
   enchantmentMagicRound(rep, 4, {});
-  // PIN MOVED (FIELD BUGS 2026-10-16b MEND-ARMOUR): it gained DFU's point; a fiftieth of its own 100 now (repairsObjectsMend)
   assert.equal(damaged.currentCondition, 52, 'the first repairable (mundane) item gains a fiftieth of its condition');
   assert.equal(enchDamaged.currentCondition, 10, 'enchanted skipped while AllowMagicRepairs is off');
 });
@@ -152,7 +152,8 @@ test('E1 pump: VampiricEffect AtRange drains every foe inside 2.25 through the p
   assert.equal(w.health, 12);
 });
 
-test('E1 fold: the channels reach their formulas - armour, chance-to-hit, skills, absorption, max magicka', () => {
+test('E1 fold: the channels reach their formulas - armour, chance-to-hit, skills, absorption, max magicka', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const w = wearer([item(T.StrengthensArmor, -1), item(T.EnhancesSkill, 2)], { isPlayer: true });
   computeEnchantmentMods(w);
   assert.equal(enchantArmorMod(w), -5);
@@ -192,7 +193,7 @@ test('E1 fold: the channels reach their formulas - armour, chance-to-hit, skills
     magnitudeBaseLow: 20, magnitudeBaseHigh: 20, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1,
     durationBase: 0, durationMod: 0, durationPerLevel: 1, chanceBase: 0, chanceMod: 0, chancePerLevel: 1,
   };
-  // ABSORB-NERF (2026-09-30): the enchantment is a 50% roll now (absorption.js ABSORB_ENCHANT_CHANCE)
+  // ABSORB-NERF: the enchantment is a 50% roll now (absorption.js ABSORB_ENCHANT_CHANCE)
   assert.ok(tryAbsorption(effect, 1, abs, { absorbing: entityAbsorbsSpells(abs), rolls: () => 0.49 }) > 0, 'the AbsorbsSpells fold absorbs on a roll under 50');
   assert.equal(tryAbsorption(effect, 1, abs, { absorbing: entityAbsorbsSpells(abs), rolls: () => 0.5 }), 0, 'and not on 50 or over');
   assert.equal(tryAbsorption(effect, 1, abs, { absorbing: false }), 0, 'no ring, no absorption');

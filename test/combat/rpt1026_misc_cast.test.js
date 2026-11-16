@@ -53,7 +53,7 @@ async function castingArm(clip = castClip()) {
   });
   assert.ok(res.ok, `build: ${res.stage} ${res.error}`);
   arm.setSheathed(false);
-  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
+  for (let i = 0; i < 400 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
   arm.readySpell(true);
   arm.update(DT);
   return arm;

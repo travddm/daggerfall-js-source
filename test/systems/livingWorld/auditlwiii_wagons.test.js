@@ -1,4 +1,4 @@
-// AUDIT LW-III (bible/01-Overview/audits/Audit-LivingWorld-III.md, "The caravans' wagons"): THE CARAVANS CLEAR OF ONE
+// AUDIT LW-III (, "The caravans' wagons"): THE CARAVANS CLEAR OF ONE
 // ANOTHER - a train keeps to the right of the road the way it walks (LANE_N) and steps out abreast of another walking its
 // way on one stretch (roadLanes); each wagon's axle stands its hitch straight behind its horse and faces it (the
 // trailer's law, chordBehind); a shared camp's teams stand one park (campTeam's slots), each horse tied alongside its

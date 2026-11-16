@@ -1,6 +1,6 @@
 // FIELD BUGS 2026-10-07b TOWER-FLOORS (Jacob on Discord, #bug-reports: "The two Daggerfall Castle courtyard tower
 // interiors are very bugged. Everything inside them seems to be shifted up several meters including stairs, and there
-// is open void in some spots"). `01-Overview/bugs/Field-Bugs-2026-10-07b.md`.
+// is open void in some spots").
 //
 // The towers are CUSTAA05 #0 and #1, five storeys of room shells. Classic writes those shells as ObjectType 5, the
 // type it writes floor planes as, at the height of the storey each stands on - where the same shells, written as
@@ -183,7 +183,6 @@ test('TOWER-FLOORS with ARENA2: across every RMB block the law moves only Object
       if (s.interior?.header?.num3dObjectRecords === 0) return;
       const it = layoutInterior(block, bi, ri, getModel);
       // the records the layout places, in its order, against DFU's verbatim placement of a non-prop (DaggerfallInterior.cs:433-436)
-      // PIN MOVED (FIELD BUGS 2026-10-25 BAD-CELL): the repair reads the record itself - its model and where it stands
       const recs = s.interior.block3dObjectRecords.filter((o) => !isBadInteriorModel(bi, ri, o) && getModel(o.modelIdNum));
       assert.equal(recs.length, it.placements.length);
       recs.forEach((o, i) => {

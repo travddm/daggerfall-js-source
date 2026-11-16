@@ -102,24 +102,3 @@ test('MAC-O2: the filter obeys it - a held gesture DROPS the owed look, click-to
   setValue('Controls', 'WeaponSwingMode', '0');
 });
 
-test('MAC-O2 (THE FOUR HOSTS RULE): every LookFilter owner asks the ONE seam, and nobody re-spells the law', () => {
-  // The three that own a LookFilter AND a weapon. world.js and
-  // exterior.js carry worldModes' interior and dungeon modes inside
-  // their own frames (those hosts own no filter of their own), and
-  // dungeon.js carries dungeonContext's.
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js']) {
-    const s = read(f);
-    assert.match(s, /import \{ LookFilter, swingSuppressesLook \} from '\.\.\/player\/lookFilter\.js';/, `${f} imports the seam`);
-    assert.match(s, /if \(swingSuppressesLook\(\{ swingHeld: rightHeld \|\| swipeHeld \|\| swingKeyLatch, weaponIsBow: [^)]+\}\)/, `${f} asks it`);
-    // ...and does NOT write the law out again beside it.
-    assert.doesNotMatch(s, /swipeHeld\) && walkMode[^\n]*isBow/, `${f}: the old inline copy is gone`);
-  }
-  // The FOURTH owner: src/scenes/interior.js mounts no weapon rig, so
-  // nothing there can hold SwingWeapon - named, not silently skipped.
-  assert.match(read('src/scenes/interior.js'), /if \(false\) lookFilter\.settle\(\);\s+\/\/ MAC-O2: the fourth LookFilter owner mounts NO weapon rig/);
-  // The law itself lives once, and it reads the setting.
-  const lf = read('src/player/lookFilter.js');
-  assert.match(lf, /export function swingSuppressesLook\(/);
-  assert.match(lf, /getInt\('Controls', 'WeaponSwingMode', 0, 2\)/);
-  assert.match(lf, /return !!swingHeld && swingMode === 0 && !weaponIsBow;/);
-});

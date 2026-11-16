@@ -1,4 +1,4 @@
-// SLAM3 (2026-09-16, Mac: Daggerfall's 30th, a streamer's server slam): HOW OFTEN TO SPEAK IN A CROWD.
+// SLAM3: HOW OFTEN TO SPEAK IN A CROWD.
 //
 // SLAM1 bounded WHO hears a pose. This bounds HOW OFTEN one is said - the last of the three terms in a room's cost
 // (senders x POSE_FAN_MAX x rate) still fixed, and the only one a client can lower without asking anybody.

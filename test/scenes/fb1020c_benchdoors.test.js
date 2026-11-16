@@ -1,5 +1,5 @@
 // FB1020c BENCH-DOORS (FIELD BUGS 2026-10-20c, the Discord: "the crafting station in towns dont have any craft buttons,
-// just buttons to store goods"). The joinery (CARP-YARD, bible/03-World/Merchant-Yards.md) is the one crafting station
+// just buttons to store goods"). The joinery (CARP-YARD) is the one crafting station
 // that stands in a town's street. A press on its carpenter, its board or its bench opens the Stores page landed on The
 // Workbench (scenes/merchantYardsHost.js activate -> scenes/world.js openYardBench), and the page asks whether the player
 // stands at it (world.js workbenchHere -> merchantYardsHost.js workbenchNear). That question measured the feet from the

@@ -1,6 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// STAR7 (2026-10-20) — THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM.
+// STAR7 — THE FALLEN STARS HELD, AS THE SERVICE KEEPS THEM.
 //
 // The owner: "A lore accurate world encounter defense mission ...
 // something coming from the sky and crashing into the ground, where
@@ -11,11 +10,11 @@
 // starReceipt.js - `j1`, under the relay's GATE_SIGNING_KEY). This file
 // honours it: counted once, and paid in Renown to the character that
 // fought it and in silver under the day's combat cap. Design:
-// bible/11-Multiplayer/Starfall.md section 6. The raid's claim, rung for
+// The raid's claim, rung for
 // rung (raids.js) - one transaction, the row first and stamped with the
 // claim's own nonce, every credit by that row alone.
 //
-// ═══ WHOSE WORD, AND WHAT BOUNDS IT ════════════════════════════════
+// WHOSE WORD, AND WHAT BOUNDS IT
 //
 // The receipt is the RELAY's word: it saw the master fall on its
 // encounter clock and the account stand at the star. What the relay
@@ -37,7 +36,6 @@
 // character - so the device finishes once (starClaims.js).
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═══════════════════════════════════════════════════════════════════
 
 import { verifyStarReceipt } from '../../src/net/starfall/starReceipt.js';
 import { starTimes } from '../../src/net/starfall/starfallLaw.js';
@@ -166,7 +164,7 @@ export async function claimStar({ db, nowS, subtle, rand }, player, { receipt, c
     ...(mint ? [mint] : []),
     // INT5's FILL - a signed win's spoils, the playing character's bucket - by THIS claim's row alone, IN the batch (B3: run
     // after it, as index.js ran it, an answer lost between the two lost the fill for good)
-    spoilsGrantStatement(db, player.id, 0, `EXISTS (SELECT 1 FROM stars_held WHERE star = ?5 AND account = ?1 AND nonce = ?6)`, key, nonce),
+    spoilsGrantStatement(db, player.id, `EXISTS (SELECT 1 FROM stars_held WHERE star = ?4 AND account = ?1 AND nonce = ?5)`, key, nonce),
   ]);
   const [row, decided, , , , after, count] = res;
   const spoils = thanks ? spoilsAnswer(res[8], cid) : false;

@@ -1,8 +1,7 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Active player involvement") - HERBALISM'S
-// ACTS, as machines the host feeds a frame at a time (bible/06-Systems/
-// Professions-Arc.md 5, 22; FORAGE0 14.6). Pure: the host hands in the
+// PROF1 - HERBALISM'S
+// ACTS, as machines the host feeds a frame at a time (docs/systems/professions.md).
+// Pure: the host hands in the
 // frame's time, whether Interact is held, whether attack was pressed,
 // the view's yaw and pitch and the player's place; the machine answers
 // where the act stands and, at its end, the report the harvest carries.
@@ -26,7 +25,6 @@
 //
 // Every act is cancelled by Esc (the host's `cancel`), nothing lost: the
 // node stands, no tool wears, no harvest is asked.
-// ═══════════════════════════════════════════════════════════════════
 import { HERB_ACT, BASKET_ACT } from '../net/professionLaw.js';
 import { firmActMult } from './firmamentLive.js';   // FIRM1: the Firmament's steadier hand (act.herbalism)
 
@@ -43,7 +41,7 @@ const turnDeg = (a, b) => { let d = (a - b) % 360; if (d > 180) d -= 360; if (d 
  *   patch (AUDIT GATHER F7: the steady window HERB_ACT.wet of itself)
  */
 export function createHerbAct({ kind, band = 1, botanist = false, master = false, gentle = false, wet = false, rng = Math.random }) {
-  // FIRM1 (bible/06-Systems/Firmament.md): the Firmament's `act.herbalism` widens (or a keystone's price narrows) both
+  // FIRM1: the Firmament's `act.herbalism` widens (or a keystone's price narrows) both
   // windows - the steady hand's turn and the Basket's glint - 1 with no tree in force
   const sky = firmActMult('herbalism');
   const window = HERB_ACT.steadyDeg * band * (botanist ? HERB_ACT.botanist : 1) * sky * (wet ? HERB_ACT.wet : 1);

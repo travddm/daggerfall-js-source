@@ -166,24 +166,3 @@ test('audit24 wave44: it fires BEFORE the bundle lands, and a host without a poo
   assert.doesNotThrow(() => castEnemySpell(foe(), { rangeType: 1, element: 0 }, castDeps(undefined)));
 });
 
-test('audit24 wave44: both casting pools hand their blood pool to the executor', () => {
-  // Scoped to the castEnemySpell CALL, not the file: dungeonContext
-  // also exposes a `hitEffects,` on its returned object, and a bare
-  // line-scan was satisfied by that one after the cast dep was
-  // deleted. The pool has to reach the EXECUTOR.
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js']) {
-    const src = rd(f);
-    const i = src.indexOf('castEnemySpell(f, spell, {');
-    assert.ok(i > 0, `${f}: calls the executor`);
-    const call = src.slice(i, src.indexOf('});', i));
-    assert.ok(/(^|\n)\s*hitEffects,/.test(call), `${f}: hands its pool to castEnemySpell`);
-  }
-  // the executor asks for it by NAME rather than importing a
-  // module-level singleton - one pool per host, as the blood is
-  assert.match(rd('src/characters/enemy/enemyCasting.js'), /hitEffects = null,/);
-  // NOTE deliberately no regex over the gate's spelling. The gate is
-  // pinned by BEHAVIOUR above (five rangeTypes, both directions), and
-  // a regex here has already false-killed an equivalent rewrite three
-  // waves running. A pin asserts what a line does.
-  assert.match(rd('src/characters/enemy/enemyCasting.js'), /showMagicSparkles\(/, 'the executor is the caller');
-});

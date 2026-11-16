@@ -1,6 +1,4 @@
-// TRIP-PICKS (2026-10-12, a profile of a player's live client from launch into the world: the first world frame froze
-// 2.7 s and the frames after it 2.8 s more, the Living World planning its roads' day; bible/07-Rendering/Performance-
-// Priority.md TRIP-PICKS) - A TRAVELLER'S ROAD CHOICES, THE SAME ANSWER FOR LESS. Every trip of every traveller of every
+// TRIP-PICKS - A TRAVELLER'S ROAD CHOICES, THE SAME ANSWER FOR LESS. Every trip of every traveller of every
 // town the roads asked filtered its town's towns near, weighed them, walked the weights' keys for the draw and sorted the
 // towns by distance again. The choices are kept by the trip world, the town and the job (trips.js roadChoices) and the
 // draw reads them (roadOrder). Every answer is the old one: the old law is restated here and the two compared over every

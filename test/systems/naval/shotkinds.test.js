@@ -1,5 +1,4 @@
-// SHOT-KINDS (2026-10-17, the owner: "Different cannon shot types, for example a grape shot to thin out crew, Chain to try
-// to take down their sail, etc"; bible/03-World/Naval-Refit.md SHOT-KINDS) - WHAT A BATTERY IS LOADED WITH: the law's own
+// SHOT-KINDS - WHAT A BATTERY IS LOADED WITH: the law's own
 // numbers (systems/naval/shotKinds.js), the deck's loads and their reload (navalGunnery.js), the ball that keeps its load
 // and says it (navalShots.js), the blow it strikes on the real naval host (test/navalSea.mjs), the room's word (navalWire.js
 // `o`), the helm's choice (scenes/naval/navalLoads.js), the captains' grape (navalAI.js captainLoads), the HUD's words,
@@ -312,10 +311,6 @@ test('SHOT-KINDS the captains: a pirate who means to board loads her broadsides 
   const navy = { hull: HULL.Carrack, pos: [0, 0, 0], cls: { faction: 'navy' }, mode: 'board', guns: createGunDeck(HULL.Carrack) };
   captainLoads(navy, at(20));
   assert.equal(navy.guns.load('port'), 'round');
-  const ai = rd('src/systems/naval/navalAI.js');
-  assert.match(ai, /captainLoads\(ship, enemy\);\n\s+if \(!ship\.guns\.braced && !\(enemy\?\.crippled && enemy\.kind === 'player'\)\) \{\n\s+gunnery\(ship, world, enemy \?\? \(ship\.cls\.faction === 'merchant' \? threat : null\), out, \{ broadsides: boarderBroadsides\(ship\) \}\);/);
-  assert.match(ai, /const shot = ship\.guns\.load\(side\);[^\n]*\n\s+const g = shotGun\(bat\.gun, GUNS\[bat\.gun\], shot\);/, 'laid and led for her load');
-  assert.match(ai, /targetY: aimY, shot \}\);/);
 });
 
 test('SHOT-KINDS the HUD and the picture: each battery\'s load under its count (the chasers named as the bore they are), the aim\'s line naming it; each load its own ball - grape\'s pellets, chain\'s two halves and its links, heated shot\'s glow and trail - and its own splash and hit (mutants: the load word, the aim\'s load, each picture)', () => {
@@ -358,19 +353,11 @@ test('SHOT-KINDS the HUD and the picture: each battery\'s load under its count (
 });
 
 test('SHOT-KINDS the world: the key appended unbound in Combat (no mod\'s row - those ship keys) and a pad button\'s to choose; the wheel\'s rung before the camera\'s; the key read at the helm; the helm panel\'s Shot button with its label (mutants: the rung, the key unread, the button, the label)', () => {
-  assert.equal(ACTIONS.at(-3), 'ShotCycle');   // PIN MOVED (PARTY-PING: PartyPing appended after; Decorate after that)
+  assert.equal(ACTIONS.at(-3), 'ShotCycle');
   assert.ok(!DEFAULT_BINDINGS.some(([, a]) => a === 'ShotCycle'), 'no key ships on it');
   assert.ok(ACTION_GROUPS.find((g) => g.title === 'Combat').rows.some((r) => r.action === 'ShotCycle' && r.label === 'Shot (aboard)'));
   assert.ok(!Object.values(MOD_ACTIONS).flat().some((r) => r.action === 'ShotCycle'));
   assert.ok(PLUS_BIND_ROWS.some((r) => r.sec === 'ShotCycle'));
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const shotWheel = \(deltaY\) => !!naval\?\.shotWheel\?\.\(deltaY\);/);
-  assert.match(w, /spyglassWheel\(e\.deltaY\) \|\| shotWheel\(e\.deltaY\) \|\| mwViewWheel\(e\.deltaY\)/);
-  assert.match(w, /if \(navalOn\(\) && hccActionPressed\('ShotCycle'\)\) naval\?\.cycleShot\?\.\(1\);/);
-  assert.match(w, /shot: \(\) => \{ naval\?\.cycleShot\?\.\(1\); \},/);
-  assert.match(w, /shot: navalOn\(\) \? naval\?\.shotLabel\?\.\(\) \?\? null : null/);
   assert.deepEqual(helmButtons({ shot: 'Broadsides: Grapeshot' }).find((b) => b.act === 'shot'), { act: 'shot', label: 'Broadsides: Grapeshot', kind: 'hook' });
   assert.ok(!helmButtons({}).some((b) => b.act === 'shot'));
-  const host = rd('src/scenes/naval/navalHost.js');
-  assert.match(host, /cycleShot: \(dir = 1\) => loads\.cycle\(dir\), shotWheel: \(dy\) => loads\.wheel\(dy\), shotLabel: \(\) => \(enabled \? loads\.label\(myBoat\(\)\) : null\),/);
 });

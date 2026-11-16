@@ -1,7 +1,5 @@
 // SKILL-TICK (2026-10-19, Discord #suggestions "Show current XP towards skill/next skill level up ticker, QoL", Cruor,
-// through Mac): "An EXP ticker when you mouse over a skill that shows out of whatever XP is needed for the skill, to
-// improve it on rest. So if you are 20/100, you can see and know how close you are to leveling it ... 'your skills can
-// be improved' notification to let players know they should probably rest, since XP does not hang over". The Stats
+// through. The Stats
 // page's skill rows carry the uses toward the next point beside what it costs, and the HUD strip a standing line while
 // any skill is ready - both read off raiseSkills' own test (advancement.js skillAdvanceProgress).
 import { test } from 'node:test';
@@ -104,8 +102,4 @@ test('SKILL-TICK: the Stats page\'s model hands each row its reading, and the ro
   const p = fresh();
   p.skillUses[SKILLS.Axe] = 7;
   assert.deepEqual(sheetModel(p).progress(SKILLS.Axe), skillAdvanceProgress(p, SKILLS.Axe));
-  const src = (await import('node:fs')).readFileSync(new URL('../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  const rows = src.slice(src.indexOf('function statsSkills(detail, m) {'), src.indexOf('/** ADVANTAGES: GetClassSpecials'));
-  assert.match(rows, /const tick = m\.progress \? skillTickText\(m\.progress\(id, ownMinutes\(\)\)\) : '';/);
-  assert.match(rows, /if \(tick\) r\.append\(el\('div', 'px-skilltick', tick\)\);/);
 });

@@ -1,5 +1,4 @@
-// SD27 (2026-10-09, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 16): AUDIT SD V - Mac: "let's
-// audit everything", cut short after six of its eight lenses found; the findings two or more lenses met and the highs
+// SD27: AUDIT SD V, cut short after six of its eight lenses found; the findings two or more lenses met and the highs
 // verified and fixed, with Mac's own ask beside them ("disable levitation inside the rift"). A Levitate lifted a body over
 // the Steps (the ward reached the street's flags alone); the bridge was walked on before it was drawn; a fresh Hour showed
 // its End in red; the way back tolled the way home's bell on every arrival and lit the void past the Threshold's rim; the
@@ -41,7 +40,7 @@ test('AUDIT SD V (L1, Mac: "disable levitation inside the rift"): NO LEVITATE IN
   const D = read('src/scenes/dungeonContext.js'), W = read('src/scenes/world.js'), M = read('src/scenes/worldModes.js');
   assert.match(D, /playerLevitating: \(\) => hasActiveEffect\(playerEntity, 'levitate'\) && !levitateWarded\(\) \|\| staffFly\(\),/);
   assert.match(D, /import \{[^}]*\blevitateWarded\b[^}]*\} from '\.\.\/characters\/playerEntity\.js';/);
-  assert.match(W, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/, 'the Hour is warded');   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law (systems/madeLevel.js): the Hour's and the Spire's rows ban it
+  assert.match(W, /registerLevitateWard\(\(\) => inSiegeRoom\(\) \|\| madeRuleHere\('levitate'\) === 'banned'\);/, 'the Hour is warded');
   assert.equal(madeLevelRule('hour', 'levitate'), 'banned');
   assert.match(M, /player\.levitating = dungeonCtx\.playerLevitating\(\);/, 'the dungeon arm reads it');
 });
@@ -95,7 +94,7 @@ test('AUDIT SD V (P1): THE RIFT\'S LOOK IS A FRAME\'S, NEVER MADE - the open Rif
   assert.equal(a.state, 'open'); assert.equal(a, b, 'the same record, call after call'); assert.ok(Object.isFrozen(a));
   assert.deepEqual({ ...a, studs: 0 }, { ...SD_RIFT_OPEN_LOOK, studs: 0 }); assert.equal(a.studs, 5, 'five hours left, five studs');
   const D = read('src/scenes/dungeonContext.js'), W = read('src/scenes/world.js');
-  assert.match(D, /riftCount: \(\) => sdEndWord\(\)\?\.count \?\? null, look: sdRiftLookNow, /);   // AUDIT SD-THROUGH (PIN MOVED, C13): one named closure, the Rift's and the Way Through's
+  assert.match(D, /riftCount: \(\) => sdEndWord\(\)\?\.count \?\? null, look: sdRiftLookNow, /);   // AUDIT SD-THROUGH (
   assert.match(D, /const sdRiftLookNow = \(\) => \(opts\.superRiftLook \? opts\.superRiftLook\(dfLocation\?\.sdSlot\) : sdEndWord\(\)\?\.look\) \?\? null;/);
   // AUDIT SD-THROUGH (B4): and the mode machine forwards the door - it never did, and every look the dungeon host asked fell
   // back to the whole word (world.js sdRiftOf: a record, a seen, a closure and the count's text, four times a frame)

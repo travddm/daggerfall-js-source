@@ -1,10 +1,10 @@
-// PROF12 (2026-10-02, Mac: "2 and 4"; "lets just finish out everything before merge") - THE APOTHECARY OPENED: a seat's
+// PROF12 - THE APOTHECARY OPENED: a seat's
 // Apothecary (Seats-Arc 7.5: "members in Alchemy, Cooking, Jewelcrafting here: +1 step" a tier) raised now its three
 // professions' stations stand (fortLaw APOTHECARY_OPEN - AUDIT SEATS-2 L5's gate), and its step a tier for the holder's
 // members crafting in its town, each profession's own: a piece of jewellery a quality step (the Forge's and the Workshop's
 // law), a dish its XP half again (a dish takes no quality - recipeLaw cookXp), a brew its Potent chance +10 (alchemyLaw
 // potentChance). Nobody else, nowhere else, and no other hall's. Driven through the real Worker over node:sqlite with every
-// migration applied (test/accountDb.mjs). bible/11-Multiplayer/Seats-Arc.md 7.5; Professions-Arc.md 37.
+// migration applied (test/accountDb.mjs). 7.5; Professions-Arc.md 37.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';
@@ -45,7 +45,7 @@ async function stood(t) {
     raw.prepare('INSERT INTO guild_members (player, char_id, guild_id, rank, name, joined_at) VALUES (?, ?, ?, ?, ?, ?)').run(m.id, m.character, gid, 2, handle, T0 - 30 * DAY);
     return m;
   };
-  const work = (w, tier) => raw.prepare(`INSERT INTO town_seat_forts (key, work, tier, building, stands_at, at) VALUES (?, ?, ?, NULL, NULL, ?)
+  const work = (w, tier) => raw.prepare(`INSERT INTO town_seat_forts (key, work, tier, at) VALUES (?, ?, ?, ?)
     ON CONFLICT (key, work) DO UPDATE SET tier = excluded.tier`).run(ANTICLERE.key, w, tier, T0);
   const give = (who, m, qty = 1) => raw.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, ?, 'own', ?)
     ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = prof_stores.qty + excluded.qty`).run(who.id, who.character, m, qty);
@@ -66,22 +66,18 @@ async function stood(t) {
   };
   const treasury = (n) => raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('mint', NULL, 'guild', ?, 'test', ?, 1, 1, 'seed', NULL, ?)`).run(gid, n, `seed-${gid}-${n}`);
-  const stock = (material, qty) => raw.prepare(`INSERT INTO town_seat_stockpile (key, material, qty) VALUES (?, ?, ?)
-    ON CONFLICT (key, material) DO UPDATE SET qty = town_seat_stockpile.qty + excluded.qty`).run(ANTICLERE.key, material, qty);
-  return { svc, raw, gm, gid, member, work, give, setXp, craft, brew, treasury, stock };
+  return { svc, raw, gm, gid, member, work, give, setXp, craft, brew, treasury };
 }
 
-test('PROF12 APOTHECARY: the gate open - the law raises it at any seat (AUDIT SEATS-2 L5\'s gate, PIN MOVED there), and the holder\'s Guildmaster begins its first tier at the board, its 100 Cut Stone and 100 Oak Planks from the stockpile, where it was `fort-not-here` (mutant: the gate shut)', async (t) => {
+test('PROF12 APOTHECARY: the gate open - the law raises it at any seat (AUDIT SEATS-2 L5\'s gate, PIN MOVED there), and the holder\'s Guildmaster begins its first tier at the board, its Marks burnt from the treasury and the tier standing at once', async (t) => {
   assert.equal(APOTHECARY_OPEN, true);
   assert.equal(fortMayRaise('apothecary', { tier: 'palace' }), true);
   assert.equal(fortMayRaise('apothecary', { tier: 'crown' }), true);
   const s = await stood(t);
   s.treasury(5_000);
-  s.stock('stone:cut', 100);
-  s.stock('plank:oak', 100);
   const r = await s.svc.call('/v1/seats/fort/fund', { character: s.gm.character, key: ANTICLERE.key, work: 'apothecary', rid: rid() }, s.gm.secret);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual([r.body.tier, r.body.forts.works.apothecary.standsAt], [1, T0 + 2 * DAY], 'met at once, standing its two days');
+  assert.deepEqual([r.body.tier, r.body.marks, r.body.forts.works.apothecary.tier], [1, 700, 1], 'paid once, standing at once');
 });
 
 test('PROF12 APOTHECARY: a holder\'s member cutting a piece of jewellery in its town takes a quality step a tier - the tier-2 Apothecary\'s two (Crude to Fine); a stranger none, another town none, and the Forge none (mutants: the profession\'s hall; the seat; the member)', async (t) => {
@@ -105,15 +101,15 @@ test('PROF12 APOTHECARY: a dish takes no quality - DECIDED, its step is the clea
   const stranger = await s.svc.seated('Stranger');
   const first = await s.craft(cook, 'stew:north', null);
   assert.deepEqual([first.xp, first.quality], [20 + firstCraftXp(recipeById('stew:north')), -1], 'the first: 20 and Provisioning\'s first-make share, no quality');   // PIN MOVED (FIRST-BUDGET): the first's XP its track's first-make share (recipeLaw firstCraftXp), no longer a flat 500
-  s.setXp(cook, 'provisioning', 0);   // PIN MOVED (FIRST-BUDGET): the first's 3,155 lifts the cook to rank 17 (a dish XP follows the rank) - set back to a Novice, so the halves below read at tier 1 as they did
+  s.setXp(cook, 'provisioning', 0);
   assert.equal((await s.craft(cook, 'stew:north', ANTICLERE.key)).xp, 20, 'no Apothecary standing: the plain dish');
   s.work('apothecary', 1);
   assert.equal((await s.craft(cook, 'stew:north', ANTICLERE.key)).xp, 30, 'tier 1: half again');
   s.work('apothecary', 2);
   const best = await s.craft(cook, 'stew:north', ANTICLERE.key, { clean: true });
   assert.deepEqual([best.xp, best.quality], [50, -1], 'a clean pan at tier 2: (2 + 1 + 2) halves');
-  assert.equal((await s.craft(stranger, 'stew:north', ANTICLERE.key)).xp, 20 + firstCraftXp(recipeById('stew:north')), 'a stranger: the plain dish (and its own first)');   // PIN MOVED (FIRST-BUDGET)
-  s.setXp(cook, 'provisioning', 0);   // PIN MOVED (FIRST-BUDGET): the clean pan's 50 at tier 1 still a Novice's
+  assert.equal((await s.craft(stranger, 'stew:north', ANTICLERE.key)).xp, 20 + firstCraftXp(recipeById('stew:north')), 'a stranger: the plain dish (and its own first)');
+  s.setXp(cook, 'provisioning', 0);
   assert.equal((await s.craft(cook, 'stew:north', ASHFIELD.key)).xp, 20, 'another town: the plain dish');
 });
 

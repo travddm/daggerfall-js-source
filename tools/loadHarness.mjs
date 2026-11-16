@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// SCALE3 (2026-10-08, Mac: "Do 1 2 and 3"): THE LOAD HARNESS - a fleet of bots against the REAL relay and the REAL account
-// service, both in local workerd, at the real client's own rates, measured (bible/11-Multiplayer/Scale-Arc.md SCALE3).
+// SCALE3: THE LOAD HARNESS - a fleet of bots against the REAL relay and the REAL account
+// service, both in local workerd, at the real client's own rates, measured (SCALE3).
 //
 //   npm run load                                    50 bots, three minutes standing play
-//   node tools/loadHarness.mjs --bots 200 --minutes 5
-//   node tools/loadHarness.mjs --scenario storm     the same, and halfway the relay is restarted under the fleet (a deploy)
-//   node tools/loadHarness.mjs --json out.json      every figure, for a machine
-//   node tools/loadHarness.mjs --help               every knob
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --bots 200 --minutes 5
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --scenario storm     the same, and halfway the relay is restarted under the fleet (a deploy)
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --json out.json      every figure, for a machine
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --help               every knob
 //
 // WRANGLER_BIN names a wrangler to run (`npm ci` in server/ installs one - server/node_modules/.bin/wrangler, which is
 // taken by default when it is there); without one, `npx --yes wrangler@4` (minutes a call on a cold cache). It runs on
@@ -68,7 +68,7 @@
 //
 // It is NOT in the suite and has no Testing.md row, for the account probe's reason (tools/accountProbe.mjs): it needs a
 // toolchain and minutes. Its parts that can be pinned without one are - test/net/scale3.test.js.
-import { spawn, execFile } from 'node:child_process';
+import { spawn, execFile, execFileSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtempSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -165,7 +165,7 @@ export function parseArgs(argv) {
 // ═══ ONLY ITS OWN TWO ADDRESSES ════════════════════════════════════════════════════════════════════════════════════
 
 /** The account service's address as the bots' storage names it. The client accepts only an https base
- *  (accountClient.js serviceBase) and falls back to the PRODUCTION service for anything else - so the bots are given
+ *  (account-service-address.ts isServiceUrl) and knows no service for anything else - so the bots are given
  *  this one, which resolves nowhere, and `localFetch` maps it to the local Worker. */
 export const LOAD_SERVICE = 'https://accounts.load.invalid';
 
@@ -205,7 +205,7 @@ export function localFetch({ port, ip = null, note = null, request = httpRequest
   };
 }
 
-/** AUDIT SCALE II L5 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): ONE FRAME THE ROOM SAID,
+/** AUDIT SCALE II L5: ONE FRAME THE ROOM SAID,
  *  TALLIED - its kind in `saidByType`, a pose's age from its sender's stamp, a refusal by its word and a welcome to its
  *  bot. A second-wire batch (SCALE5b) is opened as the client opens it (net/online.js _poses, _batch): each `poses` entry
  *  `[id, slim pose]` is one pose, aged by its `ts` where it carries one, and each frame of a frame batch (`fb`) is its
@@ -388,6 +388,48 @@ function stopDev(p) {
 }
 export const stopAll = () => { for (const p of [...started]) stopDev(p); };
 
+/** The pids listening on a local port, for a process that outlived its tree's kill (a workerd that left the group). */
+function listeners(port) {
+  try {
+    if (process.platform === 'win32') {
+      const out = execFileSync('netstat', ['-ano', '-p', 'tcp'], { encoding: 'utf8', windowsHide: true });
+      return [...new Set(out.split('\n').filter((l) => l.includes(`127.0.0.1:${port} `) && /LISTENING/.test(l)).map((l) => l.trim().split(/\s+/).pop()))];
+    }
+    return execFileSync('lsof', ['-t', '-i', `tcp:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).split('\n').filter(Boolean);
+  } catch { return []; }
+}
+function killListeners(port) {
+  for (const pid of listeners(port)) { try { killTree(Number(pid), 'SIGKILL'); } catch { /* gone */ } }
+}
+
+/** Stop what this run started, then wait - bounded - until the ports are free, so a restart does not meet the first
+ *  start's leftover workerd on them. A port still held at the half way mark has a holder that outlived the kill (the
+ *  ports are this run's own): its listener is killed too. Returns whether the ports are free. */
+export async function stopAndFree(ports, { stop = stopAll, held = portHeld, wait = sleep, killHolder = killListeners, timeoutMs = 20_000, stepMs = 250 } = {}) {
+  stop();
+  let killed = false;
+  for (let waited = 0; waited < timeoutMs; waited += stepMs) {
+    const busy = [];
+    for (const port of ports) if (await held(port)) busy.push(port);
+    if (!busy.length) return true;
+    if (!killed && waited >= timeoutMs / 2) { killed = true; for (const port of busy) killHolder(port); }
+    await wait(stepMs);
+  }
+  return false;
+}
+
+/** standServices, once more when the first start fails (wrangler's dev server now and then dies while it boots): the
+ *  first start is stopped and its ports freed before the second begins. */
+export async function standServicesRetrying(o, state, { stand = standServices, free = stopAndFree, log = console.log } = {}) {
+  try {
+    return await stand(o, state);
+  } catch (e) {
+    log(`   the services did not start, once more: ${String(e?.message).slice(0, 200)}`);
+    if (!(await free([o.port, o.port + 1]))) throw new Error(`the first start's ports stayed held: ${String(e?.message).slice(0, 200)}`);
+    return stand(o, state);
+  }
+}
+
 // ═══ THE SERVICES ══════════════════════════════════════════════════════════════════════════════════════════════════
 
 export async function standServices(o, state) {
@@ -500,7 +542,7 @@ export function makeBot(n, o, ctx) {
   return bot;
 }
 
-/** AUDIT SCALE II L3 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): how many times a bot asks
+/** AUDIT SCALE II L3: how many times a bot asks
  *  for its guest at the sign-in line before its setup fails - each after the wait the line told (ADMIT-LINE,
  *  server-account/src/admit.js: never under a second), so a bot stands in the line at least half a minute. */
 export const LINE_ASKS_MAX = 30;
@@ -1024,7 +1066,7 @@ if (isMainThread && isMain(import.meta.url)) {
   let o;
   try { o = parseArgs(process.argv.slice(2)); } catch (e) { console.error(String(e?.message ?? e)); process.exit(2); }
   if (o.help) {
-    console.log('node tools/loadHarness.mjs [--knob value]...\n');
+    console.log('node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs [--knob value]...\n');
     for (const [k, [v, what]] of Object.entries(KNOBS)) console.log(`  --${pad(k, 12)} ${pad(JSON.stringify(v), 10)} ${what}`);
     process.exit(0);
   }

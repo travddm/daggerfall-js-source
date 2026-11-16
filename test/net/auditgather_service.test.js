@@ -1,4 +1,4 @@
-// AUDIT GATHER (2026-10-26; bible/06-Systems/Professions-Arc.md section 55): THE AUDIT'S SERVICE PINS, driven through the
+// AUDIT GATHER: THE AUDIT'S SERVICE PINS, driven through the
 // real Worker over node:sqlite with every migration applied (test/accountDb.mjs), each failing on the code before its fix.
 //   F2 - a Motherlode is struck only once it has risen on the SERVICE's clock: the act's end is the client's word, allowed
 //        HARVEST_EARLY_S past the service's now, and a strike sent early took a slot before any honest client saw it.
@@ -60,7 +60,7 @@ test('AUDIT GATHER F2: a Motherlode is struck only once it has risen on the serv
 test('AUDIT GATHER F3: a school\'s fish on the account\'s first SCHOOL_HAULS_DAY SCHOOLS of the day - forty plain hauls take nothing from the bound (AUDIT LOCKPICK D2), the fortieth school counted, the forty-first not; every haul still credited (CAP-OFF) (mutants: the bound unread; one school over; every haul counted)', async () => {
   const NOON = DAY0 * DAY + 12 * 3600;
   clock(NOON);
-  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on' });
+  const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', PROF_DAY_CAPS: 'off' });
   const mac = await s.seated('Mac');
   let id = 0;
   const haul = (act) => s.call('/v1/prof/harvest', {

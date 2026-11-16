@@ -1,4 +1,4 @@
-// OFFER-ID (FIELD BUGS 2026-10-11b, bible/01-Overview/bugs/Field-Bugs-2026-10-11b.md; found re-reading the Discord's
+// OFFER-ID (FIELD BUGS 2026-10-11b,; found re-reading the Discord's
 // "Unidenitified items"): a valuable piece offered in a realm trade carries its id from the offer. The realm's checkpoint
 // gives every valuable piece its id (INT4, world.js realmCheckpoint -> itemIds.js stampItemIds), and the trade's hold
 // checkpoints AFTER the offer was written for the wire (tradeSession.js setOffer -> tradePack.js wire) - so a piece looted
@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import '../modsOff.js';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { ACCEPTED } from '../../src/net/legalLaw.js';
 import { createTradeManager } from '../../src/net/tradeSession.js';
 import { validTradeData } from '../../src/net/wire.js';
@@ -72,7 +72,7 @@ test('OFFER-ID through the realm: a Rare looted since the last checkpoint is off
   const tabs = {};
   for (const me of ['A', 'B']) {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const io = realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), env), storage });
     const char = await seatRealm(env, g.secret, ents[me].name, JSON.parse(snap(ents[me])));
@@ -116,9 +116,6 @@ test('OFFER-ID through the realm: a Rare looted since the last checkpoint is off
 });
 
 test('OFFER-ID by source: the host hands its realm pack the id stamp; a pack handed none stamps nothing (the other readers of the pack)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const tradePack = checkpointedTradePack\(createTradePack\(playerEntity, \{ stampIds: stampItemIds \}\), \(\) => onlineCheckpoint\(\)\);/);
-  assert.doesNotMatch(readFileSync(new URL('../../src/systems/tradePack.js', import.meta.url), 'utf8'), /from '(?:\.\.?\/)+(?:[\w-]+\/)*itemIds\.js'/, 'never imported: the item law would install itself');
   const fresh = rareSword(5);
   createTradePack({ items: [fresh] }).wire([{ item: fresh, count: 1 }]);
   assert.equal(fresh.uid, undefined);

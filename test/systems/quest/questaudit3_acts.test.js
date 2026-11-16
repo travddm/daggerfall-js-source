@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The audit's fixes to the quest ACTIONS and the
+// QUEST-AUDIT III. The audit's fixes to the quest ACTIONS and the
 // MACROS, each pinned here (questaudit3.test.js holds the machine's):
 //
 // - SEND-HELD: a `send` wave due outside a town waits for one (CreateFoe._tryPlacement) and raises no encounter while it
@@ -319,7 +318,6 @@ test('JOKE-MACROS: %jok\'s joke reads its own macros through the table, in the c
 });
 
 const RSC = process.env.ARENA2_PATH ? join(process.env.ARENA2_PATH, 'TEXT.RSC') : null;
-// PIN MOVED (AUDIT QA3 C4, F7): thirteen quests' rumors tell a joke, not eight; and the tavern's name drops its own "The"
 // after the joke's "the " - "Over at the Mole and Jug", never "the The Mole and Jug".
 test('JOKE-MACROS over the real data: none of TEXT.RSC 200\'s 23 jokes (K0C00Y05\'s child and thirteen quests\' rumors tell them) leaves a macro raw, nor says "the The" (needs ARENA2)', { skip: RSC && existsSync(RSC) ? false : 'no ARENA2 - sh tools/fetch-data.sh, then ARENA2_PATH' }, () => {
   const rsc = new TextRsc().load(new Uint8Array(readFileSync(RSC)));
@@ -345,7 +343,6 @@ test('JOKE-MACROS over the real data: none of TEXT.RSC 200\'s 23 jokes (K0C00Y05
 
 const sited = (scope, locationName, buildingKey = 0) => ({ scope, siteDetails: { locationName, buildingKey } });
 const PLACES = { home: sited('remote', 'Wickfield'), tavern: sited('remote', 'Mole and Jug'), limbo: { scope: 'remote', siteDetails: null }, shop: sited('local', 'Bigtown', 7) };
-// PIN MOVED (AUDIT QA3 C2): %di reads a Person's dialog place (person.js getDialogPlace: where it stands, else its home) -
 // each Person here answers the Place it stands at
 const standsAt = (place) => ({ isPerson: true, assignedPlaceSymbol: place ? { name: place } : null, getDialogPlace: () => (place ? PLACES[place] ?? null : null) });
 /** A quest as %di reads it: its resources in declaration order, its places, and the Place last referenced (none after a load). */

@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1d (2026-09-30, Mac: "Lets do this") — THE GUILD HALL
-// (bible/11-Multiplayer/Seats-Arc.md 8.2).
+// GUILD1d — THE GUILD HALL
+// (8.2).
 //
 // A guild owns ONE home as its hall, bought from its gold treasury at
 // the home's own price and half again, and owned by the GUILD, never a

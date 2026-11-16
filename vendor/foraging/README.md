@@ -11,9 +11,9 @@ Fish, and a Basket to Forage for Food."
 Mac (Lattymoy) handed the shipped zip over on 2026-09-28 - "Heres this
 for life skills" - and, asked whether the port has the author's
 permission, answered "Yes, permission" the same day. It is ported 1:1 as
-its own mod (`bible/06-Systems/Foraging.md`, FORAGE0-FORAGE2), and its
+its own mod (`docs/systems/professions.md`, FORAGE0-FORAGE2), and its
 tools are to be the online professions' tools
-(`bible/06-Systems/Professions-Arc.md`, PROF0).
+(`docs/systems/professions.md`, PROF0).
 
 **Permission: [Mac: record the author's permission, or the link to it,
 here - Mac confirmed on 2026-09-28 that Harbinger451 gave it ("Yes,

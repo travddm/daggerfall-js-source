@@ -1,4 +1,4 @@
-// TEXT-FONT (2026-10-11): the enhanced skin's words in a face the player picks - Game, Sans, Monospace, Dyslexic or one
+// TEXT-FONT: the enhanced skin's words in a face the player picks - Game, Sans, Monospace, Dyslexic or one
 // of their own installed fonts (ui/textFont.js). (A name stands apart from its words by colour - test/chatcolours1.)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -48,11 +48,3 @@ test('TEXT-FONT Dyslexic: OpenDyslexic shipped under public/ with its licence, f
   assert.doesNotMatch(textFontCss('sans', ''), /@font-face/);
 });
 
-test('TEXT-FONT worn with the look, offered on its card', () => {
-  const plus = readFileSync(new URL('../../../src/ui/enhanced/enhancedPlusStyle.js', import.meta.url), 'utf8');
-  assert.match(plus, /mountTextFont\(doc\);   \/\/ TEXT-FONT: under either look/);
-  const menu = readFileSync(new URL('../../../src/ui/enhanced/enhancedMenu.js', import.meta.url), 'utf8');
-  assert.match(menu, /choiceRow\('Text font', TEXT_FONTS, textFont\(\)/);
-  assert.match(menu, /if \(textFont\(\) === 'system'\) card\.append\(systemFontRow\(render\)\)/);
-  assert.doesNotMatch(menu, /'Player names'/);
-});

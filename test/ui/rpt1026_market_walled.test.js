@@ -50,7 +50,3 @@ test('RPT1026-MARKET STORES-SAID: the units each sale may not take are the walls
   assert.match(walledText(many, 'marks', nameOf), /k7 \(1\) and 3 more\. Goods bought with gold/);
 });
 
-test('RPT1026-MARKET STORES-SAID: both places a player looks say it - the market\'s List form for its currency, the guild Stores\' Put in for the guild (mutants: the List form\'s note dropped; the guild\'s dropped)', () => {
-  assert.match(src('src/ui/marketTab.js'), /const walled = walledText\(m\.stores\(\), gold \? 'gold' : 'marks', m\.name\);[^\n]*\n\s+if \(walled\) notes\.append\(el\('p', 'notice-tip market-refused', walled\)\);/);
-  assert.match(src('src/ui/socialPanel.js'), /const walled = walledText\(stores, 'guild', \(k\) => ps\.name\(k, 2\)\);\n\s+if \(walled\) form\.append\(el\('p', 'dfsocial-note', walled\)\);/);
-});

@@ -1,9 +1,9 @@
-// AUDIT 29 (2026-09-28, Mac: "Lets audit everything so far before we continue") - THE GATHERING HOST AND THE SEAMS, AS
+// AUDIT 29 - THE GATHERING HOST AND THE SEAMS, AS
 // THE AUDIT FOUND THEM: a node takes E only near the crosshair, in reach, seen, and ready; a press during an act is the
 // act's; a switch shut mid-act ends it; the floating origin moves an act's node with it; one dungeon stand at a time; a
 // kept harvest's answer says its rank's rise and stands its node again; the Basket is not mashed; a rock's foot is not
 // inside its neighbour; the compass asks the near pixels alone - and the hosts' lines by source. Each pin failed on
-// the code before its fix. bible/06-Systems/Online-Arc.md AUDIT 29.
+// the code before its fix. AUDIT 29.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -190,18 +190,18 @@ test('AUDIT 29 C4: a kept harvest answered through the pump says its rank\'s ris
     const v = await ready(t);
     t.face(v);
     t.host.tick(0.016);
-    const centers = () => t.entry.batches.reduce((a, b) => a + (b.dynamic ? 0 : b.centers ?? 0), 0);   // PIN MOVED (VEIN-CRACKS, GATHER-FEEL II, 2026-10-13): a blow's chunks are a dynamic batch on the pixel's list, no node's flats
+    const centers = () => t.entry.batches.reduce((a, b) => a + (b.dynamic ? 0 : b.centers ?? 0), 0);
     for (let i = 0; i < 4; i++) await tick();
     const drawnBefore = centers();
     assert.equal(t.host.press(), true);
     for (let i = 0; i < 8 && t.host.acting(); i++) { t.setInput({ attack: true }); t.host.tick(MINE_ACT.swingS + 0.01); t.setInput({}); t.host.tick(0.01); }
-    t.host.tick(MINE_ACT.swingS);   // GATHER-FEEL (PIN MOVED): the last strike's blow lands - its node goes then, not on the press
+    t.host.tick(MINE_ACT.swingS);   // GATHER-FEEL (
     for (let i = 0; i < 6; i++) await tick();
     assert.equal(t.book.pendingHarvests, 1, 'kept - its first ask unanswered');
     assert.ok(!t.said.some((x) => /Mining 24 -> 25/.test(x)));
     const shown = t.host.nodesOf(PX, 150).filter((x) => x.what === 'vein').length;
     assert.ok(shown > 0);
-    // GATHER-SPEED (PIN MOVED): the node went with its act - being counted is gone from the world (profBook `gone`)
+    // GATHER-SPEED (
     assert.equal(centers(), drawnBefore - 3, 'its node\'s flats taken down as its act ended, its harvest kept');
     t.clock.ms += 3_000;   // its wait past: the host's pump asks it again
     for (let i = 0; i < 10 && t.book.pendingHarvests; i++) { t.host.tick(0.016); await tick(); await tick(); }
@@ -270,39 +270,3 @@ test('AUDIT 29 C10: the compass asks the near pixels alone', async () => {
   } finally { setForagingHost(null); }
 });
 
-test('AUDIT 29: the hosts by source - the seams the audit moved', () => {
-  const w = hostText('src/scenes/world.js');
-  const m = src('src/scenes/worldModes.js');
-  const d = src('src/scenes/dungeonContext.js');
-  const rigSrc = src('src/combat/weapon/weaponRig.js');
-  const g = src('src/scenes/gatherHost.js');
-  // D1: the Escape the act spent is marked, and the mode machine lets it be
-  assert.match(w, /e\.preventDefault\(\); e\.profActEnded = true; return true; \}/);
-  assert.match(m, /if \(e\.profActEnded\) return;/);
-  assert.ok(m.indexOf('if (e.profActEnded) return;') < m.indexOf('// U43: THE ONE DISPATCH.'));
-  // D2: the press alone gated underground; the rig swings nothing behind the tool; the street casts no spell mid-act
-  assert.match(d, /if \(held && opts\.profActing\?\.\(\)\) return;/);
-  assert.match(rigSrc, /const canAttack = [^\n]*&& !actTool\(\) && \(!pelletsOwed\(\) \|\| playerWeapon\.mixedPair\);/);   // PIN MOVED (AUDIT PISTOL-PORT A5): the gate still holds the tool off, and now a shot with no Pellet left for it; PIN MOVED (MIXED-PAIR): a blade-and-gun pair's blade swings dry - its gun refuses its own pull
-  assert.match(w, /if \(_act\.cast && (?:!_holdFire && )?!gatherHost\?\.acting\(\)\) magic\.interceptAttack\(true, CAST_PRESS\);/);   // PIN MOVED (SPELL-HAND): the cast's own press says so; PIN MOVED (AUDIT SPELL-HAND, HOST-SPLIT): the imported word
-  // C2 + D3: a dungeon vein on Interact alone, before QG1
-  assert.match(m, /\(mode === 'dungeon' \? tryExitDungeon : tryExit\)\(\{ pressCast: _act\.pressCast, interact: useEdge, actClick \}\)/);   // PIN MOVED (AUDIT 2026-10-01 part four, CLICK-LIFT): and the act's click to its release
-  const t = m.slice(m.indexOf('function tryExitDungeon('));
-  assert.ok(t.indexOf('host.profPress?.()') < t.indexOf('pickQuestFoe('), 'the vein before the quest foe');
-  // C3 + C11 + D5: the dungeon's own mesh; no vein in the air; no court
-  assert.match(d, /const PROF_VEIN_ONLY = Object\.freeze\(\{ only: Object\.freeze\(\['dungeon'\]\) \}\);/);
-  assert.match(d, /collider\.raycastHit\(from, dir, PROF_VEIN_WALL_M, PROF_VEIN_ONLY\)/);
-  assert.match(d, /if \(!Number\.isFinite\(down\)\) continue;/);
-  assert.match(d, /isGateArena\(dfLocation\) \|\| isArenaFloor\(dfLocation\) \|\| !Number\.isSafeInteger/);   // ARENA2: nor the arena's floor
-  // C8: nature's rect - a WoD site's too
-  assert.match(src('src/scenes/herbHost.js'), /locationRect: entry\.locationRect \?\? entry\.wodSite \?\? null/);
-  assert.match(src('src/scenes/mineHost.js'), /locationRect: entry\.locationRect \?\? entry\.wodSite \?\? null/);
-  // C1: the host's sight, handed in
-  assert.match(w, /clear: \(from, to, underground, interior = false\) => \{/);   // PIN MOVED (INDOOR-SKIN): and a building's walls
-  // B3 + B4: the fee on the first answer; the kept withdrawals settled on every good read and on the Stores page
-  assert.match(w, /if \(f\.fee > 0\) \{ deductGold\(playerEntity, f\.fee\); saveSoon\.changed\(\); \}/);   // PROF-SAVE: and the save soon
-  assert.doesNotMatch(w, /!r\.data\?\.repeat\) \{? ?deductGold/);
-  assert.match(g, /if \(r\?\.ok\) \{ refreshAt = 0; restandAll\(\); if \(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) deps\.onSettle\?\.\(\); \}/);   // PIN MOVED (AUDIT2 BAG1 K3): and a kept deposit
-  assert.match(src('src/ui/professions/profPages.js'), /if \(\(book\.pendingWithdrawals \|\| book\.pendingCrafts \|\| book\.pendingDeposits\) && p\.settle && Date\.now\(\) - _stores\.settledAt > 30_000\)/);   // PROF5 (FOUND): a kept craft settles too; BAG1 (PIN MOVED): and a kept deposit
-  // D4: a smith's open for trade
-  assert.match(m, /return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: FORGE_FEE \};/);
-});

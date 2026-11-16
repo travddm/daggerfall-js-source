@@ -1,4 +1,4 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
@@ -6,11 +6,13 @@ import { addGold } from '../systems/court.js';
 import { charSheetDoorReady } from '../ui/charSheetDoor.js';
 import { isNight } from '../world/worldClock.js';
 import { playerEntity } from '../characters/playerEntity.js';
+import { partyAt } from '../systems/livingWorld/trips.js';   // WW7-7: the road's parties placed, for the probe
+import { skyMinutes } from '../systems/worldTick.js';
 
 /** @param {any} host */
 export function createTownProbes(host) {
   const {
-    _crimeResponse, built, cam, cityGuards, droppedLoot, minuteNow, state, townTalk, weaponRig
+    _crimeResponse, built, cam, cityGuards, droppedLoot, livingRoadsOf, minuteNow, state, townTalk, weaponRig
   } = host;
   // T2: the townsfolk probe surface - aggregated over built pixels,
   // positions reported in WORLD space (through the live translation).
@@ -40,10 +42,18 @@ export function createTownProbes(host) {
       return JSON.stringify(out);
     };
     window.__talk = () => JSON.stringify(townTalk._debug());   // T3b probe surface
+    // WW7-7 probe surface (WW7-7): the road's parties the living world's roads layer has near,
+    // each where its trip has it at the sky's minute - native, and in the scene - its kind and its two ends
+    window.__livingRoads = () => (livingRoadsOf?.()?.parties() ?? []).map((p) => {
+      const at = partyAt(p.trip, skyMinutes());
+      const placed = Number.isFinite(at.x) && Number.isFinite(at.z);
+      return { id: p.trip.id, kind: p.trip.kind, from: p.trip.from?.name ?? null, to: p.trip.to?.name ?? null, home: [p.trip.from?.px, p.trip.from?.py],
+        party: p.trip.party?.length ?? 1, phase: at.phase, camp: !!at.camp, native: placed ? [at.x, at.z] : null, scene: placed ? state.localFromWorld(at.x, at.z) : null };
+    });
     // MAP3: the held pose's tuning door - `__heldPose()` reads the pose in
     // force while the map is up, `__heldPose({ bones: { 'left forearm':
     // [rx, ry, rz], ... }, paper: { width, forward, drop, tilt } })` re-places
-    // the sheet on the live arm (bible/10-UI/Held-Map-Arc.md, MAP3)
+    // the sheet on the live arm (, MAP3)
     window.__heldPose = (spec) => (spec ? weaponRig?.setHeldPose?.(spec) : weaponRig?.heldPose?.());
     window.__chargenRace = () => townTalk._debug().overlayFlow?.race?.key ?? null;   // U10 probe surface
     window.__chargenConfirm = () => townTalk._debug().overlayFlow?.raceConfirm ?? null;   // U11 probe surface

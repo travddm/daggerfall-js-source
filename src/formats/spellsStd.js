@@ -75,14 +75,14 @@ export function readSpellRecord(bytes, offset = 0) {
 }
 
 /** DaggerfallSpellReader.ReadSpellsFile: every record through
- *  readSpellRecord's gate (AUDIT 68 S12-spellsstd-dup: one gate, not two),
+ *  readSpellRecord's gate (one gate, not two),
  *  then EntityEffectBroker's Free Action patch - DFU's own order. */
 export function readSpellsStd(bytes) {
   const spells = [];
   for (let o = 0; o + SPELL_RECORD_SIZE <= bytes.byteLength; o += SPELL_RECORD_SIZE) {
     const rec = readSpellRecord(bytes, o);
     if (!rec) continue;
-    // AUDIT 23 (magic-1) - EntityEffectBroker.cs:892-900: "Fix bad Free
+    // EntityEffectBroker.cs:892-900: "Fix bad Free
     // Action spell data from SPELLS.STD at runtime". Spell index 10
     // effect 0 says Cure Paralyzation (3,2) where classic intends Free
     // Action; DFU patches type=26/subType=-1 and so do we.

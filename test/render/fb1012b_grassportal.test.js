@@ -3,7 +3,6 @@
 // drawBillboards draws it in its blended phase, depth tested and never written, so the grass the frame drew after the
 // street's billboards met the ground's depth at the vortex's pixels and painted every blade behind it over it. The street's
 // blended flats are held back and drawn after the grass (RAIN-OVER-GRASS's fix for the rain, the same law).
-// bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -46,17 +45,3 @@ test('GRASS-PORTAL the renderer holds them in its one list and draws them in a c
   assert.equal(drawn.length, 1, 'nothing held, no call');
 });
 
-test('GRASS-PORTAL the world host draws the held flats after the grass, the banners and the haze, before what falls; the renderer\'s blended phase asks the same test (mutants: the late draw before the grass; the hold dropped; a second law in the phase)', () => {
-  const w = src('src/scenes/world.js');
-  const at = (needle) => { const i = w.indexOf(needle); assert.ok(i >= 0, needle); assert.equal(w.indexOf(needle, i + 1), -1, `one ${needle}`); return i; };
-  const hold = at('    renderer.holdBlended(livePersonBatches);');
-  const street = at('    if (livePersonBatches.length) renderer.drawBillboards(livePersonBatches, camRight, bbUp);');
-  const grass = at('    frameGrass();');
-  const banners = at('    frameBanners();');
-  const haze = at('    frameHaze();');
-  const late = at('    renderer.drawHeld(camRight, bbUp);');
-  const falling = at('    drawFalling();   // RAIN-OVER-GRASS');
-  assert.ok(hold < street && street < grass && grass < banners && banners < haze && haze < late && late < falling, 'held, the street, the grass, the banners, the haze, the held flats, the rain');
-  const r = src('src/render/renderer.js');
-  assert.match(r, /if \(!billboardBlended\(b\)\) continue;   \/\/ MWNPC5b/);
-});

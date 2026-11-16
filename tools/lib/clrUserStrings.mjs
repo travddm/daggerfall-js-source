@@ -1,11 +1,11 @@
-// CSA-A (2026-09-27): THE STRING LITERALS OF A .NET ASSEMBLY - its #US heap.
+// CSA-A: THE STRING LITERALS OF A .NET ASSEMBLY - its #US heap.
 //
 // Every string a C# method names in its code (`settings.GetBool("Waves",
 // "Enable")`, a HUD line, a node's name) is an `ldstr` of one entry in the
 // metadata's user-string heap (ECMA-335 II.24.2.4). So a key a mod ships in
 // its modsettings.json and never names in that heap is a key no method of
 // the assembly can read - which is how Come Sail Away's page proves its
-// three unread keys (bible/03-World/Come-Sail-Away.md) off the shipped DLL
+// three unread keys off the shipped DLL
 // rather than off a decompiler's word.
 //
 // The walk: the PE header to the CLI header (data directory 14), the

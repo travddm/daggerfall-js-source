@@ -7,8 +7,8 @@
 // [Video] beside twenty-four keys about shadow map resolution. So the
 // screen needs its own taxonomy, and this file is it.
 //
-// ORG2 (2026-10-09, Mac: "Graphic settings needs its own tab, etc. I really need you to go all in"): ONE SCREEN, ONE
-// MAP. Settings (DFU's 171 keys in seven categories) and the Features home (the port's own rows and the mods, 96 tiles
+// ORG2: ONE SCREEN, ONE
+// MAP. Settings (DFU's 173 keys in seven categories) and the Features home (the port's own rows and the mods, 96 tiles
 // in seven groups of their own) were two doors over one subject - the grass was under Features > Sight while the field
 // of view was under Settings > Video, and a player wanting "the graphics" opened both. Now one map places EVERYTHING:
 // a TAB (the rail: Graphics, Gameplay, Combat, World, Interface, Audio, Controls, Accessibility, Mods & files), then a
@@ -18,7 +18,7 @@
 //   "feat:<id>"     a row of the Features registry (systems/features.js)
 //   "port:<id>"     one of the port's own rows (ui/enhanced/enhancedMenu.js: the HUD's, the touch knobs, the quest repair...)
 //   "card:<id>"     a card (the Morrowind files, the packs, other players, the night's sounds)
-//   "preset:graphics", "bindings", "link:overhauls", "mods-index" - the screen's own pieces
+//   "preset:graphics", "preset:classic", "bindings", "link:overhauls", "mods-index" - the screen's own pieces
 //
 // THE MAP IS TOTAL AND DISJOINT: every one of DFU's keys, every Features row and every port row stands in exactly one
 // section, and test/systems/org2_options.test.js pins all three both ways. A DFU re-bake that adds a key, a registry row added
@@ -31,13 +31,13 @@
 export const CATEGORIES = Object.freeze([
   tab("graphics", "Graphics", [
     sec("quality", "Quality", [
-      "preset:graphics"]),
+      "preset:graphics", "preset:classic"]),
     sec("display", "Display", [
       "Video/FieldOfView", "feat:render-scale", "Video/TargetFrameRate", "Video/VSync", "port:showFps", "Video/Fullscreen",
       "Video/ExclusiveFullscreen", "Video/ResolutionWidth", "Video/ResolutionHeight", "Video/QualityLevel", "Video/RunInBackground"]),
     sec("distance", "View distance & detail", [
       "feat:land-view-distance", "Experimental/TerrainDistance", "feat:ground-sharpness", "feat:cloud-quality", "feat:real-windows",
-      "Experimental/TerrainHeightmapPixelError", "Experimental/AssetCacheThreshold"]),
+      "Experimental/TerrainHeightmapPixelError", "Experimental/AssetCacheThreshold", "Video/EnableObjectCulling"]),
     sec("light", "Lighting & brightness", [
       "feat:enhanced-lighting", "feat:modded-lighting", "feat:first-person-lighting", "Enhancements/DungeonAmbientLightScale",
       "Enhancements/NightAmbientLightScale", "Enhancements/PlayerTorchLightScale", "Spells/EnableSpellLighting", "Spells/EnableSpellShadows",
@@ -47,10 +47,11 @@ export const CATEGORIES = Object.freeze([
     sec("plants", "Plants, trees & wind", [
       "feat:grass", "feat:wind", "feat:mod-windfall", "feat:mod-low-poly-trees", "feat:mod-seasons-iliac-bay"]),
     sec("looks", "Textures & looks", [
-      "link:overhauls", "feat:dungeon-wall-style", "Video/RandomDungeonTextures", "Video/MainFilterMode", "GUI/GUIFilterMode", "GUI/VideoFilterMode",
+      "link:overhauls", "feat:dungeon-wall-style", "Video/RandomDungeonTextures", "Video/MainFilterMode", "feat:anisotropic-filtering", "feat:mip-quality", "GUI/GUIFilterMode", "GUI/VideoFilterMode",
       "Video/EnableTextureArrays", "GUI/AccelerateUICopyTexture"]),
     sec("retro", "Retro look", [
-      "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "Video/RetroModeAspectCorrection",
+      "feat:classic-picture", "feat:classic-aspect", "feat:classic-colours", "feat:classic-distance-shading",
+      "Video/RetroRenderingMode", "Video/PostProcessingInRetroMode", "Video/UseMipMapsInRetroMode", "feat:retro-mip-bias", "Video/RetroModeAspectCorrection",
       "Video/PalettizationLUTShift"]),
     sec("shadows", "Daggerfall Unity's shadows", [
       "Video/DungeonLightShadows", "Video/InteriorLightShadows", "Video/ExteriorLightShadows", "Video/MobileNPCShadows",
@@ -67,19 +68,19 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("gameplay", "Gameplay", [
     sec("general", "General", [
-      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "ChildGuard/PlayerNudity"]),
+      "Enhancements/LoiterLimitInHours", "Controls/InstantRepairs", "Controls/AllowMagicRepairs", "feat:repair-price-by-damage", "ChildGuard/PlayerNudity"]),
     sec("quests", "Quests", [
-      "port:questRepair", "feat:questlines", "feat:nearby-quests", "feat:choose-guild-jobs", "Enhancements/GuildQuestListBox", "GUI/CanDropQuestItems",
-      "GUI/QuestRumorWeight", "GUI/EnableQuestDebugger"]),
+      "port:questRepair", "feat:questlines", "feat:questline-rewards", "feat:nearby-quests", "feat:choose-guild-jobs", "Enhancements/GuildQuestListBox", "GUI/CanDropQuestItems",
+      "GUI/QuestRumorWeight", "GUI/EnableQuestDebugger", "Experimental/DungeonsPoolSizeTarget"]),
     sec("dungeons", "Dungeons", [
       "feat:smaller-dungeons", "Experimental/SmallerDungeons", "feat:medium-dungeons", "feat:world-dungeon-sizes", "feat:varied-dungeon-monsters",
-      "Enhancements/AlternateRandomEnemySelection", "feat:mod-aquatic-sprites"]),
+      "Enhancements/AlternateRandomEnemySelection"]),
     sec("loot", "Loot & items", [
-      "feat:quick-loot", "feat:loot-rarity", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
+      "feat:quick-loot", "feat:loot-rarity", "feat:weapon-techniques", "feat:gate-portent-loot", "feat:town-seats", "feat:humanoid-loot", "feat:revenants", "feat:mod-unleveledloot", "feat:mod-roleplay-realism-items", "feat:mod-physical-items"]),
     sec("light", "Your light", [
       "feat:torches-from-items", "Enhancements/PlayerTorchFromItems", "feat:mod-handheld-torches"]),
     sec("character", "Character & survival", [
-      "feat:mod-oblivion-remaster-leveling", "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism"]),
+      "feat:mod-character-modes", "feat:mod-project-legacy", "feat:mod-climates-calories", "feat:mod-roleplay-realism", "feat:cure-keeps-infection", "feat:claw-metal", "feat:gentle-equip-bill", "feat:legendary-equip-free", "feat:lockpick-tumblers"]),
     sec("moving", "Climbing & gathering", [
       "feat:enhanced-climbing", "Enhancements/AdvancedClimbing", "feat:resource-highlights", "feat:mod-foraging"]),
     sec("start", "Starting a new game", [
@@ -93,7 +94,7 @@ export const CATEGORIES = Object.freeze([
   ]),
   tab("combat", "Combat", [
     sec("enemies", "Enemies", [
-      "feat:enhanced-ai", "Enhancements/EnhancedCombatAI", "feat:mod-meanermonsters", "feat:mod-daggerfall-enemy-expansion", "feat:enemy-infighting", "Enhancements/EnemyInfighting"]),
+      "feat:enhanced-ai", "Enhancements/EnhancedCombatAI", "feat:mod-daggerfall-enemy-expansion", "feat:enemy-infighting", "Enhancements/EnemyInfighting"]),
     sec("rules", "Rules & armour", [
       "feat:mod-pcaao", "MeleeAttacks/MeleeAttackFriendlyProtection", "MeleeAttacks/MeleeAttackDetection"]),
     sec("weapons", "Weapons in hand", [
@@ -103,21 +104,21 @@ export const CATEGORIES = Object.freeze([
     sec("aftermath", "Seeing & bleeding", [
       "feat:enhanced-combat-visuals", "feat:blood"]),
     sec("sea", "At sea", [
-      "feat:naval-combat"]),
+      "feat:naval-combat", "feat:eltheric-sea"]),
   ]),
   tab("world", "World", [
     sec("land", "Land", [
-      "feat:tamriel-land", "feat:landforms", "feat:real-forests", "feat:bantha-jungle", "feat:climate-blend", "feat:road-verges", "feat:mod-roads-hazelnut"]),
+      "feat:tamriel-land", "feat:landforms", "feat:terrain-slope-cut", "feat:real-forests", "feat:bantha-jungle", "feat:tamriel-lands", "feat:climate-blend", "feat:road-verges", "feat:gate-floor-hidden", "feat:mod-roads-hazelnut"]),
     sec("weather", "Weather & ambience", [
       "feat:weather-events", "feat:mod-better-ambience"]),
     sec("towns", "Towns & people", [
-      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:mod-kings-gambit", "feat:town-watch"]),
+      "feat:living-world", "feat:mod-beautiful-villages", "feat:mod-beautiful-cities", "feat:mod-windmills-kamer", "feat:town-watch", "feat:crime-recovery", "feat:guild-probation", "feat:sold-goods-on-shelf", "feat:absorption-limits", "feat:opening-damage", "feat:elite-stacking", "feat:dress-for-the-part"]),
     sec("encounters", "Wilderness & encounters", [
-      "feat:mod-world-of-daggerfall", "feat:wilderness-camps", "feat:road-encounters", "feat:mod-world-events-raiding-parties"]),
+      "feat:mod-world-of-daggerfall", "feat:spawned-dungeons", "feat:wilderness-camps", "feat:road-encounters", "feat:mod-world-events-raiding-parties"]),
     sec("travel", "Travel", [
-      "feat:mod-travel-options", "feat:mod-immersive-travel", "feat:mod-horse-cart-and-cargo", "feat:horse-care", "feat:wagon-upkeep"]),
+      "feat:mod-travel-options", "feat:mod-immersive-travel", "feat:mod-horse-cart-and-cargo", "feat:horse-care", "feat:horse-walks", "feat:wagon-upkeep"]),
     sec("sea", "The sea & ships", [
-      "feat:mod-come-sail-away", "feat:mod-detailed-ships", "feat:mod-warm-ashes-ships", "feat:mod-iliac-puddle-no-more", "feat:mod-ocean-holes"]),
+      "feat:mod-come-sail-away", "feat:mod-warm-ashes-ships", "feat:mod-iliac-puddle-no-more", "feat:mod-ocean-holes"]),
   ]),
   tab("interface", "Interface", [
     // L10N1b: the language the game's words are shown in, and under it a Daggerfall Unity translation pack (L10N3b)
@@ -127,12 +128,12 @@ export const CATEGORIES = Object.freeze([
       "GUI/EnableVitalsIndicators", "GUI/InteractionModeIcon", "GUI/EnableArrowCounter", "GUI/IconsPositioningScheme", "feat:near-death-warning",
       "Enhancements/NearDeathWarning"]),
     sec("messages", "Messages & prompts", [
-      "feat:event-board", "feat:mod-world-tooltips", "feat:mod-ambient-text", "GUI/ShowQuestJournalClocksAsCountdown", "GUI/DungeonExitWagonPrompt",
+      "feat:event-board", "feat:mod-world-tooltips", "GUI/ShowQuestJournalClocksAsCountdown", "GUI/DungeonExitWagonPrompt",
       "GUI/IllegalRestWarning", "GUI/DisableEnemyDeathAlert"]),
     sec("quests", "Quest help", [
       "feat:quest-herald", "feat:quest-tracker", "feat:quest-marks", "feat:quest-guidance"]),
     sec("dungeons", "Dungeon help", [
-      "feat:dungeon-sense", "feat:dungeon-echoes", "feat:dungeon-way-out"]),
+      "feat:dungeon-sense", "feat:dungeon-echoes", "feat:dungeon-way-out", "feat:dungeon-fires"]),
     sec("maps", "Maps", [
       "port:mapScale", "feat:enhanced-map", "feat:dungeon-map-3d", "feat:tamriel-map", "GUI/TravelMapLocationsOutline", "GUI/EnableGeographicBackgrounds"]),
     sec("townmap", "Town map", [
@@ -182,8 +183,6 @@ export const CATEGORIES = Object.freeze([
       "Effects/VignetteRounded"]),
     sec("reading", "Readability", [
       "GUI/SwapHealthAndFatigueColors", "GUI/DimAlphaStrength", "GUI/SDFFontRendering"]),
-    sec("danger", "Danger shapes", [
-      "port:dangerPalette", "port:telegraphFill"]),
     sec("largehud", "Large status bar", [
       "GUI/LargeHUD", "GUI/LargeHUDDocked", "GUI/LargeHUDUndockedScale", "GUI/LargeHUDUndockedAlignment", "GUI/LargeHUDUndockedOffsetWeapon",
       "GUI/LargeHUDOffsetHorse"]),

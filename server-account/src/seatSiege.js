@@ -1,12 +1,11 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// SEAT2a part three (2026-10-01, Mac: "Finish the seats"; "Or we could go
-// ahead and do sieges"; "Continue") - WHAT THE SERVICE SAYS OF A BATTLE:
+// SEAT2a part three - WHAT THE SERVICE SAYS OF A BATTLE:
 // who may enter it (the pass, over the field the fighters' games agree),
 // what it gave (the result off the relay's `s1` receipt), and each
 // fighter's Honours.
 //
-// bible/11-Multiplayer/Seats-Arc.md 6.2, 6.5-6.8. The numbers are
+// 6.2, 6.5-6.8. The numbers are
 // src/net/townSeatLaw.js's; the battle is the relay's (net/siege/siegeRef.js).
 //
 // FACT: the relay has no door to this service. So the pass is an order
@@ -26,19 +25,21 @@ import { accountKind, displayName, overRate } from './accounts.js';
 import { renownHeldSql } from './renownTracks.js';   // AUDIT LEGACY III O5: the bound counts the living's tracks
 import { CHAR_ID_RE } from './service.js';   // AUDIT SEATS-3 A3: an Honours character in the saves' shape
 import { seatsOpenFor, confirmedSeats } from './townSeats.js';
-import { fortifierAt, fortsCaptureWithSave, fortTierAt, siegewrightAt, fortsLapsedStatements, fortsDueStatements, fortsGuildFallStatements, fortsRestoredStatements } from './seatForts.js';   // SEAT2b: a capture's drop, a Fortifier's save; part two (b): the works a siege fights behind   // VOID: a capture's works given back   // AUDIT 529 V2: and its fallen projects
+import { fortsCapturedStatements, fortTierAt } from './seatForts.js';   // SEAT2b: a capture's drop; part two (b): the works a siege fights behind   // VOID: a capture's works given back
 import { canModerate } from './titles.js';   // VOID: a moderator's, or a developer's
 import { mustChange } from './realm.js';
 import { gatherStandings } from './seatInfluence.js';   // AUDIT-SEATS S8: a Tourney's dead heat as the Turning counted it
 import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';
-import { mintSiegeOrder, siegeFieldValid } from '../../src/net/identityToken.js';
+import { settleBattleField } from './seatField.js';   // the battle's field, settled for its first pass
+import { mintSiegeOrder } from '../../src/net/identityToken.js';
 import { SIEGE_RAMS_MAX } from '../../src/net/siege/siegeRef.js';   // SEAT2b part two (b): the most Rams a pass carries
 import { verifySiegeReceipt, SIEGE_RECEIPT_TTL_S } from '../../src/net/siege/siegeReceipt.js';   // AUDIT-SEATS R6: a late pass lives the receipt's week
 import { RENOWN_XP_MAX, RENOWN_TRACKS_MAX } from '../../src/net/renown.js';
 import {
-  seatWeekOf, seatKeyOk, settleField, passWindowEnds, passOpens, siegeWinner, siegeAftermath, spoilsOf, SIEGE_HONOURS,
-  CLAIM_FEE, STANDING_START, STANDING_MAX, seasonFloor, seasonZeroOf, siegeMinutes, seatWeekStartMs, seasonOf, STANDING_CHANGES,
+  seatWeekOf, seatKeyOk, passWindowEnds, passOpens, siegeWinner, siegeAftermath, spoilsOf, SIEGE_HONOURS,
+  CLAIM_FEE, STANDING_START, STANDING_MAX, seasonFloor, seasonZeroOf, siegeMinutes, seatWeekStartMs, STANDING_CHANGES,
 } from '../../src/net/townSeatLaw.js';
+import { domainsFor } from './domains.js';   // DOMAIN3: a Tourney's dead heat counts the region's homes at a seat of power
 
 const weekAt = (nowS) => seatWeekOf(nowS * 1000);
 /** The passes an account may ask for in an hour - one a connection, a battle's worth of reconnects. */
@@ -52,38 +53,33 @@ async function battleAt(db, week, key) {
   return b ? { ...b, starts_at: Number(b.starts_at), ends_at: Number(b.ends_at), week: Number(b.week), key: Number(b.key) } : null;
 }
 const resultAt = (db, week, key) => db.prepare('SELECT result, raised, winner FROM town_seat_results WHERE week = ? AND key = ?').bind(week, key).first();
-/** VOID (migration 0067): WHAT STOOD BEFORE A RESULT, kept in the result's own INSERT (`?1` the week, `?2` the seat) - the
+/** VOID: WHAT STOOD BEFORE A RESULT, kept in the result's own INSERT (`?1` the week, `?2` the seat) - the
  *  seat's Charter row (null at an unheld seat) and every Legacy row at the seat from the battle's week on - so a
  *  moderator's void (voidSiege) gives back exactly what the result moved. */
 const PRIOR_SQL = `json_object(
   'hold', json((SELECT json_object('guild', guild_id, 'region', region, 'standing', standing, 'since', since_week, 'truce', truce_week,
     'tithe', tithe, 'titheWeek', tithe_week, 'owed', owed) FROM town_seat_holds WHERE key = ?2)),
   'legacy', json((SELECT json_group_array(json_array(week, guild_id, amount)) FROM town_seat_legacy WHERE key = ?2 AND week >= ?1)))`;
-/** VOID (migration 0067): THE WORKS BEFORE A CAPTURE'S DROP, kept on the result - each work's tier the siege was fought
- *  behind (`forts`). AUDIT 529 V2: and every building project the drop (or a revolt's lapse) makes fall (`projects`: `[work,
- *  building, guild, builder, siegewright, standsAt, at]`), what each holds (`held`: `[work, material, qty]`), and `guild`'s
- *  Edict for next week (`edict`; null for none) - so `/siege void` begins them again (seatForts.js fortsRestoredStatements).
- *  For the result's batch after its INSERT, once the projects whose day had come are raised (fortsDueStatements). */
+/** VOID: THE WORKS BEFORE A CAPTURE'S DROP, kept on the result - each work's tier the siege was fought
+ *  behind (`forts`), and `guild`'s Edict for next week (`edict`; null for none) - so `/siege void` gives them back.
+ *  For the result's batch after its INSERT. */
 const priorWorks = (db, W, K, guild = null) => db.prepare(`UPDATE town_seat_results SET prior = json_set(COALESCE(prior, '{}'),
   '$.forts', json((SELECT json_group_object(work, tier) FROM town_seat_forts WHERE key = ?2)),
-  '$.projects', json((SELECT json_group_array(json_array(work, building, guild_id, builder, siegewright, stands_at, at)) FROM town_seat_forts WHERE key = ?2 AND building IS NOT NULL)),
-  '$.held', json((SELECT json_group_array(json_array(work, material, qty)) FROM town_seat_fort_held WHERE key = ?2 AND qty > 0)),
   '$.edict', (SELECT edict FROM town_seat_edicts WHERE key = ?2 AND week = ?1 + 1 AND guild_id = ?3 AND state = 'proclaimed')) WHERE week = ?1 AND key = ?2`).bind(W, K, guild);
 /** SEAT2b part two (c) (7.7: "Fail, and the Charter lapses"): A REVOLT THAT STOOD - the holder's Charter lapsed, its coming
- *  Edict void, the Chronicle's 'revolt-stood', its building projects fallen (AUDIT SEATS-2 S5) - a Neglect's lapse's
+ *  Edict void, the Chronicle's 'revolt-stood' - a Neglect's lapse's
  *  statements, as the Turning writes them for a revolt no result reached (seatTurning.js). AUDIT 529 V1: a result's, and a
  *  moderator's void of a revolt before its result. */
 const revoltStood = (db, K, W, guild, name, nowS, history) => [
   db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ?').bind(K, guild),
   db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND state = 'proclaimed'").bind(K, W + 1),
   history('revolt-stood', { guild: name }),
-  ...fortsLapsedStatements(db, K, nowS),   // AUDIT SEATS-2 S5: its building projects fall with the Charter
 ];
 
 /**
  * THE PASS (6.2, 6.4, 6.6): this week's battle at `key`, from ten minutes before its start until its window closes - a
  * signed fighter on its side, anyone else a spectator. A fighter's game sends the field it derived from the town
- * (`field`, the pass's `sf`); the battle's field is settled as the law says (townSeatLaw.js settleField) and every pass
+ * (`field`, the pass's `sf`); the battle's field is settled as seatField.js says and every pass
  * carries it. Answers `{ pass, side, week, key, startsAt, endsAt, window }`; `pass` null where this service holds no
  * signing key (the room then admits nobody - said, never a pass that cannot be checked).
  *
@@ -113,46 +109,32 @@ export async function siegePass({ db, nowS, subtle }, player, env, { key, field,
   const row = await db.prepare('SELECT side FROM town_seat_rosters WHERE week = ? AND key = ? AND account = ?').bind(week, key, player.id).first();
   const side = row?.side === 'attack' || row?.side === 'defend' ? row.side : 'watch';
   if (late && (side === 'watch' || !b.field)) return { error: 'pass-late' };   // AUDIT-SEATS R6: a rostered fighter of a fought battle alone
-  let settled = b.field ?? null;
-  if (!settled) {
-    if (side !== 'watch') {
-      if (!siegeFieldValid(field, b.tier)) return { error: 'field-bad' };
-      await db.prepare(`INSERT INTO town_seat_fields (week, key, account, side, field, at) VALUES (?, ?, ?, ?, ?, ?)
-        ON CONFLICT (week, key, account) DO UPDATE SET field = excluded.field, at = excluded.at`)
-        .bind(week, key, player.id, side, JSON.stringify(field), nowS).run();
-    }
-    const { results: rows = [] } = await db.prepare('SELECT side, field, at FROM town_seat_fields WHERE week = ? AND key = ? ORDER BY at, rowid').bind(week, key).all();
-    const f = settleField(rows.map((r) => ({ side: r.side, field: r.field, at: Number(r.at) })), nowS >= b.starts_at, b.kind);   // SEAT2b part two (c): a revolt's first defender's
-    if (!f) return { error: 'field-unsettled' };
-    // settled once: a second request racing this one keeps the first's
-    await db.prepare('UPDATE town_seat_battles SET field = ? WHERE week = ? AND key = ? AND field IS NULL').bind(f, week, key).run();
-    settled = (await db.prepare('SELECT field FROM town_seat_battles WHERE week = ? AND key = ?').bind(week, key).first())?.field ?? f;
-  }
+  const settled = b.field ?? await settleBattleField({ db, nowS }, { b, week, key, side, field, playerId: player.id });
+  if (settled?.error) return settled;
   const out = { side, week, key, startsAt: b.starts_at, endsAt: b.ends_at, window: se, ...(late ? { late: true } : {}) };   // AUDIT-SEATS R6: a late pass says so
   if (!signingKey) return { ...out, pass: null };
   const sf = JSON.parse(String(settled));
-  const sx = await siegeWorks(db, b, nowS);   // SEAT2b part two (b): the works it is fought behind, frozen at its first pass
+  const sx = await siegeWorks(db, b);   // SEAT2b part two (b): the works it is fought behind, frozen at its first pass
   const pass = await mintSiegeOrder({ s: player.id, sk: key, sw: week, sd: side, st: b.tier, sn: b.kind, sb: b.starts_at, se, sf, sx }, signingKey, { subtle, nowS });
   return { ...out, pass };
 }
 
 /**
  * SEAT2b part two (b) (Seats-Arc 6.2, 7.5): A SIEGE'S WORKS, FROZEN AT ITS FIRST PASS - `[walls, gatehouse, rams,
- * siegewright, barracks]` (net/siege/siegeRef.js worksOf): each work's tier standing then (a project whose day has come
- * counted - fortTierAt, read without a write); the Gatehouse -1 at a palace that raised none (a crown's stands at 0);
- * the Rams the challenger's camp sent at the Turning (`town_seat_battles.rams`), none without a gate; 1 where a
- * Siegewright stands on the attacking roster (signing closed at the door's opening, so the roster is the battle's).
+ * siegewright, barracks]` (net/siege/siegeRef.js worksOf): each work's tier standing then (fortTierAt); the Gatehouse -1 at a palace that raised none (a crown's stands at 0);
+ * the Rams the challenger's camp sent at the Turning (`town_seat_battles.rams`), none without a gate; the siegewright
+ * slot is 0 (the Siegewright is cut; the pass keeps its shape).
  * DECIDED: frozen once, as the field is - the relay's room holds the first pass's battle and refuses a pass that says
  * otherwise, so a work standing mid-battle must not move the next pass; the works fought behind are those at the door.
  * A Tourney's none (null).
  */
-async function siegeWorks(db, b, nowS) {
+async function siegeWorks(db, b) {
   if (b.kind !== 'siege') return null;
   if (b.works) return JSON.parse(String(b.works));
-  const walls = await fortTierAt(db, b.key, 'walls', nowS), gatehouse = await fortTierAt(db, b.key, 'gatehouse', nowS), barracks = await fortTierAt(db, b.key, 'barracks', nowS);
+  const walls = await fortTierAt(db, b.key, 'walls'), gatehouse = await fortTierAt(db, b.key, 'gatehouse'), barracks = await fortTierAt(db, b.key, 'barracks');
   const gate = b.tier === 'crown' ? gatehouse : gatehouse >= 1 ? gatehouse : -1;
   const rams = gate >= 0 ? Math.max(0, Math.min(SIEGE_RAMS_MAX, Number(b.rams ?? 0) || 0)) : 0;
-  const sx = [walls, gate, rams, (await siegewrightAt(db, b.week, b.key, nowS)) ? 1 : 0, barracks];
+  const sx = [walls, gate, rams, 0, barracks];
   // frozen once: a second pass racing this one keeps the first's
   await db.prepare('UPDATE town_seat_battles SET works = ? WHERE week = ? AND key = ? AND works IS NULL').bind(JSON.stringify(sx), b.week, b.key).run();
   const row = await db.prepare('SELECT works FROM town_seat_battles WHERE week = ? AND key = ?').bind(b.week, b.key).first();
@@ -163,11 +145,11 @@ async function siegeWorks(db, b, nowS) {
  *  that made the seat Contested counted it (5.2 steps 1-2) - the standings' total of the week before the Tourney's (each
  *  source at its caps, reach, Tribute inside its room - never the rows' raw sum, where a Tribute row is Marks and a gate
  *  row counts unagreed), at that Turning's clock, and the Legacy each carried into that week. */
-async function higherOf(db, b, nowS, zero) {
+async function higherOf(db, b, nowS, zero, env = null) {   // DOMAIN3: `env`, the region law's week (its homes)
   const seat = (await confirmedSeats(db, nowS)).get(b.key);
   if (!seat) return null;
   const w = b.week - 1;
-  const list = await gatherStandings(db, seat, w, Math.floor(seatWeekStartMs(b.week) / 1000), !!seasonOf(w, zero));
+  const list = await gatherStandings(db, seat, w, Math.floor(seatWeekStartMs(b.week) / 1000), await domainsFor(db, nowS, env, w));
   const { results: legacy = [] } = await db.prepare('SELECT guild_id, amount FROM town_seat_legacy WHERE week = ? AND key = ?').bind(w, b.key).all();
   const of = (g) => (list.find((s) => s.guild === g)?.total ?? 0) + Number(legacy.find((l) => l.guild_id === g)?.amount ?? 0);
   const a = of(b.attacker), d = of(b.defender);
@@ -218,7 +200,7 @@ export async function swordsSettled(db, week, key, nowS, { voided = false } = {}
  *     coming Edict void (a Neglect's lapse's statements).
  * Answers whether this request wrote it (a racing one finds it written).
  */
-async function applyResult(db, b, c, nowS, zero) {
+async function applyResult(db, b, c, nowS, zero, env = null) {
   const W = b.week, K = b.key, result = c.r, raised = c.a === 1 ? 1 : 0;
   const names = new Map();
   const { results: gs = [] } = await db.prepare('SELECT id, name, tag FROM guilds WHERE id IN (?, ?)').bind(b.attacker, b.defender).all();
@@ -243,12 +225,12 @@ async function applyResult(db, b, c, nowS, zero) {
         db.prepare('UPDATE town_seat_holds SET standing = MAX(standing, ?) WHERE key = ? AND guild_id = ?').bind(STANDING_CHANGES.revoltTo, K, b.defender),
         history('revolt-down', { guild: nameOf(b.defender) }), ...swords]);
     }
-    // AUDIT 529 V2: the projects that fall and the Edict voided kept on the result first, the due raised before them
-    return run([...head('attack'), ...fortsDueStatements(db, nowS, K), priorWorks(db, W, K, b.defender),
+    // the Edict voided kept on the result first
+    return run([...head('attack'), priorWorks(db, W, K, b.defender),
       ...revoltStood(db, K, W, b.defender, nameOf(b.defender), nowS, history), ...swords]);
   }
   if (b.kind === 'tourney') {
-    const higher = result === 'tie' ? await higherOf(db, b, nowS, zero) : null;
+    const higher = result === 'tie' ? await higherOf(db, b, nowS, zero, env) : null;
     const winner = siegeWinner(result, higher);
     const order = winner === 'defend' ? [b.defender, b.attacker] : winner === 'attack' ? [b.attacker, b.defender] : [];
     const seat = (await confirmedSeats(db, nowS)).get(K);
@@ -275,14 +257,9 @@ async function applyResult(db, b, c, nowS, zero) {
   const stmts = [...head(siegeWinner(result))];
   if (after.taken) {
     const seat = (await confirmedSeats(db, nowS)).get(K);
-    // SEAT2b (6.8, 7.5): the seat's works a tier down with the Charter - a Fortifier's save keeping the Walls once a Season
-    const seasonWeek = seasonFloor(W, zero);
-    // VOID (migration 0067): the works' tiers the siege was fought behind kept on the result - after the projects whose day
-    // had come are raised (the drop's own first step, idempotent), before the drop - so `/siege void` can give them back;
-    // AUDIT 529 V2: and the defender's projects the drop makes fall
-    stmts.push(...fortsDueStatements(db, nowS, K), priorWorks(db, W, K));
-    const fortifier = await fortifierAt(db, W, K, nowS, seasonWeek);
-    stmts.push(...fortsCaptureWithSave(db, K, { week: W, nowS, seasonWeek, fortifier, history }));
+    // SEAT2b (6.8, 7.5): the seat's works a tier down with the Charter; VOID: the tiers the siege was fought behind kept on the
+    // result first, before the drop, so `/siege void` can give them back
+    stmts.push(priorWorks(db, W, K), ...fortsCapturedStatements(db, K));
     stmts.push(
       db.prepare(`INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, standing, truce_week, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (key) DO UPDATE SET guild_id = excluded.guild_id, since_week = excluded.since_week, standing = excluded.standing,
@@ -336,7 +313,7 @@ export async function claimSiege({ db, nowS, subtle }, player, env, { receipt, c
   if (b.state === 'void') return { error: 'battle-void' };
   let r = await resultAt(db, c.sw, c.sk);
   const zero = seasonZeroOf(env?.SEASON_ZERO_WEEK);   // SEASON1: the once-a-Season rules read the Season counted
-  const applied = !r && await applyResult(db, b, c, nowS, zero);
+  const applied = !r && await applyResult(db, b, c, nowS, zero, env);
   r = await resultAt(db, c.sw, c.sk);
   if (!r) {
     // AUDIT-SEATS S3: the Turning came between the read and the write - the battle void, or its week settled without it
@@ -391,7 +368,7 @@ export async function claimSiege({ db, nowS, subtle }, player, env, { receipt, c
   return { ...out, honours: { side: c.sd, won, marks: give.marks, xp: give.xp, spoil, spent } };
 }
 
-/** VOID: what a result kept of the seat before it (migration 0067's `prior`), parsed. AUDIT 529 V3: null where it kept
+/** VOID: what a result kept of the seat before it (its `prior` column), parsed. AUDIT 529 V3: null where it kept
  *  none (a result written before the column) - never `{}`, which read as "kept, the seat unheld" (`hold` null). */
 function priorOf(row) {
   try { const p = JSON.parse(String(row?.prior ?? '')); return p && typeof p === 'object' && !Array.isArray(p) ? p : null; } catch { return null; }
@@ -471,7 +448,6 @@ export async function voidSiege({ db, nowS }, mod, env, { key } = {}) {
           stmts.push(
             db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ? AND since_week = ?').bind(key, won, W),
             db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND guild_id = ? AND state = 'proclaimed'").bind(key, W + 1, won),
-            ...fortsLapsedStatements(db, key, nowS),
           );
         }
       } else if (r.result === 'attack') {
@@ -482,8 +458,6 @@ export async function voidSiege({ db, nowS }, mod, env, { key } = {}) {
         const num = (v, d) => (Number.isSafeInteger(v) ? v : d);
         const h = held ?? {};
         stmts.push(
-          ...fortsDueStatements(db, nowS, key),
-          ...(b.kind === 'siege' ? fortsGuildFallStatements(db, key, b.attacker) : []),
           !back ? db.prepare('DELETE FROM town_seat_holds WHERE key = ? AND guild_id = ? AND since_week = ?').bind(key, b.attacker, W) : db.prepare(`INSERT INTO town_seat_holds (key, guild_id, region, tier, since_week, standing, truce_week, tithe, tithe_week, owed, at)
             SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11 WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?2)
             ON CONFLICT (key) DO UPDATE SET guild_id = excluded.guild_id, region = excluded.region, since_week = excluded.since_week,
@@ -497,15 +471,8 @@ export async function voidSiege({ db, nowS }, mod, env, { key } = {}) {
           stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'void' WHERE key = ? AND week = ? AND guild_id = ? AND state = 'proclaimed'").bind(key, W + 1, b.attacker));
           const forts = p.forts && typeof p.forts === 'object' ? Object.entries(p.forts).filter(([, t]) => Number.isSafeInteger(t) && t >= 0 && t <= 3) : [];
           for (const [work, t] of forts) stmts.push(db.prepare('UPDATE town_seat_forts SET tier = MAX(tier, ?) WHERE key = ? AND work = ?').bind(t, key, work));
-          stmts.push(db.prepare('DELETE FROM town_seat_fortifier WHERE key = ? AND at = ?').bind(key, Number(r.at)));   // a Fortifier's save at this capture, unspent
         }
         if (held) {
-          // AUDIT 529 V2: the holder's projects the capture or the lapse made fall begun again - after the tiers came back
-          const int = (v) => Number.isSafeInteger(v);
-          const projects = (Array.isArray(p.projects) ? p.projects : []).filter((x) => Array.isArray(x) && typeof x[0] === 'string' && int(x[1]) && x[1] >= 1 && x[1] <= 3
-            && x[2] === b.defender && (x[5] == null || int(x[5])) && int(x[6])).map(([work, building, , builder, siegewright, standsAt, at]) => [work, building, builder === 1, siegewright === 1, standsAt ?? null, at]);
-          const stuff = (Array.isArray(p.held) ? p.held : []).filter((x) => Array.isArray(x) && typeof x[0] === 'string' && typeof x[1] === 'string' && int(x[2]) && x[2] > 0);
-          stmts.push(...fortsRestoredStatements(db, key, b.defender, projects, stuff));
           // and a revolt's Edict for next week, which its lapse voided, proclaimed again
           if (b.kind === 'revolt' && typeof p.edict === 'string') {
             stmts.push(db.prepare("UPDATE town_seat_edicts SET state = 'proclaimed' WHERE key = ? AND week = ? AND guild_id = ? AND edict = ? AND state = 'void'").bind(key, W + 1, b.defender, p.edict));

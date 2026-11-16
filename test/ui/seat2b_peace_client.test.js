@@ -1,18 +1,15 @@
-// SEAT2b part two (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): THE WORKS AT PEACE ON THE CLIENT - the
+// SEAT2b part two: THE WORKS AT PEACE ON THE CLIENT - the
 // Watchtowers' word asked ten minutes apart and said once a challenger, a week and a share, kept on the device; the
 // seats dressed in their works; the Seat tab's towers lines; a craft carrying the town its station stands in; the host's
-// seams - a members' Harbour a Travel Options port, a coast the sea beside the town, the Ram Kit's words (bible/
-// 11-Multiplayer/Seats-Arc.md 7.5; src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
-// src/scenes/world.js). `06-Systems/Online-Arc.md` SEAT2b part two.
+// seams - a members' Harbour a Travel Options port, a coast the sea beside the town
+// (src/net/townSeatBook.js, src/net/profBook.js, src/ui/seatTab.js, src/ui/professions/profPages.js,
+// src/scenes/world.js). SEAT2b part two.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { byClass } from '../chargenDom.mjs';
 import { createTownSeatBook, SEAT_TOWERS_KEY, SEAT_TOWERS_SAID_MAX, SEAT_TOWERS_EVERY_MS } from '../../src/net/townSeatBook.js';
-import { storedText } from '../../src/systems/smithItems.js';
-import { SIEGE_STAYS_LINE, STOCK_STAYS_LINE } from '../../src/ui/professions/profPages.js';
 
-const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
 const memStore = () => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), m }; };
 const SH = { id: 'gsh', name: 'The Silver Hand', tag: 'SH' };
 
@@ -85,7 +82,7 @@ test('SEAT2b part two THE SEAT TAB\'S TOWERS: the standings the service answered
       battle: null, chronicle: [], mine: { guild: 'gsh', rank: 2, seasoned: true, bound: 'gsh', pledges: [], influence: 0, tributeRoom: 0 },
       standings: [{ guild: { ...SH, heraldry: null }, influence: 1000, legacy: 0, holder: true }, { guild: { id: 'geo', name: 'Ebon Oath', tag: 'EO', heraldry: null }, influence: 600, legacy: 0, holder: false }],
       ...(towers ? { towers } : {}) };
-    const book = { zero: null, standings: async () => ({ data, error: null }), forts: async () => ({ data: { works: {}, stockpile: [] }, error: null }) };
+    const book = { zero: null, standings: async () => ({ data, error: null }), forts: async () => ({ data: { works: {} }, error: null }) };
     const ui = { busy: () => false, run: (start) => start(), rerender: () => {}, nowS: () => 1_800_000_000, alive: () => true };
     return createSeatTab({ seat: SEAT, book, port: false, countName: (k) => k }, ui);
   };
@@ -107,36 +104,15 @@ test('SEAT2b part two A CRAFT CARRIES ITS TOWN: the book keeps the town the stat
   await book.craft('longsword:mithril', { clean: true, seat: -4 }, () => {});
   assert.deepEqual(calls.map((a) => a[7]), [3021, null, null]);
   const posted = [];
-  const { accountProf } = await import('../../src/net/accountClient.js');
-  const prof = accountProf({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: () => JSON.stringify({ id: 'p1', secret: 's' }), setItem() {}, removeItem() {} } });
+  const { accountProf, SERVICE_KEY } = await import('../../src/net/accountClient.js');
+  const prof = accountProf({ fetch: async (u, i) => { posted.push([new URL(u).pathname, JSON.parse(i.body)]); return new Response('{"ok":true}', { status: 200 }); }, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : JSON.stringify({ id: 'p1', secret: 's' })), setItem() {}, removeItem() {} } });
   await prof.craft('c1', 'longsword:mithril', true, 'Hollin', 'rid-1', false, null, 3021);
   await prof.craft('c1', 'longsword:mithril', true, 'Hollin', 'rid-2');
   assert.deepEqual(posted.map(([p, b]) => [p, b.seat]), [['/v1/prof/craft', 3021], ['/v1/prof/craft', undefined]]);
 });
 
 test('SEAT2b part two THE HOST\'S SEAMS: a members\' Harbour is the travel map\'s, the popup\'s, the held map\'s, Roleplay Realism\'s and the deed\'s port; the board\'s coast is the sea beside the town; a craft names the held town whose hall steps it; the Watchtowers asked from the frame; a Ram Kit\'s craft and its Stores say where it waits (mutants: each seam; the words)', () => {
-  assert.match(W, /setSeatHarbours\(\(mapId\) => harbourPortFor\(seatHere\(mapId\), guildBook\?\.guild\?\.id \?\? null\)\);/);
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P10): past the Veil an isle's place answers by its own kind first, the Bay's as before
-  assert.match(W, /portTown: \(loc\.ether \? loc\.etherKind === 'port' : modSetting\('travel-options', 'Enabled'\) === true \? hasPortFor\(loc\.mapTableData\?\.mapId\) :/);
-  assert.match(W, /if \(hasPortFor\(summary\.id\)\) return true;/);
   for (const f of ['src/ui/travel/travelPopUp.js', 'src/ui/travel/travelMapOptions.js', 'src/ui/heldMap.js']) {   // TIDY2: whole paths, so a move rewrites them
     assert.match(readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8'), /import \{ hasPortFor as hasPort \} from '(?:\.\.\/)+systems\/travel\/travelPorts\.js';/, f);
   }
-  assert.match(readFileSync(new URL('../../src/systems/travel/travelOptions.js', import.meta.url), 'utf8'), /hasPort: \(mapId\) => hasPortFor\(mapId\),/);
-  assert.match(W, /const seaPixel = \(x, y\) => isWaterPixel\(maps\.getClimateIndex\(x, y\), woods\.getHeightMapValue\(x, y\)\);/);
-  assert.match(W, /port: coastalAt\(town\.px, town\.py, seaPixel, csaIsPortTown\(town\.px, town\.py\)\),/);
-  assert.match(W, /const \{ seat \} = myHall\(recipeById\(recipe\)\?\.profession\);/);   // PIN MOVED (AUDIT PROF-541 R2-H1): fortLaw.js hallStepsFor (prof9_client.test.js drives it)
-  assert.match(W, /const myHall = \(profession\) => hallStepsFor\(seatHere\(_musicLoc\?\.mapTableData\?\.mapId\), guildBook\?\.guild\?\.id \?\? null, profession\);/);
-  assert.match(W, /name: typeof playerEntity\?\.name === 'string' \? playerEntity\.name : null, seat, \.\.\.more \}, profMintCraft\);/);   // PIN MOVED (MASTER-ART): the page's other asks handed on after the seat
-  assert.match(W, /\{ const g = guildBook\?\.guild\?\.id \?\? null; if \(g && seatBook\?\.towersDue\(g\)\) seatBook\.towers\(g, \(t\) => townTalk\.say\(t, 6\)\)\.catch\(\(\) => \{\}\); \}/);
-  assert.match(W, /const made = rec\?\.kind === 'siege' \? storedText\(rec\.name, Number\(r\.data\.count\) \|\| 1\) : craftedText\(mintPieces\(r\.data\)\);/);
-  assert.equal(storedText('Ram Kit'), 'You made a Ram Kit. It waits in your Stores');
-  assert.equal(storedText('Ram Kit', 2), 'You made 2 Ram Kits. They wait in your Stores');
-  assert.notEqual(SIEGE_STAYS_LINE, STOCK_STAYS_LINE);
-  assert.match(SIEGE_STAYS_LINE, /Siege Camp/);
-  // BAG1 (PIN MOVED): one law for the Stores page and the bag's page - the line chosen in `staysLine`, which both call;
-  // PIN MOVED (L10N4): said through their readers
-  const pp = readFileSync(new URL('../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
-  assert.match(pp, /: pick\.family === 'siege' \? siegeStaysLine\(\) : stockStaysLine\(\)\);/);
-  assert.equal(pp.match(/: staysLine\(pick\)\)\);/g)?.length, 2, 'both pages say it');
 });

@@ -1,5 +1,4 @@
-// AUDIT PSCALE1 (2026-09-25, Mac: "Lets audit this"; five lenses - the damage doors, the network, the count and the
-// encounters, the records, play and balance - `06-Systems/Online-Arc.md` AUDIT PSCALE1). One pin per finding paid,
+// AUDIT PSCALE1. One pin per finding paid,
 // each failing on the code PSCALE1 shipped. The count is Mac's second answer, "Whoever fights it": a foe's fighters
 // are the players who struck it within thirty seconds, counted at its authority's door and streamed on its record.
 // Host slices are MOUNTED from comment-stripped source, never matched (the suite's precedent: audit26_dungeonfoes
@@ -24,6 +23,7 @@ import { ENCHANTMENT_TYPES as T } from '../../src/formats/magicDef.js';
 import { MOBILE_TYPES } from '../../src/characters/mobile/mobileTypes.js';
 import { killIfAnyLiveStatZero } from '../../src/systems/statMods.js';
 import { isPrivateQuestFoe } from '../../src/scenes/quest/questFoeHost.js';
+import { stealthOfShown } from '../../src/characters/enemy/peer-senses.ts';   // peersNear's stealth fields
 import { promoteStaffBoss } from '../../src/systems/eliteFoes.js';   // BOSS-EXACT: a staff event's mini boss   // CURSE-SYNC: the handover's word for a quest's foe
 
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
@@ -179,7 +179,7 @@ test('AUDIT PSCALE1 outdoors, driven - WHOEVER FIGHTS IT: my foe is as tough as 
   blowFrom(owner, troll, 'me', 0);
   owner.healFoe(troll, 20);
   assert.equal(troll.entity.health, 58, 'twenty against four is eight');
-  // BOSS-EXACT (mob 2026-10-25: "the rat isnt takeing any dmage"): a staff event's mini boss keeps the exact health staff
+  // BOSS-EXACT: a staff event's mini boss keeps the exact health staff
   // typed - four fighting it, every blow and heal lands whole (its blows at me still weigh by them: partyHit)
   const boss = await owner.spawnFoe(0, [20, 0, 20], { feetGiven: true });
   promoteStaffBoss(boss.entity, { hp: 10000 });
@@ -191,12 +191,12 @@ test('AUDIT PSCALE1 outdoors, driven - WHOEVER FIGHTS IT: my foe is as tough as 
   owner.healFoe(boss, 10);
   assert.equal(boss.entity.health, 9966, 'a heal its own ten');
   assert.equal(owner.partyHit(10, boss), 13, 'its blow at me still four fighters\'');
-  // BOSS-BIG-HIT (mob 2026-10-25: "magic hits 10 of thousands"): a peer's blow past the bound lands on the mini boss at the
+  // BOSS-BIG-HIT: a peer's blow past the bound lands on the mini boss at the
   // bound - it was refused whole; any other foe still refuses it
   boss.entity.maxHealth = 1e8; boss.entity.health = 20000;   // a share far past every number below (BOSS-HIT-SHARE's own pins follow)
   assert.equal(owner.applyHit('bob-0002', { i: boss.seq, dmg: 45000, kind: 'melee', k: 'world:3,12' }), true, 'a blow of 45,000 on the mini boss lands');
   assert.equal(boss.entity.health, 10000, 'as 10,000');
-  // BOSS-SPELL-WARD (mob: "use crazy spell reduction on mini bosses like 90%", "of all spell damage"): a tenth of every spell -
+  // BOSS-SPELL-WARD (, "of all spell damage"): a tenth of every spell -
   // a peer's, mine, a round, and a whole-health one never kills
   owner.applyHit('bob-0002', { i: boss.seq, dmg: 45000, kind: 'spell', k: 'world:3,12' });
   assert.equal(boss.entity.health, 9000, 'a peer\'s spell of 45,000: 10,000 at the bound, a tenth of it');
@@ -215,7 +215,7 @@ test('AUDIT PSCALE1 outdoors, driven - WHOEVER FIGHTS IT: my foe is as tough as 
   assert.ok(bossPup?.entity?.staffBoss, 'the boss stands as a puppet');
   seen.damageFoe(bossPup, 400, [20, 0, 20], null, { fromPlayer: true, kind: 'spell' });
   assert.equal(toOwner.at(-1)?.dmg, 400, 'a puppet sends its owner the spell whole - the owner cuts it, once');
-  // BOSS-HIT-SHARE (mob: "needs to scal with players", "1% per heaslth with 40 player ins much", "magfic and melee"): one hit
+  // BOSS-HIT-SHARE (, "1% per heaslth with 40 player ins much", "magfic and melee"): one hit
   // takes at most 1% of its maximum split among everyone fighting it - a blade's and a spell's alike, mine and a peer's
   const crowd = await owner.spawnFoe(0, [24, 0, 24], { feetGiven: true });
   promoteStaffBoss(crowd.entity, { hp: 100000 });
@@ -228,7 +228,7 @@ test('AUDIT PSCALE1 outdoors, driven - WHOEVER FIGHTS IT: my foe is as tough as 
   assert.equal(crowd.entity.health, 98951, 'a peer\'s spell its share too - forty-one now: 24');
   owner.damageFoe(crowd, 10, null, null, { fromPlayer: true });
   assert.equal(crowd.entity.health, 98941, 'a blow under its share lands whole');
-  // BOSS-BAR (mob: "the bar never moved"): past the wire's bound the record says the same share of it, so a reader's bar falls
+  // BOSS-BAR: past the wire's bound the record says the same share of it, so a reader's bar falls
   const big = await owner.spawnFoe(0, [22, 0, 22], { feetGiven: true });
   promoteStaffBoss(big.entity, { hp: 1000000 });
   big.entity.health = 750000;
@@ -280,7 +280,7 @@ test('AUDIT PSCALE1 the dungeon, mounted: a layout foe is as tough as the player
   j.healFoe(lf, 20); assert.equal(lf.entity.health, 113, 'a joiner\'s copy is the host\'s to heal - unweighed until the record');
   // the blow and the arrow at me: weighed where the damage is declared, so the flash and the cry read what I took
   const S = strip(D);
-  assert.match(S, /const dmg = (?:blowScaled\(f\.ai, )?_weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the blow');
+  assert.match(S, /const dmg = _weighHit\(f, foeDeps\.calculateAttackDamage\(f\.entity, foeDeps\.playerEntity, \{/, 'the blow');
   assert.match(S, /const dmg = foeDeps && shooter \? _weighHit\(shooter, foeDeps\.calculateAttackDamage\(shooter\.entity, playerEntity, \{/, 'the arrow');
   const melee = S.slice(S.indexOf('function resolveFoeMelee('), S.indexOf('function collisionTriggers('));
   assert.deepEqual(melee.match(/hurtPlayer\([^)]*\)/g), ['hurtPlayer(dmg)'], 'the blow lands the weighed number');
@@ -302,7 +302,7 @@ test('AUDIT PSCALE1 the count\'s other readers: the outdoor roll counts the part
   assert.equal(size({ online: { status: 'open', room: 'dungeon:m7' }, partyNear: () => [] }), 1, 'a dungeon room counts no strangers - a fight there weighs its fighters');
   assert.equal(size({ online: { status: 'connecting', room: 'world:3,12' }, partyNear: () => mates }), 1, 'a room not open');
   assert.equal(size({ online: { status: 'open', room: 'world:3,12' }, partyNear: () => new Array(9).fill({ feet: [1, 0, 1] }) }), 8, 'never past the seats');
-  assert.match(strip(W), /setRenownKillHandler\(\(foe\) => \{ const party = 1 \+ \(partyNear\(\)\?\.length \?\? 0\); const xp = renownPartyXp\(renownKillXp\(renownFoeLevel\(foe\), renownNow\), Number\.isInteger\(foe\?\._fightN\) \? Math\.min\(party, foe\._fightN\) : party\); renownTracker\.earn\(xp\); sigilDrinks\(xp\); seatEdicts\.campCleared\(foe\?\.site\)\.catch\(\(\) => \{\}\); \}\);/, 'PLAY-4: the bonus');   // SEAT1d (PIN MOVED): a Bounty's camp claimed after
+  assert.match(strip(W), /setRenownKillHandler\(\(foe\) => \{ const party = 1 \+ \(partyNear\(\)\?\.length \?\? 0\); const xp = renownPartyXp\(renownKillXp\(renownFoeLevel\(foe\), renownNow\), Number\.isInteger\(foe\?\._fightN\) \? Math\.min\(party, foe\._fightN\) : party\); renownTracker\.earn\(xp\); sigilDrinks\(xp\); seatEdicts\.campCleared\(foe\?\.site \?\? lairDenOf\(modes\?\.mode === 'dungeon' \? modes\?\.dungeonLocation : null\)\)\.catch\(\(\) => \{\}\); \}\);/, 'PLAY-4: the bonus');
   assert.ok(!/partySize: \(\) => partySize\(\)/.test(strip(W)), 'no pool or mode is handed the roll\'s count for a fight');
   assert.ok(!/partySize:/.test(strip(read('src/scenes/worldModes.js'))), 'nor the dungeon');
 });
@@ -427,7 +427,7 @@ test('AUDIT PSCALE1 DOORS-1 at the sources and NET-2/NET-3 in the host: a Disint
   const peersNear = mount(W.slice(pn, W.indexOf('=> {', pn) + 3) + balanced(W, W.indexOf('=> {', pn) + 3, '{', '}'), {
     modes: {}, csaPeers: { isBelowDeck: () => false },
     online: { room: 'world:3,12', status: 'open', peers: new Map([['bob-0002', { id: 'bob-0002', shown: { x: 1, y: 0, z: 1 } }]]), visible: (p, now) => { seen.push(now); return true; } },
-    peerBodies: null, _peerHeights: new Map(), onlineToScene: (p) => [p.x, p.y, p.z],
+    peerBodies: null, _peerHeights: new Map(), onlineToScene: (p) => [p.x, p.y, p.z], stealthOfShown,
   }, 'return peersNear;');
   assert.equal(peersNear().length, 1);
   assert.deepEqual(seen, [undefined], 'visible() on its own clock - performance.now() against Date.now() stamps never timed a peer out');

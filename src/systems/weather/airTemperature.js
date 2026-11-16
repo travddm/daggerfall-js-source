@@ -1,11 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PRECIP1 (2026-10-19, the owner: "I also want to begin giving each biome their own precipitation. It shouldnt snow
-// everywhere or rain everywhere when the season is winter, etc. It should truly be dynamic just like how we have a dynamic
-// cloud and weather system. If its snowing in one area and raining in the next, the transition should be seamless both in
-// ground texture and everything else. This needs to be accurate and as detailed as possible") - THE AIR: a temperature
+// PRECIP1 - THE AIR: a temperature
 // (degrees Celsius) at every place, height and minute, pure in the three - the same on every client, offline and online,
-// as the weather map is (weatherMap.js). bible/07-Rendering/Biome-Precipitation.md is the record.
+// as the weather map is (weatherMap.js). is the record.
 //
 // DFU has no temperature. Its weather table rolls Snow for a climate in Winter and never otherwise; its ground swaps
 // to the winter archive for every climate but a Desert base on the calendar; the port's WEATHER2a funnelled rain over
@@ -144,6 +141,14 @@ let _ground = null;   // { climateAt(px, py), groundAt(x, z), topAt?(px, py) } -
 export function setAirGround(g) {
   _ground = g && typeof g.climateAt === 'function' ? g : null;
   _pixelAir.clear(); _tiles.clear();
+  _groundVersion = _ground?.version?.();
+}
+let _groundVersion;
+/** AUDIT TESA-BIOME Z5: the kept tiles and pixels are the map's as it stood - a ground whose `version()` moves (the land
+ *  past the Bay: the trace landing after the boot, a fit - world/tamriel/tamrielBiomes.js biomeStamp) drops them. */
+function freshen() {
+  const v = _ground?.version?.();
+  if (v !== _groundVersion) { _groundVersion = v; _pixelAir.clear(); _tiles.clear(); }
 }
 export const airGround = () => _ground;
 
@@ -231,6 +236,7 @@ function maritimeTile(tx, ty) {
 /** A pixel's maritime share and the climate whose air it carries (its own on land, the nearest land's at sea - the
  *  Ocean's past `reach`) - for the record's probes and the pins. */
 export function maritimeAt(px, py) {
+  freshen();
   const tx = Math.floor(px / TILE), ty = Math.floor(py / TILE), tile = maritimeTile(tx, ty), o = (py - ty * TILE) * TILE + (px - tx * TILE);
   return { share: tile.share[o], land: tile.land[o] };
 }
@@ -238,6 +244,7 @@ const _pixelAir = new Map();
 /** A PIXEL'S AIR: its climate's row (a sea pixel's nearest land's) blended toward the Ocean's by its maritime share -
  *  `{ mean, amp, day, spell, row }`, kept (bounded). Pure in the pixel and the law's map. */
 export function pixelAir(px, py) {
+  freshen();
   const key = (px + 16384) * 32768 + (py + 16384);
   let a = _pixelAir.get(key);
   if (a) return a;
@@ -285,6 +292,7 @@ export function airParamsAt(x, z, out = { mean: 0, amp: 0, day: 0, spell: 0, gro
   out.mean += latitudeShare(fx, fy) * LATITUDE_C_PER_ROW * (Math.max(0, Math.min(MAX_PY, fy)) - out.row);
   const g = _ground?.groundAt ? _ground.groundAt(x, z) : 0;
   out.ground = Number.isFinite(g) && g > 0 ? g : 0;
+  if (_ground?.heatAt) out.mean += _ground.heatAt(x, z);   // RED-MOUNTAIN: the ground's own heat (airGround.js heatAt)
   for (const { fn, air } of _biomes.values()) {
     const s = Math.max(0, Math.min(1, fn(x, z) || 0));
     if (s <= 0) continue;

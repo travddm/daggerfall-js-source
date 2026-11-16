@@ -1,9 +1,9 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET, AS THE SERVICE KEEPS
+// PROF5 - THE MARKET, AS THE SERVICE KEEPS
 // IT: listings of Stores materials and crafted pieces, their sales and
 // couriers, buy orders and their fills, the prices' history, reports and
-// removal (bible/06-Systems/Professions-Arc.md 10.2-10.5 and 26; the
+// removal (10.2-10.5 and 26; the
 // numbers are src/net/marketLaw.js, which the client reads too).
 //
 // ═══ OPEN WHERE THE BOARD, THE PROFESSIONS AND THE MARKS ARE ═══════
@@ -57,8 +57,6 @@ import { titheAt } from './seatHolding.js';   // SEAT1d: the bailiwick's Tithe
 import { listingsCapAt } from './seatForts.js';   // SEAT2b: a Market Hall's listings
 import { titheOf, TITHE_CAP } from '../../src/net/townSeatLaw.js';
 import { marketHallTitheCap } from '../../src/net/fortLaw.js';
-import { tideNow } from './tides.js';   // SEASON1 part two: a Bandit Summer's couriers (9.3)
-import { tideCourier } from '../../src/net/tideLaw.js';
 import { profOpenFor, spendStatements, spendOrigins, spendableSql, storeOf, silverClothIn } from './professions.js';   // WOVEN-PAYS: a cloth bought with Drakes, counted
 import { REALM_ID_RE, realmActFirst, prepareRealmRecord, mustChange, dropIfUnnamed, recordMovedOf, dropObjects, realmHoldOf, holdStandsSql } from './realm.js';   // GOLD-MARKET
 import { lawfulItem, itemWorth } from '../../src/systems/item/itemLaw.js';   // INT1: no piece the law cannot stand behind is listed; LW15: a patron's judge
@@ -73,7 +71,8 @@ import { payFromSave, creditSave } from '../../src/net/realm/realmGoldLaw.js';  
 import { CHAR_ID_RE, readAll } from './service.js';   // MARKET-SPEED: a read's queries in three round trips
 import { MARKS_MAX, MARK_WORTH_GOLD, utcDay } from '../../src/net/marksLaw.js';
 import { STORES_MAX, looseOnly } from '../../src/net/professionLaw.js';   // CLOTH-GEMS: the loose door's materials are no market's
-import { material, regionOk, WITNESS } from '../../src/net/nodeLaw.js';
+import { material, regionOk, WITNESS } from '../../src/net/nodeLaw.js';   // WW7-5: a town book's region any of the world's
+import { REGION_NAMES } from '../../src/formats/mapsTables.js';   // WW7-5: the world's regions, the hubs' count
 import { RECIPES, recipeById } from '../../src/net/recipeLaw.js';
 import {
   MARKET_LISTING_S, MARKET_ORDER_S, MARKET_ORDERS_MAX, MARKET_POSTS_MAX, MARKET_OPS_MAX, MARKET_WINDOW_S,
@@ -137,7 +136,7 @@ const witnessOf = (player, nowS) => (Number.isSafeInteger(player.registered_at) 
 function hubsOf(hubs) {
   const out = new Map();
   if (!hubs || typeof hubs !== 'object' || Array.isArray(hubs)) return out;
-  for (const [k, v] of Object.entries(hubs).slice(0, 62)) {
+  for (const [k, v] of Object.entries(hubs).slice(0, REGION_NAMES.length)) {   // WW7-5: every region's, the provinces' too
     const r = Number(k);
     if (!regionOk(r) || !Array.isArray(v)) continue;
     const [x, y] = v;
@@ -162,16 +161,14 @@ function hubsFrom(keys, /** @type {any[]} */ results, own) {
   return new Map(keys.map((k) => [Number(k), hubPixel(by.get(k) ?? [], own.get(Number(k)) ?? null)]));
 }
 /** The courier between two regions: `{ courier, seconds, road }` - nothing on the same region, null with no road.
- *  SEASON1 part two: `slow` the Tide's factor on its seconds where it is bound (tideLaw.js tideCourier). */
-function courierOf(hubs, from, to, units, slow = 1) {
+ */
+function courierOf(hubs, from, to, units) {
   if (from === to) return { courier: 0, seconds: 0, road: 0 };
   const a = hubs.get(from), b = hubs.get(to);
   if (!a || !b) return null;
   const road = roadPixels(a, b);
-  return { courier: courierFee(units, road), seconds: courierSeconds(road) * slow, road };
+  return { courier: courierFee(units, road), seconds: courierSeconds(road), road };
 }
-/** SEASON1 part two (9.3): a Bandit Summer where a courier is bound, while a Season is counted. */
-const courierSlow = (env, nowS, to) => tideCourier(tideNow(env, nowS, to));
 /** AUDIT 30 S3: whether the ledger already holds this account's line `rid` + `suffix` - a request id spent, though the
  *  row that would answer its repeat was pruned. */
 const spent = async (db, me, rid, suffix) => !!(await db.prepare('SELECT 1 FROM marks_ledger WHERE actor = ?1 AND rid = ?2').bind(me, `${rid}${suffix}`).first());
@@ -197,7 +194,7 @@ const pieceOf = (p, wear) => (p ? {
   provenance: p.provenance, recipe: p.recipe, quality: Number(p.quality), seed: Number(p.seed), maker: p.maker ?? null,
   marked: Number(p.marked) === 1, template: Number(p.template), material: Number(p.material), wear: Number(wear),
   ...(p.dye == null ? {} : { dye: Number(p.dye) }),   // PROF7: a garment is the colour it was sewn in
-  ...(p.hand == null ? {} : { hand: Number(p.hand) }),   // PROF9: a dish keeps its cook's hand (0069)
+  ...(p.hand == null ? {} : { hand: Number(p.hand) }),   // PROF9: a dish keeps its cook's hand
   ...mintVersionView(p.record),   // CRAFT-PROCS: a piece made before mints as it was
   ...(masterLinesOf(p.record) ? { lines: masterLinesOf(p.record) } : {}),   // MASTER-ART: a Master's work mints its chosen lines
 } : null);
@@ -299,7 +296,7 @@ const orderView = (o, me) => ({
  * (where there is room). One row a batch; SETTLE_MAX rows a read.
  */
 /**
- * MARKET-SPEED (2026-10-11, Mac: "look at ... how the server affects it/slows down, same with the market"): WHAT A SETTLE
+ * MARKET-SPEED: WHAT A SETTLE
  * READS, AS STATEMENTS - whether a listing or an order is past its time (SCALE4b), and each row it would settle: the
  * listings' goods back, the auctions back, the bids' escrow, the orders' escrow, the couriers' loads. They were six round
  * trips in a row on every market read, nearly always all empty; a read sends them in its first batch (marketRead), and a
@@ -339,7 +336,7 @@ async function settle(ctx, player, read = null) {
   const touched = new Set();
   // MARKET-SPEED: the reads one batch (settleReads) - or the read's own first batch's, handed in
   let [due, back, unsold, outbid, shutOrders, loads] = read ?? await readAll(db, settleReads(db, me, nowS));
-  // SCALE4b (2026-10-08): ASKED BEFORE IT IS WRITTEN. Both updates went on every market read, nearly always changing
+  // SCALE4b: ASKED BEFORE IT IS WRITTEN. Both updates went on every market read, nearly always changing
   // nothing - two writes on the market's every look, which a read replica can never serve. One read says whether any
   // of the account's listings or orders is past its time; only then do the same two updates go, word for word (a race
   // that closes one meanwhile leaves its update nothing to change, as before). MARKET-SPEED: the rows they close read
@@ -446,7 +443,7 @@ const auctionsDueRead = (db, nowS) => db.prepare(`SELECT id, high, region, board
  * auction closes unsold. AUDIT 31 S1: a standing bid whose row is gone (its bidder's account deleted - no route does
  * it, Professions-Arc 18) closes it unsold too, never a sale to no one: the owner written NULL failed every read after.
  */
-export async function closeAuctions(ctx, read = null) {
+export async function closeAuctions(ctx, read = null, env = null) {   // DOMAIN3: `env`, the region law's week (the Tithe's bailiwick)
   const { db, nowS, rand } = ctx;
   // MARKET-SPEED: the candidates as a read's first batch found them (auctionsDueRead), or read here - the clock's
   const due = read ?? ((await auctionsDueRead(db, nowS).all()).results ?? []);
@@ -464,7 +461,7 @@ export async function closeAuctions(ctx, read = null) {
     const nonce = mintId(rand);
     const high = a.high == null ? null : Number(a.high);
     // SEAT1d: the Tithe of the seat the auction's board belongs to, from the seller's proceeds
-    const tt = high == null ? null : await titheAt(db, nowS, Number(a.region), rowBoard(a));
+    const tt = high == null ? null : await titheAt(db, nowS, Number(a.region), rowBoard(a), env);
     const tithe = tt ? saleTithe(high, tt.pct) : 0;
     const tax = high == null ? 0 : saleTaxOn(0, high), gets = high == null ? 0 : high - tax - tithe;
     const room = Number(a.balance) + gets <= MARKS_MAX;
@@ -527,11 +524,11 @@ export async function closeAuctions(ctx, read = null) {
 }
 /**
  * THE MARKET'S HISTORY KEPT MARKET_KEEP_DAYS (section 20: 90 days) - every price and fill past it, and every listing,
- * order, delivery, bid and auction long closed and settled (and, LW15, every patron's sale). SCALE4b (2026-10-08): the
+ * order, delivery, bid and auction long closed and settled (and, LW15, every patron's sale). SCALE4b: the
  * service's clock's (server-account/src/cron.js, each hour); the History view pruned first, nine writes on a read. AUDIT
  * SCALE A5: each table's delete takes `rows` at most, and the clock asks again while one took a full page - one
  * unbounded batch, a backlog's worth, could outrun D1's thirty seconds a batch, roll back, and only grow (the auctions'
- * delete walked every bid for each auction it took, until 0091 indexed market_bids by its auction). Answers
+ * delete walked every bid for each auction it took, until market_bids was indexed by its auction). Answers
  * `{ changed, full }`.
  * @param {any} db @param {number} nowS @param {number} rows
  */
@@ -662,7 +659,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
   if (!MARKET_VIEWS.some(([v]) => v === view)) return { error: 'bad-act' };
   if (!currencyOk(currency)) return { error: 'bad-act' };   // GOLD-MARKET: the Materials and Crafted views show one currency at a time
   const me = player.id;
-  // MARKET-SPEED (2026-10-11, Mac: "look at ... how the server affects it/slows down, same with the market"): A READ IS
+  // MARKET-SPEED: A READ IS
   // THREE ROUND TRIPS - its settle's reads and the auctions past their end (one batch), the view's rows and the account's
   // own (a second), and what the rows ask after: their couriers' hubs, their medians, a moderator's reports (a third).
   // It was eighteen to twenty-two, one after another, every one the whole way to the database's primary and back.
@@ -670,7 +667,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
   // closes them each minute, so a read nearly always finds none); the settle's reads then asked again, behind the close
   const first = await readAll(db, [...settleReads(db, me, nowS), auctionsDueRead(db, nowS)]);
   const dueAuctions = first[first.length - 1];
-  if (dueAuctions.length) await closeAuctions(ctx, dueAuctions);
+  if (dueAuctions.length) await closeAuctions(ctx, dueAuctions, env);
   const touched = await settle(ctx, player, dueAuctions.length ? null : first.slice(0, -1));
   const today = utcDay(nowS);
   const own = hubsOf(hubs);
@@ -732,7 +729,7 @@ export async function marketRead(ctx, player, env, { character, region, view, fa
     const by = new Map(q.map(([name], i) => [name, got[i]]));
     const at = hubKeys.length ? hubsFrom(hubKeys, by.get('hubs') ?? [], own) : new Map();
     return {
-      quotes: quoted.map((l) => courierOf(at, Number(l.region), region, unitsOf(l), courierSlow(env, nowS, region))),
+      quotes: quoted.map((l) => courierOf(at, Number(l.region), region, unitsOf(l))),
       medians: medianKeys?.length ? mediansFrom(medianKeys, by.get('medians') ?? [], today) : new Map(),
       reports: new Map((by.get('reports') ?? []).map((r) => [r.listing, Number(r.n)])),
       auctionReports: new Map((by.get('auctions') ?? []).map((r) => [r.auction, Number(r.n)])),
@@ -1146,7 +1143,7 @@ async function listGood(ctx, player, env, { character, region, item, pick, price
   const closed = shut(player, env);
   if (closed) return closed;
   // HOME-VENDOR: a piece stocked at the seller's own trader - its home's region the listing's, its stall its only door.
-  // ACCOUNT-HOMES (2026-10-06): a trader of a home of the seller's ACCOUNT, any character of it (homes.js; a hall's none)
+  // ACCOUNT-HOMES: a trader of a home of the seller's ACCOUNT, any character of it (homes.js; a hall's none)
   const vend = vendor == null ? null : vendorOf(vendor);
   if (vendor != null && !vend) return { error: 'bad-vendor' };
   if (vend) {
@@ -1320,10 +1317,10 @@ export async function marketBuy(ctx, player, env, { character, region, listing: 
   // the courier the buyer's board's seat takes, out of what is burnt
   const [hubsNow, tt, ctAny] = await Promise.all([
     hubsAt(db, [from, region], own),
-    at ? null : titheAt(db, nowS, from, rowBoard(l)),
-    at || from === region ? null : titheAt(db, nowS, region, boardOf(board)),
+    at ? null : titheAt(db, nowS, from, rowBoard(l), env),
+    at || from === region ? null : titheAt(db, nowS, region, boardOf(board), env),
   ]);
-  const road = courierOf(hubsNow, from, region, units, courierSlow(env, nowS, region));
+  const road = courierOf(hubsNow, from, region, units);
   if (!road) return { error: 'market-no-road' };
   if (at) return buyWithGold(ctx, player, { character, region, l, units, max, rid, road, own, at, answer, vend, landed: landed === true });
   const total = units * Number(l.price);
@@ -1654,7 +1651,7 @@ export async function marketFill(ctx, player, env, { character, region, order: i
   const pay = total - tax - road.courier;
   if (pay < 1) return { error: road.courier > 0 ? 'market-courier-dear' : 'market-taxed-out' };
   if (Number.isSafeInteger(least) && pay < least) return { error: 'market-price-moved' };
-  const ct = road.courier > 0 ? await titheAt(db, nowS, region, boardOf(board)) : null;
+  const ct = road.courier > 0 ? await titheAt(db, nowS, region, boardOf(board), env) : null;
   const fillTithe = ct ? titheOf(road.courier, ct.pct) : 0;   // the buy's courier share (SEAT1d), the filler's board's
   const nonce = mintId(rand);
   const day = utcDay(nowS);
@@ -2026,7 +2023,7 @@ export async function marketBid(ctx, player, env, { character, region, auction: 
   if (amount < next) return { error: 'auction-low' };
   const from = Number(a.region);
   const own = hubsOf(hubs);
-  const road = courierOf(await hubsAt(db, [from, region], own), from, region, 1, courierSlow(env, nowS, region));
+  const road = courierOf(await hubsAt(db, [from, region], own), from, region, 1);
   if (!road) return { error: 'market-no-road' };
   const held = amount + road.courier;
   const bidId = mintId(rand);
@@ -2123,7 +2120,7 @@ export async function marketReport(ctx, player, env, { listing: id } = {}) {
 /** REMOVE: `{ listing }` - a developer's: the listing off every board, its goods returned on its seller's next read.
  *  PROF5b: an auction likewise - its standing bid voided (its escrow back on its bidder's read), its piece returned.
  *  STAFF-PANEL2-FIX (design doc "DFO Staff Panel: design", Weak spots: "/v1/mod/ acts are limited to in-game mute and
- *  ban, and Market Pull is Admin only"): a Moderator no longer pulls a listing - an Admin (DEVELOPER_HANDLES) does.
+ *  ban, and Market Pull is Admin only"): a Moderator no longer pulls a listing - an Admin does.
  *  STAFF-PANEL3-REALM (design doc "Remove items": "Remove from market: the listing ends and the item does not go back"):
  *  `keep` - the staff panel's removal: the same end, and the goods marked returned in the statement that ends it (`rn` the
  *  removal's nonce), so its seller's settle never hands them back; `also(nonce, table)` the panel's own statements for the
@@ -2211,7 +2208,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
   const closed = shut(player, env);
   if (closed) return closed;
   if (!regionOk(region)) return { error: 'bad-region' };
-  // VENDOR-BOARD (2026-10-19; bible/11-Multiplayer/Scale-Arc.md VENDOR-BOARD; migration 0137): THE REGION'S BOARD, EVERY
+  // VENDOR-BOARD: THE REGION'S BOARD, EVERY
   // CALLER'S ALIKE, IS ONE ROW (vendorBoard), and the caller's own door - its own house, its guild's, a room it rents -
   // is read off two of its own rows, where the board's two statements asked them of every listing
   // AUDIT LEAN-READS D5: the caller's own rows read first - the board may keep its row last, and on a replica's session a
@@ -2223,7 +2220,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
       GROUP BY map_id, building_key`).bind(player.id, me, nowS),
   ]) : [null, null];
   const board = await vendorBoard(ctx, region);
-  // ACCOUNT-HOMES (2026-10-06): a house is its ACCOUNT's, so the door's guildmate is a guild shared with any character of
+  // ACCOUNT-HOMES: a house is its ACCOUNT's, so the door's guildmate is a guild shared with any character of
   // the owner's account - the accounts of the caller's guildmates, not their characters
   const mate = new Set((mates?.results ?? []).map((/** @type {any} */ m) => m.player));
   const rent = new Map((rooms?.results ?? []).map((/** @type {any} */ r) => [`${r.map_id}:${r.building_key}`, Number(r.until)]));
@@ -2248,9 +2245,7 @@ export async function marketVendors(ctx, player, env, { region, character = null
 }
 
 /**
- * VENDOR-BOARD (2026-10-19, the account database overloaded again: the region's traders the read most asked again in
- * the 18:05 overload - 1,517 asks in five minutes where 330 was the rate; bible/11-Multiplayer/Scale-Arc.md VENDOR-BOARD;
- * migration 0137): THE REGION'S TRADERS AS EVERY CALLER READS THEM - `{ newest, houses, patrons }`, the rows the board's
+ * VENDOR-BOARD: THE REGION'S TRADERS AS EVERY CALLER READS THEM - `{ newest, houses, patrons }`, the rows the board's
  * three reads answer, before any caller's own door. Its kept row while it is its version's (the database moves it on
  * every trader listing, trader, trader's house and patron sale written - in a row of its own, AUDIT LEAN-READS 2 B3; no
  * such row, no board kept: B4), its shape's (these reads' and their bounds' - keptBoard.js) and the caller's second is
@@ -2261,11 +2256,11 @@ export async function marketVendors(ctx, player, env, { region, character = null
  * is still the one it read, so a slow reader never puts an older board over a newer one, and only where no board kept
  * meanwhile serves its second or a later one already, so readers that missed together write it once (B2).
  *
- * PATRON-LOAD (2026-10-10, Mac: "the newest update account service keeps failing"): THE REGION'S READ RECKONS NOTHING.
+ * PATRON-LOAD: THE REGION'S READ RECKONS NOTHING.
  * Every online client standing in a living town reads it each PATRON_READ_S (scenes/world.js livingPatronsRead), and its
  * lazy reckoning - up to PATRON_READ_STATEMENTS statements a read - backed the database's writes up until D1 refused as
  * overloaded. The hour's cron reckons the towns waiting longest; a trader opened (/vendor) and a seller's own page
- * (/myvendors) reckon their towns; this read tells what they sold. PATRON-LOAD II (migration 0107): AND BY THE LISTING'S
+ * (/myvendors) reckon their towns; this read tells what they sold. PATRON-LOAD II: AND BY THE LISTING'S
  * OWN REGION - a trader's listing carries its home's region (listGood), so `l.region = ?2` asks what `h.region = ?2`
  * asks, and idx_market_vendor_region answers it. AUDIT LW-II-2 W6: AND EVERY PUBLIC TRADER OF THE REGION its patrons may
  * buy of - each such house's newest piece, where the board's VENDOR_BOARD_SHOWN newest left the house out: the towns'
@@ -2334,7 +2329,7 @@ export function vendorBoardOf(/** @type {unknown} */ text) {
  * HOME-VENDOR: MY TRADERS - `{ character }`: the Vendor page's read (the pause window's, beside the Professions). Every
  * trader of this character's homes (where it stands), the pieces standing at them, the pieces they have SOLD (newest
  * first, while the market keeps the sale's listing), and the gold the sales hold to collect at any board.
- * ACCOUNT-HOMES (2026-10-06): the traders are the ACCOUNT's homes' (every character of it owns them); what stands at
+ * ACCOUNT-HOMES: the traders are the ACCOUNT's homes' (every character of it owns them); what stands at
  * them, what they sold and the gold held stay this character's - a listing is its seller character's goods.
  */
 export async function marketMyVendors(ctx, player, env, { character } = {}) {
@@ -2374,7 +2369,7 @@ export async function marketMyVendors(ctx, player, env, { character } = {}) {
   };
 }
 
-// ─── LW15: THE PATRONS (bible/06-Systems/Living-World-II.md "LW15") ─
+// ─── LW15: THE PATRONS ("LW15") ─
 
 /** The towns one firing of the hour's cron reckons (the rest the next, or their next read). */
 export const PATRON_CRON_TOWNS = 40;
@@ -2415,7 +2410,7 @@ export const PATRON_TOLD_SQL = (/** @type {string} */ where) => `SELECT s.listin
   FROM market_patron_sales s JOIN market_listings l ON l.id = s.listing WHERE ${where} AND s.at > ?1 ORDER BY s.at DESC LIMIT ${VENDOR_BOARD_SHOWN}`;
 
 /** VENDOR-BOARD: a trader listing's columns as the board keeps them - the ones listingView reads (AUDIT LEAN-READS B7: its
- *  bookkeeping is none of the board's, and migration 0137's trigger moves the board on these alone) - and its trader's. */
+ *  bookkeeping is none of the board's, and the schema's trigger moves the board on these alone) - and its trader's. */
 const VENDOR_COLUMNS = `l.id, l.kind, l.region, l.material, l.item, l.own, l.bought, l.units, l.price, l.fee, l.wear, l.at, l.expires_at, l.state,
       l.currency, l.seller, d.map_id AS v_map, d.id AS v_id, h.building_key AS v_key, h.owner_name AS v_owner, h.player AS v_player,
       h.char_id AS v_char, h.entry AS v_entry`;

@@ -1,14 +1,12 @@
-// DUEL1 (2026-09-24, Mac: "When inspecting a player, they should be able to send an invite to duel which then traps both
-// players in a surrounding transparent holographic wall that keeps them from going outside of the duel space."; asked:
-// weapons, bows and spells; "Loser drops to 1HP and both are fully healed on duel end"; outdoors only): THE DUEL'S LAW,
+// DUEL1: THE DUEL'S LAW,
 // DRIVEN. Two managers (net/duel/duelSession.js) over a fake wire that projects every frame through the relay's own law
 // (net/wire.js validDuelData) and stamps the sender's id and account as the relay does - the three-step handshake, every
 // refusal, the count, the blows, every end and who it names, the hold, the ring's own geometry.
 //
-// INT8 (2026-10-09, bible/06-Systems/Integrity-Arc.md lane 2): AND THE WIRE CARRIES THE REFEREE. The relay holds the
+// INT8: AND THE WIRE CARRIES THE REFEREE. The relay holds the
 // bout now (net/duel/duelRef.js) - it sets it on the start it routes, judges every blow (routed to nobody), and ends it - so
 // the fake wire runs the referee's own law between the two managers as the relay's duel arm does, and hands its words
-// (`dref`) to each through `onRef`. PIN MOVED, each where it stands: the defender resolves nothing, a fall and a draw
+// (`dref`) to each through `onRef`.
 // are the referee's, a fighter that leaves its bout loses it, and the record is the referee's receipt.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -235,7 +233,6 @@ test('DUEL1 a yes that never gets its start lapses in DUEL_START_WAIT_MS - the a
 });
 
 test('DUEL1 THE COUNT, THEN THE BLOWS: nothing leaves or lands for DUEL_COUNTDOWN_MS; after it a blow leaves numbered with the number its striker rolled - INT8: and THE REFEREE judges it, clipped to its weapon\'s bucket, both fighters told what landed and what is left; routed to nobody, so the defender resolves nothing (mutants: a blow in the count; a blow routed to the defender; the clip unread)', () => {
-  // PIN MOVED (INT8): the defender resolved the blow on its own sheet and answered with a `result` for its number; each
   // number once and DUEL_BLOWS_PER_S a second were the DEFENDER's law. The referee's own pins hold the rate, the reach
   // and the clip (net/siege/siegeRef.js refereeBlow - test/systems/pvpref_law.test.js); here, that a blow is the referee's alone.
   const r = rig();
@@ -260,11 +257,10 @@ test('DUEL1 THE COUNT, THEN THE BLOWS: nothing leaves or lands for DUEL_COUNTDOW
 });
 
 test('DUEL1 THE ENDS AND WHOM THEY NAME - INT8: THE REFEREE\'S. A fall at the referee\'s vitality loses; the other wins; a yield loses; the clock is a draw; each ends the duel on BOTH sides, and a bout won hands BOTH fighters the referee\'s receipt (mutants: the winner named the loser; the receipt kept from the loser; a draw minting one; my own word of a fall believed)', () => {
-  // PIN MOVED (INT8): a fall was the defender's own (`end fell` at 1 health) and the loser reported it; both were healed
   // DUEL_HEAL_HOLD_MS after. A fall is the referee's vitality at none, the record its receipt, and the hold lets the
   // ended duel go with no heal - a duel never touches the save's health now.
   let r = duelling();
-  for (let i = 0; i < 40 && r.m.a.live; i++) { r.m.a.blow('strike', { by: 'melee', p: r.P.a.pos, d: 999 }); r.pump(); r.tick(300); }   // PIN MOVED (BAL8, bible/05-Combat/Balance-Arc.md section 14): the referee's harm ceiling, 180 in any 5 s - the fall takes more blows than ten
+  for (let i = 0; i < 40 && r.m.a.live; i++) { r.m.a.blow('strike', { by: 'melee', p: r.P.a.pos, d: 999 }); r.pump(); r.tick(300); }
   assert.deepEqual(r.P.b.ends, [{ why: 'fell', won: false, lost: true, by: 'me' }], 'B fell: B lost');
   assert.deepEqual(r.P.a.ends, [{ why: 'fell', won: true, lost: false, by: 'them' }], 'A won');
   assert.deepEqual([r.P.a.receipts, r.P.b.receipts], [[RC], [RC]], 'the receipt, to both: either carries it');
@@ -293,7 +289,6 @@ test('DUEL1 THE ENDS AND WHOM THEY NAME - INT8: THE REFEREE\'S. A fall at the re
 });
 
 test('DUEL1 THE RING HOLDS - INT8: AND LEAVING IT LOSES. My body carried past the edge, me indoors or fallen to something else: my own word to the referee, and my LOSS once the count has run (a cancel before it); the opponent past the edge DUEL_OUT_MS, or gone from the room ROYAL_RING.goneMs: the referee\'s, and my win (mutants: a fighter running from a loss unrecorded; the opponent\'s stray pose ending it at once; a disconnect free)', () => {
-  // PIN MOVED (INT8): each of these ended the duel naming nobody - so a fighter about to fall walked indoors, or out of
   // the ring, or closed the tab, and lost nothing. The referee names the one that left the loser.
   const past = (DUEL_RADIUS_M + DUEL_OUT_SLACK_M + 1) * NATIVES_PER_M;
   let r = duelling();

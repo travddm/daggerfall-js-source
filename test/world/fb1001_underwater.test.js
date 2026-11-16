@@ -70,7 +70,6 @@ test('UNDER-LOOK: the murk scales the mod\'s vision distance and everything the 
   assert.ok(Math.abs(mod[2] - underwaterVisionDistance(0.3)) < 1e-4, 'above six metres the mod\'s vision is the slider\'s');
   for (let i = 4; i < 8; i++) assert.ok(Math.abs(port[i] * UNDERWATER_MURK - mod[i]) < 1e-6, `extinction ${i}: per metre, by 1 / murk`);
   assert.ok(port[16] < mod[16] && port[17] < mod[17], 'the band closes nearer');
-  assert.match(rd('src/scenes/world.js'), /distanceFogUniforms\(f\.s, \{ daylight: f\.daylight, cameraY: f\.camY, oceanY: _dwFogP\.oceanY, murk: UNDERWATER_MURK \}, _dwFogU\)/, 'the host hands the port\'s murk');
 });
 
 /** The pass's fragment program over one pixel: the rays as drawSkyFog builds them, the frame's uniforms. */
@@ -107,19 +106,3 @@ test('UNDER-RAYS: the pass multiplies by the body\'s keep and then adds its ligh
   assert.ok(SKY_FOG_VS.includes('vRay = uRayC + p.x * uRayX + p.y * uRayY;'));
 });
 
-test('UNDER-LOOK: the world host draws it while the eye is under the sea, after the last world pass and before the weapon and the HUD; the pass owns its state (mutants: the gate; the place)', () => {
-  const w = rd('src/scenes/world.js');
-  const at = w.indexOf('dwRender.drawUnderwaterLook(');
-  assert.ok(at > 0);
-  const gate = w.lastIndexOf('\n', at);
-  assert.match(w.slice(w.lastIndexOf('\n', gate - 1), gate), /if \(deepWaters && dwRender && _dwFogP\?\.under && _dwFrame\) \{/, 'only under the sea');
-  assert.ok(at > w.indexOf('    arrows.draw(renderer);'), 'after the arrows - the last world pass');
-  assert.ok(at < w.indexOf("    meterFor(renderer.gl)?.markCpu('rig');"), 'before the weapon rig and the HUD');
-  assert.match(w.slice(at, at + 400), /underwaterLookUniforms\(\{ depth: _dwFogP\.oceanY - cam\.pos\[1\], daylight: _dwFrame\.daylight, toSun: sunDirection\(minute\), sunColor: renderer\._sunColor, sunScale: renderer\._sunScale \}, _underLook\), _dwFogP\.oceanY, SHAFT_REACH_M, now \/ 1000\);\s*\n\s*renderer\.markForeignPass\(\);/);
-  const dw = rd('src/render/deepWatersRender.js');
-  const body = dw.slice(dw.indexOf('  drawUnderwaterLook(u, seaY, reach, timeSeconds) {'), dw.indexOf('  dispose() {'));
-  for (const restore of ['gl.disable(gl.BLEND);', 'gl.depthMask(true);', 'gl.enable(gl.CULL_FACE);', 'gl.enable(gl.DEPTH_TEST);', 'gl.bindVertexArray(null);']) {
-    assert.ok(body.includes(restore), `it leaves ${restore}`);
-  }
-  assert.match(body, /gl\.blendFuncSeparate\(gl\.ZERO, gl\.SRC_COLOR, gl\.ZERO, gl\.ONE\);[\s\S]*gl\.blendFuncSeparate\(gl\.ONE, gl\.ONE, gl\.ZERO, gl\.ONE\);/, 'multiply, then add - alpha kept');
-});

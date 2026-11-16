@@ -1,5 +1,4 @@
-// TI3 (2026-09-17, Mac: "Some desktop users are reportably recieving the
-// mobile UI instead of desktop"). THE TOUCH-DEVICE LAW: a finger as the
+// TI3. THE TOUCH-DEVICE LAW: a finger as the
 // PRIMARY pointer - `(pointer: coarse)` and `(hover: none)` - with the
 // old sniff (ontouchstart / maxTouchPoints) as the fallback where the
 // media queries are absent or unknown, and `?touch=on|off` the door.

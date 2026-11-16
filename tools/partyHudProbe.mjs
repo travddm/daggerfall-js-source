@@ -1,6 +1,4 @@
-// PARTY8 (Mac, 2026-09-22: "increase the party limit to 8, and also redesign
-// the party UI so it doesnt clutter the screen into a better enhanced
-// design") - THE PARTY HUD AT A FULL PARTY, in a real browser.
+// PARTY8 - THE PARTY HUD AT A FULL PARTY, in a real browser.
 //
 // What only a browser can prove: the stack of seven companions' cards on
 // the enhanced skin's sheet - its width, its height against the viewport,
@@ -9,7 +7,7 @@
 // (test/net/soc4_partyhud.test.js); here the numbers the screen shows are read
 // back off the DOM.
 //
-// PARTY8-B (Mac: "B" - quiet rows): the same seven, now with `here` set
+// PARTY8-B (- quiet rows): the same seven, now with `here` set
 // to Daggerfall so the rows read as the design means them to - Bran's
 // place line gone (with me), the dungeon seat's kept, the digits drawn
 // only on the seats under half health.
@@ -39,7 +37,7 @@ const [VW, VH] = (process.env.VIEW ?? '1280x800').split('x').map(Number);
 const page = await browser.newPage({ viewport: { width: VW, height: VH } });
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e.message)));
-await page.goto(`${BASE}/menu.html?skin=enhanced`, { waitUntil: 'networkidle' });
+await page.goto(`${BASE}/labs/menu.html?skin=enhanced`, { waitUntil: 'networkidle' });
 
 const state = await page.evaluate(async () => {
   const { createPartyPanel } = await import('/src/ui/partyPanel.js');

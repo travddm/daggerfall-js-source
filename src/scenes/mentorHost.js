@@ -1,5 +1,5 @@
 // @ts-check
-// MENTOR2 (2026-10-27; bible/06-Systems/Mentor-Mode.md) - MENTOR MODE IN THE STREAMING WORLD. scenes/world.js builds it
+// MENTOR2 - MENTOR MODE IN THE STREAMING WORLD. scenes/world.js builds it
 // once and calls `frame` from its party frame. Each frame it reads the party members whose bodies are drawn in my room
 // (outdoors within MENTOR_NEAR_METRES), steadies them (mentorMode.js createMentorPresence), lays the mentor's and the
 // pupil's profiles on my entity, hands the Firmament its scale and says a start or an end in the chat - once each.
@@ -39,8 +39,11 @@ export function createMentorHost(deps) {
     const me = deps.player();
     if (!me) return;
     const social = deps.social();
-    if (!social?.party) presence.reset();   // leaving the party is a deliberate act: I am myself again the same frame
-    const mates = social?.party ? social.others() : [];
+    // leaving the party is a deliberate act: I am myself again the same frame. So is the
+    // leader's "no mentoring" - nobody is mentored and nobody is a pupil while it stands
+    const mentoring = !!social?.party && social.party.nm !== 1;
+    if (!mentoring) presence.reset();
+    const mates = mentoring ? social.others() : [];
     const member = (acct) => mates.some((m) => m.acct === acct);
     const levels = presence.levels(nearPartners(mates), nowMs, { fighting, member });
     const word = refreshMentor(me, levels);

@@ -91,7 +91,7 @@ export const craftedRecord = ({ provenance, wear = 1000, templateIndex = 120, ma
 });
 
 /**
- * INT19 (bible/06-Systems/Integrity-Arc.md section 7): A CRAFTED PIECE IN A REALM CHARACTER'S RECORD - a listing, an
+ * INT19: A CRAFTED PIECE IN A REALM CHARACTER'S RECORD - a listing, an
  * auction and a commission's fill take the piece out of the record (server-account/src/craftedPiece.js), so a pin's piece
  * stands there first: `pieces` (each craftedRecord's fields, `where: 'home'` among the furnishings) laid into the record
  * at its sequence (layRecord's way). Answers the records laid.

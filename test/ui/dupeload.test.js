@@ -1,4 +1,4 @@
-// DUPE-LOAD (2026-10-11, the exploit audit the owner asked for: "Can we look deep for duping"). F11 loaded the save
+// DUPE-LOAD. F11 loaded the save
 // from under ANY window outdoors (FIX-E read every overlay for the death screen's hint), and the load closed only the
 // death screen - so the pack, a loot window or a counter stood over the loaded game still holding what it had taken off
 // the old one, and its close handed that back: drop the purse on the ground, F11, close the pack - the restored purse

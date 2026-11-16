@@ -12,6 +12,9 @@ import {
 } from '../../src/systems/shopStock.js';
 import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 import { OIL_TEMPLATE } from '../../src/systems/inventory.js';   // AUDIT 58: the oil-bottle stack clause
+import { tradeCost, getTradePrice, markCounterBought } from '../../src/systems/tradeModes.js';
+import { createRestItem, REST_ITEM } from '../../src/systems/rest/restItems.js';
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 
 test('itemTemplates: the 288-row table + group enum mapping + material values', () => {
   assert.equal(ITEM_TEMPLATES.length, 288);
@@ -45,7 +48,7 @@ test('shopStock: the stock law - rarity gate, chance, gender swap, horse+cart', 
   // rolls always 0 -> every Dice100 passes -> a weaponsmith at quality
   // 21 stocks EVERY weapon and armor template (rarity <= 21 always)
   const all = stockShopShelf({ buildingType: BUILDING_TYPES.WeaponSmith, quality: 21 }, { level: 1 }, { rolls: () => 0 });
-  const weaponCount = all.filter((it) => it.group === 'Weapons').length;   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): DFU's own weapons alone again - no counter carries the Dwemer Pellet (test/systems/pelletsscarce.test.js)
+  const weaponCount = all.filter((it) => it.group === 'Weapons').length;
   const armorCount = all.filter((it) => it.group === 'Armor').length;
   assert.equal(weaponCount, GROUP_TEMPLATE_INDICES.Weapons.length);
   assert.equal(armorCount, GROUP_TEMPLATE_INDICES.Armor.length);
@@ -55,17 +58,16 @@ test('shopStock: the stock law - rarity gate, chance, gender swap, horse+cart', 
   assert.deepEqual(none.map((it) => it.templateIndex), [131], 'nothing of DFU\'s - PIN MOVED (SHOP-ARROWS): the counter\'s quiver (Arrow, 131) alone, from no roll; PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellets SHOP-PELLETS laid after it are gone');
   // the rarity gate: quality 1 refuses templates rarer than 1
   const q1 = stockShopShelf({ buildingType: BUILDING_TYPES.WeaponSmith, quality: 1 }, { level: 1 }, { rolls: () => 0 });
-  for (const it of q1) {   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): every piece the stock law's again - the counter's shot, which stood outside it, is gone
+  for (const it of q1) {
     const t = ITEM_TEMPLATES[it.templateIndex];
     assert.ok(t.rarity <= 1, `${t.name} rarity ${t.rarity} on a quality-1 shelf`);
   }
   // books ride the quality ladder with NO Dice100 gate (q5 -> 3 books)
   const gs = stockShopShelf({ buildingType: BUILDING_TYPES.GeneralStore, quality: 5 }, { level: 1 }, { rolls: () => 0.999 });
-  // PIN MOVED (MERCHANT-YARDS, 2026-10-10): no horse, no cart and no wagon - the town's Stable and Wagon Yard sell them
   // (test/world/merchantyards1.test.js holds what they sell); DFU's general store shelved the horse and the cart first
-  assert.deepEqual(gs.map((it) => it.templateIndex), [277, 541, 531, 584, 131, 83]);   // PIN MOVED (LOCKPICK, 2026-10-26): the counter's stack of Lockpicks (584) after the provisions, before the quiver   // PIN MOVED (PELLETS-SCARCE, 2026-10-24): no Dwemer Pellets (561) between the quiver and the healing supply   // PIN MOVED (SHOP-ARROWS, 2026-10-11): the counter's quiver (Arrow, 131) before the pellets   // PIN MOVED (WAGONS1, 2026-10-09): the Open Wagon and the Caravan had stood beside the cart
-  assert.equal(gs.some((it) => it.group === 'Transportation' || it.templateIndex === TRANSPORT_HORSE || it.templateIndex === TRANSPORT_SMALL_CART), false, 'MERCHANT-YARDS: nothing of the Transportation group');   // PIN MOVED (SHOP-PELLETS, 2026-10-07): and the counter's Dwemer Pellets (561), after DFU's draws and the provisions, before the healing supply   // PIN MOVED (ENDLESS PROVISIONS, 2026-10-04): the counter's Campfire Kit (541) and Rations (531), every tier, before the healing supply   // POTION-COMMON: and its day of Potions of Healing (the Glass Bottle, 83) at the shelf's end   // AUDIT-RR2 G10: AddItem merges the three same-message books into one stack (ItemCollection.cs:224-228, :710)
-  assert.equal(gs[0].stackCount, 3);   // PIN MOVED (MERCHANT-YARDS): the books first now; (WAGONS1): two wagons had stood before them
+  assert.deepEqual(gs.map((it) => it.templateIndex), [277, 541, 531, 584, 131, 83]);
+  assert.equal(gs.some((it) => it.group === 'Transportation' || it.templateIndex === TRANSPORT_HORSE || it.templateIndex === TRANSPORT_SMALL_CART), false, 'MERCHANT-YARDS: nothing of the Transportation group');
+  assert.equal(gs[0].stackCount, 3);
   // the gender swap: a female player sees WomensClothing at the clothier
   const cs = stockShopShelf({ buildingType: BUILDING_TYPES.ClothingStore, quality: 21 }, { level: 1, gender: 'female' }, { rolls: () => 0 });
   assert.ok(cs.some((it) => it.group === 'WomensClothing'));
@@ -122,7 +124,7 @@ test('shopStock: storeBuysItemType verbatim (E3 sell gating)', () => {
   assert.deepEqual([...SHOP_BUYS_GROUPS[BUILDING_TYPES.WeaponSmith]], ['Armor', 'Weapons']);
   assert.equal(SHOP_BUYS_GROUPS[BUILDING_TYPES.PawnShop].length, 10);
   assert.equal(SHOP_BUYS_GROUPS[BUILDING_TYPES.Alchemist].length, 9);
-  // MERCHANT-YARDS (2026-10-10): the general store no longer buys DFU's Transportation - the town's yards buy a horse, a cart
+  // MERCHANT-YARDS: the general store no longer buys DFU's Transportation - the town's yards buy a horse, a cart
   // and a wagon back (systems/merchantYards.js yardBuysItem)
   assert.deepEqual([...SHOP_BUYS_GROUPS[BUILDING_TYPES.GeneralStore]], ['Books', 'MensClothing', 'WomensClothing', 'Jewellery', 'Weapons', 'UselessItems2']);
   assert.equal(shopBuysItem(BUILDING_TYPES.GeneralStore, { group: 'Transportation', templateIndex: TRANSPORT_HORSE }), false);
@@ -180,4 +182,75 @@ test('AUDIT 58: a shop shelves 5-20 OIL BOTTLES when torches come from items (Da
   assert.ok(rows > 100, 'the sweep really shelved oil');
   assert.equal(lo, 5, 'the low bound is REACHED');
   assert.equal(hi, 20, 'and so is 20 - Range(5, 20 + 1) is inclusive of 20');
+});
+
+// A shop's offer for a sale online (net/profile/profileKeys.ts trade.saleCap, trade.haggleRange): DFU's haggle by
+// default, the counter-half cap as the server profile's option.
+const ONLINE = { online: true };
+const OFFLINE = { online: false };
+const WEAK = { mercantile: 5, personality: 40 };
+const BEST = { mercantile: 100, personality: 100 };
+const sell = (q, skills, where) => calculateTradePrice(1000, q, skills, true, where);
+
+/** Runs `fn` with the page online, as the game's own reads of the lane see it. */
+const onlinePage = (fn) => {
+  const was = globalThis.location;
+  globalThis.location = /** @type {any} */ ({ search: '?online=1' });
+  try {
+    return fn();
+  } finally {
+    globalThis.location = was;
+  }
+};
+
+test("online a sale is DFU's haggle (FormulaHelper.CalculateTradePrice): the same offer as single player, every quality and skill in range", () => {
+  for (let q = 1; q <= 20; q++) {
+    for (const m of [0, 5, 40, 75, 100]) {
+      for (const p of [0, 40, 100]) {
+        const skills = { mercantile: m, personality: p };
+        assert.equal(sell(q, skills, ONLINE), sell(q, skills, OFFLINE), `q${q} M${m} P${p}`);
+      }
+    }
+  }
+  // DFU's offers for a 1000-gold piece at a quality-10 shop, for a weak seller and for the best one.
+  assert.equal(sell(10, WEAK, ONLINE), 371);
+  assert.equal(sell(10, BEST, ONLINE), 671);
+});
+
+test('online a poor shop pays more for goods than a rich one, and the skills move a sale at their full weight', () => {
+  assert.ok(sell(1, BEST, ONLINE) > sell(10, BEST, ONLINE));
+  assert.ok(sell(10, BEST, ONLINE) > sell(20, BEST, ONLINE));
+  // About 81 percent from the weakest seller to the best at quality 10, as in DFU.
+  assert.ok(sell(10, BEST, ONLINE) / sell(10, WEAK, ONLINE) > 1.75);
+});
+
+test('online the haggle still reads a skill inside 0 to 100 (trade.haggleRange), so an enchanted skill never drives a price under nothing', () => {
+  const lifted = { mercantile: 346, personality: 100 };
+  assert.equal(sell(10, lifted, ONLINE), sell(10, BEST, ONLINE));
+  assert.equal(calculateTradePrice(1000, 10, lifted, false, ONLINE), calculateTradePrice(1000, 10, BEST, false, ONLINE));
+  assert.ok(calculateTradePrice(1000, 10, lifted, false, OFFLINE) < 0, "single player reads DFU's unbounded skill");
+});
+
+test("with the server profile's cap, a sale is the old online rule: at most half the counter's least ask, skills at half weight", (t) => {
+  playByRules(t, { 'trade.saleCap': true });
+  assert.equal(sell(10, WEAK, ONLINE), 145);
+  assert.equal(sell(10, BEST, ONLINE), 187);
+  assert.ok(sell(20, BEST, ONLINE) > sell(1, BEST, ONLINE), 'the quality order the cap turns over');
+  assert.equal(sell(10, WEAK, OFFLINE), 371, 'single player keeps DFU');
+});
+
+test('without the cap, a piece bought at a counter still never sells back there for more than was paid (the counter-paid mark)', () => {
+  onlinePage(() => {
+    for (let q = 1; q <= 20; q++) {
+      for (const adj of [500, 1000, 2500]) {
+        const wood = createRestItem(REST_ITEM.Firewood, { stackCount: 5 });
+        const bought = tradeCost('Buy', [wood], { quality: q, priceAdjustment: adj });
+        const paid = getTradePrice('Buy', bought.cost, q, BEST, bought.pieces);
+        markCounterBought([wood], { price: paid });
+        const back = tradeCost('Sell', [wood], { quality: q, priceAdjustment: adj });
+        const offered = getTradePrice('Sell', back.cost, q, BEST, back.pieces, back.resale);
+        assert.ok(offered <= paid, `q${q} index ${adj}: paid ${paid}, offered ${offered}`);
+      }
+    }
+  });
 });

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TV8 - GROUP TRAVEL, THE LEADER DRIVES (bible/06-Systems/Travel-View.md, THE OVERHAUL).
+// TV8 - GROUP TRAVEL, THE LEADER DRIVES (, THE OVERHAUL).
 //
-// Mac (2026-09-28): "Group traveling is possible? Where the leader dictates on the map where to go?" - his call, "Leader
+// his call, "Leader
 // drives". A party leader's Overworld journey (a place, or a spot) is offered to the members gathered with them; a
 // member who says yes walks the same journey beside them, in their own Overworld. A stop for one is a stop for all.
 //
@@ -18,7 +18,7 @@
 // partyWalkFrame) does the prompting and the journeys. AUDIT OW3 P11: every decision the host used to make inline lives
 // here now, so the halt/resume cycle, a stale yes, an arrival told from a stop, the pose's grace and the resume to the
 // same place are proved by running them, not by the shape of the host's lines.
-// AUDIT OW4 (2026-09-28, the second pass): a spot re-aimed while it walks sets out (P1); a halt lapses (P2); a journey that
+// AUDIT OW4: a spot re-aimed while it walks sets out (P1); a halt lapses (P2); a journey that
 // cannot run is not set out again by the party (P4); a member's own journey under a halt leaves the walk (P6). The host's
 // half is run from its own source text (test/systems/travel/tv8_party_walk.test.js lifts partyWalkFrame - AUDIT OW4 P7).
 // ═══════════════════════════════════════════════════════════════════

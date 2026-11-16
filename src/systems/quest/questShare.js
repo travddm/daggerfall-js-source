@@ -169,8 +169,7 @@ export function shareEnvelopeEnding(data) {
   return false;
 }
 
-/** SHARE-MEND (2026-09-27, Discord - Tabitha: "Fix sharing Guild & Temple quests - It says the quests don't match up,
- *  can't share, etc."): A DUNGEON PLACE CARRIES EVERY QUEST MARKER IN THE DUNGEON (place.js
+/** SHARE-MEND: A DUNGEON PLACE CARRIES EVERY QUEST MARKER IN THE DUNGEON (place.js
  *  _enumerateDungeonQuestMarkers - DFU's SiteDetails keeps them all, and a save must), about 240 bytes each, and a
  *  guild's or a temple's "clear the dungeon" sends the party to a big one: three hundred markers were 71 KB, over
  *  QUEST_SHARE_MAX_BYTES on their own, and the Share button said "This quest is too complex to share." A marker's
@@ -256,7 +255,7 @@ export function canReceiveSharedQuest(machine, questLists, questName, { membersh
   // AUDIT DROPS A1: the main quest is refused on RECEIPT as well as on send - the sender's own gate is the sender's
   // client, and a hand-built envelope is not bound by it.
   if (isMainQuestName(questName)) return { ok: false, reason: 'mainQuest' };
-  // QUEST-SHELF (2026-10-08): a copy I set aside takes no partner's share or step - reclaimed, it is as I left it
+  // QUEST-SHELF: a copy I set aside takes no partner's share or step - reclaimed, it is as I left it
   if (isShelved(machine.sharedCandidateNamed?.(questName))) return { ok: false, reason: 'shelved' };
   if (machine.hasActiveQuestNamed(questName)) {
     // QUEST1 LIVE SYNC: a resync of a quest ALREADY kept in sync with the
@@ -367,7 +366,7 @@ export function receiveSharedQuest(machine, questLists, questName, data, ctx = {
   return { ok: true, quest };
 }
 
-/** SHARE-COPY (2026-09-26, "Shared Quest did not match copy"): the task types whose symbol is MINTED at parse -
+/** SHARE-COPY: the task types whose symbol is MINTED at parse -
  *  `nextUid()` in task.js, DFU's own NextUID - the headless startup task EVERY quest has, and each
  *  `until _x_ performed:` block. The number is wherever the parsing machine's counter stood, so no two parses
  *  agree on it, and A1 compared it anyway: every share of every quest was refused. Such a task is the same task
@@ -449,7 +448,7 @@ export const SHARE_REFUSAL_TEXT = Object.freeze({
   get tooLarge() { return t('quest.share.tooLarge', 'This quest is too complex to share.'); },
   get mainQuest() { return t('quest.share.mainQuest', 'The main quest cannot be shared.'); },
   // AUDIT QUESTLINES REWARD-2: the sender's word for a questline's step (world.js reads this table by the reason)
-  get questline() { return t('quest.share.questline', 'A questline is your own road. Its steps cannot be shared.'); },   // AUDIT QUESTLINES VOICE-QL: two sentences, no dash aside (bible/10-UI/Voice.md rule 5)
+  get questline() { return t('quest.share.questline', 'A questline is your own road. Its steps cannot be shared.'); },   // AUDIT QUESTLINES VOICE-QL: two sentences, no dash aside (rule 5)
   // DISC22-F: the fragments below are said to the RECEIVER, after "... but you" (scenes/world.js) - second person
   get active() { return t('quest.share.active', 'already have this quest.'); },
   get done() { return t('quest.share.done', 'have already done this quest.'); },

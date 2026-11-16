@@ -1,4 +1,4 @@
-// WORLD6a (Mac, 2026-09-14: "Lets tackle #1 next" - towns, cells and
+// WORLD6a (- towns, cells and
 // buildings keep nothing): THE BUILDING IS A WORLD ROOM. A building
 // interior has had a relay room of its own since ONLINE1
 // (`interior:m<mapId>.<buildingKey>`, net/online.js roomKeyFor) and
@@ -31,7 +31,7 @@
 //   and off the wire. The interior's foes and guards are a quest's or a
 //   crime's - the player's own - and are not streamed (recorded).
 //
-// OUTDOOR-LOOT (2026-10-17, test-harness/outdoor-loot/DESIGN.md section 4): A CUPBOARD IS NO LONGER A WHOLE LIST. WORLD6a's word
+// OUTDOOR-LOOT: A CUPBOARD IS NO LONGER A WHOLE LIST. WORLD6a's word
 // for a container was its list, landed over the reader's by whoever wrote last - a stale close brought a taken piece back
 // (a dupe) and erased a put (a loss), and LOOT-BULK made one such close a whole cupboard. A `container:` is now the room's ONE
 // list: its first roll a carried base, its word PARTY-LOOT's takes, every take a claim the building's seat judges
@@ -40,13 +40,14 @@
 // WORLD6a's whole-list law exactly (a purchase is a trade, not a take - DESIGN 4.7, and the shut shop's stealing window has the
 // cupboard's race: the recorded follow-up F-1).
 //
-// HOME1 (2026-09-25): AN ONLINE HOME'S ROOM CARRIES NO LOOT AT ALL. Its
+// HOME1: AN ONLINE HOME'S ROOM CARRIES NO LOOT AT ALL. Its
 // owner and whoever they let in stand in it together (presence and the
 // doors), but its cupboards are the owner's storage, kept in the owner's
 // own save - so the memory says nothing of them, a peer's word about one
 // never lands (a word about `container:3` would have overwritten the
 // owner's chest, and then been published back as the room's), and a
 // refused act's records name none. The bag's `home` says so.
+import { shopShelvesShared } from '../../systems/shop-shelf-rule.ts';   // whether a shop's shelves are the room's (shop.sharedShelf)
 import { sharedRecord, validActionRecord } from '../actionSystem.js';
 import { validLootList, LOOT_LIST_MAX, LOOT_NEWER_TEXT } from '../../systems/loot/loot.js';   // LOOT_NEWER_TEXT: AUDIT SETS M2 - a shelf the room has spoken about in words this build cannot read
 import { peerHanded } from '../../systems/peerWord.js';   // SS3: a bound piece in a room's container never lands; HACKED-GOLD: nor a letter of credit (systems/peerWord.js)
@@ -98,6 +99,10 @@ export function interiorLootKeyOf(key) {
   return m ? `${m[1]}:${Number(m[2])}` : null;
 }
 
+/** The loot keys (or records, by `keyOf`) the room speaks of: a shop's shelf is each player's own, as in DFU, unless the
+ *  server profile shares it (shop.sharedShelf) - then the room is told nothing of it and its word never lands on it. */
+const roomKeys = (items, keyOf = (k) => k) => (shopShelvesShared() ? items ?? [] : (items ?? []).filter((x) => !String(interiorLootKeyOf(keyOf(x))).startsWith('shelf:')));
+
 /** The shelf or container a loot key names on this context, or null. */
 export function interiorLootTarget(ctx, key) {
   const canon = interiorLootKeyOf(key);
@@ -114,7 +119,7 @@ export function interiorLootTarget(ctx, key) {
  *  a shelf, and a cupboard no room holds (a bare context, an offline page), say the whole list as WORLD6a built it. */
 export function interiorLootRecords(ctx, keys, tooBig = new Set(), bag = null) {
   const out = [];
-  for (const key of keys ?? []) {
+  for (const key of roomKeys(keys)) {
     const canon = interiorLootKeyOf(key);
     if (canon && canon.startsWith('container:') && bag?.room?.live()) { out.push(...bag.room.records(ctx, canon)); continue; }
     const t = canon && interiorLootTarget(ctx, canon);
@@ -132,7 +137,7 @@ export function interiorLootRecords(ctx, keys, tooBig = new Set(), bag = null) {
   return out;
 }
 
-/** AUTO-HOLD (2026-10-16, bible/06-Systems/Integrity-Arc.md): `items` without a piece the ledger follows whose key is
+/** AUTO-HOLD: `items` without a piece the ledger follows whose key is
  *  among `carried.keys` (the reader's own lists - systems/item/itemIds.js carriedPieces) - and, `stowed` (a shop's shelf:
  *  AUDIT AUTO-HOLD, a piece put in a ship's hold came back off a stale one), among `carried.stowed` too - or repeats an
  *  earlier one's. Never the stowed keys on a container that may BE the stowage (a rented room's chest): its own pieces
@@ -162,7 +167,7 @@ export function withoutCarried(items, carried = null, { stowed = false } = {}) {
  *  twice lands once. */
 export function applyInteriorLoot(ctx, list, { seen = new Set(), openKey = null, today = null, unreadable = null, carried = null, room = null, from = null } = {}) {
   let n = 0;
-  for (const rec of Array.isArray(list) ? list : []) {
+  for (const rec of roomKeys(Array.isArray(list) ? list : [], (r) => r?.k)) {
     const canon = interiorLootKeyOf(rec?.k);
     if (!canon) continue;
     // OUTDOOR-LOOT: a cupboard's word is the room's TAKES, merged - never a list landed over a list (interiorRoomLoot.js). `from`: the
@@ -183,7 +188,7 @@ export function applyInteriorLoot(ctx, list, { seen = new Set(), openKey = null,
     if (!items) { if (unreadable && interiorLootTarget(ctx, canon)) { seen.add(canon); unreadable.add(canon); } continue; }
     const t = interiorLootTarget(ctx, canon);
     if (!t) continue;
-    // STOLEN-GOODS AUDIT (2026-10-16, S3): A SHELF'S OR A CUPBOARD'S PIECE IS ITS OWNER'S. No client of this build puts a
+    // STOLEN-GOODS AUDIT: A SHELF'S OR A CUPBOARD'S PIECE IS ITS OWNER'S. No client of this build puts a
     // marked piece in the room's word for a shelf (a stolen piece sold never reaches one - stolenGoods.js landSold), but an
     // older build's sale, a stash left on a shut shelf or a hostile client's word could carry `stolen` - and an honest Buy
     // off that shelf kept it, a stranger's purchase destroyed at its sale and taken at a verdict. Stripped as it lands; a

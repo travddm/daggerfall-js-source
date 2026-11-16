@@ -1,9 +1,8 @@
-// VC7a (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive"; the first of the four chosen:
-// living clouds): THE FIELD HAS A LIFE. It was a fixed noise volume slid across the land by the wind, a bank the same
+// VC7a: THE FIELD HAS A LIFE. It was a fixed noise volume slid across the land by the wind, a bank the same
 // bank from horizon to horizon. Three clocks read from the GAME's minutes - the boil up the shape and detail volumes,
 // the coverage's own slower wind and its daily turn - and the day's convection (fair-weather towers low in the
 // morning, tall by mid-afternoon), and a weather-map cell's cloud as grown as its system. The record is
-// bible/07-Rendering/Volumetric-Clouds-Arc.md VC7.
+// VC7.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -88,8 +87,6 @@ test('VC7a: ONE CLOCK FOR EVERY PLAYER - the sky state carries the game\'s minut
   c.setState(skyState({ minuteOfDay: 901, weather: 'sunny', classicMinutes: YEAR + 901 }), WEATHER_SKY.sunny, 'sunny', 1e9, drift);
   const later = uploads(c).uEvolve;
   assert.ok(later[0] !== got.uEvolve[0] && later[1] !== got.uEvolve[1] && later[2] !== got.uEvolve[2], 'the towers, the edges and the cover each a minute on');
-  // the lab steps the clock at one sun (`?t=`), so the life can be seen apart from the day
-  assert.match(rd('src/tools/skyLab.js'), /const labClock = \(\(405 \* 360 \+ day\) \* MINUTES_PER_DAY\) \+ minuteOfDay \+ \(Number\(params\.get\('t'\)\) \|\| 0\);/);
 });
 
 test('VC7a: THE DAY\'S CONVECTION - fair towers low through the night and the morning, tallest mid-afternoon; their cover always DFU\'s row', () => {

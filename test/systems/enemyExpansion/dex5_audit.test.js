@@ -1,4 +1,4 @@
-// AUDIT DEX (2026-10-20, bible/01-Overview/audits/Audit-DEX.md) - THE TROLL'S BODY, AUDITED. DEX5's body over the hosts'
+// AUDIT DEX - THE TROLL'S BODY, AUDITED. DEX5's body over the hosts'
 // real chain: the dungeon's corpse functions and its reach mounted from src/scenes/dungeonContext.js as
 // test/systems/audit68_dungeonctx.test.js mounts host code, the reach itself out of scenes/corpsePrefabHost.js (D11).
 // Each finding's pin, and each with a mutation it must fail under (tools/mutants/dex5.json, the AUDIT-DEX records):

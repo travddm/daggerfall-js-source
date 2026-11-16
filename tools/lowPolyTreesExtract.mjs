@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// LPT1 (2026-10-05): LOW POLY TREES 5 (SquidKamer - Kamer) - THE TREES AS DATA, OUT OF THE SHIPPED BUNDLE.
+// LPT1: LOW POLY TREES 5 (SquidKamer - Kamer) - THE TREES AS DATA, OUT OF THE SHIPPED BUNDLE.
 //
 //   node tools/lowPolyTreesExtract.mjs "<path-to>/lowpolytrees.dfmod" --arena2 <ARENA2> [outDir]
 //
 // Default outDir is vendor/low-poly-trees. The bundle is read with tools/lib/unityScene.mjs (Come Sail Away's reader);
-// bible/07-Rendering/Low-Poly-Trees.md is the record. What the port carries:
+// is the record. What the port carries:
 //
 // - `lowpolytrees.dfmod.json` - the mod's manifest, the bundle's own TextAsset byte for byte.
 // - `Trees/trees.json` + `Trees/trees.bin` - Kamer's own geometry: every mesh's positions, normals and uv0 (f32,
@@ -16,7 +16,7 @@
 //   sprites: the five small ones a classic record whole, each larger atlas 75-91% classic records copied texel for
 //   texel (turned or mirrored in places, cut down in others), the rest the author's top-down crowns and larger side
 //   views made from the same records (on the winter atlases capped with painted snow) plus a few hand-written record
-//   numbers. A render of game data IS game data (01-Overview/Port-Doctrine.md), so the spec names what to copy and the
+//   numbers. A render of game data IS game data (test/tooling/doctrine.test.js), so the spec names what to copy and the
 //   runtime paints the atlas from the player's own records (src/world/lowPolyTrees.js paintAtlas): BLITS - the record,
 //   its turn, where it lands, the rectangle it may paint and its ERASE spans (each the whole gap between this copy's
 //   own claims, so none traces a record's silhouette - AUDIT LPT D13) - in the greedy order the match found them, the

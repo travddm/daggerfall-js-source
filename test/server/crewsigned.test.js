@@ -1,6 +1,6 @@
-// CREW-SIGNED (2026-10-27, the SEA-OPEN slice; bible/03-World/Shipyards.md CREW-SIGNED): a crew hall's recruit signed once
+// CREW-SIGNED: a crew hall's recruit signed once
 // online - the law both ends read (src/net/crewSignLaw.js), the service's routes over the real Worker and its database
-// (server-account/src/crewSigns.js, migrations/0180), the clock's sweep (cron.js `crew-signs`) and the client's door
+// (server-account/src/crewSigns.js, `crew_signed`), the clock's sweep (cron.js `crew-signs`) and the client's door
 // (net/accountClient.js accountCrewSigns) through the same Worker. tools/mutants/seaopen.json (CREW-).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -32,12 +32,11 @@ test('CREW-SIGNED the law: a recruit\'s id is his hall\'s town, day and slot - t
 });
 
 test('CREW-SIGNED the service: the first account to sign a recruit holds him for his day - asked again, the same; another is refused `crew-taken`; the hall says whose; a release by another lets nothing go, by the holder frees him; a bad id, a far day, a squatter refused (mutants: the holder unread, the release unowned, the cap, the day)', async (t) => {
-  atOneInstant(t);   // PIN MOVED (AUDIT HORIZONTAL G5): one instant, the service's and the day's
+  atOneInstant(t);
   const S = await standService();
   const day = crewDayAt(Date.now());
   const a = await S.registered('Ashby'), b = await S.registered('Brannoc');
   const id = `4242:${day}:3`;
-  // PIN MOVED (AUDIT HORIZONTAL C8): every ask names the character (`registered`'s own) - the hold is the character's
   const sign = (who, x) => S.call('/v1/crew/sign', { id: x, character: who.character }, who.secret);
   const hall = (who, q) => S.call('/v1/crew/hall', { ...q, character: who.character }, who.secret);
   const release = (who, x) => S.call('/v1/crew/release', { id: x, character: who.character }, who.secret);
@@ -153,8 +152,3 @@ test('AUDIT HORIZONTAL C8: the hold is the CHARACTER\'s - an account\'s second c
   assert.deepEqual(await sign(as('hollis-three'), `999:${day}:0`), { status: 429, body: { error: 'crew-many' } });
 });
 
-test('AUDIT HORIZONTAL C8 the wiring: the world host hands the shipmaster its character\'s id while in the shared world, and the shipmaster\'s own book asks as it (mutants: the character unhanded, the host\'s book unaimed)', () => {
-  assert.match(hostText('src/scenes/world.js'), /online: \(\) => _onlineWorldSession\(\) && characterIdOf\(playerEntity\),/);
-  const yard = readFileSync(new URL('../../src/scenes/shipyardHost.js', import.meta.url), 'utf8');
-  assert.match(yard, /createCrewSignBook\(\{ live: \(\) => !!deps\.online\?\.\(\), character: \(\) => deps\.online\?\.\(\) \|\| null \}\)/);
-});

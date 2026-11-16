@@ -1,7 +1,9 @@
-// STAR2 (bible/11-Multiplayer/Starfall.md sections 1 and 2): THE COVENS, THE NIGHT'S STARS AND THE WITCHES' NIGHT - the bag
-// that names a night's coven, the twelve held against the player's own data (MAPS.BSA's covens, FACTION.TXT's witches,
+import { playFileByRules } from '../../profileRules.mjs'; // a server profile's rule keys, for one test file
+// STAR2: THE COVENS, THE NIGHT'S STARS AND THE WITCHES' NIGHT - the bag
+// that names a night's coven, the thirteen (WW-C2) held against the player's own data (MAPS.BSA's covens, FACTION.TXT's witches,
 // DFU's quest places), a night's three pixels in its coven's wilds over the gate's own scan, and the festival's night
 // read off the sky. tools/mutants/star2.json.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,10 +12,10 @@ import { join } from 'node:path';
 import { STAR_COVENS, STAR_COVENS_APART, starCovenOf, covenLocation, covenFactionName } from '../../../src/systems/starfall/starfallCovens.js';
 import { findStarSites, starSiteKey, STAR_APART_PX } from '../../../src/systems/starfall/starfallSites.js';
 import { WITCHES_FESTIVAL_DAY, witchesNight, heartStar, HEART_STAR, nightDayOfYear } from '../../../src/systems/starfall/starfallNight.js';
-import { STAR_HOUR_MS, STAR_PER_NIGHT, starTimes } from '../../../src/net/starfall/starfallLaw.js';
+import { STAR_PER_NIGHT, starTimes } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter } from '../../../src/net/sky-days.ts';
 import { DAEDRA } from '../../../src/systems/daedraSummoning.js';
 import { HOLIDAYS, holidayDayOfYear } from '../../../src/systems/holidays.js';
-import { WILD_REGION } from '../../../src/systems/wild/wildZone.js';
 import { gateScanner, findGateSite } from '../../../src/systems/gate/gateSite.js';
 import { gameDayAt } from '../../../src/net/gate/gateLaw.js';
 import { LOCATION_TYPES } from '../../../src/formats/mapsFile.js';
@@ -21,35 +23,39 @@ import { FactionFile, FACTION_TYPES } from '../../../src/formats/factionFile.js'
 import { WoodsFile } from '../../../src/formats/woodsFile.js';
 import { HAS_ARENA2, ARENA2, loadMaps, ROOT } from '../../arena1Data.mjs';
 import { FESTIVALS } from '../../../src/net/festivalLaw.js';
+
+playFileByRules({ 'time.skyClock': true }); // these pins stand on the sky clock's hourly night (a sky day is an hour at its default TimeScale)
 const { fromMs: FESTIVAL_FROM_MS, toMs: FESTIVAL_TO_MS } = FESTIVALS[0];   // the Witches' Festival's days, the Starfall's own (net/festivalLaw.js)
 
 const SKIP = HAS_ARENA2 ? false : 'no ARENA2 (sh tools/fetch-data.sh, then ARENA2_PATH)';
 
-test('STAR2 THE BAG: every coven takes a night in each round of twelve, none twice running, the rounds\' seams too (mutants: the seam unchecked; the round\'s roll fixed)', () => {
-  assert.equal(STAR_COVENS.length, 12);
+// Cyrodiil's (their coven was kept apart while it was the Wrothgarian Mountains')
+test('STAR2 THE BAG: every coven takes a night in each round of thirteen, none twice running, the rounds\' seams too (mutants: the seam unchecked; the round\'s roll fixed)', () => {
+  const K = STAR_COVENS.length;
+  assert.equal(K, 13);
   const N = 500_000;
   let last = null;
   const orders = [];
   for (let r = 0; r < 40; r++) {
     const ids = [];
-    for (let i = 0; i < 12; i++) {
-      const c = starCovenOf((Math.floor(N / 12) + r) * 12 + i);
-      assert.notEqual(c, last, `night ${(Math.floor(N / 12) + r) * 12 + i}: the coven of the night before`);
+    for (let i = 0; i < K; i++) {
+      const c = starCovenOf((Math.floor(N / K) + r) * K + i);
+      assert.notEqual(c, last, `night ${(Math.floor(N / K) + r) * K + i}: the coven of the night before`);
       last = c;
       ids.push(c.id);
     }
-    assert.equal(new Set(ids).size, 12, `round ${r} misses a coven`);
+    assert.equal(new Set(ids).size, K, `round ${r} misses a coven`);
     orders.push(ids.join());
   }
   assert.ok(new Set(orders).size > 30, 'each round shuffled anew');
 });
 
-test('STAR2 THE TABLE: twelve covens, each its own, none in the open zone; Glenmoril (Hircine\'s) and Wroth (the open zone\'s) apart (mutants: a coven in the open zone)', () => {
-  assert.equal(new Set(STAR_COVENS.map((c) => c.id)).size, 12);
-  assert.ok(STAR_COVENS.every((c) => c.region !== WILD_REGION));
-  assert.deepEqual(STAR_COVENS_APART.map((c) => [c.id, c.region]), [['glenmoril', 60], ['wroth', WILD_REGION]]);
+test('STAR2 THE TABLE: thirteen covens, each its own; Glenmoril (Hircine\'s) apart - Wroth\'s back since the zone left its mountains', () => {
+  assert.equal(new Set(STAR_COVENS.map((c) => c.id)).size, 13);
+  assert.deepEqual(STAR_COVENS_APART.map((c) => [c.id, c.region]), [['glenmoril', 60]]);
+  assert.equal(STAR_COVENS.find((c) => c.id === 'wroth')?.region, 16, 'the Daughters of Wroth, in the Wrothgarian Mountains - no longer the zone');
   assert.ok(STAR_COVENS.every((c) => typeof c.member() === 'string' && c.member().length > 3));
-  assert.deepEqual(STAR_COVENS.map((c) => c.member()), ['Witch of the Marsh', 'Witch of Devilrock', 'Mountain Witch', 'Sister of Kykos', 'Sister of the Bluff', 'Tamarilyn Witch', 'Witch of Alcaire', 'Skeffington Witch', 'Beldam', 'Daggerfall Witch', 'Tide Witch', 'Dust Witch']);
+  assert.deepEqual(STAR_COVENS.map((c) => c.member()), ['Witch of the Marsh', 'Witch of Devilrock', 'Mountain Witch', 'Sister of Kykos', 'Daughter of Wroth', 'Sister of the Bluff', 'Tamarilyn Witch', 'Witch of Alcaire', 'Skeffington Witch', 'Beldam', 'Daggerfall Witch', 'Tide Witch', 'Dust Witch']);
 });
 
 test('STAR2 CANON: every coven stands in MAPS.BSA as a Coven in its region, its witches are FACTION.TXT\'s type 8 by that name, and its place is the quest table\'s - the fourteen are every coven the map holds', { skip: SKIP }, () => {
@@ -80,7 +86,7 @@ test('STAR2 THE NIGHT\'S STARS ON THE PLAYER\'S MAP: for a hundred nights, three
   woods.load(new Uint8Array(readFileSync(join(ARENA2, 'WOODS.WLD'))));
   const scan = gateScanner(maps, { heightAt: (x, y) => woods.getHeightMapValue(x, y) }).step();
   const gateSiteOf = (day) => findGateSite(day, scan);
-  const n0 = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS);
+  const n0 = skyDayAtOrAfter(FESTIVAL_FROM_MS);
   let distinct = 0, total = 0;
   for (let n = n0; n < n0 + 100; n++) {
     const sites = findStarSites(n, scan, { gateSiteOf });
@@ -102,13 +108,14 @@ test('STAR2 THE NIGHT\'S STARS ON THE PLAYER\'S MAP: for a hundred nights, three
   assert.ok(distinct / total > 0.95, `three towns a night (${distinct} of ${total})`);
 });
 
-test('STAR2 THE WITCHES\' NIGHT: the festival is day 283 - the holiday table\'s Witches\' Festival and Mephala\'s summoning day both; the night whose dusk falls on it is the Witches\' Night, once a sky year, and its last star the Heart-Star (mutants: the day off by one; the Heart-Star the first)', () => {
+test('STAR2 THE WITCHES\' NIGHT: the festival is day 283 - the holiday table\'s Witches\' Festival and Mephala\'s summoning day both; the night whose dusk falls on it is the Witches\' Night, once a sky year, and its last star the Heart-Star (mutants: the day off by one; the Heart-Star the first)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   assert.equal(WITCHES_FESTIVAL_DAY, 283);
   assert.equal(holidayDayOfYear(HOLIDAYS.Witches_Festival), 283);
   assert.equal(DAEDRA.find((d) => d.name === 'Mephala').dayOfYear, WITCHES_FESTIVAL_DAY, 'Mephala\'s day is the Witches\' Festival');
   const nights = [];
-  for (let n = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS); n < Math.ceil(FESTIVAL_TO_MS / STAR_HOUR_MS); n++) if (witchesNight(n)) nights.push(n);
-  assert.deepEqual(nights, [Date.UTC(2026, 9, 20, 12) / STAR_HOUR_MS, Date.UTC(2026, 10, 4, 12) / STAR_HOUR_MS], 'the window\'s two, a sky year (fifteen real days) apart: dusk 2026-10-20 and 2026-11-04, 11:45 UTC');
+  for (let n = skyDayAtOrAfter(FESTIVAL_FROM_MS); n < skyDayAtOrAfter(FESTIVAL_TO_MS); n++) if (witchesNight(n)) nights.push(n);
+  assert.deepEqual(nights, [skyDayAtOrAfter(Date.UTC(2026, 9, 20, 12)), skyDayAtOrAfter(Date.UTC(2026, 10, 4, 12))], 'the window\'s two, a sky year (fifteen real days) apart: dusk 2026-10-20 and 2026-11-04, 11:45 UTC');
   const n = nights[1];
   assert.equal(nightDayOfYear(n), 283);
   assert.equal(nightDayOfYear(n + 1), 284);

@@ -1,4 +1,4 @@
-// PERF-SKY1 (2026-10-10, the stars' part of the perf pass v5's slice - bible/07-Rendering/Performance-Crowd.md): THE
+// PERF-SKY1: THE
 // STARS ARE A NIGHT'S. The Dynamic Skies dome weighs its stars by night * horizonValue, and by day night is 0 - so every
 // sky pixel's three star taps and its twinkle were multiplied by nothing. They run under a night above 0 alone now.
 // mix(col, stars, 0) is col exactly for any finite stars (the taps are saturated), so the picture is the mod's to the

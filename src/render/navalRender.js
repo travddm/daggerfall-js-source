@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-B (2026-09-28) - THE SEA FIGHT, DRAWN: the smoke, the flashes, the spray and the splinters of
+// NAV-B - THE SEA FIGHT, DRAWN: the smoke, the flashes, the spray and the splinters of
 // systems/naval/navalEffects.js, the balls in the air (navalShots.js), the fire barrels and casks afloat, and the
 // aim - the arc of the laid guns and the zone where the volley will fall - on the world renderer they draw beside.
 // The port's own pass, in the port's foreign-pass convention (render/comeSailAwayRender.js's): the renderer's own
@@ -204,7 +204,7 @@ export const GRAPE_OPEN_M = 0.45;
 export const GRAPE_OPEN_S = 1.2;
 export const CHAIN_HALF_M = 0.45;
 /**
- * SHOT-KINDS (bible/03-World/Naval-Refit.md): THE PICTURES OF ONE BALL IN THE AIR, by its load - `{ pos, gun, shot, spin,
+ * SHOT-KINDS: THE PICTURES OF ONE BALL IN THE AIR, by its load - `{ pos, gun, shot, spin,
  * age, vel }` (navalShots.js balls) to the quads' particles. Round shot one iron disc, its size its gun's; GRAPESHOT a
  * ring of GRAPE_PELLETS small balls about its line, opening to GRAPE_OPEN_M over GRAPE_OPEN_S (the bag split in flight);
  * CHAIN SHOT two half-balls tumbling about each other across its line at CHAIN_HALF_M, three links of the chain between;

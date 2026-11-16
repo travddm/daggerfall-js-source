@@ -1,6 +1,5 @@
 // @ts-check
-// HELM-WAY (DECLARED, the Port-Ledger's HELM-WAY row; 2026-09-29, Mac: "Improve the overall mobility and
-// maneuverability of ships") - THE RESPONSIVE HELM: one law for how a hull gathers way, loses it and answers her helm,
+// HELM-WAY (DECLARED, the Port-Ledger's HELM-WAY row; 2026-09-29) - THE RESPONSIVE HELM: one law for how a hull gathers way, loses it and answers her helm,
 // read by the player's own boat (systems/comeSailAway/comeSailAway.js, over Come Sail Away's own handling - the Features row's Ship
 // handling, 'responsive' by default, 'classic' the mod to the letter) and by the sea's captains
 // (systems/naval/navalAI.js maxTurnRate - they sail at the player's own pace, so they turn at the player's own helm).
@@ -35,8 +34,7 @@
 export const HELM_WAY = Object.freeze({ sailAccel: 3.5, coast: 3, turnAccelSail: 2.4, steerFloor: 3, steerPeak: 14, steerPeakV: 4.5 });
 
 /**
- * SAIL-FREE (DECLARED, the Port-Ledger's own SAIL-FREE row - AUDIT SHIPS D10; 2026-10-05, Mac: "Currently its too hard
- * to sail against the wind, ships need more speed"; Mac's calls: "No tacking, Black Flag" and "nothing that breaks
+ * SAIL-FREE (DECLARED, the Port-Ledger's own SAIL-FREE row - AUDIT SHIPS D10; 2026-10-05,; and "nothing that breaks
  * immersion") - HER WAY UNDER SAIL, the responsive helm's (the mod's own stays under Classic). Measured first on the
  * real runtime (a 1.5 m/s wind): Come Sail Away's GetSailPower gives a fore-and-aft sail a quarter to half of its pull
  * close-hauled and drives it ASTERN within 30 degrees of the wind's eye, and a square sail nothing forward of the
@@ -61,7 +59,7 @@ export const HELM_WAY = Object.freeze({ sailAccel: 3.5, coast: 3, turnAccelSail:
  */
 export const SAIL_FREE = Object.freeze({ pace: 1.2, gain: 1.643 });
 /**
- * AUDIT SHIPS A5 (2026-10-06, Mac: "Audit everything"): HER RIG'S OWN GAIN - her SAIL-FREE drive on her beam in the rated
+ * AUDIT SHIPS A5: HER RIG'S OWN GAIN - her SAIL-FREE drive on her beam in the rated
  * wind over the mod's own (HELM-WAY's, its auto-trim's) for her hull and, a Large Boat's, her variant (SAIL_FREE.gain is
  * the galleon's). SAIL_FREE.gain was every hull's, so a Large Boat (her way up 6%) gathered and lost hers a third
  * quicker than HELM-WAY tuned her, and a Large Galley (her way doubled) a third slower, with a Carrack between. Measured

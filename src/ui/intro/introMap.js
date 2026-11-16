@@ -5,7 +5,7 @@
 // described by primitives below; seeded noise supplies coast and relief.
 // It is composed for the cinematic and is not a gameplay travel map.
 //
-// INTRO4 (bible/10-UI/UI-Arc.md INTRO4): INTRO2's own landscape of the Bay (buildIliac, its ranges, its sea floor) is
+// INTRO4 (INTRO4): INTRO2's own landscape of the Bay (buildIliac, its ranges, its sea floor) is
 // retired with INTRO2's film. The Bay's authored SHAPE stays and is drawn inside the continent the new film pulls back
 // to (introTamriel.js, in the hole tamrielGeography.js leaves for the Bay), and the seeded noise stays the one home
 // ui/tamrielInk.js and the continent read.

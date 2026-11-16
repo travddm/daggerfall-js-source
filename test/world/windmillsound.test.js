@@ -67,7 +67,6 @@ test('WM4c: loop3d takes a distance model, defaults LINEAR so the torches do not
   // DISC6 (3D-AUDIO): the panner is made in ONE place, `_panner`, and
   // every position crosses the frame door `placeAudio` - so the pins
   // follow the parameter and the move there.
-  // PIN MOVED (CSA-G): the panner takes a rolloff factor too (Come Sail Away's loops work Unity's rolloff out
   // themselves, at 0); the model is still passed beside it.
   assert.match(fn, /const pan = this\._panner\(pos, \{ refDistance, maxDistance, distanceModel, rolloffFactor \}\);/, 'the parameter is not passed');
   const mk = src.slice(src.indexOf('  _panner(pos'), src.indexOf('  setLoop3d('));
@@ -107,7 +106,7 @@ test('WM4c: both exterior hosts start the hum per mill, ungated on the wind, and
   // it does not unload it). The hum law is untouched - a torn-down
   // pixel still stops its mills, whichever door it came through - so
   // the pin follows the signature rather than weakening.
-  assert.match(world, /function destroyPixel\(px, py, \{ collectLoose = true \} = \{\}\) \{[\s\S]{0,600}w\.hum\?\.stop\(\); w\.hum = null;/, 'world.js: a destroyed pixel leaves its hum behind');
+  assert.match(world, /function destroyPixel\(px, py, \{ collectLoose = true, carried = false, carryOnly = false \} = \{\}\) \{[\s\S]{0,1400}w\.hum\?\.stop\(\); w\.hum = null;/, 'world.js: a destroyed pixel leaves its hum behind');
 });
 
 test('WM4c: both interior hosts start the gear\'s hum on the part that carries Spin_Up, and the room\'s teardown ends it', () => {

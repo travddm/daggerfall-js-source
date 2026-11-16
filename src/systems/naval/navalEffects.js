@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-B (2026-09-28) - THE SMOKE AND THE SPRAY: what a sea fight looks like between the shot and the splinter. The
+// NAV-B - THE SMOKE AND THE SPRAY: what a sea fight looks like between the shot and the splinter. The
 // port's own; pure - particles as numbers, drawn by render/navalRender.js.
 //
 // FIVE KINDS, each a law of its own:
@@ -17,13 +17,13 @@
 //   timber - AUDIT NAV1 (the presentation, #15): planks off a holed hull, laid long on the sea (`aspect`), drifting
 //            slow and gone after TIMBER_LIFE or so; and a battered hull's SMOLDER - grey smoke along her deck, more as
 //            she is hurt
-// SHOT-KINDS (bible/03-World/Naval-Refit.md): EACH LOAD ITS OWN PICTURE (`shotMuzzle`, `shotSplash`, `shotHit`,
+// SHOT-KINDS: EACH LOAD ITS OWN PICTURE (`shotMuzzle`, `shotSplash`, `shotHit`,
 // `shotTear` - the host's one door per event, the load said): GRAPESHOT leaves in a wider, lower cone of smoke and
 // lands as a SPATTER - a scatter of small spouts over the sea, a peppering of splinters over a hull; CHAIN SHOT tears
 // twice the canvas a ball does and cracks spars (dark splinters among the scraps); HEATED SHOT flashes red at the
 // muzzle, HISSES into the sea (a white puff of steam over its spout) and throws EMBERS where it strikes. Round shot is
 // the picture it always was.
-// SMOKE-WIND (2026-10-17, the owner: "Improve and polish combat and visuals"; bible/03-World/Naval-Refit.md SMOKE-WIND):
+// SMOKE-WIND:
 // SMOKE IS CARRIED BY THE AIR. Its drag pulls it toward the air's way, not toward standing still - so a broadside's smoke
 // leaves the muzzles on the shot, slows to the wind's speed and goes downwind as a bank, and a burning or battered hull's
 // leans away from her down the wind. The wind the host hands is Come Sail Away's (its strength 1-2 a fair day, half again

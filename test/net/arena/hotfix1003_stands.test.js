@@ -1,12 +1,11 @@
-// HOTFIX 1003f (2026-10-03, live: "people join and are alone"; the owner: "Everyone should be shown. Nobody should be
-// invisible."): AN ARENA FLOOR DRAWS EVERYONE IN IT. A floor room drew the sockets on its sand alone (ARENA4's bodiless
+// HOTFIX 1003f: AN ARENA FLOOR DRAWS EVERYONE IN IT. A floor room drew the sockets on its sand alone (ARENA4's bodiless
 // stands), so a private session's members in the stands saw nobody and were seen by nobody, and every watcher of a bout
 // stood in an empty arena. On the real Room over fake sockets and fake objects (test/fakeRoom.mjs), as
 // test/systems/arena/arena6_private.test.js and test/net/arena/audit1003b_relay.test.js drive it: a private session's members shown to each
 // other at their join and their poses fanned among them, a stranger drawn to nobody and seeing nobody, a member gone,
 // removed or the session ended said gone; a bout's stands drawn to its fighter and to each other; a tokenless hello
 // still refused at the door (ACC1g); and the client's Host and Join wanting an account and an open socket.
-// Design: bible/11-Multiplayer/Arena.md, the ARENA6 record's HOTFIX 1003f paragraph.
+// Design:, the ARENA6 record's HOTFIX 1003f paragraph.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fakeRooms } from '../../fakeRoom.mjs';
@@ -127,7 +126,7 @@ test('HOTFIX 1003f a bout\'s stands are bodies: a spectator\'s welcome names the
 }));
 
 test('HOTFIX 1003f the client: a private session\'s Host and Join want an account held and my socket open - refused otherwise with the sign-in line, nothing entered; signed in and open, the floor is entered (mutants: the press never refused; signed out let through; a socket not open let through)', async () => {
-  const open = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const open = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   const screen = (signedIn, S) => {
     const doors = [];
     const A = createArenaOnline({

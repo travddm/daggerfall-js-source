@@ -1,7 +1,5 @@
-// ET1 - THE ENHANCED TALK PANEL (2026-09-11).
+// ET1 - THE ENHANCED TALK PANEL.
 //
-// Mac: "the talk menu. My goal is to transform it into a rectangular
-// panel akin to Fallout/Skyrim instead of a full screen menu."
 //
 // So this is a PANEL, not a screen: a framed rectangle across the
 // bottom of the view with the world still standing behind it - the
@@ -106,7 +104,7 @@ export function talkPanelModel(model) {
   // fields as they stand.
   return {
     npcName: model.shownNpcName?.() ?? model.hooks.npcName ?? '',
-    // PLAIN-UI (bible/10-UI/Plain-Words.md): how a living resident regards the player, as the host words it
+    // PLAIN-UI: how a living resident regards the player, as the host words it
     // (systems/livingWorld/people.js regardBadge) - null for anyone else
     regard: model.hooks.regard?.() ?? null,
     tone: model.hooks.tone?.() ?? 1,
@@ -281,7 +279,7 @@ function render() {
 
   shell.append(panel);
   host.append(shell);
-  // OT1 (Mac: "tapping outside of any UI closes the UI"): a tap on the
+  // OT1: a tap on the
   // world beside the panel is Goodbye - through the model, so the
   // note is filed - and the relock rides the tap (act).
   closeOnOutsideTap(shell, '.talk-panel', () => act(() => model.press('goodbye')));

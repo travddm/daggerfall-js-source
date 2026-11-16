@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24), cluster systems_f - src/systems (save.js,
+// AUDIT 68, cluster systems_f - src/systems (save.js,
 // quickslots, reverbPresets, the spellbook rename both skins share).
 // Each pin drives the producer's own output and failed on the base:
 // the online dead-load revive, the enhanced book's rename, the disarmed

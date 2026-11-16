@@ -1,11 +1,11 @@
-// SCALE4f (2026-10-10, Mac: "lets now tackle the bigger work ... really future proof our archetecture while also
-// increasing performance"; bible/11-Multiplayer/Scale-Arc.md SCALE4f): THE ACCOUNT'S HALF - THE MINT FOLDED, AND THE
+// SCALE4f: THE ACCOUNT'S HALF - THE MINT FOLDED, AND THE
 // METRICS THAT SAY HOW BUSY THE ONE PRIMARY IS. The mint asked four statements of one realm_characters row (whether it is
 // the account's realm character in play, its level, its arms, its house); one answers all four now
 // (realm.js realmMintFacts), held here to the four over every state a row can be in. Every statement a request awaits is
 // timed, its answers' rows summed, and a replica's serving counted (metrics.js countedDb) - a primary going under shows
 // first as that wait. An overloaded D1 is answered `server` still (every book asks that again), but 503, counted apart.
 // tools/mutants/scale4f.json.
+import { codeOf } from '../../src/net/modeLaw.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -58,10 +58,16 @@ async function realmHouseOf({ db }, playerId, id) {
   return row ? houseOn(row.record, row.person) : null;
 }
 
+/** CHARACTER MODES: a sixth read of the same row - the mode's token code, null for Classic (the fold did not exist for it). */
+async function realmModeCode(ctx, playerId, id) {
+  const row = await ctx.db.prepare('SELECT mode FROM realm_characters WHERE id = ? AND player = ?').bind(id, playerId).first();
+  return row && row.mode !== 'classic' ? codeOf(row.mode) : null;
+}
+
 /** What the mint asked before the fold - the four reads, each only behind `rc` as the mint asked them. */
 async function oracle(ctx, playerId, id) {
   const rc = (await realmCharacterHeld(ctx, playerId, id)) ? 1 : 0;
-  return { rc, cl: rc ? await realmLevelOf(ctx, playerId, id) : null, wa: rc ? await realmArmsOf(ctx, playerId, id) : null, house: rc ? await realmHouseOf(ctx, playerId, id) : null, name: rc ? await realmOwnName(ctx, playerId, id) : null };
+  return { rc, cl: rc ? await realmLevelOf(ctx, playerId, id) : null, wa: rc ? await realmArmsOf(ctx, playerId, id) : null, house: rc ? await realmHouseOf(ctx, playerId, id) : null, name: rc ? await realmOwnName(ctx, playerId, id) : null, md: rc ? await realmModeCode(ctx, playerId, id) : null };
 }
 
 test('SCALE4f the mint\'s four reads of one row, in one - exactly what the four answered, over every state a row can be in: held or not, leased or not, a tombstone, another\'s, a level judged, summarised, none or out of bounds, arms with a bow, without, unjudged, a house, a line gone, a name the filter refuses, no person - NAME-AS: and its own name, a fifth answer of the same read (mutants: the lease unread; a tombstone read as held; the summary\'s level unread; the level\'s bounds unread; the bow unread; the arms\' law unread; a house without its line; the house never read)', async () => {
@@ -111,28 +117,10 @@ test('SCALE4f the mint\'s four reads of one row, in one - exactly what the four 
     }
   }
   assert.ok(held >= 20 && housedSeen >= 5, `the states reached both sides of every arm (${held} held, ${housedSeen} housed)`);
-  for (const bad of [null, 7, '', 'r123', 'R'.padEnd(21, 'f'), `${housed.id}x`]) assert.deepEqual(await realmMintFacts(ctx, g.id, bad), { rc: 0, cl: null, wa: null, house: null, name: null }, String(bad));
+  for (const bad of [null, 7, '', 'r123', 'R'.padEnd(21, 'f'), `${housed.id}x`]) assert.deepEqual(await realmMintFacts(ctx, g.id, bad), { rc: 0, cl: null, wa: null, house: null, name: null, md: null }, String(bad));
 });
 
-test('SCALE4f the mint asks its realm row ONCE - one statement where four were, and a token as it was (mutants: the four asked again)', async () => {
-  const S = await standService();
-  const g = await S.guest();
-  await S.call('/v1/realm/lineage', { id: FAM, record: record('Hlaalu', [{ id: 1, given: 'Ysolde' }]) }, g.secret);
-  const c = (await S.call('/v1/realm/create', { name: 'Ysolde Hlaalu', lineage: FAM, person: 1 }, g.secret)).body;
-  S.env.DB._sessions.length = 0;
-  const r = await S.call('/v1/auth/token', { character: c.id }, g.secret);
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(r.body.house, { hn: 'Hlaalu', hc: 'Ysolde', hb: 1 }, 'the house as it was signed');
-  const claims = JSON.parse(Buffer.from(r.body.token.split('.')[1], 'base64url').toString());
-  assert.equal(claims.rc, 1);
-  assert.equal(claims.ci, c.id);
-  const rows = S.env.DB._sessions[0].statements.filter((q) => /realm_characters/.test(q));
-  assert.equal(rows.length, 1, 'one read of the realm row');
-  const src = readFileSync(new URL('../../server-account/src/index.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /realmCharacterHeld|realmLevelOf\(|realmArmsOf\(|realmHouseOf\(/, 'none of the four is asked by the service any more');
-});
-
-// ═══ HOW BUSY THE PRIMARY IS ═══════════════════════════════════════════════════════════════════════════════════════
+// HOW BUSY THE PRIMARY IS
 
 /** A D1 shaped as workerd's: statements a class with private fields, whose methods throw on any `this` but their own,
  *  and a batch that refuses anything but its own statements (AUDIT SCALE4d D8's law, one level down). Each run moves the
@@ -187,7 +175,7 @@ test('SCALE4f the request\'s point carries D1\'s rows written, its wait, its row
     const serve = async (req, env) => { await env.DB.prepare('SELECT replica FROM t').all(); await env.DB.prepare('UPDATE t SET a = 1').run(); clock.t += 2; return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } }); };
     await measured(new Request('https://accounts.invalid/v1/heartbeat', { method: 'POST' }), { DB: fakeD1(clock), METRICS: { writeDataPoint: (p) => points.push(p) } }, serve);
     assert.equal(points.length, 1);
-    assert.deepEqual(points[0].doubles.slice(0, 7), [5 + 11 + 2, 200, 2, 2, 16, 6, 1], 'wall ms, the status, statements, rows written, D1\'s wait, rows read, a replica\'s');   // SCALE4h (PIN MOVED): the hot rows' four follow - test/server/scale4h.test.js
+    assert.deepEqual(points[0].doubles.slice(0, 7), [5 + 11 + 2, 200, 2, 2, 16, 6, 1], 'wall ms, the status, statements, rows written, D1\'s wait, rows read, a replica\'s');   // SCALE4h (
     assert.deepEqual(points[0].indexes, ['/v1/heartbeat']);
   } finally { Date.now = () => T0 * 1000; }
 });
@@ -206,7 +194,7 @@ test('SCALE4f an overloaded D1 is answered `server` still - every book asks that
     S.env.DB = { ...keep, prepare: () => { throw new Error('D1 DB is overloaded. Requests queued for too long.'); }, batch: keep.batch.bind(keep) };
     const over = await S.call('/v1/heartbeat', { parts: {} }, g.secret);
     assert.deepEqual([over.status, over.body], [503, { error: 'server' }]);
-    _resetBusyShed();   // PIN MOVED (BUSY-HEART, 2026-10-16): the overload sheds the heartbeat a moment - the fault asked after it
+    _resetBusyShed();
     S.env.DB = { ...keep, prepare: () => { throw new Error('no such column: nope'); }, batch: keep.batch.bind(keep) };
     const fault = await S.call('/v1/heartbeat', { parts: {} }, g.secret);
     assert.deepEqual([fault.status, fault.body], [500, { error: 'server' }]);

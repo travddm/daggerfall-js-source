@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// OW-TOWN-WALK (2026-10-19, the owner: "When in a town, slow down overworld navigation and have it navigate properly
-// on town pathways instead of bumping into buildings"; bible/06-Systems/Travel-View.md OW-TOWN-WALK): A JOURNEY THROUGH
+// OW-TOWN-WALK: A JOURNEY THROUGH
 // A TOWN WALKS ITS STREETS, AT A TOWN'S PACE.
 //
 // Travel Options aims a journey straight at its next point (the mod's autopilot), and the port's steering feels its way
@@ -32,13 +30,17 @@
 // (scenes/townWalkHost.js) finds the town the traveller stands in and turns cells into the world's natives.
 // Not a DFU member: DFU's fast travel never walks a town (it fades to black), and Travel Options' autopilot never
 // paths. Ledger A row (OW-TOWN-WALK).
-// ═══════════════════════════════════════════════════════════════════
-import { findTownPath } from '../livingWorld/townPaths.js';
+import { townPathSearch } from '../livingWorld/townPaths.js';
+import { stepsDone } from '../../world/puddleMask.js';   // IC-STUTTER: OW-HITCH's runner, the one export
 
 /** The fastest a journey runs while it walks a town's streets (the clock's rate - travelPace.js's dials run to x100 on
  *  a road). Five times a walk: a town of eight blocks crossed in under a minute, the streets' turns taken at a pace the
  *  motor and the collider meet a frame at a time. */
 export const TOWN_PACE_MAX = 5;
+/** IC-PACE:
+ *  the fastest a journey runs in the Imperial City's streets - forty-nine pixels of them (5.7 km across: TS5), which at five times a walk took a quarter of an hour of real time to cross. Its streets are still
+ *  walked as a town's (the way, the gates, the steering); only the clock is let run. */
+export const IMPERIAL_PACE_MAX = 60;
 /** How far round a cell that is no street (a doorstep, a building's footprint the traveller stands at the edge of) the
  *  nearest street cell is looked for, cells. */
 export const TOWN_SNAP_CELLS = 8;
@@ -154,25 +156,47 @@ export function simplifyWay(nav, cells, margin = TOWN_WAY_MARGIN) {
   return out;
 }
 
+/** IC-STUTTER: the cells a journey's search opens between two steps (townWayCellsSteps). */
+export const WAY_CELLS_A_STEP = 4096;
+/** IC-STUTTER: a search (townPathSearch's) run WAY_CELLS_A_STEP cells a step - its answer the whole search's.
+ *  @param {{ step: (n: number) => (number[][]|null|undefined) }} search @returns {Generator<void, number[][]|null, void>} */
+function* searchSteps(search) {
+  for (;;) {
+    const got = search.step(WAY_CELLS_A_STEP);
+    if (got !== undefined) return got;
+    yield;
+  }
+}
+
 /** @type {WeakMap<object, Int32Array>} */
 const piecesOf = new WeakMap();
+/** IC-STUTTER: the cells a flood labels between two steps of componentsSteps - a slice of the Imperial
+ *  City is a grid of 512 by 512, flooded in one task by the traveller's first ask of its pace (10-130 ms; at x60 a new
+ *  one every slice crossed). The pixel's build floods it a step at a time before it stands (scenes/pixelBuild.js). */
+export const PIECES_CELLS_A_STEP = 16384;
 /**
  * THE GRID'S PIECES: each street cell labelled with the piece it belongs to (four neighbours, as the walkers step), 0 for
  * none - flooded once a grid and kept on it.
  */
-export function componentsOf(nav) {
+export const componentsOf = (nav) => stepsDone(componentsSteps(nav));
+/** IC-STUTTER: componentsOf a few thousand cells at a time - the same flood in the same order, the same labels, kept on
+ *  the grid as they are. @param {{ width: number, height: number, weightAt: (gx: number, gy: number) => number }} nav
+ *  @returns {Generator<void, Int32Array, void>} */
+export function* componentsSteps(nav) {
   let label = piecesOf.get(nav);
   if (label && label.length === nav.width * nav.height) return label;
   const W = nav.width, H = nav.height;
   label = new Int32Array(W * H);
   const stack = new Int32Array(W * H);
-  let next = 0;
+  let next = 0, seen = 0;
   for (let i = 0; i < W * H; i++) {
+    if (++seen % PIECES_CELLS_A_STEP === 0) yield;
     if (label[i] || !open(nav, i % W, (i / W) | 0)) continue;
     next++;
     let top = 0;
     stack[top++] = i; label[i] = next;
     while (top) {
+      if (++seen % PIECES_CELLS_A_STEP === 0) yield;
       const c = stack[--top], x = c % W, y = (c / W) | 0;
       if (x + 1 < W && !label[c + 1] && open(nav, x + 1, y)) { label[c + 1] = next; stack[top++] = c + 1; }
       if (x > 0 && !label[c - 1] && open(nav, x - 1, y)) { label[c - 1] = next; stack[top++] = c - 1; }
@@ -239,6 +263,104 @@ export function carveNav(nav, passages) {
   return { width: W, height: H, grid, weightAt: (x, y) => (inb(nav, x, y) ? grid[y * W + x] >> 4 : 0) };
 }
 
+// THE JOURNEY'S GRID KNOWS WHAT A BODY CANNOT WALK THROUGH. The town's grid is DFU's CityNavigation: its buildings'
+// automap footprints and its ground. A town's fences, walls, wells and signposts, and the pieces a town mod stands
+// (a town mod fences its yards with them), are on no automap, so a journey's way ran through a fenced yard and the body
+// stopped at the fence. The journey's grid has those cells covered: every near-vertical face of the town's solid models
+// between a step's height and the head, laid on the cells it crosses. The residents' grid is not written: DFU's
+// townsfolk walk as DFU walks them.
+
+/** The heights over the town's ground a solid face closes a cell between, metres: over a step the body climbs
+ *  (player/motor.js STEP_OFFSET, 0.5) and under its head (CAPSULE_HEIGHT, 1.8). */
+export const SOLID_BAND = Object.freeze({ lo: 0.5, hi: 1.8 });
+/** A face steeper than the motor's slope limit (player/motor.js SLOPE_LIMIT_DEG, 70 degrees) is a wall; a flatter one is
+ *  ground the body walks up (a ramp, a hill piece's slope). The normal's vertical share at that limit. */
+export const SOLID_WALL_NY = Math.cos(70 * Math.PI / 180);
+/** How far inside a cell a face must reach to close it, metres: a fence that stands on a cell's edge closes one side. */
+const SOLID_EDGE = 1e-3;
+
+/** Whether the triangle (ax, az), (bx, bz), (cx, cz) and the square [x0, x1] x [z0, z1] overlap on the ground (the
+ *  separating axes: the square's two and each edge's normal; a triangle seen edge-on, a wall's, is its segment). */
+function triangleMeetsSquare(ax, az, bx, bz, cx, cz, x0, z0, x1, z1) {
+  if (Math.max(ax, bx, cx) < x0 || Math.min(ax, bx, cx) > x1 || Math.max(az, bz, cz) < z0 || Math.min(az, bz, cz) > z1) return false;
+  const edges = [[ax, az, bx, bz], [bx, bz, cx, cz], [cx, cz, ax, az]];
+  for (const [px, pz, qx, qz] of edges) {
+    const nx = qz - pz, nz = px - qx;
+    if (nx * nx + nz * nz < 1e-12) continue;
+    const t = [ax * nx + az * nz, bx * nx + bz * nz, cx * nx + cz * nz];
+    const s = [x0 * nx + z0 * nz, x1 * nx + z0 * nz, x0 * nx + z1 * nz, x1 * nx + z1 * nz];
+    if (Math.max(...t) < Math.min(...s) || Math.min(...t) > Math.max(...s)) return false;
+  }
+  return true;
+}
+
+/**
+ * The cells of a town's grid a body cannot enter for its solid models: each model's triangles (its `matrix` placing it,
+ * column-major, in the frame `origin` is subtracted from - the location's), each face steeper than SOLID_WALL_NY that
+ * reaches into `band` over the town's ground laid on every cell it crosses.
+ * @param {{ width: number, height: number }} nav
+ * @param {Iterable<{ positions: ArrayLike<number>, indices: ArrayLike<number>, matrix: ArrayLike<number> }>} solids
+ * @param {number[]} origin - [x, y, z]: the location's origin in the models' frame; y its ground
+ * @param {number} cell - a cell's side, metres (CityNavigation's NAV_CELL)
+ * @returns {Uint8Array} one per cell, 1 where a solid face stands
+ */
+export function solidCells(nav, solids, origin, cell, band = SOLID_BAND) {
+  const out = new Uint8Array(nav.width * nav.height);
+  const v = new Float64Array(9);
+  for (const s of solids) {
+    for (let t = 0; t + 2 < s.indices.length; t += 3) {
+      placeTriangle(s, t, origin, v);
+      if (wallInBand(v, band)) stampTriangle(out, nav.width, nav.height, v, cell);
+    }
+  }
+  return out;
+}
+
+/** Triangle `t` of model `s` into `v` (three corners, x y z each), placed by its matrix and less `origin`. */
+function placeTriangle(s, t, origin, v) {
+  const P = s.positions, m = s.matrix;
+  for (let k = 0; k < 3; k++) {
+    const i = s.indices[t + k] * 3, x = P[i], y = P[i + 1], z = P[i + 2];
+    v[k * 3] = m[0] * x + m[4] * y + m[8] * z + m[12] - origin[0];
+    v[k * 3 + 1] = m[1] * x + m[5] * y + m[9] * z + m[13] - origin[1];
+    v[k * 3 + 2] = m[2] * x + m[6] * y + m[10] * z + m[14] - origin[2];
+  }
+}
+
+/** Whether the triangle in `v` is a wall (steeper than SOLID_WALL_NY) that reaches into the band. */
+function wallInBand(v, band) {
+  if (Math.max(v[1], v[4], v[7]) < band.lo || Math.min(v[1], v[4], v[7]) > band.hi) return false;
+  const ux = v[3] - v[0], uy = v[4] - v[1], uz = v[5] - v[2], wx = v[6] - v[0], wy = v[7] - v[1], wz = v[8] - v[2];
+  const nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+  const len = Math.hypot(nx, ny, nz);
+  return len > 1e-12 && Math.abs(ny) / len < SOLID_WALL_NY;
+}
+
+/** Marks in `out` (W x H cells of `cell` metres) every cell the triangle in `v` crosses on the ground. */
+function stampTriangle(out, W, H, v, cell) {
+  const gx0 = Math.max(0, Math.floor(Math.min(v[0], v[3], v[6]) / cell)), gx1 = Math.min(W - 1, Math.floor(Math.max(v[0], v[3], v[6]) / cell));
+  const gy0 = Math.max(0, Math.floor(Math.min(v[2], v[5], v[8]) / cell)), gy1 = Math.min(H - 1, Math.floor(Math.max(v[2], v[5], v[8]) / cell));
+  for (let gy = gy0; gy <= gy1; gy++) {
+    for (let gx = gx0; gx <= gx1; gx++) {
+      if (out[gy * W + gx]) continue;
+      const x0 = gx * cell + SOLID_EDGE, z0 = gy * cell + SOLID_EDGE, x1 = (gx + 1) * cell - SOLID_EDGE, z1 = (gy + 1) * cell - SOLID_EDGE;
+      if (triangleMeetsSquare(v[0], v[2], v[3], v[5], v[6], v[8], x0, z0, x1, z1)) out[gy * W + gx] = 1;
+    }
+  }
+}
+
+/** The town's grid with the cells `solid` marks covered (weight 0) - a grid of the journey's, as carveNav's; the town's
+ *  own is never written. With none marked, it is the grid itself. */
+export function coverNav(nav, solid) {
+  if (!solid?.some((c) => c)) return nav;
+  const W = nav.width, H = nav.height;
+  const grid = new Uint8Array(W * H);
+  if (nav.grid instanceof Uint8Array && nav.grid.length === W * H) grid.set(nav.grid);
+  else for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) grid[y * W + x] = (nav.weightAt(x, y) & 15) << 4;
+  for (let i = 0; i < W * H; i++) grid[i] = solid[i] ? 0 : grid[i] & 0xf0;
+  return { width: W, height: H, grid, weightAt: (x, y) => (inb(nav, x, y) ? grid[y * W + x] >> 4 : 0) };
+}
+
 /** The street cell of piece `id` nearest `to` (cells, anywhere) - of any piece when `id` is 0 - the grid read once. */
 function nearestIn(nav, label, id, to) {
   const W = nav.width;
@@ -262,20 +384,63 @@ function nearestIn(nav, label, id, to) {
  * @param {number[]} from - [gx, gy] @param {number[]} to - [gx, gy], anywhere
  * @returns {{ cells: number[][], inside: boolean, reached: boolean } | null}
  */
-export function townWayCells(nav, from, to, { maxExpansions = nav.width * nav.height, hWeight = TOWN_WAY_H_WEIGHT } = {}) {   // the whole grid's cells: a way in its piece is never given up on early (the greatest cities' pieces are 200,000 cells)
+export const townWayCells = (nav, from, to, o = {}) => stepsDone(townWayCellsSteps(nav, from, to, o));
+/** IC-STUTTER: townWayCells a few thousand cells at a time -
+ *  its pieces flooded (componentsSteps) and each search opened WAY_CELLS_A_STEP cells a step (`scratchKey` the scratch it
+ *  keeps: systems/livingWorld/townPaths.js townPathSearch); the same search in the same order, the same way. A slice of the
+ *  Imperial City is 512 cells a side, and a journey at x60 asked its way at every slice crossed, 10-200 ms of one task.
+ *  @param {{ width: number, height: number, weightAt: (gx: number, gy: number) => number, grid?: Uint8Array }} nav
+ *  @param {number[]} from @param {number[]} to @param {{ maxExpansions?: number, hWeight?: number, scratchKey?: object }} [o] */
+export function* townWayCellsSteps(nav, from, to, { maxExpansions = nav.width * nav.height, hWeight = TOWN_WAY_H_WEIGHT, scratchKey = nav } = {}) {   // the whole grid's cells: a way in its piece is never given up on early (the greatest cities' pieces are 200,000 cells)
   const a = snapCell(nav, from);
   if (!a) return null;
-  const label = componentsOf(nav), W = nav.width, id = label[a[1] * W + a[0]];
+  const findTownPath = (/** @type {any} */ g, /** @type {number[]} */ p, /** @type {number[]} */ q, /** @type {any} */ opts) => searchSteps(townPathSearch(g, p, q, { ...opts, scratchKey }));
+  const label = yield* componentsSteps(nav), W = nav.width, id = label[a[1] * W + a[0]];
   const mine = (x, y) => label[y * W + x] === id;   // the traveller's own piece - the only one a way can reach
   if (inb(nav, to[0], to[1])) {
     const b = snapCell(nav, to, TOWN_SNAP_CELLS, mine) ?? nearestIn(nav, label, id, to);   // a point in another piece (a shut gate's far side): this piece's nearest
-    const path = b ? findTownPath(nav, a, b, { maxExpansions, hWeight }) : null;
+    const path = b ? yield* findTownPath(nav, a, b, { maxExpansions, hWeight }) : null;
     const own = snapCell(nav, to) ?? nearestIn(nav, label, 0, to);   // the point's own street, of whichever piece: reached when it is the traveller's
     return path ? { cells: simplifyWay(nav, path), inside: true, reached: !!own && mine(own[0], own[1]) } : null;
   }
   for (const exit of exitCells(nav, to, TOWN_EXIT_TRIES, mine)) {
-    const path = findTownPath(nav, a, exit, { maxExpansions, hWeight });
+    const path = yield* findTownPath(nav, a, exit, { maxExpansions, hWeight });
     if (path) return { cells: simplifyWay(nav, path), inside: false, reached: true };
   }
+  return null;
+}
+
+/** The mod's named journey as a route of no legs (its beginTravel, under Avoid Obstacles): it
+ *  walks the streets of every town it starts in or crosses as the Overworld's routes do, and the mod's straight walk to
+ *  the place between them. A straight line out of a town or across one meets its walls, houses and fenced yards, and the
+ *  steering gave it up there as stuck or blocked. The route's last leg is the mod's own: the place's rect grown by the
+ *  arrival buffer, at the mod's speed, its arrival box. */
+export const classicTownRoute = (summary) =>
+  ({ legs: [], i: 0, summary, point: null, quiet: false, join: null, street: null, streetFor: null, townAt: null });
+
+/** How many times a journey asks a town for its way again, from where it stands, when the steering would stop it in
+ *  that town's streets. */
+export const STREET_REPLANS = 2;
+
+/**
+ * A steering stop in a town's streets, answered by a way asked again (`restart`) rather than the end of the journey:
+ * what stopped the body is on no grid the way was planned on (a cart, a fence no model holds), and a way from where the
+ * body now stands goes round it. STREET_REPLANS times a town; then, or off a street, the stop stands.
+ * @param {any} route - the journey's route (`st.route`), or null
+ * @param {string | null} stop - the steering's answer: 'stuck', 'blocked' or null
+ * @param {() => void} restart - begins the leg again: its town's way asked from where the body stands
+ * @returns {string | null} the stop that stands, or null
+ */
+export function streetReplan(route, stop, restart) {
+  if (!stop || !route?.street) return stop;
+  if (route.replanTown !== route.townAt) {
+    route.replanTown = route.townAt;
+    route.replans = 0;
+  }
+  if (route.replans >= STREET_REPLANS) return stop;
+  route.replans++;
+  route.street = null;
+  route.streetFor = null;
+  restart();
   return null;
 }

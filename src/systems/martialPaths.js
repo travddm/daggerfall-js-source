@@ -1,5 +1,5 @@
 // @ts-check
-// MARTIAL (2026-10-17) - MARTIAL SPECIALISATIONS: A FIGHTER IS THE WEAPONS THEY MASTER. bible/05-Combat/Martial-Specialisations.md
+// MARTIAL - MARTIAL SPECIALISATIONS: A FIGHTER IS THE WEAPONS THEY MASTER.
 //
 // The owner: "we've properly balanced mages, added a specialization tree and added the firmament system. I want to do the
 // same for other weapon types/classes." Asked, the owner chose: the six weapon skills (Long Blade, Short Blade, Axe, Blunt
@@ -26,7 +26,7 @@
 // No judge's finding (the design page, section 7): a path acts only with both its masteries held, read here at every
 // ask, and the account service's judge reads no mastery - a finding would add a version and stop nothing.
 //
-// An arcane path and a martial path are two choices (the owner: "Yes, one of each") - neither reads the other, and the
+// An arcane path and a martial path are two choices - neither reads the other, and the
 // masteries they need come from the one 3 / 2 / 1 (masterSkills.js MASTERY_SLOTS).
 //
 // Everything a player reads is `t()`, read when it is read.
@@ -41,7 +41,7 @@ const { LongBlade: LB, ShortBlade: SB, Axe: AX, BluntWeapon: BL, Archery: AR, Ha
 /** The six weapon skills, in the order the paths are tabled. */
 export const MARTIAL_SKILLS = Object.freeze([LB, SB, AX, BL, AR, HH]);
 /** A weapon skill's technique FAMILY - combat/technique/techniqueRoster.js TECHNIQUE_FAMILIES' words (pinned equal; that
- *  leaf reads the item tables, and this one must not). The Thunderlock is scored on Archery but is a gun: no path's. */
+ *  leaf reads the item tables, and this one must not). */
 export const MARTIAL_FAMILY = Object.freeze({ [LB]: 'longBlade', [SB]: 'shortBlade', [AX]: 'axe', [BL]: 'blunt', [AR]: 'archery', [HH]: 'handToHand' });
 
 /**
@@ -50,36 +50,36 @@ export const MARTIAL_FAMILY = Object.freeze({ [LB]: 'longBlade', [SB]: 'shortBla
  */
 export const MARTIAL_NUMBERS = Object.freeze({
   // the passives
-  flowingSteel: Object.freeze({ pct: 3, stacks: 5, seconds: 4 }),
+  flowingSteel: Object.freeze({ pct: 0.5, stacks: 5, seconds: 4 }),
   warRhythm: Object.freeze({ pct: 15, seconds: 10 }),
-  ironDiscipline: Object.freeze({ lighter: 10 }),
-  huntersInstinct: Object.freeze({ pct: 20 }),
+  ironDiscipline: Object.freeze({ lighter: 2 }),
+  huntersInstinct: Object.freeze({ pct: 2 }),
   dancersStep: Object.freeze({ oneIn: 10 }),
   bloodlust: Object.freeze({ health: 5 }),
-  cheapShot: Object.freeze({ pct: 25 }),
-  openingStrike: Object.freeze({ pct: 30 }),
-  lightStep: Object.freeze({ agility: 10, dodging: 15 }),
+  cheapShot: Object.freeze({ pct: 3 }),
+  openingStrike: Object.freeze({ pct: 3 }),
+  lightStep: Object.freeze({ agility: 9, dodging: 15 }),
   standFirm: Object.freeze({ below: 0.3, heal: 20, recover: 180 }),
   tireless: Object.freeze({ fatigue: 15 }),
-  frenzy: Object.freeze({ below: 0.5, pct: 20, pace: 10 }),
-  purge: Object.freeze({ pct: 20 }),
+  frenzy: Object.freeze({ below: 0.5, pct: 2, pace: 10 }),
+  purge: Object.freeze({ pct: 2 }),
   grit: Object.freeze({ health: 1, fatigue: 2 }),
-  windborne: Object.freeze({ speed: 10, running: 15, jumping: 15 }),
+  windborne: Object.freeze({ speed: 9, running: 15, jumping: 15 }),
   // the riders
   thousandCuts: Object.freeze({ share: 1 / 2 }),
-  rallyingCleave: Object.freeze({ pct: 15, seconds: 8 }),
+  rallyingCleave: Object.freeze({ pct: 1, seconds: 8 }),
   judgement: Object.freeze({ heal: 4, foes: 3 }),
-  huntersMark: Object.freeze({ pct: 20, seconds: 12 }),
+  huntersMark: Object.freeze({ pct: 2, seconds: 12 }),
   cyclone: Object.freeze({ pace: 20, seconds: 6 }),
   guttingLunge: Object.freeze({ below: 0.25 }),
   blackjack: Object.freeze({ times: 2 }),
   vanishingStrike: Object.freeze({ rounds: 4 }),
   phantomStrike: Object.freeze({ oneIn: 3, seconds: 6 }),
-  earthsplitter: Object.freeze({ lighter: 25, seconds: 10 }),
+  earthsplitter: Object.freeze({ lighter: 2, seconds: 10 }),
   fellingStrike: Object.freeze({ heal: 10 }),
   savageWhirl: Object.freeze({ leech: 10, seconds: 8 }),
   hallowedStrike: Object.freeze({ share: 1 / 2 }),
-  knockout: Object.freeze({ lighter: 30, seconds: 8 }),
+  knockout: Object.freeze({ lighter: 2, seconds: 8 }),
   windstrike: Object.freeze({ fatigue: 5, foes: 3 }),
 });
 const N = MARTIAL_NUMBERS;

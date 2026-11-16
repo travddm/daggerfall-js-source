@@ -1,8 +1,8 @@
-// FB0930-FRAME (2026-09-30, a player's screenshot and performance trace from a loaded save in a dungeon): the desktop
+// FB0930-FRAME: the desktop
 // window's title still read "DFO Online - loading the saved game" long after the save had loaded - the world
 // host names each boot step in the title and never took the last one down - and the frames ran ~151 ms, three
 // quarters of them the foes' obstacle probes asking every door bucket its box. The first two pins are the boot's
-// close; the rest are the collider's buckets filed by broad cell (bible/07-Rendering/Performance-Town.md).
+// close; the rest are the collider's buckets filed by broad cell.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

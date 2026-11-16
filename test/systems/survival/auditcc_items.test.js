@@ -22,7 +22,7 @@ import { BUILDING_TYPES } from '../../../src/world/buildingNames.js';
 import { CLIMATES } from '../../../src/formats/mapsFile.js';
 import { RACES } from '../../../src/systems/races.js';
 
-// ═══ AUDIT C&C (2026-10-12), THE ITEMS: lens I's findings on the food, the kit, the shelf and the camp menu ═══
+// ═══ AUDIT C&C, THE ITEMS: lens I's findings on the food, the kit, the shelf and the camp menu ═══
 //
 // Every fixture is the real producers' (createSurvivalItem, the minute law's rot, the chargen assigner and its fallback,
 // the provisions shelf and the general store's, the camp pool's own placing) and every number is a LITERAL (A PIN MUST
@@ -78,7 +78,7 @@ test('AUDIT C&C I5: FOOD THAT SPOILS IN THE PACK IS DRESSED AT EVERY STAGE - the
   // the card: putrid cannot be eaten (it read "Nourishes for 36 minutes (putrid)"); a raw one can still be cooked
   assert.deepEqual(pack.map((it) => survivalInfoTokens(it).map((t) => t.text)), [
     ['Putrid Bread', 'Weight: 1.50 kilograms', 'Putrid. Too disgusting to force down.'],
-    ['Putrid Raw Fish', 'Weight: 1.00 kilograms', 'Putrid. Too disgusting to force down.', 'Raw. Cook it at a fire.'],   // PIN MOVED: CRAFT-PAYS, a raw fish a kilo (2)
+    ['Putrid Raw Fish', 'Weight: 1.00 kilograms', 'Putrid. Too disgusting to force down.', 'Raw. Cook it at a fire.'],
     ['Putrid Apple', 'Weight: 0.10 kilograms', 'Putrid. Too disgusting to force down.'],
   ]);
   assert.equal(survivalInfoTokens(createSurvivalItem(TEMPLATE.Bread, { foodStage: 3 }))[2].text, 'Nourishes for 45 minutes (rotten)', 'a stage short of putrid still feeds, by its stage');

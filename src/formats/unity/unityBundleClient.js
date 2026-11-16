@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// DW1 — A MOD'S BUNDLE, OPENED OFF THE MAIN THREAD.
+// A MOD'S BUNDLE, OPENED OFF THE MAIN THREAD.
 //
 // Diverse Weapons' `.dfmod` is 58 MB of LZ4 around 1.69 GB of pixels
 // in one serialized file: indexing it is ~10 s of decompression, and
@@ -57,7 +57,7 @@ export function openBundleHere(bytes, { maxTextureSize = Infinity, knownTextures
     textAssets: bundle.textAssets.map((t) => ({ name: t.name, bytes: t.bytes, get text() { return utf8(t.bytes); } })),
     textures: bundle.textures.map((t) => ({ name: t.name, width: t.width, height: t.height, format: t.format })),
     rgba: async (name, opts) => { const tex = byName.get(name); return tex ? tex.rgba(opts) : null; },
-    arrays: (bundle.arrays ?? []).map((a) => ({ name: a.name, width: a.width, height: a.height, depth: a.depth })),   // GROUND1
+    arrays: (bundle.arrays ?? []).map((a) => ({ name: a.name, width: a.width, height: a.height, depth: a.depth })),
     layers: async (name) => { const a = bundle.arrays?.find((x) => x.name === name); return a ? a.layers() : null; },
     close() { byName.clear(); },
   };
@@ -76,7 +76,7 @@ export function openBundleHere(bytes, { maxTextureSize = Infinity, knownTextures
 export async function openUnityBundle(bytes, { workerFactory = null, maxTextureSize = Infinity, knownTextures = null } = {}) {
   const factory = workerFactory
     ?? ((bundleThreadDisabled() || typeof Worker === 'undefined') ? null : defaultWorkerFactory);
-  // DFMOD2: A BLOB is read by range in the worker and never whole here. With no worker there is no sync range read
+  // A BLOB is read by range in the worker and never whole here. With no worker there is no sync range read
   // on this thread, so the fallback materialises it - which a multi-gigabyte one cannot survive, and says so.
   const isBlob = typeof Blob !== 'undefined' && bytes instanceof Blob;
   const here = async () => openBundleHere(isBlob ? new Uint8Array(await bytes.arrayBuffer()) : bytes, { maxTextureSize, knownTextures });
@@ -107,11 +107,11 @@ export async function openUnityBundle(bytes, { workerFactory = null, maxTextureS
       const p = pending.get(m.id);
       if (!p) return;
       pending.delete(m.id);
-      // AUDIT 68 S12-bundle-client-reader-error-reparse: the worker ANSWERED -
+      // The worker ANSWERED -
       // marked so the open's catch does not mistake it for a dead worker
       if (m.t === 'error') p.reject(Object.assign(new Error(m.message), { readerError: true })); else p.resolve(m);
     };
-    // a COPY: the caller's bytes are the fallback's if this never answers; DFMOD2: a Blob is a handle, not a copy
+    // a COPY: the caller's bytes are the fallback's if this never answers; a Blob is a handle, not a copy
     let opened;
     if (isBlob) opened = await ask({ t: 'open', blob: bytes, maxTextureSize, knownTextures });
     else { const copy = bytes.slice(); opened = await ask({ t: 'open', bytes: copy, maxTextureSize, knownTextures }, [copy.buffer]); }
@@ -120,7 +120,7 @@ export async function openUnityBundle(bytes, { workerFactory = null, maxTextureS
       textAssets: opened.textAssets.map((t) => ({ name: t.name, bytes: t.bytes, get text() { return utf8(t.bytes); } })),
       textures: opened.textures,
       rgba: async (name, opts) => (await ask({ t: 'rgba', name, maxSize: opts?.maxSize })).image ?? null,
-      arrays: opened.arrays ?? [],   // GROUND1
+      arrays: opened.arrays ?? [],
       layers: async (name) => (await ask({ t: 'layers', name })).images ?? null,
       close() { try { w.postMessage({ t: 'close' }); } catch { /* gone */ } down('unity bundle worker closed'); },
     };

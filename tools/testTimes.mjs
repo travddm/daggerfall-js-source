@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// FLOW1 (2026-09-26): THE SHARDS' WEIGHTS - each test file's own wall time (a fresh `node --test <file>`: its start, its
+// FLOW1: THE SHARDS' WEIGHTS - each test file's own wall time (a fresh `node --test <file>`: its start, its
 // imports and its tests), taken `--jobs` at a time and written to tools/testTimes.json for tools/testShards.mjs. Only
 // the balance reads them: a stale or missing time never leaves a file out of a shard, it only places it less well. Run
 // it again when the suite's shape moves (a new slow file, a slow file made fast).
 //
 //
-// CI-TIMES (2026-10-19, Mac: "Do it"): the times are RECORDED BY CI now - every shard adds each of its files' wall time
+// CI-TIMES: the times are RECORDED BY CI now - every shard adds each of its files' wall time
 // to a record (tools/fileTimes.mjs), and after a green run test-times.yml merges the eight onto the times that run was
 // split by (`--merge`) and keeps them in the Actions cache, where the next run's shards read them (verify.yml). This
 // tool's re-take stays for a machine of one's own.
@@ -18,23 +18,31 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { availableParallelism } from 'node:os';
-import { testFiles, readTimes, TIMES_FILE } from './testShards.mjs';
+import { testFiles, readTimes, runnerEnv, TIMES_FILE } from './testShards.mjs';
 import { isMain } from './lib/isMain.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+/** The weight of a run's own time in a file's smoothed time; the rest is the time it had before. */
+export const NEW_TIME_WEIGHT = 1 / 3;
+
 /**
- * CI-TIMES: THE MERGE. Each of the suite's `files` takes its time from the records (a run's, file -> ms; a later record
- * over an earlier), else keeps the one `base` held, else has none (the split weighs it the median); a file no longer in
- * the suite is dropped. Sorted by file. Pure.
+ * The merge. Each of the suite's `files` takes its time from the records (a run's, file -> ms; a later record over an
+ * earlier), blended with the time `base` held for it: a third of the new time, two thirds of the old. One run's time
+ * swings with the files that share its runner, so the last time alone put the slowest shard about a third over the
+ * mean. A file with no record keeps its time, and a file with no time has none (the split weighs it the median). A file
+ * no longer in the suite is dropped. Sorted by file. Pure.
  * @param {Record<string, number>} base @param {Record<string, number>[]} records @param {string[]} files
  */
 export function mergeTimes(base, records, files) {
   const ok = (v) => Number.isFinite(v) && v >= 0;
   const out = {};
   for (const f of [...new Set(files)].sort()) {
-    let t = ok(base?.[f]) ? base[f] : undefined;
-    for (const r of records) if (ok(r?.[f])) t = Math.round(r[f]);
+    const before = ok(base?.[f]) ? base[f] : undefined;
+    let recorded;
+    for (const r of records) if (ok(r?.[f])) recorded = r[f];
+    let t = before;
+    if (recorded !== undefined) t = Math.round(before === undefined ? recorded : before + (recorded - before) * NEW_TIME_WEIGHT);
     if (t !== undefined) out[f] = t;
   }
   return out;
@@ -57,7 +65,7 @@ export function mergeDir(dir, root = ROOT) {
 function timeOne(file) {
   return new Promise((resolve) => {
     const t0 = process.hrtime.bigint();
-    const child = spawn(process.execPath, ['--test', file], { cwd: ROOT, stdio: 'ignore' });
+    const child = spawn(process.execPath, ['--test', file], { cwd: ROOT, stdio: 'ignore', env: runnerEnv(ROOT) });
     child.on('close', (code) => resolve({ file, ms: Math.round(Number(process.hrtime.bigint() - t0) / 1e6), code }));
   });
 }

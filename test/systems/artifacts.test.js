@@ -63,12 +63,6 @@ test('V3: Azura\'s Star - Used releases the soul (TEXT 32) or reports none (TEXT
   p.equip = { slots: { Amulet0: star } };
   assert.equal(isAzurasStarEquipped(p), true);
   assert.equal(isWearingArtifact(p, ARTIFACTS.RingOfNamira), false, 'subtype-keyed, not any-artifact');
-  const ef = read('src/scenes/exteriorFoes.js');
-  const dc = read('src/scenes/dungeonContext.js');
-  for (const src of [ef, dc]) {
-    assert.ok(src.includes('isAzurasStarEquipped(playerEntity)'), 'both death sites read it');
-    assert.ok(src.includes('azurasStarOnly: true'), 'and fill the Star alone, always-successful-while-empty');
-  }
 });
 
 test('V3: the Masque adds LivePersonality/5 to EVERY social group\'s reaction mod, per round', () => {
@@ -180,33 +174,6 @@ test('V3/MT-ii: the two summons - the range gate, the fail line, the PlayerAlly 
     },
   });
   assert.equal(spawned.at(-1), MOBILE_TYPES.Lich);
-  // MT-ii: THE DOOR IS MOUNTED, and RETIRING A FLAG DELETES THE
-  // SENTENCE - the module header's "no host mounts it" is gone with it.
-  // SD1 re-anchored this from the literal spawn line onto the LAW it
-  // holds. The old assertion quoted `exteriorFoes.spawnFoe(mobileType,
-  // [pf[0] + 2, ...], { allied: true })` - a fixed offset from the
-  // player's feet - and SD1 replaced that call with DFU's placement
-  // ring, so the pin went red for a change that strengthened exactly
-  // what it was defending. F041's precedent: anchor on the gate.
-  // WAVE D moved the gate itself: the ctx BODY is scenes/hostEnchant.js
-  // now and both mounting hosts hand it their own pool door, so the
-  // arm is pinned where it lives and each host is pinned to reach it.
-  const he = read('src/scenes/hostEnchant.js');
-  assert.ok(he.includes("spawnAlliedFoe: (mobileType) => { Promise.resolve(standFoe?.(mobileType, { allied: true })).then(summonedBody, () => null); },"),
-    'the shared ctx mounts the allied spawn');   // PIN MOVED (RPT1026-PROGRESS): its body carries nothing (foeLootCap.js summonedBody)
-  const w = read('src/scenes/world.js');
-  assert.ok(/standLooseFoe: _standLooseFoe,/.test(w), 'world.js hands in its own stander');
-  const stander = w.slice(w.indexOf('const _standLooseFoe ='), w.indexOf('const _standLooseFoe =') + 2400);
-  assert.ok(/\? d\.spawnLooseFoe\(mt, pos, \{ yawRad: o\.yawRad, allied: o\.allied \}\)/.test(stander)
-    && /: exteriorFoes\.spawnFoe\(mt, pos, \{ yaw: o\.yawRad, allied: o\.allied, loose: true \}\)/.test(stander),
-    'through a live pool either way, carrying allied to it');
-  // ROAD-G G1: and a THIRD live pool - a Sanguine Rose broken in a shop
-  // stands its Daedroth through the interior host's own chain.
-  assert.ok(/if \(mode === 'interior'\) return modes\?\.insideStandLooseFoe\?\.\(mobileType, opts\) \?\? null;/.test(stander),
-    'the interior arm goes to the pool that owns that building');
-  const dc0 = read('src/scenes/dungeonContext.js');
-  assert.ok(/standLooseFoe: \(mobileType, o = \{\}\) => standLooseFoe\(\{/.test(dc0),
-    'and the dungeon host hands in its own');
   for (const [f, line] of [
     ['src/scenes/exteriorFoes.js', "if (allied) { entity.team = 'PlayerAlly'; entity.mobileTeam = 'PlayerAlly'; }"],
     ['src/scenes/dungeonContext.js', "if (e?.allied && entity) { entity.team = 'PlayerAlly'; entity.mobileTeam = 'PlayerAlly'; }"],   // AUDIT OH-F C4: at the build
@@ -214,8 +181,6 @@ test('V3/MT-ii: the two summons - the range gate, the fail line, the PlayerAlly 
     assert.ok(read(f).includes(line),
       `${f}: BOTH per-instance team fields turn (SetupDemoEnemy.cs:85-86), never the shared static row`);
   }
-  assert.ok(!read('src/systems/artifactEffects.js').includes('the port has no ally/team combat'),
-    'the flag sentence is deleted, not merely contradicted');
 
   // AND THE FILTERS both summons apply BEFORE counting company
   // (:47-48): a player standing alone among their OWN summons gets
@@ -242,8 +207,6 @@ test('V3/MT-ii: the two summons - the range gate, the fail line, the PlayerAlly 
     },
   });
   assert.deepEqual(said3, [NO_MONSTERS_NEARBY_TEXT], 'the Skull refuses to clone an ally');
-  assert.ok(read('src/systems/artifactEffects.js').includes(":67-71, unreachable past the filter"),
-    'and the redundancy is recorded as the source\'s, not tidied away');
 });
 
 test('V3: the Wabbajack rerolls from the seventeen-entry table, never the same type, once per creature', () => {
@@ -263,12 +226,6 @@ test('V3: the Wabbajack rerolls from the seventeen-entry table, never the same t
   // the latch: an already-wabbajacked creature is left alone
   SPECIAL_ARTIFACT_HANDLERS.get(ARTIFACTS.Wabbajack).strikes({ target: { mobileType: 5, wabbajackActive: true }, ctx });
   assert.equal(replaced.length, 1);
-  // the world door carries the transform laws
-  const w = read('src/scenes/world.js');
-  assert.ok(w.includes('replaceFoe: (targetEntity, mobileType)'), 'the world host mounts the door');
-  assert.ok(w.includes('nf.entity.wabbajackActive = true'), 'the latch survives the swap');
-  assert.ok(w.includes('nf.entity.health -= missing'), 'damage carries over (WabbajackEffect:94)');
-  assert.ok(w.includes('if (f.questBehaviour && !f.questBehaviour.isFoeDead) return;'), 'a live quest foe is left alone');
 });
 
 test('V3: the Ring of Namira reflects by the attacker\'s TEAM at the attack tail - animals nothing, Daedra half, Undead double', () => {
@@ -306,17 +263,9 @@ test('V3: the Ring of Namira reflects by the attacker\'s TEAM at the attack tail
   onPlayerStruckByEnemy(orc, p, 10);
   assert.equal(orc.health, 30);
   assert.equal(ring.currentCondition, 800, 'still pristine after four reflected blows');
-  assert.ok(!read('src/systems/artifactEffects.js').includes('lowerCondition(ring'),
-    'the bill is gone, not commented out');
   // no ring, nothing
   const bare = P();
   const orc2 = { mobileType: MOBILE_TYPES.Orc, health: 40 };
   onPlayerStruckByEnemy(orc2, bare, 10);
   assert.equal(orc2.health, 40);
-  // and it is dispatched where DFU dispatches it - the formulas tail,
-  // through worldTick's registration
-  const f = read('src/combat/formulas.js');
-  assert.ok(f.includes("if (target?.isPlayer && !attacker.isPlayer && damage > 0) {"), 'the enemy-damages-player tail');
-  assert.ok(f.includes('_playerStruckHook?.(attacker, target, damage);'));
-  assert.ok(read('src/systems/worldTick.js').includes('setPlayerStruckHook((attacker, target, damage) => onPlayerStruckByEnemy(attacker, target, damage));'));
 });

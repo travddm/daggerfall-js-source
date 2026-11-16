@@ -1,7 +1,6 @@
 // @ts-check
-// WB9g (2026-09-30, Mac: "Add a brand new title to the broker and a new addition (the aura), an animated burning ground
-// aura that circles the ground where your character stands. These items should be expensive and sought after"): THE
-// BROKER'S INSIGNIA - what Sigil Stones buy that no day's stock carries. Design: bible/11-Multiplayer/World-Bosses.md
+// WB9g: THE
+// BROKER'S INSIGNIA - what Sigil Stones buy that no day's stock carries. Design:
 // section 14 (WB9g).
 //
 // ═══ THIS FILE IS THE LAW BOTH ENDS READ ═══════════════════════════
@@ -9,8 +8,7 @@
 // A day's ware (systems/sigil/sigilBroker.js) is an item: made on the pack, carried by the save, sold client-side as every
 // shop here is. A piece of the INSIGNIA is not an item - it is a thing worn over the name or at the feet, that every
 // other player SEES - and a thing others see must be one no client can assert (ACC3's law: a title rides the signed
-// token). So a piece is bought ONCE and kept by the ACCOUNT: the account service records the sale (players.insignia,
-// server-account/migrations/0040_insignia.sql), signs the title and the aura worn into the token (`t`, `au`), and the
+// token). So a piece is bought ONCE and kept by the ACCOUNT: the account service records the sale (players.insignia), signs the title and the aura worn into the token (`t`, `au`), and the
 // relay reads them out of it as it reads every badge.
 //
 // THE PRICE IS PAID TWICE-CHECKED. The embers are the pack's (the Deadlands Embers a breach pays - one a breach closed,
@@ -26,7 +24,7 @@ import { TITLES, AURAS } from './identityToken.js';
 
 /**
  * THE OFFERS, in the Broker's order: `{ id, kind, key, price }` - `kind` 'title' (its `key` one of identityToken.js
- * TITLES) or 'aura' (one of AURAS), `price` in Sigil Stones. Expensive on purpose (Mac: "expensive and sought after"):
+ * TITLES) or 'aura' (one of AURAS), `price` in Sigil Stones. Expensive on purpose:
  * a gate opens every two hours and drops one stone to a fighter, so the title is some thirty gates closed and the aura
  * fifty - a piece of Ruhn's Regalia in the day's stock is twelve.
  */
@@ -74,7 +72,7 @@ export function insigniaRefusal(offer, { held, stones, online }) {
 }
 
 /**
- * AUDIT FB1024 (2026-10-25; bible/01-Overview/bugs/Field-Bugs-2026-10-24.md, BROKER-RID): A BROKER SALE'S REQUEST ID. Each
+ * AUDIT FB1024: A BROKER SALE'S REQUEST ID. Each
  * press of the Broker's insignia or her Panoply piece carries one (`rid`) - the service writes it beside the sale it
  * makes (server-account/src/brokerSales.js), so a press whose answer was lost is asked after by its own id, never by
  * what else the account holds: the id names this sale, or the service FENCES it (no request of that id writes after).

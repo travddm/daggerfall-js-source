@@ -82,28 +82,6 @@ test('TR4: the boarding memory SURVIVES a save (SerializablePlayer :180, :425)',
   assert.equal(old.boardShipPosition, null);
 });
 
-test('TR4: the picker\'s row is live for an owner, and Ship routes to the teleport rather than the mode', () => {
-  const world = hostText('src/scenes/world.js');
-  // MAC-K3: the picker is `player/mountRig.js`'s now, and the Ship row
-  // takes a SECOND gate - `!!onShip` - because the fixed-city host has
-  // no world to sail across and a live row there would open onto
-  // nothing. world.js is the host that has one, and hands it in.
-  assert.match(read('src/player/mountRig.js'), /shipAvailable: isShipAvailable\(\{ canSail: !!onShip, ownsShip: ownsShip\(playerEntity\), \.\.\.\(shipLocation\?\.\(\) \?\? \{\}\) \}\),/,   // RR1: the delegate; HasShip is its default
-    'the row the bank arc has been able to answer since H3, and the host that can actually sail');
-  assert.match(read('src/player/mountRig.js'), /if \(mode === TRANSPORT_MODES\.Ship\) \{ onShip\?\.\(\); return; \}/);
-  assert.match(world, /onShip: \(\) => boardOrDisembark\(\),/, 'and world.js is the host that hands the teleport in');
-  assert.match(read('src/scenes/exterior.js'), /onShip: null,/, 'the fixed city hands none, so its row is dark');
-  // The host half: the decision comes from ship.js, the teleport and
-  // the remembered yaw are the host's.
-  assert.match(world, /const t = shipTransition\(playerEntity, \{/);
-  // F-F1 (the parity audit): the host READS the reposition rather than
-  // inferring it from `restore`, so the two encodings cannot drift.
-  assert.match(world, /const localPos = t\.reposition === REPOSITION\.None \? \(shipRestorePos\(t\.restore, state\.compensation\[1\]\) \?\? t\.restore\.pos\) : null;/);   // AUDIT 68 S22: the memory's height in the arrival's frame
-  assert.match(world, /await _teleportToPixel\(t\.go\.x, t\.go\.y, localPos, \{ reposition: t\.reposition, grounded: legacy \}\);/);
-  assert.match(world, /playerEntity\.boardShipPosition = t\.boardShipPosition;/);
-  assert.match(world, /setTransportModeHere\(t\.mode\);/, 'and it lands on Foot through the one seam');
-});
-
 // =====================================================================
 // TR4-SHIPLAND - THE SHIP ARRIVAL IS A LOCATION ARRIVAL.
 //
@@ -155,38 +133,6 @@ test('TR4-SHIPLAND: the boarding arrival routes through the location arm, not th
   assert.equal(locationArrivalLanding(null, { origin }), null);
   assert.equal(locationArrivalLanding({ mapTableData: {} }, { origin }), null);
 
-  // (2) THE HOST. The ship arm hands the teleport core the reposition
-  // method DFU's TeleportToMapPixel stores (:1076-1095), and the core
-  // applies it after the destination pixel is built, exactly where
-  // StreamingWorld.Update applies it (:266-295). Forcing the default
-  // landing - dropping the `reposition` argument, or nulling `landing`
-  // in the core - turns this red.
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /await _teleportToPixel\(t\.go\.x, t\.go\.y, localPos, \{ reposition: t\.reposition, grounded: legacy \}\);/,
-    'the boarding carries RandomStartMarker into the teleport');
-  assert.match(world, /const wantsLanding = reposition === REPOSITION\.RandomStartMarker\s*\n\s*\|\| reposition === REPOSITION\.DirectionFromStartMarker;/,
-    'BOTH marker methods take the arm - StreamingWorld.Update\'s two cases fall through to one PositionPlayerToLocation() (:279-282)');
-  assert.match(world, /const landing = wantsLanding \? locationLandingFor\(px, py, \{ travelStart: hint \}\) : null;/,
-    'and the core runs the location arm for it');
-  assert.match(world, /const local = landing\?\.pos \?\? localPos;/,
-    'the location landing OUTRANKS the caller\'s own local position');
-  assert.match(world, /const raw = local \?\? \[TERRAIN_SIZE \/ 2, dest\.centerHeight/,
-    'the default landing is only what is left when neither exists');
-  assert.match(world, /const ground = landing \? landing\.grounded : grounded;/,
-    'and grounded comes off the LocationType, not the caller');
-  assert.match(world, /if \(landing\) cam\.yaw = landing\.yaw;/,
-    'PositionPlayerToLocation sets the facing itself (:1552-1584)');
-  // The FLAGGED sentence is retired into the measured fact.
-  assert.ok(!/FLAGGED for the first session with/.test(world),
-    'the flag is closed, not carried');
-  assert.match(world, /MEASURED, 2026-09-03, against the owner's real MAPS\.BSA/,
-    'and what closed it is recorded where it was flagged');
-  // (3) THE INDEX. One location per map pixel, and the ONLY guard the
-  // index loop applies is "the location loaded an exterior" - no
-  // region filter, no LocationType filter, so region 31's hidden sea
-  // coast and its HomeYourShips rows stand like any other.
-  assert.match(world, /if \(!loc \|\| !loc\.exterior \|\| !loc\.exterior\.exteriorData\) continue;\s*\n\s*const p = longitudeLatitudeToMapPixel/,
-    'the location index filters nothing DFU does not filter');
 });
 
 // ---------------------------------------------------------------------

@@ -14,6 +14,10 @@ import { createFactionRep, setReputation, getReputation } from '../../../src/sys
 import { onPushEffects, rankNeedsLines } from '../../../src/systems/guild/guildServiceFlow.js';
 import { setStandingOwed } from '../../../src/systems/standingOwed.js';
 import { ROLL_GAIN_DAY_MAX, rollCredit } from '../../../src/net/npcChapterLaw.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Guild probation on (off is DFU's first-review expulsion, rep6_probation.test.js).
+setPref('guildProbation', true);
 
 const storeWith = (rep) => {
   const dict = new Map();

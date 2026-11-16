@@ -1,5 +1,4 @@
-// AUDIT QUESTLINES (2026-10-19, the owner: "Audit everything built. Ensure perfection"; bible/01-Overview/audits/
-// Audit-Questlines.md): THE LAW'S OWN PINS (systems/questlines/qlLaw.js) - what the lane DOC's probes showed no test
+// AUDIT QUESTLINES: THE LAW'S OWN PINS (systems/questlines/qlLaw.js) - what the lane DOC's probes showed no test
 // read: a foe never placed is no foe dead (DOC-15, W1), the catch-all failure yields to DFU's word that the quest
 // succeeded (DOC-16, W2), and the success fallback is the sheet's own - `success`, else `done` - never a guess (LAW-1:
 // "the first non-failure outcome" filed a loyal M0B11Y18 as `betrayed`).

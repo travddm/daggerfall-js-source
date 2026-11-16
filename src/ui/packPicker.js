@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PACK-PICK (2026-10-26; the owner, of a #feature-feedback thread: "This needs a comprehensive detailed overhaul") -
+// PACK-PICK -
 // THE PACK, PICTURED, WHERE A PIECE IS CHOSEN TO SELL.
 //
 // Cl3arSky, "SELLING ITEMS ON THE MARKET IS A PAIN!": "When selling items from backpack for GOLD, you get a dropdown
@@ -9,7 +9,7 @@
 // then". The Market's List form chose a piece from the pack (MARKET-ANY), a crafted piece and a Masterwork to auction
 // (PROF5, PROF5b) from a <select> of names, and so did a trader's "Put up a piece from your pack" (HOME-VENDOR).
 //
-// ONE PICKER FOR ALL FOUR (bible/Home.md, THE ONE CONSTRUCTION SEAM):
+// ONE PICKER FOR ALL FOUR (, THE ONE CONSTRUCTION SEAM):
 //   - THE PIECES AS TILES - each its picture (the host's, ui/menu/menuPicture.js, as the market's rows are), its name,
 //     and a line under it the caller writes (its tier, its quality, its wear, where it lies); its frame its tier's colour
 //     (RARITY-UI's data-rarity, the pack's own mark). A press chooses it; nothing is chosen until one is pressed - a sale

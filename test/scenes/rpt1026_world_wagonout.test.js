@@ -62,6 +62,4 @@ test('WAGON-OUT the law and its wiring: a held landing with no open ground anywh
   house(shore, 'house', [-10, -60, -10], [10, 10, 10]);
   const dry = caravanStepOut(shore, [0, 0, 0], () => 0);
   assert.ok(dry[0] >= 40 && heldInSolid(shore, dry) === false, `on dry ground: ${dry}`);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.ok(w.includes("ground: (p) => caravanStepOut(collider, p, tvSeaY),"), 'the world host\'s door');
 });

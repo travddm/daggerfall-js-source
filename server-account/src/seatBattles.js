@@ -1,12 +1,10 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
-// SEAT2a (2026-10-01, Mac: "Finish the seats"; "Or we could go ahead and
-// do sieges"; "Continue") - THE BATTLES' WEEK: the holder's window, the
+// SEAT2a - THE BATTLES' WEEK: the holder's window, the
 // battle the Turning places in it (seatTurning.js), the two sides' rosters
 // and their Sellswords, and the week's live battles for the relay's
 // deploy blackout.
 //
-// bible/11-Multiplayer/Seats-Arc.md 6.3-6.5. The numbers and the schedule
+// 6.3-6.5. The numbers and the schedule
 // are src/net/townSeatLaw.js's; the battle itself is the relay's
 // (net/siege/siegeRef.js, SEAT2a's relay half).
 //
@@ -17,7 +15,6 @@
 // only where that write landed.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { accountKind, displayName, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { seatsOpenFor } from './townSeats.js';

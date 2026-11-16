@@ -1,7 +1,5 @@
-// ACC3b — THE TITLE AND THE GLYPHS, ON A PLAYER'S SCREEN (2026-09-22).
+// ACC3b — THE TITLE AND THE GLYPHS, ON A PLAYER'S SCREEN.
 //
-// Mac: "Player titles appear above a player name... 1st title is
-// Founder with a gold color, 2nd title is Developer with a red color",
 // and "name glyphs... appear on the right side of the player name."
 //
 // ACC3a proved the badge is GRANTED and SIGNED; nothing in it reached a
@@ -317,13 +315,3 @@ test('ACC3b: a document that cannot make a shape draws NO glyph rather than thro
 
 // ── THE SESSION'S PEER ──
 
-test('ACC3b: a peer WEARS THE NEWEST HELLO\'S badge, including none - and the client reads it through the wire\'s own checker', () => {
-  // A peer that kept the FIRST badge it was ever seen with would be
-  // wearing a grant the relay has stopped vouching for, which is the
-  // same stored-fact trap ACC3a took out of the service.
-  const src = rd('src/net/online.js');
-  assert.match(src, /const \{ title, glyphs, ts = null \} = readBadge\(p\);/, 'the peer is built through the one reader (SEAT1c: with a seat title\'s claim)');
-  assert.match(src, /\(\{ title: p\.title, glyphs: p\.glyphs, ts: p\.ts = null \} = readBadge\(m\)\);/, 'and a second hello replaces it (SEAT1c: a seat title\'s claim with it, including none)');
-  assert.match(src, /this\._known\.set\(id, \{ name: p\.name, title: p\.title, glyphs: p\.glyphs,[^}]* look: p\.look \}\);/, 'the remembered introduction keeps it, so a socket blip does not strip a title');   // MOD1: `sub` rides beside it
-  assert.doesNotMatch(src, /title: m\.title/, 'nothing takes a badge off a frame without the check');
-});

@@ -1,8 +1,7 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") - A STORES MATERIAL AS DFU'S OWN
+// PROF1 - A STORES MATERIAL AS DFU'S OWN
 // ITEM: its name, and the items a withdrawal mints into the pack
-// (bible/06-Systems/Professions-Arc.md 7, 22; law 3 - the Stores are
+// (7, 22; law 3 - the Stores are
 // one way: nothing here puts an item back in).
 //
 // AN HERB is a plant template in its group - PlantIngredients1 or 2, as
@@ -27,7 +26,6 @@
 // part its own ingredient (Big Tooth, Spider's Venom...); its butchery
 // C&C's Raw Meat, and a Slaughterfish's Raw Fish as the Basket's fruit is
 // chosen - C&C's while it is on, else Foraging's Fish.
-// ═══════════════════════════════════════════════════════════════════
 import { material } from '../../net/nodeLaw.js';
 import { minedMaterial } from '../../net/professionLaw.js';
 import { setItemFields, mintCondition, templateByIndex } from '../item/itemTemplates.js';

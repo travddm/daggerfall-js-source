@@ -1,4 +1,4 @@
-// CSA-F (2026-09-27) - COME SAIL AWAY'S WAVES: systems/comeSailAway/comeSailAwayWaves.js's buildWaveMesh (UpdateWaveMesh past its
+// CSA-F - COME SAIL AWAY'S WAVES: systems/comeSailAway/comeSailAwayWaves.js's buildWaveMesh (UpdateWaveMesh past its
 // gate), its frames and material, render/comeSailAwayRender.js's wave shader, and the runtime's UpdateWaveMesh, its
 // triggers, Update's frame step and FixedUpdate's current - over a scripted heightmap and scripted rays. Every
 // expectation is worked out here from ComeSailAway.cs's own statements.

@@ -46,7 +46,7 @@ const EMISSIVE = new Map([
 /** TextureReader.cs:38/:303 - the Mantellan Crux fire walls take the
  *  GetFireWallColors32 arm instead of "reuse the albedo", and only when
  *  a reference texture is present (the player's own TEXTURE.356 - never a
- *  mod's stand-in). EG-ZH (2026-10-12, Elite-Gates.md section 11.6): the
+ *  mod's stand-in). EG-ZH: the
  *  arm is ported (formats/baseImageFile.js getFireWallColors32) and both
  *  upload arms take it (scenes/dataPipeline.js), the Spire's fire falls
  *  its first consumer. */

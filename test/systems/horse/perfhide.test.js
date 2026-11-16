@@ -1,5 +1,4 @@
-// PERF-HIDE (2026-10-12, a profile of a player's client in its first seconds in the world: the wagon pool's horse looks
-// dyed 0.9 s of the main thread; bible/07-Rendering/Performance-Priority.md PERF-HIDE) - THE HIDE IS THE PICTURE'S,
+// PERF-HIDE - THE HIDE IS THE PICTURE'S,
 // NOT THE LOOK'S: found once a picture and kept with it, and the dye's helpers answer into scratch - and every dyed
 // picture, a sprite's and the 3D horse's, is byte for byte the one COATS1 dyed before.
 import { test } from 'node:test';

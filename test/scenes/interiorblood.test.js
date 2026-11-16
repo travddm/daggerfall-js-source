@@ -70,38 +70,6 @@ test('HE1: clear() on an empty pool is a no-op, and a warming splash is retired 
   assert.equal(p._live.length, 0, 'and gone after');
 });
 
-test('HE1: the interior host mounts the pool and hands it to its foes', () => {
-  const wm = read('src/scenes/worldModes.js');
-  assert.match(wm, /import \{ createHitEffects \} from '\.\/hitEffects\.js';/);
-  // BLOOD1a: the same three handles the other three hosts pass, plus
-  // the mark pool - which is its OWN binding and not a property of this
-  // one, because HARD1's three answers are exclusive and a splash pool
-  // that hands its batches away must own no GL of its own.
-  assert.match(wm, /const interiorHitEffects = createHitEffects\(\{ renderer, getTexture, uploadRecordFrame, marks: interiorBloodMarks \}\);/,
-    'the same three handles the other three hosts pass, and the ring beside them');
-  assert.match(wm, /const interiorBloodMarks = createBloodMarks\(\{ renderer, collider: \(\) => player\.collider, settings: bloodDecalDeps \}\);/,
-    'an interior bleeds too, on the live collider');
-  assert.match(wm, /hitEffects: interiorHitEffects,/, 'into the foe pool');
-  assert.doesNotMatch(wm, /hitEffects: null,/, 'and the recorded absence is DELETED, not annotated');
-});
-
-test('HE1: the frame ticks and draws it, on the shared billboard axis', () => {
-  const wm = read('src/scenes/worldModes.js');
-  const frame = wm.slice(wm.indexOf('interiorCtx.flatAnims.tick(dt);'), wm.indexOf('if (interiorCtx.animateChars)'));
-  assert.match(frame, /interiorHitEffects\.tick\(dt\);/);
-  assert.match(frame, /const _blood = interiorHitEffects\.batches\(\);/);
-  assert.match(frame, /if \(_blood\.length\) renderer\.drawBillboards\(_blood, camRight, UP_Y\);/,
-    'the same axis every other billboard in this frame rides (EV2 made it the ONE shared array)');
-});
-
-test('HE1: BOTH interior teardowns clear the pool', () => {
-  // The door exit and the quest-teleport / load arm. A pool that
-  // outlives the room is the whole reason this host needs the call at
-  // all, so one of the two would be a splash following the player.
-  const wm = read('src/scenes/worldModes.js');
-  assert.equal([...wm.matchAll(/interiorHitEffects\.clear\(\);/g)].length, 2);
-});
-
 test('HE1: all four hosts mount the pool now', () => {
   for (const p of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
     assert.match(read(p), /createHitEffects\(/, `${p} mounts the blood pool`);

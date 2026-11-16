@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-10 (bible/01-Overview/bugs/Field-Bugs-2026-10-10.md), SPAM-TAKE - the Discord's "Bounty Board: Click
+// FIELD BUGS 2026-10-10, SPAM-TAKE - the Discord's "Bounty Board: Click
 // order": "if you spam click accept it just accepts the 4 in order", where the card stayed on the notice just taken and
 // put Give up where Take had stood, so a run of presses took and gave back the top notice. Driven on the real host's
 // board (scenes/bountyHost.js openBoard's deps - the shape the producer mints) mounted on the minimal DOM.

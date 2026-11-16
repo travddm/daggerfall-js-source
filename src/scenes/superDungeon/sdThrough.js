@@ -1,7 +1,5 @@
 // @ts-check
-// SD-THROUGH (2026-10-21, the owner: "So the abyss dungeon. When someone finds and enters the portal. I want a portal to
-// show up for anyone in the dungeon and anyone entering that automatically leads them there."; bible/11-Multiplayer/
-// Super-Dungeons.md section 6 and SD-THROUGH): THE WAY THROUGH, stood by the dungeon host (scenes/dungeonContext.js) in a
+// SD-THROUGH: THE WAY THROUGH, stood by the dungeon host (scenes/dungeonContext.js) in a
 // Hollow once its Rift has been stepped through.
 //
 //  - THE WORD: the hub's record says when the first soul went through (`inAt` - its realm's first admission, told to the

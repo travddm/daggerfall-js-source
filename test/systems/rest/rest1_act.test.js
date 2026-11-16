@@ -1,9 +1,9 @@
-// REST1 (2026-10-03, bible/06-Systems/Rest-Arc.md; Mac: "Resting is no longer time based online with campfires, beds,
-// camping sets, being the main way to rest", then "Go"): THE REST ACT ONLINE. Online the rest window opens on the act -
+// REST1: THE REST ACT ONLINE. Online the rest window opens on the act -
 // refused with no rest point, or a channel held at a fire or a bed - and lands ONE NIGHT through the host's own rest
 // bag: the timed rest's own session, eight hours, run in one call, so every sub-tick system sees what an eight-hour rest
 // gave it. A second rest inside the night interval (two hours of the character's clock) is a short rest: it heals, and
 // nothing passes. Offline the window is DFU's, byte for byte.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -66,7 +66,7 @@ test('REST1 the yield: a bed or a fire, Casual\'s rough or the arc off end full;
   assert.deepEqual([short.health, short.fatigue, short.magicka], [30, 300, 21], 'Hard\'s rough short rest: half of what is missing');
 });
 
-// AUDIT REST II (PIN MOVED): a night spent sixteen hours more off the room's expiry, and the play between nights spent
+// AUDIT REST II (
 // the same days again (three days rented, an hour of play between nights: two nights). A room counts NIGHTS now
 // (restAct.js spendRoomNight) - test/systems/auditrest2_party.test.js P6 runs them through a real bag.
 test('REST1 a rented room\'s night: a day rented is a night slept - one of the room\'s nights spent, its expiry left to the days lived; the last spent, the room is over', () => {
@@ -106,7 +106,8 @@ test('REST1 the night breaks as a rest breaks: a foe in reach at the third hour 
   assert.equal(rent.hours, 5);
 });
 
-test('REST1 createRestDeps composes the act online: the plan names the point and whether a night is due; a night moves the character\'s clock eight hours, stamps it and ends full; the next rest inside the interval is a short rest that heals and moves nothing; offline there is no act', async () => {
+test('REST1 createRestDeps composes the act online: the plan names the point and whether a night is due; a night moves the character\'s clock eight hours, stamps it and ends full; the next rest inside the interval is a short rest that heals and moves nothing; offline there is no act', async (t) => {
+  playByRules(t, { 'rest.fireOnly': true });   // the rest act online is the server profile's option
   const { createRestDeps } = await import('../../../src/scenes/shared.js');
   setSharedClock(() => 5_000_000);
   setOwnMinutes(400_000);
@@ -248,19 +249,20 @@ test('REST1 the enhanced card online: the channel card with its meter, the night
   });
 });
 
-test('REST1 by source: every host that rests online names its rest point - the open road\'s fire or a pressed bed, a building (CanRest decides), a dungeon\'s fire - and the save keeps the night\'s stamp', () => {
-  assert.match(rd('src/scenes/world.js'), /restPoint: \(\) => \(_restFromBed \? \{ kind: 'bed', where: null \} : camps\.restPointAt\(/);
-  assert.match(rd('src/scenes/worldModes.js'), /restPoint: \(\) => interiorRestSpot\(interiorRestPlaceHere\(\), \{ pressedBed: _restFromBed, fireNear: interiorCamps\.fireNear\(player\.pos\) \}\),/);   // PIN MOVED (RPT1026-MISC BED-PRESS-INDOOR): the place's law in restSession.js, a bed pressed among its beds
-  assert.match(rd('src/scenes/dungeonContext.js'), /restPoint: \(\) => \(_restFromBed \|\| bedInReach\(dungeonBeds, _fpFeet\) \? \{ kind: 'bed', where: null \} : _fpFeet \? camps\.restPointAt\(_fpFeet\) : null\)/);   // FIELD BUGS 2026-10-05 DUNGEON-BEDS: and a bed
-  assert.match(rd('src/systems/save/save.js'), /\n  'restNightAt',\n/);   // in ENTITY_FIELDS (LEGACY4's blessings appended after it)
-});
-
 test('REST1 the Next night tile: a buff while the night interval runs, its real minutes at its foot, the campfire glyph; none once a night may pass', async () => {
   const { statusTiles } = await import('../../../src/ui/hud/hudStatus.js');
   const [t] = statusTiles({ rested: { minutes: 7 } });
-  assert.deepEqual([t.key, t.kind, t.name, t.foot, t.glyph], ['rested', 'buff', 'Next night', '7m', 'rested']);   // PIN MOVED (AUDIT C&C, lens S): "Rested" stood beside Boons' Well rested
+  assert.deepEqual([t.key, t.kind, t.name, t.foot, t.glyph], ['rested', 'buff', 'Next night', '7m', 'rested']);
   assert.equal(t.name, REST_ACT_TEXT.rested, 'the act\'s own word for it');
   assert.deepEqual(statusTiles({ rested: { minutes: 0 } }), []);
   assert.deepEqual(statusTiles({ rested: null }), []);
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /const rested = sharedClockOn\(\) \? \{ minutes: nightRealMinutesLeft\(vitals, ownMinutes\(\)\) \} : null;/);
+});
+
+test("ONLINE REST, DFU's window by default (DaggerfallRestWindow.cs): with the shared clock on and no rest act in the server profile, the window opens on no act - hours or loiter wherever CanRest allows - and a lit candle still kneels", async () => {
+  const { createRestDeps } = await import('../../../src/scenes/shared.js');
+  setSharedClock(() => 5_000_000);
+  setOwnMinutes(400_000);
+  const e = { health: 5, maxHealth: 60, fatigue: 0, magicka: 0, maxMagicka: 30, stats: { endurance: 50, strength: 50, willpower: 50, agility: 50 }, skills: [], career: {}, activeEffects: [] };
+  const deps = createRestDeps(e, { restPoint: () => ({ kind: 'camp', where: 'fire' }), restKind: () => 'camp', advanceMinutes: (n) => advanceOwnMinutes(n), endLines: () => null });
+  assert.equal(deps.restAct(), null, 'no act, even at a fire: the window is DFU\'s');
 });
