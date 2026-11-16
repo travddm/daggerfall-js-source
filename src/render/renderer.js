@@ -6218,6 +6218,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   /** RW1: the background on each pane the last watched frame kept: its glass texels while the street is cut through
    *  them, and a cutout picture's holes always. Back faces stay culled, as the room's own draw culls them. */
   _rwPaintPanes(P, street) {
+    this._close2D();   // every drawer hands the 2D baseline back itself, even where its caller has
     const gl = this.gl;
     const count = this._rwPaneN;
     for (let i = 0; i < count; i++) {
