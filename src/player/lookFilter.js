@@ -22,20 +22,20 @@
 // to the TARGET as :142 does, so the camera never overshoots the range.
 
 import { getFloat, getInt } from '../systems/settings/settings.js';   // MAC-O2: Controls/WeaponSwingMode, the term the swing suppression was missing
-import { PITCH_LIMIT } from './mwCamera.js';
+import { PITCH_LIMIT } from './pitchLimit.js';
 import { LOCAL_PLAYER, writePlayerYaw } from './player-stance.ts';   // the facing a foe's retreat roll reads
 
 /** PlayerMouseLook.SmoothingMax (:45): the setter clamps to it. */
 export const SMOOTHING_MAX = 0.9;
-// MW-D30's clamp survives the filter takeover: the pitch range is the
-// REFERENCE's +/-(PI/2 - 1e-6) (camera.cpp:323-331), one home in
-// mwCamera - the 1.5 literal this filter briefly re-minted was the
-// exact divergence MW-D30 removed from the four hosts.
+// The pitch range is Daggerfall Unity's: PlayerMouseLook's Pitch setter
+// stops 0.99 of a right angle short of either pole (:68-74), one home in
+// pitchLimit.js. The head bob and the recoil, which add to the pitch
+// after this filter, hold to the same limit.
 export { PITCH_LIMIT };
 
-/** MAC1 (DFU's PlayerMouseLook clamps both ways at 90
- *  degrees (PitchMinLimit / PitchMaxLimit); the port keeps the
- *  reference CEILING (PITCH_LIMIT above) and takes the owner's FLOOR:
+/** MAC1 (DFU's PlayerMouseLook lets the look reach 89.1 degrees both
+ *  ways (PitchMinLimit / PitchMaxLimit at 90, the Pitch setter's 0.99);
+ *  the port keeps DFU's CEILING (PITCH_LIMIT above) and takes the owner's FLOOR:
  *  75 degrees below the horizon, which keeps the ground under a walk in
  *  view without the view turning perpendicular to the motion. Ledger A,
  *  MAC1 - the number is Mac's to tune. Applied where the reference
