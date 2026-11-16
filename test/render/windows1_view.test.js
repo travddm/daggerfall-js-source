@@ -251,6 +251,11 @@ test('RW1 view V5: the interior frame\'s glass - setGlassView paints the backgro
   const wallQ = project(pv, [0, 4.4, -6]);
   assert.ok(wallQ[1] > seen.rect[3], 'the wall (no glass) is not measured');
   assert.equal(r.takeGlassRect(), null, 'handed over once');
+  // the empty hand-over left no pane to paint: one more watched frame, as every interior frame watches
+  r.beginFrame(proj, view, new Float32Array([0, 1, 0]));
+  r.setGlassView(null);
+  r.drawMesh(room, I);
+  assert.ok(r.takeGlassRect(), 'the glass met again');
   // frame 2: the street in it - the background over the rectangle, the glass cut inside it
   r.beginFrame(proj, view, new Float32Array([0, 1, 0]));
   r._rwEnsureTarget(64, 64);   // a view out already drawn
@@ -320,6 +325,13 @@ test('view out on the glass alone: the background is painted on the last frame\'
   assert.deepEqual(street.map((d) => [d.glass, d.cut]), [[1, 0], [1, 0], [0, 1]], 'glass cut through, the cutout\'s holes');
   assert.deepEqual(street.map((d) => d.picture), [pictures.window, pictures.glass, pictures.cutout], 'each tested by the picture the room cuts it by');
   for (const d of street) assert.deepEqual(d.model, [...M], 'at the matrix the room drew it at');
+  log.length = 0;
+  r.drawMesh(room, M);
+  assert.deepEqual(uploads(log, 'uWinMode'), [[3], [0]], 'the painted glass is cut, the rest plain');
+  const newcomer = { vao: { id: 'newvao' }, subMeshes: [sub(3, 0, [0, 1.5, -4, 0.5])] };
+  log.length = 0;
+  r.drawMesh(newcomer, M);
+  assert.ok(!uploads(log, 'uWinMode').some((u) => u[0] === 3), 'glass that came into view this frame is not cut before it is painted');
   const sky = paint({ rect: padRect(seen.rect), view: false });
   assert.deepEqual(sky.map((d) => d.offset), [12 * 4], 'the street off: the glass is not cut, so only the cutout\'s holes show the sky');
 });

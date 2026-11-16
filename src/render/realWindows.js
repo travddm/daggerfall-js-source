@@ -558,10 +558,12 @@ uniform vec3 uZenith;
 uniform vec3 uHorizon;
 out vec4 outColor;
 void main() {
-  // The same tests the mesh shader cuts by: the glass mask's red over a half, a cutout's alpha under a half.
+  // The mesh shader cuts where the glass mask's red is over a half, or a cutout's alpha under a half. The background is
+  // painted a little wider, out to where the filtered mask starts to rise: the two programs can place a pane's edge a
+  // pixel apart, and the room draws over every texel it does not cut.
   vec4 pane = texture(uPane, vUV);
-  bool glass = uPaneGlass > 0.5 && pane.r > 0.5;
-  bool hole = uPaneCut > 0.5 && pane.a < 0.5;
+  bool glass = uPaneGlass > 0.5 && pane.r > 0.05;
+  bool hole = uPaneCut > 0.5 && pane.a < 0.95;
   if (!glass && !hole) discard;
   vec2 vT = (gl_FragCoord.xy - uRectPx.xy) / (uRectPx.zw - uRectPx.xy);
   if (any(lessThan(vT, vec2(0.0))) || any(greaterThanEqual(vT, vec2(1.0)))) discard;

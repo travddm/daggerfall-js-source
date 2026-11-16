@@ -22,13 +22,29 @@ export function newPane() {
  * Records on `pane` what the background needs of the sub-mesh: the glass mask on its emission unit when it is glass,
  * else its own picture when it is a cutout.
  * @param {Pane} pane
- * @param {{ _evWin?: number, _evEmis?: any, _evTex?: any }} subMesh the sub-mesh as the renderer's draw resolved it
+ * @param {{ _evWin?: number, _evEmis?: any, _evTex?: any, _rwPaneGen?: number, _rwPanePrev?: number }} subMesh the
+ *   sub-mesh as the renderer's draw resolved it
  * @param {boolean} holes whether its picture is a cutout
+ * @param {number} generation the pane list this pane goes into (renderer._rwPaneGen + 1): the sub-mesh is marked with it,
+ *   so the frame that paints the list cuts the sub-mesh's glass (isPainted)
  */
-export function keepPaneKind(pane, subMesh, holes) {
+export function keepPaneKind(pane, subMesh, holes, generation) {
+  if (subMesh._rwPaneGen !== generation) subMesh._rwPanePrev = subMesh._rwPaneGen;
+  subMesh._rwPaneGen = generation;
   pane.glass = (subMesh._evWin ?? GLASS_NONE) !== GLASS_NONE;
   pane.cut = holes && !pane.glass;
   pane.texture = pane.glass ? subMesh._evEmis : subMesh._evTex;
+}
+
+/**
+ * Whether the sub-mesh's glass was painted this frame: kept as a pane in the list the background drew (`generation`,
+ * renderer._rwPaneGen). Glass that comes into view this frame is not cut until the next, so it never shows the clear.
+ * The mark it was given before this frame's draw is read too: a sub-mesh drawn at two matrices is marked by the first.
+ * @param {{ _rwPaneGen?: number, _rwPanePrev?: number }} subMesh
+ * @param {number} generation
+ */
+export function isPainted(subMesh, generation) {
+  return subMesh._rwPaneGen === generation || subMesh._rwPanePrev === generation;
 }
 
 /**

@@ -20,7 +20,7 @@ import { COLUMN_GLSL } from './columnGlsl.js';   // DW-F: the water column's sha
 // then. The imports hoist and the leaves have no imports of their own, so
 // this is already guaranteed - the lines stand where they read as the rule.
 import { buildProgram, startPrograms, parallelCompile } from './glProgram.js';   // AUDIT 68 S17-gl-program-dup: the one compile and link; SHADER-STALL: and a start that never waits
-import { glassBackgroundProgram, paintGlassBackground, newPane, keepPaneKind } from './glass-background.js';
+import { glassBackgroundProgram, paintGlassBackground, newPane, keepPaneKind, isPainted } from './glass-background.js';
 import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM, GLASS_NONE, GLASS_EXTERIOR, GLASS_INTERIOR, winModeFor, roomLightFor, sphereNdcRect, cropProjection, viewTargetSize, viewSkyFrom, viewRays, VIEW_PANES_MAX, VIEW_PANE_UNIT, VIEW_PANE_VS, VIEW_PANE_FS } from './realWindows.js';   // RW1: the real windows - the rooms, the glass, the view out
 import { MESH_ALPHA_GLSL, samplerParams, samplerKey } from './meshAlpha.js';   // a translucent mesh draw, and a texture's own wrap and filter
 import { frameTarget, setFrameTarget } from './renderTarget.js';   // RW1: the view out's pass hands the frame target back as it found it (EL4's restore)
@@ -1750,7 +1750,7 @@ export class Renderer {
     this._rwAcc = { n: 0, holes: false, rect: [1, 1, -1, -1], panes: [], np: 0 };   // PANE-CLIP: and the glass's sub-meshes, for the view out's pane depth
     this.outsideViewDraws = new Set();
     this.outsideViewSkip = new Set();
-    this._rwExterior = null; this._rwTarget = null; this._rwOutside = null; this._rwBg = null;   // made on the first ask
+    this._rwExterior = null; this._rwTarget = null; this._rwOutside = null; this._rwBg = null; this._rwPaneGen = 0;   // made on the first ask
     this._rwPv = null; this._rwQ = null; this._rwPanes = []; this._rwPaneN = 0; this._rwPaneOn = false; this._rwPaneProg = null; this._rwViewDraws = 0;
     // The value last uploaded to the solid program's uEmissionColor
     // (uniforms are program state, so this survives a program switch).
@@ -6222,7 +6222,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   takeGlassRect() {
     const a = this._rwAcc;
     // PANE-CLIP: the frame's panes are the next view out's - the two lists trade places, nothing is minted
-    if (a) { const kept = this._rwPanes; this._rwPanes = a.panes; this._rwPaneN = a.n ? a.np : 0; a.panes = kept; a.np = 0; }
+    if (a) { const kept = this._rwPanes; this._rwPanes = a.panes; this._rwPaneN = a.n ? a.np : 0; a.panes = kept; a.np = 0; this._rwPaneGen++; }
     if (!a || !a.n) { if (a) a.holes = false; return null; }
     const out = { rect: [a.rect[0], a.rect[1], a.rect[2], a.rect[3]], holes: a.holes };
     a.n = 0; a.holes = false; a.rect[0] = 1; a.rect[1] = 1; a.rect[2] = -1; a.rect[3] = -1;
@@ -6236,7 +6236,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (!L) return;
     const gl = this.gl, rw = this._rw;
     const kind = sm._evWin ?? GLASS_NONE, cut = sm._evCut ? 1 : 0;
-    const mode = rw && kind !== GLASS_NONE ? winModeFor(kind, rw.rooms, rw.live) : 0;
+    const mode = rw && kind !== GLASS_NONE ? winModeFor(kind, rw.rooms, rw.live && isPainted(sm, this._rwPaneGen)) : 0;   // glass is cut where the background painted it
     if (mode === 1) this._rwRoomLight();
     else if (mode === 3 && this._rwRectUp !== rw.rectGen) { gl.uniform4fv(L.rect, rw.rect); this._rwRectUp = rw.rectGen; }
     if (mode !== this._rwModeUp) { gl.uniform1f(L.mode, mode); this._rwModeUp = mode; }
@@ -6283,7 +6283,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (a.n > n0 && mesh?.vao && a.np < VIEW_PANES_MAX) {
       const p = (a.panes[a.np] ??= newPane());
       p.vao = mesh.vao; p.start = sm.startIndex; p.count = sm.primitiveCount * 3; p.m.set(m);
-      keepPaneKind(p, sm, holes);
+      keepPaneKind(p, sm, holes, this._rwPaneGen + 1);
       a.np++;
     }
   }
