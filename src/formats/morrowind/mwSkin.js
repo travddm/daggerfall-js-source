@@ -113,9 +113,8 @@ export function buildSkeleton(nif) {
  *  so it never collides with the skeleton file's own. */
 export const INJECTED_REF_BASE = 1 << 24;
 
-/** Does a node carry the "BONE" NiStringExtraData the loader turns
- *  into a CustomBone description (nifloader.cpp:630-633)? The extra
- *  chain is walked whole (:618-640 iterates `extra` -> `next`). */
+/** Does a node carry a NiStringExtraData whose string is "BONE"? That marks a node of a bone add-on file as a bone to
+ *  add to the skeleton. The node's whole chain of extra data is read, not only the first entry. */
 export function hasBoneMarker(nif, rec) {
   let e = rec?.extra ?? -1;
   let guard = 0;
@@ -129,26 +128,19 @@ export function hasBoneMarker(nif, rec) {
 }
 
 /**
- * CUSTOM BONES,
- * OpenMW's `use additional anim sources` (animation.cpp:1306-1322
- * injectCustomBones -> :1284-1304 loadBonesFromFile). Every .nif under
- * `animations/<model>/` is a bone addon. GetExtendedBonesVisitor
- * (:218-236) collects every node carrying the "CustomBone" description
- * - the loader's name for a NiStringExtraData "BONE" (nifloader.cpp
- * :630-633) - together with its PARENT in the addon, and does not
- * descend into a found bone; loadBonesFromFile then looks the parent's
- * NAME up in the actor (FindByNameVisitor) and, when found, adds a deep
- * copy of the bone and its subtree under it. Nothing is checked for
- * already existing: the reference would add a second node of the name,
- * and its bone cache answers the FIRST (rule 16), so the copy is dead -
- * this port skips it and says so in `skipped`, the same observable. An
- * unmarked node is never added, wherever it sits (Weapon Sheathing's
- * `Bip01 AttachWeapon` is exactly that); a marked node whose parent the
- * actor lacks is skipped, silently there, named here.
+ * CUSTOM BONES: extra bones that a model brings with it in its own file.
  *
- * Refs are minted above INJECTED_REF_BASE; `pose.get(ref)` misses them
- * and skeletonSpaceMatrices poses them at rest, which is what an
- * unanimated attach bone is.
+ * Every .nif under `animations/<model>/` is a bone add-on. A node of an add-on that carries the "BONE" marker
+ * (`hasBoneMarker`) is copied, with its whole subtree, under the skeleton bone that has the same name as the marked
+ * node's parent in the add-on. The search stops at a marked node: marked nodes inside a copied subtree are part of
+ * the copy, not copied again. A node without the marker is never added, wherever it sits (the Weapon Sheathing
+ * add-on's `Bip01 AttachWeapon` is such a node). A marked node whose parent the skeleton lacks is skipped.
+ *
+ * A marked node whose name the skeleton already has is skipped too: a name lookup answers the first node of that
+ * name (see buildSkeleton), so a second node of the name would never be found. `skipped` names it.
+ *
+ * Refs are minted above INJECTED_REF_BASE; `pose.get(ref)` misses them and skeletonSpaceMatrices poses them at rest,
+ * which is what an unanimated attach bone is.
  *
  * @returns {{added:string[], skipped:string[]}}
  */
@@ -168,7 +160,7 @@ export function injectSkeletonNodes(skeleton, addonNif) {
       rest: { rotation: rec.rotation, translation: rec.translation, scale: rec.scale },
       injected: true,
     });
-    if (key && !skeleton.byName.has(key)) skeleton.byName.set(key, hereRef);   // rule 16: the first of a name answers
+    if (key && !skeleton.byName.has(key)) skeleton.byName.set(key, hereRef);   // the first of a name answers
     added.push(rec.name || '(nameless)');
     for (const child of rec.children ?? []) if (child >= 0) copy(child, hereRef);
   }
@@ -192,40 +184,20 @@ export function injectSkeletonNodes(skeleton, addonNif) {
 }
 
 /**
- * THE ACCUMULATION ROOT IS A TWO-NAME TABLE, not a search.
+ * The accumulation root is the bone whose translation channel carries the actor's locomotion: a walk or flight
+ * clip moves one bone along the path, and the body must stay put while the actor's position follows that motion. Posing
+ * without extracting it makes every walk loop carry the whole body away.
  *
- * Morrowind animations carry the actor's locomotion in one bone's
- * translation channel (a flight cycle literally contains the flight path
- * - OAAB's bat keys y=1892 into it), and the engine extracts that motion
- * for MOVEMENT while the visual skeleton stays put. The reference
- * accumulates X,Y and leaves Z animated (jumps, hovers). Posing without
- * extraction is the geometry-all-over-the-place bug: every walk loop
- * translates the whole body away.
+ * The root is one of two bones, taken in this order: "bip01" (the biped rig and many creatures) and "root bone"
+ * (banners, flags and creatures such as the cliff racer). The game's own .kf files key a translation on one of the two
+ * or on neither, never on both (mw-accum-root.test.ts counts them), so the order only decides a clip that keys both,
+ * which no retail clip does. A name is taken only when the skeleton has the bone AND the clip drives it. A clip that
+ * keys neither, such as a first-person weapon clip that keys only the arms, has no accumulation root, and nothing is
+ * extracted: that is an answer, not a failure. A rule that took the topmost tracked bone would answer an upper arm
+ * and zero its X and Y motion.
  *
- * WHICH bone, though, was ported as "the topmost tracked bone" and that
- * is not the rule (Animation::addAnimSource, animation.cpp:712-734):
- *
- *   // Priority matters! bip01 is preferred.
- *   static const std::initializer_list<std::string_view> accumRootNames
- *       = { "bip01", "root bone" };
- *
- * and a candidate is accepted only if BOTH the name resolves in the node
- * map AND the loaded KF drives a controller of that same name
- * (case-insensitively). The difference is not
- * academic: a first-person weapon .kf keys nothing on bip01, so "topmost
- * tracked bone" answered an UPPER ARM - and any translation channel on
- * that bone would then have had its X and Y zeroed, silently deforming
- * the arm rather than moving the actor.
- *
- * With neither name driven the answer is NULL, which is the correct
- * answer and not a failure: an animation with no accum root simply
- * accumulates nothing.
- *
- * STICKINESS IS THE CALLER'S. `if (!mAccumRoot)` guards the whole block,
- * so the choice is made by the FIRST anim source that resolves one and
- * later sources do not re-pick it. This function answers for ONE source;
- * a caller with several must ask them in push order and keep the first
- * non-null answer.
+ * A caller with several clips for one actor asks them in order and keeps the first non-null answer: this function
+ * answers for one clip.
  */
 export const ACCUM_ROOT_NAMES = Object.freeze(['bip01', 'root bone']);
 
@@ -245,14 +217,9 @@ export function accumRootRef(skeleton, tracks) {
  * rest values where a channel has no keys. Pass `accumRoot` (from
  * accumRootRef) to extract root motion.
  *
- * The accumulated axes are ZEROED, not pinned to rest -
- * ResetAccumRootCallback multiplies the node's translation by
- * (0,0,1) component-wise ("anything that accumulates (1.f) should be
- * reset in the callback to (0.f)", animation.cpp:515-539), and it does
- * so on WHATEVER the transform holds, keyed or rest alike. Only Z
- * stays, the reference's (1,1,0) accumulation. The port had substituted
- * the bone's rest X,Y, which is only the same thing when the rest
- * translation happens to be zero.
+ * The accumulated axes are zeroed, not pinned to the bone's rest values: X and Y of whatever the transform holds
+ * (keyed or rest) are multiplied by zero, and only Z stays, so a jump or a hover still moves the body. The rest X and Y
+ * would be the same only when the rest translation is zero.
  * @returns {Map<number, {rotation:Float32Array, translation:number[],
  *   scale:number}>}
  */
@@ -267,7 +234,7 @@ export function poseSkeleton(skeleton, tracks, sampleTrack, time, opts = {}) {
     const s = sampleTrack(track, time);
     let translation = s.translation ?? node.rest.translation;
     if (ref === opts.accumRoot) {
-      translation = [0, 0, translation[2]];   // componentMultiply((0,0,1), trans)
+      translation = [0, 0, translation[2]];   // X and Y are zeroed, Z stays
     }
     pose.set(ref, {
       rotation: s.rotation ? quatToMat33(s.rotation) : node.rest.rotation,
