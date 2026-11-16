@@ -27,7 +27,8 @@ const ofType = (ws, t) => ws.sent.filter((m) => m.t === t);
 const nowS = () => Math.floor(Date.now() / 1000);
 const MI = 'msg-id-0000000001';
 /** Turns of the loop until `cond` holds (a call through the real Worker takes a few). */
-const until = async (cond, n = 500) => { for (let i = 0; i < n && !(await cond()); i++) await new Promise((r) => setImmediate(r)); };
+/** Polls until `cond` holds or `ms` of wall time pass. A turn count is not a time: the service's answer crosses real async work (crypto on the thread pool), and 500 turns is about 5 ms. */
+const until = async (cond, ms = 10_000) => { for (const end = Date.now() + ms; Date.now() < end && !(await cond());) await new Promise((r) => setImmediate(r)); };
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn }; console.info = console.warn = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 
 /** The hub, its door, and a key the service and the relay share. */
@@ -335,7 +336,7 @@ test('STAFF-PANEL5-MESSAGE END TO END, offline: the panel sends Troll a message 
     const read = async () => (await staff('/v1/staff/messages', { target: troll.id }, mob.session)).messages[0];
     assert.equal((await read()).label, 'Delivered');
     shown[0].onOk();
-    await until(async () => (await read()).state === 'ok', 50);
+    await until(async () => (await read()).state === 'ok');
     assert.deepEqual([(await read()).state, (await read()).label], ['ok', 'they pressed OK']);
     // a player on a build from before the box
     const sylvia = await s.registered('Sylvia');
