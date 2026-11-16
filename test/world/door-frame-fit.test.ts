@@ -1,6 +1,7 @@
 // Doors fitted to their own doorway (world/interior/door-frame-fit.ts): each narrow face of a closed door is measured
-// out to the room and moved by exactly that gap, so it stops on the jamb and never lies on the wall; and over the game's
-// own residences no closed door keeps a gap.
+// out to the room and moved by exactly that gap, so it stops on the jamb and never lies on the wall; the fitted door is
+// drawn only while it is shut, and swings at Daggerfall's size; and over the game's own residences no closed door keeps
+// a gap.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -9,6 +10,8 @@ import {
   measureDoorGaps,
   measureDoorDepth,
   fitDoorModel,
+  doorFitter,
+  doorDraw,
   hasGap,
   MAX_GAP,
   MAX_DEPTH_MOVE,
@@ -97,6 +100,61 @@ test('a door thicker than its wall is set at its middle; a move past the cap is 
   const moved = fitDoorModel(door(), { hinge: 0, latch: 0, top: 0, foot: 0 }, 0.023);
   const z = Array.from({ length: 8 }, (_, i) => moved.positions[i * 3 + 2]);
   assert.deepEqual([+Math.min(...z).toFixed(4), +Math.max(...z).toFixed(4)], [0.033, 0.163], 'the whole door moves');
+});
+
+/** A room of one model, the given triangles, and one door model (9000), built through the fitter as the host builds it. */
+async function fitInRoom(faces: Float32Array, on = true) {
+  const roomModel: DoorModel = {
+    positions: faces,
+    indices: Uint32Array.from({ length: faces.length / 3 }, (_, i) => i),
+  };
+  const models = new Map<number, DoorModel>([
+    [1, roomModel],
+    [9000, door()],
+  ]);
+  const made: DoorModel[] = [];
+  const renderer = { createMesh: (m: DoorModel) => (made.push(m), m), destroyMesh: () => {} };
+  const fitter = doorFitter(on, renderer, [{ modelIdNum: 1, objectType: 0, matrix: IDENTITY }], models);
+  const meshes = await fitter.door(9000, IDENTITY, async () => 'shared');
+  return { meshes, made };
+}
+const extent = (m: unknown, k: number) => {
+  const p = (m as DoorModel).positions;
+  const values = Array.from({ length: p.length / 3 }, (_, i) => p[i * 3 + k]);
+  return [+Math.min(...values).toFixed(4), +Math.max(...values).toFixed(4)];
+};
+
+test('a door with a gap is fitted only while shut: it swings on the shared mesh, at Daggerfall size', async () => {
+  const { meshes } = await fitInRoom(doorway);
+  assert.equal(meshes.gpu, 'shared', 'no depth move: the swinging door is the shared mesh');
+  assert.deepEqual(extent(meshes.cpu, 0), [0, 1.2], 'its collider is Daggerfall size');
+  assert.deepEqual(extent(meshes.shut, 0), [-0.025, 1.225], 'the shut door fills its doorway');
+  const object = { state: 'start', matrix: IDENTITY };
+  const draw = doorDraw(meshes.gpu, meshes.shut, object);
+  assert.equal(draw.gpu, meshes.shut, 'closed');
+  for (const state of ['forward', 'end', 'reverse']) {
+    object.state = state;
+    assert.equal(draw.gpu, 'shared', state);
+  }
+  object.state = 'start';
+  assert.equal(draw.gpu, meshes.shut, 'closed again');
+  draw.object = { state: 'end', matrix: IDENTITY };
+  assert.equal(draw.gpu, 'shared', 'a door put back is read from the entry, not from the first object');
+});
+
+test('a proud door with no gap swings on its moved copy, and has no shut mesh; with the row off, nothing is made', async () => {
+  const { meshes, made } = await fitInRoom(wall(0.03, 0.25));
+  assert.equal(meshes.shut, undefined);
+  assert.equal(made.length, 1);
+  assert.equal(meshes.gpu, made[0]);
+  assert.deepEqual(extent(meshes.gpu, 2), [+(0.01 + 0.02 + RECESS).toFixed(4), +(0.14 + 0.02 + RECESS).toFixed(4)]);
+  assert.deepEqual(doorDraw(meshes.gpu, meshes.shut, { state: 'start', matrix: IDENTITY }).gpu, made[0]);
+  const off = await fitInRoom(doorway, false);
+  assert.deepEqual(
+    [off.meshes.gpu, off.meshes.shut, off.made.length],
+    ['shared', undefined, 0],
+    'Daggerfall Unity: the shared mesh',
+  );
 });
 
 const ARENA2 = process.env.ARENA2_PATH;
