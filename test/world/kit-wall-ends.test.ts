@@ -8,6 +8,8 @@ import { join } from 'node:path';
 import { extendKitWallEnds, type DfMesh } from '../../src/world/interior/kit-wall-ends.ts';
 
 type Point = { x: number; y: number; z: number };
+/** A seam as tools/seamCensus.mjs blockSeams reports it, reduced to what the count reads. */
+type Seam = { model: number; partner: number | null };
 const plane = (points: number[][]) => ({ points: points.map(([x, y, z]) => ({ x, y, z })) });
 const ys = (mesh: DfMesh): number[] =>
   mesh.subMeshes.flatMap((s) => s.planes.flatMap((p) => p.points.map((q: Point) => q.y)));
@@ -135,11 +137,11 @@ test(
           if (!hasInteriorModels(record)) return;
           const seams = blockSeams(layoutInterior(block, b, r, getModel).placements, meshOf).seams;
           const kit = seams.filter(
-            (s: any) => (isKit(s.model) && isTile(s.partner)) || (isTile(s.model) && isKit(s.partner)),
+            (s: Seam) => (isKit(s.model) && isTile(s.partner)) || (isTile(s.model) && isKit(s.partner)),
           );
           kitSeams += kit.length;
           if (kit.length) interiors++;
-          others += seams.filter((s: any) => !isProp(s.model)).length - kit.length;
+          others += seams.filter((s: Seam) => !isProp(s.model)).length - kit.length;
         });
       }
       return [kitSeams, interiors, others];
