@@ -6,12 +6,14 @@
 import { getPref } from '../../systems/uiPrefs.js';
 import { INTERIOR_SEAMS_PREF, interiorSeamsOn } from '../../systems/interior-seams-row.ts';
 import { extendKitWallEnds } from './kit-wall-ends.ts';
+import { fitDoorToFrame } from './door-fit.ts';
 
 /** @type {boolean | null} */
 let closing = null;
 
 /**
- * The model as it is drawn: with the row on, a kit wall reaching its floor and ceiling; any other model as it was.
+ * The model as it is drawn: with the row on, a kit wall reaching its floor and ceiling and an interior door filling its
+ * doorway; any other model as it was.
  * @template {import('./kit-wall-ends.ts').DfMesh} M
  * @param {number} modelId
  * @param {M} mesh
@@ -19,7 +21,7 @@ let closing = null;
  */
 export function interiorModelMesh(modelId, mesh) {
   closing ??= interiorSeamsOn(getPref(INTERIOR_SEAMS_PREF));
-  return closing ? extendKitWallEnds(modelId, mesh) : mesh;
+  return closing ? fitDoorToFrame(modelId, extendKitWallEnds(modelId, mesh)) : mesh;
 }
 
 /** Forgets the row's reading, so the next model built reads it again (tests). */
