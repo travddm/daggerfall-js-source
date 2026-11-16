@@ -20,7 +20,7 @@ import { IIL_FIREPLACE_MODELS } from '../systems/improvedInteriorLighting.js';  
 import { FlatAnimator, armFlatAnim } from '../render/flatAnimation.js';   // FA1: the flats that move
 import { layoutInterior, INTERIOR_MARKER, PROP_MODEL_TYPE } from '../world/interior/interiorLayout.js';
 import { multiply, transformPoint, identity } from '../world/mat4.js';
-import { StaticBatchBuilder, keyResolver } from '../render/staticBatch.js';   // PERF6: the room's static models as one mesh
+import { StaticBatchBuilder, keyResolver } from '../render/staticBatch.js'; import { getPref } from '../systems/uiPrefs.js'; import { INTERIOR_SEAMS_PREF, interiorSeamsOn } from '../systems/interior-seams-row.ts'; import { doorFitter } from '../world/interior/door-frame-fit.ts';   // PERF6: the room's static models as one mesh; the Close interior gaps row fits its doors
 import { collectInteriorLights } from '../world/interior/interiorLights.js';
 import { sealDoorsToNowhere, sealedDoorText } from '../world/interior/doorsToNowhere.js';   // FIELD BUGS 2026-10-25 DOOR-VOID
 import { setMidScreenText } from '../ui/midScreenText.js';   // DOOR-VOID: the sealed door's line, where a locked door's is said
@@ -272,6 +272,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
   // rotors; every other placement stands still. Built lazily on the
   // first read, freed by destroy(); drawList stays whole for the automap.
   let staticBatch = null, staticBuilt = false;
+  const fittedDoors = doorFitter(interiorSeamsOn(getPref(INTERIOR_SEAMS_PREF)), renderer, interior.placements, cpuModels);   // the Close interior gaps row fits each door to its doorway
   const staticBuilder = new StaticBatchBuilder({ pieces: true, seal: true });   // RW1: a sphere a model per merged sub-mesh - a window measured on the screen is its own model's, not the room's (render/realWindows.js)
   // ROAD-C c2/S9: THE INTERIOR AUTOMAP'S ROWS, minted at the ONE push
   // site every building entry runs through.
@@ -504,8 +505,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
     // `cpu.positions`, and the push would otherwise hand the frame
     // loop a {gpu: null} entry. A door model this data set lacks costs
     // the door, not the building.
-    const gpu = await getGpuMesh(d.modelIdNum);
-    const cpu = cpuModels.get(d.modelIdNum);
+    const { gpu, cpu } = await fittedDoors.door(d.modelIdNum, d.matrix, getGpuMesh);
     if (!gpu || !cpu) {
       console.warn(`[interior] action-door model ${d.modelIdNum} is not in this ARCH3D - the door is skipped`);
       continue;
@@ -940,7 +940,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
       for (const r of rotors) { r.hum?.stop(); r.hum = null; }   // WM4c: the gear's hum ends with the room
       for (const b of billboardBatches) renderer.destroyBatch(b);
       for (const b of base?.outBatches() ?? []) renderer.destroyBatch(b);   // BASE-HIDE: the flats taken out, out of that list
-      if (staticBatch) { renderer.destroyMesh(staticBatch); staticBatch = null; }   // PERF6
+      if (staticBatch) { renderer.destroyMesh(staticBatch); staticBatch = null; } fittedDoors.destroy();   // PERF6; and the fitted doors' own meshes
       // AUDIT 23 (hosts-16): the ?voxelfolk per-race rigs mint real GPU
       // meshes per context - every interior exit leaked them.
       for (const rg of _raceMeshes?.values?.() ?? []) renderer.destroyMesh(rg.mesh);
