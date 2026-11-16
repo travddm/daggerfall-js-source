@@ -1,5 +1,6 @@
 // The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall pieces
-// meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js). Off is Daggerfall
+// meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js), and the slits
+// left between its models are filled (render/seam-fill.ts, applied by scenes/interiorContext.js). Off is Daggerfall
 // Unity's look, with the thin slits its models leave. The player's own online: the patched models feed the collider as
 // well, but no edge moves more than a unit (2.5 cm), so play is the same.
 // This file must not reach uiPrefs.js: features.js imports it, and uiPrefs.js imports features.js.
@@ -43,7 +44,7 @@ export const INTERIOR_SEAMS_ROW: InteriorSeamsRow = Object.freeze({
   get note() {
     return t(
       'features.interiorSeams.note',
-      'Inside buildings, walls meet the floor and the ceiling with no thin gap. Off shows the gaps of the original models.',
+      'Inside buildings, walls, floors and ceilings meet with no thin gap. Off shows the gaps of the original models.',
     );
   },
   // the models are built once a session (scenes/dataPipeline.js)
