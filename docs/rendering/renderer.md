@@ -86,7 +86,9 @@ Use those types instead of passing ad-hoc objects; a wrong shape here throws ins
 
 Static models do not move, so a streamed map pixel merges them at build time into one mesh grouped by texture
 (`src/render/staticBatch.js`): one draw call per texture instead of one per sub-mesh. Models that animate or swap
-(gates, mill rotors) stay out of the batch.
+(gates, mill rotors) stay out of the batch. A building interior's batch is sealed as it is merged: near corners are
+welded and T-junctions split (`src/render/crack-seal.ts`), and, with the Close interior gaps row on, the slits up to a
+few centimetres wide between its architecture's models are filled with thin strips (`src/render/seam-fill.ts`).
 
 ## One world frame
 

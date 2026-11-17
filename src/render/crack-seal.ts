@@ -127,8 +127,9 @@ function onEdge(positions: Float32Array, grid: Grid, a: number, b: number): Arra
 }
 
 /** Seals a merged batch: welds near corners, then splits every triangle at the vertices lying on its edges. The batch's
- *  arrays are replaced; each sub-mesh keeps its triangles, in its own range. Returns what changed. */
-export function sealCracks(mesh: BatchMesh): { welded: number; split: number } {
+ *  arrays are replaced; each sub-mesh keeps its triangles, in its own range. Returns what changed, and for each
+ *  triangle of the sealed batch the triangle of the batch given that it came from (`origin`). */
+export function sealCracks(mesh: BatchMesh): { welded: number; split: number; origin: Uint32Array } {
   const welded = weld(mesh.positions);
   const grid = positionGrid(mesh.positions);
   // An edge two triangles share is searched once.
@@ -162,6 +163,7 @@ export function sealCracks(mesh: BatchMesh): { welded: number; split: number } {
     return at;
   };
   const indices: number[] = [];
+  const origin: number[] = [];
   let split = 0;
   for (const sub of mesh.subMeshes) {
     const start = indices.length;
@@ -185,6 +187,7 @@ export function sealCracks(mesh: BatchMesh): { welded: number; split: number } {
       }
       if (!inserted) {
         indices.push(...corners);
+        origin.push(sub.startIndex / 3 + t);
         continue;
       }
       // A fan about the centroid keeps every piece's winding and area: the loop goes round the triangle as its corners do.
@@ -195,7 +198,10 @@ export function sealCracks(mesh: BatchMesh): { welded: number; split: number } {
         number,
       ];
       const middle = addVertex(centre, corners, [1 / 3, 1 / 3, 1 / 3]);
-      for (let i = 0; i < loop.length; i++) indices.push(middle, loop[i], loop[(i + 1) % loop.length]);
+      for (let i = 0; i < loop.length; i++) {
+        indices.push(middle, loop[i], loop[(i + 1) % loop.length]);
+        origin.push(sub.startIndex / 3 + t);
+      }
       split++;
     }
     sub.startIndex = start;
@@ -205,5 +211,5 @@ export function sealCracks(mesh: BatchMesh): { welded: number; split: number } {
   mesh.normals = new Float32Array(normals);
   mesh.uvs = new Float32Array(uvs);
   mesh.indices = new Uint32Array(indices);
-  return { welded, split };
+  return { welded, split, origin: new Uint32Array(origin) };
 }

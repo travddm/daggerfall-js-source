@@ -20,7 +20,7 @@ import { IIL_FIREPLACE_MODELS } from '../systems/improvedInteriorLighting.js';  
 import { FlatAnimator, armFlatAnim } from '../render/flatAnimation.js';   // FA1: the flats that move
 import { layoutInterior, INTERIOR_MARKER, PROP_MODEL_TYPE } from '../world/interior/interiorLayout.js';
 import { multiply, transformPoint, identity } from '../world/mat4.js';
-import { StaticBatchBuilder, keyResolver } from '../render/staticBatch.js';   // PERF6: the room's static models as one mesh
+import { StaticBatchBuilder, keyResolver } from '../render/staticBatch.js'; import { getPref } from '../systems/uiPrefs.js'; import { INTERIOR_SEAMS_PREF, interiorSeamsOn } from '../systems/interior-seams-row.ts';   // PERF6: the room's static models as one mesh; the Close interior gaps row fills its slits
 import { collectInteriorLights } from '../world/interior/interiorLights.js';
 import { sealDoorsToNowhere, sealedDoorText } from '../world/interior/doorsToNowhere.js';   // FIELD BUGS 2026-10-25 DOOR-VOID
 import { setMidScreenText } from '../ui/midScreenText.js';   // DOOR-VOID: the sealed door's line, where a locked door's is said
@@ -272,7 +272,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
   // rotors; every other placement stands still. Built lazily on the
   // first read, freed by destroy(); drawList stays whole for the automap.
   let staticBatch = null, staticBuilt = false;
-  const staticBuilder = new StaticBatchBuilder({ pieces: true, seal: true });   // RW1: a sphere a model per merged sub-mesh - a window measured on the screen is its own model's, not the room's (render/realWindows.js)
+  const staticBuilder = new StaticBatchBuilder({ pieces: true, seal: true, fill: interiorSeamsOn(getPref(INTERIOR_SEAMS_PREF)) });   // RW1: a sphere a model per merged sub-mesh - a window measured on the screen is its own model's, not the room's (render/realWindows.js)
   // ROAD-C c2/S9: THE INTERIOR AUTOMAP'S ROWS, minted at the ONE push
   // site every building entry runs through.
   //
@@ -390,7 +390,7 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
       ? decorBaseModelKey(pi, p.modelIdNum) : null;   // BASE-HIDE: a piece its owner may take out
     drawList.push({ mesh: gpu, matrix, key, aabb });
     // PERF6: the entry stays in drawList for the automap; the main view draws the merge
-    if (!baseKey && cpu.normals && cpu.uvs) { staticBuilder.add(cpu, matrix, resolveTexKey); drawList[drawList.length - 1]._batched = true; }
+    if (!baseKey && cpu.normals && cpu.uvs) { staticBuilder.add(cpu, matrix, resolveTexKey, null, { fill: p.objectType !== PROP_MODEL_TYPE }); drawList[drawList.length - 1]._batched = true; }   // the architecture's slits are filled, a prop's never
     automapEntries.push({
       key,
       aabb,
