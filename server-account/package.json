@@ -1,0 +1,13 @@
+{
+  "name": "daggerfall-accounts-sql-study",
+  "private": true,
+  "type": "module",
+  "description": "Scratch: SQL library prototype dependencies for the account service (study branch only).",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "drizzle-kit": "^0.31.11",
+    "drizzle-orm": "^0.45.4",
+    "kysely": "^0.29.9",
+    "kysely-d1": "^0.4.0"
+  }
+}

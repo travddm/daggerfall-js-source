@@ -94,7 +94,9 @@ import { prepareCraftedPiece, pieceComingBack } from './craftedPiece.js';   // I
 import { vendorOf, VENDOR_STATION, VENDOR_LISTING_S, VENDOR_STOCK_SHOWN, VENDOR_STOCK_MAX, VENDOR_BOARD_SHOWN } from '../../src/net/vendorLaw.js';   // HOME-VENDOR: a home's trader
 import { tradeActStatements, patronActStatements } from './townEcon.js';   // TOWN-ECON TE2: a trader's sale and a patron's, counted at their town
 import { shapeOf, keptFits } from './keptBoard.js';   // AUDIT LEAN-READS B1/B10: a kept board's shape, and its bound in bytes
-import { auditStatement } from './staff.js';   // STAFF-PANEL3-REALM: a removal's audit row (read at a call, never at load)
+import { auditStatement } from './staff.js';
+import { sqlOf } from './sql/db.js';
+import { orderByRid, orderById, orderPostStatements, orderCancelStatement, orderReturnStatements } from './market-orders.js';   // STAFF-PANEL3-REALM: a removal's audit row (read at a call, never at load)
 
 const DAY_S = 86_400;
 /** GOLD-MARKET: the Stores origin of units bought in the row's own currency (a listing's or a sale's `currency`). */
@@ -407,7 +409,7 @@ async function settle(ctx, player, read = null) {
     );
   }
   // the orders' escrow back
-  for (const o of shutOrders) work.push(...orderReturn(db, o.id, nowS));
+  for (const o of shutOrders) work.push(...orderReturnStatements(db, o.id, nowS));
   // the couriers' loads that have arrived
   for (const s of loads) {
     const nonce = mintId(rand);
@@ -423,7 +425,7 @@ async function settle(ctx, player, read = null) {
     );
     touched.add(`${s.char_id}|${s.material}`);
   }
-  if (work.length) await db.batch(work);
+  if (work.length) await sqlOf(db).atomic(work);
   return touched;
 }
 const liveBidSql = (a) => `EXISTS (SELECT 1 FROM market_bids WHERE id = ${a}.high_bid AND state = 'high')`;
@@ -563,18 +565,6 @@ function backToStores(db, id, nonce) {
   return ['own', 'bought'].map((col) => db.prepare(`INSERT INTO prof_stores (player, char_id, material, origin, qty)
       SELECT seller, char_id, material, ${col === 'own' ? "'own'" : BOUGHT_ORIGIN_SQL}, ${col} FROM market_listings WHERE id = ?1 AND rn = ?2 AND kind = 'material' AND ${col} > 0
       ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = prof_stores.qty + excluded.qty`).bind(id, nonce));
-}
-/** What is left of a closed order's escrow back to its poster - one line keyed on the order's own id, under the Marks
- *  cap (else it waits) - then the order marked returned. */
-function orderReturn(db, id, nowS) {
-  return [
-    db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-      SELECT 'escrow', id, 'account', poster, 'order-return', escrow, ?2, ?3, poster, material, 'order-close:' || id FROM market_orders
-      WHERE id = ?1 AND state != 'open' AND returned = 0 AND escrow > 0
-        AND COALESCE((SELECT balance FROM marks WHERE account = market_orders.poster), 0) + escrow <= ?4`).bind(id, utcDay(nowS), nowS, MARKS_MAX),
-    db.prepare(`UPDATE market_orders SET escrow = 0, returned = 1 WHERE id = ?1 AND state != 'open' AND returned = 0
-      AND (escrow = 0 OR EXISTS (SELECT 1 FROM marks_ledger WHERE actor = market_orders.poster AND rid = 'order-close:' || ?1))`).bind(id),
-  ];
 }
 /** What is on its way to this account: couriers' loads not yet in the Stores and pieces not yet collected. */
 /** MARKET-SPEED: what is on its way, as statements - a read sends them in its batch (roadFrom reads the rows). */
@@ -1573,7 +1563,7 @@ export async function marketOrder(ctx, player, env, { character, region, materia
   if (refused) return refused;
   const me = player.id;
   const answer = async (row, extra = {}) => ({ ok: true, ...extra, order: orderView(row, me), balance: await balanceOf(db, me) });
-  const prior = await db.prepare('SELECT * FROM market_orders WHERE poster = ?1 AND rid = ?2').bind(me, rid).first();
+  const prior = await orderByRid(db, me, rid);
   if (prior) return answer(prior, { repeat: true });
   const closed = shut(player, env);
   if (closed) return closed;
@@ -1588,19 +1578,11 @@ export async function marketOrder(ctx, player, env, { character, region, materia
   const nonce = mintId(rand);
   const id = mintId(rand);
   const own = hubsOf(hubs);
-  await db.batch([
-    db.prepare(`INSERT OR IGNORE INTO market_orders (id, poster, char_id, region, material, units, left_units, price, escrow, at, expires_at, rid, n)
-      SELECT ?3, ?1, ?2, ?4, ?5, ?6, ?6, ?7, ?8, ?9, ?10, ?11, ?12
-      WHERE COALESCE((SELECT balance FROM marks WHERE account = ?1), 0) >= ?8
-        AND (SELECT COUNT(*) FROM market_orders WHERE poster = ?1 AND state = 'open') < ?13
-        AND NOT EXISTS (SELECT 1 FROM marks_ledger WHERE actor = ?1 AND rid = ?11 || ':escrow')`)
-      .bind(me, character, id, region, key, units, price, cost, nowS, nowS + MARKET_ORDER_S, rid, nonce, MARKET_ORDERS_MAX),
-    db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-      SELECT 'account', poster, 'escrow', id, 'order-escrow', escrow, ?4, at, poster, material, rid || ':escrow'
-      FROM market_orders WHERE poster = ?1 AND rid = ?2 AND n = ?3`).bind(me, rid, nonce, utcDay(nowS)),
+  await sqlOf(db).atomic([
+    ...orderPostStatements(db, { poster: me, character, id, region, material: key, units, price, nowS, expiresAt: nowS + MARKET_ORDER_S, rid, nonce, ordersMax: MARKET_ORDERS_MAX }),
     ...witnessStatements(db, player, nowS, [region], own, 'EXISTS (SELECT 1 FROM market_orders WHERE poster = ?6 AND rid = ?7 AND n = ?8)', [me, rid, nonce]),
   ]);
-  const made = await db.prepare('SELECT * FROM market_orders WHERE poster = ?1 AND rid = ?2').bind(me, rid).first();
+  const made = await orderByRid(db, me, rid);
   if (made?.n === nonce) return answer(made);
   if (made) return answer(made, { repeat: true });
   if (await spent(db, me, rid, ':escrow')) return { error: 'prof-rid' };
@@ -1729,11 +1711,11 @@ export async function marketUnorder(ctx, player, env, { order: id, rid } = {}) {
   if (closed) return closed;
   if (o.state !== 'open') return { error: 'market-gone' };
   if (await overRate(ctx, `market:${me}`, MARKET_OPS_MAX, MARKET_WINDOW_S)) return { error: 'market-rate' };
-  await db.batch([
-    db.prepare(`UPDATE market_orders SET state = 'cancelled', closed_at = ?3 WHERE id = ?1 AND poster = ?2 AND state = 'open'`).bind(id, me, nowS),
-    ...orderReturn(db, id, nowS),
+  await sqlOf(db).atomic([
+    orderCancelStatement(db, { id, poster: me, nowS }),
+    ...orderReturnStatements(db, id, nowS),
   ]);
-  const now = await db.prepare('SELECT * FROM market_orders WHERE id = ?1').bind(id).first();
+  const now = await orderById(db, id);
   if (now?.state !== 'cancelled') return { error: 'market-gone' };
   return { ok: true, order: orderView(now, me), balance: await balanceOf(db, me) };
 }
