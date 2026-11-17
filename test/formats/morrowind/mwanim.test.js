@@ -270,12 +270,9 @@ const FLIGHT = new Uint8Array(
 );
 
 test('MW-D14 rule 56: the accumulation root is a TWO-NAME TABLE, not a search', () => {
-  //   // Priority matters! bip01 is preferred.
-  //   accumRootNames = { "bip01", "root bone" }
-  // and a candidate is taken only when the KF DRIVES it. This was ported
-  // as "the topmost tracked bone", which on a first-person weapon .kf -
-  // which keys nothing on bip01 - answered an UPPER ARM, and would then
-  // have pinned that bone's X and Y to rest.
+  // The root is one of two names, "bip01" first, and a name is taken only when the KF drives it. Taking the topmost
+  // tracked bone instead answers an upper arm on a first-person weapon .kf, which keys nothing on bip01, and would then
+  // zero that arm's X and Y motion.
   const nif = parseNif(ANIMATED);
   const skeleton = buildSkeleton(nif);
   const tracks = extractTracks(parseNif(FLIGHT));
