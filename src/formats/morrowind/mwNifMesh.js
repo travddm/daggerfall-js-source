@@ -355,8 +355,20 @@ export function flattenNif(nif, opts = {}) {
     }
   }
 
-  for (const root of nif.roots) {
-    if (root >= 0) walk(root, IDENTITY, [], true);
+  for (const root of sceneRoots(nif)) {
+    walk(root, IDENTITY, [], true);
   }
   return batches;
+}
+
+/**
+ * The roots of a file that can hold a scene. A root can be a record that is no part of a scene at all:
+ * tx_crystal_02.nif and tx_crystal_03.nif hold one bare texture (NiPixelData), which has no transform to compose.
+ * Only a node, a shape or a particle system draws.
+ */
+function sceneRoots(nif) {
+  return nif.roots.filter((root) => {
+    const rec = deref(nif, root);
+    return !!rec && (NODE_TYPES.has(rec.type) || GEOMETRY_TYPES.has(rec.type) || PARTICLE_TYPES.has(rec.type));
+  });
 }
