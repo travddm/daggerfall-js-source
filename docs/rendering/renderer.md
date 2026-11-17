@@ -21,7 +21,9 @@ Rules from the data side, stated at the top of `renderer.js`:
 - Textures from `TextureFile.getColor32` are already bottom-up, which is GL's texel order. Upload with `flipY` off.
 - Indexed colour means hard pixels. The world texture filter is Daggerfall Unity's `Video/MainFilterMode` (Point,
   Bilinear, Trilinear; `src/render/world-texture-filter.ts`) plus the port's Sharp, the port's default (DFU's is
-  Point). Sharp samples through a linear sampler with anisotropy, and its world shaders move each coordinate to its
+  Point). Every quality preset leaves it Sharp, because Sharp measured no slower than Point (frame time at a town,
+  an interior and a dungeon, at 1280x800 and 3840x2160); the Classic preset sets Point. Sharp samples through a
+  linear sampler with anisotropy, and its world shaders move each coordinate to its
   texel's centre with a one-pixel blend at each texel edge (`src/render/sharp-texels.ts`): square texels close up,
   filtered ground in the distance. The world sets are built Sharp or plain for the filter, and swapped when it changes
   (`src/render/sharp-world-sets.ts`). In the retro modes Sharp drops the edge blend, so every texel is sampled at its
@@ -84,7 +86,12 @@ Use those types instead of passing ad-hoc objects; a wrong shape here throws ins
 
 Static models do not move, so a streamed map pixel merges them at build time into one mesh grouped by texture
 (`src/render/staticBatch.js`): one draw call per texture instead of one per sub-mesh. Models that animate or swap
-(gates, mill rotors) stay out of the batch.
+(gates, mill rotors) stay out of the batch. A building interior's batch is sealed as it is merged: near corners are
+welded and T-junctions split (`src/render/crack-seal.ts`), and, with the Close interior gaps row on, the slits up to a
+few centimetres wide between its architecture's models are filled with thin strips (`src/render/seam-fill.ts`).
+With the same row on, each swinging door is drawn on its own copy of its model, fitted to its doorway, and a door that
+stands out of its wall is set into it (`src/world/interior/door-frame-fit.ts`). The fitted door keeps that size as it
+swings; its collider keeps Daggerfall Unity's size.
 
 ## One world frame
 
@@ -171,7 +178,9 @@ automap clear (`PANEL_CLEAR_RGBA`), nearly transparent so the panel art shows th
 
 With real windows on, a building's glass shows the other side: from the street the room behind it, from inside the
 street. `outsideViewFrame` draws the outside view into an offscreen target before the room's frame; `setWindowRooms`
-and `setGlassView` select the mode each frame. The shader text and rules are in `src/render/realWindows.js`.
+and `setGlassView` select the mode each frame. Inside, the outside view is painted on the glass panes and cutout holes
+alone (`src/render/glass-background.js`), so a slit between two of the room's models shows the interior's black
+clear, as in Daggerfall Unity. The shader text and rules are in `src/render/realWindows.js`.
 
 ## Shaders and GLSL modules
 

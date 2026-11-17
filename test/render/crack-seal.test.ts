@@ -132,7 +132,8 @@ test('a floor with no T-junction is left as it was', () => {
   ]);
   const indices = Array.from(mesh.indices);
   const result = sealCracks(mesh);
-  assert.deepEqual(result, { welded: 0, split: 0 });
+  assert.deepEqual([result.welded, result.split], [0, 0]);
+  assert.deepEqual(Array.from(result.origin), [0, 1, 2, 3], 'each triangle its own origin');
   assert.deepEqual(Array.from(mesh.indices), indices);
 });
 

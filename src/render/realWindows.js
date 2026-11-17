@@ -16,10 +16,12 @@
 // the street drawn from the interior camera into a target of its own (renderer.outsideViewFrame - the exterior's
 // light, fog, lanterns and window style; the exterior host decides what it draws), cropped to the screen rectangle
 // the glass covered last frame (the glass's own frustum: a small pane is a small pass), at half the world's
-// resolution, and kept while the camera is still (VIEW_MAX_AGE_MS). The interior frame paints it as its background
-// inside that rectangle (renderer.setGlassView) and the glass texels are CUT - the interior is drawn over the world
-// with normal depth, so whatever hole the room has shows the street behind it. A picture uploaded `{ cutout: true }`
-// has holes wherever its alpha is under a half, in every solid pass and in the shadows' too.
+// resolution, and kept while the camera is still (VIEW_MAX_AGE_MS). The interior frame paints it on the last frame's
+// glass panes, before the room (renderer.setGlassView), and the glass texels inside that rectangle are CUT, so the
+// street shows through the glass alone. A hole in the room's own models keeps the interior's black clear, as in
+// Daggerfall Unity. A background over the whole rectangle would show the sky or the street through every slit
+// between two models, as a bright line. A picture uploaded `{ cutout: true }` has holes wherever its alpha is under a half, in every
+// solid pass and in the shadows' too; its holes show the sky.
 //
 // Which interior texels are glass: an exterior window record drawn inside a building (DFU lays interiors out with the
 // same window table - DaggerfallInterior.cs:473/:517/:1270 apply WindowStyle.Disabled to them), and the panes of a
@@ -522,23 +524,33 @@ export function viewSkyFrom(fogColor) {
   return { horizon: h, zenith: [h[0] * 0.72, h[1] * 0.82, Math.min(1, h[2] * 1.0)] };
 }
 
-/** The background: the view out over the glass's rectangle, the sky where it drew nothing. A strip of four from
- *  gl_VertexID - no vertex buffer. The texture is the view out's premultiplied picture (cleared to nothing). */
+/** The background: the view out, and the sky where it drew nothing, painted on the last frame's glass panes alone,
+ *  before the room. The pane is drawn with the mesh shader's own transform, so it covers the same pixels the room's
+ *  draw later cuts. A hole in the room's own geometry is not glass and keeps the interior's black clear, as Daggerfall
+ *  Unity draws it. The texture is the view out's premultiplied picture (cleared to nothing). */
 export const VIEW_BG_VS = `#version 300 es
-uniform vec4 uRect;
-out vec2 vT;
+layout(location=0) in vec3 aPos;
+layout(location=2) in vec2 aUV;
+uniform mat4 uProj;
+uniform mat4 uCamera;     // the frame's view matrix (uView is the view out's sampler)
+uniform mat4 uModel;
+out vec2 vUV;
 void main() {
-  vec2 c = vec2(float(gl_VertexID & 1), float((gl_VertexID >> 1) & 1));
-  vT = c;
-  gl_Position = vec4(mix(uRect.xy, uRect.zw, c), 0.0, 1.0);
+  vUV = aUV;
+  vec4 world = uModel * vec4(aPos, 1.0);
+  gl_Position = uProj * uCamera * world;
 }`;
 export const VIEW_BG_FS = `#version 300 es
 precision highp float;
-in vec2 vT;
-uniform sampler2D uView;
+in vec2 vUV;
+uniform sampler2D uView;   // unit 0: the view out
+uniform sampler2D uPane;   // unit 1: the pane's glass mask, or its cutout picture
+uniform float uPaneGlass;  // 1: the pane's glass texels are cut (the street is in the view out)
+uniform float uPaneCut;    // 1: the pane's picture is a cutout, its holes under half alpha
 uniform vec2 uViewScale;   // the drawn share of the texture
 uniform float uHasView;    // 0: the sky alone
-uniform vec4 uRect;
+uniform vec4 uRect;        // the rectangle in NDC
+uniform vec4 uRectPx;      // the same rectangle in window pixels, as the mesh shader's uGlassRect
 uniform vec3 uRayX;        // a world ray from NDC: ndc.x * uRayX + ndc.y * uRayY + uRayZ
 uniform vec3 uRayY;
 uniform vec3 uRayZ;
@@ -546,6 +558,15 @@ uniform vec3 uZenith;
 uniform vec3 uHorizon;
 out vec4 outColor;
 void main() {
+  // The mesh shader cuts where the glass mask's red is over a half, or a cutout's alpha under a half. The background is
+  // painted a little wider, out to where the filtered mask starts to rise: the two programs can place a pane's edge a
+  // pixel apart, and the room draws over every texel it does not cut.
+  vec4 pane = texture(uPane, vUV);
+  bool glass = uPaneGlass > 0.5 && pane.r > 0.05;
+  bool hole = uPaneCut > 0.5 && pane.a < 0.95;
+  if (!glass && !hole) discard;
+  vec2 vT = (gl_FragCoord.xy - uRectPx.xy) / (uRectPx.zw - uRectPx.xy);
+  if (any(lessThan(vT, vec2(0.0))) || any(greaterThanEqual(vT, vec2(1.0)))) discard;
   vec2 ndc = mix(uRect.xy, uRect.zw, vT);
   vec3 d = normalize(ndc.x * uRayX + ndc.y * uRayY + uRayZ);
   vec3 sky = mix(uHorizon, uZenith, smoothstep(0.0, 0.45, d.y));

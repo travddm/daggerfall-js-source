@@ -20,7 +20,8 @@ import { COLUMN_GLSL } from './columnGlsl.js';   // DW-F: the water column's sha
 // then. The imports hoist and the leaves have no imports of their own, so
 // this is already guaranteed - the lines stand where they read as the rule.
 import { buildProgram, startPrograms, parallelCompile } from './glProgram.js';   // AUDIT 68 S17-gl-program-dup: the one compile and link; SHADER-STALL: and a start that never waits
-import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM, GLASS_NONE, GLASS_EXTERIOR, GLASS_INTERIOR, winModeFor, roomLightFor, sphereNdcRect, cropProjection, viewTargetSize, viewSkyFrom, viewRays, VIEW_BG_VS, VIEW_BG_FS, VIEW_PANES_MAX, VIEW_PANE_UNIT, VIEW_PANE_VS, VIEW_PANE_FS } from './realWindows.js';   // RW1: the real windows - the rooms, the glass, the view out
+import { glassBackgroundProgram, paintGlassBackground, newPane, keepPaneKind, isPainted } from './glass-background.js';
+import { realWindowsGlsl, RW_MAIN_DERIVS, RW_MAIN_CUTOUT, RW_MAIN_GLASS, RW_MAIN_ROOM, GLASS_NONE, GLASS_EXTERIOR, GLASS_INTERIOR, winModeFor, roomLightFor, sphereNdcRect, cropProjection, viewTargetSize, viewSkyFrom, viewRays, VIEW_PANES_MAX, VIEW_PANE_UNIT, VIEW_PANE_VS, VIEW_PANE_FS } from './realWindows.js';   // RW1: the real windows - the rooms, the glass, the view out
 import { MESH_ALPHA_GLSL, samplerParams, samplerKey } from './meshAlpha.js';   // a translucent mesh draw, and a texture's own wrap and filter
 import { frameTarget, setFrameTarget } from './renderTarget.js';   // RW1: the view out's pass hands the frame target back as it found it (EL4's restore)
 import { CLIP_SENTINEL } from '../world/terrain/terrainSurface.js';   // FAR-CLIP1: the byte the terrain's clip variant discards - the TileMap format's module, already in this file's closure (waterCorners.js)
@@ -1749,7 +1750,7 @@ export class Renderer {
     this._rwAcc = { n: 0, holes: false, rect: [1, 1, -1, -1], panes: [], np: 0 };   // PANE-CLIP: and the glass's sub-meshes, for the view out's pane depth
     this.outsideViewDraws = new Set();
     this.outsideViewSkip = new Set();
-    this._rwExterior = null; this._rwTarget = null; this._rwOutside = null; this._rwBg = null; this._rwEmptyVao = null;   // made on the first ask
+    this._rwExterior = null; this._rwTarget = null; this._rwOutside = null; this._rwBg = null; this._rwPaneGen = 0;   // made on the first ask
     this._rwPv = null; this._rwQ = null; this._rwPanes = []; this._rwPaneN = 0; this._rwPaneOn = false; this._rwPaneProg = null; this._rwViewDraws = 0;
     // The value last uploaded to the solid program's uEmissionColor
     // (uniforms are program state, so this survives a program switch).
@@ -6171,8 +6172,10 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   /**
    * RW1: THE INTERIOR FRAME'S GLASS, after its beginFrame. Arms the watch (this frame's glass and cutout holes are
    * measured, for the next frame's view out - takeGlassRect) and, given what realWindows.js viewOutFrame answered,
-   * paints the background inside the glass's rectangle - the street (`view`) or the sky alone - and, with the street
-   * in it, cuts the glass texels inside that rectangle. Null paints nothing and cuts nothing: the room as it was.
+   * paints the background on the last frame's panes inside the glass's rectangle - the street (`view`) or the sky
+   * alone - and, with the street in it, cuts the glass texels inside that rectangle. Only the panes' glass texels and
+   * cutout holes are painted: a slit between two of the room's models keeps the black clear, as in Daggerfall Unity.
+   * Null paints nothing and cuts nothing: the room as it was.
    * @param {{ rect: number[], view: boolean } | null} vo
    */
   setGlassView(vo) {
@@ -6201,12 +6204,8 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     gl.uniform2f(P.scale, street ? t.w / t.allocW : 1, street ? t.h / t.allocH : 1);
     gl.uniform1i(P.view, 0);
     this._bindTex0(street ? t.tex : null);   // PERF-TEX3: unit 0 through its helper
-    this._bindVao(this._rwEmptyVao ??= gl.createVertexArray());
     gl.disable(gl.DEPTH_TEST);   // the background: no depth of its own - the room draws over it
-    gl.disable(gl.CULL_FACE);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    this.stats.draws++;
-    gl.enable(gl.CULL_FACE);
+    paintGlassBackground(this, P, { street, rectPx: rw.rect });
     gl.enable(gl.DEPTH_TEST);
     this._bindTex0(null);   // the view out is never left on a unit: its next pass draws into it
     this._bindVao(null);
@@ -6215,9 +6214,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
 
   /** RW1: the background's program, built on the first interior that wants it. */
   _rwBgProgram() {
-    const p = this._buildProgram(VIEW_BG_VS, VIEW_BG_FS), gl = this.gl;
-    const u = (n) => gl.getUniformLocation(p, n);
-    return { p, rect: u('uRect'), view: u('uView'), scale: u('uViewScale'), has: u('uHasView'), rayX: u('uRayX'), rayY: u('uRayY'), rayZ: u('uRayZ'), zenith: u('uZenith'), horizon: u('uHorizon') };
+    return glassBackgroundProgram(this);
   }
 
   /** RW1: the rectangle (NDC) the last watched frame's glass and cutout holes covered, and whether any of it was a
@@ -6225,7 +6222,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   takeGlassRect() {
     const a = this._rwAcc;
     // PANE-CLIP: the frame's panes are the next view out's - the two lists trade places, nothing is minted
-    if (a) { const kept = this._rwPanes; this._rwPanes = a.panes; this._rwPaneN = a.n ? a.np : 0; a.panes = kept; a.np = 0; }
+    if (a) { const kept = this._rwPanes; this._rwPanes = a.panes; this._rwPaneN = a.n ? a.np : 0; a.panes = kept; a.np = 0; this._rwPaneGen++; }
     if (!a || !a.n) { if (a) a.holes = false; return null; }
     const out = { rect: [a.rect[0], a.rect[1], a.rect[2], a.rect[3]], holes: a.holes };
     a.n = 0; a.holes = false; a.rect[0] = 1; a.rect[1] = 1; a.rect[2] = -1; a.rect[3] = -1;
@@ -6239,7 +6236,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
     if (!L) return;
     const gl = this.gl, rw = this._rw;
     const kind = sm._evWin ?? GLASS_NONE, cut = sm._evCut ? 1 : 0;
-    const mode = rw && kind !== GLASS_NONE ? winModeFor(kind, rw.rooms, rw.live) : 0;
+    const mode = rw && kind !== GLASS_NONE ? winModeFor(kind, rw.rooms, rw.live && isPainted(sm, this._rwPaneGen)) : 0;   // glass is cut where the background painted it
     if (mode === 1) this._rwRoomLight();
     else if (mode === 3 && this._rwRectUp !== rw.rectGen) { gl.uniform4fv(L.rect, rw.rect); this._rwRectUp = rw.rectGen; }
     if (mode !== this._rwModeUp) { gl.uniform1f(L.mode, mode); this._rwModeUp = mode; }
@@ -6280,10 +6277,13 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
       a.n++;
       if (holes) a.holes = true;
     }
-    // PANE-CLIP: a sub-mesh on screen is kept for the view out's pane depth - its VAO, its range and its matrix
+    // A sub-mesh on screen is kept for the view out's pane depth: its VAO, its range and its matrix. The
+    // background is painted on the same panes, so each also keeps the picture its cut is read from: the glass mask on
+    // the emission unit, or a cutout's own picture.
     if (a.n > n0 && mesh?.vao && a.np < VIEW_PANES_MAX) {
-      const p = (a.panes[a.np] ??= { vao: null, start: 0, count: 0, m: new Float32Array(16) });
+      const p = (a.panes[a.np] ??= newPane());
       p.vao = mesh.vao; p.start = sm.startIndex; p.count = sm.primitiveCount * 3; p.m.set(m);
+      keepPaneKind(p, sm, holes, this._rwPaneGen + 1);
       a.np++;
     }
   }

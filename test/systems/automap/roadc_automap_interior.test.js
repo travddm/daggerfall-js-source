@@ -270,7 +270,7 @@ test('c2/S9 a real building interior: one automap row per draw entry, and the pr
       return { gpu: id };
     };
     const deps = {
-      renderer: { createBillboardBatch: () => ({}), destroyBatch: () => {}, destroyMesh: () => {} },
+      renderer: { createBillboardBatch: () => ({}), destroyBatch: () => {}, createMesh: () => ({}), destroyMesh: () => {} },
       getGpuMesh, cpuModels,
       getTexture: async () => ({ recordCount: 0, getSize: () => ({ width: 1, height: 1 }), getScale: () => ({ x: 0, y: 0 }) }),
       uploadRecord: () => {}, uploadRecordFrame: () => {}, palette: null,

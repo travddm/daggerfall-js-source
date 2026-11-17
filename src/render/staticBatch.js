@@ -18,7 +18,7 @@
 // ranges by texture into the shape `renderer.createMesh` takes.
 
 import { boundsOf, boundsSteps } from './bounds.js';
-import { sealCracks } from './crack-seal.ts';   // PERF-EXT23: the spheres createMesh takes, measured in the merge's own slices - a leaf, no GL
+import { sealCracks } from './crack-seal.ts'; import { fillSeams } from './seam-fill.ts';   // PERF-EXT23: the spheres createMesh takes, measured in the merge's own slices - a leaf, no GL
 
 /** The rotation part of a TRS matrix applied to a normal. The block
  *  matrices are rotations and translations (rmbLayout's trs, scale 1),
@@ -121,16 +121,30 @@ export function shadowCells(positions, indices, size) {
 /** LA-AUDIT A1: the dungeon's cell side - under a third of a block (RDB_SIDE, 51.2), about a dungeon light's reach. */
 export const SHADOW_CELL_SIZE = 16;
 
+/** The merge's seal (render/crack-seal.ts) and then its fill (render/seam-fill.ts), in place. The fill runs after the
+ *  seal: the seal's weld would join a strip's two sides, a few millimetres apart. `fillMask` marks the triangles the fill
+ *  reads, in the merge's order; the seal's `origin` carries the marks to its own. */
+function sealAndFill(merged, seal, fillMask) {
+  const sealed = seal ? sealCracks(merged) : null;
+  if (sealed) merged.sealed = { welded: sealed.welded, split: sealed.split };
+  if (!fillMask) return;
+  const origin = sealed ? sealed.origin : null;
+  merged.filled = fillSeams(merged, (t) => fillMask[origin ? origin[t] : t] === 1);
+}
+
 export class StaticBatchBuilder {
-  /** @param {{ shadowCell?: number, pieces?: boolean, seal?: boolean }} [opts] shadowCell: LA-AUDIT A1's cell side; 0 (the default)
+  /** @param {{ shadowCell?: number, pieces?: boolean, seal?: boolean, fill?: boolean }} [opts] shadowCell: LA-AUDIT A1's cell side; 0 (the default)
    *  builds no cells. pieces: RW1 - every merged sub-mesh also carries one sphere per model that went into it
    *  (`pieces`, [cx, cy, cz, r] each), so a window's glass measured on the screen is that model's, not the whole batch's
    *  (render/realWindows.js: the view out is cropped to the glass a frame met). Off by default: a city pixel's batch
    *  never measures them. seal: the merge welds near corners and splits T-junctions (render/crack-seal.ts), so the
-   *  models' seams leave no gaps. */
-  constructor({ shadowCell = 0, pieces = false, seal = false } = {}) {
+   *  models' seams leave no gaps. fill: before the seal, the slits between models added with `{ fill: true }` are
+   *  filled with thin strips (render/seam-fill.ts). */
+  constructor({ shadowCell = 0, pieces = false, seal = false, fill = false } = {}) {
     this.pieces = !!pieces;
     this.seal = !!seal;
+    this.fill = !!fill;   // the slits between the models marked `fill` at their add are filled (render/seam-fill.ts)
+    this.fillRuns = new Set();
     this.chunks = [];        // [{positions, normals, uvs, base}] one per model, already transformed
     this.groups = new Map(); // resolved key -> [Uint32Array index runs, already offset by base]
     this.vertexCount = 0;
@@ -148,8 +162,9 @@ export class StaticBatchBuilder {
    *   non-uniformly - its upper 3x3 the inverse transpose of local's (World of Daggerfall stands
    *   952 models scaled unevenly, most of them rocks, which Unity lights through the inverse transpose). Absent,
    *   the normals take `local` itself, exact for every rotation-and-translation block model.
+   * @param {{ fill?: boolean }} [opts] fill: the model is architecture, whose slits the merge fills (the builder's `fill`)
    */
-  add(cpu, local, resolveKey, normalMatrix = null) {
+  add(cpu, local, resolveKey, normalMatrix = null, { fill = false } = {}) {
     const nm = normalMatrix ?? unevenScaleNormalMatrix(local) ?? local;   // WD1: a scaled world-data model lights through its inverse transpose
     const n = cpu.positions.length / 3;
     if (!n || !cpu.subMeshes?.length) return;
@@ -179,6 +194,7 @@ export class StaticBatchBuilder {
       let g = this.groups.get(key);
       if (!g) { g = []; this.groups.set(key, g); }
       g.push(run);
+      if (fill) this.fillRuns.add(run);
       this.triangles += sm.primitiveCount;
     }
     this.vertexCount += n;
@@ -235,10 +251,11 @@ export class StaticBatchBuilder {
     yield;   // the index array's allocation is a unit of its own (3.6 MB on a synthetic city)
     const subMeshes = [];
     const subs = [];
+    const fillMask = this.fill ? new Uint8Array(this.triangles) : null;
     let at = 0;
     for (const [key, runs] of this.groups) {
       const start = at;
-      for (const run of runs) { indices.set(run, at); at += run.length; }
+      for (const run of runs) { indices.set(run, at); if (fillMask && this.fillRuns.has(run)) fillMask.fill(1, at / 3, (at + run.length) / 3); at += run.length; }
       const [archive, record] = key.split('_').map(Number);   // the resolved key is `${archive}_${record}`, drawMesh's own spelling
       const sub = { textureArchive: archive, textureRecord: record, startIndex: start, primitiveCount: (at - start) / 3 };
       if (this.pieces) {   // RW1: one sphere a model that went into this sub-mesh
@@ -251,9 +268,9 @@ export class StaticBatchBuilder {
     }
     const merged = /** @type {any} */ ({ positions, normals, uvs, indices, subMeshes, vertexCount: this.vertexCount, triangles: this.triangles, models: this.models });
     if (withBounds) merged.bounds = { whole, subs };
-    if (this.seal) {
+    if (this.seal || fillMask) {
       yield;
-      merged.sealed = sealCracks(merged);
+      sealAndFill(merged, this.seal, fillMask);
       merged.vertexCount = merged.positions.length / 3;
       merged.triangles = merged.indices.length / 3;
       if (withBounds) merged.bounds = { whole: boundsOf(merged.positions), subs: subMeshes.map((sm) => boundsOf(merged.positions, merged.indices, sm.startIndex, sm.primitiveCount * 3)) };
@@ -274,6 +291,7 @@ export class StaticBatchBuilder {
   _spend() {
     this.chunks = [];
     this.groups = new Map();
+    this.fillRuns = new Set();
     this.vertexCount = 0;
     this.triangles = 0;
     this.models = 0;

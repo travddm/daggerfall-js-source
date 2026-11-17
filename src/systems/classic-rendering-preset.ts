@@ -54,11 +54,12 @@ export const GRAPHICS_PROFILES_PREF = 'graphicsProfiles';
  *  the ground without mip-mapped sharpening, as the retro picture does. Enhanced lighting off gives the flat classic
  *  light, the closest to the original game's even dungeon light. Enhanced environments off gives the painted sky and
  *  the classic weather; it also turns off the meadow grass and the evolving weather, which the original game did not
- *  have either. */
+ *  have either. Close interior gaps off leaves the interior models as Daggerfall Unity draws them. */
 export const CLASSIC_RENDERING_ROWS: Readonly<Record<string, RowValue>> = Object.freeze({
   'land-view-distance': 3,
   'ground-sharpness': 'off',
   'mip-quality': 'standard',
+  'interior-seams': 'off',
   'enhanced-lighting': false,
   'enhanced-environments': 'off',
 });
