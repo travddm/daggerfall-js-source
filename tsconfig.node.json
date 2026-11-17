@@ -5,5 +5,5 @@
   "compilerOptions": { "types": ["node"], "lib": ["ES2023"] },
   "include": ["tools/**/*.ts", "test/**/*.ts", "src/raw-imports.d.ts"],
   // Checked by tsconfig.server-sql.json, with strictNullChecks
-  "exclude": ["test/server/sql/**"]
+  "exclude": ["test/server/database-seam.test.ts"]
 }

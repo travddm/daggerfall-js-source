@@ -55,6 +55,8 @@ export interface SqlDb {
   /** The compiler for this database's dialect. Build queries with it; run them with `run` or `atomic`. */
   kysely: Kysely<Database>;
   run(statement: Compilable | CompiledQuery): Promise<StatementResult>;
+  /** A query as a D1 statement, for a caller that still sends `db.batch([...])` itself. */
+  statement(query: Compilable | CompiledQuery): D1Statement;
   atomic(statements: Statement[]): Promise<StatementResult[]>;
 }
 
@@ -90,6 +92,7 @@ export function d1Db(binding: D1Like): SqlDb {
     dialect: 'sqlite',
     kysely: sqliteCompiler,
     run: async (statement) => resultOf(await statementOf(statement).all()),
+    statement: statementOf,
     atomic: async (statements) => (await binding.batch(statements.map(statementOf))).map(resultOf),
   };
 }

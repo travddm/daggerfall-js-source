@@ -12,7 +12,7 @@
 
 import { sql } from 'kysely';
 import { BROKER_RID_RE } from '../../src/net/insignia.js';
-import { sqlOf } from './sql/database-seam.ts';
+import { sqlOf } from './database-seam.ts';
 
 /** A request id the law accepts. */
 export const brokerRidOk = (rid) => typeof rid === 'string' && BROKER_RID_RE.test(rid);
@@ -43,7 +43,8 @@ export function brokerSaleWrite(db, { account, rid, kind, item, nowS }) {
       eb.val(nowS).as('at'),
     ])
     .where(sql`changes()`, '>', 0);
-  return k.insertInto('broker_sales').columns(['account', 'rid', 'kind', 'item', 'at']).expression(row);
+  // A D1 statement, because the sale's caller (accounts.js buyInsignia) still sends its own db.batch
+  return sqlOf(db).statement(k.insertInto('broker_sales').columns(['account', 'rid', 'kind', 'item', 'at']).expression(row));
 }
 
 /** The guard a sale's UPDATE carries: no row of this request id (`acc` and `rid` its SQL parameters). */

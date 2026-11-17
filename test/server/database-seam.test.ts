@@ -1,16 +1,16 @@
-// The account service's database seam (server-account/src/sql/database-seam.ts) on the D1 fake: a Kysely query runs,
+// The account service's database seam (server-account/src/database-seam.ts) on the D1 fake: a Kysely query runs,
 // an atomic list mixes Kysely queries with D1 statements, and a failing list writes nothing.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import type { DatabaseSync } from 'node:sqlite';
-import { d1Db, sqlOf, type D1Like } from '../../../server-account/src/sql/database-seam.ts';
+import { d1Db, sqlOf, type D1Like } from '../../server-account/src/database-seam.ts';
 
 /** The D1 fake over node:sqlite, with every migration applied. */
 type FakeD1 = D1Like & { _raw: DatabaseSync };
 
 // Loaded by a computed path: a static import would pull the whole account service into the TypeScript check.
-const accountDb = new URL('../../accountDb.mjs', import.meta.url).href;
+const accountDb = new URL('../accountDb.mjs', import.meta.url).href;
 const { d1 } = (await import(accountDb)) as { d1: () => FakeD1 };
 
 const seedPlayer = (db: FakeD1, id: string): void => {
