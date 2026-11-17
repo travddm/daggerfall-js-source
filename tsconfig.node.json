@@ -3,5 +3,7 @@
   // redeclare globals the browser code uses, such as `fetch`, and would change what that config reports.
   "extends": "./tsconfig.json",
   "compilerOptions": { "types": ["node"], "lib": ["ES2023"] },
-  "include": ["tools/**/*.ts", "test/**/*.ts", "src/raw-imports.d.ts"]
+  "include": ["tools/**/*.ts", "test/**/*.ts", "src/raw-imports.d.ts"],
+  // Checked by tsconfig.server-sql.json, with strictNullChecks
+  "exclude": ["test/server/sql/**"]
 }
