@@ -110,12 +110,16 @@ export function nodeSqliteDb(database) {
 
 /**
  * The seam over Postgres: a `pg` Pool (PostgresDialect) or PGlite. `atomic` is a real transaction. Its isolation level
- * decides whether the service's guarded writes stay safe under concurrency (see the study's risks); a serialization
- * failure is not retried here yet.
- * @param {{ pool?: any, pglite?: any, isolation?: 'serializable' | 'repeatable read' | 'read committed' }} opts
+ * decides whether the service's guarded writes stay safe under concurrency (see the study's risks). Under SERIALIZABLE
+ * Postgres aborts one of two conflicting transactions (40001) or breaks a deadlock (40P01); the list is then run again
+ * from the start, up to `retries` times.
+ * @param {{
+ *   pool?: any, pglite?: any, isolation?: 'serializable' | 'repeatable read' | 'read committed',
+ *   retries?: number, onRetry?: (code: string) => void,
+ * }} opts
  * @returns {SqlDb}
  */
-export function postgresDb({ pool, pglite, isolation = 'serializable' }) {
+export function postgresDb({ pool, pglite, isolation = 'serializable', retries = 8, onRetry = () => {} }) {
   const dialect = pglite ? new PGliteDialect({ pglite }) : new PostgresDialect({ pool });
   const kysely = new Kysely({ dialect });
   /** @param {any} r @returns {Result} */
@@ -132,14 +136,24 @@ export function postgresDb({ pool, pglite, isolation = 'serializable' }) {
     backend: 'postgres',
     kysely,
     run: (q) => runOn(kysely, q),
-    atomic: (list) => kysely.transaction().setIsolationLevel(isolation).execute(async (trx) => {
-      const out = [];
-      for (const q of list) {
-        if (isD1Statement(q)) throw new Error('A raw D1 statement cannot run on Postgres: convert it first.');
-        out.push(await runOn(trx, q));
+    async atomic(list) {
+      for (let attempt = 0; ; attempt++) {
+        try {
+          return await kysely.transaction().setIsolationLevel(isolation).execute(async (trx) => {
+            const out = [];
+            for (const q of list) {
+              if (isD1Statement(q)) throw new Error('A raw D1 statement cannot run on Postgres: convert it first.');
+              out.push(await runOn(trx, q));
+            }
+            return out;
+          });
+        } catch (e) {
+          const code = /** @type {any} */ (e)?.code;
+          if ((code !== '40001' && code !== '40P01') || attempt >= retries) throw e;
+          onRetry(code);
+        }
       }
-      return out;
-    }),
+    },
   };
 }
 
