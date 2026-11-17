@@ -15,7 +15,7 @@
     "src/combat/weapon/weaponRig.js": 2001,
     "src/formats/blocksFile.js": 1008,
     "src/formats/morrowind/mwFirstPerson.js": 2207,
-    "src/formats/morrowind/mwNifFile.js": 1138,
+    "src/formats/morrowind/mwNifFile.js": 1134,
     "src/net/accountClient.js": 2286,
     "src/net/gate/gateBrain.js": 2315,
     "src/net/npcChapterLaw.js": 1427,

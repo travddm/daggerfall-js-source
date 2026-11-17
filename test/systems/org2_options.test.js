@@ -15,7 +15,10 @@ import '../../src/systems/featureLanes.js';
 import { FEATURES, featureForControl, resolveControl } from '../../src/systems/features.js';
 import { CATEGORIES, CATEGORY_IDS, whereIs, optionPath, isSettingItem, keysOf } from '../../src/ui/settings/settingsMap.js';
 import { GRAPHICS_PRESETS, PRESET_ROWS, PRESET_PARTS, presetNow } from '../../src/systems/graphicsPresets.js';
-import { ALL_KEYS, DEFAULTS, effectiveSettings, setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
+import { ALL_KEYS, DEFAULTS, effectiveSettings, getString, setValue, _resetForTests as resetSettings } from '../../src/systems/settings/settings.js';
+import { SHARP } from '../../src/render/sharp-texels.ts';
+import { POINT } from '../../src/render/world-texture-filter.ts';
+import { CLASSIC_RENDERING_VIDEO } from '../../src/systems/classic-rendering-preset.ts';
 import { getPref, setPref, PREF_DEFAULTS, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { _resetModSettings } from '../../src/systems/modSettings.js';
 import { _resetRenderScaleDoor } from '../../src/systems/renderScale.js';
@@ -166,6 +169,19 @@ test('ORG2: the graphics preset - High is how the game ships, every value is one
     applyGraphicsPreset(GRAPHICS_PRESETS[0]);
     setPref('steadyShadows', true);   // MEM-AUDIT: a part the player set on Low's rows
     assert.equal(presetNow(valueOf, getPref), null, 'a part of the player\'s own is Custom too');
+  } finally { delete globalThis.location; fresh(); }
+});
+
+test('the world texture filter: Sharp on every quality preset, as measured no slower than Point; the Classic preset sets Point', () => {
+  fresh();
+  try {
+    globalThis.location = { search: '' };
+    assert.equal(getString('Video', 'MainFilterMode'), String(SHARP), 'a fresh shelf, which reads High, is Sharp');
+    for (const p of GRAPHICS_PRESETS) {
+      applyGraphicsPreset(p);
+      assert.equal(getString('Video', 'MainFilterMode'), String(SHARP), `${p.id} leaves the world filter Sharp`);
+    }
+    assert.equal(CLASSIC_RENDERING_VIDEO['Video/MainFilterMode'], String(POINT), 'the Classic preset sets Point');
   } finally { delete globalThis.location; fresh(); }
 });
 
