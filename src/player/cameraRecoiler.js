@@ -27,6 +27,7 @@
 // have no fixed Update order either.
 
 import { getInt } from '../systems/settings/settings.js';
+import { clampPitch } from './pitchLimit.js';
 
 /** CameraRecoiler.cs:33. */
 export const BASE_MAX_RECOIL_SEVERITY = 50;
@@ -72,7 +73,7 @@ export class CameraRecoiler {
     setting = getInt('Controls', 'CameraRecoilStrength', 0, 4), rolls = Math.random } = {}) {
     // Take last frame's offset back off the look (the mouselook's
     // absolute write, PlayerMouseLook.cs:257).
-    cam.pitch += this.applied[0] * DEG;
+    cam.pitch = clampPitch(cam.pitch + this.applied[0] * DEG);
     cam.yaw -= this.applied[1] * DEG;
     this.applied = [0, 0];
     if (setting === 0 || paused) return false;
@@ -88,9 +89,12 @@ export class CameraRecoiler {
     const scalar = recoilRotationScalar(setting, healthLost, this.timer, this.timerStart);
     const xAngle = Math.sin(this.timer) * scalar * this.swayAxis[0];
     const yAngle = Math.sin(this.timer) * scalar * this.swayAxis[1];
-    cam.pitch -= xAngle * DEG;   // Rotate(+x) pitches DOWN in Unity's frame; the port's +pitch looks up
+    // Rotate(+x) pitches DOWN in Unity's frame; the port's +pitch looks up. Unity's Rotate cannot pass the pole; the
+    // port's Euler pitch can, so the reel stops at the limit and records only what it moved.
+    const pitchBefore = cam.pitch;
+    cam.pitch = clampPitch(pitchBefore - xAngle * DEG);
     cam.yaw += yAngle * DEG;     // Rotate(+y) turns right, as the port's +yaw does
-    this.applied = [xAngle, yAngle];
+    this.applied = [(pitchBefore - cam.pitch) / DEG, yAngle];
     this.swaying = this.timer > 0;
     return true;
   }

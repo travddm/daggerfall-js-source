@@ -22,6 +22,7 @@
 
 import { getBool } from '../systems/settings/settings.js';
 import { WALK_STEP_INTERVAL } from '../systems/footsteps.js';
+import { clampPitch } from './pitchLimit.js';
 
 /** bobSpeed = WalkStepInterval / 2 (:41). */
 export const BOB_SPEED = WALK_STEP_INTERVAL / 2;
@@ -83,7 +84,7 @@ export class HeadBobber {
   } = {}) {
     // Take last frame's nod back off the look (Rotate is per-frame on
     // top of PlayerMouseLook's absolute write).
-    cam.pitch += this.nod[0] * DEG;
+    cam.pitch = clampPitch(cam.pitch + this.nod[0] * DEG);
     cam.yaw -= this.nod[1] * DEG;
     this.nod = [0, 0];
     // TWO-HANDS (AUDIT): the timer, handed out for the running hands' stride - the same clock
@@ -129,8 +130,11 @@ export class HeadBobber {
     posY = this._applySimpleBouncing(dt, posY, { grounded, swimming, climbing, levitating });
     this.offset = [posX, posY];
     // Rotate(newRotation): x pitches down in Unity's frame, y turns right.
-    this.nod = [rotX, rotY];
-    cam.pitch -= rotX * DEG;
+    // Unity's Rotate composes as a quaternion and cannot pass the pole; the port's Euler pitch can, so the nod stops at
+    // the limit and records only what it moved.
+    const pitchBefore = cam.pitch;
+    cam.pitch = clampPitch(pitchBefore - rotX * DEG);
+    this.nod = [(pitchBefore - cam.pitch) / DEG, rotY];
     cam.yaw += rotY * DEG;
     return this.offset;
   }
