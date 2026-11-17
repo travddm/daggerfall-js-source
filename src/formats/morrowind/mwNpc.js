@@ -7,30 +7,14 @@
 //
 // Skinned parts (the *_skins chest/groin/limb pieces) rebind onto the
 // base skeleton by bone name (mwCharacter.js); UNSKINNED parts carry
-// the bone they attach at, the OpenMW sPartList mapping. Paired limbs
-// name both sides - the mirror-attach render lands with the clothing
-// slice, the DATA is complete here.
+// the bone they attach at (mw-body-part-bones.ts). Paired limbs name both
+// sides; which side a mesh takes is decided where it is attached.
 
 import { MW_BODY_PARTS, BODY_TYPE, isFirstPersonId } from './mwEsmFile.js';
+import { bodyPartBones } from './mw-body-part-bones.ts';
 
 /** Attach bone(s) per slot for unskinned parts, retail bone names. */
-export const PART_BONES = Object.freeze({
-  head: ['head'],
-  hair: ['head'],
-  neck: ['neck'],
-  chest: ['chest'],
-  groin: ['groin'],
-  tail: ['tail'],
-  hand: ['left hand', 'right hand'],
-  wrist: ['left wrist', 'right wrist'],
-  forearm: ['left forearm', 'right forearm'],
-  upperarm: ['left upper arm', 'right upper arm'],
-  foot: ['left foot', 'right foot'],
-  ankle: ['left ankle', 'right ankle'],
-  knee: ['left knee', 'right knee'],
-  upperleg: ['left upper leg', 'right upper leg'],
-  clavicle: ['left clavicle', 'right clavicle'],
-});
+export const PART_BONES = bodyPartBones(MW_BODY_PARTS);
 
 /** meshes\ prefix the MODL paths are relative to. */
 export const MESH_ROOT = 'meshes\\';
@@ -112,10 +96,8 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
   }
 
   // Beast races walk on their own skeleton; an NPC_ MODL overrides all.
-  // the FEMALE column was missing - getActorSkeleton
-  // (actorutil.cpp, !firstPerson branch) picks base_anim_female.nif for
-  // a female non-beast, and beast wins over sex exactly as the
-  // reference's if-ladder orders it.
+  // A female non-beast takes base_anim_female.nif, and a beast race takes its
+  // own skeleton whatever the sex.
   const animFile = npc.model
     ? MESH_ROOT + npc.model
     : race.beast
@@ -138,23 +120,13 @@ export function assembleNpc(esm, npcId, skinIndex = null) {
 // by race and sex exactly as the third-person body is, in their
 // first-person variants.
 
-/* FIRST-PERSON HELPERS THAT SPLICE A FILENAME ARE DELIBERATELY NOT HERE.
- * Such helpers (FIRST_PERSON_SLOTS, firstPersonModel and
- * firstPersonArmParts) would encode a rule that is wrong in kind:
- * firstPersonModel would splice ".1st" into a body part's MESH FILENAME and
- * ask the archive for the result.
+/* A first-person body part is found by its record, not by a file name. The first-person variant of a part is a BODY
+ * record whose ID ends in "1st", and that record carries its own MODL, unrelated to the third-person one, so splicing
+ * ".1st" into a mesh path finds nothing. Retail names do not follow the slot stem either: the Nord male hand record is
+ * `b_n_nord_m_handS.1st` (plural), and `b_n_nord_m_upper arm` contains a space.
  *
- * The engine never transforms a path. A first-person body part is a
- * RECORD whose ID ends in "1st" (components/esm3/loadbody.cpp:85-88),
- * and that record carries its OWN MODL, unrelated
- * to the third-person one. Retail data settled it beyond argument: the
- * Nord male hand record is `b_n_nord_m_handS.1st` - PLURAL - so a name
- * built from the singular slot stem finds nothing at all, and
- * `b_n_nord_m_upper arm` contains a SPACE.
- *
- * The correct lookup lives in src/formats/morrowind/mwEsmFile.js (isFirstPersonId) and
- * src/formats/morrowind/mwFirstPerson.js (armReport, armMeshPaths), pinned against hand-built records and proven
- * against real archives.
+ * The lookup lives in src/formats/morrowind/mwEsmFile.js (isFirstPersonId) and src/formats/morrowind/mwFirstPerson.js
+ * (armReport, armMeshPaths).
  */
 
 /**
