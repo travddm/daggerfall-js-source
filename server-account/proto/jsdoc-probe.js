@@ -7,3 +7,15 @@ export function probe(k) {
   k.selectFrom('no_such_table').selectAll();
   k.updateTable('market_orders').set({ escrow: 'text, not a number' });
 }
+
+// Drizzle, with one dialect's tables named directly (no runtime switch): each line below must fail too.
+import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import { eq } from 'drizzle-orm';
+import { sqliteTables } from '../src/sql/drizzle-schema.js';
+export function drizzleProbe() {
+  const d = drizzle(async () => ({ rows: [] }));
+  const o = sqliteTables.marketOrders;
+  d.select({ x: o.noSuchColumn }).from(o);
+  d.update(o).set({ escrow: 'text, not a number' });
+  d.select().from(o).where(eq(o.escrow, 'text'));
+}

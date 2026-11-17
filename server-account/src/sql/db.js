@@ -6,9 +6,14 @@
 // written against `atomic` keeps one shape on every backend. A query library is only the compiler here: Kysely
 // queries go in as `.compile()` output, Drizzle queries as `.toSQL()` output, and on D1 an unconverted
 // `db.prepare(...).bind(...)` statement may ride the same list while a module is half converted.
+//
+// On D1 and SQLite Kysely never executes anything: one compile-only instance per dialect (a DummyDriver) builds the
+// SQL, and the seam runs it. So no D1 dialect package is needed, and no Kysely object is built per request.
 
-import { Kysely, PostgresDialect, SqliteDialect, PGliteDialect } from 'kysely';
-import { D1Dialect } from 'kysely-d1';
+import {
+  Kysely, DummyDriver, PostgresDialect, PGliteDialect,
+  SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler,
+} from 'kysely';
 
 /**
  * @typedef {{ sql: string, parameters?: readonly unknown[], params?: readonly unknown[] }} Compiled
@@ -25,6 +30,16 @@ import { D1Dialect } from 'kysely-d1';
  * }} SqlDb
  */
 
+/** The SQLite compiler with no connection: shared by every D1 and node:sqlite seam. */
+const sqliteCompiler = new Kysely({
+  dialect: {
+    createAdapter: () => new SqliteAdapter(),
+    createDriver: () => new DummyDriver(),
+    createIntrospector: (db) => new SqliteIntrospector(db),
+    createQueryCompiler: () => new SqliteQueryCompiler(),
+  },
+});
+
 /** @param {any} q @returns {Compiled} */
 const compiledOf = (q) => (typeof q?.compile === 'function' ? q.compile() : q);
 /** @param {Compiled} c */
@@ -39,7 +54,6 @@ const isD1Statement = (q) => typeof q?.bind === 'function' && typeof q?.first ==
  * @returns {SqlDb}
  */
 export function d1Db(binding) {
-  const kysely = new Kysely({ dialect: new D1Dialect({ database: binding }) });
   /** @param {any} q */
   const statementOf = (q) => {
     if (isD1Statement(q)) return q;
@@ -51,45 +65,34 @@ export function d1Db(binding) {
   return {
     dialect: 'sqlite',
     backend: 'd1',
-    kysely,
+    kysely: sqliteCompiler,
     run: async (q) => resultOf(await statementOf(q).all()),
     atomic: async (list) => (await binding.batch(list.map(statementOf))).map(resultOf),
   };
 }
 
 /**
- * The seam over Node's built-in SQLite (`node:sqlite` DatabaseSync): one self-hosted server with no D1 shim.
+ * The seam over Node's built-in SQLite (`node:sqlite` DatabaseSync), for a Node host or a tool. workerd has no
+ * node:sqlite; there the D1 shim serves SQLite.
  * @param {import('node:sqlite').DatabaseSync} database
  * @returns {SqlDb}
  */
 export function nodeSqliteDb(database) {
-  // Kysely's SqliteDialect expects better-sqlite3's statement shape: `reader`, and parameters as one array.
-  const shaped = {
-    close: () => database.close(),
-    /** @param {string} sql */
-    prepare(sql) {
-      const stmt = database.prepare(sql);
-      return {
-        reader: stmt.columns().length > 0,
-        /** @param {any[]} p */ all: (p) => stmt.all(...p),
-        /** @param {any[]} p */ run: (p) => stmt.run(...p),
-        /** @param {any[]} p */ iterate: (p) => stmt.iterate(...p),
-      };
-    },
-  };
-  const kysely = new Kysely({ dialect: new SqliteDialect({ database: /** @type {any} */ (shaped) }) });
   /** @param {any} q @returns {Result} */
   const runSync = (q) => {
     const c = compiledOf(q);
     const stmt = database.prepare(c.sql);
-    const p = /** @type {any[]} */ (paramsOf(c));
-    if (stmt.columns().length > 0) return { rows: stmt.all(...p), changes: Number(database.prepare('SELECT changes() AS n').get()?.n ?? 0) };
-    return { rows: [], changes: Number(stmt.run(...p).changes) };
+    const params = /** @type {any[]} */ (paramsOf(c));
+    if (stmt.columns().length > 0) {
+      const rows = stmt.all(...params);
+      return { rows, changes: Number(database.prepare('SELECT changes() AS n').get()?.n ?? 0) };
+    }
+    return { rows: [], changes: Number(stmt.run(...params).changes) };
   };
   return {
     dialect: 'sqlite',
     backend: 'node-sqlite',
-    kysely,
+    kysely: sqliteCompiler,
     run: async (q) => runSync(q),
     async atomic(list) {
       database.exec('BEGIN IMMEDIATE');
@@ -107,7 +110,8 @@ export function nodeSqliteDb(database) {
 
 /**
  * The seam over Postgres: a `pg` Pool (PostgresDialect) or PGlite. `atomic` is a real transaction. Its isolation level
- * decides whether the service's guarded writes stay safe under concurrency (see the study's risks).
+ * decides whether the service's guarded writes stay safe under concurrency (see the study's risks); a serialization
+ * failure is not retried here yet.
  * @param {{ pool?: any, pglite?: any, isolation?: 'serializable' | 'repeatable read' | 'read committed' }} opts
  * @returns {SqlDb}
  */
@@ -119,6 +123,7 @@ export function postgresDb({ pool, pglite, isolation = 'serializable' }) {
   /** @param {any} exec @param {any} q */
   const runOn = async (exec, q) => {
     const c = compiledOf(q);
+    // A Drizzle statement has no Kysely operation node; Kysely's executor needs one only to pick its result shape
     if (!('query' in c)) return resultOf(await exec.executeQuery({ ...c, parameters: paramsOf(c), query: { kind: 'RawNode' } }));
     return resultOf(await exec.executeQuery(c));
   };

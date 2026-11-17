@@ -21,10 +21,15 @@
  * }} MarksLedgerTable
  * @typedef {{ account: string, balance: number }} MarksTable
  * @typedef {{
+ *   id: string, insignia: string | null, insignia_spent: number, last_seen: number,
+ * }} PlayersTable
+ *   Only the columns the converted code reads; the table has more.
+ * @typedef {{
  *   broker_sales: BrokerSalesTable,
  *   market_orders: MarketOrdersTable,
  *   marks_ledger: MarksLedgerTable,
  *   marks: MarksTable,
+ *   players: PlayersTable,
  * }} Database
  */
 

@@ -41,7 +41,8 @@ import { NAME_MAX } from '../../src/net/wire.js';   // NAME-AS: the wire's bound
 import { checkName } from '../../src/net/nameFilter.js';   // NAME-AS: which word a character's name was refused for (NAME-F: a refusal names it)
 import { wardrobeOf, equipRefusal, canModerate, isDeveloper, auraRefusal, glyphRefusal, glyphsHidden, iconRefusal } from './titles.js';   // ACC3: what a player holds, wears and is true of - all four derived; WB9g: and the aura worn
 import { brokerRidOk, brokerSaleOf, brokerSaleWrite, brokerRidFreeSql } from './brokerSales.js';
-import { sqlOf } from './sql/db.js';   // AUDIT FB1024 (BROKER-RID): a press by its request id
+import { sqlOf } from './sql/db.js';
+import { insigniaSaleStatement } from './insignia-sale-kysely.js';   // AUDIT FB1024 (BROKER-RID): a press by its request id
 import { insigniaById, insigniaHeld } from '../../src/net/insignia.js';   // WB9g: the Broker's insignia - one law both ends
 import { ID_RE, nameIsIssuable } from '../../src/net/identityToken.js';
 import { PLAY_GRACE_S } from '../../src/net/playClock.js';   // ACC4: the widest gap one beat may credit - one home both ends
@@ -608,15 +609,7 @@ export async function buyInsignia({ db, nowS }, player, env, id, rid = null) {
   // first's: both paid for, one held (the id's shape is the law's own, insigniaWith's: space-separated, in sale order)
   // AUDIT FB1024 (BROKER-RID): the request id's guard rides the one UPDATE, and its row is written by that write alone
   const [sold] = await sqlOf(db).atomic([
-    db.prepare(
-      `UPDATE players SET insignia = CASE WHEN COALESCE(insignia, '') = '' THEN ?2 ELSE insignia || ' ' || ?2 END,
-         insignia_spent = insignia_spent + ?3, last_seen = ?4
-       WHERE id = ?1
-         AND (' ' || COALESCE(insignia, '') || ' ') NOT LIKE ('% ' || ?2 || ' %')
-         AND ${EMBERS_EARNED_SQL} - insignia_spent >= ?3${rid ? `
-         AND ${brokerRidFreeSql('?1', '?5')}` : ''}
-       RETURNING insignia, insignia_spent`,
-    ).bind(player.id, offer.id, offer.price, nowS, ...(rid ? [rid] : [])),
+    insigniaSaleStatement(db, { account: player.id, item: offer.id, price: offer.price, nowS, rid }),
     ...(rid ? [brokerSaleWrite(db, { account: player.id, rid, kind: 'insignia', item: offer.id, nowS })] : []),
   ]);
   const row = sold?.rows?.[0] ?? null;

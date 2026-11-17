@@ -11,7 +11,7 @@ import { drizzle as pgProxy } from 'drizzle-orm/pg-proxy';
 import * as s from 'drizzle-orm/sqlite-core';
 import * as p from 'drizzle-orm/pg-core';
 
-const sqliteTables = {
+export const sqliteTables = {
   brokerSales: s.sqliteTable('broker_sales', {
     account: s.text('account').notNull(),
     rid: s.text('rid').notNull(),
