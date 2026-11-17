@@ -9,9 +9,10 @@
 // moves out by exactly that distance, so it stops on the jamb, the floor or the lintel. A fixed move would lay the
 // door's border on the wall where the doorway is the door's own size, and the two would z-fight. A door that stands
 // proud of its wall's surface first moves back into the wall along its thickness (measureDoorDepth), its pivot with it.
-// The door is fitted on a copy of its model, one a door, and the copy is drawn only while the door is shut: it swings
-// at Daggerfall's size (doorDraw), and the depth move holds always. Both are departures from Daggerfall Unity, behind the Close interior
-// gaps row (systems/interior-seams-row.ts).
+// The door is fitted on a copy of its model, one a door, and keeps its fitted size as it swings: a door that changed
+// size as it opened showed a snap. A fitted door can cut the floor, the lintel or the jamb a little more as it swings
+// than Daggerfall's does; that is accepted. Both the fit and the depth move are departures from Daggerfall Unity,
+// behind the Close interior gaps row (systems/interior-seams-row.ts).
 
 /** The door model as world/meshReader.js dfMeshToModel answers it: positions in metres, three a vertex. */
 export type DoorModel = { positions: ArrayLike<number>; indices: ArrayLike<number>; [key: string]: unknown };
@@ -210,15 +211,15 @@ export function doorFitter(
   };
   return {
     /**
-     * The door as it is hung: `matrix` is the door's own, moved into its wall when it stood proud; `gpu` and `cpu` are
-     * the shared ones, the door as it swings; `shut`, when the door has a gap, is the mesh fitted to its doorway, drawn
-     * only while it is closed (doorDraw).
+     * The door as it is hung: `matrix` is the door's own, moved into its wall when it stood proud; `gpu` is the mesh
+     * fitted to its doorway when the door has a gap, else the shared one; `cpu` is the shared model, for the collider,
+     * which keeps Daggerfall's size.
      */
     async door(
       modelId: number,
       matrix: ArrayLike<number>,
       shared: (id: number) => Promise<unknown>,
-    ): Promise<{ gpu: unknown; cpu: DoorModel | undefined; matrix: ArrayLike<number>; shut?: unknown }> {
+    ): Promise<{ gpu: unknown; cpu: DoorModel | undefined; matrix: ArrayLike<number> }> {
       const gpu = await shared(modelId);
       const cpu = models.get(modelId);
       if (!on || !gpu || !cpu) return { gpu, cpu, matrix };
@@ -227,33 +228,13 @@ export function doorFitter(
       const hung = depth ? moveDoorMatrix(matrix, depth) : matrix;
       const gaps = measureDoorGaps(cpu, hung, roomFaces());
       if (!hasGap(gaps)) return { gpu, cpu, matrix: hung };
-      const shut = renderer.createMesh(fitDoorModel(cpu, gaps));
-      own.push(shut);
-      return { gpu, cpu, matrix: hung, shut };
+      const fitted = renderer.createMesh(fitDoorModel(cpu, gaps));
+      own.push(fitted);
+      return { gpu: fitted, cpu, matrix: hung };
     },
     destroy() {
       for (const mesh of own) renderer.destroyMesh(mesh);
       own.length = 0;
-    },
-  };
-}
-
-/** The action system's door, as much of it as the draw reads. */
-type SwingingDoor = { state: string; matrix: ArrayLike<number> };
-
-/**
- * A door's entry in the room's dynamic draws. A fitted door is drawn fitted only while it is closed: from the first
- * frame of its swing it is drawn at Daggerfall's size, and it is fitted again once it has closed. Grown to its jambs,
- * lintel and floor, an opening door would cut the floor, the lintel or the jamb where Daggerfall's does not.
- * `object` is read each frame, because a room door taken out and put back is a new object on the same entry
- * (systems/decor/decorInteriorDoors.js).
- */
-export function doorDraw(swinging: unknown, shut: unknown, object: SwingingDoor) {
-  if (!shut) return { gpu: swinging, object };
-  return {
-    object,
-    get gpu() {
-      return this.object.state === 'start' ? shut : swinging;
     },
   };
 }

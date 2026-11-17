@@ -1,7 +1,8 @@
 // The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall
 // pieces meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js), the slits
-// left between its models are filled (render/seam-fill.ts), each closed door is fitted to its own doorway, and a door
-// that stands proud of its wall is set into it (door-frame-fit.ts); scenes/interiorContext.js applies the last three.
+// left between its models are filled (render/seam-fill.ts), each door is fitted to its own doorway and keeps that size
+// as it swings, and a door that stands proud of its wall is set into it (door-frame-fit.ts); scenes/interiorContext.js
+// applies the last three.
 // Off is Daggerfall Unity's look, with the thin slits its models leave. The player's own online: the patched walls feed
 // the collider as well, but no wall edge moves more than a unit (2.5 cm), and a door's collider keeps Daggerfall's
 // size and moves at most 10 cm into its wall, so play is the same.

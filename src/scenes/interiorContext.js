@@ -20,7 +20,7 @@ import { IIL_FIREPLACE_MODELS } from '../systems/improvedInteriorLighting.js';  
 import { FlatAnimator, armFlatAnim } from '../render/flatAnimation.js';   // FA1: the flats that move
 import { layoutInterior, INTERIOR_MARKER, PROP_MODEL_TYPE } from '../world/interior/interiorLayout.js';
 import { multiply, transformPoint, identity } from '../world/mat4.js';
-import { StaticBatchBuilder, keyResolver } from '../render/staticBatch.js'; import { getPref } from '../systems/uiPrefs.js'; import { INTERIOR_SEAMS_PREF, interiorSeamsOn } from '../systems/interior-seams-row.ts'; import { doorFitter, doorDraw } from '../world/interior/door-frame-fit.ts';   // PERF6: the room's static models as one mesh; the Close interior gaps row fills its slits and fits its doors
+import { StaticBatchBuilder, keyResolver } from '../render/staticBatch.js'; import { getPref } from '../systems/uiPrefs.js'; import { INTERIOR_SEAMS_PREF, interiorSeamsOn } from '../systems/interior-seams-row.ts'; import { doorFitter } from '../world/interior/door-frame-fit.ts';   // PERF6: the room's static models as one mesh; the Close interior gaps row fills its slits and fits its doors
 import { collectInteriorLights } from '../world/interior/interiorLights.js';
 import { sealDoorsToNowhere, sealedDoorText } from '../world/interior/doorsToNowhere.js';   // FIELD BUGS 2026-10-25 DOOR-VOID
 import { setMidScreenText } from '../ui/midScreenText.js';   // DOOR-VOID: the sealed door's line, where a locked door's is said
@@ -505,12 +505,12 @@ export async function buildInteriorContext(deps, dfBlock, blockIndex, recordInde
     // `cpu.positions`, and the push would otherwise hand the frame
     // loop a {gpu: null} entry. A door model this data set lacks costs
     // the door, not the building.
-    const { gpu, cpu, matrix, shut } = await fittedDoors.door(d.modelIdNum, d.matrix, getGpuMesh);
+    const { gpu, cpu, matrix } = await fittedDoors.door(d.modelIdNum, d.matrix, getGpuMesh);
     if (!gpu || !cpu) {
       console.warn(`[interior] action-door model ${d.modelIdNum} is not in this ARCH3D - the door is skipped`);
       continue;
     }
-    dynamicDraws.push(doorDraw(gpu, shut, actions.addDoor(cpu, parent(matrix))));   // fitted while shut, Daggerfall's size as it swings
+    dynamicDraws.push({ gpu, object: actions.addDoor(cpu, parent(matrix)) });   // the fitted mesh drawn, Daggerfall's model for the collider
     hung.push([doorIndex, cpu, dynamicDraws[dynamicDraws.length - 1]]);
   }
   // FIELD BUGS 2026-10-25 DOOR-VOID: a door with no floor behind it stays shut - asked of the room's whole shell and its
