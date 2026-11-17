@@ -12,6 +12,7 @@ let closing = null;
 
 /**
  * The model as it is drawn: with the row on, a kit wall reaching its floor and ceiling; any other model as it was.
+ * Doors are fitted one by one, to their own doorway (door-frame-fit.ts).
  * @template {import('./kit-wall-ends.ts').DfMesh} M
  * @param {number} modelId
  * @param {M} mesh

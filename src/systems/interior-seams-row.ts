@@ -1,8 +1,11 @@
-// The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall pieces
-// meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js), and the slits
-// left between its models are filled (render/seam-fill.ts, applied by scenes/interiorContext.js). Off is Daggerfall
-// Unity's look, with the thin slits its models leave. The player's own online: the patched models feed the collider as
-// well, but no edge moves more than a unit (2.5 cm), so play is the same.
+// The Close interior gaps row, a Features row over the `interiorSeams` preference. On, a building interior's wall
+// pieces meet its floor and ceiling (world/interior/kit-wall-ends.ts, applied by interior-model-patches.js), the slits
+// left between its models are filled (render/seam-fill.ts), each door is fitted to its own doorway and keeps that size
+// as it swings, and a door that stands proud of its wall is set into it (door-frame-fit.ts); scenes/interiorContext.js
+// applies the last three.
+// Off is Daggerfall Unity's look, with the thin slits its models leave. The player's own online: the patched walls feed
+// the collider as well, but no wall edge moves more than a unit (2.5 cm), and a door's collider keeps Daggerfall's
+// size and moves at most 10 cm into its wall, so play is the same.
 // This file must not reach uiPrefs.js: features.js imports it, and uiPrefs.js imports features.js.
 import { t, localizedText } from './textManager.js';
 
@@ -44,7 +47,7 @@ export const INTERIOR_SEAMS_ROW: InteriorSeamsRow = Object.freeze({
   get note() {
     return t(
       'features.interiorSeams.note',
-      'Inside buildings, walls, floors and ceilings meet with no thin gap. Off shows the gaps of the original models.',
+      'Inside buildings, walls, floors and ceilings meet with no thin gap, and closed doors fill their frames. Off shows the gaps of the original models.',
     );
   },
   // the models are built once a session (scenes/dataPipeline.js)

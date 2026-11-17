@@ -89,6 +89,9 @@ Static models do not move, so a streamed map pixel merges them at build time int
 (gates, mill rotors) stay out of the batch. A building interior's batch is sealed as it is merged: near corners are
 welded and T-junctions split (`src/render/crack-seal.ts`), and, with the Close interior gaps row on, the slits up to a
 few centimetres wide between its architecture's models are filled with thin strips (`src/render/seam-fill.ts`).
+With the same row on, each swinging door is drawn on its own copy of its model, fitted to its doorway, and a door that
+stands out of its wall is set into it (`src/world/interior/door-frame-fit.ts`). The fitted door keeps that size as it
+swings; its collider keeps Daggerfall Unity's size.
 
 ## One world frame
 
