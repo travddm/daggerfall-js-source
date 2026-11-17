@@ -17,10 +17,14 @@ const digestOf = (value) => createHash('sha256').update(exactJson(value)).digest
 export const tableRows = (partBones) => Object.entries(partBones).map(([slot, bones]) => [slot, [...bones]]);
 
 /** What the assembler answers for one NPC_, as a digest; a record it refuses digests the message. */
-function digestOfNpc({ parseEsm, assembleNpc, indexSkins }, esm, skins, id) {
+function digestOfNpc({ assembleNpc }, esm, skins, id) {
   try {
     const { animFile, parts, missing } = assembleNpc(esm, id, skins);
-    return digestOf({ animFile, missing, parts: parts.map(({ slot, bodyId, model, attachBones }) => [slot, bodyId, model, attachBones]) });
+    return digestOf({
+      animFile,
+      missing,
+      parts: parts.map(({ slot, bodyId, model, attachBones }) => [slot, bodyId, model, attachBones]),
+    });
   } catch (error) {
     return `error:${digestOf(String(error.message))}`;
   }
@@ -29,7 +33,9 @@ function digestOfNpc({ parseEsm, assembleNpc, indexSkins }, esm, skins, id) {
 /** Every NPC_ of the three .esm files read as one load: the count, the ids and one digest each. */
 export function recordNpcs({ dataPath, fs, path, modules }) {
   const { parseEsm, indexSkins } = modules;
-  const files = ['Morrowind.esm', 'Tribunal.esm', 'Bloodmoon.esm'].map((name) => fs.readFileSync(path.join(dataPath, name)));
+  const files = ['Morrowind.esm', 'Tribunal.esm', 'Bloodmoon.esm'].map((name) =>
+    fs.readFileSync(path.join(dataPath, name)),
+  );
   const bytes = new Uint8Array(files.reduce((sum, file) => sum + file.byteLength, 0));
   let at = 0;
   for (const file of files) {
