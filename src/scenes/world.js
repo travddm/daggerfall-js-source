@@ -14161,8 +14161,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // journey: the following team's pose is cached to ride along, or it waits at the departure with
     // FollowFastTravel off. Before `_traveling` rises (the runtime's ready() reads it) and before the gold goes.
     const partyArrival = walkMode && typeof pick.besideAt === 'function';
-    // where the journey set out: a journey whose build fails is put back here (the catch below)
-    const departFrom = walkMode ? player.pos : cam.pos;
+    const departFrom = walkMode ? player.pos : cam.pos;   // where the journey set out: a failed build puts it back here
     const departure = {
       pixel: { ...playerTravelPixel() }, native: state.worldCoords(departFrom),
       y: departFrom[1] - state.compensation[1], yaw: cam.yaw,
@@ -14259,12 +14258,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
               return resolved;
             } : null });
       } catch (error) {
-        // A failed journey is put back where it set out, its fare returned: the journey never happened.
-        fare.refund();
-        // A journey from the helm packs a packable boat before it leaves, so only a hull still afloat is stood on.
-        const boat = partyArrival || csa.boats.includes(departure.boat) ? departure.boat : null;
-        // Restore the departure in the newly rebuilt origin frame. A guest's
-        // departure hull is retained locally across the room transition.
+        fare.refund();   // the journey never happened: its fare comes back, and it is put back where it set out
+        const boat = partyArrival || csa.boats.includes(departure.boat) ? departure.boat : null;   // a journey from the helm packed a packable boat
+        // The departure in the rebuilt origin frame; a guest's departure hull is kept locally across the room change.
         await _teleportToPixel(departure.pixel.x, departure.pixel.y, null, {
           resolveArrival: () => {
             csaSyncColliders();
