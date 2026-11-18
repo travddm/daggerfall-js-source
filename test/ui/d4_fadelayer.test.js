@@ -313,7 +313,7 @@ test('D4: the overlay seam carries the key-up edge the hosts already bind', () =
   // swallow the event rather than throw on it.
   assert.match(tt, /if \(typeof overlay\.keyup !== 'function'\) return true;/);
   for (const host of ['scenes/world.js', 'scenes/exterior.js']) {
-    assert.match(src(host), /addEventListener\('keyup'[^\n]*townTalk\.keyup\(e\);/,
+    assert.match(src(host), /(addEventListener\('keyup'|bindKeyRelease\(\{)[^\n]*townTalk\.keyup\(e\);/,
       `${host} forwards the edge it has always bound`);
   }
   // ...and the travel map routes it to whichever sub-window has the

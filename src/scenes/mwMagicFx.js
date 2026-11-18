@@ -17,9 +17,8 @@
 // renderer's own camera, where the impact pass draws.
 //
 // THE PLACEMENTS (the reference's):
-//   an actor's effect  at its feet - the object root (Animation::addEffect, bone ""); a creature's scaled and lifted
-//                      by its own size (the !isNpc autoTransform: max(x, y, z/2) / 64 when that passes 1, the offset
-//                      off a 128-unit body) - formats/morrowind/mwSpellFx.js actorFxTransform
+//   an actor's effect  at its feet, on the actor's root; a creature's is scaled and lowered by its own size
+//                      (formats/morrowind/mw-actor-fx-size.ts)
 //   a burst            at the point, area x 2 in scale, no turn (EffectManager::addEffect - position and scale alone)
 //   a bolt             at the missile, its +Y along the flight (launchMagicBolt's pitch then yaw), spinning about -Y
 //

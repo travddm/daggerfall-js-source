@@ -89,3 +89,29 @@ test('REVENANT-VOICE the record: a new revenant draws its personality from its i
   assert.equal(beastEv.body, 'Rises slowly and falls in at your side with a tired, rumbling sigh.');
   N._resetRevenantForTests();
 });
+
+test('a mindless revenant, a skeleton, a zombie or an atronach, is told without an animal manner in every temperament and at every moment; a beast keeps its own (mutants: the beast table for the mindless; the mindless manner lost)', async () => {
+  const ANIMAL = /yip|snarl|whine|howl|scent|taste|pads |slinks|rumbling/i;
+  const MINDLESS = [MOBILE_TYPES.SkeletalWarrior, MOBILE_TYPES.Zombie, MOBILE_TYPES.FireAtronach, MOBILE_TYPES.IronAtronach, MOBILE_TYPES.FleshAtronach, MOBILE_TYPES.IceAtronach];
+  for (const mobileType of MINDLESS) {
+    for (const personality of PERSONALITY_IDS) {
+      for (const deed of ['slew', 'fled']) {
+        const taunt = N.revenantTaunt({ id: 'r-mindless', name: 'Bones', mobileType, personality, rank: 1, kills: 0, history: [{ deed }] }, 'Ayla Stormwind');
+        assert.match(taunt, /^Bones [a-z]/, 'the narrator tells it');
+        assert.doesNotMatch(taunt, ANIMAL, `${mobileType} ${personality} ${deed}: ${taunt}`);
+      }
+    }
+  }
+  const { mindlessBody, MINDLESS_KINDS } = await import('../../../src/systems/revenant/mindless-revenant-body.js');
+  assert.deepEqual([...MINDLESS_KINDS].sort((a, b) => a - b), [...MINDLESS].sort((a, b) => a - b));
+  const moments = [...VOICE_EVENTS, 'learned', 'signature', 'laststand', 'stole', 'festered', 'felled_return', 'routed_return', 'deserted', 'betrayed', 'devoted_warn'];
+  for (const personality of PERSONALITY_IDS) {
+    for (const moment of moments) {
+      const body = mindlessBody(personality, moment);
+      assert.doesNotMatch(body, ANIMAL, `${personality} ${moment}: ${body}`);
+      assert.doesNotMatch(body, /\{manner\}/, `${personality} ${moment}: filled`);
+    }
+  }
+  const rat = N.revenantTaunt({ id: 'r-beast', name: 'Whiskers', mobileType: MOBILE_TYPES.Rat, personality: 'humorous', rank: 1, kills: 0, history: [{ deed: 'slew' }] }, 'Ayla');
+  assert.equal(rat, 'Whiskers circles you with a playful yip. It remembers the taste of you.', 'a beast is still a beast');
+});
