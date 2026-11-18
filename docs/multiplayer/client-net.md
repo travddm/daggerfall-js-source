@@ -55,6 +55,9 @@ new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintTo
   address.
   The profile door picks the relay by the same order (`relayServerOf`), so the page installs the profile of the
   relay it joins.
+  A `?server=` link to a relay that is not the saved one and that the player has not accepted before opens a
+  full-screen prompt first (`server-link-confirm.ts`). Nothing is fetched or sent until the player chooses Join, and
+  the accepted relay is remembered under `dagger.online.joinedServers`.
 - **Sessions per page.** One presence session (the player's body in the world) and separate chat channel sessions
   (`presence: false`, `wire2: true`, sharing `pageWave`). Instance, staff and caravan links create their
   own sessions.
