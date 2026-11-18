@@ -436,8 +436,8 @@ export function voiceLine(personality, event, { p = 'stranger', rolls = Math.ran
   if (!pool.length) return null;
   return fill(pool[Math.min(pool.length - 1, Math.floor(rolls() * pool.length))], p);
 }
-/** What a beast does at a moment, in its temperament - the narrator's sentence. */
-export function beastBody(personality, event) {
-  const manner = PERSONALITIES[isPersonality(personality) ? personality : 'brutal'].manner;
+/** What a beast does at a moment, in its temperament - the narrator's sentence. `manner` replaces the temperament's
+ *  own (a mindless kind's, mindless-revenant-body.js). */
+export function beastBody(personality, event, manner = PERSONALITIES[isPersonality(personality) ? personality : 'brutal'].manner) {
   return (BEAST[event] ?? 'Watches you {manner}.').replace('{manner}', manner);
 }

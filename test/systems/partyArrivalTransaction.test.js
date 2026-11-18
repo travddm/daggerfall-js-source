@@ -5,6 +5,7 @@ import { deductGold, deductGoldPieces } from '../../src/systems/court.js';
 import { StreamingWorldState } from '../../src/world/streamingWorld.js';
 import { waitForPartyArrival, PartyArrivalUnavailable, PARTY_ARRIVAL_TEXT, createPartyArrival, besideLeaderLanding } from '../../src/systems/party/partyArrival.js';
 import { BESIDE_OFFSETS } from '../../src/systems/party/partyTravelLaw.js';
+import { travelFare, travelFailedText } from '../../src/systems/travel/travel-fare.js';
 import { rig, HULL_NAMES } from '../partyBoatTeleportRig.mjs';
 
 const source = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
@@ -31,7 +32,7 @@ function host({ safe = true, target = true, failBuild = false, boat = false, own
     _partyTravelOriginBoat: null, _partyArrivalPending: false,
     hccRuntimeOn: () => ({ handlePreFastTravel: () => { if (preThrows) throw new Error('pre'); events.push('pre'); }, handlePostFastTravel: () => { events.push('post'); if (postThrows) throw new Error('post'); } }),
     navalStow: no, csaRuntime: { isSailing: () => helmHeld, OnPreFastTravel: () => { helmHeld = false; events.push('pack'); }, StopSailing: () => { helmHeld = false; events.push('stop-sailing'); }, OnPostFastTravel: no },
-    csaCall: (f) => f(), deductGoldPieces, deductGold, playerEntity: entity,
+    csaCall: (f) => f(), deductGoldPieces, deductGold, travelFare, travelFailedText, playerEntity: entity,
     warmAshesOn: () => false, warmAshesPreTravel: no, isOnShip: () => false, cacheExteriorScene: no,
     _teleportToPixel: async (x, y, local, opts) => {
       events.push(`build:${x}`); state.init(x, y);
@@ -116,6 +117,18 @@ test('TRANSACTION: ordinary fast travel retains the existing fare and arrival be
   assert.deepEqual(h.commits, [[409, 10, 409]]);
   assert.ok(h.events.indexOf('pack') < h.events.indexOf('build:300'));
   assert.equal(h.counts().waits, 0);
+});
+
+test('a fast travel whose build fails is put back where it set out, its fare returned, the screen cleared and the player told - it threw, and left the screen black (mutants: the throw kept; no refund)', async () => {
+  const h = host({ failBuild: true }); delete h.pick.besideAt;
+  assert.equal(await h.run(h.pick, {}, fare), false, 'the journey did not happen');
+  assert.deepEqual(h.events.filter((e) => e.startsWith('build:')), ['build:300', 'build:100'], 'the destination failed, the departure built again');
+  assert.deepEqual(h.commits, [[20, 12, 30]], 'back where it set out');
+  assert.equal(h.entity.goldPieces, 100, 'the fare returned');
+  assert.ok(h.events.includes('clear'), 'the screen cleared');
+  assert.equal(h.lines.at(-1), travelFailedText());
+  assert.equal(h.counts().advances, 0, 'no time passed');
+  assert.deepEqual(h.flags(), [false, false, null]);
 });
 
 test('RETRY: the cap terminates even with a stalled clock', async () => {
