@@ -153,7 +153,7 @@ test('AUDIT 28 F-C1/F-C2: settle drops the owed look (SetFacing -> Init), and ev
     if (host !== 'src/scenes/interior.js') {
       // The raw button, tracked on the window and never gated - HasAction(SwingWeapon).
       assert.match(s, /addEventListener\('mousedown', \(e\) => \{ if \(isSwingButton\(e\.button\)\) rightHeld = true;/, `${host}: down`);
-      assert.match(s, /addEventListener\('mouseup', \(e\) => \{ if \(isSwingButton\(e\.button\)\) rightHeld = false;/, `${host}: up`);
+      assert.match(s, /(addEventListener\('mouseup', |bindButtonRelease\(\{[^\n]*released: )\(e\) => \{ if \(isSwingButton\(e\.button\)\) rightHeld = false;/, `${host}: up`);
     }
   }
 });
