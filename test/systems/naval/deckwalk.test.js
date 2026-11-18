@@ -426,7 +426,7 @@ test('SHIPMATES THE SPELL: the player\'s area, touch, missile and blast pass a s
   for (let i = 0; i < 60 && !ball.hurt.length; i++) ball.magic.update(0.05, [0, 0, 0]);
   assert.deepEqual(struck(ball.hurt), ['pirate'], 'the blast leaves him standing, inside its radius');
   assert.match(src('src/scenes/hostMagic.js'), /const crewBlast = isShipmate\(caster\?\.foe\);[\s\S]{0,400}if \(crewBlast && isShipmate\(t\)\) continue;[\s\S]{0,4000}if \(playerFeet && !crewBlast && sphereOverlapsCapsule\(pos, EXPLOSION_RADIUS, playerFeet, playerHeight, PLAYER_BODY_RADIUS\)\) \{/, 'a crewman\'s blast: the crew and the player passed by');
-  assert.match(src('src/scenes/hostMagic.js'), /if \(playerFeet && !isShipmate\(m\.casterFoe\)\) \{/, 'a crewman\'s missile flies past the player');
+  assert.match(src('src/scenes/hostMagic.js'), /enemyMissileStrike\(m, \{ feet: playerFeet, height: playerHeight, passesPlayer: isShipmate\(m\.casterFoe\) \}\)/, 'a crewman\'s missile flies past the player');
   assert.match(src('src/scenes/hostMagic.js'), /casterFoe \? \{ entity: m\.casterFoe\.entity, sinks: foeSinks\(m\.casterFoe\), foe: m\.casterFoe \}/, 'the caster wrapper carries its foe');
 });
 
