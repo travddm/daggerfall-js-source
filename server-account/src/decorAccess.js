@@ -9,7 +9,7 @@ import { homeMapIdOk, homeBuildingKeyOk } from '../../src/net/homeLaw.js';
 import { homeSceneName } from '../../src/net/homeScene.js';
 import { DECOR_ID_RE } from '../../src/net/decorLaw.js';
 import { OWNS } from './decor.js';
-import { dropIfUnnamed, dropObjects, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmSaveTextOf, realmSideOf, recordMovedOf, REALM_ID_RE } from './realm.js';
+import { dropIfUnnamed, dropObjects, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmHoldOf, realmSaveTextOf, realmSideOf, recordMovedOf, REALM_ID_RE } from './realm.js';
 import { HANDLE_RE } from '../../src/net/handleShape.js';
 import { ITEM_UID_RE, lawfulItem } from '../../src/systems/item/itemLaw.js';
 import { absorbStack, stacksWith } from '../../src/systems/inventory.js';
@@ -244,7 +244,7 @@ async function moveChest(ctx, player, { mapId, buildingKey, character, id, kind,
     await accessStep(db, mapId, buildingKey, id, kind, kept, ids).run();
     return { ok: true, mode: kept, names, at };
   }
-  const side = await realmActFirst(db, player.id, character, realm);
+  const side = await sideUnlessHeld(db, player.id, character, moving.length > 0, () => realmActFirst(db, player.id, character, realm));
   if (side.error || !side.at) return side.error ? side : { error: 'realm-needed' };
   const have = new Set(goodsIn(save, id).map((it) => it?.uid));
   const pour = back.filter((it) => !have.has(it.uid));
@@ -363,6 +363,18 @@ async function decorGrants(ctx, player, body) {
   return { ok: true, storage, station, bin, ...(owner ? { use } : {}) };
 }
 
+/**
+ * The realm side of a chest act, from `sideOf`, or the judge's hold when the act puts goods in the chest's bin
+ * (`putting`). Friends or guildmates can open a bin, so goods put there are handed on, as in a trade.
+ * @param {any} db @param {string} playerId @param {unknown} character @param {boolean} putting
+ * @param {() => any} sideOf
+ */
+async function sideUnlessHeld(db, playerId, character, putting, sideOf) {
+  const side = await sideOf();
+  if (side.error || !putting) return side;
+  return (await realmHoldOf(db, playerId, character)) ?? side;
+}
+
 async function decorDeposit(ctx, player, body) {
   const gate = await decorMay(ctx, player, { ...body, kind: 'storage' });
   if (gate.error) return gate;
@@ -371,7 +383,7 @@ async function decorDeposit(ctx, player, body) {
   if (heldByOther(await holdRow(ctx.db, mapId, buildingKey, id), player, character, ctx.nowS)) return { error: 'decor-busy' };
   const have = await ctx.db.prepare('SELECT 1 AS ok FROM decor_bin WHERE map_id = ? AND building_key = ? AND piece_id = ? AND uid = ?').bind(mapId, buildingKey, id, item.uid).first();
   if (have) return { ok: true, repeat: true };
-  const side = realmSideOf(character, realm);
+  const side = await sideUnlessHeld(ctx.db, player.id, character, true, () => realmSideOf(character, realm));
   if (side.error) return side;
   const blob = await getRealmBlob(ctx, player.id, character);
   if (!blob.ok) return blob;
@@ -482,7 +494,7 @@ async function decorSettle(ctx, player, body) {
   for (const uid of take) if (isCoin(bin.get(uid))) coin += bin.get(uid).stackCount ?? 1;
   for (const part of portions) if (isCoin(part.give)) coin += part.give.stackCount;
   if (purse !== undefined && coin !== purse) { await release.run(); return { error: 'no-item' }; }
-  const side = realmSideOf(character, realm);
+  const side = await sideUnlessHeld(db, player.id, character, put.length > 0, () => realmSideOf(character, realm));
   if (side.error) { await release.run(); return side; }
   const carried = new Map();
   const prep = await prepareRealmRecord(ctx, player.id, side.at, (live) => {
