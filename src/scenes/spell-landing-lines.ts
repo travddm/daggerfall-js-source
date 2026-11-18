@@ -6,7 +6,6 @@
 // throw all show. The other AssignBundle lines (reflection, paralysis) are the player's alone.
 
 import { localizedText } from '../systems/textManager.js';
-import { SPELL_ABSORBED_TEXT } from '../systems/effects.js';
 
 /** The counts applySpell returns that these lines read. */
 export interface SpellLanding {
@@ -40,7 +39,7 @@ export function sayFoeLandingFailures(
   peerCaster: string | null = null,
 ): void {
   if (!landing || peerCaster) return;
-  if (landing.absorbed) say(localizedText('spellAbsorbed', SPELL_ABSORBED_TEXT));
+  if (landing.absorbed) say(localizedText('spellAbsorbed', 'Spell was absorbed.'));
   if (landing.chanceFailed) say(saveMade());
   if (landing.saved) say(saveMade());
 }
