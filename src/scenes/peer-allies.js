@@ -4,20 +4,17 @@
 // my foes may fight.
 
 import { staticTeamOf } from '../characters/enemy/enemyTargets.js';
-import { KNIGHT_CITYWATCH_ID } from '../characters/enemy/enemyEntity.js';
 
 /**
  * @typedef {object} PoolFoe
  * @property {string | null} [companion] whose companion it is, or null
  * @property {boolean} [shipmate] a crewman, here or another player's
- * @property {any} [deckBoat] the ship whose deck it stands on
- * @property {boolean} [refugee] a raid's refugee on its way to safety
  * @property {boolean} [dead]
  * @property {string | null} [puppet] the owner's id, for a puppet of another player's foe
  * @property {number} [seq] the foe's number on its owner's frames
  * @property {number} [mobileType]
  * @property {{ isHostile?: boolean } | null} [ai]
- * @property {{ team?: string, mobileTeam?: string, name?: string } | null} [entity]
+ * @property {{ team?: string, mobileTeam?: string, name?: string, summoned?: boolean } | null} [entity]
  */
 
 /**
@@ -39,16 +36,15 @@ export function coopCandidates(foe, puppets) {
 }
 
 /**
- * Whether a foe of mine fights at my side: a companion, or a foe on the player's team that is no crewman, no refugee
- * and no watchman (a summon, or an ally that an item or a spell called). Crew, refugees and the watch ride frame words
- * of their own.
+ * Whether a foe of mine fights at my side: a companion, or my summon (a summoned body on the player's team). Crew,
+ * refugees and the watch ride frame words of their own. A crewman off the deck is on the player's team too, but no
+ * longer anyone's ally on another player's screen, so the team alone does not decide.
  * @param {PoolFoe | null | undefined} foe
  */
 export function fightsAtMySide(foe) {
   if (!foe || foe.puppet) return false;
   if (foe.companion != null) return true;
-  if (foe.entity?.team !== 'PlayerAlly') return false;
-  return !foe.shipmate && foe.deckBoat == null && !foe.refugee && foe.mobileType !== KNIGHT_CITYWATCH_ID;
+  return foe.entity?.team === 'PlayerAlly' && foe.entity.summoned === true;
 }
 
 /**

@@ -4,6 +4,7 @@ import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
+import { summonedBody } from '../../src/systems/foeLootCap.js';
 
 function craftCfg({ hpPerLevel = 4, speed = 90, str = 40, agi = 85, luck = 55, atkFlags = 0x08 } = {}) {
   const bytes = new Uint8Array(74);
@@ -95,7 +96,7 @@ async function summonAndOrc() {
   const B = createExteriorFoes(poolRig());
   A.setNet(netAs('mac-0001', hitsA));
   B.setNet(netAs('bob-0002', hitsB));
-  const summon = await A.spawnFoe(0, [10, 0, 10], { feetGiven: true, allied: true, loose: true });
+  const summon = summonedBody(await A.spawnFoe(0, [10, 0, 10], { feetGiven: true, allied: true, loose: true }));
   const orc = await B.spawnFoe(3, [12, 0, 12], { feetGiven: true });
   const frame = A.foesFrame(true);
   B.applyFoes('mac-0001', frame);

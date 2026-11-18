@@ -23,15 +23,16 @@ const ally = (over = {}) =>
     ...over,
   });
 
-test('my summon rides my foes frame named as my ally; a crewman, a refugee, a watchman, a body and a plain foe do not', () => {
-  const summon = ally();
+test('my summon rides my foes frame named as my ally; a crewman, a refugee, a watchman, an ally off a deck, a dead summon and a plain foe do not', () => {
+  const summon = ally({ entity: { team: 'PlayerAlly', mobileTeam: 'PlayerAlly', name: 'Daedroth', summoned: true } });
   const companion = ally({ companion: 'crew:1', shipmate: true, entity: { team: 'PlayerAlly', name: 'Brynja' } });
   const crewman = ally({ shipmate: true });
   const refugee = ally({ refugee: true });
   const watchman = ally({ mobileType: KNIGHT_CITYWATCH_ID });
-  const body = ally({ dead: true });
+  const offDeck = ally();
+  const body = ally({ dead: true, entity: { team: 'PlayerAlly', summoned: true } });
   const plain = foe();
-  const sources = [summon, companion, crewman, refugee, watchman, body, plain];
+  const sources = [summon, companion, crewman, refugee, watchman, offDeck, body, plain];
   const records = sources.map((f, i) => ({ i: i + 1, d: f.dead ? 1 : 0 }));
   const words = companionWords(records, (r) => sources[r.i - 1]);
   assert.deepEqual(words, { cp: [1, 2], cn: ['Daedroth', 'Brynja'] });
