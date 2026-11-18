@@ -375,7 +375,7 @@ test('AUDIT 39r: the hosts add and drop the mouse code on the button edges', () 
     const s = src(f);
     assert.match(s, /import \{[^}]*mouseCode[^}]*\} from '\.\.\/ui\/input\.js';/, `${f}: the one translation table`);
     const down = s.split('\n').find((l) => l.includes("addEventListener('mousedown'"));
-    const up = s.split('\n').find((l) => l.includes('const releaseMouseButton = (e) =>') || l.includes("addEventListener('mouseup', (e) =>"));
+    const up = s.split('\n').find((l) => l.includes('bindButtonRelease({') || l.includes("addEventListener('mouseup', (e) =>"));
     // MWCROUCH: the button feeds the frame's key-EDGE ring beside the
     // held Set, because an edge read (GetKeyDown/GetKeyUp) has the same
     // claim on Mouse0/1/2 that GetKey has - a slice that fed one and
