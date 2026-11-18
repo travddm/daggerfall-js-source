@@ -9,4 +9,6 @@ export const HOME_TRANSFER_REFUSAL_WORDS: Record<string, () => string> = {
   'offer-open': () => t('account.refusal.offerOpen', 'An offer for this house is already out.'),
   'offer-closed': () => t('account.refusal.offerClosed', 'That offer is no longer open.'),
   'offer-stale': () => t('account.refusal.offerStale', 'The room changed. Make the offer again.'),
+  'home-seller-held': () =>
+    t('account.refusal.homeSellerHeld', 'The owner cannot hand this house on now. Try again later.'),
 };
