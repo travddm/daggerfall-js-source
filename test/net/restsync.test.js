@@ -288,6 +288,26 @@ test('REST-SYNC: a body the joiner never saw standing is never stood, a killed e
   assert.deepEqual(out.slice(0, 3).map((r) => r.d), [0, 0, 0], 'the standing first - a body is what a crowded frame sheds');
 });
 
+test('shared encounters past the count cap: every standing one reaches a joiner, and a full frame that could not list them all takes none of them down', async () => {
+  const count = K.SHARED_FOES_MAX + 3;
+  const standing = Array.from({ length: count }, (_, n) => foe({ _encId: n + 1, ai: { feet: [n, 0, 0], yaw: 0, moving: false, target: null, height: 1.8 } }));
+  const host = side({ authority: true, shared: standing });
+  const joiner = side({ authority: false });
+  const full = host.foesFrame(true);
+  assert.equal(full.x.length, K.SHARED_FOES_MAX, 'a frame still carries at most its cap');
+  assert.equal(full.xf, undefined, 'a full frame that left a standing encounter out does not say its list is whole');
+  joiner.applyFoesFrame(full, 'host');
+  const next = host.foesFrame(false);
+  assert.deepEqual(next?.x?.map((r) => r.i), [K.SHARED_FOES_MAX + 1, K.SHARED_FOES_MAX + 2, K.SHARED_FOES_MAX + 3], 'the ones the cap left out ride the next frame');
+  joiner.applyFoesFrame(next, 'host');
+  await tick();
+  assert.equal(joiner.state._sharedById.size, count, 'the joiner stands every one of them');
+  joiner.applyFoesFrame(host.foesFrame(true), 'host');
+  await tick();
+  assert.equal(joiner.state._sharedById.size, count, 'and the next full frame takes none of them down');
+  assert.deepEqual(joiner.destroyed, []);
+});
+
 test('REST-SYNC: the encounters ride only the room the layout leaves under the wire\'s one cap - the largest elite layout\'s worst case still goes, and a frame that sheds one does not say it lists them whole', () => {
   // test/scenes/elitepscale.test.js's worst case, stood as foes: every field at its widest, every record a class foe fought by a full party
   const wide = (i) => foe({ mobileType: 140 + (i % 10), gender: 'female', _atkA: 99, _castN: 99, _castIdx: 999,
