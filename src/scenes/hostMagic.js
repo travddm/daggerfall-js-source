@@ -52,6 +52,7 @@ import { tellSpellLanded } from '../systems/spell/spellPower.js';   // SCHOOLS3:
 import '../systems/arcanePowers.js';   // AUDIT SCHOOLS L2 F8: what the paths DO, registered with THE ONE CAST ENGINE every page builds - the standalone dungeon page (scenes/dungeon.js) had their price and potency and none of their powers
 import '../systems/firmamentPowers.js';   // FIRM1: what the Firmament DOES, registered with the one cast engine every page builds, as the paths' are
 import { aimedFoeOf, enemyMissileStrike, STRUCK_PLAYER } from './enemy-missile-strike.ts';
+import { sayFoeLandingFailures, sayPlayerLandingFailures } from './spell-landing-lines.ts';
 import { startDispelSweep } from './dispel-sweep.ts';
 import { applySpell, spellReflectedText, hasActiveEffect, isSoulTrapEffect, spellSways } from '../systems/effects.js';   // WBX7: a soul trap meets the court's boss too
 import { spellToFoeOwner } from '../systems/enchantments.js';   // RPT1026-FIGHTS (TRAP-TO-OWNER): the session's door to a foe another player runs
@@ -809,6 +810,7 @@ export function createPlayerMagic({
       const trap = (foe.entity.activeEffects ?? []).find((a) => a.kind === 'soulTrap' && !a.ended);
       if (trap) trap.by = peerCaster;
     }
+    sayFoeLandingFailures(r, say, peerCaster);
     // X8: PACIFY / CHARM. The effect answers whether the target was
     // pacified; the AI flag lives on the foe RECORD rather than the
     // entity, so this door - the one place that holds both - is where
@@ -848,12 +850,7 @@ export function createPlayerMagic({
     if (caster?.entity === playerEntity && r) tellSpellLanded({ caster: playerEntity, target: playerEntity, spell, r, self: true, reflected: !!extraCtx?.reflectedCount, took: 0, cast: caster.cast ?? null });
     if (_doorFeet && !(r.saved || r.chanceFailed || r.reflected)) mwFx.hit(spell, _doorFeet);   // MW-SPELLFX1: the hit, about me
     if (r.paralyzed) say(localizedText('youAreParalyzed', 'You are paralyzed.'));   // Paralyze.cs:93
-    // S19c: AssignBundle's failure messages, player hosts only -
-    // CasterOnly chance fails say "Spell effect failed.", external
-    // contact fails and full saves say "Save versus spell made."
-    // (EntityEffectManager.cs:542, :547, :576)
-    if (r.chanceFailed) say(spell.rangeType === 0 ? localizedText('spellEffectFailed', 'Spell effect failed.') : localizedText('saveVersusSpellMade', 'Save versus spell made.'));
-    if (r.saved) say(localizedText('saveVersusSpellMade', 'Save versus spell made.'));
+    sayPlayerLandingFailures(r, say, spell.rangeType === 0);
     // X3: the ARMED half of Open/Lock. Neither effect does anything at
     // cast - it waits in forcedRoundsRemaining for a door - so this
     // line is the ONLY sign the spell worked, and DFU speaks it from

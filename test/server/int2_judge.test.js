@@ -19,7 +19,7 @@ import { judgeSave, wealthOf, possessedItemLists, groundItemLists, characterFind
 import { itemWorth } from '../../src/systems/item/itemLaw.js';
 import { calculateMaxBankLoan, calculateBankLoanRepayment } from '../../src/systems/banking.js';
 import { prepareRealmRecord, holdRefusal, dropObjects, JUDGE_COLUMNS } from '../../server-account/src/realm.js';
-import { creditSave } from '../../src/net/realm/realmGoldLaw.js';
+import { creditSave, payFromSave } from '../../src/net/realm/realmGoldLaw.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { applyRarity } from '../../src/systems/loot/lootRarity.js';
 import { seeded } from '../honestItems.mjs';
@@ -242,4 +242,21 @@ test('INT5/INT6: the service\'s own writes are WITNESSED, the next judgement cha
   assert.equal((await s.call('/v1/mod/realm-clear', { id: R.id }, mac.secret)).status, 200);
   assert.equal(s.row(R.id).held, null);
   assert.equal((await s.call('/v1/mod/realm-rollback', { id: 'r00000000000000000000' }, mac.secret)).status, 404);
+});
+
+test('INT3: a held record pays the realm nothing - a home claimed from the realm is refused, a credit still lands, a seizure asks no hold, and the hold lifted the claim goes through', async () => {
+  const s = await stand();
+  const { who, R } = await s.seat('ann', freshSave({ name: 'ann', goldPieces: 100_000 }));
+  const ctx = { db: s.env.DB, bucket: s.env.SAVES, rand: (b) => globalThis.crypto.getRandomValues(b), nowS: 1 };
+  s.raw.prepare("UPDATE realm_characters SET held = 'law' WHERE id = ?").run(R.id);
+  assert.deepEqual(await prepareRealmRecord(ctx, who.id, R.at(), (save) => (payFromSave(save, 500) ? null : 'realm-gold')), { error: 'trade-held', held: 'law' });
+  assert.ok((await prepareRealmRecord(ctx, who.id, R.at(), (save) => (creditSave(save, 1) ? null : 'bad'))).steps, 'a credit moves');
+  const claim = () => s.call('/v1/homes/claim', { mapId: 1291010263, buildingKey: 0x10203, region: 17, price: 42000, layout: null, character: R.id, realm: R.at() }, who.secret);
+  const seq = s.row(R.id).seq;
+  assert.equal((await claim()).body?.error, 'trade-held');
+  assert.equal(s.raw.prepare('SELECT COUNT(*) AS n FROM homes').get().n, 0);
+  assert.equal(s.row(R.id).seq, seq, 'the record did not move');
+  s.raw.prepare('UPDATE realm_characters SET held = NULL WHERE id = ?').run(R.id);
+  const bought = await claim();
+  assert.equal(bought.body?.ok, true, JSON.stringify(bought.body));
 });

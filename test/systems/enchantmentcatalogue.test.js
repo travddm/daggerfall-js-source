@@ -351,7 +351,7 @@ test('M4: the room check is only ever run for a bound soul (:884-897)', () => {
   assert.equal(enchantmentSettings('AbsorbsSpells', PARAM_NONE).enchantCost, 1500);
 });
 
-test('M4: removing a PARENT takes its children; removing a child takes nothing', () => {
+test('M4: removing a PARENT takes its children; a bound soul\'s child is never removed on its own', () => {
   const parent = enchantmentKey('SoulBound', MOBILE_TYPES.Ghost);
   const chosen = enchantmentSettings('SoulBound', MOBILE_TYPES.Ghost);
   const { powers, sideEffects } = forcedEnchantments('SoulBound', MOBILE_TYPES.Ghost);
@@ -362,12 +362,10 @@ test('M4: removing a PARENT takes its children; removing a child takes nothing',
   const afterParent = removeEnchantment(list, parent);
   assert.deepEqual(afterParent.map((e) => e.key), [unrelated.key], 'the soul took all three with it');
 
-  // a CHILD removed on its own takes only itself
+  // The window removes only rows with no parent (DFU EnchantmentListPicker's click handler), so a child's key
+  // matches no removable row.
   const child = sideEffects[0];
-  const afterChild = removeEnchantment(list, child.key);
-  assert.equal(afterChild.length, 4);
-  assert.ok(!afterChild.includes(child));
-  assert.ok(afterChild.includes(chosen), 'and the parent stays');
+  assert.deepEqual(removeEnchantment(list, child.key), list);
 
   // the key is the identity: same type and param, same key
   assert.equal(enchantmentKey('PotentVs', 1), enchantmentKey('PotentVs', 1));
@@ -554,4 +552,16 @@ test('M4: the secondary list alpha-sorts when flagged, and filters what is alrea
   const oneGroup = [enchantmentSettings('GoodRepWith', 0)];
   assert.deepEqual(primaryPick('GoodRepWith', { powers: oneGroup }).options.map((o) => o.param),
     [1, 2, 3, 4], 'Commoners taken, All barred, four left');
+});
+
+test('removing a chosen enchantment keeps a bound soul\'s child of the same kind (DFU EnchantmentList_OnRemoveItem)', () => {
+  // A Fire Atronach's soul forces Cast When Used: Resist Fire. The player also chose that enchantment themselves.
+  const soul = enchantmentSettings('SoulBound', MOBILE_TYPES.FireAtronach);
+  const { powers: forced } = forcedEnchantments('SoulBound', MOBILE_TYPES.FireAtronach);
+  const chosen = enchantmentSettings('CastWhenUsed', 12);
+  assert.equal(forced[0].key, chosen.key, 'the two rows share a kind');
+  const list = [soul, chosen, ...forced];
+
+  const after = removeEnchantment(list, chosen.key);
+  assert.deepEqual(after, [soul, ...forced], 'only the chosen row goes; the soul keeps its effect');
 });
