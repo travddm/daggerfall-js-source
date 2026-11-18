@@ -119,6 +119,21 @@ test('DUEL1 the wall\'s light: added onto the frame (it only brightens - see-thr
   assert.ok(DUEL_WALL_COLOR.every((v) => v >= 0 && v <= 1), 'a display colour');
 });
 
+test('the wall light is defined on every GPU: below the sweep and below the foot the shader squares a negative number, and a pow() of a negative base is undefined in GLSL (mutant: pow(x, 2.0) back)', () => {
+  const below = DUEL_WALL_BELOW_M / DUEL_WALL_HEIGHT_M;
+  for (const time of [0, 1.3, 2.6, 4.1]) {
+    for (let h = 0; h <= 1; h += 0.05) {
+      const shader = glslFunctions(DUEL_WALL_FS, {
+        vUV: [0.2, h], vWorld: [0, 0, 0], uTime: time, uColor: [1, 1, 1], uAlpha: 1, uBelow: below,
+        uFogMode: 0, uFogDensity: 0, uFogRange: [0, 1], uCamPos: [0, 0, 0],
+      }, { strictPow: true });
+      shader.main();
+      const colour = shader.globals.o;
+      assert.ok(colour.every(Number.isFinite), `a defined colour at height ${h.toFixed(2)}, time ${time}: ${colour}`);
+    }
+  }
+});
+
 test('DUEL1 the draw: one call a ring, the faded skipped, at most DUEL_WALL_RINGS_MAX; ONE, ONE blending, no depth written, both faces - and the renderer\'s state put back (mutants: depth written, the wall occluding the fight; culling left off for the world after it; a faded ring drawn)', () => {
   const calls = [];
   const gl = new Proxy({ VERTEX_SHADER: 1, FRAGMENT_SHADER: 2, COMPILE_STATUS: 3, LINK_STATUS: 4, ARRAY_BUFFER: 5, STATIC_DRAW: 6, FLOAT: 7, TRIANGLES: 8, BLEND: 9, ONE: 10, CULL_FACE: 11 }, {
