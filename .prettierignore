@@ -36,3 +36,4 @@ test/fixtures/mw/nif-material-parity.json
 test/fixtures/mw/vfx-parity.json
 test/fixtures/mw/key-parity.json
 test/fixtures/mw/npc-bones-parity.json
+test/fixtures/mw/actor-fx-parity.json

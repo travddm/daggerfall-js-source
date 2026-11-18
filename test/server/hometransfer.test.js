@@ -211,3 +211,29 @@ test('HOME-TRANSFER a batch that dies leaves the owner and both purses where the
   const hall = await call('POST', '/v1/homes/transfer', { op: 'offer', ...HOME, character: M.id, to: 'Aldric', price: 0, keepDecor: true, keepItems: false }, mara);
   assert.equal(hall.body?.error, 'no-home');
 });
+
+test('HOME-TRANSFER: a seller the judge holds cannot hand a house on - not paid, and the house, its goods and its record stay put', async () => {
+  const { env, call, registered } = await stand();
+  const aldric = await registered('Aldric');
+  const mara = await registered('Mara');
+  const A = await seatRealm(env, aldric, 'Aldric', RICH('Aldric'));
+  const M = await seatRealm(env, mara, 'Mara', RICH('Mara'));
+  assert.equal((await call('POST', '/v1/homes/claim', home({ character: A.id, realm: A.at() }), aldric)).status, 200);
+  for (const price of [1000, 0]) {
+    const sale = await call('POST', '/v1/homes/transfer', { op: 'offer', ...HOME, character: A.id, to: 'Mara', price, keepDecor: true, keepItems: true }, aldric);
+    assert.equal(sale.status, 200, JSON.stringify(sale.body));
+    env.DB._raw.prepare("UPDATE realm_characters SET held = 'law' WHERE id = ?").run(A.id);
+    const sellerSeq = realmAt(env, A.id).seq;
+    const sellerGold = recordOf(env, A.id).goldPieces;
+    const buyerGold = recordOf(env, M.id).goldPieces;
+    const took = await call('POST', '/v1/homes/transfer', { op: 'accept', id: sale.body.id, character: M.id, realm: realmAt(env, M.id) }, mara);
+    assert.equal(took.body?.error, 'home-seller-held', `price ${price}: ${JSON.stringify(took.body)}`);
+    assert.equal(took.body?.held, undefined, 'the seller\'s reason is not the buyer\'s to read');
+    assert.equal(ownerOf(env).char_id, A.id);
+    assert.equal(realmAt(env, A.id).seq, sellerSeq);
+    assert.equal(recordOf(env, A.id).goldPieces, sellerGold);
+    assert.equal(recordOf(env, M.id).goldPieces, buyerGold);
+    env.DB._raw.prepare('UPDATE realm_characters SET held = NULL WHERE id = ?').run(A.id);
+    assert.equal((await call('POST', '/v1/homes/transfer', { op: 'cancel', id: sale.body.id }, aldric)).status, 200);
+  }
+});

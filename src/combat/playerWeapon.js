@@ -631,6 +631,19 @@ export class PlayerWeapon {
     return Math.trunc(m.ticks * (m.tick ?? CLASSIC_UPDATE_INTERVAL) * 1000);
   }
 
+  /**
+   * Ends a held attack with no attack: a bow drawn, or still drawing, is put down as Activate puts it down, and a swing's
+   * tracked drag is forgotten. Used when the window loses focus with the button held: the release that would loose the
+   * arrow never comes from the player.
+   */
+  cancelHold() {
+    this._bowHeld = false;
+    this._clickHeld = false;
+    this._tracking = false;
+    this._gestureClear();
+    machineCancelBowDraw(this.machine, this.liveSpeed);
+  }
+
   /** Gesture.Clear (WeaponManager.cs:149-154). */
   _gestureClear() {
     this._gpoints.length = 0;
