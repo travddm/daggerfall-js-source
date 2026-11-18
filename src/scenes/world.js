@@ -28552,7 +28552,7 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
         // stands (the members' own senses answer too late at the journey's scale). A cautious traveller's won roll loses the
         // band; a won roll's grace lets the chase ask again. A band that cannot stand yet (a full foe pool, a road, a town)
         // still meets the journey and is spent only once it stands, as DFU's FoeSpawner retries until every foe is placed
-        // and raises OnEncounter meanwhile, which stops Travel Options' journey. Only a lost chase gives it up.
+        // and raises OnEncounter meanwhile, which stops the travel mod's journey. Only a lost chase gives it up.
         const mk = bandMake(c.band);
         const met = journeyMet();
         if (met === 'avoided') { _bandChase.delete(id); bandSpend(id); continue; }

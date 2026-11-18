@@ -478,7 +478,7 @@ test('AUDIT OW5b E1 host run: A JOURNEY AT x40 IS STOPPED THE FRAME THE BAND REA
   }
 });
 
-test('host run: a band the full foe pool cannot stand still MEETS the journey at contact, as Travel Options stops on DFU\'s OnEncounter while the spawner places; it is never spent while the pool is full, and stands once there is room (mutants: the journey not asked without room; a cap on the tries)', async () => {
+test('host run: a band the full foe pool cannot stand still MEETS the journey at contact, as the travel mod stops on DFU\'s OnEncounter while the spawner places; it is never spent while the pool is full, and stands once there is room (mutants: the journey not asked without room; a cap on the tries)', async () => {
   const h = await bandHost({ met: 'stopped', order: [], room: 1 });   // two members, room for one
   h.d._bandChase.set('b1.1.5', { band: bandAt('b1.1.5', 0, 10), pos: { x: 0, z: 10 * NATIVE_PER_M }, gainAt: 0, best: 10, tries: 0, retryAt: 0 });
   let t = 1000;
