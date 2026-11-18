@@ -62,7 +62,8 @@ import { enemyDisplayName, ENEMY_BASICS, isClassEnemyId } from '../../characters
 import { KNIGHT_CITY_WATCH } from '../../characters/mobile/mobileTypes.js';
 import { firstName, monsterName, BANK_TYPES, GENDERS } from '../../characters/nameHelper.js';
 import { getSeed, setSeed, srand } from '../../formats/dfRandom.js';
-import { personalityFor, isPersonality, personalityLabel, voiceLine, beastBody, possessive, MUTE_KINDS } from './revenantPersonality.js';   // REVENANT-VOICE: who it is, and how it talks
+import { personalityFor, isPersonality, personalityLabel, voiceLine, beastBody, possessive, MUTE_KINDS } from './revenantPersonality.js';
+import { mindlessBody, MINDLESS_KINDS } from './mindless-revenant-body.js';   // REVENANT-VOICE: who it is, and how it talks
 
 // ── the numbers ─────────────────────────────────────────────────────
 /** A revenant is a foe of this level or more (LOOT7's champion floor, ELITE-FLOOR's). */
@@ -620,7 +621,7 @@ function tauntParts(r, playerName, rolls) {
 function voiceParts(r, event, playerName, rolls = Math.random) {
   const personality = isPersonality(r.personality) ? r.personality : personalityFor(r.id, r.mobileType);
   if (!revenantSpeaks(r.mobileType)) {
-    const body = beastBody(personality, event);
+    const body = MINDLESS_KINDS.has(r.mobileType) ? mindlessBody(personality, event) : beastBody(personality, event);
     return { speech: null, body, line: `${r.name} ${body.charAt(0).toLowerCase()}${body.slice(1)}` };
   }
   const speech = voiceLine(personality, event, { p: firstWord(playerName), rolls });

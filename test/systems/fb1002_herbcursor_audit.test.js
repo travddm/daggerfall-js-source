@@ -120,7 +120,7 @@ function worldSeam(scope) {
 }
 /** The keyup listener's Escape arm. */
 function worldEscapeUp(scope) {
-  const m = WORLD.match(/addEventListener\('keyup', \(e\) => \{[^\n]*?(if \(e\.code === 'Escape' && escRelock\) \{ [^\n]*? \}) if \(e\.code === 'AltLeft'\)/);
+  const m = WORLD.match(/(?:addEventListener\('keyup', |keyUp: )\(e\) => \{[^\n]*?(if \(e\.code === 'Escape' && escRelock\) \{ [^\n]*? \}) if \(e\.code === 'AltLeft'\)/);
   assert.ok(m, 'the keyup listener\'s Escape arm');
   return new Function('scope', 'e', `with (scope) { ${m[1]} }`).bind(null, scope);
 }
