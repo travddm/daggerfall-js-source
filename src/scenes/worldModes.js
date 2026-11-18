@@ -200,6 +200,7 @@ import { isShop, stockShopShelf, stockHouseContainer, PRIVATE_PROPERTY_TEXT_ID, 
 import { BAG_WORDS, isBagItem, holdsOtherBag } from '../net/bagLaw.js';   // ONE-BAG: one Materials Bag to a character, on the keyed shelf too
 import { identifySpellPass, identifiedTallyText, notEnoughSpellPointsText, tradeCost, getTradePrice, markCounterBought } from '../systems/tradeModes.js';   // X7: the Identify SPELL's per-item roll; F067: its magicka refusal; FB0929: the keyed rows' prices are the counter's; AUDIT LW-II-2 S1: the counter's mark
 import { liveBundles, dispelBundle, dispellableBundles, DISPEL_MAGIC_TEXT } from '../systems/mysticism.js';   // X10: the Dispel Magic picker
+import { clearInteriorMissiles } from './interior-missiles.ts';
 import { ListPickerWindow, listPickerArtLoaded } from '../ui/listPicker.js';   // X10
 import { chapterRollWindow } from '../ui/chapterRoll.js';   // CHAP5a: the hall's roll, the shelf's first book
 import { createItemLabels, grantCreatedItem, lastCreateItemIndex, setLastCreateItemIndex } from '../systems/createItem.js';   // X11b
@@ -8204,14 +8205,9 @@ export function createWorldModes(host) {
     if (!landing) { console.error('exit: no exterior landing (empty sibling doors)'); return false; }   // tryEnter guards its landing; this path was unguarded - a null here killed the frame loop
     return exitInteriorNow(landing);
   }
-  /** UNSTUCK1: split from tryExit's tail so a caller with no ray at all
-   *  (the console command below) can leave through the SAME door the
-   *  player walked in by - `exitReturn.siblings` never depended on
-   *  which door was clicked, only on which one was entered, so a
-   *  landing can always be recomputed from the player's CURRENT
-   *  position with no click at all. `landing` is an optional
-   *  precomputed one so tryExit above does not pay for a second
-   *  `exteriorLanding` call it already made. */
+  /** Leave through the door the player came in by. A caller with no ray (the console command below) can use it,
+   *  because `exitReturn.siblings` depends on the door entered, not the door clicked. `landing` is optional: tryExit
+   *  passes the one it already computed. */
   function exitInteriorNow(landing = null) {
     const caravanOut = isCaravanRoom(interiorCabin);   // WAGONS1: out of the caravan's door, onto the ground behind it
     const cabinLanding = interiorCabin ? (caravanOut ? host.caravanRoom?.returnToWagon(interiorCabin) : host.sailingCabin?.returnToDeck(interiorCabin, privateVisitOwner)) : null;
@@ -8236,6 +8232,7 @@ export function createWorldModes(host) {
     _intShared = null;
     interiorFoes?.destroy?.();   // IF: OnTransitionExterior tears the interior's enemies down with it
     interiorFoes = null;
+    clearInteriorMissiles(magic);
     interiorGuards?.clearLive?.();   // ROAD-B: the watch are enemies too - same transition, same teardown
     interiorGuards = null;
     interiorNav.release();   // INDOOR-WATCH: the room's mesh and its worker, with the room
@@ -12585,6 +12582,7 @@ export function createWorldModes(host) {
         dropViewOut();   // RW1 (AUDIT): the forced way out too
         interiorFoes?.destroy?.();
         interiorFoes = null;
+        clearInteriorMissiles(magic);
         interiorGuards?.clearLive?.();   // ROAD-B: same teardown, the quest-teleport / load arm
         interiorGuards = null;
         interiorNav.release();   // INDOOR-WATCH: the same, the quest-teleport / load arm

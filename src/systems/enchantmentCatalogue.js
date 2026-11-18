@@ -406,13 +406,13 @@ export function pickEnchantment(type, param, { powers = [], sideEffects = [] } =
   };
 }
 
-/** RemoveForcedEnchantments (:916-917, EnchantmentListPicker:270).
+/** RemoveForcedEnchantments (DaggerfallItemMakerWindow EnchantmentList_OnRemoveItem, EnchantmentListPicker).
  *  Removing a PARENT takes its children out of both lists with it. A
- *  child is never removed on its own - the window's click handler
- *  only fires on panels whose ParentEnchantment == 0
- *  (EnchantmentListPicker.cs:266-271). */
+ *  child is never removed on its own: the window's click handler
+ *  only fires on panels whose ParentEnchantment == 0. So a bound soul's
+ *  child that shares the removed row's key stays, as in DFU. */
 export function removeEnchantment(list, key) {
-  return list.filter((e) => e.key !== key && e.parentEnchantment !== key);
+  return list.filter((e) => e.parentEnchantment !== key && !(e.key === key && (e.parentEnchantment ?? 0) === 0));
 }
 
 // ── the two pickers' filters (DaggerfallItemMakerWindow:614-700,

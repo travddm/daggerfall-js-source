@@ -370,3 +370,42 @@ test('DECOR-BATCH a standing poll is the revision row', async () => {
   assert.equal(empty.rev, 0);
   assert.equal(empty.pieces, undefined);
 });
+
+test('DECOR-ACCESS a character the judge holds puts nothing where another player can take it: no deposit, no settle, no chest opened to friends', async () => {
+  const { env, call, registered } = await stand();
+  const aldric = await registered('Aldric');
+  const mara = await registered('Mara');
+  const A = await seatRealm(env, aldric, 'Aldric', RICH('Aldric'));
+  const M = await seatRealm(env, mara, 'Mara', RICH('Mara', [{ ...RUBY }]));
+  const hold = (id, held) => env.DB._raw.prepare('UPDATE realm_characters SET held = ? WHERE id = ?').run(held, id);
+  const binCount = () => env.DB._raw.prepare('SELECT COUNT(*) AS n FROM decor_bin').get().n;
+  assert.equal((await call('POST', '/v1/homes/claim', home(A.id, A.at()), aldric)).status, 200);
+  assert.equal((await call('POST', '/v1/homes/decor/place', { ...HOME, character: A.id, realm: realmAt(env, A.id), piece: piece() }, aldric)).status, 200);
+  assert.equal((await call('POST', '/v1/homes/decor/use', { ...HOME, character: A.id, op: 'set', id: 'p1', kind: 'storage', mode: 'chosen_friends', names: ['Mara'] }, aldric)).status, 200);
+  hold(M.id, 'law');
+  const deposit = await call('POST', '/v1/homes/decor/use', { ...HOME, character: M.id, realm: realmAt(env, M.id), op: 'deposit', id: 'p1', item: { ...RUBY } }, mara);
+  assert.equal(deposit.body.error, 'trade-held', JSON.stringify(deposit.body));
+  assert.equal(recordOf(env, M.id).items.length, 1);
+  assert.equal(binCount(), 0);
+  assert.equal((await call('POST', '/v1/homes/decor/use', { ...HOME, character: M.id, op: 'list', id: 'p1', hold: true }, mara)).body.ok, true);
+  const settle = await call('POST', '/v1/homes/decor/use', { ...HOME, character: M.id, realm: realmAt(env, M.id), op: 'settle', id: 'p1', put: [RUBY.uid] }, mara);
+  assert.equal(settle.body.error, 'trade-held', JSON.stringify(settle.body));
+  assert.equal(recordOf(env, M.id).items.length, 1);
+  assert.equal(binCount(), 0);
+  assert.equal(env.DB._raw.prepare('SELECT COUNT(*) AS n FROM decor_hold').get().n, 0, 'a refused settle lets the chest go');
+  // the owner's own chest, its goods in the save, opened to friends while the owner is held
+  assert.equal((await call('POST', '/v1/homes/decor/use', { ...HOME, character: A.id, op: 'set', id: 'p1', kind: 'storage', mode: 'private' }, aldric)).status, 200);
+  const save = recordOf(env, A.id);
+  save.sceneCache = { scenes: [chestScene([{ ...RUBY, uid: 'abcdef0123456789' }])] };
+  layRecord(env, A.id, save);
+  hold(A.id, 'law');
+  const shared = await call('POST', '/v1/homes/decor/use', { ...HOME, character: A.id, realm: realmAt(env, A.id), op: 'set', id: 'p1', kind: 'storage', mode: 'friends', names: [] }, aldric);
+  assert.equal(shared.body.error, 'trade-held', JSON.stringify(shared.body));
+  assert.equal(binCount(), 0);
+  assert.equal(env.DB._raw.prepare('SELECT COUNT(*) AS n FROM decor_access').get().n, 0);
+  assert.equal(recordOf(env, A.id).sceneCache.scenes[0].decorItems.p1.length, 1);
+  // the hold lifted, each goes through as before
+  hold(M.id, null);
+  hold(A.id, null);
+  assert.equal((await call('POST', '/v1/homes/decor/use', { ...HOME, character: A.id, realm: realmAt(env, A.id), op: 'set', id: 'p1', kind: 'storage', mode: 'friends', names: [] }, aldric)).body.moved, true);
+});

@@ -239,8 +239,8 @@ test('AUDIT 65 CV-2: an enemy shaft meets the player at 0.45 + 0.35, two-sided, 
 });
 
 test('AUDIT 65 CV-2: EVERY player-side capsule call carries the player body, at all five sites', () => {
-  // The seam is five direct calls: hostMagic's AoE arm and its enemy
-  // missile contact, dungeonContext's two enemy-missile player arms, and
+  // The seam is five direct calls: hostMagic's AoE arm, the enemy
+  // missile contact (enemy-missile-strike.ts, which hostMagic calls), dungeonContext's two enemy-missile player arms, and
   // the shared ArrowFlight the three world hosts fly (world.js:"import { inflictPoison }",
   // exterior.js:"import { ArrowFlight, playerArrowHitFoe }", worldModes.js:"import { ArrowFlight, playerArrowHitFoe }"; the dungeon runs its own loop and
   // takes the shared player-arrow LAW at dungeonContext.js:"import { playerArrowHitFoe }") - so
@@ -248,13 +248,13 @@ test('AUDIT 65 CV-2: EVERY player-side capsule call carries the player body, at 
   // THE FOUR HOSTS RULE: the sweep is the WHOLE of src/, not a list of
   // three files, or a fifth host wiring its own contact escapes it.
   const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
-    (d.isDirectory() ? walk(join(dir, d.name)) : (d.name.endsWith('.js') ? [join(dir, d.name)] : [])));
+    (d.isDirectory() ? walk(join(dir, d.name)) : (/.(js|ts)$/.test(d.name) && !d.name.endsWith('.d.ts') ? [join(dir, d.name)] : [])));
   const root = fileURLToPath(new URL('../../', import.meta.url));
   const sites = [];
   for (const f of walk(join(root, 'src'))) {
     for (const line of readFileSync(f, 'utf8').split('\n')) {
       if (!/(missileHitsCapsule|sphereOverlapsCapsule)\(/.test(line)) continue;
-      if (!/playerFeet/.test(line)) continue;
+      if (!/playerFeet|player.feet/.test(line)) continue;
       sites.push([f.slice(root.length).split('\\').join('/'), line.trim()]);
     }
   }
@@ -265,7 +265,7 @@ test('AUDIT 65 CV-2: EVERY player-side capsule call carries the player body, at 
   assert.deepEqual(sites.map(([f]) => f).sort(), [
     'src/combat/arrowFlight.js', 'src/combat/arrowFlight.js',
     'src/scenes/dungeonContext.js', 'src/scenes/dungeonContext.js', 'src/scenes/dungeonContext.js',
-    'src/scenes/hostMagic.js', 'src/scenes/hostMagic.js', 'src/scenes/hostMagic.js',
+    'src/scenes/enemy-missile-strike.ts', 'src/scenes/hostMagic.js', 'src/scenes/hostMagic.js',
   ], 'five player-side capsule calls plus the three SPELLFX1 drawn arms, and these are the files that own them');
   for (const [f, line] of sites) {
     assert.ok(line.includes('PLAYER_BODY_RADIUS'), `${f}: a player capsule measured without the player's body - ${line}`);

@@ -191,7 +191,8 @@ test('REALM P2.2b: a realm character\'s decor moves the record\'s gold with the 
 
 test('REALM P2.2b end to end: onlineHomes buys and sells for a realm character - the purse and the record alike; the sale\'s refund is the service\'s price, and a sale whose answer was lost ends the session rather than guess', async () => {
   const { player, record } = await stand();
-  const entity = { goldPieces: 50_000, items: [], bankAccounts: bank(REGION, 0) };
+  // A level lets the judge's level law pass the checkpoints this test sends: a held record pays the realm nothing.
+  const entity = freshSave({ goldPieces: 50_000, bankAccounts: bank(REGION, 0) });
   const A = await player('Aldric', JSON.parse(JSON.stringify(entity)));
   const lost = [];
   const session = createRealmSession({ io: A.io, id: A.char, lease: A.lease, seq: 1, onLost: (why) => lost.push(why) });
