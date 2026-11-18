@@ -32,10 +32,26 @@ Placement is pinned to one region (`[placement] region`). Crons: `* * * * *` and
 | `server-account/src/sessionPass.js` | Short-lived HMAC pass for hot routes |
 | `server-account/src/titles.js` | Roles and titles from `*_HANDLES` vars; glyphs in the token |
 | `server-account/src/admit.js` | `AdmitGate` Durable Object |
+| `server-account/src/database-seam.ts`, `database-types.ts` | The database seam: Kysely builds the SQL, `run` and `atomic` run it (see Database access) |
 | `server-account/src/cron.js` | `MINUTE_JOBS`, `HOUR_JOBS`, `runCron` |
 | `server-account/src/saves.js`, `realm.js` | Cloud saves; realm characters |
 | `server-account/src/market.js`, `homes.js`, `decor*.js`, `guilds.js`, `professions.js`, `writs.js`, `townSeats.js`, ... | One module per feature area |
 | `server-account/src/safety.js`, `sanctions.js`, `modAi.js`, `staff*.js` | Moderation and staff; see [chat-safety.md](chat-safety.md) and [staff-tools.md](staff-tools.md) |
+
+## Database access
+
+The service is moving from SQL strings to queries built with [Kysely](https://kysely.dev), one module at a time, so
+that one codebase can later serve SQLite and Postgres. A converted module asks `sqlOf(ctx.db)` for the seam in
+`server-account/src/database-seam.ts`:
+
+- `seam.kysely` builds a query. It only compiles SQL; it never connects.
+- `seam.run(query)` runs one statement and answers `{ rows, changes }`.
+- `seam.atomic([...])` runs a list of statements as one unit: on D1 one `batch()`, because D1 refuses `BEGIN`. A
+  list may mix Kysely queries with `db.prepare(...).bind(...)` statements of modules not yet converted.
+- `seam.statement(query)` turns a Kysely query into a D1 statement, for a module that hands a statement to an
+  unconverted caller's `db.batch([...])`.
+
+A table's row shape goes in `database-types.ts` when its first module is converted. `brokerSales.js` is the first.
 
 The service imports shared law from `src/net/` (for example `identityToken.js`, `marketLaw.js`, `decorLaw.js`,
 `homeLaw.js`, `nameFilter.js`, `cellTree.js`), so client and server check the same rules.
