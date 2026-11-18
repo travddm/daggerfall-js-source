@@ -66,9 +66,9 @@ An online character's truth is the service's, not the client's (`server-account/
 - **The closing save.** A checkpoint with `x-realm-leave: 1` releases the lease in the update that stores it, and a
   refused one releases the lease all the same (`server-account/src/realm-save-route.js`). The client packs a save
   ahead and sends it this way when the tab closes, so the release never lands before the save
-  (`src/systems/online/realm-close-save.ts`). A packed save over `REALM_CLOSE_SAVE_BUDGET` (60 KiB, under the browser's
-  64 KiB keepalive quota) cannot go at close: that character is saved about once a minute while its save changes, and
-  the tab sends the plain leave at close.
+  (`src/systems/online/realm-close-save.ts`). A packed save over `REALM_CLOSE_SAVE_BUDGET` (56 KiB, which leaves room
+  for Renown's keepalive leave in the browser's 64 KiB quota) cannot go at close: that character is saved about once
+  a minute while its save changes, and the tab sends the plain leave at close.
 - **Born online only.** A realm character is made by `createRealm`; no offline character is brought in. Its first
   save must be a new character's (`firstSaveRefusal`: level 1 and no more than `REALM_BIRTH_WEALTH_MAX`). "Copy to
   offline" still writes a realm save as a new offline character, and nothing played on the copy comes back.

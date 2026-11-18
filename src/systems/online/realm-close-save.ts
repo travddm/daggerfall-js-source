@@ -12,9 +12,10 @@
 import { canGzip, gzipText } from '../../net/realm/realmSaveCodec.js';
 import { realmSaveWithHeld } from '../realmSaves.js';
 
-/** The browser lets a page have 64 KiB of keepalive bodies in flight. The page's other keepalive bodies at close
- *  (Renown's report, a held death's tombstone) are small JSON, each under 1 KiB, so 4 KiB is left for them. */
-export const REALM_CLOSE_SAVE_BUDGET = 60 * 1024;
+/** The browser lets a page have 64 KiB of keepalive bodies in flight. The page's other keepalive bodies at close need
+ *  less than the 8 KiB left: Renown's leave sends one report for each region with XP not yet reported, at most 128
+ *  bytes each (7,936 bytes for all 62 regions), and a held death's tombstone is under 100 bytes. */
+export const REALM_CLOSE_SAVE_BUDGET = 56 * 1024;
 /** How often a save under the budget is composed and packed: the most play a closed tab can lose. */
 export const REALM_CLOSE_STAGE_MS = 15_000;
 /** How often a save over the budget is checked and, when it changed, saved to the realm. */
