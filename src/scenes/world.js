@@ -897,6 +897,7 @@ import { characterIdOf } from '../systems/characterId.js';   // AUDIT HCC-PARK: 
 import { chooseTable, tableMoveSpeed } from '../player/eyeOfTheBeholder/eotbBillboard.js';   // AUDIT RIDE: the rider's gallop is the table the rider's own sprite shows
 import { PARTY_READY_TIMEOUT_MS, memberPresent, latestStamp, voteStands, snapshotCancels, cancelRequestFor, mirrorKey, cooldownStamp, stampOf, restsAlone, partyRestsTogether, restAloneText, restsApart, REST_APART_TEXT } from '../systems/party/partyRestLaw.js';   // AUDIT PARTY-REST: the pure half of the party-rest mechanic, pinned by execution   // SOC2: the hub's room and the party pose's floor (a second wire import: AUDIT WORLD4 A1 pins the first as it stands)
 import { createPartyArrivalHost, PartyArrivalUnavailable, PARTY_ARRIVAL_TEXT } from '../systems/party/partyArrival.js';
+import { travelFare, travelFailedText } from '../systems/travel/travel-fare.js';   // a journey's fare, and its refund when the build fails
 import { PARTY_TRAVEL_TEXT, fareText } from '../systems/party/partyTravelLaw.js';   // PARTY-TRAVEL: the party's journey - to the leader, and together; SHIP-SAIL: the fare's own row
 import { createPartyTravel } from '../systems/party/partyTravel.js';   // PARTY-TRAVEL: its session, over this host's seams
 import { TravelPopUpWindow } from '../ui/travel/travelPopUp.js';   // PARTY-TRAVEL: the map's own popup prices a party journey, headless
@@ -14161,13 +14162,13 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // journey: the following team's pose is cached to ride along, or it waits at the departure with
     // FollowFastTravel off. Before `_traveling` rises (the runtime's ready() reads it) and before the gold goes.
     const partyArrival = walkMode && typeof pick.besideAt === 'function';
-    const departure = partyArrival ? {
+    const departure = {   // where the journey set out: a failed build puts it back here
       pixel: { ...playerTravelPixel() }, native: state.worldCoords(player.pos),
       y: player.pos[1] - state.compensation[1], yaw: cam.yaw,
       boat: csaBoatUnderMe(), local: null,
-    } : null;
-    if (departure?.boat) departure.local = csaLocalOf(csaDeckPose(departure.boat), player.pos);
-    _partyTravelOriginBoat = departure?.boat ?? null;
+    };
+    if (departure.boat) departure.local = csaLocalOf(csaDeckPose(departure.boat), player.pos);
+    _partyTravelOriginBoat = partyArrival ? departure.boat : null;
     _partyArrivalPending = partyArrival;
     let hccPostDue = false;
     // WAGONS4: whether my wagon goes on this journey (the mod's word - driven, or its team following along; with the mod
@@ -14187,11 +14188,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // DeductFastTravelGold (:469-473): the inn nights come out of
       // COIN, and only what is left may be paid with a letter of
       // credit - "Taverns only accept gold pieces".
-      const payFare = () => {
-        deductGoldPieces(playerEntity, computed.piecesCost ?? 0);
-        deductGold(playerEntity, computed.totalCost - (computed.piecesCost ?? 0));
-      };
-      if (!partyArrival) payFare();
+      const fare = travelFare(playerEntity, computed);
+      if (!partyArrival) fare.pay();
       // WA1: RaiseOnPreFastTravelEvent (DaggerfallTravelPopUp.cs:328) - after DeductFastTravelGold, before the teleport:
       // Warm Ashes' OnPreFastTravel reads the journey's ocean pixels and the ship toggle
       if (warmAshesOn()) warmAshesPreTravel({ oceanPixels: computed.oceanPixels ?? 0, travelShip: !!opts.travelShip });
@@ -14260,27 +14258,27 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
               return resolved;
             } : null });
       } catch (error) {
-        if (!partyArrival) throw error;
-        // Restore the departure in the newly rebuilt origin frame. A guest's
-        // departure hull is retained locally across the room transition.
+        fare.refund();   // the journey never happened: its fare comes back, and it is put back where it set out
+        const boat = partyArrival || csa.boats.includes(departure.boat) ? departure.boat : null;   // a journey from the helm packed a packable boat
+        // The departure in the rebuilt origin frame; a guest's departure hull is kept locally across the room change.
         await _teleportToPixel(departure.pixel.x, departure.pixel.y, null, {
           resolveArrival: () => {
             csaSyncColliders();
             const local = state.localFromWorld(departure.native.x, departure.native.z);
-            const pos = departure.boat && departure.local
-              ? csaWorldOf(csaDeckPose(departure.boat), departure.local)
+            const pos = boat && departure.local
+              ? csaWorldOf(csaDeckPose(boat), departure.local)
               : [local[0], departure.y + state.compensation[1], local[1]];
             return { pos, yaw: departure.yaw };
           },
         });
-        if (departure.boat) csaAboard.board(departure.boat, CSA_ABOARD_GRACE);
+        if (boat) csaAboard.board(boat, CSA_ABOARD_GRACE);
         hudFade.clearFade();
-        townTalk.say(PARTY_ARRIVAL_TEXT.returned);
-        if (!(error instanceof PartyArrivalUnavailable)) console.warn('[party-travel] arrival failed:', error);
+        townTalk.say(partyArrival ? PARTY_ARRIVAL_TEXT.returned : travelFailedText());
+        if (!(error instanceof PartyArrivalUnavailable)) console.warn('[travel] the journey failed:', error);
         return false;
       }
       if (partyArrival) {
-        payFare();
+        fare.pay();
         const boat = [...csa.peerBoats, ...csa.boats].find((b) => typeof beside?.groundKey === 'string'
           && beside.groundKey.startsWith(`csaBoat:${csaBoatId(b)}:`));
         if (boat) csaAboard.board(boat, CSA_ABOARD_GRACE);
