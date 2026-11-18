@@ -103,3 +103,12 @@ test('A dispel landed on a foe by another player or by a foe sweeps nothing here
   magic.applySpellToFoe(holyWord, player.level, foeAt(2), { entity: foeAt(3).entity });
   assert.equal(sweeps.length, 0);
 });
+
+test('a self-cast dispel that lands on the player sweeps, as before the move to dispel-sweep.ts', () => {
+  const sweeps = [];
+  const { magic, player } = host({ onDispel: (d) => sweeps.push(d) });
+  const selfCast = { ...holyWord, rangeType: 0 };
+  magic.applySpellToPlayer(selfCast, player.level, { entity: player });
+  assert.equal(sweeps.length, 1);
+  assert.equal(sweeps[0].group, NEARBY.Undead);
+});
