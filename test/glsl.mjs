@@ -7,7 +7,7 @@
 //   fns.resolveAt([10, 20]);      // vectors are plain arrays of numbers
 //   fns.globals.fNear;            // non-const globals persist between calls
 //
-// glslFunctions(src, bindings = {}, { fp32 = false } = {})
+// glslFunctions(src, bindings = {}, { fp32 = false, strictPow = false } = {})
 //   src       a whole shader or a fragment of one.
 //   bindings  globals by name: uniforms, ins, outs, gl_FragCoord, and
 //             overrides of the source's own `const` globals. A scalar is a
@@ -19,6 +19,8 @@
 //             hooks: bindings.texture / textureLod / texelFetch /
 //             textureSize(samplerName, ...args) and dFdx / dFdy / fwidth(x);
 //             without one those built-ins throw.
+//   strictPow pow(x, y) is NaN where GLSL leaves it undefined (x < 0, or
+//             x = 0 with y <= 0), so a test sees what some GPUs draw.
 //   fp32      round every float result (arithmetic, built-ins,
 //             constructors, literals, inputs) with Math.fround.
 // The result maps each defined function to a callable. Arguments are
@@ -382,7 +384,7 @@ const zero = (t) => (t.arr ? Array.from({ length: t.arr }, () => zero(t.elem)) :
 const dotv = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
 const BRK = 1, CNT = 2, RET = 3;
 
-export function glslFunctions(src, bindings = {}, { fp32 = false, eager = false } = {}) {
+export function glslFunctions(src, bindings = {}, { fp32 = false, eager = false, strictPow = false } = {}) {
   const R = fp32 ? Math.fround : (x) => x;
   const items = new Parser(tokenize(src)).program();
   const G = {};                 // the global store (exposed as .globals)
@@ -658,7 +660,8 @@ export function glslFunctions(src, bindings = {}, { fp32 = false, eager = false 
       const [s0, ar, bases, rbase] = spec;
       if (Array.isArray(ar) ? !ar.includes(args.length) : ar !== args.length) err(n, `${name}() takes ${ar} arguments, got ${args.length}`);
       const sel = name === 'mix' && ts[2].base === 'bool';
-      const s = sel ? (x, y, a) => (a ? y : x) : s0;
+      const strictPowOf = (x, y) => (x < 0 || (x === 0 && y <= 0) ? NaN : Math.pow(x, y));
+      const s = sel ? (x, y, a) => (a ? y : x) : name === 'pow' && strictPow ? strictPowOf : s0;
       let big = ts[0];
       for (const t of ts) if (t.size > big.size) big = t;
       ts.forEach((t, i) => {

@@ -49,10 +49,9 @@ export const BAND_STAND_M = 140;
 /** AUDIT OW5b B2: the nearest a band's anchor stands to the traveller (m) - its members, a pack's spacing about it, never
  *  on top of them. A band stands where it IS, this or farther. */
 export const BAND_STAND_MIN_M = 18;
-/** AUDIT OW3 T7-1: a contact whose band finds no ground to stand on (the road, a town's rect, a full foe pool) tries again
- *  this often (ms), this many times, before the band is lost - never spent unstood on the first refusal. */
+/** A contact whose band cannot stand yet (the road, a town's rect, a full foe pool) tries again this often (ms), until
+ *  it stands or the chase is lost, as DFU's FoeSpawner retries until every foe is placed. */
 export const BAND_STAND_RETRY_MS = 1500;
-export const BAND_STAND_TRIES = 5;
 /** The bands the host is asked about: the cells within this many map pixels of the traveller. */
 export const BAND_REACH_PX = 6;
 const PIXEL_NATIVE = 32768;

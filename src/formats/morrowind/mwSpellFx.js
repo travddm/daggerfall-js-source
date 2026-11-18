@@ -122,18 +122,8 @@ export function mgefColour(mgef) {
 export const MW_UNITS_PER_FOOT = 64 / 3;
 export const areaVisualScale = (radiusMetres, unitsPerMetre) => 2 * (radiusMetres * unitsPerMetre) / MW_UNITS_PER_FOOT;
 
-/** Animation::addEffect's sizing for an actor that is not a person (animation.cpp :1742-1757): a body `height` tall and
- *  `radius` round (metres) is max(x, y, z / 2) / 64 of its bounds in Morrowind units, applied as a scale only when it
- *  passes 1, and the effect is lifted - or sunk - off a 128-unit body by `offset` units, times that ratio as the
- *  reference sets it. A person's effect is neither (`isNpc`); a flier's lift is not carried. */
-export function actorFxTransform(height, radius, unitsPerMetre) {
-  const z = height * unitsPerMetre, xy = 2 * radius * unitsPerMetre;
-  const ratio = Math.max(xy, xy, z / 2) / 64;
-  let offset = 0;
-  if (z < 128) offset = z - 128;
-  else if (z < xy + xy) offset = 128 - z;
-  return { scale: ratio > 1 ? ratio : 1, offset: offset * ratio };
-}
+// How large an effect is on an actor that is not a person, and how far it sits from the feet.
+export { actorFxTransform } from './mw-actor-fx-size.ts';
 
 /**
  * THE PLAN for one spell: `{ cast, bolt, hit, area, hands }` - each visual a `{ id, model, texture }` (`model` the
