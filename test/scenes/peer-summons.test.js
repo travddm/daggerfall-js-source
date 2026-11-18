@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
 import { summonedBody } from '../../src/systems/foeLootCap.js';
+import { coopCandidates } from '../../src/scenes/peer-allies.js';
 
 function craftCfg({ hpPerLevel = 4, speed = 90, str = 40, agi = 85, luck = 55, atkFlags = 0x08 } = {}) {
   const bytes = new Uint8Array(74);
@@ -128,4 +129,17 @@ test("the other player's foe that strikes my summon sends the blow to me, and it
   assert.equal(A.applyHit('bob-0002', blow), true);
   assert.equal(summon.entity.health, before - 5, 'it lands on my summon');
   assert.equal(summon.ai.target, orcHere, 'which turns on the orc');
+});
+
+test("my summon hunts the other player's foe, and its blow goes to that player and lands, the foe turning on my summon", async () => {
+  const { B, hitsA, summon, orc, summonThere, orcHere } = await summonAndOrc();
+  assert.ok(coopCandidates(summon, [orcHere]).includes(orcHere), "the orc is among my summon's candidates");
+  orcHere.hurtFromFoe(7, [0, 0, 1], summon);
+  const blow = hitsA.find((h) => h.al === 1);
+  assert.ok(blow, "I send my summon's blow to bob");
+  assert.deepEqual([blow.to, blow.i, blow.ac], ['bob-0002', orc.seq, summon.seq]);
+  const before = orc.entity.health;
+  assert.equal(B.applyHit('mac-0001', blow), true);
+  assert.equal(orc.entity.health, before - 7, 'it lands on his orc');
+  assert.equal(orc.ai.target, summonThere, 'which turns on my summon, not on me');
 });
