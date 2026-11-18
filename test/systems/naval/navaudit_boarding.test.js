@@ -291,6 +291,42 @@ async function boarding() {
   return { h, e, enemies: h.log.foes.filter((f) => f.side === 'enemy') };
 }
 
+/** The world moves under a boarding by `shift`: the sea's own shift, and the player and their boat with it. */
+function shiftWorld(h, shift) {
+  const move = (p) => [p[0] + shift[0], p[1] + shift[1], p[2] + shift[2]];
+  if (h.boat) h.boat.GameObject.position = move(h.boat.GameObject.position);   // the helm's boat is moved by its own runtime
+  h.view.feet = move(h.view.feet);
+  h.view.look = { ...h.view.look, origin: move(h.view.look.origin) };
+  h.host.offsetAll(shift);
+}
+
+test('a grappled ship crosses a map square with the world: at my helm she is drawn on from where she lies, and on foot she lands where she lay, moved once (mutants: the haul pose left behind; the berth moved twice)', async () => {
+  const shift = [1000, 0, -500];
+  const atHelm = await sea({ hull: 2 });
+  const hauled = place(atHelm, 'merchantGalleon', [7.4 + 7.4 + 12, 0, 0], 0);
+  hauled.ship.damage.apply({ hull: Math.ceil(hauled.ship.damage.maxHull * 0.8), sail: 0, crew: 0 });
+  atHelm.host.frame(0.1);
+  assert.equal(atHelm.host.activate(), true, 'the grapples');
+  atHelm.run(GRAPPLE_S / 2);
+  assert.equal(atHelm.host.boarding.phase, 'grapple', 'still hauled');
+  const hauledFrom = [...hauled.ship.pos];
+  shiftWorld(atHelm, shift);
+  atHelm.host.frame(0.1);
+  const helmMiss = Math.hypot(hauled.ship.pos[0] - hauledFrom[0] - shift[0], hauled.ship.pos[2] - hauledFrom[2] - shift[2]);
+  assert.ok(helmMiss < 2, `drawn on from where she lay, not from the old place: ${helmMiss.toFixed(1)} m off`);
+
+  const onFoot = await sea({ hull: null });
+  const boarded = place(onFoot, 'merchantGalleon', [8, 0, 0], 0);
+  boarded.ship.damage.apply({ hull: Math.ceil(boarded.ship.damage.maxHull * 0.8), sail: 0, crew: 0 });
+  onFoot.host.frame(0.1);
+  assert.equal(onFoot.host.activate(), true, 'over her rail');
+  const boardedFrom = [...boarded.ship.pos];
+  shiftWorld(onFoot, shift);
+  onFoot.host.frame(0.1);
+  const footMiss = Math.hypot(boarded.ship.pos[0] - boardedFrom[0] - shift[0], boarded.ship.pos[2] - boardedFrom[2] - shift[2]);
+  assert.ok(footMiss < 0.01, `where she lay, moved once: ${footMiss.toFixed(1)} m off`);
+});
+
 test('AUDIT NAV1 (B3) her crew SURRENDERS: her captain and SURRENDER_SHARE of her men down, the living rest throw down their arms - stood down before her window opens over them, never swinging at a prize screen - and stand on her deck, not spirited away; her dead never asked (mutants: the survivors left hostile)', async () => {
   const { h, enemies } = await boarding();
   const fall = Math.ceil(enemies.length * SURRENDER_SHARE);   // her captain first among them
