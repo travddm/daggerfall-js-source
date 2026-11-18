@@ -923,15 +923,15 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     // WORLD6b: a PUPPET takes no damage here - the blow goes to its owner as a hit (the owner's door applies it and
     // the owner's next frame says so); the striker's own ring, blood and pain played before this door, as ever
     if (f.puppet) {
-      if (!fromPlayer && striker && !striker.puppet && !striker.dead && (striker.companion != null || f.companion != null)) {
-        // AUDIT CC-E1: the companions' fights cross the clients. MY companion's blow on
-        // another's foe goes to its owner as an ALLY's (`al`, `ac` his number - the owner's foe turns on him, no blow of
-        // mine); a foe of mine mauling ANOTHER's companion sends the blow to the companion's owner (`fb`, `sf` the
-        // striker's number) - where the companion is real, and his knock-out is
+      if (!fromPlayer && striker && !striker.puppet && !striker.dead && (fightsAtMySide(striker) || f.companion != null)) {
+        // The allies' fights cross the clients. The blow of my companion or my summon on another player's foe goes to
+        // that player as an ally's (`al`, `ac` the ally's number): the foe turns on my ally, not on me. A foe of mine
+        // that strikes another player's ally sends the blow to that player (`fb`, `sf` the striker's number), where
+        // the ally is real.
         const hit = { to: f.puppet, k: _owners.get(f.puppet)?.k ?? _net?.room?.() ?? null, i: f.seq, dmg: Math.max(0, Math.round(Number(damage) || 0)), kind,
           ...(knockDir ? { d: [q3(knockDir[0]), q3(knockDir[1]), q3(knockDir[2])] } : {}) };
         if (f.companion != null) _net?.onPeerHit?.({ ...hit, fb: 1, ...(striker.seq != null ? { sf: striker.seq } : {}) });
-        else if (striker.companion != null) _net?.onPeerHit?.({ ...hit, al: 1, ...(striker.seq != null ? { ac: striker.seq } : {}) });
+        else if (fightsAtMySide(striker)) _net?.onPeerHit?.({ ...hit, al: 1, ...(striker.seq != null ? { ac: striker.seq } : {}) });
         return;
       }
       // AUDIT WORLD6b B1: THE DIVERT HAS THE DUNGEON DOOR'S PROVENANCE GATE - only this PLAYER's own blow goes to the
@@ -2232,9 +2232,9 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
    *  (:146-148 - senses.Target.Entity.Items.AddItem), damage or not. */
   function arrowHitFoe(m, target) {
     const f = m.shooterFoe;
-    // AUDIT WORLD6b B8: a foe's shaft into a PUPPET is a ghost hit - nobody's; AUDIT CC-E1: but my companion's into
-    // another's foe, or my foe's into another's companion, goes to the puppet's owner as the melee blow does
-    if (!f || f.dead || !target || (target.puppet && f.companion == null && target.companion == null)) return;
+    // A foe's shaft into a puppet is nobody's hit, except the shaft of my companion or my summon into another player's
+    // foe, or my foe's into another player's ally: that goes to the puppet's owner as the melee blow does
+    if (!f || f.dead || !target || (target.puppet && !fightsAtMySide(f) && target.companion == null)) return;
     const dir = [...m.dir];
     applyDamageToNonPlayer(f, target, {
       weapon: m.weapon, direction: dir, bowAttack: true, rolls, calculateAttackDamage,

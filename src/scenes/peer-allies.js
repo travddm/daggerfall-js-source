@@ -18,14 +18,14 @@ import { staticTeamOf } from '../characters/enemy/enemyTargets.js';
  */
 
 /**
- * The puppets of other players' foes that a foe of mine may fight. My companion fights their foes, and a hostile foe of
- * mine fights their companions. Every other puppet stays out of my foes' hunt.
+ * The puppets of other players' foes that a foe of mine may fight. A foe at my side (a companion, a summon) fights their
+ * foes, and a hostile foe of mine fights their allies. Every other puppet stays out of my foes' hunt.
  * @param {PoolFoe} foe a foe of mine
  * @param {Iterable<PoolFoe>} puppets every puppet standing here
  * @returns {PoolFoe[]}
  */
 export function coopCandidates(foe, puppets) {
-  const mine = foe.companion != null;
+  const mine = fightsAtMySide(foe);
   if (!mine && (foe.entity?.team === 'PlayerAlly' || !foe.ai?.isHostile)) return [];
   const out = [];
   for (const p of puppets) {
