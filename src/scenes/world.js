@@ -28548,15 +28548,11 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
       c.pos = s.pos; c.best = s.best; c.gainAt = s.gainAt; c.dist = s.dist;
       if (s.what === 'lost') { _bandChase.delete(id); bandSpend(id); }
       else if (s.what === 'contact' && !(c.retryAt > now)) {
-        // AUDIT OW5b E1: THE
-        // CONTACT IS THE ENCOUNTER - a walking journey is stopped HERE, the frame the band reaches the traveller and before
-        // a member stands; it was stopped by the members' own senses, which in this port answer after their loads and a
-        // real-time classic tick, and at the journey's scale the traveller ran on through the band (on a horse, out of its
-        // members' sight for good). A cautious traveller's won roll: the band loses the trail, and never stands. A won
-        // roll's grace still running: the chase runs on and asks again. A band that cannot stand yet (a full foe pool, a
-        // road or a town in the way) still meets the journey, and is spent only once it stands: DFU's FoeSpawner retries
-        // until every foe is placed and raises OnEncounter meanwhile, which stops Travel Options' journey. Only the
-        // chase's own lost rule gives such a band up.
+        // The contact is the encounter: a walking journey stops the frame the band reaches the traveller, before a member
+        // stands (the members' own senses answer too late at the journey's scale). A cautious traveller's won roll loses the
+        // band; a won roll's grace lets the chase ask again. A band that cannot stand yet (a full foe pool, a road, a town)
+        // still meets the journey and is spent only once it stands, as DFU's FoeSpawner retries until every foe is placed
+        // and raises OnEncounter meanwhile, which stops Travel Options' journey. Only a lost chase gives it up.
         const mk = bandMake(c.band);
         const met = journeyMet();
         if (met === 'avoided') { _bandChase.delete(id); bandSpend(id); continue; }
