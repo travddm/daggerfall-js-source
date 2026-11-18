@@ -52,6 +52,7 @@ import { tellSpellLanded } from '../systems/spell/spellPower.js';   // SCHOOLS3:
 import '../systems/arcanePowers.js';   // AUDIT SCHOOLS L2 F8: what the paths DO, registered with THE ONE CAST ENGINE every page builds - the standalone dungeon page (scenes/dungeon.js) had their price and potency and none of their powers
 import '../systems/firmamentPowers.js';   // FIRM1: what the Firmament DOES, registered with the one cast engine every page builds, as the paths' are
 import { aimedFoeOf, enemyMissileStrike, STRUCK_PLAYER } from './enemy-missile-strike.ts';
+import { startDispelSweep } from './dispel-sweep.ts';
 import { applySpell, spellReflectedText, hasActiveEffect, isSoulTrapEffect, spellSways } from '../systems/effects.js';   // WBX7: a soul trap meets the court's boss too
 import { spellToFoeOwner } from '../systems/enchantments.js';   // RPT1026-FIGHTS (TRAP-TO-OWNER): the session's door to a foe another player runs
 import { localizedText } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
@@ -816,6 +817,7 @@ export function createPlayerMagic({
     // (MakeEnemyHostileToAttacker), which is classic's own
     // "until player attacks them".
     if (r.pacify && foe.ai && !foe.entity?.pacifyImmune) foe.ai.isHostile = false;   // WB8a: never the gate's Warden
+    startDispelSweep(r, onDispel, { mine, peerCaster });
     // X11: SPELL REFLECTION - the FOE is the reflector here, so no HUD
     // line (TryReflection's "Spell was reflected." is gated on
     // `IsPlayerEntity` on the REFLECTING manager, EEM:1231-1233), and
@@ -874,11 +876,7 @@ export function createPlayerMagic({
     // refund - the player is not charged for a window that never
     // opened, which is the same shape as DFU refunding first and
     // opening second.
-    // X9: DISPEL UNDEAD / DAEDRA. Self-targeted, so it lands here on
-    // the caster and sweeps the area around them. The host owns both
-    // the nearby scan and the foe pool the destroy acts on, so the
-    // whole sweep goes out through one seam.
-    if (r.dispel) onDispel?.(r.dispel);
+    startDispelSweep(r, onDispel);
     // X10: DISPEL MAGIC opens a picker over the player's own live
     // bundles. No refund here, unlike Identify - DFU charges the cast
     // even if the popup is cancelled, "confirmed in classic".
