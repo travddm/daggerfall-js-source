@@ -98,7 +98,9 @@ test('MAC-T2: an H typed into the chat line switches no hand - the field stops t
 
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const h = rd(host);
-    assert.match(h, /addEventListener\('keyup', \(e\) => \{ keys\.delete\(e\.code\); noteKeyUp\(latch\.edge, e\.code\);/, `${host}: the ungated keyup feeds the ring`);
+    const ungated = /addEventListener\('keyup', \(e\) => \{ keys\.delete\(e\.code\); noteKeyUp\(latch\.edge, e\.code\);/.test(h)
+      || (/addEventListener\('keyup', \(e\) => \{ releaseKey\(e\.code\);/.test(h) && /const releaseKey = \(code\) => \{\s*keys\.delete\(code\);\s*noteKeyUp\(latch\.edge, code\);/.test(h));
+    assert.ok(ungated, `${host}: the ungated keyup feeds the ring`);
   }
 });
 
