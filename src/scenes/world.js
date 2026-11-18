@@ -1056,6 +1056,7 @@ import { createDoorToken } from './doorTokenHost.js';   // DOOR-TOKEN (FIELD BUG
 import { HeadBobber } from '../player/headBobber.js';   // AUDIT 28 W10: HeadBobbing
 import { createClimbFeelHost } from '../player/climb/climbFeel.js';   // CLIMB4: the climb's camera
 import { lastHealthLost, lastHealthLostPercent } from '../ui/hud/hudVitals.js';   // AUDIT 28 W9: the detector's loss
+import { bindKeyRelease, bindButtonRelease } from '../ui/release-held-input.js';
 import { fieldOfView } from '../ui/viewSettings.js';   // MENU: Video/FieldOfView, one home for five hosts
 import { keyEdges, noteKeyDown, noteKeyUp, beginInputFrame, pressed, released, actionsOf, actionOf, held, moveHeld, swallowBrowserKey, mouseCode, isSwingButton, keyboardLook, isTextEntryTarget, bindings, routeAction, installContextMenuGuard, POLLED_ACTIONS, QUICKSLOT_ACTIONS, swingKeyHeld } from '../ui/input.js';
 import { armUnloadGuard, releaseUnloadGuard } from '../systems/unloadGuard.js';   // MAC-L3: one door in front of every way out of a running game; AUDIT-MACL F3: ...and down for a door the game opened itself
@@ -16691,11 +16692,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       return false;
     }
   });
-  // D4: the overlay's KEY-UP edge. This listener has drained the
-  // movement Set since the first host and never told the open window
-  // anything; DFU's buttons hear both edges (Button.cs:79-92) and the
-  // travel popup's EXIT is the deferral that needs the release.
-  addEventListener('keyup', (e) => { keys.delete(e.code); noteKeyUp(latch.edge, e.code); peerMenuReader?.up(e.code); if (e.code === 'Escape') backButtonHeld = false; if (e.code === 'Escape' && escRelock) { const r = escRelock; escRelock = null; r(); } if (e.code === 'AltLeft') e.preventDefault(); townTalk.keyup(e); modes?.keyup?.(e); });   // ROAD-E E1: the up seam reaches BOTH slots this host feeds - the outer overlay and the mode machine's
+  // A key's release drains the movement set and tells the open window: DFU's buttons hear both edges (Button.cs),
+  // and the travel popup's EXIT acts on the release. Focus loss releases too (ui/release-held-input.js).
+  const releaseKey = bindKeyRelease({ target: globalThis, held: keys, edges: () => latch.edge, released: (code) => { peerMenuReader?.up(code); if (code === 'Escape') backButtonHeld = false; }, keyUp: (e) => { if (e.code === 'Escape' && escRelock) { const r = escRelock; escRelock = null; r(); } if (e.code === 'AltLeft') e.preventDefault(); townTalk.keyup(e); modes?.keyup?.(e); } });   // ROAD-E E1: the up seam reaches BOTH slots this host feeds - the outer overlay and the mode machine's
   // U45: Actions.ActivateCursor (Enter) - PlayerMouseLook.cursorActive,
   // bound since I1 with no consumer, and the flag the large HUD's
   // IsLargeHUDInteractable actually is.
@@ -17049,7 +17048,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   addEventListener('mousedown', (e) => { if (isSwingButton(e.button)) rightHeld = true; const mc = mouseCode(e.button); if (mc) { keys.add(mc); noteKeyDown(latch.edge, mc); } if (isSwingButton(e.button) && !townTalk.overlayActive && walkMode && modeNow() === 'exterior') { if (gatherHost?.acting()) return; if (magic.interceptAttack(true)) return; if (naval?.attackInput(true)) return; weaponRig.attackInput(0, 0, true); } });   // PROF1: an act's press is the act's   // M2; FIX-F: the swing's button is the registry's (Mouse1 -> SwingWeapon by default); NAV-H: held at a helm with guns, they are laid
   // VIEW-TOGGLE (from VOICE1, which is reverted): the mouse's side buttons are the bindings' in the world - never the browser's Back/Forward
   for (const kind of ['mousedown', 'mouseup']) addEventListener(kind, (e) => { if (e.button === 3 || e.button === 4) e.preventDefault(); });
-  addEventListener('mouseup', (e) => { if (isSwingButton(e.button)) rightHeld = false; const mc = mouseCode(e.button); if (mc) { keys.delete(mc); noteKeyUp(latch.edge, mc); } if (isSwingButton(e.button) && walkMode && modeNow() === 'exterior') weaponRig.attackInput(0, 0, false); if (isSwingButton(e.button)) navalRelease(); });   // the RELEASE is never gated - a window opened mid-swing must still let go; NAV-H: let go at the helm, the broadside fires (a window over it puts the aim down unfired)
+  bindButtonRelease({ target: globalThis, doc: globalThis.document, held: keys, releaseKey, released: (e) => { if (isSwingButton(e.button)) rightHeld = false; const mc = mouseCode(e.button); if (mc) { keys.delete(mc); noteKeyUp(latch.edge, mc); } if (isSwingButton(e.button) && walkMode && modeNow() === 'exterior') weaponRig.attackInput(0, 0, false); if (isSwingButton(e.button)) navalRelease(); } });   // the RELEASE is never gated - a window opened mid-swing must still let go; NAV-H: let go at the helm, the broadside fires (a window over it puts the aim down unfired)
   const inputHooks = {   // GP1: one hooks object for the finger AND the pad   // mobile: stick synthesizes WASD; the right half is classified (TI1)
     look: (dx, dy) => {
       lookFilter.add(dx * lookScale() * glassLookScale(spyglass.lens), -dy * lookScale() * lookInvert() * glassLookScale(spyglass.lens));   // AUDIT 28 W7: through the look filter (HANDEDNESS, mat4's law) - SPYGLASS: slowed by the glass
