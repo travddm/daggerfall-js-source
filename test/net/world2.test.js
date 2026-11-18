@@ -248,7 +248,7 @@ test('ONLINE-DUNGEON-FOES: a foe past the layout run is neither streamed nor pee
     'the stream walks the layout run; if this bound widened, the sync half has moved');
   // REST-SYNC paid both halves for ONE foe past the run - a rest's encounter, the host's and SHARED: the
   // stream carries the room's list of them beside the run, and `isRoomFoe` is exactly the run plus that list
-  assert.match(frame[1], /for \(const f of \[\.\.\._sharedById\.values\(\)\]\.sort\(/, 'the stream carries the shared encounters');
+  assert.match(frame[1], /const shared = sharedEncounterRecords\(_sharedById\.values\(\), /, 'the stream carries the shared encounters');
   assert.match(dc, /const isRoomFoe = \(f, i = foes\.indexOf\(f\)\) => \(i >= 0 && i < _layoutFoes\) \|\| \(f != null && \(f\._encId != null \|\| f\._surI != null\)\);/,
     'the room\'s set is the run and the shared encounters - nothing else past the run');
 
