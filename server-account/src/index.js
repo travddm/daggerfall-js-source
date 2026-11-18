@@ -705,7 +705,7 @@ const service = {
         headers: {
           'access-control-allow-origin': origin,
           'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'access-control-allow-headers': 'content-type, authorization, x-realm-lease, x-realm-seq, x-realm-summary, x-d1-bookmark, x-session-pass, x-staff-session',   // a checkpoint's lease, sequence and tile, the tab's D1 bookmark, the session's pass
+          'access-control-allow-headers': 'content-type, authorization, x-realm-lease, x-realm-seq, x-realm-summary, x-realm-leave, x-d1-bookmark, x-session-pass, x-staff-session',   // a checkpoint's lease, sequence, tile and closing release, the tab's D1 bookmark, the session's pass
           'access-control-max-age': '86400',
         },
       });

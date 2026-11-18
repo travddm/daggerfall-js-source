@@ -358,6 +358,10 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
   return row?.held ? { error: 'trade-held', held: row.held } : null;
 }
 
+/** The checkpoint's row move, guarded on the lease and the sequence; a closing save also releases the lease in it. */
+const checkpointMoveSql = (/** @type {boolean} */ leave) => 'UPDATE realm_characters SET seq = ?, bytes = ?, obj = ?, prev = obj, lease_at = ?, summary = COALESCE(?, summary), updated_at = ?'
+  + `${leave ? ', lease = NULL' : ''} WHERE id = ? AND player = ? AND lease = ? AND seq = ?`;
+
 /**
  * A CHECKPOINT: the save, under the current lease, at `seq + 1`. The row is asked first (a stale lease or sequence is
  * refused before a byte is written), the object lands at a key of its own, and the row moves to it only if the lease
@@ -373,9 +377,10 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
  * so a tab whose last checkpoint landed but whose answer was lost can resync; the first save's own words
  * (firstSaveRefusal).
  * @param {any} ctx @param {string} playerId
- * @param {{ id: string, lease: unknown, seq: unknown, summary?: unknown }} at @param {ArrayBuffer} body @param {number} bytes
+ * `leave`: a closing tab's last save, whose lease is released in the update that stores it (realm-save-route.js).
+ * @param {{ id: string, lease: unknown, seq: unknown, summary?: unknown, session?: string | null, leave?: boolean }} at @param {ArrayBuffer} body @param {number} bytes
  */
-export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
+export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId, { id, lease, seq, summary = null, session = null, leave }, body, bytes) {
   if (!bucket) return { error: 'no-storage' };
   if (!REALM_ID_RE.test(id) || typeof lease !== 'string' || !LEASE_RE.test(lease) || !Number.isSafeInteger(seq) || /** @type {number} */ (seq) < 1) return { error: 'body' };
   // SAVE-BATCH: the record's row, the ledger's two reads of the character's own rows and (where this isolate
@@ -441,7 +446,7 @@ export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId,
   let stood = null;
   try {
     const res = await db.batch([
-      db.prepare('UPDATE realm_characters SET seq = ?, bytes = ?, obj = ?, prev = obj, lease_at = ?, summary = COALESCE(?, summary), updated_at = ? WHERE id = ? AND player = ? AND lease = ? AND seq = ?')
+      db.prepare(checkpointMoveSql(leave === true))
         .bind(seq, bytes, key, nowS, said, nowS, id, playerId, lease, /** @type {number} */ (seq) - 1),
       mustChange(db),
       ...v.steps,
