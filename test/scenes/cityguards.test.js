@@ -10,6 +10,7 @@ import {
   GUARD_NPC_SPAWN_RANGE, GUARD_BEHIND_ANGLE,
   GUARD_FALLBACK_MIN_DIST, GUARD_FALLBACK_MAX_DIST,
 } from '../../src/scenes/cityGuards.js';
+import { isLocalPlayerTarget } from '../../src/characters/enemy/enemyTargets.js';
 import { uninstallSurvivalLoot } from '../../src/systems/survival/loot.js';   // AUDIT VC6: SURV2's corpse food is stood down for the pins that count a body's items
 
 const ARENA2 = process.env.ARENA2_PATH;
@@ -472,4 +473,34 @@ test('D9: the ring reads the SPAWNER_ARMS row, and the two named constants are t
   assert.equal(SPAWNER_ARMS.cityGuards.lineOfSightCheck, true, 'the watch converges from outside the FOV');
   assert.equal(GUARD_FALLBACK_MIN_DIST, SPAWNER_ARMS.cityGuards.minDistance, 'one home');
   assert.equal(GUARD_FALLBACK_MAX_DIST, SPAWNER_ARMS.cityGuards.maxDistance);
+});
+
+/** CLASS18.CFG's record as ClassFile.load reads it: hit points per level at byte 52, the eight u16 stats from 58. */
+function syntheticClassCfg() {
+  const bytes = new Uint8Array(80);
+  const view = new DataView(bytes.buffer);
+  view.setUint16(52, 10, true);
+  for (let i = 0; i < 8; i++) view.setUint16(58 + i * 2, 50, true);
+  return bytes;
+}
+
+test('a guard spawned for a crime targets the player and keeps the crime scene to walk to (DFU PlayerEntity.SpawnCityGuard)', async () => {
+  const deps = makeDeps(() => 0.9);
+  deps.fetchBytes = async (name) => {
+    if (name === 'CLASS18.CFG') return syntheticClassCfg();
+    throw new Error(`no ${name} here`);
+  };
+  deps.playerEntity = { ...deps.playerEntity, skills: new Array(40).fill(20), skillUses: new Array(40).fill(0), items: [], activeEffects: [], crimeCommitted: 4 };
+  const guards = createCityGuards(deps);
+  const crimeScene = [40, 0, 40];
+  const guard = await guards.spawnCityGuard([0, 0, 0], 0, crimeScene);
+  assert.ok(guard, 'the guard stands');
+  assert.ok(isLocalPlayerTarget(guard.ai.target), 'MakeEnemyHostileToAttacker gives him the player as his target');
+  assert.equal(guard.ai.isHostile, true);
+  assert.equal(guard.ai.giveUpTimer, 600, 'GiveUpTimer 200, tripled');
+
+  // The player stands far off, out of his sight. A frame of his target machine must not forget where to go.
+  guards.update(0.016, [400, 0, 400], [400, 1.6, 400]);
+  assert.ok(isLocalPlayerTarget(guard.ai.target), 'still after the player');
+  assert.ok(guard.ai.predictedTargetPos, 'he still has a place to walk to');
 });
