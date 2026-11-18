@@ -44,6 +44,7 @@ import { silenceBlocksCast, attemptSoulTrap, SOUL_TRAP_TEXT, fillEmptyTrap, peer
 import { isAzurasStarEquipped, registerFoeDoor } from '../systems/artifactEffects.js';   // V3: the Star's kill capture; AUDIT PSCALE1 DOORS-2: Namira's reflection through this pool's door
 import { EnemyAttack } from '../characters/enemy/enemyAttack.js';
 import { makeEnemyEntity, loadEnemyCareer, KNIGHT_CITYWATCH_ID, applyHeroThreat } from '../characters/enemy/enemyEntity.js';
+import { coopCandidates, companionWords, standCrewPuppet, fightsAtMySide } from './peer-allies.js';
 import { heroThreatOf } from '../systems/heroThreat.js';   // BAL11: the hero's threat
 import { MobileUnit, MOBILE_DAEDRA_SEDUCER, SeducerTransformBehaviour } from '../characters/mobile/mobileUnit.js';   // A5: the Seducer transform pair + its trigger
 import { spawnEnemyLoot, hasBowAttack, backstabChanceOf, zeroDamageHitSound, enemyMissSound, enemyAttackVoice, enemyPainVoice, playerAttackGrunt, tickEnemySound, playEnemyClip, tryLanguagePacification, applyDamageToNonPlayer, windupDoor, tellCues, takeAimedShot, aimedDirection, aimedArrowMeta, landBlowEffect } from './hostCombat.js';   // C2-slice (combat-9/17); MT-ii: the foe-vs-foe payload; TELL1: the poise door
@@ -1111,7 +1112,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
         const wildUnaware = !!senses.wildUnaware?.(f) && !isLocalPlayerTarget(ai.target);
         // AUDIT BRANCH (WoD) M1: a PLACED foe hunts no peer - it never rides, so no peer holds its puppet, and a blow at
         // a peer lands only through the puppet the peer stands; its site is the peer's own, with its own foes
-        const result = runTargetMachine(f, [...senses.candidates(), PLAYER_TARGET, ...(f.placed && !f.site ? [] : _questLike(f) ? questPeerCandidates(f) : peerCandidates()), ...coopCandidates(f)], pf, cdt, {   // QUEST-PARTY: a quest foe hunts only the party it rides to
+        const result = runTargetMachine(f, [...senses.candidates(), PLAYER_TARGET, ...(f.placed && !f.site ? [] : _questLike(f) ? questPeerCandidates(f) : peerCandidates()), ...coopCandidates(f, _pupIndex.values())], pf, cdt, {   // QUEST-PARTY: a quest foe hunts only the party it rides to
           noTargetMode: campAsleep,   // WORLD6b-ii: the peers are MY foes' candidates; AUDIT WORLD6b-ii A5: after ME (a peer never beats me on a tie), A9: a puppet never steps here
           dropLocal: wildUnaware,   // AUDIT-F5: the unaware leave ME off the list and no one else - a peer it fights stays its foe (noTargetMode dropped the peers too)
           playerEntity: senses.playerEntity ?? null,
@@ -2404,9 +2405,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     const al = out.filter((r) => r.t === KNIGHT_CITYWATCH_ID && r.d !== 1 && src.get(r)?.defender).map((r) => r.i);   // RAID2: the watchmen who are MY allies (DISC19-F's defenders, a raid's among them) - a reader stands them as its allies, where a watch record carried no team
     const cw = out.filter((r) => r.d !== 1 && isShipmate(src.get(r))).map((r) => r.i);
     const rf = out.filter((r) => r.d !== 1 && src.get(r)?.refugee).map((r) => r.i);   // RAID5: a raid's refugees, my allies - a reader stands them as its own
-    const mates = out.filter((r) => r.d !== 1 && src.get(r)?.companion != null);
-    const cp = mates.map((r) => r.i);   // AUDIT CC-E1: my companions, by number - a reader marks them so its foes may fight them
-    const cn = mates.map((r) => src.get(r)?.entity?.name ?? '');   // AUDIT WK-U3: and their names, in that order   // SHIPMATES: my crew on a deck (combat/friendlyFire.js) - a reader stands them as its allies and its own harm passes them by
+    const { cp, cn } = companionWords(out, (r) => src.get(r));
     for (const r of out) if (r.ls !== undefined) { const f = src.get(r); if (f) f._lkSent = f._lkPend; }   // AUDIT MW-NPC II K2: what went is said
     const bw = body.frameDigests(out, (r) => src.get(r));   // OUTDOOR-LOOT: each dead body's takes digest - the places gone, the stacks drawn down - beside its record
     const gs = _net.grants ? _net.grants.frameGrants(out.filter((r) => r.gr).map((r) => src.get(r)?._grant), full) : [];   // GRANT3: the grants these records name
@@ -2422,19 +2421,6 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     puppetOf: (from, i) => _pupIndex.get(pupKey(from, i)) ?? null, ownBody: (i) => foes.find((x) => !x.puppet && !_questLike(x) && x.seq === i) ?? null,
     peerCandidate, foesSeq: () => _foesSeq, takeRange: CORPSE_TAKE_RANGE, leapSlack: PUPPET_LEAP_SLACK,
   });
-  /** AUDIT CC-E1: the other clients' bodies a foe of mine may fight - my companion, their foes; a hostile foe of mine,
-   *  their companions. Every other puppet stays out of my hunt, as it was (the place's own candidates decide). */
-  function coopCandidates(f) {
-    if (!_pupIndex.size) return [];
-    const mine = f.companion != null;
-    if (!mine && (f.entity?.team === 'PlayerAlly' || !f.ai?.isHostile)) return [];
-    const out = [];
-    for (const p of _pupIndex.values()) {
-      if (p.dead || !p.ai) continue;
-      if (mine ? p.companion == null && !p.shipmate : p.companion != null) out.push(p);
-    }
-    return out;
-  }
   /** The puppets standing or building for an owner - the cap's count (B3). */
   function livePuppetsOf(from, watch = false, camp = false, deep = false, quest = false, raid = false, star = false) {   // RAID2: and a raid's   // AUDIT WATCH1 A1: the watch counted apart from the foes; WOD7: and a shared camp's; DEEP-SHARE: and the deep's; QUEST-PARTY: and a shared quest's
     const kind = (t, site, dp, qq, rd) => (site ? 'camp' : qq ? 'quest' : rd ? 'raid' : dp ? 'deep' : t === KNIGHT_CITYWATCH_ID ? 'watch' : 'foe');
@@ -2554,7 +2540,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       if (site && (f || _pupPending.has(key))) stood.add(site);   // AUDIT WOD7: standing or building here
       if (f) {
         if ((r.t !== undefined && r.t !== f.mobileType) || (r.d === 0 && f.dead) || (r.l !== undefined && isClassEnemyId(f.mobileType) && r.l !== (f.builtLevel | 0))) removePuppet(f);   // AUDIT WORLD6b-ii B2: a CLASS foe's level is its owner's word (its skills and health are built from it) - a monster's is its species' (makeEnemyEntity), whatever the record says; AUDIT FOES FOE8: against the level it was BUILT at, which a City Watch's constructor re-rolls
-        else { if (campTags.has(r.i)) f._pupCamp = campTags.get(r.i); applyPuppetRecord(f, r); f._heirElse = heirElse(r); if (heirIsMe(r)) adopted += adopt(from, f, r.it); if (f.mobileType === KNIGHT_CITYWATCH_ID) alliedWatchPuppet(f, allied.has(r.i)); crewPuppet(f, crew.has(r.i), comp.has(r.i)); f.companionName = compNames.get(r.i) ?? null; continue; }   // OW6: its camp, as the owner last said it
+        else { if (campTags.has(r.i)) f._pupCamp = campTags.get(r.i); applyPuppetRecord(f, r); f._heirElse = heirElse(r); if (heirIsMe(r)) adopted += adopt(from, f, r.it); if (f.mobileType === KNIGHT_CITYWATCH_ID) alliedWatchPuppet(f, allied.has(r.i)); standCrewPuppet(f, crew.has(r.i), comp.has(r.i)); f.companionName = compNames.get(r.i) ?? null; continue; }   // OW6: its camp, as the owner last said it
       }
       // AUDIT (the pre-merge audit, D2): a foe of theirs I took, streamed ALIVE by them again (a socket back under the
       // same id, a tab that woke) - theirs again: mine goes, and their record stands it here as their puppet
@@ -2576,7 +2562,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       if (site) stood.add(site);
       const gen = o.gen;
       const shipmate = crew.has(r.i);
-      spawnFoe(r.t, feet, { puppet: from, seq: r.i, gender: GENDER_BIT[r.x === 1 ? 1 : 0], feetGiven: true, yaw: r.y ?? null, level: r.l ?? null, site, allied: (r.t === KNIGHT_CITYWATCH_ID && allied.has(r.i)) || shipmate || refugees.has(r.i), champion: cp })   // RAID2: a watchman the owner names its ally stands as mine - SHIPMATES: and a crewman
+      spawnFoe(r.t, feet, { puppet: from, seq: r.i, gender: GENDER_BIT[r.x === 1 ? 1 : 0], feetGiven: true, yaw: r.y ?? null, level: r.l ?? null, site, allied: (r.t === KNIGHT_CITYWATCH_ID && allied.has(r.i)) || shipmate || [refugees, comp].some((named) => named.has(r.i)), champion: cp })   // RAID2: a watchman the owner names its ally stands as mine - SHIPMATES: and a crewman
         .then((nf) => {
           if (!nf) return;
           if (grantCheck && _net.grants?.enforcing()) void grantCheck.then((why) => { if (_net.grants?.standsDown(why)) removePuppet(nf); });   // GRANT6: while the law enforces, a forged grant or none stands down (GRANT_STANDDOWN_REASONS)
@@ -2635,15 +2621,6 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
    *  watch (WATCH1's recorded limit). */
   function alliedWatchPuppet(f, on) {
     const team = on ? 'PlayerAlly' : staticTeamOf(KNIGHT_CITYWATCH_ID);
-    if (f.entity && f.entity.team !== team) { f.entity.team = team; f.entity.mobileTeam = team; }
-  }
-  /** SHIPMATES: a puppet the owner names its crew (the frame's `cw`) is a shipmate here too - the player's ally, spared
-   *  the player's harm, wearing the crew's bar (combat/friendlyFire.js); one it names no longer is its species' again. */
-  function crewPuppet(f, on, companion = false) {
-    f.companion = on && companion ? `peer:${f.puppet}:${f.seq}` : null;   // AUDIT CC-E1: the owner's word, every frame
-    if (!!f.shipmate === on) return;
-    f.shipmate = on;
-    const team = on ? 'PlayerAlly' : staticTeamOf(f.mobileType);
     if (f.entity && f.entity.team !== team) { f.entity.team = team; f.entity.mobileTeam = team; }
   }
   function applyPuppetRecord(f, r) {
@@ -2837,10 +2814,10 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     if (f?.dead && data.cs === 1 && foes.includes(f)) { const s = hitSpellOf(data); return !!s && !!f.corpsePrefab?.struck(s.spell, s.level, null); }   // DEX5b: a copy's missile on my foe's prefab body (its bundle, the body's own entity)   // QUEST-PARTY: a quest's foe takes a peer's blow only from the party it rides to - any peer's word used to land on one it could not even see
     if (!f || f.dead || !Number.isFinite(dmg) || dmg < 0 || (dmg > PEER_HIT_DMG_MAX && !f.entity?.staffBoss)) return false;   // BOSS-BIG-HIT: a staff event's mini boss takes a blow past the bound at the bound (below) - every other foe refuses it whole
     const blow = Math.min(PEER_HIT_DMG_MAX, dmg);   // BOSS-BIG-HIT: a peer's spell of tens of thousands on the mini boss lands as 10,000 - it was thrown away
-    // AUDIT CC-E1: ANOTHER's foe mauled my companion where it stands - the blow lands here, where he is real: the foe's
-    // blow, not a player's (the knock-out arm his death), and he turns on the striker's puppet
+    // Another player's foe struck my companion or my summon: the blow lands here, where it is real. It is a foe's blow,
+    // not a player's (a companion is knocked out, never killed), and it turns my ally on the striker's puppet.
     if (data.fb === 1) {
-      if (f.companion == null || !foes.includes(f)) return false;
+      if (!fightsAtMySide(f) || !foes.includes(f)) return false;
       const fd = Array.isArray(data.d) && data.d.length === 3 && data.d.every(Number.isFinite) ? data.d : null;
       const fl = fd ? Math.hypot(fd[0], fd[1], fd[2]) : 0;
       damageFoe(f, dmg, null, fl > 1e-6 && fl < 1e6 ? [fd[0] / fl, fd[1] / fl, fd[2] / fl] : null, { fromPlayer: false, kind: data.kind === 'arrow' ? 'arrow' : 'melee' });
