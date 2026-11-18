@@ -51,7 +51,7 @@ import { calculateCastCost, castSchool, EFFECT_COST_TABLE } from '../systems/spe
 import { tellSpellLanded } from '../systems/spell/spellPower.js';   // SCHOOLS3: my spell landed - the paths' riders answer it
 import '../systems/arcanePowers.js';   // AUDIT SCHOOLS L2 F8: what the paths DO, registered with THE ONE CAST ENGINE every page builds - the standalone dungeon page (scenes/dungeon.js) had their price and potency and none of their powers
 import '../systems/firmamentPowers.js';   // FIRM1: what the Firmament DOES, registered with the one cast engine every page builds, as the paths' are
-import { sayPlayerLandingFailures } from './spell-landing-lines.ts';
+import { sayFoeLandingFailures, sayPlayerLandingFailures } from './spell-landing-lines.ts';
 import { applySpell, spellReflectedText, hasActiveEffect, isSoulTrapEffect, spellSways } from '../systems/effects.js';   // WBX7: a soul trap meets the court's boss too
 import { spellToFoeOwner } from '../systems/enchantments.js';   // RPT1026-FIGHTS (TRAP-TO-OWNER): the session's door to a foe another player runs
 import { localizedText } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
@@ -808,6 +808,7 @@ export function createPlayerMagic({
       const trap = (foe.entity.activeEffects ?? []).find((a) => a.kind === 'soulTrap' && !a.ended);
       if (trap) trap.by = peerCaster;
     }
+    sayFoeLandingFailures(r, say, peerCaster);
     // X8: PACIFY / CHARM. The effect answers whether the target was
     // pacified; the AI flag lives on the foe RECORD rather than the
     // entity, so this door - the one place that holds both - is where
