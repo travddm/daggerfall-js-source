@@ -51,6 +51,9 @@ import { calculateCastCost, castSchool, EFFECT_COST_TABLE } from '../systems/spe
 import { tellSpellLanded } from '../systems/spell/spellPower.js';   // SCHOOLS3: my spell landed - the paths' riders answer it
 import '../systems/arcanePowers.js';   // AUDIT SCHOOLS L2 F8: what the paths DO, registered with THE ONE CAST ENGINE every page builds - the standalone dungeon page (scenes/dungeon.js) had their price and potency and none of their powers
 import '../systems/firmamentPowers.js';   // FIRM1: what the Firmament DOES, registered with the one cast engine every page builds, as the paths' are
+import { aimedFoeOf, enemyMissileStrike, STRUCK_PLAYER } from './enemy-missile-strike.ts';
+import { sayFoeLandingFailures, sayPlayerLandingFailures } from './spell-landing-lines.ts';
+import { startDispelSweep } from './dispel-sweep.ts';
 import { applySpell, spellReflectedText, hasActiveEffect, isSoulTrapEffect, spellSways } from '../systems/effects.js';   // WBX7: a soul trap meets the court's boss too
 import { spellToFoeOwner } from '../systems/enchantments.js';   // RPT1026-FIGHTS (TRAP-TO-OWNER): the session's door to a foe another player runs
 import { localizedText } from '../systems/textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
@@ -807,6 +810,7 @@ export function createPlayerMagic({
       const trap = (foe.entity.activeEffects ?? []).find((a) => a.kind === 'soulTrap' && !a.ended);
       if (trap) trap.by = peerCaster;
     }
+    sayFoeLandingFailures(r, say, peerCaster);
     // X8: PACIFY / CHARM. The effect answers whether the target was
     // pacified; the AI flag lives on the foe RECORD rather than the
     // entity, so this door - the one place that holds both - is where
@@ -815,6 +819,7 @@ export function createPlayerMagic({
     // (MakeEnemyHostileToAttacker), which is classic's own
     // "until player attacks them".
     if (r.pacify && foe.ai && !foe.entity?.pacifyImmune) foe.ai.isHostile = false;   // WB8a: never the gate's Warden
+    startDispelSweep(r, onDispel, { mine, peerCaster });
     // X11: SPELL REFLECTION - the FOE is the reflector here, so no HUD
     // line (TryReflection's "Spell was reflected." is gated on
     // `IsPlayerEntity` on the REFLECTING manager, EEM:1231-1233), and
@@ -845,12 +850,7 @@ export function createPlayerMagic({
     if (caster?.entity === playerEntity && r) tellSpellLanded({ caster: playerEntity, target: playerEntity, spell, r, self: true, reflected: !!extraCtx?.reflectedCount, took: 0, cast: caster.cast ?? null });
     if (_doorFeet && !(r.saved || r.chanceFailed || r.reflected)) mwFx.hit(spell, _doorFeet);   // MW-SPELLFX1: the hit, about me
     if (r.paralyzed) say(localizedText('youAreParalyzed', 'You are paralyzed.'));   // Paralyze.cs:93
-    // S19c: AssignBundle's failure messages, player hosts only -
-    // CasterOnly chance fails say "Spell effect failed.", external
-    // contact fails and full saves say "Save versus spell made."
-    // (EntityEffectManager.cs:542, :547, :576)
-    if (r.chanceFailed) say(spell.rangeType === 0 ? localizedText('spellEffectFailed', 'Spell effect failed.') : localizedText('saveVersusSpellMade', 'Save versus spell made.'));
-    if (r.saved) say(localizedText('saveVersusSpellMade', 'Save versus spell made.'));
+    sayPlayerLandingFailures(r, say, spell.rangeType === 0);
     // X3: the ARMED half of Open/Lock. Neither effect does anything at
     // cast - it waits in forcedRoundsRemaining for a door - so this
     // line is the ONLY sign the spell worked, and DFU speaks it from
@@ -873,11 +873,7 @@ export function createPlayerMagic({
     // refund - the player is not charged for a window that never
     // opened, which is the same shape as DFU refunding first and
     // opening second.
-    // X9: DISPEL UNDEAD / DAEDRA. Self-targeted, so it lands here on
-    // the caster and sweeps the area around them. The host owns both
-    // the nearby scan and the foe pool the destroy acts on, so the
-    // whole sweep goes out through one seam.
-    if (r.dispel) onDispel?.(r.dispel);
+    startDispelSweep(r, onDispel);
     // X10: DISPEL MAGIC opens a picker over the player's own live
     // bundles. No refund here, unlike Identify - DFU charges the cast
     // even if the popup is cancelled, "confirmed in classic".
@@ -1475,22 +1471,16 @@ export function createPlayerMagic({
         if (body) { showImpactFlash(m, [m.pos[0], m.pos[1], m.pos[2]]); retireMissile(m); }
         continue;
       }
-      // X3-slice: an ENEMY missile hunts the PLAYER (the dungeon's
-      // arm: the caster wrapper rides the impact; foe-vs-foe
-      // friendly fire pends the target sweep, the shared residual).
+      // An enemy missile lands on the foe it was loosed at, or on the player (enemy-missile-strike.ts).
       if (m.fromPlayer === false) {
-        if (playerFeet && !isShipmate(m.casterFoe)) {   // SHIPMATES: a crewman's missile flies past the player
-          // AUDIT 62 F21 (review): the player's CAPSULE, DaggerfallMissile
-          // .cs:339's SphereCast into its CharacterController, at the LIVE
-          // height - the shared engine's copy of the dungeon's arm.
-          if (missileHitsCapsule(m.pos, playerFeet, playerHeight, PLAYER_BODY_RADIUS)) {
-            const mCaster = missileCaster(m);
-            if (m.spell.rangeType === 4) explodeAt(m.pos, m.spell, m.casterLevel ?? 1, playerFeet, mCaster, { playerHeight });   // ROAD-H H2
-            else applySpellToPlayer(m.spell, m.casterLevel ?? 1, mCaster);
-            showImpactFlash(m, [m.pos[0], m.pos[1], m.pos[2]]);   // F033
-            retireMissile(m);
-          }
-        }
+        const struck = enemyMissileStrike(m, { feet: playerFeet, height: playerHeight, passesPlayer: isShipmate(m.casterFoe) });
+        if (!struck) continue;
+        const mCaster = missileCaster(m);
+        if (m.spell.rangeType === 4) explodeAt(m.pos, m.spell, m.casterLevel ?? 1, playerFeet, mCaster, { playerHeight });   // ROAD-H H2
+        else if (struck === STRUCK_PLAYER) applySpellToPlayer(m.spell, m.casterLevel ?? 1, mCaster);
+        else applySpellToFoe(m.spell, m.casterLevel ?? 1, struck, mCaster);
+        showImpactFlash(m, [m.pos[0], m.pos[1], m.pos[2]]);   // F033
+        retireMissile(m);
         continue;
       }
       // AID1 onto ALLY-CAST: a BENEFICIAL missile of mine meets a party mate's capsule the way it meets a foe's
@@ -1854,7 +1844,7 @@ export function createPlayerMagic({
     fireEnemyMissile(from, dir, spell, casterLevel, casterFoe) {
       // MW-SPELLFX1: the caster's casting effects (CastSpell::cast plays a caster's that no character controller does)
       if (casterFoe?.ai?.feet) mwFx.cast(spell, casterFoe.ai.feet, { body: { height: casterFoe.ai.height ?? CAPSULE_HEIGHT, radius: casterFoe.ai.radius ?? PLAYER_BODY_RADIUS } });
-      missiles.push(withBolt({ spell, casterLevel, casterFoe, pos: [...from], dir: [...dir], age: 0, batch: null, fromPlayer: false }));   // MW-SPELLFX1: and its bolt
+      missiles.push(withBolt({ spell, casterLevel, casterFoe, aimFoe: aimedFoeOf(casterFoe), pos: [...from], dir: [...dir], age: 0, batch: null, fromPlayer: false }));   // MW-SPELLFX1: and its bolt
     },
     /** MW-SPELLFX1: the Morrowind spell effects layer, for the console and a pin. */
     mwFx,

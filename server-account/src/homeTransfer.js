@@ -5,7 +5,7 @@ import { CHAR_ID_RE } from './service.js';
 import { HOME_CAP, homeMapIdOk, homeBuildingKeyOk } from '../../src/net/homeLaw.js';
 import { decorRefund } from '../../src/net/decorLaw.js';
 import { decorHeldBlocks } from './decorBatch.js';
-import { dropIfUnnamed, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmSaveTextOf, seizeRealmRecord } from './realm.js';
+import { dropIfUnnamed, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmHoldOf, realmSaveTextOf, seizeRealmRecord } from './realm.js';
 import { payFromSave, creditSave } from '../../src/net/realm/realmGoldLaw.js';
 
 const OFFER_S = 3 * 24 * 60 * 60;
@@ -159,7 +159,8 @@ async function acceptHome(ctx, player, body) {
     }
   }
   const price = offer.price;
-  if (price > 0 && realm == null) return { error: 'realm-needed' };
+  const refused = await saleRefusal(db, offer, realm);
+  if (refused) return refused;
   const moved = [];
   let sellerKey = null;
   let buyerKey = null;
@@ -225,6 +226,15 @@ async function acceptHome(ctx, player, body) {
     return { error: 'offer-closed' };
   }
   return result;
+}
+
+/** What stops an accepted sale before anything moves, or null: a priced sale needs the buyer's record, and the seller
+ *  must not be held by the judge. The seller hands the house, and any goods kept, to another player and is paid, but its
+ *  record is seized, which asks no hold, so the hold is asked here. The hold's reason is the seller's, not the buyer's. */
+async function saleRefusal(db, offer, realm) {
+  if (offer.price > 0 && realm == null) return { error: 'realm-needed' };
+  if (await realmHoldOf(db, offer.seller, offer.seller_char)) return { error: 'home-seller-held' };
+  return null;
 }
 
 /** Offer, accept, decline or cancel. The client names none of the gold, the owner, or the goods. */

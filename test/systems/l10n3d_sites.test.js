@@ -47,7 +47,7 @@ const ROUTED = {
   'src/scenes/corpseMarker.js': 2,
   'src/scenes/dungeonContext.js': 2,
   'src/scenes/exterior.js': 1,
-  'src/scenes/hostMagic.js': 6,
+  'src/scenes/hostMagic.js': 3,
   'src/scenes/menu.js': 1,
   'src/scenes/questWorld.js': 2,   // TESA's merge (HOST-SPLIT): moved verbatim out of world.js's bootWorld, its two with it
   'src/scenes/world.js': 13,

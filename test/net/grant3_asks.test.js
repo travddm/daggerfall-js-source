@@ -24,11 +24,18 @@ async function world(t) {
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pk = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
   const posts = [];
+  // A post lands after the relay signs its batch, on the crypto thread pool, so a test waits for the post itself.
+  let landed = () => {};
+  const posted = (ms = 10_000) => new Promise((resolve) => {
+    if (posts.length) return resolve();
+    const timer = setTimeout(resolve, ms);
+    landed = () => { clearTimeout(timer); resolve(); };
+  });
   const cell = (key) => {
     const r = fakeRoom(key, { now: () => now });
     r.env.GATE_SIGNING_KEY = pk;
     r.env.GRANT_FEED_URL = 'https://accounts.example/v1/mod/grant-feed';
-    r.env.ACCOUNTS = { fetch: async (req) => { posts.push({ sig: req.headers.get(GRANT_MEASURE_SIG_HEADER), body: new Uint8Array(await req.arrayBuffer()) }); return new Response('{}', { status: 202 }); } };
+    r.env.ACCOUNTS = { fetch: async (req) => { posts.push({ sig: req.headers.get(GRANT_MEASURE_SIG_HEADER), body: new Uint8Array(await req.arrayBuffer()) }); landed(); return new Response('{}', { status: 202 }); } };
     t.after(() => r.room._grantFlush());
     return r;
   };
@@ -38,7 +45,7 @@ async function world(t) {
     let n = 0;
     return { ws, ask: (body) => r.raw(ws, JSON.stringify({ t: 'grant', id: ++n, ...body })), last: () => ws.sent.filter((m) => m.t === 'grant').at(-1) };
   };
-  return { kp, privateKey: await importReceiptKey(pk, { subtle }), cell, join, posts, tick: (ms) => { now += ms; }, get now() { return now; } };
+  return { kp, privateKey: await importReceiptKey(pk, { subtle }), cell, join, posts, posted, tick: (ms) => { now += ms; }, get now() { return now; } };
 }
 
 test('GRANT3 THE ASKS\' LAW: a renewal and a carry only signed grants (AUDIT GRANT A8: a renewal whole), a free my grants\' numbers, a handover\'s heirs each a member its grant stands (AUDIT GRANT A7: a turn\'s frees and heirs one ask each), a tally a reader\'s reasons; an answer to a mint says the law in force (AUDIT GRANT A10); the answers read whole; a grant renewed, carried or handed on is the same foe - its seed and marks - under a new expiry, cell or owner; the relay checks its own signature by signing again (mutants: an heir past a handed grant\'s member; a carried grant\'s cell unchanged; the expiry not moved)', async () => {
@@ -164,7 +171,7 @@ test('GRANT3 A READER\'S TALLY: folded into the cell\'s window under the reader\
   W.tick(GRANT_TALLY_MS);
   await ann.ask({ k: 'tally', rows: [{ o: 'sock-mac-01', r: 'unsigned', n: 1 }] });
   // fold that finds it so posts it - no timer does
-  for (let i = 0; i < 200 && !W.posts.length; i++) await new Promise((r) => setImmediate(r));
+  await W.posted();
   assert.equal(W.posts.length, 1, 'the next window\'s tally folded, and the window posted by that fold');
   assert.equal(c0.room._grants.w.tallies.size, 0, 'a new window begun');
   const opened = await openGrantMeasure(W.posts.at(-1).body, W.posts.at(-1).sig, W.kp.publicKey, { subtle, nowMs: W.now });

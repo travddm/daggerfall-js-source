@@ -44,6 +44,16 @@ export function createNavalHaul({ csa, myBoat, boatPose, yawOfRot }) {
       if (!b.boat?.GameObject) return b.haul(b.to, null, dt);
       return b.haul(berth(b.boat, b.from, hull, b.lie), anchorOf(b.boat), dt);
     },
+    /** The world moved by `o`: where she lay, her berth and her pose move with it. On foot her berth is where she lay,
+     *  one array under two names, so each point is moved once. */
+    offset(b, o) {
+      if (!b) return;
+      const points = new Set([b.from.pos, b.to.pos, b.at.pos]);
+      for (const point of points) {
+        point[0] += o[0];
+        point[2] += o[2];
+      }
+    },
     hauling,
     /** Come Sail Away's `brake` while `b` hauls beside my helm (0: her own rate). */
     brake: (b) => (hauling(b) ? b.brake ?? 0 : 0),
