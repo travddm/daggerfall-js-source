@@ -204,7 +204,7 @@ test('WILD-ALERT host run: A BAND NOTICES ON THE CHECK - lifted bandFrame over t
     };
     const names = Object.keys(d);
     const f = new Function('d', 'law', `const { ${names.join(', ')} } = d;
-      const { bandChaseStep, bandSight, BAND_CONTACT_M, BAND_STAND_M, BAND_STAND_TRIES, BAND_STAND_RETRY_MS, BANDS_WIRE_MAX } = law;
+      const { bandChaseStep, bandSight, BAND_CONTACT_M, BAND_STAND_M, BAND_STAND_RETRY_MS, BANDS_WIRE_MAX } = law;
       const NATIVE_PER_M = 40; let _bandClock = 0;
       const bandRoom = () => true, bandStand = () => true, bandYaw = () => 0, bandDrop = () => {}, bandSpend = (id) => _bandSpent.add(id);
       ${cut('bandFrame')} return bandFrame;`)(d, law);
