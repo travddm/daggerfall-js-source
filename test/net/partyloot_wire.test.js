@@ -38,6 +38,7 @@ import { quietFoesGate } from '../../src/net/foesQuiet.js';
 import { createSeatClock } from '../../src/net/seatLive.js';
 import { ARENA_PUPPET_OWNER } from '../../src/net/arena/arenaLaw.js';
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';
+import { sharedEncounterRecords } from '../../src/scenes/shared-encounters-frame.js';
 import { generateItems, addPileLootExtras, validLootList, LOOT_LIST_MAX, DUNGEON_LOOT_KEYS, LOOT_NEWER_TEXT } from '../../src/systems/loot/loot.js';
 import { rollLootRarity, pileSource, dungeonRarityTier, dungeonFamily, stampWonWeapons, LOOT_RARITY_KEY } from '../../src/systems/loot/lootRarity.js';
 import { peerHanded, neverPeerHanded, notCarried } from '../../src/systems/peerWord.js';
@@ -214,7 +215,7 @@ function dungeon(id, { authority, level, luck, renown, seed, foraging, partners,
     peerSoulTrapOf: () => null, attemptSoulTrap: () => ({ allowDeath: true }), isAzurasStarEquipped: () => false, fillEmptyTrap: () => false,
     hudText: { add: () => {} }, SOUL_TRAP_TEXT: {}, setEnemyAlert: () => {}, sayEnemyDied: () => null, playRareDrop: () => {}, addCorpseFood: () => {},
     // the joiner's stream doors around the records (test/net/seatheal.test.js's, test/net/restsync.test.js's): no surplus, one species
-    validFoeRecord, FOE_HEALTH_MAX, FOE_LEVEL_MAX, FOES_FRAME_MAX, ARENA_PUPPET_OWNER, foeSeed, applyWireLook,
+    validFoeRecord, FOE_HEALTH_MAX, FOE_LEVEL_MAX, FOES_FRAME_MAX, ARENA_PUPPET_OWNER, foeSeed, applyWireLook, sharedEncounterRecords,
     _foesSeq: 0, _foesSeqIn: -1, _foesFrom: null, _keyMismatchSaid: false, _retypeFails: new Map(), RETYPE_TRIES: 3, GENDER_BIT: ['male', 'female'], _retyping: new Set(),
     _surplus: new Map(), _surplusPending: new Map(), hideBeyondHostLayout: () => {}, surplusRecord: () => {}, dropSurplus: () => {},
     _sharedSeq: 0, _sharedPending: new Map(), canStandFoe: () => true,

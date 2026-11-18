@@ -6,7 +6,7 @@ import {
   BAND_CELL_PX, BAND_LIFE_MS, BAND_CHANCE_DAY, BAND_CHANCE_NIGHT, BAND_WANDER_MPS, BAND_LEG_MS, BAND_CHASE_MPS, BAND_LEASH_M,
   BAND_GIVE_UP_MS, BAND_CONTACT_M, BAND_REACH_PX, bandOf, wanderAt, bandsNear, bandSight, bandChaseStep, bandLabel,
   BAND_SIGHT_DAY_M, BAND_SIGHT_NIGHT_M, bandWordOf, validBandWord, chaseYields, BAND_ID_RE, BANDS_WIRE_MAX, BAND_WORD_MS,
-  bandMakeSeed, bandLifeOf, bandNearMe, BAND_STAND_RETRY_MS, BAND_STAND_TRIES, bandPixelOf,
+  bandMakeSeed, bandLifeOf, bandNearMe, BAND_STAND_RETRY_MS, bandPixelOf,
 } from '../../../src/systems/travel/travelBands.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 import { NATIVE_PER_M } from '../../../src/systems/travel/travelDungeons.js';
@@ -166,7 +166,7 @@ test('AUDIT OW3 T7-9/T7-1: a peer\'s word is kept only for a band that can be ab
   assert.equal(bandNearMe(`b${(200 + BAND_REACH_PX + BAND_CELL_PX) / BAND_CELL_PX + 1}.50.7`, at, 7), false, 'past it');
   assert.equal(bandNearMe('b100.60.7', at, 7), false);
   assert.equal(bandNearMe('nope', at, 7), false);
-  assert.deepEqual([BAND_STAND_RETRY_MS, BAND_STAND_TRIES], [1500, 5]);
+  assert.equal(BAND_STAND_RETRY_MS, 1500);
 });
 
 test('TV7 host: the bands about the traveller kept a life and a pixel; made once of Daggerfall\'s themed groups from their own seed; seen from above with their kind and number, a chaser held at the edge; the chase under the view, the contact standing exactly that band; the enhanced interface outdoors', async () => {
@@ -187,7 +187,7 @@ test('TV7 host: the bands about the traveller kept a life and a pixel; made once
   assert.match(w, /if \(!up \|\| _bandChase\.size >= 2 \|\| bandPeerChase\(b\.id\)\) continue;/, 'only under the view does a band first see me; two chasers at most; never a band a peer\'s chase holds (TV7b)');
   assert.match(w, /if \(!wildBands\.step\(b\.id, \{ distM: d, reachM: sight, stealth, scaledDt: sdt, now: now \/ 1000 \}\)\.alerted\) continue;/, 'WILD-ALERT: within its sight, a band chases only once it has noticed me (systems/wild/wildAlert.js)');
   assert.match(w, /for \(const \[id, c\] of _bandChase\) \{\n\s*const s = bandChaseStep\(\{ pos: c\.pos, feet, dt, scale: worldTimeScale\(\), contact: up \? BAND_CONTACT_M : BAND_STAND_M, gainAt: c\.gainAt, now: _bandClock, best: c\.best \}\);\n\s*c\.pos = s\.pos; c\.best = s\.best; c\.gainAt = s\.gainAt; c\.dist = s\.dist;/, 'every chase stepped on its own band (AUDIT OW3 T7-2), the journey\'s pace, the view\'s reach or the stand-off, the last gain fed back (T7-3), on the chases\' own clock (AUDIT OW5b B4), where it is kept (B2)');
-  assert.match(w, /else if \(s\.what === 'contact' && !\(c\.retryAt > now\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s*const mk = bandMake\(c\.band\);\n\s*const met = bandRoom\(mk\) \? journeyMet\(\) : null;\n\s*if \(met === 'avoided'\) \{ _bandChase\.delete\(id\); bandSpend\(id\); continue; \}\n\s*if \(met === 'ignored'\) \{ c\.retryAt = now \+ BAND_STAND_RETRY_MS; continue; \}\n\s*c\.yaw \?\?= bandYaw\(c\.pos\);[^\n]*\n\s*if \(bandStand\(mk, c\.yaw, c\.dist\) \|\| \+\+c\.tries >= BAND_STAND_TRIES\) \{ _bandChase\.delete\(id\); bandSpend\(id\); \}[^\n]*\n\s*else c\.retryAt = now \+ BAND_STAND_RETRY_MS;/, 'contact asks the journey first (AUDIT OW5b E1), then stands the band, once - spent only once it stood, or its tries are spent (AUDIT OW3 T7-1)');
+  assert.match(w, /else if \(s\.what === 'contact' && !\(c\.retryAt > now\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s*const mk = bandMake\(c\.band\);\n\s*const met = journeyMet\(\);\n\s*if \(met === 'avoided'\) \{ _bandChase\.delete\(id\); bandSpend\(id\); continue; \}\n\s*if \(met === 'ignored'\) \{ c\.retryAt = now \+ BAND_STAND_RETRY_MS; continue; \}\n\s*c\.yaw \?\?= bandYaw\(c\.pos\);[^\n]*\n\s*if \(bandStand\(mk, c\.yaw, c\.dist\)\) \{ _bandChase\.delete\(id\); bandSpend\(id\); \}[^\n]*\n\s*else c\.retryAt = now \+ BAND_STAND_RETRY_MS;/, 'contact asks the journey first, then stands the band - spent only once it stood');
   assert.match(w, /if \(s\.what === 'lost'\) \{ _bandChase\.delete\(id\); bandSpend\(id\); \}/, 'a lost trail: the band is gone for its life');
   assert.match(w, /_bandChase\.set\(b\.id, \{ band: b, pos: \{ x: p\.x, z: p\.z \}, gainAt: _bandClock, best: d, dist: d, tries: 0, retryAt: 0 \}\);/, 'a chase keeps its band');
   assert.match(w, /if \(_bandSpent\.has\(b\.id\) \|\| _bandChase\.has\(b\.id\)\) continue;/);
@@ -299,7 +299,7 @@ const bandHost = async (over = {}) => {
   const names = Object.keys(d).filter((k) => /^[A-Za-z_$][\w$]*$/.test(k));
   const make = new Function('d', 'law', `
     const { ${names.join(', ')} } = d;
-    const { bandChaseStep, bandSight, validBandWord, bandNearMe, bandPixelOf, chaseYields, BAND_CONTACT_M, BAND_STAND_M, BAND_STAND_TRIES,
+    const { bandChaseStep, bandSight, validBandWord, bandNearMe, bandPixelOf, chaseYields, BAND_CONTACT_M, BAND_STAND_M,
       BAND_STAND_RETRY_MS, BANDS_WIRE_MAX, BAND_LIFE_MS, BAND_STAND_MIN_M, BAND_WORD_MS } = law;
     const NATIVE_PER_M = 40, PACK_SPACING = 6, PACK_ALERT_RADIUS = 30;
     const partyGroupMembers = (t) => t, partySize = () => 1, campMembers = (t) => t, exteriorFoes = { encounterRoom: () => d.room ?? Infinity };
@@ -334,25 +334,37 @@ test('AUDIT OW4 B10 host run: a wanderer in sight chases (under the view, two at
   assert.equal(peer.d._bandChase.size, 0, 'a band a peer chases is theirs');
 });
 
-test('AUDIT OW4 B10 host run: a contact the ground refuses holds its first bearing through every retry, BAND_STAND_RETRY_MS apart, and is lost after BAND_STAND_TRIES - spent, never standing nobody', async () => {
-  const h = await bandHost({ standOk: () => false });
+test('host run: a contact the ground refuses holds its first bearing through every retry, BAND_STAND_RETRY_MS apart, and is never spent unstood for its count of tries, as DFU\'s FoeSpawner retries until it places; it stands once the ground allows, and only the chase\'s own lost rule gives it up (mutants: a cap on the tries)', async () => {
+  let refused = true;
+  const h = await bandHost({ standOk: () => !refused });
   h.d.list = [bandAt('b1.1.5', 0, 40)];
   h.bandFrame(1000);
   let t = 1000;
-  for (let i = 0; i < 5000 && h.d._bandChase.size; i++) { t += 16; h.d.ms += 16; h.bandFrame(t); }
-  assert.equal(h.d._bandChase.size, 0);
-  assert.ok(h.d._bandSpent.has('b1.1.5'), 'lost after its tries');
+  for (let i = 0; i < 2500; i++) { t += 16; h.d.ms += 16; h.bandFrame(t); }   // forty seconds at the traveller
+  assert.ok(h.d._bandChase.has('b1.1.5') && !h.d._bandSpent.has('b1.1.5'), 'still trying, never spent unstood');
   const tries = h.d.standCalls.length / 4;
-  assert.equal(tries, BAND_STAND_TRIES, 'BAND_STAND_TRIES stands tried, four bearings each');
+  assert.ok(tries > 10, `it tried on: ${tries} tries`);
   const first = h.d.standCalls[0];
   for (let i = 0; i < h.d.standCalls.length; i += 4) assert.ok(Math.abs(h.d.standCalls[i] - first) < 1e-9, 'every try on the bearing it first came from');
   assert.deepEqual(h.d.standCalls.slice(0, 4).map((y) => +(y - first).toFixed(6)), [0, +(Math.PI / 2).toFixed(6), +(-Math.PI / 2).toFixed(6), +Math.PI.toFixed(6)], 'its own, a quarter turn either way, then behind');
-  assert.ok(t - 1000 >= (BAND_STAND_TRIES - 1) * BAND_STAND_RETRY_MS, 'the tries BAND_STAND_RETRY_MS apart');
+  assert.ok(t - 1000 >= (tries - 1) * BAND_STAND_RETRY_MS, 'the tries BAND_STAND_RETRY_MS apart');
+  refused = false;
+  for (let i = 0; i < 200 && h.d._bandChase.size; i++) { t += 16; h.d.ms += 16; h.bandFrame(t); }
+  assert.ok(!h.d._bandChase.size && h.d._bandSpent.has('b1.1.5'), 'stood once the ground allowed it, then spent');
+
+  const left = await bandHost({ standOk: () => false });
+  left.d.list = [bandAt('b1.1.5', 0, 40)];
+  left.bandFrame(1000);
+  for (let i = 0, lt = 1000; i < 300; i++) { lt += 16; left.d.ms += 16; left.bandFrame(lt); }
+  assert.ok(left.d._bandChase.has('b1.1.5'), 'at contact, trying');
+  left.d.feet = { x: 0, z: 2000 * NATIVE_PER_M };   // the traveller gone far past its leash
+  left.bandFrame(1000 + 301 * 16);
+  assert.ok(!left.d._bandChase.size && left.d._bandSpent.has('b1.1.5'), 'the chase lost: given up, spent');
+
   const room = await bandHost({ room: 1 });
   assert.equal(room.bandStand({ mobileTypes: [1, 2, 3] }, 0), false, 'no room in the foe pool: not stood');
   assert.equal(room.d.standCalls.length, 0);
 });
-
 test('AUDIT OW4 B10 host run: water, a boat, a town\'s rect or the camps off end every chase SPENT; death or a window holding the game HOLDS it', async () => {
   for (const [what, over] of [['swimming', { player: { isPlayerSwimming: true, pos: [0, 0, 0], feetAt: () => [0, 0, 0] } }], ['a boat', { isBoatEffectBundle: () => true, playerEntity: { health: 50, activeEffects: [{ bundleName: 'boat' }] } }],
     ['a sailing boat', { csaRuntime: { isSailing: () => true } }], ['a town', { _inAnyLocationRect: () => true }], ['camps off', { getPref: () => false }]]) {
@@ -466,20 +478,23 @@ test('AUDIT OW5b E1 host run: A JOURNEY AT x40 IS STOPPED THE FRAME THE BAND REA
   }
 });
 
-test('AUDIT OW5b E1 host run: a band the full foe pool cannot stand MEETS NOBODY - the journey is never asked for it (no stop, no box, for a band that never comes); it tries again, and is lost after its tries', async () => {
+test('host run: a band the full foe pool cannot stand still MEETS the journey at contact, as the travel mod stops on DFU\'s OnEncounter while the spawner places; it is never spent while the pool is full, and stands once there is room (mutants: the journey not asked without room; a cap on the tries)', async () => {
   const h = await bandHost({ met: 'stopped', order: [], room: 1 });   // two members, room for one
   h.d._bandChase.set('b1.1.5', { band: bandAt('b1.1.5', 0, 10), pos: { x: 0, z: 10 * NATIVE_PER_M }, gainAt: 0, best: 10, tries: 0, retryAt: 0 });
   let t = 1000;
-  for (let i = 0; i < 5000 && h.d._bandChase.size; i++) { t += 16; h.d.ms += 16; h.bandFrame(t); }
-  assert.equal(h.d.metCalls, 0, 'never asked');
-  assert.equal(h.d.standCalls.length, 0, 'never stood');
-  assert.ok(h.d._bandSpent.has('b1.1.5'), `lost after its ${BAND_STAND_TRIES} tries`);
+  for (let i = 0; i < 2500; i++) { t += 16; h.d.ms += 16; h.bandFrame(t); }
+  assert.ok(h.d.metCalls > 0 && h.d.order[0] === 'met', 'the journey met at contact');
+  assert.equal(h.d.standCalls.length, 0, 'never stood while the pool was full');
+  assert.ok(h.d._bandChase.has('b1.1.5') && !h.d._bandSpent.has('b1.1.5'), 'never spent while it could not stand');
+  h.d.room = 2;
+  for (let i = 0; i < 200 && h.d._bandChase.size; i++) { t += 16; h.d.ms += 16; h.bandFrame(t); }
+  assert.equal(h.d.standCalls.length, 1, 'stood once there was room');
+  assert.ok(h.d._bandSpent.has('b1.1.5'), 'then spent');
   const room = await bandHost({ met: 'stopped', order: [], room: 2 });
   room.d._bandChase.set('b1.1.5', { band: bandAt('b1.1.5', 0, 10), pos: { x: 0, z: 10 * NATIVE_PER_M }, gainAt: 0, best: 10, tries: 0, retryAt: 0 });
   room.bandFrame(1000);
   assert.deepEqual(room.d.order, ['met', 'stand'], 'room for all: met, stood');
 });
-
 test('AUDIT OW5b B1 host run: THE CHASE RUNS ON THE FRAME\'S OWN CLOCK - a quarter-second hitch moves a band only the frame\'s dt (its 0.1 s clamp, the one the traveller\'s motor ran on), never its own quarter second', async () => {
   const h = await bandHost({ travelView: { active: true } });
   const c = { band: bandAt('b1.1.5', 0, 200), pos: { x: 0, z: 200 * NATIVE_PER_M }, gainAt: 0, best: 200, tries: 0, retryAt: 0 };

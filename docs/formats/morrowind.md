@@ -78,7 +78,7 @@ An async read must store its result in the cache generation it started under.
 | `mwItemMap.js`, `mw-worn-parts.ts` | Maps every Daggerfall weapon, armour and clothing template and material to a Morrowind record, resolved against the player's records by search token. A row may say "keep the classic sprite"; it must say so explicitly. The worn body: the armour and clothing part table, which skin each part hides, the reserve lists of robes and skirts, the priority law, and the shield and part-group ladders. |
 | `mwFaceMatch.js` | Pairs Daggerfall portraits with Morrowind heads and hairs. |
 | `mwCloakFit.js`, `mwPartClock.js` | Cloak fitting and parts that animate on their own clock (for example an arrow on a bow). |
-| `mwParticles.js`, `mw-particle-sim.ts`, `mwSpellFx.js`, `mwVfx.js` | NIF particle systems (torch flames: the descriptors read from a file, and the running simulation), which Morrowind effect visuals a Daggerfall spell uses, and running an effect mesh (`scenes/mwMagicFx.js`). |
+| `mwParticles.js`, `mw-particle-sim.ts`, `mwSpellFx.js`, `mw-actor-fx-size.ts`, `mwVfx.js` | NIF particle systems (torch flames: the descriptors read from a file, and the running simulation), which Morrowind effect visuals a Daggerfall spell uses, how large an effect is on a creature and how far it sits from the feet, and running an effect mesh (`scenes/mwMagicFx.js`). |
 
 ## Where it is used
 
