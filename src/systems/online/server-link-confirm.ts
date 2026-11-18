@@ -5,6 +5,7 @@
 
 import { relayUrl } from '../../net/wire.js';
 import { t } from '../textManager.js';
+import { BOOT_DOOR_KEYS } from './onlineLane.js';
 
 /** The relays the player accepted from a link, as a JSON array of relay URLs. */
 export const JOINED_SERVERS_KEY = 'dagger.online.joinedServers';
@@ -59,6 +60,32 @@ export const serverLinkJoinText = (): string => t('net.serverLink.join', 'Join')
 export const serverLinkStayText = (): string => t('net.serverLink.stay', 'Do not join');
 export const serverLinkDeclinedText = (): string =>
   t('net.serverLink.declined', 'You did not join that server. Nothing was sent to it.');
+
+/** The query keys that boot a scene before the menu can show (main.js `boot`), beside the keys the menu decides. */
+const SCENE_ROUTE_KEYS = ['world', 'interior', 'dungeon', 'exterior', 'shot', 'nomenu'];
+
+/**
+ * The page's main menu for a player who declined a link: this address without the link's relay and without the keys
+ * that would boot a scene past the menu. Other keys, such as the language, stay.
+ */
+export function menuUrlOf(href: string): string {
+  const url = new URL(href);
+  for (const key of ['server', ...SCENE_ROUTE_KEYS, ...BOOT_DOOR_KEYS]) url.searchParams.delete(key);
+  return url.href;
+}
+
+type PageLocation = { href: string; replace(url: string): void } | undefined;
+
+/**
+ * Takes a player who declined a link back to the main menu. The promise never settles, because the page is going
+ * away and the boot must not go on to the world or paint a failure over the screen first. A page with no location
+ * cannot go back, so it fails with the declined words instead.
+ */
+export function returnToMenu(location: PageLocation = globalThis.location): Promise<never> {
+  if (!location) return Promise.reject(new Error(serverLinkDeclinedText()));
+  location.replace(menuUrlOf(location.href));
+  return new Promise<never>(() => {});
+}
 
 /**
  * Shows the full-screen prompt for `relay` and answers whether the player chose to join. A page with no document

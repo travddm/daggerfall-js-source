@@ -16,12 +16,18 @@ const { openProfileDoor } = (await import(DOOR_PATH)) as {
     fetchImpl: Fetch,
     storage: Store,
     confirmLink: (relay: string) => Promise<boolean>,
+    declineLink?: () => Promise<never>,
   ) => Promise<void>;
 };
-const { unconfirmedServerLink, rememberJoinedServer, askServerLink } = (await import(CONFIRM_PATH)) as {
+type PageLocation = { href: string; replace(url: string): void };
+const { unconfirmedServerLink, rememberJoinedServer, askServerLink, menuUrlOf, returnToMenu } = (await import(
+  CONFIRM_PATH
+)) as {
   unconfirmedServerLink: (params: URLSearchParams, storage: Store, saved: unknown) => string | null;
   rememberJoinedServer: (storage: Store, relay: string) => void;
   askServerLink: (relay: string, doc?: unknown) => Promise<boolean>;
+  menuUrlOf: (href: string) => string;
+  returnToMenu: (location?: PageLocation) => Promise<never>;
 };
 const { learnedAccountService } = (await import(ADDRESS_PATH)) as {
   learnedAccountService: (storage: Store) => unknown;
@@ -33,11 +39,12 @@ const memoryStore = (): Store => {
 };
 const EVIL = 'wss://relay.evil.example';
 
-test('declining a link to a relay never joined fetches nothing, remembers nothing and says so', async () => {
+test('declining a link to a relay never joined fetches nothing, remembers nothing and goes back to the menu', async () => {
   const store = memoryStore();
   const asked: string[] = [];
   const said: string[] = [];
   let fetched = 0;
+  let declined = 0;
   await assert.rejects(
     openProfileDoor(
       new URLSearchParams(`online&server=${EVIL}`),
@@ -51,9 +58,15 @@ test('declining a link to a relay never joined fetches nothing, remembers nothin
         asked.push(relay);
         return false;
       },
+      async () => {
+        declined++;
+        throw new Error('back to the menu');
+      },
     ),
-    /You did not join that server\. Nothing was sent to it\./,
+    /back to the menu/,
   );
+  assert.equal(declined, 1);
+  assert.deepEqual(said, ['You did not join that server. Nothing was sent to it.']);
   assert.deepEqual(asked, [EVIL]);
   assert.equal(fetched, 0);
   assert.equal(learnedAccountService(store), null);
@@ -74,4 +87,19 @@ test('an accepted relay is remembered and not asked again; the saved relay and n
 
 test('a page with no document cannot ask, so it does not join', async () => {
   assert.equal(await askServerLink(EVIL, undefined), false);
+});
+
+test('the menu a declining player goes back to drops the link and every key that boots past the menu', async () => {
+  const link = `http://game.example/play/?world&online&server=${EVIL}&region=Daggerfall&loc=Daggerfall&lang=de`;
+  assert.equal(menuUrlOf(link), 'http://game.example/play/?lang=de');
+  const went: string[] = [];
+  const settled = await Promise.race([
+    returnToMenu({ href: link, replace: (url) => void went.push(url) }).then(
+      () => 'settled',
+      () => 'settled',
+    ),
+    new Promise((resolve) => setTimeout(() => resolve('pending'), 20)),
+  ]);
+  assert.deepEqual(went, ['http://game.example/play/?lang=de']);
+  assert.equal(settled, 'pending', 'the boot waits for the page to go instead of drawing a failure');
 });
