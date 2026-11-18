@@ -14161,10 +14161,9 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     // journey: the following team's pose is cached to ride along, or it waits at the departure with
     // FollowFastTravel off. Before `_traveling` rises (the runtime's ready() reads it) and before the gold goes.
     const partyArrival = walkMode && typeof pick.besideAt === 'function';
-    const departFrom = walkMode ? player.pos : cam.pos;   // where the journey set out: a failed build puts it back here
-    const departure = {
-      pixel: { ...playerTravelPixel() }, native: state.worldCoords(departFrom),
-      y: departFrom[1] - state.compensation[1], yaw: cam.yaw,
+    const departure = {   // where the journey set out: a failed build puts it back here
+      pixel: { ...playerTravelPixel() }, native: state.worldCoords(player.pos),
+      y: player.pos[1] - state.compensation[1], yaw: cam.yaw,
       boat: csaBoatUnderMe(), local: null,
     };
     if (departure.boat) departure.local = csaLocalOf(csaDeckPose(departure.boat), player.pos);
