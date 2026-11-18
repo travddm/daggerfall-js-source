@@ -68,6 +68,7 @@ import { VENDOR_REFUSAL_WORDS } from './vendorLaw.js';   // HOME-VENDOR: a trade
 import { busyRead, busyAnswer, busyWaitMs, retryAfterMs, BUSY_HOLD_MS } from './busyLaw.js';   // BUSY-GATE: the reads that stand back while the service is overloaded
 import { ARENA_TEXT } from '../systems/arena/arenaText.js';   // ARENA4b: the arena's refusals, in its own frozen table
 import { jittered } from './backoff.js';   // STORM-SHED: a failed mint's hold, jittered as every book's wait is
+import { HOME_TRANSFER_REFUSAL_WORDS } from './home-transfer-refusals.ts';
 import { tradeHeldSaid } from './realm/realmTradeLaw.js';   // RPT1026-MARKET HOLD-SAID: the standing hold's own notice
 import { MINT_VERSION } from './productRecord.js';   // a craft asks its record be stamped with the version this build mints
 import { accountServiceOf } from './account-service-address.ts';   // where the service is: an override, or what the relay said
@@ -314,12 +315,7 @@ const REFUSAL_WORDS = {
   'decor-rev': () => t('account.refusal.decorRev', 'The room changed while you were furnishing it. Look again.'),
   'decor-ops': () => t('account.refusal.decorOps', 'That is too many changes at once.'),
   'decor-txn': () => t('account.refusal.decorTxn', 'That furnishing was already sent.'),
-  'home-holds': () => t('account.refusal.homeHolds', 'Take the goods out before the house changes hands.'),
-  'bad-offer': () => t('account.refusal.badOffer', 'That offer could not be read.'),
-  'home-deed': () => t('account.refusal.homeDeed', 'A house given by a knightly order cannot be transferred.'),
-  'offer-open': () => t('account.refusal.offerOpen', 'An offer for this house is already out.'),
-  'offer-closed': () => t('account.refusal.offerClosed', 'That offer is no longer open.'),
-  'offer-stale': () => t('account.refusal.offerStale', 'The room changed. Make the offer again.'),
+  ...HOME_TRANSFER_REFUSAL_WORDS,
   // GUILD1: the guilds (server-account/src/guilds.js)
   'guilds-need-account': () => t('account.refusal.guildsNeedAccount', 'Guilds need a username and a password. Give this account one and you can found or join one.'),
   'guild-character': () => t('account.refusal.guildCharacter', 'The account service could not tell which character that is.'),
