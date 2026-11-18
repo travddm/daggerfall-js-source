@@ -44,7 +44,7 @@ import { silenceBlocksCast, attemptSoulTrap, SOUL_TRAP_TEXT, fillEmptyTrap, peer
 import { isAzurasStarEquipped, registerFoeDoor } from '../systems/artifactEffects.js';   // V3: the Star's kill capture; AUDIT PSCALE1 DOORS-2: Namira's reflection through this pool's door
 import { EnemyAttack } from '../characters/enemy/enemyAttack.js';
 import { makeEnemyEntity, loadEnemyCareer, KNIGHT_CITYWATCH_ID, applyHeroThreat } from '../characters/enemy/enemyEntity.js';
-import { coopCandidates, companionWords, standCrewPuppet } from './peer-allies.js';
+import { coopCandidates, companionWords, standCrewPuppet, fightsAtMySide } from './peer-allies.js';
 import { heroThreatOf } from '../systems/heroThreat.js';   // BAL11: the hero's threat
 import { MobileUnit, MOBILE_DAEDRA_SEDUCER, SeducerTransformBehaviour } from '../characters/mobile/mobileUnit.js';   // A5: the Seducer transform pair + its trigger
 import { spawnEnemyLoot, hasBowAttack, backstabChanceOf, zeroDamageHitSound, enemyMissSound, enemyAttackVoice, enemyPainVoice, playerAttackGrunt, tickEnemySound, playEnemyClip, tryLanguagePacification, applyDamageToNonPlayer, windupDoor, tellCues, takeAimedShot, aimedDirection, aimedArrowMeta, landBlowEffect } from './hostCombat.js';   // C2-slice (combat-9/17); MT-ii: the foe-vs-foe payload; TELL1: the poise door
@@ -2562,7 +2562,7 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
       if (site) stood.add(site);
       const gen = o.gen;
       const shipmate = crew.has(r.i);
-      spawnFoe(r.t, feet, { puppet: from, seq: r.i, gender: GENDER_BIT[r.x === 1 ? 1 : 0], feetGiven: true, yaw: r.y ?? null, level: r.l ?? null, site, allied: (r.t === KNIGHT_CITYWATCH_ID && allied.has(r.i)) || shipmate || refugees.has(r.i), champion: cp })   // RAID2: a watchman the owner names its ally stands as mine - SHIPMATES: and a crewman
+      spawnFoe(r.t, feet, { puppet: from, seq: r.i, gender: GENDER_BIT[r.x === 1 ? 1 : 0], feetGiven: true, yaw: r.y ?? null, level: r.l ?? null, site, allied: (r.t === KNIGHT_CITYWATCH_ID && allied.has(r.i)) || shipmate || [refugees, comp].some((named) => named.has(r.i)), champion: cp })   // RAID2: a watchman the owner names its ally stands as mine - SHIPMATES: and a crewman
         .then((nf) => {
           if (!nf) return;
           if (grantCheck && _net.grants?.enforcing()) void grantCheck.then((why) => { if (_net.grants?.standsDown(why)) removePuppet(nf); });   // GRANT6: while the law enforces, a forged grant or none stands down (GRANT_STANDDOWN_REASONS)
@@ -2814,10 +2814,10 @@ export function createExteriorFoes({ renderer, collider, fetchBytes, getTexture,
     if (f?.dead && data.cs === 1 && foes.includes(f)) { const s = hitSpellOf(data); return !!s && !!f.corpsePrefab?.struck(s.spell, s.level, null); }   // DEX5b: a copy's missile on my foe's prefab body (its bundle, the body's own entity)   // QUEST-PARTY: a quest's foe takes a peer's blow only from the party it rides to - any peer's word used to land on one it could not even see
     if (!f || f.dead || !Number.isFinite(dmg) || dmg < 0 || (dmg > PEER_HIT_DMG_MAX && !f.entity?.staffBoss)) return false;   // BOSS-BIG-HIT: a staff event's mini boss takes a blow past the bound at the bound (below) - every other foe refuses it whole
     const blow = Math.min(PEER_HIT_DMG_MAX, dmg);   // BOSS-BIG-HIT: a peer's spell of tens of thousands on the mini boss lands as 10,000 - it was thrown away
-    // AUDIT CC-E1: ANOTHER's foe mauled my companion where it stands - the blow lands here, where he is real: the foe's
-    // blow, not a player's (the knock-out arm his death), and he turns on the striker's puppet
+    // Another player's foe struck my companion or my summon: the blow lands here, where it is real. It is a foe's blow,
+    // not a player's (a companion is knocked out, never killed), and it turns my ally on the striker's puppet.
     if (data.fb === 1) {
-      if (f.companion == null || !foes.includes(f)) return false;
+      if (!fightsAtMySide(f) || !foes.includes(f)) return false;
       const fd = Array.isArray(data.d) && data.d.length === 3 && data.d.every(Number.isFinite) ? data.d : null;
       const fl = fd ? Math.hypot(fd[0], fd[1], fd[2]) : 0;
       damageFoe(f, dmg, null, fl > 1e-6 && fl < 1e6 ? [fd[0] / fl, fd[1] / fl, fd[2] / fl] : null, { fromPlayer: false, kind: data.kind === 'arrow' ? 'arrow' : 'melee' });
