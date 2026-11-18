@@ -345,6 +345,7 @@ import { createRoomLoot } from './roomLootHost.js';   // HOST-SPLIT
 import { createSearchRoom } from './searchRoom.js';   // GRAVE-PARTY: whose a searched object's word is - the searcher's party's, never a stranger's
 import { monsterVolume } from '../systems/monsterVolume.js';   // MONSTER-VOL: a monster's pain cry rides the Audio tab's Monster Volume
 import { isAbyssMapId } from '../world/oceanHoles.js';   // PITS-WORLD: an Ocean Hole's abyss, the Bay's or one past it - never a hall's or an Abyss Dungeon's id
+import { sharedEncounterRecords } from './shared-encounters-frame.js';
 
 
 
@@ -4841,13 +4842,8 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     }
     // REST-SYNC: the room's encounters ride the same frame, numbered by the room (`i` their id); a full frame lists them
     // all (`xf`), so a joiner takes down the ones the host no longer has
-    const shared = [];
     for (const [id, f] of _sharedById) if ((f.dead && !f.corpse && !f.corpseDestroyed) || !foes.includes(f)) _sharedById.delete(id);   // Destroy()ed or gone: the room forgets it, and a full frame takes every puppet of it down (AUDIT RPT1026 G1: a capped one, XF_STANDING, a standing puppet alone - a body forgotten past the cap lies on a joiner until a whole frame)
-    for (const f of [..._sharedById.values()].sort((a, b) => (a.dead ? 1 : 0) - (b.dead ? 1 : 0) || (a.dead ? (b._diedAt ?? 0) - (a._diedAt ?? 0) : 0))) {   // the standing before the bodies - AUDIT RPT1026 G1: and the newest dead first, so the cap sheds an old body a joiner holds, never a death no frame has told (spawnCorpse's stamp)
-      if (shared.length >= SHARED_FOES_MAX) break;
-      const r = roomRecord(f, f._encId, full, true);
-      if (r) shared.push(r);
-    }
+    const { records: shared, standingLeftOut } = sharedEncounterRecords(_sharedById.values(), (f) => roomRecord(f, f._encId, full, true), SHARED_FOES_MAX, { full, unsent: (f) => { f._sentKey = null; f._maxSent = undefined; f._lsSent = undefined; } });
     // AUDIT WORLD34 B3: a FULL frame goes even when it carries nothing - it is the seat's heartbeat (FOES_STALE_MS
     // reads it), and a layout with no foes to say left every joiner flipping to its own authority six seconds in
     if (!out.length && !shared.length && !full) return null;
@@ -4864,7 +4860,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       for (const r of shared.slice(n)) { const f = _sharedById.get(r.i); if (f) { f._sentKey = null; f._maxSent = undefined; f._lsSent = undefined; } }   // AUDIT SETS M1: and its maximum, if it carried one, is owed
       if (n) frame.x = shared.slice(0, n);
     }
-    if (full && n === shared.length) frame.xf = shared.length < _sharedById.size ? XF_STANDING : XF_WHOLE;   // RPT1026-ITEMS BODY-CAP: past SHARED_FOES_MAX the bodies are what the cap shed, so the list is whole for the standing alone (2)
+    if (full && n === shared.length && !standingLeftOut) frame.xf = shared.length < _sharedById.size ? XF_STANDING : XF_WHOLE;   // RPT1026-ITEMS BODY-CAP: past SHARED_FOES_MAX the bodies are what the cap shed, so the list is whole for the standing alone (2)
     if (full) fitMaxima(frame, [...out.map((r) => [r, foes[r.i]]), ...(frame.x ?? []).map((r) => [r, _sharedById.get(r.i)])]);
     return frame;
   }
