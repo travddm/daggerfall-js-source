@@ -13,6 +13,7 @@ import { ELITE_FOE_MULTIPLIER } from '../../src/world/spawnedDungeons.js';
 import { blowClassOf } from '../../src/ai/puppetBlows.js';   // AUDIT FEUD: the hit door builds a blow's class whenever its weakness rides (the real one)
 import { ARENA_PUPPET_OWNER } from '../../src/net/arena/arenaLaw.js';   // ARENA4: the kill door's puppet test, the real owner word (no puppet here)
 import { foeSeed, applyWireLook } from '../../src/characters/foeBodies.js';   // AUDIT MW-NPC II K3: the dungeon context's look seed, in the mounted scope
+import { sharedEncounterRecords } from '../../src/scenes/shared-encounters-frame.js';   // the frame's shared encounters, in the mounted scope
 import { isClassEnemyId, enemyEntityType } from '../../src/characters/enemy/enemyBasics.js';   // DEX1: the hosts' class test and entity type (the mount's free names)
 import { bossStrikeAt, bossTakeAt, bossClockS } from '../../src/systems/bossTraits.js';
 import { strikeTraits, traitWire, traitWireKey, readTraitWire, traitsAuthority, traitsFrame } from '../../src/scenes/foeTraitsHost.js';   // AUDIT WORLD-EVENTS: the dungeon host's trait doors, in the harness's scope   // BOSS-TRAITS: the damage door's two halves, in the harness's scope
@@ -154,6 +155,7 @@ function side({ authority, layout = [], shared = [], over = {} }) {
   const built = [], applied = [], destroyed = [], dropped = [];
   const state = {
     foeSeed, applyWireLook,   // AUDIT MW-NPC II K3: the records' look seed (roomRecord, applyFoeRecord, the puppets' stands)
+    sharedEncounterRecords,
     ...TRAIT_DOORS,   // AUDIT WORLD-EVENTS: the trait doors roomRecord, applyFoeRecord and setAuthority call
     _authority: authority, _layoutFoes: layout.length, foes, _sharedById: new Map(shared.map((f) => [f._encId, f])),
     _sharedSeq: Math.max(0, ...shared.map((f) => f._encId)), _sharedPending: new Map(), _ctxDead: false,
@@ -284,6 +286,26 @@ test('REST-SYNC: a body the joiner never saw standing is never stood, a killed e
   const out = crowded.foesFrame(true).x;
   assert.equal(out.length, K.SHARED_FOES_MAX, 'a frame carries at most its cap');
   assert.deepEqual(out.slice(0, 3).map((r) => r.d), [0, 0, 0], 'the standing first - a body is what a crowded frame sheds');
+});
+
+test('shared encounters past the count cap: every standing one reaches a joiner, and a full frame that could not list them all takes none of them down', async () => {
+  const count = K.SHARED_FOES_MAX + 3;
+  const standing = Array.from({ length: count }, (_, n) => foe({ _encId: n + 1, ai: { feet: [n, 0, 0], yaw: 0, moving: false, target: null, height: 1.8 } }));
+  const host = side({ authority: true, shared: standing });
+  const joiner = side({ authority: false });
+  const full = host.foesFrame(true);
+  assert.equal(full.x.length, K.SHARED_FOES_MAX, 'a frame still carries at most its cap');
+  assert.equal(full.xf, undefined, 'a full frame that left a standing encounter out does not say its list is whole');
+  joiner.applyFoesFrame(full, 'host');
+  const next = host.foesFrame(false);
+  assert.deepEqual(next?.x?.map((r) => r.i), [K.SHARED_FOES_MAX + 1, K.SHARED_FOES_MAX + 2, K.SHARED_FOES_MAX + 3], 'the ones the cap left out ride the next frame');
+  joiner.applyFoesFrame(next, 'host');
+  await tick();
+  assert.equal(joiner.state._sharedById.size, count, 'the joiner stands every one of them');
+  joiner.applyFoesFrame(host.foesFrame(true), 'host');
+  await tick();
+  assert.equal(joiner.state._sharedById.size, count, 'and the next full frame takes none of them down');
+  assert.deepEqual(joiner.destroyed, []);
 });
 
 test('REST-SYNC: the encounters ride only the room the layout leaves under the wire\'s one cap - the largest elite layout\'s worst case still goes, and a frame that sheds one does not say it lists them whole', () => {

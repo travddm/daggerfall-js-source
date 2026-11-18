@@ -58,7 +58,7 @@ const accountsOfSave = (/** @type {any} */ save, /** @type {unknown} */ region) 
 export function payableOf(/** @type {any} */ save, /** @type {unknown} */ region = null) {
   const coins = whole(save?.goldPieces);
   const letters = (Array.isArray(save?.items) ? save.items : []).filter((it) => it?.templateIndex === REALM_LETTER_TEMPLATE).reduce((s, it) => s + whole(it.value), 0);
-  const bank = accountsOfSave(save, region).reduce((s, a) => s + Math.max(0, Number(a.accountGold) || 0), 0);
+  const bank = accountsOfSave(save, region).reduce((s, a) => s + whole(a.accountGold), 0);
   return coins + letters + bank;
 }
 
@@ -75,11 +75,17 @@ export function payFromSave(save, amount, region = null) {
   if (amount <= purse) { save.goldPieces = purse - amount; return true; }
   let owed = amount;
   const items = Array.isArray(save.items) ? save.items : [];
+  // A letter or a balance that is not a safe whole number pays nothing, as payableOf counts it: a forged value must not
+  // leave the debt unpaid behind a success, nor stay the same after a payment.
   for (;;) {
-    const loc = items.find((it) => it?.templateIndex === REALM_LETTER_TEMPLATE);
+    const loc = items.find((it) => it?.templateIndex === REALM_LETTER_TEMPLATE && whole(it.value) > 0);
     if (!loc) break;
-    if (owed < (loc.value ?? 0)) { loc.value -= owed; owed = 0; break; }
-    owed -= loc.value ?? 0;
+    if (owed < loc.value) {
+      loc.value -= owed;
+      owed = 0;
+      break;
+    }
+    owed -= loc.value;
     items.splice(items.indexOf(loc), 1);
   }
   if (owed > 0) {
@@ -88,7 +94,7 @@ export function payFromSave(save, amount, region = null) {
   // payableOf counted it: the accounts are there and cover it - the Empire's first (EMPIRE-ACCOUNT)
   for (const a of accountsOfSave(save, region)) {
     if (!(owed > 0)) break;
-    const take = Math.min(owed, Math.max(0, Number(a.accountGold) || 0));
+    const take = Math.min(owed, whole(a.accountGold));
     a.accountGold -= take;
     owed -= take;
   }
