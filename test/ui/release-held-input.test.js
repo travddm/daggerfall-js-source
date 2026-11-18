@@ -163,7 +163,12 @@ test('a bow still drawing as the window loses focus does not loose when the draw
 
 test('a broadside laid at the helm as the window loses focus is put down unfired and silent, and a stray mouseup after it fires nothing (mutants: the blur releasing the button; the guns left laid)', async () => {
   const h = await sea({ hull: HULL.SmallShip });
-  const anims = [...h.boat.GameObject.walk()].flatMap((n) => n.getComponents('Animator').map((c) => c.animator).filter(Boolean));
+  const anims = [...h.boat.GameObject.walk()].flatMap((n) =>
+    n
+      .getComponents('Animator')
+      .map((c) => c.animator)
+      .filter(Boolean),
+  );
   const frame = (dt) => {
     for (const a of anims) a.update(dt);
     h.host.frame(dt);
