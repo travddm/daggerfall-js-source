@@ -98,7 +98,16 @@ function tavern() {
 }
 
 /** Every built lo slot's kept signature beside the one a walk for its lamp alone answers now. */
-function keptAndAlone(shadows: any): { kept: number[]; alone: number[] }[] {
+/** The lo tier's state as the shadow pass keeps it: each slot's light, whether its map is built and its signature. */
+type LoTier = {
+  _loCap: number;
+  _loBuilt: Uint8Array;
+  _loSlotLight: Float32Array;
+  _loSlotSig: Int32Array;
+  _staticSignature: (pos: number[], far: number) => Int32Array;
+};
+
+function keptAndAlone(shadows: LoTier): { kept: number[]; alone: number[] }[] {
   const out: { kept: number[]; alone: number[] }[] = [];
   for (let j = 0; j < shadows._loCap; j++) {
     if (!shadows._loBuilt[j]) continue;
