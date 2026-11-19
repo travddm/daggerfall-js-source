@@ -346,6 +346,24 @@ async function realmRelease(ctx, player, at, home) {
 }
 
 /**
+ * What keeps a home from being released, or null: a tenant's paid days, a trader's goods still for sale (they are bought
+ * at it alone), or goods in a shared chest.
+ * @param {{db: any, nowS?: number}} ctx @param {number} mapId @param {number} buildingKey
+ */
+async function releaseHeldBy(ctx, mapId, buildingKey) {
+  const { db } = ctx;
+  const tenants = await db.prepare(`SELECT COUNT(*) AS n FROM home_rooms WHERE map_id = ? AND building_key = ? AND tenant IS NOT NULL AND until > ?`)
+    .bind(mapId, buildingKey, ctx.nowS ?? Math.floor(Date.now() / 1000)).first();
+  if (Number(tenants?.n ?? 0) > 0) return 'home-tenants';
+  const stock = await db.prepare(`SELECT COUNT(*) AS n FROM market_listings l JOIN home_decor d ON d.map_id = l.vendor_map AND d.id = l.vendor_id
+    WHERE l.state = 'open' AND d.map_id = ? AND d.building_key = ?`).bind(mapId, buildingKey).first();
+  if (Number(stock?.n ?? 0) > 0) return 'home-vendor-stocked';
+  const bin = await db.prepare('SELECT COUNT(*) AS n FROM decor_bin WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey).first();
+  if (Number(bin?.n ?? 0) > 0) return 'home-holds';
+  return null;
+}
+
+/**
  * GIVE ONE UP: the caller's own, whichever character bought it (ACCOUNT-HOMES: any of the account's sells it - a deed's
  * hold is given up only as its deed sells, `deed`). Answers what it was bought for (the client pays back
  * Daggerfall's share of it) and, DECOR1e, how many placed pieces went with it and half of what they cost. A realm
@@ -372,13 +390,8 @@ export async function releaseHome(ctx, player, { mapId, buildingKey, realm = nul
   // A deed's hold is never sold as a home either (above: given up as its deed sells) - no record paid for it, so the
   // realm's sale answers `home-crossed`, and both DELETEs below name `deed = 0`
   const home = await db.prepare('SELECT * FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL').bind(mapId, buildingKey, player.id).first();
-  // HOME-RENT: a home another player is renting a room in is not sold from under them - their days were paid for
-  if (home && Number((await db.prepare(`SELECT COUNT(*) AS n FROM home_rooms WHERE map_id = ? AND building_key = ? AND tenant IS NOT NULL AND until > ?`)
-    .bind(mapId, buildingKey, ctx.nowS ?? Math.floor(Date.now() / 1000)).first())?.n ?? 0) > 0) return { error: 'home-tenants' };
-  // HOME-VENDOR: nor one whose trader still has goods for sale - they stand at it alone
-  if (home && Number((await db.prepare(`SELECT COUNT(*) AS n FROM market_listings l JOIN home_decor d ON d.map_id = l.vendor_map AND d.id = l.vendor_id
-    WHERE l.state = 'open' AND d.map_id = ? AND d.building_key = ?`).bind(mapId, buildingKey).first())?.n ?? 0) > 0) return { error: 'home-vendor-stocked' };
-  if (home && Number((await db.prepare('SELECT COUNT(*) AS n FROM decor_bin WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey).first())?.n ?? 0) > 0) return { error: 'home-holds' };
+  const held = home ? await releaseHeldBy(ctx, mapId, buildingKey) : null;
+  if (held) return { error: held };
   if (realm != null || (typeof home?.char_id === 'string' && REALM_ID_RE.test(home.char_id))) {
     return at ? realmRelease(ctx, player, at, home) : { error: 'realm-needed' };
   }
