@@ -39,6 +39,12 @@ export const GRANT_ASK_CASE_OVER_MIN = 16;
 /** FOE-BOUNDS and GRANT-ASKS: the most cases the relay's own count may OPEN an hour (a case already open takes its line
  *  whatever this says) - a flood of fresh guest accounts never floods #mod-queue (safety.js UNCOUNTED_CASES_HOUR's way). */
 export const GRANT_OWN_CASES_HOUR = 30;
+/** How long the grant feed's batches, rows and tallies are kept. The longest reader is the grants measure, which reads
+ *  30 days at most (review.js), so a row older than this is read by nothing. The relay refuses a stale batch, so a
+ *  swept batch id is never posted again. */
+export const GRANT_FEED_KEEP_S = 31 * 24 * 3600;
+/** The batches one sweep round deletes, with their rows and tallies (up to GRANT_MEASURE_ROWS each). */
+export const GRANT_SWEEP_BATCHES = 50;
 
 /**
  * A POSTED WINDOW: kept when the relay's signature holds over a batch young enough, once - `{ ok, read }` (`read` false
@@ -297,3 +303,21 @@ export const grantRateSuggested = (/** @type {number|null} */ perHour) => (Numbe
 /** GRANT5: THE CELL'S CEILING, SUGGESTED from the most live granted hostile members any cell held - half again past it,
  *  whole (null with no measure). Pure. */
 export const grantCeilingSuggested = (/** @type {number|null} */ most) => (Number.isFinite(most) && /** @type {number} */ (most) > 0 ? Math.ceil(/** @type {number} */ (most) * GRANT_SUGGEST_ROOM) : null);
+
+/**
+ * The grant feed's sweep: the oldest `page` batches past GRANT_FEED_KEEP_S, their rows and their tallies, deleted in one
+ * list. Rows and tallies go by their batch, the first column of their keys, so each delete reads an index. Answers how
+ * many batches went. @param {any} db @param {number} nowS @param {number} page
+ */
+export async function sweepGrantFeed(db, nowS, page) {
+  const seam = sqlOf(db);
+  const query = seam.kysely;
+  const cutoff = nowS - GRANT_FEED_KEEP_S;
+  const expired = () => query.selectFrom('grant_batches').select('id').where('at', '<', cutoff).orderBy('at').limit(page);
+  const [, , batches] = await seam.atomic([
+    query.deleteFrom('grant_rows').where('batch', 'in', expired()),
+    query.deleteFrom('grant_tallies').where('batch', 'in', expired()),
+    query.deleteFrom('grant_batches').where('id', 'in', expired()),
+  ]);
+  return batches.changes;
+}

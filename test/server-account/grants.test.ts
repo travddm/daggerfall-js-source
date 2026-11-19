@@ -103,3 +103,68 @@ test('a window kept by a racing post is read once: the later post answers it as 
   assert.equal(count(db, 'grant_batches'), 1);
   assert.equal(count(db, 'grant_rows'), 0);
 });
+
+type GrantsModule = {
+  sweepGrantFeed: (db: unknown, nowS: number, page: number) => Promise<number>;
+  grantsMeasure: (
+    db: unknown,
+    nowS: number,
+    days: number,
+    ranked: (n: number, at: (rank: number) => Promise<unknown>) => Promise<{ quantiles: unknown[]; most: unknown }>,
+  ) => Promise<unknown>;
+  GRANT_FEED_KEEP_S: number;
+};
+const grants = await load<GrantsModule>('../../server-account/src/grants.js');
+
+/** A batch `ageDays` old with two rows and one tally. */
+function seedBatch(db: FakeD1, id: string, nowS: number, ageDays: number): void {
+  const at = nowS - ageDays * 24 * 3600;
+  db._raw.prepare("INSERT INTO grant_batches (id, at, q, span_s, live) VALUES (?, ?, 'w', 600, 3)").run(id, at);
+  for (const sub of ['p1', 'p2']) {
+    db._raw
+      .prepare(
+        "INSERT INTO grant_rows (batch, at, sub, kind, asks, members, bucket, ceiling, span_s) VALUES (?, ?, ?, 'enc', 4, 4, 0, 0, 600)",
+      )
+      .run(id, at, sub);
+  }
+  db._raw
+    .prepare("INSERT INTO grant_tallies (batch, at, reader, sender, reason, n) VALUES (?, ?, 'r1', 's1', 'stats', 2)")
+    .run(id, at);
+}
+
+const rankAll = async (
+  n: number,
+  at: (rank: number) => Promise<unknown>,
+): Promise<{ quantiles: unknown[]; most: unknown }> => {
+  const quantiles: unknown[] = [];
+  for (let rank = 0; rank < n; rank++) quantiles.push(await at(rank));
+  return { quantiles, most: n ? await at(n - 1) : null };
+};
+
+test('the grant feed sweep deletes batches past the keep with their rows and tallies, a page at a time, and changes no measure', async () => {
+  const service = await standService({});
+  const db = service.env.DB;
+  const nowS = 1_800_000_000;
+  for (const [id, ageDays] of [
+    ['old1', 40],
+    ['old2', 35],
+    ['old3', 32],
+    ['young1', 30],
+    ['young2', 2],
+  ] as const) {
+    seedBatch(db, id, nowS, ageDays);
+  }
+  const measuredBefore = await grants.grantsMeasure(db, nowS, 30, rankAll);
+  assert.equal(await grants.sweepGrantFeed(db, nowS, 2), 2);
+  assert.equal(await grants.sweepGrantFeed(db, nowS, 2), 1);
+  assert.equal(await grants.sweepGrantFeed(db, nowS, 2), 0);
+  const left = db._raw.prepare('SELECT id FROM grant_batches ORDER BY id').all() as Array<{ id: string }>;
+  assert.deepEqual(
+    left.map((row) => row.id),
+    ['young1', 'young2'],
+  );
+  assert.equal(count(db, 'grant_rows'), 4);
+  assert.equal(count(db, 'grant_tallies'), 2);
+  assert.deepEqual(await grants.grantsMeasure(db, nowS, 30, rankAll), measuredBefore);
+  assert.ok(grants.GRANT_FEED_KEEP_S > 30 * 24 * 3600);
+});
