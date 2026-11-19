@@ -15,7 +15,7 @@ import { gatePublicKey } from './signing.js';
 import { openCaseFor, keepCaseLines, credibleReporter } from './safety.js';
 import { displayName, overRate } from './accounts.js';
 import { sql } from 'kysely';
-import { sqlOf } from './database-seam.ts';
+import { sqlOf, chunksOf, BOUND_VALUES_MAX } from './database-seam.ts';
 
 /** The door's path - the relay's GRANT_FEED_URL names it (server/wrangler.toml). */
 export const GRANT_FEED_PATH = '/v1/mod/grant-feed';
@@ -60,7 +60,7 @@ export async function takeGrantMeasure({ db, nowS, subtle, rand }, env, bytes, s
     .onConflict((conflict) => conflict.doNothing());
   const kept = await seam.run(keep);
   if (!kept.changes) return { ok: true, read: false };
-  const rowWrites = b.rows.map((/** @type {any} */ r) => query.insertInto('grant_rows').values({
+  const rowValues = b.rows.map((/** @type {any} */ r) => ({
     batch: b.id,
     at: nowS,
     sub: r.a,
@@ -71,7 +71,7 @@ export async function takeGrantMeasure({ db, nowS, subtle, rand }, env, bytes, s
     ceiling: r.ceiling,
     span_s: span,
   }));
-  const tallyWrites = b.tl.map((/** @type {any} */ t) => query.insertInto('grant_tallies').values({
+  const tallyValues = b.tl.map((/** @type {any} */ t) => ({
     batch: b.id,
     at: nowS,
     reader: t.a,
@@ -79,7 +79,12 @@ export async function takeGrantMeasure({ db, nowS, subtle, rand }, env, bytes, s
     reason: t.r,
     n: t.n,
   }));
-  const writes = [...rowWrites, ...tallyWrites];
+  // Many rows to a statement, each statement under D1's bound-value limit: a full window is a dozen statements, not 128
+  const rowsPerInsert = (/** @type {object[]} */ values) => Math.floor(BOUND_VALUES_MAX / Object.keys(values[0]).length);
+  const writes = [
+    ...(rowValues.length ? chunksOf(rowValues, rowsPerInsert(rowValues)).map((chunk) => query.insertInto('grant_rows').values(chunk)) : []),
+    ...(tallyValues.length ? chunksOf(tallyValues, rowsPerInsert(tallyValues)).map((chunk) => query.insertInto('grant_tallies').values(chunk)) : []),
+  ];
   if (writes.length) await seam.atomic(writes);
   const ctx = { db, nowS, rand };
   /** @type {Map<string, { texts: string[], readers: boolean }>} the sender, its findings - and whether readers' accounts made one */
@@ -129,22 +134,40 @@ export async function grantCases(ctx, env, senders) {
   const query = seam.kysely;
   /** @type {Map<string, string>} */
   const out = new Map();
-  for (const sender of senders.slice(0, GRANT_CASE_SENDERS_MAX)) {
-    const tallied = query
-      .selectFrom('grant_tallies')
-      .select((eb) => ['reader', 'reason', eb.fn.sum('n').as('n')])
-      .where('sender', '=', sender)
-      .where('at', '>', since)
-      .where('reason', 'in', [...GRANT_CASE_REASONS])
-      .groupBy(['reader', 'reason']);
-    const rows = (await seam.run(tallied)).rows;
-    const readers = [...new Set(rows.map((/** @type {any} */ r) => String(r.reader)))].filter((r) => r !== sender && r !== GRANT_RELAY_READER);
-    if (readers.length < GRANT_CASE_READERS) continue;
-    const counted = [];
-    for (const id of readers) {
-      const p = (await seam.run(query.selectFrom('players').selectAll().where('id', '=', id).limit(1))).rows[0];
-      if (p && credibleReporter(p, nowS)) counted.push(id);
-    }
+  const weighed = senders.slice(0, GRANT_CASE_SENDERS_MAX);
+  if (!weighed.length) return out;
+  // Every sender's tallies in one read, and every reader's account in one more: a read per sender and per reader
+  // made a batch naming 32 senders cost dozens of statements
+  const tallied = query
+    .selectFrom('grant_tallies')
+    .select((eb) => ['sender', 'reader', 'reason', eb.fn.sum('n').as('n')])
+    .where('sender', 'in', weighed)
+    .where('at', '>', since)
+    .where('reason', 'in', [...GRANT_CASE_REASONS])
+    .groupBy(['sender', 'reader', 'reason'])
+    .orderBy(['sender', 'reader', 'reason']);
+  /** @type {Map<string, any[]>} */
+  const rowsBySender = new Map();
+  for (const row of (await seam.run(tallied)).rows) {
+    const sender = String(row.sender);
+    rowsBySender.set(sender, [...(rowsBySender.get(sender) ?? []), row]);
+  }
+  /** @type {Map<string, string[]>} */
+  const readersBySender = new Map();
+  for (const sender of weighed) {
+    const rows = rowsBySender.get(sender) ?? [];
+    const readers = [...new Set(rows.map((r) => String(r.reader)))].filter((r) => r !== sender && r !== GRANT_RELAY_READER);
+    if (readers.length >= GRANT_CASE_READERS) readersBySender.set(sender, readers);
+  }
+  const readerIds = [...new Set([...readersBySender.values()].flat())];
+  /** @type {Map<string, any>} */
+  const players = new Map();
+  for (const ids of chunksOf(readerIds, BOUND_VALUES_MAX)) {
+    for (const player of (await seam.run(query.selectFrom('players').selectAll().where('id', 'in', ids))).rows) players.set(String(player.id), player);
+  }
+  for (const [sender, readers] of readersBySender) {
+    const rows = rowsBySender.get(sender) ?? [];
+    const counted = readers.filter((id) => players.has(id) && credibleReporter(players.get(id), nowS));
     if (counted.length < GRANT_CASE_READERS) continue;
     const why = new Map();
     for (const r of rows) if (counted.includes(String(r.reader))) why.set(String(r.reason), (why.get(String(r.reason)) ?? 0) + Number(r.n));
@@ -210,20 +233,23 @@ export async function grantsMeasure(db, nowS, days, ranked) {
   // An account's asks an hour, over a window of at least GRANT_RATE_SPAN_MIN_S. A CASE, not SQLite's two-argument MAX,
   // so that Postgres runs the same text.
   const rate = sql`CAST(ROUND(asks * 3600.0 / (CASE WHEN span_s > ${GRANT_RATE_SPAN_MIN_S} THEN span_s ELSE ${GRANT_RATE_SPAN_MIN_S} END)) AS INTEGER)`;
+  // Every kind's sums in one grouped read; a kind with no rows sums to nothing
+  const summed = query
+    .selectFrom('grant_rows')
+    .select((eb) => [
+      'kind',
+      eb.fn.countAll().as('n'),
+      eb.fn.sum('asks').as('asks'),
+      eb.fn.sum('members').as('members'),
+      eb.fn.sum('bucket').as('bucket'),
+      eb.fn.sum('ceiling').as('ceiling'),
+    ])
+    .where('at', '>=', since)
+    .groupBy('kind');
+  const sumsByKind = new Map((await seam.run(summed)).rows.map((row) => [String(row.kind), row]));
   const kinds = [];
   for (const kind of Object.keys(GRANT_KINDS)) {
-    const summed = query
-      .selectFrom('grant_rows')
-      .select((eb) => [
-        eb.fn.countAll().as('n'),
-        eb.fn.coalesce(eb.fn.sum('asks'), sql`0`).as('asks'),
-        eb.fn.coalesce(eb.fn.sum('members'), sql`0`).as('members'),
-        eb.fn.coalesce(eb.fn.sum('bucket'), sql`0`).as('bucket'),
-        eb.fn.coalesce(eb.fn.sum('ceiling'), sql`0`).as('ceiling'),
-      ])
-      .where('at', '>=', since)
-      .where('kind', '=', kind);
-    const sums = (await seam.run(summed)).rows[0];
+    const sums = sumsByKind.get(kind);
     const n = Number(sums?.n ?? 0);
     const at = async (/** @type {number} */ rank) => {
       const ranked = query

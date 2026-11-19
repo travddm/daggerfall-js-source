@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import type { DatabaseSync } from 'node:sqlite';
-import { d1Db, sqlOf, type D1Like } from '../../server-account/src/database-seam.ts';
+import { d1Db, sqlOf, chunksOf, BOUND_VALUES_MAX, type D1Like } from '../../server-account/src/database-seam.ts';
 
 /** The D1 fake over node:sqlite, with every migration applied. */
 type FakeD1 = D1Like & { _raw: DatabaseSync };
@@ -71,4 +71,27 @@ test('sqlOf keeps one seam a binding and passes a seam through', () => {
   const seam = sqlOf(db);
   assert.equal(sqlOf(db), seam);
   assert.equal(sqlOf(seam), seam);
+});
+
+test('chunksOf cuts a list in order, and a chunk sized by BOUND_VALUES_MAX inserts on D1', async () => {
+  assert.deepEqual(chunksOf([1, 2, 3, 4, 5], 2), [[1, 2], [3, 4], [5]]);
+  assert.deepEqual(chunksOf([], 3), []);
+  const db = d1();
+  const seam = d1Db(db);
+  const columns = 6;
+  const values = Array.from({ length: 40 }, (_, i) => ({
+    batch: 'b1',
+    at: i,
+    reader: `r${i}`,
+    sender: 's1',
+    reason: 'stats',
+    n: 1,
+  }));
+  const inserts = chunksOf(values, Math.floor(BOUND_VALUES_MAX / columns)).map((chunk) =>
+    seam.kysely.insertInto('grant_tallies').values(chunk),
+  );
+  assert.equal(inserts.length, 3);
+  await seam.atomic(inserts);
+  const counted = await seam.run(seam.kysely.selectFrom('grant_tallies').select((eb) => eb.fn.countAll().as('n')));
+  assert.equal(Number(counted.rows[0].n), 40);
 });

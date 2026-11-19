@@ -97,6 +97,16 @@ export function d1Db(binding: D1Like): SqlDb {
   };
 }
 
+/** The most values D1 binds to one statement. A multi-row insert or a long `IN` list is cut to stay under it. */
+export const BOUND_VALUES_MAX = 100;
+
+/** `items` cut into lists of at most `size`, in order. */
+export function chunksOf<T>(items: readonly T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let start = 0; start < items.length; start += size) chunks.push(items.slice(start, start + size));
+  return chunks;
+}
+
 const seams = new WeakMap<D1Like, SqlDb>();
 
 /**
