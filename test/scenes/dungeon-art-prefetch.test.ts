@@ -7,6 +7,8 @@ import {
   dungeonArtArchives,
   fetchArchives,
   remapAndPrefetchDungeonArt,
+  foeArtArchives,
+  prefetchFoeArt,
 } from '../../src/scenes/dungeon-art-prefetch.ts';
 import { applyTextureTable } from '../../src/world/dungeon/dungeonTextures.js';
 
@@ -70,4 +72,23 @@ test('the remap is the dungeon texture table, and its art fetch starts at once',
   for (const archive of [19, 20, 74, 210])
     assert.equal(remap(archive), applyTextureTable(archive, dungeon.textureTable, 0));
   assert.ok(fetcher.asked.length > 0, 'started before the build asks');
+});
+
+test('the foes art is each foe archive of both genders, once', () => {
+  const textures: Record<number, { maleTexture: number; femaleTexture: number }> = {
+    1: { maleTexture: 255, femaleTexture: 255 },
+    130: { maleTexture: 487, femaleTexture: 488 },
+  };
+  const foes = [{ mobileType: 1 }, { mobileType: 130 }, { mobileType: 1 }, { mobileType: 999 }];
+  assert.deepEqual(
+    foeArtArchives(foes, (mobileType) => textures[mobileType]),
+    [255, 487, 488],
+  );
+});
+
+test('the foes are answered unchanged and their art fetch starts at once', () => {
+  const fetcher = countingFetch();
+  const foes = [{ mobileType: 0, x: 1 }];
+  assert.equal(prefetchFoeArt(foes, fetcher.getTexture), foes);
+  assert.ok(fetcher.asked.length > 0, 'started before the foes are built');
 });
