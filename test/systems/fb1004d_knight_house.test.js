@@ -28,6 +28,7 @@ import {
 import { homeDeedOf, HOME_CAP, HOME_ARENA_MAP_ID, HOME_CLAIMS_MAX } from '../../src/net/homeLaw.js';
 import { accountHomes, SESSION_KEY } from '../../src/net/accountClient.js';
 import { ROUTES } from '../../server-account/src/service.js';
+import { deedStatement } from '../../server-account/src/homes.js';
 import { configureLayoutPins, _resetLayoutPins } from '../../src/systems/layoutPins.js';
 import { BUILDING_TYPES } from '../../src/world/buildingNames.js';
 
@@ -320,6 +321,24 @@ test('KNIGHT-HOUSE a record holds one deed for each knightly order at most: a fo
   const holdAt = (region) => S.call('/v1/homes/deed', { mapId: TOWN + 1 + region, buildingKey: 0x10300 + region, region, character: RF.id, layout: null }, arde.secret);
   for (let region = 0; region < orders; region++) assert.equal((await holdAt(region)).body?.ok, true, `deed ${region} held`);
   assert.equal((await holdAt(orders)).body?.error, 'deed-cap');
+  const held = S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE char_id = ? AND deed = 1').get(RF.id).n;
+  assert.equal(held, orders);
+});
+
+test('KNIGHT-HOUSE the deed cap holds inside the insert too: a hold that read the count before another landed still cannot write past one deed for each order', async (t) => {
+  const { S, arde } = await stood(t);
+  const orders = Object.keys(ORDERS).length;
+  const houses = createHouses(62);
+  for (let region = 0; region <= orders; region++) {
+    allocateHouseToPlayer(houses, region, { buildingKey: 0x10300 + region, mapId: (TOWN + 1 + region) | 0, location: 'Forged' }, { playerName: 'Arde' });
+  }
+  const RF = await seatRealm(S.env, arde.secret, 'Forger', { name: 'Forger', level: 30, goldPieces: 0, items: [], houses });
+  const holdAt = (region) => S.call('/v1/homes/deed', { mapId: TOWN + 1 + region, buildingKey: 0x10300 + region, region, character: RF.id, layout: null }, arde.secret);
+  for (let region = 0; region < orders; region++) assert.equal((await holdAt(region)).body?.ok, true, `deed ${region} held`);
+  // The route refuses the extra deed before it writes; the statement is run alone to reach the insert's own count.
+  const extra = { mapId: TOWN + 1 + orders, buildingKey: 0x10300 + orders, region: orders, character: RF.id, layout: null };
+  const result = await deedStatement(S.env.DB, { id: arde.id, handle: 'Arde' }, extra, T0).run();
+  assert.equal(result.meta.changes, 0, 'the insert wrote nothing');
   const held = S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE char_id = ? AND deed = 1').get(RF.id).n;
   assert.equal(held, orders);
 });

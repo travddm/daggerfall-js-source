@@ -666,7 +666,7 @@ export function shadowOrigin(camX, camZ, extent = SHADOW_EXTENT, pixel = PIXEL_M
   return [Math.floor(camX / pixel) * pixel - extent / 2 + pixel / 2, Math.floor(camZ / pixel) * pixel - extent / 2 + pixel / 2];
 }
 
-const VS = `#version 300 es
+export const VS = `#version 300 es
 layout(location=0) in vec2 aPos;
 out vec2 vNdc;
 void main() { vNdc = aPos; gl_Position = vec4(aPos, 1.0, 1.0); }`;   // PERF2: at the far plane for the composite's depth test; the marches test nothing

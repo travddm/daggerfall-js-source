@@ -2,9 +2,9 @@
 // dungeon - an instance - and the inheritance never appeared when they went to the death spot).
 //
 // A death records the size its dungeon was BUILT at (AUDIT FB1013d B1), and the remains stand only in a build of that
-// size - another size is another layout. An instance is the dungeon whole, and the world builds about half its dungeons
-// smaller in public (SD-ONLINE: it draws three in four smaller, and 2,005 of MAPS.BSA's 4,232 have the blocks to be laid
-// anew - AUDIT FB1019f B1); another player's instance admits only its owner's party. So the heir's every visit was
+// size - another size is another layout. An instance is the dungeon whole, and the world builds about a quarter of its
+// dungeons smaller in public (SD-ONLINE: it draws three in eight smaller, and 967 of MAPS.BSA's 4,232 are drawn so and
+// have the blocks to be laid anew - AUDIT FB1019f B1); another player's instance admits only its owner's party. So the heir's every visit was
 // the public room's smaller layout, which stands none, and no door offered them a build that would. Now the death
 // quest's place is "a dungeon with your quest": where the line's remains lie whole and the public room is laid smaller,
 // the door offers the heir an instance of their own (systems/instancePlaces.js remainsWholeAt, remainsInstanceEpoch;
@@ -109,7 +109,7 @@ const PIXEL = { x: 300, y: 200 };
 const blocks = [...Array.from({ length: 9 }, (_, i) => ({ blockName: `N000000${i}.RDB`, x: i, z: 0, isStartingBlock: i === 0 })), ...Array.from({ length: 4 }, (_, i) => ({ blockName: `B000000${i}.RDB`, x: i, z: 1, isStartingBlock: false }))];
 const ruinAt = (mapId, locationId = 8008) => ({ name: 'Ruins of The Hold of Coppering', regionName: 'Isle of Balfiera', regionIndex: 23, locationIndex: 12, hasDungeon: true, mapTableData: { mapId, locationType: LOCATION_TYPES.DungeonRuin }, dungeon: { recordElement: { header: { locationId } }, blocks } });
 const RUINS = ruinAt(52646492);
-/** A map id the world lays whole (a quarter of them), and another it lays smaller - the QUEST-ELSEWHERE test's search. */
+/** A map id the world lays whole (five in eight), and another it lays smaller - the QUEST-ELSEWHERE test's search. */
 const idOfSize = (want, from) => { let id = from; while (onlineDungeonSize({ mapTableData: { mapId: id } }) !== want) id++; return id; };
 const WHOLE_ID = idOfSize('full', 52646491);
 const OTHER_ID = idOfSize('medium', 52646493);
@@ -440,7 +440,7 @@ test('HEIR-WHOLE AUDIT FB1019f B1: a death in the public room of a ruin drawn sm
 const ARENA2 = process.env.ARENA2_PATH;
 const skipReal = !ARENA2 || !existsSync(ARENA2) ? 'ARENA2_PATH not set or missing - real-data validation skipped' : false;
 
-test('HEIR-WHOLE AUDIT FB1019f B1 on MAPS.BSA: every one of the 4,232 dungeons\' sites is re-laid exactly where the public room\'s build is smaller - 2,005 of them, of the 3,133 the world draws smaller; at The Tombs of Klerd (five blocks, drawn medium, built whole) a death in the public room is offered nothing and stands there (mutants: the drawn size; the thresholds swapped; the threshold off by one)', { skip: skipReal }, async () => {
+test('HEIR-WHOLE AUDIT FB1019f B1 on MAPS.BSA: every one of the 4,232 dungeons\' sites is re-laid exactly where the public room\'s build is smaller - 967 of them, of the 1,571 the world draws smaller; at The Tombs of Klerd (five blocks, drawn medium, built whole) a death in the public room is offered nothing and stands there (mutants: the drawn size; the thresholds swapped; the threshold off by one)', { skip: skipReal }, async () => {
   const maps = new MapsFile();
   maps.load(new Uint8Array(readFileSync(join(ARENA2, 'MAPS.BSA'))), new Uint8Array(readFileSync(join(ARENA2, 'CLIMATE.PAK'))), new Uint8Array(readFileSync(join(ARENA2, 'POLITIC.PAK'))));
   let dungeons = 0, drawn = 0, built = 0, wrong = 0;
@@ -456,7 +456,7 @@ test('HEIR-WHOLE AUDIT FB1019f B1 on MAPS.BSA: every one of the 4,232 dungeons\'
       if (dungeonSite(loc).relaid !== (size !== 'full') || builtSizeFor(loc, { online: true }) !== size) wrong++;
     }
   }
-  assert.deepEqual({ dungeons, drawn, built, wrong }, { dungeons: 4232, drawn: 3133, built: 2005, wrong: 0 });
+  assert.deepEqual({ dungeons, drawn, built, wrong }, { dungeons: 4232, drawn: 1571, built: 967, wrong: 0 });
   const KLERD = maps.getLocationByName("Alik'r Desert", 'The Tombs of Klerd');
   assert.deepEqual([KLERD.dungeon.blocks.length, onlineDungeonSize(KLERD), builtDungeonSize(buildOf(KLERD, PUBLIC))], [5, 'medium', 'full']);
   const t = fallenIn(KLERD, PUBLIC);

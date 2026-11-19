@@ -123,19 +123,22 @@ const answer =
   (body, ok = true) =>
   async () => ({ ok, json: async () => body });
 
+// The door from a link, the player having accepted the link's relay: these tests read the profile, not the prompt.
+const door = (p, say, fetchImpl) => openProfileDoor(p, say, fetchImpl, null, async () => true);
+
 test("P0 THE FRONT DOOR: an online page fetches /profile from its relay, checks the version and its own hash of what it got, and installs it; anything else is refused in the player's words before the world boots (mutants: the relay's hash trusted; the version unread; a bad profile installed)", async () => {
   assert.equal(profileUrlOf('wss://relay.example/'), 'https://relay.example/profile');
   assert.equal(profileUrlOf('ws://localhost:8787'), 'http://localhost:8787/profile');
   assert.equal(profileUrlOf('http://elsewhere'), null);
   let asked = null;
-  await openProfileDoor(
+  await door(
     params('server=wss://relay.example'),
     () => {},
     async () => {
       throw new Error('an offline page asks nothing');
     },
   );
-  await openProfileDoor(
+  await door(
     params('online&server=wss://relay.example'),
     () => {},
     async (url) => {
@@ -150,27 +153,27 @@ test("P0 THE FRONT DOOR: an online page fetches /profile from its relay, checks 
   const say = (w) => said.push(w);
   const online = params('online&server=wss://relay.example');
   await assert.rejects(
-    openProfileDoor(online, say, answer({ v: 'world1', ph: OFFICIAL_PH, profile: OFFICIAL_PROFILE })),
+    door(online, say, answer({ v: 'world1', ph: OFFICIAL_PH, profile: OFFICIAL_PROFILE })),
     /different versions/,
   );
   await assert.rejects(
-    openProfileDoor(online, say, answer({ v: RELAY_VERSION, ph: 'd'.repeat(64), profile: OFFICIAL_PROFILE })),
+    door(online, say, answer({ v: RELAY_VERSION, ph: 'd'.repeat(64), profile: OFFICIAL_PROFILE })),
     /newer version/,
   );
   await assert.rejects(
-    openProfileDoor(online, say, answer({ v: RELAY_VERSION, ph: OFFICIAL_PH, profile: { schema: 9 } })),
+    door(online, say, answer({ v: RELAY_VERSION, ph: OFFICIAL_PH, profile: { schema: 9 } })),
     /newer version/,
   );
-  await assert.rejects(openProfileDoor(online, say, answer({}, false)), /did not answer/);
+  await assert.rejects(door(online, say, answer({}, false)), /did not answer/);
   await assert.rejects(
-    openProfileDoor(online, say, async () => {
+    door(online, say, async () => {
       throw new Error('offline');
     }),
     /did not answer/,
   );
   assert.equal(said.length, 5, "each refusal is said on the boot's status line");
   assert.equal(installedProfileHash(), null, 'nothing installed by a refused door');
-  await openProfileDoor(online, say, answer({ v: RELAY_VERSION, ph: OFFICIAL_PH, profile: OFFICIAL_PROFILE }));
+  await door(online, say, answer({ v: RELAY_VERSION, ph: OFFICIAL_PH, profile: OFFICIAL_PROFILE }));
   assert.equal(installedProfileHash(), OFFICIAL_PH);
   assert.deepEqual(profileErrors(OFFICIAL_PROFILE), []);
 });
