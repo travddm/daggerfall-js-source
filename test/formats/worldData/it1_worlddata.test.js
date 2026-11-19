@@ -35,11 +35,12 @@ test('IT1 the four patches: WD1\'s format, each its gate block by name and index
     const a = gateAppends(p);
     assert.equal(a.MiscFlatObjectRecords.filter((f) => f.FactionID === 8642).length, 1, `${name}: one driver`);
     assert.ok(a.Misc3dObjectRecords.some((m) => m.ModelIdNum === 41214), `${name}: the carriage`);
-    // each insert at the header's classic count and on (2 models, 1 flat in all four); AUDIT IT1 G1 (
-    // the editor's round trip - 28 building slots removed and the two classic models' three scales
+    // each insert at the header's classic count and on (2 models, 1 flat in all four); the rest is the editor's
+    // round trip, diffed against BLOCKS.BSA: 28 building slots removed, the classic models' scales, and the
+    // rotations and automap byte the editor rewrites
     const at = { Misc3dObjectRecords: 2, MiscFlatObjectRecords: 1 };
     for (const [, path] of p.ops.filter(([k]) => k === 'i')) assert.equal(path[2], at[path[1]]++, `${name}: ${path.join('.')} in order, past the classic records`);
-    assert.equal(p.ops.filter(([k]) => k !== 'i').length, 28 + 6, `${name}: the round trip`);
+    assert.equal(p.ops.filter(([k]) => k !== 'i').length, { 'WALLAA08.RMB': 35, 'WALLAA09.RMB': 36, 'WALLAA10.RMB': 36, 'WALLAA11.RMB': 38 }[name], `${name}: the round trip`);
   }
   assert.deepEqual(PATCHES.map((p) => p.ops.filter(([k]) => k === 'i').length), [6, 5, 7, 10]);
 });
@@ -91,9 +92,8 @@ test('IT1 the layer: the gate\'s records appended to whatever the door serves un
   } finally { _resetWorldDataReplacement(); resetToDefaults(); }
 });
 
-// With the player's own ARENA2 (Mac's machine): each patch, laid on the classic block, IS the author's file - the
-// check the tool could not make without a BLOCKS.BSA (vendor/immersive-travel/README.md). A difference means the
-// editor touched classic records too: run `node tools/immersiveTravelPatches.mjs <dfmod> <arena2>` for WD1's diff.
+// With ARENA2 (`sh tools/fetch-data.sh`): each patch, laid on the classic block, is the author's file. The four were
+// cut against BLOCKS.BSA (vendor/immersive-travel/README.md); a difference means the patch or the data moved.
 const ARENA2 = process.env.ARENA2_PATH ?? '';
 test('IT1 with ARENA2_PATH: every gate patch rebuilds the author\'s file, sha256 for sha256', { skip: !existsSync(join(ARENA2, 'BLOCKS.BSA')) && 'no ARENA2_PATH' }, () => {
   const blocks = new BlocksFile();
