@@ -10,7 +10,8 @@
 
 import { CHARACTER_MODES_SETTINGS } from './characterModesSettings.js';
 import { appStorage } from './appStorage.js';   // the one storage seam - localStorage lives there alone
-import { onlineForcedModSetting, onlineWholeModKey } from './online/onlineLane.js';   // MODS-ONLINE-2: online, the room's ground is forced and every other switch is the player's; REALM P0.2: and the balance mods whole
+import { onlineForcedModSetting, onlineWholeModKey } from './online/onlineLane.js';
+import { resolvedModSettings } from './mod-settings-of.ts';   // MODS-ONLINE-2: online, the room's ground is forced and every other switch is the player's; REALM P0.2: and the balance mods whole
 import { FOOT_SKIN_COUNT, CLASS_SKINS, classSkinLabel } from '../player/classSkins.js';   // SKIN2: the class skins past the mod's sixteen
 import { t, localizedText } from './textManager.js';   // L10N4: every setting's description and option names in the player's language, read when they are read; DFU's own key where it has the same word
 
@@ -1747,7 +1748,9 @@ export function storedModSetting(vendor, key) {
   return load()[vendor]?.[key];
 }
 
-export { modSettingsOf } from './mod-settings-of.ts';   // every key of one vendored mod, resolved, in a new object
+/** Every key of one vendored mod, resolved, in a new object for each caller (kept between changes by systems/mod-settings-of.ts).
+ *  @param {string} vendor @returns {Record<string, any>} each value of its key's declared kind */
+export const modSettingsOf = (vendor) => resolvedModSettings(vendor);
 
 /** AUDIT 68 S15-eotb-settings-snapshot: DFU's ModSettingsChange, as a
  *  number. Every write moves it, so a reader that holds a resolved copy
