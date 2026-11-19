@@ -382,6 +382,9 @@ export async function releaseHome(ctx, player, { mapId, buildingKey, realm = nul
   if (realm != null || (typeof home?.char_id === 'string' && REALM_ID_RE.test(home.char_id))) {
     return at ? realmRelease(ctx, player, at, home) : { error: 'realm-needed' };
   }
+  // A caller who does not own the building changes nothing in it. The access and offer deletes below name only the
+  // building, so without this refusal another account's release, or a member's on a guild hall, clears its chest locks.
+  if (!home) return { error: 'no-home' };
   // DECOR1e: the home's placed pieces go with it (decor.js - the cascade), and half of what each cost comes back, as
   // removing it would give (net/decorLaw.js decorSaleBack: truncated, a piece at a time). Read in the SAME batch as
   // the release, so no piece is placed between the sum and the going - and answered only when the release is the
