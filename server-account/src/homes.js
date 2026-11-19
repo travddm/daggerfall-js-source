@@ -61,7 +61,8 @@ import { PATRON_HOUR_S } from '../../src/net/patronLaw.js';   // AUDIT LW-II P7:
 import { reckonPatrons } from './market.js';   // AUDIT LW-II-2 S4: a door leaving public reckons its town first
 import { GUILD_TREASURY_MAX } from '../../src/net/guild/guildLaw.js';   // ARENA4b: a hall's pieces paid back, into a treasury under its cap
 import { DECOR_OPS_MAX, DECOR_OPS_WINDOW_S } from '../../src/net/decorLaw.js';   // HOME-LOOK: a repaint counts as a decorator's write
-import { hallMay } from '../../src/net/hallLaw.js';   // GUILD1d: a hall's keepers
+import { hallMay } from '../../src/net/hallLaw.js';
+import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';   // GUILD1d: a hall's keepers
 import { heraldryOfRow } from './halls.js';   // GUILD1d: a hall's heraldry, on its door
 import { openGatesRead } from './seatHolding.js';   // SEAT1d: Open Gates, where the town's holder proclaims it
 import { OWNS } from './decor.js';   // GUILD-YARD: a home's character, or a hall's keeper - as its decor asks
@@ -315,6 +316,7 @@ const realmDecorBackStatement = (db, mapId, buildingKey) => db.prepare(`SELECT C
  */
 async function realmRelease(ctx, player, at, home) {
   const { db, bucket } = ctx;
+  const nowS = ctx.nowS ?? Math.floor(Date.now() / 1000);
   if (!home) return { error: 'no-home' };
   // HOME-CROSSED (FIELD BUGS 2026-09-30, Seanobi's "Sold House for 600 K, Got Nothing Back"): A HOUSE NO RECORD PAID FOR
   // STAYS A HOUSE. Customs carried it in (CUSTOMS-CARRY) and its deed share of nothing was paid while the house and its
@@ -334,12 +336,19 @@ async function realmRelease(ctx, player, at, home) {
       db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(home.map_id, home.building_key),
       db.prepare(`DELETE FROM home_offers WHERE map_id = ? AND building_key = ? AND state = 'open'`).bind(home.map_id, home.building_key),
       // ACCOUNT-HOMES: the account's (any of its characters sells it), the row as read - never a hall or a deed
-      db.prepare('DELETE FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL AND deed = 0 AND paid = ? AND rent_due = ?').bind(home.map_id, home.building_key, player.id, home.paid, home.rent_due ?? 0),   // HOME-RENT: a rent landing between the read and the sale is never lost
+      // HOME-RENT: a rent landing between the read and the sale is never lost. A tenant, a trader's listing or a chest
+      // deposit landing there refuses the sale too, so nothing in them goes with the house.
+      db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2 AND player = ?3 AND guild_id IS NULL AND deed = 0 AND paid = ?4 AND rent_due = ?5
+        AND ${homeFreeToGoSql({ mapId: '?1', buildingKey: '?2', nowS: '?6' }, true)}`)
+        .bind(home.map_id, home.building_key, player.id, home.paid, home.rent_due ?? 0, nowS),
       mustChange(db),
     ]);
   } catch {
     await dropIfUnnamed(db, bucket, player.id, at.id, prep.key);   // AUDIT REALM2 S3
-    return (await recordMovedOf(db, player.id, at)) || { error: 'no-home' };
+    const moved = await recordMovedOf(db, player.id, at);
+    if (moved) return moved;
+    const held = await homeHeldError(db, home.map_id, home.building_key, nowS, true);
+    return { error: held ?? 'no-home' };
   }
   await dropObjects(bucket, [prep.prev]);
   return { ok: true, price: home.price, refund, decorCount, decorBack, ...(rentDue ? { rent: rentDue } : {}), realm: { seq: prep.seq }, moved: homeMoved(home.map_id, [], [home.building_key]) };   // QUEST-HOME: sold, a house again
@@ -402,13 +411,25 @@ export async function releaseHome(ctx, player, { mapId, buildingKey, realm = nul
   // removing it would give (net/decorLaw.js decorSaleBack: truncated, a piece at a time). Read in the SAME batch as
   // the release, so no piece is placed between the sum and the going - and answered only when the release is the
   // caller's; a record that is not JSON is no piece and counts nothing.
-  const [pieces, gone] = await db.batch([
-    decorBackStatement(db, mapId, buildingKey),
-    db.prepare('DELETE FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL AND deed = 0 RETURNING price')
-      .bind(mapId, buildingKey, player.id),
-    db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey),
-    db.prepare(`DELETE FROM home_offers WHERE map_id = ? AND building_key = ? AND state = 'open'`).bind(mapId, buildingKey),
-  ]);
+  // The tests read above go into the DELETE as well, and the batch stops when it changes nothing, so a tenant, a
+  // listing or a chest deposit landing after the reads keeps the home, its chest access and its offer.
+  const nowS = ctx.nowS ?? Math.floor(Date.now() / 1000);
+  let pieces;
+  let gone;
+  try {
+    [pieces, gone] = await db.batch([
+      decorBackStatement(db, mapId, buildingKey),
+      db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2 AND player = ?3 AND guild_id IS NULL AND deed = 0
+        AND ${homeFreeToGoSql({ mapId: '?1', buildingKey: '?2', nowS: '?4' }, true)} RETURNING price`)
+        .bind(mapId, buildingKey, player.id, nowS),
+      mustChange(db),
+      db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey),
+      db.prepare(`DELETE FROM home_offers WHERE map_id = ? AND building_key = ? AND state = 'open'`).bind(mapId, buildingKey),
+    ]);
+  } catch {
+    const held = home ? await homeHeldError(db, mapId, buildingKey, nowS, true) : null;
+    return { error: held ?? 'no-home' };
+  }
   const row = gone?.results?.[0];
   if (!row) return { error: 'no-home' };
   const d = pieces?.results?.[0];
