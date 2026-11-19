@@ -18,6 +18,10 @@ comparison, retro mode and render scale, and GPU memory release.
     and `src/render/warmPrograms.js` runs one per `requestIdleCallback`. `renderer.lazyWarmSteps()` starts the feature
     passes the game meets later (`src/render/playPrograms.js`).
   - A new on-demand program goes into one of these lists.
+  - The boot's longest links start as soon as the renderer exists: `src/render/boot-programs.ts` starts the lighting
+    lane's world set and the volumetric clouds by the switches their hosts read later, and the terrain clip when a
+    session before built it (`src/render/terrain-clip-hint.ts`). A world set starts its five programs together before it
+    builds them (`worldSetPrograms` in `src/render/world-set-programs.ts`).
 - **No per-frame allocation on hot paths.** Reuse typed arrays and scratch objects. Billboard batches mint every
   field at creation so each has one hidden class for life (`src/render/contract.js`).
 - **Fewer state changes.** The renderer caches the bound program, VAO and textures and skips redundant binds. A
