@@ -343,7 +343,7 @@ test('MWNPC1g the GLSL says what its JS law says: the blend, the post composed o
     'bool ccw = gl_FrontFacing != (uFrontCW > 0.5);',
     'vec3 nw = ccw ? d : -d;',
     'return normalize(uSkinFlip * (uSkinNrm * nw));',
-  ]) assert.ok(src.includes(line), `the face normal: ${line}`);
+  ]) assert.ok(rd('src/render/world-set-programs.ts').includes(line), `the face normal: ${line}`);   // the skinned face normal lives with the world set's sources
   assert.ok(src.includes('char: this._charSkinProgram(fs(src.charFs)),') && src.includes('const program = this._buildProgram(CHAR_SKIN_VS, skinFaceFs(fs));'), 'the world set builds its character program from the skin VS and the edited lane shader');
   assert.ok(src.includes("vs: { mesh: VS, bb: BB_VS, terrain: TERRAIN_VS, char: CHAR_VS, charSkin: CHAR_SKIN_VS }"), 'the shadow pass keeps the unskinned CHAR_VS');
   const classic = src.match(/const CHAR_FS = `([\s\S]*?)`;/)[1];
