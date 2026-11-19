@@ -221,7 +221,7 @@ async function deedRefusal(db, player, save, { region, mapId, buildingKey, chara
 
 /** The deed's hold: a claim's row for a building nobody holds, in the town's one layout, marked `deed` - no price, and
  *  within the character's deeds (DEED_HOLDS_MAX), counted in the write so two holds at once cannot pass it. */
-const deedStatement = (db, player, { mapId, buildingKey, region, character, layout = null }, nowS) => db.prepare(`INSERT OR IGNORE INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at, paid, layout, deed)
+export const deedStatement = (db, player, { mapId, buildingKey, region, character, layout = null }, nowS) => db.prepare(`INSERT OR IGNORE INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at, paid, layout, deed)
     SELECT ?, ?, ?, ?, ?, ?, ?, 0, ?, 0, ${TOWN_LAYOUT_SQL}, 1
     WHERE NOT EXISTS (SELECT 1 FROM homes t WHERE t.map_id = ? AND NOT (${LAYOUT_MATCH_SQL}))
     AND (${deedsHeldSql}) < ?`)

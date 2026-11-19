@@ -49,16 +49,19 @@ const ROUTED = {
   'src/scenes/exterior.js': 1,
   'src/scenes/hostMagic.js': 3,
   'src/scenes/menu.js': 1,
+  'src/scenes/spell-landing-lines.ts': 3,
   'src/scenes/questWorld.js': 2,   // TESA's merge (HOST-SPLIT): moved verbatim out of world.js's bootWorld, its two with it
   'src/scenes/world.js': 13,
   'src/scenes/worldQuickSave.js': 1,   // TESA's merge (HOST-SPLIT): the quick save's, likewise
   'src/scenes/worldModes.js': 7,
+  'src/systems/anisotropic-filtering-row.ts': 1,
   'src/systems/answerPipeline.js': 24,
   'src/systems/artifactEffects.js': 1,
   'src/systems/banking.js': 5,
   'src/systems/biography.js': 16,
   'src/systems/bookshelf.js': 1,
   'src/systems/buildingLocks.js': 3,
+  'src/systems/classic-picture-rows.ts': 1,
   'src/systems/controlsConfig.js': 1,
   'src/systems/court.js': 18,
   'src/systems/createItem.js': 30,
@@ -71,10 +74,12 @@ const ROUTED = {
   'src/systems/equip.js': 2,
   'src/systems/features.js': 3,   // L10N4: the Features screen's Off, Low and High are DFU's own settings words
   'src/systems/gameDate.js': 7,
+  'src/systems/ground-sharpness-row.ts': 1,
   'src/systems/guild/guildServiceFlow.js': 21,
   'src/systems/guild/guildServices.js': 9,
   'src/systems/guild/guildVariants.js': 13,
   'src/systems/guild/guilds.js': 6,
+  'src/systems/interior-seams-row.ts': 1,
   'src/systems/inventorySession.js': 2,
   'src/systems/item/itemInfo.js': 38,
   'src/systems/item/itemPowers.js': 13,
@@ -222,5 +227,20 @@ test('L10N3d the scan itself: the core\'s routers under any local name, a lookup
       ['src/ui/a.js', 9, 'localizedText', 'avoidDeath', 'By the mercy of Stendarr, you survive certain death!', 'Internal', false],
       ['src/ui/a.js', 9, 'localizedText', 'quit', undefined, 'Internal', false],
     ]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('L10N3d the scan reads TypeScript modules: a word in a .ts file is found at its own line, a .d.ts file is not read', () => {
+  const root = mkdtempSync(join(tmpdir(), 'l10nrouted-ts-'));
+  try {
+    mkdirSync(join(root, 'src/ui'), { recursive: true });
+    writeFileSync(join(root, 'src/ui/b.ts'), [
+      "import { localizedText } from '../systems/textManager.js';",
+      'interface Row { label: string }',
+      "export const row: Row = { label: localizedText('off', 'Off') as string };",
+    ].join('\n'));
+    writeFileSync(join(root, 'src/ui/c.d.ts'), "declare const x: string;\n");
+    const words = routedWords(root);
+    assert.deepEqual(words.map((w) => [w.file, w.line, w.key, w.en]), [['src/ui/b.ts', 3, 'off', 'Off']]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
