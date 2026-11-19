@@ -51,6 +51,7 @@ import { fileURLToPath } from 'node:url';
 
 import { probeTransforms, editsPlugin, waitFrames, settle, measure, measured, summaryLine, CENSUS, SWIFTSHADER_ARGS } from './frameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
+import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
 import { standServices, stopAll, makeBot, setUp, localFetch, localWebSocket, relayTally, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { OnlineSession } from '../src/net/online.js';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
@@ -170,6 +171,7 @@ async function main() {
     const url = `/play/?world&online&realm=${c.data.id}&load&server=ws://127.0.0.1:${svc.relayPort}&novideo&shot&play&fps&tod=15:00`;
     const t0 = Date.now();
     await page.goto(`http://localhost:${PORT}${url}`);
+    await joinServerPrompt(page);
     // where the boot stands, every half minute until it is ready - an online boot refused goes to the title, never ready
     for (let i = 0; !(await page.evaluate(() => window.__shotReady === true)); i++) {
       if (i >= 40) throw new Error('the online boot never readied in 20 minutes');

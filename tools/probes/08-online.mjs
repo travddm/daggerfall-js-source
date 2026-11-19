@@ -12,6 +12,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Game } from './lib/harness.mjs';
+import { joinServerPrompt } from '../lib/joinServerPrompt.mjs';
 import { editsPlugin } from '../frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from '../onlineFrameProbe.mjs';
 import { standServicesRetrying, stopAll, localFetch, botStorage, LOAD_SERVICE } from '../loadHarness.mjs';
@@ -130,9 +131,7 @@ export async function run({ browser, base, ck }) {
           },
         },
       );
-      // A `?server=` link to a relay this browser has not joined asks first (server-link-confirm.ts), and the game does not
-      // boot until it is answered. The probe answers Join, as a player would.
-      await g.page.getByRole('button', { name: 'Join', exact: true }).click({ timeout: 420000 });
+      await joinServerPrompt(g.page);
       await g.until(() => g.page.evaluate(() => (window.__frame ?? 0) > 3), 420000);
       await g.until(() => g.page.evaluate(standing), 900000);
       return g;

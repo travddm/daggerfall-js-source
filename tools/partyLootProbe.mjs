@@ -37,6 +37,7 @@ import { fileURLToPath } from 'node:url';
 import { probeTransforms, editsPlugin, waitFrames, SWIFTSHADER_ARGS } from './frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from './onlineFrameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
+import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
 import { standServices, stopAll, localFetch, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../src/systems/realmSaves.js';
@@ -141,6 +142,7 @@ async function main() {
       page.on('console', (m) => { if (/\[(realm|online|loot)\]/.test(m.text())) console.log(`   ${label} ${m.type()}: ${m.text().slice(0, 200)}`); });
       const t0 = Date.now();
       await page.goto(`http://localhost:${PORT}/play/?world&online&realm=${c.data.id}&load&server=ws://127.0.0.1:${svc.relayPort}&novideo&shot&play`);
+      await joinServerPrompt(page);
       await until(page, () => !!window.__seat?.() && window.__foes?.() != null && (window.__frame | 0) > 30, null, { what: `${label}'s online boot into the Hold`, timeout: 1800000, every: 5000 });
       await until(page, () => window.__probeOnline?.()?.status === 'open', null, { what: `${label}'s session open` });
       console.log(`   ${label} ready after ${((Date.now() - t0) / 1000).toFixed(0)} s: ${await page.evaluate(() => window.__seat())}`);
