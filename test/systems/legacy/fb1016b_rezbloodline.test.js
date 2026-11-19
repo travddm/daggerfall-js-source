@@ -28,7 +28,8 @@ import { MINUTE_JOBS, CRON_MINUTE } from '../../../server-account/src/cron.js';
 import { d1, standService } from '../../accountDb.mjs';
 import { seatRealm, freshSave } from '../../realmSeat.mjs';
 import { SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
-import { realmIo, createRealmSession, whenPageGoes } from '../../../src/systems/realmSaves.js';
+import { realmIo, createRealmSession } from '../../../src/systems/realmSaves.js';
+import { watchRealmClose } from '../../../src/systems/online/realm-close-save.ts';
 import { createRealmLine } from '../../../src/systems/legacy/realmLine.js';
 import { createLegacyHost, LEGACY_TEXT, REZ_HOLD_MS } from '../../../src/scenes/legacyHost.js';
 import { madeRuleHere } from '../../../src/systems/madeLevel.js';   // the merge of PR #800: the frame asks the made level's law whether a Resurrect is taken here (EG-H2) - none made, so it is
@@ -376,7 +377,7 @@ test('REZ-BLOODLINE AUDIT R1 a killed tab and a second device escape nothing (th
   await settle();
   assert.deepEqual(await b.join(), [410, 'dead'], 'the join during the hold is refused');
   const win = new EventTarget();
-  mount(topOf('whenPageGoes('), { realmSession: b.session, legacyHost: b.host, whenPageGoes, globalThis: win });
+  mount(topOf('watchRealmClose('), { realmSession: b.session, legacyHost: b.host, watchRealmClose, checkpointGateOpen: () => false, _realmSaveHooks: { held: () => null }, characterIdOf: () => null, realmSummaryOf: () => null, playerEntity: {}, globalThis: win });
   win.dispatchEvent(new Event('pagehide'));
   assert.equal(b.session.lost, 'dead', 'the session the dead\'s - the leave behind it finds it so');
   await settle();
@@ -391,7 +392,7 @@ test('REZ-BLOODLINE AUDIT R1 a killed tab and a second device escape nothing (th
   b2.io.fetch = async (url, init) => { if (String(url).endsWith('/v1/realm/die')) await new Promise((go) => { gated.push(go); }); return fetchB2(url, init); };
   b2.die();
   const win2 = new EventTarget();
-  mount(topOf('whenPageGoes('), { realmSession: b2.session, legacyHost: b2.host, whenPageGoes, globalThis: win2 });
+  mount(topOf('watchRealmClose('), { realmSession: b2.session, legacyHost: b2.host, watchRealmClose, checkpointGateOpen: () => false, _realmSaveHooks: { held: () => null }, characterIdOf: () => null, realmSummaryOf: () => null, playerEntity: {}, globalThis: win2 });
   win2.dispatchEvent(new Event('pagehide'));
   gated.splice(0).forEach((go) => go());
   await settle();

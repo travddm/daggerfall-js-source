@@ -358,6 +358,10 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
   return row?.held ? { error: 'trade-held', held: row.held } : null;
 }
 
+/** The checkpoint's row move, guarded on the lease and the sequence; a closing save also releases the lease in it. */
+const checkpointMoveSql = (/** @type {boolean} */ leave) => 'UPDATE realm_characters SET seq = ?, bytes = ?, obj = ?, prev = obj, lease_at = ?, summary = COALESCE(?, summary), updated_at = ?'
+  + `${leave ? ', lease = NULL' : ''} WHERE id = ? AND player = ? AND lease = ? AND seq = ?`;
+
 /**
  * A CHECKPOINT: the save, under the current lease, at `seq + 1`. The row is asked first (a stale lease or sequence is
  * refused before a byte is written), the object lands at a key of its own, and the row moves to it only if the lease
@@ -373,9 +377,10 @@ export async function craftHoldOf(/** @type {any} */ db, /** @type {string} */ p
  * so a tab whose last checkpoint landed but whose answer was lost can resync; the first save's own words
  * (firstSaveRefusal).
  * @param {any} ctx @param {string} playerId
- * @param {{ id: string, lease: unknown, seq: unknown, summary?: unknown }} at @param {ArrayBuffer} body @param {number} bytes
+ * `leave`: a closing tab's last save, whose lease is released in the update that stores it (realm-save-route.js).
+ * @param {{ id: string, lease: unknown, seq: unknown, summary?: unknown, session?: string | null, leave?: boolean }} at @param {ArrayBuffer} body @param {number} bytes
  */
-export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId, { id, lease, seq, summary = null, session = null }, body, bytes) {
+export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId, { id, lease, seq, summary = null, session = null, leave }, body, bytes) {
   if (!bucket) return { error: 'no-storage' };
   if (!REALM_ID_RE.test(id) || typeof lease !== 'string' || !LEASE_RE.test(lease) || !Number.isSafeInteger(seq) || /** @type {number} */ (seq) < 1) return { error: 'body' };
   // SAVE-BATCH: the record's row, the ledger's two reads of the character's own rows and (where this isolate
@@ -441,7 +446,7 @@ export async function checkpointRealm({ db, bucket, rand, nowS, env }, playerId,
   let stood = null;
   try {
     const res = await db.batch([
-      db.prepare('UPDATE realm_characters SET seq = ?, bytes = ?, obj = ?, prev = obj, lease_at = ?, summary = COALESCE(?, summary), updated_at = ? WHERE id = ? AND player = ? AND lease = ? AND seq = ?')
+      db.prepare(checkpointMoveSql(leave === true))
         .bind(seq, bytes, key, nowS, said, nowS, id, playerId, lease, /** @type {number} */ (seq) - 1),
       mustChange(db),
       ...v.steps,
@@ -510,6 +515,21 @@ export function realmAtOf(/** @type {any} */ v) {
 }
 
 /**
+ * The act's change, applied to `save` in place: its own refusal as `{ error }`, or the judge's hold when the change
+ * lowers the record's wealth (a payment to the realm), or null. Forged wealth that bought a home or decor from the realm
+ * would come back as gold the service witnessed when it is sold. A credit still lands on a held record, and a seizure
+ * asks no hold.
+ * @param {any} save @param {(save: any) => string | null} change @param {any} row
+ * @param {{ seize: boolean, before: number }} opts
+ */
+function changeRefusal(save, change, row, { seize, before }) {
+  const word = change(save);
+  if (word) return { error: word };
+  if (seize || wealthOf(save) >= before) return null;
+  return holdRefusal(row);
+}
+
+/**
  * A REALM CHARACTER'S RECORD, CHANGED WITH AN ACT - the service's half of every act online that costs or pays a realm
  * character gold: a guild's treasury, a founding, a home, a piece of decor. `at` is the record as its tab last
  * checkpointed it (the tab checkpoints just before, and holds its checkpoints until the answer, so the save read here
@@ -522,7 +542,7 @@ export function realmAtOf(/** @type {any} */ v) {
  *
  * INT3: AN ACT THAT HANDS VALUE TO ANOTHER PLAYER says so (`outbound`) - a listing, a purchase, a vault's deposit, a
  * treasury's, a rent, a stake, a disenchant - and is refused while the judge holds the character (holdRefusal: 'trade-held',
- * 'record-unjudged'); and (INT4) a change that takes out a piece whose id the ledger has marked a duplicate is refused
+ * 'record-unjudged'). Any other act that lowers the record's wealth (a price paid to the realm) is refused the same way; and (INT4) a change that takes out a piece whose id the ledger has marked a duplicate is refused
  * 'piece-dupe', whatever the act: no route moves that piece again. INT5: the wealth the change moves is WITNESSED - the
  * row's `witnessed` takes it in the same step, so the budget never charges a gain the service itself made. INT6: the
  * last checkpoint judged clean is never `prev` to drop.
@@ -553,8 +573,8 @@ export async function prepareRealmRecord({ db, bucket, rand, nowS }, playerId, a
   const before = wealthOf(save);
   const piecesBefore = ledgerPieces(save);
   const classicBefore = outbound ? classicCount(save) : 0;
-  const refused = change(save);
-  if (refused) return { error: refused };
+  const refused = changeRefusal(save, change, row, { seize, before });
+  if (refused) return refused;
   // a classic save's piece the realm keeps its character's (itemLaw.js classicPiece - "Keep all, can't sell")
   if (outbound && classicCount(save) < classicBefore) return { error: 'piece-legacy' };
   // INT4: a piece leaves a record only as its own - held by it, unclaimed, no copy (ledger.js piecesRefusal). A Set, never

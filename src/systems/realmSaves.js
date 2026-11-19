@@ -190,11 +190,11 @@ async function realmBodyOf(/** @type {string} */ text, /** @type {boolean} */ gz
   if (!gzip || !canGzip()) return text;
   try { return await gzipText(text); } catch { return text; }
 }
-/** A checkpoint: the save's text under the lease at `seq`, the tile beside it. `gzip`: the service opens a packed save. */
-export const realmPut = async (/** @type {any} */ io, /** @type {string} */ id, /** @type {{ lease: string, seq: number, summary?: any }} */ { lease, seq, summary = null }, /** @type {string} */ text, { gzip = false } = {}) =>
+/** A checkpoint: the save's text under the lease at `seq`, the tile beside it. `gzip`: the service opens a packed save. `closing`: the page is going, `text` is packed already, and the lease is released with it. */
+export const realmPut = async (/** @type {any} */ io, /** @type {string} */ id, /** @type {{ lease: string, seq: number, summary?: any }} */ { lease, seq, summary = null }, /** @type {string | Uint8Array} */ text, { gzip = false, closing = false } = {}) =>
   realmAsk(io, realmSavePath(id), {
-    method: 'PUT', raw: await realmBodyOf(text, gzip),
-    headers: { 'x-realm-lease': lease, 'x-realm-seq': String(seq), ...(summary ? { 'x-realm-summary': headerJson(summary) } : {}) },
+    method: 'PUT', raw: closing ? text : await realmBodyOf(/** @type {string} */ (text), gzip), keepalive: closing,
+    headers: { 'x-realm-lease': lease, 'x-realm-seq': String(seq), ...(summary ? { 'x-realm-summary': headerJson(summary) } : {}), ...(closing ? { 'x-realm-leave': '1' } : {}) },
   });
 
 /** REALM P2.1: a trade's half - `{ id, lease, seq, sid, give, get, pick }`; answers `{ state: 'waiting' | 'done' | 'refused' }`. */
@@ -825,14 +825,14 @@ export function createRealmSession({
       const r = await realmWedHalf(io, id, lease, sid, partner, partnerChar, opts);
       return r.ok ? { ok: true, wed: r.data?.wed === true, union: r.data?.union ?? null } : { ok: false, error: r.error };
     },
-    /** The session's end: what is waiting is sent first (unless the page is going - `keepalive` sends the leave alone,
-     *  which a browser can finish after the page is gone), then the lease given up. */
-    async leave({ keepalive = false } = {}) {
+    /** The session's end: what waits is sent first, then the lease given up. As the page goes (`keepalive`), the packed `closing` save (online/realm-close-save.ts) carries the lease's release, or the leave goes alone. */
+    async leave({ keepalive = false, closing = /** @type {{ bytes: Uint8Array, summary: any } | null} */ (null) } = {}) {
       if (lost) return { ok: false, error: lost };
       if (!keepalive) { if (running) await running; if (pending) await session.checkpoint(pending.text, pending.summary); }
       keepNow();   // RESCUE-SAVE: whatever never landed is on the device before the lease goes
       lost = 'left';
-      return realmLeave(io, id, lease, { keepalive });
+      unsure ||= closing != null;   // the closing save may land unanswered: a page back from the cache finds the record one on
+      return closing ? realmPut(io, id, { lease, seq: current + 1, summary: closing.summary }, closing.bytes, { closing: true }) : realmLeave(io, id, lease, { keepalive });
     },
     /** AUDIT REALM2 C2: THE PAGE CAME BACK from the back-forward cache, its lease given up as it went (pagehide): joined
      *  again - onto the record this tab left alone, at its own sequence (or one on: its own put whose answer was lost).

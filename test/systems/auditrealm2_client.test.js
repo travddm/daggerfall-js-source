@@ -33,6 +33,7 @@ import {
   realmGoldAct, realmTradeEscrow, realmRefusalText, REALM_SAVED_TEXT, realmSaveWithHeld,
 } from '../../src/systems/realmSaves.js';
 import * as realmSaves from '../../src/systems/realmSaves.js';
+import { watchRealmClose } from '../../src/systems/online/realm-close-save.ts';
 import { createSpoilsPool, spoilsStore, recoverSpoils, SPOILS_STORE_KEY } from '../../src/scenes/spoilsPool.js';
 import { raidSpoilsList, raidSpoilsDay, RAID_SPOILS_KEYS, RAID_SPOILS_TEXT, RAID_SPOILS_RECORDS_MAX } from '../../src/systems/raidSpoils.js';
 import { registerModSaveData, modSaveRecords, restoreModSaveRecords, newGameModSaveRecords, _resetModSaveData } from '../../src/systems/modSaveData.js';
@@ -253,10 +254,10 @@ test('AUDIT REALM2 C2 in the host: beforeunload gives no lease up (the unload gu
   });
   let exitHook = null;
   const realmHooks = {
-    realmSession: c.session, setBeforeTitleExit: (f) => { exitHook = f; }, whenPageHides: realmSaves.whenPageHides, whenPageGoes: realmSaves.whenPageGoes,
+    realmSession: c.session, setBeforeTitleExit: (f) => { exitHook = f; }, whenPageHides: realmSaves.whenPageHides, watchRealmClose, checkpointGateOpen: () => false, _realmSaveHooks: { held: () => null }, characterIdOf: () => null, realmSummaryOf: () => null, playerEntity: {}, legacyHost: null,
     globalThis: win, online: null, onlineCheckpoint: () => false, realmCheckpoint: () => false, duelLeaveNow: () => {}, REALM_EXIT_WAIT_MS: 10,
   };
-  mount(W.top(WORLD, 'whenPageGoes('), realmHooks);   // the page's going: the lease, at the checkpoint
+  mount(W.top(WORLD, 'watchRealmClose('), realmHooks);   // the page's going: the lease, at the checkpoint
   mount(W.top(WORLD, 'setBeforeTitleExit('), realmHooks);   // the title exit and the page put away: the checkpoint's doors (BOOT-HIDE)
   assert.equal(typeof exitHook, 'function');
   const before = dev.door.log.length;

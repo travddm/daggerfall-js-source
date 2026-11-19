@@ -59,7 +59,7 @@ function suspends(n) {
 /** The page's own doors: what the browser fires with no game input between (a tab put away, the page going), and the
  *  two the game hands the checkpoint to. */
 const PAGE_EVENTS = new Set(['beforeunload', 'unload', 'pagehide', 'pageshow', 'visibilitychange', 'freeze', 'resume']);
-const REGISTRARS = new Set(['whenPageHides', 'whenPageGoes', 'setBeforeTitleExit']);
+const REGISTRARS = new Set(['whenPageHides', 'watchRealmClose', 'setBeforeTitleExit']);
 const doorOf = (call) => {
   const c = call.callee;
   const name = c.type === 'Identifier' ? c.name : c.type === 'MemberExpression' && !c.computed ? c.property.name : null;

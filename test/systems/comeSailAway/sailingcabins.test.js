@@ -229,6 +229,7 @@ test('worldModes exit caches the cabin, tears down the room, and lands at deck h
     unleveledLootPreTransition: noop, cacheInteriorScene: () => actions.push('cache'), teardownQuestFlats: noop,
     interiorLootLeave: noop,
     interiorCtx: { destroy: () => actions.push('destroy') }, _intShared: null, interiorFoes: null, interiorGuards: null,
+    magic: null, clearInteriorMissiles: noop,
     interiorDropped: { restorePiles: noop }, interiorHitEffects: { clear: noop }, interiorBloodMarks: { clear: noop },
     interiorCamps: { destroyAll: noop }, interiorHearths: [], interiorBuilding: {}, interiorHome: null, interiorSeatHall: null,
     _seatHallVisit: false, exteriorDoor: {}, interiorWindows: { reconcile: noop, clear: noop }, interiorOverlay: null,
