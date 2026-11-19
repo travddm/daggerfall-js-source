@@ -58,7 +58,8 @@ import { safetyMinute, safetySweep } from './safetyClock.js';   // the reviewer'
 import { sweepGuildNotes } from './guildBoard.js';
 import { sweepHarvests } from './professions.js';
 import { sweepCraftWrits } from './craftWrits.js';   // CRAFT-WRITS: an unfilled crafting writ the day after its own
-import { retryFreezePushes, sweepStaffChat } from './staffFreeze.js';   // STAFF-PANEL5-FREEZE: a freeze's push again, the staff chat's sweep
+import { retryFreezePushes, sweepStaffChat } from './staffFreeze.js';
+import { sweepGrantFeed, GRANT_SWEEP_BATCHES } from './grants.js';   // STAFF-PANEL5-FREEZE: a freeze's push again, the staff chat's sweep
 import { SESSION_IDLE_S } from './accounts.js';
 import { storeArenaChampion, ARENA_CHAMPION_CLOCK_S } from './arena.js';
 import { countedDb, newTally, d1Doubles, tablesBlob } from './metrics.js';
@@ -270,6 +271,8 @@ export const HOUR_JOBS = Object.freeze([
   // STAFF-PANEL5-FREEZE (staffFreeze.js): a freeze's thread whose freeze ran out closed, and the staff chat's lines past
   // STAFF_LINES_KEEP_S (90 days)
   ['staff-chat', (ctx) => rounds(() => sweepStaffChat(ctx.db, ctx.nowS, SWEEP_ROWS), SWEEP_ROWS, ctx.budget)],
+  // The grant feed's batches past GRANT_FEED_KEEP_S, with their rows and tallies
+  ['grant-feed', (ctx) => rounds(() => sweepGrantFeed(ctx.db, ctx.nowS, GRANT_SWEEP_BATCHES), GRANT_SWEEP_BATCHES, ctx.budget)],
 ]);
 
 /** The jobs a schedule runs - none for a schedule this service does not keep (said, so a trigger renamed in

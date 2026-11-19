@@ -214,7 +214,7 @@ test('AUDIT SCALE D2: the clock\'s moment in seconds - scheduled() hands runCron
   assert.equal(svc.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM sessions WHERE player_id = ?').get(g.id).n, 1);
 });
 
-test('AUDIT SCALE D7: on a quiet world the clock is nine statements a minute and forty-four an hour (AUDIT LW-II-2 S3; EG-ZM; REZ-BLOODLINE AUDIT R1; STAFF-PANEL1; CRAFT-WRITS; AUDIT SEA VENTURES B5; STAFF-PANEL3-REALM; STAFF-PANEL5) - each job asks once and, its page short, never again; the Motherlodes are not picked behind `dev`; a metrics write that throws costs no job (mutants: TOWNECON-AUDIT2-SVC3-kept-read-each-minute)', async () => {
+test('AUDIT SCALE D7: on a quiet world the clock is nine statements a minute and forty-seven an hour (AUDIT LW-II-2 S3; EG-ZM; REZ-BLOODLINE AUDIT R1; STAFF-PANEL1; CRAFT-WRITS; AUDIT SEA VENTURES B5; STAFF-PANEL3-REALM; STAFF-PANEL5) - each job asks once and, its page short, never again; the Motherlodes are not picked behind `dev`; a metrics write that throws costs no job (mutants: TOWNECON-AUDIT2-SVC3-kept-read-each-minute)', async () => {
   clock(T0);
   const svc = await standService({ SEATS_OPEN: 'on', PROFESSIONS_OPEN: 'on' });
   _resetCronForTests();
@@ -240,8 +240,8 @@ test('AUDIT SCALE D7: on a quiet world the clock is nine statements a minute and
   // hour, and the backfill nothing while CENSUS_BACKFILL is not 'on'
   // feeds' batch ids (four, one per table), the timed encounters past 14 days (one), and the freeze's staff chat - threads closed, lines past 90
   // days (two) - each page short: fifty
-  assert.deepEqual(hour.map((j) => [j.name, j.statements]), [['board', 2], ['guild-board', 1], ['harvests', 2], ['craft-writs', 1], ['market-history', 10], ['town-econ', 3], ['rate-limits', 1], ['sessions', 1], ['guild-invites', 1], ['realm-findings', 1], ['realm-wealth-hours', 1], ['progress-hours', 1], ['crew-signs', 1], ['patrons', 1], ['safety-sweep', 6], ['staff-audit', 1], ['staff-evidence', 1], ['census-day', 0], ['census-backfill', 0], ['staff-messages', 1], ['staff-events', 1], ['staff-feeds', 4], ['reactions', 1], ['staff-chat', 2]]);
-  assert.equal(minute.reduce((n, j) => n + j.statements, 0) + hour.reduce((n, j) => n + j.statements, 0), 9 + 44);   // OPEN-WORLD PVP REMOVED: the wild falls, the wild escrows and the sea's wrecks and bounties - seven statements - leave the hour
+  assert.deepEqual(hour.map((j) => [j.name, j.statements]), [['board', 2], ['guild-board', 1], ['harvests', 2], ['craft-writs', 1], ['market-history', 10], ['town-econ', 3], ['rate-limits', 1], ['sessions', 1], ['guild-invites', 1], ['realm-findings', 1], ['realm-wealth-hours', 1], ['progress-hours', 1], ['crew-signs', 1], ['patrons', 1], ['safety-sweep', 6], ['staff-audit', 1], ['staff-evidence', 1], ['census-day', 0], ['census-backfill', 0], ['staff-messages', 1], ['staff-events', 1], ['staff-feeds', 4], ['reactions', 1], ['staff-chat', 2], ['grant-feed', 3]]);
+  assert.equal(minute.reduce((n, j) => n + j.statements, 0) + hour.reduce((n, j) => n + j.statements, 0), 9 + 47);   // OPEN-WORLD PVP REMOVED: the wild falls, the wild escrows and the sea's wrecks and bounties - seven statements - leave the hour
   // behind `dev` the Motherlodes are a developer's: never picked by the clock
   const dev = await standService({ PROFESSIONS_OPEN: 'dev' });
   _resetCronForTests();

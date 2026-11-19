@@ -14,6 +14,8 @@ import { GRANT_KINDS, GRANT_CELL_CEILING, GRANT_CASE_REASONS } from '../../src/n
 import { gatePublicKey } from './signing.js';
 import { openCaseFor, keepCaseLines, credibleReporter } from './safety.js';
 import { displayName, overRate } from './accounts.js';
+import { sql } from 'kysely';
+import { sqlOf, chunksOf, BOUND_VALUES_MAX } from './database-seam.ts';
 
 /** The door's path - the relay's GRANT_FEED_URL names it (server/wrangler.toml). */
 export const GRANT_FEED_PATH = '/v1/mod/grant-feed';
@@ -37,6 +39,12 @@ export const GRANT_ASK_CASE_OVER_MIN = 16;
 /** FOE-BOUNDS and GRANT-ASKS: the most cases the relay's own count may OPEN an hour (a case already open takes its line
  *  whatever this says) - a flood of fresh guest accounts never floods #mod-queue (safety.js UNCOUNTED_CASES_HOUR's way). */
 export const GRANT_OWN_CASES_HOUR = 30;
+/** How long the grant feed's batches, rows and tallies are kept. The longest reader is the grants measure, which reads
+ *  30 days at most (review.js), so a row older than this is read by nothing. The relay refuses a stale batch, so a
+ *  swept batch id is never posted again. */
+export const GRANT_FEED_KEEP_S = 31 * 24 * 3600;
+/** The batches one sweep round deletes, with their rows and tallies (up to GRANT_MEASURE_ROWS each). */
+export const GRANT_SWEEP_BATCHES = 50;
 
 /**
  * A POSTED WINDOW: kept when the relay's signature holds over a batch young enough, once - `{ ok, read }` (`read` false
@@ -50,15 +58,45 @@ export async function takeGrantMeasure({ db, nowS, subtle, rand }, env, bytes, s
   if ('error' in opened) return opened;
   const b = opened.batch;
   const span = Math.max(1, Math.round((b.at - b.from) / 1000));
-  const kept = await db.prepare('INSERT OR IGNORE INTO grant_batches (id, at, q, span_s, live) VALUES (?1, ?2, ?3, ?4, ?5)').bind(b.id, nowS, b.q, span, b.live).run();
-  if (!kept?.meta?.changes) return { ok: true, read: false };
+  const seam = sqlOf(db);
+  const query = seam.kysely;
+  const known = query.selectFrom('grant_batches').select('id').where('id', '=', b.id).limit(1);
+  if ((await seam.run(known)).rows.length) return { ok: true, read: false };
+  // The batch's own row is written in the same list as its rows, so a list that fails leaves no row that would make
+  // the relay's retry read as kept
+  const keep = query.insertInto('grant_batches').values({ id: b.id, at: nowS, q: b.q, span_s: span, live: b.live });
+  const rowValues = b.rows.map((/** @type {any} */ r) => ({
+    batch: b.id,
+    at: nowS,
+    sub: r.a,
+    kind: r.k,
+    asks: r.asks,
+    members: r.members,
+    bucket: r.bucket,
+    ceiling: r.ceiling,
+    span_s: span,
+  }));
+  const tallyValues = b.tl.map((/** @type {any} */ t) => ({
+    batch: b.id,
+    at: nowS,
+    reader: t.a,
+    sender: t.b,
+    reason: t.r,
+    n: t.n,
+  }));
+  // Many rows to a statement, each statement under D1's bound-value limit: a full window is a dozen statements, not 128
+  const rowsPerInsert = (/** @type {object[]} */ values) => Math.floor(BOUND_VALUES_MAX / Object.keys(values[0]).length);
   const writes = [
-    ...b.rows.map((/** @type {any} */ r) => db.prepare('INSERT INTO grant_rows (batch, at, sub, kind, asks, members, bucket, ceiling, span_s) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)')
-      .bind(b.id, nowS, r.a, r.k, r.asks, r.members, r.bucket, r.ceiling, span)),
-    ...b.tl.map((/** @type {any} */ t) => db.prepare('INSERT INTO grant_tallies (batch, at, reader, sender, reason, n) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
-      .bind(b.id, nowS, t.a, t.b, t.r, t.n)),
+    ...(rowValues.length ? chunksOf(rowValues, rowsPerInsert(rowValues)).map((chunk) => query.insertInto('grant_rows').values(chunk)) : []),
+    ...(tallyValues.length ? chunksOf(tallyValues, rowsPerInsert(tallyValues)).map((chunk) => query.insertInto('grant_tallies').values(chunk)) : []),
   ];
-  if (writes.length) await db.batch(writes);
+  try {
+    await seam.atomic([keep, ...writes]);
+  } catch (error) {
+    // Two posts of one batch at once: the other kept it first, and this list wrote nothing
+    if ((await seam.run(known)).rows.length) return { ok: true, read: false };
+    throw error;
+  }
   const ctx = { db, nowS, rand };
   /** @type {Map<string, { texts: string[], readers: boolean }>} the sender, its findings - and whether readers' accounts made one */
   const found = new Map();
@@ -103,19 +141,44 @@ export function grantAskText(r, span) {
 export async function grantCases(ctx, env, senders) {
   const { db, nowS } = ctx;
   const since = nowS - GRANT_CASE_WINDOW_S;
-  const inReasons = GRANT_CASE_REASONS.map((_, k) => `?${k + 3}`).join(', ');
+  const seam = sqlOf(db);
+  const query = seam.kysely;
   /** @type {Map<string, string>} */
   const out = new Map();
-  for (const sender of senders.slice(0, GRANT_CASE_SENDERS_MAX)) {
-    const rows = (await db.prepare(`SELECT reader, reason, SUM(n) AS n FROM grant_tallies WHERE sender = ?1 AND at > ?2 AND reason IN (${inReasons}) GROUP BY reader, reason`)
-      .bind(sender, since, ...GRANT_CASE_REASONS).all())?.results ?? [];
-    const readers = [...new Set(rows.map((/** @type {any} */ r) => String(r.reader)))].filter((r) => r !== sender && r !== GRANT_RELAY_READER);
-    if (readers.length < GRANT_CASE_READERS) continue;
-    const counted = [];
-    for (const id of readers) {
-      const p = await db.prepare('SELECT * FROM players WHERE id = ?1').bind(id).first();
-      if (p && credibleReporter(p, nowS)) counted.push(id);
-    }
+  const weighed = senders.slice(0, GRANT_CASE_SENDERS_MAX);
+  if (!weighed.length) return out;
+  // Every sender's tallies in one read, and every reader's account in one more: a read per sender and per reader
+  // made a batch naming 32 senders cost dozens of statements
+  const tallied = query
+    .selectFrom('grant_tallies')
+    .select((eb) => ['sender', 'reader', 'reason', eb.fn.sum('n').as('n')])
+    .where('sender', 'in', weighed)
+    .where('at', '>', since)
+    .where('reason', 'in', [...GRANT_CASE_REASONS])
+    .groupBy(['sender', 'reader', 'reason'])
+    .orderBy(['sender', 'reader', 'reason']);
+  /** @type {Map<string, any[]>} */
+  const rowsBySender = new Map();
+  for (const row of (await seam.run(tallied)).rows) {
+    const sender = String(row.sender);
+    rowsBySender.set(sender, [...(rowsBySender.get(sender) ?? []), row]);
+  }
+  /** @type {Map<string, string[]>} */
+  const readersBySender = new Map();
+  for (const sender of weighed) {
+    const rows = rowsBySender.get(sender) ?? [];
+    const readers = [...new Set(rows.map((r) => String(r.reader)))].filter((r) => r !== sender && r !== GRANT_RELAY_READER);
+    if (readers.length >= GRANT_CASE_READERS) readersBySender.set(sender, readers);
+  }
+  const readerIds = [...new Set([...readersBySender.values()].flat())];
+  /** @type {Map<string, any>} */
+  const players = new Map();
+  for (const ids of chunksOf(readerIds, BOUND_VALUES_MAX)) {
+    for (const player of (await seam.run(query.selectFrom('players').selectAll().where('id', 'in', ids))).rows) players.set(String(player.id), player);
+  }
+  for (const [sender, readers] of readersBySender) {
+    const rows = rowsBySender.get(sender) ?? [];
+    const counted = readers.filter((id) => players.has(id) && credibleReporter(players.get(id), nowS));
     if (counted.length < GRANT_CASE_READERS) continue;
     const why = new Map();
     for (const r of rows) if (counted.includes(String(r.reader))) why.set(String(r.reason), (why.get(String(r.reason)) ?? 0) + Number(r.n));
@@ -136,16 +199,31 @@ export async function grantCases(ctx, env, senders) {
 export async function grantCaseLines(ctx, env, found) {
   const { db, nowS } = ctx;
   const since = nowS - GRANT_CASE_WINDOW_S;
+  const seam = sqlOf(db);
+  const query = seam.kysely;
   let touched = 0;
   for (const [sender, f] of [...found].slice(0, GRANT_CASE_SENDERS_MAX)) {
-    const target = await db.prepare('SELECT * FROM players WHERE id = ?1').bind(sender).first();
+    const target = (await seam.run(query.selectFrom('players').selectAll().where('id', '=', sender).limit(1))).rows[0];
     if (!target) continue;
-    if (!f.readers && !(await db.prepare("SELECT 1 AS y FROM mod_cases WHERE target = ?1 AND kind = 'spawn' AND status = 'open'").bind(sender).first())
-      && await overRate(ctx, 'grant-own-cases', GRANT_OWN_CASES_HOUR, 3600)) continue;
-    const caseId = await openCaseFor(ctx, env, sender, 'review', 'spawn');   // STAFF-PANEL2-FIX: a spawn case, never a chat report's
-    if (await db.prepare('SELECT 1 AS y FROM mod_case_lines WHERE case_id = ?1 AND tab = ?2 AND at > ?3').bind(caseId, GRANT_CASE_TAB, since).first()) continue;   // one line a window
+    const openCase = query
+      .selectFrom('mod_cases')
+      .select(sql`1`.as('y'))
+      .where('target', '=', sender)
+      .where('kind', '=', 'spawn')
+      .where('status', '=', 'open')
+      .limit(1);
+    if (!f.readers && !(await seam.run(openCase)).rows.length && await overRate(ctx, 'grant-own-cases', GRANT_OWN_CASES_HOUR, 3600)) continue;
+    const caseId = await openCaseFor(ctx, env, sender, 'review', 'spawn');   // a spawn case, never a chat report's
+    const lineThisWindow = query
+      .selectFrom('mod_case_lines')
+      .select(sql`1`.as('y'))
+      .where('case_id', '=', caseId)
+      .where('tab', '=', GRANT_CASE_TAB)
+      .where('at', '>', since)
+      .limit(1);
+    if ((await seam.run(lineThisWindow)).rows.length) continue;   // one line a window
     await keepCaseLines(db, caseId, [{ tab: GRANT_CASE_TAB, sub: sender, name: displayName(target), at: nowS, text: f.texts.join('; ') }], sender);
-    await db.prepare('UPDATE mod_cases SET updated_at = ?2 WHERE id = ?1').bind(caseId, nowS).run();
+    await seam.run(query.updateTable('mod_cases').set({ updated_at: nowS }).where('id', '=', caseId));
     touched++;
   }
   return touched;
@@ -161,21 +239,59 @@ export async function grantCaseLines(ctx, env, found) {
  */
 export async function grantsMeasure(db, nowS, days, ranked) {
   const since = nowS - days * 24 * 3600;
-  const rate = `CAST(ROUND(asks * 3600.0 / MAX(span_s, ${GRANT_RATE_SPAN_MIN_S})) AS INTEGER)`;
+  const seam = sqlOf(db);
+  const query = seam.kysely;
+  // An account's asks an hour, over a window of at least GRANT_RATE_SPAN_MIN_S. A CASE, not SQLite's two-argument MAX,
+  // so that Postgres runs the same text.
+  const rate = sql`CAST(ROUND(asks * 3600.0 / (CASE WHEN span_s > ${GRANT_RATE_SPAN_MIN_S} THEN span_s ELSE ${GRANT_RATE_SPAN_MIN_S} END)) AS INTEGER)`;
+  // Every kind's sums in one grouped read; a kind with no rows sums to nothing
+  const summed = query
+    .selectFrom('grant_rows')
+    .select((eb) => [
+      'kind',
+      eb.fn.countAll().as('n'),
+      eb.fn.sum('asks').as('asks'),
+      eb.fn.sum('members').as('members'),
+      eb.fn.sum('bucket').as('bucket'),
+      eb.fn.sum('ceiling').as('ceiling'),
+    ])
+    .where('at', '>=', since)
+    .groupBy('kind');
+  const sumsByKind = new Map((await seam.run(summed)).rows.map((row) => [String(row.kind), row]));
   const kinds = [];
   for (const kind of Object.keys(GRANT_KINDS)) {
-    const sums = await db.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(asks), 0) AS asks, COALESCE(SUM(members), 0) AS members, COALESCE(SUM(bucket), 0) AS bucket, COALESCE(SUM(ceiling), 0) AS ceiling FROM grant_rows WHERE at >= ?1 AND kind = ?2')
-      .bind(since, kind).first();
+    const sums = sumsByKind.get(kind);
     const n = Number(sums?.n ?? 0);
-    const at = async (/** @type {number} */ rank) => (await db.prepare(`SELECT ${rate} AS r FROM grant_rows WHERE at >= ?1 AND kind = ?2 ORDER BY r LIMIT 1 OFFSET ?3`).bind(since, kind, rank).first())?.r ?? null;
+    const at = async (/** @type {number} */ rank) => {
+      const ranked = query
+        .selectFrom('grant_rows')
+        .select(rate.as('r'))
+        .where('at', '>=', since)
+        .where('kind', '=', kind)
+        .orderBy('r')
+        .limit(1)
+        .offset(rank);
+      return (await seam.run(ranked)).rows[0]?.r ?? null;
+    };
     const { quantiles, most } = await ranked(n, at);
     const top = quantiles.at(-1)?.[1] ?? null;
     const standing = GRANT_KINDS[/** @type {keyof typeof GRANT_KINDS} */ (kind)];
     kinds.push({ kind, windows: n, asks: Number(sums?.asks ?? 0), members: Number(sums?.members ?? 0), bucket: Number(sums?.bucket ?? 0), ceiling: Number(sums?.ceiling ?? 0), perHour: { quantiles, most },
       rate: { standing: standing.rate, suggested: grantRateSuggested(top) } });
   }
-  const cellsN = Number((await db.prepare('SELECT COUNT(*) AS n FROM grant_batches WHERE at >= ?1').bind(since).first())?.n ?? 0);
-  const live = await ranked(cellsN, async (rank) => (await db.prepare('SELECT live AS r FROM grant_batches WHERE at >= ?1 ORDER BY live LIMIT 1 OFFSET ?2').bind(since, rank).first())?.r ?? null);
+  const cells = query.selectFrom('grant_batches').select((eb) => eb.fn.countAll().as('n')).where('at', '>=', since);
+  const cellsN = Number((await seam.run(cells)).rows[0]?.n ?? 0);
+  const liveAt = async (/** @type {number} */ rank) => {
+    const ranked = query
+      .selectFrom('grant_batches')
+      .select('live as r')
+      .where('at', '>=', since)
+      .orderBy('live')
+      .limit(1)
+      .offset(rank);
+    return (await seam.run(ranked)).rows[0]?.r ?? null;
+  };
+  const live = await ranked(cellsN, liveAt);
   return { days, kinds, cells: { windows: cellsN, live, ceiling: GRANT_CELL_CEILING, suggested: grantCeilingSuggested(live.most) } };
 }
 
@@ -187,3 +303,21 @@ export const grantRateSuggested = (/** @type {number|null} */ perHour) => (Numbe
 /** GRANT5: THE CELL'S CEILING, SUGGESTED from the most live granted hostile members any cell held - half again past it,
  *  whole (null with no measure). Pure. */
 export const grantCeilingSuggested = (/** @type {number|null} */ most) => (Number.isFinite(most) && /** @type {number} */ (most) > 0 ? Math.ceil(/** @type {number} */ (most) * GRANT_SUGGEST_ROOM) : null);
+
+/**
+ * The grant feed's sweep: the oldest `page` batches past GRANT_FEED_KEEP_S, their rows and their tallies, deleted in one
+ * list. Rows and tallies go by their batch, the first column of their keys, so each delete reads an index. Answers how
+ * many batches went. @param {any} db @param {number} nowS @param {number} page
+ */
+export async function sweepGrantFeed(db, nowS, page) {
+  const seam = sqlOf(db);
+  const query = seam.kysely;
+  const cutoff = nowS - GRANT_FEED_KEEP_S;
+  const expired = () => query.selectFrom('grant_batches').select('id').where('at', '<', cutoff).orderBy('at').limit(page);
+  const [, , batches] = await seam.atomic([
+    query.deleteFrom('grant_rows').where('batch', 'in', expired()),
+    query.deleteFrom('grant_tallies').where('batch', 'in', expired()),
+    query.deleteFrom('grant_batches').where('id', 'in', expired()),
+  ]);
+  return batches.changes;
+}
