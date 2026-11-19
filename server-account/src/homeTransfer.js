@@ -7,6 +7,7 @@ import { decorRefund } from '../../src/net/decorLaw.js';
 import { decorHeldBlocks } from './decorBatch.js';
 import { dropIfUnnamed, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmHoldOf, realmSaveTextOf, seizeRealmRecord } from './realm.js';
 import { payFromSave, creditSave } from '../../src/net/realm/realmGoldLaw.js';
+import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';
 
 const OFFER_S = 3 * 24 * 60 * 60;
 const PRICE_MAX = 100_000_000;
@@ -149,7 +150,9 @@ async function acceptHome(ctx, player, body) {
   if (held.error) return held;
   const keepDecor = offer.keep_decor === 1;
   const keepItems = offer.keep_items === 1;
-  if ((!keepItems || !keepDecor) && (bin > 0 || held.goods.length > 0)) return { error: 'home-holds' };
+  // A sale that keeps the decor and the items hands the chests' goods to the buyer; any other sale needs them empty
+  const binMustBeEmpty = !keepItems || !keepDecor;
+  if (binMustBeEmpty && (bin > 0 || held.goods.length > 0)) return { error: 'home-holds' };
   let refund = 0;
   if (!keepDecor) {
     for (const row of pieces) {
@@ -187,10 +190,13 @@ async function acceptHome(ctx, player, body) {
   const steps = [
     ...(sellerPrep?.steps ?? []),
     ...(buyerPrep?.steps ?? []),
+    // The tests blocked() and the bin count read go into the UPDATE too, so a tenant, a trader's listing or a chest
+    // deposit landing after those reads stops the sale instead of going to the buyer or being deleted.
     db.prepare(`UPDATE homes SET player = ?1, char_id = ?2, owner_name = ?3
       WHERE map_id = ?4 AND building_key = ?5 AND player = ?6 AND char_id = ?7 AND guild_id IS NULL AND (deed IS NULL OR deed = 0)
-      AND (SELECT COUNT(*) FROM homes h WHERE h.player = ?1 AND h.char_id = ?2 AND h.guild_id IS NULL AND h.region = homes.region) < ?8`)
-      .bind(player.id, character, displayName(player), offer.map_id, offer.building_key, offer.seller, offer.seller_char, HOME_CAP),
+      AND (SELECT COUNT(*) FROM homes h WHERE h.player = ?1 AND h.char_id = ?2 AND h.guild_id IS NULL AND h.region = homes.region) < ?8
+      AND ${homeFreeToGoSql({ mapId: '?4', buildingKey: '?5', nowS: '?9' }, binMustBeEmpty)}`)
+      .bind(player.id, character, displayName(player), offer.map_id, offer.building_key, offer.seller, offer.seller_char, HOME_CAP, nowS),
     mustChange(db),
     db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key),
   ];
@@ -219,13 +225,19 @@ async function acceptHome(ctx, player, body) {
     if (done?.state === 'accepted' && done.result) return { ...JSON.parse(done.result), repeat: true };
     const nowRev = Number((await db.prepare('SELECT rev FROM decor_rev WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key).first())?.rev) || 0;
     if (nowRev !== rev) return { error: 'offer-stale' };
-    const still = await houseOf(db, offer.map_id, offer.building_key, offer.seller);
-    if (!still) return { error: 'no-home' };
-    const after = Number((await db.prepare(REGION_HOMES_SQL).bind(player.id, character, offer.map_id, offer.building_key).first())?.n) || 0;
-    if (after >= HOME_CAP) return { error: 'home-cap' };
-    return { error: 'offer-closed' };
+    return { error: await saleRefusedBy(db, offer, player.id, character, nowS, binMustBeEmpty) };
   }
   return result;
+}
+
+/** Why an accepted sale's batch was refused, read after it: the house gone, a hold that landed, or the buyer's cap. */
+async function saleRefusedBy(db, offer, buyerId, character, nowS, binMustBeEmpty) {
+  const still = await houseOf(db, offer.map_id, offer.building_key, offer.seller);
+  if (!still) return 'no-home';
+  const held = await homeHeldError(db, offer.map_id, offer.building_key, nowS, binMustBeEmpty);
+  if (held) return held;
+  const after = Number((await db.prepare(REGION_HOMES_SQL).bind(buyerId, character, offer.map_id, offer.building_key).first())?.n) || 0;
+  return after >= HOME_CAP ? 'home-cap' : 'offer-closed';
 }
 
 /** What stops an accepted sale before anything moves, or null: a priced sale needs the buyer's record, and the seller

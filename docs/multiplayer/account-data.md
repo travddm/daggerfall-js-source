@@ -111,6 +111,9 @@ same way instead of paying twice. Listings and auctions are unique on `(seller, 
   `place` moved by `moveDecor`. Removing a home removes its pieces.
 - `homes.paid` and `home_decor.paid` record what was paid. A refund or a realm credit uses those values, never a
   client-stated price.
+- A release or a transfer refuses while a tenant's room runs, the trader has open listings or a shared chest holds
+  goods it would take. `home-free-to-go.ts` repeats those tests inside the write, so one that lands after the reads stops
+  the batch.
 - Entry is `private`, `party` or `public` (`setHomeEntry`); `decorMay` checks who may place or use decor.
 - Yards are decor rows with a `yard` flag. `yardsOf` serves a town's yards from a short-lived in-memory snapshot
   (`YARDS_KEPT_S`); `settleYards` runs a bounded number a minute.

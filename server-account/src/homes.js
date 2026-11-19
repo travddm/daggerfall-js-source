@@ -62,6 +62,7 @@ import { reckonPatrons } from './market.js';   // AUDIT LW-II-2 S4: a door leavi
 import { GUILD_TREASURY_MAX } from '../../src/net/guild/guildLaw.js';   // ARENA4b: a hall's pieces paid back, into a treasury under its cap
 import { DECOR_OPS_MAX, DECOR_OPS_WINDOW_S } from '../../src/net/decorLaw.js';   // HOME-LOOK: a repaint counts as a decorator's write
 import { hallMay } from '../../src/net/hallLaw.js';   // GUILD1d: a hall's keepers
+import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';
 import { heraldryOfRow } from './halls.js';   // GUILD1d: a hall's heraldry, on its door
 import { openGatesRead } from './seatHolding.js';   // SEAT1d: Open Gates, where the town's holder proclaims it
 import { OWNS } from './decor.js';   // GUILD-YARD: a home's character, or a hall's keeper - as its decor asks
@@ -315,6 +316,7 @@ const realmDecorBackStatement = (db, mapId, buildingKey) => db.prepare(`SELECT C
  */
 async function realmRelease(ctx, player, at, home) {
   const { db, bucket } = ctx;
+  const nowS = ctx.nowS ?? Math.floor(Date.now() / 1000);
   if (!home) return { error: 'no-home' };
   // HOME-CROSSED (FIELD BUGS 2026-09-30, Seanobi's "Sold House for 600 K, Got Nothing Back"): A HOUSE NO RECORD PAID FOR
   // STAYS A HOUSE. Customs carried it in (CUSTOMS-CARRY) and its deed share of nothing was paid while the house and its
@@ -334,15 +336,71 @@ async function realmRelease(ctx, player, at, home) {
       db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(home.map_id, home.building_key),
       db.prepare(`DELETE FROM home_offers WHERE map_id = ? AND building_key = ? AND state = 'open'`).bind(home.map_id, home.building_key),
       // ACCOUNT-HOMES: the account's (any of its characters sells it), the row as read - never a hall or a deed
-      db.prepare('DELETE FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL AND deed = 0 AND paid = ? AND rent_due = ?').bind(home.map_id, home.building_key, player.id, home.paid, home.rent_due ?? 0),   // HOME-RENT: a rent landing between the read and the sale is never lost
+      // HOME-RENT: a rent landing between the read and the sale is never lost. A tenant, a trader's listing or a chest
+      // deposit landing there refuses the sale too, so nothing in them goes with the house.
+      db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2 AND player = ?3 AND guild_id IS NULL AND deed = 0 AND paid = ?4 AND rent_due = ?5
+        AND ${homeFreeToGoSql({ mapId: '?1', buildingKey: '?2', nowS: '?6' }, true)}`)
+        .bind(home.map_id, home.building_key, player.id, home.paid, home.rent_due ?? 0, nowS),
       mustChange(db),
     ]);
   } catch {
     await dropIfUnnamed(db, bucket, player.id, at.id, prep.key);   // AUDIT REALM2 S3
-    return (await recordMovedOf(db, player.id, at)) || { error: 'no-home' };
+    const moved = await recordMovedOf(db, player.id, at);
+    if (moved) return moved;
+    const held = await homeHeldError(db, home.map_id, home.building_key, nowS, true);
+    return { error: held ?? 'no-home' };
   }
   await dropObjects(bucket, [prep.prev]);
   return { ok: true, price: home.price, refund, decorCount, decorBack, ...(rentDue ? { rent: rentDue } : {}), realm: { seq: prep.seq }, moved: homeMoved(home.map_id, [], [home.building_key]) };   // QUEST-HOME: sold, a house again
+}
+
+/**
+ * What keeps a home from being released, or null: a tenant's paid days, a trader's goods still for sale (they are bought
+ * at it alone), or goods in a shared chest.
+ * @param {{db: any, nowS?: number}} ctx @param {number} mapId @param {number} buildingKey
+ */
+async function releaseHeldBy(ctx, mapId, buildingKey) {
+  const { db } = ctx;
+  const tenants = await db.prepare(`SELECT COUNT(*) AS n FROM home_rooms WHERE map_id = ? AND building_key = ? AND tenant IS NOT NULL AND until > ?`)
+    .bind(mapId, buildingKey, ctx.nowS ?? Math.floor(Date.now() / 1000)).first();
+  if (Number(tenants?.n ?? 0) > 0) return 'home-tenants';
+  const stock = await db.prepare(`SELECT COUNT(*) AS n FROM market_listings l JOIN home_decor d ON d.map_id = l.vendor_map AND d.id = l.vendor_id
+    WHERE l.state = 'open' AND d.map_id = ? AND d.building_key = ?`).bind(mapId, buildingKey).first();
+  if (Number(stock?.n ?? 0) > 0) return 'home-vendor-stocked';
+  const bin = await db.prepare('SELECT COUNT(*) AS n FROM decor_bin WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey).first();
+  if (Number(bin?.n ?? 0) > 0) return 'home-holds';
+  return null;
+}
+
+/**
+ * The release of a home no realm record paid for: its pieces' half back is answered, not paid. The tests read before
+ * go into the DELETE as well, and the batch stops when it changes nothing, so a tenant, a listing or a chest deposit
+ * landing after the reads keeps the home, its chest access and its offer.
+ * @param {{db: any, nowS?: number}} ctx @param {any} player @param {number} mapId @param {number} buildingKey
+ */
+async function plainRelease(ctx, player, mapId, buildingKey) {
+  const { db } = ctx;
+  const nowS = ctx.nowS ?? Math.floor(Date.now() / 1000);
+  let pieces;
+  let gone;
+  try {
+    [pieces, gone] = await db.batch([
+      decorBackStatement(db, mapId, buildingKey),
+      db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2 AND player = ?3 AND guild_id IS NULL AND deed = 0
+        AND ${homeFreeToGoSql({ mapId: '?1', buildingKey: '?2', nowS: '?4' }, true)} RETURNING price`)
+        .bind(mapId, buildingKey, player.id, nowS),
+      mustChange(db),
+      db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey),
+      db.prepare(`DELETE FROM home_offers WHERE map_id = ? AND building_key = ? AND state = 'open'`).bind(mapId, buildingKey),
+    ]);
+  } catch {
+    const held = await homeHeldError(db, mapId, buildingKey, nowS, true);
+    return { error: held ?? 'no-home' };
+  }
+  const row = gone?.results?.[0];
+  if (!row) return { error: 'no-home' };
+  const d = pieces?.results?.[0];
+  return { ok: true, price: row.price, decorCount: Number(d?.n) || 0, decorBack: Math.max(0, Number(d?.back) || 0), moved: homeMoved(mapId, [], [buildingKey]) };   // QUEST-HOME
 }
 
 /**
@@ -372,31 +430,20 @@ export async function releaseHome(ctx, player, { mapId, buildingKey, realm = nul
   // A deed's hold is never sold as a home either (above: given up as its deed sells) - no record paid for it, so the
   // realm's sale answers `home-crossed`, and both DELETEs below name `deed = 0`
   const home = await db.prepare('SELECT * FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL').bind(mapId, buildingKey, player.id).first();
-  // HOME-RENT: a home another player is renting a room in is not sold from under them - their days were paid for
-  if (home && Number((await db.prepare(`SELECT COUNT(*) AS n FROM home_rooms WHERE map_id = ? AND building_key = ? AND tenant IS NOT NULL AND until > ?`)
-    .bind(mapId, buildingKey, ctx.nowS ?? Math.floor(Date.now() / 1000)).first())?.n ?? 0) > 0) return { error: 'home-tenants' };
-  // HOME-VENDOR: nor one whose trader still has goods for sale - they stand at it alone
-  if (home && Number((await db.prepare(`SELECT COUNT(*) AS n FROM market_listings l JOIN home_decor d ON d.map_id = l.vendor_map AND d.id = l.vendor_id
-    WHERE l.state = 'open' AND d.map_id = ? AND d.building_key = ?`).bind(mapId, buildingKey).first())?.n ?? 0) > 0) return { error: 'home-vendor-stocked' };
-  if (home && Number((await db.prepare('SELECT COUNT(*) AS n FROM decor_bin WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey).first())?.n ?? 0) > 0) return { error: 'home-holds' };
+  const held = home ? await releaseHeldBy(ctx, mapId, buildingKey) : null;
+  if (held) return { error: held };
   if (realm != null || (typeof home?.char_id === 'string' && REALM_ID_RE.test(home.char_id))) {
     return at ? realmRelease(ctx, player, at, home) : { error: 'realm-needed' };
   }
+  // A caller who does not own the building changes nothing in it. The access and offer deletes in plainRelease name
+  // only the building, so without this refusal another account's release, or a member's on a guild hall, clears its
+  // chest locks.
+  if (!home) return { error: 'no-home' };
   // DECOR1e: the home's placed pieces go with it (decor.js - the cascade), and half of what each cost comes back, as
   // removing it would give (net/decorLaw.js decorSaleBack: truncated, a piece at a time). Read in the SAME batch as
   // the release, so no piece is placed between the sum and the going - and answered only when the release is the
   // caller's; a record that is not JSON is no piece and counts nothing.
-  const [pieces, gone] = await db.batch([
-    decorBackStatement(db, mapId, buildingKey),
-    db.prepare('DELETE FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND guild_id IS NULL AND deed = 0 RETURNING price')
-      .bind(mapId, buildingKey, player.id),
-    db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey),
-    db.prepare(`DELETE FROM home_offers WHERE map_id = ? AND building_key = ? AND state = 'open'`).bind(mapId, buildingKey),
-  ]);
-  const row = gone?.results?.[0];
-  if (!row) return { error: 'no-home' };
-  const d = pieces?.results?.[0];
-  return { ok: true, price: row.price, decorCount: Number(d?.n) || 0, decorBack: Math.max(0, Number(d?.back) || 0), moved: homeMoved(mapId, [], [buildingKey]) };   // QUEST-HOME
+  return plainRelease(ctx, player, mapId, buildingKey);
 }
 
 /**
