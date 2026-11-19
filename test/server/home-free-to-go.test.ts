@@ -12,6 +12,8 @@ const { seatRealm, realmJoinAt } = await import(realmSeatModule);
 type Account = { secret: string; id: string };
 type Answer = { status: number; body: { ok?: boolean; error?: string; id?: string } };
 type Statement = { _sql?: string };
+/** The account database as the test reaches it: statements are made, then sent in batches. */
+type Batching = { prepare: (sql: string) => Statement; batch: (list: Statement[]) => Promise<unknown> };
 type Count = { n: number };
 
 const MAP_ID = 77;
@@ -25,7 +27,7 @@ const RICH = (name: string) => ({
 });
 
 /** Runs `land` once, just before the first batch that holds a statement matching `writes`. */
-function landBeforeBatch(db: any, writes: RegExp, land: () => void): void {
+function landBeforeBatch(db: Batching, writes: RegExp, land: () => void): void {
   const prepare = db.prepare.bind(db);
   const batch = db.batch.bind(db);
   db.prepare = (sql: string) => Object.assign(prepare(sql), { _sql: sql });
