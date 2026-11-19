@@ -2,16 +2,21 @@
 // may ride with no spawn grant.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { frameAllies, namedAlly, healthBoundRecord, ridesWithoutGrant } from '../../server/src/frame-allies.ts';
 import { foeStatsRefusal } from '../../src/net/foeBounds.js';
-import { FOE_LEVEL_MAX } from '../../src/net/wire.js';
+
+// The ally rules and the wire are loaded by a computed path, which tsconfig.node.json does not follow: the wire's
+// imports name the DOM's crypto types (CryptoKey, SubtleCrypto), and the node config has no DOM library.
+const FRAME_ALLIES_PATH: string = '../../server/src/frame-allies.ts';
+const WIRE_PATH: string = '../../src/net/wire.js';
+const { frameAllies, namedAlly, healthBoundRecord, ridesWithoutGrant } = await import(FRAME_ALLIES_PATH);
+const { FOE_LEVEL_MAX } = await import(WIRE_PATH);
 
 const DAEDROTH = 27;
 const RAT = 0;
 const MAGE = 128;
 const KNIGHT_CITY_WATCH = 146;
 
-const refused = (record: object, allies: ReturnType<typeof frameAllies>): boolean =>
+const refused = (record: object, allies: unknown): boolean =>
   foeStatsRefusal(healthBoundRecord(record, allies), { lane: 'street', camp: false }) != null;
 
 test('a summon or any other monster ally is read as it is, so the bound refuses a forged one', () => {
