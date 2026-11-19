@@ -6,20 +6,28 @@ import assert from 'node:assert/strict';
 
 // The renderer's modules use browser types that the node type pass does not load, so they are imported by a path the
 // type pass does not follow.
+// A browser's storage, so the terrain clip's record (render/terrain-clip-hint.ts) can be written and read.
+const stored = new Map<string, string>();
+(globalThis as unknown as { localStorage: unknown }).localStorage = {
+  getItem: (key: string) => stored.get(key) ?? null,
+  setItem: (key: string, value: string) => stored.set(key, String(value)),
+  removeItem: (key: string) => stored.delete(key),
+};
+
 const paths = {
   renderer: '../../src/render/renderer.js',
   boot: '../../src/render/boot-programs.ts',
   lighting: '../../src/render/enhancedLighting.js',
   clouds: '../../src/render/volumetricClouds.js',
   prefs: '../../src/systems/uiPrefs.js',
-  mods: '../../src/systems/modSettings.js',
+  clipHint: '../../src/render/terrain-clip-hint.ts',
 };
 const { Renderer } = await import(paths.renderer);
 const { bootPrograms, startBootPrograms, cloudsExpected, terrainClipExpected } = await import(paths.boot);
 const { syncLightingLane } = await import(paths.lighting);
 const { VolumetricClouds } = await import(paths.clouds);
 const { setPref } = await import(paths.prefs);
-const { setModSetting } = await import(paths.mods);
+const { noteTerrainClipBuilt } = await import(paths.clipHint);
 
 const COMPLETION_STATUS_KHR = 0x91b1;
 const LINK_STATUS = 0x8b82;
@@ -86,7 +94,7 @@ function hostBuilds(renderer: { gl: unknown; prepareTerrainClip: () => void }, s
 const search = '?world';
 setPref('enhancedLighting', true);
 setPref('enhancedEnvironments', true);
-setModSetting('iliac-puddle-no-more', 'Enabled', true);
+noteTerrainClipBuilt();
 
 test('the boot starts the lane world set, the terrain clip and the clouds, and each build takes its started program', () => {
   // Without the extension nothing starts early anywhere, so this counts the programs the builds make.

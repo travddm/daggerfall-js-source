@@ -705,6 +705,7 @@ import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
 import { skinFaceFs, worldSetPrograms } from './world-set-programs.ts';
+import { noteTerrainClipBuilt } from './terrain-clip-hint.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -7501,7 +7502,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   /** FAR-CLIP1: build the installed set's terrain clip program NOW - the
    *  streaming host asks as Iliac Puddle No More mounts, beside the mod's own
    *  programs, so the first frame that draws a coast does not compile it. */
-  prepareTerrainClip() { this._ensureTerrainClip(); }
+  prepareTerrainClip() { this._ensureTerrainClip(); noteTerrainClipBuilt(); }   // the next boot starts the clip early (render/terrain-clip-hint.ts)
   /** RenderSettings.ambientLight's stand-in: the ambient the world programs light by this frame (snow_status reads it - AUDIT ENVIRONS S6). */
   get ambientLight() { return this._ambient; }
   /** SNOWFALL1 (AUDIT ENVIRONS I5): the installed set's snow program, built when the snow's surface is made (scenes/
