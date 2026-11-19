@@ -63,6 +63,7 @@ import { GUILD_TREASURY_MAX } from '../../src/net/guild/guildLaw.js';   // ARENA
 import { DECOR_OPS_MAX, DECOR_OPS_WINDOW_S } from '../../src/net/decorLaw.js';   // HOME-LOOK: a repaint counts as a decorator's write
 import { hallMay } from '../../src/net/hallLaw.js';   // GUILD1d: a hall's keepers
 import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';
+import { homeBinEmptySql, homeBinHolds } from './decor-bin-holds.ts';
 import { heraldryOfRow } from './halls.js';   // GUILD1d: a hall's heraldry, on its door
 import { openGatesRead } from './seatHolding.js';   // SEAT1d: Open Gates, where the town's holder proclaims it
 import { OWNS } from './decor.js';   // GUILD-YARD: a home's character, or a hall's keeper - as its decor asks
@@ -418,7 +419,14 @@ export async function releaseHome(ctx, player, { mapId, buildingKey, realm = nul
   // share into the save, as Daggerfall's SellHouse does: nothing is paid here and no record is asked. Only a deed's row
   // (`deed`), never a home bought at a door; and a deed's row is never sold as a home (below: no record paid for it)
   if (deed === true) {
-    const gone = await db.prepare('DELETE FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND deed = 1').bind(mapId, buildingKey, player.id).run();
+    // The client sold the deed before it asks, so the hold goes even when its shared chests hold goods. The goods go
+    // with it, in the same batch: left behind, no chest would open them and the next home at the building could not be
+    // sold or released.
+    const [, gone] = await db.batch([
+      db.prepare(`DELETE FROM decor_bin WHERE map_id = ?1 AND building_key = ?2
+        AND EXISTS (SELECT 1 FROM homes WHERE map_id = ?1 AND building_key = ?2 AND player = ?3 AND deed = 1)`).bind(mapId, buildingKey, player.id),
+      db.prepare('DELETE FROM homes WHERE map_id = ? AND building_key = ? AND player = ? AND deed = 1').bind(mapId, buildingKey, player.id),
+    ]);
     return gone?.meta?.changes ? { ok: true, price: 0, decorCount: 0, decorBack: 0, moved: homeMoved(mapId, [], [buildingKey]) } : { error: 'no-home' };   // QUEST-HOME: a house again
   }
   const at = realm != null ? realmAtOf(realm) : null;
@@ -736,6 +744,8 @@ export async function arenaMoveHome(ctx, player, { mapId, from, to, character, r
   const owns = home ? await db.prepare(`SELECT 1 AS one WHERE ${OWNS}`).bind(mapId, from, player.id, character).first() : null;
   if (!owns) return { error: 'no-home' };   // nobody's and somebody else's are one word (HOME1)
   if (await db.prepare('SELECT 1 AS one FROM homes WHERE map_id = ? AND building_key = ?').bind(mapId, to).first()) return { error: 'home-taken' };
+  // The old house's pieces go with the move, so goods in its shared chests would be left with no chest to open them
+  if (await homeBinHolds(db, mapId, from)) return { error: 'home-holds' };
   const gid = home.guild_id ?? null;
   // what the room held, as read - the batch's DELETE holds it to this, so a piece placed between is never lost unpaid
   const d = await db.prepare(`SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN item IS NULL THEN paid ELSE 0 END), 0) AS paid,
@@ -775,7 +785,8 @@ export async function arenaMoveHome(ctx, player, { mapId, from, to, character, r
     // the room as it was read, or nothing
     db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2
         AND (SELECT COUNT(*) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?3
-        AND (SELECT COALESCE(SUM(CASE WHEN item IS NULL THEN paid ELSE 0 END), 0) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?4`)
+        AND (SELECT COALESCE(SUM(CASE WHEN item IS NULL THEN paid ELSE 0 END), 0) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?4
+        AND ${homeBinEmptySql('?1', '?2')}`)
       .bind(mapId, from, n, refund),
     mustChange(db),
     ...(gid != null ? [db.prepare('UPDATE homes SET guild_id = ? WHERE map_id = ? AND building_key = ? AND guild_id IS NULL').bind(gid, mapId, to), mustChange(db)] : []),
@@ -793,6 +804,7 @@ export async function arenaMoveHome(ctx, player, { mapId, from, to, character, r
       const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
       if (t && Number(t.treasury) + refund > GUILD_TREASURY_MAX) return { error: 'guild-treasury-full' };
     }
+    if (await homeBinHolds(db, mapId, from)) return { error: 'home-holds' };
     return { error: 'home-changed' };
   }
   if (prep) await dropObjects(bucket, [prep.prev]);

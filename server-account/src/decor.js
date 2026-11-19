@@ -41,6 +41,7 @@ import { SEAT_HALL_DECOR_CAP } from '../../src/net/townSeatLaw.js';   // SEAT-HA
 import { homeShownRead, homeShownOf } from './homeVotes.js';   // AUDIT HOME-VOTE A3: a shunned home's room, its insiders' alone; DECOR-BATCH: its read in the room's one request
 import { decorStaysShunned } from '../../src/net/homeVoteLaw.js';   // AUDIT HOME-VOTE B2: its hired trader stands
 import { shapeOf, keptPast, KEPT_BOARD_MAX_BYTES } from './keptBoard.js';   // AUDIT LEAN-READS B1: a built town's shape; 2 B7: its bound
+import { PIECE_BIN_EMPTY_SQL, pieceBinHolds } from './decor-bin-holds.ts';
 
 /**
  * REALM P2.2b: WHAT A PIECE'S CHANGE COSTS, as the client's wallet pays it - placed: what it cost (`paid`); grown: the
@@ -141,6 +142,13 @@ const SEAT_STORE = Object.freeze({
   rule: (_mapId, _buildingKey, barred) => ['? = 0', [barred]],
 });
 const storeOf = (seat) => (seat === true ? SEAT_STORE : HOME_STORE);
+/**
+ * The condition a write that removes a home's piece, or makes it no longer a container, adds after its own: the piece's
+ * bin holds no goods. A seat hall's pieces hold no shared goods, so they add nothing. `sql` starts with " AND" when set.
+ * @returns {{sql: string, binds: unknown[]}}
+ */
+const binKeptBy = (/** @type {{seat: boolean}} */ S, /** @type {boolean} */ applies, mapId, buildingKey, id) =>
+  (applies && !S.seat ? { sql: ` AND ${PIECE_BIN_EMPTY_SQL}`, binds: [mapId, buildingKey, id] } : { sql: '', binds: [] });
 /** YARD-TOWN: room in the town's yards for one more piece - DECOR_YARDS_TOWN_MAX in all, so a piece placed is always one
  *  its town's answer serves (yardRowsSql). Binds (out, map); a room's piece (out 0) passes. On idx_home_decor_yard_order's
  *  (map_id, yard) prefix: a count off the index, never the rows. */
@@ -598,14 +606,18 @@ export async function moveDecor(ctx, player, { mapId, buildingKey, character, id
   if (was.station === 'vendor' && (pl.station ?? null) !== 'vendor' && await vendorStocked(db, mapId, id)) return { error: 'vendor-stocked' };
   if (row.yard === 1 && !decorYardPlaceOf(pl)) return { error: 'bad-decor' };   // HOME-YARD: a yard's piece stays a yard's
   if (row.yard === 1 && !decorYardHighOk(pl)) return { error: 'yard-high' };   // YARD-HEIGHT: nor moved up into a tower
+  // A container moved into a piece that holds nothing would leave its goods in a bin no piece opens
+  const clearsStorage = was.storage === true && pl.storage !== true;
+  if (clearsStorage && !S.seat && await pieceBinHolds(db, mapId, buildingKey, id)) return { error: 'decor-holds' };
+  const binKept = binKeptBy(S, clearsStorage, mapId, buildingKey, id);
   const { delta, ledger } = decorGoldMove(was, pl, row.paid);   // AUDIT REALM L1-F3: half back of what records paid
   const hall = delta > 0 ? await S.guildOf(db, mapId, buildingKey) : null;
   if (hall) {
     // GUILD1d: a hall's piece shrunk - its half back to the guild's treasury, never to the keeper who shrank it
     return hallPieceBack(ctx, player, hall, {
       delta,
-      write: db.prepare(`UPDATE ${S.table} SET place = ?, paid = ? WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}`)
-        .bind(placeJson(pl), ledger, mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character),
+      write: db.prepare(`UPDATE ${S.table} SET place = ?, paid = ? WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}${binKept.sql}`)
+        .bind(placeJson(pl), ledger, mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character, ...binKept.binds),
       after: async () => pieceOfRow(await db.prepare(`SELECT * FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ?`).bind(mapId, buildingKey, id).first()),
       refusal: async () => 'no-decor',
     });
@@ -616,17 +628,17 @@ export async function moveDecor(ctx, player, { mapId, buildingKey, character, id
     // REALM P2.2b: a resize or a station, paid or given back on the record with the move - from the row as it was read
     return realmDecorWrite(ctx, player, side.at, {
       mapId, buildingKey, delta, regionOf: S.regionOf,
-      write: db.prepare(`UPDATE ${S.table} SET place = ?, paid = ? WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}`)
-        .bind(placeJson(pl), ledger, mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character),
+      write: db.prepare(`UPDATE ${S.table} SET place = ?, paid = ? WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}${binKept.sql}`)
+        .bind(placeJson(pl), ledger, mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character, ...binKept.binds),
       after: async () => pieceOfRow(await db.prepare(`SELECT * FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ?`).bind(mapId, buildingKey, id).first()),
       refusal: async () => 'no-decor',
     });
   }
   // AUDIT YARD-HEIGHT Y7: the row as read - a room's piece removed and placed again in the yard under its id between the
   // read and this write took a room's place past the yard's law (its height, its light and its craft)
-  const r = await db.prepare(`UPDATE ${S.table} SET place = ? WHERE map_id = ? AND building_key = ? AND id = ? AND yard = ? AND ${S.owns}`)
-    .bind(placeJson(pl), mapId, buildingKey, id, row.yard, mapId, buildingKey, player.id, character).run();
-  if (!r?.meta?.changes) return { error: 'no-decor' };
+  const r = await db.prepare(`UPDATE ${S.table} SET place = ? WHERE map_id = ? AND building_key = ? AND id = ? AND yard = ? AND ${S.owns}${binKept.sql}`)
+    .bind(placeJson(pl), mapId, buildingKey, id, row.yard, mapId, buildingKey, player.id, character, ...binKept.binds).run();
+  if (!r?.meta?.changes) return { error: clearsStorage && !S.seat && await pieceBinHolds(db, mapId, buildingKey, id) ? 'decor-holds' : 'no-decor' };
   const now = await db.prepare(`SELECT * FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ?`).bind(mapId, buildingKey, id).first();
   const piece = now ? pieceOfRow(now) : null;
   return piece ? { ok: true, piece } : { error: 'no-decor' };
@@ -651,14 +663,17 @@ export async function removeDecor(ctx, player, { mapId, buildingKey, character, 
       .bind(mapId, buildingKey, id, mapId, buildingKey, player.id, character).first();
     const was = row ? pieceOfRow(row) : null;
     if (was?.station === 'vendor' && await vendorStocked(db, mapId, id)) return { error: 'vendor-stocked' };   // HOME-VENDOR
+    // Goods in the piece's shared chest would be left with no chest to open them
+    if (row && !S.seat && await pieceBinHolds(db, mapId, buildingKey, id)) return { error: 'decor-holds' };
+    const pieceBinKept = binKeptBy(S, true, mapId, buildingKey, id);
     const delta = was ? decorGoldMove(was, null, row.paid).delta : 0;   // AUDIT REALM L1-F3: half of what records paid
     const hall = delta > 0 ? await S.guildOf(db, mapId, buildingKey) : null;
     if (hall) {
       // GUILD1d: a hall's piece taken out - its half back to the guild's treasury, never to the keeper who took it out
       return hallPieceBack(ctx, player, hall, {
         delta,
-        write: db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}`)
-          .bind(mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character),
+        write: db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}${pieceBinKept.sql}`)
+          .bind(mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character, ...pieceBinKept.binds),
         after: async () => was,
         refusal: async () => 'no-decor',
       });
@@ -669,15 +684,17 @@ export async function removeDecor(ctx, player, { mapId, buildingKey, character, 
       // REALM P2.2b: half of what it cost, into the record's purse with the piece's going
       return realmDecorWrite(ctx, player, side.at, {
         mapId, buildingKey, delta, regionOf: S.regionOf,
-        write: db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}`)
-          .bind(mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character),
+        write: db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND place = ? AND paid = ? AND ${S.owns}${pieceBinKept.sql}`)
+          .bind(mapId, buildingKey, id, row.place, row.paid, mapId, buildingKey, player.id, character, ...pieceBinKept.binds),
         after: async () => was,
         refusal: async () => 'no-decor',
       });
     }
   }
-  const row = await db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND ${S.owns} RETURNING *`)
-    .bind(mapId, buildingKey, id, mapId, buildingKey, player.id, character).first();
+  const binKept = binKeptBy(S, true, mapId, buildingKey, id);
+  const row = await db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND ${S.owns}${binKept.sql} RETURNING *`)
+    .bind(mapId, buildingKey, id, mapId, buildingKey, player.id, character, ...binKept.binds).first();
   const piece = row ? pieceOfRow(row) : null;
-  return piece ? { ok: true, piece } : { error: 'no-decor' };
+  if (piece) return { ok: true, piece };
+  return { error: !S.seat && await pieceBinHolds(db, mapId, buildingKey, id) ? 'decor-holds' : 'no-decor' };
 }

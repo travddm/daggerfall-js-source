@@ -41,6 +41,7 @@ import { displayName, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { marksOpenFor } from './marks.js';
 import { mustChange } from './realm.js';
+import { homeBinEmptySql, homeBinHolds } from './decor-bin-holds.ts';
 import { GUILD_TREASURY_MAX, GUILD_OPS_MAX, GUILD_OPS_WINDOW_S } from '../../src/net/guild/guildLaw.js';
 import { GUILD_HALL_ENTRY_DEFAULT, HALL_POWERS, hallMay, guildHallPrice, guildHallEntryOk, guildHallOwner } from '../../src/net/hallLaw.js';
 import { HOME_CLAIMS_MAX, HOME_CLAIMS_WINDOW_S, homeMapIdOk, homeBuildingKeyOk, homeRegionOk, homePriceOk, homeSaleRefund, homeInArenaCell, homeLayoutOk, homeMoved } from '../../src/net/homeLaw.js';   // ARENA4b: the arena's cell; QUEST-HOME: what a hall's buy or sale moved
@@ -157,6 +158,8 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
   const h = await db.prepare('SELECT * FROM homes WHERE guild_id = ?').bind(gid).first();
   if (!h) return { error: 'guild-hall-none' };
   if (atDoor && (h.map_id !== mapId || h.building_key !== buildingKey)) return { error: 'guild-hall-moved' };
+  // The sale takes the hall's pieces, so goods in its shared chests would be left with no chest to open them.
+  if (await homeBinHolds(db, h.map_id, h.building_key)) return { error: 'home-holds' };
   if (await overRate({ db, nowS }, `guild:${player.id}`, GUILD_OPS_MAX, GUILD_OPS_WINDOW_S)) return { error: 'guild-rate' };
   const p = await piecesBackOf(db, h.map_id, h.building_key);
   const refund = homeSaleRefund(Math.max(0, Number(h.paid) || 0));
@@ -167,7 +170,8 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
       db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2 AND guild_id = ?3 AND paid = ?4
         AND (SELECT COUNT(*) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?5
         AND (SELECT COALESCE(SUM(paid), 0) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?6
-        AND EXISTS (SELECT 1 FROM guild_members WHERE rowid = ?7 AND guild_id = ?3 AND rank = ?8)`)
+        AND EXISTS (SELECT 1 FROM guild_members WHERE rowid = ?7 AND guild_id = ?3 AND rank = ?8)
+        AND ${homeBinEmptySql('?1', '?2')}`)
         .bind(h.map_id, h.building_key, gid, h.paid, Number(p?.n) || 0, Number(p?.paid) || 0, a.me.rid, a.me.rank),
       mustChange(db),
       ...(back > 0 ? [
@@ -180,6 +184,7 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
     if (!(await db.prepare('SELECT 1 FROM homes WHERE guild_id = ?').bind(gid).first())) return { error: 'guild-hall-none' };
     const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
     if (t && t.treasury + back > GUILD_TREASURY_MAX) return { error: 'guild-treasury-full' };
+    if (await homeBinHolds(db, h.map_id, h.building_key)) return { error: 'home-holds' };
     return { error: 'guild-hall-moved' };   // a piece placed or moved, or the guild handed on, meanwhile: look again
   }
   const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
