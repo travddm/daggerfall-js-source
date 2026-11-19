@@ -3,6 +3,7 @@
 // that is neither forced nor declared the player's. The player keeps the dials and what only their screen draws.
 
 import { pageHas } from '../pageQuery.js';   // PERF-URL: the page's query, parsed once a search
+import { pageSearch } from '../page-search.ts';
 import { activePins, onProfileInstalled, rule } from './serverProfile.ts';
 import { PROFILE_KEYS } from '../../net/profile/profileKeys.ts';
 import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
@@ -12,7 +13,7 @@ import { OFFICIAL_PROFILE } from '../../net/profile/officialProfile.ts';
  *  THE URL through publishBootParams below, which is what makes this
  *  read true). Injectable for node; a page without a location is never
  *  online. */
-export const isOnlinePage = (search = globalThis.location?.search ?? '') => pageHas('online', search);   // PERF-URL: parsed once a search (systems/pageQuery.js)
+export const isOnlinePage = (search = pageSearch()) => pageHas('online', search);   // parsed once a search (systems/pageQuery.js), read from the browser once a change of the URL (systems/page-search.ts)
 
 /** The keys main.js's front door DECIDES per choice (F12's law: set on
  *  the door that wants them, deleted on every other) - and so the keys
