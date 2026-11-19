@@ -14,6 +14,7 @@ import { DEFAULT_ACCOUNT_SERVICE, serviceBase } from '../../src/net/accountClien
 import { DEFAULT_SERVER } from '../../src/net/online.js';
 import { accountServiceOfEnv, relayFactsAnswer } from '../../server/src/relayFacts.ts';
 import { openProfileDoor } from '../../src/systems/online/profileDoor.ts';
+import { rememberJoinedServer } from '../../src/systems/online/server-link-confirm.ts';
 import { _resetProfileForTests } from '../../src/systems/online/serverProfile.ts';
 import { OFFICIAL_PROFILE } from '../../src/net/profile/officialProfile.ts';
 import { profileHashOf } from '../../src/net/profile/profileHash.ts';
@@ -109,6 +110,7 @@ test('the profile door: no address stops at the door in words and asks nothing; 
   assert.equal(asked, 0);
   assert.deepEqual(said, ['No server address is set. Enter one in Settings, Online, Relay.']);
   const ph = await profileHashOf(OFFICIAL_PROFILE);
+  rememberJoinedServer(store, RELAY); // accepted from a link before: this test reads the door, not the prompt
   await openProfileDoor(
     params(`online&server=${RELAY}`),
     () => {},
