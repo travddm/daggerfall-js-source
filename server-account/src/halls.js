@@ -147,6 +147,15 @@ export async function buyHall(ctx, player, body = {}) {
  * names none and sells the guild's one hall, as before.
  * @param {{db: any, nowS: number}} ctx
  */
+/** Why a hall sale's batch was refused, read after it. */
+async function hallSaleRefusedBy(db, gid, back, hall) {
+  if (!(await db.prepare('SELECT 1 FROM homes WHERE guild_id = ?').bind(gid).first())) return 'guild-hall-none';
+  const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
+  if (t && t.treasury + back > GUILD_TREASURY_MAX) return 'guild-treasury-full';
+  if (await homeBinHolds(db, hall.map_id, hall.building_key)) return 'home-holds';
+  return 'guild-hall-moved';   // a piece placed or moved, or the guild handed on, meanwhile: look again
+}
+
 export async function sellHall(ctx, player, { character, mapId = null, buildingKey = null } = {}) {
   const { db, nowS } = ctx;
   const a = await guildActorOf(db, player, character);
@@ -181,11 +190,7 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
       ] : []),
     ]);
   } catch {
-    if (!(await db.prepare('SELECT 1 FROM homes WHERE guild_id = ?').bind(gid).first())) return { error: 'guild-hall-none' };
-    const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
-    if (t && t.treasury + back > GUILD_TREASURY_MAX) return { error: 'guild-treasury-full' };
-    if (await homeBinHolds(db, h.map_id, h.building_key)) return { error: 'home-holds' };
-    return { error: 'guild-hall-moved' };   // a piece placed or moved, or the guild handed on, meanwhile: look again
+    return { error: await hallSaleRefusedBy(db, gid, back, h) };
   }
   const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
   return { ok: true, refund, decorCount: Number(p?.n) || 0, decorBack: piecesBack, back, treasury: t?.treasury ?? 0, moved: homeMoved(h.map_id, [], [h.building_key]) };   // QUEST-HOME: sold, a house again

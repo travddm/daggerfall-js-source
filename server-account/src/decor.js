@@ -603,13 +603,11 @@ export async function moveDecor(ctx, player, { mapId, buildingKey, character, id
   // turn or a station (it is drawn at its own size all the same), and is brought back to it by any move of the placer's
   if (!decorScaleOk({ ...was, ...pl }) && pl.scale !== was.scale) return { error: 'decor-figure' };   // AUDIT HOME-VOTE II C2: its own word - a stale copy's turn of a figure brought back to 1 on another device
   // HOME-VENDOR: a trader with goods for sale stays one - its stock is bought at it alone (market.js)
-  if (was.station === 'vendor' && (pl.station ?? null) !== 'vendor' && await vendorStocked(db, mapId, id)) return { error: 'vendor-stocked' };
+  const refused = await moveRefusal(db, S, was, pl, mapId, buildingKey, id);
+  if (refused) return { error: refused };
   if (row.yard === 1 && !decorYardPlaceOf(pl)) return { error: 'bad-decor' };   // HOME-YARD: a yard's piece stays a yard's
   if (row.yard === 1 && !decorYardHighOk(pl)) return { error: 'yard-high' };   // YARD-HEIGHT: nor moved up into a tower
-  // A container moved into a piece that holds nothing would leave its goods in a bin no piece opens
-  const clearsStorage = was.storage === true && pl.storage !== true;
-  if (clearsStorage && !S.seat && await pieceBinHolds(db, mapId, buildingKey, id)) return { error: 'decor-holds' };
-  const binKept = binKeptBy(S, clearsStorage, mapId, buildingKey, id);
+  const binKept = binKeptBy(S, clearsStorageOf(was, pl), mapId, buildingKey, id);
   const { delta, ledger } = decorGoldMove(was, pl, row.paid);   // AUDIT REALM L1-F3: half back of what records paid
   const hall = delta > 0 ? await S.guildOf(db, mapId, buildingKey) : null;
   if (hall) {
@@ -638,10 +636,32 @@ export async function moveDecor(ctx, player, { mapId, buildingKey, character, id
   // read and this write took a room's place past the yard's law (its height, its light and its craft)
   const r = await db.prepare(`UPDATE ${S.table} SET place = ? WHERE map_id = ? AND building_key = ? AND id = ? AND yard = ? AND ${S.owns}${binKept.sql}`)
     .bind(placeJson(pl), mapId, buildingKey, id, row.yard, mapId, buildingKey, player.id, character, ...binKept.binds).run();
-  if (!r?.meta?.changes) return { error: clearsStorage && !S.seat && await pieceBinHolds(db, mapId, buildingKey, id) ? 'decor-holds' : 'no-decor' };
+  if (!r?.meta?.changes) return { error: (await moveRefusal(db, S, was, pl, mapId, buildingKey, id)) ?? 'no-decor' };
   const now = await db.prepare(`SELECT * FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ?`).bind(mapId, buildingKey, id).first();
   const piece = now ? pieceOfRow(now) : null;
   return piece ? { ok: true, piece } : { error: 'no-decor' };
+}
+
+/** A container's piece moved into one that holds nothing. */
+const clearsStorageOf = (was, pl) => was.storage === true && pl.storage !== true;
+
+/** Whether a home piece's shared chest holds goods. A seat hall's pieces hold none. */
+const homePieceHolds = async (db, S, mapId, buildingKey, id) => !S.seat && await pieceBinHolds(db, mapId, buildingKey, id);
+
+/** What refuses a piece's move, or null: a trader with goods for sale stays one (they are bought at it alone), and a
+ *  chest with goods stays a container, or its goods would lie in a bin no piece opens. */
+async function moveRefusal(db, S, was, pl, mapId, buildingKey, id) {
+  if (was.station === 'vendor' && (pl.station ?? null) !== 'vendor' && await vendorStocked(db, mapId, id)) return 'vendor-stocked';
+  if (clearsStorageOf(was, pl) && await homePieceHolds(db, S, mapId, buildingKey, id)) return 'decor-holds';
+  return null;
+}
+
+/** What refuses a piece's removal, or null: a trader with goods for sale, or a chest with goods, which would be left
+ *  with no chest to open them. */
+async function removalRefusal(db, S, row, was, mapId, buildingKey, id) {
+  if (was?.station === 'vendor' && await vendorStocked(db, mapId, id)) return 'vendor-stocked';
+  if (row && await homePieceHolds(db, S, mapId, buildingKey, id)) return 'decor-holds';
+  return null;
 }
 
 /**
@@ -662,9 +682,8 @@ export async function removeDecor(ctx, player, { mapId, buildingKey, character, 
     const row = await db.prepare(`SELECT * FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND ${S.owns}`)
       .bind(mapId, buildingKey, id, mapId, buildingKey, player.id, character).first();
     const was = row ? pieceOfRow(row) : null;
-    if (was?.station === 'vendor' && await vendorStocked(db, mapId, id)) return { error: 'vendor-stocked' };   // HOME-VENDOR
-    // Goods in the piece's shared chest would be left with no chest to open them
-    if (row && !S.seat && await pieceBinHolds(db, mapId, buildingKey, id)) return { error: 'decor-holds' };
+    const refused = await removalRefusal(db, S, row, was, mapId, buildingKey, id);
+    if (refused) return { error: refused };
     const pieceBinKept = binKeptBy(S, true, mapId, buildingKey, id);
     const delta = was ? decorGoldMove(was, null, row.paid).delta : 0;   // AUDIT REALM L1-F3: half of what records paid
     const hall = delta > 0 ? await S.guildOf(db, mapId, buildingKey) : null;
@@ -695,6 +714,5 @@ export async function removeDecor(ctx, player, { mapId, buildingKey, character, 
   const row = await db.prepare(`DELETE FROM ${S.table} WHERE map_id = ? AND building_key = ? AND id = ? AND ${S.owns}${binKept.sql} RETURNING *`)
     .bind(mapId, buildingKey, id, mapId, buildingKey, player.id, character, ...binKept.binds).first();
   const piece = row ? pieceOfRow(row) : null;
-  if (piece) return { ok: true, piece };
-  return { error: !S.seat && await pieceBinHolds(db, mapId, buildingKey, id) ? 'decor-holds' : 'no-decor' };
+  return piece ? { ok: true, piece } : { error: (await homePieceHolds(db, S, mapId, buildingKey, id)) ? 'decor-holds' : 'no-decor' };
 }

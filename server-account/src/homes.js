@@ -714,6 +714,20 @@ export const HOME_MOVES_MAX = 16;
 /** A move as the client reads it. */
 const moveOf = (m) => ({ mapId: m.map_id, from: m.old_key, to: m.new_key, refund: Math.max(0, Number(m.refund) || 0), movedAt: m.moved_at, ...(m.hall === 1 ? { hall: true } : {}) });
 
+/** Why an arena move's batch was refused when nothing else explains it: a chest deposit landed, or a piece or a room
+ *  changed while the move was read. */
+async function arenaMoveChangedBy(db, mapId, from) {
+  return (await homeBinHolds(db, mapId, from)) ? 'home-holds' : 'home-changed';
+}
+
+/** What stops an arena move before it is read, or null: the new house is somebody's, or the old house's shared chests
+ *  hold goods, which would be left with no chest to open them when its pieces go. */
+async function arenaMoveBlockedBy(db, mapId, from, to) {
+  if (await db.prepare('SELECT 1 AS one FROM homes WHERE map_id = ? AND building_key = ?').bind(mapId, to).first()) return 'home-taken';
+  if (await homeBinHolds(db, mapId, from)) return 'home-holds';
+  return null;
+}
+
 /**
  * ARENA4b: MOVE A HOME OUT OF THE ARENA'S CELL. `from` a home of the caller's in Daggerfall's cell (4,3) - its account's
  * own (ACCOUNT-HOMES; its client moves it as the character that bought it, whose save holds the old scene), or a hall it
@@ -743,9 +757,8 @@ export async function arenaMoveHome(ctx, player, { mapId, from, to, character, r
   const home = await db.prepare('SELECT * FROM homes WHERE map_id = ? AND building_key = ?').bind(mapId, from).first();
   const owns = home ? await db.prepare(`SELECT 1 AS one WHERE ${OWNS}`).bind(mapId, from, player.id, character).first() : null;
   if (!owns) return { error: 'no-home' };   // nobody's and somebody else's are one word (HOME1)
-  if (await db.prepare('SELECT 1 AS one FROM homes WHERE map_id = ? AND building_key = ?').bind(mapId, to).first()) return { error: 'home-taken' };
-  // The old house's pieces go with the move, so goods in its shared chests would be left with no chest to open them
-  if (await homeBinHolds(db, mapId, from)) return { error: 'home-holds' };
+  const blocked = await arenaMoveBlockedBy(db, mapId, from, to);
+  if (blocked) return { error: blocked };
   const gid = home.guild_id ?? null;
   // what the room held, as read - the batch's DELETE holds it to this, so a piece placed between is never lost unpaid
   const d = await db.prepare(`SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN item IS NULL THEN paid ELSE 0 END), 0) AS paid,
@@ -804,8 +817,7 @@ export async function arenaMoveHome(ctx, player, { mapId, from, to, character, r
       const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
       if (t && Number(t.treasury) + refund > GUILD_TREASURY_MAX) return { error: 'guild-treasury-full' };
     }
-    if (await homeBinHolds(db, mapId, from)) return { error: 'home-holds' };
-    return { error: 'home-changed' };
+    return { error: await arenaMoveChangedBy(db, mapId, from) };
   }
   if (prep) await dropObjects(bucket, [prep.prev]);
   return {
