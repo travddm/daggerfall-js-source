@@ -3,6 +3,7 @@
 //
 //   node selfhost/generate.ts [--out selfhost/build] [--data selfhost/data] [--metrics] [--r2 disk|s3]
 //                             [--relay-address 127.0.0.1:8787] [--accounts-address 127.0.0.1:8788]
+//                             [--accounts-entry server-account/src/index.js]
 //
 // then `workerd serve selfhost/build/dfo.capnp --experimental` (localDisk Durable Object storage and the
 // analyticsEngine binding need the flag).
@@ -25,6 +26,8 @@ const { values } = parseArgs({
     r2: { type: 'string', default: 'disk' },
     'relay-address': { type: 'string', default: '127.0.0.1:8787' },
     'accounts-address': { type: 'string', default: '127.0.0.1:8788' },
+    // The load harness bundles its own account entry here: the real Worker, with its metrics points kept for reading.
+    'accounts-entry': { type: 'string', default: join(ROOT, 'server-account/src/index.js') },
   },
 });
 if (values.r2 !== 'disk' && values.r2 !== 's3') throw new Error(`--r2 is disk or s3, not ${values.r2}`);
@@ -46,7 +49,7 @@ const accounts = tomlOf('server-account/wrangler.toml');
 mkdirSync(out, { recursive: true });
 const entries: Array<[string, string]> = [
   [join(ROOT, 'server/src/index.js'), BUNDLES.relay],
-  [join(ROOT, 'server-account/src/index.js'), BUNDLES.accounts],
+  [resolve(values['accounts-entry']), BUNDLES.accounts],
   [join(HERE, 'd1/worker.ts'), BUNDLES.d1],
   [join(HERE, 'r2/worker.ts'), BUNDLES.r2],
   [join(HERE, 'metrics/sink.ts'), BUNDLES.metricsSink],

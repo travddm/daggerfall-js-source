@@ -107,6 +107,7 @@ export default {
       bySql.clear();
       return new Response(body, { headers: { 'content-type': 'application/json' } });
     }
+    if (url.pathname === '/__load/probe') return Response.json(await bindingProbe(env, url.searchParams));
     return service.fetch(request, withLoad(env), ctx);
   },
   async scheduled(/** @type {any} */ event, /** @type {any} */ env, /** @type {any} */ ctx) {
@@ -114,3 +115,36 @@ export default {
     if (typeof s.scheduled === 'function') return s.scheduled(event, withLoad(env), ctx);
   },
 };
+
+/**
+ * The cost of one trip through each storage binding, timed inside the isolate: `n` statements one after another
+ * (`SELECT 1`, which measures the trip alone, and one indexed read of the players table), one batch of `n`, and `n`
+ * puts, gets and deletes of a `kb` object in the save bucket. The isolate's clock moves only across I/O, so each figure
+ * is a total over `n` trips divided by `n`. Never on a deploy: this entry is the harness's own.
+ * @returns {Promise<Record<string, number>>} milliseconds a trip, by operation
+ */
+async function bindingProbe(/** @type {any} */ env, /** @type {URLSearchParams} */ params) {
+  const n = Math.min(2000, Math.max(1, Number(params.get('n') ?? 200)));
+  const kb = Math.min(4096, Math.max(1, Number(params.get('kb') ?? 900)));
+  const timed = async (/** @type {() => Promise<unknown>} */ trip) => {
+    const startedAt = Date.now();
+    for (let i = 0; i < n; i++) await trip();
+    return (Date.now() - startedAt) / n;
+  };
+  /** @type {Record<string, number>} */
+  const out = { n, kb };
+  out.select1 = await timed(() => env.DB.prepare('SELECT 1').all());
+  out.playerRead = await timed(() => env.DB.prepare('SELECT id FROM players WHERE id = ?').bind('nobody').first());
+  const batchStart = Date.now();
+  await env.DB.batch(Array.from({ length: n }, () => env.DB.prepare('SELECT 1')));
+  out.batchOfNEach = (Date.now() - batchStart) / n;
+  // Bytes that do not compress, so no layer can shrink the object a trip carries.
+  const body = crypto.getRandomValues(new Uint8Array(kb * 1024 > 65536 ? 65536 : kb * 1024));
+  const object = new Uint8Array(kb * 1024);
+  for (let at = 0; at < object.length; at += body.length) object.set(body.subarray(0, Math.min(body.length, object.length - at)), at);
+  let i = 0;
+  out.r2Put = await timed(() => env.SAVES.put(`__probe/${i++ % 8}`, object));
+  out.r2Get = await timed(async () => (await env.SAVES.get(`__probe/${i++ % 8}`))?.arrayBuffer());
+  out.r2Delete = await timed(() => env.SAVES.delete(`__probe/${i++ % 8}`));
+  return out;
+}

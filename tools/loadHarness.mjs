@@ -75,7 +75,13 @@ import { request as httpRequest } from 'node:http';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 
 import { isMain } from './lib/isMain.mjs';
-import { standServices, stopAll, fireCron, serviceStats, sleep, FIRE_MINUTE, FIRE_HOUR } from './lib/load-services.mjs';
+import { standServices, stopAll, serviceStats, bindingProbe, sleep, FIRE_MINUTE, FIRE_HOUR } from './lib/load-services.mjs';
+import { standSelfhost } from './lib/selfhost-services.mjs';
+import { installRelayProfile } from './lib/relay-profile.mjs';
+import { cpuShare } from './lib/process-sampler.mjs';
+import { percentile, httpLatency, servicesFigures, startSampling, stopSampling, printServices } from './lib/service-figures.mjs';
+
+export { percentile, httpLatency, servicesFigures, IDLE_SAMPLE_MS } from './lib/service-figures.mjs';
 import { OnlineSession } from '../src/net/online.js';
 import {
   accountTokenMinter, SESSION_KEY, SERVICE_KEY, beatPlay, register as registerCall,
@@ -128,7 +134,13 @@ export const KNOBS = Object.freeze({
   keep: [0, '1 keeps the state directory (the D1 file, the Durable Objects) for a look afterwards'],
   trace: [0, '1 prints, each second of a storm, how the fleet\'s sessions stand (status, why, next retry)'],
   wire: [2, 'the wire every socket offers: 2 the second (SCALE5b, batched poses and rosters - the game\'s own), 1 the first (a before-and-after)'],
+  selfhost: [0, '1 (or the bare flag) serves both Workers from the self-host kit\'s workerd (selfhost/, `npm ci --prefix selfhost` first) in place of two wrangler dev processes'],
+  probe: [0, '1 times the storage bindings (a SELECT 1, an indexed read, a batch, 900 KB bucket puts and gets) inside the account isolate, once idle and once at the end of play'],
+  sample: [0, 'seconds between samples of the services\' memory; their CPU time is read as play begins and ends (0: off)'],
 });
+
+/** Knobs that may be given bare: `--selfhost` alone means `--selfhost 1`. */
+const BARE_FLAGS = new Set(['selfhost']);
 
 /** `--name value` / `--name=value` pairs over KNOBS' defaults, typed as the default is. Unknown names are refused. */
 export function parseArgs(argv) {
@@ -138,7 +150,8 @@ export function parseArgs(argv) {
     if (a === '--help' || a === '-h') return { help: true };
     const m = /^--([a-z-]+)(?:=(.*))?$/.exec(a);
     if (!m || !(m[1] in KNOBS)) throw new Error(`unknown argument ${a} (--help names them)`);
-    const raw = m[2] ?? argv[++i];
+    const bare = m[2] === undefined && BARE_FLAGS.has(m[1]) && (argv[i + 1] === undefined || argv[i + 1].startsWith('--'));
+    const raw = bare ? '1' : (m[2] ?? argv[++i]);
     if (raw === undefined) throw new Error(`--${m[1]} needs a value`);
     const was = KNOBS[m[1]][0];
     const v = typeof was === 'number' ? Number(raw) : String(raw);
@@ -153,6 +166,8 @@ export function parseArgs(argv) {
   for (const k of ['movers', 'fighters', 'registered']) if (!(out[k] >= 0 && out[k] <= 1)) throw new Error(`--${k} is a share, 0 to 1, not ${out[k]}`);
   if (!(out['storm-at'] > 0 && out['storm-at'] < 1)) throw new Error(`--storm-at is a share of the play, between 0 and 1, not ${out['storm-at']}`);
   if (out.wire !== 1 && out.wire !== 2) throw new Error(`--wire is 1 or 2, not ${out.wire}`);   // AUDIT SCALE II L5
+  if (out.selfhost !== 0 && out.selfhost !== 1) throw new Error(`--selfhost is 0 or 1, not ${out.selfhost}`);
+  if (!(out.sample >= 0)) throw new Error('--sample cannot be negative');
   for (const k of ['ramp', 'chat-every', 'save-kb']) if (!(out[k] >= 0)) throw new Error(`--${k} cannot be negative`);
   return out;
 }
@@ -167,7 +182,7 @@ export const LOAD_SERVICE = 'https://accounts.load.invalid';
 /** A fetch that reaches the local account service and NOTHING ELSE: a URL on LOAD_SERVICE goes to 127.0.0.1:`port`
  *  (over node:http - no proxy is consulted), every other URL - the production service a fallback would name above all
  *  - is refused before a byte leaves. `ip` rides as cf-connecting-ip, the address the service bounds an open route's
- *  callers by. `note(route, status, ms)` hears every answer. */
+ *  callers by. `note(route, status, ms, bytes)` hears every answer, with the request body's size. */
 export function localFetch({ port, ip = null, note = null, request = httpRequest }) {
   return async (url, init = {}) => {
     const u = String(url);
@@ -190,10 +205,10 @@ export function localFetch({ port, ip = null, note = null, request = httpRequest
       init.signal?.addEventListener?.('abort', () => req.destroy(new Error('aborted')), { once: true });
       if (body) req.write(body);
       req.end();
-    }).catch((e) => { note?.(routeLabel(path.split('?')[0]), 'offline', Date.now() - started); throw e; });
+    }).catch((e) => { note?.(routeLabel(path.split('?')[0]), 'offline', Date.now() - started, body?.length ?? 0); throw e; });
     let word = '';
     if (res.status >= 400 && /json/.test(String(res.headers['content-type'] ?? ''))) { try { word = JSON.parse(res.buf.toString('utf8'))?.error ?? ''; } catch { word = ''; } }
-    note?.(routeLabel(path.split('?')[0]), word ? `${res.status} ${word}` : res.status, Date.now() - started);
+    note?.(routeLabel(path.split('?')[0]), word ? `${res.status} ${word}` : res.status, Date.now() - started, body?.length ?? 0);
     const h = new Headers();
     for (const [k, v] of Object.entries(res.headers)) if (v != null) h.set(k, Array.isArray(v) ? v.join(', ') : String(v));
     return new Response(res.status === 204 || res.status === 304 ? null : res.buf, { status: res.status, headers: h });
@@ -234,9 +249,12 @@ export function tallySaid(tally, m, now, ws = null, room = null) {
  *  AUDIT SCALE II L5: `inFrames`, `inBytes` and `inByType` are the frames on the wire - what a send costs the relay - and
  *  `saidByType` what they carried (tallySaid): the first wire's every pose was its own frame, the second's are batched,
  *  and its poses were counted as nothing - no pose ages at all - until this. */
-export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now = () => Date.now() }) {
+export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now = () => Date.now(), fineNow = () => performance.now() }) {
   const allowed = `ws://127.0.0.1:${port}/room/`;
   return class LoadSocket extends Base {
+    // When each ping still unanswered went out. The relay answers a ping with a pong from the runtime itself, without
+    // waking the room (setWebSocketAutoResponse), and in order, so the oldest ping is the one a pong answers.
+    #pingsAt = [];
     constructor(url, protocols) {
       if (!String(url).startsWith(allowed)) throw new Error(`the load harness reaches its own relay only - refused ${url}`);
       super(url, protocols);
@@ -247,6 +265,10 @@ export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now =
         const t = /^\{"t":"([a-z]+)"/.exec(text)?.[1] ?? '?';
         tally.inFrames += 1; tally.inBytes += text.length;
         tally.inByType[t] = (tally.inByType[t] ?? 0) + 1;
+        if (t === 'pong') {
+          const sentAt = this.#pingsAt.shift();
+          if (sentAt !== undefined) tally.pingMs.push(fineNow() - sentAt);
+        }
         // the first wire's frames read as they always were, by their own text; a batch parsed, as the client parses it
         let m = null;
         if (t === 'poses' || t === 'fb') { try { m = JSON.parse(text); } catch { m = null; } }
@@ -278,6 +300,7 @@ export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now =
       const t = /^\{"t":"([a-z]+)"/.exec(text)?.[1] ?? '?';
       tally.outFrames += 1; tally.outBytes += text.length;
       tally.outByType[t] = (tally.outByType[t] ?? 0) + 1;
+      if (t === 'ping') this.#pingsAt.push(fineNow());
       return super.send(data);
     }
   };
@@ -286,15 +309,8 @@ export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now =
 /** A fresh tally for the relay's side. AUDIT SCALE II L5: `saidByType`, the frames the room said (tallySaid). */
 export const relayTally = () => ({
   opened: 0, synthetic: 0, inFrames: 0, inBytes: 0, outFrames: 0, outBytes: 0,
-  inByType: {}, saidByType: {}, outByType: {}, closes: {}, refusals: {}, refusedAt: [], poseMs: [], onWelcome: null,
+  inByType: {}, saidByType: {}, outByType: {}, closes: {}, refusals: {}, refusedAt: [], poseMs: [], pingMs: [], onWelcome: null,
 });
-
-/** The p-th percentile (0..1) of a list of numbers, or null for none. */
-export function percentile(list, p) {
-  if (!list.length) return null;
-  const s = [...list].sort((a, b) => a - b);
-  return s[Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1))];
-}
 
 /** A device's storage: a Map behind the four calls the client asks of localStorage. */
 export function botStorage(seed = {}) {
@@ -326,8 +342,11 @@ export function poseAt(bot, t) {
  *  where it stands and when, so every checkpoint is a save that changed (a player at play), never an idle one. */
 export function saveText(bot, kb, at) {
   const items = [];
-  for (let i = 0; JSON.stringify(items).length < kb * 1024; i++) {
-    items.push({ templateIndex: (i * 37) % 600, group: 'Weapons', equipSlot: i % 30, condition: 100 - (i % 50), name: `item ${bot.n}-${i}`, value: i * 13 });
+  let length = 2;   // the list's brackets; each item adds its own text, and a comma after the first
+  for (let i = 0; length < kb * 1024; i++) {
+    const item = { templateIndex: (i * 37) % 600, group: 'Weapons', equipSlot: i % 30, condition: 100 - (i % 50), name: `item ${bot.n}-${i}`, value: i * 13 };
+    items.push(item);
+    length += JSON.stringify(item).length + (items.length > 1 ? 1 : 0);
   }
   return JSON.stringify({ name: bot.name, level: 1, goldPieces: 100, items, place: poseAt(bot, at / 1000), at });
 }
@@ -338,9 +357,10 @@ export { standServices, standServicesRetrying, stopAndFree, stopAll, FIRE_MINUTE
 
 /** The client-side tally of the account service: route -> { n, statuses, ms[] }. */
 const accountTally = () => ({ byRoute: new Map(), at: [] });
-function noteCall(tally, route, status, ms) {
-  const row = tally.byRoute.get(route) ?? { n: 0, statuses: {}, ms: [] };
+function noteCall(tally, route, status, ms, bytes = 0) {
+  const row = tally.byRoute.get(route) ?? { n: 0, statuses: {}, ms: [], bytesOut: 0 };
   row.n += 1;
+  row.bytesOut += bytes;
   row.statuses[status] = (row.statuses[status] ?? 0) + 1;
   row.ms.push(ms);
   tally.byRoute.set(route, row);
@@ -372,7 +392,7 @@ export function makeBot(n, o, ctx) {
     acct: `aload${n.toString(36).padStart(6, '0')}${ctx.runTag}`, asecret: `loadacct${n.toString(36)}x${ctx.runTag}`.padEnd(24, 'w'),
     account: null, realm: null, sessions: [], presence: null, timers: [], welcomedAt: new Map(),
   };
-  bot.fetch = localFetch({ port: ctx.svc.accountPort, ip: bot.ip, note: (route, status, ms) => noteCall(ctx.account, route, status, ms) });
+  bot.fetch = localFetch({ port: ctx.svc.accountPort, ip: bot.ip, note: (route, status, ms, bytes) => noteCall(ctx.account, route, status, ms, bytes) });
   return bot;
 }
 
@@ -530,6 +550,7 @@ export function reservoir(list, v, seen, max = POSE_SAMPLE_MAX) {
 export class Fleet {
   constructor({ o, accountPort, relayPort, runTag, from, to }) {
     this.o = o;
+    this.relayPort = relayPort;
     this.relay = relayTally();
     this.poseSeen = 0;
     const relay = this.relay;
@@ -551,6 +572,7 @@ export class Fleet {
     return this.bots.length;
   }
   async connect(rampMs) {
+    await installRelayProfile(this.relayPort);   // each thread holds its own installed profile
     console.warn = () => {}; console.info = () => {};   // the sessions' own chatter, not the run's
     this.ticker = setInterval(() => { for (const b of this.bots) tickBot(b, this.ctx, this.o); }, 50);
     const start = Date.now();
@@ -570,6 +592,7 @@ export class Fleet {
     for (const k of ['inFrames', 'inBytes', 'outFrames', 'outBytes']) r[k] = 0;
     r.inByType = {}; r.saidByType = {}; r.outByType = {}; r.closes = {}; r.refusals = {};
     r.poseMs.list.length = 0; this.poseSeen = 0;
+    r.pingMs.length = 0;
     return true;
   }
   /** The storm begins: nobody is back until a welcome says so. */
@@ -654,6 +677,7 @@ export function mergeFleets(finals, rand = Math.random) {
     for (const [route, row] of f.account) {
       const m = account.byRoute.get(route) ?? { n: 0, statuses: {}, ms: [] };
       m.n += row.n;
+      if (row.bytesOut != null) m.bytesOut = (m.bytesOut ?? 0) + row.bytesOut;
       for (const [k, v] of Object.entries(row.statuses)) m.statuses[k] = (m.statuses[k] ?? 0) + v;
       for (const v of row.ms) m.ms.push(v);
       account.byRoute.set(route, m);
@@ -661,6 +685,7 @@ export function mergeFleets(finals, rand = Math.random) {
     for (const k of ['opened', 'synthetic', 'inFrames', 'inBytes', 'outFrames', 'outBytes']) relay[k] += f.relay[k];
     for (const k of ['inByType', 'saidByType', 'outByType', 'closes', 'refusals']) for (const [t, v] of Object.entries(f.relay[k] ?? {})) relay[k][t] = (relay[k][t] ?? 0) + v;
     poseSeen += f.relay.poseSeen;
+    for (const v of f.relay.pingMs ?? []) relay.pingMs.push(v);
   }
   // the heaviest kept age's weight (poses heard a kept one stands for), and every fleet's sample cut to it
   const weight = Math.max(0, ...finals.map((f) => (f.relay.poseMs.length ? f.relay.poseSeen / f.relay.poseMs.length : 0)));
@@ -686,7 +711,13 @@ async function main(o) {
   };
   process.on('SIGINT', onSignal); process.on('SIGTERM', onSignal);
   try {
-    const svc = await standServices(o, state);
+    const svc = o.selfhost ? await standSelfhost(o, state) : await standServices(o, state);
+    const sampler = await startSampling(o, svc);
+    const firings = [];
+    const fire = (cron) => svc.fireCron(cron).then((firing) => { firings.push(firing); });
+    const probes = {};
+    if (o.probe) probes.idle = await bindingProbe(svc.accountPort);
+    sampler.phase('setup');
     const runTag = Math.random().toString(36).slice(2, 6);
     const threads = Math.max(1, Math.min(o.threads, o.bots));
     for (let k = 0; k < threads; k++) {
@@ -703,10 +734,12 @@ async function main(o) {
     console.log(`== playing for ${o.minutes} min${o.scenario === 'storm' ? `, the relay restarted at ${Math.round(o['storm-at'] * 100)}%` : ''}`);
     await serviceStats(svc.accountPort);   // the setup's and the ramp's points and rows are not the play's - drained
     await Promise.all(fleets.map((f) => f.play()));
+    sampler.phase('play');
+    const cpuFrom = await sampler.cpu();
     const playStart = Date.now();
     const playMs = o.minutes * 60_000;
-    await fireCron(svc.accountPort, FIRE_HOUR);
-    const clockTimer = setInterval(() => { fireCron(svc.accountPort, FIRE_MINUTE); }, 60_000);
+    await fire(FIRE_HOUR);
+    const clockTimer = setInterval(() => { fire(FIRE_MINUTE); }, 60_000);
     const statsSum = { byRoute: new Map(), statements: new Map() };
     const fold = (s) => {
       for (const p of s.points) {
@@ -725,23 +758,28 @@ async function main(o) {
     if (o.scenario === 'storm') {
       const stormAt = playStart + playMs * o['storm-at'];
       while (Date.now() < stormAt) { await sleep(Math.min(30_000, stormAt - Date.now())); fold(await serviceStats(svc.accountPort)); }
+      sampler.phase('storm');
       storm = await theStorm(fleets, o.bots, svc, fold, playStart + playMs);
     }
     while (Date.now() < playStart + playMs) { await sleep(Math.min(30_000, playStart + playMs - Date.now())); fold(await serviceStats(svc.accountPort)); }
     const playedMs = Date.now() - playStart;
+    const cpuTo = await sampler.cpu();
     clearInterval(clockTimer);
+    if (o.probe) probes.underLoad = await bindingProbe(svc.accountPort);
     const merged = mergeFleets(await Promise.all(fleets.map((f) => f.finish())));
     fleets = [];
     fold(await serviceStats(svc.accountPort));
     console.warn = restore.warn; console.info = restore.info;
 
-    out.report = report({ bots: merged.bots, o, account: merged.account, relay: merged.relay, poseSeen: merged.poseSeen, statsSum, playedMs, storm, threads });
+    const services = { ...servicesFigures({ svc, firings, memory: sampler.stop(), cpu: cpuShare(cpuFrom, cpuTo, playedMs) }), probes };
+    out.report = report({ bots: merged.bots, o, account: merged.account, relay: merged.relay, poseSeen: merged.poseSeen, statsSum, playedMs, storm, threads, services });
     if (o.json) writeFileSync(o.json, JSON.stringify(out, null, 2));
   } finally {
     console.warn = restore.warn; console.info = restore.info;
+    stopSampling();
     for (const f of fleets) f.stop?.();
     stopAll();
-    if (!o.keep) rmSync(state, { recursive: true, force: true });
+    if (!o.keep) rmSync(state, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });   // a killed workerd lets go of its files a moment later on Windows
     else console.log(`== the state is kept at ${state}`);
   }
   return out;
@@ -794,7 +832,8 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
   let quiet = 0;
   while (Date.now() < endsAt) {
     await sleep(1000);
-    const s = await serviceStats(svc.accountPort);
+    // Under the self-host kit one process serves both Workers, so the account service is down while the relay is.
+    const s = await serviceStats(svc.accountPort).catch(() => ({ points: [], statements: [] }));
     fold(s);
     for (const p of s.points) marks.push([Number(p.t ?? Date.now()), 'statements', Number(p.doubles?.[2] ?? 0)]);
     const parts = await Promise.all(fleets.map((f) => f.second()));
@@ -824,15 +863,15 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
 const pad = (s, n) => String(s).padEnd(n);
 const lpad = (s, n) => String(s).padStart(n);
 const r1 = (x) => (x == null ? '-' : Math.round(x * 10) / 10);
-
-export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, storm, threads }) {
+const r2 = (x) => (x == null ? '-' : Math.round(x * 100) / 100);
+export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, storm, threads, services = null }) {
   const botHours = (bots * playedMs) / 3_600_000;
   const botSeconds = (bots * playedMs) / 1000;
   const routes = [...account.byRoute].map(([route, row]) => {
     const svc = statsSum.byRoute.get(route) ?? { n: 0, statements: 0 };
     return {
       route, requests: row.n, perBotHour: row.n / botHours, statuses: row.statuses,
-      p50: percentile(row.ms, 0.5), p95: percentile(row.ms, 0.95),
+      p50: percentile(row.ms, 0.5), p95: percentile(row.ms, 0.95), bytesOutPerRequest: row.n ? (row.bytesOut ?? 0) / row.n : null,
       statementsPerRequest: svc.n ? svc.statements / svc.n : null, statementsPerBotHour: svc.statements / botHours,
     };
   }).sort((a, b) => b.statementsPerBotHour - a.statementsPerBotHour);
@@ -859,6 +898,8 @@ export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, 
   }
   console.log(`${pad('every route', 30)}${lpad(totals.requests, 7)}${lpad(r1(totals.requests / botHours), 9)}${lpad('', 14)}${lpad('', 10)}${lpad(r1(totals.statements / botHours), 12)}`);
   console.log(`${pad('  the play (no mints)', 30)}${lpad(play.requests, 7)}${lpad(r1(play.requests / botHours), 9)}${lpad('', 14)}${lpad('', 10)}${lpad(r1(play.statements / botHours), 12)}`);
+  const http = httpLatency(account);
+  console.log(`every /v1 request: p50 ${r1(http.p50)} ms, p95 ${r1(http.p95)} ms (${http.n}); the largest bodies sent: ${routes.filter((r) => r.bytesOutPerRequest > 1024).map((r) => `${r.route} ${r1(r.bytesOutPerRequest / 1024)} KB`).join(', ') || 'none over 1 KB'}`);
   console.log(`the fleet: ${JSON.stringify(fleet)}; the service's clock: its minute every minute of play, its hour once as play began`);
   console.log(`\nD1 rows a bot-hour: ${r1(rows.read / botHours)} read, ${r1(rows.written / botHours)} written. The ten statements reading the most:`);
   for (const s of statements.slice(0, 10)) console.log(`  ${lpad(r1(s.rowsReadPerBotHour), 9)} rows/bot-h  ${lpad(s.n, 6)}x  ${s.sql.slice(0, 110)}`);
@@ -870,8 +911,10 @@ export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, 
   console.log(`said by type (a batch's frames each its own): ${JSON.stringify(relay.saidByType)}`);
   console.log(`out by type: ${JSON.stringify(relay.outByType)}`);
   console.log(`a pose, sender to listener: p50 ${percentile(relay.poseMs, 0.5) ?? '-'} ms, p95 ${percentile(relay.poseMs, 0.95) ?? '-'} ms, p99 ${percentile(relay.poseMs, 0.99) ?? '-'} ms (${poseSeen} heard, ${relay.poseMs.length} kept)`);
+  console.log(`a ping's pong, round trip: p50 ${r2(percentile(relay.pingMs, 0.5))} ms, p95 ${r2(percentile(relay.pingMs, 0.95))} ms (${relay.pingMs.length})`);
   console.log(`closes by code: ${JSON.stringify(relay.closes)}; refusals: ${JSON.stringify(relay.refusals)}`);
 
+  if (services) printServices(services);
   if (storm) {
     console.log(`\n== THE STORM - the relay answered again ${storm.relayUpS ?? '-'} s after it went down`);
     console.log(`bots back in their cell: a quarter ${storm.reachedS[0.25] ?? '-'} s, half ${storm.reachedS[0.5] ?? '-'} s, nine in ten ${storm.reachedS[0.9] ?? '-'} s, every one ${storm.reachedS[1] ?? 'never, in the run'} s`);
@@ -881,8 +924,8 @@ export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, 
   return {
     botHours, botSeconds, routes, fleet, play: { requestsPerBotHour: play.requests / botHours, statementsPerBotHour: play.statements / botHours },
     totals: { requestsPerBotHour: totals.requests / botHours, statementsPerBotHour: totals.statements / botHours, rowsReadPerBotHour: rows.read / botHours, rowsWrittenPerBotHour: rows.written / botHours },
-    statements: statements.slice(0, 40),
-    relay: { framesInPerBotSecond: relay.inFrames / botSeconds, framesOutPerBotSecond: relay.outFrames / botSeconds, bytesInPerBotSecond: relay.inBytes / botSeconds, bytesOutPerBotSecond: relay.outBytes / botSeconds, inByType: relay.inByType, saidByType: relay.saidByType, outByType: relay.outByType, poseMs: { p50: percentile(relay.poseMs, 0.5), p95: percentile(relay.poseMs, 0.95), p99: percentile(relay.poseMs, 0.99), n: relay.poseMs.length }, closes: relay.closes, refusals: relay.refusals },
+    statements: statements.slice(0, 40), http, services,
+    relay: { framesInPerBotSecond: relay.inFrames / botSeconds, framesOutPerBotSecond: relay.outFrames / botSeconds, bytesInPerBotSecond: relay.inBytes / botSeconds, bytesOutPerBotSecond: relay.outBytes / botSeconds, inByType: relay.inByType, saidByType: relay.saidByType, outByType: relay.outByType, poseMs: { p50: percentile(relay.poseMs, 0.5), p95: percentile(relay.poseMs, 0.95), p99: percentile(relay.poseMs, 0.99), n: relay.poseMs.length }, pingMs: { p50: percentile(relay.pingMs, 0.5), p95: percentile(relay.pingMs, 0.95), n: relay.pingMs.length }, closes: relay.closes, refusals: relay.refusals },
     storm,
   };
 }
