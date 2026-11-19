@@ -585,7 +585,7 @@
     "server/src/cellHandover.js": 20,
     "server/src/cellMoves.js": 16,
     "server/src/drainWindows.js": 4,
-    "server/src/index.js": 1730,
+    "server/src/index.js": 1729,
     "server/src/staffEvents.js": 7,
     "server/src/staffFeeds.js": 11,
     "server/src/staffFollow.js": 2,
