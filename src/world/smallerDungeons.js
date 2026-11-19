@@ -414,8 +414,8 @@ export function dungeonLocationFor(dfLocation, deps = {}) {
  * AUDIT FB1019f B1 (HEIR-WHOLE's audit): THE SIZE dungeonLocationFor BUILDS AT, asked without building -
  * `builtDungeonSize(dungeonLocationFor(dfLocation, deps))`, with no draw of the one DFRandom the world shares. The size
  * asked for (dungeonSizeFor) is not the size built: a dungeon at or under its size's threshold is never laid anew
- * (laidAnew), and its build is the location itself, the dungeon whole. Online the world draws 3,133 of MAPS.BSA's
- * 4,232 dungeons small or medium, and builds 2,005 of them smaller; the other 1,128 are that small already (five blocks
+ * (laidAnew), and its build is the location itself, the dungeon whole. Online the world draws 1,571 of MAPS.BSA's
+ * 4,232 dungeons small or medium, and builds 967 of them smaller; the other 604 are that small already (five blocks
  * drawn small, five or eight drawn medium), and their public room is the dungeon whole. A dungeon site's `relaid` reads it (scenes/instanceDoor.js dungeonSite).
  */
 export function builtSizeFor(dfLocation, deps = {}) {

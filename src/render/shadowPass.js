@@ -66,6 +66,7 @@ import { pageParam } from '../systems/pageQuery.js';   // PERF-URL: the page's q
 import { BAYER_GLSL, DISSOLVE_GLSL } from './orderedDither.js';   // AUDIT BAY A12: a fading ship's shadow dissolves with her
 import { windfallLawOn, swayShare, windfallLeanMax, windfallAnchorAfterShift } from './windfallSway.js';   // WINDFALL1: the flora's lean while Windfall's law stands
 import { SKIN_PALETTE_UNIT } from './skinPalette.js';   // MWNPC16: a skinned body's palette, read where the lit draw reads it
+import { spheresTouch, foldSignature, LoLampSignatures } from './shadow-signatures.ts';
 import { NO_LIGHT_ID } from './lightId.js';   // LIGHT-ID: a light's identity, its producer's (renderer.js lifts it off the frame's list)
 
 /** The sun map: two cascades of this size, as a depth texture array. */
@@ -429,17 +430,7 @@ export const SHADOW_LO_REBUILDS_STEADY = 6;
 export function shadowCacheOn(search = globalThis.location?.search ?? '') {
   return pageParam('shadowcache', search) !== 'off';   // PERF-URL
 }
-/** SC1: are two spheres touching - a record's against a lantern's reach. */
-export function spheresTouch(ax, ay, az, ar, bx, by, bz, br) {
-  const dx = ax - bx, dy = ay - by, dz = az - bz, r = ar + br;
-  return dx * dx + dy * dy + dz * dz <= r * r;
-}
-/** SC1: a 32-bit fold for the static signature - order-independent (a sum and a rotate-xor), so the hosts' draw
- *  order, which the culling shuffles, cannot change it. */
-export function foldSignature(h, v) {
-  const x = (v | 0) * 0x9e3779b1 | 0;
-  return (h + ((x << 13) | (x >>> 19))) | 0;
-}
+export { spheresTouch, foldSignature };
 let _shId = 0;
 /** SC1: a stable identity for a mesh, a surface or a batch, minted on first sight. */
 const shId = (o) => (o._shId ??= ++_shId);
@@ -1160,6 +1151,7 @@ export class ShadowPass {
     this._farOf = new Float64Array(SHADOW_POINT_CASTERS);   // LA-SHADOW4: each rank's far this frame
     this._sigOne = new Float64Array(4);
     this._sigOneOut = new Int32Array(2);
+    this._loSigs = new LoLampSignatures(SHADOW_CASTER_TABLE, heldShadowFar, shadowFarFor);   // the lo tier's lamps' signatures, one walk for all
     // PERF-SHADOW1: each ranked lantern's candidates this frame (_casterCandidates) - the records that can reach its
     // cube (indices, in record order) and, of a billboard list, the flats that can (`bb`, a list a candidate) - with the
     // lanterns' (x, y, z, far, slack), per lantern the slot the record in hand holds in its list (-1: none yet), and
@@ -1269,6 +1261,8 @@ export class ShadowPass {
     }
     for (let j = 0; j < cap; j++) if (!taken[j]) { sl[j * 4] = NaN; this._loBuilt[j] = 0; unminded[j] = 0; }   // a light gone: its slot is drawn afresh for the next
     let rebuilds = SHADOW_TUNING.steady ? SHADOW_LO_REBUILDS_STEADY : SHADOW_LO_REBUILDS;   // FLICKER-FIX: more per frame, never all at once (a door in a twenty-lamp room is a hitch)
+    const sigs = this._loSigs;   // DISC29-E: walked with the flats animating in place, as REPLAY_LO draws them
+    sigs.gather({ lights: L, lightCount: n, slotOf, readsFullMap: hi, slotLight: sl, slotBuilt: this._loBuilt, walk: (cp, nC, out) => this._staticSignatures(cp, nC, out, false, true) });
     for (let i = 0; i < n; i++) {
       const j = slotOf[i];
       if (j < 0) continue;
@@ -1284,14 +1278,14 @@ export class ShadowPass {
       // a kept map its light did not read (it held a 512 slot) is asked at once, outside the budget: it is read this frame
       const minded = unminded[j] === 0;
       unminded[j] = 0;
-      let sig = null, draw = fresh;
+      const sigHash = sigs.hash(i), sigCount = sigs.count(i);
+      let draw = fresh;
       if (!fresh && (!minded || rebuilds > 0)) {
-        sig = this._staticSignature(pos, far);
-        if (this._loSlotSig[j * 2] !== sig[0] || this._loSlotSig[j * 2 + 1] !== sig[1]) { draw = true; if (minded) rebuilds--; }
+        if (this._loSlotSig[j * 2] !== sigHash || this._loSlotSig[j * 2 + 1] !== sigCount) { draw = true; if (minded) rebuilds--; }
       }
       if (draw) {
-        if (!sig) sig = this._staticSignature(pos, far);
-        this._loSlotSig[j * 2] = sig[0]; this._loSlotSig[j * 2 + 1] = sig[1];
+        this._loSlotSig[j * 2] = sigHash;
+        this._loSlotSig[j * 2 + 1] = sigCount;
         pointFaceMatrices(pos, far, this.faceVP);
         for (let face = 0; face < 6; face++) {
           gl.bindFramebuffer(gl.FRAMEBUFFER, this._loFbos[j * 6 + face]);

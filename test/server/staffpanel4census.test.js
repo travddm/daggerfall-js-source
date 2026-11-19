@@ -308,7 +308,7 @@ test('STAFF-PANEL4-CENSUS: THE DAY\'S TOTALS - once a UTC day at the census\'s q
     s.raw.prepare(`INSERT INTO market_auctions (id, seller, char_id, region, provenance, wear, opening, fee, at, ends_at, rid, n)
       VALUES ('a1', ?, ?, 1, 'a100000000000000', 1000, 5, 1, 1, 2, 'r', 'n')`).run(syl.id, a);
     s.raw.prepare("INSERT INTO market_deliveries (id, player, char_id, why, arrives_at, at, item) VALUES ('d1', ?, ?, 'bought', 1, 1, ?)").run(syl.id, a, JSON.stringify(piece(113, { stackCount: 2 })));
-    s.raw.prepare("INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, rid) VALUES ('account', 'x', 'escrow', 'b1', 'bid-escrow', 12, 1, 1, ?, 'b1')").run(syl.id);
+    s.raw.prepare("INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, rid) VALUES ('mint', NULL, 'escrow', 'b1', 'bid-escrow', 12, 1, 1, ?, 'b1')").run(syl.id);
     const day = utcDay(s.now());
     const at = day * 86400 + CENSUS_DAY_HOUR * 3600 + 41 * 60;
     s.raw.prepare("INSERT INTO item_census_days (kind, day, carried, holders, at) VALUES ('t71', ?, 1, 1, 1), ('t71', ?, 2, 1, 1)").run(day - CENSUS_DAYS_KEEP - 1, day - 3);
