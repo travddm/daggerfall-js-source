@@ -1,7 +1,9 @@
 // The allies a foes frame names, as the relay's record strip reads them. The lists are the sender's own word, so a name
-// on one never vouches for a record by itself: it only spares the record a check that a real ally could fail.
+// on one never vouches for a record by itself: every ally is still held to a health bound, and a companion or a summon
+// to its grant.
 
 import { FOE_BOUND } from '../../src/net/foeBounds.js';
+import { FOE_LEVEL_MAX } from '../../src/net/wire.js';
 
 /** The record numbers a frame names as the sender's allies. */
 export type FrameAllies = {
@@ -13,7 +15,7 @@ export type FrameAllies = {
   companions: Set<unknown>;
 };
 
-type AllyRecord = { i?: unknown; t?: unknown };
+type AllyRecord = { i?: unknown; t?: unknown; l?: unknown };
 type AllyFrame = { al?: unknown; cw?: unknown; cp?: unknown };
 
 const idsOf = (list: unknown): Set<unknown> => new Set(Array.isArray(list) ? list : []);
@@ -34,13 +36,14 @@ export function namedAlly(record: AllyRecord, allies: FrameAllies): boolean {
 }
 
 /**
- * Whether the record skips the health bound. Only a class-type ally does: a companion carries its health from place to
- * place, and that health may come from a roll at a higher level than the one its record now states (a mentored party
- * stands its foes at a lower level). A monster's bound does not depend on its level, so a monster ally, a summon above
- * all, is held to it like any foe.
+ * The record as the health bound reads it. A class-type ally is read at the highest level the wire allows: a
+ * companion carries its health from place to place, and that health may come from a roll at a higher level than the
+ * one its record now states (a mentored party stands its foes at a lower level). A monster's bound does not depend on
+ * its level, so a monster ally, a summon above all, is read as it is, like any foe.
  */
-export function skipsHealthBound(record: AllyRecord, allies: FrameAllies): boolean {
-  return isClassType(record.t) && namedAlly(record, allies);
+export function healthBoundRecord<R extends AllyRecord>(record: R, allies: FrameAllies): R {
+  if (!isClassType(record.t) || !namedAlly(record, allies)) return record;
+  return { ...record, l: FOE_LEVEL_MAX };
 }
 
 /**

@@ -191,7 +191,7 @@ import { preTokenGate, placeGate } from './helloGate.js';   // a room's hello ga
 import { sdCopyRight, sdNewcomerWord, sdAcctTell, sdAcctInternal, SD_INTERNAL_ACCT, sdSeatsInternal, SD_INTERNAL_SEATS, sdOpenRoute, SD_OPEN_PATH } from './sdCopy.js';   // SD-PARTY: a party's own Hour - its door, one life and one win a Hollow
 import { relayFactsAnswer, relayProfileHash, RELAY_FACT_PATHS } from './relayFacts.ts';   // /health, /profile and the profile's hash
 import { helloDoorRefused, GROUND_OLD_WORDS } from './helloDoor.ts';
-import { frameAllies, skipsHealthBound, ridesWithoutGrant } from './frame-allies.ts';   // the frame's ally lists, as the record strip reads them
+import { frameAllies, healthBoundRecord, ridesWithoutGrant } from './frame-allies.ts';   // the frame's ally lists, as the record strip reads them
 import { RELAY_CFG_TTL_MS, RELAY_INTERNAL_CFG, mayRelayCfg, relayCfgValue } from '../../src/net/relayCfg.js';   // SCALE5b: the relay's settings, at run time
 import { leaseKeyOf, mintLease, readLease, leaseRoom, LEASE_FRAME_MIN_MS, LEASE_OLD_REASON } from '../../src/net/roomLease.js';   // LEASE1: the hub's word on every socket, in every room
 /** LEASE1 (the fourth review of the PR): a frame of a build that hands on no lease asks the hub's door at most this often -
@@ -8993,13 +8993,13 @@ export class Room {
     return grantModeOf(relayCfgValue(await this._relayCfgOf(), this.env, 'grantMode'));
   }
   /**
-   * GRANT9: THE RELAY STRIPS RECORDS - while `grantStrip` is on, a foes frame loses each record that names a grant this
-   * room does not hold as the sender's, a member past it, or marks past its own (net/grantLaw.js grantMarksAllow), and
-   * - from a socket that has stood on a grant here (GRANT-DOOR, section 20: or whose hello says it stands on them) - a
-   * live record with no grant, unless the frame names it crew or an allied watchman (frame-allies.ts: a companion or a
-   * summon needs one). A body (`d` 1) and a word with no species (a standing foe's delta) pass: what they name was
-   * decided when it first stood. FOE-BOUNDS (section 19): and any record whose health no builder could give it, counted
-   * under the relay's own name. Off, never called: the foe stream is not read (section 4.6).
+   * The relay strips records. While `grantStrip` is on, a foes frame loses each record that names a grant this room
+   * does not hold as the sender's, a member past it, or marks past its own (net/grantLaw.js grantMarksAllow). From a
+   * socket that has stood on a grant here, or whose hello says it stands on them, it also loses a live record with no
+   * grant, unless the frame names it crew or an allied watchman (frame-allies.ts: a companion or a summon needs one).
+   * A body (`d` 1) and a word with no species (a standing foe's delta) pass: what they name was decided when it first
+   * stood. A record whose health no builder could give it goes too, counted under the relay's own name. With
+   * `grantStrip` off this is never called, so the foe stream is not read.
    */
   _grantStripped(a, data, kind = 'foes', now = Date.now()) {
     if (!data || !Array.isArray(data.f)) return data;
@@ -9013,7 +9013,7 @@ export class Room {
       if (!r || typeof r !== 'object') return false;
       // FOE-BOUNDS (Spawn-Grants section 19): a record no builder could give (net/foeBounds.js) goes nowhere - the relay
       // is the one authority every copy hears, so none stands it, adopts it or passes it on
-      const s = skipsHealthBound(r, allies) ? null : foeStatsRefusal(r, { lane: kind === 'own' ? 'any' : 'street', camp: camps.has(r.i) });
+      const s = foeStatsRefusal(healthBoundRecord(r, allies), { lane: kind === 'own' ? 'any' : 'street', camp: camps.has(r.i) });
       if (s) { if (this._grantStripSeen(a, r)) stripped++; if (!worst || s.k - s.mx > worst.k - worst.mx) worst = s; return false; }
       if (!Array.isArray(r.gr)) return !asker || r.d === 1 || r.t === undefined || ridesWithoutGrant(r, allies);
       const v = G?.live.get(r.gr[0]), i = r.gr[1];
