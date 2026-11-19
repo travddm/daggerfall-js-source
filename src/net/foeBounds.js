@@ -21,7 +21,8 @@
 // the mod off is never refused.
 // UNVERIFIED - no bound, never refused: a type with no row (the horse, 39; an unknown id; a mod's own kind, 256 and up,
 // whose career the relay does not hold), an ally, a companion or a crewman (the frame's own lists, which the caller leaves
-// out), a boss's relay-kept body (not on this stream). The constants each builder owns are copied here, as
+// out: the relay leaves out only a class-type one, server/src/frame-allies.ts), a boss's relay-kept body (not on this
+// stream). The constants each builder owns are copied here, as
 // net/grantLaw.js copies the elite's and the champion's: the relay cannot import the modules that hold them, and
 // test/net/foebounds_law.test.js holds each equal to its home.
 
