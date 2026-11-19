@@ -31,6 +31,7 @@
 // the default rather than as a new one.
 import { getPref, setPref } from './uiPrefs.js';
 import { pageParam } from './pageQuery.js';   // PERF-URL: the page's query, parsed once a search
+import { pageSearch } from './page-search.ts';
 
 export const SKINS = Object.freeze(['enhanced', 'classic']);
 export const DEFAULT_SKIN = 'enhanced';
@@ -42,7 +43,7 @@ const clean = (v) => (SKINS.includes(v) ? v : null);
 
 /** The URL's answer for this page load only, or null. Injectable so a
  *  node test can ask the question without a location. */
-export function skinOverride(search = globalThis.location?.search ?? '') {
+export function skinOverride(search = pageSearch()) {
   return clean(pageParam('skin', search));   // PERF-URL
 }
 
