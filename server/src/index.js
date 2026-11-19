@@ -8993,14 +8993,13 @@ export class Room {
     return grantModeOf(relayCfgValue(await this._relayCfgOf(), this.env, 'grantMode'));
   }
   /**
-   * GRANT9: THE RELAY STRIPS RECORDS - while `grantStrip` is
-   * on, a foes frame (a cell's, or a world room's own lane) loses each record that names a grant this room does not hold
-   * as the sender's, a member past it, or marks past its own (net/grantLaw.js grantMarksAllow), and - from a socket that
-   * has stood on a grant here (GRANT-DOOR, section 20: or whose hello says it stands on them) - a live record with no
-   * grant, unless the frame names it crew or an allied watchman (frame-allies.ts: a companion or a summon needs one). A
-   * body (`d` 1) and a word with no species (a standing foe's delta) pass: what they name was decided when it first stood. FOE-BOUNDS (section 19): and
-   * any record whose health no builder could give it, counted under the relay's own name. The frame back, the same one
-   * when nothing went. Off, never called: the foe stream is not read (section 4.6).
+   * GRANT9: THE RELAY STRIPS RECORDS - while `grantStrip` is on, a foes frame loses each record that names a grant this
+   * room does not hold as the sender's, a member past it, or marks past its own (net/grantLaw.js grantMarksAllow), and
+   * - from a socket that has stood on a grant here (GRANT-DOOR, section 20: or whose hello says it stands on them) - a
+   * live record with no grant, unless the frame names it crew or an allied watchman (frame-allies.ts: a companion or a
+   * summon needs one). A body (`d` 1) and a word with no species (a standing foe's delta) pass: what they name was
+   * decided when it first stood. FOE-BOUNDS (section 19): and any record whose health no builder could give it, counted
+   * under the relay's own name. Off, never called: the foe stream is not read (section 4.6).
    */
   _grantStripped(a, data, kind = 'foes', now = Date.now()) {
     if (!data || !Array.isArray(data.f)) return data;

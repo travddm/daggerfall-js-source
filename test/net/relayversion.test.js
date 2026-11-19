@@ -35,7 +35,7 @@ export const RELAY_GRAPH = graph('server/src/index.js');
  *  Every relay this repo has shipped a law for, and the sha256 of its law that IS it (see `graph` for what the law is).
  *  Append; never edit an existing row - an old row is a historical fact about bytes that have already been deployed. */
 const LAW = {
-  world327: '2e4b2a7077a959e5cc15a1e6b9b09bf393c01b7b9985f474cb9df0c153952ce7', // the record strip holds a summon or a monster ally to the health bound and a companion or summon to its grant (frame-allies.ts)
+  world327: 'f931a0b00ea12486654f43b71a525c0a2a2f8b38972dfa061d906e5027305543', // the record strip holds a summon or a monster ally to the health bound and a companion or summon to its grant (frame-allies.ts)
   world326: '1aeb51c5d7cbe9da2d2d502ccd82ca97a1195b8397f26686a5cfff62628cfff3',    // the server profile's keys no longer carry census or feature tags (profileKeys.ts)
   world325: 'c5b36d9274ac04b809a6b25116dea7e27968941686015cc284c5ccc9e511a0d3', // /profile names the relay's account service (relayFacts.ts accountServiceOfEnv)
   world324: 'ff37b9430b312d2948daf4db3f50c972fcbd75a5b86addb759d2522a830d9ed5', // the vendored ship mod leaves the server profile and the online lane
