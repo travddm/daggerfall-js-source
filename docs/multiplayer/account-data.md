@@ -79,7 +79,8 @@ An online character's truth is the service's, not the client's (`server-account/
 
 Marks are the online currency. Every movement is one `marks_ledger` row with a source and destination kind (`mint`,
 `account`, `guild`, `escrow`, `burn`) and an amount. Triggers keep the `marks` and `guild_marks` balances in step with
-inserted rows. Code never updates a balance directly.
+inserted rows. Code never updates a balance directly. A trigger refuses a line whose account or guild payer cannot
+cover it, or whose account or guild end names no id, so a caller that skips its own balance check cannot create Marks.
 
 Every write carries a request id `rid`, unique per actor (`UNIQUE (actor, rid)`). A repeated request is answered the
 same way instead of paying twice. Listings and auctions are unique on `(seller, rid)`.

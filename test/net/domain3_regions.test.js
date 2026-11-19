@@ -244,6 +244,7 @@ test('DOMAIN3 THE FOLD: the Turning before the first region-law week releases a 
   z.domain(21, ANTICLERE.key);
   const g = await z.guild('Wren', 'Grey Wren', 'GW');
   z.hold(RIPMORE, g.gid);
+  z.raw.prepare('INSERT INTO guild_marks (guild_id, balance) VALUES (?, 8000) ON CONFLICT (guild_id) DO UPDATE SET balance = balance + 8000').run(g.gid);
   z.raw.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
     VALUES ('guild', ?, 'burn', NULL, 'seat-claim', 8000, 1, 1, 'seats', 'The Turning', ?)`).run(g.gid, `claim-${W - 2}-${RIPMORE.key}`);
   const zero = W - 3;
