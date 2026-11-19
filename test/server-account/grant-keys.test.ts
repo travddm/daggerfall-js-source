@@ -1,4 +1,4 @@
-// The grant feed's tables refuse a repeated key (server-account/migrations/0010_grant_keys.sql), and the migration
+// The grant feed's tables refuse a repeated key (server-account/migrations/0011_grant_keys.sql), and the migration
 // keeps the rows a database already holds.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -7,7 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 
 const MIGRATIONS = fileURLToPath(new URL('../../server-account/migrations/', import.meta.url));
-const KEYS_MIGRATION = '0010_grant_keys.sql';
+const KEYS_MIGRATION = '0011_grant_keys.sql';
 
 /** A database with the migrations applied in order, up to and not including `stopAt` when it is given. */
 function migrated(stopAt?: string): DatabaseSync {
