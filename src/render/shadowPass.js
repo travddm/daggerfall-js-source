@@ -1160,6 +1160,11 @@ export class ShadowPass {
     this._farOf = new Float64Array(SHADOW_POINT_CASTERS);   // LA-SHADOW4: each rank's far this frame
     this._sigOne = new Float64Array(4);
     this._sigOneOut = new Int32Array(2);
+    // The lo tier's lamps' static signatures, all from one walk: (x, y, z, far) and (hash, count) per lamp asked, and
+    // each light's place in them (-1 for a light that asks none).
+    this._loSigLights = new Float64Array(4 * SHADOW_CASTER_TABLE);
+    this._loSigs = new Int32Array(2 * SHADOW_CASTER_TABLE);
+    this._loSigAt = new Int32Array(SHADOW_CASTER_TABLE);
     // PERF-SHADOW1: each ranked lantern's candidates this frame (_casterCandidates) - the records that can reach its
     // cube (indices, in record order) and, of a billboard list, the flats that can (`bb`, a list a candidate) - with the
     // lanterns' (x, y, z, far, slack), per lantern the slot the record in hand holds in its list (-1: none yet), and
@@ -1269,6 +1274,26 @@ export class ShadowPass {
     }
     for (let j = 0; j < cap; j++) if (!taken[j]) { sl[j * 4] = NaN; this._loBuilt[j] = 0; unminded[j] = 0; }   // a light gone: its slot is drawn afresh for the next
     let rebuilds = SHADOW_TUNING.steady ? SHADOW_LO_REBUILDS_STEADY : SHADOW_LO_REBUILDS;   // FLICKER-FIX: more per frame, never all at once (a door in a twenty-lamp room is a hitch)
+    // Every lamp's static signature comes from one walk of the records, made before the loop below. A walk per lamp
+    // filtered every record and batch again for each lamp. The answers are the same: a lamp's place and far depend
+    // only on its own slot, which no other lamp's step changes, and the faces drawn between two lamps change nothing
+    // the walk reads.
+    const sigLights = this._loSigLights, sigs = this._loSigs, sigAt = this._loSigAt;
+    let asked = 0;
+    for (let i = 0; i < n; i++) {
+      sigAt[i] = -1;
+      const j = slotOf[i];
+      if (j < 0 || hi(i)) continue;
+      const o = j * 4;
+      const same = this._loBuilt[j] && sl[o] === L[i * 4] && sl[o + 1] === L[i * 4 + 1] && sl[o + 2] === L[i * 4 + 2];
+      sigLights[asked * 4] = L[i * 4];
+      sigLights[asked * 4 + 1] = L[i * 4 + 1];
+      sigLights[asked * 4 + 2] = L[i * 4 + 2];
+      sigLights[asked * 4 + 3] = same ? heldShadowFar(sl[o + 3], L[i * 4 + 3]) : shadowFarFor(L[i * 4 + 3]);
+      sigAt[i] = asked;
+      asked++;
+    }
+    if (asked > 0) this._staticSignatures(sigLights, asked, sigs, false, true);   // DISC29-E: with the flats animating in place, as REPLAY_LO draws them
     for (let i = 0; i < n; i++) {
       const j = slotOf[i];
       if (j < 0) continue;
@@ -1284,14 +1309,15 @@ export class ShadowPass {
       // a kept map its light did not read (it held a 512 slot) is asked at once, outside the budget: it is read this frame
       const minded = unminded[j] === 0;
       unminded[j] = 0;
-      let sig = null, draw = fresh;
+      const sigHash = sigs[sigAt[i] * 2];
+      const sigCount = sigs[sigAt[i] * 2 + 1];
+      let draw = fresh;
       if (!fresh && (!minded || rebuilds > 0)) {
-        sig = this._staticSignature(pos, far);
-        if (this._loSlotSig[j * 2] !== sig[0] || this._loSlotSig[j * 2 + 1] !== sig[1]) { draw = true; if (minded) rebuilds--; }
+        if (this._loSlotSig[j * 2] !== sigHash || this._loSlotSig[j * 2 + 1] !== sigCount) { draw = true; if (minded) rebuilds--; }
       }
       if (draw) {
-        if (!sig) sig = this._staticSignature(pos, far);
-        this._loSlotSig[j * 2] = sig[0]; this._loSlotSig[j * 2 + 1] = sig[1];
+        this._loSlotSig[j * 2] = sigHash;
+        this._loSlotSig[j * 2 + 1] = sigCount;
         pointFaceMatrices(pos, far, this.faceVP);
         for (let face = 0; face < 6; face++) {
           gl.bindFramebuffer(gl.FRAMEBUFFER, this._loFbos[j * 6 + face]);
