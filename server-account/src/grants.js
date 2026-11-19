@@ -54,12 +54,11 @@ export async function takeGrantMeasure({ db, nowS, subtle, rand }, env, bytes, s
   const span = Math.max(1, Math.round((b.at - b.from) / 1000));
   const seam = sqlOf(db);
   const query = seam.kysely;
-  const keep = query
-    .insertInto('grant_batches')
-    .values({ id: b.id, at: nowS, q: b.q, span_s: span, live: b.live })
-    .onConflict((conflict) => conflict.doNothing());
-  const kept = await seam.run(keep);
-  if (!kept.changes) return { ok: true, read: false };
+  const known = query.selectFrom('grant_batches').select('id').where('id', '=', b.id).limit(1);
+  if ((await seam.run(known)).rows.length) return { ok: true, read: false };
+  // The batch's own row is written in the same list as its rows, so a list that fails leaves no row that would make
+  // the relay's retry read as kept
+  const keep = query.insertInto('grant_batches').values({ id: b.id, at: nowS, q: b.q, span_s: span, live: b.live });
   const rowValues = b.rows.map((/** @type {any} */ r) => ({
     batch: b.id,
     at: nowS,
@@ -85,7 +84,13 @@ export async function takeGrantMeasure({ db, nowS, subtle, rand }, env, bytes, s
     ...(rowValues.length ? chunksOf(rowValues, rowsPerInsert(rowValues)).map((chunk) => query.insertInto('grant_rows').values(chunk)) : []),
     ...(tallyValues.length ? chunksOf(tallyValues, rowsPerInsert(tallyValues)).map((chunk) => query.insertInto('grant_tallies').values(chunk)) : []),
   ];
-  if (writes.length) await seam.atomic(writes);
+  try {
+    await seam.atomic([keep, ...writes]);
+  } catch (error) {
+    // Two posts of one batch at once: the other kept it first, and this list wrote nothing
+    if ((await seam.run(known)).rows.length) return { ok: true, read: false };
+    throw error;
+  }
   const ctx = { db, nowS, rand };
   /** @type {Map<string, { texts: string[], readers: boolean }>} the sender, its findings - and whether readers' accounts made one */
   const found = new Map();
