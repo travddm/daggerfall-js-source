@@ -10,6 +10,13 @@ import { installProfile, profileErrors } from './serverProfile.ts';
 import { rememberAccountService } from '../../net/account-service-address.ts';
 import { appStorage } from '../appStorage.js';
 import { noServerAddressText } from './no-server-address.ts';
+import {
+  askServerLink,
+  rememberJoinedServer,
+  returnToMenu,
+  serverLinkDeclinedText,
+  unconfirmedServerLink,
+} from './server-link-confirm.ts';
 
 export { noServerAddressText };
 
@@ -36,13 +43,17 @@ export const profileNewerGameText = (): string =>
 /**
  * Fetches, checks and installs the server's profile on an online page; does nothing on any other. Throws an Error
  * whose message is the player's words when the page cannot go online with it, after saying them on `status`. The
- * account service the relay names (`accounts`) is remembered in `storage` (net/account-service-address.ts).
+ * account service the relay names (`accounts`) is remembered in `storage` (net/account-service-address.ts). A `?server=`
+ * link to a relay the player has not joined is asked about first (`confirmLink`, server-link-confirm.ts); a player who
+ * declines goes back to the main menu (`declineLink`), and the returned promise does not settle.
  */
 export async function openProfileDoor(
   params: Params,
   status: (words: string) => void = () => {},
   fetchImpl: Fetch = globalThis.fetch,
   storage: Parameters<typeof rememberAccountService>[0] = appStorage(),
+  confirmLink: (relay: string) => Promise<boolean> = askServerLink,
+  declineLink: () => Promise<never> = returnToMenu,
 ): Promise<void> {
   if (!params.has('online')) return;
   const refuse = (words: string, cause?: unknown): never => {
@@ -51,6 +62,14 @@ export async function openProfileDoor(
   };
   const server = relayServerOf(params);
   if (!server) refuse(noServerAddressText());
+  const linked = unconfirmedServerLink(params, storage, getPref('onlineServer'));
+  if (linked) {
+    if (!(await confirmLink(linked))) {
+      status(serverLinkDeclinedText());
+      return declineLink();
+    }
+    rememberJoinedServer(storage, linked);
+  }
   const url = profileUrlOf(server);
   if (!url) refuse(profileUnreachableText());
   let body: unknown = null;

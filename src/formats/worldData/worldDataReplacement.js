@@ -210,7 +210,7 @@ export function _resetWorldDataReplacement({ assets = true } = {}) {
   regions = new Map(); locations = new Map(); blocks = new Map(); buildings = new Map();
   nextBlockIndex = 0; newBlockNames = new Map(); newBlockIndices = new Map(); _blocksFile = null;
   _refused.clear(); _quietLocations = false; _doorLatched = null;
-  if (assets) { _assets.clear(); _portBlocks.clear(); _blockFamilies.length = 0; _locationEdits.length = 0; _layers.length = 0; }   // the layers with the assets
+  if (assets) { _assets.clear(); _portBlocks.clear(); _portNameByIndex = null; _blockFamilies.length = 0; _locationEdits.length = 0; _layers.length = 0; }   // the layers with the assets
 }
 
 // ---- THE PORT'S OWN WORLD DATA - not a mod's, so behind no switch ----
@@ -220,11 +220,16 @@ export function _resetWorldDataReplacement({ assets = true } = {}) {
 // any BSA (world/gate/gateArena.js's made block is the precedent), so the first block a mod's file names still takes
 // BsaFile.Count (DFU's AssignBlockIndices) and no pack's new block moves.
 const _portBlocks = new Map();   // name -> { index, json, block }
+// The index -> name lookup is rebuilt after any write to _portBlocks. BlocksFile.getBlockIndex asks for the name of
+// every block index in the BSA, so a scan of _portBlocks per ask cost about 1.6 s of each boot.
+/** @type {Map<number, string> | null} */
+let _portNameByIndex = null;
 /** A block of the port's own, by name, at a fixed index (>= 900000): its JSON, or a function answering
  *  it, called when the block is first read. */
 export function registerPortBlock(name, json, index) {
   if (!name || json == null || !Number.isSafeInteger(index)) return false;
   _portBlocks.set(name, { index, json, block: null });
+  _portNameByIndex = null;
   return true;
 }
 /** WW7-4: a block of the port's own MADE OF ANOTHER - `make(blocksFile)` answers the block itself (world/capitalCastles.js:
@@ -232,6 +237,7 @@ export function registerPortBlock(name, json, index) {
 export function registerPortBlockOf(name, make, index) {
   if (!name || typeof make !== 'function' || !Number.isSafeInteger(index)) return false;
   _portBlocks.set(name, { index, make, block: null });
+  _portNameByIndex = null;
   return true;
 }
 /** BLOCK FAMILIES - a run of the port's own blocks answered by one
@@ -264,7 +270,18 @@ function familyBlock(name) {
   }
   return null;
 }
-const portBlockByIndex = (index) => { for (const [name, b] of _portBlocks) if (b.index === index) return name; return familyName(index); };
+/** @returns {Map<number, string>} */
+function portNameByIndex() {
+  if (_portNameByIndex) return _portNameByIndex;
+  _portNameByIndex = new Map();
+  for (const [name, b] of _portBlocks) {
+    // Two names with one index answer the first in registration order, as the scan did.
+    if (!_portNameByIndex.has(b.index)) _portNameByIndex.set(b.index, name);
+  }
+  return _portNameByIndex;
+}
+/** @param {number} index */
+const portBlockByIndex = (index) => portNameByIndex().get(index) ?? familyName(index);
 function portBlock(name) {
   const b = _portBlocks.get(name);
   if (!b) return familyBlock(name);
