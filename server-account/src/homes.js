@@ -61,8 +61,8 @@ import { PATRON_HOUR_S } from '../../src/net/patronLaw.js';   // AUDIT LW-II P7:
 import { reckonPatrons } from './market.js';   // AUDIT LW-II-2 S4: a door leaving public reckons its town first
 import { GUILD_TREASURY_MAX } from '../../src/net/guild/guildLaw.js';   // ARENA4b: a hall's pieces paid back, into a treasury under its cap
 import { DECOR_OPS_MAX, DECOR_OPS_WINDOW_S } from '../../src/net/decorLaw.js';   // HOME-LOOK: a repaint counts as a decorator's write
-import { hallMay } from '../../src/net/hallLaw.js';
-import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';   // GUILD1d: a hall's keepers
+import { hallMay } from '../../src/net/hallLaw.js';   // GUILD1d: a hall's keepers
+import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';
 import { heraldryOfRow } from './halls.js';   // GUILD1d: a hall's heraldry, on its door
 import { openGatesRead } from './seatHolding.js';   // SEAT1d: Open Gates, where the town's holder proclaims it
 import { OWNS } from './decor.js';   // GUILD-YARD: a home's character, or a hall's keeper - as its decor asks
