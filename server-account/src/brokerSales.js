@@ -10,7 +10,9 @@
 // client asked "does the account hold a sale like this one?" - by the week and the piece - and an earlier honest sale,
 // or the week turning, answered for a press that never landed (AUDIT FB1024 lanes B and C).
 
+import { sql } from 'kysely';
 import { BROKER_RID_RE } from '../../src/net/insignia.js';
+import { sqlOf } from './database-seam.ts';
 
 /** A request id the law accepts. */
 export const brokerRidOk = (rid) => typeof rid === 'string' && BROKER_RID_RE.test(rid);
@@ -19,14 +21,31 @@ const nonceOk = brokerRidOk;
 
 /** The row a request id wrote for this account, or null: `{ kind, item, at }`. */
 export async function brokerSaleOf(db, account, rid) {
-  const r = await db.prepare('SELECT kind, item, at FROM broker_sales WHERE account = ?1 AND rid = ?2').bind(account, rid).first();
+  const seam = sqlOf(db);
+  const query = seam.kysely
+    .selectFrom('broker_sales')
+    .select(['kind', 'item', 'at'])
+    .where('account', '=', account)
+    .where('rid', '=', rid);
+  const r = (await seam.run(query)).rows[0];
   return r ? { kind: String(r.kind), item: typeof r.item === 'string' ? r.item : null, at: Number(r.at) || 0 } : null;
 }
 
 /** The sale's own row, in its batch after the write it records: written only where that write took (`changes()`). */
-export const brokerSaleWrite = (db, { account, rid, kind, item, nowS }) => db.prepare(
-  'INSERT INTO broker_sales (account, rid, kind, item, at) SELECT ?1, ?2, ?3, ?4, ?5 WHERE changes() > 0',
-).bind(account, rid, kind, item, nowS);
+export function brokerSaleWrite(db, { account, rid, kind, item, nowS }) {
+  const k = sqlOf(db).kysely;
+  const row = k
+    .selectNoFrom((eb) => [
+      eb.val(account).as('account'),
+      eb.val(rid).as('rid'),
+      eb.val(kind).as('kind'),
+      eb.val(item).as('item'),
+      eb.val(nowS).as('at'),
+    ])
+    .where(sql`changes()`, '>', 0);
+  // A D1 statement, because the sale's caller (accounts.js buyInsignia) still sends its own db.batch
+  return sqlOf(db).statement(k.insertInto('broker_sales').columns(['account', 'rid', 'kind', 'item', 'at']).expression(row));
+}
 
 /** The guard a sale's UPDATE carries: no row of this request id (`acc` and `rid` its SQL parameters). */
 export const brokerRidFreeSql = (acc, rid) => `NOT EXISTS (SELECT 1 FROM broker_sales WHERE account = ${acc} AND rid = ${rid})`;
@@ -42,12 +61,19 @@ export async function settleBrokerSale({ db, nowS }, player, body) {
   if (!player?.handle) return { error: 'guest' };
   const rid = body?.rid, nonce = body?.nonce;
   if (!brokerRidOk(rid) || !nonceOk(nonce)) return { error: 'rid' };
-  const [, counted] = await db.batch([
-    db.prepare("INSERT INTO broker_sales (account, rid, kind, item, at) VALUES (?1, ?2, 'fence', NULL, ?3) ON CONFLICT (account, rid) DO NOTHING").bind(player.id, rid, nowS),
-    db.prepare('UPDATE broker_sales SET settled = settled + 1, asked_by = COALESCE(asked_by, ?3) WHERE account = ?1 AND rid = ?2 RETURNING kind, item, at, asked_by')
-      .bind(player.id, rid, nonce),
-  ]);
-  const row = counted?.results?.[0];
+  const seam = sqlOf(db);
+  const fence = seam.kysely
+    .insertInto('broker_sales')
+    .values({ account: player.id, rid, kind: 'fence', item: null, at: nowS })
+    .onConflict((oc) => oc.columns(['account', 'rid']).doNothing());
+  const count = seam.kysely
+    .updateTable('broker_sales')
+    .set((eb) => ({ settled: eb('settled', '+', 1), asked_by: eb.fn.coalesce('asked_by', eb.val(nonce)) }))
+    .where('account', '=', player.id)
+    .where('rid', '=', rid)
+    .returning(['kind', 'item', 'at', 'asked_by']);
+  const [, counted] = await seam.atomic([fence, count]);
+  const row = counted?.rows?.[0];
   // Only an insignia sale is held: a fence, or a row of a sale kind the Broker no longer makes, answers as nothing sold
   if (!row || row.kind !== 'insignia') return { held: false };
   return { held: true, kind: String(row.kind), item: row.item, by: String(row.asked_by) };

@@ -1,0 +1,7 @@
+{
+  // The account service's database seam and its test. Kysely's query types need strictNullChecks, which the other
+  // configs leave off, so these files are checked apart with it on.
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": { "strictNullChecks": true },
+  "include": ["server-account/src/database-*.ts", "test/server/database-seam.test.ts", "src/raw-imports.d.ts"]
+}

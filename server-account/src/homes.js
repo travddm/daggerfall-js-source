@@ -67,6 +67,7 @@ import { openGatesRead } from './seatHolding.js';   // SEAT1d: Open Gates, where
 import { OWNS } from './decor.js';   // GUILD-YARD: a home's character, or a hall's keeper - as its decor asks
 import { homeMyVoteOf, homeShunned } from '../../src/net/homeVoteLaw.js';   // HOME-VOTE: the caller's own vote, as the law reads one; AUDIT A3: a shunned home
 import { LAYOUT_MATCH_SQL, layoutMatchBinds, TOWN_LAYOUT_SQL, townLayoutRefusal } from './townLayout.js';   // WD3: a town's homes in one layout (AUDIT PRE-MERGE 1003 WD1: a hall's too)
+import { ORDERS } from '../../src/systems/guild/guildFactions.js';
 
 const homeOf = (row) => ({
   mapId: row.map_id, buildingKey: row.building_key, region: row.region, character: row.char_id,
@@ -202,11 +203,27 @@ export async function claimHome(ctx, player, body = {}) {
 // bed are Daggerfall's, off the deed in its save. It goes when the deed is sold at the bank (releaseHome, `deed`). THE
 // SAME TRUST AS A CLAIM's: the record is its character's own checkpoints (realm.js).
 
-/** The deed's hold: a claim's row for a building nobody holds, in the town's one layout, marked `deed` - no price, no cap. */
+/** Each knightly order gives a house once (KnightlyOrder.ReceiveHouse sets the order's house flag), so a character holds
+ *  at most one deed an order. A record is its client's checkpoint: a forged `houses` table locks no more than that. */
+const DEED_HOLDS_MAX = Object.keys(ORDERS).length;
+const deedsHeldSql = 'SELECT COUNT(*) AS n FROM homes WHERE player = ? AND char_id = ? AND deed = 1';
+
+/** Why a deed is not held, or null: the record holds no such deed in that layout (`no-deed`), or the character holds
+ *  as many deeds as there are orders (`deed-cap`). */
+async function deedRefusal(db, player, save, { region, mapId, buildingKey, character, layout }) {
+  const deed = homeDeedOf(save?.houses, region, mapId, buildingKey);
+  if (!deed || !homeLayoutsMatch(deed.layout ?? null, layout ?? null)) return { error: 'no-deed' };
+  const deedsHeld = Number((await db.prepare(deedsHeldSql).bind(player.id, character).first())?.n) || 0;
+  return deedsHeld >= DEED_HOLDS_MAX ? { error: 'deed-cap' } : null;
+}
+
+/** The deed's hold: a claim's row for a building nobody holds, in the town's one layout, marked `deed` - no price, and
+ *  within the character's deeds (DEED_HOLDS_MAX), counted in the write so two holds at once cannot pass it. */
 const deedStatement = (db, player, { mapId, buildingKey, region, character, layout = null }, nowS) => db.prepare(`INSERT OR IGNORE INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at, paid, layout, deed)
     SELECT ?, ?, ?, ?, ?, ?, ?, 0, ?, 0, ${TOWN_LAYOUT_SQL}, 1
-    WHERE NOT EXISTS (SELECT 1 FROM homes t WHERE t.map_id = ? AND NOT (${LAYOUT_MATCH_SQL}))`)
-  .bind(mapId, buildingKey, player.id, character, displayName(player), region, HOME_ENTRY_DEFAULT, nowS, mapId, mapId, layout, mapId, ...layoutMatchBinds(layout));
+    WHERE NOT EXISTS (SELECT 1 FROM homes t WHERE t.map_id = ? AND NOT (${LAYOUT_MATCH_SQL}))
+    AND (${deedsHeldSql}) < ?`)
+  .bind(mapId, buildingKey, player.id, character, displayName(player), region, HOME_ENTRY_DEFAULT, nowS, mapId, mapId, layout, mapId, ...layoutMatchBinds(layout), player.id, character, DEED_HOLDS_MAX);
 
 /**
  * HOLD A DEED: the building a realm character's record holds Daggerfall's deed to, kept from anyone else's claim. Answers
@@ -236,8 +253,8 @@ export async function holdDeed(ctx, player, body = {}) {
   if (rec.error === 'no-realm-character') return rec;
   let save = null;
   try { save = rec.ok ? JSON.parse((await realmSaveTextOf(rec.object)) ?? 'null') : null; } catch { save = null; }
-  const deed = homeDeedOf(save?.houses, region, mapId, buildingKey);
-  if (!deed || !homeLayoutsMatch(deed.layout ?? null, layout ?? null)) return { error: 'no-deed' };
+  const noDeed = await deedRefusal(db, player, save, { region, mapId, buildingKey, character, layout });
+  if (noDeed) return noDeed;
   await deedStatement(db, player, { mapId, buildingKey, region, character, layout: layout ?? null }, nowS).run();
   const row = await db.prepare('SELECT * FROM homes WHERE map_id = ? AND building_key = ?').bind(mapId, buildingKey).first();
   if (row) return row.player === player.id && row.char_id === character ? { ok: true, home: homeOf(row), moved: homeMoved(mapId, [buildingKey]) } : { error: 'home-taken' };   // a claim landed first; QUEST-HOME: held, a home to every page

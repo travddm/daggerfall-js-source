@@ -21,6 +21,7 @@ import { d1, standService, sessionStorageOf, T0 } from '../accountDb.mjs';
 import { seatRealm, realmAt } from '../realmSeat.mjs';
 import { createHouses, allocateHouseToPlayer, housesForSale, isHouseOwned } from '../../src/systems/banking.js';
 import { receiveHouseDecision, claimHouse, HOUSE_FLAG_MASK } from '../../src/systems/knightlyGifts.js';
+import { ORDERS } from '../../src/systems/guild/guildFactions.js';
 import {
   createOnlineHomes, realmDeedAt, realmDeedsOf, holdRealmDeeds, homeDoorAnswer, homePurchasable, homeDoorPrompt,
 } from '../../src/systems/online/onlineHomes.js';
@@ -306,4 +307,19 @@ test('KNIGHT-HOUSE the deploy: the schema holds `homes.deed` (0 for a home not y
   assert.match(src('server-account/wrangler.toml'), /^ACCOUNT_VERSION = "acct208"$/m);
   const idx = src('server-account/src/index.js');
   assert.ok(idx.indexOf("if (path === '/v1/homes/deed') {") > idx.indexOf("if (accountKind(who.player) !== 'linked') return no('homes-need-account', 403, origin);"), 'behind the account wall');
+});
+
+test('KNIGHT-HOUSE a record holds one deed for each knightly order at most: a forged houses table locks no more buildings than the orders could give', async (t) => {
+  const { S, arde } = await stood(t);
+  const orders = Object.keys(ORDERS).length;
+  const houses = createHouses(62);
+  for (let region = 0; region <= orders; region++) {
+    allocateHouseToPlayer(houses, region, { buildingKey: 0x10300 + region, mapId: (TOWN + 1 + region) | 0, location: 'Forged' }, { playerName: 'Arde' });
+  }
+  const RF = await seatRealm(S.env, arde.secret, 'Forger', { name: 'Forger', level: 30, goldPieces: 0, items: [], houses });
+  const holdAt = (region) => S.call('/v1/homes/deed', { mapId: TOWN + 1 + region, buildingKey: 0x10300 + region, region, character: RF.id, layout: null }, arde.secret);
+  for (let region = 0; region < orders; region++) assert.equal((await holdAt(region)).body?.ok, true, `deed ${region} held`);
+  assert.equal((await holdAt(orders)).body?.error, 'deed-cap');
+  const held = S.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM homes WHERE char_id = ? AND deed = 1').get(RF.id).n;
+  assert.equal(held, orders);
 });

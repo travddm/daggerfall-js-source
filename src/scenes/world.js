@@ -518,7 +518,7 @@ import { farPlaces, farDistanceText, PIXEL_KM, TV_FAR_RANGE } from '../systems/t
 import { nearDungeons, dungeonApproach, pixelBox, lastLegStart, dungeonToFind, dungeonFoundText, NATIVE_PER_M } from '../systems/travel/travelDungeons.js';   // TV6: the dungeons, discovered on approach; AUDIT OW3 D1/D3: off the map rows, and the spawns with them; AUDIT OW4 D4/D6: the far found spawns, the last leg's start
 import { routeGround, joinPoint, routeDrawPoints, TV_MOUNTAIN_CLIMATE } from '../systems/travel/travelRoute.js';   // OW-MOUNTAINS, OW-ROADSIDE; AUDIT OW3 J4: the drawn route's points; AUDIT OW4 J3: the ground read once
 import { drawRouteRuns, drawOwnRun } from '../systems/travel/roadLine.js';   // ROAD-FOLLOW: the drawn route on the roads' curves past the Bay
-import { bandsNear, wanderAt, bandSight, bandChaseStep, bandMakeSeed, bandSizeOf, bandLevelOf, BAND_LIFE_MS, BAND_CONTACT_M, BAND_CHASE_MPS, BAND_STAND_M, BAND_STAND_MIN_M, BAND_STAND_RETRY_MS, BAND_STAND_TRIES } from '../systems/travel/travelBands.js';   // TV7: the roaming bands; OW6: their number and their level
+import { bandsNear, wanderAt, bandSight, bandChaseStep, bandMakeSeed, bandSizeOf, bandLevelOf, BAND_LIFE_MS, BAND_CONTACT_M, BAND_CHASE_MPS, BAND_STAND_M, BAND_STAND_MIN_M, BAND_STAND_RETRY_MS } from '../systems/travel/travelBands.js';   // TV7: the roaming bands; OW6: their number and their level
 import { bandWordOf, validBandWord, chaseYields, bandLifeOf, bandNearMe, bandPixelOf, BAND_WORD_MS, BANDS_WIRE_MAX } from '../systems/travel/travelBands.js';   // TV7b: the chase, shared
 import { walkBegin, leaderWalkStep, walkHeard, memberAnswer, memberFollowing, memberStopOf, memberWalkStep, walkAskStands, sameWalkDest, NO_WALK_ANSWER, PARTY_WALK_RADIUS_M } from '../systems/party/partyWalk.js';   // TV8: group travel, the leader drives (AUDIT OW3: the whole law, pure)
 import { rollGroupComposition, PACK_SPACING, PACK_ALERT_RADIUS } from '../systems/campEncounters.js';   // TV7: a band is a themed group
@@ -1058,7 +1058,7 @@ import { createDoorToken } from './doorTokenHost.js';   // DOOR-TOKEN (FIELD BUG
 import { HeadBobber } from '../player/headBobber.js';   // AUDIT 28 W10: HeadBobbing
 import { createClimbFeelHost } from '../player/climb/climbFeel.js';   // CLIMB4: the climb's camera
 import { lastHealthLost, lastHealthLostPercent } from '../ui/hud/hudVitals.js';   // AUDIT 28 W9: the detector's loss
-import { bindKeyRelease, bindButtonRelease } from '../ui/release-held-input.js';
+import { bindKeyRelease, bindButtonRelease, cancelHeldSwing } from '../ui/release-held-input.js';
 import { fieldOfView } from '../ui/viewSettings.js';   // MENU: Video/FieldOfView, one home for five hosts
 import { keyEdges, noteKeyDown, noteKeyUp, beginInputFrame, pressed, released, actionsOf, actionOf, held, moveHeld, swallowBrowserKey, mouseCode, isSwingButton, keyboardLook, isTextEntryTarget, bindings, routeAction, installContextMenuGuard, POLLED_ACTIONS, QUICKSLOT_ACTIONS, swingKeyHeld } from '../ui/input.js';
 import { armUnloadGuard, releaseUnloadGuard } from '../systems/unloadGuard.js';   // MAC-L3: one door in front of every way out of a running game; AUDIT-MACL F3: ...and down for a door the game opened itself
@@ -17046,7 +17046,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
   addEventListener('mousedown', (e) => { if (isSwingButton(e.button)) rightHeld = true; const mc = mouseCode(e.button); if (mc) { keys.add(mc); noteKeyDown(latch.edge, mc); } if (isSwingButton(e.button) && !townTalk.overlayActive && walkMode && modeNow() === 'exterior') { if (gatherHost?.acting()) return; if (magic.interceptAttack(true)) return; if (naval?.attackInput(true)) return; weaponRig.attackInput(0, 0, true); } });   // PROF1: an act's press is the act's   // M2; FIX-F: the swing's button is the registry's (Mouse1 -> SwingWeapon by default); NAV-H: held at a helm with guns, they are laid
   // VIEW-TOGGLE (from VOICE1, which is reverted): the mouse's side buttons are the bindings' in the world - never the browser's Back/Forward
   for (const kind of ['mousedown', 'mouseup']) addEventListener(kind, (e) => { if (e.button === 3 || e.button === 4) e.preventDefault(); });
-  bindButtonRelease({ target: globalThis, doc: globalThis.document, held: keys, releaseKey, released: (e) => { if (isSwingButton(e.button)) rightHeld = false; const mc = mouseCode(e.button); if (mc) { keys.delete(mc); noteKeyUp(latch.edge, mc); } if (isSwingButton(e.button) && walkMode && modeNow() === 'exterior') weaponRig.attackInput(0, 0, false); if (isSwingButton(e.button)) navalRelease(); } });   // the RELEASE is never gated - a window opened mid-swing must still let go; NAV-H: let go at the helm, the broadside fires (a window over it puts the aim down unfired)
+  bindButtonRelease({ target: globalThis, doc: globalThis.document, held: keys, releaseKey, released: (e) => { if (isSwingButton(e.button)) rightHeld = false; const mc = mouseCode(e.button); if (mc) { keys.delete(mc); noteKeyUp(latch.edge, mc); } if (isSwingButton(e.button) && walkMode && modeNow() === 'exterior') weaponRig.attackInput(0, 0, false); if (isSwingButton(e.button)) navalRelease(); }, cancelled: (e) => { if (isSwingButton(e.button)) { rightHeld = false; cancelHeldSwing(weaponRig, naval); } } });   // the RELEASE is never gated - a window opened mid-swing must still let go; NAV-H: let go at the helm, the broadside fires (a window over it puts the aim down unfired)
   const inputHooks = {   // GP1: one hooks object for the finger AND the pad   // mobile: stick synthesizes WASD; the right half is classified (TI1)
     look: (dx, dy) => {
       lookFilter.add(dx * lookScale() * glassLookScale(spyglass.lens), -dy * lookScale() * lookInvert() * glassLookScale(spyglass.lens));   // AUDIT 28 W7: through the look filter (HANDEDNESS, mat4's law) - SPYGLASS: slowed by the glass
@@ -28434,8 +28434,8 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
     for (const id of [..._bandFeetHold.keys()]) if (!keep.has(id)) _bandFeetHold.delete(id);
     bandSprites.sync(out, { dt, eye, grow: tvf.grow, fade: tvf.blend });
   }
-  /** AUDIT OW5b E1: the encounter pool has room for the band's members, grown by the party it meets - a band it cannot
-   *  stand is neither stood nor MET (no journey is stopped for a band that never comes; it tries again). */
+  /** The encounter pool has room for the band's members, grown by the party it meets. Without it the band does not
+   *  stand yet, and its contact tries again. */
   function bandRoom(mk) { return campMembers(mk.mobileTypes).length <= (exteriorFoes.encounterRoom?.() ?? Infinity); }
   /** Contact: the band stands as its foes, on its own bearing from the traveller - or, where the road or a town refuses
    *  that bearing (a chase down a road ends on it), a quarter turn either way, then behind (AUDIT OW3 T7-1). Whether it
@@ -28545,18 +28545,17 @@ const _pixelOrder = [];   // NEAR-FIRST: the frame's pixel walk, nearest first -
       c.pos = s.pos; c.best = s.best; c.gainAt = s.gainAt; c.dist = s.dist;
       if (s.what === 'lost') { _bandChase.delete(id); bandSpend(id); }
       else if (s.what === 'contact' && !(c.retryAt > now)) {
-        // AUDIT OW5b E1: THE
-        // CONTACT IS THE ENCOUNTER - a walking journey is stopped HERE, the frame the band reaches the traveller and before
-        // a member stands; it was stopped by the members' own senses, which in this port answer after their loads and a
-        // real-time classic tick, and at the journey's scale the traveller ran on through the band (on a horse, out of its
-        // members' sight for good). A cautious traveller's won roll: the band loses the trail, and never stands. A won
-        // roll's grace still running: the chase runs on and asks again. A band the full foe pool cannot stand meets nobody
+        // The contact is the encounter: a walking journey stops the frame the band reaches the traveller, before a member
+        // stands (the members' own senses answer too late at the journey's scale). A cautious traveller's won roll loses the
+        // band; a won roll's grace lets the chase ask again. A band that cannot stand yet (a full foe pool, a road, a town)
+        // still meets the journey and is spent only once it stands, as DFU's FoeSpawner retries until every foe is placed
+        // and raises OnEncounter meanwhile, which stops the travel mod's journey. Only a lost chase gives it up.
         const mk = bandMake(c.band);
-        const met = bandRoom(mk) ? journeyMet() : null;
+        const met = journeyMet();
         if (met === 'avoided') { _bandChase.delete(id); bandSpend(id); continue; }
         if (met === 'ignored') { c.retryAt = now + BAND_STAND_RETRY_MS; continue; }
         c.yaw ??= bandYaw(c.pos);   // AUDIT OW4 B4
-        if (bandStand(mk, c.yaw, c.dist) || ++c.tries >= BAND_STAND_TRIES) { _bandChase.delete(id); bandSpend(id); }   // AUDIT OW3 T7-1: spent once it STOOD
+        if (bandStand(mk, c.yaw, c.dist)) { _bandChase.delete(id); bandSpend(id); }   // AUDIT OW3 T7-1: spent once it STOOD
         else c.retryAt = now + BAND_STAND_RETRY_MS;
       }
     }
