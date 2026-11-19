@@ -189,7 +189,7 @@ const HARDCODED = {
   'src/render/rainCurtains.js': 1,
   'src/render/realWindows.js': 11,
   'src/render/redMountainFire.js': 3,
-  'src/render/renderer.js': 17,
+  'src/render/renderer.js': 16,
   'src/render/riteSmoke.js': 1,
   'src/render/serpentRender.js': 4,
   'src/render/shadowPass.js': 6,

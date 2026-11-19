@@ -54,6 +54,14 @@ import { publishBootParams, BOOT_DOOR_KEYS } from './systems/online/onlineLane.j
 import { staleChunkAction, RELOAD_KEY, STALE_CHUNK_TEXT } from './systems/staleChunk.js';
 import { loseGlContext, onPageGone, releaseGlContexts } from './render/glRelease.js';   // GL-LEAK: a leaf - the entry's reach is unchanged
 
+/** Work on the new renderer that runs beside the boot, each module loaded by a dynamic import so the entry's static
+ *  graph stays small: the menu's portrait renderer, and the boot's longest program links, started on the driver's
+ *  threads while the boot reads the game's data (render/boot-programs.ts). */
+function startRendererWork(renderer) {
+  import('./render/portraitRenderer.js').then(({ setPortraitRenderer }) => setPortraitRenderer(renderer)).catch(() => {});   // PORTRAIT3D: the faces' renderer, for the menu's wells that hold none (behind a door: BOOT2's ceiling)
+  import('./render/boot-programs.ts').then((m) => m.startBootPrograms(renderer, location.search)).catch((err) => console.warn('[boot] the programs could not be started early:', err?.message ?? err));
+}
+
 async function boot() {
   installFramePacer();   // FPS-VSYNC: first, before any loop asks for a frame - a no-op but in the app with the wait lifted
   installCursor();   // CLASSIC-CURSOR: DFU's own arrow on the classic skin, from the first frame - it needs no game data
@@ -63,7 +71,7 @@ async function boot() {
     ? await import('./render/gpuTrail.js').then((m) => m.gpuTrailOn(canvas, globalThis.daggerShell.gpuTrail)).catch(() => null) : null;
   const renderer = new Renderer(canvas);
   onPageGone(() => { pageGoing = true; loseGlContext(renderer.gl); });   // GL-LEAK: the game's own context, let go as the page goes
-  import('./render/portraitRenderer.js').then(({ setPortraitRenderer }) => setPortraitRenderer(renderer)).catch(() => {});   // PORTRAIT3D: the faces' renderer, for the menu's wells that hold none (behind a door: BOOT2's ceiling)
+  startRendererWork(renderer);
   renderer.setRetroSource(retroFrameConfig);   // RETRO1: DFU's retro mode - asked once per world frame, so the settings screen's change lands on the next
   renderer.setRenderScaleSource(renderScaleSetting);   // PERF-SCALE: the world's share of the window's pixels - asked once per world frame, and retro wins
   renderer.setDistanceShadeSource(classicDistanceShading);

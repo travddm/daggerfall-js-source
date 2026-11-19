@@ -371,50 +371,7 @@ export function skinNormalMatrix(m, out = new Float32Array(9)) {
   return out;
 }
 
-/**
- * MWNPC1: A LANE'S CHARACTER FRAGMENT SHADER, TAUGHT THE SKINNED BODY'S FACE NORMAL. packFpArm writes each
- * triangle's normal as the cross product of its POSED corners (times the mirror's flip), and the vertex shader
- * cannot know a triangle's other corners. The fragment can: vRel is linear across its triangle, so
- * cross(dFdx(vRel), dFdy(vRel)) is that triangle's plane normal exactly - its SIGN set by the triangle's winding on
- * the screen, which gl_FrontFacing reports against the renderer's front face (CW - the projection mirrors x). For a
- * corner winding a, b, c counter-clockwise on the screen, cross(b - a, c - a) = 2 x area x the derivatives' cross,
- * whatever the lens does, so `ccw ? d : -d` IS the posed corners' cross in the world's axes.
- *
- * The CPU path then drew mat3(uModel) x n_model, and the world cross is cof(M) x n_model = det(M) M^-T n_model - so
- * n_model = M^T n_world / det(M), and the CPU's normal is sign(det M) x M M^T x n_world. `uSkinNrm` is exactly that
- * matrix (drawCharacter, per draw) and `uSkinFlip` the range's mirror (rigid left-side parts, packFpArm's `flip`):
- * with them the skinned body is lit as the packed one was, a race's unequal weight and height included.
- *
- * The edit is to the SOURCE, once per lane set: the vNormal input becomes a global the top of main() fills -
- * before any discard, so the derivatives run in uniform control flow - and every line after reads it as it read
- * the input. A lane without exactly one `in vec3 vNormal;` and one `void main() {` throws: a silent no-op here is a
- * body lit by a zero normal.
- */
-export function skinFaceFs(fs) {
-  const decl = 'in vec3 vNormal;';
-  const main = 'void main() {';
-  const n = (needle) => fs.split(needle).length - 1;
-  if (n(decl) !== 1 || n(main) !== 1) {
-    throw new Error(`MWNPC1: a character fragment shader needs one "${decl}" and one "${main}" (has ${n(decl)} and ${n(main)})`);
-  }
-  return fs.replace(decl, SKIN_FACE_DECL).replace(main, `${main}\n  vNormal = charFaceNormal();`);
-}
-const SKIN_FACE_DECL = `in vec3 vNormalV;
-in vec3 vRel;
-uniform float uSkin;
-uniform mat3 uSkinNrm;
-uniform float uSkinFlip;
-uniform float uFrontCW;
-vec3 vNormal;
-vec3 charFaceNormal() {
-  vec3 d = cross(dFdx(vRel), dFdy(vRel));
-  if (uSkin < 0.5) return vNormalV;
-  if (dot(vNormalV, vNormalV) > 1e-20) return vNormalV;
-  bool ccw = gl_FrontFacing != (uFrontCW > 0.5);
-  vec3 nw = ccw ? d : -d;
-  if (dot(nw, nw) < 1e-36) return vec3(0.0, 1.0, 0.0);
-  return normalize(uSkinFlip * (uSkinNrm * nw));
-}`;
+export { skinFaceFs };   // the skinned face normal, with the world set's sources (render/world-set-programs.ts)
 
 // MAC-Q: THE PARTICLE QUAD, osgParticle's own (ParticleSystem
 // .cpp:360-403): a camera-facing quad of half-extent `size` on the view's
@@ -747,6 +704,8 @@ import { groundAnisotropy, groundMagFor, groundSamplerFor, groundSharpnessTier, 
 import { refreshWorldSamplingOnChange } from './live-world-sampling.ts';
 import { applyRetroSharp } from './retro-sharp.ts';
 import { setFragment, sharpWanted, startWorldSets } from './sharp-world-sets.ts';
+import { skinFaceFs, worldSetPrograms } from './world-set-programs.ts';
+import { noteTerrainClipBuilt } from './terrain-clip-hint.ts';
 import { RetroPass } from './retroPass.js';   // RETRO1: DFU's retro mode - the world's small image, its effect and its present (a leaf, the air pass's kind)
 import { decalIndices, DECAL_FLOATS_PER_VERTEX } from '../combat/blood/bloodDecals.js';   // BLOOD1a: the index winding and the vertex stride are the decal module's, so the writer and the buffer cannot disagree about the format
 import { BLOOD_ABSORB_ENCODED, INK_DEPTH } from '../combat/blood/bloodArt.js';
@@ -1632,6 +1591,9 @@ export function buildWireIndices(triIndices, subMeshes) {
 }
 
 
+/** The world sets' vertex shaders and the classic decal shader (render/world-set-programs.ts), for the boot's start too. */
+export const WORLD_SET_SHADERS = Object.freeze({ mesh: VS, charSkin: CHAR_SKIN_VS, billboard: bbVertexShader, terrain: TERRAIN_VS, decal: DECAL_VS, decalFs: DECAL_FS });
+
 export class Renderer {
   // HARD3: two fields this class mints LAZILY, with `??=` at their point
   // of use, and so never declares anywhere a reader or a checker can see
@@ -2260,6 +2222,8 @@ export class Renderer {
    *  fragment is lit, never how a vertex lands; LA-COST3: a lane may ADD a
    *  per-quad term to the billboard's, bbVertexShader, and places nothing). */
   _buildWorldSet(src) {
+    // The five programs start together, so the set waits for its slowest link, not for the sum of the five.
+    if (parallelCompile(this.gl)) startPrograms(this.gl, worldSetPrograms(src, WORLD_SET_SHADERS));
     const fs = (source) => setFragment(src, source);   // a Sharp set's world-art samples rewritten (render/sharp-world-sets.ts)
     return {
       key: src.key,
@@ -7538,7 +7502,7 @@ void main() { vec4 t = texture(uTex, vUV); if (t.a < 0.5) discard; outColor = ve
   /** FAR-CLIP1: build the installed set's terrain clip program NOW - the
    *  streaming host asks as Iliac Puddle No More mounts, beside the mod's own
    *  programs, so the first frame that draws a coast does not compile it. */
-  prepareTerrainClip() { this._ensureTerrainClip(); }
+  prepareTerrainClip() { this._ensureTerrainClip(); noteTerrainClipBuilt(); }   // the next boot starts the clip early (render/terrain-clip-hint.ts)
   /** RenderSettings.ambientLight's stand-in: the ambient the world programs light by this frame (snow_status reads it - AUDIT ENVIRONS S6). */
   get ambientLight() { return this._ambient; }
   /** SNOWFALL1 (AUDIT ENVIRONS I5): the installed set's snow program, built when the snow's surface is made (scenes/
