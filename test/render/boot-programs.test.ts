@@ -87,7 +87,7 @@ function fakeContext(parallel: boolean) {
 /** What the hosts build after the renderer's constructor, by the same switches the start reads. */
 function hostBuilds(renderer: { gl: unknown; prepareTerrainClip: () => void }, search: string): void {
   syncLightingLane(renderer, search);
-  if (terrainClipExpected()) renderer.prepareTerrainClip();
+  renderer.prepareTerrainClip();
   if (cloudsExpected(search)) new VolumetricClouds(renderer.gl, 'default', [0, 0, 64, 64]);
 }
 
@@ -107,7 +107,7 @@ test('the boot starts the lane world set, the terrain clip and the clouds, and e
   const early = fakeContext(true);
   const earlyRenderer = new Renderer(early.canvas);
   const before = early.links();
-  const started = bootPrograms(earlyRenderer, search).length;
+  const started = bootPrograms(earlyRenderer, search, true).length;
   assert.equal(startBootPrograms(earlyRenderer, search), true);
   assert.equal(early.links() - before, started, 'one link for each program started');
   assert.ok(started >= 5 + 1 + 7, `the lane set, the clip and the clouds (${started})`);
@@ -129,4 +129,10 @@ test('a world set hands all five programs to the driver before it reads the firs
   const firstRead = context.log.indexOf('read');
   const linksBeforeFirstRead = context.log.slice(0, firstRead).filter((entry) => entry === 'link').length;
   assert.ok(linksBeforeFirstRead >= 5, `the classic set's five linked before its first read (${linksBeforeFirstRead})`);
+});
+
+test('the boot takes the terrain clip record: a second ask in the same page answers no', () => {
+  stored.set('dfo.terrainClipBuilt', '1');
+  assert.equal(terrainClipExpected(), true);
+  assert.equal(terrainClipExpected(), false);
 });
