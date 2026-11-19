@@ -36,7 +36,7 @@ import { signalAutomapReset } from '../ui/automap/automapWindow.js';   // A1: th
 // EM3: the skin fork. The classic skin keeps DFU's 3D panel whole; the
 // enhanced one gets the held sheet with the dungeon's plan inked on it.
 import { createAutomapWindow, preloadAutomapArt, automapDoorReady } from '../ui/automap/automapDoor.js';
-import { applyTextureTable } from '../world/dungeon/dungeonTextures.js';
+import { remapAndPrefetchDungeonArt, prefetchFoeArt } from './dungeon-art-prefetch.ts';   // the dungeon's texture table, and its art fetched ahead of the build
 import { createUseMagicItemWindow, noItemToActivateText } from '../ui/useMagicItemWindow.js';   // UI1: the U key's window
 import { cannotChangeIndoorsText } from '../ui/transportWindow.js';   // TR5: the indoors refusal
 import { smallerDungeonsStamp, needsStartWarp } from '../world/smallerDungeons.js';   // AUDIT 28 W4 / FT1: the save-time stamp and the load-time warp, one home
@@ -485,7 +485,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
       if (mine.length) b.layout = { ...b.layout, flats: [...b.layout.flats, ...mine] };
     }
   }
-  const remap = (archive) => applyTextureTable(archive, dungeon.textureTable, climateBaseType);
+  const remap = remapAndPrefetchDungeonArt(dungeon, climateBaseType, { modelOf: getModelPre, getTexture });   // the build below meets each archive fetched or in flight
 
   // SPAWNED-DUNGEONS-TTL: told once, the moment this context is built for a dungeon this client's own
   // hash synthesized (world/spawnedDungeons.js's `spawned: true` - never true for any real location).
@@ -1671,7 +1671,7 @@ export async function buildDungeonContext(deps, dfLocation, blocks, climateBaseT
     if (!flatGroups.has(key)) flatGroups.set(key, []);
     flatGroups.get(key).push(Object.assign([e.x, e.y, e.z], { noCover: true }));   // AUDIT TACT B3: a foe's stand-in is no cover
   }
-  for (const e of enemies) await buildFoeAt(e);
+  for (const e of prefetchFoeArt(enemies, getTexture)) await buildFoeAt(e);   // their sprite archives fetched together first
   // ONLINE-DUNGEON-FOES. BOTH
   // REPORTS ARE THIS ONE LINE, and it was flagged rather than fixed because the fix is a slice,
   // not an edit. `_layoutFoes` is the layout's run, and every foe appended past it - a quest
