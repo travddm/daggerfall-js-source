@@ -532,7 +532,7 @@
     "server-account/src/guilds.js": 33,
     "server-account/src/halls.js": 32,
     "server-account/src/homeTransfer.js": 78,
-    "server-account/src/homes.js": 79,
+    "server-account/src/homes.js": 69,
     "server-account/src/hunts.js": 9,
     "server-account/src/index.js": 744,
     "server-account/src/judge.js": 3,
