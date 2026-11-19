@@ -107,6 +107,7 @@ test('a realm character whose home chest holds goods is not deleted', async () =
   deposit();
   const answer = await call('/v1/realm/delete', { id: realm.id });
   assert.equal(answer.body.error, 'home-holds');
+  assert.equal(answer.status, 409);
   const row = svc.env.DB._raw.prepare('SELECT obj FROM realm_characters WHERE id = ?').get(realm.id) as { obj: string };
   assert.ok(svc.env.SAVES._map.has(row.obj), 'its save stays');
   assert.deepEqual([count('homes'), count('decor_bin')], [1, 1]);
