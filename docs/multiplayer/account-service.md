@@ -61,7 +61,8 @@ The service imports shared law from `src/net/` (for example `identityToken.js`, 
 `route()` handles, in order:
 
 1. `OPTIONS` (CORS). `Access-Control-Allow-Origin` is `ALLOWED_ORIGIN` (`*`). Allowed headers include
-   `authorization`, `x-session-pass`, `x-d1-bookmark`, `x-realm-lease`, `x-realm-seq`, `x-staff-session`.
+   `authorization`, `x-session-pass`, `x-d1-bookmark`, `x-realm-lease`, `x-realm-seq`, `x-realm-summary`, `x-realm-leave`,
+   `x-staff-session`.
 2. `/v1/health` and `/v1/pubkey` inline.
 3. `SAFE_OPEN_ROUTES`: `/v1/mod/feed` (relay feed, signature over the exact bytes). No session.
 4. Signed relay feeds: `/v1/mod/grant-feed`, `/v1/mod/reaction-feed`, `/v1/mod/hidden-seen`, `/v1/staff/net-feed`,

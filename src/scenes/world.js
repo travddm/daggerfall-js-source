@@ -850,7 +850,7 @@ import { partySizeOf, partyExtraFoes, partyGroupMembers } from '../systems/party
 import { GROUP_ROLL_RADIUS } from '../systems/campEncounters.js';   // PSCALE1: outdoors, the party a roll stands for is the camp's own group
 import {
   realmIo, openRealmBoot, createRealmSession, realmSummaryOf, setRealmNotice, realmCreate, realmPut, realmBootSearch, realmRefusalText,
-  REALM_OFFLINE_TEXT, REALM_EXIT_WAIT_MS, whenPageHides, whenPageGoes, realmTradeEscrow, realmGoldAct, realmDoorShut,
+  REALM_OFFLINE_TEXT, REALM_EXIT_WAIT_MS, whenPageHides, realmTradeEscrow, realmGoldAct, realmDoorShut,
   REALM_RESTORED_TEXT, realmStrandedText, realmSaveWithHeld, realmList, realmUnions,
   realmFetch,   // PERMADEATH-HOUSES: a fallen member's record read, for their home's cupboards
 } from '../systems/realmSaves.js';   // REALM P1.3: an online character is the realm's - joined, loaded and checkpointed through the service
@@ -893,6 +893,7 @@ import { homeDecorShown } from '../net/homeVoteLaw.js';   // HOME-VOTE: a shunne
 import { createCaravanVisitLink } from '../net/caravanVisitLink.js';   // WAGONS2-VISIT: the visited caravan's cell, heard from inside it
 import { RECEIVER_MARKS } from '../net/realm/realmTradeLaw.js';   // WAGONS2-VISIT (AUDIT): the last owner's marks, never carried to the next
 import { GATE_BRAIN_V } from '../net/wire.js';   // AUDIT WBX R7: the brain's law this client knows, said on every `in`
+import { watchRealmClose } from '../systems/online/realm-close-save.ts';   // a closed tab's last save, packed ahead and sent with the seat's release
 import { characterIdOf } from '../systems/characterId.js';   // AUDIT HCC-PARK: my parked team is my CHARACTER's (the relay keys it by the account and this)
 import { chooseTable, tableMoveSpeed } from '../player/eyeOfTheBeholder/eotbBillboard.js';   // AUDIT RIDE: the rider's gallop is the table the rider's own sprite shows
 import { PARTY_READY_TIMEOUT_MS, memberPresent, latestStamp, voteStands, snapshotCancels, cancelRequestFor, mirrorKey, cooldownStamp, stampOf, restsAlone, partyRestsTogether, restAloneText, restsApart, REST_APART_TEXT } from '../systems/party/partyRestLaw.js';   // AUDIT PARTY-REST: the pure half of the party-rest mechanic, pinned by execution   // SOC2: the hub's room and the party pose's floor (a second wire import: AUDIT WORLD4 A1 pins the first as it stands)
@@ -16852,7 +16853,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     try { duelLeaveNow(); } catch { /* no duel was built: nothing to end */ }
     // REALM P1.3: a realm character writes no local slot. AUDIT REALM2 C2: nor gives its lease up here - this comes before
     // the unload guard's "Leave site?" is answered, and a Stay played on in a session already left (every checkpoint
-    // refused, F9 saying "saved"); the leave is the page's going (pagehide, whenPageGoes below)
+    // refused, F9 saying "saved"); the leave is the page's going (pagehide, watchRealmClose below)
     if (realmSession) return;   // the realm's: no slot
     const save = (saveName) => (modes ? modes?.quickSaveNow(saveName) : worldQuickSave(saveName));   // `?.` even inside the ternary: audit24 wave37's gate above the declaration is all-or-nothing
     for (const saveName of exitAutosaveNames(playerEntity, { deathUp: townTalk.overlay instanceof DeathScreen || !!modes?.deathUp?.() || successionOpen() })) save(saveName);   // AUDIT LEGACY B1: the Succession is a death up
@@ -16911,11 +16912,10 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     exitToTitleMenu();
   }
   if (realmSession) {
-    // the title exit and the page put away are the checkpoint's: registered with its other doors (THE CHECKPOINT'S
-    // DOORS, below the duel's). AUDIT REALM2 C2: the lease given up as the page GOES (pagehide, the unload guard answered) - the leave alone, with
-    // keepalive (the browser finishes it; a save that large it cannot, so the periodic checkpoints - ONLINE_CHECKPOINT_MS -
-    // and the one the page asked as it hid bound what a close costs) - and taken again when a page the back-forward cache kept is shown
-    whenPageGoes(globalThis, () => { legacyHost?.pageGone(); realmSession.leave({ keepalive: true }); }, () => { realmSession.rejoin(); });   // REZ-BLOODLINE: a death held for a Resurrect decided first - its tombstone takes the lease, the leave then sends nothing
+    // The title exit and the page put away are the checkpoint's other doors (below the duel's). As the page goes, a save
+    // packed ahead goes with the seat's release, and the seat is taken again when the back-forward cache shows the page.
+    // A death held for a Resurrect is decided first: its tombstone takes the lease, and the leave then sends nothing.
+    watchRealmClose({ session: realmSession, win: globalThis, compose: (sink) => checkpointGateOpen() && realmCheckpoint({ sink }), held: () => _realmSaveHooks.held(characterIdOf(playerEntity)), summary: () => realmSummaryOf(playerEntity), pageGone: () => legacyHost?.pageGone() });
   }
   /** REALM P1.3: A CHARACTER BORN ONLINE - made at the service once chargen is done, its first save the service's
    *  checkpoint at sequence 1, and then the one online boot there is, from the service. Any refusal goes to the door. */

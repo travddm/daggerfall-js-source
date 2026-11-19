@@ -310,7 +310,7 @@ import { contractBoard, postContract, withdrawContract, contractPayStatements, c
 import { motherlodesRead, strikeMotherlode, isMotherlodeNode } from './motherlodes.js';   // PROF2b: the Motherlodes
 import { marketRead, marketList, marketBuy, marketCancel, marketOrder, marketFill, marketUnorder, marketCollect, marketReport, marketRemove, marketAuction, marketBid, marketGoldCollect, marketVendor, marketVendors, marketMyVendors, marketRoad } from './market.js';   // PROF5: the market; PROF5b: its auctions; GOLD-MARKET: gold held collected; RPT1026-MARKET: the road alone
 import {
-  listRealm, createRealm, joinRealm, checkpointRealm, getRealmBlob, leaveRealm, deleteRealm,
+  listRealm, createRealm, joinRealm, getRealmBlob, leaveRealm, deleteRealm,
   realmMintFacts, modeClaimOf, REALM_CHARACTERS_MAX, REALM_MAX_BYTES, objectBytesOf,
 } from './realm.js';   // REALM P1: the realm's characters; ARENA4b: the level on a realm character's tile, the token's `cl`
 import { grantSpoils } from './budget.js';   // INT5: a signed win's spoils fill the playing character's budget
@@ -320,6 +320,7 @@ import { passRoute, passKey, mintPass, readPass, passMintable } from './sessionP
 import { SESSION_PASS_HEADER } from '../../src/net/sessionPassLaw.js';   // SESSION-SIGN: its one name on the wire
 import { PROGRESS_ROUTES, seatRefusalOf, progressConfig, progressRoom, progressSpent } from './progress.js';   // INT16-INT17: a progression claim's seat, and the play that pays for it
 import { isGzip, gzipSizeOf, gunzipText, REALM_TEXT_MAX_BYTES } from '../../src/net/realm/realmSaveCodec.js';   // REALM-GZIP: a save rides packed
+import { putRealmSave } from './realm-save-route.js';   // the realm character's save route, past the body's bounds
 import { tradeRealm, REALM_TRADE_BODY_MAX } from './realmTrade.js';   // REALM P2.1: a trade, settled here
 import { listLineages, putLineage, realmDie, realmRaise, realmWed, listUnions, LINEAGE_BODY_MAX } from './legacy.js';   // LEGACY7: Project Legacy's lines and the tombstone; REZ-BLOODLINE AUDIT R1: a Resurrect inside its hold
 import { measured, heartbeatPartsOf } from './metrics.js';   // SCALE1: every request counted (Workers Analytics Engine); AUDIT SCALE II A-3: a heartbeat's parts, of the body the route read
@@ -704,7 +705,7 @@ const service = {
         headers: {
           'access-control-allow-origin': origin,
           'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'access-control-allow-headers': 'content-type, authorization, x-realm-lease, x-realm-seq, x-realm-summary, x-d1-bookmark, x-session-pass, x-staff-session',   // a checkpoint's lease, sequence and tile, the tab's D1 bookmark, the session's pass
+          'access-control-allow-headers': 'content-type, authorization, x-realm-lease, x-realm-seq, x-realm-summary, x-realm-leave, x-d1-bookmark, x-session-pass, x-staff-session',   // a checkpoint's lease, sequence, tile and closing release, the tab's D1 bookmark, the session's pass
           'access-control-max-age': '86400',
         },
       });
@@ -2233,8 +2234,7 @@ const service = {
         }
         if (realmSlot) {
           if (request.method === 'PUT') {
-            // A RAW BODY against the save's own bound, as the save slots read theirs; the lease, the sequence and
-            // the tile ride headers, since the body is the save.
+            // A RAW BODY against the save's own bound, as the save slots read theirs (realm-save-route.js reads the rest).
             const raw = await readCapped(request, REALM_MAX_BYTES);
             if (!raw) return no('too-large', 413, origin);
             if (!raw.byteLength) return no('body', 400, origin);
@@ -2242,12 +2242,7 @@ const service = {
             // trailer's word, unread; every opening keeps the bound itself, so a gzip that lies buys nothing)
             const packed = new Uint8Array(raw);
             if (isGzip(packed) && gzipSizeOf(packed) > REALM_TEXT_MAX_BYTES) return no('too-large', 413, origin);
-            let summary = null;
-            try { summary = JSON.parse(request.headers.get('x-realm-summary') || 'null'); } catch { summary = null; }
-            const r = await checkpointRealm(rctx, me, {
-              id: realmSlot.id, lease: request.headers.get('x-realm-lease'), seq: Number(request.headers.get('x-realm-seq')), summary,
-              session: who.session?.id ?? null,   // SESSION-SIGN (AUDIT PLAN-1000 E3): the save asks its session and the ban itself
-            }, raw, raw.byteLength);
+            const r = await putRealmSave(rctx, me, { id: realmSlot.id, headers: request.headers, raw, session: who.session?.id ?? null });
             // a sequence refused says the service's own, so a tab whose last answer was lost can resync (never a way in:
             // the write still needs the lease)
             if (r.error === 'seq') return json({ error: 'seq', seq: r.seq }, 409, origin);
