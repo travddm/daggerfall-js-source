@@ -1,6 +1,6 @@
 // A shared chest's goods keep their piece: a write that would delete the piece, or the home and so its pieces, or make
 // the piece no longer a container, refuses while the chest holds goods (server-account/src/decor-bin-holds.ts and the
-// key in server-account/migrations/0010_decor_bin_piece_key.sql).
+// key in server-account/migrations/0012_decor_bin_piece_key.sql).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
