@@ -10,7 +10,7 @@
 
 import { CHARACTER_MODES_SETTINGS } from './characterModesSettings.js';
 import { appStorage } from './appStorage.js';   // the one storage seam - localStorage lives there alone
-import { onlineForcedModSetting, onlineWholeModKey, isOnlinePage, rollingAsTheRoom, ONLINE_ROOM_MOD_KEYS, ONLINE_WHOLE_MODS } from './online/onlineLane.js';   // MODS-ONLINE-2: online, the room's ground is forced and every other switch is the player's; REALM P0.2: and the balance mods whole
+import { onlineForcedModSetting, onlineWholeModKey } from './online/onlineLane.js';   // MODS-ONLINE-2: online, the room's ground is forced and every other switch is the player's; REALM P0.2: and the balance mods whole
 import { FOOT_SKIN_COUNT, CLASS_SKINS, classSkinLabel } from '../player/classSkins.js';   // SKIN2: the class skins past the mod's sixteen
 import { t, localizedText } from './textManager.js';   // L10N4: every setting's description and option names in the player's language, read when they are read; DFU's own key where it has the same word
 
@@ -1747,41 +1747,7 @@ export function storedModSetting(vendor, key) {
   return load()[vendor]?.[key];
 }
 
-// A mod's resolved settings are kept until something they are read from changes: the store (its generation), whether
-// the page is online, a room's base roll, and the installed server profile's tables (each install assigns new ones).
-// The widgets, the torches and the cart ask for a whole mod's settings every frame.
-/** @typedef {{ generation: number, online: boolean, roomRoll: boolean, roomModKeys: unknown, wholeMods: unknown }} ResolvedSettingsState */
-/** @type {Map<string, Record<string, unknown>>} */
-const _resolvedByVendor = new Map();
-/** @type {ResolvedSettingsState | null} */
-let _resolvedState = null;
-
-function resolvedSettingsStateIsCurrent() {
-  const state = _resolvedState;
-  return state !== null
-    && state.generation === _generation
-    && state.online === isOnlinePage()
-    && state.roomRoll === rollingAsTheRoom()
-    && state.roomModKeys === ONLINE_ROOM_MOD_KEYS
-    && state.wholeMods === ONLINE_WHOLE_MODS;
-}
-
-/** Every key of one vendored mod, resolved, in a new object for each caller: a caller may write to its copy. */
-export function modSettingsOf(vendor) {
-  const keys = MOD_SETTINGS[vendor]?.keys;
-  if (!keys) throw new Error(`modSettingsOf: ${vendor} is not a vendored mod with switches`);
-  if (!resolvedSettingsStateIsCurrent()) {
-    _resolvedByVendor.clear();
-    _resolvedState = { generation: _generation, online: isOnlinePage(), roomRoll: rollingAsTheRoom(), roomModKeys: ONLINE_ROOM_MOD_KEYS, wholeMods: ONLINE_WHOLE_MODS };
-  }
-  let resolved = _resolvedByVendor.get(vendor);
-  if (!resolved) {
-    resolved = {};
-    for (const k of Object.keys(keys)) resolved[k] = modSetting(vendor, k);
-    _resolvedByVendor.set(vendor, resolved);
-  }
-  return { ...resolved };
-}
+export { modSettingsOf } from './mod-settings-of.ts';   // every key of one vendored mod, resolved, in a new object
 
 /** AUDIT 68 S15-eotb-settings-snapshot: DFU's ModSettingsChange, as a
  *  number. Every write moves it, so a reader that holds a resolved copy
