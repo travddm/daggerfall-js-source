@@ -61,7 +61,7 @@ export const INTERIOR_SEAMS_ROW: InteriorSeamsRow = Object.freeze({
     initial: 'on',
     online: 'player',
     tiers: Object.freeze([
-      tier('on', () => localizedText('on', 'On')),
+      tier('on', () => t('menu.toggle.on', 'On')),
       tier(INTERIOR_SEAMS_OFF, () => localizedText('off', 'Off')),
     ]),
   }),
