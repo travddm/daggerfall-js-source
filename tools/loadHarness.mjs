@@ -531,11 +531,12 @@ function tickBot(bot, ctx, o) {
   }
 }
 
-/** Ticks every bot each `period` ms, each at its own random phase. Returns a stop function.
+/** Ticks every bot about each `period` ms, each at its own random phase. Returns a stop function.
  *  Timers cannot do this on Windows: every timer fires on the 15.6 ms system tick, so bots on intervals of their own
  *  still send in the same millisecond, and the relay's batch timer, on the same grid, then holds every pose for its
- *  whole window. Players' frame loops are not in step, so the loop polls the clock instead. */
-export function phasedTicker(bots, tick, { period = 50, now = () => performance.now(), defer = setImmediate, random = Math.random } = {}) {
+ *  whole window. Players' frame loops are not in step, so the loop polls the clock instead. Each interval varies by
+ *  up to `jitter` of the period, as a frame loop's does, so bots that a stall brought into step drift apart again. */
+export function phasedTicker(bots, tick, { period = 50, jitter = 0.2, now = () => performance.now(), defer = setImmediate, random = Math.random } = {}) {
   const start = now();
   const dueAt = new Map(bots.map((bot) => [bot, start + random() * period]));
   let running = true;
@@ -544,7 +545,8 @@ export function phasedTicker(bots, tick, { period = 50, now = () => performance.
     const at = now();
     for (const [bot, due] of dueAt) {
       if (at < due) continue;
-      dueAt.set(bot, Math.max(due + period, at));
+      const next = due + period * (Math.floor((at - due) / period) + 1);   // whole periods: a stall keeps each phase
+      dueAt.set(bot, jitter > 0 ? next + (random() - 0.5) * 2 * jitter * period : next);
       tick(bot);
     }
     defer(loop);
