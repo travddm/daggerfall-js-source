@@ -60,6 +60,9 @@ import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../src/systems/realmSaves.js';
 import { worldRoom, CHAT_WORLD_ROOM, PIXEL_UNITS } from '../src/net/wire.js';
 import { PIXEL_M } from '../src/net/gate/gateLaw.js';
+import { OFFICIAL_PROFILE } from '../src/net/profile/officialProfile.ts';
+import { profileHashOf } from '../src/net/profile/profileHash.ts';
+import { installProfile } from '../src/systems/online/serverProfile.ts';
 import { ACCEPTED } from '../src/net/legalLaw.js';
 
 const ROOT = process.env.TREE || fileURLToPath(new URL('..', import.meta.url));
@@ -208,6 +211,9 @@ async function main() {
     console.log(`== setting up ${most} bots`);
     for (let i = 0; i < bots.length; i += BOT_O.setup) await Promise.all(bots.slice(i, i + BOT_O.setup).map((b) => setUp(b, BOT_O)));
     const tally = relayTally();
+    // The relay refuses a hello that does not carry its profile hash. A page installs the profile in its front door; the
+    // bots are sessions in this process and install it here, once.
+    installProfile(OFFICIAL_PROFILE, await profileHashOf(OFFICIAL_PROFILE));
     const WS = localWebSocket({ port: svc.relayPort, tally });
     const relayUrl = `ws://127.0.0.1:${svc.relayPort}`;
     const botIds = new Set(bots.map((b) => b.id));
