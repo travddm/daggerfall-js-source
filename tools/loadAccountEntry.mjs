@@ -118,8 +118,8 @@ export default {
 
 /**
  * The cost of one trip through each storage binding, timed inside the isolate: `n` statements one after another
- * (`SELECT 1`, which measures the trip alone, and one indexed read of the players table), one batch of `n`, and `n`
- * puts, gets and deletes of a `kb` object in the save bucket. The isolate's clock moves only across I/O, so each figure
+ * (`SELECT 1`, which measures the trip alone, and one indexed read of the players table), one batch of `n`, the same
+ * for a one-row write, and `n` puts, gets and deletes of a `kb` object in the save bucket. The isolate's clock moves only across I/O, so each figure
  * is a total over `n` trips divided by `n`. Never on a deploy: this entry is the harness's own.
  * @returns {Promise<Record<string, number>>} milliseconds a trip, by operation
  */
@@ -138,6 +138,13 @@ async function bindingProbe(/** @type {any} */ env, /** @type {URLSearchParams} 
   const batchStart = Date.now();
   await env.DB.batch(Array.from({ length: n }, () => env.DB.prepare('SELECT 1')));
   out.batchOfNEach = (Date.now() - batchStart) / n;
+  // Writes go to a table of the probe's own: a write may wait on its commit, which a read never does.
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS load_probe (k INTEGER PRIMARY KEY, v INTEGER)').run();
+  let w = 0;
+  out.write = await timed(() => env.DB.prepare('INSERT OR REPLACE INTO load_probe (k, v) VALUES (?, ?)').bind(w++ % 64, w).run());
+  const writeBatchStart = Date.now();
+  await env.DB.batch(Array.from({ length: n }, (_, k) => env.DB.prepare('INSERT OR REPLACE INTO load_probe (k, v) VALUES (?, ?)').bind(k % 64, k)));
+  out.writeBatchOfNEach = (Date.now() - writeBatchStart) / n;
   // Bytes that do not compress, so no layer can shrink the object a trip carries.
   const body = crypto.getRandomValues(new Uint8Array(kb * 1024 > 65536 ? 65536 : kb * 1024));
   const object = new Uint8Array(kb * 1024);
