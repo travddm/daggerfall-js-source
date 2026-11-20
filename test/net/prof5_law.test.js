@@ -111,7 +111,7 @@ test('PROF5 law: the ledger\'s market kinds - the fee, the tax and the courier b
   const ledger = sqlOf('marks_ledger');
   assert.match(ledger, /src_kind TEXT NOT NULL CHECK \(src_kind IN \('mint', 'account', 'guild', 'escrow'\)\)/);
   assert.match(ledger, /dst_kind TEXT NOT NULL CHECK \(dst_kind IN \('burn', 'account', 'guild', 'escrow'\)\)/);
-  const triggers = raw.prepare("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'marks_line_%'").all().map((r) => r.sql);
+  const triggers = raw.prepare("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'marks_line_pays_%'").all().map((r) => r.sql);
   assert.equal(triggers.length, 4, 'four triggers move the balances');
   assert.ok(triggers.every((t) => !/WHEN NEW\.(src|dst)_kind = 'escrow'/.test(t)), 'an escrow end moves no balance by trigger');
   assert.match(sqlOf('world_witness'), /kind\s+TEXT NOT NULL CHECK \(kind IN \('pixel', 'dungeon', 'hub'/);

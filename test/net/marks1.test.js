@@ -139,7 +139,7 @@ test('MARKS1 the schema: a line moves both balances on its own insert; a line th
   assert.equal(raw.prepare('SELECT balance FROM marks WHERE account = ?').get(a.id).balance, 70);
   line('account', a.id, 'burn', null, 20, 'r-000002');
   assert.equal(raw.prepare('SELECT balance FROM marks WHERE account = ?').get(a.id).balance, 50);
-  assert.throws(() => line('account', a.id, 'burn', null, 51, 'r-000003'), /CHECK/, 'never below nothing');
+  assert.throws(() => line('account', a.id, 'burn', null, 51, 'r-000003'), /CHECK|marks payer short/, 'never below nothing');
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM marks_ledger').get().n, 2, 'and the refused line is not written');
   assert.throws(() => line('mint', null, 'account', a.id, MARKS_MAX, 'r-000004'), /CHECK/, 'never past the cap');
   assert.throws(() => line('mint', null, 'account', a.id, 1, 'r-000001'), /UNIQUE/, 'one line a request');

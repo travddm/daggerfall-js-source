@@ -41,8 +41,9 @@
 // the firing (AUDIT SCALE A2: FIRING_STATEMENTS_MAX, under D1's thousand queries a Worker invocation; a settler stops
 // between its items when its share is spent, and asks again only while a full page MOVED, never while one was merely
 // picked). Each writes one metrics point, as a request does (metrics.js; `cron:<job>` its route, `CRON` its method, the
-// statements it ran, the rows it moved as a fourth double). A service held for maintenance (service.js maintaining -
-// RESTORE's rewind) runs nothing: a write in the rewind's minute would vanish with it.
+// statements it ran, its rows read and written, and the rows it moved as the twelfth double). A service held for
+// maintenance (service.js maintaining - RESTORE's rewind) runs nothing: a write in the rewind's minute would vanish with
+// it.
 // ═══════════════════════════════════════════════════════════════════
 
 import { crewSweep } from './crewSigns.js';   // CREW-SIGNED
@@ -57,10 +58,11 @@ import { safetyMinute, safetySweep } from './safetyClock.js';   // the reviewer'
 import { sweepGuildNotes } from './guildBoard.js';
 import { sweepHarvests } from './professions.js';
 import { sweepCraftWrits } from './craftWrits.js';   // CRAFT-WRITS: an unfilled crafting writ the day after its own
-import { retryFreezePushes, sweepStaffChat } from './staffFreeze.js';   // STAFF-PANEL5-FREEZE: a freeze's push again, the staff chat's sweep
+import { retryFreezePushes, sweepStaffChat } from './staffFreeze.js';
+import { sweepGrantFeed, GRANT_SWEEP_BATCHES } from './grants.js';   // STAFF-PANEL5-FREEZE: a freeze's push again, the staff chat's sweep
 import { SESSION_IDLE_S } from './accounts.js';
 import { storeArenaChampion, ARENA_CHAMPION_CLOCK_S } from './arena.js';
-import { countedDb } from './metrics.js';
+import { countedDb, newTally, d1Doubles, tablesBlob } from './metrics.js';
 import { maintaining } from './service.js';
 import { WRIT_SETTLE_MAX } from '../../src/net/writLaw.js';
 import { seatsSwitchOf, seasonZeroOf } from '../../src/net/townSeatLaw.js';
@@ -269,6 +271,8 @@ export const HOUR_JOBS = Object.freeze([
   // STAFF-PANEL5-FREEZE (staffFreeze.js): a freeze's thread whose freeze ran out closed, and the staff chat's lines past
   // STAFF_LINES_KEEP_S (90 days)
   ['staff-chat', (ctx) => rounds(() => sweepStaffChat(ctx.db, ctx.nowS, SWEEP_ROWS), SWEEP_ROWS, ctx.budget)],
+  // The grant feed's batches past GRANT_FEED_KEEP_S, with their rows and tallies
+  ['grant-feed', (ctx) => rounds(() => sweepGrantFeed(ctx.db, ctx.nowS, GRANT_SWEEP_BATCHES), GRANT_SWEEP_BATCHES, ctx.budget)],
 ]);
 
 /** The jobs a schedule runs - none for a schedule this service does not keep (said, so a trigger renamed in
@@ -290,7 +294,7 @@ export async function runCron(env, { cron, nowS, rand = (b) => { crypto.getRando
   const out = [];
   const share = Math.floor(FIRING_STATEMENTS_MAX / Math.max(1, jobs.length));
   for (const [name, job] of jobs) {
-    const tally = { n: 0 };
+    const tally = newTally();
     const started = Date.now();
     let ok = true, changed = 0;
     try {
@@ -302,7 +306,15 @@ export async function runCron(env, { cron, nowS, rand = (b) => { crypto.getRando
     const ms = Date.now() - started;
     out.push({ name, ok, changed, statements: tally.n, ms });
     try {
-      env.METRICS?.writeDataPoint?.({ indexes: [`cron:${name}`], blobs: [`cron:${name}`, 'CRON', ok ? '200' : '500', ok ? '' : 'failed'], doubles: [ms, ok ? 200 : 500, tally.n, changed] });
+      // The request point's layout (metrics.js), so a job's rows read and written are summed with the requests'
+      const route = `cron:${name}`;
+      const status = ok ? 200 : 500;
+      const word = ok ? '' : 'failed';
+      env.METRICS?.writeDataPoint?.({
+        indexes: [route],
+        blobs: [route, 'CRON', String(status), word, tablesBlob(tally.tables), ''],
+        doubles: [ms, status, ...d1Doubles(tally), changed],
+      });
     } catch { /* a metric never costs a job */ }
   }
   return out;
