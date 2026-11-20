@@ -38,6 +38,7 @@ import { probeTransforms, editsPlugin, waitFrames, SWIFTSHADER_ARGS } from './fr
 import { ONLINE_PROBE_EDITS } from './onlineFrameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
 import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
+import { fakePointerLock } from './probes/lib/fakePointerLock.mjs';
 import { standServices, stopAll, localFetch, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../src/systems/realmSaves.js';
@@ -102,6 +103,7 @@ async function main() {
 
     console.log('== the first save: the classic start, composed by the world host offline');
     const cctx = await browser.newContext({ viewport: { width: W, height: H } });
+    await fakePointerLock(cctx);
     const cpage = await cctx.newPage();
     watch(cpage, 'compose');
     await cpage.goto(`http://localhost:${PORT}/play/?world&classic&class=1&novideo&shot&play`);
@@ -126,6 +128,7 @@ async function main() {
       const first = await rs.checkpoint(saveText);
       if (!first?.ok) throw new Error(`${label}'s first save did not land (${first?.error})`);
       const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+      await fakePointerLock(ctx);
       // the tutorials' popups off (systems/tutorials.js TUTORIAL_POPUPS_PREF on the UI shelf): the first loot's page is a box
       // over the window the probe opens, and a press under a box opens nothing
       await ctx.addInitScript(({ sk, sv, sess, base }) => {

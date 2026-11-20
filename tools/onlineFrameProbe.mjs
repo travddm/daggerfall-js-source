@@ -52,6 +52,7 @@ import { fileURLToPath } from 'node:url';
 import { probeTransforms, editsPlugin, waitFrames, settle, measure, measured, summaryLine, CENSUS, SWIFTSHADER_ARGS } from './frameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
 import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
+import { fakePointerLock } from './probes/lib/fakePointerLock.mjs';
 import { standServices, stopAll, makeBot, setUp, localFetch, localWebSocket, relayTally, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { OnlineSession } from '../src/net/online.js';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
@@ -139,6 +140,7 @@ async function main() {
     else {
       console.log('== the first save: an offline boot at Knightstale, composed by the world host');
       const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+      await fakePointerLock(ctx);
       const page = await ctx.newPage();
       await page.goto(`http://localhost:${PORT}/play/?world&region=Wayrest&loc=Knightstale&class=1&novideo&shot&play&tod=15:00`);
       await page.waitForFunction(() => window.__shotReady === true, null, { timeout: 1200000, polling: 500 });
@@ -157,6 +159,7 @@ async function main() {
 
     console.log('== the online boot');
     const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+    await fakePointerLock(ctx);
     await ctx.addInitScript(({ sk, sv, sess, base }) => {
       try { localStorage.setItem(sk, sess); localStorage.setItem(sv, base); } catch { /* a page without storage reads none */ }
     }, { sk: SESSION_KEY, sv: SERVICE_KEY, sess: JSON.stringify({ secret: made.secret, id: made.id, name: made.name }), base: `http://127.0.0.1:${svc.accountPort}` });
