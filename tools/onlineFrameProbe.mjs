@@ -5,6 +5,7 @@
 // online pays, through the frame probe's own three windows (tools/frameProbe.mjs measure): the census of every WebGL
 // call, the CPU profile by sample count, and the sampled heap.
 //
+// Run it as `node --import ./tools/raw-import-hooks.ts tools/onlineFrameProbe.mjs`: the game source it imports reaches `.vert` shaders, which plain node cannot load.
 //   ARENA2_PATH=/path/to/arena2 node tools/onlineFrameProbe.mjs            crowds of 0, 20, 60 and 0 again
 //   PEERS=0,40 CHAT=1 ...                                                   the crowds, in order (a smaller one after a
 //                                                                           larger sends the extra bots away); CHAT=1 opens
@@ -51,12 +52,17 @@ import { fileURLToPath } from 'node:url';
 
 import { probeTransforms, editsPlugin, waitFrames, settle, measure, measured, summaryLine, CENSUS, SWIFTSHADER_ARGS } from './frameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
+import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
+import { fakePointerLock } from './probes/lib/fakePointerLock.mjs';
 import { standServices, stopAll, makeBot, setUp, localFetch, localWebSocket, relayTally, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { OnlineSession } from '../src/net/online.js';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../src/systems/realmSaves.js';
 import { worldRoom, CHAT_WORLD_ROOM, PIXEL_UNITS } from '../src/net/wire.js';
 import { PIXEL_M } from '../src/net/gate/gateLaw.js';
+import { OFFICIAL_PROFILE } from '../src/net/profile/officialProfile.ts';
+import { profileHashOf } from '../src/net/profile/profileHash.ts';
+import { installProfile } from '../src/systems/online/serverProfile.ts';
 import { ACCEPTED } from '../src/net/legalLaw.js';
 
 const ROOT = process.env.TREE || fileURLToPath(new URL('..', import.meta.url));
@@ -138,6 +144,7 @@ async function main() {
     else {
       console.log('== the first save: an offline boot at Knightstale, composed by the world host');
       const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+      await fakePointerLock(ctx);
       const page = await ctx.newPage();
       await page.goto(`http://localhost:${PORT}/play/?world&region=Wayrest&loc=Knightstale&class=1&novideo&shot&play&tod=15:00`);
       await page.waitForFunction(() => window.__shotReady === true, null, { timeout: 1200000, polling: 500 });
@@ -156,6 +163,7 @@ async function main() {
 
     console.log('== the online boot');
     const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+    await fakePointerLock(ctx);
     await ctx.addInitScript(({ sk, sv, sess, base }) => {
       try { localStorage.setItem(sk, sess); localStorage.setItem(sv, base); } catch { /* a page without storage reads none */ }
     }, { sk: SESSION_KEY, sv: SERVICE_KEY, sess: JSON.stringify({ secret: made.secret, id: made.id, name: made.name }), base: `http://127.0.0.1:${svc.accountPort}` });
@@ -170,6 +178,7 @@ async function main() {
     const url = `/play/?world&online&realm=${c.data.id}&load&server=ws://127.0.0.1:${svc.relayPort}&novideo&shot&play&fps&tod=15:00`;
     const t0 = Date.now();
     await page.goto(`http://localhost:${PORT}${url}`);
+    await joinServerPrompt(page);
     // where the boot stands, every half minute until it is ready - an online boot refused goes to the title, never ready
     for (let i = 0; !(await page.evaluate(() => window.__shotReady === true)); i++) {
       if (i >= 40) throw new Error('the online boot never readied in 20 minutes');
@@ -202,6 +211,9 @@ async function main() {
     console.log(`== setting up ${most} bots`);
     for (let i = 0; i < bots.length; i += BOT_O.setup) await Promise.all(bots.slice(i, i + BOT_O.setup).map((b) => setUp(b, BOT_O)));
     const tally = relayTally();
+    // The relay refuses a hello that does not carry its profile hash. A page installs the profile in its front door; the
+    // bots are sessions in this process and install it here, once.
+    installProfile(OFFICIAL_PROFILE, await profileHashOf(OFFICIAL_PROFILE));
     const WS = localWebSocket({ port: svc.relayPort, tally });
     const relayUrl = `ws://127.0.0.1:${svc.relayPort}`;
     const botIds = new Set(bots.map((b) => b.id));

@@ -739,6 +739,8 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   const homeHeld = async () => {
     if (Number((await db.prepare(HOME_TENANTS_SQL).bind(playerId, id, nowS).first())?.n ?? 0) > 0) return { error: 'home-tenants' };
     if (Number((await db.prepare(HOME_RENT_DUE_SQL).bind(playerId, id).first())?.due ?? 0) > 0) return { error: 'home-rent-due' };
+    // Goods in a shared chest of its homes would be left with no chest to open them, so they are taken out first
+    if (await db.prepare(HOME_BIN_HELD_SQL).bind(playerId, id).first()) return { error: 'realm-home-holds' };
     return null;
   };
   const held = await homeHeld();
@@ -752,6 +754,10 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
   // with the delete in one batch, so the answer names exactly what went
   const [gone] = await db.batch([
     db.prepare('SELECT map_id, building_key FROM homes WHERE player = ? AND char_id = ? ORDER BY map_id, building_key').bind(playerId, id),
+    // A deposit that lands after the asking above goes with its home, and before it: the save objects are gone already,
+    // so the batch must not fail on the bin's key to the pieces.
+    db.prepare(`DELETE FROM decor_bin WHERE EXISTS (SELECT 1 FROM homes h WHERE h.map_id = decor_bin.map_id
+      AND h.building_key = decor_bin.building_key AND h.player = ? AND h.char_id = ?)`).bind(playerId, id),
     db.prepare('DELETE FROM homes WHERE player = ? AND char_id = ?').bind(playerId, id),
     db.prepare('DELETE FROM guild_members WHERE player = ? AND char_id = ?').bind(playerId, id),
     db.prepare('DELETE FROM renown_tracks WHERE player = ? AND char_id = ?').bind(playerId, id),
@@ -783,6 +789,9 @@ export const HOME_TENANTS_SQL = `SELECT COUNT(*) AS n FROM home_rooms r JOIN hom
   WHERE h.player = ?1 AND h.char_id = ?2 AND r.tenant IS NOT NULL AND r.until > ?3`;
 /** HOME-RENT: the rent held on a character's homes, not yet collected (`due`) - its delete waits for it too. */
 export const HOME_RENT_DUE_SQL = 'SELECT COALESCE(SUM(rent_due), 0) AS due FROM homes WHERE player = ?1 AND char_id = ?2';
+/** A row when a shared chest in any of a character's homes holds goods. `?1` the account, `?2` the character. */
+export const HOME_BIN_HELD_SQL = `SELECT 1 AS held FROM decor_bin b JOIN homes h ON h.map_id = b.map_id AND h.building_key = b.building_key
+  WHERE h.player = ?1 AND h.char_id = ?2 LIMIT 1`;
 /** ACCOUNT-HOMES: the goods standing for sale at the traders of the homes a character bought, whoever of the account
  *  stocked them (`n`) - its delete takes those homes and their traders, so it waits for them. `?1` the account, `?2` the
  *  character. */

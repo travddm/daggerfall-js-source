@@ -282,7 +282,7 @@ const REFUSAL_WORDS = {
   'no-rent-room': () => t('account.refusal.noRentRoom', 'That room is not offered to rent any more.'),
   'bad-room': () => t('account.refusal.badRoom', 'The account service could not read that room.'),
   'home-tenants': () => t('account.refusal.homeTenants', 'Somebody is renting a room in your home. It cannot be sold or deleted until their days run out.'),
-  'home-rent-due': () => t('account.refusal.homeRentDue', 'Rent is waiting to be collected at your home. Collect it first.'),
+  'home-rent-due': () => t('account.refusal.homeRentDue', 'Rent is waiting to be collected at your home. Collect it first.'), 'realm-home-holds': () => t('account.refusal.realmHomeHolds', 'Take the goods out of your home before you delete this character.'),
   // ARENA4b: a home the arena displaced (homes.js arenaMoveHome), and a house of its block an old build would buy
   'home-arena': () => ARENA_TEXT.homeMove.arena,
   'home-unmoved': () => ARENA_TEXT.homeMove.unmoved,

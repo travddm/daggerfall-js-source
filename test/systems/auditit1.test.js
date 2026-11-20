@@ -257,11 +257,21 @@ test('AUDIT IT1 G1: the header-count edit carries the editor\'s two round-trip c
   const mod = editorBlock();
   const rebuilt = patchJson(classicOf(mod), appendedEdit(mod));
   assert.equal(sha256Canonical(rebuilt), sha256Canonical(mod));
-  // the vendored four: 28 slots removed, three scales on each of the two classic models, then the author's records
+  // the vendored four: 28 slots removed and each classic model scaled to 1, then the author's records. A model whose
+  // rotation the editor also rewrote is set as one whole record, so its scale is read from that record.
+  const scaleSetOn = (p, model) => {
+    const scale = {};
+    for (const [kind, path, value] of p.ops) {
+      if (kind !== 's' || path[1] !== 'Misc3dObjectRecords' || path[2] !== model) continue;
+      if (path.length === 3) Object.assign(scale, { XScale: value.XScale, YScale: value.YScale, ZScale: value.ZScale });
+      else if (/^[XYZ]Scale$/.test(path[3])) scale[path[3]] = value;
+    }
+    return scale;
+  };
   for (const name of IT_GATE_BLOCKS) {
     const p = JSON.parse(read(`vendor/immersive-travel/WorldDataPatches/${name}.json`));
     assert.equal(p.ops.filter(([k, path]) => k === 'r' && path[2] === 'BuildingDataList').length, 28, name);
-    assert.equal(p.ops.filter(([k, path]) => k === 's' && /^[XYZ]Scale$/.test(path[3])).length, 6, name);
+    for (const model of [0, 1]) assert.deepEqual(scaleSetOn(p, model), { XScale: 1, YScale: 1, ZScale: 1 }, `${name}: classic model ${model}`);
   }
   assert.equal(appendedPatch(mod).sha256, sha256Canonical(mod));
 });
