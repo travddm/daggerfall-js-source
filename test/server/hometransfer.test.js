@@ -144,6 +144,7 @@ test('HOME-TRANSFER refuses a buyer who cannot pay, a full character, a house th
   assert.equal(capped.body?.error, 'home-cap');
   assert.equal(ownerOf(env).char_id, A.id);
   assert.equal((await call('POST', '/v1/homes/transfer', { op: 'decline', id: full.body.id }, mara)).status, 200);
+  env.DB._raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (?, ?, 'p1', 41000, '{}', 1)").run(HOME.mapId, HOME.buildingKey);
   env.DB._raw.prepare('INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (?, ?, ?, ?, ?)').run(HOME.mapId, HOME.buildingKey, 'p1', '0123456789abcdef', '{"uid":"0123456789abcdef"}');
   const held = await call('POST', '/v1/homes/transfer', { op: 'offer', ...HOME, character: A.id, to: 'Mara', price: 0, keepDecor: false, keepItems: false }, aldric);
   assert.equal(held.body?.error, 'home-holds');

@@ -201,8 +201,9 @@ async function acceptHome(ctx, player, body) {
     db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key),
   ];
   if (!keepDecor) {
-    steps.push(db.prepare('DELETE FROM home_decor WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key));
+    // The bin first: its rows name the pieces, and the key refuses a piece deleted under them
     steps.push(db.prepare('DELETE FROM decor_bin WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key));
+    steps.push(db.prepare('DELETE FROM home_decor WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key));
   } else {
     for (const g of moved) {
       steps.push(db.prepare('INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING')
