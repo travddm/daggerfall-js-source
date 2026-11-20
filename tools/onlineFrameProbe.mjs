@@ -5,6 +5,7 @@
 // online pays, through the frame probe's own three windows (tools/frameProbe.mjs measure): the census of every WebGL
 // call, the CPU profile by sample count, and the sampled heap.
 //
+// Run it as `node --import ./tools/raw-import-hooks.ts tools/onlineFrameProbe.mjs`: the game source it imports reaches `.vert` shaders, which plain node cannot load.
 //   ARENA2_PATH=/path/to/arena2 node tools/onlineFrameProbe.mjs            crowds of 0, 20, 60 and 0 again
 //   PEERS=0,40 CHAT=1 ...                                                   the crowds, in order (a smaller one after a
 //                                                                           larger sends the extra bots away); CHAT=1 opens

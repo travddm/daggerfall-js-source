@@ -21,6 +21,7 @@
 //   TREE=<a checkout before PARTY-LOOT > plays the report as it was - no base is shared there, every
 //   row reads as the room's, and the run fails.
 //
+// Run it as `node --import ./tools/raw-import-hooks.ts tools/partyLootProbe.mjs`: the game source it imports reaches `.vert` shaders, which plain node cannot load.
 //   ARENA2_PATH=/path/to/arena2 node tools/partyLootProbe.mjs       KILLS=6 the bodies; TREE=<dir> the page's tree (the
 //                                                                   relay and the account service are this tree's);
 //                                                                   PORT / SVC_PORT as tools/onlineFrameProbe.mjs;
