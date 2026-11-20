@@ -166,4 +166,10 @@ test('the law reads a piece with no gold or materials as it read one before, and
   assert.equal(postHead({ ...base, materials: [{ material: ROSE, origin: 'stolen', qty: 1 }] }), null);
   assert.equal(postHead({ ...base, materials: [{ material: ROSE, origin: 'own', qty: POST_MATERIAL_MAX + 1 }] }), null);
   assert.equal(postHead({ ...base, gold: 3 })?.claimed, true, 'gold alone is something to claim');
+  for (const material of ['p1:12', 'metal:iron', 'reagent:fairy-dragon-scales', 'gem:flawless-ruby']) {
+    assert.ok(
+      postHead({ ...base, materials: [{ material, origin: 'own', qty: 1 }] }),
+      material + ' is a Stores key the post carries',
+    );
+  }
 });
