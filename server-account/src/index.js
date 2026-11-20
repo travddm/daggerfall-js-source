@@ -390,7 +390,7 @@ const RENT_STATUS = Object.freeze({
 /** PRIVATE-REPORT: a report's refusals that are not a bad request (400, the default). */
 const REPORT_STATUS = Object.freeze({ 'report-rate': 429, 'report-full': 409, 'no-report': 404, 'not-report-reader': 403 });
 /** SERVER-POST: the post's own refusals; a claim's realm words are REALM_STATUS's. */
-const POST_STATUS = Object.freeze({ 'no-post': 404, 'post-no-item': 409, 'post-claimed': 409, 'post-unclaimed': 409, 'realm-only': 403, 'realm-needed': 409, server: 503,
+const POST_STATUS = Object.freeze({ 'no-post': 404, 'post-no-item': 409, 'post-claimed': 409, 'post-unclaimed': 409, 'stores-full': 409, 'realm-only': 403, 'realm-needed': 409, server: 503,
   'lost-pieces': 400, 'lost-item': 400, 'lost-no-kill': 409, 'lost-spent': 409, 'lost-full': 409 });   // AUDIT SERVER-POST: a batch D1 dropped is the service's failure, counted as one
 const REALM_STATUS = Object.freeze({
   ...JUDGE_STATUS,   // INT3/INT4
@@ -2109,7 +2109,7 @@ const service = {
         if (request.method !== 'POST') return no('method', 405, origin);
         const act = {
           '/v1/post/read': () => readPost(ctx, who.player, body.id),
-          '/v1/post/claim': () => claimPost({ ...ctx, bucket: env.SAVES }, who.player, { id: body.id, character: body.character, realm: body.realm }),   // the realm record is in R2
+          '/v1/post/claim': () => claimPost({ ...ctx, bucket: env.SAVES }, who.player, { id: body.id, character: body.character, realm: body.realm, letter: body.letter === true }),   // the realm record is in R2
           '/v1/post/delete': () => deletePost(ctx, who.player, body.id),
           '/v1/post/lost': () => mailLostSpoils(ctx, who.player, { day: body.day, pieces: body.pieces }),   // LOST-SPOILS: the Lost and Found's (lostSpoils.js)
         }[path];

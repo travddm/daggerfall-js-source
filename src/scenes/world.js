@@ -20383,11 +20383,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
     });
     // SCALE4c: its looks ride the heartbeat - while the online lane runs, as its poll there ran
     heartbeat.add('mail', whileLive(mail.heartbeatPart(), () => performance.now() - _mailFrameAt < FRAME_LIVE_MS));
-    // SERVER-POST:
-    // THE SERVER'S POST - the developers' messages, looked at on the letterbox's clock (riding the heartbeat while the
-    // online lane runs), a new one said on the world tab as a letter is; the pause face's envelope counts what waits
-    // (pauseDoorHooks `post`). An item is claimed into the realm character being played: the service writes it into the
-    // record and the pack takes it on the answer - the guild vault's take (realmGoldAct, the answer needed)
+    // The server's post rides the heartbeat. A claim writes the realm record first; the pack, the purse and the Stores
+    // take the goods on the answer, as a guild vault's take does.
     postBox = new PostBox({
       ioOf: () => {
         const st = appStorage();
@@ -20398,6 +20395,8 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       character: () => characterIdOf(playerEntity),
       realm: realmSession && { act: (o) => realmGoldAct({ session: realmSession, checkpoint: () => onlineCheckpoint(), ...o }), abandon: (why) => realmSession.abandon(why) },   // offline, none: no claim
       pack: { add: (rec) => { playerEntity.items ??= []; takeGateSpoil({ kind: 'item', item: setItemFields(rec) }); }, changed: () => { saveSoon.changed(); } },   // LOST-SPOILS: a spoil's own door - a first ember from the Lost and Found brings its book
+      wallet: () => guildBook?.wallet() ?? null,
+      stores: { changed: () => { void profBook?.refresh({ force: true }); } },
     });
     heartbeat.add('post', whileLive(postBox.heartbeatPart(), () => performance.now() - _mailFrameAt < FRAME_LIVE_MS));
     // GUILD1b: THE CHARACTER'S GUILD, over the account service (GUILD1a's door). Its gold is the save's: the purse first,
