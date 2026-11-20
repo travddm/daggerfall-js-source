@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 
 import {
   parseArgs, KNOBS, LOAD_SERVICE, localFetch, localWebSocket, relayTally, percentile, townPixel, poseAt, saveText, botStorage,
-  FIRE_MINUTE, FIRE_HOUR, reservoir, mergeFleets, POSE_SAMPLE_MAX,
+  FIRE_MINUTE, FIRE_HOUR, reservoir, mergeFleets, POSE_SAMPLE_MAX, phasedTicker,
 } from '../../tools/loadHarness.mjs';
 import { CRON_MINUTE, CRON_HOUR } from '../../server-account/src/cron.js';
 import { pixelDistance, worldRoom, cellHaloFor, RANGE_PIXELS } from '../../src/net/wire.js';
@@ -169,4 +169,25 @@ test('SCALE3: a fleet spread over threads adds up - every route\'s calls, status
   const uneven = mergeFleets([full(10, 1_000_000), full(1000, 150_000)]).relay.poseMs.sort((a, b) => a - b);
   assert.equal(percentile(uneven, 0.75), 10);
   assert.equal(percentile(uneven, 0.9), 1000);
+});
+
+test('the fleet ticks each bot once a period, at phases spread over the period, not in one step', () => {
+  let clock = 0;
+  const queued = [];
+  const ticks = [];
+  const bots = Array.from({ length: 5 }, (_, n) => ({ n }));
+  const phases = [0.1, 0.3, 0.5, 0.7, 0.9];
+  let draw = 0;
+  const stop = phasedTicker(bots, (bot) => ticks.push([bot.n, clock]), {
+    period: 50, now: () => clock, defer: (fn) => queued.push(fn), random: () => phases[draw++],
+  });
+  for (clock = 0; clock < 200; clock += 1) queued.shift()();
+  stop();
+  queued.shift()();
+  assert.equal(queued.length, 0, 'a stopped ticker defers nothing more');
+  for (const bot of bots) {
+    const at = ticks.filter(([n]) => n === bot.n).map(([, t]) => t);
+    assert.deepEqual(at, [0, 1, 2, 3].map((k) => Math.ceil(phases[bot.n] * 50) + 50 * k), `bot ${bot.n} ticks once a period from its own phase`);
+  }
+  assert.equal(new Set(ticks.slice(0, 5).map(([, t]) => t)).size, 5, 'the first five ticks fall at five different moments');
 });

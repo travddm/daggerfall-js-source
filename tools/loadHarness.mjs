@@ -136,6 +136,7 @@ export const KNOBS = Object.freeze({
   wire: [2, 'the wire every socket offers: 2 the second (SCALE5b, batched poses and rosters - the game\'s own), 1 the first (a before-and-after)'],
   selfhost: [0, '1 (or the bare flag) serves both Workers from the self-host kit\'s workerd (selfhost/, `npm ci --prefix selfhost` first) in place of two wrangler dev processes'],
   probe: [0, '1 times the storage bindings (a SELECT 1, an indexed read, a batch, 900 KB bucket puts and gets) inside the account isolate, once idle and once at the end of play'],
+  phase: [1, '1 ticks each bot at its own random phase, as the frame loops of players do; 0 ticks the whole fleet from one 50 ms interval (the harness before)'],
   sample: [0, 'seconds between samples of the services\' memory; their CPU time is read as play begins and ends (0: off)'],
 });
 
@@ -530,6 +531,28 @@ function tickBot(bot, ctx, o) {
   }
 }
 
+/** Ticks every bot each `period` ms, each at its own random phase. Returns a stop function.
+ *  Timers cannot do this on Windows: every timer fires on the 15.6 ms system tick, so bots on intervals of their own
+ *  still send in the same millisecond, and the relay's batch timer, on the same grid, then holds every pose for its
+ *  whole window. Players' frame loops are not in step, so the loop polls the clock instead. */
+export function phasedTicker(bots, tick, { period = 50, now = () => performance.now(), defer = setImmediate, random = Math.random } = {}) {
+  const start = now();
+  const dueAt = new Map(bots.map((bot) => [bot, start + random() * period]));
+  let running = true;
+  const loop = () => {
+    if (!running) return;
+    const at = now();
+    for (const [bot, due] of dueAt) {
+      if (at < due) continue;
+      dueAt.set(bot, Math.max(due + period, at));
+      tick(bot);
+    }
+    defer(loop);
+  };
+  defer(loop);
+  return () => { running = false; };
+}
+
 // ═══ THE RUN ═══════════════════════════════════════════════════════════════════════════════════════════════════════
 
 /** The pose ages a fleet keeps for its percentiles - a reservoir, so a long crowded run neither grows without bound nor
@@ -564,7 +587,7 @@ export class Fleet {
     relay.onWelcome = (ws, room) => { const b = this.ctx.ownerOf.get(ws); if (b) b.welcomedAt.set(room, Date.now()); };
     this.bots = [];
     for (let n = from; n < to; n++) this.bots.push(makeBot(n, o, this.ctx));
-    this.ticker = null;
+    this.stopTicks = null;
     this.mark = null;
   }
   async setUp() {
@@ -574,7 +597,13 @@ export class Fleet {
   async connect(rampMs) {
     await installRelayProfile(this.relayPort);   // each thread holds its own installed profile
     console.warn = () => {}; console.info = () => {};   // the sessions' own chatter, not the run's
-    this.ticker = setInterval(() => { for (const b of this.bots) tickBot(b, this.ctx, this.o); }, 50);
+    const tick = (b) => tickBot(b, this.ctx, this.o);
+    if (this.o.phase) {
+      this.stopTicks = phasedTicker(this.bots, tick);
+    } else {
+      const ticker = setInterval(() => { for (const b of this.bots) tick(b); }, 50);
+      this.stopTicks = () => clearInterval(ticker);
+    }
     const start = Date.now();
     for (let i = 0; i < this.bots.length; i++) {
       const due = start + (i / this.bots.length) * rampMs;
@@ -630,7 +659,7 @@ export class Fleet {
   }
   /** Play ends: every session left, every clock stopped, the tallies handed back. */
   finish() {
-    clearInterval(this.ticker);
+    this.stopTicks?.();
     for (const b of this.bots) for (const ss of b.sessions) { try { ss.leave(); } catch { /* gone */ } }
     for (const b of this.bots) { b.heartbeat?.stop(); b.stopBeat?.(); }
     const r = this.relay;
