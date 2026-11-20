@@ -5,6 +5,7 @@ import type { Row, Snapshot } from './character-snapshot.ts';
 import { POST_MATERIALS_MAX, POST_MATERIAL_MAX, type PostMaterial } from '../../../src/net/postLaw.js';
 import { RENT_DAY_S } from '../../../src/net/homeLaw.js';
 import { templateByIndex } from '../../../src/systems/item/itemTemplates.js';
+import { lawTemplate } from '../../../src/systems/item/itemLaw.js';
 
 /** One piece of post the delete writes. */
 export type DeleteMail = {
@@ -42,7 +43,10 @@ const whole = (value: unknown): number => {
   return Number.isSafeInteger(n) && n > 0 ? n : 0;
 };
 
-/** An item record as the mailbox can name it: a record without a name takes its template's. */
+/**
+ * An item record as the mailbox can carry it: a template the game still knows (the mailbox claims nothing else), and a
+ * name, its template's when the record has none.
+ */
 function mailableItem(text: unknown): Record<string, unknown> | null {
   if (typeof text !== 'string') return null;
   let item: unknown;
@@ -53,6 +57,7 @@ function mailableItem(text: unknown): Record<string, unknown> | null {
   }
   if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
   const record = item as Record<string, unknown>;
+  if (!lawTemplate(record.templateIndex)) return null;
   if (typeof record.name === 'string' && record.name.length > 0) return record;
   const template = templateByIndex(Number(record.templateIndex)) as { name?: string } | null | undefined;
   return template?.name ? { ...record, name: template.name } : null;

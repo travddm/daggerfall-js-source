@@ -87,7 +87,9 @@ An online character's truth is the service's, not the client's (`server-account/
 - It reads what it settles (`character-snapshot.ts`), and the batch refuses itself (`delete-moved`) when any of it
   changed before the batch ran.
 - Its own market business is cancelled. Bids on its auctions, its own leading bids, orders and commissions are voided,
-  and their Marks come back on each bidder's next market read.
+  and their escrowed Marks go back to each account in the same batch (`market.js` `bidReturn`, `orderReturn`, `writs.js`
+  `commissionReturn`). A return that would take an account past `MARKS_MAX` waits for that account's next market read.
+  An auction it led reopens at its opening price.
 - A tenant in one of its homes is refunded the unused days, from the rent the home still holds.
 - A lone guildmaster's guild ends: its gold goes by mail and its Marks to the account. A guildmaster with members hands
   the guild to the next member.

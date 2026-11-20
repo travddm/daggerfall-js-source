@@ -163,52 +163,91 @@ test('every column that can name a character is on the delete list, a cascade, o
   for (const entry of KEPT_ROWS) assert.ok(entry.reason.length > 10, `${entry.table}.${entry.column} has a reason`);
 });
 
+/** Column names the seed fills with the deleting account, so a seeded row reads as the character's own. */
+const ACCOUNT_COLUMNS = new Set([
+  'player',
+  'account',
+  'seller',
+  'poster',
+  'bidder',
+  'buyer',
+  'owner',
+  'filler',
+  'dep_player',
+  'taker',
+]);
+
+/**
+ * One row in `table`, with `fixed` columns as given, every other key or required column filled with a value its CHECK
+ * accepts. A CHECK refusal names the column and its allowed values, and the seed tries again with one of them.
+ */
+function seedRow(db: Database, table: string, fixed: Row, player: string, fill: { n: number }): void {
+  const columns = db.raw.prepare(`PRAGMA table_info("${table}")`).all() as Row[];
+  const values: Row = { ...fixed };
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const names: string[] = [];
+    const bound: unknown[] = [];
+    for (const column of columns) {
+      const name = String(column.name);
+      let value: unknown;
+      if (name in values) value = values[name];
+      else if (ACCOUNT_COLUMNS.has(name)) value = player;
+      else if (Number(column.pk) > 0 || (Number(column.notnull) === 1 && column.dflt_value == null)) {
+        fill.n += 1;
+        value = /INT|REAL|NUM/i.test(String(column.type)) ? fill.n : `v${fill.n}`;
+      } else continue;
+      names.push(`"${name}"`);
+      bound.push(value);
+    }
+    try {
+      db.raw
+        .prepare(`INSERT INTO "${table}" (${names.join(', ')}) VALUES (${names.map(() => '?').join(', ')})`)
+        .run(...(bound as never[]));
+      return;
+    } catch (error) {
+      const check = /CHECK constraint failed: (.*)$/.exec(String((error as Error).message))?.[1] ?? '';
+      let match: RegExpExecArray | null;
+      if ((match = /^(\w+) IN \(([^)]*)\)/.exec(check)))
+        values[match[1]] = JSON.parse(`[${match[2].replace(/'/g, '"')}]`)[0];
+      else if ((match = /^(\w+) BETWEEN (-?\d+)/.exec(check))) values[match[1]] = Number(match[2]);
+      else if ((match = /^(\w+) >= (-?\d+)/.exec(check))) values[match[1]] = Number(match[2]);
+      else if ((match = /^length\((\w+)\) = (\d+)/.exec(check))) values[match[1]] = 'a'.repeat(Number(match[2]));
+      else if ((match = /^json_valid\((\w+)\)/.exec(check))) values[match[1]] = '{}';
+      else throw error;
+    }
+  }
+  throw new Error(`no seed for ${table}`);
+}
+
 test('no row on the delete list or a cascade survives the delete; the kept records are left as they were', async () => {
   const w = await world();
   homeAt(w, 7, 77);
   const raw = w.db.raw;
+  const fill = { n: 0 };
+  const at = (entry: { table: string; column: string }): number =>
+    entry.column === 'home'
+      ? count(w.db, `SELECT COUNT(*) AS n FROM ${entry.table} WHERE map_id = 7 AND building_key = 77`)
+      : count(w.db, `SELECT COUNT(*) AS n FROM ${entry.table} WHERE ${entry.column} = ?`, w.character);
   raw.exec('PRAGMA foreign_keys = OFF');
   raw
     .prepare(
       "INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (7, 77, 'p1', 1, '{}', ?)",
     )
     .run(T0);
-  raw
-    .prepare(
-      "INSERT INTO decor_access (map_id, building_key, piece_id, kind, mode) VALUES (7, 77, 'p1', 'storage', 'friends')",
-    )
-    .run();
-  raw
-    .prepare(
-      "INSERT INTO decor_hold (map_id, building_key, piece_id, player, char_id, until) VALUES (7, 77, 'p1', ?, ?, ?)",
-    )
-    .run(w.player, w.character, T0 + 60);
-  raw.prepare("INSERT INTO home_hidden (map_id, building_key, keys) VALUES (7, 77, '[]')").run();
-  raw.prepare("INSERT INTO home_rooms (map_id, building_key, room, anchor, price) VALUES (7, 77, 0, '{}', 5)").run();
-  raw
-    .prepare(
-      'INSERT INTO home_moves (map_id, old_key, new_key, player, char_id, refund, hall, moved_at) VALUES (7, 70, 77, ?, ?, 0, 0, ?)',
-    )
-    .run(w.player, w.character, T0);
-  raw
-    .prepare(
-      "INSERT INTO hunt_clears (player, char_id, kind, key, id, tier, region, day, at) VALUES (?, ?, 'board', 'k', 'i', 1, 1, 1, ?)",
-    )
-    .run(w.player, w.character, T0);
-  raw.prepare('INSERT INTO market_gold (player, char_id, gold) VALUES (?, ?, 0)').run(w.player, w.character);
-  raw
-    .prepare("INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, 'metal:iron', 'own', 3)")
-    .run(w.player, w.character);
-  raw
-    .prepare(
-      "INSERT INTO renown_tracks (player, char_id, name, xp, created_at, updated_at) VALUES (?, ?, 'Aldric', 5, ?, ?)",
-    )
-    .run(w.player, w.character, T0, T0);
-  raw
-    .prepare(
-      "INSERT INTO realm_wed_halves (sid, player, char_id, partner, partner_char, at) VALUES ('h1', ?, ?, ?, ?, ?)",
-    )
-    .run(w.other, w.otherCharacter, w.player, w.character, T0);
+  for (const entry of [...DELETED_ROWS, ...CASCADED_ROWS]) {
+    if (entry.table === 'homes' || entry.table === 'home_decor' || at(entry) > 0) continue;
+    const home = entry.column === 'home' ? { map_id: 7, building_key: 77, piece_id: 'p1' } : {};
+    // A guild place seeded as an ordinary member, and a wedding half naming the character from another player
+    const extra: Row =
+      entry.table === 'guild_members' ? { rank: 3 } : entry.table === 'realm_wed_halves' ? { player: w.other } : {};
+    seedRow(
+      w.db,
+      entry.table,
+      { ...home, ...extra, ...(entry.column === 'home' ? {} : { [entry.column]: w.character }) },
+      w.player,
+      fill,
+    );
+  }
   // Kept records: history the delete must leave as it is
   raw
     .prepare(
@@ -216,16 +255,13 @@ test('no row on the delete list or a cascade survives the delete; the kept recor
     )
     .run(w.player, w.character, T0);
   raw.exec('PRAGMA foreign_keys = ON');
+  for (const entry of [...DELETED_ROWS, ...CASCADED_ROWS])
+    assert.ok(at(entry) > 0, `${entry.table}.${entry.column} seeded`);
 
   const answer = await deleteCharacter({ db: w.db, bucket: null, nowS: T0 + 10 }, w.player, w.character);
   assert.equal(answer.ok, true, JSON.stringify(answer));
-  for (const entry of [...DELETED_ROWS, ...CASCADED_ROWS]) {
-    const n =
-      entry.column === 'home'
-        ? count(w.db, `SELECT COUNT(*) AS n FROM ${entry.table} WHERE map_id = 7 AND building_key = 77`)
-        : count(w.db, `SELECT COUNT(*) AS n FROM ${entry.table} WHERE ${entry.column} = ?`, w.character);
-    assert.equal(n, 0, `${entry.table}.${entry.column} left behind`);
-  }
+  for (const entry of [...DELETED_ROWS, ...CASCADED_ROWS])
+    assert.equal(at(entry), 0, `${entry.table}.${entry.column} left behind`);
   assert.equal(
     count(w.db, 'SELECT COUNT(*) AS n FROM prof_deposits WHERE char_id = ?', w.character),
     1,
@@ -235,10 +271,6 @@ test('no row on the delete list or a cascade survives the delete; the kept recor
     count(w.db, 'SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?', w.kept),
     1,
     'the other character stands',
-  );
-  assert.deepEqual(
-    mailOf(w, w.player).map((row) => [row.gold, row.materials]),
-    [[0, '[{"material":"metal:iron","origin":"own","qty":3}]']],
   );
 });
 
@@ -274,9 +306,22 @@ test('its own market business is cancelled and its goods, sale gold and material
     VALUES ('B1', 'A1', ?, ?, 0, 20, 0, 0, 0, 'high', ?, 'rid-b1', 'n')`,
     )
     .run(w.other, w.otherCharacter, T0);
+  // The piece's escrow ledger row, as the market writes one when a piece leaves its record
+  seedRow(
+    w.db,
+    'item_uids',
+    { uid: 'abcdefabcdef0123', player: w.player, char_id: w.character, state: 'escrow', at: T0 },
+    w.player,
+    { n: 0 },
+  );
 
   const answer = await deleteCharacter({ db: w.db, bucket: null, nowS: T0 + 10 }, w.player, w.character);
   assert.equal(answer.ok, true, JSON.stringify(answer));
+  assert.equal(
+    count(w.db, "SELECT COUNT(*) AS n FROM item_uids WHERE uid = 'abcdefabcdef0123'"),
+    0,
+    'whoever claims the piece registers it, as a buyer does',
+  );
   assert.deepEqual(
     (raw.prepare('SELECT id, state, returned FROM market_listings ORDER BY id').all() as Row[]).map((r) => [
       r.id,
@@ -361,7 +406,7 @@ test("a lone guildmaster's guild ends: its gold by mail, its Marks to the accoun
   const raw = w.db.raw;
   raw
     .prepare(
-      "INSERT INTO guilds (id, name, name_key, tag, ranks, treasury, founded_at) VALUES ('g1', 'G', 'g', 'GG', '[]', 400, ?)",
+      "INSERT INTO guilds (id, name, name_key, tag, ranks, treasury, realm_gold, founded_at) VALUES ('g1', 'G', 'g', 'GG', '[]', 400, 400, ?)",
     )
     .run(T0);
   raw
@@ -477,4 +522,126 @@ test('what it had with other players is closed: an offer of its home cancelled, 
   assert.equal((raw.prepare("SELECT state FROM home_offers WHERE id = 'o1'").get() as Row).state, 'cancelled');
   assert.equal((raw.prepare('SELECT tenant_char FROM home_rooms WHERE map_id = 8').get() as Row).tenant_char, null);
   assert.equal((raw.prepare("SELECT state FROM realm_trades WHERE sid = 's1'").get() as Row).state, 'refused');
+});
+
+test('the Marks its orders, commissions and bids held come back to each account in the delete itself', async () => {
+  const w = await world();
+  const fill = { n: 0 };
+  const open = { state: 'open', returned: 0, at: T0, expires_at: T0 + 9999 };
+  seedRow(
+    w.db,
+    'market_orders',
+    { ...open, id: 'O1', poster: w.player, char_id: w.character, escrow: 30 },
+    w.player,
+    fill,
+  );
+  seedRow(
+    w.db,
+    'commissions',
+    { ...open, id: 'C1', poster: w.player, poster_char: w.character, pay: 20 },
+    w.player,
+    fill,
+  );
+  // Its leading bid on another player's auction, and another player's bid on its own
+  seedRow(
+    w.db,
+    'market_auctions',
+    {
+      ...open,
+      id: 'A2',
+      provenance: '2222222222222222',
+      seller: w.other,
+      char_id: w.otherCharacter,
+      high: 15,
+      high_bid: 'B2',
+      bids: 1,
+      ends_at: T0 + 9999,
+    },
+    w.player,
+    fill,
+  );
+  seedRow(
+    w.db,
+    'market_bids',
+    {
+      id: 'B2',
+      auction: 'A2',
+      bidder: w.player,
+      char_id: w.character,
+      state: 'high',
+      amount: 15,
+      courier: 0,
+      returned: 0,
+      at: T0,
+    },
+    w.player,
+    fill,
+  );
+  seedRow(
+    w.db,
+    'market_auctions',
+    {
+      ...open,
+      id: 'A1',
+      provenance: '1111111111111111',
+      seller: w.player,
+      char_id: w.character,
+      high: 25,
+      high_bid: 'B1',
+      bids: 1,
+      ends_at: T0 + 9999,
+    },
+    w.player,
+    fill,
+  );
+  seedRow(
+    w.db,
+    'market_bids',
+    {
+      id: 'B1',
+      auction: 'A1',
+      bidder: w.other,
+      char_id: w.otherCharacter,
+      state: 'high',
+      amount: 25,
+      courier: 0,
+      returned: 0,
+      at: T0,
+    },
+    w.player,
+    fill,
+  );
+
+  const answer = await deleteCharacter({ db: w.db, bucket: null, nowS: T0 + 10 }, w.player, w.character);
+  assert.equal(answer.ok, true, JSON.stringify(answer));
+  assert.equal(
+    count(w.db, 'SELECT balance AS n FROM marks WHERE account = ?', w.player),
+    30 + 20 + 15,
+    'its order, commission and bid',
+  );
+  assert.equal(
+    count(w.db, 'SELECT balance AS n FROM marks WHERE account = ?', w.other),
+    25,
+    "the other bidder's bid on its auction",
+  );
+  assert.deepEqual(
+    (
+      w.db.raw
+        .prepare(
+          "SELECT 'order' AS k, returned FROM market_orders UNION ALL SELECT 'commission', returned FROM commissions UNION ALL SELECT id, returned FROM market_bids ORDER BY 1",
+        )
+        .all() as Row[]
+    ).map((row) => [row.k, row.returned]),
+    [
+      ['B1', 1],
+      ['B2', 1],
+      ['commission', 1],
+      ['order', 1],
+    ],
+  );
+  assert.deepEqual(
+    { ...w.db.raw.prepare("SELECT high, high_bid FROM market_auctions WHERE id = 'A2'").get() },
+    { high: null, high_bid: null },
+    'the auction it led reopens',
+  );
 });

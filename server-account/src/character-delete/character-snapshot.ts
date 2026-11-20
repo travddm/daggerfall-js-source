@@ -84,9 +84,10 @@ export const READS = {
     from: 'prof_stores WHERE player = ?1 AND char_id = ?2 AND qty > 0 ORDER BY material, origin',
   },
   guildPlace: {
-    columns: ['guild_id', 'rank', 'members', 'treasury', 'marks'],
+    columns: ['guild_id', 'rank', 'members', 'treasury', 'realm_gold', 'marks'],
     from: `(SELECT m.guild_id, m.rank, (SELECT COUNT(*) FROM guild_members o WHERE o.guild_id = m.guild_id) AS members,
       (SELECT treasury FROM guilds g WHERE g.id = m.guild_id) AS treasury,
+      (SELECT realm_gold FROM guilds g WHERE g.id = m.guild_id) AS realm_gold,
       (SELECT balance FROM guild_marks k WHERE k.guild_id = m.guild_id) AS marks
       FROM guild_members m WHERE m.player = ?1 AND m.char_id = ?2)`,
   },
@@ -103,12 +104,6 @@ export type Snapshot = { [Name in ReadName]: Row[] };
 
 const selectOf = (read: Read): string => `SELECT ${read.columns.join(', ')} FROM ${read.from}`;
 
-/** The values a statement's numbered parameters take: as many as its highest `?N`, since SQLite refuses more. */
-export function boundValues(sql: string, values: unknown[]): unknown[] {
-  const used = [...sql.matchAll(/\?(\d+)/g)].map((match) => Number(match[1]));
-  return values.slice(0, Math.max(0, ...used));
-}
-
 /**
  * Every read as one JSON text. Read before the batch and asked again inside it; a sale, a deposit, a rent or a
  * checkpoint that lands between the two changes the text and refuses the batch.
@@ -117,18 +112,25 @@ export const FINGERPRINT_SQL = `SELECT json_array(${(Object.values(READS) as Rea
   .map((read) => `(SELECT json_group_array(json_array(${read.columns.join(', ')})) FROM (${selectOf(read)}))`)
   .join(',\n  ')}) AS print`;
 
-/** Every read, run once. */
-export async function readSnapshot(db: Database, player: string, character: string, nowS: number): Promise<Snapshot> {
+/**
+ * Every read, in one statement: the snapshot is parsed from the fingerprint's own text, so the rows the delete plans from
+ * are exactly the rows its guard compares.
+ */
+export async function readSnapshot(
+  db: Database,
+  player: string,
+  character: string,
+  nowS: number,
+): Promise<{ snapshot: Snapshot; print: string }> {
+  const print = await readFingerprint(db, player, character, nowS);
+  const parsed = JSON.parse(print) as unknown[][][];
   const snapshot = {} as Snapshot;
-  for (const [name, read] of Object.entries(READS) as [ReadName, Read][]) {
-    const sql = selectOf(read);
-    const answer = await db
-      .prepare(sql)
-      .bind(...boundValues(sql, [player, character, nowS]))
-      .all();
-    snapshot[name] = (answer.results ?? []) as Row[];
-  }
-  return snapshot;
+  (Object.entries(READS) as [ReadName, Read][]).forEach(([name, read], index) => {
+    snapshot[name] = (parsed[index] ?? []).map((values) =>
+      Object.fromEntries(read.columns.map((column, at) => [column, values[at]])),
+    );
+  });
+  return { snapshot, print };
 }
 
 /** The fingerprint as it stands now. */

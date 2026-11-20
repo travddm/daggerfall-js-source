@@ -46,7 +46,7 @@ type GuildPlan =
   | { kind: 'none' }
   | { kind: 'member' }
   | { kind: 'hand-on'; guildId: string }
-  | { kind: 'end'; guildId: string; gold: number; marks: number };
+  | { kind: 'end'; guildId: string; treasury: number; gold: number; marks: number };
 
 /**
  * A lone guildmaster's guild ends with it, as a leave ends it: its gold goes by mail and its Marks to the account. A hold
@@ -64,20 +64,23 @@ async function guildPlan(db: Database, snapshot: Snapshot, player: string): Prom
     if (held >= 0) return { error: GUILD_HOLDS_SQL_CODES[held] };
     if (Number(holds.marks_full) > 0) return { error: 'marks-full' };
   }
-  return { kind: 'end', guildId, gold: Number(place.treasury) || 0, marks: Number(place.marks) || 0 };
+  // A realm character takes out only what realm characters paid in, as a withdrawal does; the rest ends with the guild
+  const treasury = Number(place.treasury) || 0;
+  const gold = Math.min(treasury, Number(place.realm_gold) || 0);
+  return { kind: 'end', guildId, treasury, gold, marks: Number(place.marks) || 0 };
 }
 
 /** The steps that end a lone guildmaster's guild: its gold taken out (it goes by mail), its Marks swept, its row gone. */
 function endGuildSteps(
   db: Database,
-  plan: { guildId: string; gold: number },
+  plan: { guildId: string; treasury: number },
   playerRow: Row,
   nowS: number,
 ): Statement[] {
   return [
     db
       .prepare('UPDATE guilds SET treasury = 0, moved_by = ?3, moved_at = ?4 WHERE id = ?1 AND treasury = ?2')
-      .bind(plan.guildId, plan.gold, displayName(playerRow), nowS),
+      .bind(plan.guildId, plan.treasury, displayName(playerRow), nowS),
     guildMarksSweep(db, plan.guildId, playerRow, nowS, { alone: true }),
     db
       .prepare(
@@ -126,8 +129,7 @@ export async function deleteCharacter(ctx: DeleteContext, player: string, id: un
   // A tombstone is the realm's only record of a Bloodline death, and its row the person's claim
   if (row.dead_at != null) return { error: 'dead' };
 
-  const snapshot = await readSnapshot(db, player, id, nowS);
-  const print = await readFingerprint(db, player, id, nowS);
+  const { snapshot, print } = await readSnapshot(db, player, id, nowS);
   const guild = await guildPlan(db, snapshot, player);
   if ('error' in guild) return guild;
   const playerRow = ((await db.prepare('SELECT * FROM players WHERE id = ?1').bind(player).first()) ?? {}) as Row;
@@ -164,6 +166,9 @@ export async function deleteCharacter(ctx: DeleteContext, player: string, id: un
   } catch (error) {
     // Something it settles moved between the read and the batch: nothing was written, and the player may try again
     if ((await readFingerprint(db, player, id, nowS)) !== print) return { error: 'delete-moved' };
+    // Or its guild came to hold something after the read, which refuses it as a leave is refused
+    const again = await guildPlan(db, snapshot, player);
+    if ('error' in again) return again;
     throw error;
   }
   await dropCharacterObjects(bucket, player, id, [row.obj, row.prev]);

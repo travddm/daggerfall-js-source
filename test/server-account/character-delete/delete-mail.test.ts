@@ -1,10 +1,27 @@
 // The mail a delete writes is planned from the snapshot alone: these run the planner on hand-made snapshots.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { planDeleteMail, rentRefunds } from '../../../server-account/src/character-delete/delete-mail.ts';
 import type { Snapshot } from '../../../server-account/src/character-delete/character-snapshot.ts';
 import { POST_MATERIAL_MAX, POST_MATERIALS_MAX } from '../../../src/net/postLaw.js';
-import { RENT_DAY_S } from '../../../src/net/homeLaw.js';
+
+type Row = Record<string, unknown>;
+type Material = { material: string; origin: string; qty: number };
+type MailPlan = {
+  mail: { to: string; item: Row | null; gold: number; materials: Material[] }[];
+  warnings: { code: string; count: number }[];
+};
+
+// Loaded by computed paths: a static import would pull the item and home laws, and the crypto they reach, into the
+// TypeScript check.
+const load = async <T>(path: string): Promise<T> => (await import(new URL(path, import.meta.url).href)) as T;
+const { planDeleteMail, rentRefunds } = await load<{
+  planDeleteMail: (
+    snapshot: Snapshot,
+    options: { player: string; name: string; nowS: number; guildGold: number },
+  ) => MailPlan;
+  rentRefunds: (homes: Row[], tenants: Row[], nowS: number) => { refunds: Map<string, number>; left: number };
+}>('../../../server-account/src/character-delete/delete-mail.ts');
+const RENT_DAY_S = 86_400;
 
 const NOW = 1_800_000_000;
 const ACCOUNT = 'account-1';

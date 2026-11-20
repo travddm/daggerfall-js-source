@@ -2,6 +2,8 @@
 // Each acts on exactly the rows the snapshot read; the fingerprint at the head of the batch refuses it if they moved.
 import type { Database, Row, Snapshot, Statement } from './character-snapshot.ts';
 import type { DeleteMail } from './delete-mail.ts';
+import { bidReturn, orderReturn } from '../market.js';
+import { commissionReturn } from '../writs.js';
 
 const RANK_MASTER = 0;
 
@@ -10,9 +12,11 @@ const IN_LIST = (parameter: string): string => `IN (SELECT value FROM json_each(
 
 /**
  * The market settled: its listings and auctions cancelled with their goods marked returned (the goods go by mail),
- * every bid on its auctions and its own leading bids void (their Marks go back on each bidder's next market read, as an
- * outbid bid's do), its orders cancelled and its commissions withdrawn (their Marks likewise), its materials on the road
- * and its pieces waiting marked as handed over.
+ * every bid on its auctions and its own leading bids void, its orders cancelled and its commissions withdrawn, with
+ * their escrowed Marks back to each bidder's or poster's account in the same batch (the market's own returns, which
+ * wait for the account's next market read if its Marks are at the cap), its materials on the road and its pieces
+ * waiting marked as handed over. A piece's escrow ledger row goes as a sale removes it, so whoever claims the piece
+ * registers it at their next checkpoint.
  */
 export function marketSteps(db: Database, snapshot: Snapshot, player: string, nowS: number): Statement[] {
   const pieces = JSON.stringify(
@@ -59,6 +63,21 @@ export function marketSteps(db: Database, snapshot: Snapshot, player: string, no
     db
       .prepare(`UPDATE market_deliveries SET collected = 1 WHERE player = ?2 AND collected = 0 AND id ${IN_LIST('?1')}`)
       .bind(listOf(snapshot.deliveries, 'id'), player),
+    db.prepare(`DELETE FROM item_uids WHERE state = 'escrow' AND uid ${IN_LIST('?1')}`).bind(pieces),
+    ...marksReturnSteps(db, snapshot, nowS),
+  ];
+}
+
+/** The escrowed Marks of every bid, order and commission the market steps closed, back to their accounts. */
+function marksReturnSteps(db: Database, snapshot: Snapshot, nowS: number): Statement[] {
+  const bids = [
+    ...snapshot.auctions.map((row) => row.high_bid).filter((id) => id != null),
+    ...snapshot.leadingBids.map((row) => row.id),
+  ];
+  return [
+    ...bids.flatMap((id) => bidReturn(db, id, nowS) as Statement[]),
+    ...snapshot.orders.flatMap((row) => orderReturn(db, row.id, nowS) as Statement[]),
+    ...snapshot.commissions.flatMap((row) => commissionReturn(db, row.id, nowS) as Statement[]),
   ];
 }
 
