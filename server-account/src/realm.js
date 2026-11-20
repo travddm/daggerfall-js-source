@@ -740,7 +740,7 @@ export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1
     if (Number((await db.prepare(HOME_TENANTS_SQL).bind(playerId, id, nowS).first())?.n ?? 0) > 0) return { error: 'home-tenants' };
     if (Number((await db.prepare(HOME_RENT_DUE_SQL).bind(playerId, id).first())?.due ?? 0) > 0) return { error: 'home-rent-due' };
     // Goods in a shared chest of its homes would be left with no chest to open them, so they are taken out first
-    if (await db.prepare(HOME_BIN_HELD_SQL).bind(playerId, id).first()) return { error: 'home-holds' };
+    if (await db.prepare(HOME_BIN_HELD_SQL).bind(playerId, id).first()) return { error: 'realm-home-holds' };
     return null;
   };
   const held = await homeHeld();

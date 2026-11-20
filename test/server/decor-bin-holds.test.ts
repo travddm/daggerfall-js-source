@@ -8,9 +8,11 @@ import assert from 'node:assert/strict';
 const accountDbModule = '../accountDb.mjs';
 const realmSeatModule = '../realmSeat.mjs';
 const homeLawModule = '../../src/net/homeLaw.js';
+const accountClientModule = '../../src/net/accountClient.js';
 const { standService } = await import(accountDbModule);
 const { seatRealm } = await import(realmSeatModule);
 const { HOME_ARENA_MAP_ID, HOME_ARENA_CELL } = await import(homeLawModule);
+const { accountRefusalText } = await import(accountClientModule);
 
 type Account = { secret: string; id: string };
 type Answer = { status: number; body: { ok?: boolean; error?: string } };
@@ -106,8 +108,12 @@ test('a realm character whose home chest holds goods is not deleted', async () =
   const { svc, realm, deposit, count, call } = await homeWithChest({ seat: true });
   deposit();
   const answer = await call('/v1/realm/delete', { id: realm.id });
-  assert.equal(answer.body.error, 'home-holds');
+  assert.equal(answer.body.error, 'realm-home-holds');
   assert.equal(answer.status, 409);
+  assert.equal(
+    accountRefusalText(answer.body.error),
+    'Take the goods out of your home before you delete this character.',
+  );
   const row = svc.env.DB._raw.prepare('SELECT obj FROM realm_characters WHERE id = ?').get(realm.id) as { obj: string };
   assert.ok(svc.env.SAVES._map.has(row.obj), 'its save stays');
   assert.deepEqual([count('homes'), count('decor_bin')], [1, 1]);

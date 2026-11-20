@@ -117,7 +117,8 @@ same way instead of paying twice. Listings and auctions are unique on `(seller, 
   the batch.
 - A shared container's goods live in `decor_bin`, keyed to their piece in `home_decor`. A write that would delete the
   piece or its home, or make the piece no longer a container, refuses while the bin holds goods (`decor-holds`,
-  `home-holds`; `decor-bin-holds.ts`). A deed's hold, given up as its deed sells, takes them with it.
+  `home-holds`, and `realm-home-holds` for a character delete; `decor-bin-holds.ts`). A deed's hold, given up as its
+  deed sells, takes them with it.
 - Entry is `private`, `party` or `public` (`setHomeEntry`); `decorMay` checks who may place or use decor.
 - Yards are decor rows with a `yard` flag. `yardsOf` serves a town's yards from a short-lived in-memory snapshot
   (`YARDS_KEPT_S`); `settleYards` runs a bounded number a minute.
