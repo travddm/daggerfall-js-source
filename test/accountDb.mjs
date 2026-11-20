@@ -48,9 +48,9 @@ export function d1() {
           args = a; return api;
         },
         async first() { return stmt.get(...args) ?? null; },
-        // SCALE4h: an answer's meta says its rows written, as D1's does (a table's rows - D1 counts its indexes' too), so a
-        // route's metrics point can be read over this database
-        async all() { const results = stmt.all(...args); return { results, meta: { rows_written: writes ? Number(db.prepare('SELECT changes() AS c').get().c) : 0 } }; },
+        // An answer's meta says its rows changed and written, as D1's does (D1 counts its indexes' rows written too), so a
+        // route's metrics point and the database seam's `changes` can be read over this database
+        async all() { const results = stmt.all(...args); const n = writes ? Number(db.prepare('SELECT changes() AS c').get().c) : 0; return { results, meta: { changes: n, rows_written: n } }; },
         async run() { const r = stmt.run(...args); return { meta: { changes: Number(r.changes), rows_written: writes ? Number(r.changes) : 0 } }; },
         _result() { const results = stmt.all(...args); const n = writes ? Number(db.prepare('SELECT changes() AS c').get().c) : 0; return { results, meta: { changes: n, rows_written: n } }; },
       };

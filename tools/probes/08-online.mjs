@@ -12,6 +12,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Game } from './lib/harness.mjs';
+import { joinServerPrompt } from '../lib/joinServerPrompt.mjs';
 import { editsPlugin } from '../frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from '../onlineFrameProbe.mjs';
 import { standServicesRetrying, stopAll, localFetch, botStorage, LOAD_SERVICE } from '../loadHarness.mjs';
@@ -111,7 +112,7 @@ export async function run({ browser, base, ck }) {
       await g.open(
         `/play/?world&online&realm=${c.data.id}&load&server=ws://127.0.0.1:${svc.relayPort}&novideo&shot&play`,
         {
-          wait: 'frame',
+          wait: 'commit',
           init: {
             fn: ({ sk, sv, sess, base: svcBase }) => {
               try {
@@ -130,6 +131,8 @@ export async function run({ browser, base, ck }) {
           },
         },
       );
+      await joinServerPrompt(g.page);
+      await g.until(() => g.page.evaluate(() => (window.__frame ?? 0) > 3), 420000);
       await g.until(() => g.page.evaluate(standing), 900000);
       return g;
     };

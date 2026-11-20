@@ -276,12 +276,15 @@ export function lowerRepForCrime(player, regionIndex, crime, { curfew = false } 
 export function goldAmount(player) {
   return goldPiecesOf(player);
 }
+/** A letter of credit that is legal tender: a forged value (NaN, negative, no number) is no money, so it is never spent
+ *  and never counted - it would turn the debt into NaN, which no check reads as owed. */
+const isTender = (it) => it.templateIndex === LETTER_OF_CREDIT_TEMPLATE && Number.isFinite(it.value) && it.value > 0;
 /** ItemCollection.GetCreditAmount (ItemCollection.cs:108-118): every
  *  letter of credit in the pack, by VALUE. U41: the travel popup's
  *  gold gate is DFU's GetGoldAmount, which is coins PLUS paper. */
 export function creditAmount(player) {
   return (player.items ?? []).reduce(
-    (sum, it) => (it.templateIndex === LETTER_OF_CREDIT_TEMPLATE ? sum + (it.value ?? 0) : sum), 0);
+    (sum, it) => (isTender(it) ? sum + it.value : sum), 0);
 }
 /** PlayerEntity.GetGoldAmount (:1313-1316) - what a purchase is
  *  tested against, where goldAmount alone is DFU's `goldPieces`. */
@@ -333,10 +336,10 @@ export function deductGold(player, amount) {
   let owed = amount;
   const items = player.items ?? [];
   for (;;) {
-    const loc = items.find((it) => it.templateIndex === LETTER_OF_CREDIT_TEMPLATE);
+    const loc = items.find(isTender);
     if (!loc) break;
-    if (owed < (loc.value ?? 0)) { loc.value -= owed; owed = 0; break; }
-    owed -= loc.value ?? 0;
+    if (owed < loc.value) { loc.value -= owed; owed = 0; break; }
+    owed -= loc.value;
     items.splice(items.indexOf(loc), 1);
   }
   if (owed > 0) {
@@ -357,7 +360,7 @@ export function deductGold(player, amount) {
 export function deductGoldUndoable(player, amount) {
   const purse = goldPiecesOf(player);
   const items = player.items ?? [];
-  const letters = items.filter((it) => it.templateIndex === LETTER_OF_CREDIT_TEMPLATE).map((it) => [it, it.value ?? 0]);
+  const letters = items.filter(isTender).map((it) => [it, it.value]);
   const owed = deductGold(player, amount);
   const coins = purse - goldPiecesOf(player);
   const spent = letters.filter(([it, v]) => !items.includes(it) || (it.value ?? 0) !== v).map(([it, v]) => [it, v - (items.includes(it) ? (it.value ?? 0) : 0)]);

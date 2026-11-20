@@ -16,8 +16,7 @@
 //           is the time the caller waited, not CPU)
 //   double2 the status
 //   double3 D1 statements the request ran (a batch counts each one)
-//   double4 D1 rows written (SCALE4f; a cron point's double4 is the rows
-//           its job changed - the same measure)
+//   double4 D1 rows written (SCALE4f)
 //   double5 D1 wait in ms: the wall time the request spent awaiting its
 //           statements, summed (SCALE4f)
 //   double6 D1 rows read (SCALE4f)
@@ -28,6 +27,11 @@
 //           first (SCALE4h)
 //   blob6   a heartbeat's parts, "beat,board,mail,post" - the ones its
 //           body asked (SCALE4h); "" for any other route
+//
+// A cron job's point (cron.js runCron) has the same layout, so one query
+// sums a job's rows read and written with the requests'. Its route is
+// `cron:<job>`, its method `CRON`, and double12 is the rows the job says
+// it changed.
 //
 // SCALE4f: HOW BUSY THE ONE PRIMARY IS. The
 // statements a request ran said how much it asked of D1, never how long
@@ -199,6 +203,24 @@ export function countedDb(/** @type {any} */ db, /** @type {{ n: number }} */ ta
   });
 }
 
+/** @typedef {{ n: number, ms: number, trips: number, capped: number, rr: number, rw: number, replica: number, tables: Record<string, number> }} D1Tally */
+
+/** An empty tally for countedDb: statements, the wait and trips, rows read and written, a replica's statements, and
+ *  the rows written by table.
+ *  @returns {D1Tally} */
+export const newTally = () => ({ n: 0, ms: 0, trips: 0, capped: 0, rr: 0, rw: 0, replica: 0, tables: {} });
+
+/** Doubles 3 to 11 of a point: what the database did for a request or a cron job.
+ *  @param {D1Tally} tally */
+export const d1Doubles = (tally) => [
+  tally.n,
+  tally.rw,
+  tally.ms,
+  tally.rr,
+  tally.replica,
+  ...HOT_TABLES.map((table) => tally.tables[table] ?? 0),
+];
+
 /** A refusal's one word, off a JSON answer that is not a 2xx (the service's refusals are `{ error }`) - or "". */
 async function refusalOf(/** @type {Response} */ res) {
   if (res.status < 300 || !(res.headers.get('content-type') ?? '').includes('json')) return '';
@@ -221,7 +243,7 @@ export async function measured(request, env, serve, exec = null) {
   const said = { parts: '' };
   if (!sink || typeof sink.writeDataPoint !== 'function') return serve(request, env, said, exec);   // the Worker's ExecutionContext, for what follows an answer
   const started = Date.now();
-  const tally = { n: 0, ms: 0, trips: 0, capped: 0, rr: 0, rw: 0, replica: 0, tables: /** @type {Record<string, number>} */ ({}) };
+  const tally = newTally();
   const counted = env.DB ? { ...env, DB: countedDb(env.DB, tally) } : env;
   const res = await serve(request, counted, said, exec);
   noteD1Wait(tally.capped, tally.trips, Date.now());   // SLOW-SHED: the isolate's shed hears how long the database made it wait, a trip at a time
@@ -231,8 +253,7 @@ export async function measured(request, env, serve, exec = null) {
     sink.writeDataPoint({
       indexes: [route],
       blobs: [route, request.method, String(res.status), await refusalOf(res), tablesBlob(tally.tables), parts],   // SCALE4h: the tables written, a heartbeat's parts
-      doubles: [Date.now() - started, res.status, tally.n, tally.rw, tally.ms, tally.rr, tally.replica,   // SCALE4f: rows written, D1's wait, rows read, a replica's statements
-        ...HOT_TABLES.map((t) => tally.tables[t] ?? 0)],   // SCALE4h: the hot rows, by table
+      doubles: [Date.now() - started, res.status, ...d1Doubles(tally)],
     });
   } catch { /* a metric never costs a request */ }
   return res;

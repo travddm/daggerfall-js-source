@@ -219,5 +219,6 @@ test('SD-ONLINE against MAPS.BSA: every dungeon builds online at the world\'s si
       rooms.add(k);
     }
   }
-  assert.ok(built.small > 400 && built.medium > 600 && built.full > 1500, `the three sizes all stand: ${JSON.stringify(built)}`);
+  // the draw is small 1, medium 2, whole 5 in eight, and a dungeon too small for its size is built whole
+  assert.ok(built.small > 350 && built.medium > 450 && built.full > 3000, `the three sizes all stand: ${JSON.stringify(built)}`);
 });

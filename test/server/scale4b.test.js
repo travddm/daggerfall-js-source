@@ -112,9 +112,10 @@ test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Wo
   assert.equal(count(s.env.DB._raw, 'SELECT COUNT(*) AS n FROM board_notices'), 0, 'the hour sweeps');
   assert.deepEqual(points.map((p) => p.indexes[0]), HOUR_JOBS.map(([name]) => `cron:${name}`));
   const board = points.find((p) => p.indexes[0] === 'cron:board');
-  assert.deepEqual(board.blobs, ['cron:board', 'CRON', '200', '']);
+  assert.deepEqual(board.blobs, ['cron:board', 'CRON', '200', '', 'board_notices:1', '']);
   assert.ok(board.doubles[2] >= 2, 'its statements counted');
-  assert.equal(board.doubles[3], 1, 'the rows it moved');
+  assert.equal(board.doubles[3], 1, 'the rows it wrote');
+  assert.equal(board.doubles[11], 1, 'the rows it says it changed');
   // and nothing of it names a player
   assert.ok(!JSON.stringify(points).includes(g.id));
 });
@@ -369,7 +370,7 @@ test('SCALE4b F: a job that throws never stops the next - the failure is its own
     });
   } finally { console.warn = quiet; }
   assert.deepEqual(ran.map((j) => [j.name, j.ok, j.changed]), [['breaks', false, 0], ['after', true, 3]]);
-  assert.deepEqual(points.map((p) => [p.indexes[0], p.blobs[2], p.blobs[3], p.doubles[3]]), [['cron:breaks', '500', 'failed', 0], ['cron:after', '200', '', 3]]);
+  assert.deepEqual(points.map((p) => [p.indexes[0], p.blobs[2], p.blobs[3], p.doubles[11]]), [['cron:breaks', '500', 'failed', 0], ['cron:after', '200', '', 3]]);
   // no binding, no clock: nothing at all
   assert.deepEqual(await runCron({}, { cron: CRON_HOUR, nowS: T0 }), []);
   assert.deepEqual(await runCron(s.env, { cron: CRON_HOUR, nowS: NaN }), []);

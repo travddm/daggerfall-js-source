@@ -51,7 +51,9 @@ that one codebase can later serve SQLite and Postgres. A converted module asks `
 - `seam.statement(query)` turns a Kysely query into a D1 statement, for a module that hands a statement to an
   unconverted caller's `db.batch([...])`.
 
-A table's row shape goes in `database-types.ts` when its first module is converted. `brokerSales.js` is the first.
+`database-types.ts` holds every table's row shape, generated from the schema that the migrations build. Run
+`node tools/account-row-types.ts` after a migration; `test/tooling/account-row-types.test.ts` fails while the file is
+stale. `brokerSales.js` is the first converted module.
 
 The service imports shared law from `src/net/` (for example `identityToken.js`, `marketLaw.js`, `decorLaw.js`,
 `homeLaw.js`, `nameFilter.js`, `cellTree.js`), so client and server check the same rules.
