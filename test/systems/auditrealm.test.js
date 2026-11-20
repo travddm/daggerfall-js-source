@@ -461,7 +461,7 @@ test('AUDIT REALM L1-F3: a placed piece pays back half of what records paid for 
   assert.equal((await s.saveOf(A)).goldPieces, 500_000 - HOME_PRICE_MIN - 400 + decorRefund(400));
 });
 
-test('AUDIT REALM L1-F7: a realm character deleted takes its house, its guild place and its Renown with it - and a guildmaster with members hands the guild over first', { timeout: 60_000 }, async () => {
+test('AUDIT REALM L1-F7: a realm character deleted takes its house, its guild place and its Renown with it - and a guildmaster with members hands the guild to the next member', { timeout: 60_000 }, async () => {
   const s = await registered();
   const A = await s.player('Arthago', { name: 'Arthago', goldPieces: 500_000, items: [] });
   const claimed = await A.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: A.char, price: HOME_PRICE_MIN, realm: { id: A.char, lease: A.lease, seq: 1 } });   // HOME-PRICE (
@@ -470,10 +470,8 @@ test('AUDIT REALM L1-F7: a realm character deleted takes its house, its guild pl
   const guildId = s.env.DB._raw.prepare('SELECT id FROM guilds').get().id;
   const B = await s.player('Brisienna', { name: 'Brisienna', goldPieces: 500_000, items: [] });
   s.env.DB._raw.prepare("INSERT INTO guild_members (player, char_id, guild_id, rank, name, joined_at) VALUES (?, 'x-char-0001', ?, ?, 'Mira', 1)").run(B.id, guildId, GUILD_RANK_MEMBER);
-  const held = await realmDelete(A.io, A.char);
-  assert.deepEqual([held.ok, held.error], [false, 'guild-master-leaves'], 'a guildmaster with members hands the guild over first');
-  s.env.DB._raw.prepare("DELETE FROM guild_members WHERE char_id = 'x-char-0001'").run();
   assert.equal((await realmDelete(A.io, A.char)).ok, true);
+  assert.equal(s.env.DB._raw.prepare("SELECT rank FROM guild_members WHERE char_id = 'x-char-0001'").get().rank, 0, 'the next member leads the guild');
   const left = (table) => s.env.DB._raw.prepare(`SELECT COUNT(*) AS n FROM ${table} WHERE char_id = ?`).get(A.char).n;
   assert.deepEqual([left('homes'), left('guild_members'), left('renown_tracks')], [0, 0, 0], 'nothing stands under the deleted id');
   assert.equal((await B.homes.claim({ mapId: 7, buildingKey: 9, region: 17, character: B.char, price: HOME_PRICE_MIN, realm: { id: B.char, lease: B.lease, seq: 1 } })).ok, true, 'the house is for sale again');

@@ -134,7 +134,7 @@ test('HOME-RENT the service: the owner offers a room and prices it; anyone reads
   assert.ok(ROUTES.has('/v1/homes/rooms/rent') && ROUTES.has('/v1/homes/rooms/collect'), 'the routes are known');
 });
 
-test('HOME-RENT the owner: a room taken off the offer keeps its tenant until the days run out, a free one goes; the house is not sold nor the character deleted while a tenancy runs or rent is held; the rent collected into the owner\'s record, all of it, once; the days run out, the house sells (mutants: the withdraw deleting a tenancy; the sale unguarded; the collection twice; the delete unguarded)', async (t) => {
+test('HOME-RENT the owner: a room taken off the offer keeps its tenant until the days run out, a free one goes; the house is not sold while a tenancy runs or rent is held; the rent collected into the owner\'s record, all of it, once; the days run out, the house sells (mutants: the withdraw deleting a tenancy; the sale unguarded; the collection twice)', async (t) => {
   let clock = T0 * 1000;
   t.mock.method(Date, 'now', () => clock);
   const svc = await standService();
@@ -161,13 +161,10 @@ test('HOME-RENT the owner: a room taken off the offer keeps its tenant until the
   svc.env.DB._raw.prepare('UPDATE realm_characters SET bytes = 0 WHERE id = ?').run(o.character);
   assert.deepEqual((await call('/v1/homes/rooms/offer', { character: o.character, room: 3, anchor: [9, 0, 1], price: 40 })).body.error, 'realm-needed');
   svc.env.DB._raw.prepare('UPDATE realm_characters SET bytes = 1 WHERE id = ?').run(o.character);
-  // the sale and the delete wait
+  // the sale waits
   const sale = await call('/v1/homes/release', { realm: ownerAt() });
   assert.deepEqual([sale.status, sale.body.error], [409, 'home-tenants']);
   await call('/v1/homes/rooms/offer', { character: o.character, room: 2, anchor: [5, 0, 1], price: 40 });
-  const del = await svc.call('/v1/realm/delete', { id: o.character }, owner.secret);
-  assert.deepEqual([del.status, del.body.error], [409, 'home-tenants']);
-  assert.equal(svc.env.DB._raw.prepare('SELECT listed FROM home_rooms WHERE room = 2').get().listed, 1, 'a refused delete takes no offer down');
   await call('/v1/homes/rooms/withdraw', { character: o.character, room: 2 });
   // collected, once
   const before = wealthOf(recordOf(svc.env, o.character));
@@ -206,7 +203,7 @@ test('HOME-RENT the races and the rate: a rent whose room changed between its re
   assert.deepEqual([last.status, last.body.error], [429, 'rent-rate'], 'collections are counted');
 });
 
-test('HOME-RENT held rent comes with a sale, and a delete waits for it: rent nobody collected is paid with the house, and a character is not deleted while its home holds some (mutants: the rent lost at the sale; the rent lost in the tab; the delete unguarded)', async (t) => {
+test('HOME-RENT held rent comes with a sale: rent nobody collected is paid with the house (mutants: the rent lost at the sale; the rent lost in the tab)', async (t) => {
   let clock = T0 * 1000;
   t.mock.method(Date, 'now', () => clock);
   const svc = await standService();
@@ -218,8 +215,6 @@ test('HOME-RENT held rent comes with a sale, and a delete waits for it: rent nob
   const T = await seatRealm(svc.env, tenant.secret, 'Tomas', { name: 'Tomas', level: 5, goldPieces: 1000, items: [] });
   await svc.call('/v1/homes/rooms/rent', { mapId: 7, buildingKey: 300, character: T.id, room: 1, days: 1, price: 40, realm: T.at() }, tenant.secret);
   clock = (T0 + RENT_DAY_S + 5) * 1000;
-  const del = await svc.call('/v1/realm/delete', { id: o.character }, owner.secret);
-  assert.deepEqual([del.status, del.body.error], [409, 'home-rent-due'], 'collect it first');
   // what the record holds, purse and every bank account (the sale pays into the home's region's account, if it keeps one)
   const wealth = () => { const r = recordOf(svc.env, o.character); return (r.goldPieces ?? 0) + (r.bankAccounts ?? []).reduce((n, a) => n + (a?.accountGold ?? 0), 0); };
   const before = wealth();

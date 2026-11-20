@@ -223,7 +223,7 @@ test('REALM P1: the player\'s own delete takes its objects and the row', async (
   await put(a.id, save('2'), g.secret, { lease: a.lease, seq: 2 });
   assert.equal(env.SAVES._map.size, 2);
   env.SAVES._map.set(`${realmPrefix(g.id)}${a.id}/9-deadbeef`, new Uint8Array(1));   // REALM P2.1: a lost write's object whose drop failed
-  assert.deepEqual((await call('POST', '/v1/realm/delete', { id: a.id }, g.secret)).body, { ok: true });
+  assert.deepEqual((await call('POST', '/v1/realm/delete', { id: a.id }, g.secret)).body, { ok: true, warnings: [] });
   assert.equal(env.SAVES._map.size, 0, 'the two the row names, and the walk of its prefix');
   assert.deepEqual((await call('GET', '/v1/realm', undefined, g.secret)).body.characters, []);
 });

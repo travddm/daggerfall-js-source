@@ -80,6 +80,26 @@ An online character's truth is the service's, not the client's (`server-account/
 - Value moving between players (trades, market, mail) goes through `realm_trades` and the ledger. `holdRefusal`
   refuses any such move for a held character.
 
+### Deleting a realm character
+
+`server-account/src/character-delete/delete-character.ts`. The delete runs as one batch:
+
+- It reads what it settles (`character-snapshot.ts`), and the batch refuses itself (`delete-moved`) when any of it
+  changed before the batch ran.
+- Its own market business is cancelled. Bids on its auctions, its own leading bids, orders and commissions are voided,
+  and their Marks come back on each bidder's next market read.
+- A tenant in one of its homes is refunded the unused days, from the rent the home still holds.
+- A lone guildmaster's guild ends: its gold goes by mail and its Marks to the account. A guildmaster with members hands
+  the guild to the next member.
+- Its goods, gold and Stores materials go to the account's mailbox (`delete-mail.ts`). A crafted piece it bought that
+  waits only as a provenance is lost.
+- Every row on the delete list goes (`character-rows.ts`). A last step refuses the batch if any of them is left.
+  `KEPT_ROWS` names each column that keeps the character's id, and why: receipts, history, evidence.
+- The R2 objects go after the batch commits.
+
+It refuses a tombstone (`dead`), a judged character that would send goods (`trade-held`, `record-unjudged`), and a lone
+guildmaster's guild that still holds something other than gold or Marks (the guild's leave refusals).
+
 ## Marks and the ledger
 
 Marks are the online currency. Every movement is one `marks_ledger` row with a source and destination kind (`mint`,
@@ -122,8 +142,9 @@ same way instead of paying twice. Listings and auctions are unique on `(seller, 
   the batch.
 - A shared container's goods live in `decor_bin`, keyed to their piece in `home_decor`. A write that would delete the
   piece or its home, or make the piece no longer a container, refuses while the bin holds goods (`decor-holds`,
-  `home-holds`, and `realm-home-holds` for a character delete; `decor-bin-holds.ts`). A deed's hold, given up as its
-  deed sells, takes them with it.
+  `home-holds`; `decor-bin-holds.ts`). A deed's hold, given up as its deed sells, takes them with it. A character's
+  delete sends the goods to its account by mail first. A container's access rule (`decor_access`) and a chest held open
+  (`decor_hold`) go with their piece by its key's cascade.
 - Entry is `private`, `party` or `public` (`setHomeEntry`); `decorMay` checks who may place or use decor.
 - Yards are decor rows with a `yard` flag. `yardsOf` serves a town's yards from a short-lived in-memory snapshot
   (`YARDS_KEPT_S`); `settleYards` runs a bounded number a minute.
