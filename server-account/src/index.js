@@ -235,7 +235,8 @@ import { claimArena, arenaAttempt, arenaBoardOf, arenaTeam, arenaRatingOf, ARENA
 import { arenaSeasonOf } from '../../src/net/arena/arenaLaw.js';
 import { BUSY_RETRY_AFTER_S } from '../../src/net/busyLaw.js';   // BUSY-GATE: how long an overload answer tells a client to stand back
 import { sendLetter, inboxOf, readLetter, deleteLetter } from './letters.js';   // MAIL1: the letters' routes
-import { postBoxOf, readPost, claimPost, deletePost } from './post.js';   // SERVER-POST: the server's post
+import { postBoxOf, readPost, claimPost, deletePost } from './post.js';
+import { deleteCharacter } from './character-delete/delete-character.ts';   // SERVER-POST: the server's post
 import { mailLostSpoils } from './lostSpoils.js';   // LOST-SPOILS: a boss's floor's leftovers into the post
 import { LOST_BODY_MAX } from '../../src/net/lostLaw.js';
 import { sendReport, myReports, reportInbox, readReport, closeReport } from './reports.js';   // PRIVATE-REPORT: a player's private report
@@ -310,7 +311,7 @@ import { contractBoard, postContract, withdrawContract, contractPayStatements, c
 import { motherlodesRead, strikeMotherlode, isMotherlodeNode } from './motherlodes.js';   // PROF2b: the Motherlodes
 import { marketRead, marketList, marketBuy, marketCancel, marketOrder, marketFill, marketUnorder, marketCollect, marketReport, marketRemove, marketAuction, marketBid, marketGoldCollect, marketVendor, marketVendors, marketMyVendors, marketRoad } from './market.js';   // PROF5: the market; PROF5b: its auctions; GOLD-MARKET: gold held collected; RPT1026-MARKET: the road alone
 import {
-  listRealm, createRealm, joinRealm, getRealmBlob, leaveRealm, deleteRealm,
+  listRealm, createRealm, joinRealm, getRealmBlob, leaveRealm,
   realmMintFacts, modeClaimOf, REALM_CHARACTERS_MAX, REALM_MAX_BYTES, objectBytesOf,
 } from './realm.js';   // REALM P1: the realm's characters; ARENA4b: the level on a realm character's tile, the token's `cl`
 import { grantSpoils } from './budget.js';   // INT5: a signed win's spoils fill the playing character's budget
@@ -390,21 +391,17 @@ const RENT_STATUS = Object.freeze({
 /** PRIVATE-REPORT: a report's refusals that are not a bad request (400, the default). */
 const REPORT_STATUS = Object.freeze({ 'report-rate': 429, 'report-full': 409, 'no-report': 404, 'not-report-reader': 403 });
 /** SERVER-POST: the post's own refusals; a claim's realm words are REALM_STATUS's. */
-const POST_STATUS = Object.freeze({ 'no-post': 404, 'post-no-item': 409, 'post-claimed': 409, 'post-unclaimed': 409, 'realm-only': 403, 'realm-needed': 409, server: 503,
+const POST_STATUS = Object.freeze({ 'no-post': 404, 'post-no-item': 409, 'post-claimed': 409, 'post-unclaimed': 409, 'stores-full': 409, 'realm-only': 403, 'realm-needed': 409, server: 503,
   'lost-pieces': 400, 'lost-item': 400, 'lost-no-kill': 409, 'lost-spent': 409, 'lost-full': 409 });   // AUDIT SERVER-POST: a batch D1 dropped is the service's failure, counted as one
 const REALM_STATUS = Object.freeze({
   ...JUDGE_STATUS,   // INT3/INT4
   'no-realm-character': 404, 'no-data': 404, lease: 409, seq: 409, 'too-many-characters': 409, auth: 401,   // SESSION-SIGN E3: a checkpoint's session gone
   'no-storage': 503,
   'trade-spent': 409,   // REALM P2.1: a trade's sid another pair settled
-  'guild-master-leaves': 409,   // AUDIT REALM L1-F7: a guildmaster deleted hands the guild over first
-  'guild-treasury': 409,   // AUDIT REALM2 S8: and a lone one empties the treasury first
-  'guild-hall': 409,   // AUDIT GUILD1d S1: and sells its guild's hall first
-  'guild-vault': 409,   // AUDIT GUILD2 G2: and empties its guild's vault first
-  'guild-seat': 409, 'guild-battle': 409,   // SEAT1c: and relinquishes its Charters, and fights the battle it is named in
-  'realm-market-open': 409,   // PROF-DELETE: and one with market business open settles it first
-  'home-tenants': 409, 'home-rent-due': 409,   // HOME-RENT: and one renting rooms out waits for its tenants and collects its rent
-  'home-vendor-stocked': 409, 'realm-home-holds': 409,   // HOME-VENDOR: and one whose trader still sells, or whose home chests hold goods
+  // A lone guildmaster's delete waits for what its guild still holds, as a leave does
+  'guild-hall': 409, 'guild-vault': 409, 'guild-stores': 409, 'guild-writs': 409, 'guild-writ-escrow': 409, 'guild-contracts': 409,
+  'guild-seat': 409, 'guild-battle': 409, 'guild-patron': 409, 'marks-full': 409,
+  'delete-moved': 409,   // something the delete settles changed while it was read; nothing was written
   'realm-birth': 403,   // AUDIT REALM2 S1: a first save the realm's law refuses
   // LEGACY7 (legacy.js): a tombstone is gone for good; a line or person the birth cannot be; a line's model is its founder's
   dead: 410, 'no-lineage': 404, 'lineage-person': 409, 'lineage-played': 409, 'lineage-model': 409, 'too-many-lineages': 409,
@@ -2109,7 +2106,7 @@ const service = {
         if (request.method !== 'POST') return no('method', 405, origin);
         const act = {
           '/v1/post/read': () => readPost(ctx, who.player, body.id),
-          '/v1/post/claim': () => claimPost({ ...ctx, bucket: env.SAVES }, who.player, { id: body.id, character: body.character, realm: body.realm }),   // the realm record is in R2
+          '/v1/post/claim': () => claimPost({ ...ctx, bucket: env.SAVES }, who.player, { id: body.id, character: body.character, realm: body.realm, letter: body.letter === true }),   // the realm record is in R2
           '/v1/post/delete': () => deletePost(ctx, who.player, body.id),
           '/v1/post/lost': () => mailLostSpoils(ctx, who.player, { day: body.day, pieces: body.pieces }),   // LOST-SPOILS: the Lost and Found's (lostSpoils.js)
         }[path];
@@ -2304,7 +2301,7 @@ const service = {
         if (path === '/v1/realm/unions') return json({ unions: await listUnions(rctx, me) }, 200, origin);
         // /v1/realm/delete - HOUSE-LOSS: which undoes one too, for a door that asks a delete. ACCOUNT-HOMES: the homes it
         // bought go with it (QUEST-HOME's `moved`), and their towns' kept yards are let go as a decor write lets them go (YARD-SHED)
-        const deleted = await deleteRealm(rctx, me, body.id);
+        const deleted = await deleteCharacter(rctx, me, body.id);
         for (const { mapId } of deleted?.moved ?? []) forgetYards(mapId);
         return answer(await homeOrdersOf(deleted, me, env, subtle, nowS));   // QUEST-HOME: its homes a house again to every page online
       }

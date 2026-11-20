@@ -126,7 +126,7 @@ const weapon = () => generateRandomLoot({ ...LOOT_MATRICES['-'], MinGold: 5, Max
   .find((it) => it.group === 'Weapons' && it.templateIndex !== ARROW_TEMPLATE);
 const HUBS = { 17: [207, 212], 23: [590, 166] };
 
-test('ACCOUNT-HOMES the trader and the delete: the other character stocks the trader of the home the first bought; deleting the buyer waits while those goods stand there (home-vendor-stocked), then takes its homes - and what the other character placed in them - and lets its towns\' kept yards go; the other character stands (mutants: listGood\'s home the buyer\'s; the stock unasked; the yards kept)', async (t) => {
+test('ACCOUNT-HOMES the trader and the delete: the other character stocks the trader of the home the first bought; deleting the buyer cancels those goods into the mailbox of the account and takes its homes - and what the other character placed in them - and lets its towns\' kept yards go; the other character stands (mutants: listGood\'s home the buyer\'s; the stock unasked; the yards kept)', async (t) => {
   t.mock.method(Date, 'now', () => T0 * 1000);
   const { call, env, raw, aldric, A, A2, at, claim } = await stood({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on' });
   assert.equal((await claim(3)).status, 200);
@@ -148,13 +148,12 @@ test('ACCOUNT-HOMES the trader and the delete: the other character stocks the tr
   const yardPlaced = await call('/v1/homes/decor/place', { mapId: MAP, buildingKey: 3, character: A2.id, realm: await at(A2), yard: true, piece: piece({ id: 'y1', pos: [8, 0, 2], rot: [0, 0, 0], paid: 120 }) }, aldric.secret);
   assert.equal(yardPlaced.status, 200, JSON.stringify(yardPlaced.body));
   assert.equal((await call('/v1/homes/yards', { mapId: MAP })).body.yards.length, 1, 'the yard read - and kept');
-  // the buyer's delete waits for what the other character has standing at the trader
-  const waits = await call('/v1/realm/delete', { id: A.id }, aldric.secret);
-  assert.deepEqual([waits.status, waits.body.error], [409, 'home-vendor-stocked']);
-  assert.ok(raw.prepare('SELECT 1 FROM homes WHERE building_key = 3').get(), 'nothing gone');
-  raw.prepare("UPDATE market_listings SET state = 'removed', returned = 1").run();
+  // the buyer's delete takes the trader with the home: what the other character had standing there is cancelled, and the
+  // goods go to the account's mailbox
   const gone = await call('/v1/realm/delete', { id: A.id }, aldric.secret);
   assert.equal(gone.status, 200, JSON.stringify(gone.body));
+  assert.equal(raw.prepare('SELECT state FROM market_listings').get().state, 'cancelled');
+  assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM server_post WHERE to_id = ? AND item IS NOT NULL').get(aldric.id).n, 1, 'the stock by mail');
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM homes').get().n, 0, 'the homes it bought go with it - every character of the account loses them');
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM home_decor').get().n, 0, 'and what the other character placed in them');
   assert.deepEqual((await call('/v1/homes/yards', { mapId: MAP })).body.yards, [], 'its town\'s kept yards let go - never thirty seconds of a yard gone');

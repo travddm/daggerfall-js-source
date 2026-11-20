@@ -104,19 +104,17 @@ test('a home moved out of the arena keeps its place while its chests hold goods'
   assert.deepEqual([count('homes'), count('home_decor'), count('decor_bin')], [1, 1, 1]);
 });
 
-test('a realm character whose home chest holds goods is not deleted', async () => {
+test('a realm character whose home chest holds goods is deleted, and the goods go to its account by mail', async () => {
   const { svc, realm, deposit, count, call } = await homeWithChest({ seat: true });
   deposit();
+  svc.env.DB._raw
+    .prepare('UPDATE decor_bin SET item = ?')
+    .run(JSON.stringify({ uid: 'u1', group: 'Weapons', templateIndex: 113, name: 'Dagger' }));
   const answer = await call('/v1/realm/delete', { id: realm.id });
-  assert.equal(answer.body.error, 'realm-home-holds');
-  assert.equal(answer.status, 409);
-  assert.equal(
-    accountRefusalText(answer.body.error),
-    'Take the goods out of your home before you delete this character.',
-  );
-  const row = svc.env.DB._raw.prepare('SELECT obj FROM realm_characters WHERE id = ?').get(realm.id) as { obj: string };
-  assert.ok(svc.env.SAVES._map.has(row.obj), 'its save stays');
-  assert.deepEqual([count('homes'), count('decor_bin')], [1, 1]);
+  assert.equal(answer.status, 200, JSON.stringify(answer.body));
+  assert.deepEqual([count('homes'), count('decor_bin')], [0, 0]);
+  const mail = svc.env.DB._raw.prepare('SELECT COUNT(*) AS n FROM server_post WHERE item IS NOT NULL').get() as { n: number };
+  assert.equal(mail.n, 1, 'the good from the chest by mail');
 });
 
 test('a guild hall whose chests hold goods is not sold', async () => {

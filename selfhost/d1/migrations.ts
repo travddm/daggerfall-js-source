@@ -58,9 +58,17 @@ export function splitStatements(sql: string): string[] {
   return out;
 }
 
+/** Throws unless the database enforces foreign keys. The account service relies on them: a character's delete takes
+ *  a home's pieces by a cascade, and a chest's key refuses a delete that would strand its goods. */
+export function requireForeignKeys(store: SqlStore): void {
+  const [row] = Array.from(store.sql.exec('PRAGMA foreign_keys').raw());
+  if (Number(row?.[0]) !== 1) throw new Error('the account database does not enforce foreign keys');
+}
+
 /** Applies every migration the ledger does not name, each in its own transaction, and returns the names applied. A
  *  failing file rolls back alone and throws, so the files after it wait for the next start. */
 export function applyMigrations(store: SqlStore, migrations: Migration[]): string[] {
+  requireForeignKeys(store);
   store.sql.exec(LEDGER);
   const done = new Set(Array.from(store.sql.exec('SELECT name FROM d1_migrations').raw(), (row) => String(row[0])));
   const applied: string[] = [];

@@ -25,6 +25,12 @@ async function homeWithChestAndOffer() {
        VALUES (?, ?, ?, 'char-aldric', 'Aldric', 17, 1000, 1)`,
     )
     .run(MAP_ID, BUILDING_KEY, owner.id);
+  // The chest itself, then its access rule: the rule's key names the piece
+  raw
+    .prepare(
+      `INSERT INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (?, ?, 'chest', 1, '{"storage":true}', 1)`,
+    )
+    .run(MAP_ID, BUILDING_KEY);
   raw
     .prepare(
       `INSERT INTO decor_access (map_id, building_key, piece_id, kind, mode) VALUES (?, ?, 'chest', 'storage', 'private')`,

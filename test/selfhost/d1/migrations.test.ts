@@ -76,3 +76,12 @@ test('a later file waits for the next start when an earlier one fails, and the f
   steps[1] = { name: '0002_b.sql', sql: 'CREATE TABLE b (x INTEGER);' };
   assert.deepEqual(applyMigrations(store, steps), ['0002_b.sql', '0003_c.sql']);
 });
+
+test('the migrations refuse a database that does not enforce foreign keys, before writing anything', () => {
+  const store = sqliteStore();
+  store.db.exec('PRAGMA foreign_keys = OFF');
+  assert.throws(() => applyMigrations(store, MIGRATIONS), /does not enforce foreign keys/);
+  assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE name = 'd1_migrations'").get()?.n, 0);
+  store.db.exec('PRAGMA foreign_keys = ON');
+  assert.equal(applyMigrations(store, MIGRATIONS).length, MIGRATIONS.length);
+});

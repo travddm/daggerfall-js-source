@@ -1918,6 +1918,8 @@ export interface ServerPostTable {
   read_at: number | null;
   claimed_at: number | null;
   claimed_by: string | null;
+  gold: Generated<number>;
+  materials: string | null;
 }
 
 export interface SessionsTable {

@@ -315,14 +315,14 @@ test('SCALE4b E: each hour the rows nothing reads any more go - a rate window a 
 
   // every bucket's window inside the keep: each overRate call's window is an hour or less
   const windows = new Map();
-  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url))) {
+  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url), { recursive: true }).filter((x) => /\.(js|ts)$/.test(x))) {
     for (const m of src(`server-account/src/${f2}`).matchAll(/export const ([A-Z_]+_WINDOW_S) = ([0-9 *]+);/g)) windows.set(m[1], Function(`return ${m[2]}`)());
   }
   for (const f2 of readdirSync(new URL('../../src/net', import.meta.url), { recursive: true }).filter((x) => x.endsWith('.js'))) {
     for (const m of src(`src/net/${f2}`).matchAll(/export const ([A-Z_]+_WINDOW_S) = ([0-9 *]+);/g)) windows.set(m[1], Function(`return ${m[2]}`)());
   }
   let calls = 0;
-  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url))) {
+  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url), { recursive: true }).filter((x) => /\.(js|ts)$/.test(x))) {
     const text = src(`server-account/src/${f2}`);
     for (const m of text.matchAll(/(?<!function )\boverRate\(/g)) {
       calls++;
