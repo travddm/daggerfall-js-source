@@ -38,6 +38,11 @@ service itself is in [account-service.md](account-service.md).
 | Group content | `gate_kills`, `arena_*`, `serpent_kills`, `sd_kills` |
 | Professions and towns | the `prof_*` tables, `node_harvests`, `motherlodes`; town seats (`town_seat_*`); town economy (`town_econ_*`) |
 | Moderation and staff | `mod_cases`, `mod_reports`, `mod_case_lines`, `mod_actions`, `private_reports`, the `staff_*` tables |
+| Post | `server_post`: one account's mail, each piece with at most one item, gold and Stores materials (`post.js`) |
+
+A piece of post is claimed into the realm character being played: the item and the gold go into its record, the
+materials into its Stores, all in one batch. A claim whose materials would take a Stores past `STORES_MAX` of one
+material is refused `stores-full` and moves nothing. A piece holding goods is never thrown away before its claim.
 
 Deleting a `players` row cascades to most of an account's rows. `products` deliberately does not cascade: a crafted
 piece outlives its maker's account.

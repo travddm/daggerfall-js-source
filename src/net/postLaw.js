@@ -2,8 +2,8 @@
 // The server's post: its law, the one file the service (server-account/src/post.js)
 // and the client (net/serverPost.js, ui/enhanced/enhancedPost.js) all read.
 //
-// A piece of the post is the developers' to one account: a subject, a body, and at most ONE item, which its reader
-// claims into the online character they are playing. Nothing a player sends writes one - the operator is its sender, and the operator's list First of the Spire's letter's,
+// A piece of the post is the developers' to one account: a subject, a body, and at most ONE item, gold and Stores
+// materials, which its reader claims into the online character they are playing. Nothing a player sends writes one - the operator is its sender, and the operator's list First of the Spire's letter's,
 // its words fixed (server-account/src/egHonours.js egFirstPost), and the service's hourly clock a spent Weir Key
 // stake's, its words fixed too (server-account/src/eg.js spendLapsedStakes).
 
@@ -37,9 +37,51 @@ export function postItemHead(rec) {
   return { name, rarity: typeof rec.rarity === 'string' && /^[a-z]{1,16}$/.test(rec.rarity) ? rec.rarity : null };
 }
 
+/** A material's key as the Stores file it (`herb:rose`, `p1:12`). */
+export const POST_MATERIAL_RE = /^[a-z0-9_-]{1,16}:[a-z0-9_-]{1,40}$/;
+/** Where a material in the Stores came from; the market treats own and bought units apart. */
+export const POST_MATERIAL_ORIGINS = Object.freeze(['own', 'bought', 'gold', 'loose']);
+/** The most of one material a piece carries: what an empty Stores can take (professionLaw.js STORES_MAX). */
+export const POST_MATERIAL_MAX = 5000;
+/** The most materials one piece lists. */
+export const POST_MATERIALS_MAX = 64;
+
+/**
+ * @typedef {{ material: string, origin: string, qty: number }} PostMaterial
+ */
+
+/**
+ * The materials a piece carries, checked, or null when the list is not one. A missing or empty list is `[]`.
+ * @param {unknown} list
+ * @returns {PostMaterial[] | null}
+ */
+export function postMaterialsOf(list) {
+  if (list == null) return [];
+  if (!Array.isArray(list) || list.length > POST_MATERIALS_MAX) return null;
+  /** @type {PostMaterial[]} */
+  const out = [];
+  for (const entry of list) {
+    if (!entry || typeof entry !== 'object') return null;
+    const { material, origin, qty } = /** @type {Record<string, unknown>} */ (entry);
+    if (typeof material !== 'string' || !POST_MATERIAL_RE.test(material)) return null;
+    if (typeof origin !== 'string' || !POST_MATERIAL_ORIGINS.includes(origin)) return null;
+    if (!Number.isSafeInteger(qty) || /** @type {number} */ (qty) < 1 || /** @type {number} */ (qty) > POST_MATERIAL_MAX) {
+      return null;
+    }
+    out.push({ material, origin, qty: /** @type {number} */ (qty) });
+  }
+  return out;
+}
+
+/**
+ * Whether a piece holds anything to claim: an item, gold or materials.
+ * @param {{ item?: unknown, gold?: number, materials?: unknown[] }} head
+ */
+export const postHoldsGoods = (head) => head.item != null || (head.gold ?? 0) > 0 || (head.materials?.length ?? 0) > 0;
+
 /**
  * A PIECE'S HEAD as the box carries it, checked on the way in (the client reads the service's answer through it), or
- * null: `{ id, from, subject, sentAt, read, item, claimed }` - `item` its postItemHead or null.
+ * null: `{ id, from, subject, sentAt, read, item, gold, materials, claimed }` - `item` its postItemHead or null.
  * @param {any} p
  */
 export function postHead(p) {
@@ -49,7 +91,12 @@ export function postHead(p) {
   if (!from || !subject || !Number.isSafeInteger(p.sentAt)) return null;
   const item = p.item == null ? null : postItemHead(p.item);
   if (p.item != null && !item) return null;
-  return { id: p.id, from, subject, sentAt: p.sentAt, read: p.read === true, item, claimed: item ? p.claimed === true : false };
+  const gold = p.gold == null ? 0 : p.gold;
+  if (!Number.isSafeInteger(gold) || gold < 0) return null;
+  const materials = postMaterialsOf(p.materials);
+  if (!materials) return null;
+  const holds = postHoldsGoods({ item, gold, materials });
+  return { id: p.id, from, subject, sentAt: p.sentAt, read: p.read === true, item, gold, materials, claimed: holds ? p.claimed === true : false };
 }
 
 /** A WHOLE PIECE (`/v1/post/read`'s answer): its head and its body, or null. */
@@ -59,5 +106,6 @@ export function postWhole(p) {
   return head && body ? { ...head, body, read: true } : null;
 }
 
-/** The pieces that hold an item not yet taken - the mailbox's mark lights for these as for unread words. */
-export const unclaimedOf = (/** @type {Array<{ item: any, claimed: boolean }>} */ heads) => heads.filter((h) => h.item && !h.claimed).length;
+/** The pieces that hold goods not yet taken - the mailbox's mark lights for these as for unread words. */
+export const unclaimedOf = (/** @type {Array<{ item?: any, gold?: number, materials?: unknown[], claimed: boolean }>} */ heads) =>
+  heads.filter((h) => postHoldsGoods(h) && !h.claimed).length;

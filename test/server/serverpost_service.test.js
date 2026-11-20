@@ -70,7 +70,7 @@ test('SERVER-POST the box and a piece opened: newest first, heads alone - the it
   const b = await box(svc, ann);
   assert.equal(b.status, 200);
   assert.deepEqual(b.body.post.map((p) => p.id), [gift, words], 'newest first, and only Ann\'s');
-  assert.deepEqual(b.body.post[0], { id: gift, from: POST_SENDER, subject: 'The Dragonfire Oath', sentAt: T0 + 10, read: false, item: { name: 'The Dragonfire Oath', rarity: 'gilded' }, claimed: false });
+  assert.deepEqual(b.body.post[0], { id: gift, from: POST_SENDER, subject: 'The Dragonfire Oath', sentAt: T0 + 10, read: false, item: { name: 'The Dragonfire Oath', rarity: 'gilded' }, gold: 0, materials: [], claimed: false });
   assert.deepEqual(b.body.post[1].item, null);
   assert.equal(b.body.post[1].claimed, false, 'a message alone is never waiting to be claimed');
   assert.deepEqual([b.body.unread, b.body.unclaimed, b.body.max], [2, 1, POST_BOX_MAX]);
