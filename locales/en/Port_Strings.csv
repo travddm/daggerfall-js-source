@@ -4275,6 +4275,8 @@ portal.buy.ask,"{n, plural, one {Buy a Portal Stone} other {Buy # Portal Stones}
 portal.buy.bought,"{n, plural, one {You buy a Portal Stone.} other {You buy # Portal Stones.}}"
 portal.buy.full,"Your stack of Portal Stones holds no more than {max, number}."
 portal.refused.event,"A portal cannot open this close to an event's gate."
+post.chip.goldAndMaterials,"{n, number} gold, materials"
+post.chip.materials,"Materials"
 post.claimAll,"Claim all ({n})"
 post.claimedAll,"{n, plural, one {# item is} other {# items are}} in your pack."
 post.claimedGold,"{n, number} gold is yours."

@@ -32,13 +32,25 @@ const POST_WORDS = Object.freeze({
  */
 
 /**
+ * A chip's short words for a piece with no item: as short as an item's name, so a phone keeps room for the subject.
+ * @param {any} p
+ */
+function goodsChipText(p) {
+  const gold = (p.gold ?? 0) > 0;
+  const materials = (p.materials?.length ?? 0) > 0;
+  if (gold && materials) return t('post.chip.goldAndMaterials', '{n, number} gold, materials', { n: p.gold });
+  if (gold) return t('post.goods.gold', '{n, number} gold', { n: p.gold });
+  return t('post.chip.materials', 'Materials');
+}
+
+/**
  * A list row's chip for a piece holding goods: the item by name in its rarity's colour, else the goods in words.
  * @param {MakeElement} el
  * @param {any} p
  */
 function goodsChip(el, p) {
   const chip = el('span', 'pm-chip');
-  const name = el('span', null, p.item ? p.item.name : postGoodsText(p));
+  const name = el('span', null, p.item ? p.item.name : goodsChipText(p));
   const rar = p.item ? postRarity(p.item.rarity) : null;
   if (rar) name.setAttribute('data-rarity', rar);
   chip.append(name, el('span', 'pm-state', p.claimed ? 'Claimed' : 'Waiting'));
