@@ -123,12 +123,13 @@ export async function readSnapshot(
   nowS: number,
 ): Promise<{ snapshot: Snapshot; print: string }> {
   const print = await readFingerprint(db, player, character, nowS);
-  const parsed = JSON.parse(print) as unknown[][][];
+  const parsed = JSON.parse(print) as unknown[];
   const snapshot = {} as Snapshot;
   (Object.entries(READS) as [ReadName, Read][]).forEach(([name, read], index) => {
-    snapshot[name] = (parsed[index] ?? []).map((values) =>
-      Object.fromEntries(read.columns.map((column, at) => [column, values[at]])),
-    );
+    // An older SQLite hands a read's array on as JSON text rather than as JSON, so either is taken
+    const part = parsed[index];
+    const rows = (typeof part === 'string' ? JSON.parse(part) : (part ?? [])) as unknown[][];
+    snapshot[name] = rows.map((values) => Object.fromEntries(read.columns.map((column, at) => [column, values[at]])));
   });
   return { snapshot, print };
 }
