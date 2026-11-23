@@ -282,6 +282,11 @@
   {
     "file": "brokerSales.js",
     "table": "broker_sales",
+    "sql": "broker_sales"
+  },
+  {
+    "file": "brokerSales.js",
+    "table": "broker_sales",
     "sql": "broker_sales WHERE account = ${acc} AND rid = ${rid})"
   },
   {

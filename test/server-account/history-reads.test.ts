@@ -1,11 +1,12 @@
+// test:changed scans: server-account/src/
 // A source sweep over the account service: request-path SQL must not read a history table to decide a change. A cap,
 // a balance or a gate reads current state (a counter in act_counts, a column on the row it describes), so a server
 // can keep history for a short window or not at all. history-reads-allowed.json lists the reads that already exist.
 // Work that moves a read to current state removes its entry, and a new entry needs a reviewer's agreement that the
 // read is the act's own batch, a once-only key lookup, or a display page.
 //
-// What the sweep cannot see: a table named through a template value (`FROM ${table}`), and reads in cron.js, whose
-// scheduled jobs are not request paths.
+// It reads SQL text and Kysely table arguments. It cannot see a table named through a template value (`FROM ${table}`),
+// nor reads in cron.js, whose scheduled jobs are not request paths.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -85,8 +86,11 @@ function readsIn(file: string, source: string): HistoryRead[] {
   const text = withoutComments(source);
   const reads: HistoryRead[] = [];
   // A DELETE names its table after FROM but reads nothing from it.
-  const tableReference = /(?<!DELETE\s+)\b(?:FROM|JOIN)\s+([a-z_][a-z0-9_]*)\b/gi;
-  for (const match of text.matchAll(tableReference)) {
+  const sqlReference = /(?<!DELETE\s+)\b(?:FROM|JOIN)\s+([a-z_][a-z0-9_]*)\b/gi;
+  // A Kysely query names its table as a string argument.
+  const kyselyReference = /\b(?:selectFrom|innerJoin|leftJoin|rightJoin|fullJoin)\(\s*['"]([a-z_][a-z0-9_]*)/g;
+  const matches = [...text.matchAll(sqlReference), ...text.matchAll(kyselyReference)];
+  for (const match of matches) {
     const table = match[1];
     if (!HISTORY_TABLES.has(table)) continue;
     const tableStart = match.index + match[0].length - table.length;
@@ -133,21 +137,28 @@ test('request-path SQL reads a history table only at a site on the allowed list'
     added,
     [],
     "a new read of a history table: read a counter or a state column instead. A read of the act's own batch, a " +
-      'once-only key or a display page may be added to history-reads-allowed.json.',
+      'once-only key or a display page may be added to history-reads-allowed.json ' +
+      '(UPDATE_HISTORY_READS=1 rewrites it from the tree).',
   );
-  assert.deepEqual(gone, [], 'an allowed read is gone: remove it from history-reads-allowed.json');
+  assert.deepEqual(
+    gone,
+    [],
+    'an allowed read is gone: remove it from history-reads-allowed.json (UPDATE_HISTORY_READS=1 rewrites it).',
+  );
 });
 
-test('the sweep sees a history read, skips a delete, a comment and a table that is not history', () => {
+test('the sweep sees a history read in SQL and in Kysely, and skips a delete, a comment and a table that is not history', () => {
   const sample = [
     "db.prepare('SELECT amount FROM marks_ledger WHERE actor = ?')",
     "db.prepare('DELETE FROM marks_ledger WHERE seq = ?')",
     "db.prepare('SELECT balance FROM marks WHERE account = ?')",
     '// a note on the history: SELECT 1 FROM gate_kills',
     '`SELECT 1 FROM guilds g JOIN gate_kills k ON k.account = g.id`',
+    "seam.kysely.selectFrom('broker_sales').select(['kind'])",
   ].join('\n');
   assert.deepEqual(readsIn('sample.js', sample), [
     { file: 'sample.js', table: 'marks_ledger', sql: 'marks_ledger WHERE actor = ?' },
     { file: 'sample.js', table: 'gate_kills', sql: 'gate_kills k ON k.account = g.id' },
+    { file: 'sample.js', table: 'broker_sales', sql: 'broker_sales' },
   ]);
 });
