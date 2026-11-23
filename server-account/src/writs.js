@@ -143,7 +143,7 @@ function guildWritReturn(db, id, nowS) {
   ];
 }
 /** A closed (not filled) commission's pay, back to its poster under the cap - one line keyed on the commission. */
-function commissionReturn(db, id, nowS) {
+export function commissionReturn(db, id, nowS) {
   return [
     db.prepare(`${INSERT_LINE} SELECT 'escrow', id, 'account', poster, 'commission-return', pay, ?2, ?3, poster, recipe, 'commission-return:' || id
       FROM commissions WHERE id = ?1 AND state IN ('withdrawn', 'declined', 'expired') AND returned = 0

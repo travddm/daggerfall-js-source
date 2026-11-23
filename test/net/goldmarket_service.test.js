@@ -295,7 +295,7 @@ test('GOLD-MARKET service: a piece bought with gold is marked - it lists again f
 
 // ─── COLLECTING ──────────────────────────────────────────────────────
 
-test('GOLD-MARKET service: the seller\'s gold collected into its own record\'s account at the board (the purse where it keeps none) - both or neither; nothing held refused; a character with gold held is not deleted', async () => {
+test('GOLD-MARKET service: the seller\'s gold collected into its own record\'s account at the board (the purse where it keeps none) - both or neither; nothing held refused', async () => {
   const s = await stand();
   const eve = await s.seated('Eve', { goldPieces: 7 });
   const tom = await s.seated('Tom', { goldPieces: 10_000 });
@@ -310,7 +310,6 @@ test('GOLD-MARKET service: the seller\'s gold collected into its own record\'s a
   assert.equal((await s.read(eve, 'mine')).body.goldHeld, gets, 'the read says what is held');
   const open = () => Number(s.raw.prepare(REALM_MARKET_OPEN_SQL).get(eve.id, eve.character).n);
   assert.equal(open(), 1, 'sold out: the held gold is the one business open');
-  assert.deepEqual(Object.values(await s.call('/v1/realm/delete', { id: eve.character }, eve.secret)), [409, { error: 'realm-market-open' }], 'held gold keeps the character');
   const before = s.record(eve);
   const c = await s.call('/v1/market/gold', { character: eve.character, realm: eve.at(), region: DF }, eve.secret);
   assert.equal(c.status, 200, JSON.stringify(c.body));

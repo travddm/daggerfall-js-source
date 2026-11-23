@@ -47,14 +47,12 @@
 import { isMode, tokenCodeOf, modeOfRequest, creatableModes, offeredFromList, legacy as legacyMode } from '../../src/net/modeLaw.js';   // CHARACTER MODES
 import { withoutUnenforcedModes } from '../../src/systems/unenforced-online-modes.ts';
 import { SAVE_MAX_BYTES } from './service.js';
-import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';   // AUDIT REALM L1-F7: a deleted guildmaster hands the guild over first
-import { homeMoved } from '../../src/net/homeLaw.js';   // QUEST-HOME: the homes a deleted character took with it
 import { liquidWealthOf, REALM_BIRTH_LEVEL, REALM_BIRTH_WEALTH_MAX } from '../../src/net/realm/realmGoldLaw.js';
 import { armsIssuable } from '../../src/net/identityToken.js';   // INT7: the arms' claim
 import { saveTextOf, REALM_TEXT_MAX_BYTES } from '../../src/net/realm/realmSaveCodec.js';   // REALM-GZIP: a save read packed or plain
-import { lineageBirthRefusal, houseOn, endUnionsOf } from './legacy.js';   // LEGACY7: a realm character born as a person of the account's own line
+import { lineageBirthRefusal, houseOn } from './legacy.js';   // LEGACY7: a realm character born as a person of the account's own line
 import { wealthOf, ledgerPieces, classicCount, WEALTH_VERSION } from './judge.js';   // INT5: what the service's own writes move, witnessed; INT4: the pieces it moves
-import { piecesRefusal, ledgerMoves, releaseSteps, ledgerReads, leavingKeys } from './ledger.js';   // INT4: a piece the record may give, and the ledger moved with it; SAVE-BATCH: its reads in the checkpoint's first batch
+import { piecesRefusal, ledgerMoves, ledgerReads, leavingKeys } from './ledger.js';   // INT4: a piece the record may give, and the ledger moved with it; SAVE-BATCH: its reads in the checkpoint's first batch
 import { budgetKept, budgetRead, budgetFrom } from './budget.js';   // SAVE-BATCH: and the budget's config, where the isolate kept none
 import { verdictOn } from './verdict.js';   // INT2-INT5: the verdict on every checkpoint, in the checkpoint's own batch
 
@@ -680,130 +678,9 @@ export async function leaveRealm({ db }, /** @type {string} */ playerId, /** @ty
   return { ok: true, released: r.meta.changes > 0 };
 }
 
-/** THE PLAYER'S OWN DELETE: its objects - the two the row names, and anything else under its prefix a lost write left
- *  - then the row: saves.js's order, so a failure halfway leaves a row whose bytes lie rather than objects nothing
- *  names. AUDIT REALM L1-F7 / L3-F5: AND ITS ONLINE LIFE WITH IT, as the door promises ("its home and its guild place
- *  with it"): the row's delete carries its homes (their pieces and hidden furniture go by the tables' own cascade), its
- *  guild place and its Renown track in ONE batch. ACCOUNT-HOMES: the homes are the ones it BOUGHT -
- *  every character of the account owns them while it stands, and they go with it, whatever another of them placed in
- *  them; goods another stocked at their traders wait ('home-vendor-stocked'). They stood under a dead id: a house nobody could buy again nor its
- *  owner sell, a guild whose master could never be succeeded, a track that counted against the account's sixty
- *  (RENOWN-CHAR: the character's Renown goes with it again, as the door said before RENOWN-ACCOUNT).
- *  A guildmaster with members hands the guild over first ('guild-master-leaves', the guild's own word for leaving).
- *  AUDIT REALM2 S8: AND A LONE ONE EMPTIES THE TREASURY FIRST ('guild-treasury'), as leaving asks (guilds.js leaveGuild).
- *  The delete let it go with gold inside: a guild nobody is in, holding what its records paid in, until the next founder
- *  of its name or tag cleared it away, gold and all.
- *  AUDIT LEGACY III O7: A TOMBSTONE IS NEVER DELETED ('dead') - it is the realm's only word on a Bloodline's death, and
- *  its row the person's claim (realm_characters_person): deleted, the death was gone and the person could be born again
- *  once the line's record forgot it. It holds no roster slot and is never listed, so no door offers its delete.
- *  PROF-DELETE: AND ITS PROFESSIONS WITH IT - its Stores and
- *  its professions' tracks go in the same batch, as its Renown does; they stood under a dead id where nothing could
- *  reach them (MERGE 2's open question 3). What another player is part of waits: while the character has market
- *  business open ('realm-market-open', REALM_MARKET_OPEN_SQL) the delete is refused, since the goods or the piece it
- *  would be handed come to this character. The history (the ledger, the crafts, the sales) stays. */
-export async function deleteRealm({ db, bucket, nowS = Math.floor(Date.now() / 1000) }, /** @type {string} */ playerId, /** @type {unknown} */ id) {
-  if (typeof id !== 'string' || !REALM_ID_RE.test(id)) return { error: 'body' };
-  const row = await db.prepare('SELECT obj, prev, dead_at, held FROM realm_characters WHERE id = ? AND player = ?').bind(id, playerId).first();
-  if (!row) return { error: 'no-realm-character' };
-  if (row.dead_at != null) return { error: 'dead' };   // AUDIT LEGACY III O7
-  // AUDIT CRAFT-HOLD (the exploit audit): A HELD CHARACTER WITH CRAFTS IS NOT DELETED - its row is where its hold lives,
-  // and the hold on the pieces it made (craftHoldOf) went with it: held, deleted, and its pieces listed under any other
-  // name the next minute. Its Stores go with the row (below), so a held character with no piece of its make at the
-  // account goes as any other - a finding can be the law's mistake, and the slot is the player's. The hold lifts (the
-  // law's at a clean checkpoint, a timed one at the first past its end - AUTO-HOLD; staff's by review.js realm-clear);
-  // then it goes.
-  if (row.held && await db.prepare('SELECT 1 FROM products WHERE owner = ?1 AND char_id = ?2 LIMIT 1')
-    .bind(playerId, id).first()) return { error: 'trade-held', held: row.held };
-  const master = await db.prepare(`SELECT (SELECT COUNT(*) FROM guild_members o WHERE o.guild_id = m.guild_id) AS n,
-    (SELECT treasury FROM guilds g WHERE g.id = m.guild_id) AS treasury,
-    (SELECT 1 FROM homes h WHERE h.guild_id = m.guild_id) AS hall,
-    (SELECT 1 FROM guild_vault v WHERE v.guild_id = m.guild_id LIMIT 1) AS vault FROM guild_members m
-    WHERE m.player = ? AND m.char_id = ? AND m.rank = ?`).bind(playerId, id, GUILD_RANK_MASTER).first();
-  if ((master?.n ?? 0) > 1) return { error: 'guild-master-leaves' };
-  if ((master?.treasury ?? 0) > 0) return { error: 'guild-treasury' };
-  // AUDIT GUILD1d S1: and a lone one sells its guild's hall first - deleted, the guild stood memberless with the hall,
-  // which kept it from ever being reclaimed (guildKeepsSql): the building, the name and the deed share gone for good
-  if (master?.hall) return { error: 'guild-hall' };
-  // AUDIT GUILD2 G2: and empties its guild's vault - deleted, the guild stood memberless with pieces nobody could take
-  // out, kept from going by them (guildKeepsSql), its name and tag held for good (guilds.js disband and leave ask it too)
-  if (master?.vault) return { error: 'guild-vault' };
-  if (Number((await db.prepare(REALM_MARKET_OPEN_SQL).bind(playerId, id).first())?.n ?? 0) > 0) return { error: 'realm-market-open' };
-  // ACCOUNT-HOMES: the homes it bought go with it ("Deleted characters should remove their houses from
-  // online"), and any character of the account may stock a trader in one now - so goods another of them has standing at
-  // one wait, as a sale waits for them (homes.js releaseHome): the delete would leave them for sale at a trader gone
-  if (Number((await db.prepare(HOME_VENDOR_STOCK_SQL).bind(playerId, id).first())?.n ?? 0) > 0) return { error: 'home-vendor-stocked' };
-  // HOME-RENT: a room another player is renting in its home waits for its days to run out, and rent held for it waits to
-  // be collected - the delete takes the home with it. AUDIT: then no room of it is offered any more, and both are asked
-  // again - a rent landing between the first asking and the delete's batch was deleted with the home (a rent needs its
-  // room offered, so none can land after the offers go)
-  const homeHeld = async () => {
-    if (Number((await db.prepare(HOME_TENANTS_SQL).bind(playerId, id, nowS).first())?.n ?? 0) > 0) return { error: 'home-tenants' };
-    if (Number((await db.prepare(HOME_RENT_DUE_SQL).bind(playerId, id).first())?.due ?? 0) > 0) return { error: 'home-rent-due' };
-    // Goods in a shared chest of its homes would be left with no chest to open them, so they are taken out first
-    if (await db.prepare(HOME_BIN_HELD_SQL).bind(playerId, id).first()) return { error: 'realm-home-holds' };
-    return null;
-  };
-  const held = await homeHeld();
-  if (held) return held;
-  await db.prepare(`UPDATE home_rooms SET listed = 0 WHERE EXISTS (SELECT 1 FROM homes h WHERE h.map_id = home_rooms.map_id
-    AND h.building_key = home_rooms.building_key AND h.player = ? AND h.char_id = ?)`).bind(playerId, id).run();
-  const late = await homeHeld();
-  if (late) return late;
-  await dropCharacterObjects(bucket, playerId, id, [row.obj, row.prev]);
-  // QUEST-HOME: the homes the delete takes, a house again to every page online - read
-  // with the delete in one batch, so the answer names exactly what went
-  const [gone] = await db.batch([
-    db.prepare('SELECT map_id, building_key FROM homes WHERE player = ? AND char_id = ? ORDER BY map_id, building_key').bind(playerId, id),
-    // A deposit that lands after the asking above goes with its home, and before it: the save objects are gone already,
-    // so the batch must not fail on the bin's key to the pieces.
-    db.prepare(`DELETE FROM decor_bin WHERE EXISTS (SELECT 1 FROM homes h WHERE h.map_id = decor_bin.map_id
-      AND h.building_key = decor_bin.building_key AND h.player = ? AND h.char_id = ?)`).bind(playerId, id),
-    db.prepare('DELETE FROM homes WHERE player = ? AND char_id = ?').bind(playerId, id),
-    db.prepare('DELETE FROM guild_members WHERE player = ? AND char_id = ?').bind(playerId, id),
-    db.prepare('DELETE FROM renown_tracks WHERE player = ? AND char_id = ?').bind(playerId, id),
-    db.prepare('DELETE FROM prof_stores WHERE player = ? AND char_id = ?').bind(playerId, id),   // PROF-DELETE
-    db.prepare('DELETE FROM prof_tracks WHERE player = ? AND char_id = ?').bind(playerId, id),   // PROF-DELETE
-    db.prepare('DELETE FROM firmament WHERE player = ? AND char_id = ?').bind(playerId, id),   // AUDIT UICALM-FIRM1 L2 L2: its sky with it (firmament_sets stay - the ids' memory, so a replay is answered, never made again)
-    db.prepare('DELETE FROM prof_unbruised WHERE player = ? AND char_id = ?').bind(playerId, id),   // AUDIT PROF-541 B5: the unbruised count goes with the Stores it counts
-    db.prepare('DELETE FROM prof_carried WHERE player = ? AND char_id = ?').bind(playerId, id),   // BAG1: and what it was counted as carrying
-    db.prepare('DELETE FROM prof_silver_cloth WHERE player = ? AND char_id = ?').bind(playerId, id),   // WOVEN-PAYS: and its cloth's silver counts
-    db.prepare('DELETE FROM npc_roll WHERE player = ? AND char_id = ?').bind(playerId, id),   // CHAP1: its standing with the guilds (npcRoll.js)
-    db.prepare('DELETE FROM npc_roll_heads WHERE player = ? AND char_id = ?').bind(playerId, id),
-    db.prepare('DELETE FROM npc_rep_events WHERE player = ? AND char_id = ?').bind(playerId, id),
-    db.prepare('DELETE FROM npc_receipt_credits WHERE player = ? AND char_id = ?').bind(playerId, id),   // CHAP2b: and what its receipts gave
-    db.prepare('DELETE FROM npc_chapter_seats WHERE account = ? AND char_id = ?').bind(playerId, id),   // CHAP4a: and its seats (the Chronicle keeps their story)
-    db.prepare('DELETE FROM realm_characters WHERE id = ? AND player = ?').bind(id, playerId),
-    ...releaseSteps(db, id, nowS, { deleted: true }),   // INT4: its pieces no record's, its claims and copies gone with it
-    endUnionsOf(db, id, nowS, 'gone'),   // LEGACY7 part three: a union ends with the character
-    db.prepare('DELETE FROM realm_wed_halves WHERE char_id = ?').bind(id),
-  ]);
-  /** @type {Map<number, number[]>} */
-  const towns = new Map();
-  for (const h of gone?.results ?? []) towns.set(h.map_id, [...(towns.get(h.map_id) ?? []), h.building_key]);
-  return { ok: true, ...(towns.size ? { moved: [...towns].flatMap(([mapId, keys]) => homeMoved(mapId, [], keys)) } : {}) };
-}
-
-/** HOME-RENT: THE TENANCIES STILL RUNNING in a character's homes - a sale (homes.js) or the character's
- *  delete waits for them: another player paid for those days. `?1` the account, `?2` the character, `?3` now; `n`. */
-export const HOME_TENANTS_SQL = `SELECT COUNT(*) AS n FROM home_rooms r JOIN homes h ON h.map_id = r.map_id AND h.building_key = r.building_key
-  WHERE h.player = ?1 AND h.char_id = ?2 AND r.tenant IS NOT NULL AND r.until > ?3`;
-/** HOME-RENT: the rent held on a character's homes, not yet collected (`due`) - its delete waits for it too. */
-export const HOME_RENT_DUE_SQL = 'SELECT COALESCE(SUM(rent_due), 0) AS due FROM homes WHERE player = ?1 AND char_id = ?2';
-/** A row when a shared chest in any of a character's homes holds goods. `?1` the account, `?2` the character. */
-export const HOME_BIN_HELD_SQL = `SELECT 1 AS held FROM decor_bin b JOIN homes h ON h.map_id = b.map_id AND h.building_key = b.building_key
-  WHERE h.player = ?1 AND h.char_id = ?2 LIMIT 1`;
-/** ACCOUNT-HOMES: the goods standing for sale at the traders of the homes a character bought, whoever of the account
- *  stocked them (`n`) - its delete takes those homes and their traders, so it waits for them. `?1` the account, `?2` the
- *  character. */
-export const HOME_VENDOR_STOCK_SQL = `SELECT COUNT(*) AS n FROM market_listings l JOIN home_decor d ON d.map_id = l.vendor_map AND d.id = l.vendor_id
-  JOIN homes h ON h.map_id = d.map_id AND h.building_key = d.building_key WHERE l.state = 'open' AND h.player = ?1 AND h.char_id = ?2 AND h.guild_id IS NULL`;
-
-/** PROF-DELETE: A CHARACTER'S MARKET BUSINESS STILL OPEN (`?1` the account, `?2` the character) - each a thing another
- *  player is part of whose goods, piece or Marks' worth would come to this character: a listing or an auction still
- *  standing, or closed with its goods not yet back (market.js settle hands them back on the next read); a leading bid; a
- *  buy order or a commission still open; a courier's load of materials still on the road to its Stores; a piece to
- *  collect; gold its sales hold for it (GOLD-MARKET: collected into its own record alone). Escrowed Marks come back to
- *  the ACCOUNT, never the character, so an outbid bid or a closed order holds nothing up. `n`, the count. */
+/** How much market business a character still has open (`?1` the account, `?2` the character), as `n`: a listing or
+ *  auction standing or not yet handed back, a leading bid, an open order or commission, materials on the road, a piece
+ *  to collect, and sale gold. Escrowed Marks come back to the account, so an outbid bid or a closed order is not counted. */
 export const REALM_MARKET_OPEN_SQL = `SELECT
   (SELECT COUNT(*) FROM market_listings WHERE seller = ?1 AND char_id = ?2
     AND (state = 'open' OR (state IN ('expired', 'removed') AND returned = 0)))
@@ -818,7 +695,7 @@ export const REALM_MARKET_OPEN_SQL = `SELECT
 
 /** A character's objects: the ones its row names, and anything else under its prefix a lost write left. Best effort -
  *  an object that will not go is not a reason to keep the row. */
-async function dropCharacterObjects(/** @type {any} */ bucket, /** @type {string} */ playerId, /** @type {string} */ id, /** @type {(string | null | undefined)[]} */ named) {
+export async function dropCharacterObjects(/** @type {any} */ bucket, /** @type {string} */ playerId, /** @type {string} */ id, /** @type {(string | null | undefined)[]} */ named) {
   if (!bucket) return;
   await dropObjects(bucket, named);
   if (typeof bucket.list !== 'function') return;

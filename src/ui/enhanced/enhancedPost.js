@@ -13,6 +13,9 @@ import { REFUSALS } from '../../net/accountClient.js';
 import { placeBeside } from './enhancedTimers.js';
 import { reportPane, reportPaneKey } from './enhancedReport.js';   // PRIVATE-REPORT
 import { t } from '../../systems/textManager.js';
+import { postHoldsGoods } from '../../net/postLaw.js';
+import { postGoodsText } from '../../net/serverPost.js';
+import { materialCountLabel } from '../../systems/professions/profItems.js';
 
 /** How often the mark's count and the open window look at the box's version, ms. */
 export const POST_TICK_MS = 500;
@@ -21,7 +24,67 @@ export const POST_TICK_MS = 500;
 const POST_WORDS = Object.freeze({
   'signed-out': 'Sign in to an account to receive post.',
   busy: 'A claim is already under way.',
+  'stores-full': 'Your Stores cannot hold these materials. Use or sell some, then claim again.',
 });
+
+/**
+ * @typedef {(tag: string, cls: string|null, text?: string|null) => HTMLElement} MakeElement
+ */
+
+/**
+ * A chip's short words for a piece with no item: as short as an item's name, so a phone keeps room for the subject.
+ * @param {any} p
+ */
+function goodsChipText(p) {
+  const gold = (p.gold ?? 0) > 0;
+  const materials = (p.materials?.length ?? 0) > 0;
+  if (gold && materials) return t('post.chip.goldAndMaterials', '{n, number} gold, materials', { n: p.gold });
+  if (gold) return t('post.goods.gold', '{n, number} gold', { n: p.gold });
+  return t('post.chip.materials', 'Materials');
+}
+
+/**
+ * A list row's chip for a piece holding goods: the item by name in its rarity's colour, else the goods in words.
+ * @param {MakeElement} el
+ * @param {any} p
+ */
+function goodsChip(el, p) {
+  const chip = el('span', 'pm-chip');
+  const name = el('span', null, p.item ? p.item.name : goodsChipText(p));
+  const rar = p.item ? postRarity(p.item.rarity) : null;
+  if (rar) name.setAttribute('data-rarity', rar);
+  chip.append(name, el('span', 'pm-state', p.claimed ? 'Claimed' : 'Waiting'));
+  return chip;
+}
+
+/**
+ * An opened piece's goods, one line each: its item, its gold and each material.
+ * @param {MakeElement} el
+ * @param {any} head
+ */
+function goodsCard(el, head) {
+  const card = el('div', 'pm-item');
+  if (head.item) {
+    const name = el('span', 'pm-itemname', head.item.name);
+    const rar = postRarity(head.item.rarity);
+    if (rar) name.setAttribute('data-rarity', rar);
+    card.append(name);
+  }
+  if ((head.gold ?? 0) > 0) card.append(el('span', 'pm-itemname', t('post.goods.gold', '{n, number} gold', { n: head.gold })));
+  for (const entry of head.materials ?? []) {
+    card.append(el('span', 'pm-itemname', `${entry.qty} ${materialCountLabel(entry.material, entry.qty)}`));
+  }
+  return card;
+}
+
+/** What a claim put where, said once it landed. */
+function claimedText(/** @type {any} */ r) {
+  const parts = [];
+  if (r.item) parts.push(`${r.item.name} is in your pack.`);
+  if (r.gold > 0) parts.push(t('post.claimedGold', '{n, number} gold is yours.', { n: r.gold }));
+  if (r.materials?.length > 0) parts.push(t('post.claimedMaterials', 'The materials are in your Stores.'));
+  return parts.join(' ') || 'Claimed.';
+}
 /** The words a refusal shows in the window - its own, else the account's own sentences (net/accountClient.js REFUSALS). */
 export const postRefusalText = (/** @type {string|undefined} */ w) => (w && (POST_WORDS[w] ?? REFUSALS[w])) || 'The mailbox could not do that right now. Try again in a moment.';
 
@@ -219,7 +282,7 @@ export function postWindow(doc, { box, onClose, every = POST_TICK_MS, keep = {} 
     }
     if (!b.post.length) { empty('Your mailbox is empty.'); return; }
     // LOST-SPOILS: a boss's floor's leftovers come a piece an item - claimed together (net/serverPost.js PostBox.claimAll)
-    const waiting = b.post.filter((/** @type {any} */ p) => p.item && !p.claimed).length;
+    const waiting = b.post.filter((/** @type {any} */ p) => postHoldsGoods(p) && !p.claimed).length;
     if (waiting >= 2) {
       const row = el('div', 'pm-foot pm-claimrow');
       const all = keyed(button('pm-claimall', b.claimingAll ? 'Claiming...' : t('post.claimAll', 'Claim all ({n})', { n: waiting }), () => claimAllNow()), 'claimall');
@@ -229,20 +292,13 @@ export function postWindow(doc, { box, onClose, every = POST_TICK_MS, keep = {} 
     }
     const list = el('div', 'pm-list');
     for (const p of b.post) {
-      const row = /** @type {any} */ (keyed(el('button', `pm-row${p.read ? '' : ' unread'}${p.item && !p.claimed ? ' gift' : ''}`), p.id));
+      const row = /** @type {any} */ (keyed(el('button', `pm-row${p.read ? '' : ' unread'}${postHoldsGoods(p) && !p.claimed ? ' gift' : ''}`), p.id));
       row.type = 'button';
       const text = el('span', 'pm-text');
       text.append(el('span', 'pm-subject', p.subject), el('span', 'pm-from', `${p.from} - ${postDayText(p.sentAt)}`));
       row.append(el('span', 'pm-dot'), text);
       if (!p.read) row.append(el('span', 'pm-sr', ' - unread'));   // said, as the dot is seen
-      if (p.item) {
-        const chip = el('span', 'pm-chip');
-        const name = el('span', null, p.item.name);
-        const rar = postRarity(p.item.rarity);
-        if (rar) name.setAttribute('data-rarity', rar);
-        chip.append(name, el('span', 'pm-state', p.claimed ? 'Claimed' : 'Waiting'));
-        row.append(chip);
-      }
+      if (postHoldsGoods(p)) row.append(goodsChip(el, p));
       row.addEventListener('click', () => openOne(p.id));
       list.append(row);
     }
@@ -259,16 +315,12 @@ export function postWindow(doc, { box, onClose, every = POST_TICK_MS, keep = {} 
       piece.append(el('p', 'pm-body', 'This message could not be opened.'));
       piece.append(keyed(button('pm-retry', 'Try again', () => { focusTo = 'retry'; openOne(head.id); }), 'retry'));
     } else piece.append(el('p', 'pm-body', opened?.body ?? 'Opening...'));
-    if (head.item) {
-      const card = el('div', 'pm-item');
-      const name = el('span', 'pm-itemname', head.item.name);
-      const rar = postRarity(head.item.rarity);
-      if (rar) name.setAttribute('data-rarity', rar);
-      card.append(name);
+    if (postHoldsGoods(head)) {
+      const card = goodsCard(el, head);
       if (head.claimed) card.append(el('span', 'pm-state', 'Claimed.'));   // into whichever of the account's characters took it
       else {
         const claim = keyed(button('pm-claim', b.busy ? 'Claiming...' : 'Claim', () => claimOne(head.id)), 'claim');
-        claim.setAttribute('aria-label', `Claim ${head.item.name}`);
+        claim.setAttribute('aria-label', `Claim ${postGoodsText(head)}`);
         if (b.busy || b.claimingAll) claim.disabled = true;   // LOST-SPOILS: nor while a Claim all runs
         card.append(claim);
       }
@@ -276,7 +328,7 @@ export function postWindow(doc, { box, onClose, every = POST_TICK_MS, keep = {} 
     }
     const foot = el('div', 'pm-foot');
     foot.append(back);
-    if (!head.item || head.claimed) foot.append(keyed(button('pm-throw', 'Throw away', () => throwOne(head.id)), 'throw'));
+    if (!postHoldsGoods(head) || head.claimed) foot.append(keyed(button('pm-throw', 'Throw away', () => throwOne(head.id)), 'throw'));
     piece.append(foot);
     view.append(piece);
   };
@@ -326,7 +378,7 @@ export function postWindow(doc, { box, onClose, every = POST_TICK_MS, keep = {} 
     focusTo = 'claim';
     draw(true);   // the button down at once (the box is busy the moment the claim sets out)
     const r = await going;
-    if (r.ok) { tell(`${r.item?.name ?? 'The item'} is in your pack.`, true); focusTo = 'back'; }
+    if (r.ok) { tell(claimedText(r), true); focusTo = 'back'; }
     else tell(postRefusalText(r.error));
     draw(true);
   };

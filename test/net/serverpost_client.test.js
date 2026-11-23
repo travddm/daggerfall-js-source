@@ -306,7 +306,8 @@ test('SERVER-POST the wiring: the pause face stands the envelope beside the hour
   assert.match(world, /onPost: \(event\) => \{ chatLog\.push\(tab\.id, \{ text: postNoticeText\(event\), system: true \}\); \},/, 'its news on the world tab, a line nobody spoke');
   assert.match(world, /heartbeat\.add\('post', whileLive\(postBox\.heartbeatPart\(\), \(\) => performance\.now\(\) - _mailFrameAt < FRAME_LIVE_MS\)\);/, 'on the letterbox\'s clock, while the lane runs');
   // and a first Sigil Stone's book, which a Lost and Found ember brings as the floor's does)
-  assert.match(world, /pack: \{ add: \(rec\) => \{ playerEntity\.items \?\?= \[\]; takeGateSpoil\(\{ kind: 'item', item: setItemFields\(rec\) \}\); \}, changed: \(\) => \{ saveSoon\.changed\(\); \} \},[^\n]*\n    \}\);\n    heartbeat\.add\('post'/, 'a claimed item made whole and put in the pack as the vault\'s');
+  assert.match(world, /pack: \{ add: \(rec\) => \{ playerEntity\.items \?\?= \[\]; takeGateSpoil\(\{ kind: 'item', item: setItemFields\(rec\) \}\); \}, changed: \(\) => \{ saveSoon\.changed\(\); \} \},[^\n]*\n(?: {6}[^\n]*\n)*    \}\);\n    heartbeat\.add\('post'/, 'a claimed item made whole and put in the pack as the vault\'s');
+  assert.match(world, /\n {6}wallet: \(\) => guildBook\?\.wallet\(\) \?\? null,\n {6}stores: \{ changed: \(\) => \{ void profBook\?\.refresh\(\{ force: true \}\); \} \},\n {4}\}\);/, 'claimed gold through the guild wallet, claimed materials read again');
   assert.match(ENHANCED_CSS, /\n\.px-postmark \{ position: absolute;/);
   assert.match(ENHANCED_CSS, /\n\.px-win\.px-postwin \{/);
 });
@@ -411,4 +412,41 @@ test('AUDIT SERVER-POST the doors: /mail opens the mailbox on either skin and wh
   assert.match(menu, /closeOnOutsideTap\(home, '\.px-acctwin', [^\n]*\n\s*for \(const n of \[stage, mark, envelope, laurel\]\) n\?\.setAttribute\?\.\('inert', ''\);/, 'the face under the account window inert');
   assert.match(menu, /postKeep = \{\};\n/, 'the window\'s place reset with the visit');
   assert.match(menu, /postView = postWindow\(document, \{ box: \(\) => hooks\.post\?\.\(\) \?\? null, keep: postKeep,/);
+});
+
+test('a piece with gold and materials: the claim puts the gold in the wallet, as a letter when the pack cannot carry it, and tells the Stores to read again; the window names the goods', async () => {
+  const svc = await standService();
+  const ann = await svc.registered('Ann');
+  const R = await seatRealm(svc.env, ann.secret, 'Ann', { name: 'Ann', level: 20, goldPieces: 10, items: [] });
+  const materials = [{ material: 'p1:12', origin: 'own', qty: 7 }];
+  const send2 = (batch, gold) => {
+    const id = `p${batch}`.padEnd(24, '0').slice(0, 24);
+    svc.env.DB._raw.prepare('INSERT INTO server_post (id, to_id, batch, sender, subject, body, gold, materials, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(id, ann.id, batch, POST_SENDER, 'Goods', 'Your goods.', gold, JSON.stringify(materials), T0);
+    return id;
+  };
+  const coin = send2('coin', 120);
+  const heavy = send2('heavy', 80_000);
+  const credited = [];
+  let storesRead = 0;
+  const box = new PostBox({
+    ioOf: ioFor(svc, ann), character: () => R.id, realm: realmOf(R),
+    pack: { add() {}, changed() {} },
+    wallet: () => ({ credit: (n, o) => credited.push([n, o?.letter === true]), paper: (n) => n > 50_000 }),
+    stores: { changed: () => { storesRead++; } },
+  });
+  await box.refresh();
+  assert.match(postNoticeText({ kind: 'new', post: [box.post.find((p) => p.id === coin)] }), /with 120 gold, 1 kind of material for the Stores to claim/);
+  assert.deepEqual(await box.remove(coin), { ok: false, error: 'post-unclaimed' }, 'goods waiting are never thrown away');
+
+  const r = await box.claim(coin);
+  assert.deepEqual([r.ok, r.item, r.gold, r.materials], [true, null, 120, materials]);
+  const r2 = await box.claim(heavy);
+  assert.equal(r2.ok, true, JSON.stringify(r2));
+  assert.deepEqual(credited, [[120, false], [80_000, true]], 'coin first, then a letter for what the pack cannot carry');
+  assert.equal(storesRead, 2);
+  assert.deepEqual([box.unclaimed, box.waiting], [0, 0]);
+
+  const store = svc.env.DB._raw.prepare('SELECT SUM(qty) AS n FROM prof_stores WHERE char_id = ?').get(R.id);
+  assert.equal(store.n, 14, 'both pieces\' materials in the Stores');
 });

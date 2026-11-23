@@ -311,7 +311,7 @@ test('AUDIT REALM2 S7: two checkpoints under one lease race to one sequence - th
 
 // ---- S8: A LONE GUILDMASTER DELETED EMPTIES THE TREASURY FIRST ----------------------------------------------------------
 
-test('AUDIT REALM2 S8: a lone guildmaster is deleted only once its treasury is empty - `guild-treasury`, as leaving asks - and nothing of it goes before', async () => {
+test('AUDIT REALM2 S8: a lone guildmaster leaving waits for the treasury, but its delete ends the guild and sends the treasury gold to the account by mail', async () => {
   const s = await stand();
   const P = await s.account();
   const m = await s.character(P, 'Master', { name: 'Master', level: 9, goldPieces: 200_000, items: [] });
@@ -319,9 +319,8 @@ test('AUDIT REALM2 S8: a lone guildmaster is deleted only once its treasury is e
   assert.equal((await s.call('/v1/guilds/found', { character: m.id, name: 'Rich Guild', tag: 'RICH', realm: m.at() }, P.secret)).status, 200);
   assert.equal((await s.call('/v1/guilds/deposit', { character: m.id, gold: 100_000, realm: m.at() }, P.secret)).body.treasury, 100_000);
   assert.deepEqual(Object.values(await s.call('/v1/guilds/leave', { character: m.id }, P.secret)), [409, { error: 'guild-treasury', keeps: ['guild-treasury'] }], 'the guild\'s own law');   // PIN MOVED: GUILD3c - the whole list beside the first
-  assert.deepEqual(Object.values(await s.call('/v1/realm/delete', { id: m.id }, P.secret)), [409, { error: 'guild-treasury' }]);
-  assert.ok(s.saveStands(m.id), 'the character stands');
-  assert.deepEqual(s.rows('SELECT treasury, (SELECT COUNT(*) FROM guild_members) AS members FROM guilds'), [{ treasury: 100_000, members: 1 }]);
-  assert.equal((await s.call('/v1/guilds/withdraw', { character: m.id, gold: 100_000, realm: m.at() }, P.secret)).body.treasury, 0);
-  assert.deepEqual((await s.call('/v1/realm/delete', { id: m.id }, P.secret)).body, { ok: true }, 'emptied, it goes');
+  const gone = await s.call('/v1/realm/delete', { id: m.id }, P.secret);
+  assert.equal(gone.status, 200, JSON.stringify(gone.body));
+  assert.deepEqual(s.rows('SELECT COUNT(*) AS n FROM guilds'), [{ n: 0 }], 'the guild ends with its last member');
+  assert.deepEqual(s.rows('SELECT gold FROM server_post WHERE gold > 0'), [{ gold: 100_000 }], 'its gold by mail');
 });
