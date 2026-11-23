@@ -107,6 +107,11 @@ set -a && . selfhost/.env && set +a && node selfhost/cron/sidecar.ts
 characters through the account service's operator door. It runs on the host, with `OPERATOR_SECRET` from `.env`;
 Caddy does not pass the door to the public name. See `docs/operations/operator-commands.md`.
 
+## Measuring it
+
+`tools/loadHarness.mjs --selfhost` runs the load harness's bot fleet against this kit, built and served as above, in
+place of two `wrangler dev` processes (`docs/testing/probes.md`, Load harness).
+
 ## Limits
 
 - The R2 shim serves what the account service uses: get, head, put, list by prefix and delete. Ranges, conditional

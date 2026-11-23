@@ -194,8 +194,8 @@ leases, feeds).
   `cellhandover.test.js`, `relaydeploy.test.js`). Set `HUB_POLL=driven` to stop the hub poll loop; the test then calls
   `_hubPoll` itself.
 - `npm run load` (`tools/loadHarness.mjs`) runs a bot fleet against the real relay and account service in local
-  workerd (`--bots`, `--minutes`, `--scenario storm` restarts the relay half way). `tools/lib/wranglerLaunch.mjs`
-  starts wrangler.
+  workerd (`--bots`, `--minutes`, `--scenario storm` restarts the relay half way, `--selfhost` serves both from the
+  self-host kit). `tools/lib/wranglerLaunch.mjs` starts wrangler.
 - `cd server && npx wrangler dev` runs the Worker locally. Point the client at it with `?server=ws://localhost:<port>`.
 
 ## Traps

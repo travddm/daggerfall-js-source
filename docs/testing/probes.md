@@ -99,8 +99,10 @@ port (8811) is taken. `--local` has no network, no D1 limits and no cold start, 
 
 ## Load harness
 
-This is a Cloudflare tool: it starts both services through wrangler, as the optional Cloudflare target runs them, not
-through the self-host kit (`selfhost/`).
+By default it starts both services through wrangler, as the optional Cloudflare target runs them. With `--selfhost`
+it starts them from the self-host kit instead (`selfhost/`, installed with `npm ci --prefix selfhost`): one workerd
+process, built as the kit's image builds it, with the cron fired through the kit's cron door. The fleet is the same in
+both, so one run of each compares the two runtimes.
 
 `npm run load` (`tools/loadHarness.mjs`) runs a fleet of bots against the real relay and the real account service,
 both in local workerd. A bot is the client's own modules: it registers a guest, makes a realm character, opens the
@@ -112,8 +114,10 @@ node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --bots 200 --min
 node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --help      # every option and its default
 ```
 
-It reports the relay's and the service's work per bot. Local numbers are relative: they compare two builds on one
-machine. They are not production capacity.
+It reports the relay's and the service's work per bot, the pose age and a ping's round trip, the HTTP latency, and
+the services' boot and cron times. `--sample <seconds>` adds the services' memory and CPU, and `--probe 1` times the
+account service's storage bindings (D1 and R2) from inside its isolate. Local numbers are relative: they compare two
+builds or two runtimes on one machine. They are not production capacity.
 
 ## Desktop shell probe
 
