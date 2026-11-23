@@ -3,10 +3,10 @@
 // (water/dirt/grass/stone) and BEFORE assignTiles runs its marching
 // squares, so a road tile is written over a KNOWN ground type and the
 // squares then blend the ground around it. That seam is DFU's own and
-// it is where Hazelnut's Basic Roads paints too; the design is credited
-// in roadNetwork.js. The code here is written from the design, not
-// ported from it: the geometry of a two-tile road down the centre of a
-// 128-grid is the geometry, whoever writes it.
+// it is where Hazelnut's Basic Roads paints too. This painter is a port
+// of Basic Roads' PaintPath (BasicRoadsTexturing.cs, MIT): its
+// conditions, tile tables, corner byte and road-height smoothing follow
+// his code. The notice is in vendor/roads-hazelnut/.
 //
 // THE GRID. Map Y runs south, and inside a pixel's 128x128 tilemap row 0
 // is the SOUTH edge and row 127 the NORTH (terrainSampler.js:"x=0 of pixel px equals":
