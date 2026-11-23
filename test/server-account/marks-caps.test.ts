@@ -19,7 +19,20 @@ const { mintReceipt } = await import(gateReceiptModule);
 const { mintRaidReceipt } = await import(raidReceiptModule);
 
 type Account = { secret: string; id: string; handle: string; character: string };
-type Answer = { status: number; body: Record<string, any> };
+/** The Marks a route struck and the day's tally it reports beside them. */
+type MarksStrike = { struck: number; balance?: number; why?: string; [tally: string]: unknown };
+/** The fields of a route's JSON answer that these tests read. */
+type AnswerBody = {
+  ok?: boolean;
+  error?: string;
+  recorded?: boolean;
+  struck?: number;
+  exchangedToday?: number;
+  marks?: MarksStrike;
+  deed?: MarksStrike | null;
+  guild?: { id: string };
+};
+type Answer = { status: number; body: AnswerBody };
 type HerbPatch = { x: number; y: number; slot: number; tier: number };
 type HistoryMode = 'kept' | 'deleted';
 
