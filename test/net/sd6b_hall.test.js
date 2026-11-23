@@ -237,7 +237,7 @@ test('SD6b the relay by source: a turn routed before the find\'s bucket, on the 
   const found = src.indexOf("      if (!this._spend(ws, now, sdRelayGate, 'sdBucket', 'sdDrops', 'too many sd frames')) return;");
   assert.ok(pz > 0 && found > pz, 'the turn before the find\'s bucket');
   assert.match(src, /const \[x, , z\] = dungeonToRealm\(a\.pose\.x, a\.pose\.y \?\? 0, a\.pose\.z\);\n\s+if \(!stoneInReach\(m\.i, x, z, SD_STONE_REACH_SLACK\)\) return;/);
-  const welcome = src.indexOf('      if (!this._send(ws, welcome)) return;');
+  const welcome = src.indexOf('      if (!this._sendWelcome(ws, welcome, worldFollowFrame(world, host, m.id))) return;');
   const hall = src.indexOf('      if (isSdRoom(a.key)) { try { if (!this._send(ws, this._sdHallWord(await this._sdHallOf(sdSlotOfRoom(a.key))))) return; }');
   assert.ok(welcome > 0 && hall > welcome, 'after the world path\'s welcome');
   assert.equal(SD_ORRERY_KEY, 'sdorrery');

@@ -13,6 +13,21 @@ const { BULK_PIECE_CHARS, PIECE_MARK } = await import(PIECES_PATH);
 
 const KEY = 'dungeon:m187853213';
 
+/** What a dungeon test is handed: the fake room, a join, and a pose from a socket. */
+type DungeonHarness = {
+  R: {
+    room: {
+      _bulk: { tick(): void; drain(): void; waiting: number };
+      _flushOwed(): void;
+      _attach(ws: FakeSocket): { worldSeen?: boolean };
+    };
+    world(ws: FakeSocket, data: object): Promise<void>;
+    drop(ws: FakeSocket): Promise<void>;
+  };
+  join(id: string): Promise<FakeSocket>;
+  speak(ws: FakeSocket, x: number): Promise<void>;
+};
+
 type FakeSocket = {
   sent: { t: string; [k: string]: unknown }[];
   raw: string[];
@@ -34,7 +49,7 @@ const poseAt = (x: number, ts: number) =>
   validPose({ x: x * PIXEL_UNITS, y: 0, z: 10 * PIXEL_UNITS, yaw: 0, pitch: 0, ts });
 
 /** A dungeon room on a clock of its own; each socket also keeps every text frame it was sent, pieces and all. */
-async function dungeon<T>(run: (harness: any) => Promise<T>): Promise<T> {
+async function dungeon<T>(run: (harness: DungeonHarness) => Promise<T>): Promise<T> {
   const realNow = Date.now;
   let clock = 1_800_000_000_000;
   Date.now = () => clock;
