@@ -77,18 +77,24 @@ export async function guildBalanceOf(db, guildId) {
 }
 /** SILVER-WAYS: the combat faucets' kinds, in SQL (`kind IN (...)`) - MARKS_COMBAT's own. */
 const COMBAT_KINDS_SQL = MARKS_COMBAT.kinds.map((k) => `'${k}'`).join(', ');
-/** SILVER-WAYS: the combat silver account `a` has had struck on UTC day `d`, in SQL - what the day's cap counts. */
-const combatEarnedSql = (a, d) => `(SELECT COALESCE(SUM(amount), 0) FROM marks_ledger WHERE dst_kind = 'account' AND dst_id = ${a}
-  AND kind IN (${COMBAT_KINDS_SQL}) AND day = ${d})`;
-/** SILVER-FINDS: the silver a find faucet (`gather` or `find`) has struck account `a` on UTC day `d`, in SQL - what its
- *  day's cap counts. */
-const findsEarnedSql = (a, d, kind) => `(SELECT COALESCE(SUM(amount), 0) FROM marks_ledger WHERE dst_kind = 'account' AND dst_id = ${a}
-  AND kind = '${kind}' AND day = ${d})`;
+/**
+ * A daily cap's count so far, in SQL: the act_counts row of `subject`, `counterKind` and UTC day `day`, or 0.
+ * The ledger's triggers keep the row (the act_counts migration), so a cap holds whether or not the ledger
+ * lines are kept.
+ */
+const dayCountSql = (subject, counterKind, day) =>
+  `COALESCE((SELECT n FROM act_counts WHERE subject = ${subject} AND kind = '${counterKind}' AND period = ${day}), 0)`;
+/** The combat silver account `a` has had struck on UTC day `d`, in SQL: what the day's combat cap counts. */
+const combatEarnedSql = (a, d) => dayCountSql(a, 'marks-combat', d);
+/** The silver a find faucet (`gather` or `find`) has struck account `a` on UTC day `d`, in SQL: what its cap counts. */
+const findsEarnedSql = (a, d, kind) => dayCountSql(a, `marks-${kind}`, d);
+/** The Marks account `a` has sold to the Bank on UTC day `d`, in SQL: what the Bank's cap counts. */
+const exchangedSql = (a, d) => dayCountSql(a, 'marks-exchange', d);
 /** What an account has had struck by a faucet today, and sold to the Bank today. */
 async function todayOf(db, account, day) {
   const g = await db.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE dst_id = ? AND kind = 'gate' AND day = ?").bind(account, day).first();
   const c = await db.prepare(`SELECT ${combatEarnedSql('?1', '?2')} AS s`).bind(account, day).first();
-  const x = await db.prepare("SELECT COALESCE(SUM(amount), 0) AS s FROM marks_ledger WHERE src_id = ? AND kind = 'exchange' AND day = ?").bind(account, day).first();
+  const x = await db.prepare(`SELECT ${exchangedSql('?1', '?2')} AS s`).bind(account, day).first();
   const f = await db.prepare(`SELECT ${findsEarnedSql('?1', '?2', 'gather')} AS gathered, ${findsEarnedSql('?1', '?2', 'find')} AS found`).bind(account, day).first();   // SILVER-FINDS
   return { gate: Number(g?.n ?? 0), combat: Number(c?.s ?? 0), exchanged: Number(x?.s ?? 0), gathered: Number(f?.gathered ?? 0), found: Number(f?.found ?? 0) };
 }
@@ -257,7 +263,7 @@ export function deedStatements({ db, nowS }, player, env, { kind, event, charact
       FROM guild_deed_marks d
       WHERE d.event = ?7 AND d.account = ?1
         AND (SELECT COUNT(*) FROM guild_deed_marks x WHERE x.guild_id = d.guild_id AND x.event = ?7) >= ?8
-        AND (SELECT COUNT(*) FROM marks_ledger l WHERE l.dst_kind = 'guild' AND l.dst_id = d.guild_id AND l.kind = 'guild-deed' AND l.day = ?3) < ?9
+        AND ${dayCountSql('d.guild_id', 'marks-guild-deed', '?3')} < ?9
         AND COALESCE((SELECT balance FROM guild_marks WHERE guild_id = d.guild_id), 0) + ?2 <= ?10
         AND NOT EXISTS (SELECT 1 FROM marks_ledger l WHERE l.actor = d.guild_id AND l.rid = ?6)
         AND ${CLAIM_GUARDS[kind](11)}`)
@@ -274,8 +280,7 @@ export async function deedAnswer(db, player, event, struck) {
 }
 /** SILVER-WAYS: a guild's deeds today, against the day's cap - the Guild tab's line. */
 export async function guildDeedsToday(db, guildId, nowS) {
-  const r = await db.prepare("SELECT COUNT(*) AS n FROM marks_ledger WHERE dst_kind = 'guild' AND dst_id = ?1 AND kind = 'guild-deed' AND day = ?2")
-    .bind(guildId, utcDay(nowS)).first();
+  const r = await db.prepare(`SELECT ${dayCountSql('?1', 'marks-guild-deed', '?2')} AS n`).bind(guildId, utcDay(nowS)).first();
   return { deeds: Number(r?.n ?? 0), deedsMax: MARKS_FAUCETS.deed.perDay };
 }
 
@@ -417,7 +422,7 @@ export async function exchangeMarks(ctx, player, env, { marks, rid } = {}) {
   const made = await decide(db.prepare(`${INSERT_LINE}
     SELECT 'account', ?1, 'burn', NULL, 'exchange', ?2, ?3, ?4, ?1, NULL, ?5
     WHERE COALESCE((SELECT balance FROM marks WHERE account = ?1), 0) >= ?2
-      AND COALESCE((SELECT SUM(amount) FROM marks_ledger WHERE src_id = ?1 AND kind = 'exchange' AND day = ?3), 0) + ?2 <= ?6`)
+      AND ${exchangedSql('?1', '?3')} + ?2 <= ?6`)
     .bind(player.id, marks, day, nowS, rid, MARKS_BANK.perDay));
   if (!made) {
     const again = await lineOf(db, player.id, rid);

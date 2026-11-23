@@ -4,6 +4,13 @@
 
 import type { Generated } from 'kysely';
 
+export interface ActCountsTable {
+  subject: string;
+  kind: string;
+  period: number;
+  n: number;
+}
+
 export interface ArenaAttemptsTable {
   id: string | null;
   player: string;
@@ -2493,6 +2500,7 @@ export interface WritsTable {
 }
 
 export interface Database {
+  act_counts: ActCountsTable;
   arena_attempts: ArenaAttemptsTable;
   arena_board_ver: ArenaBoardVerTable;
   arena_boards: ArenaBoardsTable;

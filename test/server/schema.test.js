@@ -13,7 +13,7 @@ const MIGRATIONS = readdirSync(new URL('server-account/migrations/', ROOT)).filt
 
 /** Every table the service keeps. A new table is added here with the file that creates it. */
 const TABLES = [
-  'arena_attempts', 'arena_board_ver', 'arena_boards', 'arena_champions', 'arena_members', 'arena_pve', 'arena_pvp',
+  'act_counts', 'arena_attempts', 'arena_board_ver', 'arena_boards', 'arena_champions', 'arena_members', 'arena_pve', 'arena_pvp',
   'arena_renown', 'blocks', 'board_notes', 'board_notices', 'board_reports', 'broker_sales', 'commissions',
   'craft_writs', 'crew_signed', 'decor_access', 'decor_batch_receipt', 'decor_bin', 'decor_hold', 'decor_rev',
   'duel_results', 'encounter_reactions', 'fest_finds', 'fest_offerings', 'fest_sales', 'fest_takes', 'firmament',
