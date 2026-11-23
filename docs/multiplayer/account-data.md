@@ -32,7 +32,7 @@ service itself is in [account-service.md](account-service.md).
 | Realm characters | `realm_characters` (with its audit and integrity columns), `realm_trades`, `realm_findings` |
 | Homes | `homes`, `home_rooms`, `home_yards`, `home_moves`, `home_offers` and the other `home_*` tables |
 | Decor | `home_decor` and the `decor_*` tables (bins, batch receipts, access, holds) |
-| Currency | `marks`, `marks_ledger` with balance triggers |
+| Currency | `marks`, `marks_ledger` with balance triggers, `act_counts` (daily cap counters) |
 | Market | `market_listings`, `market_sales`, `market_deliveries`, `market_orders`, `market_fills`, `market_prices`, `market_reports`, `products`, `market_auctions`, `market_bids`, `market_gold`, `piece_escrow` |
 | Guilds | `guilds` and the `guild_*` tables (members, notes, vault, castles, writs) |
 | Group content | `gate_kills`, `arena_*`, `serpent_kills`, `sd_kills` |
@@ -84,6 +84,12 @@ cover it, or whose account or guild end names no id, so a caller that skips its 
 
 Every write carries a request id `rid`, unique per actor (`UNIQUE (actor, rid)`). A repeated request is answered the
 same way instead of paying twice. Listings and auctions are unique on `(seller, rid)`.
+
+The daily Marks caps (combat, gathering finds, loot finds, Bank sales, guild deeds) read `act_counts`, one row a
+subject, kind and UTC day, not the ledger. A trigger on each ledger insert adds to the row, so a guard reads one row
+in the same statement that writes the line, and a retry that inserts no line counts nothing. The day is part of the
+key, so a new day starts at 0 without a reset. A row names an account or a guild and has no foreign key: deleting an
+account leaves its counter rows, which no guard reads after their day.
 
 ## Market
 
