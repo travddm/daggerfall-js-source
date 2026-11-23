@@ -191,6 +191,7 @@ import { preTokenGate, placeGate } from './helloGate.js';   // a room's hello ga
 import { sdCopyRight, sdNewcomerWord, sdAcctTell, sdAcctInternal, SD_INTERNAL_ACCT, sdSeatsInternal, SD_INTERNAL_SEATS, sdOpenRoute, SD_OPEN_PATH } from './sdCopy.js';   // SD-PARTY: a party's own Hour - its door, one life and one win a Hollow
 import { relayFactsAnswer, relayProfileHash, RELAY_FACT_PATHS } from './relayFacts.ts';   // /health, /profile and the profile's hash
 import { helloDoorRefused, GROUND_OLD_WORDS } from './helloDoor.ts';
+import { BulkOutbox, welcomeWorldField, worldFollowFrame } from './bulk-outbox.ts';
 import { frameAllies, healthBoundRecord, ridesWithoutGrant } from './frame-allies.ts';   // the frame's ally lists, as the record strip reads them
 import { RELAY_CFG_TTL_MS, RELAY_INTERNAL_CFG, mayRelayCfg, relayCfgValue } from '../../src/net/relayCfg.js';   // SCALE5b: the relay's settings, at run time
 import { leaseKeyOf, mintLease, readLease, leaseRoom, LEASE_FRAME_MIN_MS, LEASE_OLD_REASON } from '../../src/net/roomLease.js';   // LEASE1: the hub's word on every socket, in every room
@@ -665,10 +666,8 @@ export class Room {
     // class had been taking the first alone. The public key and the TTL
     // ceiling are config (bible ACC1d D2/D3), so the object needs it.
     this.env = env ?? {};
-    /** The verifying key, imported once per instance. A CryptoKey
-     *  cannot be stored, so this is memory and dies with the object -
-     *  which is right: it is derived from a config string that cannot
-     *  change without a deploy, and a deploy is a new object. */
+    /** The verifying key, imported once per instance. A CryptoKey cannot be stored; it comes from config that only a
+     *  deploy changes, and a deploy is a new object. */
     this._verifyKey = undefined;   // undefined = not tried, null = there is none
     /** SEAT1b (Seats-Arc 4.2): THE WATCH - each verified account's last tick and last move in this room, ms. Memory: a
      *  deploy or an eviction forgets it, and the next pose that moves starts it again (the account service's daily cap is
@@ -684,6 +683,7 @@ export class Room {
     this._owed = new Map();    // SCALE5b: the second wire's batch - socket -> what the room has said it and not yet sent (`_owe`)
     this._owedSoon = null;     // SCALE5b: the batch's timer while a pose is owed (POSE_BATCH_MS)
     this._owedLate = null;     // SCALE5b: and while only a channel's roster is (ROSTER_BATCH_MS)
+    this._bulk = new BulkOutbox({ sendNow: (ws, s) => this._sendNow(ws, s), isLive: (ws) => !!ws.virtual || this.state.getWebSockets().includes(ws) });
     /** MOD1: THE NEWEST MUTE ORDER THIS ROOM HAS APPLIED, per account -
      *  `{i, mu, sig}`. Two jobs: an order older than one already applied
      *  is ignored (so a replayed mute cannot undo an unmute inside its
@@ -1151,13 +1151,10 @@ export class Room {
     idx.set(ws, a);
     return true;
   }
-  _forget(ws) { this._owed.delete(ws); const a = this._idx?.get(ws); if (this._idx?.delete(ws)) this._reindex(ws, a, null); }   // SCALE5b: and owed nothing   // SCALE5a: out of the account index too - not the whole of it dropped
+  _forget(ws) { this._owed.delete(ws); this._bulk.forget(ws); const a = this._idx?.get(ws); if (this._idx?.delete(ws)) this._reindex(ws, a, null); }   // SCALE5b: and owed nothing   // SCALE5a: out of the account index too - not the whole of it dropped
 
-  /** SCALE5b: THE SECOND WIRE'S BATCH (wire.js POSE_BATCH_MS, ROSTER_BATCH_MS, wire2Batch). What the room fans to a
-   *  socket whose hello offered `w2` is OWED it, in the order the room said it - a pose as its slim entry (`[id, pose]`,
-   *  built once a pose), a channel's join or leave as its whole frame - and goes out as ONE frame: at the batch's end,
-   *  or sooner, ahead of any other frame the room sends that socket (`_send`), so nothing the room says overtakes what
-   *  it said before. A queue that reaches WIRE2_BATCH_MAX goes out at once - a reader takes no more. */
+  /** A pose entry or a roster frame owed to a socket of the second wire: all it is owed goes as one batch frame at the
+   *  window's end, or sooner ahead of any other frame to it (`_sendNow`). WIRE2_BATCH_MAX entries go at once. */
   _owe(ws, item, ms = POSE_BATCH_MS) {
     let q = this._owed.get(ws);
     if (!q) this._owed.set(ws, q = []);
@@ -2149,9 +2146,11 @@ export class Room {
     this._send(tws, out);
   }
 
-  /** A frame to one socket; a socket that will not take it is closed (A10). */
-  _send(ws, s) {
-    if (this._owed.size && this._owed.has(ws)) this._flushOwedOf(ws);   // SCALE5b: what a socket is owed goes ahead of any other frame to it - its order is the order the room said them in
+  _send(ws, s) { return this._bulk.takes(ws, s) || this._sendNow(ws, s); }   // a large bulk frame goes in pieces (bulk-outbox.ts)
+  _sendWelcome(ws, welcome, follow) { return this._sendNow(ws, welcome) && (follow === null || this._send(ws, follow)); }   // the memory the welcome left out follows it, in pieces
+  /** A frame to one socket now; a socket that will not take it is closed. */
+  _sendNow(ws, s) {
+    if (this._owed.size && this._owed.has(ws)) this._flushOwedOf(ws);   // what a socket is owed goes first, so its frames keep the order the room said them in, and a bulk piece never holds a pose batch
     try { ws.send(s); this._metrics.c.sends++; this._metrics.c.bytesOut += s.length; return true; } catch {
       try { ws.close(1011, 'send failed'); } catch { /* gone */ }
       this._dead.add(ws);   // AUDIT WORLD34 D1: closed by the object - its leave is ours to say
@@ -2159,10 +2158,8 @@ export class Room {
       return false;
     }
   }
-  /** SCALE2b: a socket this object just closed leaves the index exactly when it leaves the runtime's list - at once
-   *  where the runtime drops it, and when the walk finds it gone where the runtime still lists it until its close
-   *  completes (AUDIT ONESEAT R4). The index used to re-read the runtime on every call and learnt both for free; it is
-   *  asked once now, at the close, which is rare. */
+  /** A socket this object just closed leaves the index when it leaves the runtime's list: at once where the runtime
+   *  drops it, and at the next walk where the runtime still lists it until its close completes. */
   _closed(ws) { if (!this.state.getWebSockets().includes(ws)) this._forget(ws); }   // SCALE5a: still listed, its attachment and so its account unchanged - the kept index stands (it was dropped and rebuilt the same)
   _refuse(ws, m, code = CLOSE_POLICY, reason = m) {   // SCALE5a: the close's reason the word itself unless a door says more (BUSY_TOKEN_UNREAD)
     this._metrics.c.refusals++; if (m === 'busy') this._metrics.c.busy++;   // SCALE2b
@@ -2280,6 +2277,7 @@ export class Room {
     const host = this._hostOf(except);
     this._seatSaid = host;
     if (!host) return;
+    for (const ws of this._bulk.dropWorldFrames()) this._setAttach(ws, { ...this._attach(ws), worldSeen: false });   // a client takes a memory from the host alone: one still in pieces is dropped, and the new host's next memory is handed on
     const out = JSON.stringify({ t: 'host', id: host });
     for (const [other, b] of [...this._all()]) if (other !== skip && b.id) this._send(other, out);
   }
@@ -3705,8 +3703,8 @@ export class Room {
       // The relay's version (`v`) and profile hash (`ph`) ride it, so a client can tell a relay on another law or other rules.
       const gm = streamsFoes(a.key) ? this._grantWelcome() : '';   // GRANT2: the spawn grants' mode, a cell's (GRANT4: and a world room's)
       const rf = (isCellRoom(a.key) && this._refereesPoses() ? ',"rf":1' : '') + cellsWelcome(a);   // SCALE5b: this cell judges the poses that reach it - a halo's at their full rate; COST-2 (b): and the fine cells this socket covers (`cells`)
-      const welcome = `{"t":"welcome","id":${JSON.stringify(m.id)},"peers":${JSON.stringify(roster)},"host":${JSON.stringify(host)}${ow},"world":${world ?? 'null'},"now":${Date.now()},"v":${JSON.stringify(RELAY_VERSION)},"ph":${JSON.stringify(await relayProfileHash())}${rf}${gm}${a.ly ? `,"ly":${a.ly}` : ''}}`;   // SCALE5d: and which layer of the place this is
-      if (!this._send(ws, welcome)) return;
+      const welcome = `{"t":"welcome","id":${JSON.stringify(m.id)},"peers":${JSON.stringify(roster)},"host":${JSON.stringify(host)}${ow},"world":${welcomeWorldField(world, host, m.id)},"now":${Date.now()},"v":${JSON.stringify(RELAY_VERSION)},"ph":${JSON.stringify(await relayProfileHash())}${rf}${gm}${a.ly ? `,"ly":${a.ly}` : ''}}`;   // SCALE5d: and which layer of the place this is
+      if (!this._sendWelcome(ws, welcome, worldFollowFrame(world, host, m.id))) return;
       // AUDIT SCALE II R1-1: `_rfSaid` IS WHAT EVERY SOCKET OF THE SECOND WIRE WAS LAST TOLD - a welcome tells its own
       // socket alone. It was set here from the welcome's word, so a referee begun since the last pose (a bout,
       // a serpent's fight) and a hello before the next pose left every halo already here never told it: each said

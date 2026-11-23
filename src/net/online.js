@@ -1,6 +1,8 @@
 // @ts-check
 import { validStaffEventIn, validStaffEventOut } from './staffEvent/staffEventLaw.js';   // STAFF-EVENT
 import { loneStep, loneWake, loneAhead, aloneOf, LONE_HOLD, LONE_SAY } from './loneSleep.js';   // LONE-SLEEP: a lone session's pose at LONE_POSE_MS
+import { PieceIntake } from './bulk-pieces.ts';
+import { welcomeWorld, worldFrameTaken, worldFollowOwed } from './world-follow.ts';
 // ONLINE1: THE SESSION.
 //
 // THE SHAPE. Every player runs their own world from their own save;
@@ -795,19 +797,14 @@ export class OnlineSession {
     this._askCursor = null;       // SLAM9: the last id the fair ask rotation (`_askRound`) reached - the next tick starts after it
     this._known = new Map();      // SLAM9: id -> { name, look } of every introduction this session has had, bounded at KNOWN_MAX - a stranger this session once knew is stood as itself
     this.host = null;             // WORLD1: the room's host, the relay's word; null until the welcome
+    this._pieces = new PieceIntake();   // joins a large frame the relay sent in pieces, a socket at a time
     this.onHost = null;           // (id, mine) => void: the host changed
     this.onWorld = null;          // (world) => void: the welcome carried the room's memory, or the host published one after it (AUDIT WORLD34 C1)
     this.clockOffsetMs = 0;       // WORLD5: the relay's clock minus this machine's, from the welcome - the shared world time is read through it
     this.clockRead = false;       // AUDIT SOC B7: whether a welcome has said it - a channel's carries it since AUDIT SOC, and the hub link's is the clock the social picture reads
     this.clockWarning = null;     // OL3: the welcome's clock was a year off this machine's - said on the HUD line while it stands
     this.onClock = null;          // WORLD5: (offsetMs) => void - the welcome said the relay's clock
-    // AUDIT-SRVN F4: there WAS a `this.relayVersion` here, written on every
-    // welcome and read by nothing but its own test. Which relay this
-    // socket is on is a question one home already answers
-    // (net/updateNotice.js), and a second copy of it on the session is a
-    // second source of truth for a question nobody was asking - the same
-    // shape AUDIT-CHATR deleted `whoRows()` for. The hook is the whole
-    // seam; the detector owns the memory.
+    // No relay version is kept here: net/updateNotice.js is its one home, and a second copy would drift.
     this._hiddenTok = undefined;  // HIDDEN-UNCOUNTED: the hello token `hidden` last read, and what it read (one decode a token, never one a frame)
     this._hiddenIs = false;
     this.roomCount = null;        // ROSTER-G: the welcome's `n` when its list was CUT - how many the room holds beyond the names it gave (a channel's; a place's welcome carries none)
@@ -1302,11 +1299,10 @@ export class OnlineSession {
   /** Am I the room's host (WORLD1)? False until the welcome says so. */
   isHost() { return !!this.id && this.host === this.id; }
 
-  /** The room's memory out (WORLD1): the host's alone - the relay ignores anyone else's - and never a frame past
-   *  WORLD_FRAME_MAX, which the relay would refuse with a terminal close. False when nothing went. */
+  /** The room's memory out: the host's alone, never past the relay's cap (a terminal close). False when nothing went. */
   sendWorld(data, { final = false } = {}) {
     if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
-    if (!this.isHost() || !isWorldRoom(this.room) || !this._ws || this.status !== 'open') return false;   // AUDIT WORLD34 D3: the one out-frame without the room's guard said true where the relay kept nothing
+    if (!this.isHost() || !isWorldRoom(this.room) || !this._ws || this.status !== 'open' || worldFollowOwed(this)) return false;   // not the host, no world room, or the stored memory still on its way: publishing now would write over it
     const s = JSON.stringify(final ? { t: 'world', data, final: true } : { t: 'world', data });   // final: the socket's one farewell inside the relay's floor (AUDIT WORLD B5)
     if (s.length > worldFrameMaxFor(this.room)) return false;   // AUDIT WORLD6a B3: a building's memory has its own, smaller cap
     if (!this._welcomed.has(this._ws)) return false;   // AUDIT RPT1026 A5: a rehello's replacement keeps `host` before its welcome (sendHit's note) - the memory goes after it (world.js worldPublish: a new welcome says it again)
@@ -2166,10 +2162,8 @@ export class OnlineSession {
         try { ws.send(hello); this.stats.sent++; } catch { /* the close will say */ }
       }
     };
-    // AUDIT ONCRASH1 C3: THE DOOR IS HERE, and the first cut left it open. `_deliver` wrapped the handler CALLS, so a
-    // throw in `_receive`'s own body - the roster prune, `_member`, `_askWho`, a projection - still reached the window
-    // and painted the overlay. Driven in a real browser to prove it. The frame is one contained act from the outside in.
-    ws.onmessage = (ev) => { this._heardOn(ws); this._deliver('frame', () => { const room = this._roomOf(ws); if (room != null) { this._receive(ev.data, room); loneWake(this); } }); };   // RPT1026-SECNET: any frame in - a pong too - says the line is live; LONE-SLEEP: a frame that ended my quiet - my pose at once
+    // One contained act a frame: a throw in `_receive`'s own body, not only in a handler, must not reach the window.
+    ws.onmessage = (ev) => { this._heardOn(ws); this._deliver('frame', () => { const room = this._roomOf(ws); if (room != null) { const text = this._pieces.take(ws, ev.data); if (text !== null) this._receive(text, room); loneWake(this); } }); };   // any frame in, a pong or a piece too, says the line is live; a frame that ended my quiet sends my pose at once
     ws.onclose = (ev) => {
       this._retire(ws);   // AURA-LIVE: a replacement refused - the socket it replaced goes too (the retry below says hello)
       for (const [r, s] of this._swap) if (s.ws === ws) this._swap.delete(r);   // AURA-LIVE: one that never took its place
@@ -3239,12 +3233,12 @@ export class OnlineSession {
         else if (!this.clockWarning) { this.clockWarning = clockWarningText(); console.warn(`[online] ${CLOCK_WARNING} (relay ${new Date(m.now).toISOString()}, this machine ${new Date().toISOString()})`); }
       }
       for (const o of owIn) this._deliver('ow', () => this.onOverworld?.(o, room));   // OW6L: my own cell's ledger, after its clock
-      if (m.world && typeof m.world === 'object' && !Array.isArray(m.world)) this._deliver('world', () => this.onWorld?.(m.world));
+      welcomeWorld(this, m);   // the memory it carries, or the note that one follows it (net/world-follow.ts)
     } else if (m.t === 'host') {
       if (primary) this._setHost(m.id);
     } else if (m.t === 'world') {
-      // AUDIT WORLD34 C1: the room's memory pushed after the welcome - the host's alone (the relay says whose), never my own back
-      if (primary && typeof m.id === 'string' && m.id === this.host && m.id !== this.id && m.data && typeof m.data === 'object' && !Array.isArray(m.data)) this._deliver('world', () => this.onWorld?.(m.data));
+      // the room's memory after the welcome: the host's, or the one my welcome promised (net/world-follow.ts)
+      if (primary && worldFrameTaken(this, m)) this._deliver('world', () => this.onWorld?.(m.data));
     } else if (m.t === 'foes') {
       // WORLD2: the host's live foes - the room's host's alone (a stale frame from a host that just left is not the world)
       // WORLD6b: in a cell every peer's frame is its own foes; in a world room the host's alone

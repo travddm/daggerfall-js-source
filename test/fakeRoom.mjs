@@ -9,6 +9,7 @@ import { mintToken, MAX_TTL_S, _b64url } from '../src/net/identityToken.js';
 import { OFFICIAL_PROFILE } from '../src/net/profile/officialProfile.ts';
 import { profileHashOf } from '../src/net/profile/profileHash.ts';
 import { installProfile, _resetProfileForTests } from '../src/systems/online/serverProfile.ts';
+import { PieceIntake } from '../src/net/bulk-pieces.ts';
 /** The hash every current build's hello says; the relay refuses a hello without it. */
 export const OFFICIAL_PH = await profileHashOf(OFFICIAL_PROFILE);
 /** For a pin whose game session joins this relay: installs the official profile, as an online page's front door does,
@@ -175,12 +176,14 @@ export function fakeRoom(key, { now = () => Date.now(), ROOMS = null, poll = 'dr
   let room = new Room(state, env);
   const wake = () => { room = new Room(state, env); };
   const { token, signer } = roomSigner(env, now);
+  const pieces = new PieceIntake();
   const connect = () => {
     const ws = { sent: [], closed: null, att: { key, id: null, name: null, pose: null },
       // AUDIT ATTACH: the socket's meters are the Room INSTANCE's, not its attachment's - read off the object awake now,
       // so a wake() forgets them as a hibernation does
       get meters() { return room._meters.get(ws) ?? {}; },
-      send(s) { if (this.closed) throw new Error('closed'); this.sent.push(JSON.parse(s)); },
+      // a large frame arrives in pieces (server/src/bulk-outbox.ts): `sent` holds it once it is whole, as a client reads it
+      send(s) { if (this.closed) throw new Error('closed'); const whole = pieces.take(ws, s); if (whole !== null) this.sent.push(JSON.parse(whole)); },
       // the runtime drops a socket the object closed from getWebSockets() and calls no webSocketClose for it
       close(code, reason) { this.closed = { code, reason }; const i = sockets.indexOf(ws); if (i >= 0) sockets.splice(i, 1); },
       serializeAttachment(a) { if (JSON.stringify(a).length > 2048) throw new Error('attachment too large'); this.att = JSON.parse(JSON.stringify(a)); }, deserializeAttachment() { return this.att; } };
@@ -221,7 +224,9 @@ export function fakeRoom(key, { now = () => Date.now(), ROOMS = null, poll = 'dr
   // AUDIT WB12d (lens R): the runtime's alarm is SPENT as its handler begins - getAlarm() answers null inside it, so a
   // re-arm there is never mistaken for a sooner one already set
   const fire = () => { alarm.at = null; return room.alarm(); };
-  return { get room() { return room; }, state, store, sockets, alarm, connect, hello, token, signer, env, pose, chat, ping, world, raw, drop, wake, fire, now, look };
+  /** Sends every bulk frame still in pieces now, so a pin reads it without waiting on the outbox's ticks. */
+  const drainBulk = () => room._bulk.drain();
+  return { get room() { return room; }, drainBulk, state, store, sockets, alarm, connect, hello, token, signer, env, pose, chat, ping, world, raw, drop, wake, fire, now, look };
 }
 
 /**
