@@ -522,6 +522,8 @@ const GUILD_HOLDS = Object.freeze([
 ]);
 /** The codes GUILD_HOLDS names, once each - the client's GUILD_HOLD_CODES is swept against them (test/net/audit_guild3.test.js). */
 export const GUILD_HOLD_KEEP_CODES = Object.freeze([...new Set(GUILD_HOLDS.map(([code]) => code))]);
+/** The refusal code of each column GUILD_HOLDS_SQL answers as `h0`, `h1`..., in that order. */
+export const GUILD_HOLDS_SQL_CODES = Object.freeze(GUILD_HOLDS.map(([code]) => code));
 /**
  * PROF6: whether a guild still keeps something - goods in its guild Stores, a writ or a contract standing (or a closed
  * one's escrow not yet home), its hall, its vault's pieces, a Charter, a battle to come, a patron's bid - in SQL, the

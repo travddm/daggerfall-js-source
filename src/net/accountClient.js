@@ -282,7 +282,7 @@ const REFUSAL_WORDS = {
   'no-rent-room': () => t('account.refusal.noRentRoom', 'That room is not offered to rent any more.'),
   'bad-room': () => t('account.refusal.badRoom', 'The account service could not read that room.'),
   'home-tenants': () => t('account.refusal.homeTenants', 'Somebody is renting a room in your home. It cannot be sold or deleted until their days run out.'),
-  'home-rent-due': () => t('account.refusal.homeRentDue', 'Rent is waiting to be collected at your home. Collect it first.'), 'realm-home-holds': () => t('account.refusal.realmHomeHolds', 'Take the goods out of your home before you delete this character.'),
+  'home-rent-due': () => t('account.refusal.homeRentDue', 'Rent is waiting to be collected at your home. Collect it first.'),
   // ARENA4b: a home the arena displaced (homes.js arenaMoveHome), and a house of its block an old build would buy
   'home-arena': () => ARENA_TEXT.homeMove.arena,
   'home-unmoved': () => ARENA_TEXT.homeMove.unmoved,
@@ -331,11 +331,7 @@ const REFUSAL_WORDS = {
   'no-invite': () => t('account.refusal.noInvite', 'That invitation is no longer open.'),
   'guild-master-leaves': () => t('account.refusal.guildMasterLeaves', 'Hand the guild on to another member before you leave it.'),
   'guild-treasury': () => t('account.refusal.guildTreasury', 'Take the gold out of the treasury first.'),
-  // RPT1026-MARKET ARRIVE (private reports 2026-10-26: a character the delete refused while a trade with another player
-  // stood open, a trader's purchase still waiting for it): the goods waiting come to its pack on their own now as it plays
-  // (net/marketArrivals.js), and a trader's takings held for it are said too - they hold the delete (realm.js
-  // REALM_MARKET_OPEN_SQL's `market_gold`) and the line never named them
-  'realm-market-open': () => t('account.refusal.realmMarketOpen', 'This character still has business on the market: a listing, an auction, a bid, a buy order, a commission, goods on the way or waiting to be collected, or a trader\'s takings. Settle it first. Play it online once and goods waiting for it come to its pack on their own; takings are collected on the Vendor page.'),   // PROF-DELETE   // AUDIT 28 M3: the Marks go to the guildmaster with the guild
+  'delete-moved': () => t('account.refusal.deleteMoved', 'Something this character holds changed while it was being deleted. Nothing was deleted. Try again.'),
   'no-member': () => t('account.refusal.noMember', 'That member is no longer in the guild.'),
   'bad-ranks': () => t('account.refusal.badRanks', 'Each rank needs a name of its own, 1 to {max} letters, digits, spaces, apostrophes or hyphens.', { max: GUILD_RANK_NAME_MAX }),
   'bad-gold': () => t('account.refusal.badGold', 'Gold goes in or out 1 to {max} at a time.', { max: GUILD_MOVE_MAX }),

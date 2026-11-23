@@ -393,19 +393,7 @@ async function settle(ctx, player, read = null) {
       db.prepare(`UPDATE products SET listed = 0 WHERE provenance = (SELECT provenance FROM market_auctions WHERE id = ?1 AND rn = ?2)`).bind(a.id, nonce),
     );
   }
-  // PROF5b: an outbid bid's escrow (or a removed auction's) back to its bidder, under the Marks cap - one line keyed on
-  // the bid's own id, so it happens once
-  for (const b of outbid) {
-    work.push(
-      db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
-        SELECT 'escrow', id, 'account', bidder, 'bid-return', amount + courier, ?2, ?3, bidder, auction, 'bid-return:' || id FROM market_bids
-        WHERE id = ?1 AND state IN ('outbid', 'void') AND returned = 0
-          AND NOT EXISTS (SELECT 1 FROM marks_ledger WHERE actor = market_bids.bidder AND rid = 'bid-return:' || ?1)
-          AND COALESCE((SELECT balance FROM marks WHERE account = market_bids.bidder), 0) + amount + courier <= ?4`).bind(b.id, utcDay(nowS), nowS, MARKS_MAX),
-      db.prepare(`UPDATE market_bids SET returned = 1 WHERE id = ?1 AND returned = 0
-        AND EXISTS (SELECT 1 FROM marks_ledger WHERE actor = market_bids.bidder AND rid = 'bid-return:' || ?1)`).bind(b.id),
-    );
-  }
+  for (const b of outbid) work.push(...bidReturn(db, b.id, nowS));
   // the orders' escrow back
   for (const o of shutOrders) work.push(...orderReturn(db, o.id, nowS));
   // the couriers' loads that have arrived
@@ -564,9 +552,21 @@ function backToStores(db, id, nonce) {
       SELECT seller, char_id, material, ${col === 'own' ? "'own'" : BOUGHT_ORIGIN_SQL}, ${col} FROM market_listings WHERE id = ?1 AND rn = ?2 AND kind = 'material' AND ${col} > 0
       ON CONFLICT (player, char_id, material, origin) DO UPDATE SET qty = prof_stores.qty + excluded.qty`).bind(id, nonce));
 }
+/** An outbid or void bid's escrow back to its bidder once, under the Marks cap (else it waits); then marked returned. */
+export function bidReturn(db, id, nowS) {
+  return [
+    db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
+      SELECT 'escrow', id, 'account', bidder, 'bid-return', amount + courier, ?2, ?3, bidder, auction, 'bid-return:' || id FROM market_bids
+      WHERE id = ?1 AND state IN ('outbid', 'void') AND returned = 0
+        AND NOT EXISTS (SELECT 1 FROM marks_ledger WHERE actor = market_bids.bidder AND rid = 'bid-return:' || ?1)
+        AND COALESCE((SELECT balance FROM marks WHERE account = market_bids.bidder), 0) + amount + courier <= ?4`).bind(id, utcDay(nowS), nowS, MARKS_MAX),
+    db.prepare(`UPDATE market_bids SET returned = 1 WHERE id = ?1 AND returned = 0
+      AND EXISTS (SELECT 1 FROM marks_ledger WHERE actor = market_bids.bidder AND rid = 'bid-return:' || ?1)`).bind(id),
+  ];
+}
 /** What is left of a closed order's escrow back to its poster - one line keyed on the order's own id, under the Marks
  *  cap (else it waits) - then the order marked returned. */
-function orderReturn(db, id, nowS) {
+export function orderReturn(db, id, nowS) {
   return [
     db.prepare(`INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, who, rid)
       SELECT 'escrow', id, 'account', poster, 'order-return', escrow, ?2, ?3, poster, material, 'order-close:' || id FROM market_orders

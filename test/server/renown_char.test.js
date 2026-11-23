@@ -15,7 +15,8 @@ import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { createGuest } from '../../server-account/src/accounts.js';
 import { reportRenownXp, renownTrackOf, renownTracksOf, RENOWN_CARD_TRACKS } from '../../server-account/src/renownTracks.js';
 import { claimRaid } from '../../server-account/src/raids.js';
-import { createRealm, deleteRealm } from '../../server-account/src/realm.js';
+import { createRealm } from '../../server-account/src/realm.js';
+import { deleteCharacter } from '../../server-account/src/character-delete/delete-character.ts';
 import { ACCOUNT_VERSION } from '../../server-account/src/service.js';
 import {
   renownRaidXp, renownForXp, renownXpFor, RENOWN_XP_HOUR_MAX, RENOWN_XP_REPORT_MAX, RENOWN_XP_MAX, RENOWN_MAX, RENOWN_TRACKS_MAX,
@@ -201,7 +202,7 @@ test('RENOWN-CHAR a realm character deleted takes its OWN Renown with it and lea
   assert.ok(made.id, `made: ${JSON.stringify(made)}`);
   await reportRenownXp({ db, nowS: T0 }, A, { character: made.id, xp: 4000 });
   await reportRenownXp({ db, nowS: T0 + 1 }, A, { character: 'char-keep', xp: 900 });
-  assert.deepEqual(await deleteRealm({ db, bucket: null }, A.id, made.id), { ok: true });
+  assert.equal((await deleteCharacter({ db, bucket: null }, A.id, made.id)).ok, true);
   assert.equal(await renownTrackOf({ db }, A.id, made.id), null, 'its Renown went with it');
   assert.deepEqual(await renownTrackOf({ db }, A.id, 'char-keep'), { xp: 900, level: renownForXp(900) }, 'another character\'s stays');
   const next = await createRealm({ db, rand, nowS: T0 + 2 }, A.id, { name: 'Tamsin' });
