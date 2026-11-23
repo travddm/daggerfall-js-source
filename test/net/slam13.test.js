@@ -182,6 +182,7 @@ test('SLAM13 A4: the memory is served A LISTENER AT A TIME - the largest memory 
     const frame = `{"t":"world","id":"p0000","data":${JSON.stringify(memory)}}`.length;
     h.tick(20_000);
     await r.raw(ws[0], raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     const served = ws.slice(1).filter((s) => ofType(s, 'world').length === 1).length;
     const expect = Math.floor(FOES_ROOM_BYTES_PER_S / frame) + 1;
     assert.equal(served, expect, `a second of the rate (${Math.floor(FOES_ROOM_BYTES_PER_S / frame)}) plus one on the borrow`);
@@ -193,9 +194,11 @@ test('SLAM13 A4: the memory is served A LISTENER AT A TIME - the largest memory 
     h.tick(60_000);
     r.room._roomWorld = { bytes: -1, at: h.clock - 60_000 };
     await r.raw(ws[0], raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length === 1).length, Math.min(n - 1, expect * 2), 'the next publish serves one more second\'s worth - the refill is capped at the rate');
     h.tick(20_000);
     await r.raw(ws[0], raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length === 1).length, n - 1, 'and the rest on the one after');
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length > 1).length, 0, 'nobody twice');
   } finally { h.done(); }
