@@ -79,7 +79,7 @@ export async function guildBalanceOf(db, guildId) {
 const COMBAT_KINDS_SQL = MARKS_COMBAT.kinds.map((k) => `'${k}'`).join(', ');
 /**
  * A daily cap's count so far, in SQL: the act_counts row of `subject`, `counterKind` and UTC day `day`, or 0.
- * The ledger's triggers keep the row (migrations/0013_act_counts.sql), so a cap holds whether or not the ledger
+ * The ledger's triggers keep the row (the act_counts migration), so a cap holds whether or not the ledger
  * lines are kept.
  */
 const dayCountSql = (subject, counterKind, day) =>

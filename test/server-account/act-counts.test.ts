@@ -1,4 +1,4 @@
-// The act_counts rows that the Marks ledger's triggers write (server-account/migrations/0013_act_counts.sql) equal
+// The act_counts rows that the Marks ledger's triggers write (the act_counts migration) equal
 // the sums the daily cap guards read from the ledger, and a retry or a failed statement never moves them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
