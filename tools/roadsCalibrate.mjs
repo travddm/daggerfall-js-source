@@ -1,6 +1,6 @@
 // ROADS 14: THE ANSWER KEY, MEASURED. Basic Roads' hand-drawn network
 // is what "as close as we can" means, and its data is of unstated license:
-// it is vendored in vendor/roads-hazelnut/ and read by the mod loader and
+// it is vendored in the repository and read by the mod loader and
 // this tool, not built on by the generator. What CAN be taken from it
 // is its judgement, expressed as numbers the generator's dials control:
 // how often a road bends, by how much, how many steps are diagonal, how

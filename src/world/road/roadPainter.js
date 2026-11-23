@@ -4,9 +4,9 @@
 // squares, so a road tile is written over a KNOWN ground type and the
 // squares then blend the ground around it. That seam is DFU's own and
 // it is where Hazelnut's Basic Roads paints too. This painter is a port
-// of Basic Roads' PaintPath (BasicRoadsTexturing.cs, MIT): its
-// conditions, tile tables, corner byte and road-height smoothing follow
-// his code. The notice is in vendor/roads-hazelnut/.
+// of its PaintPath (BasicRoadsTexturing.cs, MIT): the conditions, tile
+// tables, corner byte and road-height smoothing follow his code. The MIT
+// notice ships with the vendored copy of the mod.
 //
 // THE GRID. Map Y runs south, and inside a pixel's 128x128 tilemap row 0
 // is the SOUTH edge and row 127 the NORTH (terrainSampler.js:"x=0 of pixel px equals":
