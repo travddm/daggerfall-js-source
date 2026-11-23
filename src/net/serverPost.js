@@ -9,7 +9,7 @@
 // would write the record without it. So a lost answer ends the session (`abandon`), and a join reads the record, which
 // holds it.
 import { call, forgetSession } from './accountClient.js';
-import { postHead, postWhole, unclaimedOf, POST_POLL_MS, POST_BOX_MAX } from './postLaw.js';
+import { postHead, postWhole, unclaimedOf, postHoldsGoods, POST_POLL_MS, POST_BOX_MAX } from './postLaw.js';
 import { validLootItem } from '../systems/loot/loot.js';
 import { ReportDesk } from './privateReport.js';   // PRIVATE-REPORT: the report form's desk, kept on the box for the sitting
 import { t } from '../systems/textManager.js';
@@ -18,10 +18,33 @@ import { t } from '../systems/textManager.js';
 export const postBoxCall = (io) => call(io, '/v1/post/box');
 /** Open one of mine: `{ post: { ...head, body, readAt } }` - and it is read now. */
 export const postReadCall = (io, id) => call(io, '/v1/post/read', { id });
-/** Claim its item into the realm character `character`, its record standing at `realm`: `{ ok, id, item, realm: { seq } }`. */
-export const postClaimCall = (io, { id, character, realm }) => call(io, '/v1/post/claim', { id, character, realm });
+/** Claim what it holds into the realm character `character`, its record standing at `realm`; `letter` takes the gold as a
+ *  letter of credit: `{ ok, id, item, gold, materials, realm: { seq } }`. */
+export const postClaimCall = (io, { id, character, realm, letter = false }) => call(io, '/v1/post/claim', { id, character, realm, letter });
+
+/** What a piece still holds, in words: its item by name, then gold, then materials. Null when it holds nothing. */
+export function postGoodsText(p) {
+  const parts = [];
+  if (p.item) parts.push(p.item.name);
+  if (p.gold > 0) parts.push(t('post.goods.gold', '{n, number} gold', { n: p.gold }));
+  if (p.materials?.length > 0) parts.push(t('post.goods.materials', '{n, plural, one {# kind of material} other {# kinds of materials}} for the Stores', { n: p.materials.length }));
+  return parts.length > 0 ? parts.join(', ') : null;
+}
 /** Throw one away: `{ ok, id }`. */
 export const postDeleteCall = (io, id) => call(io, '/v1/post/delete', { id });
+
+/**
+ * What a claim of `head` moves besides its item. Gold the pack cannot carry as coin comes as a letter of credit, weighed
+ * here before the service writes the record.
+ * @param {any} head
+ * @param {{ paper?: (n: number) => boolean } | null} wallet
+ */
+function claimGoods(head, wallet) {
+  const gold = head.gold ?? 0;
+  const materials = head.materials ?? [];
+  const letter = gold > 0 && wallet?.paper?.(gold) === true;
+  return { gold, materials, letter };
+}
 
 /** The world tab's line when a look finds post: who it is from and what about for one, a count for more, and where it
  *  waits - a line nobody spoke (the letterbox's own manner, net/mail.js mailNoticeText). */
@@ -30,7 +53,7 @@ export function postNoticeText(event) {
   const ps = Array.isArray(event?.post) ? event.post : [];
   // one piece, new or waiting: by name, and its gift by name (AUDIT SERVER-POST: a gift that lands with a deploy
   // is first heard of in a sitting's first look - which said only "1 message waiting")
-  const one = (p) => `Post from ${p.from}: "${p.subject}"${p.item && !p.claimed ? `, with ${p.item.name} to claim` : ''}. ${where}`;
+  const one = (p) => `Post from ${p.from}: "${p.subject}"${postHoldsGoods(p) && !p.claimed ? `, with ${postGoodsText(p)} to claim` : ''}. ${where}`;
   if (event?.kind === 'new') return ps.length === 1 ? one(ps[0]) : `${ps.length} new messages in your mailbox. ${where}`;
   // PRIVATE-REPORT: a reader's private reports - said apart from the post, and never what they say (the world tab is read
   // over a shoulder, on a stream)
@@ -57,14 +80,19 @@ export class PostBox {
    * @param {{ act: (o: any) => Promise<any>, abandon?: (why: string) => void } | null} [o.realm]  its record's act
    *        (systems/realmSaves.js realmGoldAct over the host's session)
    * @param {{ add: (rec: any) => void, changed: () => void } | null} [o.pack]  where a claimed item lands
+   * @param {(() => ({ credit: (n: number, o?: { letter?: boolean }) => void, paper?: (n: number) => boolean } | null)) | null} [o.wallet]
+   *        where claimed gold lands; `paper(n)` says the pack cannot carry n gold as coin, so it comes as a letter of credit
+   * @param {{ changed: () => void } | null} [o.stores]  told when claimed materials went into the Stores, so they are read again
    */
-  constructor({ ioOf, now = () => Date.now(), onPost = null, character = () => null, realm = null, pack = null }) {
+  constructor({ ioOf, now = () => Date.now(), onPost = null, character = () => null, realm = null, pack = null, wallet = null, stores = null }) {
     this.ioOf = ioOf;
     this.now = now;
     this.onPost = onPost;
     this.character = character;
     this.realm = realm;
     this.pack = pack;
+    this.wallet = wallet;
+    this.stores = stores;
     this.state = 'unknown';
     /** @type {string|null} */ this.error = null;
     /** @type {any[]} */ this.post = [];
@@ -92,7 +120,7 @@ export class PostBox {
 
   /** What the mailbox's mark counts: a piece unread, or holding an item not yet claimed - each once. PRIVATE-REPORT: and,
    *  for a reader, the private reports nobody has opened. */
-  get waiting() { return this.post.filter((p) => !p.read || (p.item && !p.claimed)).length + (this.reports?.unread ?? 0); }
+  get waiting() { return this.post.filter((p) => !p.read || (postHoldsGoods(p) && !p.claimed)).length + (this.reports?.unread ?? 0); }
 
   _changed() { this.version++; }
 
@@ -160,7 +188,7 @@ export class PostBox {
     const post = (Array.isArray(r.data?.post) ? r.data.post : []).map(postHead).filter((p) => p !== null);
     const first = this._known === null;
     const fresh = first ? [] : post.filter((p) => !p.read && !this._known.has(p.id));
-    const waits = post.filter((p) => !p.read || (p.item && !p.claimed));
+    const waits = post.filter((p) => !p.read || (postHoldsGoods(p) && !p.claimed));
     this._known = new Set(post.map((p) => p.id));
     const was = JSON.stringify([this.state, this.post, this.error, this.reports]);
     // PRIVATE-REPORT: a reader's count, said on the world tab when it rises (and on a sitting's first look, when any wait)
@@ -236,35 +264,40 @@ export class PostBox {
   }
 
   /**
-   * CLAIM ITS ITEM into the online character being played. The service writes it into the record and answers it; the
-   * pack takes it on the answer (checked as every item that arrives over the wire is - systems/loot/loot.js validLootItem).
-   * Answers `{ ok, item }` or `{ ok: false, error }`.
+   * CLAIM WHAT IT HOLDS into the online character being played. The service writes the item and the gold into the record
+   * and the materials into the Stores, and answers them; the pack and the purse take them on the answer (an item is
+   * checked as every item that arrives over the wire is - systems/loot/loot.js validLootItem).
+   * Answers `{ ok, item, gold, materials }` or `{ ok: false, error }`.
    * @param {string} id
    */
   async claim(id) {
     const head = this.post.find((p) => p.id === id);
-    if (!head?.item) return { ok: false, error: 'post-no-item' };
-    if (head.claimed) return { ok: false, error: 'post-claimed' };
     const character = this.character?.() ?? null;
-    if (!this.realm || !this.pack || !character) return { ok: false, error: 'realm-only' };
+    const wallet = this.wallet?.() ?? null;
+    const refused = this._claimRefusal(head, character, wallet);
+    if (refused) return { ok: false, error: refused };
+    const { gold, materials, letter } = claimGoods(head, wallet);
     const io = this._io();
     if (!io) return { ok: false, error: 'signed-out' };
     if (this.busy) return { ok: false, error: 'busy' };
     this.busy = true; this._changed();
     /** @type {any} */
     let landed = null;
+    let applied = false;
     try {
       const r = await this.realm.act({
         needsAnswer: true,
         apply: (/** @type {any} */ a) => {
-          const rec = validLootItem(a?.data?.item);
-          let held = false;
-          if (rec) {
-            try { this.pack?.add(rec); this.pack?.changed(); held = true; landed = rec; } catch (e) { console.warn('[post] a claimed item would not go in the pack', /** @type {any} */ (e)?.message ?? e); }
+          landed = head.item ? this._packTake(a?.data?.item) : null;
+          applied = !head.item || landed != null;
+          if (gold > 0) {
+            wallet?.credit(gold, { letter });
+            this.pack?.changed();
           }
-          if (!held) this.realm?.abandon?.('unknown');   // the record holds what the pack does not: a join reads it
+          if (materials.length > 0) this.stores?.changed();
+          if (!applied) this.realm?.abandon?.('unknown');   // the record holds what the pack does not: a join reads it
         },
-        call: (/** @type {any} */ at) => postClaimCall(io, { id, character, realm: at }),
+        call: (/** @type {any} */ at) => postClaimCall(io, { id, character, realm: at, letter }),
       });
       if (r?.unknown) return { ok: false, error: 'unknown' };   // the realm never said - the session is given up, and a join reads the record
       if (r?.ok) {
@@ -274,7 +307,7 @@ export class PostBox {
         if (kept) { kept.claimed = true; }
         this.unclaimed = unclaimedOf(this.post);
         this.unread = this.post.filter((p) => !p.read).length;
-        return landed ? { ok: true, item: landed } : { ok: false, error: 'unknown' };
+        return applied ? { ok: true, item: landed, gold, materials } : { ok: false, error: 'unknown' };
       }
       if (this._boxRefusal(io, r?.error)) return { ok: false, error: r.error };
       if (r?.error === 'post-claimed') { head.claimed = true; this.unclaimed = unclaimedOf(this.post); }
@@ -283,6 +316,40 @@ export class PostBox {
     } finally {
       this.busy = false;
       this._changed();
+    }
+  }
+
+  /**
+   * Why a claim cannot set out, or null: nothing to claim, claimed already, or no place for what it holds.
+   * @param {any} head
+   * @param {string|null} character
+   * @param {{ credit: Function } | null} wallet
+   * @returns {string|null}
+   */
+  _claimRefusal(head, character, wallet) {
+    if (!head || !postHoldsGoods(head)) return 'post-no-item';
+    if (head.claimed) return 'post-claimed';
+    if (!this.realm || !character) return 'realm-only';
+    if (head.item && !this.pack) return 'realm-only';
+    if ((head.gold ?? 0) > 0 && !wallet) return 'realm-only';
+    return null;
+  }
+
+  /**
+   * A claimed item into the pack, checked as every item that arrives over the wire is. Answers the item, or null when
+   * the pack could not take it.
+   * @param {unknown} record
+   */
+  _packTake(record) {
+    const rec = validLootItem(record);
+    if (!rec) return null;
+    try {
+      this.pack?.add(rec);
+      this.pack?.changed();
+      return rec;
+    } catch (e) {
+      console.warn('[post] a claimed item would not go in the pack', /** @type {any} */ (e)?.message ?? e);
+      return null;
     }
   }
 
@@ -298,9 +365,12 @@ export class PostBox {
     /** @type {any[]} */
     const items = [];
     try {
-      for (const id of this.post.filter((p) => p.item && !p.claimed).map((p) => p.id)) {
+      for (const id of this.post.filter((p) => postHoldsGoods(p) && !p.claimed).map((p) => p.id)) {
         const r = await this.claim(id);
-        if (r.ok) { items.push(r.item); continue; }
+        if (r.ok) {
+          if (r.item) items.push(r.item);
+          continue;
+        }
         if (r.error === 'post-claimed' || r.error === 'no-post') continue;
         return { ok: false, error: r.error, items };
       }
@@ -314,7 +384,7 @@ export class PostBox {
   /** THROW ONE AWAY - never a gift still waiting (the service refuses `post-unclaimed`, and so does this). */
   async remove(id) {
     const head = this.post.find((p) => p.id === id);
-    if (head?.item && !head.claimed) return { ok: false, error: 'post-unclaimed' };
+    if (head && postHoldsGoods(head) && !head.claimed) return { ok: false, error: 'post-unclaimed' };
     const io = this._io();
     if (!io) return { ok: false, error: 'signed-out' };
     const r = await postDeleteCall(io, id);
