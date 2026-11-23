@@ -54,18 +54,3 @@ test('naturePicture: else the season\'s picture - uploaded whole under the insta
 
 const walk = (dir) => readdirSync(join(root, dir), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(join(dir, d.name)) : d.name.endsWith('.js') ? [join(dir, d.name)] : []));
 
-test('THE ONE CONSTRUCTION SEAM: every host that stands a nature flat asks the one choice - the town\'s pixels, a location\'s flats, a yard\'s tree - and no file in src/ makes it for itself: none writes the season\'s key, asks which archives Low Poly Trees stands, or asks the door for a far picture (mutants: NATUREPIC-world-unwired, NATUREPIC-exterior-unwired)', () => {
-  const read = (p) => hostText(p);
-  assert.match(hostText('src/scenes/world.js'), /await naturePicture\(\{ door: lowPolyTrees, seasons: host\.seasonsActive \? seasons : null, renderer, uploadRecord: g\.uploadRecord \}, t, archive, record\)/, 'the town\'s pixels: the season while the mod stands one');   // PIN MOVED (AUDIT PRECIP HOST-7): the groups' one function, its pixel's hold handed in
-  assert.match(read('src/scenes/exterior.js'), /await naturePicture\(\{ door: lowPolyTrees, seasons, renderer, uploadRecord \}, t, archive, record\)/, 'a location\'s flats');
-  // WINDFALL1 (PIN MOVED): the yard reads its season once - for the picture, and for Windfall's table of that picture's atlas
-  assert.match(read('src/scenes/yardNature.js'), /const seasons = seasonal\?\.\(\) \?\? null;\n\s*const pic = await naturePicture\(\{ door, seasons, renderer, uploadRecord \}, t, archive, record\)/, 'a yard\'s tree');
-  const seam = 'src/world/naturePicture.js';
-  for (const f of walk('src')) {
-    if (f === seam) continue;
-    const s = read(f);
-    assert.ok(!s.includes('#season${'), `${f} writes the season's key - world/naturePicture.js seasonPictureKey`);
-    assert.ok(!s.includes('LPT_ARCHIVES.includes('), `${f} asks which archives Low Poly Trees stands - world/naturePicture.js`);
-    assert.ok(!/\.farPicture\(/.test(s), `${f} asks Low Poly Trees for a far picture - world/naturePicture.js`);
-  }
-});

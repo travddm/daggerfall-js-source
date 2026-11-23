@@ -1,5 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26; bible/06-Systems/Lockpicking.md): THE TUMBLERS' EAR - what each press of the lock's window sounds.
+// LOCKPICK: THE TUMBLERS' EAR - what each press of the lock's window sounds.
 // DAGGER.SND has the picked lock's chime (ActivateLockUnlock, which the world still plays as the lock opens) and no
 // tumblers, so the seven clips are ours (tools/lockSfx.mjs -> public/sfx/lock-*.wav, provenance in public/sfx/SOURCES.md),
 // registered on the bus under string keys the climb's way (player/climb/climbSounds.js) and played flat at the ear - the

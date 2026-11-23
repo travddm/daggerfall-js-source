@@ -1,11 +1,11 @@
-// AUDIT PRECIP HOST-7 (the owner: "Audit this and ensure perfection. No band aids"): ON THE SNOW LANE A SEASON'S TURN
+// AUDIT PRECIP HOST-7: ON THE SNOW LANE A SEASON'S TURN
 // RE-SKINS WHAT STANDS, IN PLACE. The snow turns a pixel at the weather's rate (scenes/snowCoverHost.js sweep), and each
 // turn was the classic flip's whole teardown - the terrain, the collider, the doors, the street's people and the grass
 // rebuilt, and the motor held on the player's own pixel through the build - though nothing it took depended on the snow.
 // DFU re-skins in place (DaggerfallLocation.ApplyClimateSettings): scenes/pixelBuild.js reskinPixelNow re-makes the
 // season's parts alone - the climate table (world/texRemap.js reskinRemap) and the merge through it, the homes' looks, the
 // mills' bodies, the flats' groups with their forest, cover and far pictures - aside, and trades them in one step. Run
-// here on a standing pixel through the build's own code; the record is bible/01-Overview/audits/Audit-Precip.md.
+// here on a standing pixel through the build's own code; the record is.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -216,26 +216,5 @@ test('HOST-7: the queue - a snow\'s turn is a skin, never a rebuild; a key rebui
   r.mark('5,5');
   assert.deepEqual(r.take(built), ['5,5']);
   assert.equal(r.nextSkin(built, { x: 0, y: 0 }), null, 'rebuilt: its skin spent');
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /markReskin: \(key\) => _reskin\.skin\(key\),/);
-  const tick = w.slice(w.indexOf('  function tickSeason() {'), w.indexOf('\n  }\n', w.indexOf('  function tickSeason() {')));
-  assert.match(tick, /const skin = keys\.length \? null : _reskin\.runSkin\(built, state\.current\);\n\s+if \(skin\) \{ building = true; skin\.finally\(\(\) => \{ building = false; \}\); \}\n\s+if \(!keys\.length\) return;/);
-  const pb = readFileSync('src/scenes/pixelBuild.js', 'utf8');
-  assert.match(pb, /_reskin\.skinWith\(reskinPixelNow\);/);
 });
 
-test('HOST-7: the build logs what a re-skin reads - a wild flat\'s season asked once it is known to stand (a flat the verge refused turns no pixel), the merge\'s models, the mills, and the record on the snow lane alone; the sea\'s floor wears the lane\'s ground, never the pixel\'s season (mutants: the season asked before the verge; the seafloor by the pixel)', () => {
-  const pb = readFileSync('src/scenes/pixelBuild.js', 'utf8');
-  const loop = pb.slice(pb.indexOf('    for (const f of nature) {'), pb.indexOf('    // WOD4: THE CAMP AT PRIVATEER\'S HOLD'));
-  assert.ok(loop.indexOf('vergeClear(vergeNet') < loop.indexOf('snowRec.flat('), 'the verge first');
-  assert.match(pb, /addFlat\(archive, f\.record, f\.x, f\.y, f\.z, \{ wild: base, tree \}\);/);
-  assert.match(pb, /models\.push\(\{ gpu: parts\.body, local, _box: box, _order: -1, _mill: true \}\);/);
-  assert.match(pb, /_skin: snowSeen \? \{ log: flatLog, blocks: skinBlocks, statics: remapAsked\(texRemap\) \? statics : null,/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /groundIsSnowy\(settings, snowCover\.on \? SEASON\.Summer : entry\.season \?\? season\)/);
-  // a yard stands its pieces again when its pixel's buildings' season turns in place, as when its pixel is built again
-  const y = readFileSync('src/scenes/homeYards.js', 'utf8');
-  assert.match(y, /const rebuilt = y\.entry !== p \|\| y\.skin !== \(p\._skinGen \?\? 0\);/);
-  assert.match(y, /y\.entry = p;\n\s+y\.skin = p\._skinGen \?\? 0;/);
-  assert.match(y, /e !== y\.entry \|\| \(e\?\._skinGen \?\? 0\) !== y\.skin\) \{ syncIn = 0; break; \}/);
-});

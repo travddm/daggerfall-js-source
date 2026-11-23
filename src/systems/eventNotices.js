@@ -1,7 +1,6 @@
 // @ts-check
-// EVENTS1 (2026-10-23, the owner: "Instead of stuffing these in the chat menu, there must be a less obstructive and more
-// detailed way to handle them"): THE ONE DOOR AN EVENT'S LINE GOES THROUGH, AND THE SEAT OF THE BOARD'S SOURCE.
-// Design: bible/10-UI/Event-Board.md; its audit, bible/01-Overview/audits/Audit-Event-Board.md.
+// EVENTS1: THE ONE DOOR AN EVENT'S LINE GOES THROUGH, AND THE SEAT OF THE BOARD'S SOURCE.
+// Design:; its audit,.
 //
 // `eventNotice(kind, text, id)` is what the gate's omen and its rite, the sea serpent's bells, a star's region lines and
 // its hold, the Abyss Dungeon's find, a town raid's attack and cleansing and the Witches' Festival's nights say now,

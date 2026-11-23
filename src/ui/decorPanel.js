@@ -1,10 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR1d (2026-09-25) — THE DECORATOR'S THREE SURFACES.
+// DECOR1d — THE DECORATOR'S THREE SURFACES.
 //
-// Mac, asked how the decorator opens: "A UI element that can be clicked
-// to open the decorate panel. Allows free cam mode for placement and an
-// intuitive scrolling menu with filters". So three surfaces, one sheet:
+// . So three surfaces, one sheet:
 //
 //  - THE BUTTON. "Decorate", at the screen's right edge, standing only
 //    where the player may decorate (their online home, or their own
@@ -596,7 +594,7 @@ export function createDecorPanel({
   const moveBtn = act('Move', () => { const it = placedSelected(); if (it && !moveBtn.disabled) { hide(); onMove(it.piece); } });
   const renameBtn = act('Rename', () => { const it = placedSelected(); if (it && !renameBtn.disabled) onRename(it.piece); });
   const dupBtn = act('Duplicate', () => { const it = placedSelected(); if (it && !dupBtn.disabled) { hide(); onDuplicate(it.piece); } });
-  // DECOR-TURN (Mac: "the ability to rotate objects on the ground"): the chosen piece turned where it stands, the panel up
+  // DECOR-TURN: the chosen piece turned where it stands, the panel up
   const turnBtn = (label, dir) => { const b = act(label, () => { const it = placedSelected(); if (it && !b.disabled) onTurn(it.piece, dir); }); return b; };
   const turnLeftBtn = turnBtn('Turn left', -1), turnRightBtn = turnBtn('Turn right', 1);
   const lightBtn = act('Light', () => { const it = placedSelected(); if (it) onToggle(it.piece, 'light'); });
@@ -762,7 +760,7 @@ export function createDecorPanel({
   const rentKeyOf = (it) => (it.id != null ? `r${it.id}` : `o${it.offer?.room}`);
   const rentSelected = () => (view?.rent?.rows ?? []).find((it) => rentKeyOf(it) === rentKey) ?? null;
   const rentPriceOf = (it) => rentPrices.get(rentKeyOf(it)) ?? it.offer?.price ?? RENT_PRICE_FIRST;
-  /** DECOR-ROOMS (2026-09-27, Discord: "For a house with multiple connects, add room switching tabs"): a house of two
+  /** DECOR-ROOMS: a house of two
    *  rooms or more lists the chosen room's pieces - its placed ones and its own furniture - and a piece the host could
    *  not stand in any room (none beneath it) in every one, so nothing is lost from the lists. */
   const roomsUp = () => Array.isArray(view?.rooms) && view.rooms.length > 1 && view.roomId != null;

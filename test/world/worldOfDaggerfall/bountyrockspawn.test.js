@@ -17,8 +17,15 @@ import { rockFootprint } from '../../../src/world/terrain/terrainNature.js';
 import { createBountyHost, BOUNTY_RETRY_S } from '../../../src/scenes/bountyHost.js';
 
 const world = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-const camp = world.slice(world.indexOf('  const _standCampEncounter ='), world.indexOf('  // BOUNTY1: A BOUNTY\'S PACK'));
-const bounty = world.slice(world.indexOf('  const _standBountyPack ='), world.indexOf('  // BOUNTY1 (Mac: "Dungeon bounties'));
+// A host arrow function from its declaration to its closing `  };` at the host's indent, so the slice ends on code.
+const arrowAt = (decl) => {
+  const from = world.indexOf(decl);
+  const end = world.indexOf('\n  };\n', from);
+  assert.ok(from >= 0 && end > from, `${decl} found in world.js`);
+  return world.slice(from, end + 5);
+};
+const camp = arrowAt('  const _standCampEncounter =');
+const bounty = arrowAt('  const _standBountyPack =');
 
 export function worldStand({collider, feet, inRock=(x,y,z)=>collider.insideSolid([x,y+0.5,z]), inBuilding=()=>false, random=()=>0.5}) {
   const spawned=[];

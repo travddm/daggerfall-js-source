@@ -1,8 +1,7 @@
 // EOTB5: THE LIVE BODY - what actually appears behind the camera.
 //
-// EOTB-IL (2026-09-17): THIS FILE IS `PlayerBillboard`, METHOD FOR
-// METHOD. Mac: "it needs to be 1:1 with the uploaded file. No
-// exceptions." The assembly is read now (`eotbBillboard.js`'s head
+// EOTB-IL: THIS FILE IS `PlayerBillboard`, METHOD FOR
+// METHOD. The assembly is read now (`eotbBillboard.js`'s head
 // says how), and the MonoBehaviour's three Unity phases run here in
 // Unity's own order every frame the billboard is active:
 //
@@ -19,7 +18,7 @@
 //
 // ═══ THE FOUR HOSTS, AND WHY NONE OF THEM IS TOUCHED ══════════════
 //
-// The FOUR HOSTS rule in `bible/Home.md` says a slice wiring a
+// The FOUR HOSTS rule in ` ` says a slice wiring a
 // seam into a host must name all four. Named: `scenes/exterior.js`, `scenes/world.js`,
 // `scenes/worldModes.js` and `scenes/dungeonContext.js`. NONE carries
 // a call for this body, and that is the wiring rather than a gap.
@@ -110,9 +109,7 @@ export const FOOTSTEP_VOLUME_SCALE = Object.freeze({ thirdPerson: 2, firstPerson
 // beast's is another body. It lights you from where it hangs (`setPlayerWaistLightOverride`), cleared the moment
 // it stops hanging.
 //
-// HT-WAIST-BACK (2026-09-24, Mac: "Just have it show on the back of the sprite, not all angles. Make sure all the
-// eye of the Beholder sprites get this change"; then, of the back diagonals: "It still shows on the back side
-// angle"): the picture is DRAWN only while the sprite is seen from straight behind - the painted orientation 4 of
+// HT-WAIST-BACK: the picture is DRAWN only while the sprite is seen from straight behind - the painted orientation 4 of
 // EOTB's wheel, the one view that draws its back - and never from the back diagonals, the front or the side. It still hangs there, lit, whatever the view: the swing runs on and the light stays at the hip, so
 // turning round neither restarts the swing nor moves the light. Everything the peers' sprites share with this one
 // - the rear-view rule, the picture, the hang, the swing's drive, the batch - is player/eyeOfTheBeholder/eotbLantern.js's; this
@@ -253,8 +250,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
   let stateCurrent = 'Idle';
   let stateLast = null;
   let lastOrientation = 0;
-  /** SPRITE-FLICKER (2026-10-07, Mac: "it's very finicky when moving and then switching to run at angles. Like it
-   *  flickers like it doesn't know which direction it wants to face"): the orientation UpdateOrientation last CHOSE.
+  /** SPRITE-FLICKER: the orientation UpdateOrientation last CHOSE.
    *  `lastOrientation` is the one that has LANDED - UpdateBillboard writes it, three frames after the choice - and the
    *  mod hands that to every repaint the walk clock, a table change and the mirror revert queue. One queued inside
    *  those three frames lands AFTER the turn and paints the old view back: the walk clock's, the new view for a frame
@@ -309,8 +305,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
   /** HT-WAIST-BACK: is it DRAWN this frame - it hangs, and the sprite is painted from behind (eotbLantern.js
    *  isRearView: orientation 4). */
   const lanternShown = () => lanternHangs() && isRearView(shown?.orientation);
-  /** SPRITE-FACE (2026-10-05, Mac: "The sprite rotation on character input is a little finicky and make the aura
-   *  misallign"): THE FACING THE BODY TURNS BY, as a yaw (forward (sin, cos)) - its walk's facing (UpdateOrientation's
+  /** SPRITE-FACE: THE FACING THE BODY TURNS BY, as a yaw (forward (sin, cos)) - its walk's facing (UpdateOrientation's
    *  `lastMoveDirection`), or null with none (Vector3.zero, before a first walk or placing). Not where an aura is HUNG -
    *  that is the picture's facing (facing().yaw): this one turns smoothly where the picture snaps a bucket at a time,
    *  and ahead of it by the delayed repaint; it is what the aura's swing reads, so the hem and the wing tips answer the
@@ -441,8 +436,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
       if (p && !stands(LAYERED_ARCHIVE[p[1]], p[4])) decoded.delete(k);
     }
   }
-  /** PR-WW1 (2026-09-24, player report: "Werewolf morrowind sprite not
-   *  showing online"): THE FORM IS NOT A SETTING. The lycan archive is
+  /** PR-WW1: THE FORM IS NOT A SETTING. The lycan archive is
    *  picked by the curse (lycanArchive: 112381 for the wereboar), and
    *  `cfg` is the mod's settings, which never carry it - so every
    *  spriteFor here asked for the werewolf, and a wereboar saw the wolf
@@ -770,7 +764,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
   }
   /** [IL] `LateUpdate` (IL_3d64-IL_3fa4). */
   function lateUpdate(dt) {
-    // DEATH-BODY1 (2026-09-22). Muriel on Discord: "if you die in the
+    // DEATH-BODY1. Muriel on Discord: "if you die in the
     // tutorial dungeon and press F11 to load, you load the game but are
     // visually a corpse. You can act normally, but are a corpse."
     // kurkku saw the same; trashBattery found the workaround and named
@@ -870,8 +864,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
     else y = yOff + size.h * 0.5 - h * 0.5;
     const z = FP && cfg.visibility > 0 ? FP_DEPTH : 0;
     const origin = [cam.feet[0], cam.feet[1] + h * 0.5, cam.feet[2]];
-    // EOTB-FEET (2026-09-16, Mac: "the sprite not connected to the
-    // floor. Like you walk hovering"): the three arms above are the
+    // EOTB-FEET: the three arms above are the
     // mod's, and they place the quad's CENTRE - Unity's billboard mesh
     // is centred on its transform. This renderer's billboard is
     // BOTTOM-ANCHORED (BB_VS: "centre sits half a height above the
@@ -886,18 +879,18 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
 
   return {
     /**
-     * ARENA-FIX 14 (2026-10-02, the port's own): THE BODY TURNED WITH A PLACING (`tick` sees one: PLACE_JUMP_M). The mod's sprite faces its last walk
+     * ARENA-FIX 14: THE BODY TURNED WITH A PLACING (`tick` sees one: PLACE_JUMP_M). The mod's sprite faces its last walk
      * (UpdateOrientation's `lastMoveDirection`, a field that only a walk writes) - and a body PLACED with a facing (a
      * fighter stood on its mark in the arena's instance, a probe's pose) had walked nowhere: it kept the old walk's
      * facing, or none (Vector3.zero, which SignedAngle reads as the camera's own line - the sprite's FRONT to the
      * camera), so the player's own sprite stood facing the lens at the head of every bout. A placing writes the facing
      * it places with, as the walk it stands for would; the next orientation pass repaints it. `yaw` the facing's.
      */
-    /** SERAPH-WINGS (2026-10-05): THE FIGURE LAST DRAWN - { base, h }, the quad's foot and its height over the feet (m),
+    /** SERAPH-WINGS: THE FIGURE LAST DRAWN - { base, h }, the quad's foot and its height over the feet (m),
      *  this frame's; null when nothing was drawn or in the saddle. What an aura on the back reads for the bones a sprite
      *  has not got (render/auraRing.js auraSpriteBones). */
     figure() { return figure; },
-    /** SPRITE-FACE (2026-10-05): THE WAY THE FRAME LAST DRAWN FACES - { yaw, turn }: `yaw` the facing its picture shows
+    /** SPRITE-FACE: THE WAY THE FRAME LAST DRAWN FACES - { yaw, turn }: `yaw` the facing its picture shows
      *  (the shown orientation about the eye it was drawn for - eotbBillboard.js portrayedYaw), `turn` the facing the body
      *  turns by (its walk's); this frame's, in the saddle too; null when nothing was drawn or in first person. An aura on
      *  the sprite is hung on `yaw` and swings by `turn` (render/auraRing.js auraCapeStep, auraMotionStep). */
@@ -1026,7 +1019,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
       const flipView = FP && cfg.visibility === 2;
       const lk = lookNow();
       const s = spriteFor(shown.table, shown.orientation, shown.frame, lk, { flip: shown.flip !== flipView });   // PR-WW1: the live form's archive (112381 the wereboar)
-      // OW-BIG (2026-09-28, Mac: "The player sprite needs to appear larger"): under the travel view the sprite is drawn
+      // OW-BIG: under the travel view the sprite is drawn
       // `face.grow` times its size (player/travelCamera.js tvOwnGrow) - a party's icon from the Overworld's height, not
       // a speck; whole steps, the batch made again at each
       const grow = face && face.grow > 1 ? face.grow : 1;
@@ -1061,7 +1054,7 @@ export function createEotbBody({ count = spriteCount, urlFor = eotbSpriteUrl, de
       // traveller's own heading it went edge-on as the view orbited, a sliver at 90 degrees, mirrored at 180
       const by = face ? face.yaw : cam.yaw;
       const camRight = [Math.cos(by), 0, -Math.sin(by)];
-      // FP-SHADOW1 (2026-10-10, Mac: "when i look up i see my eye of the beholder skin"): THE FIRST-PERSON BILLBOARD'S
+      // FP-SHADOW1: THE FIRST-PERSON BILLBOARD'S
       // VISIBILITY, which was read and never applied. The mod's FirstPersonBillboard is its renderer's
       // shadowCastingMode: 2 the body drawn (a quarter metre behind the eye, so looking down shows it), 1 - the default,
       // "Shadows Only" - a body that casts and is never seen, 0 none at all. The port drew all three: the quad stood

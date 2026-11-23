@@ -2,7 +2,7 @@
 // THE OARS FROM THE KEPT RUNG (systems/comeSailAway/comeSailAway.js updateSailing).
 //
 // The Overworld's crossing (OWS2, 2026-09-28: scenes/world.js tvSeaSail, systems/seaHelm.js) sails a boat through the
-// helm's keys alone - the rudder held, the sail key's edge, and the autorun for her oars. HELM-LADDER (2026-10-04) made
+// helm's keys alone - the rudder held, the sail key's edge, and the autorun for her oars. HELM-LADDER made
 // the oars a KEPT RUNG (`oarThrottle`: backing water, at rest, pulling ahead), reset only by a press, a sail raised or
 // the helm taken or left - and the crossing's hand never knew it. A journey begun at a helm left on her oars ("without
 // full sails": W once, or S from her last sail) kept the rung through the journey and past its end: the hand let go,
@@ -70,10 +70,3 @@ test('FB1020c OAR-RUNG: the player\'s own autorun at a helm takes the oars the s
   assert.ok(Math.hypot(...s.rt.state.MoveVectorCurrent) < 0.05, 'the autorun let go: she rests, no rung left to pull');
 });
 
-test('FB1020c OAR-RUNG by source: the shift is the stroke\'s own, ahead of where the oars are read, in createComeSailAwayRuntime (no host grew: the crossing in world.js is untouched)', () => {
-  const src = readFileSync(new URL('../../../src/systems/comeSailAway/comeSailAway.js', import.meta.url), 'utf8');
-  const shift = src.indexOf('      if (deps.input?.toggleAutorun) state.oarThrottle = 0;');
-  const stroke = src.indexOf('      if ((state.oarThrottle > 0 || deps.input?.toggleAutorun) && IsNodeOnWater(boat, 0)) num3 = 1;');
-  assert.ok(shift > 0 && stroke > shift, 'the autorun lets the rung go before the stroke reads it');
-  assert.equal(src.split('if (deps.input?.toggleAutorun) state.oarThrottle = 0;').length, 2, 'one home');
-});

@@ -1,6 +1,6 @@
-// EVENTS1 (2026-10-23, the owner: "Instead of stuffing these in the chat menu, there must be a less obstructive and more
-// detailed way to handle them"): THE EVENT BOARD'S LAW (systems/eventBoard.js) AND ITS DOOR (systems/eventNotices.js).
-// Design: bible/10-UI/Event-Board.md; AUDIT EVENTS1, bible/01-Overview/audits/Audit-Event-Board.md. The fixtures are the
+import { playFileByRules } from '../profileRules.mjs'; // a server profile's rule keys, for one test file
+// EVENTS1: THE EVENT BOARD'S LAW (systems/eventBoard.js) AND ITS DOOR (systems/eventNotices.js).
+// Design:; AUDIT EVENTS1,. The fixtures are the
 // producers' own (TEST THE SHAPE THE PRODUCER MINTS): the stars through starTimerRows, the raids through raidTimerList
 // over a restored day, the gate's and the serpent's rows through eventTimerRows' laws. Mutation list:
 // tools/mutants/events1.json.
@@ -17,7 +17,7 @@ import {
 } from '../../src/systems/eventNotices.js';
 import { gateAt, PIXEL_M } from '../../src/net/gate/gateLaw.js';
 import { serpentAt, serpentTimes, serpentBossOf } from '../../src/net/serpent/serpentLaw.js';
-import { starTimes, starNightAt, STAR_FALLS_MS } from '../../src/net/starfall/starfallLaw.js';
+import { starTimes, starNightAt, starFallOffsetMs } from '../../src/net/starfall/starfallLaw.js';
 import { FESTIVALS } from '../../src/net/festivalLaw.js';
 import { STAR_COVENS } from '../../src/systems/starfall/starfallCovens.js';
 import { starTimerRows, STAR_WARN_MS } from '../../src/systems/starfall/starfallClient.js';
@@ -29,6 +29,8 @@ import { LOCATION_TYPES } from '../../src/formats/mapsFile.js';
 import { registerPresenter, _resetNotifyForTests } from '../../src/systems/notify.js';
 import { setPref, _resetForTests as resetPrefs } from '../../src/systems/uiPrefs.js';
 import { FEATURES, EVENT_KINDS, EVENT_KIND_ORDER, eventKindPref, FEATURE_PREF_DEFAULTS, FEATURE_PREF_ONLINE } from '../../src/systems/features.js';
+
+playFileByRules({ 'time.skyClock': true }); // these pins stand on the sky clock's hourly night (a sky day is an hour at its default TimeScale)
 
 const HERE = { x: 200, y: 200 };
 /** A moment the day's gate is open (gateLaw's own clock). */
@@ -111,7 +113,7 @@ test('EVENTS1 THE ABYSS DUNGEON ON THE BOARD: found, its row stands near its cit
 });
 
 test('EVENTS1 THE STARS ON THE BOARD, FROM starTimerRows: each star warned STAR_WARN_MS before it falls - EVERY star, not only the soonest (AUDIT EVENTS1 A3: the night\'s falls are 7.5 minutes apart) - with its town and its way; its `since` its warning, then its fall; a star held or lost leaves (mutants: the warning for the soonest alone, the since)', () => {
-  assert.equal(STAR_FALLS_MS[1] - STAR_FALLS_MS[0], 450_000, 'the falls 7.5 minutes apart');
+  assert.equal(starFallOffsetMs(1) - starFallOffsetMs(0), 450_000, 'the falls 7.5 minutes apart');
   // a minute after the first falls: the second (6.5 min off) warned; the third (14 min off) not yet, and not the soonest
   const t = ST[0].fallAt + 60_000;
   const rows = starTimerRows(SITES, t);
@@ -356,9 +358,7 @@ test('EVENTS1 THE JOURNAL HOLDS A LINE ONCE: a line the door filed, said again o
   } finally { _resetEventNotices(); _resetNotifyForTests(); }
 });
 
-// EVENTS2 (2026-10-24, the players on Discord: "Allow us to filter which events we want to show up in the event tracker",
-// "I don't want all this crap cluttering up my interface"; the owner: "No band aids"): EACH KIND THE PLAYER'S OWN.
-// bible/10-UI/Event-Board.md section 8.
+// EVENTS2: EACH KIND THE PLAYER'S OWN.
 
 /** A `shown` that answers for these kinds alone. */
 const only = (...kinds) => (k) => kinds.includes(k);

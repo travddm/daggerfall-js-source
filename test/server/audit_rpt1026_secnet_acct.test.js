@@ -1,4 +1,4 @@
-// AUDIT RPT1026 lane A (SECNET), the account service's half (bible/01-Overview/bugs/Field-Bugs-2026-10-26r.md,
+// AUDIT RPT1026 lane A (SECNET), the account service's half (,
 // RPT1026-SECNET RECOVERY HOLDS): through the real service over the real migrations (test/accountDb.mjs), on a database
 // that HOLDS one request between two of its statements while another runs whole - the interleaving two Worker requests
 // on one D1 meet (test/server/rpt1026_secnet.test.js's harness, the same shape).

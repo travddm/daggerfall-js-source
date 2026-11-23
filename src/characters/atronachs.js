@@ -1,6 +1,5 @@
 import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 
-// ═══════════════════════════════════════════════════════════════════
 // THE ATRONACHS
 //
 // Fire, Ice, Iron and Flesh: bound elementals, and the only group in
@@ -22,7 +21,6 @@ import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 // So this file is the first place the project has four designs that use
 // three different render modes, which is the point of having built the
 // mechanism at all.
-// ═══════════════════════════════════════════════════════════════════
 
 /** ART_PAL spans, same convention as ORC_RAMPS and CLASS_RAMPS. */
 export const ATRONACH_RAMPS = Object.freeze({

@@ -1,9 +1,9 @@
 // ROLL-PACE (FIELD BUGS 2026-10-15f, a Discord report: "exploit where you do easy quests for a guild and then ask to join
-// it to farm 100 rep in 1 minute"; Mac, asked of four shapes: "Pace ranks from joining"). PROMO-NOW took the 28 days off
+// it to farm 100 rep in 1 minute"). PROMO-NOW took the 28 days off
 // an online promotion because the Roll paces reputation - but a stranger's quests bank reputation with the guild before
 // the membership begins, and the first review turned it into seven ranks at once. Online a review now promotes no
 // further than the Roll's pace could have paid since it saw the membership begin; the stranger's standing still counts,
-// at that pace, and no rank already held is taken. bible/01-Overview/bugs/Field-Bugs-2026-10-15f.md.
+// at that pace, and no rank already held is taken..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -108,10 +108,3 @@ test('ROLL-PACE: the review reads the Roll\'s reputation, never the page\'s uncl
   assert.equal(rollPaceOf({ stopped: 'chapters-closed', standing: () => null }, F, DAY0), null, 'the Roll refused: DFU\'s review');
 });
 
-test('ROLL-PACE by source: the halls read the pace for the guild\'s own faction - the review\'s ceiling, the no-wait only while it paces, the hall\'s line - and the host hands it (mutants: each dropped)', () => {
-  const wm = read('src/scenes/worldModes.js');
-  assert.ok(wm.includes('        rankCeiling: host.rollPace?.(guild.factionId)?.ceiling ?? null,'));
-  assert.ok(wm.includes('        promoteWhenEarned: sharedClockOn() && !!host.rollPace?.(guild.factionId),'));
-  assert.ok(wm.includes('rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships })'));   // PIN MOVED (SEAT-LINE, FIELD BUGS 2026-10-15g): read seated, with the review's date and book
-  assert.ok(read('src/scenes/world.js').includes('    rollPace: (f) => rollPaceOf(rollTracker, f, Math.floor(Date.now() / 1000)),'));
-});

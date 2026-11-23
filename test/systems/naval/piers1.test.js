@@ -1,8 +1,8 @@
-// SHIPYARDS (2026-10-11, Mac: "This should also come with a detailed overhaul to piers"): THE PIER'S DRESS - what a
+// SHIPYARDS: THE PIER'S DRESS - what a
 // working quay stands besides its deck, piles, bollards, lanterns and cargo (systems/naval/quays.js pierDress, in the
 // berth's frame) and how its model wears it (world/quayModel.js): the braces between the piles, the face's fender piles
 // and ladders, the cleats, the coils of rope, the first berth's cargo crane, the jetty's lamp posts (lit with the quay's
-// own), the joists and stringers under every deck. Design: bible/03-World/Holdings.md section 7, bible/03-World/Shipyards.md.
+// own), the joists and stringers under every deck. Design: .
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {

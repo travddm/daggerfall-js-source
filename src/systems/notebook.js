@@ -92,8 +92,7 @@ export class PlayerNotebook {
     this.finishedQuests = [];    // token[][]
     this.messages = [];          // the 50-slot ring
     this.nextMessageIndex = 0;
-    // JOURNAL-CLEAN (2026-09-30, Discord: "Should there be a way to clean both finished and unfinished quests from
-    // your journal for a cleaner look?"): the uids (as strings - the quest walk's own `id`, scenes/quest/questBridge.js
+    // JOURNAL-CLEAN: the uids (as strings - the quest walk's own `id`, scenes/quest/questBridge.js
     // questLog) of the ACTIVE quests the player has hidden from the journal. Hiding is the journal's, not the
     // machine's: a hidden quest keeps running, its clock keeps counting and the HUD's marks keep pointing - only the
     // journal's list leaves it out until it is unhidden or it ends (addFinishedQuest drops its id as it files it).
@@ -247,7 +246,7 @@ export class PlayerNotebook {
     this.finishedQuests.push(entry);
   }
 
-  /** QL3 (bible/06-Systems/Questlines-Arc.md section 2.4): a stamped quest's outcome, filed with the entry filed last -
+  /** QL3: a stamped quest's outcome, filed with the entry filed last -
    *  AUDIT QUESTLINES UI-5: a SIDE RECORD on its header (`outcome`, beside L10N5's `render`), never a line of its tokens:
    *  the classic logbook (ui/quest/questJournal.js) draws the tokens, and DFU's logbook is DFU's verbatim; the enhanced
    *  archive draws the record (filedOutcome). The header is the last one filed - an overflow's headerless continuations

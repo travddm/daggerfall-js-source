@@ -1,6 +1,5 @@
 // MAC-K2 - THE QUEST RAIL, ONE HOME.
 //
-// Mac, 2026-09-15: "Logbook not reflecting quests."
 //
 // It was not. The L key (`LogBook`) opens the CHRONICLE, and the
 // chronicle had three sections - Notes, Messages, History - none of
@@ -213,7 +212,7 @@ export function writtenOrder(q) {
 export function questRail(log, readLines = journalLines) {
   const active = (log?.active ?? []).map((q, i) => railRow(q, i, readLines, 'a')).filter((q) => q.entries.length);
   const finished = (log?.finished ?? []).map(parseFinished).filter((q) => q.lines.length || q.name);
-  // JOURNAL-CLEAN (2026-09-30, Discord: "...clean both finished and unfinished quests from your journal"): a quest
+  // JOURNAL-CLEAN: a quest
   // the player HID (the walk's `hidden` uids, the notebook's list) leaves `active` for `hidden` - the journal faces
   // draw `active`, and the pause tab's "Show hidden" draws `hidden`. A log with no `hidden` (the lens hands none)
   // hides nothing.
@@ -250,7 +249,7 @@ function railRow(q, i, readLines, tag) {
   };
 }
 
-/** QL2 (bible/06-Systems/Questlines-Arc.md section 6): a stamped quest that has written no journal entry yet but whose
+/** QL2: a stamped quest that has written no journal entry yet but whose
  *  objectives the machine's state has opened - the walk's `unlogged` - as a row of the pause tab's (key `a:<id>`, no
  *  entries). Every other face reads `active` alone: a quest with nothing in its journal is nothing to the lens. */
 export function unloggedRail(log) {
@@ -260,7 +259,7 @@ export function unloggedRail(log) {
   }));
 }
 
-/** QUEST-SHELF (2026-10-08): the quests set aside - the walk's `shelved` - each with its journal as it stood, for the
+/** QUEST-SHELF: the quests set aside - the walk's `shelved` - each with its journal as it stood, for the
  *  pause tab's Abandoned list and its Reclaim (key `s:<id>`; a quest set aside before it wrote a line still shows, by its
  *  name). Its audit: the pause tab's alone to ask - the rail's other faces (the timer's refresh, the chronicle) read no
  *  quest set aside, so they read none of its lines. */

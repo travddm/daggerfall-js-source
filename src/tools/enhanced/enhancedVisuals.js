@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // THE VISUALS: A VOXEL FIGURE AND CLASSIC SPRITES
 //
 // The first prototype drew an abstract slot map — twenty-eight nodes on

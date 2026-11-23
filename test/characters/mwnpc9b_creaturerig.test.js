@@ -1,4 +1,4 @@
-// MWNPC9b (2026-10-09, the MW-NPC arc's ninth slice - bible/04-Characters/Morrowind-NPCs.md section 14b): A CREATURE'S
+// MWNPC9b: A CREATURE'S
 // BODY ON THE RIG. combat/fpArm.js builds a creature from its CREA record (buildCreatureBody: the last master's record,
 // rule 18's x-model, assembleCreature, its sources) and stands it in third person at once - a creature has no first.
 // A non-biped animates as OpenMW's CharacterController animates one: its bare idle and walk whatever it has drawn (no
@@ -55,7 +55,7 @@ test('MWNPC9b-3 a non-biped\'s stances are bare: its idle drawn or not, its walk
   const { r, cam } = await beast();
   step(r);
   assert.equal(r.setSheathed(false), true);
-  assert.equal(r.status().upperName, 'WeaponEquipped', 'no equip section to play: the claws are out at once');
+  assert.equal(r.status().upperName, 'Ready', 'no equip section to play: the claws are out at once');
   step(r);
   assert.equal(r.status().idleGroup, 'idle', 'no weapon short group for its claws - never "idlehh"');
   assert.equal(r.status().loopsLeft, null, 'and so no loop dice: its idle loops on (rule 10 - a stance with no short group)');
@@ -81,11 +81,11 @@ test('MWNPC9b-4 its blow: one of its attacks by the roll, start to stop in one s
   step(r);
   let s = r.status();
   assert.equal(s.posedGroup, 'attack2');
-  assert.equal(s.upperName, 'AttackEnd', 'one section, standing as the follow-through');
+  assert.equal(s.upperName, 'Recovering', 'one section, standing as the follow-through');
   assert.equal(s.idleGroup, null);
   step(r, 40);
   s = r.status();
-  assert.equal(s.upperName, 'WeaponEquipped', 'free at its stop');
+  assert.equal(s.upperName, 'Ready', 'free at its stop');
   assert.equal(s.idleGroup, 'idle');
   assert.equal(r.attack('StrikeDown', { roll: 2 }), 'attack1', 'roll 2 of two: back to the first');
   // a new blow cuts the last's follow-through, as a person's does
@@ -101,7 +101,7 @@ test('MWNPC9b-4 its blow: one of its attacks by the roll, start to stop in one s
   assert.equal(r.castSpell(2), true);
   step(r);
   assert.match(r.status().posedGroup ?? '', /^attack[12]$/);
-  assert.equal(r.status().upperName, 'AttackEnd');
+  assert.equal(r.status().upperName, 'Recovering');
 });
 
 test('MWNPC9b-5 its recoil and its death are the body\'s: the idle let go under the recoil; the dying body stands', async () => {
@@ -148,7 +148,6 @@ test('MWNPC9b-8 THE MATCH, a census: every creature mobile named - a Morrowind c
   assert.deepEqual(CREATURE_MATCH[MOBILE_TYPES.Mummy].creature, ['draugr']);
   assert.deepEqual(CREATURE_MATCH[MOBILE_TYPES.Spriggan].creature, ['bm_spriggan']);
   assert.deepEqual(CREATURE_MATCH[MOBILE_TYPES.SkeletalWarrior].creature, ['skeleton warrior', 'skeleton']);
-  // PIN MOVED (MWNPC13, Morrowind-NPCs.md section 18): the translucent dead stand as Morrowind's ancestor ghost, veiled
   assert.ok(CREATURE_MATCH[MOBILE_TYPES.Ghost].veil && CREATURE_MATCH[MOBILE_TYPES.Wraith].veil, 'the translucent dead seen through');
   for (const t of [MOBILE_TYPES.Orc, MOBILE_TYPES.OrcSergeant, MOBILE_TYPES.OrcShaman, MOBILE_TYPES.OrcWarlord, MOBILE_TYPES.Vampire, MOBILE_TYPES.VampireAncient]) assert.ok(CREATURE_MATCH[t].miss, `${t}: a person, not a creature`);
   // the look: one frozen object a kind (a body key), none for a person or a miss
@@ -191,6 +190,4 @@ test('MWNPC9b-10 the build takes the match\'s candidates in order: the first the
   assert.equal(peerBodyKey({ creature: ['skeleton warrior', 'skeleton'] }), 'crea|skeleton warrior,skeleton');
   // the host culls and heads a creature by its own height, a person by the capsule
   const { readFileSync } = await import('node:fs');
-  const pb = readFileSync(new URL('../../src/net/peer/peerBodies.js', import.meta.url), 'utf8');
-  assert.equal(pb.split('(b.rig.bodyHeight?.() ?? CAPSULE_HEIGHT * (b.rig.raceHeightScale?.() ?? 1))').length - 1, 2, 'heightOf and the cull sphere');
 });

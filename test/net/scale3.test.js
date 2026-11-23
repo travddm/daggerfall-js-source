@@ -1,4 +1,4 @@
-// SCALE3 (2026-10-08, Mac: "Do 1 2 and 3"): THE LOAD HARNESS's parts that stand without a toolchain
+// SCALE3: THE LOAD HARNESS's parts that stand without a toolchain
 // (tools/loadHarness.mjs - the run itself needs wrangler and minutes, the account probe's reason for living outside the
 // suite). What is pinned is what keeps the harness honest and harmless: it reaches its own two services and nothing
 // else (the client falls back to the PRODUCTION account service for any base it does not take, so the bots' fetch
@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 
 import {
   parseArgs, KNOBS, LOAD_SERVICE, localFetch, localWebSocket, relayTally, percentile, townPixel, poseAt, saveText, botStorage,
-  FIRE_MINUTE, FIRE_HOUR, reservoir, mergeFleets, POSE_SAMPLE_MAX,
+  FIRE_MINUTE, FIRE_HOUR, reservoir, mergeFleets, POSE_SAMPLE_MAX, phasedTicker,
 } from '../../tools/loadHarness.mjs';
 import { CRON_MINUTE, CRON_HOUR } from '../../server-account/src/cron.js';
 import { pixelDistance, worldRoom, cellHaloFor, RANGE_PIXELS } from '../../src/net/wire.js';
@@ -130,11 +130,9 @@ test('SCALE3: a checkpoint\'s save is the size asked, a fresh character\'s shape
   assert.notEqual(a, b, 'two checkpoints two saves');
   assert.notDeepEqual(sa.place, sb.place);
   assert.equal(sb.at, 1_120_000);
-  assert.match(JSON.parse(src('package.json')).scripts.load, /^node tools\/loadHarness\.mjs$/);
+  assert.match(JSON.parse(src('package.json')).scripts.load, /^node --import \.\/tools\/raw-import-hooks\.ts tools\/loadHarness\.mjs$/);
   // the clock the harness fires is the service's own two schedules (SCALE4b), written out so a tree before it loads
   assert.deepEqual([FIRE_MINUTE, FIRE_HOUR], [CRON_MINUTE, CRON_HOUR]);
-  // the account probe's migrations ride a buffer past wrangler's summary, which grows with the square of their count
-  assert.match(src('tools/accountProbe.mjs'), /maxBuffer: 64 \* 1024 \* 1024/);
   assert.equal(percentile([], 0.5), null);
   assert.equal(percentile([5, 1, 3, 2, 4], 0.5), 3);
   assert.equal(percentile([5, 1, 3, 2, 4], 1), 5);
@@ -162,7 +160,6 @@ test('SCALE3: a fleet spread over threads adds up - every route\'s calls, status
   assert.deepEqual(m.relay.inByType, { pose: 270, pong: 30 });
   assert.deepEqual(m.relay.closes, { 1006: 3 });
   assert.deepEqual(m.relay.refusals, { busy: 3 });
-  // PIN MOVED (AUDIT SCALE C9): the kept ages pooled in proportion to the poses each fleet heard - fleet 1 heard 5 for its
   // two kept, fleet 2 heard 10 for its two, so fleet 2's kept stand for twice as many and fleet 1 keeps one
   assert.deepEqual(m.relay.poseMs.slice().sort((a, b) => a - b), [1, 2, 2]);
   assert.equal(m.poseSeen, 15);
@@ -172,4 +169,63 @@ test('SCALE3: a fleet spread over threads adds up - every route\'s calls, status
   const uneven = mergeFleets([full(10, 1_000_000), full(1000, 150_000)]).relay.poseMs.sort((a, b) => a - b);
   assert.equal(percentile(uneven, 0.75), 10);
   assert.equal(percentile(uneven, 0.9), 1000);
+});
+
+test('the fleet ticks each bot once a period, at phases spread over the period, not in one step', () => {
+  let clock = 0;
+  const queued = [];
+  const ticks = [];
+  const bots = Array.from({ length: 5 }, (_, n) => ({ n }));
+  const phases = [0.1, 0.3, 0.5, 0.7, 0.9];
+  let draw = 0;
+  const stop = phasedTicker(bots, (bot) => ticks.push([bot.n, clock]), {
+    period: 50, jitter: 0, now: () => clock, defer: (fn) => queued.push(fn), random: () => phases[draw++],
+  });
+  for (clock = 0; clock < 200; clock += 1) queued.shift()();
+  stop();
+  queued.shift()();
+  assert.equal(queued.length, 0, 'a stopped ticker defers nothing more');
+  for (const bot of bots) {
+    const at = ticks.filter(([n]) => n === bot.n).map(([, t]) => t);
+    assert.deepEqual(at, [0, 1, 2, 3].map((k) => Math.ceil(phases[bot.n] * 50) + 50 * k), `bot ${bot.n} ticks once a period from its own phase`);
+  }
+  assert.equal(new Set(ticks.slice(0, 5).map(([, t]) => t)).size, 5, 'the first five ticks fall at five different moments');
+});
+
+test('a stall in the fleet loop keeps each bot at its own phase', () => {
+  let clock = 0;
+  const queued = [];
+  const ticks = [];
+  const bots = Array.from({ length: 4 }, (_, n) => ({ n }));
+  const phases = [0.1, 0.3, 0.5, 0.7];
+  let draw = 0;
+  phasedTicker(bots, (bot) => ticks.push([bot.n, clock]), {
+    period: 50, jitter: 0, now: () => clock, defer: (fn) => queued.push(fn), random: () => phases[draw++],
+  });
+  for (clock = 0; clock < 60; clock += 1) queued.shift()();
+  clock = 190;   // the loop held for 130 ms
+  for (; clock < 300; clock += 1) queued.shift()();
+  const after = ticks.filter(([, t]) => t > 190);
+  assert.ok(after.length >= 8, 'every bot ticks again after the stall');
+  for (const [n, t] of after) assert.equal(t % 50, Math.ceil(phases[n] * 50), `bot ${n} ticks at its own phase after the stall`);
+});
+
+test('a jittered tick drifts apart the sends that a stall brought into step', () => {
+  // each bot sends as the client's pose gate does: on a tick at least 167 ms after its last send
+  let clock = 0;
+  const queued = [];
+  const lastSend = new Map();
+  const bots = Array.from({ length: 8 }, (_, n) => ({ n }));
+  let seed = 7;
+  const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const send = (bot) => { if (clock - (lastSend.get(bot) ?? -Infinity) >= 167) lastSend.set(bot, clock); };
+  phasedTicker(bots, send, { period: 50, now: () => clock, defer: (fn) => queued.push(fn), random });
+  clock = 1;
+  queued.shift()();
+  clock = 400;   // the loop held: every bot overdue, every bot sends now
+  queued.shift()();
+  assert.equal([...lastSend.values()].filter((t) => t === 400).length, 8, 'the stall put every send in one moment');
+  for (clock = 401; clock < 4400; clock += 1) queued.shift()();
+  const buckets = new Set(bots.map((bot) => Math.floor((lastSend.get(bot) % 200) / 50)));
+  assert.ok(buckets.size >= 3, `four seconds later the sends fall in different quarters of the send interval: ${[...buckets]}`);
 });

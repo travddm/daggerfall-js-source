@@ -1,7 +1,7 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE HERALD'S CALL, step 2 of 2 - the line's
+-- QL15 (2026-10-19; docs/systems/quests.md): THE HERALD'S CALL, step 2 of 2 - the line's
 -- last. Begun with the Herald's word in the journal at once (the line's runner starts it an hour after the first
 -- purse). The act: three bouts won in the Arena (`ql act arena-won 3` - systems/questlines/qlActs.js); the Herald pays
--- at the gate where the third is won (bible/11-Multiplayer/Arena.md section 1), so no Person is placed. The giver is
+-- at the gate where the third is won, so no Person is placed. The giver is
 -- unnamed, as the registry's (qlLines.js "the Arena's Herald").
 Quest: QLIA02
 DisplayName: A Name in the Sand

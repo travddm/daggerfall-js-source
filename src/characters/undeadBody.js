@@ -1,6 +1,5 @@
 import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 
-// ═══════════════════════════════════════════════════════════════════
 // THE UNDEAD LINE, AND WHAT CAME AFTER IT
 //
 // Zombie and Mummy, on the mechanism the orc line proved: a build spec
@@ -28,7 +27,6 @@ import { MOBILE_TYPES } from './mobile/mobileTypes.js';
 // they establish is how far the loft can be pushed before it needs new
 // geometry, which is precisely the question the skeleton answers with a
 // yes.
-// ═══════════════════════════════════════════════════════════════════
 
 /** ART_PAL blocks the undead draw from. Same convention as ORC_RAMPS:
  *  [firstIndex, lastIndex] into a block that runs light to dark. */
@@ -308,7 +306,7 @@ export const UNDEAD_DESIGNS = [
     level: 20,
     damage: [70, 100],
     weaponTier: 2,
-    // THE MOST-MET ENEMY STILL UNBUILT — mapChance 4, higher than
+    // THE MOST-MET ENEMY: mapChance 4, higher than
     // anything else in the table — and the first design here that asks
     // whether the pieces COMPOSE.
     //

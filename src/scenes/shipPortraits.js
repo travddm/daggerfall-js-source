@@ -1,5 +1,5 @@
 // @ts-check
-// MENU-ORDER (2026-10-12, bible/10-UI/Menu-Order.md) - A SHIP'S OWN PICTURE ON THE SHIPMASTER'S CARD.
+// MENU-ORDER - A SHIP'S OWN PICTURE ON THE SHIPMASTER'S CARD.
 //
 // The owner, of the shops and the menus: "I just feel like text lists are too much. Why cant you try something else".
 // The shipmaster's cards (ui/shipyardWindow.js) led with a ship's glyph at her size; each now shows her: the hull's

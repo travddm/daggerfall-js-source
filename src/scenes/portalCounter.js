@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PORTAL-BULK (2026-10-24; the players, +7: "I hate that I have to buy portal shards one by one; it would be better to
-// be able to bulk buy them" - the owner: "No band aids"; bible/06-Systems/Portal-Stone.md, The counter) - THE PORTAL
+// PORTAL-BULK - THE PORTAL
 // STONE'S COUNTER: the question a shop keeper's Portal Stone row asks, and the sale its Yes makes.
 //
 //   THE COUNT. A press of the row (either skin's popup - ui/merchant/merchantServiceWindow.js and
@@ -24,7 +23,7 @@
 //
 // Not a DFU member - DFU sells no such item; the counter is the port's own (Ledger A, PORTAL1).
 //
-// HOST-SPLIT (bible/01-Overview/Host-Split.md, THE HOSTS DO NOT GROW): the interior host (scenes/worldModes.js
+// HOST-SPLIT (, THE HOSTS DO NOT GROW): the interior host (scenes/worldModes.js
 // createWorldModes) builds this once and its popups' row calls `ask`. THE FOUR HOSTS: scenes/worldModes.js WIRED (its
 // interiors are the streaming world's, scenes/world.js, and the fixed city's, scenes/exterior.js - both build it);
 // scenes/dungeonContext.js stands no shop and no keeper, so no counter.

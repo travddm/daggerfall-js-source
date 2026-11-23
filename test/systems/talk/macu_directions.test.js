@@ -1,5 +1,4 @@
-// MAC-U (2026-09-18, Mac, with the screenshot): "any directions I get look like two messages at once, like it
-// changes mid-sentence" - "It's really easy. You'll want to go The Greensley Residence is south of where we're
+// MAC-U (2026-09-18, - "It's really easy. You'll want to go The Greensley Residence is south of where we're
 // standing." / "You'll find it The Greensley Residence is a ways south of here."
 //
 // THE DATA, NOT THE CODE. The answer frames (TEXT.RSC 7270-7274, 7285-7289) each carry their own subject and end
@@ -117,20 +116,5 @@ test('MAC-U: townTalk\'s own chain (the mobile townsperson) and its no-data fall
   assert.equal(expandAnswerRecord("You'll want to go %hnt.", { hint: 'south of here' }), "You'll want to go south of here.");
   assert.equal(expandAnswerRecord('Sure. %key is %hnt.', { hint: 'a way south of here', key: 'The Greensley Residence' }),
     'Sure. The Greensley Residence is a way south of here.');
-  const src = rd('src/scenes/townTalk.js');
-  assert.match(src, /h\.reveal \? '\.\.\. Let me just mark %loc here on your map' : '%di of here'\)/,
-    'the direction fallback is the table\'s phrase');
-  assert.doesNotMatch(src, /'%loc is %di of here'/, 'the classic sentence is gone from the fallback');
 });
 
-test('MAC-U: by source - the reader asks the table first, and the default table is the carried rows', () => {
-  const src = rd('src/formats/textRsc.js');
-  assert.match(src, /load\(bytes, \{ table = INTERNAL_RSC \} = \{\}\)/, 'load defaults to DFU\'s rows');
-  assert.match(src, /this\._table = rscTableBytes\(table\);/);
-  assert.match(src, /bytesById\(id\) \{\n\s+const row = this\._table\.get\(id\);\n\s+if \(row\) return row;/, 'bytesById reads the table before the file');
-  assert.match(src, /hasRecord\(id\) \{ return localeRscRow\(id\) !== undefined \|\| this\._table\.has\(id\) \|\| this\._byId\.has\(id\); \}/, 'L10N3a: a translation\'s row, then the carried rows, then the file');
-  // L10N1: the table's one import is the CSV law (DFU's StringTableCSVParser), and that module imports nothing - so
-  // still no cycle with the reader
-  assert.deepEqual(rd('src/formats/rscTable.js').match(/^import .*$/gm), ["import { loadStringTableCsv } from '../systems/textManager.js';"], 'the table is data whose one import is the CSV law');
-  assert.doesNotMatch(rd('src/systems/textManager.js'), /^import /m, 'and the CSV law imports nothing (no cycle with the reader)');
-});

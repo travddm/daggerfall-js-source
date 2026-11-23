@@ -1,5 +1,4 @@
-// INT11-INT15 (2026-10-10, the INTEGRITY arc's lane 3 - bible/06-Systems/Integrity-Arc.md section 6; Mac: "I want to do
-// everything and do it properly", and of the healing the relay cannot see: "Measure, then enforce"): THE BODY COUNTED, AS
+// INT11-INT15: THE BODY COUNTED, AS
 // LAW. A boss's blow was judged on the struck player's machine alone, so a client that took none stood every fight out
 // and could carry one. Pinned here: the relay's count of a body or a hull (net/bossBody.js - the line, a blow, the
 // client's word as a mend out of a budget, the census, the measure a receipt carries, the margin, the client's pace) and
@@ -23,7 +22,7 @@ const T = 2_000_000;
 const LINE = Object.freeze({ depth: 1, perS: 0.05 });
 const near = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg ?? ''} ${a} !~ ${b}`);
 
-// ═══ THE LINE ═══════════════════════════════════════════════════════════════════
+// THE LINE
 
 test('INT11 THE LINE: the relay\'s BOSS_BODY var read whole or not at all - empty, unreadable, a wrong type or a number past BODY_LINE_MAX is the DEFAULT, which ENFORCES NOTHING (measure first); a part left out is the default\'s; the default\'s hull line is the sea\'s own repairs under fire twice over, and a ship floats again where the sea says (mutants: a typo enforcing; a part dropped; the refloat the relay\'s own guess)', () => {
   assert.equal(BODY_DEFAULT.enforce, false, 'MEASURE FIRST: nothing enforced until staff say so');
@@ -40,7 +39,7 @@ test('INT11 THE LINE: the relay\'s BOSS_BODY var read whole or not at all - empt
   assert.equal(BODY_SAY_WHOLE, BODY_WORD_MAX, 'the client\'s word and the wire\'s bound, one whole');
 });
 
-// ═══ THE COUNT ══════════════════════════════════════════════════════════════════
+// THE COUNT
 
 test('INT11 THE COUNT: a blow the relay judged takes its share off the count; the blow that takes it to nothing is the count\'s FALL (one more, the first\'s stood time and damage kept for the receipt); a fallen count takes nothing more; nothing for no share (mutants: the fall never counted; the first fall\'s numbers overwritten; a fallen body struck again)', () => {
   const p = { stoodMs: 5000, dealt: 300 };
@@ -194,7 +193,7 @@ test('INT15 THE SAYING: the client\'s word at most every BODY_SAY_MS, at once wh
   assert.deepEqual(sent, [500, 600, 600, 700, BODY_SAY_WHOLE, 0]);
 });
 
-// ═══ THE JUDGE ══════════════════════════════════════════════════════════════════
+// THE JUDGE
 
 const W = T + 3_600_000;
 function gateFight(n = 3) {
@@ -224,7 +223,7 @@ test('INT11 THE GATE JUDGED: his plain blow at its landing on each living body d
   ];
   assert.deepEqual(posAt(moving[0], t1), [0, 0]); assert.deepEqual(posAfter(moving[0], t1), [20, 0]);
   assert.deepEqual(posAt(bd('q', 5, 6), t1), [5, 6], 'no trail: where it stands');
-  assert.equal(posAt(bd('q', 5, 6, { tr: [[t1 + 1, 1, 1]] }), t1), null, 'all after: not known');   // PIN MOVED (AUDIT INT11): it read its first pose after - a body that stepped in after the landing, counted (test/net/int_lane3_audit.test.js)
+  assert.equal(posAt(bd('q', 5, 6, { tr: [[t1 + 1, 1, 1]] }), t1), null, 'all after: not known');
   assert.deepEqual(judgeGate(f, moving, t1 + BODY_AFTER_MS).map((h) => h.sub), ['s3'], 'only the one in it before and after');
   // an element's blow is the client's
   f.atk = { i: 3, a: ATTACKS.nova.id, at: at0 + 9000, x: 0, z: 0, yw: 0, tg: [], until: at0 + 12000 };

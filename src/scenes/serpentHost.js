@@ -1,10 +1,9 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "A new world event that requires players with a ship to meet up and take on a large scale
-// sea serpent in the ocean"; "make this something truly special"): THE SERPENT HOST - Sethrakul stood in the streaming
+// SERPENT1: THE SERPENT HOST - Sethrakul stood in the streaming
 // world. It owns the client's half of the fight: the `in` said as a ship comes within sight of its waters, the balls
 // of mine that strike it gathered into the cell's words, its blows judged against MY ship and MY feet, the coil's hold
 // on her and the maelstrom's pull, the venom on the decks, the boss bar's model and the frame the renderer draws.
-// Design: bible/11-Multiplayer/Sea-Serpent.md sections 4-7.
+// Design:
 //
 // THE WORLD HOST IS ITS ONE HOST (THE FOUR HOSTS RULE): scenes/world.js wires it; scenes/worldModes.js (a building),
 // scenes/dungeonContext.js (a dungeon) and scenes/exterior.js (the ?exterior bench - no relay, no naval host) have no sea
@@ -43,7 +42,7 @@ export const COUNT_WRECK_LINE = 'The ship is holed beyond saving and counts as w
 export const IN_RESEND_MS = 20_000;
 /** How soon an `in` unanswered is said again. */
 export const IN_RETRY_MS = 3000;
-/** AUDIT 2 XC7 (2026-10-06): the `in` said at once when the ship I stand on changes (AUDIT SHIPS C1) waits this long after
+/** AUDIT 2 XC7: the `in` said at once when the ship I stand on changes (AUDIT SHIPS C1) waits this long after
  *  the last (ms) - a hull that flapped every frame said sixty a second, and the cell's shared bucket (SERPENT_HZ_MAX) then
  *  dropped every volley I fired. */
 export const IN_CHANGE_MS = 1000;
@@ -51,8 +50,7 @@ export const IN_CHANGE_MS = 1000;
 export const HIT_GATHER_MS = 500;
 /** How near its waters my ship must be for the serpent to count as a hostile near - no rest, no time scale (m). */
 export const SERPENT_NEAR_M = ENGAGE_R;
-/** SERPENT4 (2026-10-11, the players: "maybe make the wind go crazy where the serpent stands so we can sail faster an turn
- *  faster aswell so its more engaging"): ITS GALE - within SERPENT_NEAR_M of its waters while it swims unslain, my ship at
+/** SERPENT4: ITS GALE - within SERPENT_NEAR_M of its waters while it swims unslain, my ship at
  *  her helm sails in it (Come Sail Away's `gale` seam, comeSailAway.js galeWind): her canvas drawing as on her quarter on
  *  every heading, in `wind` of the rated wind at the least, her helm `turn` times quicker. Simulated against the relay's
  *  brain (tools/serpentFleetSim.mjs), a galleon circles at 18.7 m/s in it where the rated wind gave her 13.3 - and sails

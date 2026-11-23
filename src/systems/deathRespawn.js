@@ -68,8 +68,7 @@ export function nearestSafeLocation(mapTable, mapPixelXY, accept = null) {   // 
 }
 
 /**
- * SEA-RISE (2026-09-27, Yugi on Discord: "Underwater Deathloop - My character just autoran into the ocean, stuck at
- * the bottom because of my loot"): THE SEA'S OWN REGION HOLDS NO SAFE PLACE. An open-sea pixel is politic 64, region
+ * SEA-RISE: THE SEA'S OWN REGION HOLDS NO SAFE PLACE. An open-sea pixel is politic 64, region
  * 31 (formats/mapsFile.js getRegionIndexAt), whose table carries a crux and two moorings - none of the three kinds - so
  * the respawn stood the player where they fell: the carved seafloor, with the loot that sank them and one breath, to
  * drown and rise there again. When the region answers none, the nearest of the three in ANY region. One region
@@ -88,6 +87,36 @@ export function nearestSafeLocationAnywhere(maps, mapPixelXY, accept = null) {  
     if (d2 < bestDist) { bestDist = d2; best = hit; }
   }
   if (before >= 0 && typeof maps?.loadRegion === 'function') maps.loadRegion(before);
+  return best;
+}
+
+/**
+ * AUDIT TESA II P2/P3 (, A2-4's rise): THE NEAREST SAFE PLACE OF THE WORLD - the three
+ * kinds (SAFE_KINDS) over places no region's table holds: the world's registry's (world/worldWide/worldPlaces.js - the
+ * Bay's MAPS.BSA rows and the places past the Bay, each `{ type, dungeonType, px, py }`) and any list beside them (the
+ * host's: the countryside's towns it stood), the nearest by the crow's flight that `accept` takes (nearestSafeLocation's
+ * own arm). Past the Bay the regions' tables hold no town, so the rise there, the open zone's and /unstuck read this: a
+ * town of the province where the player stands, never a Bay town a continent away, and never the water where they fell.
+ * Answers nearestSafeLocation's shape (`locationIndex` -1: no region's row; `place` the registry's), or null.
+ * @param {Iterable<Iterable<{ type?: number, locationType?: number, dungeonType?: number, px: number, py: number }>>} lists
+ * @param {{ x: number, y: number }} mapPixelXY @param {((hit: any) => boolean)|null} [accept]
+ */
+export function nearestSafePlace(lists, mapPixelXY, accept = null) {
+  let best = null;
+  let bestDist = Infinity;
+  for (const list of lists) {
+    for (const p of list) {
+      const e = { locationType: p.type ?? p.locationType, dungeonType: p.dungeonType };
+      const found = SAFE_KINDS.find((t) => t.match(e));
+      if (!found) continue;
+      const dx = p.px - mapPixelXY.x, dz = p.py - mapPixelXY.y;
+      const d2 = dx * dx + dz * dz;
+      if (d2 >= bestDist) continue;
+      const hit = { kind: found.kind, locationIndex: -1, mapPixel: { x: p.px, y: p.py }, place: p };
+      if (accept && !accept(hit)) continue;
+      bestDist = d2; best = hit;
+    }
+  }
   return best;
 }
 
@@ -172,7 +201,7 @@ export const undergroundWakeText = (kind) => WAKE_FLAVOR[kind] ?? WAKE_FLAVOR.ci
 
 // ── DEATHLOOP1: A REVIVAL HAS TO END WHAT KILLED THEM ────────────
 //
-// SquidKamer on Discord (2026-09-22): "Respawn after poison and likely
+// SquidKamer on Discord: "Respawn after poison and likely
 // disease and other things can cause a deathloop. Probably should do
 // something about that. Its basically permanent death for your
 // character." He is right, and MAC-D3 did not cover it: that fix put
@@ -257,10 +286,7 @@ export function endDeathHolds(entity) {
 }
 
 /**
- * DEATHLOOP2 (2026-09-22, DragynDance on Discord: "my game keeps
- * spamming a wailing sound at me", with "I almost died in privateers
- * hold due to freezing to death" and "as soon as I stepped outside my
- * health bar started draaaaining").
+ * DEATHLOOP2.
  *
  * THE WAILING IS THE DEATH SOUND, ONE PER LOOP. PlayerDeathSequence
  * plays the character's own Pain3 in its CONSTRUCTOR, and every host
@@ -305,10 +331,7 @@ export function endLethalExposure(entity) {
 }
 
 /**
- * DISC24-D (2026-09-24, Lynk on Discord, "Stuck in death loop": "After
- * leveling up to 5 online and putting stats in my character had low
- * health so I rested then when I woke up it was stuck in a constant
- * death loop").
+ * DISC24-D.
  *
  * A STAT AT ZERO KILLS EVERY 0.2 SECONDS, WHATEVER THE HEALTH. DFU's
  * UpdateEntityMods tail (systems/statMods.js killIfAnyLiveStatZero)

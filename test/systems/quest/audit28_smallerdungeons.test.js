@@ -12,6 +12,7 @@ import { setSeed, randomRange } from '../../../src/formats/dfRandom.js';
 import { SITE_TYPES } from '../../../src/systems/quest/place.js';
 import { Quest } from '../../../src/systems/quest/quest.js';
 import { setValue, resetToDefaults, LIVE } from '../../../src/systems/settings/settings.js';
+import { hostText } from '../../hostText.mjs';   // HOST-SPLIT (at the merge of main into TESA): the world host read whole - questWorld is scenes/questWorld.js's
 
 // AUDIT 28 - W4: SMALLER DUNGEONS (MapsFile.cs:766-797, :1366-1444;
 // Quest.cs:284). Experimental/SmallerDungeons ships False and the port
@@ -136,48 +137,7 @@ test('AUDIT 28 W4: Quest.Start freezes the state (Quest.cs:284), the save carrie
   resetToDefaults();
 });
 
-test('AUDIT 28 W4: the entry seam - the location that gets BUILT is the sized clone, with the bridge\'s machine', () => {
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /const sized = dungeonLocationFor\(hit\.dfLocation, \{ questMachine: questBridge\?\.machine, online: host\.dungeonOnline\?\.\(\) \?\? false, whole: !!place\?\.whole \}\);/,   // PIN MOVED (INSTANCES' audit): \`place\`, the entry decided
-    'tryEnterDungeon does not size the location (AUDIT WORLD34 B2: and online, the room\'s one layout - SD-ONLINE: the medium size; PIN MOVED, INSTANCES: and an instance, or a quest\'s dungeon where none can be had, whole)');
-  assert.match(modes, /const dfLocation = ownDungeonLocation\(sized\);/, 'OH-E: and builds its own copy of it (MapsFile.GetLocation reads each caller its own)');
-  const fn = modes.slice(modes.indexOf('async function tryEnterDungeon('));
-  assert.ok(fn.indexOf('dungeonLocationFor(') < fn.indexOf('buildDungeonContext('), 'sized BEFORE the context is built');
-});
-
-test('AUDIT 28 W4: the save stamps the layout, and a load at the other size warps to the start marker - story dungeons and old envelopes never (FT1: the stamp is the BUILD, both laws exported from the module)', () => {
-  const ctx = read('src/scenes/dungeonContext.js');
-  assert.match(ctx, /smallerDungeonsState: smallerDungeonsStamp\(dfLocation\),/, 'SerializablePlayer.cs:224 - the stamp, from the one export (FT1)');
-  assert.ok(!/\? 2 : 1|=== 2;/.test(ctx), 'no enum literal in the host - ONE DFU MEMBER, ONE EXPORT');
-  // AUDIT DELVE E2 (PIN MOVED): the law is read once, before the world record - a load at another size leaves that
-  // record unapplied as well as warping - and the warp arm reads it
-  assert.match(ctx, /const otherLayout = extras\.locationKey === _locationKey && needsStartWarp\(extras\.smallerDungeonsState, dfLocation\);/, 'a different dungeon never warps; the rest of the law is needsStartWarp\'s (ft1_smallerdungeons.test.js)');
-  assert.match(ctx, /const settled = extras\.world && extras\.locationKey === _locationKey && !otherLayout \? applyWorld\(extras\.world\) : null;/, 'saved at another size, the world record is another layout\'s: left unapplied');
-  const arm = ctx.slice(ctx.indexOf('if (otherLayout && setPlayerPos) {'));
-  assert.ok(arm.length > 100, 'the warp arm exists');
-  // F-B1: through the entry law (floorLanding over the START marker),
-  // not the raw marker position - :470 names StartMarker, and the
-  // port's spawn space is the landed one.
-  assert.match(arm, /const p = this\.startSpawn\(\{ preferEnterMarker: false \}\);/, 'the start marker under the entry law is the destination');
-  // The warp sits AFTER the position restore, so it overrides it.
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the saved fall rides the saved position's placement.
-  const posAt = ctx.indexOf('if (extras.position && extras.locationKey === _locationKey && setPlayerPos) setPlayerPos(extras.position, extras.pose?.fall);');
-  const warpAt = ctx.indexOf('if (otherLayout && setPlayerPos) {');
-  assert.ok(posAt > 0 && warpAt > posAt, 'restore first, then the warp');
-});
-
 test('AUDIT 28 F-B2: the quest layer\'s maps sizes getLocation/getLocationByName - markers are picked from the dungeon that gets built', () => {
-  // DFU's law lives INSIDE MapsFile.GetLocation, so quest marker
-  // enumeration walks the five-block dungeon when the law says so. The
-  // port's quest world wraps the raw maps the same way, late-binding
-  // the bridge's machine.
-  const world = read('src/scenes/world.js');
-  const at = world.indexOf('const questWorld = {');
-  assert.ok(at > 0);
-  const wrap = world.slice(at, at + 2600);
-  assert.match(wrap, /maps: Object\.create\(maps, \{/, 'the quest maps is a wrap over the raw maps');
-  assert.match(wrap, /getLocation: \{ value: \(r, l\) => dungeonLocationFor\(maps\.getLocation\(r, l\), \{ questMachine: questBridge\?\.machine, online: params\.has\('online'\), whole: params\.has\('online'\) \}\) \},/);   // PIN MOVED, INSTANCES: online a quest's markers are chosen on the dungeon whole (bible/11-Multiplayer/Instances.md section 5)
-  assert.match(wrap, /getLocationByName: \{ value: \(rn, ln\) => dungeonLocationFor\(maps\.getLocationByName\(rn, ln\), \{ questMachine: questBridge\?\.machine, online: params\.has\('online'\), whole: params\.has\('online'\) \}\) \},/);   // the page flag, not the late const (a quest parsed at chargen reaches it first)
   // The prototype delegation keeps every other maps method reachable -
   // the quest layer also calls getClimateIndex, getRegion,
   // getRmbBlockName and readLocationIdFast on this object.

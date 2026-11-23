@@ -57,16 +57,24 @@ const MW_STORE = 'morrowind';
  *  stale) became exactly the derived artifact this contract was kept
  *  for. Said out loud here so nobody reads the roads as living here. */
 const DERIVED_STORE = 'derived';
+/** TESA1: the store that held the
+ *  player's own copy of The Elder Scrolls: Arena (CITYDATA.65 and A.EXE).
+ *  TESA12 retired the attachment - the places past the Bay are the
+ *  port's own - and nothing reads it now. It stays in the schema (the
+ *  upgrade's arms are additive: version 6 made it) and among the asset
+ *  stores so a wipe still sweeps it, and the world's boot empties it once
+ *  (clearRetiredArena): no copy of Arena's files stays in a browser. */
+const ARENA_STORE = 'arena';
 /** Every injected-asset store, so the upgrade and the helpers below
  *  cannot drift from each other - adding a domain is one entry. */
-const ASSET_STORES = [MUSIC_STORE, TEXTURE_STORE, MW_STORE, DERIVED_STORE];
+const ASSET_STORES = [MUSIC_STORE, TEXTURE_STORE, MW_STORE, DERIVED_STORE, ARENA_STORE];
 const mem = new Map(); // NAME -> Uint8Array
 /** AUDIT MEM-AUDIT M1: the names whose bytes came from IndexedDB or the network, so can be read again (forgetBytes) - a
  *  memory-only session's picked set (the ingest's no-IDB arm, a quota's refusal too) is its only copy, and forgetting it
  *  turned the classic sky to the gradient at its next ask. */
 const readAgain = new Set();
 
-// Ingest DIET (2026-08-14, the mobile storage fix): ARENA2 is 517MB
+// Ingest DIET: ARENA2 is 517MB
 // but the engine reads ~155MB - TEXTURE archives, the BSAs, palettes,
 // PAKs, CFGs, fonts, WOODS.WLD, MAGIC.DEF, SPELLS.STD, IMG/CIF art,
 // RSC text, RCI, SND, the .TXT set (BIOG*.TXT biographies + FACTION.TXT)
@@ -159,7 +167,8 @@ function openDb() {
     // 5 (R6): the derived store. The upgrade is ADDITIVE and every arm
     // below is guarded by `contains`, so a player arriving at any older
     // version gains the new store and keeps every byte of the old ones.
-    const req = indexedDB.open(DB_NAME, 5);
+    // 6 (TESA1): the Arena store, the same additive arm.
+    const req = indexedDB.open(DB_NAME, 6);
     req.onupgradeneeded = () => {
       const d = req.result;
       if (!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE);
@@ -238,7 +247,7 @@ let db = null;
 async function getDb() {
   if (!db) {
     const d = await openDb();
-    // BUILD-RETRY (bible/06-Systems/Travel-View.md LOAD-OWED): A CONNECTION THE BROWSER CLOSES IS NEVER ASKED AGAIN. It
+    // BUILD-RETRY (LOAD-OWED): A CONNECTION THE BROWSER CLOSES IS NEVER ASKED AGAIN. It
     // was kept for the page, and once the browser closed it under the game (its `close`: the storage failing, or the
     // site's data cleared) every read threw on it and fell through to the server - which on the deployed site holds no
     // game data - so every file not read yet failed for the rest of the session, a pixel build with it. The next read
@@ -589,8 +598,7 @@ export async function storeMorrowindFiles(files) {
     (f, base) => (MW_LOOSE_EXT.test(base) ? mwLoosePath(f.webkitRelativePath || f.name) : base));
 }
 export const storedMorrowindNames = () => assetNames(MW_STORE);
-// IG2: THE SWAP-SPEED CACHES (Mac: "load times when swapping weapons,
-// clothing, armor is really slow"). The body follows the equip table,
+// IG2: THE SWAP-SPEED CACHES. The body follows the equip table,
 // so every equip change rebuilds the arms - and every rebuild used to
 // re-read EVERY .bsa blob out of IndexedDB and re-index its directory,
 // plus every .esm, seconds per swap on retail data. The stored set
@@ -763,9 +771,8 @@ async function _openMorrowindArchives(gen) {
   } catch (err) {
     console.warn(`weapon sheathing assets: ${err.message}`);
   }
-  // FIELD-GUN-MW2: THE PORT'S OWN Morrowind assets - the Dwarven
-  // Thunderlock's mesh and texture, which no player's archives can
-  // carry because Morrowind has no firearm. Same rank and the same
+  // THE PORT'S OWN Morrowind assets - the meshes and textures of
+  // pieces no player's archives can carry. Same rank and the same
   // reason as the line above: after the loose files, so Mac dropping
   // his own texture in REPLACES ours without a rebuild, and before
   // every .bsa, where these names do not exist.
@@ -930,6 +937,14 @@ export async function registerMorrowindData() {
   return _mwCount;
 }
 
+// ---- TESA12: Arena's store, retired --------------------------------------
+
+/** TESA12: empty the store a copy of Arena was attached to (TESA1 to TESA6) - nothing reads it since the places past the
+ *  Bay became the port's own. The world's boot asks it once; no IndexedDB (private mode), nothing to clear. */
+export async function clearRetiredArena() {
+  try { await clearAssets(ARENA_STORE); } catch { /* no IndexedDB: nothing stored */ }
+}
+
 export async function pickMorrowindFiles() {
   return pickAssetFolder({
     title: 'Your Morrowind data',
@@ -1051,7 +1066,7 @@ async function pickAssetFolder({ title, blurb, store, register, zip = null, dire
         await store(files, (t) => { msg.textContent = t; });   // DFMOD1: a store may report as it goes
         msg.textContent = 'registering...';
         count = await register();
-        msg.textContent = doneText ?? (count ? `${count} files will be used` : 'nothing usable in that folder');   // IIL3: a picker that is not counting files says its own
+        msg.textContent = (typeof doneText === 'function' ? doneText(count) : doneText) ?? (count ? `${count} files will be used` : 'nothing usable in that folder');   // IIL3: a picker that is not counting files says its own (TESA1: or says it by the count)
       } catch (err) {
         // NEVER TRAPS: a storage failure costs the pack, not the game.
         msg.textContent = `could not store that: ${err?.message ?? err}`;
@@ -1101,7 +1116,7 @@ export async function pickTranslationPack(code, languageName = code) {
   return pickAssetFolder({
     title: `A translation for ${languageName}`,
     blurb: `<p>Pick a <b>Daggerfall Unity translation</b>: its folder, or the .zip it came in. Its text replaces
-      the machine translation wherever it can. Nothing is uploaded. It is stored in this browser.</p>
+      the game’s own text wherever it can. Nothing is uploaded. It is stored in this browser.</p>
       <p style="color:#999">As in Daggerfall Unity, the string tables, quests and books are read from <b>Text</b>,
       and the fonts from <b>Fonts</b>.</p>`,
     store: async (files) => {
@@ -1328,7 +1343,7 @@ export async function pickTextureFolder() {
  *  through `deps.fetchArena2Bytes`, and a test hands it a fixture. */
 export const fetchArena2Bytes = (name) => getBytes(name);
 
-/** MEM-AUDIT (2026-10-23): a file's bytes let go from the memory cache - its next read comes from IndexedDB (or the
+/** MEM-AUDIT: a file's bytes let go from the memory cache - its next read comes from IndexedDB (or the
  *  network) again, the same bytes. For a file a reader keeps only while it uses it: a classic sky's SKY??.DAT, 7.8 MB
  *  each and 32 of them, held for the session as a journey crossed climates, weathers and seasons. */
 /** AUDIT MEM-AUDIT M1: bytes this session holds and nowhere else - the ingest's no-IDB arm (private mode, a quota's
@@ -1372,8 +1387,7 @@ async function readPicked(files, progress = null) {
   return entries;
 }
 
-/** DG-LNX (2026-09-16, Ember on the Discord, Linux: "Picking the arena2
- *  folder doesn't work. Picking a zip with the game files does though."):
+/** DG-LNX:
  *  THE FOLDER ARM SAID NOTHING WHEN IT FAILED. The zip arm has always
  *  been wrapped and reports `zip failed: ...`; the folder arm's ingest
  *  was an unguarded async listener, so a read that threw (a sandboxed
@@ -1438,7 +1452,7 @@ export const incompleteArena2Text = (missing) =>
  *  decompressed, the skip-before-inflate readZip has always done.
  *  Answers `[{ name, data }]` in archive order, `data` an ArrayBuffer;
  *  directory entries and methods other than 0/8 are skipped.
- *  AUDIT POI P5: `limit(name, size)`, when a caller gives one, bounds
+ *  `limit(name, size)`, when a caller gives one, bounds
  *  what each picked entry may become - asked of every one, with the
  *  size the directory declares, BEFORE any is inflated (a declared size
  *  past its bound refuses the archive), and held while each inflates (an
@@ -1472,7 +1486,7 @@ export async function readZipEntries(file, { pick = (names) => names, onProgress
   }
   const wanted = new Set(pick(dirs.map((d) => d.name)));
   const picked = dirs.filter((d) => wanted.has(d.name));
-  // AUDIT POI P5: every bound asked before a byte is inflated (a stored entry is its own size: one longer lies)
+  // every bound asked before a byte is inflated (a stored entry is its own size: one longer lies)
   if (limit) for (const d of picked) if (!(d.size <= limit(d.name, d.size)) || (d.method === 0 && d.compSize > d.size)) throw zipTooLarge(d.name);
   const entries = [];
   let seen = 0;
@@ -1495,7 +1509,7 @@ export async function readZipEntries(file, { pick = (names) => names, onProgress
   return entries;
 }
 const zipTooLarge = (name) => Object.assign(new Error(`zip entry past its bound: ${name}`), { code: 'zip-too-large' });
-/** AUDIT POI P5: an inflating entry read to its end - and stopped, refused, the moment it passes `max` bytes. */
+/** An inflating entry read to its end - and stopped, refused, the moment it passes `max` bytes. */
 async function inflatedTo(stream, max, name) {
   const reader = stream.getReader();
   const chunks = [];

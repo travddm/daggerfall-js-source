@@ -1,4 +1,4 @@
-// QL1 (bible/06-Systems/Questlines-Arc.md section 2.5): THE QUEST PACK AS THE GAME READS IT, OFF THE DISK - the node
+// QL1: THE QUEST PACK AS THE GAME READS IT, OFF THE DISK - the node
 // twin of scenes/quest/questData.js (browser-only: Vite's glob), for the sheets' and the branches' pins. The same order
 // of reads: DFU's vendored quests with the port's own patches (SHAM-TRAIL, quest/questPatches.js), the mods' quests with
 // Foraging's (FORAGE-FIX), and - while the questlines' switch is on - a flagship quest's branch (qlPatches.js). And a
@@ -25,6 +25,7 @@ export const QUEST_DIRS = Object.freeze([
   ['warm-ashes-ships', 'vendor/warm-ashes-ships/Quests'],
   ['foraging', 'vendor/foraging/Quests'],
   ['questlines', 'src/systems/questlines/quests'],
+  ['starts', 'src/systems/starts/quests'],   // START1: the starts' own quests (systems/starts/starts.js)
 ]);
 
 /** Every quest file the pack holds: upper-case name -> { name, dir, path }. A mod's quest of a DFU name is the mod's. */

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL5-FREEZE (2026-10-22; design doc "DFO Staff Panel: design", Freeze player and Freeze chat) - THE GAME'S HALF
+// STAFF-PANEL5-FREEZE - THE GAME'S HALF
 // of a staff freeze and of the staff chat. The relay's half is server/src/staffFreeze.js, the account service's
 // server-account/src/staffFreeze.js.
 //

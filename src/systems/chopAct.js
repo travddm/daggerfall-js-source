@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF4 (2026-09-28, Mac: "Continue") - LOGGING'S ACT, the Wood-Axe at a
-// tree, as a machine the host feeds a frame at a time (bible/06-Systems/
-// Professions-Arc.md 5.2, 25; FORAGE0 14.4). Pure: the host hands in the
+// PROF4 - LOGGING'S ACT, the Wood-Axe at a
+// tree, as a machine the host feeds a frame at a time (docs/systems/professions.md).
+// Pure: the host hands in the
 // frame's time and whether attack was pressed this frame; the machine
 // answers where the act stands - the ring the meter draws - and, at its
 // end, the report the harvest carries.
@@ -26,7 +26,7 @@
 // Esc (the host's `cancel`) ends it, nothing lost: the tree stands, no
 // tool wears, no harvest is asked.
 //
-// GATHER-FEEL (2026-10-13): A CHOP LANDS ON ITS HIT FRAME. The count is
+// GATHER-FEEL: A CHOP LANDS ON ITS HIT FRAME. The count is
 // the press's; the blow the hand draws lands MELEE_HIT_SHARE into its
 // swing (`landsIn`), and the swing runs out after the act's end, so the
 // last chop is drawn landing (scenes/gatherHost.js's follow-through) and

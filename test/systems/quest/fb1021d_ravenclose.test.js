@@ -5,7 +5,7 @@
 // on a bare `variable _2dung_`, the start-up block's travel clock (21 to 38 days on the real map). BODYGUARD-CLOSE read a
 // start-up closing by the clock's OWN task, which does nothing here, so `_2dung_` stayed a deadline through the success:
 // online its days are played (QCLOCK-WORLD), two to three days of a player's life with the reward unrolled and the
-// Order's door shut (offerFlow: the busy questor). The record: bible/01-Overview/bugs/Field-Bugs-2026-10-21d.md.
+// Order's door shut (offerFlow: the busy questor). The record:.
 //
 // The AUDIT REST-PARTY harness (the real QuestMachine over the vendored script), with the travel clock ARMED - the D1
 // pin left `_2dung_` held (travelTimePending, headless), which is how the stall escaped it.

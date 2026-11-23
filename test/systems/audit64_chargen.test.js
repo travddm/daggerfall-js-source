@@ -499,7 +499,7 @@ test('AUDIT 64 F33: the drawn spinner digit follows the screen\'s own rollout', 
 });
 
 // =====================================================================
-// THE REVIEW ROUND (2026-09-08). Two halves of the laws above that the
+// THE REVIEW ROUND. Two halves of the laws above that the
 // first pass left standing.
 //
 //   F32  CreateCharGenderSelect IS a DaggerfallMessageBox

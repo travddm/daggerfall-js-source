@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL, AS THIS PAGE PLAYS IT - the one home
+// WITCH1: THE WITCHES' FESTIVAL, AS THIS PAGE PLAYS IT - the one home
 // of the client's half of the economy: the Soul Cakes this account holds (the service's count, the pack's stack its face),
 // the finds a kill and an act ask for, the Wyrd Sister's sales, and the moves on a Hearth Offering.
 //
@@ -33,7 +33,6 @@ import { restackSoulCakes, restackHearthOfferings, isHearthOffering } from './so
 import { foeFindSource } from './festivalFoes.js';
 import { cakesFoundText, festivalRefusalText, isFestivalRefusal, findsFullText } from './festivalWords.js';
 import { wyrdPieceById } from '../aetheric.js';
-import { mintIliacCard } from '../iliac/iliacItems.js';
 import { addItem } from '../inventory.js';
 
 /** The kill listener's and the act hearer's name. */
@@ -154,7 +153,7 @@ export async function refreshFestival() {
   return true;
 }
 
-// ═══ THE FINDS ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE FINDS
 let _chain = Promise.resolve();
 /** @type {WeakSet<object>} */
 const _asked = new WeakSet();
@@ -212,7 +211,7 @@ hearActs(FESTIVAL_FIND, (/** @type {string} */ kind) => {
   askFind(g);
 });
 
-// ═══ THE SALES ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE SALES
 /** The sale asked and not yet answered, on the character's save: `{ rid, ware, account }` or null. */
 let _pending = /** @type {{ rid: string, ware: string, account: string } | null} */ (null);
 /** The ask of the pending sale in flight (one at a time): `{ sale, p }`. */
@@ -241,7 +240,6 @@ export function saleRid(rand = Math.random) {
 export function wareItem(/** @type {any} */ w) {
   if (!w || accountWare(w) || bowlWare(w)) return null;
   if (w.kind === 'piece') { const it = wyrdPieceById(w.key); if (it) it.bound = true; return it; }
-  if (w.kind === 'card') return mintIliacCard(w.key);
   return null;
 }
 /** A sale answered: while it is still the one pending, its ware minted into the pack (once) and let go; the counts and the
@@ -300,7 +298,7 @@ async function resumeSale() {
   await askSale(_pending);
 }
 
-// ═══ THE WARDROBE ════════════════════════════════════════════════════════════════════════════════════════════════════
+// THE WARDROBE
 /** What the account holds and wears, as the service last said it (its wardrobe - server-account/src/titles.js
  *  wardrobeOf): the titles, auras and icons held, and the one of each worn. Null until read. */
 let _wardrobe = /** @type {{ title: string|null, aura: string|null, icon: string|null, titles: string[], auras: string[], icons: string[] } | null} */ (null);
@@ -350,7 +348,7 @@ export async function wearWare(/** @type {string} */ wareId, on = true) {
   return wearAccount(/** @type {'title'|'aura'|'icon'} */ (w.kind), w.key, on);
 }
 
-// ═══ THE HEARTH OFFERINGS ════════════════════════════════════════════════════════════════════════════════════════════
+// THE HEARTH OFFERINGS
 /** One move on an offering through the service: `set`, `fill`, `takeIn` or `take` - its answer's counts learned (the
  *  cakes, and the bowls: set out, one fewer in the pack; taken in, one more). A take-in goes on whatever the festival's
  *  state (a bowl's cakes are never lost to its end). Answers `{ ok, data, text, error? }`. */

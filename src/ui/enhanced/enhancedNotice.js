@@ -1,8 +1,4 @@
-// ENH-NOTICE1 (2026-09-21, Mac: "classic DFU has text that shows in the
-// middle of the screen, instead of this, for enhanced I want a panel
-// that slides in from the right side of the screen showing the
-// notification. This should work for any and all mods that utilize
-// this text."): THE NOTICE PANEL, THE ENHANCED SKIN'S DaggerfallMessageBox.
+// ENH-NOTICE1: THE NOTICE PANEL, THE ENHANCED SKIN'S DaggerfallMessageBox.
 //
 // WHAT IT REPLACES. DFU's `DaggerfallUI.MessageBox(...)` is the parchment
 // that lands in the middle of the screen with ClickAnywhereToClose set:
@@ -39,10 +35,9 @@
 // and the node leaves after NOTICE_SLIDE_MS. The waits go through
 // `schedule`, which a test replaces to run them at once.
 //
-// ENH-NOTICE3 (2026-09-21, Mac: "All mods, including climates and
-// calories need to utilize the enhanced notification popup"): THE
+// ENH-NOTICE3: THE
 // SAME STACK CARRIES THE HUD LINE. DaggerfallUI.AddHUDText - the
-// PopupText rows Climates & Calories, Ambient Text, the torches, the
+// PopupText rows Climates & Calories, the torches, the
 // skill-ups and the loot tallies speak through - is not a box: it is
 // timed, it is not modal, and nothing dismisses it. FONT1 gave it a
 // DOM column of its own at the top of the screen, which was a second

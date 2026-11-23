@@ -1,0 +1,249 @@
+// The key registry: one row per online rule a profile may set, each with DFU's value and today's online value. Data and
+// pure functions only, because the account Worker and the relay read it: `offline` names a setting, and `words` is an
+// l10n key. The client checks a fetched profile against it; the relay resolves its own profile's rules with it.
+
+export type ProfileValue = boolean | number | string;
+
+/** Where a key's single-player value comes from: a constant, or the player's own DFU setting (`Section.Key`). */
+export type OfflineValue = ProfileValue | { readonly setting: string };
+
+export type ProfileKey = {
+  readonly type: 'bool' | 'int' | 'number' | 'enum' | 'string';
+  readonly values?: readonly string[];
+  readonly min?: number;
+  readonly max?: number;
+  /** Daggerfall Unity's value. */
+  readonly dfu: ProfileValue;
+  /** Today's online value: the default a profile that names no value plays by. */
+  readonly online: ProfileValue;
+  readonly offline: OfflineValue;
+  /** Who reads the key: the client always; the relay and the account Worker where they check it. */
+  readonly checkedBy: readonly ('client' | 'relay' | 'account')[];
+  /** The l10n key of the label the options screen and a refusal show. */
+  readonly words: string;
+  /** A DFU setting the key forces online, as `Section.Key`; the settings read path answers its value in DFU's strings. */
+  readonly setting?: string;
+};
+
+export const PROFILE_KEYS = Object.freeze({
+  // Whether a smith mends enchanted gear: every player meets the same counter, so the room holds one answer. DFU ships
+  // False (defaults.ini AllowMagicRepairs).
+  'repair.allowMagic': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: true,
+    offline: Object.freeze({ setting: 'Controls.AllowMagicRepairs' }),
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.repair.allowMagic',
+    setting: 'Controls.AllowMagicRepairs',
+  }),
+  // Whether foes run DFU's Enhanced Combat AI: every player in a room meets the same foes, so the room holds one
+  // answer. DFU ships True (defaults.ini EnhancedCombatAI); online plays DFU's value (characters/enemy/
+  // enhanced-combat-ai.ts).
+  'combat.enhancedAI': Object.freeze({
+    type: 'bool',
+    dfu: true,
+    online: true,
+    offline: Object.freeze({ setting: 'Enhancements.EnhancedCombatAI' }),
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.combat.enhancedAI',
+    setting: 'Enhancements.EnhancedCombatAI',
+  }),
+  // Whether a party leader may set the party to no mentoring. A server owner who wants every party mentored turns it
+  // off. DFU has no parties and no mentor mode, and single player has no party, so `dfu` and `offline` are false: no
+  // switch, as in DFU.
+  'party.allowNoMentoring': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: true,
+    offline: false,
+    checkedBy: Object.freeze(['client', 'relay'] as const),
+    words: 'profile.party.allowNoMentoring',
+  }),
+  // Whether a shop's offer for a sale is capped online at half of what the counter asks the best haggler, with the
+  // seller's skills at half weight under it (shopStock.js calculateTradePrice). DFU has no cap: a poor shop pays more
+  // for goods, and Mercantile and Personality move a sale at full weight (FormulaHelper.CalculateTradePrice). Buying
+  // back a counter's own piece for profit stays shut by the counter-paid mark, which this key does not touch.
+  'trade.saleCap': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.trade.saleCap',
+  }),
+  // Whether the haggle reads Mercantile and Personality inside 0 to 100 online. DFU reads them unbounded, so a skill
+  // raised past 100 by enchantments drives a price under nothing (FormulaHelper.CalculateTradePrice).
+  'trade.haggleRange': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: true,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.trade.haggleRange',
+  }),
+  // How a dungeon treasure pile's gold is scaled online. DFU rolls it times the player's level
+  // (LootTables.GenerateLoot); 'flat' divides it back to level 1's (loot.js unlevelPileGold), so the hourly respawn
+  // does not pay a high level's gold again.
+  'loot.pileGold': Object.freeze({
+    type: 'enum',
+    values: Object.freeze(['dfu', 'flat'] as const),
+    dfu: 'dfu',
+    online: 'dfu',
+    offline: 'dfu',
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.loot.pileGold',
+  }),
+  // How a rest works online. DFU's Rest window rests wherever CanRest allows, for the hours chosen or a loiter, and
+  // each hour gives what DFU's recovery rates give (DaggerfallRestWindow.cs); online the hours are the character's own.
+  // True is the rest act (systems/rest/restAct.js): only at a fire or a bed, one 8-hour night at most every 2 hours of
+  // the character's time, a short rest between, and either ends with health, fatigue and magicka full.
+  'rest.fireOnly': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.rest.fireOnly',
+  }),
+  // Whether a guild review online promotes at once while the Roll paces the reputation. DFU waits 28 days between rank
+  // changes (Guild.cs UpdateRank); online the days are the character's own (systems/guild/guild-rank-rule.ts).
+  'guild.promoteNow': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.guild.promoteNow',
+  }),
+  // Whether chapter chairs won by Merit hold guild ranks 8 and 9 online, a member's own book stopping at 7. DFU's ranks 8
+  // and 9 are earned by reputation and skill as the others are, and their services follow the rank (Guild.cs
+  // CalculateNewRank; MagesGuild.cs CanAccessService).
+  'guild.seatRanks': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.guild.seatRanks',
+  }),
+  // Whether a quest that ends unfinished online costs its faction nothing. DFU takes 2 reputation, spread through the
+  // faction's allies and enemies (Quest.cs EndQuest). The cost was waived when deadlines ran on the character's clock in
+  // travel and rest; a deadline now charges only the time lived.
+  'quest.failureFree': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.quest.failureFree',
+  }),
+  // Whether a shop's shelves are shared by everyone in the building online. DFU gives each player their own shelf
+  // (PlayerActivate.cs ActivateLootContainer); shared, the first opener's roll is the room's list and its endless rows
+  // never sell out or sell back (systems/shop-shelf-rule.ts).
+  'shop.sharedShelf': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client'] as const),
+    words: 'profile.shop.sharedShelf',
+  }),
+  // Whether the sky runs on a clock of its own online (net/skyLaw.js, TimeScale 24 beside the event clock's 12). DFU has
+  // one clock: the hour, the date, the season and the moons a player sees are the world's own.
+  'time.skyClock': Object.freeze({
+    type: 'bool',
+    dfu: false,
+    online: false,
+    offline: false,
+    checkedBy: Object.freeze(['client', 'relay', 'account'] as const),
+    words: 'profile.time.skyClock',
+  }),
+  // How fast the world clock runs online, in DFU's TimeScale: game minutes per real minute (12 is a game minute every
+  // five real seconds and a day every two real hours). DFU's setting is the same number. The online world's date is a
+  // function of the relay's wall time from a fixed start (net/wire.js ONLINE_EPOCH_MS), so changing the value on a server
+  // with players moves the world's date at once; set it before play. The relay, the account Worker and every client read
+  // it. The Hunters' Mark days, the sea season, the court's round, the camp window and the Starfall's nights follow it.
+  'time.worldScale': Object.freeze({
+    type: 'int',
+    min: 1,
+    max: 100,
+    dfu: 12,
+    online: 12,
+    offline: 12,
+    checkedBy: Object.freeze(['client', 'relay', 'account'] as const),
+    words: 'profile.time.worldScale',
+  }),
+  // The sky clock's TimeScale while `time.skyClock` is true; read only then. DFU has one clock, so its value is the
+  // world's 12; the sky clock this key sets is the port's own faster sky, which runs at 24 (a day every real hour)
+  // unless a profile writes another. The sky's midnights fall on the hour UTC only at 24 (net/skyLaw.js).
+  'time.skyScale': Object.freeze({
+    type: 'int',
+    min: 1,
+    max: 100,
+    dfu: 12,
+    online: 24,
+    offline: 12,
+    checkedBy: Object.freeze(['client', 'relay', 'account'] as const),
+    words: 'profile.time.skyScale',
+  }),
+} satisfies Record<string, ProfileKey>);
+
+export type ProfileKeyName = keyof typeof PROFILE_KEYS;
+
+/** The registry's row for `name`, or null for a name it does not hold. */
+export function profileKeyOf(name: string): ProfileKey | null {
+  return Object.hasOwn(PROFILE_KEYS, name) ? (PROFILE_KEYS as Record<string, ProfileKey>)[name] : null;
+}
+
+/** Does `value` fit the key's type and bounds? */
+export function validProfileValue(key: ProfileKey, value: unknown): boolean {
+  switch (key.type) {
+    case 'bool':
+      return typeof value === 'boolean';
+    case 'int':
+      return Number.isSafeInteger(value) && inBounds(key, value as number);
+    case 'number':
+      return typeof value === 'number' && Number.isFinite(value) && inBounds(key, value);
+    case 'enum':
+      return typeof value === 'string' && (key.values ?? []).includes(value);
+    case 'string':
+      return typeof value === 'string';
+  }
+  return false;
+}
+
+function inBounds(key: ProfileKey, value: number): boolean {
+  return (key.min === undefined || value >= key.min) && (key.max === undefined || value <= key.max);
+}
+
+/** The schema this build reads. A profile of another schema is refused at the front door. */
+export const PROFILE_SCHEMA = 1;
+
+/**
+ * What is wrong with a profile's rules, for this build: a schema it does not read, a key it does not know (a newer
+ * server), a value the key does not take. Empty when the profile is one this build can play.
+ */
+export function profileRuleErrors(profile: unknown): string[] {
+  if (!profile || typeof profile !== 'object') return ['not a profile'];
+  const p = profile as { schema?: unknown; rules?: unknown };
+  if (p.schema !== PROFILE_SCHEMA) return [`schema ${String(p.schema)}`];
+  const rules = p.rules ?? {};
+  if (typeof rules !== 'object' || Array.isArray(rules)) return ['rules is not an object'];
+  const errors: string[] = [];
+  for (const [name, value] of Object.entries(rules)) {
+    const key = profileKeyOf(name);
+    if (!key) errors.push(`unknown key ${name}`);
+    else if (!validProfileValue(key, value)) errors.push(`bad value for ${name}`);
+  }
+  return errors;
+}
+
+/** Every key's value under a profile: its written value, else the key's online default. */
+export function resolveRules(rules: Readonly<Record<string, ProfileValue>> = {}): Record<string, ProfileValue> {
+  const out: Record<string, ProfileValue> = {};
+  for (const [name, key] of Object.entries(PROFILE_KEYS) as [string, ProfileKey][]) {
+    out[name] = Object.hasOwn(rules, name) ? rules[name] : key.online;
+  }
+  return out;
+}

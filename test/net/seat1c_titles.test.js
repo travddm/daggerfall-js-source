@@ -1,4 +1,4 @@
-// SEAT1c (2026-09-30, Mac: "Finish the seats"; Seats-Arc 7.4): THE TITLES AND GLYPHS A CHARTER GIVES - the token's
+// SEAT1c: THE TITLES AND GLYPHS A CHARTER GIVES - the token's
 // vocabulary (five generic title ids with a bounded `ts` claim, four glyphs) reaching the relay first; the relay carrying
 // the claim from the signature to every row; the client wording it off its own seats; and the service deriving both at
 // a mint and offering the titles in the wardrobe - a palace seat's guildmaster a Warden, a crown's a Protector, every
@@ -19,8 +19,8 @@ const ANTICLERE = { key: 3021, name: 'Anticlere', region: 21, tier: 'palace', pi
 const WAYREST = { key: 5023, name: 'Wayrest', region: 23, tier: 'crown', pixel: [610, 118] };
 const DAY = 86400;
 
-test('SEAT1c THE VOCABULARY: five seat title ids and four glyphs, closed; a seat title rides with its claim [key, Season] and only beside one; `badged` stamps it and `readBadge` reads it back, never beside another title (mutants: the claim required; the claim refused elsewhere; the bounds; the stamp; the reader)', () => {
-  assert.deepEqual([...SEAT_TITLES], ['warden', 'protector', 'crowned', 'keeper', 'champion']);
+test('SEAT1c THE VOCABULARY: three seat title ids and four glyphs, closed; a seat title rides with its claim [key, Season] and only beside one; `badged` stamps it and `readBadge` reads it back, never beside another title (mutants: the claim required; the claim refused elsewhere; the bounds; the stamp; the reader)', () => {
+  assert.deepEqual([...SEAT_TITLES], ['warden', 'protector', 'champion']);
   for (const t of SEAT_TITLES) assert.ok(TITLES.includes(t));
   for (const g of ['tower', 'crownDF', 'crownWR', 'crownSN']) assert.ok(GLYPHS.includes(g));
   const base = { s: 'acct-0001', n: 'Gamal', k: 'linked', i: T0, e: T0 + 60 };
@@ -48,8 +48,7 @@ test('SEAT1c THE LAW AND THE WORDS: the glyphs a guild\'s Charters give (the tow
   const place = (k) => ({ 3021: ANTICLERE, 5023: WAYREST })[k] ?? null;
   assert.equal(seatTitleText('warden', [3021, 0], place), 'Warden of Anticlere');
   assert.equal(seatTitleText('protector', [5023, 0], place), 'Protector of Wayrest');
-  assert.equal(seatTitleText('keeper', [3021, 2], place), 'Keeper of Anticlere, Season 2');
-  assert.equal(seatTitleText('crowned', [5023, 3], place), 'Crowned in Season 3');
+  assert.equal(seatTitleText('keeper', [3021, 2], place), null, 'Season titles are cut');
   assert.equal(seatTitleText('warden', [1, 0], place), null);
   setSeatTitlePlaces(place);
   assert.equal(titleBadge({ title: 'warden', ts: [3021, 0] }).text, 'Warden of Anticlere');
@@ -107,7 +106,4 @@ test('SEAT1c THE SERVICE\'S MINT AND WARDROBE: a palace seat\'s guildmaster may 
   const m3 = await mint(gm, 'char-gamal-other');
   assert.deepEqual([m3.title, m3.glyphs.includes('tower')], [null, false], 'the guildmaster\'s other character: neither');
   assert.equal((await svc.call('/v1/account/title', { title: 'warden' }, outsider.secret)).status, 403);
-  // PIN MOVED (CROWN1 part two): the champion's title is the account's own, before the guildmaster's seat titles
-  // PIN MOVED (SEASON1): every title kept for good - a Season's crowned and keeper beside the champion - worn off its own row
-  assert.match(rd('server-account/src/index.js'), /const seatT = KEPT_TITLES\.includes\(wornT\) \? \(kept \? \{ t: wornT, ts: kept\.ts \} : \{\}\)\s*: SEAT_TITLES\.includes\(wornT\) \? \(seatBadge\?\.title === wornT \? \{ t: wornT, ts: seatBadge\.ts \} : \{\}\)\s*: CHAPTER_TITLES\.includes\(wornT\) \? \(chapterT \? \{ t: chapterT\.high \? 'highmaster' : wornT, ts: chapterT\.ts \} : \{\}\) : \(wornT \? \{ t: wornT \} : \{\}\);/);   // PIN MOVED (CHAP4c): and a chapter's seat's title, its claim the named character's own; PIN MOVED (CHAP6e): a Master's in an Ascendancy signed its High Master
 });

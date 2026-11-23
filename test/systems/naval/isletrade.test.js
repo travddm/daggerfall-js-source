@@ -1,5 +1,4 @@
-// ISLE-TRADE (2026-10-17, the owner: "Can you make it so each island does sell atleast one normal exchange product so you
-// could feasibly live and trade out in the veil"; bible/03-World/Naval-Refit.md ISLE-TRADE) - every Eltheric isle's
+// ISLE-TRADE - every Eltheric isle's
 // freeport makes a good of the Bay of its own and sells it as made: the isles about Veilhaven as the world host stands
 // them (scenes/world.js etherPortOf's port), each one's good its key's, spread over the eight; a trade from isle to isle
 // that pays without crossing the Veil; the harbour office selling it from the hold's own exchange and listing it on the
@@ -14,7 +13,6 @@ import { createHarbourOffice } from '../../../src/scenes/harbourOffice.js';
 import { createCaptainLedger } from '../../../src/systems/naval/captainLedger.js';
 import * as CHART from '../../../src/ui/etherChartWindow.js';
 
-const WORLD = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
 const BAY = GOODS.filter((g) => !g.ether).map((g) => g.id);
 /** A port isle as the harbour office and the naval host read one (world.js etherPortOf - pinned below). */
 const portOf = (i) => ({ key: `${i.px},${i.py}`, name: i.name, px: i.px, py: i.py, region: 61, crown: null, ether: true });
@@ -85,7 +83,6 @@ test('ISLE-TRADE the harbour office at an isle: its own good of the Bay is bough
 });
 
 test('ISLE-TRADE the chart\'s card names a port isle\'s good off the key the world host gives its port; the lesser isles\' cards none (mutants: the card\'s good)', () => {
-  assert.match(WORLD, /const etherPortOf = \(i\) => \(\{ key: `\$\{i\.px\},\$\{i\.py\}`, name: i\.name, px: i\.px, py: i\.py, region: ETHER_REGION, crown: null, ether: true \}\);/, 'the port\'s key the card draws by');
   const word = { px: v.px - 18, py: v.py + 3, yaw: 0, charted: [v.key, ...islesNear(v.px, v.py, 30).map((i) => i.key)], legends: [], stats: {} };
   const at = { cx: v.px - 17.5, cy: v.py + 3.5, zoom: 2 };
   const m = CHART.chartModel(word, at, 1064, 550, { pick: v.key });

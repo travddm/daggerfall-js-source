@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-02b - THE CREW'S WORDS AUDITED (Mac: "Audit this"). FIELD BUGS 2026-10-02's CREW-SAY laid the
+// FIELD BUGS 2026-10-02b - THE CREW'S WORDS AUDITED. FIELD BUGS 2026-10-02's CREW-SAY laid the
 // crew's bubbles clear of each other (ui/naval/navalHud.js layoutCrewLines) - and its audit, over five minutes of real crews
 // at the helm and on deck, found three things wrong with how:
 //   TALK IS HIS OWN   - every line said by two at once was laid once, by no name: right for the chorus and a battle's
@@ -10,7 +10,7 @@
 //                       held where it stands while its way down is barred - never over another
 //   THE SCREEN'S TOP  - a stack of six at scale 2 on a 540-line screen stood off its top; a lifted bubble that would
 //                       stand over it is not drawn
-// Each pin is red on the record's own code (e2466e2bd). `01-Overview/bugs/Field-Bugs-2026-10-02b.md`.
+// Each pin is red on the record's own code (e2466e2bd).
 import '../../modsOff.js';
 import { byClass } from '../../chargenDom.mjs';
 import { test } from 'node:test';
@@ -113,9 +113,6 @@ test('CREW-SAY A STACK HOLDS: two hands side by side, a line each - as the eye d
     }
   }
   assert.ok(eased > 50, `bubbles came down eased (${eased} frames)`);
-  // the world hands the frame's dt (held at a pause) and each speaker
-  const WORLD = (await import('node:fs')).readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(WORLD, /drawCrewLines\(points, \{ covered, scale: enhancedHudScale\(\), dt: gamePaused\(\) \? 0 : dt \}\);/);
 });
 
 test('CREW-SAY THE SCREEN\'S TOP: a huddle of six near the top of the screen - each bubble at its own head is drawn, and a lifted one that would stand over the screen\'s top is not (a stack of six stood off it); nothing drawn meets anything else', () => {

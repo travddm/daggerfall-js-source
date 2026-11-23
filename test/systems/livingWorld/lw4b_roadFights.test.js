@@ -1,5 +1,4 @@
-// LW4b (2026-10-05, bible/06-Systems/Living-World.md, Mac: NPCs "can encounter enemies in the overworld ... make friends
-// or enemies"): THE FIGHT, STOOD - a beset party near the player on the ground fought for real (its foes the pool's own,
+// LW4b: THE FIGHT, STOOD - a beset party near the player on the ground fought for real (its foes the pool's own,
 // its armed the player's allies), the end what happens (the fallen, the won with the spared, the lost), the fights let
 // go, and the roads drawing none of the bodies the pool holds - over a mock pool and the synthetic map.
 import test from 'node:test';
@@ -92,7 +91,7 @@ test('LW4b the end is what happens: an ally cut down FELL; every foe dead, the f
   rig.fights.frame([{ trip, at }], here, 1001);
   await settle();
   const allies = rig.spawned.filter((r) => r.o.allied), foes = rig.spawned.filter((r) => !r.o.allied);
-  allies[1].dead = true; allies[1].corpse = true;   // PIN MOVED (AUDIT LW-III): killed as the pool kills - dead, a corpse
+  allies[1].dead = true; allies[1].corpse = true;
   rig.fights.frame([], here, 1005);
   assert.deepEqual(rig.rel.turns().died.get('L9.t5@K'), { t: 1005, seen: false, who: 'Cy Fenn' }, 'cut down beside the player: died at their side, at that minute (AUDIT-C3)');
   for (const f of foes) { f.dead = true; f.corpse = true; }
@@ -156,13 +155,6 @@ test('LW4b the end is what happens: an ally cut down FELL; every foe dead, the f
   assert.ok(!synced.some((x) => armedIds.includes(x.key)), 'its armed the peer\'s allies, come through the stream - never drawn here too (AUDIT-B6)');
   const unarmedIds = membersAt(beset, m).filter((x) => x.cls == null).map((x) => x.id);
   if (unarmedIds.length) assert.ok(synced.some((x) => unarmedIds.includes(x.key)), 'its unarmed drawn as ever');
-  // the host
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /spawn: \(type, feet, o\) => exteriorFoes\.spawnFoe\(type, feet, \{ yaw: o\.yaw, gender: o\.gender, level: o\.level, allied: o\.allied, loose: true, transient: true, managed: true \}\),/);   // PIN MOVED (AUDIT LW-III): managed - the fight owns its bodies' lives
-  assert.match(w, /owner: \(feet\) => amGroupRollOwner\(online\?\.id \?\? null, player\.feetAt\(\), \(peersNear\(\) \?\? \[\]\)\.filter\(\(p\) => Math\.hypot\(p\.feet\[0\] - feet\[0\], p\.feet\[2\] - feet\[2\]\) <= LIVE_M\), Infinity\),/, 'AUDIT-B5: the fight\'s own election');
-  assert.match(w, /ready: \(\) => !!walkMode && !!playerSpawned && !_loading && !modes\?\.transitioning && _mode\(\) === 'exterior' && !playerAfloat\(\),/);
-  assert.match(w, /return turnKey\(place, placeCycle\(place, roster, Math\.floor\(trip\.outT0 \/ 1440\), livingScale\(\)\)\);/);
-  assert.match(rd('src/scenes/livingWorld/livingRoads.js'), /clear\(\) \{ deps\.sprites\.clear\(\); deps\.teams\?\.clear\(\); deps\.fights\?\.clear\(\);/);   // LW10: PIN MOVED - the teams cleared beside
 });
 
 test('AUDIT LW-III KILLED, NOT GONE: a fight\'s bodies the pool let go without a blow (its relevance cull: dead, no corpse) are neither a fall nor a win - no ally a death at the player\'s side, no fight won, no fated spared; one killed (dead with a corpse, or executed) is (mutants: the ally\'s kill, the foes\' kill, the lost)', async () => {

@@ -1,5 +1,5 @@
 // @ts-check
-// CSA-C (2026-09-27): A PREFAB'S COLLIDERS, AND THE RAY THAT MEETS THEM -
+// CSA-C: A PREFAB'S COLLIDERS, AND THE RAY THAT MEETS THEM -
 // Physics.Raycast over the BoxColliders and MeshColliders of an instanced
 // prefab (world/prefabNode.js), as Unity answers it. Come Sail Away's
 // placement ray and its `identifyboat` both ask Physics.Raycast what they

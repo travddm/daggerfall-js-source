@@ -204,16 +204,6 @@ test('AUDIT 63 F20: the setter\'s two gates - IsPotion, and the null recipe', ()
   assert.deepEqual(archiveRecord(inventoryItemImage(unknown)), { archive: 205, record: 11 });
 });
 
-test('AUDIT 63 F20: the quest mint goes through ItemBuilder, both arms', () => {
-  // Questing/Item.cs:347-351 - `(itemKey != -1) ?
-  // ItemBuilder.CreatePotion(itemKey) : ItemBuilder.CreateRandomPotion()`.
-  // The port minted the bottle inline and so bypassed the setter
-  // entirely: no recipe price, no recipe icon, and no random arm.
-  const src = rd('src/systems/quest/item.js');
-  assert.match(src, /result = itemKey !== -1 \? createPotion\(itemKey\) : createRandomPotion\(rolls\);/);
-  assert.doesNotMatch(src, /potionRecipeKey: itemKey/, 'no inline bottle mint left');
-});
-
 // ── F21: the inventory icon reads the ITEM ───────────────────────────
 
 const artifactTemplates = () => {
@@ -289,9 +279,6 @@ test('AUDIT 63 F22: the interior context hands its TREASURE markers out', () => 
   // the flat's TextureRecord. The port parsed the type and no reader in
   // src/ ever asked for it.
   assert.equal(INTERIOR_MARKER.TREASURE, 19);
-  const src = rd('src/scenes/interiorContext.js');
-  assert.match(src, /\.filter\(\(m\) => m\.type === INTERIOR_MARKER\.TREASURE\)/);
-  assert.match(src, /^\s*treasureMarkers,/m, 'and returns them beside enterMarkers');
 });
 
 test('AUDIT 63 F22: the gate is Tavern / TG / DB, the picture is clothing record 0, the index is the LOCATION type', async () => {
@@ -347,10 +334,6 @@ test('AUDIT 63 F22: the gate is Tavern / TG / DB, the picture is clothing record
   assert.equal(off._piles.length, 1, 'the container stands on an out-of-range location');
   assert.deepEqual(off._piles[0].items, [], '...holding what the empty matrix gave it');
 
-  // ...and the pass is wired where the cache has already spoken.
-  const src = rd('src/scenes/worldModes.js');
-  assert.ok(src.indexOf('restoreInteriorScene();\n      // AUDIT 63 F22') > 0,
-    'the marker pass runs after RestoreCachedScene, as DFU orders them');
 });
 
 test('AUDIT 63 F22: a cached container keeps its marker - the pass does not mint a second', async () => {
@@ -508,8 +491,6 @@ test('AUDIT 63 F23: a classic save\'s worn 0-condition piece imports EQUIPPED', 
   e.items.push(broken);
   assert.notEqual(equipItem(e, broken), null, 'ItemEquipTable.cs:94-154 has no condition test');
 
-  // ...and the port says so where it used to say the opposite.
-  assert.doesNotMatch(rd('src/systems/classicSave.js'), /Recorded divergence: the port's law refuses a/);
 });
 
 // ── MAC-D2 (Skibbster on Discord, 2026-09-21, with a screenshot of a

@@ -1,6 +1,5 @@
-// AUDIT NAV1 (2026-09-29, Mac: "Lets do a deep comprehensive audit and ensure this is perfection. I want ship movement
-// and combat to flow perfectly, just like assisins creed black flag") - BOARDING, the audit's fourth slice
-// (bible/03-World/Naval-Combat.md "Boarding"): Warm Ashes' raid on the open sea, the pirate flagship's raid that could
+// AUDIT NAV1 - BOARDING, the audit's fourth slice
+// ("Boarding"): Warm Ashes' raid on the open sea, the pirate flagship's raid that could
 // hang for ever, a raid let go of ending with its boarders, a crewed boat's hands in every repel - the laws, the real
 // quest parser, the world host's own code lifted and run, and the host through real frames over Come Sail Away's real
 // pool (test/navalSea.mjs).
@@ -24,10 +23,11 @@ import { QuestMachine } from '../../../src/systems/quest/machine.js';
 import { loadQuestTables } from '../../../src/systems/quest/tables.js';
 import { Place } from '../../../src/systems/quest/place.js';
 import { LOCATION_TYPES } from '../../../src/formats/mapsFile.js';
+import { hostText } from '../../hostText.mjs';   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld - the host read whole
 
 const root = new URL('../../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
-const WORLD = read('src/scenes/world.js');
+const WORLD = hostText('src/scenes/world.js');
 const questFile = (name) => read(`vendor/warm-ashes-ships/Quests/${name}.txt`);
 /** A function declaration of world.js's, lifted whole (the suites' own way - test/systems/ows3_raiders.test.js). */
 const lift = (name) => {
@@ -192,7 +192,7 @@ test('AUDIT NAV1 (B5) a raid WON the moment its winning task fires - the flagshi
   assert.equal(h.host.boarding, null, 'won');
   assert.ok(h.log.mid.includes('The boarders are thrown back!'));
   assert.equal(p.ship.boarded, false);
-  assert.deepEqual(h.log.ended, [[quest, { won: true }]], 'a won raid ends with its win');   // PIN MOVED (RAID-WON, test/systems/naval/raidwon.test.js): it ran on - its `_ally_` stood on my deck after it, counted as enemies near
+  assert.deepEqual(h.log.ended, [[quest, { won: true }]], 'a won raid ends with its win');
   assert.equal(h.host.leaveShipGate(quest), 'naval');
 });
 
@@ -235,7 +235,7 @@ test('AUDIT NAV1 (B6, B7) a raid\'s own hour run out, my deck left to them, the 
 });
 
 test('AUDIT NAV1 (B6) the world host\'s endRaid, run: its living boarders withdrawn (the quest\'s own foes, alive), then the quest tombstoned through the machine; a quest already over only withdrawn (mutants: the dead or another quest\'s foes removed, a tombstoned quest ended twice)', () => {
-  const m = /\n {6}endRaid: (\(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n[\s\S]*?\n {6}\}),\n/.exec(WORLD);   // PIN MOVED (RAID-WON): and a won raid's arm, and her ship gone, its crew's
+  const m = /\n {6}endRaid: (\(quest, \{ withdraw = false, won = false, crew = false \} = \{\}\) => \{\n[\s\S]*?\n {6}\}),\n/.exec(WORLD);
   assert.ok(m, 'endRaid lifted');
   const mine = (uid, dead = false) => ({ dead, questBehaviour: { questUID: uid } });
   const foes = [mine(7), mine(7, true), mine(8), { dead: false }, mine(7)];
@@ -267,7 +267,7 @@ test('AUDIT NAV1 (B6) the world host\'s endRaid, run: its living boarders withdr
 // ── the prize, the fire, the founder (B3, B4) ──────────────────────────────────────────────────────────────────
 
 /** A blow on a ship I stand, landed through the host's own strike - `from` the striker ('local': mine). */
-/** A peer's blow - PIN MOVED (TOUGHER-SHIPS): one past a hit's most (navalWire.js NAVAL_HIT_MAX, a broadside's worth) lands
+/** A peer's blow
  *  as several, her fire and her men with the first; a toughened hull outweighs one hit. The pieces after one that strikes
  *  her are the same volley's (STRUCK_GRACE_S: floored at 1) - a blow meant to take her from afloat straight under is
  *  two blows a grace apart, never one. */
@@ -290,6 +290,42 @@ async function boarding() {
   assert.equal(h.host.boarding?.phase, 'fight');
   return { h, e, enemies: h.log.foes.filter((f) => f.side === 'enemy') };
 }
+
+/** The world moves under a boarding by `shift`: the sea's own shift, and the player and their boat with it. */
+function shiftWorld(h, shift) {
+  const move = (p) => [p[0] + shift[0], p[1] + shift[1], p[2] + shift[2]];
+  if (h.boat) h.boat.GameObject.position = move(h.boat.GameObject.position);   // the helm's boat is moved by its own runtime
+  h.view.feet = move(h.view.feet);
+  h.view.look = { ...h.view.look, origin: move(h.view.look.origin) };
+  h.host.offsetAll(shift);
+}
+
+test('a grappled ship crosses a map square with the world: at my helm she is drawn on from where she lies, and on foot she lands where she lay, moved once (mutants: the haul pose left behind; the berth moved twice)', async () => {
+  const shift = [1000, 0, -500];
+  const atHelm = await sea({ hull: 2 });
+  const hauled = place(atHelm, 'merchantGalleon', [7.4 + 7.4 + 12, 0, 0], 0);
+  hauled.ship.damage.apply({ hull: Math.ceil(hauled.ship.damage.maxHull * 0.8), sail: 0, crew: 0 });
+  atHelm.host.frame(0.1);
+  assert.equal(atHelm.host.activate(), true, 'the grapples');
+  atHelm.run(GRAPPLE_S / 2);
+  assert.equal(atHelm.host.boarding.phase, 'grapple', 'still hauled');
+  const hauledFrom = [...hauled.ship.pos];
+  shiftWorld(atHelm, shift);
+  atHelm.host.frame(0.1);
+  const helmMiss = Math.hypot(hauled.ship.pos[0] - hauledFrom[0] - shift[0], hauled.ship.pos[2] - hauledFrom[2] - shift[2]);
+  assert.ok(helmMiss < 2, `drawn on from where she lay, not from the old place: ${helmMiss.toFixed(1)} m off`);
+
+  const onFoot = await sea({ hull: null });
+  const boarded = place(onFoot, 'merchantGalleon', [8, 0, 0], 0);
+  boarded.ship.damage.apply({ hull: Math.ceil(boarded.ship.damage.maxHull * 0.8), sail: 0, crew: 0 });
+  onFoot.host.frame(0.1);
+  assert.equal(onFoot.host.activate(), true, 'over her rail');
+  const boardedFrom = [...boarded.ship.pos];
+  shiftWorld(onFoot, shift);
+  onFoot.host.frame(0.1);
+  const footMiss = Math.hypot(boarded.ship.pos[0] - boardedFrom[0] - shift[0], boarded.ship.pos[2] - boardedFrom[2] - shift[2]);
+  assert.ok(footMiss < 0.01, `where she lay, moved once: ${footMiss.toFixed(1)} m off`);
+});
 
 test('AUDIT NAV1 (B3) her crew SURRENDERS: her captain and SURRENDER_SHARE of her men down, the living rest throw down their arms - stood down before her window opens over them, never swinging at a prize screen - and stand on her deck, not spirited away; her dead never asked (mutants: the survivors left hostile)', async () => {
   const { h, enemies } = await boarding();
@@ -372,7 +408,7 @@ test('AUDIT NAV1 (B4, B6) a raider\'s ship gone under her boarders: they fight o
   h.host._sea.delete(p.id);   // she is gone (sunk and dropped)
   h.run(0.2);
   assert.equal(h.host.boarding, null);
-  assert.deepEqual(h.log.ended, [[quest, { withdraw: false, crew: true }]], 'her raid ends; her boarders stand');   // PIN MOVED (RAID-WON, AUDIT FB1019 D2): and its crew goes home (test/systems/naval/raidwon.test.js)
+  assert.deepEqual(h.log.ended, [[quest, { withdraw: false, crew: true }]], 'her raid ends; her boarders stand');
   assert.deepEqual(h.host.getSaveData().raids, []);
 });
 
@@ -429,7 +465,7 @@ test('AUDIT NAV1 (B14) NO SAVE MID-FIGHT: a boarding under way, or the player on
   assert.equal(h.host.saveRefused(), false, 'away from her');
   h.host.setEnabled(false);
   assert.equal(h.host.saveRefused(), false, 'no sea');
-  assert.match(WORLD, /if \(naval\?\.saveRefused\?\.\(\)\) \{ if \(!quiet\) townTalk\.say\('You cannot save now\.'\); return false; \}/, 'F9 and the checkpoints');
+  assert.match(WORLD, /if \((?:host\.)?naval\?\.saveRefused\?\.\(\)\) \{ if \(!quiet\) townTalk\.say\('You cannot save now\.'\); return false; \}/, 'F9 and the checkpoints');
   assert.match(WORLD, /savingPrevented: \(\) => !!naval\?\.saveRefused\?\.\(\)( \|\| [^,\n]+)?,/, 'the pause window greys its Save');   // AUDIT CARDS-2 H1: a later refusal may join it (chips on a card table)
 });
 
@@ -469,7 +505,7 @@ test('AUDIT NAV1 (B10) THE DECK DEALT: a raid\'s waves take the boarded deck\'s 
   const { h: b } = await boarding();
   const spots = b.log.foes.map((f) => f.pos.join(','));
   assert.equal(new Set(spots).size, spots.length, 'her muster and my hands apart');
-  assert.match(WORLD, /const _deck = naval\?\.placeQuestFoe\(handle\.foe\?\.parentQuest \?\? null, \(s\) => !_held\(/);
+  assert.match(WORLD, /const _deck = (?:host\.)?naval\?\.placeQuestFoe\(handle\.foe\?\.parentQuest \?\? null, \(s\) => !_held\(/);
   assert.match(WORLD, /if \(_deck === false\) return false;/);
   assert.match(WORLD, /holdSpotWhile\(collider, \{ x: _deck\[0\]\[0\], y: _deck\[0\]\[1\] \+ 0\.9, z: _deck\[0\]\[2\] \}, \(\) => exteriorFoes\.spawnFoe\(/);
 });

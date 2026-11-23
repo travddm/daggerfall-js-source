@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DECOR2b (2026-09-25) — THE FURNISHER.
+// DECOR2b — THE FURNISHER.
 //
 // Mac: decor "sold at shops not available in the world loot pool";
 // asked, the furniture shop sells Daggerfall's own furniture,
@@ -26,7 +26,7 @@
 // picture of its own and stands as it. Taken down it is delivered
 // again, and a room sold gives it back the same way.
 //
-// PROF11 (2026-10-01, bible/06-Systems/Professions-Arc.md 9.3): AND THE
+// PROF11: AND THE
 // SCULPTOR'S STONE - a column, a bench, a font, a statue plinth
 // (net/recipeLaw.js STONE_DECOR, 696-699), carved at the mason's bench
 // into DFU's Furniture group and delivered as a table is. A carving has

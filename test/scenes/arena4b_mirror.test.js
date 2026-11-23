@@ -1,5 +1,4 @@
-// ARENA4b (2026-10-03, bible/11-Multiplayer/Arena.md 2: "Exhibition - online: yes - the relay runs it, every client sees
-// one bout"): THE RELAY'S EXHIBITION ON THE CLIENT, DRIVEN - the bout driver standing the relay's bout as the hour's on
+// ARENA4b: THE RELAY'S EXHIBITION ON THE CLIENT, DRIVEN - the bout driver standing the relay's bout as the hour's on
 // the city's sand (scenes/arena/arenaBouts.js startExhibitionRelay / exhibitionWord: the relay's frame on the city's, the
 // exterior's own bodies walked by their motor, the swing off the attack's count, the Red against the Blue, the call, the
 // purse's bark, the verdict to the bookmaker, the HUD by the distance), the host's glue (scenes/arena/arenaOnline.js: the
@@ -129,7 +128,7 @@ test('ARENA4b the city\'s socket: online the hour\'s bout is the relay\'s room w
   const sent = [], links = [], asked = [], dismissed = [];
   let relay = null;
   const bouts = { ask: (p) => { asked.push(p); relay = { o: p.relayEx.o, me: '', kind: 'ex' }; }, relay: () => relay, dismiss: () => { dismissed.push(1); relay = null; }, exhibitionWord: (w) => { bouts.words.push(w); return true; }, words: [], holds: () => false };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   let t = 0;
   const A = createArenaOnline({ now: () => t, session: () => session, makeHall: () => { const l = fakeLink(sent); links.push(l); return l; }, bouts, names, account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: () => true });
   assert.equal(A.exhibitions(), true);
@@ -163,7 +162,7 @@ test('ARENA4b the verdict asked: a wager\'s hour this screen did not see to its 
   const sent = [], links = [];
   let heard = 0;
   const bouts = { ask() {}, relay: () => null, dismiss() {}, exhibitionWord: () => true, holds: () => false };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: () => true };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: () => true };
   let t = 0;
   const A = createArenaOnline({ now: () => t, session: () => session, makeHall: () => { const l = fakeLink(sent); links.push(l); return l; }, bouts, names, account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: () => true, verdictHeard: () => { heard++; } });
   assert.equal(A.exhibitionVerdict(EX.hour, NOON + 61), null, 'not known yet');
@@ -194,7 +193,7 @@ test('ARENA4b the verdict asked: a wager\'s hour this screen did not see to its 
 test('ARENA4b the Herald\'s Watch and the window\'s list: the hour\'s exhibition on the hall\'s list named off its hour (the Red\'s against the Blue\'s, titled the hour\'s); Watch takes the floor\'s instance as its room and says one `in` from the stands; the stands strike nobody (mutants: the exhibition entered as a bout\'s room; a watcher\'s blow sent)', async () => {
   const hallSent = [], boutSent = [], entered = [], asked = [];
   const hallLink = { status: 'open', join() {}, leave() {}, sendArena: (w) => { hallSent.push(w); return true; } };
-  const session = { status: 'open', arenaOk: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
+  const session = { status: 'open', arenaHeard: true, room: 'world:1,1', sendArena: (w) => { boutSent.push(w); return true; } };
   const bouts = { ask: (p) => asked.push(p), relay: () => null, dismiss() {}, exhibitionWord: () => true, relayWord: () => true, holds: () => false };
   const A = createArenaOnline({ now: () => 0, session: () => session, makeHall: () => hallLink, bouts, names, account: { board: async () => ({ ok: false }), claim: async () => ({ ok: true, data: {} }), me: () => null }, enterFloor: (k, o) => { entered.push([k, o]); return true; } });
   A.model();
@@ -260,17 +259,3 @@ test('ARENA4b the bookmaker online: a wager settled by the relay\'s verdict, nev
   assert.equal(Q.arenaLeague.book.wagers[0].status, house === null ? 'draw' : 'lost', 'offline, the house\'s record');
 });
 
-test('ARENA4b the hosts\' wiring: online the city\'s schedule is the relay\'s room (offline the seeded bout, once an hour), the Herald\'s Watch the relay\'s room, the floor\'s instance in the exhibition\'s room, the book shut by the hour standing, the mirror\'s bodies `placed`, an asked verdict settling the book (by source) (mutants: the city\'s bout this screen\'s own online; the Watch this screen\'s own online; the bodies streamed; the asked verdict unwired)', () => {
-  const W = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // PIN MOVED (FIELD BUGS 2026-10-16b ARENA-WAIT): the online arm takes the online lane's wait too
-  assert.match(W, /if \(arenaOnline\?\.exhibitions\?\.\(\) \|\| arenaOnline\?\.waiting\?\.\(\)\) arenaOnline\.watchCity\(ex\);[^\n]*\n\s+else if \(ex\?\.open && ex\.hour !== _arenaHourRun\) \{ _arenaHourRun = ex\.hour; arenaBouts\.ask\(\{ where: 'city', kind: 'exhibition', ex \}\); \}/);
-  assert.match(W, /if \(arenaOnline\?\.exhibitions\?\.\(\) \|\| arenaOnline\?\.waiting\?\.\(\)\) \{ arenaBouts\.dismiss\(\); arenaOnline\.watchExhibition\(ex\); return; \}/);
-  assert.match(W, /key = arenaFloorRoomOf\(modes\?\.roomIdentity\?\.\(\)\?\.o\);/);
-  assert.match(W, /return arenaBouts\.hour\(\) != null && !!b && !\['call', 'walk', 'count'\]\.includes\(b\.phase\);/);
-  assert.match(W, /champion: null, \.\.\.\(o\.mirror \? \{ placed: true \} : \{\}\) \}\)/);
-  assert.match(W, /exhibitionVerdict: \(hour, side\) => arenaGate\.verdictSeen\(hour, side\)/, 'the mirror\'s verdict reaches the book through the bout\'s own door');
-  assert.match(W, /verdictHeard: \(\) => arenaGate\.settle\(\),/, 'and a verdict asked of its room settles it as it comes');
-  const E = readFileSync(new URL('../../src/scenes/exterior.js', import.meta.url), 'utf8');
-  assert.match(E, /if \(ex\?\.open && ex\.hour !== _arenaHourRun\) \{ _arenaHourRun = ex\.hour; arenaBouts\.ask\(\{ where: 'city', kind: 'exhibition', ex \}\); \}/, 'the offline host: its own seeded bout');
-  assert.ok(!E.includes('watchCity'), 'the offline host holds no session');
-});

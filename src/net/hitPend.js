@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT FOES FOE2 (2026-09-15, Mac relaying players: "during online play,
-// certain enemies cant be damaged"): A BLOW THE WIRE REFUSED MUST NOT BE LOST.
+// AUDIT FOES FOE2: A BLOW THE WIRE REFUSED MUST NOT BE LOST.
 //
 // This is AUDIT WORLD3 A3's law for the acts (`_actPend`, scenes/world.js)
 // applied to the blow - and the blow needed it MORE. An act is a state, so a
@@ -25,7 +24,7 @@
 // ORDER IS KEPT: a new blow goes BEHIND whatever is already waiting, so the
 // queue drains oldest-first and one foe cannot overtake another.
 //
-// LOOT-DUP (2026-09-15, AUDIT ONCRASH1's own finding): AND EVERY FRAME LEARNS
+// LOOT-DUP: AND EVERY FRAME LEARNS
 // ITS OWN FATE. The boolean this door returns is the QUEUE's news, not the
 // caller's frame's: with anything already waiting it answers `flush`, which is
 // true when some OTHER blow went, and a frame that is merely QUEUED answers

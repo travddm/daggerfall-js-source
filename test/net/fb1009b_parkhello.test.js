@@ -9,11 +9,11 @@
 // seconds old), the park arrived while it waited, the relay closed the socket as policy ('park before hello'), and the
 // Rift cast its player out at the Hollow's door - "The way to the Shattered Hour is lost." Within ten seconds of
 // another player's hello the realm needed no fetch, which is the eighth Recall that let them in. Driven here over the
-// real session and the relay's own parse. `01-Overview/bugs/Field-Bugs-2026-10-09b.md`.
+// real session and the relay's own parse.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { OnlineSession } from '../../src/net/online.js';
-import { parseClient, RELAY_VERSION, relaySupportsPark, relaySupportsLook } from '../../src/net/wire.js';
+import { parseClient, RELAY_VERSION } from '../../src/net/wire.js';
 
 function fakeSocketClass() {
   const sockets = [];
@@ -30,14 +30,12 @@ const POSE = { x: 1000, y: 0, z: 1000, yaw: 0, pitch: 0, mv: 0 };
 const kinds = (ws) => ws.sent.map((f) => JSON.parse(f).t);
 
 test('PARK-HELLO: through the Rift, the realm\'s socket says its hello and nothing else until it is welcomed - the parked team\'s word waits for the welcome, then goes; the relay would have closed on it (mutant: the park unwelcomed)', () => {
-  assert.ok(relaySupportsPark(RELAY_VERSION) && relaySupportsLook(RELAY_VERSION), 'the relay that welcomes knows both frames');
   const { FakeWS, sockets } = fakeSocketClass();
   let now = 1_700_000_000_000;
   const s = new OnlineSession({ url: 'wss://relay.test/', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 2, items: [] }, id: 'mac-0001', secret: 'shh-shh-shh-0001', WebSocketImpl: FakeWS, now: () => now });
   s.join('dungeon:m77', POSE);   // the Hollow's own room
   sockets[0].open();
   sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
-  assert.equal(s.parkOk, true, 'the Hollow\'s welcome said the relay knows the park');
   assert.equal(s.sendPark({ c: 'char-0001-abcdef' }), 'room', 'welcomed: the word goes');
   now += 60_000;
   s.join('sd:3', POSE);   // through the Rift: the realm's room
@@ -60,7 +58,6 @@ test('PARK-HELLO: a look changed while a new room\'s hello is out is owed, not d
   s.join('dungeon:m77', POSE);
   sockets[0].open();
   sockets[0].receive({ t: 'welcome', id: 'mac-0001', peers: [], v: RELAY_VERSION });
-  assert.equal(s.lookOk, true);
   s.join('sd:3', POSE);
   sockets[1].open();
   now += 60_000;

@@ -1,4 +1,4 @@
-// QL12 (bible/06-Systems/Questlines-Arc.md section 4.4): THE GUILDS' LADDERS - each guild the player is a member of, read
+// QL12: THE GUILDS' LADDERS - each guild the player is a member of, read
 // as a line of its own quests by the rank that opens them (systems/questlines/qlLadders.js): read off the membership
 // book, the classic list's rows and the layer's record of what finished well - nothing new kept. And the window's page
 // (ui/questlines/qlJournal.js qlLadderDetail) says what a ladder is, strikes what is done and marks a choice.
@@ -50,7 +50,7 @@ test('QL12 the ladder\'s page: what a ladder is, the rank held, each rung, the d
   assert.match(text, /Guardian \(not yet\)/);
   const rows = box.querySelectorAll('.px-qobj-row');
   assert.deepEqual(rows.map((r) => r.className.split(' ')[1]), ['done', 'next']);
-  // AUDIT QUESTLINES UI-12 (PIN MOVED): the mark explained on a hover alone - no press, no pad; the page says it once
+  // AUDIT QUESTLINES UI-12 (
   assert.equal(rows[1].querySelector('.px-qobj-tag').textContent, 'a choice');
   assert.match(text, /A quest marked “a choice” asks you to choose, and ends differently for each choice\./);
 });

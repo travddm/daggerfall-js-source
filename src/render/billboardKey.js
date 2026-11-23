@@ -1,5 +1,5 @@
 // @ts-check
-// AUDIT 68 S16-bbkey-stale-shadow-reach (2026-09-24): A BILLBOARD BATCH'S
+// AUDIT 68 S16-bbkey-stale-shadow-reach: A BILLBOARD BATCH'S
 // TEXTURE KEY - one home. The main pass (renderer.drawBillboards), the shadow
 // replay (shadowPass.js) and the air pass's emitters (airPass.js) all key a
 // batch's texture by it. It used to be minted in drawBillboards alone, with
@@ -14,8 +14,7 @@
  *
  * FA1: an animated flat's frames are uploaded under `record#frame` (the key
  * uploadRecordFrame already mints for enemy sprites); a still flat is
- * `record` alone. MAC4 (2026-09-11, Mac: "enemy animations are completely
- * broken"): the cache re-minted on a FRAME change only, and the mobiles -
+ * `record` alone. MAC4: the cache re-minted on a FRAME change only, and the mobiles -
  * every foe, guard and townsperson (exteriorFoes, dungeonContext, cityGuards,
  * the two hosts' people) - animate by writing the RECORD (`record#frame`,
  * orientation and frame folded into one) and never touch `frame`: their key
@@ -34,7 +33,7 @@ export function billboardKey(b) {
   return b._bbKey;
 }
 
-// LA-COST2 (2026-09-27, Mac: "a deep audit on the enhanced lighting system ... performance improvements"): THE
+// LA-COST2: THE
 // CUTOUT PASS'S SORT, BY BUCKET. drawBillboards sorted every visible opaque batch by its STRING key each call - a
 // comparison sort of string compares, 186 us at 800 batches - to put one texture's batches together so their binds
 // happen once (PERF3). Grouping needs no comparison between batches at all: each key is interned to a small integer

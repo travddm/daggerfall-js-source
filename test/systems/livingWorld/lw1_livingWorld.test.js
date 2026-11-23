@@ -1,4 +1,4 @@
-// LW1 (2026-10-04, bible/06-Systems/Living-World.md): THE LIVING WORLD'S PURE CORE - the census, the places, the
+// LW1: THE LIVING WORLD'S PURE CORE - the census, the places, the
 // town's ways, the day, the meetings, the lines and the regards. Every fixture is the producers' own output on a
 // synthetic town (a navgrid of streets and building footprints, the buildings' summaries' columns, the doors'
 // location-frame centres and normals).
@@ -17,8 +17,8 @@ import {
 } from '../../../src/systems/livingWorld/census.js';
 import { townPlaces, streetNet, exitToward, exitNearest, SOCIAL_OUT, MARKET_OUT } from '../../../src/systems/livingWorld/places.js';
 import { findTownPath, pathLine, pointOnLine, stepCost, createPathBook } from '../../../src/systems/livingWorld/townPaths.js';
-import { dayPlan, entryAt, isOutdoor, walkMinutes, schedule, watchDuty, patrolBeat, WATCH_SHIFTS, favourites, DAY_START_MIN, DAY_MIN, MIN_STAY, GEAR_MIN, HOME_GAP, WALK_DETOUR, WALK_EXTRA_M } from '../../../src/systems/livingWorld/dayPlan.js';   // WATCH-DAY: PIN MOVED - the watch's duty and its patrol's beat
-import { spotCircles, spotRound, circleLine, circleSlots, slotSpoken, exchangeScript, circleStands, aloneStand, lineMinutes, ROUND_S, CIRCLE_APART } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK: PIN MOVED - a round on its spot's phase, the talk in exchanges
+import { dayPlan, entryAt, isOutdoor, walkMinutes, schedule, watchDuty, patrolBeat, WATCH_SHIFTS, favourites, DAY_START_MIN, DAY_MIN, MIN_STAY, GEAR_MIN, HOME_GAP, WALK_DETOUR, WALK_EXTRA_M } from '../../../src/systems/livingWorld/dayPlan.js';   // WATCH-DAY:
+import { spotCircles, spotRound, circleLine, circleSlots, slotSpoken, exchangeScript, circleStands, aloneStand, lineMinutes, ROUND_S, CIRCLE_APART } from '../../../src/systems/livingWorld/meetups.js';   // LW-TALK:
 import { fillLine, firstNameOf, pickScript, TOWN_TALKS, JOB_TALKS, LIVING_GREETINGS, TOKEN_FALLBACK } from '../../../src/systems/livingWorld/lines.js';
 import { createRelations, regardStanding, EVENTS, FRIEND_AT, ENEMY_AT, HOSTILE_AT, EASE_PER_DAY, RELATIONS_MAX, LIVING_WORLD_VENDOR } from '../../../src/systems/livingWorld/relations.js';
 import { CREW_LINE_S } from '../../../src/systems/naval/crewLife.js';
@@ -50,7 +50,7 @@ test('LW1 census: the travellers a town keeps by its size and its port (merchant
     [{ merchant: 3, mercenary: 2, adventurer: 2, sailor: 3, pilgrim: 2, courier: 1, pedlar: 3 }, 8],
     [{ merchant: 5, mercenary: 4, adventurer: 4, sailor: 0, pilgrim: 2, courier: 2, pedlar: 6 }, 20],
     [{ merchant: 5, mercenary: 6, adventurer: 6, sailor: 6, pilgrim: 2, courier: 2, pedlar: 6 }, 24],
-  ]);   // WATCH-DAY: PIN MOVED - the watch four companies of its strength a shift (watchday_watch.test.js)
+  ]);   // WATCH-DAY:
 });
 
 test('LW1 census: a resident is a DFU townsperson drawn once - the climate\'s people for the billboard, one of the four outfits of their sex, the talk portrait PERSON_FACE_RECORDS[race][sex][outfit] + 0..23, the region\'s name bank; the watch rides GUARD_TEXTURE, male, outfit 0; the armed carry their job\'s class; ids are the town\'s and the slot\'s; the same for every reader and DFRandom\'s stream put back as it stood (mutants: a re-roll per call, the guard\'s sex, the face law, the stream left moved)', () => {
@@ -59,7 +59,7 @@ test('LW1 census: a resident is a DFU townsperson drawn once - the climate\'s pe
   assert.deepEqual(roster.map((r) => `${r.id}:${r.job}`), ['L777.t0:merchant', 'L777.t1:merchant', 'L777.t2:merchant', 'L777.t3:mercenary', 'L777.t4:mercenary',
     'L777.t5:adventurer', 'L777.t6:adventurer', 'L777.t7:sailor', 'L777.t8:sailor', 'L777.t9:sailor', 'L777.t10:pilgrim', 'L777.t11:pilgrim', 'L777.t12:courier',
     'L777.t13:pedlar', 'L777.t14:pedlar', 'L777.t15:pedlar',
-    'L777.t16:pedlar', 'L777.t17:pedlar', 'L777.t18:pilgrim', 'L777.t19:courier']);   // LW9: PIN MOVED - more of the road's own, appended (census.js moreCounts)
+    'L777.t16:pedlar', 'L777.t17:pedlar', 'L777.t18:pilgrim', 'L777.t19:courier']);   // LW9:
   assert.deepEqual(travellerRoster(town).map((r) => r.name), roster.map((r) => r.name), 'the same people for every reader');
   assert.notDeepEqual(travellerRoster({ ...town, mapId: 778 }).map((r) => r.name), roster.map((r) => r.name), 'another town, other people');
   for (const r of roster) {
@@ -249,7 +249,7 @@ test('LW1 the day: every resident\'s day covers 04:00 to 04:00 once, entry to en
   const fields = fp.find((e) => e.kind === 'fields');
   assert.deepEqual([fields.t0 - D, fields.at.kind, isOutdoor(fields)], [6 * 60, 'exit', false], 'in the fields at six, out of town, unseen');
   assert.ok(fields.t1 - D >= 17 * 60 && fields.t1 - D < 18 * 60, 'till five (and the walk to the evening\'s spot after)');
-  // WATCH-DAY: PIN MOVED - the watch's three shifts and its day off, a patrol on its own beat (test/systems/livingWorld/watchday_watch.test.js)
+  // WATCH-DAY:
   for (const g of census.filter((r) => r.job === 'guard')) {
     for (const day of [100, 101, 102]) {
       const gp = dayPlan(g, places, day, { mpm: MPM });
@@ -308,14 +308,14 @@ test('LW1 favourites: a resident keeps to the same two social spots, tavern, tem
   const f1 = favourites(r, places, home);
   assert.equal(f1.tavern, places.doors.get(1000));
   assert.equal(f1.temple, places.doors.get(1001));
-  // LW-SPREAD: PIN MOVED - a social favourite is a social spot, a corner of the town, or the resident's own point of the square
+  // LW-SPREAD:
   assert.ok(f1.social.length >= 1 && f1.social.every((s) => places.social.includes(s) || places.corners.includes(s) || places.squares.includes(s)));
 });
 
 test('LW1 meetings: the residents at a spot for the WHOLE of a round pair off in an order drawn from the spot, the round and their ids - two by two, the odd three together, one alone none; a circle\'s script (LW-TALK: an exchange\'s, lwtalk_town.test.js) a line every CREW_LINE_S of the clock, its opener first, then the other, then quiet; the circles stand about the spot, CIRCLE_APART apart, facing in (mutants: a late arrival counted, the trio, the beat, the speaker\'s turn)', () => {
   const who = (i, job = 'keeper') => ({ id: `L1.${i}`, name: `Name${i} Sur`, job });
   const roundMin = ROUND_S * 0.2;
-  const { start, end } = spotRound('sq', 1000 * roundMin, roundMin);   // LW-TALK: PIN MOVED - the spot's own phase
+  const { start, end } = spotRound('sq', 1000 * roundMin, roundMin);   // LW-TALK:
   const t = start + 1;
   const present = [0, 1, 2, 3, 4].map((i) => ({ who: who(i), t0: start - 5, t1: end + 2 * roundMin }));
   present.push({ who: who(9), t0: start + 1, t1: end + 2 * roundMin });   // came mid-round: waits for the next
@@ -326,7 +326,7 @@ test('LW1 meetings: the residents at a spot for the WHOLE of a round pair off in
   assert.deepEqual(spotCircles('sq', present.slice(0, 1), t, roundMin), [], 'one alone keeps their own counsel');
   const next = spotCircles('sq', present, t + roundMin, roundMin);
   assert.equal(next.flatMap((c) => c.members).length, 6, 'the late one joins the next round');
-  // LW-TALK: PIN MOVED - the talk in exchanges from its people's gathering; a spoken exchange's script a line every
+  // LW-TALK:
   // CREW_LINE_S, its opener (the slot's) first, then the other, quiet after its last line (lwtalk_town.test.js)
   const pair = circles[0];
   const lineMin = lineMinutes(0.2);
@@ -368,7 +368,7 @@ test('LW1 lines: a token is filled from where and when it is said and a missing 
 test('LW1 regards: a stranger reads 0; a word counts once a day, a blow and a crime cost, help and a life saved earn; friend at FRIEND_AT, enemy at ENEMY_AT, hostile at HOSTILE_AT; a regard eases toward zero EASE_PER_DAY a day unseen and never across it; the save\'s record round-trips and a bad one reads as nobody known; the vendor is LivingWorld (mutants: talk counted twice, the ease crossing zero, a bad record kept)', () => {
   assert.equal(LIVING_WORLD_VENDOR, 'LivingWorld');
   assert.deepEqual([FRIEND_AT, ENEMY_AT, HOSTILE_AT, EASE_PER_DAY], [40, -40, -70, 0.5]);
-  assert.deepEqual(EVENTS, { talk: 3, polite: 1, gift: 8, helped: 20, saved: 35, struck: -45, crime: -15, slain: -75, insulted: -6, poached: -4, compliment: 2, embrace: 3, kiss: 4 });   // LW7: one of their own slain turns them hostile; PIN MOVED (LW14): a find poached; PIN MOVED (COURT-DEEDS, Field-Bugs-2026-10-26d): a compliment, a hug, a kiss
+  assert.deepEqual(EVENTS, { talk: 3, polite: 1, gift: 8, helped: 20, saved: 35, struck: -45, crime: -15, slain: -75, insulted: -6, poached: -4, compliment: 2, embrace: 3, kiss: 4 });   // LW7: one of their own slain turns them hostile
   const rel = createRelations();
   assert.equal(rel.regard('L1.0', 10), 0);
   assert.equal(rel.known('L1.0'), false);

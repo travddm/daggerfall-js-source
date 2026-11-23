@@ -1,6 +1,4 @@
-// MW-D51 + MW-D52 (2026-09-16, Mac: "Morrowind model needs a torch to
-// hold when a torch is equipped" / "Morrowind crouch animation is
-// missing").
+// MW-D51 + MW-D52.
 //
 // MW-D51: THE HELD TORCH. Morrowind's torch is a LIGH record with a
 // mesh, carried at the Shield Bone (Slot_CarriedLeft, the shield's own
@@ -26,10 +24,8 @@ import { fileURLToPath } from 'node:url';
 import {
   pickTorchRecord, blendMaskBones, overlayTracks, overlaySampler, MW_LIGHT_CARRY, MW_LIGHT_FIRE,
 } from '../../src/formats/morrowind/mwFirstPerson.js';
-import {
-  resolveTorchPart, torchPartPaths, TORCH_BONE, TORCH_GROUP, LIGHT_ATTITUDE, idleBaseFor, FP_IDLE_SNEAK, FP_IDLE_BASE,
-  carriedLeftVisible, createFpArm, fpSkeletonPath, FP_CLIP_PATH,
-} from '../../src/combat/fpArm.js';
+import { TORCH_GROUP, idleBaseFor, FP_IDLE_SNEAK, FP_IDLE_BASE, carriedLeftVisible, createFpArm, fpSkeletonPath, FP_CLIP_PATH } from '../../src/combat/fpArm.js';
+import { resolveTorchPart, torchPartPaths, TORCH_BONE, LIGHT_ATTITUDE } from '../../src/combat/fpArm/fpArmParts.js';
 import { MW_WEAPON_TYPE, weaponFlags, MW_TWO_HANDED } from '../../src/formats/morrowind/mwFirstPerson.js';
 import { armBuildOptsOf, isLitTorch } from '../../src/combat/weapon/weaponRig.js';
 import { TEMPLATES } from '../../src/systems/useItem.js';
@@ -82,7 +78,7 @@ test('MW-D51 resolveTorchPart / torchPartPaths: nothing unlit; a note, never a t
   // caller's `attitude`, and ActorAnimation::attach passes one for a LIGHT
   // alone (:97-103) and never for a weapon (:104-105) - an extra -90 about
   // X, which this port's own reference notes wrote down at
-  // 02-Formats/Morrowind-Rules.md:3228 and the code never applied. It
+  // docs/formats/morrowind.md and the code never applied. It
   // rides `preTransform`, the seam the arrow already uses, which is the
   // same place in the chain the reference's PAT sits.
   assert.deepEqual(ok.parts[0].preTransform, LIGHT_ATTITUDE);
@@ -273,7 +269,7 @@ test('AUDIT MW-TORCH F6/F7: a build arriving mid-build is queued and runs (the n
   assert.equal(second.queued, true, 'the second is queued behind the first, not refused');
   assert.equal((await first).ok, true);
   await settle(() => arm.builtFor() && arm.builtFor().faceIndex === 2);
-  assert.deepEqual(arm.builtFor(), { race: 'fprace', female: false, faceIndex: 2, werewolf: false, vampire: false }, 'the queued build ran and its identity stands');   // PIN MOVED (PORTRAIT3D): and the curse's face
+  assert.deepEqual(arm.builtFor(), { race: 'fprace', female: false, faceIndex: 2, werewolf: false, vampire: false }, 'the queued build ran and its identity stands');
   assert.equal(arm.ready(), true);
   // F7
   const inFlight = arm.build({ race: 'fprace', faceIndex: 5, deps });
@@ -291,31 +287,30 @@ test('AUDIT MW-TORCH F6/F7: a build arriving mid-build is queued and runs (the n
 test('MW-D51/52 pins: the rig hands the lit light over per frame and at the build; the arm hides the torch on the carried-left rule, overlays it on both rigs, re-picks it on a view switch; the idle reads the stance (mutant: a door dropped)', () => {
   const rig = rd('src/combat/weapon/weaponRig.js');
   assert.match(rig, /torch: isLitTorch\(entity\.lightSource\),/, 'armBuildOptsOf carries the lit light');
-  // PIN MOVED (TWO-HANDS): the weapon handed over is `armItem` (the right hand's item with both hands up), and the hands'
   // mode and the left hand's weapon ride beside it before the light (was: `fpArm.setWeapon(playerWeapon.weapon, ...)`
   // straight above `fpArm.setTorch`)
   assert.match(rig, /fpArm\.setWeapon\(armItem, \{ hasAmmo: hasAmmoFor\(entity\?\.items, armItem\), ammoCount: ammoCountFor\(entity\?\.items, armItem\) \}\);[^\n]*\n\s*fpArm\.setHands\([^\n]*\n(?:\s*const offItem = [^\n]*\n)?\s*fpArm\.setOffWeapon\([^\n]*\n/, 'the hands\' hand-over');
-  // PIN MOVED (TWO-HANDS AUDIT 2): the hands go through their one door (handArm - the enhanced pack asks it too), and the
   // light is handed over beside its call in the frame
-  assert.match(rig, /const \{ armItem, offItem \} = handArm\(\);\n(?:\s*\/\/[^\n]*\n)*\s*fpArm\.setTorch\(isLitTorch\(entity\?\.lightSource\)\);/, 'the per-frame hand-over, beside the weapon');   // PIN MOVED (TWO-HANDS x WEAPON-GLOW1): the left item named once, its blade and its glow
+  assert.match(rig, /const \{ armItem, offItem \} = handArm\(\);\n(?:\s*\/\/[^\n]*\n)*\s*fpArm\.setTorch\(isLitTorch\(entity\?\.lightSource\)\);/, 'the per-frame hand-over, beside the weapon');
   assert.equal(isLitTorch({ templateIndex: TEMPLATES.Torch }), true);
   assert.equal(isLitTorch({ templateIndex: TEMPLATES.Lantern }), false, 'a lantern is the classic lane’s');
   assert.equal(isLitTorch(null), false);
   const opts = armBuildOptsOf({ race: 'Argonian', gender: 'male', faceIndex: 0, items: [], lightSource: { templateIndex: TEMPLATES.Torch } });
   assert.equal(opts.torch, true);
   const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, sheathed, spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
+  assert.match(arm, /function torchVisible\(\) \{\n\s+if \(!torchLit \|\| !built \|\| !built\.ok\) return false;[\s\S]*?const r = rig\(\);\n\s+if \(!r \|\| !r\.torch\) return false;\n\s+return carriedLeftVisible\(animWeaponType\(built\.mwType, ub\.sheathed, ub\.spellReady\)\);/, 'F1+F2: the reference’s one-line rule, on a light that is actually in this rig’s slot');
   assert.equal((arm.match(/else if \(r\.slot === 'torch'\) r\.hidden = !torchVisible\(\);/g) ?? []).length, 2, 'both world meshes hide on the rule');
   assert.match(arm, /else if \(r\.slot === 'torch'\) r\.hidden = !torchLit;/, 'the portrait shows the lit light whatever the hand holds');
   assert.equal((arm.match(/overlayFor\((?:tBase|fBase), (?:t|built)\.leftArm\)/g) ?? []).length, 2, 'the overlay on both rigs’ own LeftArm sets, through the memo');
   assert.equal((arm.match(/if \((?:t|f)Overlay\) overlayClock = torchState\.time;/g) ?? []).length, 2, 'F4: the torch’s clock through a variable, both rigs - no sampler allocated per frame');
   assert.match(arm, /const overlaySample = overlaySampler\(sampleTrack, \(\) => overlayClock\);/, 'F4: one sampler for the life of the rig');
   assert.match(arm, /if \(pendingBuild\) \{[\s\S]*?api\.build\(o\);\n\s+return;\n\s+\}/, 'F6: a queued build drains first and supersedes the rest');
-  assert.match(arm, /resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
+  assert.match(arm, /slots\.resetIdle\(\);\n\s+refreshTorch\(true\);\s+\/\/ MW-D51/, 'setViewMode re-picks the torch on the new rig’s sources');
   assert.match(arm, /refreshTorch\(\);\n\s+if \(torchState\) advanceClip\(torchState, \(torchSource \|\| rig\(\)\)\.keys, dt, null\);/, 'the torch’s own clock, on its own keys');
   assert.match(arm, /pickAnimSource\(r\.sources, TORCH_GROUP, resetClip, \{ loopFallback: true \}\)/, '"torch", start to stop, looping');
-  assert.match(arm, /const base = idleBaseFor\(\{ sneaking, inJump: !!jumpState, hasGroup \}\);/, 'MW-D52: refreshIdle takes the state');
-  assert.match(arm, /const short = base === FP_IDLE_SNEAK \? null : weaponShortGroup\(type\);/, 'the sneak idle rolls no loop dice');
+  const slots = rd('src/combat/fpArm/animSlots.js');
+  assert.match(slots, /idleBaseFor\(\{ sneaking: ctx\.sneaking\(\), inJump: !!slots\.jumpState, hasGroup: ctx\.hasGroup \}\)/, 'MW-D52: the idle takes the state');
+  assert.match(slots, /if \(base === FP_IDLE_SNEAK\) return \{ group: base, dice: false \};/, 'the sneak idle rolls no loop dice');
   assert.match(arm, /if \(pendingTorch !== null\) \{ const l = pendingTorch; pendingTorch = null; api\.setTorch\(l\); \}/, 'a light that arrived mid-build is not dropped (MAC-S1’s law)');
   const menu = rd('src/ui/enhanced/enhancedMenu.js');
   assert.doesNotMatch(menu, /\['Torch', armState\.torch/, 'MWA4: the carried light left the card with the per-piece readout - status() still carries it');

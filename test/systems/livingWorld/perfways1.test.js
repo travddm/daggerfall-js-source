@@ -1,5 +1,4 @@
-// PERF-WAYS1 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"; bible/07-Rendering/Performance-Online.md): THE WAYS ASKED WHILE THE FRAME'S ASKING IS CHEAP. Online, the
+// PERF-WAYS1: THE WAYS ASKED WHILE THE FRAME'S ASKING IS CHEAP. Online, the
 // living world's readers planned every trip of every town near again each frame while any way they needed was unasked
 // - 16.8 ms of the real game's 36.5 ms frame on the probe's container - and the ways filled at two a frame. LW3's two
 // stay the floor; past them a frame asks on while its asking has taken under WAYS_MS_PER_FRAME (and never past

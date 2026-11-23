@@ -1,5 +1,4 @@
-// THE EIGHTEEN STOCK CLASSES, REVISED (CLASS-USE, 2026-10-21, the owner: "Can you update the premade classes to be
-// more useful?"). Record: bible/04-Characters/Stock-Classes.md; Port-Ledger section A, CLASS-USE.
+// THE EIGHTEEN STOCK CLASSES, REVISED (CLASS-USE, 2026-10-21). Record:; Port-Ledger section A, CLASS-USE.
 //
 // DFU's CreateCharClassSelect (:59-61) hands the player each CLASSnn.CFG career as the file has it, and several of
 // those careers spend their skill groups badly: the Barbarian's three majors are Jumping, Running and Swimming, the

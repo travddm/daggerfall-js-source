@@ -1,4 +1,4 @@
-// SD7a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE UNMOORED STEPS' LAW
+// SD7a: THE UNMOORED STEPS' LAW
 // (world/superDungeon/sdSteps.js) - the course from the Orrery's first step to the Last Moment's arena: the Drift, the Beat and the
 // Crumble, their checkpoints, how each step moves on the realm's clock, the Warp's breath, and the void's cast-back.
 // Its fairness is pinned to the engine's own numbers (player/motor.js, player/parkour.js), not to the design's.

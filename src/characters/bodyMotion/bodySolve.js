@@ -1,5 +1,5 @@
 // @ts-check
-// BODY-MOTION (2026-10-18; bible/04-Characters/Body-Motion.md) - THE SOLVE. A whole body's request laid on the skeleton
+// THE SOLVE. A whole body's request laid on the skeleton
 // over the clip's pose, in the order a body is built from the ground up:
 //   1. THE HIPS turned to the body-frame turn asked (the pelvis and the bone that carries the thighs, together - the
 //      rest's own build between them kept), then the body moved so the hips' middle stands where it was asked;
@@ -46,8 +46,8 @@ export function bodyFrames(body, mats) {
 }
 
 /** THE ANKLE'S RANGE (degrees off the rest's own shin-to-toe angle): how far a foot in the air may draw its toes up toward
- *  the shin, and point them away (AUDIT BODY-MOTION GAIT-4: the swing's pitch is the ground's, so a run's mid-swing,
- *  its shin swung back, drew the toes up 82 degrees). A foot on the ground keeps the gait's: it stands on the ground. */
+ *  the shin, and point them away: the swing's pitch is the ground's, so in a run's mid-swing,
+ *  with the shin swung back, the toes would draw up far too much. A foot on the ground keeps the gait's: it stands on the ground. */
 export const ANKLE = Object.freeze({ dorsi: 25, plantar: 50 });
 
 const IDENT = Object.freeze([1, 0, 0, 0, 1, 0, 0, 0, 1]);
@@ -61,7 +61,7 @@ const toward = (Rc, Rt, w) => (w >= 1 ? Rt : mul(rotFraction(mul(Rt, transpose(R
  *   chest  - { yaw, roll, pitch } - the chest's turn in the body frame;
  *   head   - { yaw, roll, pitch } - the head's;
  *   feet   - { L, R }: { at, toe, up, w } - the ankle's point, the toes' way, the sole's up;
- *   armW   - { L, R }: how far each arm is the layer's (0 the clip's - a bow's, a spell's, a draw's, the long gun's, a
+ *   armW   - { L, R }: how far each arm is the layer's (0 the clip's - a bow's, a spell's, a draw's, a
  *            torch's left): the chest, the neck and the head are the layer's as far as either arm is, each collarbone as
  *            far as its own arm is - the rest the clip's, so an aim the clip holds stays where it holds it;
  *   arms   - (ctx) => { L, R }: each a climb hand request ({ at, fingers, palm, pole, curl, w }) or null, asked with
@@ -109,9 +109,8 @@ export function solveBody(skeleton, pose, rootRef, skelMats, plan) {
   }
   // the trunk: the chest's turn spread up the spine; then the neck and the collarbones as they stand at rest on it (the
   // clip's own swings of them - an attack clip's, a draw's - would carry the shoulders off the arms' requests)
-  // AUDIT BODY-MOTION RIG-4 / DOC-3 / CARRY-10: the upper body is whoever has the arms' - the layer's chest turn, lean
-  // and collarbones under a bow's arms swung its hand 18.6 units and 38 degrees off the clip's aim, and turned a long
-  // gun's barrel 9 to 14 degrees with the gait's counter-turn
+  // the upper body is whoever has the arms' - the layer's chest turn, lean
+  // and collarbones under a bow's arms swung its hand 18.6 units and 38 degrees off the clip's aim
   const armL = clamp01(plan.armW?.L ?? 1), armR = clamp01(plan.armW?.R ?? 1), armAny = Math.max(armL, armR);
   if (plan.chest) {
     const own = mul(mul(bodyTurn(plan.chest.yaw ?? 0, plan.chest.roll ?? 0, plan.chest.pitch ?? 0), body.chestFix), body.restRot.get(body.chest));

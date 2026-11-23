@@ -22,22 +22,21 @@
 // reader of the older build reads - which knows `b` alone - is unchanged, and a new reader of an old record leads
 // nothing.
 //
-// HOLDINGS (2026-10-03, Mac: "This also introduces the ability to change your ship name for others to see" -
-// bible/03-World/Holdings.md): A NAMED BOAT SAYS HER NAME. `n`, beside `b` as `m` is - a name for each of `b`'s, '' for
+// HOLDINGS: A NAMED BOAT SAYS HER NAME. `n`, beside `b` as `m` is - a name for each of `b`'s, '' for
 // one her captain never named - and only while one of them has one, so an unnamed fleet's record is the older build's
 // to the letter. A reader takes each name through the ledger's own law (systems/fleet.js shipNameVerdict: printable,
 // SHIP_NAME_MAX, the name filter every player's name passes); a name it refuses reads as none. A bad `n` never drops the
 // boats - a name is a thing to read, not a thing to stand on - and an older reader ignores the key.
 //
-// SHIP-COLOURS (2026-10-17, bible/03-World/Naval-Refit.md): A BOAT FLYING HER CAPTAIN'S FLAG SAYS IT. `f`, beside `b` as
+// SHIP-COLOURS: A BOAT FLYING HER CAPTAIN'S FLAG SAYS IT. `f`, beside `b` as
 // `n` is - a flag's seven numbers for each of `b`'s (systems/naval/shipFlag.js flagCode), 0 for one that flies the mod's
 // pennant - and only while one of them flies a flag. Its reader takes each through the flag's own door (flagOfCode); one
 // it refuses reads as the pennant, never a reason to drop the boats, and an older reader ignores the key.
 //
-// SHIP-LIVERY (2026-10-17, bible/03-World/Naval-Refit.md): A PAINTED BOAT SAYS HER PAINT. `l`, beside `b` as `f` is - a
+// SHIP-LIVERY: A PAINTED BOAT SAYS HER PAINT. `l`, beside `b` as `f` is - a
 // livery's one number for each of `b`'s (systems/naval/shipLivery.js liveryCode), 0 for one as built - and only while
 // one of them is painted. Its reader takes each through the livery's door (liveryOfCode); one it refuses reads as built.
-// DECK-PROPS (2026-10-17): A FITTED BOAT SAYS HER FITTINGS. `d`, beside `b` - each boat's fittings as four numbers each
+// DECK-PROPS: A FITTED BOAT SAYS HER FITTINGS. `d`, beside `b` - each boat's fittings as four numbers each
 // (systems/naval/deckFittings.js fittingsCode), [] for none - only while one of them is fitted; a reader takes each list
 // through the fittings' door (fittingsOfCode), one it refuses read as none.
 import { POSE_BOUND, POSE_Y_BOUND, POSE_ABOARD_SLOTS } from '../../net/wire.js';
@@ -54,7 +53,7 @@ export const CSA_WIRE_BOATS_MAX = POSE_ABOARD_SLOTS;
 export const CSA_WIRE_VARIANTS = 10;
 /** The sails a hull's bits can name (the Carrack's are the most). */
 export const CSA_WIRE_SAILS_MAX = 16;
-/** CSA-K: a way and a turn past these are no boat's (natives a second, degrees a second) - AUDIT 2 XA6 (2026-10-06): the
+/** CSA-K: a way and a turn past these are no boat's (natives a second, degrees a second) - AUDIT 2 XA6: the
  *  way sized from its real ceiling, SAIL-FREE's fastest (a Carrack on her quarter in the sea's strongest wind with her
  *  Rigging at its best, 43.6 m/s) at the Handling dials' tenfold and the world's fastest time scale (timeScale.js
  *  MAX_TIME_SCALE, a road journey's x100), in natives (SCENE_MAP_RATIO 40): 1.74M a second. It was 64k (that tenfold on

@@ -1,5 +1,5 @@
 // @ts-check
-// ARENA5 (2026-10-03): THE HALL OF CHAMPIONS' PLAQUE WALL. Arena.md "1. The building", the undercroft: "it holds ... the
+// ARENA5: THE HALL OF CHAMPIONS' PLAQUE WALL. Arena.md "1. The building", the undercroft: "it holds ... the
 // Hall of Champions - a plaque wall naming every Grand Champion this save (offline) or this realm (online)". ARENA-FIX 4
 // stood the Keeper of the Hall and her trophies and let her READ the names (systems/arena/arenaLadder.js hallOfChampions; online
 // scenes/arena/arenaGate.js hall); no wall was drawn. This is the wall:

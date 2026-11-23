@@ -1,7 +1,6 @@
 // @ts-check
-// SD1 (2026-10-05, Mac: "Super dungeons are random finds on the world map, and spawn where population is at its most.
-// Only one can be active at a time." ... "The Super dungeon collapses when the feat is done."): THE SUPER DUNGEON'S
-// LAW - its slot, its record's life, where it rises, its name, its room. Design: bible/11-Multiplayer/Super-Dungeons.md
+// SD1: THE SUPER DUNGEON'S
+// LAW - its slot, its record's life, where it rises, its name, its room. Design:
 // sections 2-4.
 //
 // THE RECORD IS THE HUB'S. One Super dungeon stands at a time, so the world channel (`chat:world`, the room every
@@ -18,10 +17,23 @@
 // record's projection (validSdRecord) is the wire's, beside the frame that carries it (SD3) - re-exported here.
 //
 // Not a DFU member: Daggerfall has no other players and no world events. Ledger A (SUPER-DUNGEONS).
-import { sanitizeName, PIXEL_UNITS, SD_REGION_COUNT, SD_SLOT_MAX, SD_FIGHTERS_MAX } from '../wire.js';
+import { sanitizeName, PIXEL_UNITS, SD_REGION_COUNT, SD_SLOT_MAX, SD_FIGHTERS_MAX, SD_LANE_SPAN, sdLaneWire, sdLaneOpen, sdLaneRegionOk, SITE_EVENT_LANES, CHAT_BAY_REGIONS } from '../wire.js';
 import { gateHash, PIXEL_M } from '../gate/gateLaw.js';
 
-export { SD_PHASES, SD_REGION_COUNT, SD_SLOT_MAX, SD_FIGHTERS_MAX, validSdRecord } from '../wire.js';
+export { SD_PHASES, SD_REGION_COUNT, SD_SLOT_MAX, SD_FIGHTERS_MAX, validSdRecord, SD_LANE_SPAN, sdLaneOpen, sdLaneRegionOk } from '../wire.js';
+
+// ═══ WW5: A HOLLOW IN EVERY THEATRE ═══════════════════════════════════
+//
+// (WW5) One Hollow stands at a time IN EACH THEATRE that keeps one (net/wire.js SITE_EVENT_LANES - the Bay's, the
+// eight provinces'; Cyrodiil's open zone none): a LANE a theatre, each its own director's record, its own census, its own
+// rest. A slot names its lane (lane `t`'s are t * SD_LANE_SPAN + 1, + 2 ...: the Bay's the 1, 2, 3 they always were), so
+// a slot is still one Hollow's whole identity everywhere it is read.
+/** The lane slot `s` is on (net/wire.js sdLaneWire). */
+export const sdLaneOf = (s) => sdLaneWire(s);
+/** The lanes the hub keeps a Hollow on. */
+export const SD_LANES = SITE_EVENT_LANES;
+/** The census's regions a lane's Hollow may rise in: the Bay's 62 (all but SD_TOWNLESS_REGIONS), a province's one. */
+export const sdLaneRegions = (lane) => (lane === 0 ? Array.from({ length: CHAT_BAY_REGIONS }, (_, r) => r) : sdLaneOpen(lane) ? [CHAT_BAY_REGIONS - 1 + lane] : []);
 
 /** How long a Hollow stands unbeaten before it fades, real ms (two days). */
 export const SD_LIFETIME_MS = 48 * 3600 * 1000;
@@ -38,7 +50,7 @@ export const SD_FIRST_RISE_MS = 10 * 60 * 1000;
 export const SD_FADE_GRACE_MS = 15_000;
 /** A region needs this many distinct verified accounts in it for the census to choose it. */
 export const SD_CENSUS_MIN = 2;
-/** SD-SEA (FIELD BUGS 2026-10-20b, bible/01-Overview/bugs/Field-Bugs-2026-10-20b.md): THE REGIONS NO HOLLOW CAN RISE IN -
+/** SD-SEA (FIELD BUGS 2026-10-20b): THE REGIONS NO HOLLOW CAN RISE IN -
  *  those MAPS.BSA gives no city, town or village to rise by (systems/superDungeon/sdSite.js sdCities finds none), by index,
  *  which the census never chooses. 31 is the sea's: formats/mapsFile.js getRegionIndexAt reads politic 64 - every water
  *  pixel of the Bay and the ocean, PlayerGPS.cs's own law - as High Rock sea coast, so every player aboard a ship stands
@@ -84,16 +96,18 @@ export const sdHolds = (rec, now) => { const p = sdPhase(rec, now); return p ===
 // One function per move, each refusing a move its phase does not allow - the hub calls them and stores what comes
 // back; a null is "not now", never an error.
 
-/** The hub's first beat: nothing has risen, the first rise SD_FIRST_RISE_MS on. */
-export const sdFirst = (now) => /** @type {SdRecord} */ ({ s: 0, ph: 'gone', r: -1, at: now, until: now, next: now + SD_FIRST_RISE_MS });
+/** The hub's first beat: nothing has risen, the first rise SD_FIRST_RISE_MS on. WW5: a lane's own - its zero slot. */
+export const sdFirst = (now, lane = 0) => /** @type {SdRecord} */ ({ s: lane * SD_LANE_SPAN, ph: 'gone', r: -1, at: now, until: now, next: now + SD_FIRST_RISE_MS });
 
 /** A new Hollow rises - the next slot, in the census's region (-1: the Bay's great cities). Null while the last stands
- *  or rests. */
-export function sdRise(prev, now, region) {
+ *  or rests. WW5: on the lane `prev` is (`lane` for a lane with no record yet) - its next slot in its own span, a region
+ *  its own (net/wire.js sdLaneRegionOk: a province's Hollow rises in its province, or by its great cities). */
+export function sdRise(prev, now, region, lane = prev ? sdLaneOf(prev.s) : 0) {
   if (prev && (sdPhase(prev, now) !== 'gone' || now < prev.next)) return null;
-  if (!Number.isSafeInteger(region) || region < -1 || region >= SD_REGION_COUNT) return null;
-  const s = (prev?.s ?? 0) + 1;
-  if (s > SD_SLOT_MAX) return null;
+  if (!sdLaneOpen(lane) || (prev && sdLaneOf(prev.s) !== lane)) return null;
+  if (!Number.isSafeInteger(region) || region < -1 || region >= SD_REGION_COUNT || !sdLaneRegionOk(lane, region)) return null;
+  const s = (prev?.s ?? lane * SD_LANE_SPAN) + 1;
+  if (s > SD_SLOT_MAX || sdLaneOf(s) !== lane) return null;
   return /** @type {SdRecord} */ ({ s, ph: 'risen', r: region, at: now, until: now + SD_LIFETIME_MS, next: now + SD_LIFETIME_MS + SD_COOLDOWN_MS });
 }
 
@@ -103,8 +117,7 @@ export function sdFind(rec, now, name) {
   return /** @type {SdRecord} */ ({ ...rec, ph: 'found', foundAt: now, fb: sanitizeName(name) });
 }
 
-/** SD-THROUGH (2026-10-21, the owner: "When someone finds and enters the portal. I want a portal to show up for anyone in
- *  the dungeon and anyone entering that automatically leads them there."): the first soul through its Rift - stamped
+/** SD-THROUGH: the first soul through its Rift - stamped
  *  once, at `now`, while it is found and its boss stands (its realm's first admission, told to the hub). From then on
  *  every client in its Hollow, and every one entering it, stands the Way Through beside them
  *  (world/superDungeon/sdDungeon.js sdThroughStands). */
@@ -154,14 +167,15 @@ export const sdRoll = (s, k) => gateHash(SD_SALT, s, k);
  * THE CENSUS'S REGION: of the regions holding at least SD_CENSUS_MIN distinct verified accounts (`counts[r]`), the
  * fullest - ties broken by the slot's roll, and the last Hollow's region (`last`) resting while another qualifies, so
  * one crowd does not keep every Hollow. SD-SEA: never a region with no town to rise by (SD_TOWNLESS_REGIONS - the
- * sea's most of all). -1 when none qualifies: the Bay's great cities.
+ * sea's most of all). -1 when none qualifies: the Bay's great cities. WW5: the slot's LANE's regions alone (sdLaneRegions
+ * - a crowd in Skyrim draws Skyrim's Hollow, never the Bay's), -1 its own great cities.
  * @param {number} s the slot about to rise
- * @param {ArrayLike<number>} counts by region index
+ * @param {ArrayLike<number>} counts by region index (every region of the world's, SD_REGION_COUNT)
  * @param {number} [last]
  */
 export function pickSdRegion(s, counts, last = -1) {
   const qual = [];
-  for (let r = 0; r < SD_REGION_COUNT; r++) if (Number(counts?.[r] ?? 0) >= SD_CENSUS_MIN && !TOWNLESS.has(r)) qual.push(r);
+  for (const r of sdLaneRegions(sdLaneOf(s))) if (Number(counts?.[r] ?? 0) >= SD_CENSUS_MIN && !TOWNLESS.has(r)) qual.push(r);
   const pool = qual.length > 1 ? qual.filter((r) => r !== last) : qual;
   if (!pool.length) return -1;
   const top = Math.max(...pool.map((r) => Number(counts[r])));
@@ -218,8 +232,8 @@ export function sdNameOf(s, city = '') {
 
 // ═══ THE ROOM ═════════════════════════════════════════════════════════
 //
-// SD-PARTY (2026-10-28, the owner: "we need to make this a party instance"): ONE room per slot AND party, `sd:<s>.<owner>`,
-// the owner the party's account digest (net/instanceRoom.js instanceOwnerOf - the Ketch's crew law); its door the owner,
+// SD-PARTY: ONE room per slot AND party, `sd:<s>.<owner>`,
+// the owner the party's account digest (net/instanceRoom.js instanceOwnerOf); its door the owner,
 // staff and the owner's party (server/src/sdCopy.js). SD-SOLO ("if no one is in a party allow them to be put into a 8
 // player instance"): owner `p<n>`, a shared Hour of SD_PUB_SEATS, the next opened when it is full or won.
 const SD_ROOM = /^sd:([1-9]\d{0,8})\.([0-9a-f]{16}|p(?:0|[1-9]\d?))$/;
@@ -243,8 +257,10 @@ export const sdOwnerOfRoom = (key) => SD_ROOM.exec(String(key ?? ''))?.[2] ?? nu
 // to nobody: it is a find.
 /** AUDIT SD III (T19): WHERE AN ABYSS DUNGEON STANDS, in a line: near its city, else in its region (*in the Alik'r
  *  Desert region* - it read *near Alik'r Desert*), else near the Bay. Pure. */
-export const sdWhere = (near, region = '') => (near ? `near ${near}` : region ? `in the ${region} region` : 'near the Iliac Bay');
-export const sdFoundLine = ({ who, near, region }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region)}!`;   // ABYSS-NAME (Mac: "lets rename Super Dungeons to Abyss Dungeons"): the player's word; the code's stays `super`
+/** The Bay's own name in a line, its one home (sdWhere's). */
+export const SD_BAY_NAME = 'the Iliac Bay';
+export const sdWhere = (near, region = '', province = '') => (near ? `near ${near}` : region ? `in the ${region} region` : province ? 'in ' + province : 'near ' + SD_BAY_NAME);   // WW5: a province's Hollow is in its province (`province` - its name)
+export const sdFoundLine = ({ who, near, region, province = '' }) => `${who} has found an Abyss Dungeon ${sdWhere(near, region, province)}!`;   // ABYSS-NAME: the player's word; the code's stays `super`
 /** AUDIT SD II (L6 F20): a Hollow's name inside a sentence - its article small ("in the Brass Hollow"), as the Orrery's
  *  stones store theirs (net/superDungeon/sdBrain.js). */
 export const sdNameIn = (name) => String(name ?? '').replace(/^The /, 'the ');
@@ -257,11 +273,10 @@ export const SD_NO_RIFT = 'The Rift will not take you yet.';
 export const SD_NO_CLOSED = 'The Hour has closed.';
 /** And the realm's seats every one taken (SD_FIGHTERS_MAX accounts have entered it). */
 export const SD_NO_FULL = 'The Hour is full.';
-/** SD-ONELIFE (2026-10-07, Mac: "A death within the rift casts you out and youre unable to re enter. You get one life to
- *  prove your worth"): the Hour refuses an account that died in it - one life a Hollow. */
+/** SD-ONELIFE: the Hour refuses an account that died in it - one life a Hollow. */
 export const SD_NO_FALLEN = 'The Hour will not take you back.';
 /**
- * SD-REZ (EVENT-RULES, 2026-10-25, the owner: "Resurrect allowed" in the Hour, the Spire and the Ketch): ONE LIFE, UNLESS A
+ * SD-REZ (EVENT-RULES, 2026-10-25, in the Hour and the Spire): ONE LIFE, UNLESS A
  * FRIEND CALLS IT BACK. A death in the Hour no longer marks its account dead at once: the realm keeps it DOWN (`down`,
  * `[sub, at, x?, z?]` - where it fell, the realm's metres, when its dying pose said) for SD_REZ_MS. AUDIT WORLD-EVENTS L1-1:
  * THE RAISE IS THE REALM'S TO RECORD - a living fighter of the realm casting Resurrect at the body says so to the realm

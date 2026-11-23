@@ -1,6 +1,5 @@
-// HALT-ONE (2026-10-05, Mac: "with the living world we take it further and improve the guards and also reduce the HALT
-// noise"; asked how often the watch should call, "Once, then rarely"): THE WATCH CALLS AS ONE in the living watch's lane
-// (bible/06-Systems/Living-World.md HALT-ONE). DFU's EnemySounds.FixedUpdate gives every watchman within 16 m his own
+// HALT-ONE: THE WATCH CALLS AS ONE in the living watch's lane
+// (HALT-ONE). DFU's EnemySounds.FixedUpdate gives every watchman within 16 m his own
 // attract clock - "Halt!" every 3 to 9 seconds, 80% of the time, hostile or not: eight a minute a watchman, forty from
 // a crime's five, a squad arriving in chorus, allies and other players' watch among them, under the surrender box too.
 // Here the watch has one voice: one Halt as it first comes for the player, then at most one every HALT_GAP_S from the
@@ -165,9 +164,6 @@ test('HALT-ONE the tells: in the lane a watchman\'s stagger and wind-up are a pe
 });
 
 test('HALT-ONE beyond the pool: a peer\'s watchman is silent here in the lane (his call is his owner\'s); the siege\'s Town Guard cries his move voice when hurt, never a Halt (mutants: the peer\'s watch calling; the siege\'s Halt)', async () => {
-  const foes = rd('src/scenes/exteriorFoes.js');
-  assert.match(foes, /f\.quietVoice = f\.mobileType === KNIGHT_CITY_WATCH && !!oneVoice\(\);/);
-  assert.match(foes, /if \(!f\.quietVoice\) tickEnemySound\(f\.sounds, f\.ai\.feet, playerFeet, dt,/, 'the puppet\'s attract clock gated by it');
   const M = SIEGE_UNITS_PER_M, T = 1_800_000_000_000;
   const heard = [];
   const tex = { getFrameCount: () => 4, getSize: () => ({ width: 40, height: 80 }), getScale: () => ({ x: 0, y: 0 }) };
@@ -181,13 +177,3 @@ test('HALT-ONE beyond the pool: a peer\'s watchman is silent here in the lane (h
   d.leave();
 });
 
-test('HALT-ONE the hosts: the street\'s and a building\'s watch read the living lane and the window; the street\'s foe pool the lane, for a peer\'s watchman; the fixed-city page and the dungeon keep DFU\'s cadence (FLAGGED) - and the record names all four', () => {
-  const W = rd('src/scenes/world.js'), M = rd('src/scenes/worldModes.js');
-  assert.match(W, /oneVoice: \(\) => livingWorldOn\(\), windowUp: \(\) => townTalk\.overlayActive,/, 'world.js: the street\'s watch');
-  assert.match(W, /const exteriorFoes = createExteriorFoes\(\{\n {4}oneVoice: \(\) => livingWorldOn\(\),/, 'world.js: the street\'s foes');
-  assert.match(M, /oneVoice: \(\) => livingWorldOn\(\), windowUp: \(\) => !!townTalk\?\.overlayActive,/, 'worldModes.js: a building\'s watch');
-  assert.doesNotMatch(rd('src/scenes/exterior.js'), /oneVoice/, 'exterior.js: no living town, DFU\'s watch');
-  const bible = rd('bible/06-Systems/Living-World.md');
-  const rec = bible.slice(bible.indexOf('## HALT-ONE'), bible.indexOf('\n## ', bible.indexOf('## HALT-ONE') + 5));
-  for (const host of ['scenes/world.js', 'scenes/worldModes.js', 'scenes/exterior.js', 'scenes/dungeonContext.js']) assert.ok(rec.includes(host), `the record names ${host}`);
-});

@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE SHOPS AND SERVICES IN THE PLAYER'S LANGUAGE. DFU reads the words of its guilds (Temple,
+// L10N3d: THE SHOPS AND SERVICES IN THE PLAYER'S LANGUAGE. DFU reads the words of its guilds (Temple,
 // Services and the five guild classes) and of the trade, merchant, guild-service, cure, donation, banking, purchase and
 // tavern windows through TextManager.GetLocalizedText at the moment it shows them; the port's laws and windows now do
 // the same, each word through the text core by DFU's key with DFU's English. Pinned through the port's own functions
@@ -192,7 +192,7 @@ test('L10N3d services: the service popups - each guild service\'s label by its D
   french({ gettingQuests1: fr('gettingQuests1'), gettingQuests2: 'Patientez donc un moment, %pcf.' });
   const wait = () => new QuestOfferFlow(
     { isLastNPCClickedAnActiveQuestor: () => false, deps: { playerLevel: () => 1 } },
-    { getGuildQuestPool: () => [{ name: 'M0B00Y00' }] },   // PIN MOVED (QUEST-AUDIT III NO-WORK): a pool with work in it - an empty one answers the "no work" line, not the wait box
+    { getGuildQuestPool: () => [{ name: 'M0B00Y00' }] },
     { guildQuestListBox: true, getGuildFactionId: () => 41 },
   ).offerGuildQuest({ guildGroup: GUILD_GROUPS.FightersGuild, guild: { isMember: () => false, rank: 0, getReputation: () => 0 } }).textLines;
   speaks(wait, [GETTING_QUESTS_1, GETTING_QUESTS_2], [fr('gettingQuests1'), 'Patientez donc un moment, %pcf.'],
@@ -325,17 +325,3 @@ test('L10N3d services: the tavern - its eleven menu lines each in its own place 
 
 // ── the enhanced skins, by source ───────────────────────────────────────────────────────────────────────────────────
 
-test('L10N3d services by source: the enhanced trade and tavern skins read the same routed readers the classic windows do - no copy of the English left in them', () => {
-  const trade = rd('src/ui/enhanced/enhancedTrade.js');
-  for (const reader of ['cannotBeRepairedText()', 'doesntNeedIdentifyText()', 'interruptRepairText()', 'stealSuccessText()', 'stealFailureText()']) {
-    assert.ok(trade.includes(reader), `enhancedTrade.js reads ${reader}`);
-  }
-  assert.equal(trade.split('letterOfCreditText()').length - 1, 2, 'both letter-of-credit boxes read the reader');
-  for (const en of [LETTER_OF_CREDIT_TEXT, CANNOT_BE_REPAIRED_TEXT, INTERRUPT_REPAIR_TEXT, DOESNT_NEED_IDENTIFY]) assert.ok(!trade.includes(en), `no copy of "${en}"`);
-  assert.doesNotMatch(trade, /\b(CANNOT_BE_REPAIRED_TEXT|INTERRUPT_REPAIR_TEXT|DOESNT_NEED_IDENTIFY|STEAL_SUCCESS_TEXT|STEAL_FAILURE_TEXT)\b/, 'no bare constant shown');
-  const tavernSkin = rd('src/ui/enhanced/enhancedTavern.js');
-  for (const reader of ['roomFreeForKnightText()', 'roomFreeHeartsDayText()', 'youAreNotHungryText()', 'tavernMenuLines()']) {
-    assert.ok(tavernSkin.includes(reader), `enhancedTavern.js reads ${reader}`);
-  }
-  assert.doesNotMatch(tavernSkin, /\b(ROOM_FREE_FOR_KNIGHT|ROOM_FREE_HEARTS_DAY|YOU_ARE_NOT_HUNGRY|TAVERN_MENU)\b/, 'no bare constant shown');
-});

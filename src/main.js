@@ -14,9 +14,10 @@
 import { crashText } from './ui/crashText.js';   // the crash line, pinned in its own module
 import { Renderer } from './render/renderer.js';
 import { retroFrameConfig } from './systems/retroMode.js';   // RETRO1: the renderer's retro source - the settings are read here, not in render/
+import { classicDistanceShading } from './systems/distance-shading-setting.ts';
 import { renderScaleSetting } from './systems/renderScale.js';   // PERF-SCALE: the renderer's render-scale source, read the same way
 import { windowEmissionRGB } from './render/windowEmission.js';
-// BOOT1 (2026-09-20, Mac: "overall performance improvements"): THE GAME
+// BOOT1: THE GAME
 // HOSTS ARE BEHIND A DOOR, NOT ON THE ENTRY. These four were static
 // imports, and a static import of a host is the host's WHOLE graph at
 // module-evaluation time: 623 files and 13.4 MB of source reached from
@@ -37,7 +38,8 @@ import { windowEmissionRGB } from './render/windowEmission.js';
 const bootExterior = (...a) => import('./scenes/exterior.js').then((m) => m.bootExterior(...a));
 const bootInterior = (...a) => import('./scenes/interior.js').then((m) => m.bootInterior(...a));
 const bootDungeon = (...a) => import('./scenes/dungeon.js').then((m) => m.bootDungeon(...a));
-const bootWorld = (...a) => import('./scenes/world.js').then((m) => m.bootWorld(...a));
+// An online world boots on the server's profile, installed first (profileDoor.ts).
+const bootWorld = (...a) => import('./systems/online/profileDoor.ts').then((d) => d.openProfileDoor(a[2], a[3])).then(() => import('./scenes/world.js')).then((m) => m.bootWorld(...a));
 
 import { ensureArena2, getBytes } from './scenes/dataSource.js';
 import { installCursor } from './ui/cursor.js';
@@ -52,19 +54,27 @@ import { publishBootParams, BOOT_DOOR_KEYS } from './systems/online/onlineLane.j
 import { staleChunkAction, RELOAD_KEY, STALE_CHUNK_TEXT } from './systems/staleChunk.js';
 import { loseGlContext, onPageGone, releaseGlContexts } from './render/glRelease.js';   // GL-LEAK: a leaf - the entry's reach is unchanged
 
+/** Work on the new renderer that runs beside the boot, each module loaded by a dynamic import so the entry's static
+ *  graph stays small: the menu's portrait renderer, and the boot's longest program links, started on the driver's
+ *  threads while the boot reads the game's data (render/boot-programs.ts). */
+function startRendererWork(renderer) {
+  import('./render/portraitRenderer.js').then(({ setPortraitRenderer }) => setPortraitRenderer(renderer)).catch(() => {});   // PORTRAIT3D: the faces' renderer, for the menu's wells that hold none (behind a door: BOOT2's ceiling)
+  import('./render/boot-programs.ts').then((m) => m.startBootPrograms(renderer, location.search)).catch((err) => console.warn('[boot] the programs could not be started early:', err?.message ?? err));
+}
+
 async function boot() {
   installFramePacer();   // FPS-VSYNC: first, before any loop asks for a frame - a no-op but in the app with the wait lifted
   installCursor();   // CLASSIC-CURSOR: DFU's own arrow on the classic skin, from the first frame - it needs no game data
   const canvas = document.getElementById('c');
-  // GPU-TRAIL (render/gpuTrail.js): the desktop shell keeps the GPU's last samples with a crash, so the canvas is counted
-  // before the renderer makes its first object. Behind a door, as the shell's update notice is: a tab has no shell.
+  // The desktop shell keeps the GPU's last samples with a crash (render/gpuTrail.js), so the canvas is counted first.
   const gpuTrail = typeof globalThis.daggerShell?.gpuTrail === 'function'
     ? await import('./render/gpuTrail.js').then((m) => m.gpuTrailOn(canvas, globalThis.daggerShell.gpuTrail)).catch(() => null) : null;
   const renderer = new Renderer(canvas);
   onPageGone(() => { pageGoing = true; loseGlContext(renderer.gl); });   // GL-LEAK: the game's own context, let go as the page goes
-  import('./render/portraitRenderer.js').then(({ setPortraitRenderer }) => setPortraitRenderer(renderer)).catch(() => {});   // PORTRAIT3D: the faces' renderer, for the menu's wells that hold none (behind a door: BOOT2's ceiling)
+  startRendererWork(renderer);
   renderer.setRetroSource(retroFrameConfig);   // RETRO1: DFU's retro mode - asked once per world frame, so the settings screen's change lands on the next
   renderer.setRenderScaleSource(renderScaleSetting);   // PERF-SCALE: the world's share of the window's pixels - asked once per world frame, and retro wins
+  renderer.setDistanceShadeSource(classicDistanceShading);
   const params = new URLSearchParams(location.search);
   // L10N1b: THE LANGUAGE FIRST. Every door below - the cinematic, the front door, the classic start, a probe's scene -
   // draws text, so the chosen language's tables are patched in before any of them runs (?lang= for one visit, else
@@ -140,8 +150,7 @@ async function boot() {
   if (params.has('shot') || params.has('nomenu')) { await ensureData(); return bootDungeon(canvas, renderer, params, status); }
 
   // ── THE FRONT DOOR ─────────────────────────────────────────────
-  // FD1 (2026-09-11, Mac: "Remove the classic Manager screen and instead
-  // use the enhanced menu for both enhanced and classic"): ONE door for
+  // FD1: ONE door for
   // BOTH skins. The enhanced screen carries continue, new game, load,
   // settings, controls, mods and about, and it needs no game data, so
   // a player who opens the page to change a setting is never asked for
@@ -186,7 +195,7 @@ async function boot() {
     publishBootParams(params);
     const { runEnhancedMenu } = await import('./ui/enhanced/enhancedMenu.js');
     const { runCinematicFrontDoor } = await import('./ui/intro/introScreen.js');
-    // PAD-DOOR (2026-09-27, Discord - an AYN Thor: "unable to select online, load game anything"): the intro, the menu
+    // PAD-DOOR: the intro, the menu
     // and its windows answer a controller - the d-pad moves, A presses, B backs out (ui/menu/menuPad.js) - until a game is
     // chosen, when the scene's own pad layer takes over.
     // PAD-CURSOR: and the stick is the game's own cursor here - its law and the gauntlet handed in, because the
@@ -199,9 +208,10 @@ async function boot() {
     // reader handed in (ui/uiClickSound.js names no data module: the HUD imports it). Not awaited, and a missing bank
     // boots nothing.
     import('./ui/uiClickSound.js').then((m) => m.wakeUiClickSound(getBytes)).catch(() => {});
-    // INTRO2: the cinematic and menu share ONE music session. The final
-    // splash holds for the player's tap; opening the menu ducks the track,
-    // choosing a game closes it before any in-game or classic video audio.
+    // INTRO2: the cinematic and menu share ONE music session, Daggerfall's
+    // title song from the player's ARENA2 data (systems/titleMusic.js) - with
+    // no data yet the film plays silently. Opening the menu ducks the song,
+    // and choosing a game fades it out for the next host's music.
     status('introduction');
     const freeze = import.meta.env.DEV && params.has('introat') ? Number(params.get('introat')) : null;
     choice = await runCinematicFrontDoor(() => {
@@ -214,6 +224,7 @@ async function boot() {
       menuMusic: !params.has('nointro') && !!getPref('skipStartVideo'),
       debug: import.meta.env.DEV && params.has('introdebug'),
       freezeAt: freeze !== null && Number.isFinite(freeze) ? Math.max(0, freeze) : null,
+      fetchBytes: getBytes,
     }).finally(detachMenuPad);   // PAD-DOOR: the choice is made - the door's pad stops before the scene's starts
   }
   if (choice !== 'begin') {
@@ -237,7 +248,7 @@ async function boot() {
     const picked = takePickedSaveKey();
     if (choice === 'load' && picked != null) params.set('loadkey', String(picked));   // REALM P1.3: never online - a local slot is not the realm's
     else params.delete('loadkey');
-    // REALM P1.3 (bible/06-Systems/Realm-Arc.md section 2): THE ONLINE DOOR'S CHARACTER IS THE REALM'S - its id rides the
+    // REALM P1.3: THE ONLINE DOOR'S CHARACTER IS THE REALM'S - its id rides the
     // boot, which joins it and reads its save from the service; a character born online boots the online lane with no
     // save, its chargen, and the realm makes it (world.js realmBirth). The same SET-or-DELETE law.
     const realmId = choice === 'online' ? takePickedRealmId() : null;
@@ -253,7 +264,11 @@ async function boot() {
       params.set('legacyborn', String(legacyBirth.personId));
       params.set('region', legacyBirth.region);
       params.set('loc', legacyBirth.loc);
-    } else { params.delete('legacyborn'); params.delete('region'); params.delete('loc'); }
+      // BAY-LEFT-B: and the seat's map id - a seat past the Bay is in no MAPS.BSA table, and the world host stands it by
+      // its id (scenes/bootStartHost.js); a seat that never learnt its id is found by its names
+      if (Number.isInteger(legacyBirth.mapId)) params.set('seat', String(legacyBirth.mapId >>> 0));
+      else params.delete('seat');
+    } else { params.delete('legacyborn'); params.delete('region'); params.delete('loc'); params.delete('seat'); }
     // TR3: the Test Room door - the pane answers 'test:<preset>' and
     // the world host seeds the character and the armory off the same
     // testRoom home the pane showed. The param family follows F12's
@@ -261,8 +276,10 @@ async function boot() {
     // that once entered the room would re-enter it on New Game.
     if (typeof choice === 'string' && choice.startsWith('test:')) params.set('test', choice.slice(5));
     else params.delete('test');
-    // TSR4b (Mac: "it either places me in the dungeon or places me in
-    // the ground"): the classic start is Privateer's Hold - a map cell
+    // `?start=` was a headless boot's dev door for a province's start (removed with the provinces' starts); a stale URL
+    // may still carry it, so it is DELETED on every door (F12's law)
+    params.delete('start');
+    // TSR4b: the classic start is Privateer's Hold - a map cell
     // out of settings, and StartInDungeon puts a new character INSIDE
     // it - and the ride was booting there too, racing the dungeon
     // entry with an exterior landing. The ride is a SPAWN OUTDOORS, a
@@ -350,6 +367,7 @@ async function boot() {
   // non-classicload action either.
   if (action === 'classicload') params.set('classicload', '1');
   else params.delete('classicload');
+  params.delete('start');   // AUDIT STARTS W8: the dev door's start rides no menu's door
   // U31: THE CLASSIC START IS THE WORLD, not the standalone dungeon
   // scene. scenes/dungeon.js has no exit path at all - its only
   // activation arm is ctx.actions.activate - so booting it left
@@ -472,9 +490,7 @@ addEventListener('unhandledrejection', (e) => crashOverlay(`unhandled rejection\
 
 // A lost WebGL context is the classic MOBILE black screen: the page
 // lives, the canvas goes permanently black, nothing throws. Surface
-// it with a reload path (2026-08-14 - Mac's phone report; ingest
-// memory pressure was the trigger, fixed in dataSource, but ANY
-// cause must read as signal, never as silent black).
+// it with a reload path.
 document.getElementById('c')?.addEventListener('webglcontextlost', (e) => {
   e.preventDefault();
   if (pageGoing) return;   // GL-LEAK: let go on purpose as the page goes - no "context lost" over a closing tab

@@ -1,4 +1,4 @@
-// MW-EBONY1 (2026-10-09, Mac: "This is next 1. The ebony armor set and its textures"; asked, Ebony only): MAC'S EBONY
+// MW-EBONY1: MAC'S EBONY
 // PLATE, DAGGERFALL'S SEVEN CLASSIC PIECES IN EBONY, SKINNED AS THE STEEL PLATE IS.
 //
 // One export, nothing of Bethesda's in it, committed as it came; seven paintings matched to their pieces by the UV

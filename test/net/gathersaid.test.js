@@ -1,5 +1,4 @@
-// GATHER-SAID (the PROF7 merge, 2026-09-30; Mac: "Also not sure if XP works when you gather nodes, also had reports of
-// people not getting materials when using a profession"). Driven end to end - the gathering host over the real book
+// GATHER-SAID (the PROF7 merge, 2026-09-30). Driven end to end - the gathering host over the real book
 // over a real Worker - a harvest credits its goods to the Stores and its XP to the track, every profession. What the
 // players met was what the HUD SAID of it:
 //   1. an answer said one line a good (the ore, a gem, a tree's Resin, a body's part and butchery), its XP, a rank's rise
@@ -10,7 +9,7 @@
 //      account's acts were kept in silence and lapsed; the lapse said "with the day" of a ten-minute lapse;
 //   4. an act that ended before its end (let go, walked off, a window over it, the dungeon left) only lost its meter;
 //   5. the service's maintenance minute (RESTORE's 503, answered before any route) let the act go instead of keeping it.
-// bible/06-Systems/Online-Arc.md, THE PROF7 MERGE.
+// THE PROF7 MERGE.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

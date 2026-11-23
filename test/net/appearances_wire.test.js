@@ -1,4 +1,4 @@
-// APPEARANCES (2026-10-27; bible/04-Characters/Wardrobe.md): OTHER PLAYERS SEE THE LOOK. A look's item carries the look its
+// APPEARANCES: OTHER PLAYERS SEE THE LOOK. A look's item carries the look its
 // piece wears as `ap` beside the piece's own fields - omitted when none, so every look without one keeps its bytes - the
 // relay keeps it only of the piece's kind, and the peer's stand-in draws it. The piece's own fields never change: the
 // siege's referee still finds the weapon a blow claims.

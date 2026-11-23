@@ -1,6 +1,6 @@
 // @ts-check
-// SEASON1 part three (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE HALL OF RECORDS AS A BOOK
-// (bible/11-Multiplayer/Seats-Arc.md 9.2: "A Hall of Records book in every seat's palace ... read it as prose ... The book
+// SEASON1 part three: THE HALL OF RECORDS AS A BOOK
+// (9.2: "A Hall of Records book in every seat's palace ... read it as prose ... The book
 // is read through the enhanced book window the port already has"). A seat's Chronicle, read by the law
 // (net/townSeatLaw.js hallOfRecordsChapters), laid out as the book reader's own tokens - its title centred in the title
 // face, each Season's chapter under its name, each line a paragraph - and handed to the reader's one door
@@ -60,8 +60,7 @@ export function hallOfRecordsChapterLines(/** @type {any} */ chapters) {
   return chapters.rows.map((/** @type {any} */ r) => chapterChronicleLine(r, chapters.zero ?? null)).filter(Boolean);
 }
 
-// HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work"; Seats-Arc 8.1: the heraldry "drawn on ... the
-// Chronicle"): the book reader draws text alone (a Daggerfall book has no pictures, on either face), so the Hall of
+// HERALDRY-SHOWN: the book reader draws text alone (a Daggerfall book has no pictures, on either face), so the Hall of
 // Records carries its guilds' arms IN WORDS - a Roll of Arms after its chapters: each guild its lines name, in the order
 // the book first names it, whose heraldry the client knows (`armsOf(tag, name)` - the host's seats' list and own guild).
 /** The Roll of Arms' heading. */

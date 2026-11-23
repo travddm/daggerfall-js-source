@@ -1,4 +1,4 @@
-// AUDIT DEPS1 (2026-10-15, the review of Vite 5 -> 8): THE CSS IS MINIFIED FOR THE BROWSERS THE GAME RUNS ON.
+// AUDIT DEPS1: THE CSS IS MINIFIED FOR THE BROWSERS THE GAME RUNS ON.
 // Vite 8 minifies CSS - every page's inline <style> too - with Lightning CSS for `build.cssTarget`, which defaults to
 // `build.target`; es2022 reads as Safari 16.4, and at 16.4 Lightning CSS drops a prefix that browser no longer needs.
 // The game runs below 16.4 (WebGL2 is Safari 15's; SAFARI1 keeps the modules parsing there), so vite.config.js names

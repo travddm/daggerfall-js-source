@@ -1,355 +1,286 @@
-// MW-D11: THE TEXTURE PATH LAW, and it is not "prepend textures/".
+// Texture lookup and decoding for Morrowind meshes.
 //
-// Bethesda converted the BSA textures from TGA to DDS and left every
-// reference in every NIF saying .tga, so a Morrowind mesh asks for a file
-// that is not in the archive under that name. OpenMW's answer is one
-// function - Misc::ResourceHelpers::correctTexturePath, the ONLY entry
-// point a NIF texture takes (nifosg/nifloader.cpp:1136-1142) - and it is
-// four probes over a re-rooted, extension-swapped path, translated here
-// verbatim.
+// Written from the public file-format documentation (Truevision TGA 2.0, Microsoft BMP/DIB, the DDS reader in
+// mwDdsFile.js) and from the observable behaviour of Morrowind data. No third-party engine source was used.
 //
-//   correctTexturePath(p, vfs) = correctResourcePath({textures, bookart}, p, vfs, "dds")
-//                                       (misc/resourcehelpers.cpp:137-141)
-//
-// THIS FILE IS THE ONE HOME. The mesh viewer carried its own two-line
-// version (a "textures\" prefix and a .tga->.dds swap) which gets three
-// of the rules wrong; it imports this now. Two ports of one rule drifting
-// apart is how MW7 died.
+// Morrowind's archives hold DDS textures, but the meshes inside them still name the original .tga files, so a
+// mesh's texture name is a request that has to be resolved against the archive before it can be read.
 
 import { decodeDds } from './mwDdsFile.js';
 
-/** VFS::Path normalization (vfs/pathutil.hpp:18-64): backslash becomes
- *  '/', every character lowercases, runs of '/' collapse to one, and a
- *  SINGLE leading '/' is stripped. A BSA index must be built the same way
- *  or the lookups miss - VFS::Manager::exists is a plain hash lookup with
- *  no case-insensitive compare at query time (vfs/manager.cpp:64-72). */
+/**
+ * The archive's own spelling of a path: forward slashes, lower case, repeated slashes collapsed, and at most one
+ * leading slash removed. Archive indexes are built this way, and a lookup is an exact match.
+ */
 export function normalizeVfsPath(path) {
-  let out = String(path ?? '').replace(/\\/g, '/').toLowerCase();
-  out = out.replace(/\/{2,}/g, '/');
-  if (out.startsWith('/')) out = out.slice(1);
-  return out;
+  const flat = String(path).replace(/\\/g, '/').toLowerCase().replace(/\/{2,}/g, '/');
+  return flat.startsWith('/') ? flat.slice(1) : flat;
 }
 
 /**
- * findDirectory (misc/resourcehelpers.cpp:38-62), and every clause earns
- * its place:
- *   - the match must be a WHOLE path component: preceded by '/' or at
- *     index 0, and followed by '/';
- *   - it must NOT be the last component (`position + size >= pathSize`
- *     returns npos), so "foo/textures" is not re-rooted and "textures"
- *     alone is not either - both get the prefix instead. THIS CLAUSE IS
- *     AN EARLY-OUT, NOT A RULE OF ITS OWN: with it removed the very next
- *     test reads one past the end (a std::string yields '\0' there, and
- *     JS yields undefined), which is not '/', so the component check
- *     fails anyway. A mutation campaign proved the two equivalent - kept
- *     because the reference has it and this is a translation, and
- *     recorded so nobody hunts for the pin that would catch its removal;
- *   - the scan continues past a failed candidate rather than giving up.
- * @returns the index the corrected path starts at, or -1.
+ * Character offset of the first path component equal to `directory`, or -1. The component must be whole and must
+ * not be the last one, because the last component names a file.
  */
 export function findDirectory(path, directory) {
-  const size = directory.length;
+  const parts = path.split('/');
   let offset = 0;
-  for (;;) {
-    const pos = path.indexOf(directory, offset);
-    if (pos < 0) return -1;
-    if (pos + size >= path.length) return -1;
-    if ((pos === 0 || path[pos - 1] === '/') && path[pos + size] === '/') return pos;
-    offset = pos + size;
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (parts[i] === directory) return offset;
+    offset += parts[i].length + 1;
   }
+  return -1;
 }
 
 /**
- * Normalized::changeExtension (vfs/pathutil.hpp:289-297). Replaces from
- * one character PAST the last '.', so the dot survives - and REFUSES when
- * the reverse scan hits a '/' first or finds no '.' at all, which is what
- * makes an extensionless name keep its shape.
- * @returns {{path:string, changed:boolean}}
+ * Replace the extension of the file name (the text after the last '.', if that '.' follows the last '/').
+ * A name without an extension is returned as it was, with `changed` false.
  */
 export function changeExtension(path, ext) {
-  for (let i = path.length - 1; i >= 0; i--) {
-    if (path[i] === '/') break;
-    if (path[i] === '.') return { path: `${path.slice(0, i + 1)}${ext}`, changed: true };
-  }
-  return { path, changed: false };
+  const dot = path.lastIndexOf('.');
+  if (dot === -1 || dot < path.lastIndexOf('/')) return { path, changed: false };
+  return { path: `${path.slice(0, dot + 1)}${ext}`, changed: true };
 }
 
-/** The last path component. */
-const filename = (path) => {
-  const at = path.lastIndexOf('/');
-  return at < 0 ? path : path.slice(at + 1);
-};
-
 /**
- * correctResourcePath (misc/resourcehelpers.cpp:81-131), verbatim.
+ * Resolve a resource name found in a mesh or record to the path that the archive most likely holds.
  *
- * @param {string[]} topLevelDirectories tried IN ORDER; the first that
- *   matches wins, and everything before the match is DISCARDED - which is
- *   how an absolute authoring path like "D:\Bethesda\Data Files\Textures\
- *   tx_hand.tga" resolves.
- * @param {string} resPath the authored reference
- * @param {(p:string)=>boolean} exists the VFS probe
- * @param {string} ext substitute extension, WITHOUT a leading dot
- * @returns {string} the path to open - and when all four probes miss, the
- *   .dds candidate, NOT the authored name. The caller then fails to open
- *   it and gets the warning image, which is the behaviour that makes a
- *   missing texture visible instead of silent.
+ * The name is normalised, then re-rooted at the first of `topLevelDirectories` that appears in it as a whole
+ * inner component (everything before that component is dropped, which turns an absolute authoring path into an
+ * archive path). A name with no such component gets the first top-level directory as a prefix. The candidates are
+ * tried in this order and the first one `exists` accepts wins:
+ *   1. the path with its extension changed to `ext`;
+ *   2. the path as written (skipped when it has no extension to change);
+ *   3. the file name alone under the first top-level directory, with `ext`;
+ *   4. the file name alone under the first top-level directory, as written (skipped likewise).
+ * When nothing exists, candidate 1 is returned so the caller fails on a name that says what was wanted.
  */
 export function correctResourcePath(topLevelDirectories, resPath, exists, ext) {
-  const path = normalizeVfsPath(resPath);
-  let corrected = null;
+  let path = normalizeVfsPath(resPath);
+
+  let rooted = false;
   for (const dir of topLevelDirectories) {
     const at = findDirectory(path, dir);
-    if (at >= 0) {
-      corrected = path.slice(at);
+    if (at !== -1) {
+      path = path.slice(at);
+      rooted = true;
       break;
     }
   }
-  if (corrected === null) corrected = `${topLevelDirectories[0]}/${path}`;
+  if (!rooted) path = `${topLevelDirectories[0]}/${path}`;
 
-  const origExt = corrected;
-  const swapped = changeExtension(corrected, ext);
-  corrected = swapped.path;
-  const isExtChanged = swapped.changed;
+  const swapped = changeExtension(path, ext);
+  if (exists(swapped.path)) return swapped.path;
+  if (swapped.changed && exists(path)) return path;
 
-  if (exists(corrected)) return corrected;
-  if (isExtChanged && exists(origExt)) return origExt;
-  // BOTH fallbacks use topLevelDirectories.FRONT, never the directory that
-  // matched - so a bookart-rooted miss is probed under textures/.
-  const front = topLevelDirectories[0];
-  const fallback = `${front}/${filename(corrected)}`;
-  if (exists(fallback)) return fallback;
-  if (isExtChanged) {
-    const fallbackOrig = `${front}/${filename(origExt)}`;
-    if (exists(fallbackOrig)) return fallbackOrig;
-  }
-  return corrected;
+  const base = path.slice(path.lastIndexOf('/') + 1);
+  const flatOriginal = `${topLevelDirectories[0]}/${base}`;
+  const flat = changeExtension(flatOriginal, ext);
+  if (exists(flat.path)) return flat.path;
+  if (flat.changed && exists(flatOriginal)) return flatOriginal;
+  return swapped.path;
 }
 
-/** The two top-level directories a TEXTURE may be re-rooted at, in the
- *  order they are tried (misc/resourcehelpers.cpp:18-19, 140). */
 export const TEXTURE_TOP_LEVEL = Object.freeze(['textures', 'bookart']);
-
-/** The substitute extension, with NO leading dot - changeExtension
- *  replaces from one char past the '.', so the dot is already there. */
 export const TEXTURE_EXT = 'dds';
 
-/** correctTexturePath (misc/resourcehelpers.cpp:137-141). */
+/** The archive path of a texture a mesh names (a name ending in .tga is usually stored as .dds). */
 export function correctTexturePath(resPath, exists) {
   return correctResourcePath(TEXTURE_TOP_LEVEL, resPath, exists, TEXTURE_EXT);
 }
 
-/**
- * NiTexturingProperty's clamp bits (nif/property.hpp:70-71) and their GL
- * mapping (nifosg/nifloader.cpp:1152-1153).
- *
- * THE BITS ARE THE OTHER WAY ROUND FROM THE NAMES: bit 0 is wrapT and
- * bit 1 is wrapS. A set bit is REPEAT; a clear bit is CLAMP_TO_EDGE -
- * not GL_CLAMP, and not REPEAT-by-default. mClamp 3 (the common value)
- * is REPEAT on both axes.
- */
 export const GL_REPEAT = 0x2901;
 export const GL_CLAMP_TO_EDGE = 0x812f;
+
+/**
+ * WebGL wrap modes for a texturing property's clamp mode. Bit 1 set repeats S and bit 0 set repeats T; a clear
+ * bit clamps that axis.
+ */
 export function wrapModes(clampMode) {
-  const c = clampMode | 0;
   return {
-    wrapS: (c & 2) ? GL_REPEAT : GL_CLAMP_TO_EDGE,
-    wrapT: (c & 1) ? GL_REPEAT : GL_CLAMP_TO_EDGE,
+    wrapS: clampMode & 2 ? GL_REPEAT : GL_CLAMP_TO_EDGE,
+    wrapT: clampMode & 1 ? GL_REPEAT : GL_CLAMP_TO_EDGE,
   };
 }
 
-/**
- * ImageManager's warning image (resource/imagemanager.cpp:28-43): 8x8,
- * every texel (255, 0, 255).
- *
- * A MISSING TEXTURE IS NOT A REFUSAL, and that is the rule, not a
- * convenience. Every failure path in the reference - the archive throwing,
- * no reader for the extension, a decode failure, an unsupported
- * compression - returns this and caches it under the failed path. The
- * port's own instinct here was a skin-tone fallback, which is precisely
- * the "empty view called a working one" this arc keeps being burned by:
- * magenta is a texture that SAYS it is missing.
- */
+/** The image drawn in place of a texture that cannot be loaded: 8x8 opaque magenta, so a gap is visible. */
 export function warningImage() {
-  const width = 8;
-  const height = 8;
-  const rgba = new Uint8Array(width * height * 4);
-  for (let i = 0; i < width * height; i++) {
-    rgba[i * 4] = 255;
-    rgba[i * 4 + 1] = 0;
-    rgba[i * 4 + 2] = 255;
-    rgba[i * 4 + 3] = 255;
+  const size = 8;
+  const rgba = new Uint8Array(size * size * 4);
+  for (let i = 0; i < rgba.length; i += 4) {
+    rgba[i] = 255;
+    rgba[i + 2] = 255;
+    rgba[i + 3] = 255;
   }
+  return { width: size, height: size, mips: [{ width: size, height: size, rgba }] };
+}
+
+/**
+ * The x-form of an actor model: the file name gets an "x" in front and, for a .nif, the animation file with the
+ * same stem must exist as .kf. If it does the x-form is returned, otherwise the normalised original path is.
+ */
+export function correctActorModelPath(rawPath, exists) {
+  const resPath = normalizeVfsPath(rawPath);
+  const slash = resPath.lastIndexOf('/');
+  const dir = resPath.slice(0, slash + 1);
+  const name = resPath.slice(slash + 1);
+  const xName = `x${name}`;
+  const isNif = name.endsWith('.nif');
+  const probe = isNif ? `${dir}${xName.slice(0, -4)}.kf` : `${dir}${xName}`;
+  return exists(probe) ? `${dir}${xName}` : resPath;
+}
+
+function single(width, height, rgba) {
   return { width, height, mips: [{ width, height, rgba }] };
 }
 
-/**
- * RULE 18: correctActorModelPath (misc/resourcehelpers.cpp:180-198), the
- * OTHER resource-path rule, and it lives here because this file is
- * ResourceHelpers' one home and it needs the same two primitives.
- *
- *   insert 'x' before the FILENAME (after the last '/'), swap a .nif
- *   extension for .kf, and USE THE X-FORM ONLY IF THAT KF EXISTS -
- *   otherwise keep the original path.
- *
- * It REFINES RULE 6, which reads as though the skeleton names were
- * fixed. They are not: `meshes/base_anim_female.1st.nif` is promoted to
- * `meshes/xbase_anim_female.1st.nif` exactly when
- * `meshes/xbase_anim_female.1st.kf` is in the archive. The male
- * first-person entry is ALREADY x-form in the settings, so the insert
- * yields a non-existent `xx` name and the original stands - which is why
- * a port tested only on a male character sees nothing wrong.
- *
- * The extension swap is CONDITIONAL on the extension being exactly
- * "nif": for anything else the probe is against the model name itself,
- * not a .kf. Both branches are here because both are reachable.
- */
-export function correctActorModelPath(resPath, exists) {
-  const path = normalizeVfsPath(resPath);
-  const at = path.lastIndexOf('/');
-  const xform = at < 0 ? `x${path}` : `${path.slice(0, at + 1)}x${path.slice(at + 1)}`;
-  const dot = xform.lastIndexOf('.');
-  const ext = dot > xform.lastIndexOf('/') ? xform.slice(dot + 1) : '';
-  const probe = ext === 'nif' ? changeExtension(xform, 'kf').path : xform;
-  return exists(probe) ? xform : path;
+/** A 15- or 16-bit 5-5-5 pixel (the top bit is unused) as [r, g, b]. */
+function rgb555(lo, hi) {
+  const v = lo | (hi << 8);
+  const expand = (c) => Math.floor((c * 255) / 31);
+  return [expand((v >> 10) & 31), expand((v >> 5) & 31), expand(v & 31)];
 }
 
-// ---------------------------------------------------------------------------
-// MW-D34: DECODE BY EXTENSION, the other half of the ladder.
-//
-// correctResourcePath above deliberately answers the AUTHORED extension
-// when the .dds probe misses and the original file exists (`if
-// (isExtChanged && vfs.exists(origExt)) return origExt;`,
-// resourcehelpers.cpp:112-114) - and Morrowind's originals are .tga and
-// .bmp. The reference then decodes that path BY ITS EXTENSION, not by
-// assuming DDS: ImageManager reads the extension, aliases the
-// non-standard "targa" to "tga" ("Non-standard, but Morrowind supports
-// this", imagemanager.cpp:104-110), and asks osgDB for that format's
-// reader. The port fed every ladder answer to decodeDds, so a texture
-// the archives DO carry rendered as the magenta warning.
-
-
-/** TGA (types 1-3 and their RLE forms 9-11; 8/15/16/24/32 bpp), to the
- *  same {width, height, mips:[{width,height,rgba}]} shape decodeDds
- *  answers. Bottom-up unless descriptor bit 5 sets top-origin. */
+/**
+ * Truevision TGA, types 1/2/3 (colour-mapped, true colour, grey) and their run-length forms 9/10/11.
+ * Returns the single mip level as top-row-first RGBA.
+ */
 export function decodeTga(bytes) {
-  if (!(bytes instanceof Uint8Array) || bytes.length < 18) throw new Error('decodeTga: not a TGA file');
-  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  if (bytes.length < 18) throw new Error('decodeTga: truncated header');
   const idLength = bytes[0];
-  const colorMapType = bytes[1];
-  const imageType = bytes[2];
-  const mapStart = dv.getUint16(3, true);
-  const mapLength = dv.getUint16(5, true);
+  const mapType = bytes[1];
+  const type = bytes[2];
+  const mapFirst = bytes[3] | (bytes[4] << 8);
+  const mapLength = bytes[5] | (bytes[6] << 8);
   const mapDepth = bytes[7];
-  const width = dv.getUint16(12, true);
-  const height = dv.getUint16(14, true);
+  const width = bytes[12] | (bytes[13] << 8);
+  const height = bytes[14] | (bytes[15] << 8);
   const depth = bytes[16];
   const descriptor = bytes[17];
-  const baseType = imageType & 7;
-  const rle = (imageType & 8) !== 0;
-  if (baseType < 1 || baseType > 3 || !width || !height) throw new Error('decodeTga: unsupported image type');
-  let off = 18 + idLength;
-  // AUDIT 68 S11-tga-15bpp: bytes per entry ROUND UP - a 15-bit pixel or
-  // colour-map entry is two bytes (5-5-5), and `>> 3` read it as one.
-  const mapBpp = (mapDepth + 7) >> 3;
-  const palette = colorMapType === 1 ? bytes.subarray(off, off + mapLength * mapBpp) : null;
-  if (colorMapType === 1) off += mapLength * mapBpp;
-  const bpp = (depth + 7) >> 3;
-  const rgba = new Uint8Array(width * height * 4);
-  const putBgr = (o, src, at, nb) => {
-    if (nb === 1) { rgba[o] = rgba[o + 1] = rgba[o + 2] = src[at]; rgba[o + 3] = 255; return; }
-    if (nb === 2) {
-      const px = src[at] | (src[at + 1] << 8);   // ARRRRRGG GGGBBBBB
-      rgba[o] = ((px >> 10) & 31) * 255 / 31;
-      rgba[o + 1] = ((px >> 5) & 31) * 255 / 31;
-      rgba[o + 2] = (px & 31) * 255 / 31;
-      rgba[o + 3] = 255;
-      return;
+  const rle = type >= 9;
+  const kind = rle ? type - 8 : type;
+  if (kind !== 1 && kind !== 2 && kind !== 3) throw new Error(`decodeTga: unsupported image type ${type}`);
+  if (width === 0 || height === 0) throw new Error('decodeTga: empty image');
+
+  // A truncated file reads as zero bytes past its end, so a damaged texture still draws instead of failing.
+  const byteAt = (i) => bytes[i] | 0;
+  const bytesPerPixel = (depth + 7) >> 3;
+  const mapBytes = (mapDepth + 7) >> 3;
+  let at = 18 + idLength;
+
+  // Writes the colour of the entry or pixel that starts at `o` in the colour-map or pixel layout of `size` bytes.
+  const colourAt = (o, size, out, p, isMap) => {
+    if (size === 1) {
+      out[p] = out[p + 1] = out[p + 2] = byteAt(o);
+      out[p + 3] = 255;
+    } else if (!isMap && kind === 3) {
+      out[p] = out[p + 1] = out[p + 2] = byteAt(o);
+      out[p + 3] = byteAt(o + 1);
+    } else if (size === 2) {
+      const [r, g, b] = rgb555(byteAt(o), byteAt(o + 1));
+      out[p] = r; out[p + 1] = g; out[p + 2] = b; out[p + 3] = 255;
+    } else {
+      out[p] = byteAt(o + 2); out[p + 1] = byteAt(o + 1); out[p + 2] = byteAt(o);
+      out[p + 3] = size === 4 ? byteAt(o + 3) : 255;
     }
-    rgba[o] = src[at + 2]; rgba[o + 1] = src[at + 1]; rgba[o + 2] = src[at];
-    rgba[o + 3] = nb === 4 ? src[at + 3] : 255;
   };
-  const putPixel = (i, src, at) => {
-    const x = i % width;
-    const yRow = (i / width) | 0;
-    const y = (descriptor & 0x20) ? yRow : height - 1 - yRow;   // bit 5: top origin
-    const o = (y * width + x) * 4;
-    if (baseType === 1) {
-      const idx = (bpp === 2 ? (src[at] | (src[at + 1] << 8)) : src[at]) - mapStart;
-      putBgr(o, palette, idx * mapBpp, mapBpp);
-    } else if (baseType === 3) {
-      // AUDIT 68 S11-v-tga-grey16: greyscale is grey (+ its alpha byte at
-      // 16 bpp), never a 5-5-5 colour.
-      rgba[o] = rgba[o + 1] = rgba[o + 2] = src[at];
-      rgba[o + 3] = bpp >= 2 ? src[at + 1] : 255;
-    } else putBgr(o, src, at, bpp);
+
+  let palette = null;
+  if (kind === 1) {
+    if (mapType !== 1) throw new Error('decodeTga: colour-mapped image without a colour map');
+    palette = new Uint8Array((mapFirst + mapLength) * 4);
+    if (mapBytes !== 4) for (let i = 0; i < palette.length; i += 4) palette[i + 3] = 255;
+    for (let i = 0; i < mapLength; i++) colourAt(at + i * mapBytes, mapBytes, palette, (mapFirst + i) * 4, true);
+  }
+  if (mapType === 1) at += mapLength * mapBytes;
+
+  const pixelCount = width * height;
+  const pixelAt = (o, out, p) => {
+    if (kind !== 1) return colourAt(o, bytesPerPixel, out, p, false);
+    const index = bytesPerPixel === 2 ? bytes[o] | (bytes[o + 1] << 8) : bytes[o];
+    if (index >= 0 && index * 4 < palette.length) out.set(palette.subarray(index * 4, index * 4 + 4), p);
+    else out.set([0, 0, 0, mapBytes === 4 ? 0 : 255], p);
   };
-  const count = width * height;
+
+  // Pixels in file order, before the row flips below.
+  const decoded = new Uint8Array(pixelCount * 4);
   if (!rle) {
-    for (let i = 0; i < count; i++) putPixel(i, bytes, off + i * bpp);
+    for (let i = 0; i < pixelCount; i++) pixelAt(at + i * bytesPerPixel, decoded, i * 4);
   } else {
     let i = 0;
-    while (i < count && off < bytes.length) {
-      const packet = bytes[off++];
-      const n = (packet & 127) + 1;
-      if (packet & 128) {
-        for (let k = 0; k < n && i < count; k++) putPixel(i++, bytes, off);
-        off += bpp;
+    // Pixels that the data never reaches stay transparent black.
+    while (i < pixelCount && at < bytes.length) {
+      const header = byteAt(at++);
+      const count = (header & 0x7f) + 1;
+      if (header & 0x80) {
+        pixelAt(at, decoded, i * 4);
+        at += bytesPerPixel;
+        for (let k = 1; k < count && i + k < pixelCount; k++) decoded.copyWithin((i + k) * 4, i * 4, i * 4 + 4);
       } else {
-        for (let k = 0; k < n && i < count; k++) { putPixel(i++, bytes, off); off += bpp; }
+        for (let k = 0; k < count && i + k < pixelCount; k++) pixelAt(at + k * bytesPerPixel, decoded, (i + k) * 4);
+        at += count * bytesPerPixel;
       }
+      i += count;
     }
   }
-  return { width, height, mips: [{ width, height, rgba }] };
+
+  // Bit 5 of the descriptor says the first row is the top one. Bit 4 (right-to-left) is not honoured: no tool
+  // writes it and Morrowind's files never set it.
+  if ((descriptor & 0x20) !== 0) return single(width, height, decoded);
+  const rgba = new Uint8Array(pixelCount * 4);
+  for (let y = 0; y < height; y++) {
+    rgba.set(decoded.subarray(y * width * 4, (y + 1) * width * 4), (height - 1 - y) * width * 4);
+  }
+  return single(width, height, rgba);
 }
 
-/** BMP (uncompressed BI_RGB, 8-bit paletted / 24 / 32 bpp), same shape.
- *  Positive height is bottom-up, per the format. */
+/**
+ * Windows BMP with a BITMAPINFOHEADER-style header, uncompressed, at 8 bits per pixel (through the colour table
+ * that follows the header), 24 bits (BGR) or 32 bits (BGRA). Rows are padded to 4 bytes and a positive height means
+ * bottom-up storage. Bytes past the end of a truncated file read as zero. Returns the single mip level as
+ * top-row-first RGBA.
+ */
 export function decodeBmp(bytes) {
-  if (!(bytes instanceof Uint8Array) || bytes.length < 54 || bytes[0] !== 0x42 || bytes[1] !== 0x4d) {
-    throw new Error('decodeBmp: not a BMP file');
-  }
-  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const dataOff = dv.getUint32(10, true);
-  const headerSize = dv.getUint32(14, true);
-  const width = dv.getInt32(18, true);
-  const rawH = dv.getInt32(22, true);
-  const height = Math.abs(rawH);
-  const bpp = dv.getUint16(28, true);
-  const compression = dv.getUint32(30, true);
-  if (compression !== 0 || (bpp !== 8 && bpp !== 24 && bpp !== 32) || !width || !height) {
-    throw new Error('decodeBmp: unsupported BMP format');
-  }
-  const palOff = 14 + headerSize;
-  const stride = ((width * bpp + 31) >> 5) << 2;   // rows pad to 4 bytes
+  if (bytes.length < 54 || bytes[0] !== 0x42 || bytes[1] !== 0x4d) throw new Error('decodeBmp: not a bitmap');
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const pixelOffset = view.getUint32(10, true);
+  const headerSize = view.getUint32(14, true);
+  const width = view.getInt32(18, true);
+  const rawHeight = view.getInt32(22, true);
+  const bits = view.getUint16(28, true);
+  const compression = view.getUint32(30, true);
+  if (compression !== 0 || (bits !== 8 && bits !== 24 && bits !== 32)) throw new Error('decodeBmp: unsupported format');
+  const height = Math.abs(rawHeight);
+  const bottomUp = rawHeight > 0;
+  if (width <= 0 || height === 0) throw new Error('decodeBmp: empty image');
+
+  const byteAt = (i) => bytes[i] | 0;
+  const tableOffset = 14 + headerSize;
+  const stride = (((width * bits) + 31) >> 5) << 2;
   const rgba = new Uint8Array(width * height * 4);
-  for (let row = 0; row < height; row++) {
-    const y = rawH > 0 ? height - 1 - row : row;   // positive height: bottom-up
+  for (let y = 0; y < height; y++) {
+    const row = pixelOffset + (bottomUp ? height - 1 - y : y) * stride;
     for (let x = 0; x < width; x++) {
-      const o = (y * width + x) * 4;
-      if (bpp === 8) {
-        const p = palOff + bytes[dataOff + row * stride + x] * 4;   // BGRA quads
-        rgba[o] = bytes[p + 2]; rgba[o + 1] = bytes[p + 1]; rgba[o + 2] = bytes[p]; rgba[o + 3] = 255;
-      } else {
-        const at = dataOff + row * stride + x * (bpp >> 3);
-        rgba[o] = bytes[at + 2]; rgba[o + 1] = bytes[at + 1]; rgba[o + 2] = bytes[at];
-        rgba[o + 3] = bpp === 32 ? bytes[at + 3] : 255;
-      }
+      const p = (y * width + x) * 4;
+      // A pixel past the end of the file is black. For 8 bits the colour table is read straight from the file at
+      // the index, whatever the header says about its size.
+      let at = row + x * (bits >> 3);
+      if (bits === 8) at = bytes[at] === undefined ? Infinity : tableOffset + bytes[at] * 4;
+      rgba[p] = byteAt(at + 2); rgba[p + 1] = byteAt(at + 1); rgba[p + 2] = byteAt(at);
+      rgba[p + 3] = bits === 32 ? byteAt(at + 3) : 255;
     }
   }
-  return { width, height, mips: [{ width, height, rgba }] };
+  return single(width, height, rgba);
 }
 
-/** ImageManager's routing (imagemanager.cpp:104-118): the path's own
- *  extension picks the decoder, "targa" aliases to "tga", and a format
- *  with no reader is an error the caller turns into the warning image. */
+/**
+ * Decode a texture file chosen by the extension of `path`: .dds (all mip levels, or the first `levels`), .tga or
+ * .targa, .bmp. Any other extension throws.
+ */
 export function decodeTextureImage(path, bytes, { levels = Infinity } = {}) {
-  const p = String(path || '');
-  const dot = p.lastIndexOf('.');
-  let ext = dot >= 0 ? p.slice(dot + 1).toLowerCase() : '';
-  if (ext === 'targa') ext = 'tga';   // "Non-standard, but Morrowind supports this"
-  if (ext === 'dds') return decodeDds(bytes, { levels });   // MW-LOAD: tga/bmp carry one level anyway
-  if (ext === 'tga') return decodeTga(bytes);
+  const dot = path.lastIndexOf('.');
+  const ext = dot === -1 ? '' : path.slice(dot + 1).toLowerCase();
+  if (ext === 'dds') return decodeDds(bytes, { levels });
+  if (ext === 'tga' || ext === 'targa') return decodeTga(bytes);
   if (ext === 'bmp') return decodeBmp(bytes);
-  throw new Error(`no decoder for ".${ext}"`);
+  throw new Error(`no decoder for .${ext} (${path})`);
 }

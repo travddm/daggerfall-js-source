@@ -1,5 +1,4 @@
-// ASF-DEATH (2026-10-19, Discord #suggestions "Weapon/Armor Materials", through Mac): "It is absurdly easy to walk into a
-// dungeon full of daedroth, clear them out, and get tens of thousands of gold by vendoring off the daedric armor".
+// ASF-DEATH (2026-10-19, Discord #suggestions "Weapon/Armor Materials", through.
 // Unleveled Loot's death drops (dropWeapon, dropArmor) rolled a condition and left no `foundCondition`, so SELL-AS-FOUND
 // never reached them: online a Daedric piece off a Daedroth, mended at a smith, sold whole. Each drop now marks it.
 import { test } from 'node:test';

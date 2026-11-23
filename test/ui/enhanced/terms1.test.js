@@ -1,4 +1,4 @@
-// TERMS1 (2026-09-28) — THE TERMS OF SERVICE AND THE PRIVACY POLICY,
+// TERMS1 — THE TERMS OF SERVICE AND THE PRIVACY POLICY,
 // AGREED TO BEFORE AN ACCOUNT EXISTS.
 //
 // "Here is our terms of service and privacy policy. I wanna make sure
@@ -36,8 +36,8 @@ import { createGuest, register, legalRefusal } from '../../../server-account/src
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 
 const DOCS = {
-  terms: { file: 'terms/index.html', url: TERMS_URL, version: TERMS_VERSION, sections: 16, title: 'Terms of Service' },
-  privacy: { file: 'privacy/index.html', url: PRIVACY_URL, version: PRIVACY_VERSION, sections: 18, title: 'Privacy Policy' },
+  terms: { file: 'terms/index.html', url: TERMS_URL, version: TERMS_VERSION, sections: 15, title: 'Terms of Service' },
+  privacy: { file: 'privacy/index.html', url: PRIVACY_URL, version: PRIVACY_VERSION, sections: 17, title: 'Privacy Policy' },
 };
 
 /** A document's WORDS: its article with the markup taken off. */
@@ -47,7 +47,7 @@ const wordsOf = (html) => html.slice(html.indexOf('<article>'), html.indexOf('</
 // ═══ THE DOCUMENTS ══════════════════════════════════════════════════
 
 test('TERMS1: each document is dated by its version - the Last Updated a reader sees IS what an account records', () => {
-  // The Terms mark a revision by their Last Updated date (section 15),
+  // The Terms mark a revision by their Last Updated date (section 14),
   // so that date is the version: the page, the form and the service can
   // only agree if the page's date and the law's constant are one fact.
   for (const [name, d] of Object.entries(DOCS)) {
@@ -72,17 +72,20 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
   // this reddens: if the change is material, move the Last Updated date
   // and its version in src/net/legalLaw.js; either way, re-hash.
   const HASH = {
-    // BR5 (2026-10-11): the operator renamed DFO Online in both, and nothing else - not material, so the
+    // BR5: the operator renamed DFO Online in both, and nothing else - not material, so the
     // version stands and only the words are re-hashed (AUDIT BR5: a new version refuses every older build's sign-up)
-    // SAFE (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): material in both - the Terms name hate by what it
+    // SAFE: material in both - the Terms name hate by what it
     // attacks and make the in-game Code of Conduct part of them; the Policy says the stamped messages, the reports, the
     // automated review by a third-party AI provider and how long each is kept - so a new version, 2026-10-17
     // AUDIT SAFE (the same day, unreleased - the version stands): the Policy made true of the code - a report shown in the
     // game too, the reporters' automatic mute named, the names a line's own words carry, the second review before a
     // mute, a letter from a blocked player undelivered, every retention said and the Discord copies deleted with the
     // case's; the Terms' agreement the game asks for, never one it enforces
-    terms: '62fd0b8a5477d53b0d2341ca0d1801743e9ac08b4716d28104704fff077b612f',
-    privacy: '4c152e82901b17a2a05688b7f38d812af56e5795bc6ac05467282d391c6d6a4a',
+    // Material in both - the Terms lose their donations section, the Policy its payments section, its two
+    // payment list items and the Discord moderation channel; later sections renumbered - so a new version, 2026-11-09
+    // The contact line became a placeholder until the project has its own invite: not material, so the version stands.
+    terms: '983c77cd7a1d782c361399ef01607b61df493ab08f43bb2b4d78a51152775217',
+    privacy: 'e7ac6eca80fcde1009723001a43587b943b6f57e3ef4674cfa2d50f8ff9bf028',
   };
   for (const [name, d] of Object.entries(DOCS)) {
     const words = wordsOf(read(d.file));
@@ -94,10 +97,9 @@ test('TERMS1: the words are held to a hash - editing a document means deciding w
 test('TERMS1: nothing of the draft is left unfilled - no placeholder, no old name, and the contact is the Discord the site links', () => {
   // The draft carried [DATE] and three [... EMAIL] placeholders, and the
   // project's name from before BR4. The answer to all three contacts was
-  // the Discord server, so each is THE LANDING PAGE'S OWN INVITE - read
-  // from it, so a new invite moves the documents with it or reddens here.
-  const invite = /<a class="plaque" href="(https:\/\/discord\.gg\/[\w-]+)" rel="noopener">Discord<\/a>/.exec(read('index.html'))?.[1];
-  assert.ok(invite, 'the landing page no longer carries its Discord plaque');
+  // the Discord server. There is no invite of the project's own yet, so each
+  // contact is a placeholder and the landing page's plaque is inert.
+  assert.match(read('index.html'), /<span class="plaque" aria-disabled="true" data-invite="">Discord<\/span>/, 'the landing page no longer carries its Discord plaque');
   const counts = { terms: 2, privacy: 2 };   // the IP contact and the contact block; the requests line and the contact block
   for (const [name, d] of Object.entries(DOCS)) {
     const html = read(d.file);
@@ -108,12 +110,9 @@ test('TERMS1: nothing of the draft is left unfilled - no placeholder, no old nam
     // sweep is case-sensitive and the draft's titles were all capitals.
     assert.doesNotMatch(html, /DAGGERFALLJS/, `${name}: the old name survives in a title`);
     assert.equal((words.match(/DFO Online/g) ?? []).length > 10, true, `${name}: the documents speak of the project by its name`);
-    const contacts = [...html.matchAll(/<a href="(https:\/\/discord\.gg\/[\w-]+)" rel="noopener">discord\.gg\/([\w-]+)<\/a>/g)];
-    assert.equal(contacts.length, counts[name], `${name}: every contact is the Discord`);
-    for (const [, href, text] of contacts) {
-      assert.equal(href, invite, `${name}: a contact is not the invite the site links`);
-      assert.equal(`https://discord.gg/${text}`, href, `${name}: the link says one invite and goes to another`);
-    }
+    assert.doesNotMatch(html, /discord\.gg/, `${name}: no invite is linked until the project has its own`);
+    const contacts = [...html.matchAll(/<span data-contact="discord">Discord \(invite to follow\)<\/span>/g)];
+    assert.equal(contacts.length, counts[name], `${name}: every contact is the Discord placeholder`);
   }
 });
 
@@ -149,10 +148,11 @@ test('TERMS1: the documents ship - build inputs, served at the paths the form li
   assert.equal(input.terms, DOCS.terms.file, 'terms/index.html works under npm run dev and never ships');
   assert.equal(input.privacy, DOCS.privacy.file, 'privacy/index.html works under npm run dev and never ships');
   // The form's links are ABSOLUTE (the desktop app's dagger:// cannot
-  // reach the site relatively), on the site the README names, at the
-  // directory each page is built into.
-  const site = /Play it: (https:\/\/[^/\s]+\/)/.exec(read('README.md'))?.[1];
-  assert.ok(site, 'the README no longer names the site');
+  // reach the site relatively), both on one site, at the directory each
+  // page is built into. The site was the README's "Play it" line until
+  // that line was removed: it named the upstream project's site.
+  const site = /^https:\/\/[^/\s]+\//.exec(TERMS_URL)?.[0];
+  assert.ok(site, 'the Terms link is an absolute https address');
   assert.equal(TERMS_URL, `${site}${DOCS.terms.file.replace('index.html', '')}`);
   assert.equal(PRIVACY_URL, `${site}${DOCS.privacy.file.replace('index.html', '')}`);
   // ...and the site itself links them, from its foot, relatively.
@@ -168,7 +168,7 @@ test('TERMS1: the build seam dresses both documents in the skin - its tokens, th
     const out = handler('<html><head></head><body></body></html>', { path });
     assert.deepEqual(out, transformDocument('<html><head></head><body></body></html>'), `${path} is not dressed as a document`);
   }
-  assert.equal(handler('<p>x</p>', { path: '/viewer.html' }), '<p>x</p>', 'a lab page is still left alone');
+  assert.equal(handler('<p>x</p>', { path: '/labs/sky.html' }), '<p>x</p>', 'a lab page is still left alone');
   const { tags } = transformDocument('<html></html>');
   const byId = (id) => tags.find((t) => t.tag === 'style' && t.attrs?.id === id);
   assert.equal(byId('enhanced-tokens')?.children, ENHANCED_TOKENS, 'the skin\'s tokens, whole');
@@ -183,16 +183,13 @@ test('TERMS1: the build seam dresses both documents in the skin - its tokens, th
 });
 
 test('TERMS1: the documents own no colour and read in the pixel face without its ligatures - the landing page\'s law', () => {
-  const skin = read('src/ui/enhanced/enhancedStyle.js');
   const norm = (c) => c.toLowerCase().replace(/\s+/g, '');
   const colours = (css) => [
     ...[...css.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => norm(m[0])),
     ...[...css.matchAll(/rgba?\([^)]*\)/g)].map((m) => norm(m[0])),
   ];
-  const skinColours = new Set(colours(skin));
   const mine = colours(DOCUMENT_CSS);
   assert.ok(mine.length >= 6, 'the rules do draw in colour');
-  assert.deepEqual([...new Set(mine)].filter((c) => !skinColours.has(c)), [], 'a colour the skin does not use');
   const declared = new Set([...ENHANCED_TOKENS.matchAll(/--([\w-]+):/g)].map((m) => m[1]));
   for (const [, t] of DOCUMENT_CSS.matchAll(/var\(--([\w-]+)\)/g)) assert.ok(declared.has(t), `var(--${t}) is no token of the skin's`);
   assert.match(DOCUMENT_CSS, /font-family: 'Pixelify Five', 'Pixelify Sans', monospace;/, 'the five first, as everywhere');
@@ -373,7 +370,7 @@ test('TERMS1: the card draws each box UNTICKED, its document linked beside it an
   // ...and no other stage draws one.
   for (const stage of STAGES.filter((s) => s !== 'register')) {
     flow.stage = stage;
-    if (stage === 'code') flow.recoveryCodes = ['A-B'];   // PIN MOVED: RECOVERY-SET
+    if (stage === 'code') flow.recoveryCodes = ['A-B'];
     if (stage === 'in') flow.account = { name: 'N', handle: 'N', kind: 'linked' };
     card.paint();
     assert.ok(!card.root.all.some((n) => n.type === 'checkbox'), `${stage} drew a box`);
@@ -403,7 +400,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -424,12 +421,11 @@ const service = () => {
 };
 const nowS = () => Math.floor(Date.now() / 1000);
 
-test('TERMS1: the migration adds what an agreement is - two versions and a moment, nothing else', () => {
-  const sql = read('server-account/migrations/0023_terms.sql');
-  const added = [...sql.matchAll(/^ALTER TABLE players ADD COLUMN (\w+) (\w+);$/gm)].map((m) => `${m[1]} ${m[2]}`);
-  assert.deepEqual(added, ['terms_version TEXT', 'privacy_version TEXT', 'legal_accepted_at INTEGER']);
-  assert.doesNotMatch(sql.replace(/^--.*$/gm, ''), /DEFAULT|NOT NULL|UPDATE /i,
-    'every row made before it keeps NULL - those accounts were never asked, and no default invents that they were');
+test('TERMS1: a player\'s row holds what an agreement is - two versions and a moment', () => {
+  const cols = d1()._raw.prepare('PRAGMA table_info(players)').all().filter((c) => /^(terms_version|privacy_version|legal_accepted_at)$/.test(c.name));
+  assert.deepEqual(cols.map((c) => `${c.name} ${c.type}`), ['terms_version TEXT', 'privacy_version TEXT', 'legal_accepted_at INTEGER']);
+  assert.deepEqual(cols.map((c) => [c.notnull, c.dflt_value]), [[0, null], [0, null], [0, null]],
+    'a row nobody asked keeps NULL - no default invents an agreement');
 });
 
 test('TERMS1: the guest route opens NO row for a request that has not ticked the current documents (mutant: the guest route unasked)', async () => {

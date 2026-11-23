@@ -1,4 +1,4 @@
-// REZ-BLOODLINE (FIELD BUGS 2026-10-16b, bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; bible/06-Systems/Legacy-Arc.md
+// REZ-BLOODLINE (FIELD BUGS 2026-10-16b,;
 // section 6): "I was testing with a friend, he dies and I cast resurrection. It works for a moment then he disappears and
 // remains dead" - "You died without a descendant. ... The line ends here". A Bloodline death was written at the death
 // door (AUDIT LEGACY A1/B3), so the party's Resurrect raised a body whose house had already buried it, and the slow step
@@ -25,10 +25,11 @@ import * as acorn from 'acorn';
 import worker from '../../../server-account/src/index.js';
 import { REZ_SETTLE_MAX, settleHolds } from '../../../server-account/src/legacy.js';
 import { MINUTE_JOBS, CRON_MINUTE } from '../../../server-account/src/cron.js';
-import { standService } from '../../accountDb.mjs';
+import { d1, standService } from '../../accountDb.mjs';
 import { seatRealm, freshSave } from '../../realmSeat.mjs';
-import { SESSION_KEY } from '../../../src/net/accountClient.js';
-import { realmIo, createRealmSession, whenPageGoes } from '../../../src/systems/realmSaves.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
+import { realmIo, createRealmSession } from '../../../src/systems/realmSaves.js';
+import { watchRealmClose } from '../../../src/systems/online/realm-close-save.ts';
 import { createRealmLine } from '../../../src/systems/legacy/realmLine.js';
 import { createLegacyHost, LEGACY_TEXT, REZ_HOLD_MS } from '../../../src/scenes/legacyHost.js';
 import { madeRuleHere } from '../../../src/systems/madeLevel.js';   // the merge of PR #800: the frame asks the made level's law whether a Resurrect is taken here (EG-H2) - none made, so it is
@@ -43,7 +44,6 @@ import { hurtPlayer, setDeathListener } from '../../../src/characters/playerEnti
 import { reviveForPlay } from '../../../src/systems/deathRespawn.js';
 import { stateDeathLoss, statedDeathLoss } from '../../../src/systems/deathPenalty.js';
 import { DeathScreen, ONLINE_RESPAWN_SECONDS } from '../../../src/ui/deathScreen.js';
-import { WILD_DEATH_HOLD_S, setWildDeath } from '../../../src/systems/wild/wildZone.js';
 import { rezSnapshot, rezFor, resurrectionSpell, RESURRECT_TEXT, RESURRECT_HEALTH_PCT, RESURRECT_HOLD_MS, RESURRECT_TYPE, RESURRECT_SUBTYPE } from '../../../src/systems/resurrect.js';
 import { buildCustomSpell } from '../../../src/systems/spell/spellMaker.js';
 import { validPartyPose, validPartyFrame } from '../../../src/net/wire.js';
@@ -59,7 +59,11 @@ const mem = () => { const m = new Map(); return { get length() { return m.size; 
 // ── one clock for the page and the realm: the wall, moved on by the pins (the service reads Date.now) ──────────────────
 const realNow = Date.now;
 let skew = 0;
-Date.now = () => realNow() + skew;
+// The clock stands still between pins. The real wall moves while settle() waits on its 80 timers, and
+// where a timer tick is about 15 ms (Windows) one settle can take a second, enough to close a window
+// the pins hold open by a second.
+const frozenAt = realNow();
+Date.now = () => frozenAt + skew;
 test.after(() => { Date.now = realNow; });
 const later = (ms) => { skew += ms; };
 
@@ -128,6 +132,8 @@ const service = async () => (_svc ??= await standService());
  * false` - Ysolde alone, offline.
  */
 async function party({ model = MODELS.bloodline, online = true, ear = true } = {}) {
+  // A family id is minted from the clock with a fixed seed, so each party founds its line a millisecond on from the last.
+  later(1);
   _resetModSaveData();
   _resetModSettings();
   setModSetting(LEGACY_MOD, 'Family.Siblings Probability', 0);   // a house of one - the reporter's "There is no one left"
@@ -140,7 +146,7 @@ async function party({ model = MODELS.bloodline, online = true, ear = true } = {
     const g = await svc.guest();   // an account of her own, each party
     r.svc = svc; r.g = g; r.raw = svc.env.DB._raw;
     const store = mem();
-    store.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+    store.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); store.setItem(SERVICE_KEY, 'https://accounts.invalid');
     const fetch = async (url, init) => {
       const hold = init?.body && JSON.parse(init.body)?.hold === true;
       r.door.push(`${init?.method ?? 'GET'} ${new URL(url).pathname}${hold ? ' hold' : ''}${init?.keepalive ? ' keepalive' : ''}`);
@@ -198,7 +204,7 @@ async function party({ model = MODELS.bloodline, online = true, ear = true } = {
     _respawning: false, _rezSeen: null, _deadMark: null, _partyComposedAt: 0, _deathWasOnline: true,
     social: { acct: 'acct-ysolde', others: () => r.ysoldeHears ?? [] }, modes: { sdRealmSlot: () => null, clearDeath() {} },
     legacyHost: r.host, madeRuleHere, rezSnapshot, rezFor, reviveForPlay, playerEntity: r.e, RESURRECT_HEALTH_PCT, RESURRECT_TEXT, DeathScreen,
-    statedDeathLoss, stateDeathLoss, townTalk: r.townTalk, wildGhostEnd: () => {}, wildDeathKill: () => false, forgetLastSlew: () => {}, player: { stopAutorun() {} },
+    statedDeathLoss, stateDeathLoss, townTalk: r.townTalk, forgetLastSlew: () => {}, player: { stopAutorun() {} },
     hourRezOpen: () => true, _sdFallen: { rise() {} },   // SD-REZ (EVENT-RULES): no Hour here - a Resurrect is always open, and a rise lets no slot go
   };
   r.ysolde = v;
@@ -218,7 +224,7 @@ async function party({ model = MODELS.bloodline, online = true, ear = true } = {
   const c = {
     social: { acct: 'acct-bran', party: { members: [{ acct: 'acct-ysolde', name: 'Ysolde' }, { acct: 'acct-bran', name: 'Bran' }] }, others: () => r.branHears ?? [], accountOfPeer: () => 'acct-ysolde' },
     remotePlayers: rp, onlineToScene: (p) => [p.x, p.y, p.z], cam: { pos: [0, 0.9, 0] }, peerName: () => 'Ysolde',
-    _rezOut: null, _partyComposedAt: 0, RESURRECT_HOLD_MS, sendRaiseWord, online: { room: 'world:10,20' },   // PIN MOVED (AUDIT WORLD-EVENTS L1-1): the door says the raise to a made level's room; a street's keeps no death
+    _rezOut: null, _partyComposedAt: 0, RESURRECT_HOLD_MS, sendRaiseWord, online: { room: 'world:10,20' },
   };
   r.bran = c;
   const { fallenTargetPick, raiseFallenDoor } = mount(`${declOf('fallenTargetPick')}\n${declOf('raiseFallenDoor')}\nreturn { fallenTargetPick, raiseFallenDoor };`, c);
@@ -282,8 +288,8 @@ test('REZ-BLOODLINE AUDIT R1 the realm holds the death, never the page: died at 
   assert.equal(r.host.raisable(), true);
   assert.equal(r.host.tick(), null, 'no Succession under the death screen');
   assert.equal(r.host.tick(), null);
-  // late in the longest stand an online death screen makes (the open zone's two minutes)
-  later(WILD_DEATH_HOLD_S * 1000 - 1000);
+  // late in the stand an online death screen makes
+  later(ONLINE_RESPAWN_SECONDS * 1000 - 1000);
   assert.equal(r.toBran().p.fg, undefined, 'her pose says nothing of a death for good');
   assert.equal(r.resurrect(), false, 'the call reaches her frame: the realm is asked first - down until it answers');
   assert.ok(r.branSaid.includes(RESURRECT_TEXT.cast('Ysolde')), 'Bran calls her back');
@@ -371,7 +377,7 @@ test('REZ-BLOODLINE AUDIT R1 a killed tab and a second device escape nothing (th
   await settle();
   assert.deepEqual(await b.join(), [410, 'dead'], 'the join during the hold is refused');
   const win = new EventTarget();
-  mount(topOf('whenPageGoes('), { realmSession: b.session, legacyHost: b.host, whenPageGoes, globalThis: win });
+  mount(topOf('watchRealmClose('), { realmSession: b.session, legacyHost: b.host, watchRealmClose, checkpointGateOpen: () => false, _realmSaveHooks: { held: () => null }, characterIdOf: () => null, realmSummaryOf: () => null, playerEntity: {}, globalThis: win });
   win.dispatchEvent(new Event('pagehide'));
   assert.equal(b.session.lost, 'dead', 'the session the dead\'s - the leave behind it finds it so');
   await settle();
@@ -386,7 +392,7 @@ test('REZ-BLOODLINE AUDIT R1 a killed tab and a second device escape nothing (th
   b2.io.fetch = async (url, init) => { if (String(url).endsWith('/v1/realm/die')) await new Promise((go) => { gated.push(go); }); return fetchB2(url, init); };
   b2.die();
   const win2 = new EventTarget();
-  mount(topOf('whenPageGoes('), { realmSession: b2.session, legacyHost: b2.host, whenPageGoes, globalThis: win2 });
+  mount(topOf('watchRealmClose('), { realmSession: b2.session, legacyHost: b2.host, watchRealmClose, checkpointGateOpen: () => false, _realmSaveHooks: { held: () => null }, characterIdOf: () => null, realmSummaryOf: () => null, playerEntity: {}, globalThis: win2 });
   win2.dispatchEvent(new Event('pagehide'));
   gated.splice(0).forEach((go) => go());
   await settle();
@@ -755,8 +761,7 @@ test('REZ-BLOODLINE AUDIT R2 the online death screen counts the wall clock, as t
     const r = await party();
     r.die();
     await settle();
-    setWildDeath({ killer: 'a wolf', dropped: 0 });
-    try {
+    {
       let reset = false;
       const screen = new DeathScreen({ eyeHeight: 1.6, capsuleHeight: 1.8, online: true, entity: r.e, onReset: () => { reset = true; } });
       const start = Date.now();
@@ -769,23 +774,24 @@ test('REZ-BLOODLINE AUDIT R2 the online death screen counts the wall clock, as t
         legacyT -= dt;
         if (legacyT <= 0) { legacyT = 1; r.host.tick(); }   // legacyStep: once a second of the same dt
         assert.equal(r.host.raisable(), true, `${fps} fps: raisable while the screen stands (${((Date.now() - start) / 1000).toFixed(1)} s, "RISING IN ${screen.respawnIn}")`);
-        if (f === Math.round(fps * 60)) said = screen.respawnIn;
+        if (f === Math.round(fps * 30)) said = screen.respawnIn;
       }
       const wall = (Date.now() - start) / 1000;
-      assert.ok(reset && wall <= WILD_DEATH_HOLD_S + 1, `${fps} fps: the screen goes at ${wall.toFixed(1)} s on the wall`);
+      assert.ok(reset && wall <= ONLINE_RESPAWN_SECONDS + 1, `${fps} fps: the screen goes at ${wall.toFixed(1)} s on the wall`);
       assert.ok(wall * 1000 < REZ_HOLD_MS, 'inside the window');
-      assert.equal(said, WILD_DEATH_HOLD_S - 60, 'a minute in, it says a minute left');
-    } finally {
-      setWildDeath(null);
+      assert.equal(said, ONLINE_RESPAWN_SECONDS - 30, 'half a minute in, it says half a minute left');
     }
   }
   // a frame's own count still leads where its dt outruns the wall (a host stepping the screen by hand)
   const s = new DeathScreen({ eyeHeight: 1.6, capsuleHeight: 1.8, online: true, entity: ent(), wall: () => 0 });
   s.tick(ONLINE_RESPAWN_SECONDS / 2);
   assert.equal(s.respawnIn, ONLINE_RESPAWN_SECONDS / 2);
-  // one window at both doors: the longest online death screen and half a minute
-  assert.equal(REZ_HOLD_S, Math.max(ONLINE_RESPAWN_SECONDS, WILD_DEATH_HOLD_S) + 30);
+  // one window at both doors: at least the online death screen and half a minute (150 s since the open zone's two-minute hold set it)
+  assert.equal(REZ_HOLD_S, 150);
+  assert.ok(REZ_HOLD_S >= ONLINE_RESPAWN_SECONDS + 30);
   assert.equal(REZ_HOLD_MS, REZ_HOLD_S * 1000);
   assert.ok(REZ_SETTLE_MAX >= 1);
-  assert.match(rd('server-account/migrations/0122_rez_hold.sql'), /ALTER TABLE realm_characters ADD COLUMN rez_lease TEXT;\nCREATE INDEX IF NOT EXISTS realm_characters_rez_hold ON realm_characters \(dead_at\) WHERE rez_lease IS NOT NULL;/);
+  const raw = d1()._raw;
+  assert.equal(raw.prepare('PRAGMA table_info(realm_characters)').all().find((c) => c.name === 'rez_lease')?.type, 'TEXT');
+  assert.match(raw.prepare('SELECT sql FROM sqlite_master WHERE name = ?').get('realm_characters_rez_hold')?.sql ?? '', /^CREATE INDEX realm_characters_rez_hold ON realm_characters \(dead_at\) WHERE rez_lease IS NOT NULL$/);
 });

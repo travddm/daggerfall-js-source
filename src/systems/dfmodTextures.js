@@ -207,8 +207,7 @@ export function dfmodLoadOrder(mods) {
 // mod attached is on.
 export const DFMOD_OFF_PREF = 'dfmodOff';
 const offKeys = () => { const v = getPref(DFMOD_OFF_PREF); return Array.isArray(v) ? v.filter((k) => typeof k === 'string') : []; };
-// VE4: a SHIPPED mod stands at its own default until the player chooses - AUDIT VE (Mac, 2026-10-05: "Ensure this is on
-// by default"): Vanilla Enhanced's Base ships ON, as a mod in DFU's Mods folder is, and its add-ons OFF - so its switch
+// VE4: a SHIPPED mod stands at its own default until the player chooses - AUDIT VE: Vanilla Enhanced's Base ships ON, as a mod in DFU's Mods folder is, and its add-ons OFF - so its switch
 // is the player's CHOICE either way, `{ key: on }` on its own shelf entry, and a key with no choice reads the mod's
 // default (`on` in setShippedDfmods' list).
 // AUDIT VE R3/R9: ONE SWITCH A MOD. DFU keeps one Mod.Enabled a Title (ModManager.cs:859-868 restores it by
@@ -659,7 +658,7 @@ export function groundSource(archive) {
   const a = Number(archive);
   if (looseTextureExists(a, 0, 0)) return { kind: 'records' };
   for (const m of _prio) {
-    // ALIKR1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments seamlessly"):
+    // ALIKR1:
     // A PACK THAT IS A LOOSE FOLDER IN DFU. Sands of the Alik'r is a folder of loose pictures in Daggerfall Unity - no
     // bundle, no array, no record 0 - and DFU builds TEXTURE.002 out of loose records only while no mod's array claims
     // the archive (TryImportTextureArray asks the mods first, and Vanilla Enhanced's Base carries `002-TexArray`): a pack
@@ -796,7 +795,7 @@ async function groundLayers(archive, tex, decode) {
 }
 
 /**
- * STUDIO1 (bible/07-Rendering/Studio-Art.md): THE STUDIO'S RECORDS LAID IN A GROUND SET. The ground is drawn from a tile
+ * STUDIO1: THE STUDIO'S RECORDS LAID IN A GROUND SET. The ground is drawn from a tile
  * set built here, never through the texture door's uploads, so the studio's pictures of a ground archive's records
  * (textureReplacement.js studioRecordsOf) are laid over the set this door built - a mod's array, a pack's records, or
  * Daggerfall's own when nothing dresses it - each where its record is. A set is one size, so the set takes the size of

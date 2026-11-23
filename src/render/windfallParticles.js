@@ -1,6 +1,5 @@
 // @ts-check
-// WINDFALL1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments
-// seamlessly") - WINDFALL's THREE PARTICLE SYSTEMS: the gust's leaves, the ambient falling leaves and the winter
+// WINDFALL1 - WINDFALL's THREE PARTICLE SYSTEMS: the gust's leaves, the ambient falling leaves and the winter
 // boughs' snow (WindEnvironmentEffects.CreateLeaves / CreateSnow / CreateParticleSystem), run on the CPU and drawn as
 // one instanced quad each. The flows they run (where the emitter stands, its rate, the wind they ride) are
 // systems/windfallEffects.js's, set every outdoor frame.

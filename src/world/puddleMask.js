@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// WATER-PUDDLE (2026-09-25, Mac: "fixing any and all issues (especially
-// with ingame puddles and tiles in towns that are one square)"): THE
+// WATER-PUDDLE: THE
 // PUDDLE IS THE ART'S.
 //
 // DFU's shallow-water records - the town docks, moats and puddles (8, 23,
@@ -36,8 +35,7 @@ export const PUDDLE_RECORDS = Object.freeze([...new Set([...SHALLOW_DRAWN, ...SH
 const GROUND_RECORDS = 56;
 const anyTurn = (r) => [0, 1, 2, 3].some((t) => WATER_DRAW_MASK_TABLE[(r << 2) | t]);
 /**
- * SHORE-SILT (2026-10-12, Dudey's field video: a village pond's dirt shore, and a town's, freckled with blue blotches
- * where the new water's bed should be): the records the draw calls part water and part ground - the marching shores,
+ * SHORE-SILT: the records the draw calls part water and part ground - the marching shores,
  * WATER-DRAW2's corners and saddles - whose water is NOT the art's alone (the puddles above are). The bed's silt
  * (render/waterBedGlsl.js) covered their water where the corner table's bilinear coverage lies, and the art paints its
  * water as a ragged shape that reaches past that line - 7 to 34% of a temperate shore tile was painted water left
@@ -67,7 +65,7 @@ export const MIN_PATCH_TEXELS = 32;
  * @returns {Uint8Array} the same array, cleaned
  */
 export function cleanMask(wet, w, h, minArea = MIN_PATCH_TEXELS) {
-  // OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): the same patches, found with no
+  // OW-HITCH: the same patches, found with no
   // array a texel - the walk made four neighbours' array at every texel it reached (a 256-texel set's 3.6 million), and
   // a ground set met at a new climate on the journey was built in one frame. A patch is a 4-connected component, so the
   // order it is walked in moves nothing; its texels are a run of `patch` (a stack's worth at most: every texel once).
@@ -149,7 +147,7 @@ export function markPuddleWater(layers, tolerance = WATER_COLOUR_TOLERANCE) {
   return stepsDone(markPuddleWaterSteps(layers, tolerance));
 }
 
-/** OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): A TILE SET'S WATER, A RECORD AT A
+/** OW-HITCH: A TILE SET'S WATER, A RECORD AT A
  *  TIME. The streaming host meets a ground set at every new climate and season a journey reaches - on the snow lane its
  *  winter twin with it - and marked its puddles and shores inside the build in one go: a 256-texel set (Vanilla
  *  Enhanced, worn by default) and its classic shapes, a fifth of a second and more, twice. The marks are walks over the

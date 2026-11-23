@@ -1,11 +1,8 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL4-CENSUS (2026-10-22, mob picked it, 04:13Z; design doc "DFO Staff Panel: design", "Item and gold census",
-// "Built on the save judge", "Server load" and the weak spots "Copies found misses modded dupes..." and "Census rows ride
-// every save...") - THE ITEM AND GOLD CENSUS, AND THE CONTESTED PIECES. Admin only (mob, 03:03Z: a Moderator gets the chat
+// STAFF-PANEL4-CENSUS - THE ITEM AND GOLD CENSUS, AND THE CONTESTED PIECES. Admin only (mob, 03:03Z: a Moderator gets the chat
 // reports, Mute and Ban, and the few things named for them - not this).
 //
-// ═══ THE TALLY RIDES THE JUDGE, NEVER A SAVE OF ITS OWN ═════════════
+// THE TALLY RIDES THE JUDGE, NEVER A SAVE OF ITS OWN
 //
 // Every online character's checkpoint is already read by the judge (verdict.js verdictOn). The census takes its tally
 // there - gold (purse and banks) and how many of each item template the character holds (judge.js possessedItemLists:
@@ -25,15 +22,14 @@
 // What it measures is what the games claim (design doc, "Limits no fix removes"): a save's own word, as last saved by
 // the player's game. A character a service move changed while offline (a sale, a vault) counts as its last checkpoint.
 //
-// ═══ CONTESTED PIECES (the weak spot: "Copies found ... can blame an innocent player") ═══
+// CONTESTED PIECES (the weak spot: "Copies found ... can blame an innocent player")
 //
 // The ledger cannot tell a copier from someone who took the piece first (ledger.js THE FIRST HOLDER KEEPS IT), so a copy
 // found is a CONTESTED PIECE: which piece (its print), the first holder and the claimant with their times, how it was
 // found - and whether a staff member has checked its trail. A Remove of a contested piece needs that check (trail_at);
 // the Remove itself is the realm builder's. Copies and census jumps are how dupes are hunted; neither proves one.
 //
-// EVERY LIST PAGES (mob, 19:25Z: "put inf scroll in anything that pull lists"): `from`, answered as `next`.
-// ═══════════════════════════════════════════════════════════════════
+// EVERY LIST PAGES: `from`, answered as `next`.
 
 import { displayName } from './accounts.js';
 import { possessedItemLists, goldOf } from './judge.js';
@@ -61,8 +57,8 @@ export const CENSUS_DAYS_KEEP = 180;
 export const CENSUS_JUMP_HOURS = 24;
 export const CENSUS_JUMP_HOURS_MAX = 72;
 export const CENSUS_JUMPS_MAX = 50;
-/** THE QUIET HOURS (UTC) the census's own jobs run in - the evening peak is 14:00-00:00 UTC (bible/11-Multiplayer/
- *  Scale-Arc.md, PRIMARY-TRIPS). A guess at the quietest: nobody has measured the night. The day's totals at the first. */
+/** THE QUIET HOURS (UTC) the census's own jobs run in - the evening peak is 14:00-00:00 UTC (docs/multiplayer/relay-scaling-and-cost.md).
+ *  A guess at the quietest: nobody has measured the night. The day's totals at the first. */
 export const CENSUS_QUIET_HOURS = Object.freeze([7, 8, 9, 10]);
 export const CENSUS_DAY_HOUR = CENSUS_QUIET_HOURS[0];
 /** The backfill's page of characters, and the most it fills in one firing (each one an R2 read and a parse). */
@@ -82,7 +78,7 @@ const TEMPLATE_SCAN = 4096;
 export const CENSUS_ROUTES = Object.freeze(['/v1/staff/census/find', '/v1/staff/census', '/v1/staff/census/jumps',
   '/v1/staff/contested', '/v1/staff/contested/piece', '/v1/staff/contested/trail']);
 
-// ═══ THE TALLY ═══════════════════════════════════════════════════════
+// THE TALLY
 
 /**
  * ONE CHARACTER'S TALLY, pure: `{"g": gold, "b": banks, "t<index>": count, ...}` - gold the purse and the banks (judge.js goldOf,
@@ -117,7 +113,7 @@ export function censusTally(save) {
   let banks = 0;
   for (const a of Array.isArray(save.bankAccounts) ? save.bankAccounts : []) banks += goldOf(a?.accountGold);
   const gold = goldOf(save.goldPieces) + banks;
-  // ECON-WORTH (mob, 2026-10-25: "hover break down on gold held bank held and item total"): the banks' share of `g` as
+  // ECON-WORTH: the banks' share of `g` as
   // well, so the economy tells a purse from a bank - never a kind of its own (censusDay and the reads ask `g` and `t`s)
   /** @type {Record<string, number>} */
   const out = { g: Math.min(Number.MAX_SAFE_INTEGER, gold), b: Math.min(Number.MAX_SAFE_INTEGER, banks) };
@@ -151,7 +147,7 @@ export function censusStep(db, { player, char, seq, nowS }, save, was) {
   }
 }
 
-// ═══ KINDS: what staff type ═══════════════════════════════════════════
+// KINDS: what staff type
 
 /** A kind as the routes take it - 'gold', 'marks', or an item template ('t113', or 113) - or null. */
 export function kindOf(/** @type {unknown} */ v) {
@@ -201,7 +197,7 @@ export function storeTemplateOf(/** @type {string} */ key) {
   return Number.isSafeInteger(t) ? /** @type {number} */ (t) : null;
 }
 
-// ═══ THE READS ═══════════════════════════════════════════════════════
+// THE READS
 
 /** @type {Map<string, { at: number, data: any }>} the census reads this isolate kept */
 const kept = new Map();
@@ -227,7 +223,7 @@ const DELIVERY_T = "COALESCE(p.template, CAST(json_extract(d.item, '$.templateIn
 const DELIVERY_N = "SUM(CASE WHEN d.item IS NULL THEN 1 ELSE MAX(1, COALESCE(json_extract(d.item, '$.stackCount'), 1)) END)";
 const DELIVERIES = 'FROM market_deliveries d LEFT JOIN products p ON p.provenance = d.provenance WHERE d.collected = 0';
 /** Marks the market holds: the ledger's escrow end, what went in less what came out - open orders' and standing bids'
- *  alike (marks.js marksReport's measure, the economy screen's, on 0153's covering index). */
+ *  alike (marks.js marksReport's measure, the economy screen's, on the covering index). */
 const MARKS_ESCROW = `SELECT COALESCE(SUM(CASE WHEN dst_kind = 'escrow' THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN src_kind = 'escrow' THEN amount ELSE 0 END), 0) AS n
   FROM marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'`;
 
@@ -326,7 +322,7 @@ async function jumpsOf(db, kind, nowS, hours) {
   }));
 }
 
-// ═══ CONTESTED PIECES ════════════════════════════════════════════════
+// CONTESTED PIECES
 
 /** What a piece is, off its print (judge.js ledgerPrintOf: `template:material`). */
 const pieceOf = (/** @type {unknown} */ fp) => {
@@ -339,7 +335,7 @@ const recordOf = (/** @type {any} */ d, /** @type {string} */ p, /** @type {unkn
   : null);
 
 /** A listed row: a death's dropped piece (`drop`) is the ledger's own bookkeeping, never listed - and in none of the
- *  list's indexes (0154 item_dupes_at, item_dupes_open, item_dupes_open_at), so no read here walks the drops. */
+ *  list's indexes (item_dupes_at, item_dupes_open, item_dupes_open_at), so no read here walks the drops. */
 const LISTED = "(d.kind IS NULL OR d.kind != 'drop')";
 /** Unchecked contested pieces on the copy holder's character - the count that makes a row high (item_dupes_open). */
 const OPEN_SQL = "(SELECT COUNT(*) FROM item_dupes x WHERE x.char_id = d.char_id AND x.trail_at IS NULL AND (x.kind IS NULL OR x.kind != 'drop'))";
@@ -443,7 +439,7 @@ async function pieceTrail(db, uid) {
   };
 }
 
-// ═══ THE PANEL'S DOORS ═══════════════════════════════════════════════
+// THE PANEL'S DOORS
 
 const offsetOf = (/** @type {unknown} */ v) => (Number.isSafeInteger(v) && /** @type {number} */ (v) > 0 ? /** @type {number} */ (v) : 0);
 const within = (/** @type {unknown} */ v, /** @type {number} */ dflt, /** @type {number} */ max) => (Number.isSafeInteger(v) && /** @type {number} */ (v) >= 1 ? Math.min(/** @type {number} */ (v), max) : dflt);
@@ -549,7 +545,7 @@ export const HOME_WATCH = Object.freeze({
   },
 });
 
-// ═══ THE CLOCK'S JOBS (cron.js HOUR_JOBS) - off peak only ═══════════════
+// THE CLOCK'S JOBS (cron.js HOUR_JOBS) - off peak only
 
 const utcHourOf = (/** @type {number} */ nowS) => new Date(nowS * 1000).getUTCHours();
 

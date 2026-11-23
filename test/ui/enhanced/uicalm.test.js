@@ -1,4 +1,4 @@
-// UI-CALM (2026-10-14, bible/10-UI/UI-Calm.md) - THE QUIET PASS. A player's report in six points: the first screen
+// UI-CALM - THE QUIET PASS. A player's report in six points: the first screen
 // asks Online or Offline; character creation looked like a placeholder; the menus lacked hierarchy (the horse's coats
 // were a wall of presses); the text was barely readable by default; a huge, unmovable horse and cart panel stood over the
 // sky and the temperature belonged in the bottom-left corner; and every system added a panel - "Show information when it's
@@ -28,7 +28,6 @@ test('UI-CALM the front door asks which world first: Online and Offline the two 
   assert.ok(doors.indexOf("doorBtn('online'") > 0 && doors.indexOf("doorBtn('online'") < doors.indexOf("doorBtn('offline'"), 'Online first');
   assert.match(doors, /more\.append\(doorBtn\('back', t\('menu\.home\.back', 'Back'\), '', level\('top'\)\)\);/, 'a way back from the offline doors');
   assert.match(menu, /if \(offlineSection\(section\)\) homeLevel = 'offline';/, 'a game\'s pane backs out to the offline doors');
-  // PIN MOVED (AUDIT UICALM-FIRM1 L3 L1): and the keyboard back on the door it came from
   assert.match(menu, /: homeLevel !== 'top' && twoQuestionDoor\(\) \? \(\) => \{ const from = homeLevel; homeLevel = 'top'; render\(\); focusDoor\(from\); \}/, 'Escape on the offline doors: the two questions');
   assert.match(menu, /homeLevel = 'top';   \/\/ UI-CALM: every visit asks which world first/);
   assert.match(menu, /const SECTIONS_BOOT = \['Online', 'Continue', 'New Game', 'Load Game', 'Test Room',/);
@@ -62,7 +61,7 @@ test('UI-CALM the saddle panel is a block in the bottom-right corner, up and awa
   assert.equal(saddleAlert(S({ horse: null, load: { kg: 800, limit: 800 } })), null, 'at its limit is not past it');
   assert.deepEqual([saddleHello(S(), 'F2'), saddleHello(S(), '')], ['F2: saddle panel', 'Saddle panel: give it a key in Controls']);
   // the key: a port action on F2, its press handed to the one glue by both hosts, which puts the panel up or away
-  assert.equal(ACTIONS.at(-5), 'SaddlePanel');   // PIN MOVED (CARGO-ANYWHERE: ShipHold appended after; SHOT-KINDS: ShotCycle; PARTY-PING: PartyPing; Decorate)
+  assert.equal(ACTIONS.at(-5), 'SaddlePanel');
   assert.ok(PORT_ACTIONS.includes('SaddlePanel') && DEFAULT_BINDINGS.some(([c, a]) => c === 'F2' && a === 'SaddlePanel'));
   assert.match(rd('src/scenes/saddleHost.js'), /if \(s && toggle && !covered\) toggleSaddlePanel\(\);/);
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(rd(host), /toggle: show && hccActionPressed\('SaddlePanel'\),/, host);
@@ -83,7 +82,6 @@ test('UI-CALM the corner and the quiet HUD: the temperature plate the bottom-lef
   assert.doesNotMatch(hud, /compass\.append\(temp\)/);
   assert.match(rd('src/ui/hud/hudLayout.js'), /\{ id: 'temp', sel: '\.hud \.hud-temp', name: 'Temperature', inside: 'quick' \}/);
   assert.match(UI_CALM_CSS, /\.hud \.hud-temp\[data-level="ok"\] \.hud-tempword, \.hud \.hud-temp\[data-level="ok"\] \.hud-tempscale \{ display: none; \}/);
-  // PIN MOVED (AUDIT UICALM-FIRM1 L4 N1, M3): full short of no whole point; never at rest while the HUD is arranged
   assert.match(hud, /const allFull = rows\.every\(\(\[key, , now, max\]\) => \(key === 'magicka' && !\(Number\(vitals\.maxMagicka\) > 0\)\) \|\| now > max - 1\);/);
   assert.match(hud, /const calm = getPref\(HUD_CALM_PREF\) !== false && !hudArranging\(\) && allFull && !parts\.foe\?\.classList\?\.contains\?\.\('on'\);/);
   assert.match(hud, /const rest = calm && last\.calmFor >= VITALS_REST_S;/);
@@ -97,7 +95,6 @@ test('UI-CALM the windows read: the quiet ink a step lighter and the type floor 
   assert.match(UI_CALM_CSS, new RegExp(`\\${P.replace(/[[\]().]/g, (c) => `\\${c}`)} \\{ --dim: #b9b2a1; \\}`));
   assert.equal(CALM_INK.quiet, '#bdb4a0');
   // no colour rule under the sheet without Plus's prefix (a font-size, a gap, a width may stand for both dresses).
-  // PIN MOVED (AUDIT UICALM-FIRM1 L5 L3): rule by rule, every colour - a background, a border, a shadow, a line a rule
   // runs on to - where the line-start `color:` it read let the class bars' dark and amber stand on the Grimoire's page
   const COLOUR = /(?:^|[;\s{])(?:color|background(?:-color)?|border(?:-[a-z]+)*|box-shadow|text-shadow|outline(?:-color)?|fill|stroke):[^;}]*(?:#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(|\b(?:white|black)\b)/i;
   const rules = [...UI_CALM_CSS.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)];

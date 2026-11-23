@@ -2,7 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // MOD1 — THE MODERATOR'S CHAT COMMANDS, and the words around them.
 //
-// Mac: "a moderator glyph and moderator chat commands" - /mute and
+// /mute and
 // /unmute (his pick, of the four offered).
 //
 //   /mute <name> [minutes]    minutes defaults to MUTE_DEFAULT_MIN

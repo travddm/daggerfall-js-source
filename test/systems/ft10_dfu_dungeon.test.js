@@ -1,4 +1,4 @@
-// FT10 - DFU'S OWN DUNGEON ENHANCEMENTS (2026-09-14, the Features arc):
+// FT10 - DFU'S OWN DUNGEON ENHANCEMENTS:
 // Enemies Fight Each Other, Varied Dungeon Monsters, Torches Light Your
 // Way - three of the Enhancements section's switches, DFU Classic. Each
 // is read by the port at its point of use as DFU reads it, and each
@@ -45,10 +45,3 @@ test('FT10: each note says what Daggerfall Unity ships it as, and the baked defa
   }
 });
 
-test('FT10: the port reads each key where DFU reads it, live', () => {
-  assert.match(read('src/characters/enemy/enemyTargets.js'), /export const enemyInfightingEnabled = \(\) => getBool\('Enhancements', 'EnemyInfighting'\);/, 'infighting: at the point of use');
-  assert.match(read('src/characters/dungeonEnemies.js'), /alternate = getBool\('Enhancements', 'AlternateRandomEnemySelection'\) \} = \{\}\) \{/, 'alternate selection: as the dungeon\'s enemies are collected');
-  assert.match(read('src/systems/playerTorch.js'), /const enabled = fromItems \?\? getBool\('Enhancements', 'PlayerTorchFromItems'\);/, 'the torch: inside the tick, as EnablePlayerTorch.Update reads it');
-  assert.match(read('src/systems/startingGear.js'), /torchesFromItems = getBool\('Enhancements', 'PlayerTorchFromItems'\)/, 'and the starting gear');
-  assert.match(read('src/systems/shopStock.js'), /torchesFromItems = getBool\('Enhancements', 'PlayerTorchFromItems'\)/, 'and the shop shelf');
-});

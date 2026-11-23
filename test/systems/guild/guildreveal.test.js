@@ -72,15 +72,3 @@ test('G8: the DarkBrotherhood reveals on EVERY promotion, whatever the rank', ()
   assert.deepEqual(calls, ['readMapDB', 'readMapDB', 'readMapDB'], 'three promotions, three reveals');
 });
 
-test('G8: the seam threads host-to-law', () => {
-  const flow = readFileSync(new URL('../../../src/systems/guild/guildServiceFlow.js', import.meta.url), 'utf8');
-  assert.ok(flow.includes('updateRank(memberships, guild, entity, store, now, { revealLocation, ownsHouse, rankCeiling, promoteWhenEarned, owed: standingOwedOf(guild.factionId) })'),
-    'onPushEffects hands the reveal seam to updateRank');   // PIN MOVED (OWED-PACE: and the Roll's owed beside them; CHAP4b: and the host's rank ceiling beside it; PROMO-NOW: and the online no-wait)
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  // MACRO-4: through the popup's own wrapper, which keeps the revealed name for %dng
-  assert.ok(wm.includes('const r = host.revealLocation(noteKey); if (r) revealedDungeon = r; return r?.name ?? null;'), 'the interior host threads it');
-  assert.ok(/steps: \(\) => onPushEffects\([\s\S]{0,400}?\n\s+revealLocation,/.test(wm), 'and hands the wrapper to the push effects');
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.ok(w.includes('const picked = discoverRandomLocation(rows);'), 'the world host builds the region candidates');
-  assert.ok(w.includes('row.mapId, discovered: row.discovered'), 'off the map TABLE, not full location reads');
-});

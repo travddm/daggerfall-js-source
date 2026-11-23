@@ -1,6 +1,5 @@
 // @ts-check
-// WBX3 (2026-09-26, Mac: "Loot drops should show their sprite and have a small colored loot line that extrudes from the
-// sprite itself"): AN ITEM'S OWN PICTURE, FOR THE WORLD'S GL - the picture the pack shows (systems/item/itemTemplates.js
+// WBX3: AN ITEM'S OWN PICTURE, FOR THE WORLD'S GL - the picture the pack shows (systems/item/itemTemplates.js
 // inventoryItemImage: the archive, the record and the item's dye), through the pack's own door (ui/textureCanvas.js
 // requestIcon - the vendored arm, a replacement by the dye, the classic TEXTURE file with its mask stripped), handed back
 // in the port's color32 order (formats/color32Order.js - a canvas reads top row first; the GL wants the bottom row

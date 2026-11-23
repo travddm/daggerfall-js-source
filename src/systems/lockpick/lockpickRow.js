@@ -1,6 +1,5 @@
 // @ts-check
-// LOCKPICK (2026-10-26, the owner: "I want to build a detailed lock picking minigame and introduce a lockpick item";
-// bible/06-Systems/Lockpicking.md): THE LOCKPICK'S ROW, A LEAF - the Weir Key's law (systems/eliteGates/weirKeyRow.js,
+// LOCKPICK: THE LOCKPICK'S ROW, A LEAF - the Weir Key's law (systems/eliteGates/weirKeyRow.js,
 // KEY-LAW): the item law (systems/item/itemLaw.js) runs on the account service, which loads none of the game, so a template
 // whose home pulls the texture door in is read beside the registry from a leaf (lawTemplate). lockpickItem.js lays its
 // name and picture over this row and registers it. It imports nothing.

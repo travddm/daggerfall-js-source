@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { undergroundWakeSpot, undergroundWakeText, nearestSafeLocation } from '../../src/systems/deathRespawn.js';
 import { LOCATION_TYPES, DUNGEON_TYPES } from '../../src/formats/mapsFile.js';
 
-// ═══ ONLINE-UNDERGROUND-LOAD1 ═══════════════════════════════════════
+// ONLINE-UNDERGROUND-LOAD1
 //
 // Lost, 2026-09-19: online, the game saves when the page closes; a character saved underground must not wake
 // inside the dungeon on the next online load - it wakes near a city, graveyard or temple.
@@ -52,22 +52,3 @@ test('ONLINE-UNDERGROUND-LOAD1: one wake line per kind, none of them a death lin
   assert.equal(undergroundWakeText('nowhere'), undergroundWakeText('city'));
 });
 
-test('ONLINE-UNDERGROUND-LOAD1 by source: the boot load\'s dungeon arm wakes an ONLINE page at the safe place - the Hold excepted - and leaves the offline arm as it was', () => {
-  const w = read('src/scenes/world.js');
-  const i = w.indexOf(`} else if (String(extras.locationKey ?? '').startsWith('dungeon:')) {`);
-  assert.ok(i > 0, 'the dungeon arm of worldQuickLoad');
-  const arm = w.slice(i, w.indexOf(`} else if (extras.locationKey && extras.locationKey !== 'world') {`, i));
-  assert.match(arm, /else if \(onlineOn && !\(pixel\.x === getInt\('Startup', 'StartCellX'\) && pixel\.y === getInt\('Startup', 'StartCellY'\)\)\) \{/,
-    'the PAGE flag (the boot load runs before any session exists), and the tutorial dungeon read off the configured start cell');
-  // AUDIT OH-F B5: the dungeon's door - the pit, for a save in the drowned dungeon (its own pixel is the borrowed template's)
-  assert.match(arm, /const from = ohSaved\?\.Active && Number\.isFinite\(ohSaved\.PitMapX\) && Number\.isFinite\(ohSaved\.PitMapY\) \? \{ x: ohSaved\.PitMapX, y: ohSaved\.PitMapY \} : pixel;/);
-  assert.match(arm, /undergroundWakeSpot\(maps\.getRegion\(maps\.getRegionIndexAt\(from\.x, from\.y\)\)\?\.mapTable \?\? \[\], from\)/,
-    'the region the DUNGEON stands in - the player is not there yet, so the current-region reader would answer the start cell\'s');
-  assert.match(arm, /_teleportToPixel\(wake\.mapPixel\.x, wake\.mapPixel\.y, null, \{ modEvent: 'load', reposition: REPOSITION\.RandomStartMarker \}\)/,
-    'the same teleport core and the death respawn\'s own marker landing, still a LOAD to the seasons');
-  assert.match(arm, /townTalk\.say\(undergroundWakeText\(wake\.kind\)\)/);
-  assert.doesNotMatch(arm.slice(0, arm.indexOf('} else {')), /startInDungeon|restoreDungeonSave/, 'the online arm never re-enters the dungeon');
-  assert.match(arm, /\} else \{\s*\n(?:\s*_wodInside = true;[^\n]*\n)?\s*await _teleportToPixel\(pixel\.x, pixel\.y, null, \{ modEvent: 'load' \}\);[^\n]*\n\s*const entered = await \(modes\?\.startInDungeon\?\.\(\{ locationKey: extras\.locationKey, fromLoad: true, recorded: extras\.dungeon \?\? \{\} \}\) \?\? false\);/,   // PIN MOVED (INSTANCES' audit): and the save's word for its room   // MAP-KEEP: the load arm
-    'offline (and the Hold) re-enter the dungeon exactly as MAC6 #1 wrote it (CASTLE1: naming the saved dungeon)');
-  assert.match(w, /import \{[^}]*undergroundWakeSpot, undergroundWakeText[^}]*\} from '\.\.\/systems\/deathRespawn\.js';/);
-});

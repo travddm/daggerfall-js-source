@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF12 (2026-10-02, Mac: "2 and 4") - A BREW'S POTIONS AS DFU'S OWN
-// ITEMS (bible/06-Systems/Professions-Arc.md 9.3, 37): the potions the
+// PROF12 - A BREW'S POTIONS AS DFU'S OWN
+// ITEMS (9.3, 37): the potions the
 // alchemy station's brew makes, minted into the pack as DFU's own maker
 // mints one - ItemBuilder.CreatePotion (systems/loot/loot.js createPotion: the
 // Glass Bottle carrying its recipe's key, the recipe's price and its

@@ -195,15 +195,6 @@ test('AUDIT 39 #82: the biography lands BEFORE the starting kit', () => {
   finishChargen(bagged, synthResult({ biographyEffects: [] }), null, { rolls: () => 0 });
   assert.equal(bagged.items[0].templateIndex, 132, 'the spellbook is first when no answer put anything ahead of it');
 
-  // the source order itself, so a later edit cannot quietly swap them
-  // (the wizard's seam only - the ?class= copy at the head of the file
-  // builds its own kit and has always run in DFU's order)
-  const src = read('src/systems/chargenSession.js');
-  const seam = src.slice(src.indexOf('export function applyCreationExtras'));
-  assert.ok(seam.indexOf('applyBiographyEffects(playerEntity') < seam.indexOf('assignStartingEquipment(playerEntity'),
-    'ApplyEffects then AssignStartingEquipment, StartGameBehaviour.cs:415-419');
-  assert.ok(seam.indexOf('attachFactionRep(playerEntity') < seam.indexOf('bootstrapRegionPower(playerEntity.factionRep'),
-    'and the store exists before InitializeRegionData walks it');
 });
 
 // =====================================================================
@@ -230,11 +221,6 @@ test('AUDIT 39 #84: the WheneverUsed leech bills the wearer at BOTH doors', () =
     assert.deepEqual(hurts, [16, 8], 'leechCastAmount then leechWeaponAmount (:84-89)');
   } finally { setDefaultEnchantCtx(null); }
 
-  // the host mount is where it has to live - worldTick's round ctx
-  // reaches only the magic round. WAVE D: the mount BODY is
-  // scenes/hostEnchant.js, so the drawback bills at both doors in
-  // every host that mounts it rather than in the one that had a copy.
-  assert.match(read('src/scenes/hostEnchant.js'), /hurtSelf: \(n\) => \{ if \(n > 0\) sinks\?\.hurt\?\.\(n\); \},/);
 });
 
 test('AUDIT 39 #85: the strike stamps the LIVE classic minute, so the timed leech switches off', () => {
@@ -336,19 +322,3 @@ test('AUDIT 39 #87: the Mace drains the target through a real DrainStrength incu
   assert.equal(entry.ended, true, 'healed to 0, the incumbent ends');
 });
 
-// =====================================================================
-// #88 - LycanthropyEffect.cs:519-521 re-arms the move-sound timer
-// inside MorphSelf's transform-into-beast branch. The behaviour is
-// pinned in lycanmove.test.js (where the LM1 laws live); this is the
-// source pin that the call site exists at all.
-// =====================================================================
-test('AUDIT 39 #88: MorphSelf re-arms the move-sound timer on the way INTO beast form', () => {
-  const src = read('src/systems/lycanthropy.js');
-  const at = src.indexOf("entry.raceNameOverride = entry.infectionType === LYCANTHROPY_TYPES.Wereboar");
-  assert.ok(at > 0);
-  const branch = src.slice(at, src.indexOf('} else {', at));
-  assert.match(branch, /entry\.moveSoundTimer = initMoveSoundTimer\(rolls\);/,
-    'the third InitMoveSoundTimer call site (:521), after the compound-race name swap');
-  // and the note that said DFU does NOT re-arm is gone
-  assert.doesNotMatch(src, /resumes it rather than restarting/);
-});

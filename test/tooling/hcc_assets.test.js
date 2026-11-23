@@ -1,4 +1,4 @@
-// HCC (2026-09-23, Mac: "Next mod I want to implement 1 to 1 and also enhance its online integration functionality"):
+// HCC:
 // THE VENDORED FILES ARE THE ASSEMBLY'S. Horse Cart and Cargo embeds its 45 horse PNGs in `TrailingWagon.dll` as .NET
 // manifest resources - the first mod this port carries whose art is not a Unity texture - so `formats/dotnetResources.js`
 // walks the PE's CLI metadata to them, `tools/hccAssets.mjs` writes them under vendor/horse-cart-and-cargo/Textures/, and

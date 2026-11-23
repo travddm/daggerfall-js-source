@@ -1,4 +1,4 @@
-// INT18 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7): THE LEGACY RECORD HELD TO
+// INT18: THE LEGACY RECORD HELD TO
 // ITS OWN LAW. A line's copy at the realm (server-account/src/legacy.js putLineage) is asked the family law's bounds
 // (src/systems/legacy/legacyLaw.js - a member's blood and hearth, the waiting estate) and, beside the stored copy it was
 // made from, the facts store.js mergeFacts only ever adds (a member, a death, a retirement, a fallen's remains). A copy
@@ -20,7 +20,7 @@ import { STAT_KEYS_ORDER } from '../../src/systems/statMods.js';
 const entity = (over = {}) => ({
   name: 'Ysolde Hlaalu', gender: 'female', race: 'DarkElf', raceId: 4, faceIndex: 3, careerIndex: 5,
   career: { name: 'Nightblade', primarySkills: [28, 22, 16], majorSkills: [19, 24, 13], minorSkills: [1, 2, 3, 4, 5, 6] },
-  level: 7, characterId: 'c-ysolde', chargenDone: true, levelingSystem: 'virtue',
+  level: 7, characterId: 'c-ysolde', chargenDone: true,
   stats: { strength: 100, intelligence: 100, willpower: 100, agility: 100, endurance: 100, personality: 100, speed: 100, luck: 100 },
   skills: Array.from({ length: 35 }, () => 100),
   ...over,

@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-R (2026-09-28, Mac, of main's Overworld raiders: "Definitely want them to appear as ships") - WARM ASHES'
+// NAV-R - WARM ASHES'
 // RAIDERS, STOOD AS SHIPS OF THE SEA. Main's OWS3 sails one raider a cell a life on the Overworld (systems/seaRaiders.js:
 // seeded, so every player sees the same sail at the same minute) and drew none in play - alongside, the mod's raid
 // boarded a ship the player was carried onto. Here a raider near a player at sea IS a pirate of the sea: its seed's own
@@ -31,7 +31,7 @@ export const RAIDER_DROP_M = 1700;
 /** Its course: the place its seeded course reaches this many seconds on is what it steers for. */
 export const RAIDER_LEAD_S = 45;
 /** At most this many raiders stand at once - the nearest (a raider is a cell's in a life: two is already a crowd).
- *  SEA-EASE (Mac: "too many ships are appearing", "The sea is too dangerous right now"): one (it was two). */
+ *  SEA-EASE (, "The sea is too dangerous right now"): one (it was two). */
 export const RAIDER_SHIPS_MAX = 1;
 /** The seed's salt for its class (never the course's own stream). */
 const CLASS_SALT = 0x5ea1c1a5;

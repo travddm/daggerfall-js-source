@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF3 (2026-09-28, Mac: "Lets keep moving") - THE PIECE A CRAFT MADE
-// (bible/06-Systems/Professions-Arc.md 9.2, 24): minted as DFU mints
+// PROF3 - THE PIECE A CRAFT MADE
+// (9.2, 24): minted as DFU mints
 // it and the quality laid on it after.
 //
 // DFU'S OWN ITEM FIRST. A weapon is ItemBuilder.CreateWeapon's
@@ -24,17 +24,14 @@
 // pack holds. Its row is registered with the ores and ingots
 // (profTemplates.js), so any scene the save loads in knows it.
 //
-// MEND-AIM (2026-09-30, Discord suggestion, kurkku: "Allow targeting
-// field repair kit use" - "always repairing the most worn piece of
-// equipment means fixing arrows or random loot you picked up most of
-// the time"): A KIT IS AIMED. Used from either pack with more than one
+// MEND-AIM: A KIT IS AIMED. Used from either pack with more than one
 // piece to mend, it asks which (the classic window's list picker, the
 // enhanced pack's own list); the quick keys, which have no list to
 // show, take what is WORN first, then the pack's, each the most worn
 // first. An arrow is never mended - DFU mints a quiver at condition 0,
 // so it was always the "most worn" piece a kit could find.
 //
-// PROF4 (2026-09-28, Mac: "Continue"; Professions-Arc.md 25): AND THE
+// PROF4: AND THE
 // WORKBENCH'S. A staff or a bow is DFU's weapon at its wood's material,
 // its quality the smith's weapons'; arrows are CreateWeapon's arrow arm
 // at twenty, no quality and no provenance (DFU mints a quiver at
@@ -44,7 +41,7 @@
 // on every piece a Master Joiner makes (`marked`); the Basket Foraging's
 // own, its quality its life.
 //
-// PROF7 (2026-09-29, Mac: "Do it"; Professions-Arc.md 29): AND THE
+// PROF7: AND THE
 // LOOM'S. Leather armour is CreateArmor's at Leather (material 0), its
 // quality the smith's armour's; a garment is DFU's clothing template in
 // its group (the men's or the women's), its variant the record's seed's
@@ -92,7 +89,7 @@ import { itemLongName } from './item/itemInfo.js';
 import './professions/profTemplates.js';   // the Repair Kit's row (692), registered with the ores and ingots
 import { applyRarity, rarityEligible, RARE_FLAVOURS, reforgeAffix, reforgeableLines, lastPass, rarityName, affixesWorth } from './loot/lootRarity.js';   // CRAFT4: and the Reforge with Essence's roll; CRAFT-PROCS: the last pass; MASTER-ART: a Master's work's name and worth
 import { pieceQuality, temperRefusal, temperStep, reforgeEssence } from '../net/temperLaw.js';   // CRAFT4: the temper
-import { readProductRecord, mintVersionOf, MINT_V_LAST_PASS, MINT_V_LINES, MINT_V_ARMOR_LEAN, MINT_V_JEWEL_KIN, MINT_V_MASTER, masterLinesOf } from '../net/productRecord.js';   // CRAFT4: a tempered piece's record, re-signed; CRAFT-PROCS: the mint's version; AFFIX-LINES: its lines' law; MASTER-ART: a Master's lines
+import { readProductRecord, mintVersionOf, MINT_V_LAST_PASS, MINT_V_LINES, MINT_V_ARMOR_LEAN, MINT_V_JEWEL_KIN, MINT_V_MASTER, masterLinesOf, masterTierOfVersion } from '../net/productRecord.js';   // CRAFT4: a tempered piece's record, re-signed; CRAFT-PROCS: the mint's version; AFFIX-LINES: its lines' law; MASTER-ART: a Master's lines
 import { masterLinesOfRecord } from '../net/masterLaw.js';   // MASTER-ART: a Master's work's lines, as its record signs them
 import { itemIsIdentified } from './tradeModes.js';   // CRAFT4: a line the Reforge sees, known
 import { isEquipped } from './equip.js';   // CRAFT4: and never on a worn piece
@@ -148,18 +145,20 @@ function setJewel(item, r, hand) {
 }
 
 /**
- * MASTER-ART (Professions-Arc 57): A MASTER'S WORK laid on its piece - Legendary, its lines at the values its record signs
+ * MASTER-ART (Professions-Arc 57): A MASTER'S WORK laid on its piece - at its record's tier (Rare from
+ * MINT_V_MASTER_RARE, Legendary before), marked `master`, its lines at the values its record signs
  * (AUDIT HORIZONTAL B1: net/masterLaw.js masterLinesOfRecord, never rolled again), its name its lines' (a mark's name over
  * it), its worth its lines'. No record, no enchantment and no power: a drop's Legendary keeps those. Answers whether the
  * lines were a record's.
- * @param {any} item @param {unknown} lines
+ * @param {any} item @param {unknown} lines @param {'rare' | 'legendary'} tier
  */
-function applyMasterWork(item, lines) {
+function applyMasterWork(item, lines, tier) {
   const affixes = masterLinesOfRecord(lines);
   if (!affixes) return false;
-  item.rarity = 'legendary';
+  item.rarity = tier;
+  item.master = true;
   item.affixes = affixes;
-  item.name = rarityName(item, 'legendary', affixes);
+  item.name = rarityName(item, tier, affixes);
   item.value = itemBaseValue(item) + affixesWorth(affixes, item);
   item.isIdentified = true;
   return true;
@@ -177,7 +176,6 @@ export function mintPiece({ recipe, quality, seed, maker = null, marked = false,
   const r = recipeById(recipe);
   if (!r || typeof provenance !== 'string' || !PROVENANCE_RE.test(provenance)) return null;
   const mark = makerMark(maker);   // TEXT-F1
-  if (r.kind === 'siege') return null;   // PROF4: the Ram Kit is the Stores' (and made with the sieges)
   if (r.kind === 'dish') return mintDish({ recipe, maker, hand }, provenance);   // PROF9: a dish, its cook's hand the record's
   if (r.kind === 'arrows') {
     // PROF4: CreateWeapon's arrow arm (combat/enemyEquipment.js), the stack the recipe's - no quality, no provenance
@@ -226,7 +224,7 @@ export function mintPiece({ recipe, quality, seed, maker = null, marked = false,
     // AUDIT PROF-541 J4: a jewel's Rare roll one its points hold (a Cloth Amulet's 660 never carries Tongues' 1,590)
     const fits = r.kind === 'jewel' ? ((f) => (enchantmentRowCost(f) ?? Infinity) <= jewelPoints(r, templateByIndex(r.templateIndex)?.enchantmentPoints ?? 0, hand)) : null;
     // MASTER-ART: a Master's work's record names its lines - laid on whatever the switch, as the last pass is below
-    const master = q === MASTERWORK && Number.isSafeInteger(version) && version >= MINT_V_MASTER && Array.isArray(lines) && applyMasterWork(item, lines);
+    const master = q === MASTERWORK && Number.isSafeInteger(version) && version >= MINT_V_MASTER && Array.isArray(lines) && applyMasterWork(item, lines, masterTierOfVersion(version));
     if (!master && eff.rarity && rarityEligible(item)) {
       const rolls = seededRng(seed >>> 0);
       // AFFIX-LINES: a record of MINT_V_LINES on draws its lines over the lines and names the piece by them; one made
@@ -268,7 +266,7 @@ export function asMinted(item) {
   if (item.honed !== undefined) return false;   // AUDIT LOOT II C1: nor a line honed past its roll (LOOT17) - the market's mint would hand back the roll, the shards and the gold gone
   if ((item.foodStage ?? 0) > 0) return false;   // PROF9: a dish spoiled since it was cooked - the record mints it fresh
   const e = item.enchantments ?? [];
-  if (item.rarity !== 'rare') return e.length === 0;
+  if (item.rarity !== 'rare' || item.master === true) return e.length === 0;   // a Rare Master's work rolls no flavour
   const roll = RARE_FLAVOURS[item.group] ?? RARE_FLAVOURS.Jewellery;
   return e.length === 1 && roll.some((f) => f.type === e[0]?.type && f.param === e[0]?.param);
 }
@@ -499,10 +497,6 @@ export function craftedText(pieces) {
   if (isCraftedFurniture(it)) return `You made ${one}. It waits in your things until you place it in a room`;
   return pieces.length > 1 ? `You made ${pieces.length} ${name}s` : `You made ${one}`;
 }
-/** SEAT2b part two (PROF0 4.8: "690 | Ram Kit | Stores (a siege work)"): what a siege work's craft says - its kits go to
- *  the Stores, never the pack (the service answers no piece - professions.js craftAtAnvil): "You made a Ram Kit - it waits
- *  in your Stores". */
-export const storedText = (name, count = 1) => (count > 1 ? `You made ${count} ${name}s. They wait in your Stores` : `You made a ${name}. It waits in your Stores`);
 /** What a craft whose answer did not come says: kept, and made when it does. */
 export const CRAFT_KEPT_TEXT = 'The anvil rang, but the realm has not answered yet. Your work is kept and will be made when it does.';
 /** AUDIT 30 A4: the workbench's own (Carpentry's work is planed, not struck). */

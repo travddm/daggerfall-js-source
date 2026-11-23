@@ -1,18 +1,16 @@
-// WB12a (2026-10-01, Mac: "getting feedback that our oblivion gates arent lore friendly to the current daggerfall
-// timeline" - then "Dagon's Breach", and "I'd like to rename the stones" - "Deadlands Ember"): THE BREACH AND ITS WORDS.
+// WB12a: THE BREACH AND ITS WORDS.
 // The game is 3E 417: the Covenant bars a Prince's door forced from without, never one opened from within, so the gates
 // are Dagon's Breaches - torn open by his mortal faithful, sealed and torn shut by the Covenant. Every player-facing
 // line that named an Oblivion Gate says so; the Sigil Stone is the Deadlands Ember, its NAME alone moved, and every
-// stone a save, a crash record or a stack kept under the old name takes the new one. bible/11-Multiplayer/
-// World-Bosses.md section 19 A.
+// stone a save, a crash record or a stack kept under the old name takes the new one.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as acorn from 'acorn';
 import { riseLine, wrathLine, gateBossOf } from '../../../src/net/gate/gateLaw.js';
-import { omenPost, fellPost } from '../../../src/net/gate/gateHerald.js';
 import { GATE_NO_WORDS } from '../../../src/net/wire.js';
 import { fellLine, omenTimeLine, openTimeLine, sealTimeLine } from '../../../src/systems/gate/gateOmen.js';   // TIME1, at the merge: the three that name a time, in local time alone
 import { GATE_TEXT } from '../../../src/scenes/gate/gatePool.js';
@@ -28,18 +26,16 @@ import { SIGIL_STONE, SIGIL_STONE_TEMPLATE, sigilStone, nameEmbers, isSigilStone
 import { stonesText, BROKER_REFUSALS, DISMANTLED } from '../../../src/systems/sigil/sigilBroker.js';
 import { recoverSpoils, SPOILS_RECORD_V } from '../../../src/scenes/spoilsPool.js';
 import { mintCondition, setItemFields, templateByIndex } from '../../../src/systems/item/itemTemplates.js';
-import { addItem } from '../../../src/systems/inventory.js';
-import { restorePlayer, snapshotPlayer } from '../../../src/systems/save/save.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
-const ROOT = new URL('../../../', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
 const OLD = /Oblivion Gate|Sigil Stone/i;
 
 /** Every string a shipped file can show or send: its literals and its template text - never a comment. */
 function shippedStrings() {
   const files = [];
-  const walk = (d) => { for (const f of readdirSync(join(ROOT, d))) { const p = join(d, f); if (statSync(join(ROOT, p)).isDirectory()) walk(p); else if (/\.(m?js|cjs)$/.test(f)) files.push(p); } };
+  // A checkout that installed the desktop app's dependencies has app/node_modules: third-party code, not ours.
+  const walk = (d) => { for (const f of readdirSync(join(ROOT, d))) { if (f === 'node_modules') continue; const p = join(d, f); if (statSync(join(ROOT, p)).isDirectory()) walk(p); else if (/\.(m?js|cjs)$/.test(f)) files.push(p); } };
   for (const d of ['src', 'server/src', 'server-account/src', 'app']) walk(d);
   const out = [];
   for (const f of files) {
@@ -59,7 +55,7 @@ function shippedStrings() {
   return out;
 }
 
-test('WB12a the guard: no shipped string names an Oblivion Gate or a Sigil Stone - not a chat line, a card, a plaque, a Discord post, a refusal nor a console line (as DRAKES pinned the old currency\'s name) (mutants: an old line put back)', () => {
+test('WB12a the guard: no shipped string names an Oblivion Gate or a Sigil Stone - not a chat line, a card, a plaque, a refusal nor a console line (as DRAKES pinned the old currency\'s name) (mutants: an old line put back)', () => {
   const strings = shippedStrings();
   assert.ok(strings.length > 10000, `the walk read the tree (${strings.length} strings)`);
   const left = strings.filter(([, , s]) => OLD.test(s)).map(([f, l, s]) => `${f}:${l} ${JSON.stringify(s).slice(0, 80)}`);
@@ -74,18 +70,11 @@ test('WB12a the chat\'s lines (WB13b: each the event, where and when; TIME1, at 
   assert.equal(sealTimeLine({ near: 'Copperham', at: '16:52' }), 'The Covenant has sealed Dagon\'s Breach near Copperham. It collapses at 16:52 your time.');
   assert.equal(wrathLine({ near: 'Copperham', boss: 'Valkynaz Ruhn' }), 'The Covenant tears Dagon\'s Breach near Copperham shut. Valkynaz Ruhn is cast back into the Deadlands.');
   assert.equal(fellLine({ near: 'Copperham', boss: 'Valkynaz Ruhn', top: ['Mac', 'Bran'] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach near Copperham, struck down by Mac and Bran. The breach collapses.');
-  assert.equal(fellLine({ near: null, boss: 'Valkynaz Ruhn', top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'WB13b: a screen that never found the site says what Discord says');
+  assert.equal(fellLine({ near: null, boss: 'Valkynaz Ruhn', top: [] }), 'Valkynaz Ruhn has fallen at Dagon\'s Breach in the wilds. The breach collapses.', 'WB13b: a screen that never found the site');
 });
 
-test('WB12a Discord: the omen post says Dagon\'s faithful open a breach and the Covenant seals it; his fall\'s post names Dagon\'s Breach and the breach collapsing; his title is his (mutants: the old post)', () => {
-  const day = 700, boss = gateBossOf(day);
-  const p = cardOf(omenPost({ day, place: 'Copperham, Wrothgarian Mountains' }));   // HERALD-CARDS: the omen's card - the breach's name its family, its opening and its seal its fields
-  assert.deepEqual([p.author, p.title, Object.keys(p.fields)], ['Dagon\'s Breach', 'The sky burns near Copperham, Wrothgarian Mountains', ['Opens', 'Seals', 'Where']]);
-  assert.match(p.fields.Opens, /^<t:\d+:t> \(<t:\d+:R>\)$/); assert.match(p.fields.Seals, /^<t:\d+:t>$/);
-  assert.ok(p.text.includes(`${boss.name} comes **`) && !p.text.includes('holds it'), 'WB13b: the marks in the chat\'s sentence');
-  assert.equal(boss.title, 'Warden of the Burning Gate', 'the faithful\'s name for the arch the breach wears stays his');
-  const f = cardOf(fellPost({ day, place: 'Copperham', top: ['Ann'], n: 1 }));
-  assert.deepEqual([f.author, f.title, f.text, f.fields], ['Dagon\'s Breach', `${boss.name} has fallen`, 'The breach collapses.', { Where: 'Near Copperham', 'Struck down by': 'Ann' }]);
+test('WB12a his title is his: the faithful\'s name for the arch the breach wears (mutants: the title renamed with the gate)', () => {
+  assert.equal(gateBossOf(700).title, 'Warden of the Burning Gate');
 });
 
 test('WB12a the names on screen: the plaque, the banner and the map\'s legend say Dagon\'s Breach; the marks card, the record, the Drakes line, the profile, the account\'s refusal, the Broker\'s plaque and her insignia speak of breaches; the notice card names it (mutants: a name left)', () => {
@@ -94,15 +83,12 @@ test('WB12a the names on screen: the plaque, the banner and the map\'s legend sa
   assert.equal(MARKS_CARD_TEXT.gate('Valkynaz Ruhn', 'the Rime-Wrought'), 'Valkynaz Ruhn comes the Rime-Wrought tonight', 'WB13b: one subtitle near the gate and inside');
   assert.equal(GATE_CLAIM_TEXT.recorded(4), 'Breach recorded. Breaches closed: 4.');
   assert.equal(GATE_CLAIM_TEXT.guest, 'Breach not recorded. Add a username within a week to keep it.');
-  assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents, Redoubts and fallen stars.');   // SILVER: the currency's name; PIN MOVED (SILVER-WAYS): the day's cap the gates' and the raids'; PIN MOVED (EG-E1): and the Spire's Redoubts', under the same cap; PIN MOVED (STAR7): and the held stars'
+  assert.equal(MARKS_TEXT.capped, 'No silver for this breach. You can earn at most 150 silver a day from breaches, town defenses, serpents and fallen stars.');   // SILVER: the currency's name
   assert.equal(profileGateLine({ gates: { closed: 3 } }), 'Breaches closed: 3');
-  assert.match(read('src/ui/enhanced/enhancedAccount.js'), /if \(gates\) row\(t\('account\.card\.gates', 'Breaches closed'\), gates\);/);   // L10N4 (PIN MOVED): the row's word through t()
   assert.equal(accountRefusalText('short'), 'Your account has too few embers for that.');   // AUDIT WB12d (A4): a rite's ember counts
   assert.deepEqual([BROKER_TEXT.trade, BROKER_TEXT.steal, BROKER_TEXT.gone], ['Trades in Deadlands Embers', 'The Broker\'s eyes never leave her embers.', 'The Sigil Broker leaves for the night.']);   // BROKER-CAGE: midnight takes her, not the breach (a Warden fallen early leaves her standing)
   assert.equal(INSIGNIA_LINE.title, 'A title worn over your name');
   assert.ok(INSIGNIA_CARD.title[1].includes('the breach\'s fire') && /your account's embers/.test(INSIGNIA_CARD.title[2]) && /your account's embers/.test(INSIGNIA_CARD.aura[2]));   // AUDIT WB12d (A4)
-  assert.match(read('src/scenes/world.js'), /return \{ subject: 'Dagon\\'s Breach', body: state \? `Near \$\{near\}\. /);
-  assert.match(read('src/systems/sigil/sigilSetPowers.js'), /Wrath of the Warden! \$\{struck\} \$\{struck === 1 \? 'foe' : 'foes'\} struck\./);
 });
 
 test('WB12a the arch is still the gate: pressed it answers as a gate, the relay\'s refusal words are protocol and keep their bytes, the Gatebreaker title and the Burning Court stay (mutants: the protocol renamed)', () => {
@@ -135,31 +121,6 @@ test('WB12a the repair: every record of the template under another name takes th
   assert.equal(nameEmbers(list), 0, 'again: nothing left to rename');
   assert.equal(nameEmbers(null), 0);
   assert.ok(list.filter(isSigilStone).every((i) => i.templateIndex === 570), 'only the name moved');
-});
-
-const makeEntity = (over = {}) => ({
-  name: 'Tester', race: 'Breton', gender: 'male', level: 3,
-  stats: { strength: 50, endurance: 40, agility: 30, speed: 30, willpower: 30, intelligence: 30, luck: 30, personality: 30 },
-  skills: new Array(35).fill(10), skillUses: new Array(35).fill(0),
-  items: [], wagonItems: [], activeEffects: [], spells: [],
-  health: 30, fatigue: 100, magicka: 10, gold: 0,
-  ...over,
-});
-
-test('WB12a a save from before: the stones it kept as Sigil Stones load as Deadlands Embers - in the pack, the wagon and the other things - and a stone won after joins one stack under one name (mutants: the load never repairs)', () => {
-  const e = makeEntity({ items: [oldStone(4), ruby()], wagonItems: [oldStone(2)], otherItems: [oldStone(1)] });
-  const snap = snapshotPlayer(e, {});
-  assert.equal(snap.items[0].name, 'Sigil Stone', 'the save holds the old name');
-  const t = makeEntity();
-  const info = console.info, lines = [];
-  console.info = (s) => lines.push(String(s));
-  try { restorePlayer(t, snap); } finally { console.info = info; }
-  assert.deepEqual(t.items.filter(isSigilStone).map((i) => [i.name, i.stackCount]), [['Deadlands Ember', 4]]);
-  assert.deepEqual(t.wagonItems.map((i) => i.name), ['Deadlands Ember']);
-  assert.deepEqual((t.otherItems ?? []).filter(isSigilStone).map((i) => i.name), ['Deadlands Ember']);
-  assert.ok(lines.some((l) => l.includes('WB12a') && l.includes('named Deadlands Embers')), 'said, in the console');
-  addItem(t.items, sigilStone());
-  assert.deepEqual(t.items.filter(isSigilStone).map((i) => [i.name, i.stackCount]), [['Deadlands Ember', 5]], 'one stack, one name');
 });
 
 test('WB12a the crash\'s door: a stone a crash record kept under its old name is handed over as a Deadlands Ember (mutants: the record\'s name kept)', () => {

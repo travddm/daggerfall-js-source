@@ -1,4 +1,4 @@
--- QL12 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.1): THE COVENS' HOARD, step 1 of 3.
+-- QL12 (2026-10-19; docs/systems/quests.md): THE COVENS' HOARD, step 1 of 3.
 -- QL-OFFERED (2026-10-25; Questlines-Arc.md section 4, THE RUNNER): a questline is TAKEN, never sent. This letter
 -- (1011) is read where its line is offered - a notice board, a giver's door, the Quests tab - and taken, it is in
 -- hand from the start-up (`start task`, `get item`): no courier's clock, and no courier's words.
@@ -7,7 +7,7 @@
 -- gold-lit champions slain in the Elite Dungeons (`ql act elite-foe-slain 3`, said by scenes/dungeonContext.js). Then
 -- her table, where she pays; a visit before the third falls is answered and cleared, as DFU's guild quests clear an
 -- early click (M0B30Y04's `_clearclick_`). Lore: canon - the Spire's portal keys, surrendered by the Imperial
--- Secretary in 3E 398. The port's own - the covens hoard them in the deep places (bible/11-Multiplayer/Elite-Gates.md).
+-- Secretary in 3E 398. The port's own - the covens hoard them in the deep places.
 Quest: QLCH01
 DisplayName: Gold-Lit
 -- Message panels

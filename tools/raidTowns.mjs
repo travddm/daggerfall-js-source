@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RAID-ROLL (2026-09-28, Mac: "Fix it" - the relay held no copy of the day's raid schedule): THE TOWNS TABLE'S HASH,
+// RAID-ROLL: THE TOWNS TABLE'S HASH,
 // the value the relay's RAID_TOWNS_SHA256 pins (server/wrangler.toml).
 //
 // The relay reads every raid word against the day's own draws with no game data at all (net/raid/raidLaw.js

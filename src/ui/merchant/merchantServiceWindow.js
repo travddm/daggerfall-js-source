@@ -21,7 +21,7 @@
 //   service (5,14,120,7), exit (44,24,43,15).
 // - the service label is the one piece of text DFU's window draws
 //   (:70-73; PORTAL1's row under the art is the port's own, and APPEARANCES' Wardrobe row under it - its design record
-//   bible/04-Characters/Wardrobe.md): Position (0,1) INSIDE the service button,
+//   ): Position (0,1) INSIDE the service button,
 //   HorizontalAlignment.Center, ShadowPosition = Vector2.zero - no
 //   shadow, unlike every other label in the port's native windows.
 // - `ParentPanel.BackgroundColor = Color.clear` (:39) and
@@ -64,7 +64,7 @@ const SERVICE_LABEL_OFFSET_Y = 1;
  *  Panel-relative, at the panel's foot. */
 export const portalRowRect = (panelH) => shopRowRect(panelH, 0);
 export const PORTAL_ROW_KEY = 'KeyP';
-/** APPEARANCES (bible/04-Characters/Wardrobe.md): the port's rows STACK under the panel, the Portal Stone's first, a row
+/** APPEARANCES: the port's rows STACK under the panel, the Portal Stone's first, a row
  *  and a 2 px gap apart - the Wardrobe's (a Clothing Store's, an Armorer's, a Weaponsmith's keeper) under it, its key W. */
 export const shopRowRect = (panelH, i) => Object.freeze([5, panelH + 2 + 12 * i, 120, 10]);
 export const WARDROBE_ROW_KEY = 'KeyW';
@@ -121,7 +121,7 @@ export class MerchantServiceWindow {
   _wardrobe() { this._click(); this._close(); this.hooks.wardrobe?.onOpen?.(); }   // APPEARANCES: the same
 
   input(code, e = null) {
-    // AUDIT HORIZONTAL E7 (bible/04-Characters/Wardrobe.md section 4): a key's repeat is no press here - W, S and E move
+    // AUDIT HORIZONTAL E7: a key's repeat is no press here - W, S and E move
     // the player too, and one held as the popup opened ran its row (Unity's GetKeyDown: a press once, never its repeats)
     if (e?.repeat) return;
     // ROAD-G G7: these three letters ARE the port's own, and the

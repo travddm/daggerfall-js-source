@@ -1,12 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BAG1 (2026-10-03) — THE MATERIALS BAG, IN THE SAVE: the bag the player
+// BAG1 — THE MATERIALS BAG, IN THE SAVE: the bag the player
 // buys at a General Store and the materials it carries, handled as DFU
 // handles the wagon (systems/inventorySession.js, itemTransfer.js) - a
 // second list beside the pack, `entity.bagItems`, with a weight it may
 // not pass (bagLaw.js BAG_KG_LIMIT) - and what a harvest, a withdrawal
 // or a station does with the items a material is
-// (bible/06-Systems/Materials-Bag.md).
 //
 // THE BAG IS AN ITEM IN THE PACK, the way the Small Cart is (DFU's
 // HasCart reads the cart's template in the pack): owning one is
@@ -60,7 +59,7 @@ export function materialKeys() {
 let _byItem = null;
 const itemKey = (it) => `${it?.group}|${it?.templateIndex}`;
 /** THE MAP FROM AN ITEM TO ITS MATERIAL, built by minting each material - both ways a food mints (Climates & Calories
- *  on or off) - so it is the mint's own inverse. A key with no pack form (the Ram Kit, Arcane Essence) has none. */
+ *  on or off) - so it is the mint's own inverse. A key with no pack form (Arcane Essence) has none. */
 function byItem() {
   if (_byItem) return _byItem;
   const m = new Map();
@@ -134,7 +133,7 @@ export function roomFor(entity, key) {
 export function mintCarried(entity, key, n, { cc, slowRot = false, noRot = false } = {}) {
   const out = { bag: 0, pack: 0, left: 0 };
   if (!entity || !Number.isSafeInteger(n) || n < 1) return out;
-  // AUDIT2 BAG1 H12: only what has a pack form (professionLaw.js withdrawable) - an Arcane Essence or a Ram Kit minted as
+  // AUDIT2 BAG1 H12: only what has a pack form (professionLaw.js withdrawable) - an Arcane Essence minted as
   // an item was a shop's gold (PROF12 E1's closed faucet) and a held count of none
   if (!withdrawable(key)) { out.left = n; return out; }
   if (!Array.isArray(entity.items)) entity.items = [];

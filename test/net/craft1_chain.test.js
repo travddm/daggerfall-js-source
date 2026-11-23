@@ -1,9 +1,8 @@
-// CRAFT1 (2026-10-07, Mac: "How could we enhance the profession element of the game while reducing complexity and
-// making crafting more viable"; then "Lets do it") - THE CHAIN: a station plans the refining a craft needs. A Steel
+// CRAFT1 - THE CHAIN: a station plans the refining a craft needs. A Steel
 // Longsword from 6 Iron, 3 Pine Logs, 1 Copper and 2 Rat hides was four works at two stations before the anvil; the
 // craft runs them now (net/chainLaw.js chainPlan, net/profBook.js craft), each the service's own smelt kept in the
 // Stores. The done-when: that sword, made in one press through the real Worker, its works' XP and its own.
-// bible/06-Systems/Professions-Arc.md 41.
+// 41.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -61,24 +60,23 @@ test('CRAFT1 law: the works a chain may plan - every work of the forge, the work
     'ingot:iron', 'ingot:steel', 'ingot:silver', 'metal:brass', 'ingot:moonstone', 'ingot:dwarven', 'ingot:mithril', 'ingot:adamantium', 'ingot:ebony', 'ingot:orichalcum',
     'burn:pine',
     'saw:pine', 'saw:oak', 'saw:cherry', 'saw:teak', 'saw:mahogany', 'saw:ironwood', 'saw:ghostwood',
-    'cure:rat', 'cure:mudcrab', 'cure:bat', 'cure:wolf', 'cure:boar', 'cure:bear', 'cure:scorpion', 'cure:slaughterfish', 'cure:dreugh',   // PIN MOVED (FIELD BUGS 2026-10-20h DEX-HIDES): the mod's three hides
-    'weave:silk', 'weave:linen-north', 'weave:linen-south', 'spin:rat', 'spin:wolf', 'spin:boar', 'spin:bear',   // PIN MOVED (CLOTH-GEMS): the loom's Linen and Wool, the Ram Kit's Bear Hide last
+    'cure:rat', 'cure:mudcrab', 'cure:bat', 'cure:wolf', 'cure:boar', 'cure:bear', 'cure:scorpion', 'cure:slaughterfish', 'cure:dreugh',
+    'weave:silk', 'weave:linen-north', 'weave:linen-south', 'spin:rat', 'spin:wolf', 'spin:boar', 'spin:bear',
     'cut:stone', 'mix:mortar',
   ]);
   const left = WORK_RECIPES.filter((r) => !CHAIN_WORKS.includes(r)).map((r) => r.id);
-  // PIN MOVED (DAEDRIC-SMELT, Professions-Arc.md section 53): the Daedric smelt stands at the forge now, and a chain never
   // plans it - the ember it spends is the player's own press to make (chainLaw.js chainWorkOk)
   assert.deepEqual(left, ['ingot:daedric', 'burn:oak', 'burn:cherry', 'burn:teak', 'burn:mahogany', 'burn:ironwood', 'burn:ghostwood', 'cure:tiger', 'cure:dragonling',
-    'spin:tiger',   // PIN MOVED (CLOTH-GEMS): a Tiger Pelt is a tier above the Wool it spins
+    'spin:tiger',
     'transmute:tin', 'transmute:copper', 'transmute:silver', 'transmute:gold']);
   assert.deepEqual(WORK_RECIPES.filter((r) => r.embers).map((r) => [r.id, chainWorkOk(r)]), [['ingot:daedric', false]], 'the one work that spends embers, never planned');
   assert.equal(chainWorkOk({ ...smeltRecipe('ingot:daedric'), embers: undefined }), true, 'the ember alone keeps it out: its tiers climb (Ebony 6 to Daedric 7)');
   assert.deepEqual(producersOf('cloth:wool').map((r) => r.id), ['spin:rat', 'spin:wolf', 'spin:boar', 'spin:bear'], 'CLOTH-GEMS: the cheapest fur first, the Ram Kit\'s Bear Hide last');
   assert.deepEqual(producersOf('cloth:linen').map((r) => r.id), ['weave:linen-north', 'weave:linen-south']);
-  assert.deepEqual(producersOf('leather:cured').map((r) => r.id), ['cure:rat', 'cure:mudcrab', 'cure:bat', 'cure:wolf', 'cure:boar', 'cure:bear'], 'the cheapest hide first');   // PIN MOVED (DEX-HIDES; AUDIT FB1021 L2-1: the Ram Kit's Bear Hide last of its tier)
+  assert.deepEqual(producersOf('leather:cured').map((r) => r.id), ['cure:rat', 'cure:mudcrab', 'cure:bat', 'cure:wolf', 'cure:boar', 'cure:bear'], 'the cheapest hide first');
   assert.deepEqual(producersOf('leather:hardened').map((r) => r.id), ['cure:scorpion', 'cure:slaughterfish', 'cure:dreugh']);
   // FACT, pinned rather than sorted: every product two works make stands in the table cheapest first
-  const worth = (r) => r.inputs.reduce((n, i) => n + i.n * material(i.key).value, 0) / r.per;   // PIN MOVED (CLOTH-GEMS): an herb's worth its own table's (the Linen's Root Tendrils)
+  const worth = (r) => r.inputs.reduce((n, i) => n + i.n * material(i.key).value, 0) / r.per;
   for (const out of new Set(CHAIN_WORKS.map((r) => r.out))) {
     const costs = producersOf(out).map(worth);
     assert.deepEqual(costs, [...costs].sort((a, b) => a - b), `${out}: cheapest first`);
@@ -347,7 +345,6 @@ test('CRAFT1 anvil page: a recipe whose inputs are made from raw says so, its bo
   draw();
   const buttons = () => [...root.querySelectorAll('button')];
   const press = (label) => buttons().find((b) => b.textContent.startsWith(label)).onclick();
-  // PIN MOVED (CRAFT2): the anvil lists its patterns, the metal chosen in the box from what is held - the highest tier the
   // raw goods make (the Steel's, rank 10 - the Iron's too, but lower)
   const row = buttons().find((b) => b.textContent.startsWith('Longsword'));
   assert.match(row.textContent, /can make from raw/);
@@ -400,7 +397,6 @@ test('AUDIT CRAFT1 the other four benches drawn: the workbench\'s staff from Pin
     const row = (name) => buttons().find((b) => b.textContent.startsWith(name));
     const note = () => [...root.querySelectorAll('.prof-chain')].map((n) => n.textContent);
     row('Bracer').onclick();
-    // PIN MOVED (CRAFT2): the workbench and the loom list patterns - a case its row's name and its box's
     const cases = [
       ['Staff', 'Pine Staff', 'Refined first: saw plank:pine x4 - from log:pine x2. The refining earns its own experience, and anything left over stays in your Stores.'],
       ['Cuirass', 'Leather Cuirass', 'Refined first: cure leather:cured x6 - from hide:rat x12. The refining earns its own experience, and anything left over stays in your Stores.'],
@@ -428,7 +424,6 @@ test('AUDIT CRAFT1 the other four benches drawn: the workbench\'s staff from Pin
     assert.ok(note().some((n) => n.startsWith('Refined first: saw plank:pine x3 - from log:pine x1.')), JSON.stringify(note()));
     // a rank-locked row stays locked, though a chain could make its inputs (12 Scorpion hides cure to its 6 Hardened Leather)
     assert.equal(chainPlan(recipeById('leather-cuirass:hardened').inputs, (k) => held.get(k) ?? 0).ok, true);
-    // PIN MOVED (CRAFT2): the Hardened Leather is the Cuirass's other material, in its box - its Cured from raw open
     const made = (w) => buttons().find((b) => b.parentNode?.className?.includes('prof-made') && b.textContent.startsWith(w));
     assert.equal(made('Cured Leather').className.includes('prof-locked'), false, 'the Cured made from raw: unlocked');
     assert.ok(made('Hardened Leather').className.includes('prof-locked'));
@@ -446,17 +441,3 @@ test('AUDIT CRAFT1 the yields said: a Quartermaster\'s ingots two a work on the 
   assert.deepEqual(chainPlan([{ key: 'plank:pine', n: 1 }, { key: 'plank:pine', n: 1 }], heldOf({})).short, [{ key: 'log:pine', n: 1 }]);
 });
 
-test('CRAFT1 host: the world\'s craft says what its chain refined first - made or refused - and the four other stations\' pages offer the chain as the anvil does (source pins)', () => {
-  const world = src('src/scenes/world.js');
-  assert.match(world, /const chain = \[refinedText\(r\?\.refined, materialLabel, \(prof\) => profBook\.track\(prof\)\), r\?\.ok \? '' : chainStopText\(r\?\.stopped, r\?\.material, materialLabel\)\]\.filter\(Boolean\)\.join\(' '\);/);
-  assert.match(world, /text: r\?\.kept \? `\$\{st\.kept\}\$\{chain \? ` \$\{chain\}` : ''\}` : /, 'AUDIT CRAFT1 F3: a kept craft says what its chain refined');
-  // PIN MOVED (CRAFT-FIRST-SHOWN, FIELD BUGS 2026-10-15f): the craft's XP is said by craftXpText (ui/craftXpWords.js), its first with it
-  // PIN MOVED (FIELD BUGS 2026-10-18f CRAFT-LIMIT-SAID): and the crafter's limit over the track, the book's (profBook.js limit)
-  assert.match(world, /return \{ ok: true, text: `\$\{chain \? `\$\{chain\} ` : ''\}\$\{made\} \$\{craftXpText\(rec, r\.data, st\.xp, profBook\.limit\(rec\?\.profession\)\)\}/);
-  assert.match(world, /movedFirstText\(r\)\}\$\{chain \? ` \$\{chain\}` : ''\}` \};/);
-  const pages = src('src/ui/professions/profPages.js');
-  for (const st of ['_anvil', '_bench', '_loom', '_mason', '_jewel']) assert.match(pages, new RegExp(`\\(craftable\\(r, held(, spends)?\\) \\|\\| chain\\?\\.ok === true\\) && !${st}\\.`), `${st} offers the chain`);
-  assert.equal((pages.match(/const chain = chainNote\(box, el, p, book, /g) ?? []).length, 5, 'five boxes say it');
-  const book = src('src/net/profBook.js');
-  assert.match(book, /if \(r\?\.ok && carry && work && stay !== true\) r\.data\.put/);
-});

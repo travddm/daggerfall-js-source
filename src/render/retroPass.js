@@ -1,7 +1,6 @@
 // @ts-check
-// RETRO1 (2026-09-24, Mac: "Can we get retro mode from DFU ported
-// over?") - DFU'S RETRO MODE: THE PASS. AUDIT RETRO1 (the same day,
-// Mac: "Audit this") - the colour DFU's screen shows, the LUT off the
+// RETRO1 - DFU'S RETRO MODE: THE PASS. AUDIT RETRO1 (the same day,
+// ) - the colour DFU's screen shows, the LUT off the
 // frame, and nothing of the image left bound after it is shown.
 //
 // systems/retroMode.js reads the settings and does the arithmetic; this
@@ -96,11 +95,13 @@
 // THE MIP CHAINS are the renderer's (Renderer._applyRetroMips):
 // TextureReader builds no mip chain in retro mode unless
 // UseMipMapsInRetroMode. The albedo's retro mip bias (-0.75 whenever
-// retro mode is on, TextureReader.cs:271-274) is NOT ported - WebGL2
-// has no sampler LOD bias, and a bias in every world shader is a change
-// this pass is not worth (Ledger A, RETRO1).
+// retro mode is on, TextureReader.cs:271-274) reaches the Sharp filter's
+// samples alone, where the Retro Mip Bias row sets it (render/retro-sharp.ts): WebGL2 has no sampler LOD bias,
+// and Point, Bilinear and Trilinear draw with DFU's shaders unbiased.
 
 import { setFrameTarget } from './renderTarget.js';
+import retroVertex from './retro-pass.vert?raw';
+import retroFragment from './retro-pass.frag?raw';
 
 /** RetroPresentation.renderTexture's size - every mode is shown through it. */
 export const RETRO_PRESENTATION = Object.freeze([640, 400]);
@@ -309,47 +310,11 @@ export function retroPostKind(post) {
   };
 }
 
-export const RETRO_VS = `#version 300 es
-layout(location = 0) in vec2 aPos;
-void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
-`;
+// The two stages live in retro-pass.vert and retro-pass.frag; Vite and the test hook (tools/raw-import-hooks.ts) read
+// them as text, byte for byte.
+export const RETRO_VS = retroVertex;
 
-export const RETRO_FS = `#version 300 es
-precision highp float;
-precision highp int;
-precision highp sampler3D;
-uniform sampler2D uColor;   // the world's retro image
-uniform sampler2D uDepth;   // its depth - the far plane is the sky
-uniform sampler3D uLut;     // the palette's LUT
-uniform vec4 uRect;         // the world rect on the canvas, px, bottom-left
-uniform vec2 uPresent;      // RetroPresentation's 640x400
-uniform int uKind;          // 0 plain Blit, 1 posterize, 2 palettize
-uniform int uNoSky;         // EXCLUDE_SKY
-uniform int uLutSize;
-uniform int uSmooth;        // PERF-SCALE: the render scale's image - LINEAR, unsnapped, no effect
-out vec4 outColor;
-// the display byte to DFU's linear and back: the exact sRGB pair
-vec3 srgbToLinear(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
-vec3 linearToSrgb(vec3 l) { return mix(l * 12.92, 1.055 * pow(l, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, l)); }
-// UnityCG's LinearToGammaSpace and GammaToLinearSpace: the approximate pair DFU's two shaders call
-vec3 unityLinearToGamma(vec3 l) { return max(1.055 * pow(max(l, vec3(0.0)), vec3(0.416666667)) - 0.055, vec3(0.0)); }
-vec3 unityGammaToLinear(vec3 s) { return s * (s * (s * 0.305306011 + 0.682171111) + 0.012522878); }
-void main() {
-  if (uSmooth == 1) { outColor = texture(uColor, (gl_FragCoord.xy - uRect.xy) / uRect.zw); return; }
-  // the screen pixel's presentation texel, and that texel's centre - two
-  // Point blits (source -> 640x400 -> screen) in one fetch
-  vec2 uv = (floor((gl_FragCoord.xy - uRect.xy) / uRect.zw * uPresent) + 0.5) / uPresent;
-  vec4 c = texture(uColor, uv);
-  outColor = c;
-  if (uKind == 0) return;
-  if (uNoSky == 1 && texture(uDepth, uv).r >= 1.0) return;   // "Sky untouched"
-  vec3 g = unityLinearToGamma(srgbToLinear(c.rgb));
-  vec3 q;
-  if (uKind == 1) q = floor(g * 15.0 + 0.5) / 15.0;
-  else q = texelFetch(uLut, min(ivec3(floor(g * float(uLutSize))), ivec3(uLutSize - 1)), 0).rgb;
-  outColor = vec4(clamp(linearToSrgb(unityGammaToLinear(q)), 0.0, 1.0), c.a);
-}
-`;
+export const RETRO_FS = retroFragment;
 
 /**
  * THE PASS. `build(vs, fs)` is the renderer's program builder (it
@@ -557,7 +522,7 @@ export class RetroPass {
    * TEXTURE0 active, and the draw-state baseline (depth test, depth
    * writes and culling on, blending off).
    *
-   * PERF-SCALE (2026-09-25): `smooth` is the render scale's image, not
+   * PERF-SCALE: `smooth` is the render scale's image, not
    * retro's - sampled LINEAR at the pixel's own spot (no presentation
    * texel, no effect - the shader's smooth arm returns first), so a 75% world is stretched
    * soft rather than blocky. The image's filter is switched here, where

@@ -1,4 +1,4 @@
-// COST-2 (2026-10-24; bible/11-Multiplayer/Scale-Arc.md COST-2): A NODE'S ROWS HANDED OVER (server/src/cellHandover.js).
+// COST-2: A NODE'S ROWS HANDED OVER (server/src/cellHandover.js).
 // When the tree moves, the departing node's parked teams and overworld ledger go to the nodes that hold them now, by
 // pixel; its config is copied; its looks and secrets go with its drain; and any other key it holds - a fight, a debt, a
 // key this file does not know - keeps it from moving at all. Over real Rooms on the pins' fake objects (test/fakeRoom.mjs
@@ -13,7 +13,6 @@ import {
 import { childNodes, parentNode, nodeHolds } from '../../src/net/cellTree.js';
 import { owLedgerOf, owSpawnsDungeon, owIdPixel } from '../../src/net/overworldLaw.js';
 import { OW_LEDGER_KEY, PIXEL_UNITS, parkKey, sharedClassicMinutes, RAID_LEDGER_PREFIX, STAR_LEDGER_PREFIX } from '../../src/net/wire.js';
-import { WILD_REMAINS_PREFIX } from '../../src/net/wild/wildLaw.js';
 
 const NOW = 1_800_000_000_000;
 const NODE = 'cell:1:12,4';   // map pixels [384, 416) x [128, 160): its children world:24,8 25,8 24,9 25,9
@@ -35,18 +34,18 @@ function seed(store) {
   store.set(OW_LEDGER_KEY, owLedgerOf(led));
   store.set('look:peer-x', { race: 'Nord' });
   store.set('secret:peer-x', 's');
-  store.set('relaycfg', { gateThread: '1' });
+  store.set('relaycfg', { lootDoor: 'on' });
   return { parks, led: owLedgerOf(led) };
 }
 const take = (W) => async (target, payload) => (await W.room(target).room.fetch(new Request(`https://relay.internal${CELL_INTERNAL_TAKE}`, { method: 'POST', body: JSON.stringify(payload) }))).ok;
 const ledOf = (W, k) => owLedgerOf(W.room(k).store.get(OW_LEDGER_KEY));
 
 test('COST-2 EVERY KEY HAS A CLASS, AND WHAT IS NOT HANDED OVER BLOCKS: the parked teams and the ledger are partitioned, the settings, bans and freezes copied, the looks and secrets dropped with the drain - and any other key, a fight\'s, a debt\'s, a raid\'s, a star\'s, the wild\'s remains, one nobody has named, blocks the move; the blockers listed a page at a time (mutants: an unknown key handed; a raid let through; a prefix read as exact)', async () => {
-  assert.deepEqual(KEY_CLASSES.map(([k, c]) => `${k}=${c}`), ['park:=part', `${OW_LEDGER_KEY}=part`, 'relaycfg=copy', 'bans=copy', 'freezes=copy', 'look:=drop', 'secret:=drop', 'hellos=drop', 'cellmoved=drop', 'cellpulled=drop']);   // PIN MOVED (COST-2 part two): a node's moved mark and its pulled cells, never handed over - test/server/cellmoves.test.js
+  assert.deepEqual(KEY_CLASSES.map(([k, c]) => `${k}=${c}`), ['park:=part', `${OW_LEDGER_KEY}=part`, 'relaycfg=copy', 'bans=copy', 'freezes=copy', 'look:=drop', 'secret:=drop', 'hellos=drop', 'cellmoved=drop', 'cellpulled=drop']);
   assert.equal(keyClass(parkKey('aaaaaaaaaaaaaaaaaaaaaaaa')), 'part');
   assert.equal(keyClass('park'), 'block', 'a prefix is a prefix');
   assert.equal(keyClass('hellosx'), 'block', 'an exact key exactly');
-  for (const k of [`${RAID_LEDGER_PREFIX}x`, `${STAR_LEDGER_PREFIX}x`, `${WILD_REMAINS_PREFIX}x`, 'serpent', 'serpentsite', 'gatesite', 'wildowed:a', 'sevl:1', 'egbreach', 'world:0', 'nobody-named-this']) assert.equal(keyClass(k), 'block', k);
+  for (const k of [`${RAID_LEDGER_PREFIX}x`, `${STAR_LEDGER_PREFIX}x`, 'serpent', 'serpentsite', 'gatesite', 'sevl:1', 'egbreach', 'world:0', 'nobody-named-this']) assert.equal(keyClass(k), 'block', k);
   const W = fakeRooms({ now: () => NOW });
   const s = W.room(NODE).store;
   seed(s);
@@ -81,7 +80,7 @@ test('COST-2 A SPLIT HANDS EACH CHILD ITS OWN ROWS, AND A MERGE GIVES THEM BACK 
   assert.ok(owIdPixel('b192.186.7').y < 128, 'the fixture holds a band whose cell origin is past the node\'s edge');
   for (const r of Object.values(led.dg)) for (const c of KIDS) assert.equal(!!ledOf(W, c).dg[`${r[0]},${r[1]}`], nodeHolds(c, r[0], r[1]));
   assert.ok(ledOf(W, 'world:25,8').gr['401,129|0|acct-g'], 'the grave with its stone');
-  for (const c of KIDS) assert.deepEqual(W.room(c).store.get('relaycfg'), { gateThread: '1' }, `${c}: the settings copied`);
+  for (const c of KIDS) assert.deepEqual(W.room(c).store.get('relaycfg'), { lootDoor: 'on' }, `${c}: the settings copied`);
   for (const c of KIDS) assert.equal(W.room(c).store.has('look:peer-x'), false, 'a look is no row to hand over');
   // the departing node let go of what it handed
   const left = W.room(NODE).store;

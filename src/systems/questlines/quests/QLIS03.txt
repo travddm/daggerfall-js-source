@@ -1,4 +1,4 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE HARBOURMASTER'S WORD, step 3 of 3 - the
+-- QL15 (2026-10-19; docs/systems/quests.md): THE HARBOURMASTER'S WORD, step 3 of 3 - the
 -- line's last. Begun with a harbourmaster's word by a note, the harbourmaster waiting where the player stood when it
 -- came (`local tavern` - a port, most likely, a cargo just delivered). The act: a ship made to strike her colours
 -- (`ql act ship-struck 1` - systems/questlines/qlActs.js, the naval host's, by the player's own guns); then back to

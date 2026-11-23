@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // MAIL1 - THE SERVICE'S LETTERS.
 //
 // Addison Knox: "An in-game mail system where players can send messages
@@ -10,7 +9,7 @@
 // who may send one, to whom, and how often; and the three things a
 // reader does with their own: list, open, delete.
 //
-// ═══ REGISTERED, BOTH ENDS ═════════════════════════════════════════
+// REGISTERED, BOTH ENDS
 //
 // A guest is a DEVICE - an account that a cleared browser loses - so a
 // guest can neither be written to (there is no name that stays theirs:
@@ -21,7 +20,7 @@
 // asks again, because a function that trusts its caller's wall is a
 // function one refactor away from having none.
 //
-// ═══ THE THREE WALLS AGAINST A FLOOD ═══════════════════════════════
+// THE THREE WALLS AGAINST A FLOOD
 //
 // Registered-only is the first: a sender has a handle a moderator can
 // mute, and a mute stops their letters (`muted`) exactly as it stops
@@ -31,20 +30,16 @@
 // bound is the third, and it refuses the SENDER: a reader's oldest
 // letter is never deleted to make room for a stranger's newest.
 //
-// ═══ A READER'S LETTERS ARE THEIRS ALONE ═══════════════════════════
+// A READER'S LETTERS ARE THEIRS ALONE
 //
 // Every read, mark and delete names the letter AND its reader in the
 // one statement (`WHERE id = ? AND to_id = ?`), so a letter id that is
 // somebody else's is exactly as absent as one that never existed - the
 // same word (`no-letter`) for both, and nothing to learn from which.
-// ═══════════════════════════════════════════════════════════════════
 import { mintId, accountKind, displayName, isMuted, overRate } from './accounts.js';
 import { ID_RE } from '../../src/net/identityToken.js';   // NAME-AS: a friend's letter, addressed by account
 import { titleWorn, glyphsShown } from './titles.js';
-import { withIliacHonours, withIliacHonoursAll } from './iliac.js';   // CARDS10: and Iliac Hand's season #1's title
-import { withGambitHonours, withGambitHonoursAll } from './gambit.js';   // KG6: and The King's Gambit's GRANDMASTER
 import { withArenaHonours, withArenaHonoursAll } from './arena.js';   // AUDIT PRE-MERGE 1003 S8: the arena's honours on a sender's badge
-import { withEgHonours, withEgHonoursAll } from './egHonours.js';   // EG-E2: and the Spire Champions
 import { withMasteryMarks, withMasteryMarksAll } from './hunts.js';   // AUDIT HORIZONTAL F5: and the Marks of Mastery
 import { HANDLE_RE } from '../../src/net/handleShape.js';
 import {
@@ -56,7 +51,7 @@ import {
  * pair's rate spent, and the letter written only while the reader's box has room - in ONE statement, so two letters
  * racing for the last place cannot both land.
  *
- * NAME-AS (2026-10-12): OR BY ACCOUNT (`toAccount`, an account id) - a friend's letter. A friends list is accounts (the
+ * NAME-AS: OR BY ACCOUNT (`toAccount`, an account id) - a friend's letter. A friends list is accounts (the
  * hub's), but the name it shows is the one the room reads, which since NAME-AS may be a character's: sent as a
  * username, a friend who wears their character's name could not be written to, and a name that IS somebody else's
  * username would have reached them. So the friend's row addresses the account itself (ui/socialPanel.js); every other
@@ -86,7 +81,7 @@ export async function sendLetter({ db, rand, nowS }, sender, { to, toAccount, su
   if (reader.id === sender.id) return { error: 'to-self' };
   if (await overRate({ db, nowS }, `mail:${sender.id}>${reader.id}`, LETTERS_PAIR_MAX, LETTERS_SENT_WINDOW_S)) return { error: 'mail-rate' };
   const id = mintId(rand);
-  // AUDIT SAFE CLIENT-7 (bible/11-Multiplayer/Chat-Safety-Arc.md section 2): A READER WHO BLOCKED THE SENDER never gets
+  // AUDIT SAFE CLIENT-7: A READER WHO BLOCKED THE SENDER never gets
   // the letter - its subject was a line in their chat - and the sender is answered as if it went: a block is never told
   // to the blocked (safety.js SAFE1). The rates above are spent all the same.
   if (await db.prepare('SELECT 1 AS y FROM blocks WHERE player = ?1 AND blocked = ?2').bind(reader.id, sender.id).first()) return { ok: true, id, to: account ? displayName(reader) : reader.handle };
@@ -119,9 +114,7 @@ export async function inboxOf({ db, nowS, primary = db }, reader, env) {   // SC
       .bind(...senders).all();
     // SCALE4g: ON THE BINDING - a #1 found stale is counted again and STORED (arena.js championNow), never off a replica
     // (AUDIT SCALE4d A1's law, where the heartbeat's session reads the rest)
-    for (const p of await withIliacHonoursAll({ db: primary }, await withArenaHonoursAll({ db: primary }, found, nowS), nowS)) rows.set(p.id, p);   // AUDIT PRE-MERGE 1003 S8: the Grand Champion's title, the #1's laurel
-    for (const p of await withEgHonoursAll({ db: primary }, [...rows.values()], nowS)) rows.set(p.id, p);   // EG-E2: and Spire Champion (egHonours.js)
-    for (const p of await withGambitHonoursAll({ db: primary }, [...rows.values()], nowS)) rows.set(p.id, p);   // KG6: and The King's Gambit's GRANDMASTER
+    for (const p of await withArenaHonoursAll({ db: primary }, found, nowS)) rows.set(p.id, p);   // AUDIT PRE-MERGE 1003 S8: the Grand Champion's title, the #1's laurel
     for (const p of await withMasteryMarksAll({ db }, [...rows.values()])) rows.set(p.id, p);   // AUDIT HORIZONTAL F5: a worn Mark of Mastery (reads alone)
   }
   const letters = results.map((l) => ({
@@ -142,10 +135,10 @@ export async function readLetter({ db, nowS }, reader, env, id) {
     .bind(id, reader.id).first();
   if (!l) return { error: 'no-letter' };
   if (l.read_at == null) await db.prepare('UPDATE letters SET read_at = ? WHERE id = ? AND to_id = ? AND read_at IS NULL').bind(nowS, id, reader.id).run();
-  const row = await withIliacHonours({ db }, await withArenaHonours({ db }, await db.prepare('SELECT * FROM players WHERE id = ?').bind(l.from_id).first(), nowS), nowS);   // AUDIT PRE-MERGE 1003 S8; CARDS10: and Iliac Hand's
+  const row = await withArenaHonours({ db }, await db.prepare('SELECT * FROM players WHERE id = ?').bind(l.from_id).first(), nowS);   // AUDIT PRE-MERGE 1003 S8
   return {
     letter: {
-      id: l.id, from: l.from_name, ...badgeOf(await withMasteryMarks({ db }, await withGambitHonours({ db }, await withEgHonours({ db }, row, nowS), nowS)), env, nowS), subject: l.subject, body: l.body,   // EG-E2: and Spire Champion; KG6: the GRANDMASTER's too; AUDIT HORIZONTAL F5: and a Mark of Mastery
+      id: l.id, from: l.from_name, ...badgeOf(await withMasteryMarks({ db }, row), env, nowS), subject: l.subject, body: l.body,   // AUDIT HORIZONTAL F5: and a Mark of Mastery
       sentAt: l.sent_at, readAt: l.read_at ?? nowS,
     },
   };

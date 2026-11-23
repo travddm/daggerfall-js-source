@@ -1,9 +1,9 @@
 // @ts-check
-// BOAT-FAR (2026-10-21; bible/07-Rendering/Performance-Priority.md BOAT-FAR) - A SHIP'S LIFE BY HER RANGE, ONE LAW.
+// BOAT-FAR - A SHIP'S LIFE BY HER RANGE, ONE LAW.
 //
 // AUDIT NAV1 (the presentation, #17) gave the sea's ships this law in scenes/naval/navalHost.js poseShip: past
 // NEAR_LIFE_M of the eye her rigging steps every FAR_LIFE_EVERY frames with the time it missed. A player's profile
-// (2026-10-21) found every boat the Come Sail Away pool draws - mine, the peers' and the sea's - walked, baked and lit
+// found every boat the Come Sail Away pool draws - mine, the peers' and the sea's - walked, baked and lit
 // every frame wherever she was, and every peer's boat's Animators stepped every frame at any range
 // (scenes/comeSailAway/comeSailAwayPool.js frame, scenes/comeSailAway/comeSailAwayPeers.js pose). The three read the
 // law here, so it is one: the constants (navalHost re-exports them, where they were born) and the step. The EYE is each
@@ -12,7 +12,7 @@
 // `player.pos`), the peers' the pool's last - so where the camera stands apart from the player, a sea ship and a boat
 // at one range are judged from eyes as far apart. One eye for all three is the host's to hand the pool.
 //
-// BOAT-OWN (2026-10-21, the record's Left: "my own boats' Animators ... still stepped every frame"): my own boats'
+// BOAT-OWN: my own boats'
 // Animators and particle systems, which the Come Sail Away runtime stepped every frame at any range
 // (systems/comeSailAway/comeSailAway.js animate, simulateParticles), live by it too, through createBoatLives below - the
 // runtime wires it and grows nothing. And A SHIP'S TREE (farTreeStep): one reshaped or switched since she last lived

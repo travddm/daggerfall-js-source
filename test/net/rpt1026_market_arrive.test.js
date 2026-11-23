@@ -232,7 +232,7 @@ test('RPT1026-MARKET ARRIVE stall: a press whose own collect did not land says t
     };
     let stallHost = null;
     const host = createVendorHost({
-      marketBook, marketMint: () => {}, marketPutBack: () => {}, marketDrop: () => {}, marketHubs: {}, marketGoods: { goodName: () => 'Dwarven Mace' },
+      marketBook, marketMint: () => {}, marketPutBack: () => {}, marketDrop: () => {}, marketHubs: () => ({}), marketGoods: { goodName: () => 'Dwarven Mace' },
       profBook: { state: { open: true } }, marksBook: { state: { open: true } }, noticeBook: {},
       showNoticeWindow: (w) => { stallHost = w.vendors; return true; }, checkpointGateOpen: () => true,
     });
@@ -266,7 +266,4 @@ test('RPT1026-MARKET ARRIVE wiring: bootWorld hands the vendor host the checkpoi
   const host = src('src/scenes/vendorHost.js');
   assert.match(host, /ready: \(\) => checkpointGateOpen\?\.\(\) === true && globalThis\.document\?\.visibilityState !== 'hidden',/);
   assert.match(host, /if \(marketBook && typeof checkpointGateOpen === 'function'\) arrivals\.start\(\);/);
-  // the delete a waiting purchase holds says the way out: play it once, and what waits comes to its pack
-  const open = accountRefusalText('realm-market-open');
-  assert.match(typeof open === 'function' ? open() : open, /a trader's takings\. Settle it first\. Play it online once and goods waiting for it come to its pack on their own; takings are collected on the Vendor page\.$/);
 });

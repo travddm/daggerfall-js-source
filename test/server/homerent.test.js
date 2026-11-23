@@ -1,11 +1,10 @@
-// HOME-RENT (2026-09-30, asked: "For houses with multiple rooms, the owner can choose to rent out to other players and
-// adjust the price as needed"). A ROOM OF A HOME, RENTED TO ANOTHER PLAYER. The law both ends read (net/homeLaw.js
+// HOME-RENT. A ROOM OF A HOME, RENTED TO ANOTHER PLAYER. The law both ends read (net/homeLaw.js
 // RENT_*); the service through the real Worker over node:sqlite with every migration applied (server-account/src/
 // rent.js): the owner offers and prices, another player's realm character rents on its record, the rent is held on the
 // home and collected by the owner, a sale and a delete wait for the tenants; the client's half (systems/homeRent.js,
 // systems/online/onlineHomes.js): the registry's tenancies and vacancies, the door's rows, a rent paid and given back, the
 // rent collected by the service's count; the owner's rooms view in the decorator; the host's wiring by source.
-// `06-Systems/Online-Arc.md` HOME-RENT.
+// HOME-RENT.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -135,7 +134,7 @@ test('HOME-RENT the service: the owner offers a room and prices it; anyone reads
   assert.ok(ROUTES.has('/v1/homes/rooms/rent') && ROUTES.has('/v1/homes/rooms/collect'), 'the routes are known');
 });
 
-test('HOME-RENT the owner: a room taken off the offer keeps its tenant until the days run out, a free one goes; the house is not sold nor the character deleted while a tenancy runs or rent is held; the rent collected into the owner\'s record, all of it, once; the days run out, the house sells (mutants: the withdraw deleting a tenancy; the sale unguarded; the collection twice; the delete unguarded)', async (t) => {
+test('HOME-RENT the owner: a room taken off the offer keeps its tenant until the days run out, a free one goes; the house is not sold while a tenancy runs or rent is held; the rent collected into the owner\'s record, all of it, once; the days run out, the house sells (mutants: the withdraw deleting a tenancy; the sale unguarded; the collection twice)', async (t) => {
   let clock = T0 * 1000;
   t.mock.method(Date, 'now', () => clock);
   const svc = await standService();
@@ -162,13 +161,10 @@ test('HOME-RENT the owner: a room taken off the offer keeps its tenant until the
   svc.env.DB._raw.prepare('UPDATE realm_characters SET bytes = 0 WHERE id = ?').run(o.character);
   assert.deepEqual((await call('/v1/homes/rooms/offer', { character: o.character, room: 3, anchor: [9, 0, 1], price: 40 })).body.error, 'realm-needed');
   svc.env.DB._raw.prepare('UPDATE realm_characters SET bytes = 1 WHERE id = ?').run(o.character);
-  // the sale and the delete wait
+  // the sale waits
   const sale = await call('/v1/homes/release', { realm: ownerAt() });
   assert.deepEqual([sale.status, sale.body.error], [409, 'home-tenants']);
   await call('/v1/homes/rooms/offer', { character: o.character, room: 2, anchor: [5, 0, 1], price: 40 });
-  const del = await svc.call('/v1/realm/delete', { id: o.character }, owner.secret);
-  assert.deepEqual([del.status, del.body.error], [409, 'home-tenants']);
-  assert.equal(svc.env.DB._raw.prepare('SELECT listed FROM home_rooms WHERE room = 2').get().listed, 1, 'a refused delete takes no offer down');
   await call('/v1/homes/rooms/withdraw', { character: o.character, room: 2 });
   // collected, once
   const before = wealthOf(recordOf(svc.env, o.character));
@@ -201,14 +197,13 @@ test('HOME-RENT the races and the rate: a rent whose room changed between its re
   assert.deepEqual(await roomMovedOf(db, 7, 300, 1, 40), { error: 'rent-taken' });
   await call('/v1/homes/rooms/withdraw', { room: 1 });
   assert.deepEqual(await roomMovedOf(db, 7, 300, 1, 40), { error: 'no-rent-room' });
-  assert.ok(src('server-account/src/rent.js').includes('|| (await roomMovedOf(db, mapId, buildingKey, room, price));'), 'the rent\'s write answers by it');
   const ownerAt = () => ({ id: o.character, ...svc.env.DB._raw.prepare('SELECT lease, seq FROM realm_characters WHERE id = ?').get(o.character) });
   let last = null;
   for (let i = 0; i <= RENT_WRITES_MAX && last?.body?.error !== 'rent-rate'; i++) last = await call('/v1/homes/rooms/collect', { realm: ownerAt() });
   assert.deepEqual([last.status, last.body.error], [429, 'rent-rate'], 'collections are counted');
 });
 
-test('HOME-RENT held rent comes with a sale, and a delete waits for it: rent nobody collected is paid with the house, and a character is not deleted while its home holds some (mutants: the rent lost at the sale; the rent lost in the tab; the delete unguarded)', async (t) => {
+test('HOME-RENT held rent comes with a sale: rent nobody collected is paid with the house (mutants: the rent lost at the sale; the rent lost in the tab)', async (t) => {
   let clock = T0 * 1000;
   t.mock.method(Date, 'now', () => clock);
   const svc = await standService();
@@ -220,8 +215,6 @@ test('HOME-RENT held rent comes with a sale, and a delete waits for it: rent nob
   const T = await seatRealm(svc.env, tenant.secret, 'Tomas', { name: 'Tomas', level: 5, goldPieces: 1000, items: [] });
   await svc.call('/v1/homes/rooms/rent', { mapId: 7, buildingKey: 300, character: T.id, room: 1, days: 1, price: 40, realm: T.at() }, tenant.secret);
   clock = (T0 + RENT_DAY_S + 5) * 1000;
-  const del = await svc.call('/v1/realm/delete', { id: o.character }, owner.secret);
-  assert.deepEqual([del.status, del.body.error], [409, 'home-rent-due'], 'collect it first');
   // what the record holds, purse and every bank account (the sale pays into the home's region's account, if it keeps one)
   const wealth = () => { const r = recordOf(svc.env, o.character); return (r.goldPieces ?? 0) + (r.bankAccounts ?? []).reduce((n, a) => n + (a?.accountGold ?? 0), 0); };
   const before = wealth();
@@ -380,7 +373,7 @@ test('HOME-RENT the decorator\'s rooms view: an online home of two rooms gets "R
   for (let i = 0; i < 3; i++) { r3.frame({ overlayUp: true }); await settle(); }
   btn('Collect rent').fire('click');
   await settle(); await settle();
-  assert.ok(r3.said.includes('You collected 70 gold in rent. It went to your account at the Bank of the Empire.'));   // AUDIT HOME-PRICE E4 (PIN MOVED): online the rent lands in the Empire's account
+  assert.ok(r3.said.includes('You collected 70 gold in rent. It went to your account at the Bank of the Empire.'));   // AUDIT HOME-PRICE E4 (
   for (let i = 0; i < 3; i++) { r3.frame({ overlayUp: true }); await settle(); }
   rowsNow().find((r) => /Offered at/.test(JSON.stringify(r.children.map((k) => k.children?.map((x) => x.textContent))))).fire('click');
   btn('Stop offering').fire('click');
@@ -395,19 +388,3 @@ test('HOME-RENT the decorator\'s rooms view: an online home of two rooms gets "R
   assert.equal(all(house.doc.body.children.find((c) => c.className === 'dfdecor'), 'dfdecor-chip').some((c) => /^Rooms to rent/.test(c.textContent)), false, 'a house rents no rooms');
 });
 
-test('HOME-RENT the host by source: the door lists a tenant\'s and a room-to-rent\'s rows, a rent row pressed (or a click on a home that shuts me out with a room free) asks which room, how many days and the price before it pays on the record, a tenant is told their days and rests there, and the decorator\'s rooms go through the service\'s own door (mutants: the rent before the lock unasked; the tenant\'s bed; the confirm skipped)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.match(wm, /const rows = \[\.\.\.\(homeVisitorRows\(home, homeDoorFor\(bd, home\)\) \?\? \[\]\), \.\.\.\(worldPlaqueOn\(\) \? homeVoteRows\(home\) : \[\]\)\];/);   // PIN MOVED: HOME-VOTE - a visitor's rows, and the town's votes under them; PIN MOVED (AUDIT HOME-VOTE II D1): where the plaque draws a list
-  assert.match(wm, /&& \(verb === HOME_VERB\.rent \|\| \(verb == null && door === 'locked' && home\.rent\)\)\) \{ openHomeRent\(bd, home\)/);
-  assert.ok(wm.indexOf('openHomeRent(bd, home).catch') < wm.indexOf("if (door === 'locked') { townTalk?.say?.(homeLockedLine(home)); return true; }"), 'before the lock');
-  assert.match(wm, /action: \(\) => openHomeRentConfirm\(bd, room, d\)/, 'the price asked before it is paid');
-  // PIN MOVED (FIELD BUGS 2026-10-01 RENT-REST): the tenant's bed rides the rest's bag as the home's bed, which stands
-  // where a bought house stands (test/systems/fb1001_rent.test.js drives it through canRest)
-  assert.match(wm, /homeBed: homeBedIsMine\(interiorHome, Math\.floor\(Date\.now\(\) \/ 1000\)\) \|\| !!interiorSeatHall\?\.member,/);   // PIN MOVED (SEAT-HALL): and the palace holder's members rest there
-  assert.match(wm, /if \(home && !home\.own && rentDaysLeft\(home\.tenant, Math\.floor\(Date\.now\(\) \/ 1000\)\) > 0\) say\(rentWelcomeLine/);
-  assert.match(wm, /rent: \(\) => decorRentDoor\(\),/);
-  assert.match(wm, /if \(!api \|\| !interiorHome\?\.own \|\| !b\) return null;/, 'the owner\'s alone');
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const homesApi = params\.has\('online'\) \? accountHomes\(/);
-  assert.match(w, /homesApi,   \/\/ HOME-RENT/);
-});

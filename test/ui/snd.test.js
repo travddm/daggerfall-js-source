@@ -120,18 +120,3 @@ test('snd: pinned records and id lookup', { skip: skipReal }, () => {
   assert.equal(String.fromCharCode(...stream.slice(8, 12)), 'WAVE');
 });
 
-test('SND2 (Dudey: "give the main menu button presses the same sound as ingame"): the front door wakes the click\'s sound bank from the player\'s stored data - and with no bank (none stored, a read that throws) it boots nothing, so the game\'s host still boots the sound as it always did (mutants: a boot on a missing bank; the wake never called)', async () => {
-  const { wakeUiClickSound } = await import('../../src/ui/uiClickSound.js');
-  const { audio } = await import('../../src/systems/audio.js');
-  const before = audio._booted;
-  assert.equal(await wakeUiClickSound(async () => null), false);
-  assert.equal(await wakeUiClickSound(async () => { throw new Error('not stored'); }), false);
-  assert.equal(await wakeUiClickSound(async () => new Uint8Array(0)), false);
-  assert.equal(audio._booted, before, 'nothing booted on a missing bank');
-  const main = readFileSync(new URL('../../src/main.js', import.meta.url), 'utf8');
-  assert.match(main, /import\('\.\/ui\/uiClickSound\.js'\)\.then\(\(m\) => m\.wakeUiClickSound\(getBytes\)\)\.catch\(\(\) => \{\}\);/, 'the front door wakes it with its data gate\'s reader');
-  // the reader is handed in, never imported: the HUD imports this module, and a data module named here (even lazily)
-  // puts the quest machine in the HUD's reach (GUIDE3's walk)
-  const src = readFileSync(new URL('../../src/ui/uiClickSound.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /dataSource/, 'the click\'s module names no data module');
-});

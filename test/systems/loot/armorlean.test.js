@@ -1,5 +1,4 @@
-// ARMOR-LEAN (2026-10-26, a player: "can we make differences regarding stat distribution for all types when stats are
-// rolled on them") and DAEDRIC-SALE (the same player: "tune down daedric selling price by 50%"). DRIVEN: real rolls over
+// ARMOR-LEAN, and (B4) a counter paying a Daedric piece's whole value again. DRIVEN: real rolls over
 // real seeds, counted - the families' differences measured, never read off the table they come from.
 import '../../modsOff.js';
 import { test } from 'node:test';
@@ -9,7 +8,8 @@ import { rollAffixes, applyRarity, armorLean, reforgeAffix, gemWorthOf, _pickWei
 import { ARMOR_MATERIAL } from '../../../src/systems/armorMaterials.js';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 import { SKILLS } from '../../../src/systems/skills.js';
-import { counterValueOf, isDaedricGear, buyItemPrice, DAEDRIC_SALE_SHARE } from '../../../src/systems/tradeModes.js';
+import * as tradeModes from '../../../src/systems/tradeModes.js';
+import { counterValueOf } from '../../../src/systems/tradeModes.js';
 import { itemBaseValue } from '../../../src/systems/item/itemTemplates.js';
 import { mintPiece } from '../../../src/systems/smithItems.js';
 import { MINT_V_ARMOR_LEAN, MINT_V_LINES } from '../../../src/net/productRecord.js';
@@ -138,25 +138,19 @@ test('ARMOR-LEAN: a crafted piece leans from MINT_V_ARMOR_LEAN on; a record befo
   assert.ok(differed > 0, 'the new version does lean');
 });
 
-test('DAEDRIC-SALE: a counter pays half for Daedric gear - weapons, plate and shields - and nothing else moves', () => {
+test('B4: a counter pays Daedric gear its whole value, as it pays every other metal', () => {
   const daedricMail = { ...piece(ARMOR_MATERIAL.Daedric), value: undefined };
   const ebonyMail = piece(ARMOR_MATERIAL.Ebony);
   const blade = { name: 'Katana', group: 'Weapons', templateIndex: 121, material: 9, maxCondition: 100, currentCondition: 100 };
-  assert.equal(DAEDRIC_SALE_SHARE, 0.5);
-  assert.ok(isDaedricGear(daedricMail) && isDaedricGear(blade) && isDaedricGear(piece(ARMOR_MATERIAL.Daedric, 112)));
-  assert.ok(!isDaedricGear(ebonyMail) && !isDaedricGear({ ...blade, material: 8 }) && !isDaedricGear(piece(ARMOR_MATERIAL.Leather)));
-  assert.equal(counterValueOf(daedricMail), Math.round(itemBaseValue(daedricMail) / 2));
-  assert.equal(counterValueOf(blade), Math.round(itemBaseValue(blade) / 2));
-  assert.equal(counterValueOf(ebonyMail), itemBaseValue(ebonyMail), 'Ebony sells as it did');
-  // a rolled piece's whole value halves - its lines' worth with it
+  assert.equal('isDaedricGear' in tradeModes, false, 'the Daedric sale rule is gone');
+  assert.equal(counterValueOf(daedricMail), itemBaseValue(daedricMail));
+  assert.equal(counterValueOf(blade), itemBaseValue(blade));
+  assert.equal(counterValueOf(ebonyMail), itemBaseValue(ebonyMail));
   const rare = applyRarity(piece(ARMOR_MATERIAL.Daedric), 'rare', seededRng(3));
-  assert.equal(counterValueOf(rare), Math.round(rare.value / 2));
-  // only the selling side: a shop asks what it asked
-  const asIf = { ...daedricMail, material: ARMOR_MATERIAL.Daedric };
-  assert.equal(buyItemPrice(asIf, { quality: 10, online: false }), buyItemPrice({ ...asIf }, { quality: 10, online: false }));
+  assert.equal(counterValueOf(rare), rare.value, 'a rolled piece sells at its whole value, its lines with it');
 });
 
-test('DAEDRIC-SALE: a gem set in a Daedric piece sells at its whole worth', () => {
+test('B4: a gem set in a Daedric piece sells at its worth, whole', () => {
   const it = { ...piece(ARMOR_MATERIAL.Daedric), value: 100_000, sockets: ['ruby', 'empty'] };
   const bare = { ...piece(ARMOR_MATERIAL.Daedric), value: 100_000 - gemWorthOf('ruby') };
   assert.equal(counterValueOf(it) - counterValueOf(bare), gemWorthOf('ruby'));

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// L10N1b (2026-09-27): THE ENGLISH CATALOG, READ OFF THE SOURCE.
+// L10N1b: THE ENGLISH CATALOG, READ OFF THE SOURCE.
 //
 // The port's own strings are written where they are used - `t('menu.rail.new', 'New Game')` - so the English is the
 // code's and cannot drift from what the game shows. Translators, the pipeline (L10N6b) and the catalog checks need
@@ -11,6 +11,7 @@
 //
 //   node tools/l10nExtract.mjs           write the catalog
 //   node tools/l10nExtract.mjs --check   exit 1 if the catalog on disk is not what the source says
+import { stripTypeScriptTypes } from 'node:module';
 import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,7 +28,7 @@ function walkFiles(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walkFiles(p, out);
-    else if (name.endsWith('.js')) out.push(p);
+    else if (name.endsWith('.js') || (name.endsWith('.ts') && !name.endsWith('.d.ts'))) out.push(p);
   }
   return out;
 }
@@ -78,8 +79,10 @@ export function extractPortStrings(root = ROOT) {
   const strings = new Map();
   const problems = [];
   for (const file of walkFiles(join(root, 'src'))) {
-    const src = readFileSync(file, 'utf8');
-    if (!src.includes('textManager.js')) continue;
+    const text = readFileSync(file, 'utf8');
+    if (!text.includes('textManager.js')) continue;
+    // a .ts module is read with its types blanked out: the stripper keeps every position, so a string's line is its own
+    const src = file.endsWith('.ts') ? stripTypeScriptTypes(text) : text;
     let ast;
     try { ast = parse(src, { ecmaVersion: 'latest', sourceType: 'module', locations: true }); } catch (err) {
       problems.push(`${relative(root, file)}: does not parse (${err.message})`);

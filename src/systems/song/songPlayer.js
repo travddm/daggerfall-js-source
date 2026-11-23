@@ -63,8 +63,7 @@ export const setMusicMuted = (v) => { musicMuted = Boolean(v); };
 
 export const musicGain = () => (musicMuted ? 0 : MUSIC_GAIN * getFloat('Controls', 'MusicVolume', 0, 1));
 
-/** DISC20-B (2026-09-24, Mac: "Sometimes when music tracks switch, its very abrupt instead of seamlessly fading in
- *  between tracks"): THE FADER - a gain between a player's song and its master that only the transitions write. The
+/** DISC20-B: THE FADER - a gain between a player's song and its master that only the transitions write. The
  *  master is the VOLUME (MusicVolume and the video mute), with three writers that would each undo a ramp (see above);
  *  the fader is the fade alone, so neither cancels the other. A ramp starts from wherever the fader stands, so a fade
  *  turned round half way turns round where it is; a zero length sets it at once. */
@@ -77,23 +76,21 @@ export function rampFader(ctx, fader, level, seconds) {
   g.linearRampToValueAtTime(level, now + seconds);
 }
 
-/** THE SETTING ALONE, no synth trim (2026-08-27, Mac: "fix it also").
+/** THE SETTING ALONE, no synth trim.
  *  MUSIC_GAIN exists because the FM bank's raw oscillators sum hot and
  *  the classic songs are mixed under it; a REPLACEMENT is a mastered
  *  file with its own headroom, and under the trim a user's music pack
  *  played at a fifth of itself (0.22 x the 0.5 default). */
 export const trackGain = () => (musicMuted ? 0 : getFloat('Controls', 'MusicVolume', 0, 1));
 
-/** WBX9 (2026-09-26, Mac: "The music needs to be louder and more intense"): A SONG'S OWN LEVEL - a song may carry
+/** WBX9: A SONG'S OWN LEVEL - a song may carry
  *  `level`, how far over the player's own it is played (systems/gate/gateScore.js: the boss fight's score, over the dungeon
  *  tracks it stands in for). One gain between the channels and the fader, set as the song starts; every song MIDI.BSA
  *  holds carries none and plays at exactly 1, as it always has. Clamped to (0, SONG_LEVEL_MAX]. Pure. */
 export const SONG_LEVEL_MAX = 4;
-/** EG-G2: how long a duck takes to come back up (s - SongPlayer.duck). */
-export const EG_DUCK_BACK_S = 0.12;
 export const songLevel = (song) => (Number.isFinite(song?.level) && song.level > 0 ? Math.min(SONG_LEVEL_MAX, song.level) : 1);
 
-/** WB10a (2026-09-30, Mac: "make it more loud, just feel like its too quite"): A SONG'S OWN PRESS - a song may carry
+/** WB10a: A SONG'S OWN PRESS - a song may carry
  *  `press`, a compressor it is played through, and how far its output is carried after it (`out`). The level alone
  *  had gone as far as it could: WBX9's score stood a decibel under the clip at the highest MusicVolume, its drums'
  *  peaks 15 dB over its body, so a louder song had to be a PRESSED one - its peaks held down and the whole of it raised
@@ -122,8 +119,7 @@ export function songPress(song) {
   if (!(out.out > 0)) out.out = PRESS_RANGE.out[2];
   return out;
 }
-/** EG-ROAR (2026-10-18, Mac: "the music and ambience of the elite breach needs to be insanely better. Its way too
- *  tame"): A SONG'S OWN VOICES - a made song may carry `voices`, its channels' instruments past the FM bank's one
+/** EG-ROAR: A SONG'S OWN VOICES - a made song may carry `voices`, its channels' instruments past the FM bank's one
  *  oscillator pair a note (gmSynth.js fmSpec's fields, each held to its range, over the program's own), and `kit`, its
  *  drums past percussionSpec's one sine or band of noise a hit. A voice may be a UNISON (`unison` copies, `cents` apart
  *  either side of the note - an ensemble, where one pair is one player) with a SUB (`sub`, a sine an octave under at that
@@ -188,21 +184,6 @@ export function songKit(song) {
   for (const [key, o] of Object.entries(k)) { const n = Number(key), s = held(o, KIT_RANGE); if (Number.isInteger(n) && n >= 0 && n <= 127 && s) out.set(n, s); }
   return out.size ? out : null;
 }
-/** INTRO3c: A SONG'S OWN TONE - `tone`, the shape of the whole mix between the fader and the master: `bands`, up to four
- *  peaking resonances [Hz, dB, Q] (heldBody's ranges), and a shelf each end, `low` and `high` [Hz, dB] - a mix's match
- *  to a reference, measured band by band and applied once to the sum (the intro's: systems/introScore.js INTRO_TONE,
- *  the recording's third-octave curve against the render's). Null for a song that names none, or nothing usable. */
-export function songTone(song) {
-  const t = song?.tone;
-  if (!t || typeof t !== 'object') return null;
-  const shelf = (v) => (Array.isArray(v) && v.length >= 2 && Number.isFinite(v[0]) && Number.isFinite(v[1]) ? [Math.min(16000, Math.max(20, v[0])), Math.min(24, Math.max(-24, v[1]))] : null);
-  const out = {};
-  const bands = heldBody(t.bands), low = shelf(t.low), high = shelf(t.high);
-  if (bands) out.bands = bands;
-  if (low) out.low = low;
-  if (high) out.high = high;
-  return Object.keys(out).length ? out : null;
-}
 /** EG-ROAR: THE FLOOR under a song with its own voices (Hz - SongPlayer._routePress). */
 export const SONG_FLOOR_HZ = 30;
 /** EG-ROAR: the cents each of a unison's `n` copies is set off the note by - `cents` either side, spread evenly, the
@@ -242,7 +223,7 @@ export const LOOP_LEAD_SECONDS = 0.02;
  * landed exactly on a window boundary, which at 480 PPQN is every beat.
  */
 export function eventsInWindow(events, fromTick, toTick) {
-  // OW-HITCH (2026-10-21, the owner: "Theres still a lot of hitching in the overworld"): the window's first event found by
+  // OW-HITCH: the window's first event found by
   // halving - the events are tick-ordered - where every pump walked the song from its first event (a long cue late in
   // its play: thousands of events a pump, a pump every few frames, in the real game's journey profile). The same events.
   let lo = 0, hi = events.length;
@@ -276,7 +257,7 @@ export function applyChannelEvents(state, events) {
 /**
  * CC64 SUSTAIN PEDAL - the per-channel intervals the pedal is DOWN.
  *
- * AUDIT (2026-08-25): 593 pedal events across the archive were being
+ * AUDIT: 593 pedal events across the archive were being
  * dropped, so every note released on its own duration and nothing ever
  * rang on. It is the only ignored controller that changes what you
  * hear: CC123/CC121 matter to a MIDI device that must be told to stop,
@@ -382,7 +363,6 @@ export class SongPlayer {
     this._fader = null;   // DISC20-B: built with the master
     this._level = null;   // WBX9: built with the master
     this._press = null;   // WB10a: built the first time a song asks for one
-    this._tone = null;   // INTRO3c: the song's tone chain, fader to master, for the songs that carry one
     this._levelTo = null;   // WB10a: where the level runs - the fader, or the press
     this._destination = destination;
   }
@@ -400,26 +380,6 @@ export class SongPlayer {
     this._level.gain.value = 1;
     this._level.connect(this._fader);
     this._levelTo = this._fader;
-  }
-
-  /** INTRO3c: THE TONE - the fader through the song's tone (songTone) into the master, or straight in: the low shelf,
-   *  the bands in turn, the high shelf. Touched only for a song that names one and the song after it (which plays through
-   *  the graph it always did); a context with no filter plays the song untoned. */
-  _routeTone(tone) {
-    if (!this._fader || !this._master || (!tone && !this._tone)) return;
-    for (const f of this._tone ?? []) { try { f.disconnect(); } catch { /* gone */ } }
-    this._tone = null;
-    this._fader.disconnect();
-    if (!tone || typeof this.ctx.createBiquadFilter !== 'function') { this._fader.connect(this._master); return; }
-    const chain = [];
-    const add = (type, hz, db, q) => { const f = this.ctx.createBiquadFilter(); f.type = type; f.frequency.value = hz; f.gain.value = db; if (q) f.Q.value = q; chain.push(f); };
-    if (tone.low) add('lowshelf', tone.low[0], tone.low[1]);
-    for (const [hz, db, q] of tone.bands ?? []) add('peaking', hz, db, q);
-    if (tone.high) add('highshelf', tone.high[0], tone.high[1]);
-    let node = this._fader;
-    for (const f of chain) { node.connect(f); node = f; }
-    node.connect(this._master);
-    this._tone = chain;
   }
 
   /** WB10a: the level through the song's press (songPress), or straight to the fader - rewired only when that changes,
@@ -469,24 +429,10 @@ export class SongPlayer {
     return f;
   }
 
-  /** EG-G2 (bible/11-Multiplayer/Elite-Gates.md section 26, THE SPIRE MIX): THE DUCK - the song's own level (WBX9's
-   *  node) dipped `db` decibels in 20 ms, held to `seconds`, and back over EG_DUCK_BACK_S; the fader (DISC20-B's fades)
-   *  and the volume are never touched, so a duck and a fade never fight. */
-  duck(db, seconds) {
-    const g = this._level?.gain;
-    if (!g || !this.ctx || !(db > 0)) return;
-    const now = this.ctx.currentTime, base = songLevel(this.song), low = base * 10 ** (-db / 20), hold = Math.max(0.02, seconds);
-    g.cancelScheduledValues(now);
-    g.setValueAtTime(g.value, now);
-    g.linearRampToValueAtTime(low, now + 0.02);
-    g.setValueAtTime(low, now + hold);
-    g.linearRampToValueAtTime(base, now + hold + EG_DUCK_BACK_S);
-  }
-
   /** DISC20-B: ramp the fader to `level` over `seconds` (see rampFader). */
   fadeTo(level, seconds) { rampFader(this.ctx, this._fader, level, seconds); }
 
-  /** The MusicVolume setting moved (2026-08-27): follow it now, not at
+  /** The MusicVolume setting moved: follow it now, not at
    *  the next song. A short ramp, so a slider drag is not a zipper. */
   resyncGain() {
     if (!this._master) return;
@@ -507,7 +453,6 @@ export class SongPlayer {
     if (this._songVoices || this._voicedChains) this._dropChannelChains();   // INTRO3c: a voiced song's channels play through their own body and ensemble - built for this song, not the last
     this._voicedChains = !!this._songVoices;
     this._routePress(songPress(song));   // WB10a: and its press - none for every song but the ones that carry one
-    this._routeTone(songTone(song));   // INTRO3c: and its tone - none for every song but the ones that carry one
     this.song = song;
     // Computed once per song, not per window: the pedal map is a pure
     // function of the event list and the scheduler re-enters constantly.
@@ -773,7 +718,7 @@ export class SongPlayer {
       ? [this._connect(sides[0], Math.max(-1, (ch.pan ?? 0) - own.spread), e.channel), this._connect(sides[1], Math.min(1, (ch.pan ?? 0) + own.spread), e.channel)]
       : [this._connect(gain, ch.pan, e.channel)];
     for (const o of oscs) o.stop(end + 0.02);
-    // INTRO3d (2026-10-24, the owner: "Intro music is broken"): A FINISHED NOTE LETS GO. Chromium does not disable a
+    // INTRO3d: A FINISHED NOTE LETS GO. Chromium does not disable a
     // chain whose nodes take more than one input (a bow's low-pass a side, the bite into both), so every finished
     // INTRO3c note stayed on its channel and was pulled every quantum - 440 dead filters and 520 dead panners by 40 s,
     // the theme 6 s behind its film. Its outputs leave the channel and the shared sines leave it as it ends.
@@ -787,7 +732,7 @@ export class SongPlayer {
     });
   }
 
-  /** INTRO3c (2026-10-24, the owner: "I dont like the high pitch whine ... Its not natural"): THE VIBRATO - a sine at the
+  /** INTRO3c: THE VIBRATO - a sine at the
    *  voice's `vibRate` (5.5 Hz unnamed), `vibrato` cents deep, summed into the pair's detune (the carrier's and the
    *  modulator's, so the spectrum moves whole; a bowed copy's one sawtooth); copy `u` of `n` runs 6% faster a step than the one before it, so an
    *  ensemble's vibratos drift in and out of each other as players' do; the depth sets in from nothing over the attack
@@ -1051,7 +996,7 @@ export class SongPlayer {
  * volume and one "is something playing" answer. That sharing is the
  * part worth keeping, and it is why this lives beside SongPlayer
  * rather than in the replacement module. THE LEVEL LAW SPLIT ON
- * 2026-08-27 (Mac: "fix it also"): MUSIC_GAIN is the FM bank's trim -
+ * 2026-08-27: MUSIC_GAIN is the FM bank's trim -
  * raw oscillators sum hot - and a user's replacement is a MASTERED file
  * with its own headroom, so it played at a fifth of itself under the
  * trim. This player reads `trackGain()` now - Controls/MusicVolume

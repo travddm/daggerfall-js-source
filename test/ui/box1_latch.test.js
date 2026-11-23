@@ -1,5 +1,4 @@
-// BOX1 (2026-09-17, Mac: "When buying a spell, the dialouge ui Flickers
-// between 2 seperate conversations"): the guild popup and the coven draw
+// BOX1: the guild popup and the coven draw
 // their textId boxes through latchBoxRows - the record is read ONCE per
 // box, not once per frame (the host's rows() is a random-variant draw).
 import { test } from 'node:test';

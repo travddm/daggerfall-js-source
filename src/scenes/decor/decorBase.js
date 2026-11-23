@@ -1,9 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BASE-HIDE (2026-09-26) — THE ROOM'S OWN FURNITURE, ONE PIECE AT A TIME.
+// BASE-HIDE — THE ROOM'S OWN FURNITURE, ONE PIECE AT A TIME.
 //
-// Mac: "Remove bought houses decor - the base game decor isnt easy to
-// decorate around when u want more in depth house". What Daggerfall
+// . What Daggerfall
 // furnished a room with is its interior's prop models and flats, which a
 // room is built from in one merge (one static batch, one collider
 // bucket, the flats grouped by picture - scenes/interiorContext.js). A

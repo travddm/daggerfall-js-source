@@ -1,7 +1,7 @@
 // @ts-check
 // ARENA-ARROWS (FIELD BUGS 2026-10-04e, Discord: "Arrows are not refunded, which causes problems"): THE QUIVER COMES
 // BACK FULL FROM THE SAND. A bout's healers put the fighter back as they found them - health, fatigue and magicka (the
-// duel's own heal, bible/11-Multiplayer/Arena.md "2. The fights") - but nothing put back what the bow spent. An arrow
+// duel's own heal, "2. The fights") - but nothing put back what the bow spent. An arrow
 // that strikes a foe is lodged in its pack (combat/arrowFlight.js) and looted from the corpse in any other fight; a bout
 // fighter is stood with no pack, never dies (the yield floor: no corpse, no loot) and is taken away at the verdict, and a
 // player's opponent is a remote body - so every arrow loosed on the sand was gone for good, and a ladder emptied a
@@ -10,16 +10,15 @@
 // tally counted (systems/shotTally.js) - so an arrow dropped, sold or given away on the sand is no shot, and never
 // comes back while the dropped stack still lies there.
 //
-// Counted: the ammunition every ranged weapon spends (inventory.js spendAmmoFor - an Arrow, a Dwemer Pellet), REAL
+// Counted: the ammunition every ranged weapon spends (inventory.js spendAmmoFor - the Arrow), REAL
 // stacks only: a conjured arrow (isSummoned) is spent first and vanishes anyway, and a quest's is never loosed. Never
 // more than went in: a stack grown on the sand hands nothing back. Handed back as inventory.js addItem stacks it. Pure:
 // the lists in, the count handed back out. Not a DFU member - Ledger A (ARENA-ARROWS).
 
 import { ARROW_TEMPLATE, isSummoned, addItem } from '../inventory.js';
-import { PELLET_TEMPLATE } from '../../characters/thunderlockIds.js';
 
 /** The ammunition a bout's quiver counts - every template inventory.js's spendAmmoFor can spend. */
-export const QUIVER_TEMPLATES = Object.freeze([ARROW_TEMPLATE, PELLET_TEMPLATE]);
+export const QUIVER_TEMPLATES = Object.freeze([ARROW_TEMPLATE]);
 
 /** @param {any} it @param {number} template */
 const counted = (it, template) => it?.templateIndex === template && !isSummoned(it) && !it.questItem;

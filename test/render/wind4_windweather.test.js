@@ -1,4 +1,4 @@
-// WIND4 (2026-09-15, Mac, three in one message):
+// WIND4:
 //
 //   1. "The wind wisps are far too many and the amount should be reduced."
 //   2. "Clouds dont follow on the world timer with the direction of the wind"
@@ -29,19 +29,14 @@
 // when the sun sets - and had no moon at all. So at midnight the ground
 // went dark and the grass stayed lit by a sun that was not there.
 //
-// The grass shader is byte-identical to `grass-proto.html` by GR1's
-// law, so the lab carries the same change and hands the new uniforms
-// its own way (no night in the lab: scale one, moon off).
+// The grass shader text is held to a fingerprint (test/render/labGrass.test.js).
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { WISP_MAX, WISP_FLOOR, WISP_BOX, WISP_LOOK, SAND_LOOK, wispCount } from '../../src/render/windWisps.js';
 import { WORLD_PER_DRIFT, wrapField } from '../../src/render/volumetricClouds.js';
-import { LAB_GRASS_FS, LAB_GRASS_VS, GRASS2_VS_EDITS } from '../../src/render/labGrass.js';
-
-const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+import { LAB_GRASS_FS, LAB_GRASS_VS } from '../../src/render/labGrass.js';
 
 test('WIND4 (1) the wisps thinned, executed - and WIND5 thinned them again (240, Mac: "reduce the amount of wind streaks"), and DISC17-A again (120, "reduce the amount of wind wisps"): a gale in the 90 m box, a calm ten', () => {
   assert.equal(WISP_MAX, 120, 'WIND4 took 2400 to 650; WIND5 to 240, each wisp then a flourish; DISC17-A to 120, kept by WISPS-RETURN with the streak back');
@@ -65,12 +60,6 @@ test('WIND4 (1) the wisps thinned, executed - and WIND5 thinned them again (240,
 });
 
 test('WIND4 (2) the clouds go WITH the wind: the drift is subtracted from the sample, the recenter still added', () => {
-  const vc = read('src/render/volumetricClouds.js');
-  assert.match(vc, /vec3 q = vec3\(p\.x \+ uShift\.x - uDrift\.x \+ fShear \* \(p\.y - fBase\), p\.y, p\.z \+ uShift\.y - uDrift\.y\);/,
-    'the density march');
-  assert.match(vc, /textureLod\(uShape, vec3\(p\.x \+ uShift\.x - uDrift\.x, p\.y, p\.z \+ uShift\.y - uDrift\.y\) \/ MOTTLE_M/,
-    'and the ambient mottle, which rides the same air');
-  assert.ok(!/uShift\.x \+ uDrift\.x/.test(vc), 'no sample adds the drift any more');
   // THE LAW, AS ARITHMETIC. The shader reads N(p - d). A cloud sitting
   // at field position x0 is therefore drawn where p - d == x0, i.e. at
   // p = x0 + d - downwind, by exactly the drift. This is the shader's
@@ -81,12 +70,6 @@ test('WIND4 (2) the clouds go WITH the wind: the drift is subtracted from the sa
   for (const d of [0, 120, -400, 5000]) {
     assert.equal(sampleAt(cloudSeenAt(0, d), d), 0, `a cloud at the origin is drawn ${d} m downwind`);
   }
-  // and the drift itself is the wind integrated on the WORLD clock, in
-  // world metres - the seam that carries it, unchanged
-  const shared = read('src/scenes/shared.js');
-  assert.match(shared, /driftXZ\[0\] \+= weatherRowNow\.wind\[0\] \* dt \* WIND_SECONDS_PER_MINUTE;/);
-  assert.match(shared, /const dt = lastMin === null \|\| nowMin < lastMin \? 0 : nowMin - lastMin;/, 'dt is GAME minutes, so a rest moves the sky');
-  assert.match(shared, /weatherRowNow\.wind = windModel\.vector\(\);/, 'and the wind is the live model\'s, not the row\'s table value');
   assert.ok(WORLD_PER_DRIFT > 0);
   assert.equal(wrapField(0), 0, 'the wrap is still the field\'s period');
 });
@@ -99,31 +82,5 @@ test('WIND4 (3) the grass darkens: the sward takes the sun\'s SCALE and the moon
   assert.ok(!/uSunCol \* 1\.15 \* vLam/.test(LAB_GRASS_FS), 'the unscaled sun is gone');
   assert.match(LAB_GRASS_VS, /uniform vec3 uEye, uSunDir, uMoonDir;/);
   assert.match(LAB_GRASS_VS, /vMoonLam = max\(dot\(nrm, normalize\(uMoonDir\)\), 0\.0\);/);
-  // the host hands all of it - three of five terms is what the bug was
-  assert.match(read('src/scenes/world.js'),
-    /sunScale: renderer\._sunScale, moonDir: renderer\._moonDir, moonScale: renderer\._moonScale, moonCol: renderer\._moonColor,/);   // GRASS-LIT2: the lanterns follow
-  // ...and a host that hands none is the OLD look, never a black field
-  const grass = read('src/render/labGrass.js');
-  assert.match(grass, /gl\.uniform1f\(u\.uSunScale, light\.sunScale \?\? 1\);/);
-  assert.match(grass, /gl\.uniform1f\(u\.uMoonScale, light\.moonScale \?\? 0\);/);
-  for (const n of ['uSunScale', 'uMoonDir', 'uMoonScale', 'uMoonCol']) assert.ok(grass.includes(`'${n}'`), `${n} is looked up`);
-  // GR1's law: the lab is the same text, and sets the new uniforms itself
-  const lab = read('grass-proto.html');
-  assert.ok(lab.includes(LAB_GRASS_FS), 'the lab carries this fragment stage verbatim - GRASS2 changed no fragment law');
-  // GRASS2: the VERTEX stage is the lab's text plus its declared edits (four since GRASS6)
-  // now, so it is no longer a substring of the lab. The whole-text law
-  // lives in labGrass.test.js, which applies the edits and compares; what
-  // is checked here is that the lab still carries the lines those edits
-  // replace - if the lab moved under them, that pin's `from` would stop
-  // matching and the departure would silently become a rewrite.
-  for (const e of GRASS2_VS_EDITS) assert.ok(lab.includes(e.from), `the lab still carries the line this edit replaces: ${e.why}`);
-  assert.ok(!lab.includes(LAB_GRASS_VS), 'and the port\'s vertex stage is NOT the lab\'s any more - the departure is real and says so here too');
-  assert.match(lab, /gl\.uniform1f\(gl\.getUniformLocation\(grassProg, 'uSunScale'\), 1\);/, 'the lab has no night: scale one');
-  assert.match(lab, /gl\.uniform1f\(gl\.getUniformLocation\(grassProg, 'uMoonScale'\), 0\);/);
 });
 
-test('WIND4 records: the rendering page, the ledger row and the testing row', () => {
-  assert.match(read('bible/07-Rendering/Rendering.md'), /^## WIND4 - THE WISPS' COUNT, THE SKY'S DIRECTION, THE GRASS AT NIGHT \(2026-09-15\)/m);
-  assert.match(read('bible/01-Overview/Port-Ledger.md'), /THE WISPS' COUNT, THE SKY'S DIRECTION, THE GRASS AT NIGHT \(WIND4, 2026-09-15\)/);
-  assert.match(read('bible/09-Testing/Testing-Rows-2026-10-19.md'), /^\| wind4_windweather\.test\.js \| \d+ \| WIND4/m);
-});

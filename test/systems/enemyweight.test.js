@@ -1,4 +1,4 @@
-// EW1 - THE ENEMY WEIGHT TERM (2026-08-28).
+// EW1 - THE ENEMY WEIGHT TERM.
 //
 // GetEnemyEntityWeightInClassicUnits (FormulaHelper.cs:2881-2898):
 //

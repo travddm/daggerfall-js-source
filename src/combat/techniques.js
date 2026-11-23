@@ -1,9 +1,6 @@
 // @ts-check
-// TECH1 (2026-10-10, the owner: "detailed weapon skill affixes for each weapon type ... a bow could roll with an attack
-// that allows you to aim and place a telegraph that shoots a volley of arrows, or a sword attack that allows you to leap
-// and attack your opponent ... This would have its own keybinding"; "This is your baby. I want you to be as detailed as
-// possible and take your time. No exceptions"): THE TECHNIQUE KEY - what a press of WeaponTechnique does with the weapon
-// in hand. Design and laws: bible/05-Combat/Weapon-Techniques.md.
+// TECH1: THE TECHNIQUE KEY - what a press of WeaponTechnique does with the weapon
+// in hand. Design and laws:.
 //
 // ONE RUNNER, EVERY HOST. Every host builds a weapon rig (combat/weapon/weaponRig.js - exterior.js, world.js, worldModes.js'
 // interior arm, dungeonContext.js), and the rig that owns the frame steps THIS module, as it steps the one pair of
@@ -30,9 +27,10 @@
 // pass, shake(k) - the one shaker, sound(clip, volume, pitch) - the audio bus }.
 // A host that hands none still swings its techniques; it cannot leap, dash or shoot one (said so).
 
-import { techniqueById, techniqueMult, techniqueFamily, TECHNIQUE_MAX_SPEED, TECHNIQUES, TECHNIQUE_ACTION } from './technique/techniqueRoster.js';
+import { techniqueById, techniqueMult, techniqueFamily, techniquesFor, TECHNIQUE_MAX_SPEED, TECHNIQUES, TECHNIQUE_ACTION } from './technique/techniqueRoster.js';
 import { signatureFor, signatureById, SIGNATURE_IDS, SIGNATURE_TECHNIQUES } from '../systems/martialPaths.js';   // MARTIAL3: a martial path's signature - the key's answer when the weapon carries no line
-import { techniqueLineOf, lootRarityOn, rarityKnown } from '../systems/loot/lootRarity.js';
+import { rarityLineOf, rarityKnownOf, rarityOn } from './technique/rarityLink.js';   // Loot rarity's extension of the techniques: a found line (the one place the ladder is named)
+import { techniquesOn } from './technique/techniquesOn.js';
 import { EQUIP_SLOTS } from '../systems/equip.js';
 import { sigilDueling } from '../systems/sigil/sigil.js';
 import { FATIGUE_MULTIPLIER } from '../systems/statMods.js';
@@ -46,8 +44,7 @@ import { blowSchedule } from '../characters/weaponStates.js';
 import { ARROW_FLIGHT_SPEED } from '../systems/spellcast.js';   // BAL-ARCHERY: a volley's shafts fly at the arrow's speed, the one constant (spellcast.js)
 import { WEAPON_REACH, friendlyProtected } from './playerWeapon.js';
 import { playerBody, bodyRadius, tellTechniqueUsed } from './technique/techniqueBlow.js';
-import { madeRuleHere, madeSaysHere, madeOnTraverse } from '../systems/madeLevel.js';   // EG-H2 (bible/11-Multiplayer/Elite-Gates.md section 10.7): the Spire refuses a flight on its traversal ground - the made level's law
-import { techniqueCue, resetTechniqueFx, TECH_FX } from './technique/techniqueFx.js';   // TECH-FX: what each moment looks, moves and sounds like (bible/05-Combat/Weapon-Techniques.md THE FEEL)
+import { techniqueCue, resetTechniqueFx, TECH_FX } from './technique/techniqueFx.js';   // TECH-FX: what each moment looks, moves and sounds like (THE FEEL)
 
 /** The registry action (systems/inputActions.js) - the roster's (TECH-CARD: the leaf, so the card names the key). */
 export { TECHNIQUE_ACTION };
@@ -62,7 +59,7 @@ const SWING_GIVE_UP_S = 3;
 
 // ── the words ───────────────────────────────────────────────────────
 export const NO_TECHNIQUE_TEXT = 'This weapon has no technique.';
-export const LADDER_OFF_TEXT = 'Weapon techniques need Loot rarity turned on.';
+export const LADDER_OFF_TEXT = 'Weapon techniques are turned off.';
 export const DUEL_TEXT = "Techniques can't be used in a duel.";
 export const TIRED_TEXT = 'You are too tired.';
 export const SHEATHED_TEXT = 'Draw your weapon first.';
@@ -120,27 +117,41 @@ export function techniqueItem(entity, pw) {
   if (w) return w;
   return entity?.equip?.slots?.[EQUIP_SLOTS.Gloves] ?? null;
 }
-/** The technique in hand - { id, value, tech, item, known } - or null. Read whatever the ladder's switch says (the
- *  refusal says it: a piece found under the ladder keeps its line, and sleeps with it off). AUDIT TECH-FX: the HUD asks
+/** The technique in hand - { id, value, tech, item, known } - or null. Read whatever the Weapon techniques switch says (the
+ *  refusal says it). Which technique answers: a found line (Loot rarity on: it picks the technique and adds power), else a
+ *  held path's signature, else - only while Loot rarity is off - the weapon family's own first technique at its base power (with it on, a piece with no line has none). AUDIT TECH-FX: the HUD asks
  *  it every frame, so the last answer is kept while nothing it was read from has moved (the piece, its line, the line's
  *  technique and value, whether it is known) - a snapshot no caller writes, so one is as good as another. */
 let _handMemo = null;
 let _sigMemo = null;
 export function techniqueInHand(entity, pw) {
   const item = techniqueItem(entity, pw);
-  const line = techniqueLineOf(item);
+  const line = rarityLineOf(item);
   const tech = line ? techniqueById(line.param) : null;
-  if (!tech) return signatureInHand(entity, pw, item);
-  // AUDIT MARTIAL L4 L6: a found line SLEEPS with the ladder off (Loot-II law 6), so the key is free - a held path's
+  if (!tech) return signatureInHand(entity, pw, item) ?? (rarityOn() ? null : familyDefaultInHand(item));
+  // AUDIT MARTIAL L4 L6: a found line SLEEPS with the techniques switch off, so the key is free - a held path's
   // signature answers it; with none, the line's own refusal says why
-  if (!lootRarityOn()) { const sig = signatureInHand(entity, pw, item); if (sig) return sig; }
-  const known = rarityKnown(item), h = _handMemo;
+  if (!techniquesOn()) { const sig = signatureInHand(entity, pw, item); if (sig) return sig; }
+  const known = rarityKnownOf(item), h = _handMemo;
   if (h && h.item === item && h.line === line && h.id === line.param && h.value === line.value && h.known === known) return h.hand;
   const hand = { id: line.param, value: line.value, tech, item, known };
   _handMemo = { item, line, id: line.param, value: line.value, known, hand };
   return hand;
 }
-/** MARTIAL3 (bible/05-Combat/Martial-Specialisations.md section 6): THE SIGNATURE IN HAND - with no line on the piece, my
+/** Loot rarity off, a piece with no found line: its family's first technique, at its base power (value 0), known. null for a piece with no
+ *  family (an arrow, the bare hand - its signature, when held, is signatureInHand's). Kept while the piece is the same. */
+let _defaultMemo = null;
+function familyDefaultInHand(item) {
+  const id = item ? techniquesFor(item)[0] : null;
+  const tech = id ? techniqueById(id) : null;
+  if (!tech) return null;
+  const h = _defaultMemo;
+  if (h && h.item === item && h.tech === tech) return h.hand;
+  const hand = { id, value: 0, tech, item, known: true };
+  _defaultMemo = { item, tech, hand };
+  return hand;
+}
+/** MARTIAL3: THE SIGNATURE IN HAND - with no line on the piece, my
  *  held martial path's signature, when the weapon in hand is one of its pair's families (the bare hand Hand-to-Hand's,
  *  whatever gloves are worn; the beast's claws none - "the beast knows no technique"). The owner: "Technique key, when
  *  free" - a line on the weapon wins. Its `value` is none (a signature is its base, as a line's power is its own),
@@ -469,8 +480,8 @@ export function stepTechnique(dt, ctx) {
 export function refusal(hand, ctx) {
   const pw = ctx.pw;
   if (pw?.weapon?.werecreatureClaws) return BEAST_TEXT;
-  if (!hand) return pw?.weapon && techniqueLineOf(ctx.entity?.equip?.slots?.[EQUIP_SLOTS.Gloves]) ? GAUNTLETS_TEXT : NO_TECHNIQUE_TEXT;   // AUDIT TECH1: the gauntlets' line sleeps while a weapon is drawn - say so
-  if (!hand.signature && !lootRarityOn()) return LADDER_OFF_TEXT;   // Loot-II law 6: off is DFU exactly - a found line sleeps (MARTIAL3: a path's signature is no found line)
+  if (!hand) return pw?.weapon && rarityLineOf(ctx.entity?.equip?.slots?.[EQUIP_SLOTS.Gloves]) ? GAUNTLETS_TEXT : NO_TECHNIQUE_TEXT;   // AUDIT TECH1: the gauntlets' line sleeps while a weapon is drawn - say so
+  if (!hand.signature && !techniquesOn()) return LADDER_OFF_TEXT;   // Loot-II law 6: off is DFU exactly - a found line sleeps (MARTIAL3: a path's signature is no found line)
   if (sigilDueling()) return DUEL_TEXT;   // TECH law 3: never at a player - every power that sleeps in a duel, or a bout between players, sleeps
   if (pw.sheathed) return SHEATHED_TEXT;
   if (_s.act) return true;   // one at a time
@@ -494,9 +505,6 @@ export function refusal(hand, ctx) {
     // on the ground the spell holds nothing up (JUMP-SLOW gave the jump back there), and a piece that casts Slowfalling
     // while held refused every leap and dash its wearer owned; the Flying Kick from the air is still refused under it
     if (m.climb?.isClimbing || m._wall || m._pkMove || m.swimming || m.onExteriorWater || m.isPlayerSwimming || m.levitating || (m.slowFalling && !m.grounded) || m.riding || m.isDown?.() || (!m.grounded && !t.airborne)) return CANNOT_LEAP_TEXT;   // AUDIT TECH1: the open water too - DFU refuses a jump there
-    // EG-H2 (Elite-Gates.md section 10.7): on a fight floor a leap is a technique; on the Spire's traversal ground it
-    // would be a bridge - refused there, said in the Spire's words (the made level's law: systems/madeLevel.js)
-    if (madeRuleHere('techFlight') === 'refused' && madeOnTraverse()) return madeSaysHere('techFlight');
   }
   return null;
 }
@@ -729,7 +737,7 @@ let _chipSecs = -1, _chipSecsText = '';
  *  @param {any} entity @param {any} pw @param {string | (() => string)} [keyName] */
 export function techniqueHudChips(entity, pw, keyName = '') {
   const hand = techniqueInHand(entity, pw);
-  if (!hand || (!hand.signature && !lootRarityOn())) return NONE;   // TECH-FX: no technique in hand - the frozen empty list, never a new one a frame (MARTIAL3: a signature needs no ladder)
+  if (!hand || (!hand.signature && !techniquesOn())) return NONE;   // TECH-FX: no technique in hand - the frozen empty list, never a new one a frame (MARTIAL3: a signature needs no ladder)
   if (sigilDueling()) return NONE;   // FINAL AUDIT: nor while a duel sleeps the key (law 3) - the set powers' chips' law, none while they sleep; the card's block says why
   const left = techniqueWait(hand.id);
   _chip.name = techniqueName(hand);

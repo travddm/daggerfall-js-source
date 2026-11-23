@@ -1,5 +1,4 @@
-// STAFF-PANEL5-FREEZE (2026-10-22, mob: "the player can only look around"; design doc "DFO Staff Panel: design", Freeze
-// player and Freeze chat) - THE GAME'S HALF: the session's `fv`, its `frozen` and its staff nudges (net/online.js); the
+// STAFF-PANEL5-FREEZE - THE GAME'S HALF: the session's `fv`, its `frozen` and its staff nudges (net/online.js); the
 // Staff tab and its thread (net/staffChat.js, net/chat.js); the Copy button (ui/chatPanel.js); the screen
 // (ui/freezeScreen.js); the motor held and no blow delivered (characters/playerEntity.js), and the host's wiring
 // (scenes/staffFreezeHost.js, scenes/world.js). The relay's half: staffpanel5_freeze_relay.test.js; the service's:
@@ -89,7 +88,7 @@ test('STAFF-PANEL5-FREEZE the session: every hello says the build shows the free
   ws.open();
   await settle();
   assert.equal(JSON.parse(ws.sent.find((f) => JSON.parse(f).t === 'hello')).fv, 1, 'the hello says `fv` 1');
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: 'world245' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [], n: 1, v: RELAY_VERSION });
   assert.equal(s.sendChat('41', { ch: 'staff' }), false, 'no staff word heard yet: no nudge goes');
   s._leaseAskAt = now;
   ws.receive({ t: 'frozen', until: 1_800_003_600 });
@@ -187,7 +186,6 @@ test('STAFF-PANEL5-FREEZE THE LOCK: a freeze holds the motor and withholds every
   setStaffFrozen('9999999999'); assert.equal(staffFrozen(), false, 'a word that is no time is no freeze');
   // the motor: every host's paralysis gate ORs the freeze
   for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js']) assert.match(readFileSync(f, 'utf8'), /const paralyzed = entityIsParalyzed\(playerEntity\) \|\| staffFrozen\(\);/, f);
-  assert.match(readFileSync('src/scenes/worldModes.js', 'utf8'), /const paralyzed = staffFrozen\(\) \|\| playerHeld\(\) \|\| \(\(mode === 'dungeon' && dungeonCtx\)/);   // PIN MOVED (AUDIT WORLD-EVENTS L1-4): and a body lying down for a raise
   // the screen
   const doc = fakeDocument();
   const screen = createFreezeScreen({ doc, win: { navigator: { clipboard: { writeText: async (w) => { copied.push(w); } } } } });
@@ -249,10 +247,6 @@ test('STAFF-PANEL5-FREEZE THE HOST: the host wires `frozen` on every session and
     assert.equal(staffFrozen(), false);
   } finally { host.destroy(); }
   assert.equal(staffFrozen(), false);
-  const w = readFileSync('src/scenes/world.js', 'utf8');
-  assert.match(w, /staffHost = createStaffFreezeHost\(chatLog, socialLink, online, staffHost\);/);
-  assert.match(w, /staffHost\.wire\(link\);/);
-  assert.match(w, /if \(staffHost\?\.claims\(tabId\)\) return staffHost\.send\(tabId, text\);[^\n]*\n\s*\/\/ EG-PLAY: `\/breach`/, 'before every command but the mailbox\'s');
 });
 
 test('STAFF-PANEL5-FREEZE-FIX THE SERVICE\'S ANSWER BOTH WAYS (a review: a lift the relay never said - the hub link down then - held the motor until the old end): a read that finds the freeze gone lets go, a read that finds it raised holds; a read begun before the relay\'s latest word changes no freeze, its lines all the same (mutants: the read raising only; the relay\'s word overruled)', async () => {

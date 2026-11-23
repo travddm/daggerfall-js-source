@@ -1,5 +1,5 @@
 // @ts-check
-// SD5 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7): THE SHATTERED HOUR'S FRAME
+// SD5: THE SHATTERED HOUR'S FRAME
 // - where its stages stand, the one place both the client's made level (world/superDungeon/sdRealm.js) and the relay's judgements
 // (the Orrery's reach, SD6; the Brass Remnant's arena, SD8) read them; and the Orrery's law (SD6a, below) - its stones,
 // gearing, riddles and turns, drawn from the slot alike on the relay and every client. Pure, no imports: the relay's
@@ -299,7 +299,7 @@ export function orreryTurned(R, who, id, road, after, now) {
  *  `max`. */
 export const orreryLashed = (R, max = 256) => Object.entries(R.ids).filter(([, net]) => net >= 0).map(([id]) => id).slice(0, max);
 /**
- * EG-H3 (2026-10-12; bible/11-Multiplayer/Elite-Gates.md sections 8.4 and 31, EG4): ONE TURN OF A STONE, JUDGED - the
+ * EG-H3: ONE TURN OF A STONE, JUDGED - the
  * Hour's realm's judge (server/src/index.js _sdTurn) and the Spire's Athenaeum's (net/eliteGates/egBrain.js), one law over the one
  * draw (orreryOf, widened): nothing while the Concord holds or while the stone's gear has not settled (SD_STONE_SETTLE_MS
  * since `last[i]`); under THE STONES' RIGHTS (`R` - the Hour's thread; the Spire's company keeps none) a turner that may

@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW7 (2026-10-05, bible/06-Systems/Living-World.md "LW7"): A SWING AT THE ROAD'S TRAVELLERS. A swing that met nobody in
+// LW7: A SWING AT THE ROAD'S TRAVELLERS. A swing that met nobody in
 // the street is offered to the living world's travellers on the road - the body on the look ray within the weapon's reach
 // (the talk ray's own pick, SOC5's one cylinder), no wall before it: DFU's one-hit civilian (WeaponManager.cs:504-521,
 // less the watch - there is none on the road), struck down for good (the roads' deed, livingRoads.js slain - which LW11

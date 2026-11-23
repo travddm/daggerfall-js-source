@@ -46,7 +46,10 @@ import {
   DAYS_PER_YEAR, DAYS_PER_MONTH, MINUTES_PER_DAY,
   dateString, dateFromClassicMinutes,   // AUDIT 64 F28: GetLoanDueDateString's two halves
 } from './gameDate.js';
-import { localizedText, getLocalizedRegionName } from './textManager.js';   // L10N3d: the status box's words; L10N3e: the region names shown
+import { localizedText, getLocalizedRegionName, t } from './textManager.js';   // L10N3d: the status box's words; L10N3e: the region names shown; HOUSES-3: a full region's words
+import { HOME_CAP, regionDeedsOf, deedsOfHouses } from '../net/homeLaw.js';   // HOUSES-3: three houses a region, the online homes' own number, and a region's deeds
+import { REGION_NAMES } from '../formats/mapsTables.js';   // WW-R: the Bay's regions and the provinces'
+import { isMadePlaceId } from '../world/placeIds.js';   // AUDIT RELEASE R2-9: a capital's slices' deeds; BAY-LEFT-B: every place the port made
 
 /** TransactionResult (:29-51). The values ARE TEXT.RSC record ids for
  *  everything the bank says out loud - 0282-0299 is one contiguous
@@ -139,19 +142,29 @@ export const houseSellPrice = (meshRadius) => Math.trunc(housePrice(meshRadius) 
 /** MapFileReader.RegionCount - four BSA records per region, which is
  *  62 in the shipping MAPS.BSA. The accounts array is sized from the
  *  reader where one is in scope and from this where none is; a save
- *  restores its own length either way. */
-export const BANK_REGION_COUNT = 62;
+ *  restores its own length either way. WW-R (
+ *  WW-R): and the provinces' past the Bay after the Bay's (formats/mapsTables.js
+ *  REGION_NAMES) - a save's 62 padded on its restore (padRegionTable). */
+export const BANK_REGION_COUNT = REGION_NAMES.length;
+
+/** WW-R: a region table (the accounts, the houses) a save restored shorter than the world's regions, padded with the
+ *  new regions' blank rows - each its own region's (`make(regionIndex)`). The rows it held are kept as they were.
+ *  @template T @param {T[]} rows @param {(regionIndex: number) => T} make */
+export function padRegionTable(rows, make) {
+  for (let i = rows.length; i < BANK_REGION_COUNT; i++) rows.push(make(i));
+  return rows;
+}
 
 export function createBankAccounts(regionCount = BANK_REGION_COUNT) {
-  return Array.from({ length: regionCount }, (_, regionIndex) => ({
-    regionIndex, accountGold: 0, loanTotal: 0, loanDueDate: 0, hasDefaulted: false,
-  }));
+  return Array.from({ length: regionCount }, (_, regionIndex) => blankAccount(regionIndex));
 }
+/** One region's account, opened empty. @param {number} regionIndex */
+export const blankAccount = (regionIndex) => ({ regionIndex, accountGold: 0, loanTotal: 0, loanDueDate: 0, hasDefaulted: false });
 export function createHouses(regionCount) {
-  return Array.from({ length: regionCount }, (_, regionIndex) => ({
-    regionIndex, location: '', mapId: 0, buildingKey: 0,
-  }));
+  return Array.from({ length: regionCount }, (_, regionIndex) => blankHouse(regionIndex));
 }
+/** One region's house record, none owned. @param {number} regionIndex */
+export const blankHouse = (regionIndex) => ({ regionIndex, location: '', mapId: 0, buildingKey: 0 });
 
 /**
  * H1 - THE HOUSE REGISTRY GOES LIVE. `createHouses` has minted the
@@ -173,16 +186,87 @@ export function createHouses(regionCount) {
  * consumer above is asking about the building in front of them, so
  * the region is always the one they mean.
  */
-export const ownsHouse = (houses, regionIndex) => (houses?.[regionIndex]?.buildingKey ?? 0) > 0;
+export const ownsHouse = (houses, regionIndex) => regionDeeds(houses, regionIndex).length > 0;
+/** The region's FIRST deed's key - its slot's own (HOUSES-3: a region holds three; regionDeeds names them all). */
 export const ownedHouseKey = (houses, regionIndex) => houses?.[regionIndex]?.buildingKey ?? 0;
-export function isHouseOwned(houses, regionIndex, buildingKey) {
+/**
+ * HOUSES-3: A REGION HOLDS THREE HOUSES.
+ * DaggerfallBankManager keeps one house a region (OwnsHouse :136, BuyHouseButton's ALREADY_OWN_HOUSE :417-436); the
+ * port keeps HOUSES_PER_REGION, the online homes' own cap (net/homeLaw.js HOME_CAP: a character's homes in a region). The
+ * region's slot stays its first deed, so a save keeps its shape: the others stand beside it in the slot's `more`, each a
+ * record of the slot's own shape - and a save from before reads as it did. Every reader asks the region's deeds
+ * (`regionDeeds`), never the slot alone. A departure (Port-Ledger A).
+ */
+export const HOUSES_PER_REGION = HOME_CAP;
+/** The region's deeds, its slot's own first - the records themselves. @param {any} houses @param {number} regionIndex */
+export const regionDeeds = (houses, regionIndex) => regionDeedsOf(houses, regionIndex);
+/** Every deed, region by region. @param {any} houses */
+export const allDeeds = (houses) => deedsOfHouses(houses);
+/** HOUSES-3: region `regionIndex`'s deed to building `buildingKey` of town `mapId` (unsigned), or null. */
+export const regionDeedOf = (houses, regionIndex, mapId, buildingKey) => regionDeeds(houses, regionIndex)
+  .find((d) => (d.buildingKey | 0) === (buildingKey | 0) && (Number(d.mapId) >>> 0) === (Number(mapId) >>> 0)) ?? null;
+/** Whether region `regionIndex` holds its three houses already - the bank sells none there, nor an order gives one. */
+export const regionHousesFull = (houses, regionIndex) => regionDeeds(houses, regionIndex).length >= HOUSES_PER_REGION;
+/** What the bank and an order say to a buyer whose region is full - DaggerfallBankManager's ALREADY_OWN_HOUSE (record 286,
+ *  "You already own a house. You must sell it before we can sell you another.") counted to three. */
+export const housesFullText = () => t('bank.housesFull', 'You already own {max} houses in this region. You must sell one before we can sell you another.', { max: HOUSES_PER_REGION });
+/**
+ * HOUSES-3: THE REGION'S HOUSES A BANK BUYS BACK IN ITS TOWN - each deed of the region that stands (WD3 H1: a sleeping deed
+ * is neither priced nor sold), is held in this town (deedHeldIn - AUDIT RELEASE R2-9: never a capital's slice's in another)
+ * and resolves in the town's directory `dir` (AUDIT 64 F26: GetBuildingSummary's bool) - `{ deed, summary }`, the region's
+ * first deed first. @param {any} houses @param {number} regionIndex @param {any} dir
+ */
+export function townDeeds(houses, regionIndex, dir) {
+  if (!dir?.buildings?.length) return [];
+  return regionDeeds(houses, regionIndex)
+    .filter((deed) => deedStands(deed) && deedHeldIn(deed, dir.mapId))
+    .map((deed) => ({ deed, summary: dir.buildings.find((bs) => bs.buildingKey === deed.buildingKey) ?? null }))
+    .filter((o) => o.summary);
+}
+/** HOUSES-3: a region's slot copied whole - its own deed and each beside it (`more`), none shared with the copy it came from
+ *  (the save's snapshot, a load's restore). @param {any} slot */
+export const copyHouseSlot = (slot) => ({ ...slot, ...(Array.isArray(slot?.more) ? { more: slot.more.map((d) => ({ ...d })) } : {}) });
+/** HOUSES-3: the bank's sale offers a town's houses in turn - the line under the offer that says which. */
+export const houseOfferText = (n, count) => t('bank.houseOffer', 'This is your house {n} of {count} in this town.', { n, count });
+/** HOUSES-3: region `regionIndex`'s deed `deed` dropped: its record out of the slot's `more`, or - the slot's own - the next
+ *  of `more` standing in the slot, else the slot blank. The scene, the name and the gold are the caller's. */
+export function dropDeed(houses, regionIndex, deed) {
+  const slot = houses?.[regionIndex];
+  if (!slot || !deed) return;
+  const more = Array.isArray(slot.more) ? slot.more : [];
+  if (deed !== slot) {
+    const rest = more.filter((d) => d !== deed);
+    if (rest.length) slot.more = rest; else delete slot.more;
+    return;
+  }
+  const [next, ...rest] = more;
+  houses[regionIndex] = next ? { ...next, regionIndex, ...(rest.length ? { more: rest } : {}) } : blankHouse(regionIndex);
+}
+/**
+ * AUDIT RELEASE R2-9 - A CAPITAL'S DEED IS ITS SLICE'S. A capital over several pixels (the Imperial City's 625, Solitude's
+ * nine) is a map id a slice over its own blocks, every slice's layout the same eight by eight - so a building key (its
+ * block's column and row and its record, talk/talkTopics.js makeBuildingKey) names a building in every slice: on the
+ * freeware 1,173 of the Imperial City's 1,241 residences' keys are a residence's in two slices or more (up to sixteen),
+ * and DFU's (region, key) law owned them all with one deed. Asked in a town (`mapId`, its map id) that is a capital's,
+ * the deed stands there only if it was bought there (its slot's `mapId`, allocateHouseToPlayer's); anywhere else - and
+ * asked with no town - DFU's law, the region's one house by its key. A departure (Port-Ledger A, IC-GRAND).
+ * BAY-LEFT-B: AND EVERY PLACE THE PORT MADE. A
+ * province past the Bay is one region (WW-R) over a hundred towns - the Arena towns, the countryside's, the capitals -
+ * many of them clones of one Bay town, their keys the same keys: by DFU's law one deed owned a building of its key in
+ * every one of them, so no house was sold past the Bay at all. A town the port made (world/placeIds.js isMadePlaceId - its
+ * map id past the Bay's pixel ids) holds the deed only if it was bought there; a Bay town keeps DFU's law.
+ * @param {any} slot @param {?number} [mapId]
+ */
+export const deedHeldIn = (slot, mapId = null) => mapId == null || !isMadePlaceId(mapId) || ((slot?.mapId ?? 0) >>> 0) === (Number(mapId) >>> 0);
+/** IsHouseOwned (:140-148) - AUDIT RELEASE R2-9: `mapId` the town asking (deedHeldIn). */
+export function isHouseOwned(houses, regionIndex, buildingKey, mapId = null) {
   if (!(buildingKey > 0)) return false;          // :142 - key 0 is "no building"
-  return ownedHouseKey(houses, regionIndex) === buildingKey && deedStands(houses?.[regionIndex]);
+  return regionDeeds(houses, regionIndex).some((d) => d.buildingKey === buildingKey && deedStands(d) && deedHeldIn(d, mapId));   // HOUSES-3: any of the region's three
 }
 /**
  * WD3 (AUDIT WD3 H1): A DEED NAMES ITS BUILDING ONLY IN THE LAYOUT IT WAS BOUGHT IN. Where its town stands in another
  * now (offline, a town mod's pack that could not be loaded for it - Replace Game Artwork off, the network; online, a
- * deed that came through customs from before the mods, which no home of the service's pins) the key names a
+ * deed from before the mods, which no home of the service's pins) the key names a
  * stranger's house, a shop, a temple or nothing, so the deed SLEEPS: no building is the player's by it - its door, its
  * cupboards, its bed, its furniture, its sale - until its town stands in its layout again. A deed whose town the host
  * cannot place stands as Daggerfall always read it.
@@ -205,11 +289,14 @@ export function allocateHouseToPlayer(houses, regionIndex, { buildingKey, mapId,
   discoverBuilding = null, addPermanentScene = null, addNote = null,
   playerName = '', regionName = '',
 } = {}) {
-  const slot = houses[regionIndex];
+  // HOUSES-3: the region's slot while it holds none, else a record beside it - none past the region's three
+  const first = houses[regionIndex];
+  if ((first.buildingKey ?? 0) > 0 && regionHousesFull(houses, regionIndex)) return null;
+  const slot = (first.buildingKey ?? 0) > 0 ? blankHouse(regionIndex) : first;
+  if (slot !== first) (first.more ??= []).push(slot);
   slot.location = location;
   slot.mapId = mapId;
   slot.buildingKey = buildingKey;
-  delete slot.crossed;   // RESTORE: a house bought is the buyer's own, whatever crossed customs in this slot before
   stampLayout(slot, layoutStampOfMapId(mapId));   // WD3: the layout the town stands in, which a load keeps it in (systems/layoutPins.js)
   discoverBuilding?.(buildingKey, `${playerName}'s residence`);
   addPermanentScene?.(mapId, buildingKey);
@@ -239,6 +326,7 @@ export function purchaseHouse(accounts, houses, regionIndex, house, player, {
   meshRadius = 0, mapId = 0, location = '', sideEffects = {}, online = isOnlinePage(),
 } = {}) {
   if (!(house?.buildingKey > 0)) return { result: TRANSACTION_RESULT.NONE };
+  if (regionHousesFull(houses, regionIndex)) return { result: TRANSACTION_RESULT.NONE };   // HOUSES-3: never paid for a deed with no room (the bank refused before the list)
   const amount = housePrice(meshRadius);
   // AUDIT 26 F104: the GATE is GetGoldAmount - coins PLUS letters
   // (DaggerfallBankManager.cs:415 reads playerEntity.GetGoldAmount()) -
@@ -275,19 +363,19 @@ export function purchaseHouse(accounts, houses, regionIndex, house, player, {
  *  the building and zeroed the slot - the deed destroyed for nothing.
  *  `found` is GetBuildingSummary's bool; it defaults TRUE so a caller
  *  that has already resolved the building need not say so twice. */
-export function sellHouse(accounts, houses, regionIndex, { meshRadius = 0, found = true, online = isOnlinePage(), price = houseSellPrice(meshRadius) } = {}, {
+export function sellHouse(accounts, houses, regionIndex, { meshRadius = 0, found = true, online = isOnlinePage(), price = houseSellPrice(meshRadius), deed = null } = {}, {
   removePermanentScene = null, undiscoverBuilding = null,
 } = {}) {
-  const slot = houses[regionIndex];
-  if (!(slot.buildingKey > 0)) return { kind: 'none' };
-  if (online && slot.crossed) return { kind: 'crossed' };   // RESTORE: what came through customs is never bought back online
+  // HOUSES-3: `deed` the one of the region's deeds sold (the bank's pick in this town), else the region's first
+  const slot = deed ?? houses[regionIndex];
+  if (!(slot?.buildingKey > 0) || !regionDeeds(houses, regionIndex).includes(slot)) return { kind: 'none' };
   if (!found) return { kind: 'none' };   // :454-456 falls to :464 - the miss arm has no effects at all
   // AUDIT HOME-PRICE C1: `price` is GetHouseSellPrice's own unless the caller names another - online the host names the
   // deed share of the house's online price (scenes/worldModes.js deedSellPrice)
   accounts[goldRegion(accounts, regionIndex, online)].accountGold += price;   // EMPIRE-ACCOUNT: online, into the Empire's account
   removePermanentScene?.(slot.mapId, slot.buildingKey);
   undiscoverBuilding?.(slot.buildingKey);
-  houses[regionIndex] = { regionIndex, location: '', mapId: 0, buildingKey: 0 };
+  dropDeed(houses, regionIndex, slot);   // HOUSES-3: the region's next deed stands in its slot
   return { kind: 'sold', price };
 }
 
@@ -333,7 +421,6 @@ export const shipCameraDist = (ship) => (ship >= 0 ? SHIP_CAMERA_DIST[ship] : 0)
 export function assignShipToPlayer(player, shipType, { addPermanentScene = null } = {}) {
   if (player.ownedShip !== shipType) delete player.boatCabinLink;
   player.ownedShip = shipType;
-  delete player.shipCrossed;   // RESTORE: a ship bought is the buyer's own, whatever crossed customs before it
   if (shipType !== SHIP_TYPES.None) addPermanentScene?.(shipType);
   return shipType;
 }
@@ -341,7 +428,7 @@ export function assignShipToPlayer(player, shipType, { addPermanentScene = null 
 /** ResetShip (:128) - `ownedShip = ShipType.None` and nothing else: the
  *  permanent scenes stay listed, as they do in DFU. WA1: Warm Ashes -
  *  Ships takes back the ship it lends with this. */
-export function resetShip(player) { player.ownedShip = SHIP_TYPES.None; delete player.boatCabinLink; delete player.shipCrossed; }
+export function resetShip(player) { player.ownedShip = SHIP_TYPES.None; delete player.boatCabinLink; }
 
 /**
  * PurchaseShip (:467-486). The ladder is PurchaseHouse's, with one
@@ -377,12 +464,10 @@ export function purchaseShip(accounts, regionIndex, shipType, player, purse, hoo
 export function sellShip(accounts, regionIndex, player, { removePermanentScene = null, online = isOnlinePage() } = {}) {
   const ship = ownedShipType(player);
   if (ship === SHIP_TYPES.None) return { kind: 'none' };
-  if (online && player.shipCrossed) return { kind: 'crossed' };   // RESTORE: what came through customs is never bought back online
   const price = shipSellPrice(ship);
   accounts[goldRegion(accounts, regionIndex, online)].accountGold += price;   // EMPIRE-ACCOUNT: online, into the Empire's account
   removePermanentScene?.(ship);
   player.ownedShip = SHIP_TYPES.None; delete player.boatCabinLink;
-  delete player.shipCrossed;
   return { kind: 'sold', price };
 }
 
@@ -450,8 +535,7 @@ const mustValidate = (accounts, regionIndex) => {
 };
 
 // ── EMPIRE-ACCOUNT: online, every branch keeps one account ──────────
-/** EMPIRE-ACCOUNT (2026-10-01, the field - maya: "i deposited alot of letters of credit in a random bank somewhere but
- *  theyre gone in the daggerfall bank"; Mac chose "2": online, merge every region into one Empire-wide account):
+/** EMPIRE-ACCOUNT:
  *  ONLINE, EVERY BRANCH KEEPS ONE ACCOUNT, the Empire's, held at Daggerfall's index (EMPIRE-BANK: the bank of Daggerfall
  *  became the bank of the Empire). Gold paid in at any branch is drawn at any branch, and every deed, sale and wallet
  *  pays from it and into it. A LOAN STILL STANDS WHERE IT WAS TAKEN - its due date, its default and the reputation a
@@ -556,30 +640,8 @@ export const calculateMaxBankLoan = (level, online = isOnlinePage()) => {
  *  .1)`, a FLOAT sum truncated once at the end. */
 export const calculateBankLoanRepayment = (amount) => Math.trunc(amount + amount * 0.1);
 
-// ── RESTORE: what came through customs is never bought back online ──
-
-/** RESTORE (2026-09-29, Mac: "I want people to get their stuff back", and of what customs does with a house, a ship and
- *  their pieces: "Keep all, can't sell"): CUSTOMS KEEPS EVERY DEED AND MARKS IT - a house's slot `crossed`, the ship's
- *  `shipCrossed` (systems/realmCustoms.js crossDeeds) - and, online, the bank of the Empire buys none of them back, so a
- *  deed carries no gold into the realm past the allowance and customs has no reason to take one. (AUDIT REALM2 T3 took
- *  them off the copy instead - a house and every piece in its room, for an excess the purse could often pay.) A house
- *  or ship bought in the realm is the buyer's own and sells (allocateHouseToPlayer, assignShipToPlayer clear the mark);
- *  offline, a copy is an offline character's, and every deed of it sells. */
-export const CROSSED_DEED_LINES = Object.freeze([
-  'That came into the realm through customs.',
-  'The bank of the Empire does not buy it back.',
-]);
-/** The words the bank says for a sale it will not make here, or null: a crossed house in this region, a crossed ship. */
-export function crossedDeedLines(kind, { houses = null, regionIndex = 0, player = null, online = isOnlinePage() } = {}) {
-  if (!online) return null;
-  const slot = houses?.[regionIndex];
-  const crossed = kind === 'ship' ? ownsShip(player) && !!player?.shipCrossed : slot?.buildingKey > 0 && !!slot.crossed;
-  return crossed ? CROSSED_DEED_LINES : null;
-}
-
 // ── REALM P0.3: online, the Empire is one lender ───────────────────
-/** REALM P0.3 (2026-09-28, Mac: "I want to make sure players cant take an offline character and bring in massive
- *  resources"; bible/06-Systems/Realm-Arc.md "The Empire is one lender"). Daggerfall lends region by region: sixty-two
+/** REALM P0.3. Daggerfall lends region by region: sixty-two
  *  lenders, each blind to the rest, and a default costs one region's reputation. ONLINE THE EMPIRE IS ONE LENDER:
  *  one loan a character, wherever it stands; a default anywhere shuts every branch, and the Empire then takes from
  *  every account and every deposit; a character joining with more debt than the Empire would lend has the rest
@@ -664,44 +726,6 @@ export function callInEmpireDebt(accounts, player, { cap = 0, nowMinutes = 0, on
   return out;
 }
 
-/**
- * LOAN-AMNESTY (2026-09-29, Mac: "Can we reset the loans for everyone online. The bank of the empire has decided to
- * forgive everyone's loans"): THE EMPIRE FORGIVES EVERY LOAN ONCE. A save's `loanAmnesty` says which amnesty it has had;
- * one older than LOAN_AMNESTY has every loan struck off - the debt, its due date and the mark of a default, so the
- * Empire lends again and nothing is garnished - and is marked with it. The gold borrowed stays where it is; what was
- * already repaid, garnished or drawn stays paid; the reputation a default cost stays lost (it recovers as reputation
- * does). A save written before the amnesty carries no mark (0); every save written after it carries the mark (save.js),
- * so a character made after it, and a loan taken after it, are never forgiven. Applied to an online character's save as
- * it boots, before it is restored and before the Empire's join settles a loan (scenes/world.js); a character crossing
- * customs is marked as it crosses (realmCustoms.js) - an offline loan is never forgiven by walking it online.
- * Answers `{ forgiven, defaulted }` (the gold owed that was struck off, and the regions that had defaulted), or null
- * when the save had nothing to forgive or had its amnesty already.
- */
-export const LOAN_AMNESTY = 1;
-export function forgiveLoans(snap) {
-  if (!snap || typeof snap !== 'object') return null;
-  if ((Number.isSafeInteger(snap.loanAmnesty) ? snap.loanAmnesty : 0) >= LOAN_AMNESTY) return null;
-  snap.loanAmnesty = LOAN_AMNESTY;
-  let forgiven = 0, defaulted = 0;
-  for (const a of Array.isArray(snap.bankAccounts) ? snap.bankAccounts : []) {
-    if (!a || typeof a !== 'object') continue;
-    if (!(a.loanTotal > 0) && a.hasDefaulted !== true && !a.loanDueDate) continue;
-    if (a.loanTotal > 0) forgiven += Math.trunc(a.loanTotal);
-    if (a.hasDefaulted === true) defaulted++;
-    a.loanTotal = 0;
-    a.loanDueDate = 0;
-    a.hasDefaulted = false;
-  }
-  return forgiven > 0 || defaulted > 0 ? { forgiven, defaulted } : null;
-}
-/** What the character is told when its loans are forgiven, once the world stands. */
-export function loanAmnestyLines(r) {
-  if (!r) return [];
-  return [r.forgiven > 0
-    ? `The Bank of the Empire has forgiven your loan of ${r.forgiven.toLocaleString('en-US')} gold.`
-    : 'The Bank of the Empire has forgiven your debt.',
-  'Its branches will lend to you again.'];
-}
 /** The join's words: what the Empire called in, and what stands unpaid. */
 export function empireCallInLines({ called, owed }) {
   if (!(called > 0)) return [];
@@ -924,9 +948,10 @@ export function borrowDecision(accounts, regionIndex, { online = isOnlinePage() 
 
 /** BuyHouseButton (:417-436) and BuyShipButton (:453-464). Both refuse
  *  what you already own; the ship additionally refuses OUTSIDE A PORT
- *  TOWN, which is the one place PortTownAndUnknown is read. */
-export function buyHouseDecision({ ownsHouse = false, housesForSale = 0 } = {}) {
-  if (ownsHouse) return { kind: 'refuse', result: TRANSACTION_RESULT.ALREADY_OWN_HOUSE };
+ *  TOWN, which is the one place PortTownAndUnknown is read.
+ *  HOUSES-3: a house is refused when the region holds its three (`housesFull`), in the bank's words counted to three. */
+export function buyHouseDecision({ housesFull = false, housesForSale = 0 } = {}) {
+  if (housesFull) return { kind: 'refuse', result: TRANSACTION_RESULT.ALREADY_OWN_HOUSE, lines: [housesFullText()] };
   if (housesForSale < 1) return { kind: 'refuse', result: TRANSACTION_RESULT.NO_HOUSES_FOR_SALE };
   return { kind: 'pick' };
 }

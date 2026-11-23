@@ -1,4 +1,4 @@
-// DISC28-I/J (2026-09-28, Discord): the shared quest's end, its house, and a partner's quest foe.
+// DISC28-I/J: the shared quest's end, its house, and a partner's quest foe.
 //
 // I-a (The Courier, Buckingwing Residence: a quest shared by a friend "does not complete" for the receiver). The
 // sharer's `end quest` completes the quest and the machine tombstones it IN THE SAME TICK - which takes it out of
@@ -216,7 +216,7 @@ test('DISC28-I/J: the hosts read the rung, send the finish and stand a partner\'
   assert.match(w, /for \(let data = machine\.nextFinishedShare\?\.\(\) \?\? null; data; data = machine\.nextFinishedShare\(\)\) \{/);   // AUDIT DISC28 QS-1: pending until it has left
   assert.match(w, /data: \{ \.\.\.prepared\.data, sync: 1, final: 1 \}/);
   assert.match(w, /const count = shareSignature\(quest\);/);
-  assert.match(w, /accepts: \(\) => true,/);   // PIN MOVED (DESYNC-ZERO): every player in the room stands every foe it holds - the credit, not the sight, is the party's
+  assert.match(w, /accepts: \(\) => true,/);
 });
 
 test('DISC28-J: a partner\'s quest foe credits only a linked copy - an independent one has nothing to count it on', () => {

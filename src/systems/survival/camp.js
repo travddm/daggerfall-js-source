@@ -2,7 +2,7 @@
 // mod had (Climates & Calories 1.7.1, read off the DLL: Camping.
 // SetUpCamp / DeployTent / DestroyCamp / CampfireCook, the tent as
 // model 41606 and the fire as TEXTURE.210 record 1) rebuilt on Mac's
-// brief (2026-09-18): "For tents, they are shared world objects.
+// brief: "For tents, they are shared world objects.
 // Campfires in dungeons/outside + beds should act as the go-to rest
 // options + adding a new campfire item players can buy and place."
 //
@@ -23,7 +23,7 @@
 // DFU's own rest law makes it a crime, restSession.js), not with
 // enemies near (DFU's AreEnemiesNearby, the resting variant), not in
 // water, and only where the ground answers a probe; a dungeon takes a
-// fire and no tent (Mac: "Campfires in dungeons/outside").
+// fire and no tent.
 //
 // WHAT IT DOES. A lit fire within BY_FIRE_REACH is the needs law's
 // `byFire` (survival/needs.js: fifteen degrees of warmth, drying,
@@ -111,7 +111,7 @@ export const CAMP_TEXT = Object.freeze({
   menuStoke: 'Stoke the fire',
   menuPack: 'Pack up the camp',
   menuStamp: 'Put out the fire',
-  // REST2 (bible/06-Systems/Rest-Arc.md section 3): THE CAMPFIRE IS A TOOL, NOT A MATCH - placed free, its charges
+  // REST2: THE CAMPFIRE IS A TOOL, NOT A MATCH - placed free, its charges
   // spent by the nights its owner sleeps at it, picked back up, relit while it has fuel
   menuPickUp: 'Pick up the Campfire',   // AUDIT REST II H13: the item's own name, as the hover and the card say it
   menuRelight: 'Relight the fire',
@@ -149,7 +149,7 @@ export function campSpot(feet, yaw, probe) {
   return { pos: [x, ground ?? feet[1], z], ground };
 }
 
-// ---- DECK-CAMP (2026-10-04, from the field: "Campfires placed on a boat dont attach to a boat") --------------------
+// ---- DECK-CAMP --------------------
 /**
  * A CAMP ON A BOAT'S DECK RIDES HER. Come Sail Away's boats stand in the world's collider (world.js csaSyncColliders), so
  * a camp's spot found her deck - and the camp kept the scene point it was stood at while she sailed on from under it.

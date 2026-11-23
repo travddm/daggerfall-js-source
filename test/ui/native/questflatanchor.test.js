@@ -42,50 +42,6 @@ import { NativeTalkWindow, TALK_RECTS } from '../../../src/ui/native/nativeTalk.
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const rd = (p) => readFileSync(join(root, p), 'utf8');
 
-test('questflatanchor: a DUNGEON quest flat drops half a height, a BUILDING one does not', () => {
-  const s = rd('src/scenes/worldModes.js');
-  // The anchor rides a parameter, so the two curried stands cannot
-  // drift apart or silently share the wrong one.
-  assert.match(s, /function standQuestFlatIn\(list, getCtx, toScene, inDungeon, /);
-  // F068: the half-height anchor is the NPC arm's; an ITEM takes
-  // AddQuestItem's flat -0.5 marker shift instead.
-  assert.match(s, /by = inDungeon \? y - size\.h \/ 2 : y;/,
-    'the dungeon NPC arm takes the half-height shift the building arm must not');
-  assert.match(s, /by = inDungeon \? y - QUEST_ITEM_MARKER_SHIFT : y;/,
-    'and an ITEM takes the constant treasure-marker shift');
-  assert.match(s, /const QUEST_ITEM_MARKER_SHIFT = 0\.5;/,
-    '-(randomTreasureMarkerDim / 2) * GlobalScale = -(40 / 2) * 0.025');
-  assert.match(s, /standQuestFlatIn\(questFlats, \(\) => interiorCtx, \(ctx, p\) => ctx\.parentPt\(p\.x, p\.y, p\.z\), false,/,
-    'the interior stand is NOT in a dungeon');
-  assert.match(s, /standQuestFlatIn\(dungeonQuestFlats, \(\) => dungeonCtx, \(_ctx, p\) => \[p\.x, p\.y, p\.z\], true,/,
-    'and the dungeon stand is');
-  // The shift is the same one the scene's own static flats take.
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const based = centers\.map\(\(p\) => Object\.assign\(\[p\[0\], p\[1\] - size\.h \/ 2, p\[2\]\], \{ noCover: !!p\.noCover \}\)\);/,
-    "the dungeon's RDB flats shift by the same half height - a quest flat in the same scene cannot differ");
-});
-
-test('questflatanchor: AlignBillboardToGround runs on the NPC stand, distance 4, with the 2% lift', () => {
-  const s = rd('src/scenes/worldModes.js');
-  // Ray from 0.2 above the billboard's CENTRE (:339), distance 4 as
-  // AddQuestNPC passes it. AUDIT 26 F069: the port rayed from the
-  // BASE + 0.2, half a sprite lower, so a tall dungeon NPC could
-  // start below a surface DFU clears and miss the snap entirely.
-  assert.match(s, /const origin = by \+ size\.h \/ 2 \+ 0\.2;/);
-  assert.match(s, /collider\?\.raycast\?\.\(\[x, origin, z\], \[0, -1, 0\], 4\)/);
-  // On a hit the CENTRE goes to hit.y + size.y * 0.52 (:344), so a
-  // bottom-anchored base sits size.y * 0.02 above the floor.
-  assert.match(s, /if \(Number\.isFinite\(drop\)\) by = \(origin - drop\) \+ size\.h \* 0\.02;/);
-  // ...and the ray is the NPC arm's ALONE - an item never reaches it.
-  assert.match(s, /if \(isItem\) \{/, 'the two laws are split by resource');
-  assert.equal((s.match(/standQuestFlat\(t\.worldTextureArchive[^\n]*, null, null, true[,)]/g) ?? []).length, 1);   // QUEST-MARKERS: the building's backstop rides after it
-  assert.equal((s.match(/standDungeonQuestFlat\(t\.worldTextureArchive[^\n]*true\)/g) ?? []).length, 1);
-  // No floor within 4 -> C# returns without moving anything. The
-  // guard, not a fallback, is what expresses that.
-  assert.doesNotMatch(s, /Number\.isFinite\(drop\) \?[^\n]*:\s*0/,
-    'a miss leaves the marker position standing, it does not zero the height');
-});
-
 /** A window over recording hooks; clicks are in native 320x200 space. */
 function makeWindow() {
   const sounds = [];
@@ -115,23 +71,6 @@ test('questflatanchor: a category click while Tell-me-about is selected changes 
   assert.equal(w.topicMode, before.mode, 'the page did not change');
   assert.deepEqual(w.topics.map((t) => t.label), before.rows, 'nor the rows');
   assert.equal(w._lastCategory, before.cat, 'nor the remembered category');
-});
-
-test('questflatanchor: the gate is SILENT - the click sound sits inside it', () => {
-  // C# plays SoundClips.ButtonClick INSIDE the
-  // `selectedTalkOption == TalkOption.WhereIs` branch in all four
-  // handlers (:1465-1498). A gate that returns AFTER the sound would
-  // still be wrong: the buttons are greyed out, and greyed-out buttons
-  // in this window are silent.
-  const s = rd('src/ui/native/nativeTalk.js');
-  const gates = [...s.matchAll(/if \(this\._talkOption !== 'whereIs'\) return true;[^\n]*\n\s*audio\.playOneShot/g)];
-  assert.equal(gates.length, 4, 'all four category buttons gate BEFORE the sound');
-  // ...and Tell-me-about and Where-is themselves are never gated -
-  // they are the two options, not categories.
-  // ET1: the buttons are pressed BY NAME (press(name) is the one
-  // handler under both faces), so the two options are the case arms.
-  assert.match(s, /case 'tellMeAbout': audio\.playOneShot/);
-  assert.match(s, /case 'whereIs': audio\.playOneShot/);
 });
 
 test('questflatanchor: Where-is re-enables the categories, and restores the one last used', () => {

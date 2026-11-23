@@ -1,9 +1,9 @@
-// SHIPYARDS (2026-10-11; Mac chose "Town's seaward edge" and "Climbable, with keeper"): WHERE A PORT TOWN'S SHIPYARD AND
+// SHIPYARDS: WHERE A PORT TOWN'S SHIPYARD AND
 // LIGHTHOUSE STAND AND WHAT THEY ARE - world/portSites.js (the town's own sea, the sea's bearing off the map, each place
 // backing onto the water on what the yards left), world/shipyardModel.js and world/lighthouseModel.js (their timber and
 // stone under the port's own art, world/portArt.js), and scenes/portHost.js (the pool: each place stood, its people,
 // the press - the shipmaster's window and the tower's stair - the lamp lit and its beams turning, the Overworld's marks).
-// Design: bible/03-World/Shipyards.md.
+// Design:.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -160,9 +160,8 @@ test('SHIPYARDS THE MODELS: the shipyard and the lighthouse under the port\'s ow
   assert.ok(LIGHTHOUSE_POINTS.lamp[1] > GALLERY_Y);
   assert.ok(LIGHTHOUSE_POINTS.gallery[2] < T.z && LIGHTHOUSE_POINTS.hatch[2] > T.z, 'the gallery\'s spot to the sea, the hatch to the town');
   const rG = Math.abs(LIGHTHOUSE_POINTS.gallery[2] - T.z);
-  assert.ok(rG > LIGHTHOUSE.lantern.r && rG < LIGHTHOUSE.gallery.parapetR, 'between the lantern and the parapet');   // PIN MOVED (BEACON-TOWER): the railing a parapet
+  assert.ok(rG > LIGHTHOUSE.lantern.r && rG < LIGHTHOUSE.gallery.parapetR, 'between the lantern and the parapet');
   assert.ok(LIGHTHOUSE_POINTS.foot[2] > T.z + towerR(0), 'the foot before its door');
-  // PIN MOVED (AUDIT SHIPYARDS L4-1): the guard was a band over the railing, open over its top - a climb crossed it and fell
   // 19.68 m; it is a closed corridor now, from the gallery's floor to guardH, lidded in to the lantern's faces
   const band = bounds(guardBand());
   assert.ok(Math.abs(band[1] - GALLERY_Y) < 1e-5 && Math.abs(band[4] - (GALLERY_Y + LIGHTHOUSE.gallery.guardH)) < 1e-5, 'from the floor to guardH (Float32)');
@@ -250,7 +249,6 @@ test('SHIPYARDS THE POOL STANDS THEM: each on its site\'s ground under its own b
 test('SHIPYARDS THE POOL HOLDS A PLACE BACK from feet on its ground at its foot as it first rises - never feet up on the gallery, which it must stand under (mutants: the gallery\'s feet held)', () => {
   const site = { kind: 'lighthouse', yaw: 0 };
   assert.equal(feetInPort(site, [0, 0, 0], [1, 0.2, 1]), true);
-  // PIN MOVED (AUDIT SHIPYARDS L4-5): [1, GALLERY_Y, -3] stands 1.64 m off the tower's axis - inside the lantern's ring
   // (1.72; BEACON-TOWER: its arches' faces stand 1.59 off it, so no body's middle on the walk comes within 1.94), never the
   // gallery's walk; a body there has risen up the hollow tower and is held back to the roof's point
   assert.equal(feetInPort(site, [0, 0, 0], LIGHTHOUSE_POINTS.gallery), false, 'up on the gallery');
@@ -359,7 +357,6 @@ test('SHIPYARDS THE LAMP: in the lanterns\' hours the lamp is a scene light at i
   assert.deepEqual(L.map((l) => l.range).sort((a, b) => a - b), [OFFICE_LAMP_RANGE, LAMP_RANGE]);
   const lamp = L.find((l) => l.range === LAMP_RANGE), want = yardToScene([160, 2, 20], 270, ...LIGHTHOUSE_POINTS.lamp);
   assert.deepEqual([lamp.x, lamp.y, lamp.z].map((v) => +v.toFixed(9)), want.map((v) => +v.toFixed(9)));
-  // PIN MOVED (AUDIT SHIPYARDS L4-2): the glows are the pool's own records written in place into one array - each call's
   // read before the next (a copy of where each stands)
   const copy = (G) => G.map((g) => ({ pos: [...g.pos], size: g.size, alpha: g.color[3], blend: g.blend, kind: g.kind }));
   const g0 = copy(p.glows([100, 3, 70], 5));

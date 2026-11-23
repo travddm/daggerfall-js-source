@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOST-SPLIT (BANTHA1, bible/03-World/Bantha-Jungle.md): THE NEAR 3D TREES' HOST - out of bootWorld (scenes/world.js),
-// a module the world host wires (bible/01-Overview/Host-Split.md: scenes/fishHost.js is the shape). It owns the two
-// doors that stand a 3D tree where a flat stands - Low Poly Trees' (LPT1, bible/07-Rendering/Low-Poly-Trees.md) and
+// HOST-SPLIT (BANTHA1): THE NEAR 3D TREES' HOST - out of bootWorld (scenes/world.js),
+// a module the world host wires (: scenes/fishHost.js is the shape). It owns the two
+// doors that stand a 3D tree where a flat stands - Low Poly Trees' (LPT1) and
 // the jungle's (BANTHA1, scenes/jungleHost.js's) - and each frame's near sets of both:
 //   - THE DOORS, built once for the session (the world holds them, as it holds the mills' parts);
 //   - THE NEAR SETS: a pixel's tree set is made as it comes into the eye's 3x3 and let go past its 5x5 (AUDIT LPT B10),
@@ -12,20 +12,25 @@
 //     (releasedBuild - BUILD-FAIL1's ledger) - EVERY ALLOCATION HAS AN OWNER.
 // The flats' shares of the wind's lean (WIND3) and Windfall's law (WINDFALL1), by prototype, are the frame's maps
 // (lptSway, lptWindfall): the pixel's build writes them as it stands a batch, the frame's near trees read them.
+// GRAHT1: and the graht-oaks' frame beside them (the jungle host's `graht`, scenes/grahtHost.js - its own slot), every
+// built pixel's, near and far. TESA-LANDS: and the landmarks past the Bay (scenes/landPropsHost.js, `landProps`, its own slot).
 // ═══════════════════════════════════════════════════════════════════
 import { createLowPolyTrees } from '../systems/lowPolyTreesAssets.js';
 import { buildTreeSet } from '../world/lowPolyTrees.js';
 import { FOREST_STAMP } from './treeHost.js';
 import { FELLED } from '../ai/cover.js';
+import { createLandPropsHost } from './landPropsHost.js';   // TESA-LANDS: the lands' landmarks past the Bay
+import { tamrielLandsOn } from '../systems/landsSwitch.js';
 
 /**
  * @param {{ renderer: any, getTexture: (archive: number) => Promise<any>, seasons?: any, seasonsActive: () => boolean,
- *   lowPolyTreesOn: boolean, jungle?: any, breathe: () => Promise<void>, yards: () => any }} deps
+ *   lowPolyTreesOn: boolean, jungle?: any, breathe: () => Promise<void>, yards: () => any, landsOn?: boolean }} deps
  *   `seasons` Seasons of the Iliac Bay's helper (or null) and `seasonsActive()` whether it stands a season now;
  *   `lowPolyTreesOn` the mod's switch (read once, as the world loads); `jungle` the jungle's host (scenes/jungleHost.js)
- *   or null; `yards()` the online homes' yards (their placed trees' sets), or null
+ *   or null; `yards()` the online homes' yards (their placed trees' sets), or null; `landsOn` TESA-LANDS' row (the
+ *   landmarks' host made - systems/landsSwitch.js tamrielLandsOn, read as the world loads)
  */
-export function createTreesHost({ renderer, getTexture, seasons = null, seasonsActive, lowPolyTreesOn, jungle = null, breathe, yards }) {
+export function createTreesHost({ renderer, getTexture, seasons = null, seasonsActive, lowPolyTreesOn, jungle = null, breathe, yards, landsOn = tamrielLandsOn() }) {
   // LPT1: the nature flats it has a tree for stand as their 3D trees within LPT_NEAR_M of the eye and as the same
   // tree's far picture beyond it, out to the land view's whole reach at a flat's own cost. Seasons of the Iliac Bay's
   // seasonal pictures, while the mod stands a season, paint the trees' atlases, so they take the season the flats take
@@ -41,6 +46,7 @@ export function createTreesHost({ renderer, getTexture, seasons = null, seasonsA
     breathe,   // the stream's own slice clock (PERF7) - a tree's atlases are painted inside the build that first stands it
   }) : null;
   const jungleDoor = jungle?.door ?? null;
+  const landProps = landsOn ? createLandPropsHost({ renderer, breathe }) : null;
   const lptSway = new Map();   // a prototype's share of the wind's lean, as its far pictures' batch takes it
   const lptWindfall = new Map();   // WINDFALL1: ...and its share under Windfall's law
   const lptSets = [], jungleSets = [];   // the frame's near pixels' sets (scratch)
@@ -53,7 +59,7 @@ export function createTreesHost({ renderer, getTexture, seasons = null, seasonsA
   };
   const drop = (set) => { if (set?.trees) { set.trees = null; set.centers = null; } };
   return {
-    lowPolyTrees, lptSway, lptWindfall,
+    lowPolyTrees, lptSway, lptWindfall, landProps,
     /**
      * THE FRAME'S NEAR 3D TREES - the eye's pixel's and its neighbours' sets (`pixels` the frame's, nearest first, each
      * with `_dist2` its grid distance from the player's pixel and `_t` its translation), gathered (when the eye or they
@@ -62,6 +68,8 @@ export function createTreesHost({ renderer, getTexture, seasons = null, seasonsA
      * @param {any[]} pixels @param {ArrayLike<number>} eye @param {Float32Array|null} planes
      */
     frame(pixels, eye, planes) {
+      jungle?.graht?.frame(pixels, eye, planes);   // GRAHT1: Valenwood's graht-oaks, their own slot, every pixel's (scenes/grahtHost.js)
+      landProps?.frame(pixels, eye, planes);   // TESA-LANDS: the lands' landmarks, their own slot, every pixel's (scenes/landPropsHost.js)
       if (!lowPolyTrees && !jungleDoor) return;
       lptSets.length = 0; jungleSets.length = 0;
       for (let i = 0; i < pixels.length; i++) {

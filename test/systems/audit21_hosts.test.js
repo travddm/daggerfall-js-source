@@ -297,7 +297,7 @@ test('AUDIT 21 hosts F6: no host writes player health raw any more', () => {
     // DC1 grew the constructor: every host now leads with the LIVE
     // eyeHeight/capsuleHeight pair (playerdeath.test.js pins each
     // host's exact form); this pin keeps holding the onReset tail.
-    // D-ONLINE1 (2026-09-17): the three online hosts wire the SAME seam
+    // D-ONLINE1: the three online hosts wire the SAME seam
     // behind a respawn door - the world host's own `_deathWasOnline`
     // snapshot, the mode machine's `host.onlineRespawn`, the dungeon's
     // `opts.onlineRespawn` - and fall to endRunToTitleMenu when it

@@ -1,4 +1,4 @@
-// INTRO4 (bible/10-UI/UI-Arc.md INTRO4) - THE FILM'S HEAVY HALF, OFF THE PAGE'S THREAD: the Imperial City (its landmarks'
+// INTRO4 (INTRO4) - THE FILM'S HEAVY HALF, OFF THE PAGE'S THREAD: the Imperial City (its landmarks'
 // meshes, its houses, its trees, its ground - introCity.js) and then the continent's field (introTamriel.js), each
 // posted the moment it is built, its arrays transferred. The city is the film's first frame and comes first; the
 // continent is not wanted until the ascent. Pure modules only - a worker has no DOM.

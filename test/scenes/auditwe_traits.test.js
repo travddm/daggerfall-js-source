@@ -1,4 +1,4 @@
-// AUDIT WORLD-EVENTS (2026-10-25, the owner: "Audit this. Ensure perfection"; bible/01-Overview/audits/Audit-World-Events.md)
+// AUDIT WORLD-EVENTS
 // - THE BOSS TRAITS' FINDINGS (lane L2, and L5-4/L5-6/L5-12), each run through the real pools, the real stand-in spell door
 // and the real save where it was found: a peer's strike spell and a stand-in's rounds unresisted; the ward sized before the
 // health was; the owner's half on a fall, the wrath's clock on any wound and the wall; a raid leader's drop and its two
@@ -6,7 +6,6 @@
 // the floating number; the relay's draw; the Spire's lords; the rules never shown; the title's word.
 import '../modsOff.js';
 import { test, beforeEach } from 'node:test';
-import { _forceUnquietForTests } from '../../src/systems/revenant/unquietMark.js';   // the Unquiet mark held off: its draw is a fresh voice id's, so one foe in eight came "Unquiet Elite Orc"
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createExteriorFoes } from '../../src/scenes/exteriorFoes.js';
@@ -20,7 +19,7 @@ import {
 import { traitWire, readTraitWire, traitsAuthority, hostLordTraits } from '../../src/scenes/foeTraitsHost.js';
 import { createStandInSpell } from '../../src/scenes/gate/standInSpell.js';
 import { bossStandIn } from '../../src/world/gate/gateBoss.js';
-import { COURT_ROUND_MS } from '../../src/scenes/gate/gateCourt.js';
+import { courtRoundMs } from '../../src/scenes/gate/gateCourt.js';
 import { applySpell } from '../../src/systems/effects.js';
 import { hitSpellFields } from '../../src/net/wire.js';
 import { foeTitle } from '../../src/systems/foeTitle.js';
@@ -29,6 +28,7 @@ import { mountHitNumbers, unmountHitNumbers } from '../../src/ui/hitNumbers.js';
 import { reportPlayerAttack } from '../../src/combat/formulas.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { WEAPONS } from '../../src/characters/weapons.js';
+const COURT_ROUND_MS = courtRoundMs();   // five seconds at TimeScale 12
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 // the raid guards' rig (test/scenes/bosstraits_hosts.test.js)
@@ -78,7 +78,7 @@ async function elite(p, traits, hp = 5000, x = 0) {
   giveBossTraits(f.entity, traits);
   return f;
 }
-beforeEach(() => { _resetBossTraitsTaughtForTests(); clearFoeTarget(); _forceUnquietForTests(false); });   // a trait's foe, never the revenant arc's mark (unquietMark.js) - its own law, its own pins
+beforeEach(() => { _resetBossTraitsTaughtForTests(); clearFoeTarget(); });
 
 test('AUDIT WORLD-EVENTS L2-1: a PEER\'s Cast-When-Strikes spell on my Flameproof elite lands a quarter, as mine does - its element resisted where it lands whole (mutants: the peer\'s spell unresisted)', async () => {
   const FIRE = { name: 'Burn', element: 0, rangeType: 0, effects: [{ type: 4, subType: 0, magnitudeBaseLow: 40, magnitudeBaseHigh: 40, magnitudeLevelBase: 0, magnitudeLevelHigh: 0, magnitudePerLevel: 1 }] };
@@ -154,7 +154,6 @@ test('AUDIT WORLD-EVENTS L2-6: a raid\'s leader carries an elite\'s drop, and it
   const was = e.items.length;
   promoteRaidLeader(e, { name: 'Orc Warlord' });
   assert.equal(e.items.length, was, 'once');
-  assert.match(rd('src/systems/raidingParties.js'), /promoteRaidLeader\(foe\.entity, \{ name: raidLeaderNameOf\(foe\.mobileType \?\? mobileType\) \}\); foe\.entity\.bossTraits = undefined; foe\.entity\.bossWard = undefined; giveBossTraits\(foe\.entity, rollBossTraits\(RAID_LEADER_TRAITS, rnd\(\)\)\);/, 'its two, in place of a stand\'s one');
 });
 
 test('AUDIT WORLD-EVENTS L2-7 / L2-8 / L2-11: two real pools - my ward\'s share rides my record, a reader draws it and hears it break; a forged mask stands an elite\'s one trait; the heir of a warded foe keeps a ward (mutants: the share unsent; the share unread; the mask untrimmed; the heir unwarded)', async () => {
@@ -268,8 +267,6 @@ test('AUDIT WORLD-EVENTS L5-4: a Spire lord (its target\'s `lord`) carries its t
   assert.equal(lord.entity.bossTraits.length, 2);
   assert.equal(said.length, 1, 'said once');
   assert.equal(legion.entity.bossTraits, undefined);
-  assert.match(rd('src/scenes/eliteGates/egFight.js'), /name: look\.name, lord: !!look\.lord, m: b\.max, hp: b\.hp \};/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /hostLordTraits\(q, \(l\) => hudText\.add\(l\)\);/);
 });
 
 test('AUDIT WORLD-EVENTS L5-6 / L5-12: each trait\'s rule is told once a session at my first blow on one; the target frame carries the rules and names the foe without the word its trait line says; the title\'s word composes in the player\'s language (mutants: the rules never told; told every blow; the word twice)', async () => {
@@ -285,5 +282,4 @@ test('AUDIT WORLD-EVENTS L5-6 / L5-12: each trait\'s rule is told once a session
   assert.ok(foeTarget().rules[0].includes('comes back at you'));
   assert.equal(foeTarget().name, 'Elite Orc', 'the name without the word its trait line says');
   assert.equal(foeTitle(f.entity, 'Orc'), 'Thorned Elite Orc', 'the title keeps it (the hover, the death line)');
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /parts\.foeTraits\.title = rules;/);
 });

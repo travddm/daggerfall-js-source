@@ -3,7 +3,7 @@
 The brief a routing batch follows. The port's own words - the enhanced interface, the online game, the port's
 systems, every notice Daggerfall Unity does not have - reach a player in their language only through the text core:
 `t(key, en, args)` (`src/systems/textManager.js`), whose English lands in `locales/en/Port_Strings.csv`
-(`node tools/l10nExtract.mjs`) and is drafted into every language (`tools/l10n/TRANSLATE-BRIEF.md`). English must stay
+(`node tools/l10nExtract.mjs`) and a person translates it into each reviewed language. English must stay
 byte for byte what it was: `t` answers the English pattern while no table has the key. Worked example:
 `src/ui/statsCard.js` (the pilot).
 
@@ -40,15 +40,16 @@ byte for byte what it was: `t` answers the English pattern while no table has th
 3. **Never at module load.** Static imports evaluate before the boot chooses the language, so a `t()` in a top-level
    `const` freezes English. Read lazily:
    - an exported English constant the tests compare against stays as the English identity, and a reader goes beside
-     it: `export const NO_PARTY_TEXT = 'You are not in a party.';` + `export const noPartyText = () => t('social.party.none', NO_PARTY_TEXT);`
+     it: `export const NO_PARTY_TEXT = 'You are not in a party.';` +
+     `export const noPartyText = () => t('social.party.none', NO_PARTY_TEXT);`
      (the extractor reads the module's own constant as the English) - then switch EVERY site that shows it, in every
      file, to the reader;
    - a frozen table of words: getters (`Object.freeze({ get title() { return t('k', 'English'); } })`), or
      `localizedTable({ name: () => t('k', 'English') })` beside DFU rows;
    - a template built at load from other constants: a function.
 4. **Pins.** Source-regex pins (`assert.match(src, /townTalk\.say\('Game saved\.'\)/)`) and mutant records
-   (`tools/mutants/*.json`, held by `test/tooling/mutantdrift.test.js`) that quote a line you changed are re-aimed to the new
-   form; English assertions stay exactly as they were. Never skip, delete or weaken a test.
+   (`tools/mutants/*.json`, held by `test/tooling/mutantdrift.test.js`) that quote a line you changed are re-aimed to
+   the new form; English assertions stay exactly as they were. Never skip, delete or weaken a test.
 5. **Counts.** After a file: `node tools/l10nHardcoded.mjs` and write its count into `test/systems/l10n4_hardcoded.test.js`
    HARDCODED (a count only falls); a DFU word you routed through `localizedText` is counted in
    `test/systems/l10n3d_sites.test.js` ROUTED (`node tools/l10nRouted.mjs` lists them). `node tools/l10nExtract.mjs`

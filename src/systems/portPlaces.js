@@ -1,8 +1,5 @@
 // @ts-check
-// SHIPYARDS (2026-10-11, Mac: "I want to give ports the same treatment we did wagons and horses. A new highly detailed
-// shipmaster vendor and crew recruitment station within it ... This should also come with a detailed overhaul to piers
-// and introduce the new lighthouse building. Everything should show on the map/overworld and be able to be asked by
-// NPCs"): THE PORT'S PLACES, NAMED AND FOUND AS A YARD IS - the law of what a port town stands beside its Stable and its
+// SHIPYARDS: THE PORT'S PLACES, NAMED AND FOUND AS A YARD IS - the law of what a port town stands beside its Stable and its
 // Wagon Yard, and how the town's talk directory, its two maps and the Overworld know each one.
 //
 // THE PLACES. A port town (a city, a town or a village that is a port by its own data - `portTownByData`: Travel Options'

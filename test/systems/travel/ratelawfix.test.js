@@ -1,4 +1,4 @@
-// RATE-LAW-FIX (2026-10-05, bible/06-Systems/Travel-Options.md "RATE-LAW-FIX"): THE DEEP AUDIT'S THREE - a route's last
+// RATE-LAW-FIX: THE DEEP AUDIT'S THREE - a route's last
 // stretch to a spot ran at its pixel's step's rate wherever the spot lay (the road's x100 off across a field to a camp),
 // a route of no legs ran at x60 down a road, and each change of ground lifted the governor's hold for a frame. Driven
 // through the real mod and panel; the host's ask lifted out of scenes/world.js and run.
@@ -10,7 +10,7 @@ import { createTravelOptions, readTravelOptionsSettings } from '../../../src/sys
 import { mapPixelWorldOrigin } from '../../../src/systems/travel/travelPaths.js';
 import { TRAVEL_ROAD_RATE, TRAVEL_OPEN_RATE } from '../../../src/systems/timeScale.js';
 import { setPaceGround, setTravelPace, _resetTravelPace } from '../../../src/systems/travel/travelPace.js';   // PACE-DIALS: the road's x100 is the player's dial
-/** PACE-DIALS (2026-10-06): x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
+/** PACE-DIALS: x100 is chosen, on a road - the dial set there as the panels set it (the default is x60, and
  *  leaving a road takes it back to x60: test/systems/travel/pacedials.test.js). These pins hold the LANES' law at the dial's top. */
 const dialAtTop = () => { _resetTravelPace(); setPaceGround(true); setTravelPace('speed', 100); };
 

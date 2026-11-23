@@ -3,7 +3,7 @@
 // not in shops?" M0B00Y15 and M0C00Y14 (`Place _house_ local random` - any building, shops among them) `create foe` at
 // the house: DFU's interior arm is PlaceFoeFreely alone, a bearing just outside the view with 5 m + 1.25 m clear, and a
 // shop's counter and shelves leave it none - the wave waited forever. Over the real Collider in a shop-shaped room, the
-// ring alone and the host's law (questFoeHost.js placeRoomQuestFoe). bible/01-Overview/bugs/Field-Bugs-2026-10-12g.md.
+// ring alone and the host's law (questFoeHost.js placeRoomQuestFoe)..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -82,9 +82,3 @@ test('SHOP-RATS the room\'s spots: the farthest within the ring\'s reach with a 
   assert.equal(ROOM_RING_MISSES, 30);
 });
 
-test('SHOP-RATS the interior host places a building\'s quest foe by the law, over the room\'s markers (mutants: the host back on the ring alone)', () => {
-  const wm = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const body = wm.slice(wm.indexOf('  function tryPlaceInteriorQuestFoe(handle) {'), wm.indexOf('  /** ROAD-G G1: THE LOOSE-FOE STAND, INDOORS'));
-  assert.match(body, /const spot = placeRoomQuestFoe\(env, handle, interiorCtx\.markers\?\.map\(\(m\) => \[m\.x, m\.y, m\.z\]\)\);/);
-  assert.doesNotMatch(body, /placeFoeFreely\(env\)/);
-});

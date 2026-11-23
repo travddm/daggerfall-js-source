@@ -1,5 +1,4 @@
-// OW-CROWD (2026-10-02, Mac: "Can we also find a way to reduce the overwhelming player markers that flood the screen? I
-// like it, dont get me wrong, but there must be a way to make it where its not overwhelming").
+// OW-CROWD.
 //
 // The Overworld drew every player of the region as their own mark, wearing their whole badge (the title, the Renown, the
 // name, the guild's tag, the glyphs), and each off the picture as their own arrow at the edge - a town's crowd, or a

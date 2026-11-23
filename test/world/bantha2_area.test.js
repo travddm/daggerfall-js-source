@@ -1,7 +1,6 @@
-// BANTHA2 (2026-10-19, the owner, with a map of the Iliac Bay and an area of its south-eastern shore painted red: "The area
-// is red in bantha and should be the jungle biome"): WHERE BANTHA IS - the owner's red read into map pixels
+// BANTHA2: WHERE BANTHA IS - the owner's red read into map pixels
 // (tools/banthaArea.mjs), the rows the jungle stands on (src/world/jungle/banthaArea.js), and the field that reads them
-// (src/world/jungle/jungleRegion.js). bible/03-World/Bantha-Jungle.md "Where the jungle is" is the record.
+// (src/world/jungle/jungleRegion.js). "Where the jungle is" is the record.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -128,5 +127,4 @@ test('BANTHA2 THE ROWS ARE THE DRAWING\'S on the freeware\'s map: tools/banthaAr
     }
   }
   assert.ok(rain / n > 0.9, `the Rainforest's ${(rain / n).toFixed(3)}`);
-  assert.ok(readFileSync(join(ROOT, 'tools/jungleExtent.mjs'), 'utf8').includes('banthaAreaHas'), 'the extent tool reads the area');
 });

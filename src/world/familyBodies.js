@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LEGACY7 part four (2026-10-06, bible/06-Systems/Legacy-Arc.md section 10b) - THE LINE IN ITS OWN BODY.
+// LEGACY7 part four - THE LINE IN ITS OWN BODY.
 //
 // LEGACY-HOME recorded a departure and named who owed it: "the design asked for their own race and kit, the way an
 // online peer is drawn; the street's walkers are the census's billboards, and a peer's composite body is the realm's

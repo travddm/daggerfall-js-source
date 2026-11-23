@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GUILD1d (2026-09-30, Mac: "Lets do this") - A GUILD'S HALL AND ITS
-// HERALDRY, AS THE SERVICE KEEPS THEM (bible/11-Multiplayer/
-// Seats-Arc.md 8; the law both ends read is src/net/hallLaw.js and
+// GUILD1d - A GUILD'S HALL AND ITS
+// HERALDRY, AS THE SERVICE KEEPS THEM (the law both ends read is src/net/hallLaw.js and
 // src/net/heraldryLaw.js).
 //
 // ═══ A HALL IS A HOME THE GUILD OWNS ═══════════════════════════════
@@ -24,8 +23,8 @@
 // share back into that part - so a hall is never a road from gold a
 // client named to gold a record holds. Bought and sold, the treasury
 // moves in ONE batch with the hall's row, each guarded; both or
-// neither. The ledger names why (`hall`, `hall-sale` - migration
-// 0043's `moved_kind`).
+// neither. The ledger names why (`hall`, `hall-sale` - the ledger's
+// `moved_kind`).
 //
 // ═══ HERALDRY ══════════════════════════════════════════════════════
 //
@@ -42,6 +41,7 @@ import { displayName, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { marksOpenFor } from './marks.js';
 import { mustChange } from './realm.js';
+import { homeBinEmptySql, homeBinHolds } from './decor-bin-holds.ts';
 import { GUILD_TREASURY_MAX, GUILD_OPS_MAX, GUILD_OPS_WINDOW_S } from '../../src/net/guild/guildLaw.js';
 import { GUILD_HALL_ENTRY_DEFAULT, HALL_POWERS, hallMay, guildHallPrice, guildHallEntryOk, guildHallOwner } from '../../src/net/hallLaw.js';
 import { HOME_CLAIMS_MAX, HOME_CLAIMS_WINDOW_S, homeMapIdOk, homeBuildingKeyOk, homeRegionOk, homePriceOk, homeSaleRefund, homeInArenaCell, homeLayoutOk, homeMoved } from '../../src/net/homeLaw.js';   // ARENA4b: the arena's cell; QUEST-HOME: what a hall's buy or sale moved
@@ -141,12 +141,21 @@ export async function buyHall(ctx, player, body = {}) {
  * and the deed share of what the treasury paid (homeLaw.js homeSaleRefund) with half of what records paid for its pieces
  * paid back into the treasury - into what records paid in - in the same batch, both or neither. The batch holds the
  * hall and its pieces as they were read, so a piece placed between the read and the sale is never sold unpaid.
- * GUILD-HALL-SALE (2026-10-06, asked: "Guild houses should be able to be sold, like regular houses"): sold at its own
+ * GUILD-HALL-SALE: sold at its own
  * door too, as a home is - the door names the building it sells (`mapId`, `buildingKey`), and a guild's hall that
  * stands anywhere else is not the one its guildmaster was shown (`guild-hall-moved`: look again). The Guild tab's sale
  * names none and sells the guild's one hall, as before.
  * @param {{db: any, nowS: number}} ctx
  */
+/** Why a hall sale's batch was refused, read after it. */
+async function hallSaleRefusedBy(db, gid, back, hall) {
+  if (!(await db.prepare('SELECT 1 FROM homes WHERE guild_id = ?').bind(gid).first())) return 'guild-hall-none';
+  const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
+  if (t && t.treasury + back > GUILD_TREASURY_MAX) return 'guild-treasury-full';
+  if (await homeBinHolds(db, hall.map_id, hall.building_key)) return 'home-holds';
+  return 'guild-hall-moved';   // a piece placed or moved, or the guild handed on, meanwhile: look again
+}
+
 export async function sellHall(ctx, player, { character, mapId = null, buildingKey = null } = {}) {
   const { db, nowS } = ctx;
   const a = await guildActorOf(db, player, character);
@@ -158,6 +167,8 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
   const h = await db.prepare('SELECT * FROM homes WHERE guild_id = ?').bind(gid).first();
   if (!h) return { error: 'guild-hall-none' };
   if (atDoor && (h.map_id !== mapId || h.building_key !== buildingKey)) return { error: 'guild-hall-moved' };
+  // The sale takes the hall's pieces, so goods in its shared chests would be left with no chest to open them.
+  if (await homeBinHolds(db, h.map_id, h.building_key)) return { error: 'home-holds' };
   if (await overRate({ db, nowS }, `guild:${player.id}`, GUILD_OPS_MAX, GUILD_OPS_WINDOW_S)) return { error: 'guild-rate' };
   const p = await piecesBackOf(db, h.map_id, h.building_key);
   const refund = homeSaleRefund(Math.max(0, Number(h.paid) || 0));
@@ -168,7 +179,8 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
       db.prepare(`DELETE FROM homes WHERE map_id = ?1 AND building_key = ?2 AND guild_id = ?3 AND paid = ?4
         AND (SELECT COUNT(*) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?5
         AND (SELECT COALESCE(SUM(paid), 0) FROM home_decor WHERE map_id = ?1 AND building_key = ?2) = ?6
-        AND EXISTS (SELECT 1 FROM guild_members WHERE rowid = ?7 AND guild_id = ?3 AND rank = ?8)`)
+        AND EXISTS (SELECT 1 FROM guild_members WHERE rowid = ?7 AND guild_id = ?3 AND rank = ?8)
+        AND ${homeBinEmptySql('?1', '?2')}`)
         .bind(h.map_id, h.building_key, gid, h.paid, Number(p?.n) || 0, Number(p?.paid) || 0, a.me.rid, a.me.rank),
       mustChange(db),
       ...(back > 0 ? [
@@ -178,10 +190,7 @@ export async function sellHall(ctx, player, { character, mapId = null, buildingK
       ] : []),
     ]);
   } catch {
-    if (!(await db.prepare('SELECT 1 FROM homes WHERE guild_id = ?').bind(gid).first())) return { error: 'guild-hall-none' };
-    const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
-    if (t && t.treasury + back > GUILD_TREASURY_MAX) return { error: 'guild-treasury-full' };
-    return { error: 'guild-hall-moved' };   // a piece placed or moved, or the guild handed on, meanwhile: look again
+    return { error: await hallSaleRefusedBy(db, gid, back, h) };
   }
   const t = await db.prepare('SELECT treasury FROM guilds WHERE id = ?').bind(gid).first();
   return { ok: true, refund, decorCount: Number(p?.n) || 0, decorBack: piecesBack, back, treasury: t?.treasury ?? 0, moved: homeMoved(h.map_id, [], [h.building_key]) };   // QUEST-HOME: sold, a house again

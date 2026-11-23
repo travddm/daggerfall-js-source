@@ -1,6 +1,6 @@
-// CROWN1 part one (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE SEAT TAB AT A CROWN - its holder's
+// CROWN1 part one: THE SEAT TAB AT A CROWN - its holder's
 // Officer offered the crown's Conscription beside every tier's Edicts, with its words; a palace's never offered it; the
-// service's refusal in the board's words (bible/11-Multiplayer/Seats-Arc.md 7.6, 7.9; src/ui/seatTab.js).
+// service's refusal in the board's words (7.6, 7.9; src/ui/seatTab.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { byClass } from '../chargenDom.mjs';
@@ -35,7 +35,7 @@ test('CROWN1 THE CROWN\'S LEVER: at a crown its Officer is offered Conscription 
   const crown = mount(WAYREST);
   await tick();
   const sel = byClass(crown.host, 'notice-seat-edict')[0];
-  assert.deepEqual(sel.children.map((o) => o.value), ['market-day', 'open-gates', 'curfew', 'levy', 'bounty', 'conscription', 'royal-tourney']);   // part two: and the Royal Tourney
+  assert.deepEqual(sel.children.map((o) => o.value), ['market-day', 'open-gates', 'curfew', 'bounty', 'conscription', 'royal-tourney']);   // part two: and the Royal Tourney
   sel.value = 'conscription';
   sel.onchange();
   await tick();

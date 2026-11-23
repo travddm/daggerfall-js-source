@@ -1,4 +1,6 @@
-// L10N3d (2026-09-27): THE DFU WORDS THE PORT ROUTES, READ OFF THE SOURCE.
+// L10N3d: THE DFU WORDS THE PORT ROUTES, READ OFF THE SOURCE.
+//
+// It reads every .js and .ts module in src/ (not .d.ts).
 //
 // DFU shows its interface words through TextManager.GetLocalizedText(key); the port holds them as constants and reads
 // each through the text core where it is shown. This reads every such word in src/ - each `localizedText('key', ...)`
@@ -12,6 +14,7 @@
 //                                        (test/ui/l10n3g_wiring.test.js's GRAMMAR map), and coverage:
 //                                        DFU's keys the port routes, of those DFU's own code asks for by name
 import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'acorn';
@@ -33,7 +36,7 @@ export function dfuTables(root = ROOT) {
 }
 
 const walk = (d, out = []) => {
-  for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p, out); else if (p.endsWith('.js')) out.push(p); }
+  for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p, out); else if (p.endsWith('.js') || (p.endsWith('.ts') && !p.endsWith('.d.ts'))) out.push(p); }
   return out;
 };
 const literal = (n) => (n?.type === 'Literal' && typeof n.value === 'string' ? n.value
@@ -47,7 +50,9 @@ function* coreCallers(root, names) {
   for (const path of walk(join(root, 'src'))) {
     const file = relative(root, path).split('\\').join('/');
     if (file === 'src/systems/textManager.js') continue;
-    const text = readFileSync(path, 'utf8');
+    const raw = readFileSync(path, 'utf8');
+    // Strip mode blanks each type with spaces, so the line numbers of a .ts module stay its own.
+    const text = path.endsWith('.ts') ? stripTypeScriptTypes(raw, { mode: 'strip' }) : raw;
     if (![...names].some((r) => text.includes(r))) continue;
     const ast = parse(text, { ecmaVersion: 'latest', sourceType: 'module', locations: true });
     const local = new Map();

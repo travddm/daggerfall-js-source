@@ -861,7 +861,7 @@ test('getKeySubjectPersonHint: the questor key, the site-details name, the resid
   tree.addQuestTopicWithInfoAndRumors(1, person, '_p_', QUEST_INFO_RESOURCE_TYPE.Person, null, null);
   pipe.currentQuestionListItem = newListItem({ questID: 1, key: '_p_' });
   pipe.currentKeySubject = 'BACKUP';
-  // FIELD BUGS 2026-09-30b RES-MARK (PIN MOVED): a quest resource's row is marked whatever the roll (it was DFU's
+  // FIELD BUGS 2026-09-30b RES-MARK (
   // directions at 0.9)
   assert.equal(pipe.getKeySubjectPersonHint(), `record:${MAP_REVEAL_TEXT_ID}`);
   assert.equal(pipe.currentKeySubjectBuildingKey, 88, 'the site details supplied the building key');

@@ -1,4 +1,4 @@
-// GP1 - THE GAMEPAD LAYER (2026-09-11). InputManager.cs's joystick
+// GP1 - THE GAMEPAD LAYER. InputManager.cs's joystick
 // law, the half the port never had: "AXES + JOYSTICK (AxisActions,
 // JoystickUIActions): no gamepad layer in the port" stood flagged at
 // inputActions.js since I2. This module is the PURE half - no DOM, no

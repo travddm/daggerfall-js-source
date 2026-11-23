@@ -1,18 +1,16 @@
-// STAFF-EVENT (2026-10-24, mob: "lets start making an event tool for staff to use"; bible/11-Multiplayer/Staff-Events.md) -
+// STAFF-EVENT -
 // THE LAW (net/staffEvent/staffEventLaw.js): an event's shape and bounds, the words each way, the cell's ledger (the cap,
 // the meter's boss once, a hand call one more, the boss's moments from the one who stands it, done), the signed order
-// (identityToken.js 'sevent'), and the place picker's game half (net/staffPlaces.js).
+// (identityToken.js 'sevent').
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   validStaffEvent, staffEventFault, validStaffEventIn, validStaffEventOut, validStaffEventTell, newStaffLedger, staffEventCap, staffBossCall,
   foldStaffWord, staffEventDone, staffLedgerState, staffEventTell, staffEventKey, staffEventIdOf, staffEventLapsed, isAreaEvent,
-  relaySupportsStaffEvents, staffEventKindOk, STAFF_EVENT_KILLS_BURST, STAFF_EVENT_KILL_MS, STAFF_BOSS_HEALTH_DEFAULT,
+  staffEventKindOk, STAFF_EVENT_KILLS_BURST, STAFF_EVENT_KILL_MS, STAFF_BOSS_HEALTH_DEFAULT,
   STAFF_EVENT_ACCOUNTS_MAX, STAFF_EVENT_PRESENT_MS, STAFF_BOSS_HP_MAX,
 } from '../../src/net/staffEvent/staffEventLaw.js';
 import { mintStaffEventOrder, verifyOrder, orderValid, ORDER_KINDS } from '../../src/net/identityToken.js';
-import { staffPlaces, staffHere, placeKind, gameMaps, keptMaps } from '../../src/net/staffPlaces.js';
-import { LOCATION_TYPES } from '../../src/formats/mapsFile.js';
 
 const { subtle } = globalThis.crypto;
 const EV = Object.freeze({ id: 'ab12cd34ef', rg: 17, loc: 0, px: 207, py: 213, nm: 'Daggerfall', ct: 1, mt: [7, 12], n: 50, m: 25, b: 24, bs: 200, bh: 10, at: 1_700_000_000_000, ue: 0, eb: 1, fb: 0, by: 'SirMcMobdon' });
@@ -37,12 +35,11 @@ test('STAFF-EVENT: an event is held to its bounds - kinds any monster but the tw
   assert.ok(staffEventLapsed({ ...EV, ue: EV.at + 1000 }, EV.at + 1000) && !staffEventLapsed(EV, EV.at * 2));
   assert.equal(staffEventIdOf(staffEventKey(EV.id)), EV.id);
   assert.equal(staffEventIdOf('raid:17:0:3'), null);
-  assert.ok(relaySupportsStaffEvents('world256') && !relaySupportsStaffEvents('world255') && !relaySupportsStaffEvents(null));
 });
 
 test('STAFF-EVENT: the words each way are projected - a player\'s word, the hub\'s book and end, a cell\'s ledger, a tell', () => {
   assert.deepEqual(validStaffEventIn({ k: 'w', id: EV.id, px: 207, py: 213, n: 4, s: 1, extra: 9 }), { k: 'w', id: EV.id, px: 207, py: 213, n: 4, s: 1, bu: 0, bk: 0, fb: 0, h: 0 });
-  for (const bad of [{ k: 'x' }, { n: -1 }, { n: 10_000 }, { bu: 2 }, { fb: 100 }, { px: 1000 }]) assert.equal(validStaffEventIn({ k: 'w', id: EV.id, px: 207, py: 213, n: 1, ...bad }), null);
+  for (const bad of [{ k: 'x' }, { n: -1 }, { n: 10_000 }, { bu: 2 }, { fb: 100 }, { px: 8192 }]) assert.equal(validStaffEventIn({ k: 'w', id: EV.id, px: 207, py: 213, n: 1, ...bad }), null);
   const book = validStaffEventOut({ k: 'ev', l: [EV, EV, { ...EV, id: 'zz' }, { ...EV, id: 'cc22dd33ee' }] });
   assert.deepEqual(book.l.map((e) => e.id), [EV.id, 'cc22dd33ee'], 'each event once, a bad one dropped');
   assert.deepEqual(validStaffEventOut({ k: 'end', id: EV.id, why: 'nope' }), { k: 'end', id: EV.id, why: 'staff' });
@@ -136,25 +133,4 @@ test('STAFF-EVENT: THE ORDER - its own kind, only its own fields, each op with w
   assert.deepEqual(v.claims.ev, EV);
   assert.equal((await verifyOrder(tok, kp.publicKey, { subtle, nowS, kind: 'smsg' })).ok, false);
   await assert.rejects(mintStaffEventOrder({ s: 'acct_1234', op: 'start', ev: { ...EV, n: 0 } }, kp.privateKey, { subtle, nowS }), /refused/);
-});
-
-test('STAFF-EVENT: THE PLACE PICKER (the game\'s half) - a region\'s named places off the maps, towns first; where I stand; the maps kept as the boot makes them', () => {
-  const T = LOCATION_TYPES;
-  const rows = [{ locationType: T.TownCity, longitude: 0, latitude: 0 }, { locationType: T.DungeonLabyrinth, longitude: 0, latitude: 0 }, { locationType: T.TownHamlet, longitude: 0, latitude: 0 }, { locationType: T.Tavern, longitude: 0, latitude: 0 }];
-  const names = ['Daggerfall', 'Copperham', 'Ashfield', ''];
-  const maps = { getRegion: (r) => (r === 17 ? { mapTable: rows, mapNames: names } : null), baseLocationCount: () => 4, getRegionName: (r) => (r === 17 ? 'Daggerfall' : ''), getRegionIndexAt: () => 17 };
-  const p = staffPlaces(maps, 17);
-  assert.equal(p.dfoStaff, 'places');
-  assert.deepEqual(p.list.map((x) => [x.loc, x.name, x.kind]), [[2, 'Ashfield', 'town'], [0, 'Daggerfall', 'town'], [1, 'Copperham', 'dungeon']], 'towns first, by name; a place with no name left out');
-  assert.deepEqual(staffPlaces(maps, 62).list, [], 'no region past the politic map');
-  assert.deepEqual(staffPlaces(null, 17).list, []);
-  const px = p.list[0];
-  assert.deepEqual(staffHere(maps, { x: px.px, y: px.py }), { dfoStaff: 'here', region: 17, name: 'Daggerfall', loc: 2, place: 'Ashfield', kind: 'town', px: px.px, py: px.py });
-  assert.equal(staffHere(maps, { x: 999, y: 1 }).kind, null, 'no place on that pixel: an area, no kind');
-  assert.equal(staffHere(null, { x: 1, y: 1 }).region, null);
-  assert.equal(placeKind(T.ReligionCult), 'temple');
-  assert.equal(placeKind(T.HomeWealthy), 'home');
-  const m = {};
-  assert.equal(gameMaps(m), m);
-  assert.equal(keptMaps(), m);
 });

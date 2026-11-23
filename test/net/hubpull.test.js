@@ -1,5 +1,4 @@
-// HUB-PULL (2026-10-16, Mac: "Is the server okay?", then "Yes and do any other improvements along the way. I really wanna
-// continue to beef up the server"; bible/11-Multiplayer/Scale-Arc.md HUB-PULL): THE BUS NEVER CALLS A SHARD. The live
+// HUB-PULL: THE BUS NEVER CALLS A SHARD. The live
 // relay refused hundreds of thousands of the hub's calls a day with `Subrequest depth limit exceeded`: a Durable Object
 // charges every call it makes to the newest call it is serving (workerd io-context.h, getCurrentIncomingRequest), so the
 // bus's push to a shard (`/internal/hub/down`) rode the shard's hand-up it was serving, the shard's next hand-up rode

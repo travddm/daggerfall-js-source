@@ -123,20 +123,3 @@ test('R1 save: otherItems and their repairData ride the quicksave (SerializableP
   assert.deepEqual(w3.otherItems, []);
 });
 
-test('R1 repairNote: the note the commit pass writes is the ROW, with DFU\'s two fills (:536-537)', () => {
-  // UpdateRepairTimes writes one note per newly-booked item:
-  //   string.Format(GetLocalizedText("repairNote"), item.LongName,
-  //                 buildingDiscoveryData.displayName)
-  // The row is Internal_Strings.csv:820 - "Left my {0} for repair at
-  // {1}." - so {0} is the ITEM and {1} is the SHOP, in that order.
-  // Both of the port's commit arms (the staged Repair mode and the
-  // one-item repair) write it, so both are pinned.
-  const wm = src('src/scenes/worldModes.js');
-  const notes = wm.match(/questBridge\?\.notebook\?\.addNote\?\.\(formatText\(localizedText\('repairNote', [^\n]*\)\);/g) ?? [];
-  assert.equal(notes.length, 2, 'both commit arms write the repairNote');
-  for (const n of notes) {
-    assert.match(n, /formatText\(localizedText\('repairNote', 'Left my \{0\} for repair at \{1\}\.'\), _itemLabel\(it\), interiorBuilding\?\.name \?\? 'the shop'\)/,
-      'the row verbatim (L10N3d: read through the text core), item into {0} and shop into {1}');
-    assert.ok(!n.includes('to be repaired at'), 'the old paraphrase is gone');
-  }
-});

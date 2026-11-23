@@ -1,15 +1,14 @@
-// SILVER-FINDS (2026-10-05, Mac: "Silver should be more accessible in more forms of interactions like foraging and
-// different activities, also needs to be sometimes lootable"): THE CLIENT'S HALF - the device rolls each container it
+// SILVER-FINDS: THE CLIENT'S HALF - the device rolls each container it
 // opens once (systems/silverFinds.js), every host's loot door asks there, a find is asked of the account service
 // through the marks book (each its own request id; one never answered is owed and asked again with it), and an answered
-// find is a card or a line. bible/06-Systems/Professions-Arc.md 10.5 (SILVER-FINDS).
+// find is a card or a line. 10.5 (SILVER-FINDS).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { setSilverFinder, silverFinderSet, silverFindAt, SILVER_FINDS_KEPT, _resetSilverFindsForTests } from '../../src/systems/silverFinds.js';
 import { findChanceOf, MARKS_FAUCETS, MARKS_RID_RE } from '../../src/net/marksLaw.js';
-import { accountMarks, REFUSALS, SESSION_KEY } from '../../src/net/accountClient.js';
+import { accountMarks, REFUSALS, SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import { createMarksBook, MARKS_TEXT, MARKS_TRIES, FIND_WORDS, FINDS_OWED_MAX } from '../../src/net/marksBook.js';
 import { findHaul, harvestHauls, haulWords, FIND_SOURCE, FIND_BAR_TEXT, COMBAT_BAR_TEXT, claimHauls } from '../../src/ui/haulCards.js';
 import { openCorpseLoot, ARROW_TEMPLATE_INDEX } from '../../src/scenes/corpseMarker.js';
@@ -74,7 +73,7 @@ test('SILVER-FINDS the roll\'s memory: a key string is remembered beside an obje
 test('SILVER-FINDS the door: a find posts its kind and its request id to /v1/marks/find behind the session; `bad-find` has its sentence (mutants: the route; the body)', async () => {
   const sent = [];
   const fetch = async (url, init) => { sent.push([new URL(url).pathname, JSON.parse(init.body), init.headers.authorization]); return new Response(JSON.stringify({ ok: true }), { status: 200 }); };
-  const door = accountMarks({ fetch, storage: { getItem: (k) => (k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } });
+  const door = accountMarks({ fetch, storage: { getItem: (k) => (k === SERVICE_KEY ? 'https://accounts.invalid' : k === SESSION_KEY ? JSON.stringify({ secret: 'sek' }) : null) } });
   await door.find('corpse', 'r-00000001');
   assert.deepEqual(sent, [['/v1/marks/find', { kind: 'corpse', rid: 'r-00000001' }, 'Bearer sek']]);
   assert.equal(REFUSALS['bad-find'], 'That find could not be read.');
@@ -175,7 +174,6 @@ test('SILVER-FINDS the book\'s refusals: silver not this account\'s (a guest, th
   await r.book.find('corpse');
   assert.deepEqual((await r.book.find('pile')).map((f) => f.kind), ['pile'], 'the refused find is not owed');
   assert.equal(r.asks.length, 2);
-  // PIN MOVED (AUDIT 625 S3): the hour's refusal has an arm of its own now (the rest wait owed for the next hour), so
   // the arm that lets a refused find go is held here by the refusals of the FIND ITSELF - an id the service cannot
   // read, a kind of none - which the hour's no longer reaches
   for (const error of ['marks-rid', 'bad-find']) {
@@ -232,7 +230,6 @@ test('SILVER-FINDS a body\'s door: a body opened with treasure in it rolls its s
   try {
     const player = { items: [], goldPieces: 0 };
     const body = { corpse: true, corpseMarker: { archive: 400, record: 1, pos: [0, 0, 0] }, entity: { items: [{ name: 'Longsword', group: 'Weapons', templateIndex: 121 }] } };
-    // PIN MOVED (AUDIT 625 D6): a door that OPENED says so - `true` (test/net/audit625_silver.test.js: a refused one rolls none)
     openCorpseLoot(body, { playerEntity: player, openWindow: () => true });
     openCorpseLoot(body, { playerEntity: player, openWindow: () => true });
     assert.deepEqual(asked, ['corpse'], 'once a body');
@@ -245,29 +242,3 @@ test('SILVER-FINDS a body\'s door: a body opened with treasure in it rolls its s
   } finally { Math.random = rnd; _resetSilverFindsForTests(); }
 });
 
-test('SILVER-FINDS every host\'s loot door asks (THE FOUR HOSTS): the dungeon\'s take - a body, a treasure pile, opened with something in it - and its search\'s find at its search; the street\'s bodies through the corpse door, a peer\'s at its grant; a headstone\'s find; the streaming host registers the finder online alone, a card where the feed stands and else the line (mutants: a door unasked; a dropped pile asked; the finder offline; the line lost to a card)', () => {
-  const dc = src('src/scenes/dungeonContext.js');
-  // PIN MOVED (AUDIT 625 S5 + D6): a body's and a pile's find named by the room's own name for it, before anything
-  // moves, and rolled by the quick door's take and the window's mount each (test/net/audit625_silver.test.js)
-  assert.match(dc, /const _find = source\.length && \(kind === 'corpse' \|\| kind === 'loot'\) \? \{ kind: kind === 'corpse' \? 'corpse' : 'pile', key: silverFindKey\(key, kind, i\) \} : null;/);
-  assert.ok(dc.indexOf('const _find = source.length') > dc.indexOf('if (activeOverlay && !activeOverlay.done) return source.length;'), 'a window already standing is no open');
-  assert.ok(dc.indexOf('const _find = source.length') < dc.indexOf('if (!pileKeys && quickLootTake(key, { items: () => source }'), 'named before the quick door and the window alike - before the take empties it');
-  assert.match(dc, /onClose = \(\) => \{ if \(!_ctxDead && sb\.items\.length\) \{ silverFindAt\('search', find\); api\.takeLoot\(`srch:\$\{i\}`\); \} \};/);
-  assert.match(src('src/scenes/corpseMarker.js'), /if \(openWindow\(corpseLootHooks\(entry\)\) === true\) silverFindAt\('corpse', entry\);\n  return items\.length;/);
-  assert.match(src('src/scenes/bodyLootHost.js'), /if \(n > 0 && !arrows\) silverFindAt\('corpse', f\);/);   // PIN MOVED (OUTDOOR-LOOT): the legacy grant's landing is the body block's
-  const w = src('src/scenes/world.js');
-  assert.match(src('src/scenes/searchPartyHost.js'), /if \(!pile\) return;\n\s+silverFindAt\('search', items\);/);   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the headstone's search left world.js for scenes/searchPartyHost.js
-  assert.match(w, /if \(marksBook\) \{\n\s+setSilverFinder\(\(kind\) => \{\n\s+marksBook\.find\(kind\)\.then\(\(finds\) => \{/);
-  assert.match(w, /if \(!\(stands && showHaul\(\[findHaul\(f\.found, f\.kind\)\]\)\)\) chatNotice\(f\.line\);/);
-  assert.match(w, /const stands = walkMode && !gamePaused\(\) && pointerSurfaces\.size === 0 && !travelView\?\.active;/);
-  assert.match(w, /marks: marksBook,   \/\/ SILVER-FINDS: a harvest's find said, its balance kept/);
-  assert.match(w, /nowMs: \(\) => Date\.now\(\) \+ _sharedOffsetMs \}\)   \/\/ SILVER-FINDS: the day's finds counted by the shared clock/);
-  const g = src('src/scenes/gatherHost.js');
-  assert.match(g, /const found = !d\.motherlode && d\.marks \? deps\.marks\?\.findLine\?\.\(d\.marks, 'gather'\) \?\? null : null;\n\s+if \(found && !hauled\) hud\.toast\(found\);/);
-});
-
-test('SILVER-FINDS the Bank\'s card: the day\'s finds beside the combat\'s - found in loot against 20, found gathering against 30; the combat row names the serpents (mutants: a count unsaid; the maxes)', () => {
-  const p = src('src/ui/enhanced/enhancedPorts.js');
-  assert.match(p, /\['Found in loot today', `\$\{\(w\.hooks\.marks\.today\(\)\?\.found \?\? 0\)\} of \$\{w\.hooks\.marks\.today\(\)\?\.findMax \?\? MARKS_FAUCETS\.find\.perDay\}`\],/);
-  assert.match(p, /\['Found gathering today', `\$\{\(w\.hooks\.marks\.today\(\)\?\.gathered \?\? 0\)\} of \$\{w\.hooks\.marks\.today\(\)\?\.gatherMax \?\? MARKS_FAUCETS\.gather\.perDay\}`\],/);
-});

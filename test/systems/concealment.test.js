@@ -51,7 +51,6 @@ test('concealment: cast lands the buff, says the start line ONCE, renews silentl
   assert.ok(hasActiveEffect(t, 'invisNormal'));
   assert.equal(t.activeEffects[0].roundsRemaining, 4);       // 3 + 1*2, round 1 consumed at cast (F17)
   assert.deepEqual(said, ['You are invisible.']);
-  // PIN MOVED (STACK-CAP): the re-cast RENEWS (ConcealmentEffect.AddState stacked it - 4 + 5 = 9) and stays silent:
   // two rounds gone, the recast puts the incumbent back at a fresh cast's 4 - never 9
   t.activeEffects[0].roundsRemaining = 2;
   applySpell({ element: 4, rangeType: 0, effects: [invis] }, 2, t, { say: (l) => said.push(l) }, seq(0));

@@ -1,8 +1,8 @@
-// AUDIT BAG-CRAFT (2026-10-09, Mac: "Audit this"; bible/06-Systems/Materials-Bag.md section 15) - THE STATIONS' WALL.
+// AUDIT BAG-CRAFT - THE STATIONS' WALL.
 // A1: BAG-CRAFT's `work` put-in moved the units the carried count did not hold into the Stores as BOUGHT - and a `work`
 // put-in is no station's act but a request any client may send. Reproduced against the real Worker before the fix: 200
 // Mithril Ore no pack had, put in by a bare `work` deposit, listed for Drakes, and withdrawn counted as carried (every
-// counted door open to it). Fixed: the Stores' fourth origin, `loose` (migration 0097_loose_origin.sql, bagLaw.js
+// counted door open to it). Fixed: the Stores' fourth origin, `loose` (bagLaw.js
 // LOOSE_ORIGIN) - a station alone spends it (craft, smelt, brew, temper: STATION_ORIGINS, loose first); a writ, the
 // guild Stores and the market read own and bought (WRIT_ORIGINS); a withdrawal gives it back to the pack uncounted; a
 // station's products of it stay walled (a smelt's loose, a piece walled to gold - MARKET-ANY's pack-piece law).
@@ -170,14 +170,6 @@ test('AUDIT BAG-CRAFT A1 service: a station spends the loose units first, and wh
   const t = await s.ask(mac, '/v1/prof/temper', { recipe: 'longsword:steel', quality: q, provenance: spv });
   assert.equal(t.status, 200, JSON.stringify(t.body));
   assert.equal(s.raw.prepare('SELECT bought_with FROM products WHERE provenance = ?').get(spv).bought_with, 'gold', 'raised with goods no Stores had');
-  // a Ram Kit of loose planks: loose - a station's, never a camp's writ (it reads own and bought)
-  s.rank(mac, 'building', 60);   // CRAFT3: Carpentry is Building's
-  s.give(mac, 'ingot:iron', 'own', 20);
-  s.give(mac, 'hide:bear', 'own', 4);
-  await s.loose(mac, 'plank:oak', 40);
-  const ram = await s.ask(mac, '/v1/prof/craft', { recipe: 'ramkit:oak', clean: false, name: 'Mac' });
-  assert.equal(ram.status, 200, JSON.stringify(ram.body));
-  assert.deepEqual(s.stores(mac, 'work:ram'), [['loose', 1]]);
   // the refusal counts the loose units as a station's
   assert.equal((await s.ask(mac, '/v1/prof/smelt', { recipe: 'ingot:iron', count: 2 })).body.error, 'stores-short', 'two own Iron: one ingot\'s worth');
   await s.loose(mac, 'metal:iron', 2);

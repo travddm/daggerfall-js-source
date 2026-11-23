@@ -3,8 +3,7 @@
 // ONLINE HOMES AT THE BOOT - the account's homes put right once a boot,
 // once the homes' towns land and the world stands with the character
 // loaded (a realm act's checkpoint can write, and a hold names its
-// building in its town's layout). HOST-SPLIT (bible/01-Overview/
-// Host-Split.md, THE HOSTS DO NOT GROW): the streaming host
+// building in its town's layout). HOST-SPLIT (docs/architecture/hosts-and-modules.md): the streaming host
 // (scenes/world.js bootWorld) builds it above the boot's first landing
 // and calls both beside ARENA4b's move (moveArenaHomesOnline, still the
 // host's); these were its own functions (holdRealmDeedsOnline) or its
@@ -21,9 +20,7 @@
 //     reads the deed off the record the boot loaded. A house given before
 //     the hold existed, and one whose hold at the grant was lost, are held
 //     here; a hold made already answers `repeat`.
-//   sweepGone - ACCOUNT-HOMES (2026-10-06, asked: "House ownership should
-//     be account bound, not character bound"; bible/06-Systems/
-//     Online-Arc.md ACCOUNT-HOMES): every home this character kept things
+//   sweepGone - ACCOUNT-HOMES: every home this character kept things
 //     in that its account holds no more - sold by another of its
 //     characters, or gone with the character that bought it - gives this
 //     character's own things that stood in it back to the pack

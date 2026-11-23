@@ -1,5 +1,5 @@
 // @ts-check
-// PORTRAIT3D (2026-10-15): THE RENDERER A FACE IS DRAWN WITH, held for the doors that have none.
+// PORTRAIT3D: THE RENDERER A FACE IS DRAWN WITH, held for the doors that have none.
 //
 // A Morrowind head portrait is a picture the GL renderer takes (combat/fpArm.js headPortrait, its readback). The
 // classic windows and the HUD hand their renderer in; the enhanced menu's DOM wells - the save tiles, the profile, the

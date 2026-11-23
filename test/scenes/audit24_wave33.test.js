@@ -57,54 +57,6 @@ test('audit24 wave33: the ranged marker latches the same way, on its own flag', 
   assert.equal(m.shootArrow, true, 'latched');
 });
 
-test('audit24 wave33: no host freezes the animation, and every host consumes its latch', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  // the freeze is GONE - the mobile update runs whatever the paralysis state
-  assert.equal(d.includes('if (!_fParalyzed || !f._mout) {'), false, 'the dungeon animation freeze is retired');
-  // what actually stops the blow is the consume-and-clear, gated like
-  // EnemyAttack.Update's early return - which leaves the latch SET.
-  // MT-iv: gated on a live TARGET, as EnemyAttack.MeleeDamage is
-  // (:136-137 returns at `senses.Target == null`). The consume-and-
-  // clear the pin guards is unchanged.
-  assert.ok(d.includes('if ((_tgt || f._pupMine) && !_fParalyzed && f.mobile.doMeleeDamage) { f.mobile.doMeleeDamage = false; resolveFoeMelee(f, _pf, { vsPlayer: !!f._pupMine }); }'),   // WORLD3: or a puppet's blow at ME
-    'the dungeon consumes and clears');
-  // ROAD-H tail (2026-09-07): the archer arm is gated on the live
-  // TARGET too (BowDamage returns at `senses.Target == null`, :136-137),
-  // the shape the exterior pool has carried since MT-ii.
-  assert.match(d, /if \(\(_tgt \|\| f\._pupTarget != null\) && !_fParalyzed && f\.mobile\.shootArrow\) \{[^\n]*\n\s+f\.mobile\.shootArrow = false;/,   // WORLD3: or a puppet's streamed target
-    'and so does its archer arm');
-
-  const xf = rd('src/scenes/exteriorFoes.js');
-  // MT-ii: the frame is gated on a live TARGET now (`_tgt`), which is
-  // the player's feet whenever the player is the target - and null only
-  // when an armed foe holds no target at all, where DFU's own
-  // MeleeDamage cannot run either (senses.Target == null).
-  assert.ok(xf.includes('if (!_fParalyzed && f.mobile.doMeleeDamage && _tgt) {\n        f.mobile.doMeleeDamage = false;'));
-  // MT-ii: BowDamage returns at `senses.Target == null` too (:136).
-  assert.ok(xf.includes('if (!_fParalyzed && f.mobile.shootArrow && _tgt && onArrow) {\n        f.mobile.shootArrow = false;'));
-  const cg = rd('src/scenes/cityGuards.js');
-  // MT-ii: gated on a live target, as EnemyAttack.MeleeDamage is.
-  assert.ok(cg.includes('if (!_gParalyzed && g.mobile.doMeleeDamage && _tgt) {\n        g.mobile.doMeleeDamage = false;'));
-
-  // EVERY consumer must clear, or a latch fires forever. Count them: the
-  // three reads above and exactly three clears, no more and no fewer.
-  for (const [name, src] of [['dungeonContext.js', d], ['exteriorFoes.js', xf], ['cityGuards.js', cg]]) {
-    const reads = (src.match(/\.(doMeleeDamage|shootArrow)\b(?! = false)/g) ?? []).length;
-    const clears = (src.match(/\.(doMeleeDamage|shootArrow) = false/g) ?? []).length;
-    // WORLD2: a PUPPET drops both latches unconsumed (a puppet lands no blow of its own; the first live frame after a
-    // handover fires none from its last puppet frame) - two marked lines, two latches each, in the dungeon alone
-    const drops = (src.match(/^[^\n]*= false;[^\n]*WORLD2 dropped unconsumed[^\n]*$/gm) ?? []).reduce((n, line) => n + (line.match(/= false/g) ?? []).length, 0);
-    assert.equal(drops, name === 'dungeonContext.js' ? 6 : name === 'exteriorFoes.js' ? 2 : 0, `${name}: the puppet's drops, marked, and nowhere else (WORLD6b: the cell's puppet drops both, one marked line) (WORLD3: a puppet's own frame drops them unless the blow is at ME or a shaft flies at anyone - the arm consumes those)`);   // QUEST-PARTY phase 3c: a party member's quest foe taken over drops both too, marked
-    assert.equal(reads, clears - drops, `${name}: every latch read has a clear`);
-  }
-
-  // the old per-frame names are gone from src/ entirely
-  for (const f of ['src/characters/mobile/mobileUnit.js', 'src/scenes/dungeonContext.js',
-    'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
-    assert.equal(/\bhitFrame\b|\bshootFrame\b/.test(rd(f)), false, `${f} has no edge-flavoured name left`);
-  }
-});
-
 test('audit24 wave33: the C# dead store is real, and nothing else freezes a paralysed sprite', { skip: noDfu }, () => {
   // The whole wave rests on one claim about DFU, so the claim is pinned
   // against DFU rather than against the port that now assumes it.

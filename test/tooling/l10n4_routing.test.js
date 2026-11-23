@@ -1,4 +1,4 @@
-// L10N4 (2026-10-03): THE PORT'S OWN STRINGS, ROUTED. Two laws the routing batches lean on, pinned over fixtures:
+// L10N4: THE PORT'S OWN STRINGS, ROUTED. Two laws the routing batches lean on, pinned over fixtures:
 // the English catalog reads an English constant the module holds (`t('k', NO_PARTY_TEXT)`, the L10N3d shape -
 // `TOO_FAR_AWAY_TEXT` beside `tooFarAwayText()`), and literals joined by `+`, so a long English needs no second copy;
 // and the ratchet does not count a constant's words where they are written when a text-core call reads them - they

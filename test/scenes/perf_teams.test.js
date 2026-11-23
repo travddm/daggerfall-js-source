@@ -1,10 +1,10 @@
-// PERF-TEAMS (2026-10-10, the owner: 40 fps by a populated town, 165 forty pixels out): ANOTHER PLAYER'S TEAM IS CULLED.
+// PERF-TEAMS: ANOTHER PLAYER'S TEAM IS CULLED.
 // HCC-PARK keeps up to PARK_CELL_MAX parked teams a cell for PARK_TTL_MS, owner online or not, and the pool stepped and
 // drew every one of them every frame across the whole sixteen-pixel cell - behind the eye and past the far plane alike.
 // BY EXECUTION: past PEER_TEAM_DRAW_M a team keeps its word and its ease and draws nothing (with a hysteresis); my own
 // parked wagon a league off is the same; the travel view's grown world is never cut by the eye's distance; the host's
 // view verdict (world.js yardCull) drops a wagon off screen or casts it into the shadow maps alone; the window's view
-// out takes no team past the reach. `06-Systems/Horse-Cart-And-Cargo.md`.
+// out takes no team past the reach.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

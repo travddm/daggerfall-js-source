@@ -310,18 +310,3 @@ test('A8: the controls window builds a combo from a modified keydown', () => {
   assert.equal(comboFromEvent('ControlLeft', { ctrlKey: true }), null);
 });
 
-test('A8: the combo flags that stood in the source are retired, not orphaned', () => {
-  const ia = readFileSync(join(root, 'src/systems/inputActions.js'), 'utf8');
-  assert.ok(!/without the engine half[\s\S]{0,80}combos/.test(ia)
-    || /RETIRED THE COMBO FLAG/.test(ia), 'the header no longer claims no combos');
-  assert.match(ia, /A8 RETIRED THE COMBO FLAG/);
-  assert.ok(!/the port has no combos/.test(ia));
-  const cc = readFileSync(join(root, 'src/systems/controlsConfig.js'), 'utf8');
-  assert.match(cc, /A8 RETIRED THE COMBO FLAG/);
-  assert.ok(!/The port has no key combos/.test(cc));
-  const cw = readFileSync(join(root, 'src/ui/controlsWindow.js'), 'utf8');
-  assert.ok(!/both flagged with I1's combo flag/.test(cw));
-  // ...and what is genuinely still missing is NAMED rather than dropped
-  assert.match(ia, /heldKeys/, 'the held-ORDER remainder is recorded');
-  assert.match(cw, /MOUSE BUTTONS/, 'the mouse-button capture remainder is recorded');
-});

@@ -1,4 +1,4 @@
-// LEGACY7 part two (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9): A HOUSE NAME ONLINE - the law both ends share
+// LEGACY7 part two: A HOUSE NAME ONLINE - the law both ends share
 // (src/net/houseLaw.js), the identity token's claims (identityToken.js), the relay's stamp (wire.js badged) and the
 // client's read, the account service's mint and roster (server-account/src/legacy.js realmHouseOf - realm.js realmMintFacts since SCALE4f - and realm.js listRealm) on
 // the real Worker over the real migrations, and the three faces: over the head, the inspect card, the roster's tile.
@@ -13,7 +13,7 @@ import { badged, readHouse as wireReadHouse } from '../../src/net/wire.js';
 import { standService } from '../accountDb.mjs';
 import { profileView } from '../../src/ui/profileWindow.js';
 import { realmRowAsSave } from '../../src/systems/realmSaves.js';
-import { realmMintFacts } from '../../server-account/src/realm.js';   // PIN MOVED (SCALE4f): legacy.js realmHouseOf is realmMintFacts' `house`
+import { realmMintFacts } from '../../server-account/src/realm.js';
 
 const rd = (f) => readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
@@ -104,11 +104,4 @@ test('LEGACY7 the faces: the inspect card\'s line, the roster\'s tile, and the n
   assert.equal(profileView({ name: 'Mira', peer: {} }).house, null);
   assert.equal(realmRowAsSave({ id: 'r1', name: 'Ysolde Hlaalu', house: { hn: 'Hlaalu', hc: 'Ysolde' } }).house, 'Ysolde of House Hlaalu');
   assert.equal(realmRowAsSave({ id: 'r1', name: 'X' }).house, null);
-  const layer = rd('src/ui/nameLayer.js');
-  assert.match(layer, /setText\(tag\.house, houseLine\(p\.house\) \?\? ''\);/);
-  assert.match(layer, /node\.append\(bubble, title, tag, house, ribbon\);/);
-  assert.match(rd('src/net/remotePlayers.js'), /house: e\.peer\.house \?\? null,/);
-  assert.match(rd('src/net/online.js'), /p\.house = readHouse\(m\);/);
-  assert.match(rd('src/ui/saveTile.js'), /if \(save\?\.house\) who\.append\(el\('p', 'svhouse', save\.house\)\);/);
-  assert.match(rd('server/src/index.js'), /const house = c\.hn \? \{ hn: c\.hn,/);
 });

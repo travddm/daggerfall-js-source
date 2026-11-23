@@ -1,6 +1,4 @@
-// SEAT-WORDS and STANDING-WORDS (FIELD BUGS 2026-10-15g; Mac, asked what the guild system still left unsaid: "Seat-locked
-// services", "Standing changes shown", "Probation warning", "Tutorial + guide words"), AUDIT GUILD-WORDS (Mac: "Lets
-// audit everything") and AUDIT GUILD-WORDS II (Mac: "Audit this and ensure perfection"; bible/01-Overview/audits/Audit-Guild-Words.md),
+// SEAT-WORDS and STANDING-WORDS (FIELD BUGS 2026-10-15g;, "Standing changes shown", "Probation warning", "Tutorial + guide words"), AUDIT GUILD-WORDS and AUDIT GUILD-WORDS II (),
 // which read them cold and fixed what they found: online, a service a chair opens says it is a chair's at any rank, and a
 // knight is told the order's house is not given; the hold at 7 pops the Chapters page; every Roll answer says what it
 // moved - a quest's whole reward, a loss the owed absorbed, the owed paid (the service's own word, II B-4) - and what it
@@ -8,6 +6,7 @@
 // grew, and a gain lost to the most a standing holds said lost (II B-3); the review's warnings (a probation's stakes, one
 // the next review begins, a demotion before it lands, each with its days) come first; the tutorial and the notice board's
 // guide say the law as it is.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -378,10 +377,11 @@ test('AUDIT GUILD-WORDS L1-3, L1-4, L1-7, II A-6, C-7: a probation as its review
   assert.deepEqual(reviewWarnings(entity, g, bookOf(entity), store, { now: day(30) }), [probationWords(8)]);
   assert.deepEqual(reviewWarnings(entity, g, bookOf(entity), store, { now: day(30), online: true }), [probationWords(8, 'expel', true)]);
   assert.deepEqual(affiliations(entity, { now: day(30) })[0].warnings, [probationWords(8)], 'the Standing page\'s days (II E-6)');
-  assert.deepEqual(affiliations(entity, { now: day(30), online: true })[0].warnings, [probationWords(8, 'expel', true)]);
+  assert.deepEqual(affiliations(entity, { now: day(30), online: true })[0].warnings, [probationWords(8)], 'online a review waits DFU\'s 28 days by default');
   const lines = rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30) });
   assert.deepEqual(lines.slice(0, 2), [probationWords(8), 'Next rank: Journeyman']);
-  assert.equal(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30), pace: PACE })[0], probationWords(8, 'expel', true), 'the hall online, while the Roll paces');
+  assert.equal(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30), pace: PACE })[0], probationWords(8), 'the hall online waits the 28 days by default');
+  assert.equal(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30), pace: { ...PACE, promoteNow: true } })[0], probationWords(8, 'expel', true), 'the hall online under guild.promoteNow, while the Roll paces');
   setReputation(store, MAGES, 20);   // mended, the review not yet run: nothing short, the probation still said
   assert.deepEqual(rankNeedsLines(entity, g, bookOf(entity), store, { now: day(30) }), [probationWords(8)]);
   const skillsWords = (d) => `On probation: your guild skills are short of a member's. Your review is ${when(d)}: below -10 you are expelled, and it ends only once one skill reaches 22, a second 4, and your standing is 0 or more.`;
@@ -438,11 +438,12 @@ test('AUDIT GUILD-WORDS II E-12: an unstamped membership is due now; no store, n
 
 // ── THE WORDS ───────────────────────────────────────────────────────
 
-test('SEAT-WORDS: the tutorial and the notice board\'s guide say the law - a review\'s 7, the chairs\' 8 and 9, a quest\'s pace in real days and the UTC day, a chair\'s services at its own halls, a chapter writ\'s 2 and a receipt\'s 1 beyond the pace (mutants: a number not the law\'s)', () => {
+test('SEAT-WORDS: the tutorial and the notice board\'s guide say the law - a review\'s 7, the chairs\' 8 and 9, a quest\'s pace in real days and the UTC day, a chair\'s services at its own halls, a chapter writ\'s 2 and a receipt\'s 1 beyond the pace (mutants: a number not the law\'s)', (t) => {
+  playByRules(t, { 'guild.seatRanks': true });   // the chairs hold ranks 8 and 9: the server profile's option
   const guilds = tutorialById('guilds');
   assert.deepEqual([guilds.title, guilds.trigger, guilds.body], ['Guilds', 'When you first visit a guild.',
     ['Join a guild for its services and its work. Do that work and practice the skills it teaches to rise in rank.', 'You may join one temple, one knightly order, and as many guilds as will have you.']]);
-  assert.deepEqual(guilds.points, ['Online, reviews promote you no further than rank 7. Ranks 8 and 9 are chapter chairs; see Guild Chapters.']);   // VOICE1 (PIN MOVED)
+  assert.deepEqual(guilds.points, ['Online, reviews promote you no further than rank 7. Ranks 8 and 9 are chapter chairs; see Guild Chapters.']);   // VOICE1 (
   const ch = tutorialById('chapters');
   assert.deepEqual([ch.group, ch.title], ['online', 'Guild Chapters']);
   assert.deepEqual(ch.body, ['Online, quests raise your standing with each guild by at most 15 a real day (days start at midnight UTC). Any more is added on later days.',
@@ -496,23 +497,5 @@ test('AUDIT GUILD-WORDS II F-1, F-2: the classic window\'s refusal wraps on the 
   assert.ok(layoutMessageBox(font, latchBoxRows({ rows: [SEAT] })).w > 320, 'left whole, the chair\'s refusal ran past both edges');
   const laid = layoutMessageBox(font, fitBoxRows(font, latchBoxRows({ rows: [SEAT] })));
   assert.ok(laid.w <= 320 && laid.x >= 0, `fitted, ${laid.w} wide at ${laid.x}`);
-  assert.ok(src('src/ui/guildServiceWindow.js').includes('this._box = layoutMessageBox(font, fitBoxRows(font, latchBoxRows(top, this.hooks.rows)), buttons);'));
-  assert.ok(src('src/ui/enhanced/enhancedPort.js').includes("const n = el(doc, 'div', `port-text${b.center ? ' center' : ''}${b.scroll ? ' scroll' : ''}`);"));
-  const css = src('src/ui/enhanced/enhancedPortStyle.js');
-  assert.match(css, /\.port-text\.scroll \{ flex: none; max-height: min\(34dvh, 240px\); overflow-y: auto; display: flex; flex-direction: column; gap: 6px;/);
-  assert.match(css, /@media \(max-height: 480px\) \{ \.port-text\.scroll \{ max-height: 20dvh; \} \}/, 'a phone on its side: a shorter well');
 });
 
-test('SEAT-WORDS / STANDING-WORDS: the hosts - the gate and the house take the book\'s ceiling, the hall\'s line the character\'s date and the review\'s book, the Standing page the online flag, the streets\' tracker the module\'s doors through a lazy chat door and no door of its own over them, in any shape (mutants: each seam, a door overridden - II E-11)', () => {
-  const wm = src('src/scenes/worldModes.js');
-  assert.ok(wm.includes('const access = serviceAccess(guild, membershipOf(seated(), guild), service, { rankCeiling: host.rollPace?.(guild.factionId)?.book ?? null });'));
-  assert.ok(wm.includes('const decision = receiveHouseDecision(kept, { rankCeiling: host.rollPace?.(guild.factionId)?.book ?? null,'));
-  assert.ok(wm.includes('rankNeedsLines(playerEntity, guild, seated(), store, { rankCeiling: pace?.book ?? null, pace, now: ownDate(), book: memberships })'));
-  const w = src('src/scenes/world.js');
-  const start = w.indexOf('const rollTracker = onlineOn && realmSession ? createRollTracker({');
-  const call = w.slice(start, w.indexOf('}) : null;', start));
-  assert.ok(start > 0 && call.includes('...rollNoticeDoors({ entityOf: () => playerEntity, say: (text) => chatNotice(text) }),'));
-  assert.doesNotMatch(call.slice(call.indexOf('...rollNoticeDoors(')), /['"]?\bon(Capped|Standing|Ceiling|Full)['"]?\s*[:(]/, 'no door of the host\'s own after the module\'s');
-  assert.doesNotMatch(call, /['"]?\bon(Ceiling|Full)['"]?\s*[:(]/, 'the pace\'s lines are the module\'s alone');
-  assert.ok(src('src/ui/enhanced/enhancedMenu.js').includes('const book = affiliations(entity, { now: dateFromClassicMinutes(Math.floor(ownMinutes())), online: isOnlinePage() });'));
-});

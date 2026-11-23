@@ -1,5 +1,4 @@
-// SET5 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md; Mac: "sigil armor sets that also come with set
-// builds ... go all out on this") - THE SETS ON SCREEN, DRAWN AND MEASURED.
+// SET5 - THE SETS ON SCREEN, DRAWN AND MEASURED.
 //
 // A pin can say the card appends a set block and the sheet has a rule for it; only a layout engine can say the block
 // reads, the doll's strip fits its column beside the worn map, the rune in a tile's corner took its set's colour, and

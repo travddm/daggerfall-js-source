@@ -51,7 +51,7 @@
 // THE PAPERDOLL. The classic sheet composes it at DFU's (200,8) and
 // the prototype answers the same slot with a 28-node body schematic -
 // but that schematic is the INVENTORY's signature, it wants
-// tools/enhanced/enhancedVisuals.js and the three.js tag enhanced.html loads
+// tools/enhanced/enhancedVisuals.js and the three.js tag the old UI prototype page loads
 // from a CDN, and the port's doctrine has exactly one third-party
 // request in it already - the Ledger's THE ENHANCED SKIN'S WEB FONTS
 // row, which is another file's departure and not a claim of one here.
@@ -59,7 +59,7 @@
 // inventory slice with the equip map it explains. Recorded as a real
 // loss rather than dropped quietly.
 //
-// THE LEVEL-UP SCREEN: RETIRED, LV1 (2026-09-18). This paragraph said
+// THE LEVEL-UP SCREEN: RETIRED, LV1. This paragraph said
 // it stays classic - "a different window (LevelUpScreen), the hosts
 // push it themselves... not this door's business" - and that was the
 // last screen in the game with no enhanced face. It has one now
@@ -67,7 +67,7 @@
 // all reach it through ui/charSheetDoor.js, and it still mutates
 // nothing: the window drives the same LevelUpScreen this sentence
 // named, through that screen's own input. The sentence is replaced
-// rather than appended to, per bible/Home.md's RETIRING A FLAG DELETES
+// rather than appended to, per 's RETIRING A FLAG DELETES
 // THE SENTENCE.
 // ═══════════════════════════════════════════════════════════════════
 
@@ -153,8 +153,7 @@ export function sheetModel(entity) {
     },
     encumbrance: { now: Math.trunc(carriedWeight(e)), max: entityMaxEncumbrance(e) },
     attributes: STAT_KEYS_ORDER.map((key) => ({ key, value: liveStat(e, key) })),
-    // MAC-G (Mac: "the enhanced stat page ... doesn't have any listing
-    // for character advantages/disadvantages"). GetClassSpecials, off
+    // MAC-G. GetClassSpecials, off
     // the career's flags and the race template - the same list the
     // classic sheet's History button pops before the history window,
     // which the port had never drawn in EITHER skin.

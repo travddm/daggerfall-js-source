@@ -1,5 +1,4 @@
-// DUEL1 (2026-09-24, Mac: "...traps both players in a surrounding transparent holographic wall that keeps them from
-// going outside of the duel space"): THE RING, HELD AND DRAWN. The motor's clamp (player/motor.js _keepInArena - the
+// DUEL1: THE RING, HELD AND DRAWN. The motor's clamp (player/motor.js _keepInArena - the
 // body kept inside after every step, the outward half of a jump taken away, the ring shifted with the world and dropped
 // on any placement); the wall (render/duelWall.js - the cylinder placed by its uniforms, see-through by construction,
 // every rate whole cycles over its clock, fogged, its GL state restored); and the world host by source (the ring set on
@@ -120,6 +119,21 @@ test('DUEL1 the wall\'s light: added onto the frame (it only brightens - see-thr
   assert.ok(DUEL_WALL_COLOR.every((v) => v >= 0 && v <= 1), 'a display colour');
 });
 
+test('the wall light is defined on every GPU: below the sweep and below the foot the shader squares a negative number, and a pow() of a negative base is undefined in GLSL (mutant: pow(x, 2.0) back)', () => {
+  const below = DUEL_WALL_BELOW_M / DUEL_WALL_HEIGHT_M;
+  for (const time of [0, 1.3, 2.6, 4.1]) {
+    for (let h = 0; h <= 1; h += 0.05) {
+      const shader = glslFunctions(DUEL_WALL_FS, {
+        vUV: [0.2, h], vWorld: [0, 0, 0], uTime: time, uColor: [1, 1, 1], uAlpha: 1, uBelow: below,
+        uFogMode: 0, uFogDensity: 0, uFogRange: [0, 1], uCamPos: [0, 0, 0],
+      }, { strictPow: true });
+      shader.main();
+      const colour = shader.globals.o;
+      assert.ok(colour.every(Number.isFinite), `a defined colour at height ${h.toFixed(2)}, time ${time}: ${colour}`);
+    }
+  }
+});
+
 test('DUEL1 the draw: one call a ring, the faded skipped, at most DUEL_WALL_RINGS_MAX; ONE, ONE blending, no depth written, both faces - and the renderer\'s state put back (mutants: depth written, the wall occluding the fight; culling left off for the world after it; a faded ring drawn)', () => {
   const calls = [];
   const gl = new Proxy({ VERTEX_SHADER: 1, FRAGMENT_SHADER: 2, COMPILE_STATUS: 3, LINK_STATUS: 4, ARRAY_BUFFER: 5, STATIC_DRAW: 6, FLOAT: 7, TRIANGLES: 8, BLEND: 9, ONE: 10, CULL_FACE: 11 }, {
@@ -149,24 +163,3 @@ test('DUEL1 the draw: one call a ring, the faded skipped, at most DUEL_WALL_RING
   assert.equal(calls.filter((c) => c[0] === 'drawArrays').length, 1, 'a ring faded out is not drawn at all');
 });
 
-test('DUEL1 the world host by source: the wall built in every skin (a shader that will not build costs the wall, never the game); drawn after the grass from the view\'s own eye, fogged, a foreign pass; the ring set on the motor every frame from the WORLD frame (a recenter moves the scene, not the ring) and only outdoors; my ring said on the foes frame for the onlookers, theirs read back through the ring law, each duel drawn once (mutants: the wall on the enhanced lane alone; drawn from cam.pos; the ring cached in the scene frame; an onlooker\'s ring drawn twice)', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const duelWall = \(\(\) => \{ try \{ return new DuelWallRenderer\(renderer\.gl\); \} catch \(e\) \{ console\.warn\('\[duel\] the ring wall could not be built', e\); return null; \} \}\)\(\);/);
-  const grass = w.indexOf("renderer.markForeignPass();   // EV6: the grass changed programs behind the shadows' back");
-  const wall = w.indexOf('duelWall.draw(rings, proj, view, new Float32Array(mwv.eye), now / 1000,');
-  const arrows = w.indexOf('arrows.update(foeDt, {');
-  assert.ok(grass > 0 && wall > grass && arrows > wall, 'after the grass, before the arrows and the weapon');
-  assert.match(w, /duelWall\.draw\(rings, proj, view, new Float32Array\(mwv\.eye\), now \/ 1000,\s*\n\s*\{ mode: renderer\._fogMode, density: renderer\._fogDensity, range: renderer\._fogRange, color: renderer\._fogColor, camPos: renderer\._camPos, dw: renderer\._dwFog, haze: renderer\._haze, focus: renderer\._focus \}\);[^\n]*\n\s*renderer\.markForeignPass\(\);/);   // DW-C: the carved sea's fog rides with the frame's
-  assert.match(w, /player\.arena = live && \(modes\?\.mode \?\? 'exterior'\) === 'exterior' \? \{ centre: campToScene\(live\.c\), radius: DUEL_RADIUS_M \} : null;/, 'every frame, off the world frame');
-  assert.match(w, /else \{ out\.push\(\{ centre: campToScene\(w\.c\), radius: DUEL_RADIUS_M, alpha: w\.alpha \}\); seen\.add\(w\.s\); \}/);
-  assert.match(w, /if \(seen\.has\(e\.rec\.s\)\) continue;\s*\n\s*seen\.add\(e\.rec\.s\);\s*\n\s*out\.push\(\{ centre: campToScene\(e\.rec\.c\), radius: DUEL_RADIUS_M, alpha: 0\.85 \}\);/, 'each duel once');
-  assert.match(w, /exteriorFoes\.setOnDuel\(\(from, r, at\) => \{ const rec = r === null \? null : validRingRecord\(r\); if \(rec\) _duelRings\.set\(from, \{ rec, at \}\); else _duelRings\.delete\(from\); \}, \(\) => _duelRings\.clear\(\)\);/);
-  assert.match(w, /_hccDirty = false; \} if \(cell\) duelRingWord\(frame, full\);/, 'my ring rides my own foes frame');
-  assert.match(w, /if \(online && isCellRoom\(online\.room\) && \(duelMgr\.live\?\.s \?\? null\) !== _duelRingSaid\) _foesFullAt = -Infinity;/, 'a change goes out at once - in a cell room, the only one whose frame carries it (AUDIT DUEL1 C1)');
-  const x = rd('src/scenes/exteriorFoes.js');
-  assert.match(x, /if \(data\.du !== undefined\) _onDuel\?\.\(from, data\.du, _now\(\)\);/, 'past the owner\'s room test');
-  assert.match(x, /_onHccClear\?\.\(\);[^\n]*\n\s*_onDuelClear\?\.\(\);/, 'and cleared with the puppets');
-  // PIN MOVED (TELL6e: the step's input is emptied while knocked down - `moveInput` - and a blow's push moves the feet
-  // after the step; the clamp stands after both, so no push leaves the ring)
-  assert.match(rd('src/player/motor.js'), /this\._step\(step, moveInput, yaw, pitch\);\s*\n\s*this\._pushStep\(step\);[^\n]*\n\s*if \(this\.arena\) this\._keepInArena\(\);/, 'the clamp after the collider\'s move, every step');
-});

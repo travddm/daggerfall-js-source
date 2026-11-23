@@ -1,4 +1,4 @@
-// SEAT-COUNT (bible/11-Multiplayer/Seats-Arc.md 3.1: "tools/seatCount.mjs ... walks MAPS.BSA from ARENA2_PATH exactly as
+// SEAT-COUNT (3.1: "tools/seatCount.mjs ... walks MAPS.BSA from ARENA2_PATH exactly as
 // the boot pass does and prints every seat (region, kingdom, name, tier, hub or not, whether its blocks place a bulletin
 // board, the pixel) and the totals. It writes nothing to the tree; Mac runs it."). The seats are systems/town/townSeats.js
 // deriveTownSeats over the game's own rows (the boot pass's, regionHubs.js pickRegionHubs's); each is laid out

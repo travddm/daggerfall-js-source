@@ -34,7 +34,7 @@ import { RMB_SIDE } from '../../world/locationLayout.js';
 import { directionHintString } from './talk.js';   // wave 27: one compass law
 import { staticNpcData, isChildNPCData } from '../../characters/staticNpc.js';   // QP1: the one SetLayoutData law
 import { collectInteriorPeople } from '../../characters/interiorPeople.js';   // QP1: the one people mapper
-import { hasInteriorModels } from '../../world/interior/interiorLayout.js';   // FIELD BUGS 2026-10-05 CRYPT-SALE: a room that cannot be laid out is not for sale
+import { hasInteriorModels, interiorCast } from '../../world/interior/interiorLayout.js';   // FIELD BUGS 2026-10-05 CRYPT-SALE: a room that cannot be laid out is not for sale; IC-INTERIORS: a made room's cast
 import { buildingSummaries } from '../../world/buildingSummaries.js';   // D9: GetBuildingList's own per-block building walk (RMBLayout.GetBuildingData)
 import { localizedTable } from '../textManager.js';   // L10N3d: DFU's Internal_Strings, read in the player's language
 
@@ -69,7 +69,7 @@ export function npcKnowsAboutItem(npcSeed, buildingKey, socialGroup = 0, questio
 // Furniture stores, which classic never offers. The list is built in
 // BUILDING_TYPES enum order (DFU walks the enum), and three captions
 // were paraphrased rather than taken from DFU's strings. PROF-FOUND
-// (2026-10-12): the Furniture Store, Carpentry's workbench, is asked
+// the Furniture Store, Carpentry's workbench, is asked
 // after again under its own group AFTER these (world/buildingNames.js
 // OPENED_SHOP_TYPES; scenes/townTalk.js, systems/topicTree.js) - this
 // list stays DFU's.
@@ -170,6 +170,11 @@ export function drawNamedBuildings(exteriorBuildings, blocks, { locationIndex = 
   const out = new Map();   // block -> merged buildingDataList copy
   for (const b of blocks) {
     const list = b.dfBlock.rmbBlock.fldHeader.buildingDataList.map((d) => ({ ...d }));
+    // BLD (IC-GRAND, BLD; Port-Ledger section A, IC-GRAND): A BLOCK THAT NAMES ITS OWN
+    // BUILDINGS - the Imperial City's fabric (world/imperialFabricBuildings.js withFabricBuildings) - keeps its records and
+    // draws none of the location's list: the outcome that list would give carrying them in grid order, and a classic
+    // block's draw after it untouched
+    if (b.dfBlock.ownNamedBuildings) { out.set(b, list); continue; }
     // AUDIT 2026-08-17c: DFU scans SubRecords.Length entries, NOT the
     // full 32-slot header - garbage entries past the subrecord count
     // must never steal pool draws (they misalign every later name).
@@ -351,7 +356,9 @@ export function questorCandidateBuildings(exteriorBuildings, blocks, {
       if (!data) continue;
       const buildingKey = makeBuildingKey(b.x ?? 0, b.y ?? 0, i);
       const sub = b.dfBlock.rmbBlock.subRecords?.[i];
-      const npcs = (sub?.interior?.blockPeopleRecords ? collectInteriorPeople(sub) : []).map((p) => {
+      // IC-INTERIORS: a made interior's people as its cast's record holds them (their names the same - interiorCast)
+      const cast = interiorCast(sub);
+      const npcs = (cast?.blockPeopleRecords ? collectInteriorPeople({ interior: cast }) : []).map((p) => {
         const d = staticNpcData(p, {
           mapId, locationIndex, buildingKey, getFaction, raceOfCurrentRegion,
         });
@@ -463,7 +470,7 @@ export const QUESTION_TYPE_REACTION_MODS = Object.freeze([5, 0, 0, 0, 5, 0, 0, 0
 export const ETIQUETTE_REACTION_MODS = Object.freeze([-10, 5, 10, 15, -15]);
 export const STREETWISE_REACTION_MODS = Object.freeze([10, 5, -10, -15, 15]);
 
-/** TONE-TASTE (2026-10-15, Mac: "someone who didnt like etiquette still went up"): how the one spoken to takes a
+/** TONE-TASTE: how the one spoken to takes a
  *  tone - 1 a tone their group takes kindly (its row in the tables above over nought: Polite with Merchants, Scholars
  *  and Nobles, Blunt with Commoners, Merchants and the Underworld), -1 one it takes ill, 0 the Normal tone. The
  *  reaction's own fold (sgroup 5 and above is a Merchant's); a group off the tables takes nothing. The port's, read

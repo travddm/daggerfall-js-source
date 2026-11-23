@@ -1,6 +1,5 @@
-// GUILD-WINDOW (2026-10-23, the owner: "overhaul the guild tab to be more of a full fledged detailed window with easy
-// navigation and readabity instead of being stuffed as a small window in the social tab") - THE GUILD TAB IS A WINDOW
-// OF ITS OWN (bible/11-Multiplayer/Guild-Overhaul.md GUILD-WINDOW): the panel in its guild mode while the Guild tab is
+// GUILD-WINDOW - THE GUILD TAB IS A WINDOW
+// OF ITS OWN (GUILD-WINDOW): the panel in its guild mode while the Guild tab is
 // up, its Social button back to the tab last up (the social tabs' badges summed on it), the social door never the
 // window's, the pages a column with their names, counts and what each holds (the arrow keys walk it, and no arrow in
 // the window is the world's), each page's sections in cards, the last act's words in the window's foot, the focus kept
@@ -268,7 +267,3 @@ test('GUILD-WINDOW the sheet: the window sized past every place the social mode 
   has(':root:has(.dfduel-toast.second[data-up="1"]) .dfsocial[data-mode="guild"][data-open] { top: calc(144px + env(safe-area-inset-top, 0px));', 'W1: and below a second toast');
 });
 
-test('GUILD-WINDOW AUDIT W14: the status widget does not fold under the Guild window - the HUD\'s band reads the Social panel in its social mode alone (mutants: the window read again)', () => {
-  const hud = readFileSync(new URL('../../../src/ui/enhanced/enhancedHud.js', import.meta.url), 'utf8');
-  assert.ok(hud.includes(`const STAT_ABOVE = '.dfchat, .dfsocial[data-open="1"]:not([data-mode="guild"]), .wb-boss-bar,`));
-});

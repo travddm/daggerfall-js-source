@@ -1,4 +1,4 @@
-// CSA-B (2026-09-27) - COME SAIL AWAY'S BOATS BUILT: world/prefabNode.js (a
+// CSA-B - COME SAIL AWAY'S BOATS BUILT: world/prefabNode.js (a
 // Unity prefab instanced - the Transform rules the C# leans on),
 // systems/comeSailAway/comeSailAwayModels.js (the vendored meshes read back, and which
 // Daggerfall texture each renderer's slot wears) and systems/comeSailAway/comeSailAwayBoat.js
@@ -255,7 +255,7 @@ test('CSA-B: SpawnBoat builds each of the five hulls as GetBoatTransforms walks 
     assert.equal(boat.DoorTriggers.length, 0);
     assert.equal(boat.OarParticles.length, want.oars, `${label}: oars`);
     assert.equal(boat.RudderEmitters.length, want.rudderEffects);
-    // SHIP-PACK (PIN MOVED): a crewed hull packs as the small boats do - the prefab's own `Packable` node, or its `Crewed`
+    // SHIP-PACK (
     assert.deepEqual([boat.crewed, boat.packable], [want.crewed, want.packable || want.crewed], `${label}: crewed / packable`);
     for (const [k, t] of [['DriveTrigger', 'DriveTrigger'], ['CargoTrigger', 'CargoTrigger'], ['VariantTrigger', 'VariantTrigger'], ['StatusTrigger', 'StatusTrigger'], ['PositionTrigger', 'PositionTrigger'], ['BedObject', 'BedObject'], ['FireObject', 'FireObject'], ['FlagObject', 'FlagObject']]) {
       assert.equal(!!boat[k], want.has(t), `${label}: ${k}`);

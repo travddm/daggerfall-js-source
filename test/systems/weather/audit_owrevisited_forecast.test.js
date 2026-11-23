@@ -1,5 +1,4 @@
-// AUDIT OW-REVISITED (2026-10-20, the owner: "Audit this and ensure perfection"; bible/01-Overview/audits/Audit-Overworld-
-// Revisited.md): THE FORECAST, as lane L3 found it and as it is now. The headline (L3-1): the whole way was asked at the
+// AUDIT OW-REVISITED: THE FORECAST, as lane L3 found it and as it is now. The headline (L3-1): the whole way was asked at the
 // pace of the moment, while a road runs at x100, the open ground at x60, a track at a cautious force and a town's streets
 // at x5 - a third of the "ahead" lines untrue on arrival offline, four in five at an online journey's start. Each stretch
 // now walks at its own pace; pinned against a PHYSICAL model of the walk (each stretch's motion and clock, never the
@@ -156,7 +155,7 @@ test('AUDIT OW-REVISITED L3-10 / L3-6: A PASS IS READ A FEW PLACES A FRAME, and 
   } finally { setWeatherMapLaw(null); }
 });
 
-test('AUDIT OW-REVISITED L3-4 / L3-7 / L3-14: HERE AT THE TRAVELLER\'S OWN HEIGHT (the sky\'s air, never the ground\'s mean); a change found to the minute, not the quarter hour; an event that holds the sky (Sun Baby) says nothing (mutants: the height dropped; the bisection undone; the event unread)', () => {
+test('AUDIT OW-REVISITED L3-4 / L3-7 / L3-14: HERE AT THE TRAVELLER\'S OWN HEIGHT (the sky\'s air, never the ground\'s mean); a change found to the minute, not the quarter hour; an event that holds the sky says nothing (mutants: the height dropped; the bisection undone; the event unread)', () => {
   setWeatherMapLaw(true);
   try {
     const heights = [];

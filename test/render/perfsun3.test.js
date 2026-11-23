@@ -1,5 +1,4 @@
-// PERF-SUN3 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"): THE SUN'S CASCADES SHARE ONE WALK (bible/07-Rendering/Performance-Online.md PERF-SUN3; PERF-NEXT item 1).
+// PERF-SUN3: THE SUN'S CASCADES SHARE ONE WALK (PERF-SUN3; PERF-NEXT item 1).
 // Every cascade's replay walked every record and every flat of the frame; now one walk finds the far cascade's, and each
 // nearer cascade's list is found from the next one out's (shadowPass.js _sunCandidates). These pins hold the cascades to
 // the draws they made - every draw of every frame, its program, VAO, framebuffer, count and offset, in order, against

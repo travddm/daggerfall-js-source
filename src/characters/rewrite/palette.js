@@ -5,7 +5,7 @@
 // upstream first, then re-vendor + re-capture.
 // Palette + band-quantised flat shading (the voxel pixel-art look).
 
-      // ════════════════════════ palette ════════════════════════
+      // palette
       const P = {
         metal: [104, 114, 129],
         metalD: [64, 70, 81],

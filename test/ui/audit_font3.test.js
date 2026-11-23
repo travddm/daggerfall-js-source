@@ -1,5 +1,5 @@
-// AUDIT FONT3 (2026-10-02, Mac: "Audit this", of FONT3 - 64369501). Each pin below names its finding
-// (bible/01-Overview/audits/Audit-Font3.md) and fails on the unfixed tree for the finding's reason.
+// AUDIT FONT3. Each pin below names its finding
+//  and fails on the unfixed tree for the finding's reason.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -145,7 +145,7 @@ test('AUDIT FONT3 L3/L6/L7: the corners and the narrow labels track none where t
 test('AUDIT FONT3 C2/C3: the dim a step under the mid, and the film\'s phone words at the floor', () => {
   assert.match(ENHANCED_CSS, /--dim: #9a9486;/);
   const intro = read('src/ui/intro/introScreen.js');
-  // TITLE-DOOR (2026-10-27): Tap to continue is retired - the menu's doors stand on the held title in its place
+  // TITLE-DOOR: Tap to continue is retired - the menu's doors stand on the held title in its place
   assert.doesNotMatch(intro, /intro-continue/);
   assert.match(intro, /intro-footer\{font-size:11px\}/);
 });

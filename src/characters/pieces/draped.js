@@ -1,8 +1,8 @@
 // Draped garments - standoff cloth that hangs OFF the body (skirts, robes,
 // cloaks, dresses, surcoats, togas, sashes, wraps, mummy wraps). Unlike
 // body-hugging clothing (vertex displacement), each is a separate GRID
-// that the verlet cloth sim (clothSim.js) simulates + collides against the
-// body. This module owns the geometry: the measured body collider
+// that a cloth sim could simulate + collide against the
+// body (the verlet sim that did so was removed with the paperdoll viewer). This module owns the geometry: the measured body collider
 // (BODY_CORE), the per-garment grids (drapedGrid), and materials
 // (DRAPE_MATERIAL). Two grid kinds: ring lofts (GRIDSPEC - skirts, robes,
 // capes, tunics) and centreline strips (stripGrid - the sash).
@@ -126,7 +126,7 @@ export function drapedGrid(name) {
   return { rows: R, cols, wrap, pos, faces };
 }
 // One grid quad -> a pieceLoft-convention face ({p: 12 floats, n, g}).
-// AUDIT 68 S06-draped-group-tag: g is the RIG GROUP every packer and
+// g is the RIG GROUP every packer and
 // animator keys on - a drape hangs off the torso, so 'body' (it carried
 // the DRAPE_MATERIAL table itself, and packed as body only by accident).
 function facesFromGrid(g) {

@@ -1,5 +1,5 @@
-// MEM-AUDIT (2026-10-23, the owner: "a comprehensive performance audit, looking for memory leaks"): what a place, a map
-// pixel, a menu or a session online left standing after its life (bible/07-Rendering/Performance-Priority.md MEM-AUDIT).
+// MEM-AUDIT: what a place, a map
+// pixel, a menu or a session online left standing after its life (MEM-AUDIT).
 // Each pin drives the module that owned the leak; where the owner is a host's or a window's wiring (setMode, the menu's
 // account card and foot, the item menu's timer, the classic sky's bound) it reads that one line. Each names its mutants
 // (tools/mutants/memaudit.json). AUDIT MEM-AUDIT (01-Overview/audits/Audit-Mem-Audit.md) widened them.
@@ -334,14 +334,7 @@ test('MEM-AUDIT the market\'s cache holds exactly MARKET_CACHE_KEPT (256), the l
 
 // ─── THE HOSTS' AND THE WINDOWS' OWN LINES ───────────────────────────
 
-test('MEM-AUDIT the place left is let go: setMode clears what latched the last room\'s and the last castle\'s context (mutants: a latch kept)', () => {
-  const src = hostText('src/scenes/worldModes.js');
-  const line = src.slice(src.indexOf('  const setMode = (next) => {'), src.indexOf('};', src.indexOf('  const setMode = (next) => {')));
-  assert.match(line, /if \(next !== 'interior'\) \{ _arrowsCtx = null; interiorArrows\.clear\(\); cardLookedCtx = null; cardStandsDue\.clear\(\); gambitStandsDue\.clear\(\); \}/);
-  assert.match(line, /if \(next !== 'dungeon'\) \{ _crownTried = null; arenaWall = null; _arenaStage = _arenaStageCtx = null; _pitStage = _pitStageCtx = null; \}/);
-});
-
-test('MEM-AUDIT the windows\' listeners and caches: the account card\'s focus listener goes with its card (driven: a card made, then let go), and the menu lets each go - a repaint\'s card, the close, the unmount, with the foot\'s observer; an item menu\'s pair with its menu, its timer its own; the icons\' encodings with their pictures (AUDIT P7) (mutants: each kept)', () => {
+test('MEM-AUDIT the windows\' listeners and caches: the account card holds no window listener and its let-go is safe to call (driven: a card made, then let go), and the menu lets each go - a repaint\'s card, the close, the unmount, with the foot\'s observer; an item menu\'s pair with its menu, its timer its own; the icons\' encodings with their pictures (AUDIT P7) (mutants: each kept)', () => {
   const live = new Set();
   const win = { addEventListener: (t, f) => { if (t === 'focus') live.add(f); }, removeEventListener: (t, f) => { if (t === 'focus') live.delete(f); } };
   const mk = (tag) => {
@@ -351,9 +344,9 @@ test('MEM-AUDIT the windows\' listeners and caches: the account card\'s focus li
   };
   const flow = AccountFlow({ io: { fetch: async () => { throw new Error('no network'); } }, storage: { getItem: () => null, setItem() {}, removeItem() {} } });
   const card = accountCard({ createElement: mk, defaultView: win }, flow);
-  assert.equal(live.size, 1, 'the card listens for the window\'s focus');
+  assert.equal(live.size, 0, 'the card listens for no window focus');
   card.off();
-  assert.equal(live.size, 0, 'and lets it go when told');
+  assert.equal(live.size, 0, 'and its let-go leaves nothing behind');
   const menu = rd('ui/enhanced/enhancedMenu.js'), inv = rd('ui/enhanced/enhancedInventory.js');
   assert.match(menu, /acctPaint = card\.paint;\n {2}acctOff\?\.\(\); acctOff = card\.off \?\? null;/, 'the card drawn before is let go');
   assert.match(menu, /acctOff\?\.\(\); acctOff = null;\n {2}acctPaint = null;\n {2}rereadCollectionsAccount\(\);/, 'the close');

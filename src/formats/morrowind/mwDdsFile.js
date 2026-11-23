@@ -122,7 +122,7 @@ function maskShift(mask) {
 /**
  * Decode a DDS file to RGBA8 mip levels.
  * @param {Uint8Array} bytes
- * @param {{levels?:number}} [opts] - MW-LOAD: decode at most this many
+ * @param {{levels?:number}} [opts] - decode at most this many
  *   levels from the top (default: the whole chain). A measurement that
  *   reads level 0 only (the face match's head and hair candidates)
  *   should not pay for the chain below it - a third again of the work.

@@ -1,5 +1,4 @@
-// VC7e - CLOUD DETAIL (2026-09-23, Mac, on the cloudy blur and the flat
-// storm lid: "Whatever is the most visually detailed and immersive").
+// VC7e - CLOUD DETAIL.
 // Measured first: a deck's optical depth along the sun varied by a tenth
 // across the sky (overcast 0.56-0.80, thunder 5.1-6.3), so no lighting
 // could draw structure into it, and Beer's law alone made every storm

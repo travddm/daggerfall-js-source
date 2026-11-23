@@ -5,6 +5,7 @@ import { deductGold, deductGoldPieces } from '../../src/systems/court.js';
 import { StreamingWorldState } from '../../src/world/streamingWorld.js';
 import { waitForPartyArrival, PartyArrivalUnavailable, PARTY_ARRIVAL_TEXT, createPartyArrival, besideLeaderLanding } from '../../src/systems/party/partyArrival.js';
 import { BESIDE_OFFSETS } from '../../src/systems/party/partyTravelLaw.js';
+import { travelFare, travelFailedText } from '../../src/systems/travel/travel-fare.js';
 import { rig, HULL_NAMES } from '../partyBoatTeleportRig.mjs';
 
 const source = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
@@ -12,30 +13,32 @@ const start = source.indexOf('  async function fastTravelTo(');
 assert.ok(start >= 0);
 const travelSource = source.slice(start, source.indexOf('\n  }\n', start) + 5);
 
-function host({ safe = true, target = true, failBuild = false, boat = false, ownBoat = false, dry = false, preThrows = false, postThrows = false, besideAfter = 0 } = {}) {
+function host({ safe = true, target = true, failBuild = false, boat = false, ownBoat = false, dry = false, preThrows = false, postThrows = false, besideAfter = 0, unstreamed = false } = {}) {
   const events = [], lines = [], commits = [];
   const state = new StreamingWorldState(); state.init(100, 200);
   const player = { pos: [20, 12, 30], spawn(x, y, z) { this.pos = [x, y, z]; commits.push([...this.pos]); } };
   const entity = { goldPieces: 100, items: [], health: 50, maxHealth: 100, career: {} };
   const cam = { pos: [...player.pos], yaw: 0.3 };
   const originBoat = boat || ownBoat ? {} : null;
+  let helmHeld = !!originBoat;   // AUDIT HELM-SIGHT A1: departing aboard, at her helm - let go by StopSailing or OnPreFastTravel
   const destination = { pos: [140, 5, 130], yaw: 1, groundKey: 'csaBoat:1:hull' };
   let advances = 0, failures = 0, waits = 0, besideProbes = 0;
   const no = () => {};
   const deps = {
     worldMoveBusy: () => false, _traveling: false, walkMode: true,
-    wildTravelGate: () => ({ ok: true, fee: 0 }), wildTravelPaid: no,   // WILD3: the open zone off (wildJourney's answer with no mask) - every journey goes, no fee
+    travelGate: () => ({ ok: true }),   // the journey's gate: every journey goes
     playerTravelPixel: () => ({ ...state.current }), state, player, cam,
     csaBoatUnderMe: () => originBoat, csaLocalOf: () => [2, 3, 4], csaDeckPose: (b) => b,
     _partyTravelOriginBoat: null, _partyArrivalPending: false,
     hccRuntimeOn: () => ({ handlePreFastTravel: () => { if (preThrows) throw new Error('pre'); events.push('pre'); }, handlePostFastTravel: () => { events.push('post'); if (postThrows) throw new Error('post'); } }),
-    navalStow: no, csaRuntime: { OnPreFastTravel: () => events.push('pack'), StopSailing: () => events.push('stop-sailing'), OnPostFastTravel: no },
-    csaCall: (f) => f(), deductGoldPieces, deductGold, playerEntity: entity,
+    navalStow: no, csaRuntime: { isSailing: () => helmHeld, OnPreFastTravel: () => { helmHeld = false; events.push('pack'); }, StopSailing: () => { helmHeld = false; events.push('stop-sailing'); }, OnPostFastTravel: no },
+    csaCall: (f) => f(), deductGoldPieces, deductGold, travelFare, travelFailedText, playerEntity: entity,
     warmAshesOn: () => false, warmAshesPreTravel: no, isOnShip: () => false, cacheExteriorScene: no,
     _teleportToPixel: async (x, y, local, opts) => {
       events.push(`build:${x}`); state.init(x, y);
       if (failBuild && failures++ === 0) throw new Error('injected world load failure');
-      const landing = opts.resolveArrival ? await opts.resolveArrival([409, dry ? 10 : -30, 409]) : { pos: [409, 10, 409] };
+      // AUDIT HELM-SIGHT A1: `unstreamed` - a pixel this client does not stream, where the core takes the landing's word away
+      const landing = opts.resolveArrival && !unstreamed ? await opts.resolveArrival([409, dry ? 10 : -30, 409]) : { pos: [409, 10, 409] };
       player.spawn(...landing.pos); if (landing.yaw != null) cam.yaw = landing.yaw;
     },
     sharedClockOn: () => true, skyMinutes: () => 1000, worldMinutes: () => 1000,
@@ -68,7 +71,7 @@ function host({ safe = true, target = true, failBuild = false, boat = false, own
   // Execute the complete production travel function, with explicit host seams.
   const api = new Function(...Object.keys(deps), travelSource + '\nreturn { run: fastTravelTo, flags: () => [_traveling, _partyArrivalPending, _partyTravelOriginBoat] };')(...Object.values(deps));
   const pick = { pixel: { x: 300, y: 150 }, name: 'Open sea', besideText: 'Joined leader.', besideMissedText: 'Not beside the leader.', besideAt: () => target ? { x: 1, y: 5, z: 2 } : null, besideSeat: 0 };
-  return { ...api, pick, entity, player, cam, events, lines, commits, counts: () => ({ advances, waits }) };
+  return { ...api, pick, entity, player, cam, events, lines, commits, counts: () => ({ advances, waits }), helmHeld: () => helmHeld };
 }
 const fare = { piecesCost: 5, totalCost: 20, minutes: 100 };
 
@@ -114,6 +117,18 @@ test('TRANSACTION: ordinary fast travel retains the existing fare and arrival be
   assert.deepEqual(h.commits, [[409, 10, 409]]);
   assert.ok(h.events.indexOf('pack') < h.events.indexOf('build:300'));
   assert.equal(h.counts().waits, 0);
+});
+
+test('a fast travel whose build fails is put back where it set out, its fare returned, the screen cleared and the player told - it threw, and left the screen black (mutants: the throw kept; no refund)', async () => {
+  const h = host({ failBuild: true }); delete h.pick.besideAt;
+  assert.equal(await h.run(h.pick, {}, fare), false, 'the journey did not happen');
+  assert.deepEqual(h.events.filter((e) => e.startsWith('build:')), ['build:300', 'build:100'], 'the destination failed, the departure built again');
+  assert.deepEqual(h.commits, [[20, 12, 30]], 'back where it set out');
+  assert.equal(h.entity.goldPieces, 100, 'the fare returned');
+  assert.ok(h.events.includes('clear'), 'the screen cleared');
+  assert.equal(h.lines.at(-1), travelFailedText());
+  assert.equal(h.counts().advances, 0, 'no time passed');
+  assert.deepEqual(h.flags(), [false, false, null]);
 });
 
 test('RETRY: the cap terminates even with a stalled clock', async () => {
@@ -214,4 +229,12 @@ test('PARTY-FOLLOW besideLeaderLanding: the leader\'s feet into this scene\'s fr
   const leaderY = 5 + state.compensation[1];
   assert.deepEqual(first.pos.map((v) => Math.round(v * 1000) / 1000), [10 + BESIDE_OFFSETS[0][0], leaderY, 20 + BESIDE_OFFSETS[0][1]].map((v) => Math.round(v * 1000) / 1000));
   assert.deepEqual(second.pos.map((v) => Math.round(v * 1000) / 1000), [10 + BESIDE_OFFSETS[1][0], leaderY, 20 + BESIDE_OFFSETS[1][1]].map((v) => Math.round(v * 1000) / 1000), 'seat 1 starts at the ring\'s second spot');
+});
+
+test('AUDIT HELM-SIGHT A1: a follower at her helm sent to a pixel this client does not stream - the journey ends with the helm held and the mod\'s frame free, so the runtime lets it go at its next frame (audit_helmsight.test.js)', async () => {
+  const h = host({ boat: true, unstreamed: true });
+  assert.equal(h.helmHeld(), true, 'at her helm as the journey begins');
+  assert.equal(await h.run(h.pick, {}, fare), true);
+  assert.equal(h.helmHeld(), true, 'no landing let it go');
+  assert.equal(h.flags()[1], false, 'the arrival\'s hold lifted: the mod\'s frame runs again');
 });

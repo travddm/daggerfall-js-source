@@ -1,11 +1,11 @@
-// PERF-ON4 (2026-10-09, Mac: "I want to continue working to increase performance across the board, especially for
-// online"): THE ONLINE FRAME PROBE - the REAL game online, in headless Chromium over the freeware ARENA2, joined to the
+// PERF-ON4: THE ONLINE FRAME PROBE - the REAL game online, in headless Chromium over the freeware ARENA2, joined to the
 // REAL relay and the REAL account service in local workerd (tools/loadHarness.mjs's own two services), with a crowd of
 // bots round the player - each bot the client's own OnlineSession, as the harness's fleet is. PERF-NEXT measured online
-// in node, over the modules (bible/07-Rendering/Performance-Next.md "Online, measured"); this measures the frame a player
+// in node, over the modules ("Online, measured"); this measures the frame a player
 // online pays, through the frame probe's own three windows (tools/frameProbe.mjs measure): the census of every WebGL
 // call, the CPU profile by sample count, and the sampled heap.
 //
+// Run it as `node --import ./tools/raw-import-hooks.ts tools/onlineFrameProbe.mjs`: the game source it imports reaches `.vert` shaders, which plain node cannot load.
 //   ARENA2_PATH=/path/to/arena2 node tools/onlineFrameProbe.mjs            crowds of 0, 20, 60 and 0 again
 //   PEERS=0,40 CHAT=1 ...                                                   the crowds, in order (a smaller one after a
 //                                                                           larger sends the extra bots away); CHAT=1 opens
@@ -34,7 +34,7 @@
 // default's last crowd is 0 again: the drift between the first and the last is the run's own noise floor.
 //
 // Three probe-only transforms beside the frame probe's own, the tree untouched: the account base may be the local service
-// (net/accountClient.js serviceBase answers an https base alone); `?shot` survives the online boot (REALM P0.1 refuses
+// (net/account-service-address.ts isServiceUrl answers an https base alone); `?shot` survives the online boot (REALM P0.1 refuses
 // it there - systems/online/onlineLane.js ONLINE_REFUSED_FLAGS - because it installs the probe seams, which are the instrument
 // here: `__frame`, `__shotReady`); and the composer's hook (`__probeSaveText`, with `__onlinePeers`, the peers the
 // session draws, its status and the way book's size - `__probeOnline`). `?tod` is still refused online, so the sky is the shared clock's: an A/B's two arms stand at
@@ -52,12 +52,17 @@ import { fileURLToPath } from 'node:url';
 
 import { probeTransforms, editsPlugin, waitFrames, settle, measure, measured, summaryLine, CENSUS, SWIFTSHADER_ARGS } from './frameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
+import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
+import { fakePointerLock } from './probes/lib/fakePointerLock.mjs';
 import { standServices, stopAll, makeBot, setUp, localFetch, localWebSocket, relayTally, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { OnlineSession } from '../src/net/online.js';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../src/systems/realmSaves.js';
 import { worldRoom, CHAT_WORLD_ROOM, PIXEL_UNITS } from '../src/net/wire.js';
 import { PIXEL_M } from '../src/net/gate/gateLaw.js';
+import { OFFICIAL_PROFILE } from '../src/net/profile/officialProfile.ts';
+import { profileHashOf } from '../src/net/profile/profileHash.ts';
+import { installProfile } from '../src/systems/online/serverProfile.ts';
 import { ACCEPTED } from '../src/net/legalLaw.js';
 
 const ROOT = process.env.TREE || fileURLToPath(new URL('..', import.meta.url));
@@ -83,8 +88,8 @@ const dropState = () => { if (stateDir) { try { rmSync(stateDir, { recursive: tr
 /** The edits this probe makes beside the frame probe's (FRAME_PROBE_EDITS' shape: each needle asserted, and held to the
  *  tree by test/tooling/perfon4_probes.test.js). */
 export const ONLINE_PROBE_EDITS = Object.freeze([
-  // the account base may be the local service - serviceBase answers an https base alone
-  { file: 'src/net/accountClient.js', edits: [["/^https:\\/\\/\\S+$/.test(v)", "/^(https:\\/\\/\\S+|http:\\/\\/127\\.0\\.0\\.1:\\d+)$/.test(v)"]] },
+  // the account base may be the local service - isServiceUrl answers an https base alone
+  { file: 'src/net/account-service-address.ts', edits: [["/^https:\\/\\/\\S+$/.test(value)", "/^(https:\\/\\/\\S+|http:\\/\\/127\\.0\\.0\\.1:\\d+)$/.test(value)"]] },
   // REALM P0.1 drops `?shot` from an online boot - it installs the probe seams, `__addGold` among them, which no player's
   // world may carry. Here the world is this run's own, local, and the seams are the instrument
   { file: 'src/systems/online/onlineLane.js', edits: [["export const ONLINE_REFUSED_FLAGS = Object.freeze(['shot', ", 'export const ONLINE_REFUSED_FLAGS = Object.freeze([']] },
@@ -139,6 +144,7 @@ async function main() {
     else {
       console.log('== the first save: an offline boot at Knightstale, composed by the world host');
       const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+      await fakePointerLock(ctx);
       const page = await ctx.newPage();
       await page.goto(`http://localhost:${PORT}/play/?world&region=Wayrest&loc=Knightstale&class=1&novideo&shot&play&tod=15:00`);
       await page.waitForFunction(() => window.__shotReady === true, null, { timeout: 1200000, polling: 500 });
@@ -157,6 +163,7 @@ async function main() {
 
     console.log('== the online boot');
     const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+    await fakePointerLock(ctx);
     await ctx.addInitScript(({ sk, sv, sess, base }) => {
       try { localStorage.setItem(sk, sess); localStorage.setItem(sv, base); } catch { /* a page without storage reads none */ }
     }, { sk: SESSION_KEY, sv: SERVICE_KEY, sess: JSON.stringify({ secret: made.secret, id: made.id, name: made.name }), base: `http://127.0.0.1:${svc.accountPort}` });
@@ -171,6 +178,7 @@ async function main() {
     const url = `/play/?world&online&realm=${c.data.id}&load&server=ws://127.0.0.1:${svc.relayPort}&novideo&shot&play&fps&tod=15:00`;
     const t0 = Date.now();
     await page.goto(`http://localhost:${PORT}${url}`);
+    await joinServerPrompt(page);
     // where the boot stands, every half minute until it is ready - an online boot refused goes to the title, never ready
     for (let i = 0; !(await page.evaluate(() => window.__shotReady === true)); i++) {
       if (i >= 40) throw new Error('the online boot never readied in 20 minutes');
@@ -203,6 +211,9 @@ async function main() {
     console.log(`== setting up ${most} bots`);
     for (let i = 0; i < bots.length; i += BOT_O.setup) await Promise.all(bots.slice(i, i + BOT_O.setup).map((b) => setUp(b, BOT_O)));
     const tally = relayTally();
+    // The relay refuses a hello that does not carry its profile hash. A page installs the profile in its front door; the
+    // bots are sessions in this process and install it here, once.
+    installProfile(OFFICIAL_PROFILE, await profileHashOf(OFFICIAL_PROFILE));
     const WS = localWebSocket({ port: svc.relayPort, tally });
     const relayUrl = `ws://127.0.0.1:${svc.relayPort}`;
     const botIds = new Set(bots.map((b) => b.id));

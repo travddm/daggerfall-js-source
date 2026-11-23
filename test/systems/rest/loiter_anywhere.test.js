@@ -1,6 +1,5 @@
 // @ts-check
-// LOITER-ANYWHERE (2026-10-04, Discord: "the new rest system ... has no loiter which again, another system that a lot
-// of quests want you to do"; "adding loitering without a camp needed would be a solution"): online the rest window
+// LOITER-ANYWHERE: online the rest window
 // opens on the act (REST1) and refused with no fire or bed, in a town's street, or under a building's own law - and
 // there was no Loiter anywhere. Now every refusal offers Loiter, and so does the act's channel; the loiter is classic's
 // whole arm (the hours prompt, loiterLimitHours, the loiter session - which recovers nothing and still rolls the hour's

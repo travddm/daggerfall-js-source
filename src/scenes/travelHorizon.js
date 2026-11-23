@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// OW-HORIZON (2026-10-20, the owner: "the overworld map as it stands doesnt allow you to see as far as the eye can
-// see, this needs to change without impacting performance"; bible/06-Systems/Travel-View.md OW-HORIZON): AS FAR AS
+// OW-HORIZON: AS FAR AS
 // THE EYE CAN SEE, FROM THE AIR.
 //
 // WHY THE VIEW STOPPED SHORT. Three laws, each right for the eye they were made for, met under the Overworld:
@@ -22,13 +20,12 @@
 // with it, so the depth buffer keeps its precision out there. All of it eases with the rise and the fall (the eye's
 // own smoothstep), so nothing pops as the camera leaves the head or comes back to it.
 //
-// WHAT IS NOT CHANGED. An EXPONENTIAL row is weather - rain, snow, a fog, a sandstorm - and stays the traveller's,
+// WHAT IS NOT CHANGED. An EXPONENTIAL row is weather - rain, snow, a fog, a sandstorm, an ashfall - and stays the traveller's,
 // exactly as TV1 measured it (the far ring stands down under it, as ever). On the ground nothing moves: with no view
 // up every function here hands back what it was given, the same object.
 //
 // THE COST. None of it draws anything new: the haze and the lens are numbers the frame already sends. The far
 // ring's pass (one draw) was drawn under the view before; past the grid it is what the eye now sees.
-// ═══════════════════════════════════════════════════════════════════
 
 import { RING_RIM_END } from '../render/farRing.js';
 import { perspective, mirrorProjectionX } from '../world/mat4.js';

@@ -1,9 +1,8 @@
-// CACHE-COPY (2026-10-07, Mac: "Ive noticed certain nivida cards have the issue. Like rapid flickering, epileptic
-// inducing"): THE SHADOW CACHE'S COPY, CHECKED ON THIS MACHINE'S GPU - with no flickering frame on screen.
+// CACHE-COPY: THE SHADOW CACHE'S COPY, CHECKED ON THIS MACHINE'S GPU - with no flickering frame on screen.
 //
 // SC1's static cache reached the live shadow layers by a depth BLIT out of a layer of one DEPTH_COMPONENT24 array into a
 // layer of another. On Direct3D 11 (ANGLE - every browser on Windows) that blit reads the layer through a view its
-// shader does not declare, and what comes back is the driver's (bible/07-Rendering/Enhanced-Lighting-Arc.md CACHE-COPY).
+// shader does not declare, and what comes back is the driver's (CACHE-COPY).
 // This fills a cache-shaped array with a known depth in every texel of every layer, copies it into a live-shaped one
 // both ways - the old blit, and CACHE-COPY's draw with shadowPass.js's own DEPTH_COPY_VS / DEPTH_COPY_FS - and reads
 // every texel back. Round after round, a new pattern each time: a read that is merely wrong and one that changes from

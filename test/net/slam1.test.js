@@ -1,5 +1,4 @@
-// SLAM1 (2026-09-16, Mac: "This Sunday is Daggerfall's 30th anniversary. A streamer is going to host a 30th
-// celebration server slam smack dab in DFE"): THE POSE FAN IS BOUNDED TO THE NEAREST LISTENERS.
+// SLAM1: THE POSE FAN IS BOUNDED TO THE NEAREST LISTENERS.
 //
 // A pose reached everyone in the room within range, so one Durable Object's cost was N senders times N listeners.
 // MEASURED over the real Room on the fake DO, a crowd standing together: 2.4k sends a second at 16 players, 22.6k
@@ -18,7 +17,7 @@
 // exact BECAUSE they are arithmetic - N x min(N-1, FAN) x rate - not because anybody observed them. On relay work
 // alone the bound may even cost more at 200; it wins only if ws.send() is dear next to a 199-element sort.)
 //
-// SLAM6 (2026-09-16, AUDIT SLAM) CORRECTED THE SECOND HALF OF THIS. "The nearest win and the rest hear silence" was
+// SLAM6 CORRECTED THE SECOND HALF OF THIS. "The nearest win and the rest hear silence" was
 // not a bound, it was an ERASURE: the silence law HIDES a peer after PEER_TIMEOUT_MS, so every listener past the
 // bound lost that sender off its screen entirely. And because the bound is a RANK, the loss fell hardest on the
 // densest player in the room - measured at 200 standing in one town block, the man in the middle was heard by 32 and

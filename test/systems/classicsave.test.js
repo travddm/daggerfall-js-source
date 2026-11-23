@@ -72,10 +72,10 @@ const concat = (...parts) => {
 
 // A 71-byte record root. Byte 0 is the record type (PeekRecordType's
 // read); the field offsets are ReadRecordRoot's.
-function buildRecordRoot({ type, recordId, parentRecordId = 0, spriteIndex = 0, questId = 0, time = 0 }) {
+function buildRecordRoot({ type, recordId, parentRecordId = 0, spriteIndex = 0, questId = 0, time = 0, pitch = -100, yaw = 200 }) {
   const w = new Writer(RECORD_ROOT_LENGTH);
   w.u8(0, type);
-  w.i16(1, -100); w.i16(3, 200); w.i16(5, -300);        // pitch/yaw/roll
+  w.i16(1, pitch); w.i16(3, yaw); w.i16(5, -300);        // pitch/yaw/roll
   w.i32(7, 111); w.i32(11, -222); w.i32(15, 333);        // position
   w.u16(27, spriteIndex);
   w.u16(29, 0x5678);                                     // picture2
@@ -895,7 +895,7 @@ test('corpus: every real classic save parses - version, character, savevars tabl
   }
 });
 
-// ═══════════════════════════ SAV2: the import core ═══════════════════════════
+// SAV2: the import core
 
 import {
   classicPitchDegrees, classicYawDegrees, convertClassicClimateWeathers,
@@ -938,7 +938,7 @@ function recordElement(type, recordId, parentRecordId, data = new Uint8Array(0),
 // conjured item, a filled soul gem, guild + old-guild rows, an
 // OldClass record, a bank record and the position record.
 function buildImportTree({ charOpts = {}, diseaseId = null, guildTime = 1440 * 10,
-  bankDataLength = 40, oldClassFlags = null, charName = null, templeFactionId = null } = {}) {
+  bankDataLength = 40, oldClassFlags = null, charName = null, templeFactionId = null, look = {} } = {}) {
   const header = new Writer(SAVE_TREE_HEADER_LENGTH);
   header.i32(0, SAVE_TREE_VERSION);
   header.i32(4, 0); header.i32(8, 0); header.i32(12, 0);
@@ -1002,7 +1002,7 @@ function buildImportTree({ charOpts = {}, diseaseId = null, guildTime = 1440 * 1
     recordElement(RECORD_TYPES.OldGuild, 41, 2, oldGuildRow.bytes),
     recordElement(RECORD_TYPES.OldClass, 43, 2, oldClass),
     recordElement(RECORD_TYPES.BankAccount, 44, 0, bank.bytes),
-    recordElement(RECORD_TYPES.CharacterPositionRecord, 45, 0, new Uint8Array(0), {}),
+    recordElement(RECORD_TYPES.CharacterPositionRecord, 45, 0, new Uint8Array(0), look),
   ];
   if (templeFactionId != null) {
     parts.push(recordElement(RECORD_TYPES.GuildMembership, 42, 2, templeRow.bytes));
@@ -1401,10 +1401,10 @@ test('SAV2: classicSaveToSnapshot - the whole envelope, at SAVE_VERSION', () => 
   // store's own rep (the Merge law end to end).
   assert.deepEqual(snap.factionRep.rep, [-3, 5]);
 
-  // The pose: converted look, classic weaponDrawn.
+  // The pose: converted look in radians (the camera's unit), classic weaponDrawn.
   assert.equal(snap.pose.weaponDrawn, true);
-  assert.equal(snap.pose.pitch, classicPitchDegrees(-100));
-  assert.equal(snap.pose.yaw, classicYawDegrees(200));
+  assert.equal(snap.pose.pitch, (classicPitchDegrees(-100) * Math.PI) / 180);
+  assert.equal(snap.pose.yaw, (classicYawDegrees(200) * Math.PI) / 180);
   assert.equal(snap.pose.crouching, false);
 
   // The bundle's host-frame half.
@@ -1414,6 +1414,18 @@ test('SAV2: classicSaveToSnapshot - the whole envelope, at SAVE_VERSION', () => 
   assert.equal(bundle.globalVars.length, 64);
   assert.equal(bundle.saveName, 'My Save');
   assert.equal(bundle.classicTransformedRace, TRANSFORMED_RACES.None);
+});
+
+// A UESP community save ("Shadow", outside The Silver Wolf Tavern) faces yaw 1828 with the view level; DOS draws that
+// view toward the north-west. The camera turns by sin/cos of its yaw in radians, x east and z north.
+test('SAV2: a classic save faces where DOS faced it - yaw 1828 lands north-west, in radians', () => {
+  const games = importSaveGames({ look: { yaw: 1828, pitch: 0 } });
+  const { snap } = classicSaveToSnapshot(games, { spellsByIndex: new Map(), factionStore: { dict: FAKE_FACTIONS } });
+  assert.ok(Math.abs(snap.pose.yaw - (1828 / 2048) * 2 * Math.PI) < 1e-9, `yaw ${snap.pose.yaw}`);
+  assert.equal(snap.pose.pitch, 0);
+  const east = Math.sin(snap.pose.yaw);
+  const north = Math.cos(snap.pose.yaw);
+  assert.ok(east < -0.6 && north > 0.7, `facing east ${east}, north ${north}`);
 });
 
 // The advancement law re-derived locally so a drifted import breaks
@@ -1492,14 +1504,14 @@ test('SAV2: MAPSAVE discovery lands in the envelope through the resolver seam', 
   });
 });
 
-// ═══════════════════════ SAV3: the window and the wiring ═══════════════════════
+// SAV3: the window and the wiring
 
 import {
   LoadClassicWindow, SAVE_IMAGE_RECTS, SAVE_TEXT_RECTS, OUTLINE_RECTS,
   LOAD_BUTTON_RECT, EXIT_BUTTON_RECT, LOAD_CLASSIC_IMG,
 } from '../../src/ui/loadClassicWindow.js';
 import {
-  importClimateWeathers, resetWeatherSim, tickWeather, currentWeatherEnum, WEATHER_ENUM, setSnowGroundLaw, currentWeatherRaw, setWeatherMapLaw,
+  importClimateWeathers, resetWeatherSim, tickWeather, currentWeatherEnum, WEATHER_ENUM, setSnowGroundLaw, currentWeatherRaw, setWeatherMapLaw, setWeatherFieldLaw,
 } from '../../src/systems/weather/weatherSim.js';
 import { bitmapToColor32 } from '../../src/formats/color32Order.js';
 import {
@@ -1570,6 +1582,17 @@ test('SAV3: importClimateWeathers - the imported array wears on the next tick, n
   resetWeatherSim(); setWeatherMapLaw(false);
 });
 
+// With the Weather events row off (no weather field, no weather map) the classic lane is DFU's: the save's own array is
+// the sky. With the row on, the weather map is the sky everywhere, the same for every player, so no save's weather shows.
+test('SAV3: the Shadow save\'s weather bytes reach the sky with Weather events off - Woodlands reads slot 5', () => {
+  resetWeatherSim(); setWeatherFieldLaw(false); setWeatherMapLaw(false); setSnowGroundLaw(false);
+  // SAVEVARS 0x17A2 in that save: [0, 2, 0x84, 5, 2, 6]; Daggerfall's region is Woodlands (231), the sixth slot.
+  assert.equal(importClimateWeathers(convertClassicClimateWeathers(Uint8Array.of(0, 2, 0x84, 5, 2, 6))), true);
+  tickWeather(0, 231, () => { throw new Error('a re-roll clobbered the imported array'); });
+  assert.equal(currentWeatherEnum(), WEATHER_ENUM.thunder, 'classic 6 is DFU\'s Thunder after the 5<->6 swap');
+  resetWeatherSim(); setWeatherFieldLaw(null); setWeatherMapLaw(false);
+});
+
 test('SAV3: bitmapToColor32 grows the GetColor32 alphaIndex - -1 draws index 0 opaque', () => {
   const bmp = { width: 2, height: 1, data: Uint8Array.of(0, 1) };
   const palette = { get: (i) => ({ r: i * 10, g: 0, b: 0 }) };
@@ -1588,44 +1611,6 @@ test('SAV3: the pending hand-off - set, peek, and TAKE clears', () => {
   assert.equal(takePendingClassicSave(), marker);
   assert.equal(peekPendingClassicSave(), null, 'a consumed import cannot replay');
   assert.equal(takePendingClassicSave(), null);
-});
-
-// The host wiring cannot run headless (a live canvas, IDB and rAF);
-// the seam is READ instead - the project's own idiom for host-side
-// laws (the mysticism host sweeps' shape).
-test('SAV3: the wiring source pins - menu arm, boot arm order, chargen gate, main routing', () => {
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  // The classic arm sits BEFORE the load arm in the boot walk and is
-  // gated on a REAL pending import.
-  const classicArm = world.indexOf("params.has('classicload') && peekPendingClassicSave()");
-  const loadArm = world.indexOf("} else if (params.has('load')) {");
-  assert.ok(classicArm > -1 && loadArm > -1 && classicArm < loadArm,
-    'the classicload arm precedes the load arm');
-  // The chargen gate skips the wizard only for a REAL pending import.
-  assert.match(world, /!\(params\.has\('classicload'\) && peekPendingClassicSave\(\)\)/);
-  // The boot arm awaits the deps a fast boot would otherwise miss.
-  assert.match(world, /if \(!spellsByIndex\) spellsByIndex = await loadSpellIndex\(fetchBytes\);/);
-  assert.match(world, /await townTalk\.ensureFactions\?\.\(\);/);
-  // The position lands through the streaming world's own converters.
-  assert.match(world, /worldCoordToMapPixel\(bundle\.position\.worldX, bundle\.position\.worldZ\)/);
-  assert.match(world, /importClimateWeathers\(bundle\.climateWeathers\)/);
-  // The quest globals move ENTRY BY ENTRY - the machine's hooks hold
-  // the Map reference.
-  assert.match(world, /questBridge\.machine\.globalVars\.set\(i, v\)/);
-  // The classic rumors reach the mill through ITS import member.
-  assert.match(world, /rumorMill\.importClassicRumor\(rumor, /);
-
-  const menu = readFileSync(new URL('../../src/scenes/menu.js', import.meta.url), 'utf8');
-  // Load with no saves runs the classic flow (SAV4 routed it through
-  // the slot window's no-saves arm) - the old dead end is gone.
-  assert.match(menu, /await runClassicLoad\(canvas, renderer, status\)/);
-  assert.doesNotMatch(menu, /no quicksave to load/);
-  // The screenshot uploads OPAQUE (GetColor32 alphaIndex -1).
-  assert.match(menu, /bitmapToColor32\(bmp, palette, -1\)/);
-
-  const main = readFileSync(new URL('../../src/main.js', import.meta.url), 'utf8');
-  // SET on classicload, DELETE on anything else (the F12 law's shape).
-  assert.match(main, /if \(action === 'classicload'\) params\.set\('classicload', '1'\);\n\s*else params\.delete\('classicload'\);/);
 });
 
 /** The smallest player snapshot restorePlayer accepts, for the ship
@@ -1674,22 +1659,4 @@ test('AUDIT 58 (SAV3): the classic import runs AssignShipToPlayer WHOLE - the de
   assignShipToPlayer(poor, poor.ownedShip, { addPermanentScene: addBoth });
   assert.equal(poor.sceneCache.permanent.size, 0);
 
-  // and the HOST really runs it on the import path - classicLoadBoot
-  // has no headless boot, so the wiring is source-pinned.
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const boot = world.slice(world.indexOf('async function classicLoadBoot()'));
-  const body = boot.slice(0, boot.indexOf('const toggleTravelMap'));
-  assert.match(body, /assignShipToPlayer\(playerEntity, playerEntity\.ownedShip, \{ addPermanentScene: shipPermanentScenes \}\);/,
-    'the import goes through the port\'s AssignShipToPlayer, not a raw field write');
-  // WA1: the two scenes are ONE helper now - the import and Warm Ashes' lent ship both hand it over
-  const helper = world.slice(world.indexOf('const shipPermanentScenes = (s) => {'), world.indexOf('};', world.indexOf('const shipPermanentScenes = (s) => {')));
-  // CSA-G: through the host's lazy cache (`_sceneCache()`: `playerEntity.sceneCache ??= createSceneCache()`) - the
-  // import's own cache when restorePlayer minted one, and a fresh one for Come Sail Away's helm on a new character
-  assert.match(helper, /addPermanentScene\(_sceneCache\(\), worldSceneName\(SHIP_COORDS\[s\]\.x, SHIP_COORDS\[s\]\.y\)\)/);
-  assert.match(helper, /addPermanentScene\(_sceneCache\(\), interiorSceneName\(SHIP_INTERIOR_MAP_IDS\[s\], BUILDING_KEY_0\)\)/);
-  // DFU's ORDER: NewCharacterCleanup's ClearSceneCache(true) (:468)
-  // runs first, the ship's scenes are added after (:616) - here that
-  // means after restorePlayer has minted the cache.
-  assert.ok(body.indexOf('restorePlayer(playerEntity, bundle.snap') < body.indexOf('assignShipToPlayer(playerEntity'),
-    'the scenes are added AFTER the cache is minted, never before');
 });

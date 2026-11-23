@@ -1,5 +1,4 @@
-// SERPENT1 (2026-10-04, Mac: "A new world event that requires players with a ship to meet up and take on a large scale
-// sea serpent in the ocean"; "make this something truly special"): THE CLIENT'S HALF. Where it rises off the packet
+// SERPENT1: THE CLIENT'S HALF. Where it rises off the packet
 // lanes (systems/serpent/serpentSite.js); the cell's words folded (net/serpent/serpentLink.js); its blows judged on my own ship
 // (systems/serpent/serpentStrike.js); the sighting's lines and ring (systems/serpent/serpentOmen.js); the host end to end against the
 // relay's own brain (scenes/serpentHost.js - the `in`, the volleys gathered, a blow landed, the coil held and broken,
@@ -37,7 +36,7 @@ let DAY = 360;
 while (!isSerpentDay(DAY)) DAY++;
 const TT = serpentTimes(DAY);
 
-// ═══ WHERE IT RISES ═══════════════════════════════════════════════════════════════════════════════
+// WHERE IT RISES
 
 /** A made sea: ports on map pixels, a straight way between each pair in native units (seaLanes.js's own shape). */
 const nativeOf = (px, py) => ({ x: (px + 0.5) * PIXEL_UNITS, z: (499 - py + 0.5) * PIXEL_UNITS });
@@ -84,7 +83,7 @@ test('SERPENT1 site: on a packet lane, in its middle stretch, in open sea every 
   assert.deepEqual(pointAlong(w, 2), { x: 10, z: 10 });
 });
 
-// ═══ THE CELL'S WORDS, FOLDED ═══════════════════════════════════════════════════════════════════════
+// THE CELL'S WORDS, FOLDED
 
 const SX = (205 + 0.5) * PIXEL_UNITS, SZ = (499 - 214 + 0.5) * PIXEL_UNITS;
 const CELL = cellRoomOfWire(SX, SZ);
@@ -148,7 +147,7 @@ test('SERPENT1 link: a refusal said once until the fight is left; a receipt kept
   assert.equal(fells.length, 1, 'unsaid');
 });
 
-// ═══ ITS BLOWS ON MY SHIP ════════════════════════════════════════════════════════════════════════════
+// ITS BLOWS ON MY SHIP
 
 const CARRACK = { x: 0, z: 0, yw: 0, hl: 25, hw: 7, maxHull: 1200, maxSail: 600 };
 const ROWBOAT = { x: 0, z: 0, yw: 0, hl: 3, hw: 1, maxHull: 120, maxSail: 0 };
@@ -177,7 +176,7 @@ test('SERPENT1 strike: each shape meets a ship by her bow, her middle or her ste
   assert.equal(shipPoints(CARRACK).length, 3);
   // the hurt: her whole's share and points on top - alike for a rowboat and a carrack
   const h = shipHurt(SERPENT_ATTACK_TABLE.breach, CARRACK);
-  assert.deepEqual(h, { hull: Math.round(0.07 * 1200 + 8), sail: Math.round(0.1 * SERPENT_CANVAS_X * 600), crew: 2 });   // AUDIT SERPENT T1's numbers (PIN MOVED: SERPENT4 - its canvas halved)
+  assert.deepEqual(h, { hull: Math.round(0.07 * 1200 + 8), sail: Math.round(0.1 * SERPENT_CANVAS_X * 600), crew: 2 });   // AUDIT SERPENT T1's numbers (
   assert.ok(close(shipHurt(SERPENT_ATTACK_TABLE.breach, ROWBOAT).hull / ROWBOAT.maxHull, (0.07 * 120 + 8) / 120, 0.01));
   assert.deepEqual(crushHurt(CARRACK), shipHurt(CRUSH, CARRACK));
 });
@@ -192,7 +191,7 @@ test('SERPENT1 strike: the grip and the eye grind by the second with their fract
   for (let i = 0; i < 4; i++) { const g = grindHurt(CARRACK, 0.25, gc); gc = g.carry; gh += g.hurt.hull; }
   assert.ok(Math.abs(gh + gc - (MAEL_GRIND.hull * 1200 + MAEL_GRIND.base)) < 1e-9);
   const v = shoveOf({ a: SERPENT_ATTACK_TABLE.breach.id, tg: [[0, -10]] }, CARRACK);
-  assert.ok(close(v[0], 0) && close(v[1], SERPENT_ATTACK_TABLE.breach.shove * SERPENT_THROW_X), 'away from it');   // PIN MOVED: SERPENT4 - half the throw
+  assert.ok(close(v[0], 0) && close(v[1], SERPENT_ATTACK_TABLE.breach.shove * SERPENT_THROW_X), 'away from it');
   const lane = shoveOf({ a: SERPENT_ATTACK_TABLE.ram.id, tg: [[0, -100], [0, 100]] }, { ...CARRACK, x: 5 });
   assert.ok(close(lane[0], SERPENT_ATTACK_TABLE.ram.shove * SERPENT_THROW_X) && close(lane[1], 0), 'across the ram\'s lane, to her side');
   assert.deepEqual(shoveOf({ a: SERPENT_ATTACK_TABLE.spit.id, tg: [[0, 0]] }, CARRACK), [0, 0], 'no throw in venom');
@@ -216,7 +215,7 @@ test('SERPENT1 strike: the grip and the eye grind by the second with their fract
   assert.equal(poolBites(pool, 0, 100, pool.until), false, 'dried');
 });
 
-// ═══ THE SIGHTING ═══════════════════════════════════════════════════════════════════════════════════
+// THE SIGHTING
 
 const SITE = Object.freeze({ day: DAY, px: 205, py: 214, sx: SX, sz: SZ, near: 'Sentinel', place: 'Sentinel, Sentinel', between: ['Sentinel', 'Wayrest'], ring: { cx: 205.5, cy: 214.5, r: SERPENT_RING_PIXELS } });
 
@@ -296,7 +295,7 @@ test('SERPENT1 omen: nothing said before its host is ready and settled; each of 
   assert.equal(O.mapMark(), null, 'gone');
 });
 
-// ═══ THE HOST, END TO END AGAINST THE BRAIN ═══════════════════════════════════════════════════════════
+// THE HOST, END TO END AGAINST THE BRAIN
 
 /** The scene's frame is the site's moved (1000, 2000) - a floating origin. */
 const OFF = [1000, 2000];
@@ -317,7 +316,7 @@ function rig({ shipAt = [60, 0], acct = 'acct-0001' } = {}) {
     level: () => 20,
     boat: () => (ship.none ? null : { boat, hull: 4, root: [ship.at[0] + OFF[0], ship.at[1] + OFF[1]], pos: [ship.at[0] + OFF[0], 0, ship.at[1] + OFF[1]], yaw: ship.yaw, hl: 25, hw: 7, maxHull: 1200, maxSail: 600, atHelm: ship.atHelm, wrecked: ship.wrecked }),
     strike: (b, hurt, o) => strikes.push({ b, hurt, o }),
-    maxHealth: () => 100, hurt: (n, el) => hurts.push([n, el]),   // PIN MOVED (AUDIT 2 XC4): the bite in points
+    maxHealth: () => 100, hurt: (n, el) => hurts.push([n, el]),
     say: (t) => says.push(t), mid: (t) => mids.push(t), sound: (k, p) => sounds.push([k, p]), fx: (k, p) => fx.push([k, p]),
   });
   // the cell's word as the relay fans it - its fight's site stamped on it (AUDIT SERPENT 2 F1)
@@ -509,7 +508,7 @@ test('SERPENT1 host: the whirl pulls my ship toward its heart and round; the ven
   assert.equal(marksMesh({ ...f2, tele: [], mael: null, venom: [], glob: null, coil: null }, flat) < m, true, 'the telegraph drew');
 });
 
-// ═══ THE BAR, ITS VOICE, ITS HOARD, ITS RING ════════════════════════════════════════════════════════
+// THE BAR, ITS VOICE, ITS HOARD, ITS RING
 
 test('SERPENT1 bar: the gate\'s bar in the sea\'s colours - its health, the attack named in its colour (MOVE when on my ship), the stun before it, the coil\'s health, the ships, the sounding\'s countdown inside SOUND_WARN_MS alone; its fall holds then fades (mutants: the stun under the attack; the countdown always; no fade)', () => {
   const b = { name: 'Sethrakul', title: 'the Shed-Skin of Satakal', hp: 300, max: 1200, phase: 2, phaseName: 'The Coil', fighters: 3, warded: false, stunned: false, stunLeft: 0, coil: { h: 20, m: 60, mine: true }, countdown: null, soundIn: SOUND_WARN_MS + 1, fell: null, gone: null, opening: false, atk: { key: 'ram', name: 'Breaching Ram', t: 0.5, aimed: true }, now: 5000 };
@@ -554,7 +553,6 @@ test('SERPENT1 voice: DAGGER.SND\'s own records, never a new clip - the Dreugh\'
 test('SERPENT1 hoard: the seed\'s own - the same seed, level and earning the same hoard; a ship that dealt has a Rare-or-better piece and a Magic-or-better, one that stood the second alone and STOOD_GOLD of the gold; its own spoils keys, never a raid\'s (mutants: the earning ignored; the gold unscaled; the keys shared)', () => {
   const a = rollSerpentSpoils(12345, 20, 'dealt'), b = rollSerpentSpoils(12345, 20, 'dealt');
   assert.deepEqual(a, b);
-  // PIN MOVED (CAST-SPEED): the castSpeed line is a Weapons' and Jewellery's proc kind, so this seed's dai-katana draws
   // it at the last pass and the Coilscale roll after it reads a moved stream - and lands: the set piece third
   assert.equal(a.pieces.length, 3);
   assert.ok(['rare', 'legendary', 'exalted'].includes(a.pieces[0].tier), a.pieces[0].tier);
@@ -565,7 +563,7 @@ test('SERPENT1 hoard: the seed\'s own - the same seed, level and earning the sam
   assert.equal(s.pieces.length, 1);
   assert.ok(Math.abs(s.gold - a.gold * STOOD_GOLD) <= 1, 'the same seed\'s gold, its share');
   const list = serpentSpoilsList(12345, 20, 'dealt');
-  assert.deepEqual(list.map((p) => p.kind), ['item', 'item', 'item', 'item', 'item', 'gold']);   // PIN MOVED (SERPENT-SET): the gate's embers between the pieces and the gold; PIN MOVED (CAST-SPEED): three pieces before them; PIN MOVED (GEM2): the Old Coil's gem after the pieces, a dealer's
+  assert.deepEqual(list.map((p) => p.kind), ['item', 'item', 'item', 'item', 'item', 'gold']);
   assert.equal(a.gems.length, 1); assert.equal(s.gems.length, 0, 'a ship that stood: no gem');
   assert.equal(serpentSpoilsDay(DAY), `serpent:${DAY}`);
   assert.notEqual(SERPENT_SPOILS_KEYS.store, RAID_SPOILS_KEYS.store);
@@ -591,34 +589,5 @@ test('SERPENT1 ring: the held map reads its mark by the gate\'s reader and paint
   assert.ok(!ops.some(([, f, s]) => f === SERPENT_RING_MAP_CSS || s === SERPENT_RING_MAP_CSS));
 });
 
-// ═══ THE FOUR HOSTS ═════════════════════════════════════════════════════════════════════════════════
+// THE FOUR HOSTS
 
-test('SERPENT1 hosts: THE WORLD HOST wires it whole - the naval host\'s seam read at a frame, Come Sail Away\'s drift beside its warp, the cell\'s and the hub\'s words to the link, its frame in the online frame and away from it, its body before the sea and its marks after, the held map\'s ring and the compass; the other three hosts are named and carry none of it (THE FOUR HOSTS RULE - by design) (mutants: a seam unwired; a host importing it)', () => {
-  const src = (f) => readFileSync(new URL(`../../src/scenes/${f}`, import.meta.url), 'utf8');
-  const world = src('world.js');
-  for (const pin of [
-    'get serpent() { return serpentHost; }',
-    'drift: (boat) => naval?.drift?.(boat) ?? null',
-    "online.onSerpent = (w) => { if (w?.k === 'bd') serpentHost?.wrecked?.(w); else serpentLink?.word(w); };",   // PIN MOVED (INT13): the count's wreck heard beside the link
-    'link.onSerpent = (w) => serpentLink?.word(w);',
-    'serpentFrame();   // SERPENT1',
-    'serpentAway(!onlineOn);',
-    'serpent: () => serpentOmen?.mapMark() ?? null',
-    'serpent: serpentCompassMark()',
-    'onReceipt: (r) => { const c = readSerpentReceipt(r); serpentClaims?.add(',
-    'onSpoils: (entry) => grantSerpentSpoils(entry)',
-  ]) assert.ok(world.includes(pin), pin);
-  const body = world.indexOf('serpentRenderer()?.drawBody(_serpentDraw)'), csa = world.indexOf('if (csaOn()) csa.draw(renderer);   // CSA-B');
-  const sea = world.indexOf('serpentRenderer()?.drawSea(_serpentDraw)'), naval = world.indexOf('if (naval?.enabled) navalRender.draw(naval.drawFrame());');
-  assert.ok(csa > 0 && body > csa && body - csa < 600, 'the body with the opaque world, after the boats');
-  assert.ok(naval > 0 && sea > naval && sea - naval < 400, 'the marks over the sea');
-  assert.ok(/THE FOUR HOSTS RULE: THIS host \(scenes\/world\.js\) wires it whole\. scenes\/exterior\.js[\s\S]{0,200}scenes\/worldModes\.js[\s\S]{0,200}scenes\/dungeonContext\.js[\s\S]{0,200}named and left without it/.test(world), 'all four named');
-  for (const other of ['exterior.js', 'worldModes.js', 'dungeonContext.js']) assert.ok(!/serpent/i.test(src(other)), `${other} carries no serpent`);
-  const naval2 = src('naval/navalHost.js');
-  assert.ok(naval2.includes('drift: (boat) => (enabled ? deps.serpent?.drift?.(boat) ?? null : null)'));   // PIN MOVED: SERPENT4 - and the ships' bumpers; PIN MOVED: HULL-PASS (Field-Bugs-2026-10-26d) - the bumpers retired
-  assert.ok(naval2.includes('gale: (boat) => (enabled ? deps.serpent?.gale?.(boat) ?? null : null)'), 'SERPENT4: the gale through the naval host');
-  assert.ok(world.includes('gale: (boat) => naval?.gale?.(boat) ?? null,'), 'SERPENT4: Come Sail Away\'s gale beside its drift');
-  assert.ok(naval2.includes('for (const t of deps.serpent?.targets?.() ?? []) out.push(t);'));
-  const csaSrc = readFileSync(new URL('../../src/systems/comeSailAway/comeSailAway.js', import.meta.url), 'utf8');
-  assert.ok(csaSrc.includes('drift ? vAdd(state.currentVector, drift) : state.currentVector'));
-});

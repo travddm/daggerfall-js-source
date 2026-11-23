@@ -11,7 +11,7 @@
 // WHAT IS VERBATIM
 //   - the sections, keys and DEFAULT VALUES: parsed from the VENDORED
 //     defaults.ini.txt (vendor/dfu-settings), not hand-transcribed -
-//     171 defaults across 13 sections is exactly the lossy-copy shape
+//     173 defaults across 13 sections is exactly the lossy-copy shape
 //     AUDIT 17e F9 caught in the item templates.
 //   - the TYPED GETTERS, including their failure modes, which are
 //     quirks and not accidents (SettingsManager.cs:911-1000):
@@ -41,7 +41,7 @@
 //                reads it, so there is nothing here to close.
 //   unavailable  meaningless here (resolution, controllers, mod
 //                paths) or the port implements ONE side of the branch
-//                (EnhancedCombatAI, AdvancedClimbing - see the Ledger)
+//                (AdvancedClimbing - see the Ledger)
 //   restart      FPS-VSYNC: read by the desktop shell at its next launch
 //                (SHELL_AT_LAUNCH names the reader) - in the app it
 //                changes play from the next start; in a browser the
@@ -51,6 +51,7 @@
 
 import { SETTINGS_DEFAULTS } from './settingsDefaults.js';
 import { appStorage } from '../appStorage.js';   // DA1: the storage seam
+import { t } from '../textManager.js';
 import { onlineForcedSetting, ONLINE_FORCED_SETTINGS } from '../online/onlineLane.js';   // DISC22-A: the room's settings, read first online
 
 const STORAGE_KEY = 'dagger.settings.v1';
@@ -77,6 +78,9 @@ export const LIVE = Object.freeze({
   'Controls/JoystickMovementThreshold': 'src/systems/gamepad.js',
   'Controls/JoystickDeadzone': 'src/systems/gamepad.js',
   'Enhancements/CombatVoices': 'src/combat/combatVoices.js',
+  // Color Boost's dungeon falloff, gated by Color Boost as DFU's is (the rest of Color Boost is not built yet)
+  'Effects/ColorBoostEnable': 'src/systems/distance-shading-setting.ts',
+  'Effects/ColorBoostDungeonFalloff': 'src/systems/distance-shading-setting.ts',
   // MT-i: EnemyInfighting. OFF sends GetTargets down its else-arm
   // (:801-803), where a non-PlayerAlly foe skips every enemy
   // candidate and the whole scene is player-only again - which is
@@ -177,6 +181,9 @@ export const LIVE = Object.freeze({
   'Controls/InstantRepairs': 'src/scenes/worldModes.js',      // R1: the repair flow's instant branch
   'Controls/AllowMagicRepairs': 'src/scenes/worldModes.js',   // R1: the repair entry gate + world.js's enchantCtx seam
   'Controls/MusicVolume': 'src/systems/song/songPlayer.js',
+  // DFU's Enhanced Combat AI (EnemySenses, EnemyMotor, EnemyAttack, DaggerfallMissile): the foe pools hand the reader
+  // to every EnemyAI. Pinned online by the server profile (combat.enhancedAI).
+  'Enhancements/EnhancedCombatAI': 'src/characters/enemy/enhanced-combat-ai.ts',
   'Controls/MouseLookSensitivity': 'src/ui/lookSettings.js',
   'Controls/InvertMouseVertical': 'src/ui/lookSettings.js',
   // AUDIT: this one was tiered `stored` while main.js read it as
@@ -292,7 +299,16 @@ export const LIVE = Object.freeze({
   'Video/UseMipMapsInRetroMode': 'src/systems/retroMode.js',
   'Video/RetroModeAspectCorrection': 'src/systems/retroMode.js',
   'Video/PalettizationLUTShift': 'src/systems/retroMode.js',
-  // FPS-CAP1 (Mac: "Add FPS limiter to settings"): the Frame Rate Cap, stored-tier since the settings screen shipped.
+  // The world's texture filter: each world texture takes it at upload, and a cached one the next time a scene asks
+  // for it.
+  'Video/MainFilterMode': 'src/render/world-texture-filter.ts',
+  // Its anisotropy on world art off Point (Unity's quality levels), read with the filter.
+  'Video/QualityLevel': 'src/render/world-texture-filter.ts',
+  // The video frames' filter (DFU's DaggerfallVideo), read at each frame's upload.
+  'GUI/VideoFilterMode': 'src/ui/videoPlayer.js',
+  // The compass pictures' filter (DFU's HUDCompass), read when the HUD loads them.
+  'GUI/GUIFilterMode': 'src/ui/hud/hud-picture.ts',
+  // FPS-CAP1: the Frame Rate Cap, stored-tier since the settings screen shipped.
   // StartGameBehaviour's two lines (:244-250), read by the four hosts' frame gate and the FPS counter every frame.
   'Video/TargetFrameRate': 'src/systems/frameCap.js',
 });
@@ -302,7 +318,6 @@ export const LIVE = Object.freeze({
  *  player cannot find out about. */
 const NO_MOD_LOADER = 'there is no mod loader to set up';
 export const UNAVAILABLE = Object.freeze({
-  'Enhancements/EnhancedCombatAI': 'this game uses the classic enemy AI',
   'Enhancements/AdvancedClimbing': 'this game uses the classic climbing',
   'Enhancements/LypyL_ModSystem': NO_MOD_LOADER,
   'Enhancements/CompressModdedTextures': NO_MOD_LOADER,
@@ -314,12 +329,20 @@ export const UNAVAILABLE = Object.freeze({
   'Video/ResolutionHeight': 'the game fills your browser window',
   'Video/Fullscreen': 'your browser controls fullscreen',
   'Video/ExclusiveFullscreen': 'your browser controls fullscreen',
+  // Settings for Unity's own machinery, which this game does not have. Each states what stands in its place. Getters,
+  // so each reason is read in the player's language when it is shown, not when this module loads.
+  get 'Video/EnableObjectCulling'() { return t('settings.unavailable.objectCulling', 'the world is drawn in batches and skips what is out of view; a distance cut would only add pop-in'); },
+  get 'Video/EnableTextureArrays'() { return t('settings.unavailable.textureArrays', 'the ground always draws from texture arrays'); },
+  get 'Video/RunInBackground'() { return t('settings.unavailable.runInBackground', 'your browser decides whether a hidden game keeps running'); },
+  get 'GUI/AccelerateUICopyTexture'() { return t('settings.unavailable.uiCopyTexture', 'menu pictures go to the graphics card once as they load, with no copy to speed up'); },
+  get 'Experimental/TerrainHeightmapPixelError'() { return t('settings.unavailable.heightmapError', "the land is drawn by this game's own terrain, which sets its own detail"); },
+  get 'Experimental/AssetCacheThreshold'() { return t('settings.unavailable.assetCache', 'this game manages the memory its files use by itself'); },
   // FPS-CAP1: a page's frames always wait for the screen - there is no other mode to switch to. The Frame Rate Cap
   // holds under it (systems/frameCap.js: DFU's cap does nothing under VSync, which here would be never).
   // FPS-VSYNC: in the BROWSER. The desktop app answers it at launch (SHELL_AT_LAUNCH, below).
   'Video/VSync': 'the browser always waits for the screen refresh',
 });
-/** FPS-VSYNC (2026-09-28, Mac, of the desktop app running above the screen's refresh: "Yes"): the keys the DESKTOP
+/** FPS-VSYNC: the keys the DESKTOP
  *  SHELL reads at launch (app/lib/frameRate.cjs). A page cannot stop waiting for the screen; the app's Chromium can,
  *  if told before it starts - so in the app VSync is a real choice, read at the next start ('restart'), and in a
  *  browser it stays unavailable. */
@@ -352,34 +375,25 @@ export function tierOf(key) {
 // A player's own override still wins over both, and a value set back to
 // THIS default drops the override, so the two layers behave as one.
 //
-// PlayerTorchFromItems: DFU ships it False, which means a lit torch
-// casts no light at all. With Handheld Torches vendored and on, that
-// default makes the mod's whole subject invisible - you light a torch
-// and nothing happens. Ledger A row MODS-ON.
+// PlayerTorchFromItems: DFU ships it False, so a lit torch casts no light; with Handheld Torches vendored and on, that
+// hides the mod's whole subject. Ledger A row MODS-ON.
 //
-// SWING-DEFAULT1 (Mac, 2026-09-22, after a first-time player on Discord:
-// "my character isn't swinging? I'm holding down RMB and moving my
-// mouse and it's doing nothing" - The Frog: "Change your attack setting
-// to click or click and hold... It should be the default setting"):
-// WeaponSwingMode. DFU ships 0, the vanilla drag - the button held AND
-// the mouse dragged half a percent of the screen's longer side, which a
-// touchpad can barely do and a new player never guesses. 2 is CLICK OR
-// HOLD (WeaponManager.cs:316-350): a click swings, a held button keeps
-// swinging, and the drag mode is one row away in the controls screen
-// for whoever wants it. The stored file carries overrides alone, so a
-// player who never touched the row takes this default too.
+// SWING-DEFAULT1: WeaponSwingMode. DFU ships 0, the vanilla drag (button held and the mouse dragged half a percent of the
+// screen), which a touchpad can barely do and a new player never guesses. 2 is click or hold (WeaponManager.cs:316-350);
+// the drag mode is one row away in the controls screen. The stored file carries overrides alone, so a player who never
+// touched the row takes this default too.
 //
-// DISC22-A (Mac, 2026-09-24: "repair magical items should be enabled by
-// default and required online"): AllowMagicRepairs. DFU ships False - a
-// smith turns an enchanted item away (RepairsObjects' magic arm). The
-// port's default mends it; online the lane forces it (onlineLane.js
-// ONLINE_FORCED_SETTINGS), so a player's own False stands offline only.
+// AllowMagicRepairs and InstantRepairs take DFU's own False offline (DFU-GAPS EL26): a smith keeps the item for days and
+// turns an enchanted one away, and the player's own True stands. Online the lane forces AllowMagicRepairs True
+// (onlineLane.js ONLINE_FORCED_SETTINGS) until the server profile owns it.
 //
-// REPAIR-EASE (2026-09-30, Mac: "instant repair on by default"): InstantRepairs. DFU ships False - a smith keeps
-// the item for days. The port's default hands it back at once; a player's own False still stands.
+// MainFilterMode: DFU ships 0, Point. The port's default is 3, Sharp (render/sharp-texels.ts): square texels close up
+// with smooth edges, and filtered, anisotropic ground in the distance, where Point draws the ground blurred or
+// shimmering in the browser. Point, Bilinear and Trilinear stay one press away, and the Classic preset sets Point.
 export const PORT_DEFAULTS = Object.freeze({
   Enhancements: Object.freeze({ PlayerTorchFromItems: 'True' }),
-  Controls: Object.freeze({ WeaponSwingMode: '2', AllowMagicRepairs: 'True', InstantRepairs: 'True' }),
+  Controls: Object.freeze({ WeaponSwingMode: '2' }),
+  Video: Object.freeze({ MainFilterMode: '3' }),
 });
 
 /** The default in effect: the port's, else the vendored ini's. Every
@@ -514,7 +528,7 @@ export function setValue(section, key, value) {
   _publish(section, key, str);
 }
 
-// ---- THE CHANGE, PUBLISHED (2026-08-27) ----
+// ---- THE CHANGE, PUBLISHED ----
 // LIVE was a tier the registry could name but a consumer could only
 // honour by re-reading on its next natural occasion - the next song, the
 // next boot. Mac, from play: the music slider must work while music is

@@ -1,4 +1,4 @@
-// MWNPC1 (2026-10-09): THE BODY RECORD WRITER, moved out of bodyRig.mjs (which reads its fixtures with node:fs) so
+// MWNPC1: THE BODY RECORD WRITER, moved out of bodyRig.mjs (which reads its fixtures with node:fs) so
 // the browser probe (tools/mwGpuSkinProbe.mjs, through bodyRigBrowser.mjs) mints the same records the node pins do.
 
 /** a BODY record, as fparm.test.js mints them (hand=5, upperarm=8 in MW_BODY_PARTS order) */

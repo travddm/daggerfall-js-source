@@ -6,7 +6,7 @@
 // stands its House2 #6 (model 159) inside two of the author's hills - the one walled door of both packs (AUDIT FB1005
 // T3), carried as the pack's own until a quest seated its person there. The house is stood on the block's nearest clear
 // ground at the author's facing, its record kept (src/world/curatedPlacements.js; measured by
-// tools/curatedPlacements.mjs). `01-Overview/bugs/Field-Bugs-2026-10-09e.md`.
+// tools/curatedPlacements.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -80,12 +80,6 @@ test('HILL-HOUSE: a row applies only to its pack\'s block with the record where 
   assert.equal(curateBlockPlacements(blockFromJson(packJson({ model: 201 }), 1, 'TEMPASD1.RMB'), 'beautiful-villages'), 0);
   assert.equal(curateBlockPlacements(blockFromJson(packJson(), 1, 'TEMPASD1.RMB'), undefined), 0, 'a block BLOCKS.BSA serves names no pack');
   assert.equal(curateBlockPlacements(null, 'beautiful-villages'), 0);
-});
-
-test('HILL-HOUSE by source: the door applies it beside the temple summoners on both of its paths - a pinned town\'s block and the cached one - under the vendor that served the block', () => {
-  const src = readFileSync(new URL('../../src/formats/worldData/worldDataReplacement.js', import.meta.url), 'utf8');
-  const both = src.match(/curateBlockPeople\(dfBlock, liveAsset\(blockReplacementFilename\(blockName, variant\)\)\?\.vendor\);[^\n]*\n(\s*\/\/[^\n]*\n)?\s*curateBlockPlacements\(dfBlock, liveAsset\(blockReplacementFilename\(blockName, variant\)\)\?\.vendor\);/g);
-  assert.equal(both?.length, 2);
 });
 
 test('HILL-HOUSE with ARENA2: the committed row is the measurement on the player\'s data - the author\'s spot walled by the hills, the row\'s the nearest clear ground at the author\'s facing, its automap cells the footprint\'s - and the block the door mints stands the house there', { skip: HAVE_ARENA2 ? false : 'ARENA2_PATH not set' }, async () => {

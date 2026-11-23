@@ -1,9 +1,9 @@
 // @ts-check
-// STAR6 (2026-10-20): THE MASTER'S BAR - the gate's boss bar (ui/gate/gateBossBar.js) in the star's colours (its
+// STAR6: THE MASTER'S BAR - the gate's boss bar (ui/gate/gateBossBar.js) in the star's colours (its
 // `star` theme): the master's name, *Master of the Fallen Star* (the Heart-Star's: *Heart of the Web*), its health, its
 // circle's calls as the bar's two marks (net/starfall/starfallLaw.js STAR_CIRCLE_AT), *Warded* and how many of its circle
 // stand while they do, the defenders at the star, and *Felled* - its words its own, through the text core (AUDIT STAR U3).
-// Design: bible/11-Multiplayer/Starfall.md section 8.
+// Design:
 //
 // Pure: a model the bar draws. Not a DFU member. Ledger A (STARFALL).
 import { STAR_CIRCLE_AT } from '../../net/starfall/starfallLaw.js';

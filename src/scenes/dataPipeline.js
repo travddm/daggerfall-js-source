@@ -10,11 +10,12 @@
 import { TextureFile, LAST_CLASSIC_TEXTURE_ARCHIVE } from '../formats/textureFile.js'; import { changeMask } from '../formats/baseImageFile.js';   // HM1: the item icons' removeMask (one line: the cites below stand)
 import { FlatsFile } from '../formats/flatsFile.js';   // NPC1: captions + portrait indices
 import { isExteriorWindow } from '../world/climateSwaps.js';
+import { standInWindowMask } from '../world/imperialWindows.js';   // BLD: a stand-in wall that carries its own glass
 import { isInteriorGlassArchive, interiorGlassMask } from '../world/interior/interiorGlass.js';   // RW1: an interior's own glass
 import { isEmissive, FIRE_WALLS_ARCHIVE, FIRE_WALL_COLOR, FIRE_WALL_SCALE } from '../world/emissiveTextures.js';   // TextureReader's auto-emissive table (lit lanterns, fireplaces, fire daedra)
-import { dfMeshToModel } from '../world/meshReader.js'; import { patchSeams } from '../world/arch3dSeams.js';   // DUNGEON-SEAMS (one line: the cites below stand)
+import { dfMeshToModel } from '../world/meshReader.js'; import { patchSeams } from '../world/arch3dSeams.js'; import { interiorModelMesh } from '../world/interior/interior-model-patches.js';   // DUNGEON-SEAMS (one line: the cites below stand); the Close interior gaps row's patches
 import { fetchBytes, texName } from './shared.js';
-import { decodedTexture, preloadTextureArchive, isVendorArchive, vendorTextureStandIn, setTextureDeriveContext, textureTierEpoch, textureTiersSettled } from '../systems/textureReplacement.js';   // M-TEX: user-supplied textures override the classic ones; AUDIT VE R1: the tiers' epoch
+import { decodedTexture, preloadTextureArchive, isVendorArchive, vendorTextureStandIn, setTextureDeriveContext, textureTierEpoch, textureTiersSettled, vendorCutout } from '../systems/textureReplacement.js';   // M-TEX: user-supplied textures override the classic ones; AUDIT VE R1: the tiers' epoch
 import { classicRecordRgba } from '../formats/derivedTexture.js';   // WD2: a mod sprite rebuilt from the player's own record
 import { setDfLookPalette } from '../world/dfLook.js';   // DF-LOOK: the port's own painted pictures in this palette's colours
 import { customModelBuilt, customAliasFor, aliasSubMeshes, customModelNeeds } from '../world/customModels.js';   // DS1: models no ARCH3D carries; WD3: a classic model with its pictures swapped
@@ -131,7 +132,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
         return t;
       })();
       texturePromises.set(archive, asked);
-      // BUILD-RETRY (bible/06-Systems/Travel-View.md LOAD-OWED): A READ THAT FAILED IS NO ANSWER. The rejection stood
+      // BUILD-RETRY (LOAD-OWED): A READ THAT FAILED IS NO ANSWER. The rejection stood
       // here as the archive's answer for the page, so one failed read - a dropped fetch, an IndexedDB read that failed
       // and fell through to a server without the file - failed every later ask for the archive without reading again:
       // every pixel of that climate, every town wearing that picture, threw for the rest of the session. A failed ask
@@ -173,6 +174,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
   const _standInMisses = new Set();   // WD3: the stand-in records said once each
   const uploadRecord = (archive, record, { opaque = false, mips, removeMask = false, dye = null, dyeTarget = null, cutout = false } = {}) => {   // DYE-ICON: `dyeTarget` - the swatch the classic arm dyes (itemDye.js itemDyeTarget)   // DW3: `dye` - GetItemImage asks the replacement by the item's dye (ItemHelper.cs:458); the icon uploads under a per-dye variant and answers which   // REVIEW 2026-09-05: `mips: false` for item icons (ImageReader.cs:59 builds UI art with no chain); HM1: `removeMask` = ItemHelper's GetItemImage(removeMask: true), the item icons' door - 0xFF becomes the cutout before the upload   // DF-LOOK (DF-ART II's, kept): `cutout` - a model's picture whose glass is seen through (renderer.uploadTexture's RW1 cut-out; the port's ships' stern windows)
     const t = textureFiles.get(archive); freshen(archive);   // AUDIT VE R1
+    cutout ||= vendorCutout(archive, record);   // CAPITAL-TREES: a picture registered as a flat cut by its alpha (a capital tree's leaf spray) is cut wherever it is uploaded
     const bitmap = t.getDFBitmap(record, 0);
     // Spectral archives (ghost/wraith/Lysandus) take the verbatim
     // TextureReader path: SetSpectral gray remap + eye patch, albedo
@@ -215,7 +217,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
     // replacement decoded after a classic dyed upload must still land.
     const dyed = mips === false && !swap && dyeTarget != null && dye != null && dye !== '';
     const variant = mips === false ? (swap && token ? `#ui_${token}` : dyed ? `#ui_dye${dye}_${dyeTarget}` : '#ui') : undefined;
-    // INCIDENT (2026-09-04, the see-through lines in dungeon walls): a
+    // INCIDENT: a
     // MODEL texture is opaque. DaggerfallMesh.cs:141/:169 fetch a mesh's
     // material through MaterialReader.GetMaterial(archive, record) whose
     // alphaIndex defaults to -1 (MaterialReader.cs:352) - no cutout
@@ -246,8 +248,13 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
     // window mask from - and IsExteriorWindow's `archive % 100` reads 1210's
     // record 3 as a window. A mod picture's billboard material carries no
     // window emission in DFU (GetStaticBillboardMaterial), so it gets none.
+    // BLD: a stand-in WALL that carries its own glass (world/imperialWindows.js - the Imperial City's facades, read off
+    // their own painting) takes the same window mask, lit by the window style after dark as a classic window is.
+    const ownGlass = t.vendor ? standInWindowMask(archive, record) : null;
     if (isExteriorWindow(archive, record) && !t.vendor) {
       renderer.uploadEmissionTexture(archive, record, t.getWindowColors32(bitmap), { replacement, window: true });   // RW1: DFU's window mask - the rooms' glass from the street, the street's from inside (render/realWindows.js)
+    } else if (ownGlass) {
+      renderer.uploadEmissionTexture(archive, record, ownGlass, { replacement, window: true });
     } else if (isEmissive(archive, record)) {
       // AUDIT 39 F49: THE AUTO-EMISSIVE ARM (MaterialReader.cs:419-423
       // -> TextureReader.cs:301-308 "Just reuse albedo map for basic
@@ -433,7 +440,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
       gpuMeshes.set(modelIdNum, null);
       return null;
     }
-    const dfMesh = patchSeams(modelIdNum, arch.getMesh(index));   // DUNGEON-SEAMS: the holes in Daggerfall's own stairs and ceilings closed - on a copy, the archive's mesh is shared
+    const dfMesh = interiorModelMesh(modelIdNum, patchSeams(modelIdNum, arch.getMesh(index)));   // DUNGEON-SEAMS: the holes in Daggerfall's own stairs and ceilings closed - on a copy, the archive's mesh is shared
     for (const sm of dfMesh.subMeshes) await getTexture(sm.textureArchive);
     const model = dfMeshToModel(dfMesh, getTextureSize);
     const pictures = [];   // PLACE-LRU: what this model's build put up, the model's to hold
@@ -460,7 +467,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
   async function buildAliasMesh(modelIdNum, alias) {
     const index = arch.getRecordIndex(alias.model);
     if (index === -1) { gpuMeshes.set(modelIdNum, null); return null; }
-    const dfMesh = patchSeams(alias.model, arch.getMesh(index));
+    const dfMesh = interiorModelMesh(alias.model, patchSeams(alias.model, arch.getMesh(index)));
     for (const sm of dfMesh.subMeshes) await getTexture(sm.textureArchive);
     const classic = dfMeshToModel(dfMesh, getTextureSize);
     const model = { ...classic, subMeshes: aliasSubMeshes(classic.subMeshes, alias.remap) };
@@ -574,6 +581,7 @@ export function createDataPipeline({ renderer, arch, palette, fetch = fetchBytes
       tileArray: (archive) => h.hold('tile', archive),
       release: () => h.release(),
       settle: () => h.settle(),
+      rekey: (to) => h.rekey(to),   // IC-SWAP-BEHIND: a view built behind its pixel's, its pixel's from the swap
     };
   }
 

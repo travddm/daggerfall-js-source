@@ -1,7 +1,7 @@
-// FIRM1 (2026-10-13) - THIS DEVICE'S FIRMAMENT (src/net/firmament/firmamentBook.js): the state read, a change asked under its own id,
+// FIRM1 - THIS DEVICE'S FIRMAMENT (src/net/firmament/firmamentBook.js): the state read, a change asked under its own id,
 // ASYNC NEVER DROPS - a change asked while another is on its way waits behind it, the newest winning, never dropped and
 // never asked beside it - a change whose answer did not come KEPT and asked again with the SAME id at the next read, and a
-// refusal the service gave after it looked let go and the state read again. bible/06-Systems/Firmament.md.
+// refusal the service gave after it looked let go and the state read again..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 

@@ -1,6 +1,5 @@
 // @ts-check
-// SOC5 (2026-09-16, Mac: "Players should be able to interact with others in the world upon encountering them by
-// pressing F on their body, which should show options to add as a friend or invite to a party"): WHICH BODY IS THE
+// SOC5: WHICH BODY IS THE
 // ONE IN FRONT OF ME - the reach law, pure arithmetic, no scene and no DOM.
 //
 // WHY IT IS ITS OWN MODULE. "On their body" is an ACTIVATION, and this port already has one law for that
@@ -37,8 +36,7 @@ import { WHY_IN_PARTY } from '../net/social.js';   // AUDIT DROPS: the seat's re
 export const SOCIAL_REACH = MOBILE_NPC_ACTIVATION_DISTANCE;
 
 /**
- * CONCEAL-MATE (2026-10-07, a player: "you're not interactable with party members - would be a QoL if you can interact
- * with at least your party members while chameleon or shadow form, invis etc on"): THE PLAYERS I CAN REACH OUT TO.
+ * CONCEAL-MATE: THE PLAYERS I CAN REACH OUT TO.
  * INVIS-NET took a concealed player (`cv`: invisible, blending, a shade) out of every social door - the F key and its
  * plaque, the Nearby list, a page held out - so a stranger's spell is not given away by a menu that names them. A
  * PARTY MATE is not a stranger: the party already keeps them (its HUD, the roll, a gift - SPELL-GIFT B1/B3's law), and
@@ -91,8 +89,7 @@ export function pickPeerInFront(camPos, fwd, peers, reach, distanceOf) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// PEER-PLAQUE1 (2026-09-22, Mac: "Using the world tooltip implementation for other players and interaction
-// prompt"): THE PLAQUE'S HALF OF THE SAME PICK. World Tooltips names what the crosshair rests on
+// PEER-PLAQUE1: THE PLAQUE'S HALF OF THE SAME PICK. World Tooltips names what the crosshair rests on
 // (systems/worldHover.js, ui/worldPlaque.js) off the SAME ray race the press runs (player/activationRace.js
 // raceWinner), so another player under the crosshair is one more racer - `peerRayPick` dresses `pickPeerInFront`'s
 // answer in the race's own shape - and what the plaque lists under their name is what the F-menu would offer at

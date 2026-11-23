@@ -1,5 +1,5 @@
 // @ts-check
-// FIELD BUGS 2026-10-09e - EVERY-STANDING (bible/01-Overview/bugs/Field-Bugs-2026-10-09e.md; the Discord's suggestion "Could
+// FIELD BUGS 2026-10-09e - EVERY-STANDING (; the Discord's suggestion "Could
 // we have a setting to see our reputation with every guild/kingdoms?": "I got expelled from the Mages Guild recently ...
 // and now I wanted to get my reputation back into positive with them to get unlist again. Problem is, since I don't am
 // part of the guild anymore, I can't see how is my standing with them ... could we be able to see most or all
@@ -19,6 +19,7 @@
 
 import { FACTION_TYPES } from '../../formats/factionFile.js';
 import { getReputation } from './factionRep.js';
+import { getLocalizedFactionName } from '../textManager.js';
 import { DIVINES, ORDERS } from '../guild/guildVariants.js';
 import { GUILDS } from '../guild/guilds.js';
 import { affiliations } from '../affiliations.js';
@@ -57,7 +58,7 @@ export function standingGroups(entity) {
     for (const id of ids) {
       const f = dict.get(id);
       if (!f || member.has(id)) continue;
-      rows.push({ factionId: id, name: String(f.name ?? id), rep: getReputation(store, id) });
+      rows.push({ factionId: id, name: getLocalizedFactionName(id, String(f.name ?? id)), rep: getReputation(store, id) });   // PROVINCE-COURTS: shown as GetFactionData shows a name (L10N3e) - a province's kingdom in the player's language
     }
     if (rows.length) out.push({ id: g.id, title: g.title, rows });
   }

@@ -1,8 +1,4 @@
-// WAGONS3 (2026-10-10, bible/06-Systems/Wagons.md section WAGONS3; Mac: "1. All the wagons/carts are oversized in the
-// overworld 2. Spawning the wagon can trap you under the wagon 3. ... sit on the wagon itself, the ledge its built for
-// and requiring 2 horses to use. 4. Proper animated rope mechanics that connect the horses to the wagon 5. Using a wagon
-// doesnt allow you to zoom out into 3rd person when mounted"; asked: "Open Wagon + Caravan", "Buy a second Horse",
-// "Traces and reins"). The law (systems/wagon/wagonKinds.js, world/wagonModels.js, systems/wagon/wagonRopes.js), the pool
+// WAGONS3. The law (systems/wagon/wagonKinds.js, world/wagonModels.js, systems/wagon/wagonRopes.js), the pool
 // (scenes/horseCartPool.js - the team, the driver, the harness, the parked box, the Overworld's rig), the runtime's gate
 // (systems/horse/horseCart.js) and the hosts' seat (scenes/world.js, scenes/exterior.js, player/mwView.js).
 import '../modsOff.js';
@@ -447,7 +443,7 @@ test('WAGONS3 THE PARKED BOX NEVER HOLDS ME (Mac: "Spawning the wagon can trap y
   assert.match(src, /const \[wx, wz\] = toWorld\(vsub\(playerPosition\(\), vscale\(heading, deploySetback\(\)\)\)\);/);
   assert.match(src, /const wg = tryFindGround\(phys, vsub\(grounded, vscale\(fwd, hitchSetback\(\)\)\)\);/);
   const pool = rd('src/scenes/horseCartPool.js');
-  assert.match(pool, /standWagonCollider\(parked && !capsuleInBox\(parked, myParts\) && !_held\.has\(''\) \? parked : null, myParts\);/);   // PIN MOVED (WARDEN1): nor while the town watch carries it
+  assert.match(pool, /standWagonCollider\(parked && !capsuleInBox\(parked, myParts\) && !_held\.has\(''\) \? parked : null, myParts\);/);
   assert.match(pool, /if \(parts !== _bucketParts\) \{ _bucketKey = standBox\(WAGON_BUCKET, null, _bucketKey, parts\); _bucketParts = parts; \}/);
 });
 
@@ -558,7 +554,7 @@ test('WAGONS3 TWO HORSES TO PULL A PAIR\'S WAGON: short of its pair the wagon is
   // the hosts hand the runtime the word and the pool the count
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
     const s = rd(host);
-    assert.match(s, /teamShort: \(\) => wagonTeamShort\(playerEntity\.items \?\? \[\]\),/, host);   // PIN MOVED (WAGONS4, then back at WAGON-MEND: no wagon is ever broken)
+    assert.match(s, /teamShort: \(\) => wagonTeamShort\(playerEntity\.items \?\? \[\]\),/, host);
     assert.match(s, /horses: \(\) => horseCountOf\(playerEntity\.items \?\? \[\]\),/, host);
   }
 });
@@ -596,7 +592,7 @@ test('WAGONS3 THE CAMERA\'S WALL ON THE BENCH: a ray from the camera\'s focal ov
   drive(cart); cart.pool.frame(1 / 30, [0, 2, -5], 0);
   assert.equal(cart.pool.cameraHit([0, 2, 3], [0, 0, -1], 10), Infinity, 'the Small Cart: no bench');
   // AUDIT WAGONS3 B1 stood the open wagon no wall: its front hoop stood 5.6 cm behind the bench and met every cast from
-  // the head. PIN MOVED (BENCH-CAM): its tilt is a shell as the caravan's room is, and the camera turns about a pivot
+  // the head.
   // over it (cameraFloor) - from there free to the full distance, level and looking down on the driver; from the old
   // focal under the tilt the cast meets it at once
   const open = await wagonWorld('openWagon');
@@ -726,7 +722,7 @@ test('WAGONS3 THIRD PERSON FROM THE BENCH (Mac: "Using a wagon doesnt allow you 
   mv.mwViewFrame({ fpEye: [0, 1.7, 0], feet: [0, 0, 0], yaw: 0, pitch: 0, dt: 0 });
   const src = rd('src/player/mwView.js');
   assert.match(src, /benchSeated = !!state\.seated;/);
-  assert.match(src, /mounted = !!state\.riding && !saddled;\n\s*if \(mounted\)/, 'RIDE-POV unchanged: the saddle holds the head');   // PIN MOVED, COATS3D: a saddle of no 3D horse
+  assert.match(src, /mounted = !!state\.riding && !saddled;\n\s*if \(mounted\)/, 'RIDE-POV unchanged: the saddle holds the head');
   assert.match(rd('src/player/mountRig.js'), /!mwViewHides\(\)\.horse\) \{/, 'the mount\'s picture asks the hides');
   // AUDIT WAGONS3 B2: the bench is the KIND's - a journey, a teleport or a load's first frames stand no seat, and the
   // third person stays out of the head through them

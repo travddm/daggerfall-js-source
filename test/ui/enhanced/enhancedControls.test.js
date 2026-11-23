@@ -1,6 +1,6 @@
 // FIX-F - THE ENHANCED SKIN'S REBINDING PANE, pinned.
 //
-// Mac: "changing keybinds in classic/enhanced do not work". The
+// . The
 // classic grid worked; the DEFAULT skin simply had no door to it, so
 // on the skin almost everyone plays there was no way to rebind a key
 // at all. src/ui/enhanced/enhancedControls.js is that door.
@@ -146,8 +146,7 @@ const clearBtn = (view, action) => {
 
 // ── THE PANE EXISTS WHERE A PLAYER CAN REACH IT ──────────────────
 
-// FT16 (2026-09-15, Mac: "the control menu option needs to be within
-// settings"): THE BINDINGS ARE THE CONTROLS CATEGORY OF SETTINGS.
+// FT16: THE BINDINGS ARE THE CONTROLS CATEGORY OF SETTINGS.
 //
 // FIX-F put Controls on both rails because it was reachable from
 // neither - the right fix for that bug, and one door too many for the
@@ -214,7 +213,7 @@ test('FT16: the key bindings live inside Settings, and both doors still reach th
 test('KB1: the pane draws the standard\'s groups - every action once, the two DFU leaves nothing reads never, a mod\'s group only while that mod is on (mutant: draw the classic grid slice again)', () => {
   // FIX-F built this pane as the classic window's second face - DFU's 38-button grid slice, the ADVANCED popup's
   // six, then the port's rows under four more headings (SOC5, QS2, QUICK-LOOT B4, FREEMOUSE each widened it). KB1
-  // (Mac: "ensuring keybinds are organized") replaced the faces with the one table a player reads: Movement,
+  //  replaced the faces with the one table a player reads: Movement,
   // Combat, Magic, Interaction, Windows, Quickslots and hotbar, Mouse, Online, Game, and one group per vendored mod.
   // The coverage rule the old pin held - every bindable action has a row, none twice - is held of that table.
   const all = ACTION_GROUPS.flatMap((g) => g.rows.map((r) => r.action));

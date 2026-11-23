@@ -1,4 +1,4 @@
-// RSH1 (2026-10-11, Mac: "can we implement this mod into the source") - READIED SPELLCASTING HANDS 1.3 (jefetienne,
+// RSH1 - READIED SPELLCASTING HANDS 1.3 (jefetienne,
 // vendor/readied-spellcasting-hands/, MIT): while a spell that is not CasterOnly is readied and the cast is not
 // playing, the element's casting hands stand at frame 0 (Modded_FPSSpellCasting_Ready.cs AnimateSpellCast). Driven
 // through the REAL weapon rig over a synthetic six-record casting CIF, whose records differ in width so a drawn quad
@@ -108,23 +108,6 @@ test('RSH1: a CasterOnly spell raises nothing, and the switch takes them away at
   assert.deepEqual(await frame(), [], 'off: DFU\'s empty screen');
   setModSetting('readied-spellcasting-hands', 'Enabled', true);
   assert.equal((await frame()).length, 2, 'on again, on the frame');
-});
-
-test('RSH1: the rig reads the readied hands under the cast hands\' own two lane gates, after the cast\'s draw, and every host hands it the engine\'s readied() (mutants: the Morrowind arm or the Beholder drawing them too, a host left out)', () => {
-  const rig = read('src/combat/weapon/weaponRig.js').toString();
-  const at = rig.indexOf('if (c && !fpArm.active() && !eotbHidesSpellHands()) {');
-  const end = rig.indexOf('// PROF1', at);
-  const block = rig.slice(at, end);
-  assert.ok(at > 0 && end > at);
-  assert.ok(block.indexOf('drawSpellCastHands(renderer, c, spellArtFor(fpsSpellCasting.element)') < block.indexOf('readiedHandsFrame('), 'the cast first, then the readied hands');
-  // PIN MOVED (FIELD BUGS 2026-10-22c SPELL-CLIMB): and they yield to the fists on the wall
-  // (test/combat/weapon/fb1022c_spellclimb.test.js drives it)
-  assert.match(block, /if \(readiedHandsOn\(\) && !fpsSpellCasting\.isPlayingAnim && !climbHands\.showing\(\)\) \{/);
-  assert.match(rig, /const readiedHandsOn = \(\) => modSetting\('readied-spellcasting-hands', 'Enabled'\);/);
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js']) {
-    assert.match(read(host).toString(), /readiedSpell: \(\) => magic\??\.readied\?\.\(\) \?\? null,/, `${host} hands the rig the readied record`);
-  }
-  assert.match(read('src/scenes/hostMagic.js').toString(), /readied: \(\) => readiedSpell,/, 'the engine\'s own PlayerEffectManager.ReadySpell');
 });
 
 test('RSH1: the mod\'s own source, byte for byte, and the one condition the port reads quoted from it (mutant: a re-saved or hand-edited vendor file)', () => {

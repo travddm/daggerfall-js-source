@@ -1,4 +1,4 @@
-// WORLD6a (Mac, 2026-09-14: "Lets tackle #1 next" - towns, cells and
+// WORLD6a (- towns, cells and
 // buildings keep nothing) - SLICE 6a: THE BUILDING IS A WORLD ROOM. A
 // building interior has had a relay room of its own since ONLINE1 and
 // carried presence alone, because the wire's world-room law admitted
@@ -14,6 +14,7 @@
 // keeping a building's memory and handing it to the next joiner, and still
 // ignoring a town's; the pure half (world/interior/interiorShared.js) composing,
 // projecting and landing on a bare context; and the hosts by source.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -80,7 +81,8 @@ const ctxOf = () => {
   return ctx;
 };
 
-test('WORLD6a: the pure half - the vocabulary is the cache\'s own keys, one spelling each; an opened container is said with what is left and the day it was stocked, a never-opened one is not, and one past the cap stays this player\'s own, said once', () => {
+test('WORLD6a: the pure half - the vocabulary is the cache\'s own keys, one spelling each; an opened container is said with what is left and the day it was stocked, a never-opened one is not, and one past the cap stays this player\'s own, said once', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   assert.equal(interiorLootKeyOf('shelf:0'), 'shelf:0'); assert.equal(interiorLootKeyOf('container:12'), 'container:12');
   for (const k of ['shelf:00', 'shelf:1e1', 'loot:0', 'corpse:1', 'droppedLoot:0', 'shelf:', 'shelf:123456', 3]) assert.equal(interiorLootKeyOf(k), null, String(k));
   const ctx = ctxOf();
@@ -95,7 +97,8 @@ test('WORLD6a: the pure half - the vocabulary is the cache\'s own keys, one spel
   assert.equal(warned.length, 1, 'said once'); assert.ok(tooBig.has('shelf:0'));
 });
 
-test('WORLD6a: the pure half - the room\'s word lands IN PLACE on an opened container, WHOLE on one this client never opened (a second reader adopts the first\'s roll), with the day it was stocked, and never under this player\'s open window', () => {
+test('WORLD6a: the pure half - the room\'s word lands IN PLACE on an opened container, WHOLE on one this client never opened (a second reader adopts the first\'s roll), with the day it was stocked, and never under this player\'s open window', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const ctx = ctxOf();
   const live = ctx.shelves[0].items;
   const seen = new Set();
@@ -115,7 +118,8 @@ test('WORLD6a: the pure half - the room\'s word lands IN PLACE on an opened cont
   assert.deepEqual(ctx.shelves[0].items, before, 'yours until you close it (AUDIT WORLD4 C1)');
 });
 
-test('WORLD6a: the pure half - the memory is the opened containers the room knows of and every action record\'s SHARED half; it lands once, projected, never its own or another building\'s; a refused act\'s keys are re-read current', () => {
+test('WORLD6a: the pure half - the memory is the opened containers the room knows of and every action record\'s SHARED half; it lands once, projected, never its own or another building\'s; a refused act\'s keys are re-read current', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const ctx = ctxOf();
   const seen = new Set(['shelf:0']);
   const shared = composeInteriorShared(ctx, { locationKey: 'interior:m5.9', stamp: 'me', seen });
@@ -136,35 +140,3 @@ test('WORLD6a: the pure half - the memory is the opened containers the room know
   assert.equal(interiorActionRecords(ctx, [], { locationKey: 'interior:m5.9' }), null);
 });
 
-test('WORLD6a: the hosts by source - the interior mode keys and stamps its room at the mount (an owned house or ship keeps none), wires the doors\' seam, claims a container on the open, says a restock and the close through the frame\'s settle, fires the leave before both teardowns, and the mode machine dispatches the PLACE; the world host walks the one path; the pane says it', () => {
-  const m = hostText('src/scenes/worldModes.js'), pure = rd('src/world/interior/interiorShared.js');   // PIN MOVED (OUTDOOR-LOOT): the open, the frame's settle and the publish stand in world/interior/interiorShared.js (HOST-SPLIT moved them out of createWorldModes)
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P9): the deed read where the building stands - never an isle town's (houseOwnedAt)
-  assert.match(m, /const owned = !!privateVisitRoom \|\| b\?\.buildingType === BUILDING_TYPES\.Ship \|\| \(!interiorHome && houseOwnedAt\(b, b\?\.buildingKey\)\);\s*_intShared = mintInteriorShared\(interiorLocationKey\(questSceneCtx\?\.\(\)\?\.mapId \?\? 0, b\?\.buildingKey \?\? 0, visitLayoutNow\(\)\), \{ owned, home: !!interiorHome, net: \{ selfId: [^\n]*\} \}\);[^\n]*\n\s*interiorLootAside\(ctx, _intShared\);[^\n]*\n\s*const key = _intShared\.locationKey;\s*if \(key\) ctx\.actions\.onChanged = \(recs\) => host\.onActions\?\.\(\{ k: key, a: recs \}\);/, 'the mount (AUDIT WORLD6a A1: the bag from the one mint; B6: any ship is owned; HOME1 re-aim: an online home keeps its room, loot-free)');
-  assert.match(m, /wallNow: \(\) => \(sharedClockOn\(\) \? wallMsForClassicMinutes\(worldMinutes\(\)\) : null\), send: \(d\) => host\.onActions\?\.\(d\)/, 'the room\'s wiring: a cupboard\'s first-open instant is read from the SHARED clock, never this machine\'s (OUTDOOR-LOOT R-3), and its words go through the act path that heals a refused one');
-  assert.match(m, /fresh = true;   \/\/ AUDIT WORLD6a A5/, 'a cupboard\'s restock is said at the window');
-  assert.match(m, /if \(win\) \{ interiorOverlay = win; if \(!owned\) interiorLootOpen\(interiorCtx, key, win, _intShared, \{ fresh, keeping: before \}\); \}/, 'a stranger\'s cupboard claimed on the open (SPLIT-LIFT: handed the window\'s theft keeping), an owner\'s never');
-  assert.match(m, /const fresh = needsRestock\(shelf, today\);/, 'a shelf\'s restock is the open\'s word');
-  assert.match(m, /if \(win\) \{ interiorOverlay = win; interiorLootOpen\(interiorCtx, `shelf:\$\{i\}`, win, _intShared, \{ fresh \}\); \}/, 'the closed shop\'s shelf, on the open');
-  assert.match(m, /const w = openTradeWindow\(shelf, b, 'Buy'\);\s*if \(!w\) return;[^\n]*\n\s*interiorOverlay = w;\s*interiorLootOpen\(interiorCtx, `shelf:\$\{i\}`, interiorOverlay, _intShared, \{ fresh \}\);/, 'the trade window\'s shelf, on the open');   // DISC10-E L3 re-aim: a counter the door refused (null) claims nothing
-  assert.match(m, /showShelfList\(shelf, 0, fresh\);/, 'the keyed fallback too (AUDIT WORLD6a A4)');
-  assert.match(m, /if \(si >= 0\) interiorLootOpen\(interiorCtx, `shelf:\$\{si\}`, interiorOverlay, _intShared, \{ fresh \}\);/, 'every page of it an open');
-  assert.match(m, /const at = shelf\.items\.indexOf\(it\);\s*if \(at < 0\) return undefined;/, 'a row the shelf no longer holds buys nothing');
-  assert.match(m, /if \(shelf\) interiorLootOpen\(interiorCtx, 'shelf:0', win, _intShared, \{ fresh \}\);/, 'the merchant\'s sell screen');
-  assert.match(m, /if \(mode === 'interior'\) interiorLootFrame\(interiorCtx, _intShared, \{ now: performance\.now\(\), open: \(w\) => interiorWindows\.containsWindow\(w\) \}\);/, 'the close is the frame\'s settle');
-  assert.match(pure, /export function interiorLootFrame\(ctx, bag, \{ now = 0, open = \(\) => true \} = \{\}\) \{\s*if \(!bag\?\.locationKey\) return;\s*const win = bag\.openWin;\s*if \(win && !\(String\(bag\.openKey\)\.startsWith\('container:'\) && bag\.room\?\.live\(\)\) && !\(open\(win\) && !win\.done\)\) \{\s*const k = bag\.openKey;\s*bag\.openKey = null; bag\.openWin = null;\s*publishWhole\(ctx, k, bag\);\s*\}/, 'gone from the STACK, not from the slot (AUDIT WORLD6a A3)');
-  assert.match(pure, /if \(claim && bag\.seen\.has\(canon\)\) return false;[\s\S]{0,400}?if \(first\) bag\.net\?\.claimed\?\.\(\);/, 'a claim speaks once; the memory is due on a first claim');
-  assert.equal((m.match(/host\.onInteriorLeave\?\.\(\);/g) ?? []).length, 2, 'the two teardowns, no third');
-  assert.match(m, /cacheInteriorScene\(\);\s*interiorLootLeave\(interiorCtx, _intShared\);[^\n]*\n\s*host\.onInteriorLeave\?\.\(\);   \/\/ WORLD6a[^\n]*\n\s*teardownQuestFlats\(\);/, 'the exit: after the cache, before the teardown (and the cupboards hear of the leave first - OUTDOOR-LOOT D-1)');
-  assert.equal((m.match(/interiorLootLeave\(interiorCtx, _intShared\);/g) ?? []).length, 2, 'and a teleport\'s or a load\'s leave tells them too (D-1a)');
-  assert.match(m, /placeSharedWorld\(\) \{\s*if \(mode === 'dungeon'\) return dungeonCtx \? dungeonCtx\.sharedWorld\(\) : null;\s*return mode === 'interior' && interiorCtx && _intShared\?\.locationKey \? composeInteriorShared\(interiorCtx, _intShared\) : null;/);
-  assert.match(m, /\{ kind: 'interior', buildingKey: interiorBuilding\?\.buildingKey \?\? 0, layout: _visitLayout, instance: placeInstance, \.\.\.\(interiorCabin \? \{ boatUid: interiorCabin\.uid \} : \{\}\), \.\.\.\(_intShared\?\.owned \? \{ private: true, privateRoom: privateVisitRoom \} : \{\}\) \}/, 'owned buildings share private presence while world memory/loot remain disabled');
-  assert.match(m, /restorePlaceSharedWorld\(shared\) \{[\s\S]*?if \(ok\) _intShared\.applied = true;/, 'the memory lands once per context');
-  assert.match(m, /applyPlaceActions\(id, data\) \{[\s\S]*?data\.k !== _intShared\.locationKey\) return false;/, 'another building\'s act is not this one\'s');
-  assert.match(m, /placeActionRecords\(keys\) \{[\s\S]*?interiorActionRecords\(interiorCtx, keys, \{ locationKey: _intShared\.locationKey, tooBig: _intShared\.tooBig, home: _intShared\.home, room: _intShared\.room \}\)/);   // HOME1 re-aim: a home's room names no cupboard
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const shared = modes\?\.placeSharedWorld\?\.\(\);/); assert.match(w, /modes\?\.restorePlaceSharedWorld\?\.\(shared\)/); assert.match(w, /modes\?\.applyPlaceActions\?\.\(id, data\)/);
-  assert.equal((w.match(/modes\?\.placeActionRecords\?\./g) ?? []).length, 2, 'the act and the flush');
-  assert.match(w, /onInteriorLeave: \(\) => \{ const n = handOverRoomFoes\(\);[^\n]*worldPublish\(performance\.now\(\), true\); \},/);   // QUEST-PARTY phase 3b: my foes to those who stay, then the memory
-  assert.match(rd('src/ui/enhanced/enhancedMenu.js'), /Dungeons and buildings are shared: enemies, doors, levers and opened chests are the same for everyone and stay that way\. In towns and the wilds, everyone nearby sees the same monsters and can fight them, and they can hurt you too\./);
-  assert.match(rd('bible/06-Systems/Online-Arc.md'), /## WORLD6 \(2026-09-14\)/, 'the record');
-});

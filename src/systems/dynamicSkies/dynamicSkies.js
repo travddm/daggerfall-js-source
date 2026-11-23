@@ -1,5 +1,4 @@
-// DYNAMIC SKIES (DS1, 2026-09-04, Mac's call: "I want to implement this
-// mod 1:1. We received permission from the creator.")
+// DYNAMIC SKIES (DS1, 2026-09-04)
 //
 // The LOGIC of Dynamic Skies 2.3.4 for Daggerfall Unity, by BadLuckBurt
 // and carademono - BLBSkybox.cs and the Scripts/ structs - ported line
@@ -84,10 +83,16 @@ export const DYNAMIC_SKIES_MOD = Object.freeze({
 });
 
 /** loadAllSkyboxSettings: the preset the mod loads per WeatherType,
- *  keyed by the port's weather names (WeatherType.None == Sunny). */
+ *  keyed by the port's weather names (WeatherType.None == Sunny).
+ *  ASHFALL1's audit: the port's own two words take the presets their fog
+ *  rows stand in for (world/weather.js fogForWeather under a mod's five) -
+ *  the sandstorm the fog's sky, the ashfall the overcast's (its flags');
+ *  unmapped, both fell to the sunny sky and the sunny fog under a wall of
+ *  sand or a pall of ash. */
 export const WEATHER_PRESET = Object.freeze({
   sunny: 'SkyboxSunny', cloudy: 'SkyboxCloudy', overcast: 'SkyboxOvercast', fog: 'SkyboxFog',
   rain: 'SkyboxRain', thunder: 'SkyboxThunder', snow: 'SkyboxSnow',
+  sandstorm: 'SkyboxFog', ashfall: 'SkyboxOvercast',
 });
 
 /** loadFogSettings' dictionary (BLBSkybox.cs:1100-1108): which of the
@@ -96,6 +101,7 @@ export const WEATHER_PRESET = Object.freeze({
 export const FOG_PRESET_FOR_WEATHER = Object.freeze({
   sunny: 'FogSunny', cloudy: 'FogSunny', overcast: 'FogOvercast', fog: 'FogHeavyFog',
   rain: 'FogRainy', thunder: 'FogRainy', snow: 'FogSnowy',
+  sandstorm: 'FogHeavyFog', ashfall: 'FogSnowy',   // ASHFALL1's audit: as world/weather.js fogForWeather stands them in
 });
 
 /** "Because game runs at timescale 12" - the mod's own constant. */
@@ -433,8 +439,7 @@ export const TEXTURE_SLOTS = Object.freeze([
   '_CloudTopDiffuse', '_CloudTopNormal', '_CloudDiffuse', '_CloudNormal',
   '_StarTex', '_StarTwinkleTex', '_TwinkleTex', '_MoonTex', '_SecundaTex',
 ]);
-// DS3 (2026-09-15, Mac: "the nighttime sky has these dark spots in the
-// skybox") - THE STAR FIELD IS FILTERED, AND THAT IS A DEPARTURE.
+// DS3 - THE STAR FIELD IS FILTERED, AND THAT IS A DEPARTURE.
 //
 // The mod imports every one of these Point, and the port matched it.
 // At night that costs the sky: `night * horizonValue` reaches 1.0, so

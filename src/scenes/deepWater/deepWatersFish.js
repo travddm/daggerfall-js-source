@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E3 (2026-09-25): ILIAC PUDDLE NO MORE'S FISH IN THE STREAMED WORLD
+// DW-E3: ILIAC PUDDLE NO MORE'S FISH IN THE STREAMED WORLD
 // (jet082, 1.2.2) - what a fish is once the spawner stands it
 // (UnderwaterPassiveFishSpawner.SpawnPassiveFish), and the frame's pump
 // of them all (PassiveFishBehaviour.PumpAll). The laws are world/

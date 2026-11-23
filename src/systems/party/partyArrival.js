@@ -61,7 +61,7 @@ export async function waitForPartyArrival(probe, {
   throw new PartyArrivalUnavailable();
 }
 
-// THE PARTY ARRIVAL, out of the host (PARTY-FOLLOW, 2026-10-25; HOST-SPLIT, bible/01-Overview/Host-Split.md). This
+// THE PARTY ARRIVAL, out of the host (PARTY-FOLLOW, 2026-10-25; HOST-SPLIT). This
 // was a callback inside bootWorld's fastTravelTo; it is the party's own law, so it lives here and the host wires it:
 // one construction (createPartyArrivalHost), one `land` in the teleport's arrival, one `arrivalLine` when it is said.
 //

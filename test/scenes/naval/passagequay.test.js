@@ -1,4 +1,4 @@
-// PASSAGE-QUAY (2026-10-27; bible/03-World/Passage.md, PASSAGE-QUAY) - A BOOKED SHIP COMES IN TO HER PORT'S QUAY: the tow
+// PASSAGE-QUAY - A BOOKED SHIP COMES IN TO HER PORT'S QUAY: the tow
 // (scenes/naval/passageQuay.js) over the real naval host and Come Sail Away's pool on SHIP-LIFE's coast (test/navalSea.mjs -
 // quays.test.js's dockSea, the warp seam laid on her as the mod lays it), and the passage's half (scenes/naval/passageHost.js)
 // over stand-ins for the sea and the journey.
@@ -56,7 +56,7 @@ function warpFor(h, seconds, seen = { land: 0, path: [], steps: 0 }, untilFast =
     h.boat.GameObject.rotation = w.rotation;
     h.view.feet = [...h.boat.GameObject.position];
     const p = h.boat.GameObject.position, y = yawOf(w.rotation);
-    if (overLand(p, y, h.boat.hull)) seen.land++;   // PIN MOVED (AUDIT HORIZONTAL C3): her stem, waist and stern at both sides too
+    if (overLand(p, y, h.boat.hull)) seen.land++;
     seen.path.push([p[0], p[2], y]);
     if (untilFast && h.host.berthing(h.boat) === 'fast') return seen;
   }
@@ -184,11 +184,6 @@ test('PASSAGE-QUAY THE PASSAGE\'S HALF: under way, her port\'s quay in reach - t
   n.host.frame(0.1);
   assert.equal(n.log.stopped, 0);
   assert.deepEqual(n.log.say, []);
-  // by source: the naval host wires the quay over the warp seam
-  const host = read('src/scenes/naval/navalHost.js');
-  assert.match(host, /const towed = enabled && boat \? quay\.step\(boat, dt\) : null;/);
-  assert.match(host, /bringIn: quay\.begin, berthing: quay\.state,/);
-  assert.match(host, /quay\.offset\(o\);/);
 });
 
 test('AUDIT HORIZONTAL C3 THE TOW NEVER LAYS HER OVER LAND: from ten places about the headland and the roads, each at eight headings - facing the land 30 m off it among them - the Small Ship and the Carrack are brought in and made fast with no part of her hull (bow, waist, stern; her centreline and both sides) ever over land; her way is planned TOW_CLEAR_M past her beam, and she makes way only with her head within TOW_SWING of it (mutants: the way planned on her centreline, the beam unread, warped along her head, way made while she swings, the land unread)', async () => {

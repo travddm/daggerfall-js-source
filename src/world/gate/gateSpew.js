@@ -1,16 +1,15 @@
 // @ts-check
-// WB5 (2026-09-25, Mac: "On death the boss would physically spew out per player loot and bounce (sort of how dropping a
-// torch works)"): THE SPEW - each piece of a fallen boss's spoils leaves his chest on its own arc, out and up toward the
+// WB5: THE SPEW - each piece of a fallen boss's spoils leaves his chest on its own arc, out and up toward the
 // player's side of him, and falls, bounces and comes to rest with the thrown torch's own physics
 // (scenes/droppedTorches.js stepProjectile: the fixed 0.02 s step, gravity accumulating on its own vector, the
 // collider's ray along each step, the flight's x/z with the gravity's y reflected off the struck face, the speed times
 // the bounce, rest once a bounce leaves it under a fifth of the throw's speed). Design:
-// bible/11-Multiplayer/World-Bosses.md section 7 ("The spew").
+// ("The spew").
 //
 // PURE: a seed, where he stood and where the player stands in; each piece's launch out; a piece and a ray function in,
 // the piece stepped. The pieces leave one at a time (SPEW_GAP_MS apart) so the burst reads as a burst.
 //
-// WB9f (2026-09-30, Mac: "Improve the loot drops that emit on his death and have them spread out more"): THE SPREAD. WB5
+// WB9f: THE SPREAD. WB5
 // threw every piece inside 0.9 radians of the player's bearing at 7-10.5 m/s, each bearing its own roll, so five pieces
 // could leave on one line and land in one heap. Now each piece takes its OWN SLOT across a fan twice as wide (the slots
 // dealt out in a seeded order, each jittered inside its own, `spewLaunches`), thrown harder; and so a throw that hard

@@ -1,4 +1,4 @@
-// AUDIT MW-CLOAK (2026-10-09, Mac: "Lets audit everything so far"): THE CLOAK IN MOTION. Four cold reviews of MW-EBONY1,
+// AUDIT MW-CLOAK: THE CLOAK IN MOTION. Four cold reviews of MW-EBONY1,
 // MW-CLOAK1 and MW-CLOAK2 found the cloak's two fits held at REST alone: the hem, swinging with the thighs, swept through
 // a hip-hung blade on every step its leg went forward (31 of the addon's 71 scabbards); a greatsword's tip came through
 // it in a stride and a bow's limb as the spine leant back; a pauldron came through its shoulders as an arm swung back;

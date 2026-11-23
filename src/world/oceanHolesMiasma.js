@@ -1,5 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════
-// OH-C (2026-09-26): THE ABYSS MIASMA - OceanHoles.CreateSurfaceMiasma's
+// OH-C: THE ABYSS MIASMA - OceanHoles.CreateSurfaceMiasma's
 // ParticleSystem, simulated. What the C# configures, and what a Unity
 // ParticleSystem does with it:
 //
@@ -22,7 +21,6 @@
 //
 // Unity's particle RNG is its own and unseeded; these are the player's
 // look (the sliders are theirs online), so the draws are Math.random's.
-// ═══════════════════════════════════════════════════════════════════
 
 import { SURFACE_MIASMA_LIFETIME, SURFACE_MIASMA_MAX_PARTICLES, SURFACE_MIASMA_EMISSION_RATE } from './oceanHoles.js';
 

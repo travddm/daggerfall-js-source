@@ -1,4 +1,4 @@
-// SAFE7 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 8): THE CODE OF CONDUCT, AS
+// SAFE7: THE CODE OF CONDUCT, AS
 // A PLAYER MEETS IT - a card over the game the first time they send a chat line (and again when the code changes): the
 // rules (net/safety/conduct.js), what follows a broken one, and two buttons. "I agree" keeps the agreement on the
 // account (the host asks the service) and the line that waited stays in the chat's field for the player's next Enter -
@@ -7,7 +7,7 @@
 // (Port-Doctrine, Scope): its record is this page.
 //
 // The card takes the pointer while it stands - a press on it is the card's, never a swing. AUDIT SAFE CLIENT-10
-// (2026-10-17): AND IT IS AN ENHANCED WINDOW LIKE THE REST - on the overlay stack while it stands (ui/enhanced/
+// AND IT IS AN ENHANCED WINDOW LIKE THE REST - on the overlay stack while it stands (ui/enhanced/
 // enhancedOverlays.js: the QuickDial key puts it away, as Not now, and the chat panel stands down under it with its line
 // kept in the field), Escape is Not now (overlayAction's 'back', the windows' own word), I agree has the focus, and the
 // pointer lock is let go so the mouse can reach it. Handed the document and the window so the pins drive it headless.
@@ -70,7 +70,7 @@ export function createConductCard({ agree, later = () => {}, touch = false, doc 
   let up = false;
   let unregister = () => {};
   /** AUDIT SAFE CLIENT-10: down, off the stack and out of the keyboard - THE SLOT IS EMPTIED BEFORE THE OCCUPANT IS TOLD
-   *  (bible/Home.md): an answer runs after this, and a close from any door answers once. True when it stood. */
+   * : an answer runs after this, and a close from any door answers once. True when it stood. */
   const close = () => {
     if (!up) return false;
     up = false;

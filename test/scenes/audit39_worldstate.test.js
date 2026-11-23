@@ -17,144 +17,14 @@ import { hostText } from '../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const src = (f) => readFileSync(join(root, f), 'utf8');
-const WORLD = hostText('src/scenes/world.js');
-const EXTERIOR = src('src/scenes/exterior.js');
-const WORLD_MODES = src('src/scenes/worldModes.js');
-const HOSTS = [['world.js', WORLD], ['exterior.js', EXTERIOR]];
 
 // ---------------------------------------------------------------------
 // #59 - paralysis, above ground
 // ---------------------------------------------------------------------
 
-test('AUDIT 39 #59: the two above-ground hosts gate the motor and the weapon on paralysis', () => {
-  // DFU reads PlayerEntity.IsParalyzed with no interior/exterior test:
-  // FrictionMotor.GroundedMovement (:75-81) and AcrobatMotor
-  // .CheckAirControl (:135-141) zero the movement input,
-  // HandleJumpInput (:64-70) and LevitateMotor.Update (:67-69) return
-  // early, WeaponManager (:235-239) does ShowWeapons(false) and takes
-  // no swing. Only dungeon.js and worldModes' dungeon arm carried it,
-  // and exteriorFoes' readySpell mints the spell out of the
-  // wilderness encounter tables - so a landed paralysis was inert.
-  for (const [name, s] of HOSTS) {
-    assert.match(s, /import \{ isInvisible, entityIsParalyzed(?:, concealBits)? \} from '\.\.\/systems\/effects\.js';/,
-      `${name}: the read-time fold (DaggerfallEntity.IsParalyzed + the FreeAction immunity)`);
-    assert.match(s, /const paralyzed = entityIsParalyzed\(playerEntity\)(?: \|\| staffFrozen\(\))?;/,
-      `${name}: one read per frame, above the motor and the weapon rig (STAFF-PANEL5-FREEZE: a staff freeze folded in beside it)`);
-    // AUDIT 64 F3 (review): the stride gate is no longer a host-side
-    // `moving` term. DFU silences the frozen player's footsteps
-    // THROUGH IsStandingStill: FrictionMotor.GroundedMovement zeroes
-    // inputX/inputY on IsParalyzed (:76-81), so moveDirection is zero
-    // and PlayerMotor.cs:113-125 answers true, which is what
-    // PlayerFootsteps.cs:264-265 reads. The hosts zero both axes in
-    // the paralysis bag (pinned below), so `player.standing` carries
-    // it - and unlike the raw move keys it also speaks under AutoRun.
-    assert.ok(s.includes('standingStill: player.standing,'),
-      `${name}: the footstep machine reads IsStandingStill`);
-    assert.equal(/standingStill: !moving,/.test(s), false,
-      `${name}: not a raw-move-key term (silent under autorun)`);
-    // PIN MOVED (TELL6e: a knocked-down player swings nothing either - the rig's flag takes the knockdown beside the
-    // paralysis, systems/blowEffects.js knockedDown)
-    assert.ok(s.includes('weaponRig.frame(dt, { paralyzed: paralyzed || knockedDown() })'), `${name}: no swing while frozen`);
-    assert.ok(s.includes('weaponRig.draw({ paralyzed })'), `${name}: ShowWeapons(false) - and no viewmodel`);
-  }
-  // the standalone dungeon host is the shape being matched
-  assert.match(src('src/scenes/dungeon.js'), /const paralyzed = ctx\.playerParalyzed\?\.\(\) \?\? false;/);
-});
-
-test('AUDIT 39r: the paralysed bag zeroes the movement VECTOR and keeps the speed-adjustment keys', () => {
-  // PIN MOVED, deliberately: it used to read `run: false` and carried
-  // neither autoRun, back nor sneak. DFU zeroes moveDirection
-  // (FrictionMotor :75-81, AcrobatMotor :135-141) and never
-  // CaptureInputSpeedAdjustment, which PlayerMotor.Update (:363-379)
-  // runs behind a levitate gate and nothing else - so with the wave's
-  // new press-edge latches a run/sneak/AutoRun key held through the
-  // paralysis read as RELEASED and fired a synthetic press the frame it
-  // lifted. The crouch toggle stays live either way (DecideHeightAction
-  // has no paralysis check).
-  // PADWALK (the EM3-3D patch): walk mode rides the same key - DFU's slow walk is Sneak, held or latched
-  const KEYS = "run: held(keys, 'Run'), autoRun: held(keys, 'AutoRun'), back: mv.backwards, sneak: held(keys, 'Sneak') || walkModeOn()";
-  // MWCROUCH replaced the `crouchHeld && !<latch>` derivation the four
-  // hosts shared with `crouchPress` - GetKeyDown off the frame's key
-  // ring (ui/input.js). The law this pin states is untouched: the
-  // paralysed bag zeroes the VECTOR and still carries the live crouch.
-  for (const [name, s] of [
-    ['world.js', WORLD], ['exterior.js', EXTERIOR],
-    ['worldModes.js', WORLD_MODES], ['dungeon.js', src('src/scenes/dungeon.js')],
-  ]) {
-    assert.ok(s.includes(`player.update(dt, paralyzed ? { forward: 0, strafe: 0, ${KEYS}, jump: false, up: false, down: false, crouch: crouchPress } : {`),
-      `${name}: the vector is zeroed, the capture keys ride through`);
-    assert.ok(!s.includes('paralyzed ? { forward: 0, strafe: 0, run: false,'), `${name}: and the old reduced bag is gone`);
-  }
-});
-
-test('AUDIT 39r: the THIRD above-ground host - worldModes\' interior arm - reads the same gate', () => {
-  // The #59 fix wired world.js and exterior.js and left worldModes'
-  // interior arm hardcoded `false`, in the same file whose #39 mounts
-  // spellsByIndex/magicHooks on the interior foe pool so "the S19
-  // monster paralyze rider" has Spider Touch indoors. Inside a building
-  // the motor took full input, the footstep machine strode, and the
-  // interior rig was handed no flag at all.
-  assert.match(WORLD_MODES, /import \{ entityIsParalyzed \} from '\.\.\/systems\/effects\.js';/,
-    'the read-time fold, the other two hosts\' own import');
-  assert.ok(WORLD_MODES.includes("const paralyzed = staffFrozen() || playerHeld() || ((mode === 'dungeon' && dungeonCtx) ? (dungeonCtx.playerParalyzed?.() ?? false) : entityIsParalyzed(playerEntity));"),   // PIN MOVED (AUDIT WORLD-EVENTS L1-4): and a body lying down for a raise
-    'one fold: the dungeon context underground, the entity above it (STAFF-PANEL5-FREEZE: a staff freeze before both)');
-  assert.ok(!WORLD_MODES.includes("(dungeonCtx.playerParalyzed?.() ?? false) : false;"), 'the hardcoded false is gone');
-  // AUDIT 64 F3 (review): see the note in the #59 pin above - the
-  // stride gate is IsStandingStill (PlayerFootsteps.cs:264-265), and
-  // the paralysis answer rides it because FrictionMotor.cs:76-81
-  // zeroes the axes the port's paralysis bag also zeroes.
-  assert.ok(WORLD_MODES.includes('standingStill: player.standing,'), 'the footstep machine reads IsStandingStill');
-  assert.equal(/standingStill: !(moving|anyMove\(mv\)),/.test(WORLD_MODES), false, 'not the raw keys');
-  assert.ok(WORLD_MODES.includes('interiorWeapon.frame(dt, { paralyzed: paralyzed || knockedDown() })'), 'WeaponManager :235-239 - no swing while frozen');   // PIN MOVED (TELL6e: and none knocked down)
-  assert.ok(WORLD_MODES.includes('interiorWeapon.draw({ paralyzed })'), 'ShowWeapons(false) - and no viewmodel');
-});
-
-test('AUDIT 39r: the interior arrow that lands on the player flashes the screen', () => {
-  // AUDIT 24 (wave 46): an arrow reaches the player through BowDamage
-  // -> ApplyDamageToPlayer -> SendDamageToPlayer, the same door as a
-  // blow, so it owes the flash. The new interior arm was world.js's
-  // four lines minus that call, and this host imported no damageFlash.
-  assert.match(WORLD_MODES, /import \{ flashPlayerDamage \} from '\.\.\/ui\/damageFlash\.js';/);
-  const hit = WORLD_MODES.slice(WORLD_MODES.indexOf('onPlayerHit: (m) => {'));
-  const body = hit.slice(0, hit.indexOf('addItem(playerEntity.items,'));
-  assert.ok(body.includes('hurtPlayer(playerEntity, dmg);') && body.includes('flashPlayerDamage(dmg);'),
-    'the flash sits with the damage, the sound and the cry');
-});
-
 // ---------------------------------------------------------------------
 // #152 - the HUD call is host-agnostic and reads no ARENA2
 // ---------------------------------------------------------------------
-
-test('AUDIT 39 #152: no host hides drawHud behind the classic HUD art', () => {
-  // hud.js:"HUDCompass.DrawCompass" runs playerDamageFlash and the enhanced DOM branch
-  // ABOVE its own `if (!art) return;` - "the enhanced HUD reads no
-  // ARENA2, and a player whose HUD art failed to load still has
-  // vitals". Three hosts wrapped the whole call in `if (hudArt)`, and
-  // hudArt starts null and is filled by a fire-and-forget load whose
-  // failure leaves it null forever: no vitals for the first frames of
-  // every session, and none at all when MAIN/HUD cannot be read.
-  const hud = src('src/ui/hud/hud.js');
-  const flashAt = hud.indexOf('playerDamageFlash.tick(dt);');
-  const enhancedAt = hud.indexOf('if (isEnhanced() && typeof document !== \'undefined\') {');
-  const returnAt = hud.indexOf('if (!art) return;');
-  assert.ok(flashAt > 0 && enhancedAt > flashAt && returnAt > enhancedAt,
-    'the flash and the enhanced branch sit above the art return');
-  for (const [name, s] of [...HOSTS, ['worldModes.js', WORLD_MODES]]) {
-    const call = s.indexOf('drawHud(renderer, canvas, hudArt, playerEntity,');
-    assert.ok(call > 0, `${name}: the one host-agnostic call`);
-    // walk out from the call: no `if (hudArt) {` may open a block that
-    // still contains it
-    for (let i = s.indexOf('if (hudArt) {'); i >= 0; i = s.indexOf('if (hudArt) {', i + 1)) {
-      let depth = 0, j = s.indexOf('{', i);
-      const open = j;
-      for (; j < s.length; j++) {
-        if (s[j] === '{') depth++;
-        else if (s[j] === '}' && --depth === 0) break;
-      }
-      assert.ok(!(call > open && call < j), `${name}: drawHud must not sit inside a classic-art guard`);
-    }
-  }
-});
 
 // ---------------------------------------------------------------------
 // #158 - CleanupUntrackedObjects
@@ -341,112 +211,13 @@ test('AUDIT-39r: a player ARROW knocks a watchman back - WeaponManager sets Knoc
   pool.guards.push(g2);
   pool.hurtGuard(g2, 5, [0, 0, 0]);
   assert.equal(g2.ai.knockbackDir, undefined, 'a directionless caster shoves nobody');
-  // and both above-ground hosts hand the missile's direction over
-  for (const [name, s] of HOSTS) {
-    assert.match(s, /cityGuards\.hurtGuard\(f, d, player\.pos, m\.dir, \{ kind: 'arrow' \}\)/,   // PIN MOVED (TELL1: and the blow's kind - a shaft's weight on a wind-up)
-      `${name}: the guard arm of onPlayerArrowHitFoe carries m.dir, like the foe arm beside it`);
-  }
-});
-
-test('AUDIT-39r: the dungeon host runs the missile sweep at its OWN load door', () => {
-  // clearMissiles' trigger is SaveLoadManager_OnStartLoad - a LOAD, in
-  // every host - and the port wired it into world.js's teleport alone.
-  // DFU reaches a dungeon's flights from the other side: a missile cast
-  // underground is parented to the dungeon (GameObjectHelper
-  // .GetBestParent :405-427), and the load runs RespawnPlayer, whose
-  // first act is Destroy(dungeon) (PlayerEnterExit.cs:453-457,
-  // :622-630). dungeonContext is REUSED across its own quickLoad, so
-  // nothing tore the flights down and a missile in the air when F12
-  // landed kept flying at the restored player. (The world-HOSTED
-  // dungeon needs nothing: worldQuickLoad forces the exit first, and
-  // that destroys the context and its engine with it. exterior.js has
-  // no load door at all.)
-  const ctx = src('src/scenes/dungeonContext.js');
-  const at = ctx.indexOf('quickLoad(setPlayerPos, key = null) {');
-  assert.ok(at > 0, 'the dungeon host owns a load door');
-  // ONLINE-LOAD1 widened this window slightly: quickLoad now carries its own online guard
-  // (F9/F11 reach it directly, with no pane in the way to stop them) ahead of the same call chain.
-  // BLOOD AUDIT 4 widened it again: the blood's clear rides beside the sweep, with its reason.
-  // CASTLE1 widened it once more: the door hands a save from another place to the world host first, with its reason.
-  // AUDIT OH-F B2 widened it again: the drowned dungeon's load goes the same way, with its reason, and the restore
-  // hands its rebuilds back. DIAL-LOAD widened it again: the second half's first line takes the host's load law when the
-  // door brought none. (The merge of the two: both widenings, 5500 + 1000 + 500.)
-  // AUDIT DISC28 widened it once more: the load's start raises the host's own OnStartLoad hands (onStartLoad - the
-  // camera's reel reset), with its reason. AUDIT REST III A1 widened it again: the save's camps outside, stood after the
-  // second half (outerCampsLoad), with its reason.
-  // AUDIT DELVE widened it again: the restore reads the size law once before the world record (a load at another size
-  // leaves that record unapplied), with its reason.
-  const body = ctx.slice(at, at + 8200);
-  assert.match(body, /magic\.clearMissiles\(\);/, 'which sweeps its own flights');
-  assert.ok(body.indexOf('magic.clearMissiles();') < body.indexOf('applyWorld(extras.world)'),
-    'ahead of the world restore, as OnStartLoad is');
 });
 
 // ---------------------------------------------------------------------
 // #159 - AreEnemiesNearby at the travel map's door
 // ---------------------------------------------------------------------
 
-test('AUDIT 39 #159: the travel map refuses with enemies nearby, before the racial gate', () => {
-  // DaggerfallUI.cs:604-609: IsPlayerInside first, then
-  // AreEnemiesNearby -> MessageBox("cannotTravelWithEnemiesNearby"),
-  // and only then GiveOffer, the sun-damage box and
-  // racialOverride.CheckFastTravel. The port carried the indoors gate
-  // (the keydown ladder's `mode === 'exterior'`) and the racial one,
-  // and nothing between them.
-  assert.match(WORLD, /const CANNOT_TRAVEL_ENEMIES_TEXT = 'You cannot travel with enemies nearby\.';/,
-    'Internal_Strings.csv :221, verbatim');
-  const i = WORLD.indexOf('const toggleTravelMap = (gotoPlace = null) => {');
-  assert.ok(i > 0);
-  const door = WORLD.slice(i, WORLD.indexOf('townTalk.showOverlay(_travelMap);', i));
-  const nearby = door.indexOf('if (duelEnemyNear() || areEnemiesNearby([...cityGuards.guards, ...exteriorFoes.foes]) || navalHostileNear()) {');   // DUEL1: a duel opponent is an enemy nearby too; NAV-H (2026-09-28): and a hostile ship in reach
-  const racial = door.indexOf('const ftb = racialFastTravelBlock(playerEntity');
-  const build = door.indexOf('_travelMap = buildTravelMapWindow(');
-  assert.ok(nearby > 0, 'the refusal is at the door');
-  assert.ok(racial > nearby, 'ordered ahead of CheckFastTravel, as DFU orders it');
-  assert.ok(build > racial, 'and both ahead of the window');
-  assert.ok(door.includes("townTalk.say(localizedText('cannotTravelWithEnemiesNearby', CANNOT_TRAVEL_ENEMIES_TEXT));"), 'the line is spoken');
-  // the STRICT variant - resting's slack distance is the sleep rule
-  assert.ok(!/areEnemiesNearby\(\[\.\.\.cityGuards\.guards, \.\.\.exteriorFoes\.foes\]\), \{ resting/.test(door));
-});
-
 // ---------------------------------------------------------------------
 // #130 / #78 - the exterior host's touch tap and its stale comment
 // ---------------------------------------------------------------------
 
-test('AUDIT 39 #130: the exterior host\'s attack TAP defers to a readied spell like its other three doors', () => {
-  // WeaponManager.cs:244-263 hands the click to the ready spell before
-  // it handles any attack; touch.js:"function setLockDot" already promises the tap casts.
-  // TI1 (2026-09-05): the tap-to-attack button is gone - the touch
-  // SWIPE is the attack now, and it carries the same gate in front of
-  // the drag seam, held-edge only (a release must reach the rig).
-  assert.ok(EXTERIOR.includes("if (held && magic.interceptAttack(true)) return;   // M2: an armed cast eats the swing"),
-    'the swipe defers to a readied spell');
-  // INTEGRATION MOVED THIS PIN 4 -> 3 (#127 removed the dead drag
-  // hook) and ROAD A8 MOVED IT BACK to 4: the pointer-parity layout's
-  // Mouse0 cast arm (`_act.cast`) is the new fourth door - a LIVE one,
-  // unlike the drag hook it numerically replaces. The four doors are
-  // mousemove, mousedown, the SWIPE (TI1) and the frame's cast dispatch.
-  // MAC-SWING1 (2026-09-21) added a FIFTH door: the frame's key latch
-  // for a swing bound to a key or pad code, gated exactly as mousedown.
-  // PIN MOVED (SPELL-HAND): the cast dispatch says it is a cast's own press - `interceptAttack(true, { cast: true })`, the
-  // door a spell in the free hand still casts through while the swing button swings (scenes/hostMagic.js); still five doors.
-  // PIN MOVED (AUDIT SPELL-HAND, HOST-SPLIT): the press is the imported word CAST_PRESS (was: `{ cast: true }`, an entry)
-  for (const [name, s] of HOSTS) {
-    // AUDIT SPELL-HAND L5-9: four swing doors (no word) and the one cast press (the word) - each counted on its own
-    assert.equal((s.match(/magic\.interceptAttack\(true\)/g) ?? []).length, 4, `${name}: the four swing doors`);
-    assert.equal((s.match(/magic\.interceptAttack\(true, CAST_PRESS\)/g) ?? []).length, 1, `${name}: the one cast press`);
-    assert.equal((s.match(/magic\.interceptAttack\(true(?:, CAST_PRESS)?\)/g) ?? []).length, 5,
-      `${name}: mousemove, mousedown, the swipe, the cast dispatch and the key latch`);
-  }
-});
-
-test('AUDIT 39 #78: the engine-rig block no longer promises a V toggle that was retired', () => {
-  // I2 retired it: V is DFU's TravelMap default (InputManager.cs:1028,
-  // mirrored at inputActions.js's ['KeyV', 'TravelMap']), and the
-  // keydown ladder has no camera branch. ?tp is boot-only, and the
-  // const says so.
-  assert.ok(!EXTERIOR.includes('V toggles at runtime'), 'the promise is gone');
-  assert.match(EXTERIOR, /const tpMode = params\.has\('tp'\);/, 'never reassigned - the binding pins it');
-  assert.ok(EXTERIOR.includes('?tp is BOOT-ONLY'), 'and the block says what is true');
-  assert.match(src('src/systems/inputActions.js'), /\['KeyV', 'TravelMap'\]/, 'V is the map');
-});

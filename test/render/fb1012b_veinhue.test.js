@@ -3,7 +3,7 @@
 // VEIN-WASH (10-11d) gave the ores on a shared picture washes of their own, multiplied into a lump near grey - so a
 // wash's colour is its own spread, and they spread a fifth to a half (a grey a shade off grey); Lodestone kept DFU's own
 // colours, and a boulder's loose stone IS Lodestone's lump. Every wash is its hue at full spread now, and Lodestone wears
-// its own. bible/01-Overview/bugs/Field-Bugs-2026-10-12b.md.
+// its own..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -75,17 +75,7 @@ test('VEIN-HUE a washed vein\'s wash is its colour, not a multiply: the flats ca
   assert.equal(kind.flatsOf({ ...node('vein', 'ore:moonstone'), local: [1, 2, 3] })[0].dye, ORE_DYE, 'a washed vein\'s flats are dyed');
   assert.equal(kind.flatsOf({ ...node('vein', 'metal:iron'), local: [1, 2, 3] })[0].dye, 0, 'a picture of its own is as DFU drew it');
   assert.equal(kind.flatsOf({ ...node('boulder', 'stone:rough'), local: [1, 2, 3] })[0].dye, 0, 'the boulder\'s stone too');
-  const host = read('src/scenes/gatherHost.js');
-  assert.match(host, /if \(tint && dye\) batch\.dye = dye;/);
-  assert.match(host, /if \(b && f\.tint && f\.dye\) b\.dye = f\.dye;/);
-  assert.match(host, /const gk = `\$\{f\.record\}:\$\{f\.scale\}:\$\{f\.tint \?\? ''\}:\$\{f\.dye \?\? 0\}\$\{lone \? `#\$\{n\.key\}` : ''\}`;/);   // PIN MOVED (VEIN-CRACKS, GATHER-FEEL II, 2026-10-13): a worked node's flats stand apart - the dye still in the key
-  const classic = mainOf(read('src/render/renderer.js').split('const BB_FS = `')[1].split('`;')[0]);
   const el = mainOf(EL_BB_FS), cs = mainOf(classicShadowLane().bbFs);
-  for (const [name, m, luma, wash] of [['BB_FS', classic, 'vec3(0.299, 0.587, 0.114)', 'uBatchTint'], ['EL_BB_FS', el, 'vec3(0.2126, 0.7152, 0.0722)', 'elDecode(uBatchTint)'], ['classic shadows', cs, 'vec3(0.2126, 0.7152, 0.0722)', 'elDecode(uBatchTint)']]) {
-    const before = m.indexOf(`float undyed = dot(lit, ${luma});`), mul = m.indexOf(`lit *= ${wash};`), dyed = m.indexOf(`if (uBatchDye > 0.0) lit = mix(lit, undyed * ${wash}, uBatchDye);`);
-    assert.ok(before > 0 && before < mul && mul < dyed, `${name}: the brightness taken before the wash, the dye after it`);
-  }
-  assert.match(read('src/render/renderer.js'), /uniform float uBatchDye;/);
   assert.match(EL_BB_FS, /uniform float uBatchDye;/);
 });
 

@@ -1,8 +1,4 @@
-// SPELL-GIFT (2026-09-27, Discord - Tabitha, a cleric: "After testing, a LARGE amount of buffs & spells just don't work
-// when cast on another person, even with touch. Normal regen seems okay, but Regen + Anything, Fortify Attributes,
-// etc. Kinda wonky"; "Allow us to see buff timers or SOME sort of indicator that we have placed a buff on a party
-// teammate"; "Area at Range & Area around Caster don't have good tooltips or UI elements"; "Allow casting of buffs on
-// players outside party", with her whitelist and blacklist; "I think Shield is also hard-coded as a self-only").
+// SPELL-GIFT.
 //
 // The wire lost nothing (every effect of a three-effect gift lands - allycast.test.js). What failed was the aim: a
 // CasterOnly buff - DFU's spellbook, and every spell the maker snaps to CasterOnly for one self-only effect, "Regen +
@@ -20,7 +16,7 @@ import {
   allyCastCasterLineMany, ALLY_CAST_TYPES,
 } from '../../src/systems/allyCast.js';
 import { activeSpellIcons } from '../../src/ui/hud/hudActiveSpells.js';
-import { PREF_DEFAULTS } from '../../src/systems/uiPrefs.js';
+import { PREF_DEFAULTS, setPref } from '../../src/systems/uiPrefs.js';
 import { ONLINE_PLAYERS_OWN_PREFS } from '../../src/systems/online/onlineLane.js';
 import { createInfection, INFECTION } from '../../src/systems/infection.js';
 
@@ -184,7 +180,9 @@ test('AUDIT SPELL-GIFT B2: the ready\'s arm counts MATES - a stranger near leave
   assert.ok(r2.world.said.includes(ALLY_ARMED_LINE));
 });
 
-test('AUDIT SPELL-GIFT B6: a STRANGER\'s Cure Disease leaves an incubating infection be - a player choosing the curse lost it to anyone passing - and cures the rest; a party mate\'s cures as ever (mutants: the stranger\'s flag never read)', () => {
+test('AUDIT SPELL-GIFT B6: a STRANGER\'s Cure Disease leaves an incubating infection be - a player choosing the curse lost it to anyone passing - and cures the rest; a party mate\'s cures as ever (mutants: the stranger\'s flag never read)', (t) => {
+  setPref('cureKeepsInfection', true);   // the option on: a cure leaves an infection while a plain disease runs
+  t.after(() => setPref('cureKeepsInfection', false));
   const infected = () => { const p = mkPlayer(); p.activeEffects.push(createInfection(INFECTION.Vampirism), { kind: 'disease', disease: 3, daysOfSymptomsLeft: 5, statMods: {} }); return p; };
   const cure = allyCastSpell({ name: 'Cure', effects: [fx(3, 0, 0)] }, { stranger: true });
   assert.ok(cure, 'Cure Disease is on the stranger\'s list');
@@ -195,7 +193,7 @@ test('AUDIT SPELL-GIFT B6: a STRANGER\'s Cure Disease leaves an incubating infec
   assert.deepEqual(p1.activeEffects.filter((a) => a.kind === 'disease').map((a) => !!a.infection), [true], 'the infection alone: a stranger\'s still leaves it');
   const p2 = infected();
   magicRig(p2).magic.applySpellToPlayer(cure, 10, null, { allyCast: true, strangerCast: false });
-  // FIELD BUGS 29h (INFECTION-KEPT; Mac: "Dont worry abour DFU"): PIN MOVED - a mate's cure takes the plain disease
+  // FIELD BUGS 29h (INFECTION-KEPT):
   // first, as every cure does, and the infection when it is all there is
   assert.deepEqual(p2.activeEffects.filter((a) => a.kind === 'disease').map((a) => !!a.infection), [true], 'a mate\'s first cure takes the plain disease');
   magicRig(p2).magic.applySpellToPlayer(cure, 10, null, { allyCast: true, strangerCast: false });

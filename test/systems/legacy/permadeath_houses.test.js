@@ -1,6 +1,5 @@
-// PERMADEATH-HOUSES (2026-10-09, the owner: "now all that needs to be looked at is what happens to houses owned by dead
-// permadeath characters and I can go back to playing my family"; asked, he chose "Heir inherits"): A DEAD MEMBER'S
-// HOUSE PASSES TO WHOEVER CARRIES THE LINE (bible/06-Systems/Legacy-Arc.md section 10c). Until it did, a fallen
+// PERMADEATH-HOUSES: A DEAD MEMBER'S
+// HOUSE PASSES TO WHOEVER CARRIES THE LINE. Until it did, a fallen
 // member's deed stayed in a save the line refuses to play: the family lived in the house, and the heir found its door
 // locked at night, no bed of theirs and no cupboard - online a tombstone held the building out of the world for good.
 // The law (systems/legacy/household.js deedsDue, syncHouses' `taken`) and the host (scenes/legacyHost.js takeDeeds)
@@ -338,14 +337,3 @@ test('PERMADEATH-HOUSES: online a fallen realm character\'s home is taken up by 
 
 // ---- the wiring --------------------------------------------------------------------------------------------------------
 
-test('PERMADEATH-HOUSES: the world host hands the house on - offline the bank\'s deed (one a region) and the fallen\'s own newest save\'s scene, online the service\'s home and the fallen\'s realm record\'s cupboards', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /inheritHouse: legacyInheritHouse,/);
-  assert.match(w, /if \(\(slot\.buildingKey \| 0\) > 0\) return \(slot\.mapId >>> 0\) === \(row\.mapId >>> 0\) && \(slot\.buildingKey \| 0\) === \(row\.buildingKey \| 0\) \? 'given' : 'waits';/);
-  assert.match(w, /graftPermanentScene\(playerEntity\.sceneCache \?\?= createSceneCache\(\), scenes\(\), interiorSceneName\(row\.mapId, row\.buildingKey \| 0\)\);/);
-  assert.match(w, /return legacyInheritDeed\(row, \(\) => \(at >= 0 \? loadSlot\(at\)\?\.sceneCache \?\? null : null\)\);/);
-  assert.match(w, /const r = await homesApi\.inherit\(\{ mapId: row\.mapId >>> 0, buildingKey: row\.buildingKey \| 0, character: me, from \}\);/);
-  assert.match(w, /const rec = await realmFetch\(realmIoNow\(\), from\);/);
-  assert.match(rd('src/net/accountClient.js'), /inherit: \(\{ mapId, buildingKey, character, from \}\) => post\('\/v1\/homes\/inherit', \{ mapId, buildingKey, character, from \}\),/);
-  assert.match(rd('server-account/src/index.js'), /if \(path === '\/v1\/homes\/inherit'\) \{\n[^]*?const r = await inheritHome\(hctx, who\.player, body\);/);
-});

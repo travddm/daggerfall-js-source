@@ -74,8 +74,7 @@ export class ServiceFlowWindow {
   constructor(boxes = [], { onClose = null, graceMs = 0 } = {}) {
     this.boxes = [...boxes];
     this.onClose = onClose;
-    // QUEST-NOTE (2026-10-13, a player: "killed the mage in question, but DFO never popped up saying the mage was
-    // killed"): A BOX THAT JUST APPEARED IS NOT CLOSED BY THE PRESS ALREADY ON ITS WAY. Online the game does not stop for
+    // QUEST-NOTE: A BOX THAT JUST APPEARED IS NOT CLOSED BY THE PRESS ALREADY ON ITS WAY. Online the game does not stop for
     // it, and the swing or the step that killed the foe closed the box the kill raised before a word of it was drawn.
     // A plain click-anywhere box ignores clicks and keys for `graceMs` after each box comes up (0: DFU's own, at once).
     this.graceMs = Math.max(0, Number(graceMs) || 0);
@@ -264,8 +263,7 @@ const line = (text) => [{ text, center: true }];
  *  the whole MacroHelper table over each one. The tavern's own prompt
  *  is where a live probe finally read one raw, but these three windows
  *  speak the same records and had the same hole. */
-/** MAC-BUG2 (2026-09-20, Mac, over a screenshot of the temple's cure
- *  box: "curing disease in temple gives this %cpn thing") - AND IT IS
+/** MAC-BUG2 - AND IT IS
  *  U39'S OWN ARGUMENT, ONE TABLE ROW FURTHER ALONG.
  *
  *  U39 put `%ra` and `%hnr` here because "DFU expands the WHOLE
@@ -424,7 +422,7 @@ export function buildDonationFlow(entity, store, divineFactionId, deps) {
   return new ServiceFlowWindow(standingOffers(entity, deps, [donation]), { onClose });
 }
 
-/** REP3 + REP4 (Mac: "Timed or pardoned"; "Earn it + faster drift" - temple penance, paid reparations whose price rises
+/** REP3 + REP4 (; "Earn it + faster drift" - temple penance, paid reparations whose price rises
  *  each use): THE TEMPLE SPEAKS FOR A BAD NAME. The donation's priest asks first, only when the law of the temple's region
  *  has something to mend: a banishment standing is offered a PARDON (standing.js pardonPrice - the first 2,500, each
  *  after it one more step), a standing below zero a PENANCE (five points back toward zero; 200, then 400, 600 ...). A No

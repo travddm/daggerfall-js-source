@@ -1,6 +1,5 @@
 // FIELD BUGS 2026-09-29h (WALK-CLOCK) - ThetaDecay: "Guild rank time not advancing (online). I tried traveling back and
 // forth between towns, which took 32 total days. I met all the reqs for a guild rank bump and wasn't able to get one."
-// Mac, on the batch's first answer: "Dont worry abour DFU."
 //
 // A guild's 28 days (Guild.cs) are stamped and read on the character's own clock (LIVED1). Online the shared clock is the
 // world's and moves for nobody, and the frame's tick reads it alone - so an accelerated walk (Travel Options' walk, the
@@ -26,7 +25,9 @@ function walkRaiseOf() {
   const m = /\n\s*const walkRaise = ([^\n]+);\n/.exec(W);
   assert.ok(m, 'the frame no longer names its walk raise');
   // eslint-disable-next-line no-new-func
-  return new Function('sharedClockOn', 'travelScale', 'dt', 'CLASSIC_MINUTES_PER_SECOND', `return ${m[1]};`);
+  const lifted = new Function('sharedClockOn', 'travelScale', 'dt', 'CLASSIC_MINUTES_PER_SECOND', 'onlineMinutesPerMs', `return ${m[1]};`);
+  // online the frame reads the wire's live rate; at DFU's TimeScale 12 it is the classic rate over a thousand
+  return (sharedClockOn, travelScale, dt, rate) => lifted(sharedClockOn, travelScale, dt, rate, () => rate / 1000);
 }
 const player = () => ({
   isPlayer: true, name: 'P', raceId: RACES.Breton, level: 5, health: 60, maxHealth: 60, magicka: 10, maxMagicka: 10, fatigue: 6000,

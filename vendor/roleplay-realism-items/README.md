@@ -58,7 +58,7 @@ derives the folder's membership from it).
   `src/systems/roleplayRealismItems/rriItems.js` (DFU's virtuals, dispatched from each of the
   port's law sites), the template rows and patches, the art on the
   texture-replacement door, the random makers' custom slots
-  (`newWeapons`, `newArmor`). `bible/06-Systems/Roleplay-Realism-Items.md`
+  (`newWeapons`, `newArmor`). `docs/formats/mods-and-vendor.md`
   is the page.
 - The mod's other nine modules (loot tables, bandaging, condition
   prices, store condition, enemy kits, starting kits and spells, weapon

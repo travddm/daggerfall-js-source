@@ -1,5 +1,5 @@
-// TWO-HANDS (2026-10-16): THE SPRITE LANE'S TWO HANDS - both fists up, a pair of weapons, and the hands that run.
-// Design and record: bible/05-Combat/Two-Hands.md; the law (which hand strikes, the mirror, the guard, the pump):
+// TWO-HANDS: THE SPRITE LANE'S TWO HANDS - both fists up, a pair of weapons, and the hands that run.
+// Design and record:; the law (which hand strikes, the mirror, the guard, the pump):
 // combat/twoHands/handsLaw.js. Wired by combat/weapon/weaponRig.js, the one surface all four hosts mount (THE FOUR HOSTS RULE: world.js,
 // exterior.js, worldModes.js and dungeonContext.js each build a rig and carry no line of this).
 //
@@ -152,7 +152,7 @@ export function createTwoHands({ audio = null, envHit = null, missEffect = null,
     const rect = moved(mirror ? mirrorRect(q.rect, canvas.width) : q.rect, nudge(hand, canvas, q.rect.h, v.state !== 'Idle'));
     const uv = mirror ? MIRROR_UV : q.uv;
     renderer.drawScreenQuad(q.tex, rect, uv, tint ?? undefined);
-    // WEAPON-GLOW1 (bible/05-Combat/Weapon-Glow.md): this hand's own weapon's element, its outline over its own picture -
+    // WEAPON-GLOW1: this hand's own weapon's element, its outline over its own picture -
     // the mirror's rect and source, measured in the record's own pixels (drawFpsWeapon's line)
     if (glow) renderer.drawScreenQuadGlow?.(q.tex, rect, uv, glow, { art: [q.rec.width, q.rec.height], view: [canvas.width, canvas.height] });
     return rect;
@@ -164,14 +164,13 @@ export function createTwoHands({ audio = null, envHit = null, missEffect = null,
    * draw (its art still loading) falls through to the classic sprite for that hand, as the one hand's seam does (WW4).
    * `artFor(hand)` answers a hand's classic art, `glowFor(hand)` its weapon's element (WEAPON-GLOW1 - a widget clone is
    * handed its own in its frame). `running` the seam's word that the running hands are drawn this frame (it yields them
-   * to any picture that takes the hands). `only` draws that one hand alone (MIXED-PAIR: a blade-and-gun pair's blade - its
-   * gun is drawn on the gun's own frame, in this order: combat/weapon/weaponRig.js). True when it owned the seam.
+   * to any picture that takes the hands). True when it owned the seam.
    */
-  function drawPair(renderer, canvas, { widget = null, widgetOn = false, artFor, glowFor = () => null, shown = true, tint = null, offsetHeight = 0, running = st.run.w > 0, only = null } = {}) {
+  function drawPair(renderer, canvas, { widget = null, widgetOn = false, artFor, glowFor = () => null, shown = true, tint = null, offsetHeight = 0, running = st.run.w > 0 } = {}) {
     if (!renderer || !canvas || !twoHanded(st.mode)) return false;
     // the running hands own the fists (drawRun, before this) - all but a punch thrown on the run, drawn here over them
     for (const hand of drawOrder()) {
-      if ((running && hand !== st.strikeHand) || (only && hand !== only)) continue;
+      if (running && hand !== st.strikeHand) continue;
       const clone = hand === 'R' ? widget : offWidget;
       const shows = clone?.state ?? 0;   // the record the clone draws - it plays its strike a frame behind the machine
       const mirror = mirrorOf(hand, paintedAt(shows));
@@ -243,8 +242,7 @@ export function createTwoHands({ audio = null, envHit = null, missEffect = null,
 
   return {
     step, drawPair, drawRun, restRect, view: (hand) => views[hand], offWidget,
-    /** The hands in the order they are drawn - the one striking last, over the other (MIXED-PAIR: the rig's own order for a
-     *  pair drawn through two doors). */
+    /** The hands in the order they are drawn - the one striking last, over the other. */
     drawOrder,
     /** AUDIT 2: the hand's punch was thrown off the running arm - its clone winds up from below the view. */
     fromBelow: (hand) => st.fromBelow === hand,

@@ -1,5 +1,5 @@
 // @ts-check
-// MWNPC1 (2026-10-09): THE GPU SKIN'S PALETTE, ITS SHAPE IN ONE HOME. The palette is an RGBA32F texture the
+// MWNPC1: THE GPU SKIN'S PALETTE, ITS SHAPE IN ONE HOME. The palette is an RGBA32F texture the
 // character vertex shader reads with texelFetch (renderer.js CHAR_SKIN_VS), written by formats/morrowind/mwGpuSkin.js
 // writeSkinPalette and uploaded by renderer.js updateSkinPalette - three modules that must agree on where entry `e`
 // lives, so the numbers are here and each of them imports them.

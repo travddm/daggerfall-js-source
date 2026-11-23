@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-A (2026-09-28) - THE SHOT IN FLIGHT, AND WHAT FLOATS: every ball fired, every fire barrel rolled off a stern,
+// NAV-A - THE SHOT IN FLIGHT, AND WHAT FLOATS: every ball fired, every fire barrel rolled off a stern,
 // every cask a sinking hull gives up. The port's own; pure - the host hands the sea's height, the ships as boxes
 // and (optionally) the ground, and reads back what happened as events.
 //
@@ -23,11 +23,11 @@
 // FLOTSAM - the casks a sunk ship leaves (NAV-D) - floats FLOTSAM_LIFE seconds, and the first collector (the
 // player's boat) within FLOTSAM_REACH picks it up - a 'pickup'. Whatever floats DRIFTS: FLOAT_DRIFT of the wind's
 // vector a second, downwind, as a cask does.
-// SHOT-KINDS (bible/03-World/Naval-Refit.md): a ball keeps the load it left with (`shot`, navalGunnery.js volleyLaunches;
+// SHOT-KINDS: a ball keeps the load it left with (`shot`, navalGunnery.js volleyLaunches;
 // null its bore's own) - its sweep the loaded gun's (shotKinds.js shotGun: a bag of grape and a tumbling chain sweep wider
 // than a ball), and every event it raises says it, a hit with its flight `t` (grapeshot's men fall off with it -
 // shotKinds.js shotReach).
-// NEAR-MISS (COMBAT-FEEL, bible/03-World/Naval-Refit.md): a ball that goes by a ship that HEARS it (a target marked
+// NEAR-MISS (COMBAT-FEEL): a ball that goes by a ship that HEARS it (a target marked
 // `ear` - the player's own boats) within NEAR_MISS_M without striking her in that piece of its flight is a 'pass' - once
 // a ball a ship, told at its nearest (`point`, `gap`): the host's whistle and the near splash's drench read it. A ball
 // that comes on to strike her a piece later is heard coming, then strikes.

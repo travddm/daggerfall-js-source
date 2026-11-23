@@ -49,7 +49,7 @@ export function installPlusCursor(doc = globalThis.document) {
   installed = true;
   const root = doc.documentElement;
   applyPlusCursor(doc);
-  // CLICK-STUTTER (2026-10-13, field: "when I'm spamming the left mouse button the game starts to stutter"): the press
+  // CLICK-STUTTER: the press
   // frame is a class on <html>, and the rules above match EVERY element and pseudo-element under it - so each toggle
   // restyles the whole page, twice a click. With the pointer LOCKED (a swing in the world) there is no cursor to draw:
   // the press is not worn at all, and a class left on from before the lock is taken off once.

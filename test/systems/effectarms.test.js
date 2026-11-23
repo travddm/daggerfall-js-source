@@ -3,6 +3,7 @@
 // out of spellEffects.js's inert set, so the maker's "(no effect
 // yet)" marks disappear as the arms land.
 
+import { setPref } from '../../src/systems/uiPrefs.js';   // a Features row's pref, for one test
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -214,17 +215,18 @@ test('X1 Elemental Resistance: a successful roll drops the effect WHOLE, per ele
   s.activeEffects[0].roundsRemaining = 1;
   applySpell(half, 1, s, {}, () => 0.5, null, {});
   assert.equal(s.activeEffects.length, 1, 'like-kind merges into one incumbent');
-  assert.equal(s.activeEffects[0].roundsRemaining, rounds1, 'rounds RENEWED, never stacked');   // PIN MOVED (STACK-CAP)
+  assert.equal(s.activeEffects[0].roundsRemaining, rounds1, 'rounds RENEWED, never stacked');
   assert.equal(elementalResistanceChance(s, 3), chance1, 'the chance is the incumbent\'s, unchanged');
   // a DIFFERENT element is not like-kind - its own instance
   applySpell(buildCustomSpell({ slots: [{ type: 8, subType: 1, settings: { ...blankEffectSettings(), durationBase: 5, chanceBase: 30 } }], rangeType: 0 }), 1, s, {}, () => 0.5, null, {});
   assert.equal(s.activeEffects.length, 2);
 });
 
-test('X1 Spell Absorption: the effect arm swallows the spell and credits its cost as magicka', () => {
+test('X1 Spell Absorption: the effect arm swallows the spell and credits its cost as magicka', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   const e = target();
   grant(e, 20);
-  // ABSORB-NERF (2026-09-30): a crafted 100 is built at the maker's 50, and the chance caps at 50 - a roll under it
+  // ABSORB-NERF: a crafted 100 is built at the maker's 50, and the chance caps at 50 - a roll under it
   assert.equal(spellAbsorptionChance(e), 50);
   const cost = effectCastingCost(
     buildCustomSpell({ slots: [{ type: 4, subType: 0, settings: { ...blankEffectSettings(), magnitudeBaseLow: 10, magnitudeBaseHigh: 10 } }] }).effects[0], 2, e);
@@ -392,7 +394,6 @@ test('X1 REVIEW: the four SetHealth(0) callers all say bypassShield, and each na
     // aliased at import, because a one-argument wrapper owns the name here
     'src/scenes/dungeonContext.js': 'hurtEntity',
   };
-  // PIN MOVED (FIELD BUGS 2026-10-13e SPENT-ASHORE): the exhaustion collapse is no SetHealth(0) in any host now - with
   // foes about (and in the water, SWIM-SPENT) it costs a share of the health through the same door, the shield still
   // bypassed - so exterior.js and worldModes.js, whose only SetHealth(0) it was, are held to that arm; the drownings
   // (world.js's Deep Waters breath, the dungeon's) still kill.
@@ -414,7 +415,8 @@ test('X1 REVIEW: the four SetHealth(0) callers all say bypassShield, and each na
 });
 
 // ── X2: the defence parity gaps ───────────────────────────────────
-test('X2: absorption recomputes from the TARGET level at absorb time; resistance stays frozen at the caster level', () => {
+test('X2: absorption recomputes from the TARGET level at absorb time; resistance stays frozen at the caster level', (tc) => {
+  setPref('absorptionLimits', true); tc.after(() => setPref('absorptionLimits', false));   // the port's absorption limits: the Features row, off by default
   // The one asymmetry in DFU's defence chain:
   // TryEffectBasedAbsorption reads entity.Level of the TARGET
   // (EEM:1287-1292), while TryResistance goes through RollChance ->

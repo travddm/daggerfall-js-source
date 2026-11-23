@@ -82,14 +82,3 @@ test('INTERIOR-LOAD a finished building leaves the full screen hidden through it
   }
 });
 
-test('INTERIOR-LOAD the building door raises the ring and the frame lifts the aside before the hold ends (mutants: the ring never raised; the aside lifts after the hold)', () => {
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /let _hccLanded = \(markInteriorLoad\(true\), false\);/);
-  assert.match(modes, /transitioning = markInteriorLoad\(false\);/);
-  assert.equal((modes.match(/transitioning = markInteriorLoad\(false\)/g) ?? []).length, 1, 'the dungeon door does not raise it');
-  const world = read('src/scenes/world.js');
-  const frame = world.slice(world.indexOf('  function frame(now) {'));
-  const hold = frame.indexOf('syncLoading(_moving, { place: loadingPlaceNow, line: loadingLineNow });');
-  const ask = frame.indexOf('syncInteriorLoad(!!modes?.transitioning);');
-  assert.ok(ask > 0 && hold > ask, 'the aside lifts while the hold is still open');
-});

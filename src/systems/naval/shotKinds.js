@@ -1,6 +1,5 @@
 // @ts-check
-// SHOT-KINDS (2026-10-17, the owner: "Different cannon shot types, for example a grape shot to thin out crew, Chain to try
-// to take down their sail, etc"; bible/03-World/Naval-Refit.md SHOT-KINDS) - WHAT A GUN IS LOADED WITH. The port's own;
+// SHOT-KINDS - WHAT A GUN IS LOADED WITH. The port's own;
 // pure.
 //
 // A gun (navalShips.js GUNS) is a bore - its muzzle speed, its carriage's elevation, its scatter, its reload - and until

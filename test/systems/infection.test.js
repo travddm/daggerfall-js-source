@@ -6,6 +6,7 @@
 // the mutants that survived are recorded beside the pin that should
 // have caught them.
 
+import { setPref } from '../../src/systems/uiPrefs.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -136,7 +137,9 @@ test('infection: the level-1 and non-player gates are DiseaseEffect.Start, reach
 // 3. IT IS A DISEASE - which is the Ledger correction
 // ---------------------------------------------------------------
 
-test('infection: an infection IS a disease bundle (GetDiseaseCount counts it) - and since INFECTION-KEPT a cure takes it after the plain diseases', () => {
+test('infection: an infection IS a disease bundle (GetDiseaseCount counts it) - and since INFECTION-KEPT a cure takes it after the plain diseases', (t) => {
+  setPref('cureKeepsInfection', true);   // the option on: a cure leaves an infection while a plain disease runs
+  t.after(() => setPref('cureKeepsInfection', false));
   // The Ledger row that opened this arc said the cure-disease count is
   // short by one until a vampirism timer lands. It is not:
   // GetDiseaseCount (:1489-1499) counts every bundle of type Disease

@@ -1,4 +1,4 @@
-// AUDIT NAV1 (2026-09-29) - the online audit's ROOM: several players' naval hosts over Come Sail Away's real pool, one
+// AUDIT NAV1 - the online audit's ROOM: several players' naval hosts over Come Sail Away's real pool, one
 // pool each (test/navalSea.mjs freshPool), and a stand-in relay between them - each player's word (`nv`) on their foes
 // frame at the world's own cadence (scenes/world.js: every FOES_MS when it changed, every FOES_FULL_MS always) and
 // their blows as directed hit frames, both a `latency` late. A player can leave the cell (`present`), fall quiet

@@ -1,5 +1,4 @@
-// FAR-CLIP1 (2026-09-28, a player's report through Mac, with a screenshot: "There's this weird issue with paneling in
-// the ocean and geometry just being hard squares") - ILIAC PUDDLE NO MORE'S CLIP IS A PROGRAM. The mod clips the carved
+// FAR-CLIP1 - ILIAC PUDDLE NO MORE'S CLIP IS A PROGRAM. The mod clips the carved
 // sea out of a coastal terrain per texel, in the terrain's own shader: DeepWaterTerrainCapRenderer.ApplyWaterTexelClip
 // swaps each terrain it clips to the clip variant of its shader (DeepWaters/TilemapTextureArrayClipWater) and marks the
 // clipped texels in the tilemap it hands it. DW-C clipped by leaving a clipped tile's quad out of the pixel's index set,
@@ -27,6 +26,11 @@ import { EL_LANE, EL_TERRAIN_FS } from '../../../src/render/enhancedLighting.js'
 import { CLIP_SENTINEL, patchTilemapForClip, clippedTerrainIndices } from '../../../src/world/deepWater/deepWaterCap.js';
 import { generateSamples, HEIGHTMAP_DIMENSION } from '../../../src/world/terrain/terrainSampler.js';
 import { generateTileData, assignTiles } from '../../../src/world/terrain/terrainTiles.js';
+import { setValue } from '../../../src/systems/settings/settings.js';
+
+// These tests read the plain world shaders and DFU's Point filter: the port's default, Sharp, rewrites the shaders
+// and filters world art linear (render/sharp-texels.ts, test/render/sharp-texels.test.js).
+setValue('Video', 'MainFilterMode', '0');
 
 const { Renderer } = RENDER;
 const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -75,7 +79,7 @@ function driverGl() {
   const fsOf = (p) => p?.shaders?.find((s) => s.type === gl.FRAGMENT_SHADER)?.src ?? null;
   const compiled = () => log.filter((e) => e.k === 'compileShader').length;
   /** the clip variants compiled so far - a terrain program's decode with the cap's byte discarded */
-  const clips = () => log.filter((e) => e.k === 'compileShader' && /texelFetch\(uTilemap, cell, 0\)\.r;/.test(e.sh.src) && /if \(data == \d+u\) discard;/.test(e.sh.src)).length;
+  const clips = () => log.filter((e) => e.k === 'compileShader' && /texelFetch\(uTilemap, cell, 0\)\.r;/.test(e.sh.src) && / : data == \d+u\) discard;/.test(e.sh.src)).length;
   return { gl, log, fsOf, compiled, clips, canvas: { getContext: () => gl, clientWidth: 320, clientHeight: 200, width: 320, height: 200 } };
 }
 
@@ -99,6 +103,7 @@ function terrainFragment(fs) {
   const f = glslFunctions(fs, {
     vLocalXZ: [TILE / 2, TILE / 2], vWorldPos: [0, 30, 0], vNormal: [0, 1, 0], uTileSize: TILE,
     texelFetch: (_s, c) => [byteAt(c[0], c[1]), 0, 0, 0],
+    textureSize: () => [64, 64, 56],   // the tile array's size, for a two-ground tile's edge margin (render/tile-edge-glsl.ts)
     dFdx: (x) => { dx = true; return x.map(() => 0.01); },
     dFdy: (x) => { dy = true; return x.map(() => 0.02); },
     textureGrad: (_s, p, gx, gy) => { sample = { layer: p[2], uv: p.slice(0, 2), gx, gy }; throw new Sampled(); },
@@ -289,7 +294,7 @@ test('FAR-CLIP1: on a coast the port\'s own terrain pipeline builds, every clipp
 
 test('FAR-CLIP1: the world draws a pixel whose TileMap the cap patched with the clip program and every other with the plain one, the patched pixels after the rest, and builds the clip program as the mod mounts; the byte has one home; the other three hosts draw no carved sea (mutants: every pixel plain; the cull\'s pixels only; every pixel clipped; unsorted; clipped first; no warm)', () => {
   const w = rd('src/scenes/world.js');
-  assert.match(w, /renderer\.drawTerrain\(p\.dwTerrain \?\? p\.terrain, pixelMatrix,[^\n]*\n\s+snowCover\.arrayOf\(p\.groundArchive\), p\.tilemapTex, 6\.4, !!p\._dwBytes, ecoDraw\(p\), snowCover\.drawOf\(p\)\);/,   // ECOTONE1: PIN MOVED - the border pixel's neighbours ride after the clip; PRECIP4: PIN MOVED - the set's twin on the snow lane, and the pixel's snow after its border
+  assert.match(w, /renderer\.drawTerrain\(p\.dwTerrain \?\? p\.terrain, pixelMatrix,[^\n]*\n\s+snowCover\.arrayOf\(p\.groundArchive\), p\.tilemapTex, 6\.4, !!p\._dwBytes, ecoDraw\(p\), snowCover\.drawOf\(p\)\);/,   // ECOTONE1:
     'the ground of a pixel the cap patched (dwSetTilemap\'s `_dwBytes`: its TileMap on the texture) draws with the clip program, as the mod swaps the material of each terrain it clips');
   assert.match(w, /renderer\.setCloudShadow\(sky\?\.cloudShadow \?\? null\);\n\s+if \(deepWaters\) groundQueue\.sort\(dwClipLast\);[^\n]*\n\s+for \(const p of groundQueue\) \{/, 'the queue is ordered before the drain');
   const cmp = w.match(/function dwClipLast\(a, b\) \{ (return [^}]+) \}/);

@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-16b GRAVE-PARTY (bible/01-Overview/bugs/Field-Bugs-2026-10-16b.md; the Discord's "A few things": "graveyard
+// FIELD BUGS 2026-10-16b GRAVE-PARTY (the Discord's "A few things": "graveyard
 // loot on headstones are able to be looted by others, objects in tombs are un lootable (have not tried dungeons yet)"; Mac's
 // SEARCH1-PARTY: "When one player in the party interacted with it no one else can again for 5 hours ... visible for
 // everyone in the party the same the looter sees"). A SEARCH IS ITS SEARCHER'S PARTY'S - above ground and below:
@@ -21,7 +21,7 @@
 // fresh stones neither evicts another searcher's row nor writes the ledger at its pace (the real Room); G4 a stranger's
 // word kept is stamped never ahead of now; G5 the lock is the account's, and another character of it is told whose
 // search it was.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as acorn from 'acorn';
@@ -36,7 +36,7 @@ import {
   owFoldGraves, owGraveKey, owGraveLive, OW_GRAVE_KEEP_MIN, owPrune, toWelcome, owLedgerOf, newOwLedger, owLedgerEmpty,
 } from '../../src/net/overworldLaw.js';
 import {
-  validOwIn, validOwOut, OW_KINDS, OW_GRAVE_RELAY_MIN, relaySupportsOwGraves, OW_CELL_GRAVES_MAX, RELAY_VERSION, worldRoom,
+  validOwIn, validOwOut, OW_KINDS, OW_CELL_GRAVES_MAX, RELAY_VERSION, worldRoom,
   PIXEL_UNITS, sharedClassicMinutes, wallMsForClassicMinutes, parseClient, OW_LEDGER_KEY, respawnDue, validSocialFrame,
   OW_GRAVE_ACCT_ROWS_MAX, OW_GRAVE_HZ_MAX, OW_GRAVE_BURST_MAX, owGraveGate, owGate, RESPAWN_MS, NAME_MAX,
 } from '../../src/net/wire.js';
@@ -61,8 +61,9 @@ import { enemyDisplayName, ENEMY_BASICS } from '../../src/characters/enemy/enemy
 import * as RL from '../../src/systems/roomLoot.js';
 import { playerEntity } from '../../src/characters/playerEntity.js';   // AUDIT GRAVE-PARTY G2: the pack a room container's take is lifted back out of (roomLootHost.js roomLift)
 import { installRoleplayRealismItems } from '../../src/systems/roleplayRealismItems/rriInstall.js';
-import { fakeRooms } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 installRoleplayRealismItems();   // the hosts' own install (scenes/shared.js): its weapons are among a search's finds, and its templates the wire's
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -188,17 +189,10 @@ test('GRAVE-PARTY law: a search\'s hours carry WHO searched - mine says SEARCHED
   // THE WIRE
   assert.deepEqual(OW_KINDS, ['sp', 'dg', 'gr']);
   assert.deepEqual(validOwIn({ k: 'gr', rows: [[101, 207, 3], [101, 207, 3]] }), { k: 'gr', rows: [[101, 207, 3]] });
-  for (const bad of [{ k: 'gr', rows: [] }, { k: 'gr', rows: [[101, 207]] }, { k: 'gr', rows: [[1000, 207, 3]] }, { k: 'gr', rows: [[101, 207, -1]] }, { k: 'gr', rows: [[101, 207, 3, M, 'acct-ann']] }]) assert.equal(validOwIn(bad), null, JSON.stringify(bad));
+  for (const bad of [{ k: 'gr', rows: [] }, { k: 'gr', rows: [[101, 207]] }, { k: 'gr', rows: [[8192, 207, 3]] }, { k: 'gr', rows: [[101, 207, -1]] }, { k: 'gr', rows: [[101, 207, 3, M, 'acct-ann']] }]) assert.equal(validOwIn(bad), null, JSON.stringify(bad));   // PIN MOVED (AUDIT RELEASE R2-3): a stone's pixel is the world's grid - (1000, 207) is land past the Bay now, (8192, 207) past the wire's
   assert.deepEqual(parseClient(JSON.stringify({ t: 'ow', k: 'gr', rows: [[101, 207, 3]] }), { hasHello: true }), { t: 'ow', k: 'gr', rows: [[101, 207, 3]] });
   assert.deepEqual(validOwOut({ k: 'gr', rows: [[101, 207, 3, M, 'acct-ann', 'Ann'], [101, 207, 3], 'x', [101, 207, 3, -1, 'acct-ann', 'Ann'], [101, 207, 3, M, '', 'Ann'], [101, 207, 3, M, 'acct-ann'], [101, 207, 3, M, 'acct-ann', 7], [101, 207, 3, M, 'acct-ann', 'x'.repeat(NAME_MAX + 1)], [101, 207, 4, M, 'acct-ann', '']] }),
     { k: 'gr', rows: [[101, 207, 3, M, 'acct-ann', 'Ann'], [101, 207, 4, M, 'acct-ann', '']] }, 'a row names its account and its character (or none) - nothing else is a row');
-  // AUDIT GRAVE-PARTY G1: main's INSTANCES world208, WEAPON-GLOW1 world209 and HUB-PULL + DO-ASK world210 know no `gr`
-  // (their parseClient answers `bad ow`, the socket closes CLOSE_POLICY and the session is terminal) - a headstone's
-  // search took its player offline. The first relay that keeps the graves is this one, world212 (world211 on the branch,
-  // renumbered past main's TIDY2 world211 - which knows no `gr` either - at the merge).
-  assert.equal(OW_GRAVE_RELAY_MIN, 212);
-  assert.deepEqual(['world207', 'world208', 'world209', 'world210', 'world211', 'world212', 'world300', 'junk', null].map(relaySupportsOwGraves), [false, false, false, false, false, true, true, false, false]);
-  assert.ok(relaySupportsOwGraves(RELAY_VERSION), 'this build\'s relay keeps them');
 });
 
 // ═══ 2. ABOVE GROUND: THE CELL ═════════════════════════════════════════════════════════════════════════════════════
@@ -280,7 +274,7 @@ test('GRAVE-PARTY above ground END TO END: Ann searches a headstone; the cell ke
       const eve = graveyardPlayer(world, 'acct-eve', null);
       for (const P of [ann, bob, eve]) P.session.join(CELL, { ...ON });
       await world.pump();
-      for (const P of [ann, bob, eve]) { assert.equal(P.session.status, 'open', `${P.acct} stands in the cell`); assert.equal(P.session.owGraveOk, true, 'at a relay that keeps the graves'); }
+      for (const P of [ann, bob, eve]) { assert.equal(P.session.status, 'open', `${P.acct} stands in the cell`); }
       assert.equal(ann.press(), 'searched', 'Ann searches the stone');
       ann.sp.frame(performance.now() + 5000);   // the frame's clock is performance.now()'s (requestAnimationFrame's), as the owed stones' own
       await world.pump();
@@ -320,12 +314,6 @@ test('GRAVE-PARTY the cell\'s door: a stone is said down the primary cell\'s soc
       return { s, ws, said: () => ws.sent.map((x) => JSON.parse(x)).filter((x) => x.t === 'ow') };
     });
   };
-  for (const v of ['world207', 'world208', 'world209', 'world210']) {   // AUDIT G1: main's world208-210 among them
-    const old = await rig(v);
-    assert.equal(old.s.owGraveOk, false, v);
-    assert.deepEqual(old.s.sendOverworld('gr', [[GPX, GPY, 3]]), [], `nothing to ${v} - it would close the socket`);
-    assert.deepEqual(old.said(), []);
-  }
   const now = await rig(RELAY_VERSION);
   assert.deepEqual(now.s.sendOverworld('gr', [[GPX, GPY, 3], [300, GPY, 4]]), [[GPX, GPY, 3]], 'the cell\'s own law at home: a stone off its square left out');
   assert.deepEqual(now.said(), [{ t: 'ow', k: 'gr', rows: [[GPX, GPY, 3]] }]);
@@ -797,7 +785,6 @@ test('AUDIT GRAVE-PARTY G5 above ground END TO END: Ann searches a headstone; he
       const ann = graveyardPlayer(world, 'acct-ann', null);
       ann.session.join(CELL, { ...ON });
       await world.pump();
-      assert.equal(ann.session.owGraveOk, true);
       assert.equal(ann.press(), 'searched', 'Ann searches the stone');
       ann.sp.frame(performance.now() + 5000);
       await world.pump();

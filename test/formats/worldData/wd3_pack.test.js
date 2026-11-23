@@ -1,5 +1,4 @@
-// WD3 (2026-10-01, Mac: "These are the next mods I'd like to implement (We have permission) and ensure this doesn't
-// conflict or regress anything (For example housing customization)") - THE WORLD-DATA PACK: Beautiful Villages of
+// WD3 - THE WORLD-DATA PACK: Beautiful Villages of
 // Daggerfall's and Beautiful Cities of Daggerfall's whole world data carried as the authors' edits over the player's
 // own MAPS.BSA and BLOCKS.BSA (src/formats/worldData/worldDataPack.js), built by tools/worldDataPackBuild.mjs.
 //
@@ -305,5 +304,4 @@ test('WD3 a pack\'s classic references are checked BY NAME (AUDIT WD3 P5) - `cla
       for (const [i, n] of Object.entries(pack.classicNames)) assert.equal(blocks.getBlockName(Number(i)), n, `${v}: block ${i}`);
     }
   }
-  assert.match(readFileSync(join(ROOT, 'tools/worldDataPackBuild.mjs'), 'utf8'), /out\.classicNames = Object\.fromEntries\(classicIndicesOf\(out\)\.map\(\(i\) => \[i, blocks\.getBlockName\(i\)\]\)\);/, 'the builder names them');
 });

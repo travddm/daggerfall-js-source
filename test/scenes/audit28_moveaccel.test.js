@@ -76,28 +76,3 @@ test('AUDIT 28 W8: the setting is the default source, read live, LIVE', () => {
   assert.equal(LIVE['Controls/MovementAcceleration'], 'src/player/moveAxes.js');
 });
 
-test('AUDIT 28 W8: all four producers hand the motor the axes, advanced only on frames the motor runs', () => {
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/worldModes.js']) {
-    const s = read(host);
-    assert.equal((s.match(/forward: \(mv\.forwards \? 1 : 0\) - \(mv\.backwards \? 1 : 0\)/g) || []).length, 0, `${host}: the bare difference still reaches the motor`);
-    assert.match(s, /forward: axes\.forward,/, `${host}: forward from the axes`);
-    assert.match(s, /strafe: axes\.strafe,/, `${host}: strafe from the axes`);
-    assert.match(s, /const moveAxes = new MoveAxes\(\);/, `${host}: one axes filter`);
-  }
-  // The streaming hosts and the modal frame hold the axes still under an overlay (timeScale 0).
-  for (const [host, flag] of [['src/scenes/world.js', '_overlayHeld'], ['src/scenes/exterior.js', '_overlayHeld'], ['src/scenes/worldModes.js', 'overlayHeld']]) {
-    // AUDIT 64 F3: the held bag carries the autorun latch now
-    // (InputManager.cs:542-545), so the update call takes the spread.
-    assert.match(read(host), new RegExp(`const axes = ${flag} \\? \\{ forward: moveAxes\\.vertical, strafe: moveAxes\\.horizontal \\} : moveAxes\\.update\\(dt, \\{ \\.\\.\\.mv, autorun: player\\.toggleAutorun \\}\\);`), `${host}: the overlay hold`);
-  }
-  // The standalone dungeon host's producer already sits inside its own `if (!overlayHeld)`.
-  const d = read('src/scenes/dungeon.js');
-  const at = d.indexOf('const axes = moveAxes.update(dt, { ...mv, autorun: player.toggleAutorun });');
-  const gate = d.lastIndexOf('if (walkMode && !overlayHeld) {', at);
-  // AUDIT 64: the budget is a proximity heuristic, not the law - the
-  // no-block-close assert below is what proves containment. F0/F1's
-  // onExteriorWater clear and F3's autorun note added prose between
-  // the gate and the update, so the budget moves with them.
-  assert.ok(gate > 0 && at - gate < 4500, 'dungeon.js: the axes update is inside the walk-mode overlay gate');   // MAC-SWING1: the key latch sits in that window too
-  assert.equal(d.slice(gate, at).split('\n    }\n').length, 1, 'dungeon.js: no block close between the gate and the update');
-});

@@ -1,6 +1,5 @@
 // @ts-check
-// SD15 (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 10 and section 16's SD15;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE ARENA READ - what the Hour tells a fighter about
+// SD15: THE ARENA READ - what the Hour tells a fighter about
 // the ground under them and the fight's turns, where the gate tells its own (WB13a's "in it", WB13e's title card):
 //
 //   IN IT (`sdPerilAt`): a blow of the Remnant's or an Echo's still to land ON MY FEET - the Stomp's disc, the

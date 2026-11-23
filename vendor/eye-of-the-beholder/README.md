@@ -35,7 +35,7 @@ no twin are Unity lifecycle, mesh and material handling the port's
 billboard batch replaces, two other mods' hooks (Come Sail Away, Free
 Rein), the mod bus, and one getter the assembly itself never calls.
 `test/player/eyeOfTheBeholder/eotb_scope.test.js` holds all 61 rows with a verdict each and
-checks them against the IL dump; `bible/06-Systems/Eye-Of-The-Beholder.md`
+checks them against the IL dump; `docs/formats/mods-and-vendor.md`
 carries the findings. An earlier count of 62 (AUDIT-EOTB, written
 without the assembly) listed a method that does not exist.
 
@@ -118,5 +118,4 @@ Mac, 2026-09-15: *"instead of numpad being used to change views, I want
 it scrollable like how we handle morrowind."* So the port takes the
 mod's own scrollable arm as the ONLY way in and out of third person,
 and its ladder is Morrowind's (`player/mwView.js`, MW-D25/MW-D30) -
-one wheel, whichever body answers. Recorded in `bible/01-Overview/
-Port-Ledger.md` and on the mod's bible page.
+one wheel, whichever body answers.

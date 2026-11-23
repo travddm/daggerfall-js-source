@@ -1,10 +1,10 @@
 // FIELD BUGS 2026-10-19f CHAIN-SEEN (a player's private report: a Legendary bow's Chain Lightning shows nothing) - the
 // arc lands: half the shaft's damage, as shock, on the nearest other foe within 6 m, through that foe's own pool's door.
 // But the door runs no formula, and HN1's numbers are the formula's readout (ui/hitNumbers.js), so the arc rose no
-// number and said no word - the same omission ROSE-SEEN (bible/01-Overview/bugs/Field-Bugs-2026-10-15e.md) closed for
+// number and said no word - the same omission ROSE-SEEN closed for
 // its neighbour, again()'s follow-up. Every reach of a blow on another foe in systems/loot/lootPowers.js was the same:
 // Earthshaker's quake and Dragonfire's burst, and Dragonfire's own second burn rose untagged. Each raises its number now,
-// tagged with its power's name (`reachOn`). bible/06-Systems/Loot-Arc.md, CHAIN-SEEN.
+// tagged with its power's name (`reachOn`)., CHAIN-SEEN.
 import '../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

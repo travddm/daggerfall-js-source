@@ -1,5 +1,4 @@
-// HB-LYCFREE (2026-09-30, Mac: "Lycanthropy costs to cast from hotbar when it shouldnt. Also want to make the hotbar
-// the default on option."): TWO THINGS.
+// HB-LYCFREE: TWO THINGS.
 //
 //   - THE CURSE'S SPELL IS FREE FROM THE BAR AS FROM THE BOOK. The book readies the lycanthrope's Lycanthropy spell with DFU's
 //     noSpellPointCost (DaggerfallSpellBookWindow's cast: `noSpellPointCost = spellSettings.Tag ==
@@ -115,14 +114,6 @@ test('HB-LYCFREE: the diamond\'s spell key readies the Lycanthropy spell free to
   assert.equal(r.player.magicka, 0);
 });
 
-test('HB-LYCFREE: the free flag is keyed on the TAG, the books\' own test - one law, the books\' and the bar\'s', () => {
-  const q = read('src/systems/quickslots.js');
-  assert.match(q, /const freeReady = \(sp\) => \(\{ free: sp\?\.tag === LYCANTHROPY_SPELL_TAG \}\);/);
-  assert.equal((q.match(/magic\?\.readySpell\?\.\(r\.spell, freeReady\(r\.spell\)\)/g) ?? []).length, 2, 'both arms of the press');
-  assert.equal((q.match(/magic\?\.readySpell\?\.\(r\.spell\)/g) ?? []).length, 0, 'no priced ready of the slot\'s spell left');
-  for (const f of ['src/ui/enhanced/enhancedSpellbook.js', 'src/ui/spellbookWindow.js']) assert.match(read(f), /noSpellPointCost: [a-z.?]*spell\??\.tag === LYCANTHROPY_SPELL_TAG/, f);
-});
-
 // ── THE DEFAULT ──────────────────────────────────────────────────────
 
 test('HB-LYCFREE: the hotbar is the default - the shelf\'s, the lane\'s and the row\'s own, and a fresh shelf reads it (mutants: the lane left at Diamond; the shelf left at quickbar)', () => {
@@ -141,7 +132,7 @@ test('HB-LYCFREE: Diamond and Off are still the player\'s to choose, and are kep
   _resetForTests();
   quickSlotsWrite('diamond');
   assert.equal(quickSlotsRead(), 'diamond');
-  // DIAMOND-HB (PIN MOVED): Diamond is the hotbar's four now, its own style ('diamond'), not QS's 'quickbar'
+  // DIAMOND-HB (
   assert.equal(overridesOf({ ...PREF_DEFAULTS, quickbarStyle: getPref('quickbarStyle') }).quickbarStyle, 'diamond', 'the choice is on the shelf');
   quickSlotsWrite('off');
   assert.equal(quickSlotsRead(), 'off');

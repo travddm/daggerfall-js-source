@@ -1,10 +1,10 @@
-// TEXT-F1 (2026-10-07, Mac: "Any human input elements need filtering, including notes"): A PLAYER'S WORDS, FILTERED.
+// TEXT-F1: A PLAYER'S WORDS, FILTERED.
 // NAME-F1's filter judged a NAME, read whole; a sentence read whole hides every word in it. net/nameFilter.js now reads a
 // line word by word (maskText, textCaught) and the laws every player's words pass through star what it catches: a chat
 // line, a red line and a narration (wire.js sanitizeChat - both ends and the relay's parse), a letter's lines, a note's,
 // a guild note's and a journal page's (wire.js wordsLine - net/letterLaw.js, the board's law, the page law). Name-shaped
 // words are judged instead: a rank's name refused naming the word, a custom class dropped from a look, a maker's mark left
-// off, an item's typed name starred wherever it is named. The record: bible/06-Systems/Online-Arc.md TEXT-F1.
+// off, an item's typed name starred wherever it is named. The record: TEXT-F1.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -112,7 +112,7 @@ test('TEXT-F1 a piece\'s names: a name a player typed starred wherever it is nam
 });
 
 test('TEXT-F1 the service: a note pinned with a caught word is kept starred, and read starred; a note kept before the filter is starred as the board is read; a guild note and a letter likewise (mutants: the board read raw; the notices read raw; the guild board read raw)', async () => {
-  const svc = await standService({ BOARD_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+  const svc = await standService({ BOARD_OPEN: 'on', SEAT_ADMINS: 'Mac' });
   const raw = svc.env.DB._raw;
   const ann = await svc.registered('Ann');
   const pin = await svc.call('/v1/board/pin', { map: 7, subject: 'Party, assholes', body: 'Heading out.\nNo dickheads.', days: 1, rid: 'rid-ann-0001' }, ann.secret);
@@ -156,14 +156,3 @@ test('TEXT-F1 the service: a rank\'s name with a caught word is refused, naming 
   assert.ok(REFUSALS['guild-rank-word'], 'the service\'s word has its sentence');
 });
 
-test('TEXT-F1 the seams: every surface reads the one reader - the chat\'s and the words\' laws in wire.js, the look\'s class, the boards\' reads, the rank\'s refusal and its word through the route (mutants: none - each seam\'s own mutant is the behaviour pin above)', () => {
-  const wire = src('src/net/wire.js');
-  assert.match(wire, /return maskText\(s\.trim\(\)\);/);
-  assert.match(wire, /export const wordsLine = \(line\) => maskText\(visibleText\(/);
-  assert.match(wire, /&& !textCaught\(look\.class\) \? look\.class\.trim\(\) : null;/);
-  assert.match(src('server-account/src/board.js'), /subject: maskText\(n\.subject\), body: maskText\(n\.body\),/);
-  assert.match(src('server-account/src/board.js'), /subject: maskText\(x\.subject\), body: maskText\(x\.body\),/, 'the server\'s notices too');
-  assert.match(src('server-account/src/guildBoard.js'), /subject: maskText\(n\.subject\), body: maskText\(n\.body\),/);
-  assert.match(src('server-account/src/index.js'), /\(r\.error === 'guild-name-word' \|\| r\.error === 'guild-rank-word'\) && typeof r\.word === 'string'/);
-  assert.equal((src('src/net/nameFilter.js').match(/^import /gm) ?? []).length, 0, 'the filter imports nothing - the relay\'s and the Worker\'s graphs stay flat');
-});

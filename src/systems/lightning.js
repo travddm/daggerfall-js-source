@@ -1,7 +1,5 @@
 // @ts-check
-// BOLT (2026-09-24, Mac: "Can we do detailed cloud and cloud to ground
-// lighting? Not just when in storms but also being able to be seen far
-// away?"): THE LIGHTNING ITSELF.
+// BOLT: THE LIGHTNING ITSELF.
 //
 // Until now a storm's lightning was only light: the storm overhead
 // strobed the sun (DFU's LightningPlayer, world/weather.js) and a storm at

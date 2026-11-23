@@ -1,5 +1,5 @@
 // @ts-check
-// MARTIAL2 (2026-10-17) - THE WEAPON PAST 100. bible/05-Combat/Martial-Specialisations.md section 4.
+// MARTIAL2 - THE WEAPON PAST 100.
 //
 // Measured first (the page's section 2): past 100 a weapon skill bought its TO-HIT alone - PCAAO's `ceil(skill * 1.5)`
 // and DFU's `skill` - against a chance clamped at 97, so a Long Blade mastered to 200 struck an armoured Orc Warlord no
@@ -7,22 +7,20 @@
 // handToHandMinDamage / MaxDamage: 11-21 at 100, 15-29 at effective 140). The schools' climb had paid in price alone
 // until BAL9b and SCHOOLS2 made it pay in each school's own dimension; the owner chose the same for the weapons ("Past-100
 // perk per weapon"). So, BAL9b's law for every weapon whose formula stops paying at 100 - each effective point of the
-// skill's CLIMB past 100 (skillSoftcap.js climbedSkill - the climb the foes' edge reads, so the climb that raises them is
-// the climb that pays) is worth this, to effective 140 at 200:
+// skill's CLIMB past 100 is worth this, to effective 140 at 200:
 //
-//   Long Blade    every blow 1% harder (x1.4)                                   the WEAPON BLOW modifier
-//   Archery       every arrow 1% harder (x1.4) - the Thunderlock's shot too,     the WEAPON BLOW modifier
-//                 scored on Archery (its departure)
-//   Axe           a blow at a foe under half its health 2% harder (x1.8):        the WEAPON BLOW modifier
+//   Long Blade    every blow 0.2% harder (x1.08)                                the WEAPON BLOW modifier
+//   Archery       every arrow 0.2% harder (x1.08)                               the WEAPON BLOW modifier
+//   Axe           a blow at a foe under half its health 0.4% harder (x1.16):     the WEAPON BLOW modifier
 //                 the axe finishes
-//   Blunt Weapon  a blow at a foe at half its health or more 2% harder (x1.8):   the WEAPON BLOW modifier
+//   Blunt Weapon  a blow at a foe at half its health or more 0.4% harder (x1.16): the WEAPON BLOW modifier
 //                 the hammer opens
-//   Short Blade   every swing 1% quicker (x1.4 the swings) - never past the      the SWING PACE (characters/weaponStates.js)
-//                 swing law's floor of 0.45 s a swing (SWING_FRAME_MIN)
+//   Short Blade   every swing 0.2% quicker (x1.08 the swings) - never past the  the SWING PACE (characters/weaponStates.js)
+//                 swing law's floor of 0.2 s a swing (SWING_FRAME_MIN)
 //   Hand-to-Hand  nothing more - its formula reads the climb in its damage already
 //
 // The two halves of a fight read as one: a foe killed from full health by a blow of one size takes its first half at x1
-// and its second at x1.8 (the Axe) - x1.29 over the fight - so the heavy two-handers, which lead the six raw (a War Axe
+// and its second at x1.16 (the Axe) - x1.08 over the fight - so the heavy two-handers, which lead the six raw (a War Axe
 // 15.2 a second at Strength 80, a Warhammer 15.7, a Longsword 12.6), climb a little less than the sword does.
 //
 // Online alone, as BAL9b and SCHOOLS2: offline the game is Daggerfall's, and so is the weapon past 100. MY blow (a
@@ -34,7 +32,7 @@ import { SKILLS, skillModOf } from './skills.js';
 import { SKILL_SOFT_CAP } from './skillSoftcap.js';
 import { isOnlinePage } from './online/onlineLane.js';
 import { sigilDueling } from './sigil/sigil.js';
-import { SCHOOL_POTENCY_PER_POINT, fightingClimb } from './spell/spellPower.js';   // CLIMB-PAST's one number: a point past 100 is 1%; MENTOR2: the climb fought with
+import { SCHOOL_POTENCY_PER_POINT, fightingClimb } from './spell/spellPower.js';   // CLIMB-PAST's one number: a point past 100 is a fifth of a per cent (B1); MENTOR2: the climb fought with
 import { registerWeaponBlowMod } from './entityMods.js';
 import { blowRoom } from './powerCeiling.js';   // POWER-CEILING: the blow's one product
 import { registerSwingPaceMod } from '../characters/weaponStates.js';
@@ -48,17 +46,17 @@ export const WEAPON_POTENCY_PER_POINT = SCHOOL_POTENCY_PER_POINT;
 export const WEAPON_HALF_PER_POINT = 2 * WEAPON_POTENCY_PER_POINT;
 /** The line between the two halves: a share of the foe's health. */
 export const WEAPON_HALF_LINE = 0.5;
-/** WEAPON-GEAR: the percent each point of gear on a weapon skill adds to its blow (0.44: a sheet of 872, trained 200
- *  and 672 on it, is the climb's 40 + 296 = x4.36, the top mob was shown). */
-export const WEAPON_GEAR_PER_POINT = 0.44;
-/** WEAPON-GEAR: the most percent gear adds (727 points) - with the axe's 80, the ceiling's mastery top of 400. */
-export const WEAPON_GEAR_PCT_MOST = 320;
+/** WEAPON-GEAR: the percent each point of gear on a weapon skill adds to its blow. B1 (tame player power): 0.1, was 0.44,
+ *  which paid +296% for 672 points of gear and was the largest single term of the blow stack. */
+export const WEAPON_GEAR_PER_POINT = 0.02;
+/** WEAPON-GEAR: the most percent gear adds (50 points) - with the axe's 16, the ceiling's mastery top of 21 (B1; was 320). */
+export const WEAPON_GEAR_PCT_MOST = 1;
 
 /** The skill a blow is struck with, by its family (combat/technique/techniqueRoster.js techniqueFamily - an RRI class's
- *  own included): the bare hand Hand-to-Hand, the Thunderlock Archery (it is scored on it). Null for anything else. */
+ *  own included): the bare hand Hand-to-Hand. Null for anything else. */
 const SKILL_OF_FAMILY = Object.freeze({
   longBlade: SKILLS.LongBlade, shortBlade: SKILLS.ShortBlade, axe: SKILLS.Axe, blunt: SKILLS.BluntWeapon,
-  archery: SKILLS.Archery, thunderlock: SKILLS.Archery, handToHand: SKILLS.HandToHand,
+  archery: SKILLS.Archery, handToHand: SKILLS.HandToHand,
 });
 export const blowSkillOf = (weapon) => (weapon ? SKILL_OF_FAMILY[techniqueFamily(weapon) ?? ''] ?? null : SKILLS.HandToHand);
 
@@ -72,15 +70,14 @@ export function weaponClimb(entity, skill, { online = isOnlinePage() } = {}) {
 
 /** The struck foe's share of its health - null where this machine cannot know it: a body the relay runs, its health here
  *  a placeholder nothing empties (world/gate/gateBoss.js bossStandIn `relayHealth` - the Warden, his crystals and host,
- *  the Remnant, the Elite Gates' court, the sea serpent), with no word of its own heard. AUDIT MARTIAL L3 F2: read as
+ *  the Remnant, the sea serpent), with no word of its own heard. AUDIT MARTIAL L3 F2: read as
  *  full, the hammer took its x1.8 on every blow of a boss fight and the axe never its own. FIELD BUGS 2026-10-18f
  *  RELAY-SHARE: the one law (combat/healthShare.js) - such a body now reads the relay's own word of its health (its
  *  stand-in's owner's reader), so each half pays its own there too, and the mean only where no word is heard. */
 const shareOf = healthShare;
-/** WEAPON-GEAR (2026-10-27, mob: "Bow and weapon fix"; Martial-Specialisations.md section 4): the climb above reads the
+/** WEAPON-GEAR: the climb above reads the
  *  trained skill, so gear bought a weapon no damage while the fists' roll read it whole. So each point of gear on a
- *  weapon skill adds 0.44% to its blow, from the first point (GEAR-ADDS, mob: "they should both just stack
- *  additively", "help the begingin"): the percent here, 0 to 320. Online, mine, never the fists. */
+ *  weapon skill adds 0.1% to its blow, from the first point (GEAR-ADDS,, "help the begingin"): the percent here, 0 to 5. Online, mine, never the fists. */
 export function weaponGearPct(entity, skill, { online = isOnlinePage() } = {}) {
   if (!online || !entity?.isPlayer || entity.peer || entity._mentor || entity.isInBeastForm || !Number.isInteger(skill) || skill === SKILLS.HandToHand) return 0;
   const gear = skillModOf(entity, skill);
@@ -102,7 +99,7 @@ function climbPastPct(skill, attacker, target, opts) {
     case SKILLS.LongBlade: case SKILLS.Archery: return climb * (WEAPON_POTENCY_PER_POINT * 100);
     case SKILLS.Axe: case SKILLS.BluntWeapon: {
       const share = shareOf(target);
-      if (share === null) return climb * (WEAPON_POTENCY_PER_POINT * 100);   // the line unread: the halves' mean (x1.4), the sword's own
+      if (share === null) return climb * (WEAPON_POTENCY_PER_POINT * 100);   // the line unread: the halves' mean (x1.08), the sword's own
       return (skill === SKILLS.Axe ? share < WEAPON_HALF_LINE : share >= WEAPON_HALF_LINE) ? climb * (WEAPON_HALF_PER_POINT * 100) : 0;
     }
     default: return 0;
@@ -123,7 +120,7 @@ export function weaponMasteryBlow(weapon, damage, attacker, target, info = null)
   return damage + more;
 }
 
-/** THE PACE: a short blade's swing, its skill past 100 - 1% quicker a point. `w` the swing reader's answer
+/** THE PACE: a short blade's swing, its skill past 100 - 0.2% quicker a point. `w` the swing reader's answer
  *  (combat/swingLaw.js readSwing), read here only once a climb would pay (AUDIT MARTIAL L2 F3). */
 export function weaponMasteryPace(ctx, w) {
   if (sigilDueling()) return 0;

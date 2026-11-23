@@ -142,8 +142,7 @@ export function wearComparison(entity, item) {
   if (itemDamageLine(item) != null) {
     const rival = [table[slot], ...replaces].find((it) => it && itemDamageLine(it) != null);
     if (rival) damage = { against: rival, before: weaponDamageRange(rival), after: weaponDamageRange(item) };
-    // HANDS-COMPARE (2026-10-08, the owner: "Damage comparison should now show left and right hand in the item info when
-    // hovering"): a weapon set against what each hand holds now - the right's and the left's, each its own row
+    // HANDS-COMPARE: a weapon set against what each hand holds now - the right's and the left's, each its own row
     hands = [['Right hand', EQUIP_SLOTS.RightHand], ['Left hand', EQUIP_SLOTS.LeftHand]].map(([label, s]) => {
       const held = table[s];
       return { label, held, before: held && itemDamageLine(held) != null ? weaponDamageRange(held) : null, after: weaponDamageRange(item) };
@@ -203,7 +202,7 @@ export function armourPlaque(entity) {
  * red worse). Null where wearComparison is, and for a piece that is neither armour nor a weapon and moves no part (a
  * ring, a shirt): there is no stat to set against another. `nameOf` names a piece (the pack hands itemLongName).
  */
-/** LOOT18 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 10): THE LINES A WEAR WOULD CHANGE, under the
+/** LOOT18 (the Loot arc II): THE LINES A WEAR WOULD CHANGE, under the
  *  numbers - each of the piece's lines against the same line on what it replaces (systems/loot/lootRarity.js
  *  lineComparison): up or down by how much, `new` where they have none, and their lines it would lose; a resistance
  *  line with what of its element the rolled gear counts, now and after (LOOT12's cap). Only a wear that replaces a known

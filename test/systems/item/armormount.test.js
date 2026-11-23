@@ -1,5 +1,4 @@
-// ARMOR-MOUNT (2026-09-26, Mac: "Cant set down armor in house - Would be awesome to display armor as well so people
-// can run shop and show collection"): DECOR2c hung a weapon or one of the four shields, and armour never stands
+// ARMOR-MOUNT: DECOR2c hung a weapon or one of the four shields, and armour never stands
 // (DECOR2a: it is mounted) - so a cuirass, a helm or boots had no way into a room at all. Every piece of armour hangs
 // now, as a shield does: its pack picture (the owner's body's), flat on the surface it is set on, free and back to the
 // pack whole when taken down. Worn armour stays refused, as a worn blade is.

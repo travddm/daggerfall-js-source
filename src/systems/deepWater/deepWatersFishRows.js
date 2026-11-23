@@ -1,4 +1,4 @@
-// INT1 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): DEEP WATERS' FISH ROWS, A LEAF. They were
+// INT1: DEEP WATERS' FISH ROWS, A LEAF. They were
 // deepWatersFishItems.js's own, and that module pulls the sea's textures and the passive fish in; the item law
 // (systems/item/itemLaw.js) runs on the account service, which loads none of it, and needs only the rows. One home, two
 // readers: deepWatersFishItems.js imports and re-exports every name here and registers the rows as it always did.

@@ -1,5 +1,5 @@
 // @ts-check
-// EG-H3 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 13.1, EG3): THE BOSS
+// EG-H3: THE BOSS
 // SEAM - one contract every boss the relay hosts keeps, made from the shape the three brains already kept by convention:
 //
 //   new(birth, rng)                          a fight born from the brain's own birth record (the gate's day, wrath and
@@ -26,7 +26,7 @@
 // What the seam does not take: the gate's crystals, host and heals and the Remnant's Echoes and Hearts are each brain's
 // own blows beside its boss (`applyCrystalHit`, `applyHostHit`, `applyEchoHit`, `applyHeartHit`) and stay so.
 //
-// EG-ZK (2026-10-12; section 13.1, "The Spire's lords are written to it"): THE SPIRE'S LORDS keep the contract too, ONE plug
+// EG-ZK: THE SPIRE'S LORDS keep the contract too, ONE plug
 // for every lord and champion (net/eliteGates/egLords.js EG_SEAM - it imports this board, so the relay's graph walks as before). The
 // breach's director (net/eliteGates/egBrain.js) calls it inside its one beat with the legion and the place's hazards: the seam is a
 // contract the director calls, not a second host.

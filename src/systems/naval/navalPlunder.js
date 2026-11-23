@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-D (2026-09-28, Mac: "actual sailing ships to the world that players can encounter and pillage") - THE PRIZE:
+// NAV-D - THE PRIZE:
 // what a taken ship's hold gives up, and what her captor can make of her. The port's own; pure - the host draws the
 // items through DFU's own loot tables (systems/loot/loot.js generateItems, LootTables.GenerateRandomLoot).
 //
@@ -19,7 +19,7 @@
 // FLOTSAM. A ship sunk rather than taken gives up FLOTSAM_OF her lots as casks afloat (navalShots.js dropFlotsam),
 // each a lot of her hold; a boat that sails through one hauls it into its own cargo.
 //
-// SALVAGE (2026-10-03, Mac: "allow sunken vessels to provide nessecary materials so you dont have to rely on the port") -
+// SALVAGE -
 // beside her casks a sunk ship leaves her WRECKAGE afloat: a floater as a cask is, its lot SALVAGE_LOT. A boat that sails
 // through it (or a swimmer who reaches it) hauls in what a carpenter and a gunner can use - her timber, pitch and canvas
 // as CARPENTER'S STORES (navalStores.js), SALVAGE_SHARE of her hull's whole in their work (navalYard.js STORE_POINTS), at
@@ -59,7 +59,7 @@ export const PRESS_SHARE = 0.6;
 /** The share of a sunk ship's lots that float free (at least one). */
 export const FLOTSAM_OF = 0.5;
 /**
- * SHIP-CLAIM (2026-10-01, Mac: "Claim captured prizes - Keep a ship you take by boarding as your own boat") - HER
+ * SHIP-CLAIM - HER
  * PAPERS: a prize claimed is the captor's own boat on a Come Sail Away deed (scenes/naval/navalHost.js claimPrize), and the
  * deed is worth PRIZE_DEED_SHARE of what her hull's deed costs on the shelf (comeSailAwayBoat.js HULL_PRICES) - a taken
  * ship is no bought one, and a full-price deed would make every pirate a fortune to sell.

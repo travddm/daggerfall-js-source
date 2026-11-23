@@ -25,7 +25,7 @@ const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 
 async function shoot(label, q) {
-  await page.goto(`${BASE}/sky.html?still&nopanel&${q}`, { waitUntil: 'load' });
+  await page.goto(`${BASE}/labs/sky.html?still&nopanel&${q}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__skyReady === true, null, { timeout: 30000 });
   await page.waitForTimeout(200);
   const stats = await page.evaluate(() => {

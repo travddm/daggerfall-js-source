@@ -33,7 +33,7 @@ jobs:
     name: patch notes in STE
     # a closed pull request's description is the release's (REL7), and its merge ref is gone
     if: github.event.pull_request.state == 'open'
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
         with:

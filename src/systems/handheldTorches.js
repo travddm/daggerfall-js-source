@@ -1,4 +1,4 @@
-// HT1 (2026-09-14, Mac: "Next mod to integrate 1:1 is this"): HANDHELD
+// HT1: HANDHELD
 // TORCHES 1.4.1 by RedRoryOTheGlen - the HandheldTorches MonoBehaviour,
 // ported 1:1.
 //
@@ -21,7 +21,7 @@
 // The script ships only as a compiled DLL (43,520 bytes); the four .cs
 // files its manifest names are not in the bundle, so it was read off
 // the IL method by method (the record, with every method against its
-// home here, is bible/06-Systems/Handheld-Torches.md). IL offsets in
+// home here, is). IL offsets in
 // the notes below cite that reading.
 //
 // THE SHAPE HERE. createHandheldTorches() is the component; the weapon
@@ -342,7 +342,7 @@ export function createHandheldTorches({
     // 0x2d5d) are read LIVE here, not the mod's own latched copies -
     // those are the edge detectors below in Update, written after this
     const sheathedNow = !!ctx?.sheathed, usingRightNow = ctx?.usingRightHand !== false;
-    // HT7 (2026-09-17, Mac: "Take care of both") - THE PORT'S ONE DEPARTURE
+    // HT7 - THE PORT'S ONE DEPARTURE
     // FROM UpdateFreeHand, and it is about DAGGERFALL rather than about
     // the mod.
     //
@@ -368,8 +368,7 @@ export function createHandheldTorches({
     // and the ONE clause that stays stance-bound is the mod's own bare
     // right hand "in use" (0x2d53): an empty hand you are not swinging
     // with is free, which is what lets a weaponless player carry a light.
-    // 3ARMS (2026-09-22, a player on Discord: "Torch and a Two-Handed
-    // weapon simultaneously" - three arms on screen): the IL's
+    // 3ARMS: the IL's
     // `GetItemHands() == 2` was read as LeftOnly because the port's own
     // ITEM_HANDS numbering puts LeftOnly at 2. DFU's enum is declared
     // None, Either, Both, LeftOnly, RightOnly (DaggerfallUnityEnums.cs
@@ -588,9 +587,7 @@ export function createHandheldTorches({
     }
   }
 
-  /** HT6 (2026-09-17, Mac: "When equipping a shield or other offhand
-   *  item, the torch in the inventory isnt shown unequipped and
-   *  replaced"): THE HAND LAW AT THE EQUIP MOMENT.
+  /** HT6: THE HAND LAW AT THE EQUIP MOMENT.
    *
    *  The law above is Update's, and the rig only runs Update on a frame
    *  the host is not holding for an overlay (weaponRig's frame, gated
@@ -784,9 +781,7 @@ export function createHandheldTorches({
   /** OnGUI (IL 0x114c): the sprite, while the module shows it and the
    *  view is first person.
    *
-   *  MAC-H (2026-09-17, Mac: "On the classic sprite, when a torch is
-   *  unequipped, a random sprite is shown on the left middle of the
-   *  screen"). THE HAND HOLDS NOTHING, SO IT DRAWS NOTHING. The only
+   *  MAC-H. THE HAND HOLDS NOTHING, SO IT DRAWS NOTHING. The only
    *  gates here were the module's switch and "is there a texture at
    *  all" - and `w.currentTexture` is set ONCE, to `list[0]`, the
    *  moment InitializeTextures finishes (:234), and is never cleared

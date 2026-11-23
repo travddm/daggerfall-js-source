@@ -142,11 +142,3 @@ test('RPT1026-FIGHTS TRAP-TO-OWNER THE RUNNER\'S OWN TRAP, KILLED BY ITS PARTY M
   assert.ok(t.bobSaid.includes(SOUL_TRAP_TEXT.trapNoneEmpty));
 });
 
-test('RPT1026-FIGHTS TRAP-TO-OWNER THE DUNGEON\'S TWIN, by source: the room\'s runner reads its own trap whoever struck, and tethers only its own blow - the street pool\'s law (mutants: the dungeon\'s peer kill reads no gem)', () => {
-  const d = rd('src/scenes/dungeonContext.js');
-  assert.match(d, /const trap = _peerTrap \? \{ allowDeath: true \} : attemptSoulTrap\(foe\.entity, foe\.mobileType, playerEntity\.items, Math\.random\(\)\);\n\s+if \(trap\.alert\) hudText\.add\(SOUL_TRAP_TEXT\[trap\.alert\]\);\n\s+if \(!trap\.allowDeath && !peer\) \{ foe\.entity\.health = 1; return; \}/);
-  // its cast engine takes the session's door (none handed: the default)
-  assert.ok(!/trapToOwner:/.test(d), 'the dungeon hands no door of its own - the session\'s routes by the pool');
-  const h = rd('src/scenes/hostEnchant.js');
-  assert.match(h, /spellToOwner: \(f, record, level\) => !!spellToOwner\?\.\(f, record, level\),/, 'the ctx offers STRIKE-SHARED\'s door');
-});

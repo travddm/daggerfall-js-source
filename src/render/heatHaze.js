@@ -1,5 +1,5 @@
 // @ts-check
-// HAZE1 (2026-10-08, Mac: "These should be on by default and integrate into our enhanced environments seamlessly") -
+// HAZE1 -
 // HEAT HAZE's RING, DRAWN. The translation of the mod's one shader, `Daggerfall/Mods/HeatHaze`
 // (vendor/heat-haze/shaders/HeatHaze.glsl, read back from its DXBC), and of the mesh and textures HeatHazeMod makes
 // (CreateCylinderMesh, CreateNoiseTexture - systems/heatHaze.js hazeNoise).

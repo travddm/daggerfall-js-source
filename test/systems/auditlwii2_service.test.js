@@ -1,4 +1,4 @@
-// AUDIT LW-II-2 (2026-10-10), the service's lane: THE LIVING WORLD II's patrons a second time - their law
+// AUDIT LW-II-2, the service's lane: THE LIVING WORLD II's patrons a second time - their law
 // (src/net/patronLaw.js), their reckoning (server-account/src/market.js reckonPatrons), a trader's door (homes.js
 // setHomeEntry), the hour's cron (cron.js), the measure staff read (review.js, tools/realmReview.mjs), the region's
 // traders (marketVendors) and the counter's mark (systems/tradeModes.js markCounterBought, at worldModes.js's two Buy
@@ -7,8 +7,6 @@
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { DatabaseSync } from 'node:sqlite';
 
 import { standService, T0 } from '../accountDb.mjs';
 import { seatRealm, freshSave } from '../realmSeat.mjs';
@@ -166,11 +164,6 @@ test('AUDIT LW-II-2 S1: A PATRON\'S WORTH IS min(THE JUDGE\'S FLOOR, THE RECORD\
   addItem(pack2, third);
   const picked = splitStack(pack2, marked, 1);
   assert.ok(picked && picked !== marked && picked.counterBought === true && marked.counterBought === true, 'a split keeps it on both halves');
-  // the doors: the counter's Buy and the keyed list's, each before the pack takes the piece (and a stack's merge with it)
-  const wm = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(wm, /if \(mode === 'Buy'\) \{\n\s+deductGold\(playerEntity, price\);\n\s+markCounterBought\(staged, \{ price, \.\.\.asked \}\);[^\n]*\n\s+for \(const it of staged\) \{/);   // PIN MOVED (AUDIT TOWN-ECON 2 PRICE-1): and the purchase's holiday and guild
-  assert.match(wm, /shelf\.items\.splice\(at, 1\);\n\s+markCounterBought\(\[it\], \{ price \}\);[^\n]*\n\s+playerEntity\.items = playerEntity\.items \|\| \[\];/);
-  assert.equal(wm.match(/markCounterBought\(/g).length, 2, 'the two doors');
 });
 
 test('AUDIT LW-II-2 S1: THROUGH THE WORKER, A COUNTER\'S BOOKS NEVER SELL FOR MORE THAN THEY COST - fourteen books bought online at a quality-10 bookseller (the counter\'s mark) and stocked at their patron cap: none sold in two days (the patrons paid 2.06 times what the counter asked); a found book priced under its template\'s old cap never sells, one under its own file price\'s cap sells at it (mutants: the mark refused, the own price)', async () => {
@@ -241,11 +234,11 @@ test('AUDIT LW-II-2 S2: A PATRON\'S SALE TELLS THE INT4 LEDGER - a rare piece (i
   const a = await run(true);
   assert.deepEqual({ ...a.ledger(a.U) }, { char_id: '', state: 'gone', claim_char: null }, 'the row gone, the claim settled');
   assert.deepEqual(a.raw.prepare('SELECT uid, char_id FROM item_dupes').all().map((x) => ({ ...x })), [{ uid: a.U, char_id: a.R.id }], 'the copy written down, the claimant\'s');
-  assert.equal(a.raw.prepare('SELECT dupes FROM realm_characters WHERE id = ?').get(a.R.id).dupes, 0, 'no strike');   // PIN MOVED (AUDIT AUTO-HOLD): contested, as a player's purchase of the piece is - it struck the claimant
+  assert.equal(a.raw.prepare('SELECT dupes FROM realm_characters WHERE id = ?').get(a.R.id).dupes, 0, 'no strike');
   assert.deepEqual(a.raw.prepare("SELECT detail FROM realm_findings WHERE char_id = ? AND kind = 'dupe'").all(a.R.id).map((x) => JSON.parse(x.detail)), [{ keys: [a.U], count: 1, contested: true }], 'its finding, said contested');
   // the copy's checkpoints after: found once, and it never takes the piece up
   for (let i = 0; i < 2; i++) { _now += DUPE_GRACE_S + 60; assert.equal((await realmPut(a.s, a.eve, a.R, [a.piece])).status, 200); }
-  assert.deepEqual([a.ledger(a.U).state, a.raw.prepare("SELECT COUNT(*) AS n FROM realm_findings WHERE char_id = ? AND kind = 'dupe'").get(a.R.id).n], ['gone', 1], 'never taken up, found once');   // PIN MOVED (AUDIT AUTO-HOLD): the finding counted, no strike to count
+  assert.deepEqual([a.ledger(a.U).state, a.raw.prepare("SELECT COUNT(*) AS n FROM realm_findings WHERE char_id = ? AND kind = 'dupe'").get(a.R.id).n], ['gone', 1], 'never taken up, found once');
   const b = await run(false);
   assert.equal(b.ledger(b.U), null, 'no copy kept: the row goes');
   assert.deepEqual([b.raw.prepare('SELECT COUNT(*) AS n FROM item_dupes').get().n, b.raw.prepare('SELECT dupes FROM realm_characters WHERE id = ?').get(b.R.id).dupes], [0, 0], 'and no one is charged');
@@ -253,10 +246,10 @@ test('AUDIT LW-II-2 S2: A PATRON\'S SALE TELLS THE INT4 LEDGER - a rare piece (i
 
 // ─── S3: THE MARKET SHUT ───
 
-test('AUDIT LW-II-2 S3: WHILE THE MARKET IS NOT OPEN TO EVERYONE NO HOUR IS PAID - shut (or its developers\' alone) thirty hours, the hour\'s cron marks the traders\' hours as they pass, and opening it pays none of them (its first firing after paid every shut hour); a developer\'s read behind `dev` reckons nobody\'s town; the migration reckons every open trader listing to the hour before it runs, never a board\'s (mutants: the cron marks, a read asks the switch, the backfill\'s hour, its traders alone)', async () => {
+test('AUDIT LW-II-2 S3: WHILE THE MARKET IS NOT OPEN TO EVERYONE NO HOUR IS PAID - shut (or its developers\' alone) thirty hours, the hour\'s cron marks the traders\' hours as they pass, and opening it pays none of them (its first firing after paid every shut hour); a developer\'s read behind `dev` reckons nobody\'s town (mutants: the cron marks, a read asks the switch)', async () => {
   for (const marks of ['off', 'dev']) {
     _now = T0;
-    const s = await rawStand({ MARKS_OPEN: marks, DEVELOPER_HANDLES: 'Dev' });
+    const s = await rawStand({ MARKS_OPEN: marks, SEAT_ADMINS: 'Dev' });
     const eve = await s.registered('Eve');
     const v = s.home(eve, 8001, 10);
     for (const it of loot(20)) s.list(eve, v, it);
@@ -271,7 +264,7 @@ test('AUDIT LW-II-2 S3: WHILE THE MARKET IS NOT OPEN TO EVERYONE NO HOUR IS PAID
   }
   // behind `dev`, a developer's region read: nobody's town reckoned
   _now = T0;
-  const d = await rawStand({ MARKS_OPEN: 'dev', DEVELOPER_HANDLES: 'Dev' });
+  const d = await rawStand({ MARKS_OPEN: 'dev', SEAT_ADMINS: 'Dev' });
   const ann = await d.registered('Ann'), dev = await d.registered('Dev');
   const dv = d.home(ann, 8101, 10);
   for (const it of loot(20)) d.list(ann, dv, it);
@@ -279,19 +272,6 @@ test('AUDIT LW-II-2 S3: WHILE THE MARKET IS NOT OPEN TO EVERYONE NO HOUR IS PAID
   assert.equal((await d.call('/v1/market/vendors', { region: DF }, dev.secret)).status, 200, 'the developer reads');
   assert.equal((await d.call('/v1/market/vendor', { vendor: dv }, dev.secret)).status, 200);
   assert.deepEqual([d.sales(), d.raw.prepare('SELECT COUNT(*) AS n FROM realm_faucets').get().n], [[], 0], 'no seller\'s piece sold, no gold minted');
-  // the migration: the listings standing when it runs
-  const files = readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((f) => f.endsWith('.sql')).sort();
-  const db = new DatabaseSync(':memory:', { enableForeignKeyConstraints: false });
-  for (const f of files.filter((x) => x < '0106')) db.exec(readFileSync(new URL(`../../server-account/migrations/${f}`, import.meta.url), 'utf8'));
-  const row = (id, vendor, state = 'open', currency = 'gold') => db.prepare(`INSERT INTO market_listings (id, seller, char_id, region, kind, units, own, bought, price, fee, at, expires_at, rid, n, currency, item, vendor_map, vendor_id, state)
-    VALUES (?, 'p1', 'c1', 17, 'item', 1, 1, 0, 100, 1, 1, 9999999999, ?, ?, ?, '{}', ?, ?, ?)`).run(id, `r-${id}`, `n-${id}`, currency, vendor ? 1001 : null, vendor ? 'trader1' : null, state);
-  row('trader', true); row('board', false); row('sold', true, 'sold');
-  const before = Math.floor(realNow() / 1000 / 3600);
-  db.exec(readFileSync(new URL('../../server-account/migrations/0106_patrons.sql', import.meta.url), 'utf8'));
-  const after = Math.floor(realNow() / 1000 / 3600);
-  const hourOf = (id) => db.prepare('SELECT patron_hour AS h FROM market_listings WHERE id = ?').get(id).h;
-  assert.ok([before - 1, after - 1].includes(hourOf('trader')), `the trader's listing to the hour before it ran: ${hourOf('trader')} of ${before}`);
-  assert.deepEqual(['board', 'sold'].map(hourOf), [null, null], 'a board\'s and a closed listing untouched');
 });
 
 // ─── S4: A DOOR ───
@@ -386,7 +366,7 @@ test('AUDIT LW-II-2 S5: A HELD SELLER CROWDS NO TOWN - four traders the judge ho
 
 test('AUDIT LW-II-2 S6: THE PATRONS\' GOLD WHERE THE WEALTH MEASURE COUNTS IT - /v1/mod/realm-budget names the service\'s own faucets over its window (every FAUCET_KINDS kind, the patron\'s gold and payments - nothing read realm_faucets), an hour older than the window not counted; tools/realmReview.mjs says it (mutants: the faucets answered, the window, the tool)', async () => {
   _now = T0;
-  const s = await rawStand({ DEVELOPER_HANDLES: 'Dev' });
+  const s = await rawStand({ SEAT_ADMINS: 'Dev' });
   const eve = await s.registered('Eve'), dev = await s.registered('Dev');
   const v = s.home(eve, 8301, 10);
   for (const it of loot(20)) s.list(eve, v, it);

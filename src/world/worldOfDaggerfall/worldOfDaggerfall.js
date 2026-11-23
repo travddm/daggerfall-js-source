@@ -312,7 +312,7 @@ export class WodWorld {
    * @param {Array<object>} picks - picksFor's answer
    * @param {number[]} averages - the kernel's, one per pick
    */
-  /** OW-WOD-PATH (2026-09-29, Mac: "Pathing doesnt go around mountains"): THE PIXELS A MOUNTAINS LAYOUT NAMES - one
+  /** OW-WOD-PATH: THE PIXELS A MOUNTAINS LAYOUT NAMES - one
    *  byte a map pixel (1000 x 500, x + y * 1000), 1 where any instance the session holds is a WOD_Mountain_ prefab. Those
    *  layouts stand eight to thirty-six rocks scaled by hundreds and thousands, reaching over a kilometre from the site -
    *  wider than the pixel - and the Overworld's route planner knew nothing of them: its peaks are the MAPS climate's

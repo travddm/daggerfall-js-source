@@ -1,6 +1,5 @@
 // @ts-check
-// SHIP-COLOURS (2026-10-17, the owner: "Finally, a fully customizable flag with the option to use your guild insignia";
-// bible/03-World/Naval-Refit.md SHIP-COLOURS) - THE FLAGS FLOWN, the world host's: which boats fly a flag of cloth this
+// SHIP-COLOURS - THE FLAGS FLOWN, the world host's: which boats fly a flag of cloth this
 // frame and where (render/shipFlagPass.js draws them), the boats whose pennant it replaces (scenes/world.js
 // csaParticleLists leaves their cubes out), and the flag each of mine says to the room (systems/comeSailAway/
 // comeSailAwayWire.js `f`).

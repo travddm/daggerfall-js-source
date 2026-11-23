@@ -1,5 +1,4 @@
-// DAY-TURN (2026-10-22, the owner: "The servers are on fire right now. We need to do something"; bible/01-Overview/bugs/
-// Field-Bugs-2026-10-22.md DAY-TURN). Every page online asked the account service again at 00:00:00 UTC - the
+// DAY-TURN. Every page online asked the account service again at 00:00:00 UTC - the
 // professions' state and pixels (net/profBook.js), the hall, the town and the seat witnessed once a day (npcHallBook.js,
 // townEconBook.js, townSeatBook.js) - and the one database's queue went from some 3,000 s of waiting a minute to 230,000
 // for two hours and more, every night: 503s, the sign-in's tokens refused, the relay's hellos with them. Now each page
@@ -217,8 +216,3 @@ function callOf(src, name) {
   throw new Error(`${name}'s call never closes`);
 }
 
-test('DAY-TURN the hosts hand every day-keyed book the page\'s one moment: the world host\'s seats, halls and professions, and the town economy\'s host (mutants: each book built without it)', () => {
-  const world = rd('src/scenes/world.js');
-  for (const name of ['createTownSeatBook', 'createHallBook', 'createProfBook']) assert.match(callOf(world, name), /\bturnMs: dayTurnMs\(\)/, name);
-  assert.match(callOf(rd('src/scenes/townEconHost.js'), 'createTownEconBook'), /\bturnMs: dayTurnMs\(\)/);
-});

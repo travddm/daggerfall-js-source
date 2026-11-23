@@ -1,4 +1,4 @@
-// OWS1 (2026-09-28, the player's ask: "being able to see other players sailing in the overworld") - THE SHIPS ON THE
+// OWS1 - THE SHIPS ON THE
 // MAP. A traveller at a helm, or aboard a boat (CSA-K), sends the region the mark's way the TV3 frame always carried and
 // nothing sent - `ship`, TRAV_MODES' fourth - headed as the boat's bow; the Overworld draws a mark whose way is the sea
 // as a ship (a hull under a sail, where the dot stood), riding the sea's top, and the held map inks it so.
@@ -107,18 +107,3 @@ test('OWS1 held map: a row the host says is at sea is a ship mark (only `true` c
   assert.deepEqual(inked.filter((c) => c[0] === 'fillText').map((c) => c[1]), ['Bran'], 'named under it as under the ring');
 });
 
-test('OWS1 host wiring by source: the boat under me is my own at its helm or another\'s I stand aboard; my mark says ship and heads as its bow; the view and the map mark the others\' ships, on the sea\'s top', () => {
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const csaBoatUnderMe = \(\) => \(csaRuntime\?\.isSailing\(\) \? csaRuntime\.state\.CurrentBoat : null\) \?\? csaAboard\.aboard\?\.boat \?\? null;/);
-  assert.match(w, /const csaBoatYaw = \(boat\) => \{ const fw = csaQuatRotate\(boat\.GameObject\.rotation, \[0, 0, 1\]\); return Math\.atan2\(fw\[0\], fw\[2\]\); \};/);
-  assert.match(w, /const ship = n \? csaBoatUnderMe\(\) : null;\n\s*const mark = n \? travellerMarkOf\(\{ x: n\.x, z: n\.z, yaw: ship \? csaBoatYaw\(ship\) : cam\.yaw, mode: ship \? TRANSPORT_MODES\.Ship : player\.transportMode, journey: !!travelControlUI\?\.isShowing \}\) : null;/);
-  assert.match(w, /\.map\(\(t\) => \(\{ id: t\.id, name: t\.name, \.\.\.t\.p, ship: isShipMark\(t\.p\), kin: travellerKin\(/, 'the held map\'s rows say who is at sea');   // PIN MOVED (FIELD BUGS 2026-10-04e OW-KIN): and who they are to me
-  // PIN MOVED (HOST-SPLIT 1, 2026-10-15): the Overworld's marks left world.js for scenes/travelViewMarks.js
-  const tvm = rd('src/scenes/travelViewMarks.js');
-  assert.match(tvm, /kind: `\$\{party \? 'party' : 'traveller'\}\$\{isShipMark\(t\?\.p\) \? ' ship' : ''\}\$\{t\?\.p\.tv \? ' journey' : ''\}`/, 'within the pose range, by their region mark');
-  assert.match(tvm, /const ship = isShipMark\(t\.p\);[^\n]*\n\s*marks\.push\(\{ key: `trav:\$\{t\.id\}`, at: tvSceneKept\(t, w\.x, w\.z, 2, ship\),/, 'a ship\'s mark asked on the sea');
-  assert.match(w, /if \(onSea\) holder\._tvAt\[1\] = Math\.max\(holder\._tvAt\[1\], tvSeaY\(\) \+ lift\);/, 'a ship rides the sea\'s top, not the carved seabed');
-  assert.match(w, /if \(holder\._tvGen !== gen \|\| holder\._tvNx !== nx \|\| holder\._tvNz !== nz \|\| holder\._tvSea !== onSea\) \{/, 'kept by it too: putting to sea lifts the point at once');
-  assert.match(tvm, /kind: `\$\{kind\}\$\{ship \? ' ship' : ''\}\$\{t\.p\.tv \? ' journey' : ''\}`/);
-  assert.match(rd('src/ui/heldMap.js'), /journey: t\.journey, ship: t\.ship \}\)\),/);
-});

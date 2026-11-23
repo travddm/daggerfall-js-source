@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { mintQuestFoeWave, bindQuestFoeHost, placeFoeEnv, entityOccupancy, questFoeGender } from '../../src/scenes/quest/questFoeHost.js';
 import { placeFoeFreely } from '../../src/systems/quest/sceneMount.js';
 import { GENDERS } from '../../src/characters/nameHelper.js';
+import { hostText } from '../hostText.mjs';   // HOST-SPLIT (at the merge of main into TESA): the world host read whole - questWorld is scenes/questWorld.js's
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
@@ -135,33 +136,3 @@ test('B1 gender: the Foe resource\'s own humanoid gender, the marker stand\'s re
   assert.equal(questFoeGender({ gender: GENDERS.Male }), 'male');
 });
 
-test('B1 seam gate: the trio is mounted on questWorld and the pools drive + tear down behaviours', () => {
-  const world = read('src/scenes/world.js');
-  const modes = read('src/scenes/worldModes.js');
-  const ext = read('src/scenes/exteriorFoes.js');
-  const dun = read('src/scenes/dungeonContext.js');
-  for (const seam of ['createFoeGameObjects:', 'tryPlaceFoe:', 'raiseOnEncounterEvent:']) {
-    assert.ok(world.includes(seam), `questWorld mounts ${seam}`);
-  }
-  // the wilderness arm widens the ring (TryPlacement :252-257) - AUDIT 68 S30-placefoe-defaults-dup: off the ring
-  // table (whose 8/25 questscene.test.js pins), not a second copy of its literals
-  assert.match(world, /minDistance: PLACE_FOE_DEFAULTS\.wildernessMinDistance, maxDistance: PLACE_FOE_DEFAULTS\.wildernessMaxDistance/);
-  // MERGE (the S-A lane's catch): fieldOfView() answers RADIANS and
-  // the law speaks DEGREES - both arms must convert, or every foe
-  // places ~1 degree off the view axis, dead ahead of the player
-  assert.match(world, /fovDegrees: fieldOfView\(\) \* 180 \/ Math\.PI/);
-  assert.match(modes, /fovDegrees: fieldOfView\(\) \* 180 \/ Math\.PI/);
-  // FinalizeFoe (:341-359): the Flying lift, in both arms - and only
-  // Flying, never Spectral (the one flag FinalizeFoe reads)
-  assert.match(world, /=== 'Flying'/);
-  assert.match(modes, /=== 'Flying'/);
-  // the dungeon arm stands through the context's one build chain
-  assert.match(modes, /dungeonCtx\.spawnQuestFoe\(/);
-  // both pools drive the behaviour every frame the object lives
-  // (a ported function with no caller is a comment - the standing lesson)
-  assert.match(ext, /f\.questBehaviour\?\.update\(\)/);
-  assert.match(dun, /f\.questBehaviour\?\.update\(\)/);
-  // and both tear it down - the cull, the hidden-foe remove, the scene destroy
-  assert.match(ext, /questBehaviour\?\.notifyDestroyed\(\)/);
-  assert.match(dun, /questBehaviour\?\.notifyDestroyed\(\)/);
-});

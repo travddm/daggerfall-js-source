@@ -1,6 +1,4 @@
-// RF1 - ENTITY MODIFIER CHANNELS (2026-09-14, Mac: "is there anything in
-// the codebase that can benefit from a refactor. This is our first time
-// going against parity with DFU ... Lets tackle each one at a time").
+// RF1 - ENTITY MODIFIER CHANNELS.
 //
 // The first departure (loot rarity) had to add its own term inside
 // five DFU-verbatim formulas beside the enchantment fold's. Now every

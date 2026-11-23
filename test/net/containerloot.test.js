@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, AC8 (2026-10-17): A BUILDING'S CUPBOARD IS ONE LIST FOR EVERYONE IN THE BUILDING. RED PINS, PHASE 1.
+// OUTDOOR-LOOT, AC8: A BUILDING'S CUPBOARD IS ONE LIST FOR EVERYONE IN THE BUILDING. RED PINS, PHASE 1.
 // Since WORLD6a a building is a world room and a stranger's cupboard is the room's from its first open
 // (world/interior/interiorShared.js): the room's word is the WHOLE list, and the last writer wins -
 // `applyInteriorLoot` lands a list over the container (`t.items.length = 0; ... push`) except under the reader's own

@@ -284,8 +284,8 @@ test('MW-D14: an ATTACK poses from ITS source, which is not the idle\'s', async 
   assert.equal(arm.status().idleSource, 'meshes/xbase_anim_female.1st.kf');
   assert.equal(arm.status().actionSource, 'meshes/xbase_anim.1st.kf',
     'the equip section came from the OTHER file');
-  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.WeaponEquipped; i++) arm.update(0.05);
-  assert.equal(arm.status().upper, UPPER_BODY.WeaponEquipped);
+  for (let i = 0; i < 60 && arm.status().upper !== UPPER_BODY.Ready; i++) arm.update(0.05);
+  assert.equal(arm.status().upper, UPPER_BODY.Ready);
   // The slot is empty between sections, which is why the source is read
   // while something is playing and not after.
   assert.equal(arm.status().actionSource, null);
@@ -337,7 +337,7 @@ test('MW-D15 rule 32(a): the GMST is READ, and a missing one is null not zero', 
 });
 
 test('MW-D15 rule 32(a): the sink moves the arm, through the NECK', async () => {
-  const { assembleFirstPersonArm, applyFirstPersonNeck } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
+  const { assembleFirstPersonArm, pitchNeck } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
   const { parseNif } = await import('../../../src/formats/morrowind/mwNifFile.js');
   const { poseSkeleton, skeletonSpaceMatrices, GRAPH_ROOT } = await import('../../../src/formats/morrowind/mwSkin.js');
   const arm = await assembleFirstPersonArm({
@@ -348,7 +348,7 @@ test('MW-D15 rule 32(a): the sink moves the arm, through the NECK', async () => 
   const skelMats = (sk, pose, root) => skeletonSpaceMatrices(sk, pose, root);
   const neckAt = (offset, pitch) => {
     const pose = poseSkeleton(arm.skeleton, null, null, 0, {});
-    applyFirstPersonNeck(arm.skeleton, pose, GRAPH_ROOT, skelMats, pitch, 0, offset);   // AUDIT 68 S11-rootref-dead: the production frame (MW-D20)
+    pitchNeck(arm.skeleton, pose, GRAPH_ROOT, skelMats, pitch, 0, offset);   // AUDIT 68 S11-rootref-dead: the production frame (MW-D20)
     return pose.get(arm.skeleton.byName.get('bip01 neck')).translation;
   };
   const rest = neckAt(null, 0);
@@ -463,7 +463,7 @@ test('MW-D15 rule 32(a): the LIVE arm sinks when the camera dep says sneak', asy
 });
 
 test('MW-D15: the neck controller uses the ROTATION, with the scale divided out', async () => {
-  const { applyFirstPersonNeck, FP_NECK_BONE } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
+  const { pitchNeck, NECK_BONE } = await import('../../../src/formats/morrowind/mwFirstPerson.js');
   // RotateController takes `worldMat.getRotate()`, not the matrix. The
   // skeleton-space 3x3 this module works in is rotation TIMES SCALE
   // (rule 55 folds a NIF's uniform scale in), so conjugating with it
@@ -474,7 +474,7 @@ test('MW-D15: the neck controller uses the ROTATION, with the scale divided out'
   const ident = () => Float32Array.from([1, 0, 0, 0, 1, 0, 0, 0, 1]);
   const rig = (s) => ({
     skeleton: {
-      byName: new Map([[FP_NECK_BONE, REF]]),
+      byName: new Map([[NECK_BONE, REF]]),
       nodes: new Map([[REF, { rest: { rotation: ident(), translation: [0, 0, 0], scale: 1 } }]]),
     },
     // The neck's world 3x3, scaled - what skeletonSpaceMatrices really
@@ -484,7 +484,7 @@ test('MW-D15: the neck controller uses the ROTATION, with the scale divided out'
   const run = (s, pitch, offset) => {
     const { skeleton, mats } = rig(s);
     const pose = new Map();
-    applyFirstPersonNeck(skeleton, pose, 0, () => mats, pitch, 0, offset);
+    pitchNeck(skeleton, pose, 0, () => mats, pitch, 0, offset);
     return pose.get(REF);
   };
   const one = run(1, 0.5, [0, 0, -10]);

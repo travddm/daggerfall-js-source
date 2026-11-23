@@ -1,11 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════
-// FORAGE1 (2026-09-28): QUEST ACTIONS EXTENSION'S FOUR ACTIONS - the ones
-// Harbinger451's Foraging quests say (bible/06-Systems/Foraging.md 9.2).
+// FORAGE1: QUEST ACTIONS EXTENSION'S FOUR ACTIONS - the ones
+// Harbinger451's Foraging quests say (9.2).
 // Quest Actions Extension is Jagget's (2.0.0, github.com/Jagget/
 // QuestActionsExtension at 56a407e, Actions/*.cs); nothing of it is
 // carried - each class here restates one of its actions' behaviour, cited
 // to its file, and Jagget is credited on the About screen beside the mod
-// that needs it (Mac: "Your lead").
+// that needs it.
 //
 //   raise time by H:MM          RaiseTime.cs           WorldTime.Now.RaiseTime(seconds) - a bare clock advance
 //                                                      (online, FORAGE4: the host's wait - the clock is shared)

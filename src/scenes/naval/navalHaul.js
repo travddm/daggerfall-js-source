@@ -1,6 +1,5 @@
 // @ts-check
-// BOARD-MAGNET (2026-10-26, the owner: "a prompt to board should show within range and properly magnitize to the other
-// ship"; bible/03-World/Naval-Refit.md BOARD-MAGNET and its AUDIT) - THE GRAPPLES' HAUL, wired by the naval host
+// BOARD-MAGNET - THE GRAPPLES' HAUL, wired by the naval host
 // (scenes/naval/navalHost.js startBoarding, stepBoarding, wayScale, brake - HOST-SPLIT: the module the host wires, as
 // fishHost.js is) over the boarding's own law (systems/naval/navalBoarding.js berthPose, drawHaul, haulBrake). The port's
 // own - Daggerfall has no sea.
@@ -44,6 +43,16 @@ export function createNavalHaul({ csa, myBoat, boatPose, yawOfRot }) {
     step(b, hull, dt) {
       if (!b.boat?.GameObject) return b.haul(b.to, null, dt);
       return b.haul(berth(b.boat, b.from, hull, b.lie), anchorOf(b.boat), dt);
+    },
+    /** The world moved by `o`: where she lay, her berth and her pose move with it. On foot her berth is where she lay,
+     *  one array under two names, so each point is moved once. */
+    offset(b, o) {
+      if (!b) return;
+      const points = new Set([b.from.pos, b.to.pos, b.at.pos]);
+      for (const point of points) {
+        point[0] += o[0];
+        point[2] += o[2];
+      }
     },
     hauling,
     /** Come Sail Away's `brake` while `b` hauls beside my helm (0: her own rate). */

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// OH-B / OH-C (2026-09-26): THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN
+// OH-B / OH-C: THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN
 // THE STREAMED WORLD. The host half of OceanHoles' tile work (jet082's
 // 1.1.0): every terrain promoted is given an OceanPitTileState and queued;
 // one a frame is processed (ProcessOneTerrain), and a pixel the hash picks
@@ -37,8 +37,8 @@ import {
   isPitPixel, placementFraction, getScaledSliderValue, deformSeafloorVertices, raycastFloorY, findPitOpeningY, oceanSurfaceWorldY,
   MAX_FLOOR_WAIT_FRAMES, MINIMUM_DEPTH, MINIMUM_EDGE_DISTANCE, FLOOR_FLATTEN_VARIANCE, SURFACE_OUTER_RADIUS, SURFACE_MIASMA_MAX_PARTICLES,
   SURFACE_MIASMA_HEIGHT, OCEAN_HOLES_VENDOR,
+  pitPixelOk,   // PITS-WORLD: IsValidMapPixel's hold - the world's grid, where an abyss has an id (ETHER-DEEP held it to the Bay's map)
 } from '../world/oceanHoles.js';
-import { isValidMapPixel } from '../world/deepWater/deepWatersBake.js';   // ETHER-DEEP: IsValidMapPixel - the pits' map is the Bay's
 import { sampleMeshLocalY, TILE_WORLD_SIZE_F32 } from '../world/deepWater/deepWaterFloor.js';   // AUDIT PRE-MERGE 0928 H4: terrainData.size, a float
 import { modSetting, modSettingsGeneration } from '../systems/modSettings.js';
 import { OCEAN_CLIMATE } from '../world/terrain/terrainHelper.js';   // worldClimate 223: the unverified placement's own check
@@ -268,10 +268,11 @@ export function createOceanHoles({ deepWaters, decor = null, built, pixelTransla
       return;
     }
     const v = version(entry);
-    // ETHER-DEEP (bible/03-World/Eltheric-Ocean.md): the pits are the Bay's. The Eltheric Ocean's floors are carved now
-    // (world/etherWatersBake.js), and a pit's drowned dungeon is named by its pixel's id's low twenty bits
-    // (GetAbyssMapId) - the Bay's 1000 x 500 alone keeps those apart; a pit past the Veil would share a Bay pit's abyss
-    if (!isValidMapPixel(st.mapX, st.mapY)) { markTerrainProcessed(st, v, 'rejected:off-the-map'); return; }
+    // PITS-WORLD (WORLD-LANES): the pits are the world's. ETHER-DEEP held them to the Bay's
+    // map because a pit's drowned dungeon was named by its pixel's id's low twenty bits (GetAbyssMapId), which the Bay's
+    // 1000 x 500 alone keeps apart; past the Bay an abyss is named in the world's abyss lane now, so every pixel of the
+    // world's grid may open one - the continent's sea (TAMRIEL-DEEP) and the Eltheric Ocean's (ETHER-DEEP) as the Bay's
+    if (!pitPixelOk(st.mapX, st.mapY)) { markTerrainProcessed(st, v, 'rejected:off-the-map'); return; }
     if (!isPitPixel(st.mapX, st.mapY, s.pitSpawnRate)) { markTerrainProcessed(st, v, 'rejected:not-selected'); return; }
     if (hasLocation(entry)) { markTerrainProcessed(st, v, 'rejected:has-location'); return; }
     const flag = !!deepWaters.tryGetSeafloor(entry);   // TryGetFloorCollider

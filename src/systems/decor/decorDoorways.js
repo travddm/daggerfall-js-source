@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-DOORS (2026-09-30) — A DOOR HUNG IN A DOORWAY, AND WHERE ONE GOES.
+// HOME-DOORS — A DOOR HUNG IN A DOORWAY, AND WHERE ONE GOES.
 //
 // Asked: "For houses with multiple rooms attached, I want to add a door
 // item that can attach to the wall that leads to another room. This

@@ -296,8 +296,7 @@ const CLASSIC_NAMES = Object.freeze({
   Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/', Backslash: '\\',
 });
 
-/** SWING-LABEL (2026-09-22, Mac: "why some players arent able to
- *  attack and ensure this isnt an issue with keybindings"): THE THREE
+/** SWING-LABEL: THE THREE
  *  MOUSE BUTTONS BY WHAT THEY ARE, NOT BY UNITY'S NUMBER.
  *
  *  DFU names a button by its KeyCode - Mouse0, Mouse1, Mouse2 - and
@@ -340,8 +339,7 @@ export function swingHint(code, mode, readyCode) {
   return readyCode == null ? how : `${how} Draw your weapon first with ${buttonText(readyCode, true)} (Ready Weapon).`;
 }
 
-/** UXB1-D (2026-09-25, the UX backlog: "Is there a reason you cannot have multiple keys bound to the same action
- *  such as jump+swim-up?"): THE TWO ROWS WHOSE KEY IS NOT THE ONLY ONE THAT MOVES YOU. LevitateMotor.Update rises on
+/** UXB1-D: THE TWO ROWS WHOSE KEY IS NOT THE ONLY ONE THAT MOVES YOU. LevitateMotor.Update rises on
  *  Jump OR FloatUp and sinks on Crouch OR FloatDown (LevitateMotor.cs:86-89), and every host passes the pair
  *  (`up: jumpHeld || held(keys, 'FloatUp')`) - so the swim-up a player wanted Space for is already Space's. Since
  *  UXB1-S a key CAN carry both (Use for both, Controls.md law 3); this line is why this pair never needs to (AUDIT

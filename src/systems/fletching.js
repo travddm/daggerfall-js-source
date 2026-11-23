@@ -1,4 +1,4 @@
-// FLETCH (2026-10-11, Mac: "Allow crafting of arrows"; bible/05-Combat/Arrow-Supply.md): THE PACK'S ARROW CRAFT.
+// FLETCH: THE PACK'S ARROW CRAFT.
 //
 // Online the arrows are Carpentry's (net/recipeLaw.js, twenty at a workbench - Professions-Arc.md 9.3); offline nothing
 // made one, and a bow went quiet when the shops ran dry. Now the player whittles them from wood they carry, anywhere,

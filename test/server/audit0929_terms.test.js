@@ -1,6 +1,6 @@
-// AUDIT PRE-MERGE 0929 (2026-09-29, Mac: "Audit this") - TERMS1's half: the deploy that asks the service as a player
+// AUDIT PRE-MERGE 0929 - TERMS1's half: the deploy that asks the service as a player
 // does, the site that waits for the service its forms ask, a game from before the boxes told the truth, and a keyboard
-// that survives the card's redraw. The record: bible/01-Overview/audits/Audit-PreMerge-0929.md.
+// that survives the card's redraw. The record:.
 //
 // Each test failed on the unfixed tree for its finding's reason: the smoke's guest opened with a label alone (T-CI), a
 // deploy job that published with nothing waited on (T2), a bare request answered `terms-unaccepted` - a word no game
@@ -11,6 +11,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 
 import { TERMS_VERSION, PRIVACY_VERSION, ACCEPTED } from '../../src/net/legalLaw.js';
@@ -38,7 +39,8 @@ function runBlock(yml, stepName) {
 }
 
 /** bash, from the repository's root, with the environment given - how the runner runs a step. */
-const bash = (script, env = {}) => spawnSync('bash', ['-c', script], { cwd: ROOT.pathname, env: { PATH: process.env.PATH, ...env }, encoding: 'utf8' });
+// The runner's shell has LANG=C.UTF-8; without it, Git for Windows' grep refuses -P.
+const bash = (script, env = {}) => spawnSync('bash', ['-c', script], { cwd: fileURLToPath(ROOT), env: { PATH: process.env.PATH, LANG: 'C.UTF-8', ...env }, encoding: 'utf8' });
 
 test('AUDIT PRE-MERGE 0929 T-CI: every request a workflow makes that opens or names an account carries the versions both ends read - the deploy smoke opened its guest with a label alone, 400 under curl -f, and every check after the Worker went live never ran (mutants: a body without the versions; the versions typed in the workflow)', () => {
   let asked = 0;
@@ -91,7 +93,7 @@ test('AUDIT PRE-MERGE 0929 T2: the site is published only once the account servi
   assert.match(deployJob, /BASE: \$\{\{ needs\.site\.outputs\.account_base \}\}/);
   // the loop itself, over a service that answers as the real one does (`{ ok, v }`, index.js /v1/health)
   const loop = runBlock(deployJob, 'Wait for the account service to serve this build\'s version');
-  const against = (answers, { upto = 0 } = {}) => {
+  const against = (answers, { upto = 0, base = 'https://svc.invalid' } = {}) => {
     // each ask runs in the $( ) subshell the step puts it in, so the stub counts its asks in a file, not a variable;
     // `upto` cuts the loop's `seq` short (DEPLOY-WAIT: 1050 asks of stubs cost the suite twelve seconds) - the count
     // itself is read off the source below
@@ -101,9 +103,11 @@ sleep() { :; }
 ${upto ? `seq() { command seq 1 ${upto}; }\n` : ''}${loop}`;
     const calls = join(mkdtempSync(join(tmpdir(), 'a0929-')), 'calls');
     writeFileSync(calls, '');
-    const res = bash(script, { WANT: 'acct20', BASE: 'https://svc.invalid', CALLS: calls });
+    const res = bash(script, { WANT: 'acct20', BASE: base, CALLS: calls });
     return { status: res.status, asked: readFileSync(calls, 'utf8').trim().split('\n').filter(Boolean) };
   };
+  const none = against(['{"ok":true,"v":"acct19"}'], { base: '' });
+  assert.deepEqual([none.status, none.asked.length], [0, 0], 'no built-in account service (decision 116 (8)): nothing to wait on');
   const now = against(['{"ok":true,"v":"acct20"}']);
   assert.deepEqual([now.status, now.asked.length], [0, 1], 'a service already serving it: one request');
   assert.match(now.asked[0], /https:\/\/svc\.invalid\/v1\/health/);
@@ -112,7 +116,6 @@ ${upto ? `seq() { command seq 1 ${upto}; }\n` : ''}${loop}`;
   const never = against(['{"ok":true,"v":"acct19"}'], { upto: 3 });
   assert.equal(never.status, 1, 'a service that never came: the site is not published');
   assert.equal(never.asked.length, 3, 'one ask a turn, and none after the last');
-  // PIN MOVED (DEPLOY-WAIT, 2026-10-17): 90 asks, thirty minutes, gave up on #983's site six minutes before its service
   // came - the service waits up to five and a half hours on the relay. Now as long as that chain may take, and no longer
   // than a job may run.
   const asks = (src, name) => Number(/for i in \$\(seq 1 (\d+)\); do/.exec(runBlock(src, name))?.[1]);

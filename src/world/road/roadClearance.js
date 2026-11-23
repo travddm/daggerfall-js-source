@@ -1,4 +1,4 @@
-// ROADS-CLEAR (2026-09-25, Mac: "Camps, mountains from WOD, shouldnt be placed on roads") - is a footprint
+// ROADS-CLEAR - is a footprint
 // clear of the painted road network?
 //
 // Basic Roads (and the port's own generated network, which carries the same compass) draws every path in a
@@ -56,7 +56,7 @@ export function boxNearPath(net, px, py, x0, z0, x1, z1, clearance = 0) {
   if (!net) return false;
   const g = PATH_HALF_WIDTH + clearance;
   const gx0 = x0 - g, gz0 = z0 - g, gx1 = x1 + g, gz1 = z1 + g;
-  // OW-WOD-LAG (2026-09-29, Mac: "When near mountains from WOD, the game lags insane"): ONLY THE MAP'S PIXELS ARE ASKED.
+  // OW-WOD-LAG: ONLY THE MAP'S PIXELS ARE ASKED.
   // Every World of Daggerfall Mountains layout carries a rock scaled by a million 83 km under its site (object 2), whose
   // box spans thousands of pixels each way - most of them off the map - and this walk asked every one for a byte that
   // is never there: 46-121 ms of main thread a mountain pixel's build, measured. A pixel off the map has no road.

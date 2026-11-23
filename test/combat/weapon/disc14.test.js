@@ -1,5 +1,5 @@
-// DISC14 (2026-09-23, Discord through Mac). Each pin here fails at d80fe4ef and passes with its fix
-// (bible/01-Overview/bugs/Field-Bugs-2026-09-23.md, DISC14).
+// DISC14. Each pin here fails at d80fe4ef and passes with its fix
+// (, DISC14).
 //
 // ── DISC14-A: "is there a way to make it so I can see my weapon above my horse?" (Starempire42) ──
 // Riding, the horse's head covered the hand and the root of the blade. DFU draws the mount in OnGUI at GUI.depth 2,
@@ -49,8 +49,7 @@ test('DISC14-A: in both hosts that ride, the weapons draw over the mount - the m
   assert.match(rd('vendor/roleplay-realism/Scripts/EnhancedRiding.cs'), /Draw horse texture behind other HUD elements & weapons[^\n]*\n\s*GUI\.depth = 2;/, 'the law, in the vendored mod');
 });
 
-// ── DISC14-B: REVERTED by DISC16-B (2026-09-24, Mac: "Weapon widget preset needs to be defaulted on with diverse
-// weapons and the changes we made to the values for the weapon widget reverted"). Its pins went with it; the defaults
+// ── DISC14-B: REVERTED by DISC16-B. Its pins went with it; the defaults
 // are DW-CLIP's again, pinned where they were (DW1, WW1, AUDIT-DW) and in test/combat/disc16.test.js.
 
 // ── DISC14-C ─────────────────────────────────────────────────────────

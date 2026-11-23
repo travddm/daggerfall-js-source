@@ -1,0 +1,83 @@
+name: verify-light
+
+# The light run on a draft pull request (check.yml): lint and the types as the full verification runs them, and the
+# near tier of the tests (tools/test-near.ts) on two runners. It never builds and never runs the far tier, the tests
+# that reach a change only through other modules. Those run in the full verification, when the pull request is marked
+# ready. A light run never passes `check`.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: lint and types
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cached dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci
+      # The same cache as verify.yml's: a light run warms the full run's lint, and the other way round
+      - name: ESLint's cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/eslint
+          key: eslint-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: eslint-${{ runner.os }}-
+      - name: Lint
+        run: npm run lint
+      - name: Lint ratchet is current
+        run: node tools/lintRatchet.mjs --strict
+      - name: Type-check
+        run: npm run types
+      - name: Shaders compile
+        run: |
+          command -v glslangValidator >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq glslang-tools; }
+          node tools/glsl-check.ts
+
+  test:
+    name: near tests ${{ matrix.shard }}/2
+    runs-on: ${{ github.event.repository.private && vars.DFO_CI != 'hosted' && 'dfo-self-hosted' || 'ubuntu-latest' }}
+    strategy:
+      # every shard reports, so one red run shows every failing file
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      # The pull request's merge commit and its parents: HEAD^1 is the base the near tier is measured against
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Cached dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Fetch the vendored mods' published files
+        run: sh tools/fetch-vendor.sh
+      - name: Near tests, shard ${{ matrix.shard }} of 2
+        run: node tools/test-near.ts ${{ matrix.shard }}/2 --base HEAD^1

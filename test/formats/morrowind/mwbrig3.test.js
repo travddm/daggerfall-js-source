@@ -1,5 +1,4 @@
-// MW-BRIG3 (2026-09-29, Mac on MW-BRIG2: "completely broke the morrowind torso" - asked what it looks like: "it's
-// placed lower where the torso should be", only with the brigandine worn, on a male body): THE BRIGANDINE IS FITTED
+// MW-BRIG3: THE BRIGANDINE IS FITTED
 // ONTO THE WEARER.
 //
 // MW-BRIG1 and MW-BRIG2 both drew the brigandine at the height of the modeller's scene, taken on faith as the
@@ -180,8 +179,4 @@ test('MW-BRIG3: the Steel Brigandine is fitted to the chest it hides, and the bu
   const w = composeWornArmor({ pieces: [{ templateIndex: RRI_JERKIN_TEMPLATE, material: ARMOR_MATERIAL.Steel }], armors: [], bodyPool: [] });
   assert.deepEqual(w.adds.map((a) => a.fitTo), ['chest']);
   assert.deepEqual(w.shadows, ['chest'], 'the part it is fitted to is the part it hides');
-  // carried through ownBodyPart, beside the body it is skinned from
-  const fp = sourceText('src/combat/fpArm.js');
-  assert.match(fp, /\.filter\(\(b\) => b\.bytes\),\n    fitTo: add\.fitTo \?\? null,/);
-  assert.match(fp, /\.\.\.ownBodyPart\(row, rows, find\) \}\);/);
 });

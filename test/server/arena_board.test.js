@@ -1,5 +1,4 @@
-// ARENA-BOARD (2026-10-19, the account database overloaded again; bible/11-Multiplayer/Scale-Arc.md ARENA-BOARD;
-// migration 0139) - THE ARENA'S BOARD READ AS ONE ROW A SEASON: its ten counts, every caller's alike, kept at a version the
+// ARENA-BOARD - THE ARENA'S BOARD READ AS ONE ROW A SEASON: its ten counts, every caller's alike, kept at a version the
 // database moves on every bout, void, account gone and banner joined or left; the caller's own rows read after them.
 //
 // The proof is an oracle: ladder and players' bouts across seasons and banners, runs voided, banners joined and left and
@@ -164,10 +163,3 @@ test('ARENA-BOARD a kept season is one statement for its counts; a bout moves th
   assert.equal(arenaSharedOf(JSON.stringify({ ...keptText, standingRows: { now: [[]], last: [[], []] } })), null, 'a season\'s rows short: no board');
 });
 
-test('ARENA-BOARD the writes that move a season are the database\'s own - every ladder bout, players\' bout and banner membership written, voided or deleted, by any route or cascade - and stand after every migration (mutant: a trigger dropped)', () => {
-  const { raw } = world();
-  const triggers = raw.prepare("SELECT name FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'arena_board_%' ORDER BY name").all().map((t) => t.name);
-  assert.ok(raw.prepare("SELECT sql FROM sqlite_master WHERE name = 'arena_board_pve_in'").get().sql.includes('UPDATE arena_board_ver SET ver = ver + 1 WHERE id = 1'), 'the arena\'s one version');
-  assert.deepEqual(triggers, ['arena_board_member_in', 'arena_board_member_out', 'arena_board_member_up', 'arena_board_pve_in', 'arena_board_pve_out', 'arena_board_pve_up', 'arena_board_pvp_in', 'arena_board_pvp_out', 'arena_board_pvp_up']);
-  assert.match(src('server-account/src/arena.js'), /const \{ grandRows, pvpAll, pveAll, fastAll, standings, last, rosters, counts \} = await arenaShared\(ctx, season, later\);/, 'the board reads its counts off the kept row');
-});

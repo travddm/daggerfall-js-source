@@ -1,4 +1,4 @@
-// IT1 (2026-10-04): IMMERSIVE TRAVEL ON THE ENHANCED SHEET (ui/heldMap.js) - the skin every online player wears. A
+// IT1: IMMERSIVE TRAVEL ON THE ENHANCED SHEET (ui/heldMap.js) - the skin every online player wears. A
 // driver's map bills the mod's fare, refuses where the driver will not go, never remembers its toggles and commits a
 // trip the host knows as a driver's (`opts.immersive`); the player's own map under Disable Normal Travel refuses a
 // place outright; a captain's map shows only docks with ShowOnlyDocks.

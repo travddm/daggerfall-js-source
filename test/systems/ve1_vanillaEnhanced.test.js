@@ -1,4 +1,4 @@
-// VE1-VE3 (2026-10-05) - VANILLA ENHANCED, and the two laws of DFU's mod door it found the port without.
+// VE1-VE3 - VANILLA ENHANCED, and the two laws of DFU's mod door it found the port without.
 //
 // carademono's Vanilla Enhanced is Daggerfall's own textures remastered, worn through the texture-mod door - the
 // player's own copy (VE3; Port-Doctrine - A RENDER OF GAME DATA IS GAME DATA), shipped since VE4 under the exception
@@ -80,7 +80,7 @@ const VE = 'dfmod/vanilla enhanced - base.dfmod';
 const MASKED = 'dfmod/vanilla enhanced - masked roads.dfmod';
 const SNOWLESS = 'dfmod/vanilla enhanced - snowless swamps and jungles.dfmod';
 const WINTER = 'dfmod/vanilla enhanced - winter tracks.dfmod';
-// ALIKR1 / SNOWFALL1 (2026-10-08): the two environment packs ship through the same door, on by default and built on the
+// ALIKR1 / SNOWFALL1: the two environment packs ship through the same door, on by default and built on the
 // Base (test/systems/environs_texturePacks.test.js holds their own law); a pin over the whole door names them in their places
 const SANDS = 'dfmod/sands of the alikr.dfmod';
 const SNOWFALL = 'dfmod/snowfall.dfmod';
@@ -280,9 +280,7 @@ test('VE2 the records\' set: record 0\'s size, else the classic; a record of ano
 
 test('VE2 the hosts: the two terrain hosts hand the classic file and upload what comes back; the interior and dungeon hosts draw no ground (THE FOUR HOSTS)', () => {
   assert.match(src('scenes/exterior.js'), /const modLayers = await dfmodGroundLayers\(groundArchive, groundTex\);[\s\S]{0,400}?renderer\.uploadTileArray\(groundArchive, modLayers \? layers : markPuddleWater\(layers\)\);/, 'scenes/exterior.js');
-  // PIN MOVED (AUDIT PRECIP GROUND-2): the streaming host asks in one home (groundLayersOf) for its set and its twin's winter,
   // and uploads the set - or on the snow lane its twin, the two as one array - once
-  // PIN MOVED (OW-HITCH): that home is scenes/groundSets.js, the world host's module (HOST-SPLIT), uploading a few layers a breath
   assert.match(src('scenes/groundSets.js'), /const modLayers = await dfmodGroundLayers\(archive, tex\), classic = \[\];/, 'scenes/groundSets.js');
   assert.match(src('scenes/groundSets.js'), /const layers = winter == null \? own\.layers : twinLayers\(own\.layers, \(await groundLayersOf\(winter, await getTexture\(winter\)\)\)\.layers\);\n\s+await stepsBreathing\(renderer\.uploadTileArraySteps\(key, layers\), breathe\);/, 'scenes/groundSets.js');
   assert.match(src('scenes/world.js'), /const \{ loadGroundSet \} = createGroundSets\(\{ renderer, getTexture, labGrass, breathe: \(\) => breather\.breathe\(\),/, 'scenes/world.js wires it');
@@ -296,10 +294,8 @@ test('VE3/VE4 the Texture Overhaul card: Classic and Vanilla Enhanced - the pack
   assert.deepEqual(tex.options.map((o) => [o.id, o.name]), [['classic', 'Classic'], ['vanilla-enhanced', 'Vanilla Enhanced']]);
   const [classic, ve] = tex.options;
   await attach({});
-  // PIN MOVED (AUDIT VE, Mac: "Ensure this is on by default"): nothing attached was Classic while the shipped pack was off
   assert.equal(currentOption(tex), ve, 'nothing attached: the shipped Base, on by default');
   assert.equal(ve.by, 'carademono, version 3.4.7', 'VE4: the shipped Base');
-  // PIN MOVED (AUDIT VE R3, one switch a mod): a copy over a shipped mod wears that mod's switch, so the attach's own
   // step is what switches it on - this registered the copies without it, and each was on by its own empty shelf
   await attach({
     'dfmod/dream - sprites.dfmod': fakeMod('DREAM - Sprites', { textures: [['210_0-0', 2, 2]] }),

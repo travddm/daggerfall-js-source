@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════════════════
-// PERF-TOWN1 (2026-09-20) - THE TOWN LOOP'S SCRATCH, for both outdoor
+// PERF-TOWN1 - THE TOWN LOOP'S SCRATCH, for both outdoor
 // hosts.
 //
-// Mac: "I noticed ingame the exterior is really heavy rn". The
+// . The
 // `?perf=cpu` line named it - `people` swinging 1.14 to 7.36 ms a
 // frame against a `sim` steady at 2-3 - and a zone that varies
 // fourfold frame to frame is not doing four times the work. It is

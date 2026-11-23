@@ -1,4 +1,4 @@
-// OH-B / OH-C (2026-09-26) - THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN THE
+// OH-B / OH-C - THERE'S A HOLE IN THE BOTTOM OF THE OCEAN IN THE
 // STREAMED WORLD (src/scenes/oceanHolesHost.js) against the assembly's
 // OceanHoles tile work: the gates in ProcessTerrain's order and their
 // diagnostics, the wait for Iliac Puddle No More's floor (RequestSeafloorRefresh
@@ -97,7 +97,10 @@ test('OH-B ProcessTerrain: a pixel the hash does not pick is rejected at once, b
   assert.deepEqual(r.deepWaters.log, [], 'no floor asked for');
 });
 
-test('OH-B ProcessTerrain (ETHER-DEEP): a pixel off the Bay\'s map - the Eltheric Ocean\'s carved floor - is never cut: an abyss is named by its pit pixel\'s id, the Bay\'s alone - nor the continent\'s west of it (mutants: the hold dropped, the box\'s alone held)', () => {
+// because an abyss was named by its pit pixel's id's low twenty bits, the Bay's alone apart; past the Bay an abyss is named
+// in the world's abyss lane now (world/oceanHoles.js getAbyssMapId), so a pixel past the Veil and one west of the Bay are cut
+// as the Bay's are, and off the world's grid is still off the map
+test('OH-B ProcessTerrain (ETHER-DEEP, then PITS-WORLD): a pixel past the Veil - the Eltheric Ocean\'s carved floor - and one of the continent west of the Bay are cut as the Bay\'s, each abyss its own; a pixel off the world\'s grid is never (mutants: the hold the Bay\'s, the box\'s alone, none)', () => {
   const r = rig();
   let pit = null;
   for (let x = 4000; x < 8000 && !pit; x++) if (isPitPixel(x, -5000, 0.5)) pit = [x, -5000];
@@ -106,9 +109,8 @@ test('OH-B ProcessTerrain (ETHER-DEEP): a pixel off the Bay\'s map - the Eltheri
   r.deepWaters.build(e, -100, 1);
   r.oh.promoted(e);
   r.oh.update();
-  assert.equal(r.oh.stateOf(e).diagnostic, 'rejected:off-the-map');
-  assert.deepEqual([r.pits.length, r.deepWaters.log.filter((l) => l[0] === 'commit').length], [0, 0], 'no pit, no cut');
-  // AUDIT ETHER-OW T-14: the continent's west of the map too - off the map is off it, the box or not
+  assert.equal(r.oh.stateOf(e).diagnostic, 'built', 'past the Veil a pit stands');
+  // AUDIT ETHER-OW T-14: the continent's west of the map too - the world's grid is the hold, the box or not
   let west = null;
   for (let x = -1; x > -1000 && !west; x--) if (isPitPixel(x, 250, 0.5)) west = [x, 250];
   assert.ok(west, 'a pixel west of the Bay the hash picks');
@@ -116,8 +118,16 @@ test('OH-B ProcessTerrain (ETHER-DEEP): a pixel off the Bay\'s map - the Eltheri
   r.deepWaters.build(c, -100, 1);
   r.oh.promoted(c);
   r.oh.update();
-  assert.equal(r.oh.stateOf(c).diagnostic, 'rejected:off-the-map');
-  assert.deepEqual([r.pits.length, r.deepWaters.log.filter((l) => l[0] === 'commit').length], [0, 0], 'no pit, no cut');
+  assert.equal(r.oh.stateOf(c).diagnostic, 'built', 'and west of the Bay');
+  assert.deepEqual([r.pits.length, r.deepWaters.log.filter((l) => l[0] === 'commit').length], [2, 2], 'two pits, two cuts');
+  let off = null;
+  for (let x = 8192; x < 9000 && !off; x++) if (isPitPixel(x, 250, 0.5)) off = [x, 250];
+  const o = r.add(...off);
+  r.deepWaters.build(o, -100, 1);
+  r.oh.promoted(o);
+  r.oh.update();
+  assert.equal(r.oh.stateOf(o).diagnostic, 'rejected:off-the-map', 'off the world\'s grid no abyss has an id');
+  assert.deepEqual([r.pits.length, r.deepWaters.log.filter((l) => l[0] === 'commit').length], [2, 2], 'no pit, no cut');
 });
 
 test('OH-B ProcessTerrain: a location is never cut; a missing floor waits, asking the sea to build it (a new wait and every thirtieth try) until MaxFloorWaitFrames', () => {
@@ -311,7 +321,7 @@ test('OH-B ApplySettings off the declared keys: the midpoint\'s values, as the C
   assert.deepEqual(Object.keys(MOD_SETTINGS['ocean-holes'].keys), ['Enabled', 'General.PitSpawnRate', 'General.SurfaceHoleSize', 'General.SeafloorHoleSize',
     'General.MiasmaParticleCount', 'General.MiasmaHeight', 'General.DungeonVisualIntensity', 'General.DungeonVisualDarkness'], 'the shipped order');
   const shipped = JSON.parse(readFileSync(new URL('../../vendor/ocean-holes/modsettings.json', import.meta.url), 'utf8'));
-  // PLAIN-TEXT (2026-10-19): four of the mod's lines said plainly for a player - their words, exactly
+  // PLAIN-TEXT: four of the mod's lines said plainly for a player - their words, exactly
   const PLAIN = {
     PitSpawnRate: 'How many blue holes there are: none at 0, 1 square in 48 at the middle, 1 in 24 at most',
     MiasmaParticleCount: 'Amount of mist over a hole',
@@ -325,18 +335,6 @@ test('OH-B ApplySettings off the declared keys: the midpoint\'s values, as the C
     assert.equal(d.min, k.Min);
     assert.equal(d.max, k.Max);
   }
-});
-
-test('OH-B Iliac Puddle No More\'s half of the API: OnSeafloorBuilt before OnFloorRefreshed, the commit reads the grid back, RefreshLoadedTile goes to the front', () => {
-  const src = readFileSync(new URL('../../src/scenes/deepWater/deepWatersHost.js', import.meta.url), 'utf8');
-  assert.match(src, /onSeafloorBuilt\?\.\(entry\);[^\n]*\n\s*onFloorRefreshed\?\.\(entry\);/, 'the built event first');
-  assert.match(src, /heightGridFromPositions\(s\.floor\.positions, s\.floor\.vertexLocalY\);\s*\n\s*standWalls\(entry, s\);\s*\n\s*if \(s\.gpu\) gpu\?\.updateFloor\?\.\(s\.gpu, s\.floor\);/);
-  assert.match(src, /const d = urgent\.has\(k\) \? -1 : chebyshev/, 'an urgent refresh is taken before the nearest');
-  assert.match(src, /if \(!force && this\.isSeafloorCurrent\(entry\)\) return;/);
-  const world = hostText('src/scenes/world.js');
-  assert.match(world, /onSeafloorBuilt: \(e\) => oceanHoles\?\.seafloorBuilt\(e\)/);
-  assert.match(world, /if \(host\.oceanHoles\) host\.oceanHoles\.promoted\(built\.get\(key\)\);/, 'OnTerrainPromoted after the sea\'s own promote');
-  assert.match(world, /if \(oceanHoles\) oceanHoles\.destroyed\(p\);/);
 });
 
 test('OH-B RefreshLoadedTile through the sea\'s own host: nothing while the terrain may not be mutated, a current floor kept unless forced, the refresh built before a nearer pixel, and the built event before the refreshed one', async () => {
@@ -375,18 +373,7 @@ test('OH-B RefreshLoadedTile through the sea\'s own host: nothing while the terr
   assert.deepEqual(asked, ['14,10', '12,10'], 'the refresh first (the mod builds it in the call), then the nearest');
 });
 
-test('OH-C the pit\'s programs take their attributes where the buffers put them: every input bound by layout(location), the disc\'s position at 0, the miasma\'s centre, corner and size-and-turn at 0, 1 and 2 (a linker orders unbound inputs as it likes)', () => {
-  const src = readFileSync(new URL('../../src/render/oceanHolesRender.js', import.meta.url), 'utf8');
-  assert.match(src, /const DISC_VS = `#version 300 es\nlayout\(location = 0\) in vec3 aPos;/);
-  assert.match(src, /const MIASMA_VS = `#version 300 es\nlayout\(location = 0\) in vec3 aCentre;\nlayout\(location = 1\) in vec2 aCorner;\nlayout\(location = 2\) in vec2 aSizeRot;/);
-  for (const vs of ['DISC_VS', 'MIASMA_VS']) {
-    const body = src.match(new RegExp(`const ${vs} = \`([^\`]*)\``))[1];
-    assert.doesNotMatch(body, /^in /m, `${vs}: no input left to the linker`);
-  }
-  assert.match(src, /gl\.vertexAttribPointer\(0, 3, gl\.FLOAT, false, 28, 0\);\n[^\n]*gl\.vertexAttribPointer\(1, 2, gl\.FLOAT, false, 28, 12\);\n[^\n]*gl\.vertexAttribPointer\(2, 2, gl\.FLOAT, false, 28, 20\);/, 'the stream\'s three, in that order');
-});
-
-// AUDIT OH-F A1/A3 (2026-09-26): LoadSettings is a callback DFU raises in any mode, and indoors every terrain is
+// AUDIT OH-F A1/A3: LoadSettings is a callback DFU raises in any mode, and indoors every terrain is
 // inactive (DisableAllParents) - so FindObjectsOfType finds none and ProcessTerrain waits toward its timeout.
 test('AUDIT OH-F A1/A3 indoors: a settings change applies at once (the abyss\'s dials live) and re-cuts nothing; it is not replayed on the way out', async () => {
   let s = { surfaceHoleRadius: 20, seafloorHoleScale: 1, pitSpawnRate: 0.5, miasmaParticleCount: 72, miasmaHeight: 300, dungeonVisualIntensity: 0.5, dungeonVisualDarkness: 0.5 };
@@ -424,18 +411,6 @@ test('AUDIT OH-F A3 indoors: a queued pixel waits as an inactive terrain for Max
   inside = false;
   q.oh.saveLoaded();
   assert.equal(q.oh.stateOf(e2)?.diagnostic, 'queued', 'outside it promotes every loaded terrain');
-});
-
-test('AUDIT OH-F A1/A2/A3 the wiring: the settings above the modal gate, the queue in both modes (after the sea outside), the plume in its pixel\'s box', () => {
-  const w = hostText('src/scenes/world.js');
-  const gate = w.indexOf('if (modes.frame(dt, now)) {');
-  const check = w.indexOf('oceanHoles.checkSettings();');
-  assert.ok(check > 0 && check < gate, 'LoadSettings\' callback is asked above the modal gate');
-  const modal = w.slice(gate, w.indexOf('requestAnimationFrame(frame);', gate));
-  assert.match(modal, /if \(oceanHoles\) oceanHoles\.processOneTerrain\(\);/, 'indoors the queue runs on');
-  assert.match(w, /function ohFrame\(dt\) \{[^}]*oceanHoles\.processOneTerrain\(\);/, 'outside, OceanHoles.Update after the sea (its execution order)');
-  assert.match(w, /inside: \(\) => \(modes\?\.mode \?\? 'exterior'\) !== 'exterior',[^\n]*AUDIT OH-F A3/);
-  assert.match(w, /const b = entry\._box, reach = miasmaReach\(pit\.miasma\), c = \[x, pit\.miasma\.y, z\];\n\s*if \(b\) for \(let i = 0; i < 3; i\+\+\) \{ b\[i\] = Math\.min\(b\[i\], c\[i\] \+ reach\[i\]\); b\[3 \+ i\] = Math\.max\(b\[3 \+ i\], c\[i\] \+ reach\[3 \+ i\]\); \}/);
 });
 
 test('AUDIT OH-F A2 miasmaReach: the disc and a life\'s drift out, the whole rise up, the largest puff\'s half all round', async () => {

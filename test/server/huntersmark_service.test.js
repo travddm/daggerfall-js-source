@@ -1,5 +1,4 @@
-// HUNTERS-MARK and MARKS-OF-MASTERY (2026-10-27; a player, handed on by the owner: "Add more horizontal progression
-// please!"; bible/06-Systems/Bounty-Boards.md section 12): THE HUNT'S LEDGER on the account service, through the real
+// HUNTERS-MARK and MARKS-OF-MASTERY: THE HUNT'S LEDGER on the account service, through the real
 // Worker over node:sqlite (test/accountDb.mjs). A clear is the client's word, bounded: its shape, the event clock's
 // window, the level the realm trusts, one row a character a notice, the account's day; asked of the seat; a named mark
 // from its rung alone. The Marks of Mastery are derived from what the service keeps - the clears, a living Master's
@@ -12,8 +11,8 @@ import { standService, T0 } from '../accountDb.mjs';
 import { verifyToken } from '../../src/net/identityToken.js';
 import { bountyId, bountySlotKey } from '../../src/systems/bounty/bountyBoard.js';
 import {
-  huntGameDayAt, huntWeekAt, huntMarkId, huntClearOf, huntTierFits, masteryMarksOf, HUNT_CLEARS_DAY_MAX, HUNT_CLEAR_LATE_DAYS,
-  HUNT_RUNGS, HUNT_MARK_RUNG, HUNT_TITLES, MASTERY_TITLES, SEA_TITLES, MASTERY_MARKS, GAME_DAYS_PER_UTC_DAY,
+  huntGameDayAt, huntWeekAt, huntMarkId, huntClearOf, huntTierFits, masteryMarksOf, HUNT_CLEARS_DAY_MAX, huntClearLateDays,
+  HUNT_RUNGS, HUNT_MARK_RUNG, HUNT_TITLES, MASTERY_TITLES, SEA_TITLES, MASTERY_MARKS, gameDaysPerUtcDay,
 } from '../../src/net/huntLaw.js';
 import { PROF_XP_MAX } from '../../src/net/professionLaw.js';
 import { HUNT_INFLUENCE, HUNT_WEEK_CAP, accountSeatInfluence, ACCOUNT_SEAT_WEEK_CAP, seatWeekOf, seatWeekStartMs } from '../../src/net/townSeatLaw.js';
@@ -42,13 +41,12 @@ async function stand(t, env = { SEATS_OPEN: 'on' }) {
 test('HUNTERS-MARK THE LAW: a board clear inside the event clock\'s window, a mark of this week or the last, the level within reach of the trusted one; the day\'s ceiling measured, above any honest day (mutants: the window\'s edges; the ceiling; the tier\'s reach)', () => {
   const now = NOON * 1000;
   const today = huntGameDayAt(now);
-  assert.equal(GAME_DAYS_PER_UTC_DAY, 12, 'a game day every two real hours');
-  // PIN MOVED (AUDIT HORIZONTAL F3): 48 was four held a game day - four held is not four cleared; the ceiling is measured
+  assert.equal(gameDaysPerUtcDay(), 12, 'a game day every two real hours');
   // (tools/huntPace.mjs, test/tooling/huntpace.test.js on the game's map)
   assert.equal(HUNT_CLEARS_DAY_MAX, 750);
   assert.deepEqual(huntClearOf(bountyId(today, 300, 200, 1, 7), now), { kind: 'board', id: bountyId(today, 300, 200, 1, 7), key: bountySlotKey(today, 300, 200, 1), level: 7, tier: 2 });
-  assert.equal(huntClearOf(bountyId(today - HUNT_CLEAR_LATE_DAYS, 300, 200, 1, 7), now).kind, 'board', 'a real day late: still taken');
-  assert.deepEqual(huntClearOf(bountyId(today - HUNT_CLEAR_LATE_DAYS - 1, 300, 200, 1, 7), now), { why: 'late' });
+  assert.equal(huntClearOf(bountyId(today - huntClearLateDays(), 300, 200, 1, 7), now).kind, 'board', 'a real day late: still taken');
+  assert.deepEqual(huntClearOf(bountyId(today - huntClearLateDays() - 1, 300, 200, 1, 7), now), { why: 'late' });
   assert.equal(huntClearOf(bountyId(today + 1, 300, 200, 1, 7), now).kind, 'board', 'the boards a minute ahead');
   assert.deepEqual(huntClearOf(bountyId(today + 2, 300, 200, 1, 7), now), { why: 'early' });
   const week = huntWeekAt(now);
@@ -57,6 +55,11 @@ test('HUNTERS-MARK THE LAW: a board clear inside the event clock\'s window, a ma
   assert.deepEqual(huntClearOf(huntMarkId(week - 2, 300, 200, 16), now), { why: 'late' });
   assert.deepEqual(huntClearOf(huntMarkId(week + 1, 300, 200, 16), now), { why: 'early' });
   assert.deepEqual(huntClearOf('7.300.200.1', now), { why: 'id' });
+  // SHIP AUDIT: a board past the Bay posts its mark too - its town the world's pixel (the Imperial City's,
+  // Lillandril's west of the Bay), as a board notice's (LAIR-WORLD); a pixel past the world's bound is no mark
+  assert.equal(huntClearOf(huntMarkId(week, 2069, 658, 16), now).kind, 'mark', 'past the Bay');
+  assert.equal(huntClearOf(huntMarkId(week, -27, 1322, 16), now).kind, 'mark', 'west of the Bay');
+  assert.deepEqual(huntClearOf(`m.${week}.12000.658.16`, now), { why: 'id' }, 'past the world');
   assert.equal(huntTierFits(12, 10), true, 'two levels past the trusted one');
   assert.equal(huntTierFits(13, 10), false);
   assert.equal(huntTierFits(6, 15), false, 'two tiers below');
@@ -95,7 +98,7 @@ test('HUNTERS-MARK THE LEDGER through the real Worker: a clear recorded once a c
   // REFUSED: no bounty's shape, a region out of law, a day the boards are past, the trusted level's reach
   assert.equal((await clear(mac, 'nothing')).body.error, 'hunt-id');
   assert.equal((await clear(mac, bountyId(day, 300, 200, 0, 3), { region: 999 })).body.error, 'hunt-id');
-  assert.equal((await clear(mac, bountyId(day - HUNT_CLEAR_LATE_DAYS - 1, 300, 200, 0, 3))).body.error, 'hunt-late');
+  assert.equal((await clear(mac, bountyId(day - huntClearLateDays() - 1, 300, 200, 0, 3))).body.error, 'hunt-late');
   assert.equal(raw.prepare('SELECT level_seen AS lv FROM realm_characters WHERE id = ?').get(mac.character).lv, 1, 'the seat\'s first save judged: level 1');
   raw.prepare('UPDATE realm_characters SET level_seen = 3 WHERE id = ?').run(mac.character);
   const far = await clear(mac, bountyId(day, 300, 200, 0, 9));
@@ -151,15 +154,11 @@ test('HUNTERS-MARK THE DAY\'S CEILING AND THE MARK\'S RUNG: the account\'s UTC d
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM hunt_clears WHERE player = ? AND day = ?').get(mac.id, today).n, HUNT_CLEARS_DAY_MAX);
 });
 
-test('MARKS-OF-MASTERY THE TITLES ARE DERIVED: the hunt\'s off the account\'s board clears (every character), a Master\'s off a LIVING character\'s track, the sea\'s off the serpents slain - held on the wardrobe, worn, signed into the token; a guest holds none; the wardrobe carries the Annals\' pages kept (mutants: the clears\' count; the dead character\'s track; the serpents; the guest\'s guard; the mint\'s read; the pages left off)', async (t) => {
+test('MARKS-OF-MASTERY THE TITLES ARE DERIVED: the hunt\'s off the account\'s board clears (every character), a Master\'s off a LIVING character\'s track, the sea\'s off the serpents slain - held on the wardrobe, worn, signed into the token; a guest holds none (mutants: the clears\' count; the dead character\'s track; the serpents; the guest\'s guard; the mint\'s read)', async (t) => {
   const { s, raw, mac } = await stand(t);
   const seed = (n, char = mac.character) => { for (let i = 0; i < n; i++) raw.prepare("INSERT INTO hunt_clears (player, char_id, kind, key, id, tier, region, day, at) VALUES (?, ?, 'board', ?, 'x', 0, NULL, 1, 1)").run(mac.id, char, `k${char}${i}`); };
   const wardrobe = async () => (await (await s.fetch('https://accounts.invalid/v1/account', { headers: { authorization: `Bearer ${mac.secret}` } })).json()).wardrobe;
   assert.ok(!(await wardrobe()).titles.includes('bloodhound'));
-  // HUNTERS-MARK (Collections.md section 10): the Annals' pages the account keeps ride the wardrobe, for the page's part
-  assert.equal((await wardrobe()).annals, 0);
-  raw.prepare('UPDATE players SET eg_annals = 5 WHERE id = ?').run(mac.id);
-  assert.equal((await wardrobe()).annals, 5);
   seed(19);
   seed(5, 'char-other');   // another character of the account: counted together
   raw.prepare("INSERT INTO hunt_clears (player, char_id, kind, key, id, tier, region, day, at) VALUES (?, ?, 'mark', 'm.1', 'x', 0, NULL, 1, 1)").run(mac.id, mac.character);

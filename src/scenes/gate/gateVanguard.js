@@ -1,6 +1,5 @@
 // @ts-check
-// WB14c (2026-10-19, Mac: "the chance of a gate to spawn with platforms of wave based adds that need to be defeated before
-// encountering the boss"; bible/11-Multiplayer/Breach-Portents.md sections 4 and 6): THE VANGUARD ON MY SCREEN - what its
+// WB14c: THE VANGUARD ON MY SCREEN - what its
 // stages say (the relay's `vgw` words, net/gate/gateBrain.js VG_WORD) and whether it still holds the approach. Its bodies
 // are his host's (scenes/gate/gateHost.js draws, hears and judges them), its progress the bar's (ui/gate/gateBossBar.js),
 // its walkways the court's floor law. Pure.

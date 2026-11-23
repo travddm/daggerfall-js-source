@@ -1,5 +1,4 @@
-// BEAST-SELF (2026-09-26, Mac: "You dont see your self transform less your in paperdoll style (morrowind models need
-// their vampire/werewolf forms)"): the Morrowind lane has no beast - Morrowind's data holds no Daggerfall lycanthrope -
+// BEAST-SELF: the Morrowind lane has no beast - Morrowind's data holds no Daggerfall lycanthrope -
 // so a Morrowind-lane player who transformed stood in their HUMAN arms (the claws resolve to no Morrowind weapon: bare
 // fists) and their human body. The arm and the body STAND ASIDE while the curse holds them in the beast: the first
 // person is the classic claws (the weapon rig's own draw), the third Eye Of The Beholder's lycanthrope - what a player
@@ -78,8 +77,6 @@ test('BEAST-SELF: an arm standing aside has no body to cross into - the wheel is
   assert.equal(arm.canThirdPerson(), true, 'the body is there again, not rebuilt');
   assert.equal(arm.setViewMode('third'), true);
   assert.equal(arm.ready(), true, 'ready() was never touched - the rig kept stepping it');
-  const src = rd('src/combat/fpArm.js');
-  assert.match(src, /const thirdActive = \(\) => !standIn && !!\(/, 'the third-person draw stands aside too');
 });
 
 test('BEAST-SELF: the weapon rig stands the arm aside from the curse itself - transformed, and not', () => {

@@ -1,4 +1,4 @@
-// QL4 (bible/06-Systems/Questlines-Arc.md sections 2.3 and 3): A FLAGSHIP QUEST'S BRANCH, RUN. M0B50Y09 (the Fighters
+// QL4: A FLAGSHIP QUEST'S BRANCH, RUN. M0B50Y09 (the Fighters
 // Guild's gargoyle) carries the hand-in branch (tools/qlPatchKit.mjs): with the switch on, the questor asks how the
 // player takes their pay, and the two answers end it differently - the fee as agreed, or the fee waived for the Guild's
 // name (its standing, its outcome, no gold, the choice of gear still). With the switch off the script is DFU's: no

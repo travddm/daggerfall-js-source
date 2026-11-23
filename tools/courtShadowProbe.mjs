@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-13e AOE-PERF, THE PART ITS PROBE DID NOT TIME - THE COURT'S SHADOW PASS, COUNTED; and LIGHT-ID's
-// before and after (2026-10-14, Mac: "Engine fix (Recommended)" - bible/07-Rendering/Enhanced-Lighting-Arc.md LIGHT-ID).
+// before and after.
 //
 // HellRay's "massive FPS drops when the boss performs AoE attacks ... especially when more than 10 players are gathered"
 // was measured by tools/fb1013ePerfProbe.mjs, which times the telegraph pass and the crowd's draws AFTER beginFrame. The
@@ -19,7 +19,7 @@
 // `loUnread` false, the pins' oracles: a light that moved through its static cache, and a lo map for every light that may
 // cast) - and `now`. test/render/lightid.test.js pins the counts (`courtShadowCounts`).
 //
-// Usage: node tools/courtShadowProbe.mjs [bodies=8]
+// Usage: node --import ./tools/raw-import-hooks.ts tools/courtShadowProbe.mjs [bodies=8]
 import { Renderer, WORLD_FRAME } from '../src/render/renderer.js';
 import { EL_LANE } from '../src/render/enhancedLighting.js';
 import { SHADOW_TUNING } from '../src/render/shadowPass.js';

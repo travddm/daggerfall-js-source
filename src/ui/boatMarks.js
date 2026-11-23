@@ -1,9 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BOAT-MARK (2026-10-01, the field: a Large Boat put in from its deed,
-// her owner killed aboard her and woken at a temple - "is there any way
-// to know where your ships are located at?", then "I want to build a
-// compass icon that tracks your boat"): YOUR BOATS ON THE COMPASS. A
+// BOAT-MARK: YOUR BOATS ON THE COMPASS. A
 // Large Boat's deed and a Rowboat's parts are spent on placing
 // (systems/comeSailAway/comeSailAway.js takePlaceItem), the boat is kept where she
 // was left, and nothing in the game said where that was - the compass

@@ -1,4 +1,4 @@
-// AUDIT SHIP-LIFE (2026-09-30, the pre-merge audit of PR #478) - the naval host's lens: the harbours and their moored
+// AUDIT SHIP-LIFE - the naval host's lens: the harbours and their moored
 // ships online and across the sea's comings and goings (scenes/naval/navalHost.js harbourFrame). The real hosts, alone
 // (test/navalSea.mjs) and two in a room (test/navalRoom.mjs).
 import '../../modsOff.js';
@@ -40,7 +40,7 @@ test('AUDIT SHIP-LIFE B2: A HARBOUR\'S MOORED SHIPS ARE THE HARBOUR\'S TO DROP -
   at([0, 0, -2150]); w.run(1);
   at([0, 0, -150]); w.run(2);
   assert.equal(moored(w).length, n, 'there still');
-  at([0, 0, -150 - HARBOUR_LEAVE - 600]); w.run(1 + SHIP_FADE_S);   // SHIP-FADE (2026-10-02) PIN MOVED: they fade as they go
+  at([0, 0, -150 - HARBOUR_LEAVE - 600]); w.run(1 + SHIP_FADE_S);   // SHIP-FADE
   assert.equal(moored(w).length, 0, 'gone past HARBOUR_LEAVE');
   at([0, 0, -150]); w.run(1);
   assert.equal(moored(w).length, n, 'and stood again');
@@ -79,7 +79,7 @@ test('AUDIT SHIP-LIFE B4 / B5: THE PORT\'S ROLLER IS ELECTED NEAR ITS MOUTH, AND
   assert.equal(all(z.get('b').s).filter((e) => !e.owner).length, 0, 'b beside it rolled none of its own');
   QA.present = false;
   q.run(OWNER_SWEEP_S + 1);
-  const mine = () => all(QB.s).filter((e) => !e.owner && !e.ship.cls.fisher);   // PIN MOVED (FISH-BOATS): the moored ships; the fishing boats' heir is fishboats.test.js's pin
+  const mine = () => all(QB.s).filter((e) => !e.owner && !e.ship.cls.fisher);
   assert.ok(mine().length > 0 && mine().every((e) => e.fromHarbour === PORT.key), 'taken over, the harbour\'s');
   QB.s.view.feet = [0, 0, 300 + HARBOUR_LEAVE + 800];
   q.run(5);

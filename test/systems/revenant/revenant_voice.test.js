@@ -1,5 +1,4 @@
-// REVENANT-VOICE (2026-10-02, Mac: "They should have their own unique personalities that affect their speach. One could
-// be humorous, or witty, etc"): ten personalities, one per revenant drawn from its id and leaning by its kind, and every
+// REVENANT-VOICE: ten personalities, one per revenant drawn from its id and leaning by its kind, and every
 // moment it has a word for said in that voice - a beast's in its temperament.
 
 import '../../modsOff.js';
@@ -16,7 +15,6 @@ globalThis.localStorage = {
 const N = await import('../../../src/systems/revenant/revenant.js');
 const { setPref, _resetForTests } = await import('../../../src/systems/uiPrefs.js');
 
-// PIN MOVED (RVN12a, bible/12-Enhanced-AI/Feud-Arc.md 23): FEUD's last stand and betrayal are key moments too (three each)
 const KEY_MOMENTS = ['taunt_slew', 'taunt_fled', 'yield', 'executed', 'spared', 'laststand', 'betrayed'];
 
 test('REVENANT-VOICE the bank: ten personalities, every moment two lines or more in each (three for the returns, the yield, the execution and the oath), each short enough for the card, nothing unfilled but the player (mutants: a moment emptied)', () => {
@@ -31,7 +29,7 @@ test('REVENANT-VOICE the bank: ten personalities, every moment two lines or more
       assert.equal(new Set(lines).size, lines.length, `${id}.${ev}: no line twice`);
       for (const l of lines) {
         assert.ok(l.length > 0 && l.length <= 96, `${id}.${ev}: "${l}" fits the card`);
-        assert.doesNotMatch(l.replace(/\{(p|how|item|move|ally)\}/g, ''), /[{}]/, `${id}.${ev}: "${l}" has nothing unfilled`);   // PIN MOVED (RVN12a): the widened placeholders, exactly
+        assert.doesNotMatch(l.replace(/\{(p|how|item|move|ally)\}/g, ''), /[{}]/, `${id}.${ev}: "${l}" has nothing unfilled`);
       }
     }
   }
@@ -90,4 +88,30 @@ test('REVENANT-VOICE the record: a new revenant draws its personality from its i
   assert.equal(beastEv.speech, null);
   assert.equal(beastEv.body, 'Rises slowly and falls in at your side with a tired, rumbling sigh.');
   N._resetRevenantForTests();
+});
+
+test('a mindless revenant, a skeleton, a zombie or an atronach, is told without an animal manner in every temperament and at every moment; a beast keeps its own (mutants: the beast table for the mindless; the mindless manner lost)', async () => {
+  const ANIMAL = /yip|snarl|whine|howl|scent|taste|pads |slinks|rumbling/i;
+  const MINDLESS = [MOBILE_TYPES.SkeletalWarrior, MOBILE_TYPES.Zombie, MOBILE_TYPES.FireAtronach, MOBILE_TYPES.IronAtronach, MOBILE_TYPES.FleshAtronach, MOBILE_TYPES.IceAtronach];
+  for (const mobileType of MINDLESS) {
+    for (const personality of PERSONALITY_IDS) {
+      for (const deed of ['slew', 'fled']) {
+        const taunt = N.revenantTaunt({ id: 'r-mindless', name: 'Bones', mobileType, personality, rank: 1, kills: 0, history: [{ deed }] }, 'Ayla Stormwind');
+        assert.match(taunt, /^Bones [a-z]/, 'the narrator tells it');
+        assert.doesNotMatch(taunt, ANIMAL, `${mobileType} ${personality} ${deed}: ${taunt}`);
+      }
+    }
+  }
+  const { mindlessBody, MINDLESS_KINDS } = await import('../../../src/systems/revenant/mindless-revenant-body.js');
+  assert.deepEqual([...MINDLESS_KINDS].sort((a, b) => a - b), [...MINDLESS].sort((a, b) => a - b));
+  const moments = [...VOICE_EVENTS, 'learned', 'signature', 'laststand', 'stole', 'festered', 'felled_return', 'routed_return', 'deserted', 'betrayed', 'devoted_warn'];
+  for (const personality of PERSONALITY_IDS) {
+    for (const moment of moments) {
+      const body = mindlessBody(personality, moment);
+      assert.doesNotMatch(body, ANIMAL, `${personality} ${moment}: ${body}`);
+      assert.doesNotMatch(body, /\{manner\}/, `${personality} ${moment}: filled`);
+    }
+  }
+  const rat = N.revenantTaunt({ id: 'r-beast', name: 'Whiskers', mobileType: MOBILE_TYPES.Rat, personality: 'humorous', rank: 1, kills: 0, history: [{ deed: 'slew' }] }, 'Ayla');
+  assert.equal(rat, 'Whiskers circles you with a playful yip. It remembers the taste of you.', 'a beast is still a beast');
 });

@@ -103,7 +103,7 @@ export function startRacialOverrideQuest(entity, isCureQuest, { rolls = Math.ran
   return null;
 }
 
-/** REST8 (2026-10-03, bible/06-Systems/Rest-Arc.md section 8; Mac's OPEN 12 - TIMEFREE's, restored): online the curse's
+/** REST8: online the curse's
  *  quests do not wait 38 and 84 days of the character's time - about 15 and 34 hours of play at a night every ten real
  *  minutes, 76 and 168 without one. Each arm rolls on the quest clocks' short wait instead (twenty-four of the
  *  character's minutes, about two real minutes of play) whenever it has nothing running: no P0 quest for the vampire's

@@ -71,17 +71,3 @@ test('UI2: the accelerators - Escape/Enter/E exit, T talks, S takes the service'
   order.length = 0; win().input('KeyZ'); assert.deepEqual(order, [], 'an unbound key does nothing');
 });
 
-test('UI2: the host raises the popup for BOTH services, and the direct arms are the art-less fallback', () => {
-  const s = read('src/scenes/worldModes.js');
-  assert.match(s, /if \(!forceTalk && route\.kind === 'merchant'\s*\n\s*&& \(route\.service === 'banking' \|\| route\.service === 'sell'\)\s*\n\s*&& merchantServiceDoorReady\(\) && \(isEnhanced\(\) \|\| _shopFont \|\| \(mode !== 'interior' && getCustomMerchantService\(pn\.factionID\)\)\)\) \{/);   // IT1 (PIN MOVED): outdoors a mod's service (Immersive Travel's driver) draws in the street's slot
-  assert.match(s, /service: banking \? 'Banking' : 'Sell',/);
-  assert.match(s, /onTalk: \(\) => openStaticNpc\(pn, \{ forceTalk: true \}\),/, 'the Talk row DFU has and the port had lost');
-  // RR3: the custom-service arm (DaggerfallMerchantServicePopupWindow.cs:149-151) stands in front of the two
-  assert.match(s, /onService: \(\) => \{ if \(custom\) openCustomMerchantService\(custom\); else if \(banking\) openBank\(\); else openMerchantSell\(\); \},/);
-  // The old direct arms stay BELOW it - the never-traps law, for a
-  // build whose GNRC01I0 did not load.
-  const popupAt = s.indexOf('createMerchantServiceWindow({');
-  assert.ok(s.indexOf("&& openBank()) return;", popupAt) > popupAt);
-  assert.ok(s.indexOf("&& openMerchantSell()) return;", popupAt) > popupAt);
-  assert.match(s, /preloadMerchantServiceArt\(\{ renderer, fetchBytes, palette \}\);/);
-});

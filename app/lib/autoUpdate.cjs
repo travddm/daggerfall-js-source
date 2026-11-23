@@ -1,5 +1,4 @@
-// DA7 (2026-09-21, Mac: "Is there an easy way to make it where players
-// dont have to manually install each release?" - "#1 is best?" - "Do it"):
+// DA7:
 // THE AUTO-UPDATER'S PURE HALF - which transport a running copy of the
 // app updates by.
 //

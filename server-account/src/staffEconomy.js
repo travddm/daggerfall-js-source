@@ -1,5 +1,4 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
 // STAFF-PANEL3-ECON (2026-10-22; design doc "DFO Staff Panel: design", build step 3: "Market and trades, Node activity,
 // Economy (all read existing data)") - THE PANEL'S ECONOMY SCREENS, an Admin's alone (mob, 03:03Z: Moderators get the
 // chat reports, Mute and Ban; "Admin sees and does everything"). Every answer is a read of what the service already
@@ -15,7 +14,7 @@
 //                            and go, a day at a time over `days`, and the twenty richest characters and guilds
 //   /v1/staff/econ/guilds    PER GUILD: gold (realm and unverified legacy), Marks and vault contents, sortable, paged
 //
-// ═══ THE FLAGS ON A ROW (design doc, "Market and trades"; weak spot "The market 5x flag compares to the wrong prices") ═══
+// THE FLAGS ON A ROW (design doc, "Market and trades"; weak spot "The market 5x flag compares to the wrong prices")
 //
 // price     a material sold 5x above or below its usual price. The usual price is the median over MARKET_MEDIAN_DAYS of
 //           that material's sales IN THE ROW'S OWN CURRENCY (gold's sales never set a Drakes price, nor the other way),
@@ -29,17 +28,17 @@
 // The "linked account" flag is dropped (the weak spot: nothing the service keeps links two accounts).
 // Every number is in ECON_LIMITS, one place: starting numbers for Admins to tune, not measured ones.
 //
-// ═══ SERVER LOAD (design doc, "Server load": the existing economy reads cost 37, 56 and 96 serial trips an open, and an
-// unindexed read has reset the live database once) ═══
+// SERVER LOAD (design doc, "Server load": the existing economy reads cost 37, 56 and 96 serial trips an open, and an
+// unindexed read has reset the live database once)
 //
 // Each read is ONE batch (one trip, service.js readAll) or two where the second needs the first's answer. The stream's
 // span is STREAM_SPAN_DAYS at most and pages STREAM_PAGE rows; the economy reads ECON_DAYS_MAX days at most; node
 // activity is a day and a week. The heavy answers (economy, guilds, node activity, the Home watch, usual prices) are
 // kept in the isolate's memory ECON_KEEP_S (node activity HARVEST_KEEP_S), keyed by the database binding, and an answer
-// says when it was read (`asOf`): the panel never polls them. Every statement stands on an index migration 0153 adds or
+// says when it was read (`asOf`): the panel never polls them. Every statement stands on an index the schema holds or
 // one already there (test/server/staffpanel3econ.test.js asks EXPLAIN QUERY PLAN).
 //
-// ═══ WHAT THE SERVICE CANNOT SEE ═══
+// WHAT THE SERVICE CANNOT SEE
 //
 // A character's purse, bank and letters of credit live inside its save (realm.js, R2); no table holds them. The
 // economy names the places the service holds gold itself, and ranks characters by the judge's wealth at their last
@@ -95,7 +94,7 @@ export const HARVEST_PAGE = 50;
 export const HARVEST_ONE_MAX = 500;
 /** The richest characters and guilds named. */
 export const RICHEST = 20;
-/** A character this wealthy or more is in the rich index (migration 0153 idx_realm_characters_rich, whose condition this
+/** A character this wealthy or more is in the rich index (idx_realm_characters_rich, whose condition this
  *  literal is - the statement must say it as the index does, or the index is not used). Below it, no list is needed. */
 export const RICH_FLOOR = 250_000;
 /** Guilds one ranked list holds; pages of GUILDS_PAGE. */
@@ -110,7 +109,7 @@ const STREAM_KINDS = Object.freeze(['sale', 'fill', 'bid', 'trade', 'vault']);
 const LEVELS = Object.freeze(['low', 'medium', 'high']);
 const GUILD_SORTS = Object.freeze({ gold: 'treasury', realm: 'realm_gold', legacy: 'legacy', marks: 'marks', vault: 'vault_items', members: 'members' });
 
-/** ECON-LEFT-OUT (mob, 2026-10-25: "we need to remove gold of banned or trade held player in staff menu data", "economy"):
+/** ECON-LEFT-OUT (, "economy"):
  *  A CHARACTER THE ECONOMY LEAVES OUT - its account banned now, or a trade hold standing on it (realm.js holdStandsSql) -
  *  as SQL over the character aliased `c` and its account `p`, either of them perhaps missing (a LEFT JOIN). Their gold is
  *  never touched: it is only kept out of the economy's totals and lists, and its sum said beside them. */
@@ -247,7 +246,7 @@ async function streamView(db, body, nowS) {
   return {
     player, kinds, since, until,
     item: str(body.item), priceMin: int(body.priceMin, 0, Number.MAX_SAFE_INTEGER), priceMax: int(body.priceMax, 0, Number.MAX_SAFE_INTEGER),
-    region: int(body.region, 0, 61), before: m ? { at: Number(m[1]), k: m[2] } : null,
+    region: int(body.region, 0, 70), before: m ? { at: Number(m[1]), k: m[2] } : null,
   };
 }
 
@@ -547,7 +546,7 @@ export function economy(db, nowS, days) {
         (SELECT COALESCE(SUM(CASE WHEN ${out} THEN m.rent_due ELSE 0 END), 0) FROM homes m ${OUT_JOIN('m')}) AS rent_out`),
       db.prepare('SELECT COALESCE(SUM(balance), 0) AS s, COUNT(*) AS n FROM marks WHERE balance > 0'),
       db.prepare('SELECT COALESCE(SUM(balance), 0) AS s FROM guild_marks'),
-      // marks.js marksReport's escrow - the ledger's escrow end, what went in less what came out - on 0153's covering index
+      // marks.js marksReport's escrow - the ledger's escrow end, what went in less what came out - on the covering index
       db.prepare(`SELECT COALESCE(SUM(CASE WHEN dst_kind = 'escrow' THEN amount ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN src_kind = 'escrow' THEN amount ELSE 0 END), 0) AS s
         FROM marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'`),
       db.prepare(`SELECT day, kind, CASE WHEN src_kind = 'mint' THEN 1 ELSE 0 END AS minted, SUM(amount) AS s FROM marks_ledger
@@ -564,8 +563,7 @@ export function economy(db, nowS, days) {
           (SELECT m.gold FROM market_gold m WHERE m.player = c.player AND m.char_id = c.id) AS market_gold
         FROM realm_characters c LEFT JOIN players p ON p.id = c.player
         WHERE c.wealth >= ${RICH_FLOOR} AND c.dead_at IS NULL AND NOT ${out} ORDER BY c.wealth DESC LIMIT ${RICHEST}`),
-      // ECON-WORTH (mob, 2026-10-25: "we need a total games worth as well with hover break down on gold held bank held
-      // and item total"): every living character the census has counted, the left out apart - the judge's wealth at
+      // ECON-WORTH: every living character the census has counted, the left out apart - the judge's wealth at
       // its last checkpoint (judge.js wealthOf), and its census tally's purse and banks (staffCensus.js censusTally).
       // A tally written before ECON-WORTH has no `b`: its purse and banks are one figure until its next checkpoint. A
       // character the judge never weighed (no `wealth`) is worth its gold, and no items.

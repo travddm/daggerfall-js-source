@@ -177,7 +177,7 @@ export const lunarPhasesFromMinutes = (gameMinutes) => {
   };
 };
 
-/** CLK3 (2026-09-08): THE PHASE AS A NUMBER ON THE CLOCK. DFU's phase is
+/** CLK3: THE PHASE AS A NUMBER ON THE CLOCK. DFU's phase is
  *  a day-granularity STEP of the ladder above - the rule, kept for every
  *  system that reads it (the lycanthrope's full moon, the enchantment
  *  ctx). The enhanced dome draws a moon at a place behind the sun set by
@@ -219,7 +219,7 @@ export const isFullMoonFromMinutes = (gameMinutes) => {
   const { masser, secunda } = lunarPhasesFromMinutes(gameMinutes);
   return masser === LUNAR_PHASES.Full || secunda === LUNAR_PHASES.Full;
 };
-/** TIME2 (bible/06-Systems/Online-Time-Arc.md 6.1): the NIGHT a minute stands in, named by the date of its dusk - from
+/** TIME2 (6.1): the NIGHT a minute stands in, named by the date of its dusk - from
  *  18:00 of a date to 06:00 of the next (isDayFromMinutes' complement) - as that date's first minute; null by day. */
 export const nightDateMinutes = (gameMinutes) => {
   const day = Math.floor(gameMinutes / MINUTES_PER_DAY), into = gameMinutes - day * MINUTES_PER_DAY;

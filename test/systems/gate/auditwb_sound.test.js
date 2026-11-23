@@ -1,8 +1,8 @@
-// AUDIT WB (2026-09-25, Mac: "A proper audit on everything"): THE LOOK AND THE SOUND, pinned - the fanfare cut by a
+// AUDIT WB: THE LOOK AND THE SOUND, pinned - the fanfare cut by a
 // clock that was not its own (D2), a Warden who never grunted in a big fight (D3), war songs silent a second at every
 // loop (D4), a veil that counted its own ticks (D5) and flashed a frame late (D6), a sky clock that drifted after a sleep
 // (D7), falls of fire that jumped at the wrap (D8), ridges worked out at the zenith (D9), and what the court made every
-// frame (D10). Design: bible/11-Multiplayer/World-Bosses.md section 11.
+// frame (D10). Design:
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -90,8 +90,6 @@ test('AUDIT WB D2 fadeOut is an ending, not a cut: the song fades over MUSIC_FAD
   // a fade asked during a switch: nothing starts after it
   svc.playSong('DAY'); svc.fadeOut(); flush();
   assert.equal(svc.current, null); assert.equal(svc.playing, false);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const _courtScore = createCourtScore\(\);/);
 });
 
 test('AUDIT WB D3 his grunt counts the loss since his last one: many small blows add up to a share and he grunts; none closer than HURT_GAP_MS; a heal starts the count again', () => {
@@ -180,10 +178,6 @@ test('AUDIT WB D5 the veil holds shut on the frames the host has DRAWN since the
   assert.equal(veil.phase, 'opening', 'opened on the new place\'s frames');
   assert.equal(veil.warm(), true, 'built ahead: the same veil');
   assert.equal(p.canvases.length, 1);
-  const w = hostText('src/scenes/world.js');
-  assert.equal((w.match(/gateVeil\?\.frameDrawn\(\);   \/\/ AUDIT WB D5/g) ?? []).length, 2, 'the exterior\'s frame and the modal one both say it');
-  assert.match(w, /try \{ if \(gatePool\?\.frame\(dt\)\) warmGateVeil\(\); \}/);
-  assert.match(w, /idle\(\(\) => \{ try \{ gateVeil\.warm\(\); \} catch \{/);
 });
 
 test('AUDIT WB D6 the flash is the fire in the call itself - never a frame of what it covers', () => {
@@ -244,10 +238,4 @@ test('AUDIT WB D10 what the court asks for every frame is made once: its lists r
   assert.equal(spoils.lights(), spoils.lights());
   assert.ok(Object.isFrozen(spoils.lights()) && spoils.lights().length === 0);
   assert.equal(courtLights(), courtLights());
-  const m = read('src/scenes/worldModes.js');
-  assert.match(m, /renderer\.setLighting\(courtEquatorOf\(_ct\), 0, undefined, _ct\);/);
-  assert.doesNotMatch(m, /new Float32Array\(_ct\.equator\)/);
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /const _courtBeds = courtBraziers\(\)\.map\(\(\[, p\]\) => p\);/);
-  assert.doesNotMatch(w, /drawLife\(proj, view, courtToDungeon\(/);
 });

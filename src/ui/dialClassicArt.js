@@ -1,6 +1,4 @@
-// DIAL-CLASSIC (2026-10-12, Mac: "do you remember the compass inventory, skills, magic and map selector here the arena2
-// files look for those symbols green should be the skills based on the face of your character youve choosen, blue magic,
-// yellow inventory and red map, make the icons fit to each other sizewise"): THE TAB DIAL'S FOUR DOORS IN DAGGERFALL'S
+// DIAL-CLASSIC: THE TAB DIAL'S FOUR DOORS IN DAGGERFALL'S
 // OWN ART. Under DFO Grimoire the dial's doors were pieces of the pack's paintings (GRIM4: the Empire's helm, the
 // spellmaker's book, the map of Tamriel, a chest); they are now the classic HUD bar's own buttons and the player's own
 // face, read out of the player's ARENA2 when the dial is raised - nothing of the game's art ships with the port:
@@ -16,7 +14,7 @@
 // as Mac asked ("check all heads if they match like the red haired here") - every pixel square. Only a head longer than
 // 36 pixels a side is fitted down to CLASSIC_FACE_MAX, so no door outgrows the rose.
 //
-// PORTRAIT3D (2026-10-15, the owner: "5. Do this" - the tab dial's door among the faces still Daggerfall's): with
+// PORTRAIT3D: with
 // Morrowind's data attached SKILLS is the player's Morrowind head, as the large HUD's (characters/headPortraits.js
 // playerHeadImage - the helm worn, the curse's head; the wereboar's Daggerfall's), trimmed to its painted pixels and
 // drawn at CLASSIC_FACE_MAX at most, smooth (`smooth`: data-grim-dial-face="head" lifts the pixels' squaring off it).

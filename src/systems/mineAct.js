@@ -1,8 +1,7 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// PROF2 (2026-09-28, Mac: "Go") - MINING'S ACT, the Pick-Axe at a vein or
-// a boulder, as a machine the host feeds a frame at a time (bible/
-// 06-Systems/Professions-Arc.md 5.2, 23; FORAGE0 14.4). Pure: the host
+// PROF2 - MINING'S ACT, the Pick-Axe at a vein or
+// a boulder, as a machine the host feeds a frame at a time (docs/systems/professions.md).
+// Pure: the host
 // hands in the frame's time, whether attack was pressed this frame, and
 // where the crosshair points on the node's face - `aim`, the view's
 // bearing from the node's centre in degrees ({ yaw, pitch }); the machine
@@ -28,11 +27,10 @@
 // Esc (the host's `cancel`) ends it, nothing lost: the node stands, no
 // tool wears, no harvest is asked.
 //
-// GATHER-FEEL (2026-10-13): A STRIKE LANDS ON ITS HIT FRAME, as a chop
+// GATHER-FEEL: A STRIKE LANDS ON ITS HIT FRAME, as a chop
 // does (systems/chopAct.js): `landsIn`, and the swing run out past the
 // end so the last strike is drawn and heard landing. AUDIT GATHER-FEEL
 // LANDING: and counts its blows landed (`landed`), as a chop does.
-// ═══════════════════════════════════════════════════════════════════
 import { MINE_ACT, strikesFor } from '../net/professionLaw.js';
 import { MELEE_HIT_SHARE } from '../characters/weaponStates.js';
 

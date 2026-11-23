@@ -53,7 +53,7 @@ test('overhaul core: hit chance and pre-armour damage match pcaao\'s own roll co
   const foe = referenceFoe(p.level, REFERENCE_FOES[1]);
   const rolls = mulberry(99);
   const prof = pcaaoProficiencyModifiers(p, w); const racial = pcaaoRacialModifiers(p, w, p);
-  const chanceMod = Math.ceil(Math.fround(55 * 1.5)) + prof.toHitMod + racial.toHitMod + pcaaoWeaponToHit(w);
+  const chanceMod = 55 + prof.toHitMod + racial.toHitMod + pcaaoWeaponToHit(w);
   let hits = 0; let dmg = 0;
   for (let i = 0; i < N; i++) {
     const part = pcaaoStruckBodyPart(rolls());

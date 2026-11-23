@@ -1,8 +1,7 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// LOOT19 (2026-10-07) — SCRYING.
+// LOOT19 — SCRYING.
 //
-// The Loot arc II (bible/06-Systems/Loot-II-Arc.md section 11; Mac:
+// The Loot arc II (; Mac:
 // "what could we do to make it even more amazing, while also balancing
 // everyrhing?", then "Lets go all in"). The codex says where an unfound
 // Legendary is said to be - among a FAMILY of foes (LOOT6), whose
@@ -21,7 +20,6 @@
 // rows, each with its name and map pixel, and the player's pixel); the
 // window (ui/reforgeWindow.js 'scry') asks and draws. OFF IS DFU
 // EXACTLY: with the loot-rarity row off nothing is scried.
-// ═══════════════════════════════════════════════════════════════════
 
 import { lootRarityOn, DUNGEON_FAMILY, FAMILY_IDS } from './lootRarity.js';
 import { hasDiscoveredLocationId, discoverLocation } from '../discovery.js';

@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// OW-FORECAST (2026-10-19, the owner, of "a weather forecast from the air": "I like this idea, but do it right";
-// bible/06-Systems/Travel-View.md OW-FORECAST): THE WEATHER AHEAD, ON THE OVERWORLD.
+// OW-FORECAST: THE WEATHER AHEAD, ON THE OVERWORLD.
 //
 // The world's weather is a map (WEATHER3, systems/weather/weatherMap.js): systems born on the land, drifting, growing and
 // dying, the weather at any place and minute a pure function of both - so it can be asked of a place and a minute that
@@ -22,7 +21,7 @@
 //   - HERE, standing: the next HERE_HOURS at the traveller's place, every HERE_STEP_MIN (forecastAt) - what falls now and
 //     when it clears, or what comes and when.
 //   - A PLACE'S CARD, under the pointer: its own next hours, the same law.
-// The map's lane only (weatherMapOn: the enhanced skin's world weather map, forced on online). Off it the sky is DFU's
+// The map's lane only (weatherMapOn: the weather-events row's world weather map, forced on online). Off it the sky is DFU's
 // day roll per climate, which has no tomorrow to read - and nothing is said.
 //
 // PURE: points, minutes and a reader in; words out - the player's language's (L10N4: every word through the text core,
@@ -39,6 +38,7 @@ export const FORECAST_WORDS = Object.freeze({
   get thunder() { return t('forecast.word.thunder', 'Thunderstorm'); },
   get snow() { return t('forecast.word.snow', 'Snow'); },
   get sandstorm() { return t('forecast.word.sandstorm', 'Sandstorm'); },
+  get ashfall() { return t('forecast.word.ashfall', 'Ashfall'); },   // ASHFALL1
 });
 /** What a traveller meets, as said after another ("Rain - snow in 30 min") - its own words, never a lowercased one. */
 const FORECAST_TURNS = Object.freeze({
@@ -47,9 +47,10 @@ const FORECAST_TURNS = Object.freeze({
   get thunder() { return t('forecast.turn.thunder', 'thunderstorm'); },
   get snow() { return t('forecast.turn.snow', 'snow'); },
   get sandstorm() { return t('forecast.turn.sandstorm', 'sandstorm'); },
+  get ashfall() { return t('forecast.turn.ashfall', 'ashfall'); },   // ASHFALL1
 });
 /** What a traveller meets on the way - what falls, what blinds; the rest is the sky's look. */
-export const FORECAST_NOTABLE = Object.freeze(new Set(['fog', 'rain', 'thunder', 'snow', 'sandstorm']));
+export const FORECAST_NOTABLE = Object.freeze(new Set(['fog', 'rain', 'thunder', 'snow', 'sandstorm', 'ashfall']));
 /** The way ahead is asked every ROUTE_STEP_M (field metres - AUDIT OW-REVISITED L3-5: a fog bank under a kilometre across
  *  slipped between the two-pixel samples it was), out to ROUTE_AHEAD_M (the far ring's own reach, past what the view
  *  shows) and at its end, ROUTE_SAMPLES_MAX at most - read a few a frame (the host's FORECAST_SLICE), never a pass in one

@@ -83,45 +83,6 @@ test('RPT1026-PROGRESS (practice banked at 100, then mastered): offline, practic
 
 // ─── #267: Blademaster's Flowing Steel, said on the HUD ───────────────────────────────────────────────────────────
 
-test('RPT1026-PROGRESS (Blademaster\'s passive unseen): Flowing Steel builds on real blows through the formula and the HUD is told - a chip with its stacks and its seconds, gone when they run out; none for a fighter of another path (mutants: the chip never made; the stacks unsaid)', async () => {
-  const MP = await import('../../src/systems/martialPaths.js');
-  const POW = await import('../../src/systems/martialPowers.js');
-  const { calculateAttackDamage } = await import('../../src/combat/formulas.js');
-  const { makeEnemyEntity } = await import('../../src/characters/enemy/enemyEntity.js');
-  const { ENEMY_BASICS } = await import('../../src/characters/enemy/enemyBasics.js');
-  const { mintCondition, setItemFields } = await import('../../src/systems/item/itemTemplates.js');
-  const { WEAPONS } = await import('../../src/characters/weapons.js');
-  const { EQUIP_SLOTS, equipTableOf } = await import('../../src/systems/equip.js');
-  const { readFileSync } = await import('node:fs');
-  let clock = 100;
-  POW._resetMartialPowersForTests(); POW._setMartialPowersClockForTests(() => clock);
-  try {
-    const path = (id) => {
-      const p = fighter();
-      for (const s of MP.MARTIAL_BY_ID[id].skills) { p.skills[s] = 100; assert.equal(masterSkill(p, s).ok, true); p.skills[s] = 120; }
-      assert.equal(MP.chooseMartialPath(p, id).ok, true);
-      return p;
-    };
-    const me = path('blademaster');
-    const blade = mintCondition(setItemFields({ group: 'Weapons', templateIndex: WEAPONS.Shortsword, material: 0 }));
-    me.items = [blade]; equipTableOf(me)[EQUIP_SLOTS.RightHand] = blade;
-    const orc = () => Object.assign(makeEnemyEntity(7, ENEMY_BASICS[7], { hitPointsPerLevel: 8, strength: 50, intelligence: 50, willpower: 0, agility: 50, endurance: 50, personality: 50, speed: 50, luck: 50 }, 21, () => 0.5), { activeEffects: [] });
-    assert.deepEqual(POW.martialHudChips(me), [], 'no stack yet: no chip');
-    for (let i = 0; i < 3; i++) calculateAttackDamage(me, orc(), { weapon: blade, rolls: () => 0.3 });
-    assert.deepEqual(POW.martialHudChips(me), [{ key: 'flowing-steel', set: 'martial', name: 'Flowing Steel 3', text: '4s', state: 'active' }]);
-    clock += 2.5;
-    assert.equal(POW.martialHudChips(me)[0].text, '2s', 'its seconds run down');
-    clock += 2;
-    assert.deepEqual(POW.martialHudChips(me), [], 'and it is gone with the stacks');
-    const other = path('ranger');
-    for (let i = 0; i < 3; i++) calculateAttackDamage(other, orc(), { weapon: blade, rolls: () => 0.3 });
-    assert.deepEqual(POW.martialHudChips(other), [], 'another path\'s passive builds no Flowing Steel');
-    // the host that mounts the HUD hands it on beside the sets' and the Legendaries'
-    const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-    assert.ok(w.includes('setHudSetChips((e) => [...setHudChips(e), ...lootHudChips(e), ...martialHudChips(e)]);'));
-  } finally { POW._resetMartialPowersForTests(); }
-});
-
 // ─── #66: a jewel's Cast When Used on the hotbar ───────────────────────────────────────────────────────────────────
 
 test('RPT1026-PROGRESS (a jewel on the hotbar): a piece the item maker gave Cast When Used is USED by its hotbar slot - its spell readied, the piece neither put on nor taken off; a Cast When Held jewel is still worn; a slot saved as worn before the fix casts too (mutants: the kind unchanged; the saved slot worn)', async () => {

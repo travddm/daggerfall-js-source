@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// BANTHA1 (bible/03-World/Bantha-Jungle.md; the owner: "When traveling inside the area there should be a fog-like haze
-// that reduces visability") - THE JUNGLE'S HAZE, ONE LAW. A leaf with no imports, as horizonHaze.js is: every world
+// BANTHA1 () - THE JUNGLE'S HAZE, ONE LAW. A leaf with no imports, as horizonHaze.js is: every world
 // program takes it inside the fog block (FOG_GLSL), the far ring takes it beside its horizon's haze, and the skies take
 // its sky half - so the ground, the trees, the water, the ring and the sky close into one haze at one rate.
 //

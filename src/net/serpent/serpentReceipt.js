@@ -1,7 +1,6 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): A SERPENT'S RECEIPT - the relay's signature on
+// SERPENT1: A SERPENT'S RECEIPT - the relay's signature on
 // Sethrakul's kill, the gate's receipt's and the raid's twin (net/gate/gateReceipt.js, net/raid/raidReceipt.js). Design:
-// bible/11-Multiplayer/Sea-Serpent.md section 8.
 //
 //     l1.<base64url({ d, b, s, c, x, h, l, i, e })>.<base64url(64-byte Ed25519 signature)>
 //         d the serpent's day   b the serpent's id (net/serpent/serpentLaw.js SERPENT_BOSSES)   s the account (the identity sub)

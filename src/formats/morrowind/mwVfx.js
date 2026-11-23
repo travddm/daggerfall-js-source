@@ -1,14 +1,12 @@
-// MW-SPELLFX1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): A MORROWIND
+// A MORROWIND
 // EFFECT MESH, RUNNING.
 //
 // Morrowind draws its magic with records that name meshes - an MGEF's casting, bolt, hit and area visuals, and
 // VFX_Hands - and those meshes carry their own motion: keyframed nodes that spin and swell, visibility keys, alpha and
-// colour ramps on their materials, scrolling UVs, flipbook textures, billboards and particle systems. OpenMW instances
-// the mesh and runs every controller on the effect's OWN clock, an EffectAnimationTime that starts at zero
-// (mwrender/animation.cpp Animation::addEffect, mwrender/effectmanager.cpp EffectManager::addEffect - the
-// AssignControllerSourcesVisitor hands it to every controller that has no source yet); the effect is over when that
-// clock reaches the longest controller's stop time (FindMaxControllerLengthVisitor over ControllerFunction::getMaximum,
-// which is mStopTime), and is hidden at once unless it loops, when the remainder carries (UpdateVfxCallback).
+// colour ramps on their materials, scrolling UVs, flipbook textures, billboards and particle systems. An effect runs
+// every one of those controllers on its OWN clock, which starts at zero when the effect is made, whatever the game's
+// time is. The effect is over when that clock reaches the longest controller's stop time, and it is hidden at once
+// unless it loops, when the remainder carries into the next round.
 //
 // This module is that, pure - no GL. `vfxOf(nif)` reads a parsed file once into a descriptor; `createVfx(desc)` is one
 // running instance whose `update(dt, ...)` advances the clock, poses the graph and answers PACKED STREAMS in
@@ -16,49 +14,41 @@
 // triangles and its particles alike: a triangle's three vertices carry corner (0, 0) and size 0, which the program
 // places exactly where they are.
 //
-// THE REFERENCE, member by member:
-//   nifosg/nifloader.cpp   handleNode (:700-940): "Bounding Box" and the collision node, the hidden flag that skips a
-//                          subtree's meshes unless the node carries a NiVisController (:826-843), the geometry name
-//                          skip list (:857-868), the switch's one branch; handleMeshControllers (:972-998): a UV
-//                          controller lives on the GEOMETRY, nowhere else; handleNodeControllers: keyframes and
-//                          visibility on any AV object; handleMaterialControllers / handleTextureControllers: alpha
-//                          and colour ramps on the NiMaterialProperty, the flipbook on the NiTexturingProperty, both
-//                          riding the node that lists the property; createNode (:676-705): a NiBillboardNode is an
-//                          AutoTransform; the first-root texture (:524-539): the ROOT's first NiTexturingProperty is
-//                          remembered, and any other node listing that same record is marked "overrideFx"
-//   nifosg/controller.cpp  ControllerFunction::calculate (mwParticles.controllerTime); KeyframeController (:179-200 -
-//                          a missing rotation rewrites the rest rotation, a missing translation or scale writes nothing:
-//                          Morrowind-Rules.md [B]); VisController::calculate (:364-377 - upper_bound, the key at or
-//                          before); AlphaController (:434-464 - the "alpha" uniform, 1 with no keys); MaterialColor-
-//                          Controller (:466-540 - the target in the flags, (1,1,1) with no keys); UVController::apply
-//                          (:316-337 - scaled about the centre, then the offset, U negated); FlipController::apply
-//                          (:567-578 - int(t / delta) % count; delta 0 holds the first)
-//   nifosg/autotransform.cpp  computeMatrixForFrame: the three billboard modes (rule 60 and its [B] refinement)
-//   nifosg/nifloader.cpp   handleParticleSystem (:1470-1570): LocalSpace keeps the particles in the node's space,
-//                          anything else in the WORLD under an InverseWorldMatrix - sized in world units, emitted
-//                          through the emitter's orthonormalised world frame (particle.cpp :548)
-//   mwrender/util.cpp      overrideFirstRootTexture: the effect's particle texture (an MGEF's PTEX) on every marked
-//                          node, OVERRIDE, clamped at the edge
+// What the file's records mean, member by member (nif.xml and UESP):
+//   - A node named "Bounding Box" and a RootCollisionNode hold collision and editor data, and nothing of them draws.
+//     The root is exempt from the name.
+//   - A node with the hidden flag hides every mesh beneath it for good, unless the node carries a NiVisController,
+//     which then decides each frame whether it shows. A switch node shows exactly one of its branches. A shape's name
+//     can also keep it out (shadows, and editor markers when the root carries the marker flag).
+//   - A UV controller lives on the shape. A keyframe controller and a visibility controller may sit on any node. The
+//     alpha and colour ramps sit on a NiMaterialProperty and the flipbook on a NiTexturingProperty, and each acts on
+//     the shapes under the node that lists the property.
+//   - A keyframe track that has no rotation keys leaves the node its rest rotation; one that has no translation or
+//     scale keys leaves those as they were.
+//   - A NiBillboardNode turns to the camera by its mode (nif-effect-motion.ts).
+//   - A particle system with the LocalSpace flag keeps its particles in its node's space; any other keeps them in the
+//     WORLD, sized in world units and emitted through the emitter's orthonormalised world frame.
+//   - The first NiTexturingProperty of the root is the effect's particle texture slot: any other node that lists that
+//     same record is marked, and the effect's own particle texture (an MGEF's PTEX) replaces the texture of every
+//     marked node and the nodes beneath it, clamped at the edge.
 //
 // THE FRAMES. `place` carries the effect into the MORROWIND world (units, Z up) and `view` carries that world into the
-// space the caller draws in. They are kept apart because a world-frame particle lives in the Morrowind world: OpenMW
-// keeps it there, so its size and speed are the file's own whatever the effect's scale (an area burst spawned at
-// twenty times its size throws sparks of the size the artist drew), and a moving bolt leaves its sparks behind.
+// space the caller draws in. They are kept apart because a world-frame particle lives in the Morrowind world: its size
+// and speed are the file's own whatever the effect's scale (an area burst spawned at twenty times its size throws sparks
+// of the size the artist drew), and a moving bolt leaves its sparks behind.
 //
 // WHAT IS NOT CARRIED, recorded:
-//   - LIGHTING. OpenMW lights an effect under a white ambient (configureSunAmbientOverride, "Morrowind has a white
-//     ambient light attached to the root VFX node"); here a surface's colour is its emission plus its ambient under
-//     that white light, with no sun and no lamps. Morrowind's effects are emissive or additive almost to the last
-//     shape, which is what this keeps.
-//   - AutoPlay's FRAME clock (setupController): every controller here runs on the effect's clock, so a cycling
-//     controller under an AutoPlay node starts its loop at zero rather than at the game's time - the same motion in
-//     another phase.
+//   - LIGHTING. An effect is lit by a white ambient light alone; here a surface's colour is its emission plus its
+//     ambient under that white light, with no sun and no lamps. Morrowind's effects are emissive or additive almost to
+//     the last shape, which is what this keeps.
+//   - AutoPlay's frame clock: every controller here runs on the effect's clock, so a cycling controller under an
+//     AutoPlay node starts its loop at zero rather than at the game's time - the same motion in another phase.
 //   - NiRollController, NiPathController, NiLookAtController, NiGeomMorpherController: parsed, not run.
 //   - NiBSPArrayController's emission over a target's vertices (mwParticles.js refuses it, by name).
-//   - SORTING. The reference sorts the transparent bin back to front; these streams draw in file order. An additive
-//     effect - nearly all of them - does not care.
-//   - A FLIPBOOK UNDER THE OVERRIDE. Where a marked node's subtree also flips its own textures, the override wins here
-//     (the reference's answer turns on which stateset the flip writes); no retail effect is known to do both.
+//   - SORTING. Transparent shapes are not sorted back to front; these streams draw in file order. An additive effect -
+//     nearly all of them - does not care.
+//   - A FLIPBOOK UNDER THE OVERRIDE. Where a marked node's subtree also flips its own textures, the override wins here;
+//     no retail effect is known to do both.
 
 import { deref } from './mwNifFile.js';
 import {
@@ -69,6 +59,7 @@ import { quatToMat33 } from './mwSkin.js';
 import { affineOfTransform, affineMul, affineApply, affineRotate, AFFINE_IDENTITY } from './mwAffine.js';
 import { sampleKeyGroup } from './mwKeys.js';
 import { trackFromController, sampleTrack } from './mwAnim.js';
+import { BILLBOARD_MODE, billboardRotation, uvAt, flipIndex, visAt } from './nif-effect-motion.ts';
 import {
   particleSystemsOf, createParticleSystem, controllerTime, packParticleQuads, particleDrawState, affineInverse,
   affineScale, affineOrthoNormalize, PARTICLE_FLOATS, CONTROLLER_FLAG_ACTIVE,
@@ -77,7 +68,7 @@ import {
 /** NiTimeController's clock terms, as controllerTime takes them (the extrapolation bits unshifted, EXTRAPOLATION). */
 export const timingOf = (c) => ({ frequency: c.frequency, phase: c.phase, startTime: c.startTime, stopTime: c.stopTime, extrapolation: c.flags & 0x6 });
 
-/** Every ACTIVE controller on a record's chain (the reference makes no other), in chain order. MW-BOW1: exported - a
+/** Every ACTIVE controller on a record's chain (the reference makes no other), in chain order. Exported - a
  *  part's own clock (formats/morrowind/mwPartClock.js) reads the same chain. */
 export function activeControllers(nif, rec) {
   const out = [];
@@ -92,11 +83,10 @@ export function activeControllers(nif, rec) {
   return out;
 }
 
-/** NiMaterialColorController's target (nif/controller.cpp: `(mFlags >> 4) & 3` in a 4.0.0.2 file). */
+/** NiMaterialColorController's target, read off a 4.0.0.2 controller's flags as `(flags >> 4) & 3`. */
 export const COLOR_TARGET = Object.freeze({ Ambient: 0, Diffuse: 1, Specular: 2, Emissive: 3 });
-/** NiBillboardNode's modes (nif/node.hpp), read off a 4.0.0.2 node's flags as `(flags >> 5) & 3`. */
-export const BILLBOARD_MODE = Object.freeze({ AlwaysFaceCamera: 0, RotateAboutUp: 1, RigidFaceCamera: 2, AlwaysFaceCenter: 3 });
-/** overrideTexture's wrap: CLAMP_TO_EDGE on both axes - NiTexturingProperty's clamp mode 0. */
+export { BILLBOARD_MODE, billboardRotation, uvAt, flipIndex, visAt };
+/** The wrap of an overriding particle texture: clamped at the edge on both axes - NiTexturingProperty's clamp mode 0. */
 export const OVERRIDE_CLAMP_MODE = 0;
 
 /** The controllers a property chain hands its drawable: the NEAREST NiMaterialProperty's alpha and colour ramps and the
@@ -114,7 +104,7 @@ function propertyControllers(nif, chain, grow) {
   }
   for (const c of activeControllers(nif, last('NiTexturingProperty'))) {
     if (c.type !== 'NiFlipController') continue;
-    // handleTextureControllers skips an empty source; a source with no external name keeps its slot and draws the base
+    // An empty source is skipped; a source with no external name keeps its slot and draws the base texture.
     const files = (c.sources ?? []).filter((s) => s >= 0).map((s) => deref(nif, s)).map((s) => (s && s.external && s.fileName ? s.fileName : null));
     if (files.length) { out.flip = { files, delta: c.delta, timing: timingOf(c) }; grow(c); }
   }
@@ -136,23 +126,23 @@ export function vfxOf(nif) {
   let length = 0;
   const grow = (c) => { if (Number.isFinite(c?.stopTime)) length = Math.max(length, c.stopTime); };
   const rootRec = deref(nif, nif.roots.find((r) => r >= 0) ?? -1);
-  // :527-533 - the ROOT's first NiTexturingProperty: what an effect's particle texture replaces
+  // The root's first NiTexturingProperty: what an effect's particle texture replaces.
   const rootTex = (rootRec?.properties ?? []).find((p) => deref(nif, p)?.type === 'NiTexturingProperty') ?? -1;
   const hasMarkers = rootRec ? hasMarkerFlag(nif, rootRec) : false;
 
   const visit = (ref, parent, chain, animFlags, overridden, skipMeshes, isRoot) => {
     const rec = deref(nif, ref);
     if (!rec) return;
-    if (!isRoot && String(rec.name || '').toLowerCase() === 'bounding box') return;   // rule 58 (1)
-    if (rec.type === 'RootCollisionNode') return;   // rule 58 (2): hidden, its meshes skipped - nothing of it draws
+    if (!isRoot && String(rec.name || '').toLowerCase() === 'bounding box') return;   // collision data, never drawn
+    if (rec.type === 'RootCollisionNode') return;   // collision data: nothing of it draws
     const isNode = NODE_TYPES.has(rec.type);
     const isShape = GEOMETRY_TYPES.has(rec.type);
     const isParticles = PARTICLE_TYPES.has(rec.type);
     if (!isNode && !isShape && !isParticles) return;
     const flags = ANIM_FLAG_NODES.has(rec.type) ? rec.flags | 0 : animFlags;
     const own = (rec.properties ?? []).filter((p) => p >= 0);
-    // :535-538 - any node but the root that lists the root's texturing property is marked, and OVERRIDE carries the
-    // texture over its whole subtree
+    // Any node but the root that lists the root's texturing property is marked, and the override carries the texture
+    // over its whole subtree.
     const marked = overridden || (!isRoot && rootTex >= 0 && own.includes(rootTex));
     const nextChain = own.length ? [...chain, ...own] : chain;
     const controllers = activeControllers(nif, rec);
@@ -175,7 +165,7 @@ export function vfxOf(nif) {
       }
     }
     nodes.set(ref, entry);
-    // :826-843 - a hidden node with no visibility controller skips every mesh beneath it
+    // A hidden node with no visibility controller skips every mesh beneath it.
     const skip = skipMeshes || (hidden && !hasVis);
     if (isParticles) {
       if (!skip && !skipGeometryName(rec.name, hasMarkers)) particleChains.set(ref, { chain: nextChain, override: marked });
@@ -227,32 +217,11 @@ export function vfxOf(nif) {
   return { nodes, shapes, particles, length };
 }
 
-/** VisController::calculate - the key at or before the time (upper_bound, then one back); no keys is visible. */
-export function visAt(keys, time) {
-  if (!keys || !keys.length) return true;
-  let lo = 0; let hi = keys.length;
-  while (lo < hi) { const mid = (lo + hi) >>> 1; if (time < keys[mid].time) hi = mid; else lo = mid + 1; }
-  return !!keys[Math.max(0, lo - 1)].value;
-}
-
-/** UVController::apply's texture matrix on one coordinate pair: scaled about (0.5, 0.5), then offset - U's negated. */
-export function uvAt(u, v, { uTrans = 0, vTrans = 0, uScale = 1, vScale = 1 }) {
-  return [(u - 0.5) * uScale + 0.5 - uTrans, (v - 0.5) * vScale + 0.5 + vTrans];
-}
-
-/** FlipController::apply's slot: int(t / delta) % count, and the first when delta is 0. */
-export function flipIndex(time, delta, count) {
-  if (!(count > 0)) return -1;
-  if (!delta) return 0;
-  const i = Math.trunc(time / delta) % count;
-  return i < 0 ? i + count : i;
-}
-
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
 /**
  * A surface's colour under the effect's white ambient (see the header), per vertex: rgb the emission plus the
- * ambient, the vertex colour SUBSTITUTED into the channel its mode names (rule 63); alpha the diffuse alpha - the
+ * ambient, the vertex colour SUBSTITUTED into the channel its mode names; alpha the diffuse alpha - the
  * vertex's where it is the diffuse - times the AlphaController's uniform.
  */
 export function shapeVertexColour(material, colors, i, alphaUniform = 1) {
@@ -264,56 +233,7 @@ export function shapeVertexColour(material, colors, i, alphaUniform = 1) {
   return [clamp01(emissive[0] + ambient[0]), clamp01(emissive[1] + ambient[1]), clamp01(emissive[2] + ambient[2]), clamp01(diffuseA * alphaUniform)];
 }
 
-// ---- 3x3 helpers, row-major, column vectors (mwAffine's convention) --------
-const m3mul = (a, b) => {
-  const o = new Float32Array(9);
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) o[r * 3 + c] = a[r * 3] * b[c] + a[r * 3 + 1] * b[3 + c] + a[r * 3 + 2] * b[6 + c];
-  return o;
-};
-/** The transpose applied - the inverse of a rotation. */
-const m3tApply = (a, v) => [a[0] * v[0] + a[3] * v[1] + a[6] * v[2], a[1] * v[0] + a[4] * v[1] + a[7] * v[2], a[2] * v[0] + a[5] * v[1] + a[8] * v[2]];
-const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const norm = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return l > 0 ? [v[0] / l, v[1] / l, v[2] / l] : [0, 0, 0]; };
-/** A 3x3 whose columns are the three vectors - an osg row matrix `set(r0, r1, r2)` read as a column-vector map. */
-const fromColumns = (a, b, c) => Float32Array.from([a[0], b[0], c[0], a[1], b[1], c[1], a[2], b[2], c[2]]);
-
-/**
- * AutoTransform::computeMatrixForFrame's rotation (nifosg/autotransform.cpp), as the column-vector 3x3 the node's
- * local transform takes: `mat.getRotate() * mBaseRotation` is osg's "first mat, then the base", so R = base * mat.
- * `base` is the node's own rotation (its keyed one, [B]); `eye`, `look` and `up` are the cull stack's, in the node's
- * PARENT's space; `translation` is the node's own. A degenerate frame leaves `mat` the identity - the file's rotation
- * alone, as the reference's guards leave it.
- */
-export function billboardRotation(mode, base, translation, eye, look, up) {
-  let mat = null;
-  if (mode === BILLBOARD_MODE.RotateAboutUp) {
-    const d = m3tApply(base, [eye[0] - translation[0], eye[1] - translation[1], eye[2] - translation[2]]);
-    const n = Math.hypot(d[0], d[2]);
-    if (n > 1e-12) { const x = d[0] / n, z = d[2] / n; mat = fromColumns([z, 0, -x], [0, 1, 0], [x, 0, z]); }
-  } else {
-    // AlwaysFaceCamera, RigidFaceCamera - and the two "center" modes, which the reference builds with the DEFAULT mode,
-    // RigidFaceCamera (rule 60)
-    const relForward = norm(m3tApply(base, look));
-    let relUp = m3tApply(base, up);
-    const relRight = norm(cross(relUp, relForward));
-    relUp = norm(cross(relForward, relRight));
-    if (mode === BILLBOARD_MODE.AlwaysFaceCamera) {
-      const n = Math.sqrt(relUp[1] * relUp[1] + relRight[1] * relRight[1]);
-      if (n > 1e-6) {
-        const cos = relUp[1] / n, sin = -relRight[1] / n;
-        mat = fromColumns(
-          [-relRight[0] * cos - relUp[0] * sin, -relRight[1] * cos - relUp[1] * sin, -relRight[2] * cos - relUp[2] * sin],
-          [relUp[0] * cos - relRight[0] * sin, relUp[1] * cos - relRight[1] * sin, relUp[2] * cos - relRight[2] * sin],
-          [-relForward[0], -relForward[1], -relForward[2]]);
-      }
-    } else {
-      mat = fromColumns(relRight, relUp, relForward);
-    }
-  }
-  return mat ? m3mul(base, mat) : Float32Array.from(base);
-}
-
-/** The node's local transform at `clock`, in parts: its keyframe track over its rest ([B]: no rotation keys is the rest
+/** The node's local transform at `clock`, in parts: its keyframe track over its rest (no rotation keys is the rest
  *  rotation, no translation or scale keys leaves what was there). */
 function localParts(node, clock) {
   const rest = node.rest;
@@ -358,12 +278,12 @@ export function createVfx(desc, { textureOverride = null, rolls = Math.random, l
       const p = localParts(node, time);
       let rotation = p.rotation;
       if (node.billboard !== null && eyeLocal) {
-        const inv = affineInverse(parentW);   // the cull stack's eye, look and up, in the PARENT's space
+        const inv = affineInverse(parentW);   // the camera's eye, look and up, in the PARENT's space
         const eye = affineApply(inv, eyeLocal.position[0], eyeLocal.position[1], eyeLocal.position[2]);
         rotation = billboardRotation(node.billboard, p.rotation, p.translation, eye, turn(inv, eyeLocal.look), turn(inv, eyeLocal.up));
       }
       worldOf.set(ref, affineMul(parentW, affineOfTransform({ rotation, translation: p.translation, scale: p.scale })));
-      // rule 57: the hidden flag hides, and a visibility controller overrides it every frame
+      // The hidden flag hides, and a visibility controller overrides it every frame.
       const vis = node.vis ? visAt(node.vis.keys, controllerTime(node.vis.timing, time)) : !node.hidden;
       visibleOf.set(ref, vis && (node.parent >= 0 ? visibleOf.get(node.parent) ?? true : true));
     }
@@ -424,8 +344,8 @@ export function createVfx(desc, { textureOverride = null, rolls = Math.random, l
       if (finished) return { time, done: true, streams: [] };
       time += dt;
       if (time >= desc.length) {
-        if (loop && desc.length > 0) time -= desc.length * Math.floor(time / desc.length);   // UpdateVfxCallback: the remainder carried
-        else { finished = true; return { time, done: true, streams: [] }; }   // "Hide effect immediately"
+        if (loop && desc.length > 0) time -= desc.length * Math.floor(time / desc.length);   // the remainder carries into the next round
+        else { finished = true; return { time, done: true, streams: [] }; }   // hidden at once
       }
       const placeA = place ?? AFFINE_IDENTITY;
       const viewA = view ?? AFFINE_IDENTITY;

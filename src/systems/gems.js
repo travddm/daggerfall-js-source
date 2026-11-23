@@ -1,11 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// GEM2 (2026-10-09) — THE GRADED GEMS.
+// GEM2 — THE GRADED GEMS.
 //
-// Gem Sockets (bible/06-Systems/Gem-Sockets.md section 4; Mac: "Id
-// like to have and show weapons with physical gem slots that can be
-// slotted into, along with introducing new gem items into the world
-// loot pool and world bosses"). DFU's eight gems are the plain grade;
+// Gem Sockets (). DFU's eight gems are the plain grade;
 // this file owns the port's four others of each - Chipped, Flawed,
 // Flawless, Perfect - thirty-two rows of its own (1900-1931,
 // lootRarity.js GEM_GRADE_TEMPLATE_BASE), and where they are found:
@@ -74,8 +71,7 @@ export function mintGem(/** @type {string} */ id) {
 /** THE WORLD'S CHANCE AT A GEM, per mille: `base` and `perTier` a tier of the source to `cap`, a pile 1.3 times and a
  *  boss 2.5 (the ladder's SOURCE_MULT), and the player's live Luck through the ladder's own multiplier (luckMult) - the
  *  odds are the source's, the Luck the finder's, as every ladder roll reads it.
- *  GEM-RARE (bible/06-Systems/Gem-Sockets.md; Mac, 2026-10-11: "We need to make gems that can be slotted more rare.
- *  Currently they are too common"): a third of GEM2's 30 + 5 a tier to 150, which found a gem about as often as the
+ *  GEM-RARE (): a third of GEM2's 30 + 5 a tier to 150, which found a gem about as often as the
  *  ladder minted a Rare - one body in twelve at tier 10, one source in seven at the cap. */
 export const GEM_FIND = Object.freeze({ base: 10, perTier: 2, cap: 50 });
 /** THE GRADE A SOURCE'S TIER GIVES: from `tier` on, each grade's weight (GEM_GRADES' order - chipped, flawed, plain,

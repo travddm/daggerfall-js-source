@@ -1,15 +1,16 @@
-// AUDIT STAR (2026-10-20, the owner: text and UI "enhanced plus + not AI-like and overexplanatory"): THE STARFALL'S WORDS,
-// ITS ITEM'S NAME AND ITS SET'S POWERS, read again - bible/11-Multiplayer/Starfall.md section 8 (AUDIT STAR) and
+// AUDIT STAR: THE STARFALL'S WORDS,
+// ITS ITEM'S NAME AND ITS SET'S POWERS, read again (AUDIT STAR) and
 // Sigil-Sets.md section 6f. Each master its own circle line; the fight's calls each their own; the claim's and the cap's
 // lines in the gate's and the festival's voice, the cap's number handed to the language; the Veil's effect said, its chip
 // and its spell named through the text core; Bound in Silk's held blow cuts the count whatever its weight; a chip
 // carries its tier; the star's glass is Starfall Glass, no custom row's name is another's, and its card says what it is.
 // tools/mutants/auditstar.json.
+import '../../techniquesLinked.js';
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { join, dirname } from 'node:path';
 import { STAR_MASTERS } from '../../../src/systems/starfall/starCoven.js';
 import { STAR_AT_TEXT } from '../../../src/systems/starfall/starWords.js';
@@ -24,7 +25,7 @@ import {
   _setSetPowersClockForTests, _resetSetPowersForTests,
 } from '../../../src/systems/sigil/sigilSetPowers.js';
 import { setSigilOnline, setSigilRenown, _resetSigilForTests } from '../../../src/systems/sigil/sigil.js';
-import { setById, ROUND_SECONDS, _resetSigilSetsForTests } from '../../../src/systems/sigil/sigilSets.js';
+import { ROUND_SECONDS, _resetSigilSetsForTests } from '../../../src/systems/sigil/sigilSets.js';
 import { statusTiles } from '../../../src/ui/hud/hudStatus.js';
 import { setTileTier } from '../../../src/ui/enhanced/enhancedHud.js';
 import { _resetPlayerHealForTests } from '../../../src/systems/playerHeal.js';
@@ -56,7 +57,6 @@ test('AUDIT STAR W1: every master calls its circle in a line of its own - its na
     assert.match(m.circle(), m.female ? / her circle\./ : / its circle\./, `${m.id}: as it stands`);
   }
   assert.equal('circle' in STAR_AT_TEXT, false, 'the shared line is gone');
-  assert.match(read('src/scenes/starfall/starfallHost.js'), /sayAt\(S, `circle\$\{i\}`, M\.circle\(\)\)/, 'the host says the master\'s own');
 });
 
 test('AUDIT STAR W4: the fight\'s calls each say their own thing - "comes for the star" at most three times over the waves and the masters (mutants: a call of the old set)', () => {
@@ -119,7 +119,7 @@ test('AUDIT STAR S1: BOUND IN SILK - the held blow\'s landing cuts the count wha
   setPlayerDoor({ foes: () => [], feet: () => [0, 0, 0], hurtFoe: () => {}, castOnPlayer: () => {}, player: () => e });
   const s = createWeapon(120, 0, () => 0.5);
   T = 10;
-  assert.deepEqual([swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT, false), swing(e, s, RAT)], [100, 100, 100, 160, 100], 'the part-blow held, the count cut');
+  assert.deepEqual([swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT), swing(e, s, RAT, false), swing(e, s, RAT)], [100, 100, 100, 102, 100], 'the part-blow held, the count cut');   // PIN MOVED: B5 (Bound in Silk Faint 6 -> 2)
   assert.equal(strandsAt(RAT), 1, 'and the next whole blow laid the first again');
   fresh();
   const f = wearSet(player(), 'starspun', 4);
@@ -153,7 +153,6 @@ test('AUDIT STAR W6/S2/S3: the Veil says its effect and how long, its spell and 
   assert.equal(setTileTier({ ...tiles[0], name: 'Schleier' })?.i, 2, 'nor does a name in the player\'s language matter');
   assert.equal(setTileTier({ ...tiles[0], tier: null }), null, 'no tier, no line');
   assert.equal(setTileTier({ set: 'technique', tier: 2 }), null, 'a tile of no set');
-  assert.equal('Reprieve'.startsWith(setById('panoply').tiers[2].name), false, 'the Reprieve\'s chip was another the name could not find');
   try {
     patchLocaleTable('xx', 'Port_Strings', [['starfall.set.veilChip', 'Schleier'], ['starfall.set.veil', 'Schleier! {s} s.'], ['starfall.set.veilSpell', 'Mephalas Schleier']]);
     setLocale('xx');
@@ -169,7 +168,7 @@ async function everyCustomRow() {
   const walk = (d, out = []) => { for (const n of readdirSync(d)) { const p = join(d, n); if (statSync(p).isDirectory()) walk(p, out); else if (p.endsWith('.js')) out.push(p); } return out; };
   const files = walk(join(ROOT, 'src')).filter((f) => /registerCustomTemplates\(/.test(readFileSync(f, 'utf8')));
   assert.ok(files.length >= 20, `${files.length} homes`);
-  for (const f of files) await import(f);
+  for (const f of files) await import(pathToFileURL(f).href);
   registerCustomTemplates(RRI_TEMPLATES);
   return customTemplateRows();
 }

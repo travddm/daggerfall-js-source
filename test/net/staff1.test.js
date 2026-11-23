@@ -1,6 +1,5 @@
-// STAFF1 (2026-09-28, Mac: "So for developer, dungeon master and the shadow fang titles I want to add teleport, debug,
-// and other admin commands") - THE STAFF'S CHAT COMMANDS: /tp (a place, a map pixel, a player), /god, /fly, /heal,
-// /pos, /staff, for a player whose own glyphs are `dev`, `dm` or `shadowfang`, and nobody else.
+// STAFF1 - THE STAFF'S CHAT COMMANDS: /tp (a place, a map pixel, a player), /god, /fly, /heal, /pos, /staff, for a
+// player whose own glyphs are `dev` or `dm`, and nobody else.
 //
 // Pinned here: who may (isStaff), the grammar (parseStaffCommand), the matching (findPlace, findPlayer), the two
 // switches at their doors (god at the damage veto, fly at the motor-flag write), and the world host's wiring by source.
@@ -14,12 +13,12 @@ import { applyMotorEffectFlags } from '../../src/scenes/shared.js';
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
-test('STAFF1 who: the Developer\'s, the Dungeon Master\'s and Shadow Fang\'s glyphs, every one a signed glyph - and no other', () => {
-  assert.deepEqual([...STAFF_GLYPHS], ['dev', 'dm', 'shadowfang']);
+test('STAFF1 who: the Developer\'s and the Dungeon Master\'s glyphs, every one a signed glyph - and no other', () => {
+  assert.deepEqual([...STAFF_GLYPHS], ['dev', 'dm']);
   for (const g of STAFF_GLYPHS) assert.ok(GLYPHS.includes(g), `${g} is a glyph the token signs`);
   assert.equal(isStaff(['sprout', 'dm']), true);
   assert.equal(isStaff(['dev']), true);
-  assert.equal(isStaff(['shadowfang']), true);
+  assert.equal(isStaff(['mod']), false, 'the moderator\'s shield opens no staff command');
   for (const g of GLYPHS.filter((x) => !STAFF_GLYPHS.includes(x))) assert.equal(isStaff([g]), false, `${g} is not staff`);
   assert.equal(isStaff([]), false);
   assert.equal(isStaff(null), false);
@@ -49,7 +48,7 @@ test('STAFF1 grammar: /tp takes a place, a map pixel or @player; /god and /fly f
   assert.deepEqual(parseStaffCommand('/staff'), { cmd: 'staff' });
   assert.ok('error' in parseStaffCommand('/heal me'));
   for (const line of ['/red hi', '/unstuck', 'tp Daggerfall', '/tpx 1 2', '//tp 1 2', 'hello']) assert.equal(parseStaffCommand(line), null, line);
-  assert.deepEqual([...STAFF_COMMANDS], ['tp', 'god', 'fly', 'heal', 'pos', 'staff', 'relay']);   // PIN MOVED (SCALE5b): /relay, a developer's (net/relayCfg.js, test/net/scale5b.test.js)
+  assert.deepEqual([...STAFF_COMMANDS], ['tp', 'god', 'fly', 'heal', 'pos', 'staff', 'relay']);
   for (const c of STAFF_COMMANDS.filter((n) => n !== 'staff')) assert.ok(STAFF_HELP_LINES.some((l) => l.startsWith(`/${c} `)), `/staff lists /${c}`);
 });
 
@@ -91,16 +90,3 @@ test('STAFF1 switches: /god withholds every blow at the damage veto\'s door; /fl
   } finally { setStaffPowers({ god: false, fly: false }); }
 });
 
-test('STAFF1 host wiring by source: asked only of staff by the service\'s own glyphs; the switches cleared with the title; the dungeon\'s levitation ORs /fly', () => {
-  const w = rd('src/scenes/world.js');
-  // TESTBUILD (THE WROTHGARIAN ZONE): the host asks isStaffT, which is isStaff OR the test build's switch - so "only of
-  // staff" holds while the switch ships off, and that is pinned with it. PIN MOVED: isStaff -> isStaffT, and /godmode
-  // folded to /god before the parser
-  assert.match(w, /\nconst TEST_GODMODE = false;\nconst isStaffT = \(g\) => TEST_GODMODE \|\| isStaff\(g\);\n/, 'TESTBUILD: the switch ships off, so isStaffT is isStaff');
-  assert.match(w, /const staffCmd = isStaffT\(staffGlyphs\(\)\) \? parseStaffCommand\(text\.replace\(\/\^\\\/godmode\\b\/i, '\/god'\), staffPowers\(\)\) : null;[^\n]*\n\s*if \(staffCmd\) \{ runStaffCommand\(tabId, staffCmd\); return 'error' in staffCmd \? false : true; \}/);
-  assert.ok(w.indexOf('const staffCmd = isStaffT(') < w.indexOf('const cmd = parseChatLine('), 'asked before the chat\'s own refusal');
-  assert.match(w, /_staffGlyphs = Array\.isArray\(who\?\.glyphs\) \? who\.glyphs : \[\];[^\n]*\n\s*if \(!isStaffT\(_staffGlyphs\)\) setStaffPowers\(\{ god: false, fly: false \}\);/);
-  assert.match(w, /const staffGlyphs = \(\) => _staffGlyphs;/);
-  assert.match(w, /if \(_teleporting \|\| worldMoveBusy\(\)\) \{ say\('You cannot teleport right now\.'\); return; \}\n\s*hudFade\.smashHUDToBlack\(\);[^\n]*\n\s*teleportTo\(pick\)\.catch\(/);
-  assert.match(rd('src/scenes/dungeonContext.js'), /playerLevitating: \(\) => hasActiveEffect\(playerEntity, 'levitate'\) && !levitateWarded\(\) \|\| staffFly\(\),/);   // PIN MOVED (AUDIT SD V L1): the ward holds the effect, never /fly
-});

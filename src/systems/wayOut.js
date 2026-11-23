@@ -13,7 +13,7 @@ import { TRAIL_CELL } from './automap/automap.js';   // AUDIT DELVE C8: the trai
 // into the level, a save older than the trail), the mark stands on the way in itself, as the crow flies - the held
 // map's own beacon, said on the compass.
 //
-// AUDIT DELVE (bible/01-Overview/audits/Audit-Delve.md): the trail is filled between the scan's samples (automapTrailTick - at
+// AUDIT DELVE: the trail is filled between the scan's samples (automapTrailTick - at
 // a run a sample is 1.6 m from the last and skipped a cell, and the field broke into pieces, the compass falling back to
 // the crow's line through the walls it promised never to point through); the cells are parsed once and added to as the
 // trail grows, on numeric column keys, and the field is built again only when the player stands off it (a crawl's

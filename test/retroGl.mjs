@@ -96,6 +96,7 @@ export function stateGl(W = 1280, H = 720) {
     uniform1i: (loc, v) => { if (loc?.p) { loc.p.units[loc.name] = v; loc.p.values[loc.name] = [v]; } },
     uniform1f: (loc, ...v) => { if (loc?.p) loc.p.values[loc.name] = v; },
     uniform2f: (loc, ...v) => { if (loc?.p) loc.p.values[loc.name] = v; },
+    uniform3f: (loc, ...v) => { if (loc?.p) loc.p.values[loc.name] = v; },
     uniform4f: (loc, ...v) => { if (loc?.p) loc.p.values[loc.name] = v; },
     uniform4fv: (loc, v) => { if (loc?.p) loc.p.values[loc.name] = Array.from(v); },
     uniform2fv: (loc, v) => { if (loc?.p) loc.p.values[loc.name] = Array.from(v); },

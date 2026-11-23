@@ -1,4 +1,4 @@
-// LANDFORM7 (2026-10-08, Mac, of the hills on the real ground: "Do your thing") - A ROAD EASES THE HILLS
+// LANDFORM7 - A ROAD EASES THE HILLS
 // (world/landforms.js). The hills rode a road's profile whole, so a road climbed every hill the country wore: on the real
 // map a straight road's grade at the 95th percentile rose from the bare land's 7.5% to 18.5% in the deserts. Within
 // `LANDFORM_DIALS.ease` of a road's or a track's centre line the hills ease down to `keep` of themselves at the line.

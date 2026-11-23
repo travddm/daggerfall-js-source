@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27): A UNITY BUNDLE'S PREFABS, MESHES, MATERIALS AND ANIMATION,
+// CSA-A: A UNITY BUNDLE'S PREFABS, MESHES, MATERIALS AND ANIMATION,
 // READ OFF ITS TYPE TREES INTO PLAIN DATA (tools/comeSailAwayExtract.mjs).
 //
 // src/formats/unity/unityBundle.js reads any object through its type tree; this

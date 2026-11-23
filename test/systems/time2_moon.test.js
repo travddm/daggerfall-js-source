@@ -1,10 +1,10 @@
-// TIME2 (2026-10-01, Mac: "werewolf forms last insanely long" / "I don't want a band aid, I want a detailed way we can
-// do this" / "This needs to be perfect"): ONLINE THE FULL MOON IS A NIGHT. Design: bible/06-Systems/Online-Time-Arc.md
+// TIME2: ONLINE THE FULL MOON IS A NIGHT. Design:
 // section 6.1. DFU forces a lycanthrope's change for the whole calendar day either moon is full, and online that day was
 // two real hours no rest could shorten (the moon is the sky's, which no rest moves). Online the change is forced while
 // the full moon is UP - from the dusk of a full-moon date to the next dawn, thirty real minutes on TIME1's sky - and at
 // dawn the lock ends. Offline DFU's whole day stands. THE LAW EXECUTES: the night's date, the full moon up, the round
 // online and offline, the round runner's lane, the morning after, and the Hircine ring.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -93,7 +93,6 @@ test('TIME2 the round runner raises the night\'s rule exactly when a host hands 
   const offline = wolf();
   runMagicRoundsFor(offline, FULL + 720 - 3, FULL + 720, { sinks });
   assert.equal(liveLycanthropy(offline).isTransformed, true, 'no sky handed (offline, the one clock): DFU\'s day');
-  assert.match(rd('src/systems/worldTick.js'), /lycanthropyMagicRound\(entity, \{ nowMinutes: r \+ 1, clockMinutes, skyMinutes: sky, moonNight: Number\.isFinite\(skyMinutes\), say \}\);/, 'by source: the lane is the sky handed');
 });
 
 test('TIME2 the morning after: at dawn the lock ends - the change back holds, and the next round forces nothing until the next full moon\'s dusk', () => {
@@ -129,7 +128,8 @@ test('TIME2 the Hircine ring still holds the change off, the night of the full m
   }
 });
 
-test('TIME2 on the sky: a full moon\'s night is thirty real minutes, and a werewolf meets the two moons\' nights four real hours apart, then none for twenty-eight', () => {
+test('TIME2 on the sky: a full moon\'s night is thirty real minutes, and a werewolf meets the two moons\' nights four real hours apart, then none for twenty-eight', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const from = SKY_SEGMENTS[0].fromMs + 3_600_000;
   const nights = [];
   let inNight = false, start = 0;

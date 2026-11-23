@@ -229,7 +229,7 @@ export const hasActionCollision = (o) => !!o && COLLISION_TRIGGER_FLAGS.includes
  *  and DaggerfallActionCollision hears only OnControllerColliderHit, which a CharacterController never raises for a
  *  trigger: in DFU a flat's action fires on a click or a blow, never a walk. The port hears an effect's and a moving
  *  flat's box on a walk (AUDIT PRE-MERGE 0929, a departure named in Port-Ledger A); a RELAY's never - a flat Teleport,
- *  Activate or DoorText walked under fires nothing. FLAT-RELAY (2026-10-05c) had made 41 relay flats walk-ins for a
+ *  Activate or DoorText walked under fires nothing. FLAT-RELAY had made 41 relay flats walk-ins for a
  *  Collision03 flat Teleport the corpus does not hold: Edworyan Laboratory's six hanging roots, at head height in the
  *  online build's first block, each sent the body back to the entrance. */
 export const walkHears = (o) => hasActionCollision(o) && !(o.isFlat === true && o.kind === 'relay');
@@ -507,7 +507,7 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
     // ActivateLockUnlock sound on success
     this.onLockpickTally = null;
     this.onLockpickResult = null;
-    // LOCKPICK (bible/06-Systems/Lockpicking.md): onLockpickAttempt(o) - a host that plays the lock's tumblers
+    // LOCKPICK: onLockpickAttempt(o) - a host that plays the lock's tumblers
     // (scenes/lockpickHost.js) takes the attempt from the roll below, and answers its opened lock through lockpicked(o)
     this.onLockpickAttempt = null;
     // WAVE D: onFlatMoved(o) - a MOVE-flag FLAT reached a new pose.
@@ -780,7 +780,7 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
       index: action.index,
       axisRaw: action.axisRaw,
       // FIELD BUGS 2026-10-05c (FLAT-RELAY): a relay keeps its flat's mark, as addEffect's and addMoveFlat's objects do.
-      // FLAT-WALK (2026-10-21d): the mark is what keeps a flat relay off the walk - `walkHears`; a click or a blow fires it
+      // FLAT-WALK: the mark is what keeps a flat relay off the walk - `walkHears`; a click or a blow fires it
       isFlat: action.isFlat === true,
       activationCount: 0,
       state: 'start',
@@ -874,7 +874,7 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
     this._early.set(rec.key, rec);
   }
 
-  /** HOME-DOORS (2026-09-30): a door taken back out - one an owner hung in a doorway (scenes/decor/decorRoom.js), moved or
+  /** HOME-DOORS: a door taken back out - one an owner hung in a doorway (scenes/decor/decorRoom.js), moved or
    *  removed. Not a DFU member (Daggerfall's doors are never taken down): the object, its place in the chain graph and
    *  its collider bucket go, open or shut. Answers whether there was one. */
   removeDoor(key) {
@@ -1364,22 +1364,16 @@ constructor(collider, { damagePlayer = null, drainMagicka = null, castSpell = nu
     return true;
   }
 
-  /** DaggerfallActionDoor.AttemptLockpicking (:147-191), verbatim:
-   *  no-op while the door swings; a SILENT return while the live
-   *  Lockpicking skill still equals the recorded failure (the
-   *  C# == test, so a skill that moved EITHER way re-opens the
-   *  attempt); a magically held lock (>= 20) speaks the failure line
-   *  with NO tally, NO roll and NO record; otherwise the attempt
-   *  tallies Lockpicking BEFORE the roll, rolls d100 under
-   *  CalculateInteriorLockpickingChance, and on success zeroes the
-   *  lock and opens the door (ToggleDoor(true)), on failure records
-   *  the skill level. No lockpick ITEM is required - DFU checks no
-   *  inventory. */
+  /** DaggerfallActionDoor.AttemptLockpicking (:147-191), verbatim: no-op while the door swings; a silent return while
+   *  the live Lockpicking skill equals the recorded failure (the C# == test, so a skill that moved either way re-opens the
+   *  attempt); a magically held lock (>= 20) speaks the failure line with no tally, roll or record; otherwise the attempt
+   *  tallies Lockpicking before the roll, rolls d100 under CalculateInteriorLockpickingChance, and on success zeroes the
+   *  lock and opens the door (ToggleDoor(true)), on failure records the skill level. No lockpick item is required. */
   attemptLockpicking(o) {
     if (o.state === 'forward' || o.state === 'reverse') return false;   // IsMoving
-    // LOCKPICK: a host that plays the tumblers takes a lock DFU would roll for - the magic arm below stays DFU's - and its
-    // snapped picks are what a retry costs, so the retry gate is not read for it (Ledger A, LOCKPICK)
-    if (this.onLockpickAttempt && o.currentLockValue < MAGIC_LOCK_THRESHOLD) { this.onLockpickAttempt(o); return false; }
+    // LOCKPICK: a host that plays the tumblers takes a lock DFU would roll for (the magic arm below stays DFU's); its snapped picks
+    // are the retry's cost, so the gate is not read for it. A host that answers false (option off) leaves DFU's roll to this graph
+    if (this.onLockpickAttempt && o.currentLockValue < MAGIC_LOCK_THRESHOLD && this.onLockpickAttempt(o) !== false) return false;
     const skill = this._lockpickSkill();
     if (o.failedSkillLevel === skill) return false;   // the retry gate (:157) - == exactly, so a skill moved EITHER way re-opens it
     if (o.currentLockValue >= MAGIC_LOCK_THRESHOLD) {

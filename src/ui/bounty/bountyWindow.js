@@ -1,5 +1,5 @@
 // @ts-check
-// BOUNTY1 (2026-09-28, Mac: "one of the two when opened gives a quest screen in Enhanced Plus UI look"): THE BOUNTY
+// BOUNTY1: THE BOUNTY
 // BOARD'S WINDOW and THE PAYDAY NOTICE.
 //
 // The board: the town's four notices down the left (the beasts, how many, which way, the purse, and where the hunter

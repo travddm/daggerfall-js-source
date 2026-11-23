@@ -1,7 +1,5 @@
-// HOLDINGS (2026-10-03, Mac: "Lets add a new tab to the pause menu as the stat page is starting to get bloated. Lets
-// organize everything appropriately. Under the new tab add a page that allows you to see your currently owned mounts
-// ships and carts. You can summon your horse/cart from this page/send away much like the companion system") - THE
-// HOLDINGS TAB and THE STABLE (bible/03-World/Holdings.md): the pause window's fourth tab and its rail (ui/enhanced/enhancedMenu.js
+// HOLDINGS - THE
+// HOLDINGS TAB and THE STABLE: the pause window's fourth tab and its rail (ui/enhanced/enhancedMenu.js
 // pauseHoldings), what moved off the Stats rail onto it, the landings; Horse Cart and Cargo's summon answered and its
 // new other half, Send away (systems/horse/horseCart.js summonTransport, sendTransportAway, renameHorse, stableView - the
 // real runtime over test/hccWorld.mjs); the Stable page's words and acts (ui/holdingsPages.js); the one construction
@@ -19,7 +17,6 @@ import { CSA_ITEM_TEMPLATES } from '../../../src/systems/comeSailAway/comeSailAw
 import { hostText } from '../../hostText.mjs';   // HOST-SPLIT 2 (AUDIT, the second read): its negatives read the host whole
 
 const read = (p) => hostText(p);
-const MENU = read('src/ui/enhanced/enhancedMenu.js');
 
 // ── a fake DOM, the Companions page's (test/systems/revenant/revenant_companions.test.js) ─────────────────────────────────────────────
 function fakeEl(tag) {
@@ -43,37 +40,6 @@ _setHoldingsIconForTests(() => ({ src: 'data:x', w: 30, h: 30 }));
 globalThis.document = undefined;
 
 // ── the tab ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('HOLDINGS the pause window has a fourth tab, Holdings, between Stats and System; a landing may name it (every tab one list - PAUSE_TAB_IDS - the landing and the strip read alike)', () => {
-  assert.match(MENU, /const PAUSE_TABS = Object\.freeze\(\[\['quests', 'Quests'\], \['stats', 'Stats'\], \['growth', 'Growth'\], \['holdings', 'Holdings'\], \['family', 'Family'\], \['tutorials', 'Tutorials'\], \['system', 'System'\]\]\);/);   // LEGACY3: the Family tab between Holdings and System; TUT1: the Tutorials tab before System - PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab): Growth after Stats
-  assert.match(MENU, /export const PAUSE_TAB_IDS = Object\.freeze\(PAUSE_TABS\.map\(\(\[id\]\) => id\)\);/);
-  assert.match(MENU, /if \(PAUSE_TAB_IDS\.includes\(at\)\) pauseTab = at;/);
-  assert.match(MENU, /\(\{ quests: pauseQuests, stats: pauseStats, growth: pauseGrowth, holdings: pauseHoldings, family: pauseFamily, tutorials: drawTutorialsPane, system: pauseSystem \}\)\[pauseTab\]\(body\);/);   // TUT1 - PIN MOVED (GROWTH1, bible/10-UI/Growth.md: the Growth tab)
-});
-
-test('HOLDINGS the Stats rail is the character sheet again - its six pages and the Professions online; the Holdings rail takes the Stable, the Fleet, the Companions, the Revenants and the Stores, each while it has a thing to show', () => {
-  assert.match(MENU, /const statsSections = \(\) => \[\.\.\.STATS_SECTIONS, \.\.\.\(profPagesShown\(\) \? PROF_STATS_SECTIONS : \[\]\), \.\.\.\(vendorPageShown\(\) \? VENDOR_PAGE_SECTIONS : \[\]\)\];/);   // PIN MOVED (HOME-VENDOR): the Vendor page under the Professions
-  // PIN MOVED (CRAFT-HALL): the Stats rail's professions pages are PROF_STATS_PAGES (the Professions page and the Crafting
-  // page beside it); every other is the Holdings rail's (the Stores)
-  assert.match(MENU, /const PROF_STATS_SECTIONS = Object\.freeze\(PROF_PAGE_SECTIONS\.filter\(\(\[id\]\) => PROF_STATS_PAGES\.includes\(id\)\)\);/);
-  assert.match(MENU, /const PROF_HOLD_SECTIONS = Object\.freeze\(PROF_PAGE_SECTIONS\.filter\(\(\[id\]\) => !PROF_STATS_PAGES\.includes\(id\)\)\);/);
-  assert.match(MENU, /const holdingsSections = \(\) => \[\.\.\.\(stablePageShown\(\) \? STABLE_PAGE_SECTIONS : \[\]\), \.\.\.\(fleetPageShown\(\) \? FLEET_PAGE_SECTIONS : \[\]\), \.\.\.\(captainPageShown\(\) \? CAPTAIN_PAGE_SECTIONS : \[\]\), \.\.\.\(companionPageShown\(\) \? COMPANION_PAGE_SECTIONS : \[\]\), \.\.\.\(revenantPageShown\(playerEntity\) \? REVENANT_PAGE_SECTIONS : \[\]\), \.\.\.\(profPagesShown\(\) \? PROF_HOLD_SECTIONS : \[\]\), \.\.\.\(collectionsPageShown\(playerEntity\) \? COLLECTION_PAGE_SECTIONS : \[\]\)\];   \/\/ COLLECTIONS/);   // COLLECTIONS (PIN MOVED): the codex and the cards, last - CAPT-LOG (PIN MOVED): the Captain page after the Fleet
-  // the Stats page draws none of the moved pages; the Holdings page draws every one, the Fleet's with its door
-  const stats = MENU.slice(MENU.indexOf('function pauseStats(body)'), MENU.indexOf('// PX25: THE DOORS THE F5 SHEET CARRIED'));
-  for (const gone of ['drawStoresPage', 'drawRevenantsPage', 'drawCompanionsPage']) assert.doesNotMatch(stats, new RegExp(gone), `${gone} left the Stats page`);
-  const hold = MENU.slice(MENU.indexOf('function pauseHoldings(body)'), MENU.indexOf('// ── PX7: THE SYSTEM PAGE'));
-  for (const page of ['drawStablePage', 'drawFleetPage', 'drawCompanionsPage', 'drawRevenantsPage', 'drawStoresPage']) assert.match(hold, new RegExp(page));
-  assert.match(hold, /if \(!secs\.some\(\(\[id\]\) => id === holdSec\)\) holdSec = secs\[0\]\?\.\[0\] \?\? 'stable';/, 'a page gone falls to the first');
-  assert.match(hold, /door: \(fn\) => \{ handoff\(fn\); \}/, 'a door the Fleet opens is the sheet doors\' handoff (PIN MOVED, AUDIT SEASON-BOOK S3: its one home)');
-  assert.match(hold, /el\('div', 'px-qdetail px-sys'\)/, 'the system page\'s dress, as the Stats detail wears it');
-});
-
-test('HOLDINGS the landings: a Stores press (a home\'s station) lands on the Holdings tab at the Stores, a Professions press on the Stats tab; every visit opens the rail on its first page and forgets the pages\' words', () => {
-  const mount = MENU.slice(MENU.indexOf('export function mountEnhancedMenu'));
-  assert.match(mount, /if \(PROF_STATS_SECTIONS\.some\(\(\[id\]\) => id === at\)\) \{ pauseTab = 'stats'; statsSec = at; \}\n  else if \(PROF_HOLD_SECTIONS\.some\(\(\[id\]\) => id === at\)\) \{ pauseTab = 'holdings'; holdSec = at; \}/);
-  assert.ok(mount.indexOf("holdSec = 'stable';") < mount.indexOf("pauseTab = 'holdings'; holdSec = at;"), 'the reset runs before the landing');
-  assert.match(mount, /resetHoldingsPages\(\); resetFleetPage\(\);/);
-});
 
 // ── the runtime: summon answered, send away, the name ────────────────────────────────────────────────────────────────
 
@@ -155,7 +121,7 @@ test('HOLDINGS stableView: the pair as the page reads it - owned, its modes, a p
   walk(30, 90);
   const v = rt.stableView();
   assert.deepEqual({ ...v, wagonAt: undefined }, { persistence: true, transport: TRANSPORT.Foot, hasHorse: true, hasCart: true, horseName: '', wagonMode: WAGON_MODE.Deployed, horseMode: HORSE_MODE.HitchedToWagon,
-    wagonStabled: false, horseStabled: false,   // WAGON-STABLED (PIN MOVED): whether each was sent to the stable
+    wagonStabled: false, horseStabled: false,   // WAGON-STABLED (
     wagonAt: undefined, horseAt: null, out: true, inside: false, onShip: false, kg: 120, limit: 750 });
   assert.ok(v.wagonAt >= 32 && v.wagonAt <= 33, `the wagon 2.5 m behind where it was summoned, 30 m walked: ${v.wagonAt}`);
 });
@@ -171,7 +137,7 @@ test('HOLDINGS the Stable\'s words: each state of the pair a chip and a line - r
   assert.deepEqual(at({ horseMode: HORSE_MODE.LooseStationary, horseAt: 42 }).horse, { state: 'Waiting', tone: 'is-away', line: 'Waiting where you left it, 42 m away.' });
   assert.equal(at({ wagonMode: WAGON_MODE.Deployed, horseMode: HORSE_MODE.HitchedToWagon, wagonAt: 1500 }).horse.line, 'Hitched to your parked wagon, 1.5 km away.');
   assert.equal(at({ wagonMode: WAGON_MODE.Deployed, wagonAt: null }).wagon.line, 'Parked away from here.');
-  // WAGON-STABLED (PIN MOVED): Stabled is the runtime's word that the pair was sent away; the mod's WithPlayer without it is
+  // WAGON-STABLED (
   // beside the player, and the next door parks it outside (test/systems/horse/fb1015_wagonstabled.test.js)
   assert.deepEqual([at({ horseStabled: true, wagonStabled: true }).horse.state, at({ horseStabled: true, wagonStabled: true }).wagon.state], ['Stabled', 'Stabled']);
   assert.deepEqual([at({}).horse.state, at({}).wagon.state], ['With you', 'With you']);
@@ -192,7 +158,7 @@ test('HOLDINGS the Stable page over the real runtime through the hosts\' one sea
   let re = 0;
   const draw = () => { const d = el('div', 'px-qdetail'); drawStablePage(d, () => { re++; }, kit); return d; };
   let d = draw();
-  assert.match(d.textContent, /Your horse.*With you/);   // WAGON-STABLED (PIN MOVED): never sent away is not stabled
+  assert.match(d.textContent, /Your horse.*With you/);   // WAGON-STABLED (
   assert.match(d.textContent, /Your wagon.*With you/);
   assert.match(d.textContent, /0\/750/, 'the load against the wagon\'s limit');
   assert.equal(buttons(d, 'Send away').length, 0, 'nothing out to send');

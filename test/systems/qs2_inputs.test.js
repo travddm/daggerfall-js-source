@@ -1,6 +1,4 @@
-// QS2 (2026-09-17, Mac: a Demon's Souls quickslot diamond on the ENHANCED
-// HUD's bottom-left - main hand, off hand, and two consumables, each with a
-// keybind tag): THE ACTIONS, THE ROUTE, AND THE FOUR HOSTS' DOORS.
+// QS2: THE ACTIONS, THE ROUTE, AND THE FOUR HOSTS' DOORS.
 //
 // QS1 built the model (systems/quickslots.js) and nothing could reach it. This
 // is the wiring, and it has four laws:
@@ -41,13 +39,13 @@ import { assignQuickslot, clearQuickslots, swapQuickslot, quickslotOf } from '..
 import { USE_PENDING as USE_PENDING_SYS } from '../../src/systems/useItem.js';
 import { USE_PENDING as USE_PENDING_UI } from '../../src/ui/native/nativeInventory.js';
 import { setPref } from '../../src/systems/uiPrefs.js';
-// HB-LYCFREE (2026-09-30): the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
-// diamond was the default, so it chooses the diamond (PIN MOVED: the environment it always ran in, now said).
+// HB-LYCFREE: the hotbar is the quick slots' default now. This suite is the DIAMOND's, written while the
+// diamond was the default, so it chooses the diamond (
 setPref('quickbarStyle', 'quickbar');
 
 const rd = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 
-// QS6 (2026-09-17) added a fifth - 'QuickSpell' - and moved Digit3 onto it.
+// QS6 added a fifth - 'QuickSpell' - and moved Digit3 onto it.
 // 'QuickSwap' keeps its row here for the reason the header above gives: an
 // action is never removed from ACTIONS, and the swap is still rebindable. What
 // it lost is its DEFAULT key, which the off-hand cell that draws it now carries.
@@ -115,7 +113,7 @@ test('QS2: the defaults are the number row, spent exactly once each, and free be
   // HELM-KEYS: and More sail owns no key - it SHARES the up arrow (inputActions.js DEFAULT_SHARES); CLASSIC-PAGES: nor
   // the Professions key - it shares the down arrow
   // MODE-WHEEL: and DFU's four mode keys and Sneak - the wheel and Crouch answer for them
-  // SPYGLASS (PIN MOVED): nor the captain's glass - it shares K with the road's follow; SHOT-KINDS (PIN MOVED): nor the guns' load - the helm's button and the wheel choose it
+  // SPYGLASS (
   assert.deepEqual(ACTIONS.filter((a) => !acts.includes(a)), ['ToggleConsole', 'Slide', 'StealMode', 'GrabMode', 'InfoMode', 'TalkMode', 'Sneak', 'QuickSwap', 'DebugOverlay', 'TravelView', 'WalkMode', 'BoatSailUp', 'Professions', 'Spyglass', 'ShotCycle', 'Decorate'],
     'the actions without an owned key');
   assert.equal(DEFAULT_BINDINGS.length, ACTIONS.length - 16);   // Decorate unbound; SHOT-KINDS: the guns' load unbound; PADWALK: WalkMode ships unbound too; HELM-KEYS: BoatSailUp a share; CLASSIC-PAGES: the Professions key a share; SPYGLASS: the glass a share
@@ -325,7 +323,7 @@ test('QS2 + QS7: the two self-routing hosts answer the dispatchable quickslots i
   // potion the hold was about to choose. This ladder never calls routeKey, so
   // routeKey's own POLLED_ACTIONS arm never reaches it - WEAPON-VIS2's lesson
   // at a second door.
-  // QS7 (2026-09-17) REVERSED THIS PIN'S OWN CLAUSE, and the reason is
+  // QS7 REVERSED THIS PIN'S OWN CLAUSE, and the reason is
   // the whole finding: the arm stood above the mode gate because the
   // modal contexts had no quickslot doors, and QS4 gave them the whole
   // set without anyone coming back here. Two ladders then answered one
@@ -335,7 +333,7 @@ test('QS2 + QS7: the two self-routing hosts answer the dispatchable quickslots i
   // works in a tavern and in a dungeon) is UNCHANGED and now held by the
   // modal ladder; what changed is which ladder holds it.
   // test/systems/qs7_one_dispatch.test.js drives the flip and proves the doors.
-  // MAC-R2 (2026-09-17): the arm routes the press edge alone and eats a held key's auto-repeat - test/ui/enhanced/macr_fixes.test.js
+  // MAC-R2: the arm routes the press edge alone and eats a held key's auto-repeat - test/ui/enhanced/macr_fixes.test.js
   const wArm = /if \(!townTalk\.overlayActive && \(modes\?\.mode \?\? 'exterior'\) === 'exterior' && QUICKSLOT_ACTIONS\.has\(act\) && !POLLED_ACTIONS\.has\(act\) && socialMenuCanOpen\(\)\) \{ if \(!e\.repeat && routeAction\(act, hudCtx\)\) \{ e\.preventDefault\(\); return true; \} if \(e\.repeat\) \{ e\.preventDefault\(\); return true; \} \}/;
   assert.match(w, wArm);
   const social = w.indexOf("act === 'SocialInteract' && socialMenuCanOpen()");

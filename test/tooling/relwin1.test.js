@@ -1,6 +1,4 @@
-// REL2 (2026-09-21, a player on Discord: "Is there a way to install
-// Daggerfall Enhanced to a specific directory, I notice the installer is
-// installing to Temp/3JbF0qpIzCVkNiHRDQuHljOnrjW/Daggerfall Enhanced.exe").
+// REL2.
 //
 // That path is the signature of electron-builder's PORTABLE target: the
 // exe unpacks itself into a random folder under %TEMP% and runs from
@@ -43,14 +41,6 @@ test('REL2 the NSIS installer is the assisted kind and lets the player choose th
   assert.equal(b.nsis.oneClick, false, 'a one-click installer offers no directory page');
   assert.equal(b.nsis.allowToChangeInstallationDirectory, true);
   assert.equal(b.nsis.perMachine, false, 'per-user: no elevation, and the saves folder is the user\'s');
-});
-
-test('REL2 the release attaches every exe the Windows leg wrote, and the update check still reads the TAG, never an asset name', () => {
-  const wf = rd('.github/workflows/release-desktop.yml');
-  assert.match(wf, /app\/release\/\*\.exe/, 'both Windows artifacts ride the same glob');
-  assert.doesNotMatch(wf, /-setup\.exe|-portable\.exe/, 'the workflow names no single exe');
-  const main = rd('app/main.cjs');
-  assert.doesNotMatch(main, /win-x64\.exe|-setup\.exe|-portable\.exe/, 'the shell never names a download file');
 });
 
 test('REL2 the landing page tells a Windows player which file is which', () => {

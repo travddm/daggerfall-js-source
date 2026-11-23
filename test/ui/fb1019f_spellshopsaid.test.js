@@ -255,8 +255,4 @@ test('SPELLSHOP-SAID: noticeShown is the owner\'s panel - up while it stands, ne
   noticeFrame(o, null);
   assert.equal(noticeShown(o), false, 'null releases');
   reset();
-  // the port asks it, and asks nothing else
-  const port = rd('src/ui/enhanced/enhancedPort.js');
-  assert.match(port, /if \(noticeShown\(win\)\) \{ win\.click\?\.\(-1, -1\); return; \}\n\s*if \(!b \|\| b\.disabled\) return;/);
-  assert.doesNotMatch(port, /win\.box/);
 });

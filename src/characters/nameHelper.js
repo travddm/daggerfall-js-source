@@ -1,4 +1,4 @@
-// Townsfolk name banks (Characters C2).
+// Townsfolk name banks.
 // 1:1 translation of Daggerfall Unity's NameHelper.cs + the
 // MapsFile.GetNameBankOfRegion switch (MIT, Daggerfall Workshop).
 // Bank data is DFU's Assets/Resources/NameGen.txt committed verbatim as
@@ -16,13 +16,13 @@
 //     draws the 75% roll.
 //   - FullName: first + " " + surname when the surname is non-empty
 //     (only REDGUARD names carry no surname - Surname(Nord) has no
-//     gender arm and always mints the 0+1+'sen' form; AUDIT 23).
-//   - MonsterName (S17): the BANK pick (Monster1 or Monster2 "for
+//     gender arm and always mints the 0+1+'sen' form).
+//   - MonsterName: the BANK pick (Monster1 or Monster2 "for
 //     now") rides UnityEngine.Random in DFU - a uniform roll here
-//     (the Ledger A engine-PRNG rule); every PART draw stays on
+//     (the engine-PRNG rule); every PART draw stays on
 //     DFRandom.rand(), verbatim order.
 //
-// L10N3f (2026-09-28): A TRANSLATION'S NAME BANKS, READ ONCE A SESSION.
+// L10N3f: A TRANSLATION'S NAME BANKS, READ ONCE A SESSION.
 // DFU's NameHelper reads NameGen.txt once, in its constructor at
 // startup: the Resources copy, replaced whole by StreamingAssets/Text/
 // NameGen.txt where a translation pack installs its own
@@ -46,10 +46,10 @@
 // the port keeps DFU's own law - one set of banks a run - and a new set
 // is read only by a new page. A save made under other banks keeps its
 // names as they were spelled, exactly as DFU's does when a pack is
-// installed between two sessions (L10N5: saves hold ids).
+// installed between two sessions (saves hold ids).
 
 import { rand, srand, randomRangeInclusive } from '../formats/dfRandom.js';
-import { REGION_RACES } from '../formats/mapsFile.js';
+import { REGION_NAME_BANKS } from '../formats/mapsTables.js';   // the Bay's banks its races' (FALL.EXE's), a province's its people's
 import { RACES } from '../systems/races.js';
 import { localeDocument, localizedText } from '../systems/textManager.js';   // L10N3f: a pack's NameGen.txt and the Nord suffix
 import { PACK_KIND } from '../systems/translationPacks.js';
@@ -179,6 +179,17 @@ function session() {
 }
 /** A new session's read, as a new page makes one. Tests; nothing in the game calls it. */
 export function resetNameBanks() { _session = null; }
+/** THE GAME'S OWN BANKS FOR A PLACE'S NAME. A place's name is the world's, as MAPS.BSA's names are -
+ *  every client's alike, a pack or none (world/tamrielPlaces.js, world/tamrielCountry.js, world/tamrielDungeons.js name the
+ *  places past the Bay): `fn` drawn on the vendored banks and DFU's own Nord suffix ('sen'), whatever NameGen.txt a
+ *  translation installed, the session's banks put back after. A person's name keeps the session's (DFU's law, L10N3f).
+ *  Not a DFU member: DFU names no place. @template T @param {() => T} fn @returns {T} */
+export function withGameNameBanks(fn) {
+  const was = _session;
+  _session = GAME_SESSION;
+  try { return fn(); } finally { _session = was; }
+}
+const GAME_SESSION = Object.freeze({ banks: nameGen, nordSuffix: 'sen' });
 
 const bankOf = (type) => session().banks[BANK_NAMES[type]];
 const draw = (parts) => parts[rand() % parts.length];
@@ -194,6 +205,7 @@ const BANK_BY_RACE = Object.freeze({
   Khajiit: BANK_TYPES.Khajiit, Argonian: BANK_TYPES.Imperial,
 });
 export const getNameBank = (raceKey) => BANK_BY_RACE[raceKey] ?? BANK_TYPES.Breton;
+
 
 /** EntityEnums.Races ordinal -> race key, so the 1..8 roll below can
  *  be handed to getNameBank exactly as C# hands GetNameBank a Races. */
@@ -228,21 +240,26 @@ export function getRandomNameBank() {
  *          ? Genders.Female : Genders.Male;
  *      return DaggerfallUnity.Instance.NameHelper.FullName(nameBankType, gender);
  *
- *  AUDIT 58: the GENDER IS A COIN FLIP on the DFRandom stream, and it
+ *  The GENDER IS A COIN FLIP on the DFRandom stream, and it
  *  is drawn whichever way it lands. The talk MCP hardcoded Male, so
  *  the fallback stranger was never a woman AND the unspent draw left
  *  every later value on that stream shifted by one. `regionIndex` is
  *  PlayerGPS.CurrentRegionIndex; getNameBankOfRegion carries the -1
  *  guard verbatim. */
 export function getRandomFullName(regionIndex) {
-  const bank = getNameBankOfRegion(regionIndex ?? -1);
+  return getRandomFullNameOfBank(getNameBankOfRegion(regionIndex ?? -1));
+}
+/** The same draw from a bank in hand - a province past the Bay names its strangers from its own (world/
+ *  tamrielPeople.js), with the gender drawn exactly as getRandomFullName draws it. */
+export function getRandomFullNameOfBank(bank) {
   const gender = randomRangeInclusive(0, 1) === 1 ? GENDERS.Female : GENDERS.Male;
   return fullName(bank, gender);
 }
 
-/** Verbatim MapsFile.GetNameBankOfRegion. */
+/** Verbatim MapsFile.GetNameBankOfRegion - over REGION_NAME_BANKS, the Bay's its races (the same numbers) and a
+ *  province's its people's (Skyrim's the Nord bank, Cyrodiil's the Imperial). */
 export function getNameBankOfRegion(regionIndex) {
-  if (regionIndex > -1) return REGION_RACES[regionIndex];
+  if (regionIndex > -1) return REGION_NAME_BANKS[regionIndex];
   return BANK_TYPES.Breton;
 }
 
@@ -301,8 +318,8 @@ export function fullName(type, gender) {
   return last ? `${first} ${last}` : first;
 }
 
-/** NameHelper.MonsterName / GetRandomMonsterName, verbatim (S17 -
- *  quest-facing). bankRoll picks Monster1 (8) or Monster2 (9)
+/** NameHelper.MonsterName / GetRandomMonsterName, verbatim,
+ *  quest-facing. bankRoll picks Monster1 (8) or Monster2 (9)
  *  uniformly (DFU: UnityEngine.Random.Range(8, 10)); pass a bankType
  *  to force one (the Monster3 branch is ported whole even though the
  *  pick never returns it, exactly as GetRandomMonsterName carries

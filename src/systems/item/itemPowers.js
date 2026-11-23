@@ -1,5 +1,5 @@
 // @ts-check
-// MACRO-3 (2026-09-22, the macro audit): %mpw - an item's POWERS, the
+// MACRO-3: %mpw - an item's POWERS, the
 // line under "Item powers:" (TEXT.RSC 1016) in the classic inventory's
 // info box. DaggerfallUnityItemMCP.MagicPowers (:262-373) is the source,
 // and the port had none: the box printed "%mpw" under every enchanted

@@ -1,8 +1,5 @@
-// PORTAL1 - THE PORTAL STONE (2026-10-04, the owner: "with the removal of fast travel, I want to implement a new item
-// available at all shops, this should cost weykar shards (from dismantling gear with rarity). These should always be
-// readily available. When using this item, it opens a portal allowing you to traverse to anywhere on the map. This is a
-// one use item that stays open for a short time, allowing multiple players to traverse"), and AUDIT PORTAL1 (the owner:
-// "Audit this. It needs to be perfect"; bible/01-Overview/audits/Audit-PORTAL1.md). The laws pinned here:
+// PORTAL1 - THE PORTAL STONE, and AUDIT PORTAL1 (the owner:
+// "Audit this. It needs to be perfect"). The laws pinned here:
 //   - THE STONE: template 572 beside the Welkynd Shard - stacking with its own kind, BOUND (the realm's list names it),
 //     miscellany (never a crystal worn), lighter than the shards it costs.
 //   - THE COUNTER: PORTAL_STONE_SHARDS shards the purse may spend (unlocked, unworn) a stone, all or nothing,
@@ -145,8 +142,7 @@ test('PORTAL1 the counter: five shards the purse may spend for a stone - exactly
   assert.equal(PS.PORTAL_TEXT.row, 'Portal Stone (5 shards)');
 });
 
-// PORTAL-BULK (2026-10-24; the players, +7: "I hate that I have to buy portal shards one by one; it would be better to be
-// able to bulk buy them" - the owner: "No band aids"): ONE SALE LAW FOR ANY COUNT, AND THE COUNT ASKED AT THE COUNTER.
+// PORTAL-BULK: ONE SALE LAW FOR ANY COUNT, AND THE COUNT ASKED AT THE COUNTER.
 const lockedStones = (n) => { const s = portalStones(n); setLocked(s, true); return s; };
 test('PORTAL-BULK the law: n stones for exactly n prices, all or nothing - 5n-1 shards refuse n with nothing taken, the most is the shards\' floor; locked and worn shards neither counted nor spent; a count no whole number from 1 refused; one stone the same law', () => {
   for (const n of [1, 2, 3, 7]) {
@@ -400,10 +396,11 @@ test('PORTAL1 the wire: the opener says where it stands, the pixel and the time 
   const bad = [
     null, [], 'x', { ...w, i: '' }, { ...w, i: 'a b' }, { ...w, i: 'x'.repeat(25) }, { ...w, i: 7 },
     { ...w, p: [1, 2] }, { ...w, p: [1, NaN, 2] }, { ...w, p: [1e12, 0, 0] }, { ...w, p: [0, 0, 1e12] }, { ...w, p: [0, 1e9, 0] },
-    { ...w, d: [1.5, 2] }, { ...w, d: [-1, 2] }, { ...w, d: [2, -1] }, { ...w, d: [1000, 2] }, { ...w, d: [2, 500] }, { ...w, d: [2] },
+    { ...w, d: [1.5, 2] }, { ...w, d: [8192, 2] }, { ...w, d: [2, -8192] }, { ...w, d: [1e6, 2] }, { ...w, d: [2] },
     { ...w, r: 0 }, { ...w, r: -5 }, { ...w, r: PS.PORTAL_OPEN_MS + 1 }, { ...w, r: Infinity },
   ];
   for (const b of bad) assert.equal(PS.validPortalRecord(b), null, JSON.stringify(b));
+  for (const d of [[-1, 2], [2, -1], [1000, 2], [2, 500], [2177, 612], [1565, -434]]) assert.deepEqual(PS.validPortalRecord({ ...w, d }), { ...w, d }, `${d}: past the Bay too`);
   assert.deepEqual(PS.validPortalRecord({ ...w, r: PS.PORTAL_OPEN_MS, extra: 1 }), { ...w, r: PS.PORTAL_OPEN_MS }, 'projected: nothing else rides');
 });
 
@@ -536,8 +533,9 @@ test('PORTAL1 the pool, a peer\'s: believed only near its opener\'s own feet, na
   assert.equal(far.grounded, true);
 });
 
-test('PORTAL1 the door, the pick and the arrival, as world.js runs them: every refusal at the door in its order and again at the pick, the map in teleport mode with no fee, the black lifted only where the classic box made it, one stone spent on a placed portal, the frame owed full; the arrival black, off the frame, the following team around it, a failure lifting the black', async () => {
+test('PORTAL1 the door, the pick and the arrival, as world.js runs them (PIN MOVED, PORTAL-BAY: scenes/portalStoneHost.js, the module world.js wires): every refusal at the door in its order and again at the pick, the map in teleport mode with no fee, the black lifted only where the classic box made it, one stone spent on a placed portal, the frame owed full; the arrival black, off the frame, the following team around it, a failure lifting the black; AUDIT TESA II Z5: the open zone\'s teleport law at the door, the pick and every step (mutants: the door\'s zone unread; the pick\'s; the step\'s)', async () => {
   const w = read('src/scenes/world.js');
+  const sh = read('src/scenes/portalStoneHost.js');
   const fade = new FadeBehaviour();
   const said = [], overlays = [], built = [], arrivals = [];
   const f = hostFrame();
@@ -548,32 +546,33 @@ test('PORTAL1 the door, the pick and the arrival, as world.js runs them: every r
     playerEntity, player: { isPlayerSwimming: false, feetAt: () => [0, 0, 0] }, cam: { pos: [0, 1.6, 0], yaw: 0 },
     walkMode: true, playerSpawned: true, _modeNow: 'exterior', _teleporting: false, busy: false,
     duel: false, siege: false, enemies: false, journeyOn: false, boat: null,
-    PORTAL_TEXT: PS.PORTAL_TEXT, PORTAL_HOLD_TEXT: PS.PORTAL_HOLD_TEXT, portalHold: PS.portalHold, portalPlace: PS.portalPlace, portalStonePlace: PS.portalStonePlace, spendPortalStone: PS.spendPortalStone,   // PIN MOVED (RPT1026-EVENTS GATE-WAY): the pick asks the stone's place, off an event's gate's ground
+    PORTAL_TEXT: PS.PORTAL_TEXT, PORTAL_HOLD_TEXT: PS.PORTAL_HOLD_TEXT, portalHold: PS.portalHold, portalPlace: PS.portalPlace, portalStonePlace: PS.portalStonePlace, spendPortalStone: PS.spendPortalStone,
     travelView: { state: 'off' }, cityGuards: { guards: [] }, exteriorFoes: { foes: [] },
     collider: { surfaceHit: () => ({ dist: 1 }), raycastHit: () => null },
     hudFade: fade, surfacePlayer: () => {}, _foesFullAt: 0, console: { warn: () => {} },
     travelMapDoorReady: () => true,
     buildTravelMapWindow: (deps) => { const win = { deps, teleport: false, activateTeleportationTravel() { this.teleport = true; } }; built.push(win); return win; },
     isOnShip: () => false, playerTravelPixel: () => ({ x: 0, y: 0 }), hcc: [],
-    teleportTo: async (dest) => { arrivals.push(dest.name); scope.hcc.push('teleport'); if (dest.fail) throw new Error('no'); },
+    teleportTo: async (dest) => { arrivals.push(dest.name); scope.hcc.push('teleport'); if (dest.fail) throw new Error('no'); return true; },
   };
+  scope.host = scope;
   Object.assign(scope, {
-    madeRuleHere: (rule) => (scope.made ? madeLevelRule(scope.made, rule) : null),   // PIN MOVED (EG-H2, Elite-Gates.md section 24): the made level's law - none here unless a pin stands one
+    madeRuleHere: (rule) => (scope.made ? madeLevelRule(scope.made, rule) : null),
     _mode: () => scope._modeNow, worldMoveBusy: () => scope.busy, duelEnemyNear: () => scope.duel, inSiegeRoom: () => scope.siege,
     areEnemiesNearby: () => scope.enemies, navalHostileNear: () => false, csaBoatUnderMe: () => scope.boat,
     hccRuntimeOn: () => ({ handlePreFastTravel: () => scope.hcc.push('pre'), handlePostFastTravel: () => scope.hcc.push('post') }),
   });
   Object.defineProperty(scope, 'travelOptions', { get: () => ({ isTravelActive: scope.journeyOn }) });
   scope.portalGates = createPortalGates({ renderer: fakeRenderer(), now: () => 0, toScene: f.toScene, toWire: f.toWire });
-  scope.portalHoldNow = mount(scope, cut(w, 'const portalHoldNow = () => portalHold({', '\n  });\n'), 'portalHoldNow');
-  scope.portalDoorRefusal = mount(scope, cut(w, 'const portalDoorRefusal = () => {', '\n  };\n'), 'portalDoorRefusal');
-  // PIN MOVED (AUDIT CAPTAIN'S SEA P6): the door and the pick ask the Veil's refusal too - the world's own, mounted
+  scope.portalHoldNow = mount(scope, cut(sh, 'const portalHoldNow = () => portalHold({', '\n  });\n'), 'portalHoldNow');
+  scope.portalDoorRefusal = mount(scope, cut(sh, 'const portalDoorRefusal = () => {', '\n  };\n'), 'portalDoorRefusal');
   Object.assign(scope, { etherSea: true, inEther, here: { x: 0, y: 0 } });
   scope.playerTravelPixel = () => scope.here;
   scope.veilRefused = mount(scope, cut(w, 'const veilRefused = (to = null) => {', '\n  };\n'), 'veilRefused');
-  scope.standPortal = mount(scope, cut(w, 'function standPortal(pick, item, live) {', '\n  }\n'), 'standPortal');
-  const openPortalStone = mount(scope, cut(w, 'function openPortalStone(item, list) {', '\n  }\n'), 'openPortalStone');
-  const portalArrive = mount(scope, cut(w, 'function portalArrive(g) {', '\n  }\n'), 'portalArrive');
+  scope.teleportRefused = mount(scope, cut(sh, 'const teleportRefused = (to) =>', ';\n'), 'teleportRefused');
+  scope.standPortal = mount(scope, cut(sh, 'function standPortal(pick, item, live) {', '\n  }\n'), 'standPortal');
+  const openPortalStone = mount(scope, cut(sh, 'function openPortalStone(item, list) {', '\n  }\n'), 'openPortalStone');
+  const portalArrive = mount(scope, cut(sh, 'function portalArrive(g) {', '\n  }\n'), 'portalArrive');
   // THE DOOR, in its order
   const door = (set, want) => {
     const keep = Object.fromEntries(Object.keys(set).map((k) => [k, scope[k]]));
@@ -584,7 +583,7 @@ test('PORTAL1 the door, the pick and the arrival, as world.js runs them: every r
     Object.assign(scope, keep);
   };
   door({ _modeNow: 'interior', busy: true }, PS.PORTAL_TEXT.notHere);
-  door({ made: 'spire', busy: true }, PS.PORTAL_TEXT.notHere);   // EG-H2: never in a made level, whatever the mode says
+  door({ made: 'hour', busy: true }, PS.PORTAL_TEXT.notHere);   // EG-H2: never in a made level, whatever the mode says (
   door({ busy: true, duel: true }, PS.PORTAL_HOLD_TEXT.busy);
   door({ _teleporting: true }, PS.PORTAL_HOLD_TEXT.busy);
   door({ duel: true, siege: true }, PS.PORTAL_HOLD_TEXT.duel);
@@ -655,6 +654,7 @@ test('PORTAL1 the door, the pick and the arrival, as world.js runs them: every r
   portalArrive({ dest: { name: 'Wayrest' } });
   await new Promise((res) => setTimeout(res, 0));
   assert.deepEqual([arrivals.length, fresh.backgroundColor[3]], [2, 0], 'a move already under way: no arrival, no black left');
+  scope.busy = false;
 });
 
 test('PORTAL1 the counter\'s row on the classic popups: under the art, drawn in the Reforge row\'s dark with its label, its key P, the popup closed before the sale asks - no hook, no row; the panels\' button', () => {
@@ -694,7 +694,6 @@ test('PORTAL1 the counter\'s row on the classic popups: under the art, drawn in 
 
 test('PORTAL1 the hosts: every shop\'s keeper sells it (a teller and a mod\'s service never), its popup out of the slot before the question, a short purse told at once; the open world opens, draws, steps and forgets; says and hears it on the foes frame; every load ends it; a building\'s pack refuses in words, the dungeon\'s has no door and the street says its own', () => {
   const wm = read('src/scenes/worldModes.js');
-  // PIN MOVED (APPEARANCES): the row and its counter left the host for scenes/shopRows.js with the Wardrobe's - every shop
   // a row, every other building none, and its press the counter's question, driven
   const said = [];
   const rows = createShopRows({ say: (l) => said.push(l), mountInterior: () => {}, mountService: () => {} });
@@ -705,9 +704,7 @@ test('PORTAL1 the hosts: every shop\'s keeper sells it (a teller and a mod\'s se
   assert.match(wm, /onSell: \(\) => openMerchantSell\(\),\n\s+\.\.\.shopRows\.of\(interiorBuilding\?\.buildingType\),/, 'the repair shop\'s popup');
   assert.match(wm, /\.\.\.\(banking \|\| custom \? \{\} : shopRows\.of\(interiorBuilding\?\.buildingType\)\),/, 'the plain shop\'s - never a bank\'s or a mod\'s service');
   assert.match(wm, /onClose\(\) \{ if \(interiorOverlay\?\.hooks === this\) interiorOverlay = null; \},\n\s+\}\)\);/, 'AUDIT PORTAL1 C1: the plain popup leaves the slot as the repair one does');
-  // PIN MOVED (PORTAL-BULK): the question and the sale left the host for scenes/portalCounter.js - the host builds it
   // once, its slot's door handed live (mountInterior is declared below the construction), and asks nothing itself
-  // PIN MOVED (APPEARANCES): built by scenes/shopRows.js, which the host builds once with the same live door
   assert.match(wm, /const shopRows = createShopRows\(\{ say: \(l\) => say\(l\), mountInterior: \(w\) => mountInterior\(w\), mountService: mountServiceWindow \}\);/);
   assert.match(read('src/scenes/shopRows.js'), /const portalCounter = createPortalCounter\(\{ say, mount: mountInterior \}\);/);
   assert.doesNotMatch(wm, /askPortalStone|buyPortalStoneNow|buyPortalStones?\(/, 'no second sale in the host');
@@ -718,14 +715,14 @@ test('PORTAL1 the hosts: every shop\'s keeper sells it (a teller and a mod\'s se
   const doors = cut(w, '  const packDoors = {', '\n  };\n');
   assert.match(doors, /openPortal: \(item, list\) => openPortalStone\(item, list\),/, 'the pack\'s door (the interior\'s pack is this host\'s)');
   assert.match(w, /onEnter: \(g\) => portalArrive\(g\),\n\s+onRefused: \(hold\) => townTalk\.say\(PORTAL_HOLD_TEXT\[hold\]\),/);
-  assert.match(w, /destOf: \(x, y\) => \{\n\s+const s = travelLocationSummaryAt\(mapDict, x, y\);\n\s+const loc = s \? maps\.getLocation\(s\.regionIndex, s\.mapIndex\) : null;\n\s+return loc\?\.name \? \{ pixel: \{ x, y \}, name: loc\.name \} : null;/, 'a destination named off this map, a nameless one refused');
+  assert.match(w, /destOf: \(x, y\) => \{\n[\s\S]{0,900}?\n\s+const s = travelLocationSummaryAt\(mapDict, x, y\);\n\s+const loc = s \? maps\.getLocation\(s\.regionIndex, s\.mapIndex\) : null;\n\s+return loc\?\.name \? \{ pixel: \{ x, y \}, name: loc\.name \} : null;/, 'a destination named off this map, a nameless one refused');
   assert.match(w, /if \(cell\) \{ const rk = raidWireWord\(\), ro = raidObjWord\(\); if \(rk\) frame\.rk = rk; if \(ro\) frame\.ro = ro; \} if \(cell\) portalWord\(frame, full\);/, 'my portal on my foes frame, the line\'s last word (PIN MOVED, RAID5: the raids\' objective word beside theirs)');
   assert.match(w, /const portalWord = \(frame, full\) => \{\n\s+if \(!full\) return;\n\s+const pg = portalGates\.wireRecord\(walkMode && playerSpawned \? player\.feetAt\(\) : cam\.pos\);[^\n]*\n\s+if \(pg\) frame\.pg = pg;/, '...on every full frame, near it, in the scene\'s metres');
   assert.match(w, /exteriorFoes\.setOnPortals\(\(from, r\) => \{ const p = online\?\.peers\?\.get\(from\); portalGates\.applyOwner\(from, r, p\?\.shown \? onlineToScene\(p\.shown\) : null\); \}\);/, 'a peer\'s, with the peer\'s own feet');
   assert.match(w, /portalGates\.tick\(_mode\(\) === 'exterior' && walkMode && playerSpawned \? player\.feetAt\(\) : null, \{ hold: portalHoldNow \}\);/);
   assert.match(w, /if \(_mode\(\) === 'exterior'\) livePersonBatches\.push\(\.\.\.portalGates\.batches\(\)\);/);
   assert.match(w, /if \(_mode\(\) !== _torchesMode\) \{ droppedTorches\.destroyAll\(\);[^\n]* portalGates\.forgetSteps\(\); _torchesMode = _mode\(\); \}/, 'the step forgotten at every change of place');
-  assert.match(w, /if \(restoresSoFar\(\) !== _portalRestores\) \{ _portalRestores = restoresSoFar\(\); portalGates\.clear\(\);[^\n]*\n\s+if \(_bootLoaded\)[^\n]*\n\s+if \(_mode\(\) !== _torchesMode\)/, 'AUDIT PORTAL1 U9: a load ends every portal - asked at the one door every load passes, before the frame turns indoors');   // PIN MOVED (AUDIT LW-II-2 D2): the one door lets the deep's layers go too, after the portals
+  assert.match(w, /if \(restoresSoFar\(\) !== _portalRestores\) \{ _portalRestores = restoresSoFar\(\); portalGates\.clear\(\);[^\n]*\n\s+if \(_mode\(\) !== _torchesMode\)/, 'AUDIT PORTAL1 U9: a load ends every portal - asked at the one door every load passes, before the frame turns indoors');
   assert.ok(w.indexOf('if (restoresSoFar() !== _portalRestores)') < w.indexOf('if (modes.frame(dt, now)) {'), '...above the indoor return');
   const save = read('src/systems/save/save.js');
   assert.match(save, /return null;\n\s+\}\n\s+_restores\+\+;/, 'the count moves for a load that lands, never for a refused one');

@@ -1,8 +1,7 @@
 // @ts-check
-// NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass. The node itself should
-// also stand out with a detailed slight glow or something"): A NODE'S GLOW - a gathering node standing near the player
+// NODE-MARKS: A NODE'S GLOW - a gathering node standing near the player
 // (scenes/gatherHost.js marks) lit softly in its profession's colour (ui/nodeMarks.js - the colour its compass mark wears),
-// so the eye finds what the compass points at. It lit every node until NODE-OUTLINE (2026-10-19); since then a node with
+// so the eye finds what the compass points at. It lit every node until NODE-OUTLINE; since then a node with
 // a picture is lit on that picture (render/nodeGlint.js - NODE-GLINT's glints since 2026-10-20), and the glow lights a node
 // with none (a body drawn as a 3D character) and SENSE1's finds (systems/dungeon/dungeonSense.js).
 //
@@ -22,7 +21,7 @@
 // focus when one is set; every rate a whole number of cycles over the wrapped clock (NODE_GLOW_PERIOD), so the picture
 // at the wrap is the picture at zero. Pure where it can be: `nodeGlows` (who is drawn, how bright) and `nodeGlowClock`.
 //
-// AUDIT NODE-MARKS (Mac: "Audit this"): UNDER REDUCED MOTION IT STANDS STILL - the halo steady, no shimmer, the motes
+// AUDIT NODE-MARKS: UNDER REDUCED MOTION IT STANDS STILL - the halo steady, no shimmer, the motes
 // held where they are (`uStill`), the professions' own law (ui/professions/profHud.js: every act has a still form); its program is
 // built at idle once a node is first marked, never on the frame that first lights one (PERF-WARM's law); and a pass that
 // ran is a foreign pass whatever it drew.

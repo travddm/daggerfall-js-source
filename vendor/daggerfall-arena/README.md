@@ -3,7 +3,7 @@
 **"Daggerfall Arena" 1.0 by Kamer** (Daggerfall Unity mod, GUID `0a802a1a-5e27-4266-84ee-8625ebf50d9d`, contact
 "DFU Discord"; `daggerfall_arena.rar`, one bundle `daggerfall arena.dfmod`, 255,947 bytes, sha256
 `6bb08b9b...76b13`, Unity 2019.4.40f1), carried as data for the port's Arena of Daggerfall
-(`bible/11-Multiplayer/Arena.md`, slice ARENA1).
+(`docs/formats/mods-and-vendor.md`).
 
 **Permission: granted by the author, relayed by Mac 2026-10-02.** As with his Windmills of Daggerfall
 (`vendor/windmills-kamer/README.md`), the invitation is what makes his work admissible here.

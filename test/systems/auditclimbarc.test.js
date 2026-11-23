@@ -1,4 +1,4 @@
-// AUDIT CLIMB-ARC (the Enhanced Climbing arc's audit - bible/03-World/Parkour-Arc.md): THE PINS. One law a finding, each
+// AUDIT CLIMB-ARC (the Enhanced Climbing arc's audit): THE PINS. One law a finding, each
 // asked of the REAL producers (PlayerMotor over a Collider and parkour.js, ClimbFeel and its host, the look filter,
 // PeerClimbSounds, the weapon rig) - the shape the producer mints, never a literal of it - and each red on the PR head
 // before the audit's fixes (d92a75a13) and green after them; the source pins hold the hosts' wiring, which no unit test
@@ -135,7 +135,7 @@ test('AUDIT CLIMB-ARC F2/F4: a held frame replays no climb - holdFrame clears th
   assert.equal(shots.length, before, 'an overlay up after a catch replays no catch');
   // the hosts: the feel is held exactly when the motor is
   const world_ = src('scenes/world.js'), ext = src('scenes/exterior.js'), modes = src('scenes/worldModes.js');
-  assert.match(world_, /if \(_overlayHeld \|\| _seasonHeld \|\| _rideHeld\) player\.holdFrame\(\);/);   // PIN MOVED (WAGONS1): a rider's held motor too
+  assert.match(world_, /if \(_overlayHeld \|\| _seasonHeld \|\| _rideHeld\) player\.holdFrame\(\);/);
   assert.match(world_, /climbFeel\.frame\(dt, _overlayHeld \|\| _seasonHeld\);/, 'world.js: held under the overlay and the season');
   assert.match(ext, /if \(_overlayHeld\) player\.holdFrame\(\);/);
   assert.match(ext, /climbFeel\.frame\(dt, _overlayHeld\);/, 'exterior.js: held under the overlay');
@@ -351,8 +351,6 @@ test('AUDIT CLIMB-ARC F10/F11: the dungeons aim with the view before the climb\'
   const body = draw.slice(0, draw.indexOf('\n  }\n'));
   assert.match(body, /_fpYaw = Math\.atan2\(-aimed\[2\], -aimed\[10\]\);/);
   assert.match(body, /_fpPitch = Math\.asin\(Math\.max\(-1, Math\.min\(1, -aimed\[6\]\)\)\);/);
-  // PIN MOVED (AUDIT SPELL-HAND L4-6): the door also hears the host's window (`held`) - a press kept never leaves beneath one
-  // PIN MOVED (RPT1026-FIGHTS WINDOW-ONLINE, scenes/windowWorld.js): online the dungeon's frame runs under its own window, which holds the kept press too
   assert.match(body, /magic\.firePending\(eye, \[-aimed\[2\], -aimed\[6\], -aimed\[10\]\], !!opts\.breathHeld\?\.\(\) \|\| dungeonPaused\(\)\)/);
   assert.match(body, /audio\.setListener\(eye, \[-aimed\[2\], -aimed\[6\], -aimed\[10\]\]\)/);
   assert.match(body, /resolvePlayerHit\(eye, inView, playerFeet, \[-aimed\[2\], -aimed\[6\], -aimed\[10\]\]\)/);

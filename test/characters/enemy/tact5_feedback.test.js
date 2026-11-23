@@ -1,4 +1,4 @@
-// TACT5 - THE FIRST FIELD REPORT ON THE TACTICS BRAIN (bible/12-Enhanced-AI/Tactics-Arc.md, 2026-10-02 - lumin: "New
+// TACT5 - THE FIRST FIELD REPORT ON THE TACTICS BRAIN (, 2026-10-02 - lumin: "New
 // monster AI is painful... a little too hard. The archers that just keep kiting you in a circle"; maya: "They keep
 // walking backwards"). Driven on the REAL motor and attack component over the real collider, on the brain's own clock,
 // with a player who CHASES - the case the TACT2 pins never drove (their player stood still): a waiting foe walked up to

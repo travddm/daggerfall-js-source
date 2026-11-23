@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E2 (2026-09-25): ILIAC PUDDLE NO MORE'S SEAFLOOR DECORATIONS -
+// DW-E2: ILIAC PUDDLE NO MORE'S SEAFLOOR DECORATIONS -
 // UnderwaterDecorationCatalog.cs, UnderwaterDecorations.cs and the
 // placement half of UnderwaterDecorationBatchFactory.cs (jet082, 1.2.2).
 //

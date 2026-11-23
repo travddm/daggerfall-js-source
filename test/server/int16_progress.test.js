@@ -1,5 +1,4 @@
-// INT16-INT17 (2026-10-17, the INTEGRITY arc's lane 4 - bible/06-Systems/Integrity-Arc.md section 7; the owner: "Take care
-// of the integrity arc", then, asked, "Measure first"): PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT
+// INT16-INT17: PROGRESSION CLAIMS - THE SEAT THEY ARE ASKED OF, AND THE PLAY THAT
 // PAYS FOR THEM (server-account/src/progress.js).
 //   - INT16: every claim (Renown, a raid's cleanse, a camp, the Watch, a silver find, a profession's XP) is the account's
 //     SEATED realm character's - an offline id, another character of the account, a seat another device took and a held
@@ -24,7 +23,6 @@ import { RENOWN_XP_HOUR_MAX } from '../../src/net/renown.js';
 import { WATCH_DAY_CAP, BOUNTY_CAMPS_DAY } from '../../src/net/townSeatLaw.js';
 import { WATCH_TICK_MS } from '../../src/net/watchReceipt.js';
 import { MARKS_FAUCETS } from '../../src/net/marksLaw.js';
-import { TIDE_EFFECTS } from '../../src/net/tideLaw.js';
 import { writXp } from '../../src/net/professionLaw.js';
 import { REFUSALS } from '../../src/net/accountClient.js';
 import { FIND_DROPS } from '../../src/net/marksBook.js';
@@ -33,13 +31,12 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 
 test('INT17: the first line - each stream a clock cap of today read per hour of play (a raid\'s game day two real hours, a Watch tick each two minutes), the professions a guess; measuring, never enforced', () => {
   assert.equal(PROGRESS_LINE.enforce, false, 'MEASURE first (the owner, asked)');
-  assert.deepEqual(PROGRESS_STREAMS, ['renown', 'raid', 'bounty', 'camp', 'watch', 'find', 'gather', 'prof']);
+  assert.deepEqual(PROGRESS_STREAMS, ['renown', 'raid', 'bounty', 'watch', 'find', 'gather', 'prof']);
   assert.equal(GAME_DAY_REAL_HOURS, 2, 'the raid line reads a game day as two real hours');
   assert.deepEqual(PROGRESS_LINE.streams, {
     renown: { rate: RENOWN_XP_HOUR_MAX, cap: RENOWN_XP_HOUR_MAX },
     raid: { rate: RAID_CLAIMS_DAY_MAX / GAME_DAY_REAL_HOURS, cap: RAID_CLAIMS_DAY_MAX },
     bounty: { rate: BOUNTY_CAMPS_DAY, cap: BOUNTY_CAMPS_DAY },
-    camp: { rate: TIDE_EFFECTS.orcsCampsDay, cap: TIDE_EFFECTS.orcsCampsDay },
     watch: { rate: 3_600_000 / WATCH_TICK_MS, cap: WATCH_DAY_CAP },
     find: { rate: MARKS_FAUCETS.find.perDay, cap: MARKS_FAUCETS.find.perDay },
     gather: { rate: MARKS_FAUCETS.gather.perDay, cap: MARKS_FAUCETS.gather.perDay },
@@ -64,8 +61,6 @@ test('INT17: what an answer spent - Renown credited (never asked), a cleanse and
   assert.deepEqual(progressSpentOf('/v1/raid/claim', { recorded: false, why: 'day-full' }), []);
   assert.deepEqual(progressSpentOf('/v1/seats/bounty', { ok: true, paid: 20 }), [['bounty', 1]]);
   assert.deepEqual(progressSpentOf('/v1/seats/bounty', { ok: true, paid: 0, why: 'claimed' }), []);
-  assert.deepEqual(progressSpentOf('/v1/seats/orc-camp', { ok: true, counted: true }), [['camp', 1]]);
-  assert.deepEqual(progressSpentOf('/v1/seats/orc-camp', { ok: true, counted: false }), []);
   assert.deepEqual(progressSpentOf('/v1/seats/watch', { ok: true, counted: 7 }), [['watch', 7]]);
   assert.deepEqual(progressSpentOf('/v1/marks/find', { ok: true, struck: 3 }), [['find', 1]]);
   assert.deepEqual(progressSpentOf('/v1/marks/find', { ok: true, struck: 0, why: 'cap' }), []);
@@ -80,7 +75,7 @@ async function stand(extra = {}) {
   let now = T0;
   const realNow = Date.now;
   Date.now = () => now * 1000;
-  const s = await standService({ DEVELOPER_HANDLES: 'mac', ...extra });
+  const s = await standService({ SEAT_ADMINS: 'mac', ...extra });
   const raw = s.env.DB._raw;
   const eve = await s.seated('eve');
   const play = (seconds) => { raw.prepare('UPDATE players SET played_s = played_s + ? WHERE id = ?').run(seconds, eve.id); now += seconds; };
@@ -224,16 +219,6 @@ test('INT17: the bucket in units - a count stream refused at less than one; the 
 });
 
 test('INT16-INT17 clients: a refused seat or hold ends the Renown tracker\'s asking for the page, drops the day\'s finds and the Watch\'s ticks; an enforced line keeps a harvest to ask again; the words are said', () => {
-  assert.match(src('src/net/renownTracker.js'), /const PERMANENT = new Set\(\['renown-character', 'renown-xp', 'renown-full', 'progress-seat', 'trade-held'\]\);/);
   assert.deepEqual(FIND_DROPS, ['marks-young', 'progress-seat', 'trade-held']);
-  assert.match(src('src/net/marksBook.js'), /\} else if \(error === 'marks-rate' \|\| error === 'progress-play'\) \{/);
-  assert.match(src('src/net/townSeatBook.js'), /const WATCH_SETTLED = Object\.freeze\(\['bad-watch', 'seats-need-account', 'seats-closed', 'progress-seat', 'trade-held'\]\);/);
-  // PIN MOVED (AUDIT GATHER F1, Professions-Arc.md section 55): and a CARRIED harvest the seat refuses is kept - it may have
-  // landed with its answer lost (test/systems/auditgather.test.js)
-  // AUDIT LOCKPICK D1: and only once an earlier ask went unanswered - refused on its first ask it never landed
-  assert.match(src('src/net/profBook.js'), /const seatHeld = h\.carry === true && SEAT_REFUSALS\.includes\(r\?\.error\) && \(h\.tries \| 0\) > 0;\n\s*if \(keptAnswer\(r\) \|\| r\?\.error === 'prof-rate' \|\| r\?\.error === 'progress-play' \|\| seatHeld\) \{/);
   for (const k of ['progress-seat', 'progress-play', 'trade-held']) assert.equal(typeof REFUSALS[k], 'string', k);
-  // PIN MOVED (PRIMARY-FOLD, Scale-Arc.md THE PLAN PAST 1,000): the seat is the door's one statement's read (door.js doorReads), judged by progressRefusal's own law
-  // PIN MOVED (AUDIT PLAN-1000 F1): the seat the door read - or, a window turned between the rate's peek and its count, read then
-  assert.match(src('server-account/src/index.js'), /const read = door\.seat === undefined \? await doorReads\(db, who\.player\.id, \{ tomb: null, stream \}\) : door;\n\s+const seat = seatRefusalOf\(read\.seat, \{ named, character: body\.character \}\);[^\n]*\n\s+if \(seat\) return json\(seat, 403, origin\);/);
 });

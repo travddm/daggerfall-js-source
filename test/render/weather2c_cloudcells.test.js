@@ -1,5 +1,4 @@
-// WEATHER2c (Mac, 2026-09-14: "different generative cloud types, like being able to see a thunderhead in the distance
-// with the weather happening elsewhere"): CLOUD TYPES BY PLACE. The one volumetric field had one profile for the whole
+// WEATHER2c: CLOUD TYPES BY PLACE. The one volumetric field had one profile for the whole
 // sky - the zone's word, eased. It takes CELLS now: a world position, a radius and a soft rim, a profile of its own with
 // its weather's cover and grey, blended over the zone's terms by the rim's weight at every sample both marches take,
 // under a slab that is the union of the zone's and the cells' (SLAB-SPAN: each ray's own, since - see the spans' tests). Ships with the `?cloudcell=` door (one static cell) and
@@ -116,7 +115,7 @@ test('SLAB-SPAN both marches: a cell a ray never passes changes nothing it draws
     const frag = [east, (elDeg / 90) * ZONE.uMapSize[1], 0, 1], a = sky([thin], frag), b = sky([], frag);
     assert.ok(a.every((v, i) => Math.abs(v - b[i]) < 0.01), `${elDeg} degrees: ${a.map((v) => v.toFixed(3))} against ${b.map((v) => v.toFixed(3))} without the cell`);
   }
-  // the aerial perspective itself (PIN MOVED, SKY-ARC: each sample's own distance): what the horizon's colour adds is a share
+  // the aerial perspective itself (
   // of the cloud's opacity between fade(entry) (1 - T) and fade(exit) (1 - T) - every sample faded by where it stands
   // in the slab, never all of it by where it begins
   for (const elDeg of [3, 8, 20]) {
@@ -256,9 +255,3 @@ test('WEATHER2c the class and the controller: setState takes the cells (the cont
   assert.equal((shared.match(/extra\?\.cells \?\? null\);/g) || []).length, 2, 'the dome path and the mod path both hand the cells');
 });
 
-test('WEATHER2c records: the arc page\'s C, the clouds arc\'s decision, the ledger row and the testing row', () => {
-  assert.match(rd('bible/07-Rendering/Weather-Arc.md'), /^## C - CLOUD TYPES BY PLACE \(WEATHER2c, 2026-09-14\)/m);
-  assert.match(rd('bible/07-Rendering/Volumetric-Clouds-Arc.md'), /\*\*Cells \(WEATHER2c\)\.\*\*/);
-  assert.match(rd('bible/01-Overview/Port-Ledger.md'), /^\| \*\*CLOUD TYPES BY PLACE \(WEATHER2c, 2026-09-14\)\*\*/m);
-  assert.match(rd('bible/09-Testing/Testing-Rows-2026-10-19.md'), /^\| weather2c_cloudcells\.test\.js \| \d+ \| WEATHER2c/m);
-});

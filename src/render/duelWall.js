@@ -1,6 +1,5 @@
 // @ts-check
-// DUEL1 (2026-09-24, Mac: "...traps both players in a surrounding transparent holographic wall that keeps them from
-// going outside of the duel space"): THE RING'S WALL, DRAWN.
+// DUEL1: THE RING'S WALL, DRAWN.
 //
 // A cylinder of light around a duel's ring (net/duel/duelSession.js DUEL_RADIUS_M): a faint tint, a grid of thin lines
 // around it, bands of light rising up it and one bright sweep climbing it every few seconds, fading out toward its
@@ -88,10 +87,13 @@ void main() {
   float lines = lineOf(vUV.x * ${DUEL_WALL_LINES}.0, 0.035);
   float bands = lineOf(h * ${DUEL_WALL_BANDS}.0 - uTime * ${DUEL_WALL_CLIMB_HZ.toFixed(2)}, 0.06);
   float s = fract(uTime * ${DUEL_WALL_SWEEP_HZ.toFixed(2)}) * 1.2 - 0.1;
-  float sweep = exp(-pow((h - s) * 14.0, 2.0));
+  // squared by hand: pow() of a negative base is undefined in GLSL
+  float fromSweep = (h - s) * 14.0;
+  float sweep = exp(-fromSweep * fromSweep);
   float shimmer = 0.85 + 0.15 * sin(uTime * 6.283185307179586 * ${DUEL_WALL_SHIMMER_HZ.toFixed(2)} + vUV.x * 6.283185307179586 * ${DUEL_WALL_SHIMMER_WAVES}.0);
   // brightest where it meets the ground, gone toward the top
-  float foot = 1.0 + 0.8 * exp(-pow((h - uBelow) * 18.0, 2.0));
+  float fromFoot = (h - uBelow) * 18.0;
+  float foot = 1.0 + 0.8 * exp(-fromFoot * fromFoot);
   float top = 1.0 - smoothstep(0.5, 1.0, h);
   float light = (0.07 + 0.45 * lines + 0.22 * bands + 0.55 * sweep) * foot * top * shimmer;
   o = vec4(dwWaterFogAdd(uColor * light * uAlpha * fogFactorAt(vWorld), vWorld), 1.0);   // DW-C: an added glow's share of the carved sea's distance fog

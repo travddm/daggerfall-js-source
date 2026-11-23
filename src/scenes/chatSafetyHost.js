@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// SAFE1-SAFE7 (2026-10-17, Mac: "Lets do every single thing here. I want a full fledged future proof system"; the chat
-// safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md): THE CHAT'S SAFETY, AS THE PLAYER MEETS IT - a module the
+// SAFE1-SAFE7: THE CHAT'S SAFETY, AS THE PLAYER MEETS IT - a module the
 // streaming host wires (scenes/world.js bootWorld; fishHost.js is the shape - HOST-SPLIT: the host does not grow).
 //
 //   - SAFE1 BLOCK: the account's block list, read from the service at the chat's start and kept there; a blocked
@@ -54,7 +52,7 @@ export const BLOCKS_RETRY_MAX_MS = 5 * 60_000;
 export const BLOCKS_REREAD_MS = 30_000;
 
 /**
- * AUDIT SAFE CLIENT-3 / DOC-6 + CLIENT-13 (2026-10-17): A NAME THAT NAMES NOBODY, OR MORE THAN ONE, IN EACH COMMAND'S OWN
+ * AUDIT SAFE CLIENT-3 / DOC-6 + CLIENT-13: A NAME THAT NAMES NOBODY, OR MORE THAN ONE, IN EACH COMMAND'S OWN
  * WORDS. These read MOD1's ("Nobody was muted") for a block and a report; a moderator's look falls through to the
  * service by the name (it decides), except where the name is two accounts here - then the account is named by its id.
  */
@@ -99,21 +97,18 @@ const verdictText = (ai) => (ai && typeof ai === 'object'
   : '');
 
 /**
- * STAFF-PANEL2-CHATMENU (2026-10-22, mob: "remove the report buttons iunch for admin and mods as well", "chat they arnt
- * usefu for us", "replace them follow mute freeze tp ban and other things we use for players", "in chat"): THE ACTS A
+ * STAFF-PANEL2-CHATMENU: THE ACTS A
  * STAFF MEMBER'S CHAT LINE MENU OFFERS IN PLACE OF REPORT, by their own glyphs as the service last issued them - the
- * design's in-game card. An Admin is a Developer (`dev`): Follow, TP, Message, Mute, Freeze, Ban, Notes, Watch. A
- * Moderator wears the shield (`mod`) or Shadow Fang (`shadowfang`, which moderates - server-account titles.js
- * MOD_TIERS): the same less TP and Freeze, and Shadow Fang keeps the TP its staff commands already give it (TP is
- * "Admin and Shadow Fang only"). Anyone else, a Dungeon Master included: none, and Report stays. The rows only open a
+ * design's in-game card. An Admin is a Developer (`dev`): TP, Message, Mute, Freeze, Ban, Notes, Watch. A
+ * Moderator wears the shield (`mod`): the same less TP and Freeze. Anyone else, a Dungeon Master included: none, and Report stays. The rows only open a
  * door: the account service, the relay and the Staff Panel each check the role again.
  * @param {unknown} glyphs @returns {string[]}
  */
 export function staffLineActs(glyphs) {
   const g = Array.isArray(glyphs) ? glyphs : [];
-  const admin = g.includes('dev'), fang = g.includes('shadowfang');
-  if (!admin && !fang && !g.includes('mod')) return [];
-  return ['follow', ...(admin || fang ? ['tp'] : []), 'message', 'mute', ...(admin ? ['freeze'] : []), 'ban', 'notes', 'watch'];
+  const admin = g.includes('dev');
+  if (!admin && !g.includes('mod')) return [];
+  return [...(admin ? ['tp'] : []), 'message', 'mute', ...(admin ? ['freeze'] : []), 'ban', 'notes', 'watch'];
 }
 /** STAFF-PANEL2-CHATMENU: a line menu's mute lengths, minutes (30 min, 1 h, 1 day, 7 days - MOD1's bound, MUTE_MAX_MIN). */
 export const STAFF_MUTE_MINUTES = Object.freeze([30, 60, 24 * 60, 7 * 24 * 60]);
@@ -122,7 +117,7 @@ export const STAFF_BAN_DAYS = Object.freeze([1, 7, 30, 0]);
 /** STAFF-PANEL2-CHATMENU: the acts the player can see happen to them (TP: design, "the player can see this"). */
 const STAFF_SEEN = Object.freeze(['tp', 'message', 'mute', 'freeze', 'ban']);
 const STAFF_LABEL = Object.freeze({
-  follow: () => t('net.staffMenu.follow', 'Follow'), tp: () => t('net.staffMenu.tp', 'TP'), message: () => t('net.staffMenu.message', 'Message on screen'),
+  tp: () => t('net.staffMenu.tp', 'TP'), message: () => t('net.staffMenu.message', 'Message on screen'),
   mute: () => t('net.staffMenu.mute', 'Mute…'), freeze: () => t('net.staffMenu.freeze', 'Freeze'), ban: () => t('net.staffMenu.ban', 'Ban…'),
   notes: () => t('net.staffMenu.notes', 'Notes'), watch: () => t('net.staffMenu.watch', 'Watch'),
 });
@@ -141,8 +136,6 @@ const spanText = (min) => (min === 0 ? t('net.staffMenu.forGood', 'For good')
  * @param {() => any} [o.panel]  AUDIT SAFE CLIENT-12: the chat panel (ui/chatPanel.js), or null
  * @param {() => unknown} [o.glyphs]  STAFF-PANEL2-CHATMENU: my own glyphs as the service last issued them (world.js
  *   _staffGlyphs) - an Admin's or a Moderator's line menu carries their acts in place of Report (staffLineActs)
- * @param {() => ((sub: string) => unknown) | null} [o.follow]  STAFF-PANEL2-CHATMENU: the game staff hook's follow
- *   (net/staffHook.js), or null - no hook, no Follow row
  * @param {((id: string) => void) | null} [o.teleport]  STAFF-PANEL2-CHATMENU: /tp to a player's socket id (world.js
  *   runStaffCommand), or null - none, no TP row
  * @param {boolean} [o.touch]
@@ -155,7 +148,7 @@ const spanText = (min) => (min === 0 ? t('net.staffMenu.forGood', 'For good')
  * @param {(fn: () => void, ms: number) => any} [o.setTimer]  AUDIT SAFE CLIENT-8: the block list's retry clock
  * @param {(h: any) => void} [o.clearTimer]
  */
-export function createChatSafetyHost({ log, links, social = () => null, minter = () => null, panel = () => null, glyphs = () => [], follow = () => null, teleport = null, touch = isTouchDevice(), doc = globalThis.document, win = globalThis, register = registerOverlay,
+export function createChatSafetyHost({ log, links, social = () => null, minter = () => null, panel = () => null, glyphs = () => [], teleport = null, touch = isTouchDevice(), doc = globalThis.document, win = globalThis, register = registerOverlay,
   fetch = (u, i) => globalThis.fetch(u, i), storage = null, now = () => Date.now(), setTimer = (fn, ms) => setTimeout(fn, ms), clearTimer = (h) => clearTimeout(h) }) {
   /** @type {Map<string, string>} sub -> the name it was blocked under (the service's: the account's own) */
   const blocked = new Map();
@@ -217,7 +210,7 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
   };
 
   /**
-   * A NAME TO THE ONE ACCOUNT IT NAMES. AUDIT SAFE CLIENT-3 / DOC-6 (2026-10-17): the players this page holds AND the
+   * A NAME TO THE ONE ACCOUNT IT NAMES. AUDIT SAFE CLIENT-3 / DOC-6: the players this page holds AND the
    * lines it heard, together - the rooms' peers were asked first and one match there won at once, so "/block Bob" blocked
    * the Bob standing in my region and not the Bob who said it on World; and past a peers' ambiguity the heard lines picked
    * one. Two accounts of one name, anywhere this page can see, is a refusal - never a guess (section 2's own law).
@@ -277,7 +270,7 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
       : t('net.safety.reported', 'Reported {name}. The moderators will see it. /block {name} hides them from you now.', { name }));
   };
 
-  /** AUDIT SAFE CLIENT-8 (2026-10-17): THE BLOCK LIST, READ - and read again. A read that failed at the chat's start (the
+  /** AUDIT SAFE CLIENT-8: THE BLOCK LIST, READ - and read again. A read that failed at the chat's start (the
    *  service's bad minute) was never asked again, so every account the player had blocked was heard for the rest of the
    *  page. A failure asks again after BLOCKS_RETRY_MS, doubling to BLOCKS_RETRY_MAX_MS; a room welcomed again reads it
    *  again (`onWelcomed` - another device may have blocked since), no oftener than BLOCKS_REREAD_MS. One read at a time.
@@ -300,7 +293,7 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
     return reading;
   };
 
-  /** AUDIT SAFE CLIENT-2 (2026-10-17): THE PAGE IS BANNED - every room it holds left and LATCHED (OnlineSession.bar: no
+  /** AUDIT SAFE CLIENT-2: THE PAGE IS BANNED - every room it holds left and LATCHED (OnlineSession.bar: no
    *  join, rejoin or retry - world.js chatFrame's rejoin brought every channel straight back on CHAT_REJOIN_MS), the token
    *  the minter holds let go (a token minted a moment before the ban opened every room a rejoin asked for), and the ban
    *  said ONCE however many sockets say it. The relay sends the ban's order (`law`) first, so it is carried before this
@@ -355,7 +348,7 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
     showCard(tabId);
     return true;
   };
-  /** AUDIT SAFE CLIENT-13 (2026-10-17): EVERY LINE A ROOM IS ASKED TO CARRY PASSES THE CODE OF CONDUCT'S GATE - each
+  /** AUDIT SAFE CLIENT-13: EVERY LINE A ROOM IS ASKED TO CARRY PASSES THE CODE OF CONDUCT'S GATE - each
    *  session asks before it sends (OnlineSession.mayChat), so an item posted from the pack (CHAT-POST, world.js
    *  postItemInChat - it went straight to the tab's session, and a player who had never agreed posted to World) is held
    *  as a typed line is: the card stands and nothing goes. A typed line was held before it got here (onSend). */
@@ -421,14 +414,11 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
   /** STAFF-PANEL2-CHATMENU: a staff member's rows for one spoken line, each act by the line's ACCOUNT (`sub`, the relay's
    *  word beside the line), never by the name it showed (design weak spot "In-game cards match players by name"). A
    *  tooltip says whether the player can see it. */
-  const staffRows = (line, name, f = follow(), card = true) => {   // CHAT-FOLLOW-CARD: `card` false where the follow given hands its own
+  const staffRows = (line, name) => {
     const sub = line.sub;
     if (!ID_RE.test(sub)) return [];
     return staffLineActs(glyphs()).map((act) => {
       const row = { label: STAFF_LABEL[act](), title: STAFF_SEEN.includes(act) ? t('net.staffMenu.seen', 'The player can see this.') : t('net.staffMenu.unseen', 'The player does not see this.') };
-      // CHAT-FOLLOW-CARD (2026-10-24, mob: "no panel pops up when followingf from chat"): a follow that took hands the panel
-      // the followed player's card, as a tag's click does (scenes/staffViewHost.js go) - the same act word, no line said
-      if (act === 'follow') return typeof f === 'function' ? { ...row, run: () => { void Promise.resolve().then(() => f(sub)).then((ok) => { if (ok !== false && card) post('follow', sub, name); if (ok === false) sayActive(t('net.staffMenu.handed', 'Staff Panel: {act} {name}. Nothing opens without the Staff Panel extension.', { act: row.label, name })); }).catch((e) => sayActive(String(e?.message ?? e))); } } : null;   // false: no Staff Panel over this game (staffFollowHost.js follow), said as the panel's other acts say it
       if (act === 'tp') return typeof teleport === 'function' && typeof line.id === 'string' && line.id ? { ...row, run: () => tpTo(line) } : null;
       if (act === 'mute') return { ...row, menu: STAFF_MUTE_MINUTES.map((m) => ({ label: spanText(m), title: row.title, run: () => { void muteFor(sub, name, m); } })) };
       if (act === 'ban') return { ...row, menu: STAFF_BAN_DAYS.map((d) => ({ label: spanText(d * 1440), title: row.title, menu: banLevel(sub, name, d) })) };
@@ -438,10 +428,10 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
 
   const host = {
     hears,
-    /** STAFF-CHAT-RED (mob, 2026-10-23: "give me a option next to chat to chat as /red or myself at all times"): the voice an
+    /** STAFF-CHAT-RED: the voice an
      *  Admin's lines go out in (net/chatVoice.js) - made here, beside the glyphs and the mint's word it reads, and handed
      *  to the chat panel (ui/chatPanel.js `voice`) by the host. */
-    voice: createChatVoice({ glyphs, say, win }),
+    voice: createChatVoice({ glyphs, say }),
     /** The chat started: the log hears through the block list, every room's word is wired, and the list is read. */
     async start() {
       const l = log();
@@ -472,20 +462,17 @@ export function createChatSafetyHost({ log, links, social = () => null, minter =
       if (agreedHere && !issued.conduct) return;
       agreed = issued.conduct;
     },
-    /** A spoken line's menu: Report it (a reason each) and Block or Unblock its speaker. STAFF-PANEL2 (2026-10-22, mob:
-     *  "remove the report buttons iunch for admin and mods as well", "chat they arnt usefu for us"): an Admin or a
+    /** A spoken line's menu: Report it (a reason each) and Block or Unblock its speaker. STAFF-PANEL2: an Admin or a
      *  Moderator (`staff`) gets no Report - they act on a player, not report them. STAFF-PANEL2-CHATMENU: and gets the
      *  acts they use on players instead (staffRows), then Block. */
-    /** STAFF-TAG-MENU (2026-10-24, mob: "when u lcick on someon", "i mean the pop up"): a player's staff acts by their
-     *  socket (`id`) and account (`sub`) - the chat line menu's own rows (staffRows), for the staff view's tag menu
-     *  (scenes/staffViewHost.js); `onFollow` its Follow when the view's own follow (which opens the panel's card) stands
-     *  for the chat's. None for a player's page. @param {{ id: string, sub: string, name: string }} p @param {(sub: string) => any} [onFollow] */
-    playerActions(p, onFollow) {
+    /** STAFF-TAG-MENU: a player's staff acts by their
+     *  socket (`id`) and account (`sub`) - the chat line menu's own rows (staffRows), for a roster row (rosterActions).
+     *  None for a player's page. @param {{ id: string, sub: string, name: string }} p */
+    playerActions(p) {
       if (!staff() || !p) return [];
-      return staffRows({ id: p.id, sub: p.sub }, String(p.name ?? ''), onFollow ?? follow(), !onFollow);
+      return staffRows({ id: p.id, sub: p.sub }, String(p.name ?? ''));
     },
-    /** ROSTER-STAFF (2026-10-24, mob: "need to add follor to find a player in chat as well", over the chat's Find a player
-     *  list): a roster row's staff acts - the line menu's own (staffRows) for the player the row names by socket, their
+    /** ROSTER-STAFF: a roster row's staff acts - the line menu's own (staffRows) for the player the row names by socket, their
      *  account as a room here holds it, or the hub's lists (everyone online, the guild's, a search's answer). None for a
      *  player's page, nor for a row no list here names an account for. @param {unknown} id */
     rosterActions(id) {

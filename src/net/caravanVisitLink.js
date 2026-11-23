@@ -1,5 +1,5 @@
 // @ts-check
-// WAGONS2-VISIT (2026-10-09): A CARAVAN I VISIT STANDS WHILE ITS CELL SAYS SO. Inside another player's caravan my primary
+// WAGONS2-VISIT: A CARAVAN I VISIT STANDS WHILE ITS CELL SAYS SO. Inside another player's caravan my primary
 // session stands in the caravan's own room (net/privateInterior.js caravanRoomOf), and the cell that keeps the caravan's
 // record (HCC-PARK - net/wire.js's park law) is no room of mine: a caravan driven off, parked again elsewhere, or gone
 // with its owner's record would leave me in a room that stands nowhere. This is the cell's LISTENER - a second session on

@@ -1,9 +1,7 @@
-// WATER-DRAW2 (2026-10-07, Mac with a winter town's screenshot - a pond of WATER-NEXT's water and in it two flat blue
-// squares round white islands: "Is there a reason these fucking patches still remain after our most recent water
-// changes?"): THE DRAW'S TABLE KNOWS THE WATER ART. The islands (4, 19, 29), the corners (37, 38, 40, 41, 43, 44) and a
+// WATER-DRAW2: THE DRAW'S TABLE KNOWS THE WATER ART. The islands (4, 19, 29), the corners (37, 38, 40, 41, 43, 44) and a
 // saddle laid half turned are drawn as their art paints them - and every water law that asks the draw's table (PUDDLE-DRY,
 // WATER-NEXT's bed, silt and sheet) follows; the law's table, the feet's, is not asked. The record:
-// bible/07-Rendering/Water-Arc.md WATER-DRAW2.
+// WATER-DRAW2.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';

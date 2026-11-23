@@ -1,5 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════
-// DW-E2 (2026-09-25): ILIAC PUDDLE NO MORE'S DECORATIONS IN THE STREAMED
+// DW-E2: ILIAC PUDDLE NO MORE'S DECORATIONS IN THE STREAMED
 // WORLD - UnderwaterDecorations.cs's work (the queue, the pending batches,
 // the markers, the suppression event) and UnderwaterDecorationBatchFactory
 // .cs's Spawn, over the port's pixels. The placement itself is
@@ -29,7 +28,6 @@
 // waits while any of its pictures is loading, every missing one started
 // at once - the port reads files asynchronously where DFU reads them in
 // the frame.
-// ═══════════════════════════════════════════════════════════════════
 
 import {
   placeTileDecorations, decorationCap, populateRadius, usesArchiveAnimation, framesPerSecondOf, authoredVisualHeight, clearEdgeBlackPixels,

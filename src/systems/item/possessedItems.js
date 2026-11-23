@@ -1,7 +1,7 @@
 // @ts-check
-// THE LISTS A REALM CHARACTER HOLDS (INT2, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md): what the item law
+// THE LISTS A REALM CHARACTER HOLDS (INT2, the INTEGRITY arc): what the item law
 // judges and the id ledger reads (server-account/src/judge.js ledgerPieces). Moved here from the judge by AUDIT AUTO-HOLD
-// (2026-10-16): the client's shelf asks the same question - which pieces does this character hold? - of the last save
+// the client's shelf asks the same question - which pieces does this character hold? - of the last save
 // that landed (scenes/realmHoldHost.js), so a piece stowed in a ship's hold or a room's chest never lands back off a
 // stale shop shelf as a second of itself. One home: the judge hands it on.
 import { deedsOf } from '../../net/realm/realmGoldLaw.js';
@@ -10,7 +10,7 @@ const lists = (/** @type {any[]} */ ...ls) => ls.filter(Array.isArray);
 const arrayOf = (/** @type {unknown} */ x) => (Array.isArray(x) ? x : []);
 const objectOf = (/** @type {unknown} */ x) => (x && typeof x === 'object' ? /** @type {Record<string, unknown>} */ (x) : {});
 
-/** Come Sail Away's, the sea fight's and the feud's records in a save's per-mod slot (realmGoldLaw.js's own names). */
+/** Come Sail Away's, the sea fight's and the revenants' records in a save's per-mod slot (realmGoldLaw.js's own names). */
 const CSA_VENDOR = 'come-sail-away', NAVAL_VENDOR = 'NavalCombat', REVENANT_VENDOR = 'Revenant';
 /** A building's interior, by the name the scene cache files it under (sceneCache.js interiorSceneName; realmGoldLaw.js
  *  keeps the same). */
@@ -40,7 +40,6 @@ export function possessedItemLists(save) {
   out.push(...lists(...Object.values(objectOf(csa?.packedCargoes))));
   for (const c of arrayOf(save?.modData?.[NAVAL_VENDOR]?.party?.party)) out.push(...lists(/** @type {any} */ (c)?.items));
   for (const r of arrayOf(save?.modData?.[REVENANT_VENDOR]?.list)) if (/** @type {any} */ (r)?.sworn && !/** @type {any} */ (r).defeated) out.push(...lists(/** @type {any} */ (r).companion?.items));
-  for (const r of arrayOf(save?.modData?.[REVENANT_VENDOR]?.list)) if (/** @type {any} */ (r)?.sworn && !/** @type {any} */ (r).defeated) out.push(...lists(Object.values(objectOf(/** @type {any} */ (r).companion?.gear)).filter((it) => it && typeof it === 'object')));   // RVN-GEAR: and the kit it wears (revenantGear.js)
   return out;
 }
 

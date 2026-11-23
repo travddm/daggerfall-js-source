@@ -1,5 +1,5 @@
-// SEASON1 part two, the banner ribbon (2026-10-01, Mac: "Finish the seats"; "Continue"; "Hurry up"): THE BANNER RIBBON
-// (bible/11-Multiplayer/Seats-Arc.md 9.1: "every member of it the Season's banner ribbon (a thin band in the guild's
+// SEASON1 part two, the banner ribbon: THE BANNER RIBBON
+// (9.1: "every member of it the Season's banner ribbon (a thin band in the guild's
 // colours under their name tag for the next Season)") - the law (the guilds a Season's end ribbons, the Season a ribbon
 // is worn in, a heraldry as the token's two colours and back); through the real Worker, a Season's end writing it and the
 // token's mint wearing it, against a twin counting no Season.
@@ -11,7 +11,7 @@ import { ribbonClaimOf, ribbonClaimOk, ribbonColours, ribbonRgba, RIBBON_PLAIN, 
 import { readFileSync } from 'node:fs';
 import { verifyToken, claimsValid, mintToken, importPublicKeyB64 } from '../../src/net/identityToken.js';
 import { badged, readRibbon } from '../../src/net/wire.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { fakeRoom, OFFICIAL_PH } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { OnlineSession } from '../../src/net/online.js';
 import { accountTokenMinter, SESSION_KEY } from '../../src/net/accountClient.js';
@@ -21,8 +21,8 @@ import { createNameLayer, NAME_CSS } from '../../src/ui/nameLayer.js';
 import { perspective, mirrorProjectionX, lookAt } from '../../src/world/mat4.js';
 
 test('SEASON1 THE BANNER RIBBON\'S LAW: a Season\'s end ribbons each keeper\'s guild once (never a crown alone); a ribbon is worn in the Season after its own, none with no Season or in Season 0; a guild\'s field and border as two colour indexes, Argent bordered Ash for none; a claim two different colours of the sixteen, read back as their hexes (mutants: the keepers; the once; the Season before; each bound; the plain; the read)', () => {
-  const titles = [{ guild: 'a', title: 'crowned', key: 1 }, { guild: 'a', title: 'keeper', key: 1 }, { guild: 'b', title: 'crowned', key: 2 }, { guild: 'c', title: 'keeper', key: 3 }, { guild: 'a', title: 'keeper', key: 4 }];
-  assert.deepEqual(seasonRibbons(titles), ['a', 'c']);
+  const keepers = [{ guild: 'a', key: 1 }, { guild: 'c', key: 3 }, { guild: 'a', key: 4 }];
+  assert.deepEqual(seasonRibbons(keepers), ['a', 'c']);
   assert.deepEqual([seasonRibbons([]), seasonRibbons(null)], [[], []]);
   assert.deepEqual([ribbonSeasonOf({ n: 3 }), ribbonSeasonOf({ n: 1 }), ribbonSeasonOf({ n: 0 }), ribbonSeasonOf(null)], [2, 0, null, null]);
   const idx = (key) => HERALDRY_COLOURS.findIndex((c) => c.key === key);
@@ -129,14 +129,10 @@ test('SEASON1 THE BANNER RIBBON ON THE TOKEN AND THE RELAY: a claim set may carr
   const eve = r.connect(); await r.hello(eve, 'evee-0003', null, { rb: [3, 4] });
   assert.deepEqual([ofType(mara, 'join').find((j) => j.id === 'evee-0003').rb, ofType(bob, 'join').find((j) => j.id === 'evee-0003').rb], [[3, 4], [3, 4]], 'the join wears it');
   const sly = r.connect();
-  await r.room.webSocketMessage(sly, JSON.stringify({ t: 'hello', id: 'slyy-0004', secret: 'secret-of-slyy-0004', name: 'slyy-0004', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, rb: [1, 2], tok: await r.token('slyy-0004') }));
+  await r.room.webSocketMessage(sly, JSON.stringify({ t: 'hello', ph: OFFICIAL_PH, id: 'slyy-0004', secret: 'secret-of-slyy-0004', name: 'slyy-0004', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, rb: [1, 2], tok: await r.token('slyy-0004') }));
   const slyJoin = ofType(bob, 'join').find((j) => j.id === 'slyy-0004');
   assert.ok(slyJoin, 'admitted');
   assert.equal('rb' in slyJoin, false, 'a frame that only types one gets none');
-  // the wiring by source - the relay's two reads
-  const relay = src('server/src/index.js');
-  assert.match(relay, /glyphs: c\.g, gx: c\.gx, au: c\.au, pi: c\.pi, rb: c\.rb, mu, lt, lv: c\.lv,/);   // PIN MOVED (LEASE1): the time of the word on the mute beside it; PIN MOVED (WITCH1): the profile icon worn beside the aura
-  assert.match(relay, /au: who\.au, \.\.\.\(who\.pi \? \{ pi: who\.pi \} : \{\}\), \.\.\.\(who\.rb \? \{ rb: who\.rb \} : \{\}\), lv: who\.lv,/);   // PIN MOVED (WITCH1): the profile icon worn beside the aura
 });
 
 test('SEASON1 THE BANNER RIBBON ON THE PAGE: the mint\'s answer hands mine to the page (null for none, nothing from an older service); the session keeps a peer\'s off the welcome and each hello (one taken off is gone), remembers it past a re-stand, and answers `ribbonOf`; the name point carries it; the bitmap face draws a band the run\'s width in the field colour under the name, edged in the border colour, none for none; the DOM face a band under the name row in both colours, written when it changes and off for none (mutants: the minter; the session\'s reads; the point; the bands; the DOM\'s colours and its off)', async () => {
@@ -161,7 +157,7 @@ test('SEASON1 THE BANNER RIBBON ON THE PAGE: the mint\'s answer hands mine to th
   s.join('world:2,12', { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 });
   const ws = sockets[0];
   ws.open();
-  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', rb: [0, 2] }, { id: 'eve-0003', name: 'Eve', rb: [5, 5] }], n: 3, v: 'world149' });
+  ws.receive({ t: 'welcome', id: 'mac-0001', peers: [{ id: 'bob-0002', name: 'Bob', rb: [0, 2] }, { id: 'eve-0003', name: 'Eve', rb: [5, 5] }], n: 3 });
   assert.deepEqual([s.ribbonOf('bob-0002'), s.ribbonOf('eve-0003'), s.ribbonOf(null)], [[0, 2], null, null], 'two of the same colour is none');
   ws.receive({ t: 'join', id: 'bob-0002', name: 'Bob' });
   assert.equal(s.ribbonOf('bob-0002'), null, 'the newest hello\'s, including none');

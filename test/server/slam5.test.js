@@ -1,4 +1,4 @@
-// SLAM5 (2026-09-16, AUDIT SLAM): THE HELLO PATH - A HARD WALL AT 130 PLAYERS, AND A ROSTER RANKED BY THE WRONG
+// SLAM5: THE HELLO PATH - A HARD WALL AT 130 PLAYERS, AND A ROSTER RANKED BY THE WRONG
 // METRIC. Both found by the lenses over SLAM1-4; neither was SLAM1-4's doing.
 //
 // THE WALL. `webSocketMessage`'s hello arm read a look for EVERY hello'd socket - up to SOCKETS_MAX-1 = 255 keys in
@@ -16,7 +16,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { rosterFor, ROSTER_MAX, SOCKETS_MAX, POSE_FAN_MAX, nearestFan, validPose } from '../../src/net/wire.js';
 import { Room } from '../../server/src/index.js';
-import { roomSigner } from '../fakeRoom.mjs';   // ACC1g: one home for a room's key and its tokens
+import { roomSigner, OFFICIAL_PH } from '../fakeRoom.mjs';   // ACC1g: one home for a room's key and its tokens; P0 SERVER PROFILE: and the hash a hello says
 import { readFileSync } from 'node:fs';
 
 /** The Durable Object's real batched-get limit. The runtime enforces it; `test/fakeRoom.mjs` does not, which is
@@ -73,7 +73,7 @@ test('SLAM5: A FULL ROOM FILLS - two hundred players join a town and every one g
       try {
         // ACC1g: a real signed token per hello - the relay refuses one it
         // cannot verify, so a full room only fills if two hundred tokens verify.
-        await r.room.webSocketMessage(ws, JSON.stringify({ t: 'hello', id: `p${String(i).padStart(4, '0')}`, secret: `secret-of-${i}`, name: `p${String(i).padStart(4, '0')}`,
+        await r.room.webSocketMessage(ws, JSON.stringify({ t: 'hello', ph: OFFICIAL_PH, id: `p${String(i).padStart(4, '0')}`, secret: `secret-of-${i}`, name: `p${String(i).padStart(4, '0')}`,
           // ACC1g: THE NAME IS THE ID HERE, and the reason is the filter
           // doing its job: `n16` folds to a slur under NAME-F1's leet
           // normalisation, so `sanitizeName` answers Traveller and the
@@ -104,7 +104,7 @@ test('SLAM5: the welcome\'s roster CARRIES each peer\'s look - reading nothing f
   try {
     for (let i = 0; i < 6; i++) {
       const ws = r.connect();
-      await r.room.webSocketMessage(ws, JSON.stringify({ t: 'hello', id: `p${String(i).padStart(4, '0')}`, secret: `secret-of-${i}`, name: `p${String(i).padStart(4, '0')}`,
+      await r.room.webSocketMessage(ws, JSON.stringify({ t: 'hello', ph: OFFICIAL_PH, id: `p${String(i).padStart(4, '0')}`, secret: `secret-of-${i}`, name: `p${String(i).padStart(4, '0')}`,
         tok: await r.token(`p${String(i).padStart(4, '0')}`),   // ACC1g: the id IS the name - `n16` folds to a slur and cannot be minted
         look: { race: i % 2 ? 'Redguard' : 'Nord', gender: 'male', faceIndex: i, items: [] }, pose: at(i * 3, 0) }));
       welcome = ws.sent.find((m) => m.t === 'welcome') ?? welcome;
@@ -122,12 +122,6 @@ test('SLAM5: the welcome\'s roster CARRIES each peer\'s look - reading nothing f
 test('SLAM5: the batched get is bounded by the ROSTER, not by the room - so it cannot breach the limit however full the room gets (mutant: the get over every socket, which is SOCKETS_MAX-1 keys)', () => {
   assert.ok(ROSTER_MAX <= STORAGE_GET_MAX, `a roster of ${ROSTER_MAX} fits one batched get`);
   assert.ok(SOCKETS_MAX > STORAGE_GET_MAX, 'and a full room does NOT - which is the whole finding');
-  const src = readFileSync(new URL('../../server/src/index.js', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-  // the selection happens BEFORE the read: `others` (every socket) must not be what is handed to storage
-  assert.doesNotMatch(src, /storage\.get\(others\.map/, 'the room is never the batch');
-  assert.match(src, /const near = rosterFor\((?:battle \? others\.map\(\(b\) => this\._drawn\(b, a\.key\)\) : )?others, m\.id, m\.pose\);/, 'the roster is chosen first');   // PIN MOVED (AUDIT-SEATS): T2 - in a battle room the same sockets, a spectator's pose told as none
-  const i = src.indexOf('const near = rosterFor(');   // PIN MOVED (AUDIT-SEATS): T2, as above
-  assert.match(src.slice(i, i + 400), /near\.filter\(\(b\) => !this\._looks\.has\(b\.id\)\)/, 'and only what is not already known is asked for');
 });
 
 test('SLAM5: ONE METRIC at both doors - the roster and the pose fan rank the same way, so the fan\'s reach really is a subset of what the welcome named (mutant: pixelDistance, which floors to 0 inside one town and makes "nearest" mean socket order)', () => {
@@ -161,7 +155,7 @@ test('SLAM5: a roster asked for with no pose to measure from still answers, boun
 test('PINS (AUDIT SLAM S7): the welcome\'s roster CARRIES EACH PEER\'S POSE - the joiner stands the room where it is, not at the origin (mutant: `{ id, name, look }` built from the ranked entry, which drops the pose and survived the whole suite)', async () => {
   const r = strictRoom('town:m9');
   const real = Date.now; let t = 1e12; Date.now = () => t;
-  const hello = async (id, pose) => { const ws = r.connect(); await r.room.webSocketMessage(ws, JSON.stringify({ t: 'hello', id, secret: `secret-of-${id}`, name: `n-${id}`, tok: await r.token(id, { n: `n-${id}` }), look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose })); t += 200; return ws; };   // ACC1g: a real token, verified by the room
+  const hello = async (id, pose) => { const ws = r.connect(); await r.room.webSocketMessage(ws, JSON.stringify({ t: 'hello', ph: OFFICIAL_PH, id, secret: `secret-of-${id}`, name: `n-${id}`, tok: await r.token(id, { n: `n-${id}` }), look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose })); t += 200; return ws; };   // ACC1g: a real token, verified by the room
   try {
     await hello('aaaa-0001', at(3, 4)); await hello('bbbb-0002', at(5, 6));
     const c = await hello('cccc-0003', at(7, 8));

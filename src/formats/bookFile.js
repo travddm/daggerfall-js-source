@@ -1,4 +1,4 @@
-// THE BOOK READER's format half (B1) - API/BookFile.cs whole. A BOK
+// THE BOOK READER's format half - API/BookFile.cs whole. A BOK
 // file (ARENA2/BOOKS/BOK%05d.TXT) is: Title/Author as 64-byte
 // C-string fields, an 8-byte naughty tag ("naughty" marks adult
 // content), 88 null bytes, a u32 price field, three unknown u16s, a

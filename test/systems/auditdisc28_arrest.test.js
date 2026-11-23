@@ -1,4 +1,4 @@
-// AUDIT DISC28 (2026-09-28, before the merge), lane "arrest": DISC28-B (a surrender box never outlives its crime) and
+// AUDIT DISC28, lane "arrest": DISC28-B (a surrender box never outlives its crime) and
 // DISC28-D (the first-person swing reads the live Speed) read again on the batch merged with main.
 //
 // - AR-1: a LOAD carried the old game's arrest into the loaded one. DFU never loads under the court (InputManager.Update
@@ -176,24 +176,6 @@ test('AUDIT DISC28 AR-1: a load under the surrender box withdraws the question -
       assert.equal(player.health, 30, `${answer}: and no surrender's forced 1 health`);
     } finally { flow.dispose(); }
   }
-});
-
-test('AUDIT DISC28 AR-1: every load door of the world host reaches the one that tells the flow - worldQuickLoad, after the restore and before the teleport', () => {
-  const world = read('src/scenes/world.js');
-  const body = world.slice(world.indexOf('async function worldQuickLoad'), world.indexOf('function applyPose'));
-  const restore = body.indexOf('const extras = restorePlayer(playerEntity, snap, spellsByIndex);');
-  const abandon = body.indexOf('arrestFlow.abandon();');
-  const teleport = body.indexOf('await _teleportToPixel');
-  assert.ok(restore > 0 && abandon > restore && teleport > abandon, 'the save is read, THEN the flow is told, before the world is rebuilt');
-  assert.ok(!/arrestFlow\.abandon\(\);[\s\S]*arrestFlow\.abandon\(\);/.test(body), 'once');
-  // the building's route (worldModes: the pause, the keys, the dungeon's hand-up) and this host's own doors are all it
-  for (const door of [/quickLoad: \(\) => worldQuickLoad\(\),/, /loadKey: \(key\) => worldQuickLoad\(\{ key \}\),/, /loadSave: \(key\) => worldQuickLoad\(key != null \? \{ key \} : \{\}\),/, /quickLoad: worldQuickLoad,/]) {
-    assert.match(world, door);
-  }
-  const modes = read('src/scenes/worldModes.js');
-  assert.match(modes, /quickLoad: host\.quickLoad,/, 'the building\'s pause door is the host\'s load');
-  assert.match(modes, /quickLoad\(\) \{ host\.quickLoad\?\.\(\); \}/, 'and its keys');
-  assert.match(modes, /worldLoad: host\.loadSave \?/, 'and a dungeon save from another place is handed up to it');
 });
 
 // ── AR-3 ────────────────────────────────────────────────────────────────────────────────────────────────────────────

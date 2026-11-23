@@ -1,10 +1,9 @@
 // THE VILLAGER DESIGNS - the 25 wandering-townsperson variations as
-// data for the neutral-body rig (tools/neutral's viewer is the editor).
+// data for the neutral-body rig.
 //
 // Mac's call: these are FULLY REDESIGNED, not traced from the classic
-// sprites. tools/neutral/README.md retired the 1:1 silhouette pin and
-// the sprite-trace architecture for this model, and the villagers
-// follow it. The classic archives still decide the ROSTER - which race,
+// sprites. The 1:1 silhouette pin and the sprite-trace architecture
+// were retired for this model, and the villagers follow it. The classic archives still decide the ROSTER - which race,
 // which gender, how many - because SetPerson spawns by that table, and
 // tools/villagerSheet.mjs renders them all if you want the old look
 // beside the new one.
@@ -38,7 +37,7 @@
 //
 // pieces/draped.js already solves it, and did before these designs
 // existed: DRAPED_NAMES is a garment list with a standoff grid per
-// name, driven by clothSim.js so the hem swings. So a design's hanging
+// name. So a design's hanging
 // cloth is a `drape: { name, mat }` - `name` picks the garment out of
 // DRAPED_NAMES, `mat` names one of the design's own ART_PAL ramps so
 // the drape is dyed from the same palette as the rest of the outfit

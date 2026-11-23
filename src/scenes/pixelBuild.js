@@ -1,9 +1,9 @@
-// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld (bible/01-Overview/Host-Split.md) by tools/hostMove.mjs.
+// HOST-SPLIT: moved verbatim out of src/scenes/world.js's bootWorld by tools/hostMove.mjs.
 // The host constructs it where the code stood. What it reads of the host's scope comes through `host`: the
 // settled names by value at construction, every live one (a `let` someone writes, a `const` made below) read at its
 // use as `host.<name>` - as the code read them where it was.
 import { ANIMAL_SOUND_BY_RECORD, ANIMALS_ARCHIVE } from '../systems/soundClips.js';
-import { applyClimate, getNatureArchive, getTerrainGroundArchive, INTERIOR_SEASON, SEASON } from '../world/climateSwaps.js';
+import { applyClimate, getNatureArchive, getTerrainGroundArchive, INTERIOR_SEASON, SEASON, winterSetSnowless } from '../world/climateSwaps.js';
 import { SEA_LEVEL_M } from '../systems/weather/airTemperature.js';   // PRECIP4: heights above the sea, the snow's
 import { ARENA_BLOCK } from '../world/arena/arenaCity.js';
 import { armFlatAnim, FlatAnimator } from '../render/flatAnimation.js';
@@ -15,8 +15,8 @@ import { boxNearGate, gateSiteTest, pointNearGate, WOD_FLAT_GATE_CLEAR_M } from 
 import { boxNearPath, pointNearPath, UNITS_PER_METRE, WOD_PIECE_ROAD_CLEAR, wodPiecewise, wodSiteClear, wodSiteFootprint } from '../world/road/roadClearance.js';
 import { buildingKeysOfType, castleEntranceOf, siegeFieldOf } from '../systems/siegeField.js';
 import { buildingSummaries } from '../world/buildingSummaries.js';
-import { buildWaterIndices, waterSwitchOn } from '../render/waterSurface.js';
-import { BULLETIN_BOARD_MODEL_ID, CITY_GATE_CLOSED_MODEL_ID, CITY_GATE_OPEN_MODEL_ID, isBulletinBoard, isCityGate } from '../world/rmbLayout.js';
+import { buildPixelWaterIndices, waterSwitchOn } from '../render/waterSurface.js';
+import { BULLETIN_BOARD_MODEL_ID, isBulletinBoard, isCityGate } from '../world/rmbLayout.js';
 import { carveLefay, isLefayTown, lefayExitOf, lefaySpotOf } from '../world/lefayMonument.js';
 import { carveYards } from '../world/merchantYards/merchantYardSites.js';
 import { CityNavigation, NAV_CELL } from '../world/city/cityNavigation.js';
@@ -34,36 +34,51 @@ import { festivalBannerAnchors, festivalLanternsOf } from './seatFestival.js';
 import { flatBatchAabb, localAabb, transformedAabb } from '../render/frustum.js';
 import { floraSwayOf } from '../systems/wind/windDrive.js';
 import { footRectsAt } from './homeYards.js';
-import { FOREST_HIDDEN_LOCATION_TYPES, populatesWanderingNpcs } from './shared.js';
-import { getLocationTerrainTileOrigin, setLocationTiles } from '../world/terrain/terrainTiles.js';
+import { FOREST_HIDDEN_LOCATION_TYPES, populatesWanderingNpcs, tamrielLandsOn } from './shared.js';
+import { landGroundSet } from '../world/tamriel/tamrielLands.js';   // TESA-LANDS: a zone's dress of its ground
+import { standLandProps, landFeetOff } from '../world/lands/landProps.js';   // TESA-LANDS: and its landmarks stood, its flats off their feet
+import { climateNeighbourIn } from '../world/tamriel/tamrielGround.js';
+import { getLocationTerrainTileOrigin, setLocationTiles, WORLD_MAP_TILE_DIM } from '../world/terrain/terrainTiles.js';
+import { townWalkShut } from '../world/townWalls.js';   // TS6: a town's walkers on its own ground, never through its wall; TS7: and its yards
+import { townGateRoads } from '../world/townGates.js';   // GATE-ROADS: a walled town's gates for their roads
+import { townFabricFor, fabricWalkShut } from '../world/urban/townFabricStand.js';   // URBANIZER U3: a town past the Bay's streets, yards and dead ends
 import { getNameBankOfRegion } from '../characters/nameHelper.js';
 import { getStaticDoors } from '../world/staticDoors.js';
 import { getWorldClimateSettings, LOCATION_TYPES } from '../formats/mapsFile.js';
 import { gothwayNorthSpots, isGothwayGarden } from '../systems/gothwayBoards.js';
-import { groundOffPlane, lowestGroundUnder, surfaceHeightAt, TERRAIN_SKIRT_DEPTH, TERRAIN_TILE_DIM } from '../world/terrain/terrainSurface.js';
-import { hasPort, maskMapId } from '../systems/travel/travelPorts.js';
+import { groundOffPlane, lowestGroundUnder, surfaceHeightAt, walkGroundAt, TERRAIN_SKIRT_DEPTH, TERRAIN_TILE_DIM } from '../world/terrain/terrainSurface.js';   // FLORA-GROUND: walkGroundAt, the ground's one law
+import { hasPort } from '../systems/travel/travelPorts.js';
+import { portIdOf } from '../world/worldWide/worldPorts.js';   // WW3: a port's one number
 import { HEIGHTMAP_DIMENSION, TERRAIN_SIZE } from '../world/terrain/terrainSampler.js';
 import { HOLD_FLATS, HOLD_MODELS, holdFireLights, holdModelMatrix, PRIVATEERS_HOLD_BLOCK } from '../world/worldOfDaggerfall/wodPrivateersHold.js';
 import { HOME_LOOK_BUILD_WAIT_MS, homeLookRemap } from '../world/homeLook.js';
 import { homeLookSig } from '../net/homeLaw.js';
 import { insideRocks, rockFootprint } from '../world/terrain/terrainNature.js';
-import { isClimateFreeModel, NO_CLIMATE_REMAP } from '../world/customModels.js';
+import { isClimateFreeModel, NO_CLIMATE_REMAP, isSolidModel } from '../world/customModels.js';   // IC-GRAND: a far skyline is drawn, never solid
+import { capitalBuildView, capitalViewOf, capitalBlockLift } from '../world/tamrielCapitals.js';   // IC-GRAND: the Imperial City's slices near and far; SOLITUDE-RELIEF: a block's tier
+import { cityHomesOf } from '../world/imperialHomes.js';   // IC-GRAND x THE LIVING WORLD: the fabric's homes in its living town
 import { isDrySourceFlat, isWaterSourceFlat, WATER_SOURCE_MODELS } from '../systems/survival/items.js';
 import { isEnhanced } from '../systems/uiSkin.js';
+import { stampPixelFade } from '../render/pixelFade.js';   // MID-RING: a pixel built past the near rings eases out of the middle ring's tint
+import { midRingDisabled } from '../render/midRing.js';
+import { overworldTint } from '../ui/overworldModel.js';
 import { isHearthFlat } from '../systems/survival/hearth.js';
 import { isPortTown } from '../systems/portPlaces.js';
 import { isStandFlat, standFlatId, standFlatRecord } from '../world/standFlats.js';
 import { isStandingHorseFlat } from '../world/standingHorses.js';
 import { isTombstoneModel } from '../systems/searchables.js';
 import { FOREST_STAMP, isTreeRecord, sinkFelled } from './treeHost.js';   // AUDIT PRECIP HOST-7: a re-skin's felled trees lie as they lay
+import { seatFlora, standsOnGround, warmFlora } from './floraSeat.js';   // FLORA-GROUND, THE RINGS: every plant drawn on the ground its pixel draws
 import { isWardenTown } from '../systems/wagon/wagonWarden.js';
 import { isWodShrub, rockSeatDrop, WOD_ROCK_SITES, wodLightPosition, wodLightProperties } from '../world/worldOfDaggerfall/wodLocationObjects.js';
 import { isYardTown } from '../systems/merchantYards.js';
 import { keyResolver, StaticBatchBuilder } from '../render/staticBatch.js';
 import { knownCriminal } from '../systems/standing.js';
-import { layoutLocation } from '../world/locationLayout.js';
+import { layoutLocationSteps, RMB_SIDE } from '../world/locationLayout.js';   // IC-STUTTER: a town laid out a block a step; SOLITUDE-RELIEF: a block's side
 import { legalRepOf } from '../systems/court.js';
-import { LivingTown } from '../systems/livingWorld/livingTown.js';
+import { LivingTown, livingTownPlaces } from '../systems/livingWorld/livingTown.js';   // IC-STUTTER: its places a step at a time
+import { componentsSteps } from '../systems/travel/townWalk.js';   // IC-STUTTER: the town walk's pieces, flooded a step at a time
+import { stepsBreathing } from '../world/puddleMask.js';   // IC-STUTTER: OW-HITCH's runner
 import { livingWorldOn } from '../systems/livingWorld/livingSwitch.js';
 import { LPT_CROWNS, LPT_TRUNKS } from '../world/lptCrowns.js';   // FB1020c TRUNK-FIT: and each prototype's trunk at the ground
 import { LPT_SCALE_MAX, lptVariety } from '../world/lowPolyTrees.js';
@@ -75,13 +90,16 @@ import { keptPairs, standRoadside } from './roadsidePairs.js';   // JUNGLE-ROADS
 const COVER_SLICE = 2048;
 import { lptFitCap, lptTrunkCap, natureReach, pathTileMask, vergeClear } from '../world/road/roadVerge.js';   // FB1020c TRUNK-FIT: lptTrunkCap
 import { makeBuildingKey } from '../systems/talk/talkTopics.js';
-import { makeCityGate } from '../world/city/cityGate.js';
+import { gateMeshIds, makeCityGate, otherGateModelId } from '../world/city/cityGate.js';
 import { markRemapLaw, remapAsked, remapLawOf, remapSubMeshes, reskinRemap } from '../world/texRemap.js';
 import { MobilePerson, PERSON_MOVE_SPEED, walkerRace } from '../characters/mobile/mobilePerson.js';
 import { multiply, trs } from '../world/mat4.js';
 import { naturePicture, junglePicture } from '../world/naturePicture.js';
 import { onFloatingFrame } from '../player/collider.js';
 import { inBay as onTheBay } from '../world/tamriel/tamrielFrame.js';
+import { standGhostfence, fireClearing, clearedLandProps } from './ghostfenceBuild.js';   // GHOSTFENCE: the Tribunal's fence round Red Mountain; LAVA-CLEAR, FENCE-CLEAR: nothing stood in its lava or its line
+import { arenaRoadsLayer } from '../world/arenaRoads.js';   // TESA4: the roads past the Bay's layer
+import { provinceNameBank } from '../world/tamrielPeople.js';   // TESA3: a province's people's names
 import { ownMinutes, skyMinutes, trustedWorldMinutes } from '../systems/worldTick.js';
 import { palaceKeysOf, seatBannerAnchors, townCentreOf } from './seatBanners.js';
 import { playerEntity } from '../characters/playerEntity.js';
@@ -99,28 +117,40 @@ import { colliderBlocked, dryGround, witchesDressingBreathing } from '../world/w
 import { wodRockUvs } from '../world/worldOfDaggerfall/wodRockUv.js';
 import { WodSpawner } from '../world/worldOfDaggerfall/wodSpawner.js';
 import { lateSolidsOf } from '../player/lateSolid.js';   // ROCK-CLEAR: a pixel's statics built round a body already standing are withheld until it is clear
+import { standBridges } from '../world/road/bridgeModels.js';   // ROAD-LOOK: a road over a river wider than a ford crosses on a bridge
 import { sightMarksOf } from '../world/signSolid.js';   // FIELD BUGS 2026-10-25i SIGN-PASS: a shop's sign stops a body where it stands, never where it hangs
 
 /** @param {any} host */
 export function createPixelBuild(host) {
   const {
-    MILL_SAIL_PAD, TERRAIN_INDICES, TERRAIN_INDICES_LOD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
+    MILL_SAIL_PAD, _building, _dwRubble, _dwRubbleCarry, _groundBefore,
     _livingPatrons, _locationToBuild, spawnGroundPlace, _lptSway, _lptWindfall, _reskin, adoptWodCarry, archAabb, blocks, boardSplitOf,
     breather, buildingDoors, built, chapterSheet, climates3x3, collider, cpuModels, deepWaters, destroyPixel,
     dfMeshSize, dwDecor, ecotones, ensurePersonTex, forests, gateClearSweep, getTexture, getWindmillMeshes,
     halfWidthsOf, heightAt, heightCell, holdPixel, hostBed, jungle, labGrass, landform, livingArmOf, livingAshore,
     livingBaseRate, livingCarriedOf, livingChapterOf, livingCrews, livingCycleOf, livingDeadAt, livingFlatOf,
-    livingKilled, livingPlaceOf, livingRate, livingSlay, livingTownsIndex, livingTripsOf, loadGroundSet, lookOfHome,
+    livingKilled, livingPlaceOf, livingRate, livingSlay, livingTownAt, livingTripsOf, loadGroundSet, lookOfHome,
     lowPolyTrees, maps, modelFeetOf, onlineHomes, personTex, playerTravelPixel, portOnSea, renderer, restrideTerrain,
     seasons, siegeFieldsByTown, snowCover, snowfall, standPixelNpcs, standWodPile, strideFor, terrainGen, tileSide,
     townEcon, townPlacesFor, townSeats, verges, waterOn, waterSheetOf, wod, wodForgetPeerSites, wodOpened, wodPathsPoint,
-    worldHeight
+    worldHeight, lodStride,   // FLORA-GROUND, THE RINGS: the far ring's class (scenes/floraSeat.js warmFlora)
+    provinceAt, arenaRoadsStale, _arenaRoadsStale, swap   // IC-SWAP-BEHIND: a rebuild built behind its view (scenes/swapBehind.js); TESA: the province past the Bay, the Arena roads' stale law and its set
   } = host;
   // ROCK-CLEAR (FIELD BUGS 2026-10-19f): the world collider's one gate - every solid the build files below goes through
   // it, so a part standing round the body (a neighbour's mountain reaching into the body's pixel, a pixel built round a
   // body that outran the stream) is drawn and solid only once the body is clear of it (player/lateSolid.js); the body
   // is the world's, the one its frame settles the gate with (none while a jump's landing builds - its law reads it whole)
   const late = lateSolidsOf(collider);
+  // TESA-LANDS: the lands past the Bay - read once, as the world mounts (its row's
+  // law: a flip reaches the next world); a pixel's ground set its zone's dress where the lands stand
+  const lands = tamrielLandsOn();
+  const landSetOf = (x, y, archive) => (lands ? landGroundSet(x, y, archive, winterSetSnowless) : archive);   // the second audit: a snowless winter its summer's dress
+  /** a 3x3 neighbour's set (k: (dz + 1) * 3 + (dx + 1), dx east, dz north - the map row py - dz): its own zone's dress
+   *  where the 3x3 reads it (climateNeighbourIn - a Bay pixel's neighbour off the Bay wears the pixel's own, undressed) */
+  const neighbourSet = (px, py, k, archive) => {
+    const x = px + (k % 3) - 1, y = py - (Math.floor(k / 3) - 1);
+    return climateNeighbourIn(px, py, x, y) ? landSetOf(x, y, archive) : landSetOf(px, py, archive);
+  };
   /**
    * THE FLATS' GROUPS STOOD (AUDIT PRECIP HOST-7: the build's and a re-skin's one law) - a batch a drawn picture, each
    * flat's group (`g.groups`, its centres) stood as Low Poly Trees' far picture, the Seasons mod's record or the plain
@@ -164,7 +194,7 @@ export function createPixelBuild(host) {
       if (far) {
         lowPolyTrees.acquire(far); lptHandles.push(far);   // AUDIT LPT B5: held until the pixel goes
         const scales = new Float32Array(centers.length), wild = new Uint8Array(centers.length);
-        // LPT-FIT (Mac: "roads still show on roads and pathways. You're not taking the entire model into account"):
+        // LPT-FIT:
         // under clear roadsides every tree here - a location's as well as the wild's - is drawn no wider than the room
         // its root has from the pixel's roads, tracks and streets (world/road/roadVerge.js lptFitCap): its crown, turned
         const crown = verges ? (LPT_CROWNS[lpt.key] ?? 0) : 0;
@@ -220,11 +250,14 @@ export function createPixelBuild(host) {
   }
   async function buildPixelNow(px, py, { roadsRetry = false } = {}) {
     breather.reset();   // PERF7
-    const key = `${px},${py}`, pipeline = holdPixel(key), { getGpuMesh, uploadRecord, uploadRecordFrame } = pipeline;   // FIELD BUGS 2026-10-04d PLACE-LRU: THE PIXEL'S HOLD, the host's three doors and `pipeline` itself shadowed for the whole build - its models, its flats and their frames, its climate's and its homes' swaps (remapSubMeshes / homeLookRemap take this `pipeline`) are held for THIS pixel, released by destroyPixel (or BUILD-FAIL1's ledger), and freed once no standing or kept place holds them. The mills' parts stay the host's (getWindmillMeshes, pinned): millParts outlives every pixel
+    // IC-SWAP-BEHIND (scenes/swapBehind.js): `key` the build's own (its buckets, cover, gates, hold and ledger - the behind
+    // key while its pixel's view stands), `pkey` the pixel's (what stands in `built`, its carries, its stale sets)
+    const pkey = `${px},${py}`, key = swap.keyFor(px, py), pipeline = holdPixel(key), { getGpuMesh, uploadRecord, uploadRecordFrame } = pipeline;   // FIELD BUGS 2026-10-04d PLACE-LRU: THE PIXEL'S HOLD, the host's three doors and `pipeline` itself shadowed for the whole build - its models, its flats and their frames, its climate's and its homes' swaps (remapSubMeshes / homeLookRemap take this `pipeline`) are held for THIS pixel, released by destroyPixel (or BUILD-FAIL1's ledger), and freed once no standing or kept place holds them. The mills' parts stay the host's (getWindmillMeshes, pinned): millParts outlives every pixel
     const made = {};   // BUILD-FAIL1: this build's ledger, until publish hands it to the entry
     _building.set(key, made);
-    const dfLocation = _locationToBuild(px, py) || null;   // SPAWNED-DUNGEONS1: an empty pixel may stand one (AUDIT OW5b D2: a spawn the index holds asked its clocks)
-    // GROUND-AGREE (bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): the terrain is shaped for the place the roll stands
+    const dfLocation = capitalBuildView(_locationToBuild(px, py), px, py, host.state.current) || null;   // SPAWNED-DUNGEONS1: an empty pixel may stand one (AUDIT OW5b D2: a spawn the index holds asked its clocks); IC-GRAND: a slice of the Imperial City far from the player its far view (world/tamrielCapitals.js capitalBuildView)
+    const farView = capitalViewOf(dfLocation) === 'far';   // IC-GRAND: no walker, yard nor port stands a far slice - its blocks close no ground
+    // GROUND-AGREE: the terrain is shaped for the place the roll stands
     // here, alive or dead (world/spawnGroundPlace.js) - every client's the same - and what STANDS is dfLocation's alone
     const groundLocation = spawnGroundPlace.groundLocationAt(px, py, dfLocation);
     // EV7: the LOCATION half stays here - setLocationTiles reads
@@ -238,7 +271,12 @@ export function createPixelBuild(host) {
     // collider, the single atomic built.set - stays on this thread.
     const seedTilemap = new Uint8Array(128 * 128); made.placeHold = pipeline;   // FIELD BUGS 2026-10-04d PLACE-LRU: BUILD-FAIL1's ledger carries the hold, so a build that throws lets it go (releaseFailedBuild)
     let locationRect = null;
+    // IC-GRAND's perf pass (IC-GRAND): a family capital's slice's blocks read a breath
+    // at a time - each taken from the city's worker or made, on the world-data door (world/capitalModels.js) - before
+    // setLocationTiles reads its sixty-four in one task (1.1-1.8 s of one frame in the game, measured)
+    if (capitalViewOf(dfLocation)) for (const name of dfLocation.exterior.exteriorData.blockNames) { blocks.getBlockByName(name); await breather.breathe(); }
     if (groundLocation) locationRect = setLocationTiles(groundLocation, maps, blocks, seedTilemap);
+    if (locationRect) locationRect.gateRoads = townGateRoads(groundLocation, maps, blocks);   // GATE-ROADS: its gates for the kernel to lay their roads (world/townGates.js)
     // WOD2: LocationLoader.AddLocation's DECISION (LocationLoader.cs:101-172),
     // taken here because it reads only the map data and the kernel needs
     // its rects. The region under the player is announced first
@@ -246,7 +284,7 @@ export function createPixelBuild(host) {
     // and again here, where the list is read), every announced folder
     // lands, and the first valid instance naming this pixel takes it.
     let wodPicks = null;
-    // GATE-AGREE (bible/01-Overview/bugs/Field-Bugs-2026-10-24b.md): per pick, whether a clearing withholds its objects. The
+    // GATE-AGREE: per pick, whether a clearing withholds its objects. The
     // clearings - the gate's, every arch this client believes and every fallen star's - are each client's own word, so
     // they never decide a pick: a pick levels the ground. A whole site reaching one keeps its pick and its level ground,
     // and none of its objects stand (GATE-CLEAR: a camp never half stood); the ledger says what it cost
@@ -284,8 +322,10 @@ export function createPixelBuild(host) {
     // EV4: the far ring builds strided with its skirt; the kernel's
     // ghost rows keep edge normals central differences either way.
     const stride = strideFor(px, py);
-    const { samples, tilemap, positions, normals, bed: carved, tilemapBytes, avg, nature, withRoads, paths, wodAverages, beach, roadside } = await terrainGen.generate({
+    const arenaRoadsAt = terrainGen.arenaRoadsEpoch;   // TESA4: the Arena roads' layer this job is built with
+    const { samples, tilemap, positions, normals, indices: terrainIndices, bed: carved, tilemapBytes, avg, nature, withRoads, paths, landProps, wodAverages, graht, beach, roadside, townGround, arenaRoads, bridges } = await terrainGen.generate({
       px, py, stride, tilemap: seedTilemap, locationRect, hasLocation: !!groundLocation, climateType: climateBase,
+      flattenAt: dfLocation?.capital?.flattenAt ?? null,   // TESA11: a capital over several pixels flattened to its centre's ground
       bed: waterOn,   // AUDIT WATER-NEXT P1: the bed under the water, carved on the worker with the grid
       // WOD2: the smoothing arms run in the kernel; FOREST1: and whether each pick is a SITE the woods close round (a camp, a
       // fort, a ruin - not a rock field or a mountain, AUDIT FOREST1 F1) and its whole footprint (its objects, F7)
@@ -293,11 +333,14 @@ export function createPixelBuild(host) {
       // FOREST1: the woods' archive (the climate's summer one, which names its Trees) and whether this pixel's place is one they hide
       forests: forests ? { archive: climate.natureArchive, hidden: FOREST_HIDDEN_LOCATION_TYPES.has(groundLocation?.mapTableData?.locationType) } : null,
       ecotone: natureBorder,   // ECOTONE1: null unless a neighbour's nature differs
+      // TESA-LANDS: past the Bay a zone's own flats (world/tamriel/tamrielLands.js), their border with the Blended climates row
+      lands: lands ? { blend: !!ecotones, archive: climate.natureArchive, hidden: FOREST_HIDDEN_LOCATION_TYPES.has(groundLocation?.mapTableData?.locationType) } : null,
       // BANTHA1: the jungle's field about this pixel (scenes/jungleHost.js job - null where it cannot reach), and whether
-      // its location is a place the woods close round
+      // its location is a place the woods close round; GRAHT1: and the canopy's field, where its graht-oaks stand
       jungle: jungle ? jungle.job(px, py, FOREST_HIDDEN_LOCATION_TYPES.has(groundLocation?.mapTableData?.locationType)) : null,
       landform,   // LANDFORM1-3: the shaped ground, cut along the kernel's own network
     });
+    const walkShut = dfLocation ? fabricWalkShut(townWalkShut(dfLocation, townGround, paths), dfLocation) : null;   // TS6-TS7: its walkers' and its yards' ground the town's own, off its wall; TS10: the paths painted on it its roads; URBANIZER U3: and off its fences and dead ends' walls
     // DW-B: HandlePromote's synchronous arm - a pixel beside the player's is
     // promoted now, on the Deep Waters worker while this build lays out, and
     // published with its seafloor (awaited below); every other one is
@@ -325,9 +368,9 @@ export function createPixelBuild(host) {
     // Beautiful Villages' towns name a climate other than their pixel's), as DFU stands them.
     const townClimateBase = dfLocation?.climate?.climateType ?? climateBase;
     const townClimateArchive = townClimateBase === climateBase ? climateArchive : (archive, record) => applyClimate(archive, record, townClimateBase, pixelSeason);
-    const groundArchive = snowCover ? snowCover.groundArchive(climate, pixelSeason) : getTerrainGroundArchive(climate, pixelSeason);   // the TERRAIN member, Desert winter-guarded (TerrainMaterialProvider.cs:126-133); PRECIP4: the summer set on the snow lane
+    const groundArchive = landSetOf(px, py, snowCover ? snowCover.groundArchive(climate, pixelSeason) : getTerrainGroundArchive(climate, pixelSeason));   // the TERRAIN member, Desert winter-guarded (TerrainMaterialProvider.cs:126-133); PRECIP4: the summer set on the snow lane; TESA-LANDS: its zone's dress of it (a set's key)
     const natureArchive = getNatureArchive(climate.natureArchive, pixelSeason);
-    // VERGE1 (Mac: "Making sure objects, like trees, avoid pathways and roads. Currently they slightly overlap"): THE
+    // VERGE1: THE
     // ROADS THIS PIXEL WAS PAINTED WITH - none when the kernel painted none (the roads sweep builds it again when the
     // network lands) - and the half widths of the climate's own pictures, its summer set's (a season moves no flat)
     const vergeNet = verges && withRoads ? terrainGen.roads() : null;
@@ -337,14 +380,16 @@ export function createPixelBuild(host) {
 
     // R9 tilemap pass: shared-index height grid + per-pixel tilemap
     // texture + one cached texture array per ground archive (loadGroundSet).
-    await loadGroundSet(groundArchive, pipeline, snowCover?.winterOf(climate) ?? null);   // PRECIP4: on the snow lane its twin, its winter in it
+    const ownSet = loadGroundSet(groundArchive, pipeline, snowCover?.winterOf(climate) ?? null);   // PRECIP4: on the snow lane its twin, its winter in it
     // ECOTONE1: and at a climate border the neighbours' sets, held by this pixel as its own is - which set each of
     // its eight neighbours wears (0 its own, 1-3 the sets on the terrain program's units 3-5), and its lattice origin
-    const groundNear = near ? near.map((c) => (snowCover ? snowCover.groundArchive(c, pixelSeason) : getTerrainGroundArchive(c, pixelSeason))) : null;
+    const groundNear = near ? near.map((c, k) => neighbourSet(px, py, k, snowCover ? snowCover.groundArchive(c, pixelSeason) : getTerrainGroundArchive(c, pixelSeason))) : null;   // TESA-LANDS: each its own zone's dress
     let eco = null;
     if (groundNear?.some((a) => a !== groundArchive)) {
       const archives = [...new Set(groundNear.filter((a) => a !== groundArchive))];
-      for (const a of archives) await loadGroundSet(a, pipeline, snowCover?.winterOf(near[groundNear.indexOf(a)]) ?? null);   // PRECIP4: the neighbours' twins
+      // TESA-LANDS (AUDIT): loaded together - a junction of zones met first has each set's dress on its worker while the
+      // page reads and uploads the next, never one set's whole making after another's
+      await Promise.all([ownSet, ...archives.map((a) => loadGroundSet(a, pipeline, snowCover?.winterOf(near[groundNear.indexOf(a)]) ?? null))]);   // PRECIP4: the neighbours' twins
       const slot = (k) => (groundNear[k] === groundArchive ? 0 : archives.indexOf(groundNear[k]) + 1);
       const [ox, oz] = ecoOrigin(px, py);
       eco = {
@@ -353,15 +398,14 @@ export function createPixelBuild(host) {
         corner: Int32Array.of(slot(0), slot(2), slot(6), slot(8)),   // SW, SE, NW, NE
         origin: Int32Array.of(ox, oz, 1),
       };
-    }
+    } else await ownSet;
     // WATER-NEXT 2 (world/water/waterBed.js): the ground the eye sees carved into a bed under the water - the game's ground
     // (heightAt, the samples) never moves - and the water's own sheet, the grid as it stood with the bed's depth.
     // AUDIT WATER-NEXT P1: carved by the kernel on the worker (terrainGen.js restrideGrid), not on this thread
     const bed = hostBed({ positions, normals }, carved);
-    const terrain = renderer.createTerrainSurface(carved?.positions ?? positions, carved?.normals ?? normals,
-      stride === 1 ? TERRAIN_INDICES : TERRAIN_INDICES_LOD);
+    const terrain = renderer.createPixelTerrainSurface(carved?.positions ?? positions, carved?.normals ?? normals, terrainIndices, stride);
     // WATER1 / WATER-AUDIT (M4): the water's own quads - null for a pixel without water, which never enters the pass
-    const waterIndices = waterOn ? buildWaterIndices(tilemapBytes, stride) : null;
+    const waterIndices = waterOn ? buildPixelWaterIndices(tilemapBytes, stride, samples) : null;
     const water = waterIndices ? renderer.createWaterSheet(waterIndices, waterSheetOf(bed, terrain)) : null;
     made.terrain = terrain; made.water = water;   // BUILD-FAIL1
     // EV3: the pixel's presentation bounds, pixel-local - seeded by the
@@ -395,7 +439,11 @@ export function createPixelBuild(host) {
     const light210 = await getTexture(LIGHTS_ARCHIVE);
     const lightSize = (record) =>
       billboardSize(light210, record);
-    const addFlat = (archive, record, x, y, z, skin = null) => { flatLog.push({ archive, record, c: [x, y, z], ...skin }); };
+    const addFlat = (archive, record, x, y, z, skin = null) => {
+      const c = [x, y, z];
+      flatLog.push({ archive, record, c, ...skin });
+      if (skin?.wild != null) standsOnGround(c);   // FLORA-GROUND, THE RINGS: the wild's flats stand on the ground by its law - the kernel's woods and scatter, the roadside pairs' fallback
+    };
     // WOD2: a flat the mod SCALES (LoadObject's `localScale *= scale`,
     // LocationHelper.cs:1243) is a batch of its own at its own size; the
     // shipped layouts scale four records, always uniformly.
@@ -451,13 +499,14 @@ export function createPixelBuild(host) {
       // subrecord widens the block's building count and must not exist
       // on the classic one.
       setLastLocationKeyTo(dfLocation.regionIndex, dfLocation.locationIndex ?? 0);   // AUDIT-RR F32: WorldDataVariants' last key is THIS location's before its blocks are read - DFU reads the DFLocation right before RMBLayout (MapsFile.cs:999 sets it); the boot index here read every location and left the key on the last
-      const loc = layoutLocation(dfLocation, maps, blocks, { enhanced: isEnhanced(), windmills: windmillsOn() });   // WM3: the pack's own switch
+      const loc = await stepsBreathing(layoutLocationSteps(dfLocation, maps, blocks, { enhanced: isEnhanced(), windmills: windmillsOn() }), () => breather.breathe());   // WM3: the pack's own switch; IC-STUTTER: a block a step
       locBlocks = loc.blocks;
+      const fabric = await townFabricFor(dfLocation, loc.blocks, { px, py, breathe: () => breather.breathe(), ground: townGround, paths });   // URBANIZER U3 (world/urban/townFabricStand.js): planned before its yards and its walkers are placed - TOWN-BOARDS: on the town's ground, the outline TS2 flattens, its painted roads its roads (TS10)
       const lefayExitDoors = [];   // HOLD-MONUMENT (AUDIT FIVE-ASKS B1): the Hold's dungeon-entrance doors as its blocks stand them - its way out
       // MERCHANT-YARDS: the town's open ground, clear of its buildings, roads and lots; SHIPYARDS: and a port town's seaward
       // ground, on what the yards left - one pass (AUDIT SHIPYARDS L3-3: the yards' and the port's each asked it whole)
-      const yardTown = isYardTown(dfLocation), portTown = isPortTown(dfLocation, portOnSea(dfLocation));
-      const places = yardTown || portTown ? townPlacesFor(dfLocation, lefaySpot, climate?.people, loc) : null;
+      const yardTown = !farView && isYardTown(dfLocation), portTown = !farView && isPortTown(dfLocation, portOnSea(dfLocation));
+      const places = yardTown || portTown ? await townPlacesFor(dfLocation, lefaySpot, climate?.people, loc, walkShut, () => breather.breathe()) : null;   // TS7: on the town's own ground; IC-STUTTER: a step at a time through the build's breather
       if (yardTown) yardSites = places.yards;
       if (portTown) portSites = places.ports;
       const tilePos = getLocationTerrainTileOrigin(dfLocation);
@@ -479,8 +528,11 @@ export function createPixelBuild(host) {
         homeLookRead = onlineHomes.version() * 1024 + host._lookPreviewGen;
       }
       for (const b of loc.blocks) {
+        // SOLITUDE-RELIEF (world/tamrielCapitals.js capitalBlockLift): a block on a capital's upper tier stands its tier's
+        // height over the location's flatten - its models, doors, flats, people and lights with it (0 everywhere else)
+        const blockY = locLocal[1] + capitalBlockLift(dfLocation, b.x, b.y);
         const originMatrix = trs(
-          locLocal[0] + b.originX, locLocal[1], locLocal[2] + b.originZ, 0, 0, 0);
+          locLocal[0] + b.originX, blockY, locLocal[2] + b.originZ, 0, 0, 0);
         if (wod && b.blockName === PRIVATEERS_HOLD_BLOCK) holdBlocks.push(originMatrix);   // WOD4
         if (b.blockName === ARENA_BLOCK) arenaOrigin = [originMatrix[12], originMatrix[13], originMatrix[14]];   // ARENA2
         // AUDIT 64 F11: DFU's `firstModel` is a LOCAL, reset once per
@@ -522,14 +574,15 @@ export function createPixelBuild(host) {
           // departure; the 1:1 lane must not see it.
           if (placed.enhancedOnly && !isEnhanced()) continue;
           if (isHouseSign(placed, b, (id) => cpuModels.get(id)?.doors)) continue;   // HOUSE-SIGN: a shop's sign at a house's door does not stand
-          const gpu = await getGpuMesh(placed.modelIdNum, () => breather.breathe());   // AUDIT PRE-MERGE 1003 W6: a model built here breathes with the pixel (the colosseum's seal)
+          const local = multiply(originMatrix, placed.matrix);
+          const { own: meshId, other: otherMeshId } = gateMeshIds(placed.modelIdNum, local, paths);
+          const gpu = await getGpuMesh(meshId, () => breather.breathe());   // AUDIT PRE-MERGE 1003 W6: a model built here breathes with the pixel (the colosseum's seal)
           if (!gpu) continue;
           const climateFree = isClimateFreeModel(placed.modelIdNum);   // ARENA1: the colosseum - never swapped, nor a key of the pixel's table
           if (!climateFree) await remapSubMeshes(gpu.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase);   // AUDIT PRECIP HOST-7: kept in the table's recipe under its climate
-          const local = multiply(originMatrix, placed.matrix);
           if (WATER_SOURCE_MODELS.includes(placed.modelIdNum)) pixelSprings.push({ pos: [local[12], local[13], local[14]], dry: false });   // SURV3: a trough is a water source
-          const cpu = cpuModels.get(placed.modelIdNum);
-          const box = transformedAabb(archAabb(placed.modelIdNum, cpu.positions), local);
+          const cpu = cpuModels.get(meshId);
+          const box = transformedAabb(archAabb(meshId, cpu.positions), local);
           unionBox(box);
           const entry = { gpu, local, _box: box, _order: placed.modelIdNum };   // EV6: sort key
           if (climateFree) entry.texRemap = NO_CLIMATE_REMAP;   // ARENA1: drawn by its own table (an empty one - never the pixel's)
@@ -538,7 +591,7 @@ export function createPixelBuild(host) {
           if (homeKey != null) {
             pixelBuildingKeys.add(homeKey);
             // its own place (rmbLayout.js recordAt) and the box round its models: its yard's frame and footprint
-            const at = Array.isArray(placed.recordAt) ? [locLocal[0] + b.originX + placed.recordAt[0], locLocal[1] + placed.recordAt[1], locLocal[2] + b.originZ + placed.recordAt[2]] : null;
+            const at = Array.isArray(placed.recordAt) ? [locLocal[0] + b.originX + placed.recordAt[0], blockY + placed.recordAt[1], locLocal[2] + b.originZ + placed.recordAt[2]] : null;
             const bd = b.dfBlock?.rmbBlock?.fldHeader?.buildingDataList?.[placed.recordIndex] ?? null;   // YARD-LINE: whether it could hold a lot of its own
             const rects = footRectsAt(modelFeetOf(placed.modelIdNum, cpu), local);   // FB1009 HOME-FOOT: the ground its faces cover, never its box
             const f = pixelHomeFrames.get(homeKey);
@@ -576,7 +629,7 @@ export function createPixelBuild(host) {
             }
           }
           const gateKey = isCityGate(placed.modelIdNum) ? `${key}:gate:${pixelGates.length}` : key;
-          late.add(gateKey, cpu.positions, cpu.indices, local,
+          if (isSolidModel(placed.modelIdNum)) late.add(gateKey, cpu.positions, cpu.indices, local,
             { translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])), sight: sightMarksOf(placed.modelIdNum, cpu) });   // BLOOD1 AUDIT 3: the same; PERF-COL2: riding the floating origin; SIGN-PASS: a sign's board met by every ray, by no body
           // THE BULLETIN BOARDS. RMBLayout stands model 41739
           // STANDALONE rather than combining it (:857, :935) for the
@@ -599,13 +652,12 @@ export function createPixelBuild(host) {
           // the pixel union for BOTH variants so culling stays truthful
           // whichever is drawn.
           if (isCityGate(placed.modelIdNum)) {
-            const otherId = placed.modelIdNum === CITY_GATE_OPEN_MODEL_ID
-              ? CITY_GATE_CLOSED_MODEL_ID : CITY_GATE_OPEN_MODEL_ID;
-            const otherGpu = await getGpuMesh(otherId);
-            const otherCpu = cpuModels.get(otherId);
+            const otherId = otherGateModelId(placed.modelIdNum);
+            const otherGpu = await getGpuMesh(otherMeshId);
+            const otherCpu = cpuModels.get(otherMeshId);
             if (otherGpu && otherCpu) {
               await remapSubMeshes(otherGpu.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase);
-              unionBox(transformedAabb(archAabb(otherId, otherCpu.positions), local));
+              unionBox(transformedAabb(archAabb(otherMeshId, otherCpu.positions), local));
             }
             pixelGates.push({
               gate: makeCityGate(placed.modelIdNum), entry, local, bucketKey: gateKey,
@@ -633,7 +685,7 @@ export function createPixelBuild(host) {
             if (dfLocation.hasDungeon) for (const d of cpu.doors) if (d.type === DOOR_TYPE.DUNGEON_ENTRANCE) pixelDungeonDoors.push({ door: doorCornersOf(d, local), box, normal: doorNormalOf(d, local), arena: b.blockName === ARENA_BLOCK });   // CASTLE-GATE (AUDIT G1: its outward normal; AUDIT PRE-MERGE 1003 W7: the undercroft's stair, no castle's - castleEntranceOf passes it over)
             for (const door of staticDoors) {
               host.doorGeneration += 1;   // WORLD-HOVER: a pixel's doors arriving
-              buildingDoors.push({
+              (key === pkey ? buildingDoors : (made.doors ??= [])).push({   // IC-SWAP-BEHIND: staged on its ledger while it builds behind
                 door, pixelKey: key, dfBlock: b.dfBlock, blockX: b.x, blockY: b.y,   // LW2: the block's grid cell, so a door names its building (makeBuildingKey)
                 // A1: the season a door carries INSIDE is the
                 // interior's own constant, never the world's.
@@ -665,7 +717,7 @@ export function createPixelBuild(host) {
           pixelNpcFlats.push({
             ...npc,
             x: locLocal[0] + b.originX + npc.x,
-            y: locLocal[1] + npc.y,
+            y: blockY + npc.y,
             z: locLocal[2] + b.originZ + npc.z,
           });
         }
@@ -676,13 +728,13 @@ export function createPixelBuild(host) {
           // what the NPC pass takes over below.
           if (flat.archive === ANIMALS_ARCHIVE && ANIMAL_SOUND_BY_RECORD[flat.record] != null) {
             pixelAnimals.push({
-              pos: [locLocal[0] + b.originX + flat.x, locLocal[1] + flat.y, locLocal[2] + b.originZ + flat.z],
+              pos: [locLocal[0] + b.originX + flat.x, blockY + flat.y, locLocal[2] + b.originZ + flat.z],
               sound: ANIMAL_SOUND_BY_RECORD[flat.record],
             });
           }
           // SURV3: a fountain or a well is a water source (the mod's RegisterCustomActivation list); the dry one only says so
           if (isWaterSourceFlat(flat.archive, flat.record) || isDrySourceFlat(flat.archive, flat.record)) {
-            pixelSprings.push({ pos: [locLocal[0] + b.originX + flat.x, locLocal[1] + flat.y, locLocal[2] + b.originZ + flat.z], dry: isDrySourceFlat(flat.archive, flat.record) });
+            pixelSprings.push({ pos: [locLocal[0] + b.originX + flat.x, blockY + flat.y, locLocal[2] + b.originZ + flat.z], dry: isDrySourceFlat(flat.archive, flat.record) });
           }
           // E3: an exterior StaticNPC's BILLBOARD is stood by
           // standPixelNpcs, not batched here - RMBLayout hands the same
@@ -703,23 +755,31 @@ export function createPixelBuild(host) {
           // read it - it simply never reaches a batch.
           if (flat.editor) continue;
           const fx = locLocal[0] + b.originX + flat.x, fz = locLocal[2] + b.originZ + flat.z;
-          // STAND-FLAT / STAND-HORSE (bible/04-Characters/Morrowind-NPCs.md section 28): a town horse and a person no
+          // STAND-FLAT / STAND-HORSE: a town horse and a person no
           // StaticNPC holds (a flat of a person's archive with no faction) stand in batches of their own
           // (standPixelFlats, below), so a 3D horse or a Morrowind body can take one's place. Neither was ever cover
           // (201 is NOT_COVER's; a person never is - AUDIT TACT B3).
-          if (isStandFlat(flat.archive, flat.record)) { pixelStandFlats.push({ archive: flat.archive, record: flat.record, x: fx, y: locLocal[1] + flat.y, z: fz }); continue; }
-          // NATURE-GROUND (2026-09-26, Ilvi: "a lot of floating sprites across Illiac Bay"): the block's ground scenery and nature
+          if (isStandFlat(flat.archive, flat.record)) { pixelStandFlats.push({ archive: flat.archive, record: flat.record, x: fx, y: blockY + flat.y, z: fz }); continue; }
+          // NATURE-GROUND: the block's ground scenery and nature
           // flats stand on the DRAWN ground - the plane holds only inside the flattened rect, the band past it is only eased toward
           // it (DFU's too: AddNatureFlats reads no terrain); inside the rect the lift is exactly 0. A lamp, a sign, an animal keep the
           // plane. TREES-SEATED (Rissa: "Floating trees in Tamhope"): in a block whose hills the port draws as its stand-ins, a flat
           // of the nature range (the 504 trees stood on the pack's bigger hills) stands on the higher of the ground and the mounds.
-          const lift = flat.archive === natureArchive ? groundOffPlane(samples, avg, fx, fz) : 0;
-          addFlat(flat.archive, flat.record, fx, locLocal[1] + (hillSeat && isNatureArchive(flat.archive) ? seatNatureFlat(hillSeat, flat.x, flat.z, NATURE_FLATS_Y + groundOffPlane(samples, avg, fx, fz)) : flat.y + lift), fz, { block, n });
+          // SOLITUDE-RELIEF: a nature flat stands on the drawn ground (its offset off the plane holds the block's tier), a seated
+          // one on its block's own hills (FLORA-GROUND's hill ground read off its block's tier), every other flat on its block -
+          // all one law where the block stands on the plane
+          const off = flat.archive === natureArchive || (hillSeat && isNatureArchive(flat.archive)) ? groundOffPlane(samples, avg, fx, fz) : 0;
+          const hillY = hillSeat && isNatureArchive(flat.archive) ? NATURE_FLATS_Y + off - (blockY - locLocal[1]) : null;
+          const fy = hillY !== null ? blockY + seatNatureFlat(hillSeat, flat.x, flat.z, hillY) : flat.archive === natureArchive ? locLocal[1] + flat.y + off : blockY + flat.y;
+          addFlat(flat.archive, flat.record, fx, fy, fz, { block, n });
+          // FLORA-GROUND, THE RINGS (scenes/floraSeat.js): a nature flat stood on the ground - the climate's, the plane's
+          // band under it; a hill block's where no mound raised it - is drawn on the ground its pixel draws at every ring
+          if (hillY !== null ? seatNatureFlat(hillSeat, flat.x, flat.z, hillY) === hillY : flat.archive === natureArchive) standsOnGround(flatLog[flatLog.length - 1].c);
         }
         for (const light of collectCityLights(b.dfBlock, lightSize)) {
           const lp = [
             locLocal[0] + b.originX + light.x,
-            locLocal[1] + light.y,
+            blockY + light.y,
             locLocal[2] + b.originZ + light.z,
           ];
           pixelLights.push(lp);
@@ -729,7 +789,7 @@ export function createPixelBuild(host) {
           // is the one place that has it.
           // FIX-D: and the sprite under the flame - base y, width,
           // height - pixel-local like the rest, for the eye's box.
-          if (isHearthFlat(LIGHTS_ARCHIVE, light.record)) pixelHearths.push([lp[0], lp[1], lp[2], locLocal[1] + light.foot, light.w, light.h]);
+          if (isHearthFlat(LIGHTS_ARCHIVE, light.record)) pixelHearths.push([lp[0], lp[1], lp[2], blockY + light.foot, light.w, light.h]);
         }
       }
       // HOLD-MONUMENT (AUDIT FIVE-ASKS B1): the monument's spot, its blocks stood - beside the Hold's way out (DFU's exit landing over
@@ -754,7 +814,7 @@ export function createPixelBuild(host) {
           }
           const spots = gothwayNorthSpots((gx, gy) => navB.weightAt(gx, gy), navB.width, navB.height, NAV_CELL) ?? [];
           for (const sp of spots) {
-            // GOTHWAY-LIFT (the owner: "the boards are in the ground"): the board's mesh is centred on its origin, so it
+            // GOTHWAY-LIFT: the board's mesh is centred on its origin, so it
             // is stood with its FOOT on the town's ground - lifted by its own box's floor
             const lift = -archAabb(BULLETIN_BOARD_MODEL_ID, cpuB.positions)[1] + 0.02;
             const local = trs(locLocal[0] + sp.x, locLocal[1] + lift, locLocal[2] + sp.z, 0, sp.yawDeg, 0);
@@ -769,6 +829,22 @@ export function createPixelBuild(host) {
         }
       }
 
+      // URBANIZER U3 (world/urban/townFabricModel.js): the town's own fabric - its main streets' setts and pavements, its side
+      // streets' cobbles, its yards' fences and walls, its dead ends' walls, its woodpiles - one model at its origin, merged
+      // and solid as its blocks' are, its Daggerfall pieces in the town's climate
+      if (fabric) {
+        const gpuF = await getGpuMesh(fabric.modelId, () => breather.breathe()), cpuF = cpuModels.get(fabric.modelId);
+        if (gpuF && cpuF) {
+          await remapSubMeshes(gpuF.subMeshes, texRemap, townClimateArchive, pipeline, townClimateBase);
+          const local = trs(locLocal[0], locLocal[1], locLocal[2], 0, 0, 0), box = transformedAabb(archAabb(fabric.modelId, cpuF.positions), local);
+          unionBox(box);
+          const entry = { gpu: gpuF, local, _box: box, _order: fabric.modelId };
+          models.push(entry);
+          if (cpuF.normals && cpuF.uvs) { addStatic(cpuF, local, false); entry._batched = true; }
+          late.add(key, cpuF.positions, cpuF.indices, local, { translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])) });
+        }
+      }
+
       // T2 towns: the streaming host's wandering population (the
       // standing host rule - every scene-side seam ships in every
       // motor host). The navgrid + persons live in the LOCATION frame
@@ -777,7 +853,7 @@ export function createPixelBuild(host) {
       // translation. Persons ground on the flattened location terrain
       // (blendLocationTerrain planes the rect to avg - the same base
       // the RMB flats sit on). Location-type gate verbatim.
-      if (populatesWanderingNpcs(dfLocation.mapTableData.locationType)) {
+      if (!farView && populatesWanderingNpcs(dfLocation.mapTableData.locationType)) {
         await ensurePersonTex();
         const nav = new CityNavigation(loc.width, loc.height);
         for (const b of loc.blocks) {
@@ -787,7 +863,9 @@ export function createPixelBuild(host) {
           // draws water, a wandering NPC will not walk into it.
           nav.setBlockData(b.x, b.y, b.dfBlock.rmbBlock.fldHeader.autoMapData,
             (tx, ty) => srcTiles[tx][ty].textureRecord, { enhancedWater: waterSwitchOn() });
+          await breather.breathe();   // IC-STUTTER: a block of the walkers' grid a breath (a city's sixty-four were one task)
         }
+        walkShut?.(nav);   // TS6: and only on the town's own ground, never through its wall (world/townWalls.js townWalkShut)
         if (lefaySpot) carveLefay(nav, lefaySpot);   // LEFAY1: the people walk round the monument, never through it
         if (yardSites?.length) carveYards(nav, yardSites);   // MERCHANT-YARDS: and round the yards
         if (portSites?.length) carveYards(nav, portSites);   // SHIPYARDS: and round the shipyard and the lighthouse
@@ -801,11 +879,11 @@ export function createPixelBuild(host) {
               [from[0] + locOrigin[0] + t[0], from[1] + t[1], from[2] + locOrigin[2] + t[2]], dir, l);
           },
         };
-        // LW2 (2026-10-04, Mac: "NPCs are no longer just random walking entities"): THE LIVING WORLD'S STREETS where
+        // LW2: THE LIVING WORLD'S STREETS where
         // the Features row says (systems/livingWorld/livingSwitch.js) - the town's residents on their days
         // (systems/livingWorld/livingTown.js), in the pool's own shape and on the same navgrid, bodies and batches; the
         // town's doors named by their buildings (the block cell each door now carries), its buildings by their summaries.
-        // JAN1 (2026-09-18, Janome: "people walking in the sky lol, just outside the city"): THE TERRAIN'S
+        // JAN1: THE TERRAIN'S
         // FLOOR, not the location's average. The navgrid is the BLOCK rect; the flattened rect is the stamped
         // tiles plus a clearance (terrainTiles.js setLocationTiles) and is smaller by a band of ~70 units on
         // every side, and blendLocationTerrain only EASES that band toward the average - so a walker there stood
@@ -818,23 +896,35 @@ export function createPixelBuild(host) {
           const h = heightAt(x + locOrigin[0] + t[0], z + locOrigin[2] + t[2]);
           return Number.isFinite(h) ? h - t[1] + 2.0 * 0.025 : locOrigin[1];
         };
-        const livingTown = livingTownsIndex().get(py * 1000 + px) ?? {
+        const livingTown = livingTownAt(px, py) ?? {
           mapId: (dfLocation.mapTableData?.mapId ?? 0) >>> 0, name: dfLocation.name, px, py,
           type: dfLocation.mapTableData?.locationType, region: dfLocation.regionIndex, people: climate?.people,
           blocks: loc.width * loc.height, port: hasPort(dfLocation.mapTableData?.mapId),
-        };   // LW3: the roads' own record of the town (the same row the trips read), a mod's town its own
-        population = livingWorldOn() ? new LivingTown(nav, {
+        };   // LW3: the roads' own record of the town (the same row the trips read - WW1: the world's registry's, wherever it stands), a mod's town its own
+        // IC-STUTTER (IC-STUTTER): the town's buildings and doors first, and its places
+        // made of them a step at a time through the build's breather (livingTown.js livingTownPlaces) - one task of
+        // 0.1-0.4 s on a near slice of the Imperial City where the town made them itself
+        /** @type {any} */
+        const livingOf = {
           town: livingTown,
           buildings: buildingSummaries(dfLocation.exterior?.buildings ?? [], loc.blocks, { locationIndex: dfLocation.locationIndex ?? 0, locationName: dfLocation.name })
-            .map((b) => ({ key: b.buildingKey, type: b.buildingType, quality: b.quality, factionId: b.factionId })),
-          doors: buildingDoors.filter((d) => d.pixelKey === key && d.blockX != null).map((d) => {
+            .map((b) => ({ key: b.buildingKey, type: b.buildingType, quality: b.quality, factionId: b.factionId })).concat(cityHomesOf(dfLocation).buildings),   // IC-GRAND: the fabric's homes (world/imperialHomes.js)
+          doors: (made.doors ?? buildingDoors).filter((d) => d.pixelKey === key && d.blockX != null).map((d) => {
             const m = d.door.matrix, c = d.door.centre, n = d.door.normal;
             return {
               key: makeBuildingKey(d.blockX, d.blockY, d.recordIndex),
               x: m[0] * c.x + m[4] * c.y + m[8] * c.z + m[12] - locOrigin[0], z: m[2] * c.x + m[6] * c.y + m[10] * c.z + m[14] - locOrigin[2],
               nx: m[0] * n.x + m[4] * n.y + m[8] * n.z, nz: m[2] * n.x + m[6] * n.y + m[10] * n.z,
             };
-          }),
+          }).concat(cityHomesOf(dfLocation).doors),
+        };
+        if (livingWorldOn()) livingOf.places = await livingTownPlaces(nav, livingOf, () => breather.breathe());
+        // IC-STUTTER: and its streets' pieces flooded a step at a time before it stands - the town walk's (systems/travel/
+        // townWalk.js componentsOf: the traveller's pace and way ask them), kept on the grid; asked whole by the first
+        // frame of a traveller in it, a slice of the Imperial City's 512 by 512 cells was a task of its own
+        await stepsBreathing(componentsSteps(nav), () => breather.breathe());
+        population = livingWorldOn() ? new LivingTown(nav, {
+          ...livingOf,
           makePerson: (archive, guard) => {
             const person = new ResidentWalker(nav, { archive, guard, frameCount: (rec, a) => personTex.get(a).getFrameCount(rec), collider: personCollider, groundY: personGroundY });
             personBatches.set(person, renderer.createBillboardBatch(archive, 0, { w: 1, h: 1 }, [[0, 0, 0]]));
@@ -868,7 +958,7 @@ export function createPixelBuild(host) {
             return !(Number.isFinite(hit) && hit < len - 0.25);
           },
           harbour: () => {   // LW5: its harbour's berth in the location's frame (the dock of a port with no Ship building)
-            const b = host.harbourBook.get(`port:${maskMapId(livingTown.mapId)}`)?.harbour?.berths?.[0];
+            const b = host.harbourBook.get(`port:${portIdOf(livingTown)}`)?.harbour?.berths?.[0];   // WW3: its port id, the world's key past the Bay
             if (!b) return null;
             const tr = host.state.pixelTranslation(px, py);
             return { x: b.pos[0] - locOrigin[0] - tr[0], z: b.pos[1] - locOrigin[2] - tr[2] };
@@ -883,7 +973,7 @@ export function createPixelBuild(host) {
           // People; the NAME bank = the REGION's (MobilePersonNPC.cs:214).
           // REGIONAL-FOLK: and a Redguard region's walkers are Redguards.
           race: walkerRace(climate?.people, dfLocation.regionIndex),
-          nameBank: getNameBankOfRegion(dfLocation.regionIndex),
+          nameBank: provinceNameBank(provinceAt(px, py)?.key) ?? getNameBankOfRegion(dfLocation.regionIndex),   // AUDIT-TESA A2-5: past the Bay the province's people, never the Bay region's
           makePerson: (archive, guard) => {
             const person = new MobilePerson(nav, {
               archive, guard,
@@ -924,15 +1014,15 @@ export function createPixelBuild(host) {
       for (const m of place.models) {
         const gpu = await getGpuMesh(m.modelId);
         if (!gpu) continue;   // a model ARCH3D does not carry stands empty in DFU (no mesh, no collider)
-        const cpu = wodRockUvs(cpuModels.get(m.modelId), m.matrix, m.modelId);   // FB1001-WODROCK (Mac: "Retexture them to be as detailed as possible"): a piece stretched 4x or more draws its planes unfolded at its pebble's own texel density (world/worldOfDaggerfall/wodRockUv.js) - new UVs only, its positions and indices the model's own arrays; a camp or a house is the same object
+        const cpu = wodRockUvs(cpuModels.get(m.modelId), m.matrix, m.modelId);   // FB1001-WODROCK: a piece stretched 4x or more draws its planes unfolded at its pebble's own texel density (world/worldOfDaggerfall/wodRockUv.js) - new UVs only, its positions and indices the model's own arrays; a camp or a house is the same object
         const box = transformedAabb(archAabb(m.modelId, cpu.positions), m.matrix);
-        // WOD-BUSH (2026-10-01, Mac: "World of daggerfall bush props float above the ground in bandit camps"): the
+        // WOD-BUSH: the
         // layouts' shrub stands on the DRAWN ground. The mod stands every object on the site's average plus the
         // author's own height, and the ground is levelled to that average only inside the site's rect - the band past
         // it is eased toward it (flattenForLocation), and the shrubs ring the site in that band, at heights the
         // author read off the ground of the one place they were laid out. They hung over ground falling away (DFU's
         // too). Its mesh's foot goes to the lowest ground under the middle of its footprint, collider and all.
-        if (isWodShrub(m.modelId, stood[m.pick]?.name)) {   // ROCK-SUNK (2026-10-02, the field: "Insane glitched geometry over at Hadus"): the rock fields build their outcrops of the same model - boulders scaled 5.6 to 95, set into the piles on purpose - and standing those on their lowest corner raised shards hundreds of metres into the sky round Hadus; a Rocks or Mountains site keeps the mod's height (world/worldOfDaggerfall/wodLocationObjects.js isWodShrub)
+        if (isWodShrub(m.modelId, stood[m.pick]?.name)) {   // ROCK-SUNK: the rock fields build their outcrops of the same model - boulders scaled 5.6 to 95, set into the piles on purpose - and standing those on their lowest corner raised shards hundreds of metres into the sky round Hadus; a Rocks or Mountains site keeps the mod's height (world/worldOfDaggerfall/wodLocationObjects.js isWodShrub)
           const dy = lowestGroundUnder(samples, box) - box[1];
           m.matrix[13] += dy; box[1] += dy; box[4] += dy;
         }
@@ -940,11 +1030,11 @@ export function createPixelBuild(host) {
         // under it is lowered into the ground - its open underside never stands in the air; one in the ground stays put
         // - and only a piece SET into it (its foot under the ground at its middle): one the mod rests on another's crown keeps its height
         if (rockPick(m.pick) && box[1] < surfaceHeightAt(samples, Math.max(0, Math.min(TERRAIN_SIZE, (box[0] + box[3]) / 2)), Math.max(0, Math.min(TERRAIN_SIZE, (box[2] + box[5]) / 2)))) { const dy = rockSeatDrop(lowestGroundUnder(samples, box), box[1]); if (dy < 0) { m.matrix[13] += dy; box[1] += dy; box[4] += dy; } }
-        // ROADS-CLEAR (2026-09-25, Mac: "Camps, mountains from WOD, shouldnt be placed on roads"): a piece whose own
+        // ROADS-CLEAR: a piece whose own
         // mesh box reaches a road - here or in the pixel it spills into - is not stood: no mesh, no collider. The rock
         // fields and mountains lose the pieces over the road and keep the rest; a whole site was asked at its pick.
         if (boxNearPath(_roadsNow, px, py, box[0] * UNITS_PER_METRE, box[2] * UNITS_PER_METRE, box[3] * UNITS_PER_METRE, box[5] * UNITS_PER_METRE, WOD_PIECE_ROAD_CLEAR)) { _wodOffRoad++; continue; }
-        // GATE-CLEAR (2026-09-28, Mac: "the gate can spawn inside the rock geometry from world of daggerfall"): nor one
+        // GATE-CLEAR: nor one
         // whose box reaches the Oblivion Gate's clearing (world/gate/gateClearance.js) - a gate risen inside a boulder is out
         // of reach of the press and the step. What stands goes in the reach, for the next gate's sweep to ask.
         if (boxNearGate(gateClear, px, py, box[0], box[2], box[3], box[5])) { gateLedger.refused = true; _wodOffGate++; continue; }
@@ -1004,11 +1094,15 @@ export function createPixelBuild(host) {
       const site = [...wodPicks].reverse().find((p) => p.flatten);
       if (site) wodSite = { xMin: site.rect.x, xMax: site.rect.x + site.rect.width, yMin: site.rect.y, yMax: site.rect.y + site.rect.height };
     }
+    // ROAD-LOOK (world/road/bridgeModels.js): the bridges this pixel owns, the kernel's - a road or a track over a river wider
+    // than a ford - merged with its statics and solid in its bucket through the gate, both freed with the pixel
+    const bridgeBucket = onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0]));
+    standBridges(bridges, px, py, { addStatic: (m, at) => addStatic(m, at, true), solid: (m, at) => late.add(key, m.positions, m.indices, at, { translation: bridgeBucket }), grow: unionBox });
 
     // EV7: the nature layout arrived with the kernel's reply - laid
     // out over the same blended samples and finished tilemap, consumed
     // at the same point in the sequence it was always computed at.
-    // PROF4 (bible/06-Systems/Professions-Arc.md 25): THE FOREST'S TREES KEPT - the flats World of Daggerfall's table names
+    // PROF4 (25): THE FOREST'S TREES KEPT - the flats World of Daggerfall's table names
     // a Tree by the climate's summer archive, each its group and its place in it: Logging's trees stand at them
     const pixelTrees = [];
     // BANTHA1: THE JUNGLE'S TREES - the flats its layout stood as the owner's trees (world/terrain/jungleNature.js: a
@@ -1016,7 +1110,15 @@ export function createPixelBuild(host) {
     const jungleGroups = new Map();
     const jungleOk = !!jungle && nature.some((f) => f.jungle != null) && !!(await jungle.door.load());
     const borderNature = new Map();   // ECOTONE1: a neighbour climate's nature archive the border stood here -> its summer archive
+    // TESA-LANDS: THE LANDS' LANDMARKS past the Bay (world/lands/landProps.js) - the worker's, each kept whole or not at all
+    // off the gate's clearing and the rocks as the graht-oaks are (below), and the flats kept off the feet of those kept
+    // (AUDIT: the worker cleared them under every landmark, and one the gate or a rock dropped left a bare ring)
+    const fire = onTheBay(px, py) ? null : fireClearing(px, py);   // LAVA-CLEAR, FENCE-CLEAR: the lava's beds and the fence's line
+    const landStood = lands ? standLandProps(px, py, fire ? clearedLandProps(fire, landProps) : landProps, (x, z) => !pointNearGate(gateClear, px, py, x, z, WOD_FLAT_GATE_CLEAR_M) && !insideRocks(pixelRocks, x, z)) : null;
+    const offLand = landFeetOff(landStood?.set.props, TERRAIN_SIZE / WORLD_MAP_TILE_DIM);
     for (const f of nature) {
+      if (offLand?.(f.x, f.z)) continue;   // TESA-LANDS: a stalk's, a column's, a trunk's foot and a vineyard's rows clear
+      if (fire?.(f.x, f.z)) continue;   // LAVA-CLEAR, FENCE-CLEAR: no flat in the lava or the fence
       // GATE-CLEAR (AUDIT FOREST1 F5): the day's Oblivion Gate keeps its clearing of nature as it keeps it of World of
       // Daggerfall's flats - a tree no longer stands through the gate's stone or the Sigil Broker (the sweep builds the
       // pixel again when the gate's day turns). FOREST1 (F1): and a wood's flats keep out of the rock pieces it grows
@@ -1061,7 +1163,7 @@ export function createPixelBuild(host) {
       for (const t of pairs.flatMap((p) => p.trees)) {
         const archive = getNatureArchive(JUNGLE_ARCHIVE, pixelSeason);
         if (archive !== natureArchive) borderNature.set(archive, JUNGLE_ARCHIVE);
-        addFlat(archive, t.record, t.x, surfaceHeightAt(samples, t.x, t.z), t.z, { wild: JUNGLE_ARCHIVE });
+        addFlat(archive, t.record, t.x, walkGroundAt(samples, t.x, t.z), t.z, { wild: JUNGLE_ARCHIVE });
       }
     }
     // WOD4: THE CAMP AT PRIVATEER'S HOLD (world/worldOfDaggerfall/wodPrivateersHold.js).
@@ -1102,6 +1204,9 @@ export function createPixelBuild(host) {
       privateersHold = { origins: holdBlocks.map((o) => [o[12], o[13], o[14]]), state: { rolled: false, foes: [], gone: false } };   // a carried roll replaces it at publish (m4)
     }
 
+    // GHOSTFENCE (scenes/ghostfenceBuild.js): the Ghostfence's pylons, its curtain's solid and Ghostgate where it crosses
+    // this pixel past the Bay, on its own ground
+    if (!onTheBay(px, py)) standGhostfence({ px, py, pkey, key, samples, renderer, addStatic, unionBox, late, translation: onFloatingFrame(host.state, ((o) => () => host.state.pixelTranslation(px, py, o))([0, 0, 0])) });
     // OW-WOD-LAG: the pixel's wide faces (a World of Daggerfall massif's rocks) in their tree now, once every mesh of the
     // pixel's bucket is in - inside the build, never raised by the first query of a frame in play
     collider.settle(key);
@@ -1127,13 +1232,14 @@ export function createPixelBuild(host) {
     // season's own number named none in winter, so a winter wood's trees were cover as flats - mended with it)
     const natureSet = new Set([natureArchive, ...borderNature.keys()]);
     const natureBase = (a) => (a === natureArchive ? climate.natureArchive : borderNature.get(a));
-    // WITCH1 (bible/06-Systems/Witches-Festival.md): WHILE THE WITCHES' FESTIVAL RUNS, the town dressed in its people's
+    // WITCH1: WHILE THE WITCHES' FESTIVAL RUNS, the town dressed in its people's
     // way and a Wyrd Sister at each tavern's door (world/witchesDecor.js) - its flats logged with the block's (they batch,
     // light, stand solid and keep through a re-skin as those do), a fire among them a hearth, the Sisters stood with the
     // street's people below; each spot clear of the walls the pixel's bucket now holds and of what the town stands
     const witchDress = witchFloor != null && locBlocks ? await witchesDressingBreathing({
       frames: pixelHomeFrames, taverns: buildingKeysOfType(locBlocks, makeBuildingKey, TALK_BUILDING_TYPES.Tavern), temples: buildingKeysOfType(locBlocks, makeBuildingKey, TALK_BUILDING_TYPES.Temple),
       mapId: dfLocation?.mapTableData?.mapId ?? 0, climateIndex: maps.getClimateIndex(px, py), region: dfLocation?.regionIndex ?? null, floorY: witchFloor,
+      floorAt: dfLocation?.capital && locOrigin ? (x, z) => witchFloor + capitalBlockLift(dfLocation, Math.floor((x - locOrigin[0]) / RMB_SIDE), Math.floor((z - locOrigin[2]) / RMB_SIDE)) : null,   // SOLITUDE-RELIEF: a block's tier
       blocked: colliderBlocked(collider, host.state, px, py), ground: dryGround(locBlocks, locOrigin), taken: [...flatLog.map((f) => f.c), ...[...pixelNpcFlats, ...pixelStandFlats].map((n) => [n.x, n.y, n.z])],
     }, () => breather.breathe()) : null;   // PERF7: a city's rays breathe
     for (const f of witchDress?.flats ?? []) {
@@ -1174,6 +1280,7 @@ export function createPixelBuild(host) {
     }
     for (const [gk, g] of jungleGroups) {
       await breather.breathe();
+      g.centers.forEach(standsOnGround);   // FLORA-GROUND, THE RINGS: the jungle's trees and its roadside pairs stand on the ground by its law
       const species = g.species, record = JUNGLE_SPECIES[species].record;
       g.centers.forEach((c, i) => coverItems.push(jungleBody(c, species, g.own[i])));   // PROP-BODIES: its trunk, whichever picture stands
       const pic = await speciesPic(species);
@@ -1216,6 +1323,23 @@ export function createPixelBuild(host) {
       forestGroups.set(gk, { batch, centers: g.centers, size: far.size, scales });   // PROF4: a felled tree's batch - it falls as its far picture
       g.centers.forEach((c, i) => coverItems.push(...jungleCover(c, species, own[i])));   // TACT1: its own trunk and crown
     }
+    // GRAHT1: VALENWOOD'S GRAHT-OAKS (scenes/grahtHost.js) - the worker's, each kept whole or not at all off the gate's
+    // clearing and the rocks as every flat; the set rides the pixel (its host frames every built pixel's), its trunks' and
+    // buttresses' bodies its cover, with the jungle's (kept through a re-skin as theirs are)
+    const grahtStood = jungle?.graht?.stand(px, py, graht, (x, z) => !pointNearGate(gateClear, px, py, x, z, WOD_FLAT_GATE_CLEAR_M) && !insideRocks(pixelRocks, x, z)) ?? null;
+    if (grahtStood) coverItems.push(...grahtStood.bodies);
+    // TESA-LANDS: the landmarks stood above - the set rides the pixel (the trees' host frames every built pixel's -
+    // scenes/landPropsHost.js), the bodies of its stalks, columns and trunks its cover
+    if (landStood) coverItems.push(...landStood.bodies);
+    // FLORA-GROUND, THE RINGS (scenes/floraSeat.js): ITS PLANTS DRAWN ON THE GROUND IT IS BUILT AT - every forest group's
+    // batch and its graht-oaks, on its ring's ground, its box grown to hold them - a breath of its own (the far ring's
+    // first read of its ground), before it publishes and its felled trees are sunk; the world host seats them again
+    // wherever that ground changes (world.js restrideTerrain, dwRecarve)
+    await breather.breathe();
+    seatFlora({ samples, _stride: stride, _bed: bed, _box: bounds, forest: { groups: forestGroups }, grahtOaks: grahtStood?.set ?? null, landProps: landStood?.set ?? null }, renderer);   // TESA-LANDS: and the landmarks
+    // and built near, the far ring's lifts made ahead in a breath of their own - the walk away from a pixel built about the
+    // player (a load, a landing) demotes five at a crossing, each then reading its ground in the crossing's frame
+    if (stride === 1 && lodStride > 1) { await breather.breathe(); warmFlora({ samples, forest: { groups: forestGroups }, grahtOaks: grahtStood?.set ?? null, landProps: landStood?.set ?? null }, lodStride); }
     // WOD2: the scaled flats - billboardSize times the object's own scale.
     for (const { archive, record, scale, centers } of scaledGroups.values()) {
       const t = await getTexture(archive);
@@ -1231,7 +1355,7 @@ export function createPixelBuild(host) {
       if (isCoverFlat(archive, record, size)) for (const c of centers) coverItems.push(coverProxy(c, size));
       coverItems.push(...flatBodies(t, archive, record, size, centers, { tree: natureSet.has(archive) && isTreeRecord(natureBase(archive), record) }));   // PROP-BODIES
     }
-    // STAND-FLAT / STAND-HORSE (bible/04-Characters/Morrowind-NPCs.md section 28): each town horse and each person no
+    // STAND-FLAT / STAND-HORSE: each town horse and each person no
     // StaticNPC holds a batch of its own in the pixel's list (its cull, its far-ring rule, its animation and its teardown
     // the groups'), minted as a group's plain picture is - a person's picture the clothed stand-in's under NUDE-FLATS, the
     // born flat their identity. The record is world/standFlats.js's (a horse's heading and look, a person's piece for
@@ -1293,9 +1417,7 @@ export function createPixelBuild(host) {
     // EV6: the pixel's models sort by MESH at build - one archetype's
     // placements draw back to back and the VAO shadow skips the rebind.
     models.sort((a, b) => a._order - b._order);
-    // PERF-EXT23 (2026-09-25, the players: "fps issues in the exterior but
-    // fine in the interior", "me too my friend.. don't know why. I got a
-    // RX6600"): THE TAIL BREATHES TOO. The merge and createMesh's spheres ran
+    // PERF-EXT23: THE TAIL BREATHES TOO. The merge and createMesh's spheres ran
     // after the last breath above in one piece - on a synthetic city pixel
     // 45-60 ms of ONE frame, on a town 6-26 ms, for every town, city and WoD
     // pixel streamed in. The merge now yields a model's copy, a range of the
@@ -1345,13 +1467,14 @@ export function createPixelBuild(host) {
       gates: pixelGates.map((g) => ({ box: g.entry?._box })), boards: pixelBoards, bounty: pixelBoardSplit, centre: townCentreOf(pixelHomeFrames),
       tier: seatTier, castle: castleGate,
     }) : null;
-    if (siegeField) siegeFieldsByTown.set(dfLocation.mapTableData?.mapId, { key, px, py, field: siegeField });
+    if (siegeField) siegeFieldsByTown.set(dfLocation.mapTableData?.mapId, { key: pkey, px, py, field: siegeField });
     const snowSeen = snowRec?.done(models.length > 0 || dfLocation != null) ?? null;
-    const wodKept = adoptWodCarry(key, wodSpawners, privateersHold);
+    const wodKept = adoptWodCarry(pkey, wodSpawners, privateersHold);
     const wodLife = wodKept.life ?? {};   // L1-3: this terrain's identity - kept across a rebuild or a pool, new on a promote
-    if (!wodKept.life) wodForgetPeerSites(key);   // AUDIT WOD7: a fresh promote's markers are its own again
+    if (!wodKept.life) wodForgetPeerSites(pkey);   // AUDIT WOD7: a fresh promote's markers are its own again
+    if (key === pkey && isEnhanced() && !midRingDisabled()) stampPixelFade(terrain, px, py, host.state.current, overworldTint(maps.getClimateIndex(px, py), host.woods.getHeightMapValue(px, py)), performance.now());   // MID-RING: the stream's new pixel eases out of the middle ring's tint
     if (_building.get(key) === made) _building.delete(key);   // BUILD-FAIL1: the entry owns them from here
-    built.set(key, {
+    swap.publish(px, py, key, made, {   // IC-SWAP-BEHIND: published - behind, the old view down and this one's woken in the same step
       staticBatch,   // PERF4: the merged static models, drawn with the pixel matrix; null when the pixel has none
       // AUDIT-TO1 B2: DaggerfallTerrain.MapData.locationRect - the tile
       // rect setLocationTiles answered, with its extraClearance, which is
@@ -1367,6 +1490,7 @@ export function createPixelBuild(host) {
       chapterHalls: pixelChapterHalls,   // CHAP7b (above)
       beach: beach ?? null,   // AUDIT LANDFORMS II H2: DFU's own blend in a location's pixel with the row on - where a gathering node asks the beach line
       px, py, terrain, water, tilemapTex, tilemap, groundArchive, models, windmills, batches, flatAnims, texRemap, lights: pixelLights, hearths: pixelHearths, animals: pixelAnimals, springs: pixelSprings, skyBase: climate.skyBase, samples, natureCount: nature.length,
+      terrainIndices,   // with the slope cut on, its ground's own triangles (terrain-quad-cut.ts): a re-carve draws the same ones; off, null
       tilemapBytes, season: pixelSeason,   // GR1: the placer reads the tiles and the season (PRECIP4: the pixel's)
       _snow: snowSeen,   // PRECIP4: the snow it was built under, every season it took (the sweep's - AUDIT PRECIP HOST-6)
       // AUDIT PRECIP HOST-7: what a re-skin reads (reskinPixelNow), on the snow lane alone - its flats as logged, its blocks'
@@ -1410,6 +1534,8 @@ export function createPixelBuild(host) {
       forest: { base: climate.natureArchive, archive: natureArchive, trees: pixelTrees.filter((t) => forestGroups.has(t.group)), groups: forestGroups },
       lowPolyTrees: lptGroups.length ? { px, py, ox: 0, oy: 0, oz: 0, handles: lptHandles, groups: lptGroups, trees: null, centers: null } : null,   // LPT1: its 3D trees (gatherNear's set, made near the eye; the frame writes its translation)
       jungleTrees: jungleSet.length ? { px, py, ox: 0, oy: 0, oz: 0, handles: jungleHandles, groups: jungleSet, trees: null, centers: null } : null,   // BANTHA1: the jungle's 3D trees, the jungle door's set (scenes/treesHost.js)
+      grahtOaks: grahtStood?.set ?? null,   // GRAHT1: its graht-oaks (scenes/grahtHost.js - framed at its translation, near and far)
+      landProps: landStood?.set ?? null,   // TESA-LANDS: its landmarks (scenes/landPropsHost.js - framed at its translation, near and far)
       wodSpawners, // WOD2: LoadObject's spawn markers, for WOD3
       privateersHold,   // WOD4: the camp's block origins and its Start's state, null off the Hold
       arena: arenaOrigin,   // ARENA2: the colosseum's block origin, pixel-local - null off Daggerfall's cell (4,3)
@@ -1419,20 +1545,22 @@ export function createPixelBuild(host) {
       wodReach: gateLedger.reach.length ? Float32Array.from(gateLedger.reach) : null,   // GATE-CLEAR: what it stood, for the next gate's sweep
       placeHold: pipeline,
       location: dfLocation ? dfLocation.name : null,
+      arenaSlot: dfLocation?.arena ?? null,
+      arenaRoadsEpoch: arenaRoadsAt, arenaRoadsPainted: !!arenaRoads,   // TESA4: the layer it was painted with, and whether its roads reached it
       centerHeight: samples[64 * HEIGHTMAP_DIMENSION + 64] * worldHeight,
       avgY: dfLocation ? avg * worldHeight : 0,
+      capitalLod: capitalViewOf(dfLocation),   // IC-GRAND: the view a slice of the Imperial City was built in (scenes/tamrielSweepsHost.js sweepCapitalLod)
     });
-    if (deepWaters) deepWaters.published(built.get(key), dwResult);   // DW-B: the near promote stands with the pixel, or the pixel waits its turn
-    if (dwDecor) dwDecor.onPromote(built.get(key));   // DW-E2: UnderwaterDecorations.HandlePromote, after the floor builder's (the subscription order)
-    if (host.oceanHoles) host.oceanHoles.promoted(built.get(key));   // OH-B: DaggerfallTerrain.OnPromoteTerrainData -> OceanHoles.OnTerrainPromoted (its dependant, subscribed after both of the sea's)
-    snowfall.promoted(built.get(key));   // SNOWFALL1: OnPromoteTerrainData -> DynamicSnowController.HandleTerrainPromoted - its blanket to make, the nearer tiers over it again
-    const dwRubbleKept = _dwRubbleCarry.get(key);   // AUDIT DW-F: a rebuilt pixel's rubble, on the entry that stands now
-    if (dwRubbleKept) { _dwRubbleCarry.delete(key); const e = built.get(key); for (const r of dwRubbleKept) r.entry = e; _dwRubble.set(e, dwRubbleKept); }
-    host.gatherHost?.onBuilt(built.get(key));   // PROF1/PROF2: the day's patches, veins and boulders, stood in the pixel's own list
-    for (const pile of wodKept.piles ?? []) standWodPile(key, wodLife, pile);   // AUDIT BRANCH (WoD) L1-3: the pooled terrain's piles, where they lay
-    gateClearSweep.published(key, gateClear?.key);   // GATE-CLEAR: built against a clearing the sweep has moved on from - asked again
-    // GRASS-STALE1 (2026-09-19, Discord: "grass is flying and not on the
-    // ground" around graveyards and other POIs): this pixel's own
+    if (deepWaters) deepWaters.published(built.get(pkey), dwResult);   // DW-B: the near promote stands with the pixel, or the pixel waits its turn
+    if (dwDecor) dwDecor.onPromote(built.get(pkey));   // DW-E2: UnderwaterDecorations.HandlePromote, after the floor builder's (the subscription order)
+    if (host.oceanHoles) host.oceanHoles.promoted(built.get(pkey));   // OH-B: DaggerfallTerrain.OnPromoteTerrainData -> OceanHoles.OnTerrainPromoted (its dependant, subscribed after both of the sea's)
+    snowfall.promoted(built.get(pkey));   // SNOWFALL1: OnPromoteTerrainData -> DynamicSnowController.HandleTerrainPromoted - its blanket to make, the nearer tiers over it again
+    const dwRubbleKept = _dwRubbleCarry.get(pkey);   // AUDIT DW-F: a rebuilt pixel's rubble, on the entry that stands now
+    if (dwRubbleKept) { _dwRubbleCarry.delete(pkey); const e = built.get(pkey); for (const r of dwRubbleKept) r.entry = e; _dwRubble.set(e, dwRubbleKept); }
+    host.gatherHost?.onBuilt(built.get(pkey));   // PROF1/PROF2: the day's patches, veins and boulders, stood in the pixel's own list
+    for (const pile of wodKept.piles ?? []) standWodPile(pkey, wodLife, pile);   // AUDIT BRANCH (WoD) L1-3: the pooled terrain's piles, where they lay
+    gateClearSweep.published(pkey, gateClear?.key);   // GATE-CLEAR: built against a clearing the sweep has moved on from - asked again
+    // GRASS-STALE1: this pixel's own
     // samples may have just been flattened toward its location's avgY
     // (blendLocationTerrain, terrainGen.js) - a grass cell placed nearby
     // BEFORE this pixel finished (the world streams nearest-first) read
@@ -1458,7 +1586,7 @@ export function createPixelBuild(host) {
       const t = host.state.pixelTranslation(px, py);
       host.labGrassField.invalidate(t[0], t[2], t[0] + TERRAIN_SIZE, t[2] + TERRAIN_SIZE);
     }
-    // DISC20-C (Mac: "Horse and carts can be seen parked in the sky"): and a parked wagon or a waiting horse on this
+    // DISC20-C: and a parked wagon or a waiting horse on this
     // pixel - mine or a peer's - stands again on the ground as it now is (horseCartPool.js groundMoved). The mod
     // grounds its standing team once; a rebuild under it (the road network, a late World of Daggerfall pack) left it
     // on the old ground until its owner walked out of the pixel and back.
@@ -1466,6 +1594,7 @@ export function createPixelBuild(host) {
       const t = host.state.pixelTranslation(px, py);
       host.hccGroundMoved(t[0], t[2], t[0] + TERRAIN_SIZE, t[2] + TERRAIN_SIZE);
     }
+    if (built.has(pkey) && arenaRoadsStale(built.get(pkey), terrainGen.arenaRoadsLanded, arenaRoadsLayer())) _arenaRoadsStale.add(pkey);   // TESA4: posted before a layer that landed while it built
     // AUDIT LANDFORMS II G1/G2: A REBUILD CARRIES WHAT LIES ON ITS GROUND. The road network's landing (ROADS 25) cuts the
     // landforms' roads and channels metres into a pixel built before it - 14% of the network's samples move, up to 30 m
     // on the Menevia escarpment - and a late World of Daggerfall pack or the gate's clearing flattens one. The pools'
@@ -1474,18 +1603,14 @@ export function createPixelBuild(host) {
     // the new samples less the old (TERRAIN-SCALE1's law); and the player the hold held over this pixel, on their feet,
     // rides it too - put back where they stood, they fell the cut (28.7 m, 118 HP, at the worst); a fall under way is
     // their own (FALL-KEPT).
-    const groundWas = _groundBefore.get(key);
+    const groundWas = _groundBefore.get(pkey);
     if (groundWas) {
-      _groundBefore.delete(key);
-      const now = built.get(key).samples, t = host.state.pixelTranslation(px, py);
-      const groundIn = (smp, x, z) => {   // heightAt's own read: bilinear over the pixel's samples, pixel-local
-        const fx = Math.max(0, Math.min(TERRAIN_SIZE, x - t[0])) / heightCell, fz = Math.max(0, Math.min(TERRAIN_SIZE, z - t[2])) / heightCell;
-        const ix = Math.min(HEIGHTMAP_DIMENSION - 2, Math.floor(fx)), iz = Math.min(HEIGHTMAP_DIMENSION - 2, Math.floor(fz)), sx = fx - ix, sz = fz - iz;
-        const at = (a, b) => smp[a * HEIGHTMAP_DIMENSION + b];
-        return (at(ix, iz) * (1 - sx) * (1 - sz) + at(ix + 1, iz) * sx * (1 - sz) + at(ix, iz + 1) * (1 - sx) * sz + at(ix + 1, iz + 1) * sx * sz) * worldHeight;
-      };
+      _groundBefore.delete(pkey);
+      const now = built.get(pkey).samples, t = host.state.pixelTranslation(px, py);
+      // heightAt's own read over the pixel's samples, pixel-local - FLORA-GROUND: the ground's one law (walkGroundAt)
+      const groundIn = (smp, x, z) => walkGroundAt(smp, Math.max(0, Math.min(TERRAIN_SIZE, x - t[0])), Math.max(0, Math.min(TERRAIN_SIZE, z - t[2])));
       const moved = (x, z) => groundIn(now, x, z) - groundIn(groundWas, x, z);
-      host.rideGround?.(t, key, moved);
+      host.rideGround?.(t, pkey, moved, key !== pkey);   // IC-SWAP-BEHIND: the pixel's own key; behind, the player on the view swapped out rides it unheld
     }
     if (homeTown) host._homeLookV = -1;   // HOME-LOOK (AUDIT): a town's pixel stood after the registry moved is painted by the next refresh
     // AUDIT-TO1 B3: the second hook. BOOT-TDZ2: THE MOD IS ASKED FIRST,
@@ -1507,12 +1632,12 @@ export function createPixelBuild(host) {
     // cannot see a pixel that was not published yet, so this build asks
     // for the re-skin itself - the same publish-time re-check the
     // terrain ring class runs below.
-    if (seasons && seasonsGen !== seasons.generation) _reskin.mark(key);   // ROAD-H H3: ITS key, not the grid
+    if (seasons && seasonsGen !== seasons.generation) _reskin.mark(pkey);   // ROAD-H H3: ITS key, not the grid (IC-SWAP-BEHIND: the pixel's, never the build's behind it)
     // ROADS 25: a pixel that was already in flight when the network landed
     // was painted without it and arrives AFTER the sweep. It goes straight
     // back for a rebuild - the worker has the network by now, since the
     // message order is kept.
-    // ROADS 25a (Mac: "boot failed: can't access property centerHeight"):
+    // ROADS 25a:
     // the rebuild is THIS call's to make, not a caller's to notice. The
     // first cut tore the pixel down and returned nothing, and the boot
     // path - which awaits the PLAYER's pixel and stands the camera on its
@@ -1527,12 +1652,12 @@ export function createPixelBuild(host) {
     // down too and then read its entry, throwing out of every build.
     if (!withRoads && terrainGen.hasRoads) {
       if (!roadsRetry) {
-        destroyPixel(px, py, { collectLoose: false });
+        swap.mark(px, py);   // IC-SWAP-BEHIND: built again behind the roadless view
         return buildPixelNow(px, py, { roadsRetry: true });
       }
       console.warn(`[roads] pixel ${key} painted without the network twice - kept as painted`);
     }
-    const entry = built.get(key); pipeline.settle();   // FIELD BUGS 2026-10-04d PLACE-LRU: the pixel stands (published above with its hold, `placeHold`, which destroyPixel releases) - the keep of its last visit goes, with what only that visit held (a re-skin's old season, a rebuild's old layout)
+    const entry = built.get(pkey); pipeline.settle();   // FIELD BUGS 2026-10-04d PLACE-LRU: the pixel stands (published above with its hold, `placeHold`, which destroyPixel releases) - the keep of its last visit goes, with what only that visit held (a re-skin's old season, a rebuild's old layout)
     // AUDIT EV F-SIM2: the ring class was chosen at job-send time and
     // the player may have crossed during the worker round trip - and
     // the pixelChanged restride sweep cannot see an unpublished pixel.
@@ -1545,7 +1670,7 @@ export function createPixelBuild(host) {
     // 0.11 ms and settles now, because a pixel left at stride 1 in the
     // far ring costs every frame until it is spent.
     if (wantStride !== entry._stride) {
-      if (wantStride === 1) host.restridePending.set(key, entry);
+      if (wantStride === 1) host.restridePending.set(pkey, entry);   // IC-SWAP-BEHIND: the pixel's key
       else restrideTerrain(entry, wantStride);
     }
     // E3: RMBLayout's THIRD act on an exterior StaticNPC, and the stand
@@ -1669,6 +1794,7 @@ export function createPixelBuild(host) {
         p._seasonsGen = flats.seasonsGen;
         sk.batches = made.batches;
         sk.forest = new Set(made.forestGroups.keys());
+        seatFlora(p, renderer);   // FLORA-GROUND, THE RINGS: the new pictures drawn on the ground the pixel draws (scenes/floraSeat.js)
       }
       sk.log.forEach((f, j) => { f.archive = pics[j][0]; f.record = pics[j][1]; });
       host.gatherHost?.restandAt(px, py);   // PROF4: a felled tree's stump in its season

@@ -1,4 +1,4 @@
-// GRASS-LIT (2026-10-01): THE REAL WORLD'S GRASS, PHOTOGRAPHED. Boots the streaming world (`?world`) headless on
+// GRASS-LIT: THE REAL WORLD'S GRASS, PHOTOGRAPHED. Boots the streaming world (`?world`) headless on
 // SwiftShader at a ONE-square view radius (the shelf's land view and DFU's TerrainDistance, set before the page
 // loads - the default radius streams 121 squares and a software rasteriser never finishes), waits for the shot
 // flag, runs `EVAL` (shot mode's hooks: `__grassSpot(r, skip)` finds a field, `__pose` stands the camera on it),
@@ -20,8 +20,7 @@
 // viewport; PORT the dev server's (5201); DEBUG every console line. KEYS=',' presses none (an empty KEYS is the default's).
 // UNTIL an expression the page is waited on before the first shot (BANTHA2: `__grassStats().floor.cells >= 340` - a field
 // placed whole, its ~355 cells inside the 300 m range; SwiftShader's frames take seconds, and a field places two cells a
-// frame). The judgement counts the jungle floor's tufts with the meadow's: deep in the jungle the floor is the only grass
-// (03-World/Bantha-Jungle.md).
+// frame). The judgement counts the jungle floor's tufts with the meadow's: deep in the jungle the floor is the only grass.
 import { createServer } from 'vite';
 import { chromium } from 'playwright';
 

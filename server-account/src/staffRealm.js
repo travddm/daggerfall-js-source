@@ -1,12 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// STAFF-PANEL3-REALM (2026-10-22, design doc "DFO Staff Panel: design", build step 3 - "Trade freezes", "Built on the save
-// judge", "Remove items", the profile's Roll back and Fix account, the census's Unexplained line; its weak spots "Freeze
-// and trade holds" and "Items, census and economy") - THE PANEL'S TRADE HOLDS, ROLLBACKS, FIXES, GAINS AND REMOVALS.
-// Admins alone (mob, 03:03Z: "Freeze, trade holds, rollbacks" are the Admin's), every door; OFFLINE ONLY until mob tries
+// STAFF-PANEL3-REALM - THE PANEL'S TRADE HOLDS, ROLLBACKS, FIXES, GAINS AND REMOVALS.
+// Admins alone (are the Admin's), every door; OFFLINE ONLY until mob tries
 // it live.
 //
-// NOTHING NEW IS JUDGED (mob, 09:22Z: "use the validators the server already has"). The holds, findings, clear, hold,
+// NOTHING NEW IS JUDGED. The holds, findings, clear, hold,
 // rollback, repair, mend and (STAFF-SET-BANK) bank are review.js's own acts (reviewAct, the developers' /v1/mod/realm-*
 // doors a script reached),
 // made as this Admin - a developer, as titles.js isDeveloper reads the same list - so a panel act lands in the character's
@@ -24,7 +22,7 @@
 //     doc "Server load").
 //   - Remove from a player takes the piece on a path of its own (realm.js prepareRealmRecord `take`): the repair path
 //     refuses copied pieces, which are what staff remove. The record moves one save on with its seat taken, so the
-//     player's game's next save is refused; the piece goes to the 30-day store (staff_evidence, migration 0152) and its
+//     player's game's next save is refused; the piece goes to the 30-day store (staff_evidence) and its
 //     ledger row is marked taken by staff (ledger.js SEIZED), so a save that shows it again is charged as a copy. A piece
 //     the ledger contests (another holds it, or copies are known) needs `trail: true` - the design's "require a trail
 //     check before Remove" - and the preview names the trail; a copy written down on the character itself needs its
@@ -34,7 +32,7 @@
 //   - Every removal names a reason and a note, and Put back undoes it within 30 days - the piece back as exactly what it
 //     was: the ledger row the removal took given back, any other left as it stands, and a copy mark where it was found.
 //
-// EVERY LIST PAGES (mob, 19:25Z: "put inf scroll in anything that pull lists"): `from` the offset of the next page,
+// EVERY LIST PAGES: `from` the offset of the next page,
 // answered as `next` while more stand.
 import { displayName, mintId } from './accounts.js';
 import { reviewAct, staffFinding, NOTE_MAX } from './review.js';
@@ -49,6 +47,7 @@ import { progressConfig } from './progress.js';
 import { DB_ROOT } from './service.js';
 import { itemWorth } from '../../src/systems/item/itemLaw.js';
 import { giveCatalogue, mintGift, giftWorth, GIVE_REASONS } from './staffGive.js';
+import { whenOption } from './operator-options.ts';   // the operator's option `give`
 
 /** Rows one page answers. */
 export const REALM_PAGE = 25;
@@ -233,7 +232,7 @@ export function takeOut(node, piece) {
 /**
  * AUDIT FB1025i F1: EVERY COPY OF THE MARKED PIECES A SAVE HOLDS, WHEREVER IT LIES - by ledger key, the record's own
  * lists first and in their order (possessedItemLists: a keep keeps one of them), then whatever else the save's tree
- * holds: a deserter revenant's take (revenant.js RVN8), a pile on the ground, a shop's shelf, a dungeon's chest - lists
+ * holds: a pile on the ground, a shop's shelf, a dungeon's chest - lists
  * the checkpoint's ledger never reads, where a copy waited out a lift and came back. `listed` how many of `all` the
  * record's lists hold. @param {any} save @param {Set<string>} keySet @returns {Map<string, { all: any[], listed: number }>}
  */
@@ -330,7 +329,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
   if (path === '/v1/staff/trade-holds') {
     const sort = body.sort === 'newest' ? 'newest' : 'urgent';
     const from = fromOf(body.from);
-    // STAFF-PANEL-SPEED: the read and its audit row in one batch; 0162's index walks the holds newest first, a tie as its old scan gave it
+    // STAFF-PANEL-SPEED: the read and its audit row in one batch; the holds index walks the holds newest first, a tie as its old scan gave it
     const [read] = await db.batch([db.prepare(`SELECT c.id, c.name, c.player, p.handle, p.guest_name, c.held, c.held_at, c.held_until, c.strikes, c.law_holds, c.dupes, c.review,
         c.wealth, c.allowance, c.lease, c.lease_at, c.dead_at,
         (SELECT json_object('kind', f.kind, 'at', f.at, 'detail', json(f.detail)) FROM realm_findings f WHERE f.char_id = c.id AND f.kind != 'staff' ORDER BY f.id DESC LIMIT 1) AS finding,
@@ -519,7 +518,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
   }
 
   // STAFF-GIVE: the item list Add an item picks from (staffGive.js) - the game's own tables, no character
-  if (path === '/v1/staff/item/catalogue') return giveCatalogue();
+  if (path === '/v1/staff/item/catalogue') return whenOption(env, 'give', () => giveCatalogue());
 
   // ═══ ONE CHARACTER'S DOORS, by its id ═══
   const row = await charRow(db, body.id);
@@ -591,7 +590,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
   }
 
   if (path === '/v1/staff/fix/letter') {
-    // GUILD-LETTER-FIX (2026-10-25, mob: "do it"): review.js `letter` - a crime guild's letter sent again or called off,
+    // GUILD-LETTER-FIX: review.js `letter` - a crime guild's letter sent again or called off,
     // `{ ticket, guild, op, note }`; the playing tab's seat taken as a mend's
     const note = noteOf(body.note);
     const { ticket, guild, op } = body;
@@ -603,7 +602,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
 
   if (path === '/v1/staff/fix/repair' || path === '/v1/staff/fix/mend' || path === '/v1/staff/fix/bank') {
     // review.js `repair` and `mend`, as buttons with a note instead of scripts (design doc "Fix account"). STAFF-SET-BANK
-    // (2026-10-23, mob: "we need a set bank setting"): and `bank` - the bank the profile says (`banks`, the total it was
+    // and `bank` - the bank the profile says (`banks`, the total it was
     // read as) set to the gold named, `{ ticket, was, gold, note }` as the mend's; the playing tab's seat taken as a mend's
     const act = path === '/v1/staff/fix/repair' ? 'repair' : path === '/v1/staff/fix/mend' ? 'mend' : 'bank';
     const note = noteOf(body.note);
@@ -611,7 +610,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
     const { ticket, faction, flag, gold, was } = body;
     const r = await reviewAct(c, me, env, act, act === 'repair' ? { id: row.id, note, ticket, faction, flag, gold } : { id: row.id, note, ticket, was, gold });
     const detail = { ...ch, note, ticket: typeof ticket === 'string' ? ticket.slice(0, 64) : null, gold: Number.isSafeInteger(gold) ? gold : null, ...(act === 'repair' ? { faction, flag } : { was }) };
-    // STAFF-SET-BANK REVIEW (2026-10-23): a fix that landed is written as its row holds it, and whether it was a repeat - a
+    // STAFF-SET-BANK REVIEW: a fix that landed is written as its row holds it, and whether it was a repeat - a
     // ticket asked again with other values moves nothing, and its row once named the body's values as done
     const landed = r.error ? {} : { gold: r.gold, ...(act === 'repair' ? { faction: r.faction, flag: r.flag } : { was: r.was }), repeat: r.repeat };
     return said(`fix-${act}`, row.player, { ...detail, ...landed }, r.error ? r : { ...r, playing: playing(row) });
@@ -619,7 +618,7 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
 
   if (path === '/v1/staff/item/purge-dupes') return purgeDupes();
   if (path === '/v1/staff/item/take') return takeAct();
-  if (path === '/v1/staff/item/give') return giveAct();
+  if (path === '/v1/staff/item/give') return whenOption(env, 'give', () => giveAct());
   return { error: 'not-found' };
 
   /**
@@ -673,8 +672,8 @@ export async function staffRealm(ctx, env, path, body, who, audit) {
    * checkpoint landed between this act's read and the seizure's).
    * FIELD BUGS 2026-10-25i COPY-LIFT: `keep: true` KEEPS ONE OF EACH - the record's own lists first (its pack before a
    * room's chest), of them the first of the print its ledger row holds (AUDIT FB1025i F6), else the first - and only the
-   * copies go: every other one the save holds, `hidden` counting those where the record lists nothing (a deserter
-   * revenant's take - revenant.js RVN8 splitPack, and its kill's take, pickTaken - a pile on the ground, a shop's shelf),
+   * copies go: every other one the save holds, `hidden` counting those where the record lists nothing (a pile on
+   * the ground, a shop's shelf),
    * and the account's chests' of a piece it lifts (AUDIT FB1025i F5: one it does not lift may be the chest's real piece).
    * The ledger's rows stay, and in the same batch a copy of the record's own is lifted (ledger.js ownCopiesLiftable) ONLY
    * where the act itself leaves one (AUDIT FB1025i F1): this batch destroys a copy of it, or staff's Remove took one off

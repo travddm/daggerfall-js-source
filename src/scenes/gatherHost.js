@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF2 (2026-09-28, Mac: "Go") - THE GATHERING PROFESSIONS IN THE
-// STREAMING WORLD, one shell for every kind of node (bible/06-Systems/
-// Professions-Arc.md 5, 6, 8, 22, 23; FORAGE0 14). PROF1 built it as
+// PROF2 - THE GATHERING PROFESSIONS IN THE
+// STREAMING WORLD, one shell for every kind of node (docs/systems/professions.md).
+// PROF1 built it as
 // Herbalism's own host; every gathering profession needs the same shell,
 // so the shell is this, and each profession is a KIND in it - PROF1's
 // patches (scenes/herbHost.js herbKind), PROF2's veins and boulders
@@ -21,8 +21,7 @@
 //   stood again at the UTC day's turn, when the service says a pixel's
 //   state, or when a node is taken whole (gone for the day, PROF0 5.3).
 //   THE TARGET. The node in reach nearest the look, of any kind.
-//   THE MENU (PROF-MENU, 2026-10-01, Mac: "They should use the same menu
-//   the loot menu uses and not an interaction button"). The target is the
+//   THE MENU (PROF-MENU, 2026-10-01). The target is the
 //   loot plaque's own list under the crosshair (ui/worldPlaque.js
 //   'actions'): the node named, its acts the rows - a patch's herbs and
 //   its Basket, a body's knife and its search - a refused one with its
@@ -63,6 +62,7 @@
 // ═══════════════════════════════════════════════════════════════════
 import { utcDayOfMs, pixelKey, parseNodeKey } from '../net/nodeLaw.js';
 import { t } from '../systems/textManager.js';   // AUDIT LOCKPICK C14: the gone spot's line, in the player's language
+import { tamrielBiomeAt } from '../world/tamriel/tamrielBiomes.js';   // AUDIT TESA II J5: a pixel past the Bay's jungle zone
 import { TERRAIN_SIZE } from '../world/terrain/terrainSampler.js';
 /** A map pixel's side in the scene (metres). */
 const PIXEL_M = TERRAIN_SIZE;
@@ -97,8 +97,7 @@ export const NODE_MARK_M = 150;
 export const NODE_MARK_MAX = 16;
 /** NODE-MARKS: a node's glow footprint about its base where its kind names none - metres across (`w`) and up (`h`). */
 export const NODE_MARK_SIZE = Object.freeze({ w: 1.8, h: 1.3 });
-/** GATHER-OW (2026-10-02, Mac: "allow them to appear in the overworld without being overwhelming, maybe a glyph marker
- *  showing where a group of them are"): the Overworld marks each profession's group on a stood pixel - its nodes not
+/** GATHER-OW: the Overworld marks each profession's group on a stood pixel - its nodes not
  *  yet worked today - within this many metres of the player, the nearest GROUP_MAX of them, the list read again at most
  *  every GROUP_REFRESH_MS. */
 export const GROUP_M = 3000;
@@ -138,6 +137,14 @@ const isVec3 = (v) => v != null && typeof v === 'object' && v.length >= 3;
 
 /** NODE-OUTLINE: a node's pictures in `m` (its key's list, made the first time). */
 const pictureOf = (m, key) => { let l = m.get(key); if (!l) m.set(key, (l = [])); return l; };
+/** AUDIT TESA II J5: A PIXEL'S GROUND AS THE GATHERING READS IT - `info` (the host's climate and region) with its jungle's
+ *  word where it stands past the Bay in a jungle zone (world/tamriel/tamrielBiomes.js `jungle`): the service holds no trace
+ *  to read the zones by, so the word is witnessed with the ground (net/nodeLaw.js pixelReport, jungleWoods) and the
+ *  jungle's trees stand on confirmed ground. Null in, null out. @param {any} info @param {number} px @param {number} py */
+export function withJungleWord(info, px, py) {
+  if (!info) return info;
+  return tamrielBiomeAt(px, py)?.jungle === true ? { ...info, jungle: true } : info;   // a Bay pixel is no zone's
+}
 /**
  * VEIN-NEED (FIELD BUGS 2026-09-29h): WHAT E SAYS AT A NODE THAT CANNOT BE WORKED, when the press opened nothing else -
  * the prompt's own words, and where a rank is what is short (the kind's `needsRank`), the player's own rank beside it:
@@ -153,7 +160,7 @@ export function needLine(plan, rankOf) {
 }
 
 /**
- * GATHER-SAID (the PROF7 merge, 2026-09-30, Mac: "had reports of people not getting materials when using a profession"):
+ * GATHER-SAID (the PROF7 merge, 2026-09-30):
  * A HARVEST'S GOODS IN ONE LINE - the Stores' own, a gem (PROF2) and a second find (PROF4's Resin, PROF7's butchery) beside
  * them: "+1 Bear Hide, a Big Tooth and 2 Raw Meat to your Stores". Each was a line of its own, and with the XP and a rank's
  * rise an answer said five into the four the toasts hold (PROF0 8) - the Stores' line, the oldest, went first.
@@ -575,7 +582,7 @@ export function createGatherHost(deps) {
     const key = `${entry.px},${entry.py}`;
     const gen = (standGen.get(key) ?? 0) + 1;   // AUDIT GATHER-FEEL V1: the newest stand of a pixel alone swaps its flats in
     standGen.set(key, gen);
-    const info = book.state.open === true ? deps.pixelInfo(entry.px, entry.py) : null;
+    const info = book.state.open === true ? withJungleWord(deps.pixelInfo(entry.px, entry.py), entry.px, entry.py) : null;   // AUDIT TESA II J5
     const rec = { entry, info, nodes: /** @type {any[]} */ ([]), batches: /** @type {any[]} */ ([]), pictures: /** @type {Map<string, any[]>} */ (new Map()) };   // NODE-OUTLINE: each node's flats, by its key
     // AUDIT 30 A7: a pixel that stands no nodes - the switch shut, no ground to read, the witnesses' other word - stands
     // its forest whole: the day's turn under a shut switch left yesterday's felled tree sunk, and its herbs standing
@@ -584,7 +591,7 @@ export function createGatherHost(deps) {
     const fact = book.pixel(entry.px, entry.py);
     const confirmed = fact?.state === 'confirmed' || fact?.state === 'disputed';
     // a pixel the witnesses confirmed as something else stands nothing: nothing here could be gathered
-    if (confirmed && (fact.climate !== info.climate || fact.region !== info.region)) { bare(); return; }
+    if (confirmed && (fact.climate !== info.climate || fact.region !== info.region || (fact.jungle === true) !== (info.jungle === true))) { bare(); return; }
     const ctx = { entry, px: entry.px, py: entry.py, day, info, confirmed, specs, book, near: nearRocks(entry) };   // ROCK-NEAR
     rec.nodes = kinds.flatMap((k) => k.nodesOf(ctx).map((n) => ({ ...n, kind: k.id })));
     // SETTLE-STAND (FIELD BUGS 2026-10-01): a node of the ground on a settlement's ground is never worked there - its act
@@ -784,20 +791,20 @@ export function createGatherHost(deps) {
    *  holds it, as a tool's Use does (TOUCH-HOLD) - the kind's start reads it beside `tool`. */
   const ctxFor = (t, tool = null, byPress = false) => ({ entity: deps.entity(), info: t.info, book, rank, specs, keyLabel: deps.keyLabel, pitch: t.pitch ?? null, tool, byPress });
   /** REFUSALS-LEARNED (AUDIT 2026-10-01 part four): A PLAN THE SERVICE HAS REFUSED TODAY IS NO READY PLAN - the account's
-   *  veins in dungeons nobody has vouched for: a count the state does not carry, so the book keeps what the refusal said
-   *  (net/profBook.js `closed`) and the prompt says it, never an act played and a tool worn for the same refusal again.
-   *  CAP-OFF: the account's day in a craft closes nothing - there is none. */
+   *  veins in dungeons nobody has vouched for, and (PROFESSION-CAPS) the character's day on the plan's track: counts the state does
+   *  not carry, so the book keeps what the refusal said (net/profBook.js `closed`) and the prompt says it, never a tool worn again. */
   function planFor(t, tool = null) {
     return learned(t, kindOf(t.node)?.plan(t.node, ctxFor(t, tool)) ?? null);
   }
   /** REFUSALS-LEARNED over one plan - the kind's `plan`, or one of its menu's rows. SETTLE-SAID: and the ground's check -
    *  a ready plan on a settlement's ground is none, its reason the act's own words. */
-  function learned(t, plan) {
-    const where = plan?.ready ? (kindOf(t.node)?.where?.(t.node) ?? null) : null;   // SETTLE-SAID
+  function learned(target, plan) {
+    const where = plan?.ready ? (kindOf(target.node)?.where?.(target.node) ?? null) : null;   // SETTLE-SAID
     if (where) return { ...plan, ready: false, rest: where };
     if (!plan?.ready || typeof book.closed !== 'function') return plan;
-    if (t.node.what === 'dvein' && book.closed('deep')) {
-      const fact = t.dungeon && dungeon ? book.dungeon(dungeon.id) : null;
+    if (book.closed(`day:${plan.harvest}`)) return { ...plan, ready: false, rest: t('prof.dayCapRest', 'done all a day allows') };   // PROFESSION-CAPS
+    if (target.node.what === 'dvein' && book.closed('deep')) {
+      const fact = target.dungeon && dungeon ? book.dungeon(dungeon.id) : null;
       if (fact?.state !== 'confirmed' && fact?.state !== 'disputed') return { ...plan, ready: false, rest: `${DEEP_UNCONFIRMED_PER_DAY} veins today in dungeons nobody has vouched for` };
     }
     return plan;
@@ -872,12 +879,13 @@ export function createGatherHost(deps) {
     const before = rank(a.profession);
     book.harvest({
       node: a.node.key, kind: a.harvest, climate: a.info?.climate ?? null, region: a.info?.region ?? null, act: report,   // PROF7: a body names no ground
+      ...(a.info?.jungle === true ? { jungle: true } : {}),   // AUDIT TESA II J5: the jungle's word, witnessed with the ground
       at: Math.floor(deps.nowMs() / 1000), ...((typeof a.ask === 'function' ? a.ask() : a.ask) ?? {}),   // AUDIT SILVER-WAYS D5: a kind's ask may be asked at the act's end
       // AUDIT BAG1 B4: the material the act's goods are, where the kind knows it - the book reads what the bag and the pack
       // hold of it (`held`); no kind named one, and no carried harvest ever cut the count to the pack
       ...(actMaterial(a) ? { material: actMaterial(a) } : {}),
     }).then((r) => answered(a, r, before), () => {});
-    // GATHER-SPEED (2026-10-11, Mac: "look at gathering minigame performance and how the server affects it/slows down"):
+    // GATHER-SPEED:
     // THE NODE GOES WITH THE ACT. The book counts the harvest from the ask (net/profBook.js `gone`: taken, or being
     // counted), so the patch, the vein and the tree went a whole round trip after the act that took them - the fall
     // waited on the service. Fallen and stood again now, once; the answer stands it again only where it was refused
@@ -1344,8 +1352,7 @@ export function createGatherHost(deps) {
       return out;
     },
     /**
-     * NODE-MARKS (2026-10-01, Mac: "Any profession node, like herbs, should appear on the compass. The node itself
-     * should also stand out with a detailed slight glow"): THE NODES STANDING NEAR `pos` - underground the dungeon's,
+     * NODE-MARKS: THE NODES STANDING NEAR `pos` - underground the dungeon's,
      * above ground the stood pixels', and the loose ones (Hunting's bodies) where they lie - each its kind's mark says
      * stands within its reach: `{ key, profession, at: [x, y, z] its base in the scene, w, h, d, reach }`, `d` its
      * distance on the ground, nearest first, at most NODE_MARK_MAX - and (AUDIT NODE-GLINT) `quiet` the node an act works,

@@ -1,7 +1,5 @@
 // @ts-check
-// EVENTS1 (2026-10-23, the owner: "Instead of stuffing these in the chat menu, there must be a less obstructive and more
-// detailed way to handle them"): THE EVENT BOARD, ON THE HUD. Design: bible/10-UI/Event-Board.md; its audit,
-// bible/01-Overview/audits/Audit-Event-Board.md.
+// EVENTS1: THE EVENT BOARD, ON THE HUD. Design:; its audit,
 //
 // ONE PLATE AT THE LEFT EDGE. Its rows are the shared events a player can still reach (systems/eventBoard.js
 // eventBoardModel) - each one's name, its clock ("12:04 left", "in 4:30"), how far and which way from here, then where;

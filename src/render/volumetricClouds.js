@@ -1,8 +1,6 @@
 // @ts-check
-// VC3 (2026-09-07): THE VOLUMETRIC CLOUDS. VC4: AND THEIR SHADOW.
+// VC3: THE VOLUMETRIC CLOUDS. VC4: AND THEIR SHADOW.
 //
-// Mac: "true volumetric clouds that move across the sky, build during
-// weather... on top of real cloud shadows that reflect on the ground".
 // A raymarched cloud SLAB - a layer of the atmosphere between two
 // altitudes, in world metres, over a flat earth that fades into the
 // dome's horizon with distance - lit by the sun (or the moon at night)
@@ -82,9 +80,7 @@ export const CELL_EDGE = 0.35;
 /** A full sweep of either map takes this many frames - a fair sky's; a heavier one takes more (sweepFramesFor). */
 export const SWEEP_FRAMES = 8;
 // ═══════════════════════════════════════════════════════════════════
-// RAIN-FPS (2026-09-25, Mac: "some ... are reporting fps drops. I myself
-// have flawless performance. One user said they turned off the rain and it
-// fixed it"): THE SWEEP TAKES AS MANY FRAMES AS THE SKY COSTS.
+// RAIN-FPS: THE SWEEP TAKES AS MANY FRAMES AS THE SKY COSTS.
 //
 // Measured in the sky lab and the game on a software GPU (the stand-in for
 // a weak one): with the clouds off, rain costs what a clear day costs - the
@@ -148,8 +144,7 @@ export const WORLD_PER_DRIFT = 1 / 0.0038;
  *  ambient's mottle every 5) - a recenter is answered by uShift, not
  *  by the periods; these keep the shadow square's texel grid exact.
  *
- *  VC6a (2026-09-18, Mac: "clouds repeat pretty consistently when its
- *  partly cloudy"): the variation was SIXTEEN pixels, 13107 m, against
+ *  VC6a: the variation was SIXTEEN pixels, 13107 m, against
  *  the shape volume's 12288 m - two grids within seven per cent of each
  *  other, so they walked in step and the same bank came round every
  *  twelve kilometres, which is well inside the march's own 24 km reach.
@@ -191,7 +186,7 @@ export const FIELD_PERIOD_METRES = PIXEL_METRES * 240;
 export const wrapField = (v) => v - Math.floor(v / FIELD_PERIOD_METRES) * FIELD_PERIOD_METRES;
 /** Extinction per metre at density 1. */
 export const EXTINCTION = 0.006;
-/** VC7e (2026-09-23, Mac: "Whatever is the most visually detailed and immersive"): THE LIGHT THROUGH A THICK DECK.
+/** VC7e: THE LIGHT THROUGH A THICK DECK.
  *  Beer's law alone is single scattering: a storm deck's optical depth ran 5.1 to 6.3 along the sun (the arc's
  *  measurement; an overcast's 0.56 to 0.80), and exp(-5.1) and exp(-6.3) are both black, so every point under a
  *  storm got the same nothing, and the overcast's narrow range the same grey - the deck was one
@@ -219,13 +214,13 @@ export const DECK_COVER_LO = 0.4;
 export const DECK_COVER_HI = 0.95;
 export const CELL_BASE_LIFT = 0.07;
 export const CELL_THIN = 0.55;
-/** VC7c (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive" - rain shafts): THE CURTAINS
+/** VC7c: THE CURTAINS
  *  UNDER A STORM. A cell whose weather falls hangs a veil from its base to the ground: a vertical cylinder of
  *  CURTAIN_SHARE of the cell's radius (the fall comes out of the core, not the skirt), its optical depth CURTAIN_EXT
  *  a metre at a full fall, thinning toward its rim, streaked vertically by CURTAIN_STREAKS streaks around its axis,
  *  and fading as the eye comes under it (the falling rain itself takes over there). CURTAIN_FALL is each word's
  *  fall - rain, the storm's heavier, snow lighter and paler (kind 1); a sandstorm is already a wall on the ground,
- *  and fog and cloud do not fall. */
+ *  and fog and cloud do not fall. ASHFALL1: the ash hangs its own veil, in its pall's colour (CELL_TINT). */
 export const CURTAIN_SHARE = 0.55;
 /** VC7c: rain's own extinction, per metre at a fall of one - Koschmieder's 3.0 over moderate rain's five-kilometre
  *  visibility. The first cut took a fifth of it and a storm's curtain was a faint smear at the horizon: a real shaft
@@ -248,14 +243,13 @@ export const CURTAIN_INTO = 0.12;
 /** VC7c: the veils' own aerial perspective, metres - the slab's 14 km is the far lid's, and at a storm's 20 km it
  *  handed three quarters of a curtain to the horizon: a storm that far off stands out plainly in clear air. */
 export const CURTAIN_FADE_M = 40000;
-export const CURTAIN_FALL = Object.freeze({ rain: Object.freeze([1, 0]), thunder: Object.freeze([1.3, 0]), snow: Object.freeze([0.7, 1]) });
+export const CURTAIN_FALL = Object.freeze({ rain: Object.freeze([1, 0]), thunder: Object.freeze([1.3, 0]), snow: Object.freeze([0.7, 1]), ashfall: Object.freeze([0.9, 0]) });
 /** VC7c: how far under the coverage cut the shape must read before the sky march may stride past it, where the
  *  column's profile can move within a stride - the margin that measured the same picture as no stride at all (the
  *  arc's AUDIT-VC7 table: under a rain cell 50 pixels off by more than 8 levels and none by 24, the dither's own
  *  jitter at a cloud's edge; every other sky none). */
 export const SKIP_ROOM = 0.02;
-/** VC7d (2026-09-23, Mac: "improve the volumetric cloud system to be more immersive" - the high cirrus, the last of
- *  the four chosen): THE ICE LAYER. A thin shell of ice cloud at CIRRUS_ALT_M, far above the slab, read ONCE per ray
+/** VC7d: THE ICE LAYER. A thin shell of ice cloud at CIRRUS_ALT_M, far above the slab, read ONCE per ray
  *  where the ray meets it over a round earth (so it runs out to its own horizon, 339 km off, instead of to infinity).
  *  Its streaks lie along the upper wind - at these latitudes the westerly jet, whatever the surface wind is doing, so
  *  they ride east on the game's clock at CIRRUS_JET_M_PER_MINUTE (five times a fair day's surface drift, the ratio
@@ -302,7 +296,7 @@ export const CIRRUS_FWD = 0.6;
 export const CIRRUS_AMB = 0.45;
 /** VC7d: how much of the sky carries cirrus under each word (eased with the weather). A fair sky shows it most - an
  *  overcast lid or a storm keeps theirs, but their own cloud hides it, which the march does by itself. */
-export const CIRRUS_COVER = Object.freeze({ sunny: 0.45, cloudy: 0.5, overcast: 0.5, fog: 0.3, rain: 0.5, snow: 0.45, thunder: 0.6, sandstorm: 0.15 });
+export const CIRRUS_COVER = Object.freeze({ sunny: 0.45, cloudy: 0.5, overcast: 0.5, fog: 0.3, rain: 0.5, snow: 0.45, thunder: 0.6, sandstorm: 0.15, ashfall: 0.15 });
 /** VC7e: how full a column is on the average (the shape noise past its coverage cut) - columnAbove's estimate. */
 export const COLUMN_FILL = 0.5;
 /** The shadow map's square, in metres: SIXTEEN pixels a side, the
@@ -342,21 +336,23 @@ export const VC_PROFILE = Object.freeze({
   snow:     Object.freeze({ base: 600,  top: 2000, density: 0.80, dark: 0.30, flat: 0.85, shear: 0.20, vary: 0.20 }),
   thunder:  Object.freeze({ base: 500,  top: 4200, density: 1.00, dark: 0.70, flat: 0.50, shear: 0.50, vary: 0.40 }),
   sandstorm: Object.freeze({ base: 0,   top: 900,  density: 1.00, dark: 0.35, flat: 0.95, shear: 0.05, vary: 0.00 }),   // WEATHER2d: a wall on the ground, a lid 900 m up
+  ashfall:  Object.freeze({ base: 450,  top: 3400, density: 0.95, dark: 0.60, flat: 0.80, shear: 0.25, vary: 0.15 }),   // ASHFALL1: the plume's pall - low, deep and dark, a deck that rolls a little
 });
 /** AUDIT-VC7 (B3): the type variation at which a sky is wholly a deck's - the least any varying row takes, so every
  *  row that varies at all is (overcast's 0.15), and fog and a sandstorm (0: one thing everywhere) are not, with a
  *  cell's rim easing between them instead of snapping. */
 export const DECK_VARY_FULL = Math.min(...Object.values(VC_PROFILE).map((r) => r.vary).filter((v) => v > 0));
 /** WEATHER2d: a cell's TINT on the zone's cloud colours - the sandstorm's
- *  tan; every other word takes the row's colours unchanged. */
-export const CELL_TINT = Object.freeze({ sandstorm: Object.freeze([0.88, 0.72, 0.46]) });
+ *  tan; ASHFALL1: the ash's brown-grey, its veil's too; every other word
+ *  takes the row's colours unchanged. */
+export const CELL_TINT = Object.freeze({ sandstorm: Object.freeze([0.88, 0.72, 0.46]), ashfall: Object.freeze([0.66, 0.60, 0.56]) });
 const PROFILE_KEYS = ['base', 'top', 'density', 'dark', 'flat', 'shear', 'vary'];   // VC6a: `vary` eases with the rest
 /** AUDIT PRECIP FALL-5: what a wet cell walks from its warm side to the snow's by its share - the profile, its sky row's
  *  cover and grey, and its curtain's weight (PRECIP1: its tint is the share itself). */
 const SHARE_KEYS = [...PROFILE_KEYS, 'cover', 'grey', 'fall'];
 
-// ═══ VC7a (2026-09-23): LIVING CLOUDS ════════════════════════════════
-// Mac: "improve the volumetric cloud system to be more immersive". The
+// ═══ VC7a: LIVING CLOUDS ════════════════════════════════
+// . The
 // field was a fixed noise volume slid across the land by the wind: a bank
 // was the same bank from the horizon to the horizon. Three clocks now
 // give it a life, every one of them read from the GAME's minutes (the
@@ -450,9 +446,7 @@ export function cloudClocks(minutes, driftWorld) {
   };
 }
 
-// ═══ WEATHER2c (2026-09-14): CLOUD TYPES BY PLACE ═══════════════════
-// Mac: "different generative cloud types, like being able to see a
-// thunderhead in the distance with the weather happening elsewhere."
+// ═══ WEATHER2c: CLOUD TYPES BY PLACE ═══════════════════
 // The field had ONE profile for the whole sky - the zone's word, eased.
 // It takes CELLS now: a world position, a radius and a soft rim, and a
 // profile of its own (base, top, density, flat, dark, shear) with its
@@ -672,7 +666,7 @@ export function shadowOrigin(camX, camZ, extent = SHADOW_EXTENT, pixel = PIXEL_M
   return [Math.floor(camX / pixel) * pixel - extent / 2 + pixel / 2, Math.floor(camZ / pixel) * pixel - extent / 2 + pixel / 2];
 }
 
-const VS = `#version 300 es
+export const VS = `#version 300 es
 layout(location=0) in vec2 aPos;
 out vec2 vNdc;
 void main() { vNdc = aPos; gl_Position = vec4(aPos, 1.0, 1.0); }`;   // PERF2: at the far plane for the composite's depth test; the marches test nothing
@@ -905,8 +899,7 @@ float density(vec3 p, float mip) {
   // VC7c: outside the band - whose ends move only at a cell's rim - a stride holds; AUDIT-VC7: under it, only where
   // the stride cannot climb into it (it rises at most its own length), and over it always (the sky march looks up)
   if (hr <= 0.0 || hr >= 1.0) { fSkip = hr >= 1.0 || fBase - p.y > fReach ? 1.0 - fNear : 0.0; return 0.0; }
-  // WIND4 (2026-09-15, Mac: "clouds dont follow on the world timer with
-  // the direction of the wind"): the drift is SUBTRACTED. uShift is the
+  // WIND4: the drift is SUBTRACTED. uShift is the
   // floating origin's recenter and is ADDED, because q must be the
   // point's ABSOLUTE position in the field (setState does
   // shift -= offset for exactly that). The drift is not a position - it
@@ -1082,6 +1075,10 @@ void curtains(vec3 cam, vec3 dir, float tSplit, out vec4 front, out vec4 back, o
     vec2 lo = veilPiece(i, cam, dir, c0, c1, rad, yb, yt), mid = veilPiece(i, cam, dir, c1, c2, rad, yb, yt), hi = veilPiece(i, cam, dir, c2, c3, rad, yb, yt);
     vec2 inF = w * (lo + (c2 <= tSplit ? mid : vec2(0.0))), inB = w * (hi + (c2 <= tSplit ? vec2(0.0) : mid));
     vec3 tint = mix(mix(uCloudShade * (1.0 - 0.6 * uCellB[i].x), uHorizonColor, 0.3), mix(uCloudLit, uHorizonColor, 0.4), F.y);   // rain the cell's own dark grey, snow pale
+    // ASHFALL1: a tinted cell's veil is its tint's - its grey first (the sky's blue-grey times the ash's tint read neutral,
+    // the audit's), then tinted; a word with none (white) is untouched
+    float tinted = 1.0 - step(2.999, dot(uCellC[i].rgb, vec3(1.0)));
+    tint = mix(tint, vec3(dot(tint, vec3(0.299, 0.587, 0.114))), tinted) * uCellC[i].rgb;
     tauF += inF.x; tintF += tint * (inF.x - inF.y) + uHorizonColor * inF.y;   // SKY-2: each sample in its own aerial perspective
     tauB += inB.x; tintB += tint * (inB.x - inB.y) + uHorizonColor * inB.y; tSum += inB.x * 0.5 * (max(ta, tSplit) + tb);
   }
@@ -1099,7 +1096,7 @@ vec4 underCurtains(vec3 col, float T, vec3 cam, vec3 dir) {
   return vec4(front.rgb + front.a * col, T * front.a);
 }
 float hg(float c, float g) { float g2 = g * g; return (1.0 - g2) / (4.0 * PI * pow(1.0 + g2 - 2.0 * g * c, 1.5)); }
-// SKY-ARC (2026-10-19, a player's screenshot "BY THE RING"): THE AERIAL PERSPECTIVE IS THE LIGHT PATH'S - the share of the
+// SKY-ARC: THE AERIAL PERSPECTIVE IS THE LIGHT PATH'S - the share of the
 // horizon's colour a sample takes is its own distance's, never the span list's. Spans only say where the march may skip
 // air; read off where a sample's span BEGAN, the one deck took two fades either side of the locus where a cell's bounding
 // column merged with the zone's slab (the column's wall at the zone's base - a horizontal circle, so a smooth conic on
@@ -1225,8 +1222,7 @@ void main() {
   float cosTheta = dot(dir, uLightDir);
   float phase = min(mix(hg(cosTheta, 0.55), hg(cosTheta, -0.1), 0.4) * 4.0 * PI, 2.5);   // the average over the sphere is 1; the forward peak capped
   // ═══ VC6b: THE LOW SUN ══════════════════════════════════════════════
-  // Mac: "in the evening when the sun is setting and the sky is golden,
-  // clouds arent influenced by the sun". Three terms, all of them
+  // . Three terms, all of them
   // WEIGHTED BY HOW LOW THE SUN IS and all of them zero by day, so noon
   // is the picture it was:
   //   low    - 0 above 17 degrees, 1 at and below the horizon, and 0
@@ -1408,8 +1404,7 @@ void main() {
   float cy = cos(uYaw), sy = sin(uYaw);
   vec3 dir = normalize(vec3(r1.x * cy + r1.z * sy, r1.y, -r1.x * sy + r1.z * cy));
   float el = asin(clamp(dir.y, -1.0, 1.0));
-  // DSH1 (2026-09-20, Mac: "The far away horizon is still viewable even
-  // though it's cloudy"): THE LID CLEARS THE HORIZON BY A SKIRT. The
+  // DSH1: THE LID CLEARS THE HORIZON BY A SKIRT. The
   // composite discarded at the horizon exactly, and a dome's own last
   // half-degree is not a half-degree of nothing: under Dynamic Skies it
   // is the bare in-scattering strip (Unity's procedural skybox lerps sky

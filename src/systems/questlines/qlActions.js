@@ -1,5 +1,5 @@
 // @ts-check
-// QL4 (bible/06-Systems/Questlines-Arc.md section 2.3): THE QUESTLINES' ACTIONS - six lines a quest script may say
+// QL4: THE QUESTLINES' ACTIONS - six lines a quest script may say
 // that DFU's machine does not know, registered by the quest bridge beside DFU's 82 (scenes/quest/questBridge.js), as
 // Jagget's four are (systems/quest/questActionsExtension.js, FORAGE1). Not DFU members; Port-Ledger A (QL4).
 //
@@ -15,7 +15,7 @@
 //                                                                   DFU quest's (unstamped) says nothing.
 //   ql act <kind> <n>                                               a trigger (QL11): true once the player has done <n>
 //                                                                   acts of <kind> since the task was armed - a fish
-//                                                                   caught, a breach closed, a Redoubt taken. The acts
+//                                                                   caught, a breach closed. The acts
 //                                                                   are the layer's (qlLayer.js act), heard from the
 //                                                                   features; a quest that is not stamped hears none.
 //   ql paid                                                         the quest paid, quietly: its success and its
@@ -63,7 +63,7 @@ const UP = -1;
 const heldOf = (quest) => { let m = held.get(quest); if (!m) held.set(quest, (m = new Map())); return m; };
 
 /** AUDIT QUESTLINES BRANCH-1: A RECEIVED COPY KEPT IN STEP WITH A PARTY ASKS NOTHING - the sharer chooses, and the copies
- *  take the choice on the resync (decision 7, record 10.2). Every copy asked: the resync carried the sharer's click, so
+ *  take the choice on the resync. Every copy asked: the resync carried the sharer's click, so
  *  the member was asked the sharer's question; the member's answer synced back and decided the sharer's copy under the
  *  sharer's own box, whose answer then started the other choice's task - the kept gold AND the standing for giving it up
  *  (R0C11Y26). A received copy with no party to resync it (machine.js rewardShares: the party gone; or after a load - the

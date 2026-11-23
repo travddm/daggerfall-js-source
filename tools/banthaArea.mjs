@@ -1,4 +1,4 @@
-// BANTHA2 (2026-10-19, bible/03-World/Bantha-Jungle.md "Where the jungle is") - THE OWNER'S RED, READ INTO MAP PIXELS.
+// BANTHA2 - THE OWNER'S RED, READ INTO MAP PIXELS.
 //
 // The owner's call, with a map of the Iliac Bay and an area of its south-eastern shore painted red: "The area is red in
 // bantha and should be the jungle biome". Their map is Daggerfall's own 1000 x 500 at 0.4: it registers on the Bay's

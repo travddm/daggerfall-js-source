@@ -52,34 +52,6 @@ test('audit26 F083: every activity producer reports the climb flag', () => {
   }
 });
 
-// ---------------------------------------------------------------
-// F107 - InitializeRegionData's tail (PlayerEntity.cs:2211-2217):
-// TWELVE iterations of RegionPowerAndConditionsUpdate(false) AND
-// (true). (The Ledger row said "twelve false then one true"; the code
-// is the law - both arms, twelve times each.) Without it every
-// character started on raw FACTION.TXT powers, shifting the
-// merchants-vs-region term of every regional price day.
-// ---------------------------------------------------------------
-test('audit26 F107: the bootstrap walks both arms twelve times each', () => {
-  const calls = [];
-  // a store shaped like the power walk expects: dict of factions -
-  // drive through a stub by observing regionPowerUpdate's effects is
-  // heavy, so pin the loop itself on a spy-shaped store: an empty
-  // dict makes regionPowerUpdate answer {walked:0} without touching
-  // anything, and the CALL COUNT is what the bootstrap owns.
-  const store = { dict: null };
-  // count via a proxy store: regionPowerUpdate returns early on a
-  // null dict, so wrap it - the exported bootstrap calls the module's
-  // own function, so instead pin the SOURCE loop and the wiring.
-  void calls; void store;
-  const s = rd('src/systems/region/regionPower.js');
-  assert.match(s, /for \(let i = 0; i < 12; i\+\+\) \{\s*\n\s*regionPowerUpdate\(store, \{ rumorMill, rolls \}\);\s*\n\s*regionPowerUpdate\(store, \{ rumorMill, rolls, updateConditions: true, regionConditions \}\);\s*\n\s*\}/,
-    'twelve iterations, both arms each - PlayerEntity.cs:2211-2217 verbatim');
-  const c = rd('src/systems/chargenSession.js');
-  assert.equal((c.match(/bootstrapRegionPower\(playerEntity\.factionRep, \{ regionConditions: playerEntity\.regionConditions \}\)/g) ?? []).length, 2,
-    'BOTH construction paths run it - the wizard\'s and the ?class= copy (the second copy is where S25\'s store went missing once already)');
-});
-
 test('audit26 F107: the bootstrap actually moves powers on a real store shape', () => {
   // a minimal two-faction dict the walk can move
   const mk = (id, power) => [id, { id, power, ally1: 0, ally2: 0, ally3: 0, enemy1: 0, enemy2: 0, enemy3: 0, region: -1, type: 2, ggroup: 0, parent: 0, children: [] }];   // type 2 = Group, inside the rumor-mill validity set

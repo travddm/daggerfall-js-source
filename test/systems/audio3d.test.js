@@ -1,6 +1,4 @@
-// 3D-AUDIO + RIDE-SOUND (2026-09-23, Discord through Mac: "we need 3d audio right now it doesnt matter where enemies
-// are it always sounds like the opposite or directly in front of you while the mob is behind"; and the known limit,
-// "other players' horses make no hoof sounds yet"). BY EXECUTION over a WebAudio graph that records what the engine
+// 3D-AUDIO + RIDE-SOUND. BY EXECUTION over a WebAudio graph that records what the engine
 // set: the scene is DFU's LEFT-handed frame and WebAudio is right-handed, so the audio door turns it once (a source
 // on the player's right plays on the right); every positional source is HRTF (a foe behind is heard behind); a peer
 // in the saddle is heard at them - the riding loop, its stop and its neigh - and their steps and swings too.
@@ -71,7 +69,6 @@ test('3D-AUDIO: every positional source is HRTF - a foe behind is not a foe ahea
   assert.equal(listener.forwardZ.value, -1);
   loop.move([0, 0, 7]);
   assert.equal(panners[1].positionZ.value, -7, 'a moved loop turns at the same door');
-  assert.doesNotMatch(rd('src/systems/audio.js'), /panningModel = 'equalpower'/);
 });
 
 test('RIDE-SOUND: a peer in the saddle is heard AT them - the fast clop (or the cart), moved with them, stopped 0.2 s after they stand, gone when they dismount or leave; their steps and swings play at them too (mutants: the loop never started; left running after the dismount)', () => {
@@ -105,8 +102,6 @@ test('RIDE-SOUND: a peer in the saddle is heard AT them - the fast clop (or the 
   rp.sync([], toScene, opts());
   assert.equal(loops().has(ridingLoopName('bob-0001')), false, 'gone (and the dead\'s empty sync): silent');
   assert.deepEqual(PEER_SOUND_PROFILE, { refDistance: 6, maxDistance: 30, distanceModel: 'linear' }, 'PEER-FS1\'s own falloff, now the panner\'s');
-  const src = rd('src/net/remotePlayers.js');
-  assert.doesNotMatch(src, /playOneShot\(step\.clip, step\.volume \* falloff\)/, 'a peer\'s step plays at them, not flat');
 });
 
 test('RIDE-SOUND: the named positional loop SWAPS its clip at the seam (DFU\'s ridingAudioSource), and the hooves ride the peers\' footsteps switch; a peer\'s step plays at them with the peers\' falloff, and nothing is made past earshot (mutants: the swap lost; the switch ignored; the step flat; the earshot unbounded)', () => {

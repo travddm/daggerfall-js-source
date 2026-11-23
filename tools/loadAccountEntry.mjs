@@ -1,4 +1,4 @@
-// SCALE3 (2026-10-08, Mac: "Do 1 2 and 3"): THE ACCOUNT SERVICE AS THE LOAD HARNESS RUNS IT. Never deployed -
+// SCALE3: THE ACCOUNT SERVICE AS THE LOAD HARNESS RUNS IT. Never deployed -
 // tools/loadHarness.mjs hands this file to `wrangler dev` as the entry, over server-account/wrangler.toml's own bindings.
 //
 // It is the real Worker (server-account/src/index.js), unchanged, with two things kept in the isolate that a deploy sends
@@ -15,7 +15,7 @@
 // returned - the same row, and the only door D1 opens on a statement's meta.
 import service from '../server-account/src/index.js';
 import { DB_ROOT } from '../server-account/src/service.js';
-// AUDIT SCALE II L2 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): AND EVERY DURABLE OBJECT CLASS
+// AUDIT SCALE II L2: AND EVERY DURABLE OBJECT CLASS
 // THE SERVICE'S ENTRY EXPORTS. wrangler.toml binds them by class name from the entry it runs - this file, here - and
 // `wrangler dev` refuses an entry that does not export one ("Your Worker depends on the following Durable Objects, which
 // are not exported in your entrypoint file: AdmitGate"): from ADMIT-LINE on, the harness could not boot the service at
@@ -107,6 +107,7 @@ export default {
       bySql.clear();
       return new Response(body, { headers: { 'content-type': 'application/json' } });
     }
+    if (url.pathname === '/__load/probe') return Response.json(await bindingProbe(env, url.searchParams));
     return service.fetch(request, withLoad(env), ctx);
   },
   async scheduled(/** @type {any} */ event, /** @type {any} */ env, /** @type {any} */ ctx) {
@@ -114,3 +115,43 @@ export default {
     if (typeof s.scheduled === 'function') return s.scheduled(event, withLoad(env), ctx);
   },
 };
+
+/**
+ * The cost of one trip through each storage binding, timed inside the isolate: `n` statements one after another
+ * (`SELECT 1`, which measures the trip alone, and one indexed read of the players table), one batch of `n`, the same
+ * for a one-row write, and `n` puts, gets and deletes of a `kb` object in the save bucket. The isolate's clock moves only across I/O, so each figure
+ * is a total over `n` trips divided by `n`. Never on a deploy: this entry is the harness's own.
+ * @returns {Promise<Record<string, number>>} milliseconds a trip, by operation
+ */
+async function bindingProbe(/** @type {any} */ env, /** @type {URLSearchParams} */ params) {
+  const n = Math.min(2000, Math.max(1, Number(params.get('n') ?? 200)));
+  const kb = Math.min(4096, Math.max(1, Number(params.get('kb') ?? 900)));
+  const timed = async (/** @type {() => Promise<unknown>} */ trip) => {
+    const startedAt = Date.now();
+    for (let i = 0; i < n; i++) await trip();
+    return (Date.now() - startedAt) / n;
+  };
+  /** @type {Record<string, number>} */
+  const out = { n, kb };
+  out.select1 = await timed(() => env.DB.prepare('SELECT 1').all());
+  out.playerRead = await timed(() => env.DB.prepare('SELECT id FROM players WHERE id = ?').bind('nobody').first());
+  const batchStart = Date.now();
+  await env.DB.batch(Array.from({ length: n }, () => env.DB.prepare('SELECT 1')));
+  out.batchOfNEach = (Date.now() - batchStart) / n;
+  // Writes go to a table of the probe's own: a write may wait on its commit, which a read never does.
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS load_probe (k INTEGER PRIMARY KEY, v INTEGER)').run();
+  let w = 0;
+  out.write = await timed(() => env.DB.prepare('INSERT OR REPLACE INTO load_probe (k, v) VALUES (?, ?)').bind(w++ % 64, w).run());
+  const writeBatchStart = Date.now();
+  await env.DB.batch(Array.from({ length: n }, (_, k) => env.DB.prepare('INSERT OR REPLACE INTO load_probe (k, v) VALUES (?, ?)').bind(k % 64, k)));
+  out.writeBatchOfNEach = (Date.now() - writeBatchStart) / n;
+  // Bytes that do not compress, so no layer can shrink the object a trip carries.
+  const body = crypto.getRandomValues(new Uint8Array(kb * 1024 > 65536 ? 65536 : kb * 1024));
+  const object = new Uint8Array(kb * 1024);
+  for (let at = 0; at < object.length; at += body.length) object.set(body.subarray(0, Math.min(body.length, object.length - at)), at);
+  let i = 0;
+  out.r2Put = await timed(() => env.SAVES.put(`__probe/${i++ % 8}`, object));
+  out.r2Get = await timed(async () => (await env.SAVES.get(`__probe/${i++ % 8}`))?.arrayBuffer());
+  out.r2Delete = await timed(() => env.SAVES.delete(`__probe/${i++ % 8}`));
+  return out;
+}

@@ -1,16 +1,14 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SET1 (2026-09-26) — SIGIL SETS: ARMOUR THAT ANSWERS TO A DAEDRIC PRINCE.
+// SET1 — SIGIL SETS: ARMOUR THAT ANSWERS TO A DAEDRIC PRINCE.
 //
-// Mac: "I wanna talk about making sigil armor sets that also come with
-// set builds (think having multiple of one set type grants detailed
-// abilities)". Asked, Mac chose: sets "come from any source, just like
+// . Asked, Mac chose: sets "come from any source, just like
 // weapons", a boss's own set at a new rarity (Aetheric), Sigil Stones
 // as a currency at a vendor beside the gate; tiers at 2 / 4 / 6 pieces;
 // "Grow together" - the bonuses scale with the LOWEST stage among the
 // worn pieces; online only, never in duels. Then: "I want you to go all
 // out on this, just like you did with the World Boss". Design, and the
-// record of every slice: bible/11-Multiplayer/Sigil-Sets.md.
+// record of every slice:.
 //
 // ═══ THIS FILE IS THE LAW ══════════════════════════════════════════
 //
@@ -71,7 +69,7 @@ export const RAMPAGE_SECONDS = 12;
 export const RAMPAGE_STACKS = 3;
 /** Malacath's Bulwark (6): Unbroken's half, the share it takes off every hurt while its window holds (POWER-CEILING
  *  names it so the guards' ceiling can count it). */
-export const UNBROKEN_LESS = 50;
+export const UNBROKEN_LESS = 3;
 /** Nocturnal's Shroud (6): Eventide's shadow is a Chameleon of whole magic rounds, and online a round is five seconds
  *  of the shared clock (net/wire.js: a classic minute every five real seconds). */
 export const ROUND_SECONDS = 5;
@@ -102,14 +100,8 @@ export const STRAND_HITS = 4;
 export const STRAND_SECONDS = 8;
 /** STAR7, The Starspun Weave (6): Mephala's Veil wakes when a foe's blow takes me below this share of my health. */
 export const VEIL_BELOW = 0.3;
-/** EG15, The Battlemage's Panoply (6): the Reprieve wakes when a foe's blow takes me below this share of my health; its
- *  shield holds this long; my allies within this many metres are shielded too, each for this share of its points. */
-export const REPRIEVE_BELOW = 0.2;
-export const REPRIEVE_SECONDS = 6;
-export const REPRIEVE_METRES = 8;
-export const REPRIEVE_ALLY_SHARE = 0.5;
 
-/** CARD-FIT (2026-09-28, Discord - Cruor: "New sigil items descriptor is a bit long!"): a tier's BRIEF - what it does in
+/** CARD-FIT: a tier's BRIEF - what it does in
  *  a few words, one line of the card's row, and every line a tooltip, a trade or a chat post prints of it; `text` stays
  *  the whole sentence, which the Info box and a row's hover read. A recovery is never in the brief - it is the tier's
  *  `recover` number, which the card draws as its own tag and a line says after the brief. No brief runs past BRIEF_MAX
@@ -136,8 +128,8 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `Enemies that hit you take ${v.back}% of the damage back. This never kills them`,
         (v) => `Return ${v.back}% of hits taken`),
       tier(6, 'unbroken', 'Unbroken', { halved: [4, 8], recover: [300, 150] },
-        (v) => `A hit that would kill you leaves you at 1 health, and you take half damage for ${v.halved} s. Recovers in ${v.recover} s`,
-        (v) => `Cheat death, then half damage ${v.halved}s`),
+        (v) => `A hit that would kill you leaves you at 1 health, and you take ${UNBROKEN_LESS}% less damage for ${v.halved} s. Recovers in ${v.recover} s`,
+        (v) => `Cheat death, ${UNBROKEN_LESS}% less dmg ${v.halved}s`),
     ]),
   }),
   dagon: Object.freeze({
@@ -147,10 +139,10 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'ravager', 'Ravager', { strength: [2, 6], critical: [4, 12] },
         (v) => `+${v.strength} Strength, +${v.critical} Critical Strike`,
         (v) => `+${v.strength} Strength, +${v.critical} Critical Strike`),
-      tier(4, 'bloodfury', 'Bloodfury', { more: [4, 12] },
+      tier(4, 'bloodfury', 'Bloodfury', { more: [0.5, 1.5] },
         (v) => `Your weapon deals ${v.more}% more damage, or ${v.more * 2}% more while you are below half health`,
         (v) => `+${v.more}% damage, +${v.more * 2}% below half HP`),
-      tier(6, 'rampage', 'Rampage', { stack: [4, 10] },
+      tier(6, 'rampage', 'Rampage', { stack: [0.5, 1] },
         (v) => `Each kill adds ${v.stack}% weapon damage for ${RAMPAGE_SECONDS} s, up to ${RAMPAGE_STACKS} times`,
         (v) => `+${v.stack}% per kill, up to ${RAMPAGE_STACKS} (${RAMPAGE_SECONDS}s)`),
     ]),
@@ -162,7 +154,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'shadows-grace', "Shadow's Grace", { stealth: [4, 12], agility: [2, 6] },
         (v) => `+${v.stealth} Stealth, +${v.agility} Agility`,
         (v) => `+${v.stealth} Stealth, +${v.agility} Agility`),
-      tier(4, 'nightfall', 'Nightfall Strike', { more: [25, 60] },
+      tier(4, 'nightfall', 'Nightfall Strike', { more: [1, 3] },
         (v) => `Your weapon and arrows deal ${v.more}% more damage to enemies that have not noticed you`,
         (v) => `+${v.more}% vs unaware foes`),
       tier(6, 'eventide', 'Eventide', { rounds: [1, 3], recover: [30, 15] },
@@ -177,7 +169,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'forbidden-lore', 'Forbidden Lore', { intelligence: [2, 6], schools: [2, 6] },
         (v) => `+${v.intelligence} Intelligence, +${v.schools} to every school of magic`,
         (v) => `+${v.intelligence} Intelligence, +${v.schools} every school`),
-      tier(4, 'waters', 'Waters of Oblivion', { less: [5, 15] },
+      tier(4, 'waters', 'Waters of Oblivion', { less: [1.5, 4.5] },
         (v) => `Your spells cost ${v.less}% less magicka`,
         (v) => `Spells cost ${v.less}% less`),
       tier(6, 'eye', 'Eye of Mora', { absorb: [10, 30] },
@@ -189,19 +181,18 @@ export const SIGIL_SETS = Object.freeze({
     id: 'ruhn', name: "Ruhn's Regalia", prince: 'Mehrunes Dagon', colour: '#ffae45', aetheric: true,
     role: 'The Warden of the Burning Gate, worn',
     tiers: Object.freeze([
-      tier(2, 'burning-gate', 'The Burning Gate', { fire: [15, 45], sear: [2, 6] },
+      tier(2, 'burning-gate', 'The Burning Gate', { fire: [10, 30], sear: [2, 6] },
         (v) => `+${v.fire} fire resistance, and your weapon hits deal ${v.sear} extra fire damage`,
         (v) => `+${v.fire} fire resist, +${v.sear} fire a blow`),
       tier(4, 'cleave', 'Cleave', { share: [25, 60] },
         (v) => `Your melee hits also strike the nearest other enemy within ${CLEAVE_METRES} m of your target for ${v.share}% of the damage`,
         (v) => `Melee splashes ${v.share}% to a 2nd foe`),
-      tier(6, 'wrath', 'Wrath of the Warden', { nova: [10, 40], more: [10, 25], recover: [180, 90] },
+      tier(6, 'wrath', 'Wrath of the Warden', { nova: [10, 40], more: [0.5, 2], recover: [180, 90] },
         (v) => `When a hit drops you below ${Math.round(WRATH_BELOW * 100)}% health, a Flame Nova deals ${v.nova} damage to every enemy within ${NOVA_METRES} m, and your weapon deals ${v.more}% more damage for ${WRATH_SECONDS} s. Recovers in ${v.recover} s`,
         (v) => `Under ${Math.round(WRATH_BELOW * 100)}%: Nova ${v.nova}, +${v.more}% damage`),
     ]),
   }),
-  // RAID4b (2026-09-28, Mac on World Events - Raiding Parties online: "3. We can also add renown and it's own atheric +
-  // armor sets"): THE RAIDING PARTIES' OWN - three Aetheric sets no world drop, shelf or Broker rolls; a town defended
+  // RAID4b: THE RAIDING PARTIES' OWN - three Aetheric sets no world drop, shelf or Broker rolls; a town defended
   // pays a piece of the set of the party it was defended against (systems/raidSpoils.js). Their Prince is the Bay's
   // towns: a raid is fought for them, not for a Daedra.
   oath: Object.freeze({
@@ -211,10 +202,10 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'watch-oath', 'Oath of the Watch', { armor: [1, 4], willpower: [2, 6] },
         (v) => `+${v.armor} armor on every part, +${v.willpower} Willpower`,
         (v) => `+${v.armor} armour, +${v.willpower} Willpower`),
-      tier(4, 'riposte', 'Riposte', { more: [15, 40] },
+      tier(4, 'riposte', 'Riposte', { more: [1, 3] },
         (v) => `When an enemy hits you, your next weapon hit within ${RIPOSTE_SECONDS} s deals ${v.more}% more damage`,
         (v) => `When hit: next hit +${v.more}% (${RIPOSTE_SECONDS}s)`),
-      tier(6, 'hold-the-line', 'Hold the Line', { less: [10, 25] },
+      tier(6, 'hold-the-line', 'Hold the Line', { less: [1, 3] },
         (v) => `While you are below half health, you take ${v.less}% less damage`,
         (v) => `${v.less}% less damage below half HP`),
     ]),
@@ -226,10 +217,10 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'keen-eyed', 'Keen-Eyed', { agility: [2, 6], archery: [4, 12] },
         (v) => `+${v.agility} Agility, +${v.archery} Archery`,
         (v) => `+${v.agility} Agility, +${v.archery} Archery`),
-      tier(4, 'run-them-down', 'Run Them Down', { more: [8, 20] },
+      tier(4, 'run-them-down', 'Run Them Down', { more: [0.5, 1.5] },
         (v) => `Your weapon and arrows deal ${v.more}% more damage to enemies below half health`,
         (v) => `+${v.more}% on foes below half HP`),
-      tier(6, 'no-escape', 'No Escape', { more: [15, 40] },
+      tier(6, 'no-escape', 'No Escape', { more: [1, 3] },
         (v) => `A kill marks the nearest other enemy within ${MARK_METRES} m for ${MARK_SECONDS} s. Your weapon deals ${v.more}% more damage to it`,
         (v) => `Kill marks next foe: +${v.more}% (${MARK_SECONDS}s)`),
     ]),
@@ -241,16 +232,15 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'thick-skinned', 'Thick-Skinned', { endurance: [2, 6], blunt: [4, 12] },
         (v) => `+${v.endurance} Endurance, +${v.blunt} Blunt Weapon`,
         (v) => `+${v.endurance} Endurance, +${v.blunt} Blunt Weapon`),
-      tier(4, 'blood-for-blood', 'Blood for Blood', { stack: [3, 8] },
+      tier(4, 'blood-for-blood', 'Blood for Blood', { stack: [0.5, 0.5] },
         (v) => `Each enemy hit on you adds ${v.stack}% weapon damage for ${BLOOD_SECONDS} s, up to ${BLOOD_STACKS} times`,
-        (v) => `+${v.stack}% per hit taken, up to ${BLOOD_STACKS} (${BLOOD_SECONDS}s)`),
+        (v) => `+${v.stack}% a hit taken, to ${BLOOD_STACKS} (${BLOOD_SECONDS}s)`),
       tier(6, 'iron-hide', 'Iron Hide', { ward: [10, 40], recover: [60, 30] },
         (v) => `A kill gives you a ward that blocks the next ${v.ward} damage you take. Recovers in ${v.recover} s`,
         (v) => `A kill: a ${v.ward}-point ward`),
     ]),
   }),
-  // SERPENT-SET (2026-10-05, Mac: "The serpent boss needs to use the currency from oblivion gate and have its own
-  // equipment rewards"): THE OLD COIL'S OWN - an Aetheric set no world drop, shelf or Broker rolls; a ship that dealt
+  // SERPENT-SET: THE OLD COIL'S OWN - an Aetheric set no world drop, shelf or Broker rolls; a ship that dealt
   // Sethrakul its share may find a piece in its hoard (systems/serpent/serpentSpoils.js). Its patron is no Daedra: Satakal, the
   // World-Skin the Redguards say sheds the world as a snake sheds its skin (net/serpent/serpentLaw.js SERPENT_BOSSES).
   coilscale: Object.freeze({
@@ -260,15 +250,15 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'sea-scale', 'Sea-Scale', { frost: [10, 30], endurance: [2, 6] },
         (v) => `+${v.frost} frost resistance, +${v.endurance} Endurance`,
         (v) => `+${v.frost} frost resist, +${v.endurance} Endurance`),
-      tier(4, 'constrict', 'Constrict', { stack: [3, 8] },
-        (v) => `Each weapon hit on an enemy adds ${v.stack}% weapon damage against it, up to ${COIL_STACKS} times, lasting ${COIL_SECONDS} s after your last hit. Each enemy keeps its own count`,   // AUDIT 625 P3 (Mac: "A coil per foe")
+      tier(4, 'constrict', 'Constrict', { stack: [0.5, 0.5] },
+        (v) => `Each weapon hit on an enemy adds ${v.stack}% weapon damage against it, up to ${COIL_STACKS} times, lasting ${COIL_SECONDS} s after your last hit. Each enemy keeps its own count`,   // AUDIT 625 P3
         (v) => `+${v.stack}% per hit on a foe, up to ${COIL_STACKS}`),
       tier(6, 'shed-skin', 'Shed Skin', { heal: [10, 30], recover: [240, 120] },
         (v) => `When a hit drops you below ${Math.round(SHED_BELOW * 100)}% health, you shed your skin and heal ${v.heal}% of your health. Recovers in ${v.recover} s`,
         (v) => `Under ${Math.round(SHED_BELOW * 100)}%: shed skin, heal ${v.heal}%`),
     ]),
   }),
-  // SD9d (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE BRASS OF NUMIDIUM -
+  // SD9d: THE BRASS OF NUMIDIUM -
   // an Aetheric set no world drop, shelf or Broker rolls; the Brass Remnant's spoils carry a piece one time in three
   // (systems/superDungeon/sdSpoils.js). Its patron is no Daedra: Kagrenac, the Tonal Architect who built the Walking Brass. Its colour
   // the Hourbreaker's brass (ui/playerBadge.js HOUR_BRASS).
@@ -279,7 +269,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'dwemer-brass', 'Dwemer Brass', { magic: [4, 10], shock: [4, 10] },
         (v) => `+${v.magic} magic resistance, +${v.shock} shock resistance`,
         (v) => `+${v.magic} magic, +${v.shock} shock resist`),
-      tier(4, 'gearward', 'Gearward', { lighter: [15, 30], recover: [18, 12] },
+      tier(4, 'gearward', 'Gearward', { lighter: [2, 3], recover: [18, 12] },
         (v) => `The next enemy hit on you deals ${v.lighter}% less damage. Recovers in ${v.recover} s`,
         (v) => `A foe's blow ${v.lighter}% lighter`),
       tier(6, 'hour-turns', 'The Hour Turns', { heal: [15, 25], recover: [90, 60] },
@@ -287,27 +277,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `Death turned back, heal ${v.heal}%`),
     ]),
   }),
-  // EG15 (2026-10-12, Mac: "I said I want everything"; bible/11-Multiplayer/Elite-Gates.md section 19): THE BATTLEMAGE'S
-  // PANOPLY - the war-gear the Imperial Battlemages wore in the Spire, taken by the Kyn: an Aetheric set no world drop,
-  // shelf or day's stock rolls; a Redoubt's spoils carry a piece (systems/eliteGates/egSpoils.js) and the Broker's weekly sink sells
-  // one by its id (the account service's). Its patron the Battlemages themselves; its colour Battlemage blue
-  // (Elite-Gates.md section 25.2's [92,124,196]: blue is yours).
-  panoply: Object.freeze({
-    id: 'panoply', name: "The Battlemage's Panoply", prince: 'The Imperial Battlemages', colour: '#5c7cc4', aetheric: true,
-    role: 'What the Kyn took from the Battlemages',
-    tiers: Object.freeze([
-      tier(2, 'battlemages-bearing', "Battlemage's Bearing", { resist: [5, 15], magicka: [10, 30] },
-        (v) => `+${v.resist} to every resistance, +${v.magicka} magicka`,
-        (v) => `+${v.resist} all resists, +${v.magicka} magicka`),
-      tier(4, 'battlemages-discipline', "Battlemage's Discipline", { armed: [20, 50], refund: [5, 15] },
-        (v) => `Casting a spell adds its element to your next weapon hit for ${v.armed}% more damage. Each weapon hit restores ${v.refund}% of your last spell's cost as magicka`,
-        (v) => `Cast arms blow +${v.armed}%, ${v.refund}% MP back`),
-      tier(6, 'battlemages-reprieve', "Battlemage's Reprieve", { shield: [15, 40], recover: [240, 120] },
-        (v) => `When a hit drops you below ${Math.round(REPRIEVE_BELOW * 100)}% health, you gain a shield worth ${v.shield}% of your max health for ${REPRIEVE_SECONDS} s, and allies within ${REPRIEVE_METRES} m get half of it. Recovers in ${v.recover} s`,
-        (v) => `Under ${Math.round(REPRIEVE_BELOW * 100)}%: shield ${v.shield}% of HP`),
-    ]),
-  }),
-  // WITCH1 (2026-10-20, the owner: "A new armor set, a new weapon"; bible/06-Systems/Witches-Festival.md): THE WYRD'S
+  // WITCH1: THE WYRD'S
   // RAIMENT - what the Glenmoril Wyrd wear to the Witches' Festival, sold by the Wyrd Sisters at the taverns' doors for
   // Soul Cakes (systems/aetheric.js WYRD_SET_PIECES), never a drop. Its tiers answer the festival's night: the sight that
   // sees the summoned, the tallow that wards off the dead, and the souls a kill sends home.
@@ -318,7 +288,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'wyrd-sight', 'Wyrd-Sight', { willpower: [2, 6], magic: [5, 15] },
         (v) => `+${v.willpower} Willpower, +${v.magic} magic resistance`,
         (v) => `+${v.willpower} Willpower, +${v.magic} magic resist`),
-      tier(4, 'tallow-ward', 'Tallow-Ward', { more: [10, 30] },
+      tier(4, 'tallow-ward', 'Tallow-Ward', { more: [1, 3] },
         (v) => `Your weapon deals ${v.more}% more damage to the undead, the Daedra and the atronachs`,
         (v) => `+${v.more}% vs undead and summoned`),
       tier(6, 'soul-harvest', 'Soul Harvest', { heal: [8, 20], recover: [40, 20] },
@@ -326,7 +296,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `A kill: +${v.heal}% health, magicka`),
     ]),
   }),
-  // STAR7 (2026-10-20, bible/11-Multiplayer/Starfall.md section 6): THE STARSPUN WEAVE - an Aetheric set no world drop,
+  // STAR7: THE STARSPUN WEAVE - an Aetheric set no world drop,
   // shelf or Broker rolls; a held star's spoils carry a piece a quarter of the time, the Heart-Star's every time
   // (systems/starfall/starSpoils.js). Its patron Mephala, the Webspinner, whose covens wind their black thread about a fallen
   // star to draw its light home: the Weave is that thread, cut from the stars the coven lost. Its colour the star's violet
@@ -338,7 +308,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'spinners-thread', "Spinner's Thread", { poison: [10, 30], agility: [2, 6] },
         (v) => `+${v.poison} poison resistance, +${v.agility} Agility`,
         (v) => `+${v.poison} poison resist, +${v.agility} Agility`),
-      tier(4, 'bound-in-silk', 'Bound in Silk', { more: [60, 140] },
+      tier(4, 'bound-in-silk', 'Bound in Silk', { more: [2, 3] },
         (v) => `Every ${STRAND_HITS}th weapon hit on the same enemy deals ${v.more}% more damage. The count falls away ${STRAND_SECONDS} s after your last hit on it`,
         (v) => `Every ${STRAND_HITS}th hit on a foe +${v.more}%`),
       tier(6, 'mephalas-veil', "Mephala's Veil", { rounds: [2, 4], recover: [240, 120] },
@@ -346,8 +316,7 @@ export const SIGIL_SETS = Object.freeze({
         (v) => `Under ${Math.round(VEIL_BELOW * 100)}%: Chameleon ${v.rounds * ROUND_SECONDS}s`),
     ]),
   }),
-  // SEA-SET (2026-10-22, the owner: "Build ever single bit of this" - the sea past the Veil's Abyss-only gear;
-  // bible/11-Multiplayer/Sigil-Sets.md section 6h, the sea's page's SEA-SET): THE TIDEMAIL - an Aetheric set
+  // SEA-SET: THE TIDEMAIL - an Aetheric set
   // no world drop, shelf or Broker rolls; the Deep Aether's and the Abyss's own: a legend taken or sunk there, a vault of
   // the deep and a ruin's hoard there carry a piece (systems/aetheric.js rollElthericPiece). Its patron is no Daedra: the
   // Drowned Queen, Maraveth, Thrice Drowned - the sea's legends are its makers, and every piece was taken off one of them.
@@ -359,7 +328,7 @@ export const SIGIL_SETS = Object.freeze({
       tier(2, 'stormwrack', 'Stormwrack', { shock: [10, 30], speed: [2, 6] },
         (v) => `+${v.shock} shock resistance, +${v.speed} Speed`,
         (v) => `+${v.shock} shock resist, +${v.speed} Speed`),
-      tier(4, 'undertow', 'Undertow', { more: [15, 40] },
+      tier(4, 'undertow', 'Undertow', { more: [1, 2.5] },
         (v) => `Your weapon deals ${v.more}% more damage in the open ${ETHER_WORD} Ocean, and half of that anywhere else`,
         (v) => `+${v.more}% at sea, half ashore`),
       tier(6, 'captains-due', "The Captain's Due", { guns: [10, 30], hull: [10, 25] },
@@ -375,16 +344,21 @@ export const setById = (id) => (typeof id === 'string' && Object.hasOwn(SIGIL_SE
  *  (a world set names none: read bare, `undefined` would have matched every one of them). */
 export const raidSetOf = (party) => Object.values(SIGIL_SETS).find((s) => 'raid' in s && s.raid === party) ?? null;
 
-/** A number of a tier at a stage: its place on the line from Faint to Ascendant, rounded. Stage clamped to 0..4. */
-export function stageValue(pair, stage) {
+/** B5: the percents of a tier (a share of a blow or a hurt) are small, so they round to a half, where a number of seconds or
+ *  of damage rounds to a whole. */
+const PERCENT_KEYS = Object.freeze(['more', 'stack', 'less', 'lighter']);
+/** A number of a tier at a stage: its place on the line from Faint to Ascendant, rounded (to a half for a percent, `key` one
+ *  of PERCENT_KEYS). Stage clamped to 0..4. */
+export function stageValue(pair, stage, key = '') {
   const [faint, asc] = pair;
   const s = Math.max(0, Math.min(SET_STAGE_MAX, Math.trunc(Number(stage) || 0)));
-  return Math.round(faint + ((asc - faint) * s) / SET_STAGE_MAX);
+  const at = faint + ((asc - faint) * s) / SET_STAGE_MAX;
+  return PERCENT_KEYS.includes(key) ? Math.round(at * 2) / 2 : Math.round(at);
 }
 /** Every number of a tier at a stage. */
 export function tierValues(t, stage) {
   const out = {};
-  for (const [k, pair] of Object.entries(t.values)) out[k] = stageValue(pair, stage);
+  for (const [k, pair] of Object.entries(t.values)) out[k] = stageValue(pair, stage, k);
   return out;
 }
 

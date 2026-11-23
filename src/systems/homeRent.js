@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HOME-RENT (2026-09-30) — THE CLIENT'S HALF OF A RENTED ROOM.
+// HOME-RENT — THE CLIENT'S HALF OF A RENTED ROOM.
 //
 // Asked: "For houses with multiple rooms, the owner can choose to rent
 // out to other players and adjust the price as needed". The law both

@@ -12,7 +12,6 @@
 //    the `place` actions alone, and answered "Nothing was missing" over a recipient no marker held - and assigns him
 //    where no Place is assigned him, which is what the talk's Where is reads. Never a questor or an individual, whom
 //    Person.PlaceAtHome refuses.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-22b.md.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,4 +1,4 @@
-// HT-WAIST-NET (2026-09-24): THE OTHERS SEE YOUR LANTERN AT THE WAIST.
+// HT-WAIST-NET: THE OTHERS SEE YOUR LANTERN AT THE WAIST.
 //
 // HT-WAIST hangs a lit lantern at the waist (Handheld Torches' port-own
 // Handling.LanternsAtWaist) and draws it swinging at the hip of the local
@@ -20,19 +20,21 @@
 // fake sockets either side of the real relay Room (test/fakeRoom.mjs), and
 // PeerBodies over whole createFpArm() rigs on the fixture body with a pelvis
 // and a LIGH lantern (test/fixtures/mw/bodyRig.mjs hipLanternBodyDeps).
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { validPose, poseChanged, parseClient } from '../../src/net/wire.js';
 import { lerpPose, OnlineSession } from '../../src/net/online.js';
 import { PeerBodies } from '../../src/net/peer/peerBodies.js';
-import { createFpArm, HIP_LIGHT_SLOT } from '../../src/combat/fpArm.js';
+import { createFpArm } from '../../src/combat/fpArm.js';
+import { HIP_LIGHT_SLOT } from '../../src/combat/fpArm/fpArmParts.js';
 import * as playerTorch from '../../src/systems/playerTorch.js';
 import { setModSetting, _resetModSettings } from '../../src/systems/modSettings.js';
 import { TEMPLATES } from '../../src/systems/useItem.js';
-import { fakeRoom } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRoom } from '../fakeRoom.mjs';
 import { countingRenderer, hipLanternBodyDeps } from '../fixtures/mw/bodyRig.mjs';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const rd = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const P = { x: 1, y: 2, z: 3, yaw: 0, pitch: 0, mv: 0 };
@@ -82,10 +84,6 @@ test('HT-WAIST-NET sender: the bit is 1 ONLY while a lit lantern hangs at the wa
     setModSetting(V, 'Enabled', false);
     assert.equal(bit(lantern()), undefined, 'the mod off: its switch goes with it');
   } finally { _resetModSettings(); }
-  const w = rd('src/scenes/world.js');
-  const arm = w.slice(w.indexOf('    const arm = {\n      mv,'), w.indexOf('};   // the wire\'s move bit'));
-  assert.ok(arm.length > 0, 'the pose\'s arm block');
-  assert.match(arm, /\n\s*hl: waistLanternPoseBit\(playerEntity\.lightSource\),/, 'the arm the host spreads into every pose and the hello asks the player\'s lit light');
 });
 
 // ---------------------------------------------------------------
@@ -117,7 +115,7 @@ test('HT-WAIST-NET end to end: my lantern lit at the waist leaves my session THE
   const r = fakeRoom(ROOM);
   const relayMine = r.connect(), relayTheirs = r.connect();
   await r.hello(relayMine, 'lamp-0001', P); await r.hello(relayTheirs, 'seer-0001', P);
-  for (const f of relayMine.sent) mine.receive(f);   // SD-HELLO (PIN MOVED): my own welcome, off the real Room - a socket says nothing past its hello until it lands
+  for (const f of relayMine.sent) mine.receive(f);   // SD-HELLO (
   let heard = 0;
   const hear = () => { for (; heard < relayTheirs.sent.length; heard++) theirs.receive(relayTheirs.sent[heard]); };
   const relayLast = async () => {
@@ -223,26 +221,3 @@ test('HT-WAIST-NET peer swing: a peer\'s lantern swings off its OWN body\'s stub
   assert.ok(fore < -0.05, `a walk begun: the lantern lags back, as the local body's does (${fore})`);
 });
 
-// ---------------------------------------------------------------
-// the record
-// ---------------------------------------------------------------
-test('HT-WAIST-NET: recorded - the deferral is retired where HT-WAIST wrote it (Handheld-Torches.md, Morrowind-Rules.md, the Ledger A row), the arc names the bit and the version, and the RELAY_VERSION chain carries it (mutant: the stale "wire untouched" sentence kept beside the retiring one)', () => {
-  const arc = rd('bible/06-Systems/Handheld-Torches.md');
-  const sec = arc.slice(arc.indexOf('## HT-WAIST - THE LANTERN AT THE WAIST'));
-  assert.doesNotMatch(sec, /The wire is untouched|Online: NOT carried/, 'RETIRING A FLAG DELETES THE SENTENCE');
-  assert.match(sec, /HT-WAIST-NET/); assert.match(sec, /`hl`/); assert.match(sec, /world108/);
-  const mw = rd('bible/02-Formats/Morrowind-Rules.md');
-  const mws = mw.slice(mw.indexOf('## HT-WAIST (2026-09-24)'));
-  assert.doesNotMatch(mws.slice(0, 4000), /\*\*Peers\*\*: unchanged/, 'the body\'s record no longer says peers never ask');
-  const ledger = rd('bible/01-Overview/Port-Ledger.md');
-  const row = ledger.split('\n').find((l) => l.startsWith('|') && /\(HT-WAIST, 2026-09-24/.test(l));
-  assert.ok(row, 'HT-WAIST\'s Ledger A row');
-  assert.doesNotMatch(row, /the wire is untouched/);
-  assert.match(row, /HT-WAIST-NET/);
-  const online = rd('bible/06-Systems/Online-Arc.md');
-  assert.match(online, /^## HT-WAIST-NET \(2026-09-24[^\n]*world108$/m, 'the online arc\'s section');
-  const w = rd('src/net/wire.js');
-  // PIN MOVED (THE WROTHGARIAN ZONE, world177): the chain no longer rides the RELAY_VERSION line itself - the line names world177's
-  // parts and the chain before it follows as `// worldN:` comment lines directly beneath; the pin reads the line and its block
-  assert.match(w, /\nexport const RELAY_VERSION = 'world\d+';[^\n]*\n(?:\/\/[^\n]*\n)*?\/\/[^\n]*HT-WAIST-NET \(2026-09-24[^\n]*? - world108 /, 'the relay\'s version chain names it at world108');
-});

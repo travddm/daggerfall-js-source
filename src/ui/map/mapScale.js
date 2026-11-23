@@ -1,5 +1,5 @@
 // @ts-check
-// FIELD BUGS 2026-10-09e - MAP-SCALE (bible/01-Overview/bugs/Field-Bugs-2026-10-09e.md; the Discord's "Desktop client
+// FIELD BUGS 2026-10-09e - MAP-SCALE (; the Discord's "Desktop client
 // in-game map icons and text too small on high resolutions": "playing this game on a monitor greater than 1080P will
 // result in text and icons being way to small for the eye to comfortably see ... For the record I'm using a 2k monitor").
 //

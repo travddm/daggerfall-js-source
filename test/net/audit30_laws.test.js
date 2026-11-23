@@ -1,8 +1,8 @@
-// AUDIT 30 (2026-09-29, Mac: "Do it") - THE LAWS OF PROF3-PROF5, AS THE AUDIT FOUND THEM: a herb's key in its one
+// AUDIT 30 - THE LAWS OF PROF3-PROF5, AS THE AUDIT FOUND THEM: a herb's key in its one
 // spelling; a maker's name well-formed and a record never past its own bound; the mark a claim of its own; a worn
 // piece never "100%"; the tax on the running total; a catalogue of what something yields; a piece listable by its
 // family; a listing's worth bounded; a piece listed only as it was minted; a plane drawn, not flicked. Each pin failed on
-// the code before its fix. bible/06-Systems/Online-Arc.md AUDIT 30.
+// the code before its fix. AUDIT 30.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -33,8 +33,6 @@ test('AUDIT 30 L3: a maker\'s name is well-formed - no lone surrogate kept, no p
   assert.equal(makerName('Ab\udc00c'), 'Abc', 'a lone low surrogate');
   assert.equal(makerName('Silver\u{1F600}thorn'), 'Silver\u{1F600}thorn', 'a whole pair kept');
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
-  // PIN MOVED (MASTER-ART): the bound is 640 - a Master's three lines (`l`) ride the widest record past it
-  // PIN MOVED (AUDIT HORIZONTAL B1): the bound is 704 and `l` the lines at their signed values - still past it here
   const wide = claims({ m: '\u0001'.repeat(MAKER_MAX), h: 'H'.repeat(64), c: 0xffffffff, r: 'clothamulet:linen:flawless-turquoise', q: MASTERWORK, v: MINT_V_MASTER, l: [['stat', 15, 'intelligence'], ['stat', 15, 'personality'], ['stat', 15, 'willpower']] });
   await assert.rejects(mintProductRecord(wide, kp.privateKey, { subtle, nowS: 9_999_999_999 }), RangeError, 'a record its own reader refuses');
   const rec = await mintProductRecord(claims(), kp.privateKey, { subtle, nowS: 1 });
@@ -60,8 +58,8 @@ test('AUDIT 30 L5 + L6: a worn piece never reads "worn to 100%"; the tax is take
 });
 
 test('AUDIT 30 L7 + L2 + L8: the catalogue holds what something yields; a piece is listable by its crafted family; a listing\'s worth is a balance\'s', () => {
-  // PROF7 moved it: Hunting yields the Bear Hide; PIN MOVED (AUDIT-SEATS): the sieges' Spoils yield the Warforged ingot and
-  // the silk; PIN MOVED (DAEDRIC-SMELT, Professions-Arc.md section 53): the forge smelts the Daedric Ingot, and the heart it
+  // PROF7 moved it: Hunting yields the Bear Hide
+  // the silk
   // takes - loose alone, never counted by the service - is the loose door's, as CLOTH-GEMS' graded gems are
   // (professionLaw.js LOOSE_ONLY_KEYS): nothing waits on a yield
   assert.deepEqual([...UNYIELDED], []);

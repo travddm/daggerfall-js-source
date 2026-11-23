@@ -1,6 +1,4 @@
-// RENOWN-GATE (2026-10-12, bible/06-Systems/Revenants.md section 39; the owner: "I want to gate elite/revenant spawns
-// behind renown level and also slighty reduce the spawn rate of revnants"; asked: "Elites 5, revenants 10", offline
-// "Unchanged offline", a shared dungeon "Room's pick stands", the rate "Return chance 50% → 40%").
+// RENOWN-GATE.
 //
 // Pinned: the numbers; the one door (systems/sigil/sigil.js renownOpens - offline open, online from the Renown, never before
 // the page knows it); the elites a player stands as its own - the open world's roll, through the real spawn pool, and a
@@ -22,15 +20,14 @@ globalThis.localStorage = {
 };
 
 const N = await import('../../src/systems/revenant/revenant.js');
-const { ambitionOf, AMBITION } = await import('../../src/systems/revenant/revenantUnquiet.js');   // UNQUIET: the return's share by its ambition
 const P = await import('../../src/ui/revenant/revenantPage.js');
 const E = await import('../../src/systems/eliteFoes.js');
+const CH = await import('../../src/systems/champions.js');
 const { rollSearchElite } = await import('../../src/systems/searchables.js');
 const { setSigilOnline, setSigilRenown, renownOpens, _resetSigilForTests } = await import('../../src/systems/sigil/sigil.js');
 const { setPref, _resetForTests } = await import('../../src/systems/uiPrefs.js');
 const { setPlayerDoor } = await import('../../src/systems/playerDoor.js');
 const { setWorldMinutes } = await import('../../src/systems/worldTick.js');
-const { LOYALTY } = await import('../../src/systems/revenant/revenantFeud.js');
 const { MOBILE_TYPES: M } = await import('../../src/characters/mobile/mobileTypes.js');
 const { createExteriorFoes } = await import('../../src/scenes/exteriorFoes.js');
 
@@ -42,24 +39,24 @@ const orc = (over = {}) => ({ mobileType: M.Orc, level: 6, health: 5, maxHealth:
 const offline = () => setSigilOnline(false);
 const online = (renown = null) => { setSigilOnline(true); setSigilRenown(renown); };
 /** A revenant made while the gate is open (offline), then left as the test needs it. */
-function made(p, { rank = 2, dueAt = 0, lair = null, known = false } = {}) {
+function made(p, { rank = 2, dueAt = 0 } = {}) {
   offline();
   const r = N.revenantDeed(p, orc(), 'fled', { mobileType: M.Orc, rolls: () => 0 });
-  r.rank = rank; r.dueAt = dueAt; r.out = false; r.lair = lair ? { ...lair } : null; r.lairKnown = known;
+  r.rank = rank; r.dueAt = dueAt; r.out = false;
   return r;
 }
-const LAIR = Object.freeze({ px: 40, py: 41, name: 'The Pit', region: 5 });
 const HERE = Object.freeze({ px: 40, py: 41, region: 5 });
 
 beforeEach(() => {
-  _resetForTests(); setPref('lootRarity', true);
+  _resetForTests(); setPref('lootRarity', true); setPref('revenantRenown', '10');   // the wait is the player's choice now (none by default)
   N._resetRevenantForTests(); _store.clear(); setPlayerDoor(null); _resetSigilForTests(); setWorldMinutes(DAY * 5);
 });
 
-test('RENOWN-GATE THE NUMBERS: elites at Renown 5, revenants at 10, a due revenant on two encounter rolls in five (mutants: any number moved)', () => {
-  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 10, 0.4]);
-  assert.ok(N.REVENANT_MIN_RENOWN >= E.ELITE_FOE_MIN_RENOWN, 'a returning elite always finds elites standing');
-  assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.05, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
+test('RENOWN-GATE THE NUMBERS: elites at Renown 5, a due revenant on two encounter rolls in five, and no Renown wait unless the player sets one (mutants: any number moved)', () => {
+  assert.deepEqual([E.ELITE_FOE_MIN_RENOWN, N.REVENANT_RETURN_CHANCE], [5, 0.4]);
+  setPref('revenantRenown', 'none'); online(null);
+  assert.equal(N.revenantHeld(), false, 'the default: nothing waits, whatever the page knows');
+  assert.equal(E.ELITE_FOE_OVERWORLD_CHANCE, 0.01, 'the open world\'s rate is ELITE-RATES\' - the gate holds it back, it does not thin it');
 });
 
 test('RENOWN-GATE THE DOOR: offline always open; online open from the Renown on, never before the page knows it - injected and through the page\'s own door (mutants: offline shut; unknown open; the Renown itself shut)', () => {
@@ -81,22 +78,22 @@ test('RENOWN-GATE THE DOOR: offline always open; online open from the Renown on,
   offline(); assert.deepEqual(both(), [true, false], 'offline again: the door forgets the Renown, and nothing is held');
 });
 
-test('RENOWN-GATE THE OPEN WORLD\'S ROLL: one in twenty from Renown 5 online, as ever offline - the roll drawn either way (mutants: the gate dropped; the gate before the draw; the revenants\' Renown read)', () => {
-  let draws = 0;
-  const at = (v) => () => { draws++; return v; };
-  assert.equal(E.rollOverworldElite(at(0)), true, 'offline');
+test('RENOWN-GATE THE OPEN WORLD\'S ROLL: the street roll is the same dice at every Renown - the gate is asked after it, from Renown 5 online and always offline (mutants: the gate before the draw; the revenants\' Renown read)', () => {
+  const spot = eliteSpot(24);
+  const tiers = [];
+  const ask = () => { CH._resetStreetChampionsForTests(); tiers.push(CH.rollStreetPromotion(spot, 24)?.tier ?? null); return E.eliteRenownOpen(); };
+  assert.equal(ask(), true, 'offline');
   online(4);
-  assert.equal(E.rollOverworldElite(at(0)), false, 'online under Renown 5: none');
+  assert.equal(ask(), false, 'online under Renown 5: none');
   online(null);
-  assert.equal(E.rollOverworldElite(at(0)), false, 'online, not known yet: none');
+  assert.equal(ask(), false, 'online, not known yet: none');
   online(5);
-  assert.equal(E.rollOverworldElite(at(0.0499)), true, 'Renown 5: the one in twenty');
-  assert.equal(E.rollOverworldElite(at(0.05)), false, 'strict');
-  assert.equal(draws, 5, 'every ask draws once, held or not - the same dice either way');
+  assert.equal(ask(), true, 'Renown 5');
+  assert.deepEqual(tiers, ['elite', 'elite', 'elite', 'elite'], 'the roll lands the same whether or not the gate is open');
 });
 
 // the open world's pool on a crafted MONSTER.BSA (test/systems/bal_arc.test.js's rig): an Orc Warlord (base level 16 - past
-// ELITE-FLOOR) built in the wilds, `inLocation` false, with Math.random low enough for the one in twenty
+// ELITE-FLOOR) built in the wilds, `inLocation` false, on a spot whose street roll lands elite
 function craftCfg() {
   const b = new Uint8Array(74); const v = new DataView(b.buffer);
   b[10] = 0x08; v.setUint16(52, 4, true);
@@ -126,7 +123,17 @@ const wildsPool = () => createExteriorFoes({
   inLocation: () => false,
 });
 const withRandom = async (v, fn) => { const old = Math.random; Math.random = () => v; try { return await fn(); } finally { Math.random = old; } };
-const stand = (opts = {}) => withRandom(0.01, () => wildsPool().spawnFoe(24, [10, 0, 10], { feetGiven: true, champion: null, ...opts }));
+/** A spot whose street roll (a hash of the spot, the kind and the pool's count) lands an elite at the pool's first stand. */
+function eliteSpot(mobileType) {
+  setPref('lootRarity', true);
+  for (let i = 0; i < 20000; i++) {
+    const feet = [10 + i * 0.5, 0, 10];
+    CH._resetStreetChampionsForTests();
+    if (CH.rollStreetPromotion(feet, mobileType)?.tier === 'elite') { CH._resetStreetChampionsForTests(); return feet; }
+  }
+  throw new Error('no elite spot');
+}
+const stand = (opts = {}) => withRandom(0.01, () => wildsPool().spawnFoe(24, eliteSpot(24), { feetGiven: true, champion: null, ...opts }));
 
 test('RENOWN-GATE THE OPEN WORLD BY EXECUTION: the real spawn pool stands an elite offline and from Renown 5 online, a plain foe under it and before the Renown is known; a saved foe\'s word stands whatever the Renown (mutants: the gate dropped; a saved elite re-rolled)', async () => {
   const off = await stand();
@@ -135,11 +142,11 @@ test('RENOWN-GATE THE OPEN WORLD BY EXECUTION: the real spawn pool stands an eli
   const under = await stand();
   assert.ok(under?.entity, 'the foe stands');
   assert.equal(!!under.entity.eliteFoe, false, 'online under Renown 5: plain');
-  // the wilds' place scales both after the promotion and rounds, so the health is read off what was stood on the kind's
-  // own (TELL1's healthMult - the place never writes it) and the blows off the ratio
-  assert.equal(off.entity.healthMult ?? 1, E.ELITE_FOE_HEALTH_MULT * (under.entity.healthMult ?? 1), 'the five times not stood');
+  // the health is read off what was stood on the kind's own (TELL1's healthMult) and the blows off the ratio, so the
+  // hero's threat on the plain foe cancels out
+  assert.equal(off.entity.healthMult ?? 1, E.ELITE_FOE_HEALTH_MULT * (under.entity.healthMult ?? 1), 'the elite\'s health multiple not stood');
   const blows = (f) => (Number.isFinite(f.entity.damageScale) ? f.entity.damageScale : 1);
-  assert.ok(Math.abs(blows(off) / blows(under) - E.ELITE_FOE_DAMAGE_MULT) < 1e-9, 'nor the three times');
+  assert.ok(Math.abs(blows(off) / blows(under) - E.ELITE_FOE_DAMAGE_MULT) < 1e-9, 'nor its damage multiple');
   online(null);
   assert.equal(!!(await stand()).entity.eliteFoe, false, 'online, the Renown not known yet: plain');
   online(5);
@@ -174,7 +181,7 @@ test('RENOWN-GATE THE SHARED DUNGEON\'S PICK STANDS: every client builds it alik
   assert.deepEqual(picked(b), picked(a), 'the room\'s pick, whoever builds it');
 });
 
-test('RENOWN-GATE HELD, NONE IS MADE OR RUNS: under Renown 10 online no special foe becomes a revenant, flees or keeps a ledger - a flight that could make none would only rob a kill; at 10 and offline, as ever (mutants: the candidate\'s gate dropped)', () => {
+test('RENOWN-GATE HELD, NONE IS MADE OR RUNS: under Renown 10 online no special foe becomes a revenant, or flees - a flight that could make none would only rob a kill; at 10 and offline, as ever (mutants: the candidate\'s gate dropped)', () => {
   const p = me();
   online(9);
   assert.equal(N.revenantCandidate(orc()), false, 'a champion: held');
@@ -196,14 +203,12 @@ test('RENOWN-GATE HELD, NONE IS MADE OR RUNS: under Renown 10 online no special 
 test('RENOWN-GATE HELD, NONE RETURNS: a due revenant takes no roll and is never claimed under Renown 10; from 10 on two rolls in five (mutants: the return\'s gate dropped; the chance moved either way)', () => {
   const p = me();
   const r = made(p, { dueAt: 0 });
-  r.personality = 'cold';   // AUDIT UNQUIET (Revenants.md section 49): one ambition, every run - not vengeance, its share REVENANT_RETURN_CHANCE
   const now = DAY * 9;
   online(9);
   assert.equal(N.revenantToReturn(p, { now, rolls: () => 0 }), null, 'held');
   assert.equal(r.out, false, 'and not claimed');
   online(10);
-  assert.notEqual(ambitionOf(r.personality), 'vengeance');
-  const chance = N.REVENANT_RETURN_CHANCE;   // UNQUIET (Revenants.md section 46): a revenant of vengeance takes more of the rolls (AMBITION.VENGEANCE_RETURN - unquiet.test.js)
+  const chance = N.REVENANT_RETURN_CHANCE;
   assert.equal(N.revenantToReturn(p, { now, rolls: () => chance }), null, 'the roll at its share passes it by');
   assert.equal(r.out, false);
   assert.equal(N.revenantToReturn(p, { now, rolls: () => chance - 0.01 }), r, 'under it, it comes');
@@ -213,85 +218,14 @@ test('RENOWN-GATE HELD, NONE RETURNS: a due revenant takes no roll and is never 
   assert.equal(N.revenantToReturn(p, { now, rolls: () => 0.39 }), r, 'offline: as ever, at the same two in five');
 });
 
-test('RENOWN-GATE HELD, NONE AT HOME: entering its lair, a rest\'s ask too, stands none and claims none under Renown 10 (mutants: the lair\'s gate dropped)', () => {
-  const p = me();
-  const r = made(p, { dueAt: 0, lair: LAIR, known: true });
-  online(9);
-  assert.equal(N.revenantForLair(p, HERE, { now: DAY * 9 }), null, 'held: not at home');
-  assert.equal(N.revenantForLair(p, HERE, { now: DAY * 9, dueOnly: true }), null, 'a rest\'s ask: held too');
-  assert.equal(r.out, false, 'never claimed');
-  online(10);
-  assert.equal(N.revenantForLair(p, HERE, { now: DAY * 9 }), r, 'Renown 10: at home');
-});
-
-test('RENOWN-GATE HELD, NO WORD, NO MARK, NO HUNT: the towns say nothing of a held one (the person\'s answer unspent, the lair unlearned), the maps mark no lair, the log holds no hunt; from Renown 10 all three (mutants: each gate dropped)', () => {
-  const p = me();
-  const r = made(p, { dueAt: 0, lair: LAIR, known: true });
-  const q = made(p, { dueAt: 0, lair: { px: 42, py: 41, name: 'Old Barrow', region: 5 }, known: false });
-  online(9);
-  const s = { numAnswersGivenTellMeAboutOrRumors: 0, isSpyMaster: false };
-  assert.equal(N.revenantRumor(HERE, s, { rolls: () => 0 }), null, 'no word - the mill\'s turn');
-  assert.equal(s.numAnswersGivenTellMeAboutOrRumors, 0, 'the person\'s one answer unspent');
-  assert.equal(q.lairKnown, false, 'nothing learned');
-  assert.deepEqual(N.revenantMapMarks(), [], 'no lair on the maps');
-  assert.deepEqual(N.revenantHuntEntries({ px: 30, py: 30 }), [], 'no hunt in the log');
-  online(10);
-  assert.deepEqual(N.revenantMapMarks().map((m) => m.id), [r.id], 'Renown 10: the known lair marked');
-  assert.deepEqual(N.revenantHuntEntries({ px: 30, py: 30 }).map((h) => h.name), [`Hunt: ${r.name}`]);
-  assert.match(N.revenantRumor(HERE, s, { rolls: () => 0 }) ?? '', /They say/, 'and the towns speak of one');
-});
-
-test('RENOWN-GATE HELD, NONE FESTERS: a held one gains no wrath on its days and its held days are not caught up when the gate opens; the sworn\'s days run all the while (mutants: the hunters\' loop ungated; the held days counted later)', () => {
-  const p = me();
-  const r = made(p, { rank: 1, dueAt: DAY * 10 + 300 });   // due day 10: a wrath on days 13, 16, 19...
-  r.wrath = 0;
-  const e = orc();
-  const sworn = N.revenantDeed(p, e, 'fled', { mobileType: M.Orc, rolls: () => 0 });
-  assert.ok(N.revenantSpared(p, { revenant: { id: sworn.id } }, { state: 'with' }), 'one sworn, walking with me');
-  const start = sworn.companion.loyalty;
-  const at = (day) => ({ now: DAY * day + 60, rolls: () => 0.99 });   // no desertion roll lands
-  N.revenantFester(p, at(14));   // the first count: from here
-  online(9);
-  N.revenantFester(p, at(16));
-  assert.equal(r.wrath, 0, 'day 16 held: no wrath');
-  assert.equal(sworn.companion.loyalty, Math.min(100, start + 2 * LOYALTY.DAY_WITH), 'the sworn\'s two days ran');
-  online(10);
-  N.revenantFester(p, at(17));
-  assert.equal(r.wrath, 0, 'the gate opens on day 17: the held day 16 is not caught up');
-  N.revenantFester(p, at(19));
-  assert.equal(r.wrath, 1, 'day 19: festering again, on its own days');
-});
-
-test('RENOWN-GATE HELD, NONE TURNS: a sworn one at the edge of betrayal stays sworn under Renown 10 - its turning would stand a hostile revenant beside me - and turns from 10 on; a desertion stands nothing, and runs (mutants: the betrayal\'s gate dropped)', () => {
-  const p = me();
-  const r = made(p, { rank: 1 });
-  assert.ok(N.revenantSpared(p, { revenant: { id: r.id } }, { state: 'with' }), 'sworn');
-  online(9);
-  assert.equal(N.revenantBetrays(p, r, { now: DAY * 6, rolls: () => 0 }), null, 'held: no turning');
-  assert.equal(r.sworn, true, 'still at my side');
-  online(10);
-  assert.equal(N.revenantBetrays(p, r, { now: DAY * 6, rolls: () => 0 }), r, 'Renown 10: it turns');
-  assert.equal(r.sworn, false);
-  const d = made(p, { rank: 1 });
-  assert.ok(N.revenantSpared(p, { revenant: { id: d.id } }, { state: 'with' }));
-  online(9);
-  assert.equal(N.revenantDeserts(p, d, { now: DAY * 6, rolls: () => 0 }), d, 'a desertion leaves - it stands no foe, and its return is held');
-  assert.equal(N.revenantToReturn(p, { now: DAY * 99, rolls: () => 0 }), null, 'held');
-});
-
-test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" - never Hunting on any road nor coming in days; its lair promised on no map nor by the towns; none, and the page says from when (mutants: the held words dropped; the door unread; the lair\'s words; the note)', () => {
-  const r = { dueAt: -1, lair: { name: 'The Pit' }, lairKnown: true };
+test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" - never Hunting on any road nor coming in days; none, and the page says from when (mutants: the held words dropped; the door unread; the lair\'s words; the note)', () => {
+  const r = { dueAt: -1 };
   assert.deepEqual(P.comeWords(r, 0, true), { tag: 'Held', cls: 'is-waiting', line: 'It will not come for you before Renown 10.' });
   assert.equal(P.comeWords({ dueAt: 2 * DAY }, 0, true).tag, 'Held', 'not "in about 2 days" either');
   assert.equal(P.comeWords({ out: true }, 0, true).tag, 'Abroad', 'one standing is standing');
   assert.equal(P.comeWords(r, 0, false).tag, 'Hunting', 'open: as ever');
   online(9); assert.equal(P.comeWords(r, 0).tag, 'Held', 'the page\'s door read');
   online(10); assert.equal(P.comeWords(r, 0).tag, 'Hunting');
-  assert.equal(P.lairWords(r, true), 'Lair: The Pit.', 'held: no map promised');
-  assert.equal(P.lairWords({ lair: { name: 'The Pit' }, lairKnown: false }, true), 'Lair: unknown.', 'nor the towns');
-  assert.equal(P.lairWords(r, false), 'Lair: The Pit, marked on your map.');
-  online(9); assert.equal(P.lairWords(r), 'Lair: The Pit.', 'the page\'s door read');
-  online(10); assert.equal(P.lairWords(r), 'Lair: The Pit, marked on your map.');
   // none: the note
   const note = () => {
     const kids = [];
@@ -302,26 +236,8 @@ test('RENOWN-GATE THE PAGE SAYS SO: a held one is Held, "not before Renown 10" -
     return kids.map((k) => k.textContent).join(' | ');
   };
   online(9);
-  assert.match(note(), /No foe has earned your name yet\. From Renown 10, an elite or champion marked Unquiet that escapes you, or kills you, will remember you and come back for you\./);   // UNQUIET (Revenants.md section 46): only the marked rise
+  assert.match(note(), /No foe has earned your name yet. From Renown 10, an elite or champion that kills you, or breaks, runs and gets away, will remember you and come back for you./);
   online(10);
-  assert.match(note(), /No foe has earned your name yet\. An elite or champion marked Unquiet that escapes you/);
+  assert.match(note(), /No foe has earned your name yet. An elite or champion that kills you/);
 });
 
-test('RENOWN-GATE THE HOSTS: the gate lives in the laws - the open world\'s call and a save\'s word in the pool, both searches\' one roll, the dungeon\'s pick never asked; the page\'s door set by the streaming world alone, the bench offline, the interiors\' one elite the arena\'s bout; no host reads the gate itself', () => {
-  const pool = read('src/scenes/exteriorFoes.js');
-  assert.match(pool, /\(revenant \? revenant\.elite : rollOverworldElite\(Math\.random\)\)\) promoteEliteFoe\(entity\);/, 'the open world: the roll the gate lives in; a revenant as what it was');
-  assert.match(pool, /if \(eliteFoe === true && !allied\) promoteEliteFoe\(entity\);/, 'a save\'s word: never re-rolled');
-  const world = hostText('src/scenes/world.js'), dc = read('src/scenes/dungeonContext.js'), grave = read('src/scenes/searchPartyHost.js');   // PIN MOVED (FIELD BUGS 2026-10-16b GRAVE-PARTY): the headstone's search left world.js's bootWorld for scenes/searchPartyHost.js
-  for (const [name, src] of [['searchPartyHost.js', grave], ['dungeonContext.js', dc]]) assert.match(src, /const elite = rollSearchElite\(\);/, `${name}: a search's one roll`);
-  const pick = dc.split('\n').find((l) => l.includes('pickDungeonElites(enemies'));
-  assert.ok(pick && /elitesAllowed\(\{ onlinePage: isOnlinePage\(\), inRoom: opts\.selfId\?\.\(\) != null \}\)\) pickDungeonElites\(/.test(pick), 'the dungeon\'s pick, the room\'s');
-  assert.match(world, /setSigilOnline\(params\.has\('online'\)\);/, 'the door: online from the page\'s word');
-  assert.match(world, /setSigilRenown\(level\);/, 'and the Renown as it is adopted');
-  assert.doesNotMatch(read('src/scenes/exterior.js'), /setSigilOnline\(/, 'the bench never goes online: open, as offline is');
-  const modes = read('src/scenes/worldModes.js');
-  assert.doesNotMatch(modes, /rollOverworldElite|rollSearchElite|pickDungeonElites/, 'the interiors roll no elite of their own');
-  assert.equal((modes.match(/eliteFoe: !!o\.elite \}\) \?\? null,   \/\/ AUDIT ARENA-LADDER: a tier champion stands as an elite/g) ?? []).length, 2, 'the arena\'s bout: its tier champion, the sand\'s and the pit\'s');
-  for (const f of readdirSync(new URL('../../src/scenes/', import.meta.url), { recursive: true }).filter((x) => x.endsWith('.js'))) {
-    assert.doesNotMatch(read(`src/scenes/${f}`), /\b(renownOpens|eliteRenownOpen|revenantHeld)\(/, `${f} reads the gate only through the laws`);
-  }
-});

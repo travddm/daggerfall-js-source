@@ -1,10 +1,10 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") - FORAGING'S PURE CORE: the draws,
+// PROF1 - FORAGING'S PURE CORE: the draws,
 // the attribute bands, the day and the Basket's five blocks, moved out
 // of foragingLaw.js (which imports and re-exports every one) so the
 // account service can read them without bundling a host. The
-// professions' Basket (bible/06-Systems/Foraging.md 14.6) rolls its
+// professions' Basket (14.6) rolls its
 // food on the service from these very tables - the IL's arrays still
 // live once. Verbatim from the IL; nothing here touches a host.
 // ═══════════════════════════════════════════════════════════════════

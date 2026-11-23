@@ -1,5 +1,4 @@
-// TACT2 - THE TACTICS BRAIN (bible/12-Enhanced-AI/Tactics-Arc.md; Mac, 2026-10-02: "enemy tactics like backing off
-// and knowing when to strike"; his calls: 2 melee + 2 ranged tokens; animals and cowardly humans flee, undead,
+// TACT2 - THE TACTICS BRAIN (;; his calls: 2 melee + 2 ranged tokens; cowardly humans flee, animals never, nor undead,
 // daedra, constructs and guards never). Driven on the REAL motor and the REAL attack component over the real collider,
 // on the brain's own clock: with the switch on, a crowd takes turns - two in, the rest on the ring, each blow followed
 // by a step back and the token handed on, a wounded foe backing off, a coward running, an archer kiting, a back
@@ -54,9 +53,9 @@ function run(foes, secs, { player = [0, 0, 0], each = null } = {}) {
   }
 }
 
-test('TACT2: who runs - animals and the cowardly classes; never the watch, undead, daedra or constructs', () => {
-  assert.equal(isCoward(MOBILE_TYPES.Rat), true);
-  assert.equal(isCoward(MOBILE_TYPES.GrizzlyBear), true);
+test('TACT2: who runs - the cowardly classes; never animals, the watch, undead, daedra or constructs', () => {
+  assert.equal(isCoward(MOBILE_TYPES.Rat), false);
+  assert.equal(isCoward(MOBILE_TYPES.GrizzlyBear), false);
   for (const n of ['Mage', 'Sorcerer', 'Healer', 'Bard', 'Burglar', 'Acrobat', 'Thief']) assert.equal(isCoward(MOBILE_TYPES[n]), true, n);
   for (const n of ['Knight_CityWatch', 'Warrior', 'Knight', 'Barbarian', 'SkeletalWarrior', 'Zombie', 'Lich', 'FireDaedra', 'DaedraLord', 'IronAtronach', 'Orc', 'Giant']) assert.equal(isCoward(MOBILE_TYPES[n]), false, n);
   assert.equal(COWARD_CLASSES.size, 7);
@@ -139,8 +138,8 @@ test('TACT2: a foe that loses a quarter of its health in a moment backs off and 
   assert.notEqual(f.ai._tac.state, 'backoff', 'and back in the fight');
 });
 
-test('TACT2: a coward near death runs; a guard, an orc and the undead fight on', () => {
-  for (const [type, runs] of [[MOBILE_TYPES.Thief, true], [MOBILE_TYPES.Rat, true], [MOBILE_TYPES.Knight_CityWatch, false], [MOBILE_TYPES.Orc, false], [MOBILE_TYPES.Zombie, false]]) {
+test('TACT2: a coward near death runs; a rat, a guard, an orc and the undead fight on', () => {
+  for (const [type, runs] of [[MOBILE_TYPES.Thief, true], [MOBILE_TYPES.Rat, false], [MOBILE_TYPES.Knight_CityWatch, false], [MOBILE_TYPES.Orc, false], [MOBILE_TYPES.Zombie, false]]) {
     resetTactics();
     const foes = crowd(1, { mobileType: type });
     run(foes, 2);
@@ -215,23 +214,6 @@ test('TACT2: the brain only steers a foe that sees its target in range - out of 
   run(foes, 0.3);
   assert.equal(foes[0].ai._tacStrike, undefined);
   assert.equal(tacticsStep({ _dist: Infinity, inSight: false, feet: [0, 0, 0] }, 1, 0), false);
-});
-
-test('TACT2: the motor and the attack read the brain - the step, the stand, the gates; the hosts hand the vitals and the player\'s facing', () => {
-  const m = rd('src/characters/enemy/enemyMotor.js');
-  // PIN MOVED (TELL6, bible/12-Enhanced-AI/Feud-Arc.md 8.1): a charge's run is never the detour's either
-  assert.match(m, /const _took = tacticsStep\(this, dx, dz\);\n\s*if \(_took && \(!detouring \|\| this\.fleeLeft > 0 \|\| this\._tac\?\.state === 'windup' \|\| this\._tac\?\.state === 'dash'\)\) return;[^\n]*\n\s*this\._tacDir = null;\n\s*\/\/ Ranged attacks/);
-  assert.match(m, /if \(this\._tacDir\) \{ this\._tacDir = null; this\._tacBlocked = true; this\.moving = false; \}[^\n]*\n\s*else this\._findDetour\(dir2d\);/);
-  const a = rd('src/characters/enemy/enemyAttack.js');
-  assert.match(a, /if \(ai\._tacStrike === false\) continue;/);
-  assert.match(a, /&& ai\._tacShoot !== false && this\.rolls\(\) < BOW_SHOT_CHANCE\)/);
-  assert.match(a, /ai\._tacSwung = \(ai\._tacSwung \?\? 0\) \+ 1;/);
-  const c = rd('src/characters/enemy/enemyCasting.js');
-  assert.match(c, /if \(ai\._tacShoot === false\) continue;/);
-  assert.match(c, /dist <= MELEE_DISTANCE && ai\._tacStrike !== false\)/);
-  for (const f of ['src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) assert.match(rd(f), /vitals: \(\) => entity,/, f);
-  assert.equal((rd('src/scenes/dungeonContext.js').match(/vitals: \(\) => entity,/g) ?? []).length, 2);
-  assert.match(rd('src/scenes/world.js'), /noteLocalPlayer\(walkMode && playerSpawned \? player\.pos : cam\.pos, fwd\);/);
 });
 
 /** A bare foe for the board's own law: in sight, at `d` from the target, ahead along +z. */

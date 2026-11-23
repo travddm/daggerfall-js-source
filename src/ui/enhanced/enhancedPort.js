@@ -66,8 +66,7 @@ const el = (doc, tag, cls, text) => {
 /** The native-coordinate centre of a panel-relative rect. */
 export const centreOf = ([x, y, w, h], ox = 0, oy = 0) => [ox + x + w / 2, oy + y + h / 2];
 
-/** HOLD-STEP (2026-09-27, Skeptikali on Discord: "hold a + or - button in for example spell making to increase values
- *  instead of clicking hundred times"): a spinner's button held repeats its press - the first repeat after `delay`,
+/** HOLD-STEP: a spinner's button held repeats its press - the first repeat after `delay`,
  *  then one every `every`, and every `fast` once `fastAfter` have gone by: a field walked 1 to 100 in under five
  *  seconds. Never DFU's (its UpDownSpinner steps once a click); the enhanced port's own. */
 export const HOLD_REPEAT = Object.freeze({ delay: 400, every: 100, fast: 40, fastAfter: 10 });

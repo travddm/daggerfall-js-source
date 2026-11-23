@@ -161,7 +161,7 @@ export function hasPort(mapId) {
   return PORT_SET.has(maskMapId(mapId));
 }
 
-// SEAT2b part two (bible/11-Multiplayer/Seats-Arc.md 7.5: "Harbour (coastal seats only) ... ships (the Sea update) dock at
+// SEAT2b part two (7.5: "Harbour (coastal seats only) ... ships (the Sea update) dock at
 // the seat; the town is a Travel Options port for members"): A SEAT'S HARBOUR. The mod's own table above is untouched
 // (hasPort stays TravelOptionsMapWindow.cs's list); every place that asks Travel Options whether a town is a port asks
 // `hasPortFor`, which adds the host's word - a Harbour standing at a seat the playing character's guild holds

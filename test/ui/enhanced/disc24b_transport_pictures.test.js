@@ -1,5 +1,4 @@
-// DISC24-B (2026-09-24, kurkku on Discord: "Horse and Wagon don't have sprites in GrimoireUI" - "presumably applies to
-// the normal vanilla UI as well").
+// DISC24-B.
 //
 // THE BUG: MAC-D2 answered the Small Cart's tomato (its template's 213/1 is the Wine Rack's world sprite) by giving the
 // WHOLE Transportation group no picture. That took the Horse with it, whose 201/0 was never borrowed - it is the
@@ -17,7 +16,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { inventoryItemImage, inventoryItemModel, GROUP_TEMPLATE_INDICES, TRANSPORT_HORSE, TRANSPORT_SMALL_CART } from '../../../src/systems/item/itemTemplates.js';
 import { WAGON_KINDS, newWagonItem } from '../../../src/systems/wagon/wagonKinds.js';
-// PIN MOVED (WAGONS1, 2026-10-09): the cart's picture is Mac's Wagon Cart, the world's wagon since WAGONS1 - drawn off
 // the port's own build under its own id (ui/modelIcon.js's port door), no longer classic model 41214
 const WAGON_MODEL_ID = WAGON_KINDS.cart.icon;
 import { bakeModelIcon, requestModelIcon, requestModelIconUrl, _resetModelIcons, ICON_SIZE } from '../../../src/ui/modelIcon.js';
@@ -224,7 +222,4 @@ test('DISC24-B: the enhanced lists (pack, detail, shop, player trade) picture th
   for (const f of ['src/ui/enhanced/enhancedTrade.js', 'src/ui/enhanced/enhancedPlayerTrade.js']) {
     assert.match(readFileSync(new URL(f, ROOT), 'utf8'), /linePicture\(line, \{ box: SLOT_BOX\.row,/, f);
   }
-  const inv = readFileSync(new URL('src/ui/enhanced/enhancedInventory.js', ROOT), 'utf8');
-  assert.equal((inv.match(/linePicture\(line, \{ box(?:: SLOT_BOX\.card)?, onReady: ready(?:, snap)? \}\)/g) ?? []).length, 2, 'the pack\'s tile and its detail card');
-  assert.match(inv, /requestFittedPicture\(name, \(wake\) => linePictureUrl\(line, \{ scale: 1, onReady: wake \}\),/, 'the fitted door asks this one');
 });

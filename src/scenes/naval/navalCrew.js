@@ -1,6 +1,5 @@
 // @ts-check
-// LIVING CREW - THE HOST (2026-09-29, Mac: "Crew members shouldnt be the static sprites and instead the enemy type
-// sprites with multiple animations, they should navigate the deck, talk with each other, blurb, sing chantys, etc"):
+// LIVING CREW - THE HOST:
 // every crewed ship near the eye stands her crew (systems/naval/crewLife.js) as DFU's own mobile units - the classes'
 // sprites, idle and walking, turned to the eye as DFU's DaggerfallMobileUnit turns them (characters/mobile/mobileUnit.js) - on
 // her deck, carried by her mesh node (her way, her turn, her roll), with the lines over their heads for the naval HUD.
@@ -198,7 +197,7 @@ export function createNavalCrew({ renderer, getTexture, uploadRecordFrame, rand 
   }
 
   /**
-   * MWNPC10 (bible/04-Characters/Morrowind-NPCs.md section 15b): EVERY STANDING HAND IN HIS MORROWIND BODY, before the
+   * MWNPC10: EVERY STANDING HAND IN HIS MORROWIND BODY, before the
    * world's people pass draws his sprite - his class's look off his ship's seed and his place in her roster (a creature
    * hand its creature), walking as he walks, each swing at his work a blow, concealed with his ship's owner.
    */

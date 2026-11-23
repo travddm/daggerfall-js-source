@@ -1,4 +1,4 @@
-// MW-BOW1 (2026-10-10): A BOW THAT DRAWS. No committed fixture bow carries the motion a retail Morrowind bow does - its
+// MW-BOW1: A BOW THAT DRAWS. No committed fixture bow carries the motion a retail Morrowind bow does - its
 // limbs and string morphing as the string is pulled, and its ArrowBone keyframed from where the arrow is fetched to the
 // string and back (OpenMW issues 5642 and 9322: "arrow fetching animation is baked into bow mesh"). This is bowmesh.nif
 // - its every record written back by tools/nifWrite.mjs - with the two controllers a retail bow carries added, timed in

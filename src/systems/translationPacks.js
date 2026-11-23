@@ -1,4 +1,4 @@
-// L10N3b (2026-09-27, Mac: "Install + bundle allowed" - a player installs any DFU translation pack from their own disk):
+// L10N3b:
 // WHAT A DFU TRANSLATION PACK HOLDS, by the path DFU reads each file from. A pack is loose files for Daggerfall
 // Unity's StreamingAssets, usually inside a folder of its own ("French files for DFU 1.2/Text/..."):
 //   Text/<Table>.csv                 a string table - Internal_Strings, Internal_RSC, Internal_Locations... (TextManager)

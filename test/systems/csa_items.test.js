@@ -1,4 +1,4 @@
-// CSA-H (2026-09-27) - COME SAIL AWAY'S ITEMS, SHELVES, CARGO AND PORTS: systems/comeSailAway/comeSailAwayItems.js (the two
+// CSA-H - COME SAIL AWAY'S ITEMS, SHELVES, CARGO AND PORTS: systems/comeSailAway/comeSailAwayItems.js (the two
 // template rows, the mint, the names, AssignVariantsToShopItems) and systems/comeSailAway/comeSailAway.js over the real SpawnBoat
 // (IsNearPort's square, PackBoat and the packed cargo, the cargo box, the variant picker, giveboat, the two classes'
 // UseItem), the shelf's custom loop (systems/shopStock.js through itemTemplates.js's one GetCustomItemsForGroup) and the
@@ -99,7 +99,6 @@ test('CSA-H: the two rows are the bundle\'s ItemTemplates.json field for field (
   assert.throws(() => boatItemName('Deed to', 0, 10), /IndexOutOfRangeException/, 'variantNames[10]');
 });
 
-// PIN MOVED (SHIPYARDS, 2026-10-11, Mac: "Shipyard only"): RegisterCustomItem's group no longer stocks the two - a port
 // town's shipyard sells every hull and buys them back (systems/shipyards.js), a DECLARED departure (Ledger A, SHIPYARDS)
 test('CSA-H x SHIPYARDS: the two rows stand on no shelf - GetCustomItemsForGroup answers neither, the mod on or off; the one home\'s Contains guard and the fish\'s rows stand', () => {
   try {
@@ -322,8 +321,7 @@ test('CSA-H: the host\'s seams - the two use handlers on the item-use door (the 
   assert.match(w, /const win = new ListPickerWindow\(\{ items: rows, backdrop: 'none', onPick: \(i\) => onPick\(i\),/);   // DaggerfallPopupWindow's Color.clear: the world stays behind it
   assert.match(w, /if \(modes\?\.mountWindow\?\.\(win\)\) _csaPicker = win;/);
   assert.match(w, /const csaShelfStocked = \(items\) => \{ if \(csaOn\(\) && Array\.isArray\(items\)\) assignVariantsToShopItems\(mintShelfBoatUids\(items, csaNewItemUid\), \(min, max\) => min \+ Math\.floor\(Math\.random\(\) \* \(max - min\)\)\); return items; \};/);
-  // SHIP-PACK (PIN MOVED): and the pack itself, which a ship's deed is found in and taken from as she is picked up
-  // PIN MOVED (HOLDINGS, bible/03-World/Holdings.md): the items' seam carries the Fleet's book after the pack (titles, retitle) -
+  // SHIP-PACK (
   // the pin reads the three the mod's own laws use, up to the pack, and test/systems/naval/fleet.test.js pins the two it added
   assert.match(w, /items: \{ create: \(templateIndex\) => mintBoatItem\(templateIndex, csaNewItemUid\(\)\), addToPlayer: \(item\) => addItem\(\(playerEntity\.items \?\?= \[\]\), item\), player: \(\) => \(playerEntity\.items \?\?= \[\]\),/);
   const m = src('scenes/worldModes.js');

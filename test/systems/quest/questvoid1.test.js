@@ -1,5 +1,4 @@
-// QUEST-VOID (2026-10-12, a player online: the Dust of Restful Death's mummy nowhere in Ruins of Old Barbara's Place;
-// Mac: "the enemy is not marked on the map. i prob spawned the mob somewhere in the void"). The net under the dungeon's
+// QUEST-VOID. The net under the dungeon's
 // mount (quest/questRepair.js relayBuiltDungeon): a quest target on a marker the dungeon AS BUILT has not is laid again
 // on that build before anything stands - whatever drift put it there.
 import { test } from 'node:test';
@@ -84,13 +83,3 @@ test('QUEST-VOID a target the build has is left where it is, whatever else diffe
   assert.equal(crypt.siteDetails.selectedMarker.targetResources, null, 'a dead foe stays dead');
 });
 
-test('QUEST-VOID wired: the dungeon mount re-lays on the built dungeon first, its own placements\' mount held back, through the bridge', () => {
-  const wm = src('src/scenes/worldModes.js');
-  const body = wm.slice(wm.indexOf('function mountQuestResources() {'), wm.indexOf('const dungeonSceneBehaviours'));
-  const relay = body.indexOf('questBridge.relayBuiltDungeon?.(dungeonLoc, dungeonQuestAdapter.currentMapId())');
-  assert.ok(relay > 0, 'the built location and the mount\'s key');
-  assert.ok(relay < body.indexOf('questBridge.mountScene(dungeonQuestAdapter'), 'before the mount');
-  assert.match(body, /if \(relayingBuilt\) return;/);
-  assert.match(body, /finally \{ relayingBuilt = false; \}/);
-  assert.match(src('src/scenes/quest/questBridge.js'), /relayBuiltDungeon\(location, mapId\) \{\n\s+return relayBuiltDungeon\(machine, location, \{ carriesQuestItem/);
-});

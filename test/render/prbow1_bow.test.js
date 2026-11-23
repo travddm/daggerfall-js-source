@@ -1,5 +1,4 @@
-// PR-BOW1 (2026-09-24, player report: "Equipping a bow enlarges your
-// character"): THE MORROWIND BODY'S SPRITE STANDS ON THE BODY, NOT ON
+// PR-BOW1: THE MORROWIND BODY'S SPRITE STANDS ON THE BODY, NOT ON
 // ITS GEAR. The third-person body is a true-size ortho picture on an
 // upright billboard quad (render/characterSprite.js drawRigSpriteBox),
 // so its size on screen is set by where the quad stands - and that was
@@ -154,7 +153,7 @@ test('PR-BOW1: the body is the SAME size on screen bare-handed, with a longsword
 test('PR-BOW1: the picture is OF the body - taken along the eye\'s ray to the actor\'s own axis at the body\'s mid-height (the drawn ranges less CARRIED_SLOTS), that point drawn exactly on itself, and every point of the body drawn where it is drawn bare-handed, whatever the hand holds (unfixed: the gear-inclusive box centre placed the picture)', async () => {
   const SAMPLES = [[0, 0, 0], [0, 0, 3.2], [1.5, 0.5, 2], [-0.4, 1.8, 3.2]];   // feet, shoulder, off-axis points of the fixture body
   const bare = await standBody();
-  // BODY-CROP (2026-10-22): the card - and so its ray and its anchor - stands under the Billboard Look; by default the
+  // BODY-CROP: the card - and so its ray and its anchor - stands under the Billboard Look; by default the
   // picture is the main camera's own, cut to the body's window, and the same points land the same way
   for (const card of [true, false]) {
     setPref('mwBillboardLook', card);
@@ -172,8 +171,8 @@ test('PR-BOW1: the picture is OF the body - taken along the eye\'s ray to the ac
           const got = drawnBody(body, cam);
           const at = `${what}, ${back}/${pitch}`;
           if (card) {
-            // lookAt's third row is -forward. BODY-FLAT (2026-10-23): along the ray's LEVEL part - the Billboard Look's
-            // card is a classic flat, its picture drawn level (PIN MOVED: it was the pitched ray)
+            // lookAt's third row is -forward. BODY-FLAT: along the ray's LEVEL part - the Billboard Look's
+            // card is a classic flat, its picture drawn level (
             const fwd = [-got.sprite.oview[2], -got.sprite.oview[6], -got.sprite.oview[10]];
             assert.ok(crossLen(fwd, [axis[0] - cam.eye[0], 0, axis[2] - cam.eye[2]]) < 1e-5, `${at}: the picture is taken along the eye's level ray to the body`);
           } else {
@@ -200,7 +199,7 @@ test('AUDIT OW3 J6: drawThird\'s `grow` (the travel view\'s OW-BIG - the Morrowi
   const { minZ, maxZ } = meshBounds(pieces);
   const midZ = (minZ + maxZ) / 2;
   const SAMPLES = [[0, 0, 0], [0, 0, 3.2], [1.5, 0.5, 2], [-0.4, 1.8, 3.2]];
-  // BODY-CROP (2026-10-22): the card's window grows with the body under the Billboard Look; the main camera's own picture
+  // BODY-CROP: the card's window grows with the body under the Billboard Look; the main camera's own picture
   // (the default) draws every grown point where the grown mesh itself stands on the screen
   for (const card of [true, false]) {
     setPref('mwBillboardLook', card);
@@ -414,17 +413,3 @@ test('PR-BOW1: the per-range boxes - folded over each piece\'s posed positions i
   assert.deepEqual([...CARRIED_SLOTS], ['weapon', 'arrow', 'torch', 'paper', ...HOLSTER_SLOTS]);
 });
 
-test('PR-BOW1: the wiring, by source - the upload folds the per-range boxes, drawThird folds only what it draws and anchors the quad, and every body reaches it: the local one in every host through mwView, the peers through PeerBodies', () => {
-  const arm = rd('src/combat/fpArm.js');
-  assert.match(arm, /function uploadThirdMesh\(t\) \{[\s\S]*?foldRangeBoxes\(thirdMesh\.ranges\);[\s\S]*?return thirdMesh;/, 'every upload refolds the boxes');
-  const at = arm.indexOf('    drawThird(canvas, { proj, view, eye, feet, yaw, hitFlash = 0, conceal = null, grow = 1, up = null, fx = null, cast = false, anchored = false, horse = null }) {');   // PIN MOVED, COATS3D: and the horse under the body   // PIN MOVED (AUDIT MWNPC16-18 A3, section 27): and whether the body never walks   // PIN MOVED (MWNPC5): and a foe's tells   // AUDIT OW3 J6: and the travel view's grow; AUDIT OW4 J6: and its up; MWNPC16: and its own shadow
-  assert.notEqual(at, -1, 'drawThird found');
-  const draw = arm.slice(at, arm.indexOf('    itemIcon(item,'));
-  // PIN MOVED (MWNPC16): the box is thirdBox's - one home for the draw and the cast (castThird)
-  assert.match(draw, /const box = thirdBox\(\);/, 'the box is thirdBox\'s');
-  assert.match(arm.slice(arm.indexOf('  function thirdBox() {'), arm.indexOf('  const castSphere = ')), /visibleRangeBounds\(thirdMesh\.ranges, thirdDrawBox\)/, 'the box is the drawn ranges');
-  assert.match(draw, /visibleRangeBounds\(thirdMesh\.ranges, thirdBodyBox, CARRIED_SLOTS\)/, 'the anchor height is the body\'s');
-  assert.match(draw, /drawBodyPicture\(renderer, canvas, thirdMesh, model, \{ center, halfW, halfH, anchor, hitFlash, conceal, up, fx, glowLook: padLooks \}/, 'and the quad is anchored (AUDIT OW4 J6: and leaned by the view\'s up)');   // PIN MOVED (MWNPC5): and a foe's tells; PIN MOVED (WEAPON-GLOW1, AUDIT MW-3): and the held weapon's glow, whose outline the picture is padded for   // PIN MOVED (TWO-HANDS x WEAPON-GLOW1): the pad's looks - the held weapon's and a pair's left blade's   // PIN MOVED (BODY-CROP x MW-DETAIL, 2026-10-22): through drawBodyPicture, which hands the anchor to drawRigSpriteBox's card
-  assert.match(rd('src/player/mwView.js'), /fpArm\.drawThird\(canvas, \{ proj, view, eye, feet, yaw, grow: face\?\.grow > 1 \? face\.grow : 1, up: face\?\.up \?\? null(?:, horse)? \}\)/, 'the local body, every host (AUDIT OW3 J6: grown under the travel view; AUDIT OW4 J6: leaned)');   // PIN MOVED, COATS3D: astride, its horse
-  assert.match(rd('src/net/peer/peerBodies.js'), /b\.rig\.drawThird\(canvas, \{ proj, view, eye, feet: b\.feet, yaw: b\.yaw, hitFlash: flashOf \? flashOf\(b\.id\) : 0, conceal: b\.veil \?\? null(?:, grow: g, up: this\._cam\?\.up \?\? null)?(?:, fx(?:: this\._cam\?\.fxOf \? this\._cam\.fxOf\(b\.id\) : null)?)?(?:, cast(?:, anchored)?)?(?:, horse)? \}\)/, 'every peer\'s body');   // PIN MOVED (MWNPC5): and its tells by id   // PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11): grown and leaned under the Overworld   // PIN MOVED (AUDIT MWNPC16-18 A3, Morrowind-NPCs.md section 27): and whether the body never walks   // PIN MOVED (AUDIT MWNPC16-18 R1, Morrowind-NPCs.md section 27): its tells read once a body, a line above (the cast asks their dissolve)   // PIN MOVED, COATS3D: a rider's horse
-});

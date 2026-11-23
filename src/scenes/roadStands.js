@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW7b (2026-10-05, bible/06-Systems/Living-World.md "LW7b"): THE ARMED BEYOND THE WALLS - what a traveller's regard of
-// the character comes to when the player meets them on the road. Mac: "make friends or enemies"; LW0: "a friend greets
+// LW7b: THE ARMED BEYOND THE WALLS - what a traveller's regard of
+// the character comes to when the player meets them on the road.; LW0: "a friend greets
 // you by name, an enemy will not talk, and an armed one draws on you beyond the walls".
 //
 // The parties are pure (systems/livingWorld/trips.js); how each member regards the character is the character's own

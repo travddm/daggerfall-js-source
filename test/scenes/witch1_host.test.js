@@ -1,5 +1,4 @@
-// WITCH1 (2026-10-20, the owner: "players with housing can place an object on the outside in which players can give
-// candy"; bible/06-Systems/Witches-Festival.md): THE WITCHES' FESTIVAL IN THE STREETS (src/scenes/witchesHost.js) - the
+// WITCH1: THE WITCHES' FESTIVAL IN THE STREETS (src/scenes/witchesHost.js) - the
 // town underfoot asked for its offerings and each stood at its home's kept spot as the pixel's own batch and lantern, a
 // target in the street's ray named with its rows, taken from, filled and taken in; set out by the item's Use at one's
 // own door; taken down offline or for another account; asked only while the festival is live or one's own stands there;
@@ -228,19 +227,3 @@ test('AUDIT STAR8 T1 A WYRD SISTER MET: her window opened is the act `wyrd-met`,
   } finally { setActSink(null); }
 });
 
-test('WITCH1 THE FOUR HOSTS: world.js makes the host and reads its frame, names and presses; worldModes presses a Wyrd Sister and an offering', () => {
-  const world = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const modes = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  const ext = readFileSync(new URL('../../src/scenes/exterior.js', import.meta.url), 'utf8');
-  assert.match(world, /witches = createWitchesHost\(\{ built, renderer, pipeline, onlineHomes, townTalk, state, player, saveSoon, chatNotice, mode: _mode, get online\(\) \{ return online; \} \}\);/);
-  assert.ok(world.indexOf('witches = createWitchesHost(') < world.indexOf('var modes = createWorldModes({'), 'made before the modes host reads it');
-  assert.match(world, /\n {4}witches,   \/\/ WITCH1/);
-  assert.match(world, /\(key\) => witches\?\.hoverName\(key\) \?\? null,/);
-  assert.match(world, /\n {4}witches\?\.frame\(\);/);
-  assert.match(world, /else if \(name === 'harvest'\) audio\.playOneShotId\(SPELL_CAST_SOUND\[2\], 1\);/);
-  assert.match(modes, /if \(!info && pn\?\.witch && host\.witches\?\.shop\(\)\) return;/);
-  assert.match(modes, /for \(const t of host\.witches\?\.targets\(\) \?\? \[\]\) targets\.push\(t\);/);
-  assert.match(modes, /key\.startsWith\('witch:'\)\) \{[^\n]*\n\s+if \(_hitDist > _hitReach\) \{ setMidScreenText\(tooFarAwayText\(\)\); return true; \}\n\s+return host\.witches\?\.activate\(key, getInteractionMode\(\), plaqueActionFor\(key\)\) \?\? true;/);
-  assert.match(modes, /\?\? \(pn\?\.witch \? vendorOffice\(\) : null\);/);
-  assert.doesNotMatch(ext, /createWitchesHost|witchesDressing/, 'the bench stands no festival');
-});

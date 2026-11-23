@@ -1,4 +1,4 @@
-// PRIMARY-TRIPS (2026-10-16, Mac: "Is the server okay?", then "Start #2"; bible/11-Multiplayer/Scale-Arc.md PRIMARY-TRIPS):
+// PRIMARY-TRIPS:
 // THE ACCOUNT DATABASE'S PRIMARY IS CAPPED BY ITS ROUND TRIPS. It overloaded at 00:00 UTC that night at some 224 batches a
 // second, every batch a fraction of a millisecond (p50 0.4 ms) - as at DISPLAY-REPLICA's ceiling, it is the count of trips
 // that holds it, never the rows. Each slice here takes trips off it without moving an answer: the seats' list's six reads
@@ -19,8 +19,6 @@ import { forgetBudgetConfig, budgetKept } from '../../server-account/src/budget.
 import { _resetArenaCache, arenaHonoursOf } from '../../server-account/src/arena.js';
 import { withHonours } from '../../server-account/src/honours.js';
 import { ARENA_SEASON_EPOCH_S, ARENA_SEASON_S } from '../../src/net/arena/arenaLaw.js';
-import { _resetIliacCache, iliacHonoursOf } from '../../server-account/src/iliac.js';
-import { _resetGambitCache, gambitHonoursOf } from '../../server-account/src/gambit.js';
 
 const quiet = async (fn) => { const keep = { warn: console.warn }; console.warn = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 
@@ -70,7 +68,7 @@ test('PRIMARY-TRIPS YARDS-REPLICA: a town\'s yards are read on a session of thei
     await yardsKept(ctx, 1291, T0);
     await yardsKept(ctx, 1291, T0 + 1);   // kept: no read
     assert.deepEqual(db._sessions.map((s) => s.constraint), ['first-unconstrained'], 'the first read any instance\'s, the kept answer no read at all');
-    assert.match(db._sessions[0].statements.join('\n'), /LEFT JOIN home_yards_ver v ON v\.map_id = q\.m LEFT JOIN home_yards y/);   // PIN MOVED (YARD-SNAP; AUDIT LEAN-READS 2 B3: the version a row of its own): the town's version and built row - a town with no yard has none, and no rows are read
+    assert.match(db._sessions[0].statements.join('\n'), /LEFT JOIN home_yards_ver v ON v\.map_id = q\.m LEFT JOIN home_yards y/);
     await yardsKept(ctx, 1291, T0 + 60);   // past YARDS_KEPT_S
     const mark = db._sessions[1]?.constraint;
     assert.ok(mark && mark !== 'first-unconstrained' && mark !== 'first-primary', `the next read from the last one's bookmark (${mark})`);
@@ -94,7 +92,6 @@ test('PRIMARY-TRIPS SAVE-BATCH: a checkpoint reads its record\'s row, the ledger
   assert.equal(cold.trips.length, 3, `the lookup, the reads, the write (${cold.trips.map((t) => t.batch ? `BATCH(${t.batch.length})` : t.sql.slice(0, 40)).join(' | ')})`);
   const reads = cold.trips[1].batch ?? [];
   assert.equal(reads.length, 4);
-  // PIN MOVED (SESSION-SIGN, AUDIT PLAN-1000 E3): the record's row asks its session and the ban beside it, its places numbered
   assert.ok(has(cold.trips[1], /FROM realm_characters WHERE id = \?1 AND player = \?2/) && has(cold.trips[1], /FROM item_uids WHERE char_id = \?1 OR claim_char = \?1/) && has(cold.trips[1], /FROM item_dupes WHERE char_id = \?/) && has(cold.trips[1], /FROM realm_config WHERE key = 'budget'/));
   const warm = await ask(save);
   assert.equal(warm.r.status, 200);
@@ -102,21 +99,21 @@ test('PRIMARY-TRIPS SAVE-BATCH: a checkpoint reads its record\'s row, the ledger
   assert.equal(R.at().seq, 3, 'both landed');
 });
 
-test('PRIMARY-TRIPS SIGN-BATCH: the doors that read a badge ask the arena\'s, Iliac Hand\'s and The King\'s Gambit\'s honours in ONE batch on the binding - never a session\'s - and leave out a #1 this Worker kept (mutants: a game\'s reads asked apart; the kept #1 asked again)', async () => {
+test('PRIMARY-TRIPS SIGN-BATCH: the doors that read a badge ask the arena\'s honours in ONE batch on the binding - never a session\'s - and leave out a #1 this Worker kept (mutants: a game\'s reads asked apart; the kept #1 asked again)', async () => {
   const { S, db, who, R, ask } = await counted();
-  _resetArenaCache(); _resetIliacCache(); _resetGambitCache();
+  _resetArenaCache();
   db._sessions.length = 0;
   const cold = await ask(() => S.call('/v1/auth/token', { character: R.id }, who.secret));
   assert.equal(cold.r.status, 200);
   const honours = cold.trips.filter((t) => has(t, /FROM arena_pve WHERE player = \?1/));
   assert.equal(honours.length, 1, 'one batch');
-  for (const re of [/FROM arena_champions WHERE season/, /FROM iliac_champions WHERE season/, /FROM iliac_games WHERE season/, /FROM gambit_champions WHERE season/, /FROM gambit_games WHERE season/]) assert.ok(has(honours[0], re), `${re} in it`);
-  assert.ok(!cold.trips.some((t) => t.sql && /arena_pve WHERE player|FROM (arena|iliac|gambit)_champions WHERE season|FROM (iliac|gambit)_games WHERE season/.test(t.sql)), 'none asked apart (a #1 found stale is counted and stored after, as before)');
+  assert.ok(has(honours[0], /FROM arena_champions WHERE season/), 'the season\'s #1 in it');
+  assert.ok(!cold.trips.some((t) => t.sql && /arena_pve WHERE player|FROM arena_champions WHERE season/.test(t.sql)), 'none asked apart (a #1 found stale is counted and stored after, as before)');
   assert.ok(!db._sessions.some((s) => s.statements.some((x) => /arena_pve WHERE player/.test(x))), 'on the binding, never the mint\'s session (AUDIT SCALE4d A1)');
   const warm = await ask(() => S.call('/v1/auth/token', { character: R.id }, who.secret));
   const again = warm.trips.filter((t) => has(t, /FROM arena_pve WHERE player = \?1/));
   assert.equal(again.length, 1);
-  assert.deepEqual(again[0].batch?.length, 1, 'the three #1s this Worker kept are not asked again - the Grand Champion\'s row alone');
+  assert.deepEqual(again[0].batch?.length, 1, 'the #1 this Worker kept is not asked again - the Grand Champion\'s row alone');
 });
 
 test('PRIMARY-TRIPS BEAT-LAST: a heartbeat asks its reads - the box, the board, the post - before its beat, so a session sends none of them after the write to the primary; every part answered as before (mutant: the beat first)', async () => {
@@ -132,20 +129,6 @@ test('PRIMARY-TRIPS BEAT-LAST: a heartbeat asks its reads - the box, the board, 
   assert.ok(beat > lastRead, `the beat after every read of the box, the board and the post (beat at ${beat}, last read at ${lastRead})`);
 });
 
-test('PRIMARY-TRIPS HALL-PLAN: a hall witness\'s version bump reads the key\'s own reports - the (kind, key) index - never every hall report through (kind, region) (mutant: the bump\'s DISTINCT on the bare column)', () => {
-  const src = readFileSync(new URL('../../server-account/src/npcHalls.js', import.meta.url), 'utf8');
-  const m = /`INSERT INTO npc_hall_regions \(region, ver, done, at\) SELECT DISTINCT (\+?region), 1, 0, \?2 FROM world_witness/.exec(src);
-  assert.ok(m, 'the bump\'s statement');
-  const db = new DatabaseSync(':memory:');
-  const dir = new URL('../../server-account/migrations/', import.meta.url);
-  for (const f of readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()) db.exec(readFileSync(new URL(f, dir), 'utf8'));
-  const plan = db.prepare(`EXPLAIN QUERY PLAN INSERT INTO npc_hall_regions (region, ver, done, at) SELECT DISTINCT ${m[1]}, 1, 0, ?2 FROM world_witness
-    WHERE kind = 'npchall' AND key = ?1 AND changes() > 0
-    ON CONFLICT (region) DO UPDATE SET ver = npc_hall_regions.ver + 1`).all().map((r) => r.detail).join('\n');
-  assert.match(plan, /USING INDEX sqlite_autoindex_world_witness_1 \(kind=\? AND key=\?\)/, plan);
-  assert.doesNotMatch(plan, /idx_world_witness_region/);
-});
-
 /** A D1 binding over two node:sqlite copies of the schema - a primary and a replica that lags it until `catchUp` - its
  *  sessions served as D1 serves them: 'first-primary' the primary, 'first-unconstrained' the replica, a bookmark the
  *  replica once it has caught up to it, else the primary. `refuse` names a bookmark whose session fails at its read. */
@@ -156,7 +139,6 @@ function laggingD1() {
   const mark = (n) => `${n.toString(16).padStart(8, '0')}-00000000-00000000-${'0'.repeat(32)}`;
   const posOf = (m) => parseInt(m.slice(0, 8), 16);
   const L = { refuse: /** @type {string | null} */ (null), sessions: /** @type {{ c: string, on: string }[]} */ ([]) };
-  // PIN MOVED (YARD-SNAP): a refused bookmark refuses its first statement whatever it is - the town's built row now
   const stmtOn = (node, sql, refused) => { const st = node.db.prepare(sql); let a = []; const api = { bind(...x) { a = x; return api; }, async all() { if (refused) throw new Error('D1_ERROR: bookmark refused'); return { results: st.all(...a) }; }, async first() { if (refused) throw new Error('D1_ERROR: bookmark refused'); return st.get(...a) ?? null; }, async run() { return { meta: { changes: st.run(...a).changes } }; } }; return api; };
   const binding = {
     prepare: (sql) => stmtOn(primary, sql, false),
@@ -215,20 +197,20 @@ test('PRIMARY-TRIPS audit: a checkpoint keeps the budget\'s config the moment it
 });
 
 test('PRIMARY-TRIPS audit: a badge\'s kept #1 is the one the plan saw - another request counting a new season while the batch is out never stands in its place (mutant: the kept #1 read after the batch)', async () => {
-  _resetArenaCache(); _resetIliacCache(); _resetGambitCache();
+  _resetArenaCache();
   const boundary = ARENA_SEASON_EPOCH_S + 3 * ARENA_SEASON_S;
   const dbFor = (champ, nowS, hold = null) => {
     const st = (sql) => ({ sql, bind() { return this; }, async first() { return /_champions/.test(sql) ? { player: champ, at: nowS } : null; }, async all() { return { results: [] }; }, async run() { return {}; } });
     return { prepare: st, async batch(list) { await hold; return list.map((x) => ({ results: /_champions/.test(x.sql) ? [{ player: champ, at: nowS }] : [] })); } };
   };
   const A = { id: 'A', handle: 'a' };
-  for (const of of [arenaHonoursOf, iliacHonoursOf, gambitHonoursOf]) assert.equal((await of({ db: dbFor('A', boundary - 1) }, A, boundary - 1)).champion, true, 'each game\'s #1, kept');
+  assert.equal((await arenaHonoursOf({ db: dbFor('A', boundary - 1) }, A, boundary - 1)).champion, true, 'the arena\'s #1, kept');
   let release = () => {};
   const hold = new Promise((r) => { release = r; });
   const signing = withHonours({ db: dbFor('A', boundary - 1, hold) }, A, boundary - 1);
-  for (const of of [arenaHonoursOf, iliacHonoursOf, gambitHonoursOf]) await of({ db: dbFor(null, boundary) }, { id: 'X', handle: 'x' }, boundary);   // a second on: each game's next season counted
+  await arenaHonoursOf({ db: dbFor(null, boundary) }, { id: 'X', handle: 'x' }, boundary);   // a second on: the next season counted
   release();
   const signed = await signing;
-  assert.deepEqual([signed.arena.champion, signed.iliac.champion, signed.gambit.champion], [true, true, true], 'the #1 each plan saw');
-  _resetArenaCache(); _resetIliacCache(); _resetGambitCache();
+  assert.equal(signed.arena.champion, true, 'the #1 the plan saw');
+  _resetArenaCache();
 });

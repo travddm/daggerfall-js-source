@@ -1,4 +1,4 @@
-// AUDIT DEX A6 (2026-10-20, Mac: "We need to make everything compatible. No if ands or vutts") - THE FIFTY NAMES IN THE
+// AUDIT DEX A6 - THE FIFTY NAMES IN THE
 // PLAYER'S LANGUAGE. DFU shows a custom enemy by the mod's own name (BestiaryTextProvider.GetCustomEnemyName, the
 // MonsterBase and ClassBase `Name` column), so a Goblin is "Goblin" in every language; the port names it in the
 // player's (textManager.js registerCustomEnemyNameText, asked by getLocalizedEnemyName - the HUD's "You see", the death

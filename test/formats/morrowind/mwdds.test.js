@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { decodeDds } from '../../../src/formats/morrowind/mwDdsFile.js';
+import { decodeTextureImage } from '../../../src/formats/morrowind/mwTexture.js';
 
 // Every expected pixel below is computed by hand from the S3TC spec, so the
 // decoder is checked against the format, not against itself.
@@ -147,7 +148,7 @@ test('MW-LOAD: decodeDds({ levels }) stops the chain at the level asked for, and
   assert.equal(decodeDds(bytes, { levels: 0 }).mips.length, 1, 'zero asks for nothing sensible - level 0 still answers');
   assert.equal(decodeDds(bytes, { levels: 99 }).mips.length, whole.mips.length, 'more than the file has is the file');
   // the router forwards it, and only to the DDS reader (tga/bmp are one level)
-  const { decodeTextureImage } = readFileSync(new URL('../../../src/formats/morrowind/mwTexture.js', import.meta.url), 'utf8').includes("decodeDds(bytes, { levels })")
-    ? { decodeTextureImage: true } : { decodeTextureImage: false };
-  assert.ok(decodeTextureImage, 'decodeTextureImage forwards levels to decodeDds');
+  const viaRouter = decodeTextureImage('textures/fixture.dds', bytes, { levels: 1 });
+  assert.equal(viaRouter.mips.length, 1, 'decodeTextureImage forwards levels to decodeDds');
+  assert.equal(decodeTextureImage('textures/fixture.dds', bytes).mips.length, whole.mips.length, 'and the default is the whole chain');
 });

@@ -1,6 +1,5 @@
 // @ts-check
-// HUNTERS-MARK (2026-10-27; a player, handed on by the owner: "Add more horizontal progression please!"; bible/06-Systems/
-// Bounty-Boards.md section 12): THE HUNTER'S RANK AND THE WEEK'S NAMED MARK, wired by scenes/bountyHost.js. Online alone:
+// HUNTERS-MARK: THE HUNTER'S RANK AND THE WEEK'S NAMED MARK, wired by scenes/bountyHost.js. Online alone:
 // the rank is the account service's, kept by the hunt's book (net/huntBook.js).
 //
 // A NAMED MARK: one beast of the reader's tier a week, the same at every board (huntLaw.js huntMarkOf), on one of the

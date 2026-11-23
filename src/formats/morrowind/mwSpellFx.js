@@ -1,4 +1,4 @@
-// MW-SPELLFX1 (2026-10-07, Mac: "We need to implement morrowind spell casting effects and animations"): WHICH
+// WHICH
 // MORROWIND VISUALS A DAGGERFALL SPELL IS DRAWN WITH.
 //
 // Morrowind draws a spell with its magic effects' records (MGEF, components/esm3/loadmgef.cpp): each effect names a
@@ -76,8 +76,8 @@ const DF_TO_MW = Object.freeze({
   '40,*': E.DetectEnchantment,   // Identify
   '43,*': E.Recall,   // Teleport
   '44,*': E.Sound,   // Comprehend Languages
-  '45,*': E.RestoreHealth,   // RESURRECT1: the port's own Resurrect
-  '46,*': E.Mark,   // PARTY-MAP: the port's own Shared Cartography
+  '45,*': E.RestoreHealth,   // the port's own Resurrect
+  '46,*': E.Mark,   // the port's own Shared Cartography
 });
 
 /** A family the table has no row for: its school's plainest member, by Daggerfall's skill (skills.js SKILLS) -
@@ -122,18 +122,8 @@ export function mgefColour(mgef) {
 export const MW_UNITS_PER_FOOT = 64 / 3;
 export const areaVisualScale = (radiusMetres, unitsPerMetre) => 2 * (radiusMetres * unitsPerMetre) / MW_UNITS_PER_FOOT;
 
-/** Animation::addEffect's sizing for an actor that is not a person (animation.cpp :1742-1757): a body `height` tall and
- *  `radius` round (metres) is max(x, y, z / 2) / 64 of its bounds in Morrowind units, applied as a scale only when it
- *  passes 1, and the effect is lifted - or sunk - off a 128-unit body by `offset` units, times that ratio as the
- *  reference sets it. A person's effect is neither (`isNpc`); a flier's lift is not carried. */
-export function actorFxTransform(height, radius, unitsPerMetre) {
-  const z = height * unitsPerMetre, xy = 2 * radius * unitsPerMetre;
-  const ratio = Math.max(xy, xy, z / 2) / 64;
-  let offset = 0;
-  if (z < 128) offset = z - 128;
-  else if (z < xy + xy) offset = 128 - z;
-  return { scale: ratio > 1 ? ratio : 1, offset: offset * ratio };
-}
+// How large an effect is on an actor that is not a person, and how far it sits from the feet.
+export { actorFxTransform } from './mw-actor-fx-size.ts';
 
 /**
  * THE PLAN for one spell: `{ cast, bolt, hit, area, hands }` - each visual a `{ id, model, texture }` (`model` the

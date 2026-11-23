@@ -1,4 +1,4 @@
-// HOST-SPLIT 2 (2026-10-15, bible/01-Overview/Host-Split.md) - THE PINS READ THE HOST WHOLE.
+// HOST-SPLIT 2 - THE PINS READ THE HOST WHOLE.
 // The suite reads the hosts as text: 1,444 test files read world.js, and a pin that quotes a line of bootWorld goes
 // red the moment tools/hostMove.mjs moves that line into a module the host constructs, though the host does what it
 // did. The pilot moved 22 such files by hand for 229 lines; buildPixelNow's 1,237 lines broke 130. So a pin that reads

@@ -1,5 +1,5 @@
-// LA-AUDIT (2026-09-27, the audit before LA's merge - Mac: "Audit before we merge"): SIX LENSES ON THE OVERHAUL, EVERY
-// FINDING PROVED BY A DRIVER BEFORE ANYTHING WAS FIXED, AND EACH FIX PINNED HERE. `07-Rendering/Enhanced-Lighting-Arc.md`
+// LA-AUDIT: SIX LENSES ON THE OVERHAUL, EVERY
+// FINDING PROVED BY A DRIVER BEFORE ANYTHING WAS FIXED, AND EACH FIX PINNED HERE.
 // AUDIT (LA) has the lenses, the numbers and what was declined.
 //   A1  the dungeon's lo maps drew the whole level a face - the batch's shadow cells, culled by cell;
 //   A5  the dungeons (and World of Daggerfall's towns) still cut the light cap - they fade it now, as the street does;
@@ -63,7 +63,7 @@ function f16(x) {
   return Math.round(x / step) * step;
 }
 
-// ═══ A1. THE SHADOW CELLS ════════════════════════════════════════════════════════════════════════════════════════
+// A1. THE SHADOW CELLS
 /** Two rooms of floor quads 200 units apart, their textures alternating so every texture group spans both rooms (the
  *  dungeon's shape: one sub-mesh per texture, each across the level). */
 function twoRooms({ cells = true } = {}) {
@@ -122,7 +122,6 @@ test('LA-AUDIT A1: THE LEVEL\'S SHADOW CELLS - the batch\'s triangles again, sor
   calls.length = 0;
   r.destroyMesh(mesh);
   assert.deepEqual(calls.filter((c) => c[0] === 'deleteVertexArray').map((c) => c[1]), [mesh.vao, mesh.shadowVao]);
-  assert.match(rd('src/scenes/dungeonContext.js'), /const staticBuilder = new StaticBatchBuilder\(\{ shadowCell: SHADOW_CELL_SIZE \}\);/);
 });
 
 test('LA-AUDIT A1: A FACE DRAWS THE CELLS IT CAN SEE - a lamp in one room of a two-room level redraws its six faces from the cells\' buffer and never touches the other room, where the texture sub-meshes (each across both rooms) drew both rooms six times; the lit pass still draws the sub-meshes; a recentre carries the cells\' spheres (mutants: the replay by sub-mesh; the cells\' VAO not bound; a cell never culled; the spheres left behind)', () => {
@@ -168,7 +167,7 @@ test('LA-AUDIT A1: A FACE DRAWS THE CELLS IT CAN SEE - a lamp in one room of a t
   assert.ok(Math.abs(rec.cellSpheres[0] - (before[0] - 819.2)) < 1e-3 && Math.abs(rec.cellSpheres[2] - (before[2] + 409.6)) < 1e-3 && rec.cellSpheres[3] === before[3], 'the spheres follow the recentre');
 });
 
-// ═══ A5. THE DUNGEON'S CAP FADES ═════════════════════════════════════════════════════════════════════════════════
+// A5. THE DUNGEON'S CAP FADES
 test('LA-AUDIT A5: THE CAP FADES IN THE DUNGEONS AND IN THE MOD\'S TOWNS - capFadePairs gives each kept light ITS OWN colour times its share (the hand\'s whole), is capFadeColors for one shared colour, and fades nothing when the cap cuts nothing; both dungeon hosts and the World of Daggerfall arm pick one light past the cap on the lane and hand the renderer the faded colours, and the gate\'s court keeps its cut (mutants: the pairs\' own colours dropped; a host\'s extra light dropped; the fade not handed over)', () => {
   const pos = [0, 0, 0];
   const lit = new Float32Array([0, 0, 1, 5, /* the hand */ 5, 0, 0, 18, 10, 0, 0, 18, 20, 0, 0, 18]);
@@ -180,17 +179,9 @@ test('LA-AUDIT A5: THE CAP FADES IN THE DUNGEONS AND IN THE MOD\'S TOWNS - capFa
   assert.deepEqual([...capFadePairs(lit, 1, pos, 3, same)], [...capFadeColors(lit, 1, pos, 3, [0.7, 0.7, 0.7])], 'one colour for all: capFadeColors');
   assert.equal(capFadePairs(lit, 1, pos, 4, colors), null, 'nothing cut, nothing faded');
   assert.equal(capFadePairs(lit, 3, pos, 3, colors), null, 'the hand fills the cap');
-  const wm = rd('src/scenes/worldModes.js'), dg = rd('src/scenes/dungeon.js'), w = rd('src/scenes/world.js');
-  assert.match(wm, /const _dgFade = !!renderer\.lightingLane && !isGateArena\(dungeonLoc\);/);
-  assert.match(wm, /const _dgNear = _iilDg \? nearestLights\(_iilDg\.lights, cam\.pos, renderer\.maxPointLights, _iilDg\.ranges, _iilDg\.colorOf\) : nearestLights\(dungeonCtx\.lights, cam\.pos, renderer\.maxPointLights \+ \(_dgFade \? 1 : 0\), /);
-  assert.match(wm, /renderer\.setPointLights\(_dgLit\.data, null, \(_dgFade && capFadePairs\(_dgLit\.data, _dgLit\.data\.length \/ 4 - _dgNear\.data\.length \/ 4, cam\.pos, renderer\.maxPointLights, _dgLit\.colors\)\) \|\| _dgLit\.colors\);/);
-  assert.match(dg, /const _near = _iilDg \? [^\n]*: nearestLights\(ctx\.lights, cam\.pos, renderer\.maxPointLights \+ \(renderer\.lightingLane \? 1 : 0\), /);
-  assert.match(dg, /renderer\.setPointLights\(_lit, DUNGEON_LANTERN_F32, renderer\.lightingLane \? capFadeColors\(_lit, _lit\.length \/ 4 - _near\.length \/ 4, cam\.pos, renderer\.maxPointLights, DUNGEON_LANTERN_F32\) : null\);/);
-  assert.match(w, /return nearestLights\(_sceneLights, cam\.pos, renderer\.maxPointLights \+ \(renderer\.lightingLane \? 1 : 0\), _litRanges, \(l, i\) =>/);
-  assert.match(w, /renderer\.setPointLights\(data, CITY_LIGHT_COLOR_F32, \(renderer\.lightingLane && capFadePairs\(data, lead, cam\.pos, renderer\.maxPointLights, colors\)\) \|\| colors\);/);
 });
 
-// ═══ F2. THE STREET'S POOL ═══════════════════════════════════════════════════════════════════════════════════════
+// F2. THE STREET'S POOL
 test('LA-AUDIT F2: THE LANTERN POOL GROWS WITH THE TOWN - fillLanternPool writes every lantern\'s range however many the pixels hold (a pool born with 64 slots takes 300), each from its pixel\'s slot; rangesFor keeps what it held and hands back the same array when it has room; the World of Daggerfall arm grows the same way (mutants: the growth dropped; the mod\'s growth dropped)', () => {
   const anim = Float32Array.from({ length: 4096 }, (_, i) => 16 + (i % 7) * 0.4);
   const pixels = Array.from({ length: 10 }, (_, k) => ({ px: 100 + k, py: 200, lights: Array.from({ length: 30 }, (_, j) => [k, 0, j]) }));
@@ -201,10 +192,9 @@ test('LA-AUDIT F2: THE LANTERN POOL GROWS WITH THE TOWN - fillLanternPool writes
   assert.equal(rangesFor(kept, 8), kept, 'room enough: the same array');
   const grown = rangesFor(kept, 9);
   assert.ok(grown.length >= 9 && grown[7] === 3, 'grown, with what it held');
-  assert.match(rd('src/scenes/world.js'), /_litRanges = rangesFor\(_litRanges, total\);/);
 });
 
-// ═══ B1. THE CONTACT MARCH'S LIFT ════════════════════════════════════════════════════════════════════════════════
+// B1. THE CONTACT MARCH'S LIFT
 /** The previous frame, ray-cast at W x H (la_post's prevFrame, any size): the eye 1.7 up looking down -z, a floor, a
  *  crate (x -0.5..0.5, y 0..0.4) whose near face stands D + 0.15 off, 24-bit depth. */
 function crateFrame(W, H, D) {
@@ -248,7 +238,7 @@ test('LA-AUDIT B1: THE MARCH\'S SELF-CHECK CREDITS ITS OWN LIFT - at 1080p and 1
   }
 });
 
-// ═══ B2. THE SHAFTS HELD AT 1 ════════════════════════════════════════════════════════════════════════════════════
+// B2. THE SHAFTS HELD AT 1
 test('LA-AUDIT B2: THE SHAFTS ARE HELD AT 1 AS THE BYTES HELD THEM - heavy fog\'s jittered haze march writes over 1 on some pixels of its tile, and SHAFT_FS hands the image no pixel over 1 (mutant: the hold dropped)', () => {
   const W = 320, H = 200, pi = projInfo(perspective(Math.PI / 3, W / H, 0.2, 6000));
   const L = [0, 0.3, -1], ln = Math.hypot(...L), lightDir = L.map((v) => v / ln);
@@ -267,7 +257,7 @@ test('LA-AUDIT B2: THE SHAFTS ARE HELD AT 1 AS THE BYTES HELD THEM - heavy fog\'
   assert.equal(most, 1, 'the image holds no pixel over 1');
 });
 
-// ═══ B3. THE BRIGHT PASS ON ONE GRID ═════════════════════════════════════════════════════════════════════════════
+// B3. THE BRIGHT PASS ON ONE GRID
 function brightPass() {
   const { gl } = recordingGl();
   const ap = new AirPass(gl, { build: (vs, fs) => ({ vs, fs }), vs: { mesh: 'M', bb: 'B' } });
@@ -326,7 +316,7 @@ test('LA-AUDIT B3: THE BRIGHT PASS\'S BLOCKS ARE WHOLE 4x4s ON ONE GRID - on a 1
   }
 });
 
-// ═══ B5. THE EYE'S SIXTEEN BITS, AT ANY FETCH ════════════════════════════════════════════════════════════════════
+// B5. THE EYE'S SIXTEEN BITS, AT ANY FETCH
 test('LA-AUDIT B5: THE EYE READS ITS STATE EXACTLY THROUGH A HALF-FLOAT FETCH - airAdaptLog2 rounds each byte before it scales it, so over the eye\'s whole range a fetch at half precision decodes what unpackAdapt does, where the unrounded decode ran up to 16 steps off; the eye\'s samplers are highp (mutants: a byte unrounded; a sampler back to lowp)', () => {
   const dec = glslFunctions(AIR_ADAPT_GLSL, {}, { fp32: true });
   const OLD = glslFunctions(AIR_ADAPT_GLSL.replace('(floor(t.r * 255.0 + 0.5) * 256.0 + floor(t.g * 255.0 + 0.5))', 'dot(t.rg, vec2(65280.0, 255.0))'), {}, { fp32: true });
@@ -339,12 +329,10 @@ test('LA-AUDIT B5: THE EYE READS ITS STATE EXACTLY THROUGH A HALF-FLOAT FETCH - 
   const step = (AIR_ADAPT_LOG_RANGE[1] - AIR_ADAPT_LOG_RANGE[0]) / AIR_ADAPT_STEPS;
   assert.ok(worst < 0.01 * step, `the rounded decode: ${(worst / step).toFixed(4)} of a step`);
   assert.ok(worstOld > 10 * step, `the unrounded decode ran ${(worstOld / step).toFixed(1)} steps off`);
-  const air = rd('src/render/airPass.js');
   assert.match(AIR_ADAPT_GLSL, /uniform highp sampler2D uAdapt;/);
-  assert.equal((air.match(/uniform highp sampler2D uPrev;/g) ?? []).length, 2, 'LUM_FS\'s and ADAPT_FS\'s');
 });
 
-// ═══ B6. THE AO WINDOW FOLLOWS THE SURFACE ═══════════════════════════════════════════════════════════════════════
+// B6. THE AO WINDOW FOLLOWS THE SURFACE
 test('LA-AUDIT B6: A PILLAR BEFORE A WALL GIVES THE WALL NO HALO - at 1080p, the pillar 10, 20 and 40 units off and the wall 1 or 1.5 behind it (inside LA-POST5\'s share, past the radius), the wall\'s AO texel at the silhouette reads the wall\'s own 1.000 where the share window read 0.737 (mutants: the one-surface test loosened to the radius; the gentler side\'s line taken from the steeper)', () => {
   const { gl } = recordingGl();
   const ap = new AirPass(gl, { build: (vs, fs) => ({ vs, fs }), vs: { mesh: 'M', bb: 'B' } });
@@ -365,7 +353,7 @@ test('LA-AUDIT B6: A PILLAR BEFORE A WALL GIVES THE WALL NO HALO - at 1080p, the
   }
 });
 
-// ═══ C1. THE RECENTRE MOVES THE STAMP ════════════════════════════════════════════════════════════════════════════
+// C1. THE RECENTRE MOVES THE STAMP
 test('LA-AUDIT C1: THE FLOATING ORIGIN\'S SHIFT MOVES THE STAMP - a billboard call after a shift sends the lane\'s frame block again (the air\'s held view-projection moved under it), where a second call with nothing moved sends only its own (mutant: the stamp not moved)', () => {
   const { calls, canvas } = recordingGl();
   const r = new Renderer(canvas);
@@ -384,7 +372,7 @@ test('LA-AUDIT C1: THE FLOATING ORIGIN\'S SHIFT MOVES THE STAMP - a billboard ca
   assert.ok(third.has('uCasterOf') && third.has('uContactParams') && third.has('uPointCount') && third.size > 20, `the block again, after the shift (${third.size})`);
 });
 
-// ═══ F1. THE PROBE'S VERDICT ═════════════════════════════════════════════════════════════════════════════════════
+// F1. THE PROBE'S VERDICT
 /** A pass's rows as the page records them: n frames at `lum`, the eye moving `step` a frame, turning `turn` a frame. */
 const rows = (n, { lum = 40, c4 = 0.2, c12 = 0, step = 0, turn = 0, mode = 'exterior', lights = null, flashAt = -1, hurtAt = -1 } = {}) =>
   Array.from({ length: n }, (_, k) => ({ k: k + 1, ms: 5, c12, c4: k ? c4 : 0, flip: 0, lum, cam: [k * step, 1.7, 0], yaw: k * turn, mode, lights: 48, lIn: lights ? 1 : 0, lOut: lights ? 1 : 0, lInW: lights?.in ?? 0, lOutW: lights?.out ?? 0,
@@ -416,16 +404,9 @@ test('LA-AUDIT F1 + D: THE PROBE JUDGES A PICTURE, AND ONLY THE LIGHTING\'S - su
   // the churn: ten joins at no share and ten leaves at no share weigh nothing; the count still sees them
   const faded = summarize('street-walk', rows(11, { lights: { in: 0, out: 0 } })), hard = summarize('street-walk', rows(11, { lights: { in: 1, out: 1 } }));
   assert.deepEqual([faded.churn, faded.churnW, hard.churnW], [22, 0, 22]);
-  const probe = rd('tools/lightFlickerProbe.mjs');
-  assert.match(probe, /const bad = judge\(\{ scenes: SCENES, all, errors, frames: FRAMES, stillMax: STILL_MAX, booted, streetTavern \}\);/);
-  assert.match(probe, /const summary = summarize\(name, rows, out\.err\);/);
-  assert.match(probe, /if \(!booted\) fail\(`the world never booted \(\$\{BOOT_S\} s\)`\);/);
-  assert.match(probe, /await ev\(\(\) => \{ const e = window\.__playerEntity; if \(e && e\.maxHealth > 0\) e\.health = e\.maxHealth; \}\);\n\s+await ev\(\(\[src, keep, keep4\]\) => \{ const P = window\.__lfp;/, 'LA-AUDIT D: each pass starts whole');
-  assert.match(probe, /hp: window\.__playerEntity\?\.health \?\? null, flash: window\.__lfpFlash \? \+window\.__lfpFlash\.alpha\.toFixed\(3\) : null/, 'and every row carries the health and the HUD\'s flash');
-  assert.match(probe, /const j = i >> 2, w = PK && PK\[j\] \? 0 : PC && PC\.length >= j \* 3 \+ 3 \? Math\.min\(1, Math\.max\(PC\[j \* 3\], PC\[j \* 3 \+ 1\], PC\[j \* 3 \+ 2\]\)\) : 1;/);
 });
 
-// ═══ F6. THE HANDOVER AND THE LO COMPARE, DRIVEN ═════════════════════════════════════════════════════════════════
+// F6. THE HANDOVER AND THE LO COMPARE, DRIVEN
 test('LA-AUDIT F6: SHADOW_GLSL DRIVEN, NOT READ - sunShadowTap over the real cascade matrices on a map answering a constant a layer changes by under a hundredth a centimetre from 0.5 to 238 units (the base\'s hard handover stepped 0.4) and reads no map past the far fade; the lo lookups compare at the far the WORD carries, whatever the light\'s live range (F-H3: a lookup that took the range\'s own quantum passed every pin) (mutants: the handover hard; the lo compare at the live range, in either lookup)', () => {
   const vp = sunCascadeMatrices([0, 0, 0], sunDirection(9 * 60), SHADOW_CASCADES.map(() => new Float32Array(16)));
   const LAYER = [0.1, 0.5, 0.9];

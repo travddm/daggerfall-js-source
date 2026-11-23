@@ -1,4 +1,4 @@
-// AUDIT WERE-FRIGHT (2026-09-30, Mac: "Audit this") - PR #459's WERE-FRIGHT and MW-BRIG3, audited in six lenses: the
+// AUDIT WERE-FRIGHT - PR #459's WERE-FRIGHT and MW-BRIG3, audited in six lenses: the
 // arrest flow and its laws, the watch pool, the enemy motor, the hosts' seams (online and every input path to the
 // box), MW-BRIG3's fit, and the records. Each pin here failed on the code before its fix.
 import { test } from 'node:test';
@@ -32,29 +32,12 @@ function mkFlow(player, { roll = 0.99 } = {}) {
   return { flow, slot, said, heard, fled: () => fled };
 }
 
-// ── F1 (the hosts' seams) ────────────────────────────────────────────────────────────────────────────────────────
-test('AUDIT WERE-FRIGHT F1: every host that keeps a building\'s watch sends it running - exterior.js ran its street alone', () => {
-  // Both exterior hosts build the mode machine (createWorldModes), and so a watch that can be called into a building
-  // (worldModes' interiorGuards, ROAD-B). A roar that works forgets the crime; a building's watch left standing - the
-  // player a beast, GUARD1's fourth clause - kept striking a beast with no crime left to halt it for.
-  for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js']) {
-    const s = src(host);
-    assert.ok(s.includes('createWorldModes('), `${host} keeps a building's watch`);
-    const flow = s.slice(s.indexOf('createArrestFlow({'), s.indexOf('createArrestFlow({') + 4000);
-    const door = flow.match(/watchFlees: \(\) => ([^\n]*),/);
-    assert.ok(door, `${host}: the roar's door`);
-    assert.match(door[1], /cityGuards\.frighten\(/, `${host}: the street's watch`);
-    assert.match(door[1], /modes\?\.frightenWatch\?\.\(\)/, `${host}: and the building's`);
-  }
-  assert.match(src('src/scenes/worldModes.js'), /frightenWatch: \(\) => interiorGuards\?\.frighten\(player\.pos\) \?\? 0,/);
-});
-
 // ── F2 (the arrest flow) ─────────────────────────────────────────────────────────────────────────────────────────
 test('AUDIT WERE-FRIGHT F2: a roar is a beast\'s - asked as a beast and answered as a man, F frightens no one and forgets nothing', () => {
   // Online the world runs under the box (WORLD5), so the change can end while it stands - the mirror of the man's
   // question answered as a beast (WERE-FRIGHT, arrestFlow's Y arm). The roll used to run whatever the form: a MAN's
   // crime written to None through the setter (outside beast form that write is real) and the watch routed by a roar
-  // nobody heard. Mac's rule is the form's: "human form surrenders as before" - a man has no roar, and fights.
+  // nobody heard. - a man has no roar, and fights.
   const player = mkWanted();
   const f = mkFlow(player, { roll: 0 });   // a roar would work
   let landed = 0;

@@ -1,6 +1,5 @@
 // @ts-check
-// STEADY-BALANCE (2026-10-04, Discord: "shadows too dark and too light where they should be normal ... light of candles too
-// bright ... it fixed the flickering tho"): under Steady shadows the player's own card casts into the TWO lamps nearest it
+// STEADY-BALANCE: under Steady shadows the player's own card casts into the TWO lamps nearest it
 // (SHADOW_SELF_LAMPS), as it does with the switch off - not into every lamp with a full map, which stacked a silhouette
 // per lamp behind the player at the crosshair and opened the eye until the candles blew out. And the calmer eye is its
 // own chip (prefs 'calmEye', off), no longer ridden on Steady shadows.

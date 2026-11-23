@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// HEAL CURSE (2026-10-08, the owner: "Add a button to the temple services under heal disease named heal curse it removes
-// being a werewolv and vampire and also removes their positive effects/negative effects and buffs ofc.")
+// HEAL CURSE
 //
 // The temple's Cure Disease priest offers a second row: the CURSE lifted. What a curse is here:
 //   - VAMPIRISM, turned (systems/vampirism.js cureVampirism - DFU's own CureVampirism: the clan remembered, the racial
@@ -16,7 +14,6 @@
 //
 // THE PRICE: a temple's rite, not a potion - HEAL_CURSE_BASE gold, through the region's price adjustment as Cure Disease
 // is (guildServiceActions.js), and the temple's quality a tenth either way. Pure but for the entity it is handed.
-// ═══════════════════════════════════════════════════════════════════
 import { liveVampirism, cureVampirism } from './vampirism.js';
 import { liveLycanthropy, cureLycanthropy } from './lycanthropy.js';
 import { liveInfections } from './infection.js';

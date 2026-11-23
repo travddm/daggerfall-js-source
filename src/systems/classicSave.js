@@ -46,7 +46,6 @@ import { RECORD_TYPES, ENVIRONMENTS, isWagonRecord } from '../formats/save/saveT
 import { readMapSaveDiscovery } from '../formats/save/saveGames.js';
 import { SHIP_TYPES } from './banking.js';
 import { SAVE_VERSION } from './save/save.js';
-import { LEVELING_CLASSIC, newCharacterLevelingSystem } from './oblivionLeveling.js';   // ORL1: a classic save is a classic character
 import { STAT_KEYS_ORDER } from './statMods.js';
 import { SOCIAL_GROUP_COUNT } from '../formats/factionFile.js';
 import { ITEM_GROUP_BY_ID } from './biography.js';
@@ -222,6 +221,16 @@ export function toCharacterDocument(parsedData, stripLycanthropyType = LYCANTHRO
  *  skips the scale - same value, DFU's own shape). */
 export const classicPitchDegrees = (pitch) => (pitch !== 0 ? (pitch * 45) / 256 : 0);
 export const classicYawDegrees = (yaw) => (yaw !== 0 ? (yaw * 360) / 2048 : 0);
+const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+
+/** A save record's look as the camera holds it. DFU hands the degrees above to PlayerMouseLook.SetFacing; the camera
+ *  here, and the port's own saves, hold radians. */
+function classicFacing(root) {
+  return {
+    pitch: degreesToRadians(classicPitchDegrees(root.pitch)),
+    yaw: degreesToRadians(classicYawDegrees(root.yaw)),
+  };
+}
 
 /** The StartFromClassicSave weather loop (:633-643): the 0x80 fog flag
  *  is masked off (DFU's own TODO - fog-on-snow/rain is not built), and
@@ -657,12 +666,10 @@ export function restoreOldClassSpecials(saveTree, career, classicTransformedRace
  *   MAPSAVE discovery walk. Absent = no discovery imports (recorded).
  * @param {number[]} [deps.regionLocationCounts] - per-region location
  *   counts for the MAPSAVE walk (with resolveLocation).
- * @param {boolean} [deps.online] - LEVEL-ONLINE: the import is on the online page - a new online character (LEVEL-ONLINE-2: Daggerfall's leveling).
  */
 export function classicSaveToSnapshot(saveGames, {
   spellsByIndex = null, factionStore = null,
   resolveLocation = null, regionLocationCounts = null,
-  online = false,   // LEVEL-ONLINE: an import on the online page is a new ONLINE character - the online law's system
 } = {}) {
   const saveTree = saveGames.saveTree;
   const saveVars = saveGames.saveVars;
@@ -766,15 +773,6 @@ export function classicSaveToSnapshot(saveGames, {
     readyToLevelUp: false, pendingLevel: null, pendingBonusPool: null,
     chargenDone: true,
     characterId: mintCharacterId(),   // CHARID1: a character read out of a classic save is a new character here
-    // ORL1: A CLASSIC SAVE IS A CLASSIC CHARACTER. Daggerfall's own
-    // SAVEVARS carries no leveling-system choice and no point bar -
-    // there is nothing in the file to read one out of - so a character
-    // imported from a classic save levels by Daggerfall's law, which is
-    // the only law that character has ever played under. The bar is
-    // zeroed rather than left undefined so the import writes a complete
-    // entity, as it does for every other field here.
-    // LEVEL-ONLINE-2: ...and online, where a new character never levels Oblivion's way (newCharacterLevelingSystem).
-    levelingSystem: newCharacterLevelingSystem(LEVELING_CLASSIC, { online }), levelProgress: 0, levelRollUp: 0,
 
     biographyResistDiseaseMod: saveVars.biographyResistDiseaseMod,
     biographyResistMagicMod: saveVars.biographyResistMagicMod,
@@ -900,10 +898,7 @@ export function classicSaveToSnapshot(saveGames, {
   // whatever the save's environment byte says.
   const positionRecord = saveTree.findRecord(RECORD_TYPES.CharacterPositionRecord);
   const root = positionRecord?.recordRoot ?? null;
-  if (root) {
-    snap.pose.pitch = classicPitchDegrees(root.pitch);
-    snap.pose.yaw = classicYawDegrees(root.yaw);
-  }
+  if (root) Object.assign(snap.pose, classicFacing(root));
 
   return {
     snap,

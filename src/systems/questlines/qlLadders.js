@@ -1,5 +1,5 @@
 // @ts-check
-// QL12 (bible/06-Systems/Questlines-Arc.md section 4.4): THE GUILDS' LADDERS - "A guild's own quests are already a story
+// QL12: THE GUILDS' LADDERS - "A guild's own quests are already a story
 // told by rank. Each guild and order a player has joined shows in the window as a questline whose quests are its own,
 // by rank, with its promotions as milestones and its flagship quests marked. No new content: it is how the window reads
 // what the machine and the Roll already hold."

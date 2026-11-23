@@ -134,7 +134,6 @@ test('AUDIT 58: all three foe damage doors consult the Shield pool, and the zero
   // exactly as the player does. Only the player's door consumed it.
   for (const [file, sub] of [
     ['scenes/dungeonContext.js', 'const healthDamage = bypassShield ? damage : damageShieldPool(foe.entity, damage);'],
-    // PIN MOVED (STAR5): a master's circle wards the blow first (its share, scenes/starfall/starfallHost.js circleWard) - the
     // pool then consults what is left, at the subtraction as before
     ['scenes/exteriorFoes.js', 'const healthDamage = bypassShield ? warded : damageShieldPool(f.entity, warded);'],
     ['scenes/cityGuards.js', 'const healthDamage = bypassShield ? damage : damageShieldPool(g.entity, damage);'],
@@ -319,8 +318,12 @@ test('AUDIT 58: GetRandomFullName draws the gender - the talk fallback is not al
   assert.equal(wild, fullName(getNameBankOfRegion(-1), coin === 1 ? GENDERS.Female : GENDERS.Male));
   // ...and the talk MCP calls it, over PlayerGPS.CurrentRegionIndex
   const w = src('scenes/world.js');
-  assert.match(w, /randomFullName: \(\) => getRandomFullName\(_questRegionIndex\(\)\)/);
-  assert.match(w, /const talkFullName = \(gender\) => nameHelperFullName\(getNameBankOfRegion\(_questRegionIndex\(\)\), gender\);/);
+  // (GetNameBankOfRegion over PlayerGPS.CurrentRegionIndex) on the Bay, a province's past it - and getRandomFullName's own
+  // draw from it (nameHelper.js getRandomFullNameOfBank, which getRandomFullName now calls)
+  assert.match(w, /randomFullName: \(\) => getRandomFullNameOfBank\(nameBankHere\(\)\)/);
+  assert.match(w, /const talkFullName = \(gender\) => nameHelperFullName\(nameBankHere\(\), gender\);/);
+  assert.match(w, /const nameBankHere = \(\) => provinceBankHere\(\) \?\? getNameBankOfRegion\(_questRegionIndex\(\)\);/);
+  assert.match(src('characters/nameHelper.js'), /export function getRandomFullName\(regionIndex\) \{\n  return getRandomFullNameOfBank\(getNameBankOfRegion\(regionIndex \?\? -1\)\);\n\}/);
   assert.ok(!/talkFullName\(GENDERS\.Male\)/.test(w), 'no hardcoded Male fallback survives');
   // one home: the %rn arm calls it too rather than repeating the body
   assert.match(src('systems/quest/questMacros.js'), /return getRandomFullName\(w\.currentRegionIndex\?\.\(\) \?\? -1\);/);

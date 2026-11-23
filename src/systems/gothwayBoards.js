@@ -1,7 +1,5 @@
 // @ts-check
-// GOTHWAY-BOARDS (2026-10-08, the owner: "is it possible to put a bounty board on each site of gothway gardens so newbies
-// have a direction!", then: "place them to the north on the border of the town so new player coming from privateers hold
-// can see them"): Gothway Garden - the first town a new character walks into out of Privateer's Hold - stands two bounty
+// GOTHWAY-BOARDS: Gothway Garden - the first town a new character walks into out of Privateer's Hold - stands two bounty
 // boards at its NORTH ENTRANCE, one on each side of the road in. Both post the town's bounties (scenes/world.js
 // boardSplitOf counts them as bounty boards always). Pure: the town's walk grid in, the two spots out - the same on every
 // client, so every player sees the same boards.
@@ -9,8 +7,7 @@
 export const GOTHWAY_RE = /^gothway garden$/i;
 export const isGothwayGarden = (name) => GOTHWAY_RE.test(String(name ?? '').trim());
 
-// ── GOTHWAY-NORTH (2026-10-08, the owner: "place them to the north on the border of the town so new player coming from
-// privateers hold can see them") ───────────────────────────────────────────────────────────────────────────────────────
+// ── GOTHWAY-NORTH ───────────────────────────────────────────────────────────────────────────────────────
 // The boards stand at the town's NORTH ENTRANCE - where the road from Privateer's Hold comes in - one on each side of the
 // road, a few paces inside the border, facing north at whoever arrives. The road is found, not guessed: the town's own
 // walk grid (world/city/cityNavigation.js - its people walk the same cells; a road cell weighs ROAD_WEIGHT, a building's 0) is

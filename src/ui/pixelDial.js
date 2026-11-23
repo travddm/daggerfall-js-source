@@ -188,8 +188,7 @@ export function setDialOpenHook(fn) { _onOpen = typeof fn === 'function' ? fn : 
 export function openPixelDial(entries) {
   if (!isEnhanced() || typeof document === 'undefined') return false;
   if (_open) { _open.unmount(); _open = null; return true; }
-  // PX28 (Mac: "when hitting tab a second time, it should minimize any
-  // UI"): the dial already closed ITSELF on a second press; what it
+  // PX28: the dial already closed ITSELF on a second press; what it
   // could not do was close what it had OPENED. Press Tab, press Items,
   // and the pack was up with Tab doing nothing, because each enhanced
   // window owns its own keyboard and knows nothing of the others. So

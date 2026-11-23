@@ -1,18 +1,16 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// TOWN-ECON (2026-10-16, bible/06-Systems/Town-Economy-Arc.md; Mac: "give every city and village a dynamic economy
-// system, where even players can affect the influence. Allowing players to hover over towns and see an economy tooltip
-// along with guild control"): THE TOWN ECONOMY'S LAW - one Prosperity a town, 0 to 100, and what it does to the town's
+// TOWN-ECON: THE TOWN ECONOMY'S LAW - one Prosperity a town, 0 to 100, and what it does to the town's
 // counters and its card.
 //
 //  - A TOWN is a MAPS location of type TownCity, TownHamlet or TownVillage (formats/mapsFile.js LOCATION_TYPES 0-2),
 //    its market cycle phased by its map pixel (`townKeyOf`); TE2's service keys it by its unsigned map id - the seats',
 //    the homes', the stalls' and the patrons' own.
-//  - THE BASELINE IS PURE (TE0 decision 2): the town's size, its own market cycle over real UTC days (a closed form,
+//  - THE BASELINE IS PURE: the town's size, its own market cycle over real UTC days (a closed form,
 //    phased by its pixel - a player away a month reads what one who stayed reads), its seat's Standing and Edict, and a
 //    raid at its gates. THE PLAYERS' SHARE (TE2, the account service's count of witnessed acts - the law's lines below,
 //    read by both ends) is an argument, bounded here to TOWN_PLAYERS_MAX.
-//  - THE PRICE (TE0 decision 4 - Mac: "Wider swings, ±25%+", an exception to the Economy arc's law 5, bounded): what a
+//  - THE PRICE (an exception to the Economy arc's law 5, bounded): what a
 //    counter ASKS moves by up to TOWN_PRICE_SWING each way; what it PAYS falls by the same share away from the middle,
 //    either way, and never rises - AUDIT TOWN-ECON LAW-1: a Booming town's counter never pays more than it asks, so the
 //    essentials' half (shopStock.js ESSENTIALS-HALF) breaks even there as it does at the region's price; with a seat's
@@ -23,14 +21,16 @@
 // (THE TOWN ECONOMY's row). Pure: no clock, no network, no DOM.
 // ═══════════════════════════════════════════════════════════════════
 
-import { seatTipOf, seatShopFactor, kingdomName, CROWN_SEAT_REGIONS } from './townSeatLaw.js';   // TE0 decision 5: a seat town's card, its area's holder; AUDIT TOWN-ECON UI-4: Market Day on the card's price
+import { seatTipOf, seatShopFactor, kingdomName, CROWN_SEAT_REGIONS, seatRegionOk, SEAT_PIXEL_SPAN } from './townSeatLaw.js';   // a seat town's card, its area's holder; AUDIT TOWN-ECON UI-4: Market Day on the card's price
 import { t } from '../systems/textManager.js';   // L10N4: the card's words in the player's language, each read when it is said
+import { CAPITAL_LANE } from '../world/capitalLane.js';   // BAY-LEFT-SEA: the staff audit's order - a capital's map id
 
 /** The location types that are towns (mapsFile.js LOCATION_TYPES TownCity, TownHamlet, TownVillage). */
 export const TOWN_ECON_TYPES = Object.freeze([0, 1, 2]);
 /** Whether a MAPS location type is a town with an economy. @param {unknown} type */
 export const isEconTown = (type) => TOWN_ECON_TYPES.includes(/** @type {number} */ (type));
-/** A town's key: its map pixel, as the relay's receipts and the market's boards name it. @param {number} px @param {number} py */
+/** A town's key: its map pixel, as the relay's receipts and the market's boards name it - WW7-5: past the Bay the same
+ *  arithmetic (a key phases the market's waves alone; two towns sharing one share a wave). @param {number} px @param {number} py */
 export const townKeyOf = (px, py) => py * 1000 + px;
 
 /** The middle of the scale, and its ends. */
@@ -43,7 +43,7 @@ export const TOWN_CYCLE = Object.freeze([Object.freeze({ amp: 12, days: 11 }), O
 /** A seat town's Standing moves it (Standing - 50) / TOWN_STANDING_DIV. */
 export const TOWN_STANDING_DIV = 5;
 /** The Edict in force at a seat town, as a term of its Prosperity (townSeatLaw.js EDICTS' ids). */
-export const TOWN_EDICT_TERMS = Object.freeze({ 'market-day': 6, festival: 8, 'open-gates': 3, levy: -6, curfew: -4 });
+export const TOWN_EDICT_TERMS = Object.freeze({ 'market-day': 6, festival: 8, 'open-gates': 3, curfew: -4 });
 /** A raid running at the town's gates. */
 export const TOWN_RAID_TERM = -15;
 /** The most the players' share (TE2) adds. */
@@ -60,7 +60,7 @@ export const TOWN_BANDS = Object.freeze([
   /** @type {readonly [string, number]} */ (Object.freeze(['Steady', 35])), /** @type {readonly [string, number]} */ (Object.freeze(['Struggling', 15])),
   /** @type {readonly [string, number]} */ (Object.freeze(['Destitute', 0])),
 ]);
-/** How far a town moves what its counters ask, each way (Mac: "Wider swings, ±25%+"). */
+/** How far a town moves what its counters ask, each way. */
 export const TOWN_PRICE_SWING = 0.25;
 /** The deepest a counter's asking factor goes, a town's and a seat's together: a seat's own deepest, a crown's loved
  *  member on Market Day (townSeatLaw.js seatShopFactor: MEMBER_DISCOUNT.crown 0.15, LOVED_DISCOUNT 0.05,
@@ -132,7 +132,7 @@ export const TOWN_SALE_MODES = Object.freeze(['Sell', 'SellMagic']);
  * A COUNTER'S FACTOR in the town, for `mode` (the trade window's: Buy, Repair, Sell, SellMagic) - what it asks, the
  * town's asking factor times the seat's (`seatFactor`, townSeatLaw.js seatShopFactor, 1 for none), never below
  * TOWN_FACTOR_FLOOR; what it pays, the town's paying factor, never above what it asks THIS player; any other mode 1.
- * SEAT-LOOP (Town-Economy-Arc 7.5, Mac: "Close it"): a seat's discount - its holder's members', Market Day's - lowered
+ * SEAT-LOOP (Town-Economy-Arc 7.5): a seat's discount - its holder's members', Market Day's - lowered
  * what a counter asked while what it paid stood, so an essential (half its price online) bought and sold back paid
  * (five firewood, 13 in and 15 out on Market Day); what it pays falls with what it asks.
  * @param {number} p @param {string} mode @param {number} [seatFactor]
@@ -148,7 +148,7 @@ export function townShopFactor(p, mode, seatFactor = 1) {
 // Witnessed acts at a town - its footsteps (the relay's signed Watch ticks), its players' traders' sales (the market's,
 // and LW15's patrons') and a raid driven from its gates - counted by the account service a town a day by source, each
 // account capped a town a day, and read back by every client as one share. The service and the client both read
-// these lines; nothing a player pays in gold moves a town (TE0 decision 3).
+// these lines; nothing a player pays in gold moves a town.
 
 /** The sources of a town's activity. SEA-TRADE: `sea`, a captain's dealing at its exchange. */
 export const TOWN_ECON_SOURCES = Object.freeze(['watch', 'trade', 'raid', 'sea']);
@@ -205,6 +205,10 @@ export const townShareShown = (share) => Math.round(share * 10) / 10;
 /** A map id's pixel id - its low 20 bits (DFU's ContentReader keys the map's summaries by them and asks a pixel's,
  *  MapsFile.GetMapPixelID: y x 1000 + x). @param {number} map */
 export const townPixelIdOf = (map) => (map >>> 0) & 0x000fffff;
+/** WW7-5: the least pixel id a place of the port's own past the Bay carries in its map id's low 20 bits (world/
+ *  arenaLocations.js ARENA_PLACE_BASE; the capitals', the countryside's and the lairs' 0x80000 and up) - past the Bay's
+ *  most (499 x 1000 + 999), so no MAPS row is one. */
+export const TOWN_PLACE_ID_MIN = 500000;
 /** A TOWN'S REGISTRY REPORT (TE2, the witnessed town): the town a client stands in, by its map id, its pixel, its region
  *  and its location's index in the region - canonical, or null. The service learns from three agreeing accounts which
  *  town stands at a Watch tick's pixel and which a raid's `region:location` names. AUDIT TOWN-ECON 2 SVC-1: the map id
@@ -214,10 +218,34 @@ export function townReportOf(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const { map, px, py, region, location } = raw;
   const ok = (v, max) => Number.isSafeInteger(v) && v >= 0 && v <= max;
-  if (!ok(map, 0xffffffff) || map === 0 || !ok(px, 999) || !ok(py, 499) || !ok(region, 61) || !ok(location, 9999)) return null;
-  if (townPixelIdOf(map) !== py * 1000 + px) return null;
+  if (!ok(map, 0xffffffff) || map === 0 || !seatRegionOk(region)) return null;
+  if (ok(px, 999) && ok(py, 499)) {
+    if (!ok(location, 9999) || townPixelIdOf(map) !== py * 1000 + px) return null;
+  } else {
+    // WW7-5 (WW7-5): A TOWN PAST THE BAY - the world's grid, a place of the port's own (its
+    // map id no MAPS row's), its location's index its own negative (world/arenaLocations.js arenaLocationIndex and the rest)
+    const grid = (v) => Number.isSafeInteger(v) && Math.abs(v) < SEAT_PIXEL_SPAN;
+    if (!grid(px) || !grid(py) || townPixelIdOf(map) < TOWN_PLACE_ID_MIN || !Number.isSafeInteger(location) || location >= 0 || location < -0x7fffffff) return null;
+  }
   return { map, px, py, region, location };
 }
+/**
+ * BAY-LEFT-SEA: THE STAFF AUDIT'S ORDER
+ * (server-account/src/townEcon.js auditTowns, `/town audit [page]`) - a region's confirmed towns TOWN_AUDIT_PAGE a page:
+ * the Bay's by their location's index, as they always were; a province's (WW7-5: their indices their own negatives, so
+ * `ORDER BY location` listed the countryside's farthest hamlets first and the capitals never) its capitals' slices first
+ * (world/capitalLane.js - each capital's centre, then its other slices), then the rest by the size of their index: the
+ * producers' own numbering puts the places' city-states, towns and villages (world/arenaLocations.js ARENA_INDEX_BASE,
+ * 1,000,000) before the countryside's (world/tamrielCountry.js COUNTRY_INDEX_BASE, 2,000,000). `townAuditRank` the rank
+ * (TOWN_AUDIT_CAPITAL_LANE the lane it reads) - the service's SQL reads the same order (townEcon.js AUDIT_ORDER_SQL;
+ * pinned row for row).
+ */
+export const TOWN_AUDIT_PAGE = 400;
+/** The lane a capital's map id carries in its high 12 bits (world/capitalLane.js), the rank's one read. */
+export const TOWN_AUDIT_CAPITAL_LANE = CAPITAL_LANE;
+/** A confirmed town's rank in the audit: 0 the Bay's, 1 a capital's slice, 2 any other's past the Bay.
+ *  @param {number} map @param {number} location */
+export const townAuditRank = (map, location) => (location >= 0 ? 0 : ((map >>> 20) & 0xfff) === CAPITAL_LANE ? 1 : 2);
 /** A report as world_witness keeps it. @param {{ map: number, px: number, py: number, region: number, location: number }} t */
 export const townReportText = (t) => JSON.stringify([t.map, t.px, t.py, t.region, t.location]);
 /** A kept report read back, or null. @param {unknown} s */
@@ -275,7 +303,6 @@ export const TOWN_REASONS = Object.freeze({
   get 'market-day'() { return t('town.econ.reason.marketDay', 'Market Day draws trade.'); },
   get festival() { return t('town.econ.reason.festival', 'The Festival draws visitors.'); },
   get 'open-gates'() { return t('town.econ.reason.openGates', 'Open Gates draw trade.'); },
-  get levy() { return t('town.econ.reason.levy', 'The Levy weighs on trade.'); },
   get curfew() { return t('town.econ.reason.curfew', 'The Curfew keeps buyers home.'); },
   get players() { return t('town.econ.reason.players', 'Busy with travellers and traders.'); },
   get harbour() { return t('town.econ.reason.harbour', 'Its harbor brings trade.'); },   // SEA-TRADE: a port town's lanes

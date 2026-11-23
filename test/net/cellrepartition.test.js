@@ -1,4 +1,4 @@
-// COST-2 part two (2026-10-25; bible/11-Multiplayer/Scale-Arc.md COST-2 part two): THE PAGE IN A MOVING TREE. A cell's
+// COST-2 part two: THE PAGE IN A MOVING TREE. A cell's
 // hello says the cell law it stands on (`cv`, wire.js CELL_HELLO_LAW) - a coarse node refuses one without it - and a
 // socket the tree's move closed (CLOSE_REPARTITION) joins again after BACKOFF_MIN_MS and up to REPARTITION_SPAN_MS more,
 // with no drop weighed and no backoff, as its halos do. Through the real session (src/net/online.js) over the pins'

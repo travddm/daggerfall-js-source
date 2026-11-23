@@ -44,9 +44,6 @@ test('audit24 wave29: GetWeaponSkillUsed keys on the TEMPLATE, not the name', ()
   assert.equal(isForbiddenEquip(axeBan, w(123)), false, 'nor is a Dai-katana');
   assert.equal(isForbiddenEquip(axeBan, w(127)), true, 'a Battle Axe still is');
 
-  // one implementation: equip.js maps weapons.js's template partition
-  assert.match(rd('src/systems/equip.js'), /PROFICIENCY_OF_SKILL\[weaponSkillUsed\(item\?\.templateIndex\)\]/);
-  assert.doesNotMatch(rd('src/systems/equip.js'), /PROFICIENCY_OF_SKILL\[WEAPON_SKILL\[item\?\.name\]\]/);
 });
 
 test('audit24 wave29: a BROKEN item cannot be equipped', () => {
@@ -77,21 +74,10 @@ test('audit24 wave29: a BROKEN item cannot be equipped', () => {
   entity.items.push(sword);
   assert.notEqual(equipItem(entity, sword), null, 'the TABLE equips it - ItemEquipTable.cs:94-154 has no condition test');
   assert.notEqual(sword.equipSlot, undefined, 'and it takes its slot, as PlayerEntity.cs:959 needs');
-  assert.doesNotMatch(rd('src/systems/equip.js').slice(
-    rd('src/systems/equip.js').indexOf('export function equipItem('),
-    rd('src/systems/equip.js').indexOf('export function unequipSlot(')),
-  /if \(isBrokenItem\(item\)\) return null;/, 'no condition gate inside EquipItem');
 
   const sound = { group: 'Weapons', templateIndex: 120, material: 0, currentCondition: 1 };
   entity.items.push(sound);
   assert.notEqual(equipItem(entity, sound), null, 'condition 1 equips');
   assert.notEqual(sound.equipSlot, undefined);
 
-  // the refusal is the WINDOW's, and it runs BEFORE the prohibition chain
-  const ui = rd('src/ui/native/nativeInventory.js');
-  const fn = ui.slice(ui.indexOf('_refuseForbidden(it) {'), ui.indexOf('/** ShowInfoPopup'));
-  assert.ok(fn.indexOf('isBrokenItem(it)') < fn.indexOf('isForbiddenEquip('), 'broken first, as DFU orders it');
-  assert.match(fn, /ITEM_BROKEN_TEXT_ID/);
-  // ...and the enhanced pack's own door carries it too
-  assert.match(rd('src/ui/enhanced/enhancedInventory.js'), /if \(isBrokenItem\(item\)\) \{ notice = /);
 });

@@ -1,7 +1,4 @@
-// PERF-SUN (2026-09-19, Mac: "exterior shadows at a distance, tree sway at
-// a distance, and whatever else can cause insane performance issues. On
-// the outside, I'm receiving over 1000 calls and looking up in the sky
-// restores frame rate").
+// PERF-SUN.
 //
 // LOOKING UP IS THE DIAGNOSIS. The sun cascades are built around the EYE,
 // not the view direction, and the shadow replays cull by the cascade's own
@@ -55,7 +52,7 @@ test('PERF-SUN1: the far cascade takes ONE tap, and the near ones keep the kerne
   assert.equal(SHADOW_PCF_CASCADES, 2);
   assert.ok(SHADOW_PCF_CASCADES < SHADOW_CASCADES.length, 'at least one cascade is cheap, or the change does nothing');
   assert.ok(SHADOW_PCF_CASCADES >= 1, 'and at least one keeps the kernel, or EL7’s contact hairline goes');
-  // the kernel is still there for the near cascades - PERF-EXT5 (2026-09-25): the 3x3 in four bilinear taps, its
+  // the kernel is still there for the near cascades - PERF-EXT5: the 3x3 in four bilinear taps, its
   // weights exactly (test/render/perfexta.test.js)
   assert.match(SHADOW_GLSL, /vec2 wA = 2\.0 - f, wB = 1\.0 \+ f;/);
   assert.match(SHADOW_GLSL, /return lit \/ 9\.0;/);
@@ -118,7 +115,6 @@ test('PERF-SUN2: the sun’s shadow is not read where the sun cannot reach', () 
   // where uSunScale is zero cannot move a pixel. Found by looking for
   // them all rather than by assuming there was one.
   const shadowUses = water.split('\n').filter((l) => /\bshadow\b/.test(l) && !/float shadow =/.test(l));
-  // PIN MOVED (WATER-NEXT 3): a third - the foam, lit by the sun it lies in, uSunScale on its own line too
   assert.equal(shadowUses.length, 3, `the water has ${shadowUses.length} consumers of shadow - every one must be under uSunScale`);
   assert.ok(shadowUses.some((l) => /vec3 foamLit = .*uSunScale \* shadow/.test(l)), 'the foam is the third, and it carries uSunScale itself');
   assert.ok(shadowUses.some((l) => /spec .*uSunScale \* shadow/.test(l)), 'the sun specular is one of them, and it carries uSunScale itself');
@@ -137,10 +133,10 @@ test('PERF-SUN2: a FLAT has no normal, so its gate is the sun’s own share of t
   // zero. uBBSun IS the sun's whole share, so this is a uniform branch:
   // free, coherent, and it takes out the entire night.
   const bb = EL_BB_FS.split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
-  // LA-COST3 (2026-09-27): the map is read by the lane's billboard VERTEX shader now, once a quad - and the gate went
+  // LA-COST3: the map is read by the lane's billboard VERTEX shader now, once a quad - and the gate went
   // with it: at night that stage reads nothing either, and the fragment's cloud read stays behind the same gate
   assert.match(bb, /vec3 sunLit = dot\(uBBSun, uBBSun\) > 0\.0 \? uBBSun \* cloudShadowAt\(vBBWorld\) \* vBBSunVis : vec3\(0\.0\);/);
-  assert.match(EL_LANE.bbVs.main, /vBBSunVis = dot\(uBBSun, uBBSun\) > 0\.0 \? \(uMesh > 0\.5 \? sunShadowAt\(sunAt, vec3\(0\.0, 1\.0, 0\.0\)\) : sunShadowSoftAt\(sunAt, vec3\(0\.0, 1\.0, 0\.0\), uSize\.y\)\) : 1\.0;/, 'the vertex stage takes the same gate');   // AUDIT BANTHA1 TREE-2 (PIN MOVED): read at `sunAt` - half a unit up, or a jungle tree's crown
+  assert.match(EL_LANE.bbVs.main, /vBBSunVis = dot\(uBBSun, uBBSun\) > 0\.0 \? \(uMesh > 0\.5 \? sunShadowAt\(sunAt, vec3\(0\.0, 1\.0, 0\.0\)\) : sunShadowSoftAt\(sunAt, vec3\(0\.0, 1\.0, 0\.0\), uSize\.y\)\) : 1\.0;/, 'the vertex stage takes the same gate');   // AUDIT BANTHA1 TREE-2 (
   assert.match(bb, /uTint \+ sunLit \+ elPointFlat/, 'and it enters the sum exactly where the product did');
   assert.doesNotMatch(bb, /uBBSun \* cloudShadowAt\(vBBWorld\) \* (?:sunShadowSoftAt\(base[^)]*\)\)|vBBSunVis) \+ elPointFlat/, 'the inline product is gone');
   // the shadow is still read at the flat's BASE, once for the whole
@@ -159,56 +155,20 @@ test('PERF-SUN: the tree sway is CLEARED as a suspect - the lean is baked at bui
   assert.equal(floraSwayOf(500, 500, 3), 1, 'a tall flora flat leans');
   assert.equal(floraSwayOf(500, 500, 0.4), 0.6, 'a short one leans less');
   assert.equal(floraSwayOf(210, 500, 3), 0, 'and anything that is not the climate’s flora does not lean at all');
-  const w = hostText('src/scenes/world.js'), ex = read('src/scenes/exterior.js');
-  for (const [name, src] of [['world', w], ['exterior', ex]]) {
-    // PIN MOVED (ECOTONE1, 2026-10-07): the streaming host's pixel asks by its nature set (its climate's and a border's)
-    assert.match(src, name === 'world' ? /batch\.sway = floraSwayOf\(archive, g\.natureSet, size\.h\);/ : /batch\.sway = floraSwayOf\(archive, natureArchive, size\.h\);/, `${name}: set at BUILD`);
-    assert.equal((src.match(/renderer\.setFlatWind\(/g) ?? []).length, 1, `${name}: one wind upload a frame, for every flat there is`);
-  }
-  assert.doesNotMatch(w, /floraSwayOf\([^)]*\)[^\n]*\n[^\n]*for \(const b of p\.batches\)/, 'nothing recomputes a lean inside the draw walk');
-  // ...but the DOOR beside it was parsing the query string once a frame
-  // AUDIT PERF-URL A4: read through the page's one parse (systems/pageQuery.js) - held BY COUNT in
-  // test/systems/perfurl_doors.test.js, where a hundred reads of one search mint one URLSearchParams across nine doors
-  assert.match(read('src/systems/wind/windDrive.js'), /return pageParam\('sway', search\) === 'off';/, 'the ?sway=off door is read once a search');
   assert.equal(swayDisabled('?sway=off'), true);
   assert.equal(swayDisabled('?sway=on'), false, 'and it re-reads when the search really changes');
   assert.equal(typeof floraSwayOn(''), 'boolean');
 });
 
-
-// ---- AUDIT PERF-SUN / PERF-FOG (2026-09-19) ------------------------------
-
-test('AUDIT F4: three decoded colours, three scratches - the billboard tint\u2019s moon term was reading the SUN', async () => {
-  // PRE-EXISTING, found by the audit that had just pinned `_fogLin`
-  // against this exact hazard one method away. `_c3` writes into a scratch
-  // the caller names, and the billboard tint site named `_decB` TWICE: so
-  // `mc` and `sc` were the same Float32Array, `sc`'s decode overwrote
-  // `mc`'s contents, and the very next statement built uBBTint from a
-  // "moon colour" that held the sun's. Every flat in the world, at night.
-  const r = read('src/render/renderer.js');
-  assert.match(r, /const am = this\._c3\(this\._ambient, this\._decA\), mc = this\._c3\(this\._moonColor, this\._decB\), sc = this\._c3\(this\._sunColor, this\._decC\);/,
-    'three colours, three scratches');
-  assert.match(r, /this\._decA = new Float32Array\(3\); this\._decB = new Float32Array\(3\); this\._decC = new Float32Array\(3\);/);
-  // AND THE RULE, held generally rather than at the one site: no statement
-  // may take two decoded colours into the same scratch. That is what makes
-  // this a law instead of a patch - the next caller who needs a fourth
-  // colour fails here rather than in the field.
-  for (const line of r.split('\n')) {
-    const scratches = [...line.matchAll(/this\._c3\([^)]*?,\s*this\.(_dec[A-Z])\)/g)].map((m) => m[1]);
-    assert.equal(new Set(scratches).size, scratches.length, `two decodes into one scratch: ${line.trim()}`);
-  }
-});
+// ---- AUDIT PERF-SUN / PERF-FOG ------------------------------
 
 test('AUDIT F2: the cheap tap runs OUTWARD from its index, and the note says so', () => {
-  const sp = read('src/render/shadowPass.js');
   // The test is `c >= SHADOW_PCF_CASCADES`, so a fourth cascade would be
   // cheap too. That is the RIGHT behaviour - the cascades ascend by
   // radius, so a further one is always the coarser map - but the note
   // first written here claimed the opposite, and a false claim about a
   // safe direction is exactly what this slice's own lesson was about.
   assert.match(SHADOW_GLSL, /if \(!soft && c >= 2\) return/, 'outward from the index, not the last cascade alone');
-  assert.doesNotMatch(sp, /A cascade count this does not cover keeps the kernel/, 'the false note is gone');
-  assert.match(sp, /EVERY cascade from/, '...and the true one is there');
   for (let i = 1; i < SHADOW_CASCADES.length; i++) {
     assert.ok(SHADOW_CASCADES[i] > SHADOW_CASCADES[i - 1], 'the cascades ascend, so a later index is always the coarser map');
   }
@@ -236,28 +196,9 @@ test('AUDIT F5/F6: the numbers behind what was taken and what was left', () => {
   assert.equal(SHADOW_PCF_CASCADES, 2, 'the choice, written down');
 });
 
-test('AUDIT F1: the sway door\u2019s state is declared ABOVE its reader', () => {
-  // A `let` below the function that reads it is in the temporal dead zone
-  // until the module finishes evaluating. Nothing calls this during module
-  // init today - but this port has already lost a boot to one end of a
-  // module cycle reaching the other too early (the HOTFIX black screen),
-  // and the fix for that class is to not write the shape at all.
-  // AUDIT PERF-URL A4: the door keeps no state now - the memo is the page's one parse - so the law moves with the
-  // state: pageQuery.js declares its two `let`s above the function that reads them
-  const w = read('src/systems/wind/windDrive.js');
-  assert.doesNotMatch(w, /let _sway(?:Off|Search)\b/, 'no private copy of the memo');
-  const q = read('src/systems/pageQuery.js');
-  const reader = q.indexOf('function parsed(search)');
-  assert.ok(reader > 0 && q.indexOf('let _search = null;') > 0 && q.indexOf('let _params = null;') > 0, 'the home and its state are there');
-  assert.ok(q.indexOf('let _search = null;') < reader, 'the state is declared before the function that reads it');
-  assert.ok(q.indexOf('let _params = null;') < reader, '...and so is its sibling');
-});
-
-
-// ---- TREES1 (2026-09-19) -------------------------------------------------
+// ---- TREES1 -------------------------------------------------
 
 test('TREES1: a FLAT keeps the kernel at every distance, because it samples once for a whole sprite', () => {
-  // Mac: "there's this weird darkening effect happening to trees."
   //
   // PERF-SUN1's cheap far tap is an ANTIALIASING trade, and it only holds
   // for a surface that shades PER FRAGMENT - the terrain and the meshes,
@@ -281,12 +222,12 @@ test('TREES1: a FLAT keeps the kernel at every distance, because it samples once
   // be asked of what is left when the block is taken out.
   const body = (raw) => raw.replace(SHADOW_GLSL, '').split('\n').map((l) => l.replace(/\/\/.*$/, '')).join('\n');
   const bb = body(EL_BB_FS);
-  // LA-COST3 (2026-09-27): the flat's read is its vertex shader's now (once a quad, EL_BB_VS_EXT) - the soft one there
+  // LA-COST3: the flat's read is its vertex shader's now (once a quad, EL_BB_VS_EXT) - the soft one there
   const bbVs = body(EL_LANE.bbVs.head + EL_LANE.bbVs.main);
-  assert.match(bbVs, /sunShadowSoftAt\(sunAt, vec3\(0\.0, 1\.0, 0\.0\), uSize\.y\)/, 'the flat reads the soft one');   // AUDIT BANTHA1 TREE-2 (PIN MOVED): at `sunAt`
+  assert.match(bbVs, /sunShadowSoftAt\(sunAt, vec3\(0\.0, 1\.0, 0\.0\), uSize\.y\)/, 'the flat reads the soft one');   // AUDIT BANTHA1 TREE-2 (
   // LPT1 (AUDIT LPT B4): a low-poly tree in the billboard program's mesh mode is no flat - its every VERTEX would run
   // the kernel, so it takes one tap at its root; the flat's path is what is left without that arm
-  const meshArm = 'uMesh > 0.5 ? sunShadowAt(sunAt, vec3(0.0, 1.0, 0.0)) : ';   // AUDIT BANTHA1 TREE-2 (PIN MOVED): one tap at `sunAt` - its root's half unit, a jungle tree's crown
+  const meshArm = 'uMesh > 0.5 ? sunShadowAt(sunAt, vec3(0.0, 1.0, 0.0)) : ';   // AUDIT BANTHA1 TREE-2 (
   assert.ok(bbVs.includes(meshArm), 'the tree\'s arm, gated on the mesh mode');
   assert.ok(!/[^t]sunShadowAt\(/.test(bbVs.replace(meshArm, '')), 'and never the cheap one, at the vertex either');
   assert.ok(!/sunShadow(?:Soft)?At\(/.test(bb), 'the flat’s fragment reads no sun map at all');

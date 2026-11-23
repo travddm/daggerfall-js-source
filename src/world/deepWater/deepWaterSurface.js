@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // DW-B: WaterSurfaceManager.BuildSurfaceMesh (Iliac Puddle No More 1.2.2,
 // jet082) - the sea's own surface over one streamed pixel: flat, at the
 // sea's height plus SurfaceRenderYOffset, drawn twice by the host (the
@@ -22,7 +21,6 @@
 // matches). The Animated Water bridge's uniform vertex grid is not taken:
 // the port's water look (render/waterSurface.js, the enhanced lane's
 // WATER1, the animated water this host has) moves no vertices.
-// ═══════════════════════════════════════════════════════════════════
 
 import {
   mapDataHasWater, mapDataFullySubmerged, cellContainsWaterTile, isCellVisuallyWet,

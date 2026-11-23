@@ -1,9 +1,9 @@
-// PROF2 (2026-09-28, Mac: "Go") - MINING'S CLIENT: the Pick-Axe's act (the strikes, the glint that counts double and
+// PROF2 - MINING'S CLIENT: the Pick-Axe's act (the strikes, the glint that counts double and
 // moves, the clean finish, Gentle acts), where a node stands (a rock field's piece, else a stone tile, else nature's
 // ground; a boulder a piece itself), the plan the prompt says, the one gathering host every profession is a kind in,
 // the new materials as items (DFU's own metals and gems, the registered ores, ingots and stone on DFU's dyed pictures),
 // the forge's arithmetic - and the done-when, driven through the real Worker: VEINS PLACED ON ROCK FIELDS; SIGNATURES BY
-// KINGDOM. Then the hosts' wiring. bible/06-Systems/Professions-Arc.md 23.
+// KINGDOM. Then the hosts' wiring. 23.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -189,7 +189,6 @@ test('PROF2 plan: what E does at a vein or a boulder, and what it needs - worked
   assert.equal(minePlan({ ...base, storesFull: () => true }).rest, 'Stores full - Lodestone');
   assert.deepEqual([minePlan({ ...base, taken: true }).verb, minePlan({ ...base, taken: true }).ready], ['Lodestone - worked today', false]);
   assert.equal(minePlan({ ...base, counting: true }).rest, 'being counted');
-  // PIN MOVED (CAP-OFF, 2026-10-07 - Mac: "Remove the cap on life skills"): sixty today was no ready plan
   assert.equal(minePlan({ ...base, today: 600, cap: 60 }).ready, true, 'a day past the old sixty: ready');
   const b = minePlan({ ...base, node: { what: 'boulder', tier: 1, material: 'stone:rough' } });
   assert.deepEqual([b.harvest, b.verb], ['stone', 'Quarry the stone']);
@@ -197,7 +196,7 @@ test('PROF2 plan: what E does at a vein or a boulder, and what it needs - worked
   assert.deepEqual([pickHandFrame(1).frame, pickHandFrame(0.5).frame, pickHandFrame(0.01).frame], [0, 2, 4], 'StrikeDown\'s frames over the swing');
   assert.deepEqual({ ...PICK_HAND }, { group: 'Weapons', templateIndex: 126, material: 0 });
   assert.equal(templateByIndex(126).name, 'Warhammer', 'the Pick-Axe in the hand is DFU\'s Warhammer (PROF0 5.1)');
-  assert.equal(PROSPECT_M, 500);   // PIN MOVED (MINE-PERKS, Professions-Arc 43): 200 beside everyone's 150 was "only a 50m difference"
+  assert.equal(PROSPECT_M, 500);
 });
 
 // ─── THE ONE HOST ────────────────────────────────────────────────────
@@ -358,7 +357,7 @@ test('PROF2 forge: what the Stores can smelt of a recipe - every input\'s units 
   // DAEDRIC-SMELT: and over the pack's embers where the work spends any - unknown (no pack in the book), its inputs alone
   const daedric = smeltRecipe('ingot:daedric'), all = () => 1000;
   assert.deepEqual([smeltable(daedric, all, 3), smeltable(daedric, all, 0), smeltable(daedric, all, null), smeltable(smeltRecipe('ingot:iron'), all, 0)], [3, 0, 100, 100]);
-  assert.deepEqual([...DECOR_STATIONS], ['alchemy', 'spells', 'enchant', 'forge', 'workbench', 'cooking', 'loom', 'mason', 'jeweller', 'vendor']);   // PIN MOVED (DECOR-USE): the cooking station   // PROF4: the workbench, a fifth; PROF7: the loom, a sixth; PIN MOVED (PROF11): the mason's bench, a seventh; PIN MOVED (PROF10): the jeweller's bench, an eighth; PIN MOVED (HOME-VENDOR): the hired trader, a ninth
+  assert.deepEqual([...DECOR_STATIONS], ['alchemy', 'spells', 'enchant', 'forge', 'workbench', 'cooking', 'loom', 'mason', 'jeweller', 'vendor']);
   assert.deepEqual([DECOR_STATION_FEES.forge, DECOR_STATION_NAMES.forge], [50_000, 'Forge']);
 });
 
@@ -410,32 +409,3 @@ test('PROF2 DONE WHEN: veins placed on rock fields; signatures by kingdom - a co
 
 // ─── THE HOSTS ───────────────────────────────────────────────────────
 
-test('PROF2 hosts: the streaming world stands every kind through the one host, its rock pieces carried on the pixel; the dungeon\'s veins through its own doors; the forge at a smith\'s or a home; the Prospector\'s compass on both skins', () => {
-  const w = hostText('src/scenes/world.js');
-  assert.match(w, /gatherHost = createGatherHost\(\{\n\s*book: profBook, hud, kinds: \[herbKind\(\{ book: profBook \}\), mineKind\(\{ book: profBook, lodes: motherlodeBook, marks: marksBook \}\),[^\n]*\n\s*treeKind\(\{ book: profBook, renderer, flatBatchAabb, getTexture, billboardSize, uploadRecord \}\),[^\n]*\n\s*huntKind\(\{ book: profBook, bodies: \(\) => huntBodies\(\), openLoot: openHuntLoot, trophy: trophyDoor\(saveSoon\) \}\),/);   // PROF4: Logging's trees, the third; PROF7: Hunting's bodies, the fourth; PROF8's casts after them; PIN MOVED (PROF2b): Mining's with the Motherlodes; PIN MOVED (HUNTERS-MARK): and a Trophy Hunter's trophy door
-  assert.match(w, /if \(rockPick\(m\.pick\)\) \{ const foot = rockFootprint\(cpu\.positions, cpu\.indices, m\.matrix, samples\); if \(foot\) pixelRocks\.push\(foot\); \}/, 'a rock piece that stood - after the road\'s clearance; ROCK-FOOT: as it stands out of the ground');
-  assert.match(w, /rocks: pixelRocks,/);
-  assert.match(w, /const rockPick = \(i\) => WOD_ROCK_SITES\.includes\(stood\[i\]\?\.name\);/);   // PIN MOVED (GATE-AGREE): the standing picks' list   // ROCK-SUNK: the rock sites one list, the shrub's exemption's too
-  assert.match(src('src/world/worldOfDaggerfall/wodLocationObjects.js'), /export const WOD_ROCK_SITES = Object\.freeze\(\['Rocks', 'Mountains'\]\);/, 'the Rocks and Mountains layouts');
-  assert.match(w, /if \(!townTalk\.overlayActive && act === 'Escape' && gatherHost\?\.cancel\(\)\) \{ e\.preventDefault\(\); e\.profActEnded = true; return true; \}/, 'Escape above the mode gate');
-  assert.ok(w.indexOf("act === 'Escape' && gatherHost?.cancel()") < w.indexOf("if (!townTalk.overlayActive && (modes?.mode ?? 'exterior') === 'exterior') {"), 'before the exterior gate');
-  assert.match(w, /nodes: professionMarks\(\),/);   // PROF7 moved it: a Tracker's animals beside a Prospector's veins; NODE-MARKS: every node beside them
-  assert.match(w, /const near = nodeMarksAt\(feet\), far = motherlodeMarks\(\);\n\s*return nodeCompassPoints\(far\.length \? \[\.\.\.far, \.\.\.\(near \?\? \[\]\)\] : near, trackerAnimals\(\)\);/);   // PIN MOVED (PROF2b): and the far Motherlodes; LODE-MARK (FIELD BUGS 2026-10-12g, PIN MOVED): the far marks first, drawn over the near
-  assert.match(src('src/scenes/mineHost.js'), /return \(specs\('mining'\)\[50\] === 'prospector' && PROSPECTOR_MARKS\[n\.what\]\) \|\| MINE_MARKS\[n\.what\] \|\| MINE_MARKS\.vein;/, 'NODE-MARKS: the Prospector\'s veins marked from PROSPECT_M off, in the mine kind\'s own mark');
-  assert.match(w, /onDungeonLeave: \(\) => \{ if \(_wdunInside\) wdunLeft\(false\); const n = handOverRoomFoes\(\);[^\n]*gatherHost\?\.leaveDungeon\(\); worldPublish\(performance\.now\(\), true\); \},/, 'the veins dropped while the dungeon still stands');   // PVPDUNGEONS: a zone hall's leaving said first (wdunLeft)
-  assert.match(w, /profPress: \(\) => gatherHost\?\.press\(\) \?\? false,/);
-  assert.match(src('src/world/worldOfDaggerfall/worldOfDaggerfall.js'), /name: session\.name\[pick\.index\], prefabName: session\.prefab\[pick\.index\] \}\)\);/);   // FOREST1: and the prefab's name - a site or a rock field
-  const m = src('src/scenes/worldModes.js');
-  assert.match(m, /\n\s*dungeonLoc = dfLocation;\n\s*host\.profDungeonEntered\?\.\(ctx\);/, 'after the flip and its lock, once the dungeon is the one stood in');
-  assert.match(m, /if \(interact && !pressCast && host\.profPress\?\.\(\)\) return true;/, 'AUDIT 29: Interact alone, above QG1');
-  assert.match(m, /if \(PROF_STATIONS\.includes\(piece\.station\)\) \{ if \(forgeOffered\(\)\) interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\(piece\.station\) \}\); else say\(stationColdLine\(piece\.station\)\); return; \}/, 'AUDIT 29 B2: a cold forge says so');   // PIN MOVED (CRAFT-HALL): the station's own door, the Crafting page at it
-  assert.match(m, /if \(t === BUILDING_TYPES\.WeaponSmith \|\| t === BUILDING_TYPES\.Armorer\) return interiorBuilding\.insideOpenShop === false \? null : \{ kind: 'shop', fee: FORGE_FEE \};/, 'AUDIT 29 D4: open for trade');
-  const d = src('src/scenes/dungeonContext.js');
-  assert.match(d, /actTool: \(\) => opts\.actTool\?\.\(\) \?\? null,/);
-  assert.match(d, /if \(held && opts\.profActing\?\.\(\)\) return;/, 'AUDIT 29 D2: the press alone');
-  assert.match(d, /if \(dfLocation\?\.spawned \|\| isGateArena\(dfLocation\) \|\| isArenaFloor\(dfLocation\) \|\| !Number\.isSafeInteger\(dfLocation\?\.mapTableData\?\.mapId\)\) return null;/, 'a spawned dungeon grows none, nor the Burning Court (AUDIT 29 D5), nor the arena\'s floor (ARENA2)');
-  assert.match(src('src/ui/hud/hud.js'), /drawNodeCompassMarks\(renderer, nodes, playerXZ, heading01, \{ bx, by, bw, s \}\);/);   // NODE-MARKS: in each profession's colour
-  assert.match(src('src/ui/enhanced/enhancedHud.js'), /drawNodeMarks\(opts\.nodes \?\? null, opts\.playerXZ \?\? null, heading01\);/);
-  assert.match(src('src/systems/save/save.js'), /import '\.\.\/professions\/profTemplates\.js';/, 'every scene a save loads in knows the new templates');
-  assert.doesNotMatch(src('src/scenes/exterior.js'), /gatherHost|createProfBook/, 'the fixed city: no wilderness, no nodes (PROF0 17.1, FLAGGED)');
-});

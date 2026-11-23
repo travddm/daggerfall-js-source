@@ -20,8 +20,7 @@ export function identity() {
  *  consumer treats an up axis as a constant. */
 export const UP_Y = new Float32Array([0, 1, 0]);
 
-/** ONCRASH1 (2026-09-15, Mac: "reports of player browser crashing when
- *  online"): WRAP AN ANGLE TO (-PI, PI], IN ONE STEP.
+/** ONCRASH1: WRAP AN ANGLE TO (-PI, PI], IN ONE STEP.
  *
  *  This is the port's one wrap, moved here from player/lockOn.js, where
  *  it could not be reached by the four sites that had hand-rolled it as
@@ -143,7 +142,7 @@ export function perspective(fovYRad, aspect, near, far) {
 }
 
 /** Right-handed lookAt view matrix. */
-/** THE HANDEDNESS LAW (Mac's playtest: "signage is inverted").
+/** THE HANDEDNESS LAW.
  *
  *  The world DATA is Daggerfall Unity's, verbatim - x east, y up,
  *  z north, LEFT-handed (the layout math in rmbLayout/rdbLayout is a

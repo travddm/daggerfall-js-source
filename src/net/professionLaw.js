@@ -1,13 +1,11 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!"; "Life skills will utilize things
-// like tree chopping, picking up ingredients, fishing, etc. Active player
-// involvement and actual UI integration for life skills") - THE
+// PROF1 - THE
 // PROFESSIONS' LAW: the ten (the thirteen until CRAFT3 merged eight crafts
 // into five), their ranks and XP, the tiers, the
 // specialisations, the day (no cap since CAP-OFF), the Stores, Herbalism's
 // two acts, the materials the Stores hold, and the Court writs. The record is
-// bible/06-Systems/Professions-Arc.md (PROF0) 3, 5, 7, 11 and 22.
+// (PROF0) 3, 5, 7, 11 and 22.
 //
 // ONLINE ONLY. Daggerfall has no crafting skill and its three makers use
 // none (PROF0 law 1); a profession is a Ledger A departure, online's
@@ -35,7 +33,7 @@ import { GEM_IDS, GEM_ROW_GRADES, GEM_NAMES, gemId, gemGrade, gemTemplateOf, gra
 // ─── THE TEN (PROF0 3.1; CRAFT3, Professions-Arc 41.6) ───────────────
 
 /** Every profession - every TRACK a character holds - in the Professions tab's order: the five that gather, then the
- *  five that craft (CRAFT3, Mac: "Lets do it" - Smithing with Jewelcrafting, Building of Carpentry and Masonry,
+ *  five that craft (CRAFT3, - Smithing with Jewelcrafting, Building of Carpentry and Masonry,
  *  Outfitting, Provisioning of Alchemy and Cooking, Enchanting; the eight crafts until then). */
 export const PROFESSIONS = Object.freeze([
   Object.freeze({ id: 'mining', name: 'Mining', kind: 'gathering' }),
@@ -118,7 +116,7 @@ export function harvestXp(tier, rank, clean) {
   if (tier < topTierOf(rank) - 2) xp = Math.floor(xp / 4);
   return xp;
 }
-/** HERB-XP (2026-10-01 part four - Mac: "XP follows your rank"): a herb is picked at the highest tier the rank opens, as
+/** HERB-XP: a herb is picked at the highest tier the rank opens, as
  *  a haul is worked (haulTier). Herbs stop at tier 3, and harvestXp quarters a tier more than two below the rank's, so
  *  past rank 70 every herb was worth a quarter (3, 11 and 16 XP) and 70 to 100 took 107 full days. The herb's own tier
  *  still opens it (tierOpen) and is the harvest's; the Basket's food keeps its tier. */
@@ -133,8 +131,7 @@ export const JOURNEYMAN_RANK = 50;
 
 /** The ranks a choice opens at. */
 export const SPEC_RANKS = Object.freeze([50, 100]);
-/** A change of mind: 1,000 Marks burnt. PERK-TRIAL (2026-10-24, the owner's pick of the Discord's "The time limit of a
- *  profession's perks changing"): the new one takes effect AT ONCE, and the week is a lock after it - the track's next paid
+/** A change of mind: 1,000 Marks burnt. PERK-TRIAL: the new one takes effect AT ONCE, and the week is a lock after it - the track's next paid
  *  change waits `days` from this one (Professions-Arc PERK-TRIAL). Before it, the new one waited the week, the old standing. */
 export const RESPEC = Object.freeze({ marks: 1000, days: 7 });
 /** PERK-TRIAL: A CHOICE'S TRIAL - for this long (s) after a rank's choice is made (its first, or a paid change), changing
@@ -160,7 +157,7 @@ export function respecLockUntil(row, nowS) {
 export const SURVEYOR = 'stonebreaker';
 /** `later`: the slice the choice waits for - named on its card, never chosen until then (AUDIT 29 A17). */
 const spec = (id, name, text, later = null) => Object.freeze(later ? { id, name, text, later } : { id, name, text });
-const pair = (a, b) => Object.freeze([a, b]);
+const pair = (...specs) => Object.freeze(specs);   // two choices a rank; a rank whose partner was cut holds the one left
 /** Every profession's and discipline's two choices at 50 and at 100 - the record's words. PROF1 gives Herbalism's their
  *  effect; the others take effect with their professions' slices (a track there holds no XP until then). CRAFT3: a
  *  merged craft offers its disciplines' (SPECIALISATIONS, below). */
@@ -214,17 +211,12 @@ const OWN_CHOICES = Object.freeze({
   carpentry: Object.freeze({
     50: pair(spec('bowyer', 'Bowyer', 'Bows +1 quality step (arrows take none).'),
       spec('joiner', 'Joiner', 'Furniture at half the planks.')),
-    100: pair(spec('siegewright', 'Siegewright', 'Rams +50% vitality; siege works a day sooner.'),   // PROF4: the sieges are SEAT2's - SEAT2b part two: chosen since (fortLaw.js SIEGEWRIGHT_DAYS, ramVitality)
-      spec('master-joiner', 'Master Joiner', "Furniture carries the maker's mark.")),
+    100: pair(spec('master-joiner', 'Master Joiner', "Furniture carries the maker's mark.")),
   }),
   masonry: Object.freeze({
-    // PROF11: the Quarryman's cut and the Sculptor's decor are the bench's (MASON_RECIPES, recipeLaw MASONRY_RECIPES); the
-    // Builder's and the Fortifier's act on the fortifications SEAT2b builds (server-account/src/seatForts.js) - chosen
-    // since SEAT2b, their law and helpers standing below (fortificationStone, wallsOnCapture)
-    50: pair(spec('quarryman', 'Quarryman', 'Rough Stone cuts 1:1, not 2:1.'),
-      spec('builder', 'Builder', 'Fortification projects need 10% less stone.')),
-    100: pair(spec('fortifier', 'Fortifier', "Once a Season a seat's Walls skip their drop on capture."),
-      spec('sculptor', 'Sculptor', 'Stone decor pieces.')),
+    // PROF11: the Quarryman's cut and the Sculptor's decor are the bench's (MASON_RECIPES, recipeLaw MASONRY_RECIPES)
+    50: pair(spec('quarryman', 'Quarryman', 'Rough Stone cuts 1:1, not 2:1.')),
+    100: pair(spec('sculptor', 'Sculptor', 'Stone decor pieces.')),
   }),
   alchemy: Object.freeze({
     50: pair(spec('brewer', 'Brewer', '3 potions a brew at Journeyman.'),
@@ -271,7 +263,7 @@ export const specOf = (profession, rank, specId) => SPECIALISATIONS[trackOf(prof
  * The specialisations a track stands under at `nowS`: the chosen ones, a paid change taking the place of its rank's
  * choice once its week is out. `row` is the service's track row (spec50, spec100, respec_rank, respec_to, respec_at).
  * PERK-TRIAL: a change is written at once now (`respec_to` stays empty, `respec_at` the lock's end) - the fold is for a
- * change made before it, which migration 0173 folds too. AUDIT PERK-TRIAL P8: a change written as waiting stands AT ONCE,
+ * change made before it, which it folds too. AUDIT PERK-TRIAL P8: a change written as waiting stands AT ONCE,
  * whatever its `respec_at` (now the lock): the older service, serving between the migration and the new one's deploy,
  * still wrote changes to wait their week, and they would have waited it.
  * @returns {{ 50: string|null, 100: string|null }}
@@ -286,7 +278,7 @@ export function specsAt(row, nowS) {   // CRAFT3: a merged craft's track stands 
 
 // ─── THE DAY, THE STORES, THE RATE (PROF0 6, 7, 20) ──────────────────
 
-// CAP-OFF (2026-10-07, Mac: "Remove the cap on life skills"): NO DAY'S CAP. A gathering profession gave a character 60
+// CAP-OFF: NO DAY'S CAP. A gathering profession gave a character 60
 // harvests a UTC day and an account 120 (AUDIT 29 A3), Fishing 40 hauls an account and Hunting 30 hides; none is counted
 // now. A day is bounded by the world - each node once a character a UTC day (PROF0 6), the travel between them - and by
 // the hour's writes (PROF_OPS_MAX). Two bounds stand, asked by Mac, because they bound a modified client's claim and no
@@ -295,13 +287,13 @@ export function specsAt(row, nowS) {   // CRAFT3: a merged craft's track stands 
 /** AUDIT 29 A5: the veins an account may work a UTC day in dungeons nobody has vouched for - one dungeon's most. A
  *  dungeon's id is the client's word, and an unconfirmed dungeon's least (Silver, tier 3, at any hour) was worth more
  *  than any unconfirmed pixel; a confirmed dungeon is bounded by its own veins (1-4 a day, each once a character).
- *  DEEP-OPEN (Professions-Arc.md section 53; the owner: "FULL ORE TABLE"): such a dungeon draws its whole deep table now
+ *  DEEP-OPEN (Professions-Arc.md section 53): such a dungeon draws its whole deep table now
  *  (nodeLaw.js dungeonVein - all but the climate's own Moonstone), and these four are the whole of the bound - the trade
  *  the owner accepted: a modified client that invents dungeon ids mines four full-table deep veins a day, no more. */
 export const DEEP_UNCONFIRMED_PER_DAY = 4;
 /** The Stores hold at most this many of any one material, own and bought together. */
 export const STORES_MAX = 5000;
-/** GATHER-SPEED (2026-10-11): WHETHER A NODE'S HARVEST IS GONE FROM THE WORLD - the book's word (net/profBook.js
+/** GATHER-SPEED: WHETHER A NODE'S HARVEST IS GONE FROM THE WORLD - the book's word (net/profBook.js
  *  `gone`: taken today, or being counted), so a node goes the moment its act ends, never a round trip after it. A book
  *  that says no such word answers by `taken`, as before. */
 export const goneIn = (book, key, kind) => (typeof book?.gone === 'function' ? book.gone(key, kind) : book.taken(key, kind));
@@ -354,7 +346,6 @@ export const MATERIAL_FAMILIES = Object.freeze([
   Object.freeze(['metals', 'Ores and Metals']), Object.freeze(['wood', 'Wood']), Object.freeze(['herbs', 'Herbs']),
   Object.freeze(['hides', 'Hides and Cloth']), Object.freeze(['food', 'Food']), Object.freeze(['stone', 'Stone']),
   Object.freeze(['gems', 'Gems']), Object.freeze(['essences', 'Essences']), Object.freeze(['spoils', 'Spoils of War']),
-  Object.freeze(['siege', 'Siege Works']),   // SEAT2b part two: the Ram Kit, made at the workbench (PROF0 4.8's 690)
 ]);
 /** DFU's two plant groups (itemTemplatesData.js GROUP_TEMPLATE_INDICES), as the material keys write them. */
 export const PLANT_GROUPS = Object.freeze({ p1: 'PlantIngredients1', p2: 'PlantIngredients2' });
@@ -461,8 +452,7 @@ export const GEM_DFU_PRICES = Object.freeze({ ruby: 250, emerald: 425, sapphire:
  *  425, Sapphire 375, Diamond 500, Jade 10, Turquoise 50, Malachite 25, Amber 100). The Pearl is Fishing's (PEARL, PROF8). */
 export const GEMS = Object.freeze(GEM_IDS.map((kind, k) => dfu(`gem:${kind}`, 'gems', gemTierOfPrice(GEM_DFU_PRICES[kind]), 'Gems', k)));
 /**
- * CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids" - accept every
- * grade at the jeweller): THE GRADED GEMS AS MATERIALS. The port's thirty-two rows (Gem-Sockets 4, GEM2: a Chipped, a
+ * CLOTH-GEMS: THE GRADED GEMS AS MATERIALS. The port's thirty-two rows (Gem-Sockets 4, GEM2: a Chipped, a
  * Flawed, a Flawless and a Perfect of each kind, templates 1900-1931) are pack-only socket loot - no harvest, no counter
  * and no smelt makes one - and each grade has a material key now, `gem:<gemId>` ('gem:flawless-ruby'), in DFU's Gems
  * group on its own row, its tier its graded price's band as a gem's is (gradedGemPrice, gemTierOfPrice), its name the
@@ -477,7 +467,7 @@ export const GRADED_GEMS = Object.freeze(GEM_ROW_GRADES.flatMap((grade) => GEM_I
   name: GEM_NAMES[gemId(kind, grade)],
 }))));
 /**
- * DAEDRIC-SMELT (Professions-Arc.md section 53; the owner: "the heart may come FROM LOOT OR THE GATE"): DFU'S DAEDRA'S
+ * DAEDRIC-SMELT (Professions-Arc.md section 53): DFU'S DAEDRA'S
  * HEART as the Stores keep it - its own ingredient (CreatureIngredients1 53, 500 gold: itemTemplates.json), at its price's
  * tier as a body's part is (6) - the Daedric Ingot's heart (PROF0 4.1). No door of the service counts one: no body is
  * skinned of it and no counter sells it. It enters the Stores only as a station's loose unit (bagLaw.js looseOrder - the
@@ -535,16 +525,6 @@ export const RESIN = made('wood:resin', 'wood', 1, 653, 'Resin', ICON_ALOE, null
 export const HEARTWOOD = made('wood:heartwood', 'wood', 4, 654, 'Heartwood', ICON_TWIGS, null);
 /** Every new template PROF4 registers, by template. */
 export const WOOD_TEMPLATES = Object.freeze([...LOGS, ...PLANKS, CHARCOAL, RESIN, HEARTWOOD]);
-/**
- * SEAT2b part two (PROF0 4.8: "690 | Ram Kit | Stores (a siege work)"; Seats-Arc 4.2, 6.2): THE RAM KIT AS THE STORES HOLD
- * IT - made at the workbench (recipeLaw.js `ramkit:oak`, Carpentry 60), delivered by a seat writ to a pledged challenger's
- * Siege Camp, sent at the Turning to the siege the camp won where a Gatehouse stands (fortLaw.js campSpent). A siege work
- * never leaves the Stores (NO_PACK_FORM): its whole road is the writ's. DECIDED: its tier the recipe's (5) and its worth
- * the inputs' at their tiers' values (40 Oak Planks 80, 20 Iron Ingots 20, 4 Bear Hides 8 - 108), so a writ's pay and the
- * influence a delivery raises (4.2: "own units at their value") keep the materials' - a tier's 9 would make a kit worth
- * less than its hides.
- */
-export const RAM_KIT = Object.freeze({ ...made('work:ram', 'siege', 5, 690, 'Ram Kit', ICON_IRON, null), value: 108 });
 // ─── THE HIDES PROF7 STORES (PROF0 4.4, 4.5, 4.8, 29) ────────────────
 
 /** DFU's pictures the hides and the cloth borrow (law 6). FOUND (PROF0 29): 4.8's "DFU Small Skins" and "Large Skins"
@@ -563,7 +543,7 @@ const MOB = Object.freeze({
   Dragonling: 34, DragonlingAlternate: 40, Dreugh: 41,
 });
 /** FIELD BUGS 2026-10-20h DEX-HIDES: Daggerfall Enemy Expansion's animals by their own ids (its MonsterBase.mdb.csv ID
- *  column - bible/04-Characters/Enemy-Expansion.md section 5), the nine rows of Animal affinity among its fifty. The
+ *  column), the nine rows of Animal affinity among its fifty. The
  *  classic ten skin every classic Animal row, and so do these: a DEX Bat, Wolf or Mudcrab carries its own id, never a
  *  MobileTypes value, and was no body the knife knew. The Hell Hound (264) is a daedra and the Lizard Men and the Troll
  *  are people - no hide, as no classic daedra or person gives one. */
@@ -618,7 +598,7 @@ export const HIDES = Object.freeze([
 /** The hide a foe's body gives, by its MobileTypes value (or, DEX-HIDES, Daggerfall Enemy Expansion's own id), or null for a
  *  body no knife takes a hide from. */
 export const hideOfFoe = (mobileType) => (Number.isSafeInteger(mobileType) ? HIDES.find((h) => h.foes.includes(mobileType)) ?? null : null);
-/** Hunting's Bear Hide - the Ram Kit's (PROF0 25). */
+/** Hunting's Bear Hide. */
 export const BEAR_HIDE = HIDES[2];
 /** The leathers (4.4: 665, 666): Cured the cure of tiers 1-3, their middle, tier 2; Hardened of tiers 4-6, tier 5. */
 export const CURED_LEATHER = made('leather:cured', 'hides', 2, 665, 'Cured Leather', ICON_GARMENT, null);
@@ -699,13 +679,13 @@ export const SCHOOL_FISH = Object.freeze({ plain: 1, netter: 2 });
  *  hauls bound it, and CAP-OFF lifted that bound from the hauls and never from the school: every haul of a lying client
  *  claimed one, the act's report moving the yield by +117% (a Netter's +183%) past 5.1's +50%. Forty schools an account a
  *  day - twenty pixels' worth, two a pixel - and the hauls themselves uncapped. AUDIT LOCKPICK D2: the schools that counted
- *  are counted (the harvest row's `school`, migration 0176), never every haul - an honest angler's first school after forty
+ *  are counted (the harvest row's `school`), never every haul - an honest angler's first school after forty
  *  plain hauls was refused its fish. */
 export const SCHOOL_HAULS_DAY = 40;
 /** The finds, a haul each (5.2): at sea, on ground the witnesses confirmed, a Pearl 1 in 50 (a Pearl Diver's x3, a
  *  Deep-Sea's x2) and a Slaughterfish 1 in 100 (a Deep-Sea's x2); a trophy 1 in 200 anywhere. */
 export const FISH_CHANCE = Object.freeze({ pearl: 1 / 50, slaughterfish: 1 / 100, trophy: 1 / 200, pearlDiver: 3, deepSea: 2 });
-/** XP FOLLOWS THE RANK (Mac, 2026-09-30: "XP follows your rank"): a haul is worked at the highest tier the rank opens.
+/** XP FOLLOWS THE RANK: a haul is worked at the highest tier the rank opens.
  *  Raw Fish is tier 1, and a tier more than two below the rank's is quartered (harvestXp), so a haul worked at its
  *  catch's tier would have held Fishing at a Novice's pace for good; at the rank's own tier it climbs as the others do. */
 export const haulTier = (rank) => topTierOf(rank);
@@ -813,7 +793,7 @@ export const WEAVERS_STOCK = Object.freeze([
  *  (REAGENTS' `value`), straight into the Stores, bought, never own: a Marks sink, never a purse-gold purchase. Without it
  *  the brewing act could make none of the twenty potions. */
 export const APOTHECARY_STOCK = Object.freeze(REAGENTS.map((r) => Object.freeze({ key: r.key, marks: /** @type {number} */ (r.value), counter: 'apothecaries' })));
-/** AUDIT 32 S1 (Mac, 2026-09-30: "Whatever you think is best"): THE GOODS A COUNTER SELLS WITHOUT END that S1 judges - 4.5's
+/** AUDIT 32 S1: THE GOODS A COUNTER SELLS WITHOUT END that S1 judges - 4.5's
  *  Linen and Wool, and the Apothecaries' sixteen, never gathered. A recipe made wholly of them earns its craft's XP, and its
  *  first-craft bonus only where its units are the character's own (recipeLaw firstCraftPays) - CLOTH-GEMS: the loom makes
  *  Linen and Wool of the world's goods now (WEAVE_RECIPES, SPIN_RECIPES), and S1 judges the units, never the material:
@@ -853,14 +833,14 @@ export const stockOf = (key) => STOCKS.find((s) => s.key === key) ?? null;
 /** Units a purchase, at most. */
 export const STOCK_MAX = 100;
 /** The materials with no pack form - none since PROF7, which registered the hides', the leathers' and the cloth's
- *  templates (PROF4 the planks' and Charcoal's before it), until SEAT2b part two made the Ram Kit: a siege work never
- *  leaves the Stores but by a Siege Camp's writ. AUDIT PROF12 E1: nor does Arcane Essence - in the pack it sold to any
+ *  templates (PROF4 the planks' and Charcoal's before it).
+ *  AUDIT PROF12 E1: nor does Arcane Essence - in the pack it sold to any
  *  shop at its DFU worth (32 gold), a gold faucet a ring's 18 Essence deep and a silver-to-gold road around the Bank's
  *  rate; its uses are the Stores' (the market, Runecaster's roll to come), and it stays where they read it. */
-export const NO_PACK_FORM = Object.freeze(['work:ram', 'essence:arcane']);   // SEAT2b part two: a siege work's road is the writ's (RAM_KIT); AUDIT PROF12 E1: Arcane Essence's the Stores'
+export const NO_PACK_FORM = Object.freeze(['essence:arcane']);   // AUDIT PROF12 E1: Arcane Essence's the Stores'
 /** Whether the Stores may give a material to the pack. */
 export const withdrawable = (key) => !NO_PACK_FORM.includes(key);
-const MINED = new Map([...METALS, ...ORES, ...INGOTS, ...STONES, ...GEMS, SIEGE_GEM, PEARL, ...WOOD_TEMPLATES, ...HIDE_TEMPLATES, ...PARTS, ...MASONRY_TEMPLATES, RAM_KIT, ...REAGENTS, ARCANE_ESSENCE].map((m) => [m.key, m]));
+const MINED = new Map([...METALS, ...ORES, ...INGOTS, ...STONES, ...GEMS, SIEGE_GEM, PEARL, ...WOOD_TEMPLATES, ...HIDE_TEMPLATES, ...PARTS, ...MASONRY_TEMPLATES, ...REAGENTS, ARCANE_ESSENCE].map((m) => [m.key, m]));
 /** CLOTH-GEMS: the loose door's materials, read as every material is (minedMaterial, materialOf) and listed apart from
  *  MINED_KEYS - the market's catalogue - so no market, writ or guild names one. DAEDRIC-SMELT (Professions-Arc.md section
  *  52): and the Daedra's Heart, loot's word as a graded gem is (LOOSE_ONLY_KEYS). */
@@ -1054,20 +1034,19 @@ export const SAW_RECIPES = Object.freeze(LOGS.map((l) => recipe(`saw:${woodOf(l.
  *  and the loom are Outfitting's one station. No XP: a hide's was its skinning's, as a log's was its fall's (PROF0 25).
  *  DEX-HIDES (FIELD BUGS 2026-10-20h): by the hide's tier, the ten's order kept - a leather's cures stand cheapest first,
  *  as a chain plans them (chainLaw.js producersOf), so the Mudcrab Chitin's stands beside the Rat Pelt's. AUDIT FB1021
- *  L2-1: the Bear Hide last of its tier - it is the Ram Kit's too, and a chain for Cured Leather spent every one before a
+ *  L2-1: the Bear Hide last of its tier, and a chain for Cured Leather spent every one before a
  *  Wolf Pelt or a Boar Hide. */
 export const CURE_RECIPES = Object.freeze(HIDES.filter((h) => h.cures).sort((a, b) => a.tier - b.tier || Number(a === BEAR_HIDE) - Number(b === BEAR_HIDE)).map((h) => recipe(`cure:${h.key.slice('hide:'.length)}`, /** @type {string} */ (h.cures), [[h.key, 2]],
   { station: 'loom', more: Object.freeze({ profession: 'hunting', spec: 'tanner', per: 2, rank: 50 }), xp: null })));
 /**
- * CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids" and, of Linen and
- * Wool, craft them - Professions-Arc 4.5, 50): THE CLOTH THE LOOM MAKES. Daggerfall grows no flax and keeps no sheep, so
+ * CLOTH-GEMS: THE CLOTH THE LOOM MAKES. Daggerfall grows no flax and keeps no sheep, so
  * its own goods stand in, each Hunting's or Herbalism's already (a Ledger A departure - Daggerfall weaves nothing):
  * - LINEN is woven from ROOT TENDRILS (`LINEN_FIBRE`, DFU's template 12 - the one fibrous plant of both of DFU's plant
  *   groups, so a recipe a land, the arrows' Twigs' law), a common herb of the MountainWoods, the HauntedWoodlands and the
  *   Swamp (nodeLaw HERB_TABLES), and one the winter keeps: `LINEN_IN` a bolt.
  * - WOOL is spun from a FUR (`WOOL_FURS`): the Rat Pelt, the Wolf Pelt, the Boar Hide, the Bear Hide and the Tiger Pelt -
  *   recipeLaw PELTS' furs less the Bat Leather, a wing's skin no fleece grows on - `SPIN_IN` a bolt, a hide's cure's two
- *   (4.4). Cheapest first, the Bear Hide last of its tier (it is the Ram Kit's - AUDIT FB1021 L2-1's law for the cures);
+ *   (4.4). Cheapest first, the Bear Hide last of its tier (AUDIT FB1021 L2-1's law for the cures);
  *   the Tiger Pelt a tier above the Wool it spins, a press the player makes, never a chain's (chainLaw never trades down).
  * No XP, as a cure and the Silk's weave give none: the herb's and the hide's were their gathering's. A bolt is own where
  * its goods were (smeltOrigin), and AUDIT 32 S1 reads that: a piece of the loom's own cloth pays its first-make 500, one
@@ -1110,7 +1089,7 @@ export const MASON_RECIPES = Object.freeze([
 export const TRANSMUTE_LADDER = Object.freeze(['metal:tin', 'metal:copper', 'metal:silver', 'metal:gold', 'metal:platinum']);
 /** The Transmuter - Alchemy's choice at 100 - the one door to a transmutation (`spec`, smeltAtForge's `prof-transmuter`). */
 export const TRANSMUTER = Object.freeze({ profession: 'alchemy', rank: 100, id: 'transmuter' });
-/** Two of a metal a transmutation takes, and the Mercury that turns them (4.1) - AUDIT PROF12 E3 (Mac: "2 + Mercury -> 1"):
+/** Two of a metal a transmutation takes, and the Mercury that turns them (4.1) - AUDIT PROF12 E3:
  *  Mac's choice, 2026-10-03, over 3.3's three - a Mercury and two of a metal make one of the next. */
 export const TRANSMUTE_IN = 2;
 export const TRANSMUTE_MERCURY = 1;
@@ -1201,61 +1180,6 @@ export function craftLimitOf(tracks, profession) {
  *  (ui/craftXpWords.js). */
 export const creditedXp = (earned, room) => Math.max(0, Math.min(Number(earned) || 0, room));
 
-// ─── PROF11: THE BUILDER AND THE FORTIFIER - SEAT2b'S TO CALL (PROF0 3.3; SEAT0 7.5) ───
-//
-// Masonry's two seat choices act on what SEAT2b builds - the fortification projects (SEAT0 7.5: each tier's materials
-// delivered to the seat's stockpile by writs) and a capture's tier down ("When the seat changes hands each drops one
-// tier") - and no fortification stands yet. So the law and its helpers stand here, pure and pinned
-// (test/net/prof11_law.test.js), for SEAT2b to call; which member's choice stands for a seat (a project's Builder, a
-// capture's Fortifier) is SEAT2b's to say. Both are chosen now - they cost nothing until a seat reads them.
-
-/** The Builder (3.3: "fortification projects need 10% less stone"): the share of a project's stone taken off, percent. */
-export const BUILDER_STONE_OFF_PCT = 10;
-/** Whether a track stands as a Builder - its choice at 50 (specsAt's shape, `{ 50, 100 }`). */
-export const isBuilder = (specs) => specs?.[50] === 'builder';
-/**
- * The stone a fortification project needs: `need` units, a Builder's a tenth fewer - rounded UP (DECIDED: a need of
- * whole units is never cut by more than 3.3's tenth; every SEAT0 7.5 count is a multiple of ten, so its 400 is 360 and
- * its 1,600 1,440 exactly). A need that is no whole count is none.
- */
-export function fortificationStone(need, builder = false) {
-  if (!Number.isSafeInteger(need) || need <= 0) return 0;
-  return builder ? Math.ceil((need * (100 - BUILDER_STONE_OFF_PCT)) / 100) : need;
-}
-/**
- * A project's needs (`{ [material]: units }` - SEAT0 7.5's "400 Cut Stone, 100 Oak Planks"), a Builder's stone cut
- * (fortificationStone) - the stone the Stores' 'stone' family holds (Cut Stone, the 7.5 table's; Rough Stone and Mortar
- * where a project asks them); every other material, and the Marks (no material), as asked. A fresh object.
- */
-export function fortificationNeeds(needs, builder = false) {
-  const out = {};
-  for (const [key, n] of Object.entries(needs ?? {})) out[key] = minedMaterial(key)?.family === 'stone' ? fortificationStone(n, builder) : n;
-  return out;
-}
-/** The Fortifier (3.3: "once a Season a seat's Walls skip their drop on capture"): the saves a Fortifier has a Season. */
-export const FORTIFIER_SAVES_A_SEASON = 1;
-/** The one work a Fortifier keeps from its drop: the Walls (SEAT0 7.5's first row) - every other drops its tier. */
-export const FORTIFIER_WORK = 'walls';
-/** Whether a track stands as a Fortifier - its choice at 100. */
-export const isFortifier = (specs) => specs?.[100] === 'fortifier';
-/** SEAT2b part two (3.3: "Siegewright - Rams +50% vitality; siege works a day sooner"): a character standing as a
- *  Siegewright - Carpentry's choice at 100 (`specs` its Carpentry track's, specsAt). */
-export const isSiegewright = (specs) => specs?.[100] === 'siegewright';
-/** Whether a Fortifier who has saved Walls `saves` times this Season (SEAT2b keeps the count, a Season's) may save more. */
-export const fortifierReady = (saves = 0) => (Number.isSafeInteger(saves) ? saves : FORTIFIER_SAVES_A_SEASON) < FORTIFIER_SAVES_A_SEASON;
-/**
- * A seat's WALLS AT A CAPTURE (SEAT0 7.5: one tier down): `{ tier, saved }` - kept at their tier, and the save `saved`
- * (SEAT2b counts it to the Fortifier's Season), where a Fortifier stands for them whose Season's save is unspent; else
- * one tier down. Walls at tier 0 have no drop to skip and spend no save. `fortifier` - whether a Fortifier stands for
- * the seat's Walls; `saves` - the saves that Fortifier has spent this Season.
- */
-export function wallsOnCapture(tier, { fortifier = false, saves = 0 } = {}) {
-  const t = Number.isSafeInteger(tier) && tier > 0 ? tier : 0;
-  if (t === 0) return { tier: 0, saved: false };
-  if (fortifier === true && fortifierReady(saves)) return { tier: t, saved: true };
-  return { tier: t - 1, saved: false };
-}
-
 // ─── COURT WRITS (PROF0 11) ──────────────────────────────────────────
 
 /** A region's Court writs a UTC day: 6 x max(1, ceil(active / 100)). */
@@ -1269,8 +1193,7 @@ export const WRIT_UNITS = Object.freeze({
 });
 /** A writ's pay: units x the material's Marks value x 1.2. */
 export const writPay = (units, value) => (units * value * 6) / 5;
-/** A writ's Renown XP: 25 x tier x units / 10 at the full rate - MERGE 2 (main's RENOWN-ACCOUNT, Mac: "reducing the
- *  accumulation of renown from resources a bit"): at renown.js RENOWN_RATE_PCT, three quarters, taken by its one door
+/** A writ's Renown XP: 25 x tier x units / 10 at the full rate - MERGE 2 (main's RENOWN-ACCOUNT): at renown.js RENOWN_RATE_PCT, three quarters, taken by its one door
  *  (renownRate, floored to a whole XP), as every other source's is. A tier-2 writ of 30 units, 150 at the full rate,
  *  pays 112. */
 export const writRenown = (tier, units) => renownRate((25 * tier * units) / 10);

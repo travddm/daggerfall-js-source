@@ -1,5 +1,5 @@
 // @ts-check
-// PASSAGE (2026-10-19, the owner: "buy and ride a friendly boat (if one is docked) at any port"; bible/03-World/Passage.md)
+// PASSAGE
 // - A BERTH'S SHIP, BOOKED: the sea's half of the passage. AUDIT PASSAGE D-M1 (HOST-SPLIT, THE HOSTS DO NOT GROW): it was
 // four functions in createNavalHost's own scope; it is a module the naval host builds once over its state (by getters,
 // fishHost.js's shape) and wires into Activate, takesActivate, its frame's hint and its face. The voyage itself is

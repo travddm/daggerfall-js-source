@@ -1,5 +1,5 @@
 // @ts-check
-// BOUNTY1 (Mac, 2026-09-28: "board quests can be a green circle", then "make the circles black green area already
+// BOUNTY1 (, then "make the circles black green area already
 // players on the map"): A HELD BOUNTY'S PIXEL, ON BOTH MAPS - in black, since green is the party's.
 //
 // The host hands the maps a FUNCTION (`bounties: () => marks[]`, beside WB1's `gate`) and neither map learns what a
@@ -21,9 +21,8 @@ export const BOUNTY_LEGEND_RIM_CSS = '#e6dccb';
 export const BOUNTY_LEGEND_TEXT = 'Bounty';
 /** The circle's radius, map pixels: the target pixel inside it with a ring of its neighbours as the band. */
 export const BOUNTY_RING_R = 1.5;
-/** RVN7c (bible/12-Enhanced-AI/Feud-Arc.md 18.3): A REVENANT'S LAIR the player has heard of - the same circle, in blood
- *  red, with its name; `revenants: () => marks[]` beside `bounties` in the host's map deps (systems/revenant/revenant.js
- *  revenantMapMarks), read by the same reader. */
+/** RVN7c (18.3): A REVENANT'S LAIR - the same circle, in blood red, with its name; `revenants: () => marks[]` beside
+ *  `bounties` in the host's map deps, read by the same reader. Revenants keep no lair now, so no host supplies it. */
 export const REVENANT_RING_CSS = '#7a0a0a';
 export const REVENANT_FILL_CSS = 'rgba(122, 10, 10, 0.16)';
 export const REVENANT_DOT_RGB = Object.freeze([122, 10, 10]);
@@ -33,7 +32,7 @@ export const BOUNTY_MARKS_MAX = 8;
 
 /**
  * The host's marks, read and checked - an empty list for none, a throw, or anything a map could not place - `max` at
- * most (AUDIT POI R7: a reader of more circles than a hunter's names its own cap - ui/poi/poiMapMark.js POI_MARKS_MAX).
+ * most.
  * @param {(() => any) | undefined} fn
  * @param {{width:number, height:number}} size the map, in pixels
  * @returns {Array<{cx:number, cy:number, r:number, label:string}>}
@@ -52,6 +51,14 @@ export function readBountyMarks(fn, size, fallbackLabel = BOUNTY_LEGEND_TEXT, ma
     if (out.length >= max) break;
   }
   return out;
+}
+
+/** LAIR-WORLD: the host's marks over a BOX of map pixels (`{ x0, y0, w, h }` - the held map's continent
+ *  frame while it is shown, tamrielFrameInBay; else the Bay's own sheet), as WW2's rings past the Bay are read
+ *  (ui/gate/gateMapMark.js readGateMarks): a hunt past the Bay is drawn where the Bay's sheet would drop it. */
+export function readBountyMarksIn(fn, box, fallbackLabel = BOUNTY_LEGEND_TEXT, max = BOUNTY_MARKS_MAX) {
+  const shifted = () => { const l = typeof fn === 'function' ? fn() : null; return Array.isArray(l) ? l.map((m) => (m && typeof m === 'object' ? { ...m, cx: m.cx - box.x0, cy: m.cy - box.y0 } : m)) : l; };
+  return readBountyMarks(shifted, { width: box.w, height: box.h }, fallbackLabel, max).map((m) => ({ ...m, cx: m.cx + box.x0, cy: m.cy + box.y0 }));
 }
 
 /** What a map repaints on: the circles and their words. */

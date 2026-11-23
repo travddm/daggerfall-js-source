@@ -1,16 +1,15 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// SILVER-WAYS (2026-10-03, Mac: "Do it") - GUILD CONTRACTS, AS THE SERVICE
+// SILVER-WAYS - GUILD CONTRACTS, AS THE SERVICE
 // KEEPS THEM. A contract is a guild writ for DEEDS: a guild puts up `pay`
 // silver for each defender of a raid in a region, `deeds` of them, held
 // from its treasury while it stands; every account a raid's receipt counts
 // there is paid by it as its claim is counted (raids.js claimRaid's own
 // batch), less the market's 5% tax. The law both ends read is
 // src/net/writLaw.js (GUILD CONTRACTS); the record is
-// bible/06-Systems/Professions-Arc.md 10.5 and bible/06-Systems/Online-Arc.md
+// 10.5 and
 // SILVER-WAYS.
 //
-// ═══ IT MINTS NOTHING ═══════════════════════════════════════════════
+// IT MINTS NOTHING
 //
 // Every line here moves silver a guild already holds: the treasury to the
 // ledger's `escrow` end at the post, the escrow to a defender (and its tax
@@ -18,7 +17,7 @@
 // seventh day. A guild of gatherers pays a guild's fighters without a coin
 // struck.
 //
-// ═══ ONE STATEMENT DECIDES, AND A REQUEST ASKED TWICE IS ONE ════════
+// ONE STATEMENT DECIDES, AND A REQUEST ASKED TWICE IS ONE
 //
 // PROF6's law (writs.js), whole: a post or a withdrawal is one batch whose
 // first statement writes its row with a fresh nonce only where every
@@ -28,20 +27,19 @@
 // nothing, and one that is pays each contract once - (contract, raid,
 // account) is the pay row's key.
 //
-// ═══ SETTLED ON READ ════════════════════════════════════════════════
+// SETTLED ON READ
 //
 // A contract past its seventh day is closed, and its escrow home, by the
 // next Work read of anyone - the guild writs' close.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═══════════════════════════════════════════════════════════════════
 import { accountKind, displayName, mintId, overRate } from './accounts.js';
 import { guildActorOf } from './guilds.js';
 import { marksOpenFor, guildBalanceOf } from './marks.js';
 import { CHAR_ID_RE } from './service.js';
 import { heraldryOfRow } from './halls.js';
 import { MARKS_MAX, utcDay } from '../../src/net/marksLaw.js';
-import { regionOk } from '../../src/net/nodeLaw.js';
+import { regionOk } from '../../src/net/nodeLaw.js';   // WW7-5: a town book's region any of the world's
 import { MARKET_TAX_PCT } from '../../src/net/marketLaw.js';   // AUDIT SILVER-WAYS B1: a deed's tax reckoned in the batch (deedTaxSql - saleTaxOn's law)
 import { GUILD_RANK_MASTER } from '../../src/net/guild/guildLaw.js';
 import {

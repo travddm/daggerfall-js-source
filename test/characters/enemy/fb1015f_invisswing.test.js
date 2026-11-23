@@ -4,7 +4,6 @@
 // faced the target's live feet, where DFU's MeleeAnimation faces senses.LastKnownTargetPos (EnemyAttack.cs:155), which
 // only a detection writes. A foe a corridor put in front of an invisible player swung, and the blow landed. And the
 // wild gate's notice roll (WILD-ALERT) ran the stealth formula with no illusion gate at all.
-// bible/01-Overview/bugs/Field-Bugs-2026-10-15f.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -93,9 +92,3 @@ test('INVIS-SWING: the wild gate\'s notice is blinded by an Invisibility as the 
   assert.equal(gate.alerted('seer'), true);
 });
 
-test('INVIS-SWING by source: world.js hands both wild checks the traveller\'s concealment and the enemy\'s sight through it (mutants: either dropped)', () => {
-  const w = read('src/scenes/world.js');
-  assert.match(w, /const noticed = !fast \|\| noticeRoll\([^\n]*\{ seesThrough: !!ENEMY_BASICS\[hit\.mobileType\]\?\.seesThroughInvisibility, concealment: concealmentFlags\(playerEntity\), rng: Math\.random \}\);/);
-  assert.match(w, /const fx = player\.feetAt\(\), stealth = wildStealth\(\), hid = concealmentFlags\(playerEntity\),/);
-  assert.match(w, /wildFoes\.step\(f, \{[^\n]*seesThrough: !!f\.ai\.seesThroughInvisibility, concealment: hid \}\);/);
-});

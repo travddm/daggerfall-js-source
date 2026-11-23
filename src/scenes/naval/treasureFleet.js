@@ -1,7 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// SEA-EVENTS (2026-10-22, the owner: "Build ever single bit of this and dont return until its perfected"; bible/03-World/
-// Eltheric-Ocean.md SEA-EVENTS) - THE TREASURE FLEET AT SEA: the sailing's ships (systems/sea/seaEvents.js fleetOf - where
+// SEA-EVENTS - THE TREASURE FLEET AT SEA: the sailing's ships (systems/sea/seaEvents.js fleetOf - where
 // the shared clock puts each, the world host's feed) stood in the naval host's sea, steered along their route, let go out
 // of reach, and the flagship's spoils paid. HOST-SPLIT: the naval host constructs it once and asks it (raiders()' and
 // liners()' shape, out of createNavalHost).

@@ -1,5 +1,4 @@
-// REL4 (2026-09-29, Mac: "How can we drastically improve the install
-// experience? ... I really want to make it AAA grade"): THE RELEASE IS
+// REL4: THE RELEASE IS
 // PUBLISHED WHOLE, ONCE, WITH NOTES A PLAYER CAN READ.
 //
 // What the releases looked like before this, read off GitHub:
@@ -30,8 +29,7 @@
 // GitHub's list of merged changes below them for the record; the
 // desktop app's launcher shows the same body in its news (DA10).
 //
-// REL6 (2026-10-01, Mac: "Remove patch notes from the codebase and
-// somehow refrain from patch notes filling up the codebase"): THE NOTES
+// REL6: THE NOTES
 // COME OFF THE PULL REQUEST. They were PATCH-NOTES-*.md files committed
 // at the repository's root - 147 by #541, each read by one release and
 // then kept in the tree for good. A pull request now carries its
@@ -42,7 +40,7 @@
 // tree, and test/tooling/rel4_release.test.js fails any patch-notes file
 // committed to it (PATCH_NOTES_PATH_RE).
 //
-// DA13 (2026-10-14, Mac: "B only: per-file channel"): THE GAME RIDES BESIDE THE INSTALLERS, A FILE AT A TIME. The
+// DA13: THE GAME RIDES BESIDE THE INSTALLERS, A FILE AT A TIME. The
 // installers carried the whole built site in one archive, and an update re-downloaded most of it (~130 MB of a 240 MB
 // installer, measured off the published blockmaps). Every release now also carries the game as one pack of files each
 // compressed on its own, and a manifest of where each stands (`pack`, app/lib/gameChannel.cjs), and every installer

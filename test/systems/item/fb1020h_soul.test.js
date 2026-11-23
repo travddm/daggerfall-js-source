@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-20h (SOUL-LAW, TRADE-WHOLE; bible/01-Overview/bugs/Field-Bugs-2026-10-20h.md) - the Discord's "Soul
+// FIELD BUGS 2026-10-20h (SOUL-LAW, TRADE-WHOLE) - the Discord's "Soul
 // Trap (Ogre)" report: a Soul Gem holding an Ogre's soul, and the realm's word that its trapper's trading was frozen.
 // The Ogre is one of Daggerfall Enemy Expansion's fifty (DEX1, on by default the day of the report), mobile id 282. The
 // soul trap's kill door fills a gem with the foe's mobile id (mysticism.js attemptSoulTrap, as EnemyEntity.cs:217 hands
@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process';
 import worker from '../../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../../server-account/src/signing.js';
 import { judgeSave } from '../../../server-account/src/judge.js';
-import { SESSION_KEY } from '../../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../../src/net/accountClient.js';
 import { ACCEPTED } from '../../../src/net/legalLaw.js';
 import { createTradeManager, tradeUnreadableText } from '../../../src/net/tradeSession.js';
 import { validTradeData } from '../../../src/net/wire.js';
@@ -93,7 +93,7 @@ test('SOUL-LAW: every creature a soul gem can hold - DFU\'s 62 and the mod\'s fi
   // spell, which fills the Star first (SoulTrap.cs:126-134)
   assert.deepEqual(refused(() => createArtifact(MAGIC, 9)), [], 'Azura\'s Star');
   // the install's registry is exactly these: no creature the game fields that the sweep did not ask
-  installEnemyExpansion({ on: true, meaner: false, log: () => {} });
+  installEnemyExpansion({ on: true, mudex: false, log: () => {} });
   assert.deepEqual(Object.keys(ENEMY_BASICS).map(Number).sort(byId), [...CLASSIC, ...MOD]);
   assert.equal(itemNameParts(filled(createEmptySoulTrap(), OGRE)).name, 'Soul Trap (Ogre)', 'ItemHelper.ResolveItemLongName\'s soul tail (ItemHelper.cs:352-368)');
 });
@@ -137,7 +137,7 @@ test('SOUL-LAW through the realm: a character traps an Ogre\'s soul, checkpoints
   const tabs = {};
   for (const me of ['A', 'B']) {
     const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
-    const kept = new Map([[SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })]]);
+    const kept = new Map([[SERVICE_KEY, 'https://accounts.invalid'], [SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })]]);
     const storage = { get length() { return kept.size; }, key: (i) => [...kept.keys()][i] ?? null, getItem: (k) => (kept.has(k) ? kept.get(k) : null), setItem: (k, v) => { kept.set(k, String(v)); }, removeItem: (k) => { kept.delete(k); } };
     const io = realmIo({ fetch: (u, i) => worker.fetch(new Request(u, i), env), storage });
     const char = await seatRealm(env, g.secret, ents[me].name, JSON.parse(snap(ents[me])));

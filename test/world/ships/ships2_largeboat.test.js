@@ -1,5 +1,4 @@
-// SHIPS-2 (2026-10-07, Mac, sending Tiny_Ship.fbx: "implement both of these new ship placement models, UV Map/Texture,
-// and ensure it matches the love we gave the other new ship model we implemented") - the new large boat (hull 1) held to
+// SHIPS-2 - the new large boat (hull 1) held to
 // her model: the mod's seven sail plans by the mod's own names, each plan's rig swept clear of itself, her solids and
 // her helmsman, her parts fitted to one another, her helm, her swivels firing from their barrels, HULL_BUILDS' Large
 // Boat measured off her (her rig boxes her own plan's canvas), her pictures, and the loader's and the builds' fallback to

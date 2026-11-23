@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF5 (2026-09-29, Mac: "Continue") - THE MARKET: what a listing, a
+// PROF5 - THE MARKET: what a listing, a
 // sale, a courier and a buy order are, and every bound both ends read.
-// The record is bible/06-Systems/Professions-Arc.md 10.2-10.5 and 26.
+// The record is 10.2-10.5 and 26.
 //
 // A LISTING is a Stores material (escrowed by the service - the units
 // leave the Stores at once) or a crafted piece with a provenance id (the
@@ -24,7 +24,7 @@
 import { STORES_MAX, MATERIAL_FAMILIES, MINED_KEYS, FOOD_KEYS, PLANT_GROUP_TEMPLATES } from './professionLaw.js';   // MARKET-ANY: and the Stores' forms
 import { PROVENANCE_RE, recipeById, takesQuality, MASTERWORK, RECIPES } from './recipeLaw.js';   // BOARD-SIFT: a search's recipes
 import { MARKS_MAX } from './marksLaw.js';
-import { witnessedFact, factConfirmed, material } from './nodeLaw.js';
+import { witnessedFact, factConfirmed, material, pixelOk } from './nodeLaw.js';   // WW7-5: a board's pixel the world's grid's
 import { tradeableRecord, boundRecord, BOAT_TEMPLATES, GOLD_PIECES_TEMPLATE, VALUE_IS_IDENTITY_TEMPLATES } from './realm/realmTradeLaw.js';   // MARKET-ANY: the trade's own law of what may leave a record
 
 /** A listing stands this long (10.2: 72 hours). */
@@ -88,10 +88,9 @@ export const CRAFTED_FAMILIES = Object.freeze([
 export const MARKET_FAMILIES = MATERIAL_FAMILIES;
 
 // ─── BOARD-SIFT: PAGES, ORDERS, A SEARCH OF THE PIECES ───────────────
-// (2026-10-21, feature-feedback: "The notice board market also doesnt show everything if there are too many
-// weapons/armor/etc listed it stops after a certain number") - a view showed its first MARKET_SHOWN rows and nothing
+// a view showed its first MARKET_SHOWN rows and nothing
 // past them. The views of pieces and of buy orders turn pages of MARKET_SHOWN now, every filter read in the query
-// itself so a page is a page (bible/06-Systems/Professions-Arc.md 10.13).
+// itself so a page is a page (10.13).
 
 /** The views read a page at a time. Materials is not: its first look is the Bay's cheapest hundred of every material,
  *  and its search, family and tier reach any material - each to its own cheapest hundred, its market's front. */
@@ -181,7 +180,7 @@ export const saleTitheOn = (before, total, pct = MARKET_TITHE_PCT) => saleTithe(
 /** What the seller receives of a sale: the price less the tax and the Tithe (10.4). */
 export const sellerGets = (total, tithePct = MARKET_TITHE_PCT) => total - saleTax(total) - saleTithe(total, tithePct);
 
-// ─── GOLD-MARKET (2026-09-30, Mac: "Allow trading with gold or drakes on the marketplace"; "Gold listings, walled") ───
+// ─── GOLD-MARKET ───
 //
 // A listing names its currency: Drakes (`marks`, the code's name for them) as ever, or GOLD - a realm character's own
 // gold, paid off its record on the service and held for its seller until collected into a bank account. Buy orders,
@@ -210,11 +209,12 @@ export function goldSaleOf(before, total) {
 /** An amount of gold in words, as the game's own windows say it. */
 export const goldText = (n) => `${Number(n).toLocaleString('en-US')} gold`;
 
-/** A map pixel as `world_witness` keeps a hub's: "x,y" - MAPS.BSA's 1000 x 500 (mapsFile.js). */
+/** A map pixel as `world_witness` keeps a hub's: "x,y" - MAPS.BSA's 1000 x 500 (mapsFile.js); WW7-5: the world's grid
+ *  (net/nodeLaw.js pixelOk - a board past the Bay its town's pixel there). */
 export const hubReport = (x, y) => `${x},${y}`;
-export const hubPixelOk = (x, y) => Number.isSafeInteger(x) && Number.isSafeInteger(y) && x >= 0 && x < 1000 && y >= 0 && y < 500;
+export const hubPixelOk = (x, y) => pixelOk(x, y);
 export function parseHubReport(s) {
-  const m = typeof s === 'string' ? /^(\d{1,3}),(\d{1,3})$/.exec(s) : null;
+  const m = typeof s === 'string' ? /^(-?\d{1,4}),(-?\d{1,4})$/.exec(s) : null;
   if (!m) return null;
   const x = Number(m[1]), y = Number(m[2]);
   return hubPixelOk(x, y) ? { x, y } : null;
@@ -308,7 +308,7 @@ export function marketCatalogue() {
  *  names three switches, and the market needs each). */
 export const marketOpen = (board, prof, marks) => board === true && prof === true && marks === true;
 
-// ─── PROF5b: TIMED AUCTIONS FOR MASTERWORKS (10.2, bible/06-Systems/Professions-Arc.md 27) ─────
+// ─── PROF5b: TIMED AUCTIONS FOR MASTERWORKS (10.2, 27) ─────
 
 /** An auction stands this long (10.2: 24 hours). */
 export const AUCTION_S = 24 * 3600;

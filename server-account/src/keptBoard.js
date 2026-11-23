@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// KEPT-BOARD (AUDIT LEAN-READS B1/B10, 2026-10-20; bible/11-Multiplayer/
-// Scale-Arc.md AUDIT LEAN-READS) - WHAT A KEPT BOARD'S ROW SAYS OF THE CODE
+// KEPT-BOARD (AUDIT LEAN-READS B1/B10, 2026-10-20; docs/multiplayer/relay-scaling-and-cost.md) - WHAT A KEPT BOARD'S ROW SAYS OF THE CODE
 // THAT KEPT IT, AND HOW LARGE ONE MAY BE.
 //
 // The yards (decor.js), the region's traders (market.js) and the arena's
@@ -12,7 +10,6 @@
 // for a quiet town's yards, never. So each row carries its SHAPE, a hash
 // of the reads' own text and the bounds they are built with, and a row of
 // another shape is no board: read again, and kept again in this one's.
-// ═══════════════════════════════════════════════════════════════════
 
 /** A shape: FNV-1a (32 bits, hex) over the parts - the reads' SQL text and every constant they are built with. */
 export function shapeOf(/** @type {(string | number)[]} */ ...parts) {

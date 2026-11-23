@@ -1,4 +1,4 @@
-// EL5 (2026-09-17, THE FIELD): THE LANE ON A REAL GPU.
+// EL5: THE LANE ON A REAL GPU.
 //
 // Every Enhanced Lighting pin runs on a fake GL that compiles anything and
 // draws nothing. The first field report ("the lights from inside the city

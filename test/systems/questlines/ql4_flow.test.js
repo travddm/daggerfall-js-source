@@ -1,4 +1,4 @@
-// AUDIT QUESTLINES (2026-10-19, fixer FLOW - bible/06-Systems/Questlines-Arc.md sections 2.3, 2.4, 10.2): THE ASK'S
+// AUDIT QUESTLINES: THE ASK'S
 // FLOW AND A SHARED COPY. A branch's `ask` from the machine to the box chain the player answers through
 // (scenes/quest/questBridge.js choiceBoxes in ui/guildServiceWindows.js ServiceFlowWindow) - asked behind the words that
 // set it up, never shut without an answer, a pick that cannot be drawn settled and asked again; and a quest shared in a

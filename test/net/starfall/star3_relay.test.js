@@ -1,4 +1,4 @@
-// STAR3 (bible/11-Multiplayer/Starfall.md sections 5, 6 and 9): THE RELAY HOLDS THE STAR - a word at a fallen star, its
+// STAR3 (6 and 9): THE RELAY HOLDS THE STAR - a word at a fallen star, its
 // cell's ledger, the waves moved by the owner's word alone, the hold said once with its earners' receipts, the hub's
 // half (everyone told, the night's held stars and each account's receipts kept for a hello), dawn, the cell's places, a
 // hibernation's wake, and the session's doors. Driven through the real Room (test/fakeRoom.mjs) and the real session.
@@ -8,17 +8,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  STAR_HOUR_MS, STAR_PER_NIGHT, STAR_WAVES, STAR_LEVEL_MAX, STAR_KILLS_WIRE_MAX, STAR_BLOWS_WIRE_MAX,
+  STAR_PER_NIGHT, STAR_WAVES, STAR_LEVEL_MAX, STAR_KILLS_WIRE_MAX, STAR_BLOWS_WIRE_MAX,
   STAR_TOP_MAX, STAR_ACCOUNTS_MAX, STAR_LIGHT, STAR_PHASES, STAR_WORD_MS, STAR_GRACE_MS, STAR_REACH_M, STAR_UNITS_PER_M,
   STAR_ORPHAN_MS, STAR_LOST_DAWN, STAR_LOST_DARK, P_GATHER, P_WAVE, P_BREATH, P_MASTER, P_HELD, P_LOST, starTimes, starNativeOf, starLedgerId,
-  starWaveSize, starNightGoneAt, STAR_WAVE_MAX, newStarLedger, starLedgerSane, starHeldWord, STAR_LIFE_MS, STAR_AFTER_MS, starLedgerState,
+  starWaveSize, starNightGoneAt, STAR_WAVE_MAX, newStarLedger, starLedgerSane, starHeldWord, starLifeMs, STAR_AFTER_MS, starLedgerState,
 } from '../../../src/net/starfall/starfallLaw.js';
+import { skyDayAtOrAfter, skyDayStartMs } from '../../../src/net/sky-days.ts';
 import { readStarReceipt, verifyStarReceipt, mintStarReceipt, STAR_RECEIPT_MAX, STAR_RECEIPT_V } from '../../../src/net/starfall/starReceipt.js';
 import {
-  parseClient, validStarIn, validStarOut, relaySupportsStar, STAR_RELAY_MIN, STAR_STARS_MAX, STAR_WAVES_MAX, STAR_LEVEL_WIRE_MAX,
+  parseClient, validStarIn, validStarOut, STAR_STARS_MAX, STAR_WAVES_MAX, STAR_LEVEL_WIRE_MAX,
   STAR_KILLS_MAX, STAR_BLOWS_MAX, STAR_TOP_WIRE_MAX, STAR_COUNT_MAX, STAR_LIGHT_MAX, STAR_PHASE_MAX, STAR_RECEIPT_WIRE_MAX,
   STAR_HELD_MAX, STAR_HELD_KEY, STAR_LEDGERS_MAX, STAR_LEDGERS_BY_MAX, STAR_IDLE_MS, STAR_KEEP_MS, STAR_RC_KEEP, STAR_RC_KEEP_MS,
-  starLedgerKey, starReceiptKeyOf, LIVE_EVENTS, LIVE_EVENT_RELAY_MIN, relayKnowsLiveEvent, RELAY_VERSION, SOCIAL_ROOM,
+  starLedgerKey, starReceiptKeyOf, LIVE_EVENTS, RELAY_VERSION, SOCIAL_ROOM,
   worldRoom, STAR_INTERNAL_HELD, STAR_WAVE_SIZE_MAX, STAR_WAVE_SIZE_OLD_MAX,
 } from '../../../src/net/wire.js';
 import { fakeRooms } from '../../fakeRoom.mjs';
@@ -30,10 +31,10 @@ const FESTIVAL_FROM_MS = FESTIVALS[0].fromMs;   // the Witches' Festival's first
 const subtle = globalThis.crypto.subtle;
 const quiet = async (fn) => { const w = console.warn, i = console.info; console.warn = () => {}; console.info = () => {}; try { return await fn(); } finally { console.warn = w; console.info = i; } };
 
-// ═══ THE RIG ══════════════════════════════════════════════════════════════════════════════════════
+// THE RIG
 
 /** A night inside the window, its first star, and a pixel of the Bay. */
-const N = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS) + 5, K = 0;
+const N = skyDayAtOrAfter(FESTIVAL_FROM_MS) + 5, K = 0;
 const PX = 100, PY = 200, CELL = worldRoom(PX, PY);
 const T = starTimes(N, K);
 /** A pose at the star the law places in (px, py) - `east` metres east of it. */
@@ -76,7 +77,7 @@ async function defend({ say, step }, owner, others, { until = (st) => st.p === P
   return seen(owner);
 }
 
-// ═══ THE WIRE ═════════════════════════════════════════════════════════════════════════════════════
+// THE WIRE
 
 test('STAR3 THE WIRE: a star word projected whole and bounded - the wave its deaths belong to among it; each word a cell or the hub says, projected - the speaker\'s own blows on its ledger, bounded, a receipt by its shape, the held list by its entries; the law\'s bounds written again and pinned equal; an older relay is said none; the Starfall rides the festival\'s days, no live event of its own (mutants: the star\'s index unbounded; the deaths\' wave unbounded; the light unbounded; my blows unbounded; a junk name hiding the held list\'s count; the relay floor off)', () => {
   assert.deepEqual(validStarIn({ ...word(), junk: 1 }), word(), 'projected: nothing the law does not read rides on');
@@ -120,7 +121,7 @@ test('STAR3 THE WIRE: a star word projected whole and bounded - the wave its dea
   assert.equal(validStarOut({ k: 'hd', n: N, s: K, px: PX, py: PY, at: 5, top: ['Ann', 'Bran'], c: 1 }).c, 2, 'never fewer than it names');
   assert.equal(validStarOut({ k: 'hd', n: N, s: K, px: PX, py: PY, at: 0, top: [], c: 0 }), null, 'a hold has its moment');
   assert.deepEqual(validStarOut({ k: 'hds', l: [[N, K, PX, PY, 9], [N, 3, PX, PY, 9], 'x', [N, 1, PX, PY, 0]] }), { k: 'hds', l: [[N, K, PX, PY, 9]] });
-  assert.equal(validStarOut({ k: 'hds', l: Array.from({ length: 20 }, () => [N, K, PX, PY, 9]) }).l.length, STAR_HELD_MAX);
+  assert.equal(validStarOut({ k: 'hds', l: Array.from({ length: STAR_HELD_MAX + 8 }, () => [N, K, PX, PY, 9]) }).l.length, STAR_HELD_MAX);
   assert.equal(validStarOut({ k: 'rc', r: 'w1.abc.def' }), null, 'another shape\'s receipt');
   assert.equal(validStarOut({ k: 'rc', r: `j1.${'a'.repeat(STAR_RECEIPT_WIRE_MAX)}.` }), null, 'bounded');
   assert.deepEqual(validStarOut({ k: 'rc', r: 'j1.abc.' }), { k: 'rc', r: 'j1.abc.' }, 'unsigned is a real answer');
@@ -136,12 +137,8 @@ test('STAR3 THE WIRE: a star word projected whole and bounded - the wave its dea
   assert.equal(STAR_PHASE_MAX, STAR_PHASES.length - 1);
   assert.equal(STAR_RECEIPT_WIRE_MAX, STAR_RECEIPT_MAX);
   assert.equal(STAR_RECEIPT_V, 'j1');
-  // the relay that speaks it - and no live event to stage: the stars fall on the festival's own days (net/festivalLaw.js)
-  assert.equal(STAR_RELAY_MIN, 235);   // world233 on the branch, renumbered past SD-SEA's world233 and DEX1's world234 at the merge - neither keeps a star
-  assert.equal(relaySupportsStar(`world${STAR_RELAY_MIN - 1}`), false);
-  assert.equal(relaySupportsStar(`world${STAR_RELAY_MIN}`), true);
-  assert.equal(relaySupportsStar(RELAY_VERSION), true, 'this build\'s relay keeps a star');
-  assert.ok(!LIVE_EVENTS.includes('witchfest') && !Object.hasOwn(LIVE_EVENT_RELAY_MIN, 'witchfest'), 'no word of the hub\'s gates a star');
+  // no live event to stage: the stars fall on the festival's own days (net/festivalLaw.js)
+  assert.ok(!LIVE_EVENTS.includes('witchfest'), 'a star is no live event of the hub');
 });
 
 test('STAR3 THE STORED LEDGER: a ledger is what the law made, read back - its star, pixel, phase, accounts and receipts - and nothing else under a star\'s key is read as one (a word makes the star anew) or kept (the sweep forgets a value under a key not its own); the held word is the wire\'s; a night\'s held stars stand until its last star is gone (mutants: a phase past the law\'s read; a ledger without its receipts read; a value under another star\'s key kept; the night gone with its first star)', async () => {
@@ -153,7 +150,7 @@ test('STAR3 THE STORED LEDGER: a ledger is what the law made, read back - its st
   }
   const held = { ...led, p: P_HELD, hd: T.fallAt + 9, top: ['Ann'], hn: 3 };
   assert.deepEqual(validStarOut(starHeldWord(held)), { k: 'hd', n: N, s: K, px: PX, py: PY, at: T.fallAt + 9, top: ['Ann'], c: 3 }, 'the wire\'s own word');
-  assert.equal(starNightGoneAt(N), N * STAR_HOUR_MS + STAR_LIFE_MS + STAR_AFTER_MS, 'the night\'s last star falls at its midnight');
+  assert.equal(starNightGoneAt(N), skyDayStartMs(N) + starLifeMs() + STAR_AFTER_MS, 'the night\'s last star falls at its midnight');
   await withStar(async ({ r, say, step }) => {
     const a = r.connect(); await r.hello(a, 'peer-0001', ON);
     r.store.set(LED(), { junk: 1 });
@@ -168,7 +165,7 @@ test('STAR3 THE STORED LEDGER: a ledger is what the law made, read back - its st
   });
 });
 
-// ═══ THE CELL ═════════════════════════════════════════════════════════════════════════════════════
+// THE CELL
 
 test('STAR3 THE WORD: heard in the star\'s own cell alone (another cell\'s pixel is junk), never in a layer, and inside the star\'s life and the window; its ledger made only at the star, by a word from its pose, and only before its deadline - the grace hears its last words; a word from off the star is heard and counts nothing (mutants: the cell unchecked; a layer\'s ledger; the life unchecked; a ledger made from anywhere; a ledger made past the deadline; a word off the star counted)', async () => {
   await withStar(async ({ world, r, say, set, step }) => {
@@ -183,7 +180,7 @@ test('STAR3 THE WORD: heard in the star\'s own cell alone (another cell\'s pixel
     step(1000); set(T.endAt + STAR_GRACE_MS); await say(a);
     assert.deepEqual(ledgers(r), [], 'nothing read, kept or said before its landing or past its grace');
     // a night outside the window
-    const early = Math.ceil(FESTIVAL_FROM_MS / STAR_HOUR_MS) - 3;
+    const early = skyDayAtOrAfter(FESTIVAL_FROM_MS) - 3;
     set(starTimes(early, K).fallAt + 1000); await say(a, { n: early });
     assert.deepEqual(ledgers(r), [], 'a night before the window');
     assert.equal(r.room._meterOf(a).junk, 1, 'and nobody struck for them');
@@ -581,7 +578,7 @@ test('STAR3 MINTED ONCE: the master\'s fall mints its receipts once - the alarm\
   });
 });
 
-// ═══ THE HUB ══════════════════════════════════════════════════════════════════════════════════════
+// THE HUB
 
 test('STAR3 THE HUB: a hold told again is neither said nor kept twice; a receipt is kept only signed, for its own account and its own star; one told after its night keeps its receipts and says nothing; a night\'s held stars go once its last star is gone; the sweep lets a spent keep go; a hello hands the list and the account\'s receipts (mutants: told twice said twice; another account\'s receipt kept; an unsigned one kept; the night kept for ever; the sweep blind)', async () => {
   const { kp } = await signing();
@@ -629,9 +626,9 @@ test('STAR3 THE HUB: a hold told again is neither said nor kept twice; a receipt
   });
 });
 
-// ═══ THE SESSION ══════════════════════════════════════════════════════════════════════════════════
+// THE SESSION
 
-test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - my own or a halo\'s - only when that socket\'s own relay keeps a star; a cell\'s ledger is heard from a cell, the night\'s held list from the hub, a hold and a receipt from either (mutants: the halo sent on the primary\'s word; the hub\'s list heard from a cell)', () => {
+test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - my own or a halo\'s - only once that socket is welcomed; a cell\'s ledger is heard from a cell, the night\'s held list from the hub, a hold and a receipt from either (mutants: the halo sent on the primary\'s word; the hub\'s list heard from a cell)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = T.fallAt;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
@@ -639,9 +636,6 @@ test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - 
   try {
     s.join(CELL, { x: ON.x, y: 0, z: ON.z, yaw: 0 });
     sockets[0].open();
-    sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: `world${STAR_RELAY_MIN - 1}` });
-    assert.equal(s.starReady(CELL), false);
-    assert.equal(s.sendStar(word(), CELL), false, 'an older relay would close the socket for it');
     sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION });
     assert.equal(s.sendStar(word(), CELL), true);
     assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).t === 'star').length, 1);
@@ -650,9 +644,8 @@ test('STAR3 THE SESSION: a star word goes down the socket of the star\'s cell - 
     s.setHalo([other]);
     const halo = sockets[1];
     halo.open();
-    halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: `world${STAR_RELAY_MIN - 1}` });
     t += 1000;
-    assert.equal(s.sendStar(word({ px: PX + 16 }), other), false, 'the halo\'s own relay would close the socket for it');
+    assert.equal(s.sendStar(word({ px: PX + 16 }), other), false, 'the halo\'s socket is not welcomed yet');
     halo.receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: RELAY_VERSION });
     const before = sockets[0].sent.filter((x) => JSON.parse(x).t === 'star').length;
     assert.equal(s.sendStar(word({ px: PX + 16 }), other), true);

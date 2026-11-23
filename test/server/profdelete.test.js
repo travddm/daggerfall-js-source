@@ -1,20 +1,15 @@
-// PROF-DELETE (2026-09-29, Mac, asked what a deleted online character's professions come to: "Goes with it; wait on
-// trades"; MERGE 2's open question 3, bible/06-Systems/Online-Arc.md PROF-DELETE): A REALM CHARACTER DELETED TAKES ITS
-// PROFESSIONS WITH IT, and waits on what another player is part of. The service over the real migrations
-// (server-account/src/realm.js deleteRealm, REALM_MARKET_OPEN_SQL): its Stores and its professions' tracks go in the
-// delete's one batch, another character's stay, the history stays; while it has market business open - a listing or an
-// auction standing or not yet handed back, a leading bid, a buy order, a commission, materials on the road, a piece to
-// collect - the delete is refused `realm-market-open` (409) and nothing moves; what comes back to the ACCOUNT (an outbid
-// bid's Marks, a closed order's escrow) holds nothing up. The door's words and the dialog's.
+// A realm character deleted takes its professions with it, over the real migrations
+// (server-account/src/character-delete/delete-character.ts): its Stores and its professions' tracks go in the delete's one
+// batch, another character's stay, the history stays. Its market business open is settled in the same batch, so none is
+// left open after it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 
 import { createGuest } from '../../server-account/src/accounts.js';
-import { createRealm, deleteRealm } from '../../server-account/src/realm.js';
-import { accountRefusalText } from '../../src/net/accountClient.js';
-import { realmRefusalText } from '../../src/systems/realmSaves.js';
+import { createRealm, REALM_MARKET_OPEN_SQL } from '../../server-account/src/realm.js';
+import { deleteCharacter } from '../../server-account/src/character-delete/delete-character.ts';
 
 const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
@@ -112,11 +107,12 @@ test('PROF-DELETE a realm character deleted takes its Stores and its professions
     db._raw.prepare("INSERT INTO prof_tracks (player, char_id, profession, xp, updated_at) VALUES (?, ?, 'herbalism', 1800, ?)").run(P, c, T0);
     db._raw.prepare("INSERT INTO prof_silver_cloth (player, char_id, material, qty) VALUES (?, ?, 'cloth:linen', 3)").run(P, c);   // AUDIT WOVEN-PAYS: the silver count
   }
+  db._raw.prepare('UPDATE realm_characters SET judged_seq = 0').run();   // a checkpoint the judge read
   // history: a courier's load delivered long ago, a piece collected
   const other = await player(db);
   BUSINESS['materials on the road'].open(db, P, made.id, other);
   BUSINESS['materials on the road'].settled(db);
-  assert.deepEqual(await deleteRealm({ db, bucket: null }, P, made.id), { ok: true });
+  assert.equal((await deleteCharacter({ db, bucket: null }, P, made.id)).ok, true);
   assert.deepEqual([count(db, 'SELECT COUNT(*) AS n FROM prof_stores WHERE char_id = ?', made.id), count(db, 'SELECT COUNT(*) AS n FROM prof_tracks WHERE char_id = ?', made.id)], [0, 0], 'its Stores and its tracks went with it');
   assert.deepEqual([count(db, 'SELECT COUNT(*) AS n FROM prof_stores WHERE char_id = ?', keep.id), count(db, 'SELECT COUNT(*) AS n FROM prof_tracks WHERE char_id = ?', keep.id)], [1, 1], 'another character\'s stay');
   assert.equal(count(db, 'SELECT COUNT(*) AS n FROM market_sales WHERE char_id = ?', made.id), 1, 'the history stays');
@@ -124,31 +120,21 @@ test('PROF-DELETE a realm character deleted takes its Stores and its professions
   assert.equal(count(db, 'SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?', made.id), 0);
 });
 
-test('PROF-DELETE while the character has market business open the delete is refused `realm-market-open` and nothing moves - each of a listing standing or not yet handed back, an auction standing or not yet handed back, a leading bid, a buy order, a commission, materials on the road, a piece to collect; settled, it goes (mutants: each kind unread; the refusal after the objects are dropped)', async () => {
+test('PROF-DELETE a character with market business open is deleted, and the business is settled in the same batch - each of a listing standing or not yet handed back, an auction standing or not yet handed back, a leading bid, a buy order, a commission, materials on the road, a piece to collect; its objects dropped once the batch has committed', async () => {
   for (const [what, b] of Object.entries(BUSINESS)) {
     const db = d1();
     const P = await player(db);
     const other = await player(db);
     const made = await createRealm({ db, rand, nowS: T0 }, P, { name: 'Nystul' });
     db._raw.prepare("INSERT INTO prof_stores (player, char_id, material, origin, qty) VALUES (?, ?, 'herb:rose', 'own', 34)").run(P, made.id);
-    db._raw.prepare('UPDATE realm_characters SET obj = ?, bytes = 10 WHERE id = ?').run(`realm/${P}/${made.id}/1`, made.id);   // a save landed
+    db._raw.prepare('UPDATE realm_characters SET obj = ?, bytes = 10, judged_seq = 0 WHERE id = ?').run(`realm/${P}/${made.id}/1`, made.id);   // a save landed and judged
     b.open(db, P, made.id, other);
     const dropped = [];
     const bucket = { delete: async (k) => { dropped.push(k); }, list: async () => ({ objects: [] }) };
-    assert.deepEqual(await deleteRealm({ db, bucket }, P, made.id), { error: 'realm-market-open' }, what);
-    assert.deepEqual([count(db, 'SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?', made.id), count(db, 'SELECT COUNT(*) AS n FROM prof_stores WHERE char_id = ?', made.id), dropped.length], [1, 1, 0], `${what}: nothing moved, no object dropped`);
-    b.settled(db);
-    assert.deepEqual(await deleteRealm({ db, bucket: null }, P, made.id), { ok: true }, `${what}, settled: it goes`);
+    const answer = await deleteCharacter({ db, bucket }, P, made.id);
+    assert.equal(answer.ok, true, `${what}: ${JSON.stringify(answer)}`);
+    assert.equal(count(db, 'SELECT COUNT(*) AS n FROM realm_characters WHERE id = ?', made.id), 0, what);
+    assert.equal(Number(db._raw.prepare(REALM_MARKET_OPEN_SQL).get(P, made.id).n), 0, `${what}: nothing left open`);
+    assert.deepEqual(dropped, [`realm/${P}/${made.id}/1`], `${what}: its object dropped`);
   }
-  const s = src('server-account/src/index.js');
-  assert.match(s, /'realm-market-open': 409,/, 'a conflict the player settles, never a bad request');
-});
-
-test('PROF-DELETE the words: the door says what to settle, and the delete dialog says the professions and their Stores go with the character', () => {
-  const said = realmRefusalText('realm-market-open');
-  assert.equal(said, accountRefusalText('realm-market-open'));
-  // PIN MOVED (RPT1026-MARKET ARRIVE): a trader's takings named too (they hold the delete), and the way out of a waiting purchase
-  assert.match(said, /^This character still has business on the market: a listing, an auction, a bid, a buy order, a commission, goods on the way or waiting to be collected, or a trader's takings\. Settle it first\. Play it online once and goods waiting for it come to its pack on their own; takings are collected on the Vendor page\.$/);
-  // ACCOUNT-HOMES: the homes it bought go with it, and a home is the account's - its other characters lose it too
-  assert.match(src('src/ui/enhanced/enhancedMenu.js'), /'Deleting an online character is permanent\. Its Renown, professions, Stores, the homes it bought and its guild place are lost\. Homes belong to your account, so your other characters lose them too\. Any offline copy you made stays\.'/);
 });

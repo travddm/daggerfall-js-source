@@ -1,4 +1,4 @@
-// LW-ROOMS (bible/06-Systems/Living-World.md "LW-ROOMS"): A SYNTHETIC TAVERN on the port's own collider
+// LW-ROOMS ("LW-ROOMS"): A SYNTHETIC TAVERN on the port's own collider
 // (player/collider.js) - the room the living world's pins and probes stand residents in, with no game data: a hall of `w`
 // by `d` metres, its floor at 0 and four walls, its way in the middle of the south wall (shut: a building's door is a face
 // of its wall, as DFU's interiors draw it), a counter by the north wall, nine tables scaled to the hall and a stair up the

@@ -1,4 +1,4 @@
-// PERF-ON3 (2026-10-06, Mac: "I wanna look into how we can continue to improve performance, including for online"):
+// PERF-ON3:
 // THE CHAT ROSTER, DERIVED ONCE AND NOT ONCE A FRAME. The chat panel asks net/roster.js for its rows on every frame the
 // chat is open, over everyone the hub knows; each ask rebuilt every row and sorted them with a localeCompare that
 // constructs a collator per comparison - 9.3 ms a frame at 200 online, 24 at 500, measured over the real module. Now

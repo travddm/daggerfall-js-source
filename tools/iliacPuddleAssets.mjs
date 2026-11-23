@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// DW-E3 (2026-09-25): ILIAC PUDDLE NO MORE 1.2.2 (jet082) - THE FISH'S
+// DW-E3: ILIAC PUDDLE NO MORE 1.2.2 (jet082) - THE FISH'S
 // VENDORED FILES, OUT OF THE SHIPPED BUNDLE.
 //
 //   node tools/iliacPuddleAssets.mjs "<path-to>/iliac puddle no more.dfmod" [outDir]
@@ -12,7 +12,7 @@
 //   the icon's aspect at run time) decoded at its first mip, every pixel
 //   the game samples there. None is a classic record: each is measured
 //   against every record of every TEXTURE file (--arena2) by the search
-//   tools/detailedShipsAssets.mjs puts its pictures through, and the tool
+//   tools/lib/classic-source.ts puts pictures through, and the tool
 //   refuses to write one a record covers.
 // - `ItemTemplates.json` - the mod's seven item templates, the bundle's
 //   text verbatim.
@@ -24,7 +24,7 @@ import { PNG } from 'pngjs';
 import { isMain } from './lib/isMain.mjs';
 import { readUnityBundle } from '../src/formats/unity/unityBundle.js';
 import { DFPalette } from '../src/formats/dfPalette.js';
-import { classicRecords, findClassicSource } from './detailedShipsAssets.mjs';   // DS1's search: a record within a pixel of the picture's size, at every offset
+import { classicRecords, findClassicSource } from './lib/classic-source.ts';   // the classic-record search: a record within a pixel of the picture's size, at every offset
 
 /** The seven pictures PassiveFishSpeciesCatalog loads, by their bundle names. */
 export const FISH_TEXTURES = Object.freeze(['longnose_butterflyfish', 'largemouth_bass', 'canary_rockfish', 'crucian_carp', 'mackerel', 'white_zebra_angelfish', 'finulon']);

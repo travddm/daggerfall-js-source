@@ -1,10 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13; the lead dev, on Discord: "with the POE tree stuff, i would recommend almost 1to1 copy pasting its
-// structure and then attach everything you can do in daggerfall online to it, Magic, Phys based attacks and skills,
-// trading, gathering, hunting, ship controls/ocean stuff in general ... So ppl can be a awesome trader, or a better
-// gatherer crafter etc ... guilds will also benefit from it ... make sure the tree looks awesome and investing points in
-// there feels rewarding. Must suit DFO Grimoire and Enhanced plus ui"). bible/06-Systems/Firmament.md is the record.
+// FIRM1. is the record.
 //
 // THE FIRMAMENT - THE TREE ITSELF: every star (node), where it stands and what it is joined to. Path of Exile's shape,
 // one for one, laid on Tamriel's sky:
@@ -28,7 +24,7 @@
 // firmament row). A key never changes once shipped and is never reused for another star; a star removed from this table
 // is simply refunded (firmamentLaw.js cleanKeys drops a key no table holds). New stars take new keys.
 //
-// BAL10 (2026-10-17, bible/05-Combat/Balance-Arc.md section 16; the owner chose "Firmament weapon keystones"): EVERY WEAPON
+// BAL10: EVERY WEAPON
 // FAMILY TWO NOTABLES OF ITS OWN, each raising its skill - Blade Dancer and Iron Knuckles took the Long Blade's and the
 // fist's second; Headsman and Bonebreaker the Axe's and the Blunt Weapon's (the thinnest two, one skill notable each, in the
 // one sign); and Carnage (the Warrior's) and the Ritual's Templar's Mace (Battlemage's Focus until then)
@@ -88,6 +84,21 @@ const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 // stands a line draws a fork or a chain; any other draws a wheel (a fork's three small stars and two notables make a
 // small wheel of five).
 
+/** B5: the sky's damage and guard channels, scaled to the budget (the blow's powers add to +34.5% at the most, the hurt's guards
+ *  keep 86%). A star's number is the scale times what the design page first wrote, to the half per cent and never under it. The
+ *  Health, the attributes, the skills and the lives are not scaled. */
+const SKY_BLOW_SCALE = 0.2;
+const SKY_GUARD_SCALE = 0.25;
+const SKY_BLOW_KEYS = new Set(['weaponDmg', 'meleeDmg', 'bowDmg', 'fistDmg', 'shortDmg', 'longDmg', 'axeDmg', 'bluntDmg', 'undeadDmg', 'daedraDmg', 'beastDmg', 'unawareDmg', 'rageDmg', 'spellPower']);
+const SKY_GUARD_KEYS = new Set(['blowTaken', 'spellTaken']);
+const skyScaled = (stats) => {
+  const out = {};
+  for (const [k, v] of Object.entries(stats)) {
+    const scale = SKY_BLOW_KEYS.has(k) ? SKY_BLOW_SCALE : SKY_GUARD_KEYS.has(k) ? SKY_GUARD_SCALE : 1;
+    out[k] = scale === 1 ? v : Math.sign(v) * Math.max(0.5, Math.round(Math.abs(v) * scale * 2) / 2);
+  }
+  return out;
+};
 const N = (name, stats) => Object.freeze({ name, stats: Object.freeze(stats) });
 const K = (name, stats, text) => Object.freeze({ name, stats: Object.freeze(stats), text });
 
@@ -168,8 +179,8 @@ const SKY = {
     roads: { s1: { speed: 2 }, s2: { strength: 3 }, g: { speed: 1, strength: 2 }, r1: { meleeDmg: 3 }, r2: { 'skill.LongBlade': 4 }, k1: { meleeDmg: 3 } },
     combat: [
       { id: 'c1', tpl: 'wheel', n: 5, small: { longDmg: 2 }, notables: [N('Riposte', { longDmg: 6, 'skill.LongBlade': 6 }), N('Blade Dancer', { longDmg: 4, speed: 2, 'skill.LongBlade': 4 })] },
-      { id: 'c2', tpl: 'fork', n: 3, small: { meleeDmg: 2 }, notables: [N('Momentum', { meleeDmg: 5, speed: 2 }), N('Cavalier', { meleeDmg: 4, hp: 12 })] },
-      { id: 'c3', tpl: 'wheel', n: 5, small: [{ endurance: 2 }, { hp: 5 }], notables: [N('Iron Lungs', { endurance: 5, hp: 10 }), N('Unflagging', { hpRegen: 2, endurance: 3 })] },
+      { id: 'c2', tpl: 'fork', n: 3, small: { meleeDmg: 2 }, notables: [N('Momentum', { meleeDmg: 5, speed: 2 }), N('Cavalier', { meleeDmg: 4, hp: 3 })] },
+      { id: 'c3', tpl: 'wheel', n: 5, small: [{ endurance: 2 }, { hp: 2 }], notables: [N('Iron Lungs', { endurance: 5, hp: 2 }), N('Unflagging', { hpRegen: 2, endurance: 3 })] },
       { id: 'c4', tpl: 'chain', n: 4, small: { speed: 1 }, notables: [N('Lightning Reflexes', { speed: 3, evade: 2 })] },
       { id: 'c5', tpl: 'wheel', n: 5, small: { fistDmg: 3 }, notables: [N('Pankration', { fistDmg: 8, 'skill.HandToHand': 8 }), N('Iron Knuckles', { fistDmg: 5, strength: 3, 'skill.HandToHand': 4 })] },
       { id: 'c6', tpl: 'fork', n: 3, small: { 'skill.CriticalStrike': 3 }, notables: [N('Precision', { weaponDmg: 4, 'skill.CriticalStrike': 5 }), N("Fencer's Footwork", { 'skill.Dodging': 6, evade: 2 })] },
@@ -191,12 +202,12 @@ const SKY = {
     roads: { s1: { strength: 3 }, s2: { endurance: 3 }, g: { strength: 2, endurance: 2 }, r1: { hp: 2 }, r2: { blowTaken: -1 }, k1: { armor: 1 } },
     combat: [
       { id: 'c1', tpl: 'wheel', n: 5, small: { axeDmg: 2 }, notables: [N('Cleaver', { axeDmg: 6, 'skill.Axe': 6 }), N('Headsman', { axeDmg: 4, strength: 3, 'skill.Axe': 5 })] },
-      { id: 'c2', tpl: 'fork', n: 3, small: { armor: 1 }, notables: [N('Walking Fortress', { armor: 3, blowTaken: -3 }), N('Shield Wall', { blowTaken: -2, hp: 10 })] },
+      { id: 'c2', tpl: 'fork', n: 3, small: { armor: 1 }, notables: [N('Walking Fortress', { armor: 3, blowTaken: -3 }), N('Shield Wall', { blowTaken: -2, hp: 2 })] },
       { id: 'c3', tpl: 'wheel', n: 5, small: { bluntDmg: 2 }, notables: [N('Crushing Blows', { bluntDmg: 6, 'skill.BluntWeapon': 6 }), N('Bonebreaker', { bluntDmg: 4, meleeDmg: 2, 'skill.BluntWeapon': 5 })] },
       { id: 'c4', tpl: 'chain', n: 4, small: { meleeDmg: 2 }, notables: [N('Warlord', { meleeDmg: 5, strength: 4 })] },
-      { id: 'c5', tpl: 'wheel', n: 5, small: { hp: 4 }, notables: [N("Troll's Blood", { hpRegen: 3, hp: 8 }), N("Giant's Heart", { hp: 18, endurance: 3 })] },
+      { id: 'c5', tpl: 'wheel', n: 5, small: { hp: 2 }, notables: [N("Troll's Blood", { hpRegen: 3, hp: 2 }), N("Giant's Heart", { hp: 4, endurance: 3 })] },
       { id: 'c6', tpl: 'fork', n: 3, small: { killHeal: 1 }, notables: [N('Carnage', { killHeal: 2, axeDmg: 4 }), N('Reaver', { rageDmg: 7, strength: 2 })] },
-      { id: 'c7', tpl: 'wheel', n: 4, small: { strength: 2 }, notables: [N("The Lady's Favor", { endurance: 4, hp: 8 })] },
+      { id: 'c7', tpl: 'wheel', n: 4, small: { strength: 2 }, notables: [N("The Lady's Favor", { endurance: 4, hp: 2 })] },
     ],
     keystone: K("Berserker's Fury", { rageDmg: 18, armor: -2 }, 'Below half Health you strike far harder, though your armor guards you a little less.'),
     life: { ring: [{ 'yield.mining': 1 }, { 'xp.smithing': 2 }], lr1: { 'xp.mining': 4 }, lr2: { 'yield.logging': 1 }, la: { 'xp.building': 4 } },
@@ -308,7 +319,7 @@ function build() {
     edges.push(arc ? { a, b, arc } : { a, b });
   };
   const node = (key, kind, ring, sector, cluster, name, stats, p, text = undefined) =>
-    add(/** @type {FirmNode} */ ({ key, kind, ring, sector, cluster, name, stats: Object.freeze(kind === 'small' || kind === 'road' ? smallStats(stats) : { ...stats }), ...(text ? { text } : {}), x: p.x, y: p.y }));
+    add(/** @type {FirmNode} */ ({ key, kind, ring, sector, cluster, name, stats: Object.freeze(skyScaled(kind === 'small' || kind === 'road' ? smallStats(stats) : stats)), ...(text ? { text } : {}), x: p.x, y: p.y }));
 
   // the middle, the starts and the inner ring
   node('sp.start', 'start', 'combat', 'sp', null, SERPENT.name, { luck: 2 }, { x: 0, y: 0 });

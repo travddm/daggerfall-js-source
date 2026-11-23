@@ -5,12 +5,15 @@ import { CHAR_ID_RE } from './service.js';
 import { HOME_CAP, homeMapIdOk, homeBuildingKeyOk } from '../../src/net/homeLaw.js';
 import { decorRefund } from '../../src/net/decorLaw.js';
 import { decorHeldBlocks } from './decorBatch.js';
-import { dropIfUnnamed, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmSaveTextOf, seizeRealmRecord } from './realm.js';
+import { dropIfUnnamed, getRealmBlob, mustChange, prepareRealmRecord, realmActFirst, realmHoldOf, realmSaveTextOf, seizeRealmRecord } from './realm.js';
 import { payFromSave, creditSave } from '../../src/net/realm/realmGoldLaw.js';
+import { homeFreeToGoSql, homeHeldError } from './home-free-to-go.ts';
 
 const OFFER_S = 3 * 24 * 60 * 60;
 const PRICE_MAX = 100_000_000;
 const UID_RE = /^[0-9a-f]{16}$/;
+/** HOUSES-3: a character's homes in the region of the home at (map id, key) - none where no home stands there. */
+const REGION_HOMES_SQL = 'SELECT COUNT(*) AS n FROM homes WHERE player = ? AND char_id = ? AND guild_id IS NULL AND region = (SELECT region FROM homes WHERE map_id = ? AND building_key = ?)';
 
 const offerId = () => [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
 
@@ -128,7 +131,8 @@ async function acceptHome(ctx, player, body) {
   }
   const mine = await db.prepare('SELECT id FROM realm_characters WHERE id = ? AND player = ? AND dead_at IS NULL').bind(character, player.id).first();
   if (!mine) return { error: 'no-home' };
-  const owned = Number((await db.prepare('SELECT COUNT(*) AS n FROM homes WHERE player = ? AND char_id = ? AND guild_id IS NULL').bind(player.id, character).first())?.n) || 0;
+  // HOUSES-3: the cap is the buyer's homes in the offered home's region (net/homeLaw.js HOME_CAP)
+  const owned = Number((await db.prepare(REGION_HOMES_SQL).bind(player.id, character, offer.map_id, offer.building_key).first())?.n) || 0;
   if (owned >= HOME_CAP) return { error: 'home-cap' };
   const home = await houseOf(db, offer.map_id, offer.building_key, offer.seller);
   if (!home || home.char_id !== offer.seller_char || home.deed === 1) {
@@ -146,7 +150,9 @@ async function acceptHome(ctx, player, body) {
   if (held.error) return held;
   const keepDecor = offer.keep_decor === 1;
   const keepItems = offer.keep_items === 1;
-  if ((!keepItems || !keepDecor) && (bin > 0 || held.goods.length > 0)) return { error: 'home-holds' };
+  // A sale that keeps the decor and the items hands the chests' goods to the buyer; any other sale needs them empty
+  const binMustBeEmpty = !keepItems || !keepDecor;
+  if (binMustBeEmpty && (bin > 0 || held.goods.length > 0)) return { error: 'home-holds' };
   let refund = 0;
   if (!keepDecor) {
     for (const row of pieces) {
@@ -156,7 +162,8 @@ async function acceptHome(ctx, player, body) {
     }
   }
   const price = offer.price;
-  if (price > 0 && realm == null) return { error: 'realm-needed' };
+  const refused = await saleRefusal(db, offer, realm);
+  if (refused) return refused;
   const moved = [];
   let sellerKey = null;
   let buyerKey = null;
@@ -183,16 +190,20 @@ async function acceptHome(ctx, player, body) {
   const steps = [
     ...(sellerPrep?.steps ?? []),
     ...(buyerPrep?.steps ?? []),
+    // The tests blocked() and the bin count read go into the UPDATE too, so a tenant, a trader's listing or a chest
+    // deposit landing after those reads stops the sale instead of going to the buyer or being deleted.
     db.prepare(`UPDATE homes SET player = ?1, char_id = ?2, owner_name = ?3
       WHERE map_id = ?4 AND building_key = ?5 AND player = ?6 AND char_id = ?7 AND guild_id IS NULL AND (deed IS NULL OR deed = 0)
-      AND (SELECT COUNT(*) FROM homes WHERE player = ?1 AND char_id = ?2 AND guild_id IS NULL) < ?8`)
-      .bind(player.id, character, displayName(player), offer.map_id, offer.building_key, offer.seller, offer.seller_char, HOME_CAP),
+      AND (SELECT COUNT(*) FROM homes h WHERE h.player = ?1 AND h.char_id = ?2 AND h.guild_id IS NULL AND h.region = homes.region) < ?8
+      AND ${homeFreeToGoSql({ mapId: '?4', buildingKey: '?5', nowS: '?9' }, binMustBeEmpty)}`)
+      .bind(player.id, character, displayName(player), offer.map_id, offer.building_key, offer.seller, offer.seller_char, HOME_CAP, nowS),
     mustChange(db),
     db.prepare('DELETE FROM decor_access WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key),
   ];
   if (!keepDecor) {
-    steps.push(db.prepare('DELETE FROM home_decor WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key));
+    // The bin first: its rows name the pieces, and the key refuses a piece deleted under them
     steps.push(db.prepare('DELETE FROM decor_bin WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key));
+    steps.push(db.prepare('DELETE FROM home_decor WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key));
   } else {
     for (const g of moved) {
       steps.push(db.prepare('INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING')
@@ -215,13 +226,28 @@ async function acceptHome(ctx, player, body) {
     if (done?.state === 'accepted' && done.result) return { ...JSON.parse(done.result), repeat: true };
     const nowRev = Number((await db.prepare('SELECT rev FROM decor_rev WHERE map_id = ? AND building_key = ?').bind(offer.map_id, offer.building_key).first())?.rev) || 0;
     if (nowRev !== rev) return { error: 'offer-stale' };
-    const still = await houseOf(db, offer.map_id, offer.building_key, offer.seller);
-    if (!still) return { error: 'no-home' };
-    const after = Number((await db.prepare('SELECT COUNT(*) AS n FROM homes WHERE player = ? AND char_id = ? AND guild_id IS NULL').bind(player.id, character).first())?.n) || 0;
-    if (after >= HOME_CAP) return { error: 'home-cap' };
-    return { error: 'offer-closed' };
+    return { error: await saleRefusedBy(db, offer, player.id, character, nowS, binMustBeEmpty) };
   }
   return result;
+}
+
+/** Why an accepted sale's batch was refused, read after it: the house gone, a hold that landed, or the buyer's cap. */
+async function saleRefusedBy(db, offer, buyerId, character, nowS, binMustBeEmpty) {
+  const still = await houseOf(db, offer.map_id, offer.building_key, offer.seller);
+  if (!still) return 'no-home';
+  const held = await homeHeldError(db, offer.map_id, offer.building_key, nowS, binMustBeEmpty);
+  if (held) return held;
+  const after = Number((await db.prepare(REGION_HOMES_SQL).bind(buyerId, character, offer.map_id, offer.building_key).first())?.n) || 0;
+  return after >= HOME_CAP ? 'home-cap' : 'offer-closed';
+}
+
+/** What stops an accepted sale before anything moves, or null: a priced sale needs the buyer's record, and the seller
+ *  must not be held by the judge. The seller hands the house, and any goods kept, to another player and is paid, but its
+ *  record is seized, which asks no hold, so the hold is asked here. The hold's reason is the seller's, not the buyer's. */
+async function saleRefusal(db, offer, realm) {
+  if (offer.price > 0 && realm == null) return { error: 'realm-needed' };
+  if (await realmHoldOf(db, offer.seller, offer.seller_char)) return { error: 'home-seller-held' };
+  return null;
 }
 
 /** Offer, accept, decline or cancel. The client names none of the gold, the owner, or the goods. */

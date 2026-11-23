@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // THE BEAST BODY
 //
 // A quadruped, built to a spec. Head, neck, barrel, four legs, tail —

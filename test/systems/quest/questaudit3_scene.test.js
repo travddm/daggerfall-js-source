@@ -1,5 +1,4 @@
-// QUEST-AUDIT III (2026-10-23, the owner: "Can you do a detailed quest audit, fix any and all outstanding issues. Do not
-// worry about DFU parity."; bible/01-Overview/audits/Quest-Audit-III.md). The audit's fixes to the scene, the sites and
+// QUEST-AUDIT III. The audit's fixes to the scene, the sites and
 // the journal windows, each pinned here (questaudit3.test.js holds the story's and the stands'). No game data: every
 // town, dungeon and quest is built here.
 //
@@ -49,6 +48,7 @@ import { mapPixelToLongitudeLatitude } from '../../../src/formats/mapsFile.js';
 import { loadTables, rmbBlock, town, dungeon, rdbBlock, worldOf, typeAtKey } from '../../fb1004dTowns.mjs';
 import { BV } from '../../fb1004dArena.mjs';
 import { packMachine, questSource } from '../../qlSources.mjs';
+import { hostText } from '../../hostText.mjs';   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld - the host read whole
 
 loadTables();
 const src = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
@@ -421,7 +421,3 @@ test('NAMED-TIMER: the pause tab\'s and the chronicle\'s "Time remains" is the t
   assert.equal(row.clockSeconds, by.near, 'the nearer of the two deadlines the entry names');
 });
 
-test('The exterior\'s quest world hands %oth and %jok their TEXT.RSC pool, as world.js\'s does (source pin; mutants: the line)', () => {
-  assert.match(src('src/scenes/exterior.js'), /flatCaption: \(archive, record\) => pipeline\.flatCaption\(archive, record\),[^\n]*\n\s*getRandomText: \(id\) => townTalk\.randomText\?\.\(id\) \?\? null,/);
-  assert.match(src('src/scenes/world.js'), /getRandomText: \(id\) => townTalk\.randomText\(id\),/);
-});

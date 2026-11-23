@@ -1,7 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// LW14 (2026-10-09, bible/06-Systems/Living-World-II.md "LW14"): THE DIVE'S ROUTE - where a company is inside the
-// dungeon it went down into, minute by minute, and what it leaves behind. Mac: "smarter and more dungeon diving npcs".
+// LW14: THE DIVE'S ROUTE - where a company is inside the
+// dungeon it went down into, minute by minute, and what it leaves behind..
 // Pure over the dungeon's own data (its blocks' markers, as the dungeon's build reads them - so only while the player is
 // in it; the trips need none of it) and the dive (trips.js diveTrip): every reader's company works the same rooms in
 // the same order at the same minutes.
@@ -17,7 +17,7 @@
 //    only the fated die (the lives' law) - its DEEP_FIGHT_MIN that stop's own.
 //  - WHERE THEY ARE (`stopAt`): at a stop (fighting at a foe's), between two, on the way out, or gone.
 //  - WHAT THEY LEAVE (`clearedOf`): the stops a dive left within DIVE_CLEAR_MIN before a minute - its foes built dead
-//    and emptied, its treasure built empty (decision 3).
+//    and emptied, its treasure built empty.
 import { lwSeed, lwRng, textSeed, rollInt } from './seed.js';
 import { DAY_MIN } from './dayPlan.js';
 import { RANDOM_RECORD } from '../../characters/dungeonEnemies.js';   // AUDIT LW-II-2 D11: the random foe marker's one home

@@ -1,7 +1,7 @@
 // @ts-check
 // IIL2 - IMPROVED INTERIOR LIGHTING'S SHADOWS, WITHOUT ENHANCED LIGHTING'S LOOK.
 //
-// Mac (2026-09-27): "I don't want Enhanced Lighting to do the shadows - the mod should." In Daggerfall Unity the mod
+// In Daggerfall Unity the mod
 // never draws a shadow itself: it sets `light.shadows = LightShadows.Soft` on its lights (and turns the NPCs' and
 // enemies' billboards to cast, BillboardShadows.cs) and Unity's engine draws them - shadow maps, depth compares, the
 // soft edge. The port's engine already has that machinery (render/shadowPass.js: a cube map per light, the casters

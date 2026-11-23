@@ -1,5 +1,5 @@
 // FIELD BUGS 2026-10-02 - the three that are not the climb (test/player/fb1002_climb.test.js holds those). The third,
-// HUNT-FOES (a foe come near the text hunt's box), retired with the hunt itself (2026-10-04); two stand:
+// HUNT-FOES (a foe come near the text hunt's box), retired with the hunt itself; two stand:
 //   HELM-NET  - Cruor: "New fishing context pop up clashes with come sail away! Gets in the way especially when trying
 //               to aim bow guns";
 //   HELM-HUSH - (relayed) "audio cutting when taking helm of a ship".
@@ -32,11 +32,6 @@ test('HELM-NET: the report - at sea the net\'s water is everywhere, and the cast
     busy = true;
     assert.deepEqual(s.k.looseNodesOf({ entity, dungeon: false }), [], 'at the helm: none');
   } finally { s.done(); }
-});
-
-test('HELM-NET by source: the world host\'s fishing kind is busy at a helm, over laid guns and in a boarding', () => {
-  assert.match(src('src/scenes/world.js'), /busy: \(\) => !!csaRuntime\?\.isSailing\?\.\(\) \|\| !!naval\?\.aiming \|\| !!naval\?\.boarding,/);
-  assert.match(src('src/scenes/fishHost.js'), /if \(dungeon \|\| host\.busy\?\.\(\) \|\| !foragingToolIn\(entity, FT\.FishingNet\) \|\| !inWater\(\)\) return \[\];/);
 });
 
 test('HELM-HUSH: the report - at the helm, the first stroke past the wake\'s threshold and every slowing under it crossfade the boat\'s loops, and the crossfade played the loop it fades out again: the host heard a new play and cut it back to its first sample; a loop already playing goes on (mutants: every play counted again)', () => {

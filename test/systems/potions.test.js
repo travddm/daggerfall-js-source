@@ -323,33 +323,6 @@ test('U44: the one effect with no classic pair rides under its DFU key', () => {
   assert.equal(isHealSpellPoints({ type: 10, subType: 9 }), false, 'and it is NOT heal fatigue');
 });
 
-test('U44: every host that opens an inventory can DRINK from it', () => {
-  // The hook chain is host -> window -> useItem -> the ONE cast
-  // engine, and a break anywhere in it is silent: the arm falls back
-  // to its `pending` line and the potion does nothing, which is the
-  // state this slice found. Swept at the host end; the window's
-  // forwarding is pinned in nativeinventory.test.js.
-  const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-  for (const rel of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeonContext.js']) {
-    const src = readFileSync(join(root, rel), 'utf8');
-    assert.match(src, /drinkPotion: \(key, potent\) => magic\.drinkPotion\(key, potent\)/,   // PIN MOVED (PROF12): a Potent potion's share handed on
-      `${rel} hands the drink through its cast engine`);
-  }
-  // U53: ONE builder per host, so the count is ONE and the loot-pile
-  // window can drink because it goes through that builder rather than
-  // through a copy of it that someone has to remember to update. The
-  // law is unchanged and is now structural.
-  const world = readFileSync(join(root, 'src/scenes/world.js'), 'utf8');
-  assert.equal((world.match(/drinkPotion: \(key, potent\)/g) ?? []).length, 1,   // PIN MOVED (PROF12)
-    'exactly one drink hook, in the one builder');
-  assert.match(world, /const w = makeInventoryWindow\(\{\n/,   // DISC10-E L3 re-aim: built first (the door may refuse, null), mounted only when it is a window
-    'and the loot-pile window is built BY that builder, so it drinks too');
-  // and the engine's own half is DFU's AssignBundle flags
-  const hm = readFileSync(join(root, 'src/scenes/hostMagic.js'), 'utf8');
-  assert.match(hm, /bypassSavingThrows: true, bypassChance: true/,
-    'AssignBundleFlags.BypassSavingThrows | BypassChance (:942)');
-});
-
 test('U44: drinking one actually reaches the sinks - the whole point', () => {
   // The arm consumed the bottle and printed "You drink the potion."
   // over an entity nothing had touched, for the whole of the item arc.

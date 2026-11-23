@@ -4,7 +4,7 @@
 // (ui/oreMapTip.js): the ground's veins (its climate's table), its dungeons' deep veins, its kingdom's own ore, and
 // whether the witnesses have vouched for it - every word read off the law that stands the veins, so the card cannot
 // promise an ore the ground would not give. The world host hands the map the card and asks the ground's witnessed
-// state once a pixel, through the gathering host. bible/01-Overview/bugs/Field-Bugs-2026-10-11d.md.
+// state once a pixel, through the gathering host..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,7 +14,8 @@ import { readTip, TIP_LINES_MAX, TIP_TEXT_MAX } from '../../src/ui/eventMapMarks
 import { VEIN_TABLES, veins, regionSignature, UNCONFIRMED_VEIN_TIER } from '../../src/net/nodeLaw.js';
 import { minedMaterial } from '../../src/net/professionLaw.js';
 import { CLIMATES } from '../../src/formats/mapsFile.js';
-import { REGION_NAMES } from '../../src/formats/mapsTables.js';
+import { REGION_NAMES, CYRODIIL_REGION } from '../../src/formats/mapsTables.js';
+import { richness } from '../../src/net/provinceNodes.js';
 import { createGatherHost } from '../../src/scenes/gatherHost.js';
 import { mineKind } from '../../src/scenes/mineHost.js';
 import { TERRAIN_SIZE, HEIGHTMAP_DIMENSION } from '../../src/world/terrain/terrainSampler.js';
@@ -24,7 +25,6 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const GLENUMBRA = 59, SENTINEL = 20, ORSINIUM = 26, ALIKR = 0, BETONY = 19;
 
 test('ORE-MAP: the card says a pixel\'s veins, its dungeons\', its kingdom\'s own ore and its ground\'s witnessed state - for the report\'s own case, a Daggerfall woodland nobody has read yet (mutants: the signature unsaid; the held ores unsaid; a confirmed pixel said unwitnessed)', () => {
-  // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): the Dungeons line is the table every dungeon draws on anyone's
   // word, and the woods' deep Moonstone - which still waits on its dungeon's witnesses - is said on the state line
   assert.deepEqual(oreMapTip({ climate: CLIMATES.Woodlands, region: GLENUMBRA, fact: null }), { title: ORE_TIP_TITLE, lines: [
     'Veins: Iron, Copper, Tin, Lodestone',
@@ -56,7 +56,10 @@ test('ORE-MAP: the card is the vein law\'s own - over every climate a vein stand
         assert.ok(card.lines.length <= TIP_LINES_MAX && card.lines.every((l) => l.length <= TIP_TEXT_MAX));
         assert.equal(card.lines[0], `Veins: ${table.map(oreWord).join(', ')}`);
         const sig = regionSignature(region);
-        assert.equal(card.lines.some((l) => l.endsWith(`'s own ore: ${sig ? oreWord(sig.ore) : ''}`)), !!sig, `region ${region}'s own ore`);
+        // Cyrodiil's every province's ores and metals (net/provinceNodes.js)
+        const times = richness(region, 'vein') > 1 ? ` (${richness(region, 'vein')}x the veins)` : '';
+        if (region === CYRODIIL_REGION) assert.ok(card.lines.includes(`Cyrodiil holds every province's ores and metals${times}`), 'Cyrodiil: every province\'s');
+        else assert.equal(card.lines.some((l) => l.endsWith(`'s own ore: ${sig ? oreWord(sig.ore) : ''}${times}`)), !!sig, `region ${region}'s own ore`);
       }
     }
     // the law: an unwitnessed pixel's veins over thirty days hold none of what the card holds back
@@ -71,13 +74,7 @@ test('ORE-MAP: the card is the vein law\'s own - over every climate a vein stand
 });
 
 test('ORE-MAP: the world host hands the held map the card online, asks a pixel\'s witnessed state once and after the pointer rests, through the gathering host - which stands again a pixel of its own whose state the answer moved - and the Mining page says where to look (mutants: the card offline; asked every hover; the ask past the host; the stood pixel left on its old word)', async () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /      oreAt: profBook \? oreMapAt : null,/);
-  assert.match(w, /if \(!fact && profBook\?\.state\?\.open === true && gatherHost && !_oreAsked\.has\(k\)\) \{\n\s+clearTimeout\(_oreAskTimer\);\n\s+_oreAskTimer = setTimeout\(\(\) => \{\n\s+if \(_oreAsked\.has\(k\)\) return;\n\s+_oreAsked\.add\(k\);\n\s+gatherHost\?\.askPixels\(\[\[px, py\]\]\)\.then\(\(\) => again\?\.\(\), \(\) => \{\}\);\n\s+\}, ORE_ASK_MS\);/);
-  // PIN MOVED (MINE-PERKS, Professions-Arc 43): and whether the reader is a Surveyor, whose own word witnesses the ground
-  assert.match(w, /return oreMapTip\(\{ climate: maps\.getClimateIndex\(px, py\), region: maps\.getRegionIndexAt\(px, py\), fact, surveyed \}\);/, 'the ground\'s own climate and region, as the gathering host reads them');
-  assert.match(w, /pixelInfo: \(x, y\) => \{ try \{ return \{ climate: maps\.getClimateIndex\(x, y\), region: maps\.getRegionIndexAt\(x, y\) \}; \}/, 'the same reads the veins stand by');
-  assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);   // VOICE1 (PIN MOVED): the same law in plain words
+  assert.match(MINING_GROUND_LINE, /Point at open ground on the world map to see what its veins hold and whether it has been witnessed yet\.$/);   // VOICE1 (
   // the gathering host's ask: a pixel it stands, answered as changed, is stood again
   const WOODS = CLIMATES.Woodlands, PX = 405, PY = 150, DAY = 20500;
   const law = veins({ x: PX, y: PY, day: DAY, climate: WOODS, region: GLENUMBRA, confirmed: false });

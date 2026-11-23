@@ -1,0 +1,12 @@
+# Only what the bundles read: the two services, the shared code in src/, the vendored mods' JSON tables, and the kit.
+*
+!server/
+!server-account/
+!src/
+!vendor/**/*.json
+!selfhost/
+selfhost/node_modules/
+selfhost/build/
+selfhost/data/
+selfhost/.env
+**/node_modules/

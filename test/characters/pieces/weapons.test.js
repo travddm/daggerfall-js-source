@@ -44,7 +44,7 @@ test('weapons: verbatim DFU data pins - and the one condition pool WEAPON-POOL d
   // ported row: baseWeight 4.5, hitPoints 800, basePrice 15):
   // value 15*3*512; weight quarter-kg rule with Unity's half-to-EVEN
   // round (trunc(4.5*4)=18, *5=90, /4=22.5 -> 22 -> 5.5kg);
-  // condition trunc(800*32/4) - WEAPON-POOL (2026-10-06): the one pool
+  // condition trunc(800*32/4) - WEAPON-POOL: the one pool
   // every weapon type shares stands in the row's 800, trunc(1600*32/4)
   // (test/systems/weaponpool.test.js).
   const d = buildWeapon(WEAPONS.Longsword, WEAPON_MATERIALS.Daedric);

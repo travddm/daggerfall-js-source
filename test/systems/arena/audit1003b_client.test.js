@@ -1,8 +1,7 @@
-// AUDIT PRE-MERGE 1003b (2026-10-03, the owner: "We're going to do one last deep audit on everything before we push this.
-// It needs to be perfection"): THE CLIENT'S SIDE OF A PRIVATE SESSION (ARENA6) - the session on a screen, the hosts'
+// AUDIT PRE-MERGE 1003b: THE CLIENT'S SIDE OF A PRIVATE SESSION (ARENA6) - the session on a screen, the hosts'
 // seams, the card - each finding red first on the real modules: the real relay Room over fake sockets
 // (test/fakeRoom.mjs), the real online half (scenes/arena/arenaOnline.js) driving the real bout driver (scenes/arena/arenaBouts.js),
-// as test/systems/arena/arena6_private.test.js's screen() does. The record: bible/01-Overview/audits/Audit-PreMerge-1003.md, its second pass.
+// as test/systems/arena/arena6_private.test.js's screen() does. The record:, its second pass.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,6 +13,7 @@ import { createArenaBouts } from '../../../src/scenes/arena/arenaBouts.js';
 import { callMs, COUNT_MS } from '../../../src/systems/arena/arenaBout.js';
 import { ARENA_TEXT } from '../../../src/systems/arena/arenaText.js';
 import { sessionCard, onlineCards, arenaBoard } from '../../../src/systems/arena/arenaBoard.js';
+const DAI = { race: 'Nord', gender: 'male', faceIndex: 0, items: [{ templateIndex: 123, group: 'Weapons', equipSlot: 19, material: 9 }] };   // the weapon the bouts' blows name: the referee holds a claim to the look
 
 const C = ARENA_FLOOR_CENTRE;
 const O = ARENA_TEXT.online;
@@ -34,7 +34,7 @@ async function walk(R, step, ms, screens = []) { for (let t = 0; t < ms; t += AR
 function clientSocket(R, ws, room) {
   let seen = 0;
   const s = {
-    status: 'open', arenaOk: true, room, ws, q: [],
+    status: 'open', arenaHeard: true, room, ws, q: [],
     sendArena(w) { const v = validArenaIn(w); if (!v || s.status !== 'open' || !isArenaRoom(s.room)) return false; s.q.push(word(R, s.ws, v)); return true; },
     async flush() { while (s.q.length) await Promise.all(s.q.splice(0)); },
     pump(onArena) { const out = s.ws.sent.slice(seen); seen = s.ws.sent.length; for (const m of out) if (m.t === 'arena') { const w = readArenaOut(m); if (w) onArena(w, s.room); } },
@@ -65,7 +65,7 @@ function screen(R, ws, name, { guest = false, banner = null } = {}) {
 const last = (ws, k) => ws.sent.filter((m) => m.t === 'arena' && m.k === k).at(-1) ?? null;
 async function mk(R, name, linked = true, opts = {}) {
   const ws = R.connect();
-  await R.hello(ws, `peer-${name.toLowerCase()}`, { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${name.toLowerCase()}` });
+  await R.hello(ws, `peer-${name.toLowerCase()}`, { x: C[0], y: 7, z: C[2] - 21.8, yaw: 0, pitch: 0, mv: 0 }, { name, ...(linked ? { kind: 'linked' } : {}), tokenSub: `acct-${name.toLowerCase()}`, look: DAI });
   return screen(R, ws, name, { guest: !linked, ...opts });
 }
 /** Hela hosts `AAAAAA` on a fresh room; `who` join it (`[name, linked = true, opts]`). Answers the room and the screens. */
@@ -188,14 +188,6 @@ test('AUDIT PRE-MERGE 1003b C6/S5: a newcomer refused by a full session (or a lo
   assert.equal(shut.A.session(), null);
   assert.deepEqual(shut.doors.at(-1), ['leave']);
 }));
-
-test('AUDIT PRE-MERGE 1003b C7: the floor entered away from Daggerfall\'s colosseum lands back where it was entered - its way out is the Herald\'s place only when the Herald is streamed in (mutants: no way back recorded; the exit not falling back to it)', () => {
-  const modes = rd('src/scenes/worldModes.js');
-  assert.match(modes, /const from = \{ pos: \[player\.pos\[0\], player\.pos\[1\] \+ CAPSULE_HEIGHT \/ 2, player\.pos\[2\]\], normal: \[Math\.sin\(cam\.yaw\), 0, Math\.cos\(cam\.yaw\)\] \};/);
-  assert.match(modes, /arenaFloor: kind, arenaFrom: from,/);
-  assert.match(modes, /arenaFrom: hit\.arenaFrom \?\? null,/);
-  assert.match(modes, /dungeonReturn\.arena \? host\.arenaLanding\?\.\(\) \?\? dungeonReturn\.arenaFrom \?\? null :/);
-});
 
 test('AUDIT PRE-MERGE 1003b C8/U3/U8: the card keeps the session\'s word - a host\'s press refused is said in the window, not only in the chat under it; `no bout` with no bout here is said; a session stepped out of offers its code again, a wrong code says why (mutants: the word dropped; `no bout` unsaid; no rejoin)', async () => onClock(async () => {
   const o = await hosted([['Alva']]);

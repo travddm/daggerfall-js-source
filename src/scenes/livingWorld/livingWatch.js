@@ -1,6 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// LW7 / LW-FIX2 / WATCH-FIX (2026-10-05, bible/06-Systems/Living-World.md "LW7", "LW-FIX2", "WATCH-FIX"): THE TURNED
+// LW7 / LW-FIX2 / WATCH-FIX: THE TURNED
 // WATCH - a resident the watch's conversion took (DFU's: the walker's body gone, a guard stood in its place - a swing, the
 // trample, the crime response's arms, the minute's sweep, the town watch's summons) is followed through the guard that
 // stands for them to its end. Every such guard carries the resident it came from (`livingFrom`, put on it where it is
@@ -19,7 +18,6 @@
 //     guard has seen): a guard stood in their place, they stepped aside - its end is never their death.
 // The first cut read any `dead` as a kill: the watch walking off when the crime cleared slew the resident by the player's
 // hand and turned the palace household against them; and a resident only the swing had marked was taken for the day.
-// ═══════════════════════════════════════════════════════════════════
 
 /** The beats (host frames) a guard's resident is looked for (a load's guard knows only the id) before it is let be. */
 export const WATCH_WAIT = 600;

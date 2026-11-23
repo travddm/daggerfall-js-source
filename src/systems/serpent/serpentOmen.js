@@ -1,7 +1,7 @@
 // @ts-check
-// SERPENT1 (2026-10-04, Mac: "a large scale sea serpent in the ocean"): THE SIGHTING - what the clock's serpent says to
+// SERPENT1: THE SIGHTING - what the clock's serpent says to
 // one player: the chat's lines, the map's ring, the compass's mark. The gate's omen's twin (systems/gate/gateOmen.js).
-// Design: bible/11-Multiplayer/Sea-Serpent.md section 2.
+// Design:
 //
 // ONE CALL A FRAME from the online frame (scenes/world.js), reads for the maps and the HUD. Everything is a function of
 // the RELAY'S clock (`now` - the welcome's offset); before the host is ready (the relay's clock heard, the hub's
@@ -13,7 +13,7 @@
 // slain says no sounding.
 //
 // THE SITE IS ASKED LAZILY: the lanes' walk (systems/serpent/serpentSite.js) runs the first time a serpent is in its omen or
-// later - SERPENT2: or online, from its quiet on (`ahead`, the site said to the hub for its Discord herald) - and a
+// later - or online, from its quiet on (`ahead`, the site said to the hub) - and a
 // host with no map data hands `site` a null and the omen stays silent rather than naming nowhere - asking again every
 // SITE_RETRY_MS (a site that throws is none), so a map loaded late still names it that day.
 //
@@ -85,7 +85,7 @@ export function createSerpentOmen({ now, site, say, localTime = () => null, fell
     },
     current: () => current,
     /** SERPENT2: the serpent the clock is about and its site, found AHEAD of its bells (from its quiet on, once the omen is
-     *  ready) - what this game says to the hub, so the Discord herald's bells can name the place (net/serpent/serpentHerald.js).
+     *  ready) - what this game says to the hub, so the accounts can agree on the site (net/serpent/serpent-site.ts).
      *  Null until then, or while no site is found. */
     ahead() {
       if (!settled) return null;

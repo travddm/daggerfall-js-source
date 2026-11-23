@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13; bible/06-Systems/Firmament.md) - WHAT THE FIRMAMENT DOES. The law (net/firmament/firmamentLaw.js) sums and
+// FIRM1 - WHAT THE FIRMAMENT DOES. The law (net/firmament/firmamentLaw.js) sums and
 // caps every channel the stars allocated carry; the tree in force is firmamentLive.js's; this file lays those channels
 // onto the seams the Sigil Sets, the loot and the Arcane paths opened - registered here at import, each a no-op for
 // anyone but MY entity, the tree in force:
@@ -32,7 +32,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { SKILLS, SKILL_KEYS, permanentSkillValue } from './skills.js';
-import { ATTRIBUTES, COMBAT_SKILLS, LIFE_SKILLS, FIRM_ELEMENTS, blowPct, castCostPct, statDef, pctOf } from '../net/firmament/firmamentLaw.js';
+import { ATTRIBUTES, COMBAT_SKILLS, LIFE_SKILLS, FIRM_ELEMENTS, blowPct, castCostPct, statDef, pctOf, firmamentHealth } from '../net/firmament/firmamentLaw.js';
 import { firmamentStats, firmamentStatsAt, onFirmamentChange, firmamentInForce } from './firmamentLive.js';
 import { mentorPowerScale } from './mentorMode.js';   // MENTOR2: the combat stars at the mentor's share
 import { sigilDueling } from './sigil/sigil.js';
@@ -110,7 +110,7 @@ export function firmamentFold(entity) {
   // a key star's raw points, and a small star's share of the character's own (its permanent value: Ascend's points in it)
   // - AUDIT UICALM-FIRM1 L1 H1: the two TOGETHER held to the channel's budget (an attribute +15, a combat skill +15):
   // capped apart they made +21 Strength and a mastered Stealth +53
-  // FIRM-MAX (2026-10-15, asked of the port: "all nodes should also work on maxed out stats"): a gain lifts the attribute's
+  // FIRM-MAX: a gain lifts the attribute's
   // live ceiling by itself too, so +2% Speed on a 100 reads 102 - liveStat had held it at MAX_STAT_VALUE, and a star
   // did nothing for a maxed stat. A departure from GetLiveStatValue's ceiling for the sky's gains alone.
   for (const a of ATTRIBUTES) {
@@ -214,12 +214,12 @@ export function firmamentLayer(entity = me()) {
   if (!entity) return;
   const baseHp = Number.isFinite(entity.rawMaxHealth) ? entity.rawMaxHealth : (entity.maxHealth ?? 0) - renownHpOf(entity);
   const baseMp = (entity.maxMagicka ?? 0) - renownMpOf(entity);
-  // AUDIT UICALM-FIRM1 L1 H1: the raw points and the share together inside the budget (+75 Health, +75 Spell Points)
+  // AUDIT UICALM-FIRM1 L1 H1: the raw points and the share together inside the budget (+75 Spell Points; B5: Health is held by its two channels' own sums)
   // LEVEL-EVEN (systems/levelEven.js): and the stars' Endurance, which the online health floor reads
   const end = attributeGain(entity, 'endurance', (key) => c[key] ?? 0);   // an attribute is a combat channel (firmamentLaw.js statDef)
   // AUDIT LEVEL-EVEN L2-4: a small star's share is of the body the floor stands the stored one at (never of the layer)
   const floored = baseHp + (Number.isFinite(entity.rawMaxHealth) ? evenHpOf(entity, (entity.stats?.endurance ?? NaN) + end) : 0);
-  setOnlineLayerExtra(entity, { hp: capAt('hp', (c.hp ?? 0) + pctOf(floored, c.hpPct ?? 0)), mp: capAt('mp', (c.mp ?? 0) + pctOf(baseMp, c.mpPct ?? 0)), end });
+  setOnlineLayerExtra(entity, { hp: firmamentHealth(c, floored), mp: capAt('mp', (c.mp ?? 0) + pctOf(baseMp, c.mpPct ?? 0)), end });
 }
 
 // ── registered at import ───────────────────────────────────────────

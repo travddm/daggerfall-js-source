@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF1 (2026-09-28, Mac: "Begin!") — THIS DEVICE'S PROFESSIONS: the
+// PROF1 — THIS DEVICE'S PROFESSIONS: the
 // character's tracks, Stores and day as the account service last said
 // them, its streamed pixels' witnessed states, the harvests on their way,
 // the withdrawals to the pack, the region's Court writs and a delivery.
@@ -26,7 +26,7 @@
 // for the act's row - every refusal but the network's, the service's own
 // fault, the account's rate and a missing session.
 //
-// BAG1 (bible/06-Systems/Materials-Bag.md): A CARRYING BOOK - one handed
+// BAG1: A CARRYING BOOK - one handed
 // `carry`, the host's hands on the Materials Bag and the pack (systems/
 // materialsBag.js) - asks every harvest and withdrawal as carried: the
 // units are the service's count, and the items are minted into the bag
@@ -37,7 +37,7 @@
 // and given back on a refusal), so the station's own route spends the
 // Stores as it always has.
 //
-// AUDIT BAG1 (bible/06-Systems/Materials-Bag.md, the audit): WHAT THE
+// AUDIT BAG1 (, the audit): WHAT THE
 // PACK HOLDS IS SAID WHEN THE ACT IS ASKED, never when it was kept -
 // `held` read at the send, with the units of every deposit still out (the
 // pack gave them up; the count holds them until the deposit lands), beside
@@ -61,11 +61,12 @@ import { recipeById, recipeInputs, recipeOpen, counterMade } from './recipeLaw.j
 import { potionById, brewSpends } from './alchemyLaw.js';   // BAG1: a brew's
 import { chainPlan, chainNeeded, storesRoom } from './chainLaw.js';   // CRAFT1: the works a craft's inputs want first
 import { temperableRecipe, temperCost } from './temperLaw.js';   // CRAFT4: a temper's input, moved in from the bag first
-import { MASTER_CATALYSTS, masterDayOf } from './masterLaw.js';   // MASTER-ART: a Master's work's catalysts, moved in from the bag first; its day
+import { MASTER_CATALYSTS, masterDayOf, masterTierOfState } from './masterLaw.js';   // MASTER-ART: a Master's work's catalysts, moved in from the bag first; its day
 import { pixelKey, parseNodeKey } from './nodeLaw.js';
 import { accountRefusalText } from './accountClient.js';
 import { ASK_AGAIN_NOW, jittered } from './backoff.js';   // SCALE1: asks again spread out, and never at once into a minute's refusal
 import { t } from '../systems/textManager.js';   // L10N4: the Stores' words in the player's language
+import { learnRefusal, closedToday, heardCaps } from './profDayCapBook.js';   // PROFESSION-CAPS
 import { noteAct } from '../systems/questlines/qlActs.js';   // QL11: the features' acts, heard by the running quests
 import { turnedDayOf } from './dayTurn.js';   // DAY-TURN: a page's day turns at its own moment past midnight
 
@@ -147,7 +148,7 @@ const dayOf = (ms) => Math.floor(ms / 86_400_000);
  *   units the service handed over, every one minted (what finds no room into the pack past its weight - B5's law);
  *   `stamped`/`unstamp`/`stamps` a deposit's stamp in the save (takeCarried's `stamp` - its id, material, units and
  *   order); `flush` a checkpoint that LANDED (the save holding the take is the realm's before the deposit is asked).
- *   DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): `embers` the pack's Deadlands Embers - how many it
+ *   DAEDRIC-SMELT: `embers` the pack's Deadlands Embers - how many it
  *   holds unlocked, and a take of them with its undo (systems/sigil/sigilBroker.js emberHands) - the pack's half of a
  *   work that spends them, as the Broker's sale takes its price.
  */
@@ -180,7 +181,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     /** CRAFT-HALL: what the service says the character has made, or null from an older service */
     made: /** @type {{ crafts: Set<string>, works: Set<string>, brews: Set<string> }|null} */ (null),
     /** MASTER-ART: whether today's Master's work is made (null unknown - an older service), and the last one's answer */
-    master: /** @type {{ made: boolean|null, last: any }} */ ({ made: null, last: null }),
+    master: /** @type {{ made: boolean|null, last: any, tier: 'rare'|'legendary' }} */ ({ made: null, last: null, tier: 'rare' }),
     /** PROF3: the account's Marks as the smith's stock last answered them, or null */
     marks: /** @type {number|null} */ (null),
     /** PROF7: the account's hides today, every character's together, and of them those of tiers 5-6 (PROF0 6: 3 a day -
@@ -190,7 +191,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     hauls: 0,
     /** REFUSALS-LEARNED: the state to be read again (a refusal said the Stores or the carried count moved elsewhere) */
     reread: false,
-    /** REFUSALS-LEARNED: what the account's refusals closed, by key (`deep` - CAP-OFF: no `account:<profession>`) -> the UTC day */
+    /** REFUSALS-LEARNED: what the account's refusals closed, by key (`deep`; `day:<character>:<track>` - PROFESSION-CAPS) -> the UTC day */
     closed: new Map(),
   };
   const account = () => { try { return door.account?.() ?? null; } catch { return null; } };
@@ -219,7 +220,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     try { storage?.setItem?.(PROF_KEPT_KEY, JSON.stringify(t)); _memory = null; } catch { _memory = t; }
     _wrote += 1;   // GATHER-SPEED: the pump's idle read is stale
   };
-  /** GATHER-SPEED (2026-10-11, Mac: "look at gathering minigame performance"): THE KEPT TABLE AS LAST PARSED, for the
+  /** GATHER-SPEED: THE KEPT TABLE AS LAST PARSED, for the
    *  readers that only look - the prompt's `counting` (every plan, every frame) and the pump's due check (every frame).
    *  Each parsed the whole table out of storage again, every frame. The text is read still (another tab may write it),
    *  and parsed only when it changed; what this answers is never written to - a writer reads its own copy (keptOf). */
@@ -312,12 +313,12 @@ export function createProfBook({ door, storage = null, character = () => null, n
     for (const c of data?.carried ?? []) applyCarried(c);   // BAG1
     state.silver = new Map(Object.entries(data?.silver && typeof data.silver === 'object' ? data.silver : {}).filter(([, n]) => Number.isSafeInteger(n) && n > 0));   // WOVEN-PAYS
     if (data?.writs) state.writs = { today: data.writs.today | 0, max: data.writs.max | 0 };
-    state.caps = data?.caps ?? null;
+    state.caps = data?.caps ?? null; heardCaps(state.caps);   // PROFESSION-CAPS: the tier prices' scale
     applyHunt(data?.hunt);
     applyHauls(data?.hauls);
     state.made = madeOf(data?.made);   // CRAFT-HALL
     // MASTER-ART: the day's work as the service says it; the last one's card kept for its own character alone
-    state.master = { made: typeof data?.master?.made === 'boolean' ? data.master.made : null, last: was === state.character ? state.master.last : null };
+    state.master = { made: typeof data?.master?.made === 'boolean' ? data.master.made : null, last: was === state.character ? state.master.last : null, tier: masterTierOfState(data) };   // the tier the service makes it at
   }
   /** CRAFT-HALL: the state's `made` as Sets, or null when the service sent none. */
   function madeOf(m) {
@@ -452,8 +453,8 @@ export function createProfBook({ door, storage = null, character = () => null, n
       return state.day < heldDay() && now() - state.readAt >= PROF_REFRESH_BACKOFF_MS;   // DAY-TURN: another day at this page's turn
     },
     /** REFUSALS-LEARNED: whether today a refusal closed `key` for the account - `deep` (its veins in dungeons nobody has
-     *  vouched for). CAP-OFF: the account's day in a craft (`account:<profession>`) closes nothing - there is none. */
-    closed(key) { return state.closed.get(key) === dayOf(now()); },
+     *  vouched for). A refused harvest's track is `dayCapped`. */
+    closed(key) { return closedToday(state.closed, character(), key, dayOf(now())); },   // PROFESSION-CAPS: and `day:<harvest kind>` - a refusal said this character's day on its track is done
     /** A track as the service last said it (never null: a profession not worked yet is at nothing). */
     /** A track as the service said it - CRAFT3: a discipline's its craft's ('jewelcrafting' the Smithing track). */
     track(profession) {
@@ -491,8 +492,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       const s = this.store(material);
       return (s.gold | 0) + (s[LOOSE_ORIGIN] | 0) + (carry ? Math.max(0, heldAll(material) - this.carriedUsable(material)) : 0);   // AUDIT TOWN-ECON 2 PRICE-2: a counter's pieces too
     },
-    /** BAG-CRAFT (FIELD BUGS 2026-10-09d, Mac: "I just want players to also be able to craft from their inventory, not
-     *  just the store"): WHAT A STATION MAY WORK OF IT - a craft, a brew, a smelt, a temper: the Stores' and everything the
+    /** BAG-CRAFT (FIELD BUGS 2026-10-09d): WHAT A STATION MAY WORK OF IT - a craft, a brew, a smelt, a temper: the Stores' and everything the
      *  bag, the pack and the wagon hold of it, counted or not, but gold's (bagLaw.js carriedWorkable) - the shortfall put
      *  in first (`ensureInStores` with `work`). */
     workable(material) { return this.storesWorkable(material) + this.carriedWorkable(material); },
@@ -505,7 +505,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     /** BAG1: whether this book carries (a host handed it the bag and the pack) - every harvest and withdrawal is then
      *  the bag's or the pack's, never the Stores'. */
     carrying() { return !!carry; },
-    /** DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): the Deadlands Embers the pack holds unlocked - what a
+    /** DAEDRIC-SMELT: the Deadlands Embers the pack holds unlocked - what a
      *  work that spends them may take (`carry`'s embers) - or null where this book holds no pack (the Forge bounds by the
      *  service's purse alone, its refusal `prof-embers`). */
     embers() { return carry?.embers ? carry.embers.held() : null; },
@@ -551,7 +551,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
         for (const p of r.data?.pixels ?? []) {
           const k = pixelKey(p.x, p.y);
           const before = pixels.get(k);
-          pixels.set(k, { day, state: p.state, climate: p.climate ?? null, region: p.region ?? null });
+          pixels.set(k, { day, state: p.state, climate: p.climate ?? null, region: p.region ?? null, ...(p.jungle === true ? { jungle: true } : {}) });   // AUDIT TESA II J5: a confirmed jungle's word
           // GROUND-MIDNIGHT (AUDIT 2026-10-01 part four): yesterday's word is no word - the day's turn stood every pixel
           // again before today's states were read (the ground's least), so a pixel confirmed yesterday AND today was
           // never stood again: it stood unconfirmed all day, its signature veins gone
@@ -849,7 +849,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
      * so a lost answer is asked again (the same id, the same pieces) and `mint` makes them on the answer, once: the tab
      * that lets the craft go mints it (AUDIT 29 C5's law). One at a time. AUDIT 30 C4: `fee` the station's gold, kept with
      * the craft and handed to `mint` with it - the tab that mints the pieces pays it, whenever the answer comes.
-     * CRAFT1 (bible/06-Systems/Professions-Arc.md 41): THE CHAIN - inputs the Stores and what is carried lack are made
+     * CRAFT1 (41): THE CHAIN - inputs the Stores and what is carried lack are made
      * first by the works chainLaw plans from what is held, each the service's own smelt kept in the Stores (`stay`), in
      * the plan's order; a plan that cannot cover them asks no work (the craft is asked as before - the book's view of the
      * Stores is not the service's, and the service says what is short), and a work refused stops the craft with the
@@ -1094,7 +1094,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       return p;
     },
 
-    /** CRAFT-WRITS (bible/06-Systems/Professions-Arc.md section 49): A CRAFTING WRIT FILLED - its goods out of the realm
+    /** CRAFT-WRITS: A CRAFTING WRIT FILLED - its goods out of the realm
      *  record where it stands (`realm`, the host's realm act: systems/realmSaves.js realmGoldAct asks again itself, so this
      *  asks once), `pieces` a dish or kit writ's provenance ids. The id is the writ's own until an answer comes, so a press
      *  after a lost answer is the same delivery. Answers the service's answer; the track and the Work list moved with it -
@@ -1150,7 +1150,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       m.promise = (async () => {
         // BAG1: the work's inputs the Stores lack, from the bag and the pack first
         const work = smeltRecipe(recipe);
-        // DAEDRIC-SMELT (bible/06-Systems/Professions-Arc.md section 53): THE EMBERS A WORK SPENDS - the pack's half (`carry`'s
+        // DAEDRIC-SMELT: THE EMBERS A WORK SPENDS - the pack's half (`carry`'s
         // embers, the insignia's own law: systems/sigil/sigilBroker.js insigniaSale), the account's purse the service's.
         // Asked before anything moves: a pack short of them puts nothing in the Stores
         const embers = workEmbers(work, count), pack = carry?.embers ?? null;
@@ -1222,6 +1222,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
     if (key !== slot()) return { ok: false, error: 'elsewhere', kept: true };
     const body = {
       character: h.character, node: h.node, kind: h.kind, climate: h.climate, region: h.region, act: h.act, at: h.at, rid: h.rid,
+      ...(h.jungle === true ? { jungle: true } : {}),   // AUDIT TESA II J5: its pixel past the Bay a jungle zone's (nodeLaw.js jungleWoods - witnessed)
       ...(h.foe === undefined ? {} : { foe: h.foe }),   // PROF7: the foe a body is (PROF0 6: the client's claim)
       ...(typeof h.watch === 'string' ? { watch: h.watch } : {}),   // PROF2b: a Motherlode's - the relay's Watch receipt for its pixel
       ...(h.carry === true ? { carry: true, ...heldBody(h) } : {}),   // BAG1: into the bag or the pack
@@ -1272,12 +1273,11 @@ export function createProfBook({ door, storage = null, character = () => null, n
     if (!here) return { ok: false, error: r?.error ?? 'server', elsewhere: true };
     shutBy(r);
     if (r?.error === 'node-taken') state.taken.add(`${h.node}|${h.kind}`);
-    // REFUSALS-LEARNED (AUDIT 2026-10-01 part four): WHAT A REFUSAL SAYS OF THE DAY IS KEPT - the plan went on offering
-    // the act as ready, the act played, the tool wore, and the same refusal came every try. The Stores filled elsewhere
-    // (another device): the state is read again. Its veins in dungeons nobody has vouched for - a count the state does not
-    // carry: closed until the UTC day turns. CAP-OFF: the character's day and the account's day in a craft are no more.
+    // REFUSALS-LEARNED (AUDIT 2026-10-01 part four): WHAT A REFUSAL SAYS OF THE DAY IS KEPT - the plan went on offering the act as
+    // ready, the act played, the tool wore, and the same refusal came every try. The Stores filled elsewhere (another device): the state
+    // is read again. Veins in dungeons nobody has vouched for, and a character's day on a track: closed until the UTC day turns.
     if (r?.error === 'stores-full' || r?.error === 'carried-full') state.reread = true;   // AUDIT2 BAG1 K9: and the carried count's own
-    if (r?.error === 'prof-deep-cap') state.closed.set('deep', dayOf(now()));
+    learnRefusal(state.closed, h, r?.error, dayOf(now()));   // PROFESSION-CAPS: `prof-deep-cap` closes `deep`, `prof-day-cap` the character's day on the track
     staleGround(h.node);   // GROUND-STALE: a refusal (`prof-rank` on a node the client stood within the rank) is the stale ground's word too
     // AUDIT 32 B2: the account's rare hides as the refusal says them - the book counted what this device saw, and another
     // character (or device) of the account may have taken the rest; a knife worn on every try until the next day's read
@@ -1339,7 +1339,7 @@ export function createProfBook({ door, storage = null, character = () => null, n
       applyTrack(r.data?.track);
       // CRAFT-HALL: what it made; a judged cloth pattern only by the craft that laid its first on (WOVEN-PAYS, `firstPaid`)
       if (w.brew === true) noteMade('brews', w.recipe);
-      else if (Array.isArray(w.master)) state.master = { made: state.master.made === true || Number(r.data?.day) === masterDayOf(now() / 1000), last: r.data };   // MASTER-ART: the work made, its card; AUDIT HORIZONTAL B5: today's by an answer of today's day alone
+      else if (Array.isArray(w.master)) state.master = { made: state.master.made === true || Number(r.data?.day) === masterDayOf(now() / 1000), last: r.data, tier: state.master.tier };   // MASTER-ART: the work made, its card; AUDIT HORIZONTAL B5: today's by an answer of today's day alone
       else if (!counterMade(recipeById(w.recipe)) || r.data?.firstPaid === true) noteMade('crafts', w.recipe);
       // AUDIT CRAFT-WRITS C7: a brew, a dish or a kit moves what a crafting writ's card holds (its `brewed`, its `pieces`)
       const made = w.brew === true ? null : recipeById(w.recipe);

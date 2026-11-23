@@ -1,5 +1,4 @@
-// AUDIT SUGGESTIONS-1019 (2026-10-19, Mac: "Audit everything" / "Audit everything built"; bible/01-Overview/audits/
-// Audit-Suggestions-1019.md): the laws the six cold lanes found wanting in the #suggestions batch, each pinned here by its
+// AUDIT SUGGESTIONS-1019: the laws the six cold lanes found wanting in the #suggestions batch, each pinned here by its
 // finding's id - the loot's (L1), the health floor's (L2), the skill ticker's (L3) and the class skill swap's (L5).
 import '../modsOff.js';
 import { test } from 'node:test';
@@ -275,7 +274,7 @@ test('AUDIT L6-3 and L2-2, by source (the hosts and the canvas sheet do not run 
   const { readFileSync } = await import('node:fs');
   const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
   const notice = src('src/ui/levelUp/levelNotice.js');
-  // SKILL-READY (2026-10-20): the strip no longer counts them - the HUD's tile beside the Renown bar does (ui/hud/hudAdvance.js)
+  // SKILL-READY: the strip no longer counts them - the HUD's tile beside the Renown bar does (ui/hud/hudAdvance.js)
   assert.match(notice, /const rows = hidden \? \[\] : levelNotices\.frame\(now, \{ owed, improvable: improvable \?\? 0 \}\);/);
   assert.match(src('src/ui/hud/hudAdvance.js'), /skillsImprovable\(/, 'the tile counts the skills');
   assert.match(notice, /export const skillsImprovable = \(e = playerEntity\) => countReadyToImprove\(e, \{ now: ownMinutes\(\) \}\);/);

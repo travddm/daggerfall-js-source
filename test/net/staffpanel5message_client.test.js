@@ -1,14 +1,13 @@
-// STAFF-PANEL5-MESSAGE (2026-10-22, mob, 04:14Z: a message in the middle of one player's screen; design doc "DFO Staff
-// Panel: design", Message on screen) - THE RELAY'S AND THE GAME'S HALVES: the order of its own kind ('smsg'), the hub's
+// STAFF-PANEL5-MESSAGE - THE RELAY'S AND THE GAME'S HALVES: the order of its own kind ('smsg'), the hub's
 // nudge to one account's own sockets and its count back through the door (server/src/staffMessage.js), the hello's `sm`
 // (a build that shows the box), the session's frame arm, the box (ui/staffMessageBox.js) and the game's half
 // (net/staffMessages.js) - and the whole chain, from the panel's send to "they pressed OK", over the real relay and the
 // real account service.
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import '../chargenDom.mjs';
 import worker from '../../server/src/index.js';
-import { fakeRooms } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms } from '../fakeRoom.mjs';
 import { fakeSocketClass } from '../fakeSocket.mjs';
 import { standService, sessionStorageOf } from '../accountDb.mjs';
 import { OnlineSession } from '../../src/net/online.js';
@@ -21,13 +20,15 @@ import { ChatLog } from '../../src/net/chat.js';
 import { showStaffMessageBox, STAFF_MESSAGE_BOX_ID } from '../../src/ui/staffMessageBox.js';
 import { staffWords, STAFF_SESSION_HEADER } from '../../server-account/src/staff.js';
 import * as H from '../../src/net/hubShards.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const subtle = globalThis.crypto.subtle;
 const ofType = (ws, t) => ws.sent.filter((m) => m.t === t);
 const nowS = () => Math.floor(Date.now() / 1000);
 const MI = 'msg-id-0000000001';
 /** Turns of the loop until `cond` holds (a call through the real Worker takes a few). */
-const until = async (cond, n = 500) => { for (let i = 0; i < n && !(await cond()); i++) await new Promise((r) => setImmediate(r)); };
+/** Polls until `cond` holds or `ms` of wall time pass. A turn count is not a time: the service's answer crosses real async work (crypto on the thread pool), and 500 turns is about 5 ms. */
+const until = async (cond, ms = 10_000) => { for (const end = Date.now() + ms; Date.now() < end && !(await cond());) await new Promise((r) => setImmediate(r)); };
 const quiet = async (fn) => { const keep = { info: console.info, warn: console.warn }; console.info = console.warn = () => {}; try { return await fn(); } finally { Object.assign(console, keep); } };
 
 /** The hub, its door, and a key the service and the relay share. */
@@ -301,7 +302,7 @@ async function panelOverRelay() {
   const owner = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pub = Buffer.from(new Uint8Array(await subtle.exportKey('raw', owner.publicKey))).toString('base64url');
   const RELAY = `https://relay.example${SAFE_LAW_PATH}`;
-  const s = await standService({ IDENTITY_PRIVATE_KEY: pkcs8, DEVELOPER_HANDLES: 'SirMcMobdon', OWNER_HANDLES: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}`, RELAY_LAW_URL: RELAY });
+  const s = await standService({ IDENTITY_PRIVATE_KEY: pkcs8, SEAT_ADMINS: 'SirMcMobdon', SEAT_OWNERS: 'SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${pub}`, RELAY_LAW_URL: RELAY });
   const real = globalThis.fetch;
   globalThis.fetch = async (url, init) => (String(url) === RELAY ? worker.fetch(new Request(url, init), env) : real(url, init));
   await s.registered('SirMcMobdon');
@@ -335,7 +336,7 @@ test('STAFF-PANEL5-MESSAGE END TO END, offline: the panel sends Troll a message 
     const read = async () => (await staff('/v1/staff/messages', { target: troll.id }, mob.session)).messages[0];
     assert.equal((await read()).label, 'Delivered');
     shown[0].onOk();
-    await until(async () => (await read()).state === 'ok', 50);
+    await until(async () => (await read()).state === 'ok');
     assert.deepEqual([(await read()).state, (await read()).label], ['ok', 'they pressed OK']);
     // a player on a build from before the box
     const sylvia = await s.registered('Sylvia');

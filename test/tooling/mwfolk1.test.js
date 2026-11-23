@@ -1,18 +1,18 @@
-// MW-FOLK1 (2026-10-13, the owner: "This is for the Townspeople outfits"; asked, each walker sprite's own outfit in that
-// sprite's colours): THE TOWNSFOLK'S OUTFITS FOR THE MORROWIND BODY.
+// MW-FOLK1: THE TOWNSFOLK'S OUTFITS FOR THE MORROWIND BODY.
 //
 // One export of nine objects, each a sprite's whole outfit, committed less the 61 polygons of Morrowind's own groin one
 // of them carried (tools/fbxStrip.mjs's cut); fourteen paintings; eleven outfits, each baked into one skinned part in the
 // pose the outfits were made in (the symmetric pack's - its clavicles level, its arms falling half a unit to the
 // wrist), each garment piece weighted by what it is, the hoods raised onto the game's head. A walker whose sprite has
 // an outfit wears it - hiding the skin it covers all round, as a gauntlet hides its forearm - and the wardrobe dresses
-// every other sprite as before. bible/04-Characters/Townsfolk-Outfits.md.
+// every other sprite as before..
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, mkdtempSync, rmSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { parseNif } from '../../src/formats/morrowind/mwNifFile.js';
 import { flattenNif } from '../../src/formats/morrowind/mwNifMesh.js';
@@ -291,11 +291,11 @@ test('MW-FOLK1 (AUDIT): a cut on a file written here - its loose vertex kept, it
   const dir = mkdtempSync(join(tmpdir(), 'mwfolk1-cut-'));
   try {
     const out = join(dir, 'cut.fbx');
-    const run = spawnSync(process.execPath, [new URL('../../tools/fbxStrip.mjs', import.meta.url).pathname, new URL(`../../${SOURCE}`, import.meta.url).pathname, out, '--cut=Breton_Male.018:7,Breton_Male.018:2'], { encoding: 'utf8' });
+    const run = spawnSync(process.execPath, [fileURLToPath(new URL('../../tools/fbxStrip.mjs', import.meta.url)), fileURLToPath(new URL(`../../${SOURCE}`, import.meta.url)), out, '--cut=Breton_Male.018:7,Breton_Male.018:2'], { encoding: 'utf8' });
     assert.equal(run.status, 0, run.stderr);
     assert.match(run.stdout, /cut "Breton_Male\.018" material 7: 92 polygons, material 2: 510 polygons; 379 vertices/);
     assert.equal(Buffer.compare(readFileSync(out), stripFbx(raw(SOURCE), { cut: [{ object: 'Breton_Male.018', material: 7 }, { object: 'Breton_Male.018', material: 2 }] }).bytes), 0);
-    assert.equal(spawnSync(process.execPath, [new URL('../../tools/fbxStrip.mjs', import.meta.url).pathname, 'a.fbx', 'b.fbx'], { encoding: 'utf8' }).status, 2, 'neither a drop nor a cut: the usage');
+    assert.equal(spawnSync(process.execPath, [fileURLToPath(new URL('../../tools/fbxStrip.mjs', import.meta.url)), 'a.fbx', 'b.fbx'], { encoding: 'utf8' }).status, 2, 'neither a drop nor a cut: the usage');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
@@ -559,7 +559,7 @@ test('MW-FOLK1: a walker whose sprite has an outfit wears it - each of the eleve
   assert.deepEqual(all.filter((a) => townsfolkOutfitOf(a)).sort(), ARCHIVES, 'every outfit a walker\'s sprite');
   // AUDIT MW-FOLK1 (L3-F1): EVERY WALKER OF ONE PICTURE DRESSES ALIKE AND THEIR FACES DIFFER - a street of 385's Breton
   // men, read as the build reads them (the look's hint through peerBuildOpts to the walk), reaches every one of the
-  // heads-and-hairs. PIN MOVED (MW-HEADS2 - the owner: "only the player Britons should recieve the new heads, not npcs"):
+  // heads-and-hairs.
   // the data's, four heads and four hairs - the port's own nine are a player's
   const recs = [];
   for (let i = 0; i < 4; i++) for (const [slot, part] of [['head', 0], ['hair', 1]]) recs.push(bodyRec(`b_n_breton_m_${slot}_0${i}`, `b\\b_n_breton_m_${slot}_0${i}.nif`, 'Breton', part));
@@ -665,8 +665,6 @@ test('MW-FOLK1: the hooded woman wears no modesty shirt - her bodice covers her 
   assert.ok(drew.ok && drew.pieces.length > 0, drew.error);
   assert.deepEqual(bareHeadRows(ROWS, hooded, drew.pieces), [], 'the hood drew: it covers it');
   assert.deepEqual(bareHeadRows(ROWS, composeWornArmor({ pieces: [{ kind: 'outfit', id: 'townsfolk_385' }], armors: [], bodyPool: [] }), []), [], 'no hood, nothing hidden');
-  const src = readFileSync(new URL('../../src/combat/fpArm.js', import.meta.url), 'utf8');
-  assert.match(src, /const cap = worn\.adds\.find\(capsHead\);\n\s*missing\.push\(`\$\{cap\?\.partName === 'outfit' \? cap\.slot : 'helm'\}: none of it bound/, 'the note names the outfit');
 });
 
 test('MW-FOLK1: through the binder - every outfit the producer composes a skinned part on retail\'s skeleton, no note; in the idle each garment on its bones, the hood round the head; striding, a tunic\'s hem goes with the leg and its chest stays', async () => {

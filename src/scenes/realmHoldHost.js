@@ -1,6 +1,5 @@
 // @ts-check
-// THE REALM'S HOLDS, SAID TO THE PLAYER (INT3; AUTO-HOLD, 2026-10-16 - Mac: "We need to figure out a better system for
-// trade banning. I dont want to have to manually review"; bible/06-Systems/Integrity-Arc.md AUTO-HOLD). The realm session
+// THE REALM'S HOLDS, SAID TO THE PLAYER (INT3; AUTO-HOLD, 2026-10-16; AUTO-HOLD). The realm session
 // (systems/realmSaves.js) hears two things from a landed checkpoint: the hold on the character's trade as it moves
 // (onTradeHeld - the law's piece named, or a timed hold's end) and the pieces the ledger locked (onPiecesLocked - copies
 // found, locked piece by piece; the character trades on). bootWorld wires both here, one line (HOST-SPLIT) - and, AUDIT

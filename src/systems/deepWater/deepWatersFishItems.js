@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// DW-E3 (2026-09-25): ILIAC PUDDLE NO MORE'S FISH AS ITEMS (jet082,
+// DW-E3: ILIAC PUDDLE NO MORE'S FISH AS ITEMS (jet082,
 // 1.2.2) - the seven templates the mod registers (DeepWaters.Init's
 // RegisterCustomItem, UselessItems2), the pictures its PassiveFishResources
 // gives them, and the item a fish carries (TryCreateFishItem).

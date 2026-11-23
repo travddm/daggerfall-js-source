@@ -3,7 +3,7 @@
 // with NPC for courtship. Compliments, giving gifts, hugging, kissing ... Right now it's confusing on what exactly you're
 // supposed to use to improve relationships"; Revy: "the only thing that seems to work is to have 1 conversation per day
 // with an NPC, with specific attitude (blunt etc), to raise their disposition by 1 point";
-// bible/01-Overview/bugs/Field-Bugs-2026-10-26d.md): THE DEEDS OF A COURTSHIP - four things the one played can do for a
+// ): THE DEEDS OF A COURTSHIP - four things the one played can do for a
 // townsperson of a household, each on the Tell me about page beside Courtship, each once a day per resident, and each
 // answer SAYING what it moved, since a regard and a courtship's affection were numbers the player never saw move:
 //

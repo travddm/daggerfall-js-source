@@ -1,5 +1,5 @@
 // FB1020c TEMPER-CARRIED (found tracing FIELD BUGS 2026-10-20c's "the crafting station ... dont have any craft buttons"):
-// CRAFT4's Temper at the Anvil and Temper at the Loom (bible/06-Systems/Professions-Arc.md 41.7) stood in the Stores
+// CRAFT4's Temper at the Anvil and Temper at the Loom (41.7) stood in the Stores
 // page's station list for a book that carries nothing - and every live book carries (BAG1: scenes/world.js hands the book
 // its carry), whose page (ui/professions/profPages.js drawCarryStores) listed no temper. A smith's or a tailor's temper
 // was drawn nowhere in the game. The carrying page lists both, beside the anvil and the loom.

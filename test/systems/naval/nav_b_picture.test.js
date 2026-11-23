@@ -1,8 +1,7 @@
-// NAV-B (2026-09-28, Mac: "proper naval combat with a huge reference to assassins creed black flag ... extremely
-// detailed, authentic") - THE PICTURE: the smoke, flame, spray and splinters of a sea fight as numbers
+// NAV-B - THE PICTURE: the smoke, flame, spray and splinters of a sea fight as numbers
 // (systems/naval/navalEffects.js), the one pass that draws them with the balls in flight, what floats and the aim
 // (render/navalRender.js), a burning deck on Daggerfall's own fire flat (scenes/naval/navalFlames.js), and a sea ship's
-// colours on her flag (render/comeSailAwayRender.js flagRuns) - bible/03-World/Naval-Combat.md NAV-B.
+// colours on her flag (render/comeSailAwayRender.js flagRuns) NAV-B.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createNavalEffects, PARTICLE_BUDGET } from '../../../src/systems/naval/navalEffects.js';
@@ -96,7 +95,7 @@ test('NAV-B a burning ship breathes embers and smoke at a rate per second whatev
   assert.ok(Math.abs(fast - slow) / slow < 0.2, `the same fire at 120 and 30 frames a second: ${fast} vs ${slow}`);
   const fx = createNavalEffects({ random: seeded(4) });
   for (let i = 0; i < 400; i++) fx.founder([0, 0, 0], 0.1);
-  assert.ok(fx.drawList().every((p) => (p.kind === 'foam' && p.flat) || p.kind === 'spray'));   // PIN MOVED (COMBAT-FEEL FOUNDER-BOIL: her air boiling up, small drops popping)
+  assert.ok(fx.drawList().every((p) => (p.kind === 'foam' && p.flat) || p.kind === 'spray'));
   assert.ok(fx.drawList().some((p) => p.kind === 'spray') && fx.drawList().some((p) => p.kind === 'foam'));
   const full = createNavalEffects({ random: seeded(7) });
   full.smoke([0, 0, 0], [1, 0, 0], 1, 10);

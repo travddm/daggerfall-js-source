@@ -1,4 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
 // WOD3 - GameObjectHelper's two GROUND ALIGNS (GameObjectHelper.cs
 // :336-362), ported once. Both cast a ray straight down from 0.2 above
 // the object's transform and, on a hit within `distance`, move the
@@ -11,7 +10,6 @@
 // The caller casts the ray (the port's collider is a host's) and hands
 // in its distance, null for no hit; these answer the new centre height.
 // A LEAF.
-// ═══════════════════════════════════════════════════════════════════
 
 /**
  * AlignBillboardToGround(go, size, distance = 2f) (:336-346).

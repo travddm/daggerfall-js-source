@@ -1,5 +1,4 @@
-// RUN-IN-PLACE (2026-10-06, Mac: "I think the newly integrated spell effects are causing issues and theres a lot of player
-// desync online, including players appearing to run in place"): A BODY WALKS WHILE IT IS DRAWN WALKING. Every on-foot
+// RUN-IN-PLACE: A BODY WALKS WHILE IT IS DRAWN WALKING. Every on-foot
 // renderer - the Morrowind bodies, the class sprites, the Eye Of The Beholder walkers, the beasts - and the peers'
 // footsteps take their stride off the drawn pose's `mv` (net/peer/peerClimb.js peerMoving), and the play-out (OnlineSession
 // tick) stands a peer at the end of its path whenever the next pose is late, with the last pose's `mv` still on it. A

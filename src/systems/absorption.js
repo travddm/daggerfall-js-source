@@ -20,6 +20,7 @@
 //     (:1180-1184). An absorber at full magicka absorbs nothing.
 //   - then the sources in order: the Spell Absorption EFFECT, the
 //     CAREER flag, and a persistent absorb state.
+import { absorptionLimitsOn } from './absorption-limits.ts';   // ABSORB-NERF, a player option
 import { SKILLS, skillValue } from './skills.js';
 import { effectCost, effectSchool, TARGET_COST_MULT, CAST_COST_FLOOR } from './spellcost.js';
 
@@ -29,7 +30,7 @@ import { effectCost, effectSchool, TARGET_COST_MULT, CAST_COST_FLOOR } from './s
  *  pinned). */
 export const SPELL_ABSORPTION = Object.freeze({ None: 0, InLight: 1, InDarkness: 2, Always: 4 });
 
-/** ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): THE PORT'S OWN, never DFU's. A
+/** THE PORT'S OWN, never DFU's, now a player option (absorption-limits.ts; off, DFU's). A
  *  100% AbsorbsSpells item (or a 100% crafted Spell Absorption) made its wearer all but immune to casters AND refilled
  *  their magicka off every bolt. Three numbers, one home:
  *   - ABSORB_ENCHANT_CHANCE: the AbsorbsSpells item enchantment is a ROLL of 50%, no longer DFU's flat always;
@@ -43,7 +44,7 @@ export const ABSORB_ENCHANT_CHANCE = 50;
 export const SPELL_ABSORPTION_CHANCE_CAP = 50;
 export const ABSORB_REFUND_SCALE = 0.5;
 /** ABSORB-NERF: the magicka an absorb of `points` gives back - half, floored. */
-export const absorbRefund = (points) => Math.max(0, Math.floor((Number(points) || 0) * ABSORB_REFUND_SCALE));
+export const absorbRefund = (points) => Math.max(0, Math.floor((Number(points) || 0) * (absorptionLimitsOn() ? ABSORB_REFUND_SCALE : 1)));
 
 /** GetEffectCastingCost (:1238-1252): the effect's own spellpoint
  *  cost, the TARGET-TYPE multiplier, then the floor of 5 - which DFU
@@ -75,12 +76,15 @@ export function careerAbsorbs(career, { day = false, inside = true } = {}) {
   return false;
 }
 
-/** SET2 (Mora's Mantle's Eye of Mora, bible/11-Multiplayer/Sigil-Sets.md): THE PORT'S OWN ABSORPTION CHANCES - named
+/** SET2 (Mora's Mantle's Eye of Mora): THE PORT'S OWN ABSORPTION CHANCES - named
  *  sources, `fn(target) -> per cent`, each rolled on its own after the effect's arm and before the career's, under
  *  DFU's own two gates (a Destruction effect, and room in the target's magicka for what it drinks). A source answers 0
  *  for any target it is not about. */
 const _absorbChances = new Map();
 export function registerAbsorptionChance(name, fn) { if (typeof fn === 'function') _absorbChances.set(name, fn); else _absorbChances.delete(name); }
+
+/** Whether an AbsorbsSpells enchantment absorbs: always in DFU (:1196); a 50% roll with the absorption limits on. */
+const enchantAbsorbs = (rolls) => !absorptionLimitsOn() || Math.floor(rolls() * 100) < ABSORB_ENCHANT_CHANCE;
 
 /** TryAbsorption (:1160-1200). Returns the spell points absorbed, or 0
  *  when the effect passes through. `absorbing` is DFU's persistent
@@ -112,9 +116,9 @@ export function tryAbsorption(effect, targetType, target, { day = false, inside 
     if (c > 0 && Math.floor(rolls() * 100) < c) return drink;
   }
   if (careerAbsorbs(target?.career, { day, inside })) return drink;
-  // ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): the AbsorbsSpells enchantment is
+  // ABSORB-NERF: the AbsorbsSpells enchantment is
   // a 50% roll, no longer DFU's flat always (:1196)
-  if (absorbing && Math.floor(rolls() * 100) < ABSORB_ENCHANT_CHANCE) return drink;
+  if (absorbing && enchantAbsorbs(rolls)) return drink;
   return 0;
 }
 
@@ -137,6 +141,6 @@ export function spellAbsorptionChance(target) {
     const chance = a.chanceBase == null ? (a.chance ?? 0) : (a.chanceBase ?? 0) + (a.chanceMod ?? 0) * Math.floor((target?.level ?? 1) / per);
     if (chance > best) best = chance;
   }
-  // ABSORB-NERF (2026-09-30, Discord: "Nerf spell absorption, it breaks the game"): the effect's chance caps at 50%
-  return Math.min(SPELL_ABSORPTION_CHANCE_CAP, best);
+  // ABSORB-NERF: the effect's chance caps at 50%
+  return absorptionLimitsOn() ? Math.min(SPELL_ABSORPTION_CHANCE_CAP, best) : best;
 }

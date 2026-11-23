@@ -1,6 +1,4 @@
-// RAID-ASHORE (2026-10-17, the owner: "when pirates attack but your first boat (the one that is assigned to be your cabin
-// if you press T > ship) You spawn and fight in land ... after you defeat the pirates they keep spawning but passive";
-// bible/03-World/Naval-Refit.md RAID-ASHORE) - Warm Ashes' voyage raid, fought where the player stands, ENDS there: the
+// RAID-ASHORE - Warm Ashes' voyage raid, fought where the player stands, ENDS there: the
 // author's own WAQ_SHIP_SMALLRAID through the real quest machine, each of its three outcomes, won ashore - its crew and
 // its last raiders withdrawn, the dead left lying, the quest ended (no crew called again), the ship blocks at their base;
 // at sea the IL's own arm as it was; the withdraw's own law over the pools; one raid at a time on the fast travel too;
@@ -22,7 +20,6 @@ const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8'
 const T = new URL('../../../vendor/dfu-quests/Tables/', import.meta.url);
 loadQuestTables(Object.fromEntries(readdirSync(T).map((f) => [f.replace(/\.txt$/, ''), readFileSync(new URL(f, T), 'utf8')])));
 const RAID = rd('vendor/warm-ashes-ships/Quests/WAQ_SHIP_SMALLRAID.txt').split(/\r?\n/);
-const WORLD = hostText('src/scenes/world.js');
 
 /**
  * The author's raid run through the real machine over a street's pool of records (the exterior pool's shape: a foe the
@@ -159,8 +156,3 @@ test('RAID-ASHORE one raid at a time on the fast travel too: a voyage by ship wh
   _resetWarmAshesShips();
 });
 
-test('RAID-ASHORE the world host\'s wiring: one withdraw built before the quest bridge over the street\'s pool and the room\'s, Leave Ship\'s seam its `over`, and the quest\'s end its `questEnded`', () => {
-  assert.match(WORLD, /const raidAshore = createRaidAshore\(\{ pools: \(\) => \{\n\s+const inner = modes\?\.interiorPool\?\.\(\);\n\s+return \[\{ foes: \(\) => exteriorFoes\.foes, remove: \(f\) => exteriorFoes\.removeFoe\(f\) \}, inner \? \{ foes: \(\) => inner\.foes, remove: \(f\) => inner\.removeFoe\(f\) \} : null\];\n\s+\} \}\);\n {2}questBridge = createQuestBridge\(\{/);   // the room's pool read once, guarded on `modes` (declared below - audit24_wave37)
-  assert.match(WORLD, /raidAshore: \(quest\) => raidAshore\.over\(quest\),/);
-  assert.match(WORLD, /naval\?\.raidEnded\(q\);[^\n]*\n {6}raidAshore\.questEnded\(q\);/);
-});

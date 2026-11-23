@@ -1,7 +1,6 @@
 // @ts-check
-// LW6c (2026-10-05, bible/06-Systems/Living-World.md "LW6c"): CARRIED HOME - a keepsake of one the deep kept, found with
-// their remains (LW6b) and carried home to the household they lived with. Mac: "make friends or enemies, and explore a
-// dynamic world".
+// LW6c: CARRIED HOME - a keepsake of one the deep kept, found with
+// their remains (LW6b) and carried home to the household they lived with..
 //
 // THE THING. Each of the fallen of a dive carries one (`mintKeepsake`): a locket, a ring, a brooch or a charm - their
 // own, by their id - an item of the port's own (DECLARED; a custom template registered at import, as the port's others

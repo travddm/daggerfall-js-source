@@ -1,5 +1,5 @@
 // @ts-check
-// WAGONS1 (2026-10-09, Mac, sending his three wagons: "Here are 3 new models that will need to be textured"): THE
+// WAGONS1: THE
 // WAGONS' OWN ART, MADE AT THE LOAD.
 //
 // world/ships/carrackArt.js's law, for Mac's Wagon Cart, Open Wagon and Caravan (tools/bakeWagons.mjs): painted from numbers
@@ -265,7 +265,7 @@ function caravanSideArt(paint = PAINTS.green, name = 'green') {
 /** The caravan side's two gilt lines (m over the ground): its skirt's head and its cornice's foot. */
 export const CARAVAN_SKIRT_Y = 1.32, CARAVAN_CORNICE_Y = 2.86;
 /** The caravan's side window, in its side's picture (and its room's - the two meet): rows top to bottom, columns.
- *  WAGON-UV (2026-10-10, from play: "the windows on the wagon arent centered properly"): its 0.84 m centred between
+ *  WAGON-UV: its 0.84 m centred between
  *  the skirt and the cornice - it stood at 1.78-2.62 m, six rows under the cornice and thirteen over the skirt. */
 export const CARAVAN_SIDE_WINDOW = Object.freeze({
   y0: sideRow((CARAVAN_SKIRT_Y + CARAVAN_CORNICE_Y + 0.84) / 2), y1: sideRow((CARAVAN_SKIRT_Y + CARAVAN_CORNICE_Y - 0.84) / 2), x0: 22, x1: 42,

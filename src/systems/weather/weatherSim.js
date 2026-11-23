@@ -46,6 +46,7 @@ import { isEnhanced } from '../uiSkin.js';   // CLK2: the evolution is the enhan
 import { getPref } from '../uiPrefs.js';
 import { groundWearsSnow, climateSeasonFromMinutes } from '../../world/climateSwaps.js';   // WEATHER2a: the terrain's own snow law
 import { fieldAt, FIELD_RANGE_M, pixelOfField } from './weatherField.js';   // WEATHER2b: the day's words as places
+import { biomeStamp } from '../../world/tamriel/tamrielBiomes.js';   // ASHFALL1's audit: the found systems follow the land past the Bay
 import { systemsNear, wornAmong, skyCells, approachAt, insideClip, isWet } from './weatherMap.js';   // WEATHER3b: the world weather map - systems on the land; WEATHER3c: its sky and its wind
 
 export { WEATHER_TYPES };
@@ -59,7 +60,7 @@ export { WEATHER_ENUM, WEATHER_TABLE, weatherTableFor, rollWeather } from './wea
 
 // ---- the module state ----------------------------------------------
 
-// WORLD5 (Mac: "the shared clock and weather"): ONLINE, THE DAY PICKS THE ROLL. The six-zone array is rolled once per
+// WORLD5: ONLINE, THE DAY PICKS THE ROLL. The six-zone array is rolled once per
 // game date from Math.random, so two players under one sky rolled two skies. With the shared clock on, every roll of
 // the array - the day change's, the boot's, a respawn's - draws from a generator seeded by the DAY (and the climate,
 // for a respawn), so every client rolls the same six values for the same date without a frame to carry them. The
@@ -114,12 +115,10 @@ export const currentWeatherEnum = () => _current;
  *  violence word, so a storm that fell as snow still blows like one. */
 export const currentWeatherRaw = () => WEATHER_TYPES[_raw];
 
-// ---- WEATHER2b (2026-09-14): THE WEATHER FIELD -------------------------
-// Mac: "a dynamic world space event system where weather can be
-// traveled out of and into instead of just starting and stopping in
-// your location." systems/weather/weatherField.js is the law (the day's words as
+// ---- WEATHER2b: THE WEATHER FIELD -------------------------
+// systems/weather/weatherField.js is the law (the day's words as
 // cells over the land, drifting on the day's wind); this is its seam
-// into the sim. On the enhanced lane the player's word is what the
+// into the sim. On the weather-events lane the player's word is what the
 // field says AT THE PLAYER - sampled every exterior frame after the
 // drain, at every travel and respawn arrival - and it goes through the
 // same `_set` (the ground law included). A change the sample makes on a
@@ -127,16 +126,18 @@ export const currentWeatherRaw = () => WEATHER_TYPES[_raw];
 // drifted over them. It is stamped apart from the jumps so the sky
 // builds a SHORT front for it (wind.js `arrive`, the sky eased on the
 // same short lead) rather than the day roll's three hours - the storm
-// was already in view. Behind Enhanced Environments and its own row on
-// the Features home (`weather-events`, the pref `weatherEvents`, forced
-// on online so one sky is shared); `?wxfield=off` the door.
+// was already in view. Behind its own row on the Features home
+// (`weather-events`, the pref `weatherEvents`, forced on online so one
+// sky is shared) and nothing else: it runs on DFU's weather words in
+// every skin, and Enhanced Environments only adds to it (the clouds'
+// cells, the air's phase law). `?wxfield=off` the door.
 let _fieldOverride = null;   // tests: true/false; null reads the lane
 let _fieldUrlDoor = null;    // ?wxfield=off, read once (lazily)
 export function setWeatherFieldLaw(on) { _fieldOverride = on == null ? null : !!on; }
 export function weatherFieldOn() {
   if (_fieldOverride !== null) return _fieldOverride;
   _fieldUrlDoor ??= new URLSearchParams(globalThis.location?.search ?? '').get('wxfield') !== 'off';
-  return _fieldUrlDoor && isEnhanced() && !!getPref('enhancedEnvironments') && !!getPref('weatherEvents');
+  return _fieldUrlDoor && !!getPref('weatherEvents');
 }
 /** WEATHER2b: the count of crossings. A host keeps the last value it saw;
  *  a new one means the change on this frame is a crossing - a short front. */
@@ -166,13 +167,11 @@ export function sampleWeatherField(nowMinutes, climateIndex, at, climateAt, how 
   return changed;
 }
 
-// ---- WEATHER3b (2026-09-22): THE WORLD WEATHER MAP IS THE SKY -----------
-// Mac: "imagine a map, one location its sunny, one is cloudy, one has a
-// rainstorm, etc." systems/weather/weatherMap.js is the law (systems born on the
+// ---- WEATHER3b: THE WORLD WEATHER MAP IS THE SKY -----------
+// systems/weather/weatherMap.js is the law (systems born on the
 // land, drifting, growing, dying; the weather a pure function of place
 // and minute); this is its seam into the sim. On its lane - the field's
-// own (the enhanced skin, Enhanced Environments, the weather-events row,
-// forced on online) unless `?wxmap=off` hands the lane back to WEATHER2b's
+// own (the weather-events row, forced on online) unless `?wxmap=off` hands the lane back to WEATHER2b's
 // field - the player's word is the map at the player:
 //   - every exterior frame, through the same `_set` (the ground law, the
 //     raw word kept for the wind's violence);
@@ -206,7 +205,7 @@ export const MAP_JUMP_M = 2000;
 const MAP_REFIND_M = 250;
 let _mapAt = null;   // the last sample's place, for the crossing-or-arrival test
 let _mapSampledAt = null;   // its minute
-let _mapNear = [], _mapNearAt = null, _mapNearMinute = null, _mapNearLookup = null;
+let _mapNear = [], _mapNearAt = null, _mapNearMinute = null, _mapNearLookup = null, _mapNearStamp = null;
 let _mapIntensity = 0;
 let _mapApproach = 0;
 let _arrivals = 0;
@@ -230,9 +229,12 @@ export const currentCloudBase = () => (weatherMapOn() ? 'sunny' : null);
 export const currentWeatherIntensity = () => (weatherMapOn() ? _mapIntensity : null);
 function sampleWeatherMap(nowMinutes, climateIndex, at, climateAt, how) {
   const minute = Math.floor(nowMinutes);
-  if (minute !== _mapNearMinute || climateAt !== _mapNearLookup || !_mapNearAt || Math.hypot(at[0] - _mapNearAt[0], at[1] - _mapNearAt[1]) > MAP_REFIND_M) {
+  // ASHFALL1's audit (lane A): and when the land past the Bay moved (its zones' stamp: the trace landing, a fit) - the map
+  // drew its births again (weatherMap.js memoised), and a minute's found systems kept the old land's weather over it
+  const stamp = biomeStamp();
+  if (minute !== _mapNearMinute || climateAt !== _mapNearLookup || stamp !== _mapNearStamp || !_mapNearAt || Math.hypot(at[0] - _mapNearAt[0], at[1] - _mapNearAt[1]) > MAP_REFIND_M) {
     _mapNear = systemsNear(at[0], at[1], minute, climateAt, FIELD_RANGE_M + MAP_REFIND_M);
-    _mapNearAt = [at[0], at[1]]; _mapNearMinute = minute; _mapNearLookup = climateAt;
+    _mapNearAt = [at[0], at[1]]; _mapNearMinute = minute; _mapNearLookup = climateAt; _mapNearStamp = stamp;
   }
   // AUDIT-3i: the player's word through the SAME ground law as every other reader's - rain over snow ground is snow
   // BEFORE the strongest is chosen, so the strength the player feels is the one that falls there (resolved raw first,
@@ -295,7 +297,7 @@ export function mapGround(climateAt) {
   return ground;
 }
 
-// ---- PRECIP1 (2026-10-19): WHAT FALLS IS THE AIR'S TO SAY -----------------------------------------------------------
+// ---- PRECIP1: WHAT FALLS IS THE AIR'S TO SAY -----------------------------------------------------------
 // The owner: "It shouldnt snow everywhere or rain everywhere when the season is winter ... If its snowing in one area and
 // raining in the next, the transition should be seamless". WEATHER2a's law above asked a climate's ARCHIVE on the
 // calendar: every pixel of a snowy climate snowed all winter (the rainforest and the sea among them) and rained the rest
@@ -362,7 +364,7 @@ export const weatherSystemStamp = () => _systems;
 export const weatherPhaseFlip = () => _phaseFlip;
 /** AUDIT PRECIP FALL-2: THE SYSTEM A HOST'S WORD IS - on the law's lane, when the word is the sim's own, the system
  *  falling there (`raw`: a storm falling as snow is a storm - its wind, its episode, its deck, its strikes); any other
- *  word (off the lane, a pin, the Sun Baby's sky) is itself. What the hosts key a weather's identity on; its phase reaches
+ *  word (off the lane, a pin) is itself. What the hosts key a weather's identity on; its phase reaches
  *  them through the share. */
 export const systemWordOf = (word) => (precipLawOn() && word === WEATHER_TYPES[_current] ? WEATHER_TYPES[_raw] : word);
 
@@ -379,8 +381,8 @@ export function sampleWeatherIndoors(nowMinutes, climateIndex, at, climateAt) {
   return sampleWeatherMap(nowMinutes, climateIndex, at, climateAt, 'jump');
 }
 
-// ---- WEATHER2a (2026-09-14): NO RAIN OVER SNOW -----------------------
-// Mac: "it can rain when there's snow on the ground." The table is the
+// ---- WEATHER2a: NO RAIN OVER SNOW -----------------------
+// The table is the
 // Chronicles' and DFU's, digit for digit, and its winter rows carry rain
 // and thunder for every climate but the mountains - woodlands 10% rain,
 // the jungle 25% rain and 12% thunder, the swamp's spring... - while the
@@ -511,7 +513,7 @@ function applyFromArray(climateIndex, nowMinutes) {
   return _set(weatherForClimate(climateIndex), climateIndex, nowMinutes);   // WEATHER2a: through the ground
 }
 
-/** DISC9 (Mac, 2026-09-23: "now it's not raining outside and you can hear it raining inside"): THE WEATHER THE
+/** DISC9: THE WEATHER THE
  *  PLAYER HEARS. On the enhanced lane the sim's word is not what is falling: the front (systems/weather/weatherFront.js)
  *  eases an episode in behind the cloud's arrival and has dry spells inside it, and the street's ear follows the
  *  drops (`soundWeather`), so a 'rain' word over a dry street is a cloudy day. Every reader of "is it raining here"
@@ -530,15 +532,14 @@ export function setHeardWeather(word, rainGain = 1, fall = null) {
   _heardFall = fall && fall.snow != null && Number.isFinite(fall.intensity) ? { level: Math.max(0, Math.min(1, fall.intensity)), snow: Math.max(0, Math.min(1, fall.snow)) } : null;
 }
 export const heardWeather = () => (_heard != null && _heardAtJump === _jumps ? _heard : currentWeather());
-/** DISC11 (Mac: "ITS LOUDER ON THE INSIDE COMPARED TO THE OUTSIDE"): the street's rain LEVEL, beside its word - the
+/** DISC11: the street's rain LEVEL, beside its word - the
  *  front's intensity on the enhanced lane (a light shower is 0.15), 1 on the classic one. Every rain the player hears
  *  indoors is scaled from THIS, so no indoor rain can outplay the street's. After a jump the classic level stands. */
 export const heardRainGain = () => (_heard != null && _heardAtJump === _jumps ? _heardGain : 1);
 /** WET-FALL (FIELD BUGS 2026-10-15f, "Player is getting wet despite it not raining"): WHAT FALLS ON THE PLAYER - the
  *  street's word and level as the outdoor frame last wrote them, the one truth the skin reads beside the ear. RAIN-HEART
  *  made most rain a sprinkle the eye barely sees, and the soak read the sim's word at the downpour's rate - and soaked
- *  before the front's first drop. `shown` is the host's own word for its sky (world.js's: the Sun Baby's clear day,
- *  AUDIT TEMP-UI E11), taken whole where the street holds none: after a jump, as the ear's, and before the first frame. */
+ *  before the front's first drop. `shown` is the host's own word for its sky (world.js's, AUDIT TEMP-UI E11), taken whole where the street holds none: after a jump, as the ear's, and before the first frame. */
 export const fallingWeather = (shown = currentWeather()) => (_heard != null && _heardAtJump === _jumps ? { word: _heard, level: _heardFall?.level ?? _heardGain, snow: _heardFall?.snow ?? null } : { word: shown, level: 1, snow: null });
 
 /** WX2a: the count of weather changes that were jumps. A host keeps the
@@ -675,8 +676,8 @@ export function importClimateWeathers(converted) {
   return true;
 }
 
-// ---- CLK2 (2026-09-08): THE WEATHER EVOLVES WITHIN THE DAY -----------
-// Mac: "in sync with the world clock". DFU rolls the six zones ONCE per
+// ---- CLK2: THE WEATHER EVOLVES WITHIN THE DAY -----------
+// . DFU rolls the six zones ONCE per
 // game day (PlayerEntity.cs:447-448) and shipped WeatherManager's hourly
 // poll commented out (the W1 row); the classic lane keeps that verbatim
 // above. The ENHANCED lane adds an evolution ON THE CLOCK: at every game
@@ -757,7 +758,7 @@ export function resetWeatherSim() {
   _heard = null; _heardGain = 1; _heardAtJump = -1; _heardFall = null;   // DISC9 / DISC11; AUDIT PRECIP FALL-4
   _crossings = 0; _fieldCells = []; _fieldInside = null; _fieldOverride = null; _fieldUrlDoor = null;   // WEATHER2b
   _mapOverride = null; _mapUrlDoor = null; _mapAt = null; _mapSampledAt = null;   // WEATHER3b
-  _mapNear = []; _mapNearAt = null; _mapNearMinute = null; _mapNearLookup = null; _mapIntensity = 0; _mapApproach = 0; _arrivals = 0;
+  _mapNear = []; _mapNearAt = null; _mapNearMinute = null; _mapNearLookup = null; _mapNearStamp = null; _mapIntensity = 0; _mapApproach = 0; _arrivals = 0;
   _rolledAtMinutes = null;
   _zoneChangedAtMinutes = new Array(6).fill(null);
   _climateWeathersValid = false;

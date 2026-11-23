@@ -1,6 +1,5 @@
 // PX28 - WHAT IS OPEN, SO TAB CAN PUT IT AWAY.
 //
-// Mac: "when hitting tab a second time, it should minimize any UI."
 //
 // Tab already toggled the DIAL - openPixelDial closes itself on a
 // second press. What it could not do is close what the dial OPENED.
@@ -22,8 +21,7 @@ import { eventMeans } from '../input.js';   // KB1: the dial's key is the regist
 
 const stack = [];
 
-/* PX28b (Mac: "Tab should also minimize any open UI menus, currently
-   it only applies to the radial"). PX28 taught the DIAL to put a
+/* PX28b. PX28 taught the DIAL to put a
    window away, and that was the wrong half: `openPixelDial` is only
    reached through the host's key routing, and while an enhanced
    window is up the window owns the keyboard - so Tab never got there.
@@ -107,8 +105,7 @@ export function closeTopOverlay() {
 export function clearOverlays() { stack.length = 0; unlisten(); }
 
 /**
- * OT1 (Mac, 2026-09-12: "make it where tapping outside of any UI
- * closes the UI"): a tap on the SHELL - the scrim around a framed
+ * OT1: a tap on the SHELL - the scrim around a framed
  * window - closes the window. Wire it on the shell; `keep` is the
  * selector of everything that counts as INSIDE (the window, the foot,
  * a dialog standing over it), so a press on those is theirs. Only

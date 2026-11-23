@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, bible/06-Systems/Witches-Festival.md): THE WYRD SISTER'S DOOR - the one place a host opens her
+// WITCH1: THE WYRD SISTER'S DOOR - the one place a host opens her
 // window through (ui/wyrdWindow.js), the Broker's door's shape (ui/brokerDoor.js): a lazy chunk mounted through the one
 // home (ui/enhanced/enhancedChunk.js), in a host of its own, wrapped in the overlay every host's frame drives - `done` once
 // shut, `dispose` to shut it - and registered with the overlay stack. One stands at a time. A page with no document

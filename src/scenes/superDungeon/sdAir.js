@@ -1,6 +1,5 @@
 // @ts-check
-// SD14b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 7 and section 16's SD14b;
-// Mac: "The detail needs to exceed that of the oblivion gates"): THE HOUR'S AIR - what the Shattered Hour sounds like
+// SD14b: THE HOUR'S AIR - what the Shattered Hour sounds like
 // between its blows. The Deadlands have three beds and three kinds of event (scenes/deadlandsAir.js); the Hour had none
 // - its dungeon's drips and doors silenced (scenes/dungeonContext.js) and nothing put back but the Rift's bell.
 //

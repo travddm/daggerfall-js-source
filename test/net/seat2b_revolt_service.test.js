@@ -1,8 +1,8 @@
-// SEAT2b part two (c) (2026-10-01, Mac: "Finish the seats"; "Let's pick up 482"): A REVOLT IN THE ACCOUNT SERVICE - a
+// SEAT2b part two (c): A REVOLT IN THE ACCOUNT SERVICE - a
 // held seat whose Standing the Turning leaves at nought revolts at its holder's window the next week (a battle row of
-// kind 'revolt', migration 0064); the holder's members sign to defend it and enter on a revolt's pass; a defender's
+// kind 'revolt'); the holder's members sign to defend it and enter on a revolt's pass; a defender's
 // receipt settles it - put down, the Standing back to 20; standing, the Charter lapsed; none by the next Turning, the
-// Charter lapsed there (bible/11-Multiplayer/Seats-Arc.md 7.7, 6.3; server-account/src/seatTurning.js, seatSiege.js).
+// Charter lapsed there (7.7, 6.3; server-account/src/seatTurning.js, seatSiege.js).
 // Driven through the real Worker over node:sqlite with every migration applied (test/accountDb.mjs). `06-Systems/
 // Online-Arc.md` SEAT2b part two (c).
 import { test } from 'node:test';
@@ -20,7 +20,7 @@ const W = seatWeekOf(T0 * 1000);
 const turning = (w) => Math.floor(seatWeekStartMs(w + 1) / 1000);
 const AFTER = (w) => turning(w) + 3 * 3600;
 const START = Math.floor(siegeStartMs(W + 1, 0, 20) / 1000);   // the default window, Wednesday 20:00 UTC
-const F = [[0, 40], [40, 0], [-40, 0], [0, -40], [0, 80], [0, -60]].map(([x, z]) => [x * SIEGE_UNITS_PER_M, z * SIEGE_UNITS_PER_M]);
+const F = [[0, 100], [30, 50], [-30, 50], [0, 0], [0, 120], [0, 10.5]].map(([x, z]) => [x * SIEGE_UNITS_PER_M + 402 * 32768 + 16384, z * SIEGE_UNITS_PER_M + (499 - 151) * 32768 + 16384]);   // in Anticlere's pixel: the service holds a field to its seat's
 
 /** A holder whose week leaves its Standing at nought: at 0, its upkeep unpaid (Neglect), no Watch of its own. */
 async function revoltWeek(t) {

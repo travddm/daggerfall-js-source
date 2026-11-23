@@ -1,6 +1,5 @@
 // @ts-check
-// ONE-SEAT (2026-09-27, Mac: "Can we also make it where the player can only have one character only at a time. Like
-// they shouldnt be able to open multiple tabs and join as different characters").
+// ONE-SEAT.
 //
 // ONE TAB ONLINE, TWO WAYS OF KNOWING WHICH. The relay's hub decides it for an ACCOUNT (net/wire.js ONE-SEAT: a hub
 // hello that claims closes the account's other tabs; server/src/index.js), and that covers a player on two devices, or

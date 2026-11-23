@@ -1,7 +1,5 @@
 // @ts-check
-// CAPTAIN-TREE (2026-10-17, the owner: "A firmament styled captain skill tree along with making improvements to the ship
-// upgrade system" - a player's ask beside it: "a skill tree for ship layers ... integrated with leveling ... connect current
-// stats to ship behaviour"; bible/03-World/Naval-Refit.md CAPTAIN-TREE) - THE CAPTAIN'S STARS. The port's own; pure.
+// CAPTAIN-TREE - THE CAPTAIN'S STARS. The port's own; pure.
 //
 // A CAPTAIN'S LEVEL is earned at sea and never stored: it is read off the captain's log (systems/naval/captainLedger.js
 // newLog - ships sunk and taken by their trade, boarders thrown back, prizes claimed, contracts done, leagues sailed,
@@ -9,7 +7,7 @@
 // to CAPTAIN_LEVEL_MAX (`levelOf`). The log is the save's, so the level follows the character, and a captain who has
 // done nothing at sea is level 1.
 //
-// A POINT A LEVEL past the first buys a star on the captain's sky - the Firmament's shape (bible/06-Systems/Firmament.md:
+// A POINT A LEVEL past the first buys a star on the captain's sky - the Firmament's shape (:
 // a start in the middle, paths of small stars to notables and keystones, a star bought only beside one held), its
 // "Master and Commander" made a sky of its own. THE HELM in the middle (held by every captain); to its left THE MASTER -
 // the seamanship of a ship: her canvas, her oars and helm, her hold and her trade, her shipwright's; to its right THE
@@ -22,7 +20,7 @@
 // WHAT THE STARS DO is one sum of stats (`starStats`, each a share: +0.06 way is 6% more), read where the ship's own
 // numbers are read: her way under sail, under oars and her helm, her hold, her hull (Come Sail Away's and the sea fight's
 // refit seam - scenes/fleetHost.js refit), her guns' harm, reload and aim, each load's own edge, her boarders and how far
-// her grapples reach, her repairs, her trade at the exchange (CAPTAIN_STATS). BOARD-MAGNET (2026-10-26): the ram is gone,
+// her grapples reach, her repairs, her trade at the exchange (CAPTAIN_STATS). BOARD-MAGNET: the ram is gone,
 // and its two stars with it - `c_ram1` and `c_irons` keep their ids (a saved sky names them) and reach farther instead.
 
 import { LEAGUE_M } from '../../world/ethericSea.js';   // the log's `sailed` is metres

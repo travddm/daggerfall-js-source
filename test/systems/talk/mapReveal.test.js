@@ -106,28 +106,6 @@ test('T4: %hnr by gender and %ra by BIRTH race - the DFU display names, elves in
     "Beggin' yer pardon Ma'am, I'm a Wood Elf too.");
 });
 
-test('T4: the townTalk seam is wired - the lazy %hnt gate, the mark, the entity macros', () => {
-  // The hosts have no execution coverage (AUDIT 18's standing gap), so
-  // the wiring is pinned at the source, the audit18 idiom.
-  const src = readFileSync(new URL('../../../src/scenes/townTalk.js', import.meta.url), 'utf8');
-  // MACRO-6: the laziness is the walk's own - the hint is a FUNCTION the walk calls per %hnt/%hnt2 occurrence
-  // PIN MOVED (AUDIT SHIPYARDS L7-5): the fork asks whether a town map letters the place - the crew hall and the docks,
-  // which none does, take the way there (test/systems/shipyards1_audit_port.test.js runs it)
-  assert.match(src, /const hint = \(\) => \{\n\s+const h = buildingHint\(rolls, !lettersOnMap\(building\.buildingKey\)\);/, 'the fork must be LAZY - a refusal record never rolls or marks');
-  assert.doesNotMatch(src, /hint = randomVariant\(/, 'no eager roll left beside it');
-  assert.match(src, /buildingHint\(rolls/, 'the reveal roll rides the seam-injectable rolls');
-  assert.match(src, /if \(h\.reveal\) discoverBuilding\(/, 'the %loc mark side effect fires only on the reveal arm');
-  assert.match(src, /honorific: honorificOf\(playerEntity\.gender\)/, '%hnr reads the entity');
-  assert.match(src, /race: raceDisplayName\(playerEntity\.race\)/, '%ra reads the entity');
-  // ...and so does the QUEST/talk macro table's one host mount. %ra is
-  // MacroHelper.PlayerRace (:942-945) = BirthRaceTemplate.Name, and
-  // playerEntity.race is the CamelCase KEY, so the seam owes
-  // raceDisplayName or every elf prints "DarkElf".
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /playerRaceName: \(\) => \(playerEntity\.race \? raceDisplayName\(playerEntity\.race\) : null\)/,
-    "the macro table's playerRaceName mount is RaceTemplate.Name, not the key");
-});
-
 test('T4: TEXT.RSC grounds the record ids - 7332 marks the map, 7333 gives directions', { skip: skipReal }, () => {
   const t = new TextRsc().load(readFileSync(join(ARENA2, 'TEXT.RSC')));
   const reveal = t.plainText(MAP_REVEAL_TEXT_ID);

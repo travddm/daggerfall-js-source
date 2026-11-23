@@ -1,9 +1,9 @@
-// CLOTH-GEMS (2026-10-25; the player SaberGGaming's "Profession oversights", the owner: "No band aids") - EVERY GEM'S
+// CLOTH-GEMS - EVERY GEM'S
 // GRADE AT THE JEWELLER'S BENCH, AS THE CLIENT HOLDS AND DRAWS IT. A graded gem looted into the pack IS its material
 // (systems/materialsBag.js materialKeyOfItem - it mapped every one of them to none), counted as held, so a jeweller's
 // bench works it and the station's shortfall puts it in by the loose door; a graded gem stays a pack piece the market
 // lists from the pack (marketLaw storesForm). The bench shows the gems a grade at a time (ui/professions/profPages.js
-// jewelRecipes, gemGradeWord), each recipe's points its grade's. bible/06-Systems/Professions-Arc.md 50.
+// jewelRecipes, gemGradeWord), each recipe's points its grade's. 50.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

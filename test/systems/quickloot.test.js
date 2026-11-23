@@ -388,10 +388,6 @@ test('QUICK-LOOT: a take that empties a body does NOT disable it', () => withQui
 }));
 
 // ── QL-WEIGHT1: THE TAKE IS THE WINDOW'S TAKE ────────────────────
-// (2026-09-23, Satranath on Discord: "The quick loot system lets you pick
-// up items even if you are overencumbered. Applies only to quick loot -
-// vanilla loot interaction still gives the appropriate error that you
-// are carrying too much.")
 
 test('QL-WEIGHT1: a row the hero cannot carry is REFUSED with the window\'s own line, stays on the pile, and the press is handled - not "open the window" (mutants: the gate dropped, so the row moves; null answered, so the window opens over the refusal; the line unsaid)', () => withQuickLoot(() => {
   // strength 2: 3 kg of carry. A Katana (template 121) is 2.5 kg - one fits, the second does not.
@@ -475,7 +471,6 @@ test('AUDIT QL-WEIGHT1: a QUEST ITEM goes through the door with the host\'s own 
   assert.equal(res.playerDropped, false, 'the resource knows it is carried again (the window\'s own write)');
   assert.equal(res.hasPlayerClicked, true, 'WHERE-ROBES: and it was CLICKED - the remote list\'s first act, its `clicked item` trigger\'s to read');
   assert.deepEqual(said, ['You take the Ring of Namira.']);
-  // PIN MOVED (QUEST-AUDIT III SHELF-TWIN, item/itemTransfer.js holdsQuestTwin): a second copy of the ring this pack keeps
   // is a twin, refused whatever the resolver - so the no-resolver half takes a pack of its own
   assert.equal(planTake(ring(), { bag: p.items, entity: p, getQuest }).ok, false, 'a twin of the ring kept: refused');
   const q = player();

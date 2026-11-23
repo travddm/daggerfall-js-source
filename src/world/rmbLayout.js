@@ -15,7 +15,7 @@
 //     GroundOffset (-1)
 //     to minimise depth-fighting, tile size 256, 16x16 tiles.
 // Flats/billboards live in rmbFlats.js (milestone 3). Interiors and people
-// records are later features of this arc; see bible/03-World/World-Arc.md.
+// records are later features of this arc; see.
 
 import { ROTATION_DIVISOR, RMB_DIMENSION } from '../formats/blocksFile.js';
 import { PLACEMENTS as WINDMILL_PLACEMENTS } from './windmillMesh.js';   // WM2d: the mills Daggerfall does not stand
@@ -68,7 +68,7 @@ export const isBulletinBoard = (modelID) => modelID === BULLETIN_BOARD_MODEL_ID;
 /**
  * RMBLayout.GetModelScaleVector (:74-77): a model record's scale, a zero
  * (absent - every classic record) read as 1. Only a world-data JSON
- * record carries one (WD1: Detailed Ships, Warm Ashes - Ships).
+ * record carries one (Warm Ashes - Ships).
  * @returns {[number, number, number]}
  */
 export function modelScaleVector(obj) {

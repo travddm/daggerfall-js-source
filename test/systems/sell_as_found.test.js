@@ -4,8 +4,9 @@
 // cost less than the sale it added, and mending worn loot to sell it paid every player online: +102 gold on a
 // value-1000 piece found at 20% (Mercantile 30, Personality 40, a quality-10 counter), +2,592 on a Daedric longsword.
 // Each roll now leaves the condition it set as `foundCondition`, and online the Sell arm reads a piece no higher.
-// A smith's repair still adds nothing; MEND-THIRD (2026-10-19, mend_third.test.js) credits a third of what its owner's OWN
+// A smith's repair still adds nothing; MEND-THIRD credits a third of what its owner's OWN
 // mends - a kit, Repairs Objects, the Varla Stone - put past the mark, which nothing here makes.
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -59,7 +60,8 @@ test('SELL-AS-FOUND: each of Roleplay & Realism: Items\' rolls leaves the condit
   assert.equal(knight.items.find((it) => it.group === 'Currency')?.foundCondition, undefined, 'gold');
 });
 
-test('SELL-AS-FOUND: online, repairing a found piece to sell it never pays - the counter pays what it paid before, a smith\'s whole repair and a kit\'s 75% alike, for every haggler at every counter (mutants: the mark ignored; read past the mark; the rule offline-only)', () => {
+test('SELL-AS-FOUND: online, repairing a found piece to sell it never pays - the counter pays what it paid before, a smith\'s whole repair and a kit\'s 75% alike, for every haggler at every counter (mutants: the mark ignored; read past the mark; the rule offline-only)', (t) => {
+  playByRules(t, { 'trade.saleCap': true });   // the figures below are priced under the server profile's sale cap
   online(() => {
     let checked = 0;
     for (const quality of [1, 10, 20]) {
@@ -84,11 +86,10 @@ test('SELL-AS-FOUND: online, repairing a found piece to sell it never pays - the
     const sword = addPileLootExtras([weaponOfMaterial(120, 9)], 'J', at(0), { online: false })[0];
     assert.deepEqual([sword.value, sword.currentCondition, sword.maxCondition], [23040, 2560, 12800]);   // WEAPON-POOL: 1280 of 6400 on the row's pool
     const c = { quality: 10, skills: { mercantile: 40, personality: 50 } };
-    // PIN MOVED (MERC-SLOPE, FIELD BUGS 2026-10-08): 1728 was the counter's flat half; a Mercantile 40 / Personality 50
-    // seller now stands under it, by their own offer against the best haggler's at half its strength. PIN MOVED
-    // (DAEDRIC-SALE, 2026-10-26): 1471 was its whole Daedric value's - a counter pays half for Daedric gear now
-    assert.equal(quote('Sell', sword, c), 735, 'as found');
-    assert.equal(quote('Sell', mended(sword), c), 735, 'whole, as found');
+    // seller now stands under it, by their own offer against the best haggler's at half its strength.
+    // (B4: the Daedric sale rule is gone, so a counter pays its whole Daedric value again)
+    assert.equal(quote('Sell', sword, c), 1471, 'as found');
+    assert.equal(quote('Sell', mended(sword), c), 1471, 'whole, as found');
     assert.ok(quote('Repair', sword, c) > 0);
   });
 });

@@ -1,7 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// CHAP7b (2026-10-09, Mac: "continue"; bible/11-Multiplayer/Chapters-Arc.md
-// section 8, CALL 6) — A PATRON'S BANNERS AT ITS CHAPTER'S HALLS: "A
+// CHAP7b — A PATRON'S BANNERS AT ITS CHAPTER'S HALLS: "A
 // patron's banner hangs in the chapter's halls". A town's guild halls and
 // temples whose chapter (the hall's guild in the town's politic region - AUDIT
 // CHAP3 C6, as the hall's prices read it - off the chapter sheet,
@@ -16,7 +14,6 @@
 // WIRED (the streets, the halls' banners' own pass); worldModes.js and
 // dungeonContext.js stand no street; exterior.js (the bench) not wired - it
 // reads no sheet.
-// ═══════════════════════════════════════════════════════════════════
 import { BANNERS_MAX } from '../render/bannerPass.js';
 import { hallBannerAnchors, bannerKeyOf, BANNER_REFRESH_MS } from './hallBanners.js';
 

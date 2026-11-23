@@ -1,11 +1,11 @@
 // @ts-check
-// GATE-MIX (2026-10-20, the owner: "in oblivion gates ... the game hitches"): THE NIGHT'S BODIES MADE READY BEFORE THEY
+// GATE-MIX: THE NIGHT'S BODIES MADE READY BEFORE THEY
 // COME. His host's, his Flame's and his own sprites were each fetched when their first body was drawn (a wave's first
 // rising, the Sundering) and each frame of them decoded and uploaded the first time it showed (a new angle, a first
 // swing, a first hurt) - work landing in the frames the fight is busiest in. Now the court asks, as I stand in it, for
 // the archive of every body the night can show (`nightMobiles`), and uploads their frames a few a frame
 // (SPRITE_WARM_UPLOADS) until all stand; the draws find them there, and upload whatever they still find missing as before.
-// Design: bible/11-Multiplayer/World-Bosses.md section 28.
+// Design:
 
 import { HOST } from '../../net/gate/gateBrain.js';
 import { hasPortent } from '../../net/gate/gateMods.js';

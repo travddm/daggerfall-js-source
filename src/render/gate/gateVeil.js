@@ -1,6 +1,6 @@
 // @ts-check
-// WB6c (2026-09-25, Mac: "the transition and the arena needs to be an oblivion masterpiece"): THE GATE'S VEIL - the step
-// through an Oblivion gate, drawn. Design: bible/11-Multiplayer/World-Bosses.md section 4 ("The step through").
+// WB6c: THE GATE'S VEIL - the step
+// through an Oblivion gate, drawn. Design: ("The step through").
 //
 // THE LOOK: a vortex of fire over the whole screen, painted per pixel on one triangle - flame arms spiralling into a
 // white-hot eye (log-polar value noise, tiled round the circle so no seam shows where the angle wraps), pouring inward

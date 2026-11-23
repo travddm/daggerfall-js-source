@@ -1,4 +1,4 @@
-// ALLOC-RACE (2026-10-14): THE ALLOCATION MEASURE'S CHILD, ONE HOME. Ten suites
+// ALLOC-RACE: THE ALLOCATION MEASURE'S CHILD, ONE HOME. Ten suites
 // spawn a child to count the bytes a frame makes (L2 F9's measure: a fixed
 // 64 MB young space, the least of several windows, against a control that must
 // show) - and each spelled its flags itself. The measure only reads true once
@@ -19,12 +19,11 @@
 // 48 bytes a frame concurrently and 1 synchronously.) test/tooling/allocchild.test.js
 // proves the settle under an artificially late compiler. Every suite that
 // measures allocation spawns its child with these.
-import { fileURLToPath } from 'node:url';
-
 export const ALLOC_CHILD_ARGS = Object.freeze([
   '--expose-gc',
   '--min-semi-space-size=64',
   '--max-semi-space-size=64',
   '--allow-natives-syntax',
-  '--import', fileURLToPath(new URL('./allocSettle.mjs', import.meta.url)),
+  // --import takes a module specifier: a Windows path such as E:\x.mjs reads as a URL with the scheme "e:".
+  '--import', new URL('./allocSettle.mjs', import.meta.url).href,
 ]);

@@ -1,5 +1,4 @@
-// SHIPS-2 (2026-10-07, Mac, sending New_Ship_2.fbx and New_Ship_2_Shutter.fbx: "implement both of these new ship
-// placement models, UV Map/Texture, and ensure it matches the love we gave the other new ship model we implemented") -
+// SHIPS-2 -
 // the new carrack (hull 4) held to her model as the galleon is to hers (test/world/ships/galleon_model.test.js): her guns firing from
 // her ports on their own carriages, her shutters fitted to her side, her doors, her helm, her five sails by Come Sail
 // Away's names and her rig swept clear of itself and her solids, her rudder, ladders and anchor fitted, HULL_BUILDS'

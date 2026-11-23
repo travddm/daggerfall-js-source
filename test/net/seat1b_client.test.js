@@ -1,8 +1,8 @@
-// SEAT1b (2026-09-30, Mac: "Finish the seats"): INFLUENCE, THE LAW AND THE CLIENT'S HALF - the Watch's `k1` receipt and
+// SEAT1b: INFLUENCE, THE LAW AND THE CLIENT'S HALF - the Watch's `k1` receipt and
 // its rhythm, the relay's tick in a cell room (driven through the real Room over test/fakeRoom.mjs), the caps' arithmetic,
 // the Seat tab's words, the seats' book (the standings, a pledge, Tribute's one request id, the Watch's receipts kept and
-// claimed), the Renown report's region, and the hosts by source. bible/11-Multiplayer/Seats-Arc.md 4.1-4.2, 7.9;
-// `06-Systems/Online-Arc.md` SEAT1b.
+// claimed), the Renown report's region, and the hosts by source. 4.1-4.2, 7.9;
+// SEAT1b.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -17,6 +17,7 @@ import {
   seatMineLines, seatTributeLine, seatSpanWords, seatMay, SEAT_POWERS, ACCOUNT_SEAT_WEEK_CAP, GATE_WEEK_CAP, RENOWN_WEEK_CAP,
   SEAT_WATCH_CLAIM_MAX, WATCH_DAY_CAP,
 } from '../../src/net/townSeatLaw.js';
+import { seatPixelTest } from '../../src/systems/town/townSeats.js';   // DOMAIN1: the seats' pixels, out of the host
 import { createTownSeatBook, SEAT_WATCH_KEY, SEAT_WATCH_CLAIM_EVERY_MS, SEAT_STANDINGS_CACHE_MS, SEAT_WATCH_RETRY_MS } from '../../src/net/townSeatBook.js';
 import { createRenownTracker } from '../../src/net/renownTracker.js';
 import { cellRoomOfWire, PIXEL_UNITS } from '../../src/net/wire.js';
@@ -52,12 +53,12 @@ test('SEAT1b THE WATCH\'S RECEIPT: `k1` signed by the relay\'s one key, read by 
   const ok = { s: 'acct-0001', x: 0, y: 0, c: 0, i: T, e: T + 60 };
   assert.equal(watchReceiptValid(ok), true);
   for (const f of ['n', 'k', 't', 'o', 'd', 'b', 'w']) assert.equal(watchReceiptValid({ ...ok, [f]: 1 }), false, `a foreign field ${f}`);
-  assert.equal(watchReceiptValid({ ...ok, x: 1000 }), false);
-  assert.equal(watchReceiptValid({ ...ok, y: 500 }), false);
-  assert.equal(watchReceiptValid({ ...ok, y: -1 }), false);
+  assert.equal(watchReceiptValid({ ...ok, x: 8192 }), false);
+  assert.equal(watchReceiptValid({ ...ok, y: -8192 }), false);
+  assert.equal(watchReceiptValid({ ...ok, x: 100, y: -3000 }), false);
   assert.equal(watchReceiptValid({ ...ok, e: T + WATCH_RECEIPT_TTL_S + 1 }), false, 'never longer than its life');
   assert.equal(watchReceiptValid({ ...ok, c: 2 ** 32 }), false);
-  await assert.rejects(() => mintWatchReceipt({ s: 'acct-0001', x: 1000, y: 1, c: 1 }, null, { subtle, nowS: T }), TypeError, 'the relay never mints what it could not verify');
+  await assert.rejects(() => mintWatchReceipt({ s: 'acct-0001', x: 9000, y: 1, c: 1 }, null, { subtle, nowS: T }), TypeError, 'the relay never mints what it could not verify');
 });
 
 test('SEAT1b THE WATCH\'S RHYTHM AND THE RELAY\'S TICK: a verified account in a cell room, having moved in the last five minutes, is sent a `watch` frame every two minutes naming its map pixel; a standing one is not; a channel is no place (mutants: the moved window; the tick interval; the cell-room gate; the pixel; the nonce)', async (t) => {
@@ -107,8 +108,7 @@ test('SEAT1b THE CAPS\' ARITHMETIC: each source at its own cap, then 2,000 an ac
   assert.equal(accountSeatInfluence({ renownXp: 60000 }), RENOWN_WEEK_CAP);
   assert.equal(accountSeatInfluence({ renownXp: 39 }), 1, '1 per 20 XP, rounded down');
   assert.equal(accountSeatInfluence({ homeDays: 7 }), 175);
-  assert.equal(accountSeatInfluence({ writ: 900 }), 900);
-  assert.equal(accountSeatInfluence({ watch: 420, gates: 3, renownXp: 8000, homeDays: 7, writ: 900 }), ACCOUNT_SEAT_WEEK_CAP);
+  assert.equal(accountSeatInfluence({ watch: 420, gates: 3, renownXp: 8000, homeDays: 7, hunt: 250 }), ACCOUNT_SEAT_WEEK_CAP);
   assert.equal(accountSeatInfluence({ watch: -5 }), 0);
   assert.equal(tributeRoom(400), 100, 'a quarter of the rest is a fifth of the whole');
   assert.equal(tributeRoom(400, 60), 40);
@@ -133,10 +133,10 @@ test('SEAT1b THE SEAT TAB\'S WORDS: the week\'s clock, a standing, the empty boa
   assert.equal(seatStandingLine({ guild: { name: 'The Silver Hand', tag: 'SH' }, influence: 8393 }, 0), '1. the Silver Hand <SH> - 8,393 influence');
   assert.equal(seatNoStandingsLine(ANTICLERE), 'No guild has pledged to Anticlere this week.');
   const mine = { guild: 'g1', rank: 1, seasoned: true, bound: 'g1', pledges: [{ region: 21, key: 3021 }], influence: 340 };
-  assert.deepEqual(seatMineLines(ANTICLERE, mine), ['Your guild is pledged to Anticlere.', 'Your influence here this week: 340 of 2,000.']);   // BOARD-UI (PIN MOVED): what the number is
+  assert.deepEqual(seatMineLines(ANTICLERE, mine), ['Your guild is pledged to Anticlere.', 'Your influence here this week: 340 of 2,000.']);   // BOARD-UI (
   assert.deepEqual(seatMineLines(ANTICLERE, { ...mine, pledges: [{ region: 21, key: 3022 }] }, (k) => (k === 3022 ? 'Alcaire Keep' : null)), ['Your guild is pledged to Alcaire Keep in this region.']);
   assert.deepEqual(seatMineLines(ANTICLERE, { ...mine, pledges: [] }), ['Your guild has not pledged in this region this week.']);
-  assert.deepEqual(seatMineLines(ANTICLERE, { ...mine, seasoned: false }), ['Your guild is pledged to Anticlere.', 'You count for your guild after 7 days in it.']);   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the words cut
+  assert.deepEqual(seatMineLines(ANTICLERE, { ...mine, seasoned: false }), ['Your guild is pledged to Anticlere.', 'You count for your guild after 7 days in it.']);   // AUDIT 657 D7: BOARD-UI (
   assert.deepEqual(seatMineLines(ANTICLERE, { ...mine, bound: 'g2' }), ['Your guild is pledged to Anticlere.', 'Your account fights for another guild this week.']);
   assert.deepEqual(seatMineLines(ANTICLERE, null), ['Join a guild to fight for a seat.']);
   assert.match(seatTributeLine(100), /^Tribute: up to 100 silver more this week/);
@@ -183,7 +183,7 @@ test('SEAT1b THE BOOK KEEPS THE WATCH: a signed tick for the signed-in account i
   assert.equal(await book.claimWatch(), null);
   assert.equal(book.watchHeldCount(), 1, 'kept through a failed claim');
   answer = { ok: true, data: { ok: true, counted: 1 } };
-  // STORM-SHED (PIN MOVED): not at once - a failed claim waits (test/net/stormshed.test.js holds how long)
+  // STORM-SHED (
   assert.equal(await book.claimWatch(), null, 'the claim after a failure waits');
   now.ms += 1.5 * SEAT_WATCH_RETRY_MS;
   assert.deepEqual(await book.claimWatch(), { ok: true, counted: 1 }, 'the oldest ten minutes old: claimed');
@@ -278,7 +278,7 @@ test('SEAT1b THE SEAT TAB: beside the board\'s tabs while the seats are open, ne
   assert.deepEqual(rows.map((r) => r.textContent), ['1. Ebon Oath <EO> - 900 influence', '2. the Silver Hand <SH> - 340 influence']);
   assert.equal(rows[1].className.includes('mine'), true, 'the reader\'s own guild marked');
   assert.equal(rows[0].querySelectorAll('.notice-banner').length, 1, 'a guild under its banner');
-  assert.match(text, /Your guild is pledged to Anticlere\.Your influence here this week: 340 of 2,000\./);   // AUDIT 657 D7: BOARD-UI (PIN MOVED): what the number is
+  assert.match(text, /Your guild is pledged to Anticlere\.Your influence here this week: 340 of 2,000\./);   // AUDIT 657 D7: BOARD-UI (
   assert.match(text, /Tribute: up to 80 silver more this week/);
   byClass(host, 'notice-seat-drop')[0].click();
   await tick();
@@ -318,25 +318,26 @@ test('SEAT1b THE SEAT TAB: beside the board\'s tabs while the seats are open, ne
 
 test('SEAT1b THE HOSTS BY SOURCE: the relay ticks in its pose arm and nowhere else; the client hands a `watch` frame of its own cell to the book; the world host keeps it, claims on the frame, passes the board its seat, the gate claim its region and the Renown report the region it stands in; the service routes, statuses and deploy filter (mutants: each seam)', () => {
   const relay = rd('server/src/index.js');
-  assert.match(relay, /if \(isCellRoom\(a\.key\) && inCover\(a, cellRoomOfWire\(m\.p\.x, m\.p\.z\)\) && typeof met\.sub === 'string' && met\.sub\) await this\._watchTick\(ws, met\.sub, m\.p, !unmoved, now\);/);   // PIN MOVED (COST-2): a cell the socket covers - its own at L0, never a halo's; PIN MOVED (AUDIT-SEATS): R7 - the pose's own cell alone, never a halo's
+  assert.match(relay, /if \(isCellRoom\(a\.key\) && inCover\(a, cellRoomOfWire\(m\.p\.x, m\.p\.z\)\) && typeof met\.sub === 'string' && met\.sub\) await this\._watchTick\(ws, met\.sub, m\.p, !unmoved, now\);/);
   assert.equal((relay.match(/_watchTick\(/g) ?? []).length, 2, 'one call, one definition');
-  // PIN MOVED (AUDIT ETHER-OW C2-1, test/systems/audit_etherow.test.js): a pose off the map mints nothing - the Watch's ground
   // one home (net/watchReceipt.js watchPixelOk), its answers as they were
   assert.match(relay, /const \[x, y\] = mapPixelOfWire\(p\.x, p\.z\);\n {4}if \(!watchPixelOk\(x, y\)\) return;/);
-  assert.deepEqual([watchPixelOk(0, 0), watchPixelOk(999, 499), watchPixelOk(-1, 0), watchPixelOk(1000, 0), watchPixelOk(0, -1), watchPixelOk(0, 500)], [true, true, false, false, false, false]);
+  assert.deepEqual([watchPixelOk(0, 0), watchPixelOk(999, 499), watchPixelOk(-1, 0), watchPixelOk(1000, 0), watchPixelOk(8192, 0), watchPixelOk(100, -3000)], [true, true, true, true, false, false]);
   assert.match(relay, /mintWatchReceipt\(\{ s: sub, x, y, c: rand32\(\) \}, await this\._receiptKeyOf\(\)/);
   assert.match(relay, /this\._send\(ws, JSON\.stringify\(\{ t: 'watch', r \}\)\);/);
   const online = rd('src/net/online.js');
   assert.match(online, /const w = primary && isCellRoom\(room\) \? readWatchReceipt\(m\.r\) : null;\n\s*if \(w\) this\._deliver\('watch', \(\) => this\.onWatch\?\.\(m\.r, w\)\);/);
   const w = rd('src/scenes/world.js');
-  assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);   // PIN MOVED (TOWN-ECON TE2: the towns' book keeps it beside); PIN MOVED (PROF2b): and the Motherlodes' book keeps it too
-  assert.match(w, /if \(seatBook\?\.claimWatchDue\(\)\) seatBook\.claimWatch\(\);/);   // PIN MOVED (AUDIT-SEATS C12): asked in sync first - a frame with nothing due makes no Promise
-  assert.match(w, /isSeatPixel: \(x, y\) => seatPixels\.has\(`\$\{x\},\$\{y\}`\),/);
-  assert.match(w, /const seatPixels = new Set\(townSeats\.list\.map\(\(s\) => `\$\{s\.pixel\[0\]\},\$\{s\.pixel\[1\]\}`\)\);/);
+  assert.match(w, /online\.onWatch = \(r\) => \{ seatBook\?\.keepWatch\(r\); motherlodeBook\?\.watch\(r\); townEcon\.keepWatch\(r\); \};/);
+  assert.match(w, /if \(seatBook\?\.claimWatchDue\(\)\) seatBook\.claimWatch\(\);/);
+  // had kept its own set beside the book - the same answer, read off the derivation the host hands it
+  assert.match(w, /      seats: townSeats,   \/\/ DOMAIN1 \(HOST-SPLIT\)/);
+  const seatPixelAt = seatPixelTest({ list: [{ pixel: [402, 151] }, { pixel: [7, 9] }] });
+  assert.deepEqual([seatPixelAt(402, 151), seatPixelAt(7, 9), seatPixelAt(151, 402), seatPixelAt(402, 152), seatPixelTest(null)(0, 0)], [true, true, false, false, false]);
   assert.match(w, /seat: seatAt \? \{ seat: seatAt, book: seatBook, nameOf: \(k\) => seatAtMapId\(townSeats, k\)\?\.name \?\? null, port: coastalAt\(town\.px, town\.py, seaPixel, csaIsPortTown\(town\.px, town\.py\)\), countName: materialCountLabel \} : null,/);   // SEAT2b: and whether DFU names the town a port, the works' material words
   assert.match(w, /const seatAt = seatHere\(town\.mapId\);/);
-  // PIN MOVED (SILVER-WAYS): the claiming character rides every claim (its guild's deed asks it), the region where the scan found it
-  assert.match(w, /const character = characterIdOf\(playerEntity\);\n[^\n]*\n\s*return site \? \{ region: site\.region, character \} : character \? \{ character \} : null;/);
+  // own province's (scenes/gate/gateSeat.js gateSeatRegion), named where there is one
+  assert.match(w, /const character = characterIdOf\(playerEntity\);\n[^\n]*\n\s*return region != null \? \{ region, character \} : character \? \{ character \} : null;/);
   assert.match(w, /region: \(\) => \{ const px = playerTravelPixel\(\); const r = maps\.getRegionIndexAt\(px\.x, px\.y\); return Number\.isSafeInteger\(r\) \? r : null; \},/);
   const nw = rd('src/ui/noticeWindow.js');
   assert.match(nw, /\.\.\.\(seatShown\(\) \? \[\['seat', 'Seat'\]\] : \[\]\)\];/);

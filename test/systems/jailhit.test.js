@@ -1,5 +1,4 @@
-// JAIL-HIT (2026-09-27, Discord: "Retaining criminal status even after going to prison and serving sentence - Guards
-// will still chase you down and kill you, even if you have already been to prison for the crime committed").
+// JAIL-HIT.
 //
 // The release is faithful - every court exit clears the crime and the watch walks away on it (GUARD1). What was not:
 // DFU's surrender box and court are pushed windows that stop the world (UserInterfaceManager.cs:183-184) until

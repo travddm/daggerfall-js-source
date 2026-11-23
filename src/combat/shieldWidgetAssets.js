@@ -11,7 +11,7 @@
 // for these to be a repaint of. That is what separates them from Weapon
 // Widget's 173 (repaints of the classic WEAPON*.CIF frames) and from
 // Seasons of the Iliac Bay's flats, which the doctrine
-// (bible/01-Overview/Port-Doctrine.md: A RENDER OF GAME DATA IS GAME
+// (: A RENDER OF GAME DATA IS GAME
 // DATA) keeps out of this repository and reads from the player's own
 // copy of the mod. This art is carried, the way Eye of the Beholder's
 // 3035 sprites and Handheld Torches' are, and the mod works out of the
@@ -30,15 +30,14 @@
 // export left UNDER the transparent pixels collapses to one index.
 // Nothing visible changes; the bytes under the cutout do.
 //
-// SW4 (2026-09-19, Mac: "the new shield mod we integrated shows the
-// shields upside down") - AND REVERSED, ONCE, ON DISK. The 600 came out
+// SW4 - AND REVERSED, ONCE, ON DISK. The 600 came out
 // of the mod's Unity texture buffer without the flip a PNG's top-down
 // rows need - a Texture2D is stored bottom-up - so every sprite shipped
 // vertically mirrored and the arm reached DOWN into the shield out of
 // the sky. The rows were reversed in place, palette and transparent
 // index carried over byte for byte, each file checked by flipping the
 // output back to the input. The door below is unchanged, because the
-// door was never what was wrong: see bible/05-Combat/Shield-Widget.md.
+// door was never what was wrong: see.
 
 import { toScreenOrder } from '../formats/color32Order.js';
 import { decodePng } from '../systems/textureReplacement.js';
@@ -64,7 +63,7 @@ export const shieldSpritePath = (index) => `vendor/shield-widget/Textures/${shie
  *  own, which is what lets the bundler carry them. The archive, record
  *  and frame are interpolated separately, as that door does: measured
  *  over a real build, all 600 names reach the bundle. INLINE1
- *  (2026-09-20): ALL 600 AS FILES. This used to read "201 as files and
+ *  ALL 600 AS FILES. This used to read "201 as files and
  *  the rest inlined under Vite's 4 KB limit, which is the project's
  *  setting and not this mod's business" - and that deference is exactly
  *  how 275 of these went into the boot chunk as 1.34 MB of base64. The

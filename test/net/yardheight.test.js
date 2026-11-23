@@ -1,6 +1,4 @@
-// YARD-HEIGHT and DECOR-TURN (2026-10-06, Mac: "limit the height at which players can build, along with adding the
-// ability to rotate objects on the ground. People currently can build towers that seem out of place"; Mac's calls: 4 m,
-// and "Turn placed pieces"). A yard's piece stands at most DECOR_YARD_HIGH over the ground - refused at both ends
+// YARD-HEIGHT and DECOR-TURN. A yard's piece stands at most DECOR_YARD_HIGH over the ground - refused at both ends
 // (net/decorLaw.js decorYardHighOk: server-account/src/decor.js placeDecor and moveDecor, scenes/homeYards.js
 // yardWhyNot) - each piece stood on the one below had climbed as far as DECOR_YARD_POS_MAX. And a placed piece is turned
 // where it stands from the panel's "In this room" view (ui/decorPanel.js Turn left / Turn right, scenes/decor/decorTool.js

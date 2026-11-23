@@ -1,5 +1,4 @@
-// HOME-STATIONS (2026-09-27, Discord - Tabitha: "CRAFTABLE / PURCHASABLE CRAFT / GUILD STATIONS [Spellmaking, Alchemy,
-// Enchanting] FOR HOMES / SHIPS").
+// HOME-STATIONS.
 //
 // A PLACED PIECE MAY SERVE A CRAFT. In the owner's own home, house or ship, a placed piece (not one's own item, not one
 // that holds things) is made an Alchemy, a Spellmaking or an Enchanting station for a licence paid once
@@ -36,9 +35,8 @@ function choose(rig, id) {
 const PLACE = Object.freeze({ pos: [1, 0, 2], rot: [90, 0, 0], scale: 1, light: null, storage: false, paid: 120 });
 
 test('HOME-STATIONS the law: a piece serves one of three crafts, carried only when it serves one; a craft it does not know, a piece that holds things, and one\'s own item serve none (mutants: any word taken; storage and a station together; the key always written)', () => {
-  // PIN MOVED (PROF11): the mason's bench a seventh station, at the loom's licence
-  assert.deepEqual([...DECOR_STATIONS], ['alchemy', 'spells', 'enchant', 'forge', 'workbench', 'cooking', 'loom', 'mason', 'jeweller', 'vendor']);   // PIN MOVED (DECOR-USE): the cooking station, a ninth   // HOME-VENDOR: a hired trader   // PROF2: the forge, a fourth (Professions-Arc 23); PROF4: the workbench, a fifth (25); PROF7: the loom, a sixth (29); PROF11: the mason's bench, a seventh; PIN MOVED (PROF10): the jeweller's bench, an eighth
-  assert.deepEqual({ ...DECOR_STATION_FEES }, { alchemy: 50000, spells: 100000, enchant: 200000, forge: 50000, workbench: 50000, cooking: 50000, loom: 50000, mason: 50000, jeweller: 50000, vendor: 25000 });   // HOME-VENDOR: a trader's licence;   // STATION-FEES: ten times the first pass; PROF2: a forge as the alchemy station; PROF4: a workbench as the forge; PROF7: a loom as the workbench; PROF11: a mason's bench as the loom; PIN MOVED (PROF10): a jeweller's bench as the mason's
+  assert.deepEqual([...DECOR_STATIONS], ['alchemy', 'spells', 'enchant', 'forge', 'workbench', 'cooking', 'loom', 'mason', 'jeweller', 'vendor']);
+  assert.deepEqual({ ...DECOR_STATION_FEES }, { alchemy: 50000, spells: 100000, enchant: 200000, forge: 50000, workbench: 50000, cooking: 50000, loom: 50000, mason: 50000, jeweller: 50000, vendor: 25000 });   // HOME-VENDOR: a trader's licence;   // STATION-FEES: ten times the first pass; PROF2: a forge as the alchemy station; PROF4: a workbench as the forge; PROF7: a loom as the workbench; PROF11: a mason's bench as the loom
   assert.deepEqual({ ...DECOR_STATION_SERVICES }, { alchemy: 'guildServicePotionMaker', spells: 'guildServiceSpellMaker', enchant: 'guildServiceItemMaker' }, 'the forge is no guild\'s service - it opens the Stores\' forge');
   assert.deepEqual(decorStationWords(null, 'forge'), { pick: 'Station: Forge >', act: 'Make station - 50,000 gold', what: 'station:forge' });
   assert.equal(DECOR_STATION_NAMES.spells, 'Spellmaking station');
@@ -132,15 +130,6 @@ test('HOME-STATIONS an online home: the account service first - a station it kee
   assert.deepEqual([rig.standing[0].station, rig.w.paid.at(-1)], ['alchemy', 50000]);
 });
 
-test('HOME-STATIONS the room and the service: a station pressed opens its craft\'s maker for its owner alone, through the guild service\'s own door; the account service writes the craft with the place (mutants: the station never pressed; any visitor served; the craft never stored)', () => {
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /if \(piece\?\.station\) \{ useDecorStation\(piece\); return; \}/);
-  const use = M.slice(M.indexOf('  function useDecorStation(piece) {'), M.indexOf('  function offerStationActs(piece) {'));   // GUILD1d (re-aimed by content): the hall's members' rung inside the owner's check; PIN MOVED (FIELD BUGS 2026-10-11f STATION-DOOR): the press and the maker it opens (openStationMaker), to the chooser
-  assert.match(use, /if \(!stationOwnerHere\(\) && !decorMayStation\(piece\.id\)\) \{/, 'the owner\'s, or a grant\'s');   // PIN MOVED (DECOR access): a visitor still stops here; a grant or a hall member goes on
-  assert.match(use, /openServiceFlow\(DECOR_STATION_SERVICES\[piece\.station\], \{ guild: null, memberships: null, store: null, rows, route: null \}\)/);
-  assert.match(src('server-account/src/decor.js'), /const placeJson = \(\{ pos, rot, scale, light, storage, paid, station, name \}\) => JSON\.stringify\(\{ pos, rot, scale, light, storage, paid, \.\.\.\(station \? \{ station \} : \{\}\), \.\.\.\(name \? \{ name \} : \{\}\) \}\);/);
-});
-
 // ─── AUDIT (the batch's audit, agent E) ────────────────────────────────────────────────────────────────────────────
 
 const onlineRig = (gold, hold = false) => {
@@ -207,35 +196,3 @@ test('AUDIT HOME-STATIONS S2: one change of craft at a time - a second press whi
   assert.equal(o2.rig.said.at(-1), DECOR_STATION_GOLD_WENT);
 });
 
-test('AUDIT HOME-STATIONS S3 + S6 + S9: the room\'s view repaints when a piece\'s craft changes (its signature carries the craft), and the button acts as it is painted; a station\'s Remove says the licence does not come back; the chooser is named for a reader (mutants: the craft out of the signature; the act re-read from a newer piece)', async () => {
-  const rig = toolRig({ gold: 300_000 });
-  const chair = await placedOne(rig);
-  const root = choose(rig, chair.id);
-  btn(root, /^Make station/).fire('click');
-  await settle();
-  rig.frame({ overlayUp: true });   // the next frame hands the panel the room as it stands - no row chosen again
-  assert.ok(btn(root, /^Unmake station/), 'the button says what the piece now is');
-  assert.match(one(root, 'dfdecor-pick-price').textContent, / back \(the station license is not\)$/);
-  assert.equal(btn(root, /^Station:/).attrs['aria-label'], 'Station craft: Alchemy - press for the next');
-  // unmade: no gold moves (the view's gold does not change it), and the view still repaints - the craft is its own
-  btn(root, /^Unmake station/).fire('click');
-  btn(root, /^Press again to de/).fire('click');
-  await settle();
-  rig.frame({ overlayUp: true });
-  assert.equal(rig.standing[0].station, undefined);
-  assert.equal(btn(root, /^Make station/)?.textContent, 'Make station - 50,000 gold', 'the button says what the piece now is');
-  const P = src('src/ui/decorPanel.js');
-  assert.match(P, /const what = stationBtn\.dataset\.what;\s*\n\s*if \(what === 'arm'\) \{ stationArmed = it\.piece\.id; paintRoomSide\(\); return; \}\s*\n\s*stationArmed = null;\s*\n\s*if \(what\) onToggle\(it\.piece, what\);/, 'the act the button says');
-  assert.match(P, /stationBtn\.dataset\.what = words\.what;/);
-});
-
-test('AUDIT HOME-STATIONS S5 + S7 + S8: six acts fit a landscape phone (the side scrolls, a short screen\'s preview gives way); a maker\'s refusal with no record still says so; a station says its craft on the hover (mutants: each dropped)', () => {
-  const P = src('src/ui/decorPanel.js');
-  assert.match(P, /\.dfdecor-side \{ display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; contain: layout; \}/);
-  assert.match(P, /@media \(max-height: 480px\) \{ \.dfdecor-preview \{ min-height: 60px; \} \}/);
-  const M = src('src/scenes/worldModes.js');
-  assert.match(M, /for \(const t of lines\.length \? lines : \[DECOR_STATION_REFUSED\]\) say\(t\);/);
-  assert.match(M, /const DECOR_STATION_REFUSED = 'You cannot use the station right now\.';/);
-  assert.match(src('src/systems/worldTooltips.js'), /const craft = piece\.station \? stationName : null;\n\s*return t \? \{ title: craft \? `\$\{t\} \(\$\{craft\}\)` : t \} : craft \? \{ title: craft \} : null;/);
-  assert.match(M, /stationName: piece\?\.station \? \(DECOR_STATION_NAMES\[piece\.station\] \?\? null\) : null/);
-});

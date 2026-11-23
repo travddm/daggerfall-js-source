@@ -1,4 +1,4 @@
-// HCC (2026-09-23): THE WAGON'S SPLIT, PINNED BY EXECUTION - systems/wagon/wagon41214.js is Wagon41214VisualBuilder off
+// HCC: THE WAGON'S SPLIT, PINNED BY EXECUTION - systems/wagon/wagon41214.js is Wagon41214VisualBuilder off
 // the IL: classic model 41214 welded into its five pieces (a body of 14 triangles, two planar wheels of 10, two
 // shafts of 7) with the wheels' pivots and radius, and WagonCargoVisual's twelve pieces by tier. The model here is
 // test/hccModel.mjs's synthetic twin of the verified topology; every refusal the builder throws is driven too.

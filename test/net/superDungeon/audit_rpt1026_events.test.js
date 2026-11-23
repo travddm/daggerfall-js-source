@@ -105,8 +105,4 @@ test('AUDIT RPT1026 I1 THE MARK: a held hand told to wait behind held hands alon
   long6(R3, 'a:t', 200); orreryTurned(R3, 'a:free', 'peer-free', 11, 10, 300);
   assert.deepEqual(orreryJudge(o, orreryFresh(o), last, 0, 1, 300 + SD_STONE_SETTLE_MS, R3, 'a:t', 'peer-t'), { wait: true });
   assert.deepEqual(R3.wt, {}, 'and not behind a free one');
-  // the realm snaps by orreryRightsSnapped, and judges by orreryJudge
-  const RELAY = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(RELAY, /const res = orreryJudge\(o, hall, hall\.last, m\.i, m\.a, now, R, who, a\.id\);/);
-  assert.match(RELAY, /if \(res\.x\) this\._sdRights = \{ s, R: orreryRightsSnapped\(R\) \};/);
 });

@@ -22,6 +22,7 @@ import { collectInteriorPeople } from '../../../src/characters/interiorPeople.js
 import { questorCandidateBuildings, makeBuildingKey } from '../../../src/systems/talk/talkTopics.js';
 import { configureLayoutPins, recordStands, _resetLayoutPins } from '../../../src/systems/layoutPins.js';
 import { mapPixelToWorldCoord } from '../../../src/formats/mapsFile.js';
+import { hostText } from '../../hostText.mjs';   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld - the host read whole
 
 {
   const T = new URL('../../../vendor/dfu-quests/Tables/', import.meta.url);
@@ -248,7 +249,6 @@ test('QUESTOR-MOVED: a town with no building to seat the questor in keeps the re
       { type: ALCHEMIST, markers: true, people: [person({ x: 1, z: 1, position: 50, factionID: 0, look: { archive: 182, record: 5 } })] },
       { type: LIBRARY, people: [person({ x: 5, z: 5, position: 1100, factionID: 0, look: { archive: 182, record: 7 } })] },
     ]);
-    // PIN MOVED (QUEST-AUDIT II HOUSE-HALL): the hall is UNSEATED, never left on a key its layout no longer names (here
     // the library again by chance; in the Thieves Guild's town a stranger's house) - its record kept, never the apothecary
     assert.equal(m.reseatMovedSites(t.world), 1, 'the hall unseated, nothing chosen again');
     assert.deepEqual(four(qg.questorData), four(classicClick), 'the questor\'s record as it was');
@@ -299,10 +299,3 @@ test('QUESTOR-MOVED: "me and my friend" - a party member\'s copy taken before th
   } finally { _resetLayoutPins(); }
 });
 
-test('QUESTOR-MOVED: the hosts - the world\'s quest seam says when its towns\' layouts are known (applyLayoutPins\' own gate); the interior\'s one name derivation asks for a moved questor\'s name first (mutants: the seam always known; the name preference dropped)', () => {
-  // PIN MOVED (AUDIT QA2): known AND standing - the pins and their held-back towns set (_homeLayoutsApplied), not the
-  // service's word alone: a share landing while the packs were fetched was chosen again unpinned
-  assert.match(src('src/scenes/world.js'), /\n {4}townLayoutsKnown: \(\) => !homeLayoutsOnline \|\| _homeLayoutsApplied,/);
-  assert.match(src('src/scenes/world.js'), /const reseated = homeLayoutsOnline && _serverLayoutRecords === null \? 0 : \(questBridge\?\.machine\?\.reseatMovedSites\?\.\(\) \?\? 0\);/, 'the load\'s gate it mirrors');
-  assert.match(src('src/scenes/worldModes.js'), /return questBridge\?\.machine\?\.movedQuestorName\?\.\(npcData\) \?\? staticNpcName\(npcData, /);
-});

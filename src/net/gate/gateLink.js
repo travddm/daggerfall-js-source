@@ -1,6 +1,5 @@
 // @ts-check
-// WB3b (2026-09-25, Mac: "a gate of oblivion which takes place in a large boss arena with an oversized enemy with
-// telegraphed attacks"): WHAT THE CLIENT HOLDS OF A GATE'S FIGHT - the relay's words (net/wire.js validGateOut, off the
+// WB3b: WHAT THE CLIENT HOLDS OF A GATE'S FIGHT - the relay's words (net/wire.js validGateOut, off the
 // court's room or the hub) folded into one state: the boss's health, where he stands and walks, the attack in flight,
 // his phase and shield, the kill and the wrath, and this account's receipt. The court draws from it (WB4 - the body,
 // the telegraphs, the bar); the gate in the world reads its `fellAt` (a gate whose boss fell collapses on every screen).
@@ -276,8 +275,7 @@ export const GATE_NO_TEXT = Object.freeze({
   'the court is full': 'The Burning Court is full.',
 });
 
-/** GATE-RELOAD (2026-09-26, volo on Discord: "the oblivion gate is bugged rn" - "you cant enter it" - "it kicks you out
- *  instantly"): what the room's refusal of my `in` MEANS when it says the gate is closed. The relay says that word in a
+/** GATE-RELOAD: what the room's refusal of my `in` MEANS when it says the gate is closed. The relay says that word in a
  *  `no` for one reason alone - AUDIT WBX R7, a game that does not know its brain's law (`bv` below GATE_BRAIN_MIN: a tab
  *  loaded before the relay's deploy, a desktop copy whose update waits for the app to quit) - while the gate stands open
  *  (a closed window is refused at the hello, as an `error`, and never gets this far). "The gate is closed." in front of
@@ -288,14 +286,14 @@ export const gateRefusalText = (word) => (word === 'the gate is closed' ? GATE_O
 
 /**
  * The link: the state, the falls by day, the receipts by day, and the words said.
- * @param {{now: () => number, say?: (text: string) => void, onFell?: (day: number, fell: {at: number, top: string[], n: number, c?: number, cs?: number}) => void, onReceipt?: (receipt: string) => void, onRefused?: (why: string) => void, place?: (s: Readonly<GateState>, now: number) => number[], watches?: () => boolean}} deps
+ * @param {{now: () => number, say?: (text: string) => void, onFell?: (day: number, fell: {at: number, top: string[], n: number, c?: number, cs?: number}) => void, onReceipt?: (receipt: string) => void, onRefused?: (why: string) => void, place?: (s: Readonly<GateState>, now: number) => number[]}} deps
  *   `onReceipt` is told every receipt the relay hands this socket - the same one again after a reconnect or from the hub
  *   (WB5b: net/gate/gateClaims.js carries it to the account service, and keeps one a day). AUDIT WB B5: `onRefused` is told
  *   the relay's refusal of my `in` (its word, net/wire.js GATE_NO_WORDS) - the court this player stands in is not theirs
  *   to fight in, and the host takes them out of it. GATE-COURTS: `onFell` is told each court's kill (`c` its court, `cs`
  *   the courts the night held then) and, where none was told, the night's.
  */
-export function createGateLink({ now, say = () => {}, onFell = () => {}, onReceipt = () => {}, onRefused = () => {}, place = bossAt, watches = () => true }) {
+export function createGateLink({ now, say = () => {}, onFell = () => {}, onReceipt = () => {}, onRefused = () => {}, place = bossAt }) {
   /** @type {Readonly<GateState>} */
   let state = GATE_STATE_EMPTY;
   const falls = new Map();     // day -> {at, top, n}
@@ -308,9 +306,9 @@ export function createGateLink({ now, say = () => {}, onFell = () => {}, onRecei
      *  moves the court for a kill of its own day alone. */
     word(g) {
       if (!g) return;
-      // COURT-WATCH (bible/11-Multiplayer/World-Bosses.md section 24): a full court keeps me as its watcher - its fight
+      // COURT-WATCH: a full court keeps me as its watcher - its fight
       // heard and seen, never fought - until the answer to an `in` asked again (gateBrain.js COURT_WATCH_ASK_MS) gives me a seat
-      if (g.k === 'no' && WATCHED_NO[g.m] === true && watches()) { if (!watching) say(courtWatchText()); watching = true; return; }   // AUDIT PLAN-1000 G3: a relay that says `me` (relaySupportsCourtWatch)
+      if (g.k === 'no' && WATCHED_NO[g.m] === true) { if (!watching) say(courtWatchText()); watching = true; return; }   // AUDIT PLAN-1000 G3
       if (g.k === 'no') { say(gateRefusalText(g.m)); onRefused(g.m); return; }   // GATE-RELOAD: in what the word means
       if (g.k === 'st' && g.me === 1) watching = false;   // COURT-WATCH: my `in` answered - the seat mine
       if (g.k === 'rcpt') { const c = readReceipt(g.r); if (c) { receipts.set(c.d, g.r); onReceipt(g.r); } return; }   // one a day: the receipt says which

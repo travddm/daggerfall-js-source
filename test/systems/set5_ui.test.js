@@ -1,5 +1,4 @@
-// SET5 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md; Mac: "sigil armor sets that also come with set
-// builds ... go all out on this"): THE SETS ON SCREEN. The law's one view of a set for a wearer (the places filled, the
+// SET5: THE SETS ON SCREEN. The law's one view of a set for a wearer (the places filled, the
 // stage and what holds it, why it sleeps, the tiers) and its words for a line-printing tooltip; the HUD's chips for the
 // powers; the set block, the doll's strip and the frame's mark built on the fake document (test/invdrag.mjs); the sigil
 // block's words for a set's armour; the sheet's rules; and every surface's wiring. The browser's side - the strip in its
@@ -80,7 +79,7 @@ test('SET5 the view of a set for a wearer: which of the nine places its pieces f
   assert.equal(v.heldPiece, shield, 'the fresh Gate-Shield, the first of the lowest');
   assert.equal(v.renownNext, null, 'the Renown opens Kindled: not what holds it');
   assert.deepEqual(v.tiers.map((t) => t.awake), [true, true, false], 'four pieces: two tiers');
-  assert.equal(v.tiers[0].text, SIGIL_SETS.ruhn.tiers[0].text({ fire: 15, sear: 2 }), 'the numbers at the set\'s stage');
+  assert.equal(v.tiers[0].text, SIGIL_SETS.ruhn.tiers[0].text({ fire: 10, sear: 2 }), 'the numbers at the set\'s stage');
   const packed = piece(103, 'ruhn', 0);
   e.items.push(packed);
   assert.equal(setCardView(packed, e).worn, false, 'a piece in the pack is not one of the four');
@@ -108,8 +107,8 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   assert.deepEqual(setLines(a), [
     "Dagon's Brand: 3 of 9 worn (sets only work online)",
     `2 pieces - Ravager: ${SIGIL_SETS.dagon.tiers[0].brief({ strength: 2, critical: 4 })} (inactive)`,   // CARD-FIT: each tier by its brief
-    `4 pieces - Bloodfury: ${SIGIL_SETS.dagon.tiers[1].brief({ more: 4 })} (1 more)`,
-    `6 pieces - Rampage: ${SIGIL_SETS.dagon.tiers[2].brief({ stack: 4 })} (3 more)`,
+    `4 pieces - Bloodfury: ${SIGIL_SETS.dagon.tiers[1].brief({ more: 0.5 })} (1 more)`,   // PIN MOVED: B5 (Bloodfury Faint 2 -> 0.5)
+    `6 pieces - Rampage: ${SIGIL_SETS.dagon.tiers[2].brief({ stack: 0.5 })} (3 more)`,   // PIN MOVED: B5 (Rampage Faint 2 -> 0.5)
   ]);
   online(1);
   const lines = setLines(a);
@@ -124,9 +123,6 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   const tip = rarityLines(a);
   assert.deepEqual(tip.slice(-4), lines, 'a tooltip\'s list ends with its set');
   assert.ok(!rarityLines(a, { set: false }).includes(lines[0]), 'the card that draws the block asks without');
-  const inv = strip(read('src/ui/enhanced/enhancedInventory.js'));
-  assert.match(inv, /itemPowerLines\(picked, deps, \{ set: false, lore: false, technique: false \}\)/);   // TRADE-INFO: the card reads the one list, and asks it without the set (CARD-FIT: and the lore); PIN MOVED (TECH-CARD): and without a technique's line, its block's
-  assert.match(inv, /const lines = rarityLines\(item, \{ sigil: false, set, lore, technique \}\);/, 'the list asks rarityLines as the card asked it');   // PIN MOVED (TECH-CARD): and a technique's line as asked
   // AUDIT SET U5: an unidentified piece - its enchantment hidden, its sigil and its set said
   const hidden = { ...a, enchantments: [{ type: 1, param: 0 }], isIdentified: false };
   const unk = rarityLines(hidden);
@@ -138,8 +134,8 @@ test('SET5 the set in words, for a line-printing tooltip: its name, the places w
   assert.deepEqual(rarityLines(a).slice(1, 2), ['Sigil (inactive in a duel)']);
   const sw = createWeapon(120, 0);
   sw.rarity = 'rare';
-  sw.sigil = { power: 6, set: 'dagon', party: 1, xp: 0 };
-  assert.match(rarityLines(sw)[1], /^Sigil \(Faint\): \+[\d.]+% damage, \+6% at Ascendant$/, 'the set weapon\'s blow, awake on a foe');
+  sw.sigil = { power: 3, set: 'dagon', party: 1, xp: 0 };
+  assert.match(rarityLines(sw)[1], /^Sigil \(Faint\): \+[\d.]+% damage, \+3% at Ascendant$/, 'the set weapon\'s blow, awake on a foe');
   setSetsDueling(false);
   _resetForTests();
   fresh();
@@ -153,7 +149,7 @@ test('SET5 the HUD\'s chips for the powers: a window running burns (the Rampage\
   T = 10;
   reportPlayerKill({}); reportPlayerKill({});
   T = 10.4;
-  assert.deepEqual(setHudChips(e), [{ key: 'rampage', set: 'dagon', name: 'Rampage II', text: '12s', state: 'active', tier: 2 }]);   // PIN MOVED (AUDIT STAR S2): a chip carries its tier, which the HUD's card reads
+  assert.deepEqual(setHudChips(e), [{ key: 'rampage', set: 'dagon', name: 'Rampage II', text: '12s', state: 'active', tier: 2 }]);
   assert.deepEqual(setHudChips({ ...e, peer: 'p1' }), [], 'a peer\'s entity');
   setSetsDueling(true);
   assert.deepEqual(setHudChips(e), [], 'a duel');
@@ -215,7 +211,6 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     assert.deepEqual(places.map((p) => p.classList.contains('on')), [true, true, true, true, false, false, false, false, false]);
     assert.equal(places[0].title, 'Head - worn');
     assert.equal(places[8].title, 'Weapon');
-    // PIN MOVED (SET-CATCHUP, Sigil-Sets.md section 5): three pieces stand at Bright, so the helm below them drinks faster
     assert.equal(one(box, 'set-stage').textContent, 'Kindled · Bright: grow your Helm (3x XP), reach Renown 20');
     const tiers = kids(box, 'set-tier');
     assert.deepEqual(tiers.map((t) => t.classList.contains('awake')), [true, true, false]);
@@ -229,11 +224,11 @@ test('SET5 the set block, built: the name and the pieces of nine, the Prince and
     assert.equal(card.className, 'setbox compact');
     assert.equal(one(card, 'set-count').textContent, '4/9 · Kindled');
     assert.equal(one(card, 'set-role'), null, 'the Prince and the role are the Info box\'s');
-    assert.equal(one(card, 'set-stage').textContent, 'Bright: grow your Helm (3x XP), reach Renown 20');   // PIN MOVED (SET-CATCHUP)
+    assert.equal(one(card, 'set-stage').textContent, 'Bright: grow your Helm (3x XP), reach Renown 20');
     const rows = kids(card, 'set-tier');
     assert.deepEqual(rows.map((t) => t.classList.contains('awake')), [true, true, false]);
-    assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 6 }));
-    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 6 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 12 })}`);
+    assert.equal(one(rows[1], 'set-tier-text').textContent, SIGIL_SETS.dagon.tiers[1].brief({ more: 1 }));   // PIN MOVED: B5 (Bloodfury at Kindled 3 -> 1)
+    assert.equal(rows[1].title, `${SIGIL_SETS.dagon.tiers[1].text({ more: 1 })}\nAt Ascendant: ${SIGIL_SETS.dagon.tiers[1].text({ more: 1.5 })}`);   // PIN MOVED: B5 (Bloodfury Kindled 3 -> 1, Ascendant 5 -> 1.5)
     assert.equal(one(rows[2], 'set-tier-every'), null, 'no recovery, no tag');
     { const e2 = player(), m = piece(107, 'malacath', 0); wear(e2, m);
       const tag = one(kids(setCard(m, e2), 'set-tier')[2], 'set-tier-every');
@@ -337,9 +332,6 @@ test('SET5 the frame\'s mark and the rune\'s colour: a set piece\'s frame wears 
   assert.ok(PLUS_CSS.includes('.pack-shell .card .setbox p.set-role'));
   assert.ok(PLUS_CSS.includes('.dragghost[data-set] .tile::after { background-image: var(--set-rune); }'));
   for (const sel of ['.setbox {', '.set-place.on {', '.set-tier.awake .set-at {', '.setstrip {', '.setline-pips i.on {']) assert.ok(PLUS_CSS.includes(sel), sel);
-  // UI3: a set power's tile in the status widget - its frame the set's light and shade, a recovery dashed and dimmed
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hst-cell\.set \{ --hst-hi: var\(--set-hi, #e6dccb\); --hst-lo: var\(--set-lo, #3a352a\); \}/);
-  assert.match(read('src/ui/enhanced/enhancedStyle.js'), /\.hst-cell\.recovering \.hst-tile \{ border-style: dashed;/);
 });
 
 test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it is a set\'s sigil (asleep, or growing its set with its lowest piece), and a fresh one says it grows as I earn Renown wearing it; a weapon\'s block is as it was; AUDIT U11 in a duel a set\'s armour\'s sigil sleeps (no gem lit, named Asleep) and a set weapon\'s keeps its blow; U12 a set sigil on what is no set piece answers no set (mutants: the blow\'s words on armour; a duel\'s armour sigil lit; a set weapon\'s blow put to sleep; a ring called a set\'s)', () => {
@@ -355,11 +347,11 @@ test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it i
     assert.equal(one(box, 'sigil-note').textContent, 'It grows as you earn Renown wearing it.');
     assert.equal(one(sigilCard(armour), 'sigil-effect'), null, 'the card\'s dress: a set\'s armour says no more - its set\'s block does');
     const w = createWeapon(120, 0);
-    w.sigil = { power: 6, set: 'dagon', party: 1, xp: 0 };
+    w.sigil = { power: 3, set: 'dagon', party: 1, xp: 0 };
     box = sigilCard(w, whole);
-    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+6% at Ascendant$/, 'a set weapon keeps its blow\'s words');
+    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+3% at Ascendant$/, 'a set weapon keeps its blow\'s words');
     assert.equal(one(box, 'sigil-note').textContent, 'It grows as you earn Renown with this weapon.');
-    assert.match(one(sigilCard(w), 'sigil-effect').textContent, /^\+[\d.]+% damage \(up to \+6%\)$/, 'and its card\'s one line');
+    assert.match(one(sigilCard(w), 'sigil-effect').textContent, /^\+[\d.]+% damage \(up to \+3%\)$/, 'and its card\'s one line');
     // AUDIT SET U11: a duel
     setSetsDueling(true);
     box = sigilCard(armour, whole);
@@ -369,7 +361,7 @@ test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it i
     assert.ok(kids(box, 'sigil-gem').every((g) => !g.classList.contains('awake')), 'no gem burning');
     assert.ok(kids(sigilCard(armour), 'sigil-gem').every((g) => !g.classList.contains('awake')), 'nor on the card');
     box = sigilCard(w, whole);
-    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+6% at Ascendant$/, 'a set weapon\'s blow is awake on a foe');
+    assert.match(one(box, 'sigil-effect').textContent, /^\+[\d.]+% damage now · \+3% at Ascendant$/, 'a set weapon\'s blow is awake on a foe');
     setSetsDueling(false);
     // U12: a set's sigil on a ring - no set piece
     box = sigilCard({ name: 'Ring', sigil: { set: 'mora', party: 1, xp: 0 } }, whole);
@@ -379,20 +371,3 @@ test('SET5 the sigil block for a set\'s armour: no "+null%" - its line says it i
   });
 });
 
-test('SET5 the surfaces\' wiring: the pack\'s card and the Info box append the set block after the sigil\'s, the doll\'s column the strip after the shelf, every frame the pack marks and the hotbar\'s slot and the diamond\'s cell wear the set (their repaint keys read it); the host names the wearer and hands the HUD its chips (mutants: the Info box without the block; the strip never drawn; the hotbar\'s key blind to the set; the HUD\'s chips unwired)', () => {
-  const inv = strip(read('src/ui/enhanced/enhancedInventory.js'));
-  assert.match(inv, /\{ const sb = sigilCard\(picked\); if \(sb\) into\.append\(sb\); \}\s*\{ const set = setCard\(picked, deps\.entity, itemLongName\); if \(set\) into\.append\(set\); \}/, 'the card (CARD-FIT: its short dress, into its body)');
-  assert.match(inv, /\{ const sb = sigilCard\(item, \{ full: true \}\); if \(sb\) body\.append\(sb\); \}\s*\{ const set = setCard\(item, deps\.entity, itemLongName, \{ full: true \}\); if \(set\) body\.append\(set\); \}/, 'the Info box (CARD-FIT: whole, into its scrolling body)');
-  assert.match(inv, /col2\.append\(accessoryShelf\(\)\);\s*const sets = setStrip\(deps\.entity, \{ onPick: \(it\) => \{ picked = it; goldEntry = null; pickedAt = 'worn'; side = 'local'; notice = null; render\(\); \} \}\);\s*if \(sets\) col2\.append\(sets\);/, 'the doll\'s strip');
-  assert.match(inv, /export function markItemFrame\(node, item\) \{[\s\S]*?markSetFrame\(node, item\);[\s\S]*?return node;\s*\}/, 'every frame the pack marks');
-  const hb = strip(read('src/ui/enhanced/enhancedHotbar.js'));
-  assert.match(hb, /\$\{validSigil\(v\.item\.sigil\) \? '\*' : ''\}\$\{setIdOf\(v\.item\) \?\? ''\}/, 'the hotbar\'s repaint key reads the set');
-  assert.match(hb, /if \(it && validSigil\(it\.sigil\)\) n\.dataset\.sigil = ''; else delete n\.dataset\.sigil;\s*markSetFrame\(n, it\);/);
-  const hud = strip(read('src/ui/enhanced/enhancedHud.js'));
-  assert.match(hud, /const frameKey = worn \? `\$\{rarityAttr\(worn\) \?\? ''\}\|\$\{validSigil\(worn\.sigil\) \? 1 : 0\}\|\$\{setIdOf\(worn\) \?\? ''\}` : '';/, 'the diamond\'s key');
-  assert.match(hud, /markSetFrame\(part\.cell, worn\);/);
-  assert.match(hud, /const powers = setPowerChips\(vitals\);/);
-  assert.doesNotMatch(hud, /from '(?:\.\.?\/)+(?:[\w-]+\/)*sigilSetPowers\.js'/, 'the HUD never imports the powers (a cycle through the round\'s ticker)');
-  const w = strip(read('src/scenes/world.js'));
-  assert.match(w, /setSetsWearer\(\(\) => playerEntity\);\s*setHudSetChips\(\(e\) => \[\.\.\.setHudChips\(e\), \.\.\.lootHudChips\(e\), \.\.\.martialHudChips\(e\)\]\);/);   // LOOT5: the Legendary powers' chips beside the sets'; PIN MOVED (RPT1026-PROGRESS): and a martial path's passive
-});

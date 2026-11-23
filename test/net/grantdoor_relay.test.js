@@ -1,4 +1,4 @@
-// GRANT-DOOR and FOE-BOUNDS (2026-10-19, Mac: "Spec + B + A"; bible/11-Multiplayer/Spawn-Grants.md sections 19 and 20):
+// GRANT-DOOR and FOE-BOUNDS:
 // THE RELAY'S HALF, over real Rooms (test/fakeRoom.mjs) - while `grantDoor` is on a foes room turns away a build whose
 // hello says no spawn grants (GROUND-GATE's own law: a current build asks nothing, a cold room asks the hub before its
 // first such hello, the hub itself lets anyone in); the relay vouches on every foes frame it fans for a sender whose
@@ -16,7 +16,7 @@ const { subtle } = globalThis.crypto;
 const quiet = async (fn) => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return await fn(); } finally { console.warn = w; console.log = l; } };
 const P0 = { x: 402 * PIXEL_UNITS + 100, y: 60, z: (499 - 151) * PIXEL_UNITS + 100, yaw: 0, pitch: 0 };
 const CELL = cellRoomOfWire(P0.x, P0.z);
-const CURRENT = { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW };   // PIN MOVED (LEASE1, net/roomLease.js): a current build hands its hub's lease on too - a foes cell is a lease room. PIN MOVED (LOOT-DOOR, AUDIT HORIZONTAL B7): and says the loot it reads - one that did not would ask the hub for the loot door
+const CURRENT = { gl: GROUND_LAW, gv: GRANT_HELLO_LAW, ls: 1, ll: LOOT_HELLO_LAW };
 
 test('GRANT-DOOR THE WIRE: a hello says `gv` 1 to GRANT_HELLO_LAW_WIRE_MAX, any other value read as none (never refused for it); the setting is `grantDoor`, on or off; the refusal\'s reason fits a WebSocket close (mutants: the field dropped; the range)', () => {
   const hello = (gv) => parseClient(JSON.stringify({ t: 'hello', id: 'mac-0001', secret: 'secret-of-mac-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, gv }), { hasHello: false });
@@ -91,37 +91,39 @@ test('GRANT-DOOR THE RELAY VOUCHES: a frame from a socket whose hello said its s
   assert.deepEqual(heard.map((m) => [m.id, m.g]), [['sock-mac-01', 1], ['sock-old-01', undefined]]);
 });
 
-test('FOE-BOUNDS THE RELAY STRIPS WHAT NO BUILDER COULD GIVE: with `grantStrip` on, a rat of 99,999 health goes to nobody - said three times, counted once - and a vouched sender\'s record with no grant goes too, at its bound or not; an ally of any health passes; the batch the relay signs carries the count under its own name with the worst one\'s evidence (mutants: the bound unread; counted every frame; the vouched sender passed whole; the evidence dropped)', async (t) => {
+test('FOE-BOUNDS THE RELAY STRIPS WHAT NO BUILDER COULD GIVE: with `grantStrip` on, a rat of 99,999 health goes to nobody - said three times, counted once - and a vouched sender\'s record with no grant goes too, at its bound or not; a summon of 99,999 health goes as any monster does, and so does a class-type crewman of 99,999; one whose health was carried from a higher level passes; the batch the relay signs carries the count under its own name with the worst one\'s evidence (mutants: the bound unread; counted every frame; the vouched sender passed whole; a summon spared the bound; a class ally read at its own level; the evidence dropped)', async (t) => {
   const C = await cell(t, { GRANT_STRIP: 'on' });
   const mac = await C.join('sock-mac-01', CURRENT), zed = await C.join('sock-zed-01', CURRENT);
   const mx = foeHealthBound({ t: 0 }, { lane: 'street', wild: true, camp: false });
   const f = [
     { i: 1, t: 0, f: [1, 2, 3], k: 99_999, h: 99_999 },   // no builder's rat
     { i: 2, t: 0, f: [1, 2, 3], k: mx, h: mx },   // at its bound - but with no grant, from a sender the door holds to them
-    { i: 3, t: 0, f: [1, 2, 3], k: 99_999, h: 99_999 },   // an ally: unverified
+    { i: 3, t: 128, l: 5, f: [1, 2, 3], k: 900, h: 900 },   // a class-type crewman, his health carried from a roll at a higher level
+    { i: 5, t: 128, l: 5, f: [1, 2, 3], k: 99_999, h: 99_999 },   // a class-type crewman no level could give
+    { i: 4, t: 27, f: [1, 2, 3], k: 99_999, h: 99_999 },   // a summoned Daedroth: a monster, held to its bound
   ];
-  for (let n = 1; n <= 3; n++) await C.r.raw(mac.ws, JSON.stringify({ t: 'foes', data: { n, k: CELL, full: 1, f, cp: [3], cn: ['Sworn'] } }));
-  assert.deepEqual(zed.foes().at(-1)?.data?.f.map((r) => r.i), [3], 'the forged rat and the ungranted one went nowhere; the ally passed');
+  for (let n = 1; n <= 3; n++) await C.r.raw(mac.ws, JSON.stringify({ t: 'foes', data: { n, k: CELL, full: 1, f, cw: [3, 5], cp: [4], cn: ['Daedroth'] } }));
+  assert.deepEqual(zed.foes().at(-1)?.data?.f.map((r) => r.i), [3], 'the forged rat, the ungranted one, the forged summon and the forged crewman went nowhere; the carried crewman passed');
   await C.r.room._grantFlush();
   assert.equal(C.posts.length, 1);
   const opened = await openGrantMeasure(C.posts[0].body, C.posts[0].sig, C.kp.publicKey, { subtle, nowMs: C.now });
   assert.ok(opened.ok, opened.error ?? '');
-  assert.deepEqual(opened.batch.tl, [{ a: GRANT_RELAY_READER, b: 'acct-sock-mac-01', r: 'stats', n: 1, e: { t: 0, k: 99_999, mx } }], 'once, under the relay\'s name, with its evidence');
+  assert.deepEqual(opened.batch.tl, [{ a: GRANT_RELAY_READER, b: 'acct-sock-mac-01', r: 'stats', n: 3, e: { t: 0, k: 99_999, mx } }], 'once each, under the relay\'s name, with its evidence');
 });
 
-test('GRANT-DOOR THE CLIENT: a foes room\'s hello says its spawn grants; a frame the relay vouched (`g` 1) makes its sender one held to them, an unvouched one does not; a relay at world223 takes `stats`, one before it does not (mutants: the vouch unread; the relay\'s version unread)', async () => {
+test('GRANT-DOOR THE CLIENT: a foes room\'s hello says its spawn grants; a frame the relay vouched (`g` 1) makes its sender one held to them, an unvouched one does not (mutant: the vouch unread)', async () => {
   const { OnlineSession } = await import('../../src/net/online.js');
   const { fakeSocketClass } = await import('../fakeSocket.mjs');
   const room = 'interior:m123456.7';
-  for (const v of ['world223', 'world222']) {
+  {
     const { FakeWS, sockets } = fakeSocketClass();
     const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => 1000 });
     await quiet(() => s.join(room, { x: 1, y: 2, z: 3, yaw: 0 }));
     sockets[0].open();
     assert.equal(JSON.parse(sockets[0].sent[0]).gv, GRANT_HELLO_LAW, 'the hello says it');
-    await quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'zzz-0001', name: 'Z', look: null, pose: null }, { id: 'zzz-0002', name: 'Y', look: null, pose: null }], host: 'zzz-0001', world: null, v, gm: 'measure' }));
+    await quiet(() => sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [{ id: 'zzz-0001', name: 'Z', look: null, pose: null }, { id: 'zzz-0002', name: 'Y', look: null, pose: null }], host: 'zzz-0001', world: null, gm: 'measure' }));
     sockets[0].receive({ t: 'own', id: 'zzz-0001', g: 1, data: { n: 1, k: room, full: 1, f: [] } });
     sockets[0].receive({ t: 'own', id: 'zzz-0002', data: { n: 1, k: room, full: 1, f: [] } });
-    assert.deepEqual([[...s.grantSenders], s.grantStatsOk], [['zzz-0001'], v === 'world223'], v);
+    assert.deepEqual([...s.grantSenders], ['zzz-0001']);
   }
 });

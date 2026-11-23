@@ -1,4 +1,4 @@
-// SLAM15 (2026-09-17, AUDIT SLAM FINAL): THE THREE LEFT RECORDED, PAID. Mac: "Take care of the left recorded."
+// SLAM15: THE THREE LEFT RECORDED, PAID.
 //
 // A6 A STOP IS HEARD WHOLE. The pose that ends a walk - the first with `mv` 0 after one that moved - carries where
 // the player actually stopped, and the tier served it to one far slice in four. The other three eased to the last

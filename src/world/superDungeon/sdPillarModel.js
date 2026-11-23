@@ -1,5 +1,5 @@
 // @ts-check
-// SD-LOOK S7 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 9): THE ARENA'S PILLARS, DRESSED - square
+// SD-LOOK S7: THE ARENA'S PILLARS, DRESSED - square
 // clock-tower columns of dark basalt banded in brass, the arena's four (net/superDungeon/sdBrain.js SD_PILLAR_R on the diagonals),
 // every face of them INSIDE THE LAW'S SQUARE (world/superDungeon/sdRealm.js pillarQuads - the collider and the Hour-Hand's shade,
 // net/superDungeon/sdRemnant.js behindPillar; "no visual larger than the law"): a plinth flush with it, a chamfered shaft in from it

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-// HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1 (2026-10-08, Mac: "We have permission to use and implement everything into
-// the codebase. These should be on by default and integrate into our enhanced environments seamlessly.") - THE FOUR
+// HAZE1 / WINDFALL1 / SNOWFALL1 / ALIKR1 - THE FOUR
 // ENVIRONMENT MODS, OUT OF THE ARCHIVES MAC HANDED OVER.
 //
 //   node tools/environmentModsExtract.mjs \
@@ -254,7 +253,7 @@ export function snowfallFiles(bytes) {
         // SNOWFALL1: the port orders the shipped winter records after Vanilla Enhanced's Base (an optional dependency, which
         // orders when the Base is attached and is dropped when it is not - dfmodLoadOrder), as a player orders Snowfall
         // in DFU's mod window for its packaged winter archives to decide over the Base's arrays. The shipped manifest
-        // names none (`"Dependencies": []`) - bible/03-World/Snowfall.md, the departures.
+        // names none (`"Dependencies": []`), the departures.
         deps: [...manifestDeps(m.json), ['vanilla enhanced - base', true, false]],
         textures: records, arrays: [], xml: {},
       },

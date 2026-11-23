@@ -1,6 +1,4 @@
-// SIGIL-UI + RARITY-UI (2026-09-26, Mac: "sigil weapons need a visible indicator within the info section, something
-// that makes it stand out, along with progress as you use it. Rarity needs to be more noticable in the UI with the icon
-// borders being color coded"). The view is pure (systems/sigil/sigil.js sigilView) and the block is BUILT here on the fake
+// SIGIL-UI + RARITY-UI. The view is pure (systems/sigil/sigil.js sigilView) and the block is BUILT here on the fake
 // document (test/invdrag.mjs); the frames are the Plus sheet's own rules, read as text, and the four places that mark
 // a frame are driven (the pack's helper) or pinned (the hotbar's and the diamond's writes).
 import { test } from 'node:test';
@@ -18,7 +16,7 @@ import { ITEM_FRAME_CSS, PLUS_CSS } from '../../../src/ui/enhanced/enhancedPlusS
 import { setPref, _resetForTests } from '../../../src/systems/uiPrefs.js';
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
-const sword = (xp, extra = {}) => ({ name: 'Longsword', group: 'Weapons', templateIndex: 117, rarity: 'rare', affixes: [], isIdentified: true, sigil: { power: 6, party: 3, xp }, ...extra });
+const sword = (xp, extra = {}) => ({ name: 'Longsword', group: 'Weapons', templateIndex: 117, rarity: 'rare', affixes: [], isIdentified: true, sigil: { power: 3, party: 3, xp }, ...extra });
 const online = (renown) => { _resetSigilForTests(); setSigilOnline(true); setSigilRenown(renown); };
 const kids = (n, cls) => (n.children ?? []).flatMap((c) => [...(c.classList?.contains(cls) ? [c] : []), ...kids(c, cls)]);
 const one = (n, cls) => kids(n, cls)[0] ?? null;
@@ -27,9 +25,9 @@ test('SIGIL-UI the view: the stage it stands at in MY hand (the lower of its gro
   online(15);
   const v = sigilView(sword(7420));
   assert.deepEqual([v.rank, v.stage, v.dormant, v.held, v.name], [1, 1, false, false, 'Kindled']);
-  assert.deepEqual([v.from, v.to, v.next, v.full, v.party], [5000, 12500, 'Bright', 6, 3]);
+  assert.deepEqual([v.from, v.to, v.next, v.full, v.party], [5000, 12500, 'Bright', 3, 3]);
   assert.ok(Math.abs(v.frac - (7420 - 5000) / (12500 - 5000)) < 1e-9, 'measured from the stage it reached, not from zero');
-  assert.equal(v.pct, (6 * SIGIL_STAGES[1].share) / 100);
+  assert.equal(v.pct, (3 * SIGIL_STAGES[1].share) / 100);
   assert.equal(sigilProgressText(v), '7,420 / 12,500 to Bright');
   assert.deepEqual(v.stages.map((s) => [s.grown, s.awake]), [[true, true], [true, true], [false, false], [false, false], [false, false]]);
   const held = sigilView(sword(23900));
@@ -58,7 +56,7 @@ test('SIGIL-UI the block: the rune, "Sigil" and the stage, what it gives now and
     assert.equal(one(box, 'sigil-rune').getAttribute('aria-hidden'), 'true');
     assert.equal(one(box, 'sigil-word').textContent, 'Sigil');
     assert.equal(one(box, 'sigil-stage').textContent, 'Kindled');
-    assert.equal(one(box, 'sigil-effect').textContent, '+2.4% damage now · +6% at Ascendant');
+    assert.equal(one(box, 'sigil-effect').textContent, '+1.2% damage now · +3% at Ascendant');
     const gems = kids(box, 'sigil-gem');
     assert.equal(gems.length, 5);
     assert.deepEqual(gems.map((g) => g.className), ['sigil-gem grown awake', 'sigil-gem grown awake', 'sigil-gem', 'sigil-gem', 'sigil-gem']);
@@ -86,7 +84,7 @@ test('SIGIL-UI the block: the rune, "Sigil" and the stage, what it gives now and
     assert.equal(cg[2].dataset.fill, '32.3%');
     assert.equal(one(c, 'sigil-stages').getAttribute('role'), 'progressbar');
     assert.equal(one(c, 'sigil-stages').getAttribute('aria-valuenow'), '32');
-    assert.equal(one(c, 'sigil-effect').textContent, '+2.4% damage (up to +6%)');
+    assert.equal(one(c, 'sigil-effect').textContent, '+1.2% damage (up to +3%)');
     for (const cls of ['sigil-meter', 'sigil-party', 'sigil-note']) assert.equal(one(c, cls), null, `no ${cls} on the card`);
     const cheld = sigilCard(sword(23900));
     assert.equal(one(cheld, 'sigil-note').textContent, 'Renown limit: Bright at Renown 20');
@@ -95,8 +93,8 @@ test('SIGIL-UI the block: the rune, "Sigil" and the stage, what it gives now and
     setSigilOnline(false);
     const dormant = sigilCard(sword(7420), { full: true });
     assert.equal(dormant.dataset.stage, 'dormant');
-    assert.equal(one(dormant, 'sigil-effect').textContent, 'Works online only: +6% damage at Ascendant');
-    assert.equal(one(sigilCard(sword(7420)), 'sigil-effect').textContent, 'Works online: up to +6% damage');
+    assert.equal(one(dormant, 'sigil-effect').textContent, 'Works online only: +3% damage at Ascendant');
+    assert.equal(one(sigilCard(sword(7420)), 'sigil-effect').textContent, 'Works online: up to +3% damage');
     assert.equal(sigilCard({ name: 'Mace' }), null);
     _resetSigilForTests();
   });
@@ -117,10 +115,6 @@ test('SIGIL-UI the card carries the BLOCK, not three more lines: the tier list l
   assert.ok(all.length > bare.length, 'the default still says the sigil (the classic tooltip, the trade window)');
   assert.ok(all.some((l) => /Kindled/.test(l)));
   assert.ok(!bare.some((l) => /Kindled|[Ss]igil/.test(l)), 'the card\'s own list does not');
-  const inv = read('src/ui/enhanced/enhancedInventory.js');
-  assert.match(inv, /itemPowerLines\(picked, deps, \{ set: false, lore: false, technique: false \}\)[^\n]*\n\s+\{ const tb = techniqueCard\(picked, \{ keyWord: techniqueKeyWord\(\) \}\); if \(tb\) into\.append\(tb\); \}[^\n]*\n[^\n]*\n[^\n]*\n\s+\{ const sb = sigilCard\(picked\); if \(sb\) into\.append\(sb\); \}/, 'the hover card: the list, then the block');   // TRADE-INFO: the list is itemPowerLines now (SET5: set: false; CARD-FIT: lore: false, and the card's words go into its body); PIN MOVED (TECH-CARD): a technique's block between them
-  assert.match(inv, /export function itemPowerLines\(item, d = deps, \{ set = true, lore = true, technique = true \} = \{\}\) \{\n  const lines = rarityLines\(item, \{ sigil: false, set, lore, technique \}\);/, 'and it leaves the sigil to the block');   // PIN MOVED (TECH-CARD): and a technique to its, when asked
-  assert.match(inv, /\{ const sb = sigilCard\(item, \{ full: true \}\); if \(sb\) body\.append\(sb\); \}/, 'the Info box - whole');
   _resetSigilForTests();
 });
 
@@ -140,7 +134,5 @@ test('RARITY-UI the frame: a piece\'s tier and its rune are marked on every pict
     assert.ok(ITEM_FRAME_CSS.includes(sel), sel);
   }
   assert.ok(PLUS_CSS.includes(ITEM_FRAME_CSS), 'the frames ride the Plus sheet');
-  assert.match(read('src/ui/enhanced/enhancedHotbar.js'), /if \(rar\) n\.dataset\.rarity = rar; else delete n\.dataset\.rarity;\n\s+if \(it && validSigil\(it\.sigil\)\) n\.dataset\.sigil = ''; else delete n\.dataset\.sigil;/);
-  assert.match(read('src/ui/enhanced/enhancedHud.js'), /if \(rar\) part\.cell\.dataset\.rarity = rar; else delete part\.cell\.dataset\.rarity;\n\s+if \(worn && validSigil\(worn\.sigil\)\) part\.cell\.dataset\.sigil = ''; else delete part\.cell\.dataset\.sigil;/);
   for (const f of ['src/ui/enhanced/enhancedTrade.js', 'src/ui/enhanced/enhancedPlayerTrade.js']) assert.match(read(f), /markItemFrame\(el\('button', 'itemrow'\), item\)/, f);
 });

@@ -1,5 +1,5 @@
 // @ts-check
-// WAGON-FILTER (2026-10-04, Mac: "The wagon needs a filter option"). THE PLAYER'S OWN STORES, FILTERED.
+// WAGON-FILTER. THE PLAYER'S OWN STORES, FILTERED.
 //
 // DFU's inventory window filters only the LOCAL list: its four tabs are AddLocalItem's (nativeInventory.js tabAccepts),
 // and the remote list - the wagon, a chest, a corpse - is shown whole. A wagon holds 750 kg and the player fills it with
@@ -19,10 +19,10 @@
 // log, hide and reagent the professions mint). It crosses the pages - an ingot is Misc and a herb Ingredients - which
 // is why it stands beside them rather than among them. The search matches the row's own name, lower-cased.
 //
-// Classic skin: not drawn there. THE NATIVE-WINDOW RULE (bible/Home.md) holds every element of a native window to a DFU
+// Classic skin: not drawn there. THE NATIVE-WINDOW RULE holds every element of a native window to a DFU
 // source, and DFU's window has no control for this; shift-click (ui/native/nativeInventory.js) is the classic skin's half.
 //
-// LOOT-BULK (2026-10-16): the same bar on a container (a chest, a corpse). A rarity menu beside the pages, listing only
+// LOOT-BULK: the same bar on a container (a chest, a corpse). A rarity menu beside the pages, listing only
 // the tiers this list holds, each with its count, and a material menu of the same shape for armour and weapons. The
 // ground and a reward tray stay whole.
 import { PACK_PAGES, pageOf } from './packPages.js';

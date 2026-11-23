@@ -19,7 +19,7 @@ test('M5: an armed cast eats the attack click in every host (WeaponManager defer
   // BEFORE handing the click to the weapon rig.
   for (const f of HOSTS) {
     const s = src(f);
-    // NAV-H re-pinned (2026-09-28): at a helm with guns world.js's press lays them (navalHost.js attackInput) - AFTER
+    // NAV-H re-pinned: at a helm with guns world.js's press lays them (navalHost.js attackInput) - AFTER
     // the cast and before the rig, so the law holds: a readied spell eats the click before anything else takes it
     assert.ok(/if \(magic\.interceptAttack\(true\)\) return; (?:if \(naval\?\.attackInput\(true\)\) return; )?weaponRig\.attackInput/.test(s),
       `${f}: the drag/press arms test the latch first`);
@@ -28,9 +28,7 @@ test('M5: an armed cast eats the attack click in every host (WeaponManager defer
   }
   assert.ok(src('worldModes.js').includes('if (held && magic?.interceptAttack(true)) return; interiorWeapon.attackInput'),
     'the interior attack route is wrapped');
-  // PIN MOVED (SPELL-HAND): the dungeon's door says whether the press is a cast's own, and a cast's own never swings (was:
   // `if (magic.interceptAttack(held)) return;`)
-  // PIN MOVED (AUDIT SPELL-HAND, HOST-SPLIT): `cast` positional, the word imported (was: `{ cast }`, an entry)
   assert.ok(src('dungeonContext.js').includes('if (magic.interceptAttack(held, cast ? CAST_PRESS : undefined) || cast) return;'),
     'the dungeon playerAttackInput defers too');
 });
@@ -119,7 +117,7 @@ test('M5: spell damage reaches guards through the ONE damage door', () => {
   assert.ok(src('cityGuards.js').includes('hurtGuard: (g, dmg, playerFeet, knockDir = null, opts = undefined) => damageGuard(g, dmg, playerFeet, knockDir, opts)'),   // AUDIT WORLD6b-iii(a) B2: and the options bag (the provenance)
     'cityGuards exports the door');
   for (const f of HOSTS) {
-    assert.ok(/hurt: \(n(?:, o)?\) => \{ (?:const fp = o\?\.fromPlayer \?\? fromPlayer; )?if \(n > 0\) (cityGuards\.hurtGuard\(g, n, player\.pos\)|\(g\._encounter \? exteriorFoes\.damageFoe\(g, n, player\.pos, null, \{ fromPlayer(?:: fp)?, kind: 'spell'(?:, whole: !!o\?\.whole)?(?:, round: !!o\?\.round)?(?:, element: o\?\.element \?\? null)? \}\) : cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer(?:: fp)?(?:, kind: 'spell', round: !!o\?\.round)? \}\)\))/.test(src(f)),   // PIN MOVED (TELL1: the kind reaches the watch, and a later round says so)   // AUDIT WORLD6b-iii(a) B2: the world host's carries the engine's provenance
+    assert.ok(/hurt: \(n(?:, o)?\) => \{ (?:const fp = o\?\.fromPlayer \?\? fromPlayer; )?if \(n > 0\) (cityGuards\.hurtGuard\(g, n, player\.pos\)|\(g\._encounter \? exteriorFoes\.damageFoe\(g, n, player\.pos, null, \{ fromPlayer(?:: fp)?, kind: 'spell'(?:, whole: !!o\?\.whole)?(?:, round: !!o\?\.round)?(?:, element: o\?\.element \?\? null)? \}\) : cityGuards\.hurtGuard\(g, n, player\.pos, null, \{ fromPlayer(?:: fp)?(?:, kind: 'spell', round: !!o\?\.round)? \}\)\))/.test(src(f)),
       `${f}: the engine sink routes through the pool's own damage door`);   // PIN MOVED (RVN3: a landing's element, and exterior.js's whole)
   }
 });

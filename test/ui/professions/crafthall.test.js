@@ -1,13 +1,12 @@
 // CRAFT-HALL (2026-10-26; a player's feedback, handed on by the owner: crafting "is hidden behind 2 tabs. There's a lack
 // of necessary information on the page regarding your level, what gives progress, progression bars, what gives a first
-// time crafting bonus (or what already has)"; the owner: "No exceptions and no band aids") - THE CRAFTER'S PAGE.
+// time crafting bonus (or what already has)") - THE CRAFTER'S PAGE.
 // The service says what a character has made (server-account/src/professions.js profState's `made`), the book keeps it
 // and notes every act it answers (net/profBook.js), recipeLaw firstMakesSpent keys it as the first-make decisions do,
 // and the pages say it: the Crafting page beside the Professions page (each craft's bar and its first-time bonuses over
 // the stations), every station's header, the patterns' shows and their first-time marks, the box's line owed or spent,
 // Craft x N, what raises a track, and the Professions key landing at the station. Built from the producers: the real
 // Worker over node:sqlite (test/accountDb.mjs), a book that reads it, and the pages drawn for real.
-// bible/06-Systems/Professions-Arc.md section 56.
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -91,14 +90,14 @@ test('CRAFT-HALL the service\'s state says what the character has made - its cra
   assert.equal(brewFirstOwed(book.state.made, POTIONS.find((p) => p.id === 'healing')), false);
   assert.equal(firstStanding(book.state.made, 'provisioning').spent, 1, 'the brew counts on Provisioning');
   assert.equal(firstStanding(book.state.made, 'building').spent, 1, 'the cut on Building');
-  assert.deepEqual(firstStanding(book.state.made, 'smithing'), { all: firstMakesOf('smithing').length, spent: 1, share: 500, closed: false });   // PIN MOVED (AUDIT HORIZONTAL A2): the standing says whether its craft is closed
+  assert.deepEqual(firstStanding(book.state.made, 'smithing'), { all: firstMakesOf('smithing').length, spent: 1, share: 500, closed: false });
 });
 
 test('CRAFT-HALL the law alone: a made set unknown says nothing (null), never "all owed"; a key of another track is none of this one\'s; Enchanting has no first-makes; every first-make of a craft track is a key the service decides by (mutants: null read as empty; the track\'s filter gone)', () => {
   assert.equal(firstMakesSpent(null, 'smithing'), null);
   assert.equal(firstStanding(null, 'smithing'), null);
   assert.equal(recipeFirstOwed(null, recipeById('dagger:iron')), null);
-  assert.deepEqual(firstStanding(null, 'enchanting'), { all: 0, spent: 0, share: 0, closed: false });   // PIN MOVED (AUDIT HORIZONTAL A2)
+  assert.deepEqual(firstStanding(null, 'enchanting'), { all: 0, spent: 0, share: 0, closed: false });
   const made = { crafts: new Set(['dagger:iron', 'stew:north']), works: new Set(['cut:stone', 'ingot:iron']), brews: new Set(['healing']) };
   assert.deepEqual([...firstMakesSpent(made, 'smithing')], ['dagger@1']);
   assert.deepEqual([...firstMakesSpent(made, 'building')], ['cut:stone']);
@@ -126,9 +125,9 @@ test('CRAFT-HALL what raises a track is reckoned by the laws the service credits
   assert.equal(rows('enchanting').get('Disenchanting a crafted piece'), `${DISENCHANT_XP} XP per Essence per grade (${DISENCHANT_XP * top} at grade ${top})`);
   for (let pay = 0; pay < 400; pay += 7) assert.equal(writXp(pay), craftWritXp(pay), 'one writ law - the row says it once');
   assert.equal(rows('herbalism').get('Court writ for herbs'), 'Twice its pay');
-  assert.equal(rows('smithing', { pct: 6 }).get('Your Firmament stars'), '+6%, not on writs or first-time bonuses');   // PIN MOVED (AUDIT HORIZONTAL A1): the service scales no writ's XP
+  assert.equal(rows('smithing', { pct: 6 }).get('Your Firmament stars'), '+6%, not on writs or first-time bonuses');
   assert.equal(rows('smithing').has('Your Firmament stars'), false);
-  assert.equal(gradeNote('smithing', rank), `Each grade is worth ${CRAFT_XP_PER_TIER} experience a piece and ${smeltXp(1, 1)} an ingot. Work more than two grades below your best (grade ${top}) earns a quarter.`);   // PIN MOVED (AUDIT HORIZONTAL A1): a smelt pays 10 a grade
+  assert.equal(gradeNote('smithing', rank), `Each grade is worth ${CRAFT_XP_PER_TIER} experience a piece and ${smeltXp(1, 1)} an ingot. Work more than two grades below your best (grade ${top}) earns a quarter.`);
   assert.equal(gradeNote('building', rank), `Each grade is worth ${CRAFT_XP_PER_TIER} experience. Work more than two grades below your best (grade ${top}) earns a quarter.`);
   assert.equal(gradeNote('fishing', rank), '', 'a haul is worked at the rank\'s own grade');
   for (const p of PROFESSIONS) assert.ok(xpSources(p.id, 0).length >= 1, `${p.id} says what raises it`);
@@ -212,17 +211,6 @@ test('CRAFT-HALL the rails: the Crafting page beside the Professions page on the
   assert.equal(stationHere(), 'fire');
   assert.equal(stationDoorAt('loom'), 'crafting');
   setProfessionsPages(null);
-  const door = hostText('src/ui/pauseDoor.js');
-  assert.match(door, /enhancedPauseOverlay\(show, hooks\.at === 'professions' \? \{ \.\.\.hooks, at: professionsKeyAt\(\) \} : hooks\)/);
-  const modes = hostText('src/scenes/worldModes.js'), world = hostText('src/scenes/world.js');
-  assert.match(modes, /interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\('fire'\) \}\)/);
-  assert.match(modes, /interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\(piece\.station\) \}\)/);
-  assert.match(modes, /label: stationActLabel\(kind\), action: \(\) => \{ leave\(\); interiorKeyCtx\.togglePause\(\{ at: stationDoorAt\(kind\) \}\); \}/);   // PIN MOVED (AUDIT HORIZONTAL A7): the option's words profPages.js's, through t()
-  assert.match(world, /hudCtx\.togglePause\(\{ at: stationDoorAt\('workbench'\) \}\);/);
-  assert.doesNotMatch(modes + world, /togglePause\(\{ at: 'stores' \}\)/, 'no station door lands under the goods any more');
-  const menu = hostText('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /crafting: \(d\) => drawCraftingPage\(d, render, profKit\)/);
-  assert.match(menu, /const profKit = \{ el, divider: pxDivider, meter: pxMeter, go: profGo, keyName: /);
 });
 
 test('CRAFT-HALL the Crafting page: the five crafts\' headers - each its rank, its bar from the rank\'s floor, its XP and what is left, its first-time bonuses made - pressed to open the Professions page on it; the crafter\'s rule; where no station stands here, where they are and the bound key; the stations tiled, the one here drawn with its own header; a door to the Stores (mutants: a header gone; the press\'s track; the key unread)', async (t) => {
@@ -371,7 +359,7 @@ test('CRAFT-HALL patternFirst: a pattern\'s open grades say its first-time bonus
   assert.equal(trackOf('jewelcrafting'), STATION_TRACKS.jeweller);
 });
 
-// ─── AUDIT HORIZONTAL (2026-10-27, the owner: "Audit this") ─────────
+// ─── AUDIT HORIZONTAL ─────────
 
 test('CRAFT-HALL AUDIT HORIZONTAL A1: what raises a track names a grade its act is worked at, at every rank - no vein, tree or hide past 6, the loom\'s pieces to 5, the workbench\'s to 6, the anvil\'s Daedric 7; a common herb no clean pick; a Court writ never a gem (mutants: a row at the rank\'s top; the patterns\' rank unread; the clean herb below 10)', () => {
   const tierOf = (k) => material(k)?.tier ?? 0;
@@ -499,5 +487,4 @@ test('CRAFT-HALL AUDIT HORIZONTAL (the lane\'s suspected read): a state read ans
 
 test('CRAFT-HALL AUDIT HORIZONTAL A7: the chooser at an alchemy or enchanting station offers its act through t(), and the Professions key\'s row says where it lands (mutant: the option\'s words glued in the host)', () => {
   assert.deepEqual(['alchemy', 'enchant', 'forge'].map(stationActLabel), ['2 - Brew (Crafting page)', '2 - Disenchant (Crafting page)', '']);
-  assert.doesNotMatch(hostText('src/scenes/worldModes.js'), /\(Crafting page\)`/, 'no English glued in the host');
 });

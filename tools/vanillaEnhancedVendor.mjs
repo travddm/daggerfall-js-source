@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// VE4 (2026-10-05, Mac: "Put it in the codebase") - VANILLA ENHANCED, VENDORED.
+// VE4 - VANILLA ENHANCED, VENDORED.
 //
 // carademono's Vanilla Enhanced ships as .dfmod bundles (Nexus Daggerfall Unity mod 273), and its sources are public at
 // github.com/drcarademono/vanilla-enhanced. This tool reads that repository AT THE COMMIT IT PINS and writes what the
@@ -46,7 +46,7 @@ import { isMain } from './lib/isMain.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const VE_REPO = 'https://github.com/drcarademono/vanilla-enhanced';
-/** The commit read: "HD dungeon textures, snowless swamps and jungles" (2025-05-08), the manifests' 3.4.7. */
+/** The commit read: "HD dungeon textures, snowless swamps and jungles", the manifests' 3.4.7. */
 export const VE_COMMIT = 'c0c9041c101ba8b57feb93258dda7a37be1b9433';
 const ASSET_ROOT = 'Assets/Game/Mods/vanilla-enhanced/';
 export const ART = 'public/art/vanilla-enhanced';

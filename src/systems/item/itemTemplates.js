@@ -84,19 +84,9 @@ export function groupTemplates(group) {
 
 /** AMMUNITION SKIPS THE MATERIAL LADDER. CreateWeapon's arrow arm never
  *  runs ApplyWeaponMaterial - no material weight or value, no material
- *  name, the ammunition info record - and the port's own ammunition (the
- *  Dwemer Pellet) is the same kind of thing, so every reader asks this
- *  rather than "is it the Arrow". A mod that adds ammunition registers it
- *  (thunderlock.js), since this file has no business knowing what a
- *  Dwemer Pellet is. AUDIT 68 S27-ammo-arrow-only: the registry lived in
- *  lootRarity.js, which no weight, value or name reader imports, and six
- *  of them spelled it "is the Arrow" - the pellet weighed nothing, cost
- *  three times its price and read "Iron Dwemer Pellet". */
+ *  name, the ammunition info record - so every reader asks this rather
+ *  than spelling "is it the Arrow" itself. */
 const _ammunition = new Set([WEAPONS.Arrow]);
-export function registerAmmunition(templateIndex) {
-  if (Number.isFinite(templateIndex)) _ammunition.add(templateIndex);
-  return _ammunition.size;
-}
 export const isAmmunition = (item) => _ammunition.has(item?.templateIndex);
 
 /** SetItemPropertiesByMaterial's value line (ItemBuilder.cs:649) over
@@ -138,8 +128,7 @@ export function itemBaseValue(item, lookup = templateByIndex) {
  *  trade window reads `item.value` raw: an undefined one sums to NaN
  *  and CalculateTradePrice's `>> 8` collapses that to 0.
  *
- *  MAC-N1 (2026-09-16, Mac: "Weapon and Armorsmiths dont want to pay
- *  for loot"): this law lived as FIVE private copies - loot.js,
+ *  MAC-N1: this law lived as FIVE private copies - loot.js,
  *  unleveledLoot.js, startingGear.js and two in shopStock.js - and the
  *  corpse's armor (combat/enemyEquipment.js equipmentItems) was minted
  *  by none of them. A cuirass off a dead knight had no value, so the
@@ -168,7 +157,7 @@ export function setItemFields(item) {
     value: itemValueOf(named),
   };
 }
-/** JAN1 (2026-09-18, Janome: "when I try to sell certain items I get COST:NaN ... he offers me 0"): THE ONE VALUE
+/** JAN1: THE ONE VALUE
  *  READ. DFU's `item.value` is always an int; the port's can be absent (an item saved before MAC-N1 set every minter)
  *  or, worse, NaN (a sum over an absent term), and `??` lets NaN through. A value that is not a finite number is no
  *  value: the template's base price answers, as SetItem's own write does. Every price arm reads through here. */
@@ -220,7 +209,7 @@ export function usesWorldTexture(item, template = templateByIndex(item.templateI
  *  minted none, so every torch/lantern/candle read as empty and no
  *  looted weapon carried a condition. Idempotent - an item that
  *  already has a condition (magic uses, a save round-trip) keeps it.
- *  WEAPON-POOL (2026-10-06): a weapon's hitPoints is the one pool every
+ *  WEAPON-POOL: a weapon's hitPoints is the one pool every
  *  weapon type shares (characters/weapons.js WEAPON_CONDITION_POOL),
  *  not its row's - ammunition alone keeps the row's - and the material
  *  scales it as before. */
@@ -242,8 +231,7 @@ export const conditionPercentage = (item) => ((item?.maxCondition ?? 0) > 0 ? Ma
 /** A piece's condition as a share of its maximum - the mend order's key, and a kit's before and after. */
 export const conditionShare = (item) => item.currentCondition / item.maxCondition;
 const wornFirst = (item) => (item.equipSlot != null ? 1 : 0);
-/** THE MEND ORDER. MEND-AIM's (2026-09-30, kurkku on Discord: "always repairing the most worn piece of equipment means
- *  fixing arrows or random loot you picked up most of the time"), one home since MEND-WORN gave Repairs Objects the
+/** THE MEND ORDER. MEND-AIM's, one home since MEND-WORN gave Repairs Objects the
  *  same answer: what is WORN first - the player's own gear, never a piece of loot carried to sell - then the rest,
  *  each the lowest share of its condition left first. A sort comparator, and the sort is stable, so two pieces at one
  *  share keep the pack's order. Read by the repair kit (smithItems.js repairKitTargets) and Repairs Objects
@@ -316,38 +304,9 @@ export function inventoryItemModel(item) {
   return null;
 }
 
-// ---- THUNDERLOCK-ART: a port-owned item's own pictures, by job ----------
-/** THUNDERLOCK-ART (2026-10-07, AUDIT SD III's companion; Mac: "The thunderlock/ammo also doesnt recieve proper artwork
- *  in slots like the hotbar or inventory"): A CLASSIC WEAPON'S ICON IS ITS DOLL LAYER - GetInventoryTextureArchive hands
- *  back the PlayerTextureArchive the doll draws from, which is why a classic icon carries the fist's notch - and the
- *  port's own weapon was made the same way (tools/gunPaperdoll.mjs), so its pack tile and hotbar slot showed a doll layer
- *  with a hole in it. A weapon of the port's OWN has pictures of its own to give, and registers them here: a provider
- *  answers `{ archive, record }` for an item - `forPaperDoll` true on the doll, false in a list - or null, and DFU's
- *  ladder answers as before. Registered by the item's home (systems/thunderlock.js), which imports this file. */
-const _ownImages = new Map();
-export function registerOwnItemImage(templateIndex, fn) { if (typeof fn === 'function') _ownImages.set(templateIndex, fn); else _ownImages.delete(templateIndex); }
-/** The port's own picture for an item and a job, or null for every item DFU's ladder answers. */
-export function ownItemImage(item, { forPaperDoll = false } = {}) {
-  const fn = _ownImages.get(item?.templateIndex);
-  const r = fn ? fn(item, { forPaperDoll }) : null;
-  return r && Number.isInteger(r.archive) && Number.isInteger(r.record) ? r : null;
-}
-
-/** GUN-LORE (2026-10-24, the owner: "A proper lore pass on both weapons and how their projectiles work according to the
- *  dweamer"; bible/05-Combat/Dwarven-Thunderlock.md "GUN-LORE"): A TEMPLATE'S OWN WORDS - what a thing of the port's own
- *  IS, said under its name in the Info box (ui/enhanced/enhancedInventory.js itemInfoBoxes) for every item of the
- *  template, whatever its tier. DFU's templates have none to say (its weapons carry no description; a book's are its
- *  pages), so only a home of the port's own registers one (systems/thunderlock.js, systems/pistolet.js). */
-const _templateLore = new Map();
-export function registerTemplateLore(templateIndex, text) { if (typeof text === 'string' && text) _templateLore.set(templateIndex, text); else _templateLore.delete(templateIndex); }
-/** The words an item's template says of itself, or null. */
-export const templateLore = (item) => _templateLore.get(item?.templateIndex) ?? null;
-
 export function inventoryItemImage(item, identity = undefined) {
   const t = templateByIndex(item.templateIndex);
   if (!t) return null;
-  // THUNDERLOCK-ART: a weapon of the port's own draws its own picture in a list, never its doll layer
-  { const own = ownItemImage(item); if (own) return { archive: own.archive, record: own.record, dye: itemDyeColor(item), dyeTarget: itemDyeTarget(item) }; }
   // MAC-D2 (Skibbster on Discord, 2026-09-21, with a screenshot of a
   // TOMATO on the "Small Cart" card): TRANSPORTATION HAS NO INVENTORY
   // ART, AND THE FIELDS THAT LOOK LIKE IT ARE ANOTHER ITEM'S.

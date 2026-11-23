@@ -1,4 +1,4 @@
-// CSA-A (2026-09-27): AN RGBA PICTURE OF AT MOST 256 COLOURS AS AN INDEXED PNG
+// CSA-A: AN RGBA PICTURE OF AT MOST 256 COLOURS AS AN INDEXED PNG
 // (colour type 3, PLTE and tRNS) - pngjs writes truecolour only, and a
 // mod's palette-painted frames (Come Sail Away's waves: 57 RGBA values over
 // 32 frames of 640x640) are a fifth of the size this way.

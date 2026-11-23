@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FESTIVAL-STAGE (2026-10-02, Mac: "lets finish the build work") - A
-// FESTIVAL'S MUSIC, BANNERS AND LANTERNS (bible/11-Multiplayer/
-// Seats-Arc.md 7.6: "Festival - music, banners, lanterns"). SEAT1d built
+// FESTIVAL-STAGE - A
+// FESTIVAL'S MUSIC, BANNERS AND LANTERNS. SEAT1d built
 // its Festive buff (systems/seatEdicts.js); this is the town dressed for
 // it, while a Festival rules there - the holder's Edict as the seats'
 // list dresses the seat (net/townSeatLaw.js festivalRules). Nothing on
@@ -79,7 +78,7 @@ export function createFestivalStage({ seatAt, now = () => Date.now(), version = 
     const v = version(), t = now();
     if (v !== seen || t - at >= BANNER_REFRESH_MS) { rules.clear(); seen = v; at = t; }
     let r = rules.get(mapId);
-    if (r === undefined) { r = mapId != null && festivalRules(seatAt(mapId)); rules.set(mapId, r); }
+    if (r === undefined) { const town = mapId != null ? seatAt(mapId) : null; r = mapId != null && festivalRules(town?.charterSeat ?? town); rules.set(mapId, r); }   // DOMAIN3: a holding keeps its Charter's Festival
     return r;
   };
   return {

@@ -1,8 +1,5 @@
 // TILE1/TILE2 — THE SAVE TILES, IN A REAL BROWSER.
 //
-// Mac: "a detailed tile based design for your saves which will
-// translate to the load character pane also. Basically showing your
-// portrait and character information."
 //
 // node cannot draw a tile, so the node pins hold its ARITHMETIC and
 // this holds the drawing. Same machinery as tools/accountCardProbe.mjs

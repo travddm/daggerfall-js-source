@@ -1,4 +1,4 @@
-// CLIMB1 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md): THE
+// CLIMB1 (the Enhanced Climbing arc): THE
 // LEDGE SENSOR, THE MANTLE AND THE VAULT. The laws (player/parkour.js), the
 // sensor against a real Collider's boxes, the motor living them (a jump that
 // mantles, a held jump that catches, a run that vaults, a classic climb that
@@ -356,7 +356,7 @@ test('CLIMB1: the switch - the enhanced skin, the row, and ?parkour=off; the cla
   assert.deepEqual(checkFeature(row), []);
   assert.deepEqual([...row.kinds], ['enhanced']);
   assert.equal(row.control.key, 'enhancedClimbing');
-  assert.equal(row.control.online, true, 'on for everyone online: nobody crosses a rooftop a way another cannot');
+  assert.equal(row.control.online, 'room', 'on for everyone online: nobody crosses a rooftop a way another cannot');
 });
 
 test('CLIMB1: every host mounts the enhanced climb and reports its edge - the three motors, the five activity reports', () => {

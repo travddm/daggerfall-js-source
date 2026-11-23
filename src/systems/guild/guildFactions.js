@@ -1,5 +1,5 @@
 // @ts-check
-// CHAP1 (2026-10-07, bible/11-Multiplayer/Chapters-Arc.md law 4): THE GUILD FACTIONS, A LEAF - Daggerfall's own guilds
+// CHAP1: THE GUILD FACTIONS, A LEAF - Daggerfall's own guilds
 // by their faction ids: the four that are one guild each, the eight divines' temples and the ten knightly orders.
 //
 // A LEAF: no imports, so the account service's graph reaches it and nothing past it (the precedent is AUDIT

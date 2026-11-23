@@ -1,6 +1,4 @@
-// SD-THROUGH (2026-10-21, the owner: "So the abyss dungeon. When someone finds and enters the portal. I want a portal to
-// show up for anyone in the dungeon and anyone entering that automatically leads them there."; bible/11-Multiplayer/
-// Super-Dungeons.md section 6, SD-THROUGH and AUDIT SD-THROUGH): THE WAY THROUGH. Once the first soul has stepped through
+// SD-THROUGH: THE WAY THROUGH. Once the first soul has stepped through
 // a Hollow's Rift (the hub's record's `inAt` - its relay half is test/net/superDungeon/sdthrough_relay.test.js), a second
 // Rift stands beside everyone in the Hollow and everyone who enters it, and leads to the Shattered Hour through the Rift's
 // own door - pressed, never walked into. Here: the law of when it stands (world/superDungeon/sdDungeon.js sdThroughStands)

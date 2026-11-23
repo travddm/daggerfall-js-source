@@ -50,7 +50,7 @@ Editor writes it:
 - `WorldDataPack/beautiful-cities.pack.json.gz` - every world-data file of
   the mod as the author's EDIT of Daggerfall's own data
   (`src/formats/worldData/worldDataPack.js`, WD3;
-  `bible/02-Formats/World-Data-Patches.md`): a location as the edit of the
+  `docs/formats/world-data.md`): a location as the edit of the
   location MAPS.BSA holds, a classic-named block as the edit of the block,
   a composite as the edit of a parent, a new block as the edit of the
   classic block nearest it - every subrecord or building half the author
@@ -81,7 +81,7 @@ Editor writes it:
 
 | dependency | manifest | in the port |
 |---|---|---|
-| RMB Resource Pack 0.2.1 | peer | not carried - the port's own stand-ins for the hills, rocks, towers' domes, temple platforms, foundations and the crop fields the composite farms lay out (Daggerfall's own crop billboards, sown as the pack's own field script sows them); Cliffworms' Items, archive 1210, are Detailed Ships' pictures of them (the same author's, carried with his leave). Its wall piece `53210` (224 placements, the 128 units at every corner of the walls between the tower and the first segment) stands as the middle of Daggerfall's own wall segment `445`, cut out of the player's ARCH3D (FIELD BUGS 2026-10-03c). Not stood in: its stone bridges (two meshes each under transforms the published files do not settle) and its winter-smoke markers |
+| RMB Resource Pack 0.2.1 | peer | not carried - the port's own stand-ins for the hills, rocks, towers' domes, temple platforms, foundations and the crop fields the composite farms lay out (Daggerfall's own crop billboards, sown as the pack's own field script sows them); Cliffworms' Items, archive 1210, are not stood in: their bottles and shelf pieces stand invisible, as in DFU without them. Its wall piece `53210` (224 placements, the 128 units at every corner of the walls between the tower and the first segment) stands as the middle of Daggerfall's own wall segment `445`, cut out of the player's ARCH3D (FIELD BUGS 2026-10-03c). Not stood in: its stone bridges (two meshes each under transforms the published files do not settle) and its winter-smoke markers |
 | Daggerfall Expanded Textures 0.6.5 (Ninelan) | peer | not carried - the port's own stand-ins (DS1's `detStandIns.js`, grown for the towns: chimneys, pillars and beams, tapestries and banners, vanes, pots, stumps, rugs; its food, animals and tools drawn in code); not its chimney smoke, nor the few pieces no catalogue names |
 | DET Harvestable Crops | peer | not carried - the temple garden rows (archive `10035`, TEMPAAE0) stand as Daggerfall's own garden plants (`TEXTURE.301`) |
 | Diep - Rosy's Resources | peer | not carried - its paintings as Daggerfall's own framed paintings, its small hangings and rugs drawn in code; not its fireplace dressing (`69465`), whose classic hearth stands |
@@ -100,6 +100,6 @@ port orders them so (`scenes/modWorldData.js` `WORLD_DATA_PRIORITY`).
 
 A house bought, a room rented, a quest's building, an item at a smith and a
 Recall anchor set indoors keep the layout their city was in when they were
-made (`src/systems/layoutPins.js`; `bible/03-World/Beautiful-Towns.md`).
+made (`src/systems/layoutPins.js`; `docs/formats/mods-and-vendor.md`).
 Online the switch is the room's, and every online home keeps the layout
 its city was bought in, server-wide.

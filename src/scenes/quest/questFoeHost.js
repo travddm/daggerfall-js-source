@@ -164,8 +164,7 @@ export function placeFoeEnv({ collider, playerFeet, playerYawRad, fovDegrees, ro
     raycast: (origin, dir, maxDist) => {
       const o = [origin.x, origin.y, origin.z];
       const d = [dir.x, dir.y, dir.z];
-      // QUEST-BACKFACE (2026-10-14, Dudey's dev with a spawn debugger: "there isnt even a spawn point ... its just
-      // droping the spawn location in general instead of find a spot"): UNITY'S RAYCAST NEVER HITS A MESH COLLIDER'S
+      // QUEST-BACKFACE: UNITY'S RAYCAST NEVER HITS A MESH COLLIDER'S
       // BACK FACE, and the port's collider is two-sided (it says so: `back`). A ring ray that slipped out through a seam
       // took its "open area" point in the rock, and the floor probe there struck the TOP of a hall's ceiling - a back
       // face - and the foe stood on it, outside every hall (CreateFoe, an encounter, a summon). A back-face hit is passed
@@ -224,7 +223,7 @@ export function entityOccupancy(feetOf, liveFoes, playerFeet) {
   };
 }
 
-/** QUEST-WAVE (2026-09-26, SquidKamer, Warm Ashes - Ships' author: "ship encounters ... get jumped by everyone"):
+/** QUEST-WAVE:
  *  THE SPOTS A PLACEMENT HOLDS UNTIL ITS FOE LANDS, per scene (keyed by its collider). PlaceFoeFreely's OverlapSphere
  *  meets every placed foe's capsule (CreateFoe.cs:319-323 - Unity syncs a placed foe's transform before the next
  *  action's test, in the same tick), but a pool's stand is async here - the career, the texture - and its record joins
@@ -250,7 +249,7 @@ export function holdSpotWhile(collider, spot, stand) {
   return Promise.resolve(landing).finally(release);
 }
 
-/** QUEST-PARTY (2026-09-26, Mac: "Party shares them"). Online a quest stayed its player's own (Multiplayer.md's first
+/** QUEST-PARTY. Online a quest stayed its player's own (Multiplayer.md's first
  *  lock): a party that shared one ran a copy each, and each copy stood its own foes that no one else saw - two players
  *  on the ship raid fought two raids. Now a quest SHARED with the party streams its foes to the party, a member stands
  *  them and fights them, and each member's own copy counts the injuries and the kills it sees; a receiver's copy
@@ -269,7 +268,7 @@ export function questShareTag(machine, f, partied) {
   return { q: quest.questName, s };
 }
 
-/** DESYNC-ZERO (2026-10-09, the owner: "monster desyncs should never happen in dungeons and outside"): EVERY QUEST'S
+/** DESYNC-ZERO: EVERY QUEST'S
  *  FOE RIDES - a private quest's too. Its tag names the quest and the Foe as a shared one's does, and `pv: 1` says no
  *  party shares it: everyone in the place stands it, anyone may strike it (its owner's quest counts the kill - it dies
  *  on the owner's machine), and a member of its owner's party whose own copy holds the same quest counts it too
@@ -283,8 +282,7 @@ export function questPrivateTag(machine, f) {
   return { q: quest.questName, s, pv: 1 };
 }
 
-/** QUEST-OWNER (2026-10-12, Mac: "quest mobs that get spawned in dungeons to only appear for the questowner or the
- *  questowners party so he gets credit, same for the main quest", then "Yes quest monsters always owner and its party"):
+/** QUEST-OWNER:
  *  A QUEST'S FOE IS ITS OWNER'S AND ITS OWNER'S PARTY'S - underground, in a building and in the open air alike (world.js
  *  hands every pool the narrowed seam; the dungeon narrows what it is handed again, which changes nothing). DESYNC-ZERO stood every quest foe for everyone in the place (a private one tagged `pv`), and let
  *  anyone strike it - so in a dungeon every player's copy of the same quest stood its monsters there side by side
@@ -310,8 +308,7 @@ export function partyOnlyQuestShare(seam) {
   return w;
 }
 
-/** DESYNC-ZERO (the owner: "when a party member kills the quest monsters it also counts for the quest owner or everyone
- *  who also has this quest ... in the SAME party"): my Foe for a party member's quest foe - my copy kept in step with the
+/** DESYNC-ZERO: my Foe for a party member's quest foe - my copy kept in step with the
  *  party (sharedQuestFoe), or else any live copy of the same quest I hold, by name, and its Foe by symbol. The CALLER
  *  asks only for a party member's foe. */
 export function partyQuestFoe(machine, tag) {
@@ -324,8 +321,7 @@ export function partyQuestFoe(machine, tag) {
   return null;
 }
 
-/** QUEST-RESET's field finding (2026-10-13, LostMyLeg: the Dust of Restful Death's mummy "wont spawn in the dungeon
- *  choosen by the quest"): A KILL CREDITED BY NAME IS A COUNT, NEVER A DEATH. My copy is not the member's - my Foe stands
+/** QUEST-RESET's field finding: A KILL CREDITED BY NAME IS A COUNT, NEVER A DEATH. My copy is not the member's - my Foe stands
  *  in my world, at my Place, holding my quest's items - and a kill counted on it is the mount's verdict that it is dead
  *  (sceneMount.js: a Foe stands only while killCount < spawnCount): it never stands again, and what it carried is never
  *  dropped. The main story's copies are never shared (questShare.js), so every party member on S0000018 holds their own
@@ -344,8 +340,7 @@ export function countsByName(quest, foe) {
   return false;
 }
 
-/** CURSE-SYNC (2026-09-27, the bug-reports channel: "Monsters aren't syncing ... The ghost on daggerfall ... We all had
- *  to kill them ... And everyone had to kill thier ow[n]"). A WORLD QUEST'S FOES ARE THE WORLD'S. S0000977, the Curse of
+/** CURSE-SYNC. A WORLD QUEST'S FOES ARE THE WORLD'S. S0000977, the Curse of
  *  Daggerfall, is no player's story: the tutorial starts it for every character as it ends (_TUTOR__'s `_no_`: `start
  *  quest 977 977`, finished or declined), a main quest is never shared (systems/quest/questShare.js), and at night in
  *  Daggerfall's streets it stands a wraith every 21 minutes and a ghost every 31, one time in two. As a quest's foes they
@@ -399,8 +394,7 @@ export function sharedQuestFoe(machine, tag) {
   return null;
 }
 
-/** KEPT-KILL (2026-10-01, Mac: "If someone kills a quest target regardless of relation then it should ping the quest for
- *  the players involved regardless ... party only sync with quest entities"). A quest foe a party member HOLDS ON A
+/** KEPT-KILL. A quest foe a party member HOLDS ON A
  *  PARTNER'S WORD (AUDIT DISC28 QS-J: its owner left or died and named that member heir, whose copy holds no such quest
  *  - `_keptTag`) died in the heir's world alone: each copy of the quest counts only the deaths it sees (QUEST-PARTY
  *  phase 1), so a kill with no linked copy in the room counted on none - the owner came back to a fresh foe at the
@@ -515,8 +509,7 @@ export function adoptsOrphanQuestFoe({ myId, myFeet, foeFeet, partyPeers, radius
   return true;
 }
 
-/** QUEST-POPUP-PAUSE (2026-09-26, SquidKamer on the Discord: a ship raid's box came up and the player "get[s] jumped
- *  by everyone"; Mac, asked: "Pause them offline"). DFU's message box pauses the game (UserInterfaceWindow
+/** QUEST-POPUP-PAUSE. DFU's message box pauses the game (UserInterfaceWindow
  *  .PauseWhileOpen), so a quest's box held every foe. WINFOE1 let the foes run under every window; offline they stand
  *  still again while the host's quest box is open and the window on top of its slot - a rest window keeps WINFOE1,
  *  and the rest under a box resumes with the foes. Online the room keeps one clock for everyone: nothing is held.

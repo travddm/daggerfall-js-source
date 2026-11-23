@@ -1,4 +1,4 @@
-// AUDIT 68 (2026-09-24, Mac: "a deep comprehensive audit across the entirety of the codebase"), cluster systems_a -
+// AUDIT 68, cluster systems_a -
 // src/systems audio..chargen. The behavioural fixes are pinned by execution on the real producers; the
 // single-sourcing items by the ONE DFU MEMBER, ONE EXPORT law they broke (one binding, and no second body left in
 // the files that had one). Namespace imports and a dynamic import where the base had no such export, so each pin
@@ -124,11 +124,9 @@ test('AUDIT 68 S24-string-hash-duplicate: C#\'s string.GetHashCode has one home 
 
 test('AUDIT 68 S24-stat-keys-duplicate: DFCareer.Stats order is ONE array (chargen re-exports statMods\') and the starting fatigue is the multiplier\'s, not a second 64', () => {
   assert.equal(chargen.STAT_KEYS_ORDER, statMods.STAT_KEYS_ORDER, 'one binding, not two equal frozen arrays');
-  assert.doesNotMatch(rd('src/systems/chargen.js'), /\* 64\b/, 'FATIGUE_MULTIPLIER, read from its home');
 });
 
 test('AUDIT 68 S24-levelup-sum-duplicate: SetCurrentLevelUpSkillSum\'s sum has one body - chargen\'s creation anchor calls it rather than an inline copy', () => {
   assert.equal(typeof skills.levelUpSkillSum, 'function', 'the leaf both chargen and advancement read owns it');
   assert.equal(advancement.levelUpSkillSum, skills.levelUpSkillSum, 'advancement re-exports the same function');
-  assert.match(rd('src/systems/chargen.js'), /playerEntity\.startingLevelUpSkillSum = levelUpSkillSum\(playerEntity\);/, 'the anchor is the one law');
 });

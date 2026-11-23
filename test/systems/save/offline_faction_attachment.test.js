@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { snapshotPlayer, restorePlayer } from '../../../src/systems/save/save.js';
 import { setSharedClock, setOwnMinutes, hearSharedClock, normalizeAcross } from '../../../src/systems/worldTick.js';
 import { attachFactionRep } from '../../../src/systems/faction/factionRep.js';
-const W = 10080;
+import { RECOVERY_INTERVAL_MINUTES as W } from '../../../src/systems/court.js';
 const faction = {id: 1, rep: -30, flags: 0, power: 1, parent: 0, type: 0, children: []};
 const dict = new Map([[1, faction]]);
 const player = () => ({isPlayer:true, name:'Test',level:5,health:60,maxHealth:60,magicka:10,maxMagicka:10,fatigue:6000,stats:{strength:50,endurance:50,willpower:50,agility:50,luck:50,intelligence:50,personality:50,speed:50},skills:30,skillUses:[],items:[],career:{},activeEffects:[],legalRep:{1:-30}});

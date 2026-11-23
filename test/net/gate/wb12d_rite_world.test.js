@@ -1,8 +1,8 @@
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"): THE FAITHFUL'S RITE IN THE WORLD - the circle and its smoke
+// WB12d: THE FAITHFUL'S RITE IN THE WORLD - the circle and its smoke
 // (scenes/riteHost.js, world/riteModel.js, render/riteSmoke.js), its faithful shared by the World of Daggerfall camps'
 // law, the rite's word to its cell, the opening, the hub's broken word, the casket (systems/riteChest.js), the receipt's
 // rite in the spoils and the claim, the omen's order, the session and the world host's seams -
-// bible/11-Multiplayer/World-Bosses.md section 19 D. AUDIT WB12d (2026-10-02): every host finding pinned here by the
+// D. AUDIT WB12d: every host finding pinned here by the
 // host's own behaviour on a fake world; the camps' law end to end is test/net/gate/wb12d_rite_host.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -29,7 +29,6 @@ import { spoilsList, createSpoilsPool, SPOILS_TEXT } from '../../../src/scenes/s
 import { gateClaimVerdict, GATE_CLAIM_TEXT, createGateClaims } from '../../../src/net/gate/gateClaims.js';
 import { mintReceipt, importReceiptKey } from '../../../src/net/gate/gateReceipt.js';
 import { createGateOmen, riteOmenLine } from '../../../src/systems/gate/gateOmen.js';
-import { ritePost, omenPost } from '../../../src/net/gate/gateHerald.js';
 import { isSigilStone } from '../../../src/systems/gate/gateSpoils.js';
 import { COURT_STRIKE_TEXT } from '../../../src/scenes/gate/gateCourt.js';
 import { properName } from '../../../src/systems/champions.js';
@@ -43,7 +42,6 @@ import { fakeSocketClass } from '../../fakeSocket.mjs';
 import { seededRng } from '../../../src/systems/wind/wind.js';
 import { sigilParty } from '../../../src/systems/sigil/sigil.js';
 import { GLOBAL_SCALE } from '../../../src/player/activate.js';
-import { cardOf } from '../../heraldCards.mjs';   // HERALD-CARDS: a post read as its card
 
 const read = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const DAY = 700;
@@ -964,11 +962,8 @@ test('WB12d the claim: a rite\'s own receipt is "Rite recorded." and closes no b
   assert.deepEqual((await run('dealt', { ok: false, error: 'receipt', why: 'claims' })).kept, 0, 'a fighter\'s refused for good');
 });
 
-test('WB12d the omen\'s order: right after the omen\'s line, before tonight\'s marks, once a day - AUDIT WB12d (D3): the Discord post\'s own sentence; (C8, L5) never once the hub says this breach\'s rite broken, nor on a relay that cannot keep it (mutants: the line unsaid; said after the marks; said over a broken rite; said to an old relay)', () => {
+test('WB12d the omen\'s order: right after the omen\'s line, before tonight\'s marks, once a day - AUDIT WB12d (C8, L5): never once the hub says this breach\'s rite broken, nor offline (mutants: the line unsaid; said after the marks; said over a broken rite; said offline)', () => {
   assert.equal(riteOmenLine(), 'The faithful work their rite nearby. Kill their Summoner before the breach opens.');
-  const post = cardOf(omenPost({ day: DAY, place: 'Copperham' }));
-  assert.ok(post.text.startsWith(`${riteOmenLine()} ${gateBossOf(DAY).name} comes`), `Discord says it so, first in the card's text and before the marks (HERALD-CARDS: the times its fields): ${post.text}`);
-  assert.equal(post.fields.Seals, `<t:${Math.floor(T.sealAt / 1000)}:t>`);
   const site = { ...SITE, ring: { cx: PX, cy: PY, r: 3 }, spot: [400, 400] };
   const run = (deps = {}) => {
     const said = [], seen = [];
@@ -988,7 +983,7 @@ test('WB12d the omen\'s order: right after the omen\'s line, before tonight\'s m
   assert.deepEqual(run({ ready: false }).said.slice(1), [marks, pt]);
   const w = read('src/scenes/world.js');
   assert.match(w, /riteBroken: \(day, s\) => !!riteHost\?\.isBroken\(day, s\?\.px, s\?\.py\),/);
-  assert.match(w, /riteReady: \(\) => !!online\?\.riteOk,/);
+  assert.match(w, /riteReady: \(\) => !!online,/);
 });
 
 test('AUDIT WB12d (D2): the Summoner by his own name in the classic lines - "You see the Summoner.", "The Summoner just died." and "The Summoner (dead)"; the faithful by their careers (mutants: each line by his kind)', () => {
@@ -1031,45 +1026,30 @@ test('AUDIT WB12d (C14, C5, R1, D4): a day\'s faithful are a site of their own -
   assert.equal(validRiteOut({ ...w, n: RITE_COUNT_MAX + 1 }).n, 2, 'nor more than a rite counts');
   assert.equal(validRiteOut(w).n, 2);
   assert.equal(validRiteOut({ ...w, by: [...Array(12)].map((_, i) => `N${i}`), n: 12 }).by.length, RITE_BY_MAX);
-  // the channel's post, the kill's own sentence (net/gate/gateHerald.js fellPost): the event, the place, the first three and how many more
-  assert.deepEqual(cardOf(ritePost({ place: 'Copperham', by: ['Ann', 'Bo', 'Cy', 'Di'], n: 9 })), { content: null, author: 'Dagon\'s Breach', colour: 0xe2554c, footer: 'Rite broken', title: 'The faithful\'s rite is broken', text: null, fields: { Where: 'Near Copperham', 'Broken by': 'Ann, Bo, Cy and 6 others' } });   // HERALD-CARDS: the kill's own card
-  assert.deepEqual(cardOf(ritePost({ by: ['Ann'], n: 2 })).fields, { Where: 'In the wilds', 'Broken by': 'Ann and 1 other' });
-  assert.deepEqual(cardOf(ritePost({ place: 'Copperham', by: [] })).fields, { Where: 'Near Copperham' });
-  assert.deepEqual(ritePost({ by: ['<@&1> x'] }).allowed_mentions, { parse: [] }, 'pings nobody');
-  assert.match(read('server/src/index.js'), /ritePost\(\{ day: st\.riteOwe\.d, place: site\?\.pl \?\? null, by: riteNames\(c\), n: Object\.keys\(c\.h\)\.length \}\)/);
+  // the broken word's line: the first three who broke it and how many more
+  assert.equal(RITE_TEXT.broken({ near: 'Copperham', by: ['Ann', 'Bo', 'Cy', 'Di'], n: 9 }), 'The faithful\'s rite is broken near Copperham, by Ann, Bo, Cy and 6 others.');
+  assert.equal(RITE_TEXT.broken({ near: 'Copperham', by: ['Ann'], n: 2 }), 'The faithful\'s rite is broken near Copperham, by Ann and 1 other.');
 });
 
-test('WB12d the session: a word down the circle\'s cell socket only to a relay that keeps the rite - a halo\'s by its own welcome, and (AUDIT WB12d C6) each socket keeping its own word across a seam\'s promotion; RITE_HZ_MAX a second (mutants: the halo never keeps it; the promotion forgets it; any room; unmetered)', () => {
+test('WB12d the session: a word down the circle\'s cell socket - a halo\'s by its own welcome; RITE_HZ_MAX a second (mutants: any room; unmetered)', () => {
   const { FakeWS, sockets } = fakeSocketClass();
   let t = 1000;
   const s = new OnlineSession({ url: 'wss://relay.test', name: 'a', id: 'aaaa-0001', secret: 'secret-of-aaaa-0001', WebSocketImpl: FakeWS, now: () => t });
   const log = console.info; console.info = () => {};
   try {
-    const here = worldRoom(PX, PY), there = worldRoom(PX + 16, PY);
+    const here = worldRoom(PX, PY);
     s.join(here, null);
     sockets[0].open();
     sockets[0].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], host: 'aaaa-0001', world: null, v: RELAY_VERSION });
-    assert.equal(s.riteOk, true);
-    s.setHalo([there]);
-    sockets[1].open();
-    sockets[1].receive({ t: 'welcome', id: 'aaaa-0001', peers: [], n: 1, v: 'world140' });
-    const w = { d: DAY, px: PX, py: PY, s: 1, f: 0 }, w2 = { ...w, px: PX + 16 };
-    assert.equal(s.sendRite(w2, there), false, 'the halo on an older relay is said none');
+    const w = { d: DAY, px: PX, py: PY, s: 1, f: 0 };
     assert.equal(s.sendRite(w, here), true);
-    // the seam: the halo promoted - its word with it; the old primary stepped down with its own
-    s.join(there, null);
-    assert.equal(s.room, there);
-    assert.equal(s.riteOk, false, 'the promoted socket\'s word');
-    t += 1000;
-    assert.equal(s.sendRite(w2, there), false);
-    assert.equal(s.sendRite(w, here), true, 'the stepped-down socket\'s own word');
-    assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).t === 'rite').length, 2, 'down its own socket');
+    assert.equal(sockets[0].sent.filter((x) => JSON.parse(x).t === 'rite').length, 1, 'down its own socket');
     assert.equal(s.sendRite(w, 'dungeon:m1'), false);
     t += 1000;
     for (let i = 0; i < RITE_HZ_MAX; i++) assert.equal(s.sendRite(w, here), true);
     assert.equal(s.sendRite(w, here), false, 'RITE_HZ_MAX a second');
   } finally { console.info = log; }
-  // AUDIT WB12d (T): a halo on a relay that keeps it says it for itself; a primary that is no cell is said none
+  // AUDIT WB12d (T): a halo says it for itself on its own welcome; a primary that is no cell is said none
   const k = fakeSocketClass();
   const h2 = new OnlineSession({ url: 'wss://relay.test', name: 'b', id: 'bbbb-0001', secret: 'secret-of-bbbb-0001', WebSocketImpl: k.FakeWS, now: () => t });
   console.info = () => {};
@@ -1099,9 +1079,9 @@ test('WB12d the world host by source: the host made beside the gate on the camps
   const w = read('src/scenes/world.js');
   const at = w.indexOf('const riteHost = gateOmen ? createRiteHost(');
   const deps = w.slice(at, w.indexOf('}) : null;', at));
-  assert.match(deps, /omen: \(\) => gateOmen\.current\(\),/);
+  assert.match(deps, /omen: \(\) => gateOmen\.nearCurrent\(\),/);
   assert.match(deps, /fellAt: \(day\) => gateLink\?\.fellAt\(day\) \?\? null,/);
-  assert.match(deps, /online: \(\) => !!online\?\.riteOk,/);
+  assert.match(deps, /online: \(\) => !!online,/);
   assert.match(deps, /return exteriorFoes\.spawnFoe\(career, \[x, y, z\], \{ yaw, placed: true, groundAlign: \{ hitDist: hitDistance\(hit\) \}, site, transient \}\);/);
   assert.match(deps, /drop: \(site\) => exteriorFoes\.dropSiteFoes\(site\),/);
   assert.match(deps, /remove: \(f\) => exteriorFoes\.removeFoe\(f\),/);

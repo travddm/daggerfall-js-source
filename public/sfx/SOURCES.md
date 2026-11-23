@@ -1,44 +1,36 @@
 # public/sfx — where these came from
 
-The gun lab’s shooting and reloading sounds. Every file here is
-**CC0** (public domain) from [Freesound](https://freesound.org), found with
-`tools/freesoundPick.mjs` and baked to Daggerfall’s own format —
-11025 Hz unsigned 8-bit mono, DAGGER.SND’s parameters
-(`src/formats/sndFile.js`) — by `tools/sndify.mjs`. Re-run
-`tools/gunSfxInstall.mjs` to rebuild them from the same sources.
+Every file here is baked to Daggerfall’s own format - 11025 Hz unsigned 8-bit mono, DAGGER.SND’s parameters
+(`src/formats/sndFile.js`) - by `tools/sndify.mjs`, unless its paragraph says otherwise.
 
-The `*-synth.wav` files are ours outright: `tools/gunSfx.mjs` builds them
-from noise and sine through the same bake, deterministically.
-
-The `naval-*.wav` files are ours outright too: the sea fight's guns, strikes,
-barrels, grapnels and gun carriages (bible/03-World/Naval-Combat.md), built by `tools/navalSfx.mjs`
+The `naval-*.wav` files are ours outright: the sea fight's guns, strikes,
+barrels, grapnels and gun carriages (docs/systems/naval.md), built by `tools/navalSfx.mjs`
 from the same kit (`tools/sfxSynth.mjs`) and the same bake. DAGGER.SND has the
 splashes, the bell and the fire the naval host also plays; it has no cannon.
 
 The `climb-*.wav` files are ours outright as well: the climb's hands on stone,
 boots on the wall, the haul over a sill, the rush of a leap and the grit coming
-away (bible/03-World/Parkour-Arc.md, CLIMB4), built by `tools/climbSfx.mjs` from
+away, built by `tools/climbSfx.mjs` from
 the same kit and the same bake. DAGGER.SND has a body falling and the stride; it
 has no hand on stone.
 
 The `gather-*.wav` files are ours outright as well: the gathering professions' axe in a trunk, the tree's groan and its
 fall, a pick on stone and on ore, a vein's rubble, hands among leaves, a herb pulled, the knife through hide, the net
-thrown, landing, tugged and hauled, and the chimes of a clean finish and a rank (bible/06-Systems/Professions-Arc.md
-section 44, GATHER-FEEL), built by `tools/gatherSfx.mjs` from the same kit and the same bake. DAGGER.SND has hits, a
+thrown, landing, tugged and hauled, and the chimes of a clean finish and a rank (docs/systems/professions.md), built by `tools/gatherSfx.mjs` from the same kit and the same bake. DAGGER.SND has hits, a
 parry, a splash and a lock's click, which the acts borrowed; it has no axe in wood, no pick on stone, no leaves and no
 tree coming down.
 
 The `lock-*.wav` files are ours outright as well: the lockpicking minigame's tumblers - a pin lifted, a free pin
-springing back, a pin set, a spool's false set, a slip and a pick snapping (bible/06-Systems/Lockpicking.md, LOCKPICK),
+springing back, a pin set, a spool's false set, a slip and a pick snapping,
 built by `tools/lockSfx.mjs` from the same kit and the same bake. DAGGER.SND has the picked lock's chime, which the world
 still plays as a lock opens; it has no tumblers.
 
 The `horse-*.wav` files are ours outright as well: the horse's snorts, blows, breaths and spook, and its hooves on grass,
-in snow and in water (bible/08-Audio/Audio.md HORSE-VOICE), built by `tools/horseSfx.mjs` from the same kit and the same
+in snow and in water (docs/systems/audio.md), built by `tools/horseSfx.mjs` from the same kit and the same
 bake. DAGGER.SND has one neigh, two clops on hard ground and the cart; it has no snort, no breath and no hoof on soft
 ground.
 
-The `sea-*`, `shore-*`, `wild-*` and `town-*` files are the soundscape's (SOUNDSCAPE, bible/08-Audio/Audio.md): the
+The `sea-*`, `shore-*`, `wild-*` and `town-*` files are the soundscape's (SOUNDSCAPE, docs/systems/audio.md): the
 gulls at sea, the surf on a shore, the wild's voices and a town's smithies. Two kinds. OURS: a wave breaking, the owls
 and the wolves, built by `tools/soundscapeSfx.mjs` from the same kit and the same bake - DAGGER.SND has splashes, a bell
 and a lap of water, and no surf, no owl and no wolf (the deck's own eleven - the hull's slaps, the timbers' and the
@@ -57,22 +49,6 @@ over 5 kHz, which DAGGER.SND's format cannot hold. **Source and license: to be f
 
 | file | slot | source | by | license | why |
 | --- | --- | --- | --- | --- | --- |
-| `fire-shotgun.wav` | fire | [Shotgun Shot 03.wav](https://freesound.org/people/LilMati/sounds/473846/) | LilMati | CC0 | a 6ms transient - the cleanest crack in the set, and the reason it is the default |
-| `fire-20gauge.wav` | fire | [20 gauge shotgun gunshot](https://freesound.org/people/michorvath/sounds/427595/) | michorvath | CC0 | a real 20-gauge, and the most trusted file on the site (4.7 from 116 ratings, 12k downloads) |
-| `fire-musket.wav` | fire | [Musket Explosion](https://freesound.org/people/Willlewis/sounds/244345/) | Willlewis | CC0 | black powder - the most Elder Scrolls thing here; slow, huge, and it wants the big room |
-| `fire-blast.wav` | fire | [shotgun shoot](https://freesound.org/people/MrGungus/sounds/773873/) | MrGungus | CC0 | short tail and a 25dB crest: the one to use if the trigger is held |
-| `fire-dry.wav` | fire | [Shotgun Shot sfx](https://freesound.org/people/lumikon/sounds/564480/) | lumikon | CC0 | drier and closer - no room on it at all, for when the lab’s own room does the work |
-| `open-winchester.wav` | reload-open | [Winchester Rifle Cock Reload.wav](https://freesound.org/people/SpliceSound/sounds/153560/) | SpliceSound | CC0 | a lever cocking: two events, hard and wooden, and it ends |
-| `open-rack.wav` | reload-open | [SXP_SHOTGUN_RACK_01](https://freesound.org/people/dasBUTCHER84/sounds/449614/) | dasBUTCHER84 | CC0 | a clean shotgun rack, dark enough to survive the bake whole |
-| `open-gunrack.wav` | reload-open | [GunRack3.mp3](https://freesound.org/people/AKkingStudio/sounds/679878/) | AKkingStudio | CC0 | the darkest of the racks (914Hz) - the most Daggerfall-sounding of them |
-| `open-shell.wav` | reload-open | [shell load.ogg](https://freesound.org/people/CeebFrack/sounds/108793/) | CeebFrack | CC0 | the shell itself going in, if the break should be quieter than the lock-up |
-| `close-ready.wav` | reload-close | [Shotgun, Ready 01.wav](https://freesound.org/people/LilMati/sounds/383933/) | LilMati | CC0 | 30ms of tail and a 26dB crest: it stops dead, which is what "ready" sounds like |
-| `close-rack2.wav` | reload-close | [SXP_SHOTGUN_RACK_02](https://freesound.org/people/dasBUTCHER84/sounds/449613/) | dasBUTCHER84 | CC0 | the rack’s second half, for a pair that matches its opening |
-| `close-rack3.wav` | reload-close | [SXP_SHOTGUN_RACK_03](https://freesound.org/people/dasBUTCHER84/sounds/449612/) | dasBUTCHER84 | CC0 | the same, a shade brighter |
-| `close-shell.wav` | reload-close | [shell load.ogg](https://freesound.org/people/CeebFrack/sounds/108793/) | CeebFrack | CC0 | the shell home, for a break-action that closes softly |
-| `gun-fire-synth.wav` | fire | `tools/gunSfx.mjs` | ours | n/a | synthesised from noise and sine, deterministically - nothing recorded, nothing to attribute |
-| `gun-reload-open-synth.wav` | reload-open | `tools/gunSfx.mjs` | ours | n/a | synthesised from noise and sine, deterministically - nothing recorded, nothing to attribute |
-| `gun-reload-close-synth.wav` | reload-close | `tools/gunSfx.mjs` | ours | n/a | synthesised from noise and sine, deterministically - nothing recorded, nothing to attribute |
 | `naval-cannon.wav` | naval: cannon | `tools/navalSfx.mjs` | ours | n/a | synthesised from noise and sine, deterministically - a long gun near: crack, a body falling 2.4 kHz to 180 Hz, a 75 to 34 Hz thump, and a roll over open water with its slap back |
 | `naval-cannon-far.wav` | naval: cannon, past 260 m | `tools/navalSfx.mjs` | ours | n/a | synthesised from noise and sine, deterministically - a broadside across the bay: the top gone in the air (all under 500 Hz), two thumps rolled together, a long rumble |
 | `naval-swivel.wav` | naval: swivel gun | `tools/navalSfx.mjs` | ours | n/a | synthesised from noise and sine, deterministically - the swivel on a rail: sharper, higher and shorter than a long gun |

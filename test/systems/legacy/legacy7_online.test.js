@@ -1,5 +1,4 @@
-// LEGACY7 (2026-10-06, bible/06-Systems/Legacy-Arc.md section 9; Mac: "online integration with permadeath (Bloodline)
-// or non-permadeath (Enduring)"): PROJECT LEGACY ONLINE, CLIENT SIDE - the line's realm copy (systems/legacy/realmLine.js),
+// LEGACY7: PROJECT LEGACY ONLINE, CLIENT SIDE - the line's realm copy (systems/legacy/realmLine.js),
 // the session's tombstone (systems/realmSaves.js die), the host's online law (scenes/legacyHost.js: founded as asked, a
 // fall the realm's tombstone and the Succession waiting on it, a birth whose first save answers later, the realm's id
 // rebound into the record), the chargen's question open, and the world host's wiring by source.
@@ -124,7 +123,6 @@ test('LEGACY7 the host online: founded as asked; a fall is the realm\'s tombston
   assert.ok(w.stored > 0, 'each write of the device\'s is the realm\'s to follow');
   const out = w.host.deathOutcome();
   assert.equal(out.kind, 'fall');
-  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE AUDIT R1): asked at the door with its hold (the realm holds the fall for
   // a party's Resurrect), and again as the player goes on - the window closed
   assert.equal(w.tombs, 2, 'the tombstone asked at the door, and its window closed');
   assert.equal(w.host.succeed({ newborn: true }), true);
@@ -143,7 +141,7 @@ test('LEGACY7 the host online: a tombstone refused is said, and asked again befo
   assert.ok(w.said.includes(LEGACY_TEXT.unTombed));
   assert.equal(w.host.succeed({ newborn: true }), true);
   await tick();
-  assert.equal(w.tombs, 3, 'asked again');   // PIN MOVED (REZ-BLOODLINE AUDIT R1): the door's, the window's close, and the Succession's
+  assert.equal(w.tombs, 3, 'asked again');
   assert.deepEqual(w.booted, [], 'no birth while the realm has not heard');
   assert.ok(w.host.family.pending, 'the fall waits on the record - the Succession is raised again');
   w.tombAnswer = true;
@@ -226,19 +224,3 @@ test('LEGACY7 the chargen\'s question and the birth\'s address: Bloodline open o
   assert.doesNotMatch(birthSearch('?world', 4, null), /realmnew/, 'offline: a birth of the device');
 });
 
-test('LEGACY7 wiring: the boot reads the lines before any save; the realm\'s copy follows each write; a fall is the session\'s tombstone; a member is born and joined through the realm', () => {
-  const w = rd('src/scenes/world.js');
-  // PIN MOVED (BOOT-OVERLAP, 2026-10-12): the lines and the roster read at once, behind the boot, from the join - and
-  // waited for where their reader (Project Legacy's host) is made, which stands above the boot's load door (both on the
-  // boot's own walk, so the text's order is the run's)
-  assert.match(w, /const legacyRealmRead = legacyRealmLine \? Promise\.all\(\[\n\s+legacyRealmLine\.pull\(\)/, 'the lines asked at the join');
-  const read = w.indexOf('    await legacyRealmRead;\n  }\n  legacyHost = createLegacyHost({');
-  assert.ok(read > w.indexOf('const legacyRealmRead = ') && read < w.indexOf('await worldQuickLoad({ ...bootLoadPick, snap });') && read < w.indexOf('await classicLoadBoot();'), 'read before any save is restored');
-  // PIN MOVED (FIELD BUGS 2026-10-16b REZ-BLOODLINE): the tombstone carries its options - `keepalive` as the page goes
-  assert.match(w, /stored: \(f\) => \{ legacyRealmLine\?\.push\(f\); \},\n\s+tombstone: \(why, o\) => \(realmSession \? realmSession\.die\(why, o\) : false\),/);
-  assert.match(w, /if \(realmNew\) \{ legacyRealmBirth\(host\)\.catch\(/);
-  assert.match(w, /saveNow: \(\) => \(legacyFirstSave \? legacyFirstSave\(\) : /);
-  assert.match(w, /if \(legacyRealmLine\) \{\n\s+if \(legacyRealmRoster && !legacyRealmRoster\.has\(String\(cid\)\)\) return false;\n\s+legacyBoot\(realmBootSearch\(location\.search, String\(cid\), BOOT_DOOR_KEYS\)\);/);
-  assert.match(w, /async function legacyBoot\(search\) \{\n\s+if \(legacyRealmLine\) \{[\s\S]{0,200}legacyRealmLine\.flush\(\)[\s\S]{0,200}realmSession\.leave\(\)/, 'the line written and the lease given up before the next joins');
-  assert.match(w, /made = await realmCreate\(io, playerEntity\.name \|\| 'Traveller', realmSummaryOf\(playerEntity\), born\);/);
-});

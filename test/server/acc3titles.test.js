@@ -1,22 +1,18 @@
-// ACC3 — PLAYER TITLES AND NAME GLYPHS (2026-09-22).
+// ACC3 — PLAYER TITLES AND NAME GLYPHS.
 //
-// Mac: "Player titles appear above a player name. We will develop 2
-// titles to start out. 1st title is Founder with a gold color, 2nd
-// title is Developer with a red color. All current players should be
-// granted the founder title." And beside the name: "Sprouting green
+// And beside the name: "Sprouting green
 // plant. Attached to new accounts for 2 weeks. Developer glyph
 // specifically for developers."
 //
-// ═══ WHAT THESE PINS ARE FOR ═══════════════════════════════════════
+// WHAT THESE PINS ARE FOR
 //
 // THE GRANTS ARE DERIVED AND NOT A COLUMN, and that is the claim worth
 // pinning, because it is the one a later slice will be tempted to
 // undo. A `grants` table would pass a test that only asked "does a
-// founder get the founder title?" - so these pins drive the things a
+// developer get the developer title?" - so these pins drive the things a
 // stored grant CANNOT do: a sprout that expires because time passed
 // with nothing running, a developer who stops being one the moment the
-// config drops them, a founder granted to a row inserted long after the
-// migration ran.
+// role is taken off the row.
 //
 // AND THE BADGE IS SIGNED, NEVER ASSERTED. ACC1g shut this hole on the
 // name one slice ago; a title is the stronger claim of the two, so the
@@ -32,7 +28,7 @@ import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
 import { register } from '../../server-account/src/accounts.js';
 import {
-  FOUNDER_UNTIL, SPROUT_S, developerHandles, isDeveloper,
+  SPROUT_S, isDeveloper,
   titlesHeld, glyphsOf, titleWorn, equipRefusal, wardrobeOf,
 } from '../../server-account/src/titles.js';
 import {
@@ -46,9 +42,10 @@ const src = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
 const { subtle } = globalThis.crypto;
 const rand = (b) => globalThis.crypto.getRandomValues(b);
 
-// A moment AFTER the founder cutoff, so "registered before it" and
-// "registered after it" are both reachable from one clock.
-const NOW = FOUNDER_UNTIL + 90 * 24 * 60 * 60;
+// One fixed clock for the glyph reads, long after the test rows were made.
+const NOW = Date.UTC(2026, 11, 24, 12) / 1000;
+// A registration time for the test rows, before NOW.
+const REGISTERED = Date.UTC(2026, 9, 1) / 1000;
 
 const MIGRATIONS = readdirSync(new URL('../../server-account/migrations', import.meta.url))
   .filter((f) => f.endsWith('.sql')).sort();
@@ -74,7 +71,7 @@ function d1() {
       };
       return api;
     },
-    // SIGN-BATCH (PIN MOVED): D1's batch, as the runtime runs it - one transaction, rolled back whole when a statement throws
+    // SIGN-BATCH (
     // (the badge's doors ask the three games' honours in one, honours.js withHonours)
     async batch(list) { db.exec('BEGIN'); try { const out = list.map((st) => st._result()); db.exec('COMMIT'); return out; } catch (e) { db.exec('ROLLBACK'); throw e; } },
   };
@@ -82,31 +79,14 @@ function d1() {
 
 // ── THE GRANTS, derived ─────────────────────────────────────────────
 
-test('ACC3: the founder title is a CUTOFF, so a row inserted long after any migration ran still answers correctly (mutant: a `granted` column, written once by a walk over the table)', () => {
-  // Mac asked that "all current players should be granted the founder
-  // title". The obvious migration walks every row and writes one - and
-  // a walk is a fact recorded at a moment nobody can re-derive. THIS is
-  // the difference, and it is the whole design: a row that did not
-  // exist when anybody ran anything is still judged correctly.
-  const early = { registered_at: FOUNDER_UNTIL - 1, created_at: 1 };
-  const onTheDot = { registered_at: FOUNDER_UNTIL, created_at: FOUNDER_UNTIL };   // FOUNDER3: first played in the cutoff's second
-  const late = { registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1 };   // FOUNDER3: first played after it (a row first seen before it and registered after is a founder)
-  assert.deepEqual(titlesHeld(early, {}), ['founder']);
-  assert.deepEqual(titlesHeld(onTheDot, {}), ['founder'], 'the cutoff is inclusive - the day Mac asked counts');
-  assert.deepEqual(titlesHeld(late, {}), []);
-
-  // AND A GUEST HOLDS NOTHING, which is Mac's own call when asked
-  // whether guests count ("Registered accounts only"). A guest row has
-  // no `registered_at` at all, so there is nothing to compare - and
-  // that is the right refusal rather than a coincidence: a founding
-  // title on a row one storage clear from gone was never anybody's.
+test('ACC3: Founder is no longer granted: no row holds it or may wear it, whenever it first played (server feature audit PR 3)', () => {
+  const early = { handle: 'Early', registered_at: 1, created_at: 1, first_played_at: 1, title: 'founder' };
+  assert.deepEqual(titlesHeld(early, {}), []);
+  assert.equal(titleWorn(early, {}), undefined, 'a row that still says founder wears nothing');
+  assert.equal(equipRefusal('founder', early, {}), 'not-held');
+  assert.deepEqual(titlesHeld(early, { FOUNDER_HANDLES: 'early' }), [], 'the old config list grants nothing');
+  // A GUEST HOLDS NOTHING: a guest row has no handle and no role.
   assert.deepEqual(titlesHeld({ created_at: 1, registered_at: null }, {}), []);
-  assert.deepEqual(titlesHeld({ created_at: 1 }, {}), []);
-
-  // The cutoff is a real date and not a number somebody typed: the end
-  // of the day Mac asked for this - asked again (FOUNDER2), so the later day;
-  // FOUNDER5 (PIN MOVED): its end on the last clock to reach the next, UTC-12.
-  assert.equal(new Date(FOUNDER_UNTIL * 1000).toISOString(), '2026-09-25T12:00:00.000Z');
 });
 
 test('ACC3: the sprout EXPIRES because time passed - nothing runs, nothing is cleared (mutant: a stored glyph and a cron to remove it)', () => {
@@ -122,53 +102,52 @@ test('ACC3: the sprout EXPIRES because time passed - nothing runs, nothing is cl
   assert.equal(SPROUT_S, 14 * 24 * 60 * 60, 'two weeks, as Mac wrote it');
 });
 
-test('ACC3: a developer is a handle in CONFIG, so taking the handle off takes the title and the glyph with it', () => {
-  const env = { DEVELOPER_HANDLES: 'mack, Someone_Else' };
-  assert.deepEqual([...developerHandles(env)], ['mack', 'someone_else'], 'trimmed and case-folded - handle_lc is what uniqueness is really on');
-  const dev = { handle: 'MacK', registered_at: FOUNDER_UNTIL + 1, created_at: FOUNDER_UNTIL + 1 };   // FOUNDER3: first played after the cutoff, so no Founder beside the Developer
+test('ACC3: a developer is a role on the ACCOUNT (staff_admin), so taking the role off takes the title and the glyph with it', () => {
+  const env = {};
+  const dev = { handle: 'MacK', registered_at: REGISTERED, created_at: REGISTERED, staff_admin: 1 };
   assert.ok(isDeveloper(dev, env));
   assert.deepEqual(titlesHeld(dev, env), ['developer']);
-  assert.deepEqual(glyphsOf(dev, env, NOW), ['dev'], 'the glyph rides the same list as the title - one grant, two faces');
+  assert.deepEqual(glyphsOf(dev, env, NOW), ['dev'], 'the glyph rides the same role as the title - one grant, two faces');
 
-  // THE REMOVAL IS THE POINT. Nothing is written anywhere, so dropping
-  // the handle from the config is the whole of revoking it.
-  assert.deepEqual(titlesHeld(dev, { DEVELOPER_HANDLES: '' }), []);
-  assert.deepEqual(glyphsOf(dev, { DEVELOPER_HANDLES: '' }, NOW), []);
-  assert.deepEqual(titlesHeld(dev, {}), [], 'a service with no list at all grants nobody');
+  // THE REMOVAL IS THE POINT. Nothing else is written, so clearing the
+  // role on the row is the whole of revoking it.
+  assert.deepEqual(titlesHeld({ ...dev, staff_admin: 0 }, env), []);
+  assert.deepEqual(glyphsOf({ ...dev, staff_admin: 0 }, env, NOW), []);
+  assert.equal(titlesHeld(dev, { DEVELOPER_HANDLES: '' }).length, 1, 'the role is on the row: a list in the env neither adds nor removes it');
+  assert.deepEqual(titlesHeld({ handle: 'MacK', registered_at: REGISTERED, created_at: REGISTERED }, { DEVELOPER_HANDLES: 'mack' }), [], 'a handle on an env list, with no role on the row, is nobody');
 
-  // A GUEST HAS NO HANDLE, so a guest can never be in a list of
-  // handles - the list names people and a guest row is a device.
-  assert.equal(isDeveloper({ handle: null }, env), false);
+  // A GUEST HAS NO HANDLE and no role: a guest row is a device.
+  assert.equal(isDeveloper({ handle: null, staff_admin: 0 }, env), false);
   assert.equal(isDeveloper({ handle: '' }, env), false);
 });
 
 test('ACC3: HOLDING IS NOT WEARING - a stored title stops being worn the moment the grant behind it lapses', () => {
-  const env = { DEVELOPER_HANDLES: 'mack' };
-  const dev = { handle: 'mack', registered_at: FOUNDER_UNTIL - 1, created_at: 0, title: 'developer' };
-  assert.deepEqual(titlesHeld(dev, env), ['founder', 'developer'], 'both, in the order they are offered');
+  const env = {};
+  const dev = { handle: 'mack', registered_at: REGISTERED, created_at: 0, title: 'developer', staff_admin: 1 };
+  assert.deepEqual(titlesHeld(dev, env), ['developer']);
   assert.equal(titleWorn(dev, env), 'developer');
 
-  // OFF THE LIST, AND THE COLUMN STILL SAYS `developer`. Nothing
+  // THE ROLE TAKEN OFF, AND THE COLUMN STILL SAYS `developer`. Nothing
   // rewrote the row and nothing had to: a grant is a fact checked now.
-  assert.equal(titleWorn(dev, {}), undefined);
-  assert.equal(wardrobeOf(dev, {}, NOW).title, null, 'the wardrobe says null rather than a title nobody holds');
+  assert.equal(titleWorn({ ...dev, staff_admin: 0 }, env), undefined);
+  assert.equal(wardrobeOf({ ...dev, staff_admin: 0 }, env, NOW).title, null, 'the wardrobe says null rather than a title nobody holds');
 
   assert.equal(titleWorn({ ...dev, title: null }, env), undefined);
   assert.equal(titleWorn({ ...dev, title: 'emperor' }, env), undefined, 'a column somebody edited by hand is not a grant');
 });
 
 test('ACC3: equip refuses what is not held and what is not a title, and taking it off is always allowed', () => {
-  const env = { DEVELOPER_HANDLES: 'mack' };
-  const founder = { handle: 'notmack', registered_at: FOUNDER_UNTIL - 1, created_at: 0 };
-  assert.equal(equipRefusal('founder', founder, env), null);
-  assert.equal(equipRefusal('developer', founder, env), 'not-held');
-  assert.equal(equipRefusal('emperor', founder, env), 'no-title');
-  assert.equal(equipRefusal('', founder, env), 'no-title');
-  assert.equal(equipRefusal(null, founder, env), null, 'a player may always wear nothing');
+  const env = {};
+  const dev = { handle: 'notmack', registered_at: REGISTERED, created_at: 0, staff_admin: 1 };
+  assert.equal(equipRefusal('developer', dev, env), null);
+  assert.equal(equipRefusal('dungeonmaster', dev, env), 'not-held');
+  assert.equal(equipRefusal('emperor', dev, env), 'no-title');
+  assert.equal(equipRefusal('', dev, env), 'no-title');
+  assert.equal(equipRefusal(null, dev, env), null, 'a player may always wear nothing');
   // THE TWO REFUSALS ARE DIFFERENT WORDS because they are different
   // situations: one is "no such title exists" and the other is "it
   // exists and it is not yours", and the Worker answers 400 and 403.
-  assert.notEqual(equipRefusal('emperor', founder, env), equipRefusal('developer', founder, env));
+  assert.notEqual(equipRefusal('emperor', dev, env), equipRefusal('dungeonmaster', dev, env));
 });
 
 // ── THE TOKEN ───────────────────────────────────────────────────────
@@ -208,13 +187,13 @@ test('ACC3: the token carries the badge, and a body edited to claim one that is 
   assert.equal(claimsValid({ ...base, g: 'sprout' }), false, 'a string is not a list of glyphs');
   assert.equal(claimsValid({ ...base, g: [...GLYPHS, 'sprout'] }), false, 'more slots than there are glyphs');
   assert.equal(GLYPHS_MAX, GLYPHS.length, 'the bound is the vocabulary\'s own size, not a number somebody picked');
-  assert.deepEqual([...TITLES], ['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'shadowfang', 'penitent', 'gatebreaker', 'herald', 'warden', 'protector', 'crowned', 'keeper', 'champion', 'grandchampion', 'arenachampion', 'aegis', 'primarch', 'crystalfist', 'hourbreaker', 'hoursfirst', 'iliacchampion', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'grandmaster', 'coilbreaker', 'spirewalker', 'beaconlighter', 'kynbane', 'unfallen', 'lonebeacon', 'battlemage', 'wellheadwalker', 'mastergallery', 'mastercairn', 'mastershade', 'masterwellhead', 'spirechampion', 'spirefirst', 'wikimaid', 'doorwarden', 'covenbane', 'weirwalker', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper' /* PIN MOVED (WITCH1): the Witches' Festival's two last */, 'skyfarer', 'nirnrootsage', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane'], 'HUNTERS-MARK and MARKS-OF-MASTERY added the hunt\'s four, a profession\'s Master each and the sea\'s two last (PIN MOVED); NIRNROOT-SAGE added the Nirnroot Sage last (PIN MOVED); KETCH added the Sky-Ketch\'s Skyfarer last; STAR8 added the Thirteenth of Frostfall\'s Starwarden after the questlines\' five, before the festival\'s two (PIN MOVED); QL12 added the questlines\' five last (the Doorwarden, Covenbane, the Weirwalker, Witness of the Hour, Satakal\'s Witness); WIKIMAID added SylviaBun\'s WikiMaid last; SERPENT5 added the Old Coil\'s Coilbreaker last (PIN MOVED); KG6 added The King\'s Gambit\'s Grandmaster last (its season #1 - PIN MOVED); LAMP-KEEPER II added I Love Lamp last (PIN MOVED); CHAP6e added the Chapters\' two more last (after CARDS10\'s Iliac Champion, Iliac Hand\'s season #1 - its relay first - at the merge of main) (a High Master and a Season\'s Master - PIN MOVED); CHAP4c added the Chapters\' three last (a chapter\'s Master, officer and Former Master - PIN MOVED; after HOURS-FIRST\'s Hour\'s First at the merge of main); HOURS-FIRST added Hour\'s First (PIN MOVED); CRYSTAL-FIST added Flylighter\'s last (PIN MOVED); PRIMARCH added GA00250\'s last (the Primarch); AEGIS added Sureme\'s before it (the Aegis of Oblivion); ARENA4 the arena\'s two before it (the Grand Champion, the Arena Champion); before them Mac\'s two, then TITLE-N\'s Dungeon Master and the Patreon tiers lowest first, then SHADOW-FANG\'s, then PENITENT\'s, then the Broker\'s (WB9g), then HERALD\'s, then the seats\' five generic ids (SEAT1c)');
-  assert.deepEqual([...GLYPHS], ['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'shadowfang', 'penitent', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'aegis', 'primarch', 'crystalfist', 'wikimaid', 'nirnrootsage'], 'NIRNROOT-SAGE added the nirnrootsage last (Blob-Marley\'s nirnroot - PIN MOVED); WIKIMAID added the wikimaid last (SylviaBun\'s rabbit in its maid\'s lace); CRYSTAL-FIST added the crystalfist last (Flylighter\'s three slashes - PIN MOVED); PRIMARCH added the primarch (GA00250\'s sword between wings); AEGIS added the aegis before it (Sureme\'s pillars through the ring); ARENA4 the laurel before it (the Arena Champion\'s wreath), after SEAT1c\'s four; SEAT1c: the seats\' four after HERALD\'s; MOD1 added the moderator shield, TITLE-N a glyph per new title, SHADOW-FANG the wolf, PENITENT the sword in its lozenge, HERALD the trumpet, each last - the order is the order a name draws them in');
+  assert.deepEqual([...TITLES], ['founder', 'developer', 'dungeonmaster', 'disciple', 'apostle', 'hierophant', 'gatebreaker', 'herald', 'warden', 'protector', 'champion', 'grandchampion', 'arenachampion', 'hourbreaker', 'hoursfirst', 'chaptermaster', 'chapterofficer', 'formermaster', 'highmaster', 'seasonmaster', 'ilovelamp', 'coilbreaker', 'doorwarden', 'covenbane', 'hourwitness', 'satakalwitness', 'starwarden', 'witchwarden', 'hearthkeeper', 'bloodhound', 'beastbane', 'grandhuntsman', 'huntlegend', 'mastermining', 'masterlogging', 'masterherbalism', 'masterhunting', 'masterfishing', 'mastersmithing', 'masterbuilding', 'masteroutfitting', 'masterprovisioning', 'masterenchanting', 'serpenthunter', 'deepbane'], 'the closed list of titles, in order');
+  assert.deepEqual([...GLYPHS], ['sprout', 'dev', 'mod', 'dm', 'disciple', 'apostle', 'hierophant', 'herald', 'tower', 'crownDF', 'crownWR', 'crownSN', 'laurel', 'crownSK', 'crownMW', 'crownSU', 'crownVW', 'crownEW', 'crownBM', 'crownCY'], 'the closed list of glyphs, in order');
 });
 
 // ── THE SERVICE, end to end ─────────────────────────────────────────
 
-async function stand(vars = {}) {
+async function stand({ admins = [], ...vars } = {}) {
   _resetKeyForTests();
   const kp = await subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const pkcs8 = Buffer.from(new Uint8Array(await subtle.exportKey('pkcs8', kp.privateKey))).toString('base64');
@@ -231,13 +210,12 @@ async function stand(vars = {}) {
     }), env);
     return { status: res.status, body: await res.json().catch(() => null) };
   };
-  /** A REGISTERED account, because Founder is for registered accounts
-   *  (Mac's call) - a guest is one storage clear from gone. `register`
-   *  stamps `registered_at` off the ctx clock, so the clock chooses
-   *  which side of the cutoff the account lands on. */
-  const account = async (handle, { registeredAt = FOUNDER_UNTIL - 1, createdAt = null } = {}) => {
+  /** A REGISTERED account: a role is held by a registered account alone. `register` stamps `registered_at` off the
+   *  ctx clock. */
+  const account = async (handle, { registeredAt = REGISTERED, createdAt = null } = {}) => {
     const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
     await register({ db: env.DB, subtle, rand, nowS: registeredAt }, guest.id, { handle, password: 'a-long-enough-password' });
+    if (admins.includes(handle)) await env.DB.prepare('UPDATE players SET staff_admin = 1 WHERE id = ?').bind(guest.id).run();   // STAFF-ROLES-BY-ACCOUNT
     if (createdAt !== null) await env.DB.prepare('UPDATE players SET created_at = ? WHERE id = ?').bind(createdAt, guest.id).run();
     return guest;
   };
@@ -245,19 +223,19 @@ async function stand(vars = {}) {
 }
 
 test('ACC3: /v1/account carries the wardrobe, and /v1/account/title equips one of it', async () => {
-  const { call, account } = await stand({ DEVELOPER_HANDLES: 'mack' });
+  const { call, account } = await stand({ admins: ['mack'] });
   const me = await account('mack');
 
   const seen = (await call('GET', '/v1/account', undefined, me.secret)).body;
-  assert.deepEqual(seen.wardrobe.titles, ['founder', 'developer']);
+  assert.deepEqual(seen.wardrobe.titles, ['developer']);
   assert.equal(seen.wardrobe.title, null, 'nothing is worn until it is equipped - null is a perfectly good answer and is what every existing row gets');
   assert.ok(seen.wardrobe.glyphs.includes('dev'));
-  assert.equal('title' in seen.account, false, 'the wardrobe is its own field: an account view is the ROW, a wardrobe is the row read against config and a clock');
+  assert.equal('title' in seen.account, false, 'the wardrobe is its own field: an account view is the ROW, a wardrobe is the row read against the roles and a clock');
 
   const on = await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
   assert.equal(on.status, 200);
   assert.equal(on.body.title, 'developer');
-  assert.deepEqual(on.body.titles, ['founder', 'developer'], 'the answer describes the row AFTER the write, so nothing has to re-read');
+  assert.deepEqual(on.body.titles, ['developer'], 'the answer describes the row AFTER the write, so nothing has to re-read');
 
   const again = (await call('GET', '/v1/account', undefined, me.secret)).body;
   assert.equal(again.wardrobe.title, 'developer', 'and it stuck - the WORN title is the one thing that is stored, because it is the only thing that is a choice');
@@ -269,7 +247,7 @@ test('ACC3: /v1/account carries the wardrobe, and /v1/account/title equips one o
 });
 
 test('ACC3: a title nobody granted cannot be equipped by a client that asks nicely', async () => {
-  const { call, account } = await stand({ DEVELOPER_HANDLES: 'someone-else' });
+  const { call, account } = await stand({ admins: ['someone-else'] });
   const me = await account('mack');
   // 403 AND NOT 401: the credential is GOOD and the title is simply
   // not theirs - the same reading the save wall takes.
@@ -287,27 +265,26 @@ test('ACC3: a title nobody granted cannot be equipped by a client that asks nice
 });
 
 test('ACC3: the minted token carries what the service DERIVED, not what the caller asked for', async () => {
-  const { call, account, pubB64, env } = await stand({ DEVELOPER_HANDLES: 'mack' });
+  const { call, account, pubB64, env } = await stand({ admins: ['mack'] });
   // OLD ENOUGH TO HAVE LOST THE SPROUT, so the only glyph in play
   // here is the developer's and the assertion below means what it says.
   const me = await account('mack', { createdAt: 1 });
-  await call('POST', '/v1/account/title', { title: 'founder' }, me.secret);
+  await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
 
   const pub = await importPublicKeyB64(pubB64, { subtle });
-  const got = await call('POST', '/v1/auth/token', { secret: me.secret, title: 'developer', glyphs: ['dev'] });
+  const got = await call('POST', '/v1/auth/token', { secret: me.secret, title: 'founder', glyphs: ['sprout'] });
   assert.equal(got.status, 200);
-  assert.equal(got.body.title, 'founder', 'the token route reads the WORN title off the row - a `title` in the body is not a request anybody answers');
+  assert.equal(got.body.title, 'developer', 'the token route reads the WORN title off the row - a `title` in the body is not a request anybody answers');
   const r = await verifyToken(got.body.token, pub, { subtle, nowS: Math.floor(Date.now() / 1000) });
   assert.ok(r.ok, r.why);
-  assert.equal(r.claims.t, 'founder');
+  assert.equal(r.claims.t, 'developer');
   assert.ok(r.claims.g.includes('dev'));
 
   // THE BADGE LAPSES ON THE NEXT TOKEN, with no cron and no column to
-  // clear: take the handle off the list and both halves of the
+  // clear: take the role off the account and both halves of the
   // developer grant are gone from what gets signed. The worn title
   // survives in the column and simply stops being worn.
-  await call('POST', '/v1/account/title', { title: 'developer' }, me.secret);
-  env.DEVELOPER_HANDLES = '';
+  await env.DB.prepare('UPDATE players SET staff_admin = 0 WHERE id = ?').bind(me.id).run();
   const after = await call('POST', '/v1/auth/token', { secret: me.secret });
   assert.equal(after.body.title, null);
   assert.deepEqual(after.body.glyphs, [], 'the dev glyph went with the grant');
@@ -317,10 +294,10 @@ test('ACC3: the minted token carries what the service DERIVED, not what the call
 });
 
 test('ACC3: a guest gets a token and no badge - the wall for a title is the same one the saves have', async () => {
-  const { call } = await stand({ DEVELOPER_HANDLES: 'mack' });
+  const { call } = await stand({ admins: ['mack'] });
   const guest = (await call('POST', '/v1/auth/guest', { ...ACCEPTED })).body;
   const seen = (await call('GET', '/v1/account', undefined, guest.secret)).body;
-  assert.deepEqual(seen.wardrobe.titles, [], 'Founder is for registered accounts (Mac)');
+  assert.deepEqual(seen.wardrobe.titles, [], 'a guest holds no title');
   // ...BUT THE SPROUT IS NOT A TITLE. It is true of a new account, and
   // a guest account is as new as any other, so it is there.
   assert.deepEqual(seen.wardrobe.glyphs, ['sprout']);

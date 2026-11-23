@@ -70,9 +70,10 @@ import { bannerSvg, shieldSvg } from './heraldryArt.js';   // GUILD1d: the guild
 import { GUILD_HALL_PRICE_MULT, GUILD_HALL_ENTRIES, GUILD_HALL_ENTRY_WORDS, hallMay } from '../net/hallLaw.js';   // GUILD1d: the hall
 import { homeSaleRefund } from '../net/homeLaw.js';   // GUILD1d: what the hall sells back for
 import { REGION_NAMES } from '../formats/mapsTables.js';   // GUILD1d: where the hall stands
+import { CASTLE_PRICE, castleMay, castleLostRefund, castleSaleRefund, castleCityOf } from '../net/castleLaw.js';   // DOMAIN2: the castle's price, power and refunds; AUDIT TESA III E2-2: its city
 import { wagonItemName } from '../systems/wagon/wagonKinds.js';   // WAGONS2 (FINAL AUDIT): a marked wagon by its kind's name
 import { noteFirstUse } from '../systems/tutorials.js';   // TUT1: the first touch of a system pops its tutorial page
-import { t } from '../systems/textManager.js';   // GUILD-UX: the storage pages' new words in the player's language
+import { t, formatNumber } from '../systems/textManager.js'; import { noMentoringLines, mentoringSwitch } from './partyMentoring.js';   // GUILD-UX: the storage pages' new words in the player's language; AUDIT DOMAINS C5: a castle's numbers
 import { levelShort } from '../systems/mentorText.js';   // MENTOR2: a member's level, short
 import { storeFilterAccepts, storeRarityAccepts, storeQuery, storeFilterOptions, storeRarityOptions } from './storeFilter.js';   // GUILD-UX: the stores' one filter
 import { showItemHover, hideItemHover } from './enhanced/enhancedInventory.js';   // GUILD-UX: the pack's one item card
@@ -156,7 +157,7 @@ export const GUILD_HALL_NONE_TEXT = `Your guild has no hall. The guildmaster can
  *  characters put in counts (halls.js buyHall), and a guild whose gold came in before the realm could not see why it was
  *  refused. Absent from an older service's answer: nothing said. */
 export const guildHallGoldText = (hallGold, treasury) => guildRealmGoldText(hallGold, treasury, false);   // AUDIT GUILD3 W15: one rule, one sentence (GUILD3c's)
-/** GUILD3c (bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE PRESS): THE TREASURY'S TWO GOLDS, said
+/** GUILD3c: THE TREASURY'S TWO GOLDS, said
  *  where the gold is - the Treasury page's top - and not only where a hall is bought: only the gold realm characters put
  *  in buys a hall or a new name or tag (halls.js buyHall, guilds.js renameGuild - AUDIT GUILD3 W15: the rename's own words);
  *  a guild with its hall already, the name alone (C10). Absent from an older service's answer: null. */
@@ -236,7 +237,7 @@ export function guildKeepsOf(v, said) {
   return out;
 }
 export const GUILD_HERALDRY_NONE_TEXT = 'Your guild has no arms yet.';   // AUDIT GUILD3 W6: one word - the page is "Arms"
-/** GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): the pages' own sentences. */
+/** GUILD2: the pages' own sentences. */
 export const GUILD_RENAME_COST_TEXT = `A new name or tag costs ${GUILD_RENAME_GOLD.toLocaleString('en-US')} gold from the treasury (gold put in by realm characters). You can rename again after two weeks. The old name is free for anyone at once.`;
 /** GUILD2a: when the next new name may come, from `at` (epoch seconds). */
 export const guildRenameSoonText = (at, nowS) => {
@@ -258,17 +259,17 @@ export function armsWhy(h) {
 }
 /** AUDIT SILVER-WAYS A3: the day's guild deeds, as the Guild tab says them (marksLaw.js MARKS_FAUCETS.deed). */
 export const guildDeedsText = (n, max) => `Guild deeds today: ${Math.max(0, Number(n) || 0)} of ${max}. When ${MARKS_FAUCETS.deed.members} members who joined at least ${Math.round(MARKS_FAUCETS.deed.tenureS / 86_400)} days ago defend the same town or close the same gate, the treasury earns ${marksText(MARKS_FAUCETS.deed.amount)}.`;
-/** GUILD1d: a treasury ledger line's verb - a deposit and a withdrawal, and the hall's own moves (0043's `moved_kind`). */
-export const GUILD_LEDGER_WORDS = Object.freeze({ deposit: 'put in', withdraw: 'took out', hall: 'bought the hall for', 'hall-sale': 'sold the hall for', 'hall-piece': 'took down a hall piece, returned to the treasury:', rename: 'renamed the guild for', grant: 'awarded the guild' });   // AUDIT2 GUILD2: a rename's line read "put in" - a payment out said as one in; GUILD-GRANT: the operator's award (tools/grantGuildGold.mjs)
+/** GUILD1d: a treasury ledger line's verb - a deposit and a withdrawal, and the hall's own moves (`moved_kind`). */
+export const GUILD_LEDGER_WORDS = Object.freeze({ deposit: 'put in', withdraw: 'took out', hall: 'bought the hall for', 'hall-sale': 'sold the hall for', 'hall-piece': 'took down a hall piece, returned to the treasury:', rename: 'renamed the guild for', grant: 'awarded the guild' });   // a rename is a payment out, so its line must not read "put in"; `grant` is the operator's award
 /** AUDIT GUILD1d R5: a Drakes ledger line's verb - a heraldry changed is the treasury paying, never a deposit. */
 export const GUILD_MARKS_LEDGER_WORDS = Object.freeze({
   deposit: 'put in', withdraw: 'took out', heraldry: 'changed the guild\'s arms for',   // AUDIT GUILD3 W6: the page is "Arms"
   // SILVER-WAYS: a guild deed (its third member names it), a contract's pay put up, and what came home of it
   deed: 'completed a guild deed:', contract: 'put up a contract of', 'contract-return': 'came home with',
 });
-/** GUILD3b (bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE PRESS): A SILVER LINE BY ITS OWN KIND - the
+/** GUILD3b: A SILVER LINE BY ITS OWN KIND - the
  *  ledger's (`raw`, marksLaw.js MARKS_KINDS) where the service sends it, each kind a guild's treasury is an end of, worded
- *  as `<who> <words> <amount>`; a kind that runs either way (a Conscription, a vassal's fealty share) worded by its
+ *  as `<who> <words> <amount>`; a kind that runs either way (a Conscription) worded by its
  *  direction. Before it, every line the service had no word for said "put in" - a Tribute, an upkeep, a claim fee, a writ's
  *  escrow, a patron's bid: silver LEAVING the treasury read as silver coming into it. */
 export const GUILD_SILVER_LINE_WORDS = Object.freeze({
@@ -283,8 +284,13 @@ export const GUILD_SILVER_LINE_WORDS = Object.freeze({
   'royal-escrow': 'put up a Royal Tourney prize of', 'royal-return': 'had a Royal Tourney prize come home:',
   'patron-escrow': 'bid for a chapter\'s patronage:', 'patron-return': 'had a patronage bid come home:',
   conscription: Object.freeze({ in: 'received Conscription of', out: 'paid Conscription of' }),
-  // AUDIT GUILD3 W5: a vassal's 5% is its FEALTY share - "Tribute" is the seat's, paid where the guild pledged
-  'fealty-tribute': Object.freeze({ in: 'received a vassal\'s fealty share of', out: 'paid its liege a fealty share of' }),
+});
+/** DOMAIN2: the castle's silver lines in words, in the player's language - read before GUILD_SILVER_LINE_WORDS (whose
+ *  English stands as it was), each a guild's own line ("The guild bought a castle for 120,000 silver"). */
+export const GUILD_SILVER_LINE_SAID = Object.freeze({
+  castle: () => t('social.guild.silver.castle', 'bought a castle for'),
+  'castle-sale': () => t('social.guild.silver.castleSale', 'gave up a castle, and got back'),
+  'castle-lost': () => t('social.guild.silver.castleLost', 'lost a castle with its crown, and got back'),
 });
 /** AUDIT GUILD3 W2: THE KINDS WHOSE `who` IS THE MEMBER WHO ACTED - the service writes their display name (marks.js
  *  deposits, withdrawals and deeds; halls.js the arms; contracts.js a contract put up; seatInfluence.js a Tribute;
@@ -299,10 +305,28 @@ export const GUILD_SILVER_MEMBER_KINDS = Object.freeze(['guild-deposit', 'guild-
 export function guildSilverLineText(l) {
   const amount = marksText(Number(l?.amount ?? 0));
   if (typeof l?.raw !== 'string') return `${l?.who} ${GUILD_MARKS_LEDGER_WORDS[l?.kind] ?? GUILD_MARKS_LEDGER_WORDS.deposit} ${amount}`;
-  const w = Object.hasOwn(GUILD_SILVER_LINE_WORDS, l.raw) ? GUILD_SILVER_LINE_WORDS[l.raw] : null;
+  const w = Object.hasOwn(GUILD_SILVER_LINE_SAID, l.raw) ? GUILD_SILVER_LINE_SAID[l.raw]() : Object.hasOwn(GUILD_SILVER_LINE_WORDS, l.raw) ? GUILD_SILVER_LINE_WORDS[l.raw] : null;   // DOMAIN2: the castle's lines first
   const words = typeof w === 'string' ? w : w ? w[l.out === true ? 'out' : 'in'] : l.out === true ? 'paid' : 'received';
   return `${GUILD_SILVER_MEMBER_KINDS.includes(l.raw) ? l.who : 'The guild'} ${words} ${amount}`;
 }
+/** DOMAIN2: THE CASTLE'S WORDS on the Guild window's Overview - read at each call, in
+ *  the player's language. `city` the crown city (castleLaw.js castleCityOf - AUDIT TESA III E2-2: a province's capital, never
+ *  the province), every number already in figures. */
+export const guildCastleText = Object.freeze({
+  head: () => t('social.guild.castle.head', 'Castle'),
+  none: () => t('social.guild.castle.none', "A guild that holds a crown's Charter - Daggerfall, Wayrest, Sentinel or a province's capital, but the Imperial City - may buy its castle for {price, number} silver from the treasury: its own instance of the castle, which only its members can enter. The castle goes with the Charter: if the region is lost, half its price comes home.", { price: CASTLE_PRICE }),
+  name: (city) => t('social.guild.castle.name', 'Castle {city}', { city }),
+  held: (city, paid) => t('social.guild.castle.held', "Your guild's own - choose it at the castle's door in {city}. Bought for {paid} silver.", { city, paid }),
+  rule: (city, lost, back) => t('social.guild.castle.rule', "It stays your guild's while the guild holds {city}'s crown. If the crown is lost, {lost} silver comes home; given up now, {back}.", { city, lost, back }),
+  sell: () => t('social.guild.castle.sell', 'Give up the castle'),
+  sellSure: (back) => t('social.guild.castle.sellSure', 'Sure? {back} silver comes home', { back }),
+  sold: (back) => t('social.guild.castle.sold', 'The castle is given up. {back} silver came home.', { back }),
+  offer: (city, price, has) => t('social.guild.castle.offer', 'Castle {city} can be your guild\'s: {price} silver from the treasury, which holds {has}.', { city, price, has }),
+  buy: (city) => t('social.guild.castle.buy', 'Buy Castle {city}', { city }),
+  short: () => t('social.guild.castle.short', 'the treasury holds too little silver'),
+  bought: (city) => t('social.guild.castle.bought', "Castle {city} is your guild's. Choose it at the castle's door.", { city }),
+  wait: () => t('social.guild.castle.wait', 'a moment'),   // AUDIT DOMAINS C5: a castle button held while an act is out
+});
 /** AUDIT GUILD1d R13: the hall's sale in words - the service's own sum (the deed share and its pieces' half). */
 export const guildHallSoldText = (r) => `The hall is sold. ${Number(r?.data?.back ?? 0).toLocaleString('en-US')} gold went back into the treasury.`;
 /** GUILD1d: where a hall stands, in words. */
@@ -451,7 +475,7 @@ textarea.dfsocial-field { resize: vertical; min-height: 120px; line-height: 1.4;
 .dfsocial-count { font-size: 11px; color: var(--dim, #9a9486); text-align: right; }
 .dfsocial-count.over { color: #e0704a; }
 
-/* GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): THE GUILD PAGE - its header (the banner beside the name), its page
+/* GUILD2: THE GUILD PAGE - its header (the banner beside the name), its page
    strip (wrapping: seven pages are wider than the panel at a phone's width), a member's vault grant beneath its row, and
    the arms' choices drawn - colour swatches and shield tiles, the one picked ringed in brass. */
 .dfsocial-guildhead { flex-direction: row; align-items: center; gap: 10px; }
@@ -1048,10 +1072,10 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
       const noteOf = () => { try { return mentorNote() ?? ''; } catch { return ''; } };
       const note = el('div', 'dfsocial-empty dfsocial-mentor', noteOf());
       liveSubs.push({ el: note, of: noteOf });
-      out.push(note);
+      out.push(note, ...noMentoringLines(el, p));   // the line every member reads
       out.push(...journeyBody());   // PARTY-UI
       const leave = el('div', 'dfsocial-row');
-      leave.append(btn('Leave party', { warn: true, run: () => act({ k: 'party.leave' }) }));
+      leave.append(btn('Leave party', { warn: true, run: () => act({ k: 'party.leave' }) }), ...mentoringSwitch(btn, p, social.leads(), act));   // the leader's switch
       out.push(leave);
     }
     out.push(...invitesBody());
@@ -1131,7 +1155,7 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
     const head = el('div', 'dfsocial-letterhead');
     const age = el('div', 'dfsocial-sub', `Sent ${letterAgeText(l.sentAt, mail.now())}`);
     liveSubs.push({ el: age, of: () => `Sent ${letterAgeText(l.sentAt, mail.now())}` });
-    const titled = titleBadge(l)?.text ?? null;   // AUDIT B7 (SHADOW-FANG): the title's words, never its key ("shadowfang")
+    const titled = titleBadge(l)?.text ?? null;   // AUDIT B7: the title's words, never its key
     head.append(el('div', 'dfsocial-subject', l.subject), senderNode('dfsocial-sub', `From ${l.from}${titled ? ` - ${titled}` : ''}`, l), age);
     out.push(head, el('div', 'dfsocial-lettertext', l.body));
     if (letters.word) out.push(el('div', 'dfsocial-err', letters.word));
@@ -1451,7 +1475,35 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
     if (acts.children.length) out.push(acts);
     return out;
   };
-  // ═══ GUILD2 (bible/11-Multiplayer/Guild-Overhaul.md): THE GUILD PAGE, IN PAGES ══════════════════════════════════════
+  /** DOMAIN2: THE CASTLE - each castle the guild keeps (its door, what was paid, both
+   *  refunds said before the press, the Guildmaster's Give up, pressed twice), each one its crowns may buy (the
+   *  Guildmaster's, its price beside the treasury's silver), and with neither, what a castle is and how one is had. */
+  const guildCastleNodes = (g, v, me) => {
+    const castles = Array.isArray(v.castles) ? v.castles : [], offers = Array.isArray(v.castleOffers) ? v.castleOffers : [];
+    const out = [el('div', 'dfsocial-sec', guildCastleText.head())];
+    const n = (x) => formatNumber(Number(x ?? 0));   // AUDIT DOMAINS C5: in the player's own grouping, inside the player's own words
+    if (!castles.length && !offers.length) { out.push(el('div', 'dfsocial-note', guildCastleText.none())); return out; }
+    for (const c of castles) {
+      const city = castleCityOf(c.region) ?? REGION_NAMES[c.region] ?? '';   // AUDIT TESA III E2-2: its crown's seat - Solitude, never Skyrim
+      out.push(personRow({ name: guildCastleText.name(city), sub: guildCastleText.held(city, n(c.paid)) }));
+      out.push(el('div', 'dfsocial-note', guildCastleText.rule(city, n(castleLostRefund(c.paid)), n(castleSaleRefund(c.paid)))));
+      if (castleMay(me, 'sell')) {
+        const acts = el('div', 'dfsocial-acts'), key = `castle-sell-${c.region}`;
+        acts.append(armed(key) ? btn(guildCastleText.sellSure(n(castleSaleRefund(c.paid))), { warn: true, enabled: !g.busy, why: guildCastleText.wait(), run: () => guildDo(g.sellCastle(c.region), (r) => guildCastleText.sold(n(r?.data?.back))) })
+          : btn(guildCastleText.sell(), { enabled: !g.busy, why: guildCastleText.wait(), run: () => arm(key) }));
+        out.push(acts);
+      }
+    }
+    for (const o of offers) {
+      const city = castleCityOf(o.region) ?? REGION_NAMES[o.region] ?? '', has = Number(v.marks ?? 0);   // AUDIT TESA III E2-2
+      out.push(el('div', 'dfsocial-note', guildCastleText.offer(city, n(o.price), n(has))));
+      const acts = el('div', 'dfsocial-acts');
+      acts.append(btn(guildCastleText.buy(city), { enabled: !g.busy && has >= o.price, why: g.busy ? guildCastleText.wait() : guildCastleText.short(), run: () => guildDo(g.buyCastle(o.region), guildCastleText.bought(city)) }));
+      out.push(acts);
+    }
+    return out;
+  };
+  // ═══ GUILD2: THE GUILD PAGE, IN PAGES ══════════════════════════════════════
   // Asked: "the guild page needs an overhaul". GUILD1b's tab was one scroll - roster, invites, two treasuries and their
   // ledgers, the hall, the heraldry, the guild Stores, the rank names and leaving, every section under the one before. It
   // is pages now, under the guild's own header (its banner, its name and tag, the reader's rank): Overview, Members,
@@ -1555,6 +1607,7 @@ export function createSocialPanel({ social, send = null, mail = null, guild = nu
     out.push(el('div', 'dfsocial-note', v.heraldry ? heraldryText(v.heraldry) : GUILD_HERALDRY_NONE_TEXT));
     if (v.vault?.me) out.push(el('div', 'dfsocial-note', `At the vault: ${vaultStandingText(v.vault.me)}.`));
     out.push(...guildHallNodes(g, v, me));
+    out.push(...guildCastleNodes(g, v, me));   // DOMAIN2: the region's castle, beside the hall
     out.push(el('div', 'dfsocial-sec', 'Elsewhere'), el('div', 'dfsocial-empty', GUILD_ELSEWHERE_TEXT));   // GUILD3c: where the rest is run
     return out;
   };

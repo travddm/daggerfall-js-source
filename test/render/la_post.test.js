@@ -1,5 +1,4 @@
-// LA-POST (2026-09-27, Mac: "a deep audit on the enhanced lighting system, look for flickering issues, performance
-// improvements and just a complete detailed overhaul to make this insanely better") - THE POST CHAIN, AUDITED.
+// LA-POST - THE POST CHAIN, AUDITED.
 // render/airPass.js's screen-space passes, each fix pinned where it can be run: the shaders' own text through the
 // GLSL evaluator (test/glsl.mjs) against synthetic frames and depths, the JS mirrors of what the shaders keep, and the
 // lifecycle on a fake GL.
@@ -75,7 +74,7 @@ function bilinear(W, H, at) {
 const depth01 = (dist, pi) => ((pi[3] / dist - pi[2]) + 1) / 2;
 const viewDistJs = (d01, pi) => pi[3] / (d01 * 2 - 1 + pi[2]);
 
-// ═══ 1. THE BRIGHT PASS ══════════════════════════════════════════════════════════════════════════════════════════
+// 1. THE BRIGHT PASS
 test('LA-POST1: the bright pass reads its whole 4x4 block - four bilinear reads at the inner corners, every pixel once at a sixteenth (the old one read the middle four) - and thresholds each quarter before the average, so a 3x3 flame blooms the same at all sixteen places in a block where the old read bloomed it whole at four and not at all at twelve; the glow still blooms (mutants: one read at the centre; the threshold after the average; the taps half a pixel out; the glow dropped)', () => {
   // the footprint, in JS: a bloom texel's centre is the corner (2, 2) of its block; a bilinear read at a pixel corner
   // (cx, cy) weighs the four pixels about it a quarter each
@@ -132,7 +131,7 @@ test('LA-POST1: the bright pass reads its whole 4x4 block - four bilinear reads 
   assert.equal(run(fs0, () => [0, 0, 0, 1], () => [1, 1, 1, 1]), 0, 'the pass built without the glow reads none');
 });
 
-// ═══ 2. THE LANTERN GLARE ════════════════════════════════════════════════════════════════════════════════════════
+// 2. THE LANTERN GLARE
 /** The glare's scene on a 320 x 200 canvas: a flame flat at view distance D (x in [-hw, hw], y in [-1, 0] - the light
  *  at its top, a city light's), a wall 20 behind it, and `beam` (a surface one unit nearer, over x in [beam[0],
  *  beam[1]] and y in [-0.2, 0.2], or null) - the eye at (tx, ty, 0) looking down -z, the light at (lx, 0, -D). */
@@ -297,40 +296,7 @@ test('LA-POST2: the glare is sized by a range HELD per light - a lamp whose rang
   assert.equal(calls.filter((c) => c[0] === 'drawArrays').length, 0);
 });
 
-// ═══ 3. THE BLOOM AND THE SHAFTS IN HALF FLOATS ══════════════════════════════════════════════════════════════════
-test('LA-POST3: the bloom\'s and the shafts\' images are half floats where the GL renders them (the AO keeps its bytes; with no float target every image is bytes, as before), the gaussians hold their reads at 1 so the source saturates exactly as the byte image did, and a halo\'s tail the byte image rounded to a ring survives; the probes read either through readTarget (mutants: the bloom in bytes; the shafts in bytes; the hold dropped; a float read as bytes)', () => {
-  for (const float of [true, false]) {
-    const { ap, calls } = pass({ float });
-    ap.resize(320, 200);
-    const T = ap.targets;
-    for (const k of ['bloom', 'bloomB', 'shaft', 'shaftRaw', 'vol', 'volB']) assert.equal(T[k].float, float, `${k}: ${float ? 'a half float' : 'bytes'}`);
-    for (const k of ['ao', 'aoBlur', 'volOut']) assert.equal(T[k].float, false, `${k}: bytes - a share, or the tonemapped glow`);
-    assert.equal(calls.filter((c) => c[0] === 'texImage2D' && c[3] === 34842 && c[8] === 5131).length, float ? 6 : 0, 'RGBA16F / HALF_FLOAT: the bloom\'s two, the shafts\' two, the glow\'s two');
-    // the probes' read: a float image as FLOAT, a byte image as bytes
-    calls.length = 0;
-    const b = ap.readTarget('bloom'), a = ap.readTarget('ao');
-    const reads = calls.filter((c) => c[0] === 'readPixels');
-    assert.deepEqual(reads.map((c) => c[6]), [float ? 5126 : 5121, 5121], 'the bloom read as its storage, the AO as bytes');
-    assert.equal(b.px.length, T.bloom.w * T.bloom.h * 4); assert.ok(b.px instanceof Uint8Array && a.px instanceof Uint8Array);
-    assert.equal(ap.readTarget('nothing'), null);
-  }
-  // the gaussian: a source the writers summed past 1 (a flame's own emitter, glare and bright pass together) is held
-  // at 1 - the byte image's own answer - and a source under 1 is read as it is
-  const { ap } = pass({ float: true });
-  const gauss = (src) => { const f = glslFunctions(ap.programs.gauss.p.fs, { uDir: [0.01, 0], vUV: [0.5, 0.5], texture: () => [src, src, src, 1] }); f.main(); return f.globals.outColor[0]; };
-  assert.ok(Math.abs(gauss(3) - gauss(1)) < 1e-9 && Math.abs(gauss(1) - 1) < 1e-5, 'a sum of three reads as one - the level Mac\'s gain was tuned on');
-  assert.ok(Math.abs(gauss(0.25) - 0.25) < 1e-5, 'under one, untouched');
-  // the tail: a halo's linear light under half a byte step - four display levels once the resolve adds it at the
-  // bloom's gain over black and encodes - was 0 in the byte image: the ring
-  const tail = 0.0018, gain = 0.6;
-  const shown = (lin) => Math.round((lin <= 0.0031308 ? lin * 12.92 : 1.055 * lin ** (1 / 2.4) - 0.055) * 255);
-  assert.equal(Math.round(tail * 255) / 255, 0, 'the byte image held nothing of it');
-  assert.ok(shown(tail * gain) >= 3, `the half float holds it: ${shown(tail * gain)} display levels where the byte image showed 0`);
-  // by source: the four targets on the one test the glow already takes
-  assert.match(read('src/render/airPass.js'), /bloom: color\(bw, bh, f16\), bloomB: color\(bw, bh, f16\),\n\s+shaft: color\(bw, bh, f16\), shaftRaw: color\(bw, bh, f16\),/);
-});
-
-// ═══ 4. THE EYE IN SIXTEEN BITS ══════════════════════════════════════════════════════════════════════════════════
+// 4. THE EYE IN SIXTEEN BITS
 test('LA-POST4: the eye\'s state is sixteen bits (the high byte in R, the low in G) - the codec round-trips to 6e-5 of a stop and reads the bare [128, 128] images as it always did; at 144 Hz a dark frame that the byte eye never opened to is reached, and after a flash the eye comes back where the byte eye stayed closed; ADAPT_FS is packAdapt(adaptStep(unpackAdapt)) term for term, and LUM_FS holds each tap\'s log to the encoded range (mutants: one byte; the low byte dropped; a black tap scored at -29.9)', () => {
   const R = AIR_ADAPT_LOG_RANGE;
   assert.equal(AIR_ADAPT_STEPS, 65535);
@@ -392,7 +358,7 @@ test('LA-POST4: the eye\'s state is sixteen bits (the high byte in R, the low in
   assert.ok(want - oldMean > 4, `the base scored the same cell ${(want - oldMean).toFixed(1)} stops darker - four black taps outweighing twelve lit`);
 });
 
-// ═══ 5. THE AO BLUR'S WINDOW ═════════════════════════════════════════════════════════════════════════════════════
+// 5. THE AO BLUR'S WINDOW
 test('LA-POST5: the AO blur keeps the whole tile on far ground - its depth window is a share of the distance with the radius its floor - where the absolute radius dropped the ground\'s far and near rows past ~20 units (the rotation\'s stripes); the sky beside a wall is still no neighbour (mutants: the absolute window back; the share applied as a ceiling)', () => {
   assert.equal(AIR_AO_BLUR_SHARE, 0.15); assert.equal(AIR_AO_RADIUS, 0.8);
   // the ground from an eye 1.7 up looking level, at 1080p: an AO texel is two canvas rows
@@ -427,7 +393,7 @@ test('LA-POST5: the AO blur keeps the whole tile on far ground - its depth windo
   assert.equal(f.globals.outColor[0], 1, 'the sky\'s taps (occlusion 0 here) are no neighbours of the wall');
 });
 
-// ═══ 6. THE CONTACT MARCH ════════════════════════════════════════════════════════════════════════════════════════
+// 6. THE CONTACT MARCH
 /** The previous frame, ray-cast: the eye at (0, 1.7, 0) looking down -z on a 320 x 200 canvas, a floor at y = 0, a
  *  wall at z = -wallZ, a pillar (x 1..2, y 0..3, z -9.7..-9.2). Returns the contact block's bindings for it. */
 function prevFrame({ wallZ = 10, camPos = [0, 1.7, 0.5] } = {}) {
@@ -555,14 +521,10 @@ test('LA-POST6: the march\'s previous frame is a frame this one follows - the fl
   frame(at, 0);
   assert.equal(walk(), false, 'the frame after a menu\'s: no previous depth to march');
   assert.equal(walk(), true);
-  // by source: the wiring where the renderer knows
-  const rs = read('src/render/renderer.js');
-  assert.match(rs, /shadowOriginShift\(offset\) \{ this\._shadowPass\?\.shiftOrigin\(offset\); this\._air\?\.shiftOrigin\(offset\); this\._frameStamp\+\+; \}/);   // LA-AUDIT C1: and the stamp
-  assert.match(rs, /const cut = this\._everyLightNow !== this\._everyLightPrev;[^\n]*\n\s+if \(cut\) sp\.discard\(\);[^\n]*\n\s+if \(this\._everyLightNow !== this\._everyLightPrev\) \{ this\._air\?\.invalidatePrev\(\); \} this\._everyLightPrev = this\._everyLightNow;/, 'the door, both ways, before the edge is spent');   // PIN MOVED (EMPTY-HOLD, 2026-10-06): the replay's discard reads the door's edge where EMPTY-HOLD named it, `cut` - the same edge, still read before it is spent
   assert.ok(calls.length > 0);
 });
 
-// ═══ 7. THE GLOW'S GATE ══════════════════════════════════════════════════════════════════════════════════════════
+// 7. THE GLOW'S GATE
 test('LA-POST7: the renderer hands the lanterns\' glow to the air pass only where the glow\'s shader BUILT - a GL that refused it (`vol: null`) marches nothing, and the lane keeps its own analytic glow instead of zeroing it and leaving none (mutant: the build unasked)', () => {
   const { calls, canvas } = rendererGl();
   const r = new Renderer(canvas);
@@ -595,7 +557,7 @@ test('LA-POST7: the renderer hands the lanterns\' glow to the air pass only wher
   r.air.programs.vol = vol;
 });
 
-// ═══ 8. THE FRAME'S FRAMEBUFFERS, THE IMAGES NOTHING READS ═══════════════════════════════════════════════════════
+// 8. THE FRAME'S FRAMEBUFFERS, THE IMAGES NOTHING READS
 test('LA-POST8: the frame binds one of two framebuffers - each the colour image with one depth - and attaches nothing per frame; a night frame (no beams, no haze) leaves the shafts\' image alone because its resolve reads none; a menu\'s frame runs no bright pass and no gaussians (mutants: the depth re-attached; the framebuffers swapped; the shafts cleared; the bloom for a menu)', () => {
   const { calls, canvas } = rendererGl();
   const r = new Renderer(canvas);

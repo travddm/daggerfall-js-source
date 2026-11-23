@@ -1,4 +1,4 @@
-// L10N3d (2026-09-27): THE SETTINGS AND CONTROLS WINDOWS IN THE PLAYER'S LANGUAGE - DFU's own words on them, read
+// L10N3d: THE SETTINGS AND CONTROLS WINDOWS IN THE PLAYER'S LANGUAGE - DFU's own words on them, read
 // through the text core where DFU reads them, each through the port's real function. Pinned, with a French pack's rows
 // laid over English and English checked before French is chosen and after:
 //  - the enum rows DFU words through its tables (DaggerfallAdvancedSettingsWindow's TextSettings lists,
@@ -51,7 +51,6 @@ const paints = (w, text) => { const s = spyFont(); w.draw(renderer(), CANVAS, s.
 const WORDED = [
   ['Video/RandomDungeonTextures', 'Internal_Settings', 'dungeonTextureModes'],
   ['Video/QualityLevel', 'Internal_Settings', 'qualitySettings'],
-  ['Video/MainFilterMode', 'Internal_Settings', 'filterModes'],
   ['GUI/GUIFilterMode', 'Internal_Settings', 'filterModes'],
   ['GUI/VideoFilterMode', 'Internal_Settings', 'filterModes'],
   ['GUI/HelmAndShieldMaterialDisplay', 'Internal_Settings', 'helmAndShieldMaterialDisplay'],
@@ -62,12 +61,16 @@ const WORDED = [
 /** A pack's word for value `i` of a worded row. */
 const frWord = (keys, i) => (Array.isArray(keys) ? `fr:${keys[i]}` : `fr:${keys}:${i}`);
 const shown = (key) => ENUM_LAW[key].values.map((_, i) => formatValue(key, String(i)));
+/** The words a worded row shows for DFU's words: DFU's own, except the 640x400 retro choice, which is marked as the
+ *  sharper one in the player's language (settingsLaw.js retroSharperWord). */
+const SHARPER_INDEX = { 'Video/RetroRenderingMode': 2 };
+const asShown = (key, words) => words.map((w, i) => (SHARPER_INDEX[key] === i ? tm.t('settings.retroMode640x400Sharper', '{size} (sharper)', { size: w }) : w));
 
 test('L10N3d settings: an enum row DFU words through its tables shows a translation\'s word, read by DFU\'s key when it is drawn - and English is its law\'s words, byte for byte, before and after', () => {
   const english = Object.fromEntries(WORDED.map(([key]) => [key, shown(key)]));
   for (const [key] of WORDED) {
-    assert.deepEqual(english[key], [...ENUM_LAW[key].values], `${key}: English shows the law's words`);
-    assert.deepEqual([...enumWords(key)], [...ENUM_LAW[key].values], `${key}: its words' English is its law's`);
+    assert.deepEqual(english[key], asShown(key, [...ENUM_LAW[key].values]), `${key}: English shows the law's words`);
+    assert.deepEqual([...enumWords(key)], asShown(key, [...ENUM_LAW[key].values]), `${key}: its words' English is its law's`);
   }
   for (const [key, table, keys] of WORDED) {
     tm.patchLocaleTable('fr', table, Array.isArray(keys) ? keys.map((k, i) => [k, frWord(keys, i)])
@@ -76,9 +79,11 @@ test('L10N3d settings: an enum row DFU words through its tables shows a translat
   for (const [key] of WORDED) assert.deepEqual(shown(key), english[key], `${key}: English stands until French is chosen`);
   tm.setLocale('fr');
   for (const [key, , keys] of WORDED) {
-    assert.deepEqual(shown(key), ENUM_LAW[key].values.map((_, i) => frWord(keys, i)), `${key} reads the pack's words`);
+    assert.deepEqual(shown(key), asShown(key, ENUM_LAW[key].values.map((_, i) => frWord(keys, i))), `${key} reads the pack's words`);
     assert.equal(stepValue(key, '0', 1), '1', `${key}: the store still holds an index`);
   }
+  // the world filter: DFU's three words from its table, then the port's own Sharp
+  assert.deepEqual(shown('Video/MainFilterMode'), [...shown('GUI/GUIFilterMode'), 'Sharp'], "Video/MainFilterMode reads the pack's three and its own fourth");
   assert.deepEqual(ENUM_LAW['Video/QualityLevel'].values, ['Fastest', 'Fast', 'Simple', 'Good', 'Beautiful', 'Fantastic'], 'the law is not the words');
   assert.equal(formatValue('Video/RetroModeAspectCorrection', '1'), 'fr:FourThree', 'FourThree by its own key - English "4:3", DFU\'s shipped word');
   tm.setLocale('en');

@@ -1,5 +1,5 @@
 // @ts-check
-// SET2 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md): THE PLAYER'S DOOR TO THE LIVE SCENE.
+// SET2: THE PLAYER'S DOOR TO THE LIVE SCENE.
 //
 // A set's power sometimes reaches past the one blow the formula resolves: Malacath's Spite strikes the foe that struck
 // me, Ruhn's Cleave the next foe beside the one I struck, the Warden's Nova every foe around me, and Nocturnal's
@@ -18,13 +18,7 @@
 //   player()        my entity (a kill's word names the foe, not me)
 //   clear(a, b)     AUDIT SET M4 (optional): whether nothing solid stands between feet a and feet b, chest high
 //   say(line)       RVN3 (optional): a line the scene's HUD speaks
-//   sfx(id, at)     RVN3 (optional): a sound where a foe stands
-//   lairHere(at)    RVN7 (optional): where a revenant's deed is done, for its lair - { px, py, dungeons, enterable } in
-//                   the open world (its map pixel and the named dungeons in reach - LAIR-DOOR: those the player can go
-//                   down into, and the test itself; `at` a map pixel { x, y } to ask of instead of mine), { underground }
-//                   in a dungeon, or null
-//   fx(recipe, at)  UNQUIET (optional): one of the magic engine's techniques where something stands (a revenant's
-//                   flight craft - its 'vanish' puff, render/spellImpactFx.js)
+//   fx(recipe, at)  (optional): one of the magic engine's techniques where something stands (render/spellImpactFx.js)
 // }
 
 /** @type {null | { foes: () => any[], feet: () => number[]|null, hurtFoe: (f: any, n: number) => void, castOnPlayer: (b: any, o?: { power?: boolean }) => void, player?: () => any, clear?: (a: number[], b: number[]) => boolean, say?: (line: string) => void, sfx?: (id: number, at: number[]) => void, lairHere?: (at?: { x: number, y: number }) => any, isPuppet?: (f: any) => boolean, fx?: (recipe: string, at: number[], o?: any) => void }} */
@@ -53,7 +47,7 @@ export function takeOwed(entity) {
   return n;
 }
 
-/** BAL5 (bible/05-Combat/Balance-Arc.md section 11): what a blow PAID BACK may take from foe record `f` - `n`, but never
+/** BAL5: what a blow PAID BACK may take from foe record `f` - `n`, but never
  *  its last point. A foe's own blow turned back on it (the loot's thorns, Spite of the Spurned) wounds and never kills:
  *  the kill is the player's to take, so standing still is no way to win a fight. A whole point is left whatever the
  *  host's door divides it by (a shared foe's toughness only lessens it); a record that carries no health is taken at

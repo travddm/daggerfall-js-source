@@ -1,6 +1,5 @@
 // PX24 - THE CHRONICLE'S ONE DOOR.
 //
-// Mac: "with the logbook and history, I want them as one detailed UI."
 //
 // TWO WINDOWS BECAME ONE BECAUSE THEY ARE ONE SUBJECT. The logbook
 // (ui/quest/questJournal.js) and the history (ui/playerHistory.js) are
@@ -161,9 +160,7 @@ function enhancedChronicleOverlay(deps, section) {
     // inside the host's keydown handler. Same arms as ui/pauseDoor.js,
     // ui/inventoryDoor.js, ui/charSheetDoor.js and ui/spellbookDoor.js.
     //
-    // CRASH1 (2026-09-15, reported from live play: "opening the logbook
-    // and pressing L reliably causes the errors ... as well as sometimes
-    // randomly when trying to access the pause menu with escape"). This
+    // CRASH1. This
     // window had `onKey`/`onPointer` - a contract NOTHING in the tree
     // reads - and no `input`. So every key `overlayAction` maps threw:
     // any letter, digit or space (it returns 'char:<k>' for those, which

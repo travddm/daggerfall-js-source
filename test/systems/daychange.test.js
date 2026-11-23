@@ -139,7 +139,7 @@ test('S41 prices: FindFactionByTypeAndRegion\'s region -1 FALLBACK carries the w
 });
 
 test('S41 prices: the walk covers all 62 of PlayerEntity.regionData, materialising what the shops never touched', () => {
-  assert.equal(REGION_COUNT, 62, 'new RegionDataRecord[62] (PlayerEntity.cs:99)');
+  assert.equal(REGION_COUNT, 71, 'new RegionDataRecord[62] (PlayerEntity.cs:99) - and the provinces\' nine');   // PIN MOVED (WW-R): the walk covers the provinces' too (their roll after the Bay's: the Bay's prices are the ones they were)
   const p = player();                                       // nothing initialised at all
   const regions = Array.from({ length: REGION_COUNT }, (_, i) => i);
   updateRegionalPrices(p, dict({ regions }), 1, () => 0.99);
@@ -456,7 +456,7 @@ test('S41 re-entrancy: the exhaustion collapse re-enters the tick, and one midni
   //
   // The port's hosts implement that RaiseTime as playerTicker.advance(60)
   // fired from inside sinks.drainFatigue (shared.js:"GameObject DaggerfallInterior.AddFurnitureAction" ->
-  // exterior.js:"playerTicker.advance(60);", world.js:"AUDIT EV F-SIM1 (2026-08-31)"), which re-enters tickPlayerMinutes
+  // exterior.js:"playerTicker.advance(60);", world.js:"AUDIT EV F-SIM1 "), which re-enters tickPlayerMinutes
   // from inside its own fatigue band. With the marker assigned
   // unconditionally the nested tick left it an hour AHEAD, the outer
   // frame's own setWorldMinutes then reset the clock BELOW it, and the

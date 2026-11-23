@@ -1,14 +1,12 @@
 // @ts-check
-// ═════════════════════════════════════════════════════════════════════
-// CROWN1 part two (2026-10-01, Mac: "Finish the seats"; "Continue";
-// "Hurry up") - THE ROYAL TOURNEY, AS THE SERVICE KEEPS IT: who may enter
+// CROWN1 part two - THE ROYAL TOURNEY, AS THE SERVICE KEEPS IT: who may enter
 // (the pass, over the ring the contenders' games agree), the bouts the
 // winners' receipts bring (counted by the room's own ladder rule), the
 // ladder on the Seat tab, and the week's champion named at the Turning -
 // the prize the Edict escrowed paid to its account, the title kept for
 // good.
 //
-// bible/11-Multiplayer/Seats-Arc.md 7.6. The bouts are the relay's
+// 7.6. The bouts are the relay's
 // (net/siege/siegeRef.js royal*); a winner's `t1` receipt is its word that one
 // was won (net/siege/siegeReceipt.js). FACT, as for a siege: the relay has no
 // door to this service, so each receipt rides its winner's own client.
@@ -19,7 +17,6 @@
 // third are the uncounted alone) is asked inside its own INSERT.
 //
 // EVERY CLOCK IS AN ARGUMENT, as in accounts.js.
-// ═════════════════════════════════════════════════════════════════════
 import { accountKind, overRate } from './accounts.js';
 import { seatsOpenFor, confirmedSeats } from './townSeats.js';
 import { utcDay, MARKS_MAX } from '../../src/net/marksLaw.js';
@@ -171,9 +168,9 @@ export async function royalTurning(db, week, nowS, history, registry) {
   return out;
 }
 
-/** The titles an account keeps for good (`town_seat_titles`): a Season's crowned and keeper (SEASON1, 9.1), the Royal
+/** The titles an account keeps for good (`town_seat_titles`): the Royal
  *  Tourney's champion (7.6). */
-export const KEPT_TITLES = Object.freeze(['crowned', 'keeper', 'champion']);
+export const KEPT_TITLES = Object.freeze(['champion']);
 /** A TITLE KEPT FOR GOOD an account wears: its newest of `title` - `{ ts }` its seat's key and the Season of the week it
  *  was won (SEASON1 - seasonOf over `zero`, 0 where none was counted) - or null. */
 export async function keptTitleOf(db, playerId, title, zero = null) {

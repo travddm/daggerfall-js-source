@@ -93,8 +93,8 @@ function liftedDeepCleared({ ohAbyss = null, map, tBuild, memo = new Map() }) {
   const m = /  const livingDeepCleared = (\(loc, stops, entry\) => \{\n[\s\S]*?\n  \});\n/.exec(w);
   assert.ok(m, 'world.js livingDeepCleared');
   const byId = new Map(map.dungeons.map((d) => [d.mapId, d]));
-  return new Function('livingWorldOn', 'params', 'ohAbyss', 'livingDungeonsIndex', '_livingDungeonById', 'skyMinutes', 'divesIn', 'DIVE_CLEAR_MIN', 'livingTripWorld', 'PERSON_MOVE_SPEED', 'livingBaseRate', '_livingTripMemo', 'deepClearedOf', 'deepRouteOf', `return ${m[1]};`)(
-    () => true, { has: () => false }, ohAbyss, () => {}, byId, () => tBuild, divesIn, DIVE_CLEAR_MIN, map.world, CALENDAR_MPM, () => 1, memo, clearedOf, routeOf);
+  return new Function('livingWorldOn', 'params', 'ohAbyss', 'livingIndex', 'skyMinutes', 'divesIn', 'DIVE_CLEAR_MIN', 'livingTripWorld', 'PERSON_MOVE_SPEED', 'livingBaseRate', '_livingTripMemo', 'deepClearedOf', 'deepRouteOf', `return ${m[1]};`)(
+    () => true, { has: () => false }, ohAbyss, { dungeonOfId: (id) => byId.get(id) ?? null }, () => tBuild, divesIn, DIVE_CLEAR_MIN, map.world, CALENDAR_MPM, () => 1, memo, clearedOf, routeOf);
 }
 
 test('AUDIT LW-II-2 D1: LEAD ON to a stop 140 m away keeps the company beside the player after a frame - left behind is measured from its nearest standing member, never from where it goes; walked away from, it is let go (mutants: the destination, the farthest)', async () => {
@@ -238,7 +238,7 @@ test('AUDIT LW-II-2 D5: a rival charges only this player\'s own take - a peer\'s
   assert.ok(back.members.every((m) => back.rel.regard(m.id, 0) === EVENTS.poached));
   assert.deepEqual(back.st.said.slice(-1), [POACHED_LINE('Mem2')]);
   // the room's word counted on the pile where it lands (dungeonContext.js applyLoot)
-  assert.match(rd('src/scenes/dungeonContext.js'), /      held\.length = 0;\n      for \(const it of withoutCarried\(items, carriedPieces\(playerEntity\)\)\) held\.push\(it\);[^\n]*\n      if \(canon\.startsWith\('loot:'\)\) \{ const p = lootPiles\[Number\(canon\.slice\(5\)\)\]; p\.roomWords = \(p\.roomWords \?\? 0\) \+ 1; \}/);   // PIN MOVED (AUDIT AUTO-HOLD): the landing keeps off a piece I carry (world/interior/interiorShared.js withoutCarried)
+  assert.match(rd('src/scenes/dungeonContext.js'), /      held\.length = 0;\n      for \(const it of withoutCarried\(items, carriedPieces\(playerEntity\)\)\) held\.push\(it\);[^\n]*\n      if \(canon\.startsWith\('loot:'\)\) \{ const p = lootPiles\[Number\(canon\.slice\(5\)\)\]; p\.roomWords = \(p\.roomWords \?\? 0\) \+ 1; \}/);
 });
 
 test('AUDIT LW-II-2 D6: the fallen of one dive lie a pace apart at their stop (DEEP_APART_M, never within the remains\' own 0.6 m), side by side in the order the deep took them; world.js placeOf walks each out from the stop\'s floor (mutants: the pace, the order, the walk)', () => {

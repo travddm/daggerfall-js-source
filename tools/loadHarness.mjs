@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// SCALE3 (2026-10-08, Mac: "Do 1 2 and 3"): THE LOAD HARNESS - a fleet of bots against the REAL relay and the REAL account
-// service, both in local workerd, at the real client's own rates, measured (bible/11-Multiplayer/Scale-Arc.md SCALE3).
+// SCALE3: THE LOAD HARNESS - a fleet of bots against the REAL relay and the REAL account
+// service, both in local workerd, at the real client's own rates, measured (SCALE3).
 //
 //   npm run load                                    50 bots, three minutes standing play
-//   node tools/loadHarness.mjs --bots 200 --minutes 5
-//   node tools/loadHarness.mjs --scenario storm     the same, and halfway the relay is restarted under the fleet (a deploy)
-//   node tools/loadHarness.mjs --json out.json      every figure, for a machine
-//   node tools/loadHarness.mjs --help               every knob
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --bots 200 --minutes 5
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --scenario storm     the same, and halfway the relay is restarted under the fleet (a deploy)
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --json out.json      every figure, for a machine
+//   node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs --help               every knob
 //
 // WRANGLER_BIN names a wrangler to run (`npm ci` in server/ installs one - server/node_modules/.bin/wrangler, which is
 // taken by default when it is there); without one, `npx --yes wrangler@4` (minutes a call on a cold cache). It runs on
@@ -68,17 +68,20 @@
 //
 // It is NOT in the suite and has no Testing.md row, for the account probe's reason (tools/accountProbe.mjs): it needs a
 // toolchain and minutes. Its parts that can be pinned without one are - test/net/scale3.test.js.
-import { spawn, execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-import { mkdtempSync, writeFileSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { request as httpRequest } from 'node:http';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 
 import { isMain } from './lib/isMain.mjs';
-import { wranglerCommand, devSpawnOptions, killTree } from './lib/wranglerLaunch.mjs';
+import { standServices, stopAll, serviceStats, bindingProbe, sleep, FIRE_MINUTE, FIRE_HOUR } from './lib/load-services.mjs';
+import { standSelfhost } from './lib/selfhost-services.mjs';
+import { installRelayProfile } from './lib/relay-profile.mjs';
+import { cpuShare } from './lib/process-sampler.mjs';
+import { percentile, httpLatency, servicesFigures, startSampling, stopSampling, printServices } from './lib/service-figures.mjs';
+
+export { percentile, httpLatency, servicesFigures, IDLE_SAMPLE_MS } from './lib/service-figures.mjs';
 import { OnlineSession } from '../src/net/online.js';
 import {
   accountTokenMinter, SESSION_KEY, SERVICE_KEY, beatPlay, register as registerCall,
@@ -103,12 +106,10 @@ import { PROF_CLOSED_RECHECK_MS } from '../src/net/profBook.js';
 import { utcDayOfMs } from '../src/net/nodeLaw.js';
 import { routeLabel } from '../server-account/src/metrics.js';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 /** SCALE4c: the tab's one heartbeat (src/net/heartbeat.js), where the tree under test has it - its bots then keep the
  *  beat, the letterbox and the town's board as the world host keeps them (the client's own MailBox, notice book and play
  *  clock, each a part of the bot's heartbeat); a tree before it is measured with the three clocks it had. */
 const HEARTBEAT = await import('../src/net/heartbeat.js').catch(() => null);
-const run = promisify(execFile);
 
 // ═══ THE KNOBS ═════════════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -133,7 +134,14 @@ export const KNOBS = Object.freeze({
   keep: [0, '1 keeps the state directory (the D1 file, the Durable Objects) for a look afterwards'],
   trace: [0, '1 prints, each second of a storm, how the fleet\'s sessions stand (status, why, next retry)'],
   wire: [2, 'the wire every socket offers: 2 the second (SCALE5b, batched poses and rosters - the game\'s own), 1 the first (a before-and-after)'],
+  selfhost: [0, '1 (or the bare flag) serves both Workers from the self-host kit\'s workerd (selfhost/, `npm ci --prefix selfhost` first) in place of two wrangler dev processes'],
+  probe: [0, '1 times the storage bindings (a SELECT 1, an indexed read, a batch, 900 KB bucket puts and gets) inside the account isolate, once idle and once at the end of play'],
+  phase: [1, '1 ticks each bot at its own random phase, as the frame loops of players do; 0 ticks the whole fleet from one 50 ms interval (the harness before)'],
+  sample: [0, 'seconds between samples of the services\' memory; their CPU time is read as play begins and ends (0: off)'],
 });
+
+/** Knobs that may be given bare: `--selfhost` alone means `--selfhost 1`. */
+const BARE_FLAGS = new Set(['selfhost']);
 
 /** `--name value` / `--name=value` pairs over KNOBS' defaults, typed as the default is. Unknown names are refused. */
 export function parseArgs(argv) {
@@ -143,7 +151,8 @@ export function parseArgs(argv) {
     if (a === '--help' || a === '-h') return { help: true };
     const m = /^--([a-z-]+)(?:=(.*))?$/.exec(a);
     if (!m || !(m[1] in KNOBS)) throw new Error(`unknown argument ${a} (--help names them)`);
-    const raw = m[2] ?? argv[++i];
+    const bare = m[2] === undefined && BARE_FLAGS.has(m[1]) && (argv[i + 1] === undefined || argv[i + 1].startsWith('--'));
+    const raw = bare ? '1' : (m[2] ?? argv[++i]);
     if (raw === undefined) throw new Error(`--${m[1]} needs a value`);
     const was = KNOBS[m[1]][0];
     const v = typeof was === 'number' ? Number(raw) : String(raw);
@@ -158,6 +167,8 @@ export function parseArgs(argv) {
   for (const k of ['movers', 'fighters', 'registered']) if (!(out[k] >= 0 && out[k] <= 1)) throw new Error(`--${k} is a share, 0 to 1, not ${out[k]}`);
   if (!(out['storm-at'] > 0 && out['storm-at'] < 1)) throw new Error(`--storm-at is a share of the play, between 0 and 1, not ${out['storm-at']}`);
   if (out.wire !== 1 && out.wire !== 2) throw new Error(`--wire is 1 or 2, not ${out.wire}`);   // AUDIT SCALE II L5
+  if (out.selfhost !== 0 && out.selfhost !== 1) throw new Error(`--selfhost is 0 or 1, not ${out.selfhost}`);
+  if (!(out.sample >= 0)) throw new Error('--sample cannot be negative');
   for (const k of ['ramp', 'chat-every', 'save-kb']) if (!(out[k] >= 0)) throw new Error(`--${k} cannot be negative`);
   return out;
 }
@@ -165,14 +176,14 @@ export function parseArgs(argv) {
 // ═══ ONLY ITS OWN TWO ADDRESSES ════════════════════════════════════════════════════════════════════════════════════
 
 /** The account service's address as the bots' storage names it. The client accepts only an https base
- *  (accountClient.js serviceBase) and falls back to the PRODUCTION service for anything else - so the bots are given
+ *  (account-service-address.ts isServiceUrl) and knows no service for anything else - so the bots are given
  *  this one, which resolves nowhere, and `localFetch` maps it to the local Worker. */
 export const LOAD_SERVICE = 'https://accounts.load.invalid';
 
 /** A fetch that reaches the local account service and NOTHING ELSE: a URL on LOAD_SERVICE goes to 127.0.0.1:`port`
  *  (over node:http - no proxy is consulted), every other URL - the production service a fallback would name above all
  *  - is refused before a byte leaves. `ip` rides as cf-connecting-ip, the address the service bounds an open route's
- *  callers by. `note(route, status, ms)` hears every answer. */
+ *  callers by. `note(route, status, ms, bytes)` hears every answer, with the request body's size. */
 export function localFetch({ port, ip = null, note = null, request = httpRequest }) {
   return async (url, init = {}) => {
     const u = String(url);
@@ -195,17 +206,17 @@ export function localFetch({ port, ip = null, note = null, request = httpRequest
       init.signal?.addEventListener?.('abort', () => req.destroy(new Error('aborted')), { once: true });
       if (body) req.write(body);
       req.end();
-    }).catch((e) => { note?.(routeLabel(path.split('?')[0]), 'offline', Date.now() - started); throw e; });
+    }).catch((e) => { note?.(routeLabel(path.split('?')[0]), 'offline', Date.now() - started, body?.length ?? 0); throw e; });
     let word = '';
     if (res.status >= 400 && /json/.test(String(res.headers['content-type'] ?? ''))) { try { word = JSON.parse(res.buf.toString('utf8'))?.error ?? ''; } catch { word = ''; } }
-    note?.(routeLabel(path.split('?')[0]), word ? `${res.status} ${word}` : res.status, Date.now() - started);
+    note?.(routeLabel(path.split('?')[0]), word ? `${res.status} ${word}` : res.status, Date.now() - started, body?.length ?? 0);
     const h = new Headers();
     for (const [k, v] of Object.entries(res.headers)) if (v != null) h.set(k, Array.isArray(v) ? v.join(', ') : String(v));
     return new Response(res.status === 204 || res.status === 304 ? null : res.buf, { status: res.status, headers: h });
   };
 }
 
-/** AUDIT SCALE II L5 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): ONE FRAME THE ROOM SAID,
+/** AUDIT SCALE II L5: ONE FRAME THE ROOM SAID,
  *  TALLIED - its kind in `saidByType`, a pose's age from its sender's stamp, a refusal by its word and a welcome to its
  *  bot. A second-wire batch (SCALE5b) is opened as the client opens it (net/online.js _poses, _batch): each `poses` entry
  *  `[id, slim pose]` is one pose, aged by its `ts` where it carries one, and each frame of a frame batch (`fb`) is its
@@ -239,9 +250,12 @@ export function tallySaid(tally, m, now, ws = null, room = null) {
  *  AUDIT SCALE II L5: `inFrames`, `inBytes` and `inByType` are the frames on the wire - what a send costs the relay - and
  *  `saidByType` what they carried (tallySaid): the first wire's every pose was its own frame, the second's are batched,
  *  and its poses were counted as nothing - no pose ages at all - until this. */
-export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now = () => Date.now() }) {
+export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now = () => Date.now(), fineNow = () => performance.now() }) {
   const allowed = `ws://127.0.0.1:${port}/room/`;
   return class LoadSocket extends Base {
+    // When each ping still unanswered went out. The relay answers a ping with a pong from the runtime itself, without
+    // waking the room (setWebSocketAutoResponse), and in order, so the oldest ping is the one a pong answers.
+    #pingsAt = [];
     constructor(url, protocols) {
       if (!String(url).startsWith(allowed)) throw new Error(`the load harness reaches its own relay only - refused ${url}`);
       super(url, protocols);
@@ -252,6 +266,10 @@ export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now =
         const t = /^\{"t":"([a-z]+)"/.exec(text)?.[1] ?? '?';
         tally.inFrames += 1; tally.inBytes += text.length;
         tally.inByType[t] = (tally.inByType[t] ?? 0) + 1;
+        if (t === 'pong') {
+          const sentAt = this.#pingsAt.shift();
+          if (sentAt !== undefined) tally.pingMs.push(fineNow() - sentAt);
+        }
         // the first wire's frames read as they always were, by their own text; a batch parsed, as the client parses it
         let m = null;
         if (t === 'poses' || t === 'fb') { try { m = JSON.parse(text); } catch { m = null; } }
@@ -283,6 +301,7 @@ export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now =
       const t = /^\{"t":"([a-z]+)"/.exec(text)?.[1] ?? '?';
       tally.outFrames += 1; tally.outBytes += text.length;
       tally.outByType[t] = (tally.outByType[t] ?? 0) + 1;
+      if (t === 'ping') this.#pingsAt.push(fineNow());
       return super.send(data);
     }
   };
@@ -291,15 +310,8 @@ export function localWebSocket({ port, tally, Base = globalThis.WebSocket, now =
 /** A fresh tally for the relay's side. AUDIT SCALE II L5: `saidByType`, the frames the room said (tallySaid). */
 export const relayTally = () => ({
   opened: 0, synthetic: 0, inFrames: 0, inBytes: 0, outFrames: 0, outBytes: 0,
-  inByType: {}, saidByType: {}, outByType: {}, closes: {}, refusals: {}, refusedAt: [], poseMs: [], onWelcome: null,
+  inByType: {}, saidByType: {}, outByType: {}, closes: {}, refusals: {}, refusedAt: [], poseMs: [], pingMs: [], onWelcome: null,
 });
-
-/** The p-th percentile (0..1) of a list of numbers, or null for none. */
-export function percentile(list, p) {
-  if (!list.length) return null;
-  const s = [...list].sort((a, b) => a - b);
-  return s[Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1))];
-}
 
 /** A device's storage: a Map behind the four calls the client asks of localStorage. */
 export function botStorage(seed = {}) {
@@ -331,140 +343,25 @@ export function poseAt(bot, t) {
  *  where it stands and when, so every checkpoint is a save that changed (a player at play), never an idle one. */
 export function saveText(bot, kb, at) {
   const items = [];
-  for (let i = 0; JSON.stringify(items).length < kb * 1024; i++) {
-    items.push({ templateIndex: (i * 37) % 600, group: 'Weapons', equipSlot: i % 30, condition: 100 - (i % 50), name: `item ${bot.n}-${i}`, value: i * 13 });
+  let length = 2;   // the list's brackets; each item adds its own text, and a comma after the first
+  for (let i = 0; length < kb * 1024; i++) {
+    const item = { templateIndex: (i * 37) % 600, group: 'Weapons', equipSlot: i % 30, condition: 100 - (i % 50), name: `item ${bot.n}-${i}`, value: i * 13 };
+    items.push(item);
+    length += JSON.stringify(item).length + (items.length > 1 ? 1 : 0);
   }
   return JSON.stringify({ name: bot.name, level: 1, goldPieces: 100, items, place: poseAt(bot, at / 1000), at });
 }
 
-// ═══ THE TOOLCHAIN ═════════════════════════════════════════════════════════════════════════════════════════════════
-
-const localWrangler = join(ROOT, 'server/node_modules/.bin/wrangler');
-const WRANGLER_BIN = process.env.WRANGLER_BIN || (existsSync(localWrangler) ? localWrangler : '');
-const wrangler = (args) => wranglerCommand(args, { bin: WRANGLER_BIN });
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-/** Is anything answering (or holding) a local port? Only a refused connection says no - an orphaned workerd accepts and
- *  never answers (tools/accountProbe.mjs's lesson). */
-async function portHeld(port) {
-  return new Promise((resolve) => {
-    const req = httpRequest({ host: '127.0.0.1', port, path: '/', timeout: 1500 }, (r) => { r.resume(); resolve(true); });
-    req.on('timeout', () => { req.destroy(); resolve(true); });
-    req.on('error', (e) => resolve(!/ECONNREFUSED/.test(String(e?.code ?? e?.message ?? e))));
-    req.end();
-  });
-}
-
-async function healthy(port, path, waitS) {
-  for (let i = 0; i < waitS; i++) {
-    const ok = await new Promise((resolve) => {
-      const req = httpRequest({ host: '127.0.0.1', port, path, timeout: 1500 }, (r) => { r.resume(); resolve(r.statusCode === 200); });
-      req.on('timeout', () => { req.destroy(); resolve(false); });
-      req.on('error', () => resolve(false));
-      req.end();
-    });
-    if (ok) return true;
-    await sleep(1000);
-  }
-  return false;
-}
-
-/** The processes this run started, each killed whole (npx -> wrangler -> workerd: the grandchild holds the port), on the
- *  way out and on a signal - its own group off Windows, its tree on it (tools/lib/wranglerLaunch.mjs). */
-const started = new Set();
-function startDev(cwd, args, label) {
-  const [bin, a] = wrangler(args);
-  const p = spawn(bin, a, devSpawnOptions({ cwd, stdio: ['ignore', 'pipe', 'pipe'] }));
-  p.label = label; p.log = '';
-  const keep = (d) => { p.log = (p.log + d).slice(-20_000); };
-  p.stdout.on('data', keep); p.stderr.on('data', keep);
-  started.add(p);
-  return p;
-}
-function stopDev(p) {
-  if (!p) return;
-  started.delete(p);
-  try { killTree(p.pid, 'SIGKILL'); } catch { /* already gone */ }
-}
-export const stopAll = () => { for (const p of [...started]) stopDev(p); };
-
-// ═══ THE SERVICES ══════════════════════════════════════════════════════════════════════════════════════════════════
-
-export async function standServices(o, state) {
-  const accountPort = o.port, relayPort = o.port + 1;
-  for (const port of [accountPort, relayPort]) {
-    if (await portHeld(port)) throw new Error(`something already holds 127.0.0.1:${port} - stop it (an orphaned workerd: \`ps aux | grep workerd\`), or pass --port`);
-  }
-  console.log('== a throwaway signing pair (never written into the repository)');
-  const { stdout } = await run(process.execPath, [join(ROOT, 'tools/mintIdentityKeys.mjs'), '--pipe']);
-  const [priv, pub] = stdout.split('\n');
-  const acctEnv = join(state, 'account.env');
-  writeFileSync(acctEnv, `IDENTITY_PRIVATE_KEY=${priv}\nIDENTITY_PUBLIC_KEY=${pub}\n`, { mode: 0o600 });
-  const relayEnv = join(state, 'relay.env');
-  writeFileSync(relayEnv, `IDENTITY_PUBLIC_KEY=${pub}\n`, { mode: 0o600 });
-
-  console.log('== the account database: every migration, through wrangler\'s ledger');
-  const [mb, ma] = wrangler(['d1', 'migrations', 'apply', 'daggerfall-accounts', '--local', '--persist-to', state]);
-  await run(mb, ma, { cwd: join(ROOT, 'server-account'), timeout: 600_000, maxBuffer: 64 * 1024 * 1024 });
-
-  const account = () => startDev(join(ROOT, 'server-account'), ['dev', join(ROOT, 'tools/loadAccountEntry.mjs'),
-    '--config', join(ROOT, 'server-account/wrangler.toml'), '--local', '--persist-to', state, '--port', String(accountPort),
-    '--ip', '127.0.0.1', '--inspector-port', String(accountPort + 100), '--env-file', acctEnv, '--test-scheduled'], 'account');
-  const relay = () => startDev(join(ROOT, 'server'), ['dev', '--config', join(ROOT, 'server/wrangler.toml'), '--local',
-    '--persist-to', state, '--port', String(relayPort), '--ip', '127.0.0.1', '--inspector-port', String(relayPort + 100), '--env-file', relayEnv], 'relay');
-  console.log('== booting both Workers in workerd');
-  const svc = { accountPort, relayPort, account: account(), relay: relay(), restartRelay: null };
-  if (!(await healthy(accountPort, '/v1/health', 180))) throw new Error(`the account service never answered:\n${svc.account.log.slice(-2000)}`);
-  // AUDIT SCALE C11: the private half read and the service up - it leaves the disk now, not at the run's end (the relay's
-  // file holds the public half alone, and the storm restarts only the relay)
-  rmSync(acctEnv, { force: true });
-  if (!(await healthy(relayPort, '/health', 180))) throw new Error(`the relay never answered:\n${svc.relay.log.slice(-2000)}`);
-  svc.restartRelay = async () => {
-    stopDev(svc.relay);
-    for (let i = 0; i < 20 && (await portHeld(relayPort)); i++) await sleep(250);
-    svc.relay = relay();
-    return healthy(relayPort, '/health', 180);
-  };
-  return svc;
-}
-
-/** THE SERVICE'S OWN CLOCK (SCALE4b, server-account/src/cron.js), fired as the deploy fires it: the minute's list every
- *  minute of play and the hour's once as play begins - `wrangler dev --test-scheduled` answers /__scheduled. Its
- *  statements ride the service's own points (`cron:<job>`), counted with the rest. The two strings are cron.js's
- *  CRON_MINUTE and CRON_HOUR (test/net/scale3.test.js holds them together); a tree whose service keeps no clock (before
- *  SCALE4b) answers the firing with nothing, so one harness measures either. */
-export const FIRE_MINUTE = '* * * * *';
-export const FIRE_HOUR = '41 * * * *';
-async function fireCron(port, cron) {
-  return new Promise((resolve) => {
-    const req = httpRequest({ host: '127.0.0.1', port, path: `/__scheduled?cron=${encodeURIComponent(cron)}`, timeout: 60_000 }, (r) => { r.resume(); r.on('end', resolve); });
-    req.on('error', () => resolve());
-    req.on('timeout', () => { req.destroy(); resolve(); });
-    req.end();
-  });
-}
-
-/** The account service's kept points and statements since the last read (tools/loadAccountEntry.mjs) - every read
- *  drains them, so each fold is of what is new. */
-async function serviceStats(port) {
-  return new Promise((resolve, reject) => {
-    const req = httpRequest({ host: '127.0.0.1', port, path: '/__load/stats', timeout: 30_000 }, (r) => {
-      const parts = [];
-      r.on('data', (d) => parts.push(d));
-      r.on('end', () => { try { resolve(JSON.parse(Buffer.concat(parts).toString('utf8'))); } catch (e) { reject(e); } });
-    });
-    req.on('error', reject);
-    req.end();
-  });
-}
+export { standServices, standServicesRetrying, stopAndFree, stopAll, FIRE_MINUTE, FIRE_HOUR } from './lib/load-services.mjs';
 
 // ═══ THE FLEET ═════════════════════════════════════════════════════════════════════════════════════════════════════
 
 /** The client-side tally of the account service: route -> { n, statuses, ms[] }. */
 const accountTally = () => ({ byRoute: new Map(), at: [] });
-function noteCall(tally, route, status, ms) {
-  const row = tally.byRoute.get(route) ?? { n: 0, statuses: {}, ms: [] };
+function noteCall(tally, route, status, ms, bytes = 0) {
+  const row = tally.byRoute.get(route) ?? { n: 0, statuses: {}, ms: [], bytesOut: 0 };
   row.n += 1;
+  row.bytesOut += bytes;
   row.statuses[status] = (row.statuses[status] ?? 0) + 1;
   row.ms.push(ms);
   tally.byRoute.set(route, row);
@@ -496,11 +393,11 @@ export function makeBot(n, o, ctx) {
     acct: `aload${n.toString(36).padStart(6, '0')}${ctx.runTag}`, asecret: `loadacct${n.toString(36)}x${ctx.runTag}`.padEnd(24, 'w'),
     account: null, realm: null, sessions: [], presence: null, timers: [], welcomedAt: new Map(),
   };
-  bot.fetch = localFetch({ port: ctx.svc.accountPort, ip: bot.ip, note: (route, status, ms) => noteCall(ctx.account, route, status, ms) });
+  bot.fetch = localFetch({ port: ctx.svc.accountPort, ip: bot.ip, note: (route, status, ms, bytes) => noteCall(ctx.account, route, status, ms, bytes) });
   return bot;
 }
 
-/** AUDIT SCALE II L3 (2026-10-11; Mac: "Lets do an audit on everything. Ensure perfection"): how many times a bot asks
+/** AUDIT SCALE II L3: how many times a bot asks
  *  for its guest at the sign-in line before its setup fails - each after the wait the line told (ADMIT-LINE,
  *  server-account/src/admit.js: never under a second), so a bot stands in the line at least half a minute. */
 export const LINE_ASKS_MAX = 30;
@@ -634,6 +531,30 @@ function tickBot(bot, ctx, o) {
   }
 }
 
+/** Ticks every bot about each `period` ms, each at its own random phase. Returns a stop function.
+ *  Timers cannot do this on Windows: every timer fires on the 15.6 ms system tick, so bots on intervals of their own
+ *  still send in the same millisecond, and the relay's batch timer, on the same grid, then holds every pose for its
+ *  whole window. Players' frame loops are not in step, so the loop polls the clock instead. Each interval varies by
+ *  up to `jitter` of the period, as a frame loop's does, so bots that a stall brought into step drift apart again. */
+export function phasedTicker(bots, tick, { period = 50, jitter = 0.2, now = () => performance.now(), defer = setImmediate, random = Math.random } = {}) {
+  const start = now();
+  const dueAt = new Map(bots.map((bot) => [bot, start + random() * period]));
+  let running = true;
+  const loop = () => {
+    if (!running) return;
+    const at = now();
+    for (const [bot, due] of dueAt) {
+      if (at < due) continue;
+      const next = due + period * (Math.floor((at - due) / period) + 1);   // whole periods: a stall keeps each phase
+      dueAt.set(bot, jitter > 0 ? next + (random() - 0.5) * 2 * jitter * period : next);
+      tick(bot);
+    }
+    defer(loop);
+  };
+  defer(loop);
+  return () => { running = false; };
+}
+
 // ═══ THE RUN ═══════════════════════════════════════════════════════════════════════════════════════════════════════
 
 /** The pose ages a fleet keeps for its percentiles - a reservoir, so a long crowded run neither grows without bound nor
@@ -654,6 +575,7 @@ export function reservoir(list, v, seen, max = POSE_SAMPLE_MAX) {
 export class Fleet {
   constructor({ o, accountPort, relayPort, runTag, from, to }) {
     this.o = o;
+    this.relayPort = relayPort;
     this.relay = relayTally();
     this.poseSeen = 0;
     const relay = this.relay;
@@ -667,7 +589,7 @@ export class Fleet {
     relay.onWelcome = (ws, room) => { const b = this.ctx.ownerOf.get(ws); if (b) b.welcomedAt.set(room, Date.now()); };
     this.bots = [];
     for (let n = from; n < to; n++) this.bots.push(makeBot(n, o, this.ctx));
-    this.ticker = null;
+    this.stopTicks = null;
     this.mark = null;
   }
   async setUp() {
@@ -675,8 +597,15 @@ export class Fleet {
     return this.bots.length;
   }
   async connect(rampMs) {
+    await installRelayProfile(this.relayPort);   // each thread holds its own installed profile
     console.warn = () => {}; console.info = () => {};   // the sessions' own chatter, not the run's
-    this.ticker = setInterval(() => { for (const b of this.bots) tickBot(b, this.ctx, this.o); }, 50);
+    const tick = (b) => tickBot(b, this.ctx, this.o);
+    if (this.o.phase) {
+      this.stopTicks = phasedTicker(this.bots, tick);
+    } else {
+      const ticker = setInterval(() => { for (const b of this.bots) tick(b); }, 50);
+      this.stopTicks = () => clearInterval(ticker);
+    }
     const start = Date.now();
     for (let i = 0; i < this.bots.length; i++) {
       const due = start + (i / this.bots.length) * rampMs;
@@ -694,6 +623,7 @@ export class Fleet {
     for (const k of ['inFrames', 'inBytes', 'outFrames', 'outBytes']) r[k] = 0;
     r.inByType = {}; r.saidByType = {}; r.outByType = {}; r.closes = {}; r.refusals = {};
     r.poseMs.list.length = 0; this.poseSeen = 0;
+    r.pingMs.length = 0;
     return true;
   }
   /** The storm begins: nobody is back until a welcome says so. */
@@ -731,7 +661,7 @@ export class Fleet {
   }
   /** Play ends: every session left, every clock stopped, the tallies handed back. */
   finish() {
-    clearInterval(this.ticker);
+    this.stopTicks?.();
     for (const b of this.bots) for (const ss of b.sessions) { try { ss.leave(); } catch { /* gone */ } }
     for (const b of this.bots) { b.heartbeat?.stop(); b.stopBeat?.(); }
     const r = this.relay;
@@ -778,6 +708,7 @@ export function mergeFleets(finals, rand = Math.random) {
     for (const [route, row] of f.account) {
       const m = account.byRoute.get(route) ?? { n: 0, statuses: {}, ms: [] };
       m.n += row.n;
+      if (row.bytesOut != null) m.bytesOut = (m.bytesOut ?? 0) + row.bytesOut;
       for (const [k, v] of Object.entries(row.statuses)) m.statuses[k] = (m.statuses[k] ?? 0) + v;
       for (const v of row.ms) m.ms.push(v);
       account.byRoute.set(route, m);
@@ -785,6 +716,7 @@ export function mergeFleets(finals, rand = Math.random) {
     for (const k of ['opened', 'synthetic', 'inFrames', 'inBytes', 'outFrames', 'outBytes']) relay[k] += f.relay[k];
     for (const k of ['inByType', 'saidByType', 'outByType', 'closes', 'refusals']) for (const [t, v] of Object.entries(f.relay[k] ?? {})) relay[k][t] = (relay[k][t] ?? 0) + v;
     poseSeen += f.relay.poseSeen;
+    for (const v of f.relay.pingMs ?? []) relay.pingMs.push(v);
   }
   // the heaviest kept age's weight (poses heard a kept one stands for), and every fleet's sample cut to it
   const weight = Math.max(0, ...finals.map((f) => (f.relay.poseMs.length ? f.relay.poseSeen / f.relay.poseMs.length : 0)));
@@ -810,7 +742,13 @@ async function main(o) {
   };
   process.on('SIGINT', onSignal); process.on('SIGTERM', onSignal);
   try {
-    const svc = await standServices(o, state);
+    const svc = o.selfhost ? await standSelfhost(o, state) : await standServices(o, state);
+    const sampler = await startSampling(o, svc);
+    const firings = [];
+    const fire = (cron) => svc.fireCron(cron).then((firing) => { firings.push(firing); });
+    const probes = {};
+    if (o.probe) probes.idle = await bindingProbe(svc.accountPort);
+    sampler.phase('setup');
     const runTag = Math.random().toString(36).slice(2, 6);
     const threads = Math.max(1, Math.min(o.threads, o.bots));
     for (let k = 0; k < threads; k++) {
@@ -827,10 +765,12 @@ async function main(o) {
     console.log(`== playing for ${o.minutes} min${o.scenario === 'storm' ? `, the relay restarted at ${Math.round(o['storm-at'] * 100)}%` : ''}`);
     await serviceStats(svc.accountPort);   // the setup's and the ramp's points and rows are not the play's - drained
     await Promise.all(fleets.map((f) => f.play()));
+    sampler.phase('play');
+    const cpuFrom = await sampler.cpu();
     const playStart = Date.now();
     const playMs = o.minutes * 60_000;
-    await fireCron(svc.accountPort, FIRE_HOUR);
-    const clockTimer = setInterval(() => { fireCron(svc.accountPort, FIRE_MINUTE); }, 60_000);
+    await fire(FIRE_HOUR);
+    const clockTimer = setInterval(() => { fire(FIRE_MINUTE); }, 60_000);
     const statsSum = { byRoute: new Map(), statements: new Map() };
     const fold = (s) => {
       for (const p of s.points) {
@@ -849,23 +789,28 @@ async function main(o) {
     if (o.scenario === 'storm') {
       const stormAt = playStart + playMs * o['storm-at'];
       while (Date.now() < stormAt) { await sleep(Math.min(30_000, stormAt - Date.now())); fold(await serviceStats(svc.accountPort)); }
+      sampler.phase('storm');
       storm = await theStorm(fleets, o.bots, svc, fold, playStart + playMs);
     }
     while (Date.now() < playStart + playMs) { await sleep(Math.min(30_000, playStart + playMs - Date.now())); fold(await serviceStats(svc.accountPort)); }
     const playedMs = Date.now() - playStart;
+    const cpuTo = await sampler.cpu();
     clearInterval(clockTimer);
+    if (o.probe) probes.underLoad = await bindingProbe(svc.accountPort);
     const merged = mergeFleets(await Promise.all(fleets.map((f) => f.finish())));
     fleets = [];
     fold(await serviceStats(svc.accountPort));
     console.warn = restore.warn; console.info = restore.info;
 
-    out.report = report({ bots: merged.bots, o, account: merged.account, relay: merged.relay, poseSeen: merged.poseSeen, statsSum, playedMs, storm, threads });
+    const services = { ...servicesFigures({ svc, firings, memory: sampler.stop(), cpu: cpuShare(cpuFrom, cpuTo, playedMs) }), probes };
+    out.report = report({ bots: merged.bots, o, account: merged.account, relay: merged.relay, poseSeen: merged.poseSeen, statsSum, playedMs, storm, threads, services });
     if (o.json) writeFileSync(o.json, JSON.stringify(out, null, 2));
   } finally {
     console.warn = restore.warn; console.info = restore.info;
+    stopSampling();
     for (const f of fleets) f.stop?.();
     stopAll();
-    if (!o.keep) rmSync(state, { recursive: true, force: true });
+    if (!o.keep) rmSync(state, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });   // a killed workerd lets go of its files a moment later on Windows
     else console.log(`== the state is kept at ${state}`);
   }
   return out;
@@ -918,7 +863,8 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
   let quiet = 0;
   while (Date.now() < endsAt) {
     await sleep(1000);
-    const s = await serviceStats(svc.accountPort);
+    // Under the self-host kit one process serves both Workers, so the account service is down while the relay is.
+    const s = await serviceStats(svc.accountPort).catch(() => ({ points: [], statements: [] }));
     fold(s);
     for (const p of s.points) marks.push([Number(p.t ?? Date.now()), 'statements', Number(p.doubles?.[2] ?? 0)]);
     const parts = await Promise.all(fleets.map((f) => f.second()));
@@ -948,15 +894,15 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
 const pad = (s, n) => String(s).padEnd(n);
 const lpad = (s, n) => String(s).padStart(n);
 const r1 = (x) => (x == null ? '-' : Math.round(x * 10) / 10);
-
-export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, storm, threads }) {
+const r2 = (x) => (x == null ? '-' : Math.round(x * 100) / 100);
+export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, storm, threads, services = null }) {
   const botHours = (bots * playedMs) / 3_600_000;
   const botSeconds = (bots * playedMs) / 1000;
   const routes = [...account.byRoute].map(([route, row]) => {
     const svc = statsSum.byRoute.get(route) ?? { n: 0, statements: 0 };
     return {
       route, requests: row.n, perBotHour: row.n / botHours, statuses: row.statuses,
-      p50: percentile(row.ms, 0.5), p95: percentile(row.ms, 0.95),
+      p50: percentile(row.ms, 0.5), p95: percentile(row.ms, 0.95), bytesOutPerRequest: row.n ? (row.bytesOut ?? 0) / row.n : null,
       statementsPerRequest: svc.n ? svc.statements / svc.n : null, statementsPerBotHour: svc.statements / botHours,
     };
   }).sort((a, b) => b.statementsPerBotHour - a.statementsPerBotHour);
@@ -983,6 +929,8 @@ export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, 
   }
   console.log(`${pad('every route', 30)}${lpad(totals.requests, 7)}${lpad(r1(totals.requests / botHours), 9)}${lpad('', 14)}${lpad('', 10)}${lpad(r1(totals.statements / botHours), 12)}`);
   console.log(`${pad('  the play (no mints)', 30)}${lpad(play.requests, 7)}${lpad(r1(play.requests / botHours), 9)}${lpad('', 14)}${lpad('', 10)}${lpad(r1(play.statements / botHours), 12)}`);
+  const http = httpLatency(account);
+  console.log(`every /v1 request: p50 ${r1(http.p50)} ms, p95 ${r1(http.p95)} ms (${http.n}); the largest bodies sent: ${routes.filter((r) => r.bytesOutPerRequest > 1024).map((r) => `${r.route} ${r1(r.bytesOutPerRequest / 1024)} KB`).join(', ') || 'none over 1 KB'}`);
   console.log(`the fleet: ${JSON.stringify(fleet)}; the service's clock: its minute every minute of play, its hour once as play began`);
   console.log(`\nD1 rows a bot-hour: ${r1(rows.read / botHours)} read, ${r1(rows.written / botHours)} written. The ten statements reading the most:`);
   for (const s of statements.slice(0, 10)) console.log(`  ${lpad(r1(s.rowsReadPerBotHour), 9)} rows/bot-h  ${lpad(s.n, 6)}x  ${s.sql.slice(0, 110)}`);
@@ -994,8 +942,10 @@ export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, 
   console.log(`said by type (a batch's frames each its own): ${JSON.stringify(relay.saidByType)}`);
   console.log(`out by type: ${JSON.stringify(relay.outByType)}`);
   console.log(`a pose, sender to listener: p50 ${percentile(relay.poseMs, 0.5) ?? '-'} ms, p95 ${percentile(relay.poseMs, 0.95) ?? '-'} ms, p99 ${percentile(relay.poseMs, 0.99) ?? '-'} ms (${poseSeen} heard, ${relay.poseMs.length} kept)`);
+  console.log(`a ping's pong, round trip: p50 ${r2(percentile(relay.pingMs, 0.5))} ms, p95 ${r2(percentile(relay.pingMs, 0.95))} ms (${relay.pingMs.length})`);
   console.log(`closes by code: ${JSON.stringify(relay.closes)}; refusals: ${JSON.stringify(relay.refusals)}`);
 
+  if (services) printServices(services);
   if (storm) {
     console.log(`\n== THE STORM - the relay answered again ${storm.relayUpS ?? '-'} s after it went down`);
     console.log(`bots back in their cell: a quarter ${storm.reachedS[0.25] ?? '-'} s, half ${storm.reachedS[0.5] ?? '-'} s, nine in ten ${storm.reachedS[0.9] ?? '-'} s, every one ${storm.reachedS[1] ?? 'never, in the run'} s`);
@@ -1005,8 +955,8 @@ export function report({ bots, o, account, relay, poseSeen, statsSum, playedMs, 
   return {
     botHours, botSeconds, routes, fleet, play: { requestsPerBotHour: play.requests / botHours, statementsPerBotHour: play.statements / botHours },
     totals: { requestsPerBotHour: totals.requests / botHours, statementsPerBotHour: totals.statements / botHours, rowsReadPerBotHour: rows.read / botHours, rowsWrittenPerBotHour: rows.written / botHours },
-    statements: statements.slice(0, 40),
-    relay: { framesInPerBotSecond: relay.inFrames / botSeconds, framesOutPerBotSecond: relay.outFrames / botSeconds, bytesInPerBotSecond: relay.inBytes / botSeconds, bytesOutPerBotSecond: relay.outBytes / botSeconds, inByType: relay.inByType, saidByType: relay.saidByType, outByType: relay.outByType, poseMs: { p50: percentile(relay.poseMs, 0.5), p95: percentile(relay.poseMs, 0.95), p99: percentile(relay.poseMs, 0.99), n: relay.poseMs.length }, closes: relay.closes, refusals: relay.refusals },
+    statements: statements.slice(0, 40), http, services,
+    relay: { framesInPerBotSecond: relay.inFrames / botSeconds, framesOutPerBotSecond: relay.outFrames / botSeconds, bytesInPerBotSecond: relay.inBytes / botSeconds, bytesOutPerBotSecond: relay.outBytes / botSeconds, inByType: relay.inByType, saidByType: relay.saidByType, outByType: relay.outByType, poseMs: { p50: percentile(relay.poseMs, 0.5), p95: percentile(relay.poseMs, 0.95), p99: percentile(relay.poseMs, 0.99), n: relay.poseMs.length }, pingMs: { p50: percentile(relay.pingMs, 0.5), p95: percentile(relay.pingMs, 0.95), n: relay.pingMs.length }, closes: relay.closes, refusals: relay.refusals },
     storm,
   };
 }
@@ -1024,7 +974,7 @@ if (isMainThread && isMain(import.meta.url)) {
   let o;
   try { o = parseArgs(process.argv.slice(2)); } catch (e) { console.error(String(e?.message ?? e)); process.exit(2); }
   if (o.help) {
-    console.log('node tools/loadHarness.mjs [--knob value]...\n');
+    console.log('node --import ./tools/raw-import-hooks.ts tools/loadHarness.mjs [--knob value]...\n');
     for (const [k, [v, what]] of Object.entries(KNOBS)) console.log(`  --${pad(k, 12)} ${pad(JSON.stringify(v), 10)} ${what}`);
     process.exit(0);
   }

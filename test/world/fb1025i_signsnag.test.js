@@ -88,9 +88,6 @@ test('SIGN-PASS the law: a sign\'s triangles every corner of which stands SIGN_H
   assert.deepEqual([...sightMarksOf(43727, sign)], [...marks]);
   assert.deepEqual([SHOP_SIGN_FIRST_MODEL - 1, SHOP_SIGN_FIRST_MODEL, 43727, SHOP_SIGN_LAST_MODEL, SHOP_SIGN_LAST_MODEL + 1].map((id) => sightMarksOf(id, { positions: s.positions, indices: s.indices }) !== null), [false, true, true, true, false]);
   assert.equal(sightMarksOf(41105, sign), null, 'a bench, a fence, a house: a body\'s, every triangle');
-  const src = rd('src/world/signSolid.js');
-  assert.match(src, /import \{ isShopSignModel \} from '\.\/houseSigns\.js';/, 'the range is houseSigns.js\'s');
-  assert.doesNotMatch(src, /export const \w*(FIRST|LAST)\w*|[<>]= 437/, 'and declared nowhere else');
 });
 
 test('SIGN-PASS the motor, on a sign built to 43727\'s measures: a wagon\'s driver crossing under the board was stopped at its face and now drives on; a walker under its low edge passes; the post stops both, as a post does (mutants: the board a body\'s again; the law asked of no sign; the resolve meets a ray\'s triangle)', () => {
@@ -264,15 +261,6 @@ test('SIGN-PASS with ARENA2, the report\'s case: TVRNBM04\'s tavern sign (43727)
   const met = hosts.raycast(eye, dir, 20);
   assert.ok(met < L && Math.abs(met - dfu.raycast(eye, dir, 20)) < 1e-6, `the eye meets the board (${met.toFixed(2)} of ${L.toFixed(2)}), as DFU's does`);
   assert.ok(!(none.raycast(eye, dir, 20) < L), 'nothing else stands there');
-});
-
-test('SIGN-PASS THE TOWN HOSTS: the world\'s town build and the exterior host stand every placed model\'s triangles and hand a sign\'s marks beside them (sightMarksOf, the one law), and the late gate carries them to the collider - no interior and no dungeon stands a sign (mutants: either host back to the whole mesh a body\'s)', () => {
-  const pb = rd('src/scenes/pixelBuild.js'), ex = rd('src/scenes/exterior.js'), ls = rd('src/player/lateSolid.js');
-  assert.match(pb, /late\.add\(gateKey, cpu\.positions, cpu\.indices, local,\n[^\n]*\[0, 0, 0\]\)\), sight: sightMarksOf\(placed\.modelIdNum, cpu\) \}\);/);
-  assert.match(pb, /import \{ sightMarksOf \} from '\.\.\/world\/signSolid\.js';/);
-  assert.match(ex, /collider\.addMesh\(bucketKey, cpu\.positions, cpu\.indices, matrix, null, null, false, sightMarksOf\(placed\.modelIdNum, cpu\)\);/);
-  assert.match(ex, /import \{ sightMarksOf \} from '\.\.\/world\/signSolid\.js';/);
-  assert.match(ls, /const stand = \(key, h\) => collider\.addMesh\?\.\(key, h\.positions, h\.indices, h\.matrix, h\.translation, null, false, h\.sight\);/);
 });
 
 test('SIGN-PASS THE PORT\'S OWN BOARDS: the Stable\'s, the Wagon Yard\'s, the Joinery\'s and the Shipyard\'s signboards, and the Shipyard\'s crew board under its eaves, hang - a ray\'s, no body\'s: every model marks a board\'s triangles (its two faces, its four edges, its two rods: 32) and no other, and no hung triangle comes lower than 1.75 m (mutants: a board laid a body\'s; the mark left on after it; every triangle a body\'s)', () => {

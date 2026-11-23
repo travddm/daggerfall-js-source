@@ -51,7 +51,7 @@ export function buildTail(skin, kind = 'argonian') {
   });
   // Planar curve (x=0): width axis = X; dorsal axis = X x tangent, a 90deg
   // in-plane turn of the tangent - continuous along the curve, so no twist.
-  // AUDIT 68 S06-khajiit-tail-frame-flip: the sign was chosen PER RING
+  // the sign was chosen PER RING
   // ("flip so it points up"), which mirrored every ring past the point
   // where the Khajiit tip curls forward - a bow-tie pinch in the tube.
   const side = [1, 0, 0];

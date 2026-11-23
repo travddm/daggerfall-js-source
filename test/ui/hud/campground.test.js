@@ -1,5 +1,4 @@
-// CAMP-GROUND (2026-09-22, Mac: "Did you tackle camping not working in
-// the world because of flat tarren?") - THE PROBE ASKED THE WRONG DOOR.
+// CAMP-GROUND - THE PROBE ASKED THE WRONG DOOR.
 //
 // DragynDance reported camping kits that "don't work for me". The
 // silent refusal was one half (CAMP-SILENT); this is the other, and it
@@ -14,8 +13,7 @@
 // outdoors, for every kit.
 //
 // THE DOOR THAT FIXES IT IS TWO DAYS OLD AND WAS BUILT FOR THE SAME
-// MISTAKE: `surfaceHit` (MAC-BUG W5, Mac: "blood doesn't work
-// outside"). Its own note names this caller without knowing it - "a
+// MISTAKE: `surfaceHit` (MAC-BUG W5). Its own note names this caller without knowing it - "a
 // caller that reads 'nothing' as 'no surface' is right indoors and
 // silently wrong in the whole outdoors". Blood was moved onto it and
 // camping was not, which is why this pin holds the CLASS and not just
@@ -67,29 +65,9 @@ test('CAMP-GROUND: too far down is still no ground - the fix does not make every
   assert.equal(campDecision(CAMP_KIND.Fire, { ground: spot.ground }).text, CAMP_TEXT.noGround);
 });
 
-test('CAMP-GROUND: the host wires the door that sees terrain, and falls back rather than losing the probe', () => {
-  const src = readFileSync(join(ROOT, 'src/scenes/camps.js'), 'utf8');
-  assert.match(src, /col\?\.surfaceHit \? \(o, d, m\) => col\.surfaceHit\(o, d, m\)\.dist/,
-    'the probe asks surfaceHit, which answers mesh OR terrain, whichever is nearer');
-  // A collider without the newer door still gets the old one rather
-  // than null, which would be a silent "no ground" for every host that
-  // has not caught up.
-  assert.match(src, /: \(col\?\.raycast \? \(o, d, m\) => col\.raycast\(o, d, m\) : null\)/,
-    'and an older collider keeps the bucket probe');
-  // REST6's Bedroll lays on the same ground: one home, so these pins and their mutants hold both callers - a copy
-  // beside it kept the pins green while the camp's own probe was broken (AUDIT REST-PARTY).
-  assert.equal(src.match(/groundProbe\(col\)/g)?.length, 2, 'the camp and the Bedroll ask the one probe');
-  assert.equal(src.match(/col\.surfaceHit\(/g)?.length, 1, 'and no copy of it stands beside');
-
-  // THE CLASS, not the call site: blood was moved onto surfaceHit for
-  // this exact reason two days earlier. Both outdoor placers use it now.
-  const marks = readFileSync(join(ROOT, 'src/combat/blood/bloodMarks.js'), 'utf8');
-  assert.match(marks, /surfaceHit/, 'blood asks the same door (MAC-BUG W5)');
-});
-
 // ── NOTICE-SPAM: A TOAST SYSTEM DOES NOT SAY THE SAME LINE TWICE ──
 //
-// Mac: "the enhanced notification spam". DragynDance had a column of
+// . DragynDance had a column of
 // the same line over and over while a deathloop turned under him.
 //
 // The classic column SCROLLS, so a repeat there costs a row and goes

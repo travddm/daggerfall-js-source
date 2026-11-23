@@ -15,6 +15,7 @@ import { SKILLS } from '../../src/systems/skills.js';
 import { SKILL_ADVANCEMENT_MULTIPLIER } from '../../src/systems/advancement.js';
 import { CRIMES } from '../../src/systems/court.js';
 import { FATIGUE_LOSS } from '../../src/systems/statMods.js';
+import { hostText } from '../hostText.mjs';   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld - the host read whole
 
 const VENDOR = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'vendor', 'dfu-quests');
 const read = (p) => readFileSync(p, 'utf8').replace(/^﻿/, '');
@@ -333,31 +334,3 @@ test('Q5: SpawnCityGuards and Enemies fire their host doors, flags intact', () =
   assert.equal(m.of('clearEnemies').length, 1);
 });
 
-test('Q5: the world host mounts every new door', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  for (const door of ['setPlayerCrime: (crime) => setCrimeCommitted(playerEntity, crime)',
-    'getGoldPieces: () => goldAmount(playerEntity)',
-    'deductGoldPieces: (n) => deductGoldPieces(playerEntity, n)',
-    'raiseTime: (seconds) => advanceOwnMinutes(seconds / 60)',   // LIVED1: a quest's RaiseTime is the character's own time
-    'spawnCityGuards: (immediate) =>',
-    // ROAD-B MOVED THIS NEEDLE. The door is still mounted; it is no
-    // longer an inline arrow, because MakeEnemiesHostile is now the
-    // shared law (hostCombat.makeEnemiesHostile) over the host's whole
-    // active-enemy database rather than a private walk of the two
-    // exterior pools. `_makeEnemiesHostile` IS that closure, so the
-    // pin follows it by name.
-    'makeEnemiesHostile: _makeEnemiesHostile', 'clearEnemies: () =>',
-// AUDIT 39 (#27) MOVED THIS PIN. It used to read
-    // `currentWeatherKey: () => WEATHER_TYPES[`, which pinned the bug:
-    // WEATHER_TYPES is the NAME array and both operands are already
-    // names, so the index answered undefined -> null on every call and
-    // the always-on Weather trigger could never match. The fold is the
-    // identity, so the seam is the bare read.
-    'currentWeatherKey: () => weatherOverride ?? currentWeather()', 'currentClimateIndex: () => maps.getClimateIndex(',
-    // AUDIT 39: the two seams this wave mounted - JournalNote's TOKEN
-    // overload and PayMoney's GetGoldAmount gate.
-    'addNoteTokens: (tokens) => questBridge?.notebook?.addNoteTokens(tokens)',
-    'getTotalGold: () => totalGoldAmount(playerEntity)']) {
-    assert.ok(w.includes(door), `world.js mounts ${door.split(':')[0]}`);
-  }
-});

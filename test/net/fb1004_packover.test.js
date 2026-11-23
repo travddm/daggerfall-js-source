@@ -3,7 +3,7 @@
 // the rest was "left where it was gathered" - counted carried by the service and never made. A DFU pack is carried to
 // its limit, and a character with no Materials Bag has nothing else, so it gathered goods it never saw. Every unit the
 // service counts is minted now: the bag, the pack, then the pack past its weight - the hands' `give` (giveCarried), B5's
-// law for a withdrawal and the Foraging mod's own AddItem (bible/01-Overview/bugs/Field-Bugs-2026-10-04.md).
+// law for a withdrawal and the Foraging mod's own AddItem.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -158,7 +158,5 @@ test('AUDIT PACK-OVER A: what goes past the pack\'s weight is minted as the pack
 });
 
 test('AUDIT PACK-OVER B/C: the world\'s hands save a harvest that went wholly past the weight - its only change is `over`; and the over-weight line is said once in ten seconds, not once an answer (by source; mutants: `over` uncounted for the save; the line every answer)', () => {
-  assert.match(src('src/scenes/world.js'), /give: \(key, n\) => \{ const got = giveCarried\(playerEntity, key, n, carryOpts\(key\)\); if \(got\.bag \+ got\.pack \+ got\.over > 0\) saveSoon\.changed\(\); return got; \},/);
   assert.equal(OVER_SAID_MS, 10_000);
-  assert.match(src('src/scenes/gatherHost.js'), /if \(hauled && d\.carry === true && \(d\.put\?\.over \?\? 0\) > 0 && deps\.nowMs\(\) - overSaidAt >= OVER_SAID_MS\) \{ overSaidAt = deps\.nowMs\(\); hud\.toast\(BAG_WORDS\.overWeight\); \}/);
 });

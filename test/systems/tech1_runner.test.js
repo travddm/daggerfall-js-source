@@ -1,4 +1,4 @@
-// TECH1 (bible/05-Combat/Weapon-Techniques.md): THE TECHNIQUE KEY AT WORK - the blow every host's swing and shaft resolve
+// TECH1: THE TECHNIQUE KEY AT WORK - the blow every host's swing and shaft resolve
 // through (combat/technique/techniqueBlow.js, PlayerWeapon.resolveHit, arrowFlight.js playerArrowHitFoe), the one runner every rig
 // steps (combat/techniques.js), the motor's flight (player/motor.js techniqueLaunch), the marks on the ground and the chip.
 import '../modsOff.js';
@@ -111,13 +111,15 @@ test('TECH1 THE SWING: PlayerWeapon.resolveHit with a technique\'s blow - its re
   pw.techniqueBlow = T.swingBlow('whirlwind', 20, { feet: [0, 0, 0], yaw: 0 });
   const duellist = { ...foeAt(0, -2.4), duel: true };
   assert.deepEqual(pw.resolveHit([duellist], player(), sight, () => 0.01), [], 'a player\'s body behind me: the plain swing\'s view');
-  // the to-hit: a roll the plain swing misses on, the technique's +30 lands
+  // the to-hit: a roll the plain swing misses on, the technique's +10 (Skull Crack) lands
+  // B1: Skull Crack's term is +10 (was +30), so the window needs a hand that is not already at the formula's floor
+  const skilled = player({ skills: new Array(35).fill(90) });
   let missAt = null;
-  for (let r = 0.05; r < 1 && missAt == null; r += 0.01) {
+  for (let r = 0.001; r < 1 && missAt == null; r += 0.002) {
     pw.techniqueBlow = null;
-    const p = pw.resolveHit([near], player(), sight, () => r)[0].damage;
+    const p = pw.resolveHit([near], skilled, sight, () => r)[0].damage;
     pw.techniqueBlow = T.swingBlow('crush', 0, { feet: [0, 0, 0], yaw: 0 });
-    const c = pw.resolveHit([near], player(), sight, () => r)[0].damage;
+    const c = pw.resolveHit([near], skilled, sight, () => r)[0].damage;
     if (p === 0 && c > 0) missAt = r;
   }
   assert.ok(missAt != null, 'a sure blow lands where a plain one missed');
@@ -195,7 +197,7 @@ test('TECH1 THE KEY - REFUSALS: no technique, the beast, the ladder off, a duel,
   };
   assert.equal(said(() => ({ pw: weaponOf(LR.applyRarity(createWeapon(120, 1), 'rare', lcg(1))) })).said, T.NO_TECHNIQUE_TEXT);
   assert.equal(said(() => { const pw = weaponOf(null); pw.weapon = { werecreatureClaws: true }; return { pw }; }).said, T.BEAST_TEXT);
-  const off = said(() => { const pw = weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')); setPref('lootRarity', false); return { pw }; });
+  const off = said(() => { const pw = weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')); setPref('weaponTechniques', false); return { pw }; });
   assert.deepEqual([off.said, off.started, off.fatigue], [T.LADDER_OFF_TEXT, 0, 6400]);
   assert.equal(said(() => { setSigilDueling(true); return { pw: weaponOf(piece(() => createWeapon(120, 1), 'whirlwind')) }; }).said, T.DUEL_TEXT);
   setSigilDueling(false);
@@ -528,8 +530,8 @@ test('TECH1 THE SCREEN: the marks in the ground pass at their own sizes, nothing
   assert.deepEqual(ring.map((m) => [m.blow.kind, m.blow.r]), [['leap', 3]]);
   T.offsetTechniques([10, 0, -5]);
   assert.deepEqual(pw.techniqueBlow.feet, [10, 0, -5]);
-  setPref('lootRarity', false);
-  assert.deepEqual(T.techniqueHudChips(me, pw), [], 'the ladder off: no chip');
+  setPref('weaponTechniques', false);
+  assert.deepEqual(T.techniqueHudChips(me, pw), [], 'the switch off: no chip');
   _resetForTests();
 });
 

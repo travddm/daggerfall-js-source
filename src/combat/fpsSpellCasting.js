@@ -36,6 +36,7 @@
 import { CifRciFile } from '../formats/cifRciFile.js';
 import { frameToColor32 } from './fpsWeapon.js';   // the ONE indexed-bitmap bake
 import { weaponOffsetHeight } from '../ui/hud/hudLarge.js';
+import { spriteFilterScale } from '../render/world-texture-filter.ts';
 import { validCastRate } from '../systems/castSpeed.js';   // CAST-SPEED: the rate a cast runs at
 
 /** nativeScreenWidth / nativeScreenHeight (:44-45). NOT 320x200: the
@@ -59,16 +60,15 @@ export const SMALL_FRAME_ADJUST = 0.134;
  *  longer step at it - see CAST_FRAME_PERIOD. */
 export const ANIM_SPEED = 0.04;
 
-/** CAST-SPEED (2026-10-08, Mac: "nerf the animation of the regular sprite spellcasting to fall in line with the
- *  morrowind model"): THE PERIOD THE HANDS STEP AT, at rate 1 - two and a half times DFU's animSpeed. The release
+/** CAST-SPEED: THE PERIOD THE HANDS STEP AT, at rate 1 - two and a half times DFU's animSpeed. The release
  *  (frame 5) lands at 0.5 s and the hands come down at 0.7 s, where at DFU's 0.2 s and 0.28 s a classic caster cast
  *  three times for every Morrowind hand's one. Divided by the cast's rate (systems/castSpeed.js: the live Speed and the
  *  castSpeed loot line), which the Morrowind arm's spellcast group plays at too. */
-// CAST-QUICK (2026-10-09, the owner: "the casting got slowed in a update i think"): back to DFU's own clock
+// CAST-QUICK: back to DFU's own clock
 // (ANIM_SPEED, 0.04 s - the release at 0.2 s, the hands down at 0.28 s). Speed and the castSpeed loot line still scale it.
 export const CAST_FRAME_PERIOD = 0.04;
 
-/** CAST-RECOVER (2026-10-09, the owner: "i can spam the spell way more than before the fix"): THE QUICK HANDS, THE OLD
+/** CAST-RECOVER: THE QUICK HANDS, THE OLD
  *  PACE. CAST-QUICK gave the hands DFU's clock back (the spell leaves 0.2 s after the click), and with it the next cast
  *  0.28 s after the last - the spam CAST-SPEED's slower clock had closed. The two are split now: the hands and the
  *  release keep the quick clock, and the NEXT cast waits out this recovery from the click before it may start - the
@@ -156,7 +156,7 @@ export async function loadSpellCastArt(getBytes, palette, renderer, element) {
     records.push({
       width: size.width,
       height: size.height,
-      tex: renderer.uploadTexture('img', `fpsc:${fileName}:${r}`, c32, { clamp: true }),   // HAND-SEAM: one quad, never tiled - no wrap onto the far edge (render/renderer.js textureParams)
+      tex: renderer.uploadTexture('img', `fpsc:${fileName}:${r}`, c32, { clamp: true, world: true }),   // HAND-SEAM: one quad, never tiled - no wrap onto the far edge (render/renderer.js textureParams)
     });
   }
   return { element, records };
@@ -231,7 +231,7 @@ export class SpellCastAnim {
     this.currentFrame = 0;
     this._acc = 0;
     this._onRelease = onRelease;
-    // MW-CAST1 (Mac: "We need to implement morrowind spell casting effects and animations"): THE SPELL LEAVES ON THE
+    // MW-CAST1: THE SPELL LEAVES ON THE
     // ARM'S KEY. With the Morrowind arm casting, the release waits for its "<type> release" (`hold` answers true once
     // the arm has crossed it, or once it no longer casts) - OpenMW casts there (character.cpp handleTextKey:
     // `groupname == "spellcast" && action == mAttackType + " release"`), as the bow's shot waits for "shoot release"
@@ -308,20 +308,14 @@ export const fpsSpellCasting = new SpellCastAnim();
  * retro-rendering rect, and this port composites its overlays onto
  * the canvas itself.
  *
- * The non-point filter adjust (:212-217) - "Adjust scale to be
- * slightly larger when not using point filtering... reduces the
- * effect of filter shrink at edge of display", handScaleX/Y *= 1.01 -
- * is CORRECTLY ABSENT, the same answer the 2026-08-17 classic-weapon
- * parity audit reached for FPSWeapon's identical fudge (Combat.md,
- * "NEAREST filtering (DFU's 1.01 non-point fudge correctly absent)").
- * renderer.uploadTexture binds NEAREST for every image texture
- * (render/renderer.js textureParams), so there is no filter shrink to
- * compensate for; applying it off the Video/MainFilterMode setting
- * alone would scale the hands up by 1% for nothing.
+ * The non-point filter adjust (:212-217): the hands take the world
+ * filter (render/world-texture-filter.ts), and off Point they are drawn
+ * 1% larger, as DFU does, so the filtered edge texels stay off screen.
  */
 export function spellHandRects(canvas, rec, { frameIndex, element, offsetHeight = 0 }) {
-  const handScaleX = canvas.width / NATIVE_SPELL_W;
-  const handScaleY = canvas.height / NATIVE_SPELL_H;
+  const filtered = spriteFilterScale();
+  const handScaleX = (canvas.width / NATIVE_SPELL_W) * filtered;
+  const handScaleY = (canvas.height / NATIVE_SPELL_H) * filtered;
   // "Frames 0 and 5 are always small frames"; "Fire frame 4 is also a
   // small frame" (:220-225).
   const offsetWidth = (frameIndex === 0 || frameIndex === 5
@@ -361,7 +355,7 @@ export function drawSpellCastHands(renderer, canvas, art, frameIndex, {
 }
 
 /**
- * RSH1 (2026-10-11, Mac: "can we implement this mod into the source"): READIED SPELLCASTING HANDS 1.3 (jefetienne,
+ * RSH1: READIED SPELLCASTING HANDS 1.3 (jefetienne,
  * vendor/readied-spellcasting-hands/, MIT). The mod's whole change is AnimateSpellCast
  * (Modded_FPSSpellCasting_Ready.cs, the coroutine): every step it shows FRAME 0 of the readied spell's element while
  *

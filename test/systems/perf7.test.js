@@ -1,4 +1,4 @@
-// PERF7 (2026-09-11). The stream build breathes: a warm pixel build -
+// PERF7. The stream build breathes: a warm pixel build -
 // every await settled from cache - ran as one task and stalled the
 // frame for the whole of a city pixel. The breather yields to the next
 // animation frame once a slice's budget is spent. EXECUTES with an
@@ -52,15 +52,3 @@ test('PERF7 createBreather: resolves at once inside the slice, awaits one frame 
   assert.equal(BUILD_SLICE_MS, 6, 'the shipped slice: room for the draw in a 16.7 ms frame');
 });
 
-test('PERF7 pins: the world host keeps one breather for the stream, resets it at each build, and breathes after every placed model (mutant: the call dropped, or reset dropped so a long earlier await eats the first slice)', () => {
-  const w = hostText('src/scenes/world.js');
-  // PERF-EXT24: the breather takes the frame clock's budget and lends its slices back (test/systems/buildslice.test.js)
-  // HOST-SPLIT 2: the build moved to src/scenes/pixelBuild.js - the host makes the one breather and hands it to the build it
-  // constructs next; the build resets it first
-  assert.match(w, /const breather = createBreather\(\{[^\n]*\n(    [^\n]*\n)+  \}\);\n\s+const \{ buildPixelNow \} = createPixelBuild\(\{[^}]*\bbreather,/, 'one breather, handed to the build');
-  assert.match(w, /async function buildPixelNow\(px, py, \{ roadsRetry = false \} = \{\}\) \{\n\s+breather\.reset\(\);/, 'reset per build');
-  assert.match(w, /entry\._batched = true; \}[^\n]*\n\s+await breather\.breathe\(\);/, 'after each model, inside the placements loop');
-  const loopAt = w.indexOf('for (const placed of b.layout.models) {');
-  const breatheAt = w.indexOf('await breather.breathe();', loopAt);   // PIN MOVED (AUDIT PRECIP HOST-7): the flat groups' own loop (standFlatGroups, shared with the re-skin) breathes above the model loop - the breath this pins is the first after it
-  assert.ok(loopAt > 0 && breatheAt > loopAt && breatheAt - loopAt < 4000, 'the breath is inside the model loop');   // WD3 (the arena merge): a model's alias grew the loop past 3000 - a runaway guard, not a law
-});

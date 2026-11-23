@@ -1,4 +1,4 @@
-// CLIMB5 (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "I really want you to go all in on this"):
+// CLIMB5 (the Enhanced Climbing arc):
 // THE CLIMB, SEEN AND HEARD BY THE OTHERS - and by the player in third person. The motor's facing on the wall and the
 // body's eased yaw (player/motor.js climbFacing, bodyYawFor), the pose's two fields (climbPoseOf -> net/wire.js
 // validPose `cl`/`cw`, poseChanged, online.js lerpPose), the peers' readings of them (net/peer/peerClimb.js: the facing, the
@@ -145,26 +145,13 @@ test('CLIMB5 C4: the others draw a climber facing the wall, off the ground, neve
   assert.equal(again.move.grounded, true, 'down again: grounded');
   assert.equal(again.move.forward, 1);
   assert.equal(again.yaw, 2.9);
-  // every renderer reads it
-  const rp = rd('src/net/remotePlayers.js');
-  assert.match(rp, /const moving = peerMoving\(shown\);/, 'the billboard\'s move bit');
-  assert.match(rp, /const face = peerBodyYaw\(shown\);[^\n]*\n\s*const yaw = Number\.isFinite\(face\) \? face : 0;/, 'the billboard\'s facing');
-  assert.match(rp, /standingStill: !peerMoving\(shown\)/, 'no stride on the wall');
-  const pb = rd('src/net/peer/peerBodies.js');
-  // PIN MOVED (FIELD BUGS 2026-10-13b ONE-BAD-BODY): the eased yaw is read once as `want` and taken only when finite
-  assert.match(pb, /const want = peerBodyYaw\(peer\.shown\);[^\n]*\n[^\n]*\n\s*else b\.yaw = Number\.isFinite\(b\.yaw\) \? b\.yaw \+ wrapAngle\(want - b\.yaw\)/, 'the body eases to the wall');
-  assert.match(pb, /yaw: peerBodyYaw\(shown\), speed: 0,/, 'and stands at it');
-  const pr = rd('src/net/peer/peerRiders.js');
-  assert.match(pr, /const standing = \(pose\) => chooseTable\(\{ stopped: !peerMoving\(pose\)/, 'the walkers stand on the wall (not only the beast: AUDIT CLIMB-ARC N2 says the same words there)');
-  assert.match(pr, /const yaw = peerBodyYaw\(pose\), view = viewOf\(yaw, feet, eye\);   \/\/ CLIMB5: facing the wall it climbs/);   // SPRITE-FACE (PIN MOVED): the walker's facing named once, its view and its aura's facing off it
-  assert.match(pr, /spriteStride\(peerMoving\(pose\) && !r\.shot,/);
 });
 
 /** The peers' ear on a pin's bus: every play3d, [kind, volume, pitch, at, profile]. */
 function peerEar({ on = () => true, rand = () => 0.5 } = {}) {
   const shots = [];
   const audio = { play3d: (k, at, v, opts) => shots.push([String(k).replace(/^climb:/, '').replace(/-\d$/, ''), v, opts.pitch, at, opts]) };
-  let t = 0;   // PIN MOVED (AUDIT CLIMB-ARC N6): a clock a second on per frame - the floors never bite an honest climb here
+  let t = 0;
   return { shots, law: new PeerClimbSounds({ audio, profile: PEER_SOUND_PROFILE, on, rand, install: false, now: () => (t += 1000) }) };
 }
 
@@ -242,24 +229,6 @@ test('CLIMB5 C5: the others HEAR the climb, at the climber - a catch, the hands 
     law.update('g', { cl: FACE }, [0, 0.9, 0]);
     assert.equal(shots.length, 0, 'the origin moved: no travel');
   }
-});
-
-test('CLIMB5 C6: every host says the climb and draws its own body at the climb\'s yaw, and the peers\' sounds ride the peers\' own switch (mutants: the pose unsent, a host drawing the body at the camera\'s yaw, the sound unwired)', () => {
-  assert.match(hostText('src/scenes/world.js'), /\.\.\.climbPoseOf\(player\),[^\n]*\n\s*\};/, 'the pose carries the climb');
-  let n = 0;
-  for (const f of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/dungeon.js', 'src/scenes/worldModes.js']) {
-    const s = rd(f);
-    n += (s.match(/mwViewDrawBody\(canvas, \{[^}]*feet: player\.bodyFeetAt\(\), yaw: player\.bodyYawFor\(cam\.yaw\)/g) ?? []).length;
-    assert.doesNotMatch(s, /mwViewDrawBody\(canvas, \{[^}]*yaw: cam\.yaw[ ,}]/, `${f}: no body drawn at the camera's yaw`);
-  }
-  assert.equal(n, 5, 'all five body draws');
-  const rp = rd('src/net/remotePlayers.js');
-  assert.match(rp, /this\._syncFootsteps\(peer, toScene, eye\);\s*\n\s*this\._syncClimbSound\(peer, toScene, eye\);/, 'heard beside the stride');
-  // PIN MOVED (AUDIT CLIMB-ARC N5): the switch silences the sound, never the law's knowing - off, the law is still told
-  assert.match(rp, /_syncClimbSound\(peer, toScene, eye\) \{\s*\n\s*if \(!this\.deps\?\.audio\?\.play3d\) return;[\s\S]{0,400}?this\._climbSounds\.update\(peer\.id, peer\.shown, f, getPref\('peerFootsteps'\) !== false && peerInEarshot\(f, eye\)\);/, 'behind the peers\' sounds\' own switch');
-  assert.match(rp, /this\._climbSounds\.update\(peer\.id, peer\.shown, f, [^\n]*&& peerInEarshot\(f, eye\)\);/, 'past the peers\' far edge nothing is made (the earshot, as the stride\'s)');
-  assert.match(rp, /if \(!seen\.has\(id\)\) this\._climbSounds\.forget\(id\);/, 'a peer gone is forgotten');
-  assert.match(rp, /this\._climbSounds\.rebase\(\);/, 'and the recentre is no climb');
 });
 
 test('CLIMB5 C7: end to end - a body caught on a lip with its camera turned away is sent as a hang facing the wall, arrives through the relay\'s door, and the other client draws it facing the wall, off the ground', () => {

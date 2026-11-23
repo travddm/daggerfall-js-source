@@ -47,8 +47,7 @@ function wrapShellStorage(bridge) {
   };
 }
 
-/** ONLINE1 (TABS1, Mac: "even though I load in with a different save,
- *  it always says the character is open in another window"): THE TAB'S
+/** ONLINE1 (TABS1): THE TAB'S
  *  OWN storage - what a session keeps for the life of one tab and no
  *  other. The online id lived in the browser's storage, so two tabs of
  *  one browser shared it and the second hello replaced the first,

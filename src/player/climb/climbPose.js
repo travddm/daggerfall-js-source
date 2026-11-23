@@ -1,6 +1,4 @@
-// CLIMB6 - THE MORROWIND BODY ON THE WALL, THE CLIMB'S HALF (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md;
-// Mac: "Definitely want you to use the morrowind model to get correct animations for everything. Be as detailed as
-// possible").
+// CLIMB6 - THE MORROWIND BODY ON THE WALL, THE CLIMB'S HALF (the Enhanced Climbing arc;
 //
 // The motor climbs a capsule; this is what the body's limbs do about it. A law per body (the own body and its arms
 // share one, every peer has its own), fed the climb a frame at a time - the hold (a lip, a face), the move in flight

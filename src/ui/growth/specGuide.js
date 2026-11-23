@@ -1,6 +1,5 @@
 // @ts-check
-// GROWTH2 (2026-10-17, the owner: "properly give the specialization its own UI for ease of player use and proper
-// descriptions instead of keeping players guessing"; bible/10-UI/Growth.md section 5) - THE SPECIALISATIONS GUIDE, the
+// GROWTH2 - THE SPECIALISATIONS GUIDE, the
 // Growth tab's page (ui/growth/growthTab.js). Every path of both families - the arcane (systems/arcanePaths.js, a pair of
 // the six schools) and the martial (systems/martialPaths.js, a pair of the six weapon skills) - with what opens it,
 // measured on this character (each skill's value, mastered or not, its career group's slots), what it does (its passive,
@@ -21,7 +20,6 @@ import { signatureSpell } from '../../systems/signatureSpells.js';
 import { specResetRefusal, resetSpec, resetField } from '../../systems/specReset.js';   // SPEC-RESET: a held path given up, for gold
 import { SKILL_SWAP_GOLD, swapOutChoices, swapInChoices, skillSwapRefusal, swapGroupOf, swapSkill, swappedCareer, swapOpens, swapShortfall } from '../../systems/skillSwap.js';   // SKILL-SWAP: a class skill given up for another, for gold
 import { alreadyMasteredASkill } from '../../systems/advancement.js';   // AUDIT SUGGESTIONS-1019 L5-2: the 95 lock a swap moves
-import { usesVirtueLeveling } from '../../systems/oblivionLeveling.js';   // SWAP-CYCLE: the skill sum levels nothing on Oblivion's bar
 import { computeEntityMods } from '../../systems/entityMods.js';   // AUDIT SPEC-RESET L1-3: a chosen path's stats now
 import { sigilDueling } from '../../systems/sigil/sigil.js';
 import { lootRarityOn } from '../../systems/loot/lootRarity.js';
@@ -233,8 +231,8 @@ export function specGuideModel(entity) {
       const before = alreadyMasteredASkill(entity), after = alreadyMasteredASkill({ ...entity, career: swappedCareer(entity, out, inn) });
       return before === after ? null : after ? 'on' : 'off';
     },
-    // SWAP-CYCLE: the points the class's skills make up before the next level comes closer - none on Oblivion's bar
-    shortfall: (out, inn) => (usesVirtueLeveling(entity) ? 0 : swapShortfall(entity, out, inn)),
+    // SWAP-CYCLE: the points the class's skills make up before the next level comes closer
+    shortfall: (out, inn) => swapShortfall(entity, out, inn),
   } : null;
   // AUDIT SUGGESTIONS-1019 L5-1: a family's hint only where ONE swap would open a path, the masteries and slots as they stand
   for (const f of families) {

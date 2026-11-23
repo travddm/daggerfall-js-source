@@ -1,6 +1,5 @@
 // @ts-check
-// AUDIT ARENA-LADDER (2026-10-05, the owner: "ensure climbing the PvE ladder isnt an easy feat"; asked what may be used
-// on the sand, "No cheese spells or potions"): THE SAND'S KIT LAW. From the bell to the healers a ladder bout is fought
+// AUDIT ARENA-LADDER: THE SAND'S KIT LAW. From the bell to the healers a ladder bout is fought
 // with arms, armour and fighting magic. Before it the ladder fell to a pack: potions drunk mid-bout, Levitate over a
 // ring the clamp held only across the ground (the beasts, the Orc Warlord and the Grand Champion melee-only below),
 // Invisibility no class fighter sees through, a Calm or a Charm on the fighter. So, while the player's own LADDER bout is

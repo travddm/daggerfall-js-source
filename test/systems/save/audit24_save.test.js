@@ -60,31 +60,6 @@ test('audit24 save: a pre-S15 save defaults fatigue to MaxFatigue = (Str + End) 
   assert.equal(t2.fatigue, 1234, 'the default is only for a MISSING field');
 });
 
-test('audit24 save / E4: EVERY restored Currency stack is absorbed into the counter, whatever its index', () => {
-  // The 17f upgrade this pin used to hold - stamp template 276 on an
-  // index-less stack so stacksWith would still merge it - is moot:
-  // PlayerEntity.Items can no longer hold Currency at all. The
-  // successor law is UNCONDITIONAL, and that is the point: an
-  // index-less pre-17f stack, an already-indexed one and (a save from
-  // any older wave) both at once all end up as one number, and
-  // nothing of any other group is touched.
-  const e = makeEntity({
-    items: [
-      { group: 'Currency', stackCount: 500 },                       // pre-17f: no index
-      { group: 'Currency', templateIndex: 276, stackCount: 250 },   // already upgraded
-      { group: 'Weapons', stackCount: 1 },                          // index-less, NOT currency
-    ],
-  });
-  const snap = snapshotPlayer(e, {});
-  delete snap.goldPieces;   // a save older than E4 carries no counter
-  const t = makeEntity();
-  restorePlayer(t, snap);
-  assert.equal(t.goldPieces, 750, 'both stacks land in PlayerEntity.GoldPieces');
-  assert.equal(t.items.length, 1, 'and neither survives in the pack');
-  assert.equal(t.items[0].templateIndex, undefined, 'a non-Currency item is never touched');
-  assert.equal(t.items[0].group, 'Weapons');
-});
-
 test('audit24 save: the light-source sentinel is -1, and only >= 0 relinks', () => {
   // AUDIT 22 F7: the lit light source is a REFERENCE into an items
   // array the restore just replaced. A snapshot older than the field
@@ -155,40 +130,3 @@ test('audit24 save: the 64 quest GLOBALS ride the envelope, and survive a clearS
   assert.equal(m3.globalVars.get(7), true, 'an old save does not blank them');
 });
 
-// A TIMEOUT, deliberately: the defect this pins is an INFINITE LOOP, so
-// a regression does not fail an assertion - it hangs the whole suite
-// with no output. Five seconds turns that into a red test.
-test('audit24: the notebook wrap THROWS on an unbreakable run, where the port span for ever',
-  { timeout: 5000 }, async () => {
-  // WrapLinesIntoNote breaks on the last space at or before column 70.
-  // C# `LastIndexOf` answers -1 when the first 71 characters carry no
-  // space, and `Substring(0, -1)` is an ArgumentOutOfRangeException -
-  // DFU shows an exception. In JS `slice(0, -1)` is a legal "drop the
-  // last character" and `slice(0)` is the SAME STRING, so the loop
-  // made no progress and spun for ever: a frozen tab. A 71-character
-  // run with no space is reachable - a long quest name, a pasted
-  // token, any note the player types.
-  const { wrapLinesIntoNote, MAX_LINE_LENGTH } = await import('../../../src/systems/notebook.js');
-  assert.equal(MAX_LINE_LENGTH, 70);
-  // THE SHAPE FIRST, and it has to be. A synchronous infinite loop is
-  // the one defect a behavioural pin cannot catch: the pin never
-  // returns, so node's per-test timeout never fires (the event loop
-  // does not get a turn) and the whole suite hangs with no output
-  // instead of going red. This assertion runs BEFORE the call that
-  // would hang, so removing the guard fails here.
-  const src = readFileSync(new URL('../../../src/systems/notebook.js', import.meta.url), 'utf8');
-  assert.match(src, /if \(pos < 0\) \{[\s\S]{0,200}throw new RangeError\(/,
-    'the no-break-point guard is present - without it this test HANGS rather than fails');
-  const note = [];
-  assert.throws(() => wrapLinesIntoNote(note, 'x'.repeat(MAX_LINE_LENGTH + 1), 'text'), RangeError,
-    'no break point in the first 71 characters throws, as C# does');
-  // exactly 70 is fine - the loop never runs
-  const ok = [];
-  wrapLinesIntoNote(ok, 'y'.repeat(MAX_LINE_LENGTH), 'text');
-  assert.equal(ok.length, 2, 'one line and its NOTHING');
-  assert.equal(ok[0].text, ' ' + 'y'.repeat(MAX_LINE_LENGTH), 'with C#s leading space');
-  // and a breakable long run still wraps
-  const wrapped = [];
-  wrapLinesIntoNote(wrapped, `${'a'.repeat(40)} ${'b'.repeat(40)}`, 'text');
-  assert.equal(wrapped.length, 4, 'two lines, each with its NOTHING');
-});

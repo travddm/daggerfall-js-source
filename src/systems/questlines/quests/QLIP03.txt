@@ -1,4 +1,4 @@
--- QL15 (2026-10-19; bible/06-Systems/Questlines-Arc.md section 4.5): THE COURT CRAFTER, step 3 of 3.
+-- QL15 (2026-10-19; docs/systems/quests.md): THE COURT CRAFTER, step 3 of 3.
 -- The port's own script on DFU's machine (systems/questlines/qlLines.js). Started by the line's runner an hour after
 -- step 2 ends: the crafter's word is in the journal at once. The giver is unnamed (a court crafter): a Smith of the
 -- player's own town, at its general store. The act is the stations' (qlActs.js piece-crafted - net/profBook.js, a piece

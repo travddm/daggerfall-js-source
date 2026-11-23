@@ -1,5 +1,5 @@
 // @ts-check
-// WITCH1 (2026-10-20, the owner: "a brand new item (profile icon)"; bible/06-Systems/Witches-Festival.md): THE PROFILE
+// WITCH1: THE PROFILE
 // ICONS - a picture a player WEARS in their portrait well in place of their character's face (net/identityToken.js
 // ICONS, signed as `pi`): the profile mark in the menu's corner (ui/profileBadge.js), the account card's plate
 // (ui/enhanced/enhancedAccount.js) and another player's Inspect card (ui/profileWindow.js). The Witches' Festival brings

@@ -1,4 +1,4 @@
-// HALL-GOLD (FIELD BUGS 2026-10-03, the Patreon chat - a guild of realm characters with "Buy it for Empire of Tamriel:
+// A report from the players' chat (a guild of realm characters with "Buy it for Empire of Tamriel:
 // 1274880 gold from the treasury" at a house's door: "we have the cash, began with putting it all in guild bank, but then
 // when we went to buy it says whats above ... so went and took all out and put in in bank thinking it meant it had to be
 // within the realm ... so is this a glitch, or r we not putting gold in right place").
@@ -43,7 +43,6 @@ test('HALL-GOLD the Guild tab: the service\'s view carries what of the treasury 
   svc.env.DB._raw.prepare('UPDATE guilds SET treasury = treasury + 40000').run();   // gold that came in before the realm
   v = await view();
   assert.deepEqual([v.treasury, v.hallGold], [100_000, 60_000], 'the treasury\'s whole, and what of it buys a hall');
-  // PIN MOVED: AUDIT GUILD3 W15 - the Treasury's sentence, one rule said once: a hall, or a new name or tag
   assert.equal(guildHallGoldText(v.hallGold, v.treasury), '60,000 of the treasury\'s 100,000 gold was put in by realm characters and can buy a hall, or a new name or tag. Gold in a bank account cannot.');
   assert.equal(guildHallGoldText(undefined, 5), null, 'an older service\'s answer: nothing said');
   const panel = rd('src/ui/socialPanel.js');

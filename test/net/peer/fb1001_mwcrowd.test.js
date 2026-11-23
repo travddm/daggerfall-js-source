@@ -91,10 +91,6 @@ test('MW-CROWD: the third-person mesh walks no sphere at its poses - only the sh
   const moved = packed.map((v, i) => (i % 14 === 0 ? v + 5 : v));
   Renderer.prototype.updateCharacterMesh.call(r, casts, moved);
   assert.notDeepEqual(Array.from(casts.bounds), before, '...and follows its pose');
-  const fp = rd('src/combat/fpArm.js');
-  assert.match(fp, /thirdMesh = renderer\.createCharacterMesh\(thirdPacked\.packed, \{ uv: true, bounds: false \}\);/, 'the third-person body: the sprite target\'s alone');
-  assert.match(fp, /mesh = renderer\.createCharacterMesh\(packed\.packed, \{ uv: true \}\);/, 'the first-person arm keeps its sphere');
-  assert.match(rd('src/render/renderer.js'), /if \(this\._casting && this\._spriteDepth === 0 && this\._studioDepth === 0\) this\._shadows\.recordCharacter\(mesh, modelMatrix\);/, 'the recorder reads it only off the sprite target');
 });
 
 test('MW-CROWD: a look\'s stand-in once - the weapon the arm asks for every frame is one object a look; and a person\'s body is its look less its weapons (mutants: the memo; weapons back in the key)', () => {

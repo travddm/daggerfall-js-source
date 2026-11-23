@@ -34,7 +34,7 @@ DFU is MIT (Interkarma and contributors); see the repo's attribution.
 ## What is committed
 
 | Path | What |
-|---|---|
+| --- | --- |
 | `cs/Dump.cs`, `cs/Dump2.cs` | the driver — one subcommand per corpus |
 | `cs/shim/UnityShim.cs` | `Color32`, `Color`, `Mathf`, `Debug`, `Resources`, `Application`. **`Mathf.RoundToInt` is banker's rounding** — Unity rounds half to even and that is load-bearing here |
 | `cs/shim/GameShim.cs` | the vanilla, no-mods, default-settings path for the few game-layer members the readers touch |
@@ -64,7 +64,7 @@ A difference is not automatically a port bug. Check, in order:
    AUDIT 18 caught three of its own this way — loading with `UseDisk` where DFU
    uses `UseMemory` (which skips `Arch3dPatch`) produced 8 fake mesh
    divergences; sharing one `DFPalette` across IMG files corrupted later ones.
-2. **`bible/01-Overview/Port-Ledger.md` A and B.** Approved departures and
+2. Approved departures and
    deliberately preserved DFU bugs are not findings. Row 18's float→double
    widening alone accounts for 52,505 of 1,917,087 UVs against a STOCK DFU
    build - which is why `patches/FaceUVTool.cs.patch` widens DFU's side too,

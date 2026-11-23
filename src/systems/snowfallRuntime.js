@@ -1,4 +1,4 @@
-// SNOWFALL1 (2026-10-08): THE SNOW, STOOD ROUND THE PLAYER - DynamicSnowController, MidDetailSnowRing, StreamedSnow-
+// SNOWFALL1: THE SNOW, STOOD ROUND THE PLAYER - DynamicSnowController, MidDetailSnowRing, StreamedSnow-
 // BlanketPrototype, FarTrackMask, SnowContextData and BlanketSurfaceSamples, ported off the assembly over the law in
 // systems/snowfall.js. GL-free: it keeps the meshes and the masks as arrays and says what changed; render/snowfall-
 // Surface.js uploads and draws them, and scenes/snowfallHost.js hands it the frame and the world.
@@ -31,6 +31,7 @@ import {
 import { roundToInt } from './mathf.js';
 import { dateFromClassicMinutes, seasonValue, SEASONS } from './gameDate.js';
 import { getWorldClimateSettings, CLIMATE_BASE_TYPES } from '../formats/mapsFile.js';
+import { WORLD_PIXEL_SPAN } from '../world/worldWide/worldGrid.js';   // BAY-LEFT-GROUND: Prepare's clamp, the world's grid
 
 const f32 = Math.fround;
 
@@ -92,6 +93,15 @@ const distanceF = (ax, ay, bx, by) => { const dx = f32(ax - bx), dy = f32(ay - b
 const steepnessOf = (n) => Math.acos(Math.max(-1, Math.min(1, n[1]))) * (180 / Math.PI);   // TerrainData.GetSteepness: the normal's angle to up
 
 // ---- SnowContextData's sampling ------------------------------------------------------------------------------------
+/** BAY-LEFT-GROUND (the audit "no system left behind in the Bay", D3): Prepare's box held to THE WORLD'S metres - its
+ *  grid's pixels either way of the Bay's corner (world/worldWide/worldGrid.js inWorldGrid), 819.2 m a pixel, the global
+ *  z north from the Bay's south edge (499 - py). DFU's map is the Bay's 0..819,200 x 0..409,600, and held to it a box past
+ *  the Bay stood on no ground: no deep snow, no track, no berm anywhere past it. On the Bay, away from its edge, the same box. */
+export const SNOW_WORLD_METRES = Object.freeze({
+  minX: -(WORLD_PIXEL_SPAN - 1) * 819.2, maxX: WORLD_PIXEL_SPAN * 819.2,
+  minZ: (500 - WORLD_PIXEL_SPAN) * 819.2, maxZ: (499 + WORLD_PIXEL_SPAN) * 819.2,
+});
+
 /** SnowContextData: the vanilla locations, the authored footprints and the Basic Roads tiles round a centre, and the
  *  four weights a place takes from them (settlement, location cap, path, berm). */
 export class SnowContext {
@@ -118,7 +128,8 @@ export class SnowContext {
     this.locations = s?.locationLoaderIntegration && this.world.footprints ? this.world.footprints(gx, gz, radius + loaderFeather) : [];
     const reach = s?.basicRoadsIntegration ? Math.max(s.pathBoundaryFeather, s.roadBermWidth) : 0;
     const span = Math.ceil((radius + Math.max(feather, reach)) * 40) / 40;
-    const minGX = Math.max(0, gx - span), minGZ = Math.max(0, gz - span), maxGX = Math.min(819200, gx + span), maxGZ = Math.min(409600, gz + span);
+    const W = SNOW_WORLD_METRES;   // BAY-LEFT-GROUND: the world's, where DFU's map was the Bay's (0..819200 x 0..409600)
+    const minGX = Math.max(W.minX, gx - span), minGZ = Math.max(W.minZ, gz - span), maxGX = Math.min(W.maxX, gx + span), maxGZ = Math.min(W.maxZ, gz + span);
     if (s?.basicRoadsIntegration) {
       for (const t of this.world.terrainsIn(minGX, minGZ, maxGX, maxGZ)) {   // AUDIT ENVIRONS S1: the box's own map pixels, wherever the player stands
         const roads = t.roads;
@@ -987,7 +998,7 @@ export class SnowfallRuntime {
     // Overworld journey under the travel view, kept every pixel the world destroyed meanwhile
     if (!B.active) {
       if (was) { B.queue.length = 0; B.queued.clear(); }
-      // MEM-AUDIT (2026-10-23): AND ITS OVERLAYS ARE PRUNED STILL. The prune below ran only while the tier was active, so
+      // MEM-AUDIT: AND ITS OVERLAYS ARE PRUNED STILL. The prune below ran only while the tier was active, so
       // an indoors or a journey under the travel view kept every overlay of the last ring - and each its tile, and the
       // tile its map pixel's whole entry, long after the world destroyed it. The same prune, on the same schedule: a tile
       // still standing keeps its overlay for the door or the view coming down, as before

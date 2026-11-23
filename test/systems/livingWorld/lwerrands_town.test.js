@@ -1,5 +1,4 @@
-// LW-ERRANDS (2026-10-06, bible/06-Systems/Living-World.md "LW-ERRANDS"; Mac: "NPCs should also utilize going into
-// guilds, shops, etc"): THE TOWN'S PEOPLE GO INTO ITS GUILD HALLS AND ITS SHOPS ON THEIR OWN BUSINESS. A guild hall saw
+// LW-ERRANDS: THE TOWN'S PEOPLE GO INTO ITS GUILD HALLS AND ITS SHOPS ON THEIR OWN BUSINESS. A guild hall saw
 // its own two members and a sellsword's or an adventurer's hour - one of the two halls nearest their home, whatever its
 // guild (a sorcerer at the Fighters Guild) - and nobody else: 10-12 a day in a city of three hundred. An errand went
 // into one of the four shops nearest home or stood at a market, half and half, whatever the trade: a city's banks saw

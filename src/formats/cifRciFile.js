@@ -239,7 +239,7 @@ export class CifRciFile extends BaseImageFile {
       pos += 2;
 
       this._records.push({
-        // AUDIT 24 formats: ReadWeaponCif sets only
+        // ReadWeaponCif sets only
         // `records[count].Header.FrameCount = FrameCount;`
         // (CifRciFile.cs:456) over a default-initialised
         // ImgFileHeader STRUCT, so the other fields are 0, not

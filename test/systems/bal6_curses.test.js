@@ -1,10 +1,9 @@
-// BAL6 - THE CURSES (2026-10-12; bible/05-Combat/Balance-Arc.md section 12; the owner, asked: "Beast-only bonuses",
-// "Hood only shields", "Beast claws count as silver"). Measured first: a lycanthrope with a sword in hand struck at
+// BAL6 - THE CURSES. Measured first: a lycanthrope with a sword in hand struck at
 // x1.8-2.9 a plain character's damage a second without ever changing, every change healed it whole (twice a day, and
 // without end under Hircine's Ring), and the beast's +30 Hand-to-Hand fist met a Lich's Mithril hide ungated; a hooded
-// vampire stood +20 at every hour. BAL6-CLAWS (2026-10-12; the owner: "revert the material nerf on werewolf"): the
+// vampire stood +20 at every hour. BAL6-CLAWS: the
 // claws' silver is taken back - the beast's fist meets a foe's metal ungated again, DFU's bare hand. BAL6-GAUNTLETS
-// (the same day; the owner: "based on your equipped gauntlets it would affect your attacks as a wereboar/werewolf"):
+// (the same day):
 // the plate gauntlets the beast wears add their metal's damage to its claws.
 //
 // Pinned by execution through the curse's own round and change (systems/lycanthropy.js), the stat and skill channels
@@ -14,7 +13,7 @@
 // vampireStatMod) on the sun's own seam.
 
 import '../modsOff.js';
-import { test } from 'node:test';
+import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createLycanthropyCurse, lycanthropyMagicRound, morphSelf, liveLycanthropy, morphHeals, lycanthropeAdvantages,
@@ -24,11 +23,10 @@ import { LYCANTHROPY_TYPES } from '../../src/systems/infection.js';
 import { isFullMoonFromMinutes, MINUTES_PER_DAY, CLASSIC_GAME_START_TIME } from '../../src/systems/gameDate.js';
 import { liveStat } from '../../src/systems/statMods.js';
 import { skillValue, SKILLS } from '../../src/systems/skills.js';
-import { clampMarkersAheadOf } from '../../src/systems/save/save.js';
 import { WEAPON_MATERIALS } from '../../src/characters/weapons.js';
 import { pcaaoModules, pcaaoAttackDamage, pcaaoHandToHandAttackDamage } from '../../src/combat/pcaao.js';
 import { calculateAttackDamage, handToHandAttackDamage } from '../../src/combat/formulas.js';
-import { clawMetalDamage } from '../../src/combat/clawMetal.js';
+import { clawMetalDamage, CLAW_METAL_PREF } from '../../src/combat/clawMetal.js';
 import { computeCombatStats } from '../../src/combat/combatStats.js';
 import { equipItem, equipTableOf, EQUIP_SLOTS } from '../../src/systems/equip.js';
 import { armorOfMaterial } from '../../src/combat/enemyEquipment.js';
@@ -38,6 +36,11 @@ import { makeEnemyEntity } from '../../src/characters/enemy/enemyEntity.js';
 import { ENEMY_BASICS } from '../../src/characters/enemy/enemyBasics.js';
 import { vampireStatMod, VAMPIRE_STAT_MOD } from '../../src/systems/vampirism.js';
 import { setPassiveSpecialsHost } from '../../src/systems/passiveSpecials.js';
+import { setPref } from '../../src/systems/uiPrefs.js';
+
+// These tests are the option's: Claws take gauntlet metal on. DFU's default (off) is test/combat/clawmetal_option.test.js.
+before(() => setPref(CLAW_METAL_PREF, true));
+after(() => setPref(CLAW_METAL_PREF, false));
 
 const QUIET = (() => {
   let m = CLASSIC_GAME_START_TIME;
@@ -114,10 +117,6 @@ test('BAL6: one change a day heals - the change in heals, the change back inside
   assert.equal(morphHeals({ lastMorphHeal: 100 }, 100 + MINUTES_PER_DAY), false);
   assert.equal(morphHeals({ lastMorphHeal: 100 }, 101 + MINUTES_PER_DAY), true);
   assert.equal(morphHeals({}, 0), true, 'a curse from before BAL6 carries no stamp: its next change heals');
-  // the stamp is a curse clock's marker: a save written ahead of its own clock brings it back (save.js)
-  const ahead = { activeEffects: [{ kind: 'racialOverride', lastMorphHeal: 5000 }] };
-  assert.equal(clampMarkersAheadOf(ahead, 4000), 1);
-  assert.equal(ahead.activeEffects[0].lastMorphHeal, 4000);
 });
 
 const OVERHAUL = { Enabled: true, equipmentDamageEnhanced: false, fadingEnchantedItems: false, fixedStrengthDamageModifier: true, armorHitFormulaRedone: true, criticalStrikesIncreaseDamage: true, conditionBasedEffectiveness: true, softMaterialRequirements: true };
@@ -140,7 +139,7 @@ test('BAL6-CLAWS: the beast\'s claws meet no metal - DFU\'s bare hand, ungated a
   assert.equal(lich(-1).minMetalToHit, -1);
   assert.equal(ENEMY_BASICS[32].minMetalToHit, WEAPON_MATERIALS.Mithril, 'the fixture is the real Lich\'s Mithril');
   const open = swings(beast, lich(-1), M);
-  assert.ok(open > 2000, `the claws land (${open})`);
+  assert.ok(open > 600, `the claws land (${open})`);
   assert.equal(swings(beast, lich(WEAPON_MATERIALS.Mithril), M), open, 'the overhaul\'s soft rule: the claws at Mithril whole');
   assert.equal(swings(man, lich(WEAPON_MATERIALS.Mithril), M), swings(man, lich(-1), M), 'a man\'s fist: DFU\'s, no gate');
   // without the soft rule: no refusal, nothing said

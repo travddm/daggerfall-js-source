@@ -1,6 +1,5 @@
 // @ts-check
-// LOOT9 (2026-10-01, the Loot arc - bible/06-Systems/Loot-Arc.md section 11; Mac: "Do you wanna turn this into an arc
-// and do all of the above?" - "spend it at the Mages Guild to reroll one affix"): THE REFORGE'S WINDOW.
+// LOOT9: THE REFORGE'S WINDOW.
 //
 // Two pages over the player's own pack: REFORGE - every piece the Reforge takes (a Magic or Rare piece, an Exalted
 // Legendary), a row each in its tier's frame; a row pressed shows the piece whole beside the list, and each line the
@@ -50,13 +49,13 @@ const el = (tag, cls = null, text = null) => {
 export const REFORGE_TITLE = 'The Reforge';
 export const REFORGE_SUB = 'Spend Welkynd Shards and gold to remake or improve one line · Salvage breaks a piece into shards';   // LOOT17: the hone
 export const REFORGE_PAGES = Object.freeze({ reforge: 'Reforge', imbue: 'Imbue', salvage: 'Salvage', imprint: 'Imprint', codex: 'Codex', scry: 'Scry', sockets: 'Sockets', lift: 'Lift Curse' });   // LOOT10: the imprint and the codex; LOOT16: the temple's lifting; LOOT19: scrying; LOOT20: sockets
-/** MENU-ORDER (2026-10-12): each page's picture (ui/menu/menuGlyphs.js). */
+/** MENU-ORDER: each page's picture (ui/menu/menuGlyphs.js). */
 export const REFORGE_PAGE_ICONS = Object.freeze({ reforge: 'anvil', imbue: 'flask', salvage: 'chisel', imprint: 'rune', codex: 'books', scry: 'eye', sockets: 'gem', lift: 'light' });
 /** The pages the guild's window shows when its host names none - never the temple's (LOOT16); LOOT19: and its scryers'. */
 export const REFORGE_GUILD_PAGES = Object.freeze(['reforge', 'imbue', 'salvage', 'imprint', 'codex', 'scry', 'sockets']);   // LOOT20: and its sockets; LOOT-GATE: the Imbue
-/** LOOT20 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 12): THE SOCKETS' PAGE - every piece of the pack with
+/** LOOT20 (the Loot arc II): THE SOCKETS' PAGE - every piece of the pack with
  *  a socket; picked, its card - an empty socket offers each gem the pack holds, a set one its unsetting, asked first.
- *  GEM1 (bible/06-Systems/Gem-Sockets.md section 3): a row a socket of the piece, and a set one's EXTRACTION beside its
+ *  GEM1: a row a socket of the piece, and a set one's EXTRACTION beside its
  *  unsetting - the gem out whole, for gold by its grade; setting is free (the pack's card sets too). */
 export const SOCKETS_NONE = 'Nothing in your pack has a socket. Weapons, Rares and Legendaries found as loot can have one.';
 export const GEMS_NONE = 'You have no gems to set. Any grade of Ruby, Emerald, Sapphire, Diamond, Jade, Turquoise, Malachite or Amber will do.';
@@ -65,12 +64,12 @@ export const UNSET_ASK = (gem) => `Unset the ${GEM_NAMES[gem] ?? 'gem'}? It shat
 export const GEM_SHATTERED = (name, gem) => `The ${GEM_NAMES[gem] ?? 'gem'} in ${name} shatters. The socket is empty.`;
 export const GEM_EXTRACTED = (name, gem, price) => `Extracted: the ${GEM_NAMES[gem] ?? 'gem'} from ${name}, for ${price} gold.`;
 export const SOCKETS_NOTE = 'Setting a gem is free. Unsetting a gem destroys it, or the guild can extract it intact for gold, based on its grade.';
-/** LOOT19 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 11): THE SCRYERS' PAGE - a row a family, its dungeon
+/** LOOT19 (the Loot arc II): THE SCRYERS' PAGE - a row a family, its dungeon
  *  kinds, the price, and a press that names the nearest of its haunts in the region not yet on the map (systems/
  *  lootScry.js); asked first of the region, so a family with nothing hidden says so before a coin is taken. */
 export const SCRIED = (name, family) => `Scried: ${name}, a haunt of ${String(SCRY_FAMILY_WORDS[family] ?? 'them').toLowerCase()}. It is on your map now.`;
 export const SCRY_FOR_KIN = 'Scry for who carries it';
-/** LOOT16 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 8): THE TEMPLE'S PAGE - the window on its one page,
+/** LOOT16 (the Loot arc II): THE TEMPLE'S PAGE - the window on its one page,
  *  opened by a temple's Cure Disease priest (scenes/worldModes.js openLift): every known cursed piece of the pack, its
  *  drawback named, its price, and a press that lifts it (systems/loot/lootCurse.js liftCurse). */
 export const LIFT_TITLE = 'Lift a Curse';
@@ -134,14 +133,14 @@ export function reforgeLabel(why, price, have, verb = 'Reforge') {
 /** The last word of a press. */
 export const REFORGED = (name, line) => `Reforged: ${name} - ${line}.`;
 export const HONED = (name, line) => `Honed: ${name} - ${line}.`;   // LOOT17
-/** REFORGE-REPLACE (the owner: "Replace, price rises"): the card's word on the Reforge's price - what it does, and that
+/** REFORGE-REPLACE: the card's word on the Reforge's price - what it does, and that
  *  the next costs twice. */
 export const REFORGE_NOTE = (price) => t('reforge.note', 'A reforge costs {price}. It always replaces the line with a different kind, and the price doubles with each reforge on this piece.', { price: reforgePriceText(price) });
 /** LOOT17: the card's word on the hone's price. */
 export const HONE_NOTE = (price) => `A hone costs ${reforgePriceText(price)}. The price doubles with each hone, and a line at its highest value can't be honed.`;
 export const SALVAGED = (name, n) => `Salvaged: ${name}, for ${shardsText(n)}.`;
 export const BREAK_ASK = (name, n) => `Break ${name} for ${shardsText(n)}? It is gone for good.`;
-/** LOOT18 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 10): SALVAGE EVERY MAGIC - one press, asked first. */
+/** LOOT18 (the Loot arc II): SALVAGE EVERY MAGIC - one press, asked first. */
 export const EVERY_MAGIC = 'every-magic';
 export const EVERY_MAGIC_LABEL = (n) => `Salvage every Magic (${n})`;
 export const EVERY_MAGIC_ASK = (n, shards) => `Break all ${n} Magic pieces for ${shardsText(shards)}? They are gone for good.`;

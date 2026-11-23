@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// FIRM1 (2026-10-13) - THE FIRMAMENT'S LAW: what a star gives, what a character may spend, which allocations are
+// FIRM1 - THE FIRMAMENT'S LAW: what a star gives, what a character may spend, which allocations are
 // whole, what a refund costs, and THE BUDGET - the most the whole sky may ever add to a character, however it is spent.
-// The tree is firmamentTree.js; the record is bible/06-Systems/Firmament.md.
+// The tree is firmamentTree.js; the record is.
 //
 // ═══ THE TWO PURSES ═════════════════════════════════════════════════
 //
@@ -89,35 +89,37 @@ const def = (kind, max, words, min = -max) => Object.freeze({ kind, max, min, wo
 export const STAT_DEFS = Object.freeze({
   ...Object.fromEntries(ATTRIBUTES.map((a) => [a, def(a === 'personality' ? 'life' : 'combat', 15, (v) => `${signed(v)} ${cap1(a)}`)])),
   // the weapon's blow - each channel capped, then the blow's whole group (BLOW_CAP, blowPct)
-  weaponDmg: def('combat', 30, (v) => `${signed(v)}% damage with all weapons`, -20),
-  meleeDmg: def('combat', 30, (v) => `${signed(v)}% melee weapon damage`, -20),
-  bowDmg: def('combat', 30, (v) => `${signed(v)}% damage with bows`),
-  fistDmg: def('combat', 30, (v) => `${signed(v)}% hand-to-hand damage`),
-  shortDmg: def('combat', 30, (v) => `${signed(v)}% damage with short blades`),
-  longDmg: def('combat', 30, (v) => `${signed(v)}% damage with long blades`),
-  axeDmg: def('combat', 30, (v) => `${signed(v)}% damage with axes`),
-  bluntDmg: def('combat', 30, (v) => `${signed(v)}% damage with blunt weapons`),
-  undeadDmg: def('combat', 30, (v) => `${signed(v)}% weapon damage against the undead`),
-  daedraDmg: def('combat', 30, (v) => `${signed(v)}% weapon damage against daedra`),
-  beastDmg: def('combat', 30, (v) => `${signed(v)}% weapon damage against animals`),
-  unawareDmg: def('combat', 40, (v) => `${signed(v)}% weapon damage against unaware foes`, 0),
-  rageDmg: def('combat', 25, (v) => `${signed(v)}% weapon damage while below half Health`, 0),
+  weaponDmg: def('combat', 6, (v) => `${signed(v)}% damage with all weapons`, -4),
+  meleeDmg: def('combat', 7, (v) => `${signed(v)}% melee weapon damage`, -4),
+  bowDmg: def('combat', 7, (v) => `${signed(v)}% damage with bows`),
+  fistDmg: def('combat', 6, (v) => `${signed(v)}% hand-to-hand damage`),
+  shortDmg: def('combat', 6, (v) => `${signed(v)}% damage with short blades`),
+  longDmg: def('combat', 6, (v) => `${signed(v)}% damage with long blades`),
+  axeDmg: def('combat', 6, (v) => `${signed(v)}% damage with axes`),
+  bluntDmg: def('combat', 6, (v) => `${signed(v)}% damage with blunt weapons`),
+  undeadDmg: def('combat', 6, (v) => `${signed(v)}% weapon damage against the undead`),
+  daedraDmg: def('combat', 6, (v) => `${signed(v)}% weapon damage against daedra`),
+  beastDmg: def('combat', 6, (v) => `${signed(v)}% weapon damage against animals`),
+  unawareDmg: def('combat', 8, (v) => `${signed(v)}% weapon damage against unaware foes`, 0),
+  rageDmg: def('combat', 5, (v) => `${signed(v)}% weapon damage while below half Health`, 0),
   // the spell
-  spellPower: def('combat', 30, (v) => `${signed(v)}% damage from your spells`, -20),
+  spellPower: def('combat', 6, (v) => `${signed(v)}% damage from your spells`, -4),
   spellPierce: def('combat', 10, (v) => `-${v} to saving throws against your spells`, 0),
   castCost: def('combat', 25, (v) => (v >= 0 ? `Spells cost ${v}% fewer Spell Points` : `Spells cost ${-v}% more Spell Points`), -20),
   castSpeed: def('combat', 15, (v) => `${signed(v)}% casting speed`),
   // what lands on you
-  blowTaken: def('combat', 30, (v) => pctLess(v, 'damage from blows'), -15),
-  spellTaken: def('combat', 30, (v) => pctLess(v, 'damage from spells and other harm'), -15),
+  blowTaken: def('combat', 8, (v) => pctLess(v, 'damage from blows'), -3),
+  spellTaken: def('combat', 8, (v) => pctLess(v, 'damage from spells and other harm'), -3),
   armor: def('combat', 10, (v) => `${signed(v)} to Armor Rating`),
-  hp: def('combat', 75, (v) => `${signed(v)} maximum Health`, 0),
+  // B5: Health is a few per cent of a body - the key stars' raw points 15 at most and the small stars' share 8% (the tree's sums, no cap
+  // above them), where it was 75 and 15% (a quarter of a level-45 body) beside Renown's 147
+  hp: def('combat', 15, (v) => `${signed(v)} maximum Health`, 0),
   mp: def('combat', 75, (v) => `${signed(v)} maximum Spell Points`, 0),
   // RAW ON THE KEY STARS, PERCENT ON THE SMALL (the lead dev, 2026-10-13: "combined with the ascend system you will get
   // waaay to many stat points just add stats with raw numbers to the key nodes and percentages to the smaller ones"): a
   // small star's Health and Spell Points are a share of the character's own, as its attributes and skills are (pct.*,
   // skillPct.* below)
-  hpPct: def('combat', 15, (v) => `${signed(v)}% maximum Health`, 0),
+  hpPct: def('combat', 8, (v) => `${signed(v)}% maximum Health`, 0),
   mpPct: def('combat', 15, (v) => `${signed(v)}% maximum Spell Points`, 0),
   hpRegen: def('combat', 10, (v) => `${(v / 10).toFixed(1)}% of Health restored each round`, 0),
   mpRegen: def('combat', 10, (v) => `${(v / 10).toFixed(1)}% of Spell Points restored each round`, 0),
@@ -167,6 +169,12 @@ const SKILL_PCT_DEF = Object.freeze({
 });
 /** The raw points a share of `base` comes to: whole, toward nothing. */
 export const pctOf = (base, pct) => (Number.isFinite(base) && base > 0 && pct > 0 ? Math.floor((base * pct) / 100) : 0);
+/** The Health the sky gives a body of `body` (the stored maximum with the online floor in it): the key stars' raw points and the
+ *  small stars' share together. `c` is the tree's capped totals (`treeStats`): each channel is held to its own sum, and the two
+ *  together are held to nothing (B5; the +75 budget over both is gone, so a card's number is what applies). Whole. */
+export function firmamentHealth(c, body) {
+  return (c.hp ?? 0) + pctOf(body, c.hpPct ?? 0);
+}
 const profName = (p) => cap1(p);
 const SKILL_DEF = Object.freeze({
   combat: Object.freeze(Object.fromEntries(COMBAT_SKILLS.map((n) => [n, def('combat', 15, (v) => `${signed(v)} ${SKILL_WORDS(n)}`)]))),
@@ -188,10 +196,10 @@ export const statWords = (key, v) => statDef(key)?.words(v) ?? `${key} ${signed(
 
 /** The most the sky adds to one weapon blow from its general channels (any weapon, melee, the weapon's family, the foe's
  *  kind) - and the most it takes away. */
-export const BLOW_CAP = 30;
+export const BLOW_CAP = 5;
 export const BLOW_FLOOR = -20;
 /** And from everything, the blow's conditions with it (an unaware foe, a wounded wielder). */
-export const BLOW_TOTAL_CAP = 50;
+export const BLOW_TOTAL_CAP = 6;
 /** The most the sky takes off a spell's price, all channels together. */
 export const CAST_COST_CAP = 25;
 

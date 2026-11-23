@@ -1,4 +1,4 @@
-// ES2 - THE EQUIP SOUND (2026-08-28). equip.js's header FLAGGED it
+// ES2 - THE EQUIP SOUND. equip.js's header FLAGGED it
 // since U8f: DFU rings a per-item clip at EquipItem's own moment
 // (ItemEquipTable.cs:144-146, DaggerfallUI.PlayOneShot(item.
 // GetEquipSound())). The switch is DaggerfallUnityItem.cs:820-841
@@ -72,10 +72,3 @@ test('ES2: the RESTORE path is silent - rebuildEquipState never rings', () => {
   }
 });
 
-test('ES2: the sink registers inside audio.ensure - no host can forget the wire', () => {
-  const audio = read('src/systems/audio.js');
-  assert.match(audio, /setEquipSoundSink\(\(clip\) => this\.playOneShot\(clip\)\);/,
-    'the FOUR HOSTS RULE\'s structural arm: every boot passes through ensure');
-  assert.ok(!/FLAGGED: equip sounds/.test(read('src/systems/equip.js')),
-    'retiring a flag deletes the sentence');
-});

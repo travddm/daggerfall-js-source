@@ -24,7 +24,7 @@ export function shellFromSprite(bmp, opts = {}) {
   const radiusZ = opts.radiusZ ?? 0.22;
   const height = opts.height ?? 0.9;
   const arc = opts.arc ?? Math.PI * 0.9;
-  // Profile mode (C6 restructure): the shell inherits the BODY's own
+  // Profile mode: the shell inherits the BODY's own
   // per-row half-extents - opts.profile(y) -> {rx, rz} (torsoProfile +
   // stand-off) with opts.yTop/yBottom placing sprite rows in absolute
   // rig space. Fixed-radius mode stays for callers without a body.

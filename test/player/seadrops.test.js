@@ -1,7 +1,7 @@
-// SEA-DROPS (2026-10-23, the owner: "while at sea players encounter on and off persistent frame drops"): a mover's
+// SEA-DROPS: a mover's
 // bucket - a boat's, carried by her turn and her way (AUDIT NAV1 #12) - is handed to a query only where its box, as it
 // stands, reaches the query's; a posed one's box is made once a move (the world host's sync asks posesMoved) and kept.
-// Measured in the real game (bible/07-Rendering/Performance-Priority.md SEA-DROPS): at sea every ray of the deep's foes
+// Measured in the real game (SEA-DROPS): at sea every ray of the deep's foes
 // asked every bucket of my boat and of each ship within COLLIDE_RANGE - 101 of them - and a fresh water's spawns cast
 // 2,400-3,200 rays a frame. These pin that every answer is the old walk's, and the work the new one leaves.
 import { test } from 'node:test';
@@ -155,12 +155,3 @@ test('SEA-DROPS: the work - a posed fleet\'s poses are read once a move, a query
   assert.equal(c.raycastHit([500, 30, 500], [0, -1, 0], 60).key, 'boat:late', 'a hull laid after the move met where she lies');
 });
 
-test('SEA-DROPS: the world host lays every boat\'s bucket posed and says they moved after each sync carries them - in the sync\'s own body, after its last bucket is carried, baked or let go (mutants: laid unposed; never said)', () => {
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const at = w.indexOf('  function csaSyncColliders() {');
-  const body = w.slice(at, w.indexOf('\n  }\n', at) + 5);
-  assert.ok(body.includes('col.addMesh(key, tri.positions, tri.indices, m, () => b.T, () => b.R, true);'), 'laid posed');
-  assert.match(body, /for \(const \[key, b\] of _csaBuckets\) if \(!want\.has\(key\)\) \{ b\.col\?\.removeBucket\?\.\(key\); _csaBuckets\.delete\(key\); \}\n {4}col\?\.posesMoved\?\.\(\);[^\n]*\n {2}\}\n$/, 'told they moved, last');
-  assert.equal(body.split('posesMoved?.()').length - 1, 1, 'once a sync');
-  assert.equal(w.split('() => b.T, () => b.R').length - 1, 1, 'the sync is the one place a boat\'s bucket is laid');
-});

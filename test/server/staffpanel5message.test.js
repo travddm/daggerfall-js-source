@@ -1,5 +1,4 @@
-// STAFF-PANEL5-MESSAGE (2026-10-22, mob, 04:14Z: a message in the middle of one player's screen; design doc "DFO Staff
-// Panel: design", Message on screen) - THE ACCOUNT SERVICE'S HALF (server-account/src/staffMessage.js), driven through the
+// STAFF-PANEL5-MESSAGE - THE ACCOUNT SERVICE'S HALF (server-account/src/staffMessage.js), driven through the
 // real Worker on the node:sqlite database every account pin stands on (test/accountDb.mjs): a message sent by account id,
 // bounded, paced, stored first and audited, its signed order posted to the relay's door, each one's state read back, and
 // the game's own two doors - the messages waiting, and the OK.
@@ -40,7 +39,7 @@ async function extensionKey() {
 async function stand(extra = {}) {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian,Tabbyvish', OWNER_HANDLES: 'Lattymoy,SirMcMobdon',
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian,Tabbyvish', SEAT_OWNERS: 'Lattymoy,SirMcMobdon',
     OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`, RELAY_LAW_URL: RELAY, ...extra,
   });
   const door = { pushed: [], say: [200, { ok: true, n: 1, old: 0 }] };
@@ -135,6 +134,10 @@ test('STAFF-PANEL5-MESSAGE: never by name, never empty, an account that exists, 
 
 test('STAFF-PANEL5-MESSAGE: one message every 5 seconds a staff member - a second inside it is refused 429 and audited failed, another member is not held by it, and 5 seconds on it goes (mutants: the gap unasked; the gap asked of everyone; the store\'s own ask dropped)', async () => {
   const s = await stand();
+  // The server reads whole seconds and the pin backdates by whole seconds: a second boundary between two steps would move the gap by one.
+  const realNow = Date.now;
+  const frozen = realNow();
+  Date.now = () => frozen;
   try {
     assert.equal((await s.send(s.asy, { target: s.troll.id, text: 'one' })).status, 200);
     assert.deepEqual(await s.send(s.asy, { target: s.sylvia.id, text: 'two' }), { status: 429, body: { error: 'staff-message-rate' } });
@@ -156,7 +159,7 @@ test('STAFF-PANEL5-MESSAGE: one message every 5 seconds a staff member - a secon
     try { assert.deepEqual(await s.send(s.tab, { target: s.troll.id, text: 'second' }), { status: 429, body: { error: 'staff-message-rate' } }); } finally { s.env.DB.prepare = realPrepare; }
     assert.ok(raced, 'the race was run');
     assert.equal(s.audits('message').at(-1).outcome, 'failed', 'and its audit row says it changed nothing');
-  } finally { s.restore(); }
+  } finally { Date.now = realNow; s.restore(); }
 });
 
 test('STAFF-PANEL5-MESSAGE: EACH MESSAGE\'S STATE - Delivered (the hub handed it), "old game, not shown", Not confirmed (no socket, the door refused, no relay), Sent (a door that gave no count), then "they pressed OK" from the player\'s own game (mutants: each state\'s rule)', async () => {

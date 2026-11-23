@@ -816,7 +816,7 @@ function figure(phase, eq, t) {
 
 // ── entry: resolve the baked params for (loco, hold, weapon) and pose the body in LOCAL space ──
 // s = { loco, hold, weapon, phase, action, mantleU, jumpU, recoil, recoilYaw, slidePos, muzzleT }
-// The bare-humanoid plugs (Toolkit-Arc S5): inert sockets, so buildBody(s) with NO plugs poses the base
+// The bare-humanoid plugs: inert sockets, so buildBody(s) with NO plugs poses the base
 // rig with empty hands - the toolkit's demo body. Covers exactly what the base path touches: the held +
 // stowed gun mounts, the scope rail, the relic hands, the armor pass (identity), and the one ungated
 // treatment default (ravager RGUN). Everything else is state-gated and never fires bare.

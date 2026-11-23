@@ -1,4 +1,4 @@
-// HCC (2026-09-23): A SYNTHETIC MODEL 41214 for the pins - the classic wagon's verified topology (102 vertices,
+// HCC: A SYNTHETIC MODEL 41214 for the pins - the classic wagon's verified topology (102 vertices,
 // 48 triangles, 4 sub-meshes, five welded components of 14 / 10 / 10 / 7 / 7 triangles with the wheels planar in X)
 // built from scratch, so wagon41214.js's split can be driven without the player's ARENA2. Every number here is what
 // Wagon41214VisualBuilder.TryBuild demands; a model off by one vertex is refused, which a pin also drives.

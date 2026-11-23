@@ -1,4 +1,4 @@
-// COST-2 part two (2026-10-25; bible/11-Multiplayer/Scale-Arc.md COST-2 part two): THE TREE MOVES, at the relay
+// COST-2 part two: THE TREE MOVES, at the relay
 // (server/src/cellMoves.js, cellNodes.js, cellHandover.js). The directory seeds its tree while `cellSeed` is on, hears its
 // nodes' counts, plans a move when the law says one is due, and makes it in its alarm - each departing layer's rows sent
 // and kept, the tree committed, then every socket closed CLOSE_REPARTITION and the rows sent again and let go - resuming
@@ -21,7 +21,6 @@ import { RELAY_CFG_TTL_MS } from '../../src/net/relayCfg.js';
 import { CELL_MOVED_KEY, CELL_PULLED_KEY } from '../../server/src/cellHandover.js';
 import { tellCell, SEV_INTERNAL_CALL } from '../../server/src/staffEvents.js';
 import { RoomMetrics } from '../../server/src/relayScale.js';
-import { loadSql } from '../../tools/relayLoad.mjs';
 import { L0_TREE, seedTree, splitTree, childNodes, nodeHolds } from '../../src/net/cellTree.js';
 import { owLedgerOf, owIdPixel } from '../../src/net/overworldLaw.js';
 import {
@@ -283,7 +282,7 @@ test('COST-2 part two A MOVE ITS ROWS BLOCK IS NOT MADE: a departing layer that 
     assert.equal(dir.room._cellDir.cool[NODE], now + MOVE_COOLDOWN_MS, 'left alone');
     assert.deepEqual(parksIn(W, KIDS[0]), [], 'nothing sent');
     assert.equal(socks[0].closed, null, 'no socket closed');
-    assert.deepEqual(points.at(-1).blobs.slice(11), ['0', '1'], 'blob13: one move blocked');
+    assert.deepEqual(points.at(-1).blobs.slice(11), ['0', '1', '0'], 'blob13: one move blocked; blob14: no cast cut short');
     // a child that never takes
     const F = await splitPlanned();
     const get = F.W.ROOMS.get;
@@ -479,16 +478,10 @@ test('COST-2 part two THE CELL DOOR: a cell\'s hello in a coarse node from a bui
   });
 });
 
-test('COST-2 part two THE NODE COUNT BY LEVEL IS READ BACK: the relay-load workflow\'s `levels` question groups the cells\' points by their node\'s level (blob11) - the room-windows each level was awake, before the seed and after it - and its `moves` question reads the directory\'s moves made and blocked (blob12, blob13) over the points that carry them; RoomMetrics writes the two after the level (mutants: the level ungrouped; another kind read; a blob moved; an empty blob read as a number)', () => {
-  const lv = loadSql('levels', 3);
-  assert.match(lv, /SELECT blob1 AS kind, blob11 AS level, SUM\(_sample_interval\) AS room_windows,/);
-  assert.match(lv, /AND blob1 = 'world' GROUP BY kind, level ORDER BY level LIMIT 10/);
-  const mv = loadSql('moves', 3);
-  assert.match(mv, /SUM\(_sample_interval \* toUInt32\(blob12\)\) AS moves, SUM\(_sample_interval \* toUInt32\(blob13\)\) AS blocked/);
-  assert.match(mv, /AND blob1 = 'cells' AND blob12 != '' GROUP BY kind/);
+test('COST-2 part two RoomMetrics writes the node level (blob11) and the directory\'s moves made and blocked (blob12, blob13), in that order (mutants: a blob moved; an empty blob read as a number)', () => {
   let p = null;
   const m = new RoomMetrics(0);
   Object.assign(m.c, { frames: 1, cellMoves: 2, cellBlocked: 3 });
   m.flush({ writeDataPoint: (x) => { p = x; } }, 'cells', 0, 'v', 1000, true);
-  assert.deepEqual(p.blobs.slice(10), ['', '2', '3']);
+  assert.deepEqual(p.blobs.slice(10), ['', '2', '3', '0']);
 });

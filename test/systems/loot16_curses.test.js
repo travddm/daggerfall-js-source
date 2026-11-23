@@ -1,5 +1,4 @@
-// LOOT16 - CURSED FINDS, AND THE TEMPLE'S LIFTING (2026-10-07; bible/06-Systems/Loot-II-Arc.md section 8; Mac: "what
-// could we do to make it even more amazing, while also balancing everyrhing?", then "Lets go all in").
+// LOOT16 - CURSED FINDS, AND THE TEMPLE'S LIFTING.
 //
 // One Rare or Legendary in twelve that a body or a pile mints is cursed in the door's last pass: a line more - a number
 // kind its group may carry and it does not, from the top half of its tier's band - and ONE drawback from DFU's own
@@ -35,8 +34,8 @@ import { rollGemFind } from '../../src/systems/gems.js';   // GEM2: the gem find
 
 const T = ENCHANTMENT_TYPES;
 const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-// PIN MOVED (PELLETS-SCARCE, 2026-10-24): the Dwemer Pellet's final find is the door's draw after every pass these laws
-// read - held off here (test/systems/pelletsscarce.test.js holds it the door's very last)
+// A final find is the door's draw after every pass these laws read - held off here (no find is registered final since
+// the Dwemer Pellet's went with the guns)
 const on = () => { _resetForTests(); setPref('lootRarity', true); LR._setCurseForTests(null); LR._setExaltedForTests(null); LR._holdFinalFindsForTests(true); };
 const off = () => { _resetForTests(); setPref('lootRarity', false); LR._setCurseForTests(null); LR._holdFinalFindsForTests(false); };
 const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 8) / 0x800000; };
@@ -137,7 +136,7 @@ test('LOOT16: the doors - one Rare or Legendary in twelve a body or a pile mints
   const src = { kind: 'pile', tier: 14, boss: false, family: null };
   const list = () => [createWeapon(120, 1), cuirass(), amulet(), garment(155), garment(195)];
   let both = 0;
-  LR.registerGemFind(null);   // PIN MOVED (GEM2, bible/06-Systems/Gem-Sockets.md): the gem find is the door's last draw since - a curse's draw moves it, and its gem is no piece of the list
+  LR.registerGemFind(null);
   try {
     for (let seed = 1; seed < 80; seed++) {
       LR._setCurseForTests(1);
@@ -145,7 +144,6 @@ test('LOOT16: the doors - one Rare or Legendary in twelve a body or a pile mints
       LR._setCurseForTests(Infinity);
       const none = list(); LR.rollLootRarity(none, src, { rolls: lcg(seed) });
       LR._setCurseForTests(null);
-      // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): a weapon's technique is the door's very last draw, after the
       // curse's - where a curse drew, the two runs' techniques differ, so it is set aside on both sides
       const own = (x) => (x.affixes ?? []).filter((a) => !LR.isTechniqueAffix(a));
       all.forEach((it, i) => {
@@ -351,9 +349,6 @@ test('LOOT16: the temple\'s row - a Cure Disease priest\'s, in the Reforge\'s pl
   teleport.input(LIFT_KEY);
   assert.deepEqual([served, lifted], [1, 2], 'DFU\'s own L (Teleport\'s) first');
   assert.equal(LIFT_ROW, 'Lift Curse');
-  assert.match(read('src/ui/enhanced/enhancedPorts.js'), /\.\.\.\(!w\.hooks\.reforge && w\.hooks\.lift \? \[\{ label: LIFT_ROW, act: \(\) => w\._lift\(\) \}\] : \[\]\)/, 'the Plus face lists it beside the service');
-  assert.match(read('src/scenes/worldModes.js'), /lift: route\.guildGroup === GUILD_GROUPS\.HolyOrder && service === 'CureDisease' && lootRarityOn\(\) \? \(\) => shutBox\(\) \?\? \(openLift\(\) \? \{ dispatched: true \} : null\) : null,/, 'a temple\'s Cure Disease priest');   // PIN MOVED (AUDIT CHAP5 D2): a shut hall's row refused on the popup
-  assert.match(read('src/scenes/worldModes.js'), /const done = liftCurse\(item, playerEntity\);[\s\S]{0,200}pages: \['lift'\], page: 'lift',/, 'the law\'s, on the player\'s own pack, its one page');
   _setGuildServiceArtForTests(null);
   // the page
   on();

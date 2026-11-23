@@ -1,6 +1,4 @@
-// PERF-DYE (2026-10-12, a profile of a player's live client travelling the overworld: 29 of the 122 frames over 50 ms
-// in two minutes were a horse look's walk set dyed whole - forty pictures, some 45 ms, in one frame; bible/07-Rendering/
-// Performance-Priority.md PERF-DYE) - A LOOK'S PICTURES ARE DYED HORSE_DYE_PICTURES A FRAME, never a set at once: no
+// PERF-DYE - A LOOK'S PICTURES ARE DYED HORSE_DYE_PICTURES A FRAME, never a set at once: no
 // frame dyes more, among every look; a look's views then its walk frames, each once, and posed in the look only once
 // its last is up; a look let go halfway gives back exactly the pictures it had.
 import { test } from 'node:test';

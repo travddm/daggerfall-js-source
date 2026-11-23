@@ -1,5 +1,5 @@
 // @ts-check
-// DECOR-FIGURE (2026-10-10): RDBLayout.NPCFlatArchives' one home - a LEAF, so the
+// DECOR-FIGURE: RDBLayout.NPCFlatArchives' one home - a LEAF, so the
 // decor law (net/decorLaw.js decorIsFigure), which the account service reads as
 // the client does, names a person's flat without carrying the dungeon layout's
 // whole reader into the Worker. world/rdbLayout.js re-exports both members.

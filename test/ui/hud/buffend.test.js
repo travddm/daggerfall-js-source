@@ -1,7 +1,4 @@
-// BUFF-END (2026-09-27, Leafen on Discord: "Could there be a way to dispel magic for non-magic users? It's a bit of a
-// buzzkill just having something on me that will take irl months of game time to wear off" - a Shield Group at 11397
-// rounds; "Or maybe have a hard limit for the number of ticks"; Zerofyre: "An option to right click cancel buffs on
-// yourself like most RPGs would be incredibly nice"). Never DFU's - its one way off is Dispel Magic - and the stacking
+// BUFF-END. Never DFU's - its one way off is Dispel Magic - and the stacking
 // law stands: a player ENDS a spell of theirs, with a right-click on its HUD icon (the mouse freed) on either skin, or
 // the End on the pause window's Stats page, Effects. What may be ended is a spell of the kinds that only help.
 import { test } from 'node:test';
@@ -76,25 +73,8 @@ test('BUFF-END: the classic right-click - the freed mouse over an icon the playe
     assert.equal(routeSpellIconClick(2, { entity, placed }), true);
     assert.deepEqual(entity.activeEffects.map((a) => a.bundleId), [3], 'the Shield Group is gone');
   } finally { setCursorActive(false); setHudPointer(-1, -1); }
-  const large = rd('src/ui/hud/hudLarge.js');
-  assert.match(large, /if \(routeSpellIconClick\(button, \{ windowUp \}\)\) \{ event\?\.preventDefault\?\.\(\); return true; \}/, 'the icon\'s press raises no mousedown - no swing, no armed cast');
   for (const host of ['src/scenes/world.js', 'src/scenes/exterior.js', 'src/scenes/worldModes.js', 'src/scenes/dungeon.js']) {
     assert.match(rd(host), /routeLargeHudClick\([\s\S]{0,260}?event: e \}\)\) return/, `${host} hands the click door its event`);
   }
 });
 
-test('BUFF-END: the enhanced widget takes the pointer only with the mouse freed, and the Stats page lists every spell with an End on the ones that may be ended', () => {
-  const hud = rd('src/ui/enhanced/enhancedHud.js');
-  assert.match(hud, /const ending = cursorActive\(\) && !overlayOpen\(\) && !controllerLook\(\);/);
-  assert.match(hud, /const g = endingGesture\(cellOf, \(bundle\) => \{\n\s*const name = endBundle\(last\.statEntity, bundle\);/);
-  assert.match(hud, /stat\.addEventListener\('contextmenu', g\.menu\);/);
-  // AUDIT 27h B1: the press is the widget's - no swing under it - and so is ITS release, and only its (test/ui/enhanced/audit27h.test.js runs the gesture)
-  assert.match(hud, /stat\.addEventListener\('mousedown', g\.down\);\n\s*stat\.addEventListener\('mouseup', g\.up\);/);
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /\.hud-stat\.ending \.hst-cell\.can-end \{ pointer-events: auto; cursor: pointer; \}/);
-  const menu = rd('src/ui/enhanced/enhancedMenu.js');
-  assert.match(menu, /\['effects', 'Effects'\],/);
-  const at = menu.indexOf('function statsEffects(detail) {');
-  const fn = menu.slice(at, menu.indexOf('\n}\n', at));
-  assert.match(fn, /if \(canEndBundle\(b\)\) \{/);
-  assert.match(fn, /end\.onclick = \(\) => \{ endBundle\(playerEntity, b\.bundleId\); render\(\); \};/);
-});

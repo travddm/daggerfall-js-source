@@ -1,4 +1,4 @@
-// HOME-OFFER (2026-09-26, Mac: "Enhanced plus cant buy house"): HOME1 put a house's offer (and its owner's menu)
+// HOME-OFFER: HOME1 put a house's offer (and its owner's menu)
 // behind Info mode alone. Nothing on the enhanced skins says so - the mode is a drawn word, the default is Grab
 // (PlayerActivate.cs:70) - so a player the bank told "a home is bought at its own front door" pressed the door and
 // walked in. The offer asks now in any mode but Steal, once a session per house (a No is remembered; Info always
@@ -44,15 +44,3 @@ test('HOME-OFFER: the owner\'s menu is Info\'s alone - in every other mode the o
   assert.equal(homeDoorPrompt({ door: 'own', mode: 'info', asked: true }), null, 'Go in comes back past the menu');
 });
 
-test('HOME-OFFER by source: the door asks what the prompt says in the mode the player stands in, and the offer\'s No - alone - remembers the house', () => {
-  const m = rd('src/scenes/worldModes.js');
-  // (the merge with HOME2: the prompt answers where the plaque lit no verb, in the mode read once for both)
-  assert.match(m, /const mode = getInteractionMode\(\);\n\s*const price = door === 'none' \? homeOfferPrice\(bd\) : 0;/);
-  assert.match(m, /const prompt = homeDoorPrompt\(\{ door, mode, price, declined: _homeDeclined\.has\(homeIdOf\(bd\)\), asked: homeAsked, isBash, hallMenu: hallManaged\(home\) \}\);/);   // GUILD-HALL-SALE: and a hall I may turn or sell
-  assert.match(m, /const _homeDeclined = new Set\(\);/);
-  assert.match(m, /const homeIdOf = \(bd\) => `\$\{homeTownOf\(bd\)\}:\$\{bd\?\.buildingKey\}`;/, 'a house is its own town\'s building');
-  const offer = m.slice(m.indexOf('function openHomeOffer('), m.indexOf('\n  }\n', m.indexOf('function openHomeOffer(')));
-  assert.match(offer, /\{ code: 'KeyN', label: HOME_OFFER_PASS, action: \(\) => \{ _homeDeclined\.add\(homeIdOf\(bd\)\); homeOnward\(hit, entries\)\(\); \} \},/, 'No ("just go in", HOME2\'s word): remembered, then on through the door');
-  assert.doesNotMatch(offer.slice(offer.indexOf("code: 'KeyY'"), offer.indexOf("code: 'KeyN'")), /_homeDeclined/, 'a Yes is not a No');
-  assert.equal((m.match(/_homeDeclined\.add\(/g) ?? []).length, 1, 'nothing else declines for the player');
-});

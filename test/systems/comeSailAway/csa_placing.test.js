@@ -1,4 +1,4 @@
-// CSA-C (2026-09-27) - COME SAIL AWAY'S BOATS PLACED, KEPT AND SAVED:
+// CSA-C - COME SAIL AWAY'S BOATS PLACED, KEPT AND SAVED:
 // world/prefabColliders.js (Physics.Raycast over a prefab's BoxColliders and
 // MeshColliders, the convex ones as their hull) and systems/comeSailAway/comeSailAway.js
 // (StartPlacing .. PlaceBoatAtRayHit's five arms, SetBoatPositionAndDirection,
@@ -521,27 +521,31 @@ test('CSA-C / FIELD-CSA1: OnPositionUpdate moves EVERY boat by the offset - acti
 test('FIELD-CSA1: OnWorldReanchored (a teleport\'s new frame) carries every boat by the frame\'s move and shows or hides it for the new pixel - the helm is not asked, and a dungeon\'s boat out of sight stays in its dungeon\'s frame', () => {
   const s = scene({ persistent: true });
   const here = s.rt.PlaceBoat([100, 34, 200], [0, 0, 1]);
+  const held = s.rt.PlaceBoat([100, 34, 260], [0, 0, 1]);
   const away = s.rt.PlaceBoat([300, 34, 400], [0, 0, 1]); away.MapPixel = { X: 40, Y: 20 };
   const dun = s.rt.PlaceBoat([40, -5, 40], [0, 0, 1]); dun.inside = true;
   s.rt.UpdateBoatVisibility();
-  assert.deepEqual([here.GameObject.activeSelf, away.GameObject.activeSelf], [true, false]);
+  assert.deepEqual([here.GameObject.activeSelf, held.GameObject.activeSelf, away.GameObject.activeSelf], [true, true, false]);
   // the player woke at a temple 30 pixels west: the old frame's origin stands 30 pixels east of the new one's
   s.setPixel(-20, 20);
   const moves = [];
   s.deps.helm = { setPlayerPosition: (p) => moves.push(p) };
-  s.rt.state.CurrentBoat = here;   // as if the teleport found them at its helm: OnPositionUpdateBoat's arm would set them back aboard
+  s.rt.state.CurrentBoat = held;   // as if the teleport found them at its helm: OnPositionUpdateBoat's arm would set them back aboard
   s.rt.OnWorldReanchored([30 * 819.2, 0, 0]);
-  s.rt.state.CurrentBoat = null;
   closeV(here.GameObject.position, [100 + 30 * 819.2, 34, 200], 1e-2, 'carried by the frame\'s move');
+  closeV(held.GameObject.position, [100 + 30 * 819.2, 34, 260], 1e-2, 'the held helm\'s boat too');
   closeV(away.GameObject.position, [300 + 30 * 819.2, 34, 400], 1e-2, 'in sight or not');
   assert.deepEqual([here.GameObject.activeSelf, away.GameObject.activeSelf], [false, false], 'thirty pixels off: hidden (and silent)');
+  assert.equal(held.GameObject.activeSelf, true, 'HELM-SIGHT: the boat whose helm is still held stays in sight');
   assert.deepEqual(moves, [], 'nobody set back at a helm');
   closeV(dun.GameObject.position, [40, -5, 40], 1e-9, 'the dungeon\'s boat: not the streaming world\'s to move');
   // and the teleport home stands it again where it was placed
   s.setPixel(10, 20);
   s.rt.OnWorldReanchored([-30 * 819.2, 0, 0]);
+  s.rt.state.CurrentBoat = null;
   closeV(here.GameObject.position, [100, 34, 200], 1e-2);
-  assert.equal(here.GameObject.activeSelf, true);
+  closeV(held.GameObject.position, [100, 34, 260], 1e-2);
+  assert.deepEqual([here.GameObject.activeSelf, held.GameObject.activeSelf], [true, true]);
 });
 
 // ── ComeSailAwaySaveData ──────────────────────────────────────────────────────
@@ -668,7 +672,7 @@ test('CSA-C: LateUpdate\'s placing arm (4957) - held by its pause gate and while
   assert.deepEqual([s.rt.AllBoats[0].hull, s.rt.AllBoats[0].variant], [1, 4]);
   assert.deepEqual(s.out.log.slice(0, 2), ['COME SAIL AWAY - ITEM HULL IS 1', 'COME SAIL AWAY - ITEM VARIANT IS 4']);
   assert.equal(s.rt.placing, false);
-  // sailing holds the arm: LateUpdate's `if (IsSailing) ... else if (placing ...)` - PIN MOVED (AUDIT HOLDINGS F1): a
+  // sailing holds the arm: LateUpdate's `if (IsSailing) ... else if (placing ...)`
   // second boat's parts, the first's being refused while she stands (never a second boat of one number)
   s.rt.StartPlacing({ ...parts, UID: 4 }, []);
   s.setTime(20);

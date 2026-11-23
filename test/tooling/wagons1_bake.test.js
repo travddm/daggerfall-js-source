@@ -1,4 +1,4 @@
-// WAGONS1 (2026-10-09): Mac's wagons.blend (the newest of the four saves he sent - tools/bakeWagons.mjs says why it is
+// WAGONS1: Mac's wagons.blend (the newest of the four saves he sent - tools/bakeWagons.mjs says why it is
 // the one committed) baked into src/assets/wagons/{cart,openWagon,caravan}.json by tools/bakeWagons.mjs: each file
 // re-made to the byte, every object of the scene read by one wagon or skipped as what it is, each wagon's frame its own
 // rear wheels' (on the ground at y 0, turning about z 0), and a scene that has moved under a spec refused.

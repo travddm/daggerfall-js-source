@@ -2,8 +2,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ACC1c — THE PASSWORD, AND THE ONE WAY BACK IN.
 //
-// Mac (2026-09-21): "I want email completely optional. Username and
-// Password will be the main thing for the account" — and, asked what a
+// — and, asked what a
 // player does when they forget one: "Yes" to a recovery code.
 //
 // ═══ WHY A RECOVERY CODE EXISTS AT ALL ═════════════════════════════
@@ -309,7 +308,7 @@ export function canonicalCode(input) {
  *  player who types it without the dashes still gets in. */
 export const codeForHashing = (code) => canonicalCode(code);
 
-// ═══ RECOVERY-SET (2026-10-14) - EIGHT CODES, EACH SPENT ALONE ══════
+// ═══ RECOVERY-SET - EIGHT CODES, EACH SPENT ALONE ══════
 //
 // The request: "I want players to be able to click and see their
 // account recovery code in their profile instead of it being a one off
@@ -325,8 +324,8 @@ export const codeForHashing = (code) => canonicalCode(code);
 //
 // THE SAME COLUMN. `recovery_hash` holds `codes,<hash>,<hash>,...`, each
 // `<hash>` this file's own self-describing form (base64 and `$` - never
-// a comma). A row from before keeps its one PBKDF2 string, as ACC1c and
-// RECOVER-OP (tools/reissueRecoveryCode.mjs) write it, and that string
+// a comma). A row from before keeps its one PBKDF2 string, as the first
+// recovery codes and the operator's reissue wrote it, and that string
 // still opens the account as the one code it is.
 //
 // AT THE CODE'S COST, NOT THE PASSWORD'S. The iterations are there to

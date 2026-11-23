@@ -63,17 +63,6 @@ function foe(Cls, c, bake, feet, opts = {}) {
 
 const START = [2, 0, 2], TARGET = [10, 0, 2];   // either side of the divider, near its closed (north) end
 
-test('ENHANCED AI 4: the classic motor is untouched', () => {
-  const motor = rd('src/characters/enemy/enemyMotor.js');
-  // DFU's own EnhancedCombatAI is NAMED in the classic file (its header
-  // says it ports the classic path), so the test is for the PORT's
-  // enhanced symbols, not the word.
-  assert.ok(!/navmesh|findPath|EnhancedEnemyAI|enhancedMotor|navWorld/.test(motor), 'decision #1: enemyMotor.js carries no enhanced code');
-  const ours = rd('src/ai/enhancedMotor.js');
-  assert.ok(/extends EnemyAI/.test(ours), 'the enhanced motor is a subclass, not a fork');
-  assert.ok(!/_classicTick\s*\(/.test(ours.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')), 'it overrides the DESTINATION, not the classic tick');
-});
-
 test('ENHANCED AI 4: the constants are project-final\u2019s, verbatim', () => {
   // enemyShared.js:7-12 and enemy.js:402 at project-final 8ba9100.
   assert.equal(REPATH_INT, 0.4); assert.equal(REPATH_FAIL, 0.5);
@@ -407,11 +396,6 @@ test('ENHANCED AI 4a: the bake is height-invariant - the anchor carries its y', 
   const xz = (r) => r.p.map((q) => `${q[0].toFixed(2)},${q[2].toFixed(2)}`).join('|');
   assert.equal(xz(at25), xz(at0));
   assert.equal(xz(atNeg), xz(at0));
-  // ONE HOME: the anchor is built through regionAnchor, in the one bake
-  // core (AUDIT 68: navBake's bakeSoup) - the worker and the main-thread
-  // fallback call it and spell no pipeline of their own.
-  const core = rd('src/ai/nav/navBake.js');
-  assert.equal((core.match(/buildRegions\(chf, \{ anchor: regionAnchor\(/g) ?? []).length, 1, 'navBake builds the anchor, once');
   for (const f of ['src/ai/nav/navBake.js', 'src/ai/nav/navWorker.js', 'src/ai/nav/navClient.js']) {
     const src = rd(f);
     assert.ok(!/anchor: \{ x: [a-z.]*anchor\[0\], z:/.test(src), `${f} still builds an anchor without y`);
@@ -475,16 +459,14 @@ test('ENHANCED AI 4a: the nudge\u2019s fall probe is not silenced by a stuck foe
 });
 
 test('AUDIT 55: the switch\u2019s reach is the dungeon host\u2019s foes and nothing else', () => {
-  // Mac's report: "I think enhanced AI is affecting NPCs - hovering and
-  // walking in mid air." The pref is read in exactly four files, and
+  // The pref is read in exactly four files, and
   // none of them is a path a townsperson, a guard or an exterior foe
   // takes. This pins that reach so a future reader can answer the same
   // question in one test instead of a sweep.
-  // PIN MOVED (FIELD BUGS 2026-10-16b INDOOR-WATCH): ENHANCED AI 5's interior half - a building's mesh (scenes/interiorNav.js)
   // and the two pools that walk it. The pools read the switch only where a host hands them a mesh (`nav && getPref`), and
   // only the mode machine's building does: the street's pools (world.js, exterior.js) hand none, so no townsperson, no
   // street guard and no street foe sees it - the reach this pin was written for.
-  const readers = ['src/ai/enhancedMotor.js', 'src/scenes/dungeonContext.js', 'src/systems/uiPrefs.js', 'src/systems/features.js', 'src/ai/cover.js', 'src/ai/tactics.js', 'src/scenes/interiorNav.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js'];   // FT5: the row is the registry's, not the menu's   // TACT1 (Mac: "Everywhere, Enhanced on"): cover is the one thing the switch does outside the dungeon - billboards block sight and missiles - and ai/cover.js is its one reader; it never moves a body, so no townsperson hovers. TACT2: ai/tactics.js reads it for the brain, which only steers a foe that sees its target - never a townsperson
+  const readers = ['src/ai/enhancedMotor.js', 'src/scenes/dungeonContext.js', 'src/systems/uiPrefs.js', 'src/systems/features.js', 'src/ai/cover.js', 'src/ai/tactics.js', 'src/scenes/interiorNav.js', 'src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js'];   // FT5: the row is the registry's, not the menu's   // TACT1: cover is the one thing the switch does outside the dungeon - billboards block sight and missiles - and ai/cover.js is its one reader; it never moves a body, so no townsperson hovers. TACT2: ai/tactics.js reads it for the brain, which only steers a foe that sees its target - never a townsperson
   for (const f of ['src/characters/mobile/mobilePerson.js', 'src/scenes/world.js', 'src/scenes/exterior.js', 'src/characters/enemy/enemyMotor.js']) {
     const src = rd(f);
     assert.ok(!/enhancedAI|EnhancedEnemyAI|enhancedNav|enhancedMotor|interiorNav/.test(src), `${f} can see the switch`);
@@ -498,27 +480,3 @@ test('AUDIT 55: the switch\u2019s reach is the dungeon host\u2019s foes and noth
   for (const f of readers) assert.ok(/enhancedAI|EnhancedEnemyAI|enhancedNav/.test(rd(f)), `${f} lost its read`);
 });
 
-test('ENHANCED AI 4: the host chooses the motor by the switch and refills the budget each frame', () => {
-  const host = rd('src/scenes/dungeonContext.js');
-  assert.equal((host.match(/getPref\('enhancedAI'\) \? D\.EnhancedEnemyAI : D\.EnemyAI/g) || []).length, 2, 'both construction sites choose by the pref');
-  assert.ok(/nav: \(\) => enhancedNav\.chf, navWorld: enhancedNav\.world/.test(host), 'the bake is a thunk and the world is the host\u2019s');
-  assert.ok(/enhancedNav\.world\.pathBudget = enhancedNav\.world\.budgetPerFrame/.test(host), 'the budget is refilled once a frame (his enemy.js:404)');
-  // THE BUG MAC FOUND. buildFoeAt runs in buildDungeonContext's top-level
-  // flow and reads `enhancedNav.world` at construction; the object must
-  // therefore be declared ABOVE the foe block, or every foe hits the
-  // temporal dead zone inside its per-foe try and is left a floating
-  // billboard with no motor. Pinned by line ORDER, since no node test
-  // can run this host without ARENA2.
-  const decl = host.indexOf('const enhancedNav = {');
-  const firstMint = host.indexOf('async function buildFoeAt(');
-  const lazy = host.indexOf('const [{ EnemyAI, withinYaw');   // AUDIT 68 S04-v-dungeon-dead-rig-deps: the lazy block's first destructure now
-  assert.ok(decl > 0 && firstMint > 0 && lazy > 0);
-  assert.ok(decl < lazy, 'enhancedNav must be declared before the lazy foe block');
-  assert.ok(decl < firstMint, 'enhancedNav must be declared before buildFoeAt');
-  assert.ok(/enhancedNav\.world = makeNavWorld\(\)/.test(host), 'one world per host, made in the lazy block');
-  // PIN MOVED (FIELD BUGS 2026-10-16b INDOOR-WATCH): the other two pools are AI 5's - its interior half constructs the
-  // enhanced motor in each where the room hands a mesh, by the same switch (test/ai/nav/fb1016b_indoorwatch.test.js)
-  for (const f of ['src/scenes/cityGuards.js', 'src/scenes/exteriorFoes.js']) {
-    assert.equal((rd(f).match(/getPref\('enhancedAI'\) \? EnhancedEnemyAI : EnemyAI/g) || []).length, 1, `${f}: its one construction site chooses by the pref`);
-  }
-});

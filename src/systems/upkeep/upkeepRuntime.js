@@ -1,5 +1,5 @@
 // @ts-check
-// STEED1 / WAGONS4 (2026-10-11): THE UPKEEP, A FRAME AT A TIME - horse care (systems/steedCare.js) and wagon upkeep
+// STEED1 / WAGONS4: THE UPKEEP, A FRAME AT A TIME - horse care (systems/steedCare.js) and wagon upkeep
 // (systems/wagon/wagonUpkeep.js) run over a host's pack and clock. One a host (scenes/world.js, scenes/exterior.js -
 // createUpkeep), its doors the host's:
 //
@@ -37,6 +37,7 @@ import {
 import { isWagonKitItem, UPKEEP_ITEM } from './upkeepItemRows.js';
 import { registerItemUseHandler } from '../item/itemTemplates.js';
 import { HORSE_MODE, WAGON_MODE, TRANSPORT } from '../horse/horseCartLaw.js';
+import { horseWalksOn } from './horseWalks.js';   // HORSE-WALK: off, DFU's ride base
 
 /** A breath under this share shows short on the HUD. */
 export const BREATH_LOW = 0.25;
@@ -48,7 +49,7 @@ export function bondWay(bond) {
 }
 
 /**
- * HORSE-TIERS (2026-10-15): `horseCare()` answers the live tier's rules (upkeepTiers.js HORSE_CARE_RULES) or null for
+ * HORSE-TIERS: `horseCare()` answers the live tier's rules (upkeepTiers.js HORSE_CARE_RULES) or null for
  * Off - each door below reads it once, at its call, so a turn of the tier takes effect at once. WAGON-TIERS: and
  * `wagonUpkeep()` wagon upkeep's (WAGON_UPKEEP_RULES), the same way.
  * @param {{ items: () => any[], now: () => number, horseCare?: () => any, wagonUpkeep?: () => any,
@@ -174,16 +175,16 @@ export function createUpkeep({ items, now, horseCare = () => null, wagonUpkeep =
     return canGallop(breathOf(horse), st.hunger);
   }
 
-  /** transport.js's walk (HORSE-WALK): the horse walks unless it gallops wherever horse care rules its gallop - horse
-   *  care on, a horse, the one ridden born (its stats; gallopGate defers to the mod without them). Else false: DFU's
-   *  ride base. HORSE-TIERS: `runAsked` the rider asks the gallop (Run held, or latched) - a gallop asked and refused
-   *  (winded, starving: gallopGate) walks only in a tier that holds a refused gallop to the walk (`refusedRunWalks` -
-   *  Hard); Boons rides it at DFU's own pace, so Run held is never slower than DFU's horse.
+  /** transport.js's walk (HORSE-WALK, the Horse walks option, off by default): the horse walks unless it gallops, wherever
+   *  horse care rules its gallop (care on, a horse, the ridden one born; gallopGate defers to the mod without its stats).
+   *  Else false: DFU's ride base. HORSE-TIERS: `runAsked` is the rider asking the gallop (Run held or latched); one asked
+   *  and refused (winded, starving) walks only in a tier that holds a refused gallop to the walk (`refusedRunWalks`, Hard).
+   *  Boons rides it at DFU's pace, so Run held is never slower than DFU's horse.
    *  @param {string} mode @param {boolean} [runAsked] */
   function rideWalks(mode, runAsked = false) {
     const care = horseCare();
     if (!care || mode !== 'Horse') return false;
-    if (runAsked && !care.refusedRunWalks) return false;
+    if (runAsked ? !care.refusedRunWalks : !horseWalksOn()) return false;   // no Run asked: the walk is the Horse walks option's, else DFU's ride base
     return !!steedStats(ridden(), now(), care);
   }
 

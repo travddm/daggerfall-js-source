@@ -1,8 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF-RETICLE (2026-10-01, Mac: "move away from the overcomplicated
-// minigame visuals and instead use the mechanics on something that
-// doesnt cover the screen"; asked, "Around the crosshair"): THE ACT ON
+// PROF-RETICLE: THE ACT ON
 // THE CROSSHAIR - no box, no title, no picture. Each act's mechanic
 // drawn on and about the reticle (ui/worldPlaque.js reticleAnchor: its
 // middle, and the lens's focal length, so an angle off the look stands

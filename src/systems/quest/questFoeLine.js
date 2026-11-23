@@ -1,7 +1,7 @@
 // @ts-check
 // QUEST-FOE-LINE (FIELD BUGS 2026-10-04f, the Discord's #bug-reports "Bugged Quests": "The quest The Assassin ... has
 // you track down and kill Rodyn Buckingston. I am at his location, he doesn't spawn. I double checked with multiple
-// NPCs on his location as well"; the owner, of a line naming the foe as the quest's: "Do it").
+// NPCs on his location as well").
 //
 // A0C00Y08 is DFU's own and the port runs it as written: walking into `_place_` sets `_S.11_`, which hides the named
 // man (`hide npc _darkb_`) and picks ONE of four tasks that stand a RESTRAINED class foe - an Archer, a Bard, a Rogue

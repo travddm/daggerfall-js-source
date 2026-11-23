@@ -48,7 +48,7 @@ test('FIELD BUGS 2026-09-29 (the sea) #1: THE HELMSMAN AT THE WHEEL - my place a
   const wheel = copy.DrivePosition.position;
   nearV([drawn.shown.x, drawn.shown.y, drawn.shown.z], [wheel[0], wheel[1] - 0.9, wheel[2]], 0.01, 'at the wheel of the boat drawn here');
   assert.equal(drawn.shown.deckKey, 'bo:0');
-  // the world says it: my own helm, when aboard nothing else - PIN MOVED (DECK-POSE): one place for the foes word and the
+  // the world says it: my own helm, when aboard nothing else
   // pose (world.js csaDeckWord, test/net/peer/deckpose.test.js), so the expression is the shared one's
   assert.match(WORLD, /const csaDeckWord = \(\) => \(csaOn\(\) \? \(csaAboard\.word\(player\.pos\) \?\? csaHelmWord\(\) \?\? naval\?\.deckWord\?\.\(player\.pos\) \?\? null\) : null\);/);
   assert.match(WORLD, /const w = csaDeckWord\(\);/);

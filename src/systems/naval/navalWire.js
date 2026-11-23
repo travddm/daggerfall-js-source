@@ -1,5 +1,5 @@
 // @ts-check
-// NAV-G (2026-09-28, Mac: "directly integrate into online mode") - THE WIRE: the sea's ships, their volleys and the
+// NAV-G - THE WIRE: the sea's ships, their volleys and the
 // blows on them, between the players in a cell. The port's own; pure.
 //
 // THE SEA IS THE ROOM'S, STOOD BY ONE. The open bay is cells (net/wire.js isCellRoom) - no host seat, no room memory -
@@ -56,7 +56,7 @@
 //   l - AUDIT BAY A18: the lanes' packets the owner has seen spent (sunk, struck, boarded, taken) - each her
 //       voyage's seed (systems/naval/seaLanes.js), the last NAVAL_WIRE_SPENT - so no player stands her again where she
 //       went down (a player who never saw her go stood her afresh, to every player's sight)
-//   w - SALVAGE (2026-10-03): the wreckage a sunk ship leaves afloat in the owner's sea, each [id, x, y, z, cls] as a
+//   w - SALVAGE: the wreckage a sunk ship leaves afloat in the owner's sea, each [id, x, y, z, cls] as a
 //       cask of `f` (its lot navalPlunder.js SALVAGE_LOT, never one of LOT_KEYS) - hauled in and claimed as a cask is;
 //       at most NAVAL_WIRE_CASKS. A key of its own as `k`, `m` and `l` are: an older build reads none of it, where a lot
 //       past its LOT_KEYS would fail its door and the whole word with it
@@ -64,15 +64,24 @@
 //       hold, her casks and the chart in her papers the deep's on every client (a peer's copy of her was open water's)
 //   e - AUDIT CAPTAIN'S SEA D8: the casks of `f` of a deep ship's (or the Eltheric Ocean's) cargo, each its id - a peer's
 //       haul of one drawn as rich as its owner's (it was DEEP_TIER tiers poorer)
-//   o - SHOT-KINDS (bible/03-World/Naval-Refit.md): the volleys of `v` loaded with other than their bores' own, each
+//   o - SHOT-KINDS: the volleys of `v` loaded with other than their bores' own, each
 //       [id, shot] - the volley's id and its load by SHOT_CODES' row (systems/naval/shotKinds.js), so every client flies
 //       the same grape, chain or heated shot and the victim's client judges the same blow. A volley it does not name
 //       (an older build's word says none) is its bores' own; a pair for no volley of the word reads as nothing
-//   q - AUDIT PASSAGE B5 (bible/03-World/Passage.md): the harbour ships the owner has heard let go of their berths for
+//   q - AUDIT PASSAGE B5: the harbour ships the owner has heard let go of their berths for
 //       good today - a passage booked on her, her boat standing in her place (scenes/naval/passageBerths.js) - each her
 //       seed (navalHost.js harbourFrame's: her port's, the day's, her berth's), the last NAVAL_WIRE_GONE, said on by
 //       every reader: no player stands her at her berth again that day, nor holds a copy of her (an older build's word
 //       says none, and its reader ignores this one)
+//   r - WW7-8: the ships of `s` named PAST THE
+//       BAY, each [n, region, area] - her region where it is a province's (WW-R's 62 and up: `s` says the Bay's alone, -1
+//       past it, for an older build's door refuses a whole word with any other), else -1; and the area her names were
+//       drawn in where it is a province's district (world/worldWide/worldGrid.js - her captain and hands a Nord's in
+//       Skyrim's waters, systems/naval/shipNameBank.js), else -1. `s`'s -1 was read as "the reader's own waters", and the
+//       reader's waters are not hers: a packet named by her home port's people (Solitude's) met in Morrowind's, a crown's
+//       ship of the Bay's region named by the province's people she was met in, two players either side of the line where
+//       the nearest port changes - each called her and her captain otherwise than her stander did. An older build's word
+//       says none, and its reader ignores this one
 //   `k`, `m` and `l` are keys of their own because an older build's door checks every field of `s` and `p` by count: it
 //   passes a word with them whole and reads none of them, and a newer door reads an older build's word as saying none.
 //   Nor are theirs counted: a newer build's longer entry reads as its first fields, never the whole word refused.
@@ -91,7 +100,7 @@
 // stander's world while all of it happened in another's. AUDIT NAV1 (online #15): the frame with `k` and no hurt is a
 // CASK's - `k` a cask of your sea my boat sailed through, and with `a` 1 your ANSWER, that it is mine: its owner answers
 // the first claim and lets the cask go, the claimer draws its lot only on the answer, so one cask is one haul whoever
-// else reached it. BOARD-MAGNET (2026-10-26): the ram is gone, and with it a ram's foul (`u`, RAM-BOARD's) - an older
+// else reached it. BOARD-MAGNET: the ram is gone, and with it a ram's foul (`u`, RAM-BOARD's) - an older
 // build's blow that still says one is taken as the blow alone. RAM-RETURN (AUDIT, 2026-10-27): the ram back, never the
 // foul - a ram's blow carries `r` 1, and its stander takes it to her own line, never on a ship struck since it was sent.
 
@@ -100,7 +109,8 @@ import { SHIP_CLASSES, CROWNS } from './navalShips.js';
 import { LOT_KEYS, SALVAGE_LOT, isSalvage } from './navalPlunder.js';
 import { NOTORIETY } from './navalLaw.js';
 import { DENSITY_KEYS } from './navalDirector.js';
-import { REGION_NAMES } from '../../formats/mapsFile.js';
+import { BAY_REGION_COUNT, CYRODIIL_REGION } from '../../formats/mapsTables.js';   // WW-R: the Bay's regions, the wire's; WW7-8: the provinces' after them, `r`'s
+import { BAY_AREA_COUNT, AREA_COUNT } from '../../world/worldWide/worldGrid.js';   // WW7-8: a province's district, the area her names were drawn in
 import { HULL_NAMES, HULL_VARIANT_COUNTS } from '../comeSailAway/comeSailAwayBoat.js';
 import { TEMPERS } from './navalAI.js';
 import { SHOT_CODES, SHOT_ORDER } from './shotKinds.js';
@@ -153,7 +163,7 @@ const U32 = 0xffffffff;
  *   gone?: number[], laid?: string[] }} view
  */
 export function navalWireRecord(view, toWire = (p) => p) {
-  const s = [], v = [], b = [], k = [], d = [], e = [], o = [], h = [];
+  const s = [], v = [], b = [], k = [], d = [], e = [], o = [], r = [], h = [];
   for (const sh of view?.ships ?? []) {
     if (s.length + h.length >= NAVAL_WIRE_SHIPS) break;
     const cls = SHIP_CLASSES.findIndex((c) => c.id === sh.classId);
@@ -161,11 +171,13 @@ export function navalWireRecord(view, toWire = (p) => p) {
     const p = toWire(sh.pos);
     (cls < NAVAL_WIRE_OLD_CLASSES ? s : h).push([sh.n | 0, cls, sh.variant | 0, r2(p[0]), r2(p[1]), r2(p[2]), r4(sh.yaw), r2(sh.speed), r2(sh.sails), pct(sh.hull), pct(sh.sail), pct(sh.crew),
       Math.max(0, WIRE_STATES.indexOf(sh.state)), Math.round(sh.heel * 10) / 10, sh.seed >>> 0, sh.fire ? 1 : 0, (sh.runOut | 0) & 15,
-      Math.max(0, Math.min(NAVAL_GEN_MAX, sh.gen | 0)), Number.isInteger(sh.region) && sh.region >= 0 && sh.region < REGION_NAMES.length ? sh.region : -1]);
+      Math.max(0, Math.min(NAVAL_GEN_MAX, sh.gen | 0)), Number.isInteger(sh.region) && sh.region >= 0 && sh.region < BAY_REGION_COUNT ? sh.region : -1]);   // WW-R: the Bay's regions on the wire - an older build refuses a whole word with a province's (-1: the reader's waters')
     // AUDIT NAV2 F1/F3/F5: her captain - a ship said without a temper (a caller's older view) is said without one
     const temper = TEMPER_CODES.indexOf(sh.temper);
     if (temper >= 0) k.push([sh.n | 0, temper, Math.max(0, MODE_CODES.indexOf(sh.mode)), Number.isInteger(sh.struckTo) && sh.struckTo >= 0 && sh.struckTo <= 0xffff ? sh.struckTo : -1]);
     if (sh.deep) d.push(sh.n | 0);   // AUDIT CAPTAIN'S SEA D8
+    const named = pastBayNaming(sh);   // WW7-8: named past the Bay - her province and her waters' area
+    if (named) r.push([sh.n | 0, ...named]);
   }
   for (const vo of view?.volleys ?? []) {
     if (v.length >= NAVAL_WIRE_VOLLEYS) break;
@@ -200,6 +212,7 @@ export function navalWireRecord(view, toWire = (p) => p) {
   if (d.length) out.d = d;
   if (e.length) out.e = e;
   if (o.length) out.o = o;
+  if (r.length) out.r = r;
   const me = view?.me;
   if (me) out.p = [pct(me.hull), me.crippled ? 1 : 0, me.boarders === false ? 0 : 1];
   // AUDIT GN-G3: my boat's laid broadsides - a bit a side (SIDE_CODES), said only while one is
@@ -217,6 +230,29 @@ export function navalWireRecord(view, toWire = (p) => p) {
   const q = (view?.gone ?? []).filter((x) => int(x, 0, U32)).slice(-NAVAL_WIRE_GONE);   // AUDIT PASSAGE B5
   if (q.length) out.q = q;
   return s.length || h.length || v.length || b.length || out.p || out.n || out.t !== undefined || out.f || out.w || out.j || out.l || out.g || out.q ? out : null;
+}
+
+/** WW7-8: a province's region (WW-R: 62 to 70) - `r`'s, never `s`'s. @param {any} x */
+const provinceRegionOk = (x) => int(x, BAY_REGION_COUNT, CYRODIIL_REGION);
+/** WW7-8: a province's district's area (world/worldWide/worldGrid.js) - `r`'s. @param {any} x */
+const provinceAreaOk = (x) => int(x, BAY_AREA_COUNT, AREA_COUNT - 1);
+/** WW7-8: what `r` says of a ship - [region, area], each -1 where it is no province's - or null for a ship named on the
+ *  Bay (`s` says it whole). @param {{ region?: any, area?: any }} sh */
+export function pastBayNaming(sh) {
+  const region = provinceRegionOk(sh?.region) ? sh.region : -1, area = provinceAreaOk(sh?.area) ? sh.area : -1;
+  return region < 0 && area < 0 ? null : [region, area];
+}
+/** WW7-8: the `r` key through the door - a Map from a ship's number to her province's region and her names' area; null
+ *  when malformed (the word fails whole). */
+function validNaming(raw) {
+  const out = new Map();
+  if (raw === undefined) return out;
+  if (!Array.isArray(raw) || raw.length > NAVAL_WIRE_SHIPS) return null;
+  for (const w of raw) {
+    if (!Array.isArray(w) || w.length !== 3 || !int(w[0], 0, 0xffff) || !(w[1] === -1 || provinceRegionOk(w[1])) || !(w[2] === -1 || provinceAreaOk(w[2])) || (w[1] === -1 && w[2] === -1)) return null;
+    out.set(w[0], { region: w[1], area: w[2] });
+  }
+  return out;
 }
 
 /** AUDIT NAV2 F1/F3/F5: the captains' key through the door - a Map from a ship's number to her temper, her captain's
@@ -250,7 +286,7 @@ function shipOf(w) {
   if (!inBounds(pos) || Math.abs(w[6]) > 7 || w[7] < 0 || w[7] > 40 || w[8] < 0 || w[8] > 1) return null;
   if (!int(w[9], 0, 100) || !int(w[10], 0, 100) || !int(w[11], 0, 100) || !int(w[12], 0, WIRE_STATES.length - 1)) return null;
   if (Math.abs(w[13]) > 90 || !int(w[14], 0, U32) || (w[15] !== 0 && w[15] !== 1) || (w.length >= 17 && !int(w[16], 0, 15))) return null;
-  if (w.length === 19 && (!int(w[17], 0, NAVAL_GEN_MAX) || !int(w[18], -1, REGION_NAMES.length - 1))) return null;
+  if (w.length === 19 && (!int(w[17], 0, NAVAL_GEN_MAX) || !int(w[18], -1, BAY_REGION_COUNT - 1))) return null;   // WW-R: the Bay's regions alone on `s` - a province's on `r`
   return { n: w[0], classId: cls.id, hull: cls.hull, variant: w[2], pos, yaw: w[6], speed: w[7], sails: w[8], hull100: w[9], sail100: w[10], crew100: w[11], state: WIRE_STATES[w[12]], heel: w[13], seed: w[14], fire: w[15] === 1, runOut: w[16] ?? 0,
     gen: w[17] ?? 0, region: w[18] ?? -1 };
 }
@@ -339,6 +375,16 @@ export function validNavalRecord(raw) {
   if (!Array.isArray(deepShips) || deepShips.length > NAVAL_WIRE_SHIPS || !deepShips.every((x) => int(x, 0, 0xffff))) return null;
   if (!Array.isArray(deepCasks) || deepCasks.length > NAVAL_WIRE_CASKS || !deepCasks.every((x) => int(x, 0, U32))) return null;
   for (const sh of ships) if (deepShips.includes(sh.n)) sh.deep = true;
+  // WW7-8: the ships named past the Bay - her province's region where `s` said -1, and the area her names were drawn in
+  // (an older build's word says none: the reader's own waters, as before)
+  const naming = validNaming(raw.r);
+  if (!naming) return null;
+  for (const sh of ships) {
+    const nm = naming.get(sh.n);
+    if (!nm) continue;
+    if (sh.region < 0 && nm.region >= 0) sh.region = nm.region;
+    sh.area = nm.area;
+  }
   for (const c of casks) if (c.lot !== SALVAGE_LOT && deepCasks.includes(c.id)) c.deep = true;
   // SHOT-KINDS: the volleys' loads (an older build's word says none - their bores' own)
   const loaded = raw.o ?? [];

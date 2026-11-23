@@ -1,0 +1,207 @@
+# The renderer
+
+This page covers `Renderer` in `src/render/renderer.js`: what it owns, the resources it creates, the life of one
+frame, and the rules for code that draws. It is hand-written WebGL2 with no engine or framework.
+
+## What it is
+
+`main.js` creates one `Renderer` on the game canvas, and every scene host draws through it. It owns:
+
+- the WebGL2 context and all GL state (program, VAO, texture units, blend, depth, viewport, scissor, framebuffer);
+- the world programs (mesh, billboard, terrain, character, decal, water) in two sets: the classic set and the
+  enhanced lighting set ([lighting-and-shadows.md](lighting-and-shadows.md));
+- texture, mesh and billboard caches;
+- the post passes it drives: the shadow pass, the air pass, the retro pass, the distance shading pass;
+- per-frame counters in `renderer.stats` (`draws`, `programBinds`, `vaoBinds`, `texBinds`, `bbCulled`,
+  `spriteBinds`, `viewDraws`, `shadowDraws`) and `renderer.frameInfo`. The FPS counter shows them.
+
+Rules from the data side, stated at the top of `renderer.js`:
+
+- UVs can be negative or above 1. Daggerfall's models rely on `REPEAT` wrapping.
+- Textures from `TextureFile.getColor32` are already bottom-up, which is GL's texel order. Upload with `flipY` off.
+- Indexed colour means hard pixels. The world texture filter is Daggerfall Unity's `Video/MainFilterMode` (Point,
+  Bilinear, Trilinear; `src/render/world-texture-filter.ts`) plus the port's Sharp, the port's default (DFU's is
+  Point). Every quality preset leaves it Sharp, because Sharp measured no slower than Point (frame time at a town,
+  an interior and a dungeon, at 1280x800 and 3840x2160); the Classic preset sets Point. Sharp samples through a
+  linear sampler with anisotropy, and its world shaders move each coordinate to its
+  texel's centre with a one-pixel blend at each texel edge (`src/render/sharp-texels.ts`): square texels close up,
+  filtered ground in the distance. The world sets are built Sharp or plain for the filter, and swapped when it changes
+  (`src/render/sharp-world-sets.ts`). In the retro modes Sharp drops the edge blend, so every texel is sampled at its
+  centre as under Point, and its samples take the Retro Mip Bias row's bias (preference `retroMipBias`, 0 to -2 levels
+  in quarters, DFU's fixed -0.75 by default; `src/systems/retro-mip-bias-row.ts`). The bias acts only when Retro Mip
+  Maps keeps the mip chains, and the row is drawn disabled with that reason until then. The values reach the shaders
+  as one uniform set at each frame's start (`src/render/retro-sharp.ts`). Every mip-mapped classic
+  texture, its emission map, and the weapon and spell-hand sprites take it at upload. A changed value reaches every
+  cached texture on the next frame (`src/render/live-world-sampling.ts`, from `beginFrame`). Off Point, the weapon
+  and the spell hands draw 1% larger, as in DFU. Textures with an owner of their own take the filter too, and follow a
+  change at their next draw or through the same per-frame check: the far trees, banners and ship flags, the tree
+  atlases (`createAtlasTexture`), the body parts and held items (`createCharacterTexture`), and the seabed decorations
+  (`createDecorationTexture`), and the meadow's atlas (`src/render/grass-sheets.ts`); the decorations' and the
+  meadow's own programs carry Sharp's snap behind `uSharpOn`. UI art, the sky, smoothed pictures, data textures (the
+  pixel grass sheet among them: its texels are a tone index, a height and a blade ordinal), particles and a spell
+  effect's textures keep their own filters.
+- The Anisotropic Filtering row (preference `anisotropicFiltering`: Off, Per texture, 2x, 4x, 8x, 16x; 8x by default;
+  `src/render/anisotropic-filtering.ts`) sets the anisotropy of that world art and of the ground, capped by the
+  driver. Per texture is DFU's: 8x on the ground, none elsewhere. It applies only off Point, because Direct3D under
+  ANGLE makes a sampler with anisotropy above 1 fully linear. A change of `Video/QualityLevel` sets the row as DFU's
+  quality levels set Unity's anisotropy: Fastest and Fast Off, Simple and Good Per texture, Beautiful and Fantastic 8x.
+- The ground tile arrays take the world filter for magnification, the Ground sharpness row for minification (nearest-mip
+  or trilinear) and the Anisotropic Filtering row for anisotropy (`src/render/ground-sampler.ts`). The snow ground's
+  albedo takes the same (`filterGroundPicture`). `applyGroundSharpness` applies them at every world load, and on the
+  next frame after any of them changes. Where the driver drops a nearest-mip filter for anisotropy (ANGLE over Direct3D
+  11, `src/render/anisotropic-mip-filter.ts`), Off and Smooth draw alike while the ground takes anisotropy above 1, so
+  the settings screen shows the Ground sharpness row disabled with that reason. The `sampler` game probe records what
+  the CI browser's driver does (`tools/probes/lib/samplerCheck.mjs`).
+- A texel with alpha 0 is a palette cutout. The shaders discard it. Daggerfall stores such texels black, and a linear
+  filter or a mip level at a cut-out's edge would mix that black in. World art (`uploadTexture`) and the far trees'
+  layers are therefore uploaded with each transparent texel in the colour of its nearest opaque texel, alpha kept, and
+  their mips are built from that picture (`src/render/alpha-bleed.ts`). Point is unchanged. Banners and ship flags
+  upload premultiplied instead.
+- The Mip quality row (preference `mipQuality`: Standard or Sharp, Standard by default;
+  `src/systems/mip-quality-row.ts`) picks how the smaller levels of every mip-mapped world picture are built. Standard
+  calls `gl.generateMipmap`, the driver's box average, as Daggerfall Unity does. Sharp builds each level on the CPU in
+  `src/render/mip-chain.ts`: in linear light, with a Lanczos-windowed kernel, from the float level above, with colour
+  weighted by alpha, with the coverage of a pure cut-out (alpha only 0 or 255) kept at every level, and with each
+  level's transparent texels bled as level 0's are. A repeating texture filters across its edge; the ground tile arrays,
+  the far trees and the decor arrays clamp. `src/render/mip-upload.ts` uploads the levels by hand, so the memory is the
+  same as Standard's, and remembers each texture so a change of the row rebuilds the loaded ones on the next frame
+  (`applyMipQuality`: Standard calls `generateMipmap` again; Sharp reads level 0 back from the GPU). The tree atlases a
+  mod ships, the Morrowind character textures and every data texture keep their own levels.
+
+## Resources
+
+| Resource | Create | Release | Notes |
+| --- | --- | --- | --- |
+| Texture | `uploadTexture(archive, record, color32, opts)` | `releaseTexture`, `evictTexture` | Cached in `textures` by `archive_record` plus option suffixes (`#smooth`, `#opaque`, ...). Sampling options are part of the key. |
+| Window mask | `uploadEmissionTexture` | `evictEmissionTexture` | In `emissionTextures`; marks window glass for night emission. |
+| Ground tile array | uploaded per terrain archive (`uploadTileArraySteps`, `TILE_LAYERS_A_STEP` layers per step) | `releaseTileArray` | A `TEXTURE_2D_ARRAY` per archive in `tileArrays`; uploaded in steps so a new climate does not stall a frame. |
+| Mesh | `createMesh(model, { bounds })` | (owner releases) | A Daggerfall model's vertices and sub-meshes; bounds measured at upload for culling. |
+| Billboard batch | `createBillboardBatch(archive, record, size, centers, opts)` | `destroyBillboardBatch` | Every flat of one texture in one batch, four vertices each. Quads come from a shared arena (`BB_ARENA_QUADS`). |
+| Character mesh | `createCharacterMesh`, `createSkinnedCharacterMesh` | `releaseCharacterSkin`, `releaseCharacterTexture` | Player and NPC bodies; skinned meshes use a palette texture. |
+| Particles, decals | `createParticleEffect`, `createDecalBatch` | `releaseParticleEffect`, `destroyDecalBatch` | |
+
+Every allocation has an owner: the scene or module that created it releases it. A billboard batch's fields and the
+other shapes that cross from a host into the renderer are declared in `src/render/contract.js` (types only, no code).
+Use those types instead of passing ad-hoc objects; a wrong shape here throws inside WebGL.
+
+Static models do not move, so a streamed map pixel merges them at build time into one mesh grouped by texture
+(`src/render/staticBatch.js`): one draw call per texture instead of one per sub-mesh. Models that animate or swap
+(gates, mill rotors) stay out of the batch. A building interior's batch is sealed as it is merged: near corners are
+welded and T-junctions split (`src/render/crack-seal.ts`), and, with the Close interior gaps row on, the slits up to a
+few centimetres wide between its architecture's models are filled with thin strips (`src/render/seam-fill.ts`).
+With the same row on, each swinging door is drawn on its own copy of its model, fitted to its doorway, and a door that
+stands out of its wall is set into it (`src/world/interior/door-frame-fit.ts`). The fitted door keeps that size as it
+swings; its collider keeps Daggerfall Unity's size.
+
+## One world frame
+
+A host draws a world frame like this (see the frame order in
+[../architecture/boot-and-frame.md](../architecture/boot-and-frame.md)):
+
+```js
+renderer.setFog(mode, density, start, end, color);
+renderer.setLighting(ambient, sunScale, sunColor, trilight);
+renderer.setPointLights(data, color, colors);
+renderer.setClearColor(rgba);
+renderer.beginFrame(proj, view, lightDir, WORLD_FRAME);   // WORLD_FRAME = { world: true }
+// terrain, meshes, static batches, water, sky, billboards, characters, foreign passes
+// 2D: HUD and windows (drawScreenQuad ...)
+renderer.resolveFrame();
+```
+
+What `beginFrame` does:
+
+1. Closes the previous 2D pass and resets per-frame state: counters, the cloud-shadow deck, fog overrides, the
+   sea haze, the travel-view focus, cached program and VAO bindings. Anything a host wants for this frame it must set
+   again after `beginFrame`.
+2. Resizes the canvas to its CSS size if it changed, and applies a world viewport the host asked for
+   (`setWorldViewport`, used by the docked large HUD). The request is consumed, so the host asks every frame.
+3. `_beginLane`:
+   - presents an image still owed from the previous frame (the enhanced resolve or a retro image);
+   - opens a retro or render-scale image when one is active, or a full-size image for classic distance shading
+     (`_retroBegin`);
+   - on a world frame with shadows, runs the shadow pass (`_renderPasses`). It replays the casters recorded during
+     the previous frame's world pass into the shadow maps;
+   - binds the frame target: the air pass's canvas-sized image under enhanced lighting, the retro image, or the
+     canvas.
+4. Builds this frame's light clusters (enhanced lighting only).
+5. Clears colour and depth, binds the mesh program, and uploads the frame's uniforms: matrices, light direction,
+   ambient, sun, moon, a third light, point lights, window emission colour and fog.
+
+During the world pass the draw methods record shadow casters as they draw. Main draw calls:
+
+| Method | Draws |
+| --- | --- |
+| `drawTerrain(surface, model, arrayTex, tilemapTex, tileSize, clip, eco, snow)` | All ground: exterior blocks and terrain, as a tile map over a tile array. `clip` selects the variant that discards `CLIP_SENTINEL` tiles. |
+| `drawMesh(mesh, model, texRemap, { noShadow, translucent })` | A model or a static batch. `texRemap` swaps textures (climate and season). |
+| `drawWaterSurface(...)` | The enhanced water surface. |
+| `drawSnow(surface, u, tex)` | Snow cover tiers over the ground. |
+| `drawBillboards(batches, camRight, camUp)` | Flats: trees, NPCs, foes, lights. Culled per batch; blended flats (ghosts, concealed bodies) are drawn after the opaque ones. |
+| `drawCharacter(mesh, model)` | A 3D character directly in the world. |
+| `drawDecals`, `drawWorldParticleEffects` | Decals and particle effects. |
+
+### Characters as sprites
+
+Characters are often drawn as pixel art: `renderCharacterSprite` (and the batched `beginCharacterSpriteBatch` /
+`queueCharacterSprite` / `flushCharacterSpriteBatch`) renders the 3D mesh into an offscreen target under a fitted
+orthographic camera at `CHAR_PIXEL` size, and `drawCharacterSpriteQuad` places the result in the world as a quad.
+The world itself is not pixelized this way.
+
+### Foreign passes
+
+Sky, clouds, precipitation, horizon rings and many feature effects are drawn by modules outside `renderer.js` that use
+the same context. These are foreign passes. Rules:
+
+- Build programs with `buildProgram` from `src/render/glProgram.js` (the renderer uses the same function).
+- After drawing, restore what you changed (cull face, blend, depth mask, bound framebuffer) and call
+  `renderer.markForeignPass()`. It tells the renderer that its cached program, VAO and texture-unit state are no longer
+  valid, so the next renderer draw rebinds.
+- If you bind a framebuffer, restore the frame target with `frameTarget()` / `setFrameTarget()` from
+  `src/render/renderTarget.js`. Under enhanced lighting or retro mode the frame target is not the canvas.
+
+### The 2D pass and the resolve
+
+Screen-space drawing uses `drawScreenQuad`, `drawScreenQuadRun`, `drawScreenQuadGlow`, `setScreenOffset` and
+`setScreenScissor`. The first screen-space draw of a frame resolves the world image first (`_compositeAir`): the air
+pass composites ambient occlusion, bloom and sun shafts and writes the frame to the canvas, then the retro or
+render-scale image is distance-shaded (when that is on) and presented. `resolveFrame()` does the same for a frame
+that draws no screen quad afterwards.
+
+### Panel frames
+
+A window that shows a 3D view (the automap, a model preview) uses `panelFrame({ proj, view, lightDir, rect, clear,
+setup }, body)` or `beginPanelFrame` / `endPanelFrame`. The renderer sets the scissor and viewport, draws, and restores
+its state. Do not save and restore GL state yourself in UI code. The default clear colour is Daggerfall Unity's
+automap clear (`PANEL_CLEAR_RGBA`), nearly transparent so the panel art shows through.
+
+### Real windows
+
+With real windows on, a building's glass shows the other side: from the street the room behind it, from inside the
+street. `outsideViewFrame` draws the outside view into an offscreen target before the room's frame; `setWindowRooms`
+and `setGlassView` select the mode each frame. Inside, the outside view is painted on the glass panes and cutout holes
+alone (`src/render/glass-background.js`), so a slit between two of the room's models shows the interior's black
+clear, as in Daggerfall Unity. The shader text and rules are in `src/render/realWindows.js`.
+
+## Shaders and GLSL modules
+
+- Shader text is JavaScript template strings. The main world shaders are at the top of `renderer.js`; each pass keeps
+  its own in its module.
+- A complete stage can live in a `.vert` or `.frag` file beside its module, imported with `?raw`
+  (`retroPass.js` imports `retro-pass.vert` and `retro-pass.frag`). Vite reads the file as text; under Node,
+  `tools/raw-import-hooks.ts` does the same. The files are checked out with LF line ends (`.gitattributes`), and CI
+  compiles each one with glslang (`tools/glsl-check.ts`). Move a module's shaders to files when you change that
+  module, not in a sweep.
+- Shared GLSL lives in leaf modules imported as strings: `fogGlsl.js` (`FOG_GLSL`, the one fog factor),
+  `cloudShadow.js`, `orderedDither.js`, `meshAlpha.js`, `columnGlsl.js`, `hazeGlsl.js`, `snowCoverGlsl.js`,
+  `roadEdgeGlsl.js`, `groundEdgeGlsl.js`, `ecotoneGlsl.js`, `lowPolyTreesGlsl.js`, `waterBedGlsl.js`,
+  `weaponGlowGlsl.js`. Keep one home for each formula; do not copy a block into a second shader file.
+- These modules have no imports of their own, so they are evaluated before the shader templates that use them.
+- Some texture units are reserved by name (`CLOUD_SHADOW_UNIT`, `BB_SURFACE_UNIT`, `SNOW_UNITS`, `ECO_UNITS`). Check
+  the existing constants before you bind a new unit in a world program.
+- `test/glsl.mjs` evaluates GLSL functions in JavaScript, so a test can check a shader's maths on the real shader text.
+
+## Data and presentation
+
+The renderer is presentation and is our own, not a port of Daggerfall Unity's Unity rendering. What it draws must
+still follow the data: texture records, palettes, UV wrapping, window emission colours (`src/render/windowEmission.js`
+holds Daggerfall Unity's values) and the sky's records (`src/render/skyRenderer.js` follows `DaggerfallSky.cs`).

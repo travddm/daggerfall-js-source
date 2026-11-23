@@ -1,9 +1,8 @@
-// SET1 (2026-09-26, Mac: "sigil armor sets that also come with set builds (think having multiple of one set type grants
-// detailed abilities)"; chose tiers at 2 / 4 / 6, "Grow together", online only and never in duels): THE SET LAW
+// SET1: THE SET LAW
 // (systems/sigil/sigilSets.js, and the record's one new field in systems/sigil/sigil.js). The registry and its numbers; the record
 // with a `set` and no `power`, and every reader of the power reading its absence as no blow; what may be a piece; the
 // worn pieces per set - the nine places, one weapon a set; the stage - the lowest piece's, the Renown's cap, what holds
-// it; the tiers awake by the count; the one question the powers ask. bible/11-Multiplayer/Sigil-Sets.md sections 1-2.
+// it; the tiers awake by the count; the one question the powers ask.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -30,7 +29,7 @@ const armour = (templateIndex, set, xp = 0) => {
   if (set) it.sigil = { set, party: 1, xp };
   return it;
 };
-const weapon = (templateIndex, set, xp = 0, power = 5) => {
+const weapon = (templateIndex, set, xp = 0, power = 3) => {
   const it = createWeapon(templateIndex, 0);
   it.rarity = 'rare';
   it.sigil = set ? { power, set, party: 1, xp } : { power, party: 1, xp };
@@ -43,7 +42,7 @@ const XP = SIGIL_STAGES.map((s) => s.xp);           // 0, 5000, 12500, 22500, 37
 test('SET1 the registry: the sets in the record\'s own order - the four of the world, then the gate boss\'s own (Aetheric), then (RAID4b) the raiding parties\' three (Aetheric) - each with three tiers at 2, 4 and 6 pieces, every number a whole pair from Faint to Ascendant, every tier\'s words whole at both ends (mutants: a set out of the record\'s order; a tier at the wrong count)', () => {
   assert.deepEqual(Object.keys(SIGIL_SETS), [...SIGIL_SET_IDS], 'the registry and the record name the same sets, in one order');
   assert.deepEqual(WORLD_SET_IDS, ['malacath', 'dagon', 'nocturnal', 'mora']);
-  assert.deepEqual(Object.values(SIGIL_SETS).filter((s) => s.aetheric).map((s) => s.id), ['ruhn', 'oath', 'thieftaker', 'orcsbane', 'coilscale', 'numidium', 'panoply', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - RAID4b: the gate boss\'s own, then the raids\' three - SERPENT-SET: then the sea serpent\'s own - PIN MOVED (EG15): the Battlemage\'s Panoply - PIN MOVED (WITCH1): the Wyrd\'s Raiment - PIN MOVED (STAR7): the Starspun Weave last');
+  assert.deepEqual(Object.values(SIGIL_SETS).filter((s) => s.aetheric).map((s) => s.id), ['ruhn', 'oath', 'thieftaker', 'orcsbane', 'coilscale', 'numidium', 'wyrd', 'starspun', 'eltheric'], 'PIN MOVED (SEA-SET): the Eltheric Tidemail last - RAID4b: the gate boss\'s own, then the raids\' three - SERPENT-SET: then the sea serpent\'s own - PIN MOVED (WITCH1): the Wyrd\'s Raiment - PIN MOVED (STAR7): the Starspun Weave last');
   assert.deepEqual(SET_TIERS, [2, 4, 6]);
   assert.equal(SET_PLACES.length, 9, 'seven body pieces, the shield, the weapon');
   for (const set of Object.values(SIGIL_SETS)) {
@@ -53,7 +52,7 @@ test('SET1 the registry: the sets in the record\'s own order - the four of the w
     assert.deepEqual(set.tiers.map((t) => t.at), [...SET_TIERS], set.id);
     for (const t of set.tiers) {
       for (const [k, pair] of Object.entries(t.values)) {
-        assert.ok(Array.isArray(pair) && pair.length === 2 && pair.every(Number.isInteger), `${set.id}.${t.key}.${k}`);
+        assert.ok(Array.isArray(pair) && pair.length === 2 && pair.every((n) => Number.isInteger(['more', 'stack', 'less', 'lighter'].includes(k) ? n * 2 : n)), `${set.id}.${t.key}.${k}`);   // PIN MOVED: B5 (a percent is a whole number or a half, the others stay whole)
       }
       for (const st of [0, SET_STAGE_MAX]) {
         const words = t.text(tierValues(t, st));
@@ -76,9 +75,9 @@ test('SET1 the numbers\' line: a number at a stage is its place on the line from
 });
 
 test('SET1 the record: a sigil carries a power, a set, or both - never neither - and a set is one the registry knows; every reader of the power reads a set\'s armour as no blow (no per cent, no "undefined" in its words, a card with no blow); the item field and the loot door take a set piece and refuse a forged set (mutants: power still required; any set taken; the blow read off a set piece)', () => {
-  const weaponSigil = { power: 5, party: 1, xp: 0 };
+  const weaponSigil = { power: 3, party: 1, xp: 0 };
   const armourSigil = { set: 'dagon', party: 2, xp: 100 };
-  const setWeapon = { power: 5, set: 'mora', party: 1, xp: 0 };
+  const setWeapon = { power: 3, set: 'mora', party: 1, xp: 0 };
   for (const s of [weaponSigil, armourSigil, setWeapon]) assert.ok(validSigil(s), JSON.stringify(s));
   for (const s of [
     { party: 1, xp: 0 },                       // neither
@@ -99,7 +98,7 @@ test('SET1 the record: a sigil carries a power, a set, or both - never neither -
   try {
     setSigilOnline(true); setSigilRenown(40);
     assert.equal(sigilPercent(armourSigil, 40), 0, 'no power, no blow');
-    assert.equal(sigilPercent(setWeapon, 40), 1, 'a set weapon keeps its blow (5% at Faint)');
+    assert.equal(sigilPercent(setWeapon, 40), 0.6, 'a set weapon keeps its blow (0.6% at Faint)');
     const piece = armour(102, 'dagon');
     const lines = sigilLines(piece);
     assert.deepEqual(lines, ['Sigil (Faint)', 'Faint: 0 / 5,000 to Kindled']);
@@ -107,7 +106,7 @@ test('SET1 the record: a sigil carries a power, a set, or both - never neither -
     assert.equal(v.blow, false); assert.equal(v.pct, 0); assert.equal(v.full, null); assert.equal(v.set, 'dagon');
     setSigilOnline(false);
     assert.deepEqual(sigilLines(piece), ['Sigil (Dormant: works online only)']);
-    assert.deepEqual(sigilLines(weapon(120, null)), ['Sigil (Dormant: works online only): +5% at Ascendant'], 'a weapon\'s words are what they were');
+    assert.deepEqual(sigilLines(weapon(120, null)), ['Sigil (Dormant: works online only): +3% at Ascendant'], 'a weapon\'s words are what they were');
   } finally { _resetSigilForTests(); }
   assert.deepEqual(validItemField('sigil', armourSigil), armourSigil);
   assert.equal(validItemField('sigil', { set: 'nobody', party: 1, xp: 0 }), undefined);
@@ -168,8 +167,8 @@ test('SET1 the stage: the lowest worn piece\'s rank capped by the Renown\'s stag
   assert.equal(st.heldRenown, false);
   assert.deepEqual(st.tiers.map((t) => t.awake), [true, true, false], 'four pieces: the 2 and the 4');
   assert.deepEqual(st.tiers[0].values, { strength: 3, critical: 6 }, 'Kindled\'s numbers');
-  assert.equal(st.tiers[1].text, 'Your weapon deals 6% more damage, or 12% more while you are below half health');
-  assert.equal(st.tiers[1].full, 'Your weapon deals 12% more damage, or 24% more while you are below half health', 'and what it is at Ascendant');
+  assert.equal(st.tiers[1].text, 'Your weapon deals 1% more damage, or 2% more while you are below half health');   // PIN MOVED: B5 (Bloodfury [0.5, 1.5], Kindled rounds to 1)
+  assert.equal(st.tiers[1].full, 'Your weapon deals 1.5% more damage, or 3% more while you are below half health', 'and what it is at Ascendant');   // PIN MOVED: B5 (Bloodfury Ascendant 5 -> 1.5)
   // Renown 9 opens only Faint: the Renown holds it
   st = setState('dagon', pieces, 9, true);
   assert.equal(st.stage, 0);
@@ -221,7 +220,7 @@ test('SET1 the session and the powers\' one question: awake online with my Renow
     setSigilRenown(40);
     assert.equal(setsAwake(), true);
     assert.deepEqual(awakeTier(e, 'dagon', 0), { strength: 6, critical: 12 });
-    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 12 });
+    assert.deepEqual(awakeTier(e, 'dagon', 1), { more: 1.5 });   // PIN MOVED: B5 (Bloodfury Ascendant 5 -> 1.5)
     assert.equal(awakeTier(e, 'dagon', 2), null, 'four pieces: the third sleeps');
     assert.equal(awakeTier(e, 'mora', 0), null, 'a set not worn');
     setSetsDueling(true);

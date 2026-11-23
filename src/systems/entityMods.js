@@ -1,6 +1,4 @@
-// RF1 (2026-09-14, Mac: "is there anything in the codebase that can
-// benefit from a refactor. This is our first time going against parity
-// with DFU ... Lets tackle each one at a time"): ENTITY MODIFIER
+// RF1: ENTITY MODIFIER
 // CHANNELS - the one home for what a wearer carries, read once per
 // channel by DFU's formulas.
 //
@@ -40,7 +38,7 @@
 //   heatDegrees     LOOT15: degrees the heat is felt less
 //   fatigueLess     LOOT15: % less of the minute's fatigue drain (scenes/shared.js fatigueLossMultiplierFor)
 //   fallLess        LOOT15: % less of a fall's damage (scenes/shared.js applyFallLanding)
-//   magicka         EG15: points on the maximum magicka - the Battlemage's Bearing (systems/sigil/sigilSetPowers.js); the live
+//   magicka         points on the maximum magicka; the live
 //                   accessor reads it beside Renown's term (systems/chargen.js defineLiveMaxMagicka, through
 //                   systems/renownLayer.js foldMpOf), so a save takes it off with Renown's (offlineVitals) and the
 //                   magery's third is never taken of it (passiveSpecials.js)
@@ -59,7 +57,7 @@ import { addEquipChangeListener } from './equip.js';
 import { openBlowCeiling, closeBlowCeiling } from './powerCeiling.js';   // POWER-CEILING: the blow's powers multiplied, held under one product
 import { NUMBER_BODY_PARTS } from './armorMaterials.js';   // one home for the seven (audit24's one-home ratchet)
 export { NUMBER_BODY_PARTS };
-/** LOOT14/LOOT15 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md sections 6 and 7): the social groups a standing
+/** LOOT14/LOOT15 (the Loot arc II): the social groups a standing
  *  channel counts (FactionFile.SocialGroups 0..4), and the wardrobe's plain numbers, summed fold by fold. */
 export const STANDING_CHANNELS = 5;
 export const WARDROBE_CHANNELS = Object.freeze(['warmth', 'dry', 'coldDegrees', 'heatDegrees', 'fatigueLess', 'fallLess']);
@@ -68,7 +66,7 @@ export const EMPTY_MODS = Object.freeze({
   armorParts: Object.freeze(new Array(NUMBER_BODY_PARTS).fill(0)),
   stats: Object.freeze({}), statMax: Object.freeze({}), skills: Object.freeze({}), resist: Object.freeze({}), weightMult: 0,
   standing: Object.freeze(new Array(STANDING_CHANNELS).fill(0)),
-  ...Object.fromEntries(WARDROBE_CHANNELS.map((k) => [k, 0])), magicka: 0,   // EG15: the maximum magicka's points
+  ...Object.fromEntries(WARDROBE_CHANNELS.map((k) => [k, 0])), magicka: 0,   // the maximum magicka's points
 });
 /** A fresh, writable record for a fold to fill. */
 export const newMods = () => ({ armorParts: new Array(NUMBER_BODY_PARTS).fill(0), stats: {}, statMax: {}, skills: {}, resist: {}, weightMult: 0,
@@ -97,19 +95,21 @@ const _blowMods = new Map();
  *  pcaaoWeaponAttackDamage). */
 export function registerWeaponBlowMod(name, fn) { if (typeof fn === 'function') _blowMods.set(name, fn); else _blowMods.delete(name); }
 const NO_BLOW_INFO = Object.freeze({ unaware: false });
-/** The blow's damage through every registered blow modifier, in registration order. POWER-CEILING: inside one product
+/** The blow's damage through every registered blow modifier, in registration order. POWER-CEILING: inside one sum
  *  (powerCeiling.js) - each modifier asks blowRoom for its per cent, so together they stay under BLOW_MOST. */
 export function weaponBlowMods(weapon, damage, attacker, target, info = NO_BLOW_INFO) {
-  let d = damage;
+  // B1: THE POWERS ADD. Each modifier is handed the damage the blow started with and returns its own, and what each added
+  // (or took) is summed onto it, so +6% and +8% make +14% and a card's number is what the blow gets.
+  let added = 0;
   const was = openBlowCeiling();
   // AUDIT SET L6: a modifier that throws is skipped, as every other seam here skips one - a blow modifier now reaches a
   // second foe's whole damage door and death (SET3's Cleave), and a throw there aborted the swing that carried it
   try {
     for (const fn of _blowMods.values()) {
-      try { const next = fn(weapon, d, attacker, target, info ?? NO_BLOW_INFO); if (Number.isFinite(next)) d = next; } catch (e) { console.warn('[entityMods] a blow modifier threw', e?.message ?? e); }
+      try { const next = fn(weapon, damage, attacker, target, info ?? NO_BLOW_INFO); if (Number.isFinite(next)) added += next - damage; } catch (e) { console.warn('[entityMods] a blow modifier threw', e?.message ?? e); }
     }
   } finally { closeBlowCeiling(was); }
-  return d;
+  return damage + added;
 }
 
 /** Run every fold and sum the channels onto `entity._mods`. Called at
@@ -130,7 +130,7 @@ export function computeEntityMods(entity) {
     out.weightMult += Number(m.weightMult) || 0;
     if (Array.isArray(m.standing)) for (let g = 0; g < STANDING_CHANNELS; g++) out.standing[g] += Number(m.standing[g]) || 0;   // LOOT14
     for (const k of WARDROBE_CHANNELS) out[k] += Number(m[k]) || 0;
-    out.magicka += m.magicka | 0;   // EG15: whole points
+    out.magicka += m.magicka | 0;   // whole points
   }
   entity._mods = out;
   return out;

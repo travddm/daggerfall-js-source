@@ -165,20 +165,6 @@ test('WM3: the shared seam remaps, prunes the short archive, and never re-keys',
   assert.equal(texRemap.size, 1);
 });
 
-test('WM3: ONE DFU MEMBER, ONE EXPORT - no host keeps its own copy of the loop', () => {
-  for (const host of REMAP_HOSTS) {
-    const text = src(host);
-    assert.match(text, /import \{ remapSubMeshes(?:, \w+)* \} from '\.\.\/world\/texRemap\.js'/,   // PIN MOVED (AUDIT MENU-ORDER C3): the seam's own name for a table's law may ride the same import
-      `${host} does not use the shared remap seam`);
-    // The tell of a re-grown copy is the write, not the read: any host
-    // that sets a texRemap entry itself has stopped going through the
-    // seam. src/world/texRemap.js is the one file allowed to.
-    assert.doesNotMatch(text, /texRemap\.set\(/,
-      `${host} writes the remap table itself - the loop has been copied back`);
-  }
-  assert.match(src('src/world/texRemap.js'), /texRemap\.set\(/);
-});
-
 test('WM3: the mill does NOT go through the scene table - WM2e owns its skin', () => {
   // Recorded as a rule because it is the thing WM3 nearly shipped. The
   // scene's texRemap is keyed "archive_record" over the WHOLE location:

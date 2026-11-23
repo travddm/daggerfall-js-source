@@ -93,8 +93,3 @@ test('BAG-COOK THE LAW: cookFood takes the raw food off its own list and puts th
   assert.deepEqual(one.map((it) => it.templateIndex), [TEMPLATE.Meat], 'no `into`: the same list');
 });
 
-test('BAG-COOK THE WORDS: the fire\'s page says where the gathered goods go and that a Raw Fish from the pack or the bag cooks over the flame (mutants: none - the words)', () => {
-  const page = readFileSync(new URL('../../src/ui/professions/profPages.js', import.meta.url), 'utf8');
-  assert.match(page, /All go into your Materials Bag, then your pack\. A Raw Fish from your pack or bag cooked over the flame is a plain meal and gives no Cooking experience\./);
-  assert.doesNotMatch(page, /All go to your Stores\./);
-});

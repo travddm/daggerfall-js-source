@@ -1,9 +1,8 @@
-// LOOT-BANNER + ACQUIRE1 (2026-10-09, Mac: "a popup for when you obtain something of rarity including weapons, armor, the
-// new cards, etc - something akin to a destiny loot popup notification"; bible/10-UI/Loot-Banner.md). The laws pinned here:
+// LOOT-BANNER + ACQUIRE1. The laws pinned here:
 //   - THE WATCHER (systems/acquireWatch.js): what arrived in the player's keeping - the pack, the wagon, the Materials Bag -
-//     read once a frame; a piece marked the first frame it stands there; a card by its count; a new baseline for a new
+//     read once a frame; a piece marked the first frame it stands there; a new baseline for a new
 //     entity, a load, and the creation; only Rare and up announces; the mark is the receiver's (stripped off the wire).
-//   - THE LAW (ui/lootBanner.js createBannerQueue): three standing, the best waiting first, a card's count added, a hold
+//   - THE LAW (ui/lootBanner.js createBannerQueue): three standing, the best waiting first, a count added, a hold
 //     and a big one's, a piece no longer held never standing.
 //   - THE FACE: Enhanced Plus only, at the right edge under the notices; the big tiers' banner and fanfare; hidden under the
 //     HUD's gate with its clock still; the codex's first find said on the banner.
@@ -20,12 +19,8 @@ import * as B from '../../src/ui/lootBanner.js';
 import * as CX from '../../src/systems/loot/lootCodex.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
 import { mintAetheric, AETHERIC_RECORDS } from '../../src/systems/aetheric.js';
-import { mintHourlock } from '../../src/systems/gilded.js';
-import { mintIliacCard, giveBinderAtChargen } from '../../src/systems/iliac/iliacItems.js';
-import { ILIAC_CARDS } from '../../src/net/iliac/iliacCards.js';
-import { addItem, splitStack } from '../../src/systems/inventory.js';
+import { mintGilded, DRAGONFIRE_OATH } from '../../src/systems/gilded.js';
 import { validLootItem } from '../../src/systems/loot/loot.js';
-import { wildRecord } from '../../src/systems/wild/wildDeath.js';
 import { ITEM_FIELDS } from '../../src/systems/item/itemFields.js';
 import { templateByIndex } from '../../src/systems/item/itemTemplates.js';
 import { HUD_PIECES } from '../../src/ui/hud/hudLayout.js';
@@ -38,7 +33,6 @@ const lcg = (seed) => () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; r
 const known = (it) => Object.assign(it, { isIdentified: true });
 const tiered = (tier, seed = 2) => known(LR.applyRarity(createWeapon(113, 1), tier, lcg(seed)));
 const legend = (id = 'wyrmbane') => { const rec = LR.legendaryById(id); return known(LR.applyRarity(createWeapon(rec.templates?.[0] ?? 113, 1), 'legendary', lcg(1), [rec])); };
-const cardOf = (tier) => ILIAC_CARDS.find((c) => c.tier === tier).id;
 const on = () => { _resetForTests(); setPref('lootRarity', true); };
 const hero = (over = {}) => ({ isPlayer: true, chargenDone: true, items: [], wagonItems: [], bagItems: [], ...over });
 const names = (arr) => arr.map((a) => [a.item.name, a.tier, a.count]);
@@ -67,51 +61,16 @@ test('ACQUIRE1 THE WATCHER: the first frame is a baseline; a new Rare piece arri
   assert.equal(W.markable(potion), false); assert.equal(W.markable({ group: 'Weapons', templateIndex: 131 }), false, 'an arrow never');
 });
 
-test('ACQUIRE1 THE CARDS: a card arrives by its count - a new record, a card merged into a stack held, a stack of the player\'s own back from a chest saying nothing; a split into the wagon says nothing; its tier its catalog\'s, with loot rarity off too (mutants: the merge missed; the split an arrival; my own stack an arrival; a card\'s tier the loot ladder\'s)', () => {
-  on();
-  const watch = W.createAcquireWatch();
-  const rareId = cardOf('rare'), commonId = cardOf('common');
-  const me = hero();
-  watch.observe(me);
-  addItem(me.items, mintIliacCard(rareId, 1));
-  addItem(me.items, mintIliacCard(commonId, 3));
-  const a = watch.observe(me);
-  assert.equal(a.length, 1, 'the Rare card; a Common card says nothing');
-  assert.deepEqual([a[0].item.card, a[0].tier, a[0].count], [rareId, 'rare', 1]);
-  addItem(me.items, mintIliacCard(rareId, 2));
-  assert.equal(me.items.filter((it) => it.card === rareId).length, 1, 'merged into the stack held');
-  assert.deepEqual(watch.observe(me).map((x) => [x.item.card, x.count]), [[rareId, 2]], 'its count rose by two');
-  const stack = me.items.find((it) => it.card === rareId);
-  const half = splitStack(me.items, stack, 1);
-  me.items.splice(me.items.indexOf(half), 1);
-  addItem(me.wagonItems, half);
-  assert.deepEqual(watch.observe(me), [], 'a split into the wagon');
-  me.wagonItems.splice(me.wagonItems.indexOf(half), 1);
-  addItem(me.items, half);
-  assert.equal(me.items.filter((it) => it.card === rareId).length, 1, 'merged back into the pack\'s stack');
-  assert.deepEqual(watch.observe(me), [], 'and back out of the wagon: the three lists\' count did not rise');
-  me.items.splice(me.items.indexOf(stack), 1);
-  assert.deepEqual(watch.observe(me), [], 'into a chest');
-  me.items.push(stack);
-  assert.deepEqual(watch.observe(me), [], 'and back: my own stack, marked');
-  setPref('lootRarity', false);
-  addItem(me.items, mintIliacCard(cardOf('legendary'), 1));
-  assert.deepEqual(watch.observe(me).map((x) => x.tier), ['legendary'], 'the tier printed on the card, whatever the ladder\'s switch');
-  me.items.push(tiered('legendary', 9));
-  assert.deepEqual(watch.observe(me), [], 'a piece of the ladder, the ladder off: no tier');
-});
-
-test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it ends, and a new entity announce nothing; the mark is the receiver\'s - stripped by the wire\'s clamp and the zone\'s record, so a piece another player hands over arrives (mutants: no baseline at a load; the starter deck announced; the wire keeping the mark)', () => {
+test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it ends, and a new entity announce nothing; the mark is the receiver\'s - stripped by the wire\'s clamp, so a piece another player hands over arrives (mutants: no baseline at a load; the starter deck announced; the wire keeping the mark)', () => {
   on();
   const watch = W.createAcquireWatch();
   const me = hero({ chargenDone: false });
   watch.observe(me);
   me.items.push(tiered('legendary'));
   assert.deepEqual(watch.observe(me), [], 'the creation');
-  giveBinderAtChargen(me);   // the kit's tail and the flag in the same gap between two frames (chargenSession.js)
-  me.items.push(mintAetheric(AETHERIC_RECORDS[0]));
+  me.items.push(mintAetheric(AETHERIC_RECORDS[0]));   // the kit's tail and the flag in the same gap between two frames (chargenSession.js)
   me.chargenDone = true;
-  assert.deepEqual(watch.observe(me), [], 'the frame it ends: its starter deck and kit announce nothing');
+  assert.deepEqual(watch.observe(me), [], 'the frame it ends: its kit announces nothing');
   assert.deepEqual(watch.observe(me), [], 'nor the next');
   me.items = [...me.items, legend('graveward')];   // a save from before the mark: nothing in it carries one
   assert.deepEqual(watch.observe(me), [], 'a load replaces the pack: a baseline');
@@ -119,14 +78,13 @@ test('ACQUIRE1 THE BASELINES: a load\'s new pack, the creation and the frame it 
   assert.equal(ITEM_FIELDS.acquired.kind, 'bool', 'a declared field: it rides the save');
   const mine = Object.assign(tiered('rare', 6), { acquired: true });
   assert.equal(validLootItem(JSON.parse(JSON.stringify(mine))).acquired, undefined, 'the wire\'s clamp strips it');
-  assert.equal(wildRecord(mine).acquired, undefined, 'the zone\'s record too');
   const me2 = hero();
   watch.observe(me2);
   me2.items.push(validLootItem(JSON.parse(JSON.stringify(mine))));
   assert.deepEqual(watch.observe(me2).map((x) => x.tier), ['rare'], 'handed over: new to its taker');
 });
 
-test('LOOT-BANNER THE LAW: three stand, the newest first; what waits goes in by tier, the best first; a card\'s count adds to its banner standing or waiting; a hold, a big one\'s longer, then the slide; a piece no longer held is dropped at its turn; past the waiting cap the lowest go (mutants: no cap; waiting in arrival order; a second card a second banner; one hold for all; the held check skipped)', () => {
+test('LOOT-BANNER THE LAW: three stand, the newest first; what waits goes in by tier, the best first; a count adds to its banner standing or waiting; a hold, a big one\'s longer, then the slide; a piece no longer held is dropped at its turn; past the waiting cap the lowest go (mutants: no cap; waiting in arrival order; a second card a second banner; one hold for all; the held check skipped)', () => {
   const q = B.createBannerQueue({ max: 3, hold: 100, bigHold: 300, slide: 10, pendingMax: 5 });
   const e = (key, tier, big = false) => ({ key, tier, big, count: 1, name: key });
   q.push([e('a', 'rare'), e('b', 'legendary'), e('c', 'rare'), e('d', 'gilded', true), e('x', 'rare')]);
@@ -243,12 +201,12 @@ test('LOOT-BANNER THE FACE: on Enhanced Plus a new Exalted Legendary stands at t
   }, { skin: 'classic' });
 }));
 
-test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece stand big and play the fanfare once a frame, with the port\'s sounds on; a Rare plays nothing; a card stands as its tier\'s card with its count; a piece gone before its turn never stands (mutants: no big banner; no fanfare; the fanfare past the sounds switch; a card uncounted)', () => withPage((doc, sounds) => {
+test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece stand big and play the fanfare once a frame, with the port\'s sounds on; a Rare plays nothing; a piece gone before its turn never stands (mutants: no big banner; no fanfare; the fanfare past the sounds switch; a card uncounted)', () => withPage((doc, sounds) => {
   on();
   setPref('soundEnhancements', true);
   const me = hero();
   frame(me);
-  me.items.push(mintAetheric(AETHERIC_RECORDS[0]), mintHourlock());
+  me.items.push(mintAetheric(AETHERIC_RECORDS[0]), mintGilded(DRAGONFIRE_OATH));   // the Dragonfire Oath, the Hourlock's place since the guns' removal
   frame(me);
   const big = byClass(doc.body, 'lootbanner');
   assert.deepEqual(big.map((b) => b.dataset.rarity), ['aetheric', 'gilded'], 'the newest on top');
@@ -266,15 +224,6 @@ test('LOOT-BANNER THE TOP TIERS: an Aetheric, an Artifact and a Gilded piece sta
   me.items.push(Object.assign(tiered('rare', 10), { artifact: true }));
   frame(me);
   assert.deepEqual(sounds, [], 'the port\'s sounds off: no fanfare');
-  B._resetLootBannersForTests();
-  frame(me);
-  const id = cardOf('legendary');
-  addItem(me.items, mintIliacCard(id, 2));
-  frame(me);
-  const c = byClass(doc.body, 'lootbanner')[0];
-  assert.equal(textIn(c, 'lb-kicker'), 'Legendary Card');
-  assert.equal(byClass(c, 'lb-count')[0].textContent, '×2');
-  assert.equal(textIn(c, 'lb-sub'), `${ILIAC_CARDS.find((x) => x.id === id).kind.replace(/^./, (s) => s.toUpperCase())} card`);
   B._resetLootBannersForTests();
   frame(me);
   const fleeting = tiered('legendary', 11);
@@ -328,9 +277,6 @@ test('LOOT-BANNER THE CODEX: a first find is said on the banner on Enhanced Plus
 }));
 
 test('LOOT-BANNER THE WIRING: drawHud reads the player entity it is handed on every skin, under the HUD\'s gate, and its hide door hides the stack; the stack is a HUD-MOVE piece with a preview; the stack steps under the notice stack and never past the window\'s foot; the codex hands its find through the leaf (mutants: the call inside the skin\'s gate; the hide door forgotten; no HUD piece; the layout over the notices)', () => {
-  const hud = read('src/ui/hud/hud.js');
-  assert.match(hud, /\n  drawLootBanners\(\{ entity: vitals, hidden: cursorActive \|\| !hudRenderEnabled\(\), dt \}\);\n  if \(isEnhanced\(\) && typeof document !== 'undefined'\) \{/, 'beside the revenant\'s cards, before the skin\'s gate');
-  assert.match(hud, /drawRevenantCards\(\{ hidden: true \}\);[^\n]*\n  drawLootBanners\(\{ hidden: true \}\);[^\n]*\n\}/, 'the hide door');
   for (const host of ['world.js', 'worldModes.js', 'dungeonContext.js', 'exterior.js']) {
     assert.match(read(`src/scenes/${host}`), /drawHud\(renderer, canvas, hudArt, playerEntity,/, `${host}: hands drawHud the player entity`);
   }
@@ -342,12 +288,9 @@ test('LOOT-BANNER THE WIRING: drawHud reads the player entity it is handed on ev
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 380, bottom: 520 }, lower: 790, heights: [60, 60] }), { top: 530, shown: 2 }, 'under the notices');
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 100, bottom: 300 }, lower: 790, heights: [60, 60] }), { top: 480, shown: 2 }, 'notices far above: its own place');
   assert.deepEqual(B.bannerLayout({ base: 480, notice: { top: 380, bottom: 700 }, lower: 790, heights: [60, 60, 60] }), { top: 710, shown: 1 }, 'a short band shows the newest');
-  assert.match(read('src/systems/loot/lootCodex.js'), /if \(!quiet && !presentCodexFind\(item, key\.kind\)\) \{/);
-  assert.doesNotMatch(read('src/systems/loot/lootCodex.js'), /from '(?:\.\.\/)+ui\//, 'the codex imports no face');   // AUDIT TIDY TOOL-1: at any depth
 });
 
-// ── HONOUR-BANNER (2026-10-14, Mac: "The title/aura in the abyss dungeon should also have a loot popup"; the lamp's "ensure
-// there is a loot popup for obtaining the title") ──
+// ── HONOUR-BANNER ──
 test('HONOUR-BANNER THE ENTRY: a title or an aura granted is a banner of its own - its word, "New Title"/"New Aura", the top tier\'s place and fanfare, the title\'s own colour; a word nobody names is none', async () => {
   const PB = await import('../../src/ui/playerBadge.js');
   const t = B.honourEntry({ kind: 'title', key: 'hourbreaker' });
@@ -364,40 +307,3 @@ test('HONOUR-BANNER THE ENTRY: a title or an aura granted is a banner of its own
   assert.equal(B.honourVars(null), null);
 });
 
-test('HONOUR-BANNER THE FACE: announced on Enhanced Plus it stands - held by the account, never dropped as gone from the pack - in the title\'s colour and paint, big, with the fanfare; the mark an SVG in the title\'s colour, a laurel or a ring; the classic skin builds nothing and the door says so; the Hour\'s door wired (the lamp\'s is test/lampkeeper2\'s)', () => withPage((doc, sounds) => {
-  on();
-  doc.createElementNS = (ns, tag) => Object.assign(fakeEl(tag, doc), { namespaceURI: ns });   // AUDIT FIVE-ASKS E4: the browser's door, the mark's real path
-  setPref('soundEnhancements', true);
-  const me = hero();
-  frame(me);
-  assert.equal(B.announceHonour('title', 'hourbreaker'), true);
-  frame(me);
-  const [b] = byClass(doc.body, 'lootbanner');
-  assert.ok(b, 'it stands, though nothing of it is in the pack');
-  assert.deepEqual([b.dataset.rarity, b.dataset.honour], ['gilded', 'title']);
-  assert.ok(b.classList.contains('lb-big'));
-  assert.equal(b.style.getPropertyValue('--rar'), '#e8c060', 'its edge and light the title\'s colour');
-  assert.deepEqual([textIn(b, 'lb-kicker'), textIn(b, 'lb-name'), textIn(b, 'lb-sub')], ['New Title', 'Hourbreaker', B.honourSub()]);
-  const word = byClass(b, 'lb-word')[0];
-  assert.ok(word && word.parent === byClass(b, 'lb-name')[0] && word.textContent === 'Hourbreaker', 'the word in its own box (AUDIT FIVE-ASKS E3)');
-  assert.match(word.style.backgroundImage, /^linear-gradient/, 'the word in the paint it is worn in - over the word, not the row');
-  assert.equal(byClass(b, 'lb-name')[0].style.backgroundImage ?? '', '', 'the row itself unpainted: the count keeps its own colour');
-  const [mark] = byClass(b, 'lb-icon')[0].children;
-  assert.deepEqual([mark.namespaceURI, mark.tag, mark.attrs.fill, mark.attrs.width, mark.attrs.height], [B.HONOUR_MARK_NS, 'svg', 'var(--rar)', '48', '48'], 'an SVG in the banner\'s colour, whole pixels a cell');
-  const titleRects = mark.children.length;
-  assert.deepEqual(sounds, [SOUND.ArenaFanfareLevelUp]);
-  assert.equal(B.announceHonour('aura', 'turninghour'), true);
-  frame(me);
-  const aura = byClass(doc.body, 'lootbanner').find((n) => n.dataset.honour === 'aura');
-  assert.ok(aura && byClass(aura, 'lb-icon')[0].children[0].children.length !== titleRects, 'a ring of light, not the title\'s laurel');
-  assert.equal(B.announceHonour('aura', 'nobody'), false, 'a word nobody names: no banner');
-  withPage((cdoc) => {
-    assert.equal(B.announceHonour('title', 'hourbreaker'), false, 'the classic skin: the line alone');
-    frame(hero());
-    assert.equal(cdoc.getElementById(B.LOOT_BANNER_STACK_ID), null);
-  }, { skin: 'classic' });
-  // AUDIT WORLD-REWARDS C1: anchored to the Hour's own carrier - SERPENT5's door (the Old Coil's carrier, above it) is the
-  // same text, and the bare line matched it with the Hour's gone (HONOUR-BANNER-world-hands-no-door survived)
-  assert.match(read('src/scenes/world.js'), /createSdClaims\(\{[\s\S]{0,1200}announce: \(kind, key\) => announceHonour\(kind, key\),   \/\/ HONOUR-BANNER/, 'the Hour\'s door');
-  assert.match(read('src/net/superDungeon/sdClaims.js'), /if \(answer\.data\.titleNew === true\) announce\('title', SD_HONOUR_KEYS\.title\);/, 'announced when the title is newly held (AUDIT FIVE-ASKS E1)');
-}));

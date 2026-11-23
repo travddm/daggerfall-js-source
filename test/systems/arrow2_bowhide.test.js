@@ -153,7 +153,7 @@ test('ARROW2: BowDrawback off, the bow idles DRAWN (frame 3) and the instant sho
   assert.equal(c.frame, 0, 'not while cooling: AnimateWeapon does not step a bow it has hidden');
 });
 
-test('ARROW2: ONE step per resume - a long frame on the release moves one frame, never StrikeDown to Idle at once (FPSWeapon.cs:545); the port\'s own gun keeps its clock', () => {
+test('ARROW2: ONE step per resume - a long frame on the release moves one frame, never StrikeDown to Idle at once (FPSWeapon.cs:545)', () => {
   const m = createWeaponMachine(true);
   m.bowIdleDrawn = true; m.frame = 3;
   machineAttack(m, 'StrikeDown');
@@ -161,9 +161,4 @@ test('ARROW2: ONE step per resume - a long frame on the release moves one frame,
   assert.equal(m.state, 'StrikeDown');
   assert.equal(m.acc, 0, 'the remainder is dropped, not carried');
   assert.deepEqual(machineStep(m, T16 * 0.99, 50), [], 'and the next wait is a whole tick');
-  const g = createWeaponMachine(false);
-  g.tick = 0.07; g.frames = { StrikeDown: 6 };
-  machineAttack(g, 'StrikeDown');
-  machineStep(g, 0.07 * 3 + 0.001, 50);
-  assert.equal(g.frame, 3, 'FIELD-GUN7\'s lab clock is no FPSWeapon: it still carries');
 });

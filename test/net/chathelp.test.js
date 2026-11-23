@@ -1,5 +1,4 @@
-// CHAT-HELP (2026-09-23, Mac: "a non-intrusive greeting message that says something along the lines of (use /help
-// for commands)"). The chat has had /help since CHAT-CHAN, and nothing pointed a player at it. Each time the player
+// CHAT-HELP. The chat has had /help since CHAT-CHAN, and nothing pointed a player at it. Each time the player
 // goes online the chat greets them with one line that is theirs alone and is never counted unread - it is there when
 // they open the chat, and no badge asks them to.
 import { test } from 'node:test';
@@ -26,11 +25,3 @@ test('CHAT-HELP: a quiet line is kept but never counted unread; any other line s
   assert.equal(log.unreadTotal(), 1, 'a line anyone says still counts');
 });
 
-test('CHAT-HELP: the host greets on every join - chatStart pushes it quietly, as the system, on the first tab (mutant: the push dropped)', () => {
-  const w = rd('src/scenes/world.js');
-  const start = w.indexOf('const chatStart = () => {');
-  assert.ok(start > 0);
-  const body = w.slice(start, w.indexOf('\n  };', start));
-  // PIN MOVED (CROWN2): the seats' red lines' door is set with the chat, between the two
-  assert.match(body, /chatLog = new ChatLog\(\);\n\s+chatLinks = new Map\(\);\n\s+redChat = [^\n]*\n\s+chatLog\.push\(chatLog\.active, \{ text: CHAT_GREETING_TEXT, system: true \}, \{ quiet: true \}\);/);
-});

@@ -1,7 +1,6 @@
 // A MESH WEIGHTED TO A SKELETON, AT BAKE TIME.
 //
-// MW-STEEL4 (2026-10-07, Mac: "I think the prior session to rig the new steel set on the morrowind model really
-// fucked it up. How hard is it to switch it out?", and asked how, "You do it properly"). Retail Morrowind ships its
+// MW-STEEL4. Retail Morrowind ships its
 // armour SKINNED: each piece's NIF carries its own weights to the Bip01 bones and its own inverse binds, made once by
 // the modeller, and the engine only reads them (Morrowind-Rules.md rules 12, 19, 20). The steel plate came from Mac
 // as static meshes on a T-posed body, and MW-STEEL1-3 rigged it AT RUNTIME instead - each vertex copying the skin of

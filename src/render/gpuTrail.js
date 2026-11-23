@@ -1,5 +1,5 @@
 // @ts-check
-// GPU-TRAIL (2026-10-24): THE GPU'S LAST TEN MINUTES, KEPT BESIDE A CRASH.
+// GPU-TRAIL: THE GPU'S LAST TEN MINUTES, KEPT BESIDE A CRASH.
 //
 // Players report the desktop app's page stopping after a while of play, and the box says "It ran out of memory" - which
 // is only Electron's reason for the stop, in the player's words (app/lib/rendererGone.cjs GONE_WHY). One reporter's

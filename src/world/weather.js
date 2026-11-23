@@ -37,14 +37,16 @@ import { UMRandom } from '../formats/umRandom.js';
 
 export const WEATHER_TYPES = Object.freeze([
   'sunny', 'cloudy', 'overcast', 'fog', 'rain', 'thunder', 'snow',
-  // WEATHER2d (2026-09-14, Mac: "a new sand storm weather event for
-  // desert regions"): the port's own EIGHTH word, APPENDED so DFU's
+  // WEATHER2d: the port's own EIGHTH word, APPENDED so DFU's
   // seven keep their enum values (a save's byte, the classic array's
   // 0x7f mask and 5<->6 swap, WeatherTable.json's seven columns are all
   // untouched). It is never rolled: the weather field (systems/
   // weatherField.js) stands it as cells over the desert tables' land on
   // a cloudy or thunder day, on the enhanced lane only.
   'sandstorm',
+  // ASHFALL1 (Weather-Arc.md E): the port's own NINTH word, appended as the sandstorm was; never rolled - the weather
+  // map births it over the volcanic zones past the Bay (tamrielBiomes.js `ash`), on the enhanced lane only.
+  'ashfall',
 ]);
 
 export const FOG_SETTINGS = Object.freeze({
@@ -56,6 +58,7 @@ export const FOG_SETTINGS = Object.freeze({
   interior: { mode: 'exp', density: 0.001, start: 0, end: 0, excludeSky: false },
   dungeon: { mode: 'exp', density: 0.005, start: 0, end: 0, excludeSky: false },
   sandstorm: { mode: 'exp', density: 0.09, start: 0, end: 0, excludeSky: false },   // WEATHER2d: the port's own row - denser than the heavy fog, the sky in it (the wall is fog and cloud both)
+  ashfall: { mode: 'exp', density: 0.006, start: 0, end: 0, excludeSky: true },   // ASHFALL1: the port's own row - a haze of ash, thicker than the snow's (half a kilometre to the fog's colour), the pall over it seen
 });
 
 /** EV4: the DISTANCE HAZE follows the streamed horizon. DFU's linear
@@ -92,6 +95,7 @@ export function fogForWeather(weather, table = FOG_SETTINGS) {
     case 'thunder': return table.rainy;
     case 'snow': return table.snowy;
     case 'sandstorm': return table.sandstorm ?? table.heavy;   // WEATHER2d: the port's row; a mod's five settings (Dynamic Skies) have none, so the heavy fog stands in
+    case 'ashfall': return table.ashfall ?? table.snowy;   // ASHFALL1: the port's row; a mod's five have none, so the snow's (the nearest haze of a fall) stands in
     default: return table.sunny; // sunny, cloudy
   }
 }
@@ -130,13 +134,14 @@ export function weatherSunlightScale(weather, isWinter) {
   else if (weather === 'snow') scale = 0.45;
   else if (weather === 'overcast' || weather === 'fog') scale = 0.65;
   else if (weather === 'sandstorm') scale = 0.35;   // WEATHER2d: the port's own - between a rain and a storm
+  else if (weather === 'ashfall') scale = 0.4;   // ASHFALL1: the port's own - the pall a shade darker than a rain's deck
   return scale;
 }
 
 /** AT1: WeatherManager's FOUR PUBLIC FLAGS for a weather word.
  *
  *  IsRaining, IsStorming, IsSnowing and IsOvercast are what a mod asks
- *  the sky (Ambient Text's WeatherKey is the first here to), and they
+ *  the sky, and they
  *  are not a fifth enum - they are whatever SetWeather's switch
  *  (WeatherManager.cs:442-473) has left set, over ClearAllWeather's
  *  floor (:141-156). So the table is DERIVED from the calls each case
@@ -158,7 +163,7 @@ export function weatherSunlightScale(weather, isWinter) {
  *  WEATHER2d's sandstorm is the port's own eighth word and DFU's switch
  *  has no case for it, so there is nothing to port: it is answered here,
  *  once, as OVERCAST - the sky in a sandstorm is not clear, and every
- *  reader of these flags should be told so. It is neither rain nor snow.
+ *  reader of these flags should be told so. It is neither rain nor snow. ASHFALL1's ashfall, the ninth, is answered the same.
  */
 export function weatherFlags(weather) {
   return Object.freeze({
@@ -166,9 +171,13 @@ export function weatherFlags(weather) {
     storming: weather === 'thunder',
     snowing: weather === 'snow',
     overcast: weather === 'overcast' || weather === 'fog' || weather === 'rain'
-      || weather === 'thunder' || weather === 'snow' || weather === 'sandstorm',
+      || weather === 'thunder' || weather === 'snow' || weather === 'sandstorm' || weather === 'ashfall',
   });
 }
+
+/** WEATHER2d, ASHFALL1: THE DRY FALLS - the precipitation modes the rain program never draws: the sandstorm's sand and
+ *  the ashfall's ash (render/dryFall.js draws both). */
+export const isDryFall = (mode) => mode === 'sand' || mode === 'ash';
 
 /** Precipitation flags for the particles milestone. */
 export function precipitationForWeather(weather) {
@@ -176,6 +185,7 @@ export function precipitationForWeather(weather) {
   if (weather === 'thunder') return 'storm';
   if (weather === 'snow') return 'snow';
   if (weather === 'sandstorm') return 'sand';   // WEATHER2d: the wind-borne sand (render/windWisps.js SAND_LOOK), not the rain program
+  if (weather === 'ashfall') return 'ash';   // ASHFALL1: the ash and its embers (render/dryFall.js), not the rain program
   return null;
 }
 

@@ -1,11 +1,11 @@
 // @ts-check
-// QL12 (bible/06-Systems/Questlines-Arc.md section 7): THE QUESTLINES' SEAM WITH THE PAGE - what the line runner
+// QL12: THE QUESTLINES' SEAM WITH THE PAGE - what the line runner
 // (systems/questlines/qlLineRunner.js) needs of the world outside the machine, made once by the quest bridge
 // (scenes/quest/questBridge.js, THE ONE CONSTRUCTION SEAM) so no host builds or carries it: the account service's door
 // for the endgame lines' claims, on an online page alone (net/accountClient.js accountQuestlines). Offline, and on a
 // page with no service, null - the endgame lines then wait, and the introductions run as ever.
 //
-// T-B (bible/06-Systems/Witches-Festival.md "The Starwarden's purse"): a claim's answer that paid a line's purse of Soul
+// T-B ("The Starwarden's purse"): a claim's answer that paid a line's purse of Soul
 // Cakes (`purse` - server-account/src/questlines.js QL_PURSES, onto the account's count) is heard at this door, whatever
 // the runner makes of the rest: said as a find is, and the pack's Soul Cakes restacked through the festival's own door
 // (systems/festival/festivalClient.js refreshFestival - its answer's count, soulCake.js restackSoulCakes).

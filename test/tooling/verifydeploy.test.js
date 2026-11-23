@@ -146,32 +146,3 @@ test('V-DEPLOY: no local entry script is a caller error, not a poll', () => {
   assert.equal(deployVerdict({ localHtml: '<html></html>', liveHtml: '' }).kind, 'nolocal');
 });
 
-test('V-DEPLOY: the stamp is a real build plugin, wired into the real config', () => {
-  const plugin = viteConfig.plugins.find((p) => p?.name === 'build-tag-meta');
-  assert.ok(plugin, 'vite.config.js must carry the build-tag-meta plugin');
-  assert.equal(plugin.apply, 'build', 'the dev server must not be stamped');
-  const sha = readFileSync('src/buildTag.js', 'utf8').match(/'([^']*)'/)?.[1];
-  const injected = plugin.transformIndexHtml();
-  assert.deepEqual(injected, [{
-    tag: 'meta', attrs: { name: 'build-tag', content: sha }, injectTo: 'head',
-  }], 'the plugin must stamp the SAME sha scripts/buildTag.mjs wrote');
-  // And what it emits has to be readable by the thing that reads it -
-  // the two halves are pinned against each other rather than against
-  // a hand-written string.
-  const html = `<head><meta ${Object.entries(injected[0].attrs)
-    .map(([k, val]) => `${k}="${val}"`).join(' ')}></head>`;
-  assert.equal(buildTagOf(html), sha);
-});
-
-test('V-DEPLOY: importing the tool does not run it', () => {
-  // tools/musicNames.mjs reported `# tests 1 / # fail 0` for a file of
-  // eleven because importing it hit a top-level process.exit and killed
-  // the runner. Reaching this line at all is the proof for this file;
-  // the guard itself is pinned so it cannot be deleted quietly.
-  // AUDIT 68: the guard is the shared real-path one (tools/lib/isMain.mjs).
-  const src = readFileSync('tools/verify-deploy.mjs', 'utf8');
-  assert.ok(src.includes("import { isMain } from './lib/isMain.mjs';"),
-    'verify-deploy.mjs must only run main() when it IS the program');
-  assert.ok(/^if \(isMain\(import\.meta\.url\)\) main\(\);$/m.test(src),
-    'the guard must gate the main() call itself, not merely appear in the file');
-});

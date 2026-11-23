@@ -1,5 +1,5 @@
 // @ts-check
-// MENU-ORDER (2026-10-12, bible/10-UI/Menu-Order.md) - A PICTURE MADE WITH THE PANEL PASS.
+// MENU-ORDER - A PICTURE MADE WITH THE PANEL PASS.
 //
 // The owner: "I just feel like text lists are too much". A piece of furniture's tile (scenes/decor/decorTool.js) and a ship's
 // card (scenes/shipPortraits.js) show the thing itself: drawn once, small, by the second camera the decorator's preview

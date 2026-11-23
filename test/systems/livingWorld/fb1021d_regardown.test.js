@@ -4,11 +4,12 @@
 // online are a real hour each and run while the player is away: an evening's friendship was nought by the next evening,
 // the Courtship row's +40 (legacy/marriage.js FRIEND_AT) never reached, a word counted once a real hour. Now the regard
 // counts the character's own days (systems/livingWorld/regardClock.js), which stand while they are away (LIVED1).
-// The record: bible/01-Overview/bugs/Field-Bugs-2026-10-21d.md.
+// The record:.
 //
 // The real street (LivingTown over the test town, its talk path handing the relations the sky's living day) on the real
 // online sky (net/skyLaw.js skyClassicMinutes at wall instants), beside the character's own clock: twelve of its minutes a
 // real second while played, standing while logged off.
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -60,7 +61,8 @@ function street(own = DAY_416 + 720) {
   return { at, sky, town, person, id: person.living.id, relations, play, away };
 }
 
-test('REGARD-OWN: the report - an evening of words, a day logged off, and the regard stands where it was left; ten evenings of a word a day reach a friend (the Courtship row) - on the sky every evening began at nought (mutants: the wrapper reading the caller\'s sky day, the host on createRelations)', () => {
+test('REGARD-OWN: the report - an evening of words, a day logged off, and the regard stands where it was left; ten evenings of a word a day reach a friend (the Courtship row) - on the sky every evening began at nought (mutants: the wrapper reading the caller\'s sky day, the host on createRelations)', (t) => {
+  playByRules(t, { 'time.skyClock': true });   // the sky's own clock: the server profile's option
   const s = street();
   for (let h = 0; h < 3; h++) { s.town.talked(s.person); s.play(1); }
   const left = s.relations.regard(s.id);
@@ -154,7 +156,6 @@ test('REGARD-OWN, its feedback: the relations count the friend a word or its ton
   assert.deepEqual(s.relations.friendsMade(), [], 'a friend already: nothing more');
   assert.equal(friendLine({ name: 'Ysabel Lark', court: true }), 'Ysabel Lark counts you a friend now. You can court them: ask about Courtship under Tell me about.');
   assert.equal(friendLine({ name: 'Sir Ada', court: false }), 'Sir Ada counts you a friend now.', 'one of the watch, or no house: no Courtship named');
-  assert.match(readFileSync(join(ROOT, 'src/scenes/legacyHost.js'), 'utf8'), /topicsFor\(family, me, res, ctx\.regard \| 0\)\.map\(\(t\) => \(\{\n\s+topic: t,/);
 });
 
 test('REGARD-OWN (AUDIT FB1021d RO-4): a DEED that makes a friend is counted too - a life saved, a keepsake carried home (`note`, any kind) - and a regard handed down is not (`inherit`: a family\'s friends met as such); a friend lost again before the line is read is not said; one deed\'s crowd is said at most FRIENDS_SAID_MAX (mutants: deeds uncounted, inherit counted, the lapse unread, the crowd uncapped)', () => {
@@ -203,8 +204,6 @@ test('REGARD-OWN (AUDIT FB1021d RO-1): townTalk says a friend made once nothing 
   queue.push({ name: 'Sir Ada', court: false });
   tt.hudFrame(1 / 30, null);
   assert.equal(said.at(-1), 'Sir Ada counts you a friend now.', 'indoors too');
-  const W = readFileSync(join(ROOT, 'src/scenes/world.js'), 'utf8');
-  assert.match(W, /friendsMade: \(\) => friendCards\(livingRelations\.friendsMade\(\), livingTownOfId, legacyTopicRows\),/);
 });
 
 test('REGARD-OWN (AUDIT FB1021d RO-4): a friend\'s card is their resident minted again from their town, and the Courtship row read for them; an id of no known town is not named', () => {

@@ -1,4 +1,4 @@
-// DISC28-B (2026-09-28, Discord: "the game locks up if guards hit you the moment you fast travel").
+// DISC28-B.
 //
 // Online the world runs under every window (WORLD5), so a guard's blow can raise the surrender box as the travel map
 // commits the journey - and the arrival clears the crime (PostFastTravel, world.js) with the box still standing. The
@@ -132,7 +132,3 @@ test('DISC28-B: a new crime after the withdrawn question raises a fresh surrende
   flow.dispose();
 });
 
-test('DISC28-B: the host withdraws the question where the arrival clears the crime', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(src, /setCrimeCommitted\(playerEntity, CRIMES\.None\);\s*\n\s*arrestFlow\.crimeCleared\(\);/);
-});

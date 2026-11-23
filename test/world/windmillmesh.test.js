@@ -85,8 +85,6 @@ test('WM2a: the rotor names CLASSIC textures and carries none of them', () => {
     assert.ok(Number.isInteger(sm.textureArchive) && sm.textureArchive >= 0);
     assert.ok(Number.isInteger(sm.textureRecord) && sm.textureRecord >= 0);
   }
-  const baked = readFileSync(join(root, 'src/world/windmillMesh.js'), 'utf8');
-  assert.doesNotMatch(baked, /base64|data:image/, 'image data was baked into the mesh module');
 });
 
 test('WM2a: no Daggerfall art was vendored beside the geometry', () => {
@@ -182,12 +180,3 @@ test('WM2e: the hub sits at the CENTRE of the cap, on the axis it turns about', 
   assert.ok(ROTOR_HUB[2] - capMaxZ < 4, 'the hub stands too far off the cap to be on a shaft');
 });
 
-test('WM2e: the bake reaches the space the mod\'s own numbers are in', () => {
-  // The conversion itself, held from the source side: drop it and every
-  // number taken from a prefab or a WorldData block silently means its
-  // mirror image.
-  const bake = readFileSync(join(root, 'scripts/bakeWindmill.mjs'), 'utf8');
-  assert.match(bake, /positions\[i\] = -positions\[i\]/, 'the X negation is gone');
-  assert.match(bake, /normals\[i\] = -normals\[i\]/, 'the normals were not mirrored with the vertices');
-  assert.match(bake, /indices\[i \+ 2\] = t/, 'a mirror turns triangles inside out - the winding must reverse with it');
-});

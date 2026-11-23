@@ -3,6 +3,7 @@ import { createReadStream, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { landingHtml, readBuildSha } from './scripts/landingHtml.mjs';
 import { studioArtIndex } from './scripts/studioArtIndex.mjs';   // STUDIO1: the studio's listing, served and built from the folder
+import { buildLicense, THIRD_PARTY_FILE } from './scripts/buildLicense.mjs';   // the licences every copy must carry
 
 // Dev-only: serve ARENA2 game data at /arena2/*. The data is freeware but
 // never committed or bundled (Port-Doctrine); builds contain no game files.
@@ -39,7 +40,7 @@ function arena2DevServer() {
   // /play/arena2/*; the probes' direct imports still fetch /arena2/*.
   // Same handler, both doors - a dev server that answered one and not
   // the other is the mixed-case bug above in a new coat.
-  return {
+  const plugin = {
     name: 'arena2-dev-server',
     configureServer(server) {
       for (const mount of ['/arena2', '/play/arena2']) server.middlewares.use(mount, (req, res, next) => {
@@ -79,6 +80,9 @@ function arena2DevServer() {
       });
     },
   };
+  // `vite preview` serves a built game to the probes (tools/probes/build.mjs): the data is mounted there too
+  plugin.configurePreviewServer = plugin.configureServer;
+  return plugin;
 }
 
 // THE DEPLOY'S OWN NAME, stamped where a verifier can read it without
@@ -141,7 +145,7 @@ export default defineConfig({
     // the problem here is only ever the COUNT." AUDIT-IF F1 then added
     // Immersive Footsteps (123 clips under 4 KB, 250 KB of base64).
     //
-    // INLINE1 (2026-09-20): THAT PREMISE WAS WRONG, AND THE RULE WAS AN
+    // INLINE1: THAT PREMISE WAS WRONG, AND THE RULE WAS AN
     // ENUMERATION. A vendored mod is never "a handful of small files" -
     // it ships in the hundreds - and an allow-list of three folders is a
     // rule enforced by memory: twenty vendor folders landed after it and
@@ -162,21 +166,19 @@ export default defineConfig({
     // that returned `true` would force-inline REGARDLESS of size, the
     // opposite mistake and just as quiet.
     assetsInlineLimit: (filePath) => (/[\\/]vendor[\\/]/.test(filePath) ? false : undefined),
-    // BUILD-LEFTOVERS (2026-10-15): THE CHUNK-SIZE WARNING IS A LINE AGAIN.
+    // BUILD-LEFTOVERS: THE CHUNK-SIZE WARNING IS A LINE AGAIN.
     // At Vite's 500 kB it fired on every build - the world chunk, world.js
-    // and all it imports statically, is 2,662 kB - so it said nothing. Set
-    // just over today's largest chunk, it speaks when a chunk grows past the
-    // world. (AUDIT BUILD-LEFTOVERS, the second read: 2,500 sat over the
-    // world's 2,446 when written, and main's POI editor took it to 2,662 by
-    // the merge. And HOST-SPLIT does not shrink it: a module the host imports
+    // and all it imports statically, was 2,662 kB when this was set - so it
+    // said nothing. Set just over the largest chunk then, it speaks when a
+    // chunk grows past the world. (Splitting the host does not shrink it: a module the host imports
     // statically joins the host's chunk - pixelBuild.js is in it. Only a
     // dynamic import takes code out; lower this when one does.)
     chunkSizeWarningLimit: 2_750,
-    // EVERY ROOT PAGE: the game, the voxel editor (viewer.html), the labs
-    // and the prototypes. None carries game data - a page that draws the
-    // game's art asks for the user's own ARENA2. AUDIT 68: a root page
+    // The bundled npm packages' licences, beside the LICENSE.txt that buildLicense() writes (scripts/buildLicense.mjs).
+    license: { fileName: THIRD_PARTY_FILE },
+    // EVERY HTML PAGE: the site, the game, the legal pages and the labs in labs/. A page
     // missing here works under `npm run dev` and silently never ships;
-    // test/tooling/audit68_repo.test.js holds every tracked root *.html to a key.
+    // test/tooling/audit68_repo.test.js holds every tracked *.html at the root and in labs/ to a key.
     rollupOptions: {
       // BUILD-LEFTOVERS: one warning is the design, not a fault. hudLayout.js
       // loads revenantCard.js dynamically (the HUD preview's ghost) because
@@ -211,79 +213,31 @@ export default defineConfig({
         // links to (src/net/legalLaw.js TERMS_URL and PRIVACY_URL).
         terms: 'terms/index.html',
         privacy: 'privacy/index.html',
-        viewer: 'viewer.html',
-        sky: 'sky.html',   // ES1: the enhanced sky lab
-        water: 'water.html', // WATER1: the enhanced water lab (src/tools/waterLab.js)
-        ketch: 'ketch.html', // KETCH: the sky-ketch Mzunthar, made in code, drawn by the game's renderer (src/tools/ketchLab.js)
-        abyss: 'abyss.html', // SD-LAB: the Shattered Hour and the Rift, made in code, drawn by the game's renderer (src/tools/abyssLab.js)
-        spire: 'spire.html', // EG-G2: an Elite Breach's circle in its band's dress, made in code (src/tools/spireLab.js) - tools/spireLabProbe.mjs
-        cards: 'cards.html', // CARDS3: the card table lab (src/tools/cardsLab.js) - tools/cardsProbe.mjs
-        // MW-D: the Morrowind data inspector. Reads a player's own
-        // archives and reports what is IN them; it draws nothing, stores
-        // nothing and is wired to nothing the game runs. It exists
-        // because the reverted first-person arc asked for a skeleton
-        // file that is not in Morrowind.bsa and never said so.
-        mwInspect: 'mw-inspect.html',
-        // MW-IMPORT SLICE 2: the Morrowind mesh viewer - user-supplied
-        // Morrowind.bsa / loose NIFs through a picker, nothing baked in.
-        // Doubles as the record-coverage scout for the strict NIF reader,
-        // and as the visual proving ground the first-person rig has to
-        // pass before it goes anywhere near the game.
-        mwViewer: 'mw-viewer.html',
-        // A PROTOTYPE, and deployed on purpose: a design that claims to
-        // adapt to a phone has to be opened on one.
-        enhanced: 'enhanced.html',
-        // The same, for the FRONT DOOR - the four boot screens
-        // (title, launcher, splash, PICK03I0) as one menu.
-        menu: 'menu.html',
-        // And for the wizard behind it, one stage at a time.
-        chargen: 'chargen.html',
-        // THE MODERN DIRECTION (Mac, 2026-08-27): the Skyrim-esque
-        // main-menu redesign, self-contained, deployed for phone eyes.
-        menuRedesign: 'menu-redesign.html',
-        // The same direction cut in Daggerfall's own pixel idiom.
-        menuPixel: 'menu-pixel.html',
-        // THE GROUND PROTOTYPE (Mac, 2026-08-31: prototype the new
-        // ground textures and the 3D grass before any code change).
-        // Deployed on purpose - a look has to be judged on a real
-        // screen, and this one runs on the phone too. It touches
-        // nothing the game runs: its own page, its own shaders, and
-        // the tileset tools/groundProto.mjs writes into
-        // public/prototype/ground/.
-        grassProto: 'grass-proto.html',
-        // THE GUN LAB (Mac, 2026-09-19): a NEW WEAPON TYPE prototyped
-        // before a line of the game changes. Its own page over our own
-        // art (public/art/gun-*), the classic 320x200 placement law and
-        // nothing else borrowed; combat/fpsWeapon.js is untouched and
-        // nothing the game runs imports src/tools/gunLab.js.
-        gunProto: 'gun-proto.html',
-        // THE PISTOL LAB (2026-10-21): the second new weapon type through
-        // the gun lab's door - a dwarven flintlock pistol, one in either
-        // hand. Our own art (public/art/pistol-frames.png); nothing the
-        // game runs imports src/tools/pistolLab.js.
-        pistolProto: 'pistol-proto.html',
+        // The lab pages live in labs/. They carry no game data: a page that draws the game's art asks for the user's own
+        // ARENA2, or runs on made-up data. They ship so a phone can open them.
+        sky: 'labs/sky.html',   // ES1: the enhanced sky lab
+        water: 'labs/water.html', // WATER1: the enhanced water lab (src/tools/waterLab.js)
+        abyss: 'labs/abyss.html', // SD-LAB: the Shattered Hour and the Rift, made in code, drawn by the game's renderer (src/tools/abyssLab.js)
+        // The front door - the four boot screens (title, launcher, splash, PICK03I0) as one menu.
+        menu: 'labs/menu.html',
+        // And the wizard behind it, one stage at a time.
+        chargen: 'labs/chargen.html',
         // LV1: THE ASCENSION LAB - the enhanced level-up window over a
         // made-up character, so the screen a player sees once a level
         // can be opened on demand, at any size, with no ARENA2 on disk.
         // tools/levelUpProbe.mjs drives this page.
-        levelUp: 'levelup.html',
+        levelUp: 'labs/levelup.html',
         // FIRM1: THE FIRMAMENT LAB - the passive tree's window over made-up purses, no service and no ARENA2, in either
         // dress (`?dress=grimoire`), so the sky can be judged and driven by hand
-        firmament: 'firmament.html',
+        firmament: 'labs/firmament.html',
         // GROWTH: THE GROWTH TAB'S LAB - the pause window on its Growth tab over a made-up character, Firmament book and
-        // captain, no ARENA2 and no service, so the guide and the skies drawn in the pane can be driven by hand;
-        // tools/growthProbe.mjs drives this page.
-        growth: 'growth.html',
-        // The texture-archive contact sheet: every record of one
-        // TEXTURE.nnn laid out and numbered, to read off which record
-        // an item template points at. The player's own ARENA2 through
-        // a picker, like mw-inspect - nothing baked in.
-        archiveSheet: 'archive-sheet.html',
+        // captain, no ARENA2 and no service, so the guide and the skies drawn in the pane can be driven by hand.
+        growth: 'labs/growth.html',
         // STUDIO1: THE STUDIO - every picture the port paints itself, as worn, each with its template to download, and the
         // artists' own pictures beside them (src/tools/studioLab.js; public/art/studio/README.md). No game data.
-        studio: 'studio.html',
+        studio: 'labs/studio.html',
       },
     },
   },
-  plugins: [arena2DevServer(), buildTagMeta(), landingHtml(), studioArtIndex()],
+  plugins: [arena2DevServer(), buildTagMeta(), landingHtml(), studioArtIndex(), buildLicense()],
 });

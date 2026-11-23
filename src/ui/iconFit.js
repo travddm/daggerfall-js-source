@@ -1,5 +1,4 @@
-// UI1 (2026-09-27, the Plus UI pass - bible/10-UI/Slots-Hotbar-Status.md; Mac: "make the actual inventory plots have
-// the rarity frame with sprites enlarged properly, instead of the inventory icon just plopping into a slot"):
+// UI1:
 // THE FIT LAW - how big an item's picture is drawn in its slot, and how.
 //
 // Pure: the numbers alone. The canvas that carries them out is bitmapCanvas.js's `fitCanvas`, the cache

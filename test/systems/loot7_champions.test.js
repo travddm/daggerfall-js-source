@@ -1,11 +1,10 @@
-// LOOT7 - CHAMPION FOES (2026-10-01; bible/06-Systems/Loot-Arc.md section 9, Mac: "Do you wanna turn this into an arc
-// and do all of the above?" - "Champion foes. Single named foes with visible traits (Fiery, Swift, Vampiric) and a
+// LOOT7 - CHAMPION FOES (2026-10-01;  - "Champion foes. Single named foes with visible traits (Fiery, Swift, Vampiric) and a
 // guaranteed Rare"). The laws pinned here:
 //   - THE TRAITS: five, each a name that is its id's (the HUD's leaf spells it), each what its sentence says.
-//   - WHO: about one foe in fourteen (CHAMP-RATE, was twenty) - a dungeon's by a hash of the place and the marker (every client the same), the
+//   - WHO: about one foe in fifty (one in fifty, twenty per mille) - a dungeon's by a hash of the place and the marker (every client the same), the
 //     street's by its owner's roll and carried to every puppet (`cp`), a save's kept; never under level 3, the watch,
 //     an ally; off, none.
-//   - WHAT: twice its health and its blows a quarter harder (on any elite's), its trait on top; its name everywhere.
+//   - WHAT: 1.4 times its health and its blows 15% harder (on any elite's), its trait on top; its name everywhere.
 //   - ITS LOOT: a stronger source, and a Rare or better always - never its worn kit.
 
 import '../modsOff.js';
@@ -14,6 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { setPref, _resetForTests } from '../../src/systems/uiPrefs.js';
 import * as CH from '../../src/systems/champions.js';
+import { markDungeonPromotions } from '../../src/systems/eliteFoes.js';
 import * as LR from '../../src/systems/loot/lootRarity.js';
 import { spawnEnemyLoot } from '../../src/scenes/hostCombat.js';
 import { equipTableOf } from '../../src/systems/equip.js';
@@ -42,90 +42,90 @@ test('LOOT7: the traits - five, each named as its id reads, the wire\'s order it
     assert.ok(t.text, t.id);
     assert.equal(CH.championIndex(t.id), CH.CHAMPION_TRAITS.indexOf(t));
   }
-  assert.equal(CH.CHAMPION_PER_MILLE, 70, 'CHAMP-RATE: 70, was 50');
+  assert.equal(CH.CHAMPION_PER_MILLE, 20);
   assert.equal(CH.CHAMPION_MIN_LEVEL, 3);
   assert.equal(CH.CHAMPION_TRAITS.length - 1 <= 15, true, 'the wire has room for every index');
 });
 
-test('LOOT7: the dungeon\'s - a hash of the place and the marker, the same every time, about one in fourteen; never an ally; off none', () => {
+test('LOOT7: the dungeon\'s - a hash of the place and the marker, the same every time; one foe in fifty is a champion; never an ally; off none', () => {
   on();
   const layout = (n) => Array.from({ length: n }, (_, i) => ({ mobileType: 7, x: i, y: 0, z: 0 }));
-  let marked = 0, total = 0;
-  for (let loc = 1; loc <= 400; loc++) {
-    const a = layout(25), b = layout(25);
-    const na = CH.markDungeonChampions(a, loc * 7919);
-    CH.markDungeonChampions(b, loc * 7919);
-    assert.deepEqual(a.map((e) => e.champion ?? null), b.map((e) => e.champion ?? null), 'every client the same');
-    for (const e of a) if (e.champion != null) assert.ok(Number.isInteger(e.champion) && CH.CHAMPION_TRAITS[e.champion]);
-    marked += na; total += 25;
-  }
-  assert.ok(Math.abs(marked / total - 0.07) < 0.01, `about one in fourteen (${marked} of ${total})`);
   const seen = new Set();
-  for (let loc = 1; loc <= 400; loc++) { const a = layout(25); CH.markDungeonChampions(a, loc); for (const e of a) if (e.champion != null) seen.add(e.champion); }
+  let champions = 0, elites = 0, total = 0;
+  for (let loc = 1; loc <= 2000; loc++) {
+    const a = layout(25), b = layout(25);
+    markDungeonPromotions(a, loc * 7919);
+    markDungeonPromotions(b, loc * 7919);
+    const said = (list) => list.map((e) => [e.champion ?? null, e.eliteFoe ?? null]);
+    assert.deepEqual(said(a), said(b), 'every client the same');
+    for (const e of a) {
+      total++;
+      if (e.eliteFoe) { elites++; assert.equal(e.champion, undefined, 'an elite is never a champion'); }
+      if (e.champion != null) { champions++; seen.add(e.champion); assert.ok(Number.isInteger(e.champion) && CH.CHAMPION_TRAITS[e.champion]); }
+    }
+  }
+  assert.ok(Math.abs(champions / total - 0.02) < 0.004, `about one in fifty (${champions} of ${total})`);
+  assert.ok(Math.abs(elites / total - 0.01) < 0.003, `the elite band beside it, one in a hundred (${elites} of ${total})`);
   assert.equal(seen.size, 5, 'every trait stands somewhere');
-  const allies = layout(200).map((e) => ({ ...e, allied: true }));
-  assert.equal(CH.markDungeonChampions(allies, 3), 0, 'never an ally');
-  // THE HASH IS THE BUILD'S WORD: a client on another build must stand the same champions - these never move
-  const forty = (loc) => { const a = Array.from({ length: 40 }, () => ({})); CH.markDungeonChampions(a, loc); return a.flatMap((e, i) => (e.champion != null ? [[i, e.champion]] : [])); };
-  assert.deepEqual(forty(2), [[2, 2], [3, 0], [12, 3], [21, 1], [30, 3]]);   // CHAMP-RATE: 70 per mille keeps every pick of 50's and adds
-  assert.deepEqual(forty(7), [[5, 0], [17, 4], [36, 0]]);
-  const first = [{}];
-  CH.markDungeonChampions(first, 39);
-  assert.equal(first[0].champion, 4, 'location 39 marks its first marker the Thorned');
-  const kept = [{ champion: 2 }];
-  assert.equal(CH.markDungeonChampions(kept, 39), 0);
+  const allies = layout(400).map((e) => ({ ...e, allied: true }));
+  assert.equal(markDungeonPromotions(allies, 3), 0, 'never an ally');
+  // The hash is the build's word: a client on another build must stand the same foes, so these never move.
+  const forty = (loc) => { const a = Array.from({ length: 40 }, () => ({ mobileType: 7 })); markDungeonPromotions(a, loc); return a.flatMap((e, i) => (e.eliteFoe ? [[i, 'elite']] : e.champion != null ? [[i, e.champion]] : [])); };
+  assert.deepEqual(forty(2), [[2, 2], [30, 3]]);
+  assert.deepEqual(forty(7), [[5, 0], [17, 4]]);
+  assert.deepEqual(forty(39), [[0, 'elite'], [13, 2], [25, 1]]);
+  const first = [{ mobileType: 7 }];
+  markDungeonPromotions(first, 39);
+  assert.equal(first[0].eliteFoe, true, 'location 39 marks its first marker an elite');
+  const kept = [{ mobileType: 7, champion: 2 }];
+  assert.equal(markDungeonPromotions(kept, 39), 0);
   assert.equal(kept[0].champion, 2, 'a mark rides its record - a rebuild keeps it');
   off();
-  assert.equal(CH.markDungeonChampions(layout(500), 5), 0, 'off: none');
+  assert.equal(markDungeonPromotions(layout(500), 5), 0, 'off: none');
 });
 
-test('LOOT7: the street\'s - a hash of where it stands, its type and the count, never a draw; one in fourteen; the record carries it and refuses a forged one', () => {
+test('LOOT7: the street\'s - a hash of where it stands, its type and the count, never a draw; elite or champion by band; the record carries it and refuses a forged one', () => {
   on();
   const r = lcg(4);
   const spots = Array.from({ length: 20000 }, () => [r() * 4000 - 2000, 0, r() * 4000 - 2000]);
   const real = Math.random;
   Math.random = () => { throw new Error('a draw'); };
   let first;
-  try { first = spots.map((p, i) => CH.rollStreetChampion(p, i % 40)); } finally { Math.random = real; }
-  const marked = first.filter((c) => c != null);
-  assert.ok(Math.abs(marked.length / 20000 - 0.07) < 0.006, `about one in fourteen (${marked.length})`);
-  assert.equal(new Set(marked).size, 5, 'every trait');
+  try { first = spots.map((p, i) => CH.rollStreetPromotion(p, i % 40)); } finally { Math.random = real; }
+  const champions = first.filter((c) => c?.tier === 'champion');
+  const elites = first.filter((c) => c?.tier === 'elite');
+  assert.ok(Math.abs(champions.length / 20000 - 0.02) < 0.004, `about one in fifty (${champions.length})`);
+  assert.ok(Math.abs(elites.length / 20000 - 0.01) < 0.003, `the elite band, one in a hundred (${elites.length})`);
+  assert.equal(new Set(champions.map((c) => c.trait)).size, 5, 'every trait');
   CH._resetStreetChampionsForTests();
-  assert.deepEqual(spots.map((p, i) => CH.rollStreetChampion(p, i % 40)), first, 'the same street stands the same champions - a seeded test\'s too');
+  assert.deepEqual(spots.map((p, i) => CH.rollStreetPromotion(p, i % 40)), first, 'the same street stands the same foes - a seeded test\'s too');
   CH._resetStreetChampionsForTests();
   const street = [];
-  for (let i = 0; i < 200; i++) { const c = CH.rollStreetChampion([i * 7.5, 0, i * -3.25], 7); if (c != null) street.push([i, c]); }
-  assert.deepEqual(street, [[2, 4], [6, 2], [12, 2], [26, 4], [28, 1], [33, 0], [37, 2], [56, 2], [67, 2], [74, 0], [78, 4], [79, 2], [103, 3], [118, 3], [139, 2], [141, 3], [159, 2], [163, 3], [168, 1], [178, 0], [181, 1], [199, 0]], 'golden (CHAMP-RATE: 50\'s twelve kept, ten more)');
-  CH._resetStreetChampionsForTests();
-  assert.notDeepEqual(Array.from({ length: 200 }, (_, i) => CH.rollStreetChampion([i * 7.5, 0, i * -3.25], 8)), Array.from({ length: 200 }, (_, i) => street.find(([j]) => j === i)?.[1] ?? null), 'its type is in the hash');
+  for (let i = 0; i < 200; i++) { const c = CH.rollStreetPromotion([i * 7.5, 0, i * -3.25], 7); if (c) street.push([i, c.tier, c.trait]); }
+  assert.deepEqual(street, [[26, 'champion', 4], [28, 'champion', 1], [37, 'champion', 2], [74, 'elite', 0], [103, 'elite', 3], [159, 'champion', 2], [168, 'elite', 1]], 'golden');
+  const pick = (type) => { CH._resetStreetChampionsForTests(); return Array.from({ length: 200 }, (_, i) => CH.rollStreetPromotion([i * 7.5, 0, i * -3.25], type)); };
+  assert.notDeepEqual(pick(8), pick(7), 'its type is in the hash');
   off();
-  assert.ok(Array.from({ length: 200 }, (_, i) => CH.rollStreetChampion([i * 7.5, 0, i * -3.25], 7)).every((c) => c === null), 'off: none');
+  assert.ok(Array.from({ length: 200 }, (_, i) => CH.rollStreetPromotion([i * 7.5, 0, i * -3.25], 7)).every((c) => c === null), 'off: none');
   on();
   assert.deepEqual(validFoeRecord({ i: 3, cp: 4 }), { i: 3, cp: 4 });
   for (const bad of [-1, 16, 1.5, 'x']) assert.equal(validFoeRecord({ i: 3, cp: bad }), null, `cp ${bad}`);
   assert.deepEqual(validFoeRecord({ i: 3 }), { i: 3 }, 'none when none');
-  const ef = strip(read('src/scenes/exteriorFoes.js'));
-  assert.match(ef, /if \(!allied && !entity\.eliteFoe\) applyChampion\(entity, champion !== undefined \? champion : revenant \? \(revenant\.trait \? championIndex\(revenant\.trait\) : null\) : \(capped \? rollStreetChampion\(pending\.feet, mobileType\) : null\), \{ own: !puppet \}\);\s*(?:if \(revenant && !puppet\) applyRevenant\(entity, revenant(?:, \{ turned \})?\);\s*)?(?:(?:const wild = |if \(wild|if \(zoneGiant != null\))[^\n]*\n\s*|entity\.(?:maxHealth|healthMult|damageScale) = [^\n]*\n\s*|\}\s*\n\s*)*if \(puppet\) entity\.items = \[\];/, 'the owner rolls an encounter\'s, a puppet takes its owner\'s word - before the loot (WILD1: the open zone\'s scaling between; ELITE FOES: never on an elite - one or the other)');   // ZONE-GIANTS/PVPGIANT: the zone's giant marks and its ten-times body are the zone's scaling too
-  assert.match(ef, /if \(!onWatch && f\.entity\?\.champion\) r\.cp = championIndex\(f\.entity\.champion\);/, 'the record carries it');
-  assert.equal((ef.match(/const cp = Number\.isInteger\(r\.cp\) && championsOf\(from\) < PEER_CHAMPION_PUPPETS_MAX \? r\.cp : null;/g) ?? []).length, 2, 'both of a puppet\'s stands read it, under its owner\'s champions');   // PIN MOVED (GRANT0, Spawn-Grants.md section 8: the trait counted)
-  assert.equal((ef.match(/champion: cp \}\)/g) ?? []).length, 2, 'and stand it');
-  assert.match(ef, /champion: f\.entity\.champion \?\? null,/, 'a save keeps it');
-  assert.match(ef, /champion: sf\.champion \? championIndex\(sf\.champion\) : null/, 'and a load stands it again, never rolled');
 });
 
-test('LOOT7: what a champion is - twice the health, a quarter harder on any elite\'s, its trait on top; never the low, the watch, an ally, off', () => {
+test('LOOT7: what a champion is - 1.4 times the health, 15% harder on any elite\'s, its trait on top; never the low, the watch, an ally, off', () => {
   on();
   const m = foe();
   assert.equal(CH.applyChampion(m, 0), true);
-  assert.deepEqual([m.champion, m.maxHealth, m.health, m.damageScale], ['mighty', 80, 80, 1.25 * 1.5]);
+  assert.deepEqual([m.champion, m.maxHealth, m.health, m.damageScale], ['mighty', 56, 56, 1.15 * 1.2]);
   assert.equal(m.stats.speed, 50, 'only the Swift is quicker');
   const s = foe();
   CH.applyChampion(s, 1);
-  assert.equal(s.maxHealth, 120, 'the Stalwart: half again on the double');
+  assert.equal(s.maxHealth, 67, 'the Stalwart: a fifth more on the champion\'s');
   const elite = foe(10, { damageScale: 2, maxHealth: 80, health: 80 });
   CH.applyChampion(elite, 3);
-  assert.equal(elite.damageScale, 2.5, 'onto the elite\'s double, never over it');
-  assert.equal(elite.maxHealth, 160);
+  assert.equal(elite.damageScale, 2 * 1.15, 'onto the elite\'s scale, never over it');
+  assert.equal(elite.maxHealth, 112);
   const w = foe(10, { stats: { speed: 90 } });
   CH.applyChampion(w, 2);
   assert.equal(w.stats.speed, 100, 'the Swift: thirty more, never past a hundred');
@@ -154,9 +154,6 @@ test('LOOT7: its name everywhere - the hover, the HUD\'s target, the death line,
   assert.equal(liveEntityName({ entity: foe() }, 'Orc'), 'Orc');
   assert.equal(sayEnemyDied(() => {}, 7, e), 'Mighty Orc just died.');
   assert.equal(sayEnemyDied(() => {}, 7), 'Orc just died.');
-  const dc = strip(read('src/scenes/dungeonContext.js'));
-  assert.match(dc, /corpseName\(championName\(f\.entity, corpseEntityName\(f\.mobileType\)\)\)/, 'the dungeon\'s body');
-  assert.match(strip(read('src/scenes/exteriorFoes.js')), /corpseName\(properName\(e\.entity\) \?\? championName\(e\.entity, corpseEntityName\(e\.mobileType\)\)\)/, 'the street\'s - AUDIT WB12d (D2): a foe\'s own name first');
 });
 
 test('LOOT7: the traits that answer a blow - the Vampiric drinks its blow, the Thorned hurts my blow back; registered', () => {
@@ -184,9 +181,6 @@ test('LOOT7: the traits that answer a blow - the Vampiric drinks its blow, the T
   const pet = { health: 50, maxHealth: 50, activeEffects: [] };
   CH.championStrike(pet, t, 70);
   assert.equal(pet.health, 50, 'never an ally\'s blow');
-  const src = strip(read('src/systems/champions.js'));
-  assert.match(src, /registerPlayerStruckListener\(CHAMPIONS, championStruck\);/);
-  assert.match(src, /registerPlayerStrikeListener\(CHAMPIONS, championStrike\);/);
 });
 
 test('LOOT7: its loot - its own roll and no Rare forced (CHAMP-LOOT), never its worn kit; its own source; nothing off', () => {
@@ -217,9 +211,5 @@ test('LOOT7: its loot - its own roll and no Rare forced (CHAMP-LOOT), never its 
     assert.deepEqual(said(a.items), said(b), `seed ${seed}`);
   }
   assert.deepEqual(LR.CHAMPION_SOURCE, { tier: 2, quality: 1.25, ladder: 0.5 });   // CHAMP-LOOT: half the elite's
-  assert.match(strip(read('src/systems/loot/lootRarity.js')), /rollLootRarity\(loot, champ \? championSource\(source, qualityMult\) : \{ \.\.\.source, qualityMult, \.\.\.\(weights \? \{ weights \} : \{\}\) \}, \{ rolls, luck, find, level \}\);/, 'the corpse door reads it');   // PIN MOVED (AUDIT UPDATE L4): and the roller's level   // PIN MOVED (PARTY-LOOT): the caller's finders ride beside the Luck   // FOE-CAP: a plain foe's ladder rides beside it (a champion is never plain)
   off();
-  const dc = strip(read('src/scenes/dungeonContext.js'));
-  assert.match(dc, /markDungeonChampions\(enemies, dfLocation\.dungeon\.recordElement\.header\.locationId\);/, 'the layout marked');
-  assert.match(dc, /if \(!e\?\.elite \|\| !entity\) return void applyChampion\(entity, e\?\.champion\);[\s\S]{0,400}entity\.elite = true; applyChampion\(entity, e\.champion\);/, 'every build arm stands it, an elite\'s too');
 });

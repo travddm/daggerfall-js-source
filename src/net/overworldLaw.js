@@ -1,5 +1,5 @@
 // @ts-check
-// OW6L (2026-09-29, the product owner: "Everything needs that persistence between players in the overworld."): THE
+// OW6L: THE
 // OVERWORLD'S LEDGER, AS A CELL KEEPS IT - one a cell room (net/wire.js worldRoom: sixteen map pixels square), in the
 // cell object's storage, so every player in the cell agrees: the ones standing in it now, and the ones who walk in later.
 //
@@ -227,8 +227,7 @@ export function owLedgerOf(v) {
 
 // ═══ THE GRAVES (GRAVE-PARTY) ════════════════════════════════════════════════════════════════════
 //
-// (FIELD BUGS 2026-10-16b, "graveyard loot on headstones are able to be looted by others"; Mac's SEARCH1-PARTY: "When one
-// player in the party interacted with it no one else can again for 5 hours".) A headstone's search was its searcher's
+// (FIELD BUGS 2026-10-16b, "graveyard loot on headstones are able to be looted by others";.) A headstone's search was its searcher's
 // game's alone - the act channel is a world room's, and a street cell is not one - so a partymate searched the same stone
 // again and found again. The cell keeps who searched which stone now: one row a stone and a SEARCHER, its minute the
 // relay's own (the shared clock, never the word's), its account the token's subject and its name the token's character's

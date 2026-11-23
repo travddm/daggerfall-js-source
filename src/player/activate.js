@@ -95,7 +95,7 @@ const boxVolume = (b) => (b.max[0] - b.min[0]) * (b.max[1] - b.min[1]) * (b.max[
  * FB1020e OFFERING-RAY: THE RAY'S BOX - world corners as `{ min, max }`, which rayAabb, boxContains and the pick read.
  * Not the culling box's 6-array (render/frustum.js flatBatchAabb, a batch's `_box`): a producer holding one converts
  * it, as the streaming host's boards and graves do. A Hearth Offering handed the ray its 6-array, and every press in
- * the street it stood in threw out of rayAabb (bible/01-Overview/bugs/Field-Bugs-2026-10-20e.md).
+ * the street it stood in threw out of rayAabb.
  * @typedef {{ min: number[], max: number[] }} RayBox
  */
 /** ...and one entrant of the pick: its key, its box, the distance it wins at and the reach it answers within (MC-2).
@@ -414,10 +414,7 @@ export function pickActivatable(eye, dir, targets, collider) {
  * holds the law). Here, and not at the call sites, so every reader of
  * the ray - the presses, the plaque - reads the one pile.
  *
- * PR-WAGON1 (2026-09-24, a player's report Mac relayed: "Players can
- * grief other players with the wagon by putting it in front of dungeon
- * entryways and building entrances"; Mac's choice: "Others' wagons
- * don't block"): A TARGET THAT YIELDS. Another player's team - their
+ * PR-WAGON1: A TARGET THAT YIELDS. Another player's team - their
  * wagon and their horse, live or kept (scenes/horseCartPool.js marks
  * both `yields: true`: the producer's word, as LOOT-STACK's `body` is)
  * - stands no collider in this world, and the one ray passes through

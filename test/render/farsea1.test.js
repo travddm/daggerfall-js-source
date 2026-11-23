@@ -1,4 +1,4 @@
-// FAR-SEA1 (2026-10-10, Mac: "Anyway we can fix the draw distance for oceans without affecting performance?") -
+// FAR-SEA1 -
 // THE SEA REACHES THE HORIZON. From a mountain over the sea the streamed water faded into the world fog at the fog's
 // end, stood fully fogged to the streamed grid's square edge, and past it the far ring's sea came back at its 85%
 // haze hold - darker than the band in front of it. Pinned with no GL and no game data: the horizon's one haze law
@@ -82,21 +82,21 @@ test('FAR-SEA1: the open sea\'s light is ONE text - the water surface calls it, 
 test('FAR-SEA1: every ring shader - classic, the lane, the classic-shadow lane - fades by the one law and lights its sea as the water', () => {
   const fr = rd('src/render/farRing.js');
   const classicFs = fr.slice(fr.indexOf('const FS = `#version 300 es'), fr.indexOf('}`;', fr.indexOf('const FS = `#version 300 es'))).replace('${RING_SEA_GLSL}', RING_SEA_GLSL);
-  // PIN MOVED (OW-HORIZON, 2026-10-20): the land and the sea take the ring's sun at their point (cloudShadow.js ringSun - the
   // clouds' map where it knows the ground, the far law past it) where they took the scale whole
   const order = (text, lines, name) => {
     let at = -1;
     for (const l of lines) { const i = text.indexOf(l); assert.ok(i > at, `${name}: '${l}' in its place`); at = i; }
   };
   // AUDIT FAR-SEA1 C1: the whole output line, and the sea's line between the light and it - inverted or dead, it fails
-  order(classicFs, ['float sun = ringSun();', 'vec3 lit = vColor * (uAmbient + uSunColor * (sun * diff) + uMoonColor * (uMoonScale * mdiff));',
+  // cover - the ground's alone off the woods (vFlora 0)
+  order(classicFs, ['float sun = ringSun();', 'vec3 lit = mix(vColor * (uAmbient + uSunColor * (sun * diff) + uMoonColor * (uMoonScale * mdiff)), vCanopy * floraLight(uAmbient, uSunColor, sun, uMoonColor, uMoonScale) * floraGrain(vWorld.xz), vFlora);',
     'float sea = vSea * uSeaLook;', 'if (sea > 0.0) lit = mix(lit, ringSea(uAmbient, uSunColor, uMoonColor, sun), sea);',
-    'outColor = vec4(mix(lit, uFogColor, ringHaze(horizonHaze(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, uHazeHold))), 1.0);'], 'classic');   // BANTHA1: the jungle's haze over the horizon's
+    'outColor = vec4(mix(lit, uFogColor, ringHaze(horizonHaze(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, summitHold(uHazeHold, vDist)))), 1.0);'], 'classic');   // BANTHA1: the jungle's haze over the horizon's
   // the lane: its ground through the tonemap into display space, the sea in the water's own space from the light as given
   for (const [name, text] of [['lane', EL_FAR_RING_FS], ['classic shadows', classicShadowLane().farRingFs]]) {
     order(text, ['float sun = ringSun();', 'vec3 shown = elEncode(elTonemapRGB(lit * ex));', 'float sea = vSea * uSeaLook;',
       'if (sea > 0.0) shown = mix(shown, ringSea(uSeaAmbient, uSeaSunColor, uSeaMoonColor, sun), sea);',
-      'vec3 col = mix(shown, uFogColor, ringHaze(horizonHaze(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, uHazeHold)));'], name);
+      'vec3 col = mix(shown, uFogColor, ringHaze(horizonHaze(vDist, uFogStart, uFogEnd, uRimStart, uRimEnd, summitHold(uHazeHold, vDist))));'], name);
   }
   for (const text of [classicFs, EL_FAR_RING_FS]) {
     assert.ok(!/uHazeHold \* clamp\(/.test(text), 'the scaled ramp is gone');
@@ -111,7 +111,7 @@ test('FAR-SEA1: every ring shader - classic, the lane, the classic-shadow lane -
     vSea: 1, vWorld: wp, vSeaBody: [0.1, 0.15, 0.2], uEye: eye, uSkyZenith: [0.2, 0.35, 0.7], uSkyHorizon: [0.65, 0.78, 0.92], uSeaF0: WATER_F0, uSeaLook: 1,
     uLightDir: L, uSunScale: 0.54, uMoonDir: M, uMoonScale: 0,
   });
-  const got = f.ringSea([0.9, 0.9, 0.9], [1, 0.95, 0.85], [0, 0, 0], 0.54);   // PIN MOVED (OW-HORIZON, 2026-10-20): the sun's scale handed at the sea's point
+  const got = f.ringSea([0.9, 0.9, 0.9], [1, 0.95, 0.85], [0, 0, 0], 0.54);
   const v = [eye[0] - wp[0], eye[1] - wp[1], eye[2] - wp[2]]; const vl = Math.hypot(...v); const V = v.map((x) => x / vl);
   const lit = [0.1, 0.15, 0.2].map((b, k) => b * (0.9 + [1, 0.95, 0.85][k] * (0.54 * L[1] * 0.6)));
   const h = [L[0] + V[0], L[1] + V[1], L[2] + V[2]]; const hl = Math.hypot(...h);
@@ -124,13 +124,17 @@ test('FAR-SEA1: the ring\'s sea is a water pixel at the sea\'s own height - not 
   const W = 40, H = 40;
   const bytes = new Uint8Array(W * H).fill(0);
   bytes[20 * W + 20] = 60;   // an island
-  bytes[20 * W + 21] = 2;    // shallows (a water byte, still at the sea's clamp)
+  bytes[20 * W + 24] = 2;    // shallows (a water byte, still at the sea's clamp)
+  // The ring's vertex stands the kernel's ground at its pixel's centre (ringGroundAt): the island's byte stands at its node,
+  // the corner of pixels (20..21, 20..21), and the kernel's slope off it stands all four over the sea - (21, 20) beside it
+  // is the island's shore, as the streamed ground's
   bytes[21 * W + 20] = 30;   // land under the Ocean climate
   const climateAt = (x, y) => (x === 20 && y === 21 ? CLIMATES.Ocean : 231);
   const g = buildFarRingGrid({ heightBytes: bytes, mapWidth: W, mapHeight: H, climateAt, baseX: 20, baseY: 20, radius: 3 });
   const at = (px, py) => g.sea[(py - 20 + 3) * g.side + (px - 20 + 3)];
   assert.equal(at(19, 19), 255, 'open sea');
-  assert.equal(at(21, 20), 255, 'the shallows');
+  assert.equal(at(24, 20), 255, 'the shallows');
+  assert.equal(at(21, 20), 0, 'the island\'s shore (RELIEF-PEAKS: the kernel\'s ground at the centre, the island\'s node at its corner)');
   assert.equal(at(20, 20), 0, 'the island');
   assert.equal(at(20, 21), 0, 'an Ocean-climate pixel above the sea is not the sea');
   assert.equal(g.positions[((20 - 20 + 3) * g.side + (19 - 20 + 3)) * 3 + 1], Math.fround(ringHeight(0)), 'and the sea stands at the clamp (f32 storage)');
@@ -149,10 +153,13 @@ test('FAR-SEA1: the sea inside the hole - only fully-inside cells, only four sea
   const cellsOf = (idx) => { const s = new Set(); for (let t = 0; t < idx.length; t += 6) s.add(cellOf(idx[t]).join(',')); return s; };
   const ringCells = cellsOf(ring), fillCells = cellsOf(fill);
   for (const c of fillCells) assert.ok(!ringCells.has(c), `cell ${c}: drawn once`);
-  // the island's pixel is a corner of four cells: (30,29) (31,29) (30,30) (31,30) - every one left out
-  for (const c of ['30,29', '31,29', '30,30', '31,30']) assert.ok(!fillCells.has(c), `cell ${c} touches the island`);
-  assert.equal(fillCells.size, (2 * d) ** 2 - 4, 'every other fully-inside cell is the sea');
-  assert.equal(ringCells.size + fillCells.size, (side - 1) ** 2 - 4, 'with the ring, the whole mesh but the island\'s four');
+  // stands at its node, the corner of pixels (31..32, 30..31), and the four stand over the sea: every cell with one of them a
+  // corner, nine, left out (its pixel alone a corner of four, under the byte-at-the-centre law)
+  const island = [];
+  for (let y = 29; y <= 31; y++) for (let x = 30; x <= 32; x++) island.push(`${x},${y}`);
+  for (const c of island) assert.ok(!fillCells.has(c), `cell ${c} touches the island`);
+  assert.equal(fillCells.size, (2 * d) ** 2 - 9, 'every other fully-inside cell is the sea');
+  assert.equal(ringCells.size + fillCells.size, (side - 1) ** 2 - 9, 'with the ring, the whole mesh but the island\'s nine');
   // the same winding as the ring's cells
   assert.deepEqual([...fill.subarray(0, 6)].map((i) => i - fill[0]), [0, side, side + 1, 0, side + 1, 1]);
   // AUDIT FAR-SEA1 P1: farthest first - each cell's reach its farthest corner (pixel centres) from the hole pixel's centre
@@ -304,7 +311,7 @@ test('FAR-SEA1: the world host - the ring takes the water\'s sky, body and eye, 
   // one home for the sea's climate: Iliac Puddle No More's sea and the ring's sea read the same archive
   assert.equal((w.match(/snowCover\.arrayOf\(seaGroundArchive\(\)\)/g) || []).length, 2, 'the open sea and the ring\'s sea, one body');   // AUDIT PRECIP GROUND-2 (PIN MOVED)
   assert.equal((w.match(/renderer\.tileArrays\.get\(seaGroundArchive\(\)\)/g) || []).length, 0, 'never the bare set, which the snow lane does not upload');
-  assert.match(w, /import \{ FarRingRenderer, ringDisabled, ringHeight, RING_HAZE_HOLD, BuiltPixels \} from '\.\.\/render\/farRing\.js';/);   // PIN MOVED (OW-HORIZON, 2026-10-20): and the built pixels the ring's hole is keyed by
+  assert.match(w, /import \{ FarRingRenderer, ringDisabled, ringGroundAt, RING_HAZE_HOLD, BuiltPixels \} from '\.\.\/render\/farRing\.js';/);
   // THE FOUR HOSTS: the fixed city draws the water and no ring, the interiors and the dungeons neither - none sets it
   for (const f of ['src/scenes/exterior.js', 'src/scenes/dungeonContext.js', 'src/scenes/worldModes.js', 'src/tools/waterLab.js']) assert.ok(!rd(f).includes('setSeaHaze'), `${f}: the world's fog alone`);
   // the lens reads back the world's far plane

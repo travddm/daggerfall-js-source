@@ -1,5 +1,4 @@
-// STAFF-PANEL4-CENSUS (2026-10-22, mob picked it, 04:13Z; design doc "DFO Staff Panel: design", "Item and gold census",
-// "Server load" and the weak spots "Copies found misses modded dupes..." and "Census rows ride every save...") - THE ITEM
+// STAFF-PANEL4-CENSUS - THE ITEM
 // AND GOLD CENSUS AND THE CONTESTED PIECES (server-account/src/staffCensus.js), driven through the real Worker on the
 // node:sqlite database every account pin stands on (test/accountDb.mjs): the tally a checkpoint takes - on the hour's row
 // and the character's latest, only when it changed, and never the checkpoint's undoing when it fails - a kind's count,
@@ -49,7 +48,7 @@ async function stand() {
   const clock = () => now;
   const mobKey = await extensionKey(clock);
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
   });
   const raw = s.env.DB._raw;
   const staff = async (path, body = {}, token = null) => {
@@ -309,7 +308,7 @@ test('STAFF-PANEL4-CENSUS: THE DAY\'S TOTALS - once a UTC day at the census\'s q
     s.raw.prepare(`INSERT INTO market_auctions (id, seller, char_id, region, provenance, wear, opening, fee, at, ends_at, rid, n)
       VALUES ('a1', ?, ?, 1, 'a100000000000000', 1000, 5, 1, 1, 2, 'r', 'n')`).run(syl.id, a);
     s.raw.prepare("INSERT INTO market_deliveries (id, player, char_id, why, arrives_at, at, item) VALUES ('d1', ?, ?, 'bought', 1, 1, ?)").run(syl.id, a, JSON.stringify(piece(113, { stackCount: 2 })));
-    s.raw.prepare("INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, rid) VALUES ('account', 'x', 'escrow', 'b1', 'bid-escrow', 12, 1, 1, ?, 'b1')").run(syl.id);
+    s.raw.prepare("INSERT INTO marks_ledger (src_kind, src_id, dst_kind, dst_id, kind, amount, day, at, actor, rid) VALUES ('mint', NULL, 'escrow', 'b1', 'bid-escrow', 12, 1, 1, ?, 'b1')").run(syl.id);
     const day = utcDay(s.now());
     const at = day * 86400 + CENSUS_DAY_HOUR * 3600 + 41 * 60;
     s.raw.prepare("INSERT INTO item_census_days (kind, day, carried, holders, at) VALUES ('t71', ?, 1, 1, 1), ('t71', ?, 2, 1, 1)").run(day - CENSUS_DAYS_KEEP - 1, day - 3);
@@ -501,7 +500,7 @@ function planned(db) {
   return { rec, plans };
 }
 
-test('STAFF-PANEL4-CENSUS: THE JUMPS, THE CONTESTED LIST AND HOME STAND ON INDEXES - the jumps on the hours\' index, never the whole of realm_wealth_hours; the list and Home on the listed rows\' own (0154), never a walk of item_dupes, whose drops are in none of them (mutants: the jumps grouped on the bare column; an index lost; the drops indexed)', async () => {
+test('STAFF-PANEL4-CENSUS: THE JUMPS, THE CONTESTED LIST AND HOME STAND ON INDEXES - the jumps on the hours\' index, never the whole of realm_wealth_hours; the list and Home on the listed rows\' own, never a walk of item_dupes, whose drops are in none of them (mutants: the jumps grouped on the bare column; an index lost; the drops indexed)', async () => {
   const db = d1();
   const { rec, plans } = planned(db);
   const nowS = 1_800_000_000;

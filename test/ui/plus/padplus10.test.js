@@ -1,4 +1,4 @@
-// PADPLUS10 (2026-09-26): the Controller bindings window's laws, the d-pad's tap/hold per direction (hold left =
+// PADPLUS10: the Controller bindings window's laws, the d-pad's tap/hold per direction (hold left =
 // Transport, hold up = the next interaction mode) and the sticks' sensitivity.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

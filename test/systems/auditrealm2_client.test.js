@@ -1,4 +1,4 @@
-// AUDIT REALM2 (2026-09-28): THE REALM'S CLIENT, AUDITED - C1-C8 and M3-M5 (bible/06-Systems/Realm-Arc.md sections 1-2:
+// AUDIT REALM2: THE REALM'S CLIENT, AUDITED - C1-C8 and M3-M5 (:
 // a realm character's truth is the account service's; the tab joins under a lease and checkpoints at seq + 1, every two
 // real minutes, before any hand-over and on exit, and no local slot ever holds it).
 //   C1 - a town's thanks (RAID4b's own pool) were cleared by a slot's save alone, which a realm character never writes:
@@ -27,12 +27,13 @@ import { DatabaseSync } from 'node:sqlite';
 import * as acorn from 'acorn';
 import worker from '../../server-account/src/index.js';
 import { _resetKeyForTests } from '../../server-account/src/signing.js';
-import { SESSION_KEY } from '../../src/net/accountClient.js';
+import { SESSION_KEY, SERVICE_KEY } from '../../src/net/accountClient.js';
 import {
   realmIo, realmCreate, realmPut, realmJoin, realmFetch, realmList, openRealmBoot, createRealmSession, realmSummaryOf,
   realmGoldAct, realmTradeEscrow, realmRefusalText, REALM_SAVED_TEXT, realmSaveWithHeld,
 } from '../../src/systems/realmSaves.js';
 import * as realmSaves from '../../src/systems/realmSaves.js';
+import { watchRealmClose } from '../../src/systems/online/realm-close-save.ts';
 import { createSpoilsPool, spoilsStore, recoverSpoils, SPOILS_STORE_KEY } from '../../src/scenes/spoilsPool.js';
 import { raidSpoilsList, raidSpoilsDay, RAID_SPOILS_KEYS, RAID_SPOILS_TEXT, RAID_SPOILS_RECORDS_MAX } from '../../src/systems/raidSpoils.js';
 import { registerModSaveData, modSaveRecords, restoreModSaveRecords, newGameModSaveRecords, _resetModSaveData } from '../../src/systems/modSaveData.js';
@@ -88,7 +89,7 @@ async function device() {
   const env = { DB: d1(), SAVES: r2(), ACCOUNT_VERSION: 'test1' };
   const g = await (await worker.fetch(new Request('https://accounts.invalid/v1/auth/guest', { method: 'POST', body: JSON.stringify(ACCEPTED) }), env)).json();
   const storage = fakeStorage();
-  storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret }));
+  storage.setItem(SESSION_KEY, JSON.stringify({ id: g.id, secret: g.secret })); storage.setItem(SERVICE_KEY, 'https://accounts.invalid');
   const door = { plan: [], log: [], tiles: [] };
   const fetch = async (url, init) => {
     const mode = door.plan.length ? door.plan.shift() : 'ok';
@@ -253,10 +254,10 @@ test('AUDIT REALM2 C2 in the host: beforeunload gives no lease up (the unload gu
   });
   let exitHook = null;
   const realmHooks = {
-    realmSession: c.session, setBeforeTitleExit: (f) => { exitHook = f; }, whenPageHides: realmSaves.whenPageHides, whenPageGoes: realmSaves.whenPageGoes,
+    realmSession: c.session, setBeforeTitleExit: (f) => { exitHook = f; }, whenPageHides: realmSaves.whenPageHides, watchRealmClose, checkpointGateOpen: () => false, _realmSaveHooks: { held: () => null }, characterIdOf: () => null, realmSummaryOf: () => null, playerEntity: {}, legacyHost: null,
     globalThis: win, online: null, onlineCheckpoint: () => false, realmCheckpoint: () => false, duelLeaveNow: () => {}, REALM_EXIT_WAIT_MS: 10,
   };
-  mount(W.top(WORLD, 'whenPageGoes('), realmHooks);   // the page's going: the lease, at the checkpoint
+  mount(W.top(WORLD, 'watchRealmClose('), realmHooks);   // the page's going: the lease, at the checkpoint
   mount(W.top(WORLD, 'setBeforeTitleExit('), realmHooks);   // the title exit and the page put away: the checkpoint's doors (BOOT-HIDE)
   assert.equal(typeof exitHook, 'function');
   const before = dev.door.log.length;
@@ -292,7 +293,7 @@ function realmArm(rel) {
 }
 
 test('AUDIT REALM2 C2: F9 says what the realm answered - "Saved to the realm." only for a checkpoint that landed; one refused says so and why, in both composers; a quiet checkpoint says nothing either way (mutant: the word said before the answer)', async () => {
-  for (const [rel, hud] of [['src/scenes/world.js', 'townTalk'], ['src/scenes/dungeonContext.js', 'hudText']]) {
+  for (const [rel, hud] of [['src/scenes/worldQuickSave.js', 'townTalk'], ['src/scenes/dungeonContext.js', 'hudText']]) {
     const said = [];
     const arm = mount(`return (snap, sink, quiet) => { ${realmArm(rel)}\nreturn 'slot'; };`, {
       realmSaveSink: () => null, REALM_SAVED_TEXT, sayRealmSave: realmSaves.sayRealmSave,
@@ -461,7 +462,7 @@ test('AUDIT REALM2 C5: a tile\'s class name past Latin-1 rides the checkpoint\'s
   const names = ['Łowca', 'Маг', 'Blade ⚔', 'Mage’s Aide', 'Dragon 🐉', 'Épéiste', 'Spell\\u0041sword "x"'];
   for (const className of names) {
     const made = (await realmCreate(dev.io, 'Nystul')).data;
-    // INT2 (PIN MOVED): the tile's level the save's own (a birth's, 1 - the judge holds a summary claiming another), and the
+    // INT2 (
     // answer saying the hold
     const summary = realmSummaryOf({ level: 1, career: { name: className }, race: 'Breton', gender: 'female', faceIndex: 1 });
     const put = await realmPut(dev.io, made.id, { lease: made.lease, seq: 1, summary }, JSON.stringify(freshSave({ v: 1 })));   // world.js realmBirth's (AUDIT REALM2 S1: a new character's)
@@ -517,7 +518,6 @@ test('AUDIT REALM2 C6: a realm home\'s sale gives the owner\'s own things back t
 test('AUDIT REALM2 C7: the pause menu\'s Exit ends a duel first and passes P0.5\'s gate - the last checkpoint is the healed character, never the duel\'s 1 health or the opponent\'s spells, and still out of the seat (mutants: realmCheckpoint straight, no duelLeaveNow)', async () => {
   const run = async ({ seatOut = false } = {}) => {
     const log = [];
-    // PIN MOVED (INT8, 2026-10-09 - bible/06-Systems/Integrity-Arc.md lane 2): a duel is the relay's to referee - its bar
     // is the referee's vitality, never the save's health, and no opponent's spell lands on my sheet - so the exit has no
     // duel's damage to heal (duelHeal is gone): the duel ends, and the checkpoint is the character as it stands
     const playerEntity = { health: 80, maxHealth: 80, fatigue: 3, magicka: 2, maxMagicka: 40, activeEffects: [{ name: 'Mine' }] };
@@ -525,7 +525,7 @@ test('AUDIT REALM2 C7: the pause menu\'s Exit ends a duel first and passes P0.5\
     const state = {
       playerEntity, duelMgr, log, checkpointAllowed, online: {}, playerSpawned: true, seatOut: () => seatOut, performance: { now: () => 1 },
       ownWalkWaiting: () => false,   // AUDIT LIVED1b S1: no raise waiting
-      stampItemIds: () => 0,   // INT4 (PIN MOVED): a checkpoint stamps the valuable pieces' ids first - a name the fragment now reads
+      stampItemIds: () => 0,   // INT4 (
       townTalk: { overlay: null, say: () => {} }, DeathScreen: class {}, QUICK_SAVE_NAME: 'QuickSave', exitAutosaveNames: () => [], worldQuickSave: null,
       modes: { deathUp: () => false, quickSaveNow: () => { log.push({ health: playerEntity.health, effects: playerEntity.activeEffects.map((a) => a.name) }); return true; } },
       maxFatigue: () => 50, surfacePlayer: () => {}, console: { error() {} },
@@ -546,7 +546,6 @@ test('AUDIT REALM2 C7: the pause menu\'s Exit ends a duel first and passes P0.5\
     return log;
   };
   assert.deepEqual(await run(), ['duel ended', { health: 80, effects: ['Mine'] }, 'leave'], 'the duel ends, then the checkpoint, then the leave');
-  // PIN MOVED (FIELD BUGS 2026-10-25 SEAT-SAVES): a realm character out of the seat still saves - the service's lease decides
   assert.deepEqual(await run({ seatOut: true }), ['duel ended', { health: 80, effects: ['Mine'] }, 'leave'], 'out of the seat: the realm checkpoint still goes, then the leave');
 });
 
@@ -601,7 +600,7 @@ test('AUDIT REALM2 M5: realmCheckpoint answers what its composer did - a save th
   const realmCheckpoint = mount(`${W.fn('realmCheckpoint')}\nreturn realmCheckpoint;`, {
     realmSession: { lost: null }, townTalk: { overlay: null }, DeathScreen: class {}, playerEntity: { health: 10 }, QUICK_SAVE_NAME: 'QuickSave',
     modes: { deathUp: () => false, quickSaveNow: () => answer }, worldQuickSave: null,
-    stampItemIds: () => 0,   // INT4 (PIN MOVED): a checkpoint stamps the valuable pieces' ids first - a name the fragment now reads
+    stampItemIds: () => 0,   // INT4 (
   });
   assert.equal(realmCheckpoint(), false, 'the composer refused: no checkpoint');
   const session = { transact: () => new Promise(() => {}), abandon() {} };
@@ -609,7 +608,7 @@ test('AUDIT REALM2 M5: realmCheckpoint answers what its composer did - a save th
   answer = true;
   assert.equal(realmCheckpoint(), true, 'composed: a checkpoint');
   // the world composer's own refusal, mid-descent: said to F9, never to the quiet checkpoint
-  const worldQuickSave = mount(`${W.fn('worldQuickSave')}\nreturn worldQuickSave;`, { ohAbyss: { entering: true }, townTalk: { say: (t) => said.push(t) }, QUICK_SAVE_NAME: 'QuickSave' });
+  const worldQuickSave = mount(`${sliced('src/scenes/worldQuickSave.js').fn('worldQuickSave')}\nreturn worldQuickSave;`, { host: { ohAbyss: { entering: true } }, townTalk: { say: (t) => said.push(t) }, QUICK_SAVE_NAME: 'QuickSave' });
   assert.equal(worldQuickSave('QuickSave', { quiet: true }), false);
   assert.deepEqual(said, [], 'the periodic checkpoint says nothing');
   assert.equal(worldQuickSave('QuickSave'), false);

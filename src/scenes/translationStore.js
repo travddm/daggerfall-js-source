@@ -1,4 +1,4 @@
-// L10N3b (2026-09-27, Mac: "Install + bundle allowed"): THE TRANSLATION PACKS A PLAYER INSTALLED - kept in this
+// L10N3b: THE TRANSLATION PACKS A PLAYER INSTALLED - kept in this
 // browser (or the desktop app), never uploaded, never bundled, one pack a language. A DFU pack is its authors' work
 // under their own terms, so the port carries none of it that they have not allowed: the player brings their own, as
 // they bring ARENA2, a music pack or their Morrowind files.

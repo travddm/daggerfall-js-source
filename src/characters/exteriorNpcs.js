@@ -1,4 +1,4 @@
-// Exterior NPCs (Characters C2).
+// Exterior NPCs.
 // Verbatim RMBLayout rule (both flat sites): a flat record with a
 // NON-ZERO FactionID is an exterior NPC - it gets StaticNPC layout
 // data on top of its billboard. Editor flats are skipped BEFORE the
@@ -10,13 +10,13 @@
 
 import { exteriorNpcFlags, NPC_CONTEXT } from './staticNpc.js';
 
-/** @param flats - output of collectBlockFlats (C2 passthrough fields) */
+/** @param flats - output of collectBlockFlats (passthrough fields) */
 export function collectExteriorNpcs(flats) {
   return flats.filter((f) => f.factionID !== 0 && f.factionID !== undefined);
 }
 
 /**
- * AUDIT 26 (F019/F190): the collection above had NO caller, so no
+ * the collection above had NO caller, so no
  * street NPC was ever stood as a StaticNPC and none could be clicked
  * or talked to. This is the record the hosts stand, i.e. what
  * RMBLayout.cs:372-376 / :443-447 does with one collected flat:
@@ -58,7 +58,7 @@ export function exteriorNpcRecord(flat, flatData = null) {
 }
 
 /**
- * E3 - RMBLayout's THIRD act on an exterior StaticNPC, as a pass over
+ * RMBLayout's THIRD act on an exterior StaticNPC, as a pass over
  * the records above (RMBLayout.cs:377 and :453 - the block-flat site and
  * the building-subrecord one; the same statement in both):
  *

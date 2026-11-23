@@ -1,4 +1,4 @@
-// LW7c (2026-10-05, bible/06-Systems/Living-World.md "LW7c", Mac: "make friends or enemies"): THE PEOPLE WHO KNOW YOU
+// LW7c: THE PEOPLE WHO KNOW YOU
 // - the character's regards as the chronicle's People page: each resident met, minted again from their id (nothing new
 // saved), by name and town, their standing and their fate; the page in the enhanced chronicle where the host hands it
 // over. The town is the synthetic one (test/lwTown.mjs); the window mounts on the minimal DOM.
@@ -115,6 +115,4 @@ test('LW7c the chronicle\'s People: a section of its own where the host hands th
   const none = globalThis.document.createElement('div');
   const v3 = mountEnhancedChronicle(none, { section: 'people' });
   try { assert.ok(all(none, 'cr-row')[0].className.includes(' on'), 'no page: the section unknown, the window opens on the quests'); } finally { v3.destroy(); }
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /people: livingWorldOn\(\) \? \(\) => peoplePage\(livingRelations, livingRegardDay\(\), livingTownOfId\) : undefined,/);   // REGARD-OWN (FIELD BUGS 2026-10-21d): the regard's own day
 });

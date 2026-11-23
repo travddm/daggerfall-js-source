@@ -1,6 +1,4 @@
-// MW-STEEL5 (2026-10-09, Mac: "Heres an updated fix for the integrated steel armor for the morrowind model. Theres also
-// an issue where the helmet isnt positioned properly on the head but only for the new integrated model", with
-// steel_armor.fbx and a screenshot of the set worn from behind, the scalp standing up through the closed helm's crown):
+// MW-STEEL5:
 // MAC'S UPDATE, AND THE HELM ON THE GAME'S HEAD.
 //
 // One export now - the set with the closed helm, committed as it came - and the open helm MW-STEEL1's, alone. The

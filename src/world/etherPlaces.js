@@ -1,6 +1,5 @@
 // @ts-check
-// ETHER-PLACES (2026-10-11, the owner: "procedural islands with towns, dungeons"; bible/03-World/Eltheric-Ocean.md
-// ETHER-PLACES) - THE ISLES' PLACES: a port isle's town and a ruin isle's dungeon, each a NON-MUTATING CLONE of one of the
+// ETHER-PLACES - THE ISLES' PLACES: a port isle's town and a ruin isle's dungeon, each a NON-MUTATING CLONE of one of the
 // game's own places (spawnedDungeons.js's law - the locations are cached objects the exterior layout shares) standing on
 // its isle's centre pixel under its own id, name and index. Pure: the world host (scenes/world.js `_locationToBuild`)
 // asks it of an isle's pixel as the pixel builds and stands the answer in its index.
@@ -18,7 +17,7 @@
 // its hamlets alone), never a main-story place nor one with a dungeon under it; a RUIN a dungeon whose exterior is one
 // block where any is. Picked off the isle's own hash, in the rows' map-id order: the same place on every client.
 import { mapPixelToLongitudeLatitude, LOCATION_TYPES } from '../formats/mapsFile.js';
-import { CELLS_W, etherHash, etherBandOf, etherDepthAt, ETHER_WORD, isleAt, islesNear } from './ethericSea.js';
+import { CELLS_W, etherHash, etherBandOf, etherDepthAt, ETHER_WORD, isleAt, isleOfCell, islesNear } from './ethericSea.js';
 
 /** The places' lane in the id's high 12 bits, and the first low number an isle's place takes. */
 export const ETHER_PLACE_SALT = 0xe7;
@@ -45,7 +44,16 @@ export const etherLocationIndex = (isle) => -(1000 + isle.cy * CELLS_W + isle.cx
 export const isEtherPlaceId = (id) => ((Number(id) >>> 20) & 0xfff) === ETHER_PLACE_SALT && ((Number(id) >>> 0) & 0xfffff) >= ETHER_PLACE_BASE;
 /** The isle kinds that stand a place (etherTemplateOf: a port's town, a ruin's dungeon) - a wild isle and a rock none. */
 export const PLACE_KINDS = Object.freeze(['port', 'ruin']);
-/** ETHER-OW (2026-10-13): the isle whose place stands on this pixel - its centre, a port's or a ruin's - or null. Where
+/** BAY-LEFT-B: an isle's place's map id read back to the pixel it stands on (etherPlaceId's inverse: its cell, the isle's
+ *  centre) - a seat on an isle is in no MAPS.BSA table (scenes/bootStartHost.js stands a birth there by its id); null
+ *  for any other id, or a cell whose isle stands no place. */
+export function etherPlacePixelOfId(id) {
+  if (!isEtherPlaceId(id)) return null;
+  const n = ((Number(id) >>> 0) & 0xfffff) - ETHER_PLACE_BASE;
+  const isle = isleOfCell(n % CELLS_W, Math.floor(n / CELLS_W));
+  return isle && PLACE_KINDS.includes(isle.kind) ? { x: isle.px, y: isle.py } : null;
+}
+/** ETHER-OW: the isle whose place stands on this pixel - its centre, a port's or a ruin's - or null. Where
  *  the Overworld's bands are never born (the Bay's places' own law, world.js `_bandPlacePixels`) and its plates stand. */
 export function etherPlaceIsle(x, y) {
   const isle = isleAt(x, y);

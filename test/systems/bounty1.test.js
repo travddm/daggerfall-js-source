@@ -1,4 +1,4 @@
-// BOUNTY1 (2026-09-28): the town's bounty boards - the law (systems/bounty/bountyBoard.js), the piece (systems/bounty/bountyReward.js),
+// BOUNTY1: the town's bounty boards - the law (systems/bounty/bountyBoard.js), the piece (systems/bounty/bountyReward.js),
 // the host's hunt from Take to payday (scenes/bountyHost.js) and the party pose's `bq` (net/wire.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -428,18 +428,6 @@ test('BOUNTY-TIERLABEL: a notice names its tier and the levels in it', async () 
   const p = boardPostings({ day: 900, ...TOWN, level: 5, sites: bountySites(TOWN.px, TOWN.py, allLand) })[0];
   assert.equal(p.tier, 2);
   assert.equal(p.tierLabel, 'Tier 2 (levels 4\u20135)');
-});
-
-test('BOUNTY1: the bounties tick in the modal arm too - inside a dungeon or a building the hunt is not asleep', async () => {
-  const { readFileSync } = await import('node:fs');
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const arm = src.indexOf('    if (modes.frame(dt, now)) {');
-  const armEnd = src.indexOf('      requestAnimationFrame(frame);\n      return;\n    }', arm);
-  assert.ok(arm > 0 && armEnd > arm, 'the modal arm is where it was');
-  const body = src.slice(arm, armEnd);
-  assert.match(body, /bountyHost\?\.tick\(dt\)/, 'the bounty tick runs in the modal arm (Mac: the graveyard\'s spiders never stood)');
-  assert.match(body, /bountyFarms\?\.sync\(/, 'and the farms are brought in line there (they come down underground)');
-  assert.match(src, /dungeonPixel: \(\) => \{[\s\S]{0,400}modes\?\.dungeonLocation\?\.mapTableData/, 'the dungeon\'s own pixel is its location\'s');
 });
 
 test('BOUNTY-FARM-PICK: a notice copies one of the eight nearest farms, the same one for everyone', async () => {

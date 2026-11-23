@@ -1,4 +1,4 @@
-// STAFF-PANEL3-REALM (2026-10-22, design doc "DFO Staff Panel: design", build step 3) - THE PANEL'S TRADE HOLDS, ROLLBACKS,
+// STAFF-PANEL3-REALM - THE PANEL'S TRADE HOLDS, ROLLBACKS,
 // FIXES, GAINS AND REMOVALS (server-account/src/staffRealm.js), driven through the real Worker on the node:sqlite database
 // every account pin stands on (test/accountDb.mjs) with R2 beside it (test/realmSeat.mjs): the held characters most
 // urgent first with why, a hold laid on one character or a whole account and lifted (saying it excused the finding and
@@ -57,7 +57,7 @@ async function extensionKey() {
 async function stand() {
   const mobKey = await extensionKey();
   const s = await standService({
-    DEVELOPER_HANDLES: 'Lattymoy,SirMcMobdon', MODERATOR_HANDLES: 'Asynian', OWNER_HANDLES: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
+    SEAT_ADMINS: 'Lattymoy,SirMcMobdon', SEAT_MODERATORS: 'Asynian', SEAT_OWNERS: 'Lattymoy,SirMcMobdon', OWNER_KEYS: `SirMcMobdon:${mobKey.pub}`,
     PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', BOARD_OPEN: 'on',
   });
   const raw = s.env.DB._raw;
@@ -684,9 +684,11 @@ test('STAFF-PURGE-DUPES: one confirm destroys every copy marked on the character
   s.raw.prepare('INSERT INTO item_dupes (uid, char_id, at) VALUES (?, ?, ?)').run(gear, t.id, nowS());
   const player = s.row(t.id).player;
   s.raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (11, 11, ?, ?, 'Flagged', 17, 'private', 1, 1)").run(player, t.id);
+  s.raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (11, 11, 'chest', 41000, '{}', 1)").run();
   s.raw.prepare("INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (11, 11, 'chest', ?, '{}')").run(a);
   const other = await s.seat('Neighbour');
   s.raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (22, 22, ?, ?, 'Neighbour', 17, 'private', 1, 1)").run(s.row(other.id).player, other.id);
+  s.raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (22, 22, 'chest', 41000, '{}', 1)").run();
   s.raw.prepare("INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (22, 22, 'chest', ?, '{}')").run(a);
   const pre = await s.admin('/v1/staff/item/purge-dupes', { id: t.id });
   assert.equal(pre.status, 200, JSON.stringify(pre.body));
@@ -714,6 +716,7 @@ test('STAFF-PURGE-DUPES: one confirm destroys every copy marked on the character
   const chest = await s.seat('Chested');
   s.raw.prepare('INSERT INTO item_dupes (uid, char_id, at) VALUES (?, ?, ?)').run(only, chest.id, nowS());
   s.raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (33, 33, ?, ?, 'Chested', 17, 'private', 1, 1)").run(s.row(chest.id).player, chest.id);
+  s.raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (33, 33, 'chest', 41000, '{}', 1)").run();
   s.raw.prepare("INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (33, 33, 'chest', ?, '{}')").run(only);
   const bare = await s.admin('/v1/staff/item/purge-dupes', { id: chest.id });
   assert.deepEqual([bare.body.dupes, bare.body.held, bare.body.bins], [1, 0, 1]);
@@ -736,6 +739,7 @@ test('STAFF-PURGE-DUPES keep (FIELD BUGS 2026-10-25i COPY-LIFT): one confirm kee
   s.raw.prepare("INSERT INTO item_dupes (uid, char_id, at, kind) VALUES (?, ?, ?, 'claim')").run(b, t.id, nowS());
   s.raw.prepare("INSERT INTO item_dupes (uid, char_id, at, kind) VALUES (?, ?, ?, 'claim')").run(c, t.id, nowS());
   s.raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (11, 11, ?, ?, 'Paired', 17, 'private', 1, 1)").run(s.row(t.id).player, t.id);
+  s.raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (11, 11, 'chest', 41000, '{}', 1)").run();
   for (const k of [a, c]) s.raw.prepare("INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (11, 11, 'chest', ?, '{}')").run(k);
   const pre = await s.admin('/v1/staff/item/purge-dupes', { id: t.id, keep: true });
   assert.equal(pre.status, 200, JSON.stringify(pre.body));
@@ -800,6 +804,7 @@ test('STAFF-PURGE-DUPES keep (FIELD BUGS 2026-10-25i COPY-LIFT): one confirm kee
   const f = 'd200000000000007';
   const binned = await s.seat('Binned', freshSave({ name: 'Binned', items: [piece(f), piece(f)] }));
   s.raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (55, 55, ?, ?, 'Binned', 17, 'private', 1, 1)").run(s.row(binned.id).player, binned.id);
+  s.raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (55, 55, 'chest', 41000, '{}', 1)").run();
   s.raw.prepare("INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (55, 55, 'chest', ?, ?)").run(f, JSON.stringify(piece(f)));
   assert.equal((await s.put(binned.who, binned.id, freshSave({ name: 'Binned', items: [piece(f)] }))).status, 200, 'the other in the bin');
   const bpre = await s.admin('/v1/staff/item/purge-dupes', { id: binned.id, keep: true });
@@ -866,6 +871,7 @@ test('STAFF-PURGE-DUPES keep (AUDIT FB1025i F5): a claim\'s copy, its holder\'s 
   s.raw.prepare("INSERT INTO item_dupes (uid, char_id, at, kind, first_char, claimant) VALUES (?, ?, ?, 'claim', ?, ?)").run(k, C.id, nowS(), P.id, C.id);
   assert.equal((await s.put(P.who, P.id, freshSave({ name: 'Giver', items: [] }))).status, 200, 'the holder lets it go - into the chest');
   s.raw.prepare("INSERT INTO homes (map_id, building_key, player, char_id, owner_name, region, entry, price, bought_at) VALUES (44, 44, ?, ?, 'Taker', 17, 'private', 1, 1)").run(s.row(C.id).player, C.id);
+  s.raw.prepare("INSERT OR IGNORE INTO home_decor (map_id, building_key, id, model, place, placed_at) VALUES (44, 44, 'chest', 41000, '{}', 1)").run();
   s.raw.prepare("INSERT INTO decor_bin (map_id, building_key, piece_id, uid, item) VALUES (44, 44, 'chest', ?, ?)").run(k, JSON.stringify(piece(k)));
   const pre = await s.admin('/v1/staff/item/purge-dupes', { id: C.id, keep: true });
   assert.deepEqual([pre.body.held, pre.body.extra, pre.body.bins, pre.body.lifts], [1, 0, 0, 0]);

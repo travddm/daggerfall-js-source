@@ -1,4 +1,4 @@
-// AUDIT PRE-MERGE 1003 (2026-10-03) - LENS U: THE ARENA'S WINDOW AND ITS HUD, read on real Chromium before #545 merges
+// AUDIT PRE-MERGE 1003 - LENS U: THE ARENA'S WINDOW AND ITS HUD, read on real Chromium before #545 merges
 // (src/ui/arena/arenaWindow.js, arenaDoor.js, arenaHud.js, hudFoeTarget.js; src/systems/arena/arenaBoard.js, arenaText.js; the sheets
 // in src/ui/enhanced/enhancedPlusStyle.js, enhancedStyle.js, partyPanel.js; the hosts' arena HUD in src/scenes/world.js and
 // exterior.js). Each pin FAILED on the unfixed tree for its finding's reason; each fix carries an `AUDIT PRE-MERGE 1003
@@ -122,7 +122,7 @@ function onlineRig() {
   };
   const board = onlineRigBoard();
   const on = createArenaOnline({
-    now: () => clock.t, session: () => ({ status: 'open', arenaOk: true, room: null }), makeHall,
+    now: () => clock.t, session: () => ({ status: 'open', arenaHeard: true, room: null }), makeHall,
     account: { board: async () => ({ ok: true, data: board }), claim: async () => ({ ok: true }), me: () => null },
     bouts: { setRealm() {}, relay: () => null, dismiss() {} }, enterFloor: () => true, say: () => {}, level: () => 5,
   });
@@ -265,26 +265,6 @@ test('AUDIT PRE-MERGE 1003 U3: the bar STEPS UNDER THE TARGET FRAME while it sta
 });
 
 // ── U4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-test('AUDIT PRE-MERGE 1003 U4: while the bar stands it says so (`.on`), and the quest card (1100 and under) and the party list (561-980, its phone place at the foot clear of it) step aside for it - the house\'s step-aside; measured in Chromium at 800x600, 844x390, 740x360, 390x844: neither under the bar (mutants: `.on` never set; either rule gone)', () => withDom((dom) => {
-  destroyArenaHud();
-  const { b, t } = live(F2);
-  const m = arenaHudModel(b, newCrowd({ fighters: b.fighters }), t, { you: 'you' });
-  drawArenaHud(m, { doc: dom.doc });
-  const root = one(dom.body, 'arena-hud');
-  assert.ok(root.classList.contains('on'), 'on while it stands');
-  drawArenaHud(m, { doc: dom.doc, hidden: true });
-  assert.ok(!root.classList.contains('on'), 'off with the HUD');
-  drawArenaHud(null, { doc: dom.doc });
-  assert.ok(!root.classList.contains('on'), 'off with the bout');
-  drawArenaHud(m, { doc: dom.doc });
-  assert.ok(root.classList.contains('on'));
-  destroyArenaHud();
-  // the widths the rules are drawn from: the bar's half against the card's 260 (+8) and the list's 200 (+8)
-  assert.ok(1100 >= 2 * (ARENA_HUD_WIDTH / 2 + 268) && 980 >= 2 * (ARENA_HUD_WIDTH / 2 + 208));
-  assert.match(rd('src/ui/enhanced/enhancedStyle.js'), /@media \(max-width: 1100px\) \{ body:has\(\.arena-hud\.on\) \.qtrack \{ visibility: hidden; \} \}/);
-  assert.match(PARTY_CSS, /@media \(min-width: 561px\) and \(max-width: 980px\) \{ body:has\(\.arena-hud\.on\) \.dfparty \{ visibility: hidden; \} \}/);
-}));
 
 // ── U5 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 

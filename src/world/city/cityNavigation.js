@@ -17,8 +17,7 @@ import { RMB_SIDE } from '../locationLayout.js';   // 4096 * scale = 102.4, the 
 import { WATER_MASK_TABLE } from '../water/waterCorners.js';   // WATER-NPC: the one water table the draw and the player's feet already share
 
 /**
- * WATER-NPC (2026-09-15, Mac from live play: "NPCs arent water aware and
- * will walk into it").
+ * WATER-NPC.
  *
  * THE PORT IS VERBATIM AND THAT IS THE PROBLEM. DFU's `GetTileWeight`
  * gives weight 0 to seven records - its `TileTypes` enum knows Water

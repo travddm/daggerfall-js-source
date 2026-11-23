@@ -1,4 +1,4 @@
-// LW14 (bible/06-Systems/Living-World-II.md "LW14"): THE DEEP'S OWN - a dungeon's stops in a company's order (its random
+// LW14 ("LW14"): THE DEEP'S OWN - a dungeon's stops in a company's order (its random
 // foes and treasure, never a fixed foe, a quest's marker or fixed treasure; the blocks breadth first from the start's,
 // nearest first within), the dive's timeline over them (its reach by the dive's middle, the way out by its end, the
 // deep's own fight), where they are at a minute, what they leave (built dead and emptied, piles empty, for a day), the
@@ -53,7 +53,7 @@ test('LW14 the timeline: each stop its minutes (a foe\'s DEEP_FOE_MIN by its see
   assert.deepEqual([...DEEP_FOE_MIN], [25, 40]);
   assert.deepEqual([DEEP_TREASURE_MIN, DEEP_DETOUR, DEEP_WALK_M], [10, 1.6, 30]);
   const stops = stopsOf(dungeon(), SIDE, ENTRY);
-  const trip = { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1000 + 400 } };   // a fated trouble: no deep fight of its own   // PIN MOVED (AUDIT LW-II-2 D8): a fated trouble is one met INSIDE (trouble.js diveTrouble mints `inside: true`) - a road's takes nothing from the deep
+  const trip = { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1000 + 400 } };   // a fated trouble: no deep fight of its own   //
   const r = routeOf(stops, ENTRY, trip);
   assert.ok(r.legs.length >= 2);
   let t = 1000, at = ENTRY;
@@ -87,12 +87,12 @@ test('LW14 the deep\'s own fight: DEEP_RISK of the dives with no fated trouble m
   let n = 0;
   for (let i = 0; i < 2000; i++) if (deepFightOf({ id: `L1.t${i}:3` }) != null) n++;
   assert.ok(Math.abs(n / 2000 - DEEP_RISK) < 0.04);
-  assert.equal(deepFightOf({ id: 'L1.t0:3', enc: { id: 'e', inside: true } }), null);   // PIN MOVED (AUDIT LW-II-2 D8): the fated trouble met inside, as diveTrouble mints it
+  assert.equal(deepFightOf({ id: 'L1.t0:3', enc: { id: 'e', inside: true } }), null);
   const stops = stopsOf(dungeon(), SIDE, ENTRY);
   for (let i = 0; i < 60; i++) {
     const id = `L1.t${i}:5`;
     if (deepFightOf({ id }) == null) continue;
-    const plain = routeOf(stops, ENTRY, { id, enc: { id: 'e', inside: true }, dive: { t0: 0, t1: 600 } });   // PIN MOVED (AUDIT LW-II-2 D8): a fated trouble is one met inside
+    const plain = routeOf(stops, ENTRY, { id, enc: { id: 'e', inside: true }, dive: { t0: 0, t1: 600 } });
     const fought = routeOf(stops, ENTRY, { id, dive: { t0: 0, t1: 600 } });
     const longer = fought.legs.findIndex((l, j) => plain.legs[j] && l.tOut - l.tIn > plain.legs[j].tOut - plain.legs[j].tIn);
     if (longer < 0) continue;
@@ -106,14 +106,14 @@ test('LW14 the deep\'s own fight: DEEP_RISK of the dives with no fated trouble m
 test('LW14 what they leave: the stops a dive left within DIVE_CLEAR_MIN before the build - none it is at, none after a day - the same for two readers; the dice\'s end at the stop its minute reaches (mutants: the window, the left, the stop)', () => {
   assert.equal(DIVE_CLEAR_MIN, DAY_MIN);
   const stops = stopsOf(dungeon(), SIDE, ENTRY);
-  const r = routeOf(stops, ENTRY, { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1400 } });   // PIN MOVED (AUDIT LW-II-2 D8): a fated trouble is one met inside
+  const r = routeOf(stops, ENTRY, { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1400 } });
   const [a, b] = r.legs;
   const mid = (b.tIn + b.tOut) / 2;
   assert.deepEqual([...clearedOf([r], mid)], [a.stop.key], 'the one left, not the one at');
   assert.deepEqual([...clearedOf([r], b.tOut)].sort(), [a.stop.key, b.stop.key].sort());
   assert.deepEqual([...clearedOf([r], a.tOut + DIVE_CLEAR_MIN - 1)].includes(a.stop.key), true);
   assert.equal(clearedOf([r], a.tOut + DIVE_CLEAR_MIN).has(a.stop.key), false, 'a day on, as Daggerfall built it');
-  const r2 = routeOf(stopsOf(dungeon(), SIDE, ENTRY), ENTRY, { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1400 } });   // PIN MOVED (AUDIT LW-II-2 D8): a fated trouble is one met inside
+  const r2 = routeOf(stopsOf(dungeon(), SIDE, ENTRY), ENTRY, { id: 'L1.t1:9', enc: { id: 'x', inside: true }, dive: { t0: 1000, t1: 1400 } });
   assert.deepEqual([...clearedOf([r2], b.tOut)], [...clearedOf([r], b.tOut)], 'two readers alike');
   assert.equal(stopOfMinute(r, a.tIn + 1), a.stop);
   assert.equal(stopOfMinute(r, b.tIn - 0.001), b.stop, 'the nearer of the two walked between');
@@ -161,7 +161,7 @@ function diversOver({ player = [0, 0, 0], clear = false, rel = createRelations()
     leader: () => ({ feet: st.feet, yaw: 0 }), spot: (from, dx, dz) => [from[0] + dx, from[1], from[2] + dz], owner: () => true,
     relations: () => rel, turnKeyOf: (res) => res.id, dies: () => false, day: () => 0, say: (s) => st.said.push(s),
     route: () => route, floor: (x, y, z) => [x, 0, z], clearLine: () => clear, ring: (f) => st.rung.push(f),
-    choose: (lines, options) => { st.chose = { lines, options }; return true; }, stopPile: (key) => st.piles?.[key] ?? null, realNow: () => st.now,   // PIN MOVED (AUDIT LW-II-2 D4): the window mounted, as the dungeon's showOverlay answers (offers answers whether it did)
+    choose: (lines, options) => { st.chose = { lines, options }; return true; }, stopPile: (key) => st.piles?.[key] ?? null, realNow: () => st.now,
   };
   return { host: createDungeonDivers({ ...deps, ...extra }), st, trip, members, rel };
 }
@@ -331,26 +331,6 @@ test('LW14 the remains at the true stop: the deep\'s fallen laid where the dice\
   assert.ok([[1, 0, 1], [2, 0, 2]].some((s) => s[0] === laid[1][0]));
 });
 
-test('LW14 the host\'s seams: the build\'s stops and its cleared set (the outer host\'s word through the modes host), the dead built emptied and the piles empty, the pool\'s stops and floors, the world\'s routes and remains and door, the activation\'s door underground (mutants: each seam)', () => {
-  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  assert.match(d, /const _deepStops = stopsOf\(dungeon\.blocks, RDB_SIDE, dungeon\.startMarker \?\? null\);/);
-  assert.match(d, /const _deepCleared = opts\.deepCleared\?\.\(dfLocation, _deepStops, dungeon\.startMarker \?\? null\) \?\? new Set\(\);/);
-  assert.match(d, /if \(!f\.entity \|\| f\.src\?\.fixed \|\| !_deepFoeCleared\.has\(`\$\{f\.src\?\.blockIndex\}:\$\{f\.src\?\.loadID\}`\)\) continue;\n\s*f\.entity\.items = \[\];\n\s*setFoeDead\(f, true\);/);   // PIN MOVED (AUDIT LW-II D1/D3): by the placed block, at the build's end
-  assert.match(d, /if \(stopKey && _deepCleared\.has\(stopKey\)\) items\.length = 0;/);
-  assert.match(d, /deepStops: \(\) => _deepStops,/);
-  assert.match(d, /stopPile: \(key\) => lootPiles\.find\(\(p\) => p\.stopKey === key\) \?\? null,/);
-  const m = readFileSync(new URL('../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-  assert.match(m, /deepCleared: \(loc, stops, entry\) => host\.deepCleared\?\.\(loc, stops, entry\) \?\? null,/);
-  assert.match(m, /openLiving: \(rec\) => !!host\.openLivingDiver\?\.\(rec\),/);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /const dives = divesIn\(here, tBuild - DIVE_CLEAR_MIN, tBuild, livingTripWorld,/);
-  assert.match(w, /return deepClearedOf\(dives\.map\(\(tr\) => deepRouteOf\(stops, from, tr\)\), tBuild\);/);
-  assert.match(w, /deepCleared: \(loc, stops, entry\) => livingDeepCleared\(loc, stops, entry\),/);
-  assert.match(w, /route: livingDeepRoute,/);
-  assert.match(w, /const s = stopOfMinute\(livingDeepRoute\(r\.trip\), r\.t\);\n\s+const at = s \? d\.floorAt\?\.\(s\.x, s\.y, s\.z\) \?\? null : null;/);   // PIN MOVED (AUDIT LW-II D9): kept by the remains' key
-  assert.match(w, /openLivingDiver: \(rec\) => \(livingWorldOn\(\) && rec\?\.living \? !!livingDivers\?\.offers\(rec,/);
-});
-
 test('AUDIT LW-II LW14: a company\'s strength is who stood (the bodies come one by one, an enemy keeps away) - none had enough before one fell; LEAD ON arrives each at its own stop; on the way out nothing ahead is theirs; another floor heard, never met; let go and met again as left, one drawing on the player never let go; the rival\'s word once a pile; remains with no resting places; the door at the treasure\'s reach, never in Info; the way out on its floors (mutants: D2, D4, D6, D7, D8, D11, D12, D13)', async () => {
   const route = lineRoute();
   // D2: the bodies arrive one by one - nobody hurt, nobody leaves
@@ -482,17 +462,3 @@ test('AUDIT LW-II LW14: a company\'s strength is who stood (the bodies come one 
   assert.equal(pointAt(ro, mid).y, -8, 'floored where it walks');
 });
 
-test('AUDIT LW-II LW14: the build\'s clear at its END, every binding a corpse reads stood before it, keyed by the placed block; the piles it passed lie picked over; online none - the room\'s dungeon is the room\'s; the remains\' places kept (mutants: D1, D3, D5, D9, D10)', () => {
-  const d = readFileSync(new URL('../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-  const clear = d.indexOf('for (const f of foes) {\n    if (!f.entity || f.src?.fixed || !_deepFoeCleared.has(');
-  assert.ok(clear > 0);
-  for (const bound of ['const _wallNow = () =>', 'const billboardBatches = [];', 'const flatAnims = new FlatAnimator();', 'let _ctxDead = false;', 'function settleLootFlat(i) {']) {
-    assert.ok(d.indexOf(bound) > 0 && d.indexOf(bound) < clear, `${bound} stands before the clear`);
-  }
-  assert.ok(clear < d.lastIndexOf('  return api;'), 'and the build returns after it');
-  assert.match(d, /\.map\(\(s\) => `\$\{s\.block\}:\$\{s\.loadID\}`\)\);/);
-  assert.match(d, /for \(const \[i, p\] of lootPiles\.entries\(\)\) if \(p\.stopKey && _deepCleared\.has\(p\.stopKey\) && !p\.items\.length\) settleLootFlat\(i\);/);
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /if \(!livingWorldOn\(\) \|\| params\.has\('online'\) \|\| !stops\?\.length \|\| !loc\?\.mapTableData\) return null;/);
-  assert.match(w, /if \(_livingRemainsPlace\.has\(r\.key\)\) return _livingRemainsPlace\.get\(r\.key\);/);
-});

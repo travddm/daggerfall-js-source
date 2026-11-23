@@ -31,6 +31,7 @@ import { LoadClassicWindow, LOAD_CLASSIC_IMG } from '../ui/loadClassicWindow.js'
 import { fetchBytes } from './shared.js';
 import { readZipEntries, droppedEntries, walkDroppedEntries } from './dataSource.js';   // OT1: the saves picker's phone path rides the ARENA2 door's zip walk (AUDIT 68: and its drop walk)
 import { music } from '../systems/music.js';
+import { TITLE_SONGS, titleSongName } from '../systems/titleMusic.js';   // the front door plays the same title song
 import { mostRecentRestorable } from '../systems/save/saveSlots.js';   // SAV4: the F2 question, now over the slot store
 import { SaveGames, SAVENAME_TXT, MAPSAVE_FILENAME, RUMOR_FILENAME, BIO_FILENAME } from '../formats/save/saveGames.js';
 import { SAVETREE_FILENAME } from '../formats/save/saveTreeFile.js';
@@ -45,11 +46,9 @@ import { bitmapToColor32 } from '../formats/color32Order.js';
 import { SaveWindow } from '../ui/saveWindow.js';   // SAV4: the start menu's Load door
 import { t, localizedText } from '../systems/textManager.js';   // L10N4: the window title's step and the classic picker's words in the player's language
 
-const TITLE_SONGS = ['5STRONG.HMI', '03.HMI'];   // DFU start scene song, then the stand-in
-
 async function startTitleMusic() {
   await music.ensure(fetchBytes);
-  const name = TITLE_SONGS.find((n) => (music.archive?.getSongIndex(n) ?? -1) >= 0);
+  const name = titleSongName(music.archive);
   if (name) music.playSong(name);
   else if (music.enabled) console.warn('[menu] no title song in MIDI.BSA (tried ' + TITLE_SONGS.join(', ') + ')');
 }
@@ -142,7 +141,7 @@ export async function runMenu(canvas, renderer, status) {
 /** Is there a game to load? The menu shows Load unconditionally, as
  *  DFU does; this is for the host that has to act on the press.
  *
- *  AUDIT (2026-08-25) F2: this asked readQuicksave, which parses the
+ *  AUDIT F2: this asked readQuicksave, which parses the
  *  blob and does not test its VERSION - so F3's own guard passed on an
  *  envelope restorePlayer would refuse, and Load came up on the chargen
  *  wizard. The question is "can this build restore it", and that
@@ -246,18 +245,7 @@ export async function classicSaveFilesFromZip(file) {
  */
 function pickClassicSaveFiles() {
   return new Promise((resolve) => {
-    const ui = document.createElement('div');
-    ui.style.cssText = 'position:fixed;inset:0;background:#111;color:#ddd;font:14px monospace;display:flex;align-items:center;justify-content:center;z-index:10';
-    ui.innerHTML = `
-      <div style="max-width:460px;text-align:center;border:1px solid #444;padding:24px">
-        <h2 style="margin-top:0">${t('menu.classicLoad.title', 'Load Classic Save')}</h2>
-        <p>${t('menu.classicLoad.pick', 'Select your classic {game} folder (the one with SAVE0-SAVE5 next to ARENA2), or drop it here. Your saves are read for this load only and are not stored.', { game: '<b>Daggerfall</b>' })}</p>
-        <input type="file" id="picksaves" webkitdirectory multiple style="margin:8px">
-        <p style="margin:4px 0">${t('menu.classicLoad.phone', 'on a phone: pick a {zip} of your Daggerfall folder or a SAVE# folder instead', { zip: '<b>.zip</b>' })}</p>
-        <input type="file" id="picksaveszip" accept=".zip,application/zip" style="margin:8px">
-        <p><button id="cancelsaves" style="font:inherit;padding:4px 12px">${localizedText('cancel', 'Cancel')}</button></p>
-        <p id="savemsg" style="color:#8a8"></p>
-      </div>`;
+    const ui = buildClassicSavePicker(document);
     document.body.appendChild(ui);
     const msg = ui.querySelector('#savemsg');
     const finish = (result) => { ui.remove(); resolve(result); };
@@ -304,6 +292,54 @@ function pickClassicSaveFiles() {
       ingest(files);
     });
   });
+}
+
+/** Stands in a translated line for the word drawn bold, so the word can go back in as an element. */
+const BOLD_MARK = '\u0001';
+
+/** Appends `line` to `el` as text, with each BOLD_MARK replaced by `word` in a <b>. */
+function appendWithBold(doc, el, line, word) {
+  line.split(BOLD_MARK).forEach((part, i) => {
+    if (i > 0) {
+      const bold = doc.createElement('b');
+      bold.textContent = word;
+      el.append(bold);
+    }
+    el.append(part);
+  });
+}
+
+/**
+ * The classic saves picker's overlay, built as elements. Its words come from the string tables, and a translation
+ * pack the player installs can supply any row, so every word goes in as text and none is parsed as HTML.
+ */
+export function buildClassicSavePicker(doc) {
+  const el = (tag, attrs = {}, text = null) => {
+    const node = doc.createElement(tag);
+    for (const [name, value] of Object.entries(attrs)) node.setAttribute(name, value);
+    if (text !== null) node.textContent = text;
+    return node;
+  };
+  const ui = doc.createElement('div');
+  ui.style.cssText = 'position:fixed;inset:0;background:#111;color:#ddd;font:14px monospace;display:flex;align-items:center;justify-content:center;z-index:10';
+  const box = el('div', { style: 'max-width:460px;text-align:center;border:1px solid #444;padding:24px' });
+  const pick = el('p');
+  appendWithBold(doc, pick, t('menu.classicLoad.pick', 'Select your classic {game} folder (the one with SAVE0-SAVE5 next to ARENA2), or drop it here. Your saves are read for this load only and are not stored.', { game: BOLD_MARK }), 'Daggerfall');
+  const phone = el('p', { style: 'margin:4px 0' });
+  appendWithBold(doc, phone, t('menu.classicLoad.phone', 'on a phone: pick a {zip} of your Daggerfall folder or a SAVE# folder instead', { zip: BOLD_MARK }), '.zip');
+  const cancel = el('p');
+  cancel.append(el('button', { id: 'cancelsaves', style: 'font:inherit;padding:4px 12px' }, localizedText('cancel', 'Cancel')));
+  box.append(
+    el('h2', { style: 'margin-top:0' }, t('menu.classicLoad.title', 'Load Classic Save')),
+    pick,
+    el('input', { type: 'file', id: 'picksaves', webkitdirectory: '', multiple: '', style: 'margin:8px' }),
+    phone,
+    el('input', { type: 'file', id: 'picksaveszip', accept: '.zip,application/zip', style: 'margin:8px' }),
+    cancel,
+    el('p', { id: 'savemsg', style: 'color:#8a8' }),
+  );
+  ui.append(box);
+  return ui;
 }
 
 /**

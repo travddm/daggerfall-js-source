@@ -1,7 +1,4 @@
-// DESYNC-ZERO (2026-10-09, the owner: "ive seen enemies desyncing for players in a party sometimes they only strike the
-// air and on their ends are monsters" / "monster desyncs should never happen in dungeons and outside" / "when a party
-// member kills the quest monsters it also counts for the quest owner or everyone who also has this quest" - "in the
-// SAME party"). Four ways one player's foes were not another's, and the lag between them:
+// DESYNC-ZERO. Four ways one player's foes were not another's, and the lag between them:
 //   1. a reader stood at most twelve of an owner's encounter foes outdoors and four loose stands in a room - a Greater
 //      Giant's call of ten went mostly unseen (ENCOUNTER_PUPPETS_MAX, dungeonContext.js LOOSE_PUPPETS_MAX - reader-side,
 //      the relay and wire.js untouched);

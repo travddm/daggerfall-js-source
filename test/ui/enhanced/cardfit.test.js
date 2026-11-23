@@ -1,6 +1,4 @@
-// CARD-FIT (2026-09-28, Discord - Cruor, "New sigil items descriptor is a bit long!": "You can still interact with it by
-// right clicking, but notably all the buttons on it's pop-up card are.. off the screen, because it's got a bit much on
-// it!"; Mac: "Address screenshot for current and future weapons/gear. Want to improve this and reduce text bloat").
+// CARD-FIT.
 // THE ITEM CARD FITS AND SAYS LESS, for every piece the game has and every one it will get:
 //   - a set tier's BRIEF (systems/sigil/sigilSets.js) is short enough for one line of the card, at every stage, for every set -
 //     a new set's too - and its recovery is its own number, never in its words;
@@ -147,10 +145,10 @@ test('CARD-FIT the sheet: the tip\'s card a column - its body the one thing that
 
 test('CARD-FIT the Info box is the whole read: the tier\'s lines and the lore (a line the powers box says is not said twice), then the sigil and the set in their whole dress; the card\'s own list leaves the lore out (mutants: the Info box without the tier\'s lines; a line said twice; the card with the lore)', () => {
   const inv = strip(read('src/ui/enhanced/enhancedInventory.js'));
-  assert.match(inv, /const said = new Set\(boxes\.flat\(\)\.map\(\(r\) => String\(r\?\.text \?\? r \?\? ''\)\.trim\(\)\)\);\s*const tier = rarityLines\(item, \{ sigil: false, set: false, technique: false \}\)\.filter\(\(t\) => t && !said\.has\(t\)\);\s*if \(tier\.length\) boxes\.splice\(1, 0, tier\.map\(\(text\) => \(\{ text, center: true \}\)\)\);/);   // PIN MOVED (TECH-CARD): the Info box's list leaves a technique to its whole block
+  assert.match(inv, /const said = new Set\(boxes\.flat\(\)\.map\(\(r\) => String\(r\?\.text \?\? r \?\? ''\)\.trim\(\)\)\);\s*const tier = rarityLines\(item, \{ sigil: false, set: false, technique: false \}\)\.filter\(\(t\) => t && !said\.has\(t\)\);\s*if \(tier\.length\) boxes\.splice\(1, 0, tier\.map\(\(text\) => \(\{ text, center: true \}\)\)\);/);
   assert.match(inv, /\{ const sb = sigilCard\(item, \{ full: true \}\); if \(sb\) body\.append\(sb\); \}/);
   assert.match(inv, /\{ const set = setCard\(item, deps\.entity, itemLongName, \{ full: true \}\); if \(set\) body\.append\(set\); \}/);
-  assert.match(inv, /itemPowerLines\(picked, deps, \{ set: false, lore: false, technique: false \}\)/);   // PIN MOVED (TECH-CARD): the card leaves a technique's line to its block (technique: false)
+  assert.match(inv, /itemPowerLines\(picked, deps, \{ set: false, lore: false, technique: false \}\)/);
   _resetForTests(); setPref(LOOT_RARITY_KEY, true);
   const leg = { group: 'Weapons', templateIndex: 120, rarity: 'aetheric', aetheric: 'oath-longsword', affixes: [], isIdentified: true };
   assert.ok(rarityLines(leg).length > rarityLines(leg, { lore: false }).length, 'the lore is the one line the card asks without');

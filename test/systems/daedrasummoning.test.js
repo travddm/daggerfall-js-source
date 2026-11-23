@@ -190,7 +190,7 @@ test('G7: the last null destination is gone, and the host goes through the law',
 });
 
 test('DAEDRA1: the summoning box says a date, a prince and a name - not %dat, %dae and %pcn', () => {
-  // Dracula/Valentin on Discord (2026-09-21): "daedra summoning is
+  // Dracula/Valentin on Discord: "daedra summoning is
   // fucked", with a screenshot of record 481 reading
   //   "Today is %dat, the day of summoning for %dae. Do you, %pcn,
   //    wish to risk you life and very soul by summoning %dae into our

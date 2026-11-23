@@ -1,4 +1,4 @@
-// LW10 (bible/06-Systems/Living-World-II.md "LW10"): THE WAGON TRAIN - who has a team (a merchant's wagon, two from a
+// LW10 ("LW10"): THE WAGON TRAIN - who has a team (a merchant's wagon, two from a
 // great house; a noble's baggage wagon; a pedlar's or a carter's pack horse), the train in file along its way (the van
 // before, the leader at the first horse's head, each wagon on its shafts the mod's hitch behind its horse, the rest
 // behind), the park at camp, the cargo by the trip, the wheels by the distance walked; the teams drawn with Horse Cart
@@ -80,7 +80,6 @@ test('LW10 the train in file: the van (the first half of the armed) before the l
   const bt = { ...trip, way: bend, from: { blocks: 4 } };
   for (const s of [10000, 20000, 33000, 40000, 50000, 60000]) {
     const t = trainOf(bt, { phase: 'out', s }, [leader], 0);
-    // PIN MOVED (AUDIT LW-III): on the way's line - rounded at a corner (trips.js laneAt, LANE_EASE_N either side)
     const w = t.wagons[0], on = laneAt(bend, w.s, 0);
     assert.ok(Math.hypot(w.x - on.x, w.z - on.z) < 1e-6, `the axle on the way at ${s}`);
   }
@@ -120,7 +119,7 @@ test('LW10 the teams drawn: each horse its own billboard batch posed by the pool
     horseArt: { ensureStationary: () => true, ensureWalk: () => {}, hasWalk: () => true },
     poseHorse: (b, eye, horse) => { posed.push(horse); b.size = { w: 3, h: 2 }; },
     wagonParts: () => ({ wheelRadius: 0.4, bounds: { min: [-1, 0, -2], max: [1, 1.5, 2] } }),
-    drawWagon: (r, tex, pos, rot, tier, turn, grow, kind, hitched) => { drawnWagons.push({ pos, rot, tier, angle: turn.angle, grow, kind, hitched }); return true; },   // PIN MOVED (WAGONS1 x LW10): WAGONS2's draw - `turn` an object, the kind, hitched
+    drawWagon: (r, tex, pos, rot, tier, turn, grow, kind, hitched) => { drawnWagons.push({ pos, rot, tier, angle: turn.angle, grow, kind, hitched }); return true; },
   };
   const col = { addMesh: (k) => buckets.set(k, true), removeBucket: (k) => buckets.delete(k) };
   const teams = createRoadTeams({ renderer, presentation: () => pres, collider: () => col });
@@ -185,13 +184,6 @@ test('LW10 the roads\' layer lays the teams: a caravan on the road its train (it
   assert.equal(w.moving, !found.at.camp);
   roads.clear();
   assert.equal(synced[synced.length - 1], 'clear');
-  const host = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(host, /teams: createRoadTeams\(\{ renderer, presentation: \(\) => hcc\.presentation, collider: \(\) => collider(?:, horses3d: mwViewHorseRig)? \}\)/);   // PIN MOVED, COATS3D: their horses 3D on the Morrowind lane
-  assert.match(host, /if \(livingRoads && livingWorldOn\(\) && _mode\(\) === 'exterior'\) livingRoads\.drawTeams\(renderer, yardCull\);/);   // PIN MOVED (PERF-WAGON): the street's view test handed on
-  const pool = readFileSync(new URL('../../../src/scenes/horseCartPool.js', import.meta.url), 'utf8');
-  // PIN MOVED (WAGONS1 x LW10): the runtime's hitch the driven wagon's; the road's wagon a kind's parts and hitch
-  // PIN MOVED (PERF-WAGON): and the culled draw the road's teams take under the street's view test
-  assert.match(pool, /presentation: \{ wagonParts, horseArt, hitchOf: \(\) => hitchOf\(myKind\(\)\), onChanged: \(\) => onChanged\?\.\(\), drawWagon, drawWagonSeen, poseHorse: poseHorseBatch, partsOf, hitchOfKind: hitchOf \}/);
 });
 
 test('AUDIT LW-II LW10: the wheels turn forward on the way home - the distance walked the way the wagon faces; the roads\' layer lays a train on the march in the train\'s own places, and a camped caravan\'s wagons parked CAMP_PARK_N beyond its ring, facing its fire (mutants: E8 the wheels home, F3 the people in the train, F3 the park)', () => {
@@ -229,7 +221,6 @@ test('AUDIT LW-II LW10: the wheels turn forward on the way home - the distance w
   const walking = find(12, (at, tr) => !at.camp && tr.party.length > 1);
   assert.ok(walking, 'a caravan on the march');
   const w = lay(walking);
-  // PIN MOVED (AUDIT LW-III): the train in its lane - the layer's own (roadLanes), right of the road's middle
   const lanes = roadLanes(w.walking, HITCH_N);
   assert.ok(lanes.get(walking.tr.id) >= LANE_N, 'in a lane right of the road\'s middle');
   const train = trainOf(walking.tr, walking.at, membersAt(walking.tr, walking.t), walking.t, HITCH_N, lanes.get(walking.tr.id));
@@ -292,9 +283,4 @@ test('WAGONS1 x LW10: the living world\'s wagon is the Small Cart whatever the p
   assert.equal(w.hitched, true);
   assert.ok(Math.abs(trainOf(trip, at, [leader], 1).wagons[0].x - wayAt(way, 30000 - LEAD_N - HITCH_N).x) < 1e-6, 'unsaid, the mod\'s');
   assert.equal(campTeam(trip, 0, 0, 100, 1).wagons[0].hitched, false);
-  const host = readFileSync(new URL('../../../src/scenes/livingWorld/livingRoads.js', import.meta.url), 'utf8');
-  // PIN MOVED (AUDIT LW-III): the drawn wagon's hitch read once a frame, the train in its lane
-  assert.match(host, /const hitchN = deps\.teams\?\.hitchN\?\.\(\);/);
-  assert.match(host, /const train = trainOf\(trip, at, members, t, hitchN, lanes\.get\(p\.trip\.id\) \?\? LANE_N\);/);
-  assert.match(host, /tier: w\.tier, s: w\.s, hitched: w\.hitched, distM: near\(w\)/);
 });

@@ -3,9 +3,6 @@
 // EM4 — THE TOWN SHEET: the streets behind the sheet contract, on the
 // same parchment as the bay and the dungeon.
 //
-// Mac (2026-09-21): "instead of 3 seperate keybinds, adding a tab
-// toggle on the map itself... we're going to put our own spin on the
-// automap and town map themselves."
 //
 // The second sheet written to `ui/map/mapStrip.js`'s SHEET_MEMBERS from
 // outside the window: no back-reference, no DOM, no renderer. It is
@@ -44,6 +41,7 @@ import {
 import { nameplateAnchor, resolveNameplates, WORLD_PER_PX, STAR_PLATE } from '../nameplateLayout.js';   // FB1020c STAR-PLATE: the surrender's "*", one home
 import { readPartyBodies, PARTY_MARK_CSS } from '../partyMapMarks.js';   // DISC23-A: the party's bodies in the streets
 import { readTownBoards, readTownHomes, TOWN_MARK_REACH } from './townMapMarks.js';   // TOWN-MARKS: the Notice Boards and the player housing
+import { createImperialSheet } from './imperialSheet.js';   // IC-TOWNMAP: the Imperial City's slices draw the city
 
 /** The fit at rest has ONE HOME in ui/ink/inkMap.js - re-exported so a
  *  pin that has this sheet does not also have to reach for it. */
@@ -56,8 +54,7 @@ export const NAME_SIZE = 13;
 export const NAME_SIZE_MIN = 9;
 export const NAME_SIZE_MAX = 20;
 /**
- * EM8 — NOT EVERY NAME IS WORTH THE SAME. Mac: "let's enhance the
- * location names on the buildings more."
+ * EM8 — NOT EVERY NAME IS WORTH THE SAME.
  *
  * A town plan is read to FIND something, and the things a player
  * navigates BY are not the things they are hunting FOR. So a plate's
@@ -109,6 +106,9 @@ const EMPTY_SIZE = Object.freeze({ width: 1, height: 1 });
 const PARTY_REACH = 12;
 
 export function createTownSheet(deps = {}) {
+  // IC-TOWNMAP: in any of the Imperial City's slices the sheet is the city itself, its plan and its fabric round this
+  // slice's own blocks - which it draws through this sheet, made without `imperial`
+  if (deps.imperial != null) return createImperialSheet(deps, createTownSheet);
   let field = null;      // the town's bytes, built once
   let plan = null;       // { chains, wash }, traced once
   let plates = null;     // { key, rows } - laid out per view
@@ -348,7 +348,12 @@ export function createTownSheet(deps = {}) {
 
     ensure() {
       ensureField();
-      return plan?.chains?.length ? plan : null;
+      // IC-TOWNMAP: A GRID WITH NOTHING BUILT ON IT IS STILL THE STREETS THE PLAYER STANDS ON. The plan was null with no
+      // chain, and the window paints nothing for a null model (heldMap.js:"if (!ctx || !model) return;") - no heading,
+      // no caret, no Find me cross: 242 of the Imperial City's 442 slices, its whole Palace District, are closed cells
+      // and open ground (world/tamrielCapitals.js CAPITAL_CLOSED_BYTE, in no quarter). A town with blocks hands its plan,
+      // empty or not; only a town with none is the quiet nothing
+      return deps.blocks?.length ? plan : null;
     },
 
     staticKey() {

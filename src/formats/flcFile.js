@@ -1,7 +1,7 @@
 // THE FLIC READER (F1) - API/FlcFile.cs ported whole. Autodesk
 // Animator's FLIC format, which is what Daggerfall's .CEL animations
 // are (the three chargen constellations ROGUE/MAGE/WARRIOR.CEL) - a
-// different format from the .VID movies, which is why the U22 video
+// different format from the .VID movies, which is why the video
 // reader could not stand in for it.
 //
 // Shape: a 128-byte header (size, magic, frame count, dimensions,
@@ -76,7 +76,7 @@ export class FlcFile {
     this.header = null;
     this.frameHeaders = [];
     this.palette = null;        // Uint32Array, ColorCount entries
-    this.frameBuffer = null;    // Uint32Array, Width*Height (BOTTOM-UP)
+    this.frameBuffer = null;    // Uint32Array, Width*Height
     this.currentFrame = 0;
     this.colorCount = 0;
     this.frameDelay = 0;        // seconds
@@ -113,7 +113,7 @@ export class FlcFile {
     // Pre-filling matches that exactly, and matters: a guard that
     // refused a missing header instead STALLED the frame counter, so
     // a non-looping player could never reach NumOfFrames and its
-    // OnAnimEnd never fired (AUDIT F-P2 - caught by the player pin).
+    // OnAnimEnd never fired.
     this.frameHeaders = Array.from({ length: this.header.numOfFrames + 1 },
       () => ({ posInFile: 0, size: 0, type: CHUNK_TYPE.None, numSubChunks: 0 }));
     if (!this._readFrameHeaders()) {
@@ -122,7 +122,7 @@ export class FlcFile {
       return false;
     }
     this.readyToPlay = true;
-    // AUDIT 24 formats: no format branch. Read() is a bare
+    // No format branch. Read() is a bare
     // `FrameDelay = (float)(header.FrameDelay / (float)CinematicSpeed
     // .FLIC);` (FlcFile.cs:135). CinematicSpeed.FLI = 70 is declared
     // (:588) and referenced NOWHERE in the DFU tree - the port wired
@@ -226,7 +226,7 @@ export class FlcFile {
         case CHUNK_TYPE.BYTE_RUN: this._decodeByteRun(); break;
         case CHUNK_TYPE.PSTAMP: c.skip(ch.size - CHUNK_HEADER_SIZE); break;   // a thumbnail
         default: {
-          // BUG-FOR-BUG (see the header): an ABSOLUTE position is
+          // An ABSOLUTE position is
           // computed and then applied as a RELATIVE skip.
           const skip = c.pos + ch.size - CHUNK_HEADER_SIZE;
           if (skip > this.header.fileSize) {
@@ -254,7 +254,7 @@ export class FlcFile {
       if (numOfColorsToChange === 0) numOfColorsToChange = 256;
       for (let cc = 0; cc < numOfColorsToChange; cc++) {
         const r = c.u8() * scale, g = c.u8() * scale, b = c.u8() * scale;
-        // AUDIT 24 formats: colorInd runs across ALL packets and C#
+        // colorInd runs across ALL packets and C#
         // never bounds it, so a chunk carrying more entries than
         // ColorCount raises IndexOutOfRangeException out of Load
         // (Palette is `new Color32[ColorCount]`, FlcFile.cs:118). The
@@ -340,7 +340,7 @@ export class FlcFile {
   _pos(x, y) { return x + (this.header.height - 1) * this.header.width - y * this.header.width; }
 
   /** Writes one pixel, THROWING past the frame buffer as C#'s
-   *  Color32[] indexer does (IndexOutOfRangeException). AUDIT F-P1:
+   *  Color32[] indexer does (IndexOutOfRangeException). 
    *  without this a JS typed array DROPS the write silently and the
    *  malformed chunk decodes "successfully" - the exact hazard the
    *  VID reader already emulates (vidFile.js _putPixel). */

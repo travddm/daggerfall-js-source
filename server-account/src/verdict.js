@@ -1,12 +1,11 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// INT2-INT5 (2026-10-09, the INTEGRITY arc - bible/06-Systems/Integrity-Arc.md; its audit the same day): THE VERDICT ON
+// INT2-INT5: THE VERDICT ON
 // A CHECKPOINT - what the judge found (judge.js), what the ledger says (INT4, ledger.js), what the budget says (INT5,
 // budget.js), the level the realm trusts, and the hold they come to - as the statements realm.js checkpointRealm lays in
 // the SAME BATCH that moves the character's row to the new save. One batch, so a checkpoint that loses its race (a
 // trade settling, a join) writes no verdict either, and a verdict never stands for a save that did not land.
 //
-// ═══ THE HOLD ══════════════════════════════════════════════════════
+// THE HOLD
 //
 // `held` is the character's, and every route that hands its value to another player reads it (realm.js holdRefusal).
 // Its reasons stand in an order - staff's, the law's, the budget's - and each clears its own way:
@@ -23,41 +22,43 @@
 //              whose values were cut (C5).
 //   - 'budget' (only once staff turn `enforce` on) a gain past the bucket. Cleared when play refills it.
 //
-// A COPY HOLDS NO CHARACTER (AUTO-HOLD, 2026-10-16 - Mac: "I dont want to have to manually review"). The ledger locks
+// A COPY HOLDS NO CHARACTER (AUTO-HOLD, 2026-10-16). The ledger locks
 // the copied PIECE (ledger.js item_dupes - it moves by no route) and the checkpoint's answer names it; the character
 // trades on. 'dupe' - DUPES_FOR_HOLD copies, staff alone to lift - is retired: no verdict writes it, a row still holding
-// it is lifted by its next checkpoint, and migration 0120 lifted every one standing.
+// it is lifted by its next checkpoint, and the schema's start has none standing.
 //
-// ═══ WHAT A VERDICT WRITES OVER ════════════════════════════════════
+// WHAT A VERDICT WRITES OVER
 //
 // The row as the checkpoint READ it (`judge_rev`): a staff act landing in between moves the rev, and this verdict is not
 // written - the next checkpoint judges again over the row as it stands
 // (AUDIT INT: a staff hold landing mid-checkpoint was written over). The bucket is written as a change, so a win's
 // spoils granted in between (budget.js grantSpoils) are kept.
 //
-// ═══ THE FIRST JUDGEMENT ═══════════════════════════════════════════
+// THE FIRST JUDGEMENT
 //
-// Mac's call at the cutover: "Items judged, wealth baselined". The baseline is what the realm ALREADY HELD for the
+// . The baseline is what the realm ALREADY HELD for the
 // character - its stored record, read once - never the save the first judged checkpoint brings: that save is charged
 // for what it adds like any other (AUDIT INT: the first judged save could hold anything, and was the baseline). A new
-// character's baseline is a newborn's purse (REALM_BIRTH_WEALTH_MAX); one through customs, its level's allowance.
-// ═══════════════════════════════════════════════════════════════════
+// character's baseline is a newborn's purse (REALM_BIRTH_WEALTH_MAX).
 
 import { judgeSave, judgeProducts, STRIKES_FOR_TIMED, JUDGE_VERSION, FINDINGS_KEPT, WEALTH_VERSION, goodsOf, lawValuesOf, LAW_VALUES_CUT } from './judge.js';
 import { ledgerStep, chargeSteps } from './ledger.js';
 import { budgetConfig, bandOf, stepBudget } from './budget.js';
-import { customsAllowance } from '../../src/net/realm/realmGoldLaw.js';
-import { censusStep } from './staffCensus.js';   // STAFF-PANEL4-CENSUS: the census's tally, on the hour's row and the character's latest
+import { levelWealthCeiling } from '../../src/net/realm/realmGoldLaw.js';
+import { censusStep } from './staffCensus.js';
+import { whenOption } from './operator-options.ts';   // the census's tally only while the operator's option is on
+/** No census this checkpoint: no step, and the hour's row keeps its tally. */
+const NO_CENSUS = Object.freeze({ steps: [], tally: null });   // the census's tally, on the hour's row and the character's latest
 
-/** INT2's cutover (Mac: "Items judged, wealth baselined"): a character whose first judged wealth stands past this many
- *  of its level's customs allowance (realmGoldLaw.js customsAllowance) is flagged for staff - flagged, never held. */
+/** INT2's cutover: a character whose first judged wealth stands past this many
+ *  of its level's wealth ceiling (realmGoldLaw.js levelWealthCeiling) is flagged for staff - flagged, never held. */
 export const OUTLIER_ALLOWANCES = 10;
 /** The fewest seconds of play a level takes to rise, as the realm trusts it (the budget's band, a win's spoils) - the
  *  save's own level stands, and lane 4 judges it (Integrity-Arc). Generous: no honest level comes faster. */
 export const LEVEL_RISE_S = 300;
 const HOUR_S = 3600;
 const DAY_S = 24 * HOUR_S;
-/** AUTO-HOLD (2026-10-16, Mac's call): the law's timed hold - the first a week, each after it a month - and how long with
+/** AUTO-HOLD: the law's timed hold - the first a week, each after it a month - and how long with
  *  nothing found before the strikes and the timed holds served are forgotten. */
 export const LAW_HOLD_S = 7 * DAY_S;
 export const LAW_HOLD_REPEAT_S = 30 * DAY_S;
@@ -149,7 +150,7 @@ export function trustedLevel({ seen, at, level, played }) {
  * @param {{ mine: any, dupes: any, config: any } | null} [known] SAVE-BATCH: the ledger's reads and the config, answered in
  * the checkpoint's first batch (realm.js checkpointRealm) - null, and they are asked here
  */
-export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, save, summary, baseline = null, known = null) {
+export async function verdictOn({ db, nowS, env = null }, { player, char, seq, key }, row, save, summary, baseline = null, known = null) {
   const first = row.wealth == null;
   const playedS = Number.isSafeInteger(row.played_now) ? row.played_now : 0;
   const lv = trustedLevel({
@@ -192,7 +193,7 @@ export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, s
   const count = lawCountOf({ strikes: row.strikes ?? null, served: row.law_holds ?? null, until: row.held_until ?? null, at: row.law_at ?? null }, { rising, holding: lawHolds > 0, nowS });
   const held = holdOf({ prev: row.held ?? null, law: lawHolds, until: count.until, nowS, over: budget.over, enforce: config.enforce });
   // the cutover's outlier: a first judgement far past its level's line is flagged for staff, and holds nothing
-  const outlier = first && judged.wealth > OUTLIER_ALLOWANCES * customsAllowance(lv.level);
+  const outlier = first && judged.wealth > OUTLIER_ALLOWANCES * levelWealthCeiling(lv.level);
   const clean = law === 0 && fresh === 0;
   /** @type {any[]} */
   const after = [...ledger.steps];
@@ -214,7 +215,7 @@ export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, s
   // nothing new (the hold, under `enforce`, stands until it is paid)
   // STAFF-PANEL3-REALM (design doc weak spots: "split gold from item worth"): and the goods of that wealth (judge.js
   // goodsOf - its pieces that are not gold, at the wealth's own worth), so staff read gold - the rest of it, the debt off
-  // it - apart from goods in one measure (FLAW REVIEW: customs' gold beside it, the loan never off it, made the goods short)
+  // it - apart from goods in one measure (FLAW REVIEW: the liquid gold beside it, the loan never off it, made the goods short)
   // - asked only when this finding is written
   if (budget.over > 0 && gain > 0) finding(config.enforce ? 'budget' : 'measure', { gain, over: budget.over, level: lv.level, played: dPlayed, wealth: judged.wealth, goods: goodsOf(save), ...(first ? { first: true } : {}) });
   if (outlier) finding('outlier', { wealth: judged.wealth, level: lv.level });
@@ -223,7 +224,7 @@ export async function verdictOn({ db, nowS }, { player, char, seq, key }, row, s
   // STAFF-PANEL4-CENSUS (design doc, Server load: "keep a tally on the hourly wealth row the checkpoint already writes,
   // only when it changes"): the census's tally rides this row - null, unchanged, and the row keeps its own - and the
   // character's latest beside it. censusStep never throws: a census that fails is no census, never a lost save
-  const census = censusStep(db, { player, char, seq, nowS }, save, row.census_tally ?? null);
+  const census = whenOption(env, 'census', () => censusStep(db, { player, char, seq, nowS }, save, row.census_tally ?? null), NO_CENSUS);
   after.push(db.prepare(
     'INSERT INTO realm_wealth_hours (char_id, hour, player, level, gain, loss, played_s, checkpoints, tally) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)'
     + ' ON CONFLICT (char_id, hour) DO UPDATE SET level = excluded.level, gain = gain + excluded.gain, loss = loss + excluded.loss,'

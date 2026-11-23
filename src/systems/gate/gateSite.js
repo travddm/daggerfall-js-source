@@ -1,5 +1,5 @@
 // @ts-check
-// WB1 (2026-09-25): WHERE THE GATE STANDS - the client's half of the site, over the world's own data.
+// WB1: WHERE THE GATE STANDS - the client's half of the site, over the world's own data.
 //
 // net/gate/gateLaw.js rolls a day's region and pixel over LISTS; this module makes the lists, once a session, from the map
 // files every client holds alike (MAPS.BSA's locations, the climate and politic pages) - so every client finds the
@@ -24,10 +24,10 @@
 //
 // Not a DFU member. Ledger A (WB).
 import { CLIMATES, LOCATION_TYPES, REGION_NAMES } from '../../formats/mapsFile.js';
+import { BAY_REGION_COUNT } from '../../formats/mapsTables.js';
 import { BASE_HEIGHT_SCALE, SCALED_OCEAN_ELEVATION } from '../../world/terrain/terrainSampler.js';
 import { spawnsDungeon, WORLD_SALT } from '../../world/spawnedDungeons.js';
 import { pickGateRegion, pickGatePixel, gateSpotLocal, omenRing } from '../../net/gate/gateLaw.js';
-import { WILD_REGION } from '../wild/wildZone.js';   // PVPDUNGEONS: no world event in the open zone
 
 const W = 1000, H = 500;
 /** The towns a gate may be reached from: DFU's fast-travel towns. */
@@ -41,7 +41,7 @@ export const GATE_REGION_MIN_PIXELS = 24;
 /** Is a politic value a province's (MapsFile.getRegionIndexAt's own bands: a region's 128 + index, and the one known
  *  bad value 128 + 105 that DFU reads as the Wrothgarian Mountains)? AUDIT WB C1: not High Rock's sea coast's 64 - it
  *  is the sea's value (ui/travel/travelMapWindow.js), and no province an omen can name. */
-export const politicClaimed = (pol) => (pol >= 128 && pol < 128 + REGION_NAMES.length) || pol === 128 + 105;
+export const politicClaimed = (pol) => (pol >= 128 && pol < 128 + BAY_REGION_COUNT) || pol === 128 + 105;   // WW-R: the Bay's own regions - the Bay's scan reads the Bay's map
 /** Is a pixel water - the ONE law (ui/overworldModel.js isWaterPixel, pinned equal): an Ocean climate, or a height
  *  byte at or under the ocean's elevation. */
 export const gateSeaPixel = (climate, byte) => climate === CLIMATES.Ocean || byte * BASE_HEIGHT_SCALE <= SCALED_OCEAN_ELEVATION;
@@ -143,7 +143,7 @@ export function gateScanner(maps, { spawnSalt = WORLD_SALT, heightAt = null } = 
 }
 
 /** The regions a gate may open in, ascending. */
-export const gateRegions = (scan) => [...scan.byRegion.keys()].filter((r) => r !== WILD_REGION && scan.byRegion.get(r).length >= GATE_REGION_MIN_PIXELS).sort((a, b) => a - b);
+export const gateRegions = (scan) => [...scan.byRegion.keys()].filter((r) => scan.byRegion.get(r).length >= GATE_REGION_MIN_PIXELS).sort((a, b) => a - b);
 
 /**
  * A day's gate site, or null when the world offered no ground at all.

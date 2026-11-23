@@ -1,5 +1,5 @@
 // @ts-check
-// SET7 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 7): THE BROKER'S DOOR - the one place a
+// SET7: THE BROKER'S DOOR - the one place a
 // host opens the Sigil Broker's window through. The window (ui/brokerWindow.js) is a lazy chunk mounted through the one
 // home (ui/enhanced/enhancedChunk.js - a chunk that will not arrive is a notice the player dismisses, MENU1), in a host of its
 // own, wrapped in the generic overlay shape every host's frame already drives (ui/tavernDoor.js's own wrapper): `done`

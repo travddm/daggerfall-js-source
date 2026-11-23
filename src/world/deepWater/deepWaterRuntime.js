@@ -1,5 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════
-// DW-D (2026-09-25): ILIAC PUDDLE NO MORE'S LOAD GRACE (DeepWaterRuntime.cs,
+// DW-D: ILIAC PUDDLE NO MORE'S LOAD GRACE (DeepWaterRuntime.cs,
 // jet082, 1.2.2) - the window in which the mod holds its hand off the
 // player: the shore exit does not lift a swimmer and the swim stroke and
 // multiplier stand down (OutdoorSwimMovementController). It opens:
@@ -35,7 +34,6 @@
 // cost measure for DFU's streamed world; the port's location builds are its
 // own pipeline, so a coast's neighbouring towns stand as they do without
 // the mod (Port-Ledger A, the Iliac Puddle No More row).
-// ═══════════════════════════════════════════════════════════════════
 
 export const LOAD_GRACE_SECONDS = 1.5;
 export const LOCATION_LOAD_STUCK_SECONDS = 12;

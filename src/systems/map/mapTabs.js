@@ -3,9 +3,6 @@
 // EM1 — THE TAB LAW: one map, three sheets, and where each one is
 // readable.
 //
-// Mac (2026-09-21): "instead of 3 seperate keybinds, adding a tab
-// toggle on the map itself. So if you open it in a dungeon, the world
-// map would be not accessible, same for the town map."
 //
 // The enhanced skin had THREE map windows reached three ways - the
 // dungeon automap and the building automap on the AutoMap key, the

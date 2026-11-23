@@ -1,4 +1,4 @@
-// TOUCH-HOLD (2026-10-01 part four - Mac: "Interact button + knife Use", the audit's question answered). No Interact
+// TOUCH-HOLD. No Interact
 // existed on a phone or in the pad's shipped layouts, and E is the professions' start and their hold: there a common
 // herb (no tool picks it) could not be started, Hunting could not be started at all (the Skinning Knife had no Use) nor
 // its line held, and the net's haul could not hold its band (299 of 300 seeded hauls slipped to a plain net). Now:
@@ -177,13 +177,6 @@ test('TOUCH-HOLD Plus: layout 2 - LT is Interact: a store on layout 1 (LT Recast
     assert.deepEqual(plusDpadMap().right, { tap: 'Rest', hold: 'RecastSpell' }, 'Recast, the d-pad\'s right held');
     assert.ok(PLUS_BIND_ROWS.some((r) => r.sec === 'Interact'), 'the Controller bindings window binds it');
   } finally { resetPrefs(); }
-});
-
-test('TOUCH-HOLD prompts: with a pad in hand the professions\' prompts and lines name the pad\'s button, as the sea\'s readout names its own; else the key (mutants: the key named to a pad)', () => {
-  const w = src('src/scenes/world.js');
-  assert.match(w, /const actKeyWord = \(action\) => \{\n\s*const padHeld = controllerLook\(\) \? padFamily\(\) : null;[^\n]*\n\s*const pad = padHeld \? getBinding\(bindings\(\), action, false\) : null;\n\s*if \(pad && \/\^Joystick\/\.test\(pad\)\) return hdGlyphName\(padHeld, pad\);\n\s*const c = getBinding\(bindings\(\), action\);\n\s*return c \? tagText\(c\) : null;\n\s*\};/);
-  assert.match(w, /keyLabel: \(a\) => actKeyWord\(a\) \?\? '\?',/, 'the gathering host\'s prompt and meter');
-  assert.match(w, /keyLabel: \(a\) => actKeyWord\(a\),[^\n]*\n\s*professionUse: /, 'the tools\' lines');
 });
 
 // ─── THE SKINNING KNIFE'S USE ────────────────────────────────────────

@@ -2,9 +2,8 @@
 // Pure + browser-safe: buildNeutralBody(ramps) returns faces
 // [{ p:[12], n:[3], c:[r,g,b] }] with AO + snapped-ramp palette shading
 // baked in. `ramps` = { skin:[[r,g,b]...], boot:[[r,g,b]...] } supplied
-// by the caller (engine passes ramps from the loaded ART_PAL; the
-// viewer tool passes them from the sprite). Geometry is authored as
-// loft profiles - see tools/neutral for the viewer.
+// by the caller (engine passes ramps from the loaded ART_PAL).
+// Geometry is authored as loft profiles.
 
 // The hand/forearm JUNCTION (pre-HSCALE): the hand's top row sits at
 // y 0.985 and the arm loft's wrist row at y 0.99 - the wrist joint is
@@ -20,7 +19,7 @@ export const WRIST_JUNCTION_Y = 0.9875;
 // forearm (~0.013 disconnect at Mac's -40).
 export const ARM_X = 0.235;
 
-// REST HAND ROLL (Mac: "hand roll -40" in the viewer tuner) - baked
+// REST HAND ROLL (in the viewer tuner) - baked
 // into the rig so it holds through poses and gaits, not just the idle
 // tuner. Same semantics the slider applied: -40/100 * pi, mirrored
 // (left +, right -), rolled about the forearm axis.
@@ -257,7 +256,7 @@ export function buildNeutralBody(ramps, opts = {}) {
   grp = 'legL'; leg(-1); grp = 'legR'; leg(1); grp = 'body';
 
   // FEET: forward, from the TRUE thin ankle (rx ~0.066). ANK is the
-  // ankle stump's top ring. AUDIT 68 S05-neutralbody-dead-writes: a
+  // ankle stump's top ring. A
   // "slim ankle" rewrite of legProf's bottom rows stood here, AFTER
   // leg() had lofted them - it never reached the geometry.
   const ANK = 0.045;
@@ -315,7 +314,7 @@ export function buildNeutralBody(ramps, opts = {}) {
   // neck, behind knee/elbow, under pec/delt) face a close opposing wall
   // and darken. No hardcoded positions.
 
-  // ARMOR-AS-BODY (prototype): instead of a separate mesh, thicken the
+  // Instead of a separate mesh, thicken the
   // rig's own surface where a piece sits and recolour it. No gaps, and
   // it animates with the body for free. Cuirass = the torso ('body')
   // faces in the chest->waist band pushed radially out + tagged steel.

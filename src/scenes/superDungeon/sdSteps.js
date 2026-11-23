@@ -1,5 +1,5 @@
 // @ts-check
-// SD7b (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 9): THE UNMOORED STEPS ON THE
+// SD7b: THE UNMOORED STEPS ON THE
 // PAGE - the dungeon host's set for the Shattered Hour's platforming, as scenes/superDungeon/sdHall.js is for its puzzle. The Steps are
 // not the relay's: every screen moves them on the realm's anchored clock (scenes/world.js deadlandsSeconds - the relay's
 // time), so every player sees the same step in the same place; what a foot breaks is its own.
@@ -18,7 +18,7 @@
 //     void's floor answered with the checkpoint of the span it last stood in - the outer host stands it there and takes
 //     what it costs.
 //
-// SD-LOOK S9 (2026-10-09, bible/11-Multiplayer/Super-Dungeons-Look.md section 8): EVERY STEP SHOWS WHAT IT WILL DO NEXT,
+// SD-LOOK S9: EVERY STEP SHOWS WHAT IT WILL DO NEXT,
 // from across the void, before the jump. The law (world/superDungeon/sdSteps.js - its solids and its timing) is untouched; every
 // picture stands inside its step's box, and every part that moves casts nothing (`noShadow`).
 //   THE DRIFT hangs from pendulums: two rods up SD_PENDULUM.len to a gear, leaning with the law's own swing
@@ -80,7 +80,7 @@ export const SD_CHUNK = Object.freeze({ rewind: 0.6, rise: 2.2, drift: 0.5, spin
 /** The longest frame the breath pushes for (s) - a hitch is not a gale. */
 const BREATH_DT_MAX = 0.1;
 /** AUDIT KETCH II L4-6: how far either side of a course's steps (their breadth and their sway) its breath reaches - on a course
- *  laid beside a ship's decks, never the Hour's (its void is all about it). */
+ *  laid beside other ground, never the Hour's (its void is all about it). */
 export const SD_BREATH_BAND_M = 3;
 /** The breath's band across a course `[x0, x1]` (the realm's x) - null for the Hour's, which breathes at every x. Pure. */
 export function sdBreathBand(course) {
@@ -167,7 +167,7 @@ const hide = (d) => { if (d && !d.hidden) { d.object.matrix.fill(0); d.hidden = 
  * @param {{ renderer?: any, audio?: any, ending?: string | null, lite?: boolean, course?: any }} deps - SD-LOOK S9: `ending` the Hollow's Ending
  *   (net/superDungeon/sdMarks.js SD_ENDINGS' id), its sign on the vane's fin; `lite` the phone's tier (ui/touch/touchDevice.js isTouchDevice -
  *   its own by default): two chunks a Crumble step, not four, and the pendulums' gears without teeth; EG-H3 (EG4):
- *   `course` the course it rides (net/eliteGates/egSpanLaw.js courseOf's record - the Hour's by default), its ghosts at most
+ *   `course` the course it rides (net/superDungeon/egSpanLaw.js courseOf's record - the Hour's by default), its ghosts at most
  *   SD_GHOSTS_MAX
  */
 export function createSdSteps({ renderer = null, audio = null, ending = null, lite = isTouchDevice(), course = SD_COURSE } = {}) {
@@ -186,7 +186,7 @@ export function createSdSteps({ renderer = null, audio = null, ending = null, li
   /** @type {any[] | null} */
   let draws = null;
   let checksMesh = null, lastTick = null, lastWarned = null;
-  const band = sdBreathBand(course);   // AUDIT KETCH II L4-6: the ship's gust blew on her aft deck and her bridge, and its wind sounded all through the Warden's fight
+  const band = sdBreathBand(course);   // AUDIT KETCH II L4-6: a course beside other ground breathes on its own band alone
   /** AUDIT SD II (L2 F18): the breath's streaks - their mesh and their draw, hidden but while the breath is seen. L4 F1:
    *  the span my feet last stood in (a checkpoint's included), where the void casts me back to. */
   let breathMesh = null, breathDraw = null, lastSpan = -1;
@@ -207,7 +207,7 @@ export function createSdSteps({ renderer = null, audio = null, ending = null, li
   /** @type {Array<{ at: ReadonlyArray<number>, ox: number, oz: number, kx: number, kz: number, w: number, g: number }>} */
   let chunkWays = [];
   const ghostStep = new Float32Array(SD_GHOSTS_MAX * 4), ghostState = new Float32Array(SD_GHOSTS_MAX * 4);
-  /** KETCH-LOOK KL3 (bible/11-Multiplayer/Sky-Ketch-Look.md "The PVS"): every draw the Steps stood, and whether a host's
+  /** KETCH-LOOK KL3 ("The PVS"): every draw the Steps stood, and whether a host's
    *  PVS has them out of sight - `culled` on each (the dungeon loop's own flag: no draw, no shadow's record) and no ghosts.
    *  The law rides on: a culled step still moves, carries and casts back. The Hour never asks. */
   /** @type {any[]} */

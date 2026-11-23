@@ -1,8 +1,8 @@
 // @ts-check
-// WB12d (2026-10-01, Mac: "faithful and a Summoner"): THE FAITHFUL'S CHEST - what the faithful keep in their circle,
+// WB12d: THE FAITHFUL'S CHEST - what the faithful keep in their circle,
 // opened once their rite is broken, for each character once a day: gold, two to four reagents of the rite (Sulphur,
 // Ichor, Ectoplasm, Lich Dust - a Daedra's Heart rarely) and, one time in twenty, a piece of Dagon's Brand - a Magic
-// piece of armour bearing the set's sigil. Design: bible/11-Multiplayer/World-Bosses.md section 19 D.
+// piece of armour bearing the set's sigil. Design: D.
 //
 // The day it was opened is the character's own record in the save (systems/modSaveData.js), as the Broker's is - and
 // beside it, the rite's memory (AUDIT WB12d: which of the day's faithful fell, whether the Summoner did).
@@ -28,7 +28,7 @@ export const RITE_REAGENTS = Object.freeze([
 export const RITE_REAGENTS_MIN = 2;
 export const RITE_REAGENTS_MAX = 4;
 /** A reagent drawn is a Daedra's Heart this often - DFU's own (CreatureIngredients1 53), the Stores' row of it since
- *  DAEDRIC-SMELT: the Daedric smelt takes it at the forge, loose (bible/06-Systems/Professions-Arc.md section 53). */
+ *  DAEDRIC-SMELT: the Daedric smelt takes it at the forge, loose. */
 export const RITE_HEART = Object.freeze({ templateIndex: DAEDRA_HEART.templateIndex, group: DAEDRA_HEART.group });
 export const RITE_HEART_CHANCE = 0.08;
 /** A piece of Dagon's Brand, one chest in this many. */

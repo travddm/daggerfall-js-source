@@ -1,13 +1,13 @@
-// LOOT-DOOR (AUDIT HORIZONTAL B7, 2026-10-27; bible/06-Systems/Professions-Arc.md 57.8): an older build's item law drops a
+// LOOT-DOOR (AUDIT HORIZONTAL B7, 2026-10-27; 57.8): an older build's item law drops a
 // Master's work it cannot read (a made Legendary of no record), so an older build in a room's seat said a container
 // without it, and every peer landed that - the piece gone. A loot room's hello says the loot its build reads (net/wire.js
 // LOOT_HELLO_LAW, `ll`), and while `lootDoor` is on the relay refuses one that says less or none - GRANT-DOOR's own law.
 import '../chargenDom.mjs';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fakeRooms } from '../fakeRoom.mjs';
-import { LOOT_HELLO_LAW, LOOT_HELLO_LAW_WIRE_MAX, LOOT_OLD_REASON, GROUND_LAW, GRANT_HELLO_LAW, lootRoom, groundRoom, parseClient, CLOSE_POLICY, RELAY_VERSION } from '../../src/net/wire.js';
-import { RELAY_CFG_KEYS, RELAY_CFG_VARS, RELAY_CFG_KEY_MIN, RELAY_INTERNAL_CFG, RELAY_CFG_TTL_MS, parseRelayCfgCommand, relayCfgSupported } from '../../src/net/relayCfg.js';
+import { asOnlinePage, fakeRooms } from '../fakeRoom.mjs';
+import { LOOT_HELLO_LAW, LOOT_HELLO_LAW_WIRE_MAX, LOOT_OLD_REASON, GROUND_LAW, GRANT_HELLO_LAW, lootRoom, groundRoom, parseClient, CLOSE_POLICY } from '../../src/net/wire.js';
+import { RELAY_CFG_KEYS, RELAY_CFG_VARS, RELAY_INTERNAL_CFG, RELAY_CFG_TTL_MS, parseRelayCfgCommand } from '../../src/net/relayCfg.js';
 import { privateInteriorPrefix, privateInteriorRoom, privateBoatRoom } from '../../src/net/privateInterior.js';
 import { siegeRoomKey, royalRoomKey } from '../../src/net/siege/siegeRef.js';
 import { validRoomWord, roomState, roomWord, carriedBase, judgeRoomClaim } from '../../src/systems/roomLoot.js';
@@ -17,6 +17,7 @@ import { MINT_V_MASTER } from '../../src/net/productRecord.js';
 import { rollMasterLines, masterRecordLines } from '../../src/net/masterLaw.js';
 import { mintTrophy, TROPHY_BEASTS } from '../../src/systems/hunt/trophies.js';
 import { OnlineSession } from '../../src/net/online.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const quiet = async (fn) => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return await fn(); } finally { console.warn = w; console.log = l; } };
 /** Main's build (4c696da8d): it says its ground, its grants and its lease - and no loot law. */
@@ -26,7 +27,7 @@ const prefix = await privateInteriorPrefix('acct-0001', 'char-0001');
 const OWNED = [privateInteriorRoom(prefix, 123456, 7), privateBoatRoom(prefix, 9)];
 const BATTLES = [siegeRoomKey(1234, 7), royalRoomKey(1234, 7)];
 
-test('LOOT-DOOR THE WIRE: a hello says `ll` 1 to LOOT_HELLO_LAW_WIRE_MAX, any other value read as none (never refused for it); the loot rooms are a world room and a cell - not a battle, an owned room or a boat, which ride the ground but carry no shared list; the setting is `lootDoor`, a relay of world272 or later takes it - main\'s MASTER-THREE world271 does not; the reason fits a close (mutants: the field dropped; the range; the rooms)', () => {
+test('LOOT-DOOR THE WIRE: a hello says `ll` 1 to LOOT_HELLO_LAW_WIRE_MAX, any other value read as none (never refused for it); the loot rooms are a world room and a cell - not a battle, an owned room or a boat, which ride the ground but carry no shared list; the setting is `lootDoor`; the reason fits a close (mutants: the field dropped; the range; the rooms)', () => {
   const hello = (ll) => parseClient(JSON.stringify({ t: 'hello', id: 'mac-0001', secret: 'secret-of-mac-0001', name: 'Mac', look: { race: 'Nord', gender: 'male', faceIndex: 0, items: [] }, pose: null, ...(ll === undefined ? {} : { ll }) }), { hasHello: false });
   assert.equal(hello(LOOT_HELLO_LAW).ll, LOOT_HELLO_LAW);
   assert.equal(hello(LOOT_HELLO_LAW_WIRE_MAX).ll, LOOT_HELLO_LAW_WIRE_MAX, 'a later build\'s number, read');
@@ -42,8 +43,6 @@ test('LOOT-DOOR THE WIRE: a hello says `ll` 1 to LOOT_HELLO_LAW_WIRE_MAX, any ot
   assert.ok(RELAY_CFG_KEYS.includes('lootDoor'));
   assert.equal(RELAY_CFG_VARS.lootDoor, 'LOOT_DOOR');
   assert.deepEqual(parseRelayCfgCommand('lootdoor on'), { cmd: 'relay', k: 'lootDoor', v: 'on' });
-  assert.equal(RELAY_CFG_KEY_MIN.lootDoor, 273);   // world273: main's FIELD BUGS 2026-10-26r took world272 at the merge
-  assert.deepEqual([relayCfgSupported('world272', 'lootDoor'), relayCfgSupported('world274', 'lootDoor'), relayCfgSupported(RELAY_VERSION, 'lootDoor')], [false, true, true]);   // PIN MOVED: world274, LADDER-CUT (systems/skillSoftcap.js, a file the bundle reaches; NOT YET DEPLOYED)
 });
 
 test('LOOT-DOOR THE NUMBER READS WHAT IT SAYS: 1 is a Master\'s work and a Mounted Trophy, each minted by its producer - both ride a room\'s stored word whole at this build, where main\'s law drops the one and cannot read the other', () => {

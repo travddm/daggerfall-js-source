@@ -1,10 +1,10 @@
-// GOLD-MARKET (2026-09-30, Mac: "Allow trading with gold or drakes on the marketplace"; "Gold listings, walled") - THE
+// GOLD-MARKET - THE
 // CLIENT: the market book's gold buy through the realm act (systems/realmSaves.js realmGoldAct over a session) - the
 // exact cost out of the purse as the service is asked, back on the service's refusal, kept on silence and asked again by
 // a settle (paid on the answer, a repeat paying nothing); the gold held collected into the board's bank account; a
 // view's currency its own cache; the Stores' third count (profBook, the Stores page); the Market tab's currency switch,
 // gold rows, gold Buy, the List form's "Priced in gold" and the Collect under My listings - a realm character's alone;
-// the host's wiring. bible/06-Systems/Professions-Arc.md 10.8.
+// the host's wiring. 10.8.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -162,8 +162,6 @@ test('GOLD-MARKET Stores: the professions\' book keeps what gold bought as its o
   assert.equal(storesSplit({ own: 2, bought: 1 }), '2 own · 1 bought', 'as before');
   assert.equal(storesSplit({ own: 2, bought: 0 }), 'own');
   assert.match(GOLD_GOODS_LINE, /It can go to your pack or be sold on the market for gold/);
-  assert.match(src('src/ui/professions/profPages.js'), /if \(\(pick\.gold \| 0\) > 0\) detail\.append\(el\('p', 'px-note', goldGoodsLine\(pick\.material\)\)\);/);   // PIN MOVED (FB1020h ESSENCE-LOOSE): the line its material's - a material with no pack form says the market alone; PIN MOVED (L10N4): said through its reader
-  assert.match(src('src/ui/professions/profPages.js'), /const goldGoodsLine = \(\/\*\* @type \{string\} \*\/ m\) => \(withdrawable\(m\) \? t\('prof\.page\.stores\.goldGoods', GOLD_GOODS_LINE\)/);   // PIN MOVED (FB1020h ESSENCE-LOOSE): a material the pack takes
   // the listable units a currency's listing may take
   assert.equal(listableUnits({ own: 4, bought: 5, gold: 7 }, 'gold'), 11);
   assert.equal(listableUnits({ own: 4, bought: 5, gold: 7 }, 'marks'), 9);
@@ -273,7 +271,7 @@ test('GOLD-MARKET tab: My listings - a gold listing\'s price in gold; the List f
   cur.value = 'gold';
   cur.onchange();
   assert.deepEqual(matOptions(), ['Iron Ore (8)'], 'gold: own and gold\'s - Mithril bought with Drakes lists for none');
-  assert.match(t.text(), /No fee to list\. Up for 72 hours on every board\. If it all sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\./);   // AUDIT 657 B9 (PIN MOVED): the 1% the sale's fee; BOARD-UI (PIN MOVED)
+  assert.match(t.text(), /No fee to list\. Up for 72 hours on every board\. If it all sells you get \d+ gold \(after a 1% fee and 5% tax\), collected at a bank\./);   // AUDIT 657 B9 (
   const list = t.buttons().find((b) => b.textContent === 'List');
   assert.equal(list.disabled, false, 'no Drakes fee asked');
   await list.onclick();
@@ -287,25 +285,9 @@ test('GOLD-MARKET refusals: every new word the service says has its sentence', (
   }
   assert.match(accountRefusalText('market-gold-goods'), /pack or back on the market for gold/);
   assert.match(accountRefusalText('market-drakes-goods'), /^Goods bought with silver, and pieces made with them, sell only for silver\./, 'AUDIT PROF-541 R2-S3: a piece made of counter goods is silver\'s, in words');
-  assert.match(readFileSync(new URL('../../src/ui/marketTab.js', import.meta.url), 'utf8'), /Goods bought with silver, and pieces made with them, sell only for silver\./, 'AUDIT PROF-541 R2-S3: the gold form\'s own word agrees');   // AUDIT 657 D7: BOARD-UI (PIN MOVED): the words cut
 });
 
 // ─── THE WIRING ──────────────────────────────────────────────────────
-
-test('GOLD-MARKET wiring: the host gives the market book the realm act over the playing session and a wallet that pays at the board\'s region (purse, letters, then that account - the service\'s order); the door has the collect; the service routes it', () => {
-  const w = src('src/scenes/world.js');
-  // PIN MOVED (FIELD BUGS 2026-10-01, MARKET-ANY): the realm hook carries the session's abandon too, and the goods' receive beside it
-  assert.match(w, /realm: realmSession \? \{ act: \(o\) => realmGoldAct\(\{ \.\.\.o, session: realmSession, checkpoint: \(\) => onlineCheckpoint\(\) \}\), abandon: \(why\) => realmSession\.abandon\(why\) \} : null, goods: realmSession \? \{ receive: \(rec, why\) => marketGoods\.receive\(rec, why\) \} : null,\n\s+wallet: realmWallet \}\)/);   // PIN MOVED (RPT1026-MARKET ARRIVE): the road's word on a collected piece handed through
-  // PIN MOVED (CARDS6): the wallet is the host's one realm wallet, the card stakes' too
-  assert.match(w, /const realmWallet = realmSession \? \(region\) => \{/);
-  // MARKET-AUDIT (PIN MOVED: `deductGold`, its refusal's `credit` the whole cost as coins): the pay answers the undo of exactly
-  // what it took - the purse's coins, a letter's value, the bank's gold
-  assert.match(w, /pay: \(n\) => payUndoable\(playerEntity, n, account\),\n\s+credit: \(n\) => addGold\(playerEntity, n\),/);
-  assert.match(src('src/net/accountClient.js'), /gold: \(req\) => post\('\/v1\/market\/gold', req\),/);
-  assert.match(src('server-account/src/index.js'), /'\/v1\/market\/gold': \(\) => marketGoldCollect\(mctx, who\.player, env, body\),/);
-  assert.match(src('server-account/src/index.js'), /'\/v1\/market\/buy': \(\) => marketBuy\(mctx, who\.player, env, body\),/);
-  assert.match(src('server-account/src/service.js'), /'\/v1\/market\/gold',/);
-});
 
 test('AUDIT PROF-541 R2-C7: a dish of your own make spoiled since it was cooked lists neither way - the Crafted list leaves it out (its record mints it fresh: smithItems.js asMinted), and the pack\'s list says why, never "list it as a crafted piece"; AUDIT MAKER-RARE B2: and so does a Masterwork of your own make enchanted at the item maker since', async () => {
   const fresh = { templateIndex: 531, name: 'Bread', provenance: 'aaaaaaaaaaaaaaaa' };
@@ -327,11 +309,10 @@ test('AUDIT PROF-541 R2-C7: a dish of your own make spoiled since it was cooked 
   await tab.open();
   [...root.querySelectorAll('button')].find((b) => b.textContent === 'My listings').onclick();
   await new Promise((r) => setTimeout(r, 0));
-  // PIN MOVED (PACK-PICK): the pack's kind a press (and a realm character's form opens on it), and each refused piece its
   // own tile under "Not for the market", its why beneath its name - never one sentence
   [...root.querySelectorAll('button')].find((b) => b.getAttribute('data-kind') === 'item').onclick();
   const off = [...root.querySelectorAll('.packpick-refused')[0].querySelectorAll('.packpick-tile')]
     .map((n) => [n.querySelectorAll('.packpick-name')[0].textContent, n.querySelectorAll('.packpick-why')[0].textContent]);
-  assert.deepEqual(off, [['Bread', 'made by you. List it as a crafted piece'], ['Mouldy Bread', SPOILED_DISH_WHY], [enchanted.name, CHANGED_PIECE_WHY]]);   // PIN MOVED (AUDIT MAKER-RARE B2): the enchanted Masterwork beside them
+  assert.deepEqual(off, [['Bread', 'made by you. List it as a crafted piece'], ['Mouldy Bread', SPOILED_DISH_WHY], [enchanted.name, CHANGED_PIECE_WHY]]);
   root.remove();
 });

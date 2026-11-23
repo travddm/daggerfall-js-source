@@ -1,4 +1,4 @@
-// SD25 S10 (2026-10-09, the Abyss Dungeon's look; bible/11-Multiplayer/Super-Dungeons-Look.md section 7): THE ORRERY OF
+// SD25 S10: THE ORRERY OF
 // ENDINGS REBUILT - the stones in the Daggerfall manner inside the law's shapes (world/superDungeon/sdHall.js), the hall's atlas through
 // the paint box (world/superDungeon/sdHallArt.js), the orrery overhead in mode A (world/superDungeon/sdOrreryModel.js), and the set that moves them
 // (scenes/superDungeon/sdHall.js): crown gears that move only with their own hands, bezels that settle gold and burn ember on a refusal,
@@ -482,7 +482,7 @@ test('SD-LOOK S10 THE LAB: the Orrery\'s knobs stand the hall at any word from i
 test('SD-LOOK S10 THE HOSTS: the dungeon host hangs the orrery\'s decor on the realm\'s anchored clock (every screen\'s rings tick together) and hands the hall\'s halos and gem light on with the end\'s - drawn and lit where the hosts already draw and light the end\'s (world.js drawSdRift, the mode machine\'s light list), in kept lists, the end\'s alone when the hall has none (mutants: the hall\'s halos dropped; the gem\'s light dropped)', () => {
   const D = read('src/scenes/dungeonContext.js');
   assert.match(D, /createSdHall\(\{ renderer, audio, s: dfLocation\.sdRealm, clock: sdEndClock,/);
-  // SD-THROUGH (PIN MOVED): or, in a Hollow (the hall is the Hour's), the Way Through's
+  // SD-THROUGH (
   assert.match(D, /sdEndHalos: sdEnd \? \(\) => sdEndWith\(sdEnd\.halos\(\), sdHall\?\.halos\(\) \?\? sdThrough\?\.halos\(\), _sdEndHalos\) : undefined,/);
   assert.match(D, /sdEndLights: sdEnd \? \(\) => sdEndWith\(sdEnd\.lights\(\), sdHall\?\.lights\(\) \?\? sdThrough\?\.lights\(\), _sdEndLights\) : undefined,/);
   const i = D.indexOf('  const sdEndWith = (a, b, into) => {'), body = D.slice(i, D.indexOf('\n  };\n', i) + 5);

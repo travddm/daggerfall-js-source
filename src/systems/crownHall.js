@@ -1,8 +1,7 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// CROWN-HALL (2026-10-02, Mac: "Build that next" - the crown's hall
-// after SEAT-HALL's palace): A CROWN'S CASTLE AS ITS HOLDER'S HALL
-// (bible/11-Multiplayer/Seats-Arc.md 7.2: "Crown: the castle is the
+// CROWN-HALL: A CROWN'S CASTLE AS ITS HOLDER'S HALL
+// (7.2: "Crown: the castle is the
 // hall - its throne room carries the holder's banners, the roster board
 // and the Stores chest, and no decor").
 //
@@ -32,6 +31,8 @@
 import { FACTION_TYPES } from '../formats/factionFile.js';
 import { BANNER_H_M } from '../render/bannerPass.js';
 import { BULLETIN_BOARD_MODEL_ID } from '../world/rmbLayout.js';
+import { isProvinceFactionId } from './faction/provinceFactions.js';   // PROVINCE-COURTS: a province's ruler
+import { CASTLE_SEATS } from '../world/capitalCastles.js';   // PROVINCE-COURTS: the castle copy's throne seat
 
 /** Daggerfall's chest (worldTooltips.js's "Chest", the first of its three). */
 export const CROWN_HALL_CHEST_MODEL = 41811;
@@ -140,7 +141,13 @@ export function crownHallPlan(at, ray) {
  * @param {Array<any>|null|undefined} people
  * @param {number|null} rulerId
  */
-export const crownRulerHere = (people, rulerId) => (rulerId == null ? null : (people ?? []).find((p) => p?.factionID === rulerId) ?? null);
+export const crownRulerHere = (people, rulerId) => {
+  if (rulerId == null) return null;
+  const list = people ?? [];
+  // PROVINCE-COURTS: a province's ruler (systems/faction/provinceFactions.js) sits a capital's castle under DFU's
+  // generic ruler - the copy's throne seat (world/capitalCastles.js CASTLE_SEATS), one copy serving two capitals
+  return list.find((p) => p?.factionID === rulerId) ?? (isProvinceFactionId(rulerId) ? list.find((p) => p?.factionID === CASTLE_SEATS.ruler.faction) ?? null : null);
+};
 
 /** The throne room's words. */
 export const CROWN_HALL_TEXT = Object.freeze({

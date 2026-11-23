@@ -1,4 +1,4 @@
-// OUTDOOR-LOOT, SLICE 2 (2026-10-17): THE PURE HALF OF A CARRIED BASE - systems/roomLoot.js, read on its own.
+// OUTDOOR-LOOT, SLICE 2: THE PURE HALF OF A CARRIED BASE - systems/roomLoot.js, read on its own.
 // DESIGN.md 6.1 and 6.2: a building's cupboard cannot have a COMPUTED base (its stock is the first opener's roll), so its
 // first roll is MINTED ONCE and travels in the word `b` (validRoomWord projects it, mergeRoomWord keeps the first base heard
 // for a mint, roomWord and claimWord carry it, carriedBase makes the pieces); two births of one day with different rolls are

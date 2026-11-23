@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PARTY-LOOT's END-TO-END PROBE (bible/06-Systems/Online-Arc.md PARTY-LOOT) - the report, played: "When in a party, if a
+// PARTY-LOOT's END-TO-END PROBE (PARTY-LOOT) - the report, played: "When in a party, if a
 // monster is killed, loot drops for one player but the other player sees 'Empty'. If that player clicks 'Empty' it wipes
 // out the loot for the other player." Two players in the REAL game in headless Chromium over the player's own ARENA2, both
 // online in Privateer's Hold against the REAL relay and the REAL account service in local workerd
@@ -18,9 +18,10 @@
 //   the joiner opens a body and takes a base piece - the host's base must lose that one piece and keep the rest.
 //   PASS: every body names one base on both copies, the three windows leave both bases as the takes left them, and no
 //   page threw. A body a copy cannot read fails the run; so does a run whose bodies hold nothing to take.
-//   TREE=<a checkout before PARTY-LOOT (2026-10-15, #923)> plays the report as it was - no base is shared there, every
+//   TREE=<a checkout before PARTY-LOOT > plays the report as it was - no base is shared there, every
 //   row reads as the room's, and the run fails.
 //
+// Run it as `node --import ./tools/raw-import-hooks.ts tools/partyLootProbe.mjs`: the game source it imports reaches `.vert` shaders, which plain node cannot load.
 //   ARENA2_PATH=/path/to/arena2 node tools/partyLootProbe.mjs       KILLS=6 the bodies; TREE=<dir> the page's tree (the
 //                                                                   relay and the account service are this tree's);
 //                                                                   PORT / SVC_PORT as tools/onlineFrameProbe.mjs;
@@ -37,6 +38,8 @@ import { fileURLToPath } from 'node:url';
 import { probeTransforms, editsPlugin, waitFrames, SWIFTSHADER_ARGS } from './frameProbe.mjs';
 import { ONLINE_PROBE_EDITS } from './onlineFrameProbe.mjs';
 import { isMain } from './lib/isMain.mjs';
+import { joinServerPrompt } from './lib/joinServerPrompt.mjs';
+import { fakePointerLock } from './probes/lib/fakePointerLock.mjs';
 import { standServices, stopAll, localFetch, botStorage, LOAD_SERVICE } from './loadHarness.mjs';
 import { SESSION_KEY, SERVICE_KEY } from '../src/net/accountClient.js';
 import { realmIo, realmCreate, createRealmSession } from '../src/systems/realmSaves.js';
@@ -101,6 +104,7 @@ async function main() {
 
     console.log('== the first save: the classic start, composed by the world host offline');
     const cctx = await browser.newContext({ viewport: { width: W, height: H } });
+    await fakePointerLock(cctx);
     const cpage = await cctx.newPage();
     watch(cpage, 'compose');
     await cpage.goto(`http://localhost:${PORT}/play/?world&classic&class=1&novideo&shot&play`);
@@ -125,6 +129,7 @@ async function main() {
       const first = await rs.checkpoint(saveText);
       if (!first?.ok) throw new Error(`${label}'s first save did not land (${first?.error})`);
       const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+      await fakePointerLock(ctx);
       // the tutorials' popups off (systems/tutorials.js TUTORIAL_POPUPS_PREF on the UI shelf): the first loot's page is a box
       // over the window the probe opens, and a press under a box opens nothing
       await ctx.addInitScript(({ sk, sv, sess, base }) => {
@@ -141,6 +146,7 @@ async function main() {
       page.on('console', (m) => { if (/\[(realm|online|loot)\]/.test(m.text())) console.log(`   ${label} ${m.type()}: ${m.text().slice(0, 200)}`); });
       const t0 = Date.now();
       await page.goto(`http://localhost:${PORT}/play/?world&online&realm=${c.data.id}&load&server=ws://127.0.0.1:${svc.relayPort}&novideo&shot&play`);
+      await joinServerPrompt(page);
       await until(page, () => !!window.__seat?.() && window.__foes?.() != null && (window.__frame | 0) > 30, null, { what: `${label}'s online boot into the Hold`, timeout: 1800000, every: 5000 });
       await until(page, () => window.__probeOnline?.()?.status === 'open', null, { what: `${label}'s session open` });
       console.log(`   ${label} ready after ${((Date.now() - t0) / 1000).toFixed(0)} s: ${await page.evaluate(() => window.__seat())}`);

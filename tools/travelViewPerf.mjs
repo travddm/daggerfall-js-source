@@ -1,5 +1,4 @@
-// PERF-TV (2026-09-28, Mac: "I also want to ensure performance is golden"; bible/06-Systems/Travel-View.md
-// PERF-TV): THE OVERWORLD'S OWN FRAME COST, MEASURED IN A REAL BROWSER.
+// PERF-TV: THE OVERWORLD'S OWN FRAME COST, MEASURED IN A REAL BROWSER.
 //
 // What the view adds to a frame on top of the world it draws: the readout (the traveller's ring, the compass and the
 // route line in the DOM; every keyed mark - plates, far places, travellers - drawn on its one canvas since PERF-TV,
@@ -17,11 +16,10 @@
 //   20 places + 256 travellers moving  <= 1.50 ms a frame
 //   20 places + 64 travellers at rest  <= 0.15 ms a frame
 //
-// Measured before PERF-TV (2026-09-28, every mark a DOM node, the screen read per held mark): 64 moving marks 5.8 ms,
+// Measured before PERF-TV: 64 moving marks 5.8 ms,
 // 256 moving 35.7 ms - the screen's size read after each mark's writes forced a layout per held mark.
 //
-// FB0929 (2026-09-29, the Discord: "The moment I go to my Travel Map and select a far away destination, the game drops
-// to sub-10 FPS"): THE ROUTE LINE, BY ITS FRAMES. The timer above holds the update and the layout it owes; a line's
+// FB0929: THE ROUTE LINE, BY ITS FRAMES. The timer above holds the update and the layout it owes; a line's
 // cost is the browser's paint and raster, after it - the route above was a 120-point line on the screen, and a far
 // journey's dashed line running a million pixels off it was never timed. So the line is measured by the frames
 // themselves: the readout updated in requestAnimationFrame under a moving camera, the median interval (16.7 ms at

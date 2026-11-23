@@ -43,7 +43,8 @@
 //     Open lets it escape; the READER still throws verbatim, and next()/draw()
 //     are inert until a file has opened.
 
-import { getFloat } from '../systems/settings/settings.js';   // SETT: DaggerfallVideo reads SoundVolume per clip
+import { getFloat, getString } from '../systems/settings/settings.js';   // SETT: DaggerfallVideo reads SoundVolume per clip
+import { parseWorldFilterMode, samplerFilterWord } from '../render/world-texture-filter.ts';
 import { UP_Y } from '../world/mat4.js';   // EV2: the shared billboard up axis
 import { VidFile, VID_BLOCK_TYPES } from '../formats/vidFile.js';
 import { NATIVE_W, NATIVE_H, drawImg, nativeMetrics } from './native/nativePanel.js';
@@ -220,11 +221,13 @@ export class VideoPlayer {
   _uploadFrame() {
     const fb = this.vidFile.frameBuffer;
     this.renderer.releaseTexture?.('vid', this.textureKey);
+    // DFU's DaggerfallVideo samples a frame with GUI/VideoFilterMode, Bilinear by default
+    const filter = samplerFilterWord(parseWorldFilterMode(getString('GUI', 'VideoFilterMode')));
     this._tex = this.renderer.uploadTexture('vid', this.textureKey, {
       width: this.vidFile.frameWidth,
       height: this.vidFile.frameHeight,
       colors: new Uint32Array(fb.buffer, fb.byteOffset, fb.length / 4),
-    });
+    }, { sampler: { filter } });
     return this._tex;
   }
 

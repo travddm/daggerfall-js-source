@@ -1,4 +1,4 @@
-// QL3 (bible/06-Systems/Questlines-Arc.md section 5.2): WHAT AN OUTCOME PAYS, PINNED - AUDIT QUESTLINES REWARD-9 found the
+// QL3: WHAT AN OUTCOME PAYS, PINNED - AUDIT QUESTLINES REWARD-9 found the
 // reward law held by nothing (eight probe mutants lived through every questlines pin: the class fit removed, a lesser
 // outcome's gold at 1, a greater one's at 1 with no rung, tier 1 paying Rare, the roll on Math.random, a named piece every
 // time, its name never set, the letter rule). Each is held here, through the real bridge where a quest's own script is
@@ -115,17 +115,17 @@ function giant(order, { entity = FIGHTER, reload = false } = {}) {
 
 test('QL3 the pays, exact (section 5.2): each pay\'s gold factor, gear and step; the factor bounded; gold scaled once at least a coin, never an item (mutants: lesser gold 1; greater gold 1 no rung)', () => {
   assert.deepEqual(JSON.parse(JSON.stringify(PAY_PROFILES)), {
-    standard: { gold: 1, gear: true, step: 0 }, lesser: { gold: 0.75, gear: true, step: 0 }, greater: { gold: 1.25, gear: true, step: 1 },
+    standard: { gold: 1, gear: true, step: 0 }, lesser: { gold: 0.9, gear: true, step: 0 }, greater: { gold: 1.1, gear: true, step: 1 },
     double: { gold: 1, gear: true, step: 0 }, betrayal: { gold: 1, gear: false, step: 0 }, own: { gold: 1, gear: false, step: 0 },
     none: { gold: 1, gear: false, step: 0 },
   });
-  assert.deepEqual(['standard', 'lesser', 'greater', 'nosuch'].map((pay) => goldFactor({ pay })), [1, 0.75, 1.25, 1]);
-  assert.deepEqual([OUTCOME_GOLD_MIN, OUTCOME_GOLD_MAX], [0.75, 1.5]);
-  assert.deepEqual(['lesser', 'standard', 'greater'].map((pay) => scaleGold({ stackCount: 100 }, { pay }, true).after), [75, 100, 125]);
+  assert.deepEqual(['standard', 'lesser', 'greater', 'nosuch'].map((pay) => goldFactor({ pay })), [1, 0.9, 1.1, 1]);
+  assert.deepEqual([OUTCOME_GOLD_MIN, OUTCOME_GOLD_MAX], [0.9, 1.1]);
+  assert.deepEqual(['lesser', 'standard', 'greater'].map((pay) => scaleGold({ stackCount: 100 }, { pay }, true).after), [90, 100, 110]);
   for (const pay of Object.keys(PAY_PROFILES)) assert.equal(payProfileOf({ pay }), PAY_PROFILES[pay], pay);
   assert.equal(payProfileOf({ pay: 'nosuch' }), PAY_PROFILES.none, 'an unknown pay pays nothing extra');
   const g = { stackCount: 401 };
-  assert.deepEqual(scaleGold(g, { pay: 'lesser' }, true), { before: 401, after: 301 });
+  assert.deepEqual(scaleGold(g, { pay: 'lesser' }, true), { before: 401, after: 361 });
   assert.deepEqual(scaleGold({ stackCount: 1 }, { pay: 'lesser' }, true), { before: 1, after: 1 }, 'at least a coin');
   assert.equal(scaleGold({ stackCount: 9 }, { pay: 'greater' }, false), null, 'a script\'s own item is never touched');
   assert.deepEqual([1, 2, 3, 4].map((t) => rewardTier(t, { pay: 'greater' })), [2, 3, 4, 4], 'greater: a rung up, never past 4');
@@ -181,7 +181,7 @@ test('QL3 the fit: never a piece the class may not equip, a weapon of the player
 // ---- the named pieces (REWARD-5) ----
 
 test('QL3 a named piece is made FROM its base (AUDIT QUESTLINES REWARD-5): every sheet\'s named piece names a base of its kind; the card is that template, the name the sheet\'s, no metal before it; a holder who cannot wear the base gets the card unnamed (mutants: name never set; the base ignored; the fit skipped for the named card; the metal prefix kept)', () => {
-  assert.equal(NAMED.length, 28, 'the questlines\' 28 named pieces');   // PIN MOVED (STAR8): the Thirteenth of Frostfall's three; PIN MOVED (AUDIT STAR8 T2): and the Heart-Star Ring; PIN MOVED (KETCH): and the Sky-Ketch's two - Bel-Tavir's Tuning-Charm, the Steersman's Hammer
+  assert.equal(NAMED.length, 23, 'the questlines\' 23 named pieces');   // PIN MOVED (Elite Gates removed): the Weir Road's two gone; PIN MOVED (STAR8): the Thirteenth of Frostfall's three; PIN MOVED (AUDIT STAR8 T2): and the Heart-Star Ring
   for (const { quest, named } of NAMED) {
     const base = namedBaseOf(named);
     assert.ok(base != null, `${quest} ${named.name}: base "${named.base}" is a ${named.kind} the roll makes`);
@@ -283,31 +283,31 @@ test('QL3 a failure\'s standing obeys QFAIL-FREE (AUDIT QUESTLINES REWARD-14): o
 
 test('QL3 a named piece is spent when TAKEN, never when rolled (AUDIT QUESTLINES LINES-20): a second ending names nothing once it is taken; a card chosen instead leaves the name for a later ending; one waiting offer holds a line\'s name at a time (mutants: named every time; the name spent on take deleted)', () => {
   const { layer } = fixtureLayer();
-  const first = layer.ending(endedQuest('QLWR04', 'mercy', 1));
+  const first = layer.ending(endedQuest('QLCH03', 'seal', 1));
   const named = first.pieces.find((p) => p.named);
-  assert.ok(named, 'the first mercy names Corvane\'s blade');
-  assert.equal(named.item.name, 'Corvane\'s Spire-Blade');
-  assert.equal(layer.history()['named:QLWR04'], undefined, 'not spent by the roll');
-  const waiting = layer.ending(endedQuest('QLWR04', 'mercy', 2));
+  assert.ok(named, 'the first seal names the Hourkeeper\'s signet');
+  assert.equal(named.item.name, 'Hourkeeper\'s Linen Signet');
+  assert.equal(layer.history()['named:QLCH03'], undefined, 'not spent by the roll');
+  const waiting = layer.ending(endedQuest('QLCH03', 'seal', 2));
   assert.equal(waiting.pieces.some((p) => p.named), false, 'a name a waiting offer holds is not rolled twice');
   layer.take(waiting.id, 2);   // the jewel of the second: no name spent
-  assert.equal(layer.history()['named:QLWR04'], undefined);
+  assert.equal(layer.history()['named:QLCH03'], undefined);
   layer.take(first.id, first.pieces.indexOf(named));
-  assert.equal(layer.history()['named:QLWR04'], 'Corvane\'s Spire-Blade', 'spent when taken');
-  const later = layer.ending(endedQuest('QLWR04', 'mercy', 3));
+  assert.equal(layer.history()['named:QLCH03'], 'Hourkeeper\'s Linen Signet', 'spent when taken');
+  const later = layer.ending(endedQuest('QLCH03', 'seal', 3));
   assert.equal(later.pieces.some((p) => p.named || p.item.qlNamed), false, 'once a character');
   // a card chosen instead of the named one: the name is the line's still
   const { layer: other } = fixtureLayer();
-  const a = other.ending(endedQuest('QLWR04', 'truth', 4));
+  const a = other.ending(endedQuest('QLCH03', 'seal', 4));
   const ai = a.pieces.findIndex((p) => !p.named);
   other.take(a.id, ai);
-  assert.equal(other.history()['named:QLWR04'], undefined);
-  assert.ok(other.ending(endedQuest('QLWR04', 'truth', 5)).pieces.some((p) => p.named), 'offered again');
+  assert.equal(other.history()['named:QLCH03'], undefined);
+  assert.ok(other.ending(endedQuest('QLCH03', 'seal', 5)).pieces.some((p) => p.named), 'offered again');
 });
 
 test('QL3 the cap (OFFERS_MAX): the oldest offer naming no piece goes first and its going is said; a named one outlives twelve newer (AUDIT QUESTLINES LINES-20, REWARD-8) (mutants: the cap cuts the oldest whatever it holds; the dropped offer unsaid)', () => {
   const { layer, rec } = fixtureLayer();
-  const named = layer.ending(endedQuest('QLWR04', 'mercy', 1));
+  const named = layer.ending(endedQuest('QLCH03', 'seal', 1));
   assert.ok(named.pieces.some((p) => p.named));
   const plain = [];
   for (let i = 0; i < OFFERS_MAX; i++) plain.push(layer.ending(endedQuest('M0B00Y06', 'done', 10 + i)));
@@ -339,11 +339,11 @@ test('QL3 no door, no cut (AUDIT QUESTLINES REWARD-13): a host with no door for 
 
 // ---- the gold settled at the end (REWARD-3) ----
 
-test('QL3 the gold an ending settles (AUDIT QUESTLINES REWARD-3): M0B00Y16 pays at the questor\'s click and settles `rescued` (greater) on the walk home - in either order the player has x1.25, the rest added at the end, and said; a save between keeps the record (mutants: the settle deleted; the record not saved)', () => {
+test('QL3 the gold an ending settles (AUDIT QUESTLINES REWARD-3): M0B00Y16 pays at the questor\'s click and settles `rescued` (greater) on the walk home - in either order the player has x1.1, the rest added at the end, and said; a save between keeps the record (mutants: the settle deleted; the record not saved)', () => {
   for (const order of ['escort first', 'claim first']) {
     const r = giant(order);
     assert.equal(r.quest.ql.outcome, 'rescued', order);
-    assert.equal(r.purse + r.added.reduce((n, x) => n + x, 0), Math.round(r.minted * 1.25), `${order}: x1.25 in all`);
+    assert.equal(r.purse + r.added.reduce((n, x) => n + x, 0), Math.round(r.minted * 1.1), `${order}: x1.1 in all`);
     if (r.added.length) assert.ok(r.hud.includes(`You receive ${r.added[0]} more gold pieces for how it ended.`), 'said');
     assert.equal(r.offers.length, 1);
     assert.equal(r.offers[0].tier, 2, 'tier 1 a rung up');
@@ -353,32 +353,31 @@ test('QL3 the gold an ending settles (AUDIT QUESTLINES REWARD-3): M0B00Y16 pays 
   assert.equal(late.added.length, 1, 'the difference added once');
   const kept = giant('claim first', { reload: true });
   assert.equal(kept.quest.ql.outcome, 'rescued');
-  assert.equal(kept.purse + kept.added.reduce((n, x) => n + x, 0), Math.round(kept.minted * 1.25), 'settled after a load');
+  assert.equal(kept.purse + kept.added.reduce((n, x) => n + x, 0), Math.round(kept.minted * 1.1), 'settled after a load');
 });
 
 test('QL3 the gold still owed, pure: the settled outcome\'s factor above the one applied, a party\'s share of it; never below, never a failure\'s, never `none`\'s (REWARD-3) (mutants: gold taken back; the party\'s shares ignored)', () => {
   const paid = { base: 400, factor: 1, shares: 1 };
-  assert.equal(goldStillOwed(paid, { pay: 'greater' }), 100);
+  assert.equal(goldStillOwed(paid, { pay: 'greater' }), 40);
   assert.equal(goldStillOwed(paid, { pay: 'standard' }), 0);
-  assert.equal(goldStillOwed({ base: 400, factor: 1.25, shares: 1 }, { pay: 'lesser' }), 0, 'never taken back');
-  assert.equal(goldStillOwed({ base: 400, factor: 0.75, shares: 1 }, { pay: 'none' }), 0, 'an ending that pays nothing adds nothing');
+  assert.equal(goldStillOwed({ base: 400, factor: 1.1, shares: 1 }, { pay: 'lesser' }), 0, 'never taken back');
+  assert.equal(goldStillOwed({ base: 400, factor: 0.9, shares: 1 }, { pay: 'none' }), 0, 'an ending that pays nothing adds nothing');
   assert.equal(goldStillOwed(paid, { pay: 'greater', failure: true }), 0);
-  assert.equal(goldStillOwed({ base: 400, factor: 1, shares: 2 }, { pay: 'greater' }), 50, 'a share: 250 - 200');
+  assert.equal(goldStillOwed({ base: 400, factor: 1, shares: 2 }, { pay: 'greater' }), 20, 'a share: 220 - 200');
   assert.equal(goldStillOwed(null, { pay: 'greater' }), 0, 'nothing paid, nothing owed');
 });
 
-test('QL3 a party\'s share is named after the scale (AUDIT QUESTLINES REWARD-11): QLWR04\'s mercy in a party of two - the HUD names the purse the pile holds (mutants: the split before the scale)', () => {
+test('QL3 a party\'s share is named after the scale (AUDIT QUESTLINES REWARD-11): QLCH03\'s seal in a party of two - the HUD names the purse the pile holds (mutants: the split before the scale)', () => {
   const { bridge, rec, start, tick } = packBridge({ entity: { ...FIGHTER, level: 20 }, over: { partySize: () => 2 } });
-  const q = start('QLWR04');
+  const q = start('QLCH03');
   for (const t of q.tasks.values()) for (const a of t.actions) if (a.typeName === 'PlaceNpc') a.isComplete = true;
-  bridge.machine.markQuestShared('QLWR04');
-  // PIN MOVED (QUEST-AUDIT III GOLD-HOLDERS, machine.js rewardShares): the shares are the copies held, not the party's
+  bridge.machine.markQuestShared('QLCH03');
   // size - the partner's answer (its envelope of the copy) names it a holder before the split is two
-  bridge.machine.noteShareHolder('QLWR04', 'acct-b');
+  bridge.machine.noteShareHolder('QLCH03', 'acct-b');
   const minted = q.getItem({ name: 'gold' }).daggerfallUnityItem.stackCount;
-  q.getTask({ name: 'tomercy' }).start(); tick(6);
+  q.getTask({ name: 'toseal' }).start(); tick(6);
   const pile = rec.rewards.find((i) => i.group === 'Currency');
-  assert.equal(pile.stackCount, Math.floor(Math.round(minted * 1.25) / 2), 'scaled, then halved');
+  assert.equal(pile.stackCount, Math.floor(Math.round(minted * 1.1) / 2), 'scaled, then halved');
   assert.deepEqual(rec.hud.filter((h) => /share/.test(h)), [`Your share of the party's reward: ${pile.stackCount} gold.`]);
 });
 
@@ -451,4 +450,23 @@ test('QL3 the journal\'s row is kept while what it reads stands (AUDIT QUESTLINE
   const laid = bridge.questlines.rowOf(q, quietText);
   assert.notEqual(laid, words, 'a pack laid: read again');
   assert.equal(laid.objectives[1].text, 'Report to the Guild (laid by a pack)');
+});
+
+test('QUESTLINE-REWARDS the scale is the row\'s: off, a quest pays what its script pays - gold x1, no piece, no rung (DFU\'s); on, the questline pay (mutants: the row unread; the pay kept when off)', () => {
+  try {
+    setPref('questlineRewards', false);
+    assert.deepEqual(['standard', 'lesser', 'greater'].map((pay) => goldFactor({ pay })), [1, 1, 1]);
+    assert.deepEqual(['standard', 'greater'].map((pay) => payProfileOf({ pay }).gear), [false, false], 'no piece offered');
+    assert.deepEqual([1, 2, 3, 4].map((t) => rewardTier(t, { pay: 'greater' })), [1, 2, 3, 4], 'no rung up');
+    assert.deepEqual(scaleGold({ stackCount: 100 }, { pay: 'greater' }, true), { before: 100, after: 100 });
+  } finally { setPref('questlineRewards', true); }
+  assert.equal(payProfileOf({ pay: 'greater' }).gear, true);
+  assert.equal(goldFactor({ pay: 'greater' }), 1.1);
+});
+
+test('QUESTLINE-REWARDS a Rare piece passes the level gate as a drop does: tier 4 at level 1 is Magic nearly always, at level 12 and up Rare (mutants: the gate unread)', () => {
+  const tally = (level) => { const r = seededRng(99 + level); let rare = 0; for (let i = 0; i < 2000; i++) if (pieceRarity(4, r, level) === 'rare') rare++; return rare; };
+  assert.ok(tally(1) < 500, `level 1: ${tally(1)} of 2000 Rare`);
+  assert.equal(tally(12), 2000, 'the gate open at level 12');
+  assert.equal(pieceRarity(4, () => 0.5), 'rare', 'no level handed: not gated, as a tool rolls');
 });

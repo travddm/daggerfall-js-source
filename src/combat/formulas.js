@@ -26,7 +26,7 @@ import { rand } from '../formats/dfRandom.js';
 import { enchantChanceToHitMod, doItemEnchantmentPayloads, PAYLOAD, isEnchantedItem, entityImprovedAdrenalineRush } from '../systems/enchantments.js';   // E1: the enchantment channels + the Strikes payload; AUDIT 39: ImprovesTalents' adrenaline flag lives in the fold's bag   // the monster multi-attack reflex gate (F2)
 import { entityArmorMod, entityWeightMult, weaponDamageMods, weaponBlowMods } from '../systems/entityMods.js';   // RF1: one read per channel - DFU's enchantment channel and every enhancement fold, summed there
 import { liveStat } from '../systems/statMods.js';   // S14: fortify-aware stat reads
-import { skillValue, SKILLS } from '../systems/skills.js';
+import { skillValue, aimSkill, SKILLS } from '../systems/skills.js';
 import { noteSkillChallenge } from '../systems/skillSoftcap.js';   // SOFTCAP1: the foe a blow was traded with, for the real-use law
 import { mentorArmorValue, mentorGearScale, mentorDamageTakenMult } from '../systems/mentorMode.js';   // SOFTCAP1: mentor mode's overlay   // S3: real skills (enemies stay flat, verbatim)
 import { RACES } from '../systems/races.js';   // CalculateRacialModifiers reads the DFU-numbered race id
@@ -306,7 +306,7 @@ export const statsToHit = (a, t) =>
 // ---- CalculateSkillsToHit (classic's /4 dodging; crit roll adds crit/10) ----
 export function skillsToHit(a, t, roll01 = Math.random(), notes = null) {
   let mod = -Math.floor(skillValue(t, SKILLS.Dodging) / 4);            // classic's /4 bug preserved
-  const crit = skillValue(a, SKILLS.CriticalStrike);
+  const crit = aimSkill(a, SKILLS.CriticalStrike, skillValue(a, SKILLS.CriticalStrike));
   // HN1: the CRITICAL STRIKE roll is Daggerfall's own "critical hit" -
   // it lands on the chance to hit, not the damage (classic parity) -
   // and the enhanced HUD's numbers name it when it succeeds. The notes
@@ -315,7 +315,7 @@ export function skillsToHit(a, t, roll01 = Math.random(), notes = null) {
   return mod;
 }
 
-// ---- CalculateAdjustmentsToHit (2026-08-13 parity audit F1) ----
+// ---- CalculateAdjustmentsToHit ----
 // Verbatim: biography avoid-hit (pending chargen biography - 0),
 // +40 when the TARGET is an enemy MONSTER, then a flat -50 always
 // ("DF Chronicles says -60 ... it actually seems to be -50").
@@ -413,7 +413,7 @@ export function calculateSuccessfulHit(attacker, target, chanceToHitMod, struckB
 }
 
 // ---- CalculateHandToHandAttackDamage ----
-/** BAL10 (bible/05-Combat/Balance-Arc.md section 16; the owner chose "Fix fists' missing bonuses"): AND THE PORT'S BLOW
+/** BAL10 (; the owner chose "Fix fists' missing bonuses"): AND THE PORT'S BLOW
  *  MODIFIERS, as the weapon path reads them at its tail (weaponAttackDamage, below) - a player's fists, never the beast's
  *  claws (BAL6 balanced the curse on its own claws and their metal). `info` is the host's word, the weapon path's own. */
 export function handToHandAttackDamage(attacker, target, damageMod, isPlayer, rolls = Math.random, info = undefined) {
@@ -427,7 +427,7 @@ export function handToHandAttackDamage(attacker, target, damageMod, isPlayer, ro
   // a strength drain (diseases.js writes signed statMods) moved a
   // player's weapon damage and left their fists untouched.
   if (isPlayer) damage += damageModifier(liveStat(attacker, 'strength'));   // "not applied in classic" for AI - DFU preserves that
-  // BAL6-GAUNTLETS (combat/clawMetal.js): A DEPARTURE - the beast's claws add its gauntlets' metal where the weapon
+  // Claw metal (combat/clawMetal.js): an option, off by default (DFU's bare claws) - the beast's claws add its gauntlets' metal where the weapon
   // path's material modifier stands, after Strength and before the enemy-type term
   if (isPlayer) damage += clawMetalDamage(attacker);
   damage += bonusOrPenaltyByEnemyType(attacker, target);
@@ -456,18 +456,6 @@ export const isSkeletalTarget = (target) => {
   return target.careerIndex === SKELETAL_WARRIOR_INDEX;
 };
 
-/** RVN2 (bible/12-Enhanced-AI/Feud-Arc.md 13.2): NAMED VETOES on silver's double against a kind it doubles against -
- *  `fn(target) -> true` keeps silver to its plain damage on that target (a Silver-scarred revenant's: its kind's double
- *  gone). With none registered, or none answering true, DFU's double stands - in both cores (this one's Skeletal Warrior,
- *  PCAAO's six beside it). A veto that throws is no veto. */
-const _silverVetoes = new Map();
-export function registerSilverDoubleVeto(name, fn) { if (typeof fn === 'function') _silverVetoes.set(name, fn); else _silverVetoes.delete(name); }
-/** Does silver double against `target` (its kind aside - the cores ask only for a kind it doubles against)? */
-export function silverDoubles(target) {
-  for (const fn of _silverVetoes.values()) { try { if (fn(target) === true) return false; } catch { /* a veto that throws is none */ } }
-  return true;
-}
-
 // ---- CalculateWeaponAttackDamage ----
 /** AUDIT 18: the pre-resolved `targetGroup` parameter is GONE. DFU
  *  passes the TARGET ENTITY to GetBonusOrPenaltyByEnemyType
@@ -480,7 +468,7 @@ export function weaponAttackDamage(attacker, target, damageMod, weapon, rolls = 
   let damage = weaponDamageMods(weapon, wMin + Math.floor(rolls() * (wMax + 1 - wMin))) + damageMod;   // RF1: the weapon's own modifiers over ITS roll, before the swing's mods
   if (!target.isPlayer && isSkeletalTarget(target)) {   // DEX4b: a mod's skeletal enemy too
     if ((weapon.flags & 0x10) === 0) damage = Math.trunc(damage / 2);   // edged-weapon rule
-    if (weapon.material === 2 && silverDoubles(target)) damage *= 2;    // Silver (RVN2: unless a veto keeps it plain)
+    if (weapon.material === 2) damage *= 2;    // Silver
   }
   damage += damageModifier(liveStat(attacker, 'strength'));
   damage += WEAPON_MATERIAL_MODIFIER[weapon.material] ?? 0;   // half of the in-game display, per the source comment
@@ -565,7 +553,7 @@ export function dropWeaponIfTargetImmune(weapon, targetEntity) {
  *  classic never damaged shields - else to the struck part's armor
  *  slot. Breaks speak and unequip through lowerCondition. */
 export function damageEquipment(attacker, target, damage, weapon, struckBodyPart, { rolls = Math.random, say = null } = {}) {
-  // WBX6 (2026-09-26, Swololo on Discord: "I broke one and a half of a weapon during the fight"): A BLOW ON THE WARDEN
+  // WBX6: A BLOW ON THE WARDEN
   // OF THE BURNING GATE WEARS NOTHING. His body is a stand-in the relay judges (world/gate/gateBoss.js bossStandIn carries
   // `spareGear`), a fight measured in hundreds of blows, and it broke weapons it was never meant to. A departure (Ledger
   // A, WB): every other foe wears the gear as DFU's does, and the override below is never asked for him either.
@@ -636,7 +624,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
   // struck hook said -1 on every blow and the Shield Widget's "Attack On Shield" Recoil (its default) never fired
   const overridden = core ? core(attacker, target, { weapon, damageMod, toHitMod, backstabChance, weaponAnimTime, rolls, dfRand, onMonsterHit, onInflictPoison, say, playerReflexes, notes, onStruck: (part) => (struckPart = part), unaware, blowShare }) : undefined;
   let damage = 0;
-  // TWO-HANDS (AUDIT, bible/05-Combat/Two-Hands.md): THE BLOW'S SHARE - the off hand's (handsLaw.js offHandDamage), a
+  // TWO-HANDS (AUDIT): THE BLOW'S SHARE - the off hand's (handsLaw.js offHandDamage), a
   // function of the rolled damage - laid where the blow is rolled, before anything reads it: in the stock core ahead of
   // the equipment's wear, after a mod's core; so the HUD, the strike listeners (a leech, an echo), the Strikes payloads
   // and the report all see the blow that landed, never the whole roll. Null for every other blow. (AUDIT 2: a core that
@@ -661,7 +649,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
   // skill or HandToHand), + player mods. Enemies read the same value
   // for every skill (flat, SetEnemyCareer verbatim).
   const attackSkill = weapon ? (weaponSkillUsed(weapon.templateIndex) ?? SKILLS.HandToHand) : SKILLS.HandToHand;
-  let chanceToHitMod = skillValue(attacker, attackSkill) + toHitMod;
+  let chanceToHitMod = aimSkill(attacker, attackSkill, skillValue(attacker, attackSkill)) + toHitMod;
   let damageModifiers = damageMod;
   // FormulaHelper.cs:594-613, the `attacker == player` block, in DFU's
   // order: swing mods (the caller's damageMod/toHitMod - they need the
@@ -779,7 +767,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
     const m = mentorDamageTakenMult(target);
     if (m > 1) damage = Math.max(1, Math.round(damage * m));
   }
-  // TELL1 (bible/12-Enhanced-AI/Feud-Arc.md 3.2): what the TARGET takes - a staggered foe a quarter more - after either
+  // TELL1 (3.2): what the TARGET takes - a staggered foe a quarter more - after either
   // core and every scale of the striker's, before the reports below, so they say what landed (systems/blowTaken.js)
   damage = blowTaken(damage, attacker, target, weapon, { kind: weapon && weaponSkillUsed(weapon.templateIndex) === SKILLS.Archery ? 'arrow' : 'melee', ...(blowInfo ?? {}) });   // TELL6d: what the blow was (an aimed shot's)
   // AUDIT 24 (wave 31) - A LANDED HIT ENDS THE ATTACKER'S NORMAL-POWER
@@ -816,7 +804,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
   // admits at zero is HealthLeech's use-stamp. The payloads can
   // modulate the damage (PotentVs +5, LowDamageVs -5) and the total
   // clamps at 0 inside the dispatcher.
-  // TWO-HANDS (AUDIT 2, bible/05-Combat/Two-Hands.md): THE BLOW'S WEIGHT - an off-hand blow is DUAL.OFF_DAMAGE of a blow
+  // TWO-HANDS (AUDIT 2): THE BLOW'S WEIGHT - an off-hand blow is DUAL.OFF_DAMAGE of a blow
   // (handsLaw.js OFF_HAND_BLOW) for what a blow sets off at its own rate rather than its damage's: on one roll it counts
   // whole that share of the time, and otherwise sets off neither the weapon's Strikes payloads below (Cast When Strikes'
   // spell, Potent Vs' five) nor a power's per-blow charge (the strike listeners' `blow`). Every other blow is whole.
@@ -865,7 +853,7 @@ export function calculateAttackDamage(attacker, target, { weapon = null, damageM
   // core's crits, materials and armour, which PCAAO's apply after the blow modifiers), so a power that shares the blow
   // (Ruhn's Cleave) shares what landed, never the number before the struck foe's own armour took its part
   if (attacker.isPlayer && !attacker.peer && !target.isPlayer && damage > 0) {
-    const info = { backstab: notes.backstab, blow: whole };   // RVN1: and whether it was a backstab (the fight's ledger, systems/feudLedger.js); AUDIT 2: whether it counts whole for a per-blow charge
+    const info = { blow: whole };   // AUDIT 2: whether it counts whole for a per-blow charge
     for (const fn of _playerStrikeListeners.values()) { try { fn(attacker, target, damage, weapon, info); } catch { /* a set is not the blow's problem */ } }
   }
   return report(damage);
@@ -901,7 +889,7 @@ const _playerStruckListeners = new Map();
 export function registerPlayerStruckListener(name, fn) { if (typeof fn === 'function') _playerStruckListeners.set(name, fn); else _playerStruckListeners.delete(name); }
 const _playerStrikeListeners = new Map();
 /** AUDIT SET M2: NAMED listeners at the same tail for the other direction - `fn(attacker, target, damage, weapon, info)`
- *  (RVN1: `info.backstab` - the blow landed as a backstab), told
+ *  (`info.blow` - the blow counts whole), told
  *  when MY attack (never a peer's resolved here) resolves with damage on a foe (never a player: a duel's blow is its
  *  own), the damage final, before any host subtracts it. A name re-registered replaces, `null` removes; an answer is
  *  ignored. */

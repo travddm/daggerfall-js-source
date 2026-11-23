@@ -11,7 +11,7 @@
 // card and on Take's title, what is held and walled and why (profBook.js walled, workTab.js writWalledText); a guild
 // writ's card the same; the service's gold refusal no longer sends the reader to withdraw what withdrawn is walled still.
 // Driven through the real Worker over node:sqlite (test/accountDb.mjs), the real books and the real board.
-// `01-Overview/bugs/Field-Bugs-2026-10-13e.md` WRIT-WALL; `06-Systems/Materials-Bag.md` section 4.
+// WRIT-WALL.
 import '../../chargenDom.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -190,7 +190,6 @@ test('WRIT-WALL the report: Iron off an Alchemist\'s shelf in the bag, then Iron
 test('WRIT-WALL mined Iron, counted: no walled line, Take open and delivering from the bag; a mix - counted short of the writ, the rest looted - names only the rest; counted enough beside the walled says nothing of them; short with nothing walled says what it always said (mutants: walled unread; the line where nothing is walled; said where the writ fills)', async () => {
   const s = await stand();
   // a harvest into the Stores is `own` (the older door: Materials-Bag.md 3), withdrawn into the bag counted carried
-  // PIN MOVED (INT16, Integrity-Arc section 7): a writ's delivery is a progression claim, asked of the account's SEATED
   // realm character (progress.js progressRefusal) - Ann plays one (stand's `seated`), where an offline id is refused
   // 'progress-seat' before the writ is read
   const ann = await s.seated('Ann');

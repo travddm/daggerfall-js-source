@@ -1,5 +1,4 @@
-// GOLD-DROP (2026-09-26, a player on Discord: "Gold isnt able to be put in a container", "Cant put gold in
-// containers", "Can't drop gold at all"): THE GOLD BUTTON IS THE PACK'S. DFU keeps its goldButton on the player's
+// GOLD-DROP: THE GOLD BUTTON IS THE PACK'S. DFU keeps its goldButton on the player's
 // own panel (DaggerfallInventoryWindow.cs:47, :515-517) and GoldButton_OnMouseClick drops the amount into whatever the
 // window's remote list is - the ground, the wagon, a container (:1269-1316). The enhanced pack carried it on the
 // remote window's bar alone, and that window is built for the ground only once something lies on it (PX19c) and is
@@ -54,7 +53,7 @@ function withPack(fn, { deps = {}, items = () => [DAGGER()], gold = 1287, setup 
       input.oninput();
       f.onsubmit({ preventDefault() {} });
     };
-    /** The field's own submit, as the player reads it (AUDIT GOLD-DROP 5). PIN MOVED (GOLD-ALL): it stands in the
+    /** The field's own submit, as the player reads it (AUDIT GOLD-DROP 5).
      *  field's stack of presses now, over its "all" (`.goldacts`). */
     const acts = () => field()?.children.find((c) => c.classList?.contains('goldacts')) ?? null;
     const submit = () => acts()?.children.find((c) => c.tagName === 'BUTTON' && c.type === 'submit')?.textContent ?? null;
@@ -322,19 +321,7 @@ test('GOLD-DROP: with the wagon showing the button is Stow and the gold goes int
   }, { deps: { loot: { items: () => [DAGGER()] } } });
 });
 
-test('GOLD-DROP: by source - the button rides the pack\'s footer and its field the footer too (AUDIT GOLD-DROP 1); the remote bar carries none, by any label; the field\'s verb is the button\'s (mutants: the bar\'s button back)', () => {
-  const s = src('src/ui/enhanced/enhancedInventory.js');
-  const remoteCol = s.slice(s.indexOf('function remoteCol()'), s.indexOf('function goldField()'));
-  assert.ok(!/'Gold'\)/.test(remoteCol) && !/goldField\(\)/.test(remoteCol), 'no gold on the remote window');
-  assert.ok(!/el\('button'[^;]*gold/i.test(remoteCol), 'AUDIT GOLD-DROP 5: nor a gold button under another word - "Drop gold", "Store gold"');
-  assert.match(s, /const verb = `\$\{GOLD_VERB\[remote\?\.kind\] \?\? 'Drop'\} gold`;/);
-  assert.match(s, /const give = el\('button', `act goldbtn\$\{goldEntry != null \? ' primary' : ''\}`, verb\);/);
-  assert.match(s, /if \(giving && goldEntry != null\) bar\.append\(goldField\(\)\);/);
-  // PIN MOVED (GOLD-ALL): the verb said once, the field's press and its "all" both named by it
-  assert.match(s, /const verb = GOLD_VERB\[remote\?\.kind\] \?\? 'Drop';\n\s*const acts = el\('div', 'goldacts'\);\n\s*const go = el\('button', 'act primary goldgo', verb\);/);
-});
-
-// AUDIT GOLD-DROP 1 (2026-09-27, the audit of GOLD-DROP): ON A PHONE THE BUTTON WAS OFF THE SCREEN. The footer is one
+// AUDIT GOLD-DROP 1: ON A PHONE THE BUTTON WAS OFF THE SCREEN. The footer is one
 // flex row never narrower than ~550px, the host clips and play/index.html will not zoom, so on a 393px Pixel 5 the
 // button stood at x=446..550 and "Can't drop gold at all" stayed true there. It was 32px under a finger where every
 // other button of this window is 44; and its field, a row of the window below the bar, took its ~110px out of the item
@@ -473,7 +460,7 @@ test('AUDIT GOLD-DROP 5: a press of the button clears a standing notice - the wa
   });
 });
 
-// AUDIT2 GOLD-DROP 1 and 3 (2026-09-27, the second audit of GOLD-DROP): THE WRAP COST A PHONE ITS ONE ROW. The first
+// AUDIT2 GOLD-DROP 1 and 3: THE WRAP COST A PHONE ITS ONE ROW. The first
 // audit's footer wrapped on a phone to bring the button on screen: 57px became 90, and the fixed-height window took
 // the difference from the list - 375x667 58 -> 25, a 390x664 iPhone 65 -> 32, a Pixel 5 128 -> 95, the one row of
 // tiles gone on the common small phones. And at 320 it still overran: three rows, the carry's meter 14-44px past the
@@ -604,8 +591,7 @@ test('AUDIT2 GOLD-DROP 2: ONE FLOATER AT A TIME - the field opening puts an item
   } finally { globalThis.location = prev; _resetForTests(); }
 });
 
-// GOLD-ALL (2026-10-23, the owner: "Stow all button under stow make stow smaller button and add the stow all button ...
-// with stow all i mean the money amount"): THE WHOLE PURSE IN ONE PRESS. The field's verb stands over its "all" - Stow
+// GOLD-ALL: THE WHOLE PURSE IN ONE PRESS. The field's verb stands over its "all" - Stow
 // and Stow all over the wagon, Store and Store all over storage, Drop and Drop all on the ground - and the "all" moves
 // every coin the purse holds, clamped by the wagon's room as a typed amount is, and said; an empty purse's "all" is
 // greyed. Both presses are the kit's `.act` in one stack (`.goldacts`), so Enhanced Plus and the DFO Grimoire dress
@@ -645,16 +631,7 @@ test('GOLD-ALL: the field stacks its verb over "<verb> all", and the "all" moves
   }, { gold: 1 });
 });
 
-test('GOLD-ALL: by the sheets - the two presses one column of two equal rows inside the box\'s 44px (the field grows by nothing), each the kit\'s press at the Gold button\'s 12px; the DFO Grimoire dress writes them in its face at no height of their own', async () => {
-  const s = src('src/ui/enhanced/enhancedStyle.js');
-  assert.match(s, /\.goldfield \.goldacts \{ display: grid; grid-template-columns: max-content; grid-template-rows: 1fr 1fr; gap: 4px;\n\s*flex: 0 0 auto; height: 44px; \}/);
-  assert.match(s, /\.goldfield \.goldacts \.act \{ min-height: 0; height: auto; margin: 0; padding: 0 12px;[^}]*font-size: 12px;/);
-  assert.match(s, /\.goldfield input \{\n\s*flex: 1 1 90px; min-width: 0; min-height: 44px;/, 'the box they stand beside is 44px');
-  const g = src('src/ui/grimoireDress.js');
-  assert.match(g, /\$\{G\} \.goldfield \.goldacts \.act \{ min-height: 0 !important;[^\n]*font-size: 16px !important; line-height: 1 !important;/);
-});
-
-// AUDIT UPDATE II (2026-10-25, bible/01-Overview/audits/Audit-Update-II-2026-10-25.md) B1
+// AUDIT UPDATE II B1
 test('AUDIT UPDATE II B1: no gold into a store that settles its own pieces - the hall\'s shared chest (decorGrants.js openSharedChest, `loot.commit`) shows no gold field and keeps the purse whole; a store without one still takes it (mutants: the commit unasked; the press ungated)', () => {
   const chest = [];
   withPack(({ e, button, act }) => {

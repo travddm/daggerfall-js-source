@@ -1,7 +1,5 @@
 // @ts-check
-// RAM-RETURN (2026-10-26, the owner: "So players are complaining about ship ramming being removed. So I would like to
-// reintegrate it in a thoughtful way. The major issue was that you could easily instability ships just by ramming";
-// bible/03-World/Naval-Refit.md RAM-RETURN and its AUDIT) - THE RAM'S LAW, bounded. The port's own; pure. The naval
+// RAM-RETURN - THE RAM'S LAW, bounded. The port's own; pure. The naval
 // host's module (scenes/naval/navalRams.js) finds the stems and lands the blows; this says what a ram does.
 //
 // WHY IT WAS RETIRED (BOARD-MAGNET): a ram dealt RAM_DAMAGE (14) a metre a second of closing way, a galley's three times

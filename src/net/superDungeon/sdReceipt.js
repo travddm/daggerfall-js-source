@@ -1,5 +1,5 @@
 // @ts-check
-// SD9a (2026-10-07, the Super Dungeons arc; bible/11-Multiplayer/Super-Dungeons.md section 11): THE HOUR'S RECEIPT - the
+// SD9a: THE HOUR'S RECEIPT - the
 // relay's signature on the Brass Remnant's fall, the gate's and the serpent's twin (net/gate/gateReceipt.js,
 // net/serpent/serpentReceipt.js).
 //

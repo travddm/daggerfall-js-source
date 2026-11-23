@@ -1,5 +1,4 @@
-// SCALE4b (2026-10-08, Mac: "Do 1 2 and 3" - the scaling audit's D1 discipline; bible/11-Multiplayer/Scale-Arc.md
-// SCALE4b): THE ACCOUNT SERVICE'S OWN CLOCK. Until this the service had no scheduled job, so the sweeps that keep its
+// SCALE4b: THE ACCOUNT SERVICE'S OWN CLOCK. Until this the service had no scheduled job, so the sweeps that keep its
 // database small ran inside reads - the Notice Board's on every look, a guild board's, the professions' state's on a
 // gatherer's every ask, the market History's nine deletes - and the tables nothing swept grew for ever. Now a
 // scheduled() of two crons (server-account/src/cron.js): every minute the settlements nobody's read should wait on
@@ -81,7 +80,7 @@ function argsOf(text, at) {
   return out;
 }
 
-// ═══ A. THE SCHEDULE ═════════════════════════════════════════════════════════════════════════════════════════════════
+// A. THE SCHEDULE
 
 test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Worker still exports `default` alone and its scheduled() fires the list its cron names - none for a cron the service does not keep, nothing while it is held for maintenance, and one metrics point a job (mutants: the hour\'s list for the minute, maintenance ignored, the point never written)', async () => {
   const toml = src('server-account/wrangler.toml');
@@ -91,10 +90,6 @@ test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Wo
   assert.equal(jobsFor(CRON_MINUTE), MINUTE_JOBS);
   assert.equal(jobsFor(CRON_HOUR), HOUR_JOBS);
   assert.deepEqual(jobsFor('0 0 * * *'), []);
-  // a module Worker reads every named export of its entrypoint as an entrypoint (AUDIT-ACC F2): `default` alone
-  const index = src('server-account/src/index.js');
-  // PIN MOVED (ADMIT-LINE): and the sign-in line's Durable Object class, the one named export a binding needs
-  assert.deepEqual(index.match(/^export\s+(?!default\b).*/gm) ?? [], ["export { AdmitGate } from './admit.js';   // ADMIT-LINE: the line's Durable Object (wrangler.toml binds it from this module)"]);
   assert.deepEqual(Object.keys(worker).sort(), ['fetch', 'scheduled']);
 
   const s = await standService(OPEN);
@@ -117,14 +112,15 @@ test('SCALE4b A: wrangler.toml\'s two crons are cron.js\'s two schedules, the Wo
   assert.equal(count(s.env.DB._raw, 'SELECT COUNT(*) AS n FROM board_notices'), 0, 'the hour sweeps');
   assert.deepEqual(points.map((p) => p.indexes[0]), HOUR_JOBS.map(([name]) => `cron:${name}`));
   const board = points.find((p) => p.indexes[0] === 'cron:board');
-  assert.deepEqual(board.blobs, ['cron:board', 'CRON', '200', '']);
+  assert.deepEqual(board.blobs, ['cron:board', 'CRON', '200', '', 'board_notices:1', '']);
   assert.ok(board.doubles[2] >= 2, 'its statements counted');
-  assert.equal(board.doubles[3], 1, 'the rows it moved');
+  assert.equal(board.doubles[3], 1, 'the rows it wrote');
+  assert.equal(board.doubles[11], 1, 'the rows it says it changed');
   // and nothing of it names a player
   assert.ok(!JSON.stringify(points).includes(g.id));
 });
 
-// ═══ B. THE READS WRITE NOTHING THEY SWEPT ═══════════════════════════════════════════════════════════════════════════
+// B. THE READS WRITE NOTHING THEY SWEPT
 
 test('SCALE4b B: the Notice Board\'s read, a guild board\'s, the professions\' state and the market\'s History write nothing - and answer what they answered when they swept first; the expired rows wait for the hour, which takes them and leaves the live (mutants: each sweep back on its read, a sweep that takes the live)', async () => {
   const s = await standService(OPEN);
@@ -192,7 +188,7 @@ test('SCALE4b B: the Notice Board\'s read, a guild board\'s, the professions\' s
   assert.deepEqual((await s.call('/v1/guilds/board', { character: a.character }, a.secret)).body, gb.body);
 });
 
-// ═══ C. ASKED BEFORE IT IS WRITTEN ═══════════════════════════════════════════════════════════════════════════════════
+// C. ASKED BEFORE IT IS WRITTEN
 
 test('SCALE4b C: the market\'s read, the Work tab\'s and a guild\'s write nothing while nothing is due - and the moment something is, the same updates go: a listing past its hours expired, a commission past its days, a guild that lost its master crowned (mutants: each update left unasked, its guard inverted)', async () => {
   const s = await standService(OPEN);
@@ -205,7 +201,6 @@ test('SCALE4b C: the market\'s read, the Work tab\'s and a guild\'s write nothin
   const market = () => s.call('/v1/market/read', { character: a.character, region: DF, view: 'materials', hubs: HUBS }, a.secret);
   const work = () => s.call('/v1/writs/list', { character: a.character, region: DF }, a.secret);
   const mine = () => s.call('/v1/guilds/mine', { character: a.character }, a.secret);
-  // PIN MOVED (CRAFT-WRITS, Professions-Arc.md section 49): the Work tab's first read of a UTC day writes the character's
   // crafting writs down - due, as the Court's posting is on a region's first read - and the read after writes nothing
   w.asked.length = 0;
   assert.equal((await work()).status, 200);
@@ -241,7 +236,7 @@ test('SCALE4b C: the market\'s read, the Work tab\'s and a guild\'s write nothin
   assert.deepEqual(w.writes(), [], 'crowned: nothing to write again');
 });
 
-// ═══ D. THE MINUTE'S SETTLEMENTS ═════════════════════════════════════════════════════════════════════════════════════
+// D. THE MINUTE'S SETTLEMENTS
 
 test('SCALE4b D: every minute the clock settles what no read has asked for - an auction past its end closed, a guild\'s writ and contract past theirs expired and their escrow back, the seats\' Turning (only while the seats are everyone\'s) and the day\'s Motherlodes, picked once an isolate (mutants: a job dropped from the minute, the seats settled behind `dev`, the day picked every minute)', async () => {
   const s = await standService(OPEN);
@@ -279,7 +274,6 @@ test('SCALE4b D: every minute the clock settles what no read has asked for - an 
   // the #1 kept younger than ARENA_CHAMPION_CLOCK_S is read, not counted
   const champ = () => ['changed', 'statements'].map((k) => ran.find((j) => j.name === 'arena-champion')[k]);
   assert.deepEqual(champ(), [0, 1]);
-  // PIN MOVED (AUDIT SCALE A4): past it with no bout since, the kept word is stamped again rather than counted - a bout
   // is all that moves the board, and the count walks the season's every bout - before a reader would count it
   ran = await runCron(s.env, { cron: CRON_MINUTE, nowS: T0 + ARENA_CHAMPION_CLOCK_S, rand });
   assert.deepEqual(champ(), [0, 3], 'the kept word read, the newest bout read, the word stamped');
@@ -294,7 +288,7 @@ test('SCALE4b D: every minute the clock settles what no read has asked for - an 
   assert.equal(keptAt(), T0 + 2 * ARENA_CHAMPION_CLOCK_S);
 });
 
-// ═══ E. RETENTION ════════════════════════════════════════════════════════════════════════════════════════════════════
+// E. RETENTION
 
 test('SCALE4b E: each hour the rows nothing reads any more go - a rate window a day past its start (the longest window any bucket counts is an hour), a session idle past its year (the bound resolveSession refuses it at; the table walked, AUDIT SCALE A6), an invitation past its week - and the live stay; a sweep past a page is taken in rounds, never more than ROUNDS_MAX pages a firing (mutants: the cutoffs moved, the rounds unbounded)', async () => {
   const s = await standService(OPEN);
@@ -321,14 +315,14 @@ test('SCALE4b E: each hour the rows nothing reads any more go - a rate window a 
 
   // every bucket's window inside the keep: each overRate call's window is an hour or less
   const windows = new Map();
-  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url))) {
+  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url), { recursive: true }).filter((x) => /\.(js|ts)$/.test(x))) {
     for (const m of src(`server-account/src/${f2}`).matchAll(/export const ([A-Z_]+_WINDOW_S) = ([0-9 *]+);/g)) windows.set(m[1], Function(`return ${m[2]}`)());
   }
   for (const f2 of readdirSync(new URL('../../src/net', import.meta.url), { recursive: true }).filter((x) => x.endsWith('.js'))) {
     for (const m of src(`src/net/${f2}`).matchAll(/export const ([A-Z_]+_WINDOW_S) = ([0-9 *]+);/g)) windows.set(m[1], Function(`return ${m[2]}`)());
   }
   let calls = 0;
-  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url))) {
+  for (const f2 of readdirSync(new URL('../../server-account/src', import.meta.url), { recursive: true }).filter((x) => /\.(js|ts)$/.test(x))) {
     const text = src(`server-account/src/${f2}`);
     for (const m of text.matchAll(/(?<!function )\boverRate\(/g)) {
       calls++;
@@ -342,7 +336,6 @@ test('SCALE4b E: each hour the rows nothing reads any more go - a rate window a 
   assert.ok(calls > 40, `every overRate call read (${calls})`);
   assert.ok(windows.get('LOGIN_WINDOW_S') * 2 <= RATE_ROW_KEEP_S);
 
-  // PIN MOVED (AUDIT SCALE A6): the sessions' sweep WALKS the table, by no index of its own - one on last_seen cost a
   // written row at every stale touch (D1 bills a write at a thousand times a read) to spare this hourly walk
   const plan = new DatabaseSync(':memory:');
   for (const m of readdirSync(new URL('../../server-account/migrations', import.meta.url)).filter((x) => x.endsWith('.sql')).sort()) plan.exec(src(`server-account/migrations/${m}`));
@@ -377,7 +370,7 @@ test('SCALE4b F: a job that throws never stops the next - the failure is its own
     });
   } finally { console.warn = quiet; }
   assert.deepEqual(ran.map((j) => [j.name, j.ok, j.changed]), [['breaks', false, 0], ['after', true, 3]]);
-  assert.deepEqual(points.map((p) => [p.indexes[0], p.blobs[2], p.blobs[3], p.doubles[3]]), [['cron:breaks', '500', 'failed', 0], ['cron:after', '200', '', 3]]);
+  assert.deepEqual(points.map((p) => [p.indexes[0], p.blobs[2], p.blobs[3], p.doubles[11]]), [['cron:breaks', '500', 'failed', 0], ['cron:after', '200', '', 3]]);
   // no binding, no clock: nothing at all
   assert.deepEqual(await runCron({}, { cron: CRON_HOUR, nowS: T0 }), []);
   assert.deepEqual(await runCron(s.env, { cron: CRON_HOUR, nowS: NaN }), []);

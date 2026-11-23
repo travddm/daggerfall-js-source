@@ -1,6 +1,5 @@
 // @ts-check
-// PRECIP4 (2026-10-19, the owner: "If its snowing in one area and raining in the next, the transition should be seamless
-// both in ground texture and everything else") - THE GROUND'S SNOW, in both terrain programs (renderer.js TERRAIN_FS and
+// PRECIP4 - THE GROUND'S SNOW, in both terrain programs (renderer.js TERRAIN_FS and
 // the lane's EL_TERRAIN_FS), right after ECOTONE1's border (render/ecotoneGlsl.js). systems/weather/snowpack.js is the
 // law: what fell and has not melted, at every place and height; scenes/snowCoverHost.js reads it about the player into
 // a lattice of SNOWLINES - the heights where the cover crosses 10, 50 and 90 % at map-pixel corners every two pixels -

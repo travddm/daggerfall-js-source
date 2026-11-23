@@ -1,6 +1,4 @@
-// ARROW-SUPPLY (2026-10-11, Mac: "allow arrows to stick in walls/ground wherever shot and be retrieved", "Allow arrows to
-// sometimes be retrieved from enemies", "Allow crafting of arrows", "Buff the shop's stock of arrows";
-// bible/05-Combat/Arrow-Supply.md). STUCK-ARROWS, the lodge and the cap, FLETCH and SHOP-ARROWS - each by execution
+// ARROW-SUPPLY. STUCK-ARROWS, the lodge and the cap, FLETCH and SHOP-ARROWS - each by execution
 // through its real producer, the four hosts by their source.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,8 +13,7 @@ import { Collider } from '../../src/player/collider.js';
 import { startShotTally, stopShotTally } from '../../src/systems/shotTally.js';
 import { spendAmmoFor, ARROW_TEMPLATE, ammoCountFor } from '../../src/systems/inventory.js';
 import { createWeapon } from '../../src/combat/enemyEquipment.js';
-import { createThunderlock } from '../../src/systems/thunderlock.js';
-import { capLootList } from '../../src/systems/foeLootCap.js';
+import { capFoeLoot } from '../../src/systems/foeLootCap.js';
 import { stockShopShelf, shopArrowStack, shopAmmoStack, SHOP_ARROWS_MAX, SHOP_ITEM_GROUPS, endlessArrowsAt, GENERAL_STORE_ARROWS } from '../../src/systems/shopStock.js';
 import { BUILDING_TYPES as B } from '../../src/world/buildingNames.js';
 import { useItem, usableItem } from '../../src/systems/useItem.js';
@@ -83,7 +80,7 @@ test('STUCK-ARROWS: a shaft into the bare ground sticks where its step crossed t
   assert.deepEqual(groundEntry([0, -0.2, 0], [0, -0.5, 2], { heightAt: () => 0 }), [0, 0, 0], 'already under: where the step began');
 });
 
-test('STUCK-ARROWS: what never sticks - an enemy\'s shaft, a peer\'s drawn echo, a conjured round, the gun\'s pellet, a shaft on a bout\'s sand, and a host with no pool (mutants: each gate dropped)', () => {
+test('STUCK-ARROWS: what never sticks - an enemy\'s shaft, a peer\'s drawn echo, a conjured round, a shaft on a bout\'s sand, and a host with no pool (mutants: each gate dropped)', () => {
   const shoot = (meta, loot = pool()) => {
     const a = new ArrowFlight({ getGpuMesh: () => null, collider: walled(), loot });
     a.fire([0, 1.5, 0], [0, 0, 1], { muzzle: { world: [0, 1.5, 0] }, ...meta });
@@ -94,7 +91,6 @@ test('STUCK-ARROWS: what never sticks - an enemy\'s shaft, a peer\'s drawn echo,
   assert.equal(shoot({ enemy: true, weapon: BOW }), 0, 'an enemy\'s');
   assert.equal(shoot({ fromPlayer: true, visual: true, weapon: BOW }), 0, 'a peer\'s echo');
   assert.equal(shoot({ fromPlayer: true, summoned: true, weapon: BOW }), 0, 'a conjured round vanishes');
-  assert.equal(shoot({ fromPlayer: true, weapon: createThunderlock() }), 0, 'a pellet is spent');
   startShotTally([]);
   assert.equal(shoot({ fromPlayer: true, weapon: BOW }), 0, 'the sand keeps the LOST law - the healers pay it');
   stopShotTally();
@@ -171,25 +167,6 @@ test('STUCK-ARROWS: THE DUNGEON\'S HALF - an entry in its draw list for each sta
   assert.equal(held.size, 1);
 });
 
-test('STUCK-ARROWS: THE FOUR HOSTS - the three flights pass their pool (the world its pixel), the dungeon sticks at its wall seam and draws in its list, every loose and technique door carries the conjured round, and neither save keeps an unsaved pile (mutants: by source)', () => {
-  const ext = read('src/scenes/exterior.js'), world = read('src/scenes/world.js'), modes = read('src/scenes/worldModes.js'), dun = read('src/scenes/dungeonContext.js');
-  assert.match(ext, /new ArrowFlight\(\{ getGpuMesh, collider: \(\) => collider, effects: hitEffects, loot: droppedLoot \}\)/);
-  assert.match(world, /new ArrowFlight\(\{ getGpuMesh, collider: \(\) => collider, effects: hitEffects, loot: droppedLoot, pixelKeyAt: \(\) => `\$\{playerTravelPixel\(\)\.x\},\$\{playerTravelPixel\(\)\.y\}` \}\)/);
-  assert.match(modes, /new ArrowFlight\(\{ getGpuMesh: pipeline\.getGpuMesh, collider: \(\) => interiorCtx\?\.collider, effects: interiorHitEffects, loot: interiorDropped \}\)/);
-  assert.match(dun, /if \(m\.arrow && stickable\(m\)\) stickArrow\(droppedLoot, impact, _unit\);[^\n]*\n\s*retireMissile\(m\);/);
-  assert.match(dun, /syncStuckArrowDraws\(droppedLoot, dynamicDraws, _stuckDraws, stuckArrowMesh\);[^\n]*\n\s*if \(!missiles\.length \|\| !playerFeet\) return;/, 'before the no-missile return');
-  assert.match(dun, /droppedLoot: droppedLoot\._piles\.filter\(\(p\) => !p\.unsaved\)\.map/);
-  for (const [name, s, fire] of [['exterior', ext, 'arrows.fire(eye, fwd'], ['world', world, 'arrows.fire(cam.pos, fwd'], ['worldModes', modes, 'interiorArrows.fire(player.eye, eyeDir()']]) {
-    assert.match(s, /const shot = \{ summoned: false \};[^\n]*\n\s*if \(spendAmmoFor\(playerEntity\.items, \w+\.playerWeapon\.weapon, shot\)\) \{/, `${name}: the loose asks whether the round was conjured`);
-    const at = s.indexOf(fire);
-    assert.ok(at > 0 && s.slice(at, s.indexOf('\n', at)).includes('summoned: shot.summoned'), `${name}: the shaft carries it`);
-    assert.match(s, /\.\.\.\(o\?\.summoned \? \{ summoned: true \} : \{\}\) \}\),/, `${name}: the technique door carries it`);
-  }
-  assert.match(dun, /if \(!spendAmmoFor\(playerEntity\.items, playerWeapon\.weapon, shot\)\) continue;\n\s*fireArrow\([^\n]*shot\.summoned \? \{ summoned: true \} : null\);/);
-  assert.match(dun, /\.\.\.\(o\?\.summoned \? \{ summoned: true \} : \{\}\) \}\),/);
-  assert.match(read('src/scenes/droppedLoot.js'), /p\.owner !== 'wild' && !p\.unsaved\)/);
-});
-
 test('STUCK-ARROWS: spendAmmoFor answers whether the round was conjured - DFU\'s isArrowSummoned, conjured first (mutants: never told; told the inverse)', () => {
   const pack = [arrows(1, { timeForItemToDisappear: 99 }), arrows(2)];
   const shot = {};
@@ -215,23 +192,14 @@ test('ARROW LODGE: a real shaft that strikes a foe lodges in its pack ARROW_LODG
   playerArrowHitFoe(shaft, f, { playerEntity: player, rolls: () => { n++; return n === 1 ? 0.99 : 0.3; } });
   assert.ok(n >= 2);
   assert.equal(arrowCount(f.entity.items), 1, 'the last draw (0.3) decided it, the first (0.99) was the blow\'s');
-  assert.match(read('src/combat/arrowFlight.js'), /if \(foe\.entity\?\.items && !orbArchiveFor\(m\.weapon\) && !m\.summoned && rolls\(\) < ARROW_LODGE_CHANCE\) \{/);
 });
 
-test('ARROW LODGE: AN ARROW IS NO FIND - a plain body keeps its cap of pieces AND every arrow in it, uncounted (mutants: arrows counted; arrows dropped; arrows ranked)', () => {
+test('ARROW LODGE: a plain body keeps every piece and every arrow in it (B4 removed the count cap that once counted pieces and spared the quiver)', () => {
   const piece = (v) => ({ group: 'Weapons', templateIndex: 113, material: 0, value: v });
-  const full = [piece(10), piece(20), piece(30), arrows(4)];
-  assert.deepEqual(capLootList(full, 3), [], 'three pieces and the quiver: nothing thrown away');
-  assert.equal(full.length, 4);
-  const over = [piece(10), arrows(2), piece(20), piece(30), piece(40)];
-  const dropped = capLootList(over, 3);
-  assert.deepEqual(dropped.map((it) => it.value), [10], 'the cheapest piece goes, never the arrows');
-  assert.deepEqual(over.map((it) => it.templateIndex === ARROW_TEMPLATE ? 'arrows' : it.value), ['arrows', 20, 30, 40], 'in the list\'s own order');
-  assert.equal(capLootList([arrows(1), arrows(1), piece(1)], 0).length, 1, 'cap 0: the piece goes, the arrows stay');
-  // the quiver never takes a piece's place, however cheap the pieces
-  const cheap = [piece(1), piece(1), piece(1), piece(1), arrows(9)];
-  assert.equal(capLootList(cheap, 3).length, 1, 'one piece over the cap - and only one');
-  assert.equal(cheap.filter((it) => it.templateIndex === 113).length, 3);
+  const body = { lootCap: 3, items: [piece(10), arrows(2), piece(20), piece(30), piece(40), piece(50)] };
+  assert.deepEqual(capFoeLoot(body), [], 'nothing thrown away');
+  assert.equal(body.items.length, 6);
+  assert.equal(body.items.filter((it) => it.templateIndex === ARROW_TEMPLATE).length, 1, 'the quiver stays');
 });
 
 test('SHOP-ARROWS: the counter\'s quiver is the counter\'s law (SHOP-PELLETS\' own) at SHOP_ARROWS_MAX - a Weapon Smith 50 to 100, an Armorer and a General Store 14 to 29, a Pawn Shop 7 to 14, none where no weapon sells (mutants: the max)', () => {
@@ -255,7 +223,6 @@ test('SHOP-ARROWS ON THE COUNTER, FROM NO ROLL: the counter holds DFU\'s own dra
     const counter = run(0), next = run(1);
     const rows = counter.items.filter((it) => it.templateIndex === ARROW_TEMPLATE);
     assert.equal(rows.length, 1, `building ${b}: one arrow stack`);
-    // PIN MOVED (ENDLESS-ARROWS): a General Store's quiver is a whole one at any quality (test/systems/endless_arrows.test.js)
     assert.equal(arrowCount(counter.items), arrowCount(next.items) + (endlessArrowsAt(b) ? GENERAL_STORE_ARROWS : shopArrowStack(b, q)), `building ${b}: DFU's draw and the quiver`);
     assert.deepEqual([rows[0].group, rows[0].material, rows[0].currentCondition, rows[0].value], ['Weapons', 0, 0, 2], 'CreateWeapon\'s arrow');
     if (b === B.WeaponSmith || b === B.Armorer) assert.equal(counter.n, next.n, `building ${b}: the same draws`);

@@ -75,7 +75,7 @@ export const GUILD_RECTS = Object.freeze({
 
 /** serviceLabel.Position (:135) inside the service button. */
 export const SERVICE_LABEL_OFFSET_Y = 1;
-/** LOOT9 (the Loot arc, bible/06-Systems/Loot-Arc.md section 11): THE REFORGE'S ROW - the Mages Guild's Identify NPC
+/** LOOT9 (the Loot arc): THE REFORGE'S ROW - the Mages Guild's Identify NPC
  *  offers a fourth press, the Reforge's window (ui/reforgeDoor.js), when its host hands `hooks.reforge`. DFU's 130x51
  *  art has no room for it, so this one row is the port's own, drawn under the panel in the parchment's dark (the
  *  classic skin's first port-drawn row - PORTAL1's Portal Stone row on the two shop popups took its law; the Enhanced
@@ -85,7 +85,7 @@ export const REFORGE_RECT = Object.freeze([5, 53, 120, 10]);
 export const REFORGE_ROW = 'Reforge';
 export const REFORGE_KEY = 'KeyF';
 export const REFORGE_ROW_BG = Object.freeze([0.16, 0.11, 0.06, 0.92]);   // PORTAL1: the shop popups' Portal Stone row wears it too
-/** LOOT16 (the Loot arc II, bible/06-Systems/Loot-II-Arc.md section 8): THE TEMPLE'S ROW - a temple's Cure Disease
+/** LOOT16 (the Loot arc II): THE TEMPLE'S ROW - a temple's Cure Disease
  *  priest offers the lifting of a curse (the Reforge's window on its one page - ui/reforgeDoor.js) when its host hands
  *  `hooks.lift`: the Reforge's row's place and dress (the two never stand on one NPC - the Mages Guild's Identify and the
  *  temple's Cure Disease), its key L. */

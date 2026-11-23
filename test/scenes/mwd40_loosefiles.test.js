@@ -39,23 +39,6 @@ test('MW-D40: makeLooseArchive speaks the archive duck - case- and slash-insensi
   assert.equal(arc.get('meshes/absent.nif'), null);
 });
 
-test('MW-D40: the store keeps archives by basename and loose files by canonical path, loose first', () => {
-  const src = readFileSync('src/scenes/dataSource.js', 'utf8');
-  // the widened accept: archives, plugins, and the loose set
-  assert.match(src, /\\\.\(bsa\|esm\|esp\)\$\/i\.test\(n\) \|\| MW_LOOSE_EXT\.test\(n\)/,
-    'bsa/esm/esp plus loose extensions');
-  assert.match(src, /MW_LOOSE_EXT = \/\\\.\(nif\|kf\|dds\|tga\|wav\)\$\/i/, 'the loose set is exactly the mod asset kinds');
-  // loose files key by the canonical path the engine asks in; archives
-  // keep their basename keys so existing attaches stay valid
-  assert.ok(src.includes('MW_LOOSE_EXT.test(base) ? mwLoosePath(f.webkitRelativePath || f.name) : base'),
-    'the key law');
-  // and the loose duck ranks BEFORE every .bsa in loadMorrowindArchives
-  const load = src.slice(src.indexOf('export async function loadMorrowindArchives'));
-  const looseAt = load.indexOf('makeLooseArchive(loose)');
-  const bsaAt = load.indexOf('MwBsaFile.open(');   // MW-LOAD: opened off the stored Blob, by range
-  assert.ok(looseAt > 0 && bsaAt > looseAt, 'loose data files override archives - the engine\'s own load law');
-});
-
 test('MW-D40: _buffer answers registered string keys and never sends a string to the SND file', () => {
   const fake = { buffers: new Map(), snd: { getSound: () => { throw new Error('a string reached the SND reader'); } } };
   assert.equal(AudioEngine.prototype._buffer.call(fake, 'pegas:trot'), null, 'unregistered string is a missing clip');

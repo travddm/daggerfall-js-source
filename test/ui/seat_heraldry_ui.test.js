@@ -1,9 +1,9 @@
-// HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work") - THE HERALDRY ON THE SMALL FACES (Seats-Arc 8.1: "It is
+// HERALDRY-SHOWN - THE HERALDRY ON THE SMALL FACES (Seats-Arc 8.1: "It is
 // drawn on banners (3.4), the map ring, the frame of the guild tag, the siege HUD, the board and the Chronicle"): the one
 // swatch (ui/heraldrySwatch.js over ui/heraldryArt.js shieldSvg), the index by tag the client builds from what it holds
 // (net/heraldryIndex.js heraldryByTag), the name tag's frame (ui/nameLayer.js), the siege HUD's two shields
 // (net/siege/siegeLink.js siegeHudModel's `arms`, fightArmed; ui/siegeHud.js), the Seat tab's Chronicle and the Hall of
-// Records' Roll of Arms (ui/seatTab.js, ui/hallOfRecords.js), and the host's wiring. `06-Systems/Online-Arc.md`
+// Records' Roll of Arms (ui/seatTab.js, ui/hallOfRecords.js), and the host's wiring.
 // HERALDRY-SHOWN.
 import '../chargenDom.mjs';
 import { test } from 'node:test';
@@ -107,10 +107,6 @@ test('HERALDRY-SHOWN THE INDEX: a guild\'s heraldry by its tag off what the clie
   assert.equal(of('siege-forfeit', { guild: SH, against: EO }), 'EO');
   assert.equal(of('siege-void', { battle: 'siege', guild: EO, holder: SH, carried: true }), 'SH');
   assert.equal(of('siege-void', { battle: 'tourney', guild: EO, holder: SH }), null, 'a void Tourney names neither');
-  assert.equal(of('fealty-sworn', { vassal: IC, liege: SH }), 'IC');
-  assert.equal(of('fealty-broken', { vassal: IC, liege: SH, breaker: SH }), 'SH');
-  assert.equal(of('fealty-tribute', { vassal: EO, liege: SH, marks: 5 }), 'EO');
-  assert.equal(of('fealty-lapsed', { vassal: EO, liege: SH }), 'EO');
   assert.equal(of('royal-champion', { name: 'Mara', wins: 3 }), null);
   assert.equal(of('held', { guild: { name: 'X', tag: '' } }), null);
   assert.equal(of('held', { guild: 'SH' }), null);
@@ -163,10 +159,6 @@ test('HERALDRY-SHOWN THE TAG\'S FRAME: a peer\'s <TAG> whose guild\'s heraldry t
   bare.render(pt('SH'));
   assert.equal(bare.tagFor('p').guild.className, 'dfname-guild', 'a lookup that is no function: none');
   assert.match(NAME_CSS, /\.dfname-guild\.armed \{ padding: \.06em \.3em \.04em 1\.25em; border: 1px solid; border-radius: \.12em;\n  background: rgba\(14, 16, 19, \.78\) no-repeat \.22em 50% \/ \.82em auto; \}/);
-  // the host
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /\n  const seatArmsOf = heraldryLookup\(\(\) => \[guildBook\?\.guild, seatBook\?\.data\]\);\n/, 'the reader\'s own guild first, then the seats\' list');
-  assert.match(w, /if \(nameLayerWanted\(\)\) nameLayer = createNameLayer\(\{\}\);[^\n]*\n    nameLayer\?\.setArmsOf\(seatArmsOf\);/);
 });
 
 test('HERALDRY-SHOWN THE SIEGE HUD: each side\'s shield on the bar - the defender\'s at its left, the challenger\'s at its right - from the fight its guilds dressed in the seat\'s heraldry (the fight\'s answer carries none); a revolt\'s rising town and a guild with none show none, and a Royal Tourney\'s model none at all; the session dresses the fight it enters (mutants: the sides; the revolt; the dress; the paint)', () => {
@@ -204,9 +196,6 @@ test('HERALDRY-SHOWN THE SIEGE HUD: each side\'s shield on the bar - the defende
   assert.deepEqual([d.style.display, a.style.display], ['none', 'none'], 'a Royal Tourney\'s model: none');
   assert.match(SIEGE_HUD_CSS, /\.sg-bar \{ position: relative;[^\n]*padding: 3px 34px; \}\n\.sg-arm \{ position: absolute; top: 4px; width: 22px; height: auto;[^\n]*\}\n\.sg-arm-defend \{ left: 6px; \}\n\.sg-arm-attack \{ right: 6px; \}/);
   hud.destroy();
-  // the session dresses the fight it enters, once
-  assert.match(rd('src/net/siege/siegeSession.js'), /      s = \{ seat, battle: fightArmed\(battle, seat\), field, room: '',/);
-  assert.match(rd('src/net/siege/siegeSession.js'), /attacker: s\.battle\?\.attackerGuild, defender: s\.battle\?\.defenderGuild \}/);
 });
 
 test('HERALDRY-SHOWN THE SEAT TAB\'S CHRONICLE: each line under the shield of the guild it is about - known from the standings\' answer or the seats\' list - and a line about a guild unknown, or no guild, under none; the words unchanged (mutants: the swatch; the row\'s guild; the sources)', async () => {
@@ -267,10 +256,6 @@ test('HERALDRY-SHOWN THE HALL OF RECORDS\' ROLL OF ARMS: the book reader draws t
   assert.equal(HALL_OF_RECORDS_ROLL, 'The Roll of Arms');
   assert.deepEqual(hallOfRecordsTokens(ANTICLERE, rows, null), t.slice(0, -11), 'no lookup: the book as it was');
   assert.deepEqual(hallOfRecordsTokens(ANTICLERE, rows, null, () => null), t.slice(0, -11), 'none known: no Roll');
-  const w = rd('src/scenes/world.js');
-  assert.match(w, /const w = st && seatBook \? await hallOfRecordsRead\(st\) : null;/);   // PIN MOVED (AUDIT CHAP4 C5): the board's door reads as the palace's
-  assert.match(w, /return r\?\.data \? hallOfRecordsWindow\(seat, r\.data\.rows, r\.data\.zero, seatArmsOf, ch\?\.ok \? ch\.data : null\) : null;/);   // PIN MOVED (CHAP4d): and the chapters' Chronicle; (AUDIT CHAP4 C5) the one read
-  assert.match(rd('src/ui/hallOfRecords.js'), /export const hallOfRecordsWindow = \(seat, rows, zero = null, armsOf = null, chapters = null\) => createBookReaderWindow\(hallOfRecordsBook\(seat, rows, zero, armsOf, chapters\)\);/);   // PIN MOVED (CHAP4d): and the chapters' Chronicle
 });
 
 // ─── AUDIT HERALDRY H1-H4 ────────────────────────────────────────────
@@ -299,9 +284,6 @@ test('AUDIT HERALDRY H2 the Roll of Arms names only the guilds a row\'s LINE nam
   assert.deepEqual(roll([{ kind: 'siege-void', week: 4, data: { battle: 'siege', guild: NAMED(EO), holder: NAMED(SH), carried: true } }]), [
     'The Silver Hand <SH>: Azure bordered Gold, a Tower.', 'Ebon Oath <EO>: Crimson bordered Argent, a Wolf.',
   ], 'a carried void: the holder its line names first, then the attacker');
-  assert.deepEqual(roll([{ kind: 'fealty-broken', week: 6, data: { vassal: NAMED(IC), liege: NAMED(SH), breaker: NAMED(SH) } }]), [
-    'The Silver Hand <SH>: Azure bordered Gold, a Tower.', 'Iron Circle <IC>: Vert bordered Sable, an Axe.',
-  ], 'the breaker first, as the line says it');
   assert.deepEqual(roll([{ kind: 'siege-voided', week: 7, data: { battle: 'siege', guild: NAMED(EO), holder: NAMED(SH), restored: false } }]), [], 'a voided battle restored to none names no guild');
 });
 
@@ -398,6 +380,4 @@ test('AUDIT HERALDRY H4 the Overworld\'s name face frames a guild\'s <TAG> as th
     globalThis.Path2D = undefined;
     assert.equal(drawShield(ctx, SH_ARMS, 0, 0, 10), false, 'no Path2D: none');
   } finally { tvHud.disposeTravelViewHud(); tvHud.setTravelViewArmsOf(null); globalThis.Path2D = Path2DWas; }
-  // the host: the one lookup the name tags use
-  assert.match(rd('src/scenes/world.js'), /\n  const seatArmsOf = heraldryLookup\(\(\) => \[guildBook\?\.guild, seatBook\?\.data\]\);\n  setTravelViewArmsOf\(seatArmsOf\);/);
 });

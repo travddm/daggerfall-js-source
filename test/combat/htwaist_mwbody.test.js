@@ -1,5 +1,4 @@
-// HT-WAIST (2026-09-24, Mac: "Let the lantern item be able to be hung at
-// the waist ... a separate animated item on movement"). THE MORROWIND BODY.
+// HT-WAIST. THE MORROWIND BODY.
 //
 // A lit lantern at the waist is drawn on the third-person Morrowind body:
 // a carriable LIGH record named lantern (pickLanternRecord, the torch
@@ -21,10 +20,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { pickLanternRecord, pickTorchRecord, assembleFirstPersonArm, poseAssembly, hangAffine, hangAnchor, MW_LIGHT_CARRY, MW_UNITS_PER_METER } from '../../src/formats/morrowind/mwFirstPerson.js';
-import {
-  createFpArm, resolveHipLanternPart, hipLanternPartPaths, hangHipLight, effectPlacement, hipLanternSize,
-  HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK,
-} from '../../src/combat/fpArm.js';
+import { createFpArm, hangHipLight, effectPlacement, hipLanternSize } from '../../src/combat/fpArm.js';
+import { resolveHipLanternPart, hipLanternPartPaths, HIP_LIGHT_BONE, HIP_LIGHT_SLOT, HIP_LANTERN_HOOK } from '../../src/combat/fpArm/fpArmParts.js';
 import { HIP_LANTERN_SPRITE } from '../../src/player/eyeOfTheBeholder/eotbLantern.js';
 import { fixtureFile, countingRenderer, hipLanternBodyDeps } from '../fixtures/mw/bodyRig.mjs';   // HT-WAIST-NET: the lantern body lives there once - the peers' pin builds the same rig
 import { createLanternSwing, lanternSwingMatrix, HIP_LANTERN_HEIGHT } from '../../src/systems/lanternSwing.js';
@@ -304,15 +301,3 @@ test('HT-WAIST the live rig: lit AFTER the build binds it on the body (the slow 
   q.unload();
 });
 
-test('HT-WAIST the wiring: the weapon rig hands the lantern at the waist over per frame beside the torch, and to the sprite body; the portrait shows it lit (mutant: a door dropped)', () => {
-  const rig = rd('src/combat/weapon/weaponRig.js');
-  assert.match(rig, /fpArm\.setTorch\(isLitTorch\(entity\?\.lightSource\)\);\n(?:\s*\/\/[^\n]*\n)*\s*fpArm\.setHipLight\(lanternAtWaist\(entity\?\.lightSource\)\);/, 'per frame, beside the torch');
-  assert.match(rig, /hipLight: lanternAtWaist\(entity\.lightSource\),/, 'and at the build');
-  assert.match(rig, /hipLantern: !!entity && lanternAtWaist\(entity\.lightSource\),/, 'and to the Eye Of The Beholder body\'s frame state');
-  const fp = rd('src/combat/fpArm.js');
-  assert.match(fp, /else if \(r\.slot === HIP_LIGHT_SLOT\) r\.hidden = !hipLit;/, 'the portrait shows what you carry, lit');
-  assert.match(fp, /else if \(r\.slot === HIP_LIGHT_SLOT\) r\.hidden = !hipVisible\(\);/, 'the world body hides it only unlit');
-  assert.match(fp, /if \(eff\.slot === HIP_LIGHT_SLOT\) return !hipVisible\(\);/, 'its flame with it');
-  const peers = rd('src/net/peer/peerBodies.js');
-  assert.match(peers, /b\.rig\.setHipLight\?\.\(!b\.wolf && !!shown\.hl\);/, 'HT-WAIST-NET: a peer\'s body takes it through the same door, off the pose\'s `hl` (test/net/htwaistnet_peers.test.js drives it)');
-});

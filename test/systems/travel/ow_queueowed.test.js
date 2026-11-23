@@ -1,4 +1,4 @@
-// QUEUE-OWED (bible/06-Systems/Travel-View.md QUEUE-OWED; a player's report, 2026-10-18: "the world isnt loading at times
+// QUEUE-OWED (QUEUE-OWED; a player's report, 2026-10-18: "the world isnt loading at times
 // in the overworld and when it doesnt load his overworld speed goes down to 1x").
 //
 // THE QUEUE BUILT WHAT THE STREAM HAD LET GO. A crossing queues the grid's new edge (StreamingWorldState.update's load
@@ -70,8 +70,9 @@ test('QUEUE-OWED, the host\'s pump: crossings that leave queued pixels behind - 
     return Promise.resolve(built.get(k));
   };
   const destroyPixel = (px, py) => { built.delete(`${px},${py}`); };
-  const s = { state, built, queue, buildPixel, destroyPixel, _wodArrival: { keys: new Set() }, console: { error() {} }, performance: { now: () => 0 } };
-  const pump = new Function('s', `let { state, built, queue, buildPixel, destroyPixel, _wodArrival, console, performance } = s;
+  // firstReady) - none of the city's here, every pixel ready
+  const s = { state, built, queue, buildPixel, destroyPixel, _wodArrival: { keys: new Set() }, console: { error() {} }, performance: { now: () => 0 }, capitalPrebuild: { firstReady: () => true } };
+  const pump = new Function('s', `let { state, built, queue, buildPixel, destroyPixel, _wodArrival, console, performance, capitalPrebuild } = s;
     let building = false, _streamSince = null;
     ${cut('pump')}
     return pump;`)(s);
@@ -121,6 +122,7 @@ async function journey({ mps, buildS, turnS, seconds }) {
   const player = { pos: at, speed: mps, isPlayerSwimming: false, feetAt: () => [...player.pos] };
   let cur = null;
   const scope = {
+    capitalPrebuild: { firstReady: () => true },
     travelControlUI: { isShowing: true }, travelOptions: { state: { autopilot: {} } },
     travelView: { active: true, state: 'up' }, tvOwnsJourneys: () => true,
     worldTimeScale: timeScale, setWorldTimeScale: setTimeScale, resetTimeScale, createLoadGovernor, travellerPace, MAX_TIME_SCALE,
@@ -140,7 +142,7 @@ async function journey({ mps, buildS, turnS, seconds }) {
     raiderSight: () => 1000, isNight: () => false, minuteNow: () => 0, travelViewRaiders: () => [], tvRaid: { spent: new Set(), chase: new Map() },
     navalRaidersOn: () => false, naval: null, seaRaidPeerChase: () => null, RAIDER_CONTACT_M: 60, RAIDER_CHASE_MPS: 4.2,
     exteriorFoes: { foes: [] }, foeHostile, foeAlerted, foeCampKey: () => null, SIGHT_RADIUS: 102.4,
-    _wildStrangers: [], WILD_STRANGER_SLOW_M: 200, threatCap, foePaced, foeRate, tvInTown: () => false, TOWN_PACE_MAX: 5,   /* OW-TOWN-WALK: out of town */ _travelDrive: { yaw: 45 },
+    _wildStrangers: [], WILD_STRANGER_SLOW_M: 200, threatCap, foePaced, foeRate, tvTownPace: () => null,   /* OW-TOWN-WALK: out of town */ _travelDrive: { yaw: 45 },
     tvSay: () => {}, TRAVEL_VIEW_TEXT, performance: { now: () => d.t * 1000 },
     travelWalkRate, TV_MOVE_ACTIONS, held: () => false, keys: new Set(), csaBoatUnderMe: () => null, gamePaused: () => false,
     travellerOnRoad: () => true, csaHoldsTimeScale: () => false,

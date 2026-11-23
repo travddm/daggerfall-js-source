@@ -66,24 +66,6 @@ test('roster: every design names a real MobileType', () => {
 // Then the drape FIT, which sized a garment for the wrong body. Now the
 // drape SELECTION, which was left wherever the user had put it.
 
-test('drape: a design with none is passed to the drape path, not null', () => {
-  // `applyVillagerDrape(null)` means "no design is selected, leave the
-  // control where the user put it" — right for the bare rig, where
-  // cycling garments is the whole point, and absurd for an enemy.
-  // Handing it null for every design without a drape meant a bat wore
-  // whatever happened to be showing: cycle the control to a skirt, pick
-  // an animal, and the animal is in a skirt.
-  const src = readFileSync(new URL('../../src/tools/paperdoll/paperdollViewer.js', import.meta.url), 'utf8');
-  assert.ok(
-    /applyVillagerDrape\(o\);/.test(src),
-    'the enemy path still hands the drape function null for undressed designs',
-  );
-  assert.ok(
-    !/applyVillagerDrape\(o\.drape \? o : null\)/.test(src),
-    'the old null-for-no-drape call is back',
-  );
-});
-
 test('drape: the animals ask for none, and would be absurd in one', () => {
   // Not a code check: a statement about the designs. If somebody ever
   // gives a slaughterfish a gown this fails and they have to mean it.

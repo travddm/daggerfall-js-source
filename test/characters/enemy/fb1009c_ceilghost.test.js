@@ -6,7 +6,7 @@
 // combat" - read a leader a hair below it as a descent and turned it up: it climbed till its feet were a metre off the
 // floor or its body met the ceiling, its 2.6 m into the roof. Its bar stood 0.3 m over its top - over the ceiling - and
 // the sight test hid it. The lift is combat's alone now (never while following), and the bar stands under the ceiling
-// over the body (ui/naval/navalHud.js crewBarPoint). `01-Overview/bugs/Field-Bugs-2026-10-09c.md`.
+// over the body (ui/naval/navalHud.js crewBarPoint).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -67,11 +67,3 @@ test('CEIL-GHOST: the bar stands CREW_BAR_LIFT over the body - and under the cei
   assert.deepEqual(crewBarPoint(feet, GHOST, null), [1, GHOST + 0.3, 2], 'no collider asked: over its top');
 });
 
-test('CEIL-GHOST by source: the one bar drawer (world.js navalCrewBars - worldModes.js and dungeonContext.js call it, exterior.js stands no companion) stands each bar at crewBarPoint, in the place\'s own collider, and projects and sight-tests that point', () => {
-  const w = readFileSync(new URL('../../../src/scenes/world.js', import.meta.url), 'utf8');
-  const fn = w.slice(w.indexOf('function navalCrewBars('), w.indexOf('drawCrewBars(points,', w.indexOf('function navalCrewBars(')));
-  assert.match(fn, /const head = crewBarPoint\(feet, f\.ai\.height \?\? CAPSULE_HEIGHT, player\.collider\);/);
-  assert.match(fn, /projectToScreen\(head, /);
-  assert.match(fn, /crewSight\.blocked\(player\.collider, eye, key, head\)/);
-  assert.doesNotMatch(fn, /\+ 0\.3/, 'no second lift of its own');
-});

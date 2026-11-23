@@ -67,7 +67,7 @@ costs one ray and a pointer comparison rather than a ladder walk.
 
 ## The port's departures, recorded
 
-See `bible/10-UI/UI-Arc.md` (the WORLD-HOVER section) and the Ledger A
+See `docs/systems/ui.md` (the WORLD-HOVER section) and the Ledger A
 row. In outline: the enhanced skin's own plaque instead of the mod's
 tooltip panel; the loot arm keeps the port's itemised list rather than
 the mod's "Loot Pile"; and the port's own world objects (dropped

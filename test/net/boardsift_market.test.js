@@ -1,11 +1,10 @@
-// BOARD-SIFT (2026-10-21, feature-feedback: "The notice board market also doesnt show everything if there are too many
-// weapons/armor/etc listed it stops after a certain number"): THE MARKET'S VIEWS OF PIECES AND ORDERS TURN PAGES - a
+// BOARD-SIFT: THE MARKET'S VIEWS OF PIECES AND ORDERS TURN PAGES - a
 // view showed its first MARKET_SHOWN rows and nothing past them - every filter in the query so a page is a page; Crafted,
 // Goods and Auctions read in the order asked; Crafted and Auctions searched by the recipes a search names, Crafted by its
 // least quality (net/marketLaw.js, server-account/src/market.js marketRead, net/marketBook.js keyOf). AUDIT BOARD-SIFT
-// (2026-10-22): the fixture's orders apart - the cheapest, the dearest, the newest, the best and the soonest to end each a
+// the fixture's orders apart - the cheapest, the dearest, the newest, the best and the soonest to end each a
 // different row, auctions with standing bids - and every order judged against a plain model of it; a search is the
-// client's recipes. The record: bible/06-Systems/Professions-Arc.md 10.13.
+// client's recipes. The record: 10.13.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { standService, T0 } from '../accountDb.mjs';

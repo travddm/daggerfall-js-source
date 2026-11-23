@@ -9,7 +9,7 @@
 //     first open of right,left).
 //   - GetItemHands: weapon map -> shields LeftOnly -> None. Bows READ
 //     DFU's BowLeftHandWithSwitching setting (ItemEquipTable.cs:
-//     633-635): on = LeftOnly, off = the classic Both. AUDIT 58: the
+//     633-635): on = LeftOnly, off = the classic Both. The
 //     port used to pin them to the default, which left the setting
 //     half-applied - the two members that DO read it (hud's arrow
 //     counter, playerWeapon's switch delay) both assume the table put
@@ -20,8 +20,7 @@
 import { EQUIP_SLOTS } from './paperdoll/paperdoll.js';
 import { ITEM_GROUPS, SLOT_RULES, WEAPON_HANDS, SHIELD_INDICES } from './equipRules.js';
 import { getBool } from '../systems/settings/settings.js';
-import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // RRI1: GetItemHands / GetEquipSlot are virtuals a custom class answers   // AUDIT 58: ItemEquipTable.cs:635 reads BowLeftHandWithSwitching
-import { THUNDERLOCK_TEMPLATE, PISTOLET_TEMPLATE } from './thunderlockIds.js';   // FIELD-GUN2: the departure below - a leaf with no imports, so this cannot cycle
+import { customItemClass } from '../systems/roleplayRealismItems/rriItems.js';   // GetItemHands / GetEquipSlot are virtuals a custom class answers   // ItemEquipTable.cs:635 reads BowLeftHandWithSwitching
 
 export const ITEM_HANDS = Object.freeze({ None: 0, RightOnly: 1, LeftOnly: 2, Either: 3, Both: 4 });
 /** Weapons.Short_Bow / Weapons.Long_Bow - the one switch case in
@@ -37,7 +36,7 @@ export function getItemHands(item, { bowLeftHand = getBool('Enhancements', 'BowL
   if (group !== ITEM_GROUPS.Weapons && group !== ITEM_GROUPS.Armor) {
     return ITEM_HANDS.None;
   }
-  // AUDIT 58: `case Weapons.Short_Bow: case Weapons.Long_Bow: return
+  // `case Weapons.Short_Bow: case Weapons.Long_Bow: return
   // DaggerfallUnity.Settings.BowLeftHandWithSwitching ?
   // ItemHands.LeftOnly : ItemHands.Both;` (ItemEquipTable.cs:633-635).
   // The generated WEAPON_HANDS row is DFU's OFF answer and stays the
@@ -45,28 +44,11 @@ export function getItemHands(item, { bowLeftHand = getBool('Enhancements', 'BowL
   // the setting on the bow lands in EQUIP_SLOTS.LeftHand and bumps a
   // held 2H exactly as a shield does - which is what hud's arrow
   // counter (hud.js:"leftHand = getBool") and playerWeapon.toggleHand (playerWeapon.js:"bowSwitching = getBool") have
-  // assumed since AUDIT 28 made the key live.
+  // assumed.
   if (group === ITEM_GROUPS.Weapons && BOW_HAND_TEMPLATES.includes(item.templateIndex)) {
     return bowLeftHand ? ITEM_HANDS.LeftOnly : ITEM_HANDS.Both;
   }
-  // FIELD-GUN2 (Mac, from play: "It doesnt let me equip"). THE
-  // DEPARTURE, written as an explicit arm AHEAD of the verbatim table
-  // exactly as characters/weapons.js writes its two - so WEAPON_HANDS
-  // stays the generated DFU row set and the new weapon is one line a
-  // reader can see and delete.
-  //
-  // WHY IT COULD NOT BE EQUIPPED AT ALL. `WEAPON_HANDS` is keyed by
-  // template index over DFU's own 113-130, so index 560 fell past it
-  // to `return ITEM_HANDS.None` - and GetEquipSlot's weapon arm maps
-  // None to EQUIP_SLOTS.None, which equipItem refuses on its first
-  // line. Not a wrong hand: NO hand, and so no slot and no way to
-  // hold it. It is two-handed (the template's `isOneHanded: false`),
-  // which is what a gun this size and this heavy has to be.
-  if (group === ITEM_GROUPS.Weapons && item.templateIndex === THUNDERLOCK_TEMPLATE) return ITEM_HANDS.Both;
-  // PISTOLET: the same arm for the second gun - Either, a one-handed weapon's hand, so it is worn in either hand and a
-  // second one in the other makes a pair (combat/twoHands/handsLaw.js DUAL_GUN_TYPES)
-  if (group === ITEM_GROUPS.Weapons && item.templateIndex === PISTOLET_TEMPLATE) return ITEM_HANDS.Either;
-  const cls = customItemClass(item.templateIndex);   // RRI1: ItemArchersAxe / ItemLightFlail answer Either
+  const cls = customItemClass(item.templateIndex);   // ItemArchersAxe / ItemLightFlail answer Either
   if (cls?.itemHands) return ITEM_HANDS[cls.itemHands];
   const w = WEAPON_HANDS[item.templateIndex];
   if (w) return ITEM_HANDS[w];
@@ -87,7 +69,7 @@ export function createEquipTable() {
   };
 
   const getEquipSlot = (item) => {
-    // RRI1: a custom armor class names its slot (GetEquipSlot, a virtual)
+    // A custom armor class names its slot (GetEquipSlot, a virtual)
     const cls = item.group === ITEM_GROUPS.Armor ? customItemClass(item.templateIndex) : null;
     if (cls?.equipSlot) return EQUIP_SLOTS[cls.equipSlot];
     switch (item.group) {

@@ -1,4 +1,4 @@
-// SLAM10 (2026-09-16, AUDIT SLAM over SLAM1..SLAM7): THREE OF SLAM6'S OWN REGRESSIONS.
+// SLAM10: THREE OF SLAM6'S OWN REGRESSIONS.
 //
 // ONE: THE FAR TIER WAS INDEXED BY A RANK THAT MOVED. SLAM6 cut the listeners past POSE_FAN_MAX into POSE_FAR_SHARE
 // slices of a list re-sorted on every pose, and served slice `turn % share`. When the crowd moves, ranks shuffle; a
@@ -18,7 +18,7 @@
 // from 1000 ms (far) to 250 ms (near) in one step, the accumulated lag burned inside one 250 ms segment: a peer
 // walking at 5 u/s was drawn at 20.6 u/s for a quarter second. The interval may now halve at most per pose, which
 // caps the catch-up at 2x and converges in two intervals; growth is unbounded as before.
-// NET-SMOOTH (2026-10-04) re-aimed THREE: the halving is gone (a backlog's burst halved it to the floor and dashed),
+// NET-SMOOTH re-aimed THREE: the halving is gone (a backlog's burst halved it to the floor and dashed),
 // and the 2x bound is on the drawn speed itself - a peer is played out along its waypoints at PLAY_RATE_MIN..PLAY_RATE_MAX.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,5 +1,4 @@
-// RPT1026-LEDGERLAW (2026-10-26, a private report: wear spent a found piece's own-mend credit and a smith's restore
-// paid it out again; bible/06-Systems/Economy-Arc.md, MEND-THIRD): online a found piece sells at its mark and a third of what
+// RPT1026-LEDGERLAW: online a found piece sells at its mark and a third of what
 // its owner's OWN mends put past it (MEND-THIRD - systems/item/foundMark.js), and wear spends those mends first. The
 // count had only ever grown: worn back down it stood whole, and a smith's paid repair that raised the condition again made
 // it count - the paid repair sold a third over its worth, and two kits a wear apart credited more than the piece ever held.

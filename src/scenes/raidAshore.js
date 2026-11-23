@@ -1,8 +1,5 @@
 // @ts-check
-// RAID-ASHORE (2026-10-17, the owner: "when pirates attack but your first boat (the one that is assigned to be your
-// cabin if you press T > ship) You spawn and fight in land which is cool and way better than being teleported to a ship
-// a mile away. Anyway the actual bug is that after you defeat the pirates they keep spawning but passive";
-// bible/03-World/Naval-Refit.md RAID-ASHORE) - A VOYAGE'S RAID THROWN BACK WHERE THE PLAYER STANDS.
+// RAID-ASHORE - A VOYAGE'S RAID THROWN BACK WHERE THE PLAYER STANDS.
 //
 // Warm Ashes' voyage ambush (systems/warmAshesShips.js) starts WAQ_SHIP_SMALLRAID and boards "Your Ship" - and once a
 // bank ship's cabin is linked to a sailing ship of the player's (systems/boatCabinOwnership.js), Transport > Ship opens
@@ -26,7 +23,7 @@
 // again. Its message (1014, "The attackers have been fought off") is the quest's, said before the Leave Ship runs.
 //
 // RAID-WON (FIELD BUGS 2026-10-19, the Discord, [IMB]Monday: "If you get boarded.. repel the attackers.. board them..
-// etc. You can use overview as your crew class as enemies"; bible/01-Overview/bugs/Field-Bugs-2026-10-19.md): AT SEA THE
+// etc. You can use overview as your crew class as enemies"): AT SEA THE
 // SAME LAW. A raid the sea fight started (scenes/naval/navalHost.js beginFight) and the player won - its leader down, or
 // its wave killed and its Leave Ship the sea fight's - ran on: the small raid until its hour, the pirate attack until
 // its `_reset_`, and its five `_ally_` Warriors (the hands it stood in my crew's place) stood on my deck after it, hostile

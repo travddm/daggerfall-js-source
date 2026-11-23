@@ -9,6 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { calculateEnemyPacification, enemyLanguageSkill } from '../../src/combat/formulas.js';
 import { SKILLS } from '../../src/systems/skills.js';
+import { tryLanguagePacification, languageIgnoredText } from '../../src/scenes/hostCombat.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const player = (skillVal, personality) => {
@@ -54,79 +55,6 @@ test('pacification: the chance arms - social skills divide, tongues count in ful
   assert.equal(calculateEnemyPacification(player(59, 59), SKILLS.Streetwise, true, 26.1 / 200), false);
 });
 
-test('pacification: the host runs it on the FIRST-encounter edge and a pacified foe stands down', () => {
-  const src = readFileSync(join(root, 'src/scenes/dungeonContext.js'), 'utf8');
-  // AUDIT 24 (wave 42): the roll moved out of this frame body into
-  // hostCombat.tryLanguagePacification, because the dungeon was its
-  // only caller though the motor raises justEncountered for every
-  // pool. The law is asserted by RUNNING it now, not by quoting the
-  // dungeon's copy of it - see the exercise below.
-  const hc = readFileSync(join(root, 'src/scenes/hostCombat.js'), 'utf8');
-  const i = hc.indexOf('export function tryLanguagePacification');
-  assert.ok(i > 0, 'the one home exists');
-  const arm = hc.slice(i);
-  // AUDIT 24 (wave 42): the EDGE gate is asserted by BEHAVIOUR in
-  // audit24_wave42 (no edge -> null, null ai -> null), not by its
-  // spelling. Quoting `!ai?.justEncountered` here failed an
-  // equivalent rewrite to `!ai || !ai.justEncountered` and called it
-  // a kill, which is the opposite of what a campaign is for.
-  assert.ok(arm.includes('justEncountered'), 'the edge drives the check');
-  // X11 added a fifth argument (the Comprehend Languages bonus), which
-  // this pin's exact-call spelling flagged at once - correctly. It is
-  // relaxed to the SHAPE rather than re-frozen to the new spelling, for
-  // the reason written three lines above about `justEncountered`.
-  assert.ok(/calculateEnemyPacification\(playerEntity, lang, sheathed[,)]/.test(arm),
-    'the sheathed state feeds the roll');
-  assert.ok(arm.includes('comprehendLanguagesChance(playerEntity)')
-    && /calculateEnemyPacification\([^)]*comprehend\)/.test(arm),
-  'and so does the Comprehend Languages bonus (X11 - DFU reads it inside the formula, FormulaHelper.cs:377-380)');
-  assert.ok(arm.includes('ai.isHostile = false'), 'success stands the foe down');
-  assert.ok(arm.includes('tallySkill(playerEntity, lang, 3)'), 'success tallies 3 (DFU BCHG)');
-  assert.ok(arm.includes('lang !== SKILLS.Etiquette && lang !== SKILLS.Streetwise'), 'a failed tongue still tallies 1');
-  // and all three pools call it now, not one
-  for (const f of ['src/scenes/dungeonContext.js', 'src/scenes/exteriorFoes.js', 'src/scenes/cityGuards.js']) {
-    assert.ok(readFileSync(join(root, f), 'utf8').includes('tryLanguagePacification('), `${f} runs the roll`);
-  }
-  // AUDIT 24 (the re-read): the stand-down is a TARGET DROP, not an
-  // action skip. EnemySenses.Update:321-327 nulls the target for a
-  // non-hostile motor and :410-414 then forces targetInSight and
-  // detectedTarget false - so the foe reads BLIND and every gate that
-  // asks about sight refuses. EnemyAttack.FixedUpdate has no hostility
-  // test of its own (:55-56 gates on DisableAI/IsParalyzed alone), so
-  // the component keeps ticking and keeps burning its DFRandom byte;
-  // holding it at the host desynced the one shared global stream for
-  // as long as the foe stood pacified.
-  // MT-iv: paralysis, or NO TARGET - EnemyAttack's own two returns
-  // (:55-57 paralysed, :136-137 `senses.Target == null`). Still no
-  // hostility gate, which is what this pin guards: a pacified foe
-  // keeps ticking its component and burning its DFRandom byte.
-  assert.ok(src.includes('f.events = (_fParalyzed || !_tgt) ? [] : f.attack.update'),
-    'only paralysis and a null target skip the attack component - DFU has no hostility gate there');
-  assert.equal(/_fParalyzed \|\| !f\.ai\.isHostile/.test(src), false, 'no hostility gate crept in');
-  assert.equal(/_fParalyzed \|\| !f\.ai\.isHostile/.test(src), false, 'the host gate is gone');
-  const motor = readFileSync(join(root, 'src/characters/enemy/enemyMotor.js'), 'utf8');
-  // MT-i refined the blind arm to what :321-327 actually says: the
-  // non-hostile drop nulls the PLAYER target only, so a pacified foe
-  // that a bear is mauling keeps its senses and fights back (through
-  // MakeEnemyHostileToAttacker). With no target - the unarmed pool's
-  // pacified foe, and every pre-MT caller - it still reads blind.
-  assert.ok(motor.includes('if (!this.isHostile && !foeTarget) {\n      this.inSight = false;\n      this.detected = false;'),
-    'the senses read blind instead');
-  assert.ok(motor.includes('const foeTarget = this._armedTargeting && this._targetCandidate && !this._targetCandidate.isPlayer;'),
-    'and the one exception is a live FOE target, per :321-327');
-  // the CASTING gate stays: DFU's spell paths hang off the MOTOR's
-  // TakeAction, behind CanAct, which HandleNoAction:357-364 drops the
-  // moment the target is null.
-  assert.ok(src.includes('!_fParalyzed && !_fPaused && f.ai.isHostile) {'), 'no casts while pacified');
-  // AUDIT 26 F041: the flip asks WHOSE blow it was - it sits inside
-  // HandleAttackFromSource's player-source gate, so a fall no longer
-  // un-pacifies a language-pacified foe.
-  // ...and MT-iv runs the WHOLE method inside that gate, with the
-  // narrow raise kept as the no-subsystem fallback.
-  assert.ok(src.includes('if (fromPlayer && foe.ai) {'), 'a PLAYER attack re-hostiles (MakeEnemyHostileToAttacker)');
-  assert.ok(src.includes('foeDeps.resetAllyTeamOnPlayerAttack(foe.ai, foe.entity, foe.mobileType);'), 'and reverts a struck ally');
-});
-
 test('pacification: the motor edge fires once and non-hostile foes stop moving', async () => {
   const { EnemyAI } = await import('../../src/characters/enemy/enemyMotor.js');
   const { Collider } = await import('../../src/player/collider.js');
@@ -147,4 +75,20 @@ test('pacification: the motor edge fires once and non-hostile foes stop moving',
   assert.equal(ai.moving, false, 'a pacified foe does not pursue');
   assert.deepEqual(ai.feet, before, '...its feet stay planted');
   assert.equal(ai.yaw, yaw0, '...and it does not even TURN - the decision tick itself is gated (DFU TakeAction)');
+});
+
+test("pacification: a failed roll says the foe ignores the player's words; a success says it is pacified", () => {
+  const said = [];
+  const orc = { isClass: false, careerIndex: 7 };
+  const deps = { sheathed: true, enemyLanguageSkill: () => SKILLS.Orcish, say: (l) => said.push(l) };
+  const failed = tryLanguagePacification({ justEncountered: true, isHostile: true }, orc, 7, player(0, 50), { ...deps, calculateEnemyPacification: () => false });
+  assert.equal(failed.pacified, false);
+  assert.equal(said.length, 1);
+  assert.match(said[0], / ignores your words\.$/);
+  assert.equal(said[0], languageIgnoredText(said[0].slice(0, -' ignores your words.'.length)));
+  const ai = { justEncountered: true, isHostile: true };
+  tryLanguagePacification(ai, orc, 7, player(0, 50), { ...deps, calculateEnemyPacification: () => true });
+  assert.equal(ai.isHostile, false);
+  assert.match(said[1], /is pacified by your/);
+  assert.equal(said.length, 2, 'one line a roll');
 });

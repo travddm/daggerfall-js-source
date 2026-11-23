@@ -1,4 +1,4 @@
-// AUDIT DISC28 (2026-09-28, the pre-merge audit of the 2026-09-28 Discord batch, before the merge) - lane 4, motion.
+// AUDIT DISC28 - lane 4, motion.
 //
 // MO-1: A WALL IS NEVER A FLOOR. DISC28-G stopped a RISING swimmer being set on a ceiling's top face, and the same
 // report came true by another road the fix left as it was. PH1's one-way floor read the CONTACT's direction alone -
@@ -94,7 +94,6 @@ test('AUDIT DISC28 MO-1: walkers - a crouched walker along a crawlspace\'s wall 
   assert.equal(air, 0, 'and never leaves the floor');
 });
 
-// PIN MOVED (FIELD BUGS 2026-10-25i RAIL-HANG, player/collider.js): a LEVEL stride's floor is one whose own plane stands
 // over the sphere now (planeOver - a wall's has no up), so the walkers above no longer tell MO-1's law from that one -
 // measured, the face-slope test dropped passed them. A stride with a vertical part is MO-1's alone: the runner's hall.
 test('AUDIT DISC28 MO-1 at a stride with a vertical part: a body pressed into the hall\'s wall at 45 and 75 degrees, rising or sinking a hair, is never lifted by the wall\'s diagonal (41 of 1686 strides were, the face-slope test dropped)', () => {

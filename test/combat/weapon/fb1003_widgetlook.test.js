@@ -64,10 +64,8 @@ test('WIDGET-LOOK: through the mod\'s own inertia step, a turn sways the sprite 
   // the rig: one read of the latch, the radians to the Thunderlock (its lab's), the axes to the three mods
   const rig = rd('src/combat/weapon/weaponRig.js');
   assert.match(rig, /const look = takeFrameLook\(\);[^\n]*\n\s*const lookAxes = dfuLookAxes\(look\);/);
-  assert.match(rig, /thunderlockFeel\(dt, \{ width: c\?\.width \?\? 320, height: c\?\.height \?\? 200, motion: frameMotion, look \}\);/, 'the gun keeps the radians its lab is tuned on');
   assert.match(rig, /look: lookAxes, swingHeld: _held, cursorActive: cursorActive\(\), camera: camThunk, collider:/, 'Handheld Torches');
   assert.match(rig, /look: \{ x: lookAxes\[0\], y: lookAxes\[1\], cursorActive: cursorActive\(\), swingAction: _held \}/, 'Shield Widget');
-  // PIN MOVED (TWO-HANDS, bible/05-Combat/Two-Hands.md): the clone's frame is built by cloneFrame, once for each hand of
   // a pair, from the frame's own inputs - the axes among them
   assert.match(rig, /look: f\.look, swingHeld: _held, cursorActive: cursorActive\(\), camera: f\.camera,\n\s*activateStarted:/, 'Weapon Widget');
   assert.match(rig, /const pair = pairUp\(\), cf = \{ c, motion: frameMotion, look: lookAxes, camera: camThunk \};/, 'Weapon Widget: the axes into its frame');

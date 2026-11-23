@@ -1,4 +1,4 @@
-// Random encounter tables (Characters C3).
+// Random encounter tables.
 // Generated 1:1 from DFU's RandomEncounters.cs EncounterTables
 // (MIT, Daggerfall Workshop): 45 tables x 20 MobileTypes ids, in
 // array order (comment-stripped - the source carries one dead

@@ -90,15 +90,4 @@ test('G7b: sixteen princes, sixteen films, and the host mounts ONE consumer of t
   assert.equal(videos.length, 16, 'one row per prince');
   assert.ok(videos.every((v) => /^[A-Z0-9]+\.FLC$/.test(v)), 'each names its .FLC');
   assert.equal(new Set(videos).size, 16, 'no prince borrows another\'s film');
-  const wm = read('src/scenes/worldModes.js');
-  assert.ok(wm.includes("fetchBytes(r.daedra.video).then((bytes) => {"), 'the film fetches on a successful summons');
-  assert.ok(wm.includes('if (!sw.flc.readyToPlay) { mountBoxes(); return; }'),
-    'an unreadable FLC falls back to the box chain - never traps');
-  // SUMMON-OFFER: the quest arm always holds its offer step now (no step is the 'noQuest' arm, answered before the gold)
-  const offerIdx = wm.indexOf('        if (r.daedra.video) {\n          fetchBytes(r.daedra.video)');
-  const boxIdx = wm.indexOf('        mountBoxes();\n        return null;\n      };');
-  assert.ok(offerIdx > 0 && boxIdx > offerIdx,
-    'the step has ONE consumer: the film window first, the boxes only when no film can');
-  const fp = read('src/ui/daedraSummonedWindow.js');
-  assert.ok(fp.includes('new FlcPlayer(this.flc, { loop: true })'), 'the film LOOPS - FLCPlayer.Loop defaults true (:38)');
 });

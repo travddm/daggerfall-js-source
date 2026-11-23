@@ -1,4 +1,4 @@
-// FIELD BUGS 2026-10-21b SNOW-YEAR (bible/01-Overview/bugs/Field-Bugs-2026-10-21b.md, BLACK-SCREEN): "Crashing every minute -
+// FIELD BUGS 2026-10-21b SNOW-YEAR (, BLACK-SCREEN): "Crashing every minute -
 // No message just black", "when I enter dungeons or traveling overworld". The snow year's origin (snowpack.js
 // yearOriginOf) floored a midsummer that carried a fractional minute's float error, so two minutes of one year could
 // name origins a step apart; a pixel build waiting on the snow (snowCoverHost.js settle) held the minute it began at, and

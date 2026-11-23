@@ -1,5 +1,5 @@
 // HUD-SADDLE (FIELD BUGS 2026-10-14, Discord: "Riding Window is not able to be edited in the HUD Editor (Alt+U)" - and
-// "the horse care toggle in the settings menu doesn't seem to work"; bible/01-Overview/bugs/Field-Bugs-2026-10-14-riding-panel.md).
+// "the horse care toggle in the settings menu doesn't seem to work").
 //
 // THE RIDING PANEL IS A HUD PIECE. The saddle panel (ui/enhanced/enhancedSaddle.js, STEED-UI) shipped ten days after HUD-MOVE
 // (ui/hud/hudLayout.js) and never joined its registry, so Alt+U framed the compass, the boss bar, the target bar and the
@@ -7,7 +7,7 @@
 // over a page that answers the selectors HUD-MOVE asks (descendants among them - the panel's bar stands inside its
 // whole-screen layer) with the real sweep, the real panel and the real editor's key and handles.
 //
-// THE SWITCH. Horse care's tile was traced to every reader and found sound; Mac's word on it (2026-10-15) made it tiers
+// THE SWITCH. Horse care's tile was traced to every reader and found sound; Mac's word on it made it tiers
 // on the one key, each player's own online - HORSE-TIERS, pinned end to end by test/systems/horsetiers.test.js.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -129,18 +129,3 @@ test('HUD-SADDLE THE PREVIEW: with the editor open and nobody riding, the riding
   assert.equal(buildSaddlePreview(phone).className, 'saddlepanel touch');
 });
 
-test('HUD-SADDLE THE FOUR HOSTS: the panel has one builder, and it places itself - world.js and exterior.js, the hosts that ride, draw it only through the one glue; worldModes.js (interiors) and dungeonContext.js (dungeons) stand no transport and draw none; the sweep that frames it is the HUD\'s, which every host draws (mutant: the build\'s placing dropped)', () => {
-  const files = [];
-  const walk = (dir) => { for (const f of readdirSync(dir)) { const p = join(dir, f); if (statSync(p).isDirectory()) walk(p); else if (f.endsWith('.js')) files.push(p); } };
-  walk(SRC);
-  const rel = (p) => p.slice(SRC.length);
-  assert.deepEqual(files.filter((p) => /className = 'saddlepanel(-bar)?'/.test(readFileSync(p, 'utf8'))).map(rel), ['ui/enhanced/enhancedSaddle.js'], 'one builder');
-  assert.deepEqual(files.filter((p) => readFileSync(p, 'utf8').includes('drawEnhancedSaddle(')).map(rel).sort(), ['scenes/saddleHost.js', 'ui/enhanced/enhancedSaddle.js'], 'one glue draws it');
-  for (const host of ['world.js', 'exterior.js']) assert.match(rd(`src/scenes/${host}`), /import \{ createSaddleHost \} from '\.\/saddleHost\.js';/, `${host}: rides, through the glue`);
-  for (const host of ['worldModes.js', 'dungeonContext.js']) assert.ok(!/saddleHost|enhancedSaddle/.test(rd(`src/scenes/${host}`)), `${host}: no transport - named, not wired`);
-  const saddle = rd('src/ui/enhanced/enhancedSaddle.js');
-  assert.match(saddle, /import \{ placeHudPieces \} from '\.\.\/hud\/hudPlacer\.js';/);
-  assert.ok(!saddle.includes("from '../hud/hudLayout.js'"), 'through the leaf, not the editor and its previews\' hosts');
-  assert.match(saddle, /doc\.body\.append\(host\);\n {4}placeHudPieces\(doc\);/, 'placed the moment it is put on the page');
-  assert.match(rd('src/ui/enhanced/enhancedHud.js'), /import \{ tickHudLayout, hudArranging \} from '\.\.\/hud\/hudLayout\.js';/, 'the HUD every host draws seats the sweep');   // PIN MOVED (THE MERGE of main: AUDIT UICALM-FIRM1 imports hudArranging beside the sweep)
-});

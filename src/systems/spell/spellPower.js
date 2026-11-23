@@ -1,14 +1,10 @@
-// BAL9 (2026-10-12, the owner: "I think destruction needs a buff. A lot of players saying its lack luster";
-// bible/05-Combat/Balance-Arc.md section 15). A PLAYER'S SPELL POWER - what a Destruction spell's damage is worth past
+// BAL9. A PLAYER'S SPELL POWER - what a Destruction spell's damage is worth past
 // Daggerfall's own magnitude. DFU rolls a damage spell's magnitude off the caster's LEVEL alone (EntityEffect.
 // GetMagnitude); the school's skill prices the spell and moves nothing else. Two things here are the port's:
 //
 //   THE SCHOOL PAST 100 IS ITS POTENCY. Online a mastered school reads past 100 (SOFTCAP1, effective 140 at 200) and
-//   SPELL-COST-PAST prices those points at 100 / skill - every one still cheaper, none free - while the same mastery
-//   raises the foes (skillSoftcap.js combatEdge): a Destruction mastered to 200 paid x0.58 for a Crypt's foes at x1.30
-//   health. CLIMB-PAST's law, for the school whose formula stops paying at 100: each effective point past it is 1% more
-//   damage, to the effective cap (x1.4 at 140). The CLIMB alone (skillSoftcap.js climbedSkill) - what the foes' edge
-//   reads, so the climb that raises them is the climb that pays: a worn Destruction line already pays in price (the
+//   SPELL-COST-PAST prices those points at 100 / skill - every one still cheaper, none free. CLIMB-PAST's law, for the school whose formula stops paying at 100: each effective point past it is 1% more
+//   damage, to the effective cap (x1.08 at 140 since B1; it was 1% a point, x1.4). The CLIMB alone: a worn Destruction line already pays in price (the
 //   live value SPELL-COST-PAST reads) and strikes no harder. Mentoring: the mentored climb (MENTOR2). Offline
 //   Daggerfall's price term stands (to nothing at 110), and so does Daggerfall's damage.
 //
@@ -20,7 +16,7 @@
 // player: a refereed fight's stand-in is a player (combat/duelCombat.js duelStub), so the duel, the siege, the Wild Zone
 // and the arena stand exactly where BAL8 left them; a foe's spell is its own (BAL3 keeps the place off a foe's spells).
 //
-// SCHOOLS2 (bible/06-Systems/Arcane-Specialisations.md section 4; the owner chose "each mastered school also pays past
+// SCHOOLS2 (; the owner chose "each mastered school also pays past
 // 100 in its own way, not just in price" - BAL9's open "other schools" call): THE SAME LAW FOR EVERY SCHOOL. schoolPotency
 // reads any school's climb (Destruction's by default, BAL9b's own); systems/effects.js lands each school's in its own
 // dimension - Restoration's heals, Alteration's Shield, Illusion's concealments and Thaumaturgy's wards on MYSELF
@@ -39,8 +35,9 @@ import { mentoredSkill } from '../mentorMode.js';   // MENTOR2: kept out of skil
 import { isOnlinePage } from '../online/onlineLane.js';
 import { sigilDueling } from '../sigil/sigil.js';   // SCHOOLS2: a self perk sleeps in a refereed fight, as every loot and set power does
 
-/** Each effective point of Destruction past 100 is this much more damage (CLIMB-PAST's CLIMB_OVERCAP_SPEED_PER_POINT). */
-export const DESTRUCTION_POTENCY_PER_POINT = 0.01;
+/** Each effective point of Destruction past 100 is this much more damage. B1 (tame player power): a fifth of a per cent,
+ *  was 1% (CLIMB-PAST's CLIMB_OVERCAP_SPEED_PER_POINT), so a school mastered to 200 (effective 140) is x1.08, not x1.40. */
+export const DESTRUCTION_POTENCY_PER_POINT = 0.0007;
 /** SCHOOLS2: and every school's own - one law, one number. */
 export const SCHOOL_POTENCY_PER_POINT = DESTRUCTION_POTENCY_PER_POINT;
 
@@ -50,11 +47,10 @@ export const ownSpellAt = (caster, target) => !!caster?.isPlayer && !caster.peer
 export const ownSpellOnSelf = (caster, target) => !!caster?.isPlayer && !caster.peer && caster === target && !sigilDueling();
 
 /** MENTOR2: the climb a character FIGHTS with - the mentored value while mentoring (mentorMode.js mentoredSkill), else
- *  skillSoftcap.js climbedSkill's. What a school's potency and a weapon past 100 pay on; the foes' edge reads the real
- *  climb, and none while mentoring (combatEdge). */
+ *  the real climb's. What a school's potency and a weapon past 100 pay on. */
 export const fightingClimb = (entity, id) => effectiveSkill(mentoredSkill(entity, masterCappedSkill(entity, entity?.skills?.[id] ?? 0, id)));
 
-/** The school past 100: 1 to 100, then 1% a point of the school's CLIMB (effective 140 at most: x1.4) - Destruction's
+/** The school past 100: 1 to 100, then 0.2% a point of the school's CLIMB (effective 140 at most: x1.08) - Destruction's
  *  unless `school` names another (SCHOOLS2). Online alone; MENTOR2: while mentoring, the mentored climb. */
 export function schoolPotency(caster, { online = isOnlinePage(), school = SKILLS.Destruction } = {}) {
   if (!online || !caster?.isPlayer) return 1;
@@ -80,8 +76,7 @@ export function registerSpellPowerMod(name, fn) { if (typeof fn === 'function') 
 /** Named modifiers, `fn(caster, target) -> points` off the target's saving throw. A non-function removes the name. */
 export function registerSpellPierceMod(name, fn) { if (typeof fn === 'function') _pierce.set(name, fn); else _pierce.delete(name); }
 
-/** The multiplier on MY damage spell's landed amount: the school past 100, times every modifier's percent. 1 for
- *  anything that is not my spell at a target the port may strengthen. */
+/** The multiplier on MY damage spell's landed amount: the school past 100, times every modifier's percent. 1 for anything that is not my spell at a target the port may strengthen. */
 export function spellPowerMult(caster, target, opts = {}) {
   if (!ownSpellAt(caster, target)) return 1;
   let pct = 0;

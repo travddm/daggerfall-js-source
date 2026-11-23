@@ -3,14 +3,14 @@
 // The claim a source sweep cannot make: the enhanced level-up window
 // DRAWS, its stars spend the pool the law rolled, it refuses every way
 // out while a point is unspent, and the commit that ends it moves the
-// entity by exactly one level - in all three lanes, at four viewport
+// entity by exactly one level - in both lanes, at four viewport
 // sizes, by pointer and by keyboard alone.
 //
 // Run against a dev server (no game data needed):
 //     npx vite --port 5199 &
 //     node tools/levelUpProbe.mjs
 //
-// It drives levelup.html (src/tools/levelUpLab.js), which mounts the
+// It drives labs/levelup.html (src/tools/levelUpLab.js), which mounts the
 // SHIPPING window over a made-up character. The window and both
 // rollout laws under it are the game's own modules; only the entity is
 // the lab's.
@@ -40,7 +40,7 @@ async function open(lane, viewport) {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(`${BASE}/levelup.html?lane=${lane}`, { waitUntil: 'load' });
+  await page.goto(`${BASE}/labs/levelup.html?lane=${lane}`, { waitUntil: 'load' });
   await page.waitForSelector('.lv-star', { timeout: 20000 });
   await page.waitForTimeout(250);
   return { ctx, page, errors };
@@ -177,39 +177,6 @@ async function boxes(page) {
   await ctx.close();
 }
 
-// ── 7. THE MOD'S LANE, BY ITS OWN RULES ──────────────────────────
-{
-  const { ctx, page, errors } = await open('virtue', { width: 1400, height: 900 });
-  const m = await model(page);
-  check('virtue: the purse is counted in the mod’s own words', /virtue/i.test(m.poolLabel), m.poolLabel);
-  check('virtue: the window is the mod’s lane', m.lane === 'virtue');
-  // Luck is priced differently from the rest (attributeOffset), and the
-  // window must say so rather than let a player discover it by pressing.
-  const luck = m.rows.find((r) => r.key === 'luck');
-  check('virtue: Luck carries its own price', luck.cost >= 1, `${luck.cost} per point`);
-  await page.screenshot({ path: `${shots}/levelup-virtue.png` });
-  // Spend the purse the way a player would - into the row the window
-  // offers - until nothing is legal, then commit.
-  for (let i = 0; i < 40; i++) {
-    const cur = await model(page);
-    if (cur.pool === 0) break;
-    const row = cur.rows.find((r) => r.canRaise);
-    if (!row) break;
-    await page.locator('.lv-star').nth(row.index).click();
-  }
-  const spent = await model(page);
-  check('virtue: the purse spends to zero under the mod’s caps', spent.pool === 0, `left ${spent.pool}`);
-  const raised = spent.rows.filter((r) => r.delta > 0).length;
-  check('virtue: at most the mod’s number of attributes moved', raised > 0 && raised <= 3, `${raised} attributes`);
-  const start = await entity(page);
-  await page.locator('.lv-ok').click();
-  await page.waitForTimeout(150);
-  const end = await entity(page);
-  check('virtue: the commit is the mod’s commit', end.level === start.level + 1 && end.ready === false, `${start.level} -> ${end.level}`);
-  check('virtue: no page errors', errors.length === 0, errors.join(' | '));
-  await ctx.close();
-}
-
 // ── 8. THE KEYBOARD ALONE ────────────────────────────────────────
 {
   const { ctx, page } = await open('classic', { width: 1400, height: 900 });
@@ -313,7 +280,7 @@ for (const [label, viewport] of [
     await new Promise((r) => setTimeout(r, 900));
     await route.continue();
   });
-  await page.goto(`${BASE}/levelup.html?lane=door`, { waitUntil: 'commit' });
+  await page.goto(`${BASE}/labs/levelup.html?lane=door`, { waitUntil: 'commit' });
   const waited = await page.waitForSelector('#levelup-wait', { timeout: 5000 }).then(() => true, () => false);
   check('door: a paused game is never blank - the wait is drawn while the chunk is in flight', waited);
   if (waited) {
@@ -379,7 +346,7 @@ for (const [label, viewport, hudScale] of [
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(`${BASE}/levelup.html?lane=notice`, { waitUntil: 'load' });
+  await page.goto(`${BASE}/labs/levelup.html?lane=notice`, { waitUntil: 'load' });
   await page.waitForSelector('#enhanced-levelnotice .lv-note', { timeout: 20000 });
   // A LIVE BOTTOM BLOCK: the breath bar up - the row a player levelling
   // in a dungeon has over the vitals (UI3: the effects and the needs are

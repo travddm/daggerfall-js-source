@@ -189,7 +189,6 @@ test('U56 applyTransfer: the split leaves a remainder, the whole move keeps its 
   const to3 = [];
   applyTransfer(book(3), { amount: 3 }, from3, to3);
   assert.deepEqual(from3, [keep], 'splice(-1, 1) ate the wrong item');
-  // PIN MOVED (OUTDOOR-LOOT, DESIGN 3.9 / T14): ...and moves nothing at all - a row its source no longer holds (a piece
   // lifted out of the pack while its claim stands, a container emptied under an open window) landed a COPY here before
   assert.deepEqual(to3, [], 'a stale row put a copy of a piece its source did not hold into the destination');
   const stale = book(5), to4 = [];
@@ -210,7 +209,7 @@ test('U56 applyTransfer: the split leaves a remainder, the whole move keeps its 
 // a TEMPLATE, not a copy. The ladder used to re-spell the member as
 // `{ ...item, stackCount }`, which is the fourth re-spelling a2 set out
 // to remove and the only one on the main path.
-// BOOK-SPLIT (2026-09-29, Field-Bugs-2026-09-29d): the mint keeps the
+// BOOK-SPLIT: the mint keeps the
 // stack's IDENTITY - message, recipe, expiry, and the price a book's id
 // or a potion's recipe set - a Port-Ledger A departure; this pin was
 // flipped to it (the half split off a potion stack is that potion).

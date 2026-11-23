@@ -26,7 +26,7 @@ export const PARTY_POSE = { px: 100, py: 200, loc: 'Daggerfall', in: 0, h: 50, h
 
 /** Everything a place socket's attachment carries - what a wake must recompute, and nothing else. */
 // CHAP4c: and a claimed title's `ts` (wire.js badged) - a seat's (SEAT1c) and a chapter's seat's ride the attachment with it,
-// unmeasured until the widest title was a claimed one (PIN MOVED)
+// unmeasured until the widest title was a claimed one (
 // LEASE1 (net/roomLease.js): and the hub's word on the socket - when the room's last word on its mute was said (`lt`),
 // when the lease it hands on lapses (`ld`, epoch seconds; none for a build that hands on none), and a freeze (`fz`)
 export const PLACE_ATTACH_FIELDS = Object.freeze(['key', 'id', 'sc', 'name', 'title', 'ts', 'glyphs', 'sub', 'mu', 'lv', 'gi', 'gt', 'gm', 'hn', 'hc', 'hb', 'hg', 'ci', 'gio', 'pose', 'since', 'turn', 'kept', 'worldSeen', 'finalUsed', 'pk', 'lt', 'ld', 'fz']);   // HIBERNATE: `sc`, the id's secret, on the attachment so a wake can ask it without a storage read; WARDEN1: `pk`, whose parked team the socket last spoke for (24 hex - the town watch tells it of a throw); AUDIT RENOWN1 WIRE-4: `lv`, the Renown the token signed; GUILD1c: the guild it signed (`gi`, `gt`, `gm`) and when it was said (`gio`); LEGACY7: the house it signed (`hn`, `hc`, `hb`, `hg`); AUDIT LEGACY III O1: its realm character (`ci`), which the wed arm stamps
@@ -64,7 +64,6 @@ export const placeFrames = (other) => [
  *  (AUDIT FB1018D L4-4) `key` another's, a dungeon instance's at its widest. */
 export async function widestPlace(tick, key = 'interior:m4294967295.16777216') {
   const r = fakeRoom(key);   // a map id at ten digits, the building key's 1<<24 sentinel
-  // PIN MOVED (HUNTERS-MARK): the widest title by what it puts on the attachment - its word and, claimed, its claim - since
   // the Masters' words outgrew the chapters' (masterprovisioning, eighteen letters, unclaimed); a claimed chapter's is still wider
   const wide = (/** @type {string} */ t) => t.length + (titleClaimed(t) ? JSON.stringify({ ts: [0xffffffff, 9999] }).length : 0);
   const title = TITLES.reduce((x, y) => (wide(y) > wide(x) ? y : x));   // CHAP4c: a chapter's seat's now - claimed, so it rides with its widest claim

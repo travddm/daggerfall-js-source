@@ -1,6 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// DW-E4 (2026-09-25): ILIAC PUDDLE NO MORE'S FOES OF THE DEEP - the
+// DW-E4: ILIAC PUDDLE NO MORE'S FOES OF THE DEEP - the
 // laws UnderwaterEnemySpawner.cs places them by, as pure functions
 // (jet082, 1.2.2): the depth table and its weights, the rare and the
 // boss rosters, the column a foe may stand in, its place in it, the
@@ -12,7 +11,6 @@
 //
 // THE DRAWS are the unseeded UnityEngine.Random and ride the host's
 // injectable roll (Port-Ledger A, the engine-PRNG rule).
-// ═══════════════════════════════════════════════════════════════════
 
 import { DEPTH_EDGE_SOFTNESS } from '../passiveFish.js';
 import { rangeInt, rangeFloat } from '../../systems/unleveledLoot.js';   // Random.Range(int, int) and (float, float)

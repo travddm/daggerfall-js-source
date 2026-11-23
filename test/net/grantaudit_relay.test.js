@@ -1,5 +1,4 @@
-// AUDIT GRANT (2026-10-18, Mac: "Audit this real quick", then "Yes fix them"; bible/11-Multiplayer/Spawn-Grants.md
-// section 17): THE RELAY'S HALF OF THE AUDIT'S FIXES, over real Rooms (test/fakeRoom.mjs) - a mint's answer says the law
+// AUDIT GRANT: THE RELAY'S HALF OF THE AUDIT'S FIXES, over real Rooms (test/fakeRoom.mjs) - a mint's answer says the law
 // in force (A10); a reader's tally posts the window at its whole bound and begins the next, never past it (A4); a
 // window begins at its first fold, not at the last post (A5).
 import test from 'node:test';

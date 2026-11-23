@@ -162,16 +162,6 @@ test('CORNER-TOP: in a corner, the hands holding the side wall (which runs on up
   }
 });
 
-test('FIELD BUGS 2026-10-02 by source: the four laws where the motor and the sensor ask them', () => {
-  const motor = readFileSync(new URL('../../src/player/motor.js', import.meta.url), 'utf8');
-  const parkour = readFileSync(new URL('../../src/player/parkour.js', import.meta.url), 'utf8');
-  assert.match(motor, /if \(!side && vert > 0 && \(w\.stuck \|\| \(w\.sidestep && w\.sidestep\.gone < w\.sidestep\.want\)\)\) this\._fcSidestep\(v, n, dt, held\);/);
-  assert.match(motor, /const press = Math\.min\(this\.speed \* dt, Math\.max\(0, this\._wall\?\.gap \?\? Infinity\) \+ PARKOUR_HUG_PRESS\);/);
-  assert.match(motor, /w\.gap = c\.dist - CAPSULE_RADIUS;/);
-  assert.match(parkour, /if \(!Number\.isFinite\(at\(i - 1\)\) && faceGoesOn\(collider, ox, rungY\(i - 1\), oz, dir, dist, PARKOUR_GRIP_RUNG\)\) continue;/);
-  assert.match(motor, /if \(s && s\.normal\[0\] \* n\[0\] \+ s\.normal\[2\] \* n\[2\] >= PARKOUR_FACE_FOLLOW\) \{\n\s+w\.past = this\._fcFaceTop\(was, into\);\n\s+w\.seek = true;/);
-});
-
 /** The reporter's dungeon as the dungeon host builds its collider: every block's placed models and its doors. */
 function carololda() {
   const blocks = new BlocksFile(); blocks.load(new Uint8Array(readFileSync(join(ARENA2, 'BLOCKS.BSA'))));

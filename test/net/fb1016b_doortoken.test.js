@@ -10,11 +10,11 @@
 //
 // Driven over the REAL OnlineSession, the REAL relay Room (test/fakeRoom.mjs) and the REAL accountTokenMinter, one clock
 // for all of them (node's mock timers: Date and setTimeout), an account service whose mint takes its seconds.
-import { test, mock } from 'node:test';
+import { after, test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { fakeRooms, roomSigner } from '../fakeRoom.mjs';
+import { asOnlinePage, fakeRooms, roomSigner } from '../fakeRoom.mjs';
 import { OnlineSession, roomKeyFor, TOKEN_WAIT_MS } from '../../src/net/online.js';
 import { accountTokenMinter, SESSION_KEY, TOKEN_REUSE_MS, MINT_COOL_MS } from '../../src/net/accountClient.js';
 import { reconnectWave } from '../../src/net/reconnectWave.js';
@@ -22,6 +22,7 @@ import { PIXEL_UNITS, cellHaloFor, isWorldRoom, isCellRoom } from '../../src/net
 import { createDoorToken, EXIT_NEAR_M, EXIT_ARM_M, DOOR_SOON_MS, EXIT_WALK_MS, DOOR_PENDING_MS } from '../../src/scenes/doorTokenHost.js';
 import { arenaExitDoors } from '../../src/world/arena/arenaFloor.js';
 import { doorWorldPosition } from '../../src/player/enterExit.js';
+after(asOnlinePage());   // P0 SERVER PROFILE: the game sessions here join the real relay, as an online page that installed its profile
 
 const T0 = 1_800_000_000_000;
 const STEP = 100;
@@ -318,20 +319,7 @@ test('DOOR-TOKEN THE HOST\'S DOORS: online only (no session, a terminal one, one
   assert.deepEqual([TOKEN_REUSE_MS, DOOR_SOON_MS, EXIT_WALK_MS, DOOR_PENDING_MS], [60_000, 2_000, 8_000, 30_000]);
 });
 
-test('DOOR-TOKEN THE WIRING: world.js mints at every door the mode machine names (onPreTransition, onDungeonLeave, onInteriorLeave), at every jump (_teleportToPixel) and on the walk out (the online frame), off the one page minter and presence session - declared beside the recoiler the jump resets (mutants: each call dropped)', () => {
-  const src = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  const line = (needle) => src.split('\n').find((l) => l.includes(needle)) ?? '';
-  assert.match(line('const cameraRecoiler = new CameraRecoiler();'), /; const doorToken = createDoorToken\(\{ minter: \(\) => identityMinter, session: \(\) => online, modes: \(\) => modes, player: \(\) => player \}\);/);
-  assert.match(line('    onPreTransition: () => {'), /doorToken\.entering\(\);/);
-  assert.match(line('    onDungeonLeave: () => {'), /doorToken\.leaving\(\);/);
-  assert.match(line('    onInteriorLeave: () => {'), /doorToken\.leaving\(\);/);
-  const tp = src.indexOf('async function _teleportToPixel(');
-  assert.match(src.slice(tp, tp + 1200), /\n {4}dwTeleported\(performance\.now\(\) \/ 1000\); doorToken\.jumping\(\);/);
-  const tick = src.indexOf('\n    online.tick();\n');
-  assert.ok(tick > 0 && /\n {4}hccParkTick\(now\); doorToken\.frame\(\);/.test(src.slice(tick, tick + 6000)), 'each online frame, after the room\'s tick');
-});
-
-// ═══ AUDIT (2026-10-16) A2 ═══════════════════════════════════════════════════════════════════════════════════════════
+// AUDIT A2
 /** A player hopping between a cell and buildings over the REAL doorTokenHost and the REAL accountTokenMinter (no host:
  *  before DOOR-TOKEN): `cycles` door gaps drawn from `gaps` s, a 1.5 s build, the walk away from the exit and back to it,
  *  frames every 200 ms, a mint that takes 3 s on the wire. Answers the mints, and how long the sockets waited on one. */

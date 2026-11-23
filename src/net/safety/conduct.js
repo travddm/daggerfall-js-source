@@ -1,5 +1,5 @@
 // @ts-check
-// SAFE7 (2026-10-17, the chat safety plan, bible/11-Multiplayer/Chat-Safety-Arc.md section 8): THE CODE OF CONDUCT -
+// SAFE7: THE CODE OF CONDUCT -
 // the rules every player agrees to before their first line, and the rules the reviewer (server-account/src/modAi.js)
 // reads every line against. ONE TEXT FOR BOTH: the reviewer's prompt is built from these same lines in English, so a
 // player is never held to a rule they were not shown, and a rule changed here changes for both at once.
@@ -36,7 +36,7 @@ export const conductRules = () => [
   t('net.conduct.banter', 'Trash talk about the game is fine. Attacking people is not.'),
 ];
 /** What follows a broken rule, and who reads a report. */
-export const conductConsequence = () => t('net.conduct.consequence', 'Breaking these rules leads to a mute, then longer mutes, then a ban. Moderators read every report, and an automated reviewer helps them sort what comes in. /block hides a player from you; /report sends their lines to the moderators.');
+export const conductConsequence = () => t('net.conduct.consequence', 'Breaking these rules leads to a mute, then longer mutes, then a ban. Moderators read every report. /block hides a player from you; /report sends their lines to the moderators.');
 /** The button that agrees. */
 export const conductAgreeLabel = () => t('net.conduct.agree', 'I agree');
 /** The button that puts it off - the line stays unsent. */

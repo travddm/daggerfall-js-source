@@ -1,4 +1,4 @@
-// GRANT4, GRANT8, GRANT9 (2026-10-18, Mac: "Do all slices"; bible/11-Multiplayer/Spawn-Grants.md sections 14 and 16):
+// GRANT4, GRANT8, GRANT9:
 // THE RELAY'S SIDE OF THE LAST SLICES, over real Rooms (test/fakeRoom.mjs): a world room (a building's, a dungeon's) takes
 // its own lane's asks - no pixel, no open-country kind, no carry in or out; with `grantRoll` on an encounter's grant is
 // `encr`, its species its seed's; with `grantStrip` on the relay drops a record its grant does not stand.
@@ -78,7 +78,7 @@ test('GRANT8 THE SEED ROLLS THE SPECIES: with `grantRoll` on an encounter\'s ask
   assert.equal(validGrantOut(b.last()).gr.k, 'camp', 'an encounter alone');
 });
 
-test('GRANT9 THE RELAY STRIPS RECORDS: with `grantStrip` on a foes frame loses each record whose grant this cell does not hold as the sender\'s, a member past its grant, marks past its grant, and a live hostile record with no grant from a socket that stands on grants - a body, a standing foe\'s delta and an ally pass; a socket that never asked passes whole; off, nothing is read (mutants: the sender unchecked; the member\'s bound; the marks unchecked; an ally stripped)', async (t) => {
+test('GRANT9 THE RELAY STRIPS RECORDS: with `grantStrip` on a foes frame loses each record whose grant this cell does not hold as the sender\'s, a member past its grant, marks past its grant, and a live hostile record with no grant from a socket that stands on grants, and a companion or a summon with none - a body, a standing foe\'s delta, a crewman and a granted summon pass; a socket that never asked passes whole; off, nothing is read (mutants: the sender unchecked; the member\'s bound; the marks unchecked; a crewman stripped; a summon with no grant passed)', async (t) => {
   for (const strip of [false, true]) {
     const W = await world(t, strip ? { GRANT_STRIP: 'on' } : {});
     const C = W.room(CELL);
@@ -87,6 +87,8 @@ test('GRANT9 THE RELAY STRIPS RECORDS: with `grantStrip` on a foes frame loses e
     const g = validGrantOut(mac.last()).gr;
     await ann.ask({ k: 'mint', kind: 'enc', n: 1 });
     const other = validGrantOut(ann.last()).gr;
+    await mac.ask({ k: 'mint', kind: 'ally', n: 1 });
+    const ally = validGrantOut(mac.last()).gr;
     const plain = [0, 1].find((i) => !((g.e >>> i) & 1));
     const rec = (i, extra = {}) => ({ i, t: 0, f: [1, 2, 3], ...extra });
     const f = [
@@ -96,11 +98,13 @@ test('GRANT9 THE RELAY STRIPS RECORDS: with `grantStrip` on a foes frame loses e
       rec(5, { gr: [999, 0] }),   // none this cell holds
       rec(6, { gr: [g.g, plain], z: 1 }),   // an elite its grant never rolled
       rec(7),   // a live hostile with none
-      rec(8, { d: 1 }), { i: 9, f: [1, 2, 3] }, rec(10),   // a body, a delta, an ally (cp)
+      rec(8, { d: 1 }), { i: 9, f: [1, 2, 3] }, rec(10),   // a body, a delta, a crewman (cw)
+      rec(11),   // a summon (cp) with no grant
+      rec(12, { gr: [ally.g, 0] }),   // a summon (cp) on its ally grant
     ];
-    await C.raw(mac.ws, JSON.stringify({ t: 'foes', data: { n: 1, k: CELL, full: 1, f, cp: [10] } }));
+    await C.raw(mac.ws, JSON.stringify({ t: 'foes', data: { n: 1, k: CELL, full: 1, f, cw: [10], cp: [11, 12] } }));
     const heard = zed.foes().at(-1)?.data?.f.map((r) => r.i);
-    assert.deepEqual(heard, strip ? [1, 2, 8, 9, 10] : f.map((r) => r.i), strip ? 'what the grants stand, and what needs none' : 'off: the frame as it was sent');
+    assert.deepEqual(heard, strip ? [1, 2, 8, 9, 10, 12] : f.map((r) => r.i), strip ? 'what the grants stand, and what needs none' : 'off: the frame as it was sent');
     // a socket that never asked passes whole - an older build, or one whose law is off
     await C.raw(zed.ws, JSON.stringify({ t: 'foes', data: { n: 1, k: CELL, full: 1, f: [rec(1), rec(2)] } }));
     assert.deepEqual(mac.foes().at(-1)?.data?.f.map((r) => r.i), [1, 2]);

@@ -1,12 +1,11 @@
 // RPT1026-FIGHTS RETIRED-BLOW (a private report, 2026-10-21: two fighters cleared the Remnant far faster than one
 // could): A BLOW IS A SIGHTING. A fighter the beat has not seen for ABSENT_RETIRE_MS has its share taken out of the boss
 // (gateBrain.js retireShare), and no blow arm asked whether the striker was one of them: a level-60 that stopped posing
-// beside a level-1 struck a Remnant holding the level-1's share alone, its blows whole (68,250 -> 34,125 with two
+// beside a level-1 struck a Remnant holding the level-1's share alone, its blows whole (147,000 -> 73,500 with two
 // level-60s, 3,150 with a level-1, and the "absent" one's next blow 780). And the relay judged that blow from the socket's
 // last pose however old - the census drops a pose older than SD_POSE_FRESH_MS, the blow path did not. Now the relay drops
-// a blow from a stale pose (the Hour's and the Ketch's), and a blow that reaches the purse brings its striker's share back
-// first, at the fraction the boss stands at - the Remnant, its Echoes and Hearts, the gate's Warden, the Ketch's Tonal
-// Warden and its forks. tools/mutants/rpt1026_fights.json.
+// a blow from a stale pose (the Hour's), and a blow that reaches the purse brings its striker's share back
+// first, at the fraction the boss stands at - the Remnant, its Echoes and Hearts, and the gate's Warden. tools/mutants/rpt1026_fights.json.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,8 +20,6 @@ import {
   SD_OPENING_MS, SD_POSE_FRESH_MS, SD_TTK_S, SD_SHARE_X, SD_PHASE_AT, SD_BREAK_MS,
 } from '../../../src/net/superDungeon/sdRemnant.js';
 import { ABSENT_RETIRE_MS, HIT_KINDS, HIT_CAP_X, dpsRef, newFight, joinFight, stepBrain, applyHit, BRAIN_TICK_MS } from '../../../src/net/gate/gateBrain.js';
-import { newWardenFight, joinWarden, stepWarden, applyWardenHit, applyForkHit, forksOpen, KW_TTK_S, KW_SHARE_X } from '../../../src/net/ketch/ketchWarden.js';
-import { KT_BRIDGE } from '../../../src/net/ketch/ketchDeck.js';
 import { sdTestKey, sdOneParty } from './sdParty.mjs';   // SD-PARTY: the rig's one party's Hour
 
 sdOneParty();
@@ -42,22 +39,23 @@ function beat(f, from, until, bodies, rng = seeded(5)) {
 
 // ── the law: the Remnant ────────────────────────────────────────────
 
-test('RPT1026-FIGHTS RETIRED-BLOW THE REPORT\'S NUMBERS: two level-60s bring 68,250; the one the beat has not seen for ABSENT_RETIRE_MS has its share out (34,125) - and its next blow brings it back, at the fraction the Remnant stands at, before it lands (it landed 780 on the other\'s share alone); beside a level-1 partner the share left is 3,150, and the level-60\'s blow restores 37,275 (mutants: no sighting; a sighting that never restores)', () => {
-  assert.equal(share(60), 34_125); assert.equal(share(1), 3_150);
+// PIN MOVED: B6 (dpsRef(60) 65 -> 140: a level-60 share is 73,500)
+test('RPT1026-FIGHTS RETIRED-BLOW THE REPORT\'S NUMBERS: two level-60s bring 147,000; the one the beat has not seen for ABSENT_RETIRE_MS has its share out (73,500) - and its next blow brings it back, at the fraction the Remnant stands at, before it lands (it landed 780 on the other\'s share alone); beside a level-1 partner the share left is 3,150, and the level-60\'s blow restores 76,650 (mutants: no sighting; a sighting that never restores)', () => {
+  assert.equal(share(60), 73_500); assert.equal(share(1), 3_150);
   const f = newRemnantFight(4, 1, T0);
   joinRemnant(f, 'a', 'A', 60, T0); joinRemnant(f, 'b', 'B', 60, T0);
-  assert.equal(f.max, 68_250);
+  assert.equal(f.max, 147_000);
   let t = beat(f, T0, T0 + SD_OPENING_MS + ABSENT_RETIRE_MS + 1000, [at('b')]);
   assert.equal(f.players.a.retired, true, 'the still one, retired');
-  assert.equal(f.max, 34_125, 'its share out');
+  assert.equal(f.max, 73_500, 'its share out');
   const frac = f.hp / f.max;
   t += 10;
-  const got = applyRemnantHit(f, 'a', 780, HIT_KINDS.Spell, { x: 0, z: -10 }, t);
+  const got = applyRemnantHit(f, 'a', 2000, HIT_KINDS.Spell, { x: 0, z: -10 }, t);
   assert.equal(got, HIT_CAP_X * dpsRef(60), 'the blow lands, capped as ever');
   assert.equal(f.players.a.retired, false, 'seen by its blow');
   assert.equal(f.players.a.seenAt, t);
-  assert.equal(f.max, 68_250, 'its share back in the whole');
-  assert.ok(near(f.hp, frac * 68_250 - got), 'at the fraction it stood at - a return never heals it - and the blow off that');
+  assert.equal(f.max, 147_000, 'its share back in the whole');
+  assert.ok(near(f.hp, frac * 147_000 - got), 'at the fraction it stood at - a return never heals it - and the blow off that');
   // the report's second case: a level-1 partner
   const g = newRemnantFight(4, 2, T0);
   joinRemnant(g, 'hi', 'Hi', 60, T0); joinRemnant(g, 'lo', 'Lo', 1, T0);
@@ -65,7 +63,7 @@ test('RPT1026-FIGHTS RETIRED-BLOW THE REPORT\'S NUMBERS: two level-60s bring 68,
   assert.equal(g.max, 3_150, 'the level-1\'s share alone');
   u += 10;
   assert.ok(applyRemnantHit(g, 'hi', 780, HIT_KINDS.Spell, { x: 0, z: -10 }, u) > 0);
-  assert.equal(g.max, 37_275, 'the level-60\'s share back before its blow');
+  assert.equal(g.max, 76_650, 'the level-60\'s share back before its blow');
   assert.ok(g.hp / g.max > 0.95, `one blow is no longer a quarter of the fight (${(g.hp / g.max).toFixed(3)})`);
   // a blow refused before the purse (off the arena) sees nobody: the share stays out
   const h = newRemnantFight(4, 3, T0);
@@ -108,7 +106,7 @@ test('RPT1026-FIGHTS RETIRED-BLOW THE DRAGON BREAK AND THE RESET: a retired figh
   assert.equal(g.max, share(60) + share(1));
 });
 
-// ── the law: the gate's Warden and the Ketch's ────────────────────────
+// ── the law: the gate's Warden ────────────────────────
 
 test('RPT1026-FIGHTS RETIRED-BLOW THE GATE\'S WARDEN: a fighter whose share was retired (no body in the court ABSENT_RETIRE_MS) and whose blow comes before the beat sees it again strikes with its share back in his health, at the fraction he stands at (mutants: no sighting at the gate)', () => {
   const f = newFight(7, T0, T0 + 3_600_000, 'ruhn');
@@ -124,36 +122,6 @@ test('RPT1026-FIGHTS RETIRED-BLOW THE GATE\'S WARDEN: a fighter whose share was 
   assert.equal(f.players.a.retired, false);
   assert.ok(near(f.max, both), 'its share back');
   assert.ok(near(f.hp, frac * both - got, 1e-3), 'at the fraction he stood at');
-});
-
-test('RPT1026-FIGHTS RETIRED-BLOW THE KETCH\'S TONAL WARDEN: a member gone from the bridge ABSENT_RETIRE_MS has its share out, and its blow on the Warden - or on a tuning-fork of the Keel-Song - brings it back first (mutants: no sighting on the Warden; nor on a fork)', () => {
-  const rng = seeded(11);
-  const bridge = (sub) => ({ sub, x: KT_BRIDGE.x, z: KT_BRIDGE.z - 10, y: KT_BRIDGE.y, dead: false });
-  const pose = { x: KT_BRIDGE.x, y: KT_BRIDGE.y, z: KT_BRIDGE.z - 10 };
-  const spend = (d, left) => Math.min(d, left);
-  const ws = (lv) => KW_TTK_S * dpsRef(lv) * KW_SHARE_X;
-  const f = newWardenFight('kt:test', 1, T0);
-  joinWarden(f, 'a', 'A', 60, T0); joinWarden(f, 'b', 'B', 1, T0);
-  let t = T0;
-  for (; t <= T0 + ABSENT_RETIRE_MS + 7000; t += 250) stepWarden(f, t, [bridge('b')], rng);
-  assert.equal(f.players.a.retired, true);
-  assert.ok(near(f.max, ws(1)));
-  assert.ok(applyWardenHit(f, 'a', 50, HIT_KINDS.Spell, pose, t, spend) > 0);
-  assert.equal(f.players.a.retired, false);
-  assert.ok(near(f.max, ws(60) + ws(1)), 'its share back on the Warden');
-  // the Last Note's song, as the beat sings it: its forks minted (raiseForks)
-  const g = newWardenFight('kt:test', 2, T0);
-  joinWarden(g, 'a', 'A', 60, T0); joinWarden(g, 'b', 'B', 1, T0);
-  let u = T0;
-  for (; u <= T0 + ABSENT_RETIRE_MS + 7000; u += 250) stepWarden(g, u, [bridge('b')], rng);
-  assert.equal(g.players.a.retired, true);
-  Object.assign(g, { phase: 3, ward: false, hp: 0.3 * g.max, outUntil: 0, stunUntil: 0, songAt: u, secAt: u + 600_000, fk: null });
-  Object.assign(g.wd, { atk: null, nextAt: 0, mv: null });
-  stepWarden(g, u, [bridge('b')], rng);
-  assert.ok(g.fk && forksOpen(g, u + 10), 'the song winds up, its forks standing');
-  applyForkHit(g, 'a', 0, 5, HIT_KINDS.Spell, pose, u + 10, spend);
-  assert.equal(g.players.a.retired, false, 'a fork\'s striker stands on the bridge too');
-  assert.ok(near(g.max, ws(60) + ws(1)));
 });
 
 // ── the relay: a blow from a stale pose ───────────────────────────────
@@ -222,8 +190,3 @@ test('RPT1026-FIGHTS RETIRED-BLOW AT THE RELAY: a fighter that stops posing is a
   });
 });
 
-test('RPT1026-FIGHTS RETIRED-BLOW THE KETCH\'S RELAY: a word aboard is judged from a pose no older than KT_POSE_FRESH_MS, the census\'s own law (mutants: the word\'s pose never aged)', () => {
-  const RELAY = readFileSync(new URL('../../../server/src/index.js', import.meta.url), 'utf8');
-  assert.match(RELAY, /const pose = a\.pose && now - \(a\.pAt \?\? a\.since \?\? 0\) <= KT_POSE_FRESH_MS \? this\._ktPoseOf\(a\.pose\) : null;/);
-  assert.match(RELAY, /if \(!b\.id \|\| !b\.sub \|\| !b\.pose \|\| !V\.players\[b\.sub\] \|\| now - \(b\.pAt \?\? b\.since \?\? 0\) > KT_POSE_FRESH_MS\) continue;/, 'the census\'s, the same age');
-});

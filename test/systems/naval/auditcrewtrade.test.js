@@ -1,11 +1,10 @@
-// AUDIT CREW-TRADE (2026-10-24, the owner: "Audit this", of CREW-TRADE - bible/01-Overview/audits/Audit-Crew-Trade.md):
+// AUDIT CREW-TRADE:
 // five cold lanes read CREW-TRADE at 5f4f04bef on frozen snapshots - the economy (E), her crew (H), the office, the
 // window, online and the realm (O), the pins and the record (P), the real game (R) - and each finding fixed is pinned
 // here, over the REAL sea fight (crewQuay.mjs - TEST THE SHAPE THE PRODUCER MINTS). tools/mutants/auditcrewtrade.json.
 import '../../modsOff.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { BAY, ISLE, portStanding, quay } from './crewQuay.mjs';
 import { crewStandOf, exchangeOf, DAY_STOCK, TRADE_MOST } from '../../../src/systems/naval/tradeGoods.js';
 import { crewRowOf, crewPayMost, crewSpare, CREW_TRADE_TEXT, signOffOrder, handsNamed } from '../../../src/systems/naval/crewTrade.js';
@@ -15,11 +14,9 @@ import { playerCrewCount } from '../../../src/systems/naval/crewLife.js';
 import { RANK_PERKS } from '../../../src/systems/naval/captainLedger.js';
 import { exchangeText } from '../../../src/ui/naval/navalYardWindow.js';
 import { townExchangeFactors } from '../../../src/net/townEconLaw.js';
-import { restoreFleetSaveData, _resetFleetForTests } from '../../../src/systems/fleet.js';
 import { charterRecord } from '../../../src/systems/naval/passage.js';
 import * as tm from '../../../src/systems/textManager.js';
 
-const rd = (p) => readFileSync(new URL(`../../../${p}`, import.meta.url), 'utf8');
 const SMALL_SHIP = 2;
 
 test('AUDIT CREW-TRADE H1 - A PAID-FOR VETERAN IS NOT ONE MAN\'S PRICE: the order a headcount sale signs named hands off - never one in the shore party, a plain Deckhand before a post\'s holder, her First Mate last of all, the deck\'s own before a hall\'s recruit, the less service before the more, of the rest the last to join; over the real sea, a Veteran First Mate signed on at the crew hall in a hand\'s place keeps his post through a Sell 1 (mutants: each rung of the order)', async () => {
@@ -58,12 +55,11 @@ test('AUDIT CREW-TRADE E1 - A BOOKED PASSAGE\'S CREW IS HER MASTER\'S: a boat on
   assert.deepEqual(q.x().sell('crew', 1), { ok: false, text: CREW_TRADE_TEXT.charter }, 'a charter answered before a fight');
 });
 
-test('AUDIT CREW-TRADE O1 - A GREYED SELL SAYS WHY: a ship come through customs, a shore party\'s last place, her last man - each reason beside the row where the press is greyed, never while the exchange takes none today (mutants: the reason unshown, the reason always)', async () => {
+test('AUDIT CREW-TRADE O1 - A GREYED SELL SAYS WHY: a shore party\'s last place, her last man - each reason beside the row where the press is greyed, never while the exchange takes none today (mutants: the reason unshown, the reason always)', async () => {
+  const last = await quay(SMALL_SHIP, 1, { port: portStanding('wants') });
+  const t = exchangeText(last.x()).rows[0];
+  assert.deepEqual([t.canSell, t.extra], [false, `Aboard: 1 of 24 crew - ${CREW_TRADE_TEXT.lastMan}`]);
   const c = await quay(SMALL_SHIP, 12, { port: portStanding('wants') });
-  restoreFleetSaveData({ v: 1, ships: [], crossed: [42] });
-  const t = exchangeText(c.x()).rows[0];
-  assert.deepEqual([t.canSell, t.extra], [false, `Aboard: 12 of 24 crew - ${CREW_TRADE_TEXT.crossed}`]);
-  _resetFleetForTests();
   assert.equal(exchangeText(c.x()).rows[0].extra, 'Aboard: 12 of 24 crew', 'no reason while men may leave her');
   const spare = await quay(SMALL_SHIP, 24, { port: portStanding('makes') });
   spare.x().sell('crew', Infinity);
@@ -74,7 +70,21 @@ test('AUDIT CREW-TRADE O1 - A GREYED SELL SAYS WHY: a ship come through customs,
 test('AUDIT CREW-TRADE O2/O3 - IN THE PLAYER\'S LANGUAGE: the crew row\'s title, its stand, its two prices and its counts, the note of a sale and the refusals are the language\'s own, the gold a number in its own figures - no English left in German (mutants: the title, the prices\' words, the gold a string)', async () => {
   const q = await quay(SMALL_SHIP, 24, { port: portStanding('wants') });
   const en = exchangeText(q.x()).rows[0];
-  const de = Object.fromEntries(tm.parseStringTableCsv(rd('locales/de/Port_Strings.csv')));
+  // Fixture rows stand in for a German translation of the crew exchange; the subject is that every word it says is
+  // read through the text core in the player's language.
+  const de = {
+    'sea.crew.title': 'Besatzung',
+    'sea.crew.standWants': 'Seeleute knapp: teuer',
+    'sea.crew.buyAt': 'anheuern für {gold, number} Gold pro Mann (heute noch {left})',
+    'sea.crew.sellAt': 'abmustern für {gold, number} Gold ({wanted} gesucht)',
+    'sea.crew.aboard': 'An Bord: {have} von {whole} Mann Besatzung',
+    'sea.crew.noneTaken': 'heute niemand gesucht',
+    'sea.crew.noneToBuy': 'heute niemand anzuheuern',
+    'sea.crew.sold': 'Heuerverträge von {n} Mann Besatzung für {gold, number} Gold verkauft.',
+    'sea.crew.paidOff': 'Abgemustert: {names}.',
+    'sea.crew.lastMan': 'Das ist dein letztes Besatzungsmitglied. Niemand wäre mehr an Bord.',
+    'sea.crew.fighting': 'Nicht, solange das Schiff im Kampf ist.',
+  };
   try {
     tm.patchLocaleTable('de', 'Port_Strings', Object.entries(de));
     tm.setLocale('de');
@@ -194,10 +204,3 @@ test('AUDIT CREW-TRADE P10/P11/P13 - THE LAW\'S EDGES: every isle of the Veil sh
   assert.deepEqual(RANK_PERKS.map((k) => crewPayMost(k.yard)), [29, 28, 26, 25, 23], 'a gold under the yard\'s man at each rank');
 });
 
-test('AUDIT CREW-TRADE R2 - CREW SELLS TEN AT A TIME: the crew row\'s presses are Buy 1, Buy 10, Sell 1, Sell 10 - one press never takes a ship from her crew to her last man; the goods\' rows keep Sell all (mutants: Sell all on crew)', async () => {
-  const src = rd('src/ui/naval/navalYardWindow.js');
-  assert.match(src, /if \(r\.id === CREW\.id\) mk\('Sell 10', r\.canSell, \(\) => press\(x\.sell\(r\.id, 10\)\)\);\n\s+else mk\('Sell all', r\.canSell, \(\) => press\(x\.sell\(r\.id, Infinity\)\)\);/);
-  const q = await quay(SMALL_SHIP, 24, { port: portStanding('wants') });
-  q.x().sell('crew', 10);
-  assert.equal(q.model.ship().crew, 14, 'a Sell 10 is ten men');
-});

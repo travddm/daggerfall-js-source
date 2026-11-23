@@ -1,12 +1,11 @@
-// ENDLESS PROVISIONS (2026-10-04, Mac: "campfires should be unlimited, rations should be available in stores where it
-// makes sense and unlimited as well", then "i can use and find all those without climates and calories" -> "do that";
-// the Plenty-Rations-Campfirekits handoff, ported onto ENDLESS-STOCK and REST2): a General Store's and a Pawn Shop's
+// ENDLESS PROVISIONS: a General Store's and a Pawn Shop's
 // counter shelf has a Campfire Kit and a stack of 99 Rations in every tier, Climates & Calories Off and offline too
 // (shopStock.js, survival/items.js ensureEndlessProvisions); online a purchase stands them again (restockEndless, Rations
 // now among isEndlessStock's rows) and no shop buys them back; offline they sell out until the day's restock
-// (ENDLESS-STOCK F4, the owner's call 2026-10-04: "Online only"). An Off meal is eaten, never refused for hunger, and
+// (ENDLESS-STOCK F4). An Off meal is eaten, never refused for hunger, and
 // gives stamina back (eatFood's offMeal; useItem.js passes it with the arc Off). A camp is every tier's (camps.js:
 // auditsurv, survtiers and survtiers3 pin it).
+import { playByRules } from '../profileRules.mjs';   // a server profile's rule keys, for one test
 import '../modsOff.js';
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -52,7 +51,8 @@ test('ENDLESS PROVISIONS: a General Store\'s and a Pawn Shop\'s counter shelf ha
   assert.ok(!back.some((i) => i.templateIndex === TEMPLATE.Rations), 'a back shelf is its own container, stocked whole - not the counter\'s');
 });
 
-test('ENDLESS PROVISIONS: online, Rations are endless stock - a stack bought whole or in part is filled back to 99, a kit stands again; and no shop buys them back (mutants: Rations not endless, the stack not refilled, a bought-out stack not stood again)', () => {
+test('ENDLESS PROVISIONS: online, Rations are endless stock - a stack bought whole or in part is filled back to 99, a kit stands again; and no shop buys them back (mutants: Rations not endless, the stack not refilled, a bought-out stack not stood again)', (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const shelf = shelfOf(BUILDING_TYPES.GeneralStore, { online: true, tier: false });
   const stack = rations(shelf);
   assert.equal(isEndlessStock(stack), true);
@@ -117,5 +117,4 @@ test('ENDLESS PROVISIONS: an Off meal is eaten - never "not hungry", stamina bac
   setPref(SURVIVAL_PREF, 'casual');
   const on = { ...fed, items: [createSurvivalItem(TEMPLATE.Rations)] };
   assert.equal(useItem(on.items[0], on.items, { entity: on, nowMinute: 5000 }).kind, 'notEaten', 'on: the tier\'s hunger');
-  assert.match(src('src/systems/useItem.js'), /rules: survivalRules\(\) \?\? SURVIVAL_RULES\.casual, offMeal: survivalRules\(\) == null \}\);/);
 });

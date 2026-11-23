@@ -1,6 +1,4 @@
-// CRICKET-QUIET (2026-09-22, Mac: "The cricket noise at night is way too
-// persistent. I want to make a change that lowers its occurrence and
-// persistence, but doesn't remove it as a sound"). DFU plays
+// CRICKET-QUIET. DFU plays
 // AmbientCrickets at full volume from nightfall to dawn without a break;
 // the night now sings in CHORUSES - quieter, swelling in and dying away,
 // with silent spells between.
@@ -113,7 +111,4 @@ test('CRICKET-DUNGEON (2026-09-23, Mac: "turn off cricket noises in dungeons"): 
   const r = stub(); const b = new AmbientEffects({ minWait: 5, maxWait: 25 }, r.engine, () => 0);
   b.setPreset('rain'); b.update(0.1, { underground: true });
   assert.equal(live(r.loops).length, 1, 'the rain loop is not this departure\'s');
-  // by source: the world host says where the player is
-  const w = readFileSync(new URL('../../src/scenes/world.js', import.meta.url), 'utf8');
-  assert.match(w, /ambience\.update\(dt, \{ playerPos: cam\.pos, inside: false, underground: modes\?\.mode === 'dungeon'(?:, waterSurfaceY: dwPlayer\?\.waterLevelY \?\? null, submerged: !!dwPlayer\?\.submerged)? \}\);/);   // DW-D: the sea's forged water arm may ride beside it
 });

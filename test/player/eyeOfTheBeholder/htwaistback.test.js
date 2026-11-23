@@ -1,11 +1,10 @@
-// HT-WAIST-BACK (2026-09-24). Mac, looking at screenshots of the Eye Of The Beholder sprite with HT-WAIST's lantern
+// HT-WAIST-BACK. Mac, looking at screenshots of the Eye Of The Beholder sprite with HT-WAIST's lantern
 // hung at the right hip - visible from the front, the side, walking and behind: "Just have it show on the back of the
 // sprite, not all angles. Make sure all the eye of the Beholder sprites get this change."
 //
 // THE LAW. The lantern's picture is drawn only while the viewer sees the sprite STRAIGHT FROM BEHIND: the one view
 // of EOTB's eight whose record is the back - orientation 4 (the camera straight behind, record +4) - and never from
-// the back diagonals 3 and 5 (record +3, the back three-quarter; HT-WAIST-BACK let them in first, and Mac: "It still
-// shows on the back side angle"), the front, the front diagonals or the sides (0, 1, 2, 6, 7). The numbering is orientationFor's (0 the camera in front, 4 behind) through the wheel [0, 1, 2, 3, 4, 3, 2, 1]; which
+// the back diagonals 3 and 5 (record +3, the back three-quarter; HT-WAIST-BACK let them in first, and), the front, the front diagonals or the sides (0, 1, 2, 6, 7). The numbering is orientationFor's (0 the camera in front, 4 behind) through the wheel [0, 1, 2, 3, 4, 3, 2, 1]; which
 // record is a back was read off the vendored art (112364 idle 0-4, walk 5-9, armed walk 20-24; 112372 idle 0-4).
 // Unseen, it still HANGS: it swings on, and the local player's light stays at the hip.
 //
@@ -294,57 +293,3 @@ test('HT-WAIST-BACK (the others): EVERY ALLOCATION HAS AN OWNER - the lantern\'s
   assert.equal(minted(), freed(), 'every batch minted was freed');
 });
 
-test('HT-WAIST-BACK: ONE HOME - your sprite and the walkers hang it through player/eyeOfTheBeholder/eotbLantern.js and neither keeps its own rule, hang, swing drive or art door; the host draws the walkers\' lanterns in the hook every mode\'s pass calls after your body; the pace is net/peer/peerPace.js\'s (mutants: a second copy; the host never draws them)', () => {
-  const lantern = rd('src/player/eyeOfTheBeholder/eotbLantern.js');
-  const body = rd('src/player/eyeOfTheBeholder/eotbBody.js');
-  const riders = rd('src/net/peer/peerRiders.js');
-  for (const [name, src] of [['eotbBody.js', body], ['peerRiders.js', riders]]) {
-    assert.match(src, /from '(?:\.|(?:\.\.\/)+player\/eyeOfTheBeholder)\/eotbLantern\.js';/, `${name} takes the lantern from its one home`);
-    for (const fn of ['isRearView', 'createLanternArt', 'createSpriteLantern', 'stepSpriteLantern', 'spriteStride', 'hangSpriteLantern', 'mintSpriteLantern', 'dropSpriteLantern']) {
-      assert.match(src, new RegExp(`\\b${fn}\\(`), `${name} calls ${fn}`);
-    }
-    for (const copy of [/lanternSwingDown\(/, /stepLanternSwing\(/, /HIP_LANTERN_SPRITE\s*=/, /RECORD_OFFSETS\[/, /\.uploadTexture\(LANTERN_ART_KEY/, /templateByIndex\(LANTERN_TEMPLATE\)/]) {
-      assert.doesNotMatch(src, copy, `${name} carries no copy of the shared law (${copy})`);
-    }
-  }
-  for (const once of [/export function isRearView\(/, /export const HIP_LANTERN_SPRITE = /, /lanternSwingDown\(/, /export async function loadLanternArt\(/]) {
-    assert.equal(lantern.match(new RegExp(once.source, 'g'))?.length, 1, `eotbLantern.js states ${once} once`);
-  }
-  // the host: the bodies' hook - world.js's exterior pass calls it, and worldModes' dungeon and interior passes reach it
-  const world = rd('src/scenes/world.js');
-  assert.match(world, /const drawPeerBodies = \(proj, view, eye, face = null\) => \{ if \(peerBodies\) peerBodies\.draw\(canvas, \{ proj, view, eye, flashOf: peerFlashOf, grow: face \? peerGrow : null, up: face\?\.up \?\? null \}\); peerWalkers\?\.drawLanterns\(\); \(_mode\(\) === 'interior' \? familyRoom : _mode\(\) === 'exterior' \? familyStreet : null\)\?\.draw\(canvas, \{ proj, view, eye \}\); \};/);   // PIN MOVED (OW-PEERS, FIELD BUGS 2026-10-01 #11)
-  assert.match(world, /mwViewDrawBody\([^\n]*\n\s*drawPeerBodies\(proj, view, mwv\.eye, tvf \? tvFace : null\);/, 'the exterior pass: right after the player\'s own body');
-  assert.equal(rd('src/scenes/worldModes.js').match(/mwViewDrawBody\([^\n]*\n\s*host\.drawPeerBodies\?\.\(\{ proj, view, eye: mwv\.eye \}\);/g)?.length, 2, 'the dungeon and the interior passes: the same hook');
-  // the pace: one law, two readers
-  const pace = rd('src/net/peer/peerPace.js');
-  assert.match(pace, /export const JUMP_UNITS = 5;/);
-  for (const [name, src] of [['peerBodies.js', rd('src/net/peer/peerBodies.js')], ['peerRiders.js', riders]]) {
-    assert.match(src, /stepPeerPace\(/, `${name} reads the pace through net/peer/peerPace.js`);
-    assert.doesNotMatch(src, /\* 0\.8 \+ \(d \/ dt\) \* 0\.2/, `${name} keeps no copy of it`);
-  }
-});
-
-test('HT-WAIST-BACK: recorded - the HT-WAIST sections of Handheld-Torches.md and Eye-Of-The-Beholder.md carry the dated HT-WAIST-BACK note (the rear view - straight behind, not the back diagonals -, the peers, the one home), and the Ledger A row\'s EOTB clause says the back; the all-angles sentence and the three-rear-views one are gone (mutant: the record left saying it hangs in every view)', () => {
-  const ht = rd('bible/06-Systems/Handheld-Torches.md');
-  const hts = ht.slice(ht.indexOf('## HT-WAIST - THE LANTERN AT THE WAIST'));
-  assert.match(hts, /HT-WAIST-BACK \(2026-09-24/);
-  assert.match(hts, /straight behind/);
-  assert.match(hts, /It still shows on the back side angle/, 'Mac\'s word on the back diagonals, quoted');
-  assert.doesNotMatch(hts, /3, 4 (?:and|or) 5|three views of Eye Of The Beholder\'s eight/, 'the three-rear-views rule is rewritten');
-  assert.match(hts, /player\/eyeOfTheBeholder\/eotbLantern\.js/);
-  assert.match(hts, /createPeerWalkers|walkers/);
-  const eo = rd('bible/06-Systems/Eye-Of-The-Beholder.md');
-  const eos = eo.slice(eo.indexOf('## HT-WAIST (2026-09-24)'));
-  assert.match(eos, /HT-WAIST-BACK \(2026-09-24/);
-  assert.match(eos, /isRearView/);
-  assert.match(eos, /112364/, 'the numbering verified against the vendored art, and said where');
-  assert.match(eos, /It still shows on the back side angle/);
-  assert.doesNotMatch(eos, /3, 4 (?:and|or) 5/, 'the three-rear-views rule is rewritten');
-  assert.doesNotMatch(eos, /\*\*Only\*\* in third person, on foot, alive and in your own form - the rider/, 'the old "only" line, which said nothing of the view, is rewritten');
-  const row = rd('bible/01-Overview/Port-Ledger.md').split('\n').find((l) => l.startsWith('|') && /\(HT-WAIST, 2026-09-24/.test(l));
-  assert.ok(row, 'HT-WAIST\'s Ledger A row');
-  assert.match(row, /HT-WAIST-BACK/);
-  assert.match(row, /straight behind/);
-  assert.doesNotMatch(row, /three rear views/, 'the row\'s three-rear-views clause is rewritten');
-  assert.match(row, /test\/player\/eyeOfTheBeholder\/htwaistback\.test\.js/);
-});

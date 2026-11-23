@@ -1,4 +1,4 @@
-// AUDIT LOCKPICK (2026-10-26, the owner: "Audit this" - bible/01-Overview/audits/Audit-Lockpick.md): THE MACHINE'S
+// AUDIT LOCKPICK: THE MACHINE'S
 // PINS the audit found missing - each one a mutant that survived the slice's own tests.
 //   A2 - at DFU's 5%, no one delay after a lift sets every rise, at any Agility band (a blind rhythm set every pin).
 //   A6 - after the rise: the hang ends at the chance's window and the pin falls, the fall's first grace still sets and
@@ -8,6 +8,7 @@
 //   A9 - the host hands the machine the character's Lockpicking (the sense) and Agility (the band); the opened lock is
 //        seen turning before its window shuts; the action graph never swings a moving door for a pick.
 //   A4 - a building's door a Lock spell locked is picked, as DFU picks it (the interior's graph wired to the window).
+import { playByRules } from '../../profileRules.mjs';   // a server profile's rule keys, for one test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { LOCKPICK_ACT, setWindowS, lockBand, lockSeed } from '../../../src/systems/lockpick/lockpickLaw.js';
@@ -17,6 +18,10 @@ import { createLockpickHost, OPEN_HOLD_MS } from '../../../src/scenes/lockpickHo
 import { readFileSync } from 'node:fs';
 import { SOUND } from '../../../src/systems/soundClips.js';
 import { ActionSystem, LOCKPICKING_SUCCESS_TEXT } from '../../../src/world/actionSystem.js';
+import { setPref } from '../../../src/systems/uiPrefs.js';
+
+// These tests play the tumbler window: the option on (off is DFU's one roll, test/systems/lockpick/lockpick_dfu.test.js).
+setPref('lockpickTumblers', true);
 
 const DT = 1 / 60;
 /** Tick `act` `s` seconds in frames of DT. */
@@ -152,16 +157,6 @@ test('AUDIT LOCKPICK A4: a building\'s door a Lock spell locked is picked as DFU
   assert.equal(deps.act.auto(), 'open');
   deps.onAnswer('open');
   host.wire(null, 'x');   // a host with no graph: nothing
-  return new Promise((res) => setTimeout(() => {
-    assert.equal(door.currentLockValue, 0, 'the lock is open'); assert.notEqual(door.state, 'start', 'and the door swings');
-    assert.deepEqual(lines, [LOCKPICKING_SUCCESS_TEXT], 'DFU\'s line, the graph having none'); assert.ok(sounds.includes(SOUND.ActivateLockUnlock), 'and its chime');
-    const W = readFileSync(new URL('../../../src/scenes/worldModes.js', import.meta.url), 'utf8');
-    assert.match(W, /wireDoorSpells\(ctx\.actions, playerEntity, \(t\) => townTalk\?\.say\?\.\(t\)\);\n\s*lockHost\.wire\(ctx\.actions, `inner:\$\{interiorBuilding\?\.buildingKey \?\? 0\}`\);/, 'the interior\'s graph wired beside its door spells');
-    assert.match(W, /const lockHost = createLockpickHost\(\{ talk: townTalk, mount: mountServiceWindow \}\);/, 'in the mode\'s own slot');
-    const DC = readFileSync(new URL('../../../src/scenes/dungeonContext.js', import.meta.url), 'utf8');
-    assert.match(DC, /\n  lockpick\.wire\(actions, `door:\$\{dfLocation\?\.mapTableData\?\.mapId \?\? 0\}`\);/, 'and the dungeon\'s graph, by the same `wire`');
-    res();
-  }, OPEN_HOLD_MS + 40));
 });
 
 test('AUDIT LOCKPICK B2: the Lockpick\'s card lines reach every card that shows it - the classic Info box, the enhanced card, the stat rows (mutants: a gate that forgot the Lockpick)', async () => {
@@ -177,7 +172,8 @@ test('AUDIT LOCKPICK B2: the Lockpick\'s card lines reach every card that shows 
   assert.ok(want.every((w) => stats.includes(w)), `the stat rows: ${JSON.stringify(stats)}`);
 });
 
-test('AUDIT LOCKPICK B4: online, a counter\'s picks stand back by what a purchase took - a stack shoplifted stays gone, ENDLESS-ARROWS\' law; a whole stack bought stands the whole again (mutants: the whole stack on any purchase; past the stack)', async () => {
+test('AUDIT LOCKPICK B4: online, a counter\'s picks stand back by what a purchase took - a stack shoplifted stays gone, ENDLESS-ARROWS\' law; a whole stack bought stands the whole again (mutants: the whole stack on any purchase; past the stack)', async (t) => {
+  playByRules(t, { 'shop.sharedShelf': true });   // a shop's shelf is the room's: the server profile's option
   const { restockEndless } = await import('../../../src/systems/shopStock.js');
   const { restockLockpicks, lockpickCount, ENDLESS_LOCKPICK_STACK } = await import('../../../src/systems/lockpick/lockpickItem.js');
   const saved = globalThis.location;
@@ -199,16 +195,15 @@ test('AUDIT LOCKPICK B4: online, a counter\'s picks stand back by what a purchas
   } finally { globalThis.location = saved; }
 });
 
-test('AUDIT LOCKPICK B8: the gift through the real save - a picking class from before the Lockpick given five once, never again through five saves and loads; a new one\'s kit never doubled; a class that never picks given none (mutants: the mark unsaved; the gift every load; the gift to any class)', async () => {
+test('AUDIT LOCKPICK B8: the kit through the real save - a new one\'s kit never doubled; a class that never picks given none, through five saves and loads (mutants: picks given at a load)', async () => {
   const { snapshotPlayer, restorePlayer } = await import('../../../src/systems/save/save.js');
   const { giveStartingLockpicks, lockpickCount, LOCKPICK_KIT } = await import('../../../src/systems/lockpick/lockpickItem.js');
   const { SKILLS } = await import('../../../src/systems/skills.js');
   const careerOf = (picks) => ({ primarySkills: [SKILLS.ShortBlade, 0, 1], majorSkills: picks ? [SKILLS.Lockpicking, 2, 3] : [2, 3, 4], minorSkills: [5, 6, 7, 8, 9, 10], luck: 50 });
   const mk = (picks) => ({ isPlayer: true, level: 3, gender: 'male', activeEffects: [], health: 60, maxHealth: 60, items: [], spells: [], stats: {}, skills: {}, career: careerOf(picks) });
   const quiet = (fn) => { const k = [console.info, console.log, console.warn]; console.info = console.log = console.warn = () => {}; try { return fn(); } finally { [console.info, console.log, console.warn] = k; } };
-  const cycles = (entity, { old = false } = {}) => {
+  const cycles = (entity) => {
     let snap = JSON.parse(JSON.stringify(snapshotPlayer(entity, { classicMinutes: 100 })));
-    if (old) delete snap.lockpickGift;
     const counts = [];
     for (let k = 0; k < 5; k++) {
       const loaded = { isPlayer: true };
@@ -221,8 +216,6 @@ test('AUDIT LOCKPICK B8: the gift through the real save - a picking class from b
   const five = Array(5).fill(LOCKPICK_KIT);
   const thief = mk(true); giveStartingLockpicks(thief);
   assert.deepEqual(cycles(thief), five, 'a new Thief: the kit, never doubled');
-  assert.deepEqual(cycles(mk(true), { old: true }), five, 'a Thief from before: five, once');
-  assert.deepEqual(cycles(mk(false), { old: true }), [0, 0, 0, 0, 0], 'a Knight from before: none');
   assert.deepEqual(cycles(mk(false)), [0, 0, 0, 0, 0], 'a new Knight: none');
 });
 

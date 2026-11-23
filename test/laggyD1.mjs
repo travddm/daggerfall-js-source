@@ -1,4 +1,4 @@
-// AUDIT SCALE II (2026-10-11, the audit of SCALE4d-SCALE5d; Mac: "Lets do an audit on everything. Ensure perfection"):
+// AUDIT SCALE II:
 // A D1 BINDING WITH ONE READ REPLICA THAT LAGS THE PRIMARY until told to catch up - D1's Sessions API as its contract
 // says it: withSession(bookmark) may serve its first read from ANY replica at least as new as `bookmark`;
 // 'first-primary' sends the first statement to the primary; 'first-unconstrained' anywhere. A write always goes to the
@@ -48,10 +48,13 @@ export function laggy(P) {
   let R = null;
   let n = 0;
   const log = [];
+  const replicas = [];
   const sync = () => {
     const f = join(dir, `replica-${++n}.db`);
     P._raw.exec(`VACUUM INTO '${f}'`);
-    R = { api: apiOver(new DatabaseSync(f)), pos: d1Position(P) };
+    const raw = new DatabaseSync(f);
+    replicas.push(raw);
+    R = { api: apiOver(raw), pos: d1Position(P) };
     return R.pos;
   };
   class Session {
@@ -76,6 +79,10 @@ export function laggy(P) {
       return typeof v === 'function' ? v.bind(t) : v;
     },
   });
-  const close = () => { rmSync(dir, { recursive: true, force: true }); };
+  // Windows refuses to remove a database file that is still open, so every replica is closed first.
+  const close = () => {
+    for (const raw of replicas) raw.close();
+    rmSync(dir, { recursive: true, force: true });
+  };
   return { db, sync, log, close };
 }

@@ -1,8 +1,8 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// PROF6 (2026-09-29, Mac: "continue") - THE WRITS' BOOK: every act of the
+// PROF6 - THE WRITS' BOOK: every act of the
 // Work tab beside the Court's writs, and of the Guild tab's Stores
-// (server-account/src/writs.js, bible/06-Systems/Professions-Arc.md 28).
+// (server-account/src/writs.js, 28).
 // The Work tab's read is the professions' book's (`/v1/writs/list`,
 // net/profBook.js), which the service answers with the guild writs and
 // commissions beside the Court's.

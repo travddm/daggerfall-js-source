@@ -1,4 +1,4 @@
-// SPELL-HAND (2026-10-23; bible/05-Combat/Two-Hands.md "The spell hand"): THE MORROWIND ARM'S SPELL HAND - a spell in
+// SPELL-HAND: THE MORROWIND ARM'S SPELL HAND - a spell in
 // the free hand beside the weapon, on the skeleton. The law and the classic lane: combat/twoHands/spellHand.js. Wired by
 // combat/fpArm.js (HOST-SPLIT: the arm wires it and grows only by the wiring).
 //
@@ -65,7 +65,7 @@ export function spellHandLimbs({ casting = false, ready = false, weaponIdle = nu
  * @returns {'wait' | 'afterCast' | 'drop' | 'keep'}
  */
 export function spellHandStanceStep({ upper, spellReady }, U) {
-  if (upper === U.Equipping || upper === U.Unequipping) return 'wait';
+  if (upper === U.Drawing || upper === U.Stowing) return 'wait';
   if (upper === U.Casting) return 'afterCast';
   return spellReady ? 'drop' : 'keep';
 }

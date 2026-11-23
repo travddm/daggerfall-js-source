@@ -1,9 +1,9 @@
 // @ts-check
-// ARENA2 (2026-10-02, Mac: "All UI elements and text must be enhanced UI plus"): THE BOUT ON THE HUD - the versus bar
+// ARENA2: THE BOUT ON THE HUD - the versus bar
 // (each fighter's name, their banner's mark, their health; my stamina when I fight), the crowd's meter (booing to
 // roaring, its darling and its villain marked on the bar), the fight's clock, and under them the line that says I may
 // yield. The Herald's words and the "3 - 2 - 1 - Fight!" are said mid-screen (ui/midScreenText.js, the host's). Design:
-// bible/11-Multiplayer/Arena.md "5. The Arena window" (its HUD paragraph).
+// "5. The Arena window" (its HUD paragraph).
 //
 // A READOUT, NOT A WINDOW (the gate bar's law, ui/gate/gateBossBar.js): no key taken, no click, nothing paused - a fighter is
 // never held by it. One node made at the first bout and UPDATED, NOT REBUILT: each part written only when what it says
@@ -20,7 +20,7 @@
 // `.arena-team` mark, its colour the sheet's): mine in a ladder bout when I fight under one, and an exhibition's two
 // fighters, the Red Banner's against the Blue's (scenes/arena/arenaBouts.js boutTeams). The house's fighters wear none.
 //
-// ARENA4b: THE STANDS' TWO PRESSES (Mac, 2026-10-02: "During fights, the crowd is present and can cheer/boo you") - a
+// ARENA4b: THE STANDS' TWO PRESSES - a
 // spectator in the stands of a relay's bout (scenes/arena/arenaBouts.js startRelay, `me` '') may Cheer or Boo: two touch-sized
 // presses under the plate and two keys (STANDS_KEYS - the + and - keys, which no game action holds), each the host's
 // door (`drawArenaHud`'s `cheer`), shut while the relay's allowance runs (the model's `stands.ready`, scenes/arena/arenaBouts.js

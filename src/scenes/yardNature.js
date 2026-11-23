@@ -26,10 +26,9 @@
 // The yard stands its pieces again when its pixel is built again - a
 // season's turn, an install - as the town's own flats are.
 //
-// DECOR-LPT (FIELD BUGS 2026-10-05b, the owner: "elements should recieve
-// the low poly overhaul style like trees got"; asked which, "Placed trees
+// DECOR-LPT (FIELD BUGS 2026-10-05b,; asked which, "Placed trees
 // & plants"). A placed tree or plant Low Poly Trees has a tree for stands
-// as the world's own do (LPT1, bible/07-Rendering/Low-Poly-Trees.md): its
+// as the world's own do (LPT1): its
 // 3D tree within LPT_NEAR_M of the eye, turned by the piece's own turn and
 // sized by its scale (a location's tree is the prefab as it is - scale 1,
 // world/lowPolyTrees.js lptVariety), and the same tree's far picture

@@ -178,8 +178,7 @@ export function tableKeys(table, frame, look = {}) {
 }
 
 /**
- * EOTB-FLIP (2026-09-16, Mac: "The character is upside down (classic
- * sprite)"): THE ROWS, THE RIGHT WAY UP.
+ * EOTB-FLIP: THE ROWS, THE RIGHT WAY UP.
  *
  * A decoded PNG hands back its raster TOP row first; the port's
  * billboard batch samples a texture in getColor32 order, row 0 the

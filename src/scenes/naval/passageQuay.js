@@ -1,5 +1,5 @@
 // @ts-check
-// PASSAGE-QUAY (2026-10-27; bible/03-World/Passage.md PASSAGE-QUAY) - A BOOKED SHIP COMES IN TO HER PORT'S QUAY. Within
+// PASSAGE-QUAY - A BOOKED SHIP COMES IN TO HER PORT'S QUAY. Within
 // BRING_IN_M of her port's harbour, a berth free, her master ends the journey and her crew warp her along the water's
 // way to the berth, where QUAYS' docking makes her fast. Come Sail Away's `warp` seam lays her place, as QUAYS' does. A
 // hull across her way holds her, as does a step that would lay her over land; held TOW_FOUL_S by a still one (or land),

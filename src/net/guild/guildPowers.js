@@ -1,8 +1,5 @@
 // @ts-check
-// ═══════════════════════════════════════════════════════════════════
-// GUILD3c (2026-10-11, the owner: "simplifying the player guild and npc guild system from being too overcomplicated.
-// Keeping depth, but making it easier to understand"; bible/11-Multiplayer/Guilds-Made-Plain.md, EVERY RULE BEFORE THE
-// PRESS) - WHAT EACH RANK OF A PLAYER'S GUILD MAY DO, IN WORDS.
+// GUILD3c - WHAT EACH RANK OF A PLAYER'S GUILD MAY DO, IN WORDS.
 //
 // The powers live in four tables, each beside the law that asks it - guildLaw.js GUILD_POWERS (guildMay), hallLaw.js
 // HALL_POWERS (hallMay), writLaw.js WRIT_POWERS (writMay), townSeatLaw.js SEAT_POWERS (seatMay) and SEAT_LEVER_RANKS -
@@ -11,7 +8,7 @@
 // off its own table AT THE CALL - a table moved moves the page - and test/net/guild3_plain.test.js sweeps every key of the
 // four tables against it, so a power added with no words fails the suite.
 //
-// AUDIT GUILD3 (bible/01-Overview/audits/Audit-Guild3.md): W3/C6 - what a rank may NOT do is a rank's too (an Officer fills no
+// AUDIT GUILD3: W3/C6 - what a rank may NOT do is a rank's too (an Officer fills no
 // writ of its own guild's and is paid by none of its contracts: writLaw.js writDeliverMay, contractPaidMay), so "Everything
 // a Member may" was false; W4/C6 - the acts the service gives the guildmaster by rank alone (a Sellsword hired, any writ
 // withdrawn) and the town board's call for members were unworded; C4 - the writ budget binds the Officers alone; C5 - the
@@ -19,7 +16,6 @@
 // never with an article guessed for it.
 //
 // Pure: no DOM, no clock, no network.
-// ═══════════════════════════════════════════════════════════════════
 
 import { GUILD_POWERS, GUILD_RANK_MASTER, GUILD_RANK_OFFICER, GUILD_RANK_MEMBER, GUILD_RANK_RECRUIT, GUILD_RANK_NAMES } from './guildLaw.js';
 import { HALL_POWERS } from '../hallLaw.js';
@@ -56,7 +52,7 @@ export const GUILD_RANK_ACTS = Object.freeze([
   Object.freeze({ table: 'writ', power: 'postWrit', words: 'post guild writs and contracts (Officers within the weekly budget the guildmaster sets) and withdraw the ones they posted' }),
   Object.freeze({ table: 'writ', power: 'storesWithdraw', words: 'take any materials out of the guild Stores' }),
   Object.freeze({ table: 'seat', power: 'pledge', words: 'pledge the guild to a seat in the Muster' }),
-  Object.freeze({ table: 'levers', power: 'levers', words: 'run a held seat: its Tithe, Edict, battle window, Works, fealty and Pacts' }),
+  Object.freeze({ table: 'levers', power: 'levers', words: 'run a held seat: its Tithe, Edict, battle window, Works and Pacts' }),
   Object.freeze({ table: 'guild', power: 'withdraw', words: 'take gold and silver out of the treasuries' }),
   Object.freeze({ table: 'writ', power: 'writBudget', words: 'set the Officers\' weekly silver budget for guild writs and contracts' }),
   Object.freeze({ master: true, words: 'withdraw any guild writ or contract' }),

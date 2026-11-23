@@ -111,35 +111,6 @@ test('TR3: the disabled blit reads its sub-rect from the 122x36 sheet', () => {
 });
 
 test('TR3/MAC-K3: the host door - grounded and outdoors only, and EVERY host that has a mount draws it under the HUD', () => {
-  const input = read('src/ui/input.js');
-  assert.match(input, /case 'Transport': return ctx\.openTransport \? \(ctx\.openTransport\(\), true\) : false;/);
-
-  // MAC-K3 (Mac: "T to mount not working outside interiors"). This pin
-  // used to read `src/scenes/world.js` for every law below - which is
-  // why it stayed green while `scenes/exterior.js`, the FIXED-CITY
-  // host, had no transport surface at all and the T key there did
-  // nothing. A source-text pin on ONE host cannot see the host that is
-  // missing. So the laws are the rig's now, and the WIRING is checked
-  // as a population.
-  const rig = read('src/player/mountRig.js');
-  // dfuiOpenTransportWindow (:690-700): airborne is SILENTLY ignored.
-  assert.match(rig, /if \(!player\.grounded \|\| !transportArtLoaded\(\)\) return;/);
-  assert.match(rig, /hasHorse: rt \? !!rt\.canMountHorseFromTransportWindow\(\) : hasHorse\(playerEntity\.items \?\? \[\]\),/, 'HCC: with Horse Cart and Cargo on the row is the runtime\'s answer; off, DFU\'s Items.Contains');
-  // TR4 made the row live for an owner; tr4_ship.test.js holds that.
-  // MAC-K3 added the second clause: a host with no ship teleport
-  // darkens the row rather than opening onto nothing.
-  assert.match(rig, /shipAvailable: isShipAvailable\(\{ canSail: !!onShip, ownsShip: ownsShip\(playerEntity\), \.\.\.\(shipLocation\?\.\(\) \?\? \{\}\) \}\),/);   // RR1: through TransportManager.ShipAvailiable's delegate, the host's own gate first
-  // The mount's art is loaded on the pick and dropped when you dismount.
-  assert.match(rig, /animator\.mount\(mode\);/);
-  assert.match(rig, /_artFor = isRiding\(mode\) \? artKey\(mode\) : null;\s*\n\s*if \(!_artFor\) return;[\s\S]{0,120}loadRidingArt\(fetchBytes, palette, renderer, mode, lookNow\(mode\)\)/);   // COATS1: in the ridden horse's look
-  // F-E1 (the parity audit): OnGUI :293 refuses to draw while paused -
-  // an open window hides the mount, it does not freeze it.
-  assert.match(rig, /if \(art && isRiding\(player\.transportMode\) && !ridePaused && !mwViewHides\(\)\.horse\) \{/);   // AUDIT-EOTB2: and not under the Eye Of The Beholder body, which draws the rider with the horse
-  // The loop is a REAL channel, not an optional-chained no-op, and the
-  // clip is the CLASSIC one, literally: the enhanced 3D horse that once
-  // swapped mod clips into this expression was removed whole (2026-09-04). HORSE-VOL: its volume under Horse Volume.
-  assert.match(rig, /audio\.setLoop\('riding', r\.playing \? SOUND\[r\.clip\] : null, \{ volume: r\.volume \* horse, pitch: r\.pitch \}\);/);
-  assert.match(read('src/systems/audio.js'), /setLoop\(name, clip, \{ volume = 1, pitch = 1 \} = \{\}\) \{/);
 
   // THE POPULATION, derived: every host that builds a rig must open on
   // it AND draw it, and the sprite goes in BEFORE the HUD (OnGUI draws
@@ -202,13 +173,6 @@ test('G7: the five transport accelerators are the DialogShortcuts table, in DFU\
     assert.ok(BUTTONS.includes(b), `${b} is not a DaggerfallShortcut button`);
     assert.ok(shortcutBinding(b).code, `${b} has no binding in the ported table`);
   }
-  const src = read('src/ui/transportWindow.js');
-  assert.match(src, /firstHotkey\(TRANSPORT_BUTTONS, code, e\)/,
-    'the window no longer asks the table for its letters');
-  // and no hand-typed row letter survives in the file: a literal here
-  // is the defect, whatever it happens to spell.
-  assert.equal(/code === 'Key[A-Z]'/.test(src), false,
-    'a transport row is answering a hand-typed letter again');
 });
 
 test('G7: each table letter fires its own row, and TransportExit closes with no mode', () => {

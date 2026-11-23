@@ -1,4 +1,4 @@
-// MIDI-OUT1 (2026-10-11, a player asking for MIDI out): THE SONGS ON A MIDI DEVICE - a hardware synth on a cable, a
+// MIDI-OUT1: THE SONGS ON A MIDI DEVICE - a hardware synth on a cable, a
 // software one on a virtual port - in place of the port's FM bank.
 //
 // NO DFU SOURCE. DaggerfallSongPlayer renders its .mid files with its vendored synth and a SoundFont and has no

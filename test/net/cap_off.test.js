@@ -1,5 +1,5 @@
-// CAP-OFF (2026-10-07, Mac: "Remove the cap on life skills"; asked which - the daily harvest cap - and whether the two
-// bounds a modified client's claim needs go with it - "Keep both"). A gathering profession gave a character 60 harvests a
+// PROFESSION-CAPS: the service here runs with PROF_DAY_CAPS off (src/net/profCapLaw.js), the operator's switch for no cap; test/net/profcaps_service.test.js pins the caps on.
+// CAP-OFF. A gathering profession gave a character 60 harvests a
 // UTC day (the Basket's among Herbalism's) and an account 120 in a craft (AUDIT 29 A3); Fishing 40 hauls an account;
 // Hunting 30 hides. Past them the service refused (`prof-cap`, `prof-account-cap`, `prof-fish-cap`, `prof-hunt-cap`), the
 // node's prompt said "60 of 60 today", the book closed the craft for the day, and the chip under the compass read
@@ -56,9 +56,10 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
   const realNow = Date.now;
   Date.now = () => NOON * 1000;
   try {
-    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', DEVELOPER_HANDLES: 'Mac' });
+    const s = await standService({ PROFESSIONS_OPEN: 'on', MARKS_OPEN: 'on', SEAT_ADMINS: 'Mac', PROF_DAY_CAPS: 'off' });
     const raw = s.env.DB._raw;
     const mac = await s.seated('Mac');
+    s.env.DB._raw.prepare('UPDATE realm_characters SET level_seen = 30 WHERE player = ?').run(mac.id);   // PROFESSION-CAPS: a level the Rare gate is open at
     const day = utcDay(NOON);
     const at = NOON - 2;
     /** `n` rows of `profession` today on the account's character `char`, as a harvest writes them. */
@@ -101,7 +102,7 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
 
     // the state: the day's counts, and no cap beside them
     const st = (await s.call('/v1/prof/state', { character: mac.character }, mac.secret)).body;
-    assert.deepEqual(st.caps, { stores: STORES_MAX, withdraw: 200, highHides: HIGH_HIDES_PER_DAY });
+    assert.deepEqual(st.caps, { stores: STORES_MAX, withdraw: 200, highHides: HIGH_HIDES_PER_DAY, prices: 'dfu' });   // PROFESSION-CAPS: the tier prices' scale
     assert.deepEqual([st.today.mining, st.hauls, st.hunt], [62, 41, { hides: 31, high: 0 }]);
 
     // KEPT: the rare hides - three of tiers 5-6 taken, a fourth refused, a hide below them still credited
@@ -112,7 +113,7 @@ test('CAP-OFF the service: past every old day at once - a character\'s sixty in 
     assert.equal((await skin(MOB.Rat)).status, 200, 'a hide below the rare');
 
     // KEPT: the veins in dungeons nobody has vouched for - four, the fifth refused, past every old day of Mining
-    setXp('mining', xpForRank(70));   // PIN MOVED (DEEP-OPEN, Professions-Arc.md section 53): such a vein draws the whole deep table, tiers 3-6
+    setXp('mining', xpForRank(70));
     for (let i = 0; i < DEEP_UNCONFIRMED_PER_DAY; i++) {
       const r = await harvest({ node: dveinKey({ dungeon: 888000 + i, day, slot: 0 }), kind: 'ore', climate: MOUNTAIN, region: WAYREST, act: {} });
       assert.equal(r.status, 200, JSON.stringify(r.body));
@@ -205,6 +206,13 @@ test('CAP-OFF the host: five hundred Mining harvests today, the vein is ready - 
     assert.equal(host.acting(), true, 'the act starts');
     assert.equal(S.meter, 'mine');
     host.cancel();
+    // PROFESSION-CAPS: a refusal that said the character's Mining day is done - the vein shows refused, and E starts no act
+    book.closed = (k) => k === 'day:ore' || k === 'day:stone';
+    host.tick(0.016);
+    assert.match(S.prompt?.rest ?? '', /done all a day allows/, 'refused: ' + JSON.stringify(S.prompt));
+    host.press();
+    host.tick(0.016);
+    assert.equal(host.acting(), false, 'no act, so no tool worn');
   } finally { host.dispose(); setForagingHost(null); }
 });
 
@@ -256,7 +264,6 @@ test('CAP-OFF the words: the four refusals the service says no more keep their w
   assert.equal(accountRefusalText('prof-fish-cap'), 'Your account has hauled all the nets a day allows, across your characters. The water rests until midnight UTC.');
   assert.equal(accountRefusalText('prof-hunt-high'), `Your account has taken all the rare hides a day allows (${HIGH_HIDES_PER_DAY}, across your characters).`);
   const daily = eventTimerRows({ now: Date.UTC(2026, 9, 7, 12) }).find((r) => r.id === 'daily');
-  // PIN MOVED: GUILD3a (bible/11-Multiplayer/Guilds-Made-Plain.md) - silver, never Marks; marked by AUDIT GUILD3 R4
   assert.equal(daily.detail, 'Gathering nodes come back. Daily limits reset for rare hides, silver and Court writs');
   assert.match(eventTimerRows({ now: Date.UTC(2026, 9, 7, 12), seatsOpen: true }).find((r) => r.id === 'daily').detail, /Court writs, and the Watch$/);
 });

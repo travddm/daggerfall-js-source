@@ -1,4 +1,4 @@
-// FIX-D (2026-09-08, Mac: "the enhanced font number 5 looks like an 8").
+// FIX-D.
 // Pixelify Sans, the enhanced skin's face, draws its 5 with a cut
 // top-left corner, and at every size and weight it reads as an 8 or an
 // S - a rendering of the digits proved it is the glyph, not the
@@ -9,7 +9,7 @@
 // unicode-range U+0035 only and stands FIRST in every Pixelify stack,
 // so the browser takes the 5 from it and everything else from Pixelify.
 //
-// TWO (2026-10-18, Dudey: "the number 2 looks like a Z"). Pixelify's 2
+// TWO. Pixelify's 2
 // is its Z with one corner changed, so the two read alike. The family
 // gets a second face over U+0032 and U+005A: a 2 with a rounded top and
 // a stepped diagonal, and a Z with a flat top and a straight diagonal,
@@ -44,9 +44,7 @@ export const PIXEL_FAMILIES = `'${PIXELIFY_FIVE_FAMILY}', 'Pixelify Sans'`;
 /** The stack every enhanced rule sets - the five first, then the face. */
 export const PIXEL_STACK = `${PIXEL_FAMILIES}, monospace`;
 
-// FONT1 (2026-09-16, Mac: "Enhanced mode UI. Especially the new online
-// interfaces font use our enhanced font ... Any enhanced UI or text
-// must be our enhanced version").
+// FONT1.
 //
 // THE DECLARATION, NOT JUST THE STACK. Every enhanced surface that
 // wears this face sets three things together and has since PX1: the
@@ -57,8 +55,7 @@ export const PIXEL_STACK = `${PIXEL_FAMILIES}, monospace`;
 // ui/socialPanel.js, ui/partyPanel.js, ui/socialMenu.js), so without
 // one home for the trio there would be five copies of it and the
 // fifth would forget the smoothing.
-// FONT3 (2026-10-02, Mac: "improve the readability of our ingame font as
-// im recieving a lot of complaints"): THE READING PAIR. Pixelify Sans at
+// FONT3: THE READING PAIR. Pixelify Sans at
 // weight 400 draws a stroke thinner than one screen pixel at every size
 // the skin uses under 16px, so a browser greys it out rather than lighting
 // it (measured in Chromium: at 10px only 16% of a glyph's inked pixels

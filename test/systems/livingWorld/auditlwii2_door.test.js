@@ -1,4 +1,4 @@
-// AUDIT LW-II-2 (2026-10-10, the second audit of THE LIVING WORLD II, lane door): THE CARAVAN'S DOOR AGAIN - LW11's
+// AUDIT LW-II-2: THE CARAVAN'S DOOR AGAIN - LW11's
 // counter, deeds, hold-up and escort, and the host seams world.js wires them through (scenes/caravanHost.js,
 // systems/livingWorld/caravanDoor.js, relations.js's road records, the two trade skins' confirm). Each finding was
 // reproduced by a reviewer, fixed, and is pinned here. The fixtures are the real producers' - the census's rosters, the

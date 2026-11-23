@@ -1,4 +1,4 @@
-// SAFE1, SAFE3, SAFE4, SAFE7 (2026-10-17, bible/11-Multiplayer/Chat-Safety-Arc.md): THE ACCOUNT SERVICE'S HALF, driven
+// SAFE1, SAFE3, SAFE4, SAFE7: THE ACCOUNT SERVICE'S HALF, driven
 // end to end through the real Worker over a real schema - a block list, a report whose every line's stamp is the relay's
 // own signature (checked with GATE_PUBLIC_KEY, as the service checks it), the case it opens, the automatic mute three
 // credible reporters reach and a guest's reports never do, the ban a banned account meets on every door, the record of
@@ -20,7 +20,7 @@ const RELAY = 'https://relay.example' + SAFE_LAW_PATH;
 
 /** The service, with a moderator handle and the relay's door; the relay's door's posts recorded. */
 async function stand(extra = {}) {
-  const s = await standService({ MODERATOR_HANDLES: 'Asynian', RELAY_LAW_URL: RELAY, ...extra });
+  const s = await standService({ SEAT_MODERATORS: 'Asynian', RELAY_LAW_URL: RELAY, ...extra });
   const pushed = [];
   const real = globalThis.fetch;
   globalThis.fetch = async (url, init) => { if (String(url) === RELAY) { pushed.push(JSON.parse(init.body).order); return new Response('{"ok":true}'); } return real(url, init); };
@@ -34,12 +34,12 @@ async function heard(s, who, text, { tab = 'world', at = Date.now() } = {}) {
 /** An account made old enough to count (no sprout). */
 const season = (s, who) => s.env.DB._raw.prepare('UPDATE players SET created_at = ? WHERE id = ?').run(Math.floor(Date.now() / 1000) - SPROUT_S - 60, who.id);
 
-test('SAFE1-SAFE8 THE ROUTES ARE LISTED: every safety door is in ROUTES (a path that is not is a 404 - AUDIT FIVE-ASKS A1), the session ones behind a session, the relay\'s feed and Discord\'s interactions among the self-proving doors alone (mutant: a route unlisted)', () => {
-  for (const p of ['/v1/safety/blocks', '/v1/safety/block', '/v1/safety/unblock', '/v1/safety/report', '/v1/safety/conduct', '/v1/mod/ban', '/v1/mod/unban', '/v1/mod/strikes', '/v1/mod/feed', '/v1/discord/interactions']) {
+test('SAFE1-SAFE8 THE ROUTES ARE LISTED: every safety door is in ROUTES (a path that is not is a 404 - AUDIT FIVE-ASKS A1), the session ones behind a session, the relay\'s feed the self-proving door alone (mutant: a route unlisted)', () => {
+  for (const p of ['/v1/safety/blocks', '/v1/safety/block', '/v1/safety/unblock', '/v1/safety/report', '/v1/safety/conduct', '/v1/mod/ban', '/v1/mod/unban', '/v1/mod/strikes', '/v1/mod/feed']) {
     assert.ok(ROUTES.has(p), p);
     assert.equal(OPEN_ROUTES.has(p), false, `${p} is no stranger's JSON door`);
   }
-  assert.deepEqual([...SAFE_OPEN_ROUTES], ['/v1/mod/feed', '/v1/discord/interactions']);
+  assert.deepEqual([...SAFE_OPEN_ROUTES], ['/v1/mod/feed']);
 });
 
 test('SAFE1 THE BLOCK LIST follows the account: a block is kept with the name a player reads, listed newest first, undone by an unblock; never oneself, never an account that is not, never past BLOCKS_MAX (mutants: a self-block taken; the bound unchecked)', async () => {

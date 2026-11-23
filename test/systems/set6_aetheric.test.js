@@ -1,5 +1,4 @@
-// SET6 (2026-09-26, Sigil Sets - bible/11-Multiplayer/Sigil-Sets.md section 6; Mac: "Boss kills has the chance of
-// dropping a rare boss themed weapon/armor set with the rarity Atheric (new)"): AETHERIC, AND RUHN'S REGALIA. The ladder's
+// SET6: AETHERIC, AND RUHN'S REGALIA. The ladder's
 // new rung under the Artifact - its place, its colour, never rolled; the nine Regalia records and their mint (Daedric,
 // known, a sigil of their set, a price, every field a declared one); the whole set worn; the drop - the spoils' LAST
 // roll, so every earlier spoils is what it was for its seed; the floor, the card, the wire.
@@ -82,7 +81,8 @@ test('SET6 the Regalia: nine fixed records, one for each place a set is worn - t
   assert.ok(2 * REGALIA_FIRE_RESIST < 100, 'two pieces are no immunity');
   assert.equal(aethericById('the-warden'), null, 'a Legendary is not an Aetheric');
   const axe = aethericById('ruhn-gatecleaver');
-  assert.deepEqual(axe.affixes.map((a) => [a.id, a.param ?? null, a.value]), [['damage', null, 40], ['stat', 'strength', 15], ['skill', SKILLS.Axe, 30]]);
+  // PIN MOVED (B4 rescale): the Legendary band's tops are damage 24, Strength 9, skill 18, armour 12 (were 40, 15, 30, 20); the fire stays +10.
+  assert.deepEqual(axe.affixes.map((a) => [a.id, a.param ?? null, a.value]), [['damage', null, 24], ['stat', 'strength', 9], ['skill', SKILLS.Axe, 18]]);
 });
 
 test('SET6 the mint: a record made an item by the game\'s own minters - Daedric, whole, known - its name, its tier and record, its affixes a COPY, a sigil of its set fresh at Faint (the Gatecleaver\'s with the widest band\'s top blow), its price its make\'s and its affixes\' and the rung\'s; every field declared, a valid loot item on the wire, a set piece of the Regalia (mutants: the affixes shared with the record; unidentified; the price without the rung\'s worth; the axe\'s blow dropped)', () => {
@@ -117,7 +117,7 @@ test('SET6 the mint: a record made an item by the game\'s own minters - Daedric,
   const a = mintAetheric(REGALIA[0]), b = mintAetheric(REGALIA[0]);
   assert.notEqual(a, b, 'a fresh item every mint');
   a.affixes[0].value = 1;
-  assert.equal(REGALIA[0].affixes[0].value, 20, 'the record untouched');
+  assert.equal(REGALIA[0].affixes[0].value, 12, 'the record untouched');
 });
 
 test('SET6 the Regalia worn whole: the nine places count nine, and online every tier of the Warden\'s set is awake - the card and the powers read the set as any other (mutants: the shield or the axe not counted)', () => {
@@ -157,10 +157,9 @@ test('SET6 the drop: the spoils\' LAST roll - a Regalia piece a sixth of the tim
     const b = before(seed, 12);
     assert.equal(s.gold, b.gold, `seed ${seed}: the gold`);
     assert.deepEqual(s.pieces.slice(0, 3).map((p) => p.item.name), b.names, `seed ${seed}: the three graded pieces`);
-    // LOOT2/LOOT4 (bible/06-Systems/Loot-Arc.md sections 4 and 6): an Exalted Legendary's extra line and a Magic's or a
+    // LOOT2/LOOT4: an Exalted Legendary's extra line and a Magic's or a
     // Rare's line that does something are drawn AFTER everything and appended - the lines before them are still the
     // seed's, exactly
-    // PIN MOVED (TECH1, bible/05-Combat/Weapon-Techniques.md): and a weapon's technique line, the door's very last draw, is
     // set aside first - an Exalted's line is the last line before it
     const own = (it) => it.affixes?.filter((a) => !isTechniqueAffix(a));
     const drawn = (it) => (it.exalted ? own(it).slice(0, -1) : own(it)?.filter((a) => !isProcAffix(a)));
@@ -196,7 +195,7 @@ test('SET6 the floor and the card: a Regalia piece is laid as an item in its tie
   setPref('lootRarity', true);
   const lines = rarityLines(mintAetheric(aethericById('ruhn-warden-plate')));
   assert.equal(lines[0], 'Aetheric');
-  assert.deepEqual(lines.slice(1, 4), ['+20 armor', '+10% Fire resistance', '+15 Endurance']);
+  assert.deepEqual(lines.slice(1, 4), ['+12 armor', '+10% Fire resistance', '+9 Endurance']);
   assert.match(lines.at(-1), /^Beaten in the gate's own heart/, 'the lore, last - as a Legendary\'s');
   for (const r of REGALIA) assert.equal(itemLongName(mintAetheric(r)), r.name, `${r.id}: named as a Legendary is - never "Daedric ${r.name}"`);
 });

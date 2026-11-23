@@ -1,4 +1,4 @@
-// AUDIT DISC28 (2026-09-28, before the merge) - lane 5, the quests: DISC28-I (a shared quest ends for the whole
+// AUDIT DISC28 - lane 5, the quests: DISC28-I (a shared quest ends for the whole
 // party), DISC28-J (a partner's quest foe stands for a linked copy) and DISC28-K (a re-picked house shows the live
 // job's name), read against their own field reports. Each pin is DRIVEN: the real QuestMachine and share path
 // (systems/quest/questShare.js) over the vendored quests, the real OnlineSession with its client floor and inbound gates,
@@ -245,7 +245,7 @@ test('AUDIT DISC28 QS-2: the live-sync watch runs above the modal gate - one cal
   const modal = W.indexOf('    if (modes.frame(dt, now)) {', frameAt);
   const calls = [...W.matchAll(/^\s*questSyncTick\(\);/gm)].map((x) => x.index);
   assert.equal(calls.length, 1, 'one call');
-  assert.ok(calls[0] > W.indexOf('    tickAmbientText();', frameAt) && calls[0] < modal, 'above the modal return, beside the ambient text');
+  assert.ok(calls[0] > W.indexOf('    yards?.frame({ dt, cam', frameAt) && calls[0] < modal, 'above the modal return, after the yards');
   assert.ok(W.indexOf('    if (_mode() !== _torchesMode)', frameAt) < modal && W.indexOf('    if (_mode() !== _torchesMode)', frameAt) > calls[0], 'the torch sweep stays adjacent to the gate (AUDIT 66 F11)');
 });
 
@@ -613,7 +613,7 @@ test('AUDIT DISC28 QS-K1: the re-stamp moves the name alone - the town map\'s re
   assert.equal(discovery.discoverBuilding(LOC, house, null, job('The Direnni Residence', true)), false, 'never the player\'s own house');
   discovery.undiscoverBuilding(LOC, KEY, true, 'The Direnni Residence');   // that job's tombstone (Quest.cs's undiscover)
   assert.equal(discovery.getDiscoveredBuilding(LOC, KEY)?.displayName, "Mac's residence", 'and so never undiscovered by it');
-  assert.match(W, /ownsHouse: \(buildingKey\) => isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey\),/, 'the host\'s one quest source carries IsHouseOwned');
+  assert.match(W, /ownsHouse: \(buildingKey\) => \{ const id = _questLoc\(\)\?\.mapTableData\?\.mapId \?\? 0; return !isEtherPlaceId\(id\) && isHouseOwned\(playerEntity\.houses \?\? \[\], _questRegionIndex\(\), buildingKey, id\); \},/, 'the host\'s one quest source carries IsHouseOwned');   // PIN MOVED (AUDIT RELEASE R2-9): the town asking named
 });
 
 test('AUDIT DISC28 QS-K2: the town plan opened on arrival names the house for the live job, not the one before', () => {
@@ -636,7 +636,6 @@ test('AUDIT DISC28 QS-K2: the town plan opened on arrival names the house for th
     directory: () => [], discovered: () => discovery.discoveredBuildings(LOC) });
   const plate = quiet(() => w.buildPlates({ fnt: { fixedWidth: 6, fixedHeight: 6, glyphWidth: () => 5 } }, { s: 3, ox: 0, oy: 0 })).find((p) => p.buildingKey === KEY);
   assert.equal(plate?.text, 'The Direnni Residence');
-  // PIN MOVED (FB1020c STREETS-TAB, at the merge of STAR0's move): the plan is built by `townHere`, for the town key and the travel key's streets alike
   const open = W.indexOf('  const townHere = () => {');
   const stamp = W.indexOf('    restampQuestNames(locId, { ...questBuildingSource, currentMapID: () => dfLoc.mapTableData?.mapId ?? 0 });', open);
   assert.ok(open > 0 && stamp > open && stamp < W.indexOf('    stampResidenceQuestNames(summaries, discoveredBuildings(locId), {', open), 'the host re-stamps before the plates are built');

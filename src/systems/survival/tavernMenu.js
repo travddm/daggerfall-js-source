@@ -1,6 +1,6 @@
 // SURV5 - THE TAVERN'S MENU, PURE: Climates & Calories' regional
 // menus, the meal, the drink and the blackout. AUDIT C&C I8
-// (2026-10-12): THE MOD'S OWN STRUCTURE, from its source (TavernWindow.cs
+// THE MOD'S OWN STRUCTURE, from its source (TavernWindow.cs
 // - the mod's repository is public, every revision to 1.7.0; SURV5 had
 // read 1.7.1's IL and sorted its dishes into a structure the mod does
 // not have, keyed by climate, a breakfast list a key): regionMenuDay's
@@ -29,7 +29,7 @@
 // under half, a drink with alcohol fortifies and a soft one refreshes
 // (AUDIT C&C I6). The counter sobers one a ten minutes (needs.js).
 //
-// SURV-TIERS (2026-09-23): the blackout is the tier's (`blackout`,
+// SURV-TIERS: the blackout is the tier's (`blackout`,
 // survival/difficulty.js - Hard's alone). A tier without it never takes
 // the night: the barkeep will not pour the drink that would carry the
 // counter past the endurance (`tavernPour`), so a Casual evening ends
@@ -217,7 +217,7 @@ export function innWaterPrice(drinks) {
  * Returns { rows: [{ text, kind: 'food'|'drink'|'header'|'water', name, price, worth, strength }], closed, closedText }.
  */
 export function tavernMenu({ climateIndex = 232, regionIndex = -1, quality = 5, hour = 12, minutes = null, online = undefined } = {}) {
-  // ESSENTIALS-HALF (2026-09-30, Discord: "cut the cost of most essential items by half"): online each row's gold is
+  // ESSENTIALS-HALF: online each row's gold is
   // the half it costs (shopStock.js essentialPrice) - the text and the price the window charges alike
   const cost = (p) => essentialPrice(p, { online });
   const key = regionMenuDay(regionIndex, climateIndex), tier = menuTier(quality);

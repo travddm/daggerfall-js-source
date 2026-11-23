@@ -10,9 +10,10 @@ import { snapshotPlayer, restorePlayer, copyEffectEntry } from '../../src/system
 import { applyWeaponPose } from '../../src/combat/playerWeapon.js';   // HARD2c: the :420-421 inversion, called rather than quoted
 import { ActionSystem } from '../../src/world/actionSystem.js';
 import { Collider } from '../../src/player/collider.js';
+import { hostText } from '../hostText.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const rd = (p) => readFileSync(join(root, p), 'utf8');
+const rd = (p) => hostText(p);   // TESA's merge (HOST-SPLIT): the quest world and the quick save moved out of bootWorld (scenes/questWorld.js, scenes/worldQuickSave.js) - the host read whole
 
 const mkEntity = (over = {}) => ({
   name: 'T', level: 3, health: 20, maxHealth: 30, fatigue: 100, magicka: 10, maxMagicka: 40,
@@ -72,9 +73,9 @@ test('audit26 F222: both hosts write the pose and land it on load', () => {
   // (combat/playerWeapon.js), so what is matched here is the host's
   // WIRING - which rig it offers and where the pair sits in the bag -
   // and the law itself is CALLED below rather than quoted.
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): the fall joined the bag's tail (fb0930_fallkept.test.js runs it).
+  // FALL-KEPT (FIELD BUGS 2026-09-30
   assert.match(w, /pose: \{ yaw: cam\.yaw, pitch: cam\.pitch, crouching: !!player\.crouching, \.\.\.mergeWeaponPose\(wp, weaponPoseOf\(weaponRig\.playerWeapon\)\), camera: mwViewSaveCamera\(\), transport: player\.transportMode, fall: player\.fallSnapshot\(\) \}/);
-  assert.match(w, /const wp = modes\?\.weaponPose\?\.\(\) \?\? null;/, 'and `wp` is the mode host\'s answer, null outside interior mode');
+  assert.match(w, /const wp = (?:host\.)?modes\?\.weaponPose\?\.\(\) \?\? null;/, 'and `wp` is the mode host\'s answer, null outside interior mode');
   // SAV3 moved the landing into the ONE pose-apply (quickload + the
   // classic import share it); HARD2c moved the inversion one step
   // further, into the law both hosts now call - so run it.
@@ -89,7 +90,7 @@ test('audit26 F222: both hosts write the pose and land it on load', () => {
     'the dungeon context folds its own weapon AND the hand in, and takes yaw/pitch/crouch from the host seam');
   assert.match(d, /opts\.pose\?\.apply\?\.\(extras\.pose\);/);
   const m = rd('src/scenes/worldModes.js');
-  // FALL-KEPT (FIELD BUGS 2026-09-30, PIN MOVED): and the fall beside it (fb0930_fallkept.test.js runs it).
+  // FALL-KEPT (FIELD BUGS 2026-09-30
   assert.match(m, /read: \(\) => \(\{ yaw: cam\.yaw, pitch: cam\.pitch, crouching: !!player\.crouching, fall: player\.fallSnapshot\(\) \}\)/,
     'the mode host supplies the modal camera half');
 });
@@ -158,7 +159,6 @@ test('audit26 F216/F217: both exterior pools snapshot in natives and restore thr
   // AUDIT 63 F24 widened the restore: the saved quest link is revived
   // before the mint (SerializableEnemy.cs:205-218), through a callback
   // the caller that owns a quest machine hands in.
-  // PIN MOVED (SEALED-SAVE, FIELD BUGS 2026-10-05c): the restore takes the host's restand too, and a quest foe it moves
   // stands at `feet` (test/systems/quest/fb1004d_questmarkers.test.js)
   assert.match(ef, /function restoreWorld\(saved, fromNative, yOffset = 0, \{ reviveQuestBehaviour = null, restandQuestFoe = null \} = \{\}\)/);
   assert.match(ef, /const feet = \(questBehaviour && restandQuestFoe\?\.\(questBehaviour, \[lx, sf\.y \+ yOffset, lz\]\)\) \|\| \[lx, sf\.y \+ yOffset, lz\];/);

@@ -1,4 +1,4 @@
-// WILD-ALERT-FIX (2026-10-05, bible/06-Systems/Travel-View.md "WILD-ALERT-FIX"): THE DEEP AUDIT'S FIVE - a foe that
+// WILD-ALERT-FIX: THE DEEP AUDIT'S FIVE - a foe that
 // noticed a fast traveller only had the gate lifted (its own eyes came long after, so no "!", no hold of the clock, no
 // meeting), a band that caught the traveller stood unaware, a band's notice outlived a chase handed to a peer and a load,
 // the checks rolled while a window held the game, and the gate's switch dropped the peers a foe was fighting. The host's

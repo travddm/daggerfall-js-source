@@ -1,6 +1,6 @@
 // @ts-check
 // ═══════════════════════════════════════════════════════════════════
-// HERALDRY-SHOWN (2026-10-02, Mac: "lets finish the build work") — A
+// HERALDRY-SHOWN — A
 // GUILD'S HERALDRY AS A SWATCH, the one DOM door of Seats-Arc 8.1's
 // small faces: "the frame of the guild tag, the siege HUD ... and the
 // Chronicle".
@@ -93,7 +93,6 @@ export function heraldryLookup(sources) {
 /** The guild each Chronicle row's line names first (net/townSeatLaw.js chronicleLine), where it is not `guild`. */
 const CHRONICLE_FIRST = Object.freeze({
   contested: 'a', 'siege-forfeit': 'against', 'siege-void': 'holder',
-  'fealty-sworn': 'vassal', 'fealty-broken': 'breaker', 'fealty-tribute': 'vassal', 'fealty-lapsed': 'vassal',
 });
 /**
  * THE GUILD A CHRONICLE ROW IS ABOUT - the one its line names first, `{ name, tag }` as it was that day - or null for a row

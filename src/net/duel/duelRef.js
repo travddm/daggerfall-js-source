@@ -1,7 +1,6 @@
 // @ts-check
 // ═════════════════════════════════════════════════════════════════════
-// INT8 (2026-10-09, the INTEGRITY arc's lane 2 - bible/06-Systems/Integrity-Arc.md; Mac: "I want to do everything and
-// do it properly"): THE DUEL REFEREED - "a duel is the Royal Tourney's ring without its title".
+// INT8: THE DUEL REFEREED - "a duel is the Royal Tourney's ring without its title".
 //
 // DUEL1 left every blow to the defender's own machine and every result to the loser's own word: a client that never
 // took damage never fell, and one that never said it lost never did. Now the relay that routes the duel holds it:
@@ -27,7 +26,7 @@
 // Pure: no clock (every `now` an argument), no socket, no storage - the relay's room (server/src/index.js) keeps the
 // state in its memory (DECIDED: a room that restarts mid-bout - a deploy - ends it as a cancel, recording nothing).
 // ═════════════════════════════════════════════════════════════════════
-import { ROYAL_RING, SIEGE_UNITS_PER_M, SIEGE_HIT, newFighter, refereeBlow, refereeCast, refereeStep } from '../siege/siegeRef.js';
+import { ROYAL_RING, SIEGE_UNITS_PER_M, SIEGE_HIT, newFighter, refereeBlow, refereeCast, refereeStep } from '../pvp/pvpRef.js';
 
 /** DUEL1's own numbers the ring does not carry (net/duel/duelSession.js DUEL_START_WAIT_MS, DUEL_OUT_MS - pinned equal: this
  *  leaf imports no client module). */

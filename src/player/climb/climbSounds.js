@@ -1,6 +1,5 @@
 // @ts-check
-// CLIMB4 - THE FEEL: THE CLIMB'S SOUNDS (the Enhanced Climbing arc - bible/03-World/Parkour-Arc.md; Mac: "I reallty
-// want go to go all in with the detai. Liike proer feel to climbing").
+// CLIMB4 - THE FEEL: THE CLIMB'S SOUNDS (the Enhanced Climbing arc).
 //
 // The camera's twin (player/climb/climbFeel.js): fed the same frame of the motor - its climb events (motor.js _pkEmit), the
 // move in flight and its clock, the hold, the position and the grip - and answering with what the ear hears, played

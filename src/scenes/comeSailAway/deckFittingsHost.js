@@ -1,5 +1,5 @@
 // @ts-check
-// DECK-PROPS (2026-10-17; bible/03-World/Naval-Refit.md DECK-PROPS) - A SHIP'S FITTINGS STOOD ON HER DECK: each fitting
+// DECK-PROPS - A SHIP'S FITTINGS STOOD ON HER DECK: each fitting
 // (systems/naval/deckFittings.js) a classic model hung in her own tree as the mod's ModelHelpers hang theirs
 // (systems/comeSailAway/comeSailAwayBoat.js createDaggerfallMeshGameObject - a MeshRenderer and a MeshCollider over the
 // model) under one node of hers, DECK_FITTINGS_NODE, under her MeshObject - the frame her deck is baked in (systems/

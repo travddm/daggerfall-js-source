@@ -10,7 +10,7 @@
 // (net/accountClient.js accountHomes, onlineHomes.js createOnlineHomes), and the host's own gate functions lifted out
 // of its source and run over those rows. tools/mutants/fb1018d_homebench.json.
 // ACCOUNT-HOMES (at its merge of main, 2026-10-23; asked: "House ownership should be account bound, not character
-// bound"): a home is its ACCOUNT's now - B owns A's home too, its door B's own and its cupboard B's own save's (PIN MOVED
+// bound"): a home is its ACCOUNT's now - B owns A's home too, its door B's own and its cupboard B's own save's (
 // below); the stations' one owner question stands, and serves both.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -118,7 +118,6 @@ test('FB1018D HOME-BENCH THE DOOR AND THE STATION ASK ONE OWNER: through the rea
   const asA = (await reader(cruor, A)).homeAt(MAP, HOME);
   const asB = (await reader(cruor, B)).homeAt(MAP, HOME);
   assert.deepEqual([asA.own, asA.mine, homeDoorAnswer(asA), homeStationsServe(asA)], [true, true, 'own', true], 'the owning character');
-  // PIN MOVED (ACCOUNT-HOMES): the account's other character owns the home as well - its door is its own
   assert.deepEqual([asB.own, asB.mine, asB.owner, homeDoorAnswer(asB)], [true, true, 'Cruor', 'own'], 'the account\'s other character: its own home too (ACCOUNT-HOMES)');
   assert.equal(homeStationsServe(asB), true, 'THE REPORT: the door lets B in as the owner\'s, and the station serves B as the owner\'s');
   const shut = (await reader(mara, Mara)).homeAt(MAP, HOME);
@@ -144,9 +143,8 @@ test('FB1018D HOME-BENCH THE HOST\'S GATE: the host\'s own functions over the se
     gate.press({ station: 'enchant' });
     gate.press({ station: 'forge' });
     assert.deepEqual(log.said, [], `${who} is told nothing`);
-    assert.deepEqual(log.opened, [['chooser', 'enchant'], ['page', 'crafting']], `${who}: the enchanting station's chooser (the item maker, Disenchant), the forge's Crafting page`);   // PIN MOVED (CRAFT-HALL): a station's door lands on the Crafting page
+    assert.deepEqual(log.opened, [['chooser', 'enchant'], ['page', 'crafting']], `${who}: the enchanting station's chooser (the item maker, Disenchant), the forge's Crafting page`);
     gate.activate('cupboard');
-    // PIN MOVED (ACCOUNT-HOMES): every character of the account owns the home, so the cupboard is each one's own storage -
     // its things in that character's own save (HOME1's scene, kept per save)
     assert.deepEqual([gate.slot, log.said], [{ storage: true }, []], `the cupboard is ${who}'s own storage`);
   }

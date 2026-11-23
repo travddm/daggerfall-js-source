@@ -1,4 +1,4 @@
-// STUDIO1 (2026-10-17, bible/07-Rendering/Studio-Art.md): THE STUDIO'S TOOL - what the game's artists can paint, the
+// STUDIO1: THE STUDIO'S TOOL - what the game's artists can paint, the
 // pictures they start from, and whether their folder is ready to ship.
 //
 //   node tools/studioArt.mjs                 every slot the port paints itself, and which the studio already covers
@@ -8,7 +8,7 @@
 //   node tools/studioArt.mjs check           the folder's rules (scripts/studioArtIndex.mjs) and every picture decoded;
 //                                            exits 1 on a problem - the suite runs the same check
 //
-// The studio page (studio.html, on the dev server and the site) shows and hands out the same templates in a browser.
+// The studio page (labs/studio.html, on the dev server and the site) shows and hands out the same templates in a browser.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join, resolve } from 'node:path';

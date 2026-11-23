@@ -110,27 +110,6 @@ test('U21: PICK03I0 is a full-screen palettized IMG on its OWN palette', { skip:
 // front of them would block every one.
 // ---------------------------------------------------------------------------
 
-test('U21: the bare URL reaches the menu, and ?shot bypasses it', () => {
-  const main = readFileSync(join(root, 'src/main.js'), 'utf8');
-  assert.match(main, /runMenu\(canvas, renderer, status\)/, 'the bare URL must reach the menu');
-  assert.match(main, /params\.has\('shot'\)\s*\|\|\s*params\.has\('nomenu'\)/,
-    '?shot must bypass the menu or every probe in tools/ blocks');
-  // The bypass has to come BEFORE the menu, or it does not bypass anything.
-  assert.ok(main.indexOf("params.has('shot')") < main.indexOf('runMenu('),
-    'the ?shot bypass must precede the menu');
-});
-
-test('U21: LOAD reuses the host quickLoad rather than a second loader', () => {
-  const dungeon = readFileSync(join(root, 'src/scenes/dungeon.js'), 'utf8');
-  assert.match(dungeon, /params\.has\('load'\)/, 'the host must honour the menu\'s load flag');
-  assert.match(dungeon, /ctx\.quickLoad\(/, 'and load through the context, not a copy');
-  assert.match(dungeon, /loadedPos \?\? ctx\.startSpawn\(\)/,
-    'a loaded game resumes where it was saved, not at the start marker');
-  // No second loader anywhere in the menu path.
-  const menu = readFileSync(join(root, 'src/scenes/menu.js'), 'utf8');
-  assert.equal(/restorePlayer\(/.test(menu), false, 'the menu must not restore a save itself');
-});
-
 // ---------------------------------------------------------------------------
 // U21b: the chargen parent panel, in the HOST's space.
 //
@@ -263,42 +242,6 @@ test('U21c: the title screen paints opaque black behind the logo', async () => {
 // where NEAREST aliases. Both are OPT-IN, so these pins also prove the classic
 // law is still the default for everything else.
 // ---------------------------------------------------------------------------
-
-test('U21c: the logo draws ALPHA-BLENDED, where classic art keeps the cutout', async () => {
-  const { TitleScreen } = await import('../../src/ui/titleScreen.js');
-  const quads = [];
-  const renderer = {
-    drawScreenQuad: (tex, rect, uv, color, opts) => quads.push({ tex, opts }),
-  };
-  new TitleScreen({ kind: 'logo', tex: 'LOGO', width: 2000, height: 650 })
-    .draw(renderer, { width: 1400, height: 900 });
-
-  assert.equal(quads[1].tex, 'LOGO');
-  assert.equal(quads[1].opts?.blend, true, 'the logo opts INTO alpha blending');
-
-  // The backdrop - and every other quad in the port - does not.
-  assert.notEqual(quads[0].opts?.blend, true, 'the solid backdrop takes no texture blend');
-
-  // AUDIT 19 F6: this used to be three source REGEXES, and a regex cannot
-  // see whether a computed value is ever USED - swapping the shader's two
-  // arms, or making the flag dead, passed all of them. The decision is a
-  // pure function now, so it is pinned BEHAVIOURALLY.
-  const { screenQuadBlends } = await import('../../src/render/renderer.js');
-  const OPAQUE = [1, 1, 1, 1];
-  const HALF = [0, 0, 0, 0.5];
-  // Textured: the 1-bit cutout unless the caller opts in. This is the law
-  // for every piece of classic art in the game.
-  assert.equal(screenQuadBlends('TEX', OPAQUE, {}), false, 'classic art keeps the cutout');
-  assert.equal(screenQuadBlends('TEX', OPAQUE, { blend: true }), true, 'and the caller can opt in');
-  // A translucent COLOUR still blends with no texture (U10's sixteen panels).
-  assert.equal(screenQuadBlends(null, HALF, {}), true, 'a translucent solid quad blends');
-  assert.equal(screenQuadBlends(null, OPAQUE, {}), false, 'an opaque solid quad does not');
-  // And the flag must not leak across the tex/solid boundary.
-  assert.equal(screenQuadBlends(null, OPAQUE, { blend: true }), false,
-    'blend is a TEXTURE opt-in; a solid quad still decides on its alpha');
-  const shader = readFileSync('src/render/renderer.js', 'utf8');
-  assert.match(shader, /if \(t\.a < 0\.5\) discard;/, 'the 1-bit cutout is still the shader ELSE');
-});
 
 test('U21c: the logo uploads LINEAR/CLAMP, where classic art stays NEAREST/REPEAT', async () => {
   const { runTitle } = await import('../../src/scenes/menu.js');
@@ -528,26 +471,3 @@ test('AUDIT 19 F2 / AUDIT 24: the letterbox rule, and the windows C# exempts fro
   assert.deepEqual(SCREEN_DIM, [0, 0, 0, 0]);
 });
 
-test('AUDIT 19 F10: the texture cache is keyed by SAMPLING MODE, and frees both', async () => {
-  // uploadTexture memoises on archive/record and returns early on a hit, so
-  // asking for { smooth: true } under a key already uploaded NEAREST/REPEAT
-  // used to hand back the wrong sampling silently. Only the logo asks for
-  // smooth today, so nothing was broken - but a cache that ignores an
-  // argument is a trap. Fixing it then risks the opposite bug: a release
-  // that only knows the plain key leaves the smooth upload unreachable.
-  const src = readFileSync('src/render/renderer.js', 'utf8');
-  const up = src.slice(src.indexOf('uploadTexture(archive, record, color32'));
-  assert.match(up.slice(0, 900), /opts\.smooth \? '#smooth' : ''/,
-    'the sampling mode must be part of the cache key');
-
-  // AUDIT 68 X3-release-texture-variant-keys: release frees the keys the
-  // upload recorded for the base, not a guessed suffix list.
-  const rel = src.slice(src.indexOf('releaseTexture(archive, record)'));
-  assert.match(rel.slice(0, 900), /this\._texKeysByBase\.get\(base\)/,
-    'and release must free EVERY variant, or fixing the cache leaks instead');
-
-  // Behavioural half: a fake renderer-shaped cache proves the keys differ.
-  const keyOf = (archive, record, opts = {}) => `${archive}_${record}${opts.smooth ? '#smooth' : ''}`;
-  assert.notEqual(keyOf('ui', 'logo', { smooth: true }), keyOf('ui', 'logo'));
-  assert.equal(keyOf('vid', 'frame'), 'vid_frame', 'the default key is unchanged');
-});

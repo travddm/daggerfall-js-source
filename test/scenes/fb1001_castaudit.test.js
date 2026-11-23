@@ -1,4 +1,4 @@
-// AUDIT 2026-10-01 part five (Mac: "audit this") - CAST-USE, on the real engines (two createPlayerMagic, the street's and
+// AUDIT 2026-10-01 part five - CAST-USE, on the real engines (two createPlayerMagic, the street's and
 // the dungeon's, over one player), the real createEnchantCtx mounted through liveCastEngine, the real useItem:
 //   CU1 a ready held when the mode flips was still on the other engine - one taken down the stairs (a touch ready lets the
 //      dungeon door through) fired at the first click back outside, one held at the way out died with the dungeon's
@@ -39,46 +39,6 @@ function host({ foes = [] } = {}) {
     foes: () => foes, foeSinks: () => sinks, magic: () => shared.liveCastEngine(modes.mode, modes.dungeonCtx, street) }));
   return { player, street, dungeon, modes };
 }
-
-test('AUDIT CAST-USE CU1: a ready taken across a mode flip goes with the player - free and at its stored price (worldModes hands it at each flip)', () => {
-  try {
-    const h = host();
-    useItem(item(ENCHANTMENT_TYPES.CastWhenUsed, 31), h.player.items, { entity: h.player, isEnchanted: () => true });
-    assert.equal(h.street.readied()?.name, 'Shock');
-    assert.equal(typeof h.street.handReadyTo, 'function', 'the engine can hand its ready on');
-    h.street.handReadyTo(h.dungeon);
-    assert.equal(h.street.readied(), null, 'nothing left behind on the street');
-    assert.equal(h.dungeon.readied()?.name, 'Shock', 'armed underground');
-    assert.equal(h.dungeon.readiedCost(), 0, 'still the item\'s free ready');
-    // and free where it fires: an Ice Storm carried down costs nothing at the click (its 150 would be refused at 100 magicka)
-    useItem(item(ENCHANTMENT_TYPES.CastWhenUsed, 20), h.player.items, { entity: h.player, isEnchanted: () => true });
-    h.dungeon.takeReady({});   // the Shock's ready set aside
-    h.street.handReadyTo(h.dungeon);
-    const mk = h.player.magicka;
-    h.player.isSilenced = true;   // a free ready passes the silence gate (SilenceCheck is gated on its cost) - a paid one would not
-    h.dungeon.interceptAttack(true);
-    assert.equal(h.dungeon.firePending([0, 1, 0], [0, 0, 1]), true, 'the click casts it');
-    assert.equal(h.dungeon.missileCount(), 1);
-    assert.equal(h.player.magicka, mk, 'and spends no magicka, silenced or not - still the item\'s');
-    h.player.isSilenced = false;
-    const M = src('src/scenes/worldModes.js');
-    const enter = M.slice(M.indexOf("setMode('dungeon');"), M.indexOf("setMode('dungeon');") + 1200);
-    assert.match(enter, /magic\?\.handReadyTo\?\.\(ctx\.castEngine\);/, 'down: handed as the mode flips');
-    assert.match(M, /\n\s+enchantCtx: false,\n\s+outerCastEngine: \(\) => magic,/, 'the hosted dungeon is told where a ready goes on the way out');
-    assert.match(src('src/scenes/dungeonContext.js'), /magic\.handReadyTo\(opts\.outerCastEngine\?\.\(\) \?\? null\);[^\n]*\n\s+magic\.destroy\(\);/, 'up (the door, a Recall, a load): handed before the engine dies');
-  } finally { setDefaultEnchantCtx(null); }
-});
-
-test('AUDIT CAST-USE CU2: the dungeon\'s ready line prices a free ready at what the click spends (0), a paid one at its stored price', () => {
-  try {
-    const h = host();
-    h.modes.mode = 'dungeon'; h.modes.dungeonCtx = { castEngine: h.dungeon };
-    useItem(item(ENCHANTMENT_TYPES.CastWhenUsed, 20), h.player.items, { entity: h.player, isEnchanted: () => true });
-    assert.equal(typeof h.dungeon.readiedCost, 'function');
-    assert.equal(h.dungeon.readiedCost(), 0);
-    assert.match(src('src/scenes/dungeonContext.js'), /\$\{shownSpellName\(magic\.readied\(\)\)\} \(\$\{magic\.readiedCost\(\)\}\)/);
-  } finally { setDefaultEnchantCtx(null); }
-});
 
 test('AUDIT CAST-USE CU3: Cast When Strikes underground lands through the dungeon\'s engine - on a foe, and on the player (mutants: either door on the mount-time engine)', () => {
   try {

@@ -1,6 +1,5 @@
 // @ts-check
-// THE WATER SURFACE (WATER1, 2026-09-08). Mac: "develop proper water
-// shader for the oceans/rivers/ponds of daggerfall."
+// THE WATER SURFACE (WATER1, 2026-09-08).
 //
 // WHAT DAGGERFALL DRAWS. Water is record 0 of the terrain tileset, and
 // the terrain pass draws it exactly as it draws dirt: one opaque layer
@@ -41,10 +40,13 @@ import { isEnhanced } from '../systems/uiSkin.js';
 import { FOG_GLSL } from './fogGlsl.js';   // AUDIT 68 S17-fog-glsl-dup: the fog every world pass takes, one home
 import { SEA_LOOK_GLSL, SEA_HAZE_BAND } from './horizonHaze.js';   // FAR-SEA1: the sea takes the far ring's haze; AUDIT FAR-SEA1 C12: and the open sea's light is one text with the ring's sea
 import { pageParam } from '../systems/pageQuery.js';
+import { EDGE_NOISE_GLSL } from './roadEdgeGlsl.js';
+import { quadCutsSeNw, writeQuadTriangles } from '../world/terrain/terrain-quad-cut.ts';   // COAST-LOOK: the edges' lattice noise, its one text
+import { groundWanderGlsl, groundKindsGlsl } from './groundEdgeGlsl.js';   // COAST-LOOK: the shore's wander and the transitions' table, the ground's own (the sheet, the sand and the silt on one line)
 import { RIPPLE_CELLS, RIPPLE_SCALE } from '../world/water/waterRipples.js';
 import { NO_BED_DEPTH, SHELF_SHEET_DEPTH } from '../world/water/waterCorners.js';   // AUDIT WATER-NEXT H2: its one home, the water's leaf (the kernel's worker writes it)   // WATER-NEXT 4: the ripple field the shader reads   // PERF-URL: the page's query, parsed once a search
 
-/** FT6 (2026-09-14, the Features arc): THE SWITCH, ONE HOME. Both
+/** FT6: THE SWITCH, ONE HOME. Both
  *  exterior hosts composed "the enhanced skin, the pref, the kill door"
  *  inline, word for word - two copies of one law. This is the copy:
  *  the enhanced skin (the classic lane draws DFU's flat tile), the
@@ -56,7 +58,7 @@ export function waterSwitchOn(search = globalThis.location?.search ?? '') {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FIELD BUGS 2026-09-29 (the sea) #4 (the Discord, through Mac: "Water flickers from a distance"): THE WATER'S LAYERS
+// FIELD BUGS 2026-09-29 (the sea) #4 (the Discord, through): THE WATER'S LAYERS
 // IN WINDOW DEPTH. The sea is a stack of sheets a few centimetres apart: the ground under it (the beach at the sea's
 // own 34 m, Iliac Puddle No More's carved floor at least 5 cm under it), the sea's surface film over that (Iliac Puddle
 // No More's top 3 cm up, SurfaceRenderYOffset; WATER1 a hand's breadth over the ground it lies on), and Come Sail Away's
@@ -137,7 +139,7 @@ export function tilemapRectHasWater(bytes, dim, width, height, table = WATER_DRA
  * tiles at (x * stride.., z * stride..) - the grid's cell IS the tile at
  * stride 1 (6.4 units), which is the frame the shader samples in.
  */
-export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TABLE, tileDim = 128, width = tileDim, height = tileDim) {
+export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TABLE, tileDim = 128, width = tileDim, height = tileDim, samples = null) {
   const g = width / stride + 1;   // WATER-NEXT 2: a grid `width` x `height` tiles (the fixed town's), `tileDim` a row
   const qx = g - 1, qz = height / stride;
   const out = [];
@@ -149,13 +151,22 @@ export function buildWaterIndices(bytes, stride = 1, table = WATER_DRAW_MASK_TAB
         for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (table[bytes[row + tx]]) { wet = true; break; }
       }
       if (!wet) continue;
-      const i0 = z * g + x, i1 = i0 + 1, i2 = i0 + g, i3 = i2 + 1;
-      out.push(i0, i2, i3, i0, i3, i1);
+      out.push(x, z);
     }
   }
-  return out.length ? Uint32Array.from(out) : null;
+  if (!out.length) return null;
+  const indices = new Uint32Array(out.length * 3);
+  for (let k = 0, o = 0; k < out.length; k += 2) {
+    const x = out[k];
+    const z = out[k + 1];
+    const seNw = samples !== null && quadCutsSeNw(samples, x, z, stride);   // the ground's own cut; the town's flat grid has none
+    o = writeQuadTriangles(indices, o, z * g + x, g, seNw);
+  }
+  return indices;
 }
 
+/** A streamed pixel's water index set: its TileMap at the draw's table, each quad cut as its `samples` cut the ground. */
+export const buildPixelWaterIndices = (bytes, stride, samples) => buildWaterIndices(bytes, stride, WATER_DRAW_MASK_TABLE, 128, 128, 128, samples);
 
 /** 0..1: the eased wind row's strength on the sky's own scale
  *  (systems/wind/wind.js: a row's vector runs WIND_ROW_CALM to
@@ -200,8 +211,7 @@ export function waterUniforms({ seconds = 0, wind = null, rain = 0, sky = null, 
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// WATER-NEXT 2 - THE SWELL (2026-10-07, Mac: "real translucent water with proper waves"; asked, the waves "modest,
-// weather-driven"): THE SHEET MOVES. WATER1's waves were a normal map on a still sheet; the sheet now rides three
+// WATER-NEXT 2 - THE SWELL: THE SHEET MOVES. WATER1's waves were a normal map on a still sheet; the sheet now rides three
 // long trains - one down the wind, two crossing it - whose height the vertex shader lifts the sheet by and whose slope
 // the fragment shader lights, ONE field (SWELL_GLSL, written from SWELL_TRAINS, and swellAt below, the same sum for the
 // CPU - AUDIT WATER-NEXT m10: its pins read it; no hull bobs on it yet, so a still boat's waterline rides the swell's
@@ -276,7 +286,7 @@ export { NO_BED_DEPTH };
  *  without a depth copy). */
 export const OPEN_PATH = 60.0;
 // ═══════════════════════════════════════════════════════════════════
-// WATER-NEXT 3 - THE SHORE (Mac: "shoreline interactivity"): WHERE THE WATER RUNS OUT, IT BREAKS. A band of foam where
+// WATER-NEXT 3 - THE SHORE: WHERE THE WATER RUNS OUT, IT BREAKS. A band of foam where
 // the water is shallow - FOAM_DEPTH of it, wider in a wind - pushed up the bank by the swell's crest and drawn back by
 // its trough (the run-up: the band's edge rides the swell's own height), cut into lace by a noise that drifts down the
 // wind; and on open water in a strong wind, where the swell is steep, its crests whiten. Lit by the light the water
@@ -392,6 +402,9 @@ uniform vec3 uSkyHorizon;
 uniform vec3 uTint;
 uniform float uF0;
 uniform float uShoreSoft;
+${EDGE_NOISE_GLSL}
+${groundWanderGlsl()}
+${groundKindsGlsl()}
 uniform vec3 uAbsorb;
 uniform int uSceneOn;          // WATER-NEXT 2: the frame's colour and depth, copied before the water (Renderer.captureUnderWater)
 uniform sampler2D uScene;
@@ -483,7 +496,7 @@ void main() {
     uint corners = waterCorners(data);
     if (corners == 0u) discard;
     vec2 f = fract(unwrapped);
-    edge = smoothstep(0.5 - uShoreSoft, 0.5 + uShoreSoft, coverage(corners, f));
+    edge = smoothstep(0.5 - uShoreSoft, 0.5 + uShoreSoft, coverage(corners, f) - (geEntry(data) != 0u ? geWander(unwrapped) : 0.0));   // COAST-LOOK: a shore the ground blends on the ground's own line (the water the land's complement)
     // WATER-PUDDLE: a puddle record keeps only the texels its own art paints water (world/puddleMask.js)
     uint rec = data >> 2u;
     if (isPuddleRecord(rec)) {

@@ -1,7 +1,6 @@
 // MAP-FIELD2/3/4: THE HELD SPRITE, MEASURED OFF THE PICTURE.
 //
-// Mac: "the sprite I gave to hold the map isnt positioned correctly and
-// is full screen with a black background"; then "there's still a gap at
+// then "there's still a gap at
 // the bottom of the arms, any way you can author the gap?"; then "the
 // ingame map on the map appears going off the edge"; then, with a third
 // painting, "Try this instead".

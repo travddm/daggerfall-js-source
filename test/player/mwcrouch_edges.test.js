@@ -1,8 +1,6 @@
 // ---------------------------------------------------------------------------
 // MWCROUCH - GetKeyDown AND GetKeyUp, WHICH THE PORT HAD BEEN DERIVING.
 //
-// Mac, 2026-09-17: "When crouching with the morrowind model. you can't
-// uncrouch".
 //
 // The motor is innocent and so is the Morrowind rig. `_heightAction`
 // (player/motor.js) has no view-mode arm, `get height()` has no MW
@@ -216,7 +214,7 @@ test('MWCROUCH: every host that OWNS a frame rotates the ring exactly once, and 
     assert.equal(rot.length, 1, `${f}: the rotation is the frame's, once - a second call throws the frame's edges away`);
     assert.ok(/frameBegin\(now\);[^\n]*\n\s*beginInputFrame\(/.test(s), `${f}: the rotation sits at the head of the frame, above the video hold`);
     assert.ok(/noteKeyDown\((keyEdge|latch\.edge), e\.code, e\.repeat\)/.test(s), `${f}: the keydown listener must note the press`);
-    assert.ok(/noteKeyUp\((keyEdge|latch\.edge), e\.code\)/.test(s), `${f}: the keyup listener must note the release`);
+    assert.ok(/noteKeyUp\((keyEdge|latch\.edge), e\.code\)/.test(s) || /bindKeyRelease\(\{[^\n]*edges: \(\) => latch\.edge,/.test(s), `${f}: the keyup listener must note the release`);   // world.js: ui/release-held-input.js notes it
     assert.ok(/noteKeyDown\((keyEdge|latch\.edge), mc\)/.test(s), `${f}: the MOUSE codes ride the ring too (AUDIT 39r's law)`);
     assert.ok(/noteKeyUp\((keyEdge|latch\.edge), mc\)/.test(s), `${f}: ...and their release`);
   }

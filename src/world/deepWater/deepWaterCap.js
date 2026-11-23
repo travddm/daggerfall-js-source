@@ -32,6 +32,7 @@
 import { HEIGHTMAP_DIMENSION } from '../terrain/terrainSampler.js';
 import { WORLD_MAP_TILE_DIM } from '../terrain/terrainTiles.js';
 import { heightSample, mapDataHasWater, mapDataFullySubmerged, DW_WATER_THRESHOLD } from './deepWaterClassification.js';
+import { quadCutsSeNw, writeQuadTriangles } from '../terrain/terrain-quad-cut.ts';
 import { CLIP_SENTINEL } from '../terrain/terrainSurface.js';   // FAR-CLIP1: the byte's one home, the TileMap format's module - the renderer reads it there too
 
 const f32 = Math.fround;
@@ -130,6 +131,10 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
   return { hide, tilemap: clip ? patchTilemapForClip(tilemapBytes, mapData) : null };
 }
 
+/** Which way each standing quad is cut: as `samples` cut their ground, or, without them, on the fixed cut flat
+ *  ground keeps. */
+const quadCutOf = (samples, stride) => (samples ? (x, z) => quadCutsSeNw(samples, x, z, stride) : () => false);
+
 /**
  * THE CLIP'S CULL. The mod discards a clipped texel in its terrain shader
  * (TilemapTextureArrayClipWater's `(255, 0, 255)` test), and so does the
@@ -151,21 +156,27 @@ export function capDecision(mapPixelX, mapPixelY, mapData, tilemapBytes, bake) {
  * @param {number} [stride]
  * @returns {?Uint32Array} null when no quad or skirt segment is clipped
  */
-export function clippedTerrainIndices(bytes, stride = 1) {
+export function clippedTerrainIndices(bytes, stride = 1, ring = false, samples) {
   const dim = WORLD_MAP_TILE_DIM;
   const g = (HEIGHTMAP_DIMENSION - 1) / stride + 1;
   const q = g - 1;
+  const cutsSeNw = quadCutOf(samples, stride);
+  // COAST-LOOK (`ring`, renderer.coastEdges): the clip program cuts on a wandering line inside the clipped tiles, so a
+  // clipped tile goes only when it and the eight about it are clipped (wholeCut) - the coast's ring is the program's
+  const gone = ring ? wholeCut(bytes, dim) : null;
+  const cut = gone ? (t) => gone[t] === 1 : (t) => bytes[t] === CLIP_SENTINEL;
   const out = [];
   let dropped = 0;
   for (let z = 0; z < q; z++) {
     for (let x = 0; x < q; x++) {
       let clipped = true;
       for (let tz = z * stride; tz < (z + 1) * stride && clipped; tz++) {
-        for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (bytes[tz * dim + tx] !== CLIP_SENTINEL) { clipped = false; break; }
+        for (let tx = x * stride; tx < (x + 1) * stride; tx++) if (!cut(tz * dim + tx)) { clipped = false; break; }
       }
       if (clipped) { dropped++; continue; }
-      const i0 = z * g + x, i1 = i0 + 1, i2 = i0 + g, i3 = i2 + 1;
-      out.push(i0, i2, i3, i0, i3, i1);
+      const quad = [0, 0, 0, 0, 0, 0];   // a quad that stands is cut as `samples` cut its ground (terrain-quad-cut.ts)
+      writeQuadTriangles(quad, 0, z * g + x, g, cutsSeNw(x, z));
+      out.push(...quad);
     }
   }
   if (stride > 1) {
@@ -177,7 +188,7 @@ export function clippedTerrainIndices(bytes, stride = 1) {
       const edge = edges[e], tile = tiles[e], base = g * g + e * g;
       for (let i = 0; i < q; i++) {
         let clipped = true;
-        for (let t = i * stride; t < (i + 1) * stride; t++) if (bytes[tile(t)] !== CLIP_SENTINEL) { clipped = false; break; }
+        for (let t = i * stride; t < (i + 1) * stride; t++) if (!cut(tile(t))) { clipped = false; break; }
         if (clipped) { dropped++; continue; }
         const t0 = edge(i), t1 = edge(i + 1), b0 = base + i, b1 = base + i + 1;
         out.push(t0, b0, b1, t0, b1, t1, t0, b1, b0, t0, t1, b1);
@@ -186,4 +197,20 @@ export function clippedTerrainIndices(bytes, stride = 1) {
   }
   if (!dropped) return null;
   return Uint32Array.from(out);
+}
+
+/** COAST-LOOK: 1 where a clipped tile and the eight about it (clamped to the pixel) are all clipped - cut whole. */
+function wholeCut(bytes, dim) {
+  const out = new Uint8Array(dim * dim);
+  for (let z = 0; z < dim; z++) {
+    for (let x = 0; x < dim; x++) {
+      let all = true;
+      for (let dz = -1; dz <= 1 && all; dz++) {
+        const r = Math.min(dim - 1, Math.max(0, z + dz)) * dim;
+        for (let dx = -1; dx <= 1; dx++) if (bytes[r + Math.min(dim - 1, Math.max(0, x + dx))] !== CLIP_SENTINEL) { all = false; break; }
+      }
+      if (all) out[z * dim + x] = 1;
+    }
+  }
+  return out;
 }

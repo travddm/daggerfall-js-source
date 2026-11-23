@@ -1,9 +1,8 @@
-// SMOKE-LOST (2026-10-18, the owner's screenshot of #1004's account deploy: renown/xp -> 000, 503, then 200
-// `"credited":0,"repeat":true`): A WRITE WHOSE ANSWER WAS LOST MAY HAVE LANDED. The smoke's first Renown report hung
+// SMOKE-LOST: A WRITE WHOSE ANSWER WAS LOST MAY HAVE LANDED. The smoke's first Renown report hung
 // 15 s and was credited; its retry was answered, rightly, as that report again - and the smoke, asking `credited` 1 of
 // the answer it got, failed a deploy whose Worker had taken. `ask` now leaves `<out>.lost` when a try went unanswered,
 // and the two calls that write before they are read (the first beat, the first report) take, after a lost try, the
-// answer the landed write gives its retry - never without one. The record: bible/06-Systems/Online-Arc.md, HOME2's
+// answer the landed write gives its retry - never without one. The record:, HOME2's
 // "The deploy's smoke asks again".
 //
 // The step itself runs here, through bash as the runner runs it, against a curl that answers as the service does, up
@@ -14,6 +13,7 @@ import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const ROOT = new URL('../../', import.meta.url);
 const YML = readFileSync(new URL('.github/workflows/account-deploy.yml', ROOT), 'utf8');
@@ -72,9 +72,13 @@ curl() {
   printf '%s' "\${a%% *}"
 }
 sleep() { :; }
-${smokeToRenown().replace(/^base=.*$/m, `base=${SERVICE}`).replaceAll('/tmp/', `${dir}/`)}
+${smokeToRenown().replace(/^base=.*$/m, `base=${SERVICE}`).replaceAll('/tmp/', `${dir.split('\\').join('/')}/`)}
 echo ${REACHED}`;
-  const r = spawnSync('bash', ['-c', script], { cwd: ROOT.pathname, env: { PATH: process.env.PATH, CALLS: calls, LEGAL_TERMS: 't', LEGAL_PRIVACY: 'p' }, encoding: 'utf8' });
+  // Run from a file, as the runner runs a step: on Windows a script passed through `-c` is re-split by the shell's
+  // command-line parser, which mangles its quotes.
+  const scriptFile = join(dir, 'smoke-script.sh');
+  writeFileSync(scriptFile, script);
+  const r = spawnSync('bash', [scriptFile], { cwd: fileURLToPath(ROOT), env: { PATH: process.env.PATH, CALLS: calls, LEGAL_TERMS: 't', LEGAL_PRIVACY: 'p' }, encoding: 'utf8' });
   const asked = readFileSync(calls, 'utf8').trim().split('\n').filter(Boolean);
   return { ok: r.status === 0 && r.stdout.includes(REACHED), out: r.stdout + r.stderr, asked };
 }

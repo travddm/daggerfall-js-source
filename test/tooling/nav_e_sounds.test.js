@@ -1,6 +1,5 @@
-// NAV-E (2026-09-28, Mac: "proper naval combat with a huge reference to assassins creed black flag ... extremely
-// detailed, authentic") - THE SOUNDS: six clips synthesised and baked to DAGGER.SND's own format, registered on the
-// audio bus once, and the distances every naval sound carries over open water (bible/03-World/Naval-Combat.md).
+// NAV-E - THE SOUNDS: six clips synthesised and baked to DAGGER.SND's own format, registered on the
+// audio bus once, and the distances every naval sound carries over open water.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -41,12 +40,11 @@ test('NAV-E the ten clips (AUDIT NAV1: the run-out the seventh, the ready the ei
   }
 });
 
-test('NAV-E the bake is deterministic and the gun lab\'s kit moved whole: tools/navalSfx.mjs writes the ten shipped files byte for byte, and tools/gunSfx.mjs - on the shared tools/sfxSynth.mjs now - its three as they were (mutants: an unseeded noise, the kit changed under the guns)', () => {
+test('NAV-E the bake is deterministic: tools/navalSfx.mjs writes the ten shipped files byte for byte (mutants: an unseeded noise)', () => {
   const dir = mkdtempSync(join(tmpdir(), 'navsfx-'));
   try {
     execFileSync(process.execPath, [join(root, 'tools/navalSfx.mjs')], { cwd: dir, stdio: 'pipe' });
-    execFileSync(process.execPath, [join(root, 'tools/gunSfx.mjs')], { cwd: dir, stdio: 'pipe' });
-    const files = [...Object.values(NAVAL_SFX_FILES), 'gun-fire-synth.wav', 'gun-reload-open-synth.wav', 'gun-reload-close-synth.wav'];
+    const files = Object.values(NAVAL_SFX_FILES);
     for (const f of files) {
       assert.ok(readFileSync(join(dir, 'public/sfx', f)).equals(readFileSync(join(root, 'public/sfx', f))), `${f}: the bake's bytes`);
     }
@@ -85,13 +83,13 @@ test('NAV-E the clips go on the bus once: the first sea registers all ten under 
   const fetchBytes = async (file) => { fetched.push(file); return new Uint8Array(file.length); };
   const p = installNavalSounds(audio, { fetchBytes });
   assert.equal(installNavalSounds(audio, { fetchBytes }), p, 'once');
-  assert.equal(await p, 10);   // PIN MOVED (COMBAT-FEEL: the whistle the tenth)
+  assert.equal(await p, 10);
   assert.deepEqual(registered.map(([k]) => k), Object.keys(NAVAL_SFX_FILES));
   assert.deepEqual(fetched, Object.values(NAVAL_SFX_FILES));
   assert.deepEqual(registered.map(([, n]) => n), Object.values(NAVAL_SFX_FILES).map((f) => f.length), 'the file\'s own bytes');
   _resetNavalSounds();
   const half = await installNavalSounds(audio, { fetchBytes: async (file) => { if (file.includes('far')) throw new Error('404'); return new Uint8Array(4); } });
-  assert.equal(half, 9, 'the far broadside silent, the rest heard');   // PIN MOVED (COMBAT-FEEL)
+  assert.equal(half, 9, 'the far broadside silent, the rest heard');
   _resetNavalSounds();
   assert.equal(await installNavalSounds({ registerSound: async () => false }, { fetchBytes }), 0, 'refused by the bus');
   _resetNavalSounds();

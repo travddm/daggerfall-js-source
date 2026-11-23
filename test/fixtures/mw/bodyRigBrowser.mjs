@@ -1,4 +1,4 @@
-// MWNPC1 (2026-10-09): bodyRig.mjs's fixtureBodyDeps for a PAGE - the same files, fetched off the dev server instead
+// MWNPC1: bodyRig.mjs's fixtureBodyDeps for a PAGE - the same files, fetched off the dev server instead
 // of read with node:fs, and the same two BODY records (bodyRec.mjs, the one writer) - so the browser probe
 // (tools/mwGpuSkinProbe.mjs) builds the very body the node pins stand.
 import { fpSkeletonPath, FP_CLIP_PATH } from '../../../src/combat/fpArm.js';

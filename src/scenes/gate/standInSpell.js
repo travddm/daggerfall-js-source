@@ -3,7 +3,7 @@
 // huge number, and his bar never moved): A HARMFUL SPELL OF MINE ON A BODY THE RELAY RUNS - the court's Warden, his
 // crystals and his host (WB4b, WB9c, WB11c); in the Shattered Hour the Brass Remnant, its Echoes and its Hearts (SD8c);
 // every lord, add and struck object of an Elite Breach's hall (EG-PLAY, through the host seam); my opponent on a relay's
-// sand (ARENA4b). HOST-SPLIT (bible/01-Overview/Host-Split.md): out of buildDungeonContext, which kept this one door four
+// sand (ARENA4b). HOST-SPLIT: out of buildDungeonContext, which kept this one door four
 // times over (spellOnBoss, spellOnCrystal, spellOnHost, spellOnRival) - and the host wires it where they stood.
 //
 // THE DOOR. The spell's harmful families (combat/duelCombat.js duelSpellOf) land on the body's stand-in
@@ -12,18 +12,18 @@
 // forgotten at once. The sum is the claim, out through the host's door for that body; the relay's caps decide what lands.
 //
 // THE NUMBER IT SAYS is what can land (standInShown): the claim, never past the most one blow of mine lands there - the
-// relay's one-blow cap at my level (world/gate/gateBoss.js standInBlowCap; an Elite Breach's grown by my Vestiges' declared
-// factor), a bout referee's spell cap (net/arena/arenaLaw.js arenaBlowCap). The paths' riders are told the same (`took`:
+// relay's one-blow cap at my level (world/gate/gateBoss.js standInBlowCap),
+// a bout referee's spell cap (net/arena/arenaLaw.js arenaBlowCap). The paths' riders are told the same (`took`:
 // what the foe could lose - AUDIT SCHOOLS L1 M6). It said the claim whole, and a Disintegrate's claim is its target's whole
 // (STAND_IN_WHOLE; 1e9 until this fix, which no wire carried): a number rose that nothing landed.
 //
-// FIELD BUGS 2026-10-19f BOSS-DOT (the owner, 2026-10-19: "Carry DoTs"): ITS LASTING HARM IS CARRIED. The stand-in forgot
+// FIELD BUGS 2026-10-19f BOSS-DOT: ITS LASTING HARM IS CARRIED. The stand-in forgot
 // every lasting family the moment the count was done, so a Continuous Damage spell landed its cast's round alone (a level-20
 // Burn - 10 a round for 25 rounds, 8 of each through his save at even dice: 8 of its 200; the other 24 rounds gone) - WB4b's
 // comment, never a decision; WBX7 carried the Soul Trap alone. A
 // relay body's Continuous Damage on its health (carriedOnStandIn) is lifted off the stand-in before the wipe and kept a body
 // (createStandInRounds), fed back as the incumbent so a recast renews it (systems/effects.js renewRounds, STACK-CAP), and
-// ticked on the shared world's round (gateCourt.js COURT_ROUND_MS - the court's trap's clock) by the one law every entity's
+// ticked on the shared world's round (gateCourt.js courtRoundMs - the court's trap's clock) by the one law every entity's
 // rounds run by (tickActiveEffects - a save rolled each round, its caster's power), each round's sum out through the door a
 // spell's claim takes. Its body gone, the fight over, my death or the context's end - its rounds end. The sea serpent's door
 // came here with it (createSerpentSpell, out of bootWorld). A bout's rounds are not carried (BAL8: the referee's blow alone).
@@ -38,7 +38,7 @@ import { SOUL_TRAP_TEXT } from '../../systems/mysticism.js';
 import { HIT_KINDS } from '../../net/gate/gateBrain.js';
 import { ARENA_HIT, arenaBlowCap } from '../../net/arena/arenaLaw.js';
 import { BOSS_SWAY_TEXT, BOSS_SWAY_TELL_MS, standInBlowCap } from '../../world/gate/gateBoss.js';
-import { COURT_ROUND_MS } from './gateCourt.js';   // BOSS-DOT: the round a relay body's lasting harm ticks on - the court's trap's
+import { courtRoundMs } from './gateCourt.js';   // BOSS-DOT: the round a relay body's lasting harm ticks on - the court's trap's
 import { SERPENT_HIT_CAP_X, SERPENT_HAND_REF } from '../../net/serpent/serpentBrain.js';   // BOSS-DOT: the most a hand's blow lands on the serpent
 
 /** BOSS-DOT: THE LASTING HARM A RELAY BODY CARRIES - an entry of Continuous Damage on its health (DUEL_SPELL_TYPES' type 1,
@@ -75,7 +75,7 @@ export function countOnStandIn(harm, entity, level, caster, rolls = Math.random,
 
 /**
  * BOSS-DOT: THE ROUNDS RELAY BODIES CARRY - each body's running Continuous Damage, by its key, ticked together on every
- * round of the shared world's clock (COURT_ROUND_MS: one game minute online, five seconds - the court's soul trap's clock,
+ * round of the shared world's clock (courtRoundMs: one game minute online, five seconds at TimeScale 12 - the court's soul trap's clock,
  * the relay's own; never this machine's magic round, which a rest or a wait moves in a burst). A round runs each body's
  * entries against its stand-in (`tickActiveEffects` - DFU's DoMagicRound: the save rolled fresh, its caster's power), counts
  * what they deal, and sends the sum through the body's door (`land`): one claim a body a round, every body's in the same
@@ -94,14 +94,14 @@ export function createStandInRounds({ now = Date.now, rolls = Math.random } = {}
      *  round before it was laid. */
     keep(key, entries) {
       if (!entries?.length) { kept.delete(key); return; }
-      if (!kept.size) round = Math.floor(now() / COURT_ROUND_MS);
+      if (!kept.size) round = Math.floor(now() / courtRoundMs());
       kept.set(key, entries);
     },
     /** The keys running. */
     keys: () => [...kept.keys()],
     /** One frame. */
     frame(bodyOf, alive = true) {
-      const r = Math.floor(now() / COURT_ROUND_MS);
+      const r = Math.floor(now() / courtRoundMs());
       if (!alive) kept.clear();
       if (!kept.size || round === null || r < round) { round = r; return; }   // none running: the clock stands at this round - one laid now ticks from the next
       if (r === round) return;
@@ -221,7 +221,7 @@ export function createStandInSpell(host) {
     // pacifyImmune) and said so - the rest of the spell lands as it would; alone, the refusal is what met him
     const sways = spellSways(sp) && !!boss.entity.pacifyImmune;
     if (sways && now() - swayToldAt >= BOSS_SWAY_TELL_MS) { swayToldAt = now(); say(BOSS_SWAY_TEXT(boss.entity.name)); }
-    // WBX7 (2026-09-26, Swololo on Discord: "soul trap didnt seem to work"): A SOUL TRAP ON HIM. The trap is laid on his
+    // WBX7: A SOUL TRAP ON HIM. The trap is laid on his
     // stand-in by the one door every spell lands through (applySpell - its rounds, its chance frozen at the cast by my
     // level, his save against a new trap, "Trap active."), and handed to the court, which keeps it on the fight's clock:
     // he is the relay's to kill, so the kill's roll is the court's, at his fall (scenes/gate/gateCourt.js). The stand-in
