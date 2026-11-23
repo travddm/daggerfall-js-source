@@ -84,6 +84,13 @@ event records, receipts).
   `_message` is not a `switch`. It runs pre-parse fast paths (frames recognised by prefix: `WORLD_PREFIX`,
   `FOES_PREFIX`, `OWN_PREFIX`, `QUEST_PREFIX`), then parses JSON and tests `m.t` in a chain. New behaviour goes into
   a method of its own, called from that chain.
+- **Sending.** `_send(ws, text)` offers each frame to the bulk outbox (`server/src/bulk-outbox.ts`) first. A frame
+  of a bulk type in the channel table (`src/net/channel-table.ts`: `world`, `quest`) longer than 16 KiB waits in
+  its socket's queue and goes out as piece frames, one a socket every `BULK_TICK_MS` (50 ms) and at most
+  `BULK_ROOM_PIECES_PER_TICK` (10) a room. Every other frame goes at once through `_sendNow`, which first flushes the
+  pose batch the socket is owed, so poses arrive between the pieces. A virtual shard socket is never pieced: its shard
+  pieces the frame to the real socket. A change of host drops queued world frames from the old host and marks those
+  sockets as not yet handed a memory.
 - **Rate limits.** Every frame kind has a token bucket from `wire.js` (`poseGate`, `chatGate`, `foesGate`, `actGate`,
   and so on). A sender that overspends gets strikes (`DROP_STRIKES_MAX`, `CHAT_STRIKES_MAX`) and is closed with
   `CLOSE_POLICY` (1008).
@@ -107,7 +114,8 @@ it has passed every check below, in this order:
 4. Ban, hidden-staff and freeze checks run (`_bannedHello`, `hiddenHello`, `frozenHello`), then the gate for rooms
    that spend it after the token.
 5. The room answers `{ t: 'welcome', id, peers, host, world, now, v, ph }`. `v` is `RELAY_VERSION` and `ph` is the
-   profile hash.
+   profile hash. A stored memory longer than one piece leaves the welcome of a joiner that is not the host
+   (`"world":null,"wf":1`) and follows it through the bulk outbox as `{ t: 'world', wf: 1, id, data }`.
 
 The hello carries no relay version. The client compares `v` and `ph` from the welcome with its own and refuses a relay
 on another version or other rules (see [wire-protocol.md](wire-protocol.md), One version, client and relay).

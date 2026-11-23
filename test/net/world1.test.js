@@ -96,7 +96,9 @@ test('WORLD1: the Room - the host is the hello\'d socket in the room longest, sa
   await r.world(a, world);
   // served raw in the next welcome
   await r.hello(c, 'cccc-0003', at(1, 1));
-  assert.deepEqual(welcomeOf(c).world, world, 'the joiner is handed the room\'s memory as the host sent it');
+  assert.equal(welcomeOf(c).wf, 1, 'a memory longer than one piece follows the welcome, in pieces (server/src/bulk-outbox.ts)');
+  r.drainBulk();
+  assert.deepEqual(ofType(c, 'world').at(-1)?.data, world, 'the joiner is handed the room\'s memory as the host sent it');
   assert.equal(welcomeOf(c).host, 'aaaa-0001'); assert.equal(ofType(a, 'host').length + ofType(b, 'host').length, 0, 'a hello into a led room (across a wake) says no host frame');
   assert.deepEqual(welcomeOf(c).peers.map((p) => p.id).sort(), ['aaaa-0001', 'bbbb-0002'], 'and the roster still');
   // AUDIT WORLD D4: the joiner that LEADS (a stamp before everyone's - the same-millisecond tie the smaller id wins)

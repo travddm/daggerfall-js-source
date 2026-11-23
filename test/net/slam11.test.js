@@ -81,6 +81,7 @@ test('SLAM11: THE MEMORY LANDS - a room past the old cliff is handed the dungeon
     assert.ok(raw.length > 100 * 1024, `a real dungeon's memory (${raw.length} bytes)`);
     clock += 20_000;   // WORLD_MIN_MS between publishes
     await r.raw(host, raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     // SLAM13 (AUDIT SLAM A4): served A LISTENER AT A TIME at the rate - a second's worth of FOES_ROOM_BYTES_PER_S fit
     // whole, then one more on the borrow, and the rest wait UNSEEN for the next publish. SLAM11 handed all 63 on one
     // publish, which for the largest memory into a full room was 127 MiB queued in one tick - the object's whole memory.
@@ -96,6 +97,7 @@ test('SLAM11: THE MEMORY LANDS - a room past the old cliff is handed the dungeon
     // the next publish (WORLD_PUBLISH_MS on, the debt repaid) hands it to the rest, and to nobody who already has it
     clock += 20_000;
     await r.raw(host, raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length === 1).length, n - 1, `every one of the ${n - 1} sockets has the memory after the second publish`);
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length > 1).length, 0, 'nobody is handed it twice');
   } finally { Date.now = realNow; }
@@ -113,10 +115,12 @@ test('SLAM11/PINS: a REFUSED push latches NOBODY - a socket the memory did not r
     clock += 20_000;
     r.room._roomWorld = { bytes: -1, at: clock };   // IN DEBT: the push must be refused
     await r.raw(host, raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length > 0).length, 0, 'refused: nobody handed it');
     for (const s of ws.slice(1)) assert.notEqual(s.att.worldSeen, true, `${s.att.id} is NOT latched as seen - it saw nothing`);
     clock += 20_000;   // the debt repaid by the rate, WORLD_MIN_MS passed
     await r.raw(host, raw);
+    r.drainBulk();   // the memory goes in pieces: whole once the outbox drains
     assert.equal(ws.slice(1).filter((s) => ofType(s, 'world').length === 1).length, 5, 'the next publish hands it to every one of them');
     for (const s of ws.slice(1)) assert.equal(s.att.worldSeen, true, 'and now they are seen');
   } finally { Date.now = realNow; }

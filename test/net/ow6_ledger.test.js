@@ -309,7 +309,7 @@ test('OW6L wire: the `ow` word - after a hello, projected by validOwIn, the whol
   let rb = null, rpass = 0;
   for (let i = 0; i < OW_ROOM_HZ_MAX + 3; i++) { const g = owRoomGate(rb, 1000); rb = g.bucket; if (g.pass) rpass++; }
   assert.equal(rpass, OW_ROOM_HZ_MAX);
-  assert.equal(RELAY_VERSION, 'world327');
+  assert.equal(RELAY_VERSION, 'world328');
   assert.equal(OW_LEDGER_KEY, 'ow:led'); assert.ok(!OW_LEDGER_KEY.startsWith('world:'), 'never under the prefix a cell\'s alarm sweeps');
 });
 
@@ -537,7 +537,7 @@ test('OW6L by source: the relay\'s arm spends its own bucket before it asks for 
   const relay = rd('server/src/index.js');
   assert.match(relay, /if \(!this\._spend\(ws, now, owGate, 'owBucket', 'owDrops', 'too many overworld frames'\)\) return;\n\s+if \(!isCellRoom\(a\.key\)\) \{ this\._junk\(ws\); return; \}/);
   assert.match(relay, /const ow = isCellRoom\(a\.key\) \? await this\._owWelcome\(Date\.now\(\)\) : '';/);
-  assert.match(relay, /"host":\$\{JSON\.stringify\(host\)\}\$\{ow\},"world":\$\{world \?\? 'null'\},"now":\$\{Date\.now\(\)\},"v":/, 'the field before the memory, the clock (stamped as the welcome is built) and the version, which close the frame as they always have');
+  assert.match(relay, /"host":\$\{JSON\.stringify\(host\)\}\$\{ow\},"world":\$\{welcomeWorldField\(world, host, m\.id\)\},"now":\$\{Date\.now\(\)\},"v":/, 'the field before the memory, the clock (stamped as the welcome is built) and the version, which close the frame as they always have');
   const online = rd('src/net/online.js');
   const law = rd('src/net/overworldLaw.js');
   const from = [...law.matchAll(/\bfrom\s+'([^']+)'/g)].map((m) => m[1]);
