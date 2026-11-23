@@ -1,0 +1,2007 @@
+[
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE loser = ?1"
+  },
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE loser = ?1 AND winner = ?2 AND at > ?3 - ?4"
+  },
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE loser = ?1 AND winner = ?2 AND at > ?3 - ?5) < ?6 A"
+  },
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE rk = ?1"
+  },
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE rk = ?4) AND (SELECT COUNT(*) FROM duel_results WHE"
+  },
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE winner = ?1"
+  },
+  {
+    "file": "accounts.js",
+    "table": "duel_results",
+    "sql": "duel_results WHERE winner = ?2 AND at > ?3 - ?5) < ?7"
+  },
+  {
+    "file": "accounts.js",
+    "table": "gate_kills",
+    "sql": "gate_kills WHERE account = ?1 AND earned !="
+  },
+  {
+    "file": "accounts.js",
+    "table": "gate_kills",
+    "sql": "gate_kills WHERE account = ?1) + (SELECT COALESCE(SUM(stones), 0) FROM"
+  },
+  {
+    "file": "accounts.js",
+    "table": "gate_kills",
+    "sql": "gate_kills WHERE day = ?1 AND account = ?2"
+  },
+  {
+    "file": "accounts.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE account = ?1))"
+  },
+  {
+    "file": "alchemy.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND char_id = ?2 AND potion = ?4) THEN 1 "
+  },
+  {
+    "file": "alchemy.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "alchemy.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "alchemy.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND rid = ?3 AND n = ?5 ON CONFLICT (play"
+  },
+  {
+    "file": "alchemy.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "alchemy.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve f WHERE f.player = g.player) AS first FROM (SELECT player, M"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve GROUP BY player HAVING reached > 0 ORDER BY reached DESC, la"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE bout = ?1"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE bout = ?1"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE bout = ?1"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE bout = ?3)"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 AND tier = ?2 AND step = ?3 AND won = 1 AN"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 AND tier = ?2 AND step = ${ARENA_TIER_BOUT"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 AND tier = ?2 AND won = 1 AND step < ${ARE"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 AND tier = ${GRAND_TIER} AND step = ${AREN"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 AND won = 1 AND voided = 0 ORDER BY tier, "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 ORDER BY at DESC, rowid DESC LIMIT ?2"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1 UNION ALL SELECT at, 1, rowid, CASE WHEN ("
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1) AS pl, (SELECT COALESCE(SUM(CASE WHEN (a "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?1) AS pw, (SELECT COALESCE(SUM(1 - won), 0) "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE player = ?2 AND won = 1 AND voided = 0) = ?10"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE season = ?1 AND won = 1 AND banner = ?2 UNION ALL SELE"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE season = ?1 AND won = 1 AND banner IS NOT NULL GROUP B"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE tier = ${GRAND_TIER} AND step = ${ARENA_TIER_BOUTS} AN"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE tier = ${GRAND_TIER} AND step = ${ARENA_TIER_BOUTS} AN"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pve",
+    "sql": "arena_pve WHERE tier = ${GRAND_TIER} AND step = ${ARENA_TIER_BOUTS} AN"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE a = ?1 OR b = ?1 ORDER BY at DESC, rowid DESC LIMIT ?2"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE a = ?1 OR b = ?1) AS vd"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE a = ?1 OR b = ?1) AS vl, (SELECT COALESCE(SUM(CASE WHE"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE a = ?1 OR b = ?1) AS vw, (SELECT COALESCE(SUM(CASE WHE"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE a = ?1 OR b = ?1), runs AS (SELECT w, SUM(1 - w) OVER "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE a = ${p} AND season = ${s} AND rated = 1 UNION ALL SEL"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE b = ${p} AND season = ${s} AND rated = 1 AND a IS NOT "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE bout = ?1"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE bout = ?1"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE rated = 1 AND at > ?3 - 86400 AND ((a = ?1 AND b = ?2)"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE rated = 1 AND season = ?3 AND ((a = ?1 AND b = ?2) OR "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE season = ?1 AND rated = 1 AND a IS NOT NULL UNION ALL "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE season = ?1 AND rated = 1 AND b IS NOT NULL)"
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE season = ?1 AND rated = 1 AND result = 0 AND banner_a "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE season = ?1 AND rated = 1 AND result = 0 AND banner_a "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE season = ?1 AND rated = 1 AND result = 1 AND banner_b "
+  },
+  {
+    "file": "arena.js",
+    "table": "arena_pvp",
+    "sql": "arena_pvp WHERE season = ?1 AND rated = 1 AND result = 1 AND banner_b "
+  },
+  {
+    "file": "brokerSales.js",
+    "table": "broker_sales",
+    "sql": "broker_sales WHERE account = ${acc} AND rid = ${rid})"
+  },
+  {
+    "file": "castles.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "castles.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "castles.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "castles.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?3 AND rid = ?4)"
+  },
+  {
+    "file": "castles.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?7 AND rid = ?8 ||"
+  },
+  {
+    "file": "castles.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?7 AND rid = ?9)"
+  },
+  {
+    "file": "contracts.js",
+    "table": "guild_contract_pays",
+    "sql": "guild_contract_pays p JOIN guilds g ON g.id = p.guild_id WHERE p.event"
+  },
+  {
+    "file": "contracts.js",
+    "table": "guild_contract_pays",
+    "sql": "guild_contract_pays p WHERE p.event = ?3 AND p.account = ?1) < ?10"
+  },
+  {
+    "file": "contracts.js",
+    "table": "guild_contract_pays",
+    "sql": "guild_contract_pays WHERE contract = ?2 AND event = ?3 AND account = ?"
+  },
+  {
+    "file": "contracts.js",
+    "table": "guild_contract_pays",
+    "sql": "guild_contract_pays WHERE contract = ?2 AND event = ?3 AND account = ?"
+  },
+  {
+    "file": "contracts.js",
+    "table": "guild_contract_pays",
+    "sql": "guild_contract_pays WHERE contract = ?2 AND event = ?3 AND account = ?"
+  },
+  {
+    "file": "contracts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 ||"
+  },
+  {
+    "file": "contracts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "contracts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?8) AND COALESCE((SELECT balan"
+  },
+  {
+    "file": "contracts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = guild_contracts.guild_id AND rid ="
+  },
+  {
+    "file": "contracts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = guild_contracts.guild_id AND rid ="
+  },
+  {
+    "file": "contracts.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses rc ON rc.raid = ?7 AND rc.account = ?1 AND rc.nonce = ?4"
+  },
+  {
+    "file": "craftWrits.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ${p} AND char_id = ${c} AND potion = ${potio"
+  },
+  {
+    "file": "craftWrits.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts cr WHERE cr.player = ${p} AND (cr.provenance = pk.provenan"
+  },
+  {
+    "file": "crewSigns.js",
+    "table": "crew_signed",
+    "sql": "crew_signed WHERE day < ?1 LIMIT ?2)"
+  },
+  {
+    "file": "crewSigns.js",
+    "table": "crew_signed",
+    "sql": "crew_signed WHERE player >= ?4 AND player < ?5 AND day = ?2) AS n"
+  },
+  {
+    "file": "crewSigns.js",
+    "table": "crew_signed",
+    "sql": "crew_signed WHERE player >= ?6 AND player < ?7 AND day = ?2) < ?8"
+  },
+  {
+    "file": "crewSigns.js",
+    "table": "crew_signed",
+    "sql": "crew_signed WHERE town = ?1 AND day = ?2"
+  },
+  {
+    "file": "crewSigns.js",
+    "table": "crew_signed",
+    "sql": "crew_signed WHERE town = ?1 AND day = ?2 AND slot = ?3) AS holder, (SE"
+  },
+  {
+    "file": "festival.js",
+    "table": "fest_sales",
+    "sql": "fest_sales WHERE account = ?1 AND rid = ?2"
+  },
+  {
+    "file": "firmament.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?7) AND NOT EXISTS (SELECT 1 F"
+  },
+  {
+    "file": "firmament.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?9 AND kind ="
+  },
+  {
+    "file": "guilds.js",
+    "table": "guild_ledger",
+    "sql": "guild_ledger WHERE guild_id = ? ORDER BY seq DESC LIMIT ?"
+  },
+  {
+    "file": "guilds.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE (dst_kind ="
+  },
+  {
+    "file": "halls.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ?"
+  },
+  {
+    "file": "halls.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ?"
+  },
+  {
+    "file": "halls.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?5 AND rid = ?7)"
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears h WHERE h.player = v.id AND h.kind ="
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1"
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2"
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind ="
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind ="
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind ="
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind = ?3 AND key ="
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND day = ?8) < ?10 AND (?3 <>"
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND kind ="
+  },
+  {
+    "file": "hunts.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE account = ?1) AS serpents, (SELECT GROUP_CONCAT(pr"
+  },
+  {
+    "file": "hunts.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE account IN (${list(1)}) GROUP BY account"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d JOIN item_uids u ON u.uid = d.uid WHERE d.char_id = ?1 AN"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d JOIN item_uids u ON u.uid = d.uid WHERE d.char_id = ?1 AN"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d JOIN item_uids u ON u.uid = d.uid WHERE d.uid = item_dupe"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d WHERE d.uid = item_uids.uid)"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d WHERE d.uid = item_uids.uid)"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes o WHERE o.uid = d.uid AND o.char_id != ?1)"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE char_id = ?"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE char_id = ?1 AND uid IN (${m}) LIMIT 1"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids u ON u.uid = d.uid WHERE d.char_id = ?1 AND ${OWN_COPY_SQL} "
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids u ON u.uid = d.uid WHERE d.char_id = ?1 AND ${OWN_COPY_SQL} "
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids u ON u.uid = d.uid WHERE d.uid = item_dupes.uid AND d.char_i"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids u ON u.uid = p.provenance JOIN realm_characters c ON c.id = "
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids u WHERE u.uid = products.provenance AND u.state ="
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE char_id = ?1 OR claim_char = ?1"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid = ?1), ?2, (SELECT claim_at FROM item_uids WHERE u"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid = ?1), (SELECT fp FROM item_uids WHERE uid = ?1))"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid = ?1))"
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid IN (${m}) AND (char_id != ?1 OR state !="
+  },
+  {
+    "file": "ledger.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid IN (${marks(part.length, 1)})"
+  },
+  {
+    "file": "lostSpoils.js",
+    "table": "gate_kills",
+    "sql": "gate_kills WHERE day = ?1 AND account = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid = ?1 AND state ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND at > ?2 UNION ALL SELECT"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 AND ?4 > 0"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 AND tax > 0"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 ON CONFLICT (da"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 ON CONFLICT (pl"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler = ?6 AND rid = ?7 AND n = ?8)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE poster = ?1 AND at > ?2 UNION ALL SELECT"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales s JOIN market_listings l ON l.id = s.listing WHERE"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales s JOIN market_listings l ON l.id = s.listing WHERE"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales WHERE day = ?3 AND seller IN (SELECT value FROM js"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales WHERE map = ?1 AND hour = ?2 UNION ALL SELECT sell"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales WHERE map = ?2 AND hour = ?3) < ${PATRON_TOWN_HOUR"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales WHERE region = ?1 AND at <= ?3) AS told"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales WHERE seller = l.seller AND day = ?10 AND hour = ?"
+  },
+  {
+    "file": "market.js",
+    "table": "market_patron_sales",
+    "sql": "market_patron_sales WHERE seller = l.seller AND day = ?10) + l.price <"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales s JOIN market_listings l ON l.id = s.listing WHERE s.buye"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales s JOIN market_listings l ON l.id = s.listing WHERE s.buye"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales s JOIN market_listings l ON l.id = s.listing WHERE s.buye"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales s JOIN market_listings l ON l.id = s.listing WHERE s.sell"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND at > ?2 UNION ALL SELECT"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND dn = ?3 AND currency IS"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND dn = ?3 ON CONFLICT (pl"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND courier - ?4"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND tax > 0"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND tithe > 0"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND total - tax "
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 ON CONFLICT (pla"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?6 AND rid = ?7 AND n = ?8)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?6 AND rid = ?7 AND n = ?8)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?6 AND rid = ?7 AND n = ?8)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?6 AND rid = ?7 AND n = ?8)"
+  },
+  {
+    "file": "market.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE seller = ?1 AND at > ?2 UNION ALL SELECT"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 ||"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 ||"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 ||"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2 ||"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid IN (?2 ||"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?2 AND rid = ?12 ||"
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = market_bids.bidder AND rid ="
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = market_bids.bidder AND rid ="
+  },
+  {
+    "file": "market.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = market_orders.poster AND rid ="
+  },
+  {
+    "file": "marks.js",
+    "table": "gate_kills",
+    "sql": "gate_kills WHERE day = ?${p} AND account = ?1 AND at = ?4)"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger l ON l.actor = d.guild_id AND l.rid = ?2 JOIN guilds g ON"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger l WHERE l.actor = d.guild_id AND l.rid = ?6) AND ${CLAIM_"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger l WHERE l.dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ?"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ?"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?5) AND ${CLAIM_GUARDS[kind](8"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?5) AND ${guard}"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE day >= ? AND ${where} GROUP BY kind"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE day >= ? GROUP BY day ORDER BY day"
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_id = ? AND kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE src_id = ? AND kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE src_id = ?1 AND kind ="
+  },
+  {
+    "file": "marks.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?8 AND n = ?9)"
+  },
+  {
+    "file": "marks.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE raid = ?${p} AND account = ?1 AND nonce = ?${p + 1"
+  },
+  {
+    "file": "marks.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE day = ?${p} AND account = ?1 AND nonce = ?${p + 1}"
+  },
+  {
+    "file": "marks.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE star = ?${p} AND account = ?1 AND nonce = ?${p + 1})"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?7)"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE ${mine} ON CONFLICT (player, char_id, materia"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE ${mine} ON CONFLICT (player, char_id, profess"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE ${mine}) AND COALESCE((SELECT balance FROM ma"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE day = ?1 AND k = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE day = ?1 AND k = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE day = ?1 AND player = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE day = ?1 AND player = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE day = ?1 GROUP BY k"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE day = ?5 AND k = ?6) < ?13 AND ?8 - ${stored}"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "motherlodes.js",
+    "table": "motherlode_strikes",
+    "sql": "motherlode_strikes WHERE player = ?1 AND rid = ?5)"
+  },
+  {
+    "file": "npcChapters.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "npcChapters.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week = ?1 GROUP BY faction, region, source, CA"
+  },
+  {
+    "file": "npcChapters.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week BETWEEN ?1 AND ?2 GROUP BY faction, regio"
+  },
+  {
+    "file": "npcChapters.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week BETWEEN ?1 AND ?2 GROUP BY faction, regio"
+  },
+  {
+    "file": "npcChapters.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week BETWEEN ?1 AND ?2 GROUP BY faction, regio"
+  },
+  {
+    "file": "npcMerit.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE char_id = ?1 AND source = ?2 AND ref = ?3 ORDE"
+  },
+  {
+    "file": "npcMerit.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week = ?1 AND account = ?2 GROUP BY faction, r"
+  },
+  {
+    "file": "npcMerit.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week = ?5 AND account = ?1 AND faction = ?3 AN"
+  },
+  {
+    "file": "npcMerit.js",
+    "table": "npc_chapter_merit",
+    "sql": "npc_chapter_merit WHERE week = ?5 AND account = ?1 AND faction = ?3 AN"
+  },
+  {
+    "file": "npcReceipts.js",
+    "table": "npc_receipt_credits",
+    "sql": "npc_receipt_credits WHERE char_id = ?1 AND faction_id = ?3 AND tag = ?"
+  },
+  {
+    "file": "npcReceipts.js",
+    "table": "npc_receipt_credits",
+    "sql": "npc_receipt_credits WHERE char_id = ?1 AND ref IN (?2, ?3)"
+  },
+  {
+    "file": "npcReceipts.js",
+    "table": "npc_receipt_credits",
+    "sql": "npc_receipt_credits WHERE char_id = ?1 AND ref IN (${credits.map((_, i"
+  },
+  {
+    "file": "npcReceipts.js",
+    "table": "npc_receipt_credits",
+    "sql": "npc_receipt_credits WHERE char_id = ?1 AND tag = ?2 GROUP BY faction_i"
+  },
+  {
+    "file": "npcReceipts.js",
+    "table": "npc_receipt_credits",
+    "sql": "npc_receipt_credits WHERE char_id = ?2 AND faction_id = ?3 AND ref = ?"
+  },
+  {
+    "file": "profDayCaps.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND char_id = ?2 AND profession = ?3 A"
+  },
+  {
+    "file": "profDayCaps.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?7) AND NOT EXISTS (SELECT 1 F"
+  },
+  {
+    "file": "professions.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?8 AND kind ="
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE ${mine} AND extra IS NOT NULL ON CONFLICT (player,"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE ${mine} AND gem IS NOT NULL ON CONFLICT (player, c"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE ${mine} ON CONFLICT (player, char_id, material, or"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE ${mine} ON CONFLICT (player, char_id, material) DO"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE ${mine} ON CONFLICT (player, char_id, profession) "
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE ${mine})"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE carry = 0 AND day < ? LIMIT ?)"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE carry = 1 AND day < ? LIMIT ?)"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day = ?1 AND node = ?2 AND kind = ?3 AND player = "
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND char_id = ?2 AND day = ?3"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND char_id = ?2 AND day = ?3 GROUP BY"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND day = ?2 AND deep_unconfirmed = 1"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND day = ?6 AND deep_unconfirmed = 1)"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND profession ="
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND profession ="
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND profession ="
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND profession ="
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?5)"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_brews",
+    "sql": "prof_brews WHERE player = ?1 AND char_id = ?2 GROUP BY potion"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND char_id = ?2 AND (recipe NOT IN (${J"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND char_id = ?2 AND ${patternMade}) THE"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND rid = ?3 AND n = ?5"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND rid = ?3 AND n = ?5 ON CONFLICT (pla"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND char_id = ?2 AND recipe = ?4) THEN 1"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND char_id = ?2 AND recipe IN (${FIRST_"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND rid = ?2 AND n = ?3)"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND rid = ?3 AND n = ?5 AND ${origin} > "
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND rid = ?3 AND n = ?5 ON CONFLICT (pla"
+  },
+  {
+    "file": "professions.js",
+    "table": "prof_smelts",
+    "sql": "prof_smelts WHERE player = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "questlines.js",
+    "table": "gate_kills",
+    "sql": "gate_kills g WHERE g.account = ?1 AND ${WINDOW("
+  },
+  {
+    "file": "questlines.js",
+    "table": "gate_kills",
+    "sql": "gate_kills g WHERE g.account = ?1 AND ${WINDOW("
+  },
+  {
+    "file": "questlines.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills z WHERE z.account = ?1 AND ${WINDOW("
+  },
+  {
+    "file": "questlines.js",
+    "table": "stars_held",
+    "sql": "stars_held s WHERE s.account = ?1 AND ${WINDOW("
+  },
+  {
+    "file": "questlines.js",
+    "table": "stars_held",
+    "sql": "stars_held s WHERE s.account = ?1 AND ${WINDOW("
+  },
+  {
+    "file": "raids.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE account = ?1"
+  },
+  {
+    "file": "raids.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE account = ?1"
+  },
+  {
+    "file": "raids.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE account = ?2 AND day = ?3) < ?9 RETURNING nonce"
+  },
+  {
+    "file": "raids.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE raid = ?1 AND account = ?2"
+  },
+  {
+    "file": "raids.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE raid = ?3 AND account = ?1 AND nonce = ?4)"
+  },
+  {
+    "file": "realm.js",
+    "table": "item_census",
+    "sql": "item_census c WHERE c.char_id = realm_characters.id) AS census_tally F"
+  },
+  {
+    "file": "realm.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer = ?1 AND char_id = ?2 AND kind ="
+  },
+  {
+    "file": "seatForts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ? AND kind ="
+  },
+  {
+    "file": "seatForts.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ? AND kind ="
+  },
+  {
+    "file": "seatInfluence.js",
+    "table": "gate_kills",
+    "sql": "gate_kills WHERE region IS NOT NULL AND day IN (${days.map(() =>"
+  },
+  {
+    "file": "seatInfluence.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ?"
+  },
+  {
+    "file": "seatInfluence.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ? AND rid = ?"
+  },
+  {
+    "file": "seatInfluence.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?5 AND rid = ?7) AND EXISTS (SELECT 1 FROM "
+  },
+  {
+    "file": "seatInfluence.js",
+    "table": "town_seat_history",
+    "sql": "town_seat_history WHERE key = ? AND kind <>"
+  },
+  {
+    "file": "seatInfluence.js",
+    "table": "town_seat_history",
+    "sql": "town_seat_history WHERE key = ? AND week = ? AND kind ="
+  },
+  {
+    "file": "seatRoyal.js",
+    "table": "town_seat_bouts",
+    "sql": "town_seat_bouts WHERE week = ? AND key = ? AND counted = 1"
+  },
+  {
+    "file": "seatRoyal.js",
+    "table": "town_seat_bouts",
+    "sql": "town_seat_bouts WHERE week = ? AND key = ? AND n = ?"
+  },
+  {
+    "file": "seatRoyal.js",
+    "table": "town_seat_bouts",
+    "sql": "town_seat_bouts WHERE week = ? AND key = ? AND winner = ? AND counted "
+  },
+  {
+    "file": "seatRoyal.js",
+    "table": "town_seat_bouts",
+    "sql": "town_seat_bouts WHERE week = ?1 AND key = ?2 AND day = ?6 AND ((winner"
+  },
+  {
+    "file": "seatRoyal.js",
+    "table": "town_seat_bouts",
+    "sql": "town_seat_bouts WHERE week = ?1 AND key = ?2 AND n = ?3)"
+  },
+  {
+    "file": "seatTurning.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger l ON l.actor ="
+  },
+  {
+    "file": "seatTurning.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor ="
+  },
+  {
+    "file": "seatTurning.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor ="
+  },
+  {
+    "file": "seatTurning.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE day BETWEEN ? AND ? AND dst_kind ="
+  },
+  {
+    "file": "serpents.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE account = ?1"
+  },
+  {
+    "file": "serpents.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE account = ?1"
+  },
+  {
+    "file": "serpents.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE day = ?1 AND account = ?2"
+  },
+  {
+    "file": "serpents.js",
+    "table": "serpent_kills",
+    "sql": "serpent_kills WHERE day = ?3 AND account = ?1 AND nonce = ?4)"
+  },
+  {
+    "file": "staff.js",
+    "table": "staff_audit",
+    "sql": "staff_audit WHERE (?1 IS NULL OR actor = ?1) AND (?2 IS NULL OR target"
+  },
+  {
+    "file": "staff.js",
+    "table": "staff_audit",
+    "sql": "staff_audit WHERE actor = ? AND act = ? AND target IS ? AND detail IS "
+  },
+  {
+    "file": "staff.js",
+    "table": "staff_audit",
+    "sql": "staff_audit WHERE actor = ?1 AND act IN ("
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_census",
+    "sql": "item_census c JOIN realm_characters r ON r.id = c.char_id JOIN players"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_census",
+    "sql": "item_census c JOIN realm_characters r ON r.id = c.char_id, json_each(c"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_census",
+    "sql": "item_census c WHERE c.char_id = r.id) AS has FROM realm_characters r W"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d LEFT JOIN realm_characters c ON c.id = d.char_id LEFT JOI"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_dupes",
+    "sql": "item_dupes d LEFT JOIN realm_characters c ON c.id = d.char_id WHERE d."
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE trail_at IS NULL AND (kind IS NULL OR kind !="
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE uid = ? AND char_id = ?)"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_dupes",
+    "sql": "item_dupes x WHERE x.char_id = d.char_id AND x.trail_at IS NULL AND (x"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_dupes",
+    "sql": "item_dupes x WHERE x.trail_at IS NULL AND (x.kind IS NULL OR x.kind !="
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_uids",
+    "sql": "item_uids u LEFT JOIN realm_characters r ON r.id = u.char_id LEFT JOIN"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "item_uids",
+    "sql": "item_uids u ON u.uid = d.uid"
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE kind ="
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE kind ="
+  },
+  {
+    "file": "staffCensus.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "staffDesk.js",
+    "table": "market_sales",
+    "sql": "market_sales s WHERE s.buyer IN ${W} AND s.at > ?2 AND s.at <= ?3 AND "
+  },
+  {
+    "file": "staffDesk.js",
+    "table": "market_sales",
+    "sql": "market_sales s WHERE s.seller IN ${W} AND s.at > ?2 AND s.at <= ?3 AND"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "item_census",
+    "sql": "item_census i JOIN realm_characters c ON c.id = i.char_id LEFT JOIN pl"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE ?3 ="
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE at >= ?1 UNION ALL SELECT a_player, b_player FROM r"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_fills",
+    "sql": "market_fills WHERE filler IN (SELECT value FROM json_each(?1)) AND pos"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE at >= ?1 UNION ALL SELECT filler, poster FROM marke"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE buyer IN (SELECT value FROM json_each(?1)) AND sell"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE day >= ?1 AND currency ="
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE material IN (SELECT value FROM json_each(?1)) AND a"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE day >= ?1 AND (src_kind ="
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE dst_kind ="
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day >= ?1 AND at >= ?2 AND ${IN} GROUP BY player"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day >= ?1 AND at >= ?2 AND ${IN} GROUP BY player, "
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day >= ?1 AND at >= ?2 AND ${IN} GROUP BY player, "
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day >= ?1 AND at >= ?2 AND ${IN} ORDER BY at DESC "
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day >= ?1 AND at >= ?2 AND ${IN}), r AS (SELECT pl"
+  },
+  {
+    "file": "staffEconomy.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE day >= ?1 AND at >= ?2 GROUP BY +player ORDER BY n"
+  },
+  {
+    "file": "staffHidden.js",
+    "table": "staff_audit",
+    "sql": "staff_audit e WHERE e.actor = ?1 AND e.at >= h.at AND e.id > h.id AND "
+  },
+  {
+    "file": "staffHidden.js",
+    "table": "staff_audit",
+    "sql": "staff_audit o WHERE o.actor = ?1 AND o.act ="
+  },
+  {
+    "file": "staffHidden.js",
+    "table": "staff_audit",
+    "sql": "staff_audit r WHERE r.actor = ?1 AND r.act ="
+  },
+  {
+    "file": "staffHidden.js",
+    "table": "staff_audit",
+    "sql": "staff_audit WHERE actor = ?1 AND act ="
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE char_id = ?1"
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE char_id IN (${inIds})"
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE char_id IN (${inIds}) AND claim_char IS NOT NULL) AS n"
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE claim_char IN (${inIds}) AND claim_char IS NOT NULL) +"
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "market_fills",
+    "sql": "market_fills f WHERE f.filler = ?1 ORDER BY f.at DESC, f.rid DESC"
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "market_sales",
+    "sql": "market_sales s ${party("
+  },
+  {
+    "file": "staffPlayers.js",
+    "table": "market_sales",
+    "sql": "market_sales s ${party("
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE char_id = ?1"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE char_id = ?1 AND uid IN (${marksFrom(part.length, 2)}"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE uid = ?1 AND char_id = ?2"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE uid = ?1 AND char_id = ?2"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_dupes",
+    "sql": "item_dupes WHERE uid = ?1 ORDER BY at LIMIT 20"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid = ?1"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid = ?1"
+  },
+  {
+    "file": "staffRealm.js",
+    "table": "item_uids",
+    "sql": "item_uids WHERE uid IN (${marksFrom(part.length, 1)})"
+  },
+  {
+    "file": "staffStatus.js",
+    "table": "market_sales",
+    "sql": "market_sales WHERE day IN (?2, ?3) AND at >= ?1) AS sales, (SELECT COU"
+  },
+  {
+    "file": "staffStatus.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE day IN (?2, ?3) AND at >= ?1 AND dst_kind ="
+  },
+  {
+    "file": "staffStatus.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE day IN (?2, ?3) AND at >= ?1 AND src_kind ="
+  },
+  {
+    "file": "stars.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE account = ?1"
+  },
+  {
+    "file": "stars.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE account = ?1"
+  },
+  {
+    "file": "stars.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE account = ?2 AND day = ?3) < ?8 RETURNING nonce"
+  },
+  {
+    "file": "stars.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE star = ?1 AND account = ?2"
+  },
+  {
+    "file": "stars.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE star = ?3 AND account = ?1 AND nonce = ?4)"
+  },
+  {
+    "file": "stars.js",
+    "table": "stars_held",
+    "sql": "stars_held WHERE star = ?4 AND account = ?1 AND nonce = ?5)"
+  },
+  {
+    "file": "townEcon.js",
+    "table": "raid_cleanses",
+    "sql": "raid_cleanses WHERE raid = ?5 AND account = ?1 AND nonce = ?6) ON CONF"
+  },
+  {
+    "file": "townSeats.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger l ON l.actor ="
+  },
+  {
+    "file": "townSeats.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor ="
+  },
+  {
+    "file": "townSeats.js",
+    "table": "town_seat_history",
+    "sql": "town_seat_history WHERE key = ? AND kind ="
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?2"
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?2"
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 AND pay > 0"
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 AND tax > 0"
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?2 AND n = ?3 ON CONFLICT"
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "writs.js",
+    "table": "guild_writ_fills",
+    "sql": "guild_writ_fills WHERE filler = ?1 AND rid = ?5 AND n = ?6)"
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 ||"
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 ||"
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2"
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2 ||"
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = ?2 AND rid = ?7 ||"
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = commissions.poster AND rid ="
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = commissions.poster AND rid ="
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = guild_writs.guild_id AND rid ="
+  },
+  {
+    "file": "writs.js",
+    "table": "marks_ledger",
+    "sql": "marks_ledger WHERE actor = guild_writs.guild_id AND rid ="
+  },
+  {
+    "file": "writs.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND (provenance = ?2 OR provenance2 = ?2"
+  },
+  {
+    "file": "writs.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?1 AND (provenance = p.provenance OR proven"
+  },
+  {
+    "file": "writs.js",
+    "table": "prof_crafts",
+    "sql": "prof_crafts WHERE player = ?2 AND (provenance = ?4 OR provenance2 = ?4"
+  }
+]
