@@ -957,11 +957,6 @@
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger l WHERE l.dst_kind = 'guild' AND l.dst_id = d.guild_id AN"
-  },
-  {
-    "file": "marks.js",
-    "table": "marks_ledger",
     "sql": "marks_ledger WHERE actor = ? AND rid = ?"
   },
   {
@@ -997,16 +992,6 @@
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind = 'account' AND dst_id = ${a} AND kind = '"
-  },
-  {
-    "file": "marks.js",
-    "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind = 'account' AND dst_id = ${a} AND kind IN "
-  },
-  {
-    "file": "marks.js",
-    "table": "marks_ledger",
     "sql": "marks_ledger WHERE dst_kind = 'account' AND kind = ?1 AND day >= ?2 GR"
   },
   {
@@ -1022,22 +1007,7 @@
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind = 'guild' AND dst_id = ?1 AND kind = 'guil"
-  },
-  {
-    "file": "marks.js",
-    "table": "marks_ledger",
     "sql": "marks_ledger WHERE kind = 'exchange' AND day >= ? GROUP BY src_id, day"
-  },
-  {
-    "file": "marks.js",
-    "table": "marks_ledger",
-    "sql": "marks_ledger WHERE src_id = ? AND kind = 'exchange' AND day = ?"
-  },
-  {
-    "file": "marks.js",
-    "table": "marks_ledger",
-    "sql": "marks_ledger WHERE src_id = ?1 AND kind = 'exchange' AND day = ?3), 0)"
   },
   {
     "file": "marks.js",
