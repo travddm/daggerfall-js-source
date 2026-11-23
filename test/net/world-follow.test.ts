@@ -21,7 +21,13 @@ function joined() {
   const { FakeWS, sockets } = fakeSocketClass();
   const keep = { info: console.info, warn: console.warn };
   console.info = console.warn = () => {};
-  const session = new OnlineSession({ url: 'wss://relay.test', name: ME, id: ME, WebSocketImpl: FakeWS, now: () => clock });
+  const session = new OnlineSession({
+    url: 'wss://relay.test',
+    name: ME,
+    id: ME,
+    WebSocketImpl: FakeWS,
+    now: () => clock,
+  });
   const worlds: unknown[] = [];
   session.onWorld = (world: unknown) => worlds.push(world);
   session.join(KEY, { x: 1, y: 0, z: 1, yaw: 0, pitch: 0 });
@@ -57,7 +63,7 @@ test('a follow frame nobody promised, and a world frame from someone not hosting
     ws.receive({ t: 'world', id: 'other-0003', data: { x: 1 } });
     assert.deepEqual(worlds, []);
     ws.receive({ t: 'world', id: 'host-0001', data: { x: 2 } });
-    assert.deepEqual(worlds, [{ x: 2 }], 'the host\'s own still is');
+    assert.deepEqual(worlds, [{ x: 2 }], "the host's own still is");
   } finally {
     restore();
   }

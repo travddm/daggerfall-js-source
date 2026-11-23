@@ -13,7 +13,12 @@ const { BULK_PIECE_CHARS, PIECE_MARK } = await import(PIECES_PATH);
 
 const KEY = 'dungeon:m187853213';
 
-type FakeSocket = { sent: { t: string; [k: string]: unknown }[]; raw: string[]; closed: unknown; send(s: string): void };
+type FakeSocket = {
+  sent: { t: string; [k: string]: unknown }[];
+  raw: string[];
+  closed: unknown;
+  send(s: string): void;
+};
 
 const quiet = async <T>(run: () => Promise<T>): Promise<T> => {
   const keep = { info: console.info, warn: console.warn, log: console.log };
@@ -25,7 +30,8 @@ const quiet = async <T>(run: () => Promise<T>): Promise<T> => {
   }
 };
 
-const poseAt = (x: number, ts: number) => validPose({ x: x * PIXEL_UNITS, y: 0, z: 10 * PIXEL_UNITS, yaw: 0, pitch: 0, ts });
+const poseAt = (x: number, ts: number) =>
+  validPose({ x: x * PIXEL_UNITS, y: 0, z: 10 * PIXEL_UNITS, yaw: 0, pitch: 0, ts });
 
 /** A dungeon room on a clock of its own; each socket also keeps every text frame it was sent, pieces and all. */
 async function dungeon<T>(run: (harness: any) => Promise<T>): Promise<T> {

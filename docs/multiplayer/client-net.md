@@ -101,7 +101,10 @@ body (shape-shifted players), with an archive cache evicted by use (`_touch`, `_
 
 In a world or dungeon room, one client is the **host**: the relay names it in the welcome and in later frames
 (`_sayHost`). The host publishes the room's `world` snapshot (`WORLD_PUBLISH_MS` 15 s, a full republish every
-`WORLD_REPUBLISH_MS` 5 min) and its `foes` frames (`FOES_MS`, 200 ms). Other clients apply them. See
+`WORLD_REPUBLISH_MS` 5 min) and its `foes` frames (`FOES_MS`, 200 ms). Other clients apply them. A welcome that
+says `wf` promised a stored memory that follows in pieces (`src/net/world-follow.ts`): the session takes that frame
+whoever hosts by then, and `sendWorld` refuses until it lands or `WORLD_FOLLOW_WAIT_MS` (15 s) passes, so a new host
+never writes over the stored memory. See
 [group-instances.md](group-instances.md).
 
 ## The account client

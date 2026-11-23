@@ -16,13 +16,22 @@ Other shared protocol modules in `src/net/` are bundled into the relay the same 
 
 ## Frames
 
-Frames are JSON text with a type field `t`. There is no binary encoding.
+Frames are JSON text with a type field `t`, except the piece frame below. There is no binary encoding.
 
 - Some frames are recognised before parsing by their text prefix (`WORLD_PREFIX` `{"t":"world"`, `FOES_PREFIX`,
   `OWN_PREFIX`, `QUEST_PREFIX`). `frameCap(text)` picks the byte cap by prefix.
 - Size caps: `MAX_FRAME_BYTES` (16 KiB) for ordinary frames, `FOES_FRAME_MAX` (64 KiB), `WORLD_FRAME_MAX` (512 KiB, or
   `WORLD_FRAME_MAX_INTERIOR` 64 KiB indoors), `QUEST_FRAME_MAX`.
 - `wire2Batch` packs several frames into one batch frame. Chat channel sessions use it (`wire2: true`).
+
+### Channels and pieces
+
+`src/net/channel-table.ts` gives each room frame type a delivery class (`control`, `latest`, `events`, `bulk`), a
+priority and the gates that set its rate. The relay sends a `bulk` frame (`world`, `quest`) longer than
+`BULK_PIECE_CHARS` (16 KiB) as piece frames, `#pc,<seq>,<index>,<count>,<body>` (`src/net/bulk-pieces.ts`), never
+cut inside a surrogate pair. The client joins them per socket (`PieceIntake`) before it parses: one partial frame a
+socket, at most `INBOUND_FRAME_MAX` in all and `PIECES_MAX` pieces; a gap, another sequence or a body out of bounds
+drops the partial frame. Other frames may pass a frame still in pieces; bulk frames keep their order.
 
 ### Main frame types
 

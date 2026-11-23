@@ -20,8 +20,7 @@ export type WorldFollowSession = {
 
 type WorldFrame = { world?: unknown; wf?: unknown; id?: unknown; data?: unknown };
 
-const isMemory = (value: unknown): value is object =>
-  !!value && typeof value === 'object' && !Array.isArray(value);
+const isMemory = (value: unknown): value is object => !!value && typeof value === 'object' && !Array.isArray(value);
 
 /** A primary room's welcome: delivers the memory it carries, or notes that one follows. */
 export function welcomeWorld(session: WorldFollowSession, welcome: WorldFrame): void {

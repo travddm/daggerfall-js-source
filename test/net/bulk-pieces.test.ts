@@ -6,8 +6,17 @@ import assert from 'node:assert/strict';
 // Loaded by a computed path: the wire's imports name the DOM's crypto types, which tsconfig.node.json does not have.
 const PIECES_PATH: string = '../../src/net/bulk-pieces.ts';
 const WIRE_PATH: string = '../../src/net/wire.js';
-const { BULK_PIECE_CHARS, PIECES_MAX, PIECE_MARK, PIECE_SEQ_MOD, PieceIntake, cutPieces, pieceEnds, pieceFrame, readPieceHeader } =
-  await import(PIECES_PATH);
+const {
+  BULK_PIECE_CHARS,
+  PIECES_MAX,
+  PIECE_MARK,
+  PIECE_SEQ_MOD,
+  PieceIntake,
+  cutPieces,
+  pieceEnds,
+  pieceFrame,
+  readPieceHeader,
+} = await import(PIECES_PATH);
 const { INBOUND_FRAME_MAX, WORLD_FRAME_MAX } = await import(WIRE_PATH);
 
 const socket = {};
