@@ -74,7 +74,8 @@ function withoutComments(text: string): string {
 /** The SQL that follows a table's name, up to the end of its string, as one line. */
 function anchorAt(text: string, start: number): string {
   const rest = text.slice(start, start + 200);
-  const end = rest.search(/['"`]/);
+  // A string ends at a backtick, or at a quote that JavaScript code follows. A quote inside the SQL ('gate') does not.
+  const end = rest.search(/`|['"]\s*[),.;+]/);
   const sql = end === -1 ? rest : rest.slice(0, end);
   return sql.replace(/\s+/g, ' ').trim().slice(0, ANCHOR_LENGTH);
 }

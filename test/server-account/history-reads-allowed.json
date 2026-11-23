@@ -37,7 +37,7 @@
   {
     "file": "accounts.js",
     "table": "gate_kills",
-    "sql": "gate_kills WHERE account = ?1 AND earned !="
+    "sql": "gate_kills WHERE account = ?1 AND earned != 'rite'"
   },
   {
     "file": "accounts.js",
@@ -112,7 +112,7 @@
   {
     "file": "arena.js",
     "table": "arena_pve",
-    "sql": "arena_pve WHERE bout = ?3)"
+    "sql": "arena_pve WHERE bout = ?3)'}"
   },
   {
     "file": "arena.js",
@@ -307,7 +307,7 @@
   {
     "file": "castles.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?7 AND rid = ?8 ||"
+    "sql": "marks_ledger WHERE actor = ?7 AND rid = ?8 || ':castle"
   },
   {
     "file": "castles.js",
@@ -342,7 +342,7 @@
   {
     "file": "contracts.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 || ':cesc"
   },
   {
     "file": "contracts.js",
@@ -357,12 +357,12 @@
   {
     "file": "contracts.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = guild_contracts.guild_id AND rid ="
+    "sql": "marks_ledger WHERE actor = guild_contracts.guild_id AND rid = 'contrac"
   },
   {
     "file": "contracts.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = guild_contracts.guild_id AND rid ="
+    "sql": "marks_ledger WHERE actor = guild_contracts.guild_id AND rid = 'contrac"
   },
   {
     "file": "contracts.js",
@@ -417,7 +417,7 @@
   {
     "file": "firmament.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?9 AND kind ="
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?9 AND kind = 'firmament"
   },
   {
     "file": "guilds.js",
@@ -427,7 +427,7 @@
   {
     "file": "guilds.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE (dst_kind ="
+    "sql": "marks_ledger WHERE (dst_kind = 'guild' AND dst_id = ?1) OR (src_kind ="
   },
   {
     "file": "halls.js",
@@ -447,7 +447,7 @@
   {
     "file": "hunts.js",
     "table": "hunt_clears",
-    "sql": "hunt_clears h WHERE h.player = v.id AND h.kind ="
+    "sql": "hunt_clears h WHERE h.player = v.id AND h.kind = 'board' LIMIT ?1)) AS"
   },
   {
     "file": "hunts.js",
@@ -462,32 +462,32 @@
   {
     "file": "hunts.js",
     "table": "hunt_clears",
-    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind ="
-  },
-  {
-    "file": "hunts.js",
-    "table": "hunt_clears",
-    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind ="
-  },
-  {
-    "file": "hunts.js",
-    "table": "hunt_clears",
-    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind ="
-  },
-  {
-    "file": "hunts.js",
-    "table": "hunt_clears",
     "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind = ?3 AND key ="
   },
   {
     "file": "hunts.js",
     "table": "hunt_clears",
-    "sql": "hunt_clears WHERE player = ?1 AND day = ?8) < ?10 AND (?3 <>"
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind = 'board' AND "
   },
   {
     "file": "hunts.js",
     "table": "hunt_clears",
-    "sql": "hunt_clears WHERE player = ?1 AND kind ="
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind = 'board' AND "
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND char_id = ?2 AND kind = 'board' AND "
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND day = ?8) < ?10 AND (?3 <> 'mark' OR"
+  },
+  {
+    "file": "hunts.js",
+    "table": "hunt_clears",
+    "sql": "hunt_clears WHERE player = ?1 AND kind = 'board' LIMIT ?3)) AS clears,"
   },
   {
     "file": "hunts.js",
@@ -562,7 +562,7 @@
   {
     "file": "ledger.js",
     "table": "item_uids",
-    "sql": "item_uids u WHERE u.uid = products.provenance AND u.state ="
+    "sql": "item_uids u WHERE u.uid = products.provenance AND u.state = 'escrow"
   },
   {
     "file": "ledger.js",
@@ -587,7 +587,7 @@
   {
     "file": "ledger.js",
     "table": "item_uids",
-    "sql": "item_uids WHERE uid IN (${m}) AND (char_id != ?1 OR state !="
+    "sql": "item_uids WHERE uid IN (${m}) AND (char_id != ?1 OR state != 'held' OR"
   },
   {
     "file": "ledger.js",
@@ -602,12 +602,12 @@
   {
     "file": "market.js",
     "table": "item_uids",
-    "sql": "item_uids WHERE uid = ?1 AND state ="
+    "sql": "item_uids WHERE uid = ?1 AND state = 'escrow'"
   },
   {
     "file": "market.js",
     "table": "market_fills",
-    "sql": "market_fills WHERE filler = ?1 AND at > ?2 UNION ALL SELECT"
+    "sql": "market_fills WHERE filler = ?1 AND at > ?2 UNION ALL SELECT 'ordered"
   },
   {
     "file": "market.js",
@@ -672,7 +672,7 @@
   {
     "file": "market.js",
     "table": "market_fills",
-    "sql": "market_fills WHERE poster = ?1 AND at > ?2 UNION ALL SELECT"
+    "sql": "market_fills WHERE poster = ?1 AND at > ?2 UNION ALL SELECT 'won"
   },
   {
     "file": "market.js",
@@ -737,17 +737,17 @@
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND at > ?2 UNION ALL SELECT"
+    "sql": "market_sales WHERE buyer = ?1 AND at > ?2 UNION ALL SELECT 'sold"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND kind = 'material' AND delivered = 0 "
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND kind = 'material' AND delivered = 0 "
   },
   {
     "file": "market.js",
@@ -792,47 +792,47 @@
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'mate"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'mate"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'mate"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'mate"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'mate"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'piec"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'piec"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'piec"
   },
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND rid = ?2 AND n = ?3 AND kind = 'piec"
   },
   {
     "file": "market.js",
@@ -887,22 +887,22 @@
   {
     "file": "market.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE seller = ?1 AND at > ?2 UNION ALL SELECT"
+    "sql": "market_sales WHERE seller = ?1 AND at > ?2 UNION ALL SELECT 'filled"
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 || ':afee"
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 || ':escrow"
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 || ':fee"
   },
   {
     "file": "market.js",
@@ -912,32 +912,32 @@
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2 || ':fill"
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid IN (?2 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid IN (?2 || ':sale"
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?2 AND rid = ?12 ||"
+    "sql": "marks_ledger WHERE actor = ?2 AND rid = ?12 || ':bid"
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = market_bids.bidder AND rid ="
+    "sql": "marks_ledger WHERE actor = market_bids.bidder AND rid = 'bid-return:' "
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = market_bids.bidder AND rid ="
+    "sql": "marks_ledger WHERE actor = market_bids.bidder AND rid = 'bid-return:' "
   },
   {
     "file": "market.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = market_orders.poster AND rid ="
+    "sql": "marks_ledger WHERE actor = market_orders.poster AND rid = 'order-close"
   },
   {
     "file": "marks.js",
@@ -957,7 +957,7 @@
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger l WHERE l.dst_kind ="
+    "sql": "marks_ledger l WHERE l.dst_kind = 'guild' AND l.dst_id = d.guild_id AN"
   },
   {
     "file": "marks.js",
@@ -992,52 +992,52 @@
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_id = ? AND kind ="
+    "sql": "marks_ledger WHERE dst_id = ? AND kind = 'gate' AND day = ?"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'account' AND dst_id = ${a} AND kind = '"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'account' AND dst_id = ${a} AND kind IN "
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'account' AND kind = ?1 AND day >= ?2 GR"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'account' AND kind IN (${COMBAT_KINDS_SQ"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'guild' AND dst_id = ?1 AND kind = 'guil"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE kind ="
+    "sql": "marks_ledger WHERE kind = 'exchange' AND day >= ? GROUP BY src_id, day"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE src_id = ? AND kind ="
+    "sql": "marks_ledger WHERE src_id = ? AND kind = 'exchange' AND day = ?"
   },
   {
     "file": "marks.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE src_id = ?1 AND kind ="
+    "sql": "marks_ledger WHERE src_id = ?1 AND kind = 'exchange' AND day = ?3), 0)"
   },
   {
     "file": "marks.js",
@@ -1127,7 +1127,7 @@
   {
     "file": "motherlodes.js",
     "table": "motherlode_strikes",
-    "sql": "motherlode_strikes WHERE player = ?1 AND rid = ?5)"
+    "sql": "motherlode_strikes WHERE player = ?1 AND rid = ?5)' }) : []), db.prepa"
   },
   {
     "file": "npcChapters.js",
@@ -1227,7 +1227,7 @@
   {
     "file": "professions.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?8 AND kind ="
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?8 AND kind = 'respec' AND who"
   },
   {
     "file": "professions.js",
@@ -1297,27 +1297,22 @@
   {
     "file": "professions.js",
     "table": "node_harvests",
-    "sql": "node_harvests WHERE player = ?1 AND profession ="
+    "sql": "node_harvests WHERE player = ?1 AND profession = 'fishing' AND day = ?"
   },
   {
     "file": "professions.js",
     "table": "node_harvests",
-    "sql": "node_harvests WHERE player = ?1 AND profession ="
+    "sql": "node_harvests WHERE player = ?1 AND profession = 'fishing' AND day = ?"
   },
   {
     "file": "professions.js",
     "table": "node_harvests",
-    "sql": "node_harvests WHERE player = ?1 AND profession ="
+    "sql": "node_harvests WHERE player = ?1 AND profession = 'hunting' AND day = ?"
   },
   {
     "file": "professions.js",
     "table": "node_harvests",
-    "sql": "node_harvests WHERE player = ?1 AND profession ="
-  },
-  {
-    "file": "professions.js",
-    "table": "node_harvests",
-    "sql": "node_harvests WHERE player = ?1 AND rid = ?2"
+    "sql": "node_harvests WHERE player = ?1 AND profession = 'hunting' AND day = ?"
   },
   {
     "file": "professions.js",
@@ -1327,7 +1322,12 @@
   {
     "file": "professions.js",
     "table": "node_harvests",
-    "sql": "node_harvests WHERE player = ?1 AND rid = ?5)"
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?2"
+  },
+  {
+    "file": "professions.js",
+    "table": "node_harvests",
+    "sql": "node_harvests WHERE player = ?1 AND rid = ?5)' }) : []), db.prepare("
   },
   {
     "file": "professions.js",
@@ -1412,27 +1412,27 @@
   {
     "file": "questlines.js",
     "table": "gate_kills",
-    "sql": "gate_kills g WHERE g.account = ?1 AND ${WINDOW("
+    "sql": "gate_kills g WHERE g.account = ?1 AND ${WINDOW('g"
   },
   {
     "file": "questlines.js",
     "table": "gate_kills",
-    "sql": "gate_kills g WHERE g.account = ?1 AND ${WINDOW("
+    "sql": "gate_kills g WHERE g.account = ?1 AND ${WINDOW('g"
   },
   {
     "file": "questlines.js",
     "table": "serpent_kills",
-    "sql": "serpent_kills z WHERE z.account = ?1 AND ${WINDOW("
+    "sql": "serpent_kills z WHERE z.account = ?1 AND ${WINDOW('z"
   },
   {
     "file": "questlines.js",
     "table": "stars_held",
-    "sql": "stars_held s WHERE s.account = ?1 AND ${WINDOW("
+    "sql": "stars_held s WHERE s.account = ?1 AND ${WINDOW('s"
   },
   {
     "file": "questlines.js",
     "table": "stars_held",
-    "sql": "stars_held s WHERE s.account = ?1 AND ${WINDOW("
+    "sql": "stars_held s WHERE s.account = ?1 AND ${WINDOW('s"
   },
   {
     "file": "raids.js",
@@ -1467,22 +1467,22 @@
   {
     "file": "realm.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE buyer = ?1 AND char_id = ?2 AND kind ="
+    "sql": "market_sales WHERE buyer = ?1 AND char_id = ?2 AND kind = 'material' A"
   },
   {
     "file": "seatForts.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ? AND rid = ? AND kind ="
+    "sql": "marks_ledger WHERE actor = ? AND rid = ? AND kind = 'camp'"
   },
   {
     "file": "seatForts.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ? AND rid = ? AND kind ="
+    "sql": "marks_ledger WHERE actor = ? AND rid = ? AND kind = 'fort'"
   },
   {
     "file": "seatInfluence.js",
     "table": "gate_kills",
-    "sql": "gate_kills WHERE region IS NOT NULL AND day IN (${days.map(() =>"
+    "sql": "gate_kills WHERE region IS NOT NULL AND day IN (${days.map(() => '?"
   },
   {
     "file": "seatInfluence.js",
@@ -1502,12 +1502,12 @@
   {
     "file": "seatInfluence.js",
     "table": "town_seat_history",
-    "sql": "town_seat_history WHERE key = ? AND kind <>"
+    "sql": "town_seat_history WHERE key = ? AND kind <> 'standing' ORDER BY seq DE"
   },
   {
     "file": "seatInfluence.js",
     "table": "town_seat_history",
-    "sql": "town_seat_history WHERE key = ? AND week = ? AND kind ="
+    "sql": "town_seat_history WHERE key = ? AND week = ? AND kind = 'standing' ORD"
   },
   {
     "file": "seatRoyal.js",
@@ -1537,22 +1537,22 @@
   {
     "file": "seatTurning.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger l ON l.actor ="
+    "sql": "marks_ledger l ON l.actor = 'seats' AND l.kind = 'seat-claim' AND l.sr"
   },
   {
     "file": "seatTurning.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor ="
+    "sql": "marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4"
   },
   {
     "file": "seatTurning.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor ="
+    "sql": "marks_ledger WHERE actor = 'seats' AND rid = ?6"
   },
   {
     "file": "seatTurning.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE day BETWEEN ? AND ? AND dst_kind ="
+    "sql": "marks_ledger WHERE day BETWEEN ? AND ? AND dst_kind = 'guild' AND kind"
   },
   {
     "file": "serpents.js",
@@ -1587,7 +1587,7 @@
   {
     "file": "staff.js",
     "table": "staff_audit",
-    "sql": "staff_audit WHERE actor = ?1 AND act IN ("
+    "sql": "staff_audit WHERE actor = ?1 AND act IN ('hidden-token"
   },
   {
     "file": "staffCensus.js",
@@ -1617,7 +1617,7 @@
   {
     "file": "staffCensus.js",
     "table": "item_dupes",
-    "sql": "item_dupes WHERE trail_at IS NULL AND (kind IS NULL OR kind !="
+    "sql": "item_dupes WHERE trail_at IS NULL AND (kind IS NULL OR kind != 'drop"
   },
   {
     "file": "staffCensus.js",
@@ -1647,17 +1647,17 @@
   {
     "file": "staffCensus.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE kind ="
+    "sql": "market_sales WHERE kind = 'material' AND delivered = 0 AND material IN"
   },
   {
     "file": "staffCensus.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE kind ="
+    "sql": "market_sales WHERE kind = 'material' AND delivered = 0 GROUP BY materi"
   },
   {
     "file": "staffCensus.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'"
   },
   {
     "file": "staffDesk.js",
@@ -1677,7 +1677,7 @@
   {
     "file": "staffEconomy.js",
     "table": "market_fills",
-    "sql": "market_fills WHERE ?3 ="
+    "sql": "market_fills WHERE ?3 = 'marks' AND material IN (SELECT value FROM jso"
   },
   {
     "file": "staffEconomy.js",
@@ -1702,7 +1702,7 @@
   {
     "file": "staffEconomy.js",
     "table": "market_sales",
-    "sql": "market_sales WHERE day >= ?1 AND currency ="
+    "sql": "market_sales WHERE day >= ?1 AND currency = 'gold' GROUP BY day"
   },
   {
     "file": "staffEconomy.js",
@@ -1712,12 +1712,12 @@
   {
     "file": "staffEconomy.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE day >= ?1 AND (src_kind ="
+    "sql": "marks_ledger WHERE day >= ?1 AND (src_kind = 'mint' OR dst_kind = 'bur"
   },
   {
     "file": "staffEconomy.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE dst_kind ="
+    "sql": "marks_ledger WHERE dst_kind = 'escrow' OR src_kind = 'escrow'"
   },
   {
     "file": "staffEconomy.js",
@@ -1757,17 +1757,17 @@
   {
     "file": "staffHidden.js",
     "table": "staff_audit",
-    "sql": "staff_audit o WHERE o.actor = ?1 AND o.act ="
+    "sql": "staff_audit o WHERE o.actor = ?1 AND o.act = 'hide' AND o.detail = '{\""
   },
   {
     "file": "staffHidden.js",
     "table": "staff_audit",
-    "sql": "staff_audit r WHERE r.actor = ?1 AND r.act ="
+    "sql": "staff_audit r WHERE r.actor = ?1 AND r.act = 'hidden-token' AND json_e"
   },
   {
     "file": "staffHidden.js",
     "table": "staff_audit",
-    "sql": "staff_audit WHERE actor = ?1 AND act ="
+    "sql": "staff_audit WHERE actor = ?1 AND act = 'hidden-token' ORDER BY at DESC"
   },
   {
     "file": "staffPlayers.js",
@@ -1797,12 +1797,12 @@
   {
     "file": "staffPlayers.js",
     "table": "market_sales",
-    "sql": "market_sales s ${party("
+    "sql": "market_sales s ${party('buyer"
   },
   {
     "file": "staffPlayers.js",
     "table": "market_sales",
-    "sql": "market_sales s ${party("
+    "sql": "market_sales s ${party('seller"
   },
   {
     "file": "staffRealm.js",
@@ -1852,12 +1852,12 @@
   {
     "file": "staffStatus.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE day IN (?2, ?3) AND at >= ?1 AND dst_kind ="
+    "sql": "marks_ledger WHERE day IN (?2, ?3) AND at >= ?1 AND dst_kind = 'burn"
   },
   {
     "file": "staffStatus.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE day IN (?2, ?3) AND at >= ?1 AND src_kind ="
+    "sql": "marks_ledger WHERE day IN (?2, ?3) AND at >= ?1 AND src_kind = 'mint"
   },
   {
     "file": "stars.js",
@@ -1897,17 +1897,17 @@
   {
     "file": "townSeats.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger l ON l.actor ="
+    "sql": "marks_ledger l ON l.actor = 'seats' AND l.kind = 'seat-claim' AND l.sr"
   },
   {
     "file": "townSeats.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor ="
+    "sql": "marks_ledger WHERE actor = 'seats' AND rid = ?5), 0)), ?4"
   },
   {
     "file": "townSeats.js",
     "table": "town_seat_history",
-    "sql": "town_seat_history WHERE key = ? AND kind ="
+    "sql": "town_seat_history WHERE key = ? AND kind = 'strike'"
   },
   {
     "file": "writs.js",
@@ -1947,12 +1947,12 @@
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?11 || ':cesc"
   },
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?14 || ':wesc"
   },
   {
     "file": "writs.js",
@@ -1962,32 +1962,32 @@
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2 ||"
+    "sql": "marks_ledger WHERE actor = ?1 AND rid = ?2 || ':wpay"
   },
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = ?2 AND rid = ?7 ||"
+    "sql": "marks_ledger WHERE actor = ?2 AND rid = ?7 || ':cpay"
   },
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = commissions.poster AND rid ="
+    "sql": "marks_ledger WHERE actor = commissions.poster AND rid = 'commission-re"
   },
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = commissions.poster AND rid ="
+    "sql": "marks_ledger WHERE actor = commissions.poster AND rid = 'commission-re"
   },
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = guild_writs.guild_id AND rid ="
+    "sql": "marks_ledger WHERE actor = guild_writs.guild_id AND rid = 'writ-return"
   },
   {
     "file": "writs.js",
     "table": "marks_ledger",
-    "sql": "marks_ledger WHERE actor = guild_writs.guild_id AND rid ="
+    "sql": "marks_ledger WHERE actor = guild_writs.guild_id AND rid = 'writ-return"
   },
   {
     "file": "writs.js",
