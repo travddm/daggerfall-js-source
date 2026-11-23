@@ -3,9 +3,11 @@
 // The resource is Hazelnut's Basic Roads (MIT code; hand-
 // authored path data of unstated license). THE LINE: its DESIGN is free
 // to learn from and is credited here as prior art; its DATA - which
-// pixels carry a road and where each leaves - is authored work and none
-// of it enters this port. Every byte this module emits is derived from
-// the player's own MAPS.BSA and WOODS.WLD at runtime.
+// pixels carry a road and where each leaves - is authored work of
+// unstated license. It is vendored in the repository and read
+// by the mod loader, not by this generator. Every byte this module
+// emits is derived from the player's own MAPS.BSA and WOODS.WLD at
+// runtime.
 //
 // WHAT IS KEPT FROM THE DESIGN, because it is what makes roads work:
 //   - one byte per map pixel on the 1000x500 world, an 8-direction
