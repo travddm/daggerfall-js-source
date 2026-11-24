@@ -237,3 +237,62 @@ test('a session waits at the door with no socket open, shows its place, then ope
   sockets[0].drop(CLOSE_BUSY, 'busy, wait 6');
   assert.equal(s._retryAt, now + 6_000, 'rand 0.5: the wait itself');
 });
+
+test("a hello refused for want of a token keeps the door's turn: the next open waits on the token, not in line again", async () => {
+  const clock = { now: 5_000 };
+  const counts = { asks: 0 };
+  const client = new RelayDoorClient({
+    now: () => clock.now,
+    rand: () => 0.5,
+    paces: true,
+    fetchImpl: doorFetch(newDoor(), clock, counts),
+  });
+  const session = sessionIn();
+  assert.equal(client.holds(session), true);
+  await settle();
+  assert.equal(client.holds(session), false, 'the pass opens the socket');
+  client.passFor(CELL);
+  client.dropped();
+  client.keepTurn();
+  assert.equal(client.holds(session), false);
+  assert.equal(counts.asks, 1);
+});
+
+test('a session whose hello the room refused for want of a token opens again without asking the door', async () => {
+  const { OnlineSession } = await import(ONLINE_PATH);
+  const { fakeSocketClass } = await import(SOCKET_PATH);
+  const { CLOSE_POLICY } = await import(WIRE_PATH);
+  const { FakeWS, sockets } = fakeSocketClass();
+  let now = 1_000_000;
+  let asks = 0;
+  const fetchImpl = async () => {
+    asks++;
+    return { status: 200, json: async () => ({ pass: `pass-for-hello-${String(asks).padStart(6, '0')}`, until: 0 }) };
+  };
+  const mintToken = Object.assign(async () => null, { lastWhy: 'offline' });
+  const s = new OnlineSession({
+    url: 'wss://relay.test',
+    name: 'M',
+    id: 'mac-0001',
+    secret: 'secret-of-mac-0001',
+    WebSocketImpl: FakeWS,
+    now: () => now,
+    rand: () => 0.5,
+    mintToken,
+    door: true,
+  });
+  s._door = new RelayDoorClient({ now: () => now, rand: () => 0.5, paces: true, fetchImpl });
+  s.join(CELL, { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 });
+  await settle();
+  now = s._retryAt;
+  s.tick();
+  assert.equal(sockets.length, 1);
+  sockets[0].open();
+  await settle();
+  sockets[0].drop(CLOSE_POLICY, 'sign in to play online');
+  now = s._retryAt + 1;
+  s.tick();
+  await settle();
+  assert.equal(sockets.length, 2, 'the next open goes straight to the room');
+  assert.equal(asks, 1, 'and asks the door no second time');
+});

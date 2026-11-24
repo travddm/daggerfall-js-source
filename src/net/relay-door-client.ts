@@ -122,6 +122,12 @@ export class RelayDoorClient {
     this.needed = true;
   }
 
+  /** The session's hello reached its room but went without a token: the door let it in, and the account service's
+   *  sign-in line paces it now. Its next open waits on the token alone, not at the back of the door's line again. */
+  keepTurn(): void {
+    this.needed = false;
+  }
+
   /** A relay deploy's hold on a dropped session's retry. Null where the door paces the room: the line spreads the
    *  return, and a wave's hold on top of it would only lengthen it. */
   waveHold(wave: Wave, dropAt: number | null, room: string | null, now: number): number | null {
