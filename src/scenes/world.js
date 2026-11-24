@@ -19665,7 +19665,7 @@ export async function bootWorld(canvas, renderer, params, status) { handHeroGend
       // net/online.js because online.js must stay a module a node test
       // can drive: `fetch` and the storage are arguments, the same law
       // net/accountClient.js's own header states.
-      mintToken: identityMinter,
+      mintToken: identityMinter, door: true,   // the relay's door paces this place's first open and each return after a drop
       wave: pageWave,   // SCALE2c: the page's one view of a relay deploy's wave, shared with every chat link
       wire2: true,   // SCALE5b: the second wire - this build reads a relay's batched poses and its channel's roster deltas
     });

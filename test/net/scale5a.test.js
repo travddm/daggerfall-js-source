@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { fakeRoom, asOnlinePage } from '../fakeRoom.mjs';
+import { busyReason, busyTokenUnread } from '../../src/net/door-law.ts';
 import { SOCIAL_ROOM, CHAT_HELLO_HZ_MAX, CLOSE_BUSY, BUSY_TOKEN_UNREAD, ACCOUNT_TABS_MAX, SERPENT_INTERNAL_FELL, SERPENT_RC_PREFIX, CHAT_WORLD_ROOM, CHAT_ROSTER_MAX } from '../../src/net/wire.js';
 import { rosterRows } from '../../src/net/roster.js';
 import { OnlineSession } from '../../src/net/online.js';
@@ -317,7 +318,7 @@ test('SCALE5a a hello the room\'s gate refuses busy closes 1013 with BUSY_TOKEN_
     const tok = await r.token('peer-9999', { s: 'player-9999', n: 'peer-9999' });
     const refused = r.connect();
     await r.hello(refused, 'peer-9999', null, { tok, cl: 1 });
-    assert.deepEqual(refused.closed, { code: CLOSE_BUSY, reason: BUSY_TOKEN_UNREAD }, 'busy, and the token unread');
+    assert.deepEqual(refused.closed, { code: CLOSE_BUSY, reason: busyReason(BUSY_TOKEN_UNREAD, 1000) }, 'busy, the token unread, and the wait');
     tick(1000);
     const back = r.connect();
     await r.hello(back, 'peer-9999', null, { tok, cl: 1 });
@@ -328,7 +329,7 @@ test('SCALE5a a hello the room\'s gate refuses busy closes 1013 with BUSY_TOKEN_
     tick(1000);
     const replay = r.connect();
     await r.hello(replay, 'peer-9999', null, { tok, cl: 1 });
-    assert.ok(replay.closed && replay.closed.reason !== BUSY_TOKEN_UNREAD, 'a spent token is refused - never as unread');
+    assert.ok(replay.closed && !busyTokenUnread(replay.closed.reason), 'a spent token is refused - never as unread');
   });
 });
 

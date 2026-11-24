@@ -455,7 +455,7 @@ export function connect(bot, ctx, o) {
   const Fleet = ctx.WS;
   const WS = class extends Fleet { constructor(url, protocols) { super(url, protocols); ctx.ownerOf.set(this, bot); } };
   const page = { wave: reconnectWave(), wire2: o.wire !== 1 };   // AUDIT SCALE II L5: the bot's page - one wave, its wire
-  const presence = new OnlineSession({ url: ctx.relayUrl, name: bot.account.name, look: LOOK, id: bot.id, secret: bot.secret, mintToken: bot.minter, WebSocketImpl: WS, ...page });
+  const presence = new OnlineSession({ url: ctx.relayUrl, name: bot.account.name, look: LOOK, id: bot.id, secret: bot.secret, mintToken: bot.minter, WebSocketImpl: WS, door: true, ...page });
   presence.join(worldRoom(px, py), pose);
   presence.setHalo(cellHaloFor(px, py));
   const hub = new OnlineSession({ url: ctx.relayUrl, name: bot.account.name, look: LOOK, id: bot.id, secret: bot.secret, presence: false, WebSocketImpl: WS, ...page });
@@ -629,7 +629,7 @@ export class Fleet {
   /** The storm begins: nobody is back until a welcome says so. */
   stormBegin() {
     for (const b of this.bots) b.welcomedAt.clear();
-    this.mark = { calls: this.ctx.account.at.length, refusals: { ...this.relay.refusals }, refusedAt: this.relay.refusedAt.length };
+    this.mark = { calls: this.ctx.account.at.length, refusals: { ...this.relay.refusals }, refusedAt: this.relay.refusedAt.length, doorAsks: this.bots.reduce((n, b) => n + b.presence._door.asks, 0) };
     return true;
   }
   /** Each bot's welcome back into its own cell since the storm began (ms, or null for one not back). */
@@ -652,12 +652,28 @@ export class Fleet {
       }
     }
     return {
+      door: this.doorSecond(),
       mints: calls.filter(([, route]) => route === '/v1/auth/token').length,
       calls: calls.length,
       failed: calls.filter(([, , st]) => st === 'offline' || parseInt(st, 10) >= 500).length,
       back: this.bots.filter((b) => b.welcomedAt.has(b.cell)).length,
       refused, trace, callsAt: calls, refusedAt,
     };
+  }
+  /** The relay's door this second: bots waiting in line, the highest place shown, asks since the storm began, and the sockets a
+   *  waiting bot holds (its place socket and its halos), which the door means to be none. */
+  doorSecond() {
+    let waiting = 0, topPlace = 0, asks = 0, socketsWhileWaiting = 0;
+    for (const b of this.bots) {
+      const door = b.presence._door;
+      asks += door.asks;
+      if (door.position === null) continue;
+      waiting++;
+      topPlace = Math.max(topPlace, door.position);
+      if (b.presence._ws) socketsWhileWaiting++;
+      for (const h of b.presence._halo.values()) if (h.ws) socketsWhileWaiting++;
+    }
+    return { waiting, topPlace, asks: asks - (this.mark?.doorAsks ?? 0), socketsWhileWaiting };
   }
   /** Play ends: every session left, every clock stopped, the tallies handed back. */
   finish() {
@@ -861,6 +877,7 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
   /** @type {Array<[number, string, any]>} */
   const marks = [];
   let quiet = 0;
+  let doorTop = 0, doorHeld = 0, doorAsks = 0;
   while (Date.now() < endsAt) {
     await sleep(1000);
     // Under the self-host kit one process serves both Workers, so the account service is down while the relay is.
@@ -870,7 +887,12 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
     const parts = await Promise.all(fleets.map((f) => f.second()));
     const trace = {};
     let mints = 0, back = 0;
+    const door = { waiting: 0, topPlace: 0, asks: 0, socketsWhileWaiting: 0 };
     for (const p of parts) {
+      door.waiting += p.door.waiting;
+      door.topPlace = Math.max(door.topPlace, p.door.topPlace);
+      door.asks += p.door.asks;
+      door.socketsWhileWaiting += p.door.socketsWhileWaiting;
       for (const [t, route, st] of p.callsAt) {
         marks.push([t, 'calls', 1]);
         if (route === '/v1/auth/token') { marks.push([t, 'mints', 1]); mints++; }
@@ -880,13 +902,20 @@ async function theStorm(fleets, total, svc, fold, endsAt) {
       for (const [k, n] of Object.entries(p.trace)) trace[k] = (trace[k] ?? 0) + n;
       back += p.back;
     }
+    const refusedNow = parts.reduce((n, p) => n + Object.values(p.refused).reduce((a, b) => a + b, 0), 0);
+    console.log(`   door t+${Math.round((Date.now() - at) / 1000)}s back ${back}/${total}, waiting ${door.waiting}, top place ${door.topPlace}, asks ${door.asks}, sockets held while waiting ${door.socketsWhileWaiting}, refused ${refusedNow}`);
+    doorTop = Math.max(doorTop, door.topPlace);
+    doorHeld = Math.max(doorHeld, door.socketsWhileWaiting);
+    doorAsks = door.asks;
     if (Object.keys(trace).length) console.log(`   trace t+${Math.round((Date.now() - at) / 1000)}s ${JSON.stringify(trace)}`);
     quiet = mints === 0 ? quiet + 1 : 0;
     if (back >= total && quiet >= 3) break;
   }
   await restarting;
   const backs = (await Promise.all(fleets.map((f) => f.backTimes()))).flat();
-  return { relayUpS: up > 0 ? Math.round((up - at) / 100) / 10 : null, ...stormSeconds(marks, backs, at, total) };
+  const door = { topPlace: doorTop, asks: doorAsks, mostSocketsHeldWhileWaiting: doorHeld };
+  console.log(`== the door: top place shown ${doorTop}, asks ${doorAsks} (${Math.round((doorAsks / total) * 10) / 10} a bot), most sockets held by waiting bots in one second ${doorHeld}`);
+  return { relayUpS: up > 0 ? Math.round((up - at) / 100) / 10 : null, door, ...stormSeconds(marks, backs, at, total) };
 }
 
 // ═══ THE REPORT ════════════════════════════════════════════════════════════════════════════════════════════════════

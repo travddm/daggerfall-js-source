@@ -55,6 +55,11 @@ IDENTITY_PUBLIC_KEY = "2ZbUhjpY80Hne60_ucjzCZMF0i5DsarfaWW9SDU5ei4"
 # src/net/identityToken.js is the hard ceiling the module itself
 # refuses past; this may only TIGHTEN it, never widen it.
 IDENTITY_MAX_TTL_S = "300"
+# The relay's door (server/src/relay-door.ts): sign-ins a room lets in a second after a restart, and the whole
+# server's. Empty is the default, 4 each: a full room or a full server of 200 back in about 50 s. Keep the account
+# service's ADMIT_RATE at or above DOOR_SERVER_RATE, or it forms a second, slower line.
+DOOR_ROOM_RATE = ""
+DOOR_SERVER_RATE = ""
 # ═══ RAID-ROLL: THE TOWNS TABLE THE RELAY WILL KEEP ════════════════
 #
 # The SHA-256 of the towns table (src/net/raid/raidLaw.js raidTownsCanon) -
