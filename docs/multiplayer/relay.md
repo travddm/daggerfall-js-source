@@ -94,7 +94,10 @@ The first frame is `{ t: 'hello', id, secret, name, look, pose, tok, ph, ... }`.
 it has passed every check below, in this order:
 
 1. The room's hello gate (`preTokenGate`, `server/src/helloGate.js`) spends the room's bucket of hellos. Battle,
-   arena floor, Super Dungeon, instance, cell and world rooms spend it after the token instead (`placeGate`).
+   arena floor, Super Dungeon, instance, cell and world rooms spend it after the token instead (`placeGate`). A cell
+   or world room's hello that carries a pass from the door (`dp`, below) spends the pass instead of the room's bucket.
+   A busy refusal names its wait in the close reason: `busy, wait <s>`, or `busy, token unread, wait <s>`, with `s`
+   from 1 to 30 seconds: the refused still ahead at the room's hello rate.
 2. The hello doors (`helloDoorRefused`, `server/src/helloDoor.ts`). The first door compares the hello's `ph` with the
    relay's own profile hash and refuses another one with the reason `other rules`. The next doors check the law
    numbers (`GROUND_LAW`, `GRANT_HELLO_LAW`, `LOOT_HELLO_LAW`, the lease door, the cell-tree `of` field) and refuse an
@@ -164,6 +167,7 @@ Every `setAlarm` re-arms the object. See [relay-scaling-and-cost.md](relay-scali
 | Var                                                                                             | Use                                        |
 | ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | `IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S`                                                     | Identity token check                       |
+| `DOOR_ROOM_RATE`, `DOOR_SERVER_RATE`                                                            | The door's pace; see The door              |
 | `CELL_SPLIT_AT`, `CELL_SPLIT_DWELL_MS`, `CELL_MERGE_AT`, `CELL_MERGE_DWELL_MS`, `REGION_SHARDS` | Scaling; see the scaling page              |
 | `MOD_FEED_URL`, `GRANT_FEED_URL`, `HIDDEN_SEEN_URL`, `STAFF_NET_FEED_URL`, `REACTION_FEED_URL`  | Signed feeds posted to the account service |
 | `RAID_TOWNS_SHA256`, `BOSS_BODY`                                                                | Raid town list check; boss body mode       |
@@ -183,7 +187,31 @@ leases, feeds).
 4. It polls `/health` until the new version answers; a miss fails the run.
 
 **A deploy restarts every Durable Object and closes every socket.** All players drop and reconnect.
-`src/net/reconnectWave.js` spreads the reconnects. The account service deploys separately and drops nobody.
+The relay's door paces them back (below); `src/net/reconnectWave.js` spreads the sockets the door does not pace. The
+account service deploys separately and drops nobody.
+
+### The door
+
+`server/src/relay-door.ts` paces a place's players back after a restart, and shows each player its place in line.
+
+- A page asks `GET /door?room=<key>&id=<page id>` before it opens its first socket into a cell or a world room, and
+  again after a drop. A session that is already in and only changes rooms does not ask.
+- The answer is 200 `{ pass, until }`, or 503 `{ error: 'queue', position, wait }` with `retry-after`: the account
+  service's sign-in line answers in the same shape. Any other answer lets the page in without a pass.
+- Each room's line lets `DOOR_ROOM_RATE` in a second (default 4: a room of 200 returns in about 50 s), under one
+  server-wide line of `DOOR_SERVER_RATE` (default 4: the 200-player server in about 50 s). Both are Worker vars a
+  server owner may set. The account service's `ADMIT_RATE` must stay at or above `DOOR_SERVER_RATE`, or it forms a
+  second, slower line.
+- A pass lasts `DOOR_PASS_MS` (15 s) and opens one hello into its own room. The hello carries it as `dp`; the room
+  spends it at the door object, and a pass it cannot spend within `DOOR_SPEND_WAIT_MS` (1 s) leaves the hello to the
+  room's bucket.
+- A waiting page holds no socket, seat or attachment on the relay, only its place in the door's memory. A line holds
+  at most `DOOR_ROOM_PLACES_MAX` places, the server-wide line `DOOR_SERVER_PLACES_MAX`, and the door
+  `DOOR_LINES_MAX` lines; past a bound a page goes in without a pass.
+- The lines live in memory in one Room object named `#door`, which no socket can reach. A restart loses them, and
+  every page asks again. The door fails open: no answer within `DOOR_ASK_WAIT_MS` (2 s) lets the page in.
+- Within one room the order is first come, first served. When the server-wide line holds a page that its room would
+  let in, its place among the others its room let in is by the time of its next ask.
 
 ## Running and testing
 

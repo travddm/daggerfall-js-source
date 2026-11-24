@@ -29,7 +29,10 @@ export type DoorSession = {
 /** A relay deploy's wave (net/reconnectWave.js), as the door reads it. */
 type Wave = { holdUntil(dropAt: number, now: number): number | null };
 
-type FetchLike = (url: string, init?: { signal?: AbortSignal }) => Promise<{ status: number; json(): Promise<unknown> }>;
+type FetchLike = (
+  url: string,
+  init?: { signal?: AbortSignal },
+) => Promise<{ status: number; json(): Promise<unknown> }>;
 
 /** `paces`: whether this session asks the door at all (the session a page's place rides on does; its hub and region
  *  links do not). `fetchImpl` is the page's fetch unless a test hands its own. */
@@ -37,7 +40,11 @@ export type DoorClientOptions = { now: () => number; rand: () => number; paces: 
 
 /** The door's HTTP address for a relay's socket address: `wss://` asks `https://`, `ws://` asks `http://`. */
 export function doorUrl(relayUrl: string, room: string, id: string): string | null {
-  const base = /^wss:\/\//i.test(relayUrl) ? `https://${relayUrl.slice(6)}` : /^ws:\/\//i.test(relayUrl) ? `http://${relayUrl.slice(5)}` : null;
+  const base = /^wss:\/\//i.test(relayUrl)
+    ? `https://${relayUrl.slice(6)}`
+    : /^ws:\/\//i.test(relayUrl)
+      ? `http://${relayUrl.slice(5)}`
+      : null;
   if (!base) return null;
   return `${base.replace(/\/+$/, '')}${DOOR_PATH}?room=${encodeURIComponent(room)}&id=${encodeURIComponent(id)}`;
 }
@@ -75,7 +82,8 @@ export class RelayDoorClient {
     this.paces = paces;
     this.now = now;
     this.rand = rand;
-    this.fetchImpl = fetchImpl ?? (typeof globalThis.fetch === 'function' ? (globalThis.fetch.bind(globalThis) as FetchLike) : null);
+    this.fetchImpl =
+      fetchImpl ?? (typeof globalThis.fetch === 'function' ? (globalThis.fetch.bind(globalThis) as FetchLike) : null);
     this.id = newDoorId(Math.random);
   }
 
@@ -137,7 +145,8 @@ export class RelayDoorClient {
 
   /** The player's line while the session waits at the door, else the reconnecting line. */
   statusLine(label: string): string {
-    if (this.position !== null) return t('net.online.inLine', '{label}: rejoining, number {place} in line', { label, place: this.position });
+    if (this.position !== null)
+      return t('net.online.inLine', '{label}: rejoining, number {place} in line', { label, place: this.position });
     return t('net.online.reconnecting', '{label}: reconnecting', { label });
   }
 

@@ -11,7 +11,12 @@ const { newDoor, doorAsk, doorResponse, DOOR_ROOM_RATE } = await import(DOOR_PAT
 
 const CELL = 'world:25,9';
 
-type Session = { url: string; room: string; _retryAt: number | null; _halo: Map<string, { ws: unknown; retryAt: number | null }> };
+type Session = {
+  url: string;
+  room: string;
+  _retryAt: number | null;
+  _halo: Map<string, { ws: unknown; retryAt: number | null }>;
+};
 const sessionIn = (room = CELL): Session => ({ url: 'wss://relay.test', room, _retryAt: null, _halo: new Map() });
 
 /** A fetch that answers from the real door, at the fake clock's time. */
@@ -27,7 +32,7 @@ function doorFetch(door: object, clock: { now: number }, counts: { asks: number 
 /** Lets every pending ask settle. */
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test('a room of 200 dropped together comes back at the door\'s pace: about 50 s, each told its place, asking a few times', async () => {
+test("a room of 200 dropped together comes back at the door's pace: about 50 s, each told its place, asking a few times", async () => {
   const clock = { now: 1_000_000 };
   const door = newDoor();
   const counts = { asks: 0 };
@@ -67,7 +72,10 @@ test('a room of 200 dropped together comes back at the door\'s pace: about 50 s,
   }
   const last = Math.max(...pages.map((p) => (p.inAt ?? Infinity) - start));
   assert.ok(last >= 45_000 && last <= 70_000, `the last page in at ${last} ms`);
-  assert.ok(Math.max(...perSecond.values()) <= DOOR_ROOM_RATE * 2, `at most about the rate in any second: ${JSON.stringify([...perSecond])}`);
+  assert.ok(
+    Math.max(...perSecond.values()) <= DOOR_ROOM_RATE * 2,
+    `at most about the rate in any second: ${JSON.stringify([...perSecond])}`,
+  );
   assert.ok(pages.filter((p) => p.maxPlace > 0).length >= 190, 'nearly every page was shown a place');
   assert.ok(counts.asks / pages.length <= 12, `asks a page: ${counts.asks / pages.length}`);
   perSecond = new Map();
@@ -89,14 +97,23 @@ test('a door that does not answer with a place or a pass lets the page in, and t
     assert.equal(session._retryAt, clock.now, 'answered: it opens at once');
     assert.equal(client.holds(session), false);
     assert.equal(client.passFor(CELL), null, 'and its hello carries no pass');
-    assert.equal(client.waveHold({ holdUntil: () => 42 }, 1, CELL, clock.now), 42, 'with no door, the deploy wave spreads the next return');
+    assert.equal(
+      client.waveHold({ holdUntil: () => 42 }, 1, CELL, clock.now),
+      42,
+      'with no door, the deploy wave spreads the next return',
+    );
   }
 });
 
 test('a session in its place changes rooms without asking; a drop asks again', async () => {
   const clock = { now: 5_000 };
   const counts = { asks: 0 };
-  const client = new RelayDoorClient({ now: () => clock.now, rand: () => 0.5, paces: true, fetchImpl: doorFetch(newDoor(), clock, counts) });
+  const client = new RelayDoorClient({
+    now: () => clock.now,
+    rand: () => 0.5,
+    paces: true,
+    fetchImpl: doorFetch(newDoor(), clock, counts),
+  });
   const session = sessionIn();
   assert.equal(client.holds(session), true);
   await settle();
@@ -107,7 +124,11 @@ test('a session in its place changes rooms without asking; a drop asks again', a
   assert.equal(counts.asks, 1);
   client.dropped();
   assert.equal(client.holds(session), true, 'the return after a drop');
-  assert.equal(client.waveHold({ holdUntil: () => 42 }, 1, CELL, clock.now), null, 'the door, not the wave, spreads it');
+  assert.equal(
+    client.waveHold({ holdUntil: () => 42 }, 1, CELL, clock.now),
+    null,
+    'the door, not the wave, spreads it',
+  );
 });
 
 test('a session that does not pace (a hub or region link) and a room the door does not pace never ask', () => {
@@ -142,7 +163,7 @@ test('while the place waits at the door, its halos wait too', async () => {
   assert.equal(session._halo.get('world:26,9')?.retryAt, 4_000);
 });
 
-test('a busy close\'s named wait sets the retry, jittered; one without leaves it', () => {
+test("a busy close's named wait sets the retry, jittered; one without leaves it", () => {
   const clock = { now: 1_000 };
   const client = new RelayDoorClient({ now: () => clock.now, rand: () => 0, paces: true, fetchImpl: null });
   const session = sessionIn();
@@ -155,9 +176,15 @@ test('a busy close\'s named wait sets the retry, jittered; one without leaves it
   assert.equal(client.haloRetryAt({ reason: 'going away' }, 5), 5);
 });
 
-test('the door\'s address follows the relay\'s', () => {
-  assert.equal(doorUrl('wss://relay.example/', CELL, 'abcdefghijklmnop'), 'https://relay.example/door?room=world%3A25%2C9&id=abcdefghijklmnop');
-  assert.equal(doorUrl('ws://127.0.0.1:8873', CELL, 'abcdefghijklmnop'), 'http://127.0.0.1:8873/door?room=world%3A25%2C9&id=abcdefghijklmnop');
+test("the door's address follows the relay's", () => {
+  assert.equal(
+    doorUrl('wss://relay.example/', CELL, 'abcdefghijklmnop'),
+    'https://relay.example/door?room=world%3A25%2C9&id=abcdefghijklmnop',
+  );
+  assert.equal(
+    doorUrl('ws://127.0.0.1:8873', CELL, 'abcdefghijklmnop'),
+    'http://127.0.0.1:8873/door?room=world%3A25%2C9&id=abcdefghijklmnop',
+  );
   assert.equal(doorUrl('https://not-a-socket', CELL, 'abcdefghijklmnop'), null);
 });
 
@@ -179,7 +206,16 @@ test('a session waits at the door with no socket open, shows its place, then ope
     const next = answers.shift() ?? { status: 200, body: {} };
     return { status: next.status, json: async () => next.body };
   };
-  const s = new OnlineSession({ url: 'wss://relay.test', name: 'M', id: 'mac-0001', secret: 'secret-of-mac-0001', WebSocketImpl: FakeWS, now: () => now, rand: () => 0.5, door: true });
+  const s = new OnlineSession({
+    url: 'wss://relay.test',
+    name: 'M',
+    id: 'mac-0001',
+    secret: 'secret-of-mac-0001',
+    WebSocketImpl: FakeWS,
+    now: () => now,
+    rand: () => 0.5,
+    door: true,
+  });
   s._door = new RelayDoorClient({ now: () => now, rand: () => 0.5, paces: true, fetchImpl });
   s.join(CELL, { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, mv: 0 });
   await settle();

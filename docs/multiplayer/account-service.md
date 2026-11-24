@@ -121,7 +121,8 @@ reads after its own writes.
 
 `server-account/src/admit.js` is one Durable Object queue, shared by the whole service, in front of `ADMIT_ROUTES`
 (guest, login, recover, token, session). A relay deploy drops every player, and they all sign in again within a
-minute; without the queue D1 refuses as overloaded.
+minute; without the queue D1 refuses as overloaded. The line itself is `src/net/sign-in-line.js`, which the relay's
+door (`server/src/relay-door.ts`) runs too.
 
 - It admits `ADMIT_RATE` places a second, first come first served, and up to `ADMIT_BURST` at once when quiet.
 - The rest get 503 `queue` with their place and a wait (`ADMIT_WAIT_MIN_MS` to `ADMIT_WAIT_MAX_MS`), without touching

@@ -7,15 +7,28 @@ import assert from 'node:assert/strict';
 const DOOR_LAW_PATH: string = '../../src/net/door-law.ts';
 const WIRE_PATH: string = '../../src/net/wire.js';
 const ADMIT_PATH: string = '../../server-account/src/admit.js';
-const { readDoorAnswer, busyReason, busyWaitMs, busyTokenUnread, doorPaces, DOOR_WAIT_MAX_MS, DOOR_WAIT_MIN_MS } = await import(DOOR_LAW_PATH);
+const { readDoorAnswer, busyReason, busyWaitMs, busyTokenUnread, doorPaces, DOOR_WAIT_MAX_MS, DOOR_WAIT_MIN_MS } =
+  await import(DOOR_LAW_PATH);
 const { BUSY_TOKEN_UNREAD } = await import(WIRE_PATH);
 const { admitLine, admitAsk, ADMIT_BURST } = await import(ADMIT_PATH);
 
 test('a pass, a place in line, and every other answer read as open', () => {
-  assert.deepEqual(readDoorAnswer(200, { pass: 'abcdefghijklmnop', until: 5 }), { kind: 'pass', pass: 'abcdefghijklmnop', until: 5 });
-  assert.deepEqual(readDoorAnswer(503, { error: 'queue', position: 7, wait: 1750 }), { kind: 'queue', position: 7, wait: 1750 });
+  assert.deepEqual(readDoorAnswer(200, { pass: 'abcdefghijklmnop', until: 5 }), {
+    kind: 'pass',
+    pass: 'abcdefghijklmnop',
+    until: 5,
+  });
+  assert.deepEqual(readDoorAnswer(503, { error: 'queue', position: 7, wait: 1750 }), {
+    kind: 'queue',
+    position: 7,
+    wait: 1750,
+  });
   assert.deepEqual(readDoorAnswer(200, {}), { kind: 'open' }, 'a door that lets the page in unpaced');
-  assert.deepEqual(readDoorAnswer(503, { error: 'unavailable' }), { kind: 'open' }, 'a room that did not answer is no line');
+  assert.deepEqual(
+    readDoorAnswer(503, { error: 'unavailable' }),
+    { kind: 'open' },
+    'a room that did not answer is no line',
+  );
   assert.deepEqual(readDoorAnswer(404, { error: 'no such room' }), { kind: 'open' });
   assert.deepEqual(readDoorAnswer(0, null), { kind: 'open' }, 'a network error');
   assert.deepEqual(readDoorAnswer(200, { pass: 'short', until: 5 }), { kind: 'open' }, 'a pass out of shape');
@@ -28,7 +41,7 @@ test('a told wait is bounded: never under a second, never over the longest', () 
   assert.equal(readDoorAnswer(503, { error: 'queue', position: 1, wait: 9e9 }).wait, DOOR_WAIT_MAX_MS);
 });
 
-test('the account service\'s sign-in line answers in the shape the door\'s reader takes', () => {
+test("the account service's sign-in line answers in the shape the door's reader takes", () => {
   const line = admitLine();
   for (let i = 0; i < ADMIT_BURST; i++) admitAsk(line, `quiet${i}`, 1000);
   const held = admitAsk(line, 'late', 1000);

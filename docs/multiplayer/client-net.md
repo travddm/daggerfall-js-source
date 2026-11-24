@@ -78,10 +78,16 @@ new OnlineSession({ url, name, look, id, secret, presence, acct, asecret, mintTo
   every `PING_MS`. A peer silent for `PEER_TIMEOUT_MS` (4 heartbeats) is hidden, not removed. Only the room's leave
   removes a peer.
 - **Reconnect.** `_scheduleRetry` uses jittered exponential backoff between `BACKOFF_MIN_MS` (1 s) and
-  `BACKOFF_MAX_MS` (8 s). `CLOSE_BUSY` starts at half the maximum. `CLOSE_REPARTITION` retries almost at once.
+  `BACKOFF_MAX_MS` (8 s). `CLOSE_BUSY` waits the time its reason names (`busy, wait <s>`, jittered to 0.5-1.5 of
+  it), and starts at half the maximum when the reason names none. `CLOSE_REPARTITION` retries almost at once.
   `CLOSE_POLICY` with a retryable token reason waits for a fresh token. `bar()` latches every room shut after a ban.
   `refuseVersion()` latches every room shut when a welcome names another `RELAY_VERSION` or another profile hash: no
   retry, rejoin or join until the page is reloaded, and `statusLine` asks the player to reload.
+- **The relay's door.** The session a page's place rides on (`door: true`) asks the relay's door
+  (`src/net/relay-door-client.ts`) before its first socket into a cell or a world room, and again after a drop. While
+  it waits it holds no socket; its halos wait with it, and `statusLine` shows the player's place in line. A pass goes
+  in the hello as `dp`. A door that answers neither a pass nor a place, or a wait past `DOOR_GIVE_UP_MS` (3 min),
+  lets the session in without a pass. The door replaces the deploy wave's hold for the sockets it paces.
 - **Deploy waves.** `reconnectWave` detects two or more drops within `WAVE_WINDOW_MS` (2 s) while the browser is
   online, and holds each socket's first retry to a shared random offset of up to `WAVE_SPREAD_MAX_MS` (40 s), scaled
   by the number of players online. This stops a relay deploy from causing a reconnect storm.

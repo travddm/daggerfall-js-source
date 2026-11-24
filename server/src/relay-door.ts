@@ -39,10 +39,17 @@ export const DOOR_SPEND_WAIT_MS = 1_000;
 const DOOR_KEEP_MS = 2 * DOOR_WAIT_MAX_MS;
 const DOOR_SWEEP_MS = 10_000;
 
-const CORS = { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'access-control-expose-headers': 'retry-after' };
+const CORS = {
+  'content-type': 'application/json',
+  'access-control-allow-origin': '*',
+  'access-control-expose-headers': 'retry-after',
+};
 
 type DoorEnv = { ROOMS?: DurableNamespace; DOOR_ROOM_RATE?: unknown; DOOR_SERVER_RATE?: unknown };
-type DurableNamespace = { idFromName(name: string): unknown; get(id: unknown): { fetch(url: string, init?: RequestInit): Promise<Response> } };
+type DurableNamespace = {
+  idFromName(name: string): unknown;
+  get(id: unknown): { fetch(url: string, init?: RequestInit): Promise<Response> };
+};
 type DoorRoom = { env?: DoorEnv };
 type Pass = { room: string; id: string; until: number };
 
@@ -57,7 +64,8 @@ type DoorState = {
 };
 
 /** One ask's answer, before it is a Response. */
-export type DoorReply = { kind: 'pass'; pass: string; until: number } | { kind: 'queue'; position: number; wait: number } | { kind: 'open' };
+export type DoorReply =
+  { kind: 'pass'; pass: string; until: number } | { kind: 'queue'; position: number; wait: number } | { kind: 'open' };
 
 const rateOr = (value: unknown, fallback: number): number => {
   const n = Number(value);
@@ -91,7 +99,10 @@ export function newDoor(env: DoorEnv = {}): DoorState {
 const newPassWord = (): string => {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 };
 
 /** The room's line, made on its first ask. Null when the door holds DOOR_LINES_MAX lines with places in them. */
@@ -99,7 +110,8 @@ function lineOf(door: DoorState, room: string, now: number): Line | null {
   const held = door.rooms.get(room);
   if (held) return held;
   if (door.rooms.size >= DOOR_LINES_MAX) {
-    for (const [key, line] of door.rooms) if (line.places.size === 0 && now - line.at > DOOR_KEEP_MS) door.rooms.delete(key);
+    for (const [key, line] of door.rooms)
+      if (line.places.size === 0 && now - line.at > DOOR_KEEP_MS) door.rooms.delete(key);
   }
   if (door.rooms.size >= DOOR_LINES_MAX) return null;
   const line = newLine();
@@ -149,11 +161,15 @@ export function doorSpend(door: DoorState, room: string, word: string, now: numb
 /** The door's answer to a page, in the account service's sign-in line's shape. */
 export function doorResponse(reply: DoorReply): Response {
   if (reply.kind === 'queue') {
-    const res = new Response(JSON.stringify({ error: 'queue', position: reply.position, wait: reply.wait }), { status: 503, headers: CORS });
+    const res = new Response(JSON.stringify({ error: 'queue', position: reply.position, wait: reply.wait }), {
+      status: 503,
+      headers: CORS,
+    });
     res.headers.set('retry-after', String(Math.ceil(reply.wait / 1000)));
     return res;
   }
-  if (reply.kind === 'pass') return new Response(JSON.stringify({ pass: reply.pass, until: reply.until }), { status: 200, headers: CORS });
+  if (reply.kind === 'pass')
+    return new Response(JSON.stringify({ pass: reply.pass, until: reply.until }), { status: 200, headers: CORS });
   return new Response('{}', { status: 200, headers: CORS });
 }
 
@@ -186,7 +202,8 @@ export async function doorInternal(room: DoorRoom, path: string, request: Reques
 }
 
 /** Whether `room` is a key a page may ask the door for. */
-const askable = (room: string | null): room is string => room !== null && roomOf(`/room/${room}`) === room && doorPaces(room);
+const askable = (room: string | null): room is string =>
+  room !== null && roomOf(`/room/${room}`) === room && doorPaces(room);
 
 /** A promise that settles to null after `ms`, for a race. */
 const lateAfter = (ms: number): Promise<null> => new Promise((resolve) => setTimeout(() => resolve(null), ms));
@@ -198,7 +215,10 @@ export async function doorRoute(env: DoorEnv, url: URL): Promise<Response> {
   if (!askable(room) || !DOOR_WORD_RE.test(id) || !env.ROOMS) return doorResponse({ kind: 'open' });
   try {
     const stub = env.ROOMS.get(env.ROOMS.idFromName(DOOR_OBJECT));
-    const asked = stub.fetch(`https://door${DOOR_INTERNAL_ASK}`, { method: 'POST', body: JSON.stringify({ room, id }) });
+    const asked = stub.fetch(`https://door${DOOR_INTERNAL_ASK}`, {
+      method: 'POST',
+      body: JSON.stringify({ room, id }),
+    });
     const res = await Promise.race([asked, lateAfter(DOOR_ASK_WAIT_MS)]);
     if (!res) return doorResponse({ kind: 'open' });
     const answer = new Response(res.body, { status: res.status, headers: CORS });
@@ -215,7 +235,9 @@ export async function spendDoorPass(env: DoorEnv | undefined, room: string, word
   if (typeof word !== 'string' || !DOOR_WORD_RE.test(word) || !env?.ROOMS) return false;
   try {
     const stub = env.ROOMS.get(env.ROOMS.idFromName(DOOR_OBJECT));
-    const asked = stub.fetch(`https://door${DOOR_INTERNAL_SPEND}`, { method: 'POST', body: JSON.stringify({ room, word }) }).then((res) => res.json());
+    const asked = stub
+      .fetch(`https://door${DOOR_INTERNAL_SPEND}`, { method: 'POST', body: JSON.stringify({ room, word }) })
+      .then((res) => res.json());
     const answer = await Promise.race([asked, lateAfter(DOOR_SPEND_WAIT_MS)]);
     return typeof answer === 'object' && answer !== null && (answer as { spent?: unknown }).spent === true;
   } catch {

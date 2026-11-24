@@ -27,7 +27,7 @@ test('a quiet room lets a second of sign-ins in at once, then gives places in or
   assert.equal(doorAsk(d, CELL, idOf(100), t0 + 1000 / DOOR_ROOM_RATE).kind, 'pass', 'its turn comes at the rate');
 });
 
-test('a pass opens its own room\'s hello once, and no other room\'s', () => {
+test("a pass opens its own room's hello once, and no other room's", () => {
   const d = newDoor();
   const t0 = 1_000_000;
   const got = doorAsk(d, CELL, idOf(1), t0);
@@ -48,34 +48,38 @@ test('a page asking again for a pass holds one live pass, not one an ask', () =>
   assert.equal(doorSpend(d, CELL, again.pass, 1_000_002), true);
 });
 
-test('the server-wide line holds a second room the first room\'s return already fills', () => {
+test("the server-wide line holds a second room the first room's return already fills", () => {
   const d = newDoor();
   const t0 = 1_000_000;
   for (let i = 0; i < DOOR_SERVER_RATE; i++) assert.equal(doorAsk(d, CELL, idOf(i), t0).kind, 'pass');
   // The other room's own line is quiet and would let a burst in; the server's has none left this second.
   const held = doorAsk(d, OTHER_CELL, idOf(50), t0);
   assert.equal(held.kind, 'queue');
-  assert.equal(doorAsk(d, OTHER_CELL, idOf(50), t0 + 1000 / DOOR_SERVER_RATE).kind, 'pass', 'its turn in the server\'s line');
+  assert.equal(
+    doorAsk(d, OTHER_CELL, idOf(50), t0 + 1000 / DOOR_SERVER_RATE).kind,
+    'pass',
+    "its turn in the server's line",
+  );
 });
 
-test('a full line gives no place: the page goes in unpaced, and the room\'s bucket decides', () => {
+test("a full line gives no place: the page goes in unpaced, and the room's bucket decides", () => {
   const d = newDoor();
   const t0 = 1_000_000;
   for (let i = 0; i < DOOR_ROOM_PLACES_MAX + DOOR_ROOM_RATE; i++) doorAsk(d, CELL, idOf(i), t0);
   assert.equal(doorAsk(d, CELL, idOf(99_999), t0).kind, 'open');
 });
 
-test('the server owner\'s rates are read from the Worker\'s vars, and a bad value keeps the default', () => {
+test("the server owner's rates are read from the Worker's vars, and a bad value keeps the default", () => {
   const d = newDoor({ DOOR_ROOM_RATE: '10', DOOR_SERVER_RATE: 'lots' });
   assert.equal(d.roomLaw.rate, 10);
   assert.equal(d.serverLaw.rate, DOOR_SERVER_RATE);
 });
 
-test('the account service\'s sign-in line runs at or above the door\'s server-wide rate, so it forms no second line', () => {
+test("the account service's sign-in line runs at or above the door's server-wide rate, so it forms no second line", () => {
   assert.ok(ADMIT_RATE >= DOOR_SERVER_RATE, `ADMIT_RATE ${ADMIT_RATE} < DOOR_SERVER_RATE ${DOOR_SERVER_RATE}`);
 });
 
-test('a place in line answers 503 in the sign-in line\'s shape, with retry-after; a pass and open answer 200', async () => {
+test("a place in line answers 503 in the sign-in line's shape, with retry-after; a pass and open answer 200", async () => {
   const queued = doorResponse({ kind: 'queue', position: 9, wait: 2250 });
   assert.equal(queued.status, 503);
   assert.equal(queued.headers.get('retry-after'), '3');
@@ -96,13 +100,16 @@ function namespace(answers = true) {
       fetch: async (url: string, init: RequestInit) => {
         assert.equal(id, DOOR_OBJECT);
         if (!answers) return new Promise(() => {});
-        return (await doorInternal(room, new URL(url).pathname, new Request(url, init))) ?? new Response('{}', { status: 404 });
+        return (
+          (await doorInternal(room, new URL(url).pathname, new Request(url, init))) ??
+          new Response('{}', { status: 404 })
+        );
       },
     }),
   };
 }
 
-test('the Worker\'s route asks the door object and passes its answer on', async () => {
+test("the Worker's route asks the door object and passes its answer on", async () => {
   const env = { ROOMS: namespace() };
   const res = await doorRoute(env, new URL(`https://relay.test/door?room=${CELL}&id=${idOf(1)}`));
   assert.equal(res.status, 200);
@@ -111,15 +118,20 @@ test('the Worker\'s route asks the door object and passes its answer on', async 
   assert.equal(await spendDoorPass(env, CELL, pass), false);
 });
 
-test('the Worker\'s route lets a bad ask in unpaced, without asking the door object', async () => {
+test("the Worker's route lets a bad ask in unpaced, without asking the door object", async () => {
   const env = { ROOMS: namespace() };
-  for (const query of [`room=social&id=${idOf(1)}`, `room=${CELL}&id=short`, `room=%23door&id=${idOf(1)}`, `id=${idOf(1)}`]) {
+  for (const query of [
+    `room=social&id=${idOf(1)}`,
+    `room=${CELL}&id=short`,
+    `room=%23door&id=${idOf(1)}`,
+    `id=${idOf(1)}`,
+  ]) {
     const res = await doorRoute(env, new URL(`https://relay.test/door?${query}`));
     assert.deepEqual([res.status, await res.json()], [200, {}], query);
   }
 });
 
-test('a door object that does not answer lets the page in, and a room\'s spend gives up', async (t) => {
+test("a door object that does not answer lets the page in, and a room's spend gives up", async (t) => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const env = { ROOMS: namespace(false) };
   const asked = doorRoute(env, new URL(`https://relay.test/door?room=${CELL}&id=${idOf(1)}`));
@@ -131,7 +143,14 @@ test('a door object that does not answer lets the page in, and a room\'s spend g
 
 test('the door object answers only its own paths', async () => {
   const room = { env: {} };
-  assert.equal(await doorInternal(room, '/internal/park/reg', new Request('https://x/internal/park/reg', { method: 'POST' })), null);
-  const res = await doorInternal(room, DOOR_INTERNAL_ASK, new Request(`https://x${DOOR_INTERNAL_ASK}`, { method: 'POST', body: 'not json' }));
+  assert.equal(
+    await doorInternal(room, '/internal/park/reg', new Request('https://x/internal/park/reg', { method: 'POST' })),
+    null,
+  );
+  const res = await doorInternal(
+    room,
+    DOOR_INTERNAL_ASK,
+    new Request(`https://x${DOOR_INTERNAL_ASK}`, { method: 'POST', body: 'not json' }),
+  );
   assert.deepEqual(await res.json(), {}, 'a bad body is let in unpaced');
 });

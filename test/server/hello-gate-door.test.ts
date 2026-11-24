@@ -24,7 +24,10 @@ function busyRoom() {
     get: (id: string) => ({
       fetch: async (url: string, init: RequestInit) => {
         assert.equal(id, DOOR_OBJECT);
-        return (await doorInternal(doorRoom, new URL(url).pathname, new Request(url, init))) ?? new Response('{}', { status: 404 });
+        return (
+          (await doorInternal(doorRoom, new URL(url).pathname, new Request(url, init))) ??
+          new Response('{}', { status: 404 })
+        );
       },
     }),
   };
@@ -50,7 +53,7 @@ async function passFor(ROOMS: object, room: string): Promise<string> {
   return (await res.json()).pass;
 }
 
-test('a hello with the door\'s pass goes in past a shut bucket, once', async () => {
+test("a hello with the door's pass goes in past a shut bucket, once", async () => {
   const { room, ROOMS, sides, refused } = busyRoom();
   const dp = await passFor(ROOMS, CELL);
   const who = { subject: 'acct-1' };
@@ -60,7 +63,7 @@ test('a hello with the door\'s pass goes in past a shut bucket, once', async () 
   assert.equal(refused[0].code, CLOSE_BUSY);
 });
 
-test('a pass for another room is the room\'s bucket\'s to judge', async () => {
+test("a pass for another room is the room's bucket's to judge", async () => {
   const { room, ROOMS, sides } = busyRoom();
   const dp = await passFor(ROOMS, 'world:26,9');
   assert.equal(await placeGate(room, {}, CELL, { subject: 'acct-1' }, { id: 'p1', dp }, 1_000), true);

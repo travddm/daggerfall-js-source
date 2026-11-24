@@ -7,7 +7,10 @@ import { doorRoute, doorInternal } from './relay-door.ts';
 import { DOOR_PATH } from '../../src/net/door-law.ts';
 
 /** The Worker's answer for a plain HTTP path (the relay's facts, the door), or null for a path it routes to a room. */
-export function plainPathAnswer(url: URL, env: Parameters<typeof doorRoute>[0] & Parameters<typeof relayFactsAnswer>[1]): Promise<Response> | Response | null {
+export function plainPathAnswer(
+  url: URL,
+  env: Parameters<typeof doorRoute>[0] & Parameters<typeof relayFactsAnswer>[1],
+): Promise<Response> | Response | null {
   if (RELAY_FACT_PATHS.includes(url.pathname)) return relayFactsAnswer(url.pathname, env);
   if (url.pathname === DOOR_PATH) return doorRoute(env, url);
   return null;

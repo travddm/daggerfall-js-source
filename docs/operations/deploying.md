@@ -140,6 +140,7 @@ Both Workers share one Cloudflare account (`account_id`) and run on `workers.dev
 | `[[services]] ACCOUNTS` | Service binding to the account Worker. |
 | `[[analytics_engine_datasets]] METRICS` | Room metrics (`server/src/relayScale.js`). |
 | `[vars] IDENTITY_PUBLIC_KEY`, `IDENTITY_MAX_TTL_S` | Verifies identity tokens. Must match the account service's key. |
+| `[vars] DOOR_ROOM_RATE`, `DOOR_SERVER_RATE` | Sign-ins a room and the whole server let in a second after a restart (default 4 each). Keep the account service's `ADMIT_RATE` at or above `DOOR_SERVER_RATE`. |
 | `[vars] CELL_SPLIT_AT`, `CELL_MERGE_AT`, `*_DWELL_MS`, `REGION_SHARDS` | Crowd thresholds for splitting and merging cells. |
 | `[vars] *_FEED_URL`, `HIDDEN_SEEN_URL` | Account service endpoints the relay calls for moderation and staff feeds. |
 

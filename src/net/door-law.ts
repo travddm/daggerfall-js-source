@@ -21,9 +21,7 @@ export const doorPaces = (room: string): boolean => isCellRoom(room) || isWorldR
 /** The door's answer as a page reads it. `open` is any answer that is not a place in line or a pass: the page goes in
  *  without a pass, so a door that fails never keeps a player out. */
 export type DoorAnswer =
-  | { kind: 'pass'; pass: string; until: number }
-  | { kind: 'queue'; position: number; wait: number }
-  | { kind: 'open' };
+  { kind: 'pass'; pass: string; until: number } | { kind: 'queue'; position: number; wait: number } | { kind: 'open' };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
 const finiteIn = (v: unknown, min: number, max: number): v is number =>
@@ -36,11 +34,17 @@ const finiteIn = (v: unknown, min: number, max: number): v is number =>
 export function readDoorAnswer(status: number, body: unknown): DoorAnswer {
   if (!isRecord(body)) return { kind: 'open' };
   if (status === 503 && body.error === 'queue') {
-    if (!finiteIn(body.position, 1, DOOR_POSITION_MAX) || !finiteIn(body.wait, 0, Number.MAX_SAFE_INTEGER)) return { kind: 'open' };
+    if (!finiteIn(body.position, 1, DOOR_POSITION_MAX) || !finiteIn(body.wait, 0, Number.MAX_SAFE_INTEGER))
+      return { kind: 'open' };
     const wait = Math.min(DOOR_WAIT_MAX_MS, Math.max(DOOR_WAIT_MIN_MS, Math.round(body.wait)));
     return { kind: 'queue', position: Math.trunc(body.position), wait };
   }
-  if (status === 200 && typeof body.pass === 'string' && DOOR_WORD_RE.test(body.pass) && finiteIn(body.until, 0, Number.MAX_SAFE_INTEGER)) {
+  if (
+    status === 200 &&
+    typeof body.pass === 'string' &&
+    DOOR_WORD_RE.test(body.pass) &&
+    finiteIn(body.until, 0, Number.MAX_SAFE_INTEGER)
+  ) {
     return { kind: 'pass', pass: body.pass, until: body.until };
   }
   return { kind: 'open' };

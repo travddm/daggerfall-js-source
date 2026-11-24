@@ -19,7 +19,7 @@
     "src/net/accountClient.js": 2278,
     "src/net/gate/gateBrain.js": 2315,
     "src/net/npcChapterLaw.js": 1427,
-    "src/net/online.js": 4050,
+    "src/net/online.js": 4025,
     "src/net/peer/peerBodies.js": 1101,
     "src/net/profBook.js": 1484,
     "src/net/professionLaw.js": 1201,

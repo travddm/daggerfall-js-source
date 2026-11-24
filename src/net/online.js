@@ -589,7 +589,7 @@ export const steadyNow = steadyClock();
 const GATE_SITES_SAID_MAX = 64;
 
 export class OnlineSession {
-  constructor({ url = DEFAULT_SERVER, name = 'Traveller', look = null, id = null, secret = null, presence = true, acct = null, asecret = null, mintToken = null, ownerTm = () => ownerClock.tm(), WebSocketImpl = globalThis.WebSocket, now = steadyNow, rand = Math.random, wave = reconnectWave(), wire2 = false, door } = {}) {
+  constructor({ url = DEFAULT_SERVER, name = 'Traveller', look = null, id = null, secret = null, presence = true, acct = null, asecret = null, mintToken = null, ownerTm = () => ownerClock.tm(), WebSocketImpl = globalThis.WebSocket, now = steadyNow, rand = Math.random, wave = reconnectWave(), wire2 = false, door = false } = {}) {
     this.url = relayUrl(url || DEFAULT_SERVER);   // wss:// anywhere, ws:// on localhost alone; anything else is no relay (A16/E11)
     this.secret = secret ?? peerSecret();
     // SOC2: the ACCOUNT rides the hello only when the caller hands both halves in - the hub link's alone (world.js
