@@ -19,17 +19,19 @@ import {
 } from './wire.js';
 import { leaseRoom } from './roomLease.js';
 import { PROFILE_HASH_RE } from './profile/profileHash.ts';
+import { DOOR_WORD_RE } from './door-law.ts';
 
 /** A hello as it is written or read: its fields by name. */
 type Hello = Record<string, unknown>;
 /** A hello as the wire handed it, before its laws are read. */
-type HelloIn = { gl?: number; gv?: number; cv?: number; ll?: number; ls?: unknown; sm?: unknown; ph?: unknown };
+type HelloIn = { gl?: number; gv?: number; cv?: number; ll?: number; ls?: unknown; sm?: unknown; ph?: unknown; dp?: unknown };
 
 /**
  * Writes onto a hello the laws this build stands on, for the room it says hello to. `ph` is the profile this page
- * installed (systems/online/serverProfile.ts), or null when it installed none.
+ * installed (systems/online/serverProfile.ts), or null when it installed none. `doorPass` is the pass the relay's door
+ * gave for this room (net/relay-door-client.ts), or null.
  */
-export function sayHelloLaws(frame: Hello, room: string, ph: string | null): void {
+export function sayHelloLaws(frame: Hello, room: string, ph: string | null, doorPass: string | null = null): void {
   if (groundRoom(room)) frame.gl = GROUND_LAW; // GROUND-GATE: the ground this build stands on, to a room whose peers stand on it (net/wire.js)
   if (streamsFoes(room)) frame.gv = GRANT_HELLO_LAW; // GRANT-DOOR: the grants this build stands on, to a room whose foes ride (net/wire.js)
   if (isCellRoom(room)) frame.cv = CELL_HELLO_LAW; // COST-2 part two: the cell law this build stands on - a coarse node refuses a cell's hello without it (net/wire.js)
@@ -37,6 +39,7 @@ export function sayHelloLaws(frame: Hello, room: string, ph: string | null): voi
   if (leaseRoom(room)) frame.ls = 1; // LEASE1: this build hands its hub's lease to the room
   if (isSocialRoom(room)) frame.sm = 1; // STAFF-PANEL5-MESSAGE: this build shows a staff message's box - a hub link without it is "old game, not shown"
   if (ph) frame.ph = ph; // a relay on other rules refuses the hello
+  if (doorPass) frame.dp = doorPass;
 }
 
 /** Reads a hello's laws onto the hello the relay keeps: each in its own bound, any other value read as none. */
@@ -49,4 +52,5 @@ export function readHelloLaws(m: HelloIn, hello: Hello): void {
   if (m.ls === 1) hello.ls = 1; // hands its hub's lease to the room (net/roomLease.js)
   if (m.sm === 1) hello.sm = 1; // shows a staff message's box; without it a hub socket is "old game, not shown"
   if (typeof m.ph === 'string' && PROFILE_HASH_RE.test(m.ph)) hello.ph = m.ph;
+  if (typeof m.dp === 'string' && DOOR_WORD_RE.test(m.dp)) hello.dp = m.dp; // the door's pass, spent by the room's gate
 }

@@ -18,6 +18,8 @@
 //     was before the line. The line sheds load; it must never be what locks the realm out.
 // ═══════════════════════════════════════════════════════════════════
 
+import { newLine, lineAsk } from '../../src/net/sign-in-line.js';
+
 /** The doors a sign-in knocks at - each a POST. */
 export const ADMIT_ROUTES = new Set(['/v1/auth/guest', '/v1/auth/login', '/v1/auth/recover', '/v1/auth/token', '/v1/auth/session']);
 /** Places let in a second. */
@@ -36,8 +38,11 @@ export const ADMIT_ASK_MS = 2_000;
 /** How often the line forgets places and passes gone stale, ms. */
 const ADMIT_SWEEP_MS = 10_000;
 
+/** The line's own numbers, the law `lineAsk` runs it by. */
+const ADMIT_LAW = Object.freeze({ keepMs: ADMIT_KEEP_MS, passMs: ADMIT_PASS_MS, waitMinMs: ADMIT_WAIT_MIN_MS, waitMaxMs: ADMIT_WAIT_MAX_MS, sweepMs: ADMIT_SWEEP_MS });
+
 /** A line nobody stands in. */
-export const admitLine = () => ({ head: 0, tail: 0, at: 0, swept: 0, places: new Map(), passes: new Map() });
+export const admitLine = newLine;
 
 /**
  * One address asking at the gate: `{ go: true }` let in, or `{ go: false, position, wait }` - its place in the line
@@ -46,26 +51,7 @@ export const admitLine = () => ({ head: 0, tail: 0, at: 0, swept: 0, places: new
  * @param {number} [rate] @param {number} [burst]
  */
 export function admitAsk(line, key, nowMs, rate = ADMIT_RATE, burst = ADMIT_BURST) {
-  line.head = line.at ? line.head + Math.max(0, nowMs - line.at) * rate / 1000 : line.tail + burst;   // a new line stands quiet
-  line.at = nowMs;
-  line.head = Math.min(line.head, line.tail + burst);   // quiet, the head waits a burst past the back
-  if (nowMs - line.swept >= ADMIT_SWEEP_MS) {
-    line.swept = nowMs;
-    for (const [k, p] of line.places) if (nowMs - p.seen > ADMIT_KEEP_MS) line.places.delete(k);
-    for (const [k, until] of line.passes) if (until <= nowMs) line.passes.delete(k);
-  }
-  if ((line.passes.get(key) ?? 0) > nowMs) return { go: true };
-  let place = line.places.get(key);
-  if (!place) { place = { ticket: ++line.tail, seen: nowMs }; line.places.set(key, place); }
-  place.seen = nowMs;
-  if (place.ticket <= line.head) {
-    line.places.delete(key);
-    line.passes.set(key, nowMs + ADMIT_PASS_MS);
-    return { go: true };
-  }
-  const position = Math.ceil(place.ticket - line.head);
-  const wait = Math.round(Math.min(ADMIT_WAIT_MAX_MS, Math.max(ADMIT_WAIT_MIN_MS, position / rate * 1000)));
-  return { go: false, position, wait };
+  return lineAsk(line, key, nowMs, { ...ADMIT_LAW, rate, burst });
 }
 
 /** A number the service's vars may set, else the default. @param {any} v @param {number} d */

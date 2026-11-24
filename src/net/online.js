@@ -101,7 +101,7 @@ import { caravanKeyOf } from './privateInterior.js';   // WAGONS2-VISIT: a carav
 import { validCaravanData } from './wire.js';   // WAGONS2-VISIT: what a caravan's owner placed, said to its room
 import { isArenaRoom, validArenaIn } from './arena/arenaLaw.js';   // ARENA4: the arena's hall and its bouts
 import { stealthPoseFields } from './stealth-wire.ts';   // the pose's stealth fields, drawn whole
-import { poseChanged, validSeaIn, validSeaOut, POSE_TS_MOD, poseTsDiff, SOCKETS_MAX, WORLD_CELL, RANGE_PIXELS, PIXEL_UNITS, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, CLOSE_SAME_ROOM, CLOSE_REPARTITION, HALO_OF_PARAM, HALO_OF_MAX, WORLD_FRAME_MAX, worldFrameMaxFor, isCellRoom, hitOwnerOf, validPose, validLook, sanitizeName, readBadge, readAura, readIcon, readRibbon, sanitizeChat, validChatItem, validChatItems, chatGate, redGate, dmGate, muteGate, subOf, mutedUntilOf, worldRoom, inRange, relayUrl, isWorldRoom, streamsFoes, isChatRoom, foesGate, FOES_FRAME_MAX, MAX_FRAME_BYTES, hitGate, actGate, actFrameFits, whoGate, WHO_RETRY_MS, HEARTBEAT_MS, PING_MS, FOES_FULL_MS, FOES_STALE_MS, relayMatches, chatInGate, CHAT_ROOM_HZ_MAX, socialGate, partyGate, validPartyPose, validSocialFrame, validPartyFrame, PARTY_SEND_MS, validSocialAct, socialInGate, noteInGate, partyInGate, SOCIAL_IN_HZ_MAX, NOTE_IN_HZ_MAX, INBOUND_FRAME_MAX, questInGate, validQuestFrame, QUEST_SEND_MS, QUEST_HUB_MIN_MS, PARTY_MAX, tokenGate, validTradeData, tradeGate, tradeInGate, validCastData, castGate, castInGate, CAST_FRAME_MAX, CAST_IN_HZ_MAX, TRADE_IN_HZ_MAX, TRADE_FRAME_MAX, parkGate, PARK_CELL_MAX, PARK_KEY_RE, PARK_TTL_MS, CHAT_LINE_CHANNELS, partyChatInGate, PARTY_CHAT_ROOM_HZ_MAX, rollGate, validRollSpec, validRoll, validCardData, cardGate, cardInGate, CARD_FRAME_MAX, CARD_IN_HZ_MAX, validPageData, pageGate, pageInGate, PAGE_FRAME_MAX, PAGE_IN_HZ_MAX, validDuelData, duelGate, duelInGate, DUEL_FRAME_MAX, DUEL_IN_HZ_MAX, bodyWordGate, validDuelRefOut, validWedData, wedGate, wedInGate, WED_FRAME_MAX, WED_IN_HZ_MAX, readRenown, renownGate, RENOWN_ORDER_KEEP_MS, RENOWN_RESEND_MS, lookGate, eventGate, validLiveEvent, LIVE_EVENTS, isSocialRoom, validGateIn, validGateOut, gateGate, gatePlaceWire, readGuildTag, readHouse, GUILD_ORDER_KEEP_MS, guildChatInGate, GUILD_CHAT_ROOM_HZ_MAX, validRaidIn, validRaidOut, raidGate, validRaidTownsIn, isRegionRoom, validTravellerMark, validTravellerFrame, validTravWords, travInGate, TRAV_SEND_MIN_MS, TRAV_WELCOME_MAX, TRAV_STALE_MS, validAmapFrame, amapBody, AMAP_SEND_MS, AMAP_HUB_MIN_MS, validSiegeIn, validSiegeOut, siegeGate, validRiteIn, validRiteOut, riteGate, validStarIn, validStarOut, starGate, arenaGate, readArenaOut, BUSY_TOKEN_UNREAD, WIRE2_BATCH_MAX, validParkYeet, HOME_ORDER_KEEP_MS, validHomeFrame, homeInGate } from './wire.js';   // SCALE5a: a busy close's word that the token went unread   // SOC2: the hub's law, at home; AUDIT SOC B3/B11/B20: the act's projection, the inbound gates, the inbound bound
+import { poseChanged, validSeaIn, validSeaOut, POSE_TS_MOD, poseTsDiff, SOCKETS_MAX, WORLD_CELL, RANGE_PIXELS, PIXEL_UNITS, CLOSE_REPLACED, CLOSE_POLICY, CLOSE_BUSY, CLOSE_SAME_ROOM, CLOSE_REPARTITION, HALO_OF_PARAM, HALO_OF_MAX, WORLD_FRAME_MAX, worldFrameMaxFor, isCellRoom, hitOwnerOf, validPose, validLook, sanitizeName, readBadge, readAura, readIcon, readRibbon, sanitizeChat, validChatItem, validChatItems, chatGate, redGate, dmGate, muteGate, subOf, mutedUntilOf, worldRoom, inRange, relayUrl, isWorldRoom, streamsFoes, isChatRoom, foesGate, FOES_FRAME_MAX, MAX_FRAME_BYTES, hitGate, actGate, actFrameFits, whoGate, WHO_RETRY_MS, HEARTBEAT_MS, PING_MS, FOES_FULL_MS, FOES_STALE_MS, relayMatches, chatInGate, CHAT_ROOM_HZ_MAX, socialGate, partyGate, validPartyPose, validSocialFrame, validPartyFrame, PARTY_SEND_MS, validSocialAct, socialInGate, noteInGate, partyInGate, SOCIAL_IN_HZ_MAX, NOTE_IN_HZ_MAX, INBOUND_FRAME_MAX, questInGate, validQuestFrame, QUEST_SEND_MS, QUEST_HUB_MIN_MS, PARTY_MAX, tokenGate, validTradeData, tradeGate, tradeInGate, validCastData, castGate, castInGate, CAST_FRAME_MAX, CAST_IN_HZ_MAX, TRADE_IN_HZ_MAX, TRADE_FRAME_MAX, parkGate, PARK_CELL_MAX, PARK_KEY_RE, PARK_TTL_MS, CHAT_LINE_CHANNELS, partyChatInGate, PARTY_CHAT_ROOM_HZ_MAX, rollGate, validRollSpec, validRoll, validCardData, cardGate, cardInGate, CARD_FRAME_MAX, CARD_IN_HZ_MAX, validPageData, pageGate, pageInGate, PAGE_FRAME_MAX, PAGE_IN_HZ_MAX, validDuelData, duelGate, duelInGate, DUEL_FRAME_MAX, DUEL_IN_HZ_MAX, bodyWordGate, validDuelRefOut, validWedData, wedGate, wedInGate, WED_FRAME_MAX, WED_IN_HZ_MAX, readRenown, renownGate, RENOWN_ORDER_KEEP_MS, RENOWN_RESEND_MS, lookGate, eventGate, validLiveEvent, LIVE_EVENTS, isSocialRoom, validGateIn, validGateOut, gateGate, gatePlaceWire, readGuildTag, readHouse, GUILD_ORDER_KEEP_MS, guildChatInGate, GUILD_CHAT_ROOM_HZ_MAX, validRaidIn, validRaidOut, raidGate, validRaidTownsIn, isRegionRoom, validTravellerMark, validTravellerFrame, validTravWords, travInGate, TRAV_SEND_MIN_MS, TRAV_WELCOME_MAX, TRAV_STALE_MS, validAmapFrame, amapBody, AMAP_SEND_MS, AMAP_HUB_MIN_MS, validSiegeIn, validSiegeOut, siegeGate, validRiteIn, validRiteOut, riteGate, validStarIn, validStarOut, starGate, arenaGate, readArenaOut, WIRE2_BATCH_MAX, validParkYeet, HOME_ORDER_KEEP_MS, validHomeFrame, homeInGate } from './wire.js';   // SCALE5a: a busy close's word that the token went unread   // SOC2: the hub's law, at home; AUDIT SOC B3/B11/B20: the act's projection, the inbound gates, the inbound bound
 import { RAID_TOWNS_CHUNK } from './raid/raidLaw.js';   // RAID-ROLL: the towns table's pieces; WW6: a raid's lane
 import { dungeonRoomTag } from './wire.js';   // SD-ONLINE: a dungeon's room carries the size it was built at
 import { nativePoseRoom } from './wire.js';   // SLIM-FRAME: the frame a room's poses are in - one home, the relay's slim pose rounds by it
@@ -116,6 +116,8 @@ import { readWatchReceipt } from './watchReceipt.js';   // SEAT1b: the Watch's t
 import { ownerClock, stampedFrameText, applyingOwnerTm } from './ownerClock.js';   // OWNER-CLOCK: a foes frame says when its foes were stepped, and is applied with it in hand
 import { installedProfileHash, profileMatches, profileChangedText } from '../systems/online/serverProfile.ts';
 import { sayHelloLaws } from './helloLaws.ts';
+import { RelayDoorClient } from './relay-door-client.ts';   // the relay's door: a place in line before a place's socket opens
+import { busyTokenUnread } from './door-law.ts';
 import { t } from '../systems/textManager.js';   // L10N4: the HUD line's words in the player's language (the relay's own words pass as it said them)
 export { WORLD_CELL, RANGE_PIXELS, worldRoom };
 
@@ -587,7 +589,7 @@ export const steadyNow = steadyClock();
 const GATE_SITES_SAID_MAX = 64;
 
 export class OnlineSession {
-  constructor({ url = DEFAULT_SERVER, name = 'Traveller', look = null, id = null, secret = null, presence = true, acct = null, asecret = null, mintToken = null, ownerTm = () => ownerClock.tm(), WebSocketImpl = globalThis.WebSocket, now = steadyNow, rand = Math.random, wave = reconnectWave(), wire2 = false } = {}) {
+  constructor({ url = DEFAULT_SERVER, name = 'Traveller', look = null, id = null, secret = null, presence = true, acct = null, asecret = null, mintToken = null, ownerTm = () => ownerClock.tm(), WebSocketImpl = globalThis.WebSocket, now = steadyNow, rand = Math.random, wave = reconnectWave(), wire2 = false, door } = {}) {
     this.url = relayUrl(url || DEFAULT_SERVER);   // wss:// anywhere, ws:// on localhost alone; anything else is no relay (A16/E11)
     this.secret = secret ?? peerSecret();
     // SOC2: the ACCOUNT rides the hello only when the caller hands both halves in - the hub link's alone (world.js
@@ -870,8 +872,8 @@ export class OnlineSession {
     this._dead = false;   // AUDIT ONLINE 3 (the second read) A7: my death said (sendDeath) and no life since - every hello says it (_helloFrame)
     this._backoff = BACKOFF_MIN_MS;
     this._retryAt = null;
-    /** GATE-DOOR: when my room last refused me busy (this session's clock) - a door that answers, not a room gone silent (scenes/gate/gateCourt.js); AUDIT PLAN-1000 B1: and when a court's upgrade failed before it opened */
-    this.busyAt = /** @type {number|null} */ (null);
+    this.busyAt = /** @type {number|null} */ (null);   // when my room last refused me busy, or a court's upgrade failed before it opened (scenes/gate/gateCourt.js)
+    this._door = new RelayDoorClient({ now: () => this._now(), rand: () => this._rand(), paces: door === true });   // `door`: this session asks the relay's door before it opens a place
     this.wire2 = wire2;    // SCALE5b: this session's hello says `w2` - the relay batches its poses (wire.js POSE_BATCH_MS) and its channel's roster
     this._wave = wave;     // SCALE2c: the page's view of a relay deploy's wave (net/reconnectWave.js) - the world host hands every session the page's one
     this._dropAt = null;   // SCALE2c: when the open socket dropped - its first retry asks the wave whether to wait for the page's slot
@@ -2062,6 +2064,7 @@ export class OnlineSession {
     this._cover = null;   // COST-2 (b): a new socket covers what its welcome says
     if (!this.url) { this.status = 'error'; this.error = t('net.online.badUrl', 'the server address must start with wss://'); this.terminal = true; this.terminalAt = this._now(); return; }
     if (!this.room || !this._WS) { this.status = 'error'; this.error = t('net.online.noSocket', 'no WebSocket'); return; }
+    if (this._door.holds(this)) return;   // waits for the door's pass or place, holding no socket
     let ws;
     const ly = this.room === this._layerRoom && this.layer > 0 ? this.layer : this.layerHint;   // SCALE5d: a reconnect to my layer, else my party's
     try { ws = loneAhead(this, this._leased(new this._WS(`${this.url}/room/${this.room}${isLayered(this.room) && ly > 0 ? `?ly=${ly}` : ''}`), this.room), this.room); } catch (e) { this.status = 'error'; this.error = String(e?.message ?? e); this._scheduleRetry(); return; }   // SCALE5d: my party's layer asked first
@@ -2084,7 +2087,7 @@ export class OnlineSession {
     if (this.wire2) frame.w2 = 1;   // SCALE5b: the second wire - a relay that knows it batches; one before it reads no such field
     if ((isSocialRoom(this.room) || isRegionRoom(this.room)) && !this._hubBus) frame.hs = 1;   // SCALE5c: the shards understood - the hub's and a region's (part two); the bus says which is this account's
     if (isBattleRoom(this.room) && this._siegePass) frame.sp = this._siegePass;   // SEAT2a part four: the battle's pass (CROWN1 part two: a Royal Tourney's too)
-    sayHelloLaws(frame, room, installedProfileHash());
+    sayHelloLaws(frame, room, installedProfileHash(), this._door.passFor(room));
     frame.fv = 1;   // STAFF-PANEL5-FREEZE: this build shows the freeze screen - a relay closes a frozen account's socket from a build that cannot
     return frame;
   }
@@ -2196,7 +2199,7 @@ export class OnlineSession {
         h.ws = null; h.status = 'closed';
         h.dropAt = wasOpen && code !== CLOSE_BUSY && !noToken ? this._wave.dropped(this._now()) : null;   // SCALE2c: an open halo's drop is the page's to weigh as a wave
         if (code === CLOSE_BUSY || noToken) h.backoff = Math.max(h.backoff, BACKOFF_MAX_MS / 2);
-        h.retryAt = this._now() + BACKOFF_MIN_MS + this._rand() * Math.max(BACKOFF_MIN_MS, h.backoff - BACKOFF_MIN_MS); h.backoff = Math.min(BACKOFF_MAX_MS, h.backoff * 2);   // SLAM2: jittered
+        h.retryAt = this._door.haloRetryAt(ev, this._now() + BACKOFF_MIN_MS + this._rand() * Math.max(BACKOFF_MIN_MS, h.backoff - BACKOFF_MIN_MS)); h.backoff = Math.min(BACKOFF_MAX_MS, h.backoff * 2);   // jittered; a busy close's own wait first
         if (noToken) h.retryAt = this._afterMintHold(h.retryAt);   // STORM-SHED: not before the page's next mint may be asked
         h.tokenRetry = noToken;   // DOOR-TOKEN: or the moment a token is held (`tick`)
         return;
@@ -2231,7 +2234,7 @@ export class OnlineSession {
       // COST-2 part two: THE TREE MOVED (CLOSE_REPARTITION) - my node split or merged, and its rows went to the node my cell
       // is in now: joined again soon, jittered, with no drop weighed (a move is no wave) and no backoff
       if (code === CLOSE_REPARTITION) { this.status = 'closed'; this._dropAt = null; this._retryAt = this._now() + BACKOFF_MIN_MS + this._rand() * REPARTITION_SPAN_MS; return; }
-      if (code === CLOSE_BUSY) { this._tokenUnread(ws, room, ev); this.busyAt = this._now(); this.status = 'closed'; this.error = t('net.online.busy', 'the room is busy'); this._backoff = Math.max(this._backoff, BACKOFF_MAX_MS / 2); this._scheduleRetry(); return; }   // full or gated: back off hard, then try again   // SCALE5a: its token handed back when the relay never read it
+      if (code === CLOSE_BUSY) { this._tokenUnread(ws, room, ev); this.busyAt = this._now(); this.status = 'closed'; this.error = t('net.online.busy', 'the room is busy'); this._backoff = Math.max(this._backoff, BACKOFF_MAX_MS / 2); this._scheduleRetry(); this._door.afterBusy(this, ev); return; }   // full or gated: the wait the close names, else back off hard   // SCALE5a: its token handed back when the relay never read it
       // SCALE2c: an open socket's drop, weighed by the page as a wave. AUDIT SCALE II C-2 (found on the way, the same
       // cause): open as it stood BEFORE the browser's `error` - an unclean close (1006, a deploy's) fires `error` first,
       // which wrote 'error' over 'open', and no socket of a page in a browser was ever weighed: no wave, no spread
@@ -2243,40 +2246,12 @@ export class OnlineSession {
     ws.onerror = () => { const room = this._roomOf(ws); if (room === this.room && room != null) { if (!this._statusAtError.has(ws)) this._statusAtError.set(ws, this.status); this.status = 'error'; this.error = t('net.online.socketError', 'socket error'); } };   // AUDIT SCALE II C-2: what it stood at, kept for the `close` that follows
   }
 
-  /** SLAM2: THE RETRY IS JITTERED.
-   *
-   *  A room admits HELLO_HZ_MAX hellos a second and refuses the rest with CLOSE_BUSY, which is correct - but every
-   *  client refused in the same instant then waited the SAME `_backoff` and came back in the same instant, so the
-   *  wave stayed a wave. A stream saying "everyone go here now" is exactly that: hundreds of clients whose retries
-   *  are phase-locked from the first refusal, re-colliding at 1s, 2s, 4s, 8s, for as long as it takes - and each
-   *  collision spends the room's hello budget on frames it must refuse, which starves the players it could have
-   *  admitted.
-   *
-   *  The fix is the standard one and it is one line: spread the retry uniformly over the window instead of firing
-   *  at the end of it. The backoff still DOUBLES, so a relay that is genuinely down is not hammered (driven).
-   *
-   *  The floor is BACKOFF_MIN_MS so a jittered retry is never an instant one.
-   *
-   *  AUDIT SLAM WITHDREW TWO CLAIMS THAT STOOD HERE, and both mattered.
-   *
-   *  "Measured over real sessions against the real relay, a 300-client wave drains in a fraction of the time and
-   *  stops re-colliding" - THERE IS NO SUCH HARNESS, in test/ or in tools/, and this slice's own record says the pin
-   *  cannot be written against test/fakeRoom.mjs at all. It was the fourth invented performance figure this project
-   *  has had to take back. What is pinned here is the client's arithmetic, and nothing about a drain time.
-   *
-   *  "What changes is that two clients which were refused together no longer return together" - true from the SECOND
-   *  retry on, and false for the first, which is the one a wave collides on. `_backoff` starts at BACKOFF_MIN_MS, so
-   *  `_backoff - BACKOFF_MIN_MS` is exactly zero and `rand()` is multiplied by nothing: measured over 200 sessions
-   *  dropped together, one distinct return instant. Only the CLOSE_BUSY path is jittered on its first retry, because
-   *  that path alone raises `_backoff` before scheduling. Recorded, not yet paid (AUDIT SLAM item 5). */
+  /** The place socket's next try, jittered over a span that doubles up to BACKOFF_MAX_MS, so clients refused together
+   *  do not come back together and a relay that is down is not hammered. Its open asks the relay's door first. */
   _scheduleRetry() {
     if (this._closedByUs || this.terminal || !this.room) return;
-    // SLAM12 (AUDIT SLAM): THE FIRST RETRY HAS A SPAN. `_backoff` starts at BACKOFF_MIN_MS, so `_backoff - BACKOFF_MIN_MS`
-    // was exactly zero on the first retry and `rand()` was multiplied by nothing: measured over 200 sessions dropped in
-    // the same instant, ONE distinct return instant. SLAM2's jitter began on the second retry, and a wave collides on
-    // the first - a relay restart, a Durable Object eviction, the `room full` 503 (which never opens the socket, so
-    // `_backoff` is never raised). The floor of the span is now BACKOFF_MIN_MS: round one is uniform over [1 s, 2 s],
-    // every later round is what it was.
+    // The span's floor is BACKOFF_MIN_MS, so even the first retry is spread: a wave collides on the first.
+    this._door.dropped();
     const span = Math.max(BACKOFF_MIN_MS, this._backoff - BACKOFF_MIN_MS);
     this._retryAt = this._now() + BACKOFF_MIN_MS + this._rand() * span;
     this._backoff = Math.min(BACKOFF_MAX_MS, this._backoff * 2);
@@ -2297,7 +2272,7 @@ export class OnlineSession {
    *  hub's gate refuses hundreds of the wave, each of them another mint until this. Any other close, or a relay before
    *  this that closes 'busy' alone, hands nothing back. */
   _tokenUnread(ws, room, ev) {
-    if (ev?.code !== CLOSE_BUSY || ev?.reason !== BUSY_TOKEN_UNREAD) return;
+    if (ev?.code !== CLOSE_BUSY || !busyTokenUnread(ev?.reason)) return;
     const tok = this._helloTok.get(ws);
     if (tok) this.mintToken?.unopened?.(room, tok);
   }
@@ -3176,7 +3151,7 @@ export class OnlineSession {
       // back-off CLOSE_BUSY had just set: a client against a busy room retried at a fixed 2500 ms for ever, and the
       // doubling SLAM2 was written for never happened in the one case it was written for. A welcome is the relay
       // saying yes; that is when the retry ladder starts over.
-      if (primary) this._backoff = BACKOFF_MIN_MS; else { const h = this._halo.get(room); if (h) h.backoff = BACKOFF_MIN_MS; }
+      if (primary) { this._backoff = BACKOFF_MIN_MS; this._door.welcomed(); } else { const h = this._halo.get(room); if (h) h.backoff = BACKOFF_MIN_MS; }
       this._retire(primary ? this._ws : this._halo.get(room)?.ws);   // AURA-LIVE: welcomed - the socket it replaced goes (the relay has closed it already)
       if (primary) this._seatHeardAt = this._now();   // SEAT-LIVE: the welcome is the seat's word
       if (primary && isSocialRoom(room)) this.leaseDoor = m.ldo === 1;
@@ -3937,7 +3912,7 @@ export class OnlineSession {
     if (this._tokenRetry && this._retryAt != null && now < this._retryAt && this.mintToken?.holds?.(this.room)) this._retryAt = now;
     if (this._retryAt != null && now >= this._retryAt && !this._ws && !this._closedByUs && !this.terminal && this.room) {
       // SCALE2c: a drop inside a relay deploy's wave waits, once, for the page's slot in it (net/reconnectWave.js)
-      const hold = this._dropAt != null ? this._wave.holdUntil(this._dropAt, now) : null;
+      const hold = this._door.waveHold(this._wave, this._dropAt, this.room, now);
       this._dropAt = null;
       if (hold != null) this._retryAt = hold; else { this._retryAt = null; this.stats.reconnects++; this._open(); }
     }
@@ -4044,7 +4019,7 @@ export class OnlineSession {
     }
     if (this.terminal || this.status === 'error') return t('net.online.status', '{label}: {text}', { label, text: this.error ?? t('net.online.error', 'error') });
     if (this.status === 'connecting') return t('net.online.connecting', '{label}: connecting', { label });
-    if (this._retryAt != null) return t('net.online.reconnecting', '{label}: reconnecting', { label });
+    if (this._retryAt != null) return this._door.statusLine(label);
     return null;
   }
 }

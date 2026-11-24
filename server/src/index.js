@@ -178,7 +178,7 @@ import { followNoted, withoutRoom, followHello, followJoined, followLeft, follow
 import { FOLLOW_INTERNAL_SAY } from '../../src/net/staffFollow.js';
 import { takeStaffMessage } from './staffMessage.js';   // STAFF-PANEL5-MESSAGE: a staff message's nudge, to one account's own hub sockets
 import { cellDoor, cellCall, nodeHeard, cellLevelOf, coverOf, inCover, junkOutsideCover, atCover, cellsWelcome } from './cellNodes.js';   // COST-2: a cell's node, the directory, the node an object is told; part two: a call that names a cell, through the tree
-import { cellDoors, cellTell, isCellDirectory, cellPlanAlarm } from './cellMoves.js';   // the cell tree's doors, counts and the directory's alarm
+import { cellTell, isCellDirectory, cellPlanAlarm } from './cellMoves.js';   // the cell tree's doors, counts and the directory's alarm
 import { isCoarseNode, cellSeedOf } from '../../src/net/cellTree.js';   // COST-2: a coarse node is the Worker's name for an object, never a page's room; part two: the cellSeed setting read
 import { staffNetFrame, staffNetClosed, staffFoesSeen, staffFoesStripped, staffReactAsk, staffReactPose, staffLeft } from './staffFeeds.js';   // STAFF-PANEL5-FEEDS: the Staff Panel's counts - network bursts, monsters, an encounter's reaction (off until their URLs are set)
 import { hiddenMay, hiddenAsked, seatsTaken, hiddenSeats, hiddenHello, hiddenPose, hiddenLapse, hiddenEntered, isHidden } from './staffHidden.js';   // STAFF-PANEL5-HIDDEN: a hidden staff spectator, named by nobody
@@ -187,9 +187,10 @@ import { STAFF_ORDER_KINDS, takeStaffOrder, frozenHello, busFreeze, frozenFrame,
 import { privateInteriorOf, privateInteriorAdmits, caravanKeyOf } from '../../src/net/privateInterior.js';   // WAGONS2-VISIT: and a caravan's own room
 import { isInstanceRoom, instanceOf, instanceAdmission, partyHoldsOwner, INSTANCE_INTERNAL_KIN, INSTANCE_KIN_KEEP_MS, INSTANCE_DOOR_WORD } from '../../src/net/instanceRoom.js';   // INSTANCES: an instance's room, its door and the hub's party answer
 import { isStaff } from '../../src/net/staffCommands.js';
+import { plainPathAnswer, objectDoorAnswer } from './door-routes.ts';   // the relay's facts and door, and the doors between objects
 import { preTokenGate, placeGate } from './helloGate.js';   // a room's hello gate: before the token, or (battles, floors, realms, instances, cells, worlds) after it
 import { sdCopyRight, sdNewcomerWord, sdAcctTell, sdAcctInternal, SD_INTERNAL_ACCT, sdSeatsInternal, SD_INTERNAL_SEATS, sdOpenRoute, SD_OPEN_PATH } from './sdCopy.js';   // SD-PARTY: a party's own Hour - its door, one life and one win a Hollow
-import { relayFactsAnswer, relayProfileHash, RELAY_FACT_PATHS } from './relayFacts.ts';   // /health, /profile and the profile's hash
+import { relayProfileHash } from './relayFacts.ts';   // /health, /profile and the profile's hash
 import { helloDoorRefused, GROUND_OLD_WORDS } from './helloDoor.ts';
 import { frameAllies, healthBoundRecord, ridesWithoutGrant } from './frame-allies.ts';   // the frame's ally lists, as the record strip reads them
 import { RELAY_CFG_TTL_MS, RELAY_INTERNAL_CFG, mayRelayCfg, relayCfgValue } from '../../src/net/relayCfg.js';   // SCALE5b: the relay's settings, at run time
@@ -534,7 +535,7 @@ async function lawKeyOf(env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (RELAY_FACT_PATHS.includes(url.pathname)) return relayFactsAnswer(url.pathname, env);
+    const plain = plainPathAnswer(url, env); if (plain) return plain;   // /health, /profile and the door
     if (url.pathname === SD_OPEN_PATH) return sdOpenRoute(request, env, url, await lawKeyOf(env));   // SD-SOLO: which shared Hour a player in no party goes to
     if (url.pathname === SAFE_LAW_PATH) return lawDoor(request, env);   // SAFE4: a mute or ban the account service pushed, for the hub
     const key = roomOf(url.pathname);
@@ -892,10 +893,9 @@ export class Room {
   }
 
   async fetch(request) {
-    // HCC-PARK: the two doors between objects - the owner's registry and a cell's drop. The public worker forwards
-    // /room/<key> alone (the default export above), so no socket and no browser ever reaches these paths.
+    // The doors between objects: the Worker forwards /room/<key> alone from outside, so no page reaches these paths.
     const path = new URL(request.url).pathname;
-    const cells = await cellDoors(this, path, request); if (cells) return cells;   // COST-2 (cellMoves.js): the cell tree's doors (the directory's tree, a node's take, the counts, a move's stages, the seed's pull) - and a node a move closed answers a socket or a call naming a cell "moved"
+    const cells = await objectDoorAnswer(this, path, request); if (cells) return cells;   // COST-2 (cellMoves.js): the cell tree's doors (the directory's tree, a node's take, the counts, a move's stages, the seed's pull) - and a node a move closed answers a socket or a call naming a cell "moved"
     if (path === PARK_INTERNAL_REG || path === PARK_INTERNAL_DROP) return this._parkInternal(path, request);
     if (path === GATE_INTERNAL_FELL) return this._gateFellInternal(request);   // WB3: a gate's kill, said to the hub
     if (path === GATE_INTERNAL_SEAT) return this._gateSeatInternal(request);   // GATE-COURTS: a court asking the first court's book a newcomer's seat
