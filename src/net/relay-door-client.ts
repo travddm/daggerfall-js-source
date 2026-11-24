@@ -146,7 +146,7 @@ export class RelayDoorClient {
   /** The player's line while the session waits at the door, else the reconnecting line. */
   statusLine(label: string): string {
     if (this.position !== null)
-      return t('net.online.inLine', '{label}: rejoining, number {place} in line', { label, place: this.position });
+      return t('net.online.inLine', '{label}: number {place} in line to join', { label, place: this.position });
     return t('net.online.reconnecting', '{label}: reconnecting', { label });
   }
 
